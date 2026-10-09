@@ -6,9 +6,14 @@ CORRECTION. ALL FOUR COMMITS HAVE DISPOSITIONS; TWO TEST GUARDS ARE CORRECTED.
 TPR-CR21-002 HAS A COMMITTED-SOURCE SUCCESSOR DRIVER WITH SOURCE/BUILD BINDING;
 THE PARTIAL HISTORICAL DRIVER LIMITATION REMAINS EXPLICIT. TPR-CR21-003'S
 ADDITIONAL OWNER GATE IS A FALSE ALARM: SCOPED PRIVATE UPLOAD/PROCESSING WAS
-ALREADY AUTHORIZED, NOT PROVIDER-ATTESTED. CODEX CONTINUES THE FROZEN MATCHED
-STUDY IN SECTION 71. CLAUDE NEXT REVIEWS THIS CODEX ROUND INDEPENDENTLY AT ITS
-ONE FINAL PUSHED SNAPSHOT. SECTION 69 REMAINS ATTRIBUTED HISTORY.
+ALREADY AUTHORIZED, NOT PROVIDER-ATTESTED. THE FROZEN MATCHED STUDY IS BLOCKED
+ON THE EXTERNAL MIA COMPUTER-CONTROL INTERFACE IN SECTION 71.10. ALL THREE
+CODEX ON-BASE ATTEMPTS ARE CONSUMED; THE COMPLETED THIRD RUN REMAINS A
+DELISTING DIAGNOSTIC. NO MIA RECOVERY JOB OR LOOK IS RESERVED OR LAUNCHED;
+TWELVE OBSERVED RUNS AND THE OTHER FIVE UNLAUNCHED MATCHED ARMS REMAIN EXPLICIT.
+CLAUDE NEXT REVIEWS THIS CODEX ROUND INDEPENDENTLY AT ITS ONE FINAL PUSHED
+SNAPSHOT. RESTORED CONTROL AND REVIEWED COMPLETE OBSERVERS ARE REQUIRED
+BEFORE RECOVERY; NO FOURTH CODEX ATTEMPT. SECTION 69 REMAINS ATTRIBUTED HISTORY.
 TPR-CR20-001 IS CLOSED BY SUCCESSOR QUALIFICATION:
 THE OWNER'S EXACT PHYSICAL-ROOT PIN REMAINS REQUIRED, AND FUTURE PORTABILITY
 IS NOT A CURRENT BUILD GATE. SECTION 68 RECORDS ALL SIX OWNER-NAMED UNIVERSES:
@@ -511,12 +516,18 @@ outcome-free source audit; no real-row D1, outcomes or QuantConnect access is
 authorized by that audit.
 The trust rollback pin, protected parent custody, reviewer identity and
 adversarial matrix remain unresolved and parked. **Exact next role action:**
-Codex continues the prospectively frozen standalone matched study in section71,
-under the owner's latest six-universe QC instruction in section 67 and the
-continuous-build decisions in sections 58/59/60, without an intermediate review
-stop or push. Claude next reviews this Codex round independently at its one
-final pushed snapshot. Existing private-upload authority is not an attestation
-of vendor rights; no known access restriction may be bypassed.
+Codex publishes the stable blocked counter-review/build snapshot once, as
+section71.10 records. Claude next reviews this Codex round independently
+at its one final pushed snapshot, including the complete round. The
+continuous round reached a genuine external
+computer-control blocker, not a routine intermediate checkpoint. Further
+recovery requires restored authenticated controllable Mia in project37547067,
+fresh scope/source checks for the new HEAD and any expired receipt, complete
+observer source/diff/focused proof, and one separately reserved Mia recovery
+job. The three Codex slots cannot be reset or extended. Existing private-upload
+authority is not an attestation of vendor rights; no known access restriction
+may be bypassed. The owner's latest six-universe QC instruction in section 67
+persists, but the remaining five matched arms have not run.
 Section 68 records five verified order-based QC runs and one zero-trade REMX diagnostic.
 The latter is a genuine frozen-input/signal limitation, not successful trading
 execution or a reason to manufacture orders. The full six-case order-based
@@ -618,7 +629,8 @@ and are deliberately not listed here.
 | `TPR-CCR10-012` | P1 | Any positive signed-registry authority | A previously valid signed positive registry can be replayed while its key remains trusted. An external exact current-anchor pin or equivalent monotonic state needs owner approval and implementation. |
 | `TPR-CCR10-013` | P1 | Any positive signed-registry authority | Validating only the trust directory and files does not prevent replacement through a writable parent with `FILE_DELETE_CHILD`. The exact protected custody boundary for `C:\ProgramData\CustomizedAgent` needs owner approval and implementation. |
 | `TPR-CCR10-016` | P2 | TPR-TR0-I completion | Rotation, compromised-key removal, rollback, strict review-to-anchor ancestry, layer-specific byte mismatch, and full local Git/OpenSSH integration evidence are not yet complete. |
-| `TPR-MATCHED-002` | P2 | Matched-study execution acceptance | Attempt3 has four unclassified delisting events; no retained per-event held/target/window evidence. Mia recovery needs an unlocked authenticated interface and a separately bounded, source-reviewed diagnostic run. Three Codex slots are consumed; no fourth launch or inferred-unheld acceptance. See71.6. |
+| `TPR-MATCHED-002` | P2 | Matched-study execution acceptance | Attempt3 has four unclassified delisting events; held/target/history/window observations are absent. Mia's complete source-only specification was submitted, but last source readback is initialization-only and computer control timed out. No recovery job/claim exists; three Codex slots are consumed. No fourth launch or inferred-ambient acceptance. See71.6/71.9/71.10. |
+| `TPR-MATCHED-006` | P2 | Observer approval before Mia recovery launch | Retained unexecuted proposals contained native Order/ticket, open-only history, enum, exception, partial-fill and clock defects. Corrected complete observers have been requested, not verified/applied/tested. Last readback contains only additive initialization; restored control, actual complete source review and focused proof are required before any recovery job. See71.9/71.10. |
 
 No open finding is P0. The two P1 findings are inert while the registry is empty,
 but both block any positive registry entry. Read-only checks on this Windows
@@ -634,8 +646,8 @@ Section70 qualifies the two historical development findings from section69:
 `TPR-CR21-002` is prospectively corrected with the old full-driver replay
 limitation retained; `TPR-CR21-003` is a false alarm as an extra owner gate.
 Neither changes a historical observed result or closes a canonical gate.
-The six canonical findings are distinct from the additional development-only
-delisting-observability finding `TPR-MATCHED-002`; neither category is closed
+The six canonical findings are distinct from development-only
+`TPR-MATCHED-002` and `TPR-MATCHED-006`; neither category is closed
 by successful compilation, a Completed. status or the rights-paperwork waiver.
 ### Historical progression (not the current resume instruction)
 
@@ -11956,10 +11968,11 @@ Recovery source/ID/look receipts must be freshly verified before resumption.
 | ID | Priority | Status | Commit/location | Evidence and reason | Correction / verification |
 |---|---|---|---|---|---|
 | `TPR-MATCHED-001` | P2 | **Closed by correction** | 017cb010 retained audit; matched_audit.py terminal parser | Actual Completed./true/progress1/error=null is rejected by exact string spelling, falsely reporting unsuccessful completion. It must not conceal genuine engine/order/data errors. | Identified pure matched_audit_v3 successor runs v2 on ORIGINAL evidence objects/hashes, admits only exact Completed. with every original completion guard, and preserves all non-status diagnostics. Six pre-correction red fixtures;52newchecks green/.71s;129audituniongreen/1.34s;8in-memorymutants19red with38original/restoredgreen controls. Root audit/import reprise159passed/1skip/1.41s. |
-| `TPR-MATCHED-002` | P2 | **Open** | matched_algorithm_v3.py on_data/on_end and retained attempt3 | Four raw delisting counts lack type/clock/current-or-ever-held/target/open-order/ticket observations. Zero ledger residual and only MOO fills do not prove ambient events. Meaningful execution acceptance is therefore withheld. | Mia read-only diagnosis independently confirms gap. Additive scoped recovery proposed, but Mac lock prevents submission. No gate suppression, fourth Codex attempt or original-result rewrite. |
-| `TPR-MATCHED-003` | P3 | **Closed by qualification; procedural deviation retained** | QC IDE opening | Two unsolicited UI builds c2e8db-51e7dc/05e081-51e7dc occurred without compile-button action or source edits/backtests. They were not reservation-controlled. | All4 candidate source hashes independently remain exact. Keep these extra IDE builds visible, not allowed fourth candidate attempts/refunds/source-bound proof. Mia mode Ask Before Edits; automatic import proposal declined. |
+| `TPR-MATCHED-002` | P2 | **Open** | matched_algorithm_v3.py on_data/on_end and retained attempt3 | Four raw delisting counts lack type/clock/current-or-ever-held/target/open-order/ticket observations. Zero ledger residual and only MOO fills do not prove ambient events. Meaningful execution acceptance is therefore withheld. | Earlier Mac lock is superseded: Mia source-only requests were submitted and initializers applied. The complete corrected observer remains unverified; accessibility and screenshot controls timed out. No recovery job/look claim, gate suppression, fourth Codex attempt or original-result rewrite. See71.10. |
+| `TPR-MATCHED-003` | P3 | **Closed by qualification; procedural deviation retained** | QC IDE opening | Two unsolicited UI builds c2e8db-51e7dc/05e081-51e7dc occurred without compile-button action or source edits/backtests. They were not reservation-controlled. | Historical readbacks after those first two builds reproduced all4 exact source hashes. Later source-only Mia initialization and nine separately observed IDE builds are qualified in71.9/10; current main is not byte-identical to executed v3. No fourth candidate attempt/refund/source-bound proof. Mia mode Ask Before Edits; automatic import proposal declined. |
 | `TPR-MATCHED-004` | P3 | **Closed by exact format-equivalence proof** | Own research.ipynb source binding | Old controller correctly refused changed bytes; treating that as an unexplained content change would block recovery. | Current notebook JSON reserialization exactly reproduces old212a51 hash; currentaf2720 and both receipt identities retained. New scoped custody preserves current bytes without overwriting old receipt or notebook. No arbitrary guard relaxation. |
 | `TPR-MATCHED-005` | P2 | **Closed by correction before execution** | New mia_recovery.py poll/collect | Peer synthetic proof showed Loading/missing-backtest and conflicting job/compile result responses were refused before raw-wire retention. The request hash alone did not preserve the response. | Retain exclusive result-wire receipt immediately after the read and before identity parsing in both paths; six regression cases red before correction,71focused green/1.12s. Refusals and no implicit retry remain. Root collector/base/v2/v3 union200passed/2.10s. No actual recovery job ran under the defective draft. |
+| `TPR-MATCHED-006` | P2 | **Open** | Mia unexecuted helper proposals in scoped conversations | Native Order/ticket confusion, open-only inference, suffix enum matching and escaping query errors are retained proposal defects, not executed observer behavior. OWN84 additionally rejects Filled-status-only history; OWN86 requires naive-clock provenance. | Primary sources and focused synthetic predicate proof support the corrections. OWN82–86 complete specification was submitted; only initializers are source-verified. Actual complete diff and focused proof remain unavailable under the control blocker. No defective helper, source acceptance or recovery job is accepted. See71.9/71.10. |
 
 Auditorv3 SHA256
 b418be2fdd41479088b3f775b83548923c0e1aa67df309dbdb47c7956d7bde71;
@@ -12022,3 +12035,452 @@ defect. Its initial conjecture of a fixed-config/synthetic-fixture mismatch
 was a false alarm: the exact canonical minimal policy hashes to the actual
 frozen53f1c149 value; no code was weakened. All four new file hashes above
 are independently reproduced. No complete lane/repository suite is run.
+
+The new-source/recovery record commit is
+f10a3e3f07287969e72c09d51a340ff2b0f2cf25, locally committed only. Fresh UI
+scope003 correctly refused its pre-edit read because its requested maximum
+request index50 was below the existing global request census; this refusal
+preceded credentials/network. That spent manifest/access/read claim remains
+intact. Fresh scope004 restores the existing bounded maximum1000, without
+resetting the global sequence or any candidate attempt/look count; no old
+receipt is extended. Scope004 created2026-10-09T20:13:11.494466Z and
+expires2026-10-10T20:13:11.494466Z; manifest SHA256
+79002eef23998cf121337ad469780909ef21a3028715dd4bc85b2d747bd12759,
+operations manifest5deaecaec46cab84fdb9bb6883d178599a00b1a972c524bb1123ae7e9aeff771.
+Pre-edit five-file capture2e8029fde8314e502768d0c7e128c721658c5f000ddd054365ab007747c8689e
+reproduces all four operation003 candidate-source hashes and the exact current
+notebook hash. No provider/D0/original packet read or upload occurred.
+
+Native UI input deviations remain visible: one stale AX field identifier
+refused before paste; another AX text click did not focus the message box,
+and the frozen helper editor refused the attempted prompt paste
+as read-only. No source edit is inferred from that failed input. A screenshot-
+grounded coordinate then focused the actual text-entry area; focus was verified
+before paste. The exact scope004 prompt is now visible in the own-project Mia
+conversation and Mia reports Running. No other browser/account interaction
+or compile/backtest approval was sent. The asynchronously requested owner
+tab-control action is now unnecessary, and the owner was notified accordingly.
+Actual observer source comparison and recovery launch evidence must follow;
+no Mia recovery look is reserved or observed yet. Twelve observed runs remain.
+
+Read-only source progress capture under scope004,
+64fbe19cfee370042141d39574d3786988653976d545f31e79eba37f2a1453ad,
+still shows the original exact four sources and notebook, including
+main9777e0f69fb86b5efd06aca54a0c3d7c703ff9aed19858060c44d244b156450f.
+Thus the failed helper-editor input did not alter any candidate source.
+Mia's current Running UI is progress, not an implemented observer, a build
+or a recovery job. No new development look is counted for source reads.
+Peer source review also distinguishes before/after parent-handler snapshots
+from pre/post native engine liquidation and requires monotone ever-filled
+history plus native tickets, rather than inferring custody from net ledger
+quantity or the strategy's own manual MOO ticket list. Missing observations
+cannot qualify as ambient. Final observer source review must verify these
+requirements before any recovery launch.
+
+### 71.9 Pre-execution review of Mia's observer proposal
+
+The first Allow card was reviewed before approval: only initialization of
+an empty ever-filled set and zero aggregate counters in main.py. It applied;
+source capture662864662a4ef77b96f4cba34f3f130cd07d2ee7668dbc75225bcb6d14782df5
+shows main3840d1c458aaef3373871a609ab2f2878c7410a02091857d2f0fe1ccbbbb869a,
+with all three helper/config files and current notebook exactly unchanged.
+No other observer hook/helper/summary field is yet implemented. Mia's task
+UI reports Completed after that edit approval, not a completed backtest.
+IDE reports two further automatic builds287f47-e6be88/751ea9-e6be88,
+without an explicit compile-button/Mia compile request or job. Four automatic
+IDE builds are now separately retained; none refunds candidate attempt slots.
+
+`TPR-OWN-82`: before any remaining observer edit or recovery job, reject
+Mia's unsafe helper proposal and request source-backed corrections by Mia.
+[Official SecurityTransactionManager source](https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Securities/SecurityTransactionManager.cs)
+and its [Python API](https://www.lean.io/docs/v2/lean-engine/class-reference/py/QuantConnect/Securities/SecurityTransactionManager/)
+distinguish native Orders returned by get_open_orders/get_orders from
+OrderTickets. [Delisting API](https://www.lean.io/docs/v2/lean-engine/class-reference/py/QuantConnect/Data/Market/Delisting/)
+exposes the actual native ticket. Use exact enums, actual ticket and complete
+native recorded-order history, not loose strings or open-only inference.
+Add separate aggregate ever-ordered/history-unknown observations; historical
+orders conservatively disqualify ambient classification. Observe both the
+known NY algorithm receipt clock and native event clock; either inside the
+inclusive09:20–09:35 window disqualifies ambient, and an unknown clock remains
+unknown. Every observation query failure must become an unknown diagnostic
+without preventing the existing parent/trading handler; do not catch or
+alter original-handler failures. Before/after are parent-handler snapshots,
+not claimed pre/post engine liquidation. No economic/order behavior changes.
+These are prospective safety refinements before a recovery outcome, not
+performance tuning. Alternatives of accepting the planned mismatch or
+using query exceptions to change execution are rejected. Provenance: direct
+owner continuation, scoped recovery, independently verified primary sources
+and peer review. Agent-delegated, final independent Claude review pending.
+
+One draft record patch failed atomically on an unused context hunk before any
+file edit; the corrected patch retains this proposal finding. No empirical
+look, compile or launch is consumed by the documentary repair. Twelve observed
+runs, three consumed Codex slots and zero Mia recovery jobs still stand.
+
+OWN82's scoped follow-up was preclaimed at
+7bbd4d45b1db027fc003069bdbcdebe6be56f2c012a258009b310862e7799828,
+prompt829031cc60496f5d8a534be3e1970c182652c1716cddd55a593085ede13c4b41,
+and transmitted in the confirmed Mia text-entry area. The old pending
+on_data patch adds only pre-/post-parent observation calls and preserves
+original handling; its approval was separately preclaimed/evaluated, but
+the service returned404: Agent is currently running. This is a failed UI
+approval, not an applied hook, compile failure, backtest or additional look.
+Failure receipt00c10b16a76dc4a32d32038f06aa64b1136b508c5bbc632b0d8411e08f4e9f98;
+source capture06ca74a6c0f6e2f1a4b8424c579bd5084a57483cf972b8c1392822387c18fe59
+confirms main3840d1c4 still contains only initialization, with no observer
+hook/helper and unchanged other files. Mia's new continuation is Running;
+root will inspect a fresh proposal rather than reuse an old approval or
+silently retry. No execution approval or recovery look reservation exists.
+Latest document/register check187passed/3.27s, isolated runtime-root runner;
+full suite remains excluded. New modules compile and private receipts remain
+Git-ignored. Only the lane record is currently dirty.
+
+The completed continuation presents corrected additive patches for main only,
+not a completed observer or job. One own-project frontend reload recovered
+the missing approval interface; the unsolicited import-insertion modal was
+explicitly cancelled. IDE initialization added automatic buildd8212f-e6be88,
+bringing separately observed IDE builds to five. No explicit compilation or
+backtest was authorized. The mode still shows Ask Before Edits.
+
+`TPR-OWN-83`: permit only reversible application of Mia's OWN82-corrected
+main.py observer proposal, with no source acceptance or compile/job approval.
+Actual five-file source retrieval, complete diff and focused independent
+proof are required before execution. Drop the non-contract unknown_total
+proposal and count observation_unknown at most once per event. Preserve
+typed enums, actual ticket/full native history, dual-clock conservatism and
+observer-only unknown-safe catches; original economic/handler/gate behavior
+stays frozen. This is within the already authorized Mia source correction,
+not Codex editing/relaunching the three-attempt candidate. Alternative of
+accepting a UI summary or executing partial/unreviewed code is rejected.
+Provenance: owner continuation, recovery scope004, verified sources/peer
+review and the completed proposal. Agent-delegated; independent review pending.
+No recovery look is claimed by this source-edit approval.
+
+OWN83 source-edit-only permission was transmitted to the visually confirmed
+Mia message field, and its exact message appeared with queue/running status.
+Claim15eba4a581e4ddf2fc3d58807619d459f3473df72b2ed01dd0c37b74607bdeaa;
+prompt9a294493575bac77a3c658d92cda19ff1385522468a779d7b6aca6bfd5ddd631;
+submission5d34c898bb5b79f4a90c35f9fe13d6ee2e6c52f562a6604df4a56df4fd66ee1c.
+No compile or job approval is included. AX omits the embedded message field;
+screen-grounded focus/paste and visible message confirmation establish this
+UI step. The own-project editor now reports edit permission after the prior
+reload, but Codex did not write into it or change collaboration permissions.
+A sixth automatic IDE buildc55ebd-e6be88 was observed, with no explicit build
+or launch action. It is retained under the same unreserved-IDE-build limitation,
+not a fourth Codex launch, usable recovery run or source-bound acceptance.
+
+One private submission-receipt command failed before writing because a helper
+name was absent; the correct existing exclusive receipt writer then retained
+the UI evidence above. No credential/network action, source edit, compile or
+empirical look occurred in this local receipt correction. Twelve observed runs,
+three consumed Codex slots and zero Mia recovery jobs remain the current count.
+
+The new hook-card approval was separately preclaimedc43ee386fb7e2128e142aca0168355015962f641579e030eef7666e120b1d2d1
+and clicked, but source retrieval still proves no hook/helper application:
+capture0005dcb7e4ea3b7229b09abdb8f6634e9d9c5d4cbac262ae18418ccd3b2d8212df43,
+capture0006d20796d9ed4265f78c24f5f23630eafb537dcf4c17f68984bac7926512022818,
+main3840d1c458aaef3373871a609ab2f2878c7410a02091857d2f0fe1ccbbbb869a,
+37558bytes. All other sources and notebook remain exact. The Allow row
+disappeared, but no success or error was visible; root does not infer an edit.
+Widening the chat and inspecting both outer/inner preview did not resolve
+the absent controls. One additional same-project frontend reload preserved
+the proposal; import insertion was again cancelled. Automatic IDE build
+b2ec81-e6be88 is the seventh separately observed unreserved initialization,
+not an explicit compile, backtest look or refunded Codex attempt.
+
+A bounded Mia follow-up requests its actual tool failure and a fresh additive
+source patch if supported, rather than assuming the failed approval applied.
+Claim4f80e02709f1bb2830d07d3c87d9b9330dd551e4a7c8a5288068a500eb2479e8,
+prompta97314b555e48ccda65945bfb6523d2c7db82129d568c2cfd4b1b538bfca7ff0.
+The exact follow-up appeared and task changed to Running. This remains OWN83
+source-edit-only scope; no execution approval, look reservation or new outcome.
+
+Mia attributes the earlier no-op to an absent edit-tool invocation, not a
+platform refusal. This explanation is attributed, not independently attested.
+Four fresh cards were then source-edit-only approved under OWN83, with claims
+bac6f058b26a62173b36310c1e0470f9c5a1a988a2a1653edd9b914e2af94c9c,
+149c4d4d0619e6da9277c0a7f04a6ee63205dc6ba85f822ecb3cdadba7fb203d,
+2e95690f0ca3d3d4fe0d8726990bdc38c62300be523b4712cb77278c92168e8b,
+and9d0b3a18169ad05b8de8bfb1416583049e7afb48a0f18d7feee4ce8f48e5a2b7.
+No source acceptance or execution permission was granted. Actual readbacks
+683a48514bde611daeedd051ebc02afbfcbc209c4e38b34765f47b06a1ba387e and
+b073f9e389ea18732d2dcea28e574539839b28e41bf523af8641203ae1f90f90
+still show the same37558-byte initialization-only main3840d1c4; the other
+four files remain exact. Disappearing Allow controls do not prove application.
+
+`TPR-OWN-84`: reject the displayed helper's Filled-status-only ever-filled
+tracking before execution. The immutable core accounts every nonzero
+fill_quantity regardless of terminal status; a focused invented-event predicate
+proof shows the proposed status check misses a nonzero partial fill and can
+mark a zero-quantity Filled event. The corrected nonzero-quantity predicate
+distinguishes both controls. This is synthetic proposal evidence, not a new
+cloud outcome or a tested/applied observer. Preserve the unchanged parent
+handler and a monotone unknown-history flag on observation failure; later
+delisting events count that unknown at most once each. Do not increment a
+delisting occurrence counter for an unrelated order event. Scope is additive
+Mia telemetry only, not trading/candidate economics. Alternative of terminal
+status inference is rejected. Provenance: OWN82/83, visible proposal, immutable
+core and synthetic boundary proof; agent-delegated, Claude review pending.
+TPR-MATCHED-006 remains open until actual corrected source is independently
+verified; the proposed helper was never executed or accepted.
+
+A fresh bounded follow-up asks Mia to inspect actual edit responses, resume
+approved edits if necessary, verify its source and apply OWN84; otherwise
+report the exact external tool failure/owner recovery instead of another
+nonexecuted preview. Claim9f6686f1ccb198d91c636c78c1733fe835b54668b475d3798cdc1e1f9e0ebf02,
+prompt05648bf2f07f50ca31ef432f64c1b52a8e9d3ebb0d97aeca1531849d742ee9a3.
+The exact message appeared and task is Running. No compile/job, look or cap
+reset. Two guessed source-path searches failed harmlessly before the actual
+cloud_algorithm_v2.py core handler was read; no file or empirical state changed.
+
+The repeated Mia continuation again attributes all previous no-ops to absent
+real edit calls and presents a corrected nonzero-fill/monotone-unknown proposal.
+This is still attributed, unexecuted proposal evidence. A third fresh hook
+approval claimfdc28137483f9f7e72ec36bdd53f7def4d5fc5fd3f9e0909247077b60484738c
+again removed its UI controls, but delayed capture0009
+866acd664ab26177228c410cb82aa65f2594f7c4509ecc4a8fb737fd53a34c3e
+still proves initialization-only main3840d1c4 with all other files exact.
+Root does not continue inferring success from this repeated chat state.
+
+`TPR-OWN-85`: recover the stuck edit chain using a fresh Mia conversation in
+the SAME existing private project, preserving the prior chat/proposals/source
+and all candidate/attempt identities. First request only the required one-line
+fill-history-unknown initializer. This tests the actual edit path without
+trading/economic effects, compilation permission, a new candidate or another
+look. Explicit edit approval is restored before submission because fresh Mia
+chats default to Full Auto Mode; no broad automatic mode was used. Alternative
+of repeating the long stale conversation, editing/relaunching Codex attempt4
+or assuming previews applied is rejected. Provenance: authorized recovery,
+actual unchanged readbacks and UI state. Agent-delegated, Claude review pending.
+Fresh chat claimc73ce2d4dc5d70d59195092e2cfcf6182db57e107991b970f2609a78b7ea1d32;
+prompt9d074252e780096b0672dbbf3e83dc1517c6e1300acaa445c9f2341ee7286fc0.
+The new task is Add fill history unknown flag to mainpy. Its exact one-line
+source-only approval was preclaimed33c810e9f9d14d1105178b47ac66acd0737a62fd0096c9e155e80c9eb1891a57
+and invoked through its fresh native accessibility button. The task changed
+to Running, unlike the earlier nonexecuted previews. Actual source verification
+is still required; no explicit compile/job or recovery look was authorized.
+
+Fresh Mia edit succeeded: actual capture0010
+ba6421287d6b9d00989e874d5a4ff05c160cc38e2b41311d6b637ea95a2c074a
+proves main29136e5bc085a4d1b56edea62f466aead01788c3e1836bc9aba2b42863aaa7c2,
+37601bytes, differs from the prior capture by exactly the requested initializer
+line. Other three sources and notebook are unchanged. The edit's native UI
+result has a success check, and task completed without a backtest. It produced
+implicit syntax buildse8589f-410244 and794427-410244, bringing separately
+observed automatic/implicit builds to nine. These are not explicit Codex/Mia
+backtest launches or source-bound recovery-run acceptance.
+
+`TPR-OWN-86`: require explicit native clock provenance for naive delisting
+timestamps, in addition to the already frozen dual-clock/window rules. The
+[official SubscriptionDataConfig source](https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Data/SubscriptionDataConfig.cs)
+defines ExchangeTimeZone as BaseData's output timezone; retain matching native
+subscription/security clock context additively before removal where necessary.
+Aware clocks may be explicitly converted, but absent/conflicting naive-clock
+context stays unknown. Preserve original custody behavior and log no identities
+or per-event clocks. This is observational safety refinement, not economic
+timing/date tuning. Alternative of assuming naive event.time is NY is rejected.
+Provenance: OWN82 and primary source; source master is not cloud18176 attestation.
+Agent-delegated; final Claude review pending.
+
+A bounded full observer specification was preclaimed22d13f9e1a77e9235b57913ef184936de53d26423d6c4f5f6fb405c4c6ad43c3,
+prompt3bdfe4d9979ad05ea74c61f59b91811e742a7df4fa56f23fa1623ca07440cb18,
+then submitted in the working fresh chat. Its scope preserves all original
+handlers/gates/economics and source-only approval, with actual diff/tests before
+any recovery job. An AX setValue did not populate the field and sent nothing;
+confirmed focus/paste and the fresh Send control then produced queue/running
+state. No editor write, explicit compile, backtest look or cap reset occurred.
+
+### 71.10 Stable blocked handoff after the final Codex slot
+
+The owner's latest direct **"ok, proceed"** continued the same authorized
+round. Codex completed the reserved third ON-BASE attempt, independently
+retained its terminal/order/accounting evidence, stopped Codex retries, and
+used authenticated Mia directly in the existing private project. The round
+now ends on a factual external computer-control blocker, not a routine review
+stop, canonical-paperwork gate, performance-based date change or cap reset.
+No new data operation, upload, outcome, candidate, economic change, fourth
+Codex launch or Mia recovery job occurred during the final source-only work.
+
+Root/branch invariants remain the owner's exact
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__target_price_revisions`
+and `codex/strategy-target-price-revisions`. The actual matching remote was
+reverified as `32016848bc9ce4dfab3f52ddb5bb34e105e445dc` before this handoff;
+local pre-handoff HEAD is `f10a3e3f07287969e72c09d51a340ff2b0f2cf25`, with
+only this record dirty. No alternate checkout, scratch validation, branch
+switch, history rewrite, concurrent-work overwrite or intermediate push was
+used. Section70's exact independent counter-review range remains
+`505f7a3da265214cc3c0b7e6c2238cbd1c9c1d78..32016848bc9ce4dfab3f52ddb5bb34e105e445dc`:
+all four incoming Claude commits separately and cumulatively are accepted
+after correction, with confirmed, partly correct, false-alarm, corrected and
+open findings retained. This does not accept the later empirical diagnostic.
+
+The outgoing round starts at that exact remote base and includes
+`3dbcceafd78536708f7f18013f1381d8ebd64f64`,
+`db5c9017b219deffb22c5f0d8005bffe1101dd88`,
+`017cb0108094bd42ecdeed9f9d9980ef7a39652f`,
+`f10a3e3f07287969e72c09d51a340ff2b0f2cf25` and the record-only handoff
+commit containing this section. Claude's next role is independent review of
+EVERY outgoing commit and the cumulative exact final pushed tree,
+`32016848bc9ce4dfab3f52ddb5bb34e105e445dc..HEAD` at publication. None of
+these Codex decisions or new implementations is separately Claude-approved.
+The exact final commit is reported in the owner chat after the single push.
+
+**Execution and study accounting.** Section71.6's ON-BASE attempt3 has project
+`37547067`, compile
+`7ba4a1f3f9297586603909059207ff11-51e7dc8f1bc1feb130eaccfdc3f0d06b`
+and backtest `a0f26651b7bcc0a5b8fc52a9d0be27eb`. It is genuinely terminal
+Completed./true/progress1/error=null with 292 unique Filled MOO orders,
+2379 shares, USD23.79 fees and USD294990.591522 gross filled notional,
+14 decisions and 60 daily valuations. Cash and position ledger residuals,
+order failures, underfills and reported risk breaches are zero. These are
+usable execution observations, not automatic strategy acceptance: four
+unclassified delisting events preserve meaningful_execution=false under
+the pure auditv3 successor. No ambient/unheld inference is accepted and no
+historical result is relabeled by the proposed observer.
+
+End NAV is USD95859.721872, return -4.140278128%, daily-close drawdown
+10.8394789089%; QC's 11.100% headline drawdown has an unreconciled sampling
+difference. Annualized CAGR -16.096582795% uses 88 calendar days and is a
+partial-Q1 exploratory statistic, not a forecast or meaningful full-year
+annual result. Annualized daily volatility is 14.798712079%, Sharpe -1.12658027557
+with risk-free zero, and gross turnover/initial NAV is 2.94990591522.
+End cash is USD35346.441872 and end gross exposure 0.6312690963. Detailed
+cash/exposure extrema, order reconciliation, source/packet/config hashes,
+membership sequence hashes and the unchanged failed attempts remain in71.6.
+The two prior RuntimeError runs with zero orders are not erased. All three
+Codex ON-BASE slots are consumed; no fourth attempt or incidental rename is
+permitted. Seven historical cloud looks plus two historical local looks,
+then these three cloud attempts, total **twelve observed runs**. Counter-review,
+source reads, synthetic checks and IDE syntax builds add no empirical look.
+
+The six frozen sleeve definitions remain unchanged and appear together in
+the ON-BASE run; this is NOT six independently observed portfolio returns:
+
+| Sleeve | Frozen universe interpretation | Attempt3 observations / limits |
+|---|---|---|
+| SPY | Historical lagged QC SPY holdings; S&P500 proxy, not broader large-cap | 502–503 members;10 selected at each of14 decisions. |
+| XLV | Historical lagged S&P healthcare holdings | 61 members;10 selected at each of14 decisions. |
+| XLE | Historical lagged S&P energy holdings | 22 members;4–7 selected, mean5.3571;positive targets at all14 decisions. |
+| QQQ | Historical lagged Nasdaq100 holdings, NOT all Nasdaq-listed stocks | 100–101 members;10 selected at each of14 decisions. |
+| SOXX | Historical lagged semiconductor/equipment holdings | 30 members;2–6 selected, mean4.2143;positive targets at all14 decisions. |
+| REMX | QC US-covered subset of global rare-earth/strategic-metals holdings | 8–9 callback members;zero selected at all14 decisions. Sole scored eligible member is nonpositive; incomplete global coverage is not a complete ETF universe. |
+
+TPR-enabled arm trades constituent stocks with consolidated overlap; it is
+not ETF-only. The neutral OFF arm removes every TPR influence; the separate
+ETF-basket arm trades six actual ETFs. No independent sleeve P&L is invented
+from the overlapping consolidated account. **OFF-BASE, ETF-BASE, ON-ADVERSE,
+OFF-ADVERSE and ETF-ADVERSE each have zero attempts and no project/compile/
+backtest IDs.** The six frozen comparison jobs are therefore NOT complete.
+There is no matched outperformance or standalone canonical ETF-strategy
+readiness claim. AR stays entirely disabled; no AR dates, exclusions, timing,
+fallback or tuning settings have been silently adopted. The freeze SHA256
+`a0645dce96d1153de4a6709b4d39c1d8cc0c583950a76421220e00539a9521d0`
+and all executed v1/v2/v3 modules, signal inputs and historical artifacts
+remain immutable. Current-vintage source/identity availability, callback
+coverage, adaptive/correlated-study limits and the sealed holdout stay explicit.
+
+**Mia and external failure.** The full source-only OWN82–86 request was
+actually submitted in the fresh same-project Mia conversation, in Ask Before
+Edits mode, and last observed Running. A UI-state call returned after
+212.7137s despite its requested short timeout. A later accessibility/UI-state
+call failed after120.0496s and a screenshot-only call failed after120.1111s,
+both with "Sky Computer Use request timed out". Root requested short calls,
+not blocking two-minute sleeps; the backend overran their requested limits.
+Earlier safe alternatives included recovering the same project twice,
+cancelling unsolicited import proposals, starting a fresh bounded Mia chat,
+restoring explicit approvals and proving its one-line edit really applied.
+Both current control surfaces are now unavailable. No hidden Mia API, cookie
+transfer, security bypass, unrelated project or fourth Codex job was used.
+The pending source-only task could not be cancelled through the unavailable
+UI. No complete patch, source acceptance or compile/backtest authorization
+was transmitted; remaining proposed edits require explicit approval.
+
+Independent source readback0011 during the outage is retained at SHA256
+`0e21c9be76e589a9679f95263e3e6b220f85e95b96b1dfd99c0dc586011f1877`.
+Its last verified main.py is37601bytes,
+`29136e5bc085a4d1b56edea62f466aead01788c3e1836bc9aba2b42863aaa7c2`:
+only the zero aggregate/ever-filled initializers and exactly one later
+`self._fill_history_unknown = False` line differ from executed v3. The
+observer hooks/helpers/summary are absent. Other three source files and the
+known notebook remain exact; their hashes and format-only proof are in71.8/9.
+This is last VERIFIED source, not a guarantee that a running cloud task can
+never propose or change anything afterward. All changes must be retrieved
+and independently compared before further use. No Mia source has been ported
+into a local strategy successor or accepted for execution.
+
+Nine separately observed automatic/implicit IDE builds remain retained,
+including the fresh one-line EditFile syntax builds e8589f-410244 and
+794427-410244. They were not explicit Codex/Mia backtest launches, empirical
+looks, refunded slots or proof of a reviewed source-bound recovery build.
+The global `TPR-MATCHED-ON-BASE-v1.mia-recovery.spent.json` claim remains
+absent: **zero reserved/observed Mia recovery jobs**, not a failed Mia backtest.
+The old no-op previews,404 response, partial edits and unsafe proposals are
+retained history. TPR-MATCHED-002/006 stay open; all other development finding
+dispositions in71.7 and the six canonical open findings remain unchanged.
+
+A fresh metadata/source-only blocked receipt has SHA256
+`68598c0d8a83adff3d51386928b505ac255614f3ba4dc7289f3039a71f25b08c`.
+Its final private index has SHA256
+`d46f1cc3f3855feeb48b1d4b20e5e351aa09e355a22c46c6ba53ebd638aa3b98`,
+created2026-10-09T21:42:34.568784Z:48 exact scope004 receipts,933410bytes
+hashed only. Selection is bounded scope004 metadata/source/approval receipts;
+provider/D0/original-packet captures, old empirical results and the global
+request-wire census are excluded. No new API request, source interpretation,
+licensed-row publication or development look occurs in this index operation.
+Exclusive receipts remain private, mode0600 under0700 parents and Git-ignored.
+The scope004 expiry2026-10-10T20:13:11.494466Z and old HEAD pin are not renewed
+by the final publication or this receipt.
+
+**Precise resumption and next roles.** Owner recovery is to restore computer
+control of the authenticated existing QC project37547067 or continue its Mia
+source-only task there. Do not launch until the complete observer/diff,
+native clock/history/ticket/unknown semantics, unchanged economics, focused
+proof and prospectively frozen pure successor audit are reviewed. Preserve
+auditv3's original diagnostic/false result; any future ambient-only qualifier
+must be separately named and cannot retroactively accept attempt3. Recheck
+the actual cloud files, Git/remote state and new HEAD; create fresh bounded
+scope/access/source/look identities where the old pin/expiry is unsuitable.
+Then reserve the ONE source-bound Mia recovery job before its explicit
+compile/launch, retrieve all exact IDs/source/results and port only verified
+lane-owned corrections. The remaining five frozen matched arms may follow
+only after valid interpretable recovery and matched-input checks, BASE before
+the predefined ADVERSE condition; do not tune or reopen spent receipts.
+Canonical TPR-TR0-I, TPR-1/source and TPR-0B gates stay parked/incomplete.
+OOL011 remains lane-corrected with shared synchronization owner-coordinated;
+OOL003/004/006 remain closed. No broker, paper/live, funded-account or
+deployment authority is implied.
+
+OWN78 and OWN80–86 are agent-delegated scoped decisions with their provenance,
+alternatives and limitations recorded above; they are pending independent
+Claude review, not individually human-/Claude-approved. Final focused
+document/import/compilation/hash/diff checks are recorded immediately below;
+the full lane/repository suite remains excluded for Claude. All validation
+uses this physical macOS lane and the isolated in-process runtime-root runner;
+it proves no native-Windows signer/ACL/protected-parent custody and does not
+remove the fourteen frozen-Windows-Git preregistration limitations. Exactly
+one final non-force matching-lane push is intended at this stable blocked
+endpoint, with fresh actual remote/staged-diff checks before commit/push and
+local/remote equality plus clean status verified afterward in the owner chat.
+The heartbeat remains PAUSED during and after publication; no auto-rearm.
+
+Final focused validation: isolated document/active-document/import-firewall,
+Mia collector and auditv3 checks **340passed/1existingplatformskip in4.29s**.
+The first documentary reprise was6failed/211passed/1skip in3.37s because the
+new next-role wording omitted the recognized role and retained section67
+authority phrases; after restoring the truthful role phrase the reprise was
+1failed/216passed/1skip in3.19s on the remaining scope phrase. Both phrases
+were restored without weakening or editing any test guard. The green union
+above includes the actual stale-role mutations. Peer read-only audit found
+one last historical/current hash wording mismatch in TPR-MATCHED-003, now
+qualified as the first two IDE-build readbacks, with later changes referenced.
+No other concrete current-state inconsistency was found by that audit.
+The four committed new collector/audit/test hashes and six-arm freeze hash
+independently reproduce the recorded values. All four files syntax-compile
+without imports or cache writes. Diff whitespace checks pass; round scope
+contains only lane-owned source/tests and this record, and the private final
+index remains Git-ignored. The actual remote still equals the exact32016848
+base. No full suite, operator-state/database read, new empirical input/outcome
+or native-Windows custody validation was performed by these checks.
+Final documentary/import reprise after recording these validations:
+217passed/1existingplatformskip in3.14s; whitespace and record-only scope
+checks remain green.

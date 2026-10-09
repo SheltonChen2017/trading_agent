@@ -388,6 +388,10 @@ follows. ARV2E263-001 remains the concrete external barrier.
 Section 269 is Claude's independent review of `4084483a..279f37ee` (0 P0,
 0 P1, 0 P2, 0 P3): both section-267 corrections are accepted and pinned by
 tests, and 269.4 suggests next steps around the ARV2E263-001 barrier.
+Section 270 counter-reviews the sole Claude commit `b7169dc0`, accepting it
+after three documentary qualifications: outside-root validation, remedy
+certainty and reserved versus delegated decisions. No code or publication
+contract changes. The owner stopped the monitor; it remains paused.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1289,16 +1293,20 @@ is Claude's independent review of the exact pushed range `64b5a355..ae159453`
 and corrects both new P3s with bounded offline regression checks, while
 qualifying any claim that a post-claim source refusal can never spend a claim.
 Section 269 is Claude's independent review of the exact pushed range
-`4084483a..279f37ee` (section 268). The immediate next step is that Codex
-counter-reviews section 269 and this round's Claude commit, unless the owner
-explicitly changes this workflow; this is not an intermediate acknowledgement
-wait. No new
-evidence supports a production retry, new diagnostic, relocation or R284
-launch. The next substantive action needs a supported security-preserving
-publication remedy, or explicit human authority for the coordinated relocation
-trial and its absolute-path compatibility audit. Same-round advisory checks
-are not independent final review. The owner rearmed the matching-lane review
-monitor after section 264; keep it active and quiet on unchanged state.
+`4084483a..279f37ee` (section 268). Section 270 counter-reviews the sole
+Claude commit `b7169dc0` with documentary qualifications and focused in-root
+checks. Claude must review section 270 and its exact final pushed snapshot;
+this is not an intermediate acknowledgement wait. No new evidence supports
+a production retry, new diagnostic, relocation or R284 launch. The next
+substantive action needs a supported security-preserving publication remedy,
+or explicit human authority for a coordinated relocation trial and its
+absolute-path compatibility audit. Lane-owned contract design remains
+delegated, but a supported security/consumed-byte contract is not established.
+Same-round advisory checks are not independent final review. On 2026-10-09
+the owner explicitly said "stop the monitor"; the matching-lane review
+monitor was paused and must not be rearmed without a new owner request.
+The subsequent human delivery of section 269 is not a monitor rearm or a
+path/host-setting exception. Test temporary files remain inside the root.
 The human explicitly reiterated "build until the project is ready for forward
 looking" and "no need to wait for Claude." No routine approval or
 acknowledgement push is awaited. Missing independent evidence and supported
@@ -3140,6 +3148,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-08 | Claude independent review of section 266: the R284 control corrections and the in-place flags observation | `ae159453` -> this record commit | Section 267: two Codex commits `64b5a355..ae159453` disposed (2 accepted, 0 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells | No code changed by Claude. The section-265 reproductions now refuse; in-memory removal of each correction is caught by Codex's tests; the R266 report, pins and section-264 reports reproduce; accepted `ARV2CR266-001` and `-002` against section 265; section 4 names section 267, banner sentence added, this row appended | Complete lane selection at `ae159453` with every remote address refused (strict sandbox for the six groups, three parallel streams; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; the flags-diagnostic file rerun with a `staff`-group temporary directory; exact counts in 267.5 | 0 P0, 0 P1, 0 P2, 2 P3 (`ARV2R267-001` and `-002`, documented for Codex) | Single push of this round's Claude commit; Codex counter-reviews section 267 unless the owner changes the workflow |
 | 2026-10-08 | Codex section-267 counter-review and prospective preclaim/group corrections | `ae159453..4084483a` (one new Claude record commit) -> final section-268 snapshot | Section 268: both P3s reproduced and corrected; postclaim-race guarantee qualified as ARV2CR268-001; no actual diagnostic, source capture, preparation or QC action | Real production-mode checks before and after each fresh claim; allocated file group pinned before writing; flags schema/profile v2 is prospective only and old R266 path remains spent | Focused strict-network-denied validation in 268.3; same-round assistance is not independent final review; no full Codex suite | ARV2E263-001 and independent formal evidence gates remain; all action/readiness flags false; 313/239/49/699 unchanged | Exactly one final matching-lane push; Claude must review section 268 and exact snapshot; monitor stays active and quiet, with no routine approval/intermediate acknowledgement wait |
 | 2026-10-09 | Claude independent review of section 268: the preclaim and allocation-group corrections | `279f37ee` -> this record commit | Section 269: one Codex commit `4084483a..279f37ee` disposed (1 accepted, 0 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells | No code changed by Claude. The four pins and the v2 profile hash reproduce; in-memory removal of each correction is caught by Codex's tests; accepted `ARV2CR268-001` against section 267; 269.4 suggests next steps; section 4 names section 269, banner sentence added, this row appended | Complete lane selection at `279f37ee` with every remote address refused (strict sandbox for the six groups, three parallel streams, temporary directories in the scratchpad; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 269.5 | 0 P0, 0 P1, 0 P2, 0 P3 | Single push of this round's Claude commit; Codex counter-reviews section 269 unless the owner changes the workflow |
+| 2026-10-09 | Codex section-269 counter-review and boundary/authority clarification | `279f37ee..b7169dc0` (one new Claude record commit) -> this section-270 record commit | Accepted after three documentary qualifications; no executable or publication-contract change; owner-stopped monitor remains paused | Preserve Claude's reported evidence with explicit out-of-root and strict/loopback qualifications; no relocation, host-setting change, external temp path, probe or production/QC retry | 45 focused strict-network-denied passes, four byte pins and profile verified; final record gates in 270.3; no full Codex suite | ARV2E263-001 and independent formal evidence remain; 313/239/49/699 unchanged | One final matching-lane push at the concrete barrier; Claude must review section 270; supported remedy or explicit relocation exception required, no monitor rearm |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -39128,3 +39137,116 @@ and connect and refuses a connection to the reserved documentation address
 
 The final tree differs from the pushed head `279f37ee` only by this record
 commit.
+
+## 270. Codex counter-review of section 269 and publication-route decision boundaries (2026-10-09)
+
+### 270.1 Exact range, completion and disposition
+
+The owner stopped the monitor, then manually reported Claude's completed
+review and supplied its suggested next steps. The monitor was successfully
+set to `PAUSED`; this delivery does not resume it. A matching-branch-only
+fetch found a clean designated worktree, with local and remote heads both
+`b7169dc09db6a56c0efa34fcb1376808b0bca940`. The exact new completed range is
+`279f37eed5c900ef3b8c50ff573a859cd02fc5e0..b7169dc09db6a56c0efa34fcb1376808b0bca940`.
+It contains one record-only Claude commit, whose full message and diff were
+reviewed; no completion was inferred merely from authorship. Sections 265
+and 267 and their old audits were not replayed.
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `b7169dc09db6a56c0efa34fcb1376808b0bca940` | Accepted after the documentary corrections/qualifications in 270.2 | Section 269 accepts section 268 and ARV2CR268-001; its source descriptions and pass-union arithmetic check out. Source/tests/research are unchanged across this exact range. Focused in-root checks and byte/profile pins corroborate the two corrected behaviors. Its outside-root tests and proposed remediation guarantees require the qualifications below, not automatic gate clearance. |
+
+No new executable defect was found. The three P3 items below concern
+documentation, evidence classification and authority, not a shipped guard
+weakening. This section supersedes those recommendations prospectively while
+retaining section 269 as the historical review. Same-round read-only advisory
+assistance is not independent final review.
+
+### 270.2 Findings and decisions
+
+| ID | Priority | Status | Commit / location | Issue, evidence and reason for correction | Correction and verification |
+|---|---|---|---|---|---|
+| `ARV2CR270-001` | P3 | Qualified; recommendation not adopted | `b7169dc0`, 269 opening and 269.3–269.5 | The record explicitly places test temporary directories in the outside-root scratchpad. Running pytest from the designated root does not make those writes compliant with the owner's validation-path invariant. The opening strict-sandbox shorthand also omits the later disclosed loopback-only exception. Unqualified reuse would misstate compliance or authorize an excluded test location. | Retain reported counts as location-qualified Claude evidence, not compliant designated-root full validation. Preserve both network profiles and original strict failures. All Codex temporary paths in this round remain in-root; no outside-root test/probe or full-suite replay. Verified against the full diff, the owner's invariant and 269.5. |
+| `ARV2CR270-002` | P3 | Qualified; no remedy established | `b7169dc0`, 269.3–269.4 | The claim that outside-Documents temporary directories avoid drift or that tracking writes cannot make tests flaky exceeds finite observations. Matching ctime/flags symptoms do not identify an actor, authenticate security metadata or prove continuous stability. | Retain 266.3/266.5: relocation is a trial, not a guaranteed fix; disabling tracking is an unverified host-setting option, not an approved action. No new host observation is claimed or performed. Verified by comparing the recommendation to its stated finite evidence and existing limitations. |
+| `ARV2CR270-003` | P3 | Corrected authority distinction | `b7169dc0`, 269.4 item 1 | "Each needs the owner's decision" incorrectly treats all lane-owned contract design as a new routine approval gate, despite 255.2's delegated research/build decisions. Conversely, that delegation cannot lift the later explicit path and host-setting prohibitions. | Supported lane-owned design/evaluation remains delegated; relocation, outside-root validation and host-setting changes still require their explicit reserved authority. Any new output-only contract must meet 266.3 before use, with no shared-helper waiver or silent rebaseline. Verified against 255.2, 266.3, 268.4 and the current human instructions. |
+
+**270-D1 — recommended route, not move authorization.** Prefer an explicitly
+authorized, reversible whole-worktree relocation trial as the next concrete
+option to evaluate, because it can retain the strict publication/source
+guards rather than change their security meaning. The owner must approve an
+exact new absolute root and the exception to the present path invariant
+before any move or outside-root probe. That scope must include a compatibility
+audit of retained absolute-path bindings and a separately frozen bounded
+synthetic observation at the authorized location. The historical **171**
+path-bearing artifacts reported in 265.5 are not a new inventory or evidence
+that any move will succeed. Preserve original bytes and failed/spent leaves;
+do not rewrite embedded history or use a symlink as a bypass. No move, audit
+of those private artifacts, or new probe is performed in this round.
+
+**270-D2 — no unsupported alternative implementation.** Do not change macOS
+tracking/security settings or move test temporary directories outside the
+root. A lane-owned versioned output-only contract could be designed under
+delegated authority if there is a supported security/consumed-byte argument;
+section 269 supplies no such new evidence. No blanket ctime/flags hash waiver,
+attribute stripping, wait-until-pass, repair or production retry follows.
+The current evidence therefore still reaches the concrete ARV2E263-001
+barrier, not a routine approval or Claude-acknowledgement wait.
+
+**270-D3 — R284 and independent evidence stay separate.** A demonstrated
+publication remedy would permit reconsidering the frozen continuity-package
+and single-control-leaf protocol under its existing gates, not immediate
+launch by recommendation alone. R284 remains unprepared/unlaunched. Vendor
+immutable as-of/version/correction/deletion history, reviewed security-master
+identity, cutoff-valid RAW prior-close prices and scores remain missing
+formal inputs; stock-first seven-role/terminal-payoff gates remain. Existing
+research access is not admission, and another vendor's suitability is not
+established here. No new subscription, provider acquisition or external
+coordination is inferred from these suggestions.
+
+### 270.3 Validation, exclusions and handoff
+
+At exact reviewed head `b7169dc0`, **45 focused tests passed in 5.00 seconds**:
+31 flags-diagnostic tests and 14 runner cases for real-client refusal before
+credentials, already-invalid preclaim mode, both authentication boundaries,
+and before-/after-claim drift with the correct unspent/spent state. Python
+3.13.15 ran under `/usr/bin/sandbox-exec -p '(version 1)(allow default)(deny network*)'`;
+both `TMPDIR` and pytest `--basetemp` were inside the designated root.
+No loopback exception, skips, warnings or errors. A separate strict-denied
+read-only import reproduces the v2 profile hash `32b3b0af…`; all four full
+section-268 file SHA-256 pins match. The cached-terminal and allocation-pin
+source paths were also inspected; no old mutation matrix was rerun.
+
+Claude's 269.5 result remains **10,698 strict passes + 11 nonoverlapping
+loopback passes = 10,709 distinct passes / 8 skips** at `279f37ee`, with the
+outside-root qualification above. Its original **11 strict-profile failures**
+and **35 warnings**, and the loopback file's **73 passes / 2 warnings** with
+**62 overlapping passes**, remain recorded. Those are reported historical
+results, not a new Codex full suite or proof that the current production path
+is stable. Its compile and 1,839-artifact census claims were not replayed.
+
+Record/document checks passed **86 tests in 1.24 seconds** under the same
+strict denial and in-root temporary-path rules; `git diff --check` is clean.
+Together with the behavior checks this is **131 distinct focused passes**,
+not complete lane validation. Repeating the 86 on final record bytes before
+commit is not additive coverage. Same-round final read-only advisory review
+found no further issue. Scoped review-quality assessment: **8/10**, with
+correct implementation acceptance but the three evidence/authority wording
+qualifications above; this is not a readiness score. No Python code changed,
+so broad compilation or full-suite execution is not applicable to this
+record-only correction.
+The source-authority, security-master and reviewed-spec registries were read:
+source authority remains `zero_access`, all three entry lists remain empty.
+No registry/shared/root file is modified. Original failed continuity
+packages, spent diagnostics and historical evidence are preserved, with no
+private-artifact reread claimed as a new integrity census.
+
+The continuous round is `b7169dc09db6a56c0efa34fcb1376808b0bca940..this section-270 record commit`,
+ending at the concrete publication barrier with exactly one matching-lane
+final push. There was no source capture, production publication/preparation,
+provider/QC request, candidate attempt, outcome access, new look or cell;
+the floor remains **313 shared / 239 development / 49 infrastructure / 699 cells**.
+Git contact is not described as zero network activity. All readiness/action
+flags and formal gates stay unchanged. Claude must review section 270 and
+the exact final snapshot; no new Claude session or other-chat message is
+authorized. The monitor stays paused at the owner's request. No funded
+account, broker, paper/live deployment or real-order authority follows.

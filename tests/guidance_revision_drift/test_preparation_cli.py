@@ -47,6 +47,34 @@ class PreparationCliTests(unittest.TestCase):
         self.assertEqual(len(report["sha256"]), 64)
         self.assertEqual(self.run_command(["launch-preflight"])[0], 2)
 
+    def test_qc_project_preparation_is_metadata_only_not_launch_approval(self):
+        status, report = self.run_command(["prepare-qc-project"])
+        self.assertEqual(status, 0)
+        self.assertEqual(report["status"], "local_qc_project_preparation_only")
+        self.assertNotIn("artifact", report)
+        self.assertFalse(report["external_authority"])
+        self.assertEqual(report["qc_attempts"], 0)
+        self.assertEqual(report["preflight"]["status"], "blocked")
+        self.assertFalse(report["preflight"]["qc_launch_allowed"])
+        self.assertEqual(report["preflight"]["readiness"]["empirical_order_based_backtest"], "blocked")
+        self.assertLessEqual(len(report["manifest"]["project_files"]), 25)
+        self.assertIn("main.py", report["manifest"]["project_files"])
+
+    def test_preflight_does_not_conflate_synthetic_run_with_empirical_authority(self):
+        status, report = self.run_command(["launch-preflight"])
+        self.assertEqual(status, 2)
+        self.assertFalse(report["qc_upload_allowed"])
+        self.assertFalse(report["qc_launch_allowed"])
+        self.assertEqual(report["external_evaluation_scope"], "synthetic_only_order_based_integration_not_empirical")
+        self.assertIn("reviewed_root_entrypoint_and_exact_372_frame_transport",
+                      report["required_before_external_evaluation"])
+        self.assertNotIn("pinned_native_engine_and_binding_validation",
+                         report["required_before_external_evaluation"])
+        self.assertIn("pinned_native_engine_and_binding_validation",
+                      report["required_before_empirical_evaluation"])
+        self.assertIn("owner_freeze_and_separate_exact_source_outcome_and_QC_authority",
+                      report["required_before_empirical_evaluation"])
+
     def test_wrong_retained_hash_and_nonregular_archive_are_errors(self):
         with TemporaryDirectory(prefix="gdr-preparation-cli-") as directory:
             _, prepared = self.run_command(["prepare-bundle", "--output-dir", directory])
@@ -57,6 +85,8 @@ class PreparationCliTests(unittest.TestCase):
 
     def test_no_approval_launch_or_ambiguous_flag_routes(self):
         cases = (["prepare-bundle", "--approved"], ["prepare-bundle", "--launch"],
+                 ["prepare-qc-project", "--approved"], ["prepare-qc-project", "--launch"],
+                 ["prepare-qc-project", "--output-dir", "x"],
                  ["verify-bundle"], ["verify-bundle", "--bundle-file", "x"],
                  ["show-candidate", "--expected-sha256", "0" * 64],
                  ["verify-bundle", "--bundle-file", "x", "--expected-sha256", "0" * 64, "--output-dir", "x"])

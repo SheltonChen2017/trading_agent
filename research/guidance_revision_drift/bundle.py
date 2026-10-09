@@ -44,7 +44,7 @@ _MODULES = (
     "__init__", "__main__", "archive", "artifacts", "assessment", "bundle",
     "comparison", "contracts", "controls", "corporate_actions", "events",
     "fixtures", "formulas", "integration", "lean_bridge", "lineage",
-    "market_inputs", "persistence", "qc_adapter", "readiness", "recovery",
+    "market_inputs", "persistence", "qc_adapter", "qc_project", "readiness", "recovery",
     "release", "reporting", "scenario", "simulation", "specification",
     "timing", "universe", "vendor_payloads", "lean/__init__", "lean/main",
 )

@@ -18,7 +18,8 @@ from research.guidance_revision_drift.readiness import preflight
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=("show-candidate", "preflight", "synthetic-demo", "adapter-manifest",
-                                            "review-release", "launch-preflight", "prepare-bundle", "verify-bundle"))
+                                            "review-release", "launch-preflight", "prepare-bundle", "verify-bundle",
+                                            "prepare-qc-project"))
     parser.add_argument("--output-dir", type=Path, help="existing local directory; demo/release/bundle publication only")
     parser.add_argument("--bundle-file", type=Path, help="bounded local archive; verify-bundle only, never extracted")
     parser.add_argument("--expected-sha256", help="caller-retained archive hash; verify-bundle only")
@@ -48,6 +49,13 @@ def main(argv: list[str] | None = None) -> int:
             from research.guidance_revision_drift.release import launch_preflight
             print(canonical_json(launch_preflight()))
             return 2
+        if args.command == "prepare-qc-project":
+            from research.guidance_revision_drift.qc_project import qc_project_manifest
+            from research.guidance_revision_drift.release import launch_preflight
+            print(canonical_json({"status": "local_qc_project_preparation_only",
+                "manifest": qc_project_manifest(), "preflight": launch_preflight(),
+                "external_authority": False, "qc_attempts": 0}))
+            return 0
         if args.command in ("prepare-bundle", "verify-bundle"):
             from research.guidance_revision_drift.bundle import build_bundle, verify_bundle, publish_bundle, MAX_BUNDLE_BYTES
             from research.guidance_revision_drift.release import launch_preflight

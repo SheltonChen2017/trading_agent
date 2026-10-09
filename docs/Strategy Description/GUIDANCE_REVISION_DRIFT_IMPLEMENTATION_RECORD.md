@@ -4,12 +4,13 @@ Status: **Section 19 (Codex counter-review of section 18, per-frame native
 account checkpoint and the owner-approval closure) independently reviewed by
 Claude in section 20 (2026-10-09): all three commits accepted, one lane test
 pin added, one P2 pre-launch packaging risk documented, no production defect.
-Codex counter-review of section 20 pending.
-Under section 19.6 a synthetic-only order-based QuantConnect evaluation may
-start only after that counter-review accepts this review. Native LEAN/QC
+Section 20 counter-review accepted; section 21 cloud-package preparation
+implemented as a new exact-source review candidate, not native evidence.
+The new loader must receive Claude review and Codex counter-review before
+section 19.6's conditional synthetic-only QC upload/run. Native LEAN/QC
 execution and empirical backtest readiness remain unverified/blocked. The
 original economic, data, empirical, account and trading gates remain closed.**
-Current scope/evidence are sections 17 through 20. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 21. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -1747,3 +1748,196 @@ start only after that counter-review accepts this review. No GDR-1 source
 audit, empirical backtest, real data, broker, paper or live step starts from
 this review. `docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md`
 were not edited and stay frozen for both agents.
+
+## 21. Codex section-20 counter-review and cloud-package preparation, 2026-10-09
+
+### 21.1 Exact snapshot, owner scope and dispositions
+
+The owner stopped the monitor, then explicitly requested counter-review of
+Claude's landed review and up to ten next milestones or backtest readiness.
+This is manual lane work; the heartbeat remains paused. Verified the designated
+absolute root and branch, clean HEAD and matching pushed review head
+`1d81a28af43ade3e1e7b22f8af752cd7b47bc4ab`, a descendant of exact publication
+`9df3a12f2fcd4fe24b7a229a5cbcd8c9b68b142a`. Section 20 is the completed
+handoff of that baseline. No earlier consumed review is reused.
+
+| Claude commit | Disposition | Evidence |
+|---|---|---|
+| `e3a238c65e7b436ab1004ac771b29402c26639c8` | accepted | Complete test-only diff inspected. Three focused scalar/alias regressions passed (16 subtests); finite, nonnegative and whole-share guard-removal mutants each fail the new direct-bridge test. No production behavior changed. |
+| `1d81a28af43ade3e1e7b22f8af752cd7b47bc4ab` | accepted | Complete record/pin diff inspected; exact ancestry, remote head and explicit completed handoff verified. All section-20 findings and Claude's attributed full-suite evidence retained. Packaging is an unresolved pre-launch risk, not an observed cloud failure. |
+
+| ID | Priority / disposition | Evidence and status |
+|---|---|---|
+| GDR-CR20-001 | P2 / accepted, preparation pending | The exact source expects an adjacent regular JSONL via LOCAL_FILE. QC's current project-file documentation lists no JSON/JSONL, Free has 25 files / 32 KB, and the existing 35 Python files include a 45,352-byte simulation module. Object Store alone does not supply the current path. No engine failure is inferred and no attempt is consumed. |
+| GDR-CR20-002 | P3 / accepted, corrected by Claude | Direct bridge classification and atomicity are now pinned for NaN/Infinity/sNaN, negative cash/inventory and fractional shares. All three guard-removal mutants are caught. This was a test sensitivity gap, not a fail-open production defect. |
+| GDR-CCR21-001 | P2 / corrected during author QA | The new project verifier originally re-used a caller-owned mutable dict after reconstruction. Reproduced a forged map/anchor changed to the valid map during reconstruction: a successful receipt named a hash different from the retained anchor. It now copies the bounded map before validating immutable byte values, hashing and reconstruction; the receipt binds that snapshot, never later caller mutation. No cloud action occurred. |
+| GDR-CCR21-002 | P3 / corrected reporting limitation | The old always-blocked preflight listed empirical freeze/data/native completion and local installation under every external evaluation, conflating them with the scoped synthetic run that would establish native evidence. Synthetic pre-launch and empirical prerequisite lists are now separate; every permission remains false and no actuator or approval input is introduced. |
+| GDR-CR18-005 / GDR-CR16-008 | P2 / retained, out of lane | Claude's shared/Insider/Target-Price suite failures remain reported, not rerun or changed. Archive-export validations are historical informational evidence, not permission to validate outside the designated worktree. |
+| GDR-CCR19-003 / GDR-CCR17-006 | P2 / retained, native evidence missing | No verified native LEAN/QC execution, native comparator/actions or equity settlement parity exists. Synthetic package preparation cannot close these. |
+
+Section-20 ledger remains P0 0, P1 0, P2 1, P3 1 (one corrected,
+one documented). The section-19.6 external human approval is retained exactly;
+it is not written into the immutable draft. Research looks and QC launches,
+unsuccessful attempts, project/compile/run IDs remain zero/absent.
+
+### 21.2 Bounded definition of done before implementation
+
+Do not repeat ENG-1..26 or manufacture ten quotas. The next substantive
+engineering work is one **cloud-package preparation candidate**, not original
+GDR-0..6 completion or empirically backtest-ready status:
+
+1. Encode the exact deterministic source bundle, unchanged member bytes and
+   invented 372-frame fixture into only Python project files, each below
+   32,000 bytes and at most 25 files including root `main.py`. No minification,
+   licensed data, SDK, external data transport, Object Store persistence,
+   credentials or account/tier change.
+2. A root loader verifies the retained archive anchor and exact member
+   inventory before materializing it only in a new private runtime temporary
+   directory. It refuses traversal, symlinks, altered/extra/missing payloads,
+   conflicting preloaded package roots, oversize and noncanonical input.
+   It imports the byte-identical nested native source and exposes one root
+   algorithm class; no economic parameter or callback change.
+3. Local preparation/verification return detached, deterministic identities
+   bound to current source, candidate, fixture and project-file bytes. They
+   never extract/import/execute the generated project, install or upload/run.
+   Package verification requires a caller-retained hash and current-source
+   reconstruction, not self-certified approval flags.
+4. Focused hostile-input, loader/import and local CLI regressions, compilation,
+   active-document/import-boundary and frozen-document/candidate checks prove
+   the offline contract. Runtime temporary extraction is tested explicitly in
+   isolation, never relabelled a native engine run.
+   Separate the non-actuating preflight's synthetic pre-launch requirements
+   from empirical evidence prerequisites; do not require native completion
+   before the synthetic run that would establish it. Keep every permission false.
+5. Record the exact new source/package identities, full implementation range,
+   validations, exclusions and next review gate; accumulate one final push.
+   The added loader changes the producing source epoch and **must receive
+   fresh exact-source Claude review before any QC upload/launch**. Existing
+   section-19.6 approval does not bypass that independent review.
+
+Current official primary documentation read 2026-10-09:
+[project files and quotas](https://www.quantconnect.com/docs/v2/cloud-platform/projects/files),
+[custom securities](https://www.quantconnect.com/docs/v2/writing-algorithms/importing-data/streaming-data/custom-securities/key-concepts),
+[Object Store](https://www.quantconnect.com/docs/v2/writing-algorithms/object-store).
+The Python-file carrier avoids unsupported JSON project files and changing
+native data transport. Actual cloud filesystem/import/binding behavior still
+requires the later authorized engine evaluation. Its runtime/package/engine
+details, authenticated access and Mia availability are not yet measured.
+
+No empirical milestone starts while candidate freeze, source/rights,
+point-in-time inputs, family/look/evidence windows, comparator/actions and
+equity settlement requirements remain unresolved. All original proposed
+economics and false permission/null decision fields remain unchanged.
+
+### 21.3 Implemented behavior and focused evidence
+
+Technical: `qc_project` generates 20 inert literal-only Python payloads and
+root `main.py`, carrying the exact current deterministic ZIP_STORED archive.
+The generated loader checks regular-file bounds/hashes, parses payload AST
+without executing it, checks canonical base64, retained archive identity,
+exact ordered members/metadata/content and ZIP re-encoding. Only afterward
+does it create an exclusive private temporary tree and statically import the
+nested native algorithm. Parent/child preloaded package collisions and extra
+Python files refuse. One root-defined no-op subclass exposes LEAN discovery
+without overriding any native callback. The temporary-directory lifetime
+object remains retained by the root module. New generator/CLI/preflight source
+changes are part of the reviewed candidate; native `lean/main.py`, bridge and
+simulation bytes themselves remain unchanged against the Claude review head.
+
+Plain language: the code and invented data now have a small-file Python-only
+carrier and a root entry point to test in QC. The local checks prove its
+byte-preserving packaging and refusal behavior, not that QC can execute it.
+The temporary-file/import route still needs independent review and an actual
+native cloud evaluation. It needs no new purchased tier, Object Store write,
+provider or real price stream by construction; existing authenticated platform
+access and actual runtime permissions remain unmeasured, not guaranteed.
+
+`prepare-qc-project` prints only the non-authorizing preparation manifest.
+Build/verify return detached byte maps and use current-source reconstruction;
+no local extraction, SDK import, installation, account action or upload/run
+is triggered. The verifier retains a private immutable-value snapshot of the
+caller's map, so its hash receipt cannot be swapped by later caller mutation.
+The preflight remains blocked and distinguishes synthetic pre-launch facts
+from empirical prerequisites. External human authorization stays in 19.6,
+not in draft permission fields or a caller-supplied approval argument.
+
+| Focused check | Result |
+|---|---|
+| Exact Claude malformed-account pins | 3 passed / 16 subtests; finite/nonnegative/whole-share mutants caught; original production guards unchanged |
+| New carrier tests | 16 passed / 61 subtests; deterministic exact-source/fixture reconstruction, quotas, retained anchors, forged/re-anchored content, map mutation, stale/racing source epochs, unsafe/noncanonical ZIP, root discovery, private materialization and hostile carrier/package collisions |
+| Carrier mutation sensitivity | Three in-memory guard-removal mutants caught: private caller-map snapshot, exact current-source comparison and final source-epoch verification; originals restored |
+| Final combined focused selection | 121 passed / 130 subtests in 3.69s under normal pytest and network-denied sandbox; new carrier, bundle, CLI, lane boundaries, three scalar pins and active-document checks; not a complete lane/repository suite |
+| Compilation | 65 lane source/test files and 21 generated Python files compiled in memory; no bytecode publication, SDK/native binding execution or dependency installation |
+| Exact package/content checks | In-memory source bundle and Python carrier rebuilt and verified; no release regeneration, source extraction by preparation, saved upload artifact or cloud action |
+| Frozen/source boundaries | CLAUDE, AGENTS, root Session Handoff, Action Plan, Feature Milestone Record, original plan/PDF/draft and native algorithm/bridge/simulation unchanged against exact review HEAD; candidate/source pins verified; diff check passed |
+
+The isolated runtime test uses only the existing test SDK shim in a fresh
+`-I -B` child whose cwd remains the designated worktree. It compares every
+materialized archive member, verifies all imports originate in the private
+tree, finds exactly one root class with no callback overrides, and initializes
+the fixed SYN-GDR source against the exact sidecar with zero orders and zero
+account checkpoints. It does **not** prove Python/.NET conversion, native
+class discovery or the complete native 372-frame execution. Payloads are not
+imported/executed while parsing; arbitrary cloud-edited root source is not
+sanitized by archive checks and must be compared against retained file hashes
+before upload/launch. Current public
+[LEAN algorithm discovery](https://raw.githubusercontent.com/QuantConnect/Lean/master/AlgorithmFactory/Python/Wrappers/AlgorithmPythonWrapper.cs)
+supports the root-defined subclass design, not a pinned engine acceptance.
+
+An early metadata-only inspection used older system Python and stopped at the
+existing unsupported `dataclass(slots=...)` dependency; bundled CPython 3.12.14
+was used for all recorded passing checks. This is a local preparation failure,
+not a QC attempt. No other lane/shared behavior was changed or tested. Author
+subagent QA is not independent Claude review. Bounded implementation quality:
+8/10; native/empirical readiness remains unverified/blocked, not rated ready.
+An exploratory mutation harness used copied globals and was discarded because
+its patch seams were detached; only the corrected live-global mutant results
+above are evidence. No files, source identity, QC attempts or research looks
+were changed by those in-memory trials.
+
+### 21.4 Exact candidate identities, publication and next gate
+
+| Identity | Value |
+|---|---|
+| Source manifest SHA-256 | `e8ef74dc2bfd00d5e7a6bf3757291909eb3fdf76dff006933666742c1c71c5b9` |
+| Source bundle SHA-256 | `d4997830f9000c00d44da27edae09bcec2b37d542b79cf4879db608212c66a8a` (445,453 bytes / 39 members) |
+| Python project-file-map SHA-256 | `f32b7b2d74cdf8d3cda278199e31b77f0b86073a22b3c9379e45f5b6fdd9c5c1` (21 files / 611,489 bytes, maximum 30,014 bytes) |
+| Root `main.py` SHA-256 | `5a0912e575759ca13e3562c0523c2fcb60fa2b029537fe60a0bb30cc516f5ca9` (17,269 bytes) |
+| Unchanged invented sidecar SHA-256 | `8f35d56a335d3f7d9dad016e1e2236de7fcd2635e5c463c30081f97b7b944458` (43,135 bytes / 372 frames / 93 sessions) |
+| Unchanged candidate canonical SHA-256 | `b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c` |
+
+The project-map hash is canonical JSON of sorted filename -> byte count and
+SHA-256; it is not a ZIP hash. Code generates exact carrier bytes in memory;
+no new release or cloud project was saved. Earlier source/bundle epochs remain
+historical and cannot stand in for these updated identities. Generated file
+hashes must be retained and the complete resulting cloud source compared before
+any compile/run or acceptance of Mia changes.
+
+Review range is
+`9df3a12f2fcd4fe24b7a229a5cbcd8c9b68b142a..1d81a28af43ade3e1e7b22f8af752cd7b47bc4ab`;
+both ordered Claude commits are accepted in 21.1. The new implementation range
+starts at that consumed review head; producing and closing commit identities
+will be recorded in the closing checkpoint before the round's single push.
+No intermediate publication has occurred. All new source, tests and this
+record go to Claude as one combined exact snapshot on this same lane.
+
+Next: Claude independently reviews the new loader/generator, preflight/CLI,
+inventory, tests and record at the final pushed HEAD and performs full lane
+validation. Codex counter-reviews every resulting commit. Only then, with
+applicable existing scoped authority and supported authenticated access,
+may the exact reviewed synthetic candidate be uploaded/run in QC, retaining
+engine/binding/project/compile/run details and the attempt ledger. No local
+runtime installation, purchase, account change or wider processing authority.
+No QC upload, launch, compile/run ID, engine receipt or empirical look exists;
+attempt ledger remains **0 launches / 0 unsuccessful terminal attempts**.
+At most three unsuccessful candidate attempts, then Mia/owner recovery and
+full cloud-source comparison; `Completed` cannot accept altered economics.
+
+This is one implemented cloud-package preparation candidate, not ten invented
+milestones or original GDR-0..6 completion. Fresh independent source review is
+the immediate workflow gate; empirical readiness additionally remains blocked
+on the unchanged freeze, rights/PIT inputs, family/look/evidence-window,
+native comparator/actions and equity-settlement requirements. Stop this
+implementation round at that exact-source handoff. The monitor stays paused
+at the owner's request; do not re-arm or treat this Codex push as a Claude
+trigger. Root documents remain frozen and historical edits remain preserved.

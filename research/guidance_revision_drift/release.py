@@ -71,11 +71,21 @@ def launch_preflight() -> dict:
             },
             "required_before_external_evaluation": [
                 "independent_Claude_review_of_exact_pushed_source",
+                "accepted_Codex_counter_review_of_every_Claude_commit",
+                "external_human_authorization_for_exact_synthetic_candidate",
+                "reviewed_root_entrypoint_and_exact_372_frame_transport",
+                "existing_authenticated_QC_access_without_install_purchase_or_account_change",
+                "record_project_compile_run_engine_and_binding_identities",
+                "candidate_specific_maximum_three_unsuccessful_QC_attempts_then_Mia_or_owner",
+            ],
+            "external_evaluation_scope": "synthetic_only_order_based_integration_not_empirical",
+            "required_before_empirical_evaluation": [
+                "independent_Claude_review_of_exact_pushed_source",
                 "owner_freeze_and_separate_exact_source_outcome_and_QC_authority",
                 "audited_identifier_calendar_and_PIT_contracts",
-                "installed_pinned_LEAN_engine_and_binding_validation",
+                "pinned_native_engine_and_binding_validation",
                 "native_fill_scheduling_and_cash_settlement_validation",
-                "candidate_specific_maximum_three_unsuccessful_QC_attempts_then_Mia_or_owner",
+                "native_matched_comparator_and_corporate_action_parity",
             ], "original_candidate_blockers": specification["readiness"]["blockers"]}
 
 

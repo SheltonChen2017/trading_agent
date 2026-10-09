@@ -84,10 +84,12 @@ not a claim of native comparator/corporate-action parity.
 
 ## Later, separately authorized evaluation
 
-Do not upload or run this package under the current gates. `launch-preflight`
-always exits 2. A future owner authorization must name the exact source hash,
-data/processing rights, candidate and QC action. Independent Claude review and
-the original freeze/source/calendar/evidence gates are still required.
+`launch-preflight` always exits 2 and cannot certify external human approval.
+The lane record's section 19.6 retains the owner's conditional synthetic-only
+QC upload/run approval; all empirical freeze/source/calendar/evidence gates
+remain closed. Each producing source, including added cloud loaders, still
+requires exact-source Claude review and Codex counter-review before upload.
+No real market/reference/action data or empirical outcomes are authorized.
 
 For a later explicitly authorized *synthetic engine integration* evaluation,
 retain the repository package layout, neutral `data` helpers and candidate
@@ -98,6 +100,15 @@ beside `main.py` by the authorized packaging process. The explicit local
 bytes and the inventoried source. It does not automatically extract or upload
 anything. Initialization verifies every
 byte; alternate data, symbols or dates cannot be selected with parameters.
+The new `qc_project` preparation candidate carries that byte-identical layout
+and sidecar through size-bounded literal Python payloads plus root `main.py`.
+At runtime its root loader checks every carrier, exact archive anchor/member
+inventory and metadata before private temporary materialization. The loader
+uses static imports and exposes one root-defined no-op algorithm subclass;
+it changes neither native callbacks nor fixture economics. No carrier code
+is executed while parsing its literal payload. This is a proposed cloud
+filesystem route, not demonstrated QC support: fresh source review and the
+later native run must establish discovery, permissions and reader access.
 Select `GuidanceRevisionDriftAlgorithm`, pin the LEAN version and record the
 project source hash, compile/run IDs, callback trace and terminal diagnostics.
 Test reader/frame alignment, fills, fees, final cash, and native settlement

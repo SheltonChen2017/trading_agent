@@ -36,6 +36,7 @@ verified. No other lane's budget or permissions are inherited.
 | ENG-22/23 | `bundle` | Deterministic source/sidecar ZIP, explicit inventory, current-source/retained-anchor verification and no-overwrite publication; never extracted or executed |
 | ENG-24 | `lean_bridge` | Bounded hash-linked callback protocol trace, exact duplicate idempotency and atomic capacity refusal |
 | ENG-25/26 | CLI, `release` | Local preparation/verification commands, explicit offline/native/empirical readiness separation and rebuilt review release |
+| Cloud-package preparation | `qc_project` | Deterministic size-bounded Python carriers and root loader for the exact source bundle/fixture; new review candidate, not cloud execution or launch authority |
 
 Positive entries require a predecessor captured before publication. Later
 comparable cuts reduce risk when known even if the original raise was received
@@ -71,6 +72,7 @@ python -B -m research.guidance_revision_drift adapter-manifest
 python -B -m research.guidance_revision_drift synthetic-demo
 python -B -m research.guidance_revision_drift review-release
 python -B -m research.guidance_revision_drift launch-preflight
+python -B -m research.guidance_revision_drift prepare-qc-project
 python -B -m research.guidance_revision_drift prepare-bundle --output-dir /absolute/existing/owned-directory
 python -B -m research.guidance_revision_drift verify-bundle --bundle-file /absolute/bundle.zip --expected-sha256 RETAINED_SHA256
 python -B -m research.guidance_revision_drift synthetic-demo --output-dir /absolute/existing/owned-directory
@@ -121,6 +123,29 @@ directory and never overwrites; ambiguous post-publication failures are reported
 as such. This does not guarantee durability on every platform/filesystem.
 Planning documents and SDK/runtime dependencies are not included. Do not treat
 the source bundle as an automatically deployable QC project.
+
+`prepare-qc-project` prints a detached local preparation manifest, not source
+files or an uploaded project, and accepts no output, approval or launch flag.
+`qc_project.build_qc_project()` returns the exact root `main.py` and literal
+Python payload files in memory; `verify_qc_project()` requires the retained
+project-file hash and current-source reconstruction. All files are below
+32,000 bytes and the prepared inventory has at most 25 files. No source is
+minified; candidate JSON and JSONL fixture bytes remain inside the verified
+bundle rather than unsupported cloud project-file types.
+
+Only the generated root loader, when explicitly run, materializes the exact
+verified source/fixture into a new private runtime temporary directory and
+imports the unchanged nested native algorithm through a no-op root subclass.
+Preparation/verification never extracts, imports the SDK or runs that loader.
+Runtime filesystem permissions, native class discovery, binding and callback
+behavior remain unverified in QC. The loader is new source and requires fresh
+exact-source Claude review before the conditionally authorized synthetic
+evaluation in lane-record section 19.6. It grants no empirical authority.
+
+The always-blocked preflight now lists synthetic pre-launch requirements
+separately from empirical prerequisites. A pinned native run is evidence to
+obtain from synthetic evaluation, not a prerequisite to that same run. There
+is still no software approval switch; every upload/launch permission is false.
 
 Release v2 records the source bundle hash and two identities: portable content
 and interpreter environment. `verify_release` still requires exact bytes from

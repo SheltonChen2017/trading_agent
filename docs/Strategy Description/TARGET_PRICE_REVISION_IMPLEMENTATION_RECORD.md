@@ -618,6 +618,7 @@ and are deliberately not listed here.
 | `TPR-CCR10-012` | P1 | Any positive signed-registry authority | A previously valid signed positive registry can be replayed while its key remains trusted. An external exact current-anchor pin or equivalent monotonic state needs owner approval and implementation. |
 | `TPR-CCR10-013` | P1 | Any positive signed-registry authority | Validating only the trust directory and files does not prevent replacement through a writable parent with `FILE_DELETE_CHILD`. The exact protected custody boundary for `C:\ProgramData\CustomizedAgent` needs owner approval and implementation. |
 | `TPR-CCR10-016` | P2 | TPR-TR0-I completion | Rotation, compromised-key removal, rollback, strict review-to-anchor ancestry, layer-specific byte mismatch, and full local Git/OpenSSH integration evidence are not yet complete. |
+| `TPR-MATCHED-002` | P2 | Matched-study execution acceptance | Attempt3 has four unclassified delisting events; no retained per-event held/target/window evidence. Mia recovery needs an unlocked authenticated interface and a separately bounded, source-reviewed diagnostic run. Three Codex slots are consumed; no fourth launch or inferred-unheld acceptance. See71.6. |
 
 No open finding is P0. The two P1 findings are inert while the registry is empty,
 but both block any positive registry entry. Read-only checks on this Windows
@@ -633,6 +634,9 @@ Section70 qualifies the two historical development findings from section69:
 `TPR-CR21-002` is prospectively corrected with the old full-driver replay
 limitation retained; `TPR-CR21-003` is a false alarm as an extra owner gate.
 Neither changes a historical observed result or closes a canonical gate.
+The six canonical findings are distinct from the additional development-only
+delisting-observability finding `TPR-MATCHED-002`; neither category is closed
+by successful compilation, a Completed. status or the rights-paperwork waiver.
 ### Historical progression (not the current resume instruction)
 
 The remainder of this section preserves how the earlier v2.1 and v2.2
@@ -11779,3 +11783,242 @@ Python interface facts in official references:
 and [SecurityBenchmark.security](https://www.lean.io/docs/v2/lean-engine/class-reference/py/QuantConnect/Benchmarks/SecurityBenchmark/).
 These source/interface checks justify the narrow plumbing correction, not
 an assertion of actual native execution or unbiased source history.
+
+### 71.5 Owner-directed counter-review recheck — 2026-10-09
+
+Latest direct owner instruction: "start counter review". Root reverified the
+designated physical/Git root, lane branch, clean HEAD
+`017cb0108094bd42ecdeed9f9d9980ef7a39652f` and actual matching remote
+`32016848bc9ce4dfab3f52ddb5bb34e105e445dc`. No newer Claude push exists on
+that ref; no fetch or new review range is inferred. Section70's exact four
+per-commit and cumulative accepted-after-correction dispositions remain
+definitive, implemented locally in3dbcceaf. Read-only delegated verification
+confirmed that commit's direct320 parent and ancestry to current HEAD.
+
+Root reproduced252 focused counter-review/document/source-binding/driver
+checks in4.94s using the isolated runtime-root runner, not a complete suite.
+No actual operator state/database, fresh provider/packet access, new outcome,
+cloud API operation, launch, commit or push occurred in this recheck. Native
+Windows custody and canonical/research gates remain unproved/unchanged.
+
+Procedural deviation retained: the first resumed tool call loaded an absent
+saved command context, causing an undefined-command error followed by a
+read-only matching-ref lookup from the default sibling checkout. It did not
+fetch, validate code, edit, commit or push there. Root immediately rebuilt the
+literal designated root/branch guard and repeated the lookup with all
+invariants satisfied. Subsequent callers explicitly reject missing saved
+context instead of permitting a default-directory fallback. This is an
+acknowledged instruction deviation, not claimed as compliant lane evidence.
+
+Read-only inspection of own attempt3 metadata confirms compile
+`7ba4a1f3f9297586603909059207ff11-51e7dc8f1bc1feb130eaccfdc3f0d06b`
+has a retained BuildSuccess verification; no attempt3 backtest launch receipt
+exists. The same candidate's first two Runtime Errors remain visible and the
+third slot remains reserved, not reset or relabeled failed/successful. Matched
+QC evaluation is unfinished; compilation is not strategy completion. Keep
+HEAD pinned while the bounded operation remains pending. The original
+one-final-push development round is still unpublished, heartbeat paused.
+
+### 71.6 Owner-directed continuation — 2026-10-09
+
+The owner asked for the recommended next step and then explicitly said
+"ok, proceed": finish the reserved third/final ON-BASE native attempt;
+only after usable orders/coverage/accounting proof, continue the unchanged
+three-arm/two-cost comparison. If the third attempt fails, stop Codex
+candidate corrections/relaunches and use authenticated, controllable Mia
+or report precise owner recovery. This is scoped development authorization,
+not canonical acceptance, ETF-only approval or authority to tune outcomes.
+
+`TPR-OWN-76`: resume the already reserved/compiled attempt3 under still-active
+operation003, not a new candidate, compilation, attempt reservation or spent
+receipt extension. Manifest SHA256
+`f63f314098a008a58b604c0d8c9ec9028e9580ada794137f4fc49b96bb347806`
+pins HEAD017cb010 and expires2026-10-10T20:33:09.844284+00:00.
+Its BuildSuccess/source bindings are rechecked before launch; launch itself
+performs fresh cloud-source readback. No original packet/provider/D0 read
+or duplicate upload is needed. Alternative of recompiling or renaming to
+reset the cap is rejected. Provenance: direct owner continuation, frozen
+decision65/75, active manifest and unlaunched reservation. Agent-delegated
+execution choice; final independent Claude review remains pending.
+
+Attempt3 launched2026-10-09T19:36:14.001226Z, project37547067, compile
+`7ba4a1f3f9297586603909059207ff11-51e7dc8f1bc1feb130eaccfdc3f0d06b`,
+backtest `a0f26651b7bcc0a5b8fc52a9d0be27eb`; terminal Completed., progress1,
+completed=true/error=null. Collection1 retained all sources/orders/logs and
+interpreted auditv2:292/292 orders filled,2379shares,USD23.79fees,14decisions,
+60valuations,0refusals/orderfailures/accountingresiduals/positionmismatches/
+riskbreaches. EndNAV95859.721872,return-4.140278128%,dailyDD10.8394789089%
+versusQCheadline11.100%; turnover2.94990591522initialNAV. Mean cash
+38492.69128725/mean gross0.6195011069. No independent sleeve P&L.
+REMX remains0selecteddecisions and incomplete global coverage, not a positive
+TPR execution case. All14 sleeve snapshot observations exist; other five
+sleeves have positive selections. Current-vintage/PIT limits remain unchanged.
+
+Meaningful=false is retained, not overridden: four delisting events cause
+the native adapter's diagnostic flag and input-failure audit; logs lack
+event identity/time/phase/held-quantity evidence. Read-only peer confirms no
+automatic delisting liquidation in the complete MOO order inventory, but
+this does NOT prove warnings occurred only while unheld. Separately the
+auditor rejects the actual terminal spelling Completed. although completed
+is true/progress1/error null: verified false-negative in status parsing.
+Correcting punctuation alone cannot close the delisting evidence gap.
+Three candidate slots are consumed; no fourth Codex compile/job/candidate
+change is allowed. New cloud looks3 + previous9 =12observed runs.
+
+`TPR-OWN-77`: use authenticated controllable QC Mia for bounded read-only
+diagnosis in own project37547067; no edits, compile, launch, provider/packet
+read, unrelated project or deployment under the initial recovery manifest.
+Alternatives of accepting incomplete evidence or changing/relaunching the
+candidate ourselves are rejected. Provenance: standing owner three-attempt
+Mia rule, actual diagnostic and independent evidence audit. Final independent
+review remains pending. Any later Mia correction/run requires its own explicit
+bounded receipt before execution; frozen economics/IDs/attempt history stay.
+
+Opening the authenticated QC project for Mia unexpectedly caused an automatic
+IDE cloud build (UI reportsc2e8db-51e7dc/LEAN18176) without a compile-button
+action or a backtest. This initialization is retained as a procedural
+deviation/unreserved IDE build, not counted as an allowed fourth Codex attempt,
+not a new backtest look and not claimed as source-bound evidence. The proposed
+automatic import edit was declined; Mia is switched to Ask Before Edits.
+Initial record patch failed before edit (missing patch marker), corrected;
+initial pytest command failed before import/collection (quoting), corrected
+isolated runner produced251passed/3.86s. Neither consumed an empirical look.
+
+Mia diagnosis completed in authenticated project37547067, read-only: source
+and existing-backtest reads only; no source edits or backtest performed.
+It independently reproduced the conservative event-count gate, status
+spelling and missing event classification, and proposed additive aggregate
+type/held/target/open-order/window counters. This is attributed Mia diagnosis,
+not independent canonical acceptance. Its broad punctuation-normalization
+suggestion is narrowed here to the exact observed Completed. literal;
+its speculative liquidation/warning timing assertions are not adopted.
+Official LEAN Delisting/AlgorithmManager sources confirm type/ticket fields
+and OnDelistings preceding OnData, but source master is not a cloud-build
+attestation. The native superclass may act before OnData: held-now alone is
+insufficient; ever-held/order-ticket/custody unknowns must stay conservative.
+The IDE also reported a second unsolicited build05e081-51e7dc, with no
+compile-button action/backtest. Neither UI build refunds the three slots.
+
+`TPR-OWN-78`: approve only additive Mia instrumentation in main.py of this
+same candidate/project, followed by exactly ONE separately counted Mia
+recovery backtest after source comparison. No Codex fourth launch or cap reset.
+Counters must partition every warning/final/unknown event, warm-up/evaluation
+phase and window; retain current/ever-held, target, open-order and native
+ticket/unknown evidence. Snapshot before the existing parent handler and
+count native filled identities in memory only; no identifiers/rows logged.
+Preserve all existing trading, delisted-ID, refusal, RAW, account and summary
+gate logic. Prospective separate audit may qualify ambient events only when
+complete typed telemetry proves every event known, never-held, unheld,
+untargeted, no open/native ticket, outside execution window and no target
+refusal, with every existing source/order/accounting gate still satisfied.
+Otherwise acceptance stays withheld. This refines diagnostic observability,
+not signal economics or retrospective acceptance of attempt3. Alternatives
+of inferred-unheld, blanket event suppression or performance tuning rejected.
+Provenance: direct owner continuation, standing Mia recovery and independently
+verified gap. Agent-delegated, pending final Claude review.
+
+Fresh recovery scope002 binds existing exact source/input/freeze/project and
+one instrumented Mia look; no provider/D0/original capture read or new upload.
+Ask Before Edits remains enabled. Mia must await root source/diff review
+before compilation/backtest; unrelated cloud changes are not authorized.
+Automatic IDE syntax builds are separately retained, never treated as a
+source-bound launch or as refunds. Every explicit recovery failure is retained.
+
+Pre-edit source verification refused because the unrelated research notebook
+hash changed. Read-only investigation retained all five cloud files; all four
+candidate source hashes remain exactly operation003's values. Current notebook
+SHA256af27200522531d426185f4daa25d23610c164134e3ab7fdf38919616d0d5b344
+has2cells/0outputs. Serializing its parsed JSON with indent1,sorted keys,
+ensure_ascii=true and a trailing newline exactly reproduces original SHA256
+212a51a9f8eb8c29ef77442c5b3db3cc0fe308d7c18f9f2c6ecf7ed86186778e.
+Thus this is a verified JSON-format-only change, not an inferred benign edit;
+the actor causing it is not independently attested. Old receipt stays frozen.
+`TPR-OWN-79`: preserve current notebook bytes under recovery's exact new hash;
+do not overwrite/reset it or weaken the old controller guard. Mia may edit
+main only. Reject unexplained notebook changes; accept only this proven format
+equivalence as scoped re-established custody. Agent-delegated, review pending.
+Pre-edit cloud-files receipt SHA256
+329d3467e682bdca4a3be2d43e4985e5467a7fae9121e4f919cb87b6c47e9a05.
+
+The Mac locked before the staged Mia instrumentation approval could be pasted
+or submitted. The computer-use tool explicitly required a manual unlock;
+no claim of successful submission, Mia edit/compile/job is made. A safe
+in-app-browser check reached QC but explicitly reported not logged in/session
+expired; it was closed without credential access/login/account changes.
+The owner was asked asynchronously to unlock the Mac and reply unlocked.
+This is a concrete external interface blocker, not a new rights/Windows/
+canonical prerequisite. Scope002's edit preclaim is retained as attempted,
+not transmitted; do not reuse it as proof that Mia was authorized remotely.
+Recovery source/ID/look receipts must be freshly verified before resumption.
+
+### 71.7 Current development findings and focused reprise
+
+| ID | Priority | Status | Commit/location | Evidence and reason | Correction / verification |
+|---|---|---|---|---|---|
+| `TPR-MATCHED-001` | P2 | **Closed by correction** | 017cb010 retained audit; matched_audit.py terminal parser | Actual Completed./true/progress1/error=null is rejected by exact string spelling, falsely reporting unsuccessful completion. It must not conceal genuine engine/order/data errors. | Identified pure matched_audit_v3 successor runs v2 on ORIGINAL evidence objects/hashes, admits only exact Completed. with every original completion guard, and preserves all non-status diagnostics. Six pre-correction red fixtures;52newchecks green/.71s;129audituniongreen/1.34s;8in-memorymutants19red with38original/restoredgreen controls. Root audit/import reprise159passed/1skip/1.41s. |
+| `TPR-MATCHED-002` | P2 | **Open** | matched_algorithm_v3.py on_data/on_end and retained attempt3 | Four raw delisting counts lack type/clock/current-or-ever-held/target/open-order/ticket observations. Zero ledger residual and only MOO fills do not prove ambient events. Meaningful execution acceptance is therefore withheld. | Mia read-only diagnosis independently confirms gap. Additive scoped recovery proposed, but Mac lock prevents submission. No gate suppression, fourth Codex attempt or original-result rewrite. |
+| `TPR-MATCHED-003` | P3 | **Closed by qualification; procedural deviation retained** | QC IDE opening | Two unsolicited UI builds c2e8db-51e7dc/05e081-51e7dc occurred without compile-button action or source edits/backtests. They were not reservation-controlled. | All4 candidate source hashes independently remain exact. Keep these extra IDE builds visible, not allowed fourth candidate attempts/refunds/source-bound proof. Mia mode Ask Before Edits; automatic import proposal declined. |
+| `TPR-MATCHED-004` | P3 | **Closed by exact format-equivalence proof** | Own research.ipynb source binding | Old controller correctly refused changed bytes; treating that as an unexplained content change would block recovery. | Current notebook JSON reserialization exactly reproduces old212a51 hash; currentaf2720 and both receipt identities retained. New scoped custody preserves current bytes without overwriting old receipt or notebook. No arbitrary guard relaxation. |
+| `TPR-MATCHED-005` | P2 | **Closed by correction before execution** | New mia_recovery.py poll/collect | Peer synthetic proof showed Loading/missing-backtest and conflicting job/compile result responses were refused before raw-wire retention. The request hash alone did not preserve the response. | Retain exclusive result-wire receipt immediately after the read and before identity parsing in both paths; six regression cases red before correction,71focused green/1.12s. Refusals and no implicit retry remain. Root collector/base/v2/v3 union200passed/2.10s. No actual recovery job ran under the defective draft. |
+
+Auditorv3 SHA256
+b418be2fdd41479088b3f775b83548923c0e1aa67df309dbdb47c7956d7bde71;
+test SHA25634cbf5338034361c9cab2530eb1e15fa04f1027fbbf2c4fc14497cc5cd9b749d.
+Existing executed v1/v2/v3 algorithms, base/v2 auditors, packet/freeze and old
+receipts remain immutable. Root/peer source reviews and focused synthetic
+tests do not establish native Windows custody or close canonical gates.
+
+### 71.8 Bounded Mia recovery continuation and read-only collector
+
+The authenticated existing Safari tab for own project37547067 became
+accessible again at2026-10-09T20:08Z after the manual-lock interruption.
+No lock bypass, Safari-cookie transfer, login/account change, unrelated
+project/FINRA interaction or fourth Codex launch occurred. The prior staged
+scope002 approval was never transmitted and is not reused as approval.
+Mia still reports read-only diagnosis complete and Ask Before Edits selected.
+
+`TPR-OWN-80`: implement only a new read-only mia_recovery.py collector and
+synthetic tests, before any recovery launch. The five allowed own-project
+read endpoints cannot create projects, edit/upload source/inputs, compile
+or launch. Exact four-source/config/packet bindings, five-file inventory,
+proved notebook format delta, fresh committed HEAD/local hashes, immutable
+UI job/source claim plus BuildSuccess, one global Mia recovery look and at
+most five explicit same-job collection rounds are required. Three prior
+Codex job IDs cannot be relabeled as a new Mia look. Missing native compileId
+requires the captured exact UI identity, never an arbitrary inferred job.
+Loading/failed/conflicting wires are retained; no implicit retries occur.
+Alternative of weakening or rewriting executed operations_v2/driver/auditors
+is rejected. Provenance: owner continuation and Mia recovery rule, scoped
+implementation review. Agent-delegated; final independent review pending.
+
+Final new collector SHA256
+df855c0328623fa61b6b416191b93c86ab6ee2e128f3a38127aa4705494035b5;
+synthetic test SHA256
+77af6ca2c7d7f45943a9c92fe8315e6d1842e3fbf7385ae70955e1d28138259f.
+Three in-memory collector guard mutations produced six red checks, with
+six restored controls green; the later result-retention regression produced
+six additional red checks before its scoped correction. This is synthetic
+resume-path evidence, not proof of an actual Mia recovery run or delisting
+classification. Pure auditv3 intentionally keeps the original delisting
+diagnostic. No original signal packet/provider/D0 rows were read to build it.
+
+`TPR-OWN-81`: after committing the new collector/audit/source record locally,
+create a fresh bounded Mia instrumentation scope003 pinned to that exact
+HEAD/source/input/project, rather than extending spent scope002. Permit
+main.py additive observers only, with all rules in OWN78 unchanged. No
+explicit compile/backtest until all five cloud files are retrieved, compared
+with executed v3 and reviewed. Preserve any unsolicited IDE builds distinctly;
+they do not refund attempt capacity. A separately prepared source-bound
+recovery collector receipt must precede the single Mia recovery job.
+Alternative of transmitting the old spent approval or permitting Full Auto
+is rejected. Agent-delegated under direct owner continuation; independent
+review pending. No recovery job/look is claimed by this prospective entry.
+
+Root final new-source/document/import-boundary focused check:
+340passed/1existingplatformskip in3.97s; prior collector/audit union200passed
+in2.10s. Peer independently reproduced71collector checks/.93s, confirmed
+the result-wire fix and found no remaining concrete rejectable collector
+defect. Its initial conjecture of a fixed-config/synthetic-fixture mismatch
+was a false alarm: the exact canonical minimal policy hashes to the actual
+frozen53f1c149 value; no code was weakened. All four new file hashes above
+are independently reproduced. No complete lane/repository suite is run.

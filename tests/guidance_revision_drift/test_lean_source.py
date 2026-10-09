@@ -309,6 +309,26 @@ class LeanSourceTests(unittest.TestCase):
             bridge.step(fixture_frames()[0], native_quantity=Decimal(0), native_cash=Decimal("100000"))
         self.assertEqual((bridge.engine.snapshot(), bridge.protocol_trace()), before)
 
+    def test_bridge_classifies_malformed_account_scalars_itself_atomically(self):
+        # The native callback converts LEAN values with to_decimal, which
+        # already rejects NaN/Infinity, and the shadow invariants make any
+        # negative, fractional or infinite observation a plain mismatch. The
+        # bridge's own boundary must still classify such Decimal input as
+        # malformed for any direct caller, before comparing it with the shadow.
+        for quantity, cash in ((Decimal("NaN"), Decimal("100000")),
+                               (Decimal(0), Decimal("Infinity")),
+                               (Decimal(0), Decimal("sNaN")),
+                               (Decimal(-1), Decimal("100000")),
+                               (Decimal(0), Decimal("-0.01")),
+                               (Decimal("0.5"), Decimal("100000"))):
+            with self.subTest(quantity=quantity, cash=cash):
+                bridge = self.initialize().bridge
+                before = bridge.engine.snapshot(), bridge.protocol_trace()
+                with self.assertRaisesRegex(BridgeError, "malformed native account observation"):
+                    bridge.step(fixture_frames()[0], native_quantity=quantity, native_cash=cash)
+                self.assertEqual((bridge.engine.snapshot(), bridge.protocol_trace()), before)
+                self.assertEqual(bridge._account_checkpoints, 0)
+
     def test_multiday_reader_and_before_after_data_scans_reconcile_partial_cancel(self):
         # Mirrors the documented synchronous scan order, not .NET execution.
         # LEAN suppresses unchanged, zero-quantity fill-model results.

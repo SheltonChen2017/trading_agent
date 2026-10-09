@@ -1,20 +1,26 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **SECTION 101 COUNTER-REVIEWS CLAUDE'S SOLE `4228eaaf` RECORD COMMIT
-AFTER THE EXACT `b0d4a57f` CHECKPOINT. THE RECONSTRUCTED PUSH LEDGER IS VERIFIED.
-CODEX REPRODUCED A MISSED P2: A MALFORMED DUPLICATE SI ROW COULD LEAVE ITS
-VALID TICKER/SETTLEMENT PEER ADMITTED. RAW-KEY COLLISIONS NOW QUARANTINE BOTH
-COPIES, WITH 24 MATERIAL REGRESSIONS. THE EVALUATION-END GUARD IS RETAINED
-AND DIRECTLY TESTED FOR ALL THREE ALLOCATION ROLES; ITS CLAIMED REDUNDANCY
-WAS OVERBROAD. SHARADAR AUTHORITY IS QUOTED FROM THE OWNER'S ORIGINAL MESSAGE.
-CLAUDE'S 1,101-PASS COMPLETE-LANE RUN REMAINS ITS OWN PRIOR EXECUTION AT
-`b0d4a57f`; CODEX'S FOCUSED VALIDATION PASSED 201 TESTS. RESUMED FINRA SETUP
-IS BLOCKED BECAUSE THE REQUESTED CHROME SESSION IS UNAVAILABLE TO THIS CHAT.
-PUBLIC API ACTIVATION AND THE SI SOURCE COMPARISON HAVE NOT BEEN VERIFIED.
-ACTUAL BACKTESTING STILL REQUIRES COMPANION/USE/ROUTE/LOOK QUALIFICATION.
-THE CANONICAL PIT STUDY REMAINS BLOCKED ON ORIGINALS/CORRECTIONS AND TIMING.
-SOURCE/SHARED P2s AND PROSPECTIVE ADVISORIES ARE RETAINED; LOOKBACKS
-20/60/120/252 ARE UNSELECTED, ACTUAL LOOKS 0/0, ALPHA 0 AND QC ATTEMPTS 0.**
+Status: **CLAUDE HAS REVIEWED BOTH CODEX COMMITS IN `4228eaa..1e0e784`
+(SECTION 102) AND ACCEPTS THEM. ALL THREE `SI-CCR30` FINDINGS AGAINST CLAUDE'S
+SECTION 100 ARE CONFIRMED: A MALFORMED DUPLICATE SI ROW COULD ADMIT ITS VALID
+TWIN (P2, FIXED IN `cd0481d`; THE `4228eaa` HANDLING FAILS ALL 24 NEW CASES),
+THE EVALUATION-END GUARD IS REQUIRED WHEN EVERY HOLDING TERMINATES IN-WINDOW
+(P3; REMOVING IT FAILS 3 CASES), AND "NO FINRA CREDENTIAL IS PRESENT"
+OVERSTATED THE CHECKED SCOPE (P3). NO NEW FINDING AGAINST CODEX; THIS COMMIT
+CHANGES NO CODE OR TEST. NETWORK-DENIED ON `1e0e784`: THE EIGHT NEWER LANE
+FILES WITH THE LANE BOUNDARY, ACTIVE-DOCUMENT AND ML-BOUNDARY CHECKS PASS 400;
+THE 18 PRE-OCTOBER FILES, WHICH CANNOT REACH THE CHANGED MODULE, LAST PASSED
+817 ON `b0d4a57`. FINRA SETUP IS BLOCKED UNTIL THE OWNER'S SIGNED-IN CHROME
+SESSION IS REACHABLE OR AN ACTIVATED PUBLIC API CREDENTIAL'S LOCATION IS
+SUPPLIED. `SI-CR19-003` (EXPLORATORY LOOK ACCOUNTING) STAYS OPEN. THE CANONICAL
+PIT STUDY REMAINS BLOCKED ON ORIGINALS, CORRECTIONS AND AVAILABILITY CLOCKS;
+VENDOR DEADLINE 2026-10-19. THE THREE SOURCE P2s, THE SHARED P2 `SI-CR5-005` /
+`SI-CCR16-007` AND `SI-CR15-001` REMAIN OPEN. LOOKBACKS 20/60/120/252 REMAIN
+UNSELECTED; REAL LOOKS 0/0, ALPHA 0, PERMANENT LOOKS NONE, QC ATTEMPTS 0.
+PROVIDER DATA, LICENSED/ACTUAL MARKET ROWS, OUTCOMES, HOLDOUT, PRODUCTION
+RANKING/SEEDS, ETF, QC HISTORY/PROJECT/UPLOAD/COMPILE/JOB/BACKTEST, PURCHASE,
+BROKER, OPERATOR DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL, ORDERS AND TRADING
+REMAIN GATED.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -209,6 +215,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-08 | Codex source-route decision (row reconstructed by Claude in section 100 from section 99; Codex's push added none) | `dccc564` -> `b0d4a57` (record only) | Zero-additional-subscription route and FINRA Public API cross-check | Per section 99: owner approved keeping Massive plus a free FINRA cross-check; recorded FINRA Individual API terms and stronger Massive personal-use guidance; stopped because no FINRA credential is present. | Codex-reported: active-document **69 passed**. Record only. Real looks 0/0. | No new finding; source P2s open. | Owner activates a FINRA Individual credential; Claude reviews. |
 | 2026-10-08 | Claude review | `5275b7d` -> `b0d4a57` reviewed after the push watcher fired; **record-only correction (four reconstructed push-ledger rows above)**; this record commit is the only Claude commit | Independent review of the twelve-commit continuous build: synthetic order engine, ranked-order bridge, Massive qualification, latest-revised exploratory software and FINRA route | Dispositioned all 12 commits. Read the new modules for float use, network clients, imports, the pinned launch boundary, byte-before-parse loading and order-book accounting; verified three bound record hashes and the validation-period protection; ran six in-memory mutants, five red on the intended behaviour and one unreachable by construction. | Pushed tree `b0d4a57`, clean, Codex idle, network-denied: 26-file lane **1,101 passed** (817 existing + 284 new; no skips or warnings); compileall exit 0; active-document plus ML boundary 80 passed; final-tree active-document 69 passed; `git diff --check` clean. Synthetic/fabricated only; **authorized looks 0, consumed looks 0**. | `SI-CR19-001` (P3, closed by correction: four pushes without ledger rows). `SI-CR19-002` (P3, open: cross-lane Sharadar authority paraphrased). `SI-CR19-003` (P3, open advisory: exploratory look accounting before the first real run). Codex's draft findings accepted; source P2s, shared P2 and `SI-CR15-001` open. | Codex counter-reviews this record commit. The owner activates a FINRA credential if the cross-check should proceed. Every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
 | 2026-10-08 | Codex counter-review / correction | `b0d4a57f..4228eaaf` reviewed; correction `cd0481d56d6568ba6bb3e93d1432088a0a28439d`; this final record commit follows | Completed section-100 counter-review; resumed FINRA setup blocked on Chrome access | Sole Claude commit accepted after correction. Raw identifiable duplicates now quarantine valid/malformed peers across pages; successor-end guard gets three direct cases; owner Sharadar-path quotation repairs provenance. | Codex focused, network-denied: **201 passed in 115.51s**; duplicate RED 24 failed then source GREEN 59 passed; successor GREEN 3 passed / mutant RED 3 failed / final GREEN included; targeted compilation exit 0. Final document/preservation/diff checks recorded in section 101. | `SI-CCR30-001` P2 corrected; `SI-CCR30-002..003` P3 qualified; `SI-CR19-001` closure accepted, `-002` closed by quotation, `-003` prospective/open. Source/shared P2s and later-commitment advisory retained; actual looks 0/0. | One combined non-force push; delete handled Claude monitor. Make signed-in Chrome or an activated FINRA Public credential securely accessible, then freeze the bounded SI-only consistency sample. No actual comparison, outcome look or QC launch this round. |
+| 2026-10-09 | Claude review | `4228eaa` -> `1e0e784` reviewed from the published head; **no code or test correction**; this record commit is the only Claude commit | Independent review of Codex's counter-review of section 100, the duplicate-row quarantine and the evaluation-end guard pin | Confirmed `SI-CCR30-001`, `-002` and `-003` against my section 100. Reproduced the first two by execution: the `4228eaa` duplicate handling fails all 24 new cases, and removing the successor-exit guard fails all 3. Verified the fix's key equality, its cross-page counting and that only latest-revised modules can reach it. | Pushed tree `1e0e784`, clean, Codex idle, network-denied: eight newer lane files plus lane boundary, active-document and ML boundary **400 passed in 984.34s**; probes 24 failed / 3 failed / 27 passed unmutated; compileall exit 0; final-tree active-document 69 passed; `git diff --check` clean. The 18 pre-October files, which cannot reach the change, last passed 817 on `b0d4a57`. **Authorized looks 0, consumed looks 0**. | No new finding against Codex. `SI-CCR30-001` (P2), `-002` and `-003` (P3) confirmed against Claude and closed; `SI-CR19-001`, `-002` closed; `SI-CR19-003`, source P2s, shared P2 and `SI-CR15-001` open. | Codex counter-reviews this record commit. The owner makes the Chrome session reachable or supplies an activated FINRA credential's location. Every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -13928,3 +13935,146 @@ QC processing/job, broker, operator database, deployment, paper/live, actual
 capital/orders or trading access is performed during counter-review. Shared
 documents and SESSION_HANDOFF remain frozen; historical sections/ledgers and
 published history are preserved.
+
+## 102. Claude independent review — 2026-10-09 UTC (counter-review of section 100, duplicate-row quarantine, evaluation-end guard)
+
+Reviewer: Claude, the macOS session, in the designated lane worktree on
+`codex/strategy-short-interest`, CPython 3.13.15 / pytest 9.1.1, every pytest
+run network-denied with `sandbox-exec -p '(version 1)(allow default)(deny network*)'`.
+After `git fetch`, local equalled the remote at `1e0e784` with a clean tree,
+and Codex was idle.
+
+**Disposition: both Codex commits accepted.** All three `SI-CCR30` findings
+against my section 100 are confirmed, and I reproduced the two that are
+behavioural by execution. The correction in `cd0481d` is sound. No new finding
+arises against Codex this round, and this commit changes no code or test.
+Nothing here admits a source, opens a look, sends a message or accepts a
+purchase or terms.
+
+### 102.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Lane branch | `codex/strategy-short-interest` |
+| Previous Claude review record | `4228eaaf44c978c35bbcd7666ef92e37e169a388` (section 100) |
+| Reviewed remote head | `1e0e7849f0e3d41abe5c8e95b275b88d5bbdccf4` |
+| Ordered reviewed range | `4228eaa..1e0e784` (2 Codex commits, one push at 08:18 UTC on 2026-10-08) |
+| Code and test delta | `latest_revised_source.py` +19/-2 and two test files +63/-0, all in `cd0481d` |
+| Record delta | status paragraph, one ledger row (dated 2026-10-08, correct in UTC), section 101; nothing else removed |
+| Claude commits this round | this record commit only |
+
+| # | Commit | Scope | Disposition |
+|---|---|---|---|
+| 1 | `cd0481d` | Quarantine every raw ticker/settlement collision; pin the evaluation-end guard | **accepted** |
+| 2 | `1e0e784` | Section 101: counter-review of section 100, quoted Sharadar authority, FINRA access stop | **accepted** |
+
+### 102.2 The three findings against section 100 are right
+
+- **`SI-CCR30-001` (P2), confirmed by execution.** Subsection 100.4 said
+  duplicate ticker/settlement rows "are all refused, not deduplicated". That
+  held only when both copies were well formed. The code at `6f0fc88` built the
+  duplicate slots after validation, so a malformed copy (negative or boolean
+  quantity, NaN ADV or DTC, an unknown field, a short-volume field) was refused
+  on its own, and its valid twin was admitted as unambiguous. My M6 probe
+  tested only the well-formed case, so it could not see this. I put the
+  `4228eaa` version of `load_latest_revised_bundle` back in memory and ran
+  Codex's new tests: **24 failed, 35 deselected**, each on the first assertion that the shared
+  ticker/settlement key is absent from the admitted observations, matching
+  Codex's count exactly. The defect was introduced by `6f0fc88` and
+  missed by my review.
+- **`SI-CCR30-002` (P3), confirmed by execution.** Subsection 100.4 called the
+  successor-exit guard redundant because open positions at the end would void
+  the book. If every holding terminates inside the window, no position is left
+  open, and without the guard such a book completes. Removing only that
+  condition in memory: **3 failed**, one per allocation role, each because the book completed. The guard is required.
+- **`SI-CCR30-003` (P3), confirmed.** My reconstructed `b0d4a57` row says
+  Codex "stopped because no FINRA credential is present". Subsection 99.3
+  says only that none was found in the checked session and locations, and
+  explicitly not that none exists elsewhere on the machine. I repeated the
+  overstatement to the owner in chat; it is corrected there.
+- **`SI-CR19-002` is closed.** Section 101.2 now quotes the owner's message
+  giving the Sharadar directory, without inventing a date. **`SI-CR19-003`
+  stays open**, as Codex agrees.
+
+### 102.3 The correction in `cd0481d` is sound
+
+- Raw ticker and settlement identities are counted before schema and financial
+  validation, across all pages. Every copy of a colliding identity is refused,
+  each keeps its own reason, row index and raw and file hashes, and
+  unrelated rows stay in the bundle.
+- The validated slot key and the raw slot key are always the same strings:
+  `_text` and `_date` return their input unchanged, so the new lookup cannot
+  raise.
+- A row whose ticker or date is itself malformed has no identifiable slot. It
+  is refused by full validation and cannot collide; that is the stated
+  boundary of "identifiable" in the tests.
+- The 24 parametrized cases cover six malformation kinds, both orders and both
+  same-page and cross-page collisions. The three evaluation-end cases cover
+  every allocation role.
+- Only the latest-revised modules and their four test files import the
+  changed module; none of the 18 pre-October lane test files reach it.
+
+### 102.4 P0-P3 issue ledger
+
+New this round: 0 P0, 0 P1, 0 P2 and 0 P3 against Codex. Three findings
+against Claude are confirmed and closed. Still open: four P2s
+(`SI-SRC-20260928-001`, `-002`, `-003` and the shared `SI-CR5-005` /
+`SI-CCR16-007`) and two P3 advisories (`SI-CR15-001`, `SI-CR19-003`).
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or closure | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI-CCR30-001 | P2 | Closed by Codex's correction; confirmed against Claude | `6f0fc88` (introduced), `cd0481d` (fixed) | `latest_revised_source.py` duplicate handling; subsection 100.4 | A malformed duplicate let its valid twin through as an unambiguous observation. | 102.2. | Missed by my review; Codex's fix and tests are correct. | `cd0481d`. | Old function red, current green (102.2, 102.5). |
+| SI-CCR30-002 | P3 | Closed; confirmed against Claude | `6f0fc88`, `cd0481d` | evaluation-end guard; subsection 100.4 | My redundancy claim missed the all-terminated case. | 102.2. | The guard is required. | Codex's three new tests. | Guard removed red, restored green. |
+| SI-CCR30-003 | P3 | Closed; confirmed against Claude | `4228eaa` | reconstructed `b0d4a57` ledger row | "No FINRA credential is present" overstated section 99's checked scope. | Subsection 99.3. | Accepted; the historical row stays as written with Codex's qualification. | None further. | Closed. |
+| SI-CR19-001, -002 | P3 | Closed | `4228eaa`, `1e0e784` | push ledger; Sharadar authority | Reconstructed rows accepted; owner's Sharadar instruction now quoted. | Section 101.2. | Accepted. | None. | Closed. |
+| SI-CR19-003 | P3 | Open, prospective advisory | `b034cda` | exploratory look accounting | Unchanged: freeze look accounting, SI-0M treatment and a canonical-contamination rule before any real signal/outcome join. | Section 101.2. | Retained. | None. | Open. |
+| SI-SRC-20260928-001, -002, -003 | P2 | Open | prior rounds | source admission | Unchanged. | Section 101.2. | Facts no delegation can supply. | None. | Open. |
+| SI-CR15-001 | P3 | Open | `0e31505` | standing delegation | Unchanged. | Section 101.2. | Retained. | None. | Open. |
+| SI-CR5-005 / SI-CCR16-007 | P2 | Open, shared, out of lane | N/A | shared integration history | Unchanged. | Section 101.2. | Owner decision; documented only. | None on this lane. | Open. |
+
+### 102.5 Validation
+
+On the exact pushed tree `1e0e784`, clean, Codex idle, network-denied:
+
+- The eight newer lane test files (every file that can reach the changed
+  module, plus the synthetic-order files), the lane import-boundary file,
+  active-document and the repository ML boundary: **400 passed in 984.34s** with no skip, warning or error. That is 311
+  in the eight newer files (the earlier 284 plus Codex's 27 new cases) plus
+  9 + 69 + 11.
+- The 18 pre-October lane files were not rerun. None imports a latest-revised
+  module, and no module they import changed since `b0d4a57`, where they
+  passed **817** in section 100. So no complete 26-file run on `1e0e784` is
+  claimed.
+- In-memory probes: `4228eaa` duplicate handling **24 failed**; successor
+  guard removed **3 failed**; unmutated **27 passed**.
+- compileall of `research`, `scripts` and `tests`: **exit 0**.
+  Active-document on the final tree after this record: **69 passed**.
+  `git status --porcelain --ignored` before and after: **identical** (Finder `.DS_Store` excluded).
+  `git diff --check` **clean**.
+- Synthetic and fabricated fixtures only. **Authorized outcome looks: 0.
+  Consumed outcome looks: 0.**
+
+### 102.6 Quality and next step
+
+- **`cd0481d`: 10/10.** A precise fix for a real admission defect, with
+  failure-direction tests across orders and pages, plus a test that disproves
+  my redundancy claim.
+- **`1e0e784`: 9/10.** Accurate counter-review with reproduced evidence, and
+  the provenance gap closed with the owner's own words. The FINRA stop is
+  stated honestly.
+
+1. Codex counter-reviews this record commit.
+2. FINRA access: the owner either makes the signed-in Chrome session reachable
+   from Codex's chat, or activates a free FINRA Individual / Public API
+   credential and gives Codex only where it is stored (an
+   environment-variable name or file path), never its value. Then Codex
+   freezes the outcome-free FINRA-versus-Massive sample before retrieving it.
+3. Resolve `SI-CR19-003` before any real exploratory signal/outcome join.
+4. Vendor deadline 2026-10-19 17:00 America/Los_Angeles: if no exchange
+   supplies originals and all corrections with availability clocks, the
+   canonical PIT study stays blocked.
+5. Still gated: provider data, licensed or actual market rows, outcomes and
+   looks, the sealed holdout, lookback selection, production ranking and
+   seeds, ETF work, any QuantConnect history/project/upload/compile/job/
+   backtest, purchases, broker, operator database, deployment, paper/live,
+   capital, orders and trading.

@@ -397,15 +397,23 @@ whole-worktree relocation trial to
 `/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2`, including the
 compatibility audit and bounded synthetic probe. Section 272 records the
 owner's subsequent "proceed" direction after clarification that open Claude
-sessions are not evidence of hijacking or actual edits. It freezes the
-preservation audit and one new bounded probe before the physical trial.
-Actual results and the operative-root transition must be recorded below;
-no source admission or R284 clearance follows by assumption. The monitor stays paused.
+sessions are not evidence of hijacking or actual edits. The whole worktree
+now resides at that approved Code path. Its complete pre/post inventory
+preserves all names, bytes and other recorded metadata, but 21,593 regular
+files have changed ctime, so the strict preservation check refuses. No
+synthetic probe, post-move source reauthentication, production publication
+or R284 operation follows. No metadata waiver or rollback was applied.
+The monitor stays paused.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
 
 Branch: `codex/strategy-analyst-revisions-v2`
+
+Operative worktree after the owner-authorized section-272 move:
+`/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2`.
+Historical old-root strings below remain historical evidence, not a direction
+to execute there. Relocation acceptance is withheld as recorded in 272.4.
 
 Owner lane scope, 2026-08-29: this branch is exclusively for Analyst
 Revisions V2 strategy code, tests, documentation, and its eventual
@@ -1311,11 +1319,16 @@ Claude must review section 272 and its exact final pushed snapshot; this is
 not an intermediate acknowledgement wait. The owner subsequently said
 "proceed" after the open-session concern was explained. Section 272 supersedes
 the session-exit prerequisite, without authorizing any process interruption.
-Stop on actual unexplained content/Git changes. Complete the preserved-byte
-audit, exact whole-worktree move and single prospectively frozen probe, and
-record their actual results before any production decision. All repository work remains at
-the old designated root until relocation, then solely at the authorized new
-root. This authorization does not clear ARV2E263-001 or permit a publication
+The physical move and audit are now recorded in 272.4: all bytes and other
+recorded fields match, but the strict comparison refuses 21,593 ctime changes.
+All repository work must now run solely at the approved new root. Keep the
+trial stopped before post-move loaders and the uninvoked probe; preserve both
+reports without rebaselining, retrying or rewriting history. The next external
+decision is how to disposition that metadata mismatch under an explicit safe
+contract, or whether to use the already-authorized controlled rollback; no
+actor or benign security cause is established by matching bytes. Claude must
+review the exact result and protocol before it is called acceptable evidence.
+This authorization does not clear ARV2E263-001 or permit a publication
 retry/R284 launch by itself. Lane-owned contract design remains delegated,
 but a supported security/consumed-byte contract is not established.
 Same-round advisory checks are not independent final review. On 2026-10-09
@@ -3168,7 +3181,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-09 | Claude independent review of section 268: the preclaim and allocation-group corrections | `279f37ee` -> this record commit | Section 269: one Codex commit `4084483a..279f37ee` disposed (1 accepted, 0 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells | No code changed by Claude. The four pins and the v2 profile hash reproduce; in-memory removal of each correction is caught by Codex's tests; accepted `ARV2CR268-001` against section 267; 269.4 suggests next steps; section 4 names section 269, banner sentence added, this row appended | Complete lane selection at `279f37ee` with every remote address refused (strict sandbox for the six groups, three parallel streams, temporary directories in the scratchpad; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 269.5 | 0 P0, 0 P1, 0 P2, 0 P3 | Single push of this round's Claude commit; Codex counter-reviews section 269 unless the owner changes the workflow |
 | 2026-10-09 | Codex section-269 counter-review and boundary/authority clarification | `279f37ee..b7169dc0` (one new Claude record commit) -> this section-270 record commit | Accepted after three documentary qualifications; no executable or publication-contract change; owner-stopped monitor remains paused | Preserve Claude's reported evidence with explicit out-of-root and strict/loopback qualifications; no relocation, host-setting change, external temp path, probe or production/QC retry | 45 focused strict-network-denied passes, four byte pins and profile verified; final record gates in 270.3; no full Codex suite | ARV2E263-001 and independent formal evidence remain; 313/239/49/699 unchanged | One final matching-lane push at the concrete barrier; Claude must review section 270; supported remedy or explicit relocation exception required, no monitor rearm |
 | 2026-10-09 | Codex owner-authorized relocation preflight and durable permission record | `44d85d4b` -> this section-271 record commit | Exact old/new roots and reversible trial scope approved; read-only worktree/process and tracked-loader compatibility checks | No move, destination creation, private-artifact census, probe, source/helper change, publication or QC request; preserve all other sessions | Focused record gates below; no full suite or backtest | Three live Claude processes hold the old root; historical path-bound plans are not transparently relocatable; ARV2E263-001 remains | Coordinate session exit, recheck state, complete audit and freeze one new bounded probe; one final lane push at this coordination barrier; monitor remains paused |
-| 2026-10-09 | Codex authorized whole-worktree relocation trial | `4e4a6bfb` -> protocol/source freeze and final section-272 result commit | Owner says proceed after session clarification; exact old/new roots and branch retained, original bytes never rewritten | Frozen offline before/after preservation census, scoped source reauthentication, one exclusive ARV2OD272-A synthetic observation; actual results below | Focused checks only, strict network denial and operative-root temporary paths; no full suite | Historical absolute-path execution bindings remain qualified; no automatic source admission, production publication or R284 launch | Exactly one final matching-lane push for this continuous round; Claude must review section 272 and its exact snapshot; monitor remains paused |
+| 2026-10-09 | Codex authorized whole-worktree relocation trial | `4e4a6bfb` -> `dc06ed32` protocol/source freeze and final section-272 result commit | Owner says proceed after session clarification; whole worktree moved to approved Code root on unchanged branch | Complete pre/post census preserves names/bytes/other recorded fields but refuses 21,593 ctime changes; four pre-move source authentications succeeded with existing qualifications; no post-move loader or synthetic probe | 154 distinct focused strict-denied passes, four static compilations; final record checks nonadditive; no full suite | 1,837 of 1,839 artifacts have ctime-only changes; historical absolute-path bindings remain qualified; ARV2E263-001 and formal evidence gates remain | Preserve new root and both exclusive reports; no waiver, retry or automatic rollback; exactly one final matching-lane push, Claude review of section 272; monitor paused |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -39533,3 +39546,101 @@ temporary paths. Repeating record gates after this paragraph is nonadditive.
 Static compilation of the four changed Python files succeeds and
 `git diff --check` is clean. The final 86 record gates pass in 1.35 seconds
 (nonadditive); no actual census/probe has run at this freeze point.
+
+### 272.4 Actual relocation and fail-closed preservation result
+
+The source/protocol freeze is
+`dc06ed32eefb9f978e0856ac2c2947560ce2b6b0`, committed at the old root before
+either real census and before the move. The four scoped pre-move production
+loader authentications above occurred before relocation. One strict-denied
+`before` census completed; its externally retained digest was supplied to
+the single `after` invocation. No actual census was rerun.
+
+Immediately before moving, a matching-branch-only fetch still found remote
+`4e4a6bfb82e81ce25d98ec3ba16c495e901fb8d1`; local HEAD was the one unpushed
+freeze commit, with the exact branch/root and clean worktree. The exact
+destination and its parent did not exist. The parent's existing ancestor and
+old root were on device 16777232. Created only the approved
+`/Users/sheltonchen/Code` parent with 0700 permissions, then used
+`git worktree move` for the complete checkout. Git returned success. The first
+post-move command, from the new root, confirmed unchanged branch/HEAD and
+clean status, normal Git registration at the new root, and absence of both
+the old directory and an old-path symlink. No other checkout, process or
+tracking/security setting was changed. The common Git administration remains
+where Git registered it; commands do not run from that sibling checkout.
+
+Private retained reports (both gitignored), relative to the **new operative
+root** `/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2`:
+
+| Report | Bytes | SHA-256 |
+|---|---:|---|
+| `artifacts/analyst_revisions_v2/relocation_trial/R272-20261009-A/before.json` | 11,532,910 | `bd0931f9e9cac824ad394ecdc032b7c563e4b5eb92cf529e325edd3b712bbc82` |
+| `artifacts/analyst_revisions_v2/relocation_trial/R272-20261009-A/after.json` | 15,299,922 | `ca02a94e03eb67c8502e18103a8c471b72e44801b4c7ed62e28ca379b3e6236f` |
+
+Both complete inventories contain **31,653 entries**, including **21,626
+regular files / 7,517,595,616 bytes**, **986 symlinks** and **763 special
+entries**. The Analyst artifact subtree contains **1,839 regular files**.
+Exactly **2,349** regular files contain the literal old root, including
+**171** Analyst artifacts. There are **979** symlink targets containing that
+literal, all under `.pytest_cache`; the targets were recorded but never
+followed. The new census
+corroborates the historical 171 count, not the execution compatibility of
+every path-bearing artifact or symlink. `.git` administration and the exact
+audit-output subtree were the only exclusions.
+
+The `before` command returned 0. The `after` command returned **1**, with
+`complete=true` and **21,593 changed entries**. A strict-denied, hash-pinned
+count-only comparison of the two retained reports isolates every difference
+to **regular-file `ctime_ns`**. This includes **1,837 of the 1,839 Analyst
+artifact files**. There are no added/removed entries, file-hash changes,
+size/dev/ino/mode/uid/gid/link/mtime/flags changes, symlink-target changes or
+other recorded-field differences. This is content/recorded-metadata evidence,
+not proof about unqueried ACLs/xattrs, the responsible actor, continuous
+stability or why ctime changed during the relocation interval. Do not call
+the strict audit a pass or equate the Git move's success with acceptance.
+
+**272-D1 — retain new root and stop the trial.** The frozen acceptance
+condition failed. Preserve both reports and all moved evidence; do not
+silently rebaseline or excuse ctime merely because bytes match. No second
+census, post-move source-loader authentication, ARV2OD272-A observation,
+production retry, continuity preparation or QC operation was performed.
+The prospective probe directory remains unallocated; its frozen permission
+was conditional on the preceding audit passing and cannot bypass this stop.
+Keep the approved new root operative for documenting/reviewing the result.
+An immediate rollback would be another metadata-affecting move without
+restoring or explaining the original ctime, so it was not performed. The
+section-271 reversible rollback authority remains available for a separately
+documented decision; no old path is recreated by assumption.
+
+This is a concrete metadata-preservation failure, not another session-exit
+or routine-approval wait. A safe prospective disposition needs evidence and
+an explicit security/consumption argument for the observed changes, or an
+owner-directed controlled rollback. No claim that macOS document tracking
+caused this result is established. Four changed Python source/test hashes
+still equal their frozen pins after relocation. Historical path-bound plans
+and the failed continuity A/B leaves retain their original bytes and limits.
+No actor was accused of hijacking, and no Claude session was interrupted.
+
+### 272.5 Final validation and handoff
+
+Pre-move validation remains **154 distinct focused strict-network-denied
+passes**, four static compilation checks and clean diff checks. Record-only
+checks on the final result pass **86 tests in 1.69 seconds** at the new root
+under strict denial, using fresh new-root TMPDIR/basetemp, nonadditive.
+No complete lane suite or renewed real metadata probe is claimed. Read-only
+same-round advisory review independently checks both report hashes and the
+aggregate mismatch against the comparison code and confirms the refusal;
+this is not independent final review. The continuous round is
+`4e4a6bfb82e81ce25d98ec3ba16c495e901fb8d1..this final section-272 record commit`,
+with the local `dc06ed32` freeze and one final result commit, then exactly
+one successful matching-lane push from the new root. A push is not acceptance.
+Claude must review both commits, the exact evidence pins and this refusal.
+No other chat is messaged and the monitor remains paused.
+
+ARV2E263-001 remains unresolved; R284 is unprepared and unlaunched. No new
+source capture, provider/QC contact, research look or exposed cell occurred.
+The floor remains **313 shared / 239 development / 49 infrastructure / 699 cells**.
+Independent vendor immutable history, reviewed security-master identity,
+scores, cutoff-valid prior-close prices and other formal gates remain;
+readiness/action flags remain false. No funded account, broker, paper/live
+deployment or real-order authority follows from the move or these diagnostics.

@@ -115,7 +115,7 @@ def test_importing_the_whole_package_loads_no_network_capable_lane_module() -> N
 
 
 # A bounded structural check, not a network sandbox: direct transport tests
-# need an unconditional connection patch before their first transport reference.
+# need a family-specific unconditional patch before every transport reference.
 # Aliased transports, dynamic patch targets and arbitrary helper control flow
 # are not proven here. Run tests/mutants with process-tree network denial too.
 # Kept at module level so the scan below does not flag its own control sample.
@@ -165,59 +165,68 @@ def _statement_call(statement: ast.stmt) -> ast.Call | None:
     return None
 
 
-def _connection_patch(statement: ast.stmt) -> bool:
+def _connection_patch(statement: ast.stmt) -> frozenset[str]:
     call = _statement_call(statement)
     if call is None or _dotted_name(call.func) != "monkeypatch.setattr":
-        return False
+        return frozenset()
     args = call.args
     if len(args) == 2:
-        return isinstance(args[0], ast.Constant) and args[0].value in _CONNECTION_SEAMS
+        if isinstance(args[0], ast.Constant) and args[0].value in _CONNECTION_SEAMS:
+            return frozenset({args[0].value})
     if len(args) == 3:
         target = _dotted_name(args[0])
         if ((target == "http.client" or target.endswith(".http.client"))
                 and isinstance(args[1], ast.Constant) and args[1].value == "HTTPSConnection"):
-            return True
+            return frozenset({"http.client.HTTPSConnection"})
         # Section 153 (Claude review): the provider and earnings transports open
         # through urllib; patching the opener factory is their connection patch.
-        return (
-            (target == "urllib.request" or target.endswith(".request"))
-            and isinstance(args[1], ast.Constant) and args[1].value == "build_opener"
-        )
-    return False
+        if ((target == "urllib.request" or target.endswith(".request"))
+                and isinstance(args[1], ast.Constant) and args[1].value == "build_opener"):
+            return frozenset({target + ".build_opener"})
+    return frozenset()
 
 
 _CONNECTION_SEAMS = frozenset({"http.client.HTTPSConnection", "urllib.request.build_opener"})
 # Section 153 (Claude review): the urllib-based provider and earnings transports
 # share the `_default_transport` name; a test that reaches them is a direct test.
-_TRANSPORT_NAMES = frozenset({"_sec_transport", "_selected_sec_transport", "_default_transport"})
+_TRANSPORT_SEAMS = {
+    "_sec_transport": "http.client.HTTPSConnection",
+    "_selected_sec_transport": "http.client.HTTPSConnection",
+    "_default_transport": "urllib.request.build_opener",
+}
 
 
-def _touches_real_transport(statement: ast.stmt) -> bool:
+def _required_connection_seams(statement: ast.stmt) -> frozenset[str]:
+    required = set()
     for node in ast.walk(statement):
-        if isinstance(node, ast.Attribute) and node.attr in _TRANSPORT_NAMES:
-            return True
+        if isinstance(node, ast.Attribute) and node.attr in _TRANSPORT_SEAMS:
+            seam = _TRANSPORT_SEAMS[node.attr]
+            if node.attr == "_default_transport":
+                seam = _dotted_name(node.value) + ".request.build_opener"
+            required.add(seam)
         # Section 127 (Claude review): a transport imported by its bare name
         # is the same object as the attribute form.
-        if isinstance(node, ast.Name) and node.id in _TRANSPORT_NAMES:
-            return True
+        if isinstance(node, ast.Name) and node.id in _TRANSPORT_SEAMS:
+            required.add(_TRANSPORT_SEAMS[node.id])
         if isinstance(node, ast.Call) and (
             (isinstance(node.func, ast.Attribute) and node.func.attr == "_fetch_sec")
             or (isinstance(node.func, ast.Name) and node.func.id == "_fetch_sec")
         ):
-            return True
-    return False
+            required.add("http.client.HTTPSConnection")
+    return frozenset(required)
 
 
-def _wire_helper_patches(tree: ast.Module) -> bool:
+def _wire_helper_patches(tree: ast.Module) -> frozenset[str]:
     helpers = [node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == "_fake_https_wire"]
     if len(helpers) != 1:
-        return False
+        return frozenset()
     for stmt in helpers[0].body:
-        if _connection_patch(stmt):
-            return True
+        patches = _connection_patch(stmt)
+        if patches:
+            return patches
         if isinstance(stmt, (ast.Return, ast.Raise, ast.If, ast.For, ast.While, ast.Try, ast.With, ast.Match)):
-            return False
-    return False
+            return frozenset()
+    return frozenset()
 
 
 def _real_transport_tests_without_tripwire(sources: dict[str, str]) -> tuple[int, list[str]]:
@@ -230,24 +239,34 @@ def _real_transport_tests_without_tripwire(sources: dict[str, str]) -> tuple[int
         for node in ast.walk(tree):
             if (isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
                     and node.name.startswith("test_")):
-                patched = False
+                patched: set[str] = set()
+                touched, offending = False, False
                 for stmt in node.body:
-                    if _touches_real_transport(stmt):
-                        seen += 1
-                        if not patched:
-                            offenders.append(f"{name}::{node.name}")
-                        break
+                    required = _required_connection_seams(stmt)
+                    if required:
+                        touched = True
+                        if any(seam not in patched and not (
+                                seam.endswith(".request.build_opener")
+                                and "urllib.request.build_opener" in patched
+                        ) for seam in required):
+                            offending = True
+                        continue
                     call = _statement_call(stmt)
                     if call is not None and _dotted_name(call.func) == "monkeypatch.undo":
                         # Undoing every patch restores the real connection.
-                        patched = False
+                        patched.clear()
                         continue
-                    if _connection_patch(stmt) or (
+                    patched.update(_connection_patch(stmt))
+                    if (
                         wire_patches and call is not None
                         and isinstance(call.func, ast.Name) and call.func.id == "_fake_https_wire"
                         and call.args and isinstance(call.args[0], ast.Name) and call.args[0].id == "monkeypatch"
                     ):
-                        patched = True
+                        patched.update(wire_patches)
+                if touched:
+                    seen += 1
+                if offending:
+                    offenders.append(f"{name}::{node.name}")
     return seen, offenders
 
 
@@ -373,4 +392,37 @@ def test_tripwire_scan_flags_an_unpatched_urllib_transport(source: str) -> None:
     "def test_safe(monkeypatch):\n    monkeypatch.setattr('urllib.request.build_opener', opener)\n" + _URLLIB_USE,
 ))
 def test_tripwire_scan_accepts_an_opener_patch_before_a_urllib_transport(source: str) -> None:
+    assert _real_transport_tests_without_tripwire({"invented.py": source}) == (1, [])
+
+
+# Section 154 (Codex counter-review): a different transport family's patch
+# cannot protect direct SEC calls, including a later call in the same test.
+@pytest.mark.parametrize("source", (
+    "def test_unsafe(monkeypatch):\n    monkeypatch.setattr('urllib.request.build_opener', opener)\n" + _USE,
+    "def test_unsafe(monkeypatch):\n    monkeypatch.setattr(urllib.request, 'build_opener', opener)\n" + _USE,
+    "def test_unsafe(monkeypatch):\n    monkeypatch.setattr(unrelated.request, 'build_opener', opener)\n" + _URLLIB_USE,
+    "def test_unsafe(monkeypatch):\n    monkeypatch.setattr('urllib.request.build_opener', opener)\n"
+    + _URLLIB_USE + _USE,
+    "def test_unsafe(monkeypatch):\n    monkeypatch.setattr('http.client.HTTPSConnection', forbidden)\n"
+    + _USE + _URLLIB_USE,
+    "def test_unsafe(monkeypatch):\n    monkeypatch.setattr('http.client.HTTPSConnection', forbidden)\n"
+    + _USE + "    monkeypatch.undo()\n" + _USE,
+    _PATCHED_WIRE_HELPER + "def test_unsafe(monkeypatch):\n    _fake_https_wire(monkeypatch, b'')\n"
+    + _USE + _URLLIB_USE,
+))
+def test_tripwire_scan_refuses_wrong_family_or_later_unprotected_use(source: str) -> None:
+    assert _real_transport_tests_without_tripwire({"invented.py": source}) == (
+        1, ["invented.py::test_unsafe"],
+    )
+
+
+@pytest.mark.parametrize("source", (
+    "def test_safe(monkeypatch):\n    monkeypatch.setattr('http.client.HTTPSConnection', forbidden)\n"
+    + _USE + "    monkeypatch.setattr('urllib.request.build_opener', opener)\n" + _URLLIB_USE,
+    "def test_safe(monkeypatch):\n    monkeypatch.setattr('urllib.request.build_opener', opener)\n"
+    + _URLLIB_USE + "    monkeypatch.setattr('http.client.HTTPSConnection', forbidden)\n" + _USE,
+    "def test_safe(monkeypatch):\n    monkeypatch.setattr('http.client.HTTPSConnection', forbidden)\n"
+    + _USE + "    monkeypatch.undo()\n    monkeypatch.setattr('http.client.HTTPSConnection', forbidden)\n" + _USE,
+))
+def test_tripwire_scan_accepts_each_family_patched_before_every_use(source: str) -> None:
     assert _real_transport_tests_without_tripwire({"invented.py": source}) == (1, [])

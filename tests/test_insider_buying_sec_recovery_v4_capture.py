@@ -422,3 +422,29 @@ def test_observed_capture_refuses_an_invented_selection_before_any_journal(tmp_p
                    transport=lambda *args: pytest.fail("No request"), guard=lambda: None, observed=True)
     base, _, _ = directories(tmp_path)
     assert not base.exists()
+
+
+# Section 154: isolate each admission clause. The type-shaped object below is
+# deliberately UNSEALED, not an observed selection or genuine replay proof.
+# A second sentinel refuses before even contact/payload validation if a clause
+# disappears. No real lane directory, journal or network can be reached.
+@pytest.mark.parametrize("invalid_member", ("selection", "transport", "root"))
+def test_observed_capture_each_admission_clause_refuses_before_contact(monkeypatch, tmp_path, invalid_member):
+    from research.insider_buying_sec_selected_parent_runner import _selected_sec_transport
+
+    monkeypatch.setattr("http.client.HTTPSConnection", lambda *a, **k: pytest.fail("No connection"))
+    real_transport = _selected_sec_transport
+    chosen = selection.FreshV4Selection(b"", object(), b"")
+    root, transport = selection._base().LANE_ROOT, real_transport
+    if invalid_member == "selection":
+        chosen = selection.make_invented_test_selection((request(),))
+    elif invalid_member == "transport":
+        transport = lambda *a, **k: pytest.fail("No dispatch")
+    else:
+        root = tmp_path.resolve()
+    monkeypatch.setattr(m, "_contact", lambda *a, **k: pytest.fail("Admission must refuse before contact"))
+    monkeypatch.setattr(m, "_Directory", lambda *a, **k: pytest.fail("No journal access"))
+    with pytest.raises(m.FreshV4CaptureError, match="fixed genuine selection/transport/root"):
+        m._capture(chosen, "fixture-first", "a" * 40, CONTACT, root=root, transport=transport,
+                   guard=lambda: pytest.fail("No repository guard"), observed=True)
+    assert not directories(tmp_path)[0].exists()

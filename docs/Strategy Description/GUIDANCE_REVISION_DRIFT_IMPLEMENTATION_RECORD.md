@@ -2175,3 +2175,30 @@ new evidence authority or unrepresented recovery returns to the owner.
 BT-1 through BT-10 implementation is complete; independent acceptance,
 native/cloud integration evidence and empirical readiness are separate,
 uncompleted stages. No automatic monitor resumption or wider follow-on scope.
+
+### 22.7 Owner-authorized final completion publication, 2026-10-09
+
+The owner explicitly answered **"push"** to the request for one final
+completion push. This resolves the publication hold in 22.1/22.6 and the
+remaining publication decision in GDR-CCR22-001; their prior held state is
+preserved as history. Authorization covers one final non-force publication
+of this complete BT-1 through BT-10 series, with this lane-only approval
+closure, targeting only `origin/codex/strategy-guidance-revision-drift` from
+the existing designated worktree. The premature `bf91788b` publication remains
+preserved; no history rewrite, intermediate publication or other branch.
+
+Pre-publication checks verified exact absolute root/branch, clean local
+`705ad24fb285f4e8ef9cc1b2166a8b6c4f7de25a`, matching origin URL, and remote
+`bf91788b4c593e24710f5c63cfbfbcf9e56cad89`. The remote is an ancestor of the
+local completion series. This commit changes only the lane record; all source
+and package identities and validation evidence in 22.5 stay unchanged.
+Recheck root/branch/HEAD/status and the relevant remote immediately before
+the single push, then verify its exact resulting remote SHA. The execution
+result, final publication SHA and successful-push count belong in automation
+memory/thread state; no second post-publication metadata push is authorized.
+
+Next remains independent Claude review of the complete final pushed snapshot
+and every commit after consumed review `1d81a28`, followed by Codex
+counter-review. This publishing request does not authorize a QC launch,
+independent-review bypass, real-data/economic action or monitor resumption.
+Actual QC attempts remain zero and all empirical/trading gates remain closed.

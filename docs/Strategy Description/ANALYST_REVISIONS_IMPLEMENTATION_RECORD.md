@@ -410,6 +410,10 @@ assessment. Its sole invocation refused `xattr_unapproved`; the retained
 The synthetic probe remains uninvoked. The original preservation audit stays
 failed; no allowlist, production guard or formal gate was relaxed.
 The monitor stays paused.
+Section 274 is Claude's independent review of `b7169dc0..8b9c5bae` (0 P0,
+0 P1, 0 P2, 5 P3): all six Codex commits are accepted, the relocation and
+assessment reports authenticate, and 274.5 recommends a narrow, versioned
+policy for the vintage directory's attributes.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1321,9 +1325,11 @@ Claude commit `b7169dc0` with documentary qualifications and focused in-root
 checks. Section 271 records the owner's explicit authorization for the
 reversible relocation trial, compatibility audit and bounded synthetic probe
 at `/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2`.
-Claude must review section 273 and its exact final pushed snapshot, including
-the still-unreviewed section-272 move; this is not an intermediate
-acknowledgement wait. The owner subsequently said
+Section 274 is Claude's independent review of the exact pushed range
+`b7169dc0..8b9c5bae` (sections 270-273), including the section-272 move.
+The immediate next step is that Codex counter-reviews section 274 and this
+round's Claude commit, unless the owner explicitly changes this workflow;
+this is not an intermediate acknowledgement wait. The owner subsequently said
 "proceed" after the open-session concern was explained. Section 272 supersedes
 the session-exit prerequisite, without authorizing any process interruption.
 The physical move and audit are now recorded in 272.4: all bytes and other
@@ -1350,7 +1356,7 @@ metadata,
 not another move, attribute removal or an allowlist expansion by assumption.
 The frozen assessment/probe sequence stops here; a later invocation needs
 its own justified prospective decision and cannot reuse this spent identity.
-Claude must review section 273
+Section 274 is Claude's review of section 273
 and its exact result/protocol. This authorization does not clear ARV2E263-001,
 change production source guards or permit a publication retry/R284 launch by
 itself; finite sampled output evidence alone cannot establish production
@@ -1408,7 +1414,7 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 268 (section 269); for section 250 the owner
+the pushed range through section 273 (section 274); for section 250 the owner
 directed focused checks without the complete suite. Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
@@ -3207,6 +3213,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-09 | Codex owner-authorized relocation preflight and durable permission record | `44d85d4b` -> this section-271 record commit | Exact old/new roots and reversible trial scope approved; read-only worktree/process and tracked-loader compatibility checks | No move, destination creation, private-artifact census, probe, source/helper change, publication or QC request; preserve all other sessions | Focused record gates below; no full suite or backtest | Three live Claude processes hold the old root; historical path-bound plans are not transparently relocatable; ARV2E263-001 remains | Coordinate session exit, recheck state, complete audit and freeze one new bounded probe; one final lane push at this coordination barrier; monitor remains paused |
 | 2026-10-09 | Codex authorized whole-worktree relocation trial | `4e4a6bfb` -> `dc06ed32` protocol/source freeze and final section-272 result commit | Owner says proceed after session clarification; whole worktree moved to approved Code root on unchanged branch | Complete pre/post census preserves names/bytes/other recorded fields but refuses 21,593 ctime changes; four pre-move source authentications succeeded with existing qualifications; no post-move loader or synthetic probe | 154 distinct focused strict-denied passes, four static compilations; final record checks nonadditive; no full suite | 1,837 of 1,839 artifacts have ctime-only changes; historical absolute-path bindings remain qualified; ARV2E263-001 and formal evidence gates remain | Preserve new root and both exclusive reports; no waiver, retry or automatic rollback; exactly one final matching-lane push, Claude review of section 272; monitor paused |
 | 2026-10-09 | Codex authorized prospective scoped fresh-use assessment | `ac951360` -> `26cfc8dc` source/protocol freeze and final result commit | Owner approves bounded investigation and a new scoped security/consumption contract, not failed-audit acceptance | Sole fixed assessment refused xattr_unapproved; authenticated 584-byte failure report retained; bounded 27-object names-only diagnostic isolates three extra names on vintage directory; original ARV2OD272-A still uninvoked | 242 distinct focused strict-denied passes; four static compilations; final record checks nonadditive; no full suite | Extra MACL/quarantine/fileprovider names need security disposition; historical security, actor causality and production safety unproven; formal gates unchanged | Stop spent assessment; preserve all evidence, no retry/attribute mutation/R284 bypass; one final matching-lane push; Claude review section 273; monitor paused |
+| 2026-10-09 | Claude independent review of sections 270-273: the relocation, the fresh-use assessment and its attribute refusal | `8b9c5bae` -> this record commit | Section 274: six Codex commits `b7169dc0..8b9c5bae` disposed (6 accepted, 0 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells; census, assessment and R272 probe not run | No code changed by Claude. The R272 and R273 reports and nine source pins authenticate, the census difference and the names-only attribute census are reproduced independently, in-memory guard removals are tabulated, accepted `ARV2CR270-001` to `-003`, 274.5 recommends a versioned attribute policy; section 4 names section 274, banner sentence added, this row appended | Complete lane selection at `8b9c5bae` with every remote address refused (strict sandbox for the six groups, three parallel streams, temporary directories inside the root's ignored `.pytest_cache`; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 274.6 | 0 P0, 0 P1, 0 P2, 5 P3 | Single push of this round's Claude commit; Codex counter-reviews section 274 unless the owner changes the workflow |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -40060,3 +40067,419 @@ overstatements: names-only identification is now completed rather than next;
 the observed ACL API is native extended ACL, not POSIX access ACL; and these
 are currently observed attributes, not proven inherited attributes because
 there is no historical xattr inventory. No code, guard or evidence changed.
+
+## 274. Independent Claude review of sections 270–273: the relocation, the fresh-use assessment and its attribute refusal, 2026-10-09
+
+**Range reviewed:** `b7169dc0..8b9c5bae`, six Codex commits: the section-270
+counter-review, the section-271 authorization and preflight stop, the frozen
+relocation census and probe entry point with their section-272 result, and
+the frozen fresh-use assessment with its section-273 result. Each commit is
+disposed of in 274.1. The range also contains this round's one Claude lane
+commit (this record commit).
+
+**Zero research looks, development evaluations, infrastructure looks, and
+authenticated cells in this round.** This review made no provider,
+QuantConnect, mail or browser request. It did not run the census, the
+assessment or the R272 synthetic probe, and it changed no attribute, setting
+or artifact. Every pytest, mutation and private-report parser ran inside the
+strict sandbox of 242.6, with `TMPDIR` and every pytest temporary directory
+inside the operative root's ignored `.pytest_cache`. R284 stays unprepared
+and unlaunched, the monitor stays paused, and the floor stays
+**313 / 239 / 49 / 699**.
+
+**Verdict.** All six Codex commits are accepted; none is rejected.
+**0 P0, 0 P1, 0 P2, 5 P3.** The retained R272 and R273 reports authenticate,
+and an independent recomputation reproduces every count Codex reports from
+them. The relocation preserved every byte; it did not establish security
+equivalence or the executability of the 171 path-bearing artifacts, as
+Codex says. The new security observer and assessment bind freshly consumed
+bytes to the manifest pins and the current security state as claimed, and
+D5's security stop is correct. The five P3s concern a pre-freeze census that
+did not cover the assessment's own objects, a platform and interpreter
+dependency, guards no test isolates, and two fail-closed gaps in the spent
+or uninvoked tools. None changes the retained evidence or any gate. Codex's
+three qualifications of section 269 are accepted (274.3). 274.5 recommends a
+narrow, versioned attribute policy for the one vintage directory.
+
+### 274.1 Per-commit disposition
+
+| Commit | What it is | Disposition | Basis |
+|---|---|---|---|
+| `44d85d4b` | Section 270: counter-review of section 269 and the route decisions | accepted | The three qualifications of section 269 are correct (274.3). D1 to D3 keep the relocation a trial that needs explicit authority, refuse unsupported alternatives, and keep R284 and the external evidence separate. |
+| `4e4a6bfb` | Section 271: the owner's authorization and the preflight stop | accepted | It quotes the owner's authorization and stops before the move on live sessions whose working directory was the old root. The static compatibility analysis names path-bound plans and artifacts without claiming they work after a move. |
+| `dc06ed32` | Frozen relocation census, probe entry point and section 272's protocol | accepted | The census and probe sources match their pins (`9900735c…`, `6975d5fe…`), as do their tests (`0ba57d44…`, `774c741b…`). The R272 profile hash `7877cea0…` reproduces. The census output is exclusive and private, and a failed comparison keeps its report. The probe has exactly one fixed path, the R266 path stays spent, and any miswiring of the new flag refuses. `ARV2R274-003`, `-004` and `-005` are documented. |
+| `ac951360` | Section 272: the move and the census refusal | accepted | Both reports authenticate, and recomputing the difference from their census entries gives exactly 21,593 changed files, each differing only in `ctime_ns`. Every file hash, symlink target, special entry and directory row is unchanged. Stopping without a rollback, rerun or new baseline is correct. |
+| `26cfc8dc` | Frozen fresh-use assessment, security observer and section 273's protocol | accepted | The assessment, observer and test sources match their pins (`3ff39278…`, `3435bc07…`, `18d33138…`, `97afaaa0…`), and the shared capture helper is unchanged (`17e516b4…`). The six-point contract of 273.3 is implemented as written; the in-memory trials of 274.4 catch every security-observer guard and most assessment guards. `ARV2R274-002` and `-003` are documented. |
+| `8b9c5bae` | Section 273: the assessment refusal and the names-only identification | accepted | The report `8325d3e0…` authenticates and records `xattr_unapproved` with `complete=false`. Its directory holds only that report. An independent names-only census of the same 27 objects finds exactly D4's three extra names on the vintage directory. D5's stop is correct. `ARV2R274-001` is documented. |
+
+### 274.2 Findings
+
+| ID | P | Introduced by | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R274-001` | P3 | `26cfc8dc` | The one-use assessment admitted only `com.apple.provenance`. Its pre-freeze names check in 273.2 covered only the Code, repository and private artifact directories, not the 12 directories and 15 leaves the assessment would pin. The names-only census of those 27 objects that D4 ran afterwards was equally read-only and available before the freeze. It shows the three extra names on the vintage directory. Across all artifact directories, `com.apple.fileprovider.dir#N` is on 18 capture directories and `com.apple.quarantine` on 11 (274.4). The single assessment was spent on a refusal that a complete pre-freeze census of its own scope would have predicted. | Documented for Codex. A spent identity cannot be corrected. Before any future one-use freeze, run the bounded names-only census of its exact object scope and record the result in the frozen protocol. |
+| `ARV2R274-002` | P3 | `26cfc8dc` | The assessment and its tests require `stat.UF_TRACKED`, which this repository's interpreters first expose in Python 3.13: the 3.9 system Python lacks it and the 3.13 environment has it. The observer also needs `st_flags`, which Linux does not provide. Neither new test file is gated by platform or interpreter. The repository workflow `.github/workflows/tests.yml` runs `pytest tests/` on Ubuntu with Python 3.12, 3.13 and 3.14 for pushes and pull requests to `main`. Removing `stat.UF_TRACKED` in memory fails 39 of the 64 assessment tests. On Linux every observer snapshot refuses, because its metadata read needs `st_flags`. There is no effect on this branch, which CI does not run, or on R273, which ran on 3.13.15. | Documented for Codex, not corrected here: both test files are pinned in the frozen 273.3 protocol. With its next code change, Codex should gate both files on Darwin and `hasattr(stat, "UF_TRACKED")`, record the new pins, and make any later one-use tool check its platform and interpreter before allocating its output. |
+| `ARV2R274-003` | P3 | `dc06ed32`, `26cfc8dc` | Several guards are not isolated by any test, so removing one in memory still passes its file (274.4). In the census: the directory rows, the directory fields, directory drift during the walk, the exact exclusion scope, the nonzero exit on a mismatch, the named check after each read, `O_NOFOLLOW` on directory opens and the retained `before.json.pending` check. The symlink test cannot fail, because its target never exists. In the assessment: the directory flag mask, the loader-root check, the initial named check, the post-consumer hash and the exact-size check. The last three are defense in depth: other tested checks catch their scenarios. For R272 the retained evidence does not depend on these tests, because this review verified the actual report directly (274.4). | Documented for Codex. Both tools are spent, so the tests matter only if either is reused. Any successor version should add a test that fails without each listed guard. |
+| `ARV2R274-004` | P3 | `dc06ed32` | The census's after stage allocates nothing before its multi-minute census. Its first exclusive allocation is the pending report after the walk. An interruption, an uncaught exception type, or a root or output identity refusal therefore leaves no retained evidence and does not spend the stage, so a second after run could proceed. That conflicts with the "failures stay spent" design. For R272 the point is moot: `after.json` exists, so neither stage can run again. But the artifacts alone cannot show that the after stage ran only once; that rests on the record. | Documented for Codex: a successor should allocate its pending leaf exclusively before the walk. |
+| `ARV2R274-005` | P3 | `dc06ed32` (inherited from `e9e94bf6`) | The probe's command line returns 0 whenever the run returns, including `complete=false` or nonzero refusal counts; its CLI test asserts exactly that. Its printed line also omits `flags_available` and the payload match, which 272.2 requires for acceptance. Section 267 accepted the inherited behaviour without noting this. | Documented. The probe stays uninvoked. If a later decision ever authorizes it, acceptance must come from the authenticated report's fields, never from the exit status or printed line. |
+
+### 274.3 Codex's findings against Claude's section 269, and the six review questions
+
+**Codex's qualifications are accepted.**
+
+- **`ARV2CR270-001` (P3) is accepted.** Section 269 put its pytest temporary
+  directories in the scratchpad, outside the then-operative root, so its
+  counts are location-qualified evidence. Its opening sandbox shorthand
+  also omitted the loopback-only exception. This round keeps `TMPDIR` and every
+  pytest temporary directory under `.pytest_cache/claude-review-274` inside
+  the operative root. Only the review's own logs and the in-memory mutation
+  plugin live in the scratchpad.
+- **`ARV2CR270-002` (P3) is accepted.** "Avoid drift" and "cannot make tests
+  flaky" overstated a finite observation. This round did observe no drift on
+  one in-root file over one second (274.4), but that is a sample, not a
+  guarantee.
+- **`ARV2CR270-003` (P3) is accepted.** Lane contract design is delegated
+  under 255.2; only the reserved path and host-setting exceptions need the
+  owner.
+
+**Answers to the six questions.**
+
+1. **Section 270's qualifications are justified** (above).
+2. **The relocation stayed within the owner's exception and preserved the
+   evidence.**
+   - The authorization quoted in 271.1 and the later "proceed" in 272.1 cover
+     the exact new root. The operative root is the original directory object
+     (inode 1277350, birth time 2026-09-03), now at the approved path.
+   - Recomputing the difference from the authenticated census entries gives
+     the result Codex reports:
+     - all 21,626 regular files keep the same SHA-256;
+     - all 986 symlink targets are recorded verbatim, all in `.pytest_cache`;
+     - all 763 special entries and 8,278 directory rows are unchanged in every
+       compared field;
+     - the only differences are 21,593 file `ctime_ns` values;
+     - no censused object carries the dataless flag.
+   - The three-way distinction is correct:
+     - **Byte preservation** is established.
+     - **Security equivalence** is not, because the census recorded no ACLs
+       or extended attributes.
+     - **Executability** of the 171 path-bearing artifacts is not established,
+       and 979 symlinks in `.pytest_cache` still name the old root and now
+       dangle.
+3. **The census is exclusive and mostly fail-closed; the probe is fixed and
+   uninvoked.**
+   - **The census:**
+     - Its output directory is created 0700 and refuses if it already exists,
+       and its reports are created 0600, linked into place and read back.
+     - Files are compared held against named before and after each read;
+       symlinks are recorded without being followed, and special entries are
+       never opened.
+     - The exclusions in the actual report are exactly the top-level `.git`
+       and the R272 subtree; `.gitignore`, `.github`, `.gitattributes`, nested
+       `.git` entries and the `relocation_trial` parent were all censused.
+     - The comparison is of whole rows, not hashes alone, and the failed
+       comparison kept its report and exited 1.
+     - It is bounded in scope but not in size or time, which is acceptable for
+       one owner-run census.
+   - **The exceptions** are `ARV2R274-004` and the untested guards of
+     `ARV2R274-003`.
+   - **The probe:**
+     - Its entry point refuses unless the working directory, module root,
+       fixed path and non-test mode all match.
+     - Swapping the flag's two paths refuses at those fixed-path guards.
+     - Its R272 output does not exist, so it was never invoked.
+4. **The assessment binds freshly consumed bytes to the manifest pins and the
+   current security state.**
+   - **Each source leaf** is opened without following links and held. Every
+     current field, including `ctime`, must equal its pinned census record,
+     and the held bytes must hash to the historical value.
+   - **The descriptors stay open** while the unchanged loaders read and
+     authenticate their own fresh buffers against the original manifest pins.
+     The vintage loader's own pin equals the assessment's `94251ffd…`, and it
+     reads only the three pinned leaves.
+   - **Afterwards** the held and named stat, the security snapshot, the hash
+     and every directory are checked again.
+   - **Change-and-restore:** any write or time restore changes `ctime`. On this
+     volume, renaming a file away and back also changed its `ctime` (274.4),
+     so a swap and restore of a held source is caught.
+   - **ACLs:**
+     - Only a NULL result with `ENOENT` on the held descriptor counts as no
+       extended ACL; any other NULL refuses, and a stale `errno` cannot
+       disguise one.
+     - Entries are counted before the text is rendered.
+     - Any non-empty or flagged text refuses.
+     - Optional hardening for a successor: also require the raw flag set to
+       be zero, rather than relying on how the text renders flags.
+   - **Extended attributes:**
+     - Name lists are bounded to 8 KiB and values to 64 KiB in total.
+     - Unknown names refuse before any value is read.
+     - The provenance value is kept only as its length and SHA-256.
+     - Names, the ACL and the full held stat are checked again within each
+       snapshot.
+   - **Directories** are resolved component by component from `/` without
+     following links. Owner, mode and the flag mask are checked, and their
+     full metadata, including times, must not change while the loaders run. A
+     future run therefore needs a quiet Code anchor and repository root,
+     because any entry created there during the run refuses it.
+5. **The link-count allowance is sound and narrow.**
+   - On this volume an empty directory has link count 2, each entry adds one,
+     and the pending, link and unlink sequence nets exactly one (274.4).
+   - Only the link count may change, and only by one. The directory must be
+     empty before publication and hold exactly `report.json` afterwards; the
+     paired trials show the link-count and listing checks back each other up.
+   - `complete=true` alone is not success. The report is written before the
+     final checks, and its readback compares bytes, mode and link count but
+     not the inode, so success needs exit 0 and the externally recorded hash
+     of the final inventory, as 273.3 states.
+   - For R273: exit 1 and `complete=false`. The report hash authenticates, and
+     the directory is 0700 with link count 3, holding only the 0600
+     single-link report.
+6. **The attribute stop is proportionate, and a narrow versioned policy can
+   replace it** (274.5). Admitting all three names everywhere would also
+   admit them on 17 other capture directories and on any source leaf, and
+   decoding or removing them would go beyond what Apple documents.
+
+### 274.4 What this review reproduced
+
+- **The retained reports authenticate, and their hash chain closes.**
+  - `before.json`: 11,532,910 bytes, `bd0931f9…`.
+  - `after.json`: 15,299,922 bytes, `ca02a94e…`; it names `before.json` by
+    that hash.
+  - R273 `report.json`: 584 bytes, `8325d3e0…`; it names both.
+  - All three files are 0600 and owner-only.
+  - Their schemas, stages, `complete` and `matches_before` values are as
+    stated, and the R273 refusal code is `xattr_unapproved`.
+- **Every count in 272.4 and 273.2 reproduces from the census entries:**
+  - 31,653 entries;
+  - 21,593 changed files, 1,837 of them artifacts;
+  - flags of changed files: 4,903 with 64 and 16,690 with 32832;
+  - 33 unchanged files: 30 with two links and flags 32832, plus three
+    `.DS_Store` files with flags 32768;
+  - the stated `ctime` interval.
+- **The names-only census of the 27 objects matches D4.**
+  - Read without following links, names only, with stat checks before and
+    after: 26 objects have only `com.apple.provenance`.
+  - The vintage directory
+    `artifacts/analyst_revisions_v2/sharadar_capture/arv2-sharadar-source-20260914T003329843989Z`
+    has `com.apple.fileprovider.dir#N`, `com.apple.macl`,
+    `com.apple.provenance` and `com.apple.quarantine`.
+- **A wider names-only census of every artifact object** (no value read)
+  shows:
+  - **Directories:** 264 carry only provenance. 18 capture directories under
+    `sharadar_capture` and `massive_capture` carry
+    `com.apple.fileprovider.dir#N`, and 11 of those also carry
+    `com.apple.quarantine`. `com.apple.macl` appears only on the vintage
+    directory.
+  - **Files:** 1,844 carry only provenance. Three `.DS_Store` files carry
+    `com.apple.FinderInfo`.
+  - **One real artifact:**
+    `physical_firm_ontology_proposal_20260914_03/arv2-firm-ontology-proposal-35dab7b7ce02d3b601291167.json`
+    carries a custom attribute named `com.openai.arv2-test`. The only test
+    that writes that name does so in a pytest temporary directory, so the
+    attribute on the real file came from some other action. The file is not
+    in the assessment's scope; this is an observation, not a finding, and any
+    future artifact-wide policy must not admit it implicitly.
+- **APFS behaviour on this volume**, observed in an in-root scratch directory
+  under `.pytest_cache`:
+  - A new directory has link count 2. A pending file makes it 3, linking the
+    report makes it 4, and unlinking the pending file returns it to 3.
+  - Renaming a file away and back keeps its inode and changes its `ctime`.
+  - No metadata changed in the following second, and the file's flags
+    stayed 0.
+- **The old path was recreated after the move.**
+  - The old path now holds a directory with a new inode (31621912) and one
+    empty `scripts` directory (31640086). Both are 0700, and both carry the
+    worktree's original birth time, 2026-09-03 00:34:11.
+  - Their inode numbers are newer than that of `/Users/sheltonchen/Code`,
+    which was created at 13:19:53 on 2026-10-09.
+  - Several Claude sessions, this one included, still have the old path as
+    their working directory.
+  - This is consistent with 272.4, which found the old directory absent at
+    the first command after the move. It attributes the recreation to no one.
+- **Bytecode caches from the old root.**
+  - This review's pytest runs used `-B`, which writes no bytecode but still
+    reads the worktree's existing caches. Those caches stay valid after the
+    move, because the move kept each source's modification time and size.
+  - CPython's import replaces each loaded code object's file name with the
+    new path. Lane modules that compare `co_filename` with their own path are
+    therefore unaffected.
+  - pytest reuses its cached assertion rewrites of test modules without that
+    replacement. Warnings, tracebacks and skip locations from test modules
+    therefore name the old root, as the two warnings of the loopback-only run
+    and the reported locations of seven of the suite's eight skips do.
+  - Section 273 reports a fresh cache prefix for Codex's runs. Rerunning the
+    four focused files with a fresh, empty in-root `PYTHONPYCACHEPREFIX` gives
+    the same 188 passes.
+  - This is an observation, not a finding: a fresh cache prefix, or clearing
+    the ignored caches, removes it.
+- **In-memory mutation trials.** Each trial removed one guard (or one pair)
+  in memory and ran that module's test file inside the strict sandbox; no
+  file was edited. Unmutated, the observer, assessment, census and probe test
+  files pass **56, 64, 32 and 36** tests. The probe was not mutated, because
+  its tests run from the real relocation root, where a miswired entry point
+  could reach the real R272 path.
+
+Security observer, 56 tests:
+
+| Trial | Guard removed | Result |
+|---|---|---|
+| ACL absence | any NULL result treated as no ACL | 6 failed |
+| ACL entries | the entry-present and entry-census checks | 4 failed |
+| ACL text | the exact empty, unflagged text check | 5 failed |
+| ACL recheck | the second ACL check within a snapshot | 1 failed |
+| Allowlist | the attribute-name allowlist | 3 failed |
+| Name bound | the 8 KiB name-list bound | 1 failed |
+| Value bound | the 64 KiB value bound | 1 failed |
+| Name recheck | the second name read | 1 failed |
+| Held stat | stat equality around the observation | 10 failed |
+
+Fresh-use assessment, 64 tests:
+
+| Trial | Guard removed | Result |
+|---|---|---|
+| Report pins | the historical report hash check | 1 failed |
+| Retained refusal | `matches_before=false` required | 1 failed |
+| Forward ctime | the scope's forward-ctime check | 1 failed |
+| Directory security | the whole directory owner, mode and flag check | 3 failed |
+| Directory flags | only the directory flag mask | **64 passed** |
+| Current ctime | `ctime` in the current-versus-pinned comparison | 2 failed |
+| Private file | regular, 0600, owner, one link and flag mask | 5 failed |
+| Initial named check | the named-versus-held check after opening | **64 passed** |
+| Initial hash | the held-byte hash before the loaders | 1 failed |
+| Size | the exact-size check while hashing | **64 passed** |
+| After-consumer stat | both held and named rechecks after the loaders | 7 failed |
+| After-consumer security | the source security snapshot recheck | 1 failed |
+| After-consumer hash | the source hash recheck | **64 passed** |
+| Directories after | the directory identity recheck | 1 failed |
+| Directory security after | the directory snapshot recheck | 1 failed |
+| Fixed root | the working-directory and module-root check | 2 failed |
+| Loader root | the loaders' repository-root check | **64 passed** |
+| Pre-publication directory | the identity check before publishing | 1 failed |
+| Pre-publication empty | the empty-directory check | **64 passed** |
+| Link count +0 | the allowance set to no increment | 3 failed |
+| Link count ignored | the link count dropped from the final comparison | **64 passed** |
+| Final listing | the exact `report.json` listing | **64 passed** |
+| Final directory | the whole final directory comparison | 2 failed |
+| Exit status | exit 0 even when incomplete | 2 failed |
+| Initial named check and after-consumer stat | both | 7 failed, the same as the second alone |
+| After-consumer hash and stat | both | 7 failed, the same as the second alone |
+| Size and initial hash | both | 1 failed, the same as the second alone |
+| Pre-publication empty and directory | both | 2 failed, one more than the second alone |
+| Link count ignored and final listing | both | 1 failed |
+| No `stat.UF_TRACKED` | the attribute removed, as on Python 3.12 | 39 failed, 25 passed |
+
+The pairs show that the empty-directory check and the link-count and listing
+checks back each other up. No test isolates the initial named check, the
+after-consumer hash or the size check, even with its neighbour removed.
+Removing `stat.UF_TRACKED` leaves the observer's 56 tests passing.
+
+Relocation census, 32 tests:
+
+| Trial | Guard removed | Result |
+|---|---|---|
+| Whole-row comparison | compare hashes only | 9 failed |
+| Before pin | the external `before.json` hash check | 1 failed |
+| Spent leaf | the refusal of an existing output leaf | 1 failed |
+| Special entries | the device number of special entries | 1 failed |
+| Directory rows | directory rows in the census | **32 passed** |
+| Directory fields | directory fields reduced to device and inode | **32 passed** |
+| Directory drift | directory metadata drift during the walk | **32 passed** |
+| Exclusions | prefix exclusion of `.git*` and the output name | **32 passed** |
+| Exit status | exit 0 on a completed but mismatched after | **32 passed** |
+| Named after read | the named check after each file read | **32 passed** |
+| No-follow | `O_NOFOLLOW` on directory opens | **32 passed** |
+| Retained pending | the `before.json.pending` refusal | **32 passed** |
+
+### 274.5 Recommended attribute policy and next steps
+
+D5's stop is correct, and so is the refusal of blanket acceptance, decoding
+and removal. The three names are not unique to this directory. They are
+directory-level attributes, while the bytes the loaders consume are
+authenticated by hashes and manifest pins whatever a directory carries. What
+remains open is whether the owner accepts the directory's current access and
+sync state, notably `com.apple.macl`, whose format Apple treats as an
+implementation detail. A proportionate, supported policy would be a new,
+separately versioned contract, for example
+`arv2-relocated-source-fresh-use-v2`, frozen before use, with these terms:
+
+1. **One object.** It applies only to the vintage package directory,
+   identified by its absolute path and by its device, inode, mode, owner,
+   group and flags as pinned at freeze. It never applies to a source leaf,
+   another directory or the output. The 15 leaves stay provenance-only.
+2. **A closed name set.** The directory must carry exactly
+   `com.apple.provenance`, `com.apple.fileprovider.dir#N`, `com.apple.macl`
+   and `com.apple.quarantine`. Any added or missing name refuses.
+3. **Value fingerprints, not decoding.** Before the freeze, one bounded
+   observation through the existing observer's interface reads each value
+   into memory under the 64 KiB cap. It records only each value's length and
+   SHA-256 in the frozen protocol. The assessment requires exactly those
+   fingerprints before and after consumption. No value is printed,
+   persisted, decoded, interpreted, changed or removed.
+4. **A stated, limited meaning.** The policy does not claim the values are
+   harmless, who set them, or historical equivalence. It claims only that
+   the directory's attribute state is the one the owner accepted and that it
+   did not change during use. Because `com.apple.macl` may record an
+   application's persistent access to the directory, the owner, not Codex or
+   Claude, makes that acceptance.
+5. **A new one-use identity.** It gets its own output leaf, a names census of
+   its whole object scope recorded in the frozen protocol (`ARV2R274-001`),
+   and a platform and interpreter check before allocation (`ARV2R274-002`).
+   R273 stays spent and is not reinterpreted. The successor should also close
+   the test gaps of `ARV2R274-003` and may add the raw ACL flag-set check of
+   274.3.
+
+**Suggested next steps.**
+
+1. **Codex counter-reviews this section.**
+2. **Codex drafts the versioned policy above** as a frozen protocol, including
+   the pre-freeze names and fingerprint census, and asks the owner for the
+   security decision on the vintage directory's attributes. Only after that
+   decision and an independent review of the frozen protocol should one new
+   assessment run. If it succeeds, whether the frozen R272 probe may then run
+   needs its own stated authority, because 273.3 tied it to the spent
+   assessment.
+3. **R284 and the external evidence stay separate.** R284 remains blocked
+   until a publication remedy exists. The missing vendor as-of history,
+   reviewed security-master identity, scores and prior-close prices of 231.3
+   remain open.
+
+### 274.6 Validation
+
+Every check ran from the operative root
+`/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2` with
+`~/.venvs/trading_agent-py313/bin/python` (3.13.15). Each pytest process ran
+under one of the two `sandbox-exec` profiles of 242.6, with `TMPDIR` and
+`--basetemp` under the root's ignored `.pytest_cache/claude-review-274`.
+Before use, a probe confirmed that the loopback-only profile allows a
+loopback bind and connect and refuses a connection to the reserved
+documentation address `192.0.2.1` with `EPERM`.
+
+| Check | Scope | Result |
+|---|---|---|
+| Standing lane selection, strict profile | `tests/analyst_revisions_v2`, `tests/test_analyst_revisions_v2_contracts.py`, `tests/test_analyst_revisions_v2_legacy_quarantine.py`, `tests/test_analyst_revisions_v2_preregistration.py`, `tests/test_analyst_revisions_v2_statistics.py`, `tests/test_active_document_consistency.py`, at the clean pushed head `8b9c5bae`, run as six file groups in three parallel streams, together covering all 10,874 collected tests | **11 failed, 10855 passed, 8 skipped, 35 warnings in six strict-profile worktree file groups across three parallel streams (each 0:23:01, 0:11:39, 0:10:45, 1:12:22, 0:30:11, 0:04:22).** No error. Every failure is `PermissionError: [Errno 1] Operation not permitted` in one of the 11 tests of `test_qc_formal_qc_transport.py` that start HTTP servers on `127.0.0.1`, because the strict profile also refuses loopback. The 8 skips are a subset of the standing eleven: 7 Windows-only directory-junction tests and 1 top-five-only profile case. |
+| The loopback-server file, loopback-only profile | `tests/analyst_revisions_v2/test_qc_formal_qc_transport.py`, all 73 tests, at the same head | **73 passed, 2 warnings in 8.35s**, exit 0: the 11 loopback-server tests pass once loopback is allowed and every other address is refused |
+| Every collected test, remote network refused | the two rows above together | **0 failed, 10,866 passed, 8 skipped** across all 10,874 collected tests; the strict profile covers 10,855 of the passes and the loopback-only profile the other 11 |
+| The four focused files with a fresh bytecode cache, strict profile | the observer, assessment, census and probe test files, with an empty in-root `PYTHONPYCACHEPREFIX` | **188 passed** |
+| Report authentication, recomputation, names censuses, APFS observations and mutation trials | as in 274.4 | as stated there |
+| Record gates on the final record bytes, strict profile | `test_lane_record_integrity.py` and `test_active_document_consistency.py` | **86 passed** |
+| `python -m compileall -q` | the standard package list plus `research/analyst_revisions_v2_qc` | clean |
+| Worktree integrity across the complete run and the checks | `artifacts/analyst_revisions_v2` and `git status --ignored` | every one of the 1842 files under `artifacts/analyst_revisions_v2` has the same SHA-256 before and after the run and the checks, and `git status --ignored` is unchanged apart from `__pycache__` and the git-ignored Claude Code scheduled-task lock `.claude/scheduled_tasks.lock`, which another local Claude Code session owns and which was left in place |
+| `git diff --check` | final tree | clean |
+| `git status --short --branch` | after this round's commit | clean; published in this round's single push |
+
+### 274.7 Carried-open findings
+
+| ID | P | Status |
+|---|---|---|
+| `ARV2E263-001` | — | Open. The relocation preserved bytes, but the fresh-use assessment refused on the vintage directory's attributes; it blocks R284 (274.5). |
+| `ARV2R274-001` to `ARV2R274-005` | P3 | Documented for Codex (274.2). |
+| `ARV2CR270-001`, `ARV2CR270-002`, `ARV2CR270-003` | P3 | Accepted (274.3). |
+| `ARV2R265-005` | P3 | Partly corrected: the window between a remote response and its local receipt remains. |
+| `ARV2R248-002`, `ARV2R248-003`, `ARV2R248-004` | P2 | Open; partly reconciled by sections 255–257. |
+| `ARV2R196-001` | P2 | Open; the historical AR effect has the same two-year signature in every family. |
+| `ARV2D212-001` | P2 | Clock mechanism resolved by R279; forward input readiness and vendor availability remain open. |
+| `ARV2CR185-001`, `ARV2CR187-001`, `-003`, `ARV2D188-001` | P2 | Open as recorded. |
+| `ARV2R265-001`, `ARV2R265-002`, `ARV2I266-001`, `ARV2I266-002`, `ARV2I256-001` | P2 | Corrected and pinned, as recorded. |
+| `ARV2R267-001`, `ARV2R267-002`, `ARV2CR268-001`, `ARV2R265-003`, `ARV2R265-004`, `ARV2CR266-001`, `ARV2CR266-002`, `ARV2CR262-001`, `ARV2R261-001`, `ARV2CR255-001`, `ARV2CR255-002`, `ARV2R250-001`, `ARV2R248-006`, `ARV2CR249-001`, `-002`, `-003`, `ARV2CR245-001`, `ARV2R242-001` | P3 | Corrected, accepted or closed, as recorded. |
+| `ARV2R248-007` | P3 | Documented; narrowed in one direction by `4496d241`. |
+
+The final tree differs from the pushed head `8b9c5bae` only by this record
+commit.

@@ -414,6 +414,7 @@ actions = (
     lambda: socket.socket(),
     lambda: socket.getaddrinfo('blocked.invalid', 443),
     lambda: subprocess.Popen([sys.executable, '-c', 'raise SystemExit(99)']),
+    lambda: os.execv(sys.executable, (sys.executable, '-I', '-S', '-B', '-c', 'raise SystemExit(99)')),
     lambda: path.write_text('must never replace custody'),
     lambda: path.unlink(),
 )
@@ -433,7 +434,7 @@ print(json.dumps({'denied': denied, 'read_preserved': True}))
         cwd=ROOT, env={"PATH": "/usr/bin:/bin", "LC_ALL": "C"},
         capture_output=True, text=True, check=True, timeout=30,
     )
-    assert json.loads(result.stdout) == {"denied": 5, "read_preserved": True}
+    assert json.loads(result.stdout) == {"denied": 6, "read_preserved": True}
     assert sentinel.read_text() == "invented custody"
 
 
@@ -528,3 +529,134 @@ def test_bounded_child_runner_refuses_streaming_output_overflow(monkeypatch):
                         real_popen(command[3:], **kwargs))
     with pytest.raises(module.HistoricalReplayError, match="output cap"):
         module._run_isolated_worker(b"invented", 30)
+
+
+# Section 130 (Claude review): regression tests for refusals that no earlier
+# case reached alone (the policy builder, the lane-context parser, the current
+# source inventory and the before/after byte recheck). Invented roots only.
+def test_worker_policy_allows_a_framework_interpreter_relaunch_binary(tmp_path):
+    # Without the relaunch literal, a macOS framework stub cannot exec its
+    # Python.app binary and the worker never starts (fails closed).
+    version = tmp_path.resolve() / "Python.framework/Versions/3.13"
+    stub = version / "bin/python3.13"
+    relaunch = version / "Resources/Python.app/Contents/MacOS/Python"
+    flat = tmp_path.resolve() / "flat/bin/python3"
+    for path in (stub, relaunch, flat):
+        path.parent.mkdir(parents=True)
+        path.write_bytes(b"invented binary")
+    policy = module._worker_policy(str(stub))
+    assert policy.startswith("(version 1)(allow default)(deny network*)(deny file-write*)"
+                             "(deny process-fork)(deny process-exec)")
+    assert policy.count("(allow process-exec (literal ") == 2
+    assert f'(allow process-exec (literal "{stub}"))' in policy
+    assert f'(allow process-exec (literal "{relaunch}"))' in policy
+    assert module._worker_policy(str(flat)).count("(allow process-exec (literal ") == 1
+
+
+@pytest.mark.parametrize("path", ('/invented/py"thon', "/invented/py\\thon"))
+def test_worker_policy_refuses_an_unsafe_interpreter_path(path):
+    with pytest.raises(module.HistoricalReplayError, match="unsafe"):
+        module._worker_policy(path)
+
+
+@pytest.mark.parametrize("status", (
+    "",
+    " M research/insider_buying_sec_recovery_v4_historical_replay.py\n",
+    " M tests/test_insider_buying_sec_recovery_v4_historical_replay.py\n",
+    ' M "docs/Strategy Description/INSIDER_BUYING_IMPLEMENTATION_RECORD.md"\n',
+))
+def test_lane_context_accepts_only_the_three_expected_dirty_paths(status):
+    module._validate_context(("f" * 40, status), "f" * 40)
+
+
+@pytest.mark.parametrize("status", (
+    "R  research/a.py -> research/insider_buying_sec_recovery_v4_historical_replay.py\n",
+    "C  research/a.py -> tests/test_insider_buying_sec_recovery_v4_historical_replay.py\n",
+    "?? research/insider_buying_sec_recovery_v4_historical_replay.py.orig\n",
+    " M research/insider_buying/sec_recovery_v4_plan.py\n",
+    " M research/insider_buying_sec_all_form4_parent_campaign.py\n",
+    "M\n",
+))
+def test_lane_context_refuses_renames_copies_and_unrelated_changes(status):
+    with pytest.raises(module.HistoricalReplayError, match="lane"):
+        module._validate_context(("f" * 40, status), "f" * 40)
+
+
+@pytest.mark.parametrize("expected", ("0" * 40, "f" * 39, b"f" * 40, None))
+def test_lane_context_requires_the_exact_reviewed_head(expected):
+    with pytest.raises(module.HistoricalReplayError, match="HEAD"):
+        module._validate_context(("f" * 40, ""), expected)
+
+
+@pytest.fixture
+def invented_lane(monkeypatch, tmp_path):
+    # An invented lane root with the inventory shape only; never the real worktree.
+    root = tmp_path.resolve()
+    for relative, raw in (
+        ("data/__init__.py", b""), ("data/hashing.py", b"MARKER = 1\n"),
+        ("research/__init__.py", b""), ("research/insider_buying_invented.py", b"MARKER = 2\n"),
+        ("research/insider_buying/__init__.py", b""), ("research/insider_buying/plan.py", b"MARKER = 3\n"),
+        ("ml/__init__.py", b""), ("ml/immutable_io.py", b"MARKER = 4\n"),
+    ):
+        path = root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(raw)
+    monkeypatch.setattr(module, "LANE_ROOT", root)
+    return root
+
+
+def test_source_snapshot_reads_the_invented_lane_inventory_in_sorted_order(invented_lane):
+    snapshot = module._source_snapshot()
+    assert [path for path, _ in snapshot] == sorted(path for path, _ in snapshot)
+    assert len(snapshot) == 8
+    assert dict(snapshot)["ml/immutable_io.py"] == b"MARKER = 4\n"
+    module._assert_sources_unchanged(snapshot)
+
+
+@pytest.mark.parametrize("case", ("symlink", "empty_module", "oversized"))
+def test_source_snapshot_refuses_redirected_empty_or_oversized_modules(invented_lane, monkeypatch, case):
+    target = invented_lane / "research/insider_buying_invented.py"
+    if case == "symlink":
+        target.unlink()
+        target.symlink_to(invented_lane / "data/hashing.py")
+    elif case == "empty_module":
+        target.write_bytes(b"")
+    else:
+        monkeypatch.setattr(module, "_MAX_BLOB_BYTES", 4)
+    with pytest.raises(module.HistoricalReplayError, match="current source inventory"):
+        module._source_snapshot()
+
+
+@pytest.mark.parametrize("case", ("drift", "symlink"))
+def test_sources_unchanged_recheck_refuses_drift_and_redirection(invented_lane, case):
+    snapshot = module._source_snapshot()
+    target = invented_lane / "research/insider_buying_invented.py"
+    if case == "drift":
+        target.write_bytes(b"MARKER = 99\n")
+    else:
+        target.unlink()
+        target.symlink_to(invented_lane / "data/hashing.py")
+    with pytest.raises(module.HistoricalReplayError, match="changed during replay"):
+        module._assert_sources_unchanged(snapshot)
+
+
+def test_entrypoint_refuses_a_wrapper_imported_from_outside_the_lane(mock_replay, monkeypatch):
+    monkeypatch.setattr(module, "__file__", "/invented/elsewhere/replay.py")
+    with pytest.raises(module.HistoricalReplayError, match="outside the designated lane"):
+        module.run_observed_historical_v3_custody_replay(expected_head=mock_replay.head)
+    assert not mock_replay.calls
+
+
+def test_worker_audit_refuses_a_malformed_file_open_event():
+    with pytest.raises(module.HistoricalReplayError, match="malformed"):
+        module._audit_event("open", ("invented",))
+
+
+@pytest.mark.parametrize("raw,timeout,reason", (
+    (b"invented", 0, "timeout"), (b"invented", True, "timeout"), (b"", 30, "input"),
+    (b"x" * (module._MAX_INPUT_BYTES + 1), 30, "input"),
+))
+def test_child_runner_contract_refuses_before_launching_anything(monkeypatch, raw, timeout, reason):
+    monkeypatch.setattr(module.subprocess, "Popen", lambda *a, **k: pytest.fail("launched"))
+    with pytest.raises(module.HistoricalReplayError, match=reason):
+        module._run_isolated_worker(raw, timeout)

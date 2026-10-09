@@ -405,8 +405,10 @@ synthetic probe, post-move source reauthentication, production publication
 or R284 operation followed in section 272. No metadata waiver or rollback
 was applied. Section 273 records the owner's subsequent "yes, proceed" to
 bounded investigation and a separately frozen, scoped prospective fresh-use
-assessment before the still-uninvoked synthetic probe. The failed original
-preservation audit remains failed; no production guard or formal gate changes.
+assessment. Its sole invocation refused `xattr_unapproved`; the retained
+584-byte report records `complete=false` and `source_reauthenticated=false`.
+The synthetic probe remains uninvoked. The original preservation audit stays
+failed; no allowlist, production guard or formal gate was relaxed.
 The monitor stays paused.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
@@ -1335,8 +1337,21 @@ history. No actor or benign security cause is established by matching bytes.
 The original preservation comparison remains failed; the new decision is not
 its acceptance. The one fixed source/security assessment and, only on its
 success, the already-frozen uninvoked ARV2OD272-A probe are defined in 273.3.
-Any failure remains spent and stops this sequence. Claude must review the
-exact result and protocol. This authorization does not clear ARV2E263-001,
+The sole assessment now refused `xattr_unapproved`, with its private report
+retained and externally authenticated (273.5). That identity is spent;
+ARV2OD272-A remains uninvoked/unallocated. The failing object/attribute name
+was intentionally not persisted in that report. The separately bounded
+names-only diagnostic in 273.7 now isolates extra `com.apple.macl`,
+`com.apple.quarantine` and `com.apple.fileprovider.dir#N` names to the vintage
+package directory; it does not authenticate their values/security meaning or
+establish what was present at the earlier refusal. The next requirement is
+a supported security disposition for that exact currently observed directory
+metadata,
+not another move, attribute removal or an allowlist expansion by assumption.
+The frozen assessment/probe sequence stops here; a later invocation needs
+its own justified prospective decision and cannot reuse this spent identity.
+Claude must review section 273
+and its exact result/protocol. This authorization does not clear ARV2E263-001,
 change production source guards or permit a publication retry/R284 launch by
 itself; finite sampled output evidence alone cannot establish production
 publication safety.
@@ -3191,7 +3206,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-09 | Codex section-269 counter-review and boundary/authority clarification | `279f37ee..b7169dc0` (one new Claude record commit) -> this section-270 record commit | Accepted after three documentary qualifications; no executable or publication-contract change; owner-stopped monitor remains paused | Preserve Claude's reported evidence with explicit out-of-root and strict/loopback qualifications; no relocation, host-setting change, external temp path, probe or production/QC retry | 45 focused strict-network-denied passes, four byte pins and profile verified; final record gates in 270.3; no full Codex suite | ARV2E263-001 and independent formal evidence remain; 313/239/49/699 unchanged | One final matching-lane push at the concrete barrier; Claude must review section 270; supported remedy or explicit relocation exception required, no monitor rearm |
 | 2026-10-09 | Codex owner-authorized relocation preflight and durable permission record | `44d85d4b` -> this section-271 record commit | Exact old/new roots and reversible trial scope approved; read-only worktree/process and tracked-loader compatibility checks | No move, destination creation, private-artifact census, probe, source/helper change, publication or QC request; preserve all other sessions | Focused record gates below; no full suite or backtest | Three live Claude processes hold the old root; historical path-bound plans are not transparently relocatable; ARV2E263-001 remains | Coordinate session exit, recheck state, complete audit and freeze one new bounded probe; one final lane push at this coordination barrier; monitor remains paused |
 | 2026-10-09 | Codex authorized whole-worktree relocation trial | `4e4a6bfb` -> `dc06ed32` protocol/source freeze and final section-272 result commit | Owner says proceed after session clarification; whole worktree moved to approved Code root on unchanged branch | Complete pre/post census preserves names/bytes/other recorded fields but refuses 21,593 ctime changes; four pre-move source authentications succeeded with existing qualifications; no post-move loader or synthetic probe | 154 distinct focused strict-denied passes, four static compilations; final record checks nonadditive; no full suite | 1,837 of 1,839 artifacts have ctime-only changes; historical absolute-path bindings remain qualified; ARV2E263-001 and formal evidence gates remain | Preserve new root and both exclusive reports; no waiver, retry or automatic rollback; exactly one final matching-lane push, Claude review of section 272; monitor paused |
-| 2026-10-09 | Codex authorized prospective scoped fresh-use assessment | `ac951360` -> section-273 source/protocol freeze and final result commit | Owner approves bounded investigation and a new scoped security/consumption contract, not failed-audit acceptance | Exact 15 source leaves in four existing packages; current security envelope around unchanged fresh loaders; conditional original ARV2OD272-A only | Focused strict-denied tests and actual one-shot results recorded below; no full suite | Historical ACL/xattr equivalence, actor causality, whole-worktree execution compatibility and production safety remain unproven | Preserve all evidence; no retry or R284 bypass; exactly one final matching-lane push; Claude exact-snapshot review; monitor paused |
+| 2026-10-09 | Codex authorized prospective scoped fresh-use assessment | `ac951360` -> `26cfc8dc` source/protocol freeze and final result commit | Owner approves bounded investigation and a new scoped security/consumption contract, not failed-audit acceptance | Sole fixed assessment refused xattr_unapproved; authenticated 584-byte failure report retained; bounded 27-object names-only diagnostic isolates three extra names on vintage directory; original ARV2OD272-A still uninvoked | 242 distinct focused strict-denied passes; four static compilations; final record checks nonadditive; no full suite | Extra MACL/quarantine/fileprovider names need security disposition; historical security, actor causality and production safety unproven; formal gates unchanged | Stop spent assessment; preserve all evidence, no retry/attribute mutation/R284 bypass; one final matching-lane push; Claude review section 273; monitor paused |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -39880,3 +39895,168 @@ suite, real probe, source acquisition, provider/QC request or research look
 is included in this count. Same-round advisory code review also identified
 the pre-publication report-flag caveat, now explicit in the frozen acceptance
 rule. The result below must include CLI success and external readback.
+
+### 273.5 Actual assessment refusal and retained evidence
+
+The source/protocol freeze is
+`26cfc8dc64b413eb24682911c5e9e24ebab27a8c`. Before the real invocation, the
+exact new root, branch, this HEAD and clean status were rechecked; the fixed
+assessment directory did not exist. Exactly one
+`python -B -m scripts.assess_arv2_relocated_sources` ran under strict network
+denial, fresh new-root TMPDIR/cache prefix, and returned **exit 1**. The
+report-publishing/final-directory checks completed, but the assessment
+reported **`complete=false`, `source_reauthenticated=false`,
+`refusal_type=Refusal`, `refusal_code=xattr_unapproved`**.
+
+Private retained report relative to the operative new root:
+
+| Report | Bytes | SHA-256 |
+|---|---:|---|
+| `artifacts/analyst_revisions_v2/relocation_trial/R273-20261009-A/report.json` | 584 | `8325d3e0517c1f34078d792363b4cf45891c458cfb9906d180bbe89bbd2cf26e` |
+
+A separate strict-denied held-descriptor readback authenticated that exact
+hash before parsing. The exclusive directory contains only `report.json`;
+the sampled file has mode0600, uid501, gid20, one link, flags0 and device/
+inode16777232/31640275. The report's historical-audit acceptance, historical
+security equivalence, continuous stability, all-artifact executability,
+formal admission, production authorization and provider/QC-contact flags
+are all false. Source/probe/audit/shared-helper hashes still equal the frozen
+pins and tracked status stayed clean after the real command.
+
+**273-D3 — fail closed; no retry or automatic next operation.** The native
+observer encountered at least one accessible extended-attribute name outside
+the exact `com.apple.provenance` allowlist. It rejects unknown names before
+reading their values. The intentionally redacted report does not identify
+which source/ancestor object or attribute was involved, nor the observation
+phase. Therefore this result establishes neither a malicious attribute nor
+a harmless macOS cause, and does not prove all four loaders were or were not
+reached; the full guarded reauthentication did not complete. No raw attribute
+value was persisted. Do not infer an acceptable security contract from the
+prior names-only listing or from matching source bytes.
+
+Preserve this spent directory/report and both failed-preservation reports.
+No repeated native/source assessment, broadened allowlist, attribute removal,
+security-setting change, rollback or report repair follows. The original
+ARV2OD272-A path remains absent/unallocated and it was **not invoked**. The
+spent R266 path and failed continuity A/B directories remain unchanged.
+R284 remains unprepared/unlaunched; no production continuity publication or
+provider/QC access occurred. The original strict preservation audit remains
+failed, and ARV2E263-001 is not cleared by this new refusal.
+
+At this initial refusal, the next technical step was a separately bounded
+names-only identification of the unexpected accessible attribute and its
+object, followed by a security/consumption disposition supported by primary
+evidence and tests. Section 273.7 records the completed identification; the
+security disposition remains unresolved.
+That investigation is not permission to delete the attribute or relaunch the
+spent assessment; a new actual invocation would require an explicitly
+documented prospective decision. No new names-only or value probe was run
+after this refusal merely to obtain a passing result. Existing finite evidence
+does not establish a safe remedy or formal forward readiness.
+
+### 273.6 Final validation and handoff
+
+The completed focused selection remains **242 distinct strict-network-denied
+passes in 2.38 seconds**, with the earlier development/record failures and
+mutation evidence preserved in 273.4. No full Codex suite, source capture,
+production package, QuantConnect backtest, paper/live deployment, real order,
+new research look or exposed cell occurred. The floor stays
+**313 shared / 239 development / 49 infrastructure / 699 cells**; every formal
+source/security-master/score/cutoff-valid-price gate and false readiness/action
+flag remains unchanged.
+
+The continuous range is
+`ac9513601b1b81ebd5cbe63f04a81f34e800b577..this final section-273 result commit`:
+one local source/protocol freeze (`26cfc8dc`) and this result record, followed
+by exactly one successful matching-lane final push from the new root. The
+freeze is an implementation decision, not independent review; this result
+commit records refusal, not gate clearance. Claude must review both commits
+and the exact scoped contract/evidence. A push is not acceptance. The monitor
+remains paused and no other chat is messaged. Final record checks and push
+verification are reported with this handoff; repeats do not add test coverage.
+
+### 273.7 Bounded names-only identification of the new refusal
+
+**273-D4 — continue the already-authorized read-only investigation, without
+retrying the assessment.** The new `xattr_unapproved` refusal is genuinely
+actionable evidence, not unchanged-state monitoring. Stopping with only a
+redacted code would leave a safe in-scope diagnostic unexhausted. Before the
+final result push, permit one names-only inventory of the same fixed source
+leaves and their Code-anchor-through-package directories, bounded to at most
+32 objects. This supplements 273.5's initial stop with diagnostic identity
+only; the assessment identity remains spent and the synthetic probe remains
+unauthorized by that failed assessment.
+
+Use no-follow held descriptors, the same native flistxattr ABI and
+SHOWCOMPRESSION option, maximum 8 KiB names per object, and compare names on
+two reads with full held/named metadata before/after. Do not call fgetxattr,
+ACL conversion, the source loaders, the assessment CLI or the output probe.
+Do not read attribute values, change attributes/settings, broaden an allowlist
+or create another assessment identity. Print only fixed object paths, names
+and integrity status; retain the bounded result in this record, without
+adding a leaf to the exclusive assessment output directory. On unavailable
+or unstable names/identity, report refusal and stop without retry. The result
+may inform a future security disposition but cannot itself authenticate
+attribute values or make a new full source assessment pass.
+
+**Actual D4 result:** one strict-network-denied inline parser inspected
+**27 objects: 12 directories and 15 source files**. Both bounded names reads
+and the held/named/full-metadata endpoint checks agreed for every object.
+All 27 expose `com.apple.provenance`. Only the directory
+`artifacts/analyst_revisions_v2/sharadar_capture/arv2-sharadar-source-20260914T003329843989Z`
+also exposes these three names:
+
+- `com.apple.fileprovider.dir#N`
+- `com.apple.macl`
+- `com.apple.quarantine`
+
+The other 26 objects, including all 15 source leaves, expose no additional
+names in that accessible census. No value was read by D4, no source loader or
+assessment/probe was invoked, and no file/attribute was mutated. These are
+current names-only observations, not value equivalence, historical inventory,
+continuous stability or proof of the exact failed observation's object.
+The only nonallowlisted object in this subsequent exact-scope census is a
+supported explanation of the refusal, not retrospective execution tracing.
+
+[Apple DTS on inferred user intent](https://developer.apple.com/forums/thread/124121)
+associates `com.apple.macl` with persisted app access and explicitly treats
+its UUID setup as an implementation detail. This historical description is
+not a current complete decoder or validation of this directory's grants.
+[Apple DTS on quarantine](https://developer.apple.com/forums/thread/767612)
+discusses quarantine flags affecting executable access; that context cannot
+establish a harmless/security-equivalent value on this data directory. No
+primary-source safe admission contract for the observed fileprovider attribute
+was located in the bounded lookup. Accordingly, matching bytes, absent/empty
+native extended ACLs and restrictive POSIX modes are insufficient to classify
+all three as inert metadata here.
+This is **not** evidence of malicious access, an agent changing files or the
+cause of the relocation ctime changes.
+
+**273-D5 — retain the security stop.** Keep the currently observed attributes and
+every original artifact intact. Do not infer user consent/grant ownership
+from names or opaque hashes, silently expand the allowlist, remove the vintage
+source from the required package set, recopy it to evade metadata checks, or
+run another assessment/probe. Safe names-only diagnostics and primary-source
+checks have narrowed the barrier but do not supply a trustworthy interpretation
+or approval of those access/fileprovider values. A supported, independently
+reviewable disposition of the exact currently observed directory security state is
+needed before another prospective fresh-use protocol can claim acceptance.
+The present contract remains unchanged and spent. This is not a request for
+routine research/QC permission and does not resurrect a vendor entitlement
+gate. The monitor remains paused, production/forward readiness remains false,
+and final handoff is at this concrete source-security boundary.
+
+The D4 procedure was written in the working lane record before its inline
+read-only execution, not committed as a second assessment/probe freeze; the
+`26cfc8dc` committed protocol applies to the spent assessment. Final focused
+record/document checks pass **86 tests in 2.17 seconds**, strict-denied with
+fresh new-root TMPDIR/basetemp/cache prefix, nonadditive to the 242 distinct
+tests. `git diff --check` is clean. The final matching-branch-only fetch still
+finds remote `ac9513601b1b81ebd5cbe63f04a81f34e800b577`; no concurrent commit
+or unexplained worktree change was observed before the result commit.
+
+Final same-round advisory consistency review corrected three documentary
+overstatements: names-only identification is now completed rather than next;
+the observed ACL API is native extended ACL, not POSIX access ACL; and these
+are currently observed attributes, not proven inherited attributes because
+there is no historical xattr inventory. No code, guard or evidence changed.

@@ -12858,3 +12858,111 @@ reproduced. This is NOT Claude acceptance. Testv2 SHA256
 driverv2testde00ff5a994580808c34e21d7792b57c4bfe9854350021800c60b180e603c3b3.
 CAP008 corrected/resolved before execution; CAP006 compatibility source fix
 is verified locally, cloud proof still pending; CAP007 remains open diagnostic.
+
+Source-only successor commitc0197ef6a2811d897560174353fae48ae3a8ad65 was made
+locally after root/branch/HEAD/status/staged-diff and ACTUAL remotefa78 checks;
+still zero new-round pushes. Fresh scope002 access/manifest/copy claims precede
+the explicit bounded read/copy of signal-packet.scope001.json; original derived
+packet and D0/provider captures are not reopened. ManifestSHA256
+93609624aeceec4c0dd32e88dd8afe2bc59f6316219e756c3258c417fd575017 binds
+this sourceHEAD and18 source hashes. Six cloud source files read back equal
+in each SAME project (ON37600675/OFF37600676); no project reset/recreation.
+ON attempt2 was reserved before compile; compile
+8bfcf0b640d9a70c9801355ce3bd0338-90d5697ed3db0987785bb1da5410c730
+verified BuildSuccess and exact source before launch. Backtest
+8cacfe95fef750b847b448ff626afd1b launched2026-10-09T23:37:56.734940Z,
+with immutable look receipt before request. First observed In Progress...,
+completedFalse/errorFalse: not completion or accepted performance evidence.
+At this point ONattempts2/OFF0,2new cloud looks and12historical=14total.
+
+ON attempt2 subsequently reached Completed., completedTrue/errorFalse,
+backtest8cacfe95fef750b847b448ff626afd1b; terminal result projectionSHA256
+444b5ea4355abf65574eecb44ab4d5f3d35c4be94625d152be0245711470aa03.
+First terminal collection retains352native orders/352filled-status orders,
+no collection errors, but only59MATCHED logs:49NAV,10COVERAGE,noSUMMARY.
+It is therefore a completed order-producing DIAGNOSTIC, not a fully auditable
+frozen-period comparison. Collection prefix
+TPR-CAP-TILT-ON-BASE-v1.attempt.2.collection.0001 remains immutable. A fresh
+own-aggregate review claim preceded counting these exact logs. No final
+summary, unobserved valuations or missing coverage were reconstructed.
+
+`TPR-CAP-009` / P1 — confirmed account per-backtest log quota truncation.
+Fresh bounded own-job quota/summary query claims preceded two read-only API
+requests: native maximum-of message confirms100kb, and directMATCHED_SUMMARY
+query returns length0. Exact response hashes
+cdef6d1a335d2adbcd9a9c93399c5f1dca2c5b63c715f678844a94a637b2782a
+andad6f9d671ce40eb8eab60a985157f3ff6a9a6fb0dff70a7609a981bb7726d56c.
+The prefixed-log pagination was complete for available stored rows; it cannot
+recover quota-truncated records. Official
+[log quota guidance](https://www.quantconnect.com/docs/v2/writing-algorithms/logging)
+and[filtered log API](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/backtest-management/read-backtest/logs)
+support this interpretation, not entitlement to a larger quota. No upgrade,
+purchase, access bypass or fourth candidate retry is authorized/performed.
+
+`TPR-OWN-99` — agent-delegated transport-only successor for the final allowed
+ON attempt3 and not-yet-launched OFF control. NEW runtime/driver v3 preserve
+executed v1/v2, all underlying logical audit records, economics, selection,
+tilt, source clocks, native final-fill guard and acceptance predicates. Encode
+all own aggregate COVERAGE/NAV/SUMMARY JSON losslessly with bounded canonical
+JSON/zlib/base64, logical-payload SHA256 and closed MATCHED_Z wire; no market
+rows are added to logs. Keep the SAME100kbquota: cap own wire content at75000
+characters with timestamp/native-message headroom, refuse instead of silently
+dropping any record. Decoder validates full envelope census, known kinds,
+session uniqueness, canonical bytes/hash, compressed size/EOF/extra-data and
+mixed/duplicate markers before interpretation. Bind original response objects
+and hashes first, retain decoded derivative/hash separately; never overwrite
+wire evidence or re-attest a mutated receipt. Embed declared trusted codec
+source in main via local build, retaining exactly six cloud files and no new
+external module/provider. Alternative repeated unchanged v2, dropping records,
+reconstructing missing logs, raising the account quota or modifying the
+strategy after results is refused. Fresh scope003 will copy only the explicitly
+named first own-study packet, with the same persistent candidates/attempts.
+This is not a new candidate/cap reset. Pending independent Claude review.
+
+Pre-attempt3 evidence: main isolated focused union1113passed/1existingplatform
+skip in8.66s;4new transport/runtime/driver/diagnostic modules independently
+reproduced209passed in1.75s. This is not the full lane/repository suite. A
+new-driver mechanical test draft incorrectly named a nonexistent old core-v3
+fixture (3failed/38passed); restored the exact immutable cloud_algorithm_v2.py
+fixture and obtained41green, no production behavior change. Peer codec93green
+with8killed in-memory mutants; one padding-only negative did not initially kill
+the normalization mutant, so an actual changed-unused-pad-bits fixture now does
+(failed proof retained, not represented as success). Peer runtime-v3 ninegreen
+and6mutants red; AST/payload equality confirms logging-only changes vs v2.
+Peer diagnostic66green/16mutants with21expected red/42restored controls; a
+draft bool-project-ID equality and accidentally true observer-qualification
+were corrected before empirical use with two-test red proof. Exact unmodified
+five-object source binding always precedes decode. Independent Codex peer
+reproduced66green/6mutants and found no rejectable diagnostic issue; this is not
+independent Claude acceptance. All diagnostic qualification/acceptance fields
+remain false, with native Market/order/cost and original submitted/all-fill
+domains explicitly separated. Missing summary still hard-refuses.
+
+V3 source identities: codec67a19d798d3088caf6a9874c37ba33cef1614322e2ff0fc8030d45518050f123
+(4773bytes); runtime17403532062c0ee0533c839d94c5e863b5793a098290ea3b1dac323614cf520c;
+drivera2cb8b9d18284bae51e910367b5d65c21d3f26d21f5e3d29fa4c677d8db4e69f;
+diagnostica1a12f1163dccc85c927ca5e1d8fb5fa0f0cf79b12ccd6abeb94d4fb6e0a1633.
+Exact source-bound embedded templateb71d01cf8ab118cd998b92b4e8d8e26b64313c43831801862d8b1870463fc3a8;
+bundlea5ef2243239467add1e73c4cf25fc11c728bcce7dab9b896a42bd81e8194506c;
+rendered ONmaine0d8af09e51b0e24cc7eff2a326562f6fe0251cb0715e364121bcecaf8371501;
+OFFmain22b324505c1e6e34548bae7cf3f647569ce9d138c055dbd39e1a72d38b03b948.
+Both58539bytes (<60000conservative/<64000actual quota), exact six files,
+21 committed runtime/driver dependencies. Config/freeze/packet/economics are
+unchanged; diagnostic source is separately committed/bound at interpretation.
+
+A fresh own-attempt2 byte-size-only receipt preceded a conservative sizing
+check (no new launch, outcome inference or missing-record reconstruction).
+Observed compressed maxima:10availablecoverage records2508chars,49available
+NAV records411chars. Extrapolate observed maxima14/60 plus worst8192summary:
+67964own wire chars, below75000reserve; unobserved remaining records are NOT
+attested by that sizing estimate. The synthetic full75-record stream verifies
+the complete lossless transport and hard budget refusal. Production runtime
+enforces the cap even if actual later records exceed this estimate.
+
+Final codec peer reproduced93green/7killed in-memory negative variants and
+accepted the exact released source; original strict gates remain untouched.
+The staged diff check caught one new extra blank EOF line in unexecuted v3;
+removed it before committing/launching. Pre-format runtime29c6c863...faeb2,
+embeddedtemplate2b22f0de...44d85 and bundlec3cebbfc...db70 were unexecuted
+draft identities only; final full hashes above bind the one-byte whitespace
+correction, not a candidate/attempt reset. No old executed bytes changed.

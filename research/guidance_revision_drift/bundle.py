@@ -42,9 +42,9 @@ _FILE_MODE = (stat.S_IFREG | 0o444) << 16
 # *.py file discovered by source_manifest must not silently enter this bundle.
 _MODULES = (
     "__init__", "__main__", "archive", "artifacts", "assessment", "bundle",
-    "comparison", "contracts", "controls", "corporate_actions", "events",
+    "callback_plan", "comparison", "completion_evidence", "contracts", "controls", "corporate_actions", "evaluation", "events",
     "fixtures", "formulas", "integration", "lean_bridge", "lineage",
-    "market_inputs", "persistence", "qc_adapter", "qc_project", "readiness", "recovery",
+    "market_inputs", "paired_bridge", "persistence", "qc_adapter", "qc_project", "readiness", "recovery",
     "release", "reporting", "scenario", "simulation", "specification",
     "timing", "universe", "vendor_payloads", "lean/__init__", "lean/main",
 )

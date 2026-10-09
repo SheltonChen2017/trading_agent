@@ -57,6 +57,18 @@ This is synthetic normalized protocol evidence, not raw broker receipts,
 durable recovery, an external trust root or proof that a native engine ran.
 Runtime/cloud flags remain false even when the local transcript reconciles.
 
+The separate offline `completion_evidence` module now transports the entire
+transcript as bounded canonical chunks and replays it against the fixed
+bridge. A successful check requires all 372 per-frame account checkpoints,
+the exact calendar and receipt/economic sequence, retained trace identity,
+and (for a dossier) current source/project identities plus a complete passive
+compile/run attempt chain. Supplied `Completed` status is not authenticated
+engine evidence. Run-output bytes must also match the receipt hash and bind
+the complete trace/chunk inventory. Locally generating that envelope is not
+a native run; these checks never promote native/cloud or empirical flags.
+The new `paired_bridge`/`callback_plan` prototypes are not substituted into
+this native algorithm and do not expand the approved synthetic run.
+
 ## Explicit accounting envelope
 
 The deterministic shadow engine owns signal selection, quantities, limits,

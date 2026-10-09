@@ -4,13 +4,14 @@ Status: **Section 19 (Codex counter-review of section 18, per-frame native
 account checkpoint and the owner-approval closure) independently reviewed by
 Claude in section 20 (2026-10-09): all three commits accepted, one lane test
 pin added, one P2 pre-launch packaging risk documented, no production defect.
-Section 20 counter-review accepted; section 21 cloud-package preparation
-implemented as a new exact-source review candidate, not native evidence.
-The new loader must receive Claude review and Codex counter-review before
+Section 20 counter-review accepted; section 21's premature one-capability
+handoff is corrected by section 22's implemented BT-1 through BT-10 batch.
+All ten are offline engineering review candidates, not original research
+milestone completion. The complete new source must receive Claude review and Codex counter-review before
 section 19.6's conditional synthetic-only QC upload/run. Native LEAN/QC
 execution and empirical backtest readiness remain unverified/blocked. The
 original economic, data, empirical, account and trading gates remain closed.**
-Current scope/evidence are sections 17 through 21. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 22. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -1950,3 +1951,185 @@ native comparator/actions and equity-settlement requirements. Stop this
 implementation round at that exact-source handoff. The monitor stays paused
 at the owner's request; do not re-arm or treat this Codex push as a Claude
 trigger. Root documents remain frozen and historical edits remain preserved.
+
+## 22. Owner correction: complete the requested ten-milestone batch, 2026-10-09
+
+### 22.1 Scope correction, serialization and publication boundary
+
+The owner explicitly corrected Codex: **"i asked you to implement the next
+10 milestones"**. Section 21 delivered only one substantive capability and
+stopped prematurely. CLAUDE section 3 allows a multi-milestone implementation
+batch when the owner explicitly requests it; the fresh exact-source review
+gate blocks a QC upload/run, not the remaining authorized offline work.
+Section 21.4's stop-for-review instruction is therefore superseded only for
+this manual offline batch. It does not waive independent review before QC,
+open original GDR research stages or grant data/economic/trading authority.
+
+Verified designated root/branch, clean local HEAD and unchanged matching
+remote `bf91788b4c593e24710f5c63cfbfbcf9e56cad89` before resuming. No new
+Claude commit or dirty work was present. The current owner assigns this
+continuation to Codex; stop if later state indicates overlapping Claude work.
+Both section-20 review commits remain accepted; no consumed review is repeated.
+The existing Python carrier counts as the first capability. The following
+nine are substantive missing composition/evaluation boundaries, not repeated
+ENG-1..26, renamed existing functions, or original GDR-0..6 completion.
+
+The premature publication `bf91788b` remains preserved; never rewrite or
+force-push it. It already used the previous round's single successful push.
+Codex has asked the owner whether one additional final completion push is
+permitted; while unanswered, remaining work may be implemented/validated and
+committed locally, but publication is withheld. No intermediate push or
+automatic monitor resumption. All later work stays in this branch/worktree,
+with this record as the only lane handoff and root documents frozen.
+
+GDR-CCR22-001 (P2, workflow/delivery): the requested ten-capability batch was
+incomplete and published after one. The correction is to finish the remaining
+nine under explicit definitions below and preserve, not conceal, the early
+publication and its authorization boundary. A changed source always needs
+the eventual complete independent review before platform execution.
+
+### 22.2 Ten capabilities and definitions of done before implementation
+
+All new execution-style inputs are invented SYN-only fixtures. New paired,
+action or settlement prototypes are deliberately separate from the owner's
+fixed single-security 372-frame QC candidate: do not substitute them into its
+approved native entry point or silently expand its cloud evaluation scope.
+No economics, statistical allocation or protected evidence date is chosen.
+
+| Capability | Definition of done |
+|---|---|
+| BT-1 — byte-preserving Python cloud carrier | Delivered in section 21: bounded Python files, literal-only payload parsing, exact bundle/source/fixture identities and a no-op root discovery subclass. Retain its hostile-input/source-race tests; source epochs must be rebuilt after this batch. |
+| BT-2 — input-to-callback composition | A separate bounded synthetic callback plan consumes existing receipt-ordered provider lineage, eligibility and dated market/reference contracts, retaining every decision/calendar row and missing/stale/refused opportunity. It cannot backdate receipt availability, create same/future-minute fills or accept real identities. |
+| BT-3 — paired order/receipt protocol | A separate synthetic bridge composes existing strategy and matched comparator engines with independent native-style symbol/order IDs, exact partial-fill/acknowledgment lineage and atomic no-advance-on-missing-receipt behavior. Source fills bind comparator budgets/tranches; rounding/funding/timing blockers remain permanent. |
+| BT-4 — corporate-action callback reconciliation | Route validated invented whole-share split/dividend/supplied-terminal actions through that paired protocol at effective open. Exact redelivery is idempotent; conflicts, wrong clocks, pending-order hazards, fractional/noncash unsupported economics refuse without cross-sleeve partial mutation. No invented comparator terminal sale. |
+| BT-5 — dated settlement observation reconciliation | Reconcile each sleeve's settled cash, explicit dated receivables, reservations and immediate envelope separately against acknowledged state. Early/wrong/duplicate settlement or missing proceeds cannot authorize spending; no inferred T+1 model or native equity-settlement parity claim. |
+| BT-6 — complete paired account/NAV audit | Audit immutable supplied synthetic account rows against both ledgers over the explicit calendar, including quantities, costs, marks, cash/receivables and remaining orders. Missing/duplicate dates, transient mismatches and permanent terminal/parity blockers prevent a completion claim even after liquidation. |
+| BT-7 — passive durable exact-candidate QC attempt ledger | Local append-only content/hash-bound records track launch intent and terminal outcomes for one exact source/project/fixture candidate. Ambiguous or pending intent cannot disappear across restart; at most three unsuccessful terminal launches, immutable duplicate/conflict handling, no reset by renaming candidate, no platform actuator or self-certified approval. |
+| BT-8 — strict compile/run receipt contracts | Validate bounded passive compile/runtime receipts with exact candidate/project, compile/run and engine/binding identities and coherent terminal status. Compile failure consumes an unsuccessful attempt; runtime errors, missing IDs, wrong epochs and alias/nonfinite fields refuse or remain visibly incomplete. IDs/Completed alone never prove native/economic acceptance. |
+| BT-9 — complete cloud-source comparison and Mia quarantine | Compare the entire returned Python project-file map with caller-retained local candidate identities, classifying every missing/extra/changed byte and preserving complete change hashes. No partial-map success, automatic port, economic acceptance or broader source read; changed source stays quarantined for verification/review. |
+| BT-10 — fixed synthetic completion-evidence verifier | Passively reconstruct/validate the fixed 372-frame protocol trace and account checkpoints, exact duplicate/order/fill/cancel lineage, final cash/inventory and complete expected sequence. Bind retained source/project/fixture and receipt/attempt records; incomplete/forged/self-asserted completion or changed source cannot become native or empirical evidence. Unit fixtures stay explicitly offline/synthetic and external authenticity unverified. |
+
+Completion means each bounded capability is implemented end-to-end and
+focused-tested as a review candidate, not independent acceptance or a native
+run. Record technical/plain-language behavior, per-capability evidence,
+verified defects, exclusions, exact hashes and commit range. Use focused
+regressions, import/document/compilation/diff/status checks only; no full suite.
+The maximum-three-attempt/Mia rule and complete cloud-source inspection remain
+binding for a later authorized QC evaluation; this batch performs no launch.
+
+### 22.3 Implemented behavior and plain-language milestone entries
+
+| Capability | Technical implementation | Plain-language result and limit |
+|---|---|---|
+| BT-1 | Rebuilt the unchanged carrier generator against the new explicitly inventoried source epoch; exact bundle/fixture verification, literal-only parsing and bounded Python files retained. | All ten capabilities can travel in the review package without changing the native candidate. Packaging is not a successful QC run. |
+| BT-2 | `callback_plan` composes receipt-ordered as-of lineage, eligibility, dated raw market/reference contracts and every one of 93 decision rows. It derives the April 4 invented opportunity, 10:01 source/matched quote and 10:02 comparator execution; missing/stale/delayed recipes retain refusals without later retry. | A late or unusable input cannot be backdated into an entry or hidden by dropping its date. These are invented inputs, not audited point-in-time data. |
+| BT-3 | `PairedSyntheticBridge` binds independent SYN-GDR/SYN-SPY native-style IDs to shadow orders and exact ordered submission/partial-fill/cancel receipts. Actual acknowledged source fills create comparator budgets/tranches and fractional exits; draft transactions refuse missing/conflicting receipts atomically. | Both modeled sleeves must acknowledge what actually filled before proceeding. This is an offline callback prototype, not native comparator execution. |
+| BT-4 | Canonical invented action inputs and exact supplied callback bytes reconcile before the paired coordinator applies whole splits, dividends or supplied terminal cash at effective open. Conflicts, pending orders, wrong clocks and unsupported fractional/noncash economics refuse with rollback. | A callback cannot half-apply an action to one sleeve, or invent a comparator sale to make a terminal event look complete. |
+| BT-5 | Separate component observations reconcile each sleeve's quantities, settled/available/reserved cash, dated receivables and immediate envelope. Explicit session-open settlement is an atomic advance; Friday-sale/Monday-payment tests preserve nonspendable proceeds. | Proceeds do not become spendable merely because ending cash matches. No real equity T+1 model or native settlement parity was chosen or certified. |
+| BT-6 | `account_row` and `audit_paired_accounts` share semantic validation of cash/reservations, dated receivables, whole holdings, pending orders, raw marks/NAV and derived terminal status. Every expected close is retained and compared to immutable observed rows with a separate retained anchor. | Missing dates, transient differences, held assets or permanent blockers prevent completion even after later liquidation. Matching invented observations still do not prove external authenticity. |
+| BT-7 | `ReceiptJournal` adds no-overwrite, candidate-bound local intent/compile/run/failure/ambiguity records and whole-chain replay with a separately retained head. Pending/ambiguous observations block another intent; all unsuccessful terminal classes count once and a third stops the candidate. | Restarting or renaming an attempt cannot erase unresolved work or its failures within retained history. This is passive custody, not a scheduler or global research-look/approval registry. |
+| BT-8 | Immutable exact-type compile/run contracts bind source/project/candidate, project/compile/run IDs, engine/Python-binding labels and coherent clocks/statuses. Latest uncertainty is a floor for terminal observations; aliases, reused/cross-epoch IDs and malformed status refuse. | A successful-looking status must describe the same candidate/attempt. Late retrieval of an older terminal event cannot be silently inferred by this one-clock contract; preserve uncertainty pending a richer reviewed contract. |
+| BT-9 | Complete private Python maps are compared against both caller-retained inventory hashes, classifying every missing/extra/changed/unchanged file and retaining every before/after hash plus a change-manifest hash. Optional current-source verification is separate. | Mia/cloud changes remain quarantined for manual diagnosis and independent review; nothing is executed, ported or economically accepted automatically. |
+| BT-10 | Immutable complete traces are transported in bounded canonical chunks and replayed through the actual fixed bridge. All 372 account checkpoints, frame/receipt sequence, fill economics and final inventory/cash must reconcile. Dossiers bind current source/project/fixture, whole attempt-chain replay and normalized run-output bytes linking every chunk. | An unrelated or self-asserted Completed receipt cannot stand in for the returned output. Consistent supplied evidence remains offline software evidence, not an authenticated native run or empirical readiness. |
+
+The full callback-plan-to-paired-bridge regression walks all 93 closes, with
+two actual modeled strategy fills and two comparator fills, acknowledged
+order lineage, fees, dated cash/receivables and paired raw-mark NAV. The
+fixed-source evidence regression separately walks its unchanged 372 frames
+and 752 trace records using non-hardcoded native-style IDs. Neither test
+imports the SDK or consumes an empirical look. All original candidate/plan
+economics, unresolved decisions and false permission fields stay unchanged.
+
+### 22.4 Retained P0-P3 author-QA ledger and review dispositions
+
+Claude commits `e3a238c65e7b436ab1004ac771b29402c26639c8` and
+`1d81a28af43ade3e1e7b22f8af752cd7b47bc4ab` remain **accepted** under
+section 21's exact section-20 counter-review. There is no later Claude commit
+to consume; remote still names the preserved own publication `bf91788b`.
+All CR18/CR20/CCR19/CCR21 findings, shared exclusions and native/research
+blockers remain retained. New implementation is pending independent review,
+not self-accepted by the implementer or its author-QA agents.
+
+| Finding | Priority | Evidence and disposition |
+|---|---|---|
+| GDR-CCR22-001 | P2 workflow/delivery | One capability was prematurely published for a requested ten. Remaining nine implemented; early push preserved and additional publication held for explicit owner direction. Delivery corrected, publication decision still open. |
+| GDR-CCR22-002 | P2 lane-owned account completeness | Read-only cross-audit reproduced complete status for matching re-anchored final rows with 98 held shares, an open order, a receivable and inconsistent cash. Corrected via shared semantic account validation and derived terminal coherence; compound/alias/cash/order/mark/NAV regressions retained. |
+| GDR-CCR22-003 | P2 lane-owned attempt chronology | Reproduced intent 00:00, ambiguity 00:20, failure 00:01, next intent 00:02; compile/run had the same gap. Corrected by a latest-observation floor for terminal/uncertainty records, including whole-chain replay. Historical request/start clocks remain intact; unsupported late retrieval requires a richer reviewed contract, not changed timestamps. |
+| GDR-CCR22-004 | P2 lane-owned returned-output binding | Reproduced dossier consistency with a valid trace but unrelated run-output SHA `2` repeated 64 times. Corrected by requiring canonical supplied-output bytes to match the receipt hash, exact binding/trace/head/count and every chunk anchor. Changed, noncanonical, wrong-binding and unrelated-output regressions retained. |
+| P0/P1 | None found | No verified authorization bypass, shared behavior change or production financial defect found in this batch. Author QA is not independent Claude acceptance. |
+| P3/limits | Retained | Claimed statuses/IDs/review anchors remain observational; native authentication, settlement/comparator/actions parity, real-data and empirical gates are still absent. No additional economic choice or research milestone claim. |
+
+The implementer reviewed all four new production modules and their focused
+tests. Separate read-only cross-audits found the three verified P2 defects
+above, which were reproduced before lane-specific correction. Temporary
+test-fixture/index/clock assumptions and a too-strong normal-held-schedule
+blocker were corrected during author QA; failed diagnostic runs are not
+relabeled successes or actual QC attempts. A first trace-mutant experiment
+showed redundant final-hash defense; the subsequent focused scalar-guard and
+retained-anchor mutations were caught and restored without source writes.
+Validation and immutable source identities follow after the final freeze.
+
+### 22.5 Final source freeze, validation scope and exclusions
+
+Frozen production identities (rebuilt and verified in memory, not uploaded
+or saved as a new release):
+
+| Identity | Exact value |
+|---|---|
+| Full source manifest SHA-256 | `fb5ad41f32bd526ce45a4db563191f956a72e042c0506d5583f6b793f5630037` |
+| Source bundle SHA-256 | `f8e61c9cbcfbf64c1facff39ee28e3a7e69e32cd44d14e96ef88d4d37e12965f` |
+| Bundle layout | 534,743 bytes / 43 ZIP members; fixed metadata and exact inventory |
+| Python project-map SHA-256 | `fdddd733be86690771caa537b1f8117f16964d833885c5ff3f354861f797c6bb` |
+| Python project layout | 25 files / 731,516 bytes total / maximum 30,014 bytes per file; original quotas unchanged |
+| Root carrier `main.py` SHA-256 | `a19332f897576dc13e3868c2edb3c78660bbeea12512a0cda580e0d3e6b04de9` |
+| Root carrier size | 18,188 bytes; no native callback override |
+| Invented sidecar SHA-256 | `8f35d56a335d3f7d9dad016e1e2236de7fcd2635e5c463c30081f97b7b944458` |
+| Sidecar layout | Unchanged 43,135 bytes / 372 frames / 93 sessions |
+| Original candidate SHA-256 | Unchanged `b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c` |
+| Original Markdown / PDF pins | Unchanged `26478c3ba90a60bb321f664eaa0f1afb163883bedba06fb9a03345e8d60dfe11` / `f8d7855b076eb064c45089020d277b2f96f00405477b19b1610a7f3aaf42af70` |
+
+Both deterministic package reconstruction and retained-anchor verification
+passed on this source; 73 lane source/test files and all 25 generated Python
+files compiled in memory. No bytecode, installed runtime/dependency or new
+release publication is part of this check. The final frozen-source selection
+passed **176 tests / 206 subtests in 145.31 seconds**, using bundled CPython
+3.12.14 normal pytest under OS-level network denial, zero failures/skips.
+Selection: the four new modules' tests, bundle/carrier, preparation CLI,
+import/lane boundaries, active-document consistency, and three specifically
+selected baseline native-shim account/end-to-end regressions. This is not the
+complete lane or repository suite; Claude owns independent full validation.
+
+Earlier focused corrected-stage runs: carrier/protocol/new evidence/boundary
+selection passed 83 tests and 156 subtests in 20.28 seconds; the corrected
+output-binding evidence module then passed 7 tests and 19 subtests in 15.10
+seconds. Active-document, preparation/import boundaries and three baseline
+native-shim regressions passed 84 tests and 17 subtests in 7.18 seconds.
+These were focused author checks, not the complete lane or repository suite.
+Final-tree guard mutations retained: three paired-account comparison/blocker/
+terminal invariants, two paired pending/account invariants, two evaluation
+attempt/anchor invariants and two trace scalar/retained-anchor invariants.
+The preceding carrier's three mutations remain covered by its unchanged tests.
+All transient in-memory patches were restored; no mutated source was committed.
+
+Frozen root coordination files, general instructions, original candidate/plan/
+PDF and existing native `lean/main.py`, `lean_bridge`, `simulation`, `comparison`
+are unchanged from `bf91788b`. Historical root edits remain preserved; no
+shared/main issue was corrected in this lane. New APIs import only the lane
+and unchanged neutral helpers/stdlib; offline imports do not load the SDK.
+
+Actual external evaluation ledger remains **0 uploads / 0 QC launch intents /
+0 unsuccessful terminal attempts**. Invented pytest receipt/compile/run IDs
+are not platform IDs or actual attempts. No project, compile/run result,
+engine/binding evidence or authenticated external outcome exists. The fixed
+native entry point still logs its trace head/count, not an automatically
+retrieved complete cloud transcript: passive chunk/output verification does
+not invent that retrieval or authentication. Those exact integration evidence
+requirements remain for the later reviewed and owner-authorized evaluation.
+
+All ten bounded offline capability definitions are implemented as review
+candidates. This does not complete original GDR-0..6, resolve an economic
+proposal, allocate a family/look/window, clear processing rights, validate a
+calendar/PIT adapter, establish native comparator/actions/equity settlement,
+or establish empirical backtest readiness/market edge. Real-data/outcome,
+provider, operator, broker, scheduler, account, purchase, paper/live/capital,
+PR/main merge and cross-lane gates remain closed. The monitor remains PAUSED.

@@ -6,6 +6,12 @@ QuantConnect strategy. Original GDR-0 review/freeze and GDR-1..GDR-6 research,
 data, cloud and operating gates remain closed. The original plan/PDF and
 proposed parameter hash are unchanged.
 
+The owner's ten-capability implementation batch is BT-1 through BT-10 in
+lane-record section 22: the carrier plus nine new composition/evidence
+boundaries below. These are offline engineering review candidates, not ten
+research stages or empirical backtest readiness. Fresh independent review
+and the scoped synthetic QC evaluation remain outstanding.
+
 The offline core imports only the Python standard library, its own modules and the
 unchanged product-neutral `data.hashing` / `data.financial_primitives` helpers.
 It has no provider, outcome-fetch, broker, operator-database, scheduler or
@@ -37,6 +43,10 @@ verified. No other lane's budget or permissions are inherited.
 | ENG-24 | `lean_bridge` | Bounded hash-linked callback protocol trace, exact duplicate idempotency and atomic capacity refusal |
 | ENG-25/26 | CLI, `release` | Local preparation/verification commands, explicit offline/native/empirical readiness separation and rebuilt review release |
 | Cloud-package preparation | `qc_project` | Deterministic size-bounded Python carriers and root loader for the exact source bundle/fixture; new review candidate, not cloud execution or launch authority |
+| BT-2/6 | `callback_plan` | Receipt/as-of inputs to all 93 decision rows, subsequent strategy/comparator quotes and execution minutes, retained missing/stale refusals; complete immutable paired close/account audit |
+| BT-3/4/5 | `paired_bridge` | Separate paired native-style IDs and exact submission/fill/cancel acknowledgments; retained-input action reconciliation and dated settlement/component observations with atomic refusal |
+| BT-7/8/9 | `evaluation` | Passive durable exact-candidate intent/terminal ledger, strict compile/run contracts and complete returned-project byte comparison/Mia quarantine; no platform actuator |
+| BT-10 | `completion_evidence` | Bounded complete trace chunks and fixed 372-frame replay, linked to current source/project and whole passive attempt chain; consistency is not external authenticity |
 
 Positive entries require a predecessor captured before publication. Later
 comparable cuts reduce risk when known even if the original raise was received
@@ -141,6 +151,38 @@ Runtime filesystem permissions, native class discovery, binding and callback
 behavior remain unverified in QC. The loader is new source and requires fresh
 exact-source Claude review before the conditionally authorized synthetic
 evaluation in lane-record section 19.6. It grants no empirical authority.
+
+The new paired/action/settlement composition is a separate offline prototype;
+the native entry point still uses only its original single-security sidecar.
+`CallbackPlan` reconstructs fixed receipt/as-of recipes and retains every
+calendar row, including missing/stale input refusals. `account_row` plus
+`audit_paired_accounts` compare complete independently retained synthetic
+snapshots and marks: transient discrepancies or retained blockers cannot be
+erased by a matching final NAV.
+
+`ReceiptJournal` passively records exact-source intent and terminal receipts
+in an existing owner-controlled directory. Retain its head separately for
+restart/truncation checks; losing both history and anchor is not detectable
+rollback. This is not the research-look registry, a QC scheduler or approval
+store. Its supplied compile/run labels and statuses are observations only.
+Terminal observations cannot predate the latest recorded uncertainty. This
+one-clock contract cannot represent late retrieval of an earlier terminal
+event: preserve pending ambiguity rather than rewriting platform timestamps;
+that case needs a separately reviewed observed-time contract.
+The complete returned Python map is compared against both retained anchors;
+all source changes are quarantined for verification, never executed or ported.
+
+`TraceEvidence` transports the complete fixed protocol in canonical chunks
+below the unchanged 64-KiB decoder limit. `replay_completion` requires every
+frame's account checkpoint and reconstructs accepted bindings/receipts and
+economics. `completion_dossier` also binds current source/project/fixture and
+replays the complete passive attempt chain against its retained final head.
+The canonical supplied output must hash to the run receipt and bind the exact
+trace and every chunk; unrelated job-output hashes refuse. This normalized
+output still needs independent retrieval/provenance during any actual QC run.
+Even self-consistent supplied `completed` receipts leave authenticity, native
+execution, settlement parity and empirical readiness false. There is no
+launch or authority override in these APIs.
 
 The always-blocked preflight now lists synthetic pre-launch requirements
 separately from empirical prerequisites. A pinned native run is evidence to

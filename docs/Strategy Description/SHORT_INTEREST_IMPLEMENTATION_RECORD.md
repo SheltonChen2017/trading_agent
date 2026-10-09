@@ -1,26 +1,20 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE HAS REVIEWED BOTH CODEX COMMITS IN `4228eaa..1e0e784`
-(SECTION 102) AND ACCEPTS THEM. ALL THREE `SI-CCR30` FINDINGS AGAINST CLAUDE'S
-SECTION 100 ARE CONFIRMED: A MALFORMED DUPLICATE SI ROW COULD ADMIT ITS VALID
-TWIN (P2, FIXED IN `cd0481d`; THE `4228eaa` HANDLING FAILS ALL 24 NEW CASES),
-THE EVALUATION-END GUARD IS REQUIRED WHEN EVERY HOLDING TERMINATES IN-WINDOW
-(P3; REMOVING IT FAILS 3 CASES), AND "NO FINRA CREDENTIAL IS PRESENT"
-OVERSTATED THE CHECKED SCOPE (P3). NO NEW FINDING AGAINST CODEX; THIS COMMIT
-CHANGES NO CODE OR TEST. NETWORK-DENIED ON `1e0e784`: THE EIGHT NEWER LANE
-FILES WITH THE LANE BOUNDARY, ACTIVE-DOCUMENT AND ML-BOUNDARY CHECKS PASS 400;
-THE 18 PRE-OCTOBER FILES, WHICH CANNOT REACH THE CHANGED MODULE, LAST PASSED
-817 ON `b0d4a57`. FINRA SETUP IS BLOCKED UNTIL THE OWNER'S SIGNED-IN CHROME
-SESSION IS REACHABLE OR AN ACTIVATED PUBLIC API CREDENTIAL'S LOCATION IS
-SUPPLIED. `SI-CR19-003` (EXPLORATORY LOOK ACCOUNTING) STAYS OPEN. THE CANONICAL
-PIT STUDY REMAINS BLOCKED ON ORIGINALS, CORRECTIONS AND AVAILABILITY CLOCKS;
-VENDOR DEADLINE 2026-10-19. THE THREE SOURCE P2s, THE SHARED P2 `SI-CR5-005` /
-`SI-CCR16-007` AND `SI-CR15-001` REMAIN OPEN. LOOKBACKS 20/60/120/252 REMAIN
-UNSELECTED; REAL LOOKS 0/0, ALPHA 0, PERMANENT LOOKS NONE, QC ATTEMPTS 0.
-PROVIDER DATA, LICENSED/ACTUAL MARKET ROWS, OUTCOMES, HOLDOUT, PRODUCTION
-RANKING/SEEDS, ETF, QC HISTORY/PROJECT/UPLOAD/COMPILE/JOB/BACKTEST, PURCHASE,
-BROKER, OPERATOR DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL, ORDERS AND TRADING
-REMAIN GATED.**
+Status: **SECTION 103 COUNTER-REVIEWS AND ACCEPTS CLAUDE'S SOLE `f75d8d8a`
+RECORD COMMIT AFTER THE EXACT PUSHED `1e0e7849` CHECKPOINT. NO NEW CODE DEFECT
+OR CORRECTION; THE 27 DUPLICATE/SUCCESSOR REGRESSIONS AND 69 ACTIVE-DOCUMENT
+CHECKS PASS 96 UNDER NETWORK DENIAL. THE OWNER LATER SPECIFIED SAFARI,
+CONFIRMED FINRA API TERMS ACCEPTANCE AND FREE PUBLIC CREDENTIAL CREATION,
+AND PERSONALLY SET THE API SECRET. THE CONSOLE NOW INDEPENDENTLY SHOWS
+PUBLIC / ACTIVE AND A 10 GB MONTHLY CAP. THIS SUPERSEDES THE HISTORICAL
+CHROME-CONNECTION BLOCKER, NOT THE SOURCE GATES. THE SECURE LOCAL CREDENTIAL
+LOCATION IS STILL UNSUPPLIED; NO AUTHENTICATED API REQUEST OR FINRA/MASSIVE
+COMPARISON HAS RUN. CANONICAL PIT ORIGINALS/CORRECTIONS/AVAILABILITY AND
+EXPLORATORY COMPANION/COVERAGE/USE/ROUTE/LOOK/REVIEW REQUIREMENTS REMAIN OPEN.
+ALL HISTORICAL LEDGERS AND FINDING CLASSIFICATIONS ARE RETAINED. LOOKBACKS
+20/60/120/252 REMAIN UNSELECTED; CANONICAL REAL LOOKS 0/0, EXPLORATORY ACTUAL
+LOOKS 0, ALPHA 0, PERMANENT LOOKS NONE AND QC ATTEMPTS 0. NO PRICES, OUTCOMES,
+HOLDOUT, QC JOB OR TRADING ACCESS IS ESTABLISHED BY ACCOUNT ACTIVATION.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -216,6 +210,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-08 | Claude review | `5275b7d` -> `b0d4a57` reviewed after the push watcher fired; **record-only correction (four reconstructed push-ledger rows above)**; this record commit is the only Claude commit | Independent review of the twelve-commit continuous build: synthetic order engine, ranked-order bridge, Massive qualification, latest-revised exploratory software and FINRA route | Dispositioned all 12 commits. Read the new modules for float use, network clients, imports, the pinned launch boundary, byte-before-parse loading and order-book accounting; verified three bound record hashes and the validation-period protection; ran six in-memory mutants, five red on the intended behaviour and one unreachable by construction. | Pushed tree `b0d4a57`, clean, Codex idle, network-denied: 26-file lane **1,101 passed** (817 existing + 284 new; no skips or warnings); compileall exit 0; active-document plus ML boundary 80 passed; final-tree active-document 69 passed; `git diff --check` clean. Synthetic/fabricated only; **authorized looks 0, consumed looks 0**. | `SI-CR19-001` (P3, closed by correction: four pushes without ledger rows). `SI-CR19-002` (P3, open: cross-lane Sharadar authority paraphrased). `SI-CR19-003` (P3, open advisory: exploratory look accounting before the first real run). Codex's draft findings accepted; source P2s, shared P2 and `SI-CR15-001` open. | Codex counter-reviews this record commit. The owner activates a FINRA credential if the cross-check should proceed. Every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
 | 2026-10-08 | Codex counter-review / correction | `b0d4a57f..4228eaaf` reviewed; correction `cd0481d56d6568ba6bb3e93d1432088a0a28439d`; this final record commit follows | Completed section-100 counter-review; resumed FINRA setup blocked on Chrome access | Sole Claude commit accepted after correction. Raw identifiable duplicates now quarantine valid/malformed peers across pages; successor-end guard gets three direct cases; owner Sharadar-path quotation repairs provenance. | Codex focused, network-denied: **201 passed in 115.51s**; duplicate RED 24 failed then source GREEN 59 passed; successor GREEN 3 passed / mutant RED 3 failed / final GREEN included; targeted compilation exit 0. Final document/preservation/diff checks recorded in section 101. | `SI-CCR30-001` P2 corrected; `SI-CCR30-002..003` P3 qualified; `SI-CR19-001` closure accepted, `-002` closed by quotation, `-003` prospective/open. Source/shared P2s and later-commitment advisory retained; actual looks 0/0. | One combined non-force push; delete handled Claude monitor. Make signed-in Chrome or an activated FINRA Public credential securely accessible, then freeze the bounded SI-only consistency sample. No actual comparison, outcome look or QC launch this round. |
 | 2026-10-09 | Claude review | `4228eaa` -> `1e0e784` reviewed from the published head; **no code or test correction**; this record commit is the only Claude commit | Independent review of Codex's counter-review of section 100, the duplicate-row quarantine and the evaluation-end guard pin | Confirmed `SI-CCR30-001`, `-002` and `-003` against my section 100. Reproduced the first two by execution: the `4228eaa` duplicate handling fails all 24 new cases, and removing the successor-exit guard fails all 3. Verified the fix's key equality, its cross-page counting and that only latest-revised modules can reach it. | Pushed tree `1e0e784`, clean, Codex idle, network-denied: eight newer lane files plus lane boundary, active-document and ML boundary **400 passed in 984.34s**; probes 24 failed / 3 failed / 27 passed unmutated; compileall exit 0; final-tree active-document 69 passed; `git diff --check` clean. The 18 pre-October files, which cannot reach the change, last passed 817 on `b0d4a57`. **Authorized looks 0, consumed looks 0**. | No new finding against Codex. `SI-CCR30-001` (P2), `-002` and `-003` (P3) confirmed against Claude and closed; `SI-CR19-001`, `-002` closed; `SI-CR19-003`, source P2s, shared P2 and `SI-CR15-001` open. | Codex counter-reviews this record commit. The owner makes the Chrome session reachable or supplies an activated FINRA credential's location. Every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
+| 2026-10-09 | Codex counter-review / FINRA activation record | `1e0e7849..f75d8d8a` reviewed; this closing record commit follows; no code/test change | Accept section 102; record owner-confirmed free Public credential creation and observed activation in Safari | Sole Claude commit accepted, no new finding; prior ledger preserved. API terms accepted and Public credential created only after concrete owner confirmation; the owner entered/submitted the new secret. Console status independently observed Active. No credential identifier/value enters Git. | Codex focused, network-denied CPython 3.13.15 / pytest 9.1.1: **96 passed in 2.49s** (24 duplicate, 3 successor, 69 document checks). Final document/diff/preservation/status checks recorded in section 103. No full suite or new mutation. | Three source P2s and shared P2 remain open; prospective look/commitment P3s retained. FINRA activation is verified, but secure runtime location and actual source comparison remain pending. Actual looks 0/0, exploratory actual looks 0, QC attempts 0. | One final non-force push under section 81. Obtain only the secure credential path/variable names, freeze the outcome-free settlement sample before retrieval, then perform the bounded licensed-API consistency comparison. No backtest-readiness claim. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -14078,3 +14073,160 @@ On the exact pushed tree `1e0e784`, clean, Codex idle, network-denied:
    seeds, ETF work, any QuantConnect history/project/upload/compile/job/
    backtest, purchases, broker, operator database, deployment, paper/live,
    capital, orders and trading.
+
+## 103. Codex counter-review and verified FINRA Public activation — 2026-10-09
+
+### 103.1 Exact completed review and per-commit disposition
+
+The only designated physical/Git root remains
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__short_interest`,
+branch `codex/strategy-short-interest`. Initial local HEAD, matching tracking
+HEAD and the actual matching remote are clean and equal to
+`f75d8d8a2636e098947b333cbc7bd5d18c788158`. A matching-ref-only fetch with
+`--no-tags`, no force refspec, confirms equality. No fast-forward, merge,
+branch/worktree change or history rewrite is needed.
+
+The complete ordered Claude range after the pushed checkpoint is
+**`1e0e7849f0e3d41abe5c8e95b275b88d5bbdccf4..f75d8d8a2636e098947b333cbc7bd5d18c788158`**:
+
+| Commit | Disposition | Scope and evidence |
+|---|---|---|
+| `f75d8d8a2636e098947b333cbc7bd5d18c788158` | **Accepted; no issue found** | Only the status header, one appended publication row and complete section 102 change (+165/-15). Claude dispositioned both exact Codex commits `cd0481d` and `1e0e784`, confirms all three earlier `SI-CCR30` findings, and explicitly distinguishes its 400-pass focused execution from the earlier 817-pass unchanged-file result. Historical sections and ledger rows remain intact. No code/test correction is needed. |
+
+The record proves completed independent review of the exact checkpoint; this
+is not inferred from author names or an intermediate push. Git confirms the
+source +19/-2 and tests +63 delta. Validation arithmetic reconciles:
+284 + 27 = 311 newer-file cases, then 311 + 9 + 69 + 11 = 400. Those 400
+passes and the old-function/removed-guard mutation results remain **Claude's
+execution**, not a newly claimed Codex run. Counter-review quality **9/10**:
+accurate complete-range review, attributed execution and retained gates.
+
+### 103.2 Later browser authority, creation and observed activation
+
+After section 101's Chrome access stop, the owner instructed **"try safari,
+not chrome"**, then requested another retry and reported sign-in. This later
+browser direction supersedes `SI-DEC-20261008-04` for resumed setup. Safari's
+signed-in API Console was actually controllable; initial state showed no API
+credentials. Codex prepared a Public credential with total fee **$0.00 per
+month**, read the linked terms, and stopped before acceptance/creation.
+
+The action-time question asked whether the owner approved accepting
+[FINRA's API terms](https://developer.finra.org/terms-and-conditions) and
+clicking Create, explicitly identifying data-use, credential-security and
+indemnification obligations. The owner's answer was **"yes"**. A session
+logout prevented the first continuation; after the owner's renewed sign-in,
+Codex reverified the same Public/$0 form, checked the agreement and clicked
+Create once. The Console confirmed creation and **Pending email activation**.
+No Mock or paid Firm/Organization credential was selected.
+
+The new API secret's entry, confirmation and submission were handed to the
+owner. Following **"done"**, Codex independently read the Console status:
+**Public**, **Active**, and **0 MB / 10 GB** monthly usage/cap. This verifies
+activation, rather than treating registration or sign-in as production API
+access. No secret was entered by Codex; no password reset, credential reset,
+email access, purchase or authentication bypass was performed.
+
+The specific local file path or environment-variable names for using that
+activated credential have **not yet been supplied**. Only that location was
+requested; values must not be sent in chat. No broad credential search, API
+authentication attempt, provider row retrieval or consistency comparison has
+occurred. A visible Active credential is not proof that this runtime holds
+its secret. Private account/client identifiers and secret values are excluded
+from this record and Git.
+
+The [Equity-specific terms](https://developer.finra.org/specific-terms-equity-data)
+cover `otcMarket`, require valid Public/Firm/Organization credentials, permit
+noncommercial personal/professional internal use and derivative/resultant
+data. The accepted general terms require licensed API access, protected
+credentials and compliance records. This is the documented local-use route,
+not source completeness, original-vintage PIT, retention without applicable
+terms, or a separately qualified QuantConnect Cloud processing route.
+
+### 103.3 Persistent P0–P3 ledger and exercised delegation
+
+No new P0, P1, P2 or P3 software finding arises in this doc-only review.
+All historical confirmed, partial and false-alarm rows remain preserved.
+
+| ID | Priority | Current disposition and reason |
+|---|---|---|
+| `SI-CCR30-001..003` | P2 / P3 | Closed, confirmations accepted. The corrected malformed-duplicate refusal and retained successor guard remain unchanged; the credential-absence scope qualification is preserved. |
+| `SI-CR19-001..002` | P3 | Closed; publication-ledger repair and verbatim Sharadar authority remain intact. |
+| `SI-CR19-003` | P3 | Open prospective advisory. Register every real exploratory signal/outcome join permanently, resolve SI-0M accounting and canonical contamination before outcomes; activation cannot close this. |
+| `SI-SRC-20260928-001..003` | P2 | Open factual gates. FINRA Public activation is now verified progress on access, not originals/all corrections, availability clocks, historical listed/delisted identities, companion/terminal coverage or actual source comparison. |
+| `SI-CR5-005` / `SI-CCR16-007` | P2 | Open, shared/out of lane; documented only, no shared change. |
+| `SI-CR15-001` | P3 | Retained prospective commitment advisory. This particular free credential issuance/terms acceptance has concrete owner confirmation; later commitments still need their own required confirmation. |
+| `SI-DOC-20261009-001` | P3 | Confirmed draft placement error / corrected before commit. The first patch inserted section 103 before section 101. The historical-preservation check and helper audit caught it; the section was moved to EOF and the extra blank removed. Exact prior body/ledger preservation is required before publication. No published text or history was rewritten. |
+
+Recorded on 2026-10-09, with no invented timestamp for earlier chat messages:
+
+* **SI-AUTH-20261009-01:** the owner's **"try safari, not chrome"** and later
+  retry/sign-in directions authorize the specified Safari setup continuation,
+  superseding the historical Chrome-only browser choice.
+* **SI-AUTH-20261009-02:** the owner's **"yes"** to the concrete terms/Create
+  question authorizes FINRA API terms acceptance and one free Public credential
+  issuance at the reverified $0 monthly fee. This is not paid access, secret
+  entry by Codex, market-row admission or QC authority.
+* **SI-DEC-20261009-01:** use the bounded local-research alias and Public/$0
+  route; shorten the initial alias to fit the UI limit. Do not create Mock or
+  paid institutional access or infer an institutional affiliation.
+* **SI-DEC-20261009-02:** hand new-secret entry/submission to the owner, then
+  verify Active state independently and request only a secure local location.
+  Do not place credentials in Git or infer runtime access from UI activation.
+
+### 103.4 Focused validation, exclusions and exact next action
+
+Codex ran the 24 malformed-duplicate cases, three all-terminated successor
+cases and 69 active-document checks: **96 passed in 2.49s**, zero failures,
+skips or warnings, under existing CPython **3.13.15** / pytest **9.1.1**, an
+empty inherited environment and macOS `sandbox-exec` denying network. Only
+fabricated input was used. No new material defect calls for a fresh red/green
+mutation; prior red evidence retains its original attribution. No full lane
+or repository suite is run by Codex. The system Python probe lacked pytest;
+no tests ran there and nothing was installed. Validation used the existing
+qualified virtual environment documented in the lane record.
+
+This round changes only this lane handoff. A pre-commit historical-preservation
+check caught the draft append-placement error recorded above; it was repaired
+before publication. The final active-document, historical-preservation,
+privacy, diff and status checks are performed on the closing record. Code,
+tests, schemas, imports, financial
+rules, structural normalization, release-next-open rules and actual-input
+refusal are unchanged; compilation/import checks are not rerun for unchanged
+code. Shared/project-wide files and SESSION_HANDOFF stay frozen.
+
+After repairing the draft placement, exact historical-body/ledger preservation,
+added-record privacy and lane-only-diff checks pass. The active-document check
+passed **69 tests in 1.06s**, with no failures, skips or warnings. It is rerun
+after this validation-text addition, together with the staged/diff/status
+guards, before the single final push; the final hash/equality and rerun result
+are reported in the conversation rather than invented inside this commit.
+
+Next prerequisite is **only the secure credential location**, not another
+routine owner approval. Once available through the specifically identified
+secure runtime, freeze the bounded overlapping settlement sample and matching
+specification **before** retrieval, then compare FINRA and Massive current/
+previous short quantities, coverage, missing/duplicate/ambiguous rows and
+revision flags through admitted licensed APIs. No prices, volume, returns,
+outcome joins or QC job is part of that comparison. Agreement would test two
+distributors of a common underlying source, not independently prove original
+filings, PIT integrity or stable security identities.
+
+The activation/setup observation and counter-review are complete; the actual
+source-comparison milestone is **not implemented or executed**, and the lane
+is **not ready for an actual historical backtest**. Sections 98–99's remaining
+source/companion/use/route/look/review requirements are not waived. Canonical
+actual looks remain **0/0**, exploratory actual looks **0**, alpha **0**,
+permanent look IDs **none**, QC launch attempts **0**; candidate lookbacks
+**20/60/120/252** remain unselected. No price/outcome/holdout, production
+ranking/seed, ETF, QC history/project/upload/compile/job/backtest, broker,
+operator database, deployment, paper/live, capital, actual order or trading
+action occurred. No monitor is rearmed or changed.
+
+Under section 81 / **SI-AUTH-20261005-02**, publish this genuinely completed
+documented counter-review/setup record once, non-force, only as
+`HEAD:refs/heads/codex/strategy-short-interest`, with follow-tags disabled.
+Immediately before commit/push verify the designated roots, branch, HEAD,
+status and actual matching remote; stop on concurrent advancement. Verify
+clean local/tracking/actual-remote equality afterward. Claude's next review
+range begins at **`f75d8d8a`** and covers this closing record commit; no
+independent acceptance of this new record is claimed.

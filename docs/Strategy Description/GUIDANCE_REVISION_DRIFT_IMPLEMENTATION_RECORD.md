@@ -2133,3 +2133,45 @@ calendar/PIT adapter, establish native comparator/actions/equity settlement,
 or establish empirical backtest readiness/market edge. Real-data/outcome,
 provider, operator, broker, scheduler, account, purchase, paper/live/capital,
 PR/main merge and cross-lane gates remain closed. The monitor remains PAUSED.
+
+### 22.6 Exact commit range, held publication and next action
+
+Producing source/test/record commit:
+`4f85020d49c4d34af4156e14a0d7c05f3f0a0252` (13 explicitly staged lane paths).
+The correction range starts after the preserved own publication
+`bf91788b4c593e24710f5c63cfbfbcf9e56cad89`; this closing record commit is its
+final metadata handoff. The complete independent review should cover the
+whole implementation range after accepted Claude head
+`1d81a28af43ade3e1e7b22f8af752cd7b47bc4ab`, including prior carrier commits
+`3cc533cd2407b58f73af25f9c66616799d09a52d` and `bf91788b`, new source
+`4f85020d`, and this closing record. Review the complete final HEAD, not the
+superseded one-capability stop at `bf91788b` alone.
+
+Root, branch, HEAD/status and source identities were reverified before the
+producing commit. Source and project hashes in 22.5 are unchanged afterward;
+the closing active-document/import-boundary check passed 75 tests in 1.28
+seconds, with diff/status checks passing.
+Local changes are owned by this explicit continuation; no Claude work was
+overwritten. Root/project-wide documentation is still frozen.
+
+There has been **no additional push**. Remote last verified at preserved
+`bf91788b`; the owner has not yet answered the request for one additional
+final completion push. Hold the complete local series for that direction,
+then verify root/branch/HEAD/status and unchanged relevant remote before one
+authorized non-force push only to the matching lane branch. Never split it
+into intermediate pushes or disguise the earlier premature publication.
+
+After publication, Claude independently reviews every implementation commit
+and runs full independent lane validation at that exact final snapshot.
+Codex counter-reviews every resulting commit/finding and applies only verified
+lane-specific corrections. Only after accepted exact-source review and all
+applicable existing scoped gates may the fixed synthetic-only QC evaluation
+proceed, under the retained zero-attempt ledger and maximum-three/Mia rule.
+Source/review renaming or a preparation epoch does not reset the owner's
+cumulative actual attempt ledger; retain every launched candidate correction
+and terminal result. Any unsupported access, installation, financial choice,
+new evidence authority or unrepresented recovery returns to the owner.
+
+BT-1 through BT-10 implementation is complete; independent acceptance,
+native/cloud integration evidence and empirical readiness are separate,
+uncompleted stages. No automatic monitor resumption or wider follow-on scope.

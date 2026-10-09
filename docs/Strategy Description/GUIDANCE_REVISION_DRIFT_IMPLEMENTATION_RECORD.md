@@ -1,17 +1,15 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Section 19 (Codex counter-review of section 18, per-frame native
-account checkpoint and the owner-approval closure) independently reviewed by
-Claude in section 20 (2026-10-09): all three commits accepted, one lane test
-pin added, one P2 pre-launch packaging risk documented, no production defect.
-Section 20 counter-review accepted; section 21's premature one-capability
-handoff is corrected by section 22's implemented BT-1 through BT-10 batch.
-All ten are offline engineering review candidates, not original research
-milestone completion. The complete new source must receive Claude review and Codex counter-review before
-section 19.6's conditional synthetic-only QC upload/run. Native LEAN/QC
+Status: **Sections 21 and 22 (Codex counter-review of section 20, the Python
+QC carrier and BT-2..BT-10) independently reviewed by Claude in section 23
+(2026-10-09): all five commits accepted, nine lane test pins added, one P2
+pre-launch carrier-capacity risk documented, no production defect.
+Codex counter-review of section 23 pending.
+Under section 19.6 a synthetic-only order-based QuantConnect evaluation may
+start only after that counter-review accepts this review. Native LEAN/QC
 execution and empirical backtest readiness remain unverified/blocked. The
 original economic, data, empirical, account and trading gates remain closed.**
-Current scope/evidence are sections 17 through 22. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 23. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -2202,3 +2200,130 @@ and every commit after consumed review `1d81a28`, followed by Codex
 counter-review. This publishing request does not authorize a QC launch,
 independent-review bypass, real-data/economic action or monitor resumption.
 Actual QC attempts remain zero and all empirical/trading gates remain closed.
+
+## 23. Independent Claude review of `1d81a28a..180fc5b8`, 2026-10-09
+
+### 23.1 Scope and method
+
+Reviewed range: the five Codex commits after the section-20 push,
+`3cc533cd` (section-20 counter-review, the Python carrier `qc_project`,
+preflight split and CLI), `bf91788b` (section 21.4 closing record),
+`4f85020d` (BT-2..BT-10: `callback_plan`, `paired_bridge`, `evaluation`,
+`completion_evidence`), `705ad24f` (section 22.1-22.6 record) and `180fc5b8`
+(section 22.7 owner-approval record), the fetched remote head. The worktree was
+clean and equal to the remote head at the start. Every native-path module the
+section-20 review covered (`lean/main.py`, `lean_bridge`, `simulation`,
+`comparison`, `assessment`, `fixtures`, `timing`, `events`, `universe`,
+`archive`, `formulas`, `contracts`, `data/`) is byte-unchanged since
+`1d81a28a`, as are the frozen root documents, the plan, the PDF and the draft
+candidate. Method and isolation are as in 12.1: every commit read
+individually, every new module read in full, every pytest and mutation process
+network-denied under the proved `sandbox-exec` profile, all validation in the
+designated worktree. No provider, QC, broker, paper or live system was
+contacted; research looks 0; QC attempts 0. The QuantConnect project-files page
+was read again on 2026-10-09 for its per-tier quota table.
+
+### 23.2 Disposition of sections 21 and 22
+
+| Item | Claude disposition |
+|---|---|
+| `e3a238c6` accepted, `1d81a28a` accepted | Accepted. |
+| GDR-CR20-001 (carrier preparation) | Accepted as the right direction: a Python-only carrier avoids the unsupported `.jsonl` project file and keeps the native transport unchanged. GDR-CR23-001 records the remaining file-count risk. |
+| GDR-CCR21-001 (caller map mutation during verification) | Accepted; `verify_qc_project` now snapshots the map before validation, and mutant V02 confirms the reconstruction comparison is enforced. |
+| GDR-CCR21-002 (preflight lists) | Accepted: synthetic pre-launch and empirical prerequisites are now separate lists, every permission stays false, and no approval input exists. |
+| GDR-CCR22-001 (premature publication) | Accepted as self-reported. The remote-tracking reflog confirms two Codex pushes in this round, `bf91788b` at 12:55 and `180fc5b8` at 13:48 PDT; section 22.7 records the owner's "push" for the second. Listed in 23.7 for owner confirmation. |
+| GDR-CCR22-002/003/004 (account completeness, attempt chronology, output binding) | Accepted; each correction's guard is probed by a mutant in 23.6 (K05 terminal derivation, E09/E20 observation floor, C06 output binding). |
+| Section 22.7 owner "push" | Recorded by Codex from its own channel; listed in 23.7. |
+
+### 23.3 Commit dispositions
+
+| Commit | Scope | Disposition | Notes |
+|---|---|---|---|
+| `3cc533cd` | Carrier, preflight split, CLI, section 21.1-21.3 | Accepted after correction | Two loader pins added (GDR-CR23-005); 7 of 12 carrier mutants caught by its own tests, 3 redundant behind the per-file payload hashes, 2 now pinned; GDR-CR23-001 documented |
+| `bf91788b` | Section 21.4 closing record | Accepted | Documentation only; pushed separately (GDR-CCR22-001) |
+| `4f85020d` | BT-2..BT-10 modules, tests, README, section 22 draft | Accepted after correction | Seven pins added (GDR-CR23-006..009); 34 of 50 mutants on its modules caught by its own tests, 9 redundant by construction, 7 now pinned; GDR-CR23-002..004 documented |
+| `705ad24f` | Section 22.1-22.6 record | Accepted | Identities in 22.5 reproduced exactly (23.5) |
+| `180fc5b8` | Section 22.7 owner-approval record | Accepted | Documentation only |
+
+### 23.4 Findings ledger
+
+| ID | Priority / status | Location | Finding, disposition and verification |
+|---|---|---|---|
+| GDR-CR23-001 | P2 / documented, pre-launch risk | `qc_project.py` (`MAX_PROJECT_FILES = 25`, loader cap 540,000 bytes); `bundle._MODULES` | The carrier now fills exactly 25 project files (24 payloads plus `main.py`), the documented Free-tier maximum, and QuantConnect's project-files page says "Python projects start with a main.py and a research.ipynb file" without saying whether the notebook counts toward the limit. On a Free-tier organization the uploaded project may therefore hold 26 files. The bundle is 534,743 bytes against the loader's 540,000-byte cap, 5,257 bytes of headroom, so any further lane growth makes carrier preparation refuse. Both follow from carrying the whole 43-member lane bundle, including offline-only modules (`evaluation`, `completion_evidence`, `paired_bridge`, `callback_plan`, `qc_project`, `integration`, `persistence`, `recovery`, `release`), while the native algorithm's import closure is 13 modules, 169,506 bytes (`lean/main.py`, `lean_bridge`, `assessment`, `fixtures`, `simulation`, `timing`, `events`, `universe`, `archive`, `formulas`, `contracts`, `data/hashing`, `data/financial_primitives`). Recommend, before the first launch: confirm the organization's tier and whether `research.ipynb` counts or can be removed; or carry only the native closure, which roughly thirds the payload. A closure-only carrier changes reviewed bytes and needs review first. Not changed here: it is a packaging design choice. |
+| GDR-CR23-002 | P3 / documented | `evaluation.py` (`CandidateBinding`, `ReceiptJournal`), section 22.6 | The attempt journal's candidate identity includes `review_commit` and `review_record_sha256`, and each journal is one owner-controlled directory. Re-reviewing byte-identical source therefore yields a new binding and a fresh journal with zero attempts, and so does a new directory. Section 22.6's statement that "source/review renaming or a preparation epoch does not reset the owner's cumulative actual attempt ledger" is a procedural rule, not something the code enforces; within one journal the binding is fixed and renaming cannot reset it. Recommend keying the genesis on source, project, bundle, fixture and candidate hashes only, recording review anchors per intent, and stating in the record that cross-journal continuity is the operator's responsibility. Not changed: the three-attempt rule is enforced correctly within a journal (E01, E02, E10, E11 caught). |
+| GDR-CR23-003 | P3 / documented, operational | `evaluation.py::_apply`, `_observation_floor` | Once an attempt is recorded as `ambiguous`, every later compile, run or failure observation must carry a timestamp at or after the ambiguity time. A run that actually completed before the ambiguity was recorded, and is retrieved afterwards with its true platform clock, can never be recorded, and the ambiguous attempt blocks every new intent. The only exit is a `failure` record, which spends one of the three attempts even if the run succeeded. Section 22.3 names this limitation. Operational guidance for the coming QC run: retrieve the platform's terminal status before recording an attempt as ambiguous. |
+| GDR-CR23-004 | P3 / documented | `evaluation.py::compare_cloud_source`, `_snapshot_files` | The cloud-source comparison accepts only `.py` names, so a returned project that includes QuantConnect's default `research.ipynb` (or any non-Python file Mia adds) refuses instead of being classified; callers must filter the map first. The root loader ignores non-Python files and refuses unexpected `.py` files, so this does not weaken execution safety, but "complete returned project" in BT-9 means complete for Python files only. Record it as such, or classify non-Python names as reported extras. |
+| GDR-CR23-005 | P3 / corrected | `3cc533cd`, `qc_project._ROOT_TEMPLATE` (`_gdr_payload`, `_gdr_members`); `test_qc_project.py` | The loader's per-file payload hash and per-member archive hash were never what refused the cases written for them: the runtime "altered" payload appends a line and the isolated member case appends a byte, so the exact-size checks refuse first (mutants T01, T02 survived). Added `test_loader_refuses_same_size_requoted_payload_by_retained_file_hash` (quote characters swapped, same size and same decoded string, run through the real generated loader in an isolated child) and `test_generated_member_parser_refuses_same_size_content_change_by_retained_hash` (first sidecar byte flipped, a valid canonical archive). Both refuse before extraction; T01 and T02 now fail. |
+| GDR-CR23-006 | P3 / corrected | `4f85020d`, `evaluation._replay_records`; `test_evaluation.py` | The replay's duplicate observation-identity guard was untested (E15 survived). The writer refuses a different second "ambiguous" record for one attempt, but without the replay guard a correctly chained one written straight to disk would reload and overwrite the first ambiguity's retained output hash. Added `test_reload_refuses_a_chained_second_observation_of_one_kind_for_one_attempt`; E15 now fails. |
+| GDR-CR23-007 | P3 / corrected | `4f85020d`, `completion_evidence.completion_dossier`; `test_completion_evidence.py` | Two dossier guards were never reached by their test cases, because each case changes one argument and the receipts' output hash or binding hash refuses it first (C06, C07 survived). C06 is the content binding Codex added for its own GDR-CCR22-004 correction. Added `test_dossier_refuses_consistently_receipted_output_for_another_binding_or_trace` (receipt, journal and output agree on a hash, but the output names another binding or the stress trace) and `test_dossier_refuses_a_fully_consistent_chain_bound_to_an_older_source_epoch` (a whole consistent chain for a binding whose source, project or bundle hash is not current). C06 and C07 now fail. |
+| GDR-CR23-008 | P3 / corrected | `4f85020d`, `callback_plan._checked_account`; `test_callback_plan.py` | The audit's expected rows are caller-supplied under a retained anchor, so a forged but matching pair is judged only by row semantics (the GDR-CCR22-002 class). Two semantic guards were untested (K03, K08 survived): reserved cash must equal pending orders' reservations, and receivables must be dated after the observed close. Added `test_account_semantics_refuse_a_phantom_reservation_with_no_pending_order` and `test_account_semantics_refuse_a_receivable_dated_on_its_own_close`; K03 and K08 now fail. |
+| GDR-CR23-009 | P3 / corrected | `4f85020d`, `paired_bridge.acknowledge`, `action_callback`; `test_paired_bridge.py` | The paired bridge's receipt-expectation check was untested (B01 survived): the existing wrong-economics cases reuse an event ID and are refused as conflicting redeliveries, so a fresh receipt with wrong fee, price, quantity or status was never exercised. The strategy half of the pending-order guard for corporate actions was also untested (B05 survived): the existing case leaves a comparator order open, and the engines themselves accept a dividend on a holding with an open sell. Added `test_fresh_receipt_with_wrong_economics_or_status_refuses_against_expectation` and `test_cash_action_refuses_while_a_carried_strategy_exit_is_pending` (a partially filled stop exit carried to the next open, comparator fully reconciled). B01 and B05 now fail. |
+
+Scripted count from this table: P0 0, P1 0, P2 1, P3 8; corrected 5, documented 4.
+
+### 23.5 Validation
+
+| Check | Scope | Result |
+|---|---|---|
+| Lane selection at the pushed head `180fc5b8` | worktree, network-denied | 480 passed, 1,278 subtests, 9:58 |
+| Lane selection after corrections | worktree, network-denied | 489 passed, 1,283 subtests, 8:23 at `f0ed0be3`; this section and the pin rotation were written during that run, so the only test that reads the record, the lane gate in `test_boundaries.py`, was rerun on the final tree (see the closing check below) |
+| Repository suite excluding `tests/analyst_revisions_v2` | worktree at `180fc5b8`, network-denied | 15 failed, 11,369 passed, 56 skipped, 28 warnings, 1,278 subtests, 1:17:11; the fifteen failures are byte-identical to sections 12.4, 16.5, 18.5 and 20.5 (out of lane, GDR-CR18-005), and the pass count rose by exactly the 74 lane tests added in this range |
+| Section 22.5 identities | worktree, network-denied | source manifest `fb5ad41f...`, bundle `f8e61c9c...` (534,743 bytes), project map `fdddd733...` (25 files, 731,516 bytes, largest 30,014), root `main.py` `a19332f8...` (18,188 bytes) all reproduce exactly; `verify_qc_project` accepts the rebuilt map against its anchor |
+| `python -m compileall -q research/guidance_revision_drift tests/guidance_revision_drift` | worktree | passed |
+| `git diff --check` | worktree | passed |
+| Closing check on the final record tree | worktree, network-denied | lane gate `test_boundaries.py` plus shared `test_active_document_consistency.py`: 75 passed |
+| Analyst V2 directory | not run | out of lane, as in section 12.4 |
+
+### 23.6 Mutation trials
+
+Sixty-two single-behaviour in-memory mutants over the five new modules,
+each run network-denied against the test file that owns the module. Nine
+mutate the generated root-loader template, a module-level string, through a
+constant-rewrite variant of the plugin; the generated `main.py` is then
+exercised by Codex's isolated child-process loader tests. No test pins the
+project or root hashes, so template mutants were judged by behaviour.
+
+| Class | Count | Mutants |
+|---|---:|---|
+| Caught by Codex's tests | 41 | T03, T04, T07, T08; V01-V03; E01-E14, E16-E20; C08, C11; K01, K02, K04-K07, K09, K10; B02-B04, B07, B09 |
+| Survived, now caught by added pins | 9 | T01, T02 (GDR-CR23-005); E15 (GDR-CR23-006); C06, C07 (GDR-CR23-007); K03, K08 (GDR-CR23-008); B01, B05 (GDR-CR23-009) |
+| Redundant by construction, no test added | 12 | T05 AST single-assignment, T06 archive SHA-256, T09 literal target: all three are implied by the per-file payload hashes, which fix the exact payload bytes and hence the exact archive. C01 frame without checkpoint and C02 checkpoint count are a redundant pair, jointly covered by Codex's no-checkpoint trace. C03 final head, C09 per-record replay comparison and C10 constructor head are mutually redundant and jointly covered by Codex's re-hashed `side_quantity_limit` tamper. C04 chunk sequence and C05 final chunk identity are a redundant pair, jointly covered by the reversed-chunks case. B06 settle-at-open and B08 bind-only-after-own-submission are redundant in effect: an observation is compared with actual engine state after the advance, and an unsolicited binding can never be acknowledged. |
+
+Representative caught mutants: three-attempt ceiling removed (E01), pending
+or ambiguous attempt not blocking a new intent (E02), project change across
+attempts allowed (E06), compile or run failure not counted (E10, E11), the
+observation floor ignoring an ambiguity (E20), unexpected `.py` file or
+preloaded `data`/`research` package admitted by the loader (T03, T04),
+noncanonical archive or unsafe member path admitted (T07, T08), caller map
+not re-verified (V01, V02), account NAV or terminal flag not derived (K04,
+K05), audit dropping blockers or missing rows (K06, K07), pending receipts not
+blocking the next callback (B02), account observation not compared (B03).
+
+### 23.7 Owner confirmations, commits and next action
+
+For the owner to confirm where both roles can read it (each recorded only by
+Codex from its own channel): (a) the 2026-10-09 instruction "i asked you to
+implement the next 10 milestones" (22.1); (b) the 2026-10-09 "push" answer
+authorizing a second Codex publication in the same round after the early
+`bf91788b` push (22.7). Claude's instruction for this session was to review
+all unreviewed commits on this lane and push once, which is consistent with
+both.
+
+The status block names this section; the `test_boundaries.py` review-state
+phrase is rotated to "Codex counter-review of section 23 pending".
+
+| Commit | Scope |
+|---|---|
+| `f0ed0be3` | Nine regression pins (GDR-CR23-005..009) |
+| This record commit | Section 23, status block, `test_boundaries.py` pin rotation |
+
+One push of this round after every commit exists, guarded on the remote head
+still being `180fc5b8`; never force. Next: Codex counter-reviews section 23 and
+every Claude commit and rotates the pin. Under 19.6 the synthetic-only QC
+evaluation may start only after that counter-review accepts this review, and
+GDR-CR23-001 should be settled first because every failed launch spends one of
+the three attempts. Acceptance here is a software review of the exact pushed
+source; it establishes neither native execution, cloud packaging nor
+empirical readiness. No GDR-1 source audit, real data, broker, paper or live
+step starts from this review. `docs/ACTION_PLAN_2026-08-20.md` and
+`docs/SESSION_HANDOFF.md` were not edited and stay frozen for both agents.

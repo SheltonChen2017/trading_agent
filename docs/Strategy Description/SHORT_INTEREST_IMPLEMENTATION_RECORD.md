@@ -1,20 +1,17 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **SECTION 103 COUNTER-REVIEWS AND ACCEPTS CLAUDE'S SOLE `f75d8d8a`
-RECORD COMMIT AFTER THE EXACT PUSHED `1e0e7849` CHECKPOINT. NO NEW CODE DEFECT
-OR CORRECTION; THE 27 DUPLICATE/SUCCESSOR REGRESSIONS AND 69 ACTIVE-DOCUMENT
-CHECKS PASS 96 UNDER NETWORK DENIAL. THE OWNER LATER SPECIFIED SAFARI,
-CONFIRMED FINRA API TERMS ACCEPTANCE AND FREE PUBLIC CREDENTIAL CREATION,
-AND PERSONALLY SET THE API SECRET. THE CONSOLE NOW INDEPENDENTLY SHOWS
-PUBLIC / ACTIVE AND A 10 GB MONTHLY CAP. THIS SUPERSEDES THE HISTORICAL
-CHROME-CONNECTION BLOCKER, NOT THE SOURCE GATES. THE SECURE LOCAL CREDENTIAL
-LOCATION IS STILL UNSUPPLIED; NO AUTHENTICATED API REQUEST OR FINRA/MASSIVE
-COMPARISON HAS RUN. CANONICAL PIT ORIGINALS/CORRECTIONS/AVAILABILITY AND
-EXPLORATORY COMPANION/COVERAGE/USE/ROUTE/LOOK/REVIEW REQUIREMENTS REMAIN OPEN.
-ALL HISTORICAL LEDGERS AND FINDING CLASSIFICATIONS ARE RETAINED. LOOKBACKS
-20/60/120/252 REMAIN UNSELECTED; CANONICAL REAL LOOKS 0/0, EXPLORATORY ACTUAL
-LOOKS 0, ALPHA 0, PERMANENT LOOKS NONE AND QC ATTEMPTS 0. NO PRICES, OUTCOMES,
-HOLDOUT, QC JOB OR TRADING ACCESS IS ESTABLISHED BY ACCOUNT ACTIVATION.**
+Status: **SECTION 104 VERIFIES PROTECTED LOCAL FINRA CREDENTIALS, SUCCESSFUL
+OAUTH AUTHENTICATION AND PRODUCTION METADATA HTTP 200 / VERSION 1. THE
+LOCATION/ACTIVATION BLOCKER IS CLOSED. A FIXED DIRECT-FINRA, SI-ONLY SAMPLE
+AND SOURCE-QUALIFICATION SOFTWARE ARE FROZEN PROSPECTIVELY; ACTUAL RETRIEVAL
+AND ITS RESULTS ARE STILL PENDING THIS ROUND'S CLOSING RECORD. THE MASSIVE
+DISTRIBUTOR CROSS-CHECK IS NOT SUBSTITUTED OR CLAIMED: ITS EXACT AUTOMATED
+USE AND INCIDENTAL VOLUME ACQUISITION REMAIN UNQUALIFIED. THIS IS NOT PIT
+ADMISSION OR ACTUAL BACKTEST READINESS. ALL HISTORICAL FINDINGS ARE RETAINED;
+STRICT ORIGINAL/CORRECTION/CLOCK AND EXPLORATORY COMPANION/IDENTITY/USE/ROUTE/
+LOOK/REVIEW GATES STAY OPEN. LOOKBACKS 20/60/120/252 STAY UNSELECTED,
+CANONICAL ACTUAL LOOKS 0/0, EXPLORATORY ACTUAL LOOKS 0, ALPHA 0, PERMANENT
+LOOKS NONE AND QC ATTEMPTS 0. NO PRICE, OUTCOME, HOLDOUT OR TRADING ACCESS.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -14230,3 +14227,153 @@ status and actual matching remote; stop on concurrent advancement. Verify
 clean local/tracking/actual-remote equality afterward. Claude's next review
 range begins at **`f75d8d8a`** and covers this closing record commit; no
 independent acceptance of this new record is claimed.
+
+## 104. Activated runtime and prospectively frozen direct FINRA qualification — 2026-10-09
+
+### 104.1 Exact state, credential verification and bounded route decision
+
+The designated physical/Git root and branch remain unchanged. Initial local,
+tracking and actual matching remote heads are clean and equal to
+`f1d053bd73362878ec0b363956f79043f93dc481`. No new Claude commit exists;
+section 103's acceptance of sole Claude commit `f75d8d8a` is retained, not
+claimed as another independent review. The new source-qualification code and
+this record remain pending Claude review after this round's single push.
+
+After the owner said the proposed folder had not been created, Codex prepared
+only the named local credential template outside Git, directory **0700** and
+file **0600**. The owner then answered **"done"**. Codex verified ownership,
+no symlink and both populated fields without printing their values. It parsed
+only the two explicitly identified FINRA names from that known file; no shell
+sourcing, broad secret search, password entry or new credential issuance.
+
+The documented FINRA FIP OAuth POST authenticated successfully. Its token
+remained process memory only. The authenticated **production** metadata route
+`/metadata/group/otcmarket/name/consolidatedShortInterest` returned **HTTP 200**,
+**Data-Version 1**, partition `settlementDate` and the expected field types.
+These first two requests retrieved no market rows. Public/Active state is now
+verified in both the Console and this runtime; source completeness/PIT rights
+are not inferred from authentication.
+
+The owner's standing continuous-build delegation and approved free FINRA
+source route permit a bounded direct-source qualification. Use the expressly
+licensed [FINRA Equity API terms](https://developer.finra.org/specific-terms-equity-data)
+sections 2.2/2.4 for personal internal research/resultant data. Make progress
+with **FINRA only**, not a fabricated replacement for the originally proposed
+Massive distributor comparison. That paired comparison remains unexecuted.
+
+Massive's [personal-use FAQ](https://massive.com/knowledge-base/article/which-plan-do-i-need-to-show-massive-data-in-my-app)
+positively covers an individual's own research/scripts. Its
+[Market Data Terms](https://massive.com/legal/market-data-terms-of-service)
+sections 2/5(d)/9 still leave this exact automated discrepancy-report use
+unresolved; no account-specific exception is supplied. This is not a blanket
+ban on personal research, another generic permission-letter demand, or a new
+owner-approval request. The [SI endpoint](https://massive.com/docs/rest/stocks/fundamentals/short-interest)
+also documents volume/days-to-cover response fields without a projection
+selector; query filters are not projection. No Massive request or key-value
+read is made, and no ancillary-volume acquisition is silently authorized.
+The removed licensing inquiry remains removed; no mail or purchase occurs.
+
+### 104.2 Prospective freeze before every actual source row
+
+This subsection and the source implementation are committed locally **before
+the first FINRA market-row request**. The frozen protocol's canonical SHA-256 is
+**`28b85fafa01d056c3483101545bb32163f968b9f9a083b874e63f0cf1ce6e4fe`**.
+The capture requires that exact protocol, a clean designated branch/worktree
+and the exact committed code HEAD, then writes its protected protocol/start
+receipts before authentication/retrieval. There is no interim push.
+
+* Raw symbols, without aliases or replacements: **AAPL, MSFT, AMZN, NVDA,
+  JPM, XOM, GOOG, GOOGL, BRK.B, FRC, SIVB, TWTR**. These are fixed ticker
+  sentinels, not an admitted historical security population. Missing former
+  listed names do not prove delisted coverage; current names do not prove
+  permanent/share-class identity.
+* Settlement cycles **2026-06-30, 2026-07-15, 2026-07-31, 2026-08-14**;
+  June 30 is predecessor-only. All **48** symbol/date slots stay in the
+  denominator; the later three cycles supply **36** possible continuity
+  comparisons. No selection based on returned quantities or successful rows.
+* [FINRA's official schedule](https://www.finra.org/filing-reporting/regulatory-filing-systems/short-interest)
+  maps those dates to July 10, July 24, August 11 and August 25 respectively.
+  Scheduled dates are metadata only, never actual historical availability.
+* Production POST `/data/group/otcmarket/name/consolidatedShortInterest`,
+  schema version **1**, settlement equality plus the exact raw-symbol domain,
+  sorted by symbol, synchronous limit **100**, offset **0** initially. At most
+  **two pages per cycle**, **eight source pages / 800 rows** total and
+  **1 MiB per response**, no automatic retry, no asynchronous job.
+* Request only **symbolCode, settlementDate, currentShortPositionQuantity,
+  previousShortPositionQuantity, revisionFlag, stockSplitFlag, marketClassCode,
+  issuerServicesGroupExchangeCode, issueName**. No ADV, days-to-cover, price,
+  return, float/shares outstanding, sector or outcome fields.
+* Verify exact offsets/counts/version and stable totals from all pagination
+  headers, advance by actual returned length, refuse repeated/nonprogressing
+  pages or mismatched query domains, and stop at the frozen bounds.
+* Strict finite, duplicate-key-refusing JSON. Quantities must be nonnegative
+  integral JSON numbers at most **10^18**, not booleans or numeric strings;
+  integral decimal/exponent number tokens preserve exactness. Null current is
+  refused; null previous is unknown, never zero. All identifiable raw-key
+  collisions are counted **before** schema/value validation across pages.
+  Different classes for one ticker/date are ambiguous; never sum or choose one.
+* Compare each valid target's prior quantity to its valid predecessor's current
+  quantity, exact tolerance **zero**. Report missing, malformed, duplicate,
+  ambiguous, unknown-prior and mismatched cells explicitly. **R** describes a
+  revised *prior-cycle* quantity; **S** is a current-cycle split flag. Neither
+  adjusts away discrepancies or supplies correction/availability clocks.
+* Publish create-exclusive raw pages, public production metadata and hashed
+  transport/protocol/report receipts in the ignored lane capture directory,
+  with owned **0700** directories/**0600** files and no symlink escape.
+  Credentials, tokens, Authorization headers and private account/client
+  identifiers are never artifacts or diagnostics. Public outputs contain
+  aggregate counts, flags and hashes only, not actual quantities or row records.
+
+The [January 2023 release notes](https://developer.finra.org/release-notes/january-2023-release-notes)
+say all exchanges from **June 2022**, whereas section 99 records the historical
+files page's **June 2021** boundary. Preserve both claims as an unresolved
+historical-coverage distinction, not an inferred correction or complete
+coverage assertion. This 2026 sentinel sample avoids both boundaries.
+
+### 104.3 Exercised approval/decision inventory and pre-retrieval validation
+
+* **SI-AUTH-20261009-03:** the owner's **"done"**, after the named protected
+  template was prepared, authorizes using the user-populated credential at
+  that known location under the standing setup/source delegation. No values
+  are requested in chat or entered on the owner's behalf.
+* **SI-DEC-20261009-03:** prepare that one outside-Git template with 0700/0600
+  protection; parse only its named fields through the authorized runtime.
+* **SI-DEC-20261009-04:** qualify direct FINRA SI-only data now through its
+  observed production schema and expressly licensed API; keep the unresolved
+  paired Massive comparison separate rather than erase its restriction.
+* **SI-DEC-20261009-05:** freeze the exact 48/36-cell sentinel design and
+  request/comparison/refusal/storage rules above before retrieval. This is
+  source-only latest-snapshot continuity, not an outcome look or PIT adapter.
+
+Before retrieval, Codex's focused validation and closing result are appended
+below. The current-null admission mutant run by the pure-module helper
+produced one intended failure; that is attributed helper execution, not
+claimed as Codex's own mutation. Codex independently reproduced two capture
+defects with material red tests before correction: symlinked capture storage
+created artifacts outside the lane; a response for another frozen settlement
+could be rebound to the current query. Each produced **one failed focused
+test** on the old draft. The smallest lane-owned corrections now refuse them
+before credential reading/artifact creation or query admission respectively.
+The draft `fields` versus `requested_fields` integration mismatch was also
+aligned before execution. No actual source request occurred on those drafts.
+
+Codex's final pre-capture focused set passed **198 tests in 5.94s**:
+81 new pure-qualification, 28 capture, 9 lane import-boundary, 69
+active-document and 11 ML-boundary cases. CPython **3.13.15** / pytest **9.1.1**,
+empty inherited environment, bytecode disabled and macOS `sandbox-exec`
+denying network; all test inputs fabricated. The earlier command used a
+nonexistent plural ML-boundary filename and collected **no tests**; it is
+not reported as a suite failure or a pass. Final four-file in-memory
+compilation and byte-exact historical-body/ledger preservation passed; the
+post-record document check passed **69 in 0.58s**. No complete lane/repository
+suite is run. Closing publication checks/results are recorded separately.
+
+Canonical actual looks **0/0**, exploratory actual outcome looks **0**, alpha
+**0**, permanent look IDs **none**, QC attempts **0**. No selected lookback,
+change to structural normalization/release-next-open rules, actual-input
+override, source admission, historical completeness/PIT claim or backtest
+readiness follows from this diagnostic. Shared/project-wide documents and
+SESSION_HANDOFF stay frozen. No email/monitor, paid terms, price/volume/
+outcome/holdout, QC processing/project/upload/compile/job/backtest, production
+ranking/seed, ETF, broker, operator database, deployment, paper/live, capital,
+actual order or trading action is authorized by it.

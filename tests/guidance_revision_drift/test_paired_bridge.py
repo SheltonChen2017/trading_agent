@@ -272,6 +272,53 @@ def test_callback_input_mismatch_and_pending_action_hazard_cannot_partially_muta
     assert_atomic(pending, lambda: pending.action_callback(supplied, action_callback_bytes(supplied)), "terminal paired orders")
 
 
+def test_fresh_receipt_with_wrong_economics_or_status_refuses_against_expectation():
+    # The duplicate-identity cases above reuse an event ID, so they are refused
+    # as conflicting redeliveries. A new event ID carrying wrong economics or a
+    # wrong status must be refused by the deterministic expectation itself.
+    bridge = PairedSyntheticBridge()
+    bridge.decision(at(), Quote(at(), D("50"), D("50")))
+    ack_all(bridge)
+    source_minute(bridge, at(minute=1))
+    expected = bridge.pending_receipts()[0]
+    assert expected["status"] == "filled"
+    binding = next(b for b in bridge.snapshot()["protocol"]["bindings"] if b["order_id"] == expected["order_id"])
+    native_id = binding["native_id"]
+    event_id = bridge._event_ids[("strategy", native_id)] + 1
+    exact = dict(symbol="SYN-GDR", status=expected["status"], at=datetime.fromisoformat(expected["at"]),
+                 quantity=expected["quantity"], price=D(expected["price"]), fee=D(expected["fee"]))
+    for updates in ({"fee": D(expected["fee"]) + 1}, {"price": D(expected["price"]) + 1},
+                    {"quantity": expected["quantity"] - 1}, {"status": "partially_filled"}):
+        assert_atomic(bridge, lambda: bridge.acknowledge("strategy", native_id, event_id, **{**exact, **updates}),
+                      "deterministic expectation")
+    bridge.acknowledge("strategy", native_id, event_id, **exact)
+    assert bridge.snapshot()["protocol"]["source_fill_count"] == 1
+
+
+def test_cash_action_refuses_while_a_carried_strategy_exit_is_pending():
+    # The existing pending-action case leaves a comparator order open. Here the
+    # comparator is fully reconciled and only a partially filled strategy exit
+    # carries into the next open; the engines accept a dividend on a holding
+    # with an open sell, so only the strategy half of the guard refuses it.
+    bridge = entered()
+    bridge.close(date(2025, 4, 4), D("40"), D("100"))
+    bridge.decision(at("2025-04-07"))
+    ack_all(bridge)
+    source_minute(bridge, at("2025-04-07", minute=1), volume=1000, price="40", settlement="2025-04-08")
+    ack_all(bridge)
+    spy_minute(bridge, at("2025-04-07", minute=2), settlement="2025-04-08")
+    ack_all(bridge)
+    bridge.close(date(2025, 4, 7), D("40"), D("100"))
+    state = bridge.snapshot()
+    assert any(o["side"] == "sell" and o["status"] == "open" for o in state["strategy"]["orders"])
+    assert not any(o["status"] == "open" for o in state["comparator"]["orders"])
+    dividend = action(bridge, kind="dividend", action_id="SYN-CARRIED-EXIT-DIVIDEND",
+                      effective_at=at("2025-04-08", 9, 30).isoformat().replace("+00:00", "Z"),
+                      pay_session="2025-04-09")
+    assert_atomic(bridge, lambda: bridge.action_callback(dividend, action_callback_bytes(dividend)),
+                  "terminal paired orders")
+
+
 def test_comparator_split_and_dividends_keep_distinct_entitlements_and_payment_dates():
     bridge = entered()
     spy = bridge.snapshot()["comparator"]["tranches"][0]["quantity"]

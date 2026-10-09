@@ -297,6 +297,44 @@ class AccountAuditTests(unittest.TestCase):
         with self.assertRaisesRegex(CallbackPlanError, "terminal status"):
             self.audit(rows, rows)
 
+    def _flat_first_close_projection(self):
+        corpus = example_corpus()
+        day = corpus.schedule.sessions[0].session_date
+        sessions = tuple(Session(x.session_date, x.open_utc, x.close_utc) for x in corpus.schedule.sessions)
+        strategy, comparator = Simulation(sessions), MatchedComparator(sessions)
+        strategy.close_session(day, {})
+        comparator.close_session(day, None)
+        row = module.account_row(day, strategy.snapshot(), comparator.snapshot(),
+                                 marks={"strategy": {}, "comparator": {}})
+        projection = __import__("json").loads(row)["strategy"]
+        module._checked_account(projection, sleeve="strategy", day=day)
+        return projection, day
+
+    def test_account_semantics_refuse_a_phantom_reservation_with_no_pending_order(self):
+        # The audit's expected rows are caller-supplied under a retained anchor,
+        # so a forged but matching pair must still be refused on its own
+        # semantics. Reserved cash with no pending order, kept arithmetically
+        # consistent with available cash, is otherwise a "complete" flat row.
+        projection, day = self._flat_first_close_projection()
+        settled = Decimal(projection["settled_cash"])
+        forged = dict(projection, reserved_cash="10", available_cash=str(settled - Decimal("10")))
+        with self.assertRaisesRegex(module.CallbackPlanError, "observed reservation differs from pending orders"):
+            module._checked_account(forged, sleeve="strategy", day=day)
+
+    def test_account_semantics_refuse_a_receivable_dated_on_its_own_close(self):
+        # A receivable paid on or before the observed close should already be
+        # settled cash; an otherwise self-consistent forged row carrying one
+        # must be refused rather than accepted as unsettled proceeds.
+        projection, day = self._flat_first_close_projection()
+        settled = Decimal(projection["settled_cash"])
+        forged = dict(projection,
+                      receivables=[{"id": "SYN-PAST-PROCEEDS", "kind": "sale", "amount": "10",
+                                    "pay_session": day.isoformat()}],
+                      immediate_cash=str(settled + Decimal("10")), nav=str(settled + Decimal("10")),
+                      terminal_complete=False)
+        with self.assertRaisesRegex(module.CallbackPlanError, "future-dated receivable"):
+            module._checked_account(forged, sleeve="strategy", day=day)
+
     def test_snapshot_nav_cash_marks_and_non_synthetic_inputs_refuse_atomically(self):
         original = encoded((self.strategy, self.comparator)[0])
         for change in (lambda value: value.update(available_cash="1"),

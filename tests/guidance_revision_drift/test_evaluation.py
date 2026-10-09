@@ -14,7 +14,9 @@ from research.guidance_revision_drift.evaluation import (
     FIXTURE_SHA256, compare_cloud_source, project_file_inventory,
     validate_journal_projection,
 )
-from research.guidance_revision_drift.persistence import JournalError, JournalConflict, PublicationUncertain
+from research.guidance_revision_drift.persistence import (
+    JournalError, JournalConflict, PublicationUncertain, canonical_object,
+)
 
 
 def binding():
@@ -223,6 +225,27 @@ class EvaluationTests(unittest.TestCase):
             journal.record_run(expected_head=before,
                 receipt=replace(ran(candidate, status="runtime_error"), completed_at=at(21)))
             self.assertEqual(journal.to_dict()["unsuccessful_attempts"], 1)
+
+    def test_reload_refuses_a_chained_second_observation_of_one_kind_for_one_attempt(self):
+        # The writer refuses a different second "ambiguous" record for one
+        # attempt. A correctly chained one written straight to disk must also
+        # be refused on reload; otherwise replay would silently overwrite the
+        # first ambiguity's retained output evidence with the second.
+        candidate = binding()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            journal = ReceiptJournal.create(root, candidate)
+            journal.record_intent(expected_head=journal.head_sha256, attempt_id="SYN-QC-one", at=at(0))
+            journal.record_ambiguous(expected_head=journal.head_sha256, attempt_id="SYN-QC-one",
+                                     at=at(1), output_sha256="3" * 64)
+            head = journal.head_sha256
+            forged = {"schema": "gdr.synthetic.evaluation-record.v1", "sequence": 3,
+                      "previous_sha256": head, "binding_sha256": candidate.sha256,
+                      "operation": "ambiguous",
+                      "payload": {"attempt_id": "SYN-QC-one", "at": at(2), "output_sha256": "4" * 64}}
+            (root / "evaluation-000003.json").write_bytes(canonical_object(forged))
+            with self.assertRaisesRegex(EvaluationError, "reused evaluation observation identity"):
+                ReceiptJournal.open(root, binding=candidate, expected_head=head)
 
     def test_create_refuses_wrong_binding_without_invoking_caller_methods(self):
         class Forged:

@@ -284,6 +284,36 @@ class QCProjectTests(unittest.TestCase):
                 with self.subTest(expected_path=name), self.assertRaisesRegex(RuntimeError, "unsafe archive member path"):
                     parser(raw)
 
+    def test_generated_member_parser_refuses_same_size_content_change_by_retained_hash(self):
+        # The isolated archive case above appends a byte to a member, which the
+        # size/metadata loop refuses before any member is read. A same-size
+        # content change yields a valid, canonical archive that only the
+        # per-member retained hash can refuse.
+        tree = ast.parse(self.files["main.py"].decode())
+        selected = [node for node in tree.body if (
+            isinstance(node, (ast.Import, ast.ImportFrom))
+            and not (isinstance(node, ast.ImportFrom) and node.module.startswith("research.")))
+            or (isinstance(node, ast.Assign) and all(isinstance(target, ast.Name)
+                and target.id.startswith("_GDR_") for target in node.targets)
+                and isinstance(node.value, (ast.Constant, ast.Tuple, ast.BinOp)))
+            or (isinstance(node, ast.FunctionDef) and node.name in {"_gdr_refuse", "_gdr_members"})]
+        namespace = {"__name__": "isolated_generated_member_hash_test"}
+        exec(compile(ast.Module(body=selected, type_ignores=[]), "<generated-member-hash-test>", "exec"), namespace)
+        parser = namespace["_gdr_members"]
+        raw = encoded_bundle(self.files)
+
+        def flip_first_byte(info, content):
+            if info.filename == bundle.SIDECAR_PATH:
+                content = bytes([content[0] ^ 1]) + content[1:]
+            return info, content
+
+        changed = repack(raw, change=flip_first_byte)
+        self.assertEqual(len(changed), len(raw))
+        self.assertNotEqual(changed, raw)
+        with patch("tempfile.TemporaryDirectory", side_effect=AssertionError("must not extract")), \
+             self.assertRaisesRegex(RuntimeError, "archive member differs from retained identity"):
+            parser(changed)
+
     def test_stale_bundle_and_source_change_during_carrier_preparation_refuse(self):
         members, manifest = bundle._snapshot()
         changed_members, changed_manifest = dict(members), deepcopy(manifest)
@@ -416,6 +446,26 @@ else:
                 if mode in {"symlink", "root_symlink"}:
                     self.assertIn("regular file", result["error"])
                 self.assertEqual(result["loaded_lane"], [])
+
+    def test_loader_refuses_same_size_requoted_payload_by_retained_file_hash(self):
+        # The altered-payload case above appends a line, which the exact
+        # file-size check refuses first. Swapping the literal's quote
+        # characters keeps the size and the decoded string, so only the
+        # loader's per-file retained hash can refuse it before extraction.
+        payload = next(name for name in self.files if name != "main.py")
+        original = self.files[payload]
+        requoted = original.replace(b"'", b'"')
+        self.assertEqual(original.count(b"'"), 2)
+        self.assertEqual(len(requoted), len(original))
+        self.assertEqual(ast.literal_eval(requoted.decode().split("=", 1)[1].strip()),
+                         ast.literal_eval(original.decode().split("=", 1)[1].strip()))
+        with TemporaryDirectory(prefix="gdr-qc-requote-test-") as temporary:
+            directory = Path(temporary).resolve()
+            self.write_project(directory)
+            (directory / payload).write_bytes(requoted)
+            result = self.runtime(directory)
+        self.assertIn("payload file differs from retained identity", result.get("error", ""))
+        self.assertEqual(result.get("loaded_lane"), [])
 
     def test_loader_preloaded_root_or_descendant_collision_refuses_before_extraction(self):
         for name in ("data", "research", "data.hashing", "research.guidance_revision_drift"):

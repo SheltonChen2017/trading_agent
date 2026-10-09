@@ -181,6 +181,70 @@ class CompletionEvidenceTests(unittest.TestCase):
             with self.assertRaisesRegex(EvidenceError, "base"):
                 completion_dossier(stress, **(arguments | {"expected_sha256": stress.sha256}))
 
+    def test_dossier_refuses_consistently_receipted_output_for_another_binding_or_trace(self):
+        # GDR-CCR22-004's scenario: the run receipt, its journal entry and the
+        # supplied output all agree on the output hash, but the output bytes
+        # describe a different binding or trace. Only the content binding of
+        # the output to this trace and binding can refuse it; the one-argument
+        # cases above are all refused earlier by the receipt-hash comparison.
+        current = qc_project_manifest()
+        binding = CandidateBinding(current["source_manifest_sha256"], current["project_sha256"],
+            current["bundle_sha256"], current["fixture_sha256"], "d" * 40, "e" * 40, "f" * 64)
+        compiled = CompileReceipt(binding.sha256, "SYN-QC-one", 123, "SYN_compile_1",
+            "2025-01-02T00:01:00+00:00", "2025-01-02T00:02:00+00:00", "compiled",
+            "LEAN-SYN-1", "SDK-SYN-1", "1" * 64)
+        stress = export_trace(drive("stress"))
+        for label, unrelated in (
+                ("other_binding", completion_output(self.evidence, binding_sha256="0" * 64)),
+                ("other_trace", completion_output(stress, binding_sha256=binding.sha256))):
+            with self.subTest(case=label), tempfile.TemporaryDirectory() as directory:
+                ran = RunReceipt(binding.sha256, "SYN-QC-one", 123, "SYN_compile_1", "SYN_run_1",
+                    "2025-01-02T00:03:00+00:00", "2025-01-02T00:04:00+00:00", "completed",
+                    "LEAN-SYN-1", "SDK-SYN-1", hash_bytes(unrelated))
+                journal = ReceiptJournal.create(Path(directory), binding)
+                journal.record_intent(expected_head=journal.head_sha256, attempt_id="SYN-QC-one",
+                                      at="2025-01-02T00:00:00+00:00")
+                journal.record_compile(expected_head=journal.head_sha256, receipt=compiled)
+                journal.record_run(expected_head=journal.head_sha256, receipt=ran)
+                with self.assertRaisesRegex(EvidenceError, "run output differs"):
+                    completion_dossier(self.evidence, expected_sha256=self.evidence.sha256,
+                        binding=binding, compile_receipt=compiled, run_receipt=ran,
+                        run_output=unrelated, journal_snapshot=journal.to_dict(),
+                        expected_journal_head_sha256=journal.head_sha256)
+
+    def test_dossier_refuses_a_fully_consistent_chain_bound_to_an_older_source_epoch(self):
+        # Receipts, journal and output all consistently name one binding, but
+        # that binding's source/project/bundle identities are not the current
+        # carrier's: evidence from an earlier epoch cannot certify this source.
+        # The one-argument stale-binding case above is refused earlier, by the
+        # receipts' binding hash, so it never reaches the current-source check.
+        current = qc_project_manifest()
+        for field in ("source_sha256", "project_sha256", "bundle_sha256"):
+            with self.subTest(field=field), tempfile.TemporaryDirectory() as directory:
+                values = {"source_sha256": current["source_manifest_sha256"],
+                          "project_sha256": current["project_sha256"],
+                          "bundle_sha256": current["bundle_sha256"]}
+                values[field] = "0" * 64
+                stale = CandidateBinding(values["source_sha256"], values["project_sha256"],
+                    values["bundle_sha256"], current["fixture_sha256"], "d" * 40, "e" * 40, "f" * 64)
+                compiled = CompileReceipt(stale.sha256, "SYN-QC-one", 123, "SYN_compile_1",
+                    "2025-01-02T00:01:00+00:00", "2025-01-02T00:02:00+00:00", "compiled",
+                    "LEAN-SYN-1", "SDK-SYN-1", "1" * 64)
+                output = completion_output(self.evidence, binding_sha256=stale.sha256)
+                ran = RunReceipt(stale.sha256, "SYN-QC-one", 123, "SYN_compile_1", "SYN_run_1",
+                    "2025-01-02T00:03:00+00:00", "2025-01-02T00:04:00+00:00", "completed",
+                    "LEAN-SYN-1", "SDK-SYN-1", hash_bytes(output))
+                journal = ReceiptJournal.create(Path(directory), stale)
+                journal.record_intent(expected_head=journal.head_sha256, attempt_id="SYN-QC-one",
+                                      at="2025-01-02T00:00:00+00:00")
+                journal.record_compile(expected_head=journal.head_sha256, receipt=compiled)
+                journal.record_run(expected_head=journal.head_sha256, receipt=ran)
+                with self.assertRaisesRegex(EvidenceError, "not bound to current exact source"):
+                    completion_dossier(self.evidence, expected_sha256=self.evidence.sha256,
+                        binding=stale, compile_receipt=compiled, run_receipt=ran,
+                        run_output=output, journal_snapshot=journal.to_dict(),
+                        expected_journal_head_sha256=journal.head_sha256)
+
     def test_two_load_bearing_guard_mutants_are_caught_and_restored(self):
         first = json.loads(self.evidence.records[0])
         first["sequence"] = False

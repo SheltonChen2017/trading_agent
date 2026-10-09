@@ -1,14 +1,15 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Section 18 counter-review accepted after correction. Per-frame
-native-account enforcement and identity-policy test decoupling are implemented
-as offline preparation in section 19, pending independent review. Section 19.6
-records the owner's approval to publish this checkpoint in the round's single
-push, then perform a synthetic-only order-based QuantConnect evaluation after
-Claude's exact-source review and Codex counter-review. Native LEAN/QC execution
-and empirical backtest readiness remain unverified/blocked. The original
-economic, data, empirical, account and trading gates remain closed.**
-Current scope/evidence are sections 17 through 19. Sections 2 through 6 preserve
+Status: **Section 19 (Codex counter-review of section 18, per-frame native
+account checkpoint and the owner-approval closure) independently reviewed by
+Claude in section 20 (2026-10-09): all three commits accepted, one lane test
+pin added, one P2 pre-launch packaging risk documented, no production defect.
+Codex counter-review of section 20 pending.
+Under section 19.6 a synthetic-only order-based QuantConnect evaluation may
+start only after that counter-review accepts this review. Native LEAN/QC
+execution and empirical backtest readiness remain unverified/blocked. The
+original economic, data, empirical, account and trading gates remain closed.**
+Current scope/evidence are sections 17 through 20. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -1642,3 +1643,107 @@ after the scoped cycle completes or an owner-input blocker; stay quiet for
 unchanged/non-actionable remote state. A subsequent round retains its own
 single-push agreement; this closure does not authorize a second publication
 of the current round.
+
+## 20. Independent Claude review of `c0137c51..9df3a12f`, 2026-10-09
+
+### 20.1 Scope and method
+
+Reviewed range: the three Codex commits after the section-18 push,
+`8e5714a2` (section-18 counter-review, per-frame native account checkpoint,
+identity-policy fixture decoupling), `ad075cf2` (section 19.1-19.5 record and
+lane-gate rotation) and `9df3a12f` (section 19.6, the owner-approval closure),
+the fetched remote head. The worktree was clean and equal to the remote head
+at the start; no frozen root document changed in this range. Host, isolation
+and method are as in 12.1: every commit read individually, every changed
+module and test read in full, every pytest and mutation process network-denied
+under the proved `sandbox-exec` profile, all validation in the designated
+worktree except the per-commit informational run in a `git archive` export. No
+provider, QC, broker, paper or live system was contacted; research looks 0; QC
+attempts 0. Two public primary sources were read for 20.4: LEAN's
+`BacktestingBrokerage.cs` (master) and the QuantConnect documentation pages on
+custom-data examples and project files, all on 2026-10-09. No LEAN SDK is
+installed here.
+
+### 20.2 Disposition of the section-19 counter-review
+
+| Section-19 item | Claude disposition |
+|---|---|
+| `73084917` accepted, `c0137c51` accepted after correction | Accepted. |
+| GDR-CCR19-001 (attribution) | Accepted. Verified with `git show`: `73084917` changed `.gitattributes`, `test_bundle.py` and `test_lean_bridge.py`; the `*.zip binary` assertion in `test_boundaries.py` landed in `c0137c51`. My `73084917` message and section 18.7 said otherwise because I had not staged that file in the first commit. |
+| GDR-CR18-004 correction (identity fixture decoupling) | Accepted: the unit fixture is now an explicit body with the mutated fields and scalar types, and a new test forbids file reads during fixture construction; actual reconstruction stays in `test_release.py`. The historical `fccbef76...json` release is retained. |
+| GDR-CCR19-002 (per-frame account checkpoint) | Accepted after verification (20.5, 20.6). Native cash is compared with shadow settled cash plus outstanding receivables, which is the right envelope for LEAN's immediate settlement model, and the check runs on the step draft before the frame's shadow effects. |
+| GDR-CCR19-003 (native validation pending) | Accepted as stated; 20.4 adds concrete pre-launch evidence. |
+| Section 19.6 owner approval | Recorded by Codex from its own owner channel: on 2026-10-08 the owner answered yes to publishing this checkpoint as the round's single push and, after Claude's exact-source review and Codex's counter-review, a synthetic-only order-based QuantConnect upload and run on the fixed invented sidecar with at most three unsuccessful attempts and Mia recovery. Claude has no independent copy of that exchange; listed in 20.7 for the owner to confirm where both roles can read it. This review is the "Claude exact-source review" gate it names: acceptance here means the reviewed source passed software review, not that native execution, cloud packaging or empirical readiness is established. |
+
+### 20.3 Commit dispositions
+
+| Commit | Scope | Disposition | Notes |
+|---|---|---|---|
+| `8e5714a2` | Per-frame native account checkpoint, identity fixture, README updates | Accepted after correction | One bridge-level pin added (GDR-CR20-002); 8 of 12 checkpoint mutants caught by its own tests, 3 now pinned, 1 unreachable; export run 406 passed |
+| `ad075cf2` | Section 19.1-19.5, lane-gate rotation | Accepted | Documentation and pin only; manifest `4e9389e9...` and bundle `1c18e76b...` claims reproduced (20.5) |
+| `9df3a12f` | Section 19.6 owner-approval closure | Accepted | Documentation only; owner direction listed for confirmation in 20.7 |
+
+### 20.4 Findings ledger
+
+| ID | Priority / status | Location | Finding, disposition and verification |
+|---|---|---|---|
+| GDR-CR20-001 | P2 / documented, pre-launch risk for the authorized synthetic QC evaluation | `lean/main.py` (`DATA_PATH`, `get_source`, `initialize`); section 19.6 | The native source reads its invented sidecar with `SubscriptionTransportMedium.LOCAL_FILE` from `Path(__file__).with_name("gdr-synthetic.jsonl")` and re-reads it in `initialize` with `os.open`, from a `main.py` nested at `research/guidance_revision_drift/lean/`. Public evidence read on 2026-10-09: the QuantConnect custom-data example returns `SubscriptionTransportMedium.OBJECT_STORE` for backtests and `REMOTE_FILE` for live, and does not mention a local file; the project-files page lists `.cs`, `.ipynb`, `.py`, `.html` and `.css` as supported types (no `.jsonl`), says Python projects start with `main.py`, and caps files at 32 KB on the Free tier, while `simulation.py` is 45,352 bytes and the sidecar 43,135 bytes. None of this proves the cloud run fails, and LEAN's documented scan order is not in question. The fee path is consistent: `BacktestingBrokerage.Scan` keeps a non-zero fill-model fee and substitutes the fee model only for a zero-fee `Filled` event, which `ConstantFeeModel(0)` makes a zero USD fee the adapter already accepts. Because every compile or runtime failure spends one of the three allowed attempts, Codex should record a packaging plan before the first launch that settles data transport (for example the exact sidecar in the Object Store, or frames generated in code from `fixture_frames()`), the root entry point that imports the nested algorithm, the organization's file-size tier and how the non-`.py` sidecar is carried. If that plan changes any reviewed source byte, the upload is no longer "the exact reviewed source" of 19.6 and needs review first. Not changed here: the transport is a design choice for Codex, and the source passes its offline contract. |
+| GDR-CR20-002 | P3 / corrected | `8e5714a2`, `lean_bridge.py::SyntheticOrderBridge._check_account`; `test_lean_source.py` | Section 19.3 credits the per-frame checkpoint with refusing "nonfinite/fractional/negative scalars", but its finite, non-negative and whole-share guards were never what refused them in the lane tests: mutants S04, S05 and S06 each survived. On the native path `to_decimal` rejects NaN and Infinity before the bridge sees them, and the shadow invariants (settled cash and receivables non-negative, integer quantity) turn any negative, fractional or infinite observation into a plain mismatch. Refusal therefore stayed fail-closed, but the classification the record names was untested, and with the finite guard removed a NaN quantity would surface as `decimal.InvalidOperation` rather than a bridge refusal. Added `test_bridge_classifies_malformed_account_scalars_itself_atomically`: a direct `step` with NaN, Infinity, signalling NaN, negative quantity or cash, or half a share must raise "malformed native account observation" with no checkpoint, trace or shadow effect. S04, S05 and S06 now fail. |
+
+Scripted count from this table: P0 0, P1 0, P2 1, P3 1; corrected 1, documented 1.
+
+### 20.5 Validation
+
+| Check | Scope | Result |
+|---|---|---|
+| Lane selection at the pushed head `9df3a12f` | worktree, network-denied | 406 passed, 1,124 subtests, 8:27 |
+| Lane selection at `8e5714a2` (informational, `git archive` export) | export | 406 passed, 1,124 subtests, 0 failed |
+| Lane selection after corrections | worktree, network-denied | 407 passed, 1,130 subtests, 6:31 |
+| Repository suite excluding `tests/analyst_revisions_v2` | worktree at `9df3a12f`, network-denied | 15 failed, 11,295 passed, 56 skipped, 28 warnings, 1,124 subtests, 1:11:32; the fifteen failures are byte-identical to sections 12.4, 16.5 and 18.5 (out of lane, GDR-CR18-005), and the pass count rose by exactly the five lane tests added in `8e5714a2` |
+| Current-source manifest and bundle | worktree, network-denied | source manifest `4e9389e994c0e706...` and bundle `1c18e76bc3e61edd...` (426,246 bytes, 38 members) reproduce exactly; the section-17 bundle `4dd53e40...zip` refuses current-source verification as section 19.4 says |
+| `python -m compileall -q research/guidance_revision_drift tests/guidance_revision_drift` | worktree | passed |
+| `git diff --check` | worktree | passed |
+| Analyst V2 directory | not run | out of lane, as in section 12.4 |
+
+### 20.6 Mutation trials
+
+Twelve single-behaviour in-memory mutants over the per-frame account
+checkpoint, each run network-denied against `test_lean_source.py` and
+`test_lean_bridge.py`. The `lean/main.py` end-of-run checkpoint-count check
+was not mutated (its module is re-imported under the SDK shim per test); it is
+pinned by Codex's explicit 371-checkpoint refusal in
+`test_real_callbacks_submit_native_orders_emit_exact_fees_and_finish`.
+
+| Class | Count | Mutants |
+|---|---:|---|
+| Caught by Codex's tests | 8 | S01 cash comparison removed, S02 inventory comparison removed, S03 receivables excluded from the immediate-cash envelope, S08 checkpoint skipped, S09 partial input silently skips the check, S10 checkpoint count not incremented, S11 checkpoint trace record not published, S12 check run on the live object instead of the step draft |
+| Survived, now caught by the added pin | 3 | S04 finite guard, S05 non-negative guard, S06 whole-share guard (GDR-CR20-002) |
+| Unreachable by construction, no test added | 1 | S07 fixed-issuer guard: the bridge's fixed fixture only ever submits orders for one invented issuer, so a second shadow position cannot arise |
+
+### 20.7 Owner confirmations, commits and next action
+
+For the owner to confirm where both roles can read it (each is recorded only by
+Codex from its own channel): (a) the 2026-10-08 instruction to counter-review
+section 18 and build until backtest-ready without a milestone quota (19.1);
+(b) the 2026-10-08 "yes" to publishing this checkpoint as the round's single
+push and, after review, a synthetic-only order-based QuantConnect upload and
+run on the fixed invented sidecar, at most three unsuccessful attempts, then
+Mia or the owner (19.6). Claude's instruction in this session was to review all
+unreviewed commits on this lane, which is consistent with both.
+
+The status block names this section; the `test_boundaries.py` review-state
+phrase is rotated to "Codex counter-review of section 20 pending".
+
+| Commit | Scope |
+|---|---|
+| `e3a238c6` | Bridge-level malformed native-account classification pin (GDR-CR20-002) |
+| This record commit | Section 20, status block, `test_boundaries.py` pin rotation |
+
+One push of this round after every commit exists, guarded on the remote head
+still being `9df3a12f`; never force. Next: Codex counter-reviews section 20 and
+every Claude commit, rotates the pin, and resolves GDR-CR20-001's packaging
+plan before any cloud launch. Under 19.6 the synthetic-only QC evaluation may
+start only after that counter-review accepts this review. No GDR-1 source
+audit, empirical backtest, real data, broker, paper or live step starts from
+this review. `docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md`
+were not edited and stay frozen for both agents.

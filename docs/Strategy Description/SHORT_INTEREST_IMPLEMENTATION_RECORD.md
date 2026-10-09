@@ -1,17 +1,19 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **SECTION 104 VERIFIES PROTECTED LOCAL FINRA CREDENTIALS, SUCCESSFUL
-OAUTH AUTHENTICATION AND PRODUCTION METADATA HTTP 200 / VERSION 1. THE
-LOCATION/ACTIVATION BLOCKER IS CLOSED. A FIXED DIRECT-FINRA, SI-ONLY SAMPLE
-AND SOURCE-QUALIFICATION SOFTWARE ARE FROZEN PROSPECTIVELY; ACTUAL RETRIEVAL
-AND ITS RESULTS ARE STILL PENDING THIS ROUND'S CLOSING RECORD. THE MASSIVE
-DISTRIBUTOR CROSS-CHECK IS NOT SUBSTITUTED OR CLAIMED: ITS EXACT AUTOMATED
-USE AND INCIDENTAL VOLUME ACQUISITION REMAIN UNQUALIFIED. THIS IS NOT PIT
-ADMISSION OR ACTUAL BACKTEST READINESS. ALL HISTORICAL FINDINGS ARE RETAINED;
-STRICT ORIGINAL/CORRECTION/CLOCK AND EXPLORATORY COMPANION/IDENTITY/USE/ROUTE/
-LOOK/REVIEW GATES STAY OPEN. LOOKBACKS 20/60/120/252 STAY UNSELECTED,
-CANONICAL ACTUAL LOOKS 0/0, EXPLORATORY ACTUAL LOOKS 0, ALPHA 0, PERMANENT
-LOOKS NONE AND QC ATTEMPTS 0. NO PRICE, OUTCOME, HOLDOUT OR TRADING ACCESS.**
+Status: **SECTION 104 COMPLETES PROTECTED FINRA RUNTIME ACCESS AND A
+PROSPECTIVELY FROZEN DIRECT-FINRA SI-ONLY QUALIFICATION. FOUR CYCLES WERE
+FULLY RETRIEVED THROUGH VERIFIED PAGINATION: 32 VALID / 48 FIXED CELLS,
+16 MISSING; 24 MATCHING / 36 FIXED CONTINUITY TARGETS, 12 UNAVAILABLE.
+NO MISMATCH, DUPLICATE, MALFORMED OR AMBIGUOUS ROW. THE OPTIONAL-PAGE-COUNT
+FALSE REFUSAL WAS REPRODUCED AND CORRECTED; ITS FAILED CAPTURE REMAINS
+IMMUTABLE AND DISTINCT FROM THE COMPLETED RUN. THIS IS NOT MASSIVE
+DISTRIBUTOR AGREEMENT, FULL COVERAGE, PIT ADMISSION OR BACKTEST READINESS.
+AUTHENTICATION/LOCATION IS CLOSED; ORIGINAL/CORRECTION/CLOCK, COMPANION/
+IDENTITY/TERMINAL, APPLICABLE USE/QC ROUTE AND LOOK/REVIEW GATES REMAIN OPEN.
+ALL HISTORICAL FINDINGS ARE RETAINED; FOUR NEW DRAFT FINDINGS ARE CORRECTED.
+LOOKBACKS 20/60/120/252 STAY UNSELECTED; CANONICAL ACTUAL LOOKS 0/0,
+EXPLORATORY ACTUAL LOOKS 0, ALPHA 0, PERMANENT LOOKS NONE, QC ATTEMPTS 0.
+NO PRICE/VOLUME/OUTCOME/HOLDOUT, QC JOB OR TRADING ACCESS OCCURRED.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -208,6 +210,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-08 | Codex counter-review / correction | `b0d4a57f..4228eaaf` reviewed; correction `cd0481d56d6568ba6bb3e93d1432088a0a28439d`; this final record commit follows | Completed section-100 counter-review; resumed FINRA setup blocked on Chrome access | Sole Claude commit accepted after correction. Raw identifiable duplicates now quarantine valid/malformed peers across pages; successor-end guard gets three direct cases; owner Sharadar-path quotation repairs provenance. | Codex focused, network-denied: **201 passed in 115.51s**; duplicate RED 24 failed then source GREEN 59 passed; successor GREEN 3 passed / mutant RED 3 failed / final GREEN included; targeted compilation exit 0. Final document/preservation/diff checks recorded in section 101. | `SI-CCR30-001` P2 corrected; `SI-CCR30-002..003` P3 qualified; `SI-CR19-001` closure accepted, `-002` closed by quotation, `-003` prospective/open. Source/shared P2s and later-commitment advisory retained; actual looks 0/0. | One combined non-force push; delete handled Claude monitor. Make signed-in Chrome or an activated FINRA Public credential securely accessible, then freeze the bounded SI-only consistency sample. No actual comparison, outcome look or QC launch this round. |
 | 2026-10-09 | Claude review | `4228eaa` -> `1e0e784` reviewed from the published head; **no code or test correction**; this record commit is the only Claude commit | Independent review of Codex's counter-review of section 100, the duplicate-row quarantine and the evaluation-end guard pin | Confirmed `SI-CCR30-001`, `-002` and `-003` against my section 100. Reproduced the first two by execution: the `4228eaa` duplicate handling fails all 24 new cases, and removing the successor-exit guard fails all 3. Verified the fix's key equality, its cross-page counting and that only latest-revised modules can reach it. | Pushed tree `1e0e784`, clean, Codex idle, network-denied: eight newer lane files plus lane boundary, active-document and ML boundary **400 passed in 984.34s**; probes 24 failed / 3 failed / 27 passed unmutated; compileall exit 0; final-tree active-document 69 passed; `git diff --check` clean. The 18 pre-October files, which cannot reach the change, last passed 817 on `b0d4a57`. **Authorized looks 0, consumed looks 0**. | No new finding against Codex. `SI-CCR30-001` (P2), `-002` and `-003` (P3) confirmed against Claude and closed; `SI-CR19-001`, `-002` closed; `SI-CR19-003`, source P2s, shared P2 and `SI-CR15-001` open. | Codex counter-reviews this record commit. The owner makes the Chrome session reachable or supplies an activated FINRA credential's location. Every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
 | 2026-10-09 | Codex counter-review / FINRA activation record | `1e0e7849..f75d8d8a` reviewed; this closing record commit follows; no code/test change | Accept section 102; record owner-confirmed free Public credential creation and observed activation in Safari | Sole Claude commit accepted, no new finding; prior ledger preserved. API terms accepted and Public credential created only after concrete owner confirmation; the owner entered/submitted the new secret. Console status independently observed Active. No credential identifier/value enters Git. | Codex focused, network-denied CPython 3.13.15 / pytest 9.1.1: **96 passed in 2.49s** (24 duplicate, 3 successor, 69 document checks). Final document/diff/preservation/status checks recorded in section 103. No full suite or new mutation. | Three source P2s and shared P2 remain open; prospective look/commitment P3s retained. FINRA activation is verified, but secure runtime location and actual source comparison remain pending. Actual looks 0/0, exploratory actual looks 0, QC attempts 0. | One final non-force push under section 81. Obtain only the secure credential path/variable names, freeze the outcome-free settlement sample before retrieval, then perform the bounded licensed-API consistency comparison. No backtest-readiness claim. |
+| 2026-10-09 | Codex direct FINRA source qualification | `f1d053bd` -> `8cb60ebe` prospective freeze -> `ed99e922` transport correction; this closing record commit follows | Protected runtime authenticated; actual outcome-free FINRA sample qualified | Immutable four-cycle capture: 32/48 valid cells, 16 missing; 24/36 prior-cycle targets match, 12 missing, zero mismatches/refusals. No Massive comparison or historical coverage/PIT admission. Failed first capture retained; one explicit diagnostic and one corrected re-execution, six source POSTs total within eight. | Codex focused **200 passed in 5.83s**, network denied; three material own red regressions corrected. Four-file compilation, exact raw-hash/report rebuild and private 0700/0600 permissions verified. Closing document/diff/status/privacy checks in 104.5. No full suite or outcome look; canonical 0/0, exploratory 0, QC 0. | `SI-FINRA-001..004` corrected before final publication; historical source/shared P2 and prospective look/commitment P3 retained. Authentication/location closed, not companion/rights/route/original-vintage gates. | One combined non-force push under section 81; Claude independently reviews all new commits after `f75d8d8a`, then counter-review before further implementation. Qualify authentic companion/identity/terminal and exact permitted local/QC route; do not bypass actual-input refusal. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -14433,3 +14436,103 @@ or research claim.
 The final corrected-run result and validation are appended below; they are
 not inferred from the partial page or header diagnostic. No owner decision
 or new credentials are required for this bounded technical correction.
+
+### 104.5 Completed capture, persistent ledger and next factual gates
+
+The corrected implementation/record is committed as
+**`ed99e92232ac5ddd7596119556182cd48cbdacb4`** before its deliberate
+re-execution. Run **`finra-source-20261009T205705Z`** exited **0** and
+completed four settlement queries, each one page with **8 received / 8 total**,
+offset 0, limit 100, schema version 1. The same frozen protocol is retained;
+required transport headers and exact array counts prove retrieval completion.
+The total for this entire round is **four OAuth POSTs, three metadata GETs
+and six source POSTs** (one refused capture query, one identical diagnostic,
+four corrected-run queries). No automatic retry, async operation or third
+acquisition loop occurs. The six-source-request remaining budget was tested
+to stop before opening a request beyond the allowance.
+
+Results, without exposing quantities or raw rows:
+
+| Frozen denominator | Actual disposition |
+|---|---|
+| 48 ticker/settlement cells | **32 valid, 16 missing**; zero malformed/duplicate/market-class-ambiguous cells. No source row outside the frozen sample. |
+| 36 later-cycle continuity targets | **24 matched, 0 mismatched, 12 target-missing**; no unknown prior, malformed/duplicate/ambiguous predecessor, or zero substitution. |
+| Valid flags/classes | **0 R, 0 S** among 32 valid rows; 24 NNM and 8 NYSE raw market-class assertions. These are observed codes, not permanent-identity or full historical-coverage admission. |
+
+The four missing raw symbols are **BRK.B, FRC, SIVB, TWTR** in every cycle.
+Do not rename BRK.B to another provider spelling or silently replace absent
+former-listed sentinels. Their absence cannot establish the cause, a ticker
+alias, historical delisted coverage or a zero short position. All 16 missing
+cells and 12 unavailable comparisons remain in the frozen denominators.
+The diagnostic finished; `capture_structurally_complete`,
+`continuity_comparison_complete` and `continuity_consistent` remain **false**,
+not a “passed complete source” label. Agreement is only internal continuity
+of FINRA's latest stored values, not two independent distributors or originals.
+
+Protected evidence is under the ignored lane-relative directory
+`artifacts/short_interest/finra_source_qualification/finra-source-20261009T205705Z`.
+Raw pages never enter Git. The exact report was independently reconstructed
+from all four raw-file hashes and compared to the published report; all owned
+directory/file permissions are 0700/0600. Receipt identities:
+
+| Evidence | SHA-256 |
+|---|---|
+| Canonical frozen protocol | `28b85fafa01d056c3483101545bb32163f968b9f9a083b874e63f0cf1ce6e4fe` |
+| Raw protocol file (newline included) | `2fa7ce2630985316eccbe33c92e4ab0c6c0c6121e9e399407d65511929e262bb` |
+| Production metadata file | `12b4459b02ee2cb2ef5b08b8ea12cad78f7fb1d8268afee24af59b9229e75cd9` |
+| Transport receipt file | `ad9aa8fa9a2727eb95bafeeec65adf63e76ae9ad64a9f26a91b09e6074025afe` |
+| Qualification report file | `072a1b0aeeaecdd5ff4bf9bd50dda7c0a885294b134601801165782250ae19c0` |
+| Canonical report payload (own hash field excluded) | `93cd30e4f6eccf9cedb910f9bc56268cd41676aaa17b4d4d8818689acf9ff6ca` |
+| Typed source-record set | `ae49fd15c0dd7c1fa696986a6f72599cf070483473b7d9271533bd69c1a4963c` |
+
+| ID | Priority / disposition | Evidence and correction |
+|---|---|---|
+| `SI-FINRA-001` | P2 confirmed / corrected | Draft storage followed a symlink out of the ignored lane directory. Own red **1 failed**; resolve/ownership/0700 checks now refuse before artifacts or credential reads. |
+| `SI-FINRA-002` | P2 confirmed / corrected | Draft transport could attribute another frozen cycle's response to the requested cycle. Own red **1 failed**; raw query/date/domain binding now refuses the response. |
+| `SI-FINRA-003` | P3 confirmed draft integration error / corrected | Capture used `fields`, pure protocol exposed `requested_fields`. Aligned before execution; the frozen hash and integration checks pass. |
+| `SI-FINRA-004` | P3 confirmed safe false refusal / corrected | Draft required an optional response header. Actual refusal retained, identical diagnostic authenticated, own red **1 failed**, exact-array/required-header proof implemented before the corrected run. A supplied invalid/discrepant optional header still refuses. |
+| `SI-SRC-20260928-001..003` | P2 retained / open | Public authentication/location is now closed and bounded latest-snapshot source evidence obtained. Original/all-correction archives, actual availability clocks, historical listed/delisted identity, companion/terminal coverage and applicable processing rights remain unestablished; no severity is silently downgraded. |
+| `SI-CR5-005` / `SI-CCR16-007` | P2 retained / shared, open | Documented only; no shared behavior changes. |
+| `SI-CR19-003` / `SI-CR15-001` | P3 retained / prospective, open | Permanent exploratory look accounting and later concrete commitments still apply. Current source-only diagnostics spend no outcome look and accept no new terms. |
+| Earlier confirmed, partial and false-alarm rows | Retained unchanged | Including closed `SI-CCR30-001..003`, `SI-CR19-001..002` and `SI-DOC-20261009-001`. Append this record; do not rewrite historical findings. |
+
+After the transport correction and remaining-request-budget regression,
+Codex's focused set passed **200 in 5.83s**: 81 pure source, 30 capture,
+9 Short Interest boundary, 69 active-document and 11 ML-boundary cases,
+network denied under the same CPython 3.13.15 / pytest 9.1.1 runtime.
+Targeted compilation passed. Closing active-document, historical preservation,
+added-record credential exclusion, lane-only diff and clean/remote guards
+are rerun before final publication; their final result/hash/equality is
+reported in chat, not predicted inside this commit. Claude owns the full lane
+suite and independent review of this new exact snapshot.
+
+The actual source-only milestone is complete. **The lane is not ready for an
+actual historical backtest.** The next empirical step is factually blocked
+by authenticated listed/delisted share-class identity and complete raw
+price/volume/action/terminal companion coverage, exact applicable local/QC
+processing route, actual-input binding, prospective evaluation/power/date/
+permanent-look registration and independent review. The strict canonical
+study additionally still needs authentic original/all-correction history and
+availability clocks; latest revised FINRA/Massive values cannot replace them.
+The Massive paired diagnostic remains unexecuted for the precise 104.1 use/
+ancillary-field scope issue. No further routine owner decision or approval
+is awaited, no removed inquiry is resurrected, and no unavailable provider
+fact, identity, license or QC platform authority is supplied by delegation.
+
+All new authorization/decision IDs exercised in this round are inventoried in
+104.3–104.4; none are implicit approvals of an empirical look, QC job or
+paid commitment. No new source/data request follows this completed bounded
+round. Shared documents, normalization, reranking, actual-input refusal,
+20/60/120/252 candidates and canonical/exploratory/QC zero counters remain
+unchanged. No monitor is armed, resumed, modified or deleted.
+
+Under section 81 / **SI-AUTH-20261005-02**, accumulate the prospective
+freeze, verified transport correction and closing handoff into **one combined
+non-force push**, only `HEAD:refs/heads/codex/strategy-short-interest`, with
+follow-tags disabled. Before the closing commit and push reverify the exact
+roots, branch, HEAD, status and actual matching remote; stop on concurrency.
+Verify clean local/tracking/actual-remote equality afterward. Claude's complete
+pending range begins after **`f75d8d8a2636e098947b333cbc7bd5d18c788158`**,
+including prior setup record **`f1d053bd`**, freeze **`8cb60ebe`**, correction
+**`ed99e922`** and this closing record. These are **pending review**, not
+self-dispositioned as accepted Claude commits.

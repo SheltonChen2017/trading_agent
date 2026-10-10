@@ -1,12 +1,16 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN
-`505f7a3d..32016848` IN SECTION 70. CUMULATIVE DISPOSITION: ACCEPTED AFTER
-CORRECTION. ALL FOUR COMMITS HAVE DISPOSITIONS; TWO TEST GUARDS ARE CORRECTED.
-TPR-CR21-002 HAS A COMMITTED-SOURCE SUCCESSOR DRIVER WITH SOURCE/BUILD BINDING;
-THE PARTIAL HISTORICAL DRIVER LIMITATION REMAINS EXPLICIT. TPR-CR21-003'S
-ADDITIONAL OWNER GATE IS A FALSE ALARM: SCOPED PRIVATE UPLOAD/PROCESSING WAS
-ALREADY AUTHORIZED, NOT PROVIDER-ATTESTED. SECTION72 RECORDS THE OWNER'S NEW
+Status: **CLAUDE HAS INDEPENDENTLY REVIEWED EVERY CODEX COMMIT IN
+`32016848..77b156ec` IN SECTION 73: THE SECTION-70 COUNTER-REVIEW, THE FROZEN
+MATCHED STUDY, THE MIA RECOVERY ATTEMPT AND THE CAP-SELECTION/TILT EXPERIMENT.
+CUMULATIVE DISPOSITION: ACCEPTED AFTER CORRECTION (TWO REGRESSION TESTS, NO
+PRODUCTION BYTE). BOTH CAP-TILT DIAGNOSTICS REPRODUCE BYTE-FOR-BYTE FROM
+COMMITTED CODE AND THE PRIVATE RECEIPTS. ONE P2 STAYS OPEN (`TPR-CR22-001`:
+THE OPERATOR CODE THAT PRODUCED THE MIA-SCOPE AND CAP-TILT ANALYSIS RECEIPTS IS
+NOT COMMITTED). CODEX NEXT COUNTER-REVIEWS SECTION 73 AND THIS ROUND'S CLAUDE
+COMMITS. SECTION 70'S COUNTER-REVIEW OF THE EARLIER FOUR-COMMIT CLAUDE RANGE
+STANDS AS HISTORY; ITS CR21-002/003 CLOSURES ARE ACCEPTED WITH THE RETENTION
+QUESTION RESTATED FOR THE OWNER. SECTION72 RECORDS THE OWNER'S NEW
 MARKET-CAP-SELECTION / TPR-WEIGHT-TILT DEVELOPMENT TEST AND EXPLICIT PERMISSION
 TO PROCEED BEFORE CLAUDE'S PENDING REVIEW OF fa78dacd. THIS IS A GENUINELY NEW
 ECONOMIC CANDIDATE, NOT A FOURTH OLD ATTEMPT OR CANONICAL ACCEPTANCE.
@@ -24,9 +28,9 @@ ON THE EXTERNAL MIA COMPUTER-CONTROL INTERFACE IN SECTION 71.10. ALL THREE
 CODEX ON-BASE ATTEMPTS ARE CONSUMED; THE COMPLETED THIRD RUN REMAINS A
 DELISTING DIAGNOSTIC. NO MIA RECOVERY JOB OR LOOK IS RESERVED OR LAUNCHED;
 THAT PRIOR STUDY'S TWELVE OBSERVED RUNS AND FIVE UNLAUNCHED ARMS REMAIN EXPLICIT.
-CLAUDE NEXT REVIEWS THIS CODEX ROUND INDEPENDENTLY AT ITS ONE FINAL PUSHED
-SNAPSHOT. RESTORED CONTROL AND REVIEWED COMPLETE OBSERVERS ARE REQUIRED
-BEFORE RECOVERY; NO FOURTH CODEX ATTEMPT. SECTION 69 REMAINS ATTRIBUTED HISTORY.
+SECTION 73 REVIEWED THAT FINAL PUSHED SNAPSHOT. RESTORED CONTROL AND
+REVIEWED COMPLETE OBSERVERS ARE REQUIRED BEFORE RECOVERY; NO FOURTH CODEX
+ATTEMPT. SECTION 69 REMAINS ATTRIBUTED HISTORY.
 TPR-CR20-001 IS CLOSED BY SUCCESSOR QUALIFICATION:
 THE OWNER'S EXACT PHYSICAL-ROOT PIN REMAINS REQUIRED, AND FUTURE PORTABILITY
 IS NOT A CURRENT BUILD GATE. SECTION 68 RECORDS ALL SIX OWNER-NAMED UNIVERSES:
@@ -433,14 +437,20 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, 2026-10-08:** Codex has counter-reviewed the exact Claude range
-`505f7a3da265214cc3c0b7e6c2238cbd1c9c1d78..32016848bc9ce4dfab3f52ddb5bb34e105e445dc`:
-four commits carrying test corrections, section69 and the validation census.
-Section70 dispositions each and the cumulative tree accepted after correction.
-TPR-CR21-002 is corrected prospectively by a source-bound successor driver;
-exact historical full-driver replay remains unavailable and is not claimed.
-TPR-CR21-003 is closed as an additional authorization gate false alarm, without
-provider attestation or deleting the private object. Historical sections67–69 stand.
+**Current qualification, 2026-10-09:** Claude has independently reviewed the exact Codex range
+`32016848bc9ce4dfab3f52ddb5bb34e105e445dc..77b156ecf4d71df1f69678fcfe7a275c59cb4f28`:
+eleven commits carrying the section-70 counter-review, the frozen matched
+study and its three native attempts, the Mia recovery collector and blocked
+handoff, and the owner-authorized cap-selection/tilt experiment with its two
+completed runs. Section 73 dispositions every commit and the cumulative tree
+accepted after correction: two regression tests, no production byte. Both
+cap-tilt diagnostics reproduce byte-for-byte from committed code and the
+private receipts; every QC statistic and request census in sections 71 and
+72 reproduces. One P2 is open, `TPR-CR22-001`: the operator code that produced
+the Mia-scope and cap-tilt analysis receipts is not committed. Section 70's
+closures of `TPR-CR21-002` and `TPR-CR21-003` are accepted; the Object Store
+retention question is restated for the owner as `TPR-CR22-007`, not a gate.
+Historical sections 67 through 72 stand.
 `TPR-CR20-001` is closed by qualification, not by removing the owner's exact
 physical-root custody pin. Historical path-dependent evidence is retained;
 portability is not a prerequisite to this owner-pinned development round.
@@ -539,8 +549,8 @@ with all qualification gates false. Section72.5 retains exact source/evidence
 hashes, negative attempts, matched observed-input paths and exact descriptive
 returns (both negative, tilt worse; see72.5). New ON's3slots are consumed; OFF1. Four new cloud
 looks plus12historical =16consumed/observed looks. No retune/fourth ON launch.
-Claude next reviews this Codex round independently at its one final pushed
-snapshot, including the pending predecessor and new round. The previous
+Codex next counter-reviews section 73 and this round's two Claude commits;
+the pending predecessor and the new round are now both reviewed. The previous
 continuous round reached a genuine external
 computer-control blocker, not a routine intermediate checkpoint. Further
 recovery requires restored authenticated controllable Mia in project37547067,
@@ -654,6 +664,7 @@ and are deliberately not listed here.
 | `TPR-CCR10-013` | P1 | Any positive signed-registry authority | Validating only the trust directory and files does not prevent replacement through a writable parent with `FILE_DELETE_CHILD`. The exact protected custody boundary for `C:\ProgramData\CustomizedAgent` needs owner approval and implementation. |
 | `TPR-CCR10-016` | P2 | TPR-TR0-I completion | Rotation, compromised-key removal, rollback, strict review-to-anchor ancestry, layer-specific byte mismatch, and full local Git/OpenSSH integration evidence are not yet complete. |
 | `TPR-MATCHED-002` | P2 | Matched-study execution acceptance | Attempt3 has four unclassified delisting events; held/target/history/window observations are absent. Mia's complete source-only specification was submitted, but last source readback is initialization-only and computer control timed out. No recovery job/claim exists; three Codex slots are consumed. No fourth launch or inferred-ambient acceptance. See71.6/71.9/71.10. |
+| `TPR-CR22-001` | P2 | Re-driving the Mia scope and the cap-tilt analyses from Git | The code that drove the Mia tool approvals, prompts and source reads (twelve receipts under the hash-bound transport), the cap-tilt failure-review, order-cause, log-quota, transport-sizing, aggregate-review and scope-analysis receipts, and the thin invoker of the pure diagnostics is not in the repository. The pure diagnostics themselves reproduce; the operations do not. Codex should commit those operator scripts or record their exact bytes in the evidence index. |
 | `TPR-MATCHED-006` | P2 | Observer approval before Mia recovery launch | Retained unexecuted proposals contained native Order/ticket, open-only history, enum, exception, partial-fill and clock defects. Corrected complete observers have been requested, not verified/applied/tested. Last readback contains only additive initialization; restored control, actual complete source review and focused proof are required before any recovery job. See71.9/71.10. |
 
 No open finding is P0. The two P1 findings are inert while the registry is empty,
@@ -670,6 +681,9 @@ Section70 qualifies the two historical development findings from section69:
 `TPR-CR21-002` is prospectively corrected with the old full-driver replay
 limitation retained; `TPR-CR21-003` is a false alarm as an extra owner gate.
 Neither changes a historical observed result or closes a canonical gate.
+Section 73 adds one open development finding, `TPR-CR22-001`: the operator
+code behind the Mia-scope and cap-tilt analysis receipts is not committed;
+it is a reproducibility gap, not a data-validity, canonical or trust gate.
 The six canonical findings are distinct from development-only
 `TPR-MATCHED-002` and `TPR-MATCHED-006`; neither category is closed
 by successful compilation, a Completed. status or the rights-paperwork waiver.
@@ -878,6 +892,7 @@ known.
 | 2026-10-06 | Claude review | `d4fac0fbef680cc49dcd548bf1e2f26f357b40ed..fa2838de5acfa66d37f65305c88ed35534f4f572` reviewed; this record/guard commit on this same lane branch | Independent review of the section-54 counter-review; no feature milestone | Reviewed both Codex commits individually. Confirmed all four counter-review findings, one of them a transcription error of mine. Three mutations of the new section-54 guard red. One P3 qualification on editing a historical section in place. No production code, fixture behaviour or non-guard test changed in the range or in this review; the lane guard and this record changed. | Lane, development, active-document, leak-guard and ML-boundary set on the pushed head, designated worktree, network-denied: **593 passed, 20 skipped**; document guards green on the final record; `compileall` exit 0; `git diff --check` clean. The complete suite was not re-run: every commit since the last complete run (section 51.7) is a test, guard or record commit. Provider/outcome accesses **0**; licensed-row reads **0**; authorized/spent looks **0**. | No P0 or P1. `TPR-CR19-001` (P3) closed by qualification. Six lane findings open; `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. The fixture-only TPR-D1 candidate stays accepted; TPR-D2 and any real-row D1 are not authorized. | Make this round's one push. Codex counter-reviews section 55, then stops for the owner's next bounded scope. |
 | 2026-10-08 | Claude review | `b78c51385a321b80404e484b3b161d8516f07138..002a5cc648a0c10a369ba79a42728aa75c7051d3` reviewed; test commit `e5bbdf3f997e41c4637e6abc3ad34d86651355f4` and this record/guard commit on this same lane branch | Independent review of sections 56-65 (continuous build, source diagnostics, native candidate, two local backtests); no feature milestone | Reviewed all fifteen Codex commits individually. Reproduced both private backtest summaries exactly by hash from the gitignored result files. Ran the complete repository suite on the pushed head in a scratch clone. Thirty-one mutation trials across the order engine, the revision filter and the run controller: twenty-six red, five survivors, three of them now covered by regression tests. No production module, canonical artifact, shared document or shared test changed; two lane test modules, the lane guard and this record changed. | Lane, development, active-document, leak-guard and ML-boundary set on the pushed head, designated worktree, network-denied: **2,184 passed, 20 skipped**. Complete suite on `002a5cc6` in a scratch clone, six sandboxed shards: **19,471 passed, 842 skipped, 33 failed, 37 errors**; 13 failures are `TPR-CR20-001`, 4 are `TPR-OOL-015`, the remaining 16 failures and all 37 errors are `TPR-OOL-016`. Final-tree lane set after `5af0897f`, network-denied: **2,196 passed, 20 skipped**; `compileall` exit 0; `git diff --check` clean. Provider requests **0**; raw licensed rows read **0**; two private derived result files read locally for recomputation only; authorized/spent looks **0**. | No P0 or P1. `TPR-CR20-001` (P2) open for Codex; `TPR-CR20-002` (P2) and `TPR-CR20-003` (P3) closed by correction; `TPR-CR20-004` through `TPR-CR20-006` (P3) documented. Six canonical lane findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. The development backtests remain exploratory; no canonical, QuantConnect, broker, paper, live, capital or trading authority is added. | Make this round's one push. Codex counter-reviews section 66 and the two Claude commits, then resumes the owner's continuous build. |
 | 2026-10-08 | Claude review | `530e95a554a9d06e954cf86df44d3a591d6d4996..505f7a3da265214cc3c0b7e6c2238cbd1c9c1d78` reviewed; test commits `6c8ebdef` and `30ad18a5` and this record/guard commit on this same lane branch | Independent review of sections 67-68 (counter-review and six-universe QC round); no feature milestone | Reviewed the one Codex commit. Reproduced all seven QC result receipts by published hash (end equity, drawdown, order, fee and closed-trade counts), the 91-request endpoint census, submission times, order statuses, types and RAW modes from the private receipts. Found that the new lane test module `test_operations.py` collided with the shared module of the same name and aborted collection of the complete suite; renamed it with a basename guard. Thirty-six mutation trials across the cloud algorithms, packet and operations modules: six survivors without behavioural tests, now covered. No production module, canonical artifact, shared document or shared test changed; three lane test modules, the lane guard and this record changed. | Lane, development and QC sets on the pushed head `505f7a3d`, designated worktree, network-denied: **2,203 passed, 20 skipped** plus **267 passed**. Complete suite in a scratch clone, six sandboxed shards: collection aborted at `505f7a3d` (`TPR-CR21-001`); after the rename **19,758 passed, 842 skipped, 33 failed, 37 errors**, every red in the known `TPR-CR20-001`/`TPR-OOL-015`/`TPR-OOL-016` sets. Final-tree lane set after `597a3902`: **2,481 passed, 20 skipped**; `compileall` exit 0; `git diff --check` clean. Provider requests **0**; QC requests **0**; raw licensed rows read **0**; private QC receipts, order pages and result files read locally for recomputation only; authorized/spent looks **0**. | No P0 or P1. `TPR-CR21-001` (P2) and `TPR-CR21-005` (P3) closed by correction; `TPR-CR21-002` and `TPR-CR21-003` (P2) open; `TPR-CR21-004` (P2), `TPR-CR21-006` and `TPR-CR21-007` (P3) documented. Six canonical lane findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. The seven QC runs remain exploratory development looks; no canonical, QuantConnect-beyond-this-round, broker, paper, live, capital or trading authority is added. | Make this round's one push. Codex counter-reviews section 69 and the Claude commits; the owner answers `TPR-CR21-003` before any further vendor-derived upload. |
+| 2026-10-09 | Claude review | `32016848bc9ce4dfab3f52ddb5bb34e105e445dc..77b156ecf4d71df1f69678fcfe7a275c59cb4f28` reviewed; test commit `1cab57bb` and this record/guard commit on this same lane branch | Independent review of sections 70-72 (counter-review, matched study, Mia recovery, cap-selection/tilt experiment); no feature milestone | Reviewed all eleven Codex commits individually. Reproduced both cap-tilt diagnostic-v3 outputs byte-for-byte from the committed reporter and the receipt-bound private files, all seven QC run statistics (three matched attempts, four cap-tilt attempts) and both request censuses (79 and 119). Forty-two mutation trials across the cap-tilt core, both successor controllers and the collision guard: one genuine survivor, now covered. No production module, executed artifact, receipt, shared document or shared test changed; two controller test modules, the lane guard and this record changed. | Lane, development, QC, active-document, leak-guard and ML-boundary set on the pushed head `77b156ec`, designated worktree, network-denied: **3,974 passed, 20 skipped**. Complete suite in a scratch clone: see section 73.5. Final-tree lane set: see section 73.5. Provider requests **0**; QC requests **0**; raw licensed rows read **0**; private receipts, result projections, order pages and the packet structure read locally for recomputation only; authorized/spent looks **0**. | No P0 or P1. `TPR-CR22-001` (P2) open; `TPR-CR22-002`, `TPR-CR22-003` and `TPR-CR22-010` (P2) documented; `TPR-CR22-008` (P3) closed by correction; `TPR-CR22-004` through `TPR-CR22-007` and `TPR-CR22-009` (P3) documented. Six canonical lane findings, `TPR-MATCHED-002`, `TPR-MATCHED-006` and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. The sixteen observed development looks remain exploratory; no canonical, further QuantConnect, broker, paper, live, capital or trading authority is added. | Make this round's one push. Codex counter-reviews section 73 and the Claude commits; the owner decides `TPR-CR22-007` (Object Store retention) at leisure. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 | 2026-10-05 | Codex counter-review and TPR-D0 implementation | Reviewed `9958a459f5cd56c29cb9a0de13d38737e2c3412d..c0bfb21393180d44c16c10be1e667ea741098531`; corrections/decisions `cf11788f39a2148d7bc3b801e88807bd2caca5ea`; D0 implementation `8dcfb71851ff22db6f0727395e18292c19f080ef`; this record-only handoff follows | Four-commit Claude counter-review, five bounded owner selections, strict D0 plan and one retained structural audit | Accepted the cumulative Claude range after three record/encoding corrections; selected explicit native/host test variants without changing production trust policy. Implemented the separate standard-library D0 package and immutable aggregate artifacts; retained-source inventory/hashes and all canonical freezes match. Sections 46/47 contain exact dispositions, scope, evidence and remaining limitations. | Cumulative focused suite 491 passed, 5 symlink-permission skips; final routing/artifact guards 107 passed. Standard suite blocked by 110 Analyst `fcntl` collection errors, with zero tests executed. Optional continuation diagnostics capped and incomplete, not reported as totals. Compileall exit 0; diff hygiene clean; Python 3.13.14 / pytest 9.1.1. | CCR16-001/002/003 closed; no new in-lane P0/P1/P2. Six canonical findings remain open and parked. TPR-OOL-017 opened for Windows Analyst collection, documented only. | Exact local retained-structure scope only, expiring 2026-10-12; 587,046 retained rows audited. Provider/outcome/QC/development-look/trading counts zero. No vendor-rights attestation or canonical admission. | One matching-branch non-force push of this Codex round, then independent Claude review of every commit after `c0bfb213` through the exact pushed tip. No automatic D1; later action/source scope must be selected after review and counter-review. |
 
@@ -13458,3 +13473,172 @@ latest final index1c6254b42c54cf4c0f59949774e83690edfa9857b9e2a3c487e4e61745562e
 2026-10-10T00:35:56.073427Z,621files/37190081bytes hashed only. Previous617-file
 index remains exact historical evidence; this is not a source/candidate/attempt
 rename or receipt renewal. No new cloud request, launch or development look.
+
+## 73. Claude independent review of the matched study, Mia recovery and cap-tilt rounds - 2026-10-09
+
+**Disposition: accepted after correction.** The owner asked for all unreviewed
+commits to be reviewed. Eleven Codex commits are unreviewed: section 70's
+counter-review of my section-69 commits, the frozen three-arm matched study
+and its three native attempts (two runtime errors, one completed but
+unqualified run), the Mia recovery attempt that ended on a computer-control
+blocker, and the owner-authorized cap-selection/tilt experiment with its
+two completed runs. Every commit is accepted; two are accepted after a
+test-only correction. The two cap-tilt diagnostics that carry the reported
+figures reproduce byte-for-byte from committed code and the private
+receipts, and every QC statistic and request census in sections 71 and 72
+reproduces. One P2 stays open: the operator code that produced the
+Mia-scope and cap-tilt analysis receipts is not in Git.
+
+### 73.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Branch | `codex/strategy-target-price-revisions` |
+| Codex range reviewed | `32016848bc9ce4dfab3f52ddb5bb34e105e445dc..77b156ecf4d71df1f69678fcfe7a275c59cb4f28` |
+| Codex commit 1 | `3dbcceafd78536708f7f18013f1381d8ebd64f64` - Counter-review Claude QC round and freeze standalone matched study |
+| Codex commit 2 | `db5c9017b219deffb22c5f0d8005bffe1101dd88` - Correct matched QC warm-up lifecycle with preserved source successors |
+| Codex commit 3 | `017cb0108094bd42ecdeed9f9d9980ef7a39652f` - Separate native ETF context and isolated benchmark feeds from RAW trading |
+| Codex commit 4 | `f10a3e3f07287969e72c09d51a340ff2b0f2cf25` - Add bounded read-only Mia recovery evidence collector and terminal audit successor |
+| Codex commit 5 | `fa78dacddb0061c305f040fb66487c72c432f3a0` - Record blocked Mia recovery and exact matched-study handoff |
+| Codex commit 6 | `82012b68164c33092fd17c690199e9b3035a6f21` - feat(tpr): freeze cap-selected stock basket and weight-only tilt study |
+| Codex commit 7 | `c0197ef6a2811d897560174353fae48ae3a8ad65` - fix(tpr): scope native final-delisting compatibility to RAW fill custody |
+| Codex commit 8 | `c0b48fe1783c2393fe40ea4f245a26d1558e0e26` - fix(tpr): retain bounded lossless QC audit logs and explicit diagnostics |
+| Codex commit 9 | `48a1422ae4a5c2c78c817fc8ca08d067fcdf818a` - feat(tpr): label observed decision coverage without qualifying diagnostics |
+| Codex commit 10 | `60ed255c1f341b5e0cce3df4d1be37e1bdb4dd07` - feat(tpr): report unobserved native fee and monetary fields explicitly |
+| Codex commit 11 | `77b156ecf4d71df1f69678fcfe7a275c59cb4f28` - docs(tpr): hand off completed cap-tilt QC diagnostics and limitations |
+| Reachable commits in the range | 11, all first-parent; no merge |
+| Publication state at review start | the armed watcher reported the push at 17:37 PDT; local head and fetched remote head both exactly `77b156ecf4d71df1f69678fcfe7a275c59cb4f28`, clean tree, fast-forwarded from `32016848` |
+| Changed paths | `research/target_price_revisions_qc/` (23 new modules, three frozen JSON files), `tests/target_price_revisions_qc/` (23 new modules), my `test_cloud_algorithm_v2.py` (strengthened), the lane guard and this record; no canonical package, development production module, shared document, `tests/conftest.py`, requirements or sibling byte |
+| Host and interpreter | macOS (Darwin 25.6.0); the lane venv at `$HOME/.venvs/trading_agent-py313`, Python 3.13.15, pytest 9.1.1; every pytest and mutation run under `sandbox-exec -p '(version 1)(allow default)(deny network*)'`; the complete suite ran in a scratch `git clone` of the pushed head with `refs/remotes/origin/main` set to `9e834713` |
+| Review aids | three read-only exploration agents (successor controllers, drivers and the Mia collector; matched algorithms and audits; cap-tilt modules); every finding they raised was re-verified against the code or the private receipts before use, and one of their top risks was reduced to P3 by the reproduction in 73.4 |
+
+### 73.2 Commit-by-commit dispositions
+
+| Codex commit | Disposition | Review basis |
+|---|---|---|
+| `3dbcceafd78536708f7f18013f1381d8ebd64f64` | **Accepted after correction** | Section 70's counter-review of my four commits: `TPR-CCR21-001` (guard generalization) confirmed, and the rewritten collision guard is red with the original shared collision and with a nested lane collision; `TPR-CCR21-002` (membership spy) confirmed; `TPR-CCR21-003` (my mutation arithmetic: 33 listed slots, 30 executed, ten operations mutants red) confirmed; `TPR-CCR21-004` (REMX wording) and `TPR-CCR21-005` (census provenance) confirmed. The matched freeze, `operations_v2.py`, `matched_algorithm.py`, `matched_audit.py`, `matched_bundle.py` and `matched_driver.py` are read; the controller binds uploaded content to manifest hashes, re-reads cloud sources, requires a verified BuildSuccess receipt before launch, and caps attempts at three (mutations of the BuildSuccess gate and the attempt cap are red). The one genuine survivor, admitting a foreign or misplaced packet receipt for the TPR-on arm, is `TPR-CR22-008`, closed by `1cab57bb`. `historical_driver_fragments.json` is honestly labelled partial. |
+| `db5c9017b219deffb22c5f0d8005bffe1101dd88` | **Accepted** | `matched_algorithm_v2.py` starts action custody at the first observed RAW bar or action, re-attaches minute RAW feeds after warm-up and passes slippage as a .NET Decimal; economics unchanged. Attempt 2's runtime error is retained in the private receipts (verified). |
+| `017cb0108094bd42ecdeed9f9d9980ef7a39652f` | **Accepted** | `matched_algorithm_v3.py` excludes the six universe-context symbols and the benchmark's internal feed from money models and custody; attempt 3 completed with 292 filled MOO orders, end NAV 95,859.72, drawdown 11.1% and fees 23.79, all reproduced from the private result; `meaningful=false` from four unclassified delisting events stands. The unobserved-split default of one persists at line 179 (`TPR-CR22-003`). |
+| `f10a3e3f07287969e72c09d51a340ff2b0f2cf25` | **Accepted** | `mia_recovery.py` is a read-only collector over five read endpoints with its own claim files; it was never executed (no `mia.*` receipt exists). `matched_audit_v3.py` admits the exact `Completed.` spelling without weakening other guards. The receipts that the Mia scope did produce came from uncommitted code (`TPR-CR22-001`). |
+| `fa78dacddb0061c305f040fb66487c72c432f3a0` | **Accepted** | Record-only. Section 71.10 states the blocked endpoint, the twelve observed runs and the five unlaunched arms accurately; no matched comparison exists and the record says so. |
+| `82012b68164c33092fd17c690199e9b3035a6f21` | **Accepted after correction** | `cap_tilt.py` (read in full) selects by positive cap only, tie-breaks by native SID, keeps 1/60 slots, and transfers within a sleeve by tied midrank under the aggregate 1/10 cap with exact conservation checks; eight of twelve mutations are red, three survivors are unreachable defensive assertions and one was a no-op control. `cap_tilt_operations.py` mirrors the successor controller; its foreign-packet admission gap is the same `TPR-CR22-008`, closed by `1cab57bb`. The freeze is descriptive rather than machine-bound (`TPR-CR22-004`). |
+| `c0197ef6a2811d897560174353fae48ae3a8ad65` | **Accepted** | `cap_tilt_algorithm_v2.py` admits exactly one typed native final liquidation fill (zero fee in the null currency) under a closed guard; attempt 1's runtime error and attempt 2's log-quota truncation are retained in the private receipts (verified). |
+| `c0b48fe1783c2393fe40ea4f245a26d1558e0e26` | **Accepted** | `cap_tilt_algorithm_v3.py` adds a lossless compressed log transport under the 100 kB quota; attempt 3 and OFF attempt 1 completed with 352 and 309 filled orders, 60 NAV dates and 13 of 14 decisions, reproduced from the private results. |
+| `48a1422ae4a5c2c78c817fc8ca08d067fcdf818a` | **Accepted** | `cap_tilt_diagnostic_v2.py` labels the observed thirteen-decision subset without repairing the missing decision. |
+| `60ed255c1f341b5e0cce3df4d1be37e1bdb4dd07` | **Accepted** | `cap_native_order_diagnostic.py` and `cap_tilt_diagnostic_v3.py` keep unreported native fee and currency fields as unknown rather than zero. Both diagnostic-v3 outputs reproduce byte-for-byte from these modules and the receipt-bound private files (73.4). |
+| `77b156ecf4d71df1f69678fcfe7a275c59cb4f28` | **Accepted** | Record-only. Section 72.5's figures equal the reproduced diagnostics and QC statistics; its sixteen-look accounting equals the request censuses; its gates are all false. |
+
+**Cumulative disposition: accepted after correction.** The cumulative tree at
+`77b156ec` plus this round's test commit `1cab57bb` is accepted. No production
+module, executed adapter, spent receipt, canonical artifact, shared document
+or shared test changed in this review; two controller test modules, the lane
+guard and this record changed.
+
+### 73.3 P0-P3 ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| `TPR-CR22-001` | P2 | **Open** | `f10a3e3f`, `60ed255c`, `77b156ec` | private roots `artifacts/target_price_matched/` and `artifacts/target_price_cap_tilt/` | The pattern of `TPR-CR21-002` recurs. Under the matched root, twelve `mia-recovery.*` receipts (tool approvals, prompts, source reads through the hash-bound transport) and the Mia edits of cloud `main.py` in project 37547067 with nine unreserved IDE builds were driven by code with no committed producer; the committed `mia_recovery.py` never ran. Under the cap-tilt root, the `analysis.scope004/005`, `final.scope005`, `on-attempt1.failure-review`, `on-attempt1.order-cause`, `on-attempt2.log-quota`, `on-attempt2.transport-sizing` and `aggregate-review` receipts, and the invocation of the diagnostics, have no committed producer. The record discloses each step, so this is a reproducibility gap, not concealment. | `git grep` for the receipt names and schemas finds no writer; the three agents and my own search agree. The pure diagnostics do reproduce (73.4), so the figures are reproducible even though the operations are not re-drivable. | Operations that cannot be re-driven from Git remain attributed evidence. | Not corrected in review. Codex should commit the operator scripts for every receipt-producing step, or record their exact bytes and hashes in the evidence index, and route any future Mia use through the committed collector with one explicit owner approval per edit. | Not applicable. |
+| `TPR-CR22-002` | P2 | **Documented, not corrected** | `3dbcceaf`, `82012b68` | `operations_v2.py:905`, `cap_tilt_operations.py:958`, `matched_audit.py:174-181` | The evidence binding that the audits rely on is internal: the collector writes `exact_cloud_readback: True` and `build_success: True` as constants into the source receipt, and the audits accept those flags plus a shape check of the source hashes as proof. The audits therefore cannot tell a v1, v2 or v3 run apart by source and cannot detect a receipt written by a different producer; cross-arm membership and prior-mark matching happens in a separate pair receipt, not inside the audit. | Code reading, confirmed on the cited lines. | A self-attesting receipt is consistency evidence, not verification. | None in review; the next audit successor should verify the receipt against the compile-verified and source-verification receipts' hashes. | Not applicable. |
+| `TPR-CR22-003` | P2 | **Documented, not corrected** | `017cb010`, `c0b48fe1` | `matched_algorithm_v3.py:179`, `cap_tilt_algorithm_v3.py:151`, `:562-565` | Carry-over of `TPR-CR21-004`: an unobserved split still becomes factor one in both v3 successors, contrary to each freeze's rule to refuse an unknown action basis; custody plus the seven-day rule only narrows the exposure. In the cap-tilt runtime a delisted target is removed after the tilt, which breaks the sleeve's weight conservation for that decision; per-name caps remain soft and gross is checked only at the close; fees are computed on order quantity (equal to fill quantity for these all-filled MOO runs). | Code reading on the cited lines. | Executed, hash-bound successors. | None in review; a v4 successor should refuse an unobserved basis and remove delisted names before the tilt. | Not applicable. |
+| `TPR-CR22-004` | P3 | **Documented, not corrected** | `82012b68` | `cap_tilt_freeze.json`, `cap_tilt_bundle.py:80-83`, `cap_tilt_algorithm_v3.py:550` | The freeze is descriptive, not machine-enforced: the 20% capacity, the top-ten rule, the 1/60 slot, the 97% cash buffer, the 1% volume cap and the 7-21 day membership lag are hard-coded in Python, and the bundle binds only four candidate fields. The code agrees with the freeze text today; nothing enforces it. | Code reading. | Frozen parameters should be read from the frozen document. | None in review. | Not applicable. |
+| `TPR-CR22-005` | P3 | **Documented, not corrected** | `82012b68` | `cap_tilt_operations.py:410-414`, `operations_v2.py:197-209`, `:93-98` | Private-root hygiene: the cap-tilt controller retains every parsed response wire, so the two `projects/create` responses keep collaborator `uid`, `ownerId`, `email` and `publicId` unredacted (owner-only files, gitignored); substring redaction of a numeric user id can rewrite unrelated digit runs in retained evidence; QC numbers are parsed as floats before the audits convert them through text. | Key inventory of the private wires (no value transcribed) and code reading. | Hygiene only; nothing reaches Git. | None in review. | Not applicable. |
+| `TPR-CR22-006` | P3 | **Documented, not corrected** | `3dbcceaf`, `82012b68` | `operations_v2.py:628-648`, `cap_tilt_operations.py:680-702` | `reserve_attempt` does not require the previous attempt to have reached a terminal state, so a second cloud backtest of the same candidate could run concurrently (bounded at three); a wall-deadline after a server-accepted launch records `failed_or_unknown` without a backtest id. | Code reading. | Bounded by the attempt cap. | None in review. | Not applicable. |
+| `TPR-CR22-007` | P3 | **Documented; owner question restated** | `3dbcceaf`, `82012b68` | Object Store keys `tpr-qc6/...`, `tpr-matched/...`, `tpr-cap-tilt/...` | The same 7.7 MB packet of Sharadar identity rows and derived scores now resides under three Object Store keys; the controllers have no delete endpoint. Section 70's closure of `TPR-CR21-003` is accepted for the operational gate: the owner's sections 64 and 67.4 instructions and the later "yes, authorizee" authorize scoped private uploads. Whether the three objects should stay after the round is still the owner's call and nothing else. | Upload receipts in all three private roots (verified keys and hash). | Owner decision on retention. | None; not a build gate. | Not applicable. |
+| `TPR-CR22-008` | P3 | **Closed by correction** | `3dbcceaf`, `82012b68` | `operations_v2.py:733-736`, `cap_tilt_operations.py:785-788` | Removing the packet hash and key comparison from `launch_backtest` survived every test: the only ON-arm test deletes the upload receipt, so a receipt naming a foreign packet or another study's namespace was never exercised. | Mutation trial in the scratch clone (73.4). | A present-but-wrong receipt must refuse the TPR-on arm. | `test_on_arm_cannot_launch_with_a_foreign_or_misplaced_packet_receipt` in both controller suites (commit `1cab57bb`). | Red under the mutant in both controllers; green on the real code. |
+| `TPR-CR22-009` | P3 | **Documented** | `3dbcceaf` | section 70.3 | Governance notes. All five `TPR-CCR21` items against section 69 are confirmed (73.2). The `TPR-CR21-007` dispute is recorded on both sides and left to the owner; this review again used a read-only scratch clone for the complete suite and the designated worktree for everything else. Nineteen controller tests per suite are new instances of the path-bound class closed under `TPR-CR20-001`; they refuse outside the physical lane, so the guard mutations of `guard()` (ancestry, baseline head, declared source drift) could not be evaluated in the clone and are reported as not evaluated rather than survived. | Clone baseline reds; section 70 text. | Clarity. | None. | Not applicable. |
+| `TPR-CR22-010` | P2 | **Documented; owner attention** | `f10a3e3f`, `fa78dacd` | section 71.6 through 71.10 | After the third Codex attempt, Codex used the owner's authenticated browser session and QuantConnect's in-IDE assistant (Mia) to edit the cloud `main.py` of project 37547067 through approval cards, with nine implicit IDE builds and a verified one-line edit, until the computer-control surface timed out. No backtest was launched and the record is transparent, but this path mutates a cloud project outside the committed, hash-bound custody model and under an interactive session the lane cannot replay. | Sections 71.8-71.10; the Mia-scope receipts under the matched root; `main.py` readback hashes recorded there. | The owner should decide whether assistant-driven cloud edits are an acceptable recovery path. | None in review; recommendation in 73.7. | Not applicable. |
+
+No P0 and no P1 arises from this range. The open-issue register gains
+`TPR-CR22-001` (nine items). `TPR-MATCHED-002` and `TPR-MATCHED-006` stay open
+as Codex recorded them. Out of lane, `TPR-OOL-011` through `TPR-OOL-018` are
+unchanged.
+
+### 73.4 Independent reproduction and mutation evidence
+
+- **Cap-tilt diagnostics reproduced byte-for-byte.** For ON attempt 3 and
+  OFF attempt 1, the receipt-bound evidence (the result projection in the
+  terminal poll file, the logs wire, the four order pages, the source
+  receipt) and a reconstructed configuration whose hash equals the
+  completion receipt's `config_sha256` were passed to the committed
+  `cap_tilt_diagnostic_v3.diagnose_result`; the output equals the saved
+  `diagnostic-v3.json` of each run exactly. The reproduced metrics are the
+  record's: end NAV 94,981.510105 and 95,335.84179, returns -5.018489895%
+  and -4.66415821%, daily-close drawdowns 10.356% and 9.966%, 352 and 309
+  filled orders, observed fees 50.98 and 50.49, thirteen observed decisions
+  with 2025-01-13 missing, all-native fees `None`, every gate false.
+- **QC statistics by hash.** All seven run results (matched attempts 1-3,
+  cap-tilt ON 1-3 and OFF 1) give the record's end equity, net profit,
+  drawdown, order count, fees, closed-trade count and error state; the two
+  matched runtime errors and the cap-tilt attempt-1 runtime error are the
+  recorded ones.
+- **Operational census.** Matched root: 79 succeeded requests (1 project,
+  3 compiles, 3 backtests, 1 Object Store set); cap-tilt root: 119 (2
+  projects, 4 compiles, 4 backtests, 1 Object Store set). With the earlier
+  91 that is nine cloud launches this round and sixteen observed looks, as
+  the record states. No sharing or deletion endpoint was called.
+- **Cap-tilt core, 12 trials:** nonpositive cap selectable, ascending cap
+  order, eleven slots, aggregate cap unchecked, own-band check removed,
+  receiver ignores cap headroom, zero score ranked, capacity bounds removed,
+  sleeve conservation removed, duplicate ticker admitted, donor availability
+  ignores prior transfers, tie-break removed. Eight red; the three
+  conservation and band assertions are unreachable through the public
+  interface (six sleeves at 1/60 cannot exceed the 1/10 cap), and the
+  tie-break trial was a no-op because the list was already sorted.
+- **Successor controllers, 8 trials each:** the BuildSuccess gate and the
+  attempt cap are red in both; the foreign-packet admission survived in
+  both (`TPR-CR22-008`); the compile-response state and transport content
+  checks are duplicates of hash bindings that other tests cover; the three
+  `guard()` trials are not evaluable in the clone (`TPR-CR22-009`).
+- **Collision guard:** Codex's rewritten guard is red with the original
+  shared basename restored and with a nested two-lane collision.
+- **Regression tests of this round:** both new tests are red under the
+  mutant and green on the real code.
+- **Secrets and rows.** No committed file carries a credential or a vendor
+  row; the three new JSON files are frozen specifications and driver
+  fragments; private roots are gitignored and owner-only.
+
+### 73.5 Validation
+
+- **Pushed head `77b156ec` in the designated worktree, network-denied:**
+  lane, development, QC, active-document, leak-guard and ML-boundary set
+  **3,974 passed, 20 skipped**.
+- **Complete repository suite, scratch clone, six sandboxed shards:**
+  census appended in the final commit of this round.
+- **Final tree:** figures appended in the final commit of this round.
+- **Guard mutations:** this round's section-73 pin and rotated pointers are
+  exercised by in-test mutations (disposition drift, contradictory grant).
+
+Provider requests: **0**. QuantConnect requests: **0**. Raw licensed rows
+read: **0**; private receipts, result projections, order pages and the
+packet structure were read locally for recomputation only. Authorized or
+spent research looks: **0**.
+
+### 73.6 Milestone and authority decision
+
+Section 72.5's differentiated readiness stands: the cap-selected basket and
+weight-only tilt execute genuine orders in both arms with full daily
+valuation, but the shared missing decision, the non-ambient delisting fill
+and the unreported native fee fields keep every acceptance, pair and alpha
+gate false; the matched study remains blocked with five unlaunched arms.
+The canonical ladder is unchanged: TPR-1 and TPR-0B remain blocked, the
+1/80 look ceiling is unspent, canonical admission is not authorized, and no
+real-row canonical D1 is authorized. Codex next counter-reviews section 73
+and this round's two Claude commits. No provider request, QuantConnect
+launch, further Object Store upload, retained row, outcome access, broker
+action, paper or live deployment, capital, or trading authority is granted
+or used by this review.
+
+### 73.7 Recommendation to the owner
+
+Two things for you. First, `TPR-CR22-010`: decide whether letting an
+in-IDE assistant edit a cloud project under your signed-in session is an
+acceptable recovery path; if it is, ask Codex to route it through the
+committed collector with one explicit approval per edit, and if not, say so
+and the matched study ends at its blocked state. Second, `TPR-CR22-007`:
+the same Sharadar-derived packet now sits under three Object Store keys;
+decide whether they stay. On the strategy itself, sixteen looks on one
+quarter of a non-point-in-time proxy have produced no positive result in
+any construction; before another look, have Codex commit the operator
+scripts (`TPR-CR22-001`) so each round can be re-driven, and freeze a
+successor that refuses an unobserved split basis (`TPR-CR22-003`).

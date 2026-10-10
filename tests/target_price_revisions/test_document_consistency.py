@@ -346,6 +346,27 @@ SECTION70_CLAUDE_COMMITS = (
     "597a3902c58275625af51acc86e52a2c0b96c86d",
     "32016848bc9ce4dfab3f52ddb5bb34e105e445dc",
 )
+SECTION73_CODEX_BASE = "32016848bc9ce4dfab3f52ddb5bb34e105e445dc"
+SECTION73_CODEX_HEAD = "77b156ecf4d71df1f69678fcfe7a275c59cb4f28"
+SECTION73_CODEX_RANGE = f"{SECTION73_CODEX_BASE}..{SECTION73_CODEX_HEAD}"
+SECTION73_CODEX_SHORT_RANGE = "32016848..77b156ec"
+SECTION73_CODEX_COMMITS = (
+    "3dbcceafd78536708f7f18013f1381d8ebd64f64",
+    "db5c9017b219deffb22c5f0d8005bffe1101dd88",
+    "017cb0108094bd42ecdeed9f9d9980ef7a39652f",
+    "f10a3e3f07287969e72c09d51a340ff2b0f2cf25",
+    "fa78dacddb0061c305f040fb66487c72c432f3a0",
+    "82012b68164c33092fd17c690199e9b3035a6f21",
+    "c0197ef6a2811d897560174353fae48ae3a8ad65",
+    "c0b48fe1783c2393fe40ea4f245a26d1558e0e26",
+    "48a1422ae4a5c2c78c817fc8ca08d067fcdf818a",
+    "60ed255c1f341b5e0cce3df4d1be37e1bdb4dd07",
+    "77b156ecf4d71df1f69678fcfe7a275c59cb4f28",
+)
+SECTION73_DISPOSITIONS = tuple(
+    "accepted after correction" if index in (0, 5) else "accepted"
+    for index in range(len(SECTION73_CODEX_COMMITS))
+)
 SECTION57_OWNER_D2_SCOPE = (
     "After an accepted counter-review, implement one fixture-only TPR-D2 candidate "
     "using synthetic fixtures and the committed D0 aggregate report only. "
@@ -438,9 +459,9 @@ PER_ROUND_PENDING_PHRASES = (
 )
 # The superseded pointer token that must no longer appear in current blocks.
 PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD = (
-    "002a5cc648a0c10a369ba79a42728aa75c7051d3"
+    "505f7a3da265214cc3c0b7e6c2238cbd1c9c1d78"
 )
-PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD = "002a5cc6"
+PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD = "505f7a3d"
 EXPECTED_POLICY_CODE_REPO_PATHS = (
     "research/__init__.py",
     "research/target_price_revisions/__init__.py",
@@ -917,11 +938,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [SECTION70_CLAUDE_RANGE]
+    ) == [SECTION73_CODEX_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Codex has counter-reviewed the exact Claude range"
+        "Claude has independently reviewed the exact Codex range"
         in normalized_current
     )
     assert (
@@ -934,7 +955,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "TPR-TR0" in normalized_current
     assert "TPR-1 remains blocked" in normalized_current
     assert "reviewed-spec registry remains empty" in normalized_current
-    assert "Claude next reviews this Codex round independently" in normalized_current
+    assert "Claude next reviews this Codex round independently" not in normalized_current
+    assert "Codex next counter-reviews section 73" in normalized_current
     assert "Codex next counter-reviews section 69" not in normalized_current
     assert "comprehensive whole-lane audit remains complete" in normalized_current.lower()
     assert CURRENT_MAIN_SYNC_MERGE_COMMIT[:8] in current
@@ -992,10 +1014,10 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [SECTION70_CLAUDE_SHORT_RANGE]
+        ) == [SECTION73_CODEX_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert "codex has counter-reviewed every claude commit" in normalized_summary_lower
-        assert "section 70" in normalized_summary_lower
+        assert "claude has independently reviewed every codex commit" in normalized_summary_lower
+        assert "section 73" in normalized_summary_lower
         assert "fixture-only tpr-d1 candidate awaits claude review" not in normalized_summary_lower
         assert "fixture-only tpr-d1 candidate is accepted" in normalized_summary_lower
         assert "claude next reviews the counter-review and tpr-d0" not in normalized_summary_lower
@@ -1008,7 +1030,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         assert "claude next reviews sections 56 and 57" not in normalized_summary_lower
         assert "codex continues without claude review stops" not in normalized_summary_lower
         assert "five verified order-based qc runs and one zero-trade remx diagnostic" in normalized_summary_lower
-        assert "claude next reviews this codex round independently" in normalized_summary_lower
+        assert "claude next reviews this codex round independently" not in normalized_summary_lower
+        assert "codex next counter-reviews section 73" in normalized_summary_lower
         assert "codex next counter-reviews section 69" not in normalized_summary_lower
         assert "codex next counter-reviews section 66" not in normalized_summary_lower
         assert "all six owner-named universes" in normalized_summary_lower
@@ -3417,3 +3440,128 @@ def test_section_69_guard_refuses_contradictory_authority(
     )
     with pytest.raises(AssertionError, match="contradictory section 69 authority"):
         test_section_69_review_records_the_exact_range_and_grants_nothing()
+
+
+def test_section_73_review_records_the_exact_range_and_grants_nothing() -> None:
+    """TPR-CR22: pin this review of the matched, Mia-recovery and cap-tilt rounds."""
+    section = _record_section(
+        "## 73. Claude independent review of the matched study, Mia recovery and cap-tilt rounds"
+    )
+    assert SECTION73_CODEX_RANGE in section
+    ordered_commits = tuple(
+        re.search(r"`([0-9a-f]{40})`", line).group(1)
+        for line in section.splitlines()
+        if re.match(r"[|] Codex commit [0-9]+ [|]", line)
+    )
+    assert ordered_commits == SECTION73_CODEX_COMMITS
+    assert ordered_commits == tuple(
+        _git_lines("rev-list", "--reverse", SECTION73_CODEX_RANGE)
+    )
+    dispositions = _bounded(
+        section,
+        "### 73.2 Commit-by-commit dispositions",
+        "### 73.3 P0-P3 ledger",
+        "section 73 dispositions",
+    )
+    rows = tuple(
+        (match.group(1), match.group(2).lower())
+        for line in dispositions.splitlines()
+        if (
+            match := re.match(
+                r"\| `([0-9a-f]{40})` \| \*\*([A-Za-z ]+)\*\* \|", line
+            )
+        )
+    )
+    assert rows == tuple(zip(SECTION73_CODEX_COMMITS, SECTION73_DISPOSITIONS)), (
+        "exact section 73 dispositions"
+    )
+    assert "Cumulative disposition: accepted after correction." in section
+    ledger = _bounded(
+        section,
+        "### 73.3 P0-P3 ledger",
+        "### 73.4 Independent reproduction and mutation evidence",
+        "section 73 ledger",
+    )
+    statuses = dict(
+        re.findall(r"^\| `(TPR-CR22-[0-9]{3})` \| P[0-3] \| \*\*([^*]+)\*\*", ledger, re.M)
+    )
+    assert statuses == {
+        "TPR-CR22-001": "Open",
+        "TPR-CR22-002": "Documented, not corrected",
+        "TPR-CR22-003": "Documented, not corrected",
+        "TPR-CR22-004": "Documented, not corrected",
+        "TPR-CR22-005": "Documented, not corrected",
+        "TPR-CR22-006": "Documented, not corrected",
+        "TPR-CR22-007": "Documented; owner question restated",
+        "TPR-CR22-008": "Closed by correction",
+        "TPR-CR22-009": "Documented",
+        "TPR-CR22-010": "Documented; owner attention",
+    }
+    register = _open_issue_register()
+    assert re.search(r"^\| `TPR-CR22-001` \|", register, re.M) is not None
+    assert "reproduce byte-for-byte" in " ".join(section.split())
+    authority = " ".join(
+        _bounded(
+            section,
+            "### 73.6 Milestone and authority decision",
+            "### 73.7 Recommendation to the owner",
+            "section 73 authority",
+        ).split()
+    )
+    for required in (
+        "canonical admission is not authorized",
+        "no real-row canonical D1 is authorized",
+        "Codex next counter-reviews section 73",
+        "further Object Store upload",
+        "QuantConnect launch",
+        "trading authority",
+    ):
+        assert required in authority, required
+    assert re.search(
+        r"(?:^|[.!?])\s*(?:canonical admission|real-row canonical D1|TPR-1|TPR-0B|live trading)\s+is\s+authorized\b",
+        authority, re.I,
+    ) is None, "contradictory section 73 authority"
+
+
+@pytest.mark.parametrize("commit", (SECTION73_CODEX_COMMITS[0], SECTION73_CODEX_COMMITS[5]))
+def test_section_73_guard_refuses_disposition_drift(monkeypatch, commit: str) -> None:
+    """Exercise the actual review pin after its unchanged record passes."""
+    test_section_73_review_records_the_exact_range_and_grants_nothing()
+    original_section = _record_section
+    section = original_section("## 73.")
+    original = f"| `{commit}` | **Accepted after correction** |"
+    assert section.count(original) == 1
+    mutated = section.replace(original, f"| `{commit}` | **Accepted** |", 1)
+    monkeypatch.setitem(
+        globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 73.")
+        else original_section(heading),
+    )
+    with pytest.raises(AssertionError, match="exact section 73 dispositions"):
+        test_section_73_review_records_the_exact_range_and_grants_nothing()
+
+
+@pytest.mark.parametrize(
+    "added_grant",
+    ["Canonical admission is authorized.", "Live trading is authorized."],
+)
+def test_section_73_guard_refuses_contradictory_authority(
+    monkeypatch, added_grant: str,
+) -> None:
+    """A recognized affirmative grant cannot coexist with the required refusal."""
+    test_section_73_review_records_the_exact_range_and_grants_nothing()
+    original_section = _record_section
+    section = original_section("## 73.")
+    mutated = section.replace(
+        "\n### 73.7 Recommendation to the owner",
+        f"\n{added_grant}\n\n### 73.7 Recommendation to the owner",
+        1,
+    )
+    assert mutated != section
+    monkeypatch.setitem(
+        globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 73.")
+        else original_section(heading),
+    )
+    with pytest.raises(AssertionError, match="contradictory section 73 authority"):
+        test_section_73_review_records_the_exact_range_and_grants_nothing()

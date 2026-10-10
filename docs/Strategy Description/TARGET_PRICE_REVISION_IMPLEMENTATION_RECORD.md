@@ -13068,3 +13068,112 @@ Main's focused reporter/strict-auditor/transport/document/import-boundary union
 runtime-root runner. No full lane/repository suite, actual operator-state/database
 or Windows custody test. Whitespace diff clean. The new metadata does not repair
 missing caps, change any execution economics or authorize another launch.
+
+New source commit48a1422ae4a5c2c78c817fc8ca08d067fcdf818a followed fresh
+root/Git/branch/HEAD/status/staged-diff and ACTUAL remotefa78 checks; no push.
+Fresh analysis-only scope004-analysis manifest
+bdb0a89aa29cb50493789d2711e0a09e44fe0e96b7767c9e46a65219080d8612
+pins23committed sources, unchanged rendered v3 bundle and an explicit original
+ON3/OFF1 collection file allowlist. Access and spent analysis claim preceded
+reads. No packet/provider/D0 read, cloud request, launch or new development look.
+
+`TPR-CAP-011` / P1 diagnostic interpretability — first original-object bound
+ON3 diagnostic-v2 call refused before performance reporting: native final-filled
+Market event omits BOTH orderFeeAmount and orderFeeCurrency, whereas351strategy
+filled events expose explicit numeric fee/USD fields. Retained source/result/log/
+order objects were not rewritten or rebound; diagnostic error receipt retained.
+Separate fee-shape claim60465707f472349fdb70682cb120cb0e4650a2256e96985960bc736f10afe843
+preceded aggregate key/type inspection; shape receipt
+9304f92f2eb598c33b9be53563e7c14810d99ef97e35651b1a4b5b33c91daaa0.
+Absence is NOT a literal observed zero or QCC fee. Old strict/reporting modules
+stay immutable; no cloud change or fourth ON attempt.
+
+`TPR-OWN-101` — before any performance read, add separately identified pure
+order/diagnostic-v3 successors. Bind original five objects before decode and
+inventory. Permit jointly absent fee keys only for the tightly typed final-tagged
+RAW/full negative Filled native Market shape; one-sided/null/ambiguous fee data
+remain refused. Retain all frozen order/timing/currency/fee discrepancies;
+explicitly separate observed numeric fees from unknown native-event fee fields,
+with all-native fee total None if any unreported. Original source-bound runtime
+summary and native fee-stat crosschecks are attributed evidence, not substituted
+fee rows. No inferred USD/QCC/zero, raw receipt repair, global monkeypatch,
+engine-tag custody assertion, changed economics, pair admission or alpha claim.
+Preserve full60NAV/calendar and observed-subset metadata; all gates remain false.
+Reporting-only agent choice pending Claude review, not new backtest authority.
+
+Fresh own-order metadata claima1161ce644f76e0455f32b8009cef0c90ad69d476290c8dfe4199c99b207ece4
+and receipt836328427c1c9b0a79fdd0f8185ff6e50f42cb7ab96fe8a538b479a67bdeab91
+confirm one final-tagged Market0/RAW0/Filled3 order in EACH arm. Both its order
+priceCurrency and filled-event fillPriceCurrency are explicit empty strings;
+isAssignment is false and both fee keys absent. No prices, quantities, identities
+or performance were emitted. Extend CAP011/OWN101 before performance read:
+retain this tightly typed unknown monetary-unit shape as unqualified diagnostic
+only; all-native USD notional/turnover and fees stay None if any unit/fee is
+unreported, while explicitly observed USD subtotals/counts remain separate.
+No absent/empty currency becomes USD, QCC or zero. Full NAV metrics are the
+source-bound native account valuation trail, not complete API monetary-fill
+reconciliation. No fourth ON run or cloud strategy change is authorized.
+
+Public-primary-source Codex peer inspection explains a compatible serialization
+mechanism, not cloud attestation: [SerializedOrderEvent](https://github.com/QuantConnect/Lean/blob/master/Common/Orders/Serialization/SerializedOrderEvent.cs)
+defines nullable fee amount/string currency with DefaultValueHandling.Ignore;
+constructor sets them only for currency other than NullCurrency. This tests
+currency, NOT amount. [OrderEventJsonConverter](https://github.com/QuantConnect/Lean/blob/master/Common/Orders/Serialization/OrderEventJsonConverter.cs)
+uses that DTO; [OrderFee.Zero](https://github.com/QuantConnect/Lean/blob/master/Common/Orders/Fees/OrderFee.cs)
+constructs0/NullCurrency, and [Currencies](https://github.com/QuantConnect/Lean/blob/master/Common/Currencies.cs)
+defines NullCurrency as QCC. [OrderEvent.FromSerialized](https://github.com/QuantConnect/Lean/blob/master/Common/Orders/OrderEvent.cs)
+uses Zero as a deserialization default for absent amount, which is NOT an
+observed wire amount. [Official orders API](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/backtest-management/read-backtest/orders)
+enumerates fields without attesting this cloud serializer version or missing-key
+semantics. Thus missing both fee fields never proves a literal API zero/QCC.
+Peer had no private/authenticated API/job access; retain the missing evidence.
+
+`TPR-CAP-012` / P2 — new unexecuted native-order diagnostic draft wrongly
+equated event id with integer orderEventId. Fresh bounded own-key/domain claim
+428e63dfb4a7eb9d061f41bcbde9e8e87b9aaf150c3278e03de119c72e717ba4,
+receipt ea17c6172540c95596ff3c5924e96f77dd087cecd5ef98d6dfe4b93f26d3a199,
+proves ON3's352filled event ids are strings, distinct from integer orderEventId,
+and equal the exact algorithmId-orderId-orderEventId triplet. Separate job-binding
+claimdc14e52afa3f011566d7aa1e7cdfe94ef83398b0206fcaec98d6678c93cb8649 /
+receipt3397c9054d0de0c4ff9da70d6127903b88602ee469672b08c0c535e1f7cde986
+independently verifies BOTH ON352/OFF309 filled-event algorithmIds match the
+original source-receipt backtest_id and all exact triplets. Only aggregate
+booleans/types/counts emitted, no IDs/rows/returns. Public serializer's Id
+getter confirms that distinct string domain, not arbitrary integer equivalence;
+cloud-version attestation is still not inferred. Correct the successor before
+use with exact job/order/event triplet binding and preserved integer alias
+fixture semantics, never weakening duplicate/mis-bound identity refusal.
+
+Diagnostic-v3 new pure source0ad8ff59c09489cb2ccea12822a2be2e94a2d7ba36fc70b632e95abc0fa5f0f3
+and testsbc8bddbc44b067075ace936f593e7107f524769307aa153f99a0b44b2a8ed272
+directly bind original config/source/evidence before decode/inventory; old
+diagnose functions are NOT called/caught/repaired. New helper interprets original
+pages/receipt/summary/config unchanged. Full60NAV uses the original accounting
+function/calendar and exact runtime residuals; observed13 paths stay separately
+labeled. All-native fees/USD notional/turnover remain None when the native final
+fill omits fee/unit fields. Observed-USD-only turnover is explicitly named.
+Runtime SUMMARY fees/residuals are attributed, not evidence of the absent API
+amount/unit. Every execution/acceptance/pair/alpha/sleeve-PnL gate stays false.
+
+Author's53new focused tests passed0.86s, compatibility union379passed2.59s;
+13in-memory negative variants37red/74restoredgreen covered original object/source
+binding, original summary passthrough, zero-fee reconstruction, observed-notional
+promotion, runtime fee attestation, counter rewrite, hidden coverage gap, true
+gates, reduced NAV calendar and terminal/error-field ambiguity. Main reproduced
+596passed/1existingplatformskip in4.74s with document/import checks under49/52
+isolation. No private empirical/API access by authors/peer, no old source edit,
+complete suite or Windows custody claim. Final helper release/peer checks below
+precede any performance interpretation.
+
+Final new native-order helper314677df4f5eb8d6f6de16c52b67f42e9061169b2af7cafb029404654cf9a6ab
+and testsc15798ab1f725b35f8fdc9a2ea1a9ff2c7a0eaf725c15f396f8952a375a1dfac
+released unchanged after101focused passes0.29s /154helper+wrapper passes0.72s.
+Nine author's clean-first in-memory red/restored-green variants prove unknown-fee
+and unknown-unit totals, assignment/exception closure, exact composite ID/job
+binding, status type, overfill and rejection of the old integer/composite domain
+mistake. Initial6failed/93passed were test formatting expectations0.10versus
+unchanged canonical0.1, corrected in tests only. CAP012 corrected before empirical
+use. Main reproduced final697passed/1existingplatformskip in4.61s with relevant
+reporting/audit/codec/document/import checks; syntax without cache writes and
+whitespace clean. Earlier696/1 was before one added job-binding test, not a
+production change. No complete suite or actual operator/Windows-custody read.

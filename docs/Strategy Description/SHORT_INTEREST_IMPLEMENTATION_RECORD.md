@@ -2,10 +2,14 @@
 
 Status: **OWNER'S 2026-10-10 "PROCEED WITHOUT REVIEW" WAIVES THIS ROUND'S
 COUNTER-REVIEW OF THE SOLE RECORD-ONLY CLAUDE COMMIT `90e0d568`; NO CODEX
-ACCEPTANCE OR NEW INDEPENDENT REVIEW IS CLAIMED. SECTION 106 FREEZES A NEW
-OUTCOME-FREE FINRA HISTORICAL/TRADING-STOP AND RAW-SYMBOL CALIBRATION BEFORE
-RETRIEVAL. THE ORIGINAL 48/36-CELL SOURCE DIAGNOSTIC AND ALL ITS MISSING
-CELLS REMAIN UNCHANGED. CURRENT PUBLIC SHARADAR DOCUMENTATION IDENTIFIES A
+ACCEPTANCE OR NEW INDEPENDENT REVIEW IS CLAIMED. SECTION 106 COMPLETES A
+PROSPECTIVELY FROZEN, OUTCOME-FREE FINRA CALIBRATION: 10/18 HISTORICAL CELLS
+PRESENT, 8 MISSING; ONE RAW FORMAT (`BRKB`) PRESENT, FOUR MISSING. ALL SEVEN
+QUERIES COMPLETE WITH EIGHT SOURCE POSTS, RETAINED FAILED EVIDENCE AND
+EXPLICIT HTTP-204/EMPTY-CONTENT LINEAGE. NO ALIAS/PIT/COVERAGE ADMISSION.
+363 FOCUSED CHECKS PASS; FOUR DRAFT/TRANSPORT ISSUES CORRECTED. THE ORIGINAL
+48/36-CELL DIAGNOSTIC AND ALL ITS MISSING CELLS REMAIN UNCHANGED.
+CURRENT PUBLIC SHARADAR DOCUMENTATION IDENTIFIES A
 PLAUSIBLE COMPANION ROUTE, BUT THE PREVIOUSLY NAMED LOCAL CAPTURE IS ABSENT
 TODAY AND CURRENT ACCOUNT ROUTE/ENTITLEMENT IS NOT VERIFIED. ACTUAL BACKTEST
 READINESS IS NOT CLAIMED. HISTORICAL IDENTITY, COMPANION/TERMINAL COVERAGE,
@@ -215,6 +219,8 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-09 | Claude review | `f75d8d8` -> `156facd` reviewed from the published head; **no code or test correction**; this record commit is the only Claude commit | Independent review of FINRA Public activation and the first bounded FINRA-only SI source qualification | Verified the freeze preceded every retrieval, network code is confined to the script, credentials and token never persist, and the report holds counts and hashes only. Rebuilt the report byte for byte from the protected raw pages and matched all receipt hashes, printing no quantities. Ran five in-memory mutants of the capture and qualification guards; all red. | Pushed tree `156facd`, clean, Codex idle, network-denied, empty environment: new FINRA files, package-scanning lane files, active-document and ML boundary **535 passed** (111 new FINRA cases; no skips or warnings); mutants F1-F5 red, baseline 35 passed; compileall exit 0; final-tree active-document 69 passed; `git diff --check` clean. No network request by Claude. **Authorized looks 0, consumed looks 0**. | `SI-CR20-001` (P3, open: the sentinel sample cannot measure delisted coverage; 12 missing cells are pre-2026 delistings and 4 are a BRK.B symbol question). Codex's `SI-FINRA-001..004` accepted, two reproduced. `SI-CR19-003`, source P2s, shared P2 and `SI-CR15-001` open. | Codex counter-reviews this record commit. Decide whether a pre-delisting FINRA sample is needed. Every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
 
 | 2026-10-10 | Codex owner-waived continuation | Clean local/tracking/actual remote `90e0d568`; prospective code/record freeze follows | Historical latest-revised source calibration and public companion-route qualification | Owner explicitly waived the pending record-only counter-review; no disposition assigned. Freeze separate 18-cell historical and 5-cell raw-format panels before source retrieval; preserve original diagnostic. | Focused validation and actual capture result appended in section 106 before the single final push. No outcome look or QC attempt. | Historical ledger retained, including SI-CR20-001; source/companion factual gates cannot be waived into facts. | Execute only the frozen licensed FINRA SI calibration after the clean committed freeze. Establish current Sharadar secure location/route and metadata before companion retrieval; no actual-input override. |
+
+| 2026-10-10 | Codex source calibration completion | `90e0d568` -> `902b3169` freeze -> `1c8de172` status evidence -> `217e05fa` empty-transport correction; this closing record follows | Complete frozen historical/raw-format calibration; current companion-access factual stop | Seven ordered queries complete: 10/18 historical cells and 1/5 format cells valid, all 12 missing explicit, no duplicate/malformed/ambiguous rows. Three OAuth, two metadata and exactly eight source POSTs; immutable failed run and status diagnostic retained. BRKB is observed raw spelling only, not selected alias/identity. | Main focused **363 passed in 6.04s**, network denied; material red/green corrections, targeted compilation and exact lineaged report rebuild/private permissions passed. Closing document/privacy/diff/status checks in 106.8. Canonical/exploratory/QC zero counters unchanged. | SI-FINRA-CAL-001..004 corrected; SI-CR20-001 interpretation addressed only, not universal coverage. Historical source/shared P2s and prospective P3s retained. No counter-review disposition assigned to waived Claude commit. | One final non-force lane push. Current Sharadar secure location/account route needed before companion entitlement/schema/action/coverage qualification, then actual-input/evaluation/look/QC gates. No new monitor or further source POST. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -15095,3 +15101,109 @@ capture **74 in 0.68s**. A helper run during the other helper's protocol/hash
 edit saw **39 passes / 33 hash-guard failures**; that transient, mixed-draft
 run is excluded, not reported as a provider/product defect or accepted test
 run. The stable combined 363-case result is main's own final code validation.
+
+### 106.8 Completed lineaged calibration, final ledger and next factual action
+
+Transport correction commit
+**`217e05fa1641c501b91a84ea54ad9c24aaf39c64`** precedes source POST **8**.
+Final capture **`finra-calibration-lineaged-20261010T202216Z`** stores the
+prospective new protocol/code binding, immutable source lineage, fresh
+production metadata, final format raw page/transport and complete report.
+Five original HTTP-200 pages remain in the refused run. Sixth-query empty
+content is derived from the independently authenticated 204/zero-total
+receipt and HTTP semantics, explicitly labelled **body not read**. The final
+format query returns HTTP 200 with one received/total row. No JSON array,
+quantity or row is synthesized for the empty sixth query; neither failed
+capture nor status diagnostic is relabelled successful or overwritten.
+
+The lineaged report completes all **seven** ordered queries. Results:
+
+| Frozen panel | Actual result |
+|---|---|
+| 18 historical raw-symbol/date cells | **10 valid / 8 missing**; no malformed, duplicate or ambiguous cells. FRC present on the first five dates, SIVB on October/November 2022 and February/March 2023, TWTR on October 14, 2022 only. This is limited raw-symbol presence, not a general delisted universe. |
+| 5 independent raw-format cells | **BRKB valid / other four missing** at June 30, 2026. This resolves which of these five raw probes returned a row on this query; it does not select an alias, verify issue identity or establish a permanent mapping. |
+| All 23 cells | **11 valid / 12 missing**; 11 raw rows, zero refused/unidentifiable rows, zero R/S flags; 4 NNM and 7 NYSE raw class assertions, all 11 previous fields present. No nonadjacent continuity/quantity comparison. |
+
+`query_capture_complete` is **true**; `all_cells_present_valid` is **false**.
+Missing cells stay in both denominators, not short-position zeros. FINRA
+records can persist after a halt (the SIVB March 15 sentinel); trading stop,
+suspension, legal delisting, raw-symbol disappearance and economic terminal
+cashflow are different events. No historical availability or terminal
+economics follows from this presence test. The strict canonical and separate
+latest-revised exploratory study boundaries remain unchanged.
+
+Exact whole-round network accounting is **three OAuth POSTs, two production
+metadata GETs and eight source POSTs**: initial six-attempt partial run,
+one identical status-only diagnostic, one originally frozen format query.
+The final metadata hash equals the earlier schema witness. The eight-source
+allowance is exhausted; **no further provider row request occurs this round**.
+Five additional public Sharadar schema GETs belong to the separately
+attributed read-only helper, with no account or data-row access.
+
+Main independently rebuilt the report from all original raw hashes and the
+explicit zero-content/final-page lineage. Canonical bytes exactly equal
+`calibration.json`; every file in all three capture directories is owned,
+non-symlink, 0600, with owned non-symlink 0700 directories. No raw market row,
+credential/token/Authorization/account value is in Git or public output.
+
+| Final evidence | SHA-256 |
+|---|---|
+| Canonical corrected technical protocol | `fdf25f4fcf1b20b52f98ba3c57f9618b2548fdc356a0a1303169fcffea41486b` |
+| Raw protocol file | `ab9898c6e81f331cd2ad5db679f02e8f82c8757b0f043b1a930ad08bb30e122e` |
+| Start/code binding file | `04bb5d298e303af6b3df230a3811c7f3f2367f76217a8ee5d91781fa9a26de0c` |
+| Production metadata | `12b4459b02ee2cb2ef5b08b8ea12cad78f7fb1d8268afee24af59b9229e75cd9` |
+| Source POST 8 transport | `dd293853438ea4a32e14b546e1232e028ee950b0d544006c54c8409ff77572d2` |
+| Immutable lineage file | `938b46f35fab46d9ced39fb4723004fc8201503d62d2e4b814d04b9896ed70fa` |
+| Calibration report file | `9a29a40374391315469faefa16205f43fe983cdee4ac73dd55cea7c85327e3cc` |
+| Canonical report payload | `576623a6bda46ca668d3d7531e16c40abf826d4a0b46d04d01c7b80d0f00b118` |
+| Typed source-record set | `4c27ff72921f0a0df04447c689be941f3471ba48558b34cc0458e861e5522302` |
+| Independent status-only diagnostic | `2470e8b71d1ee1e1e7b55044a061ffa0cd5c75a642187241a8f355c49d1955ad` |
+| Retained original failure record | `08fe99faba13388859041399beb3bf218765db6cccffdebf52576dd2ea0abcca` |
+
+| ID | Final priority / disposition | Follow-up evidence |
+|---|---|---|
+| `SI-FINRA-CAL-001..004` | P3 confirmed / corrected and validated | Approved import dependency, report-order/repeated-page binding, safe status retention and narrow verified empty transport all have material red/green evidence above. Original refused evidence is immutable. |
+| `SI-CR20-001` | P3 interpretation / addressed and closed **only as that note** | Old 2026 sentinel is explicitly not a delisted-coverage test; frozen historical and spelling probes separately completed. Broad historical identity/coverage and alias admission remain unresolved source P2 facts, not closed by this note. No Codex counter-review of Claude's commit is claimed. |
+| Source P2s / shared P2 / prospective P3s | Retained / open | `SI-SRC-20260928-001..003`, `SI-CR5-005` / `SI-CCR16-007`, `SI-CR19-003` and `SI-CR15-001` retain their factual/process scope. No shared correction or empirical look. |
+| All historical confirmed/partial/false-alarm findings | Retained unchanged | Sections 1–105 and all pre-existing ledger rows preserve their exact bytes, except the permitted current status header and appended rows. |
+
+**Next factual prerequisite:** current secure Sharadar credential location/
+environment-variable name and actual account route. The supplied capture
+parent is absent; specifically named `SHARADAR_API_KEY`,
+`NASDAQ_DATA_LINK_API_KEY` and `QUANDL_API_KEY` are not populated in this
+runtime. No broad secret search is made. The request to the owner is for a
+**location/name, never the key**; there is no further routine owner approval
+or institution affiliation demand. Once available, authenticate the existing
+companion entitlement/schema/action dictionary, freeze a coverage-only
+sample and matching rules before companion retrieval, then qualify identity,
+prices/volume/actions/terminal and denominator inputs through that actual
+route. Keep any private data-usability evaluation out of public Git/chat.
+Actual outcome joins still require input binding, prospective evaluation/
+power/date/permanent-look registration and the exact processing/QC route.
+
+The requested review waiver is exercised, and this bounded actual source
+milestone is complete. **The lane is not ready for an actual historical
+backtest**: missing companion access/facts are not manufactured, and the
+strict canonical study still lacks originals/all-corrections and actual
+availability clocks. Canonical actual looks **0/0**, exploratory actual looks
+**0**, alpha **0**, permanent look IDs **none**, QC attempts **0**. No price/
+volume/return/denominator/outcome/holdout, QC history/project/processing/
+upload/compile/job/backtest, email/monitor, new terms/purchase, ranking/seed,
+ETF, broker/operator database, deployment, paper/live, capital, actual order
+or trading access occurs. Shared/project-wide files and SESSION_HANDOFF are
+frozen. Every exercised approval/decision is inventoried in 106.4/106.6/106.7.
+
+Final code validation is main's **363 passed in 6.04s**, not a complete
+lane/repository suite or Claude's execution. Closing record-only document,
+privacy, historical preservation, code identity, diff/status and remote
+checks are rerun before publication; final hash/equality are reported in
+chat rather than predicted here. Under section 81 / SI-AUTH-20261005-02,
+make exactly **one** combined final non-force push, only
+`HEAD:refs/heads/codex/strategy-short-interest`, follow-tags disabled.
+Reverify roots/branch/HEAD/status and actual matching remote before closing
+commit/push, then clean local/tracking/actual-remote equality afterward.
+Review notes for the new four-commit range begin at **`90e0d568`**:
+prospective freeze `902b3169`, status-evidence correction `1c8de172`,
+empty-transport correction `217e05fa`, and this closing handoff. These are
+implemented/validated, **not independently accepted**. No monitor is rearmed
+and no review checkpoint is imposed contrary to the owner's current waiver.

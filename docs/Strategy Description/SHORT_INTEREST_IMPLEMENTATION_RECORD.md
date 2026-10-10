@@ -15015,3 +15015,83 @@ network denial, zero skip/warning/error. Four-file compilation and diff
 checks pass. Helper's separate 55-case green retains helper attribution.
 `SI-FINRA-CAL-003` is **corrected and validated** before the deliberate
 diagnostic; original failed-run status remains unknown, not backfilled.
+
+### 106.7 Verified zero-content transport and bounded final-query continuation
+
+The status-only diagnostic after correction commit
+**`1c8de172dd0580cac45fabd2ec57af2399ad26bc`** succeeded. Its identical
+`hist-2023-05-15` request returned **HTTP 204**, **Record-Total 0 / Offset 0 /
+Limit 100 / Max-Limit 5000 / Data-Version 1**; optional page-count and
+Content-Length absent. The body was **not read**. Protected diagnostic
+start/attempt/result receipts identify this as source POST **7**, not a
+completed calibration report or a retry loop. The initial failed attempt's
+unknown status remains unknown; the new response is a separate observation.
+
+This supplies a narrow authenticated empty-result contract: HTTP no-content
+plus explicit zero total/offset and verified dataset version, not an
+inference from an absent ticker or an arbitrary non-200. Main's fabricated
+inline replay of that exact header shape went red under the blanket 200-only
+guard. The next transport correction permits **only** 200 strict JSON arrays
+or 204 with empty content and all required zero/header proof; nonzero totals,
+wrong/missing version/offset/limits, nonempty bodies, other statuses and
+invalid optional counts still refuse. Empty transport is preserved as
+**`b''`**, never a fabricated JSON `[]`, row or quantity. All missing cells
+stay missing, never short-position zero.
+
+* **SI-DEC-20261010-07:** the newly observed zero-total/version proof
+  supersedes subsection 106.6's no-further-continuation choice, but not its
+  eight-POST bound or immutable failed evidence. Correct only the safe
+  no-content false refusal; retain the original protocol hash and append the
+  explicit transport-rule erratum/new technical hash before the final query.
+  Date/symbol/field selection, 18/5 denominators, quantity semantics and
+  research authority remain unchanged.
+* **SI-DEC-20261010-08:** use the **sole remaining source POST (number 8)**
+  for the already frozen `format-2026-06-30` request. No historical replay,
+  new spelling/date, extra page, automatic retry or third acquisition loop.
+  Combine the original five successful raw pages, independently observed
+  zero-content sixth query and final format page into a **new** protected
+  lineaged report. Preserve the failed run/diagnostic and their original code/
+  protocol hashes; never overwrite them or label them a successful run.
+
+For the zero-content query, the new report's empty-content representation is
+derived from authenticated HTTP 204/zero-total semantics; the diagnostic
+body was not read. Its lineage must label that distinction rather than claim
+that a JSON array or raw payload was downloaded. The next format raw page
+is captured normally, with exact fields, query/hash/headers and private
+storage. The new report is a source-only calibration, not stable-identity,
+historical-completeness/PIT or empirical source admission.
+
+| ID | Priority / disposition | Evidence and correction |
+|---|---|---|
+| `SI-FINRA-CAL-004` | P3 confirmed safe false refusal / correction being validated | Authenticated 204 with zero total/offset and version 1 refused by 200-only guard; main's fabricated exact-shape probe red. Admit only the narrow empty-transport proof, not missing quantities or arbitrary non-200. New technical protocol hash and closing tests follow. |
+
+New code/hash is committed before source POST 8. Its actual result, immutable
+lineage, focused validation and final factual blocker are appended below.
+Standing delegation does not turn the unavailable Sharadar key/location,
+account entitlement, historical companion coverage or QC route into facts.
+
+The technical transport erratum adds only `http_response_rule` to the frozen
+protocol. New canonical SHA-256:
+**`fdf25f4fcf1b20b52f98ba3c57f9618b2548fdc356a0a1303169fcffea41486b`**.
+Original hash **`2185f7dc...`** and code heads remain in every earlier
+immutable receipt. This is an engineering acceptance-rule correction, not
+post-data selection of dates/names, quantity tolerance, hypothesis, outcome
+sample or lookback. Raw-query bodies and all scientific denominators are
+byte-identical; only the authenticated empty-transport case changes.
+
+HTTP 204 contains no message content under
+[RFC 9110 section 15.3.5](https://www.rfc-editor.org/rfc/rfc9110.html#name-204-no-content).
+The sixth query's derived empty-content representation is explicitly bound
+to the independent status/zero-total receipt; it is **not** claimed to be a
+downloaded JSON page or read body. No missing short quantity is imputed.
+
+Main's corrected combined focused selection passed **363 in 6.04s**:
+**89** pure-calibration, **74** calibration capture, **111** unchanged v1
+source/capture and **89** boundary/document cases. Same 3.13.15 runtime,
+network denial, empty environment, no skip/warning/error. Targeted
+compilation passes. `SI-FINRA-CAL-004` is **corrected and validated** before
+source POST 8. Helpers separately passed pure+boundary **90 in 0.96s** and
+capture **74 in 0.68s**. A helper run during the other helper's protocol/hash
+edit saw **39 passes / 33 hash-guard failures**; that transient, mixed-draft
+run is excluded, not reported as a provider/product defect or accepted test
+run. The stable combined 363-case result is main's own final code validation.

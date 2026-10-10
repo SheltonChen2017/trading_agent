@@ -43,17 +43,38 @@ class _SourceHTTPRefusal(CaptureRefusal):
 
 
 def _source_request(opener, request, maximum: int):
-    """Bound a source response; non-200 bodies and headers are withheld."""
+    """Bound a 200 response or a verified, genuinely empty 204 response.
+
+    A 204 is a zero-record transport observation only, not fabricated JSON
+    rows or evidence of source/coverage/alias admission. Other responses refuse.
+    """
     with opener.open(request, timeout=30) as response:
         status = response.status
         if type(status) is not int or not 100 <= status <= 599:
             raise CaptureRefusal("source_http_status_invalid")
         if status != 200:
-            raise _SourceHTTPRefusal(status)
+            if status != 204:
+                raise _SourceHTTPRefusal(status)
+            try:
+                zero_contract = (
+                    _integer_header(response.headers, "Record-Total") == 0
+                    and _integer_header(response.headers, "Record-Offset") == 0
+                    and _integer_header(response.headers, "Record-Limit") == 100
+                    and _integer_header(response.headers, "Record-Max-Limit") >= 100
+                    and response.headers.get("Data-Version") == "1"
+                    and (response.headers.get("Total-Records-On-Page") is None
+                         or _integer_header(response.headers, "Total-Records-On-Page") == 0)
+                )
+            except CaptureRefusal:
+                raise _SourceHTTPRefusal(status) from None
+            if not zero_contract:
+                raise _SourceHTTPRefusal(status)
         raw = response.read(maximum + 1)
+        if status == 204 and raw != b"":
+            raise _SourceHTTPRefusal(status)
         if len(raw) > maximum:
             raise CaptureRefusal("response_size_limit")
-        return raw, response.headers
+        return raw, response.headers, status
 
 
 def _budget(value: int) -> int:
@@ -131,7 +152,7 @@ def _capture(directory: Path, credentials: tuple[str, str], opener, *,
             if before_data_request is not None:
                 before_data_request()
             try:
-                raw, response_headers = _source_request(opener, request, 1048576)
+                raw, response_headers, http_status = _source_request(opener, request, 1048576)
             except Exception as error:
                 failure = {"source_request_number": source_requests, "query_id": query_id,
                            "offset": offset, "request_sha256": request_sha,
@@ -153,17 +174,18 @@ def _capture(directory: Path, credentials: tuple[str, str], opener, *,
                 "source_request_number": source_requests, "query_id": query_id,
                 "request_sha256": request_sha, "response_raw_sha256": hash_bytes(raw),
                 "request_started_utc": started, "response_completed_utc": completed,
-                "http_status": 200, "pagination_headers": pagination_headers,
+                "http_status": http_status, "pagination_headers": pagination_headers,
             })
-            rows = _decode(raw)
+            rows = [] if http_status == 204 else _decode(raw)
             if not isinstance(rows, list):
                 raise CaptureRefusal("pagination_contract")
             count = len(rows)
-            page_count_origin = "exact_json_array_length"
+            page_count_origin = "verified_empty_204_transport" if http_status == 204 else "exact_json_array_length"
             if response_headers.get("Total-Records-On-Page") is not None:
                 if _integer_header(response_headers, "Total-Records-On-Page") != count:
                     raise CaptureRefusal("pagination_contract")
-                page_count_origin = "header_verified_against_exact_json_array_length"
+                if http_status == 200:
+                    page_count_origin = "header_verified_against_exact_json_array_length"
             found = _integer_header(response_headers, "Record-Total")
             reported_offset = _integer_header(response_headers, "Record-Offset")
             limit = _integer_header(response_headers, "Record-Limit")
@@ -185,14 +207,15 @@ def _capture(directory: Path, credentials: tuple[str, str], opener, *,
             seen.add(digest)
             pages.append(calibration.CapturedFinraCalibrationPage(
                 query_id=query_id, offset=offset, total=total, limit=limit,
-                max_limit=maximum, data_version="1", request_sha256=request_sha, raw=raw))
+                max_limit=maximum, data_version="1", request_sha256=request_sha, raw=raw,
+                http_status=http_status))
             receipts.append({
                 "file": name, "raw_sha256": digest, "request_sha256": request_sha,
                 "source_request_number": source_requests, "query_id": query_id,
                 "request_started_utc": started, "response_completed_utc": completed,
                 "settlement_date": query["settlement_date"], "offset": offset,
                 "records": count, "total": total, "data_version": "1",
-                "page_count_origin": page_count_origin,
+                "http_status": http_status, "page_count_origin": page_count_origin,
             })
             offset += count
             if offset == total:

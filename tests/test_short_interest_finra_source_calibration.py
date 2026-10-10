@@ -30,12 +30,14 @@ def _rows(query: dict) -> list[dict]:
     } for symbol in query["raw_symbols"]]
 
 
-def _bound(query_id: str, rows: list, *, offset: int = 0, total: int | None = None, raw: bytes | None = None):
+def _bound(query_id: str, rows: list, *, offset: int = 0, total: int | None = None,
+           raw: bytes | None = None, http_status: int = 200):
     return CapturedFinraCalibrationPage(
         query_id=query_id, offset=offset, total=len(rows) if total is None else total,
         limit=100, max_limit=5000, data_version="1",
         request_sha256=hash_payload(calibration_request(query_id, offset)),
         raw=canonical_json(rows).encode() if raw is None else raw,
+        http_status=http_status,
     )
 
 
@@ -347,3 +349,88 @@ def test_noncanonical_or_subclassed_report_cannot_substitute():
         pass
     with pytest.raises(FinraSourceCalibrationError, match="exact canonical"):
         Subclass(canonical_json(payload))
+
+
+def test_204_requires_header_proven_zero_rows_and_preserves_actual_empty_digest(monkeypatch):
+    pages = list(_pages())
+    pages[5] = _bound(pages[5].query_id, [], raw=b"", http_status=204)
+    original_json = calibration._v1._json
+    def no_empty_json(blob):
+        assert blob != b"", "204 bytes must not be parsed or replaced with invented JSON"
+        return original_json(blob)
+    monkeypatch.setattr(calibration._v1, "_json", no_empty_json)
+    report = _result(tuple(pages))
+    descriptor = report["pages"][5]
+    assert descriptor["http_status"] == 204
+    assert descriptor["row_count"] == descriptor["total"] == descriptor["offset"] == 0
+    assert descriptor["raw_sha256"] == hash_bytes(b"")
+    assert descriptor["raw_sha256"] != hash_bytes(b"[]")
+    assert report["cell_status_counts"]["historical"]["missing"] == 3
+    assert report["totals"]["valid_cells"] == 20
+    assert report["query_capture_complete"] is True
+    assert report["all_cells_present_valid"] is False
+    assert report["authority"]["source_admitted"] is False
+
+
+def test_all_zero_proven204_queries_keep_the_full_missing_denominator():
+    pages = tuple(_bound(query["query_id"], [], raw=b"", http_status=204)
+                  for query in calibration_protocol()["queries"])
+    report = _result(pages)
+    assert report["totals"]["raw_rows"] == 0
+    assert report["cell_status_counts"]["historical"]["missing"] == 18
+    assert report["cell_status_counts"]["format"]["missing"] == 5
+    assert all(page["http_status"] == 204 for page in report["pages"])
+
+
+@pytest.mark.parametrize("changes", [
+    {"raw": b"[]"}, {"raw": b"\n"}, {"raw": b"[{\"x\":1}]"},
+    {"total": 1}, {"offset": 1}, {"total": None}, {"offset": None},
+    {"total": False}, {"offset": False}, {"limit": 99}, {"max_limit": 99},
+    {"data_version": "2"}, {"data_version": None},
+])
+def test_204_nonempty_stale_or_unproven_header_combination_refuses(changes):
+    page = _bound("hist-2023-05-15", [], raw=b"", http_status=204)
+    with pytest.raises(FinraSourceCalibrationError):
+        replace(page, **changes)
+
+
+@pytest.mark.parametrize("status", [201, 202, 206, 400, 404, 500, True, False, "204", None])
+def test_other_http_status_or_noninteger_status_is_never_zero_record_proof(status):
+    with pytest.raises(FinraSourceCalibrationError, match="HTTP status"):
+        replace(_pages()[0], http_status=status)
+
+
+def test_200_empty_body_still_requires_actual_JSON_array():
+    pages = list(_pages())
+    pages[5] = _bound(pages[5].query_id, [], raw=b"", http_status=200)
+    with pytest.raises(FinraSourceCalibrationError):
+        _result(tuple(pages))
+
+
+@pytest.mark.parametrize("changes", [
+    {"raw_sha256": hash_bytes(b"[]")}, {"raw_sha256": "f" * 64},
+    {"http_status": 200}, {"http_status": True}, {"http_status": "204"},
+    {"offset": 1}, {"total": 1}, {"row_count": 1}, {"limit": 99}, {"max_limit": 99},
+])
+def test_report_revalidates204_proof_after_rehash(changes):
+    pages = list(_pages())
+    pages[5] = _bound(pages[5].query_id, [], raw=b"", http_status=204)
+    payload = _result(tuple(pages))
+    payload["pages"][5].update(changes)
+    with pytest.raises(FinraSourceCalibrationError):
+        _rehash(payload)
+
+
+def test_report_cannot_omit_http_status_from_zero_record_proof():
+    payload = _result(_pages(empty=True))
+    payload["pages"][5].pop("http_status")
+    with pytest.raises(FinraSourceCalibrationError, match="page schema"):
+        _rehash(payload)
+
+
+def test_transport_erratum_is_explicit_but_scientific_request_and_cells_are_unchanged():
+    protocol = calibration_protocol()
+    assert protocol["http_response_rule"] == "200_strict_JSON_array_or_204_exact_empty_body_zero_total_zero_offset_required_pagination_headers_v1"
+    assert protocol["expected_cells"] == 23 and protocol["maximum_source_posts"] == 8
+    assert protocol["requested_fields"] == list(calibration._v1.FIELDS)
+    assert protocol["authority"]["actual_outcome_looks"] == 0

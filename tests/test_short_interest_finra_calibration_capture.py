@@ -362,8 +362,11 @@ def test_external_failure_text_is_never_printed(monkeypatch, tmp_path, capsys):
     assert json.loads(printed)["reason"] == "RuntimeError"
 
 
-def test_cli_complete_publishes_bound_code_protocol_report_and_final_guard(monkeypatch, tmp_path, capsys):
-    opener = Opener(complete_responses())
+@pytest.mark.parametrize("http_status", [200, 204])
+def test_cli_complete_publishes_bound_code_protocol_report_and_final_guard(monkeypatch, tmp_path, capsys, http_status):
+    fabricated_responses = complete_responses() if http_status == 200 else responses(
+        *(Response(b"", headers(total=0, count=0), status=204) for query in queries()))
+    opener = Opener(fabricated_responses)
     guarded = []
     monkeypatch.setattr(capture, "_guard_lane", lambda root, head: guarded.append((root, head, len(opener.requests))))
     monkeypatch.setattr(capture, "_git", lambda root, *args: args[-1])
@@ -385,6 +388,7 @@ def test_cli_complete_publishes_bound_code_protocol_report_and_final_guard(monke
     assert start["no_outcomes"] is True
     assert transport["retrieval_complete"] is True
     assert len(transport["pages"]) == 7
+    assert all(page["http_status"] == http_status for page in transport["pages"])
     assert result["calibration_file_sha256"] == capture.hash_bytes((directory / "calibration.json").read_bytes())
     assert guarded[0][2] == guarded[1][2] == 0  # clean head before credential use/auth
     assert [item[2] for item in guarded[2:-1]] == list(range(2, 9))
@@ -457,6 +461,13 @@ def test_source_http_helper_preserves_response_size_bound():
     assert len(opener.requests) == 1
 
 
+def test_source_http_helper_preserves_200_bytes_headers_and_status():
+    transport = headers(total=0, count=0)
+    opener = Opener([Response(b"[]", transport)])
+    assert capture._source_request(opener, capture.urllib.request.Request(capture.DATA_URL), 4) == (b"[]", transport, 200)
+    assert len(opener.requests) == 1
+
+
 @pytest.mark.parametrize("status", [True, None, "fabricated-provider-secret"])
 def test_source_http_helper_refuses_nonnumeric_status_without_external_text(status):
     opener = Opener([Response(b"fabricated-provider-secret", status=status)])
@@ -464,3 +475,62 @@ def test_source_http_helper_refuses_nonnumeric_status_without_external_text(stat
         capture._source_request(opener, capture.urllib.request.Request(capture.DATA_URL), 4)
     assert "fabricated-provider-secret" not in str(refused.value)
     assert len(opener.requests) == 1
+
+
+@pytest.mark.parametrize("include_page_count", [False, True])
+def test_source_http_helper_accepts_empty_204_only_with_verified_zero_transport(include_page_count):
+    transport = headers(total=0, count=0)
+    if not include_page_count:
+        transport.pop("Total-Records-On-Page")
+    opener = Opener([Response(b"", transport, status=204)])
+    raw, actual_headers, status = capture._source_request(
+        opener, capture.urllib.request.Request(capture.DATA_URL), 4)
+    assert raw == b""
+    assert actual_headers == transport
+    assert status == 204
+    assert len(opener.requests) == 1
+
+
+@pytest.mark.parametrize("change", [
+    "missing_total", "missing_offset", "missing_limit", "missing_maximum", "missing_version",
+    "nonzero_total", "nonzero_offset", "wrong_limit", "small_maximum", "wrong_version",
+    "nonzero_count", "malformed_count", "body", "oversize_body",
+])
+def test_204_transport_is_not_an_empty_query_when_any_contract_fact_disagrees(change):
+    transport = headers(total=0, count=0)
+    body = b""
+    missing = {"missing_total": "Record-Total", "missing_offset": "Record-Offset",
+               "missing_limit": "Record-Limit", "missing_maximum": "Record-Max-Limit",
+               "missing_version": "Data-Version"}
+    wrong = {"nonzero_total": ("Record-Total", "1"), "nonzero_offset": ("Record-Offset", "1"),
+             "wrong_limit": ("Record-Limit", "99"), "small_maximum": ("Record-Max-Limit", "99"),
+             "wrong_version": ("Data-Version", "2"), "nonzero_count": ("Total-Records-On-Page", "1"),
+             "malformed_count": ("Total-Records-On-Page", "0.0")}
+    if change in missing:
+        transport.pop(missing[change])
+    elif change in wrong:
+        key, value = wrong[change]
+        transport[key] = value
+    else:
+        body = b"[]" if change == "body" else b"xxxxx"
+    opener = Opener([Response(body, transport, status=204)])
+    with pytest.raises(capture._SourceHTTPRefusal) as refused:
+        capture._source_request(opener, capture.urllib.request.Request(capture.DATA_URL), 4)
+    assert refused.value.status == 204
+    assert str(refused.value) == "source_http_not_200"
+    assert len(opener.requests) == 1
+
+
+def test_capture_empty_204_preserves_actual_bytes_status_and_shared_counter(tmp_path):
+    pages = [Response(b"", headers(total=0, count=0), status=204) for query in queries()]
+    captured, receipts, _, attempts = capture._capture(
+        tmp_path, ("fabricated-client", "fabricated-secret"), Opener(responses(*pages)))
+    assert len(captured) == len(receipts) == attempts == 7
+    for page, receipt in zip(captured, receipts):
+        assert page.http_status == receipt["http_status"] == 204
+        assert page.raw == (tmp_path / receipt["file"]).read_bytes() == b""
+        assert page.total == receipt["total"] == receipt["records"] == 0
+        transport = json.loads((tmp_path / f"attempt-{receipt['source_request_number']:02d}-transport.json").read_text())
+        assert transport["http_status"] == 204
+        assert transport["response_raw_sha256"] == capture.hash_bytes(b"")
+        assert receipt["page_count_origin"] == "verified_empty_204_transport"

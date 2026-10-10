@@ -72,6 +72,7 @@ def _protocol_payload() -> dict[str, Any]:
         "maximum_page_bytes": _MAX_PAGE_BYTES, "source_retries": 0,
         "request_rule": "settlement_equal_symbol_domain_sort_symbol_async_false",
         "pagination_rule": "query_bound_request_hash_exact_offsets_stable_total_and_headers",
+        "http_response_rule": "200_strict_JSON_array_or_204_exact_empty_body_zero_total_zero_offset_required_pagination_headers_v1",
         "duplicate_rule": "all_identifiable_raw_collisions_quarantined_before_validation",
         "market_class_rule": "multiple_raw_classes_ambiguous_never_aggregated",
         "previous_null_rule": "unknown_not_zero_no_nonadjacent_continuity_test",
@@ -91,7 +92,7 @@ def _protocol_payload() -> dict[str, Any]:
     }
 
 
-PROTOCOL_SHA256 = "2185f7dc93443a78315b09efbc067e14ec10a60c4723600514750b380ad900f5"
+PROTOCOL_SHA256 = "fdf25f4fcf1b20b52f98ba3c57f9618b2548fdc356a0a1303169fcffea41486b"
 
 
 def calibration_protocol() -> dict[str, Any]:
@@ -153,6 +154,7 @@ class CapturedFinraCalibrationPage:
     data_version: str
     request_sha256: str
     raw: bytes
+    http_status: int = 200
 
     def __post_init__(self) -> None:
         if type(self) is not CapturedFinraCalibrationPage:
@@ -167,6 +169,10 @@ class CapturedFinraCalibrationPage:
         _sha(self.request_sha256, "request_sha256")
         if type(self.raw) is not bytes or len(self.raw) > _MAX_PAGE_BYTES:
             raise _refuse("page requires immutable bounded raw bytes")
+        if type(self.http_status) is not int or self.http_status not in (200, 204):
+            raise _refuse("unsupported page HTTP status")
+        if self.http_status == 204 and (self.total != 0 or self.offset != 0 or self.raw != b""):
+            raise _refuse("204 requires exact empty body and zero-total zero-offset header proof")
 
 
 def _parse_pages(pages: tuple[CapturedFinraCalibrationPage, ...]) -> tuple[list[dict], list[dict]]:
@@ -193,7 +199,9 @@ def _parse_pages(pages: tuple[CapturedFinraCalibrationPage, ...]) -> tuple[list[
         if page.request_sha256 != hash_payload(calibration_request(page.query_id, page.offset)):
             raise _refuse("page request hash differs from frozen query")
         try:
-            rows = _v1._json(page.raw)
+            # Keep the actual empty bytes and their digest.  A verified 204 is
+            # a zero-row response, not a fabricated JSON array or missing field.
+            rows = [] if page.http_status == 204 else _v1._json(page.raw)
         except _v1.FinraSourceQualificationError as exc:
             raise _refuse(str(exc)) from exc
         if type(rows) is not list or len(rows) > 100:
@@ -216,6 +224,7 @@ def _parse_pages(pages: tuple[CapturedFinraCalibrationPage, ...]) -> tuple[list[
             "page_index": page_index, "query_id": page.query_id,
             "offset": page.offset, "total": page.total, "limit": page.limit,
             "max_limit": page.max_limit, "data_version": page.data_version,
+            "http_status": page.http_status,
             "request_sha256": page.request_sha256, "raw_sha256": digest,
             "row_count": len(rows),
         }
@@ -399,7 +408,7 @@ def _validate_report(payload: Any) -> dict:
     query_indexes = {query["query_id"]: index for index, query in enumerate(_queries())}
     previous_query_index = -1
     for index, page in enumerate(pages):
-        if type(page) is not dict or set(page) != {"page_index", "query_id", "offset", "total", "limit", "max_limit", "data_version", "request_sha256", "raw_sha256", "row_count"}:
+        if type(page) is not dict or set(page) != {"page_index", "query_id", "offset", "total", "limit", "max_limit", "data_version", "http_status", "request_sha256", "raw_sha256", "row_count"}:
             raise _refuse("report page schema differs")
         if page["page_index"] != index or type(page["page_index"]) is not int:
             raise _refuse("report page index differs")
@@ -416,6 +425,14 @@ def _validate_report(payload: Any) -> dict:
         if page["data_version"] != "1" or page["request_sha256"] != hash_payload(calibration_request(page["query_id"], page["offset"])):
             raise _refuse("report request binding differs")
         _sha(page["raw_sha256"], "raw page hash")
+        if type(page["http_status"]) is not int or page["http_status"] not in (200, 204):
+            raise _refuse("report HTTP status differs")
+        if page["http_status"] == 200 and page["raw_sha256"] == hash_bytes(b""):
+            raise _refuse("report 200 cannot bind an empty non-JSON body")
+        if page["http_status"] == 204 and (
+                page["row_count"] != 0 or page["total"] != 0 or page["offset"] != 0
+                or page["raw_sha256"] != hash_bytes(b"")):
+            raise _refuse("report 204 empty-response proof differs")
         siblings = grouped[page["query_id"]]
         if (any(item["raw_sha256"] == page["raw_sha256"] for item in siblings)
                 or (page["row_count"] == 0 and (page["offset"] < page["total"] or siblings))):

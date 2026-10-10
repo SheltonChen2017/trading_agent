@@ -185,8 +185,17 @@ def _load_sources():
             "manifest_pins": MANIFESTS}
 
 
+def _require_supported_platform():
+    """Reject unavailable native capabilities before spending an output path."""
+    _require(sys.platform == "darwin", "darwin_platform_required")
+    _require(all(type(getattr(stat, name, None)) is int for name in ("UF_TRACKED", "UF_HIDDEN"))
+             and hasattr(os.stat_result, "st_flags"), "darwin_stat_flags_required")
+    security._native()  # Resolve the required ABI; no source object is observed.
+
+
 def main():
     _require(Path.cwd() == ROOT and Path(__file__).resolve().parents[1] == ROOT, "fixed_root_required")
+    _require_supported_platform()
     parent = audit._open_absolute_directory(OUTPUT.parent)
     output = None
     try:

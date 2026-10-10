@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import stat
+from types import SimpleNamespace
 
 import pytest
 
@@ -242,6 +243,46 @@ def test_pending_report_spends_after_path(roots, monkeypatch):
     assert not (new / subject.OUTPUT / "after.json").exists()
 
 
+@pytest.mark.parametrize("failure", ["interrupt", "unexpected", "root", "output"])
+def test_after_stage_claim_precedes_census_and_survives_failure(roots, monkeypatch, failure):
+    old, new = roots
+    _baseline, digest = before(roots, monkeypatch)
+    old.rename(new)
+    monkeypatch.chdir(new)
+    original = subject._census
+    calls = []
+
+    def census(*args):
+        calls.append(True)
+        if failure == "interrupt":
+            raise KeyboardInterrupt
+        if failure == "unexpected":
+            raise RuntimeError("synthetic interruption")
+        result = original(*args)
+
+        def refuse(*_args):
+            raise subject.Refusal("synthetic_identity_change")
+
+        monkeypatch.setattr(subject, "_assert_" + failure, refuse)
+        return result
+
+    monkeypatch.setattr(subject, "_census", census)
+    expected = {"interrupt": KeyboardInterrupt, "unexpected": RuntimeError,
+                "root": subject.Refusal, "output": subject.Refusal}[failure]
+    with pytest.raises(expected):
+        subject._run("after", old, new, digest)
+    assert calls == [True]
+    output = new / subject.OUTPUT
+    pending = output / "after.json.pending"
+    assert pending.is_file()
+    assert stat.S_IMODE(pending.stat().st_mode) == 0o600
+    assert pending.read_bytes() == b""
+    assert not (output / "after.json").exists()
+    with pytest.raises(subject.Refusal, match="report_or_pending_already_spent"):
+        subject._run("after", old, new, digest)
+    assert calls == [True]
+
+
 def test_after_requires_correct_external_digest_and_retains_failure(roots, monkeypatch):
     _baseline, _digest = before(roots, monkeypatch)
     report, _digest = after(roots, monkeypatch, "0" * 64)
@@ -270,10 +311,12 @@ def test_output_symlink_is_not_followed(roots, tmp_path, monkeypatch):
     old, new = roots
     monkeypatch.chdir(old)
     parent = old / "artifacts" / "analyst_revisions_v2" / "relocation_trial"
-    parent.symlink_to(tmp_path / "outside", target_is_directory=True)
+    outside = tmp_path / "outside"
+    outside.mkdir(mode=0o700)
+    parent.symlink_to(outside, target_is_directory=True)
     with pytest.raises(OSError):
         subject._run("before", old, new)
-    assert not (tmp_path / "outside").exists()
+    assert list(outside.iterdir()) == []
 
 
 def test_static_fifo_is_inventoried_and_compared_without_opening(roots, monkeypatch):
@@ -326,3 +369,144 @@ def test_compare_includes_exact_metadata_and_symlink_target():
     assert subject._compare(base, revised) == [
         {"path": "a", "difference": "changed", "fields": ["metadata"]},
         {"path": "link", "difference": "changed", "fields": ["target"]}]
+
+
+def test_census_records_every_directory_and_exact_security_fields(roots, monkeypatch):
+    baseline, _digest = before(roots, monkeypatch)
+    entries = baseline["census"]["entries"]
+    directories = {name: row for name, row in entries.items() if row["kind"] == "directory"}
+    assert set(directories) == {".", "artifacts", "artifacts/analyst_revisions_v2",
+                                "artifacts/analyst_revisions_v2/retained",
+                                "artifacts/analyst_revisions_v2/relocation_trial"}
+    for name, row in directories.items():
+        info = (roots[0] / name).stat()
+        assert row["metadata"] == {
+            "dev": info.st_dev, "ino": info.st_ino, "mode": info.st_mode,
+            "uid": info.st_uid, "gid": info.st_gid, "nlink": info.st_nlink,
+            "flags": getattr(info, "st_flags", None)}
+
+
+def test_directory_mode_change_during_walk_without_name_change_refuses(roots, monkeypatch):
+    old, new = roots
+    monkeypatch.chdir(old)
+    original = subject._read_regular
+    changed = False
+
+    def read(*args, **kwargs):
+        nonlocal changed
+        result = original(*args, **kwargs)
+        if not changed:
+            changed = True
+            old.chmod(0o700 if stat.S_IMODE(old.stat().st_mode) != 0o700 else 0o750)
+        return result
+
+    monkeypatch.setattr(subject, "_read_regular", read)
+    report, _digest = subject._run("before", old, new)
+    assert changed
+    assert not report["complete"]
+    assert report["refusal"] == {"code": "directory_changed_during_census", "path": "."}
+
+
+def test_exclusions_are_exact_not_prefixes(roots, monkeypatch):
+    old, _new = roots
+    included = [".gitignore", ".github/workflow.yml", subject.OUTPUT + "-sibling/retained"]
+    for relative in included:
+        path = old / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"included")
+    baseline, _digest = before(roots, monkeypatch)
+    assert all(name in baseline["census"]["entries"] for name in included)
+    assert all(not subject._excluded(name) for name in included)
+    assert subject._excluded(".git")
+    assert subject._excluded(subject.OUTPUT)
+    assert subject._excluded(subject.OUTPUT + "/before.json.pending")
+
+
+def test_named_after_read_check_is_independent_of_held_metadata(roots, monkeypatch):
+    old, _new = roots
+    original = os.stat
+    calls = 0
+    parent = subject._open_absolute_directory(old)
+
+    def named(path, *args, **kwargs):
+        nonlocal calls
+        info = original(path, *args, **kwargs)
+        if path == "private.bin" and kwargs.get("dir_fd") == parent:
+            calls += 1
+            if calls == 2:
+                # Isolate the named endpoint check. The held descriptor has
+                # not changed; no ctime side effect can catch this substitution.
+                fields = {key: getattr(info, key) for key in dir(info) if key.startswith("st_")}
+                fields["st_ino"] += 1
+                return SimpleNamespace(**fields)
+        return info
+
+    monkeypatch.setattr(subject.os, "stat", named)
+    try:
+        with pytest.raises(subject.Refusal, match="file_changed_during_read"):
+            subject._read_regular(parent, "private.bin", "private.bin", b"")
+    finally:
+        os.close(parent)
+    assert calls == 2
+
+
+def test_retained_before_pending_refuses_after_before_census(roots, monkeypatch):
+    old, new = roots
+    _baseline, digest = before(roots, monkeypatch)
+    old.rename(new)
+    monkeypatch.chdir(new)
+    pending = new / subject.OUTPUT / "before.json.pending"
+    pending.write_bytes(b"interrupted before publication")
+    calls = []
+    original = subject._census
+
+    def census(*args):
+        calls.append(True)
+        return original(*args)
+
+    monkeypatch.setattr(subject, "_census", census)
+    with pytest.raises(subject.Refusal, match="report_or_pending_already_spent"):
+        subject._run("after", old, new, digest)
+    assert not calls
+    assert pending.read_bytes() == b"interrupted before publication"
+    assert not (new / subject.OUTPUT / "after.json.pending").exists()
+
+
+def test_cli_returns_failure_for_completed_mismatching_census(roots, monkeypatch, capsys):
+    old, new = roots
+    _baseline, digest = before(roots, monkeypatch)
+    old.rename(new)
+    monkeypatch.chdir(new)
+    (new / "private.bin").write_bytes(b"changed")
+    monkeypatch.setattr(subject, "OLD_ROOT", old)
+    monkeypatch.setattr(subject, "NEW_ROOT", new)
+    assert subject.main(["after", "--expected-before-sha256", digest]) == 1
+    output = capsys.readouterr()
+    assert "complete=true" in output.out and "mismatches=1" in output.out
+    report = json.loads((new / subject.OUTPUT / "after.json").read_bytes())
+    assert report["complete"] and not report["matches_before"]
+
+
+def test_early_claim_substitution_refuses_and_retains_spent_leaf(roots, monkeypatch):
+    old, new = roots
+    _baseline, digest = before(roots, monkeypatch)
+    old.rename(new)
+    monkeypatch.chdir(new)
+    original = subject._census
+
+    def census(*args):
+        result = original(*args)
+        pending = new / subject.OUTPUT / "after.json.pending"
+        replacement = pending.with_name("synthetic-replacement")
+        replacement.write_bytes(b"")
+        replacement.chmod(0o600)
+        replacement.replace(pending)
+        return result
+
+    monkeypatch.setattr(subject, "_census", census)
+    with pytest.raises(subject.Refusal, match="report_claim_changed"):
+        subject._run("after", old, new, digest)
+    assert (new / subject.OUTPUT / "after.json.pending").is_file()
+    assert not (new / subject.OUTPUT / "after.json").exists()
+    with pytest.raises(subject.Refusal, match="report_or_pending_already_spent"):
+        subject._run("after", old, new, digest)

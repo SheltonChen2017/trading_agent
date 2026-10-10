@@ -209,15 +209,34 @@ def _assert_output(root_fd, output_fd):
         os.close(check)
 
 
-def _publish_report(output, name, raw):
-    # The exclusive pending leaf is retained on any failure. Neither it nor a
-    # completed report is a retry entitlement.
+def _claim_report(output, name):
+    # Claim before observing a stage. An interrupted census must not become a
+    # fresh attempt simply because no completed report reached publication.
     pending = name + ".pending"
     fd = os.open(pending, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=output)
     try:
         allocated = os.fstat(fd)
         if allocated.st_uid != os.getuid() or stat.S_IMODE(allocated.st_mode) != 0o600 or allocated.st_nlink != 1:
             raise Refusal("report_allocation_not_private")
+        os.fsync(fd)
+        os.fsync(output)
+        return fd, allocated
+    except BaseException:
+        os.close(fd)
+        raise
+
+
+def _publish_report(output, name, raw, *, claim=None):
+    # Callers with an early claim retain ownership of its held descriptor.
+    # Any failure leaves the exclusive pending leaf; no cleanup or retry.
+    owned = claim is None
+    fd, allocated = _claim_report(output, name) if owned else claim
+    pending = name + ".pending"
+    try:
+        held = _metadata(os.fstat(fd))
+        named = _metadata(os.stat(pending, dir_fd=output, follow_symlinks=False))
+        if held != _metadata(allocated) or held != named or held["size"] != 0:
+            raise Refusal("report_claim_changed")
         remaining = memoryview(raw)
         while remaining:
             written = os.write(fd, remaining)
@@ -236,7 +255,8 @@ def _publish_report(output, name, raw):
         os.unlink(pending, dir_fd=output)
         os.fsync(output)
     finally:
-        os.close(fd)
+        if owned:
+            os.close(fd)
     row, actual = _read_regular(output, name, name, b"", collect=True, maximum=MAX_BASELINE_BYTES)
     if actual != raw or stat.S_IMODE(row["metadata"]["mode"]) != 0o600 or row["metadata"]["nlink"] != 1:
         raise Refusal("report_readback_changed")
@@ -267,12 +287,14 @@ def _run(stage, old_root, new_root, expected_before_sha256=None):
         raise Refusal("externally_pinned_before_digest_required")
     root_fd = _open_absolute_directory(root)
     output_fd = None
+    claim = None
     try:
         output_fd = _open_output(root_fd, create=stage == "before")
         name = stage + ".json"
         existing = set(os.listdir(output_fd))
         if name in existing or name + ".pending" in existing or "before.json.pending" in existing:
             raise Refusal("report_or_pending_already_spent")
+        claim = _claim_report(output_fd, name)
         report = {"schema": SCHEMA, "stage": stage, "old_root": str(old_root), "new_root": str(new_root),
                   "excluded_relative_paths": [".git", OUTPUT], "directory_times_compared": False,
                   "symlink_policy": "targets_recorded_verbatim_not_followed_or_rebased",
@@ -305,11 +327,13 @@ def _run(stage, old_root, new_root, expected_before_sha256=None):
                                  "path": error.relative_path if isinstance(error, Refusal) else None}
         _assert_root(root, root_fd)
         _assert_output(root_fd, output_fd)
-        digest = _publish_report(output_fd, name, _json_bytes(report))
+        digest = _publish_report(output_fd, name, _json_bytes(report), claim=claim)
         _assert_output(root_fd, output_fd)
         _assert_root(root, root_fd)
         return report, digest
     finally:
+        if claim is not None:
+            os.close(claim[0])
         if output_fd is not None:
             os.close(output_fd)
         os.close(root_fd)

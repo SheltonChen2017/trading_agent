@@ -444,15 +444,79 @@ def test_fixed_production_path_and_explicit_test_seam_refuse_wrong_scope(tmp_pat
     assert not list(tmp_path.iterdir())
 
 
-def test_cli_count_hash_only_and_redacted_error(monkeypatch, capsys):
-    report = {"case_count": 2, "observation_count": 22, "initial_verification_count": 2,
-              "refused_initial_integrity_count": 1, "refused_integrity_observation_count": 20,
-              "complete": True, "cases": ["UNEXPORTED_PRIVATE_METADATA"]}
-    monkeypatch.setattr(subject, "_run", lambda *_args, **_kw: (copy.deepcopy(report), "a" * 64))
-    assert subject.main([]) == 0
+def _cli_report():
+    # A returned-report double only: these CLI tests never call the real probe
+    # or allocate either historical fixed output path.
+    return {"case_count": 2, "observation_count": 22, "initial_verification_count": 2,
+            "refused_initial_integrity_count": 0, "refused_integrity_observation_count": 0,
+            "complete": True, "flags_available": True,
+            "private_metadata": "UNEXPORTED_PRIVATE_METADATA",
+            "cases": [{"initial_verification": {"readback_matches": True},
+                       "observations": [{"readback_matches": True} for _ in subject.OFFSETS]}
+                      for _ in subject.CASES]}
+
+
+def _substitute_cli_run(monkeypatch, report):
+    calls = []
+
+    def substituted(path, _monotonic, _sleep, **options):
+        calls.append((path, options))
+        return copy.deepcopy(report), "a" * 64
+
+    monkeypatch.setattr(subject, "_run", substituted)
+    monkeypatch.setattr(subject.probe.private, "_open_directory_path",
+                        lambda *_args, **_kw: pytest.fail("CLI double must not open a probe path"))
+    return calls
+
+
+@pytest.mark.parametrize("relocation", [False, True])
+def test_cli_success_requires_all_acceptance_fields_and_redacts_details(monkeypatch, capsys, relocation):
+    calls = _substitute_cli_run(monkeypatch, _cli_report())
+    assert subject.main(["--authorized-relocation-r272"] if relocation else []) == 0
     output = capsys.readouterr().out
-    assert "cases=2 observations=22 initial_checks=2 refused_initial=1 refused_integrity=20 complete=true" in output
+    assert "cases=2 observations=22 initial_checks=2 refused_initial=0 refused_integrity=0 complete=true" in output
+    assert "flags_available=true payloads_match=true report_sha256=" + "a" * 64 in output
     assert "UNEXPORTED" not in output and subject.probe.PAYLOAD.decode().strip() not in output
+    expected_options = {"synthetic_test": False, **({"relocation_trial": True} if relocation else {})}
+    assert calls == [(subject.RELOCATION_ARTIFACT_PATH if relocation else subject.ARTIFACT_PATH, expected_options)]
+
+
+@pytest.mark.parametrize("relocation", [False, True])
+@pytest.mark.parametrize("refusal", ["incomplete", "initial_integrity", "observation_integrity", "flags",
+                                    "initial_payload", "observation_payload", "case_count",
+                                    "observation_count", "initial_count", "empty_checks"])
+def test_cli_returned_report_refusal_is_nonzero(monkeypatch, capsys, relocation, refusal):
+    report = _cli_report()
+    if refusal == "incomplete":
+        report["complete"] = False
+    elif refusal == "initial_integrity":
+        report["refused_initial_integrity_count"] = 1
+    elif refusal == "observation_integrity":
+        report["refused_integrity_observation_count"] = 1
+    elif refusal == "flags":
+        report["flags_available"] = False
+    elif refusal == "initial_payload":
+        report["cases"][0]["initial_verification"]["readback_matches"] = False
+    elif refusal == "observation_payload":
+        report["cases"][1]["observations"][-1]["readback_matches"] = False
+    elif refusal == "case_count":
+        report["case_count"] = 1
+    elif refusal == "observation_count":
+        report["observation_count"] = 21
+    elif refusal == "initial_count":
+        report["initial_verification_count"] = 1
+    else:
+        report["cases"] = []
+    calls = _substitute_cli_run(monkeypatch, report)
+    assert subject.main(["--authorized-relocation-r272"] if relocation else []) == 1
+    output = capsys.readouterr()
+    assert len(calls) == 1 and output.err == ""
+    assert "report_sha256=" + "a" * 64 in output.out
+    assert "UNEXPORTED" not in output.out
+
+
+def test_cli_exception_remains_redacted(monkeypatch, capsys):
+    _substitute_cli_run(monkeypatch, _cli_report())
     monkeypatch.setattr(subject, "_run", lambda *_args, **_kw: (_ for _ in ()).throw(RuntimeError("PRIVATE_ERROR")))
     assert subject.main([]) == 1
     assert capsys.readouterr().err == "synthetic flags diagnostic refused; all allocated fixtures retained\n"

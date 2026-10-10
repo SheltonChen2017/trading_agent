@@ -81,6 +81,19 @@ def held(tmp_path):
 def native(monkeypatch):
     fake = Native()
     monkeypatch.setattr(security, "_native", lambda: fake)
+    original_fstat = os.fstat
+
+    def synthetic_stat(fd):
+        # These are fake-ABI tests, not native filesystem observations. Supply
+        # the synthetic flags field on Linux while preserving all actual
+        # test-owned descriptor fields and the production metadata checks.
+        info = original_fstat(fd)
+        values = {name: getattr(info, name) for name in (
+            "st_dev", "st_ino", "st_mode", "st_uid", "st_gid", "st_nlink",
+            "st_size", "st_mtime_ns", "st_ctime_ns")}
+        return SimpleNamespace(**values, st_flags=getattr(info, "st_flags", 0))
+
+    monkeypatch.setattr(security.os, "fstat", synthetic_stat)
     return fake
 
 
@@ -252,7 +265,7 @@ def test_missing_native_library_or_symbol_refuses(monkeypatch, missing):
 
 def test_native_empty_synthetic_file_only(held):
     # This is a fresh test-owned inode, never a retained source or real probe.
-    if sys.platform != "darwin":
+    if sys.platform != "darwin" or not hasattr(os.stat_result, "st_flags"):
         pytest.skip("native Darwin ABI test")
     result = security.snapshot(held)
     assert result["acl_empty"] is True

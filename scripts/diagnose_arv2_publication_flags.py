@@ -214,11 +214,25 @@ def main(argv=None):
         path = RELOCATION_ARTIFACT_PATH if args.authorized_relocation_r272 else ARTIFACT_PATH
         options = {"relocation_trial": True} if args.authorized_relocation_r272 else {}
         report, digest = _run(path, time.monotonic, time.sleep, synthetic_test=False, **options)
+        checks = [case["initial_verification"] for case in report["cases"]] + [
+            row for case in report["cases"] for row in case["observations"]]
+        payloads_match = bool(checks) and all(row["readback_matches"] is True for row in checks)
         print(f"cases={report['case_count']} observations={report['observation_count']} "
               f"initial_checks={report['initial_verification_count']} refused_initial={report['refused_initial_integrity_count']} "
               f"refused_integrity={report['refused_integrity_observation_count']} "
-              f"complete={str(report['complete']).lower()} report_sha256={digest}")
-        return 0
+              f"complete={str(report['complete']).lower()} flags_available={str(report['flags_available']).lower()} "
+              f"payloads_match={str(payloads_match).lower()} report_sha256={digest}")
+        # Successful report publication is not a successful observation. This
+        # exit status summarizes the returned report, not independent report
+        # authentication, uninterrupted stability or production clearance.
+        passed = (report["complete"] is True and report["flags_available"] is True
+                  and report["case_count"] == len(CASES)
+                  and report["initial_verification_count"] == len(CASES)
+                  and report["observation_count"] == len(CASES) * len(OFFSETS)
+                  and len(checks) == len(CASES) * (1 + len(OFFSETS))
+                  and report["refused_initial_integrity_count"] == 0
+                  and report["refused_integrity_observation_count"] == 0 and payloads_match)
+        return 0 if passed else 1
     except Exception:
         print("synthetic flags diagnostic refused; all allocated fixtures retained", file=sys.stderr)
         return 1

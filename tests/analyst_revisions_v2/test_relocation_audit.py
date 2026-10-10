@@ -510,3 +510,56 @@ def test_early_claim_substitution_refuses_and_retains_spent_leaf(roots, monkeypa
     assert not (new / subject.OUTPUT / "after.json").exists()
     with pytest.raises(subject.Refusal, match="report_or_pending_already_spent"):
         subject._run("after", old, new, digest)
+
+
+@pytest.mark.parametrize("field", ["flags", "ctime_ns"])
+def test_empty_claim_metadata_drift_during_census_refuses_before_write(roots, monkeypatch, field):
+    old, new = roots
+    monkeypatch.chdir(old)
+    original_claim = subject._claim_report
+    original_census = subject._census
+    original_metadata = subject._metadata
+    claim = None
+    drift = False
+    observed = []
+
+    def allocate(*args):
+        nonlocal claim
+        claim = original_claim(*args)
+        return claim
+
+    def metadata(info):
+        row = original_metadata(info)
+        if claim is not None:
+            _fd, allocated = claim
+            if (drift and info is not allocated
+                    and (info.st_dev, info.st_ino) == (allocated.st_dev, allocated.st_ino)):
+                # Model one metadata-only drift on this held claim inode.
+                # Current held/named observations agree with each other, but
+                # the allocation snapshot stays unchanged. No host flags or
+                # real attributes are modified by the test.
+                row[field] = (row[field] or 0) + 1
+                observed.append(row.copy())
+        return row
+
+    def census(*args):
+        nonlocal drift
+        assert claim is not None
+        drift = True
+        return original_census(*args)
+
+    monkeypatch.setattr(subject, "_claim_report", allocate)
+    monkeypatch.setattr(subject, "_metadata", metadata)
+    monkeypatch.setattr(subject, "_census", census)
+    with pytest.raises(subject.Refusal, match="report_claim_changed"):
+        subject._run("before", old, new)
+    assert drift and claim is not None
+    assert len(observed) == 2 and observed[0] == observed[1]
+    allocated = original_metadata(claim[1])
+    assert {key for key in allocated if allocated[key] != observed[0][key]} == {field}
+    pending = old / subject.OUTPUT / "before.json.pending"
+    assert pending.read_bytes() == b""
+    assert stat.S_IMODE(pending.stat().st_mode) == 0o600
+    assert not (old / subject.OUTPUT / "before.json").exists()
+    with pytest.raises(subject.Refusal, match="trial_path_already_spent"):
+        subject._run("before", old, new)

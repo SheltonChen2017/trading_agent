@@ -12966,3 +12966,105 @@ removed it before committing/launching. Pre-format runtime29c6c863...faeb2,
 embeddedtemplate2b22f0de...44d85 and bundlec3cebbfc...db70 were unexecuted
 draft identities only; final full hashes above bind the one-byte whitespace
 correction, not a candidate/attempt reset. No old executed bytes changed.
+
+Final post-format validation426passed/1existingplatformskip in4.21s on new
+transport/runtime/driver/diagnostic plus document/import/active-document
+boundaries; source syntax and staged whitespace clean. New local source commit
+c0b48fe1783c2393fe40ea4f245a26d1558e0e26 followed fresh exact root/branch,
+HEAD/status/staged-diff and ACTUAL remotefa78 checks; no push yet. Fresh
+scope003 manifestd7865fd7b7dc2b5d4ea0edcb3b196911ae01252140615946541a9d21f6aec985
+pins this sourceHEAD/21 dependencies; own packet copy claims preceded reading
+explicit signal-packet.scope001.json. Neither original packet/D0/provider
+captures nor old source/outcome artifacts were reopened by implication.
+Exact six-file source readbacks in the same ON/OFF projects matched final v3.
+ONattempt3 permanently reserved before compile; compile
+f09cdbbcfc117b0be5d1b65cea0f7490-5757b3fb7f2cf96b746dcc1650502c6c
+verified BuildSuccess and exact source again. Backtest
+2eef3729316e92c38a7c31908ecf0ff8 launched2026-10-09T23:53:01.431311Z
+in project37600675; look receipt preceded launch. First In Progress...,
+not yet terminal/completion proof. ON has consumed all3allowed attempts;
+OFF remains0. New cloud looks3+historical12=15observed/consumed looks.
+No fourth ON launch or candidate rename is permitted. Terminal failure after
+this attempt requires Mia recovery/precise owner action, not another Codex fix.
+
+ONattempt3 terminal Completed./completedTrue/errorFalse; terminal projection
+e1d488560a81b724654023da0f001635b8a9ccae0a0d58e93485bfea3ac58f88.
+Collection0001 retains352orders/352filled-status orders, no collection errors,
+74compressed aggregate records. Fresh own-aggregate review preceded decoding:
+all60frozen NAV dates and a finalSUMMARY are present;13of14coverage decisions
+are present, with only2025-01-13 absent. This is NOT further log truncation:
+the original summary explicitly reports14attempted decisions/1refused and
+missing_prior_cap_snapshot1; all six sleeves selected on13decisions. Restore
+of the full NAV/SUMMARY trail confirms CAP009 transport correction; all wire
+objects remain immutable with separately derived decoding, no invented row.
+
+`TPR-CAP-010` / P1 interpretability — confirmed strict-cap freshness refusal
+on2025-01-13; underlying unavailable callback/snapshot cause is not fully
+attested by retained native input tape (none invented). Keep the refusal,
+holdings and coverage gap visible; no stale-cap waiver, source-clock shift,
+zero-score substitution, member drop, date change or fourth ON run. Native
+cash/NAV ledger residuals0, position mismatches0, risk breaches0; source-bound
+summary native-final compatibility exceptions1, submitted strategy MOO351/
+5098shares versus352all native callbacks/5380filled shares; fees50.98.
+Observer4events:2ambient/2nonambient, including actual held/ever-traded final
+liquidation. Strict and developmental runtime flags remain false. Positive
+orders and full60NAV make the native run completed and usable as a LIMITED
+diagnostic, not complete frozen14-decision or canonical acceptance. CAP006
+closed-source guard operated without runtime failure; exact complete native
+guard count is now observed, rather than inferred from attempt1.
+
+OFFattempt1 was reserved before compile in project37600676. Compile
+ae02db409a4271610dfa88051236a132-21b4cb47599114e30bc70d17069d016f
+verified BuildSuccess/exact unchanged v3 source before backtest
+1baf38669e9ddae7bf9e72cdd8ffdd79 launched2026-10-09T23:59:11.819700Z.
+Separate look receipt preceded launch. No control tuning after ON outcomes.
+ON3/OFF1 attempts;4new cloud looks+12historical=16observed/consumed looks.
+No new candidate/adverse/sweep or sealed-holdout look is introduced.
+
+`TPR-OWN-100` — before inspecting performance, add a separate identified
+pure diagnostic-v2 metadata wrapper for observed ordered nonempty subsets of
+the frozen14-decision schedule. Validate original five-object source binding
+and lossless decode first; retain the exact60-day NAV convention and every
+false acceptance gate. Preserve the complete14 prior-mark hash as None when
+partial; separately name observed-input hash/dates/missing dates. Compare
+observed13paths only when both arms independently match; any descriptive
+delta remains unqualified, not independent/confirmatory alpha. No missing row
+is reconstructed, and no portfolio/economic/source-clock input changes.
+Main's initial claim that old _prior_mark_inputs hard-refuses solely on13rows
+was a FALSE ALARM: both peers independently verified it already returns None
+for a partial validated schedule. Old diagnostic already can compute full60NAV
+metrics with missing-coverage reasons. The new wrapper adds explicit subset
+provenance, not a fabricated metric repair; old modules stay unchanged.
+Agent-delegated reporting choice pending independent Claude review.
+
+OFFattempt1 completed2026-10-10T00:02:23.185443Z collection receipt:
+terminal Completed./completedTrue/errorFalse; terminal projection
+0b7105fcdf34309e8ae08a5cf975905ac80b52a60722937552137af55d0f4487.
+Collection0001 retains309nativeorders/309filled-status orders,74compressed
+aggregate records and no collection errors. Exact cloud-source readback remains
+verified. Strict audit refused; Completed alone is not admission. No performance
+numbers were inspected before prospectively fixing the observed-subset reporting
+recipe below. ON3/OFF1 counts remain spent across any reporting source commit.
+
+Diagnostic-v2 sourceb185a01531fbdb8526d25ef98e053d2d88912da69a12a94885c1662145255a40
+and test1224a0507eb09a121e9c76916e34c1f978a1c6cd4e696c11e6d13d0c1dc9791f
+are new pure metadata successors only. Original reportera1a12f1163dccc85c927ca5e1d8fb5fa0f0cf79b12ccd6abeb94d4fb6e0a1633
+and strict auditor5f78a9af2d4bbe9da1939788ccd56a0c7a1804b511928ea577a646c0a0d07c5b
+stay exact. Independent Codex peer reproduced21focused tests and eight negative
+in-memory variants (ordering, missing-date concealment, fabricated full-period
+hash, true qualification gate,13versus60metric domain, original-input copy,
+changed all-native filled count, and decoding before source binding). Full-field
+parity confirmed every original v1 output field except the explicitly versioned
+schema, for both arms/plain and encoded transport. No private/API access or edits
+by the peer; this is NOT independent Claude acceptance.
+
+Author's separately attributed final focused union326passed in2.10s; nine
+in-memory variants produced20red/40restored-green controls. Source/test syntax,
+no-I/O/no-global-mutation AST boundary and old frozen hashes verified. Writer
+ownership released; no empirical/private/API/outcome access or commit by author.
+
+Main's focused reporter/strict-auditor/transport/document/import-boundary union
+543passed/1existingplatformskip in4.38s under the49/52isolated in-process
+runtime-root runner. No full lane/repository suite, actual operator-state/database
+or Windows custody test. Whitespace diff clean. The new metadata does not repair
+missing caps, change any execution economics or authorize another launch.

@@ -650,19 +650,40 @@ def test_terminal_failures_and_zero_order_runs_remain_diagnostic(environment, fa
     assert evidence['completion']['strategy_accepted'] is False
 
 
-def test_on_arm_cannot_launch_with_a_foreign_or_misplaced_packet_receipt(environment):
+@pytest.mark.parametrize('wrong_hash,wrong_key', [(True, False), (False, True), (True, True)],
+    ids=['foreign-hash-only', 'misplaced-key-only', 'foreign-hash-and-key'])
+def test_on_arm_cannot_launch_with_a_foreign_or_misplaced_packet_receipt(environment, wrong_hash, wrong_key):
     """TPR-CR22-008: a present upload receipt admits the TPR-on arm only when it
     names this study's exact packet hash under this study's own namespace; a
     foreign hash or another study's key must refuse before any launch call."""
     controller, cloud, _, attempt = ready(environment, candidate=ON)
     foreign = op.PACKET_HASH[::-1]
-    for receipt in ({'packet_sha256': foreign, 'key': f'tpr-cap-tilt/{op.STUDY}/{foreign}.json'},
-                    {'packet_sha256': op.PACKET_HASH, 'key': f'tpr-elsewhere/{op.STUDY}/{op.PACKET_HASH}.json'}):
-        (controller.root / 'packet-upload.completed.json').unlink(missing_ok=True)
-        controller.exclusive('packet-upload.completed.json', {'at': op.utc(), 'status': 'uploaded', **receipt})
-        with pytest.raises(op.Refusal, match='admitted private packet'):
-            controller.launch_backtest(ON, attempt)
+    assert foreign != op.PACKET_HASH
+    packet_hash = foreign if wrong_hash else op.PACKET_HASH
+    if wrong_key:
+        key = (f'tpr-cap-tilt/{op.STUDY}/{foreign}.json' if wrong_hash else
+               f'tpr-elsewhere/{op.STUDY}/{op.PACKET_HASH}.json')
+    else:
+        key = f'tpr-cap-tilt/{op.STUDY}/{op.PACKET_HASH}.json'
+    controller.exclusive('packet-upload.completed.json',
+        {'at': op.utc(), 'status': 'uploaded', 'packet_sha256': packet_hash, 'key': key})
+    with pytest.raises(op.Refusal, match='admitted private packet'):
+        controller.launch_backtest(ON, attempt)
     assert 'backtests/create' not in cloud.calls
+    assert not (controller.root / f'{ON}.attempt.{attempt}.backtest.spent.json').exists()
+
+
+def test_on_arm_exact_packet_receipt_reaches_the_launch(environment):
+    """A valid ON control proves packet negatives do not pass through an earlier refusal."""
+    controller, cloud, _, attempt = ready(environment, candidate=ON)
+    controller.exclusive('packet-upload.completed.json', {'at': op.utc(),
+        'status': 'uploaded', 'packet_sha256': op.PACKET_HASH,
+        'key': f'tpr-cap-tilt/{op.STUDY}/{op.PACKET_HASH}.json'})
+    launched = controller.launch_backtest(ON, attempt)
+    assert launched['backtest_id'] == 'backtest-synthetic'
+    assert cloud.calls.count('backtests/create') == 1
+    spent = controller._value(f'{ON}.attempt.{attempt}.backtest.spent.json')
+    assert spent['fixture'] is True and spent['development_look_consumed'] is False
 
 
 def test_on_arm_cannot_launch_without_packet_but_neutral_can(environment):

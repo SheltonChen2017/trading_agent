@@ -1,19 +1,24 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Status: **CLAUDE HAS INDEPENDENTLY REVIEWED EVERY CODEX COMMIT IN
-`32016848..77b156ec` IN SECTION 73: THE SECTION-70 COUNTER-REVIEW, THE FROZEN
-MATCHED STUDY, THE MIA RECOVERY ATTEMPT AND THE CAP-SELECTION/TILT EXPERIMENT.
-CUMULATIVE DISPOSITION: ACCEPTED AFTER CORRECTION (TWO REGRESSION TESTS, NO
-PRODUCTION BYTE). BOTH CAP-TILT DIAGNOSTICS REPRODUCE BYTE-FOR-BYTE FROM
-COMMITTED CODE AND THE PRIVATE RECEIPTS. ONE P2 STAYS OPEN (`TPR-CR22-001`:
-THE OPERATOR CODE THAT PRODUCED THE MIA-SCOPE AND CAP-TILT ANALYSIS RECEIPTS IS
-NOT COMMITTED). CODEX NEXT COUNTER-REVIEWS SECTION 73 AND THIS ROUND'S CLAUDE
-COMMITS. SECTION 70'S COUNTER-REVIEW OF THE EARLIER FOUR-COMMIT CLAUDE RANGE
-STANDS AS HISTORY; ITS CR21-002/003 CLOSURES ARE ACCEPTED WITH THE RETENTION
-QUESTION RESTATED FOR THE OWNER. SECTION72 RECORDS THE OWNER'S NEW
-MARKET-CAP-SELECTION / TPR-WEIGHT-TILT DEVELOPMENT TEST AND EXPLICIT PERMISSION
-TO PROCEED BEFORE CLAUDE'S PENDING REVIEW OF fa78dacd. THIS IS A GENUINELY NEW
-ECONOMIC CANDIDATE, NOT A FOURTH OLD ATTEMPT OR CANONICAL ACCEPTANCE.
+Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN
+`77b156ec..9a275386` AND THE CUMULATIVE REVIEW TREE IN SECTION 74.
+CUMULATIVE DISPOSITION: ACCEPTED AFTER CORRECTION OF THE INCOMING TESTS AND
+REVIEW RECORD, NOT ACCEPTANCE OF INHERITED RUNTIME OR EXTENDED-QC READINESS.
+HASH-ONLY AND KEY-ONLY PACKET-RECEIPT NEGATIVES NOW FAIL INDEPENDENTLY UNDER
+SAFE MUTATIONS; VALID ON CONTROLS REACH A SYNTHETIC LAUNCH. PRODUCTION,
+EXECUTED SOURCE, FROZEN INPUTS AND HISTORICAL SECTIONS 68 THROUGH 73 ARE
+UNCHANGED. CLAUDE'S PRIVATE-RECEIPT REPRODUCTIONS AND SCRATCH-CLONE SUITE
+REMAIN ATTRIBUTED HISTORY; THE CLONE DOES NOT SATISFY THE PHYSICAL-ROOT RULE.
+TPR-CR22-001 REMAINS OPEN; THE OTHER UNCORRECTED RUNTIME/AUDIT FINDINGS ARE
+RETAINED IN SECTION74.3 AND REQUIRE SUCCESSORS BEFORE A NEW QUALIFIED RUN.
+THE OWNER REQUESTED 2021-NOW WITH THE SAME MARKET-CAP-SELECTION /
+TPR-WEIGHT-TILT STRATEGY AND AUTHORIZED CONSUMING THE PREVIOUSLY PROTECTED
+SEPTEMBER-OCTOBER 2026 DATES AS EXPLORATORY. TARGET ENDPOINT: OCTOBER9,2026.
+NO EXTENDED STUDY, PROVIDER CAPTURE, QC ATTEMPT OR NEW LOOK HAS EXECUTED.
+FRESH ON/OFF ATTEMPT ALLOWANCE IS A SEPARATE UNANSWERED OWNER QUESTION;
+CHANGING DATES OR INPUTS DOES NOT RESET THE ORIGINAL ON3/OFF1 COUNTS.
+CLAUDE NEXT REVIEWS THIS CODEX ROUND INDEPENDENTLY. SECTION73'S COMPLETE
+REVIEW OF THE PREDECESSOR ROUNDS IS HISTORY, NOT A PENDING REVIEW STOP.
 THE TWO NEW JOINT STOCK-PORTFOLIO RUNS COMPLETED: ON3 HAS352FILLED NATIVE
 ORDERS, OFF1 HAS309; BOTH HAVE60NAV DATES AND13/14DECISION COVERAGE.
 OBSERVED MEMBERSHIP/CAP/SELECTION/BASE-WEIGHT/PRIOR-MARK INPUT PATHS MATCH.
@@ -437,17 +442,24 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, 2026-10-09:** Claude has independently reviewed the exact Codex range
-`32016848bc9ce4dfab3f52ddb5bb34e105e445dc..77b156ecf4d71df1f69678fcfe7a275c59cb4f28`:
-eleven commits carrying the section-70 counter-review, the frozen matched
-study and its three native attempts, the Mia recovery collector and blocked
-handoff, and the owner-authorized cap-selection/tilt experiment with its two
-completed runs. Section 73 dispositions every commit and the cumulative tree
-accepted after correction: two regression tests, no production byte. Both
-cap-tilt diagnostics reproduce byte-for-byte from committed code and the
-private receipts; every QC statistic and request census in sections 71 and
-72 reproduces. One P2 is open, `TPR-CR22-001`: the operator code that produced
-the Mia-scope and cap-tilt analysis receipts is not committed. Section 70's
+**Current qualification, 2026-10-10:** Codex has counter-reviewed the exact Claude range
+`77b156ecf4d71df1f69678fcfe7a275c59cb4f28..9a2753867cda373db634a35ad051b5c9386cc3c4`:
+three incoming commits, separately and cumulatively, accepted after
+correction in section 74. This accepts the corrected review tests/record,
+not inherited runtime or extended-QC readiness. Independent hash-only and
+key-only receipt negatives and valid ON controls strengthen the two tests;
+no production or executed artifact changed. Section73's eleven-commit
+review, private-result reproductions and complete-suite census remain
+attributed Claude evidence, not this counter-review's reruns. The scratch
+clone did not comply with the owner's physical-root invariant. Historical
+sections 67 through 73 remain byte-identical; section74 qualifies the launch
+arithmetic, positive-return wording, source/freeze claims and mutation census.
+`TPR-CR22-001` remains explicitly open: historical receipt producers are uncommitted.
+Confirmed unknown-basis, post-tilt removal, audit-binding and unresolved-attempt
+limitations are retained, not closed by accepting a documentation review.
+The owner authorized the requested extended exploratory dates; fresh per-arm
+attempt allowance remains unanswered, so no 2021-now QC run has launched.
+Section 70's
 closures of `TPR-CR21-002` and `TPR-CR21-003` are accepted; the Object Store
 retention question is restated for the owner as `TPR-CR22-007`, not a gate.
 Historical sections 67 through 72 stand.
@@ -539,26 +551,30 @@ outcome-free source audit; no real-row D1, outcomes or QuantConnect access is
 authorized by that audit.
 The trust rollback pin, protected parent custody, reviewer identity and
 adversarial matrix remain unresolved and parked. **Exact next role action:**
-Section71.10's blocked round was published once at fa78dacd; its five outgoing
-commits remain pending Claude review. The owner now explicitly authorized the
-new section72 cap-selection/TPR-tilt development test BEFORE that review with
-"yes, authorizee". Codex has implemented and completed that separately frozen
-candidate/control in the same lane under that direct, scoped owner exception:
-ON3/OFF1,352/309native filled orders,60NAV dates and13/14decision coverage,
-with all qualification gates false. Section72.5 retains exact source/evidence
-hashes, negative attempts, matched observed-input paths and exact descriptive
-returns (both negative, tilt worse; see72.5). New ON's3slots are consumed; OFF1. Four new cloud
-looks plus12historical =16consumed/observed looks. No retune/fourth ON launch.
-Codex next counter-reviews section 73 and this round's two Claude commits;
-the pending predecessor and the new round are now both reviewed. The previous
-continuous round reached a genuine external
-computer-control blocker, not a routine intermediate checkpoint. Further
-recovery requires restored authenticated controllable Mia in project37547067,
-fresh scope/source checks for the new HEAD and any expired receipt, complete
-observer source/diff/focused proof, and one separately reserved Mia recovery
-job. The three OLD Codex slots cannot be reset or extended; section72's genuinely
-changed cap-only selection/weight-only tilt candidates each have their own
-permanent three-attempt cap. Existing private-upload
+The three section73 Claude commits are counter-reviewed in section74.
+Claude next reviews this Codex round independently. The owner's latest
+request is an order-based 2021-now extension of section72's cap-selected
+stock portfolio and weight-only TPR tilt, with Analyst Revisions disabled.
+The reply "yes, authorized" approves the protected-date consumption that
+was asked about, not a silent reset of the same candidate's attempt ceiling.
+Proposed first/last sessions are January4,2021 and October9,2026; no future
+session or sealed 2027-2029 shared holdout is included. A separate explicit
+fresh-allowance question is outstanding. Until answered, no new ON launch
+or fresh data/cloud operation is reserved or executed. If granted, freeze
+both arms and all six universes together, implement immutable successors
+for the confirmed runtime/evidence defects, use committed bounded producers,
+and verify historical availability before launching; do not tune after results.
+Section72.5 retains the two completed diagnostics with all gates false,
+352/309filled orders,60NAV dates,13/14decisions and the missing Jan13decision.
+Original ON3/OFF1 and16observed looks remain permanently consumed/recorded.
+No retune/fourth ON launch. The older matched study still has three consumed
+Codex slots and five unlaunched arms. Its Mia computer-control outage and
+incomplete observers remain historical blockers; future recovery requires
+fresh scope, authenticated controllable interface, exact cloud-source diff,
+complete focused observer proof and a separately reserved recovery job.
+No blanket new per-edit approval prerequisite is inferred from Claude's
+recommendation; the standing bounded Mia rule continues to govern it.
+Existing private-upload
 authority is not an attestation of vendor rights; no known access restriction
 may be bypassed. The owner's latest six-universe QC instruction in section 67
 persists, but the remaining five matched arms have not run.
@@ -13658,3 +13674,231 @@ quarter of a non-point-in-time proxy have produced no positive result in
 any construction; before another look, have Codex commit the operator
 scripts (`TPR-CR22-001`) so each round can be re-driven, and freeze a
 successor that refuses an unobserved split basis (`TPR-CR22-003`).
+
+## 74. Codex counter-review and owner-requested 2021-now extension — 2026-10-10
+
+### 74.1 Exact snapshot and per-commit dispositions
+
+Exact incoming range:
+`77b156ecf4d71df1f69678fcfe7a275c59cb4f28..9a2753867cda373db634a35ad051b5c9386cc3c4`.
+The matching remote and the existing shared worktree both already equalled
+the pushed review head, with a clean tree. Only the matching lane ref was
+fetched; ancestry was verified; no checkout, fast-forward, scratch clone,
+reset or overwrite was used. The heartbeat was already paused and stayed
+paused before counter-review. All checks, fixture validation and changes
+in this round use the exact designated physical root and lane branch.
+Section73 durably reviews the exact preceding eleven-commit Codex round,
+including its final handoff and cumulative tree. The completed review and
+clean pushed tree qualified the trigger; shared author names were not used
+as proof of independent completion.
+
+| Item | Exact value |
+|---|---|
+| Physical/Git root | `/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__target_price_revisions` |
+| Branch | `codex/strategy-target-price-revisions` |
+| Claude commit 1 | `1cab57bb4ecf0bcf5bd508edee90e5d21df7c2fc` |
+| Claude commit 2 | `d99b4ffbe0f5cd9743f947e44bfa059039ac6c5b` |
+| Claude commit 3 | `9a2753867cda373db634a35ad051b5c9386cc3c4` |
+| Incoming topology | Three first-parent commits, no merge |
+| Next independent-review base | `9a2753867cda373db634a35ad051b5c9386cc3c4` |
+
+| Claude commit | Disposition | Review basis and correction |
+|---|---|---|
+| `1cab57bb4ecf0bcf5bd508edee90e5d21df7c2fc` | **Accepted after correction** | Both production controllers already enforce the correct packet hash/key. The incoming foreign-hash case changes both fields together, leaving hash-only omission undetected; a separate key-only case already exists. Added independent hash-only, key-only and combined negatives, no-launch/no-spent-receipt assertions, and valid ON fixture controls in each controller suite. No production byte changed. |
+| `d99b4ffbe0f5cd9743f947e44bfa059039ac6c5b` | **Accepted after correction** | Reviewed the entire record diff and document guard separately. The exact eleven-commit predecessor inventory/dispositions and CR22 ledger remain historical pins. Qualified source versus collector verification, full-freeze binding, Mia recommendations versus existing authority, positive-return and launch-count wording, scratch-root compliance, and incomplete mutation inventory below; rotated current pointers to this completed counter-review and the latest owner request. |
+| `9a2753867cda373db634a35ad051b5c9386cc3c4` | **Accepted after correction** | Record-only census/final-tree appendix independently inspected. The six-shard total is arithmetically correct, but is attributed Claude scratch-clone execution, not compliant-root or reproduced evidence. The unchanged section73 next-action wording counts two Claude commits although this appendix is the third; this successor records all three. |
+
+**Cumulative disposition: accepted after correction.** Acceptance is limited
+to the corrected incoming review tests and documentation. It does not
+accept the inherited runtime, historical run qualification, source rights,
+canonical ladder or extended-QC readiness over an unresolved material
+finding. Every historical acceptance/alpha gate remains false. Executed
+modules, freezes, packets, input/source bundles, private operations and
+section68-73 evidence are not changed or re-opened by this review.
+
+### 74.2 P0-P3 correction ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| `TPR-CCR22-001` | P3 | **Closed by correction** | `1cab57bb` | Both new foreign-packet tests | Simultaneously wrong hash/key fails under a key check alone; original hash-only omission survived. | Codex peer reproduced two original tests green under hash-only omission; root independently reproduced two corrected hash-only negatives red. | Each admission field must be independently exercised after a valid launch control. | Three independent negative shapes and valid ON controls per controller; no native launch or spent fixture receipt on refusal. | Root safe mutations: hash omission 2 failed/6 passed; key omission 2 failed/6 passed; both omitted 6 failed/2 passed; methods restored in finally. |
+| `TPR-CCR22-002` | P3 | **Closed by qualification** | `d99b4ffb`, `9a275386` | Sections73.4/73.6 and old current pointers | Two-versus-three review commits and nine-versus-seven latest cloud launches are inconsistent. | Git inventory has three incoming commits; matched3 + cap4 =7 latest cloud launches; 79+119+91=289 requests; prior7cloud+2local plus latest7cloud =16 looks. | Distinguish requests, launches, looks and review commits. | Historical prose remains immutable; corrected arithmetic and all three dispositions are current here. | Root integer arithmetic and matching-ref ancestry checks. No private request replay. |
+| `TPR-CCR22-003` | P3 | **Closed by qualification** | `d99b4ffb` | Section73.7 recommendation | "No positive result in any construction" is false if read as raw return: section68 retains positive XLV/XLE stock-proxy returns. | Historical section68.7.2: XLV +0.3379359025%, XLE +3.685084655%; cap ON/OFF are both negative. | Negative evidence must not erase positive raw returns or conflate them with alpha. | No established qualified incremental alpha; not no positive raw return. Those figures are historical, not newly observed outcomes. | Root read the committed result table; no licensed rows/private outcomes re-opened. |
+| `TPR-CCR22-004` | P3 | **Closed by qualification** | `d99b4ffb` | Section10 mutation total and section73.4 inventory | The stated42 mutation trials are not accounted for by the listed12cap +8per-controller +2collision slots. Six guard slots were explicitly not evaluable in the clone. | Listed slots sum30, not42; unexecuted slots are not survivors or executed reds. | A total must have a durable enumerated provenance. | Preserve attributed42 assertion, but independent support is limited to the enumerated30 slots; exact additional12-trial provenance is unestablished. | Root arithmetic; this round's separately identified three fixture mutation conditions are not pooled with Claude's inventory. |
+| `TPR-CCR22-005` | P2 | **Closed by qualification** | `d99b4ffb`, `9a275386` | Scratch-clone validation and CR22-009 | Alternate-root suite execution violates the owner's exact physical-root rule even if read-only; resulting path-refusal reds do not justify weakening that rule. | Section73.1/73.5 explicitly attribute scratch clone and83 path-bound failures. | Host/root compliance and functional test results are different claims. | Retain attributed suite outcomes; no claim of compliant-root reproduction. Portability remains non-gating under the existing owner-pinned lane; no scratch validation used here. | Focused root validation in the designated worktree; no complete suite run. |
+| `TPR-CCR22-006` | P3 | **Closed by qualification** | `d99b4ffb` | CR22-002/004/010 wording | A standalone auditor gap is not absence of upstream source checks; full-freeze hashing is not no binding; a Mia recommendation is not a newly approved per-edit gate. | Root `_source` synthetic inventory substitution succeeds, but collector checks verified compile and fresh exact source; bundle hashes the entire freeze; standing owner Mia rule already authorizes scoped recovery. | Keep confirmed gaps without overstating them or minting policy. | Distinctions and future-successor requirements in74.3; no correction of immutable executed modules or new Mia/cloud action. | Root synthetic/AST probes and complete relevant source reading; peer independently agreed. |
+
+No new P0/P1 finding was found. No CR22 finding is discarded wholesale as a
+false alarm. Where a finding is partly correct, its confirmed part and
+overstatement are both retained. No shared/sibling behavior is corrected;
+OOL003/004/006 remain closed and OOL011 synchronization remains
+owner-coordinated. Existing positive-authority P1 findings remain inert and
+parked while the registry is empty, not closed by exploratory authority.
+
+### 74.3 Complete disposition of Claude's CR22 findings
+
+| Finding | Counter-review classification | Current evidence and consequence |
+|---|---|---|
+| `TPR-CR22-001` | Confirmed; open historical provenance gap | Named historical Mia/failure/quota/analysis producers are not committed. Pure diagnostic reproducibility does not make those operations re-drivable. Historical absence/private receipt inventory remains attributed Claude evidence. A newly written invoker would be a successor, not recovered historical producer bytes; commit any future producer before using it. |
+| `TPR-CR22-002` | Confirmed standalone-audit gap; collector qualification | A synthetic well-shaped substituted source-hash inventory passes `_source` with true flags. The actual collector first verifies BuildSuccess and exact current cloud source. A successor audit must bind concrete manifest, compile and source-verification evidence and exact executed versions, rather than treating shape/flags alone as independent proof. |
+| `TPR-CR22-003` | Confirmed uncorrected runtime defects; freeze qualification | Root synthetic custody8days + unknownfactor returns1. Removing a synthetic selected target after `tilt_sleeves` leaves reported gross/conservation stale. The matched freeze explicitly refuses unknown basis; the cap freeze does not literally contain that same rule. Neither exposure narrowing nor this wording correction fixes the runtime. A successor needs explicit known-basis evidence and delisted-member exclusion before construction, preserving missing slots as cash. Per-name caps remain disclosed prior-close target constraints, not invented intraday hard guarantees. |
+| `TPR-CR22-004` | Partly correct | Economics are hard-coded and duplicated rather than semantically loaded from the freeze. However, `cap_tilt_bundle.py` verifies the entire exact freeze SHA-256; it does not bind only four fields or permit silent freeze editing. The successor must preserve full-byte custody and prove semantic agreement. |
+| `TPR-CR22-005` | Confirmed code behavior; historical private inventory attributed | Root synthetic long decimal becomes float text0.12345678901234568, and uid123456 substring-redacts unrelated9912345677. No actual uid, token or licensed value was read for this proof. Future evidence needs exact numeric lexical custody plus structural PII redaction/original-wire versus transformed-evidence provenance, not accidental digit replacement. |
+| `TPR-CR22-006` | Confirmed uncorrected attempt reconciliation gap | Reservation does not require prior terminality; peer fixture reproduced attempt2 while attempt1 remains reserved. A server-accepted unknown launch may lack returned identity. Consumed slots are not refundable: successors must refuse unresolved/concurrent predecessor attempts and reconcile exact identity before retry. |
+| `TPR-CR22-007` | Confirmed retention question, not a build gate | Existing private upload authority stands as working authorization, not provider attestation. No Object Store object was read, shared or deleted in this round. Exact owner-authorized retention/deletion choice is separate; no deletion inferred. |
+| `TPR-CR22-008` | Confirmed production admission controls; corrected test sensitivity | Whole-gate mutation claim is supported; incoming tests did not independently protect the hash field. CCR22-001 now distinguishes both fields and includes valid ON controls. Production gates remain unchanged. |
+| `TPR-CR22-009` | Confirmed historical attribution; root-compliance qualification | The reported scratch suite and unevaluated guard cases stay visible. Root-independent code custody is not granted by a green clone, and unevaluated guard mutants are not killed/surviving trials. Future checks retain the exact physical-root invariant. |
+| `TPR-CR22-010` | Confirmed custody/replay concern; proposed policy not adopted | Historical UI/Mia source edits, implicit builds and outage remain attributed receipts/record history; no Mia backtest ran. The existing standing rule permits bounded authenticated Mia recovery after the cap, with exact source comparison and verified lane-only porting. It does not remove custody requirements, but Claude's proposed separate approval for every edit is not an independently owner-approved new gate. No new recovery was attempted here. |
+
+Confirmed inherited material gaps remain unresolved. Acceptance of the
+incoming review is not permission to run the unchanged v3 runtime as a
+qualified extended study. Successor corrections and new input/operation
+custody are required before any further launch, in addition to the attempt
+authority below. Historical section73.5 totals sum correctly to21,191passed,
+842skipped,103failed,37errors; these are Claude's reported executions,
+including collection errors, not a full-suite reproduction by Codex.
+
+### 74.4 Latest owner direction and delegated decision log
+
+Direct owner request: "next, run a backtesting from 2021-now. using the same
+strategy". Codex asked whether September1,2026 onward could be consumed as
+exploratory, giving up untouched-validation status; the owner replied
+"yes, authorized" on2026-10-10. This changes the development-date authority,
+not the canonical spec, sealed shared holdout, portfolio economics or
+attempt ceiling. The prior cap-selection / weight-only-TPR instruction and
+its explicit authorization remain the strategy reference in section72.
+
+| Decision ID | Provenance | Chosen option and rationale | Alternatives | Scope, assumptions and limits | Independent-review status |
+|---|---|---|---|---|---|
+| `TPR-EXT26-D001` | Direct owner dates request and affirmative reply to the protected-period question | Evaluate2021through latest completed US session October9,2026; January4 is proposed first session, not a future-date extrapolation. September1onward loses untouched development-validation status when actually observed. | EndAugust2026; shorter Q1window. | Dates authorized; no data or results consumed yet. Sealed September2027-August2029 interval and canonical allocation remain untouched. | Owner-authorized dates; exact future freeze not yet reviewed. |
+| `TPR-EXT26-D002` | Standing three-attempt rule and agent-delegated conservative interpretation | Preserve original cap ON3/OFF1 and16observed looks; ask explicitly for fresh capped paired-study allowance rather than resetting by date/source refresh. | Eligible authenticated Mia recovery under existing rule; decline further Codex ON launch. | Asynchronous question asks at most3attempts per extended arm while retaining all old counts. No answer received; no new candidate/attempt/look reservation. | Agent-delegated interpretation; fresh allowance pending owner, not Claude- or human-approved by implication. |
+| `TPR-EXT26-D003` | Owner says same strategy; section72 frozen semantics | Keep cap-only top10 selection, fixed1/60slots,20%within-selected tied-midrank transfer ON and zero tilt OFF, AR entirely disabled, same baseline costs/timing/cash/volume rules. | Canonical price-scaled TPR ETF strategy; ETF-only portfolio; score-selected predecessor. | Six stock sleeves SPY/XLV/XLE/QQQ/SOXX/REMX, QQQ Nasdaq100 not all Nasdaq, REMX covered US subset not full global theme; consolidated overlap is not independent sleeve P&L. No economic tuning or new arms adopted. | Agent-delegated same-strategy interpretation; no new empirical freeze or launch yet. |
+| `TPR-EXT26-D004` | Immutable execution custody and confirmed review findings | Correct tests/record now; retain v1/v2/v3 executed modules and all source/input hashes. Use named successors before any new run. | Edit historical runtime/packet; relabel existing diagnostic as extended success. | No inherited material runtime finding is declared fixed. Historical producer bytes are unavailable; future committed producers cannot establish their past identity. | Agent-delegated, pending independent review. |
+| `TPR-EXT26-D005` | Source clock, no-look-ahead and same-window comparison requirements | Require fresh bounded source/capture/calendar/packet-shard and as-of identity design before any extended outcome; do not expand the Q1packet by changing dates. | Reuse spent D0/captures; assume current-vintage identifiers are historical; choose dates after coverage/results. | Product documentation supports possible history, not account entitlement/completeness/PIT. Fresh probes/manifests would need explicit scope, closed budgets and pre-credential claims; none implemented/executed here. | Agent-delegated safety requirement, not provider or reviewer attestation. |
+| `TPR-EXT26-D006` | Existing serialized lane workflow and owner one-push rule | Publish one stable counter-review handoff at the genuine fresh-attempt-authority blocker, heartbeat paused; no routine checkpoint push or automatic rearm. | Silent fourth ON attempt; new side branch; alternate-root validation. | Exactly one matching-lane non-force push for this round. Next independent reviewer is Claude; continuation must not manufacture missing authority. | Agent-delegated workflow application, pending independent review. |
+
+The requested extension remains **not launched**. This is not completion of
+the2021-now task. Root and read-only peers assessed safe in-scope alternatives:
+dates-only edits would violate immutable inputs and can reset no cap; old
+private captures cannot prove six-year coverage; a lower-look fixture cannot
+replace actual QC; historical Mia outage is not a newly verified available
+interface. The concrete required owner action is the fresh paired-study
+attempt allowance, not purchase, rights paperwork or routine parameter
+selection. After that decision, bounded history admission and successor
+readiness still require actual evidence, not assumed success.
+
+### 74.5 Feasibility evidence, verification and exclusions
+
+Public documentation consulted, with no authenticated/provider request:
+[Massive Analyst Ratings](https://massive.com/docs/rest/partners/benzinga/analyst-ratings)
+documents history beginning2011-12-08 and event/last-updated fields;
+[QC ETF constituents](https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/quantconnect/us-etf-constituents)
+documents history fromJune2009, daily afterJanuary2015, potentially delayed
+up to one week. These do not prove actual six-year completeness, correction
+vintages, target/share basis, entitlement or point-in-time issuer identity.
+[QC fundamentals](https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/morningstar/us-fundamental-data)
+documents a September23,2026 Morningstar migration replacing the full
+history; an extended run must bind the current dataset regime rather than
+assume exact old cap tapes can be reproduced. No account dataset was read.
+The old fixed fourteen-frame Q1packet, bounded scorer/calendar and capture
+window are not a six-year input merely because source history is advertised.
+
+Root independently reproduced safe in-memory/AST claims: unknown split→1;
+post-tilt removal changes represented gross while diagnostics retain the
+pre-removal value; synthetic source-inventory substitution accepted by the
+standalone auditor; decimal parsing and substring redaction; full-freeze
+hash matches; three-commit/seven-launch/sixteen-look and six-shard arithmetic.
+No provider row, private result or operator state was read for these proofs.
+The two controller test modules were independently reviewed after the peer
+released edits. The main agent then ran receipt-gate mutants in memory,
+restoring both methods in `finally`: hash-only omission **2failed/6passed
+in1.12s**, key-only **2failed/6passed in0.38s**, whole gate **6failed/2passed
+in0.87s**. These are intentional red proofs, not failed validation runs.
+
+Before final document rotation, focused controller/document/boundary/host
+tests were **475passed,1skipped in4.79s** under the isolated in-process
+runtime-root runner from49/52, before dispatch/config imports. Root proofs
+use bundledPython3.12; no production trust/Git/ACL substitution was made.
+The skip is the existing Windows-junction platform exclusion. Native signer,
+Windows frozenGit custody, ACL/parent and fourteen Windows preregistration
+cases are not claimed on this macOS host. No complete lane/repository suite
+was run; Claude owns independent full validation.
+
+<!-- TPR-CCR22-SCOPE:START -->
+| Boundary | Scope |
+|---|---|
+| Accepted object | Corrected incoming review tests and record only |
+| Extended study | Not launched; fresh attempt allowance unanswered |
+| Original cap attempts | ON3/OFF1 retained; no automatic reset |
+| Historical observed looks | 16 retained; 0 new empirical looks |
+| Authenticated provider/QC operations | 0 in this counter-review |
+| Private market rows/results/operator state | Not read in this counter-review |
+| Historical executed artifacts | Byte-identical; use successors for corrections |
+| Canonical admission and trading | Not authorized |
+| Monitor | Paused; do not rearm |
+<!-- TPR-CCR22-SCOPE:END -->
+
+Final focused reprise, syntax/hash/diff checks and publication custody are
+recorded below after they complete. Claude next reviews this Codex round
+independently from the exact section74.1 base through the final published
+snapshot. No2021-now performance statistic, compile/backtest ID or order
+count exists to report; all prior negative results and failed attempts stay
+visible rather than being replaced with an unexecuted result.
+
+### 74.6 Final focused validation and handoff
+
+After the section74/current-pointer rotation, the exact focused union is
+**488 passed,1 skipped in4.92s**, no failures/errors. Command: bundled
+Python3.12.14, `PYTHONDONTWRITEBYTECODE=1`, isolated in-process runner,
+`pytest.main` with `-q -p no:cacheprovider --tb=short` and these paths:
+
+- Both `test_qc_cap_tilt_operations.py` and `test_qc_operations_v2.py` under
+  `tests/target_price_revisions_qc/`.
+- `tests/target_price_revisions/test_document_consistency.py`,
+  `tests/test_active_document_consistency.py`, the Target import firewall,
+  and `tests/test_runtime_stop_leak_guard.py`.
+- The two direct ML-boundary nodes
+  `test_no_execution_capable_module_imports_ml` and
+  `test_assistant_package_has_no_ml_import_except_the_future_shadow_adapter`.
+- Explicit preregistration nodes
+  `test_host_git_logic_restores_production_git_after_exit` and
+  `test_reviewed_loader_refuses_when_the_frozen_git_is_unavailable`.
+
+This includes the new section74 positive guard, three disposition mutations,
+five scope-expansion mutations and four contradictory grants. Prior
+historical section73 pins stay active unchanged. Changed Python source
+compiles in memory without producing bytecode. `git diff --check` is clean.
+Host ismacOS26.6.2/arm64; this does not prove native Windows custody.
+
+The historical byte span from the start of section68 through the prior EOF
+is **254,923 bytes**, unchanged at SHA-256
+`1a2dd47807a1c62ed27cff127e08ba3464a26d76f43e3c32dc6136c58fffde95`.
+The initial comparison helper included the new section-separator newline
+and asserted unequal; corrected exact-span comparison verifies preservation,
+with exactly one added separator newline, not an edit to historical evidence.
+
+| File | Final SHA-256 |
+|---|---|
+| Lane document guard | `d40d3b670e4265561e695b65d9fe6cb609c6d85d87a79045413f269e7465ca89` |
+| Cap controller tests | `e477d325b924f32367501d1453ef8c0722e299a4460b159439e614ae8d908163` |
+| Matched successor controller tests | `c77355fae2f6d55000f707c4080e2c2dc7d12f1c30aafe1b5ed7fac7eeeca097` |
+| Unchanged `cap_tilt_operations.py` | `d4d9b8e7500388e294a703ad7262a1e825a6c99762d8b0367bc10a52beb2904a` |
+| Unchanged `operations_v2.py` | `c1939f315690b27c504939541bd1b543948a3eabea4b9eb239536dac7fcdf3e4` |
+
+Only this record and three lane-owned test files change. No empirical look,
+project, compile, backtest, order, data capture or private upload is created
+in this round. Historical ON3/OFF1 and16looks stay recorded; all six extended
+universe outcomes are **not run**, not failures or completed2021-now cases.
+The exact required owner decision is the unanswered fresh per-arm attempt
+allowance; no fourth originalON attempt is inferred. A prospective complete
+study freeze, safe successor corrections, fresh scoped source availability
+and usable actual QC evidence remain subsequent work, not claimed complete.
+
+At publication, re-verify physical/Git root, branch, HEAD, staged diff/status
+and actual matching remote; require the reviewed9a275386 baseline still
+matches origin. Commit this bounded handoff and push exactly once, non-force,
+to `HEAD:refs/heads/codex/strategy-target-price-revisions`; stop if origin
+advances unexpectedly. Verify local/actual remote equality and clean status
+after that push. The publication commit containing section74 is the exact
+next Claude snapshot, with parent/review base pinned in74.1; its hash is
+reported in the chat. The heartbeat remains paused during and after this
+round; no automatic rearm or checkpoint/side-branch publication.

@@ -1,15 +1,13 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Sections 21 and 22 (Codex counter-review of section 20, the Python
-QC carrier and BT-2..BT-10) independently reviewed by Claude in section 23
-(2026-10-09): all five commits accepted, nine lane test pins added, one P2
-pre-launch carrier-capacity risk documented, no production defect.
-Codex counter-review of section 23 pending.
-Under section 19.6 a synthetic-only order-based QuantConnect evaluation may
-start only after that counter-review accepts this review. Native LEAN/QC
-execution and empirical backtest readiness remain unverified/blocked. The
+Status: **Codex counter-review of section 23 accepted (section 24,
+2026-10-09). The owner's next ten requested engineering capabilities,
+NE-1..NE-10, are in progress as a new exact-source review candidate.
+Fresh Claude review and Codex counter-review of changed native/carrier source
+are required before the section 19.6 synthetic-only QuantConnect evaluation.
+Native LEAN/QC execution and empirical backtest readiness remain unverified/blocked. The
 original economic, data, empirical, account and trading gates remain closed.**
-Current scope/evidence are sections 17 through 23. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 24. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -2327,3 +2325,80 @@ source; it establishes neither native execution, cloud packaging nor
 empirical readiness. No GDR-1 source audit, real data, broker, paper or live
 step starts from this review. `docs/ACTION_PLAN_2026-08-20.md` and
 `docs/SESSION_HANDOFF.md` were not edited and stay frozen for both agents.
+
+## 24. Codex counter-review and next ten native-evidence capabilities, 2026-10-09
+
+### 24.1 Exact review and dispositions
+
+Baseline publication: `180fc5b8c2392e4140a2776c60d5f3b8352f153a`.
+Completed pushed Claude review: `3c5d76fffcd0c473159fef2144faf2e4057205de`,
+verified descendant, equal to clean local HEAD and the matching remote lane
+ref before work. Every review commit/diff and section 23 was read. No
+production source changed in this review range.
+
+| Claude commit | Codex disposition | Evidence |
+|---|---|---|
+| `f0ed0be39f21330d21421691af61f1b4154fc06a` | accepted | Nine new pins passed under network-denied CPython 3.12.14: 9 tests, 5 subtests, 7.24s. Nine separately isolated in-memory guard-removal mutants were caught by assertion failures, with no harness errors. |
+| `3c5d76fffcd0c473159fef2144faf2e4057205de` | accepted | Dispositions, unchanged identities, limitations and independent validation attribution agree with the exact snapshot. Section 23.7's provenance question is resolved by direct human messages visible to Codex, below. |
+
+The owner directly wrote "i asked you to implement the next 10 milestones"
+and then "push" in this chat before `180fc5b8`. These are human messages, not
+authority inferred from Codex prose. They substantiate 22.1 and 22.7 for both
+roles. The premature `bf91788b` publication remains historical, not erased or
+recast as compliant. The newest direct instruction is "review has landed.
+start counter review and then the next 10 milestones". Manual work does not
+resume the paused monitor.
+
+### 24.2 Retained P0-P3 counter-review ledger
+
+| Claude ID | Priority | Codex disposition / next correction |
+|---|---|---|
+| GDR-CR23-001 | P2 | accepted pre-launch risk; full carrier is 25 files, 534,743 bundle bytes against 540,000. Current official QC Files/Resources docs describe default Python `research.ipynb` and tier quotas. NE-1 provides a separately reviewed native-only carrier with notebook headroom, without tier/account change. |
+| GDR-CR23-002 | P3 | accepted limitation; changing only review anchors changes binding/genesis, and a new directory has no continuity. NE-7 retains a scoped cycle head across reviews/corrective source epochs; local rollback/cross-directory custody remains an operator obligation. |
+| GDR-CR23-003 | P3 | accepted limitation; intent/compile at 00:00/01:00-02:00, ambiguity at 05:00, truthful completed run at 03:00-04:00 refuses on the one-clock floor. NE-8 separates retrieval from event time; never falsify clocks or spend a fake failure. |
+| GDR-CR23-004 | P3 | accepted limitation; an invented returned map with `research.ipynb` refuses in the Python-only snapshotter. NE-9 classifies complete new-project inventory and quarantines opaque extras without execution. |
+| GDR-CR23-005 | P3 | accepted, corrected; both same-size carrier/member hash guards independently pinned. |
+| GDR-CR23-006 | P3 | accepted, corrected; correctly chained duplicate observations refuse on replay. |
+| GDR-CR23-007 | P3 | accepted, corrected; consistently receipted wrong binding/trace and old source epochs refuse. |
+| GDR-CR23-008 | P3 | accepted, corrected; phantom reservations and same-close receivables refuse with matching forged calendars. |
+| GDR-CR23-009 | P3 | accepted, corrected; fresh wrong-economics receipts and strategy-only carried pending actions refuse. |
+
+Counts remain P0 0/P1 0/P2 1/P3 8; five corrected test findings and four
+documented limitations. CR18-005's shared/out-of-lane failures stay retained,
+not changed. Claude's full results in 23.5 are not rerun or claimed as Codex
+validation. Identities in 22.5/23.5 remain the exact reviewed epoch, not hashes
+to reuse after source changes.
+
+Counter-review closing document check: rotated lane status-pin plus shared
+active-document consistency, network denied, 70 passed in 1.24s. No full suite.
+
+### 24.3 Bounded definitions of done for the next ten
+
+These distinct missing engineering capabilities do not complete original
+GDR-0..6 or repeat ENG-1..26/BT-1..10.
+
+| ID | Capability / bounded definition of done |
+|---|---|
+| NE-1 | Native import-closure carrier: exact runtime imports/initializers, unchanged candidate/372-frame sidecar; separate full-review/runtime identities; omission/extra/unsafe import refusal; conservative file/byte headroom including a default notebook. |
+| NE-2 | Complete native trace export: actual accepted fixed-callback transcript, candidate/runtime bundle anchors, bounded ordered fragments; count/head-only or truncated output cannot claim completion. |
+| NE-3 | Returned-output reconstruction: supplied raw fragments reconstruct the trace; missing/duplicate/reordered/altered/unrelated fragments refuse before existing replay; retain raw identity, no fabricated substitute trace. |
+| NE-4 | Runtime/configuration evidence: bounded observed Python/SDK and custom-security/fill/fee/timezone/immediate-settlement labels; absent/mismatched observations refuse or remain unverified, shim expectations are not native proof. |
+| NE-5 | Native raw-mark/NAV checkpoints: invented price-50 and whole-account valuation compared with quantity/cash at every fixed frame; no fill/fee/settlement economics changed. |
+| NE-6 | Immutable deferred callback fence: bounded snapshots of early SDK events, exact order/ID/symbol/currency lineage, overflow/conflict refusal; no mutable SDK-event list. |
+| NE-7 | Scoped attempt continuity: owner-retained cycle head accumulates launches/failures across reviews/corrected packaging; exact per-intent bindings; third unsuccessful attempt blocks another intent, no automatic zero-count restart. |
+| NE-8 | Dual-clock terminal recovery: monotone retrieval observations reconcile earlier truthful terminal events after uncertainty; original event times retained, wrong IDs/conflicts/chronology refuse atomically. |
+| NE-9 | Complete new-project custody: safe bounded full inventory including notebook/non-Python files, exact hashes/classification; executable Python comparison, opaque extras quarantined without execution or unrelated outcomes. |
+| NE-10 | Failed-runtime diagnostics: bounded stage, accepted partial trace, pending order/receipt identities and observations emitted before re-raising; failed/incomplete runs never emit success. |
+
+Changed native source/carrier requires fresh independent exact-source review
+before upload/run. Paired/comparator/action/equity-settlement native jobs stay
+outside the fixed base run. Section 19.6 human authorization stays external to
+immutable false/null draft fields. Actual QC ledger remains zero uploads,
+zero launches and zero unsuccessful attempts; no project/compile/run IDs.
+A read-only account/settings visit showed the controllable QC in-app browser
+signed out. The owner was asked nonblockingly to sign in; no credentials,
+outcomes, account changes or installations were accessed/requested.
+
+Implementation/validation/closing identities accumulate below. One combined
+final same-lane non-force push, no intermediate publication. Frozen root
+documents and historical edits are preserved.

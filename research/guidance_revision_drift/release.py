@@ -75,6 +75,8 @@ def launch_preflight() -> dict:
                 "external_human_authorization_for_exact_synthetic_candidate",
                 "reviewed_root_entrypoint_and_exact_372_frame_transport",
                 "existing_authenticated_QC_access_without_install_purchase_or_account_change",
+                "existing_project_file_and_remaining_log_quotas_cover_complete_native_evidence",
+                "retained_owner_cycle_and_latest_head_preserve_attempt_budget_across_corrections",
                 "record_project_compile_run_engine_and_binding_identities",
                 "candidate_specific_maximum_three_unsuccessful_QC_attempts_then_Mia_or_owner",
             ],

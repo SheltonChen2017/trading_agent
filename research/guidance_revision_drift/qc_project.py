@@ -13,12 +13,13 @@ import re
 from zipfile import ZipFile
 
 from data.hashing import hash_bytes, hash_payload
-from research.guidance_revision_drift.bundle import (
-    BundleError, MANIFEST_PATH, SIDECAR_PATH, build_bundle, verify_bundle,
-)
+from research.guidance_revision_drift.bundle import BundleError, MANIFEST_PATH, SIDECAR_PATH
+from research.guidance_revision_drift.native_bundle import build_native_bundle, verify_native_bundle
+from research.guidance_revision_drift.reporting import source_manifest
 
 
 MAX_PROJECT_FILES = 25
+RESERVED_PROJECT_FILES = 1  # Leave room for QC's default research.ipynb.
 MAX_PROJECT_FILE_BYTES = 32_000  # Every file must be strictly smaller.
 PAYLOAD_CHARS = 30_000
 _PAYLOAD_PREFIX = "gdr_payload_"
@@ -256,7 +257,7 @@ from research.guidance_revision_drift.lean.main import (
 
 class GuidanceRevisionDriftAlgorithm(_NativeGuidanceRevisionDriftAlgorithm):
     """Root discovery class; all native callbacks and economics are inherited."""
-    pass
+    _gdr_runtime_context = __RUNTIME_CONTEXT__
 
 
 del _NativeGuidanceRevisionDriftAlgorithm
@@ -269,7 +270,7 @@ def _file_manifest(files: dict[str, bytes]) -> dict[str, dict[str, object]]:
 
 
 def _bounded_files(files: dict[str, bytes]) -> None:
-    if type(files) is not dict or not 2 <= len(files) <= MAX_PROJECT_FILES:
+    if type(files) is not dict or not 2 <= len(files) <= MAX_PROJECT_FILES - RESERVED_PROJECT_FILES:
         raise QCProjectError("exact bounded project-file dictionary required")
     if ("main.py" not in files
             or any(type(name) is not str or (name != "main.py" and not _PAYLOAD_NAME.fullmatch(name))
@@ -282,13 +283,14 @@ def _bounded_files(files: dict[str, bytes]) -> None:
 
 
 def _prepare_project() -> tuple[dict[str, bytes], dict]:
+    full_review_source = source_manifest()
     try:
-        raw = build_bundle()
+        raw = build_native_bundle()
         bundle_sha256 = hash_bytes(raw)
-        bundle = verify_bundle(raw, expected_sha256=bundle_sha256)
+        bundle = verify_native_bundle(raw, expected_sha256=bundle_sha256)
     except BundleError as exc:
         raise QCProjectError("cannot prepare current-source synthetic carrier") from exc
-    if len(raw) > PAYLOAD_CHARS * (MAX_PROJECT_FILES - 1) // 4 * 3:
+    if len(raw) > PAYLOAD_CHARS * (MAX_PROJECT_FILES - RESERVED_PROJECT_FILES - 1) // 4 * 3:
         raise QCProjectError("source bundle exceeds Python carrier capacity")
     encoded = base64.b64encode(raw).decode("ascii")
     files = {}
@@ -300,21 +302,25 @@ def _prepare_project() -> tuple[dict[str, bytes], dict]:
     with ZipFile(BytesIO(raw), "r", allowZip64=False) as archive:
         members = tuple((info.filename, info.file_size, hash_bytes(archive.read(info)))
                         for info in archive.infolist())
+    body = bundle["manifest"]
+    runtime_context = {"runtime_source_sha256": body["source_manifest_sha256"],
+        "bundle_sha256": bundle_sha256, "candidate_sha256": body["candidate_sha256"],
+        "fixture_sha256": body["members"][SIDECAR_PATH]["sha256"]}
     root_source = _ROOT_TEMPLATE
     for token, value in (("__BUNDLE_SHA256__", repr(bundle_sha256)),
                          ("__BUNDLE_BYTES__", repr(len(raw))),
                          ("__PAYLOAD_FILES__", repr(payload_files)),
-                         ("__MEMBERS__", repr(members))):
+                         ("__MEMBERS__", repr(members)),
+                         ("__RUNTIME_CONTEXT__", repr(runtime_context))):
         if root_source.count(token) != 1:
             raise QCProjectError("invalid fixed root-loader template")
         root_source = root_source.replace(token, value)
     files["main.py"] = root_source.encode("ascii")
     _bounded_files(files)
     inventory = _file_manifest(files)
-    body = bundle["manifest"]
     fixture = body["members"][SIDECAR_PATH]
     manifest = {
-        "schema": "gdr.synthetic.python-project.v1",
+        "schema": "gdr.synthetic.python-project.v2",
         "purpose": "offline_cloud_carrier_preparation_not_native_certification",
         "format": "Python_AST_literal_base64_of_exact_ZIP_STORED_source_bundle",
         "entrypoint": "main.py",
@@ -324,7 +330,11 @@ def _prepare_project() -> tuple[dict[str, bytes], dict]:
         "bundle_sha256": bundle_sha256,
         "bundle_bytes": len(raw),
         "bundle_manifest_member": MANIFEST_PATH,
-        "source_manifest_sha256": body["source_manifest_sha256"],
+        "source_manifest_sha256": hash_payload(full_review_source),
+        "runtime_source_sha256": body["source_manifest_sha256"],
+        "runtime_context": runtime_context,
+        "reserved_project_files": RESERVED_PROJECT_FILES,
+        "project_files_with_reserved_notebook": len(files) + RESERVED_PROJECT_FILES,
         "candidate_sha256": body["candidate_sha256"],
         "fixture_sha256": fixture["sha256"],
         "fixture_bytes": fixture["bytes"],
@@ -344,7 +354,9 @@ def _prepare_project() -> tuple[dict[str, bytes], dict]:
     }
     try:
         # Reject a changed source epoch during carrier/template construction.
-        verify_bundle(raw, expected_sha256=bundle_sha256)
+        verify_native_bundle(raw, expected_sha256=bundle_sha256)
+        if source_manifest() != full_review_source:
+            raise BundleError("full review source changed during carrier preparation")
     except BundleError as exc:
         raise QCProjectError("source changed while preparing synthetic carrier") from exc
     return files, manifest

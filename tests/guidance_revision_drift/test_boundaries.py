@@ -97,6 +97,11 @@ import research.guidance_revision_drift.callback_plan
 import research.guidance_revision_drift.paired_bridge
 import research.guidance_revision_drift.evaluation
 import research.guidance_revision_drift.completion_evidence
+import research.guidance_revision_drift.native_bundle
+import research.guidance_revision_drift.native_observation
+import research.guidance_revision_drift.trace_transport
+import research.guidance_revision_drift.cloud_inventory
+import research.guidance_revision_drift.evaluation_cycle
 blocked = {'assistant', 'risk', 'execution', 'ml', 'config', 'requests', 'httpx', 'alpaca', 'quantconnect'}
 blocked.update({'AlgorithmImports', 'clr', 'QuantConnect'})
 print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in blocked)))

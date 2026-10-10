@@ -2,7 +2,7 @@
 
 Status: **Codex counter-review of section 23 accepted (section 24,
 2026-10-09). The owner's next ten requested engineering capabilities,
-NE-1..NE-10, are in progress as a new exact-source review candidate.
+NE-1..NE-10, are implemented as a new exact-source review candidate.
 Fresh Claude review and Codex counter-review of changed native/carrier source
 are required before the section 19.6 synthetic-only QuantConnect evaluation.
 Native LEAN/QC execution and empirical backtest readiness remain unverified/blocked. The
@@ -2402,3 +2402,110 @@ outcomes, account changes or installations were accessed/requested.
 Implementation/validation/closing identities accumulate below. One combined
 final same-lane non-force push, no intermediate publication. Frozen root
 documents and historical edits are preserved.
+
+### 24.4 Implemented next-ten behavior and limits
+
+| ID / status | Technical implementation | Plain-language boundary |
+|---|---|---|
+| NE-1 / implemented, review pending | `native_bundle` validates the exact 15-module native graph, four initializers, pinned draft and unchanged sidecar. Current-source canonical stored-ZIP verification and carrier hashes remain strict; `qc_project` separates runtime/full-review identities and reserves one notebook slot. | Upload preparation carries what the native algorithm needs, not every offline helper. Smaller files do not prove cloud discovery, filesystem support or permission. |
+| NE-2 / implemented, review pending | Native `on_end_of_algorithm` validates and exports its actual full accepted trace, immutable runtime context, observed configuration, 372 valuation rows and terminal cash/inventory. Each log fragment is distinct and bounded; count/head-only output is insufficient. | The run must return its actual transcript, not a locally invented substitute. Shim-export success is still not a native run. |
+| NE-3 / implemented, review pending | `trace_transport` validates the original canonical chain, losslessly omits only derivable sequence/predecessor fields on the compressed wire, reconstructs exact records/head, retains all raw ordered hashes and checks runtime context. Bounded decompression refuses loss, duplication, reordering, altered anchors, wrong context, trailing or oversized data; complete transport is base-only. | Incomplete logs cannot become success by rehashing them. Existing semantic replay remains required after transport reconstruction, and hashes do not authenticate the platform. |
+| NE-4 / implemented, review pending | `native_observation` reads actual Python/object/CLR assembly and configured symbol/timezone/fill/fee/immediate-settlement labels. Contradictory observed native model types refuse even when assembly reflection is missing. Missing labels remain explicit; configuration is reread before frames/end. | Expected SDK labels are not substituted for observations. Python doubles, absent SDK versions and matching labels never self-certify native bindings or settlement parity. |
+| NE-5 / implemented, review pending | Each accepted fixed frame adds an invented raw-price-50/whole-account-NAV observation bound to its trace quantity and immediate cash. Drift refuses before bridge/valuation advancement; complete metadata verifies all 372 rows and terminal account arithmetic. | A final matching cash balance cannot conceal a transient wrong mark or account value. The native immediate-cash envelope does not validate equity settled buying power. |
+| NE-6 / implemented, review pending | Early native events become canonical immutable receipt snapshots with whole IDs/quantity, exact UTC, SYN symbol and zero-control/USD currency checks. The ordered 64-event fence retains duplicate idempotence, conflicts and atomic overflow refusal, then acknowledges the original bytes only after binding. | SDK mutation after delivery cannot change the receipt later replayed. No new receipt, fill, clock or economic transition is manufactured. |
+| NE-7 / implemented, review pending | `OwnerCycle`/`CycleJournal` retain candidate/base372 identity and the three-failure ceiling across review metadata and corrective content epochs. Full per-intent review/content bindings and whole replay-verified projections remain; create/open require retained heads and conflicting observations refuse. | Re-review or repackaging does not buy another three attempts. Deliberately replacing the owner cycle or losing both history and external anchors is not detectable by local software and remains prohibited. |
+| NE-8 / implemented, review pending | The richer ledger keeps platform event times separate from monotone `observed_at`. A completed event at 04:00 retrieved at 07:00 can reconcile ambiguity observed at 05:00; all clocks/ambiguity remain, with no false failure count. IDs, compile lineage, event order, retrieval order and conflicting terminals remain strict. | Late retrieval no longer requires falsifying the engine clock or charging a successful run as a failure. A caller-supplied terminal still is not authenticated execution. |
+| NE-9 / implemented, review pending | `cloud_inventory` snapshots every bounded safe returned file, including opaque notebook/additions, under a complete inventory anchor. Python changes have hashes/diffs; oversized text diffs are explicitly incomplete, with raw manual review required. Non-Python bytes are quarantined without parsing/rendering/execution. | No filtering-away of Mia additions and no automatic economic acceptance or port. Verify current local carrier and authenticated full returned-project provenance separately. |
+| NE-10 / implemented, review pending | Failed native initialization/data/fill/receipt/end callbacks emit bounded accepted partial trace, failure class/stage, binding/pending/deferred IDs, attempted native account observations and missing fields, then re-raise the original exception. Nested failures are not repeatedly exported; missing context emits refusal only. | A failed or partial run cannot produce completion evidence. Diagnostics support later scoped investigation; they neither hide the failure nor grant another attempt. |
+
+The cross-capability `native_completion_dossier` derives evidence only from
+supplied retrieved raw fragments, verifies native metadata, exact current
+carrier/full-source/runtime context, complete owner-cycle head/projection and
+matching typed compile/run receipts, then invokes existing semantic replay.
+It does not down-convert away ambiguity or source epochs into the v1 journal.
+Run-output SHA binds the exact LF-delimited ASCII messages; fragment inventory
+SHA is distinct. Authenticated retrieval must separately retain platform
+wrappers and every other output, not silently filter them. Every native,
+external-provenance, cloud, empirical and upload/launch flag remains false.
+
+### 24.5 Author-QA ledger and validation
+
+| ID | Priority / disposition | Evidence / correction |
+|---|---|---|
+| GDR-NE24-001 | P3 / corrected | Read-only peer audit reproduced an aliased `from importlib import import_module as hidden_loader` passing the closure checker. Ban loader-module imports and direct dynamic-execution references, including aliases; pin conditional/aliased cases. Removing that loader-module guard in memory produced two expected assertion failures and zero harness errors; restoration passed. This is a guard-sensitivity gap, not execution in the actual reviewed closure. |
+| GDR-NE24-002 | P2 / documented pre-launch gate | Complete fixed native-source shim export is 88 routine Log fragments, 17,110 bytes including LF, maximum 195 bytes/message, with 752 protocol records and 372 valuation rows. It exceeds Free 10KB/backtest logging capacity. Existing tier/remaining rolling quota and actual native metadata budget must be checked before launch; no upgrade/purchase/alternative-storage change is inferred. |
+| GDR-NE24-003 | P3 / corrected during author QA | Initial tuple-valued compact rows violated strict JSON; export detached list projections. Preserve changed-volume partial-cancel diagnostics as nonfixed failed transport, not an accepted complete fixed run. Preserve/refuse known wrong native model type even if assembly/version reflection is unavailable. |
+| GDR-NE24-004 | P3 / validation observation, resolved | One peer dossier run produced 1 failed/3 passed/8 subtests while source was being edited; exact current-carrier guard refused the stale retained epoch. No guard was weakened. After source freeze, 4 passed/8 subtests in 11.35s. This was a local validation result, not a QC launch/attempt. |
+
+CR23-001 is corrected by NE-1's smaller reviewed-candidate path. CR23-002/003
+are addressed by the richer owner-cycle/dual-clock path, not by pretending the
+legacy v1 APIs changed; retained operator continuity limits remain. CR23-004
+is addressed by the complete inventory API. All old P0-P3 findings/dispositions
+remain historical, including shared CR18-005; no shared fix was made.
+
+Final combined focused selection, network-denied bundled CPython 3.12.14:
+**212 passed, 340 subtests, 116.94s**. Scope: new native bundle/observations,
+transport/inventory/cycle/dossier, impacted carrier/native source and legacy
+evaluation/completion/bundle/CLI regressions, lane import/status boundaries and
+shared active-document checks. Not a full lane/repository suite. Independent
+peer forged/rehashed cash/valuation/receipt/cycle evidence also refused during
+semantic replay. Separate capability runs: NE-7/8 plus legacy evaluator/import
+34 passed/73 subtests (0.87s); NE-3/9 17 passed/48 subtests (6.14s); native
+24 passed/60 subtests (46.39s), additional partial-reflection pin 1 passed/
+3 subtests (2.04s); carrier/native bundle 23 passed/74 subtests (5.86s).
+These are overlapping focused scopes, not additive suite totals.
+
+Seven new isolated in-memory guard-removal trials were caught and restored:
+owner-cycle ceiling and retrieval floor; transport context and opaque
+quarantine; native NAV equality and deferred-event capacity; closure loader
+imports. The nine Claude guard trials in 24.1 are separately retained. In-memory
+compilation passed for 84 source/test files and 14 generated carrier files;
+source/native/full-bundle/project verification and `git diff --check` passed.
+Frozen root documents, original plan/PDF/draft, neutral `data/` helpers and
+native bridge/simulator/comparator are byte-unchanged from `3c5d76ff`.
+Closing status/import/active-document checks: 75 passed in 1.69s; source and
+carrier identities below independently rechecked unchanged after the record.
+
+Current official [QC Files](https://www.quantconnect.com/docs/v2/cloud-platform/projects/files),
+[Resources](https://www.quantconnect.com/docs/v2/cloud-platform/organizations/resources)
+and [Logging](https://www.quantconnect.com/docs/v2/writing-algorithms/logging)
+documentation was read on 2026-10-09. Use routine Log rather than burst Debug;
+only invented fixture/software protocol observations are exported, no vendor
+or market dataset values. Documentation alignment is not platform acceptance.
+
+### 24.6 Exact prepared identities and remaining gates
+
+| Identity | SHA-256 / size |
+|---|---|
+| Full source manifest | `dbb14132f0f7b7b082b2ed87f6e75ec078c2c235c6b50d14b5d794abde9beb5a` |
+| Full review bundle, separate from executable carrier | `1d83c49498ce5ff1970ed5d8a61a1b7ed2c6c2c5f1d4c02c6401adbf1ff2425c`; 621,781 bytes, 48 members |
+| Runtime source manifest | `beee91270427d72ccda5beafa91897ae357a5d0964845eb93efef39a0f9062e9` |
+| Native-only bundle | `1579a3daf3f5665d63d1f0f9bdd975ca8fdad34847286475f5b8c1c4e6d4809b`; 272,862 bytes, 22 members |
+| Carrier project map | `fd50b0c3f380c3274afb0d491f3250f9aa498d0c05487b34964f568f394b76ab`; 14 Python files, 378,810 bytes total, largest 30,014 bytes; 15 files with one reserved notebook |
+| Root generated `main.py` | `053ae49b018216bccc1820b5349769526cf216f643f520db4dcdabf6eee4dcca`; 14,812 bytes |
+| Unchanged fixture | `8f35d56a335d3f7d9dad016e1e2236de7fcd2635e5c463c30081f97b7b944458`; 43,135 bytes, 372 frames, 93 invented sessions |
+| Unchanged draft candidate | `b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c`; false/null authority decisions unchanged |
+
+Bundles/carrier were prepared and verified in memory, not saved as a new
+release, extracted as a platform artifact or uploaded. The actual retained
+owner-cycle label for the existing 19.6 authorization is
+`GDR-base372-approved-20261008`, cycle SHA
+`bef3928146b1ca7b8e694a239b6487d9a2a13ba051c2c5f517163689d58e36c0`,
+genesis/head before any real intent
+`7232f0c3e4856a00f1361d507af20e6e1a6526215f6fb24ea3e283723a4762dc`.
+No actual journal/intent was created; this label is not a platform ID or an
+authorization token. Actual ledger stays **0 uploads / 0 launches / 0 failed
+terminal attempts**, with no project/compile/run or engine/binding result.
+
+Next: publish this complete accumulated round once to the same lane, then
+Claude independently reviews the exact final pushed snapshot and every commit
+after consumed review `3c5d76ff`; Codex counter-reviews every review commit.
+Only afterward, with existing authenticated QC access and sufficient existing
+logging resources, may the fixed synthetic-only order-based evaluation proceed
+under 19.6. A missing resource/access or economic choice returns to the owner,
+not an installation/purchase/self-approval. Count every unsuccessful terminal
+launch toward the same maximum three across corrective epochs, then stop for
+Mia/owner and retrieve/diff every resulting source file before verified porting.
+Real-data/PIT/freeze/family/protected-date/settlement/comparator/action/empirical
+and funded/broker/paper/live/capital gates remain closed. Original proposals
+are unchanged; the lane is not empirically backtest-ready. Monitor stays paused.

@@ -68,6 +68,10 @@ class PreparationCliTests(unittest.TestCase):
         self.assertEqual(report["external_evaluation_scope"], "synthetic_only_order_based_integration_not_empirical")
         self.assertIn("reviewed_root_entrypoint_and_exact_372_frame_transport",
                       report["required_before_external_evaluation"])
+        self.assertIn("existing_project_file_and_remaining_log_quotas_cover_complete_native_evidence",
+                      report["required_before_external_evaluation"])
+        self.assertIn("retained_owner_cycle_and_latest_head_preserve_attempt_budget_across_corrections",
+                      report["required_before_external_evaluation"])
         self.assertNotIn("pinned_native_engine_and_binding_validation",
                          report["required_before_external_evaluation"])
         self.assertIn("pinned_native_engine_and_binding_validation",

@@ -6,11 +6,14 @@ QuantConnect strategy. Original GDR-0 review/freeze and GDR-1..GDR-6 research,
 data, cloud and operating gates remain closed. The original plan/PDF and
 proposed parameter hash are unchanged.
 
-The owner's ten-capability implementation batch is BT-1 through BT-10 in
-lane-record section 22: the carrier plus nine new composition/evidence
-boundaries below. These are offline engineering review candidates, not ten
-research stages or empirical backtest readiness. Fresh independent review
-and the scoped synthetic QC evaluation remain outstanding.
+BT-1 through BT-10 in lane-record section 22 were independently reviewed and
+counter-reviewed in sections 23/24. The owner's next batch is NE-1..NE-10:
+native-closure packaging, complete trace export/reconstruction, runtime and
+valuation observations, immutable early callbacks, continuous attempt custody,
+dual-clock recovery, complete project inventory and failed-run diagnostics.
+These are offline engineering review candidates, not research stages or
+empirical backtest readiness. Fresh exact-source independent review and the
+scoped synthetic QC evaluation remain outstanding.
 
 The offline core imports only the Python standard library, its own modules and the
 unchanged product-neutral `data.hashing` / `data.financial_primitives` helpers.
@@ -47,6 +50,11 @@ verified. No other lane's budget or permissions are inherited.
 | BT-3/4/5 | `paired_bridge` | Separate paired native-style IDs and exact submission/fill/cancel acknowledgments; retained-input action reconciliation and dated settlement/component observations with atomic refusal |
 | BT-7/8/9 | `evaluation` | Passive durable exact-candidate intent/terminal ledger, strict compile/run contracts and complete returned-project byte comparison/Mia quarantine; no platform actuator |
 | BT-10 | `completion_evidence` | Bounded complete trace chunks and fixed 372-frame replay, linked to current source/project and whole passive attempt chain; consistency is not external authenticity |
+| NE-1 | `native_bundle`, `qc_project` | Exact native import closure with separate runtime/full-review identities and reserved default-notebook capacity; no SDK execution during preparation |
+| NE-2/3 | native source, `trace_transport` | Complete actual trace export and ordered raw-fragment reconstruction; missing/truncated/changed transport refuses before replay |
+| NE-4/5/6/10 | native source, `native_observation` | Observed runtime/configuration, raw price/whole-account valuation, immutable bounded deferred events and failed-run partial evidence |
+| NE-7/8 | `evaluation_cycle` | Retained owner-cycle budget across review/corrective epochs and truthful event/retrieval clocks; no automatic attempt reset |
+| NE-9 | `cloud_inventory` | Full returned project inventory, including opaque notebook/additions, hashes and quarantine without executing files |
 
 Positive entries require a predecessor captured before publication. Later
 comparable cuts reduce risk when known even if the original raise was received
@@ -139,13 +147,19 @@ files or an uploaded project, and accepts no output, approval or launch flag.
 `qc_project.build_qc_project()` returns the exact root `main.py` and literal
 Python payload files in memory; `verify_qc_project()` requires the retained
 project-file hash and current-source reconstruction. All files are below
-32,000 bytes and the prepared inventory has at most 25 files. No source is
+32,000 bytes and uploaded preparation reserves one of 25 files for the default
+notebook. The native ZIP is capped at 360,000 bytes. No source is
 minified; candidate JSON and JSONL fixture bytes remain inside the verified
-bundle rather than unsupported cloud project-file types.
+bundle rather than unsupported cloud project-file types. That ZIP now contains
+only the explicitly reviewed native import closure, not offline-only helper
+modules. The full review-source bundle remains a separate artifact. The outer
+preparation manifest binds both identities; offline helper/review changes do
+not get embedded into executable payload bytes.
 
 Only the generated root loader, when explicitly run, materializes the exact
 verified source/fixture into a new private runtime temporary directory and
-imports the unchanged nested native algorithm through a no-op root subclass.
+imports the nested native algorithm through a callback-inheriting root
+subclass that supplies immutable runtime bundle/candidate/fixture anchors.
 Preparation/verification never extracts, imports the SDK or runs that loader.
 Runtime filesystem permissions, native class discovery, binding and callback
 behavior remain unverified in QC. The loader is new source and requires fresh
@@ -160,7 +174,7 @@ calendar row, including missing/stale input refusals. `account_row` plus
 snapshots and marks: transient discrepancies or retained blockers cannot be
 erased by a matching final NAV.
 
-`ReceiptJournal` passively records exact-source intent and terminal receipts
+The legacy v1 `ReceiptJournal` passively records exact-source intent and terminal receipts
 in an existing owner-controlled directory. Retain its head separately for
 restart/truncation checks; losing both history and anchor is not detectable
 rollback. This is not the research-look registry, a QC scheduler or approval
@@ -168,9 +182,32 @@ store. Its supplied compile/run labels and statuses are observations only.
 Terminal observations cannot predate the latest recorded uncertainty. This
 one-clock contract cannot represent late retrieval of an earlier terminal
 event: preserve pending ambiguity rather than rewriting platform timestamps;
-that case needs a separately reviewed observed-time contract.
-The complete returned Python map is compared against both retained anchors;
+that contract is retained for historical compatibility, not used to reset the
+actual owner's cumulative attempt budget.
+The returned Python map is compared against both retained anchors;
 all source changes are quarantined for verification, never executed or ported.
+
+`OwnerCycle`/`CycleJournal` retain the fixed base372 cycle across reviews and
+corrective source/package epochs. Preserve the cycle ID and acknowledged head
+outside the journal directory; reopen requires that head. Each intent retains
+its full content and review binding, while unsuccessful terminals accumulate
+toward the same three-failure ceiling. Truthful platform event clocks are
+separate from monotone retrieval clocks, so later retrieval can reconcile an
+older terminal after uncertainty. Losing both history and retained cycle/head
+cannot be detected locally; a replacement cycle never renews authorization.
+
+`cloud_inventory` inventories every supplied file, not just Python. Notebook
+and opaque extras are hashed/quarantined without decoding, rendering or
+execution. Exact carrier verification and authenticated platform provenance
+remain separate checks. Inventory is not acceptance of Mia's economic changes.
+
+The native source exports its actual accepted trace and observations through
+bounded `trace_transport` log fragments. Reconstruction retains the raw output
+anchor and refuses loss, duplication, reordering or inconsistent metadata before
+`TraceEvidence` replay. Verify actual platform log/resource quotas before launch;
+truncation is failure of evidence, never synthetic completion. Shim runtime/config
+labels remain unverified; no caller flag creates native authenticity. Failed
+callbacks emit partial diagnostics then re-raise, never a success envelope.
 
 `TraceEvidence` transports the complete fixed protocol in canonical chunks
 below the unchanged 64-KiB decoder limit. `replay_completion` requires every

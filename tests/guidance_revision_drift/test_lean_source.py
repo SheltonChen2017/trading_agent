@@ -15,7 +15,10 @@ from unittest.mock import patch
 
 from data.financial_primitives import exact_decimal_multiply, exact_decimal_sum
 from research.guidance_revision_drift.lean_bridge import BridgeError, fixture_frames, fixture_stream
+from research.guidance_revision_drift.contracts import CANDIDATE_SHA256
+from research.guidance_revision_drift.native_observation import FIXTURE_SHA256
 from research.guidance_revision_drift.simulation import Simulation
+from research.guidance_revision_drift.trace_transport import TraceTransportError, reconstruct_trace_fragments, trace_fragment_anchor
 
 
 class CashAmount:
@@ -32,10 +35,17 @@ class OrderEvent:
     def __init__(self, order, at, fee):
         self.order_id, self.utc_time, self.order_fee = order.id, at, fee
         self.fill_quantity, self.fill_price, self.status, self.id = 0, 0, order.status, 0
+        self.symbol = order.symbol
 
 
 class Portfolio(dict):
     cash = Decimal(0)
+
+    @property
+    def total_portfolio_value(self):
+        if hasattr(self, "nav_override"):
+            return self.nav_override
+        return exact_decimal_sum((self.cash, *(exact_decimal_multiply(row.quantity, row.security.price) for row in self.values())))
 
 
 class Slice(dict):
@@ -49,10 +59,12 @@ class QCAlgorithm:
     def __init__(self):
         self.portfolio = Portfolio()
         self.native_orders = []
-        self.log = []
+        self.debug_messages = []
+        self.log_messages = []
 
     def set_time_zone(self, value):
         self.zone = value
+        self.time_zone = NS(id=value)
 
     def set_start_date(self, *value):
         self.start = value
@@ -68,11 +80,14 @@ class QCAlgorithm:
 
     def add_data(self, data_class, ticker, *args):
         self.asserted_subscription = (data_class, ticker, args)
-        self.portfolio[ticker] = NS(quantity=Decimal(0))
-        security = NS(symbol=ticker)
-        security.set_fill_model = lambda model: setattr(self, "fill_model", model)
-        security.set_fee_model = lambda model: setattr(self, "fee_model", model)
-        security.set_settlement_model = lambda model: setattr(self, "settlement_model", model)
+        security = NS(symbol=ticker, price=Decimal("50"))
+        self.portfolio[ticker] = NS(quantity=Decimal(0), security=security)
+        def configured(name, model):
+            setattr(self, name, model)
+            setattr(security, name, model)
+        security.set_fill_model = lambda model: configured("fill_model", model)
+        security.set_fee_model = lambda model: configured("fee_model", model)
+        security.set_settlement_model = lambda model: configured("settlement_model", model)
         return security
 
     def _order(self, symbol, quantity, kind, tag):
@@ -106,7 +121,10 @@ class QCAlgorithm:
         return self._order(symbol, quantity, "market", tag)
 
     def debug(self, value):
-        self.log.append(value)
+        self.debug_messages.append(value)
+
+    def log(self, value):
+        self.log_messages.append(value)
 
 
 def sdk_shim():
@@ -137,6 +155,9 @@ class LeanSourceTests(unittest.TestCase):
 
     def initialize(self):
         algo = self.source.GuidanceRevisionDriftAlgorithm()
+        # Invented shim identity, not actual source/bundle custody or SDK proof.
+        algo._gdr_runtime_context = {"runtime_source_sha256": "1" * 64, "bundle_sha256": "2" * 64,
+                                     "candidate_sha256": CANDIDATE_SHA256, "fixture_sha256": FIXTURE_SHA256}
         with patch.object(self.source, "_read_regular_file", return_value=fixture_stream()):
             algo.initialize()
         return algo
@@ -174,11 +195,11 @@ class LeanSourceTests(unittest.TestCase):
         self.assertEqual(algo.settlement_model, "immediate")
         self.assertEqual(algo.benchmark, "SYN-GDR")
         self.assertEqual(algo.portfolio.cash, Decimal(algo.bridge.finish()["strategy"]["settled_cash"]))
-        self.assertIn("no empirical", algo.log[-1])
+        self.assertIn("no empirical", algo.debug_messages[-1])
         self.assertEqual(algo.bridge.finish()["native_account_checkpoints"], 372)
         self.assertFalse(algo.bridge.finish()["settlement_parity_verified"])
-        self.assertIn("trace_count=752", algo.log[-1])
-        self.assertIn(algo.bridge.finish()["protocol_trace_head_sha256"], algo.log[-1])
+        self.assertIn("trace_count=752", algo.debug_messages[-1])
+        self.assertIn(algo.bridge.finish()["protocol_trace_head_sha256"], algo.debug_messages[-1])
         with patch.object(algo.bridge, "_account_checkpoints", 371), \
              self.assertRaisesRegex(BridgeError, "incomplete native account checkpoint"):
             algo.on_end_of_algorithm()
@@ -365,7 +386,17 @@ class LeanSourceTests(unittest.TestCase):
                 algo.on_data(Slice({algo.symbol: point}))
                 scan()
                 scan()  # repeated scans must not duplicate receipts or fees
-        algo.on_end_of_algorithm()
+        # Changed shadow source-volume is a deliberate shim diagnostic, not
+        # the approved fixed base candidate. Reconciliation remains testable,
+        # but a different receipt transcript must not export fixed completion.
+        with self.assertRaisesRegex(TraceTransportError, "complete fixed synthetic trace"):
+            algo.on_end_of_algorithm()
+        fragments = tuple(row.encode() for row in algo.log_messages)
+        output = reconstruct_trace_fragments(fragments, expected_sha256=trace_fragment_anchor(fragments),
+                                              expected_runtime_context=algo._gdr_context.to_dict())
+        self.assertEqual(output["metadata"]["status"], "failed")
+        self.assertEqual(output["trace"], algo.bridge.protocol_trace())
+        self.assertFalse(algo.debug_messages)
         report = algo.bridge.finish()
         self.assertEqual(report["strategy"]["orders"][0]["status"], "cancelled")
         self.assertEqual(report["strategy"]["orders"][0]["filled_quantity"], 10)

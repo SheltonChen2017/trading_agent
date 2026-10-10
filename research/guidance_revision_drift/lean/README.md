@@ -50,8 +50,12 @@ binding the fixed sidecar and base/stress mode. Exact duplicate callbacks and
 repeat fill-model scans create no new records. Failed calls do not append or
 consume effects. Limits are 1,024 records and 4 KiB per record; exhaustion
 refuses atomically rather than silently truncating evidence. `finish()` includes
-the count, genesis and final hash. The full transcript is available only from
-the explicit projection method; this package does not silently persist it.
+the count, genesis and final hash. The explicit projection remains the trace
+source. The native entrypoint now exports that actual projection using bounded
+ordered log fragments and observed runtime/configuration/valuation evidence.
+Failure diagnostics retain the accepted partial trace and re-raise; incomplete
+runs cannot emit success. Passive reconstruction refuses missing, duplicate,
+reordered or corrupted fragments before existing trace replay.
 
 This is synthetic normalized protocol evidence, not raw broker receipts,
 durable recovery, an external trust root or proof that a native engine ran.
@@ -112,12 +116,14 @@ beside `main.py` by the authorized packaging process. The explicit local
 bytes and the inventoried source. It does not automatically extract or upload
 anything. Initialization verifies every
 byte; alternate data, symbols or dates cannot be selected with parameters.
-The new `qc_project` preparation candidate carries that byte-identical layout
-and sidecar through size-bounded literal Python payloads plus root `main.py`.
+The new `native_bundle`/`qc_project` candidate carries the exact native import
+closure and unchanged sidecar through size-bounded literal Python payloads plus
+root `main.py`, reserving capacity for the default notebook. The full review
+bundle stays separate. Runtime-source and full-review identities are distinct.
 At runtime its root loader checks every carrier, exact archive anchor/member
 inventory and metadata before private temporary materialization. The loader
-uses static imports and exposes one root-defined no-op algorithm subclass;
-it changes neither native callbacks nor fixture economics. No carrier code
+uses static imports and exposes one callback-inheriting algorithm subclass
+with runtime bundle/candidate/fixture anchors; fixture economics are unchanged. No carrier code
 is executed while parsing its literal payload. This is a proposed cloud
 filesystem route, not demonstrated QC support: fresh source review and the
 later native run must establish discovery, permissions and reader access.
@@ -149,3 +155,27 @@ Protocol corrections were checked on 2026-10-07 against official LEAN source:
 and [transaction scan ordering](https://github.com/QuantConnect/Lean/blob/master/Engine/AlgorithmManager.cs).
 These references describe current public source, not a pinned runtime accepted
 for this candidate. The three-attempt rule still applies to any later launch.
+
+The NE-1..NE-10 candidate requires a new exact-source review. It adds bounded
+immutable early-event snapshots, actual runtime/configuration readbacks and
+per-frame invented price-50/whole-account NAV checks; native quantity/cash and
+shadow economic rules are unchanged. Runtime labels missing from Python test
+doubles stay missing/unverified, never replaced by expected SDK labels.
+
+Complete native evidence uses distinct routine `log` fragments, not a burst of
+rate-limited `debug` messages. Measured invented output exceeds the Free tier's
+10KB per-backtest quota. Verify existing organization tier, remaining rolling
+log quota and exact complete evidence budget before a launch; no tier upgrade,
+purchase or alternative-storage authorization is granted here. Only invented
+software-fixture/protocol observations are exported, never vendor/market
+dataset values. Truncated output cannot pass reconstruction. Current official
+[logging documentation](https://www.quantconnect.com/docs/v2/writing-algorithms/logging)
+and [resource quotas](https://www.quantconnect.com/docs/v2/cloud-platform/organizations/resources)
+were checked on 2026-10-09; documentation is not actual runtime evidence.
+
+`native_completion_dossier` composes reconstructed retrieved fragments,
+observations/valuation checks, exact current carrier and the full retained
+owner-cycle ledger. Raw LF-delimited message bytes and their fragment inventory
+have distinct anchors. Retrieval wrappers and all other job output must also
+be retained by the authenticated operator, not silently dropped. Matching
+invented/passive inputs still leave native/provenance/empirical flags false.

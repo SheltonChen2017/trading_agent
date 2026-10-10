@@ -18,7 +18,7 @@ import warnings
 from zipfile import ZIP_DEFLATED, ZipFile
 
 from data.hashing import hash_bytes, hash_payload
-from research.guidance_revision_drift import bundle, qc_project
+from research.guidance_revision_drift import bundle, native_bundle, qc_project
 from research.guidance_revision_drift.contracts import CANDIDATE_SHA256
 from research.guidance_revision_drift.lean_bridge import fixture_stream
 from tests.guidance_revision_drift.test_bundle import repack
@@ -96,16 +96,17 @@ class QCProjectTests(unittest.TestCase):
 
     def test_literal_chunks_reconstruct_exact_source_bundle_and_invented_jsonl(self):
         raw = encoded_bundle(self.files)
-        self.assertEqual(raw, bundle.build_bundle())
+        self.assertEqual(raw, native_bundle.build_native_bundle())
         manifest = qc_project.qc_project_manifest()
         self.assertEqual(hash_bytes(raw), manifest["bundle_sha256"])
         self.assertEqual(len(raw), manifest["bundle_bytes"])
         with ZipFile(BytesIO(raw)) as archive:
             self.assertEqual(archive.read(bundle.SIDECAR_PATH), fixture_stream())
-            for name in sorted(bundle._SOURCE_PATHS):
+            for name in sorted(native_bundle.SOURCE_PATHS):
                 self.assertEqual(archive.read(name), (ROOT / name).read_bytes(), name)
             inner = json.loads(archive.read(bundle.MANIFEST_PATH))
-        self.assertEqual(manifest["source_manifest_sha256"], inner["source_manifest_sha256"])
+        self.assertEqual(manifest["runtime_source_sha256"], inner["source_manifest_sha256"])
+        self.assertNotEqual(manifest["source_manifest_sha256"], inner["source_manifest_sha256"])
         self.assertIs(inner["native_runtime_verified"], False)
         self.assertIs(inner["market_evidence"], False)
         candidate = json.loads((ROOT / "research/guidance_revision_drift/specs/gdr0a.draft.json").read_bytes())
@@ -315,7 +316,7 @@ class QCProjectTests(unittest.TestCase):
             parser(changed)
 
     def test_stale_bundle_and_source_change_during_carrier_preparation_refuse(self):
-        members, manifest = bundle._snapshot()
+        members, manifest = native_bundle._snapshot()
         changed_members, changed_manifest = dict(members), deepcopy(manifest)
         path = "research/guidance_revision_drift/lean/main.py"
         changed_members[path] += b"\n# invented changed source epoch\n"
@@ -324,12 +325,12 @@ class QCProjectTests(unittest.TestCase):
         changed_manifest["members"][path] = {"bytes": len(changed_members[path]),
                                              "sha256": hash_bytes(changed_members[path])}
         raw = encoded_bundle(self.files)
-        with patch.object(qc_project, "build_bundle", return_value=raw), \
-             patch.object(bundle, "_snapshot", return_value=(changed_members, changed_manifest)), \
+        with patch.object(qc_project, "build_native_bundle", return_value=raw), \
+             patch.object(native_bundle, "_snapshot", return_value=(changed_members, changed_manifest)), \
              self.assertRaisesRegex(qc_project.QCProjectError, "current-source"):
             qc_project.build_qc_project()
-        with patch.object(qc_project, "build_bundle", return_value=raw), \
-             patch.object(bundle, "_snapshot", side_effect=[(members, manifest),
+        with patch.object(qc_project, "build_native_bundle", return_value=raw), \
+             patch.object(native_bundle, "_snapshot", side_effect=[(members, manifest),
                  (changed_members, changed_manifest)]) as snapshot, \
              self.assertRaisesRegex(qc_project.QCProjectError, "source changed while preparing"):
             qc_project.build_qc_project()
@@ -406,7 +407,7 @@ else:
             result = self.runtime(directory)
         self.assertNotIn("error", result)
         self.assertEqual(result["root_classes"], ["GuidanceRevisionDriftAlgorithm"])
-        self.assertEqual(result["callback_overrides"], [])
+        self.assertEqual(result["callback_overrides"], ["_gdr_runtime_context"])
         self.assertEqual(result["initialized"], {"symbol": "SYN-GDR", "cash": "100000", "native_orders": 0,
             "account_checkpoints": 0, "sidecar_sha256": hash_bytes(fixture_stream())})
         self.assertIs(result["sdk_is_shim"], True)

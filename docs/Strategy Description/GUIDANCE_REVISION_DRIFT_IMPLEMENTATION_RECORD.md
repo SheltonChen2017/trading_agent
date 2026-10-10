@@ -3,11 +3,14 @@
 Status: **Codex counter-review of section 23 accepted (section 24,
 2026-10-09). The owner's next ten requested engineering capabilities,
 NE-1..NE-10, are implemented as a new exact-source review candidate.
-Fresh Claude review and Codex counter-review of changed native/carrier source
-are required before the section 19.6 synthetic-only QuantConnect evaluation.
+On 2026-10-10 the owner explicitly waived this round's fresh Claude review
+and consequent counter-review for the exact published snapshot, solely to
+proceed with section 19.6's fixed synthetic-only QuantConnect evaluation
+(section 25). This is not independent acceptance. Existing QC authentication
+and logging-resource clearance currently block upload/run.
 Native LEAN/QC execution and empirical backtest readiness remain unverified/blocked. The
 original economic, data, empirical, account and trading gates remain closed.**
-Current scope/evidence are sections 17 through 24. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 25. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -2541,3 +2544,84 @@ owns the full independent lane validation. Codex then counter-reviews every
 review commit/finding; authentic fixed synthetic engine evidence and resource/
 access clearance remain outstanding. Actual attempts stay zero. Root handoff,
 Action Plan and Feature Milestone Record stay frozen for both roles.
+
+## 25. Exact owner review waiver and QC access blocker, 2026-10-10
+
+### 25.1 External human direction, not independent acceptance
+
+After the next-step explanation identified fresh independent review and then
+the section-19.6 fixed synthetic QC evaluation, the owner directly instructed:
+**"proceed without review"**. For this round only, that direction supersedes
+24.6/24.7's fresh-review wait for the exact already-published snapshot
+`b2bef5faec5d6838ee13d00192fd1c1b993c43cf` and its accumulated range
+`3c5d76fffcd0c473159fef2144faf2e4057205de..b2bef5faec5d6838ee13d00192fd1c1b993c43cf`.
+It waives the new independent review and consequent counter-review; it does
+not mark either as performed or accepted. The historical section-23 review
+and section-24 counter-review remain historical, not review of NE-1..NE-10.
+No Claude commit or finding was newly consumed, and no new review SHA exists.
+
+Scope remains only the fixed base SYN-GDR 372-frame, synthetic-only,
+order-based integration evaluation already authorized in 19.6. Exact source,
+native bundle, carrier project, fixture and draft identities remain those in
+24.6; full source is
+`dbb14132f0f7b7b082b2ed87f6e75ec078c2c235c6b50d14b5d794abde9beb5a`,
+native bundle
+`1579a3daf3f5665d63d1f0f9bdd975ca8fdad34847286475f5b8c1c4e6d4809b`,
+carrier project
+`fd50b0c3f380c3274afb0d491f3250f9aa498d0c05487b34964f568f394b76ab`,
+fixture
+`8f35d56a335d3f7d9dad016e1e2236de7fcd2635e5c463c30081f97b7b944458`
+and draft
+`b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c`.
+No source, carrier, economics or immutable false/null permissions changed.
+The current typed `CandidateBinding` has no review-waiver variant; it was not
+given a fabricated review commit, waiver commit or historical review as proof
+of current independent acceptance. Any later completion custody must preserve
+this explicit distinction instead of silently self-certifying the source.
+
+### 25.2 Current read-only platform preflight and retained ledger
+
+Mandatory root/branch and clean local HEAD were verified; lightweight matching
+remote-ref check also returned exact `b2bef5fa`. No competing completed review
+push was observed, and no fetch, merge or branch/worktree change was needed.
+Current official QC [Files](https://www.quantconnect.com/docs/v2/cloud-platform/projects/files),
+[Resources](https://www.quantconnect.com/docs/v2/cloud-platform/organizations/resources)
+and [Logging](https://www.quantconnect.com/docs/v2/writing-algorithms/logging)
+requirements were checked on 2026-10-10. The prepared carrier fits the
+documented Free file limits, but the retained 17,110-byte shim log export
+exceeds Free's 10KB per-backtest log allowance. Actual organization tier,
+remaining rolling log quota and native metadata capacity remain unverified;
+no purchase, upgrade or output-storage workaround is authorized.
+
+The available controllable in-app browser visited the QC account/settings
+page, which explicitly reported **"You are not logged in or your session has
+expired. Please login."** Its Sign In link opened the ordinary existing-account
+login page, retained for owner handoff. No credentials, existing empirical
+project results or real market data were read; no account/resource change,
+project creation, upload, compile or run was performed. No QC/Mia connector
+was available in the current tool inventory; authenticated controllable Mia
+was not established through this signed-out interface.
+
+Actual ledger remains **0 uploads / 0 launches / 0 unsuccessful terminal
+attempts**, with no project, compile/run IDs or native engine/binding evidence.
+Retain owner cycle `GDR-base372-approved-20261008`, cycle SHA
+`bef3928146b1ca7b8e694a239b6487d9a2a13ba051c2c5f517163689d58e36c0`
+and pre-intent genesis/head
+`7232f0c3e4856a00f1361d507af20e6e1a6526215f6fb24ea3e283723a4762dc`;
+no actual journal/intent was created and the maximum three failures was not
+reset. No code tests or full suite were repeated for this access check.
+
+Next required owner action: sign in to the existing QC account in the retained
+controllable tab (or use Mia directly). Then check existing file/log resources,
+preserve truthful owner-waiver custody, inspect the exact prepared source,
+and proceed only with the scoped synthetic upload/run. Retrieve every returned
+source file, retain IDs/attempts/engine details and compare all cloud/Mia changes
+before accepting verified lane-specific corrections. Native completion and
+empirical readiness remain unverified; every other data/economic/family/
+protected-date/account/trading gate stays closed. The monitor stays PAUSED.
+This documentation-only checkpoint is local-only; no new push or publication
+of the completed section-24 round was made while access is blocked.
+The focused lane active-document/draft-source consistency check passed
+(1 test, 0.41s, network denied); the full source SHA above was re-measured and
+unchanged. `git diff --check` passed. Only this lane record changed in Git;
+all project-wide documents and implementation bytes were preserved.

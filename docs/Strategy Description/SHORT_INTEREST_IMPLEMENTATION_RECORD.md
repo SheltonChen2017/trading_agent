@@ -1,25 +1,20 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE HAS REVIEWED ALL FOUR CODEX COMMITS IN `f75d8d8..156facd`
-(SECTION 105) AND ACCEPTS THEM. THE LANE'S FIRST REAL PROVIDER RETRIEVAL, A
-FROZEN 12-TICKER, 4-CYCLE, SI-ONLY FINRA PUBLIC API SAMPLE, WAS AUTHORIZED,
-COMMITTED BEFORE RETRIEVAL, BOUNDED TO SIX SOURCE REQUESTS AND OUTCOME-FREE.
-ITS EVIDENCE REBUILDS BYTE FOR BYTE FROM THE PROTECTED FILES ON DISK: 32 VALID
-AND 16 MISSING SLOTS, 24 MATCHED AND 0 MISMATCHED CONTINUITY CHECKS. NO FINRA
-ROW, CREDENTIAL OR TOKEN IS IN GIT. FIVE IN-MEMORY MUTATION PROBES OF THE
-CAPTURE AND QUALIFICATION GUARDS ALL WENT RED. `SI-CR20-001` (P3, OPEN): 12 OF
-THE 16 MISSING CELLS ARE NAMES THAT STOPPED TRADING BEFORE THE 2026 CYCLES AND
-4 ARE A BRK.B SYMBOL-FORMAT QUESTION, SO THE SAMPLE CANNOT MEASURE DELISTED
-COVERAGE. NETWORK-DENIED ON `156facd`, THE NEW AND PACKAGE-SCANNING LANE FILES
-WITH DOCUMENT AND BOUNDARY CHECKS PASS 535. REAL BACKTESTING
-REMAINS BLOCKED ON IDENTITY, COMPANION COVERAGE, PROCESSING ROUTE, INPUT
-BINDING AND LOOK REGISTRATION (`SI-CR19-003`); THE CANONICAL PIT STUDY REMAINS
-BLOCKED ON ORIGINALS, CORRECTIONS AND AVAILABILITY CLOCKS. THE THREE SOURCE
-P2s, THE SHARED P2 `SI-CR5-005` / `SI-CCR16-007` AND `SI-CR15-001` REMAIN OPEN.
-LOOKBACKS 20/60/120/252 REMAIN UNSELECTED; REAL LOOKS 0/0, ALPHA 0, PERMANENT
-LOOKS NONE, QC ATTEMPTS 0. OUTCOMES, HOLDOUT, PRODUCTION RANKING/SEEDS, ETF,
-QC HISTORY/PROJECT/UPLOAD/COMPILE/JOB/BACKTEST, PURCHASE, BROKER, OPERATOR
-DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL, ORDERS AND TRADING REMAIN GATED.**
+Status: **OWNER'S 2026-10-10 "PROCEED WITHOUT REVIEW" WAIVES THIS ROUND'S
+COUNTER-REVIEW OF THE SOLE RECORD-ONLY CLAUDE COMMIT `90e0d568`; NO CODEX
+ACCEPTANCE OR NEW INDEPENDENT REVIEW IS CLAIMED. SECTION 106 FREEZES A NEW
+OUTCOME-FREE FINRA HISTORICAL/TRADING-STOP AND RAW-SYMBOL CALIBRATION BEFORE
+RETRIEVAL. THE ORIGINAL 48/36-CELL SOURCE DIAGNOSTIC AND ALL ITS MISSING
+CELLS REMAIN UNCHANGED. CURRENT PUBLIC SHARADAR DOCUMENTATION IDENTIFIES A
+PLAUSIBLE COMPANION ROUTE, BUT THE PREVIOUSLY NAMED LOCAL CAPTURE IS ABSENT
+TODAY AND CURRENT ACCOUNT ROUTE/ENTITLEMENT IS NOT VERIFIED. ACTUAL BACKTEST
+READINESS IS NOT CLAIMED. HISTORICAL IDENTITY, COMPANION/TERMINAL COVERAGE,
+INPUT/PROCESSING ROUTE AND PROSPECTIVE LOOK REGISTRATION REMAIN GATED; THE
+STRICT CANONICAL STUDY ALSO NEEDS ORIGINALS/CORRECTIONS/AVAILABILITY CLOCKS.
+SOURCE/SHARED P2s AND PROSPECTIVE P3s ARE RETAINED. LOOKBACKS 20/60/120/252
+UNSELECTED; CANONICAL REAL LOOKS 0/0, EXPLORATORY REAL LOOKS 0, ALPHA 0,
+PERMANENT LOOK IDS NONE, QC ATTEMPTS 0. NO OUTCOMES/HOLDOUT/QC/TRADING ACCESS
+IS INFERRED FROM THE REVIEW WAIVER.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -218,6 +213,8 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-09 | Codex counter-review / FINRA activation record | `1e0e7849..f75d8d8a` reviewed; this closing record commit follows; no code/test change | Accept section 102; record owner-confirmed free Public credential creation and observed activation in Safari | Sole Claude commit accepted, no new finding; prior ledger preserved. API terms accepted and Public credential created only after concrete owner confirmation; the owner entered/submitted the new secret. Console status independently observed Active. No credential identifier/value enters Git. | Codex focused, network-denied CPython 3.13.15 / pytest 9.1.1: **96 passed in 2.49s** (24 duplicate, 3 successor, 69 document checks). Final document/diff/preservation/status checks recorded in section 103. No full suite or new mutation. | Three source P2s and shared P2 remain open; prospective look/commitment P3s retained. FINRA activation is verified, but secure runtime location and actual source comparison remain pending. Actual looks 0/0, exploratory actual looks 0, QC attempts 0. | One final non-force push under section 81. Obtain only the secure credential path/variable names, freeze the outcome-free settlement sample before retrieval, then perform the bounded licensed-API consistency comparison. No backtest-readiness claim. |
 | 2026-10-09 | Codex direct FINRA source qualification | `f1d053bd` -> `8cb60ebe` prospective freeze -> `ed99e922` transport correction; this closing record commit follows | Protected runtime authenticated; actual outcome-free FINRA sample qualified | Immutable four-cycle capture: 32/48 valid cells, 16 missing; 24/36 prior-cycle targets match, 12 missing, zero mismatches/refusals. No Massive comparison or historical coverage/PIT admission. Failed first capture retained; one explicit diagnostic and one corrected re-execution, six source POSTs total within eight. | Codex focused **200 passed in 5.83s**, network denied; three material own red regressions corrected. Four-file compilation, exact raw-hash/report rebuild and private 0700/0600 permissions verified. Closing document/diff/status/privacy checks in 104.5. No full suite or outcome look; canonical 0/0, exploratory 0, QC 0. | `SI-FINRA-001..004` corrected before final publication; historical source/shared P2 and prospective look/commitment P3 retained. Authentication/location closed, not companion/rights/route/original-vintage gates. | One combined non-force push under section 81; Claude independently reviews all new commits after `f75d8d8a`, then counter-review before further implementation. Qualify authentic companion/identity/terminal and exact permitted local/QC route; do not bypass actual-input refusal. |
 | 2026-10-09 | Claude review | `f75d8d8` -> `156facd` reviewed from the published head; **no code or test correction**; this record commit is the only Claude commit | Independent review of FINRA Public activation and the first bounded FINRA-only SI source qualification | Verified the freeze preceded every retrieval, network code is confined to the script, credentials and token never persist, and the report holds counts and hashes only. Rebuilt the report byte for byte from the protected raw pages and matched all receipt hashes, printing no quantities. Ran five in-memory mutants of the capture and qualification guards; all red. | Pushed tree `156facd`, clean, Codex idle, network-denied, empty environment: new FINRA files, package-scanning lane files, active-document and ML boundary **535 passed** (111 new FINRA cases; no skips or warnings); mutants F1-F5 red, baseline 35 passed; compileall exit 0; final-tree active-document 69 passed; `git diff --check` clean. No network request by Claude. **Authorized looks 0, consumed looks 0**. | `SI-CR20-001` (P3, open: the sentinel sample cannot measure delisted coverage; 12 missing cells are pre-2026 delistings and 4 are a BRK.B symbol question). Codex's `SI-FINRA-001..004` accepted, two reproduced. `SI-CR19-003`, source P2s, shared P2 and `SI-CR15-001` open. | Codex counter-reviews this record commit. Decide whether a pre-delisting FINRA sample is needed. Every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
+
+| 2026-10-10 | Codex owner-waived continuation | Clean local/tracking/actual remote `90e0d568`; prospective code/record freeze follows | Historical latest-revised source calibration and public companion-route qualification | Owner explicitly waived the pending record-only counter-review; no disposition assigned. Freeze separate 18-cell historical and 5-cell raw-format panels before source retrieval; preserve original diagnostic. | Focused validation and actual capture result appended in section 106 before the single final push. No outcome look or QC attempt. | Historical ledger retained, including SI-CR20-001; source/companion factual gates cannot be waived into facts. | Execute only the frozen licensed FINRA SI calibration after the clean committed freeze. Establish current Sharadar secure location/route and metadata before companion retrieval; no actual-input override. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -14717,3 +14714,244 @@ inherited environment:
    production ranking and seeds, ETF work, any QuantConnect history/project/
    upload/compile/job/backtest, purchases, broker, operator database,
    deployment, paper/live, capital, orders and trading.
+
+## 106. Owner-waived continuation and prospective historical/source calibration — 2026-10-10
+
+### 106.1 Exact snapshot, review waiver and continuing factual boundaries
+
+Initial physical/Git root is the designated Short Interest worktree, branch
+`codex/strategy-short-interest`; clean local, tracking and actual matching
+remote heads equal **`90e0d568fd88087ac06f6306b3f4beffdad94140`**.
+The complete pending Claude range is
+`156facdbc0625d54f9470c53a1b07448200ddddd..90e0d568fd88087ac06f6306b3f4beffdad94140`:
+one record-only commit, **`90e0d568`**, no code/test change. The owner's later
+**"proceed without review"** explicitly supersedes the routine counter-review
+checkpoint for this continuation. Codex reads section 105 as the current
+handoff, but does **not** perform or fabricate a per-commit accepted/rejected
+disposition, reproduce Claude's mutations, or attribute Claude's 535-test
+execution to itself. Section 105 and every historical ledger row remain.
+New implementation still requires focused validation and durable notes;
+its independent acceptance is not self-awarded.
+
+Standing build delegation permits routine source-calibration choices. It
+does not establish provider originals, correction history, availability
+clocks, share-class identity, licensing, actual companion completeness or
+QuantConnect platform authority. The present continuation is source-only:
+no actual price, volume, return, denominator, signal/outcome join, strategy
+evaluation, holdout or QC operation. The exploratory actual-input refusal
+and strict-original-vintage versus latest-revised distinction remain intact.
+
+### 106.2 Prospectively frozen 18/5-cell design and interpretation
+
+Freeze code and this specification in a local commit **before** the first
+actual calibration row, without an interim push. The new calibration has
+separate semantics and report; section 104's 48/36-cell protocol, missing
+denominators and internal continuity report are not edited or reselected.
+
+* Historical panel: query raw **FRC, SIVB, TWTR** separately at each of
+  **2022-10-14, 2022-11-15, 2023-02-28, 2023-03-15, 2023-04-14,
+  2023-05-15**: all **18** cells retained. No adjacent-period quantity
+  comparison is made across these nonconsecutive dates.
+* [FINRA's settlement rule](https://www.finra.org/finra-data/browse-catalog/equity-short-interest)
+  makes these dates rule-consistent mid/month-end candidates. They are not
+  independently authenticated against archived annual 2022/2023 schedules,
+  nor are settlement dates actual publication/availability timestamps.
+  FINRA expressly supplies only latest corrected values; no PIT admission.
+* SIVB February 28 is pre-halt; March 15 is post the
+  [March 10 Nasdaq halt](https://www.nasdaq.com/press-release/nasdaq-halts-svb-financial-group-2023-03-10),
+  **not** proven post-legal-delisting. FRC April 14 is before the
+  [May 2 NYSE suspension](https://ir.theice.com/press/news-details/2023/NYSE-to-Suspend-Trading-Immediately-in-First-Republic-Bank-FRC-and-Commence-Delisting-Proceedings/default.aspx);
+  May 15 is after suspension, not an authenticated effective delisting date.
+  TWTR October 14 precedes merger/suspension; November 15 follows the
+  [NYSE removal effective November 8](https://www.sec.gov/Archives/edgar/data/876661/000087666122000890/ruleprovisionnotice.htm).
+  These are historical sentinel checks, not a representative universal
+  delisted universe or a terminal-payoff study.
+* Format panel: **BRK.B, BRK/B, BRK-B, BRKB, BRK B** as five **distinct**
+  raw spellings at **2026-06-30**. Nasdaq's
+  [symbol conventions](https://nasdaqtrader.com/Trader.aspx?id=CQSSymbolConvention)
+  support `.B` and space-separated CMS `B`; the other three are labelled
+  diagnostic probes, not documented FINRA aliases. FINRA's API-specific
+  convention is unresolved before retrieval. Returned spellings do not
+  establish permanent identity; no alias is promoted, summed or selected.
+* Seven frozen ordered queries, exact settlement equality and raw-symbol
+  domain, the same nine SI-only fields as 104.2, schema version 1, synchronous
+  limit 100 and offset zero initially. At most **two pages per query**,
+  **eight source POST attempts for the whole round**, **1 MiB per page**,
+  no automatic retry. One pagination spare is shared across both panels;
+  failure consumes its attempt and cannot reset the counter.
+* Require total/offset/limit/max/version; exact JSON array count cross-checks
+  optional supplied page-count headers. Preserve exact query/request/raw
+  hashes, contiguous offsets, stable totals and complete all seven queries
+  including zero-total responses. Reject query mismatch, repeated or
+  nonprogressing pages, partial retrieval, bounds/version/protocol drift.
+* Reuse the frozen v1 lane's strict duplicate-key/finite-number/type parser
+  deliberately as a private lane dependency, without modifying v1. Count
+  identifiable collisions before financial validation. Zero is present,
+  null current malformed, null previous unknown; multiple raw market
+  classes ambiguous. Missing/malformed/duplicate/ambiguous cells remain in
+  their 18/5 denominators, never replaced with zero or silently dropped.
+* Create-exclusive capture protocol/start, every pre-HTTP attempt receipt,
+  raw page and whitelist transport/report receipts in ignored lane storage,
+  owned 0700 directories/0600 files, no symlink escape. Use only the known
+  secure FINRA file through its already qualified runtime. Credentials,
+  tokens, Authorization headers and account identifiers never persist.
+  Public output has statuses/counts/flags/hashes, no quantities or issue names.
+
+The canonical frozen protocol SHA-256 is
+**`2185f7dc93443a78315b09efbc067e14ec10a60c4723600514750b380ad900f5`**.
+It also binds the unchanged v1 normalizer protocol hash. Pre-retrieval
+validation is appended below; no source request occurs before the clean
+code/record freeze.
+
+### 106.3 Current public companion facts and precise local access state
+
+Current primary documentation is more specific than earlier qualification
+notes; retain the old claims historically and append this clarification.
+Sharadar documents permanent share-class identifiers and ticker-reuse
+rewiring, historical SIC/venue actions, as-reported fundamentals, and
+raw-open/volume reconstruction from split-adjusted fields and unadjusted
+close. Its acquisition dictionary includes cash/stock and election
+alternatives, but excludes contingent value rights; estimated coverage is
+not demonstrated completeness. Personal use expressly includes the owner's
+own research/backtesting. These are **provider documentation**, not measured
+account entitlement or data-integrity conclusions.
+[Sharadar FAQ](https://sharadar.com/docs/faqs).
+
+The applicable stock companion is **STOCKS/SEP**, not fund prices/SFP.
+Public table documentation identifies TICKERS, ACTIONS, DAILY and SF1/
+fundamentals as complementary identity/action/denominator routes, including
+DAILY market cap in USD millions and AR versus restated dimensions. Do not
+misread current classifications as historical or report-period dates as
+known filing dates. The exact schema/units/action dictionary and prospective
+historical sample still require qualification before any outcome join.
+[Stocks](https://sharadar.com/docs/stocks),
+[tickers](https://sharadar.com/docs/tickers),
+[actions](https://sharadar.com/docs/actions),
+[daily fundamentals](https://sharadar.com/docs/daily),
+[fundamentals](https://sharadar.com/docs/fundamentals).
+
+Direct Sharadar Personal Use terms apply to its own platform/API, not
+automatically an existing Nasdaq Data Link contract. They restrict raw or
+reconstructible-data sharing and publication of data-usability evaluations,
+and impose deletion duties on termination. Do not publish actual private
+companion-quality verdicts in Git or chat under an unqualified route. Public
+product/schema facts can be recorded without exposing account/data rows.
+No exact QC processing representation is established by these terms alone.
+[Direct terms](https://sharadar.com/terms).
+
+A read-only helper verified the five documented direct public SQLite schema
+URLs, `/v1.0/schema/{table}?format=sqlite`: HTTP **200**, text/plain, default
+TLS, no redirect, authentication, market-row request, SQL execution or file
+write. Main inspected their public table documentation; this transport/hash
+execution is attributed to the helper, not claimed as main's own request.
+
+| Public table schema | Bytes | SHA-256 |
+|---|---:|---|
+| stocks | 537 | `ae39e277aaae4a579d56eebbd720a7a6b8b679bfda9a9c716cf8f6a60b1eb755` |
+| tickers | 1,135 | `466b6c190ff8991c3b9e685753177a088c38be36d4d865e0baf07adf6c4e79c0` |
+| actions | 661 | `b59662529b95a3994279e4b6e561b85c087a4027209613e41dc167181e8b36b8` |
+| daily | 521 | `c203cce3a9568c2d78b12a1f3d489ead020dbda592e966a3bb3808c50f37cf1f` |
+| fundamentals | 3,086 | `82b5187aeec641bc8a855c5d69870b6fe4b7e2307935b5587dc46a73458d6e15` |
+
+The schemas expose STOCKS OHLCV/adjusted closes as REAL, TICKERS permaticker/
+SIC as INTEGER, ACTIONS value and DAILY marketcap as REAL, and fundamental
+shares/marketcap as INTEGER with sharefactor REAL. Do not floor or round
+imputed volume merely to force an integral type, or assume a documentation
+label establishes the provider's actual JSON scalar. This is public metadata
+verification, not subscription entitlement, a quality verdict, or admission
+of any actual companion row. Direct Sharadar and Nasdaq Data Link metadata
+routes/keys/contracts are not interchangeable by inference.
+
+The owner-provided earlier Sharadar capture directory **and its known capture
+parent are absent on this machine today**. A bounded filename-only check of
+that exact parent finds no current artifact; prior hash checks are historical
+evidence, not today's availability. No broader directory/secret search,
+another checkout's repository command, or market-row read is made. Codex
+asked only for the current secure file location or environment-variable name,
+not the key value, while continuing the FINRA milestone. No new purchase or
+generic permission letter is required or requested. Current account route,
+key location and entitlement are not invented from other lanes' use.
+
+### 106.4 Exercised delegated approvals and decisions
+
+* **SI-AUTH-20261010-01:** explicit owner **"proceed without review"** waives
+  this pending counter-review only; record-only `90e0d568` has no assigned
+  Codex disposition. No factual gate, full-suite exemption or secret is waived.
+* **SI-DEC-20261010-01:** proceed from the already clean synchronized head;
+  no fetch, merge, rewrite, reset, alternate checkout or branch change.
+* **SI-DEC-20261010-02:** historical/trading-stop coverage matters before a
+  survivorship-sensitive study. Freeze the 18-cell historical and five-cell
+  raw-format calibration with the eight-attempt global bound above, under
+  standing owner source delegation and the already verified free FINRA route.
+* **SI-DEC-20261010-03:** treat Sharadar's current public companion docs as
+  a concrete existing-subscription route candidate, append qualifications to
+  older incomplete notes, and keep public schema facts separate from actual
+  entitlement, private usability evaluations and exact QC processing rights.
+* **SI-DEC-20261010-04:** recheck only the previously named capture parent;
+  on its absence request a current location/name, not a secret or broad search.
+
+Every further exercised decision, validation, actual capture result, retained
+ledger disposition and closing publication is appended before the single
+final push. No email/monitor, source purchase/paid terms, actual prices/
+volume/outcomes/holdout, QC history/project/processing/upload/compile/job/
+backtest, ranking/seed change, ETF work, broker/operator database, deployment,
+paper/live, capital, actual order or trading action occurs in this scope.
+Candidate lookbacks 20/60/120/252 stay unselected; structural normalization
+and release-next-open reranking unchanged; canonical actual looks **0/0**,
+exploratory actual looks **0**, allocated alpha **0**, permanent look IDs
+**none**, QC attempts **0**.
+
+### 106.5 Pre-retrieval implementation validation and draft ledger
+
+New lane-only files are `finra_source_calibration.py`,
+`calibrate_finra_short_interest.py` and their two focused test files.
+The pure module intentionally reuses v1's private strict parser/type helpers;
+the capture script reuses the qualified lane credential/storage/HTTP guards.
+Neither v1 implementation/test file nor any exploratory actual-input runner
+is edited. Query requests, page receipts and report validation independently
+bind the seven ordered queries. Frozen credentials/token handling and all
+authority closures survive unchanged.
+
+Main Codex found and proved two draft contract regressions **before any
+actual retrieval**. The existing package import-boundary test failed once
+on an unapproved package-root import; a dotted module import fixes it without
+weakening the boundary. A fabricated inline report probe also went red when
+reordered pages were reindexed/rehashed and accepted. The report validator
+now checks frozen query order and repeated/nonprogressing pages as well as
+pagination/hash accounting. Main reran that identical probe green and the
+valid bound baseline still builds; focused tests pin the correction.
+
+| ID | Priority / disposition | Evidence and correction |
+|---|---|---|
+| `SI-FINRA-CAL-001` | P3 confirmed draft contract / corrected before freeze | Main's existing import-boundary case: **1 failed** on the package-root import; use the approved explicit dotted dependency; own closing focused run green. No network/authority import or v1 modification. |
+| `SI-FINRA-CAL-002` | P3 confirmed draft report binding / corrected before freeze | Main's fabricated reordered/rehashed report probe raised its intended red assertion before correction; query-order/repeated-page/no-progress revalidation added; identical own probe and focused cases green. No retrieval on the draft. |
+| `SI-CR20-001` | P3 retained / interpretation being addressed by new milestone | The old 2026 sentinel remains unchanged and is not reclassified as a delisted-coverage test. New frozen historical/format panels test separate questions; completed results and qualifications follow, not inferred now. |
+| `SI-SRC-20260928-001..003` | P2 retained / open | Original/all-correction archives, actual availability, historical identity/companion completeness and exact processing route remain distinct factual gates. Public schema availability and review waiver do not close them. |
+| `SI-CR5-005` / `SI-CCR16-007` | P2 retained / shared, open | Documented only; no shared behavior changes. |
+| `SI-CR19-003` / `SI-CR15-001` | P3 retained / prospective, open | Permanent actual-look accounting and future concrete commitments remain; no look/terms/payment consumed here. |
+| Earlier confirmed, partial and false-alarm rows | Retained unchanged | Including closed FINRA/CCR30/CR19/document findings; section 105's own acceptance and validation retain Claude attribution, not a waived Codex disposition. |
+
+Main Codex's exact focused selection passed **299 in 5.32s**: **51** new
+pure-calibration, **48** new capture, **81** original pure-qualification,
+**30** original capture, **9** SI import-boundary, **69** active-document and
+**11** ML-boundary checks. CPython **3.13.15** / pytest **9.1.1**, empty
+inherited environment, bytecode/cache disabled and macOS `sandbox-exec`
+network denial. All input fabricated, no skips/warnings/errors. Four new
+files compile with bytecode directed outside the worktree. Historical body
+and all ledger rows preserve their exact bytes; an initial comparison
+included the added section separator and was corrected to compare the
+unchanged historical byte prefix, not to relax content preservation.
+
+Helper execution is separately attributed: pure helper **52 passed** (51
+new plus the boundary case); capture helper **48 passed** on CPython
+3.12.14 and three in-memory mutants went red (budget removal **6 failures**,
+pre-HTTP receipt removal **2**, fresh lane-guard removal **1**), then all
+48 green. No file mutation from those probes survives. Main's 299-pass
+3.13.15 run validates the combined final code. No full lane/repository
+suite is run by Codex; no Claude counter-review is retroactively claimed.
+
+The clean prospective code/record commit is made next, after rechecking
+roots/branch/HEAD/status/actual matching remote. Only then execute this one
+frozen SI-only calibration with the known protected credential; no retry
+loop or next empirical action. Closing actual results, hashes, precise next
+blocker and publication checks are appended below before the final push.

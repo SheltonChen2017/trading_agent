@@ -418,6 +418,10 @@ Section 275 counter-reviews the sole Claude commit `557411a6`, corrects the
 prospective diagnostic failure handling and test gaps, and records an exact
 opaque-metadata policy candidate. The candidate is not security acceptance;
 the assessment/probe/publication stop remains and the monitor stays paused.
+Section 276 is Claude's independent review of `557411a6..e3db4ebc` (0 P0,
+0 P1, 0 P2, 1 P3): both Codex commits are accepted, every section-274
+correction is isolated by a test, and the 275.4 fingerprints reproduce on a
+second read-only read; the owner's security decision of 275.5 is pending.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1332,8 +1336,11 @@ at `/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2`.
 Section 274 is Claude's independent review of the exact pushed range
 `b7169dc0..8b9c5bae` (sections 270-273), including the section-272 move.
 Section 275 counter-reviews the sole Claude commit `557411a6` and supplies
-prospective corrections and an exact candidate metadata policy. Claude must
-review section 275 and its exact final pushed snapshot. The concrete next
+prospective corrections and an exact candidate metadata policy. Section 276
+is Claude's independent review of the exact pushed range `557411a6..e3db4ebc`
+(section 275). The immediate next step is that Codex counter-reviews section
+276 and this round's Claude commit, unless the owner explicitly changes this
+workflow; this is not an intermediate acknowledgement wait. The concrete next
 requirement is an explicit human security disposition of the single vintage
 directory state fingerprinted in 275.4; no new assessment/probe, attribute
 change, source admission or R284 launch follows from these fixes. This is not
@@ -1422,7 +1429,7 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 273 (section 274); for section 250 the owner
+the pushed range through section 275 (section 276); for section 250 the owner
 directed focused checks without the complete suite. Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
@@ -3223,6 +3230,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-09 | Codex authorized prospective scoped fresh-use assessment | `ac951360` -> `26cfc8dc` source/protocol freeze and final result commit | Owner approves bounded investigation and a new scoped security/consumption contract, not failed-audit acceptance | Sole fixed assessment refused xattr_unapproved; authenticated 584-byte failure report retained; bounded 27-object names-only diagnostic isolates three extra names on vintage directory; original ARV2OD272-A still uninvoked | 242 distinct focused strict-denied passes; four static compilations; final record checks nonadditive; no full suite | Extra MACL/quarantine/fileprovider names need security disposition; historical security, actor causality and production safety unproven; formal gates unchanged | Stop spent assessment; preserve all evidence, no retry/attribute mutation/R284 bypass; one final matching-lane push; Claude review section 273; monitor paused |
 | 2026-10-09 | Claude independent review of sections 270-273: the relocation, the fresh-use assessment and its attribute refusal | `8b9c5bae` -> this record commit | Section 274: six Codex commits `b7169dc0..8b9c5bae` disposed (6 accepted, 0 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells; census, assessment and R272 probe not run | No code changed by Claude. The R272 and R273 reports and nine source pins authenticate, the census difference and the names-only attribute census are reproduced independently, in-memory guard removals are tabulated, accepted `ARV2CR270-001` to `-003`, 274.5 recommends a versioned attribute policy; section 4 names section 274, banner sentence added, this row appended | Complete lane selection at `8b9c5bae` with every remote address refused (strict sandbox for the six groups, three parallel streams, temporary directories inside the root's ignored `.pytest_cache`; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 274.6 | 0 P0, 0 P1, 0 P2, 5 P3 | Single push of this round's Claude commit; Codex counter-reviews section 274 unless the owner changes the workflow |
 | 2026-10-10 | Codex counter-review and prospective diagnostic hardening | `557411a6` -> section-275 correction/record snapshot | Sole Claude review commit accepted after documentary qualifications; all five P3 findings disposed; no research or QC event | Early census claim, strict probe exit, preallocation capability guard, isolated regressions; one bounded exact-object metadata-candidate observation, not source admission | Strict-denied focused checks and omission mutations in 275.6; retained report hashes/counts reproduced; no full Codex suite | ARV2E263-001 remains; exact opaque access/sync state not yet human-accepted; historical source and formal gates remain | One final matching-lane push; Claude review of section 275; explicit security disposition before any new prospective assessment; monitor paused |
+| 2026-10-10 | Claude independent review of section 275: the diagnostic hardening and the metadata policy candidate | `e3db4ebc` -> this record commit | Section 276: two Codex commits `557411a6..e3db4ebc` disposed (2 accepted, 0 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells; census, assessment, R272 probe and Codex's observation parser not run | No code changed by Claude. Nine pins reproduce; the 275.4 fingerprints and directory identity reproduce on a second read-only read; 19 in-memory guard removals each fail a test; accepted `ARV2CR275-001` to `-003`; `ARV2R276-001` documented; section 4 names section 276, banner sentence added, this row appended | Complete lane selection at `e3db4ebc` with every remote address refused (strict sandbox for the six groups, three parallel streams, temporary directories inside the root's ignored `.pytest_cache`; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 276.6 | 0 P0, 0 P1, 0 P2, 1 P3 | Single push of this round's Claude commit; Codex counter-reviews section 276 unless the owner changes the workflow |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -40738,3 +40746,265 @@ single push. The correction quality assessment is **8/10 for this limited
 mechanical scope**: focused dangerous-path regressions and isolated omissions
 pass, but real Linux CI, a new native security contract, production publication
 and formal readiness remain unproven. No full-suite pass is inferred.
+
+## 276. Independent Claude review of section 275: the diagnostic hardening and the metadata policy candidate, 2026-10-10
+
+**Range reviewed:** `557411a6..e3db4ebc`, two Codex commits: the hardening of
+the three prospective diagnostics with their tests (`cd1e915f`) and the
+section-275 record with its counter-review of section 274 and its bounded
+metadata observation (`e3db4ebc`). Each is disposed of in 276.1. This round's
+one Claude lane commit is this record commit, which is not in that range.
+
+**Zero research looks, development evaluations, infrastructure looks, and
+authenticated cells in this round.** This review made no provider,
+QuantConnect, mail or browser request. It did not run the census, the
+assessment, the R272 synthetic probe or Codex's retained observation parser,
+and it changed no attribute, setting or artifact. Every pytest, mutation and
+private parser ran inside the strict sandbox of 242.6, with `TMPDIR`, every
+pytest temporary directory and the bytecode cache inside the operative root's
+ignored `.pytest_cache`; only this review's logs and its in-memory mutation
+plugin sit in the outside-root scratchpad, as in 274. R284 stays unprepared
+and unlaunched, the monitor stays paused, and the floor stays
+**313 / 239 / 49 / 699**.
+
+**Verdict.** Both Codex commits are accepted; none is rejected.
+**0 P0, 0 P1, 0 P2, 1 P3.** The five section-274 findings are corrected
+prospectively and each correction is now isolated by a test that fails
+without it (276.4). The seven new pins and the two unchanged pins reproduce.
+The bounded observation of 275.4 reproduces: a second read-only read found the
+same four fingerprints and the same directory identity, including `ctime`.
+Codex's three qualifications of section 274 are accepted (276.3). The one new
+P3 records a consequence of the early claim that the record does not state.
+The draft v2 policy of 275.5 matches 274.5 and remains a draft awaiting the
+owner's security decision.
+
+### 276.1 Per-commit disposition
+
+| Commit | What it is | Disposition | Basis |
+|---|---|---|---|
+| `cd1e915f` | Prospective hardening of the census, the assessment and the probe, with tests | accepted | All seven pins reproduce (`6e411fca…`, `26ce1788…`, `85d853a1…`, `a168735e…`, `11450d7f…`, `db6abed7…`, `d0855c3b…`); the observer `3435bc07…` and the shared helper `17e516b4…` are unchanged. The assessment refuses on an unsupported platform before any output path is touched; the census claims its pending leaf exclusively before the walk and refuses a substituted claim; the probe's command line exits 1 unless every acceptance field holds, and both entry points are tested only through a substituted run with a tripwire on the probe path. The focused files pass 43, 58, 77 and 56 tests. `ARV2R276-001` is documented. |
+| `e3db4ebc` | Section 275: counter-review of 274, the bounded metadata observation and the draft v2 policy | accepted | The three qualifications of section 274 are correct (276.3). The observation of 275.4 was read-only, bounded and disclosed, and its parser prints only lengths and hashes; its result reproduces (276.4). The draft in 275.5 binds one directory, four names and four value fingerprints, admits nothing by assumption, and asks the owner for the decision. The record's reports, counts and pins all reproduce. |
+
+### 276.2 Findings
+
+| ID | P | Introduced by | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R276-001` | P3 | `cd1e915f` | The census now claims its pending report before the walk and, at publication, requires the claim leaf's complete metadata, including `flags` and `ctime`, to equal its allocation-time values. Any metadata write to that empty leaf during the walk therefore spends the stage with no report. At a root with the drift of 265.4, where a new file gains `UF_TRACKED` within about 0.2 s and a later `ctime` write, a before census can no longer complete. The R272 tool is spent and the operative root showed no such drift (274.4), so nothing recorded is affected, but the record does not state the consequence. | Documented for Codex. A successor used for a move out of a drift-exposed root must decide prospectively, under 266.3, which fields of an empty claim leaf are identity and which refuse, rather than inherit this behaviour silently. No waiver is proposed here. |
+
+### 276.3 Codex's findings against Claude's section 274, and what this review checked
+
+**Codex's qualifications are accepted.**
+
+- **`ARV2CR275-001` (P3) is accepted.** Section 274 kept its logs and the
+  mutation plugin in the outside-root scratchpad, so in-root temporary
+  directories alone did not make every validation asset location-compliant;
+  this round does the same and says so above. The combined row of 274.6 is a
+  union of the strict and loopback-only passes, as 275.3 says.
+- **`ARV2CR275-002` (P3) is accepted.** "Did not change during use" in 274.5
+  and the rename example in 274.3 generalized sampled endpoint checks. Every
+  comparison in this lane, including this round's second attribute read,
+  establishes equality at its endpoints, not continuous stability.
+- **`ARV2CR275-003` (P3) is accepted.** The production observer refuses the
+  three extra names, so it cannot fingerprint them through its unchanged
+  interface as 274.5 suggested; a diagnostic-only read was needed, which is
+  what 275-D1 did.
+- **The range qualification is accepted.** Section 274's opening said its own
+  commit was in `b7169dc0..8b9c5bae`; it was the one commit after that range.
+
+**What this review checked in `cd1e915f`.**
+
+1. **Platform preflight.** `_require_supported_platform()` runs after the
+   fixed-root check and before the output parent is opened. It requires
+   Darwin, integer `UF_TRACKED` and `UF_HIDDEN`, `st_flags` on
+   `os.stat_result`, and a resolvable native ABI. Removing the call in memory
+   fails the five preflight tests, each of which trips if the output parent is
+   opened. The fixtures now split portable tests from native ones: with
+   `stat.UF_TRACKED` removed in memory, the assessment file reports
+   **29 passed, 48 skipped, 0 failed**, which matches Codex's model of
+   275.6 once the observer file's 55 passes and one skip are subtracted.
+2. **Early claim.** `_claim_report` creates the pending leaf exclusively,
+   checks owner, mode and link count, syncs the leaf and the directory, and
+   returns the held descriptor. `_run` claims right after the spent-path check
+   and before the baseline read and the walk; the descriptor is closed in
+   `finally`, and the leaf stays on every failure. `_publish_report` requires
+   the held leaf to equal the allocation-time stat and the named leaf and to
+   be empty before it writes. Dropping the early claim fails five tests
+   (interrupt, unexpected exception, root and output refusals, and the
+   substituted claim); dropping only the claim check fails the substitution
+   test. Default callers, including the assessment, keep their old interface
+   and gain the same pre-write check.
+3. **Probe exit status.** `main()` returns 0 only when the returned report is
+   complete, flags are available, the case, initial-check and observation
+   counts match the profile, the check inventory has 24 rows, both refusal
+   counts are 0 and every readback matched; it prints `flags_available` and
+   `payloads_match`. The real `_run` produces every key that logic reads
+   (`initial_verification`, `observations`, `readback_matches`,
+   `flags_available`), so a real run would not refuse on a missing key.
+   Forcing exit 0 fails 20 tests; dropping the two printed fields fails 2.
+   This review did not mutate the probe's path guards, because its tests run
+   from the real relocation root (274.4).
+4. **Isolating tests.** Each of the 13 guards that no test isolated in 274.4
+   now has one (276.4). The output-symlink test now creates its target and
+   checks it stays empty.
+
+**What this review checked in `e3db4ebc`.**
+
+- **Authority and scope of 275-D1.** The observation read attribute values,
+  which 273-D4 had not. It is read-only, bounded to the 27 objects and to 64 KiB,
+  records lengths and hashes only, and is disclosed with its timestamp,
+  duration and parser hash. That sits within the delegated investigation
+  scope of 255.2; it is neither a path nor a host-setting change, and it
+  spends no one-use identity. The parser `observe.py` (6,792 bytes,
+  `162025e4…`) matches its pin. Read in full: it holds all 27 descriptors
+  without following links, checks names on every object before reading any
+  value, reads the four vintage values once into bounded memory, rechecks the
+  ACL, names and metadata, and prints a JSON line of identity fields, lengths
+  and SHA-256 values. It writes nothing, prints no raw value, and does not
+  touch the production observer's allowlist. Its output was not persisted:
+  the 22 `.pytest_cache/r275-*` directories hold only that parser and
+  pytest's temporary files.
+- **The draft v2 (275-D2)** binds the exact directory identity and the four
+  fingerprints before and after the fresh loaders consume their own pinned
+  buffers, keeps every other object provenance-only, and refuses drift
+  without retry, pin refresh, removal or rebaseline. That is the policy of
+  274.5, with Codex's correct substitution of a dedicated diagnostic read for
+  the production observer's interface. It remains a draft: no admitting
+  consumer exists, no identity is allocated, and the owner's decision is
+  explicitly reserved.
+- **R272 probe.** Codex is right that the CLI change requires a new source pin
+  and a separately stated decision before any invocation; the frozen 272.2 pin
+  `6975d5fe…` no longer matches the file.
+
+### 276.4 What this review reproduced
+
+- **The 275.4 observation reproduces, and nothing changed between the two
+  reads.** A read-only parser, run under the strict sandbox, opened the
+  vintage directory without following links and found:
+  - exactly the four names;
+  - the four lengths 1, 72, 11 and 15 bytes (99 in total) and the four SHA-256
+    values of the 275.4 table;
+  - every metadata pin of 275.4, including `ctime_ns`, so no attribute or
+    other status change touched the directory between Codex's read and this
+    one: an in-root probe in a scratch directory under `.pytest_cache`
+    confirmed that setting, changing or removing an attribute updates `ctime`
+    on this volume, for a directory and for a file;
+  - the same `dev`, `ino`, `mode`, `uid`, `gid`, `nlink` and `flags` as the
+    directory's row in the authenticated R272 `after.json`;
+  - through the production observer's own ACL check, no extended ACL.
+  This is two endpoints, not continuous stability, and no value was printed
+  or persisted.
+- **The retained reports still authenticate:** `before.json` 11,532,910 bytes
+  `bd0931f9…`, `after.json` 15,299,922 bytes `ca02a94e…`, R273 `report.json`
+  584 bytes `8325d3e0…`, each 0600.
+- **Nothing changed across Codex's round.** All 1,842 files under
+  `artifacts/analyst_revisions_v2` have the same SHA-256 as at the end of
+  section 274's round, and `git status --ignored` is unchanged apart from
+  `__pycache__`; Codex's 22 ignored `.pytest_cache/r275-*` directories were
+  left in place. The frozen documents and every shared file are untouched in
+  the range; only the seven lane files and the record changed.
+- **In-memory mutation trials.** Each trial removed one guard in memory and
+  ran that module's test file inside the strict sandbox; no file was edited.
+  Unmutated, the census, probe, assessment and observer files pass
+  **43, 58, 77 and 56** tests.
+
+Census, 43 tests:
+
+| Trial | Guard removed | Result in 274.4 | Result now |
+|---|---|---|---|
+| Directory rows | directory rows in the census | 32 passed | 1 failed |
+| Directory fields | directory fields reduced to device and inode | 32 passed | 2 failed |
+| Directory drift | directory metadata drift during the walk | 32 passed | 1 failed |
+| Exclusions | prefix exclusion of `.git*` and the output name | 32 passed | 1 failed |
+| Exit status | exit 0 on a completed but mismatched after | 32 passed | 1 failed |
+| Named after read | the named check after each file read | 32 passed | 1 failed |
+| No-follow | `O_NOFOLLOW` on directory opens | 32 passed | 1 failed |
+| Retained pending | the `before.json.pending` refusal | 32 passed | 1 failed |
+| Late claim | the claim moved back to publication | — | 5 failed |
+| Claim check | the equality and empty check of the held claim | — | 1 failed |
+
+Assessment, 77 tests:
+
+| Trial | Guard removed | Result in 274.4 | Result now |
+|---|---|---|---|
+| Directory flags | only the directory flag mask | 64 passed | 1 failed |
+| Loader root | the loaders' repository-root check | 64 passed | 2 failed |
+| Initial named check | the named-versus-held check after opening | 64 passed | 1 failed |
+| After-consumer hash | the source hash recheck | 64 passed | 1 failed |
+| Size | the exact-size check while hashing | 64 passed | 1 failed |
+| Platform preflight | the preflight call in `main()` | — | 5 failed |
+| No `stat.UF_TRACKED` | the attribute removed, as on an older interpreter | 39 failed | 0 failed, 29 passed, 48 skipped |
+
+Probe, 58 tests:
+
+| Trial | Guard removed | Result now |
+|---|---|---|
+| Exit status | exit 0 regardless of the report | 20 failed |
+| Printed fields | `flags_available` and `payloads_match` dropped from the summary | 2 failed |
+
+These counts agree with the pre-fix regressions and omission experiments
+Codex reports in 275.6 (4 plus 1 claim failures, 22 probe failures, 5
+preflight failures, and one or two failures per isolated guard).
+
+### 276.5 Suggested next steps
+
+1. **Codex counter-reviews this section.**
+2. **The owner decides the security question of 275.5**: whether the vintage
+   directory's current access and sync state, pinned by the four fingerprints
+   of 275.4, may be the accepted baseline for one separately reviewed
+   read-only assessment. Neither reviewer can make that decision, and no
+   assessment, probe, attribute change or allowlist change should precede it.
+3. **After an approval**, Codex implements the object-bound v2 exactly as
+   drafted, with the complete-scope names and fingerprint census inside its
+   freeze, the platform preflight, the early claim with a prospective
+   decision on `ARV2R276-001`, new source and profile pins, and independent
+   review before its one run. The R272 probe then needs its own stated
+   authority and a new pin.
+4. **R284 and the external evidence stay separate.** R284 remains blocked
+   until a publication remedy exists; the missing vendor as-of history,
+   reviewed security-master identity, scores and prior-close prices of 231.3
+   remain open.
+
+### 276.6 Validation
+
+Every check ran from the operative root
+`/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2` with
+`~/.venvs/trading_agent-py313/bin/python` (3.13.15). Each pytest process ran
+under one of the two `sandbox-exec` profiles of 242.6, with `TMPDIR` and
+`--basetemp` under the root's ignored `.pytest_cache/claude-review-276`.
+Before use, a probe confirmed that the loopback-only profile allows a
+loopback bind and connect and refuses a connection to the reserved
+documentation address `192.0.2.1` with `EPERM`.
+
+| Check | Scope | Result |
+|---|---|---|
+| Standing lane selection, strict profile | `tests/analyst_revisions_v2`, `tests/test_analyst_revisions_v2_contracts.py`, `tests/test_analyst_revisions_v2_legacy_quarantine.py`, `tests/test_analyst_revisions_v2_preregistration.py`, `tests/test_analyst_revisions_v2_statistics.py`, `tests/test_active_document_consistency.py`, at the clean pushed head `e3db4ebc`, run as six file groups in three parallel streams, together covering all 10,920 collected tests | **11 failed, 10901 passed, 8 skipped, 35 warnings in six strict-profile worktree file groups across three parallel streams (each 0:20:58, 0:17:38, 0:08:32, 1:18:00, 0:38:31, 0:05:36).** No error. Every failure is `PermissionError: [Errno 1] Operation not permitted` in one of the 11 tests of `test_qc_formal_qc_transport.py` that start HTTP servers on `127.0.0.1`, because the strict profile also refuses loopback. The 8 skips are a subset of the standing eleven: 7 Windows-only directory-junction tests and 1 top-five-only profile case. |
+| The loopback-server file, loopback-only profile | `tests/analyst_revisions_v2/test_qc_formal_qc_transport.py`, all 73 tests, at the same head | **73 passed, 2 warnings in 9.71s**, exit 0: the 11 loopback-server tests pass once loopback is allowed and every other address is refused |
+| Every collected test, remote network refused | the two rows above together | **0 failed, 10,912 passed, 8 skipped** across all 10,920 collected tests; the strict profile covers 10,901 of the passes and the loopback-only profile the other 11 |
+| The four corrected files, unmutated, strict profile | census, probe, assessment and observer test files | **234 passed** |
+| Pins, report authentication, the attribute re-read, integrity across Codex's round and mutation trials | as in 276.3 and 276.4 | as stated there |
+| Record gates on the final record bytes, strict profile | `test_lane_record_integrity.py` and `test_active_document_consistency.py` | **86 passed** |
+| `python -m compileall -q` | the standard package list plus `research/analyst_revisions_v2_qc` | clean |
+| Worktree integrity across the complete run and the checks | `artifacts/analyst_revisions_v2` and `git status --ignored` | every one of the 1842 files under `artifacts/analyst_revisions_v2` has the same SHA-256 before and after the run and the checks, and `git status --ignored` is unchanged apart from `__pycache__` |
+| `git diff --check` | final tree | clean |
+| `git status --short --branch` | after this round's commit | clean; published in this round's single push |
+
+### 276.7 Carried-open findings
+
+| ID | P | Status |
+|---|---|---|
+| `ARV2E263-001` | — | Open. Bytes are preserved at the new root; the fresh-use assessment refused on the vintage directory's attributes, and the owner's security decision of 275.5 is pending. It blocks R284. |
+| `ARV2R276-001` | P3 | Documented for Codex (276.2). |
+| `ARV2R274-001` to `ARV2R274-005` | P3 | Corrected prospectively in `cd1e915f` and isolated by tests (276.4); `-001` is addressed by 275-D1's complete-scope census rule for future freezes. |
+| `ARV2CR275-001`, `ARV2CR275-002`, `ARV2CR275-003` | P3 | Accepted (276.3). |
+| `ARV2CR270-001`, `ARV2CR270-002`, `ARV2CR270-003` | P3 | Accepted (274.3). |
+| `ARV2R265-005` | P3 | Partly corrected: the window between a remote response and its local receipt remains. |
+| `ARV2R248-002`, `ARV2R248-003`, `ARV2R248-004` | P2 | Open; partly reconciled by sections 255–257. |
+| `ARV2R196-001` | P2 | Open; the historical AR effect has the same two-year signature in every family. |
+| `ARV2D212-001` | P2 | Clock mechanism resolved by R279; forward input readiness and vendor availability remain open. |
+| `ARV2CR185-001`, `ARV2CR187-001`, `-003`, `ARV2D188-001` | P2 | Open as recorded. |
+| `ARV2R265-001`, `ARV2R265-002`, `ARV2I266-001`, `ARV2I266-002`, `ARV2I256-001` | P2 | Corrected and pinned, as recorded. |
+| `ARV2R267-001`, `ARV2R267-002`, `ARV2CR268-001`, `ARV2R265-003`, `ARV2R265-004`, `ARV2CR266-001`, `ARV2CR266-002`, `ARV2CR262-001`, `ARV2R261-001`, `ARV2CR255-001`, `ARV2CR255-002`, `ARV2R250-001`, `ARV2R248-006`, `ARV2CR249-001`, `-002`, `-003`, `ARV2CR245-001`, `ARV2R242-001` | P3 | Corrected, accepted or closed, as recorded. |
+| `ARV2R248-007` | P3 | Documented; narrowed in one direction by `4496d241`. |
+
+The final tree differs from the pushed head `e3db4ebc` only by this record
+commit.

@@ -13,10 +13,10 @@ from scripts import qualify_finra_short_interest as base_capture
 
 
 class Response:
-    def __init__(self, body, headers=None):
+    def __init__(self, body, headers=None, *, status=200):
         self.raw = body if isinstance(body, bytes) else json.dumps(body).encode()
         self.headers = headers or {}
-        self.status = 200
+        self.status = status
 
     def __enter__(self):
         return self
@@ -412,3 +412,55 @@ def test_cli_http_failure_inventory_keeps_count_without_secret_text(monkeypatch,
     assert json.loads((directory / "failure.json").read_text()) == result
     assert (directory / "attempt-01-start.json").exists()
     assert not (directory / "attempt-02-start.json").exists()
+
+
+@pytest.mark.parametrize("status", [204, 206, 302])
+def test_cli_non200_source_status_is_preserved_without_admitting_or_reading_body(monkeypatch, tmp_path, capsys, status):
+    class RefusedResponse(Response):
+        def read(self, maximum):
+            raise AssertionError("non200_body_must_not_be_read")
+    response = RefusedResponse(b"fabricated-provider-secret", {"Authorization": "fabricated-header-secret"}, status=status)
+    opener = Opener(responses(response))
+    monkeypatch.setattr(capture, "_guard_lane", lambda *args: None)
+    monkeypatch.setattr(capture, "_git", lambda root, *args: args[-1])
+    monkeypatch.setattr(capture, "_read_credentials", lambda path: ("fabricated-client", "fabricated-secret"))
+    monkeypatch.setattr(capture.urllib.request, "build_opener", lambda *args: opener)
+    assert capture.main(args(tmp_path)) == 2
+    printed = capsys.readouterr().out
+    result = json.loads(printed)
+    directory = tmp_path / capture.CAPTURE_PARENT / "finra-calibration-20261010T000000Z"
+    failure = json.loads((directory / "attempt-01-failure.json").read_text())
+    assert failure["http_status"] == status
+    assert failure["error_type"] == "_SourceHTTPRefusal"
+    assert result["reason"] == "source_http_not_200"
+    assert result["http_status"] == status
+    assert result["source_requests_attempted"] == 1
+    assert result["ready_for_empirical_backtest"] is False
+    assert json.loads((directory / "failure.json").read_text()) == result
+    assert len(opener.requests) == 3
+    assert (directory / "attempt-01-start.json").exists()
+    assert not (directory / "attempt-02-start.json").exists()
+    assert not (directory / "attempt-01-transport.json").exists()
+    assert not (directory / (queries()[0]["query_id"] + "-page-00.json")).exists()
+    assert not (directory / "calibration.json").exists()
+    assert not (directory / "transport.json").exists()
+    assert "fabricated-provider-secret" not in printed
+    assert "fabricated-header-secret" not in printed
+    assert not any("fabricated-provider-secret" in path.read_text() or "fabricated-header-secret" in path.read_text()
+                   for path in directory.iterdir())
+
+
+def test_source_http_helper_preserves_response_size_bound():
+    opener = Opener([Response(b"xxxxx")])
+    with pytest.raises(capture.CaptureRefusal, match="response_size_limit"):
+        capture._source_request(opener, capture.urllib.request.Request(capture.DATA_URL), 4)
+    assert len(opener.requests) == 1
+
+
+@pytest.mark.parametrize("status", [True, None, "fabricated-provider-secret"])
+def test_source_http_helper_refuses_nonnumeric_status_without_external_text(status):
+    opener = Opener([Response(b"fabricated-provider-secret", status=status)])
+    with pytest.raises(capture.CaptureRefusal, match="source_http_status_invalid") as refused:
+        capture._source_request(opener, capture.urllib.request.Request(capture.DATA_URL), 4)
+    assert "fabricated-provider-secret" not in str(refused.value)
+    assert len(opener.requests) == 1

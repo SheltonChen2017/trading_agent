@@ -32,6 +32,30 @@ TRANSPORT_HEADERS = (
 )
 
 
+class _SourceHTTPRefusal(CaptureRefusal):
+    """Refuse a source response while retaining only its numeric HTTP status."""
+
+    def __init__(self, status: int):
+        if type(status) is not int or not 100 <= status <= 599:
+            raise CaptureRefusal("source_http_status_invalid")
+        super().__init__("source_http_not_200")
+        self.status = status
+
+
+def _source_request(opener, request, maximum: int):
+    """Bound a source response; non-200 bodies and headers are withheld."""
+    with opener.open(request, timeout=30) as response:
+        status = response.status
+        if type(status) is not int or not 100 <= status <= 599:
+            raise CaptureRefusal("source_http_status_invalid")
+        if status != 200:
+            raise _SourceHTTPRefusal(status)
+        raw = response.read(maximum + 1)
+        if len(raw) > maximum:
+            raise CaptureRefusal("response_size_limit")
+        return raw, response.headers
+
+
 def _budget(value: int) -> int:
     if type(value) is not int or not 1 <= value <= 8:
         raise CaptureRefusal("invalid_source_request_budget")
@@ -107,7 +131,7 @@ def _capture(directory: Path, credentials: tuple[str, str], opener, *,
             if before_data_request is not None:
                 before_data_request()
             try:
-                raw, response_headers = _request(opener, request, 1048576)
+                raw, response_headers = _source_request(opener, request, 1048576)
             except Exception as error:
                 failure = {"source_request_number": source_requests, "query_id": query_id,
                            "offset": offset, "request_sha256": request_sha,
@@ -115,6 +139,8 @@ def _capture(directory: Path, credentials: tuple[str, str], opener, *,
                            "response_body_withheld": True}
                 if isinstance(error, urllib.error.HTTPError):
                     failure["http_status"] = error.code
+                elif isinstance(error, _SourceHTTPRefusal):
+                    failure["http_status"] = error.status
                 _publish_json(directory, attempt + "-failure.json", failure)
                 raise
             completed = _utc_now()
@@ -257,6 +283,8 @@ def main(argv: list[str] | None = None) -> int:
         }
         if isinstance(error, urllib.error.HTTPError):
             failure["http_status"] = error.code
+        elif isinstance(error, _SourceHTTPRefusal):
+            failure["http_status"] = error.status
         if directory is not None:
             failure["source_requests_attempted"] = len(tuple(directory.glob("attempt-*-start.json")))
             try:

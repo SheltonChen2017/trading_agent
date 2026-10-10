@@ -14955,3 +14955,63 @@ roots/branch/HEAD/status/actual matching remote. Only then execute this one
 frozen SI-only calibration with the known protected credential; no retry
 loop or next empirical action. Closing actual results, hashes, precise next
 blocker and publication checks are appended below before the final push.
+
+### 106.6 Actual partial capture and status-evidence correction
+
+The prospective code/specification freeze is
+**`902b31699fbcebffb79df1039d5f47a1beb52211`**, committed before any
+calibration market row. Closing pre-commit active-document checks passed
+**69 in 0.56s**. Run **`finra-calibration-20261010T201017Z`** authenticated,
+verified production metadata and retained five successful historical pages,
+then **refused** on its sixth source POST, `hist-2023-05-15`, with
+`http_not_200`. Exit **2** is a source-capture refusal, **not** a backtest/QC
+failure. No completed calibration report exists; the sixth historical query
+is unresolved and the format query was not executed. The original run and
+every pre-HTTP attempt receipt remain immutable and protected.
+
+The old shared HTTP helper safely rejects non-200 responses but discards
+their status when raising its named refusal. Its original attempt-06
+receipt therefore does **not** establish which status was observed. Do not
+retroactively label it 204, infer a zero quantity, fabricate an empty page
+or treat the partial sample as complete. Main reproduced this evidence gap
+with a fabricated 204-response test: **1 failed in 0.55s**, missing
+`http_status` in the protected failure receipt. The smallest correction
+belongs only to the new calibration client: retain the observed status in
+a safe source-response refusal, still reject it before reading its body,
+and include that status in attempt/final failure receipts. Auth/metadata
+helpers, protocol/hash/sample and acceptance rules are unchanged.
+
+[FINRA troubleshooting](https://developer.finra.org/docs) lists 204 as no
+response content, but also says empty JSON queries return 200 with `[]`.
+That documentation alone does not identify the original response or supply
+missing total/version proof. The correction **does not admit 204**, reset
+the budget, overwrite evidence or restart the seven-query capture.
+
+* **SI-DEC-20261010-05:** correct the independently proved status-evidence
+  gap, without changing source admission or any financial/sample semantics.
+* **SI-DEC-20261010-06:** after committing the correction, make **one**
+  deliberate identical query diagnostic for `hist-2023-05-15`, exact request
+  SHA-256 `05871333aaf7eee41986730df3e78ec639bda3a7521acd241dd2421be82bcd54`.
+  Read only bounded response/status and whitelisted pagination metadata;
+  any response body stays private. Publish start/transport receipts first
+  and keep credentials/token in memory. Initial **six** source POSTs plus
+  that single diagnostic are **seven** of the fixed **eight** allowance.
+  No automatic retry, format query, partial resume or full re-execution is
+  authorized in this round's closing diagnostic.
+
+| ID | Priority / disposition | Evidence and correction |
+|---|---|---|
+| `SI-FINRA-CAL-003` | P3 confirmed status-evidence gap / correction being validated | Original refused attempt loses non-200 status; main's focused fabricated 204 case red. New source-only safe status refusal retains the observed code without body/secret exposure and still refuses non-200. Original receipt is not backfilled. |
+| `SI-CR20-001` | P3 retained / open | Frozen historical/format design is implemented; actual capture is partial. No completed historical/format coverage or alias claim follows. |
+
+Validation and the actual status-only diagnostic are appended below after
+they occur. Source/companion/original-vintage/PIT/QC gates, all old ledger
+rows, unchanged v1 evidence and zero outcome/QC counters remain intact.
+
+Main's corrected exact focused set passed **306 in 5.58s**: the previous
+299 cases plus seven status/bounded-response regressions; new capture file
+now **55** cases. Same qualified 3.13.15 runtime, empty environment and
+network denial, zero skip/warning/error. Four-file compilation and diff
+checks pass. Helper's separate 55-case green retains helper attribution.
+`SI-FINRA-CAL-003` is **corrected and validated** before the deliberate
+diagnostic; original failed-run status remains unknown, not backfilled.

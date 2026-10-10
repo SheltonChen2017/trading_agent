@@ -10,11 +10,20 @@ ALREADY AUTHORIZED, NOT PROVIDER-ATTESTED. SECTION72 RECORDS THE OWNER'S NEW
 MARKET-CAP-SELECTION / TPR-WEIGHT-TILT DEVELOPMENT TEST AND EXPLICIT PERMISSION
 TO PROCEED BEFORE CLAUDE'S PENDING REVIEW OF fa78dacd. THIS IS A GENUINELY NEW
 ECONOMIC CANDIDATE, NOT A FOURTH OLD ATTEMPT OR CANONICAL ACCEPTANCE.
+THE TWO NEW JOINT STOCK-PORTFOLIO RUNS COMPLETED: ON3 HAS352FILLED NATIVE
+ORDERS, OFF1 HAS309; BOTH HAVE60NAV DATES AND13/14DECISION COVERAGE.
+OBSERVED MEMBERSHIP/CAP/SELECTION/BASE-WEIGHT/PRIOR-MARK INPUT PATHS MATCH.
+ON RETURN -5.018489895%, OFF -4.66415821%; ON DID WORSE BY35.4331685BPS.
+SHARED JAN13CAP REFUSAL, NONAMBIENT FINAL DELISTING AND API-UNREPORTED NATIVE
+FEE/MONETARY UNITS KEEP EVERY ACCEPTANCE/PAIR/ALPHA GATE FALSE. SECTION72.5
+RETAINS FAILURES, COMPLETE IDS/HASHES, EXPLORATORY METRICS AND LIMITATIONS.
+NEW ON'S3ATTEMPTS ARE ALSO FULLY CONSUMED; OFF1, FOUR NEW CLOUD LOOKS PLUS
+TWELVE HISTORICAL = SIXTEEN CONSUMED/OBSERVED LOOKS. NO RETUNE/FOURTH ON RUN.
 THE PRIOR FROZEN MATCHED STUDY REMAINS BLOCKED
 ON THE EXTERNAL MIA COMPUTER-CONTROL INTERFACE IN SECTION 71.10. ALL THREE
 CODEX ON-BASE ATTEMPTS ARE CONSUMED; THE COMPLETED THIRD RUN REMAINS A
 DELISTING DIAGNOSTIC. NO MIA RECOVERY JOB OR LOOK IS RESERVED OR LAUNCHED;
-TWELVE OBSERVED RUNS AND THE OTHER FIVE UNLAUNCHED MATCHED ARMS REMAIN EXPLICIT.
+THAT PRIOR STUDY'S TWELVE OBSERVED RUNS AND FIVE UNLAUNCHED ARMS REMAIN EXPLICIT.
 CLAUDE NEXT REVIEWS THIS CODEX ROUND INDEPENDENTLY AT ITS ONE FINAL PUSHED
 SNAPSHOT. RESTORED CONTROL AND REVIEWED COMPLETE OBSERVERS ARE REQUIRED
 BEFORE RECOVERY; NO FOURTH CODEX ATTEMPT. SECTION 69 REMAINS ATTRIBUTED HISTORY.
@@ -523,8 +532,13 @@ adversarial matrix remain unresolved and parked. **Exact next role action:**
 Section71.10's blocked round was published once at fa78dacd; its five outgoing
 commits remain pending Claude review. The owner now explicitly authorized the
 new section72 cap-selection/TPR-tilt development test BEFORE that review with
-"yes, authorizee". Codex implements and executes that separately frozen
-candidate/control in the same lane under that direct, scoped owner exception.
+"yes, authorizee". Codex has implemented and completed that separately frozen
+candidate/control in the same lane under that direct, scoped owner exception:
+ON3/OFF1,352/309native filled orders,60NAV dates and13/14decision coverage,
+with all qualification gates false. Section72.5 retains exact source/evidence
+hashes, negative attempts, matched observed-input paths and exact descriptive
+returns (both negative, tilt worse; see72.5). New ON's3slots are consumed; OFF1. Four new cloud
+looks plus12historical =16consumed/observed looks. No retune/fourth ON launch.
 Claude next reviews this Codex round independently at its one final pushed
 snapshot, including the pending predecessor and new round. The previous
 continuous round reached a genuine external
@@ -13177,3 +13191,270 @@ use. Main reproduced final697passed/1existingplatformskip in4.61s with relevant
 reporting/audit/codec/document/import checks; syntax without cache writes and
 whitespace clean. Earlier696/1 was before one added job-binding test, not a
 production change. No complete suite or actual operator/Windows-custody read.
+
+Independent Codex peer accepts both pure diagnostic-only modules/tests:154
+focused passes0.88s;10safe in-memory mutants red with20original/restored controls
+green. Checks include unknown fee/unit coercion, foreign/composite identity,
+assignment exception widening, incomplete census totals, source-binding removal,
+qualification leak, runtime fee attestation and invented turnover. Exact released
+hashes match, no material implementation finding; no private/API/outcome access
+or changes by peer. This is NOT Claude review or empirical strategy acceptance.
+New source commit60ed255c1f341b5e0cce3df4d1be37e1bdb4dd07 followed exact
+root/Git/branch/HEAD/status/staged-diff and ACTUAL remotefa78 checks, no push yet.
+
+### 72.5 Completed new stock-portfolio diagnostics and exact final handoff
+
+Fresh analysis-only scope005-analysis binds25committed sources at60ed255c,
+unchanged runtime-v3 bundlea5ef2243239467add1e73c4cf25fc11c728bcce7dab9b896a42bd81e8194506c
+and the explicit own ON3/OFF1 collected-result/log/four-order-page/source-receipt
+allowlist. Manifest0321e1a091c0e5ec115fcc740ec646de212c23ada7e6a85ce0d9dedfa9d846b2,
+access0910e5a21edc7143d13e2f28c8f72d7003112b231773759aa4fc0ed6f5fea3fe,
+spent analysis claim99b8159549244c36c6ae394f90517e0898f8abffb42976d0e2be0890facc5377
+preceded all processing. No packet/provider/D0 read, new cloud request, launch
+or development look. Original scope004 refusal/error and all wires remain intact.
+
+Both native jobs genuinely completed with orders and full60frozen NAV dates.
+They are joint STOCK portfolios across six ETF-defined constituent sleeves,
+not six ETF-only positions or independent universe jobs. Market cap determines
+the top10 selection only; equal slots determine baseline weights, with TPR
+changing only within-selected weights. AR is wholly disabled. Initial100000USD;
+Jan2–Mar31 2025. Neither complete14-decision execution, canonical TPR/ETF
+acceptance, independent sleeve P&L nor confirmatory alpha is claimed.
+
+| Actual candidate / retained attempt | Private project | Exact compile | Exact backtest | Terminal / usable evidence |
+|---|---|---|---|---|
+| ON /1 /runtimev1 | 37600675 | e703e1b92b3e4dd06bba12ecbbfd03de-a1c888ca9bd3a6c718a44757c768504c | e05e35c49377dd56bd87682d90f20084 | Runtime Error;252filled orders before failure; no complete result |
+| ON /2 /runtimev2 | 37600675 | 8bfcf0b640d9a70c9801355ce3bd0338-90d5697ed3db0987785bb1da5410c730 | 8cacfe95fef750b847b448ff626afd1b | Completed;352filled orders,49NAV/10coverage/noSUMMARY because100kbquota; incomplete diagnostic |
+| ON /3 /runtimev3 | 37600675 | f09cdbbcfc117b0be5d1b65cea0f7490-5757b3fb7f2cf96b746dcc1650502c6c | 2eef3729316e92c38a7c31908ecf0ff8 | Completed;352filled orders,60NAV/13coverage/SUMMARY; unqualified diagnostic |
+| OFF /1 /runtimev3 | 37600676 | ae02db409a4271610dfa88051236a132-21b4cb47599114e30bc70d17069d016f | 1baf38669e9ddae7bf9e72cdd8ffdd79 | Completed;309filled orders,60NAV/13coverage/SUMMARY; unqualified diagnostic |
+
+ON3 diagnostic-v3d46b6b0ba2f300295f2344ffc0abfc414510b84abb13be4abfb184bae264d6c3;
+native-extras9344bcd6621662b2926c968d34c11620245f23cc2b8df86f4c8d7c3d274cf3af.
+OFF1 diagnostic-v3a740999cef3a2e206ccdb8344b78c8bfdd56af87c983f302cf32f2bc1b6a10f9;
+native-extras6322b6603d6500bcece12bdee1e79eea096e9ad69045a3796b19cb56d43ec53a.
+All diagnostics bind original result/log/order-page/source/config objects before
+decode. No raw evidence/receipt/summary was patched, rebound or reconstructed.
+
+| Source-bound native account / observed strategy statistic | TPR tilt ON | Same cap-selected basket, tilt OFF |
+|---|---|---|
+| End NAV / partial2025 net return | 94981.510105 / -5.018489895% | 95335.84179 / -4.66415821% |
+| Daily-close maximum drawdown | 10.356373614021434645431498341003634384966545162958% | 9.9659415980336546838939710088580705672966623634884% |
+| QC headline drawdown (sampling NOT reconciled) | 11.300% | 10.900% |
+| CAGR, decimal ratio (annualizing88calendar days, not a full-year result) | -0.19241278320339728 | -0.17983455623944677 |
+| Annualized sample daily volatility, decimal ratio / Sharpe, RF0 | 0.18925997690649968 / -1.0487373038643237 | 0.18630321428593807 / -0.9844854684268315 |
+| Full NAV / attempted decisions / observed coverage / refused | 60 /14 /13 /1 | 60 /14 /13 /1 |
+| Strategy MOO orders / filled shares / observed USD fees | 351 /5098 /50.98 | 308 /5049 /50.49 |
+| All native filled orders / callbacks / shares / QC closed trades | 352 /352 /5380 /171 | 309 /309 /5332 /149 |
+| Engine-tagged final Market liquidation | 1order /282shares; fee and monetary units unreported | 1order /283shares; fee and monetary units unreported |
+| Failed/unfilled orders in complete retained census | 0 | 0 |
+| Observed USD MOO fill notional / initial-NAV turnover | 179355.935655 /1.79355935655 | 162318.94679 /1.6231894679 |
+| ALL-native fees / ALL-native USD fill notional / turnover | None /None /None | None /None /None |
+| Mean / end cash USD | 10690.27763575 /10725.460105 | 11153.047492 /11058.37179 |
+| Mean / end gross exposure | 0.89318877673143268379903554590925214851194424040247 /0.887078441971040085518126538739979112064044814967 | 0.88884846268699847947885070442112282378577905853032 /0.884006145198164720584463829697307380328529010831 |
+| Maximum name exposure / soft-cap breaches | 0.0583217861505669891709914118115843750031407885347 /0 | 0.0536582874817179257487862478161796669782320281961 /0 |
+| Runtime cash/NAV residuals / position mismatches / risk breaches | 0 /0 /0 /0 | 0 /0 /0 /0 |
+
+Metrics use60daily returns including the initial100000 anchor; sample volatility
+and Sharpe annualize252trading days, risk-free daily0. CAGR uses the inherited
+88elapsed calendar-day convention Jan2–Mar31. This short exploratory quarter
+does not support full-year expectation or annual alpha. Turnover above is gross
+absolute BUY+SELL **observed USD strategy** notional divided by initial NAV,
+not half turnover or complete native final-fill turnover. API native final fee/
+unit fields remain unavailable even though runtime/native headline fee claims
+agree with observed MOO fee sums. Closed trades are QC consolidated lot evidence,
+not orders or independently measured sleeve P&L. All 60 source-bound runtime
+daily ledger residuals are zero; this does not independently attest omitted API
+money units/fees or native input tapes. Statistical floats are separate from
+exact Fraction arithmetic for money/returns/drawdown/strategy fees.
+
+Both runs refused2025-01-13 with missing_prior_cap_snapshot1. The retained
+aggregate evidence cannot prove its underlying callback/publication cause. Do not call
+it a holiday, repair it with a stale cap, substitute zero signal, change dates,
+or manufacture a14th observation. Full60NAV remains valued, but no complete14
+prior-mark path is claimed. Nonambient native delisting remains diagnostic:
+4observed events,2ambient/2nonambient, one source-reported compatibility exception
+per run. Native final Market execution/currency/fee/timing is not frozen MOO
+economics and was not relabeled as such. Original strict and development flags
+remain false.
+
+| Sleeve definition (same memberships/selected identities in both arms) | Observed members min–max | Selected min / mean / max,13decisions | ON selected TPR states: nonzero /zero /unknown | ON transfer count / recipient underfill |
+|---|---|---|---|---|
+| SPY, native S&P500-covered constituent proxy, not broader large-cap | 502–503 | 10 /10 /10 | 60 /18 /52 | 26 /0 |
+| XLV, healthcare | 61–61 | 10 /10 /10 | 97 /7 /26 | 45 /0 |
+| XLE, energy | 22–22 | 10 /10 /10 | 90 /5 /35 | 42 /0 |
+| QQQ, Nasdaq100, not all Nasdaq listings | 100–101 | 10 /10 /10 | 84 /18 /28 | 39 /0 |
+| SOXX, semiconductors/equipment | 30–30 | 10 /10 /10 | 102 /2 /26 | 50 /0 |
+| REMX, QC US-covered subset of global rare-earth/strategic-metals stocks | 8–9 | 6 /87-over-13 /7 | 13 /0 /74 | 0 /0 |
+
+Each table cell aggregates sleeve observations across13dates, not unique stocks.
+REMX has87available positive-cap observations,26nonpositive and1missing among114
+observed membership slots. Missing3–4of10 selection slots remain cash; no global
+ETF renormalization/fallback. Its single nonzero-score selected name per decision
+has no other nonzero-score counterpart, so the frozen tied-rank transfer is0;
+unknown scores remain explicitly neutral, not measured zero or exclusions.
+OFF score states are not_used (130observations per other sleeve,87REMX), all
+transfers0; OFF never reads the packet. All recipients' reported tilt underfill/
+aggregate cap-blocked capacity0, no binding recipients. Requested=submitted=
+filled strategy shares; this does NOT claim exact target-notional tracking after
+cash buffer, whole-share rounding or market-price drift. No independent per-sleeve
+fills, returns or additive overlap P&L are invented; all six sleeves share each
+portfolio's project/compile/backtest IDs above.
+
+Fresh pair-verification claim17378af75d7ab1b71db18dffc63a04a04bc9ea31e8cd01f76cf45faa8b6f720d
+precedes independent exact original-NAV/strategy-fee arithmetic. Source/evidence
+binding is reproduced before decode. Both calendars hash
+d9b53385a33c9fde4b53cabb5f69e23e2657cb78bc38396017b16588b87748c5;
+observed13selected prior RAW mark/volume path hash
+aabe120a3840394a8e9f7ab85edb45c7576c5ad63dbe8f89d8c15fdc3c72078e.
+Membership, cap-input, selected-ID and baseline-weight paths match separately
+for EVERY sleeve; missing-date lists and freeze hashes also match. The pair
+receipt9a492bbfc828845f956450cdbc23a939f22b79239b026d84b031dfe69cb129bd
+retains all24sleeve path checks, source hashes and per-arm diagnostic hashes.
+Independent exact return fractions are -1003697979/200000000 and
+-466415821/100000000 percent; maximum drawdown fractions218022202600/21051983129
+and6557848975/658026029 percent match displayed text within1e-45percentage points.
+Strategy observed USD fees exactly equal filled shares/100 and original runtime
+fees. No unreported native monetary field is assigned a value.
+
+Descriptive native-account ON−OFF contrast is **-0.354331685percentage points /
+-35.4331685basis points /-354.331685USD end NAV**. In this observed quarter the
+tilt did worse and its daily-close drawdown was higher. Matched observed inputs
+do not cure the shared missing decision, native money-field/custody gap, current-
+vintage/PIT limitations, overlap or adaptive study. Pair/strategy/canonical
+admission stay false, formal confirmatory alpha0. No outcome-based retuning,
+winner selection, dates/fees/selection changes, extra sweep or adverse arm.
+Four new cloud looks plus12historical =16consumed/observed development looks;
+ON3/OFF1 attempts remain permanent across future fixes/sessions. These are not
+independent tests of an alpha hypothesis and do not replace the old matched
+study's five unlaunched arms, original zero-trade REMX or its spent ON slots.
+
+Fresh source-parity receipt
+eb3b7f540334bc15d0965c17ac48febd6dc0f5fd471062380a92b31aab70d64c
+verifies the six source files differ only in main.py/matched_config.py;
+main bytes are identical after replacing the frozen per-arm config hash.
+Config differs only in arm/candidate_id; same freeze, costs/slippage and all
+non-signal constraints. Actual exact cloud source readbacks were verified
+before launch and during collection, not inferred from a shared author or a
+Completed label. Reporter source commits did not modify those executed files.
+
+Independent Codex peer audited the RECORD only, with no private/outcome/API
+access: exact return/delta/drawdown fraction arithmetic,88days, strategy fee/share
+parity, end exposure and REMX114-slot inventory agree. This is independent
+record consistency, not an independent empirical/source/PIT attestation. Peer
+flagged stale top/section8 completion wording and ambiguous decimal-ratio table
+labels; both corrected here. No outcome or portfolio parameter was changed.
+
+Final fresh hash-only private-index claim
+f0f3b9732f873b38c86bf37e29ba2491cf04e389960897344c826a4351e22206
+preceded hashing the bounded own-study capture tree:617immutable files,
+37076552bytes, private index
+e9597aeaba96f6260732237b0f030bf7fbf700b473fe970941d956797697396c,
+created2026-10-10T00:24:58.810196Z at sourceHEAD60ed255c. It includes fresh
+manifests/access/look/attempt claims, all four launches and compile/source
+readbacks, failures/loading/error/redacted parsed wires, own captured packet
+copies, source bundles, raw result/log/order pages, original strict-audit and
+reporter refusals, successful unqualified derivatives and descriptive pair.
+Hash/byte-count only, no new row interpretation/cloud request/launch/look;
+original derived packet/D0/provider captures outside this study were not read.
+Files0600/parents0700 with O_NOFOLLOW/single-link custody and Git-ignore;
+cooperative POSIX, NOT hostile-parent/native-Windows canonical custody.
+Final publication changes the HEAD pin: no scope/access is implicitly renewed
+by its remaining wall-clock lifetime or these durable hashes.
+
+| New-round finding / severity | Final disposition and evidence |
+|---|---|
+| CAP001 /P1 native Fundamental namespace | Corrected/resolved before first launch; exact native context now validates in both completed runs. |
+| CAP002 /P1 post-parent ticket/history loss | Corrected/resolved before launch; typed persistent ever-ordered/ever-filled/unknown observer retained. |
+| CAP003 /P2 aggregate-line bound | Corrected/resolved before launch; bounded16384collector lines; v3 wire transport stays within frozen75000budget. |
+| CAP004 /P2 selected prior-mark path missing | Corrected/resolved before launch; identical observed13RAW price/volume paths reproduced across both arms. |
+| CAP005 /P2 failure-wire loss | Corrected/resolved before launch; actual negative/loading/redacted parsed wires retained, not recreated. |
+| CAP006 /P1 native final scalar-custody refusal | Corrected/resolved in v2/v3 narrow typed guard, finally-cleared authority; both completed summaries report exactly1compatibility exception. This is source/runtime evidence, not literal API fee/unit observation. |
+| CAP007 /P1 native final/nonambient interpretation | OPEN: native Market/full final liquidation is not frozen MOO economics; observer2nonambient events, false gates retained. |
+| CAP008 /P1 draft zero-fee USD assumption | Corrected before execution: native guard uses literal0/NullCurrency-QCC. Runtime guard assertion is distinct from omitted native API fields (CAP011). |
+| CAP009 /P1 native100kb log truncation | Corrected/resolved in v3 bounded lossless transport; actual60NAV/13COVERAGE/SUMMARY recovered by NEW run, not reconstruction of attempt2. |
+| CAP010 /P1 Jan13fresh-cap gap | OPEN: same refused decision in both arms; underlying callback/publication cause not attested, no stale/zero/date substitution. |
+| CAP011 /P1 API native fee/unit absence | OPEN empirical completeness: one final event per arm has missing fees/empty price units. Reporting refusal corrected by new explicitly unqualified helper/v3; fees/notional remain None, not zero/USD/QCC. |
+| CAP012 /P2 draft event ID domain | Corrected/resolved before empirical use; actual source-bound string composite/job identity retained; integer-only draft killed by red/green proof. |
+| Alleged old13-row metric hard refusal | FALSE ALARM: old function returns validated partial hash None; v2 added labels only, not a repair. |
+
+No P0 introduced or unresolved software issue identified in the bounded peer
+review; the three OPEN P1 interpretation/data/custody limitations prevent full
+frozen execution/empirical acceptance. Historical complete P0–P3 ledgers,
+partial/false-alarm findings and canonical freezes remain intact; no issue is
+deleted because a Completed job or a green focused test exists.
+
+**Readiness and next role.** The new cap-selected stock construction and
+weight-only TPR integration compile and execute genuine QC orders in both arms,
+with full daily account valuation and source-bound diagnostics. This bounded
+development objective produced a stable reviewable LIMITED result; it did not
+achieve complete14-decision qualification or the original canonical ETF strategy.
+No evidence-backed safe fourth Codex attempt exists, and repeating unchanged
+inputs or changing freshness/economics after outcomes cannot repair CAP010/011.
+There is no newly failed third runtime terminal job requiring another Codex fix:
+ON3 is actually Completed with usable orders/NAV, albeit unqualified. No Mia
+recovery job was reserved or launched for this new study. Any request to replace
+this capped candidate's evidence needs fresh scoped recovery authority, a restored
+authenticated controllable Mia interface, exact source/diff validation and a
+prospectively reserved recovery look, not a rename/cap reset. Historical71.10's
+last confirmed computer-control outage and precise old-project37547067 owner
+recovery remain attributed history, not a freshly reproduced interface check.
+The new own project is37600675; do not substitute/relaunch the old candidate.
+
+Latest instruction/approval, the adopted Analyst-reference construction and
+every delegated choice OWN87–101 remain durable above. The owner authorized
+this development before review; no agent choice is separately human/Claude
+approved. No new incoming Claude commits were present after fa78 in this round.
+Historical505f7a3d..32016848 counter-review remains accepted after correction
+with per-commit dispositions in70; pending32016848..fa78 was NOT accepted by
+that decision or by this permission. Claude is next, independently reviewing
+each of those five predecessor Codex commits PLUS every current-round commit
+fa78..the final pushed HEAD, then cumulative32016848..that exact final snapshot.
+Current outgoing source commits:82012b68164c33092fd17c690199e9b3035a6f21,
+c0197ef6a2811d897560174353fae48ae3a8ad65,
+c0b48fe1783c2393fe40ea4f245a26d1558e0e26,
+48a1422ae4a5c2c78c817fc8ca08d067fcdf818a,
+60ed255c1f341b5e0cce3df4d1be37e1bdb4dd07,
+and the final record-only handoff commit containing this section. This is one
+continuous worktree round/ONE successful non-force publication, no intermediate
+push or routine Claude stop. Source/attempt/history hashes remain immutable.
+
+Claude owns the complete lane suite. Codex's relevant focused checks remain
+separate from it; fourteen preregistration cases still require frozen Windows
+Git. macOS gives no native signer/ACL/protected-parent custody proof. Canonical
+TPR-TR0-I remains parked/incomplete for replay/rollback, parent/reviewer custody
+and adversarial validation; TPR-1/source evidence and TPR-0B manifest gates stay
+incomplete. OOL011 lane correction stays accepted with owner-coordinated shared
+synchronization; OOL003/004/006 remain closed. Shared Action Plan/Session Handoff/
+workflows/main/sibling behavior, protected research allocation and sealed holdout
+are unchanged. No broker/funded/paper/live deployment authority is granted.
+Heartbeat stays PAUSED after publication; do not rearm or trigger on this push.
+
+Final post-handoff document check initially5failed/692passed/1platformskip:
+section8's existing stale-commit guard matched the long fractional return digits
+as apparent short commit IDs. This is a document-tokenization false alarm, not a
+financial/source/runtime defect. Removed duplicate long outcome decimals only
+from the exact-next-role synopsis and referenced72.5, whose exact metrics remain
+unchanged. Did not weaken tests or their stale-commit/role guards. Source syntax
+for25dependencies, exact rendered executed bundle, whitespace and private Git-
+ignore checks were clean; ACTUAL remote stillfa78. Final restored checks below.
+
+Final restored focused reporting/audit/codec/document/import-boundary validation:
+697passed/1existingplatformskip in6.42s using49/52isolated runtime-root runner.
+No cancelled/full lane/repository suite or Windows custody claim. All executed
+runtime/driver/helper/freezes and private empirical artifacts retain exact hashes;
+only this durable record changed after60ed255c. Final publication will verify
+physical/Git root, exact branch/HEAD, status/staged record-only diff and ACTUAL
+matching remote immediately before commit/push, then local/remote equality and
+clean status. No scope renewal, new launch, retune or auto-rearm follows it.
+
+Final aggregate reason/observer crosscheck receipt
+f0acd440498fb31f2b1402c6fed9c7050a5efd66ec654d5771ef49d45c1258c7
+independently confirms each original SUMMARY has missing_prior_cap_snapshot1,
+delisting_event4, ambient2/nonambient2 and equal complete/history/clock inventories.
+Only previously source-bound summary aggregates, no new outcomes or native tape.
+Fresh explicit hash-only index successor includes that final crosscheck plus the
+retained first index: claim6fa9abbf13ecf0def25931e1ffa80dfbb30fe1d010096293a90ebdce5ff67cf1,
+latest final index1c6254b42c54cf4c0f59949774e83690edfa9857b9e2a3c487e4e61745562eb3,
+2026-10-10T00:35:56.073427Z,621files/37190081bytes hashed only. Previous617-file
+index remains exact historical evidence; this is not a source/candidate/attempt
+rename or receipt renewal. No new cloud request, launch or development look.

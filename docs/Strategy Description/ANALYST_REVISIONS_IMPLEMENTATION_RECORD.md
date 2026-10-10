@@ -414,6 +414,10 @@ Section 274 is Claude's independent review of `b7169dc0..8b9c5bae` (0 P0,
 0 P1, 0 P2, 5 P3): all six Codex commits are accepted, the relocation and
 assessment reports authenticate, and 274.5 recommends a narrow, versioned
 policy for the vintage directory's attributes.
+Section 275 counter-reviews the sole Claude commit `557411a6`, corrects the
+prospective diagnostic failure handling and test gaps, and records an exact
+opaque-metadata policy candidate. The candidate is not security acceptance;
+the assessment/probe/publication stop remains and the monitor stays paused.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1327,9 +1331,13 @@ reversible relocation trial, compatibility audit and bounded synthetic probe
 at `/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2`.
 Section 274 is Claude's independent review of the exact pushed range
 `b7169dc0..8b9c5bae` (sections 270-273), including the section-272 move.
-The immediate next step is that Codex counter-reviews section 274 and this
-round's Claude commit, unless the owner explicitly changes this workflow;
-this is not an intermediate acknowledgement wait. The owner subsequently said
+Section 275 counter-reviews the sole Claude commit `557411a6` and supplies
+prospective corrections and an exact candidate metadata policy. Claude must
+review section 275 and its exact final pushed snapshot. The concrete next
+requirement is an explicit human security disposition of the single vintage
+directory state fingerprinted in 275.4; no new assessment/probe, attribute
+change, source admission or R284 launch follows from these fixes. This is not
+an intermediate acknowledgement wait. The owner subsequently said
 "proceed" after the open-session concern was explained. Section 272 supersedes
 the session-exit prerequisite, without authorizing any process interruption.
 The physical move and audit are now recorded in 272.4: all bytes and other
@@ -3214,6 +3222,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-09 | Codex authorized whole-worktree relocation trial | `4e4a6bfb` -> `dc06ed32` protocol/source freeze and final section-272 result commit | Owner says proceed after session clarification; whole worktree moved to approved Code root on unchanged branch | Complete pre/post census preserves names/bytes/other recorded fields but refuses 21,593 ctime changes; four pre-move source authentications succeeded with existing qualifications; no post-move loader or synthetic probe | 154 distinct focused strict-denied passes, four static compilations; final record checks nonadditive; no full suite | 1,837 of 1,839 artifacts have ctime-only changes; historical absolute-path bindings remain qualified; ARV2E263-001 and formal evidence gates remain | Preserve new root and both exclusive reports; no waiver, retry or automatic rollback; exactly one final matching-lane push, Claude review of section 272; monitor paused |
 | 2026-10-09 | Codex authorized prospective scoped fresh-use assessment | `ac951360` -> `26cfc8dc` source/protocol freeze and final result commit | Owner approves bounded investigation and a new scoped security/consumption contract, not failed-audit acceptance | Sole fixed assessment refused xattr_unapproved; authenticated 584-byte failure report retained; bounded 27-object names-only diagnostic isolates three extra names on vintage directory; original ARV2OD272-A still uninvoked | 242 distinct focused strict-denied passes; four static compilations; final record checks nonadditive; no full suite | Extra MACL/quarantine/fileprovider names need security disposition; historical security, actor causality and production safety unproven; formal gates unchanged | Stop spent assessment; preserve all evidence, no retry/attribute mutation/R284 bypass; one final matching-lane push; Claude review section 273; monitor paused |
 | 2026-10-09 | Claude independent review of sections 270-273: the relocation, the fresh-use assessment and its attribute refusal | `8b9c5bae` -> this record commit | Section 274: six Codex commits `b7169dc0..8b9c5bae` disposed (6 accepted, 0 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells; census, assessment and R272 probe not run | No code changed by Claude. The R272 and R273 reports and nine source pins authenticate, the census difference and the names-only attribute census are reproduced independently, in-memory guard removals are tabulated, accepted `ARV2CR270-001` to `-003`, 274.5 recommends a versioned attribute policy; section 4 names section 274, banner sentence added, this row appended | Complete lane selection at `8b9c5bae` with every remote address refused (strict sandbox for the six groups, three parallel streams, temporary directories inside the root's ignored `.pytest_cache`; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 274.6 | 0 P0, 0 P1, 0 P2, 5 P3 | Single push of this round's Claude commit; Codex counter-reviews section 274 unless the owner changes the workflow |
+| 2026-10-10 | Codex counter-review and prospective diagnostic hardening | `557411a6` -> section-275 correction/record snapshot | Sole Claude review commit accepted after documentary qualifications; all five P3 findings disposed; no research or QC event | Early census claim, strict probe exit, preallocation capability guard, isolated regressions; one bounded exact-object metadata-candidate observation, not source admission | Strict-denied focused checks and omission mutations in 275.6; retained report hashes/counts reproduced; no full Codex suite | ARV2E263-001 remains; exact opaque access/sync state not yet human-accepted; historical source and formal gates remain | One final matching-lane push; Claude review of section 275; explicit security disposition before any new prospective assessment; monitor paused |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -40483,3 +40492,249 @@ documentation address `192.0.2.1` with `EPERM`.
 
 The final tree differs from the pushed head `8b9c5bae` only by this record
 commit.
+
+## 275. Codex counter-review of section 274 and prospective diagnostic hardening, 2026-10-09–10
+
+### 275.1 Exact range, authority and scope
+
+The owner said **"Review is done"**. The matching-branch-only fetch resolved
+both local and remote to `557411a63fbde21cb4ae971d869f508c391d6919`, with the
+initial tracked tree clean. The complete new review range is
+`8b9c5baec08b9ea0ac53fe46ebca932ee4227415..557411a63fbde21cb4ae971d869f508c391d6919`:
+one record-only Claude commit, not the six previously reviewed Codex commits.
+All work remains at `/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2`
+on `codex/strategy-analyst-revisions-v2`. The old Documents path is not an
+execution root. The monitor remains paused; no other chat/session is messaged,
+started or interrupted.
+
+This is the delegated counter-review/correction round of 255.2. It does not
+authorize a new whole-worktree relocation census, assessment, synthetic
+publication probe, source capture, production publication or QC launch. Historical R272/R273 reports,
+failed continuity A/B packages and all original source artifacts remain
+untouched. Same-round advisory agents assist with disjoint corrections, not
+independent final review. Every test, mutation and private diagnostic/parser
+uses strict remote-network denial and in-root temporary/cache/plugin paths.
+No full Codex suite is run.
+
+### 275.2 Prospective policy preparation decision, recorded before observation
+
+**275-D1 — prepare an exact candidate, not security acceptance.** Section
+274.5 supplies a concrete read-only next step within the already delegated
+investigation/design scope: identify the exact candidate directory state
+for a later human security decision. Run at most one bounded pre-policy
+observation now, under strict network denial, entirely from the operative
+root. This is not another R273 assessment and cannot turn a failure into a
+retry entitlement. No source contents, source loader, consumed source buffer,
+publication or test probe is involved.
+
+The scope is exactly the same 12 current directories from the Code anchor
+downward and 15 named leaves in the four fixed source packages of 273.3.
+Resolve each object's path without following symlinks, hold all 27 descriptors,
+require the existing owner/mode/flag and private single-link leaf conditions,
+and compare exact held/named metadata before and after. Read accessible xattr
+**names only** on those 27 objects through the native held-fd API, bounded
+to 8 KiB per object with `XATTR_SHOWCOMPRESSION`. Non-vintage objects must
+remain provenance-only (absence of provenance is permitted as in v1).
+
+Only for the exact vintage package directory
+`artifacts/analyst_revisions_v2/sharadar_capture/arv2-sharadar-source-20260914T003329843989Z`,
+require the exact four-name set in 274.5, absent/empty-unflagged native extended
+ACL, and read those four opaque values once with a **64 KiB aggregate cap**.
+Recheck its ACL, all names, held/named metadata and every ancestor. Record
+only path/identity metadata and each value's length/SHA-256; do not persist,
+print, decode, interpret, change or remove raw values. Bound the entire
+observation to a 15-second cooperative signal/refusal-on-return budget (not
+a guarantee of hard interruption inside a native syscall), with no retry on
+refusal or drift. Check named source leaves are private regular files before
+opening, then match held metadata to the named snapshot. A refused
+observation yields only a redacted reason and no candidate approval.
+
+This prepares a **draft**, not an executable frozen v2 protocol or permission
+to consume sources. Fingerprints identify opaque bytes, not their safety,
+grant ownership, actor or history. They do not establish hidden-attribute
+coverage or uninterrupted stability. The production observer's allowlist
+remains unchanged; the observational parser must not monkeypatch it into an
+admitting source consumer. The exact access/sync state still needs an explicit
+human security decision; no such acceptance is inferred from this review,
+255.2's routine build delegation, or earlier relocation approval. The result
+and disposition will be appended below before handoff.
+
+### 275.3 Per-commit disposition, findings and corrections
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `557411a63fbde21cb4ae971d869f508c391d6919` | accepted after correction | Complete message/diff and section 274 inspected. Its five findings are confirmed or qualified below, retained report identities/counts reproduce, and its acceptance of the six prior commits is accepted. Documentary qualifications below narrow validation location and security/stability claims; the proposed policy remains a proposal, not permission. No code was changed by Claude in this commit. |
+
+The exact Codex round starts at `557411a63fbde21cb4ae971d869f508c391d6919`
+and consists of correction commit
+`cd1e915fd15d6df9d430c77d863b11d7ad98e37f` plus this following record commit.
+The round range excludes that starting hash and includes this final record
+snapshot, accumulated for exactly one matching-lane push. It does not
+re-review the previously disposed section-269 commit or count this round's
+advisory agents as Claude's independent review.
+
+| Finding | P | Status and reason | Correction / evidence |
+|---|---|---|---|
+| `ARV2R274-001` | P3 | Confirmed historical preflight omission; prospectively addressed, not retroactively erased | The earlier three-directory names check did not cover the assessment's 27 objects. 275-D1 completes that exact scope before reading candidate values. Every future one-use freeze must include its complete exact-object names census and refuse incompatible names before spending its run identity. A preflight is not a guarantee against later drift, nor a right to retry a spent run. |
+| `ARV2R274-002` | P3 | Confirmed platform/capability dependency; corrected prospectively | Assessment checks Darwin, integer `UF_TRACKED`/`UF_HIDDEN`, `st_flags` support and native ABI availability before any output opening/allocation. Pure historical/size/refusal tests remain portable; only native fd/APFS integration fixtures skip on unsupported hosts. Fake-ABI observer tests supply an explicitly synthetic flags field, while the actual native smoke remains Darwin-gated. This is narrower than skipping both entire test files. Five pre-fix sentinel failures prove the guard ordering. No actual Linux CI or unsupported-host production assessment is claimed. |
+| `ARV2R274-003` | P3 | Confirmed isolated-coverage gaps; corrected | Census regressions isolate directory rows/fields/drift, exact exclusions, nonzero mismatch exit, named-after read, directory no-follow and retained before-pending refusal; the symlink target now actually exists. Assessment tests isolate directory flags, loader root, initial named identity, post-consumer hash and exact size. Targeted omissions are caught as tabulated below. These synthetic seams prove individual checks, not adversarial filesystem completeness or historical invocation counts. |
+| `ARV2R274-004` | P3 | Confirmed after-stage claim gap; corrected prospectively | `_run` exclusively creates/fsyncs its private pending report claim before baseline loading or census. Uncaught interruption, unexpected exception and post-walk identity refusals retain that spent claim. Publication uses the held claim and checks allocation/named/full metadata and zero size before writing. Default publisher callers retain their old three-argument interface and receive the same pre-write check. The fix cannot establish that R272 historically ran exactly once; that chronology remains record evidence, not an artifact guarantee. |
+| `ARV2R274-005` | P3 | Confirmed misleading CLI success; corrected prospectively | CLI returns nonzero for incomplete observation, unavailable flags, wrong check counts, absent check inventory, any integrity refusal or payload mismatch; summary includes `flags_available` and `payloads_match`. Both entry points are exercised only through substituted runs with a filesystem-opening tripwire. A successful exit/summary still does not authenticate a report or clear a gate. Historical reports/schema/profile and observation mechanics stay unchanged. |
+
+| Counter-review qualification | P | Status | Location / evidence and disposition |
+|---|---|---|---|
+| `ARV2CR275-001` | P3 | Corrected documentary scope | Section 274.3 expressly keeps review logs and the mutation plugin in an outside-root scratchpad. In-root TMPDIR/basetemp alone therefore does not make all validation assets location-compliant. Retain Claude's results as qualified evidence, not a waiver; current-round logs/plugins/cache/temps stay inside the operative root. The opening strict-sandbox shorthand is also bounded by 274.6's loopback exception. Its 10,866 distinct passes are the union of 10,855 strict passes and 11 nonoverlapping loopback passes; the original 11 strict failures and 8 skips remain recorded, and the other 62 loopback-file passes are not additive. This is validation at `8b9c5bae`, not of section 275. |
+| `ARV2CR275-002` | P3 | Corrected stability claim | Section 274.5 says the accepted attribute state "did not change during use"; 274.3 generalizes a sampled rename/ctime observation. Finite stat/hash/ACL/xattr endpoint checks establish only their sampled comparisons. Neither the example nor separate checks prove uninterrupted stability or exclude every change-and-restore. No actor, harmlessness, historical security equivalence, grant ownership or exactly-once execution follows. |
+| `ARV2CR275-003` | P3 | Corrected policy/interface and authority scope | The existing production observer intentionally refuses the three extra names; it cannot fingerprint them through its unchanged accepting interface as 274.5 suggests. 275-D1 instead uses diagnostic-only native fd reads with an exact object/name bound and no production allowlist change. A separately versioned, tested and frozen consumer would be needed after the exact human security decision. Lane design remains delegated; neither review acceptance nor opaque fingerprints supplies that reserved acceptance. |
+
+Section 274's opening range sentence is also qualified: its own commit is
+**not** in `b7169dc0..8b9c5bae`; it is the one new commit in the exact range
+in 275.1. Its wider artifact-attribute census and old-path/process observations
+remain Claude-reported historical observations, not new Codex source truth,
+causality or permission to inspect/clean the obsolete path. Those checks were
+not repeated. No process or custom attribute is attributed to an actor.
+
+### 275.4 Actual bounded metadata candidate observation
+
+The one 275-D1 observation's start/observed-at timestamp is
+**2026-10-10T00:00:40.077612+00:00**. It completed successfully in
+**0.003951541992137209 seconds**, exit 0 under strict network denial.
+All **12 directories and 15 leaves** were held and checked. The other 26
+objects each exposed exactly `com.apple.provenance`; the vintage directory
+exposed exactly the four names below. All 27 names sets and held/named metadata
+matched at the sampled endpoints. The vintage extended ACL was absent or
+exactly empty/unflagged under the existing native ACL check before and after
+its value reads. No claim is made about unobserved/hidden attributes or raw ACL
+flags not independently checked by that API/text contract.
+
+Exact directory: operative root plus
+`artifacts/analyst_revisions_v2/sharadar_capture/arv2-sharadar-source-20260914T003329843989Z`.
+Observed metadata: `dev=16777232`, `ino=8124879`, `mode=16832` (directory 0700),
+`uid=501`, `gid=20`, `flags=32768`, `nlink=7`, `size=224`,
+`mtime_ns=1789346095000000000`, `ctime_ns=1791348969446992676`.
+These are observed pins for the policy candidate, not a rebaseline of any
+source file, historical census or production contract.
+
+| Exact accessible name | Value bytes | SHA-256 of opaque value |
+|---|---:|---|
+| `com.apple.fileprovider.dir#N` | 1 | `6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b` |
+| `com.apple.macl` | 72 | `38b3d95534bbdeb72e84fe595e13501eaff68b0d4fcd615e51fc4e0b1194375a` |
+| `com.apple.provenance` | 11 | `07ccfbc460d4b2eb75da90b5f2d84baf64b4dbf0059bdc6cd4c93d39d3baa4c7` |
+| `com.apple.quarantine` | 15 | `c8aeee7d17eb7062492cdd12a92c6e3d471b00dd006fc1174a7dcee37609c18a` |
+
+Total **99 value bytes** were read into bounded memory, once per name. Raw
+values were not printed, persisted or decoded. There was no second value
+read, so **before/after value equality is not asserted**. Subsequent names,
+ACL and metadata endpoints matched. Security acceptance, source
+reauthentication, continuous stability and assessment/probe authority remain
+**false**. No source bytes were read by this observation. Reading the three
+already-retained R272/R273 JSON reports separately is report verification,
+not source consumption or a census replay.
+
+The diagnostic-only parser was retained locally at
+`.pytest_cache/r275-metadata-candidate-d8oQvr/observe.py`, SHA-256
+`162025e467002f7ed204735edf613b16ab374172da548978d1b3d64f2ffa60f6`.
+It is an ignored in-root validation asset, not a deployed helper or replay
+entry point; the full procedure and result above are the durable record.
+It calls the native held-fd name/value APIs directly and leaves the production
+observer unchanged. This added value observation is **not** the older
+names-only 273-D4 procedure, whose restrictions remain historical.
+
+### 275.5 Draft v2 disposition and remaining external decision
+
+**275-D2 — recommend this narrow candidate, with no inferred acceptance.** A
+potential `arv2-relocated-source-fresh-use-v2` must bind the exact absolute
+directory, identity/security metadata and four opaque fingerprints of 275.4.
+The exception applies to that directory only, never another directory, any
+of the 15 source leaves, or an output object. It would require the exact four
+names and exact value lengths/hashes both before and after the fresh original
+loaders consume their independently pinned buffers, alongside all current
+held/named/ancestor metadata and ACL checks. Other objects remain
+provenance-only. Any drift or unsupported state refuses; no retry, automatic
+pin refresh, attribute removal or silent rebaseline is permitted.
+
+That is a **draft contract**, not an implemented/frozen executable successor.
+The owner is asked whether the existing opaque access/sync state on this one
+directory may be the accepted baseline for a separately reviewed, read-only
+assessment. Acceptance would not certify grants as harmless, identify their
+owners, alter permissions or clear a production/QC gate. The question is a
+specific security decision, not repeated permission for normal research,
+vendor entitlement or lane implementation. Until the owner decides, do not
+add an admitting observer/consumer or allocate a new assessment identity.
+
+After an exact approval, implement and test only this object-bound version,
+refresh the complete scope census as part of its new prospective freeze
+(refuse rather than silently update approved fingerprint/identity drift),
+pin source/profile/output identity and attempt/publication protocol, and
+obtain independent review of that security contract before its one allowed
+assessment. This is not a general intermediate Claude-acknowledgement wait.
+An actual later run requires its own recorded authority; it cannot reuse
+R273. R272's uninvoked probe requires a separately stated decision and new
+source pin because this round changes its CLI. No current invocation follows.
+
+**ARV2E263-001 remains open.** Even a future successful assessment or finite
+synthetic probe is not production publication safety. R284 remains
+unprepared/unlaunched, failed continuity A/B packages stay untouched, and no
+claim, source capture or QC event occurred. Formal immutable vendor-origin
+as-of/correction/deletion completeness, independently reviewed security-master
+identity/intervals, scores and cutoff-valid prior-close prices remain missing.
+No selector, formal epoch/date/hash, paper deployment or order authority is
+manufactured around those gates. Booked floor stays **313 shared / 239
+development / 49 infrastructure / 699 cells**; this read-only local observation
+adds none. R247/R281 exhaustion and historical qualifications remain.
+
+### 275.6 Focused validation, prospective pins and review handoff
+
+Validation uses Python 3.13 under
+`/usr/bin/sandbox-exec -p '(version 1)(allow default)(deny network*)'`, `-B`,
+fresh in-root `.pytest_cache/r275-*` TMPDIR/basetemp/cache prefixes. No loopback
+exception was needed. Denial is not logged-contact accounting or a claim of
+retroactive zero contact. All advisory checks are same-round evidence.
+
+| Check | Result / interpretation |
+|---|---|
+| Census pre-fix interruption regressions | 4 expected failures / 32 deselected in 1.14s: interruption, unexpected exception, root refusal and output refusal had no retained after-stage claim. |
+| Census corrected file | 43 passed in 1.03s, no skips/warnings. Eight isolated in-memory omission mutations each caused one expected failure, finally restored without disk-source changes. |
+| Probe pre-fix CLI regressions | 22 failed / 1 passed / 35 deselected in 1.11s: 20 refusal-return expectations and two summary omissions. |
+| Probe corrected file | 58 passed in 1.13s, no skips/warnings; both fixed CLI choices tested through a substituted run and opening tripwire, never an actual probe. |
+| Assessment pre-fix capability regressions | 5 expected failures at the output-open sentinel. |
+| Assessment + observer corrected files | 133 passed in 1.33s: 77 assessment, 56 observer, no skips/warnings. Six finally-restored in-memory omission experiments caught directory flags (1 failure/1 safety pass), loader root (2 failures), named identity (1), post-consumer hash (1), exact size (1 failure/1 safety pass), and platform preflight (5 failures). |
+| Unsupported-host model | Module-local Linux/missing-UF_TRACKED/missing-st_flags model: 84 passed / 49 intentional native skips in 0.95s. Not real Linux CI. An earlier global-sys.platform simulation was harness-invalid with 133 setup errors because the Darwin interpreter sought nonexistent `_sysconfigdata__linux_darwin`; it is disclosed, not counted as product validation. The corrected model and new capability tests do not change interpreter-global platform. |
+| Root combined four-file run | 234 passed in 1.44s, no skips/warnings. Includes assessment callers of the tightened census publication helper. Repeated/subagent passes are not additive. |
+| Final root focused + record/document run | **320 passed in 2.40s**, no skips/warnings: 234 diagnostic tests plus 86 lane-record/active-document checks. This is the distinct final focused total, not a complete lane/repository suite. Eight selected script/test files also compiled in memory without invoking entry points; diff check clean. Subsequent record-only checks are nonadditive. |
+| Retained report authentication and difference reproduction | Before 11,532,910 bytes / `bd0931f9e9cac824ad394ecdc032b7c563e4b5eb92cf529e325edd3b712bbc82`; after 15,299,922 bytes / `ca02a94e03eb67c8502e18103a8c471b72e44801b4c7ed62e28ca379b3e6236f`; assessment 584 bytes / `8325d3e0517c1f34078d792363b4cf45891c458cfb9906d180bbe89bbd2cf26e`. Same 31,653 keys: 21,626 files, 8,278 directories, 986 symlinks, 763 special objects. Exactly 21,593 forward ctime-only file differences, 1,837 in artifacts; all other recorded fields unchanged. Assessment remains `complete=false`, `source_reauthenticated=false`, `xattr_unapproved`; no census/loader invoked. |
+
+Prospective SHA-256 pins; **historical v1 report/profile/source pins stay
+historical in Git**. The unchanged schemas do not imply unchanged executable
+source, and these corrections grant no invocation authority:
+
+| Path | SHA-256 |
+|---|---|
+| `scripts/audit_arv2_relocation.py` | `6e411fca07ca4a2904a1de9337876fcac560cf38cbaf9f3501b00a57c8d117a3` |
+| `scripts/diagnose_arv2_publication_flags.py` | `26ce17888b20df669cfff035cfe0118625ef2804f5f2b76938c67b8586645b97` |
+| `scripts/assess_arv2_relocated_sources.py` | `85d853a103f47959506cad84e087819f9cc41c3fb57de53c9e121609596c9e5e` |
+| `tests/analyst_revisions_v2/test_relocation_audit.py` | `a168735e5b26a320f8a8619e1e2714e95af33bc903f1711c98f463bbc459a7d4` |
+| `tests/analyst_revisions_v2/test_publication_flags_diagnostic.py` | `11450d7f953f972c5802aecc5ad3f767af7f9ef097ffe84bf215140656d3a3e7` |
+| `tests/analyst_revisions_v2/test_relocated_source_assessment.py` | `db6abed7c7162bf02d34f7343f77c1a24dadddc466720a754f06023bb0a08b73` |
+| `tests/analyst_revisions_v2/test_relocation_security.py` | `d0855c3b717329dcaef02fd89d478c2ed9b3b8c033e3f5c8365f4c8762313af2` |
+
+Unchanged production observer `scripts/arv2_relocation_security.py` remains
+`3435bc07573697d682f25ea15fd2bfd10c5baf8220c184f73ae877016bae4a30`;
+shared `scripts/capture_arv2_sharadar.py` remains
+`17e516b4cc721c7f97c4690f54dfcc9d2d11d8cebd413100f2e2ffa68e663ca2`.
+No shared/root/project-wide file changes, full suite, provider call,
+QuantConnect request, broker access, funded account, paper/live action or
+economic evaluation occurred. The selected changes are prospective
+diagnostic hardening, not forward readiness or a completed research milestone.
+Claude must independently review the exact pushed section-275 snapshot,
+including the claim ordering, CLI failure semantics, portable/native test
+split, qualifications and the non-admitting metadata policy candidate.
+
+The final matching-only fetch still found remote `557411a6`; no unexplained
+HEAD or tracked-state change occurred. All seven code/test changes are in
+`cd1e915f`; only this record remained unstaged afterwards. Final record checks,
+root/branch/HEAD/status and staged diff checks precede the record commit and
+single push. The correction quality assessment is **8/10 for this limited
+mechanical scope**: focused dangerous-path regressions and isolated omissions
+pass, but real Linux CI, a new native security contract, production publication
+and formal readiness remain unproven. No full-suite pass is inferred.

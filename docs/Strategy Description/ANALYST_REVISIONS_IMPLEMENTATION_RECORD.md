@@ -41243,3 +41243,80 @@ publication, R284 preparation/launch or paper/live/broker/order action ran.
 All formal/readiness/action flags and the **313 / 239 / 49 / 699** floor remain
 unchanged. The original R272 preservation audit and spent R273 refusal remain
 unchanged and qualified; failed continuity A/B evidence is retained.
+
+### 277.7 Single preflight result, remaining review gate and exact handoff
+
+Source/protocol/owner-acceptance freeze commit:
+`23189a7e6fa0dfcd7b26e11ef28b0007e46b6ee7`. From that clean snapshot,
+after exact root/branch/HEAD/status checks, **exactly one** 277-D3 command ran
+at **2026-10-10T20:02:56Z**. The CLI exited **0**; the bounded observation's
+reported elapsed time was **0.005428749980637804 seconds**. It printed schema
+`arv2-relocated-source-prefreeze-v2` and the exact 277.5 profile hash.
+
+All **12 directories and 15 private regular leaves (27 objects)** passed the
+complete-scope names census before the vintage value observation. Exactly
+26 objects showed only `com.apple.provenance`; the fixed vintage directory
+showed exactly the four approved names, all ten metadata pins of 275.4, empty
+extended ACL at the sampled endpoints, and all four approved lengths/hashes
+(**99 bytes total**). Held/named full metadata and accessible names matched
+at the checked endpoints across the observation. This is a current bounded
+sample, not uninterrupted stability, hidden-attribute evidence or a benign
+interpretation of access/sync grants.
+
+The actual preflight returned `source_contents_read=false`,
+`source_reauthenticated=false`, `output_allocated_by_preflight=false`,
+`continuous_stability_proven=false`, `formal_admission=false` and
+`production_publication_authorized=false`. No source byte, original source
+loader or historical report parser ran. No raw attribute value was printed
+or persisted. A subsequent existence/symlink check confirmed the exact
+`R277-20261010-A` path is still absent. No other attribute observation, retry,
+assessment, pending claim, synthetic publication probe or QC event occurred.
+The retained R272/R273 and production-continuity artifacts were not repaired,
+cleaned, overwritten or used as current run acceptance.
+
+The main-agent focused result is **414 distinct passing tests**:
+91 new policy + 58 new wrapper + 56 original policy + 77 original assessment
++ 45 census + 86 record/document + 1 import closure. Intermediate document
+failures remain disclosed in 277.6. Final record repetitions are nonadditive;
+the five static compilations and omission experiments are separate evidence,
+not inflated pass counts. Source/test pins remain those frozen in 277.5;
+only this result/handoff record changes after the preflight. No complete
+Codex lane suite or QuantConnect validation is claimed.
+
+**Next authorized action:** Claude reviews section 277 and the exact final
+pushed range from `50dcf08e2ca3d189ca152af284edac1f253c394e` through this
+result/record commit, comprising the source/protocol commit `23189a7e` and
+this record commit. Review the object-only exception, every original guard
+retained in the separate v2 consumer, full-scope preflight order, source/profile
+pins, exclusive directory spent semantics, publication/final-exit distinction,
+budget limits and synthetic coverage. Claude's full validation must use this
+designated root and exact snapshot with remote network denial, in-root
+temporary paths/logs/plugins, and only necessary local-server loopback.
+Same-round advisory agents and this implementation are not that independent
+review. Review does **not** authorize invoking either actual entrypoint again.
+
+After the new security contract's independent review and Codex's per-commit
+counter-review, record the exact one-shot `--assess` decision against these
+pins and recheck the fixed unspent path before any source-consuming run.
+No routine new owner approval is requested for that delegated sequencing;
+a changed security baseline would instead be a genuinely new decision.
+Any assessment refusal/interruption spends its identity and must be preserved
+without cleanup/retry. A successful assessment still needs external report
+authentication and an independently justified next publication/probe decision;
+it is not R284 preparation, launch authority or source admission.
+
+`ARV2R276-001` is disposed as documented/strict-refusal retained, with the
+separately stated 277-D2 successor protocol. `ARV2CR277-001` remains a
+documentary qualification for Claude to review. `ARV2E263-001`, independent
+vendor-origin immutable as-of/version/correction/deletion completeness,
+reviewed security-master/QC/permanent-share-class/own-ETF/vendor identity and
+intervals, scores and cutoff-valid RAW prior-close prices remain open. The
+stock-first seven-role/terminal-payoff gates, all non-backfillable formal
+dates/estimands/power hashes/epoch gates, original false readiness flags and
+313/239/49/699 floor remain. R284 remains unprepared and unlaunched. The
+owner-stopped monitor remains paused.
+
+This continuous round has **one final successful matching-lane push only**,
+after the result record and final focused checks. No intermediate push,
+other branch/worktree, shared/root-file edit, external chat message, Claude
+session launch, provider/QC request or backtest belongs to this round.

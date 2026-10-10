@@ -2509,3 +2509,35 @@ Mia/owner and retrieve/diff every resulting source file before verified porting.
 Real-data/PIT/freeze/family/protected-date/settlement/comparator/action/empirical
 and funded/broker/paper/live/capital gates remain closed. Original proposals
 are unchanged; the lane is not empirically backtest-ready. Monitor stays paused.
+
+### 24.7 Closing commit range and single-publication handoff
+
+Consumed Claude range remains
+`180fc5b8c2392e4140a2776c60d5f3b8352f153a..3c5d76fffcd0c473159fef2144faf2e4057205de`,
+both commits accepted in 24.1. Accumulated current Codex round:
+
+| Commit | Scope |
+|---|---|
+| `e60f999c021ff900b50243080d25193ffd677021` | Exact section-23 counter-review, retained findings, direct owner provenance, next-ten DoDs and status pin |
+| `ae404c1a712bbdc5a94c281d171fab7347754e7c` | NE-1..NE-10 implementation/tests, composition, preflight, lane README and complete 24.4-24.6 evidence |
+| This final closing record commit | Exact producing range, publication guard and next independent-review handoff; no source/economic change |
+
+The complete next independent review range is consumed trigger
+`3c5d76fffcd0c473159fef2144faf2e4057205de` through the final pushed closing
+record HEAD, not only the producing source commit. Exact final publication SHA,
+push result/count and resulting remote verification are retained in automation
+memory/thread state after publication; no extra post-push metadata publication.
+
+Immediately before this closure, local HEAD was producing
+`ae404c1a712bbdc5a94c281d171fab7347754e7c`, worktree clean, mandatory root and
+branch exact. Origin fetch/push URLs both matched the owner's repository;
+lightweight matching remote check remained exactly `3c5d76ff`. Guard the single
+normal push on that unchanged ref, clean worktree, exact lane and ancestry;
+never force, follow tags, mirror or publish another ref. If the remote changes,
+stop for ownership reconciliation, not another fetch/merge/publication.
+
+No further implementation or QC starts automatically after the push. Claude
+owns the full independent lane validation. Codex then counter-reviews every
+review commit/finding; authentic fixed synthetic engine evidence and resource/
+access clearance remain outstanding. Actual attempts stay zero. Root handoff,
+Action Plan and Feature Milestone Record stay frozen for both roles.

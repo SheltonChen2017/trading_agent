@@ -77,14 +77,14 @@ def identity_inventory(native, rating_tickers):
             continue  # Explicit unmatched counts are retained by build_frames.
         for row in alternatives.values():
             sid = row["security_id"]
-            if sid in by_id and by_id[sid] != ticker:
-                _fail()  # Never choose one alias for a source identity.
-            by_id[sid] = ticker
+            by_id.setdefault(sid, set()).add(ticker)
             reason = ("ambiguous_snapshot_identity" if len(alternatives) != 1 or ticker in ambiguous
                       else raw._identity_reason(row, raw.SHARADAR_IDENTITY_POLICY))
             reasons[ticker] = reason
-    for sid, ticker in sorted(by_id.items()):
-        reason = reasons[ticker]
+    for sid, tickers in sorted(by_id.items()):
+        # Preserve one unavailable state, not a chosen alias or a zero score.
+        ticker = next(iter(tickers)) if len(tickers) == 1 else None
+        reason = reasons[ticker] if ticker is not None else "ambiguous_snapshot_identity"
         result.append({"security_id": sid, "ticker": ticker, "eligible": reason is None,
                        "reason": reason or "eligible_snapshot_identity"})
     if not result or len(result) > 100000:
@@ -240,7 +240,8 @@ def build_frames(ratings, native_identities, actions, *, calendar_payload, captu
             states = []
             for identity_row in identities:
                 sid, ticker = identity_row["security_id"], identity_row["ticker"]
-                reasons = by_ticker[ticker] - {"accepted_proxy_revision"}
+                reasons = (by_ticker[ticker] - {"accepted_proxy_revision"}
+                           if ticker is not None else {identity_row["reason"]})
                 score = None
                 if not identity_row["eligible"]:
                     state, reasons = "identity_ineligible", {identity_row["reason"]}
@@ -264,5 +265,6 @@ def build_frames(ratings, native_identities, actions, *, calendar_payload, captu
             "duplicate_rows": len(ratings) - len(groups), "native_identity_rows": len(native_identities),
             "unmatched_rating_ticker_count": len(tickers - set(mapping)),
             "all_captured_actions": len(actions), "pre_warmup_actions_audit_only": older_actions,
-            "signal_window_actions": len(action_rows)},
+            "signal_window_actions": len(action_rows),
+            "ambiguous_alias_identity_count": sum(row["ticker"] is None for row in identities)},
         "point_in_time_data": False, "canonical_admission": False, "outcome_reads": 0}

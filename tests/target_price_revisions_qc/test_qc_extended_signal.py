@@ -124,6 +124,21 @@ def test_global_identity_collision_is_not_repaired_by_relevant_ticker_filter():
     assert result['identities'][0]['reason']=='ambiguous_snapshot_identity'
 
 
+def test_multiple_observed_aliases_retain_one_ineligible_census_without_choosing_ticker():
+    rows=[rating(),rating('2',ticker='B')]
+    identities=[identity(),identity('B','1')]
+    result=build(rows,identities=identities)
+    assert result['identities']==[{'security_id':'SHARADAR:1','ticker':None,
+        'eligible':False,'reason':'ambiguous_snapshot_identity'}]
+    assert result['source_census']['native_identity_rows']==2
+    assert result['source_census']['ambiguous_alias_identity_count']==1
+    assert all(frame['states']==[{'security_id':'SHARADAR:1',
+        'state':'identity_ineligible','score':None,'reasons':['ambiguous_snapshot_identity']}]
+        for frame in result['frames'])
+    normalized,scores=gold(rows,identities,[],result['frames'][0])
+    assert not normalized.events and not scores
+
+
 @pytest.mark.parametrize('change',[{'calendar_payload':CALENDAR+b' '},
     {'capture_utc':'2020-01-01T00:00:00Z'}, {'capture_utc':'2026-10-11T00:00:00'}])
 def test_bound_calendar_and_capture_clock_refuse(change):

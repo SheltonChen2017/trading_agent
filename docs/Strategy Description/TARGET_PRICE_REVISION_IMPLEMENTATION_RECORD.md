@@ -15,8 +15,10 @@ THE OWNER REQUESTED 2021-NOW WITH THE SAME MARKET-CAP-SELECTION /
 TPR-WEIGHT-TILT STRATEGY AND AUTHORIZED CONSUMING THE PREVIOUSLY PROTECTED
 SEPTEMBER-OCTOBER 2026 DATES AS EXPLORATORY. TARGET ENDPOINT: OCTOBER9,2026.
 THE FRESH SOURCE AVAILABILITY PROBE COMPLETED SEVEN HTTP200 SAMPLES;
-NO EXTENDED PERFORMANCE STUDY, FULL SOURCE CAPTURE, QC ATTEMPT OR NEW LOOK
-HAS EXECUTED. SOURCE SAMPLING IS NOT HISTORICAL COMPLETENESS OR PIT PROOF.
+THE FRESH FULL SOURCE CAPTURE FAILED AFTER ALL74MASSIVE WINDOWS TERMINATED;
+THE FIRST SHARADAR IDENTITY RESPONSE REQUIRES BOUNDED SCHEMA DIAGNOSIS.
+NO EXTENDED PERFORMANCE STUDY, QC ATTEMPT OR NEW LOOK HAS EXECUTED.
+SOURCE SAMPLING IS NOT HISTORICAL COMPLETENESS OR PIT PROOF.
 THE OWNER NOW EXPLICITLY AUTHORIZES A FRESH ON/OFF STUDY ALLOWANCE OF AT MOST
 THREE QC ATTEMPTS PER ARM IN SECTION75. THE ORIGINAL ON3/OFF1 COUNTS AND
 SIXTEEN OBSERVED LOOKS REMAIN PERMANENT; THIS IS NOT AN IMPLICIT RESET.
@@ -14300,3 +14302,96 @@ First full-capture CLI will invoke the committed
 75.6 capture scope. At this pre-operation registration **no full source capture,
 private source preparation, extended QC launch or new outcome/look exists**.
 This is a local commit only; exactly one final matching-lane push remains.
+
+### 75.8 Actual full-source invocation and prospective runtime corrections
+
+The source producer is registered at local snapshot
+`aab3a91f2d9ecadb01b949a17a83d2f7f96f249b`; actual matching remote remains
+`5cd1a7bed6e27c121cbdf0c60d4e61a44536018a`. First CLI invocation mistakenly
+supplied future creation01:18UTC while the clock was01:11:11UTC. It returns
+`REFUSED_OR_FAILED_UNKNOWN`; that generic CLI alone proves no request count.
+Root independently verifies the source-capture leaf absent at01:11:20UTC, and
+the committed driver checks its frozen clock before leaf/global-claim creation.
+This is a retained invocation-clock error, not a consumed source request or QC
+attempt. No file or spent scope was deleted, overwritten or renewed.
+
+The legitimate first capture uses creation`2026-10-11T01:11:20Z`, expiry
+`2026-10-12T01:11:20Z`, exact75.5 owner digest and75.6 fixed74+2 scopes.
+It is currently in progress; actual terminal/count/hash evidence will be
+appended without relabeling an incomplete capture as admission or zero input.
+
+`TPR-EXT26-D018` — agent-delegated pre-outcome native-clock continuity repair,
+pending independent review. Released successor initially requests extended
+SPY but its warm-up/manual reattachment requests regular-hours for the same
+native symbol. Root confirms the contradictory calls; actual native impact is
+not reproduced yet. Preserve extended hours for the exact SPY clock only,
+regular hours for selected stock subscriptions, and require affirmative exact
+external RAW minute TradeBar extended clock metadata before09:20 admission.
+Decision time/order economics do not move. Compact per-sleeve coverage and
+selected-count aggregates plus cash/exposure observations will also be retained
+without source rows or invented independently observed sleeve P&L. Alternatives
+were an open-time shift or assuming an earlier subscription survived; neither
+is chosen. This correction is prospective, not a repair of historical runs.
+
+`TPR-EXT26-D019` — agent-delegated bounded fresh private preparation/transport,
+pending independent review. The named committed producer verifies the exact
+fresh capture's wire/projection hashes and all76 terminations before producing
+all301 global frames. Exclusive processing claims precede licensed input reads.
+Maximum5400seconds,4GiB retained wire+4GiB projections,3,968,000 captured rows;
+identity16MiB, monthly shard32MiB, aggregate512MiB. Controller transport uses
+the same32MiB/file+512MiB aggregate ceilings and exact fresh inventory. No
+truncation, state dropping, compression, old capture reuse or economics change.
+Stable closed preparation receipt hashes become private content-addressed key
+prefixes; payload hashes do not depend circularly on their own key names.
+These ceilings authorize no new result look or source request. Preparation and
+cloud operations have not yet executed.
+
+### 75.9 Preserved capture failure; separate counts-only diagnosis registration
+
+Full capture001 terminatesFAILED, not a completed or admitted source operation:
+387reserved/attempted/HTTP200 responses,255,582,135bytes,349,018retained rows,
+54semantic row refusals, no duplicate/conflict rows,74terminated Massive months
+and zero terminated Sharadar datasets. It starts01:11:34.248700UTC and ends
+01:17:26.417335UTC on October11. Request387 is a complete451756byte first
+Sharadar TICKERS CSV wire but no accepted projection; the last wire remains
+private. No data/outcome/QC look was consumed. The scope remains spent.
+
+| Immutable capture receipt | SHA-256 |
+|---|---|
+| Source index(224765bytes) | `701ab0f2e9e61d1db1f53b7d274bf70429f84b565a9fff8c56d1ced13b73e82c` |
+| Actual plan | `df363a61e77abaadbe566c8a8ce474e21e05a67a805f566ff6b868d7d8b4f57c` |
+| Closed aggregate | `21bf77f95ca6cced97084f0520d1119cc872e6867ba13f188cae25002b70edc6` |
+| Failed terminal | `ed653e397e9d28fabbfabddd5b1fbe0285b9d07f116657ea49705242572a4ef2` |
+| Original private TICKERS wire | `10e4412848bf6c917b2f22657a3203e204bf77925c2f422f50c4d4a983ecf45a` |
+
+`TPR-EXT26-D020` — agent-delegated prospective unavailable alias framing,
+pending independent review. The original pure successor unnecessarily refuses
+an entire input when two observed ticker aliases share one source identity.
+Retain every supplied alias in the native census, represent one explicitly
+ineligible SID with null ticker and ambiguous_snapshot_identity, and never pick
+one alias, score it, or turn missing data into0. Root original focused control
+fails1/0.33s; corrected nine pure controls pass1.44s. This is synthetic proof,
+not a claim that actual source aliases have been observed. Runtime accepts a
+null ticker only for that exact unavailable state; portfolio cap selection
+remains independent of TPR identity availability.
+
+`TPR-EXT26-D021` — agent-delegated necessary fresh read-only diagnosis,
+pending independent review, before any licensed wire read or new outcomes.
+Register named `extended_capture_diagnostic.py`, fixed operation
+`TPR-EXT26-CAPTURE-DIAGNOSTIC-20261010-001`: only the exact request387 wire,
+451756bytes and hash above, associated index hash, exact committed source
+closure/currentHEAD and owner instruction context bind. An exclusive private
+read claim precedes that single wire read. Report only schema/page/sort counts
+and closed refusal classification, no native headers beyond required-field
+flags, identifiers, values, source rows or credentials. Maximum4MiB/640000rows;
+zero provider calls, QC attempts or outcomes, no old D0/capture shortcut.
+Alternatives were retrying the spent capture blindly or treating the failure as
+zero input; neither is chosen. Existing preparation correctly requires all76
+terminations and cannot silently relabel this partial capture complete.
+
+The first synthetic diagnostic test has1failed/15passed because the immutable
+CSV parser catches its own sorting ValueError as generic structural refusal.
+The independent descending-order count still distinguishes the defect; the
+test now checks the actual closed classification. No source admission or
+production condition is weakened. Actual diagnosis has not yet executed at
+this pre-operation registration.

@@ -1376,6 +1376,13 @@ The owner explicitly waives Claude review of section 279 before its one
 assessment for this round, as recorded in section 280. Claude reviews section
 280 and the exact final snapshot at handoff; this exception does not cancel
 later independent review or accept a changed source/security baseline.
+That single v3 assessment now refuses `source_preopen_identity`; its identity
+is spent. Section 280.5 records twelve exact `ctime_ns`-only mismatches in
+the retained metadata evidence, without accepting them or claiming unchanged
+source bytes. ARV2E280-001 requires an explicit exact prospective baseline
+decision and a separately versioned guarded contract, not a retry or a review
+acknowledgement. The owner now directs one final push and then re-arming the
+Claude-review monitor; section 280.6 supersedes the earlier pause direction.
 The owner previously said
 "proceed" after the open-session concern was explained. Section 272 supersedes
 the session-exit prerequisite, without authorizing any process interruption.
@@ -3266,7 +3273,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-10 | Codex counter-review, exact owner metadata acceptance and prospective v2 assessment | `50dcf08e` -> section-277 source/protocol freeze and final result/record snapshot | Sole Claude record commit accepted after documentary qualifications; exact 275.4 baseline accepted by the human; no source/QC event | Object-bound four-fingerprint observer, complete-scope preflight, new one-use directory claim and guarded assessment; original implementations unchanged | Focused strict-denied tests/mutations and one bounded metadata-only preflight under 277-D3; details and pins in section 277; no full Codex suite | Historical preservation audit remains failed; new contract requires independent review before its one assessment; production and formal gates open; 313/239/49/699 unchanged | Exactly one final matching-lane push; Claude reviews section 277 and exact snapshot; no actual assessment/probe/R284 this round; monitor paused |
 | 2026-10-10 | Owner-waived pre-run review and frozen one-shot v2 assessment | `425c2ead` -> section-278 authority freeze and final result/record snapshot | Exact human waiver applies only this round; no new Claude commit exists and no independent-review acceptance is asserted | Preserve section-277 code/profile/security pins; one exclusive assessment identity, strict denial and separate bounded report authentication; no retry | Relevant focused checks and actual result recorded in section 278; no full Codex suite | Production publication, R284 and formal gates remain separate; monitor paused | Exactly one final matching-lane push; restore normal independent review at handoff, no intermediate push |
 | 2026-10-11 | Codex owner-accepted prospective device baseline and v3 contract | `736709f7` -> section-279 implementation freeze and final handoff snapshot | Exact human acceptance of prospective device 16777231 only, retaining all other security/source checks; no new Claude commit | One-way fixed-scope historical-device projection, separate policy/wrapper and new one-use identity; v1/v2 and original artifacts unchanged | Focused synthetic strict-network-denied checks and source/profile freeze in section 279; no full suite or actual observation | Spent R277 refusal preserved; no historical continuity or production readiness inferred; 313/239/49/699 unchanged | One final matching-lane push; Claude reviews section 279 before separately recorded run decision; monitor paused |
-| 2026-10-11 | Owner-waived pre-run review and single frozen v3 assessment | `0a6fb375` -> section-280 authority/protocol freeze and final result snapshot | Exact human waiver of pre-assessment review for this round only; no independent acceptance | Unchanged v3 source/profile and accepted device/attribute pins; one exclusive assessment identity and bounded external report authentication | Focused strict-denied checks and actual result in section 280; no full Codex suite | No retry, refreshed baseline or automatic production/R284 clearance; 313/239/49/699 unchanged | One final matching-lane push; restore normal independent review at handoff; monitor paused |
+| 2026-10-11 | Owner-waived pre-run review and single frozen v3 assessment | `0a6fb375` -> section-280 authority/protocol freeze and final result snapshot | Exact human waiver of pre-assessment review for this round only; no independent acceptance | Unchanged v3 source/profile; spent assessment refuses source_preopen_identity; retained-report comparison finds twelve ctime-only mismatches | 334 distinct focused strict-denied passes; authenticated refusal and retained-only comparison in section 280; no full suite | ARV2E280-001 exact prospective ctime decision remains open; no source/QC success or look increment; 313/239/49/699 unchanged | One final matching-lane push, then re-arm existing review monitor at owner's latest direction; Claude review/counter-review precedes admissible next milestone |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -42005,3 +42012,121 @@ access and wait using the available product mechanism before submission when
 occupied. This conditional instruction does not restart the paused Claude
 monitor, book an attempt or authorize contact while the present source gate
 is blocked. No node availability has been observed or claimed this round.
+
+### 280.5 Retained comparison result and concrete barrier
+
+After clean protocol freeze **`a75f096fecbe5f0462312b0ffa4f1f6f3aa34fef`**,
+the one 280-D4 comparison completed under strict network denial. Both exact
+report digests, strict canonical JSON, scoped metadata and sampled read
+endpoints passed. Of fifteen fixed source rows, **three projected rows match
+exactly** (all vintage-package leaves); **twelve differ only in `ctime_ns`**
+(all four leaves in each OpenFIGI, current-identity and price package).
+The other nine metadata fields match after the already accepted device-only
+projection. No new source-byte, attribute or ACL observation occurred.
+
+The package labels below refer only to the fixed packages in 279.3/v3 profile:
+`PUBLIC` = OpenFIGI `arv2-openfigi-identities-20261008T051923284895Z`;
+`CURRENT` = Sharadar identities `arv2-sharadar-identities-20261008T052336423396Z`;
+`PRICES` = Sharadar prices `arv2-sharadar-prices-20261007T164730430845Z`.
+Full relative paths are bound by the pinned reports and exact fifteen-key
+comparison; none is a wildcard source-admission rule.
+
+| Fixed package / leaf | Historical-after `ctime_ns` | Assessment-preflight `ctime_ns` |
+|---|---:|---:|
+| PUBLIC / batch01.json | 1791577195633474068 | 1791611826464995164 |
+| PUBLIC / batch02.json | 1791577195633603859 | 1791611826465198110 |
+| PUBLIC / manifest.json | 1791577195633547026 | 1791611826465041735 |
+| PUBLIC / manifest.sha256 | 1791577195633399193 | 1791611826464840789 |
+| CURRENT / funds.csv | 1791577195382535407 | 1791611826298541176 |
+| CURRENT / manifest.json | 1791577195382327490 | 1791611826298379097 |
+| CURRENT / manifest.sha256 | 1791577195382133699 | 1791611826298217810 |
+| CURRENT / stocks.csv | 1791577195382735281 | 1791611826298581331 |
+| PRICES / funds.csv | 1791577195654817744 | 1791611826480363897 |
+| PRICES / manifest.json | 1791577195654746827 | 1791611826480331531 |
+| PRICES / manifest.sha256 | 1791577195654548786 | 1791611826480289375 |
+| PRICES / stocks.csv | 1791577195654883994 | 1791611826480394764 |
+
+These are differences between two authenticated reports' sampled endpoint
+claims, not proof of the exact later failing leaf, actor, mutation time,
+benign cause, unchanged source bytes or unchanged per-file security. They
+are consistent with the observed pre-open identity refusal. The directory
+preflight's accepted vintage security does not authenticate the other source
+files' contents or their complete ACL/xattr envelope across consumption.
+
+**ARV2E280-001 — open external source-identity decision.** The explicit
+section-279 acceptance changed only `dev`; `ctime_ns` and every other pin
+remain binding. No existing authority silently accepts these twelve values.
+The recommended next human decision is whether to accept **only these twelve
+exact recorded ctimes**, on their fixed paths, as a prospective baseline for
+a separately versioned one-use assessment. Such acceptance must retain the
+accepted device, all other metadata, original byte/manifest pins, existing
+ACL/xattr policy and held/named checks; fresh reauthentication must actually
+pass and further drift must refuse. It would not accept historical
+preservation, continuous stability or harmlessness of an opaque attribute.
+No generic ctime omission, automatic pin refresh or retry is proposed.
+
+Without that decision, no safe in-scope alternative resolves this particular
+source gate. Stop before the original uninvoked ARV2OD272-A publication probe,
+a new continuity publication, R284 preparation or QC launch. No new source
+capture, out-of-root diagnosis, historical audit replay or further observation
+merely to reconfirm these differences is needed. Preserve all spent R273,
+R277 and R279 evidence and the failed A/B continuity packages. ARV2E263-001
+and independent formal source/history/security-master/score/price gates
+remain open. This is a failed prerequisite, **not a failed QC backtest**;
+R284 remains unprepared and unlaunched and the booked floor is unchanged.
+
+### 280.6 Review handoff, one final push and monitor authority
+
+After the result, the owner directly said: **"I've told Claude to arm a
+monitor for your next push. when this round is concluded, push once. then
+arm a monitor for Claude's review push. then start counterreview and proceed
+to the next milestone"**. This explicitly supersedes the earlier monitor
+pause only after the final push. It does not start a new Claude session,
+authorize messaging another chat, accept ARV2E280-001 or waive future review.
+
+Conclude this bounded round with exactly one successful push from the exact
+designated root to only the matching lane branch. Then update the existing
+`analyst-claude-review-forward-pair` thread heartbeat, preserving its ten-minute
+cadence and target, with the exact final pushed baseline and current relocated
+root. Stay quiet on unchanged/non-actionable state. Trigger only on a
+genuinely new completed Claude review push, never this Codex round, unpushed
+dirty work, Git authorship alone or an old disposed review. Counter-review
+every new commit/finding, make verified lane-owned corrections, record exact
+dispositions/evidence and proceed to the next admissible substantive milestone
+without a routine acknowledgement wait. An unresolved source/authority gate
+still stops execution; monitoring may remain active while that gate is open.
+If later QC capacity is occupied, respect 280-D5 and wait without touching
+other lanes' jobs.
+
+The exact current round begins at
+**`0a6fb3756bd803d53ec553a9241f6875ef40c98d`** and ends at the final pushed
+commit containing this result/handoff. Per-commit independent dispositions
+are pending, not fabricated from this Codex execution or same-round advisory:
+
+| Exact commit | Scope / required independent disposition |
+|---|---|
+| `cff48b7bf7f8146193a4060e9eba0f22a3981bc3` | Pending: exact owner waiver, unchanged v3 contract, once-only execution/report protocol and initial focused validation |
+| `a75f096fecbe5f0462312b0ffa4f1f6f3aa34fef` | Pending: actual refusal/report authentication, precommitted retained-metadata comparison and shared-node courtesy |
+| Final result/handoff commit containing 280.5–280.6 | Pending: exact twelve-field evidence, no silent admission, remaining barrier, final checks and new monitor authority |
+
+Claude reviews the cumulative still-unreviewed range beginning at disposed
+Claude head **`50dcf08e2ca3d189ca152af284edac1f253c394e`**, including every
+commit enumerated in 279.5 and the three above. Section 279's final handoff
+object is `0a6fb3756bd803d53ec553a9241f6875ef40c98d`. Independently check the
+frozen/run sequence, report/refusal semantics, exact comparison scope,
+authority interpretation and unadvanced gates. Do not rerun spent diagnostics
+or fresh native/source observations merely to review this record. Full lane
+validation, if performed by Claude, must identify the exact reviewed snapshot
+and retain all failures/partitions; old full-suite counts are not current.
+
+There are **334 distinct focused passes** for this round; the final 86-test
+record/document subset passed again in **1.92 s**, a repeat, not additive.
+All eight source hash pins reproduced unchanged after execution and the
+retained-report comparison; diff whitespace checks passed. No full Codex suite or
+performance backtest ran. Executable sources, source/profile pins, original
+reports, controls and financial construction are unchanged. All actual
+assessment/comparison/test processes used strict network denial and in-root
+temporary/cache paths; this is not logged-contact accounting. Ordinary Git
+fetch/push and requested app-automation operations are separate. No new
+provider access, subscription, QC project, compile, run, data upload, paper
+order, live deployment, formal date/estimand/power/epoch or look was created.

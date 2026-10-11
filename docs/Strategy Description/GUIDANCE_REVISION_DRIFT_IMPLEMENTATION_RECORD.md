@@ -3101,3 +3101,101 @@ root 13,863 bytes / `4983806da57ae70e7fc59d6e536f1a8f68f502a2ba9a1d638ff3f6cde97
 21 files / 277,701 bytes. Section 27.3's intermediate wrapper map was never
 uploaded or launched. All native runtime, audit-bundle, fixture and immutable
 candidate identities remain unchanged; actual unsuccessful count stays one.
+
+### 27.5 Attempt 2 and diagnostic-only Mia assistance
+
+Producing wrapper hardening commit:
+`ed747625b6fab117e8e7bcb19923e97e86261a5f`. Only root main.py changed on
+restaging after an exact attempt-1 cloud comparison. The complete returned
+attempt-2 project matched 27.4's source/map, all other Python files unchanged.
+Compile/run intents and raw responses were retained before/after each POST.
+
+| Attempt | Exact compile / run | Terminal evidence |
+| --- | --- | --- |
+| 2 | Compile `e5ac83bdc11712715eb1df19f87c64bb-51f49bd2055f5cfdbdac832a9c4760fa`, signature `51f49bd2055f5cfdbdac832a9c4760fa`, full 21-file signature order retained. BuildSuccess with warnings retained. Run `82b6af07f3998c6fbc5ed596747fdaa4`. | Runtime Error before initialize, `_gdr_read_regular` regular-file/size check at generated main.py:29 from inventory:122. Server LEAN `v2.5.0.0.18178`. API says `completed=true`, progress 1, **but this is an initialization failure, not acceptance**. Second unsuccessful terminal attempt. |
+
+Post-terminal complete API Python source and unchanged notebook were retrieved
+and compared exactly again; no cloud source edits were observed. Both failed
+runs' documented log endpoint returned `length=-1`, `logs=[]` after the first
+read timeout. These are missing log/native trace evidence, not an invented
+complete output. Raw terminal API errors/stacktraces and response bodies remain
+retained. One attempt remains under the unchanged owner-cycle ceiling.
+
+The owner said "if you were not able to fix the issue, feel free to ask for
+help from Mia". Direct signed-in Safari control opened only project 37647834.
+QC's proposed automatic import addition was declined. Opening the IDE showed
+an additional **successful** build at displayed 7:36:10, short display ID
+`f1e862-51f49b`, engine 2.5.0.0.18178. Full compile ID/provenance is not
+established; do not substitute it for either retained REST compile. No extra
+backtest was requested or failed attempt inferred from this successful build.
+
+Mia was switched from Full Auto to **Ask Before Edits** and sent a narrowly
+scoped diagnostic-only request: read this project and its two existing failed
+runs; identify runtime source/file representation changes and propose a diff;
+no source edits, imports, compile/run/optimization, real data/other outcomes,
+installation, account/resource changes or cancellation of another lane. The
+prompt explicitly retained two consumed failures and prohibited spending the
+last attempt. Mia took project edit control and its response is pending; no
+Codex source/upload/job work runs concurrently with that uncertain ownership.
+Subsequent `codeRunning=true` observation is retained, not silently treated as
+an idle project. Read-only source return still matched the exact candidate.
+
+| ID | Priority / disposition | Evidence / current action |
+| --- | --- | --- |
+| GDR-QC27-003 | P2 / open, native integration blocker | Runtime visible file regularity/size check differs from the expected uploaded representation, despite exact API source custody. Current error does not identify the file/size. [Official QC Imports documentation](https://www.quantconnect.com/docs/v2/lean-cli/projects/autocomplete) says Cloud automatically adds imports; it does not establish the exact runtime transformation or that empty initializers cause this failure. Do not broadly ignore hashes, assume whitespace/import normalization, or change native economics. Await Mia's evidence/proposal; any normalization correction needs exact observed bytes/mechanism and focused rejection regressions. |
+
+Current durable state is two unsuccessful native attempts, zero successful
+native completions, one remaining attempt, no round push and no fabricated
+review/dossier approval. Native checkpoint/valuation/752-record evidence is
+absent because callbacks never ran. API byte custody is not native runtime
+identity or empirical readiness. All 27.1 exclusions remain closed.
+
+### 27.6 Mia disposition and bounded final-attempt diagnostics
+
+After one UI reconnect, the same Mia conversation **Diagnose failed run
+causes** showed Completed; a concise follow-up confirmed no source edits,
+compiles or backtests by Mia and advised identifying the failing file/type/
+size before accepting normalization. Complete authenticated source return
+after Mia remained byte-identical to attempt 2, with unchanged notebook and
+no new Python files. No Mia source change was ported. A second IDE-load build
+was observed successful, short ID `dc219e-51f49b` at displayed 7:44:00 on
+2.5.0.0.18178; full ID unestablished, no extra native run. These two UI builds
+are retained separately from the two REST compile/run attempts, neither a
+failed attempt nor proof of native completion.
+
+Mia's structural explanation matches the guard traceback, but its statement
+that the `.pyc` loader path proves executed bytecode is **not accepted** without
+runtime selection evidence. Empty-initializer/newline and EOL rewrite proposals
+are hypotheses: Mia retrieved no runtime file bytes and its existing-run log
+searches found none. Proposed variant allowlists were **rejected as unverified**;
+no hash/type/size guard or economics was weakened. The advice to enrich bounded
+failure diagnostics was accepted; this is troubleshooting guidance, not an
+independent review disposition or native runtime acceptance.
+
+The final candidate adds evidence-only refusal details for a manifest-named
+file: relative filename, expected/observed byte counts, regular/symlink flags,
+and SHA256 when the same no-follow reader can safely read its bounded regular
+bytes. No raw source, private paths or market data is exported. A mismatch
+still always raises before imports/data preparation; unavailable/special/
+symlink reads retain unavailable hash, not invented data. Two new red focused
+tests demonstrated missing diagnostics; ten focused cases passed after the
+change, including no-follow, cache substitution, exact hash/inventory and
+isolated source loading. All 21 files compile in memory; reconstruction passed.
+
+Attempt-3-preparation full source
+`5159229a4de34e343ba08747e583236097e095fd7c10d3ba9633c53541e0d6cd`;
+project `fbf824bfa2f84101ad52ed646ffb3ac7ed0849e9f1bf88aafd11a725427bca96`;
+root 15,007 bytes / `e6ed09f6bbfe1b9ce5d341464eb04c3dc005ddc023c8b5219f9e175e34e32ea2`;
+21 files / 278,845 bytes. All 19 native files, audit bundle, runtime context,
+draft raw/semantic bytes and the 372-frame invented fixture remain unchanged.
+This is the same order-based candidate with better failure evidence, not a
+non-order-based economic test or new strategy look. Two failures remain
+consumed; the last controlled attempt must be retained even if it refuses.
+
+`codeRunning=true` remains observable with the coding IDE open. Official Project
+Read calls it project running but does not establish active algorithm/Mia job
+from that flag alone. Do not silently reinterpret it as false or use it as
+completion evidence. Mia's visible Completed/disabled Stop state, unchanged
+complete source custody and exact terminal run IDs establish the separate
+handoff checks; a UI edit-control request was made only after completion.
+Actual backtest-node availability is independently checked before launch.

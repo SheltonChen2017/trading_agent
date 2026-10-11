@@ -153,7 +153,27 @@ def _gdr_inventory(project_root):
             _gdr_refuse("missing or extra project Python file")
     contents = {}
     for name, size, digest in _GDR_EXPECTED_FILES:
-        raw = _gdr_read_regular(project_root / name, size)
+        path = project_root / name
+        try:
+            raw = _gdr_read_regular(path, size)
+        except RuntimeError as exc:
+            # Evidence only: never normalize or accept mismatching source.
+            # Read only a named bounded regular file through the same no-follow
+            # guards; export identity metadata, not source or arbitrary paths.
+            detail = "file=" + name + " expected_bytes=" + str(size)
+            observed_digest = "unavailable"
+            try:
+                observed = path.lstat()
+                regular = stat.S_ISREG(observed.st_mode)
+                detail += (" observed_bytes=" + str(observed.st_size)
+                           + " regular=" + str(regular)
+                           + " symlink=" + str(stat.S_ISLNK(observed.st_mode)))
+                if regular and 0 <= observed.st_size < _GDR_MAX_PROJECT_FILE_BYTES:
+                    diagnostic = _gdr_read_regular(path, observed.st_size)
+                    observed_digest = hashlib.sha256(diagnostic).hexdigest()
+            except (OSError, RuntimeError):
+                pass
+            raise RuntimeError(str(exc) + " [" + detail + " sha256=" + observed_digest + "]") from exc
         if hashlib.sha256(raw).hexdigest() != digest:
             _gdr_refuse("project file differs from retained identity")
         contents[name] = raw

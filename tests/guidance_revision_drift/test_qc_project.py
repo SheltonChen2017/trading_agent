@@ -417,6 +417,38 @@ class QCProjectTests(unittest.TestCase):
                      self.assertRaises(RuntimeError):
                     namespace["_gdr_inventory"](directory)
 
+    def test_runtime_source_refusal_records_only_named_file_metadata_and_hash(self):
+        with TemporaryDirectory(prefix="gdr-qc-source-diagnostic-") as temporary:
+            directory = Path(temporary).resolve()
+            self.write_project(directory)
+            name = "data/__init__.py"
+            observed = b"from AlgorithmImports import *\n"
+            (directory / name).write_bytes(observed)
+            namespace = self.generated_helpers()
+            with self.assertRaises(RuntimeError) as caught:
+                namespace["_gdr_inventory"](directory)
+            message = str(caught.exception)
+            for field in ("file=" + name, "expected_bytes=0", "observed_bytes=" + str(len(observed)),
+                          "regular=True", "symlink=False", "sha256=" + hash_bytes(observed)):
+                self.assertIn(field, message)
+            self.assertNotIn(str(directory), message)
+            self.assertNotIn(observed.decode().strip(), message)
+
+    def test_runtime_source_refusal_diagnostic_never_reads_a_symlink(self):
+        with TemporaryDirectory(prefix="gdr-qc-symlink-diagnostic-") as temporary:
+            directory = Path(temporary).resolve()
+            self.write_project(directory)
+            target = directory / "data/__init__.py"
+            target.unlink()
+            target.symlink_to(directory / "main.py")
+            namespace = self.generated_helpers()
+            with patch.object(namespace["os"], "open", side_effect=AssertionError("must not read symlink")), \
+                 self.assertRaises(RuntimeError) as caught:
+                namespace["_gdr_inventory"](directory)
+            self.assertIn("file=data/__init__.py", str(caught.exception))
+            self.assertIn("symlink=True", str(caught.exception))
+            self.assertIn("sha256=unavailable", str(caught.exception))
+
     def test_stale_audit_bundle_and_source_change_during_readable_preparation_refuse(self):
         members, manifest = native_bundle._snapshot()
         changed_members, changed_manifest = dict(members), deepcopy(manifest)

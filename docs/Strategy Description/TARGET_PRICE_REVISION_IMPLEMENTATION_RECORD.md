@@ -16693,7 +16693,7 @@ relabeled reproduced until their actual receipts exist.
 | TPR-CCR23-005 | P3; corrected current routing | Incoming preamble/current section8 simultaneously stated composite pending/no extended attempt while describing three OFF failures. Current routing now states completed preparation, ON0/OFF3,19looks, no accepted pair and mandatory Mia recovery. Historical75/76status-at-time and negative evidence remain unchanged. |
 | TPR-CCR23-006 | P3; corrected arithmetic/attribution | CR23-009's403combinedrequests and ended2024eachtime are unsupported. The enumerated77.4census is402provider(7+387+8) and185QC(136+44+2+3),587total, not403. OFF1 failed initialization; onlyOFF2/3 carry the reported July2024frontier. This independently checks ledger arithmetic, not all private request wires. |
 | TPR-CCR23-007 | P2; confirmed process deviation, historical limitation | Claude again used a scratch clone for the complete suite despite the hard session-long worktree constraint. Read-only does not satisfy it. Preserve attributed results and94path-refusal failures; neither certify clone compliance nor rerun a full suite by Codex. No sibling/shared behavior is changed. |
-| TPR-CR23-001 | P1; open | Native incomplete-frontier cause awaits78.7. No accepted implementation/QC result over this finding. Do not spend ON allowance, upload71remaining shards or make a fourth Codex OFF launch. |
+| TPR-CR23-001 | P1; open | Exact terminal/frontier and complete returned-log census independently reproduced in 78.7; the unique cause and full-window native accounting remain unproved. No accepted implementation/QC result over this finding. Do not spend ON allowance, upload 71 remaining shards or make a fourth Codex OFF launch. |
 | TPR-CR23-002 | P2; owner retention decision, not a reinstated paperwork gate | Authorized private processing is not provider-rights attestation. Exact22delete successes were recorded without absence verification; possibly-failed23rd object/cloud journals/earlier keys remain unproved inventory. No unrelated deletion, export, purchase or retrospective rights fiction. |
 | TPR-CR23-003 | P2; confirmed limitations, not corrected | Current-vintage eligibility/delisting/category/ticker and later-touch censorship can bias ON. As-of clock is syntactically checked, not historical identity proof. Actual ticker recycling incidence, direction and bias magnitude are unmeasured; no outcome-based successor selection or PIT claim. |
 | TPR-CR23-004 | P2; confirmed completeness limit | Nonunique ticker-sort/offset/short-page termination cannot attest a transactional complete identity census.48duplicates/351descents remain attributed source counts; descents alone do not prove skipped rows. No silent drop or recapture under spent scopes. |
@@ -16763,8 +16763,9 @@ market/dataset information. Scope uses this normal diagnostic endpoint only,
 not public row logging or a restricted ObjectStore export workaround. Maximum
 20pages/job,40requests total, fixed request/body/aggregate/time bounds, no
 retries/redirects; bounded truncation or missing/loading/error remains explicit.
-Only known exception/code-frame/date/cause-marker counts are public; no raw
-log text, identifiers, prices, account fields, credentials or licensed rows.
+Only known exception/code-frame/date/cause-marker counts and already-public
+fixed operation/job/source identities are public; no raw log text, log-derived
+private identifiers, prices, account fields, credentials or licensed rows.
 Keyword occurrence cannot independently prove a root cause.
 
 Fresh four-hour manifests bind exact committed source/import closure, freeze/calendar,
@@ -16810,8 +16811,8 @@ separator whitespace for this comparison, remains 600,715 bytes at
 equal to the incoming Claude tree. Executed candidate sources and artifacts
 remain unchanged; tracked/scoped whitespace checks pass.
 
-Both distinct diagnostic plans are prospectively created at
-`2026-10-11T21:56:59Z`, expire `2026-10-12T01:56:59Z`, and bind the new local
+Both distinct diagnostic plans use registered creation clock
+`2026-10-11T21:56:59Z`, expiry `2026-10-12T01:56:59Z`, and bind the new local
 registration commit's actual HEAD at invocation. Root independently verifies
 HEAD, root, branch, status and actual matching remote before that commit.
 The exact UTF-8 owner-instruction excerpt is `Independently verify material
@@ -16824,19 +16825,162 @@ body bytes/30 seconds. Cloud scope is at most 1 MiB/response, 40 MiB aggregate,
 40 requests, 30 seconds/request and 1,500 seconds total; no redirect or retry.
 All spent access/request claims precede body or credential/network effects.
 The independent test peer read the complete released source/tests and used
-helpers, verified the supplied hashes, and reproduced **35 passes in 0.85s**.
+helpers, verified the supplied hashes, and reproduced **35 passes in 0.85s**;
+final reprise at the registration commit is **35 passes in 0.90s**. Independent
+in-memory removal of the request claim, private-0600 guard and foreign-project
+check yields one expected failure each in 0.41s / 0.41s / 0.42s, respectively,
+restored in `finally`. Peer acceptance is bounded read-only/cooperative scope,
+not native API execution or an independent human approval of delegated choices.
 The lock and file-fsync claims are cooperative POSIX safeguards, not protected
 custody or power-loss-proof directory-entry durability (there is no directory
 fsync). Native Windows signer/ACL and hostile-parent protection are not proved.
 
 ### 78.7 Actual bounded diagnosis
 
-Pending prospective producer completion, focused review/validation and local
-registration commit. No terminal/log result is claimed here before execution.
+The registration/source commit is
+`b7e3903e54c3e1b3028a8ae14b8ff5b08301a904`, made with the actual matching
+remote still `9e5ed66e`; no checkpoint push. The committed producer completed
+the two independent scopes, serially, using the exact registered clocks and
+source closure. Terminal action ended `2026-10-11T21:59:50.987494+00:00`;
+unfiltered-log action ended `2026-10-11T22:00:02.466761+00:00`.
+
+| Scope | Actual bounded evidence | Qualification |
+|---|---|---|
+| `TPR-EXT26-FRONTIER-20261011-001` | Two exact retained terminal reads, 2,601,038 bytes; both original SHA/size/schema/request/job/project/Runtime Error checks pass; plan SHA `632314b451000fee1102bd076f72a84745ed7cddbb8ef738922a42d5e9491e52` | Independently reproduced terminal metadata only; no licensed input, statistic values, new look or launch |
+| `TPR-EXT26-ENGINE-LOG-20261011-001` | Two successful native API requests, 4,053 bytes: OFF2 11/11 lines in one page (1,562 wire bytes), OFF3 10/10 lines in one page (2,491 wire bytes); stable total/page checks complete; plan SHA `dfe61d6b8ecd093f2536a3148aa68b918a35648ea8ece48ae14160a9b15dcc67` | Fixed request identities; log responses contain no returned job/project identities, so no invented returned-identity or provider-authenticity attestation |
+
+Both terminals contain exactly 172 recognized rolling keys, last date token
+`2024-07-12`, and reported `tradeableDates=1449`. The frozen calendar has **886
+sessions through July 12**, not 884. That calculation is a planned-calendar
+count, **not** observed native account NAV coverage or proof of engine end.
+The historical native NAV census remains 852 observations through July 10;
+its clock/sampling limitation is not repaired by these metadata reads.
+The selected common terminal fields (Start/End Equity, Total Orders, Total Fees,
+Drawdown, Net Profit) match exactly across OFF2/OFF3; Total Trades is absent in
+both. No values, return, partial-window performance or paired result is accepted.
+
+OFF2 terminal and logs expose the same `ValueError` code frames: `main.py:1020`
+and `extended_core.py:239`, consistent with the already-attributed final
+aggregation defect. Its exact private error is 427 bytes, SHA
+`7b33ceecb9242f418ff3645c19d9e660b7b1e011e7da2e885dc0333d578e6e68`.
+OFF3 terminal/log frames match `main.py:1028`, `extended_core.py:587`,
+`extended_compressed_store.py:261` and runtime-successor lines 119/132/138;
+an audit-export marker occurs once. Its private error is 1,410 bytes, SHA
+`4d67dbc37635b91803bbb53914b91daf8504771f9a4b5662d4e80c4e062fb7f9`.
+Closed log projections for OFF2/OFF3 respectively hash to
+`40496cee6d702ba1a2d3b4b934de52d4194433846e13c5a3dfe46bc3c1f62159`
+and `b1311ee7d685574c555e0d6c0d81bfaa4dabca4d6f02519aff6b69d06e664fc5`.
+Full projections remain private, not in Git.
+
+The complete returned logs add initialization/warmup dates and the same July 12
+failure frames; the registered classifier finds no data-exhaustion, stop/cancel,
+time-limit, memory or explicit evidence-bound marker. This is a closed keyword
+census, **not proof that no such event occurred**. The API provides no preceding
+fault/stop explanation sufficient to uniquely establish why the usable evidence
+stops in 2024. `TPR-CR23-001`, F017 and F018 remain open; Python bytes being
+universally unsupported is still not proved. No executed candidate/module,
+economics, inputs or old receipt was changed or implicitly renewed. Attempts
+remain ON0/OFF3; observed looks remain 19; two diagnostic requests are not new
+backtest attempts or development outcomes.
+
+Before any new UI inspection, spend separate read-only access identity
+`TPR-EXT26-MIA-AVAILABILITY-20261011-002`: this prospective record entry is its
+manifest/access claim, bound to current local HEAD `b7e3903e54c3e1b3028a8ae14b8ff5b08301a904`,
+the same owner-instruction SHA, frozen study and unchanged candidate counts.
+Declared lifetime `2026-10-11T22:00:30Z`–`2026-10-11T22:30:30Z`; the actual
+entry was saved before the `22:01:16Z` pre-UI clock check. Maximum three
+navigation pages, available browser/app names and existing QC tab metadata only,
+then only project `https://www.quantconnect.com/project/37650980` and its Ask Mia
+availability. No other project contents, credentials, login, message, source edit,
+agent/job creation, purchase, launch or look is included. Fixed UI protocol is
+the app's documented browser/app entry and visible-state tools, not an API
+backtest disguised as Mia. Results, refusal or inability follow below; absence
+of an owner reply does not count as authentication or recovery completion.
 
 ### 78.8 Stable handoff
 
-Pending bounded diagnosis. Exactly one successful final non-force push to
-HEAD:refs/heads/codex/strategy-target-price-revisions remains; no checkpoint
-push or automatic monitor rearm. Final factual readiness/blockers, source
-hashes, operations and actual publication identity will be reported here/chat.
+Fresh availability scope 002 is spent. The existing IAB tab at the exact
+project URL shows Sign In / Log In rather than an authenticated project IDE.
+The enabled-surface inventory contains only MCP Apps (no tabs) and that IAB
+project tab; native-app access explicitly reports the Mac locked and unable
+to auto-unlock. No alternate authenticated, controllable Mia interface is
+observed. The checks end before `2026-10-11T22:02:12Z`, inside the declared
+scope. No navigation, credential extraction/login, message, source/cloud
+mutation, job, launch or look occurs. API credentials independently worked
+for the two allowed log requests, not for browser authentication.
+
+**Stable state: bounded counter-review/diagnostic milestone complete; extended
+paired backtest and implementation/QC acceptance remain blocked.** Incoming
+commit dispositions are accepted-after-correction / accepted-after-correction
+/ accepted, respectively. This does not close the material empirical findings.
+
+| Sleeve/universe | OFF | ON | Accepted matched outcome |
+|---|---|---|---|
+| SPY / S&P500 proxy | Three-attempt cap consumed; OFF3 Runtime Error | Zero attempts | None |
+| XLV / Healthcare | Same failed consolidated account, not independent sleeve P&L | Not launched | None |
+| XLE / Energy | Same failed consolidated account | Not launched | None |
+| QQQ / Nasdaq100 | Same failed job; not all Nasdaq-listed stocks | Not launched | None |
+| SOXX / Semiconductors | Same failed consolidated account | Not launched | None |
+| REMX / covered-US thematic subset | Same failed job; not the complete global ETF | Not launched | None |
+
+No accepted 2021–2026 return, CAGR, drawdown, volatility, Sharpe, annual result,
+turnover/cost comparison, full-window orders/fills/accounting parity or sleeve
+alpha exists. The original 3,076-order/852-NAV diagnostic remains immutable;
+this round does not recompute missing performance or invent sleeve attribution.
+The actual next milestone is authenticated built-in Mia diagnosis and recovery
+of the engine frontier, native export and complete frozen accounting evidence.
+No fourth Codex OFF attempt, cosmetic candidate reset, knowingly broken ON
+launch, remaining-71 upload, parameter sweep, changed economics/date range or
+holdout consumption is permissible as a substitute.
+
+Precise owner recovery: unlock the Mac, sign in to QuantConnect, and open
+[project 37650980 → Ask Mia](https://www.quantconnect.com/project/37650980).
+Make that interface controllable, or return an owner-Mia run's compile/backtest
+IDs and **every** cloud source file/diff. Diagnose both the July-2024 frontier
+and native binary audit export; preserve frozen dates, cap selection,
+standalone weight-only TPR/AR-disabled economics, timing/costs, complete audit
+rows, gzip/hashes/readback/index/sidecar and collision refusals. Use existing
+included resources only; no purchase/upgrade or actual trading. Before any
+Mia effect create its own fresh bounded operation/look receipt; do not reuse
+Codex3 provenance or reset the cap. After completion retrieve all cloud files,
+document the cause and every cloud change, and port only verified lane-owned
+corrections. Completed status alone cannot accept changed economics or missing
+full-window evidence. No owner reply or successful Mia run is assumed.
+
+The sole lane record carries D062–D064, exact incoming range/dispositions,
+complete finding qualifications, scopes/source hashes/actual requests and all
+limitations. New private diagnostic files remain in the existing ignored
+`artifacts/target_price_extended/TPR-CAP-TILT-EXT26-20261010-v1/operations`
+root, under the two exact new operation prefixes: global spent claim, per-read
+or per-request spent claims, private projections/request terminals and final
+`.result.json` receipts. No old file was overwritten/deleted. The UI scope is
+durably represented by the preceding manifest/access claim and this result,
+with app-tool state evidence; it is cooperative provenance, not cryptographic
+Mia execution or protected custody.
+
+Final root focused union: **212 passed in 10.34s**, no failures/errors/warnings,
+using the same isolated in-process 49/52 runtime root. This combines the
+diagnostic tests, complete focused lane-document guards, signal controls,
+both paired admission positives and selected direct/transitive/import/active
+document checks, **not** a complete lane/repository suite. Final execution
+source closure equals its committed registration bytes and compiles in memory;
+scoped whitespace/status checks pass. A metadata-only check of the exact new
+receipt names verifies four terminal-scope files (7,757 bytes) and eight
+log-scope files (12,295 bytes), all owner UID/0600/single-link; it reads no
+body and inventories no other private file. Historical sections 63–77 again
+match the recorded 600,715-byte digest. The saved heartbeat status is verified
+PAUSED after an app view; no schedule, prompt, notification or scope rearm.
+After the final evidence/metadata entries, the complete focused lane-document
+guard file is independently reprised: **160 passed in 3.06s**.
+
+Next independent role: Claude reviews this exact final Codex snapshot, full
+cumulative tree and entire round `9e5ed66e822f9119feb0db22866a1770fae7f606..HEAD`,
+including registration/source commit `b7e3903e54c3e1b3028a8ae14b8ff5b08301a904`
+and the final evidence/handoff commit. Review all delegated choices and open
+findings; no shared/main/sibling change or full suite was performed by Codex.
+Exactly one final non-force push targets only
+`HEAD:refs/heads/codex/strategy-target-price-revisions`. Its actual published
+SHA is reported in chat after local/remote equality and clean status checks.
+This heartbeat remains PAUSED during and after publication; no auto-rearm or
+own-push trigger. Future work remains subject to independent review, the
+factual Mia recovery and all applicable frozen gates.

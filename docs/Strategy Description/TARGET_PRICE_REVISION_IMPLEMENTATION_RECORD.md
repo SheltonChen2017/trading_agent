@@ -16139,3 +16139,243 @@ No full suite, operator-state/database, unrelated cloud project or export.
 renew only current-HEAD status/eventual own-job native collection access as
 `TPR-EXT26-QC-20261011-008`, retaining origin006 and the same daaf0c…bundle,
 candidate3/config/input/job. Do not reuse007's stale HEAD or reserve/relaunch.
+
+### 76.9 OFF3 terminal failure; Codex candidate cap reached
+
+At2026-10-11T20:18:22Z, own-job status008 reproduced completed=true,
+Runtime Error/error=true for OFF3 job`d7c76b7c4936c814f125a2b9a8cc2896`,
+project37650980. Compile remains
+`1f5768d6c9d1ace0372a6e4c515c19f2-90ea59f1f0949c464c1dca45b8a9fa19`;
+origin006, access008 manifestSHA
+`42e904767d6ac1d9ae11797a3508006dd619673f360a66c84507f88cff64d3b8`,
+source readback7ec1f3… and completion source bundle daaf0c… are unchanged.
+Terminal1301513bytes SHA
+`b5f7788177d117dd4dc95ae53c84cf6b60a15fc7410f5877b332743e618e7417`;
+closure574bytes SHA
+`72dabbf0782ac95399b3033637bf62068b18180d40e382d167354a501bdd39d7`.
+This is a failed third attempt, not successful completion. OFF has consumed
+all3 Codex attempts; ON has consumed0. No fourth OFF Codex compile/launch,
+candidate rename, incidental-parameter cap reset or changed economics is
+authorized. Looks remain19 (17cloud plus2historical local), not reset by
+read-only status/collection or successful REST input writes.
+
+`TPR-EXT26-D057` chooses fresh bounded negative-result diagnosis under the
+owner's existing continuation authority: INVENTORY-V2-OFF3-20261011-001 and
+RESULT-V2-OFF3-20261011-001 (both prefixedTPR-EXT26-) each claimed and verified
+the9 fixed own-job roles,2096583bytes, underc520e8c3…; no input, credential,
+network, export, attempt or new look. Exact961byte canonical inventorySHA
+`06911d9d1f48d521c4f94fe05167a2fcf819b6fa1b7daac7cd2f572816c484be`.
+Inventory plan9a97ea9b…; result plan3d6854f7…; both COMPLETED as readers,
+with terminal_status=Runtime Error and metrics=null. Reader completion is
+NOT backtest completion. Returned frames extended_core.py587/main.py1028;
+the retained reader's finite exception classifier returned unknown, not a
+fabricated ValueError/TypeError diagnosis.
+
+Separate fresh fixed-file scopes
+`TPR-EXT26-OFF3-ERROR-MARKERS-20261011-001` and
+`TPR-EXT26-OFF3-ERROR-METHODS-20261011-001` each bound this exact terminal
+SHA/1301513byte opened descriptor before its body, ≤30seconds/5minute scope,
+and returned only finite error-marker/method enums. Error text1410bytes SHA
+`4d67dbc37635b91803bbb53914b91daf8504771f9a4b5662d4e80c4e062fb7f9`;
+ObjectStore/unsupported markers present, quota/storage/limit/exceeded markers
+absent. Method enums: save_bytes, LocalObjectStore, bytes, not supported.
+No raw private error text or rows were disclosed. Absence of a quota word
+does not prove storage headroom. Alternatives—raw log disclosure or inferring
+an error type from a frame alone—were not used. These are delegated diagnostic
+choices, not independent Claude or separate human approval.
+
+`TPR-EXT26-F017` P2 confirmed open runtime failure at mandatory audit export:
+main1028 → core587 → CompressedAuditStore.save/native.save_bytes. Both frozen
+cloud arms contain identical compressed-store SHA
+`d661b5752c35b9dd04f783f5d78850f453d5f5f299874e5cf19700599df2356e`.
+The adapter passes Python gzip bytes into the native binary writer; local
+fixtures never exercised CLR method dispatch. Exact native incompatibility
+cause remains UNPROVED. Explicit CLR-byte conversion is a hypothesis for Mia,
+not an implemented or accepted correction: the official tutorial itself
+demonstrates Python bytes, so it would be false to declare them universally
+invalid. Primary references: QuantConnect writing-algorithms/object-store,
+LEAN Python QuantConnect/Storage/ObjectStore class reference. Advisory peer
+independently verified shared source equality and this limitation, without
+private/API access. F013's tuple-boundary correction remains locally verified
+and this run passed that point; it did not prove complete QC readiness.
+
+### 76.10 Native failed-run evidence, not performance acceptance
+
+Read-only order collection008 sequence1 completed with3076 distinct native
+orders across32 bounded pages with99-order request ranges; retained envelopes total
+4132223 stat bytes. No per-sleeve trades or P&L are inferred from overlapping
+consolidated positions. Fees, fills, turnover, exposures, underfills, full
+membership/cap coverage and accounting parity remain unverified here—not0.
+
+Root initially started collect-native while the order collector still held
+the same controller lock. It returned refused_or_uncertain; this orchestration
+mistake is retained, not classified as QC failure/new attempt. D059 registers
+`TPR-EXT26-NATIVE-LOCAL-DIAG-20261011-001`: four exact own native008 filenames,
+≤30seconds/5minute scope, stat-only/no bodies or network. All spent,
+backtest-envelope, account and completed files were absent; public controller
+code acquires the exclusive lock before spending/native requests. Root then
+waited for the order process to finish and used a genuinely fresh current-HEAD
+native-collection scope009, not a renewed008 receipt or blind retry. All future
+dependent controller actions must await the previous process's actual exit.
+
+`TPR-EXT26-D060` binds single-use
+`TPR-EXT26-ORDER-PRESENCE-20261011-001`: fixed sequences1–3,≤506 exact page
+names each/1524stats/30seconds, no directory discovery/bodies/network. It
+independently observed sequence1 complete/32envelopes; sequences2/3 unspent.
+This is filename/custody progress evidence, not a second order-body replay.
+
+Fresh collection009 manifestSHA
+`3a48f033a8b1e5dd717ee0f95eb743a9020bb3bfc316aedec6e32d5c8f81c2f9`
+completed as diagnostic_missing_evidence. Native accountSHA
+`d2995fbfb395cd07515554e4824cc6ebc83bcfc64d992d4b1379eb29935e0fee`;
+backtest envelope equals b5f778…terminal. EXT26_SUMMARY and
+EXT26_EVIDENCE_INDEX each returned0 logs. Account NAV returned852 rather
+than1449 observations: diagnostic_incomplete_daily_census. Strategy Equity
+remains a separately sampled default diagnostic, never a substitute.
+No full cloud journal was exported/replayed and no matched metrics were run.
+
+`TPR-EXT26-D061` binds
+`TPR-EXT26-OFF3-NAV-COVERAGE-20261011-001`: the exact own009 account-NAV
+envelope SHA`aa016659222620e766e9a0c7344906fb5c55cf1f5fce2cc850770e70c78a8b1c`,
+≤2MiB opened-descriptor budget/30seconds/5minute scope, native dates/clocks
+only, no NAV values/performance returned. Actual21886bytes;852 unique
+observed sessions span2021-01-04 through2024-07-10, timestamps increasing,
+850 points do not match frozen16:01NY. Missing-window/sampling cause remains
+unverified; do not relabel this as coverage through2026-10-09 or interpolate.
+`TPR-EXT26-F018` P2 confirmed/open missing required native census and final
+aggregate/index evidence. Recovery must independently resolve usable dates,
+clock/census and mandatory export, not just change the terminal label.
+
+### 76.11 Mia/owner recovery and delegated resource sequencing
+
+`TPR-EXT26-D056`: after the third failed OFF attempt, choose documented
+built-in Ask Mia on ONLY existing project37650980; alternatives of a fourth
+Codex launch, generic REST agent creation or unproved free/premium allowance
+are not equivalent recovery. Fresh
+`TPR-EXT26-MIA-AVAILABILITY-20261011-001` claimed current HEAD/owner hash,
+30minute scope/≤3navigation pages, browser names and existing QC tab metadata
+only, before UI inspection. One exact project navigation produced explicit
+"not logged in or your session has expired". Only MCP Apps and IAB browser
+surfaces were available; native-app inventory reported the Mac locked and
+automatic unlock unavailable. Authenticated controllable Mia is unavailable.
+No login/credential extraction, message, agent creation, paid allowance,
+purchase, upgrade, live action, look or launch occurred. Working API credentials
+on this machine do not establish browser authentication. Primary IDE reference:
+https://www.quantconnect.com/docs/v2/cloud-platform/projects/ide .
+
+Precise owner action: unlock the Mac, sign in to QuantConnect, open
+https://www.quantconnect.com/project/37650980 and its Ask Mia panel; make that
+authenticated interface controllable, or perform the bounded Mia recovery and
+return resulting compile/backtest IDs plus every cloud source file/diff.
+Root asked for this action asynchronously; no response is assumed.
+Recovery prompt: diagnose failedjob d7c76… at final native binary audit export
+and incomplete native daily census; preserve the frozen cap selection,
+weight-only TPR rules, dates, costs/execution, every audit row, deterministic
+gzip, hashes/readback/index/sidecar and collision refusals. No shortened dates,
+dropped audit, portfolio simplification, fallback economics, renamed candidate,
+public export or live deployment. Use existing included resources only; no
+purchase/upgrade. A Mia run must have its own bounded operation/look identity
+and retained source comparison, NOT overwrite Codex3 provenance or reset its
+cap. Retrieve all cloud files, diagnose EVERY cloud change and port only
+verified lane-owned corrections before any renewed readiness claim. Exact
+Mia cause/corrections/launch/source cannot be supplied before recovery occurs.
+
+`TPR-EXT26-D058`: delegated risk sequencing under the owner's continuous-round
+authorization holds remaining71 uploads and ON launch until mandatory OFF
+export/account evidence and Mia recovery are resolved. Rationale: both frozen
+arms share the failed native writer; knowingly spending ON1 cannot recover OFF
+or prove the comparison, and21409650bytes of new uploads could compete with
+recovery audit space. Alternatives: launch known-broken ON, or upload all71
+without audit headroom. REST remaining uploads are NOT proved broken or
+externally forbidden, and ON's3-slot allowance remains unused. First1of72
+upload is verified; remaining001 producer is committed/tested but never run.
+F012 remains partly resolved/open, capacity and other-lane contention unknown.
+No other lane's running job was inspected, cancelled or overwritten. This is
+a factual/delegated resource dependency, not a new canonical or rights gate.
+Independent Claude review of all exercised delegated choices remains pending.
+
+### 76.12 Stable one-push blocked-round handoff
+
+Frozen comparison remains TPR-CAP-TILT-EXT26-20261010-v1, planned
+2021-01-04–2026-10-09, same cap-selected STOCK sleeves/weight-only tilt,
+AR entirely disabled; not an ETF-only trade study, not an AR/TPR combination.
+
+| Universe/sleeve | Extended OFF | Extended ON | Accepted comparison |
+| --- | --- | --- | --- |
+| SPY/S&P500 proxy | Shared OFF3 Runtime Error; sleeve coverage unverified | Not launched | None |
+| XLV/Healthcare | Same failed consolidated job; no invented sleeve P&L | Not launched | None |
+| XLE/Energy | Same failed consolidated job; no invented sleeve P&L | Not launched | None |
+| QQQ/Nasdaq100 | Same failed job; NOT all Nasdaq-listed stocks | Not launched | None |
+| SOXX/Semiconductors | Same failed consolidated job | Not launched | None |
+| REMX/US-covered thematic subset | Same failed job; NOT complete global REMX | Not launched | None |
+
+Current-vintage/source-clock/PIT/restatement/survivorship, incomplete global
+holdings and adaptive-study limits from the freeze remain. There is no new
+accepted return/CAGR/drawdown/Sharpe or alpha claim; prior negative results and
+all19 observed runs remain immutable. No sealed holdout reallocation, date
+tuning, missing-input-as-zero or renormalization was used. Native301-decision
+coverage and fills/cost/accounting parity are not established by3076 orders.
+
+Root's final focused validation reproduced199passes in7.45seconds: the6 new
+completion/store-probe/first-input/remaining-input test modules, packet import
+boundary and exact policy-byte document guard. Isolated in-process49/52 root
+preceded dispatch import; no actual operator stop/database, provider rows,
+credentials/API or full lane/repository suite. Earlier red/green and peer
+evidence remains attributed as recorded. macOS proves no Windows signer/ACL/
+protected-parent custody;14 frozen-Windows-Git preregistration limitations
+and missing-frozen-Git refusal/restoration remain unchanged.
+
+Final pure-render/source compilation confirmed both generated cloud arms and
+all6 new local modules without executing QC/importing private inputs. Working
+completion bundle is exact daaf0c…pure render of immutable223efa…predecessor.
+Every1398093byte of the published08e3…record prefix remains identical, SHA
+`bcdffe6e69270bf17e8ab63818dc4edfd785c33ded0131f9c1f72bbc83a2d3e4`;
+this round adds only lane-owned successors/tests and appended record truth.
+Freeze90bdec…/calendar3eccdf…hashes, shared files and executed old artifacts
+are unchanged; diff whitespace checks pass. This is preservation evidence,
+not additional empirical or independent-review acceptance.
+
+Final advisory peer reviewed the new handoff/public commit log and found no
+material scope/false-completion/cap-reset issue. Root adopted its pagination
+wording correction:32 bounded request pages do not mean3168 returned orders.
+Native facts above remain root-reproduced, not private/API evidence reproduced
+by that peer. This advisory review is not independent Claude acceptance.
+
+Review scope for Claude is the ENTIRE new continuation round from exact
+published base`08e3fe79d2bce538692f51cf0903bdcab18cd354` through the final
+handoff commit containing this subsection, including all cumulative tree,
+documentation, tests and negative operation history. Intermediate local
+commits:5354fdffff79f673f48b47c401e027a8819053ad,
+f00a69172ffe153a0f7b9e50d8f854d835998dcf,
+c45f7ffc0cc0d4c3f25384d590b6f97450e73381,
+b1693bb6d2c46970a1b5d75289578c05b0e167ef and
+c520e8c30aaa5357d83bf3082a41f260449fb6d7. These are implementation/handoff
+commits with Claude acceptance PENDING, not incoming Claude dispositions.
+No matching incoming Claude review push was counter-reviewed in this
+owner-authorized operational continuation; no old independent review was
+silently deemed accepted. F012/F017/F018 remain OPEN; F013/F014/F015/F016
+are corrected within their recorded scope, not blanket QC completion.
+Historical finding dispositions including confirmed/partly-correct/false-alarm/
+resolved/open remain retained, not erased. OOL011 lane correction still needs
+owner-coordinated shared synchronization; OOL003/004/006 remain closed.
+
+Canonical TR0-I replay/rollback, protected-parent custody, reviewer identity
+and adversarial acceptance remain parked; TPR-1/source and TPR-0B manifest
+gates stay open. Exploratory authorization does not close them or grant
+trading. Shared Action Plan, Session Handoff, workflows/main/sibling behavior
+remain frozen. Next role: Claude independently reviews the exact one-pushed
+snapshot/full range; Codex counter-reviews EVERY resulting commit separately
+and cumulatively before the next authorized bounded milestone. Actual resumed
+backtesting additionally requires the specific authenticated Mia recovery
+above; a review push alone cannot waive the3-attempt cap or F017/F018.
+
+Owner's latest instruction explicitly requires ONE final push, THEN a new
+monitor for Claude's completed review push and subsequent counter-review/next
+milestone. D047 will therefore update the existing paused heartbeat only
+AFTER local/actual matching remote equality and clean status are verified,
+binding the exact final published Git SHA/full08e3…range in that saved app
+prompt. It must stay quiet on unchanged/incomplete review, pause BEFORE
+counter-review, and never treat Codex's publication as Claude review. No
+automatic rearm beyond this expressly requested one. Final push/monitor
+verification is reported in this chat; this record does not claim it happened
+before it actually occurs.

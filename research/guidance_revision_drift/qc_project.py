@@ -129,7 +129,17 @@ def _gdr_inventory(project_root):
                         and entry.name not in expected_children
                         and (entry.is_dir(follow_symlinks=False) or entry.is_symlink())):
                     _gdr_refuse("unlisted importable project directory")
-                if entry.name.endswith((".pyc", ".so", ".pyd")):
+                if entry.name.endswith(".pyc"):
+                    # QC's loader supplies adjacent compiled copies, including
+                    # main.pyc. Permit only bounded regular counterparts of
+                    # named visible source. Never read or execute these here;
+                    # private cache lookup below keeps imports on verified .py.
+                    cached = entry.stat(follow_symlinks=False)
+                    if (entry.name[:-1] not in expected_python
+                            or not stat.S_ISREG(cached.st_mode)
+                            or not 0 < cached.st_size < _GDR_MAX_PROJECT_FILE_BYTES):
+                        _gdr_refuse("unlisted or unsafe compiled project source")
+                elif entry.name.endswith((".so", ".pyd")):
                     _gdr_refuse("unlisted compiled project source")
                 if entry.name.endswith(".py"):
                     observed_python.add(entry.name)

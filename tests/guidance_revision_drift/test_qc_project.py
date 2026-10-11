@@ -349,6 +349,43 @@ class QCProjectTests(unittest.TestCase):
                      self.assertRaises(RuntimeError):
                     namespace["_gdr_inventory"](directory)
 
+    def test_platform_adjacent_bytecode_is_unused_and_named_source_stays_authoritative(self):
+        # QC's loader names project/main.pyc. Harmless hostile adjacent cache
+        # markers for every named source must never be evaluated by imports.
+        with TemporaryDirectory(prefix="gdr-qc-platform-bytecode-") as temporary:
+            directory = Path(temporary).resolve()
+            self.write_project(directory)
+            for name in self.files:
+                if name.endswith(".py"):
+                    source = directory / name
+                    raw = source.read_bytes()
+                    code = compile("raise AssertionError('adjacent cache must not execute')", str(source), "exec")
+                    header = (MAGIC_NUMBER + struct.pack("<I", 0)
+                              + struct.pack("<II", int(source.stat().st_mtime), len(raw)))
+                    source.with_suffix(".pyc").write_bytes(header + marshal.dumps(code))
+            self.generated_helpers()["_gdr_inventory"](directory)
+            result = self.runtime(directory)
+            self.assertNotIn("error", result)
+            self.assertEqual(result["initialized"]["symbol"], "SYN-GDR")
+            self.assertEqual(result["pycache_prefix"], result["private"] + "/unused-bytecode-cache")
+
+    def test_named_adjacent_bytecode_symlink_directory_empty_or_oversized_refuses(self):
+        for kind in ("symlink", "directory", "empty", "oversized"):
+            with self.subTest(kind=kind), TemporaryDirectory(prefix="gdr-qc-bad-bytecode-") as temporary:
+                directory = Path(temporary).resolve()
+                self.write_project(directory)
+                target = directory / "main.pyc"
+                if kind == "symlink":
+                    target.symlink_to(directory / "main.py")
+                elif kind == "directory":
+                    target.mkdir()
+                else:
+                    target.write_bytes(b"" if kind == "empty" else b"x" * 64000)
+                namespace = self.generated_helpers()
+                with patch.object(namespace["os"], "open", side_effect=AssertionError("refuse before source reads")), \
+                     self.assertRaises(RuntimeError):
+                    namespace["_gdr_inventory"](directory)
+
     def test_stale_audit_bundle_and_source_change_during_readable_preparation_refuse(self):
         members, manifest = native_bundle._snapshot()
         changed_members, changed_manifest = dict(members), deepcopy(manifest)

@@ -2963,3 +2963,112 @@ No push is made while the overall QC cycle needs the owner's official
 execution/source-return route. Retain the same future single-push agreement,
 the section-26.5 identities, project 37647834, zero actual attempts and PAUSED
 monitor. Next authorized action and all exclusions remain exactly 26.6.
+
+## 27. Owner-directed synthetic native evaluation — 2026-10-11
+
+### 27.1 Authority, access, scope and publication sequence
+
+The owner directed: "proceed to run the backtesting, document the result.
+when done, push only once" and to wait if other lanes occupy the QC nodes.
+This executes only the fixed invented 372-frame order-based integration
+candidate under the prior scoped approval/readable replacement/review waiver.
+No empirical strategy run, immutable-draft permission promotion, new look
+allocation, data/provider/outcome access, installation, account change or
+broker/paper/live/capital authority is inferred. Shared QC client behavior and
+project-wide documentation remain unchanged. No new Claude review is invented.
+
+Later owner direction: Claude is monitoring the next Codex publication; after
+this round concludes, make its one push, then arm this chat's monitor for
+Claude's completed review of that exact new baseline. Counter-review every
+review commit, then implement one next authorized bounded milestone if no
+gate blocks it. This supersedes the old paused monitor's historical baseline;
+it does not authorize simultaneous implementation or a fresh milestone quota.
+The monitor remains paused until this round's actual publication succeeds.
+The owner also authorized asking Mia if Codex cannot fix the issue; any Mia
+source must be retrieved and compared, with every cloud change/root cause
+documented before accepting only verified lane-owned corrections.
+
+Existing environment QC API authentication succeeded without displaying,
+copying or saving credential values/headers. Official REST project/file/compile/
+backtest/node/log documentation was read; no connector, dependency or account
+setup was performed. This supersedes 26.6's access blocker. The default system
+Python cannot import slots dataclasses; existing Homebrew CPython 3.13.15 was
+used, without installation. That local import refusal was not a QC attempt.
+
+Own isolated project **37647834 / Determined Green kitten** was verified owner,
+Python, no libraries/parameters and not running. Initial main.py (406 bytes,
+SHA `215476644fd846a1488ca4c45876ed21c9c736faa79b31a59fcaaa1643aac608`)
+and opaque research.ipynb (1,029 bytes,
+`af27200522531d426185f4daa25d23610c164134e3ab7fdf38919616d0d5b344`)
+were retained before replacement; notebook never executed. REST files/create/
+update staged the 21 readable files with root main.py last and no intermediate
+compilation. Complete returned project inventory matched every Python byte,
+with unchanged notebook and no extra source. No encoded carrier was uploaded.
+
+Both B2-8 nodes were idle before compilation and immediately before run;
+auto-selection was already enabled. No allocation change, cancellation or
+inspection of another lane's outcomes occurred. Pre-run project version ID
+18178 followed master (`leanPinnedToMaster=true`), with observed LEAN hash
+`80e7843f645673bcbeaab963049f76f20f6785e1` and cloud hash
+`540275f2f69cbfaed4e9fab5549c72210475b867`. This is **not an immutable pin**.
+The [official engine-version documentation](https://www.quantconnect.com/docs/v2/cloud-platform/projects/lean-engine-versions)
+does not establish Researcher entitlement to older/custom selection; no
+undocumented version-setting field or upgrade was used. Actual run server
+statistics, not a requested version, identify the observed engine build.
+
+### 27.2 Actual attempt 1 and retained custody
+
+Same owner cycle `GDR-base372-approved-20261008`; the budget is not reset by
+wrapper corrections. Durable intent was saved before each compile/run POST.
+Ignored raw responses, full initial/uploaded/returned sources and operation
+events are retained under
+`artifacts/guidance_revision_drift/qc/GDR-base372-approved-20261008/native-evaluation-20261011-xevyIk/`.
+This actual operational ledger truthfully records external owner waiver and
+`review_commit=null`; no fake `CandidateBinding`, typed-dossier review SHA or
+changed false permission field substitutes for approval.
+
+| Attempt | Exact candidate / compile / run | Terminal evidence |
+| --- | --- | --- |
+| 1 | Full source `4bb65ed2b213ac513965a8a1095c9f1558b0ba06e2a0ae8545d2327cb02b2be7`; readable project `febd61bd6725687408eb0594bdac945baafc899b4d9004a0b69ee96c2a91ca95`; producing `8e974be8`, closing `4c698f22`. Compile `715dbf0b1b76bb6dc9ee304c4cd349d5-2b759152a214f2ba64b68668b312481e` reached BuildSuccess with 12 warnings retained. Run `739ed3d3052627b50fe3b4eea4cc5b8f`. | Runtime Error, progress 0, initialization/import failure: generated `_gdr_inventory` rejected a compiled project source artifact while QC Loader named `./cache/algorithm/project/main.pyc`. Server LEAN `v2.5.0.0.18178`, no strategy callbacks/evidence. Counts as **one unsuccessful terminal attempt**. |
+
+Post-failure complete returned Python sources still matched the exact local
+attempt-1 candidate; no cloud edits or economics changed. A log-page GET-equivalent
+REST read timed out after 25 seconds; this was a read-only retrieval failure,
+not another launch or attempt. The authenticated terminal run response and full
+stacktrace are retained. The traceback proves the guard ran; naming main.pyc
+does not itself prove which bytecode was executed or an immutable engine Git
+binding. Public [LEAN Loader](https://github.com/QuantConnect/Lean/blob/master/AlgorithmFactory/Loader.cs)
+strips .py/.pyc to the module name and imports it; cloud internals are not
+asserted identical merely from this public reference.
+
+### 27.3 Verified wrapper-only correction before attempt 2
+
+| ID | Priority / disposition | Evidence and correction |
+| --- | --- | --- |
+| GDR-QC27-001 | P2 / accepted-after-correction locally; native retry pending | Actual attempt 1 refused a QC compiled artifact before initialize. A focused local regular main.pyc/counterpart fixture reproduced the same refusal (one red regression). Permit only bounded, nonempty, nonsymlink regular adjacent .pyc counterparts of the exact named visible .py inventory. These bytes are never read/executed by the guard. Unknown .pyc, .so/.pyd, empty/oversized/link/directory counterparts still refuse. All visible source hashes/origins, exact inventory and fresh private cache routing remain enforced. |
+| GDR-QC27-002 | P3 / retained evidence limitation | Moving-master configuration is not a cryptographically pinned engine. Retain actual compile/run build and pre/post version metadata; infer no immutable Git identity, portability or broader parity. No unsupported API fields or plan changes. |
+
+Six focused tests passed in 1.270s after correction: adjacent timestamp-valid
+raise markers for all named source were not executed, unsafe named and unlisted
+compiled artifacts refused, prior timestamp-cache substitution guard passed,
+isolated root initialized with only two exact data files, and same-size source/
+asset mutation still refused. All 21 current files compiled in memory and
+fresh source/package reconstruction passed; diff check passed. No full suite.
+
+New full source `327e1887cbb8cf1aee3900057503a183fe7d200ed9e10dc2b1d12d2592d92abe`;
+project `9796630608537a5ba90c3abaf816beaebdc6819dc5ffa9aa3dee7d112ea0a3c4`;
+root main.py 13,444 bytes,
+`e98e9170884ce74c83be69a87ed0025de88c130e49babc46e7d4237f817430a7`;
+21 Python files / 277,282 total bytes. Only generated wrapper inventory policy
+changed. All 19 native files, runtime source `beee9127...`, audit bundle
+`1579a3da...`, draft raw/semantic identities and fixture `8f35d56a...` remain
+exactly unchanged. No native timing, prices, fees, orders, accounting or
+candidate decisions were altered.
+
+Current state: 1 compile / 1 run / 1 unsuccessful terminal attempt; two attempts
+remain. Next: commit this bounded lane correction, restage changed readable
+source with exact pre/post cloud comparison, record attempt-2 intent, compile,
+wait if nodes busy, and run only this fixed synthetic candidate. After any
+result retrieve all source again, retain complete raw logs/metadata and validate
+actual trace if available. No native completion or empirical readiness claimed;
+no intermediate publication before the round concludes.

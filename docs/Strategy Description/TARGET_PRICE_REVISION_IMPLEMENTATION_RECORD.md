@@ -468,6 +468,8 @@ The owner authorized the requested extended exploratory dates and now the
 fresh paired-study allowance: at most three QC attempts per arm, with original
 ON3/OFF1 and16looks retained. Section75 freezes both extended candidates and
 all six universes together; no 2021-now QC run has launched.
+Section75.15 records completed fresh composite input preparation; original
+failed capture and subsequent completed Sharadar repair remain separate.
 Section 70's
 closures of `TPR-CR21-002` and `TPR-CR21-003` are accepted; the Object Store
 retention question is restated for the owner as `TPR-CR22-007`, not a gate.
@@ -14667,3 +14669,100 @@ formatting, then reproduced100runtime controls/3.00s. Final committed core
 loader3558bytes`24c752b0859a04d73306e3afddc10d45cc6d3c7b566e2ff17ef160fd90e6e10b`;
 main and preparation hashes above are unchanged. No new economic/source/
 native-execution claim follows from this formatting correction.
+
+### 75.15 Composite input preparation completed; result framing frozen
+
+The exact one-shot preparation registered in75.14 was invoked from committed
+`05a55efdf6f3792da6ce8e47e0fe1f5d059c43c4`, with actual creation
+`2026-10-11T01:46:32Z` and24hour expiry. Its completed CLI result reports
+419741source rows,5497identities,301decisions,70monthly shards and72payloads,
+241804159payload bytes. Preparation SHA
+`08e1d006b9ffef3554873722d5c40ebf739ff7e6dd2c372e78069ddf6cf2808f`;
+manifest SHA`a9cbf9ad3ec485a11a2bf5c699326b4ca792579c43efb0e5b3a388a24ab36838`.
+OriginalFAILED001 stays failed and separate from the completed repair. Massive
+refusal occurrences retain9invalid firm IDs (overlapping9native-ID counts),
+7invalid tickers and38invalid touch order; all other16category cells and the
+Sharadar map are0. These are categories, not a partitioned rejected-row count.
+No private rows, provider-rights/PIT attestation, QC attempts or new outcome/
+development looks follow from packet preparation. Fresh metadata-only custody
+verification and public source rendering must precede uploads/launches.
+
+`TPR-EXT26-D028` — agent-delegated prospective native execution framing, pending
+independent review. Preserve documented native order status6/`None` distinctly,
+without interpreting it as successful fill or dropping the order. Permit an
+explicitly derived event-weighted exact rational VWAP only at normalized
+`fill_price`, tagged`tpr-ext26-derived-fill-vwap-v1`, with closed schema,
+canonical positive reduced integer strings,1000digit/4096bit bounds. This is
+derived event arithmetic, not a native wire-price token or provider attestation.
+Quantities/NAV/fees still require their actual lexical numeric tokens. Ambiguous
+share basis, missing fills/costs/currencies stay unavailable rather than0.
+Alternative float/rounded VWAP would lose exact notional; inventing a native
+price token would misstate provenance. No strategy, source or cost-rule tuning.
+
+Root meaningful controls before this narrow correction:2failed/7passed/
+40deselected in0.72s (documentedNone status and exact1/3derived VWAP refused).
+After correction49metrics cases passed0.89s. Root then reproduced232focused
+operations/metrics/bundle cases, all passed3.92s under isolated49/52. This is
+focused evidence, not a complete lane suite or native QC execution. It includes
+foreign returned project/job refusal and complete1449daily-chart negatives;
+F003/F004 are corrected in the prospective successor, not repaired historical
+result evidence. Renderer agent's51green/0.89s and seven restored in-memory
+mutation controls remain attributed; no private/network/QC operations occurred.
+Every cloud source is capped60000bytes; local controller size does not imply
+upload eligibility. The next actual step remains fresh metadata/source bundle
+verification, committed closure, private own-project upload and counted QC.
+
+Root additionally reviewed complete pure native NAV/order normalizer and tests,
+independently reproducing92focused cases/0.78s. Two agent live-globals mutation
+negatives (invented fills/costs fromFilled; ignored post-split event basis)
+remain attributed, each with restored-green control. Its initial89setup errors
+used the wrong firewall class name before test bodies ran; a later1failed/
+88passed run exposed missing event status incorrectly refusing rather than
+retaining unknown. These are retained, not recast as independent execution.
+Root's coherently rebound missing native`success` response negative then failed
+as expected(1failed/92deselected,0.34s), revealing a pure normalizer boundary
+that accepted an absent success field. The actual collector already requires
+successTrue, so this is prospective P2 hardening, not an observed QC bypass.
+Root changed only that boundary to require explicitTrue;93native controls passed
+0.80s. No fake originalOrder.Quantity/Price intent, inferred USD/fee0, dropped
+ambiguous orders, alternate chart oracle or new empirical look was introduced.
+The pure normalizer has no private reader; a fresh named result-read producer
+must be registered before any actual diagnostic/normalization operation.
+
+### 75.16 Fresh metadata-only bundle scope and committed QC producer
+
+`TPR-EXT26-D029` — delegated metadata-only processing, pending independent
+review. Freeze`TPR-EXT26-METADATA-BUNDLE-20261010-001` to read exactly two
+fresh preparation metadata files: preparation.json SHA`08e1d006b9ffef3554873722d5c40ebf739ff7e6dd2c372e78069ddf6cf2808f`
+and manifest SHA`a9cbf9ad3ec485a11a2bf5c699326b4ca792579c43efb0e5b3a388a24ab36838`.
+An exclusive durable new claim precedes either read. Owner-only/nofollow/
+one-link custody, explicit UTC clocks(max48hours),120second processing deadline,
+262144/131072byte metadata bounds and exact committed public source closure
+apply. No identity/month payload, raw capture, old D0, outcome, credentials,
+network or QC access. Upload inventory is synthesized only from the closed
+verified preparation payload hashes/byte counts and exact derived manifest.
+This scope is separate from spent capture/preparation receipts and renews none.
+
+The renderer freezes both arm source/config/input bundles together, with typed
+attempt1 literals and all final cloud files<=60000bytes. Its immutable helpers
+and calendar are copied byte-exact; only the recorded flat import, config hash,
+attempt literal and calendar placeholder substitutions occur. Metadata-only
+signal_packet contains manifest hashes/keys/sessions, never licensed rows.
+Alternative ad-hoc raw packet inspection was unnecessary; assuming a compile
+or native API chart alone proved readiness was rejected. Output is a new private
+metadata-only rendered bundle plus closed receipt, not a tracked-file overwrite.
+Exactly one final canonical LF permits byte-identical apply_patch publication.
+An explicit emit option may return that public source bundle; default output
+is small counts/hashes/paths only. No API or price-result look is performed.
+
+Root completely reviewed the invoker and26focused synthetic controls;26passed
+0.80s under isolated49/52, including claim-before-read, expired/changed custody,
+wrong/symlink/hardlink metadata, irreversible failures, no overwrite and closed
+CLI errors. These controls prove synthetic behavior, not actual private custody.
+Current metadata driver14510bytes SHA`09fc09b5e3dffe945544e08d0eaf561d84de7509c6df468ba39c4a3f1e58d6b2`;
+tests10895bytes SHA`6d2ab598c282199e7343d1a9f14666ebfdabd11e939d8e2b95b95a96a2eee065`.
+Registration includes released prospective operations/driver/renderer/metrics/
+native reader contracts and their focused controls. No extended QC attempt has
+yet been reserved, compiled or launched. Actual own-job diagnostic/result-read
+producer remains separately registered before use; pure parser tests alone
+do not authorize an incidental private outcome read.

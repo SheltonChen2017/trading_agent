@@ -1,24 +1,19 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **OWNER'S 2026-10-10 "PROCEED WITHOUT REVIEW" WAIVES THIS ROUND'S
-COUNTER-REVIEW OF THE SOLE RECORD-ONLY CLAUDE COMMIT `90e0d568`; NO CODEX
-ACCEPTANCE OR NEW INDEPENDENT REVIEW IS CLAIMED. SECTION 106 COMPLETES A
-PROSPECTIVELY FROZEN, OUTCOME-FREE FINRA CALIBRATION: 10/18 HISTORICAL CELLS
-PRESENT, 8 MISSING; ONE RAW FORMAT (`BRKB`) PRESENT, FOUR MISSING. ALL SEVEN
-QUERIES COMPLETE WITH EIGHT SOURCE POSTS, RETAINED FAILED EVIDENCE AND
-EXPLICIT HTTP-204/EMPTY-CONTENT LINEAGE. NO ALIAS/PIT/COVERAGE ADMISSION.
-363 FOCUSED CHECKS PASS; FOUR DRAFT/TRANSPORT ISSUES CORRECTED. THE ORIGINAL
-48/36-CELL DIAGNOSTIC AND ALL ITS MISSING CELLS REMAIN UNCHANGED.
-CURRENT PUBLIC SHARADAR DOCUMENTATION IDENTIFIES A
-PLAUSIBLE COMPANION ROUTE, BUT THE PREVIOUSLY NAMED LOCAL CAPTURE IS ABSENT
-TODAY AND CURRENT ACCOUNT ROUTE/ENTITLEMENT IS NOT VERIFIED. ACTUAL BACKTEST
-READINESS IS NOT CLAIMED. HISTORICAL IDENTITY, COMPANION/TERMINAL COVERAGE,
-INPUT/PROCESSING ROUTE AND PROSPECTIVE LOOK REGISTRATION REMAIN GATED; THE
-STRICT CANONICAL STUDY ALSO NEEDS ORIGINALS/CORRECTIONS/AVAILABILITY CLOCKS.
-SOURCE/SHARED P2s AND PROSPECTIVE P3s ARE RETAINED. LOOKBACKS 20/60/120/252
-UNSELECTED; CANONICAL REAL LOOKS 0/0, EXPLORATORY REAL LOOKS 0, ALPHA 0,
-PERMANENT LOOK IDS NONE, QC ATTEMPTS 0. NO OUTCOMES/HOLDOUT/QC/TRADING ACCESS
-IS INFERRED FROM THE REVIEW WAIVER.**
+Status: **OWNER'S 2026-10-11 CONTINUATION REQUESTS ACTUAL ORDER-BASED
+BACKTESTING, DOCUMENTED RESULTS AND ONE FINAL PUSH; REQUESTED EXECUTION IS
+NOT A CLAIM OF QUALIFIED INPUTS OR A COMPLETED RUN. THE KNOWN PROTECTED
+DIRECT-SHARADAR CREDENTIAL IS PRESENT; SECTION 107 FREEZES A BOUNDED PRIVATE
+COMPANION QUALIFICATION BEFORE ROW RETRIEVAL. PUBLIC SCHEMA/ROUTE FACTS ARE
+DISTINCT FROM PRIVATE DATA-USABILITY CONCLUSIONS AND EMPIRICAL ADMISSION.
+SECTION 106'S COMPLETED FINRA CALIBRATION AND REVIEW WAIVER REMAIN HISTORICAL
+AND UNCHANGED; NO NEW CLAUDE DISPOSITION IS INVENTED. SOURCE/SHARED P2s AND
+PROSPECTIVE P3s ARE RETAINED. ACTUAL INPUT/IDENTITY/CASHFLOW, PROSPECTIVE LOOK
+AND EXACT QC ROUTE FACTS MUST EXIST BEFORE LAUNCH; NATIVE QC ECONOMICS CANNOT
+SILENTLY REPLACE THE FROZEN 48-BOOK STUDY. LOOKBACKS 20/60/120/252 UNSELECTED,
+CANONICAL REAL LOOKS 0/0, EXPLORATORY REAL LOOKS 0, ALPHA 0, PERMANENT LOOK
+IDS NONE, QC ATTEMPTS 0. THE REQUESTED ONE-SHOT CLAUDE REVIEW MONITOR IS
+ARMED ONLY AFTER THIS ROUND'S VERIFIED FINAL PUSH.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -221,6 +216,8 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-10 | Codex owner-waived continuation | Clean local/tracking/actual remote `90e0d568`; prospective code/record freeze follows | Historical latest-revised source calibration and public companion-route qualification | Owner explicitly waived the pending record-only counter-review; no disposition assigned. Freeze separate 18-cell historical and 5-cell raw-format panels before source retrieval; preserve original diagnostic. | Focused validation and actual capture result appended in section 106 before the single final push. No outcome look or QC attempt. | Historical ledger retained, including SI-CR20-001; source/companion factual gates cannot be waived into facts. | Execute only the frozen licensed FINRA SI calibration after the clean committed freeze. Establish current Sharadar secure location/route and metadata before companion retrieval; no actual-input override. |
 
 | 2026-10-10 | Codex source calibration completion | `90e0d568` -> `902b3169` freeze -> `1c8de172` status evidence -> `217e05fa` empty-transport correction; this closing record follows | Complete frozen historical/raw-format calibration; current companion-access factual stop | Seven ordered queries complete: 10/18 historical cells and 1/5 format cells valid, all 12 missing explicit, no duplicate/malformed/ambiguous rows. Three OAuth, two metadata and exactly eight source POSTs; immutable failed run and status diagnostic retained. BRKB is observed raw spelling only, not selected alias/identity. | Main focused **363 passed in 6.04s**, network denied; material red/green corrections, targeted compilation and exact lineaged report rebuild/private permissions passed. Closing document/privacy/diff/status checks in 106.8. Canonical/exploratory/QC zero counters unchanged. | SI-FINRA-CAL-001..004 corrected; SI-CR20-001 interpretation addressed only, not universal coverage. Historical source/shared P2s and prospective P3s retained. No counter-review disposition assigned to waived Claude commit. | One final non-force lane push. Current Sharadar secure location/account route needed before companion entitlement/schema/action/coverage qualification, then actual-input/evaluation/look/QC gates. No new monitor or further source POST. |
+
+| 2026-10-11 | Codex companion qualification / backtest preflight | `b80ef633` -> prospective freeze follows; final handoff appended in section 107 | Direct-Sharadar protected source-only qualification before requested order-based backtest | Known credential handed off; frozen ten-token sentinel and sixteen-request contract, exact provider identity/rational volume and private fitness handling. No empirical readiness is inferred. | Main focused **326 passed in 9.87s**, empty environment/network denied, plus targeted compilation and diff checks. Actual capture and final execution status follow in section 107. Canonical/exploratory actual looks and QC attempts zero before execution. | Draft transport/schema findings corrected before real authentication; historical source/shared P2s and prospective P3s retained. | Complete frozen source capture, evaluate factual backtest prerequisites without bypasses; one combined final push, then one-shot exact-checkpoint Claude monitor. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -15207,3 +15204,206 @@ prospective freeze `902b3169`, status-evidence correction `1c8de172`,
 empty-transport correction `217e05fa`, and this closing handoff. These are
 implemented/validated, **not independently accepted**. No monitor is rearmed
 and no review checkpoint is imposed contrary to the owner's current waiver.
+
+## 107. Direct-Sharadar companion qualification and requested backtest preflight — 2026-10-11
+
+### 107.1 Exact continuation and later owner steering
+
+This round starts from clean, synchronized local/tracking/actual matching
+remote **`b80ef63309f96dd5353cfef29334e33236fb1c8e`**, on the designated
+Short Interest worktree and `codex/strategy-short-interest`. No remote
+advancement, Claude commit, fetch, merge, reset, rebase or alternate checkout
+occurs. Section 106's pending record-only-review waiver remains precisely
+that historical waiver; it is not a new acceptance of the prior code. The
+owner completed the specifically requested secure credential handoff and
+then gave these later instructions:
+
+> proceed to run the backtesting, document the result. when done, push only once
+
+> by the way, other lanes may already be creating qc projects. if the node is occupied, wait until it becomes vailable
+
+> also, I've told Claude to arm a monitor for your next push. when this round is concluded, push once. then arm a monitor for Claude's review push. then start counterreview and proceed to the next milestone
+
+These later instructions authorize the requested execution purpose and
+restore the serialized review/next-milestone sequence after this final
+checkpoint. They do not manufacture source facts, retrospectively register
+an outcome look, change the selected hypothesis, lift protected periods,
+permit licensed-data redistribution, or authorize live trading. Codex will
+wait for an occupied node **if and when an actually qualified candidate is
+ready**; node occupancy is not assumed or reported without a read. A source
+capture/refusal or synthetic test is not a QC backtest or performance result.
+
+### 107.2 Actual access route and public facts, not a private quality verdict
+
+Safari confirmed a direct `sharadar.com` authenticated account, not Nasdaq
+Data Link. No credential value, account identifier, private contact or
+subscription receipt is recorded here. The owner saved the existing key in
+the specifically named protected local `sharadar.env` file: owned regular
+0600 file under owned non-symlink 0700 directory, bounded strict fields;
+presence is verified without printing, hashing or persisting the key.
+No new key, terms acceptance, upgrade, payment or purchase is performed.
+
+Sharadar's [official API index](https://sharadar.com/llms.txt) documents
+`x-api-key` header authentication and distinguishes the direct API from
+Nasdaq Data Link/Quandl. Its Bundle table map includes STOCKS/SEP, TICKERS,
+ACTIONS, DAILY and SF1/fundamentals. Five `status=True&years=full` requests
+check bulk-file metadata, **not** paid-plan or row entitlement. A status
+response can describe files present in storage; modification time is not
+historical publication or availability. Actual authenticated row retrieval
+is a separate bounded stage, with no free-key fallback or redirect-following.
+[Stocks](https://sharadar.com/docs/stocks),
+[actions](https://sharadar.com/docs/actions),
+[fundamentals](https://sharadar.com/docs/fundamentals).
+
+One main-agent **public**, unauthenticated descriptions SQLite-schema GET
+returned 200, 463 bytes, SHA-256
+`a8338610884f22d0f4beddfe3d418a95cb3e8d33f805679cf27d8d9767e0f80f`.
+Its lowercase `unittype/isprimarykey/isfilter` differs from the camel-case
+labels in the [public descriptions page](https://sharadar.com/docs/descriptions).
+Freeze the schema's exact projection and the documented `tablename` filter;
+do not select a spelling after inspecting market outcomes. SQL is inspected
+as metadata and never executed. This bootstrap GET is separately counted,
+not concealed inside the later sixteen-request allowance.
+
+Personal research/backtesting is documented, with raw/reconstructible
+redistribution restrictions. Private data-usability/fitness conclusions must
+not be published in Git/chat under section 8 of the
+[direct terms](https://sharadar.com/terms). The source-only receipt therefore
+stays in protected ignored local storage. The public handoff records software,
+protocol, transport/accounting and independently public contract facts, not
+private quality verdicts or licensed rows. Section 6 distinguishes
+non-reconstructible research/backtest results from source data; it does not
+by itself establish this project's exact QC custom-data representation.
+
+### 107.3 Prospective source-only sample and capture contract
+
+The frozen raw candidate tokens are **AAPL, BRK.A, BRK.B, FRC, SIVB, TWTR,
+META, FB, BBBY, BBBY1**. Keep them distinct, with no alias selection, survivor
+filter or missing-to-zero replacement. They are sentinels for raw formats,
+share classes, renaming/reuse and ceased-trading history, **not** a
+representative historical universe or the backtest population.
+
+Execute exactly these stages in order after the clean code/record freeze:
+
+1. Five authenticated bulk-status requests, explicit full history and no ZIP.
+2. Five unauthenticated public SQLite schemas, one for each companion table.
+3. One authenticated `descriptions`/`actiontypes` dictionary projection.
+4. Five authenticated, explicitly projected companion slices: TICKERS
+   `table=stocks`, no date backdating; STOCKS and DAILY **2022-10-01 through
+   2023-05-31**; ACTIONS **2022-01-01 through 2023-12-31**; SF1 **ARQ** filing-
+   date keys **2022-01-01 through 2023-05-31**. No current/validation/holdout
+   outcome panel or SI/price/signal/return join.
+
+The pure protocol owns exact URLs, filters, fields, order and request hashes.
+Sixteen requests maximum, one page per row query, limit 5000, offset zero,
+JSON `count == len(data)` and count strictly below the limit; no automatic
+retry, full table paging, free-key substitution or partial-success claim.
+Metadata/schema responses are bounded at 64/128 KiB and row responses at
+2 MiB. Strict UTF-8/duplicate-key/finite JSON, projected row shapes and
+before-value-validation collision quarantine preserve refusals and missing
+symbols. Raw financial tokens use exact rationals, independent of ambient
+Decimal precision; no binary-float authoritative arithmetic.
+
+Preserve provider permaticker identity, **not an invented share-class FIGI**;
+TICKERS' `figi` is documented composite FIGI. Preserve rational raw OHLCV
+reconstruction and fractional volume; never round it to fit the old
+integer-volume interface. DAILY market capitalization scales USD millions
+by exact 1,000,000. ARQ date keys are not report-period availability; primary-
+class fundamentals do not automatically apply to secondary classes. Action
+date/value/contra assertions do not invent dividend payment timestamps,
+terminal cash, merger/election conversion, CVRs or effective trading instants.
+The source-only report cannot open the existing actual-input runner.
+
+Create-exclusive protocol/start, pre-HTTP receipts, raw bytes and safe
+transport/private-report receipts stay under ignored Short Interest storage,
+owned 0700 directories/0600 files without symlink escape. Credentials are
+runtime header-only at one fixed HTTPS origin, never in URLs or persisted
+headers. Disable proxies/redirects; refuse credential echoes and bound HTTP
+errors without reading or printing their bodies. Before every request
+recheck root/branch/clean producing HEAD and unchanged actual matching
+remote. An occupied QC node is not involved in this source-only stage.
+
+The pinned technical protocol hash, focused validation, exact prospective
+freeze commit, capture result/accounting and final backtest preflight follow
+below after they occur. No empirical execution is claimed in advance.
+
+### 107.4 Exercised delegation inventory and retained gates
+
+* **SI-AUTH-20261011-01:** owner "done" completes the expressly requested
+  known secure direct-Sharadar credential handoff. Existing-key use only;
+  no broad secret search, credential issuance or account change.
+* **SI-AUTH-20261011-02:** owner requests actual order-based backtesting,
+  documented result and one final push. Prospective input/representation/
+  look registration still precedes execution; no fabricated backtest result.
+* **SI-AUTH-20261011-03:** owner says to wait if another lane occupies the
+  QC node. Never terminate, reassign, overwrite or race another lane.
+* **SI-AUTH-20261011-04:** after this one final push, arm one completed-
+  review-trigger monitor for the exact new head, then counter-review every
+  Claude commit before the next bounded authorized milestone.
+* **SI-DEC-20261011-01:** use only the known direct key/route; no Nasdaq
+  Data Link interchange or another checkout; leave shared files frozen.
+* **SI-DEC-20261011-02:** use the exact public schema's dictionary field
+  spelling and retain the documentation discrepancy instead of guessing.
+* **SI-DEC-20261011-03:** prospectively freeze the ten-token source-only
+  sentinel panel above before companion retrieval; no outcome-based selection.
+* **SI-DEC-20261011-04:** protect all private companion/fitness conclusions;
+  public status is capture accounting, not a provider completeness claim.
+* **SI-DEC-20261011-05:** retain the frozen original and separate latest-
+  revised studies. A native QC route is not a drop-in substitute: whole-share
+  execution, native dividend credit dates and automatic delisting handling
+  must not silently replace exact fractional/payment/terminal rules.
+
+Source P2s `SI-SRC-20260928-001..003`, shared P2s `SI-CR5-005` /
+`SI-CCR16-007`, and prospective P3s `SI-CR19-003` / `SI-CR15-001` remain.
+The previous finding/disposition rows, including corrected draft/calibration
+issues and false alarms, are retained verbatim. No new independent acceptance
+is self-awarded. Lookbacks **20/60/120/252** remain unselected, structural
+normalization/release-next-open rules unchanged. Permanent registered real
+looks remain **none**, canonical **0/0**, exploratory consumed **0**, alpha
+**0**, QC launch attempts **0** before any actual execution. No email,
+purchase/terms, broker/operator database, deployment, paper/live, capital,
+actual trading order or trading authority is inferred.
+
+### 107.5 Prospective code freeze, draft findings and focused validation
+
+The exact detached protocol is pinned at SHA-256
+`8540ea0adecf781db0323490beed1cf514fa57f92bafe06fbcce11a5569158b4`.
+The capture client independently recomputes that hash, binds ordered unique
+request IDs and every descriptor/digest before creating a receipt or HTTP
+request, and checks the lane and actual matching remote both at iteration
+start and immediately after the durable pre-HTTP receipt. Credentials never
+appear in request descriptors, URLs, stored headers or public errors. Direct
+and JSON-escaped credential echoes (including field names and duplicate
+keys) are refused before raw bytes persist. Error status is a bounded integer
+or null, never arbitrary external text. Capture time uses canonical UTC `Z`.
+
+The read-only pure-module helper made one additional unauthenticated public
+fundamentals SQLite-schema GET: 200, 3,086 bytes, SHA-256
+`82b5187aeec641bc8a855c5d69870b6fe4b7e2307935b5587dc46a73458d6e15`.
+It confirms the primary key is ticker/dimension/**date**/reportperiod; the
+proposed calendardate-key correction was a false alarm and was not applied.
+Thus this round has **two public bootstrap schema GETs before** the frozen
+sixteen-request capture, not one. Neither bootstrap used authentication or
+retrieved market rows. SQL is never executed.
+
+| ID | Priority / disposition | Evidence before real credential use |
+|---|---|---|
+| `SI-SHARADAR-001` | P3 confirmed / corrected | Greedy SQL-schema tail could swallow another CREATE TABLE or an unknown-column index. Helper's four behavioral cases failed before correction; exact terminated table plus same-table declared-column indexes now checked. Distinct permatickers for one raw token remain ambiguous rather than collapsed. |
+| `SI-SHARADAR-002` | P1 draft confirmed / corrected | Fabricated credential echoes in allowed Content-Type and escaped JSON strings could persist. Direct, percent-decoded header and JSON string-token scans now precede raw/receipt persistence. No real credential was used or exposed during these offline failures. |
+| `SI-SHARADAR-003` | P2 draft confirmed / corrected | Inventory or descriptor/hash drift reached HTTP. Independent frozen hash/ordered inventory/descriptor binding now refuses before any start receipt or network call. |
+| `SI-SHARADAR-004` | P2 draft confirmed / corrected | A HEAD change after start receipt still reached HTTP. Fresh lane/remote guard now occurs immediately before HTTP; safe refusal preserves the started receipt. |
+| `SI-SHARADAR-005` | P3 draft confirmed / corrected | Inherited `+00:00` clock falsely refused the canonical UTC contract; HTTPError status could be untyped. Lane-local `Z` clock and safe typed status are tested. Shared capture behavior is unchanged. |
+| `SI-SHARADAR-006` | P3 false alarm / retained | Proposed fundamentals calendardate collision key contradicted the actual public SQL primary key. No change; exact date-key rule retained. |
+
+Main independently ran the initial capture regressions: **10 failed / 97
+passed in 0.97s**. The test helper then added safe-status and escaped-echo
+cases and reproduced them red; those helper executions are not claimed as
+main's execution. After correction main ran **122 capture tests passed in
+0.79s**. Main's combined final pre-retrieval checks are **326 passed in
+9.87s**, no skips/warnings: 122 capture, 111 pure companion, 9 lane import
+boundary, 69 active-document, 11 ML import boundary and 4 selected actual-
+input refusal checks. CPython 3.13.15 / pytest 9.1.1, empty environment and
+network denied. Four changed/new Python files compile; `git diff --check`
+is clean. This is focused validation, not the full lane/repository suite or
+Claude review. Prospective code/record will be committed before actual
+capture; no result is claimed here in advance.

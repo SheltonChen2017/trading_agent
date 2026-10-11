@@ -15911,3 +15911,140 @@ checks in0.87seconds; pure successor rendering and all generated cloud/source
 compilation passed, diff/hash checks clean. No complete lane/repository suite;
 macOS evidence proves no Windows signer/ACL/protected-parent custody. Existing
 fourteen frozen-Windows-Git preregistration limitations remain unchanged.
+
+Probe001 invocation returned REFUSED_OR_UNCERTAIN/scope_spent=null before any
+usable receipt; this is retained, not silently assumed unspent/successful.
+Public-only guard/source/plan reconstruction subsequently passed: eight exact
+committed source files, planSHA
+`0f70b53e9a5bc3a54c7d5d3ea72d3403bc566a11692631f6e2336c0fd091a173`.
+The manually supplied created timestamp19:42:00 could have been ahead of the
+invocation; its failure cause is not proven from the generic refusal. No new
+look/attempt or result claim. A separately bounded metadata observation002 is
+now prospectively authorized by delegated D048, same two exact read-only
+targets/budgets and current source closure, with timestamps generated at the
+call rather than a future hand-supplied start. Preserve001 and all older
+failed upload claims; no upload/launch retry is implied. Peer independently
+accepted the exact probe and reproduced70 focused passes in1.17seconds.
+
+### 76.5 Fresh metadata evidence and prospective remaining OFF3
+
+Probe002 completed2026-10-11T19:43:27.433703Z underc45f7ffc…;
+planSHA`1a5227414a431ff2197f38fd602a01176512eec8f5ec47ec7f8e081429a18193`;
+canonical public receipt4667bytes SHA
+`441d9fd3833ff3dd3b7417761469a59c179049b40d6ea8ca6c8c74817ef9c2b9`.
+Exact owned input-directory HTTP200/native-success page1/totalPages1 returned
+zero gzip/plain objects on that page; completeness remains unverified. Native
+objectStorageUsed=37650697 is uninterpreted usage, not quota/free headroom.
+Exact failed-key properties HTTP200/native-success=false carried classified
+not_found; existence/content remain unknown, not provider-attested absence.
+Original response hashes: list245bytes
+`5b7180f6e34f8dddab836ff1515acf9bbfb4af0d5c41f4a053252c2972171da2`,
+properties237bytes
+`64bbe18f06c2ceb923d0548d7980baa891aaa468450200d822b4bf8042d571ba`.
+No input/outcome body, mutation, new look/attempt or other-lane inference.
+
+`TPR-EXT26-D049`, agent-delegated normal QC continuation: run the existing
+last OFF attempt3 via fresh operation`TPR-EXT26-QC-20261011-006` and exact
+daaf0c…completion bundle, owned project37650980. Source/economic correction
+is verified; changed own-store observations after cleanup make unknown audit
+headroom a disclosed execution risk, not an invented prerequisite prohibition.
+Full gzip private journal/index/sidecar readback remains mandatory; no dropped
+records or export bypass. Reserve3 before compile, retain any failure without
+refund/fourth attempt, count the new launch look prospectively19 if launched.
+Use native order-based evaluation and usable1449-date NAV/order evidence;
+Completed alone is insufficient. Wait on actual shared-compute admission
+contention without cancelling/altering any other lane. Alternative: stop solely
+on unknown capacity would not prove the owner-requested actual QC completion.
+Peer advisory decision concurs; independent Claude code acceptance pending.
+
+`TPR-EXT26-D050`, agent-delegated necessary private-input integration proposal:
+a separately named fresh bounded first-key diagnostic may test the exact same
+346371byte content-addressed owned key, preserving spent origin003/request61.
+Native present metadata must match fresh local encoded size/MD5; mismatching
+present or unknown non-notfound refuses. Explicitly documented fresh native
+not_found may admit one identical-key diagnostic write without claiming
+attested absence/headroom. Require gzip/plain exact hashes and native successful
+write plus size/MD5 metadata before a new completion proof. No automatic retry,
+unrelated overwrite/delete, candidate/counter reset or inferred full72 success.
+Producer review/tests/current-HEAD source-bound receipt required before effect;
+remaining71 need a separately frozen bounded continuation after success.
+
+OFF3 operation006 prepared manifestSHA
+`37176b07249ba2e9cf85645d082c6e2d9401e9c7563ee45a563242950465fdc7`.
+Own cloud source upload/readback verified envelopeSHA
+`7ec1f3f8c3f9e4a8ebb7ec0e1ecbc6c7928661827a22d18c407e5db9543430c5`;
+mainSHA`9e19a0381123f8e0d44c51b3e9dbdbe4671fe61f37b672e37f9cae8912a18a61`.
+Reservation returned attempt3/compile_counts_as_attempt=true. Root mistakenly
+started the compile command while the reservation shell cell was still
+running; compile returned refused_or_uncertain, no native compile result.
+Do not assume no effect or automatically retry. `TPR-EXT26-D051` now registers
+a fresh single-use local metadata diagnosis within006: current HEAD/owned
+candidate3, exclusive controller lock, exact compile spent/transport/response
+file-presence only (three fixed names, no response/input body), bounded claim
+before observations. Preserve the refusal and reservation. Only if no compile
+effect/transport/response exists may the previously unexecuted compile stage
+proceed within attempt3; this never refunds the reservation or creates4th.
+
+Evidence naming clarification `TPR-EXT26-F014` P3 corrected in this successor
+record: section75's5790ca…"config SHA" is the generated extended_config.py
+source-module hash; the exact OFF config_raw content identity bound by the
+controller is`19a9842cfceb695d1f8256f429745247387c89bb725ee2b8be44fe98a726322a`.
+Neither config content nor execution identity changed; retain historical
+section75 wording and use explicitly distinguished hashes going forward.
+
+Local D051 diagnosis observed all three exact compile effect/transport/response
+files absent; zero private response/input bodies or network/look/attempts.
+The unexecuted native compile stage then returned compile
+`1f5768d6c9d1ace0372a6e4c515c19f2-90ea59f1f0949c464c1dca45b8a9fa19`,
+InQueue then BuildSuccess. No extra reservation or native compile retry.
+OFF3 launch returned own project37650980/job
+`d7c76b7c4936c814f125a2b9a8cc2896`; source/config/input exactness and persistent
+look census passed. Observed total now19=17cloud+2historical-local; ON0/OFF3
+reserved, ON3/OFF0 remain under the caps. This is launch evidence, not a
+completed/usable run or paired performance. Do not relaunch this job while
+nonterminal, and no fourth Codex OFF attempt after failure.
+
+### 76.6 Prospectively frozen first-key integration diagnostic
+
+D050 is implemented as standalone extended_input_probe_successor.py26292bytes
+SHA`762be6e44b6fe56981919be704ea5961a81129c659626fd0cb1e4970eebb6e7c`;
+focused tests17288bytes SHA
+`a1309e1e7a9c62db009bd5b4e0fe5acccfb6d25325264de79dd8907ef19d2373`.
+Operation`TPR-EXT26-INPUT-PROBE-20261011-001` will have a fresh current-HEAD
+≤4hour manifest/120second wall budget,≤2MiB exact owned local metadata,
+one346371byte opened-FD gzip body (frozen3880862byte plaintext hash/size
+roundtrip only, no row output/new provider capture),≤3 native≤1MiB responses.
+Ten source files pinned/current committed; claims precede all exact reads and
+effects. Bind probe002 receipt4667bytes/441d9… and original003/request61's
+seven metadata proofs; reconstruct exact original multipart payload hash from
+fresh verified bytes and bound org/key before the first API request. Preserve
+the old spent read/upload/transport/projection. No D0 capture is reopened.
+
+Fresh exact-key properties must either show matching size/MD5 (observed without
+overwrite or invented upload completion), or solely classified HTTP200 native
+not_found. Only the latter explicitly admits this one content-addressed owned
+diagnostic write. Native successful write and exact post-write size/MD5 are
+required before a new O_EXCL completion/native-hash proof. Absence is not
+attested, API check/write is not atomic, native SHA-content readback is not
+performed, and full input/audit headroom stays unknown. Mismatch/other refusal
+or transport uncertainty consumes scope without automatic retry. Original
+failed input claims/candidate/attempt/look/economics remain immutable; no
+unrelated overwrite/delete or new cloud project. Remaining71 are not yet
+authorized by this diagnostic's successful first key alone.
+
+Draft findings, corrected before any actual first-key helper operation:
+`TPR-EXT26-F015` P2 confirmed origin-provenance underbinding: coherent tampering
+of old upload/request payload hashes was admitted because only their equality
+was checked. Exact reconstructed original multipart binding now refuses
+before API. `TPR-EXT26-F016` P2 confirmed imported-helper custody gap: disk
+hashes alone did not pin loaded helper paths. Six imported module paths now
+must match this physical lane before Git/source/private/network access.
+Root fully read both drafts and corrections, reproduced41 focused passes
+in1.78seconds under isolated49/52 runtime root. Root's in-memory F015 guard
+removal produced the intended1red in0.62seconds (wrong origin reached synthetic
+completion); finally-restored control1green in0.54seconds. Six path tests use
+load-bearing fail sentinels at downstream boundaries. Prior34green is partial
+pre-correction evidence only. Agent41green1.79seconds is attributed; no complete
+suite. All actual tests use synthetic rows, denied actual roots/credentials/API;
+no actual first-key operation has occurred at this paragraph. Independent
+Claude acceptance remains pending.

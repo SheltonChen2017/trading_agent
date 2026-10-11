@@ -15884,3 +15884,118 @@ push. The handled one-shot automation is deleted at this round's close;
 all other monitors, including the paused exchange monitor, stay unchanged.
 Actual results, validations, remaining blockers and the closing ledger row
 are appended before that one push, not predicted as complete here.
+
+### 109.4 Prospective v2 binding and single supplement freeze
+
+The completed counter-review is local commit
+`d6374ab6abea3aae4bd64541be0d17fd60d9695a`, before this implementation.
+No provider request, credential read or QC operation occurred during its
+counter-review. This next implementation is bounded source qualification,
+not an actual-input runner permit or completion of the empirical roadmap.
+
+**SI-DEC-20261011-10** freezes the following one source-only supplement under
+the existing subscribed personal-research route and standing delegation:
+
+- Exactly **62 ordered GETs**, no automatic retry, redirect, proxy, extra page
+  or substituted query. Sixty `/v3/reference/tickers` requests cross the ten
+  unchanged raw tokens `AAPL, BRK.A, BRK.B, FRC, SIVB, TWTR, META, FB, BBBY,
+  BBBY1`, dates **2022-10-14, 2023-02-28, 2023-05-15**, and both explicit
+  active/inactive states. The remaining two requests are batched
+  `/stocks/v1/dividends` and `/stocks/v1/splits` for those same distinct tokens,
+  respectively ex-dividend and execution dates **2022-01-01–2023-12-31**.
+  No aliases, outcome-dependent sample choice or full-population claim.
+- Dated reference limit 1,000; action limit 5,000; one terminal page per
+  descriptor and **2 MiB maximum** each. Strict HTTP 200, JSON status OK,
+  exact count if supplied, duplicate-key/nonfinite refusal. Omitted results
+  require an explicit exact-integer zero count; absence is recorded, never
+  fabricated as a provider array. A `next_url` stops the capture, without
+  following it. Each malformed/missing/duplicate observation is retained.
+- Whole-round scope claim is create-exclusive and binds supplement protocol
+  plus the prior source-file digest, **independent of invocation time or new
+  HEAD**. A later directory cannot reset the allowance. The attempt-start
+  receipt precedes each HTTP call, with fresh clean-lane HEAD/actual-remote
+  checks immediately before transport. Failed captures/budgets remain
+  consumed; no silent resume, retry or second capture.
+- Use only the specifically known named `MASSIVE_API_KEY` environment entry,
+  header-only to fixed `https://api.massive.com`. No broad search, secret URL,
+  credential issuance or account setup. Raw/header/escaped JSON credential
+  echo is refused before persistence. Receipts/raw/reports are owned 0600 in
+  owned 0700, ignored, non-symlink directories. Run name is derived from the
+  same actual UTC start clock, addressing the future-code requirement in
+  `SI-CR21-001` without rewriting the historical diagnostic.
+
+Supplement protocol is
+`3ab6565797ab1bed34e30dda310040aebdab643f457d9384283eacaee0af321f`.
+The versioned binding protocol is
+`67e0a920f0acc312057719a6994c7b46309b38e9ae8bcd2684682266ee3433c4`.
+The exact request descriptors and detached matching rules live in the two
+lane-owned pure modules; the committed CLI permits no scope override.
+
+The CLI rebuilds only the existing section-107 protected source capture,
+without rerequesting Sharadar or reading its credential. Its start/report
+file hashes remain `1ea19b65...` / `4c0cb3fc...`, with exact original code
+head `71f0a62de1ecfa07e1c1f91bd34ec94361eb207a`. It checks the frozen sixteen
+descriptors, receipt schemas, exact non-boolean ordinals, raw byte hashes,
+protected storage, and start <= request <= response <= next request <=
+report clock ordering, then rebuilds the saved report byte for byte. The
+hashed start bytes are parsed once rather than reread. All source rows,
+refusals and missing tokens remain in the **private** inventory.
+
+**SI-DEC-20261011-11** retains provider permaticker namespaces and exact
+reduced rational price/volume observations in a distinct source-only **v2**
+inventory. It is not `LatestRevisedBundle`; v1 runner refusal remains intact.
+Current provider references and Massive exact-date candidates are separate
+assertions, not an admitted historical identity link. Composite FIGIs never
+become share-class FIGIs; primary-class SF1 shares/sharefactor are never
+transferred to another class. Raw dividend cash is not current split-adjusted
+cash. Provider payment dates remain date-only with no invented intraday
+clock, known settlement, zero missing cash or ex-date substitution. Splits
+retain exact `split_to/split_from`, including stock dividends, without
+inventing a cumulative adjustment factor or acquisition/bankruptcy payoff.
+
+Primary public specifications checked for this bounded route:
+[All Tickers](https://massive.com/docs/rest/stocks/tickers/all-tickers),
+[Dividends](https://massive.com/docs/rest/stocks/corporate-actions/dividends),
+[Splits](https://massive.com/docs/rest/stocks/corporate-actions/splits),
+[official query client](https://raw.githubusercontent.com/massive-com/client-go/master/rest/gen/client.gen.go)
+and [header authentication](https://massive.com/docs/rest/quickstart).
+The provider's [individual-use FAQ](https://massive.com/knowledge-base/article/which-plan-do-i-need-to-show-massive-data-in-my-app)
+supports one's own private research scripts; this is not separate QC Cloud
+processing permission or proof of actual coverage. Dated reference data is
+not original availability, an exhaustive effective identity history, or
+terminal-payment evidence. No institutional-affiliation or blanket
+permission-letter demand is introduced. Source fitness and reconstructible
+rows remain private, including every Sharadar usability conclusion.
+
+#### Draft findings, reasons and material red/green proof
+
+| ID | Priority / disposition | Evidence, violated contract, correction and verification |
+|---|---|---|
+| `SI-SUPP-001` | P2 confirmed / closed before retrieval | Draft prior-capture reader admitted reversed clocks, unbound receipt schemas and boolean ordinal 1. Persistent fabricated-only tests show seven **DID NOT RAISE** failures, then require strict schemas/integer ordinals and ordered clocks; a valid equal-resolution clock control passes. Two additional chronology directions pass after correction. This prevents incorrect durable provenance, without modifying immutable prior receipts. |
+| `SI-SUPP-002` | P2 confirmed / closed before retrieval | A second CLI invocation with a later start directory and changed HEAD reached another capture: persistent test **1 failed**. Fixed create-exclusive source/protocol scope claim refuses the second invocation before transport; original 0600 claim is unchanged. Same-directory protection alone did not enforce the whole-round allowance. |
+| `SI-SUPP-003` | P3 confirmed / closed for new supplement; historical scope qualified | Numeric JSON `0.25` and string `"0.25"` had the same parsed-record hash because lexical-number tokens subclass string. The monetary parser already rejected the string and full-file hashes differed; no amount-admission defect. Agent's persistent regression **1 failed** before correction; raw-record provenance now binds full capture-file digest, row index and parsed digest, including duplicate positions. Agent's **137 passed** afterward. The older Sharadar parsed-record digest has the same limited semantic scope; its immutable full-file digest plus index/report binding remains authoritative. Do not rewrite that older report or call its parsed hash lexical-byte proof. |
+
+Historical confirmed, partial, false-alarm and open rows in 109.2 remain;
+none is silently deleted or promoted into source admission. Three bounded
+implementation draft findings were corrected, not defects introduced by
+Claude's record-only commit. Before the proper receipt red run, a fabricated
+test helper used JSON media for text schema responses; that setup error was
+corrected first and is not the material red proof. Concurrent-draft protocol
+repin failures were not final-tree defects. Main also interrupted an overly
+broad focused selection after **322 green in 24.15s** to omit the unnecessary
+connected fixture replay; that interrupted run is not a completed suite.
+
+Main's stable final focused selection: **323 passed in 11.20s** on CPython
+3.13.15 / pytest 9.1.1, empty inherited environment and network denied,
+without skip/warning/error: capture **48**, supplement **137**, binding **45**,
+lane import boundary **9**, ML boundary **11**, active-document **69** and
+four actual-input/manifest refusal cases. Targeted six-file compilation
+and diff check pass. A separate earlier capture run passed 48; the earlier
+counter-review closing active-document run passed 69. No full lane or
+repository suite is executed by Codex. Agents' temporary in-memory mutant
+checks remain separately attributed (binding rounding: two red; supplement
+duplicate, pagination and raw-cash mutants: three, two and one red).
+
+Commit this specification, code and focused regressions before retrieval.
+Actual capture accounting and closing validation will be appended; no
+successful capture, coverage, binding admission or performance is predicted.

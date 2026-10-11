@@ -9,12 +9,17 @@ proceed with section 19.6's fixed synthetic-only QuantConnect evaluation
 (section 25). This is not independent acceptance. Safari authentication and
 existing QC resource preflight cleared (25.3). The owner then authorized
 replacing the blocked ZIP/Base64 carrier with readable packaging (section 26).
-The replacement is prepared and focused-validated offline; native source and
-the invented fixture are unchanged. No source upload or launch occurred.
-An officially permitted execution/complete-source-return route remains required.
-Native LEAN/QC execution and empirical backtest readiness remain unverified/blocked. The
+The readable replacement and wrapper corrections are focused-validated;
+native strategy source and invented fixture are unchanged. On 2026-10-11,
+existing authenticated REST access enabled complete source custody and three
+controlled synthetic compile/run attempts (section 27). All compiled and all
+failed before strategy initialization. The final failure identifies QC's
+one-LF runtime representation of uploaded-empty data/__init__.py. The manual
+attempt ceiling is exhausted, candidate changes/relaunches stopped, and
+post-ceiling Mia interaction is blocked by the locked Mac. No successful
+native integration or empirical backtest readiness is established. The
 original economic, data, empirical, account and trading gates remain closed.**
-Current scope/evidence are sections 17 through 26. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 27. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -3199,3 +3204,114 @@ completion evidence. Mia's visible Completed/disabled Stop state, unchanged
 complete source custody and exact terminal run IDs establish the separate
 handoff checks; a UI edit-control request was made only after completion.
 Actual backtest-node availability is independently checked before launch.
+
+### 27.7 Final attempt, confirmed mismatch and failed-cycle conclusion
+
+Producing diagnostic commit:
+`ac536413af04fc63f0e13c0748199e3994c89320`. Only main.py changed on the
+last restaging; full returned Python source matched the exact 27.6 map before
+compile and run. No source change was made after the final terminal result.
+
+| Attempt | Exact compile / run | Terminal evidence |
+| --- | --- | --- |
+| 3 | Compile `a47107b4e123158bcd7470bb02f41edd-8c8ea8bc3205b36f6a6917195eecfbc4`, signature `8c8ea8bc3205b36f6a6917195eecfbc4`, complete 21-file signature order retained. BuildSuccess with warnings retained. Run `6844954ce1e654b2bbfce4c7f621f99f`. | Runtime Error before initialize, `completed=true`, progress 1, not success. Named runtime file **data/__init__.py**: expected 0 bytes, observed 1, regular=True, symlink=False, SHA256 `01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b`. Server LEAN `v2.5.0.0.18178`. Third unsuccessful terminal attempt. |
+
+An independent local SHA256 of exactly `b"\n"` matches that observed digest
+and length. This establishes the exact one-LF representation of **that one
+runtime file** relative to its uploaded empty source. It does not establish
+which QC component introduced it, the runtime bytes of research/__init__.py,
+or that every other source file is byte-exact. No blanket whitespace/import
+normalization, hash bypass, economic change or unobserved counterpart variant
+was accepted. The exact guard correctly refused the unrecognized representation.
+
+At final launch, one B2-8 node was occupied and the other idle under the
+already-enabled automatic selection. Launch proceeded only with that idle
+capacity; no occupied node allocation was changed and no other job cancelled.
+The instruction to wait if all eligible nodes are busy was retained, but that
+all-busy condition did not occur for any of these three launches.
+
+Final complete API source return again matched all 21 current Python files
+and the unchanged opaque notebook, with **zero cloud edits**. Its raw response
+SHA256 is `aa732abffdb2d893735fd1f4b01500ad7cae07afe08e5eb8c2345dd8a3cc3a9f`;
+the authenticated final terminal run response SHA256 is
+`e55e5c24509c21502da197c262eb051efd424619dbffe28be7cebe9ae415059e`.
+Raw records and saved named sources remain in 27.2's ignored machine-local
+directory; durable project/compile/run IDs and hashes here permit later
+authorized retrieval. Final logs read again returned `length=-1`, `logs=[]`.
+No trace was synthesized to fill the absent output, no shim trace substituted,
+and no native completion dossier/independent review identity fabricated.
+
+After the third failure, direct Mia follow-up was attempted through the same
+authenticated controlled Safari interface. The computer-use tool reported
+**the Mac is locked and automatic unlock could not unlock it**. No security
+bypass, duplicated Mia task, hidden API route or fourth manual launch was used.
+The owner must unlock the Mac for further direct Mia recovery. Earlier Mia
+diagnosis/proposed variants are not a successful recovery run; nothing was
+ported. This is a concrete interface blocker in addition to the exhausted
+three-unsuccessful-attempt ceiling.
+
+| Retained finding | Priority / final disposition | Evidence / next action |
+| --- | --- | --- |
+| GDR-QC27-001 | P2 / accepted-after-correction for local wrapper policy | QC adjacent compiled-artifact tolerance now keeps known counterparts unused and all visible-source/cache guards. Attempt 2 advanced past that check, but not to initialize. Does not imply native integration success. |
+| GDR-QC27-002 | P3 / retained limitation | All three actual jobs report LEAN v2.5.0.0.18178. Moving-master project/version Git metadata is separately observed, not a run-specific immutable Git/CLR/Python binding. |
+| GDR-QC27-003 | P2 / confirmed, open native-integration blocker | Actual data/__init__.py runtime byte is LF, while API source remains empty. Reconcile exact runtime representation with custody only through a separately authorized correction/recovery; do not pretend the remaining runtime files or semantics are proven. |
+| GDR-QC27-004 | P2 / owner-input blocker | Three unsuccessful manual attempts consumed; candidate frozen. Post-ceiling direct Mia is currently inaccessible because the Mac is locked. Owner unlock/direction is required; no budget reset or blind relaunch. |
+
+The scoped evaluation is concluded with a **failed native-integration result**:
+three controlled REST compiles succeeded, three native launches failed before
+strategy initialization, plus two separately observed successful IDE-load
+builds with short IDs only. There are zero completed strategy callbacks,
+native order/account/valuation checkpoints, complete 752-record traces or
+successful native runs. Offline software preparation/tests are distinct from
+this native failure and from still-prohibited empirical research. The engine
+failure provides no real-market results, PIT data, settlement/comparator/
+corporate-action parity, empirical readiness or strategy edge.
+
+### 27.8 Accumulated range, single publication and next review handoff
+
+The exact accumulated range after previous own publication
+`b2bef5faec5d6838ee13d00192fd1c1b993c43cf` comprises:
+
+| Own commit | Scope / current disposition |
+| --- | --- |
+| `691d2ed650f348a37d444133f89c2740e61e50fa` | Historical owner review waiver/access blocker documentation, preserved; not independent acceptance. |
+| `7356e3f73fd0d67cddbd3e4b880a7b76b78543b1` | Historical signed-in Safari/readable-policy blocker documentation, preserved. |
+| `8e974be852867d1b9c2e796f0ec1b5751897895f` | Owner-approved readable packaging and focused regressions; 26.3 verified local corrections. |
+| `4c698f2232027d257bc4a6e5c7e2300af0402a35` | Exact readable packaging checkpoint closure, source unchanged. |
+| `7ddf22f21fc7e8f56ff2e7ce688563247e238fa7` | Unused compiled counterparts and 27.1-27.3 initial native evidence/correction. |
+| `ed747625b6fab117e8e7bcb19923e97e86261a5f` | Separate compiled/source bounds and visible-root regularity; 27.4 pre-retry proof. |
+| `ac536413af04fc63f0e13c0748199e3994c89320` | Bounded diagnostic-only source-refusal metadata and 27.5-27.6 evidence. |
+| This closing documentation commit | Three exact attempts, failed terminal conclusion, retained P0-P3 findings/exclusions/blockers and single-publication/new-monitor handoff; source frozen at 27.6 identities. |
+
+No new Claude commit was consumed in this waived-review evaluation round.
+Historical section-24 review dispositions and all earlier findings remain
+retained, not recycled as fresh acceptance. There are no new P0/P1 findings;
+the P2/P3 ledger above remains explicit for Claude. Claude's next independent
+review must cover **every commit** of this full range and the exact final
+publication snapshot, not just the wrapper patch or a successful compile.
+
+Final focused checks include the ten selected source/guard regressions
+(3.014s), exact reconstruction/all-21 in-memory compilation and complete
+pre/post cloud-source comparisons. Final import-boundary and active-document
+checks, staged diff/status and immutable/shared-path guards must pass before
+the publication. No complete lane/repository suite, SDK/dependency installation
+or further native evaluation is authorized by this closure.
+
+The owner explicitly requested one push when this round concludes, followed
+by a monitor for Claude's review push. Publish this entire failed-result round
+once, non-force, only to the matching remote lane branch after root/branch/
+HEAD/status/remote checks. The closing commit cannot invent its own SHA; retain
+the actual verified publication SHA and remote state in automation memory and
+the re-armed prompt after the push. Do not republish historical baselines.
+
+Next authorized sequence: wait quietly for a pushed descendant with an explicit
+completed-review handoff naming that exact new snapshot; counter-review every
+Claude commit/finding; then one next genuinely authorized bounded milestone
+only if applicable gates permit. The exhausted synthetic cycle is not reset
+by review, a new wrapper hash, or a new milestone label. Further candidate
+changes/relaunches for this evaluation require owner-directed recovery/new
+scope. If the next milestone needs that authority or any closed empirical/
+economic/data gate, pause and request the decision rather than silently
+advancing. Both agents keep lane-only handoffs, the same root/branch, focused
+Codex checks/full independent Claude validation, and one end-of-round push.
+This re-arm is one review-to-next-milestone cycle, not an indefinite loop.

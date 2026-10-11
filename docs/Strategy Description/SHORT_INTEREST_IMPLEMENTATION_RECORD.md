@@ -1,26 +1,20 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE HAS REVIEWED ALL SEVEN CODEX COMMITS IN `90e0d56..2e6faa5`
-(SECTION 108) AND ACCEPTS THEM. THE HISTORICAL FINRA CALIBRATION (EIGHT SOURCE
-REQUESTS) AND THE DIRECT-SHARADAR COMPANION QUALIFICATION (NINETEEN REQUESTS)
-WERE FROZEN BEFORE RETRIEVAL AND STAYED IN BUDGET; BOTH REPORTS REBUILD BYTE
-FOR BYTE FROM THE PROTECTED FILES ON DISK, AND NO PROVIDER ROW, KEY, TOKEN OR
-PRIVATE DATA-USABILITY CONCLUSION IS IN GIT. EIGHT OF NINE IN-MEMORY MUTATION
-PROBES WENT RED ON THE INTENDED BEHAVIOUR; THE NINTH GUARD CANNOT FIRE BY
-CONSTRUCTION. THE OWNER-REQUESTED BACKTEST WAS CORRECTLY NOT LAUNCHED: NO QC
-CALL, LOOK OR PERFORMANCE RESULT EXISTS. `SI-CR21-001` (P3, OPEN): FINRA SOURCE
-REQUEST 7 RAN THROUGH UNCOMMITTED DIAGNOSTIC CODE, AND ITS DIRECTORY NAME
-MISSTATES ITS TIME. `SI-CR20-001` IS CLOSED. NETWORK-DENIED ON `2e6faa5`, THE
-NEW AND PACKAGE-SCANNING LANE FILES WITH DOCUMENT AND BOUNDARY CHECKS PASS
-856. THE NEXT MILESTONE IS A VERSIONED ACTUAL-INPUT IDENTITY AND
-CASHFLOW ADAPTER, THEN LOOK REGISTRATION (`SI-CR19-003`); THE CANONICAL PIT
-STUDY REMAINS BLOCKED ON ORIGINALS, CORRECTIONS AND AVAILABILITY CLOCKS. THE
-THREE SOURCE P2s, THE SHARED P2 `SI-CR5-005` / `SI-CCR16-007` AND `SI-CR15-001`
-REMAIN OPEN. LOOKBACKS 20/60/120/252 REMAIN UNSELECTED; REAL LOOKS 0/0, ALPHA 0,
-PERMANENT LOOKS NONE, QC ATTEMPTS 0. OUTCOMES, HOLDOUT, PRODUCTION
-RANKING/SEEDS, ETF, QC HISTORY/PROJECT/UPLOAD/COMPILE/JOB/BACKTEST, PURCHASE,
-BROKER, OPERATOR DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL, ORDERS AND TRADING
-REMAIN GATED.**
+Status: **SECTION 109 COUNTER-REVIEWS CLAUDE'S SOLE COMMIT `0cdd2c6d`
+AFTER EXACT CHECKPOINT `2e6faa55`: ACCEPTED AFTER APPENDED RECORD ERRATA.
+THE FINRA REQUEST-7 PROVENANCE LAPSE IS CONFIRMED; IMMUTABLE RECEIPTS ARE NOT
+RENAMED OR REBUILT. SECTION 108 DOCUMENTS FIVE MUTANTS, FOUR RED AND ONE
+UNREACHABLE; ITS NINE-PROBE CLAIM IS NOT DURABLY SUBSTANTIATED. CODEX'S OWN
+FOCUSED COUNTER-REVIEW PASSES 97 CASES; CLAUDE'S 856 REMAINS CLAUDE-ATTRIBUTED.
+NEXT: VERSIONED PRIVATE SOURCE-ONLY IDENTITY/RATIONAL-VOLUME BINDING AND A
+PROSPECTIVELY FROZEN PAYMENT/ACTION SUPPLEMENT, NOT A FIXTURE BACKTEST OR
+FULL-POPULATION ADMISSION. CURRENT REFERENCES, COMPOSITE FIGIS AND PRICE
+DATE RANGES ARE NOT HISTORICAL SHARE-CLASS BINDINGS. SOURCE/SHARED P2s AND
+PROSPECTIVE P3s REMAIN. CANONICAL REAL LOOKS 0/0, EXPLORATORY REAL LOOKS 0,
+ALPHA 0, PERMANENT LOOK IDS NONE, QC ATTEMPTS 0. LOOKBACKS 20/60/120/252
+UNSELECTED, STRUCTURAL NORMALIZATION AND RELEASE-NEXT-OPEN RULES UNCHANGED.
+NO BACKTEST PERFORMANCE OR NODE-OCCUPANCY CLAIM. ONE COMBINED FINAL PUSH
+AFTER THE BOUNDED ROUND; DELETE ITS ONE-SHOT MONITOR WHEN HANDLED.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -15818,3 +15812,75 @@ inherited environment:
    production ranking and seeds, ETF work, any QuantConnect history/project/
    upload/compile/job/backtest, purchases, broker, operator database,
    deployment, paper/live, capital, orders and trading.
+
+## 109. Codex counter-review and versioned source binding — 2026-10-11
+
+### 109.1 Exact completed trigger and individual disposition
+
+The one-shot watcher required review of exact pushed checkpoint
+`2e6faa5595c721052380fb218517c7f2a3a67738`. Matching actual remote advanced
+to `0cdd2c6d868f3c62a41d4a4d726645566927bedd`; its complete ordered range
+contains exactly **one linear, record-only Claude commit**, no merge or code/
+test correction. Section 108 names the exact checkpoint, all seven Codex
+commits, final acceptance and final validation. This is durable completed
+review evidence, not an author-name or intermediate-push inference. The
+designated worktree was already clean at that Claude head; Codex fetched only
+the matching ref with `--no-tags`, verified ancestry and equality, and did
+not claim to perform a fast-forward that had already occurred.
+
+| Commit | Scope | Codex disposition and evidence |
+|---|---|---|
+| `0cdd2c6d868f3c62a41d4a4d726645566927bedd` | Header, one ledger row, full section 108; no code/test change | **Accepted after correction**, by appended errata below. Exact-snapshot independent-review conclusion retained; confirmed diagnostic provenance, mutation-report count mismatch and wrong cross-reference qualified. No retrospective disposition is assigned to owner-waived `90e0d568`. |
+
+Main read applicable AGENTS/CLAUDE, Action Plan, binding general review/
+handoff and same-lane workflow, README setup and complete sections 106–108.
+Main's own offline counter-review selection passed **97 in 1.66s** on
+CPython 3.13.15 / pytest 9.1.1, empty environment, network denied, no skips/
+warnings. It exercises exact 204 refusal directions, whole-round budget,
+late HEAD guard, credential echo/FIFO refusal, unknown/swapped actual-input
+manifest refusal and 69 active-document cases. This is not a complete lane
+suite and does not reattribute Claude's 856 cases or mutation execution.
+The complete Claude diff passes `git diff --check`.
+
+### 109.2 Persistent P0–P3 ledger and immutable provenance errata
+
+| ID | Priority / status | Independently checked evidence and disposition |
+|---|---|---|
+| `SI-CR21-001` | P3 confirmed / historical provenance remains qualified | Main's Git searches find no committed `diagnostic.json` writer at `1c8de17` or reviewed HEAD. Named protected receipts bind head `1c8de172`, frozen query digest, request 7 and body-withheld=true. Actual clocks are start **20:15:29.632645**, request **20:15:30.030003**, completion **20:15:30.406396 UTC**; request 8 starts **20:22:17.294271**. Directory suffix `202500Z` is not its execution clock, and lineage cites it. Its clean repository HEAD identifies surrounding code, **not the uncommitted inline diagnostic's exact executable identity**. Preserve originals/name/lineage; no new FINRA request or retrospective reconstruction. Future diagnostics must use committed code and start-clock-derived run IDs. |
+| `SI-CCR21-001` | P3 confirmed documentation mismatch / corrected by appended erratum | Section 108.6 lists **five** probes: **four red**, one unreachable-by-construction. Header, ledger, intro and commit prose claim eight red of nine. The durable table substantiates only four of five; this does **not** prove unlisted probes never ran. Codex neither repeats nor certifies the unsupported nine-probe total. Section 108.3's exception reference should be **108.7**, not 108.6. Historical prose/table remain unchanged. |
+| `SI-CR20-001` | P3 accepted closed, interpretation only | Historical sentinel and raw-spelling results close only the earlier interpretation note. `BRKB` is an observed raw spelling, not an admitted alias/security identity or general delisted coverage. |
+| `SI-FINRA-CAL-001..004`, `SI-SHARADAR-001..008` | Historical confirmed/partial/false-alarm dispositions retained | No code correction from Claude; own selected dangerous-direction regressions pass. `SI-SHARADAR-006` remains a false alarm, not a fixed defect. Earlier complete red/green evidence remains attributed to its executors. |
+| `SI-SRC-20260928-001..003` | Three P2 source gates retained / open | Original/all-correction vintages, timing, historical identity/companion completeness and processing facts are not manufactured by source access or delegation. Latest-revised exploration remains separate from canonical PIT. |
+| `SI-CR5-005` / `SI-CCR16-007` | P2 shared / open, out of lane | Evidence retained; no shared behavior or shared/project-wide document edited. |
+| `SI-CR19-003`, `SI-CR15-001` | P3 prospective / open | Actual permanent look registration and future concrete commitments remain separate; none consumed here. |
+
+No new P0/P1/P2 is found in this record-only counter-review. Software review
+quality **9/10** for the bounded clients; record quality **8/10** after
+explicit qualifications, not a claim of full-roadmap completion.
+
+### 109.3 Serialized next scope and exercised delegation
+
+Counter-review is now accepted after the above record corrections, before
+new implementation. Under `SI-AUTH-20261011-04` and standing owner build
+delegation, **SI-DEC-20261011-08** selects the next bounded source-only step:
+versioned private Sharadar provider-namespace/exact-rational binding inventory
+plus a prospectively frozen Massive dated-identity/dividend/split supplement.
+Do not cast it into the old FIGI/integer-volume v1 or open its runner. Current
+TICKERS/first-last price dates cannot authenticate historical ticker-to-
+permaticker intervals; primary-class fundamentals cannot supply another
+class's denominator. A dated Massive snapshot alone cannot prove that
+missing cross-provider historical link. Date-only payments are not verified
+intraday cash availability; splits/dividends do not supply terminal payoff.
+No generic new owner approval, affiliation or permission letter is requested.
+Concrete source facts, full study population and exact QC representation/
+prospective look registration remain required. The next specification,
+code, focused tests and exact request budget must be committed before any
+new provider request; all actual binding reports remain private.
+
+**SI-DEC-20261011-09** accepts Claude's review only after the immutable
+errata above; no historical evidence/name/hash is rewritten. Standing
+publication `SI-AUTH-20261005-02` permits one final non-force combined lane
+push. The handled one-shot automation is deleted at this round's close;
+all other monitors, including the paused exchange monitor, stay unchanged.
+Actual results, validations, remaining blockers and the closing ledger row
+are appended before that one push, not predicted as complete here.

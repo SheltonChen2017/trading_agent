@@ -14,7 +14,9 @@ RETAINED IN SECTION74.3 AND REQUIRE SUCCESSORS BEFORE A NEW QUALIFIED RUN.
 THE OWNER REQUESTED 2021-NOW WITH THE SAME MARKET-CAP-SELECTION /
 TPR-WEIGHT-TILT STRATEGY AND AUTHORIZED CONSUMING THE PREVIOUSLY PROTECTED
 SEPTEMBER-OCTOBER 2026 DATES AS EXPLORATORY. TARGET ENDPOINT: OCTOBER9,2026.
-NO EXTENDED STUDY, PROVIDER CAPTURE, QC ATTEMPT OR NEW LOOK HAS EXECUTED.
+THE FRESH SOURCE AVAILABILITY PROBE COMPLETED SEVEN HTTP200 SAMPLES;
+NO EXTENDED PERFORMANCE STUDY, FULL SOURCE CAPTURE, QC ATTEMPT OR NEW LOOK
+HAS EXECUTED. SOURCE SAMPLING IS NOT HISTORICAL COMPLETENESS OR PIT PROOF.
 THE OWNER NOW EXPLICITLY AUTHORIZES A FRESH ON/OFF STUDY ALLOWANCE OF AT MOST
 THREE QC ATTEMPTS PER ARM IN SECTION75. THE ORIGINAL ON3/OFF1 COUNTS AND
 SIXTEEN OBSERVED LOOKS REMAIN PERMANENT; THIS IS NOT AN IMPLICIT RESET.
@@ -14153,3 +14155,148 @@ probe leaf is absent after quarantine. No new provider sample/QC attempt/
 outcome exists at this pre-operation commit; actual results follow here.
 No intermediate push is made; this registration and the final durable handoff
 remain one round with exactly one final matching-lane publication.
+
+### 75.6 First actual fresh source operation and full-capture registration
+
+First legitimate producer execution is the committed CLI in local snapshot
+`e6619ea9bfaa0236b6abfada9a2800d8b0796ef0`, with the exact75.5 clocks/owner
+hash. The actual matching remote remained5cd1a7be; no intermediate push.
+`TPR-EXT26-SOURCE-PROBE-20261010-001` completes **7 of7 HTTP200 samples**,
+7 source rows and6,870response bytes,8exclusive spent claims and20private
+receipts/preparations/reports. No outcome read, development look or QC attempt.
+All seven windows have valid string-native event/firm IDs, aware touch clocks
+inside issue/fetch bounds and USD. Six first samples have positive nominal
+target pairs/revision actions; the2026 first sample does not. That single
+non-revision is not full-year missingness or entitlement denial. All seven
+show a next page, which the sample operation does not follow. Original sampled
+wire is hashed but not retained; closed count projections are retained.
+
+| Actual receipt | SHA-256 |
+|---|---|
+| Exact source probe plan(2576bytes) | `89016988b6a6671ed239b61f986838bd2601966874449009c393fc197a7e5c31` |
+| Driver preparation(1539bytes) | `404fcffecca3e86252dd8c05bc7cb3ae52560d6d36539137903eb8c28cd5fbe5` |
+| Closed aggregate(4308bytes) | `8fc3b1d2264ed8feb6e63e1e6f1e603abcffc2a9ff8757155639791ad48111a0` |
+| Terminal COMPLETED(393bytes) | `6c52073775f3ee370ee816e4718e02ffb838c7c4fa82a9cf46bbf96bfa8e62ed` |
+
+The exact closed count-only aggregate is published as
+`research/target_price_revisions_qc/extended_source_probe_aggregate.json`;
+no native identifier, target value, licensed row, credential or error body is
+published. Sample success establishes observed endpoint/window access only;
+full history, historical availability, like-for-like targets and contractual
+rights remain unproved. The probe scope is spent and will never be reused.
+
+`TPR-EXT26-D015` — agent-delegated necessary full-source operation, pending
+independent review, not an additional human/provider approval. Prospectively
+freeze `TPR-EXT26-SOURCE-CAPTURE-20261010-001` in
+`research/target_price_revisions_qc/extended_source_capture_freeze.json`, SHA
+`24031752f00aafca0fbbba72d3af581c4624e0dbf308acaf372eaddad7993b5b`
+at initial draft; before any full capture this unexecuted draft is superseded
+by `23beda591abf29af63e0bad1fad4b94f7e8f49e6d64ca4d36d4c85b8ded87a2d`
+solely to make the signal action-window interpretation below explicit.
+Seventy-four monthly Massive windows cover September2020through October9,2026:
+limit1000/date.asc,64pages/month,2048pages/2,048,000rows overall,2MiB/page.
+Fresh same-host Sharadar CSV TICKERS uses64pages/640,000rows/256MiB;
+ACTIONS uses128pages/1,280,000rows/512MiB, `to=2026-10-09`, no lower date bound,
+to retain pre-warm-up share/identity actions in the audit census. Each Sharadar page
+is10,000rows/4MiB with explicit fields/stable sort/offset. Combined maximum
+2240GETs,4GiB original response bytes,90minutes,30seconds/request, zero retries
+or redirects. Bounded pagination must terminate; hitting a limit is incomplete,
+not a zero signal or silently extended scope. Source/code/helper/currentHEAD,
+calendar/freeze/sample evidence bind before new access/request claims and
+credentials. All source rows/wire chunks remain private; source processing
+cannot join outcomes or read D0/old captures. Alternatives were blind bulk
+history, a redirected ZIP or resetting annual action state; none is chosen.
+This separate capture has not executed when this registration is written.
+
+`TPR-EXT26-D016` — agent-delegated output-transport boundary, prospectively
+registered before any QC launch. QuantConnect's official
+[Get Object Store File documentation](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/object-store-management/get-object-store-file)
+restricts `/object/get` downloads to Institution organizations with derivative
+export permission and derived data. No such account permission is asserted;
+the owner's waiver is not provider attestation. Do not bypass a restriction
+through a signed URL, browser, Research session or custom network exfiltration.
+Instead use the existing permitted native own-backtest results/charts and
+exhaustive order APIs, plus a compact non-row `EXT26_SUMMARY`(at most24KiB) and
+private-evidence index pointer(8KiB) within the native100KiB log budget. Full
+member/cap/input/accounting journals remain private in cloud Object Store;
+their independent export/retrieval is **not attested**. No licensed rows go to
+logs/Git and no subscription or quota change is made. A meaningful actual-order
+paired run can be reported with these transparent audit limitations; API
+status, self-flags or unretrieved chunk hashes cannot close full source/audit,
+canonical readiness or alpha acceptance. If permitted native NAV/orders/costs
+or coverage/index summaries are unusable, the run stays failed/diagnostic.
+Exact controller/runtime limits and schemas must be committed before launch.
+
+`TPR-EXT26-D017` — agent-delegated same-strategy input-window interpretation,
+pending independent review, fixed **before full capture/processing/outcomes**.
+The original raw source operation supplied ACTIONS only from its declared
+warm-up start(August2024). The unchanged normalizer cumulatively excludes
+non-dividend/non-SIC actions supplied through each cutoff. Applying newly
+captured lifetime ACTIONS instead would introduce an unbounded historical
+signal rule; for example ancient `listed` actions would exclude already-listed
+stocks forever even when outside the old source window. To preserve the
+bounded-source strategy, extended signal actions begin at the already-frozen
+September1,2020 warm-up and persist cumulatively thereafter across every
+year/shard. Earlier captured rows remain retained/audit-only, never silently
+deleted or treated as nonexistent. All actual native order corporate actions,
+split-basis evidence and NAV accounting remain separate and mandatory; this
+does not make nominal target pairs like-for-like or historical identities PIT.
+Alternatives: lifetime signal exclusions or annual/horizon resets. Neither is
+chosen, and there is no outcome-based exception or later tuning. This explains
+why an extended-window score can differ from the historical Q1-only study:
+actions inside the longer frozen window cannot be forgotten at a year boundary.
+
+`extended_signal.py` is a named pure successor using the immutable normalizer's
+reason precedence, type-tagged native event/firm IDs, global duplicate/conflict
+groups, full-snapshot identity collisions before relevant-ticker filtering,
+second-open eligibility, censored source touch clocks, cumulative window actions
+and exact48digit firm/eligible-session median-decay/sum then firm median.
+It emits all301 complete identity-state frames; unavailable inputs are null
+with reasons, never measured zero. The first synthetic test invocation had
+1failed/7passed because its fixture incorrectly assumed December30's second
+open was eligible at the December31 cutoff. The fixture now uses December29;
+production timing was not weakened. Its eight controls initially pass in0.35s;
+the expanded independent-oracle test compares all301 cutoffs with the original
+normalizer and independently uses standard-library medians, rather than calling
+the tested median helper. Actual source preparation has not yet executed.
+
+### 75.7 Committed full-source producer before actual capture
+
+Main Codex independently read the complete released capture, driver and test
+sources before registering them. Production has no injected transport/resolver,
+alternate root or resume: exact physical/Git lane, committed eleven-file closure,
+fixed public hashes and clocks bind before the fresh leaf and global/per-request
+exclusive claims. Missing values and duplicate/conflicting rows remain visible;
+the source census retains all76 scopes even after an early failure. Same-host
+cursor reconstruction restores the complete frozen date/limit/sort query and
+refuses credential-bearing or cross-host URLs. Original safe wire and native
+projection hashes stay private. No capture success implies PIT, rights, complete
+target basis or canonical admission. Previous probe and D0 scopes remain spent.
+
+| Registered source | SHA-256 |
+|---|---|
+| `extended_source_capture.py`(41840bytes) | `f96223c7e68be68955ef9163a7cdbf3815447484675313316dd193d3d85868cf` |
+| `extended_source_capture_driver.py`(11281bytes) | `bda359280ae55219aeb6663eab502b2b2a096f66a617c7d349ffa08e8c0591ab` |
+| Capture controls(32705bytes) | `fddd306cc3c431f51e1717690a769bb0c93923ce44567d1d23446751d6b5304e` |
+| Pure global signal successor(13501bytes) | `8ef7719cde29fa368a1dd33e308e269d03e5023f65c9b1baf87378872c147677` |
+| Pure signal controls(7071bytes) | `1d793d3d0caaa2b829f06eb8cbb59361b1ed729e1758a6faf66a3dcfa791f18f` |
+
+Root reproduced the isolated49/52 focused capture/signal/registration union:
+**123passed/2.09s**, Python3.13.15/pytest9.1.1 on macOS, no complete suite,
+operator stop-state/database, provider or QC reads. Separate restored pure
+in-memory action-reset mutation produces1expected failure on cumulative action
+state; original8controls then pass1.45s through the isolated runner. The pure
+mutation itself imported no dispatch/configuration/operator module and performed
+no provider/private operation. Source-agent attributed omitted-access-claim and
+unsafe-pagination mutations each failed, original110controls green; those
+attributed results are not relabeled root reproduction. Root independently
+checks all1534 warm-up/valuation sessions against both existing XNYS/NYSE
+libraries: exact session/open parity and every local open09:30, justifying the
+pure scorer's frozen open axis. No Windows signer/ACL/parent custody is proved.
+
+First full-capture CLI will invoke the committed
+`research.target_price_revisions_qc.extended_source_capture_driver` with the
+75.5 owner-text digest and explicit current UTC creation/expiry, under the fixed
+75.6 capture scope. At this pre-operation registration **no full source capture,
+private source preparation, extended QC launch or new outcome/look exists**.
+This is a local commit only; exactly one final matching-lane push remains.

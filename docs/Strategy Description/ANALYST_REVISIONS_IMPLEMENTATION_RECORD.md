@@ -1365,7 +1365,13 @@ review workflow resumes after this one-round exception. Section 278's sole
 assessment has now refused before source contents on a changed device-ID pin;
 its identity is spent. The concrete next requirement is an explicit changed-
 identity disposition and supported prospective contract, not another review
-acknowledgement or a retry. No automatic pin refresh follows. The owner previously said
+acknowledgement or a retry. Section 279 records the owner's explicit acceptance
+of device ID `16777231` as a prospective baseline, conditional on retaining
+and revalidating every other security/source check. Claude reviews section 279
+and its separately versioned v3 contract before the new one-use assessment;
+the section-278 review waiver has ended. No actual v3 preflight, assessment,
+production publication or R284 action is authorized by this implementation
+handoff. No automatic pin refresh follows. The owner previously said
 "proceed" after the open-session concern was explained. Section 272 supersedes
 the session-exit prerequisite, without authorizing any process interruption.
 The physical move and audit are now recorded in 272.4: all bytes and other
@@ -3254,6 +3260,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-10 | Claude independent review of section 275: the diagnostic hardening and the metadata policy candidate | `e3db4ebc` -> this record commit | Section 276: two Codex commits `557411a6..e3db4ebc` disposed (2 accepted, 0 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells; census, assessment, R272 probe and Codex's observation parser not run | No code changed by Claude. Nine pins reproduce; the 275.4 fingerprints and directory identity reproduce on a second read-only read; 19 in-memory guard removals each fail a test; accepted `ARV2CR275-001` to `-003`; `ARV2R276-001` documented; section 4 names section 276, banner sentence added, this row appended | Complete lane selection at `e3db4ebc` with every remote address refused (strict sandbox for the six groups, three parallel streams, temporary directories inside the root's ignored `.pytest_cache`; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 276.6 | 0 P0, 0 P1, 0 P2, 1 P3 | Single push of this round's Claude commit; Codex counter-reviews section 276 unless the owner changes the workflow |
 | 2026-10-10 | Codex counter-review, exact owner metadata acceptance and prospective v2 assessment | `50dcf08e` -> section-277 source/protocol freeze and final result/record snapshot | Sole Claude record commit accepted after documentary qualifications; exact 275.4 baseline accepted by the human; no source/QC event | Object-bound four-fingerprint observer, complete-scope preflight, new one-use directory claim and guarded assessment; original implementations unchanged | Focused strict-denied tests/mutations and one bounded metadata-only preflight under 277-D3; details and pins in section 277; no full Codex suite | Historical preservation audit remains failed; new contract requires independent review before its one assessment; production and formal gates open; 313/239/49/699 unchanged | Exactly one final matching-lane push; Claude reviews section 277 and exact snapshot; no actual assessment/probe/R284 this round; monitor paused |
 | 2026-10-10 | Owner-waived pre-run review and frozen one-shot v2 assessment | `425c2ead` -> section-278 authority freeze and final result/record snapshot | Exact human waiver applies only this round; no new Claude commit exists and no independent-review acceptance is asserted | Preserve section-277 code/profile/security pins; one exclusive assessment identity, strict denial and separate bounded report authentication; no retry | Relevant focused checks and actual result recorded in section 278; no full Codex suite | Production publication, R284 and formal gates remain separate; monitor paused | Exactly one final matching-lane push; restore normal independent review at handoff, no intermediate push |
+| 2026-10-11 | Codex owner-accepted prospective device baseline and v3 contract | `736709f7` -> section-279 implementation freeze and final handoff snapshot | Exact human acceptance of prospective device 16777231 only, retaining all other security/source checks; no new Claude commit | One-way fixed-scope historical-device projection, separate policy/wrapper and new one-use identity; v1/v2 and original artifacts unchanged | Focused synthetic strict-network-denied checks and source/profile freeze in section 279; no full suite or actual observation | Spent R277 refusal preserved; no historical continuity or production readiness inferred; 313/239/49/699 unchanged | One final matching-lane push; Claude reviews section 279 before separately recorded run decision; monitor paused |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -41549,3 +41556,226 @@ subset of the **235 distinct** focused passes, not 321 distinct tests.
 277.5 pins, and the final matching-only fetch still resolves the remote to
 the original `425c2ead` baseline. No unexpected concurrent Git or tracked-file
 changes were observed.
+
+## 279. Owner-accepted prospective device baseline and separate v3 assessment contract, 2026-10-10
+
+### 279.1 Exact human decision and starting state
+
+The owner replied **"yes accepted"** to this exact question following the
+section-278 refusal: **"Do you accept `16777231` as a prospective baseline for
+a separately frozen attempt, conditional on retaining and revalidating every
+other security and source check?"** This accepts only the declared new device
+ID for that bounded assessment. It is not an instruction to ignore `dev`,
+accept either device, learn a current baseline, change any other pin, or
+certify historical volume identity/security continuity. The nine remaining
+vintage metadata fields and all four opaque attribute length/hash pairs
+remain exactly the previously accepted 275.4/277.1 pins.
+
+At entry, root/branch/HEAD/status and the matching-only remote fetch found
+clean local/remote `736709f7d12d6a10437db0dca271660f47bcefc6` on
+`codex/strategy-analyst-revisions-v2`, solely at
+`/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2`. No new Claude
+commit exists to counter-review. The section-277 implementation and
+section-278 owner-waived invocation are not independently reviewed. The
+section-278 exception was explicitly one round and has ended; this new
+baseline acceptance does not renew it. The heading uses the owner's October
+10 local date; work is October 11 UTC and the push ledger uses that UTC date.
+The monitor remains paused. No other worktree, branch, session or host setting
+is changed.
+
+### 279.2 Prospective contract and bounded implementation decisions
+
+**279-D1 — separately version the accepted device baseline.** Preserve the
+v1/v2 observers and assessments, original relocation audit/publisher and
+shared source identity helper byte-for-byte. Add only a v3 observer and v3
+assessment wrapper with synthetic tests. The v3 vintage identity changes
+exactly `dev=16777232` to **`dev=16777231`**; the fixed absolute path, inode,
+mode, UID, GID, links, size, both times, flags, empty accessible ACL, exact four
+names and exact opaque lengths/hashes stay required. Other scoped objects
+retain the original provenance-only observer and its ACL/metadata guards.
+Every scoped held object must now use exact integer device `16777231`;
+neither the former device nor a third value is acceptable. This is an explicit
+prospective equality, not a device-field omission or proof of cause.
+
+**279-D2 — authenticate history, then construct an exact one-field projection.**
+The untouched original parser must still authenticate both historical report
+byte pins and preserve `after.matches_before=false`. The original scope
+checks still require the same fifteen source-file paths, unchanged historical
+bytes and all original metadata constraints. The successor requires that
+complete fixed key set and that each original row's `dev` is exact integer
+`16777232`. It constructs new rows changing only `dev` to `16777231`; original
+reports/rows are not mutated. Full projected metadata, not normalized current
+observations, is compared before opening and around consumption. Every other
+field, source SHA-256, original manifest pin and fresh source-loader check
+remains binding. The profile/report explicitly identify this limited
+projection and deny historical device continuity. This addresses the
+historical-row comparison as well as the vintage observer; changing just the
+observer pin would leave the independently identified refusal unresolved.
+
+**279-D3 — freeze one new identity, do not replay a spent attempt.** The v3
+assessment names only
+`artifacts/analyst_revisions_v2/relocation_trial/R279-20261010-A` beneath the
+operative root. The new identity is justified by the explicit changed-device
+decision and versioned contract, not by renaming the unchanged failed v2 run.
+R277 and R273 remain spent; their reports and the failed R272 preservation
+audit remain untouched. Retain the exclusive private directory claim/fsync
+before source reads, complete-scope 12-directory/15-file names census before
+attribute values, full held/named endpoint/security/byte checks around fresh
+loaders, strict late pending-file publication and final exact inventory.
+Require the accepted device for the new output allocation too. Failure or
+interruption retains the spent identity; no cleanup, retries or automatic pin
+refresh. The 15-second preflight and 60-second total cooperative budgets remain
+qualified, not hard native-call interruption guarantees.
+
+**279-D4 — implementation only this round.** Do not invoke actual v3
+`--preflight-only` or `--assess`, reread original artifacts/source/attributes,
+repeat the stat-only comparison, allocate the real successor directory, run
+the retained synthetic publication probe, or prepare/launch R284. Tests use
+synthetic private objects with native observations substituted and real-artifact
+tripwires. All pytest, mutation and private parser processes use strict
+`(version 1)(allow default)(deny network*)` with every temporary/cache/log/plugin
+path inside the operative root. Codex runs focused checks only. Static source
+hashes and profile computation do not constitute a real observation or run.
+
+After independent review of the exact new contract and Codex counter-review,
+freeze a separate exact one-shot run decision before invoking it. The owner
+need not repeat the same baseline approval; changed metadata/security evidence
+would instead require its own disposition. No supplied profile pin can prove
+review or authority, and no same-round advisory agent is independent review.
+One future assessment must still exit successfully and retain an externally
+authenticated report with correct final inventory; a `complete=true` report
+alone is insufficient. The external reader must bind the v3 schema/profile,
+exact projection/policy/history pins and false flags in addition to the
+278-D2 no-follow/held/named/bounded/canonical-JSON authentication requirements.
+
+### 279.3 Validation and freeze
+
+Main-agent focused validation on Python **3.13.15** in the designated root,
+with strict network denial and fresh in-root TMPDIR/bytecode prefix/pytest
+basetemp: **662 passed in 4.55 s**, no failures/skips/warnings. These are
+125 v3 policy + 123 v3 wrapper + 91 v2 policy + 58 v2 wrapper + 56 v1 policy
++ 77 v1 assessment + 45 audit/publisher + 86 record/document + 1 import-closure
+checks. No complete lane or repository suite ran. The earlier standalone
+record check (86 passed in 1.61 s) overlaps this count. Four new source/test
+files also compiled in memory without invoking an entrypoint. Diff whitespace
+checks pass. No actual assessment result exists for this contract.
+
+The new tests directly exercise exact fifteen-path projection, strict device
+types and direction, deep-copy/no-history-mutation semantics, original versus
+projected row digests, all nine non-device fields before consumption, every
+projected field at pre-open, pre/post metadata/security/hash refusals,
+wrong-device rejection before names/values, output parent/allocation device
+checks, spent failures and the complete `_assess` wiring. Historical byte
+mismatch, current source hash mismatch and synthetic manifest-loader refusal
+still leave a spent refusal. The previous v2 observer/consumer still refuse
+the newly accepted prospective identity; no historical behavior is changed.
+
+The v3 wrapper's four finally-restored, in-memory code-object omissions were
+detected: historical-device guard (4 failures/5 safety passes), deep-copy
+isolation (1 failure), prospective device guard (8 failures), and non-device
+pre-open equality (9 failures). Its canonical real-artifact opener tripwire
+remained active, and no real artifact/native observation occurred. Delegated
+positive runs (policy 271 = 124 v3 + 91 v2 + 56 v1 in 1.07 s before the final
+tripwire regression; wrapper 123 in 1.57 s, earlier 58/119 subsets) overlap the
+main result and are not added. Mutant failures are sensitivity evidence, not
+passing test identities or independent review.
+
+The frozen v3 profile is
+**`eb218425e88f4d663c67d17bc211a1a0763a75c0e459884176e5186c42e54c94`**
+(the unchanged canonical JSON serializer). It binds schema
+`arv2-relocated-source-fresh-use-v3`, preflight schema
+`arv2-relocated-source-prefreeze-v3`, policy
+`arv2-relocated-source-security-v3`, the exact one-way projection, root/output,
+original source/report/manifest pins, protocols, budgets and restrictive
+flags. This is mechanical declared-contract identity, not review or run
+authority. A final existence/symlink-only check found the real
+`R279-20261010-A` path absent; no directory was allocated.
+
+| Frozen file | SHA-256 |
+|---|---|
+| `scripts/arv2_relocation_security_v3.py` | `50137dc3446cb085e05ed50c3492c4b0a5ed122cd1ebbb3843acbb2838ccfb13` |
+| `scripts/assess_arv2_relocated_sources_v3.py` | `167bb650f0b4114e85d04c7af5e590608124604160996b1cd5e8f072efee2d01` |
+| `tests/analyst_revisions_v2/test_relocation_security_v3.py` | `0c32a0bd2c891b073b87a1f8f83f95ed284346f87735ef68e4cd8f965b0a643c` |
+| `tests/analyst_revisions_v2/test_relocated_source_assessment_v3.py` | `d80fb94661d002169b990981c41a45c00c7dbfbbbe634aabc4affdf8ce4183ff` |
+| Unchanged `scripts/arv2_relocation_security.py` | `3435bc07573697d682f25ea15fd2bfd10c5baf8220c184f73ae877016bae4a30` |
+| Unchanged `scripts/arv2_relocation_security_v2.py` | `b107410afd39f67a4155c20925097374a00b5ac31018907ebb0444fb6c5022c7` |
+| Unchanged `scripts/assess_arv2_relocated_sources.py` | `85d853a103f47959506cad84e087819f9cc41c3fb57de53c9e121609596c9e5e` |
+| Unchanged `scripts/assess_arv2_relocated_sources_v2.py` | `8b75a55e7a2dd7e224260e14e3a4c050fb466e73b2ef3b09b14b2550340af224` |
+| Unchanged `scripts/audit_arv2_relocation.py` | `6e411fca07ca4a2904a1de9337876fcac560cf38cbaf9f3501b00a57c8d117a3` |
+| Unchanged `scripts/capture_arv2_sharadar.py` | `17e516b4cc721c7f97c4690f54dfcc9d2d11d8cebd413100f2e2ffa68e663ca2` |
+
+**Validation deviation, retained rather than erased by a later green run.**
+A same-round policy mutation harness initially cloned functions with detached
+globals. The test's per-module synthetic audit/exception substitutions did
+not bind those cloned globals correctly. The invalid trials invoked the
+canonical component-wise opener for the real fixed vintage directory before
+the synthetic descriptor-metadata lookup refused. The selected case matrix
+implies 22 initial opener invocations, **not** a measured successful-open or
+syscall count; no such trace was retained. The real opener/finally paths close
+descriptors. No source-file/content read, native xattr-name/value or ACL
+observation, output allocation or real assessment occurred. Remote network
+denial remained active. This was an unintended departure from the synthetic-
+only validation plan, not new diagnostic authority or baseline evidence.
+
+The detached harness's **16/16/4 failing-case totals are invalid sensitivity
+evidence and excluded**. The corrected harness executed in the actual module
+globals with finally-safe restoration. Its device-guard omission was detected
+by 16 intended failures; omitting held-device strict typing caused 2 intended
+failures/14 safety passes, and omitting named-device strict typing caused
+1 intended failure/3 safety passes. No on-disk implementation was mutated.
+The new policy test file now has an autouse canonical-artifact-opener tripwire,
+in addition to the per-test synthetic substitute, plus a direct regression
+that proves the tripwire refuses before opening. The final focused run uses
+that protection. Same-round delegated testing/advice is not independent review.
+
+| ID | Priority | Status, evidence and reason for correction | Correction and verification |
+|---|---|---|---|
+| `ARV2I279-001` | P3 | Corrected test-isolation defect: detached mutation globals bypassed the intended synthetic audit substitute, reaching a retained-directory opener and making the initial mutant results invalid. Synthetic-only validation must not accidentally inspect retained evidence. No source or native-security data was consumed. | Exclude invalid evidence; finally-restore actual module globals for valid mutants; guard the canonical retained-artifact opener with an autouse tripwire and direct pre-open refusal regression. Final 662-pass selection includes that regression. No production guard or historical artifact changed. |
+
+### 279.4 Remaining gates and review handoff
+
+The owner's acceptance resolves the **human baseline-choice** portion of
+`ARV2E278-001` only. Revalidation has not run; there is no claim that the new
+contract passes on the actual source tree. The event/actor/cause of the changed
+device ID remains unknown. Endpoint equality never proves uninterrupted
+stability, historical access state or that opaque grants are harmless.
+The original preservation audit is still failed and no source truth/PIT
+admission is obtained from a prospective filesystem contract.
+
+`ARV2E263-001` (safe production publication) remains open. Failed continuity
+A/B directories stay preserved; R284 remains unprepared and unlaunched.
+Independent immutable vendor-origin as-of/version/correction/deletion
+completeness, reviewed security master and QC/permanent-share-class/own-ETF/
+vendor identities and intervals, scores and cutoff-valid RAW prior-close
+prices remain missing formal gates. Stock-first seven-role completeness and
+terminal payoff, frozen dates/estimands/power/epoch, independent dossier and
+deployment gates are unchanged. All readiness/action flags remain false;
+**313 shared / 239 development / 49 infrastructure / 699 cells** remains the
+booked floor. No provider, QC, broker, paper/live or order action belongs to
+this round. Research access is not formal admission or new paid rights.
+
+Technical implementation result: v3 binds one explicitly accepted current
+device to the fixed assessment scope and constructs full prospective source
+metadata by a single-field projection of authenticated historical rows. It
+preserves all other security/byte/manifest and spent-attempt checks. This is a
+tested implementation candidate, not completed source reauthentication,
+historical preservation acceptance or production-readiness clearance.
+
+Plain-language result: the new tool can recognize only the device ID you
+accepted, while still rejecting changes to everything else it checks. It does
+not rewrite the old evidence or retry the failed attempt. The new contract
+still needs review before its one real assessment; R284 cannot run yet.
+
+Claude reviews section 279 and its exact pushed implementation range from
+`736709f7d12d6a10437db0dca271660f47bcefc6` through the final handoff commit,
+along with the still-unreviewed section-277 contract and section-278 execution.
+Review each commit, the exact one-way projection and unchanged security/source
+checks, synthetic sensitivity, immutable predecessor pins, attempt/report
+semantics and exclusions. Use the designated root/exact snapshot and strict
+remote-network denial; any necessary local-server loopback is separate.
+Review is not permission to invoke the actual diagnostic. Codex counter-reviews
+every subsequent Claude commit before the separately recorded run decision.
+There is no new Claude commit in this round to dispose and no independent
+acceptance is asserted. Exactly one final matching-lane push follows the
+implementation and durable handoff; no intermediate push, external chat
+message or new Claude session is authorized. The monitor stays paused.

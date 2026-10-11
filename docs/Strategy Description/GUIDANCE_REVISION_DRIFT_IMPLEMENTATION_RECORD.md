@@ -6,8 +6,11 @@ NE-1..NE-10, are implemented as a new exact-source review candidate.
 On 2026-10-10 the owner explicitly waived this round's fresh Claude review
 and consequent counter-review for the exact published snapshot, solely to
 proceed with section 19.6's fixed synthetic-only QuantConnect evaluation
-(section 25). This is not independent acceptance. Existing QC authentication
-and logging-resource clearance currently block upload/run.
+(section 25). This is not independent acceptance. Safari authentication and
+existing QC resource preflight cleared (25.3), but current QC code-packaging
+requirements block the ZIP/Base64 carrier (25.4). No source upload or launch
+occurred; a compliant readable-source candidate and permitted interface are
+required before proceeding.
 Native LEAN/QC execution and empirical backtest readiness remain unverified/blocked. The
 original economic, data, empirical, account and trading gates remain closed.**
 Current scope/evidence are sections 17 through 25. Sections 2 through 6 preserve
@@ -2625,3 +2628,123 @@ The focused lane active-document/draft-source consistency check passed
 (1 test, 0.41s, network denied); the full source SHA above was re-measured and
 unchanged. `git diff --check` passed. Only this lane record changed in Git;
 all project-wide documents and implementation bytes were preserved.
+
+### 25.3 Signed-in Safari preflight and exact package preparation
+
+The owner then directly reported **"qc is signed in using safari"**. Safari's
+QC UI confirmed the existing authenticated session. A separate account/
+organization preflight tab was opened without changing an existing project's
+source or requesting credentials. The current organization Home identifies
+its plan as **Researcher**, and Resources explicitly states **100 KB per
+backtest**. It displayed **0 KB / 3 MB** daily log use/capacity, while Home
+reported 3 MB remaining. Two existing B2-8 backtest nodes were idle, as was an
+existing A1-1 assistant node. No node, subscription, billing, credential,
+provider entitlement or account setting was changed. The transient Free label
+during initial page loading was not used as the final tier observation.
+
+Current official QC Files, Backtesting Deployment, LEAN Engine Versions and
+Package Environments documentation was read before platform preparation.
+Existing 100KB capacity clears the retained 17,110-byte shim output budget;
+actual native metadata/output length still must be measured, not presumed.
+Full-trace reconstruction remains required; truncated or summary-only logs
+cannot establish complete synthetic evidence. No alternate storage route or
+quota bypass was introduced.
+
+A new default project shell was created solely for this fixed evaluation:
+**project ID `37647834`**, platform-assigned name **Determined Green kitten**,
+URL `https://www.quantconnect.com/project/37647834`. No backtest was requested,
+no template data was run, and no compile/run ID or terminal result was observed.
+The shell's default source has not been substituted for the fixed candidate.
+Existing projects/results were not opened for outcome analysis or modified.
+
+The native entrypoint and complete carrier template were inspected before
+upload: one invented SYN-GDR custom-data stream, exact sidecar byte enforcement,
+real-data/live refusal, no real symbol/provider route, explicit native orders
+and immediate-native-cash reconciliation. The existing builder produced and
+verified the exact 14 Python carrier files; all 14 compiled in memory without
+an SDK or engine run. Full source, native bundle, project map, fixture and
+candidate hashes still match 24.6. Generated artifact bytes were saved in a
+new machine-local ignored directory, not as source edits or a new release:
+
+`artifacts/guidance_revision_drift/qc/GDR-base372-approved-20261008/candidate-b2bef5fa-nrvp0ip2/`.
+
+Its `project/` contains exactly the 14 fixed Python files, re-read and verified
+byte-for-byte against the detached generated map. The upload-only wrapper
+`gdr-b2bef5fa-python-project.zip` contains only those 14 files, is **380,378
+bytes**, SHA-256
+`25cc5dc62e6ab845783210104ac4a56f1a8f7a9eb333fa79b53395a55a7daf58`.
+The adjacent manifest is local preparation metadata, not authorization, and
+is not part of that upload wrapper. Immutable candidate permissions, carrier
+false certification fields and static launch-preflight refusals stay unchanged;
+external owner authority is only 19.6 and 25.1.
+
+Actual evaluation ledger remains **0 carrier uploads / 0 launches / 0
+unsuccessful terminal attempts**, with the same retained cycle/genesis in
+25.2. Project creation is recorded separately and does not spend a failed
+launch. Before a launch, the complete cloud source must be retrieved/compared
+with the exact local carrier, and the pending attempt must be recorded durably.
+During preparation Safari focus repeatedly moved away from this scoped QC
+project. The owner was asked to leave it available for the upload/run or handle
+the upload in Mia; no unrelated tab was used as source or evaluation evidence.
+No credential/session copying or new connector installation was attempted.
+Monitor remains PAUSED; no Git push or real-data run occurred.
+
+### 25.4 Current platform-compliance blocker, before any upload/launch
+
+While checking the supported file-upload/source-return route, the current
+official [QC Security and IP](https://www.quantconnect.com/docs/v2/cloud-platform/security-and-ip)
+Code Encryption section was inspected. Below Institution tier it disallows
+self-obfuscated, encoded or packed source; its AI Agent Rules additionally
+disallow ZIP/Base64 methods for obscuring code/files, indirect source-file
+transport and rerouting flagged code. They require named user-owned source
+to be obtained through a permitted interface and uncertain compliance to stop.
+The [QC Terms](https://www.quantconnect.com/terms), version 1.5 dated
+2026-10-08, also restrict automated access to officially provided interfaces
+and prohibit Platform Data extraction. These are current platform constraints,
+not newly granted account/data authority. No encoded carrier was uploaded.
+
+| ID | Priority / disposition | Exact evidence | Correction / next action |
+|---|---|---|---|
+| GDR-QC25-001 | P2 / open, owner-input platform blocker | At fixed source `b2bef5fa`, `qc_project.py` defines a ZIP/Base64 loader (36-46), decodes it (143-153), reads/rebuilds its ZIP (172-201), materializes hidden source (220-245) and produces Base64 payload files (295-299). The prepared project format explicitly names that method (325). Resource clearance and offline content verification do not establish compliance with the current readable-code requirement for this Researcher organization. | Preserve offline bytes/evidence, but do not upload/run this carrier or ask Mia to conceal/reroute it. Owner direction is needed to replace the fixed carrier with a genuinely readable Python-source package while preserving economics and the invented fixture, with new exact identities and truthful waiver custody. Obtain source through an officially permitted QC route or owner-controlled Mia workflow, not credential/session copying or assumed browser equivalence. |
+
+The policy conflict is lane-owned packaging, not a finding that synthetic
+economics or real-data rights have been accepted. The earlier offline hashes,
+compilation and source-bundle verifiers remain valid only as offline content
+evidence. The local generated artifact is retained for audit and explicitly
+**not cleared for cloud upload**. A new plain-source package would be a changed
+candidate/source epoch; it must not silently inherit a fabricated review or
+the old project-map identity. Existing 19.6 synthetic-only scope, zero look
+allocation and the same maximum-three-failure owner cycle remain controlling.
+
+The available tool inventory contained no QC/Mia connector. Read-only plugin
+discovery found no QuantConnect plugin in its current returned catalog; no
+installation, connection or permission change was made. A Safari sign-in is
+not proof that an officially supported programmatic source-return interface
+has been configured. The earlier Safari-availability question is superseded:
+even exclusive UI control would not clear this encoded-carrier blocker.
+
+Project `37647834` remains only the new shell. Actual **0 carrier uploads /
+0 requested launches / 0 unsuccessful terminal attempts** are retained;
+no pending launch intent, run result or native acceptance exists. No live,
+provider, real-data, purchase, account or shared-code action was taken. Stop
+for owner direction on compliant source packaging and the supported execution/
+retrieval route; do not publish this partial evaluation checkpoint, re-arm the
+monitor, upgrade the account, silently change economics or launch the prohibited
+carrier. Root project-wide documents and original proposals remain frozen.
+
+Read-only lane audit found a readable replacement size/count feasible within
+the existing Researcher tier: 19 current Python closure files, largest 45,352
+bytes, plus a readable root wrapper, draft/fixture assets and reserved notebook
+would total approximately 24 files against 50 files / 64KB each. This is not
+an implemented transport: supported JSON/JSONL assets, paths, runtime identity
+and completion custody still need a bounded transparent design. No package or
+economic source byte was corrected during this blocked checkpoint.
+
+Validation of this documentation-only checkpoint: the attempted focused pytest
+command could not start because the current bundled interpreter no longer
+had pytest available (`No module named pytest`). No dependency was installed.
+The same lane active-document/draft-source test ran through standard-library
+unittest with network denied: **1 test passed in 0.002s**. Full source SHA was
+re-measured unchanged, the 14 prepared carrier files compiled in memory, and
+`git diff --check` passed. No full suite or native SDK execution occurred;
+the unavailable local runner did not consume a QC launch attempt.

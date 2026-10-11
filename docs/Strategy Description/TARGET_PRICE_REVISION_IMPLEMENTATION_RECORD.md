@@ -1,13 +1,14 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Status: **CLAUDE HAS INDEPENDENTLY REVIEWED EVERY CODEX COMMIT IN
-`9a275386..ad5af506` IN SECTION 77: THE SECTION-74 COUNTER-REVIEW AND THE
-EXTENDED 2021-2026 STUDY ROUNDS OF SECTIONS 75 AND 76. CUMULATIVE DISPOSITION:
-ACCEPTED AFTER CORRECTION (ONE REGRESSION TEST, NO PRODUCTION BYTE). ONE NEW P1
-IS OPEN FOR CODEX (`TPR-CR23-001`): BOTH COMPLETED-LAUNCH OFF RUNS ENDED AT
-ENGINE TIME 2024-07-12, 884 OF 1,449 SESSIONS, BEFORE THE EXPORT AND AGGREGATE
-FAILURES THE RECORD DIAGNOSES; THAT EARLY END IS UNDIAGNOSED. CODEX NEXT
-COUNTER-REVIEWS SECTION 77 AND THIS ROUND'S CLAUDE COMMITS. SECTION 74'S
+Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN
+`ad5af506..9e5ed66e` AND THE CUMULATIVE REVIEW TREE IN SECTION 78.
+CUMULATIVE DISPOSITION: ACCEPTED AFTER CORRECTION OF TESTS AND CURRENT
+RECORD QUALIFICATIONS, NOT ACCEPTANCE OF EXTENDED-QC IMPLEMENTATION OR RESULTS.
+TPR-CR23-001 REMAINS OPEN: THE REPORTED JULY2024 FRONTIER REQUIRES FRESH
+BOUND RECEIPT/ENGINE-LOG DIAGNOSIS; ITS CAUSE AND ITS RELATION TO NAV SAMPLING
+ARE NOT PROVED. OFF'S THREE CODEX ATTEMPTS ARE CONSUMED; ON HAS ZERO.
+THERE IS NO ACCEPTED 2021-NOW PAIRED RESULT. THE MONITOR IS PAUSED.
+CLAUDE NEXT REVIEWS THIS CODEX ROUND INDEPENDENTLY. SECTION 74'S
 COUNTER-REVIEW OF THE EARLIER THREE-COMMIT CLAUDE RANGE STANDS AS HISTORY:
 ITS INCOMING-TEST CORRECTIONS ARE ACCEPTED, NOT INHERITED RUNTIME READINESS.
 HASH-ONLY AND KEY-ONLY PACKET-RECEIPT NEGATIVES NOW FAIL INDEPENDENTLY UNDER
@@ -24,8 +25,10 @@ THE FRESH SOURCE AVAILABILITY PROBE COMPLETED SEVEN HTTP200 SAMPLES;
 THE FRESH FULL SOURCE CAPTURE FAILED AFTER ALL74MASSIVE WINDOWS TERMINATED;
 NAMED DIAGNOSIS CONFIRMED A FALSE LOCAL TICKER-COLLATION ASSERTION;
 FRESH SHARADAR-ONLY REPAIR COMPLETED BOTH DATASETS WITH ZERO ROW REFUSALS.
-THE FAILED ORIGINAL REMAINS IMMUTABLE; FRESH COMPOSITE PREPARATION IS PENDING.
-NO EXTENDED PERFORMANCE STUDY, QC ATTEMPT OR NEW LOOK HAS EXECUTED.
+THE FAILED ORIGINAL REMAINS IMMUTABLE; FRESH COMPOSITE PREPARATION COMPLETED.
+THREE EXTENDED OFF ATTEMPTS FAILED; NINETEEN LOOKS ARE RETAINED IN SECTION76.
+NO EXTENDED PERFORMANCE OR PAIRED STUDY IS ACCEPTED. MIA RECOVERY IS REQUIRED;
+NO FOURTH CODEX OFF ATTEMPT OR ON LAUNCH THROUGH THE KNOWN FAILED AUDIT PATH.
 SOURCE SAMPLING IS NOT HISTORICAL COMPLETENESS OR PIT PROOF.
 THE OWNER NOW EXPLICITLY AUTHORIZES A FRESH ON/OFF STUDY ALLOWANCE OF AT MOST
 THREE QC ATTEMPTS PER ARM IN SECTION75. THE ORIGINAL ON3/OFF1 COUNTS AND
@@ -455,18 +458,19 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, 2026-10-11:** Claude has independently reviewed the exact Codex range
-`9a2753867cda373db634a35ad051b5c9386cc3c4..ad5af50612b80afb5e20e928f0b44adbbecc117f`:
-twenty-four commits carrying the section-74 counter-review, the frozen
-extended 2021-2026 study with its fresh source probe, capture, repair and
-composite preparation, the QuantConnect operations with three failed OFF
-attempts, the compression and exact-object cleanup, and the blocked
-handoff. Section 77 dispositions every commit and the cumulative tree
-accepted after correction: one regression test, no production byte. One
-new P1 is open for Codex, `TPR-CR23-001`: both completed-launch OFF runs
-ended at engine time 2024-07-12, 884 of 1,449 sessions, before the export
-and aggregate failures the record diagnoses, and that early end is
-undiagnosed. Section 74's counter-review accepted the corrected incoming
+**Current qualification, 2026-10-11:** Codex has counter-reviewed the exact Claude range
+`ad5af50612b80afb5e20e928f0b44adbbecc117f..9e5ed66e822f9119feb0db22866a1770fae7f606`:
+three incoming commits separately and cumulatively, accepted after correction
+in section78. This accepts the corrected review tests and qualified record,
+not extended implementation, runtime readiness or performance. Section77's
+independent review covers the exact published ad5af506 snapshot, cumulative
+tree and all six commits of the requested08e3fe79..ad5af506 round, within
+its broader24-commit review. Its historical findings and suite remain intact.
+`TPR-CR23-001` stays open: a reported July2024 terminal frontier is not an
+independently diagnosed cause, proof of884 observed daily valuations, or
+proof that NAV sampling cannot also be defective. Fresh bounded terminal
+and unfiltered own-job log diagnosis is registered in78; no launch is granted.
+Section 74's counter-review accepted the corrected incoming
 tests and record, not inherited runtime or extended-QC readiness. Independent hash-only and
 key-only receipt negatives and valid ON controls strengthen the two tests;
 no production or executed artifact changed. Section73's eleven-commit
@@ -481,7 +485,10 @@ limitations are retained, not closed by accepting a documentation review.
 The owner authorized the requested extended exploratory dates and now the
 fresh paired-study allowance: at most three QC attempts per arm, with original
 ON3/OFF1 and16looks retained. Section75 freezes both extended candidates and
-all six universes together; no 2021-now QC run has launched.
+all six universes together. OFF has consumed all three Codex attempts;
+ON has consumed zero attempts;19 observed looks remain retained;
+no accepted paired result exists. No fourth Codex OFF attempt is allowed;
+authenticated controllable Mia recovery is required.
 Section75.15 records completed fresh composite input preparation; original
 failed capture and subsequent completed Sharadar repair remain separate.
 Section 70's
@@ -577,8 +584,11 @@ authorized by that audit.
 The trust rollback pin, protected parent custody, reviewer identity and
 adversarial matrix remain unresolved and parked. **Exact next role action:**
 The three section73 Claude commits are counter-reviewed in section74.
-Codex next counter-reviews section 77 and this round's Claude commits, and
-resolves `TPR-CR23-001` before any further extended launch. The owner's latest
+Claude next reviews this Codex round independently. Codex's section78
+counter-review resolves the received test/record defects, not `TPR-CR23-001`
+or the native audit failures. The heartbeat is PAUSED during and after this
+round; no automatic rearm. No fourth OFF attempt and no ON launch through
+the known failed export path. The owner's latest
 request is an order-based 2021-now extension of section72's cap-selected
 stock portfolio and weight-only TPR tilt, with Analyst Revisions disabled.
 The first reply "yes, authorized" approved protected-date consumption. The
@@ -708,8 +718,8 @@ and are deliberately not listed here.
 | `TPR-CCR10-016` | P2 | TPR-TR0-I completion | Rotation, compromised-key removal, rollback, strict review-to-anchor ancestry, layer-specific byte mismatch, and full local Git/OpenSSH integration evidence are not yet complete. |
 | `TPR-MATCHED-002` | P2 | Matched-study execution acceptance | Attempt3 has four unclassified delisting events; held/target/history/window observations are absent. Mia's complete source-only specification was submitted, but last source readback is initialization-only and computer control timed out. No recovery job/claim exists; three Codex slots are consumed. No fourth launch or inferred-ambient acceptance. See71.6/71.9/71.10. |
 | `TPR-CR22-001` | P2 | Re-driving the Mia scope and the cap-tilt analyses from Git | The code that drove the Mia tool approvals, prompts and source reads (twelve receipts under the hash-bound transport), the cap-tilt failure-review, order-cause, log-quota, transport-sizing, aggregate-review and scope-analysis receipts, and the thin invoker of the pure diagnostics is not in the repository. The pure diagnostics themselves reproduce; the operations do not. Codex should commit those operator scripts or record their exact bytes in the evidence index. |
-| `TPR-CR23-001` | P1 | Any further extended launch, ON attempt or Mia recovery | Both completed-launch OFF runs (attempts 2 and 3) ended at engine time 2024-07-12 with identical statistics; the engine's rolling-window keys stop at `M6_20240712` and the NAV census ends 2024-07-10, 884 of 1,449 sessions. The export and aggregate failures the record names (F013, F017, F018) happened after that end. The cause is undiagnosed; the unfiltered engine log and a reproduction are required before spending any attempt. |
-| `TPR-CR23-002` | P2 | Further vendor-derived uploads and retention | Vendor identity rows and derived scores now sit in the QC Object Store under one gzip shard, possibly one failed plaintext object, the evidence journals of three OFF jobs, and the three earlier 7.7 MB packet keys; 71 uploads are queued; the cleanup deleted its 22 plaintext objects on `success:true` with no absence check. Retention and rights remain the owner's decision. |
+| `TPR-CR23-001` | P1 | Any further extended launch or ON attempt; diagnose before Mia recovery | Claude reports a July2024 terminal/rolling-window frontier in OFF2/3 and identical partial statistics; native NAV852/1449 is incomplete. The engine cause and relation to sampling are unproved, not884 independently observed daily valuations. Fresh fixed terminal/unfiltered own-job log diagnosis is registered in78; no fourth Codex OFF attempt, known-broken ON launch or accepted performance. |
+| `TPR-CR23-002` | P2 | Owner retention decision; no new standalone paperwork gate | Vendor-derived objects and journals are attributed retained inventory, with one verified gzip upload, possible failed plaintext object and earlier keys;71newuploads remain held. Cleanup recorded22delete successes without absence verification. Existing private-processing waiver is working authority, not provider attestation; do not delete or infer rights/completeness. Section78 qualifies this carried concern. |
 | `TPR-MATCHED-006` | P2 | Observer approval before Mia recovery launch | Retained unexecuted proposals contained native Order/ticket, open-only history, enum, exception, partial-fill and clock defects. Corrected complete observers have been requested, not verified/applied/tested. Last readback contains only additive initialization; restored control, actual complete source review and focused proof are required before any recovery job. See71.9/71.10. |
 
 No open finding is P0. The two P1 findings are inert while the registry is empty,
@@ -16616,3 +16626,217 @@ untilted OFF arm reached +52.7% over its 3.5 observed years, which is the
 cap-selected basket, not the target-price signal; the ON arm has never run,
 and over six years the current-vintage identity snapshot biases it in ways
 no QuantConnect run can remove (`TPR-CR23-003`).
+
+## 78. Codex counter-review and bounded extended-engine diagnosis - 2026-10-11
+
+### 78.1 Scope and exact received snapshot
+
+The owner requested this monitor after the single Codex publication and directed
+counter-review followed by the next authorized milestone. The qualifying Claude
+review was pushed clean at `9e5ed66e` on the same long-lived lane. It reviews the
+exact `ad5af506` snapshot, full tree and entire six-commit `08e3fe79..ad5af506` round
+within its broader 24-commit range. Root fetched only the matching lane ref,
+verified ancestry, and used the already-equal clean shared worktree; no checkout,
+fast-forward, scratch clone or overwrite occurred. Before counter-review the
+app changed only this heartbeat's status to PAUSED, preserving its scope.
+
+| Item | Exact value |
+|---|---|
+| Branch/worktree | codex/strategy-target-price-revisions; /Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__target_price_revisions |
+| Incoming Claude range | `ad5af50612b80afb5e20e928f0b44adbbecc117f..9e5ed66e822f9119feb0db22866a1770fae7f606` |
+| Claude commit 1 | `1434d0ddd96a5c41cecd1fb9827a0427c4c9c3de` - ratio-clip regression |
+| Claude commit 2 | `a0e0a794f96099e42dc57b95933e8499ecae9976` - section77 review/record guard |
+| Claude commit 3 | `9e5ed66e822f9119feb0db22866a1770fae7f606` - historical suite census/final-tree figures |
+
+<!-- TPR-CCR23-SCOPE:START -->
+| Boundary | Scope |
+|---|---|
+| Frozen arms | ON0/OFF3; no reset or new candidate |
+| New QC launches | 0 |
+| New research looks | 0 |
+| Accepted paired performance | none |
+| Monitor | PAUSED; no automatic rearm |
+| Canonical admission and trading | not authorized |
+<!-- TPR-CCR23-SCOPE:END -->
+
+The three incoming commits change only the sole record and two lane tests.
+The cumulative disposition below is acceptance of corrected tests and qualified
+documentation, **not** acceptance of implementation/QC over open material
+findings. CR23-001, F012, F017 and F018 continue to block that acceptance.
+The frozen 2021-01-04–2026-10-09 study/warmup/calendar/instruments/economics remain
+unchanged. Cap-selected stocks, weight-only standalone TPR tilt, AR entirely
+disabled; no ETF-only substitution, fallback, rank-11 promotion or normalization.
+
+### 78.2 Per-commit and cumulative dispositions
+
+| Claude commit | Disposition | Independently checked basis |
+|---|---|---|
+| `1434d0ddd96a5c41cecd1fb9827a0427c4c9c3de` | **Accepted after correction** | Age-zero35/10 fixture and exactscore1 assertion catch removal of the ratio clip; all earlier nine signal cases survive that mutant. Correct docstring: the immutable normalizer preserves5/2; the independent scoring oracle clips the contribution, not normalization itself. No production change. |
+| `a0e0a794f96099e42dc57b95933e8499ecae9976` | **Accepted after correction** | Ordered24-commit review coverage and nine-entry ledger are pinned against Git. Extend the actual authority guard to explicit QuantConnect-launch/trading-authority grants after clean positive controls. Correct current false unlaunched/composite-pending routing and qualify causal assertions, arithmetic and the paired-bundle false alarm in78.3, retaining section77 as historical attribution. |
+| `9e5ed66e822f9119feb0db22866a1770fae7f606` | **Accepted** | Six shard totals sum exactly to22,969passed/842skipped/114failed/37errors;94+4+16failure attribution sums114. This is Claude-attributed historical census, not a reproduced Codex full suite or compliant alternate-root validation. Its final5,768/20figures remain attributed. No code or authority change. |
+
+**Cumulative disposition: accepted after correction.** No incoming commit is
+skipped; documents, guards, tests and cumulative tree were reviewed separately.
+Two read-only peers audited tests and public runtime/operations claims; root
+independently checked their concrete public proofs and the focused controls.
+Empirical claims require the freshly bounded operations below and are not
+relabeled reproduced until their actual receipts exist.
+
+### 78.3 Complete findings and qualifications
+
+| ID | Priority/status | Evidence, correction and remaining limitation |
+|---|---|---|
+| TPR-CCR23-001 | P3; corrected | Received test docstring assigned clipping to normalization. `raw_revision._ratio` retains5/2 while `gold()` independently clips score1. Corrected wording only; test behavior is meaningful. |
+| TPR-CCR23-002 | P3; corrected | Received77guard rejected canonical/live affirmative grants but explicit QuantConnect-launch and trading-authority grants survived. Added recognized grammar and clean-first negative controls. This proves these exact grammars, not arbitrary natural-language authority detection; actual historical record grants nothing. |
+| TPR-CCR23-003 | P2; partly correct/open empirical cause | CR23-001 is a valid material incomplete-frontier concern, not a proved unique cause. Error timestamp/rolling keys cannot alone prove884 observed valuations, that F018 cannot also involve resampling, or that an export-only correction must still end at the same date. Both frozen generated mains request2021-01-04–2026-10-09 with persistent extended SPY clock and no explicit quit/stop path. A preceding fault/engine stop could be masked by a failing OnEnd hook. Fresh terminal census and unfiltered logs are necessary; no new launch or accepted metrics. |
+| TPR-CCR23-004 | P2; false alarm as stated, separate hardening retained | CR23-006 says predecessor223efa pin rejects OFF3 evidence. Processor reads unchanged config/input authorities from that bundle and explicitly admits OFF2 orOFF3; both synthetic positives pass. It does not demand actual executed main/helper equal the predecessor bundle. A distinct completion-helper/source-parity hardening concern remains; synthetic acceptance is not actual completed OFF3 evidence. |
+| TPR-CCR23-005 | P3; corrected current routing | Incoming preamble/current section8 simultaneously stated composite pending/no extended attempt while describing three OFF failures. Current routing now states completed preparation, ON0/OFF3,19looks, no accepted pair and mandatory Mia recovery. Historical75/76status-at-time and negative evidence remain unchanged. |
+| TPR-CCR23-006 | P3; corrected arithmetic/attribution | CR23-009's403combinedrequests and ended2024eachtime are unsupported. The enumerated77.4census is402provider(7+387+8) and185QC(136+44+2+3),587total, not403. OFF1 failed initialization; onlyOFF2/3 carry the reported July2024frontier. This independently checks ledger arithmetic, not all private request wires. |
+| TPR-CCR23-007 | P2; confirmed process deviation, historical limitation | Claude again used a scratch clone for the complete suite despite the hard session-long worktree constraint. Read-only does not satisfy it. Preserve attributed results and94path-refusal failures; neither certify clone compliance nor rerun a full suite by Codex. No sibling/shared behavior is changed. |
+| TPR-CR23-001 | P1; open | Native incomplete-frontier cause awaits78.7. No accepted implementation/QC result over this finding. Do not spend ON allowance, upload71remaining shards or make a fourth Codex OFF launch. |
+| TPR-CR23-002 | P2; owner retention decision, not a reinstated paperwork gate | Authorized private processing is not provider-rights attestation. Exact22delete successes were recorded without absence verification; possibly-failed23rd object/cloud journals/earlier keys remain unproved inventory. No unrelated deletion, export, purchase or retrospective rights fiction. |
+| TPR-CR23-003 | P2; confirmed limitations, not corrected | Current-vintage eligibility/delisting/category/ticker and later-touch censorship can bias ON. As-of clock is syntactically checked, not historical identity proof. Actual ticker recycling incidence, direction and bias magnitude are unmeasured; no outcome-based successor selection or PIT claim. |
+| TPR-CR23-004 | P2; confirmed completeness limit | Nonunique ticker-sort/offset/short-page termination cannot attest a transactional complete identity census.48duplicates/351descents remain attributed source counts; descents alone do not prove skipped rows. No silent drop or recapture under spent scopes. |
+| TPR-CR23-005 | P3; confirmed design facts/qualified | Essential malformed identity/event clocks can properly fail the build while other refusals become unavailable states. Ticker-keyed cumulative unknown-action exclusions and missing committed calendar builder are disclosed; not automatically a false-zero or economic defect. Calendar hash/parity evidence remains frozen. |
+| TPR-CR23-006 | P2; partly correct, open successor hardening | ON gate trusts completion dictionaries without independent wire/native-proof checks; some private metadata remains unredacted; ambiguous free-text not_found matches are not affirmative absence. Synthetic proofs establish code sensitivity, not actual forged uploads or rights violations.24h expiry/global request cap/dirty-tree source comparison are explicit bounded design choices, not attempt-reset authority. Bundle-refusal subclaim is qualified above. Do not edit/relaunch the cap-exhausted candidate by inference. |
+| TPR-CR23-007 | P3; closed/reproduced | Meaningful regression catches ratio clipping gap; independent root focused reprise and peer red/green retained in78.4. |
+| TPR-CR23-008 | P3; partly confirmed/documented | CCR22qualifications and unknown-basis/delisting-before-tilt/terminal-predecessor gates remain. Fee-order rather than fill quantity and soft close-based caps remain limits; no canonical or native trust proof. Scratch-clone deviation recorded separately above. |
+| TPR-CR23-009 | P3; partly correct/documented | Incomplete-run diagnosis is warranted; numeric/per-attempt rhetoric is qualified, not erased. Earlier explicit native save_bytes failure is real; its root cause remains unproved. Diagnosing earlier engine context is complementary to required Mia/export/accounting recovery, not permission to skip it. |
+
+No new P0. Canonical replay/rollback/parent custody/reviewer/adversarial gates,
+TPR-1/source and TPR-0B reviewed-manifest gates remain parked/incomplete.
+OOL011 stays lane-corrected with shared synchronization owner-coordinated;
+OOL003/004/006 remain closed. CR22-001 historical producers remain missing.
+Shared Action Plan, Session Handoff, workflows, main and siblings stay frozen.
+
+### 78.4 Focused independent validation
+
+Peer received-tree controls15passed1.95s; clip-only safe in-memory mutant makes
+new regression1failed0.44s, while prior9cases pass1.69s. Restored body passes.
+Corrected grammar control17passed1.76s; replacing only the recognized grammar
+with its received version produces2expected failures0.74s(new explicit grants
+survive), while existing live control passes. These are peer-reproduced,
+restored-in-finally synthetic proofs, not native QC or historical private facts.
+Root independently reproduced the exact signal/77 guards and both paired
+OFF2/OFF3 positive controls: **18 passed in 2.08s**. This validates the public
+bundle-refusal false alarm and corrected test behavior, not actual private
+completed evidence. Root then reproduced the complete focused document-guard
+file, signal tests and both paired admission positives: **172 passed in 4.41s**.
+The test peer's final corrected guard set is **35 passed in 2.13s**, warning-free.
+Selective in-memory removal of the new section-78 checks gives the expected
+negative-control failures: skipped commits 3/3 (0.75s), disposition drift 3/3
+(0.84s), closed-scope drift 6/6 (0.96s), and recognized contradictory grants 5/5
+(0.92s). Each mutation is restored in `finally`; these are public synthetic
+guard proofs, not arbitrary-language authority detection or native execution.
+Further diagnostic validation is appended after completion.
+No full lane/repository suite is run.
+Sections49/52 isolated in-process runtime root precedes dispatch/config imports.
+Python3.13.15/pytest9.1.1, macOS; no actual operator stop state/database.
+Native-Windows/host-Git split, missing-frozen-Git refusal/restoration and fourteen
+frozen-Windows-Git preregistration limits persist. No macOS signer/ACL/parent
+custody proof or production-trust relaxation follows.
+
+### 78.5 Delegated decisions and provenance
+
+| ID | Provenance/choice | Rationale/alternatives | Scope, assumptions and review status |
+|---|---|---|---|
+| TPR-EXT26-D062 | Owner's monitor/counter-review/next-milestone instruction; consume exactly the qualifying9e5ed66review and pause heartbeat before work | Completed exact snapshot/range/handoff exists; changed tip or green tests alone would not suffice | No auto-rearm or own-push trigger. App status-only update completed. Agent execution of direct owner direction, not separately Claude-approved. |
+| TPR-EXT26-D063 | CR23-001 concern plus standing scoped diagnostic authority; separately named fixed two-terminal and two-job unfiltered-log producer | Verify observed frontier and preceding fault context; alternatives blind fourthOFF/ONlaunch or assume unique export/data-exhaustion cause are rejected | Fresh exclusive local/cloud claims, fixed jobs, committed source/import closure and currentHEAD/clocks before body/credential/effect. Zero launch/look or economics change; no restricted Object export. Agent-delegated, pending independent review. |
+| TPR-EXT26-D064 | Three-failure/Mia rule and shared failed audit path | Preserve OFF3cap/ON0, original job hashes and failed receipts. No cosmetic candidate reset or ONthroughknownfailedpath | Native usable1449daily account/order/audit evidence remains prerequisite. Authenticated controllable built-in Mia or precise owner recovery required; review push does not waive this. Agent sequencing, not new human execution allowance. |
+
+### 78.6 Prospective diagnostic registration
+
+Register new terminal-frontier scope `TPR-EXT26-FRONTIER-20261011-001`, then
+separate read-only cloud scope `TPR-EXT26-ENGINE-LOG-20261011-001`. Only OFF2
+jobf79d3ff02644ec81f20da5cc6ca7440a andOFF3jobd7c76b7c4936c814f125a2b9a8cc2896,
+owned project37650980. Terminal2exact1299525bytes/SHA
+`11d6db1fbdf381653897c317d80a083527d9e925a57ba591486c673dc2697173`;
+terminal3exact1301513bytes/SHA
+`b5f7788177d117dd4dc95ae53c84cf6b60a15fc7410f5877b332743e618e7417`.
+These public identities bind fresh reads; old launch/access/collection scopes
+are not renewed. No source rows, inputs, oldD0 or unrelated project reads.
+
+Official [QC logs API](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/backtest-management/read-backtest/logs)
+was checked: emptyquery reads all matching loglines, startinclusive/endexclusive,
+maximum200lines/request, length is totalmatching lines. Logs may not export
+market/dataset information. Scope uses this normal diagnostic endpoint only,
+not public row logging or a restricted ObjectStore export workaround. Maximum
+20pages/job,40requests total, fixed request/body/aggregate/time bounds, no
+retries/redirects; bounded truncation or missing/loading/error remains explicit.
+Only known exception/code-frame/date/cause-marker counts are public; no raw
+log text, identifiers, prices, account fields, credentials or licensed rows.
+Keyword occurrence cannot independently prove a root cause.
+
+Fresh four-hour manifests bind exact committed source/import closure, freeze/calendar,
+owner provenance/currentHEAD and actual UTC before exclusive global/access/
+per-request claims. Owner-only0700/0600/nofollow/single-link opened-FD expected
+size/remaining-budget checks precede body reads; failed/uncertain/spent receipts
+remain immutable. Production has no injected root/transport/resolver entry.
+Synthetic fixtures are firewalled outside the actual lane/private tree.
+Producer validation/source hashes and actual operation clocks are appended
+before invocation. At this registration no actual diagnostic read/API occurs.
+
+The released named producer is `extended_frontier_diagnostic.py` (580 lines,
+30,185 bytes). Root read its complete source and synthetic tests, inspected
+the reachable repository import closure, and compiled all scoped Python source
+in memory. The test peer separately reviews it before effect. The runtime
+peer's final synthetic control is **35 passed in 0.62s**; removing only the
+returned-identity refusal gives two expected foreign-project/job failures in
+0.57s, restored controls two passes in 0.03s. Root's combined focused
+diagnostic/document/signal/paired/direct-boundary controls are **209 passed in
+5.50s**. Selected transitive licensed-research and interactive authority
+boundaries plus the active-document reference-index control are **3 passed in
+4.88s**. No private body, credential or network was accessed by these checks.
+
+| Committed execution-closure file | SHA-256 |
+|---|---|
+| `extended_frontier_diagnostic.py` | `2395276c0027ac89858ceeee2b03f2612e4252ff2cb7a07e27059e02e71b0fd2` |
+| `extended_evidence.py` (unchanged) | `a816b1ddca5a8428f07e9029bc3a7f7db3c5e1a1f50521664992dabf556aa2d7` |
+| `extended_operations.py` (unchanged) | `824b3f0c180f1aeb7038d8f280c44507b5c39687fcccc87c539f242d9256d167` |
+| `research/__init__.py` (empty, unchanged) | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
+| QC package `__init__.py` (unchanged) | `3bc79e69bc0c775d8ef0ec154551436011cba407f37690c27ccbeb9000153c59` |
+| `extended_study_freeze.json` (unchanged) | `90bdec5520b29bd932a3ec730f7c4c40c544ea7582731ad6680ef34ea8cf4067` |
+| `extended_calendar.json` (unchanged) | `3eccdf3cf9a2542ffd249983241d5747c2ecd4e21bc4a71f7f826c77ec1fe53d` |
+
+New diagnostic test SHA is
+`edac86c5a4298f355263531c64b881262232df6cbca8aab60416034ce043bd94`;
+corrected signal test SHA
+`a9ecf9d1bf640ef7dab5eeaeae8328d2467a17540589b2c4cf9e65092b860c85`;
+document test SHA
+`14b1c0075fdc7b3be088a16b3a3afc11ee26dddfe00d512f24d521e54df11c20`.
+The exact historical section-63-through-77 content, stripped only of its final
+separator whitespace for this comparison, remains 600,715 bytes at
+`0a60a8c6df268404e356f69111177307a890190856dab7b86c4619f42ced7424`,
+equal to the incoming Claude tree. Executed candidate sources and artifacts
+remain unchanged; tracked/scoped whitespace checks pass.
+
+Both distinct diagnostic plans are prospectively created at
+`2026-10-11T21:56:59Z`, expire `2026-10-12T01:56:59Z`, and bind the new local
+registration commit's actual HEAD at invocation. Root independently verifies
+HEAD, root, branch, status and actual matching remote before that commit.
+The exact UTF-8 owner-instruction excerpt is `Independently verify material
+claims; distinguish attributed history and reproduced evidence.`, SHA-256
+`f12e02fad04c13a4187cd8f0728b77e4c5ad72713285e13b841afe1dca0f1111`.
+This excerpt comes from the October-11 heartbeat and is contextualized by its
+standing counter-review/next-bounded-work authority; the digest alone is not
+proof of separate human approval. Local terminal scope is at most 2,601,038
+body bytes/30 seconds. Cloud scope is at most 1 MiB/response, 40 MiB aggregate,
+40 requests, 30 seconds/request and 1,500 seconds total; no redirect or retry.
+All spent access/request claims precede body or credential/network effects.
+The independent test peer read the complete released source/tests and used
+helpers, verified the supplied hashes, and reproduced **35 passes in 0.85s**.
+The lock and file-fsync claims are cooperative POSIX safeguards, not protected
+custody or power-loss-proof directory-entry durability (there is no directory
+fsync). Native Windows signer/ACL and hostile-parent protection are not proved.
+
+### 78.7 Actual bounded diagnosis
+
+Pending prospective producer completion, focused review/validation and local
+registration commit. No terminal/log result is claimed here before execution.
+
+### 78.8 Stable handoff
+
+Pending bounded diagnosis. Exactly one successful final non-force push to
+HEAD:refs/heads/codex/strategy-target-price-revisions remains; no checkpoint
+push or automatic monitor rearm. Final factual readiness/blockers, source
+hashes, operations and actual publication identity will be reported here/chat.

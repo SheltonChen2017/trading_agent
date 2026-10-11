@@ -149,10 +149,10 @@ def test_bound_calendar_and_capture_clock_refuse(change):
 def test_extreme_upward_revision_ratio_is_clipped_to_the_unit_band():
     """TPR-CR23 regression: a 3.5x target raise contributes exactly +1, never 2.5.
 
-    The immutable normalizer clips every raw revision ratio to [-1, 1] before
-    the firm median and decay; the successor must do the same. Issued 2020-12-29
-    makes the event eligible at the 2020-12-31 open, so the first 2021-01-04
-    decision sees age zero and an unscaled unit.
+    The independent score oracle clips the immutable normalizer's raw ratios
+    to [-1, 1] before the firm median and decay; the successor must do the same.
+    Issued 2020-12-29 makes the event eligible at the 2020-12-31 open, so the
+    first 2021-01-04 decision sees age zero and an unscaled unit.
     """
     result = build([rating(day='2020-12-29', price_target='35', previous_price_target='10')])
     first = result['frames'][0]['states'][0]

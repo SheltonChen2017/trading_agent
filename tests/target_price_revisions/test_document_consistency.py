@@ -410,6 +410,26 @@ SECTION77_DISPOSITIONS = tuple(
     "accepted after correction" if commit.startswith("aab3a91f") else "accepted"
     for commit in SECTION77_CODEX_COMMITS
 )
+SECTION78_CLAUDE_BASE = "ad5af50612b80afb5e20e928f0b44adbbecc117f"
+SECTION78_CLAUDE_HEAD = "9e5ed66e822f9119feb0db22866a1770fae7f606"
+SECTION78_CLAUDE_RANGE = f"{SECTION78_CLAUDE_BASE}..{SECTION78_CLAUDE_HEAD}"
+SECTION78_CLAUDE_SHORT_RANGE = "ad5af506..9e5ed66e"
+SECTION78_CLAUDE_COMMITS = (
+    "1434d0ddd96a5c41cecd1fb9827a0427c4c9c3de",
+    "a0e0a794f96099e42dc57b95933e8499ecae9976",
+    SECTION78_CLAUDE_HEAD,
+)
+SECTION78_DISPOSITIONS = (
+    "accepted after correction", "accepted after correction", "accepted",
+)
+SECTION78_SCOPE_BOUNDARIES = {
+    "Frozen arms": "ON0/OFF3; no reset or new candidate",
+    "New QC launches": "0",
+    "New research looks": "0",
+    "Accepted paired performance": "none",
+    "Monitor": "PAUSED; no automatic rearm",
+    "Canonical admission and trading": "not authorized",
+}
 SECTION74_SCOPE_BOUNDARIES = {
     "Accepted object": "Corrected incoming review tests and record only",
     "Extended study": "Not launched; fresh attempt allowance unanswered",
@@ -992,11 +1012,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [SECTION77_CODEX_RANGE]
+    ) == [SECTION78_CLAUDE_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Claude has independently reviewed the exact Codex range"
+        "Codex has counter-reviewed the exact Claude range"
         in normalized_current
     )
     assert (
@@ -1009,10 +1029,18 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "TPR-TR0" in normalized_current
     assert "TPR-1 remains blocked" in normalized_current
     assert "reviewed-spec registry remains empty" in normalized_current
-    assert "Claude next reviews this Codex round independently" not in normalized_current
-    assert "Codex next counter-reviews section 77" in normalized_current
+    assert "Claude next reviews this Codex round independently" in normalized_current
+    assert "Codex next counter-reviews section 77" not in normalized_current
     assert "Codex next counter-reviews section 73" not in normalized_current
-    assert "no 2021-now QC run has launched" in normalized_current
+    assert "no 2021-now QC run has launched" not in normalized_current
+    for current_fact in (
+        "OFF has consumed all three Codex attempts",
+        "ON has consumed zero attempts",
+        "19 observed looks",
+        "no accepted paired result exists",
+        "Mia recovery is required",
+    ):
+        assert current_fact in normalized_current, current_fact
     assert "Original ON3/OFF1 and16observed looks remain permanently consumed/recorded" in normalized_current
     assert "Codex next counter-reviews section 69" not in normalized_current
     assert "comprehensive whole-lane audit remains complete" in normalized_current.lower()
@@ -1071,11 +1099,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [SECTION77_CODEX_SHORT_RANGE]
+        ) == [SECTION78_CLAUDE_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert "claude has independently reviewed every codex commit" in normalized_summary_lower
-        assert "section 77" in normalized_summary_lower
-        assert "codex next counter-reviews section 77" in normalized_summary_lower
+        assert "codex has counter-reviewed every claude commit" in normalized_summary_lower
+        assert "section 78" in normalized_summary_lower
+        assert "codex next counter-reviews section 77" not in normalized_summary_lower
         assert "fixture-only tpr-d1 candidate awaits claude review" not in normalized_summary_lower
         assert "fixture-only tpr-d1 candidate is accepted" in normalized_summary_lower
         assert "claude next reviews the counter-review and tpr-d0" not in normalized_summary_lower
@@ -1088,7 +1116,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         assert "claude next reviews sections 56 and 57" not in normalized_summary_lower
         assert "codex continues without claude review stops" not in normalized_summary_lower
         assert "five verified order-based qc runs and one zero-trade remx diagnostic" in normalized_summary_lower
-        assert "claude next reviews this codex round independently" not in normalized_summary_lower
+        assert "claude next reviews this codex round independently" in normalized_summary_lower
         assert "codex next counter-reviews section 73" not in normalized_summary_lower
         assert "the owner now explicitly authorizes a fresh on/off study allowance" in normalized_summary_lower
         assert "codex next counter-reviews section 69" not in normalized_summary_lower
@@ -3831,7 +3859,8 @@ def test_section_77_review_records_the_exact_range_and_grants_nothing() -> None:
     ):
         assert required in authority, required
     assert re.search(
-        r"(?:^|[.!?])\s*(?:canonical admission|real-row canonical D1|TPR-1|TPR-0B|live trading)\s+is\s+authorized\b",
+        r"(?:^|[.!?])\s*(?:canonical admission|real-row canonical D1|TPR-1|TPR-0B|"
+        r"live trading|QuantConnect launch|trading authority)\s+is\s+authorized\b",
         authority, re.I,
     ) is None, "contradictory section 77 authority"
 
@@ -3856,7 +3885,12 @@ def test_section_77_guard_refuses_disposition_drift(monkeypatch) -> None:
 
 @pytest.mark.parametrize(
     "added_grant",
-    ["Canonical admission is authorized.", "Live trading is authorized."],
+    [
+        "Canonical admission is authorized.",
+        "Live trading is authorized.",
+        "QuantConnect launch is authorized.",
+        "Trading authority is authorized.",
+    ],
 )
 def test_section_77_guard_refuses_contradictory_authority(
     monkeypatch, added_grant: str,
@@ -3878,3 +3912,124 @@ def test_section_77_guard_refuses_contradictory_authority(
     )
     with pytest.raises(AssertionError, match="contradictory section 77 authority"):
         test_section_77_review_records_the_exact_range_and_grants_nothing()
+
+
+def test_section_78_counterreview_records_all_commits_and_no_attempt_reset() -> None:
+    """Pin corrected review acceptance separately from unresolved QC readiness."""
+    section = _record_section("## 78.")
+    assert SECTION78_CLAUDE_RANGE in section
+    ordered = tuple(
+        re.search(r"`([0-9a-f]{40})`", line).group(1)
+        for line in section.splitlines()
+        if re.match(r"[|] Claude commit [0-9]+ [|]", line)
+    )
+    assert ordered == SECTION78_CLAUDE_COMMITS, "ordered section 78 commits"
+    assert ordered == tuple(_git_lines("rev-list", "--reverse", SECTION78_CLAUDE_RANGE))
+    dispositions = _bounded(
+        section, "### 78.2", "### 78.3", "section 78 dispositions",
+    )
+    rows = tuple(
+        (match.group(1), match.group(2).lower())
+        for line in dispositions.splitlines()
+        if (match := re.match(
+            r"\| `([0-9a-f]{40})` \| \*\*([A-Za-z ]+)\*\* \|", line,
+        ))
+    )
+    assert rows == tuple(zip(SECTION78_CLAUDE_COMMITS, SECTION78_DISPOSITIONS)), (
+        "exact section 78 dispositions"
+    )
+    assert "Cumulative disposition: accepted after correction." in section
+    boundary = _bounded(
+        section, "<!-- TPR-CCR23-SCOPE:START -->",
+        "<!-- TPR-CCR23-SCOPE:END -->", "section 78 scope",
+    )
+    scope_rows = tuple(re.findall(r"^\| ([^|]+) \| ([^|]+) \|$", boundary, re.M))
+    assert scope_rows == (("Boundary", "Scope"), *SECTION78_SCOPE_BOUNDARIES.items()), (
+        "closed section 78 scope"
+    )
+    normalized = " ".join(section.split())
+    assert re.search(
+        r"(?:^|[.!?])\s*(?:"
+        r"(?:a\s+)?fourth Codex OFF attempt is authorized|"
+        r"accepted paired performance exists|the monitor is ACTIVE|"
+        r"(?:canonical admission|live trading) is authorized)\b",
+        normalized, re.I,
+    ) is None, "contradictory section 78 authority"
+
+
+@pytest.mark.parametrize("commit", SECTION78_CLAUDE_COMMITS)
+def test_section_78_guard_refuses_a_skipped_commit(monkeypatch, commit: str) -> None:
+    """Every incoming commit, including both record commits, remains in scope."""
+    test_section_78_counterreview_records_all_commits_and_no_attempt_reset()
+    original_section = _record_section
+    section = original_section("## 78.")
+    original = next(
+        line for line in section.splitlines()
+        if re.match(r"[|] Claude commit [0-9]+ [|]", line) and commit in line
+    )
+    assert section.count(original) == 1
+    mutated = section.replace(original + "\n", "", 1)
+    assert mutated != section
+    monkeypatch.setitem(globals(), "_record_section", lambda heading:
+        mutated if heading.startswith("## 78.") else original_section(heading))
+    with pytest.raises(AssertionError, match="ordered section 78 commits"):
+        test_section_78_counterreview_records_all_commits_and_no_attempt_reset()
+
+
+@pytest.mark.parametrize(
+    "commit,disposition", tuple(zip(SECTION78_CLAUDE_COMMITS, SECTION78_DISPOSITIONS)),
+)
+def test_section_78_guard_refuses_disposition_drift(
+    monkeypatch, commit: str, disposition: str,
+) -> None:
+    test_section_78_counterreview_records_all_commits_and_no_attempt_reset()
+    original_section = _record_section
+    section = original_section("## 78.")
+    original = f"| `{commit}` | **{disposition.capitalize()}** |"
+    assert section.count(original) == 1
+    replacement = "Rejected" if disposition == "accepted" else "Accepted"
+    mutated = section.replace(original, f"| `{commit}` | **{replacement}** |", 1)
+    monkeypatch.setitem(globals(), "_record_section", lambda heading:
+        mutated if heading.startswith("## 78.") else original_section(heading))
+    with pytest.raises(AssertionError, match="exact section 78 dispositions"):
+        test_section_78_counterreview_records_all_commits_and_no_attempt_reset()
+
+
+@pytest.mark.parametrize("field,replacement", [
+    ("Frozen arms", "ON0/OFF4; fourth attempt allowed"),
+    ("New QC launches", "1"),
+    ("New research looks", "1"),
+    ("Accepted paired performance", "accepted"),
+    ("Monitor", "ACTIVE; automatic rearm"),
+    ("Canonical admission and trading", "authorized"),
+])
+def test_section_78_guard_refuses_scope_expansion(monkeypatch, field, replacement) -> None:
+    test_section_78_counterreview_records_all_commits_and_no_attempt_reset()
+    original_section = _record_section
+    section = original_section("## 78.")
+    original = f"| {field} | {SECTION78_SCOPE_BOUNDARIES[field]} |"
+    assert section.count(original) == 1
+    mutated = section.replace(original, f"| {field} | {replacement} |", 1)
+    monkeypatch.setitem(globals(), "_record_section", lambda heading:
+        mutated if heading.startswith("## 78.") else original_section(heading))
+    with pytest.raises(AssertionError, match="closed section 78 scope"):
+        test_section_78_counterreview_records_all_commits_and_no_attempt_reset()
+
+
+@pytest.mark.parametrize("grant", [
+    "A fourth Codex OFF attempt is authorized.",
+    "Accepted paired performance exists.",
+    "The monitor is ACTIVE.",
+    "Canonical admission is authorized.",
+    "Live trading is authorized.",
+])
+def test_section_78_guard_refuses_recognized_contradictory_grants(monkeypatch, grant: str) -> None:
+    """The named contradictory sentences cannot coexist with the closed scope."""
+    test_section_78_counterreview_records_all_commits_and_no_attempt_reset()
+    original_section = _record_section
+    section = original_section("## 78.")
+    mutated = section + "\n" + grant + "\n"
+    monkeypatch.setitem(globals(), "_record_section", lambda heading:
+        mutated if heading.startswith("## 78.") else original_section(heading))
+    with pytest.raises(AssertionError, match="contradictory section 78 authority"):
+        test_section_78_counterreview_records_all_commits_and_no_attempt_reset()

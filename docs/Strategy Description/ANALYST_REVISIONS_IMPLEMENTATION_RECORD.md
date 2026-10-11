@@ -428,6 +428,9 @@ counter-reviews the sole section-276 record commit and implements a separate
 object-bound v2 observer/assessment contract. Original source guards stay
 unchanged. Independent review of that exact new security contract precedes
 its one assessment; the monitor remains paused and R284 remains unlaunched.
+Section 278 records the owner's later one-round waiver of that review wait
+and the exact single-assessment run protocol. The waiver does not change the
+frozen security baseline, authorize retries or clear production/formal gates.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1351,8 +1354,10 @@ Claude review and Codex counter-review before the single assessment under
 277-D4. No actual assessment, probe, attribute change, source admission or
 R284 launch follows from implementation or a matching preflight. This is a
 specific new-security-contract review gate, not a routine acknowledgement
-wait. Claude reviews section 277 and its exact final pushed snapshot
-independently before the new assessment contract can be used. The owner previously said
+wait. The owner explicitly waives Claude review of section 277 before its
+one assessment for this round, as recorded in section 278. Claude reviews
+section 278 and the exact final snapshot at handoff; the standing independent
+review workflow resumes after this one-round exception. The owner previously said
 "proceed" after the open-session concern was explained. Section 272 supersedes
 the session-exit prerequisite, without authorizing any process interruption.
 The physical move and audit are now recorded in 272.4: all bytes and other
@@ -3240,6 +3245,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-10 | Codex counter-review and prospective diagnostic hardening | `557411a6` -> section-275 correction/record snapshot | Sole Claude review commit accepted after documentary qualifications; all five P3 findings disposed; no research or QC event | Early census claim, strict probe exit, preallocation capability guard, isolated regressions; one bounded exact-object metadata-candidate observation, not source admission | Strict-denied focused checks and omission mutations in 275.6; retained report hashes/counts reproduced; no full Codex suite | ARV2E263-001 remains; exact opaque access/sync state not yet human-accepted; historical source and formal gates remain | One final matching-lane push; Claude review of section 275; explicit security disposition before any new prospective assessment; monitor paused |
 | 2026-10-10 | Claude independent review of section 275: the diagnostic hardening and the metadata policy candidate | `e3db4ebc` -> this record commit | Section 276: two Codex commits `557411a6..e3db4ebc` disposed (2 accepted, 0 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells; census, assessment, R272 probe and Codex's observation parser not run | No code changed by Claude. Nine pins reproduce; the 275.4 fingerprints and directory identity reproduce on a second read-only read; 19 in-memory guard removals each fail a test; accepted `ARV2CR275-001` to `-003`; `ARV2R276-001` documented; section 4 names section 276, banner sentence added, this row appended | Complete lane selection at `e3db4ebc` with every remote address refused (strict sandbox for the six groups, three parallel streams, temporary directories inside the root's ignored `.pytest_cache`; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 276.6 | 0 P0, 0 P1, 0 P2, 1 P3 | Single push of this round's Claude commit; Codex counter-reviews section 276 unless the owner changes the workflow |
 | 2026-10-10 | Codex counter-review, exact owner metadata acceptance and prospective v2 assessment | `50dcf08e` -> section-277 source/protocol freeze and final result/record snapshot | Sole Claude record commit accepted after documentary qualifications; exact 275.4 baseline accepted by the human; no source/QC event | Object-bound four-fingerprint observer, complete-scope preflight, new one-use directory claim and guarded assessment; original implementations unchanged | Focused strict-denied tests/mutations and one bounded metadata-only preflight under 277-D3; details and pins in section 277; no full Codex suite | Historical preservation audit remains failed; new contract requires independent review before its one assessment; production and formal gates open; 313/239/49/699 unchanged | Exactly one final matching-lane push; Claude reviews section 277 and exact snapshot; no actual assessment/probe/R284 this round; monitor paused |
+| 2026-10-10 | Owner-waived pre-run review and frozen one-shot v2 assessment | `425c2ead` -> section-278 authority freeze and final result/record snapshot | Exact human waiver applies only this round; no new Claude commit exists and no independent-review acceptance is asserted | Preserve section-277 code/profile/security pins; one exclusive assessment identity, strict denial and separate bounded report authentication; no retry | Relevant focused checks and actual result recorded in section 278; no full Codex suite | Production publication, R284 and formal gates remain separate; monitor paused | Exactly one final matching-lane push; restore normal independent review at handoff, no intermediate push |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -41320,3 +41326,105 @@ This continuous round has **one final successful matching-lane push only**,
 after the result record and final focused checks. No intermediate push,
 other branch/worktree, shared/root-file edit, external chat message, Claude
 session launch, provider/QC request or backtest belongs to this round.
+
+## 278. Explicit one-round review waiver and single frozen v2 assessment, 2026-10-10
+
+### 278.1 Human authority and exact starting state
+
+The owner directly said **"proceed without claude review for this round"**
+after section 277's handoff named independent review before the one-shot
+assessment. This is an explicit, one-round exception to 277-D4 and the
+pre-assessment review sequencing in 275.5/276.5. It is not an automation,
+advisory-agent approval or inferred acceptance. The existing exact opaque
+baseline acceptance remains the one in 277.1/275.4; no broader security state
+is accepted. Independent review has **not** occurred and is not relabeled.
+
+At entry, exact root/branch/HEAD/status and a matching-only fetch found clean
+local and remote `425c2eadb6a42de28573b8e915e0dee997fba91d` on
+`codex/strategy-analyst-revisions-v2` at the sole operative root
+`/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2`. There is no new
+Claude commit to counter-review. The two section-277 Codex commits remain
+unreviewed implementation, not independent acceptance. No side branch,
+other checkout, old Documents root, session interruption or monitor rearm
+is authorized. The monitor remains paused.
+
+### 278.2 Prospective run and verification decision
+
+**278-D1 — execute the already frozen one-shot assessment, not a successor.**
+Keep the section-277 source and profile unchanged. The profile remains
+`47e266a8d985a1b9db1f9eda57354378570b93f25eacb6250cc7f9f1cc4e5609`,
+including its historical/general
+`independent_review_required_before_assessment=true` field. The human waiver
+above is an external scoped exception to that sequencing, not a mutation of
+the profile, a forged review receipt or a claim that it now says false.
+The new observer and wrapper hashes reproduce as
+`b107410afd39f67a4155c20925097374a00b5ac31018907ebb0444fb6c5022c7` and
+`8b75a55e7a2dd7e224260e14e3a4c050fb466e73b2ef3b09b14b2550340af224`.
+The unchanged v1 observer/assessment, audit publisher and shared source-helper
+pins also reproduce exactly as in 277.5.
+
+Commit this authority/protocol record locally before executing **at most one**
+`python -B -m scripts.assess_arv2_relocated_sources_v2 --assess
+--expected-profile-sha256 47e266a8d985a1b9db1f9eda57354378570b93f25eacb6250cc7f9f1cc4e5609`.
+Use the designated Python 3.13 environment, strict
+`(version 1)(allow default)(deny network*)`, and fresh in-root ignored
+`TMPDIR`/bytecode-cache paths. No standalone `--preflight-only` repeats: the
+frozen assessment performs its own complete-scope preflight after the
+exclusive claim, as designed. Retain actual start/end time, exit status and
+emitted report digest. The outer cooperative budget remains 60 seconds,
+including the 15-second preflight; no hard native-call bound is asserted.
+
+The exact assessment output remains
+`artifacts/analyst_revisions_v2/relocation_trial/R277-20261010-A` beneath the
+operative root. Read-only existence and symlink checks at entry found it
+absent; recheck immediately before the invocation. Its exclusive directory
+creation/fsync spends the assessment before any source reads. No retry,
+cleanup, automatic baseline refresh, exception widening, attribute/permission
+change or reuse of R273 follows from any failure or interruption. This
+invocation is local source/security reauthentication only, not a performance
+evaluation; there is no order-based backtest exception or new research look.
+The 313/239/49/699 floor and all formal/action flags remain unchanged.
+
+**278-D2 — one bounded external report authentication, not a second run.**
+If a report is emitted, a separate strict-network-denied, read-only process
+opens only the exact output directory component-wise without following links.
+Require held/named full directory metadata equality, current ownership/0700
+and exact inventory `report.json` with no pending leaf. Require the named
+report to be regular, owner-held/0600, one link and 1–131072 bytes before an
+`O_RDONLY|O_NOFOLLOW|O_NONBLOCK` open; require held/named equality, bounded read
+and full held/named file and directory rechecks after reading. Match its hash
+to the actual emitted digest and parse strict canonical JSON, refusing
+duplicates/nonfinite values. Bind exact schema, profile, policy and
+before/after pins; for success require all 12 directory/15 file key sets,
+nested preflight pins/counts, the four manifest pins, no refusal fields and
+all restrictive flags false. Print only hash/size/non-sensitive metadata,
+counts and bounded refusal codes, never raw attribute values or source rows.
+No native attribute observation or source reread belongs to this verification.
+
+Only actual exit 0 **plus** authenticated complete/source-reauthenticated
+report **plus** final output checks can accept this mechanical diagnostic.
+A retained `complete=true` report after a late failure is insufficient. Any
+failure remains durable/spent and stops this attempt, with evidence preserved.
+An absent report means no success can be claimed, not permission to rerun.
+
+**278-D3 — adjacent gates remain intact.** The waiver allows this bounded
+round to proceed; it does not certify historical relocation preservation,
+uninterrupted security, harmless opaque grants, source truth/PIT admission,
+production publication or R284 readiness. Any subsequent publication/probe
+step needs its own supported prospective decision and exact pins; it is not
+silently chained by a passing assessment. No provider/QC/broker/order action,
+full Codex suite, public data upload, formal epoch/date/hash completion or
+shared/root-file change follows. Same-round operational advisory reading is
+not a substitute independent review. Claude reviews section 278 and the exact
+round at handoff; this one-round exception does not cancel later review.
+
+### 278.3 Pre-run checks
+
+Relevant strict-network-denied focused validation at unchanged executable
+source, with fresh in-root `TMPDIR`, bytecode prefix and pytest basetemp:
+**235 passed in 2.96 s**, no failures/skips/warnings (58 v2 wrapper, 91 v2
+policy, 86 record/document). The section-277 414-pass result remains historical
+and is not added to this count. No complete lane suite or actual preflight
+repeat ran. `git diff --check` is clean. Same-round read-only operational
+advice found no concrete run blocker; it is not independent Claude review.
+Only this lane record changes in the authority-freeze commit.

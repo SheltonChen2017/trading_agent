@@ -16,7 +16,9 @@ TPR-WEIGHT-TILT STRATEGY AND AUTHORIZED CONSUMING THE PREVIOUSLY PROTECTED
 SEPTEMBER-OCTOBER 2026 DATES AS EXPLORATORY. TARGET ENDPOINT: OCTOBER9,2026.
 THE FRESH SOURCE AVAILABILITY PROBE COMPLETED SEVEN HTTP200 SAMPLES;
 THE FRESH FULL SOURCE CAPTURE FAILED AFTER ALL74MASSIVE WINDOWS TERMINATED;
-THE FIRST SHARADAR IDENTITY RESPONSE REQUIRES BOUNDED SCHEMA DIAGNOSIS.
+NAMED DIAGNOSIS CONFIRMED A FALSE LOCAL TICKER-COLLATION ASSERTION;
+FRESH SHARADAR-ONLY REPAIR COMPLETED BOTH DATASETS WITH ZERO ROW REFUSALS.
+THE FAILED ORIGINAL REMAINS IMMUTABLE; FRESH COMPOSITE PREPARATION IS PENDING.
 NO EXTENDED PERFORMANCE STUDY, QC ATTEMPT OR NEW LOOK HAS EXECUTED.
 SOURCE SAMPLING IS NOT HISTORICAL COMPLETENESS OR PIT PROOF.
 THE OWNER NOW EXPLICITLY AUTHORIZES A FRESH ON/OFF STUDY ALLOWANCE OF AT MOST
@@ -14498,3 +14500,170 @@ fresh24hour expiry, exact owner-instruction hash and freshly committed source
 closure. No new QC project/compile/launch/outcome/look exists at this point;
 historical16observed looks remain unchanged. Zero provider-attestation/PIT/
 canonical/trading authority is inferred from successful synthetic preflight.
+
+### 75.12 Fresh repair completed; extended executions still pending
+
+Local registration commit`43910cebf90a40b7217bdb30b432c0ccde903904` was
+verified against the unchanged actual remote`5cd1a7bed6e27c121cbdf0c60d4e61a44536018a`
+before commit; no push occurred. The exact committed repair driver was invoked
+with actual clock creation2026-10-11T01:34:25Z, expiry2026-10-12T01:34:25Z,
+and the previously documented exact owner-instruction hash. Actual execution
+01:34:32.163065–01:34:37.183137UTC completed:8reserved/attempted/completeHTTP200,
+2402742bytes,70723rows,0row-refusals/conflicts,48identical duplicates and351
+Python lexical descents. TICKERS3pages/21007rows/946301bytes; ACTIONS5pages/
+49716rows/1456441bytes; both terminated. The fresh scope is now spent.
+
+Root independently verified private owner-only/no-symlink metadata custody,
+exact plan source closure, report/index/terminal crossbindings, HEAD and hashes
+without reading licensed wire/projection rows. Private plan SHA
+`b213bae54aba4fd5007123020dc6f86c240ef48d7a4af2fbdf855492268006bc`(3651bytes),
+index`73010167499c30eb2b12a2c1f5b8f76c8f37c94bd001bcebd017a5e9fe0d72e8`(7871),
+aggregate`4bc1475ad4ba64170cba3223fb50dd266809417ee00e4f22edaa6a4ae80378ef`(749),
+terminal`f35a4c53c27b2abad8170d52c2bfc83690c7ed9354dc0af036590556d9cf67f8`(376).
+Native current-vintage metadata remains non-PIT; no input admission,
+provider attestation, new outcome/look or QC attempt follows from completion.
+OriginalFAILED001 stays unchanged. Composite preparation must separately replay
+its74completed Massive scopes and this fresh repair under a new processing claim.
+
+Root reviewed final released prospective runtime clock/reason/alias/aggregate/
+matched-chain changes and controller/metrics contracts;206focused runtime,
+operations and metrics tests passed in4.02s under isolated49/52. An immediately
+preceding same206case invocation's process-output identifier was not retained;
+its incomplete output is not used as completed evidence. The reproduced completed
+invocation above is authoritative. No fullsuite, actual operator database/state,
+licensed input packet, native QC factor ABI, cloud source upload or backtest
+was exercised by these synthetic controls. F002 successor correction is now
+implemented: real inherited bounded reason counter plus uninjected controls.
+The native clock fix keeps frozen09:20 and only exactSPY extended; stocks remain
+regular-hours. All source, accounting and gates remain separately verified.
+
+Two earlier agent guard incidents are retained as workflow limitations: one
+unreleased operations patch was dispatched after an expected-HEAD guard failed
+during a root local registration commit; it touched only its assigned file,
+with no private/provider/QC operation. A later guard failure stopped before
+tests. Root required successful guard exit before patch dispatch; subsequent
+actions follow that rule. Neither incident authorizes concurrent overwrite,
+receipt renewal, extra launches or acceptance of unverified execution.
+
+### 75.13 Native-evidence preflight corrections registered before outcomes
+
+`TPR-EXT26-F003`(P1, confirmed, correction in progress): the unexecuted successor
+controller retains a truthy default Strategy Equity chart without verifying
+the complete1449 frozen daily observations; it lacks an explicit chart-read
+route. `TPR-EXT26-F004`(P1, confirmed, correction in progress): its synthetic
+order collection accepts a response that explicitly names a foreign project/job
+despite an own-job request. The independent helper reports a hard-firewalled
+synthetic105order reproduction; this is attributed evidence, not actual QC
+or root-reproduced native execution. Root authorized lane-owned corrections
+under delegated scope, not a separate human/Claude approval.
+
+`TPR-EXT26-D025` — prospectively registered bounded native result collection,
+pending independent review. Add explicit own-job Strategy Equity chart request,
+count2000, UTC2021-01-04 through2026-10-10 exclusive endpoint boundary to cover
+the final2026-10-09NY close; the strategy evaluation window does not extend.
+Bind a fresh immutable collection/read receipt; loading/missing/downsampled
+observations remain diagnostic, not complete1449 evidence or zeros. Reject
+conflicting project/job identifiers whenever returned; absence in a documented
+API response is not fabricated identity attestation. Retain request/response
+envelope provenance independently of observed provider identifiers.
+
+Root consulted primary official API models on2026-10-11UTC:
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/backtest-management/read-backtest/charts
+and
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/backtest-management/read-backtest/orders
+plus the official backtest-statistics and logs models. Own result chart/order
+collection is distinct from restricted ObjectStore export; no market-source
+row logging/export workaround is introduced. A counted bounded collection is
+not an extra candidate launch or statistical look; unsuccessful/unknown
+collections retain receipts and require explicit next action. No actual
+chart/order/outcome read has occurred for this extended study at registration.
+
+`TPR-EXT26-D026` — agent-delegated prospective native daily account series,
+pending independent review. Primary LEAN result-handler source resamples the
+default Strategy Equity chart based on full-window duration; neither a truthy
+chart nor count2000 proves1449daily closes. Add only the native account NAV
+to`EXT26 Account NAV`/`NAV`, one USD line point at the existing frozen16:01NY
+daily audit, after native held-mark and fill/action-ledger checks. No extra
+price subscription, return tuning, licensed source rows, chart-zero fallback,
+new event timing or change to portfolio accounting. Use the represented native
+invariant decimal at the .NET chart boundary, not float-converted or rounded
+private ledger totals. Every unknown/missing observation remains unavailable.
+Native chart measurements and ledger reconstruction stay separate proofs.
+Strategy Equity remains a diagnostic native control, not the daily metric axis.
+Both charts are bounded own-job requests underD025; no restrictedObject export.
+Root meaningful focused pre-correction controls:3failed/1passed/96deselected
+in0.51s (missing setup/native point/exact decimal helper); no actual calls.
+Official model/source references include
+https://raw.githubusercontent.com/QuantConnect/Lean/master/Engine/Results/BacktestingResultHandler.cs
+and the official ChartPoint/Candlestick JSON converters. Public master-source
+semantics are not attestation of the eventual cloud engine/version or data.
+
+Root post-correction runtime controls:100passed/4.55s isolated49/52,
+including once-only native account plotting, unknown-held-mark refusal and
+native invariant-decimal preservation. Final unexecuted main59372bytes SHA
+`0c5f72659d52525d16993d60c675d0949f4e0509956c620d5f195d26a41698b9`,
+core37576bytes`c27716283bacf902c568d8c69f71a778ae7abe8b4a08f90049185b9016902d9a`,
+loader3560bytes`b5b2e62e4125bb484fb233ea8080799ce0df2317945aa101de7daac05add93da`.
+Every rendered cloud file remains bounded60000bytes, including calendar and
+config/attempt substitution. Synthetic decimal stubs prove code behavior,
+not native engine ABI or full actual chart precision/coverage.
+
+Historical-section validation false alarm, resolved: an initial root assertion
+mistakenly hashed the first280152bytes of the1.3MB record, not the retained
+section68-through-original-EOF slice. Read-only comparison against published
+`5cd1a7b` confirmed the actual retained280152bytes exactly equal the original
+section68–74 range and SHA
+`dded8f771f9971c4c5488457307d24e26011a20be708de3f50b5c813585ff542`.
+Only current status and section75 have changed; no historical repair occurred.
+
+### 75.14 Explicit composite preparation preflight and fresh processing scope
+
+Root completely reviewed released composite-v2 preparation/driver and changed
+synthetic controls, then independently reproduced124focused controls, all passed
+in11.87s under isolated49/52. Agent's separate restored124green/11.66s and two
+live-globals red controls (missing processing claim; hidden invalid-event count)
+remain attributed evidence. No fullsuite, native QC engine, operator state,
+credential, source/outcome access was exercised by fixtures. Final source SHA
+`b3ddad1f57549ecaafa99cdea0d5855a8a6b1f1c37917c012afb8ee4f2b987d5`(55769bytes),
+driver`410106b36e991366fd35fb2f72e8ba2f191da5ee027aad3d241e6a419fd54684`(11694),
+tests`59b17685ae846a8861d20ea3885f723311bdd527639a41666741b615111decc0`(38538).
+
+`TPR-EXT26-D027` — delegated explicit composite-v2 processing and closed
+source-refusal census, pending independent review. Operation
+`TPR-EXT26-PREPARATION-20261010-001`, exact new ignored owner-only inputs leaf;
+fresh processing claim binds BOTH fixed source indices BEFORE either read.
+Re-read only the expressly identified completed74Massive scopes from immutable
+FAILED001 plus the independent fresh completed2scope Sharadar repair. Exact
+original wire/projection/request/terminal hashes, source closures/Git/plan/report
+and clocks must replay; original failed request387CSV remains audit-only and
+is never opened for inputs. No false completed original capture, network retry,
+resumed spent operation, new provider route, D0 capture or implicit entitlement.
+
+Joint bounds:5400seconds,4GiB wire,4GiB projections,3968000rows,16MiB identity,
+32MiB/month,512MiB total prepared payloads. One continuous301decision scorer,
+70ordered month shards and identity/manifest retain every known identity state,
+missing/unknown/refused row, global native-ID collision and cumulative action.
+The public receipt has55closed provenance/count/hash fields, not licensed rows;
+manifest derives only after receipt hash, avoiding circular input-hash claims.
+No automatic admission of canonical ETF/holdings strategy is granted.
+
+Before scoring, persist a16category per-provider refusal-occurrence map; event
+and firm-ID refinements overlap the native-ID category, so their sums are NOT
+a row partition. Unreplayed providers remainnull, not0. Invalid firm/ticker/
+touch rows retain existing explicit refusal states; invalid native EVENT IDs
+still conservatively refuse the unchanged typed global scorer. No native ID
+is invented, global collision policy weakened, or unknown input made a zero.
+This census improves diagnosis of a possible input refusal without authorizing
+an incidental extra raw-row read. Actual preparation has not executed at this
+registration. After exact local commit, use actual clock creation plus fresh
+24hour expiry and the exact frozen source hashes above for the one-shot CLI.
+
+Root's staged diff check caught trailing docstring whitespace in the untracked
+core and a redundant EOF blank line in the loader. Earlier unstaged
+`git diff --check` did not inspect untracked files; agent whitespace claims
+therefore did not establish their staged cleanliness. Root corrected only
+formatting, then reproduced100runtime controls/3.00s. Final committed core
+37572bytes SHA`706ed5efdcb3999400c5349dc8b5200be1d48c4bb01cbfc7fb080608a679d5da`,
+loader3558bytes`24c752b0859a04d73306e3afddc10d45cc6d3c7b566e2ff17ef160fd90e6e10b`;
+main and preparation hashes above are unchanged. No new economic/source/
+native-execution claim follows from this formatting correction.

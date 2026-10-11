@@ -15835,3 +15835,41 @@ these are provider documentation, not this account's measured capacity.
 Inputs21756021bytes alone do not prove sufficient headroom for private
 audit outputs. No unrelated deletion/overwrite, subscription/purchase,
 credential rotation, actual operator state or broker/paper/live access.
+
+### 76.3 Named completion correction; unchanged candidate economics
+
+F013 is corrected locally by a bounded tuple-snapshot adapter, retaining the
+original strict aggregate, duplicate/nonfinite/float/schema refusal and record
+count/UTF-8 byte budgets. The pure public-bundle renderer changes only the
+completion import/call and OFF's expected attempt literal2→3. ON remains1;
+configurations, original72 input hashes and other cloud source files are exact.
+No executed predecessor is edited. This is not a new candidate or cap reset.
+
+| Frozen successor / focused test | SHA-256 |
+| --- | --- |
+| extended_completion_successor.py | `336e67bff64f484b57e49e92209e22bf9471118c0ee8b8d13c3ff7b8b2511fb6` |
+| extended_operations_completion.py | `c88b00be4e4cc9c2032a0ccfca18cd095ff956d06a212d69ab9f95693040760e` |
+| extended_driver_completion.py | `3315f01a7d1e33ce1882014132c4eef6662b0c23f58979b74ddbdc429ac9a45b` |
+| extended_source_bundle_completion.json,561087bytes | `daaf0c33fd837b9896c99d1759e67454a9f3027d478879c5e60015af1f099934` |
+| test_qc_extended_completion_successor.py | `16cb563f51d83ed7881833c459ca0d9bff30f81b0ae8206b8b4127ba087e0da2` |
+| test_qc_extended_operations_completion.py | `cc46642868522ee43f5deab38118c7e37b667d891d74e0a19e0cb9d0c6a4a566` |
+| test_qc_extended_driver_completion.py | `5d287c2b24071a10bb43b57f00d0a5dd7e288c70ef31e3c3590d9ab5566df687` |
+
+Root independently reproduced39 focused passes in2.05seconds under the
+section49/52 isolated in-process runtime root, pytest9.1.1/Python3.13.15/macOS.
+The generated actual OnEndOfAlgorithm test reproduces old tuple refusal and
+new closed gzip export/two public logs without upgrading incomplete coverage.
+Root's in-memory load-helper mutant removes the list adaptation: one intended
+failure in0.52seconds at extended_core.py239; finally-restored control passes.
+Agent peer review accepted this narrow correction as advisory evidence, not
+Claude independent acceptance or actual QC completion. Source-bundle semantic
+equality to the exact pure render was independently checked. Full audit output
+remains mandatory and storage-sensitive. No new reserve/compile/launch yet.
+
+The bounded D045 UI observation reached the exact Resources URL but showed
+Sign In/Log In, not authenticated resources. No capacity was observed and no
+login/credential extraction or account change occurred. The owner then says
+"qc api key is on this machine". Existing API authentication already works;
+this is credential-availability context, not capacity/entitlement attestation.
+A separately named own-store metadata-only producer is being prepared for
+current evidence; no old failed upload receipt is implicitly renewed.

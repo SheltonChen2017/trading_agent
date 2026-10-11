@@ -15100,3 +15100,141 @@ advance a queued assigned-new-file patch followed a failed check. No tracked/
 executed/private state changed; root required exit-code-gated patch dispatch
 in one orchestration call, and agent changed its pattern. This was a failed
 check, not green validation or permission to ignore a lane mismatch.
+
+### 75.25 Actual ON quota diagnosis and prospective lossless transport decision
+
+Fresh `TPR-EXT26-UPLOAD-DIAG-20261010-001` under61a4e5a… completed at
+`2026-10-11T02:28:44.254849+00:00`, plan SHA
+`8beb3a75401241b52fbb3bced0ba1b51e4df1681b761dc34a9456ee763180fac`;
+42spent request metadata records/488747retained bytes, exact72input census:
+22completed,1failed_or_unknown,49unattempted. Failed request26 input SHA
+`53cc3f8533fd2531e6d1df8a885a5f61c00d76998f3041c8c8de6d8194b2131f`,
+wire SHA`703d44310debd517fb8afc78163621f194d034ee158238e03c3712ea204a5db1`,
+projection SHA`a10f0528cc70c9ea92fae107bf3d7c154a0439129258518f77bb529f9e74a450`.
+Closed safe message classification isquota; no explicit API/HTTP status code
+or transport status was retained/observed by this diagnosis. No full error
+text/account IDs/row payload/OFF response was returned. This is a concrete
+storage-capacity rejection classification, not a new backtest attempt or a
+license/entitlement/PIT claim. Do not automatically retry request26.
+
+D035 (delegated under current six-sleeve/2021-now private-processing authority,
+pending independent review) selects normal losslessgzip storage efficiency as
+a safe alternative before reporting an irreducible quota blocker. It does NOT
+buy/upgrade/rotate/bypass storage limits, export restrictions or data rights.
+Register a fresh bounded processing manifest/claim BEFORE reading72exact
+already-prepared payloads (no D0/captures/provider reaccess); retain every
+original byte/hash immutably; deterministicgzip and independently bounded
+decompression must prove exact byte-equality and original hashes. New unique
+compressed keys/source transport mapping are explicitly identified successors.
+Candidate economic/config/source-input hashes remain unchanged; both arms use
+the same exact audit encoding, and OFF has no signal reads. Prospective cloud
+InputStore returns only original verifiedUTF8; unchanged SignalStore validates
+original sha/shape. Prospective cloud audit encoding retains every logical
+journal/index byte/hash and cloud-only readback, without restricted export or
+claiming external full replay. Actual ratio/capacity fit is not yet known.
+
+If required, cleanup scope is ONLY the22successfully uploaded objects from
+this fresh study and ONLY after exact keys/source lineage and recoverable local
+byte copies are verified under fresh claims. No unknown failed-upload target,
+unrelated key/project, old research evidence, recursive namespace wipe or
+subscription change. The exact22hash census is retained in the private fresh
+diagnosis; targetkeys derive from committed original bundle. No deletion has
+occurred or is implicitly renewed by this entry; a separate committed bounded
+cleanup producer/manifest and fresh properties/proof must precede it.
+Primary QC documentation supports zippedbyte storage/readback and ownkeydelete:
+https://www.quantconnect.com/docs/v2/writing-algorithms/object-store and
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/object-store-management/delete-object-store-file.
+These describe APIs/defaults, not this account's quota/delete permission.
+No new outcome/date/threshold choice is made; ON0attempts/OFF1spent attempt,
+17total observed looks, extended paired completion still absent.
+
+### 75.26 Named native-ID/read-budget successors; compression pre-operation freeze
+
+D036 (delegated, pending independent Claude review) corrects F006 using
+`extended_runtime_successor.py`6712B SHA
+`2e6bb5c82f356ee7ece4811c9d634ce57d48533d408d4b57b8aee41de062517b`,
+tests11876B SHA`cc43210aedc0ecf13956db84c9222f7c656638bca8f8ce8500f36ab8be4e862d`.
+A bounded original PrivateEvidence buffer retains initialization records before
+the engine locks; native project/job/lock values must be valid and immutable
+before trading, journal storage or export. No configured/fake/default engine
+ID, engine mutation, production trust weakening or economic change. Agent
+43focused passes in1.01s, old constructor one red then successor green; root
+read both fully. Actual native ABI remains unproved until a later QC attempt.
+
+Root named `extended_algorithm_successor.py`59833B changes exactly eight
+substitutions, template SHA`e0077b7992dc64515384f56687b350725d694c746a8d4523336d18aa144dd9a8`,
+tests3941B SHA`a598f30c0cc00985b62060fc26ab3291849bc86c9be1cac500b254d0022369ed`.
+Rendered main is59854B, not the template size. Peer independently4green0.28s
+and accepted the complete exact diff. Changes are only the eight registered
+substitutions: imports, native deferred evidence binding, three pre-event
+binding gates, ON-only verified compressed input proxy, and both-arm compressed
+audit store. Four focused controls prove only those substitutions, unchanged
+executed algorithm/core SHA, AST compilation and every rendered attempt under
+60000B. Original executed main/core/loader/config/input/source bundles remain
+immutable. OFF never imports its ON compressed packet or reads TPR inputs.
+This prospective runtime correction does not refund OFF attempt1.
+
+F007 additionally affects the old result reader's post-read expected-size
+check: changed/opened last-file size could exceed remaining budget before
+post-read refusal. No actual breach was observed. D037 chooses named strict
+FD-open/fstat-before-body inventory and reader successors for all future reads.
+Inventory successor11059B SHA
+`44de86581286d5712843fb4f3b58509a2a5fdb82a639602e5ce000703e9bee1a`,
+tests10789B SHA`67674ad874a479e9515a0a577f2a52dc6c48cbb7ca515b4f73ebbe9288e27b50`;
+reader successor11518B SHA
+`9f28c456305bc9ee3d693b8afcaeb66541a581937be467edbd3361dcde5799d8`,
+tests10263B SHA`7ee6899dc753fcd14ad6d7226b14fe072f708a70bb3876983e8371e02bc31aa8`.
+Agent attributed31green0.18s/29green0.17s, old inventory race one red and
+old reader budget/exact-size controls two red, restored green. Root fully read
+both modules/tests and reproduced107focused passes in1.40s across these plus
+runtime/main controls. New V2 claim identities/source closures preserve own-job
+lineage, explicit byte/time/expiry bounds, negative outcomes and no automatic
+retry; old executed readers/receipts are not rewritten or retroactively safe.
+
+D035 lossless processing is now concretely frozen before private reads:
+`TPR-EXT26-COMPRESS-20261010-001`, exact72prepared input files totaling
+241804159B from bundle
+`799e6eaa452860e1223ff9e35e8e4b5fa814161e9cd6cbb9d0bc27a6ae590f7b`.
+New producer `extended_compression.py`16982B SHA
+`7031ef283e58951332a083a4ef3de079d2fe8a5a43baeb1c6b4f066736476cab`,
+cloud adapter13987B SHA
+`d661b5752c35b9dd04f783f5d78850f453d5f5f299874e5cf19700599df2356e`;
+tests8013B/`224b71c800bbab799ce28c3b6c77aacaf5d5d508d9f94694e0faade405deed22`
+and11619B/`a300b928693fbc32b03ef80ecb985bf303fcd7e456a1b7086852bbe83b2315a7`.
+Fresh exclusive claim precedes every input read; six committed source hashes
+including fixed package initializers and original bundle,24h/900s,
+32MiBfile,500MiBphysical original-read budget(two passes483608318B),
+256MiBderived read/storage. Deterministic gzip9/mtime0/empty filename; independently
+bounded single-member decoding requires exact original and compressed size/SHA,
+EOF/no tails/concat, then exact byte equality and original revalidation. Fresh
+gzip.<compressedsha>.json outputs use O_EXCL; originals stay unchanged.
+No provider/capture/D0/outcome/API/credential access, no looks/attempts/uploads/
+deletes/canonical admission. Failure/partial output remains spent, not retried.
+
+Cloud input adapter has exact hash-bound mapping and no plaintext/missing-input
+fallback. Audit adapter stores every original logical chunk/index byte and hash
+in gzip physical objects with own native job-prefix storage sidecar, both hash/
+byte domains and cloud-only readback; no licensed reconstructive export. Full
+audit compression is storage transport, not dropped records or full external
+replay. Pre-release peer refinements enforce remaining read budgets and exact
+Python.NET byte-array type before coercion; actual CLR ABI remains unverified.
+Agent51green0.80s; peer independent51green0.70s accepted-after-correction;
+root independently158focused passes in1.78s with isolated49/52 runtime across
+the six new test files. Agent two in-memory controls each1red/restored1green
+(original decoded-SHA omission, missing processing claim). Root full source/
+test reading, no full lane/repository suite, no operator stop/database, no
+Windows signer/ACL/protected-parent custody proof or changed fourteen
+frozen-Windows-Git exclusions. No new empirical performance outcome is read.
+
+Actual upload diagnostic public receipt is68233B SHA
+`2966bfbdd3c5c726f2f1c1284e043cc6ee19409e6c1e46c5778ec34f50a54699`.
+Exact22 cleanup targets are its completed SHA set, resolved only against the
+immutable original bundle, failed target23 excluded. Any later separate cleanup
+must first retain successful72byte-equality compression receipt, verify fresh
+local22original SHA/size/MD5 recoverability and ALL22 exact native object
+properties key/size/MD5 before the first delete. Drop native properties.preview;
+retain safe metadata/original wire hash only, never preview rows. Only official
+object/properties and object/delete, strictTLS30s/no redirect/retry,44calls max,
+individual spent request claims before credential/network,24h. No cleanup,
+compression processing or corrected QC launch has occurred at this entry.
+ON0/OFF1attempt remains, total17looks; paired extended results are absent.

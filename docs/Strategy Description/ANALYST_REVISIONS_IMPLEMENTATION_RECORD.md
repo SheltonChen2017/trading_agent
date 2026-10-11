@@ -41779,3 +41779,40 @@ There is no new Claude commit in this round to dispose and no independent
 acceptance is asserted. Exactly one final matching-lane push follows the
 implementation and durable handoff; no intermediate push, external chat
 message or new Claude session is authorized. The monitor stays paused.
+
+### 279.5 Exact commit handoff and final checks
+
+The source/protocol/owner-acceptance freeze is
+**`aae4551de2760242093a1c9bb7fe24ec0e0b83a1`**. This following record-only
+handoff changes no executable/test source or profile. The section-279 round
+is exactly `736709f7d12d6a10437db0dca271660f47bcefc6` through this handoff
+commit, comprising the one implementation freeze above and this record commit.
+Both are Codex work pending independent review, not independent dispositions.
+Before handoff, all 86 record/document checks passed again in **1.91 s**;
+this is a repeat subset of the 662 distinct focused passes. Four static
+compilations, diff whitespace and the narrow staged secret-shape scan passed.
+The matching-only remote fetch still resolved the original `736709f7` base
+before the implementation commit. No unexpected concurrent changes appeared.
+
+The complete still-unreviewed Codex sequence since the last disposed Claude
+commit is listed explicitly for the next reviewer; it is not a replay of any
+previously disposed Claude review:
+
+| Exact Codex commit | Required independent disposition / scope |
+|---|---|
+| `23189a7e6fa0dfcd7b26e11ef28b0007e46b6ee7` | Pending: section-277 v2 observer/wrapper, exact opaque-baseline acceptance, tests and protocol |
+| `425c2eadb6a42de28573b8e915e0dee997fba91d` | Pending: single metadata-only preflight result, scope/limitations and review handoff |
+| `f74bc1758f3192068c99c38c7e52db75195b1eb4` | Pending: exact one-round owner waiver and single v2 assessment freeze |
+| `736709f7d12d6a10437db0dca271660f47bcefc6` | Pending: spent v2 refusal, report authentication, stat-only discrimination and changed-device barrier |
+| `aae4551de2760242093a1c9bb7fe24ec0e0b83a1` | Pending: section-279 owner decision, exact one-field prospective v3 projection, retained guards, test-isolation correction/disclosure and focused evidence |
+| This record-only handoff commit | Pending: exact cumulative range, validation, exclusions and next-step record; no additional execution |
+
+The full pending review range begins at the already disposed Claude head
+`50dcf08e2ca3d189ca152af284edac1f253c394e` and ends at this handoff commit.
+The reviewer must resolve its exact pushed object before starting, keep every
+per-commit disposition, and not rerun the spent assessments or perform a fresh
+real preflight merely to validate the code. New full-suite evidence belongs
+to that exact reviewed snapshot and must disclose failures/partitions, not
+reuse the historical 10,912-pass union as current validation. The next actual
+v3 assessment remains behind the specific review/counter-review and separate
+run-freeze gates. No owner baseline question is reopened.

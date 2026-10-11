@@ -15741,3 +15741,97 @@ read only the matching saved automation id/kind/name/status fields: the consumed
 notification or schedule change was made. OpenAI Docs skill was used for this
 narrow app-state verification; no strategy or repository behavior depended on
 documentation inference about the actual saved status.
+
+## 76. Owner-directed extended-study continuation — 2026-10-11
+
+### 76.1 Scope, provenance and unchanged freeze
+
+The owner now directs: "proceed. other lanes may also create/test qc projects.
+if efforts are blocked because of this reason, wait." Followed by:
+"proceed to run the backtesting, document the result. when done, push only once".
+The UTF-8 context used by this round's fresh result-read scopes preserves the
+two messages and LF separators; SHA-256
+`b42bc72897b490a814eff55af4cc697d05e20a44c1889f6c649d20e27d6d8ec5`.
+Starting physical/Git root and branch are the designated Target-Price lane;
+clean local HEAD and actual matching remote both equal
+`08e3fe79d2bce538692f51cf0903bdcab18cd354`. No incoming Claude commit exists.
+This is explicit operational continuation of the existing frozen study, not
+independent acceptance of section75 or permission to change strategy economics.
+All six sleeves, dates2021-01-04–2026-10-09, ON/OFF candidates, inputs,
+90bdec…freeze, calendar, prior outcomes, canonical gates and sealed holdout
+remain unchanged. Stock selection is cap-only; TPR changes weights only;
+AR is entirely disabled. It is not an ETF-only or canonical ETF-alpha study.
+
+The owner additionally directs: "also, I've told Claude to arm a monitor for
+your next push. when this round is concluded, push once. then arm a monitor
+for Claude's review push. then start counterreview and proceed to the next
+milestone". Exactly one successful matching-lane non-force push concludes
+this round. Only afterward rearm the existing chat's review heartbeat for
+the exact new snapshot/full round, quiet while unchanged/incomplete. Pause
+it before the qualifying counter-review; counter-review every incoming
+commit before the next authorized bounded milestone. Claude's claimed monitor
+is owner-reported, not independently inspected by Codex. No message is sent
+to Claude's chat by inference. New direction supersedes the prior no-rearm
+instruction for this round only; it does not grant trading/canonical authority.
+
+| Decision | Provenance and chosen option | Rationale/alternatives | Scope/limits/review status |
+| --- | --- | --- | --- |
+| `TPR-EXT26-D044` | Direct latest owner continuation/run direction; resume existing exact study with fresh access. | Retrieve OFF2, do not relaunch a nonterminal attempt; retain ON quota failure. | No economics or attempt reset; execution authorized, independent code acceptance pending. |
+| `TPR-EXT26-D045` | Delegated resource diagnosis: bounded read-only authenticated QC Resources observation. | Distinguish storage capacity from shared compute occupancy before waiting/retrying; no guessed cause. | UI operation `TPR-EXT26-RESOURCE-UI-20261011-001`: exact quantconnect.com/organization/resources, ≤3 navigations/2 observations/120seconds after navigation, aggregate capacity/usage/availability and authentication state only. No other project contents, storage preview/export, mutations, login credential extraction, purchase or subscription change. Tool/UI evidence is not an API attestation. Pending independent review. |
+| `TPR-EXT26-D046` | Source-bound OFF2 diagnosis; named completion successor proposed. | Runtime adapter supplies tuple records; aggregate requires list. Correct the bounded interface, not portfolio rules; preserve executed originals. | Synthetic red/green and source review required before last OFF attempt3. No extra allowance or new candidate. Agent-delegated, not human-/Claude-approved code. |
+| `TPR-EXT26-D047` | Direct latest monitor/workflow instruction. | One final push then exact-snapshot completed-review monitor; no checkpoint publication. | Existing heartbeat stays paused during this round; actual arming must be verified after push, not assumed now. |
+
+Preflight incident: an unavailable cross-turn stored variable caused one
+read-only command to use the default sibling cwd and partially read its
+CLAUDE.md. No edit, validation, Git mutation or provider/cloud call occurred.
+Root immediately re-established absolute lane constants/invariants and read
+the correct lane instructions. This is noncompliant-root diagnostic history,
+not compliant lane evidence; no alternate checkout is used subsequently.
+
+### 76.2 Actual OFF2 terminal retrieval; no new launch
+
+Fresh access `TPR-EXT26-QC-20261011-005` prepared under08e3…from unchanged
+223efa…compressed source bundle; manifest SHA
+`1dee60f0289300aa11b4aabb88d44bfaba34c80832eb4f1a1c7d9240a19692d2`.
+Actual own job `f79d3ff02644ec81f20da5cc6ca7440a`, project37650980,
+compile`e8789d4aa60e2a1f370537234c30de6e-d8260dab150ff48e1a19031d318ed91e`
+now returns Runtime Error/completed=true/error=true/terminal=true. The first
+status invocation's shell session handle was omitted from displayed tool
+output; a later explicit status query returned the terminal result. Neither
+query reserves/recompiles/relaunches. Original attempt2/source/input/config
+and origin operation003 remain exact; OFF2 is now unsuccessful, not running.
+
+Fresh strict V2 inventory `TPR-EXT26-INVENTORY-V2-OFF2-20261011-001`
+completed2026-10-11T19:20:13.173155Z; planSHA
+`dde0b7b5054cc6f14d25461bf2e9c928d7c0cd7924a59adc4f234f3d40cd3013`.
+Nine exact own-job files/2074768bytes, lineage verified, canonical inventory
+961bytes SHA`20fa16599d75de9834267ec4b53822f7b61655ca4b65d065bd3dfe7cea08af9f`.
+Terminal envelope1299525bytes SHA
+`11d6db1fbdf381653897c317d80a083527d9e925a57ba591486c673dc2697173`.
+Fresh strict reader `TPR-EXT26-RESULT-V2-OFF2-20261011-001` completed
+19:20:50.456932Z; planSHA
+`607f97c1720025221cd1997411195c4b9fb389edf3fb955c45afa145c3749366`.
+Same nine hashes/byte census; no input/provider/credential/network/export read
+by either local reader; no receipt renewal/new look/attempt. Diagnostic emits
+ValueError and source frames extended_core.py239/main.py1020 only; private
+error text is not published. Metrics remain null; no performance claim.
+
+`TPR-EXT26-F013` P2, confirmed source-bound completion interface defect:
+CompressedBoundEvidenceJournal.records returns a tuple, while
+extended_core.public_run_aggregates line238 admits only list. The actual
+OnEndOfAlgorithm caller passes that property directly at main.py1020.
+The diagnostic frames match the unconditional type refusal. A named successor
+will adapt the bounded immutable tuple snapshot to the existing strict list
+aggregate without weakening schema/budgets or changing economics; original
+executed modules/bundles remain byte-identical. Reproduction/correction and
+actual last-attempt evidence follow, not assumed complete here.
+
+ON0/OFF2 consumed attempts; ON3/OFF1 remaining. Eighteen historical looks
+(16cloud+2local) remain retained, no new backtest look from status/diagnosis.
+Quota-classified ON failure remains open F012, not proof of another lane's
+compute contention. Official QC Object Store documentation says displayed
+usage may lag changes about one hour and Resources shows aggregate usage;
+these are provider documentation, not this account's measured capacity.
+Inputs21756021bytes alone do not prove sufficient headroom for private
+audit outputs. No unrelated deletion/overwrite, subscription/purchase,
+credential rotation, actual operator state or broker/paper/live access.

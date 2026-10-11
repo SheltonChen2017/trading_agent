@@ -15572,3 +15572,172 @@ The same project, source/config/input/job/attempt histories are retained;
 existing attempt comparison ignores only baseline Git HEAD, never source,
 config, input or project changes. This scopes new access, not a new launch,
 spent-receipt extension, candidate rename or attempt/look refund.
+
+### 75.35 Actual compressed upload diagnosis; resource blocker remains open
+
+Fresh diagnostic001 under `4a4d7fe3c280b39e5b6657ec267b4635327a2fb2`
+completed `2026-10-11T03:17:18.804723+00:00`, plan SHA
+`6d60994c5f10aa69c0c0584d8e321f70aa2bce3e6e5fc6f4e14d16155b839f01`.
+72 metadata files/567215B; fixed128-slot census found66 spent requests, all
+unrelated response bodies excluded. Public safe result64615B SHA
+`9718ef34b2c4e624d0cb4556310d4678b8fc0ffe266d882ea04212e2b8410db7`.
+Exactly zero compressed completions, one failed_or_unknown,71 unattempted.
+Matching request61 opened only its admitted own object/set response metadata:
+gzip `8ed811d89c484c006447654f6257c46f285eef8f697f0cc4d94d60a8c0e40042`,
+346371B, logical original3880862B SHA
+`0517643e30eefdbe1625db4eb470f343b7e322d5c438be710b0ac85ccc347a9b`.
+Original wire SHA
+`703d44310debd517fb8afc78163621f194d034ee158238e03c3712ea204a5db1`,
+projection SHA
+`a10f0528cc70c9ea92fae107bf3d7c154a0439129258518f77bb529f9e74a450`;
+safe error classification quota, no explicit HTTP/API error code observed and
+no raw error/account ID returned. Unknown failed effect is not a success.
+This independently corrects75.32's provisional classification: transport was
+admitted and a native quota-classified response retained, not only local refusal.
+
+`TPR-EXT26-F012` P1 external/resource, **open**: ON cannot receive its frozen
+inputs. Lossless compression reduced241.8MB to21.8MB and exact verified
+owned-object cleanup removed74.6MB, yet the first346KB compressed upload
+still failed. No free-capacity amount, plan entitlement, provider fault or
+success of a future retry is inferred. Safe alternatives already exercised
+preserved every original/local artifact and full audit design. Do not delete
+unrelated/historical frozen evidence, drop inputs/audit rows, change portfolio
+economics/dates, disguise a local run as QC, evade an access restriction, buy
+storage or change subscriptions to force a result. The owner was asked in
+this chat to free capacity in the existing QC organization for21.8MB of input
+plus private audit-output headroom. No affirmative recovery response has been
+received at this entry. A spent/failed upload cannot simply be repeated; after
+an evidenced resource change, register explicit new bounded read/upload access
+and preserve request61/its failed receipt before any authorized successor.
+No ON source upload/reservation/compile/launch, no ON QC attempt, no new outcome
+from this metadata diagnosis, no paper/live/broker/funded-account action.
+
+Fresh status/collection operation004 prepared from unchanged223e bundle under
+4a4d HEAD, manifest SHA
+`abb70be1f71e42e0619fc918175cb07c243f529d7cf0685e05161471706f2eb1`.
+Actual same OFF2 job/source/config/input continued to return In Progress,
+completed=false/error=false. No new reservation/compile/launch occurred under
+004; origin launch remains003. OFF2 output/audit-storage success is unverified.
+ON0/OFF2 consumed attempts and18 total observed looks remain unchanged.
+Original failed OFF1, uncompressed/compressed upload failures, source/capture/
+compression/cleanup evidence, operations and source bundles are retained.
+
+### 75.36 Future paired processor; two pre-execution findings corrected
+
+D043 (agent-delegated implementation, pending independent Claude review):
+named `extended_paired_results.py`31527B SHA
+`3d0c5f7df5b44b7ca92c3fb309a10ed49cca914210ae7ef1e9c20533b12de103`
+and focused test20178B SHA
+`7a9c29d58a8a74738600c67fef7337f2e19141eb346b55fd5cb7a045e1c532b6`.
+Exactly four independently SHA/byte-bound own-account artifacts: each strict
+RESULT-V2 metrics receipt plus collector normalized NAV; no raw orders,
+licensed inputs, API, credentials or Object Store export. Fresh24h120s,
+16MiB/file64MiB-total exclusive claim before child existence/body reads;
+strict opened-FD expected-size/remaining/custody reader. Actual fixed projects,
+candidate/config/input/source/job/attempt/origin-look/collection-access lineage;
+1449 matched NAV observations recomputed without interpolation. Supplied
+look receipts/counts are independently rooted inputs, not event discovery or
+provider authenticity. Nullable fees/turnover, incomplete coverage/chains,
+zero orders, accounting residuals and representational precision remain visible.
+No invented sleeve P&L, canonical/research/alpha/strategy/readiness acceptance.
+Alternative ad-hoc actual artifact reads without a fresh bounded producer were
+rejected. **No actual paired processing has occurred or is admitted yet**:
+both verified completed usable own-job metrics receipts are required; ON is
+blocked and OFF2's genuine terminal evidence is still pending.
+
+| Finding | Evidence and correction | Status |
+| --- | --- | --- |
+| `TPR-EXT26-F010` P2 | Root confirmed original paired consumer equated launch operation003 manifest with newly scoped collection004 manifest, falsely rejecting unchanged valid job/source/config/input. Independent peer confirmed. Separate exact `collection_operations_manifest_sha256` now binds strict-reader inventory; original launch look/manifest/execution hash remain independently bound and retained, never relabelled. | Corrected before execution. Agent old-comparison mutant1red0.60s/restored1green0.17s; root independently1red0.39s. |
+| `TPR-EXT26-F011` P2 | Root confirmed shared-source equality omitted `extended_construction.py`, the common cap-ranking/executable-removal/tilt policy. Include its exact cross-arm hash, with coherently rebound source/look negative evidence reaching the shared-policy gate. | Corrected before execution. Agent omitted-construction mutant1red0.16s/restored1green0.12s; root independently1red0.39s. |
+
+Root read all original/revised producer/test code, reproduced44green4.50s;
+two clean restored controls2green0.51s. Peer independently reviewed final
+hashes/full files, reproduced44green4.44s, accepted-after-correction for future
+fixed processing with no unresolved material code finding. Agent44green4.52s
+and preliminary39green/fixture-expiry repairs remain attributed pre-execution
+evidence, not actual cloud performance. Sections49/52 isolated macOS runtime
+root; no full suite/operator state/database/Windows signer/ACL/parent custody
+proof. Prior fourteen frozen-Windows-Git cases remain excluded, not weakened.
+
+### 75.37 Stable resource-blocked handoff, validation and next role
+
+Final root focused set: new compressed-upload diagnostic24, paired processor44,
+one active-document and one import-boundary check, **70 passed in5.32s**.
+Four new producer/test files py_compile exit0; diff whitespace clean. Historical
+sections68-74's exact original280152-byte span is byte-identical to5cd1a7b,
+SHA `dded8f771f9971c4c5488457307d24e26011a20be708de3f50b5c813585ff542`.
+The one new blank separator before section75 is outside that original span;
+a naive header-to-header extraction includes it and therefore has a different
+hash, not a changed historical artifact. Freeze90bdec… and compressed
+bundle223efa… hashes reproduced unchanged. All round differences are
+Target-Price-owned research/tests plus this sole record; shared Action Plan,
+Session Handoff, workflows and main/sibling behavior remain frozen. No full
+suite, operator state/database, broker/live/paper/funded-account action,
+credential disclosure, public licensed rows, purchase/upgrade, holdout access,
+research-alpha allocation change or history rewrite occurred.
+
+Final observed OFF2 status in03:28-03:29UTC on2026-10-11 remains
+In Progress/completed=false/error=false. Job
+`f79d3ff02644ec81f20da5cc6ca7440a` is **not cancelled** and may later finish;
+no later terminal outcome, usable-order count, fills, fees, NAV, return,
+drawdown, coverage or full-audit storage success is inferred. Its source and
+origin operation003/launch/compile/attempt2 remain immutable. Fresh operation004
+permitted source-identical status continuation only. This stable snapshot ends
+the continuous round on the actual ON resource blocker, not on a fabricated
+strategy or canonical gate. No third OFF attempt or first ON attempt is launched
+while the known prerequisite is unresolved. Mia recovery is not triggered:
+only OFF1 has an observed unsuccessful terminal run; OFF2 is nonterminal,
+ON0, and no candidate has three unsuccessful attempts.
+
+| Frozen sleeve | TPR ON2021-01-04–2026-10-09 | TPR OFF same window | Verified comparative outcome |
+| --- | --- | --- | --- |
+| SPY: S&P500 proxy | Not launched, private input quota blocker | Shared six-sleeve portfolio OFF2 running | None |
+| XLV: Healthcare | Same ON blocker | Same active OFF2 job | None |
+| XLE: Energy | Same ON blocker | Same active OFF2 job | None |
+| QQQ: Nasdaq100, not all listings | Same ON blocker | Same active OFF2 job | None |
+| SOXX: Semiconductors | Same ON blocker | Same active OFF2 job | None |
+| REMX: covered US subset, not complete global basket | Same ON blocker | Same active OFF2 job | None |
+
+These are two portfolio arms across six constituent-stock sleeves, not six
+ETF-only holdings, six independent sleeve-P&L observations or36 backtests.
+Same cap-only selection, weight-only TPR tilt, no AR/fallback/retuning; dates,
+301 decisions/1449 valuations, cash/cost/volume/action/missing-input rules remain
+frozen. **No2021-now paired result and no all-six completed-QC claim.**
+Observed look ledger remains18=16cloud+two historical local looks; ON0/OFF2
+reservations consumed, with ON3/OFF1 remaining under the existing caps.
+Previous Q12025 negative results and all failed/diagnostic historical looks
+remain immutable and exploratory; no independent confirmatory-alpha assertion.
+
+Next required owner action: resolve existing private QC storage capacity for
+the lossless21,756,021-byte input bundle plus bounded full private audit
+outputs; consult the existing organization's Resources/Object Store capacity,
+not a purchase or unrelated deletion by Codex. Native upload error is a
+quota-classified refusal, not an independently measured quota amount. Separate
+rights-paperwork waiver remains working authority, not provider attestation.
+After an evidenced state change, any successor upload needs fresh bounded
+manifest/claims retaining failed request61; do not reuse spent read/effect
+receipts, rename candidates or reset counters. Retrieve active OFF2's eventual
+terminal evidence via a **new current-HEAD operations access scope** because
+publication changes HEAD; do not relaunch the active attempt. Use strict V2
+own-job inventory/reader claims before any private terminal/metrics reads;
+normal native orders/chart/log collection only, no derivative Object Store
+export workaround. A Completed status/zero orders/missing coverage must remain
+diagnostic. Actual paired processing waits for both usable completed receipts.
+
+Next independent-review role: Claude reviews the exact final published round
+from5cd1a7bed6e27c121cbdf0c60d4e61a44536018a through the snapshot reported in
+this chat, commit-by-commit and cumulative tree, including current corrections,
+owner/source/operations/look authority and negative/incomplete evidence. Its
+full lane suite remains Claude-owned. Codex then counter-reviews every returned
+commit before a new implementation round. Canonical TPR-TR0-I, TPR-1 and
+TPR-0B gates remain parked/incomplete as previously recorded; OOL011 shared
+synchronization remains owner-coordinated and OOL003/004/006 stay closed.
+The consumed heartbeat remains PAUSED during and after exactly one final
+non-force matching-lane push; do not auto-rearm or trigger on Codex publication.
+
+Before final publication, root used the app's automation view and independently
+read only the matching saved automation id/kind/name/status fields: the consumed
+`target-price-claude-push-counter-review` is heartbeat/PAUSED. No rearm, prompt,
+notification or schedule change was made. OpenAI Docs skill was used for this
+narrow app-state verification; no strategy or repository behavior depended on
+documentation inference about the actual saved status.

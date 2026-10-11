@@ -1,20 +1,26 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **SECTION 107 COMPLETES THE FROZEN DIRECT-SHARADAR SOURCE-ONLY
-CAPTURE AND DOCUMENTS THE REQUESTED ORDER-BASED BACKTEST'S PREFLIGHT STOP.
-THE CORRECTED SIXTEEN-REQUEST CAPTURE AND PRIVATE REPORT REBUILD COMPLETE;
-ONE ORIGINAL METADATA REFUSAL AND TWO PUBLIC BOOTSTRAPS ARE SEPARATELY
-COUNTED, NINETEEN REQUESTS TOTAL. PRIVATE DATA-USABILITY CONCLUSIONS/ROWS
-ARE NOT PUBLISHED. A SENTINEL CAPTURE IS NOT A FULL-HISTORY BACKTEST INPUT.
-VERSIONED HISTORICAL IDENTITY/SHARE-CLASS AND PAYMENT/TERMINAL INPUT
-BINDING, PROSPECTIVE LOOK REGISTRATION AND EXACT QC REPRESENTATION REMAIN
-UNQUALIFIED. NO BACKTEST LAUNCH, PERFORMANCE RESULT OR NODE-OCCUPANCY CLAIM.
-SECTION 106'S REVIEW WAIVER AND HISTORICAL LEDGER REMAIN UNCHANGED; NEW
-CODE IS IMPLEMENTED/FOCUSED-VALIDATED, NOT INDEPENDENTLY ACCEPTED. SOURCE/
-SHARED P2s AND PROSPECTIVE P3s RETAINED. LOOKBACKS 20/60/120/252 UNSELECTED,
-CANONICAL REAL LOOKS 0/0, EXPLORATORY REAL LOOKS 0, ALPHA 0, PERMANENT LOOK
-IDS NONE, QC ATTEMPTS 0. ONE COMBINED FINAL PUSH, THEN OWNER-REQUESTED
-ONE-SHOT CLAUDE REVIEW MONITOR; ACTIVATION IS VERIFIED IN CHAT AFTER THE TOOL.**
+Status: **CLAUDE HAS REVIEWED ALL SEVEN CODEX COMMITS IN `90e0d56..2e6faa5`
+(SECTION 108) AND ACCEPTS THEM. THE HISTORICAL FINRA CALIBRATION (EIGHT SOURCE
+REQUESTS) AND THE DIRECT-SHARADAR COMPANION QUALIFICATION (NINETEEN REQUESTS)
+WERE FROZEN BEFORE RETRIEVAL AND STAYED IN BUDGET; BOTH REPORTS REBUILD BYTE
+FOR BYTE FROM THE PROTECTED FILES ON DISK, AND NO PROVIDER ROW, KEY, TOKEN OR
+PRIVATE DATA-USABILITY CONCLUSION IS IN GIT. EIGHT OF NINE IN-MEMORY MUTATION
+PROBES WENT RED ON THE INTENDED BEHAVIOUR; THE NINTH GUARD CANNOT FIRE BY
+CONSTRUCTION. THE OWNER-REQUESTED BACKTEST WAS CORRECTLY NOT LAUNCHED: NO QC
+CALL, LOOK OR PERFORMANCE RESULT EXISTS. `SI-CR21-001` (P3, OPEN): FINRA SOURCE
+REQUEST 7 RAN THROUGH UNCOMMITTED DIAGNOSTIC CODE, AND ITS DIRECTORY NAME
+MISSTATES ITS TIME. `SI-CR20-001` IS CLOSED. NETWORK-DENIED ON `2e6faa5`, THE
+NEW AND PACKAGE-SCANNING LANE FILES WITH DOCUMENT AND BOUNDARY CHECKS PASS
+856. THE NEXT MILESTONE IS A VERSIONED ACTUAL-INPUT IDENTITY AND
+CASHFLOW ADAPTER, THEN LOOK REGISTRATION (`SI-CR19-003`); THE CANONICAL PIT
+STUDY REMAINS BLOCKED ON ORIGINALS, CORRECTIONS AND AVAILABILITY CLOCKS. THE
+THREE SOURCE P2s, THE SHARED P2 `SI-CR5-005` / `SI-CCR16-007` AND `SI-CR15-001`
+REMAIN OPEN. LOOKBACKS 20/60/120/252 REMAIN UNSELECTED; REAL LOOKS 0/0, ALPHA 0,
+PERMANENT LOOKS NONE, QC ATTEMPTS 0. OUTCOMES, HOLDOUT, PRODUCTION
+RANKING/SEEDS, ETF, QC HISTORY/PROJECT/UPLOAD/COMPILE/JOB/BACKTEST, PURCHASE,
+BROKER, OPERATOR DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL, ORDERS AND TRADING
+REMAIN GATED.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -219,6 +225,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-10 | Codex source calibration completion | `90e0d568` -> `902b3169` freeze -> `1c8de172` status evidence -> `217e05fa` empty-transport correction; this closing record follows | Complete frozen historical/raw-format calibration; current companion-access factual stop | Seven ordered queries complete: 10/18 historical cells and 1/5 format cells valid, all 12 missing explicit, no duplicate/malformed/ambiguous rows. Three OAuth, two metadata and exactly eight source POSTs; immutable failed run and status diagnostic retained. BRKB is observed raw spelling only, not selected alias/identity. | Main focused **363 passed in 6.04s**, network denied; material red/green corrections, targeted compilation and exact lineaged report rebuild/private permissions passed. Closing document/privacy/diff/status checks in 106.8. Canonical/exploratory/QC zero counters unchanged. | SI-FINRA-CAL-001..004 corrected; SI-CR20-001 interpretation addressed only, not universal coverage. Historical source/shared P2s and prospective P3s retained. No counter-review disposition assigned to waived Claude commit. | One final non-force lane push. Current Sharadar secure location/account route needed before companion entitlement/schema/action/coverage qualification, then actual-input/evaluation/look/QC gates. No new monitor or further source POST. |
 
 | 2026-10-11 | Codex companion qualification / backtest preflight | `b80ef633` -> prospective freeze follows; final handoff appended in section 107 | Direct-Sharadar protected source-only qualification before requested order-based backtest | Known credential handed off; frozen ten-token sentinel and sixteen-request contract, exact provider identity/rational volume and private fitness handling. No empirical readiness is inferred. | Main focused **326 passed in 9.87s**, empty environment/network denied, plus targeted compilation and diff checks. Actual capture and final execution status follow in section 107. Canonical/exploratory actual looks and QC attempts zero before execution. | Draft transport/schema findings corrected before real authentication; historical source/shared P2s and prospective P3s retained. | Complete frozen source capture, evaluate factual backtest prerequisites without bypasses; one combined final push, then one-shot exact-checkpoint Claude monitor. |
+| 2026-10-11 | Claude review | `90e0d56` -> `2e6faa5` reviewed after the push watcher fired; **no code or test correction**; this record commit is the only Claude commit | Independent review of the historical FINRA calibration, the direct-Sharadar companion qualification and the backtest preflight stop | Verified each real request followed a clean commit of its code (one exception, `SI-CR21-001`), credentials and tokens never persist, and both reports rebuild byte for byte from the protected files, printing no Sharadar data conclusion. Ran nine in-memory mutants: eight red, one unreachable by construction. Confirmed the backtest was not launched and no look or QC call occurred. | Pushed tree `2e6faa5`, clean, Codex idle, network-denied, empty environment: new and package-scanning lane files with active-document and ML boundary **856 passed** (432 new cases; no skips or warnings); compileall exit 0; final-tree active-document 69 passed; `git diff --check` clean. No network request by Claude. **Authorized looks 0, consumed looks 0**. | `SI-CR21-001` (P3, open: FINRA request 7 ran through uncommitted diagnostic code, and its directory name misstates its time). `SI-CR20-001` closed. Codex's `SI-FINRA-CAL-*` and `SI-SHARADAR-*` accepted. `SI-CR19-003`, source P2s, shared P2 and `SI-CR15-001` open. | Codex counter-reviews this record commit, then the versioned actual-input identity/cashflow adapter. Every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -15608,3 +15615,206 @@ matching remote checks all passed. No credential value was printed/hashed
 for that privacy comparison. The requested backtest is **NOT LAUNCHED**, not
 completed or failed; actual looks and QC attempts remain zero. This appended
 erratum preserves the original ledger row instead of rewriting it.
+
+## 108. Claude independent review — 2026-10-11 UTC (historical FINRA calibration, direct-Sharadar companion qualification, backtest preflight stop)
+
+Reviewer: Claude, the macOS session, in the designated lane worktree on
+`codex/strategy-short-interest`, CPython 3.13.15 / pytest 9.1.1, every pytest
+run network-denied with `sandbox-exec -p '(version 1)(allow default)(deny network*)'`
+in an empty inherited environment, after a probe to 192.0.2.1:443 failed with
+`EPERM`. Following the owner's instruction, I armed a watcher on the remote
+head `b80ef63` and began only when Codex's push of `2e6faa5` landed at 12:49
+PDT. The worktree was then clean and equal to the remote, and Codex was idle.
+The four commits already published on 2026-10-10 are included.
+
+**Disposition: all seven Codex commits accepted.** Both real-provider rounds
+were frozen before retrieval and stayed inside their request budgets. Both
+reports rebuild byte for byte from the protected files on disk, and no
+provider row, key, token or private data-usability conclusion entered Git.
+Eight of nine in-memory mutation probes went red on the intended behaviour,
+and the ninth guard cannot fire by construction. The requested backtest was
+correctly **not launched**: Codex recorded a factual preflight stop rather
+than a fabricated or substituted result. One P3 provenance note is raised
+(`SI-CR21-001`). `SI-CR20-001` is closed. This commit changes no code or test.
+
+The owner's "proceed without review" waived Codex's counter-review of my
+section 105 (`90e0d56`), so that commit has no Codex disposition. That is the
+owner's choice, and nothing here depends on it.
+
+### 108.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Lane branch | `codex/strategy-short-interest` |
+| Previous Claude review record | `90e0d568fd88087ac06f6306b3f4beffdad94140` (section 105) |
+| Reviewed remote head | `2e6faa5595c721052380fb218517c7f2a3a67738` |
+| Ordered reviewed range | `90e0d56..2e6faa5` (7 Codex commits, linear; pushes `b80ef63` at 20:26 UTC on 2026-10-10 and `2e6faa5` at 19:49 UTC on 2026-10-11, each with ledger rows dated in UTC) |
+| Code and tests added | `finra_source_calibration.py`, `sharadar_companion_qualification.py`, `scripts/calibrate_finra_short_interest.py`, `scripts/qualify_sharadar_companion.py`, four test files; no existing code or test file changed |
+| Record delta | status paragraph, three ledger rows, sections 106 and 107; nothing else removed |
+| Claude commits this round | this record commit only |
+
+| # | Commit | Scope | Disposition |
+|---|---|---|---|
+| 1 | `902b316` | Frozen 18-cell historical and 5-cell format FINRA calibration, code and tests | **accepted** |
+| 2 | `1c8de17` | Retain a refused source response's HTTP status | **accepted**; `SI-CR21-001` documented |
+| 3 | `217e05f` | Admit HTTP 204 only with exact zero-transport proof | **accepted** |
+| 4 | `b80ef63` | Section 106 closing record | **accepted** |
+| 5 | `b366a30` | Frozen direct-Sharadar companion protocol, code and tests | **accepted** |
+| 6 | `71f0a62` | Metadata-inventory and non-blocking credential corrections | **accepted** |
+| 7 | `2e6faa5` | Section 107: capture, rebuild and backtest preflight stop | **accepted** |
+
+### 108.2 Authority and boundaries
+
+- The owner's instructions for this round are quoted where they are relied
+  on: "proceed without review" (106.1), "done" after saving the Sharadar key
+  in the requested protected file, and the backtest, node-wait and monitor
+  instructions quoted in 107.1.
+- On "proceed to run the backtesting", Codex checked the actual-input
+  preconditions and stopped. It made no QC call, registered no look and
+  produced no performance number. That is the right response: the
+  exploratory runner refuses unqualified inputs, and the missing identity,
+  cashflow, look and processing facts cannot be supplied by delegation.
+- The Sharadar companion slices include prices for ten sentinel tokens over
+  2022-10 to 2023-05, but they are joined to no signal or return, so no
+  strategy outcome was looked at.
+- Sharadar's direct terms restrict publishing data-usability evaluations.
+  The record keeps the qualification report private, and this section
+  states only hash and byte equality, request accounting and public facts.
+  It gives no presence count, coverage or quality verdict for the Sharadar
+  data.
+
+### 108.3 Freeze before retrieval
+
+Every real request followed a clean commit of the code that made it, with one
+exception noted in 108.6. Receipt clocks, not directory names:
+
+| Request | Code commit (UTC) | Request time (UTC) |
+|---|---|---|
+| FINRA calibration, requests 1-6 | `902b316` 20:09:50 | run start 20:10:18 |
+| FINRA status diagnostic, request 7 | `1c8de17` 20:14:47 | 20:15:30 |
+| FINRA format query, request 8 | `217e05f` 20:21:24 | 20:22:17 |
+| Sharadar first capture (1 request) | `b366a30` 19:37:09 | 19:37:24 |
+| Sharadar corrected capture (16 requests) | `71f0a62` 19:43:59 | 19:44:07 |
+
+Commit dates can be set by hand, so this is consistent evidence, not proof.
+The scripts refuse unless HEAD is a clean commit, and the Sharadar script also
+rechecks the remote branch before every request.
+
+### 108.4 Code: credentials, bounds and outputs
+
+- **Separation.** Both pure modules import only the standard library, `data.*`
+  and lane modules; HTTP lives only in the two scripts.
+- **FINRA 204.** A 204 is admitted only with Record-Total 0, offset 0, limit
+  100, a valid max limit, version 1, any supplied page count equal to 0 and a
+  truly empty body. The empty page is stored as empty bytes, never as a JSON
+  array, and missing cells stay missing, never zero.
+- **Sharadar key.** It is read from one fixed path: a regular 0600 file you
+  own in a 0700 directory, with no symlink, opened non-blocking so a
+  substituted pipe cannot hang it. It is sent only as an `x-api-key` header to
+  `https://api.sharadar.com/v1.0/`. Schema calls carry no key, and proxies
+  and redirects are off. Every response is scanned for the key, in raw bytes,
+  the content type and every JSON string token including escaped forms,
+  before anything is written.
+- **Request bounds.** FINRA: eight source requests for the whole round.
+  Sharadar: sixteen ordered requests bound to the frozen protocol hash, plus
+  one retained first request and two public schema requests, nineteen in
+  total, matching subsection 107.7.
+- **No secrets in Git.** No key- or token-shaped value appears in the diff,
+  and the redacted personal name remains absent.
+
+### 108.5 Evidence rebuilt from the files on disk
+
+Run under the sandbox, printing hashes, booleans and the already-public FINRA
+counts only:
+
+- **FINRA.** All eight receipt hashes in subsection 106.8 match the files. I
+  rebuilt the report from the five HTTP-200 pages of the refused run, the 204
+  diagnostic's zero-total headers and the format page, each tied to its
+  lineage and transport hashes. The result is byte-identical to
+  `calibration.json`, and the payload hash `576623a6...` matches. Counts as
+  recorded: historical 10 valid and 8 missing, format 1 valid (`BRKB`) and
+  4 missing, all 11 previous fields present, no R or S flags.
+- **Sharadar.** The protocol, start, completion, private-report and retained
+  first-refusal hashes match subsection 107.7. All sixteen raw responses
+  match their receipts in the frozen order. Rebuilding with
+  `qualify_sharadar_companion` gives bytes identical to the private report,
+  and the payload hash `7d36713a...` matches.
+- Every stored file is 0600, and every capture directory is 0700.
+
+### 108.6 Mutation probes (in memory, network-denied)
+
+The tests use fake openers, and the lane and remote guards are patched in
+tests, so no mutant could reach a provider; the sandbox blocked the network
+regardless. Unmutated baseline over the selected tests: **52 passed**.
+
+| Mutant | Guard removed | Result | Reading |
+|---|---|---|---|
+| C1 | admit 204 only with the zero-transport proof | **7 failed** | Caught: `DID NOT RAISE`. |
+| C2 | FINRA whole-round request budget | **7 failed** | Caught. |
+| S1 | Sharadar raw-byte and content-type key-echo check | **1 failed** | Caught by the content-type test; the JSON-token scan separately catches echoes in a body, so this is layered. |
+| S2 | recheck lane and remote immediately before HTTP | **1 failed** | Caught: an extra request was made after HEAD changed. |
+| S3 | Sharadar attempt budget | **127 passed** | Cannot fire by construction: the protocol check requires exactly 16 request IDs, the cap. Not a gap. |
+
+### 108.7 P0-P3 issue ledger
+
+New this round, counted from the table below: 0 P0, 0 P1, 0 P2 and 1 P3
+(`SI-CR21-001`, open). `SI-CR20-001` is closed. Still open from earlier rounds:
+four P2s (`SI-SRC-20260928-001`, `-002`, `-003` and the shared `SI-CR5-005` /
+`SI-CCR16-007`) and two P3 advisories (`SI-CR15-001`, `SI-CR19-003`).
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or closure | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI-CR21-001 | P3 | Open, provenance | `1c8de17`, `b80ef63` | FINRA status diagnostic, source request 7 | Confirmed. Request 7, a real FINRA call with the owner's credential, was made by code that is not in Git: no committed file at `1c8de17` or at the head writes the diagnostic's `diagnostic.json`, yet its receipts carry code head `1c8de17`, which reads as if committed code made it. Its directory name, `finra-status-diagnostic-20261010T202500Z`, also gives a time ten minutes later than its receipts (20:15:29-20:15:30 UTC), and after request 8 (20:22:17 UTC), the reverse of the real order. `lineage.json` cites that name. Harm is small: the request equals the frozen query hash, stayed inside the eight-request budget and its body was never read. But it breaks the lane's commit-before-retrieve rule for one real request. | `git grep` for the diagnostic's schema at `1c8de17` and at the head; receipt clocks in 108.3. | Provenance of every real provider request. | None by this review; the evidence is immutable. Codex should run any future one-off provider diagnostic through committed code, and derive run IDs from the start clock or check them against it. | Open. |
+| SI-CR20-001 | P3 | Closed | `8cb60eb`, `902b316` | sentinel interpretation | Addressed by the frozen historical and format panels: FINRA returns rows for these raw symbols before they stopped trading, and its Berkshire B spelling is `BRKB`. Broad delisted coverage and alias admission remain source-P2 questions. | 108.5. | Accepted as closed only as this note, as Codex states. | None. | Closed. |
+| SI-FINRA-CAL-001..004, SI-SHARADAR-001..008 | P1-P3 | Closed as Codex recorded | `902b316`..`71f0a62` | Codex's own drafts | Accepted. `-CAL-004` is independently reproduced by C1. `SI-SHARADAR-006` stays a false alarm. | 108.6; sections 106.5-106.8, 107.5-107.7. | Accepted. | None. | Closed. |
+| SI-CR19-003 | P3 | Open, prospective advisory | `b034cda` | exploratory look accounting | Unchanged, and now the stated next gate after input binding. | Subsection 107.8. | Retained. | None. | Open. |
+| SI-SRC-20260928-001, -002, -003 | P2 | Open | prior rounds | source admission | Unchanged. FINRA and Sharadar access are now real and bounded; originals, all corrections, availability clocks, effective identity and complete companion coverage are still unestablished. | Subsections 106.8, 107.8. | Facts no delegation can supply. | None. | Open. |
+| SI-CR15-001 | P3 | Open | `0e31505` | standing delegation | No purchase, upgrade or terms acceptance occurred. | Section 107.4. | Retained. | None. | Open. |
+| SI-CR5-005 / SI-CCR16-007 | P2 | Open, shared, out of lane | N/A | shared integration history | Unchanged. | Section 107.4. | Owner decision; documented only. | None on this lane. | Open. |
+
+### 108.8 Validation
+
+On the exact pushed tree `2e6faa5`, clean, Codex idle, network-denied, empty
+inherited environment:
+
+- The four new test files, the four older lane files that scan the whole
+  package, active-document and the repository ML boundary: **856 passed in 1,726.06s**, with no skip, warning or error. That is the
+  432 new cases (74 calibration capture, 89 pure calibration, 127 Sharadar
+  capture and 142 pure companion, matching Codex's counts), 9 + 69 + 11
+  boundary and document cases, and the same 335 package-scanning cases as in
+  section 105.
+- The other lane files were not rerun. Nothing they import changed since
+  their last runs in sections 100, 102 and 105, so no complete 32-file run on
+  `2e6faa5` is claimed.
+- Mutation probes in 108.6; evidence rebuilds in 108.5.
+- compileall of `research`, `scripts` and `tests`: **exit 0**. Active-document
+  on the final tree after this record: **69 passed**. `git status
+  --porcelain --ignored` before and after the run: **identical** (Finder `.DS_Store` excluded). `git diff
+  --check` **clean**.
+- I read the protected FINRA and Sharadar files locally only to hash them and
+  rebuild the reports, and I made no network request. **Authorized outcome
+  looks: 0. Consumed outcome looks: 0.**
+
+### 108.9 Quality and next step
+
+- **Software, 10/10.** Two careful, bounded, fail-closed clients. Their
+  evidence rebuilds byte for byte, and their draft defects were caught by red
+  tests before real use.
+- **Records and authority, 9/10.** The backtest request was handled honestly
+  and Sharadar's publication limits were respected. The ad hoc request-7
+  diagnostic and its misdated directory name (`SI-CR21-001`) are the one
+  provenance lapse.
+
+1. Codex counter-reviews this record commit.
+2. The next bounded milestone, as section 107.8 states, is a versioned
+   actual-input adapter: full prospective population, provider identity,
+   rational raw volume, and dividend-payment and terminal cashflows. Then
+   resolve `SI-CR19-003` and register the look before any signal/outcome join.
+3. Run any future one-off provider request through committed code
+   (`SI-CR21-001`).
+4. The canonical PIT study stays blocked on originals, corrections and
+   availability clocks; vendor deadline 2026-10-19 17:00 America/Los_Angeles.
+5. Still gated: outcomes and looks, the sealed holdout, lookback selection,
+   production ranking and seeds, ETF work, any QuantConnect history/project/
+   upload/compile/job/backtest, purchases, broker, operator database,
+   deployment, paper/live, capital, orders and trading.

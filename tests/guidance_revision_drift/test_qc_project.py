@@ -21,6 +21,7 @@ from data.hashing import hash_bytes, hash_payload
 from research.guidance_revision_drift import bundle, native_bundle, qc_project
 from research.guidance_revision_drift.contracts import CANDIDATE_SHA256
 from research.guidance_revision_drift.lean_bridge import fixture_stream
+from research.guidance_revision_drift.reporting import source_manifest
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -539,6 +540,53 @@ else:
             path = directory / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(raw)
+
+    def test_full_review_source_change_during_readable_preparation_refuses(self):
+        # GDR-CR28-004: an offline-only module outside the native closure can
+        # change while the project is prepared. The native bundle still
+        # verifies, so only the final full-review comparison keeps the
+        # manifest's source identity from naming a stale epoch.
+        full = source_manifest()
+        changed = full | {"research/guidance_revision_drift/evaluation_cycle.py": "0" * 64}
+        with patch.object(qc_project, "source_manifest", side_effect=[full, changed]), \
+             self.assertRaisesRegex(qc_project.QCProjectError, "source changed while preparing"):
+            qc_project.build_qc_project()
+
+    def test_generated_inventory_refuses_a_root_reached_through_a_symlinked_ancestor(self):
+        # GDR-CR28-005: lstat does not see a redirected ancestor because the
+        # final path component is a real directory; only the resolved-path
+        # comparison refuses it, before any source read or import.
+        namespace = self.generated_helpers()
+        with TemporaryDirectory(prefix="gdr-qc-ancestor-link-") as temporary:
+            base = Path(temporary).resolve()
+            real = base / "real" / "project"
+            real.mkdir(parents=True)
+            self.write_project(real)
+            (base / "link").symlink_to(base / "real", target_is_directory=True)
+            reached = base / "link" / "project"
+            self.assertTrue(reached.is_dir())
+            self.assertFalse(reached.is_symlink())
+            with patch.object(namespace["os"], "open", side_effect=AssertionError("refuse before source reads")), \
+                 self.assertRaisesRegex(RuntimeError, "redirected project directory"):
+                namespace["_gdr_inventory"](reached)
+            expected = sorted(name for name in self.files if name != "main.py")
+            self.assertEqual(sorted(namespace["_gdr_inventory"](real)), expected)
+
+    def test_generated_inventory_bounds_directory_entries_before_reading_source(self):
+        # GDR-CR28-005: non-importable extra names are ignored, but the scan of
+        # a named project directory is bounded before any source read.
+        namespace = self.generated_helpers()
+        with TemporaryDirectory(prefix="gdr-qc-entry-bound-") as temporary:
+            directory = Path(temporary).resolve()
+            self.write_project(directory)
+            for index in range(8):
+                (directory / f"note-{index:04d}.txt").write_bytes(b"")
+            self.assertEqual(len(namespace["_gdr_inventory"](directory)), len(self.files) - 1)
+            for index in range(8, 1024):
+                (directory / f"note-{index:04d}.txt").write_bytes(b"")
+            with patch.object(namespace["os"], "open", side_effect=AssertionError("refuse before source reads")), \
+                 self.assertRaisesRegex(RuntimeError, "inventory exceeds bound"):
+                namespace["_gdr_inventory"](directory)
 
     def test_fresh_isolated_root_keeps_native_source_visible_and_materializes_only_exact_data_shim_only(self):
         with TemporaryDirectory(prefix="gdr-qc-project-test-") as temporary:

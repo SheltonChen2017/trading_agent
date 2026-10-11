@@ -146,6 +146,18 @@ class NativeObservationTests(unittest.TestCase):
                 snapshot(receipt(**change))
 
 
+
+class ControlCurrencyTests(unittest.TestCase):
+    def test_qcc_currency_is_admitted_only_on_a_fully_zero_control_receipt(self):
+        # GDR-CR28-009: LEAN's OrderFee.Zero carries QCC. Status alone must not
+        # admit it: a control receipt with any quantity, price or fee is an
+        # economic receipt and must be in USD.
+        self.assertEqual(snapshot(receipt()).to_dict()["currency"], "QCC")
+        for change in (dict(order_fee=OrderFee(CashAmount(1, "QCC"))), dict(fill_quantity=1),
+                       dict(fill_price=50), dict(status="canceled", order_fee=OrderFee(CashAmount(1, "QCC")))):
+            with self.subTest(change=change), self.assertRaisesRegex(ValueError, "non-USD"):
+                snapshot(receipt(**change))
+
 class NativeSourceEvidenceTests(unittest.TestCase):
     def setUp(self):
         self.patch_sdk = patch.dict(sys.modules, {"AlgorithmImports": sdk_shim()})

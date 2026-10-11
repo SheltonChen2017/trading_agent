@@ -407,6 +407,20 @@ class EvaluationCycleTests(unittest.TestCase):
                 journal.to_dict()
             self.assertEqual(inventory(root), before)
 
+
+    def test_reopen_refuses_an_unexpected_entry_beside_the_retained_records(self):
+        # GDR-CR28-010: only the genesis, numbered records and interrupted
+        # staging files belong in an owner-cycle directory; anything else is
+        # unexplained custody, even when every retained record still replays.
+        with tempfile.TemporaryDirectory() as root:
+            journal = fresh(root)
+            intent(journal, binding())
+            head = journal.head_sha256
+            CycleJournal.open(Path(root), cycle=journal.cycle, expected_head=head)
+            (Path(root) / "notes.txt").write_bytes(b"invented stray entry\n")
+            with self.assertRaisesRegex(EvaluationError, "unexpected owner-cycle directory entry"):
+                CycleJournal.open(Path(root), cycle=journal.cycle, expected_head=head)
+
     def test_two_guard_removal_mutants_fail_and_original_is_restored(self):
         original = evaluation_cycle._apply
         source = inspect.getsource(original)

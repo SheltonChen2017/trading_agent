@@ -178,3 +178,12 @@ class TraceTransportTests(unittest.TestCase):
         first["metadata"]["valuations"].clear()
         self.assertEqual(self.reconstruct(prepared)["trace"], self.trace)
         self.assertEqual(self.reconstruct(prepared)["metadata"], self.extra)
+
+    def test_fragment_set_above_the_per_backtest_log_allowance_refuses(self):
+        # GDR-CR28-006: the 100,000-byte log bound (LF included) is the only
+        # check that keeps 200-byte lines under the organization's recorded
+        # 100 KB per-backtest allowance; the line and count bounds allow more.
+        line = b"x" * module.MAX_LINE_BYTES
+        module.trace_fragment_anchor(tuple([line] * 497))
+        with self.assertRaises(module.TraceTransportError):
+            module.trace_fragment_anchor(tuple([line] * 498))

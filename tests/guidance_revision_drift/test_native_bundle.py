@@ -56,6 +56,23 @@ class NativeBundleTests(unittest.TestCase):
         with self.assertRaises(bundle.BundleError):
             native_bundle._import_closure(changed)
 
+    def test_other_stdlib_loaders_compile_and_unimported_loader_calls_refuse(self):
+        # GDR-CR28-003: pkgutil and zipimport import arbitrary modules without
+        # importlib, compile() builds executable code without eval/exec, and a
+        # loader reached through sys.modules needs no import statement at all.
+        members, _ = native_bundle._snapshot()
+        path = "research/guidance_revision_drift/contracts.py"
+        for bad in (b"\nimport pkgutil\n", b"\nfrom pkgutil import resolve_name as hidden\n",
+                    b"\nimport zipimport\n", b"\nloader = compile\n",
+                    b"\nimport sys\nif False:\n    sys.modules['importlib'].import_module('requests')\n",
+                    b"\nimport sys\nif False:\n    sys.modules['pkgutil'].resolve_name('requests:get')\n",
+                    b"\nimport sys\nif False:\n    sys.modules['zipimport'].zipimporter('x').load_module('requests')\n",
+                    b"\nimport sys\nif False:\n    spec.loader.exec_module(sys.modules['json'])\n"):
+            with self.subTest(bad=bad), self.assertRaises(bundle.BundleError):
+                native_bundle._import_closure(members | {path: members[path] + bad})
+        # The exact reviewed closure, which uses re.compile, still passes.
+        native_bundle._import_closure(members)
+
     def test_offline_only_review_change_does_not_change_runtime_payload(self):
         raw = native_bundle.build_native_bundle()
         full = source_manifest()

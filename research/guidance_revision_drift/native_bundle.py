@@ -71,12 +71,14 @@ def _import_closure(members):
             # aliased. This is a guard over this exact reviewed source graph,
             # not a general proof that arbitrary Python is non-executable.
             if (isinstance(node, ast.Name)
-                    and node.id in {"__import__", "eval", "exec", "__builtins__"}):
+                    and node.id in {"__import__", "eval", "exec", "compile", "__builtins__"}):
                 raise BundleError("dynamic execution reference outside native closure")
             if isinstance(node, ast.Call):
                 called = node.func.id if isinstance(node.func, ast.Name) else (
                     node.func.attr if isinstance(node.func, ast.Attribute) else None)
-                if called in {"__import__", "import_module", "eval", "exec"}:
+                # A loader reached through sys.modules needs no import edge.
+                if called in {"__import__", "import_module", "resolve_name", "load_module",
+                              "exec_module", "eval", "exec"}:
                     raise BundleError("dynamic execution/import outside native closure")
             if isinstance(node, ast.Import):
                 names = [alias.name for alias in node.names]
@@ -87,7 +89,7 @@ def _import_closure(members):
             else:
                 continue
             for name in names:
-                if name.split(".")[0] in {"importlib", "builtins", "runpy"}:
+                if name.split(".")[0] in {"importlib", "builtins", "runpy", "pkgutil", "zipimport"}:
                     raise BundleError("dynamic loader dependency outside native closure")
                 if name == "AlgorithmImports" and path == ENTRYPOINT:
                     continue

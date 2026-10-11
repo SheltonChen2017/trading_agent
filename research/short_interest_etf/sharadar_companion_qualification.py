@@ -269,36 +269,27 @@ def _utc(value: Any) -> datetime:
         raise _refuse("invalid_retrieved_at") from exc
 
 
-def validate_sharadar_metadata(capture: CapturedSharadarResponse, *, retrieved_at: str) -> dict[str, Any]:
-    """Validate full-history file status; status/availability is not entitlement."""
-    _capture(capture, "metadata")
-    retrieved = _utc(retrieved_at)
-    table = capture.request_id.split("-", 1)[1]
-    payload = _json(capture.raw)
-    if type(payload) is not dict or payload.get("table") != table:
-        raise _refuse("metadata_table_mismatch")
-    if "files" in payload:
-        _keys(payload, {"table", "files"})
-        if type(payload["files"]) is not list or len(payload["files"]) != 1:
-            raise _refuse("full_history_status_requires_one_file")
-        item = _keys(payload["files"][0], {"history", "historyLabel", "name", "size", "sizeLabel", "modified", "available"})
-        if item["history"] != "full" or item["historyLabel"] != "Full History":
-            raise _refuse("metadata_history_mismatch")
-        if type(item["available"]) is not bool:
-            raise _refuse("metadata_availability_requires_boolean")
-        available = item["available"]
-    else:
-        item = _keys(payload, {"table", "name", "size", "sizeLabel", "modified"}, {"history", "historyLabel", "available"})
-        if item.get("history", "full") != "full":
-            raise _refuse("metadata_history_mismatch")
-        if "historyLabel" in item and item["historyLabel"] != "Full History":
-            raise _refuse("metadata_history_mismatch")
-        if "available" in item and type(item["available"]) is not bool:
-            raise _refuse("metadata_availability_requires_boolean")
-        available = item.get("available")
-    if item["name"] != table + ".csv.zip":
+def _metadata_file(item: Any, table: str, retrieved: datetime, *, inventory: bool) -> dict:
+    """Validate even unselected history entries; no malformed inventory drops."""
+    base = {"name", "size", "sizeLabel", "modified"}
+    extra = {"history", "historyLabel", "available"}
+    item = _keys(item, base | extra if inventory else base, {"key"} if inventory else extra)
+    if "key" in item:
+        opaque = _text(item["key"])
+        if len(opaque) > 512 or any(ord(char) < 32 or ord(char) == 127 for char in opaque):
+            raise _refuse("metadata_opaque_key_invalid")
+    history = item.get("history", "full")
+    labels = {"5y": "5 Years", "10y": "10 Years", "full": "Full History"}
+    if type(history) is not str or history not in labels or (not inventory and history != "full"):
+        raise _refuse("metadata_history_mismatch")
+    if "historyLabel" in item and item["historyLabel"] != labels[history]:
+        raise _refuse("metadata_history_mismatch")
+    if "available" in item and type(item["available"]) is not bool:
+        raise _refuse("metadata_availability_requires_boolean")
+    suffix = "" if history == "full" else "-" + history.upper()
+    if item["name"] != table + suffix + ".csv.zip":
         raise _refuse("metadata_filename_mismatch")
-    size = _integer(item["size"])
+    _integer(item["size"])
     _text(item["sizeLabel"])
     try:
         modified = datetime.fromisoformat(_text(item["modified"]).replace("Z", "+00:00"))
@@ -306,8 +297,45 @@ def validate_sharadar_metadata(capture: CapturedSharadarResponse, *, retrieved_a
         raise _refuse("metadata_modified_invalid") from exc
     if modified.tzinfo is None or modified.utcoffset() is None or modified > retrieved:
         raise _refuse("metadata_modified_naive_or_future")
-    return {"table": table, "file_name": item["name"], "byte_size": size,
-            "modified": item["modified"], "available_assertion": available,
+    return item
+
+
+def validate_sharadar_metadata(capture: CapturedSharadarResponse, *, retrieved_at: str) -> dict[str, Any]:
+    """Validate a selected full file and optional inventory, not entitlement."""
+    _capture(capture, "metadata")
+    retrieved = _utc(retrieved_at)
+    table = capture.request_id.split("-", 1)[1]
+    payload = _json(capture.raw)
+    if type(payload) is not dict or payload.get("table") != table:
+        raise _refuse("metadata_table_mismatch")
+    fields = {"history", "historyLabel", "name", "size", "sizeLabel", "modified", "available"}
+    if "files" in payload:
+        _keys(payload, {"table", "files"}, fields)
+        if type(payload["files"]) is not list or not 1 <= len(payload["files"]) <= 3:
+            raise _refuse("metadata_inventory_count_invalid")
+        inventory = {}
+        for raw in payload["files"]:
+            entry = _metadata_file(raw, table, retrieved, inventory=True)
+            if entry["history"] in inventory:
+                raise _refuse("metadata_inventory_duplicate_history")
+            inventory[entry["history"]] = entry
+        if "full" not in inventory:
+            raise _refuse("metadata_inventory_missing_full")
+        item = inventory["full"]
+        top = {key: value for key, value in payload.items() if key not in {"table", "files"}}
+        if top:
+            selected = _metadata_file(top, table, retrieved, inventory=True)
+            # Optional inventory `key` is opaque storage metadata, never a
+            # credential or a download URL. Its original bytes remain bound,
+            # but it is neither required at the top nor followed/emitted.
+            full_fields = {key: value for key, value in item.items() if key != "key"}
+            if selected["history"] != "full" or selected != full_fields:
+                raise _refuse("metadata_selected_full_inventory_mismatch")
+    else:
+        _keys(payload, {"table", "name", "size", "sizeLabel", "modified"}, {"history", "historyLabel", "available"})
+        item = _metadata_file({key: value for key, value in payload.items() if key != "table"}, table, retrieved, inventory=False)
+    return {"table": table, "file_name": item["name"], "byte_size": item["size"],
+            "modified": item["modified"], "available_assertion": item.get("available"),
             "full_history_filename_verified": True, "entitlement_inferred": False,
             "historical_availability_inferred": False,
             "source_file_sha256": hash_bytes(capture.raw)}

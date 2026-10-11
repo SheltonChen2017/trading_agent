@@ -4,8 +4,11 @@ from __future__ import annotations
 import copy
 import io
 import json
+import os
 from pathlib import Path
 import stat
+import subprocess
+import sys
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -281,6 +284,22 @@ def test_reconstructible_json_secret_echo_is_refused_before_raw_persistence(tmp_
     assert not (tmp_path / "attempt-01.received.json").exists()
 
 
+@pytest.mark.parametrize("position", ["overwritten_value", "duplicated_fieldname"])
+def test_duplicate_json_keys_cannot_hide_escaped_credential_echo(tmp_path, local_guard, position):
+    escaped = b"\\u0066" + KEY[1:].encode()
+    if position == "overwritten_value":
+        raw = b'{"echo":"' + escaped + b'","echo":"safe"}'
+    else:
+        raw = b'{"' + escaped + b'":"safe","' + escaped + b'":"other"}'
+    assert KEY.encode() not in raw
+    opener = Opener([Response(raw)])
+    with pytest.raises(capture.SharadarCaptureRefusal, match="credential_echo"):
+        run_capture(tmp_path, opener)
+    assert len(opener.requests) == 1
+    assert not (tmp_path / "attempt-01.raw").exists()
+    assert not (tmp_path / "attempt-01.received.json").exists()
+
+
 def test_allowed_content_type_secret_echo_must_not_enter_receipt(tmp_path, local_guard):
     opener = Opener([Response(documents()["metadata-stocks"],
                               content_type="application/json; charset=" + KEY),
@@ -363,6 +382,33 @@ def test_descriptor_drift_refuses_before_start_receipt_or_http(tmp_path, local_g
         run_capture(tmp_path, opener)
     assert opener.requests == []
     assert not tuple(tmp_path.iterdir())
+
+
+@pytest.mark.parametrize("change", ["descriptor", "digest"])
+def test_late_final_row_request_drift_stops_before_sixteenth_receipt_and_http(
+    tmp_path, local_guard, monkeypatch, change,
+):
+    original_request = capture.sharadar_request
+    original_digest = capture.request_sha256
+    def request(request_id):
+        spec = copy.deepcopy(original_request(request_id))
+        if change == "descriptor" and request_id == "rows-fundamentals":
+            spec["params"]["offset"] = "1"
+        return spec
+    def digest(request_id):
+        if change == "digest" and request_id == "rows-fundamentals":
+            return "0" * 64
+        return original_digest(request_id)
+    monkeypatch.setattr(capture, "sharadar_request", request)
+    monkeypatch.setattr(capture, "request_sha256", digest)
+    opener = Opener(responses())
+    with pytest.raises(capture.SharadarCaptureRefusal, match="request_binding"):
+        run_capture(tmp_path, opener)
+    assert len(opener.requests) == 15
+    assert (tmp_path / "attempt-15.received.json").exists()
+    assert not (tmp_path / "attempt-16.started.json").exists()
+    assert not (tmp_path / "qualification.private.json").exists()
+    assert not (tmp_path / "completed.json").exists()
 
 
 def test_guard_rechecked_after_started_receipt_immediately_before_http(tmp_path, monkeypatch):
@@ -485,6 +531,31 @@ def test_credential_file_wrong_owner_or_nonregular_refuses(credential, monkeypat
     monkeypatch.setattr(capture.os, "fstat", changed)
     with pytest.raises(capture.SharadarCaptureRefusal, match="credential_file_protection"):
         capture._read_key(credential)
+
+
+def test_real_nonregular_fifo_refuses_without_waiting_for_writer(tmp_path):
+    parent = tmp_path / "fifo-private"
+    parent.mkdir(mode=0o700)
+    path = (parent / "sharadar.env").resolve()
+    os.mkfifo(path, 0o600)
+    command = (
+        "from pathlib import Path; import sys; "
+        "from scripts import qualify_sharadar_companion as c; "
+        "p=Path(sys.argv[1]); c.CREDENTIAL_PATH=p; "
+        "\ntry: c._read_key(p)"
+        "\nexcept c.SharadarCaptureRefusal as exc: print(exc.code)"
+        "\nelse: sys.exit(1)"
+    )
+    # A timed child is essential: the defective blocking open has no writer.
+    # The child uses only this fabricated FIFO and inherits network denial.
+    result = subprocess.run(
+        [sys.executable, "-c", command, str(path)],
+        cwd=Path(capture.__file__).resolve().parents[1],
+        env={"PATH": "/opt/homebrew/bin:/usr/bin:/bin", "PYTHONDONTWRITEBYTECODE": "1"},
+        capture_output=True, text=True, timeout=3, check=False,
+    )
+    assert result.returncode == 0
+    assert result.stdout.strip() == "credential_file_protection"
 
 
 def test_unknown_credential_location_refuses_before_open(credential, monkeypatch):

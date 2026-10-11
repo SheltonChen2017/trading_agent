@@ -277,6 +277,85 @@ def test_metadata_documented_full_files_shape_has_no_entitlement_inference():
     assert result["historical_availability_inferred"] is False
 
 
+def metadata_inventory(*, selected=True):
+    base = documents()["metadata-stocks"]
+    base.update(history="full", historyLabel="Full History", available=True)
+    full = {key: value for key, value in base.items() if key != "table"}
+    five = {**full, "history": "5y", "historyLabel": "5 Years", "name": "stocks-5Y.csv.zip", "size": 500}
+    ten = {**full, "history": "10y", "historyLabel": "10 Years", "name": "stocks-10Y.csv.zip", "size": 900}
+    payload = base if selected else {"table": "stocks"}
+    return {**payload, "files": [five, ten, full]}
+
+
+@pytest.mark.parametrize("selected", [False, True])
+def test_metadata_inventory_selects_unique_matching_full_history_without_entitlement(selected):
+    payload = metadata_inventory(selected=selected)
+    result = validate_sharadar_metadata(capture("metadata-stocks", payload), retrieved_at=RETRIEVED_AT)
+    assert result["file_name"] == "stocks.csv.zip"
+    assert result["byte_size"] == 1234
+    assert result["available_assertion"] is True
+    assert result["entitlement_inferred"] is False
+    assert result["historical_availability_inferred"] is False
+
+
+@pytest.mark.parametrize("selected", [False, True])
+def test_metadata_inventory_optional_opaque_key_is_bound_but_never_followed_or_emitted(selected):
+    payload = metadata_inventory(selected=selected)
+    for item in payload["files"]:
+        item["key"] = "opaque-storage/" + item["name"]
+    result = validate_sharadar_metadata(capture("metadata-stocks", payload), retrieved_at=RETRIEVED_AT)
+    assert result["file_name"] == "stocks.csv.zip"
+    assert "key" not in result
+    assert "opaque-storage" not in canonical_json(result)
+    assert result["entitlement_inferred"] is False
+
+
+@pytest.mark.parametrize("value", ["", " leading-space", "new\nline", "x" * 513, 1, None, []])
+def test_inventory_opaque_storage_key_requires_only_bounded_canonical_text(value):
+    payload = metadata_inventory()
+    payload["files"][0]["key"] = value
+    with pytest.raises(SharadarCompanionQualificationError):
+        validate_sharadar_metadata(capture("metadata-stocks", payload), retrieved_at=RETRIEVED_AT)
+
+
+def test_opaque_inventory_storage_key_is_not_a_selected_top_field():
+    payload = metadata_inventory()
+    payload["key"] = "not-a-top-field"
+    with pytest.raises(SharadarCompanionQualificationError):
+        validate_sharadar_metadata(capture("metadata-stocks", payload), retrieved_at=RETRIEVED_AT)
+
+
+@pytest.mark.parametrize("field,value", [("size", 1235), ("modified", "2026-10-10T04:00:00+00:00"), ("available", False), ("history", "5y"), ("name", "stocks-5Y.csv.zip"), ("sizeLabel", "different display size"), ("historyLabel", "Other History")])
+def test_metadata_selected_top_full_item_must_exactly_match_inventory(field, value):
+    payload = metadata_inventory()
+    payload[field] = value
+    with pytest.raises(SharadarCompanionQualificationError):
+        validate_sharadar_metadata(capture("metadata-stocks", payload), retrieved_at=RETRIEVED_AT)
+
+
+@pytest.mark.parametrize("changes", [{"size": True}, {"modified": "2026-10-10T00:00:00"}, {"modified": "2026-10-12T00:00:00Z"}, {"history": "unsupported"}, {"name": "funds-5Y.csv.zip"}, {"historyLabel": "Full History"}, {"available": "true"}, {"extra": "unknown"}])
+def test_metadata_even_unselected_inventory_items_require_valid_exact_contract(changes):
+    payload = metadata_inventory()
+    payload["files"][0].update(changes)
+    with pytest.raises(SharadarCompanionQualificationError):
+        validate_sharadar_metadata(capture("metadata-stocks", payload), retrieved_at=RETRIEVED_AT)
+
+
+@pytest.mark.parametrize("mutation", ["missing_full", "duplicate_full", "duplicate_five", "partial_top"])
+def test_metadata_inventory_missing_duplicate_history_or_partial_selection_refuses(mutation):
+    payload = metadata_inventory()
+    if mutation == "missing_full":
+        payload["files"].pop()
+    elif mutation == "duplicate_full":
+        payload["files"].append(copy.deepcopy(payload["files"][-1]))
+    elif mutation == "duplicate_five":
+        payload["files"].append(copy.deepcopy(payload["files"][0]))
+    else:
+        payload.pop("history")
+    with pytest.raises(SharadarCompanionQualificationError):
+        validate_sharadar_metadata(capture("metadata-stocks", payload), retrieved_at=RETRIEVED_AT)
+
+
 @pytest.mark.parametrize("history,label,count", [("5y", "5 Years", 1), ("full", "Full History", 2), ("full", "Full History", 0)])
 def test_wrong_or_multiple_metadata_history_shapes_refuse(history, label, count):
     item = documents()["metadata-actions"]

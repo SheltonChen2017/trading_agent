@@ -15407,3 +15407,51 @@ network denied. Four changed/new Python files compile; `git diff --check`
 is clean. This is focused validation, not the full lane/repository suite or
 Claude review. Prospective code/record will be committed before actual
 capture; no result is claimed here in advance.
+
+### 107.6 Preserved first response and prospective transport correction
+
+Prospective freeze **`b366a30feceaf2676dcc1201e486cacd7954674b`** preceded
+the first authenticated request. The capture
+`sharadar-companion-20261011T193723Z` made exactly **one metadata GET**, HTTP
+200, and stopped before every later request or market-row retrieval. Its
+raw response, start/received/refusal receipts and protocol remain immutable
+in protected ignored storage. This is a local contract refusal, not a
+provider-data fitness verdict or failed QC launch.
+
+`SI-SHARADAR-007` (P3 confirmed, correction pending committed re-execution)
+records a parser assumption: selected full-file fields and a multi-history
+inventory can coexist. Every inventory item also has an optional opaque
+`key` field. The corrected pure validator checks the selected full item
+against the unique full inventory member, validates even unselected history
+entries, refuses missing/duplicate histories, and ignores only the opaque
+inventory key for selected-item equality. That field is bounded text, stays
+raw-hash-bound and private, and is never followed, interpreted as an API
+credential or emitted in normalized metadata. Top-level keys and unrelated
+unknown fields still refuse. Main replayed the saved response offline with
+the corrected validator successfully; no new provider request was needed
+for diagnosis. The helper proved two envelope cases red before correction
+and two opaque-key cases red before their correction; both executions used
+fabricated responses, not private rows.
+
+`SI-SHARADAR-008` (P3 confirmed, corrected) records the known credential
+location's FIFO substitution edge: a blocking open can hang before fstat.
+Lane-local `O_NONBLOCK` plus unchanged regular-file/ownership/mode checks
+refuses it. A timed fabricated FIFO negative control reproduced the hang;
+the persistent regression now passes. No real secret was substituted/read
+by this probe. Duplicate-key escaped echoes and late-request descriptor/hash
+drift also have persistent regressions.
+
+**SI-DEC-20261011-06:** permit exactly one deliberate corrected re-execution
+after this correction is committed, with unchanged sample, query order and
+protocol hash. This is not an automatic retry or outcome-driven change.
+Prospectively account for **one retained partial metadata GET + at most
+sixteen corrected capture GETs + two public bootstrap schema GETs = at most
+nineteen total requests** this round. No hidden retry, new FINRA request or
+extra source-row page. The corrected run will use a new create-exclusive
+directory; the original failure will not be overwritten or relabelled.
+
+Main's corrected focused validation is **362 passed in 9.82s**: 127 capture,
+142 pure companion, 9 lane boundary, 69 active-document, 11 ML boundary and
+4 selected actual-input refusals; empty environment/network denied.
+Four-file compilation and diff checks pass before the correction commit.
+No full suite, actual outcome look or QC attempt occurs.

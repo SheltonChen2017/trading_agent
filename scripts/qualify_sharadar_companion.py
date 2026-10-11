@@ -94,7 +94,9 @@ def _read_key(path: Path) -> str:
     parent = path.parent.lstat()
     if not stat.S_ISDIR(parent.st_mode) or parent.st_uid != os.getuid() or stat.S_IMODE(parent.st_mode) != 0o700:
         raise SharadarCaptureRefusal("credential_directory_protection")
-    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+    # Reject a substituted FIFO/device without blocking before fstat can
+    # establish that the protected location still contains a regular file.
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
     with os.fdopen(fd, "r", encoding="utf-8") as handle:
         info = os.fstat(handle.fileno())
         if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or stat.S_IMODE(info.st_mode) != 0o600 or info.st_size > 4096:

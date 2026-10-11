@@ -16048,3 +16048,94 @@ pre-correction evidence only. Agent41green1.79seconds is attributed; no complete
 suite. All actual tests use synthetic rows, denied actual roots/credentials/API;
 no actual first-key operation has occurred at this paragraph. Independent
 Claude acceptance remains pending.
+
+After committing this producer/record, operation006's baseline HEAD no longer
+matches. `TPR-EXT26-D052` registers fresh current-HEAD access
+`TPR-EXT26-QC-20261011-007` to the exact active OFF3 source/config/input/job
+for status and eventual native orders/chart/log collection only. No old access
+receipt renewal, source upload, reservation, compile or relaunch is inferred.
+Use the same immutable daaf0c…completion bundle and persistent counters; the
+new access manifest and origin006 launch/look remain separately identified.
+
+### 76.7 Actual first-key success; OFF3 remains active
+
+First-key001 completed2026-10-11T19:59:03.364417Z underb1693bb6…;
+planSHA`1b287f316d762021b8ec7f0d5493b8675452cde755750867c24557e237eabff2`.
+Fresh claims/readback consumed558242 verified metadata bytes and346371 encoded
+input bytes; failed-body count unknown=false, eleven read attempts including
+optional missing completion/input. Original failed multipart lineage and
+gzip/plain hashes verified. Three native HTTP200 requests: solely classified
+not_found; successful object/set (16byte wire SHA
+`c955e57777ec0d73639dca6748560d00aa5eb8e12f13ebb2ed9656add3908f97`);
+postproperties378bytes SHA
+`d41981ff4049c03bbe03c9dea1ee4a41e16f58ec54d2f4dc9369d8b529c93a12`,
+size346371/MD5`e16ea1fd1eb77a30608cc59a4392fd58` matched local bytes.
+New native-hash proofSHA
+`6c0be8ff6f6d1efe167d2b0f4372eabbde6d19b6d6fff74980ee1c5e4c5b8884`;
+new first completionSHA
+`aa6ba0ed4752e531db13f4bceb084e347f98badb2fb5f6efe1e94fd7634b79c6`.
+Old claims unchanged; no new look/attempt. This is native successful write
+and MD5/size metadata, not native SHA-content/PIT/rights/capacity attestation.
+Only1of72 input uploads is complete; F012 is partly resolved, not closed.
+
+Advisory peer accepted after correction:41 independently reproduced passes
+in1.72seconds; in-memory F015 origin gate removal1red0.53seconds, F016 path
+gate removal6red0.78seconds, restored suitegreen. This is Codex peer evidence,
+not independent Claude approval. OFF3 status remains nonterminal In Progress,
+noerror. Fresh access007 manifestSHA
+`153ecbe273cb4ac87b7954f994bbce4a1982b9919a3b003222f4683e747d762b`;
+origin006 and look19 remain separate. No new launch or metrics claim.
+
+`TPR-EXT26-D053` registers single-use local metadata hashing
+`TPR-EXT26-FIRST-RECEIPT-INDEX-20261011-001`: current HEAD/branch/root,
+exact first helper result/native-proof two files,≤65536bytes each/131072total,
+0700opened parent/0600single-link stable descriptors; claim before either
+read, hashes/size/status only, no input body/network/look/attempt. This freezes
+receipt identity for prospective remaining71 admission, not old-read renewal.
+`TPR-EXT26-D054` proposes a separately bounded exact remaining71 continuation
+after OFF3 terminal/audit accounting, rather than simultaneous bulk inputs
+competing for its mandatory final export. Freeze all71 transport rows and
+21409650byte total plus fresh custody/claims/hashes/native MD5 verification,
+stop first failure with completed/failed/unattempted history. No strategy
+retuning or full-input/headroom inference from this first success; code review
+and prospective source-bound scope required before any remaining71 effect.
+
+D053 actual two-file index verified helper result6421bytes SHA
+`daf2d427623cd0fadc422d1430818b62e454304b6c12a927b197939168530533`,
+COMPLETED_FIRST_KEY_UPLOAD; native proof1403bytes/6c0be8…matched the recorded
+identity. Total7824 metadata bytes, no input/network/look/attempt.
+
+### 76.8 Remaining71 successor frozen before execution
+
+D054 producer extended_input_remaining_successor.py23716bytes SHA
+`b6e4f8f59b03726794bf340feee05a15764f4bab81c993542d1a000777dad1b0`;
+focused tests13461bytes SHA
+`ff999ebe96075c738e639e151ba7aa4cfb1b830c896bbe29f79db7de39406c6f`.
+Prospective operation`TPR-EXT26-INPUT-REMAINING-20261011-001`: current-HEAD
+single-use≤24hour scope/1800second wall bound; exact71 frozen rows,
+21409650 total encoded bytes/max407066 per opened input;≤2MiB exact metadata,
+≤213 native≤1MiB responses/≤30seconds each. First receipt/proof/completion,
+project/org/current mapping and eleven committed source files are bound;
+seven loaded module paths checked. First gzip body is never reread. Existing
+per-row completed/read/upload/transport claims or native PRESENT (even matched)
+refuse without overwrite. Fresh per-row claims precede reads and all native
+requests; sole fresh not_found → upload success → matching post-size/MD5
+is required before an exclusive missing completion/proof is written.
+No inferred native SHA/absence/capacity/PIT/rights or full ON readiness.
+Stop first failure and retain completed/failed/unattempted counts, including
+unknown failed-body bytes when applicable; no automatic retry or scope renewal.
+No cloud candidate source/config/input identity/economics/cap or look change.
+
+Root fully read producer/tests and reproduced40 focused passes in4.02seconds
+under the isolated49/52 runner. Agent40green3.90seconds is attributed; peer
+independently40green3.74seconds, surgical prewrite-notfound gate mutant1red
+0.59seconds (PRESENT wrongly reached synthetic completion), restored40green
+3.66seconds. Advisory accepted within narrow scope, not Claude acceptance.
+No actual remaining71 effect yet. Execution waits for OFF3 terminal/audit
+accounting as prospectively chosen, avoiding self-created quota competition.
+No full suite, operator-state/database, unrelated cloud project or export.
+
+`TPR-EXT26-D055`: after committing these exact producer/test/record files,
+renew only current-HEAD status/eventual own-job native collection access as
+`TPR-EXT26-QC-20261011-008`, retaining origin006 and the same daaf0c…bundle,
+candidate3/config/input/job. Do not reuse007's stale HEAD or reserve/relaunch.

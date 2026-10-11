@@ -15335,9 +15335,9 @@ focused tests23917B SHA
 `48498d677cf6fc006aaffe04fa5d67608a379016b3d6911fbd8340667dea4114`.
 Root fully read module/tests and reproduced59focused passes in0.98s with
 isolated49/52 runtime. Agent59green0.97s and attributed MD5, nested inherited
+deadline and two-layer destination-bypass controls each red/restored green.
 Peer independently59green0.92s, final hashes/sizes match, accepted-after-
 correction with no unresolved material finding in this bounded scope.
-deadline and two-layer destination-bypass controls each red/restored green.
 F008's three confirmed pre-release defects are corrected in these never-
 executed files, not rewritten historical executions. Native cleanup remains
 unexecuted at this entry; final independently reviewed cloud facts must be
@@ -15368,3 +15368,88 @@ committed, with actual freshUTC creation/24h expiration and exact currentHEAD
 guard. Expected remote5cd… remains unchanged; this is a local registration
 commit within the continuous round, not a checkpoint push. ON0/OFF1attempt,
 17observed looks and no paired2021–now result remain unchanged.
+
+### 75.29 Actual exact-object cleanup completed; originals retained
+
+Fresh cleanup001 under`911511ba6007b3c6737717dbe7a877107d5d35f5` began
+`2026-10-11T02:55:22+00:00`/24h scope and completed
+`2026-10-11T02:55:44.777791+00:00`. Plan SHA
+`f27c6d53712d4dfd1e8671a647542afdafa1d150f01b4ec330afa32db7eee3ac`;
+public safe result35444B SHA
+`81b5601d5c1502c67f55a11acc871e94914be089d84fc7f92f7713830e868d9f`.
+75191497private read bytes, complete72processing proof,22fresh local original
+SHA/size/MD5 checks and ALL22exact native properties before firstdelete.
+Exactly44requests succeeded:22properties then22deletes; zero failed/uncertain
+requests, exactly22completed original keys removed/74557156B. No unrelated
+objects/project, failed upload target, local original, historical evidence or
+gzip-prepared object was deleted. All local originals remain byte-verified and
+recoverable; owner was notified of exact removal and recovery. Source/operator/
+outcome reads and new looks/attempts0. Preview rows/native errors/credentials
+were not retained; hash/size metadata and per-key spent/terminal receipts are
+private. This is scoped native deletion evidence, not account-capacity/rights/
+PIT/canonical custody attestation. All cleanup claims stay spent and immutable;
+do not replay or automatically renew them. Gzip21756021B upload still requires
+fresh named transport scope and actual success, not an assumed quota fit.
+
+### 75.30 Compressed same-candidate producer frozen before new QC
+
+D038 is implemented in identified successors; no executed base is relaxed:
+metadata renderer18262B SHA
+`388025137b1c6c783fc908a2f02c9d332513f012fe8ea4b4302b5073e52812e2`,
+transport controller15302B SHA
+`e7388eb53d679c242fc03db3095e01bf2bf8d8d5a9ae9fd37c80c39119b64070`,
+driver5105B SHA
+`c5a98107195eb648aa3c7a9dcd07b2fd939acdf47c7fcc215540e34f4c145594`.
+Tests8628B/`f9f091c5bcf923f392f063f50eb7a049de54ef7376e876a318b4bd935dffe41f`,
+10472B/`19b179389e872727e8807ba182ed55e7c5a74cb9f6a8eff9babdf058f8e6ab22`,
+1971B/`083db6a561fd7607498d2937cdb57693caefd4c78f3e989455513b5ec2d13d29`.
+Root fully read all six and independently34focused passes in1.40s; agent
+34green1.49s and attributed ONinput-proof omission mutant5red/restored5green.
+Initial development two syntax collection errors and17pass/1driver-fixture
+failure were corrected before release, not actual QC attempts/looks.
+All tests use isolated49/52 root with actual private/network/credential routes
+denied; no full lane/repository suite or nativeWindows custody proof.
+
+Register fresh metadata-only
+`TPR-EXT26-COMPRESSED-BUNDLE-20261010-001`,24h/120s,
+128KiBfile/256KiBtotal, exactly result58858B/fac2… and mapping57064B/1088…
+after exclusive claim. Source closure28(including two fixed package initializers);
+exact immutable original bundle799e… and six compression producer hashes,
+current committed templates/controls, completed72byte-equality/read census/
+both SHA domains/endedUTC and source validation. No private source packet,
+captures/D0/provider/outcomes/credentials/API. It returns public metadata/
+code only for root apply_patch persistence as clearly identified new bundle.
+Original input descriptors, preparation/config/input hashes, candidate IDs,
+project names and all old source files except explicitly named main boundary
+remain unchanged; planned native-source literals ON1/OFF2, not a cap reset.
+Both main files59854B, every source≤60000; ONmapping literal is bounded or
+exact split reconstruction, OFF contains neither signal nor compressed packet.
+
+Fresh transport operation`TPR-EXT26-QC-20261010-003` after saved bundle commit:
+48h/4096request/30s/16MiBresponse, own existing projects37650453/37650980.
+No new/adopted project, cleanup, original plaintext upload-success synthesis,
+generic file/key upload or retry command. Exact72gzip-key upload claims and
+receipts bind decoded original SHA/size and physical SHA/size/key/mapping;
+all72 must exist before ONlook/launch, with no missing/plaintext fallback.
+Source upload/readback/compile/persistent reservation histories remain inherited
+unchanged. OFF1failure remains consumed/closed; root must reserve OFF2 before
+compile, ON1 after verified input uploads. Existing three-attempt caps remain.
+Both-arm look census reads only at most six own fixed candidate/attempt look
+records plus corresponding execution manifests under a fresh claim, derives
+16historical+allspentnewlooks and claims next beforelaunch. OFF2 may run before
+ONuploads underD033; no performance-dependent selection/timing/economic change.
+Zero new attempt/look is claimed at this pre-execution entry.
+
+`TPR-EXT26-F009`P2 confirmed/corrected pre-execution: inherited cooperative
+project receipt alone allowed modified typed project/org destinations on
+compressed upload or source operations. D040 pins BOTH already observed own
+IDs37650453/37650980 and original raw-UTF8 org SHAa2d888… in named controller
+project(), before every routed request; no new private discovery/provider read.
+Root added four altered-org/project no-API controls for both arms. Independently
+38focused passes in1.24s; in-memory reversion to inherited project() gave
+4red0.49s→restored4green0.22s. Initial mutation runner indentation error was
+corrected before imports/effects; no QC attempt/look. Peer independently38green
+1.25s, final six-path hashes/sizes match, accepted-after-correction with no
+unresolved material finding. Original pre-release controller14812B/946d… and
+tests9575B/4e35… were never executed; final frozen identities above replace
+them. Native read/upload ABI and actual corrected QC completion remain unproved.

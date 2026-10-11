@@ -14395,3 +14395,106 @@ The independent descending-order count still distinguishes the defect; the
 test now checks the actual closed classification. No source admission or
 production condition is weakened. Actual diagnosis has not yet executed at
 this pre-operation registration.
+
+### 75.10 Actual diagnosis and registered Sharadar-only repair
+
+Named diagnostic executes once under committed`f99b4920e13fd1e4f5d70f9ce9ce93842f67c1ae`:
+the original first TICKERS wire has5unique columns, all five required fields,
+10000rows, zero width failures/overflow, but196Python-lexical ticker descents.
+Its closed original projection refusal is structural because the parser catches
+its own sorting exception. This proves an incompatible local order assertion;
+it does not prove the provider ignored its requested native sort or authenticate
+pagination/transaction consistency. No credential/provider/QC/outcome operation
+occurred; the separate diagnostic read claim is spent. Root's diagnostic/signal
+union passes18/1.56s using isolated49/52, including synthetic private hash,
+mode and symlink tests. The earlier atime-sensitive draft check was corrected
+before any private read; stable custody fields do not mistake a read access-time
+update for mutation. Original capture001 remainsFAILED, unchanged.
+
+`TPR-EXT26-D022` — agent-delegated prospective statistics convention, pending
+independent review, frozen before new outcomes. Initial100000 NAV precedes the
+first session; all1449 daily return observations include first NAV/initial−1.
+Return is final/initial−1; daily-close drawdown includes the initial peak.
+CAGR uses365.25/actual endpoint elapsed calendar days; volatility uses sample
+daily-return variance×252; Sharpe uses mean×sqrt252/sample standard deviation,
+RF0, with zero-variance Sharpe unavailable rather than infinity. Annual return
+uses the preceding year-end NAV, initial100000 for2021, and explicitly partial
+2026. Exact rational accounting/returns/costs are preserved. Dimensionless mean
+ratios and statistical transcendental outputs use explicitly bounded50-digit
+Decimal strings; multiplying1449distinct ratio denominators must not produce
+unbounded public/private summary serialization. No observations are dropped,
+money calculations changed, missing fees/currencies imputed0, or sleeve P&L
+invented. Extraction/provenance still requires actual native evidence.
+
+`TPR-EXT26-D023` — agent-delegated matched-input digest receipts, pending
+independent review, frozen before launch. Anonymous count equality alone cannot
+prove matched selected identities/native tapes while full cloud journals are
+not independently retrieved. Add ordered301-session digest chains over existing
+membership, native-cap, cap-ranked/executable selection and selected prior-mark
+domains, with explicit unavailable markers/observed counts. Exclude TPR scores,
+tilted weights, NAV and holdings-only exit domains. Exact source rows/IDs remain
+private; public chain equality can verify the defined digest domains, not row
+replay, source PIT, independent sleeve accounting or confirmatory alpha.
+
+`TPR-EXT26-D024` — agent-delegated necessary identified Sharadar repair,
+pending independent review. Freeze
+`extended_sharadar_repair_freeze.json`, SHA
+`0d0f67a6d02915ff7357018ef51108fdeb3e334cbcccc7e2fa65bbeb1f1d6097`,
+operation`TPR-EXT26-SHARADAR-REPAIR-20261010-001`, fresh private repair leaf and
+committed producer. Only original same-host TICKERS/ACTIONS routes/fields/
+filters/native sort/10000row offset requests:64+128pages,640000+1280000rows,
+256+512MiB,4MiB/page,192GETs/5400seconds,30seconds/request, no retry/redirect.
+Retain provider TICKERS order without asserting Python ASCII collation;
+identity/cap portfolio ranking remains independent of this metadata order.
+Keep ACTIONS ISO chronology/date-end bound, original wire, all refusals,
+duplicate/conflict census, repeated-wire/offset refusal and bounded termination.
+This is not permission to silently drop membership or infer historical identity.
+
+The explicit successor composite must bind the immutableFAILED001 hashes and
+all74 completed Massive scopes separately from the fresh two-scope repair.
+Fresh preparation access claims precede re-reading the necessary completed
+Massive chunks; this is expressly identified reuse for this same six-universe
+task, not an incidental D0/old-capture shortcut or renewed001 request receipt.
+Ignore001's failed Sharadar wire for signal input but preserve it for audit.
+Never pretend001completed or replay its network requests. Alternatives were
+re-fetching all74 successful months, ignoring ordering without a named
+successor, or stopping before this safe in-scope correction; none is chosen.
+The repair and composite preparation have not executed at registration.
+
+Prospective runtime finding`TPR-EXT26-F002`(P1, confirmed, correction in
+progress): the released native successor inherits QCAlgorithm directly but
+omits `_reason`, called even on its normal planned-order path. Prior synthetic
+fixtures inject a lambda and conceal this missing handler. Restore the bounded
+unchanged reason-counter semantics in the successor and use an uninjected
+inherited-handler red/green control. No historical runtime is edited or run.
+
+### 75.11 Committed Sharadar-only repair preflight (no extended QC yet)
+
+Root completely reviewed the released repair producer, committed one-shot
+driver and synthetic tests before actual use. Root reproduced86 focused
+repair/diagnostic/signal tests, all passed in2.19s with the isolated49/52
+runtime-root runner; no actual operator-state/database or full lane suite was
+read/run. The repair agent separately reports68green and two restored in-memory
+mutation controls (false Python TICKERS collation gate; missing ACTIONS
+chronology), each1red/1clean. These mutation runs are attributed agent evidence,
+not root-reproduced execution. Fixtures enforce an always-on actual-lane/private
+leaf, provider, credential, HTTP and subprocess firewall.
+
+Released repair source SHA256
+`3059f9110a90be4734a109a311b3a26191e914f67131edf40f7d2bd4d03d3a24`,
+driver`f2c898de0b7c50aa6697e9b2ef4ffaf6069f00725d173e0454d29d8c2e3da559`,
+tests`a5da493c09d9252050ee13d4eb7233e3b98d039c3b11f9100ff75f88a6466284`.
+The fixed complete source closure is checked against exact committed HEAD before
+fresh leaf creation and access; the concrete plan source inventory is
+authoritative. Native optional absence staysNone, present blank stays
+blank. All parsed rows/refusals/conflicts remain visible. Full offset termination
+is required, not a transactional snapshot attestation. Only the false metadata
+Python-collation refusal changes; no timing, ranking, tilt, costs, dates or
+portfolio rule changes. OriginalFAILED001 and diagnosis remain immutable/spent.
+
+Actual repair has not executed at this preflight; its command must use the
+actual clock reading for creation (never an estimated future timestamp), a
+fresh24hour expiry, exact owner-instruction hash and freshly committed source
+closure. No new QC project/compile/launch/outcome/look exists at this point;
+historical16observed looks remain unchanged. Zero provider-attestation/PIT/
+canonical/trading authority is inferred from successful synthetic preflight.

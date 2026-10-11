@@ -1,19 +1,20 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **OWNER'S 2026-10-11 CONTINUATION REQUESTS ACTUAL ORDER-BASED
-BACKTESTING, DOCUMENTED RESULTS AND ONE FINAL PUSH; REQUESTED EXECUTION IS
-NOT A CLAIM OF QUALIFIED INPUTS OR A COMPLETED RUN. THE KNOWN PROTECTED
-DIRECT-SHARADAR CREDENTIAL IS PRESENT; SECTION 107 FREEZES A BOUNDED PRIVATE
-COMPANION QUALIFICATION BEFORE ROW RETRIEVAL. PUBLIC SCHEMA/ROUTE FACTS ARE
-DISTINCT FROM PRIVATE DATA-USABILITY CONCLUSIONS AND EMPIRICAL ADMISSION.
-SECTION 106'S COMPLETED FINRA CALIBRATION AND REVIEW WAIVER REMAIN HISTORICAL
-AND UNCHANGED; NO NEW CLAUDE DISPOSITION IS INVENTED. SOURCE/SHARED P2s AND
-PROSPECTIVE P3s ARE RETAINED. ACTUAL INPUT/IDENTITY/CASHFLOW, PROSPECTIVE LOOK
-AND EXACT QC ROUTE FACTS MUST EXIST BEFORE LAUNCH; NATIVE QC ECONOMICS CANNOT
-SILENTLY REPLACE THE FROZEN 48-BOOK STUDY. LOOKBACKS 20/60/120/252 UNSELECTED,
+Status: **SECTION 107 COMPLETES THE FROZEN DIRECT-SHARADAR SOURCE-ONLY
+CAPTURE AND DOCUMENTS THE REQUESTED ORDER-BASED BACKTEST'S PREFLIGHT STOP.
+THE CORRECTED SIXTEEN-REQUEST CAPTURE AND PRIVATE REPORT REBUILD COMPLETE;
+ONE ORIGINAL METADATA REFUSAL AND TWO PUBLIC BOOTSTRAPS ARE SEPARATELY
+COUNTED, NINETEEN REQUESTS TOTAL. PRIVATE DATA-USABILITY CONCLUSIONS/ROWS
+ARE NOT PUBLISHED. A SENTINEL CAPTURE IS NOT A FULL-HISTORY BACKTEST INPUT.
+VERSIONED HISTORICAL IDENTITY/SHARE-CLASS AND PAYMENT/TERMINAL INPUT
+BINDING, PROSPECTIVE LOOK REGISTRATION AND EXACT QC REPRESENTATION REMAIN
+UNQUALIFIED. NO BACKTEST LAUNCH, PERFORMANCE RESULT OR NODE-OCCUPANCY CLAIM.
+SECTION 106'S REVIEW WAIVER AND HISTORICAL LEDGER REMAIN UNCHANGED; NEW
+CODE IS IMPLEMENTED/FOCUSED-VALIDATED, NOT INDEPENDENTLY ACCEPTED. SOURCE/
+SHARED P2s AND PROSPECTIVE P3s RETAINED. LOOKBACKS 20/60/120/252 UNSELECTED,
 CANONICAL REAL LOOKS 0/0, EXPLORATORY REAL LOOKS 0, ALPHA 0, PERMANENT LOOK
-IDS NONE, QC ATTEMPTS 0. THE REQUESTED ONE-SHOT CLAUDE REVIEW MONITOR IS
-ARMED ONLY AFTER THIS ROUND'S VERIFIED FINAL PUSH.**
+IDS NONE, QC ATTEMPTS 0. ONE COMBINED FINAL PUSH, THEN OWNER-REQUESTED
+ONE-SHOT CLAUDE REVIEW MONITOR; ACTIVATION IS VERIFIED IN CHAT AFTER THE TOOL.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -15455,3 +15456,155 @@ Main's corrected focused validation is **362 passed in 9.82s**: 127 capture,
 4 selected actual-input refusals; empty environment/network denied.
 Four-file compilation and diff checks pass before the correction commit.
 No full suite, actual outcome look or QC attempt occurs.
+
+### 107.7 Completed protected capture and independent rebuild
+
+Correction commit **`71f0a62de1ecfa07e1c1f91bd34ec94361eb207a`** preceded
+the deliberate corrected capture
+`sharadar-companion-20261011T194406Z`. It completed the unchanged ordered
+**sixteen GETs**, with create-exclusive start/response receipts and bounded
+responses. The private report is retained under the ignored source capture
+directory, never a public data-usability publication. Whole-round network
+accounting is **seventeen capture GETs** (one original metadata GET plus the
+sixteen corrected GETs) and **two unauthenticated bootstrap schema GETs =
+nineteen total**. No FINRA, Massive or QC call occurs this round; no hidden
+retry, paging or bulk ZIP download. The two source captures are immutable.
+
+Main independently rebuilt the complete report from all original response
+bytes, matching each receipt's byte count/hash, request/code/protocol binding
+and ordered request ID. Canonical JSON **including the publisher's final
+newline** exactly equals the private report file. An initial diagnostic
+omitted that newline and failed its own format comparison; the corrected
+comparison passed without changing any artifact or product code. This is
+not a provider-data defect or new source request. Every stored file is owned,
+non-symlink 0600; capture directories are owned, non-symlink 0700. No private
+row, coverage/fitness verdict, account/credential/header value is emitted.
+
+| Evidence | SHA-256 |
+|---|---|
+| Prospective canonical protocol | `8540ea0adecf781db0323490beed1cf514fa57f92bafe06fbcce11a5569158b4` |
+| Corrected raw protocol file | `f30e3a3833e04e305c98c6872f15404b6d5cf0e19f9f5e61901c07a054d2c688` |
+| Corrected start/code binding | `1ea19b65dfb1fd2bc5e65471ba9305dedc4680f703b8a2b926fa307a162be2f4` |
+| Canonical private report payload | `7d36713a9c3591429dc254999be8a5d5c7e24952ca352c3feb6b2edf3387d634` |
+| Private report file | `4c0cb3fcb47a76a57214cf957daf89bc97186a514959ddf863427b8c04344663` |
+| Capture completion receipt | `89bb8cb9625f46f13e906df3661050bf9ae4981f6e5296d3097bc8343f6d4a79` |
+| Retained original refusal receipt | `829d21d6fb9f3f638b37f7e02717e9300ecbcfbfeacb43da17c76901b92a5505` |
+
+`SI-SHARADAR-007` is now **confirmed/corrected and validated**, solely as the
+metadata parser defect. `SI-SHARADAR-001..005` and `-008` remain corrected;
+`-006` remains the retained false alarm. No historical source P2, shared P2
+or prospective P3 is closed by transport completion or private sentinel
+checks. A `capture_complete` status means capture/report transport completed,
+not source admission, PIT integrity or backtest readiness.
+
+### 107.8 Requested backtest execution status, factual stop and next action
+
+**Execution status: NOT LAUNCHED — actual-input preflight incomplete. No
+backtest performance result exists.** Source-only requests and fabricated
+order-engine tests are not historical strategy evaluation. No permanent
+outcome look is registered/consumed, no alpha spent, and no QC project,
+node inquiry, history, upload, compile, job or backtest call is made. This
+preflight stop is not one of the candidate's three permitted QC launch
+attempts. Node availability is unknown, not busy; Codex has neither waited
+on an observed occupied node nor interfered with another lane.
+
+The specific remaining work is:
+
+1. Bind a **full prospective study population**, not the ten sentinels, to a
+   versioned actual-input adapter. Provider permatickers/rational raw volume
+   cannot be forced into the old FIGI/integer-volume interface. Establish
+   effective historical identity, share-class denominators and sector
+   coverage; do not backdate current TICKERS assertions or reuse primary-
+   class SF1 denominators for another class by assumption.
+2. Bind actual **dividend payment and terminal consideration** under the
+   frozen self-financing order rules. Public ACTIONS date/value fields do
+   not supply payment timestamps or CVRs/election/terminal completion. Use
+   the existing subscribed routes for a prospectively bounded supplement
+   where documented; do not invent zero terminal cash or a payment date.
+3. Freeze/register the actual exploratory look **before** any signal/return
+   join, and bind the exact permitted QC representation. The owner already
+   authorized the backtest purpose and routine delegated choices; this is
+   not a demand for another generic approval, institution affiliation or
+   permission letter. Actual source and platform facts remain necessary.
+
+The strict original-vintage PIT study separately remains blocked on authentic
+original/all-correction histories and actual availability; latest-revised
+exploration cannot establish those facts. Native QC is not a silent fallback
+for this fixed 48-book study: its whole-share rounding, native ex-date cash
+credits and automatic delisting liquidation differ from exact fractional,
+payment-date and explicit terminal rules. Public
+[QC corporate-action documentation](https://www.quantconnect.com/docs/v2/writing-algorithms/securities/asset-classes/us-equity/corporate-actions)
+supports that distinction. QC's
+[FINRAShortInterest class](https://www.lean.io/docs/v2/lean-engine/class-reference/py/QuantConnect/DataSource/FINRAShortInterest/)
+does not make processor-derived EndTime an observed publication timestamp.
+When a qualified candidate exists, use the authenticated
+[project nodes route](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/nodes/read-project-nodes)
+and recheck capacity immediately before launch; wait if active backtest
+capacity is busy without stopping/reassigning another lane. No native data
+claim or cloud candidate has been verified by an actual QC call this round.
+
+**SI-DEC-20261011-07:** record a factual preflight stop rather than weaken the
+actual-input refusal, substitute fixture performance, launch a different
+economic strategy under the same identifier, or consume an unregistered
+look. No new owner decision/approval is requested now. After the owner's
+requested exact-checkpoint Claude review and serialized counter-review,
+the next bounded milestone is the versioned actual-input identity/cashflow
+adapter and source supplement qualification above; then prospective look
+registration and the exact order-based QC candidate. Proceed under existing
+delegation only where facts permit, not by blanket `rights_verified` flags.
+
+### 107.9 Closing handoff and publication
+
+Review **every new commit after `b80ef633`**: `b366a30f` prospective capture
+freeze, `71f0a62d` verified transport correction and this final record commit.
+There is no new Claude commit to disposition this round. These are Codex
+implemented/validated changes, **not independently accepted**. All original
+ledger rows and sections 1–106 are preserved, apart from the permitted
+current status header and appended 2026-10-11 ledger row. Read-only historical
+audit confirmed the normalized preserved body is 1,363,257 bytes, SHA-256
+`94ebb9e445761285f11871614eb7ba15cac4d50ee2d6a9f4c6fc7e9ed93efa20`.
+Shared/project-wide documents and SESSION_HANDOFF remain untouched.
+
+Main's final code checks are **362 passed in 9.82s**, empty environment and
+network denied, with four-file compilation; no complete lane/repository
+suite. Closing active-document, boundary, historical-preservation, privacy,
+diff/status and matching-remote checks are rerun before publication and
+their actual results appended below. The actual source-only report was
+independently rebuilt as described above, not represented as a test suite.
+
+Exercise only approvals **SI-AUTH-20261011-01..04** and decisions
+**SI-DEC-20261011-01..07** inventoried in 107.4/107.6/107.8. No additional
+secret, purchase, terms, email, ETF/production ranking, holdout, broker,
+operator database, deployment, paper/live, capital or real trading action.
+Canonical actual looks **0/0**, exploratory actual looks **0**, alpha **0**,
+permanent look IDs **none**, QC launch attempts **0**.
+
+Under section 81 / SI-AUTH-20261005-02 and the owner's current instruction,
+make **one combined final non-force push only**
+`HEAD:refs/heads/codex/strategy-short-interest`, with follow-tags disabled.
+Immediately reverify roots/branch/HEAD/status and actual matching remote
+before final commit/push, and clean local/tracking/actual-remote equality
+afterward. Then arm one quiet five-minute completed-review monitor against
+the **actual pushed final hash**, not this code hash or an intermediate
+Claude push. Counter-review every subsequent Claude commit first, then
+proceed with one bounded next authorized milestone only if factual gates
+permit. Delete that one-shot after its handled round/terminal report; leave
+the PAUSED vendor and old Claude-plus-QC monitors unchanged. Activation is
+reported in chat only after the automation tool confirms it; it is not
+predicted as already active in this pre-push record.
+
+Closing erratum to this round's **prospective** 2026-10-11 ledger row:
+freeze/capture no longer "follow". Freeze is `b366a30f`, correction is
+`71f0a62d`, the sixteen-request corrected capture and original one-request
+refusal are preserved, and total network accounting is nineteen requests.
+The row's 326 pre-retrieval checks remain historical; final code validation
+is **362 passed in 9.82s**, followed by **93 closing focused checks passed in
+8.06s** (69 documents, 9 lane boundary, 11 ML boundary, 4 selected launch
+refusals), no skips/warnings, empty environment/network denied. Main's own
+historical-body comparison exactly matches the hash above; exact changed-
+file allowlist, unchanged shared files, actual-key absence from changed
+files, ignored/untracked private captures, diff/status and unchanged actual
+matching remote checks all passed. No credential value was printed/hashed
+for that privacy comparison. The requested backtest is **NOT LAUNCHED**, not
+completed or failed; actual looks and QC attempts remain zero. This appended
+erratum preserves the original ledger row instead of rewriting it.

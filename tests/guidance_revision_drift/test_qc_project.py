@@ -380,6 +380,37 @@ class QCProjectTests(unittest.TestCase):
                 elif kind == "directory":
                     target.mkdir()
                 else:
+                    target.write_bytes(b"" if kind == "empty" else b"x" * (256 * 1024))
+                namespace = self.generated_helpers()
+                with patch.object(namespace["os"], "open", side_effect=AssertionError("refuse before source reads")), \
+                     self.assertRaises(RuntimeError):
+                    namespace["_gdr_inventory"](directory)
+
+    def test_named_compiled_copy_bound_is_separate_from_visible_source_quota(self):
+        with TemporaryDirectory(prefix="gdr-qc-larger-known-bytecode-") as temporary:
+            directory = Path(temporary).resolve()
+            self.write_project(directory)
+            name = "research/guidance_revision_drift/simulation.py"
+            compiled = MAGIC_NUMBER + b"\0" * 12 + marshal.dumps(compile(self.files[name], name, "exec"))
+            # Bytecode size varies across Python versions; the known copy may
+            # legitimately exceed the unchanged source upload quota.
+            if len(compiled) < 64000:
+                compiled += b"\0" * (64000 - len(compiled))
+            (directory / name).with_suffix(".pyc").write_bytes(compiled)
+            self.generated_helpers()["_gdr_inventory"](directory)
+
+    def test_visible_root_source_must_be_regular_even_when_entrypoint_is_bytecode(self):
+        for kind in ("symlink", "directory", "empty", "oversized"):
+            with self.subTest(kind=kind), TemporaryDirectory(prefix="gdr-qc-root-visible-") as temporary:
+                directory = Path(temporary).resolve()
+                self.write_project(directory)
+                target = directory / "main.py"
+                target.unlink()
+                if kind == "symlink":
+                    target.symlink_to(directory / "gdr_assets.py")
+                elif kind == "directory":
+                    target.mkdir()
+                else:
                     target.write_bytes(b"" if kind == "empty" else b"x" * 64000)
                 namespace = self.generated_helpers()
                 with patch.object(namespace["os"], "open", side_effect=AssertionError("refuse before source reads")), \

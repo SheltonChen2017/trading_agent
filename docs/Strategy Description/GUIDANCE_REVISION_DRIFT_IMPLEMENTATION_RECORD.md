@@ -3072,3 +3072,32 @@ wait if nodes busy, and run only this fixed synthetic candidate. After any
 result retrieve all source again, retain complete raw logs/metadata and validate
 actual trace if available. No native completion or empirical readiness claimed;
 no intermediate publication before the round concludes.
+
+### 27.4 Wrapper pre-retry hardening (no additional QC attempt)
+
+Local correction commit `7ddf22f21fc7e8f56ff2e7ce688563247e238fa7`
+contains 27.1-27.3 and the initial artifact-tolerance regression. Before launch,
+actual in-memory compilation of the unchanged simulation source produced
+66,500 bytes including its header under local Python 3.13, exceeding the
+64,000-byte **source** quota. Two further red focused tests demonstrated that
+conflating these bounds refused this known compiled counterpart and that the
+inert helper did not itself require a regular visible root main.py. A helper
+test-harness-only omitted arithmetic constant caused one failed intermediate
+run; the generated constant was made a plain literal, with no QC submission.
+
+Unused adjacent counterpart metadata now has its own explicit 262,144-byte
+bound; nothing reads/evaluates those bytes. Visible .py upload bounds remain
+strictly below 64,000. Root main.py must be nonempty, regular and nonsymlink
+even if the external loader names main.pyc. Eight focused tests now pass,
+including actual large compiled-copy acceptance, root/bytecode unsafe-file
+refusals and previous cache/hash/isolated-loader cases. These prove local
+wrapper/native-import behavior, **not root bytecode authenticity or QC root
+import selection**; complete API source and compile/run custody remain needed.
+
+Final attempt-2-preparation full source:
+`7afd84dd4f8288272c001c2335e9ed4c9c19867db5d2025fc98d37ecf5f98ff2`;
+project `85be94f2efcaa230aba12dc97162a11bfc54cd7d1847048f42b0705bdcc326e9`;
+root 13,863 bytes / `4983806da57ae70e7fc59d6e536f1a8f68f502a2ba9a1d638ff3f6cde97e21a1`;
+21 files / 277,701 bytes. Section 27.3's intermediate wrapper map was never
+uploaded or launched. All native runtime, audit-bundle, fixture and immutable
+candidate identities remain unchanged; actual unsuccessful count stays one.

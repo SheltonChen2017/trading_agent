@@ -45,6 +45,7 @@ import tempfile
 _GDR_EXPECTED_FILES = __FILES__
 _GDR_EXPECTED_ASSETS = __ASSETS__
 _GDR_MAX_PROJECT_FILE_BYTES = 64000
+_GDR_MAX_UNUSED_BYTECODE_BYTES = 262144
 
 
 def _gdr_refuse(message):
@@ -137,11 +138,16 @@ def _gdr_inventory(project_root):
                     cached = entry.stat(follow_symlinks=False)
                     if (entry.name[:-1] not in expected_python
                             or not stat.S_ISREG(cached.st_mode)
-                            or not 0 < cached.st_size < _GDR_MAX_PROJECT_FILE_BYTES):
+                            or not 0 < cached.st_size < _GDR_MAX_UNUSED_BYTECODE_BYTES):
                         _gdr_refuse("unlisted or unsafe compiled project source")
                 elif entry.name.endswith((".so", ".pyd")):
                     _gdr_refuse("unlisted compiled project source")
                 if entry.name.endswith(".py"):
+                    if not name and entry.name == "main.py":
+                        visible = entry.stat(follow_symlinks=False)
+                        if (not stat.S_ISREG(visible.st_mode)
+                                or not 0 < visible.st_size < _GDR_MAX_PROJECT_FILE_BYTES):
+                            _gdr_refuse("visible root source must be a bounded regular file")
                     observed_python.add(entry.name)
         if observed_python != expected_python:
             _gdr_refuse("missing or extra project Python file")

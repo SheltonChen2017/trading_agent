@@ -15052,3 +15052,51 @@ OFF opens no TPR/provider packet. Root will invoke fresh
 separate `TPR-EXT26-RESULT-OFF-A1-20261010-001`; both diagnose only the already
 spent attempt1/job, not new looks/attempts/canonical acceptance. No upload
 diagnosis is implied by these separate own-job receipts.
+
+### 75.24 Actual OFF source-bound failure diagnosis; new upload diagnosis
+
+Fresh OFF inventory under`c524083248209dd5b2860721603a28887cbe216c` completed
+at02:25:04.099769UTC2026-10-11:9files655108bytes, plan SHA
+`c2bd998356e883ed8d388d092d4981f1f1ee73643854396c9b480a6005a8e86f`,
+inventory958bytes SHA
+`9c5e58125c03ad10ed312ff45d9023b43c1f1a0a72690356df38908313f450d9`.
+Separate fresh result diagnosis completed02:25:31.141329UTC, same9files/bytes,
+plan SHA`f42866d231c77cf8ad71d54d6a212775e88c63cdb4049f9aceb59c3a1df82cc8`.
+Original terminal5707bytes SHA
+`3779593f54b4fbcdc7f91efc1a82c7407d0efa53e219c92f8b31cfb5771cf9bb`
+is RuntimeError; safe classesRuntimeError/ValueError and code frames
+main.py117/extended_core.py525,539. No private error text/outcomes returned.
+The referenced code rejects invalid native project/job during PrivateEvidence
+construction insideinitialize. Current primary LEAN Engine.Run source sets
+ProjectId before Setup.Initialize but SetAlgorithmId after initialization:
+https://raw.githubusercontent.com/QuantConnect/Lean/master/Engine/Engine.cs
+(current primary source, not a claimed exact18178 binary reproduction).
+`TPR-EXT26-F006`P1: audit identity initialized too early; native empty job is
+the evidenced lifecycle explanation/inference, not a directly logged value.
+Named deferred-binding successor will retain bounded initialization records,
+require the real native identity before export/trading and refuse identity
+changes. Do not set engine AlgorithmId or substitute a default/fake identity.
+Exact cloud correction still unexecuted, original runtime hashes remain frozen.
+
+Peer found `TPR-EXT26-F007`P2 in the now executed inventory: pre-stat aggregate
+budget can race replacement before unchanged readeropen and read beyond the
+remaining budget before post-read custody refusal. Its pure control observed
+10bound/11read, no actual private access. Actual9files655108bytes remained well
+under128MiB; no actual breach is evidenced. Preserve executed inventory bytes;
+a named FD-open/fstat-before-read successor is delegated for future reads.
+
+New upload diagnostic21078bytes SHA
+`9bb026bc7caf45762f84e68725f3db9768ad3d703d03549764899afc68be5b2c`,
+tests11890bytes SHA
+`f3766b3bd221499cae61e6692b71f56ed297df65144b48e1ff35e51a2d59ec10`.
+Root completely read both and reproduced22focused passes in0.57s; agent22green
+in0.92s and attributed unrelated-OFF-response mutation1red→restored1green.
+Source/manifest/bundle fixed hashes,72input stage names/96spent request slots,
+matching ONobject/set projections/terminals only, claimed before stat/read,
+120seconds/16MiBfile/128MiBjoint/24hours. FD-open/fstat limits read bytes before
+the body; no licensed packet/noOFF response/noAPI/no automatic retry.
+One repeated agent guard-race incident is retained: after intentional HEAD
+advance a queued assigned-new-file patch followed a failed check. No tracked/
+executed/private state changed; root required exit-code-gated patch dispatch
+in one orchestration call, and agent changed its pattern. This was a failed
+check, not green validation or permission to ignore a lane mismatch.

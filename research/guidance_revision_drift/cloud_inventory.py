@@ -13,8 +13,11 @@ import re
 from data.hashing import hash_bytes, hash_payload
 
 
-MAX_FILES, MAX_FILE_BYTES, MAX_TOTAL_BYTES = 64, 1_048_576, 4_194_304
-MAX_EXPECTED_PYTHON_BYTES = 32_000
+MAX_FILES, MAX_FILE_BYTES, MAX_TOTAL_BYTES = 50, 1_048_576, 4_194_304
+# Expected source must fit the existing Researcher tier with notebook headroom.
+# Larger returned opaque bytes may be retained only as quarantined observations;
+# the capture ceiling is not a statement that those files meet platform quotas.
+MAX_EXPECTED_FILES, MAX_EXPECTED_PYTHON_BYTES = 49, 64_000
 MAX_TEXT_DIFF_BYTES = 64_000
 MAX_DIFF_LINES, MAX_DIFF_CHARS, MAX_ALL_DIFF_CHARS = 2048, 32_768, 131_072
 _PATH = re.compile(r"[A-Za-z0-9_./-]{1,256}\Z")
@@ -70,8 +73,9 @@ def cloud_inventory_anchor(files):
 def compare_cloud_inventory(expected_python, returned_files, *, expected_project_sha256,
                             expected_returned_sha256):
     expected, returned = _snapshot(expected_python), _snapshot(returned_files)
-    if (not expected or "main.py" not in expected or not expected["main.py"] or len(expected) > 25
+    if (not expected or "main.py" not in expected or not expected["main.py"] or len(expected) > MAX_EXPECTED_FILES
             or any(not name.endswith(".py") or len(raw) >= MAX_EXPECTED_PYTHON_BYTES
+                   or (not raw and name.rsplit("/", 1)[-1] != "__init__.py")
                    for name, raw in expected.items())):
         raise CloudInventoryError("complete retained bounded Python carrier required")
     before, after = _inventory(expected), _inventory(returned)

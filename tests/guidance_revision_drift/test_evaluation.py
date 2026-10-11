@@ -39,7 +39,8 @@ def ran(candidate, attempt="SYN-QC-one", *, status="completed", compile_id="SYN_
 
 
 def files():
-    return {"main.py": b"# invented source\n", "gdr_payload_000.py": b"_GDR_B64 = 'AA=='\n"}
+    # Generic transparent custody fixture, not the actual candidate package.
+    return {"main.py": b"# invented source\n", "support.py": b"# invented readable helper\n"}
 
 
 def anchor(value):
@@ -328,7 +329,7 @@ class EvaluationTests(unittest.TestCase):
         result = compare_cloud_source(expected, returned, expected_project_sha256=anchor(expected),
                                       expected_returned_sha256=anchor(returned))
         self.assertEqual({row["name"]: row["status"] for row in result["changes"]},
-                         {"extra.py": "extra", "gdr_payload_000.py": "missing", "main.py": "changed"})
+                         {"extra.py": "extra", "support.py": "missing", "main.py": "changed"})
         self.assertTrue(result["quarantined"])
         self.assertEqual(result["change_manifest_sha256"], hash_payload(result["changes"]))
         same = compare_cloud_source(expected, expected, expected_project_sha256=anchor(expected),
@@ -340,8 +341,8 @@ class EvaluationTests(unittest.TestCase):
     def test_cloud_map_hostile_containers_and_retained_anchors_refuse(self):
         expected = files()
         for returned in ({"../main.py": b"x"}, {"x.py": bytearray(b"x")},
-                         {"x.py": b"x" * 32000}, {True: b"x"},
-                         {f"x{i}.py": b"x" for i in range(65)}):
+                         {"x.py": b"x" * evaluation.MAX_CLOUD_FILE_BYTES}, {True: b"x"},
+                         {f"x{i}.py": b"x" for i in range(evaluation.MAX_CLOUD_FILES + 1)}):
             with self.subTest(returned=tuple(returned)), self.assertRaises(EvaluationError):
                 compare_cloud_source(expected, returned, expected_project_sha256=anchor(expected),
                                      expected_returned_sha256="a" * 64)
@@ -366,6 +367,35 @@ class EvaluationTests(unittest.TestCase):
         self.assertTrue(result["quarantined"])
         self.assertEqual(result["expected_project_sha256"], before)
         self.assertEqual(next(row for row in result["changes"] if row["name"] == "main.py")["status"], "changed")
+
+    def test_readable_native_size_and_zero_byte_initializer_are_retained_exactly(self):
+        source = Path(__file__).resolve().parents[2] / "research/guidance_revision_drift/simulation.py"
+        native = source.read_bytes()
+        self.assertGreater(len(native), 32_000)
+        self.assertLess(len(native), evaluation.MAX_CLOUD_FILE_BYTES)
+        expected = files() | {"research/guidance_revision_drift/simulation.py": native, "data/__init__.py": b""}
+        inventory = project_file_inventory(expected)
+        self.assertEqual(inventory["data/__init__.py"], {"bytes": 0, "sha256": hash_bytes(b"")})
+        same = compare_cloud_source(expected, expected, expected_project_sha256=anchor(expected),
+                                    expected_returned_sha256=anchor(expected))
+        self.assertFalse(same["quarantined"])
+        self.assertEqual(same["expected_files"]["research/guidance_revision_drift/simulation.py"],
+                         {"bytes": len(native), "sha256": hash_bytes(native)})
+        self.assertIs(same["current_local_content_checked"], False)
+        for name in ("main.py", "support.py", "data/not__init__.py"):
+            with self.subTest(empty=name), self.assertRaises(EvaluationError):
+                project_file_inventory(expected | {name: b""})
+
+    def test_researcher_python_byte_and_file_boundaries_are_conservative(self):
+        self.assertEqual(evaluation.MAX_CLOUD_FILES, 50)
+        self.assertEqual(evaluation.MAX_CLOUD_FILE_BYTES, 64_000)
+        allowed = {f"source_{index}.py": b"# readable\n" for index in range(50)}
+        self.assertEqual(len(project_file_inventory(allowed)), 50)
+        allowed["source_0.py"] = b"x" * 63_999
+        self.assertEqual(project_file_inventory(allowed)["source_0.py"]["bytes"], 63_999)
+        for bad in (allowed | {"extra.py": b"x"}, allowed | {"source_0.py": b"x" * 64_000}):
+            with self.subTest(count=len(bad)), self.assertRaises(EvaluationError):
+                project_file_inventory(bad)
 
     def test_load_bearing_attempt_ceiling_and_anchor_mutants_are_caught(self):
         source = inspect.getsource(evaluation._apply)

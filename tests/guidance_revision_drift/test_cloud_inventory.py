@@ -1,5 +1,6 @@
 """Complete invented cloud maps; opaque files never become accepted source."""
 from copy import deepcopy
+from pathlib import Path
 import unittest
 from unittest.mock import patch
 
@@ -8,7 +9,8 @@ from research.guidance_revision_drift import cloud_inventory as module
 
 
 def expected():
-    return {"main.py": b"# invented unchanged economics\n", "gdr_payload_000.py": b"_GDR_B64='AA=='\n"}
+    # Generic readable comparison input; actual candidate verification is separate.
+    return {"main.py": b"# invented unchanged economics\n", "support.py": b"# invented readable helper\n"}
 
 
 def expected_anchor(files):
@@ -48,9 +50,9 @@ class CloudInventoryTests(unittest.TestCase):
         returned = {"main.py": b"# altered economics quarantine\n", "unreviewed.py": b"raise RuntimeError('never run')\n",
                     "research.ipynb": b"not JSON"}
         report = self.compare(returned)
-        self.assertEqual(report["python_changes"], ["gdr_payload_000.py", "main.py", "unreviewed.py"])
+        self.assertEqual(report["python_changes"], ["main.py", "support.py", "unreviewed.py"])
         by_name = {row["name"]: row for row in report["changes"]}
-        self.assertEqual(by_name["gdr_payload_000.py"]["status"], "missing")
+        self.assertEqual(by_name["support.py"]["status"], "missing")
         self.assertEqual(by_name["unreviewed.py"]["status"], "extra")
         self.assertEqual(by_name["main.py"]["status"], "changed")
         self.assertIn("-# invented unchanged economics", by_name["main.py"]["unified_diff"])
@@ -101,9 +103,59 @@ class CloudInventoryTests(unittest.TestCase):
         with self.assertRaisesRegex(module.CloudInventoryError, "retained"):
             self.compare(after="0" * 64)
         for local in ({}, {"main.py": b""}, expected() | {"research.ipynb": b"opaque"},
-                      {"main.py": b"x" * module.MAX_EXPECTED_PYTHON_BYTES}):
+                      {"main.py": b"x" * module.MAX_EXPECTED_PYTHON_BYTES},
+                      expected() | {"support.py": b""}, expected() | {"data/not__init__.py": b""}):
             with self.subTest(kind=len(local)), self.assertRaises(module.CloudInventoryError):
                 self.compare(local=local)
+
+    def test_readable_native_source_and_empty_initializer_fit_without_platform_claims(self):
+        source = Path(__file__).resolve().parents[2] / "research/guidance_revision_drift/simulation.py"
+        native = source.read_bytes()
+        self.assertGreater(len(native), 32_000)
+        local = expected() | {"research/guidance_revision_drift/simulation.py": native, "data/__init__.py": b""}
+        returned = local | {"research.ipynb": b"opaque notebook"}
+        report = self.compare(returned, local=local)
+        self.assertTrue(report["python_byte_identical"])
+        self.assertTrue(report["quarantined"])
+        self.assertEqual(report["opaque_quarantine"], ["research.ipynb"])
+        self.assertEqual(report["expected_files"]["data/__init__.py"]["bytes"], 0)
+        self.assertEqual(report["expected_files"]["research/guidance_revision_drift/simulation.py"]["bytes"], len(native))
+        self.assertIs(report["current_local_content_checked"], False)
+        self.assertIs(report["economic_acceptance"], False)
+
+    def test_current_verified_readable_project_and_opaque_notebook_compose(self):
+        from research.guidance_revision_drift.qc_project import (
+            build_qc_project, qc_project_manifest, verify_qc_project,
+        )
+        local = build_qc_project()
+        verified = verify_qc_project(local, expected_sha256=expected_anchor(local))
+        current = qc_project_manifest()
+        self.assertEqual(current["schema"], "gdr.synthetic.python-project.v3")
+        self.assertEqual(verified["project_sha256"], expected_anchor(local))
+        self.assertEqual(local["data/__init__.py"], b"")
+        self.assertEqual(local["research/__init__.py"], b"")
+        self.assertGreater(len(local["research/guidance_revision_drift/simulation.py"]), 32_000)
+        returned = local | {"research.ipynb": b"opaque default notebook, never parsed"}
+        report = self.compare(returned, local=local)
+        self.assertEqual(report["expected_project_sha256"], verified["project_sha256"])
+        self.assertEqual(set(report["returned_files"]), set(returned))
+        self.assertTrue(report["python_byte_identical"])
+        self.assertEqual(report["opaque_quarantine"], ["research.ipynb"])
+        self.assertIs(report["current_local_content_checked"], False)
+        self.assertIs(report["external_provenance_verified"], False)
+        self.assertIs(report["economic_acceptance"], False)
+
+    def test_researcher_expected_project_reserves_notebook_and_strict_byte_headroom(self):
+        self.assertEqual(module.MAX_FILES, 50)
+        self.assertEqual(module.MAX_EXPECTED_FILES, 49)
+        self.assertEqual(module.MAX_EXPECTED_PYTHON_BYTES, 64_000)
+        local = {"main.py": b"# root\n"} | {f"support_{index}.py": b"# readable\n" for index in range(48)}
+        local["support_0.py"] = b"x" * 63_999
+        self.assertTrue(self.compare(local=local)["python_byte_identical"])
+        self.assertEqual(len(self.compare(local | {"research.ipynb": b"opaque"}, local=local)["returned_files"]), 50)
+        for bad in (local | {"support_extra.py": b"x"}, local | {"support_0.py": b"x" * 64_000}):
+            with self.subTest(count=len(bad)), self.assertRaises(module.CloudInventoryError):
+                self.compare(local=bad)
 
     def test_private_byte_snapshots_survive_caller_mutation_during_hashing(self):
         retained, returned = expected(), expected() | {"research.ipynb": b"opaque"}

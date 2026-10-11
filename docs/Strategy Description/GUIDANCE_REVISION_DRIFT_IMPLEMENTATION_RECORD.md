@@ -7,13 +7,14 @@ On 2026-10-10 the owner explicitly waived this round's fresh Claude review
 and consequent counter-review for the exact published snapshot, solely to
 proceed with section 19.6's fixed synthetic-only QuantConnect evaluation
 (section 25). This is not independent acceptance. Safari authentication and
-existing QC resource preflight cleared (25.3), but current QC code-packaging
-requirements block the ZIP/Base64 carrier (25.4). No source upload or launch
-occurred; a compliant readable-source candidate and permitted interface are
-required before proceeding.
+existing QC resource preflight cleared (25.3). The owner then authorized
+replacing the blocked ZIP/Base64 carrier with readable packaging (section 26).
+The replacement is prepared and focused-validated offline; native source and
+the invented fixture are unchanged. No source upload or launch occurred.
+An officially permitted execution/complete-source-return route remains required.
 Native LEAN/QC execution and empirical backtest readiness remain unverified/blocked. The
 original economic, data, empirical, account and trading gates remain closed.**
-Current scope/evidence are sections 17 through 25. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 26. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -2748,3 +2749,191 @@ unittest with network denied: **1 test passed in 0.002s**. Full source SHA was
 re-measured unchanged, the 14 prepared carrier files compiled in memory, and
 `git diff --check` passed. No full suite or native SDK execution occurred;
 the unavailable local runner did not consume a QC launch attempt.
+
+## 26. Owner-approved readable packaging correction, 2026-10-10
+
+### 26.1 Exact scope, external direction and definition of done
+
+The owner answered **"yes"** to: **"May I replace [the ZIP/Base64 QC
+carrier] with readable Python packaging, keeping the strategy and synthetic
+fixture unchanged?"** This activates one bounded packaging correction, not
+another ten-milestone quota, an economic decision or a real-data backtest.
+The external section-25 review waiver and section-19.6 fixed base-only
+SYN-GDR synthetic evaluation scope are retained explicitly; the replacement
+is a new source/project epoch, not independent Claude acceptance of new bytes.
+No review commit or completed-review handoff was fabricated or newly consumed.
+Historical section-23 review/24 counter-review remain historical.
+
+Definition of done for offline packaging: expose every native Python source
+file readably without encoding or dynamic execution; preserve all 19 native
+files, immutable draft and 372-frame fixture bytes; use only transparent data
+literals; retain strict bounds, anchors, current-source replay and closed
+authority; prove named source/data custody, isolated static imports and
+failure sensitivity with focused tests; retain exact changed identities.
+Native QC discovery/reader execution, actual IDs, completion/source retrieval
+and empirical gates are separate and are not marked done here.
+
+The mandatory worktree/branch matched at clean starting HEAD
+`7356e3f73fd0d67cddbd3e4b880a7b76b78543b1`.
+Remote remains `b2bef5faec5d6838ee13d00192fd1c1b993c43cf`.
+Existing local-only documentation commits
+`691d2ed650f348a37d444133f89c2740e61e50fa` (owner waiver/access blocker) and
+`7356e3f73fd0d67cddbd3e4b880a7b76b78543b1` (Safari/policy preflight)
+are retained unchanged. No competing Claude work, branch/worktree change,
+merge, stash, reset, root-document edit or intermediate push occurred.
+
+### 26.2 Implemented behavior and retained boundaries
+
+`qc_project` schema **gdr.synthetic.python-project.v3** prepares:
+
+- The 19 native Python files, byte-for-byte at their original visible package
+  paths (including the two empty `__init__.py` files).
+- `gdr_assets.py`, exactly two plain raw string-literal assignments containing
+  the unchanged draft JSON and invented JSONL. They are readable data, not
+  encoded source. AST parsing and retained byte hashes reject nonliteral,
+  reordered, changed or extra statements without executing this module.
+- Root `main.py`, static native imports and one callback-inheriting subclass.
+  Before imports it checks named file sizes/hashes, nonredirected package
+  directories, exact Python inventory and preloaded package collisions.
+  Unlisted importable directories/symlinks and compiled source files refuse
+  without traversing their contents or platform-internal directories.
+  Native origins and source inventory are checked again before data binding.
+
+Runtime materialization is **only two data files**, in a retained fresh private
+temporary directory, with exclusive/no-follow creation and post-write checks.
+Only `contracts._SPEC_PATH` and native `DATA_PATH` are rebound before
+initialization; no native function/class, callback, economics or permission
+field is changed. Candidate semantics and deterministic fixture equality
+remain enforced. Static Python imports remain ordinary source execution,
+not a proof against a malicious concurrent mutate/restore race; complete
+official cloud-source custody and engine provenance remain necessary.
+
+Source-only cache lookup is directed to an uncreated path in that fresh private
+directory, with bytecode writes disabled, before the native imports.
+This avoids executing substituted timestamp-valid project cache bytes without
+traversing platform caches. It is additional packaging behavior, not evidence
+that QC has executed it or that the cloud engine's own entrypoint loading has
+been independently verified.
+
+The current official [Files](https://www.quantconnect.com/docs/v2/cloud-platform/projects/files)
+documentation was rechecked: this existing Researcher tier supports 50 files /
+64KB. Local bounds conservatively require each file strictly below **64,000
+bytes**, reserve one notebook slot, and allow zero bytes only for initializers.
+The structural map validator is separate from exact current-source
+reconstruction: a generic small comparison fixture cannot certify this
+candidate. Passive Python and complete-cloud custody bounds now accept the
+readable 45,352-byte native simulation file and preserve empty initializers.
+Larger opaque returned bytes remain bounded quarantine observations, not
+platform-fit or economic acceptance. The default notebook is never decoded
+or executed for custody.
+
+The native ZIP remains a separate **offline audit reference**; its hash in
+runtime context does not assert an uploaded or runtime-reconstructed ZIP.
+No code/file carrier is compressed, encoded, packed, extracted privately,
+transported through logs/notebooks/Object Store or concealed from platform
+review. The old ignored encoded artifact in 25.3 is retained for historical
+audit and remains explicitly prohibited for upload.
+
+### 26.3 Retained findings and correction evidence
+
+| ID | Priority / disposition | Evidence and correction | Verification / remaining limitation |
+| --- | --- | --- | --- |
+| GDR-QC25-001 | P2 / accepted-after-correction for offline packaging; platform execution still blocked | Current QC readable-code policy conflicts with the old encoded carrier. v3 exposes all native Python and plain data; removes runtime ZIP/Base64 source decoding/materialization. Does not claim platform approval merely from offline preparation. | Exact reconstruction, static-import/no-obfuscation inspection and isolated SDK-shim loading passed. Official execution/source-return route and native run remain missing. |
+| GDR-QC26-001 | P2 / accepted-after-correction | Early readable loader scanned only named directories and could allow an extra package such as `json/__init__.py` to shadow dependencies after project-path insertion. Reject unlisted importable directories/symlinks and visible compiled source before source reads; do not traverse unknown/platform directories. | Seven harmless inventory subcases failed before correction and passed after it. Removing the directory guard in memory made its regression fail again. No marker package was imported for the inventory reproduction. |
+| GDR-QC26-002 | P2 / accepted-after-correction | Verified source hashes and `__file__` alone did not prevent timestamp/size-valid cached substitute code executing under Python's normal import rules; `-B` prevents writes, not reads. Fresh private cache lookup plus disabled writes loads the visible source instead. | A temporary harmless cached raise marker executed before correction (one red regression). After correction the same fixture initializes SYN-GDR normally with only two data files; removing cache-prefix isolation in memory made the regression fail. No native economics/source byte was modified. |
+
+No new P0/P1 or P3 finding was identified in this bounded work. Historical
+P0-P3 ledgers and exclusions are retained. These are Codex implementation
+findings, not a new independent Claude review.
+
+### 26.4 Focused validation, not native completion
+
+The bundled interpreter still lacks pytest; no installation was attempted.
+Standard-library unittest ran under a network-denied sandbox:
+
+- **23** focused readable-project/loader tests passed (5.266s), including
+  anchor/type/path/TOCTOU/source-epoch refusal, closed flags, same-size hash
+  corruption, source origin, collision, symlink, literal-data and cache checks.
+- **16** focused passive custody tests, with 35 passing subtests, passed.
+  These include actual v3 source composition, large native source, empty
+  initializers, strict file/byte headroom and quarantined opaque notebook.
+- **6** focused native-closure/archive refusal, invented completion-dossier
+  composition, transitive/fresh-process import boundaries and active-document
+  checks passed (3.881s).
+
+Thus **45 unique focused tests** passed, not the complete lane/repository suite.
+Three generated-root guard-removal mutants (native file SHA, unlisted package,
+private cache prefix) and two passive-custody empty-file mutants were detected,
+all in memory without repository source mutation. All 21 prepared Python
+files compiled in memory; exact saved file-map re-read/reconstruction passed.
+Diff/status checks passed. The dossier and loader checks use invented
+receipts/test SDK shims: they are not authenticated platform results,
+AlgorithmImports/LEAN integration, settlement parity or empirical evidence.
+
+### 26.5 Exact readable candidate and preserved identities
+
+| Identity | SHA-256 / size |
+| --- | --- |
+| Full current source manifest | `4bb65ed2b213ac513965a8a1095c9f1558b0ba06e2a0ae8545d2327cb02b2be7` |
+| Readable project file map | `febd61bd6725687408eb0594bdac945baafc899b4d9004a0b69ee96c2a91ca95`; 21 files, 276,569 bytes; 22 slots with reserved notebook |
+| Root main.py | `782ba10a26fc9e79dcb3a4d84ec3ae18919625854016ac16146581329868b228`; 12,731 bytes |
+| Plain gdr_assets.py | `ee3e1024eda76afd5a01af47ce2ef775ebc0d3181feaaf92963bb6cd7bd0951d`; 50,306 bytes, largest project file |
+| Unchanged native runtime source | `beee91270427d72ccda5beafa91897ae357a5d0964845eb93efef39a0f9062e9` |
+| Unchanged offline native audit ZIP | `1579a3daf3f5665d63d1f0f9bdd975ca8fdad34847286475f5b8c1c4e6d4809b`; 272,862 bytes, not uploaded |
+| Unchanged immutable draft semantic identity | `b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c` |
+| Unchanged raw draft file bytes (distinct from semantic identity) | `1dd9b5969853924d7682b4b566734ea7e90f061340d6378912118fb93d132110`; 7,112 bytes |
+| Unchanged invented fixture | `8f35d56a335d3f7d9dad016e1e2236de7fcd2635e5c463c30081f97b7b944458`; 43,135 bytes, 372 frames / 93 sessions |
+
+The previously referenced draft `b52aedd6...` is its canonical semantic
+identity, not the raw file SHA. Both raw and semantic bytes are unchanged;
+neither identity is silently substituted for the other.
+
+Generated plain files and adjacent local manifest, mechanically saved and
+re-read from the verified builder, are in the fresh ignored directory:
+`artifacts/guidance_revision_drift/qc/GDR-base372-approved-20261008/readable-v3-RyOo1f/`.
+Its `project/` contains only the 21 named Python files. No new ZIP wrapper,
+encoded archive or cloud release was produced. Manifest flags remain false;
+external human direction is recorded here, not by changing immutable null/
+false fields or fabricating a review hash.
+
+### 26.6 Retained attempt ledger, blocker and next action
+
+Actual **0 candidate uploads / 0 requested launches / 0 unsuccessful terminal
+attempts** remain. Project **37647834**, **Determined Green kitten**, remains
+only the existing new shell. There are no compile/run IDs, pending intent,
+terminal result or native engine/binding evidence. Keep the same owner cycle
+`GDR-base372-approved-20261008`, cycle SHA
+`bef3928146b1ca7b8e694a239b6487d9a2a13ba051c2c5f517163689d58e36c0`,
+pre-intent genesis/head
+`7232f0c3e4856a00f1361d507af20e6e1a6526215f6fb24ea3e283723a4762dc`.
+The three-unsuccessful-attempt ceiling is not reset by packaging corrections.
+
+Current [Security/IP](https://www.quantconnect.com/docs/v2/cloud-platform/security-and-ip),
+[Terms](https://www.quantconnect.com/terms),
+[single-project cloud synchronization](https://www.quantconnect.com/docs/v2/lean-cli/projects/cloud-synchronization)
+and [named File Read API](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/file-management/read-file)
+were read. Only named user-owned source through an officially permitted route
+is in scope. No QC/Mia tool is enabled and no existing LEAN CLI is on PATH.
+Safari authentication does not configure these documented programmatic
+routes. Browser automation's permitted complete-source-return route has not
+been established; this is a limitation/uncertainty, not a declaration that
+every manual IDE operation is forbidden.
+
+Next: the owner supplies an existing officially supported QC/API/MCP route,
+or handles this readable candidate in Mia. Do not copy Safari sessions or
+credentials, install dependencies/connectors, change the account, use indirect
+source export, or launch before complete source custody is possible. Then
+retain exact upload/source hashes, actual intent/project/compile/run/engine/
+binding details and every terminal attempt; retrieve all resulting source and
+diff every change before accepting only verified lane-specific corrections.
+No further source changes are currently justified, and no silent partial
+publication is made while this scoped evaluation is blocked.
+
+The monitor remains explicitly **PAUSED**. Native completion and original
+GDR-0..6 / empirical readiness are not declared. Real data, PIT rights,
+matched-SPY/corporate-actions/equity settlement parity, family/looks/protected
+dates, provider/account changes and broker/paper/live/capital gates remain
+closed; project-wide documents, original plan/PDF and candidate decisions stay
+frozen. This bounded offline correction is accumulated locally for the later
+single completed-round publication; the producing/closing commit identities
+are recorded in the next closure entry, not invented in their own contents.

@@ -22,8 +22,8 @@ from research.guidance_revision_drift.persistence import (
 
 FIXTURE_SHA256 = "8f35d56a335d3f7d9dad016e1e2236de7fcd2635e5c463c30081f97b7b944458"
 MAX_RECORDS = 32
-MAX_CLOUD_FILES = 64
-MAX_CLOUD_FILE_BYTES = 32_000
+MAX_CLOUD_FILES = 50  # Existing Researcher tier; no account upgrade implied.
+MAX_CLOUD_FILE_BYTES = 64_000  # Conservative decimal KB, strictly smaller.
 _GENESIS = "evaluation-genesis.json"
 _RECORD = re.compile(r"evaluation-([0-9]{6})\.json\Z")
 _PYTHON_PATH = re.compile(r"[A-Za-z0-9_./-]+\.py\Z")
@@ -445,7 +445,8 @@ def _snapshot_files(files: dict[str, bytes]) -> dict[str, bytes]:
     for name, raw in snapshot.items():
         if (type(name) is not str or len(name) > 256 or not _PYTHON_PATH.fullmatch(name)
                 or any(part in ("", ".", "..") for part in name.split("/"))
-                or type(raw) is not bytes or len(raw) >= MAX_CLOUD_FILE_BYTES):
+                or type(raw) is not bytes or len(raw) >= MAX_CLOUD_FILE_BYTES
+                or (not raw and name.rsplit("/", 1)[-1] != "__init__.py")):
             raise EvaluationError("safe bounded immutable Python file bytes required")
     return snapshot
 

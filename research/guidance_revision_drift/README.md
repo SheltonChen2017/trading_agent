@@ -45,7 +45,7 @@ verified. No other lane's budget or permissions are inherited.
 | ENG-22/23 | `bundle` | Deterministic source/sidecar ZIP, explicit inventory, current-source/retained-anchor verification and no-overwrite publication; never extracted or executed |
 | ENG-24 | `lean_bridge` | Bounded hash-linked callback protocol trace, exact duplicate idempotency and atomic capacity refusal |
 | ENG-25/26 | CLI, `release` | Local preparation/verification commands, explicit offline/native/empirical readiness separation and rebuilt review release |
-| Cloud-package preparation | `qc_project` | Deterministic size-bounded Python carriers and root loader for the exact source bundle/fixture; new review candidate, not cloud execution or launch authority |
+| Cloud-package preparation | `qc_project` | Readable native Python, plain JSON/JSONL literals and static root entrypoint; exact offline identities, not cloud execution or launch authority |
 | BT-2/6 | `callback_plan` | Receipt/as-of inputs to all 93 decision rows, subsequent strategy/comparator quotes and execution minutes, retained missing/stale refusals; complete immutable paired close/account audit |
 | BT-3/4/5 | `paired_bridge` | Separate paired native-style IDs and exact submission/fill/cancel acknowledgments; retained-input action reconciliation and dated settlement/component observations with atomic refusal |
 | BT-7/8/9 | `evaluation` | Passive durable exact-candidate intent/terminal ledger, strict compile/run contracts and complete returned-project byte comparison/Mia quarantine; no platform actuator |
@@ -144,27 +144,27 @@ the source bundle as an automatically deployable QC project.
 
 `prepare-qc-project` prints a detached local preparation manifest, not source
 files or an uploaded project, and accepts no output, approval or launch flag.
-`qc_project.build_qc_project()` returns the exact root `main.py` and literal
-Python payload files in memory; `verify_qc_project()` requires the retained
-project-file hash and current-source reconstruction. All files are below
-32,000 bytes and uploaded preparation reserves one of 25 files for the default
-notebook. The native ZIP is capped at 360,000 bytes. No source is
-minified; candidate JSON and JSONL fixture bytes remain inside the verified
-bundle rather than unsupported cloud project-file types. That ZIP now contains
-only the explicitly reviewed native import closure, not offline-only helper
-modules. The full review-source bundle remains a separate artifact. The outer
-preparation manifest binds both identities; offline helper/review changes do
-not get embedded into executable payload bytes.
+`qc_project.build_qc_project()` returns 19 byte-identical native Python files
+at their original package paths, a readable `gdr_assets.py` containing only two
+plain raw JSON/JSONL string literals, and root `main.py`. No code is encoded,
+packed, minified or dynamically executed. `verify_qc_project()` requires the
+externally retained map hash and exact current-source reconstruction. Each
+file is strictly below 64,000 bytes; preparation reserves one of the existing
+Researcher tier's 50 files for the default notebook. The native ZIP remains a
+separate, bounded offline audit reference, not uploaded or reconstructed at
+runtime. Full review-source and native-runtime identities remain distinct.
 
-Only the generated root loader, when explicitly run, materializes the exact
-verified source/fixture into a new private runtime temporary directory and
-imports the nested native algorithm through a callback-inheriting root
-subclass that supplies immutable runtime bundle/candidate/fixture anchors.
-Preparation/verification never extracts, imports the SDK or runs that loader.
-Runtime filesystem permissions, native class discovery, binding and callback
-behavior remain unverified in QC. The loader is new source and requires fresh
-exact-source Claude review before the conditionally authorized synthetic
-evaluation in lane-record section 19.6. It grants no empirical authority.
+When explicitly run, the root validates named visible source/asset bytes,
+refuses redirected paths and package collisions, parses data literals without
+executing their module, and materializes only the two data files in a retained
+private temporary directory. Static imports load the visible native modules;
+their origins are checked before binding the private candidate/sidecar paths.
+One root subclass inherits all callbacks and economics. Preparation never
+writes/extracts, imports the SDK or runs this entrypoint. Native filesystem,
+package discovery and reader behavior remain unverified. Lane-record sections
+25–26 record the external owner review waiver and readable-packaging direction;
+neither changes immutable draft permissions or constitutes independent
+acceptance, platform execution evidence or empirical authority.
 
 The new paired/action/settlement composition is a separate offline prototype;
 the native entry point still uses only its original single-security sidecar.

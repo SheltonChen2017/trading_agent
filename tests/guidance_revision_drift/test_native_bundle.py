@@ -24,7 +24,7 @@ class NativeBundleTests(unittest.TestCase):
         self.assertIs(verified["manifest"]["qc_upload_allowed"], False)
         project = qc_project.qc_project_manifest()
         self.assertLess(project["bundle_bytes"], native_bundle.MAX_NATIVE_BUNDLE_BYTES)
-        self.assertLessEqual(project["project_files_with_reserved_notebook"], 25)
+        self.assertLessEqual(project["project_files_with_reserved_notebook"], qc_project.MAX_PROJECT_FILES)
         self.assertEqual(project["reserved_project_files"], 1)
         self.assertEqual(project["source_manifest_sha256"], hash_payload(source_manifest()))
         self.assertEqual(project["runtime_source_sha256"], verified["manifest"]["source_manifest_sha256"])

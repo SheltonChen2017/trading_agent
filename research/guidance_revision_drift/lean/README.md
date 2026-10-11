@@ -103,30 +103,33 @@ not a claim of native comparator/corporate-action parity.
 `launch-preflight` always exits 2 and cannot certify external human approval.
 The lane record's section 19.6 retains the owner's conditional synthetic-only
 QC upload/run approval; all empirical freeze/source/calendar/evidence gates
-remain closed. Each producing source, including added cloud loaders, still
-requires exact-source Claude review and Codex counter-review before upload.
+remain closed. The external owner waiver in lane-record sections 25–26
+supersedes this round's review sequencing only; it is not independent acceptance.
 No real market/reference/action data or empirical outcomes are authorized.
 
 For a later explicitly authorized *synthetic engine integration* evaluation,
 retain the repository package layout, neutral `data` helpers and candidate
 file shown in the release manifest. The exact sidecar bytes come from
-`lean_bridge.fixture_stream()` and must be placed as `gdr-synthetic.jsonl`
-beside `main.py` by the authorized packaging process. The explicit local
+`lean_bridge.fixture_stream()`. The bare native entrypoint defaults to
+`gdr-synthetic.jsonl` beside its source; the readable root described below
+explicitly binds the verified private data path before initialization. The local
 `prepare-bundle` command creates a verified archive containing those sidecar
 bytes and the inventoried source. It does not automatically extract or upload
 anything. Initialization verifies every
 byte; alternate data, symbols or dates cannot be selected with parameters.
-The new `native_bundle`/`qc_project` candidate carries the exact native import
-closure and unchanged sidecar through size-bounded literal Python payloads plus
-root `main.py`, reserving capacity for the default notebook. The full review
-bundle stays separate. Runtime-source and full-review identities are distinct.
-At runtime its root loader checks every carrier, exact archive anchor/member
-inventory and metadata before private temporary materialization. The loader
-uses static imports and exposes one callback-inheriting algorithm subclass
-with runtime bundle/candidate/fixture anchors; fixture economics are unchanged. No carrier code
-is executed while parsing its literal payload. This is a proposed cloud
-filesystem route, not demonstrated QC support: fresh source review and the
-later native run must establish discovery, permissions and reader access.
+The readable `qc_project` candidate exposes all 19 unchanged native Python
+files at their original package paths, root `main.py`, and two plain data
+literals in `gdr_assets.py` (21 files plus reserved notebook capacity). No
+source is encoded or privately materialized. Full-review and runtime-source
+identities are distinct; the native ZIP hash is an offline closure reference,
+not an uploaded archive. The root checks visible source/data bytes and paths,
+refuses preloaded package collisions, parses literal data without executing
+the asset module, and materializes only the candidate and invented sidecar.
+It statically imports the visible native implementation, verifies origins,
+binds those two private data paths and exposes one callback-inheriting subclass.
+Native source and fixture economics are unchanged. This remains a proposed
+cloud filesystem route, not demonstrated QC support: the authorized native
+run must establish package mounting, discovery, permissions and reader access.
 Select `GuidanceRevisionDriftAlgorithm`, pin the LEAN version and record the
 project source hash, compile/run IDs, callback trace and terminal diagnostics.
 Test reader/frame alignment, fills, fees, final cash, and native settlement

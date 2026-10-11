@@ -1,25 +1,19 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Codex counter-review of section 23 accepted (section 24,
-2026-10-09). The owner's next ten requested engineering capabilities,
-NE-1..NE-10, are implemented as a new exact-source review candidate.
-On 2026-10-10 the owner explicitly waived this round's fresh Claude review
-and consequent counter-review for the exact published snapshot, solely to
-proceed with section 19.6's fixed synthetic-only QuantConnect evaluation
-(section 25). This is not independent acceptance. Safari authentication and
-existing QC resource preflight cleared (25.3). The owner then authorized
-replacing the blocked ZIP/Base64 carrier with readable packaging (section 26).
-The readable replacement and wrapper corrections are focused-validated;
-native strategy source and invented fixture are unchanged. On 2026-10-11,
-existing authenticated REST access enabled complete source custody and three
-controlled synthetic compile/run attempts (section 27). All compiled and all
-failed before strategy initialization. The final failure identifies QC's
-one-LF runtime representation of uploaded-empty data/__init__.py. The manual
-attempt ceiling is exhausted, candidate changes/relaunches stopped, and
-post-ceiling Mia interaction is blocked by the locked Mac. No successful
-native integration or empirical backtest readiness is established. The
-original economic, data, empirical, account and trading gates remain closed.**
-Current scope/evidence are sections 17 through 27. Sections 2 through 6 preserve
+Status: **Independent Claude review of `3c5d76ff..75ea6280` (sections
+24-27) recorded in section 28, 2026-10-11;
+Codex counter-review of section 28 pending.
+All twelve Codex commits are accepted, two after correction. The
+owner-directed synthetic-only QuantConnect evaluation (section 27) ended with
+three compiled launches that all failed before strategy initialization; the
+three-attempt ceiling is exhausted and no relaunch is authorized. Two P2 items
+need owner direction before any recovery run: QC's current AI-agent rules
+against compressed or Base64-encoded output, which the native trace export
+uses (GDR-CR28-001), and the one-LF runtime form of the project's two empty
+initializers (GDR-CR28-002). No successful native integration or empirical
+backtest readiness is established. The original economic, data, empirical,
+account and trading gates remain closed.**
+Current scope/evidence are sections 17 through 28. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -3319,3 +3313,201 @@ economic/data gate, pause and request the decision rather than silently
 advancing. Both agents keep lane-only handoffs, the same root/branch, focused
 Codex checks/full independent Claude validation, and one end-of-round push.
 This re-arm is one review-to-next-milestone cycle, not an indefinite loop.
+
+## 28. Independent Claude review of `3c5d76ff..75ea6280`, 2026-10-11
+
+### 28.1 Scope and method
+
+Reviewed range: the twelve Codex commits after the section-23 push, ending at
+the fetched remote head `75ea6280`: `e60f999c` (section-24 counter-review and
+NE definitions), `ae404c1a` (NE-1..NE-10: `native_bundle`, `native_observation`,
+`trace_transport`, `cloud_inventory`, `evaluation_cycle`,
+`completion_evidence.native_completion_dossier`, `lean/main.py`, `qc_project`),
+`b2bef5fa` (24.7 closure), `691d2ed6` and `7356e3f7` (section 25 waiver,
+access and policy records), `8e974be8` (readable `qc_project` v3), `4c698f22`
+(26.7 closure), `7ddf22f2`, `ed747625` and `ac536413` (root-wrapper
+corrections between the three QuantConnect attempts) and `55ce28d1` and
+`75ea6280` (section 27 closure). The owner's 2026-10-10 waiver (25.1) let
+Codex skip waiting for this review before the synthetic QC evaluation; it did
+not waive the review itself, and the owner's instruction to this session was
+to review every unreviewed commit once Codex pushed. This section is therefore
+a post-hoc review of source that QuantConnect has already compiled three
+times.
+
+The worktree was clean and equal to the remote head at the start. Apart from
+`lean/main.py`, every native-path module (`lean_bridge`, `simulation`,
+`comparison`, `assessment`, `fixtures`, `timing`, `events`, `universe`,
+`archive`, `formulas`, `contracts`) is byte-unchanged since `3c5d76ff`, as are
+`data/`, the frozen root documents, the plan, the PDF and the draft candidate.
+Method and isolation are as in 12.1: every commit read individually, every
+new or rewritten module read in full, every pytest and mutation process
+network-denied under the proved `sandbox-exec` profile, all validation in
+the designated worktree. No provider, QC, broker,
+paper or live system was contacted; research looks 0; this review spent no QC
+attempt. The current QuantConnect Security and IP page was read on 2026-10-11
+for GDR-CR28-001.
+
+### 28.2 Disposition of sections 24 to 27
+
+| Item | Claude disposition |
+|---|---|
+| 24.1-24.2 dispositions of `f0ed0be3`, `3c5d76ff` and GDR-CR23-001..009 | Accepted; every retained disposition matches section 23. |
+| GDR-NE24-001..004 (author QA) | Accepted. GDR-CR28-003 extends NE24-001's loader-module ban to the two remaining standard-library loaders and the unimported loader calls. |
+| GDR-QC25-001 (encoded carrier against QC's readable-code rules) | Accepted; the readable v3 carrier carries no encoded, packed or dynamically executed source. GDR-CR28-001 raises the same rules for the trace output, which still compresses and Base64-encodes. |
+| GDR-QC26-001, GDR-QC26-002 (unlisted package, cached substitute) | Accepted; both guards are caught by mutants Q09 and Q27. |
+| GDR-QC27-001 (unused adjacent bytecode) | Accepted. Python's path finder tries source before bytecode for one module name, so an adjacent `.pyc` is never loaded while its verified `.py` exists, and `pycache_prefix` redirects cached lookups. Mutants Q11-Q14 are caught. |
+| GDR-QC27-002 (moving-master engine) | Accepted as a retained limitation. |
+| GDR-QC27-003 (one-LF runtime `data/__init__.py`) | Accepted as an open native-integration blocker; GDR-CR28-002 adds the scope and the recovery options. |
+| GDR-QC27-004 (attempt ceiling exhausted, Mia blocked) | Accepted. No fourth launch, no budget reset, Mia's unverified variants not ported: this matches the 19.6 rule. |
+| Sections 25-27 execution on unreviewed source | Owner-directed (25.1, 26.1, 27.1); recorded for owner confirmation in 28.7. |
+
+### 28.3 Commit dispositions
+
+| Commit | Scope | Disposition | Notes |
+|---|---|---|---|
+| `e60f999c` | Section-24 counter-review, NE definitions, status pin | Accepted | Every retained section-23 disposition matches; owner quotes for 22.1 and 22.7 now recorded as direct human messages |
+| `ae404c1a` | NE-1..NE-10 modules, `lean/main.py`, `qc_project` v2, tests, 24.4-24.6 | Accepted after correction | `70ab4610` closes the loader gaps in the native-closure guard (GDR-CR28-003) and pins 22 guards no test isolated (N02 and GDR-CR28-006..010); GDR-CR28-001 documented |
+| `b2bef5fa` | 24.7 closure | Accepted | Documentation only |
+| `691d2ed6` | 25.1-25.2 waiver and access record | Accepted | Documentation only; waiver listed in 28.7 |
+| `7356e3f7` | 25.3-25.4 Safari preflight and encoded-carrier policy blocker | Accepted | The policy reading is confirmed against the current Security and IP page (28.4) |
+| `8e974be8` | Readable `qc_project` v3, `cloud_inventory` and `evaluation` bounds, 26.1-26.6 | Accepted after correction | Readable carrier carries no encoded or dynamically executed source; three pins (GDR-CR28-004, GDR-CR28-005) |
+| `4c698f22` | 26.7 closure | Accepted | Documentation only |
+| `7ddf22f2` | Unused adjacent bytecode, 27.1-27.3 | Accepted | Mutants Q11-Q14 caught |
+| `ed747625` | Separate bytecode and source bounds, visible-root check, 27.4 | Accepted | Mutants Q15, Q16 caught |
+| `ac536413` | Bounded refusal diagnostics, 27.5-27.6 | Accepted | Mutant Q19 caught; the diagnostic produced attempt 3's exact one-LF evidence |
+| `55ce28d1` | 27.7 three-attempt conclusion | Accepted | `sha256(b"\n")` independently equals the recorded `01ba4719...` |
+| `75ea6280` | 27.8 closure | Accepted | Documentation only |
+
+### 28.4 Findings ledger
+
+| ID | Priority / status | Location | Finding, disposition and verification |
+|---|---|---|---|
+| GDR-CR28-001 | P2 / documented, owner decision before any relaunch | `trace_transport.export_trace_fragments`, `lean/main.py::_emit_trace` (NE-2, NE-3) | The native evidence route zlib-compresses the trace envelope, Base64-encodes it and splits it across log lines. QuantConnect's current Security and IP page, read on 2026-10-11, tells AI agents not to "use compression, ZIP, Base64 encoding, or other methods to obfuscate code or files", and its "What Counts as Exporting" list includes encoding, compressing or splitting data across files or backtests. The data is invented and the code is readable, so these rules may not be aimed at this output, but section 25.4 adopted the page's own instruction to stop when compliance is uncertain, and GDR-QC25-001 removed the same method from the code carrier only. No native callback ran in attempts 1-3, so nothing encoded was ever emitted. Measured on the complete fixed trace: 87 compressed fragments, 16,922 log bytes; a readable equivalent (one canonical JSON line per compact record) is 141,691 bytes plus 8,973 bytes of metadata, with lines up to 331 characters, above both the 100 KB per-backtest log allowance recorded in 25.3 and the transport's 200-byte line bound. Recommend the owner decide, or ask QuantConnect, whether compressed logs of invented synthetic output are acceptable; if not, Codex redesigns the evidence route (for example readable per-frame digests with deterministic local replay). Not changed here: it is a design and compliance decision. |
+| GDR-CR28-002 | P2 / documented, recovery design | `qc_project._ROOT_TEMPLATE::_gdr_inventory`; GDR-QC27-003 | The readable project carries exactly two zero-byte files, `data/__init__.py` and `research/__init__.py`; every other file already ends in LF and contains no CR. Attempt 3 proved QuantConnect's runtime form of the first is one LF, but the inventory stops at the first refused file in sorted order, so `research/__init__.py` and the runtime bytes of the other nineteen files were never compared. Any relaunch with the current carrier will refuse the same way. Options for an owner-directed recovery: carry those two initializers as non-empty readable bytes in the project only (for example one comment line ending in LF), so no zero-byte file is uploaded and the shared repository files stay untouched; or admit exactly `b"\n"` for exactly those two names. Either way, consider letting the inventory report every mismatching named file in one bounded refusal, so a single attempt surfaces every representation difference. Not changed: the candidate is frozen after the exhausted ceiling. |
+| GDR-CR28-003 | P3 / corrected | `ae404c1a`, `native_bundle._import_closure`; `test_native_bundle.py` | QuantConnect's readable-code rule forbids dynamically executed source, and this guard is the lane's evidence that the uploaded closure has none. GDR-NE24-001 banned the `importlib`, `builtins` and `runpy` loaders, but `pkgutil.resolve_name` and `zipimport` import arbitrary modules, a bare `compile` builds executable code without `eval` or `exec`, and a loader reached through `sys.modules` needs no import statement, so `resolve_name`, `load_module` and `exec_module` calls passed. No closure module uses any of them, so the closure, runtime source and project map are byte-unchanged. Added the two loader roots, the `compile` name and the three call names, and `test_other_stdlib_loaders_compile_and_unimported_loader_calls_refuse`, which fails in seven of its eight cases with the original sets restored and in its four `sys.modules` cases under mutant N02. |
+| GDR-CR28-004 | P3 / corrected | `8e974be8`, `qc_project._prepare_project`; `test_qc_project.py` | A change to an offline-only module during preparation leaves the native bundle valid, so only the final full-review comparison stops the manifest naming a stale source epoch; the existing test changes a native file, which the bundle re-verification refuses first (Q46 survived). Added `test_full_review_source_change_during_readable_preparation_refuses`; Q46 now fails. |
+| GDR-CR28-005 | P3 / corrected | `8e974be8`, generated `_gdr_inventory`; `test_qc_project.py` | Two inventory guards were never exercised (Q08, Q10 survived). `lstat` cannot see a redirected ancestor because the final path component is a real directory, so only the resolved-path comparison refuses a root reached through a symlinked parent; without it the refusal moves after data preparation and native imports. The 1,024-entry scan bound had no case. Added `test_generated_inventory_refuses_a_root_reached_through_a_symlinked_ancestor` and `test_generated_inventory_bounds_directory_entries_before_reading_source`; Q08 and Q10 now fail. |
+| GDR-CR28-006 | P3 / corrected | `ae404c1a`, `trace_transport._fragments`; `test_trace_transport.py` | The 100,000-byte bound (LF included) is the only check keeping 200-byte lines under the 100 KB per-backtest allowance; the line and count bounds admit about 206 KB (T13 survived). Added `test_fragment_set_above_the_per_backtest_log_allowance_refuses` (497 lines accepted, 498 refused); T13 now fails. |
+| GDR-CR28-007 | P3 / corrected | `ae404c1a`, `native_observation.validate_native_metadata`, `failure_diagnostics`; `test_native_dossier.py` | Seventeen rules of the validator and of `failure_diagnostics` were never isolated (O20-O22, O24-O32, O34-O38 survived). Codex's cases change one value that two rules refuse together, for example a dropped row that breaks both the row-count and checkpoint-count rules, and no case built failed-output metadata at all. Added `NativeMetadataValidationTests`: eleven complete-output and six failed-output cases, each breaking exactly one rule while staying consistent with every other, plus unknown-stage and identity-overflow cases for `failure_diagnostics`. Each mutant now fails exactly its own subtest. |
+| GDR-CR28-008 | P3 / corrected | `ae404c1a`, `completion_evidence.native_completion_dossier`; `test_native_dossier.py` | A refusal in `on_end_of_algorithm` happens after all 372 frames, so its failed-status export carries the complete 752-record trace, which replays cleanly. With a consistent "completed" receipt and cycle, only the metadata-status check stops that run becoming a completion dossier, and it was untested (D05 survived). Added `test_complete_trace_exported_by_a_failed_end_callback_cannot_form_a_dossier`; D05 now fails. |
+| GDR-CR28-009 | P3 / corrected | `ae404c1a`, `native_observation.ReceiptSnapshot`; `test_native_observation.py` | LEAN's zero fee carries currency QCC; the snapshot admits QCC only on a control receipt whose quantity, price and fee are all zero. The existing QCC case is a filled receipt, refused by its status alone (O15 survived). Added `test_qcc_currency_is_admitted_only_on_a_fully_zero_control_receipt` (non-zero fee, quantity or price on submitted and canceled receipts); O15 now fails. |
+| GDR-CR28-010 | P3 / corrected | `ae404c1a`, `evaluation_cycle.CycleJournal._load`; `test_evaluation_cycle.py` | A stray file beside the retained owner-cycle records was never tried (E33 survived). Added `test_reopen_refuses_an_unexpected_entry_beside_the_retained_records`; E33 now fails. |
+| GDR-CR28-011 | P3 / documented | Sections 25.1, 27.2; `evaluation_cycle`, `evaluation.CandidateBinding` | The NE-7/NE-8 owner-cycle journal built in this range was not used for the actual three attempts: `CandidateBinding` requires a review commit and has no waiver variant, so Codex kept the attempt ledger in ignored machine-local artifacts and in this record. That was truthful, but none of the journal's custody checks (retained head, per-intent binding, three-failure ceiling) applied to the real cycle. Before any recovery cycle, either add a waiver-aware binding variant or state that this record is the authoritative attempt ledger. |
+| GDR-CR28-012 | P3 / documented, owner awareness | Sections 25.3, 27.1-27.7 | The repository is public, and the record now names the owner's QuantConnect project ID, its platform-assigned name and URL, compile and run IDs and response hashes. They need an authenticated session to use and are neither credentials nor personal data; no credential, token or e-mail address appears. Whether to keep account-scoped identifiers in a public record is the owner's choice; nothing changed. |
+
+Scripted count from this table: P0 0, P1 0, P2 2, P3 10; corrected 8, documented 4.
+
+### 28.5 Validation
+
+| Check | Scope | Result |
+|---|---|---|
+| Lane selection at the pushed head `75ea6280` | worktree, network-denied | 560 passed, 1,442 subtests, 12:07, run alongside the repository suite and the mutation trials |
+| Six changed test files after corrections | worktree, network-denied | 87 passed, 219 subtests |
+| Lane selection on the final tree | worktree, network-denied | 571 passed, 1,471 subtests, 12:45 at `70ab4610` plus this section, eleven tests more than the pushed head; the gate test that reads the record was rerun after the last record edit (closing check below) |
+| Repository suite excluding `tests/analyst_revisions_v2` | worktree from `75ea6280`, network-denied | 15 failed, 11,449 passed, 56 skipped, 28 warnings, 1,442 subtests, 1:26:36; the fifteen failures are byte-identical to sections 12.4, 16.5, 18.5, 20.5 and 23.5 (out of lane, GDR-CR18-005), and the pass count rose by exactly the 80 lane tests added since 23.5's run at `180fc5b8`. Collection preceded the corrections, which were written during the run; the final lane selection above covers them |
+| Section 27.6 identities at `75ea6280` | worktree, network-denied | full source `5159229a...`, project map `fbf824bf...` (21 files, 278,845 bytes, largest `gdr_assets.py` 50,306), root `main.py` `e6ed09f6...` (15,007 bytes), runtime source `beee9127...`, audit ZIP `1579a3da...` (272,862 bytes), candidate `b52aedd6...`, fixture `8f35d56a...` (43,135 bytes) all reproduce exactly; `verify_qc_project` accepts the rebuilt map |
+| Identities after `70ab4610` | worktree, network-denied | only the full-review source manifest changes, to `92caa263...` (`native_bundle.py` is outside the native closure); project map, root, runtime source and audit ZIP are byte-identical, so the compiled QuantConnect candidate is unchanged |
+| `python -m compileall -q research/guidance_revision_drift tests/guidance_revision_drift` | worktree | passed |
+| `git diff --check` | worktree | passed |
+| Closing check on the final record tree | worktree, network-denied | lane gate `test_boundaries.py` plus shared `test_active_document_consistency.py`: 75 passed |
+| Analyst V2 directory | not run | out of lane, as in section 12.4 |
+
+### 28.6 Mutation trials
+
+One hundred and ninety single-behaviour in-memory mutants over the changed
+modules, each run network-denied against the test files that own the module,
+four processes at a time: 34 rewrite the generated root template through the
+constant-rewrite plugin variant and 156 rewrite one function. No test pins the
+project or root hashes, so template mutants were judged by behaviour.
+`lean/main.py` was not mutated: its tests re-import it fresh for every case,
+so an in-memory rewrite does not persist; its new paths delegate to
+`native_observation` and `trace_transport`, which were mutated.
+
+| Class | Count | Mutants |
+|---|---:|---|
+| Caught by Codex's tests | 101 | Q05, Q09, Q11-Q22, Q27, Q30, Q44, Q45, Q47; N01, N03, N04, N06, N07, N09, N11, N13; T01, T06, T10, T14-T16, T23, T24, T26, T27, T29, T31; O02, O04-O07, O14, O17-O19, O23, O33; E01-E23, E26, E28-E32, E34-E37, E39; C01-C13, C15; D01, D07, D08 |
+| Survived, now caught by added pins | 25 | N02 (GDR-CR28-003); Q46 (GDR-CR28-004); Q08, Q10 (GDR-CR28-005); T13 (GDR-CR28-006); O20-O22, O24-O32, O34-O38 (GDR-CR28-007); D05 (GDR-CR28-008); O15 (GDR-CR28-009); E33 (GDR-CR28-010) |
+| Redundant by construction or unreachable, no test added | 64 | See below |
+
+The 64 unpinned survivors, by reason:
+
+- **Repeated by another check that refuses the same input.**
+  - C14: the empty-non-initializer rule already refuses an empty `main.py`.
+  - D02-D04, D06, D09-D11: these form a mutually redundant cluster. The replayed owner-cycle attempt must equal both receipts and the binding, the cycle's own replay enforces receipt binding and compile/run lineage, and reconstruction enforces base mode for complete output.
+  - N10: `verify_native_bundle` repeats the size bound.
+  - N12, N14: canonical re-encoding equality and the hash anchor imply the archive member checks.
+  - O01, O10-O13, O16: `capture` builds canonical bytes from fields it has already validated; O11 and O16 are a redundant pair on the symbol.
+  - Q23, Q24: the inventory repeats the root regular-file check (Q15 and Q16 are caught).
+  - Q31: the asset hash and the native source hash together imply fixture equality.
+  - T07-T09, T11, T12, T28, T30: `TraceEvidence`, the reconstructed trace-identity comparison and the exact record key set duplicate these checks.
+  - T25: `_raw`'s authority-key check (T01, caught) refuses the authority flags.
+- **Unreachable through supplied inputs.**
+  - E27, E38: at most three attempts of four observations each keep the record count under the bound.
+  - O03: the native code sets its own symbol, and the projection check repeats it.
+  - O08: the bridge refuses fractional inventory before any frame commit.
+  - O09: the frame index is always in range.
+  - Q01, Q06, Q07, Q32: the generated table, already bounded offline, fixes these names and sizes.
+  - Q40, Q41: unreachable for the generated map; exact reconstruction covers a supplied one.
+  - Q42, Q43: the fixed draft and fixture contain no triple quote or trailing backslash.
+  - N05: an unreviewed module has no member and refuses as missing source.
+  - Q28, Q34: inventory exactness, the preloaded-root check and path precedence fix the import origin; these guards defend only against foreign import hooks.
+- **Race or defence-in-depth only.**
+  - Q02-Q04: three overlapping size checks plus an inode comparison.
+  - Q25, Q26, Q29: re-read after write, the second preloaded-root check and the post-import inventory recheck.
+  - N08: catches only a change-and-restore between two hashes.
+  - Q33: `dont_write_bytecode` has no observable effect under the test child's `-B`.
+- **Content-equivalent.**
+  - T05: a non-canonical envelope.
+  - T21: the END line's self-anchor.
+  - T22: non-canonical Base64.
+  - T17-T20: per-line sequence, chain and length checks; any reordering, duplication or loss changes the concatenated payload, which then fails decoding or the identity check.
+  - E24, E25: the previous-head and cycle fields sit inside each hashed record, so the retained external head refuses any change to them.
+- **Structural bounds.**
+  - T02-T04: the encoded-length bound and the interpreter's limits subsume these, and exact downstream schemas refuse such structures.
+
+Representative caught mutants:
+- the three-attempt ceiling removed (E07);
+- a pending or ambiguous attempt not blocking a new intent (E06);
+- a compile or run ID reused across the cycle (E15, E20);
+- an unlisted package, compiled file or extension module admitted (Q09, Q11, Q14);
+- private cache routing removed (Q27);
+- the transport anchor, runtime context or trace identity not compared (T16, T26, T27);
+- the raw mark or whole-account NAV not checked (O06, O07);
+- a deferred receipt conflict or the capacity bound ignored (O18, O19);
+- cloud custody missing an opaque file or an extra Python file (C07, C12).
+
+### 28.7 Owner confirmations, commits and next action
+
+For the owner to confirm where both roles can read it (each recorded only by
+Codex from its own channel):
+- (a) the 2026-10-10 "proceed without review" waiver for `b2bef5fa` (25.1);
+- (b) the "yes" to replacing the encoded carrier with readable packaging (26.1);
+- (c) the 2026-10-11 instruction "proceed to run the backtesting, document the result. when done, push only once" (27.1);
+- (d) the permission to ask Mia for help (27.5).
+
+Under these, three QuantConnect launches ran on source with no independent review. This section reviews that source after the fact. It accepts that the 19.6 limits held: synthetic only, at most three unsuccessful attempts, no fourth launch and no porting of Mia changes.
+
+Claude's instructions in this session were to watch for Codex's push, review every unreviewed commit and push once. The owner also wrote "qc is fixed", which is consistent with (a)-(d).
+
+The status block names this section; the `test_boundaries.py` review-state
+phrase is rotated to "Codex counter-review of section 28 pending".
+
+| Commit | Scope |
+|---|---|
+| `70ab4610` | Native-closure loader fix and 25 regression pins (GDR-CR28-003..010) |
+| This record commit | Section 28, status block, `test_boundaries.py` pin rotation |
+
+The round gets one push, made after every commit exists and guarded on the
+remote head still being `75ea6280`; never force.
+
+Next, Codex counter-reviews section 28 and both Claude commits, then rotates
+the pin. The synthetic evaluation stays concluded: the three-attempt ceiling is
+exhausted, and neither this review nor a new wrapper hash resets it. Any
+recovery run needs new owner direction, and GDR-CR28-001 and GDR-CR28-002
+should be settled first.
+
+Acceptance here is a software review of the exact pushed source. It
+establishes neither native execution, QuantConnect integration nor empirical
+readiness. No GDR-1 source audit, real data, broker, paper or live step starts
+from this review. `docs/ACTION_PLAN_2026-08-20.md` and
+`docs/SESSION_HANDOFF.md` were not edited and stay frozen for both agents.

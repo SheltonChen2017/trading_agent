@@ -15477,3 +15477,98 @@ request26 retry or spent cleanup receipt extension. Actual data/source upload,
 compile, launch and all IDs/failures/counts must be recorded as observed,
 not inferred from successful bundle creation. ON0/OFF1attempt and17looks
 remain unchanged before the next reservation/launch.
+
+### 75.32 Actual OFF successor attempt2; ON upload refusal pending diagnosis
+
+Root prepared operation003 under committed
+`d37e6c34489b910c91d2bf35b8f43c6ec1194bdd`, manifest SHA
+`caa3a8609ab50fb2d977e2279586dc9b3bc58e7e0434df5433b88cc251776c57`.
+OFF nine exact source files uploaded/read back, envelope SHA
+`9ece43919299c610f9e003e49ada25293043aa6b7a4e132e6f45606fc7e7e8a4`;
+actual main SHA
+`b0a827580d9db8ed30c39ad8c0a3c16f848a758e1d28e25e2c3a96c351ab2e3e`.
+The complete source hashes remain in the public compressed bundle and retained
+actual readback receipt; original core/config/input identities are unchanged.
+Persistent OFF reservation2 preceded compilation. Compile
+`e8789d4aa60e2a1f370537234c30de6e-d8260dab150ff48e1a19031d318ed91e`
+returned BuildSuccess, then own project37650980 launched job
+`f79d3ff02644ec81f20da5cc6ca7440a`. Latest observed status at this entry is
+In Progress, completed=false/error=false; this is not completed execution or
+performance evidence. OFF now has two consumed reservations/one remaining;
+ON still zero. The prelaunch persistent look census counted OFF1, so OFF2's
+launch consumes cloud look16, total18=16cloud+two historical local looks.
+No attempt/look refund or canonical acceptance is inferred.
+
+Root invoked ON compressed-input upload within operation003 only after the
+preceding OFF status call finished. It returned exit1/refused_or_uncertain,
+automatic_retry=false. No ON reservation/compile/launch occurred. The failure
+is retained; partial uploads, request admission and cause are not yet known.
+Do not label it a quota failure, successful upload or retryable transient by
+inference. D042 (agent-delegated, pending independent review): prepare a named
+single-use metadata-only diagnostic bound to operation003, its exact manifest
+and compressed bundle before reading any new private metadata. Alternatives:
+blind retry rejected because spent/unknown effects must be preserved; licensed
+payload re-read unnecessary. Scope excludes payloads, old captures, OFF
+outcomes, credentials, exports, mutation and new QC looks/attempts. A future
+fresh operations scope may carry the unchanged active OFF2 source/job under a
+later HEAD; this is renewed access, not renewal of its spent launch or receipt.
+
+### 75.33 Native numeric precision qualification before performance claims
+
+D041 (agent-delegated qualification, independent review pending): preserve
+the frozen economics and explicitly distinguish exact rational calculations
+on admitted represented values from original CLR decimal/provider precision.
+Root independently inspected current primary Python.NET Converter.cs367-370:
+CLR Decimal converts through Double to Python float. The readonly peer traced
+current LEAN ChartPoint/Extensions SmartRounding and public lane callers;
+neither current primary source nor local fixtures attest the exact cloud18178
+binary. `native_fraction(float)` uses str(float); the resulting Fraction is
+exact relative to that decimal representation, not proof of the original CLR
+value. Fraction arithmetic/pair serialization remain exact; `_text` uses
+48-significant-digit presentation and aggregate means50 digits. Account chart
+lexemes are native chart observations, not unrounded cash-ledger replay.
+The one-cent cash/NAV parity tolerance is a check, not end-to-end precision or
+independent provider authenticity. Alternatives to the qualification (claiming
+full CLR exactness or replacing native data/factors/economics speculatively)
+are rejected. No actual provider read, extra outcome, code change or QC attempt
+was caused by this primary/public-source review.
+
+Primary sources: https://raw.githubusercontent.com/QuantConnect/pythonnet/master/src/runtime/Converter.cs
+and peer-attributed https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/ChartPoint.cs
+plus https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Extensions.cs.
+
+### 75.34 Frozen metadata-only compressed-upload diagnostic
+
+New lane-owned `extended_compressed_upload_diagnostic.py`21268B SHA
+`eb9c0844d321633b035e9bb56378ea296b7e7222a2c2b054d0d599caecee0a32`
+and focused test13826B SHA
+`cfcafb1d1be10c5f0d702563c0cb1d348ee5a71145b29b93eda652762c7cae40`
+implement D042 without altering any executed controller, runtime or bundle.
+Exact operation003 manifest/candidate/input/mapping lineage; fixed72 upload
+stages and128 spent-request slots. Only matching object/set stage/payload/
+manifest proof admits response metadata; unrelated request metadata is counted
+but unrelated responses and all payload/gzip files are excluded. This is a
+bounded snapshot census, not proof about requests outside its128-slot window.
+Fresh24h120s/16MiB-file/128MiB-total exclusive claim precedes child metadata
+existence/body reads. Opened-FD size/custody and remaining body budget are
+checked before reading; hashes/counts/known error classes only leave the
+private directory. Unknown/local/no-completion/failed stages stay distinct;
+no retry, receipt renewal, attempt, look, provider attestation or acceptance.
+
+Agent24green0.81s and pre-body-budget mutation red/restored green are attributed.
+Root read complete producer/tests/reachable helpers, reproduced24green0.61s;
+peer independently read the full files and reproduced24green0.59s, accepted
+for this fixed scope with no unresolved material finding. Root also reproduced
+two focused active-document/import-boundary checks0.76s and diff whitespace
+clean. All use the sections49/52 isolated in-process runtime root on macOS;
+no operator state/database, complete suite, Windows custody proof or QC call
+from validation. Independent Claude acceptance of this new round is pending.
+
+Root will commit only this diagnostic, its tests and current record truth,
+then invoke one fresh `TPR-EXT26-COMPRESSED-UPLOAD-DIAG-20261010-001` claim.
+Because the public HEAD changes, any further active OFF2 status/collection
+will use fresh `TPR-EXT26-QC-20261011-004` access from the unchanged223e bundle.
+The same project, source/config/input/job/attempt histories are retained;
+existing attempt comparison ignores only baseline Git HEAD, never source,
+config, input or project changes. This scopes new access, not a new launch,
+spent-receipt extension, candidate rename or attempt/look refund.

@@ -431,6 +431,10 @@ its one assessment; the monitor remains paused and R284 remains unlaunched.
 Section 278 records the owner's later one-round waiver of that review wait
 and the exact single-assessment run protocol. The waiver does not change the
 frozen security baseline, authorize retries or clear production/formal gates.
+The one assessment refused `preflight_vintage_metadata`: a bounded follow-up
+stat comparison found `dev` 16777231 versus the accepted 16777232, with the
+other nine fields matching. The authenticated failure report is retained,
+the identity is spent, and no metadata rebaseline or R284 action followed.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1357,7 +1361,11 @@ specific new-security-contract review gate, not a routine acknowledgement
 wait. The owner explicitly waives Claude review of section 277 before its
 one assessment for this round, as recorded in section 278. Claude reviews
 section 278 and the exact final snapshot at handoff; the standing independent
-review workflow resumes after this one-round exception. The owner previously said
+review workflow resumes after this one-round exception. Section 278's sole
+assessment has now refused before source contents on a changed device-ID pin;
+its identity is spent. The concrete next requirement is an explicit changed-
+identity disposition and supported prospective contract, not another review
+acknowledgement or a retry. No automatic pin refresh follows. The owner previously said
 "proceed" after the open-session concern was explained. Section 272 supersedes
 the session-exit prerequisite, without authorizing any process interruption.
 The physical move and audit are now recorded in 272.4: all bytes and other
@@ -41428,3 +41436,116 @@ and is not added to this count. No complete lane suite or actual preflight
 repeat ran. `git diff --check` is clean. Same-round read-only operational
 advice found no concrete run blocker; it is not independent Claude review.
 Only this lane record changes in the authority-freeze commit.
+
+### 278.4 Refused single invocation and bounded failure discrimination
+
+Authority/protocol freeze was committed at
+`f74bc1758f3192068c99c38c7e52db75195b1eb4`, without an intermediate push.
+The sole `--assess` invocation began at **2026-10-11T00:31:16Z** (October 10
+in the owner's America/Los_Angeles timezone); completion was observed by
+**2026-10-11T00:31:17Z**. Its actual exit status was **1**, with
+`complete=false`, `sources_reauthenticated=false` and emitted report hash
+`41646315be27a539a9a1ae23a605f428488d892fe54d0c64b4c690261d57e576`.
+
+The one separate 278-D2 reader authenticated that exact **1,771-byte** report
+at `artifacts/analyst_revisions_v2/relocation_trial/R277-20261010-A/report.json`.
+It is a stable held/named owner-held 0600 regular file with one link; the
+owner-held 0700 directory has exact inventory `report.json`, no pending leaf,
+and matching held/named full metadata around the read. Hash, canonical strict
+JSON, schema, fixed profile/policy and historical report pins match. All eight
+restrictive top-level flags are false. No successful preflight or loader
+result is present. The report records **`Refusal: preflight_vintage_metadata`**.
+The refusal occurs after all scoped names have been admitted but before the
+vintage value snapshot, historical report reads, guarded source hashes or
+original source loaders. It read no source contents or attribute values.
+
+This is an authenticated **refusal**, not diagnostic acceptance or gate
+clearance. The exclusive R277 assessment identity is spent. Preserve its
+report/directory, the original R273 refusal and R272 audit; no retry, cleanup,
+code correction, pin refresh or successor identity is authorized by failure.
+
+**278-D4 — one metadata-only comparison for this new concrete refusal.**
+Before ending at a changed-baseline barrier, permit one strict-network-denied
+read-only comparison of the exact fixed vintage directory's ten stat fields
+against the already accepted static pins. Open its absolute path component-wise
+without following links, retain the held descriptor and compare held/named
+metadata at endpoints. Print only numeric field differences/equality, no
+source bytes, attribute names/values, ACL observation or historical artifact
+read. No retry or write belongs to this check. It discriminates the new
+reported failure; it is not another assessment/preflight, repeated old audit
+or an attempt to establish a benign cause. The result must not change the
+accepted baseline or silently repair the spent identity.
+
+The single 278-D4 comparison exited 0 and found **only `dev` different**:
+expected **16777232**, observed **16777231**. Held/named endpoint metadata
+matched during that comparison. `ino=8124879`, `mode=16832`, `uid=501`,
+`gid=20`, `nlink=7`, `size=224`, `mtime_ns=1789346095000000000`,
+`ctime_ns=1791348969446992676` and `flags=32768` still matched the accepted
+pins. No source bytes or attribute values were read. This identifies the
+current failing equality but not the event/actor that changed it, nor the
+meaning of the current filesystem identity. It does not prove that the
+attributes matched during the failed assessment, because their values were
+not reached; the successful section-277 observation remains historical.
+
+### 278.5 Concrete barrier, exclusions and review handoff
+
+**ARV2E278-001 — changed prospective object identity.** The approved ten-field
+security baseline no longer matches. The exact owner review waiver changes
+sequencing only; it does not accept a different `dev`, prove volume identity
+continuity or authorize a device-field waiver. Matching the other nine stat
+fields is insufficient to silently rebaseline. Original source consumption
+also remains bound to the historical report's full metadata; changing only
+the policy's device pin is not a demonstrated complete remedy. No guard or
+test was changed to make the real attempt pass.
+
+The next proposed bounded step is a specifically authorized identity
+revalidation/disposition, with evidence sufficient for a **separately frozen
+prospective contract** if a remedy is supported. That decision must state
+whether and how a changed device identity can be accepted, preserve the exact
+attribute/security requirements and byte/manifest authentication, and name a
+new one-use attempt without pretending the spent R277 attempt was unspent.
+It must not fabricate historical volume/security continuity or simply rename
+an attempt to evade its failed gate. This is a genuinely changed baseline
+decision, not routine approval for research, vendor entitlement or Claude
+acknowledgement. Until resolved, preserve evidence and do not allocate a
+successor, refresh pins, reread values to search for a passing baseline, move
+the worktree, change host tracking/attributes/permissions or retry production.
+
+The actual report is a retained, Git-ignored local diagnostic artifact; its
+hash, size, contract and refusal are in this durable lane record, not a claim
+that licensed/private artifacts were uploaded to Git. R273 remains spent;
+R272's preservation audit stays failed and its synthetic probe uninvoked.
+Failed continuity A/B packages remain untouched; R284 remains unprepared and
+unlaunched. All source-truth/PIT/security-master/score/prior-close and formal
+readiness gates remain open, and the **313/239/49/699** floor is unchanged.
+No provider, QuantConnect, broker, paper/live or order action occurred; no
+full Codex suite or current independent review is claimed. Monitor stays
+paused at the owner's direction.
+
+This round changes only the authoritative lane record; all executable source
+and test pins are unchanged. Technical result: the one-use mechanism retained
+an authenticated refusal before source/value consumption on a failed exact
+identity check. Plain language: the approved directory no longer has exactly
+the approved filesystem identity, so the tool stopped without loosening its
+rules. This is a completed bounded attempt, **not** successful assessment or
+publication readiness.
+
+Claude reviews section 278 and this final round at handoff, including the
+owner's exception, run/source/profile identity, refusal ordering, report
+authentication and the narrow follow-up's limits. There are no Claude commits
+in the round to dispose. Its exact implementation range starts at
+`425c2eadb6a42de28573b8e915e0dee997fba91d`, includes authority/protocol commit
+`f74bc1758f3192068c99c38c7e52db75195b1eb4`, and ends at this result/record
+commit. Exactly one final matching-lane push is made after focused record
+validation; there is no intermediate push. The concrete stop is changed
+identity, not an intermediate reviewer wait. Same-round advice is not
+independent final review, and this one-round waiver does not cancel later
+review of the unreviewed section-277 contract and section-278 execution.
+
+Final result-record validation: **86 passed in 1.95 s**, strict network
+denial with fresh in-root temporary paths; this repeats the record/document
+subset of the **235 distinct** focused passes, not 321 distinct tests.
+`git diff --check` is clean, both v2 source hashes still equal the frozen
+277.5 pins, and the final matching-only fetch still resolves the remote to
+the original `425c2ead` baseline. No unexpected concurrent Git or tracked-file
+changes were observed.

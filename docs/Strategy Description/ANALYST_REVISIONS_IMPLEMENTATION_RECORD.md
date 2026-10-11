@@ -435,6 +435,11 @@ The one assessment refused `preflight_vintage_metadata`: a bounded follow-up
 stat comparison found `dev` 16777231 versus the accepted 16777232, with the
 other nine fields matching. The authenticated failure report is retained,
 the identity is spent, and no metadata rebaseline or R284 action followed.
+Section 281 is Claude's independent review of `50dcf08e..65766598` (0 P0,
+0 P1, 0 P2, 3 P3): all nine Codex commits are accepted, both refusals
+reproduce from the retained reports, the device change is consistent with
+the host's reboot, and 281.5 recommends accepting the twelve `ctime` values
+with a stable volume identity; the owner's decision remains pending.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1383,6 +1388,11 @@ source bytes. ARV2E280-001 requires an explicit exact prospective baseline
 decision and a separately versioned guarded contract, not a retry or a review
 acknowledgement. The owner now directs one final push and then re-arming the
 Claude-review monitor; section 280.6 supersedes the earlier pause direction.
+Section 281 is Claude's independent review of the exact pushed range
+`50dcf08e..65766598` (sections 277-280). The immediate next step is that
+Codex counter-reviews section 281 and this round's Claude commit, unless the
+owner explicitly changes this workflow; this is not an intermediate
+acknowledgement wait.
 The owner previously said
 "proceed" after the open-session concern was explained. Section 272 supersedes
 the session-exit prerequisite, without authorizing any process interruption.
@@ -1468,7 +1478,7 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 275 (section 276); for section 250 the owner
+the pushed range through section 280 (section 281); for section 250 the owner
 directed focused checks without the complete suite. Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
@@ -3274,6 +3284,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-10 | Owner-waived pre-run review and frozen one-shot v2 assessment | `425c2ead` -> section-278 authority freeze and final result/record snapshot | Exact human waiver applies only this round; no new Claude commit exists and no independent-review acceptance is asserted | Preserve section-277 code/profile/security pins; one exclusive assessment identity, strict denial and separate bounded report authentication; no retry | Relevant focused checks and actual result recorded in section 278; no full Codex suite | Production publication, R284 and formal gates remain separate; monitor paused | Exactly one final matching-lane push; restore normal independent review at handoff, no intermediate push |
 | 2026-10-11 | Codex owner-accepted prospective device baseline and v3 contract | `736709f7` -> section-279 implementation freeze and final handoff snapshot | Exact human acceptance of prospective device 16777231 only, retaining all other security/source checks; no new Claude commit | One-way fixed-scope historical-device projection, separate policy/wrapper and new one-use identity; v1/v2 and original artifacts unchanged | Focused synthetic strict-network-denied checks and source/profile freeze in section 279; no full suite or actual observation | Spent R277 refusal preserved; no historical continuity or production readiness inferred; 313/239/49/699 unchanged | One final matching-lane push; Claude reviews section 279 before separately recorded run decision; monitor paused |
 | 2026-10-11 | Owner-waived pre-run review and single frozen v3 assessment | `0a6fb375` -> section-280 authority/protocol freeze and final result snapshot | Exact human waiver of pre-assessment review for this round only; no independent acceptance | Unchanged v3 source/profile; spent assessment refuses source_preopen_identity; retained-report comparison finds twelve ctime-only mismatches | 334 distinct focused strict-denied passes; authenticated refusal and retained-only comparison in section 280; no full suite | ARV2E280-001 exact prospective ctime decision remains open; no source/QC success or look increment; 313/239/49/699 unchanged | One final matching-lane push, then re-arm existing review monitor at owner's latest direction; Claude review/counter-review precedes admissible next milestone |
+| 2026-10-11 | Claude independent review of sections 277-280: the v2 and v3 contracts, their owner-waived runs and the two refusals | `65766598` -> this record commit | Section 281: nine Codex commits `50dcf08e..65766598` disposed (9 accepted, 0 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells; no assessment, preflight, census, probe or comparison parser run | No code changed by Claude. Nine pins, two profiles and both reports reproduce; the 278-D4 and 280.5 comparisons are recomputed from the retained reports; the device change is dated against the host's boot time; a current read-only stat of all 27 objects matches the v3 preflight; 29 in-memory guard removals tabulated; accepted `ARV2CR277-001`; `ARV2R281-001` to `-003` documented; section 4 names section 281, banner sentence added, this row appended | Complete lane selection at `65766598` with every remote address refused (strict sandbox for the six groups, three parallel streams, temporary directories inside the root's ignored `.pytest_cache`; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 281.6 | 0 P0, 0 P1, 0 P2, 3 P3 | Single push of this round's Claude commit; Codex counter-reviews section 281 unless the owner changes the workflow |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -42130,3 +42141,273 @@ temporary/cache paths; this is not logged-contact accounting. Ordinary Git
 fetch/push and requested app-automation operations are separate. No new
 provider access, subscription, QC project, compile, run, data upload, paper
 order, live deployment, formal date/estimand/power/epoch or look was created.
+
+## 281. Independent Claude review of sections 277–280: the v2 and v3 contracts, their owner-waived runs and the two refusals, 2026-10-11
+
+**Range reviewed:** `50dcf08e..65766598`, nine Codex commits: the v2
+object-bound contract and the single preflight (sections 277), the owner's
+one-round waiver, the single v2 run and its device refusal (278), the owner's
+device acceptance and the v3 contract (279), and the second waiver, the single
+v3 run, its `ctime` refusal and the retained comparison (280). Each commit is
+disposed of in 281.1. This round's one Claude lane commit is this record
+commit, which is not in that range.
+
+**Zero research looks, development evaluations, infrastructure looks, and
+authenticated cells in this round.** This review made no provider,
+QuantConnect, mail or browser request. It did not run any assessment,
+preflight, census, probe or comparison parser; it changed no attribute,
+setting or artifact. Every pytest, mutation and private-report parser ran
+inside the strict sandbox of 242.6, with `TMPDIR`, every pytest temporary
+directory and the bytecode cache inside the operative root's ignored
+`.pytest_cache`; only this review's logs and its in-memory mutation plugin
+sit in the outside-root scratchpad, as before. R284 stays unprepared and
+unlaunched, and the floor stays **313 / 239 / 49 / 699**.
+
+**Verdict.** All nine Codex commits are accepted; none is rejected.
+**0 P0, 0 P1, 0 P2, 3 P3.** Every pin in 277.5 and 279.3 and both profile
+hashes reproduce. Both retained reports authenticate, and their refusals
+reproduce from the reports and from read-only observation: the v2 refusal is
+the device number, which this host renumbered at a reboot eleven minutes
+before that run; the v3 refusal is twelve source leaves whose `ctime`
+changed in one sweep at 05:57:06 UTC on 2026-10-10. Those twelve values are
+still current. The v3 contract binds the accepted device exactly and
+one-way and loosens nothing else. Codex's qualification of section 276 is
+accepted (281.3). The three P3s are a design limit of the device pin, a
+mislabelled refusal code, and guards no test isolates. 281.5 answers
+ARV2E280-001 with a recommendation.
+
+### 281.1 Per-commit disposition
+
+| Commit | What it is | Disposition | Basis |
+|---|---|---|---|
+| `23189a7e` | v2 object-bound observer and assessment, tests, and the two census claim tests | accepted | The five pins of 277.5 reproduce (`b107410a…`, `8b75a55e…`, `f07f22a0…`, `f90cc83c…`, `8dcf710e…`); the v1 modules and the shared helper are unchanged. The exception binds one directory, reopened by its fixed name on every snapshot, with four names and four value fingerprints; every other object keeps the v1 provenance-only observer. The two census tests isolate the claim comparison that answers `ARV2R276-001`. `ARV2R281-002` and `-003` are documented. |
+| `425c2ead` | Section 277: the owner's baseline acceptance, counter-review of 276, and the single preflight result | accepted | The preflight ran once at 20:02:56 UTC on 2026-10-10, before the reboot, and found the pinned state; it allocated nothing, and the R277 leaf was absent until 278. `ARV2CR277-001` is accepted (281.3). The v2 profile `47e266a8…` reproduces. |
+| `f74bc175` | Section 278's authority: the owner's one-round waiver and the frozen v2 run protocol | accepted | It records the owner's words, keeps the profile's review-required flag true, and freezes one invocation with external authentication rather than trusting `complete=true`. |
+| `736709f7` | Section 278's result: the v2 refusal, report authentication and the device comparison | accepted | The report (1,771 bytes, `41646315…`) authenticates with its pins and records `preflight_vintage_metadata` without a preflight object, so the refusal preceded every value read. The 278-D4 comparison reproduces: only `dev` differs, 16777232 against 16777231. The identity stop is correct. |
+| `aae4551d` | v3 device-bound observer and assessment with tests, and the correction of `ARV2I279-001` | accepted | The four pins of 279.3 reproduce (`50137dc3…`, `167bb650…`, `0c32a0bd…`, `d80fb946…`), as does the profile `eb218425…`. Relative to v2 the diff adds only the device constants, the device checks and the one-way projection (281.3). The harness defect of `ARV2I279-001` opened the real vintage directory but changed nothing: its `ctime` still equals the 275.4 pin. `ARV2R281-001` is documented. |
+| `0a6fb375` | Section 279's handoff | accepted | It lists every unreviewed commit with its required disposition and makes no acceptance claim. |
+| `cff48b7b` | Section 280's authority: the second waiver and the frozen v3 run protocol | accepted | Same structure as `f74bc175`, with the reader additionally bound to the v3 schema, projection and device. |
+| `a75f096f` | Section 280's result: the v3 refusal, report authentication and the comparison protocol | accepted | The report (16,422 bytes, `1631babf…`) authenticates with its pins and carries a complete preflight for all 27 objects, the projection receipt and `source_preopen_identity` with no loader result. |
+| `65766598` | Section 280.5–280.6: the twelve-row comparison, `ARV2E280-001` and the monitor authority | accepted | The comparison reproduces exactly from the two retained reports (281.4). The stop before any probe, publication or R284 action is correct, and the owner's question is stated without admitting the values. |
+
+### 281.2 Findings
+
+| ID | P | Introduced by | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R281-001` | P3 | `aae4551d` | The v3 contract pins the volume's device number, 16777231, as part of every object's identity. That number is assigned when the volume is mounted: it is the Data volume's minor number, 16 before and 15 after the host rebooted at 00:20:54 UTC on 2026-10-11, eleven minutes before the v2 run. The record leaves the cause unknown; the reboot is the consistent explanation, though not a proof. The pin will therefore not survive the next reboot, which would spend any attempt frozen before it and need another owner decision, and the former value could return. | Documented for Codex. A successor should bind a stable volume identity obtained read-only, such as the APFS volume UUID, and treat the device number as a per-boot consistency check across the held objects rather than a frozen constant. No change to the frozen v3 is proposed. |
+| `ARV2R281-002` | P3 | `23189a7e`, carried into `aae4551d` | In both observers, the check after the observation (`if _metadata(fd) != before`) raises `vintage_held_metadata_changed` on every object, including the 26 provenance-only ones that took the v1 branch. A source leaf whose metadata changes during its snapshot is reported with the vintage code, which would misdirect the kind of discrimination 278-D4 and 280-D4 perform. Safety is unaffected: the v1 branch has its own check first. | Documented for Codex. A successor should raise a code naming the held object's branch; no test covers the v1 branch of that check. |
+| `ARV2R281-003` | P3 | `23189a7e`, `aae4551d` | Several guards have no test that fails without them. In v3: the device check on each directory inside the guarded consumer (the test fixture's substitute snapshot ignores the device, so removing only that line passes all 123 tests), and the digest check that the historical rows were not mutated by the projection (123 pass without it). In v2: the pre-open identity check was not isolated (58 pass with it weakened to the private-file check; v3's tests do isolate it, 15 failures), and the v2 preflight's directory security, named-directory, open-identity and after-names checks, the final-security directory check, the report size bound and the two profile rechecks are shadowed by other checks. The nested budget's re-arm path, which does not re-arm an exhausted outer budget, is untested. None is a correctness gap: every scenario is caught by an earlier or later guard, or by the real snapshot in production. | Documented for Codex. Both tools are spent; a successor should add one failing test per guard, as 275 did for 274's list. |
+
+### 281.3 Codex's finding against Claude's section 276, and what this review checked
+
+**`ARV2CR277-001` (P3) is accepted.** Section 276.4 said that nothing changed
+between the two attribute reads. Equal fingerprints and metadata at two
+endpoints show equality at those endpoints; they do not exclude a change and
+restore in between, and the scratch `ctime` examples do not prove it either.
+This round states its own endpoint observations the same way.
+
+**The owner's authority is recorded, not inferred.** Four quoted decisions
+drive this range: the baseline acceptance of 277.1, the one-round waiver of
+278.1, the device acceptance of 279.1 and the second waiver of 280.1. Each
+is a specific exception the owner reserved in 273-D5, 275-D2 and 277-D4; none
+is treated as routine, and both waivers ended with their rounds. This review
+is the independent review those sections said must follow; it does not
+reinterpret the refusals as passes.
+
+**What this review checked in the v2 and v3 code.**
+
+1. **The exception is bound to one object.** On every snapshot, the vintage
+   directory is reopened component by component by its fixed absolute name
+   and must equal all ten pinned fields, so a replaced directory cannot fall
+   through to the provenance-only branch; only a held descriptor with the
+   pinned device and inode takes the vintage branch, and it must then show an
+   empty ACL, exactly the four names in pinned order, and each value's pinned
+   length and SHA-256, read once into bounded memory. The 15 leaves and the
+   other 11 directories use the unchanged v1 observer, whose bytes still hash
+   to `3435bc07…`.
+2. **v3 binds the device exactly and one-way.** The v2-to-v3 diff adds the
+   two constants, the device check in both observer checks, the device checks
+   on every preflight and guarded object and on the output parent and
+   directory, and the projection. The projection requires every one of the 15
+   historical rows to carry 16777232, copies them, changes only `dev` to
+   16777231, validates the copy, and records both digests; the input is
+   checked unchanged afterwards. Nothing else moved: `ctime` stays in every
+   comparison, ACLs are checked at both ends, link counts and the final
+   one-entry inventory are unchanged from v1.
+3. **Fail-closed order.** Fixed root, platform preflight and profile pin run
+   before the output parent is opened; the output directory is created
+   exclusively, synced and checked empty before any source read; refusals
+   carry only a type name and a bounded code. The R277 report has no
+   preflight object and the R279 report has no loader result, which places
+   each refusal where the record says.
+4. **The v3 refusal is the pre-open identity check.** It compares the named
+   stat of each leaf, in sorted order, with the projected row before opening
+   it; the first PUBLIC leaf's `ctime` already differs, so no leaf was opened
+   and no source byte was read.
+5. **Nothing in the repository performs the 278-D4 or 280-D4 comparisons.**
+   Both were one-off parsers that were not retained, unlike 275.4's. The
+   retained reports contain the compared rows, and 281.4 reproduces both
+   comparisons from them.
+
+### 281.4 What this review reproduced
+
+- **Pins.** All nine changed files hash to their recorded pins; the five
+  unchanged modules keep `3435bc07…`, `85d853a1…`, `6e411fca…`, `17e516b4…`
+  and `26ce1788…`. `profile_sha256()` returns `47e266a8…` for v2 and
+  `eb218425…` for v3, and the v3 profile still says review is required.
+- **Reports.** R277 `report.json` is 1,771 bytes, `41646315…`; R279
+  `report.json` is 16,422 bytes, `1631babf…`. Each names `before.json`,
+  `after.json` and its own profile by the recorded hashes; the R272 reports
+  and the R273 report are unchanged.
+- **The device refusal.** The vintage directory now matches nine of the ten
+  275.4 pins; only `dev` differs, 16777232 then and 16777231 now, as 278-D4
+  found. The whole Data volume and the operative root report 16777231. The
+  host's boot time is 00:20:54 UTC on 2026-10-11: the v2 preflight ran 258
+  minutes before it and passed, the v2 assessment 10.4 minutes after it and
+  refused, and the v3 assessment 19 hours after it. The after-census row for
+  the directory carries the old device, so the projection is needed exactly
+  as 279-D2 says.
+- **The twelve-row comparison.** Comparing the 15 source rows of the R279
+  preflight inventory with the authenticated `after.json` rows after the
+  device-only projection gives exactly the 280.5 table: the three vintage
+  leaves match, and the twelve PUBLIC, CURRENT and PRICES leaves differ only
+  in `ctime_ns`. Their historical values fall in the move of 20:19:55 UTC on
+  2026-10-09; the new values fall between 05:57:06.298 and 05:57:06.480 UTC
+  on 2026-10-10, a single 0.18 s sweep over three package directories that
+  left the vintage package untouched. That is after section 276's push and
+  before section 277's work; no lane process is recorded then, and this
+  review attributes it to nothing.
+- **The current state.** A read-only `lstat` of all 27 objects now equals
+  the R279 preflight inventory in every field, so the twelve `ctime` values
+  that refused on 2026-10-11 are still the current ones, and nothing drifted
+  during this review. The inventory shows 26 provenance-only objects and the
+  four vintage names; the vintage fingerprints and metadata still equal the
+  275.4 pins except for the device.
+- **Nothing changed across Codex's rounds except the two new reports.** The
+  artifact tree has 1,844 files, the 1,842 of section 276 plus the two
+  reports; `git status --ignored` is unchanged apart from `__pycache__`.
+  Codex's 47 ignored `.pytest_cache/r277-*` to `r280-*` directories were left
+  in place. The frozen documents and every shared file are untouched; only
+  the nine lane files and the record changed.
+- **In-memory mutation trials.** Each trial removed one guard in memory and
+  ran that module's test file inside the strict sandbox; no file was edited,
+  and no trial touched a path or output constant. Unmutated, the v3 policy,
+  v3 wrapper, v2 policy, v2 wrapper, census, v1 observer and v1 assessment
+  files pass **125, 123, 91, 58, 45, 56 and 77** tests.
+
+v3 assessment wrapper, 123 tests:
+
+| Trial | Guard removed | Result |
+|---|---|---|
+| Historical device | the device check in the row validation | 9 failed |
+| Prospective device | the device check used on every held object | 10 failed |
+| Preflight directory device | only the preflight directories' check | 4 failed |
+| Preflight source device | only the preflight leaves' check | 4 failed |
+| Consumer directory device | only the guarded consumer's directory check | **123 passed** |
+| Output parent device | the device check on the output parent | 1 failed |
+| Output directory device | the device check on the new directory | 1 failed |
+| Deep copy | the projection applied to the historical rows themselves | 21 failed |
+| Input unchanged | the digest check after the projection | **123 passed** |
+| Pre-open identity | the named-versus-projected comparison | 15 failed |
+| Preflight vintage metadata | the ten-field check before values | 1 failed |
+| Names before values | the names check on all 27 objects | 2 failed |
+| Directory security | owner, mode and flag mask in the consumer | 1 failed |
+| Platform preflight | the platform check in `main()` | 1 failed |
+| Profile pin | the profile check in `main()` | 1 failed |
+| Exit status | exit 0 regardless of the report | 7 failed |
+
+v3 observer, 125 tests:
+
+| Trial | Guard removed | Result |
+|---|---|---|
+| Device | the device check before any observation | 16 failed |
+| Named vintage | the fixed-name reopen before the branch | 31 failed |
+| Held metadata | the ten-field check on the vintage branch | 10 failed |
+| Names exact | the four-name check | 4 failed |
+| Fingerprints | the length and hash check per value | 8 failed |
+| ACL before values | the first ACL check | 3 failed |
+| Final checks | the final metadata and named rechecks | 23 failed |
+
+v2 observer, 91 tests: names exact 4 failed; fingerprints 8 failed; named
+vintage 27 failed. v2 wrapper, 58 tests: preflight vintage metadata 1 failed;
+pre-open identity weakened to the private-file check **58 passed**. Census,
+45 tests: the claim comparison removed, 3 failed, including the two new
+flags and `ctime` drift tests. These counts agree with the omission
+experiments Codex reports in 277.6 and 279.3 where the same guard was
+removed, and the 16 device failures match 279.3 exactly.
+
+### 281.5 Suggested next steps
+
+1. **Codex counter-reviews this section.**
+2. **ARV2E280-001: accept the twelve exact `ctime` values, with two
+   additions.** Codex's proposal is sound: a separately versioned one-use
+   contract that pins the twelve recorded `ctime_ns` values on their fixed
+   paths, keeps the accepted device and every other field, byte, manifest,
+   ACL and attribute pin, and refuses further drift without retry or pin
+   refresh. The values are still current (281.4), so the question is live.
+   Two additions follow from this review: bind the volume by a stable
+   identity rather than only the device number (`ARV2R281-001`), and run the
+   one attempt promptly after its freeze, because this root has now shown
+   two `ctime`-only events, the move and the 05:57:06 sweep, and a third
+   between freeze and run would spend the attempt. Whether to inspect the
+   host's unified log around 05:57:06 UTC on 2026-10-10 for the sweep's
+   origin is the owner's call; it is read-only but outside the root and
+   outside this lane's authority.
+3. **After the owner's decision**, Codex implements only that contract,
+   freezes it with its complete-scope census, closes the test gaps of
+   `ARV2R281-003`, and asks for independent review before the one run, unless
+   the owner waives it again explicitly.
+4. **Everything downstream stays separate.** The R272 probe, any publication
+   and R284 remain behind their own decisions; the missing vendor as-of
+   history, reviewed security-master identity, scores and prior-close prices
+   of 231.3 remain open.
+
+### 281.6 Validation
+
+Every check ran from the operative root
+`/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2` with
+`~/.venvs/trading_agent-py313/bin/python` (3.13.15). Each pytest process ran
+under one of the two `sandbox-exec` profiles of 242.6, with `TMPDIR` and
+`--basetemp` under the root's ignored `.pytest_cache/claude-review-278`.
+Before use, a probe confirmed that the loopback-only profile allows a
+loopback bind and connect and refuses a connection to the reserved
+documentation address `192.0.2.1` with `EPERM`. The host rebooted before
+this round, which emptied the scratchpad; every helper script was recreated
+from the recorded procedure, and the integrity snapshot is this round's own.
+
+| Check | Scope | Result |
+|---|---|---|
+| Standing lane selection, strict profile | `tests/analyst_revisions_v2`, `tests/test_analyst_revisions_v2_contracts.py`, `tests/test_analyst_revisions_v2_legacy_quarantine.py`, `tests/test_analyst_revisions_v2_preregistration.py`, `tests/test_analyst_revisions_v2_statistics.py`, `tests/test_active_document_consistency.py`, at the clean pushed head `65766598`, run as six file groups in three parallel streams, together covering all 11,319 collected tests | **11 failed, 11300 passed, 8 skipped, 35 warnings in six strict-profile worktree file groups across three parallel streams (each 0:22:25, 0:14:58, 0:09:39, 1:25:51, 0:35:39, 0:06:38).** No error. Every failure is `PermissionError: [Errno 1] Operation not permitted` in one of the 11 tests of `test_qc_formal_qc_transport.py` that start HTTP servers on `127.0.0.1`, because the strict profile also refuses loopback. The 8 skips are a subset of the standing eleven: 7 Windows-only directory-junction tests and 1 top-five-only profile case. |
+| The loopback-server file, loopback-only profile | `tests/analyst_revisions_v2/test_qc_formal_qc_transport.py`, all 73 tests, at the same head | **73 passed, 2 warnings in 11.18s**, exit 0: the 11 loopback-server tests pass once loopback is allowed and every other address is refused |
+| Every collected test, remote network refused | the two rows above together | **0 failed, 11,311 passed, 8 skipped** across all 11,319 collected tests; the strict profile covers 11,300 of the passes and the loopback-only profile the other 11 |
+| The seven focused files, unmutated, strict profile | v3 policy, v3 wrapper, v2 policy, v2 wrapper, census, v1 observer, v1 assessment | **575 passed** |
+| Pins, profiles, report authentication, both comparisons, the current `lstat`, boot and device facts, and mutation trials | as in 281.3 and 281.4 | as stated there |
+| Record gates on the final record bytes, strict profile | `test_lane_record_integrity.py` and `test_active_document_consistency.py` | **86 passed** |
+| `python -m compileall -q` | the standard package list plus `research/analyst_revisions_v2_qc` | clean |
+| Worktree integrity across the complete run and the checks | `artifacts/analyst_revisions_v2` and `git status --ignored` | every one of the 1844 files under `artifacts/analyst_revisions_v2` has the same SHA-256 before and after the run and the checks, and `git status --ignored` is unchanged apart from `__pycache__` |
+| `git diff --check` | final tree | clean |
+| `git status --short --branch` | after this round's commit | clean; published in this round's single push |
+
+### 281.7 Carried-open findings
+
+| ID | P | Status |
+|---|---|---|
+| `ARV2E263-001` | — | Open. Bytes are preserved at the new root; the v2 and v3 one-use assessments refused on the device number and on twelve `ctime` values, and `ARV2E280-001` awaits the owner's decision (281.5). It blocks R284. |
+| `ARV2E278-001` | — | Resolved for the human choice by 279.1; the mechanism is addressed by `ARV2R281-001`. |
+| `ARV2E280-001` | — | Open; the owner's decision is pending, recommendation in 281.5. |
+| `ARV2R281-001`, `ARV2R281-002`, `ARV2R281-003` | P3 | Documented for Codex (281.2). |
+| `ARV2I279-001` | P3 | Corrected by Codex in `aae4551d`; its only side effect, opening the real vintage directory, changed nothing (281.1). |
+| `ARV2CR277-001` | P3 | Accepted (281.3). |
+| `ARV2R276-001` | P3 | Disposed by 277.3 with two census tests; the consequence is documented and retained as a strict refusal. |
+| `ARV2R274-001` to `ARV2R274-005`, `ARV2CR275-001` to `-003`, `ARV2CR270-001` to `-003` | P3 | Corrected, accepted or closed, as recorded. |
+| `ARV2R265-005` | P3 | Partly corrected: the window between a remote response and its local receipt remains. |
+| `ARV2R248-002`, `ARV2R248-003`, `ARV2R248-004` | P2 | Open; partly reconciled by sections 255–257. |
+| `ARV2R196-001` | P2 | Open; the historical AR effect has the same two-year signature in every family. |
+| `ARV2D212-001` | P2 | Clock mechanism resolved by R279; forward input readiness and vendor availability remain open. |
+| `ARV2CR185-001`, `ARV2CR187-001`, `-003`, `ARV2D188-001` | P2 | Open as recorded. |
+| `ARV2R265-001`, `ARV2R265-002`, `ARV2I266-001`, `ARV2I266-002`, `ARV2I256-001` | P2 | Corrected and pinned, as recorded. |
+| `ARV2R267-001`, `ARV2R267-002`, `ARV2CR268-001`, `ARV2R265-003`, `ARV2R265-004`, `ARV2CR266-001`, `ARV2CR266-002`, `ARV2CR262-001`, `ARV2R261-001`, `ARV2CR255-001`, `ARV2CR255-002`, `ARV2R250-001`, `ARV2R248-006`, `ARV2CR249-001`, `-002`, `-003`, `ARV2CR245-001`, `ARV2R242-001` | P3 | Corrected, accepted or closed, as recorded. |
+| `ARV2R248-007` | P3 | Documented; narrowed in one direction by `4496d241`. |
+
+The final tree differs from the pushed head `65766598` only by this record
+commit.

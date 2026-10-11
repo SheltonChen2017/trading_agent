@@ -1371,7 +1371,12 @@ and revalidating every other security/source check. Claude reviews section 279
 and its separately versioned v3 contract before the new one-use assessment;
 the section-278 review waiver has ended. No actual v3 preflight, assessment,
 production publication or R284 action is authorized by this implementation
-handoff. No automatic pin refresh follows. The owner previously said
+handoff. No automatic pin refresh follows.
+The owner explicitly waives Claude review of section 279 before its one
+assessment for this round, as recorded in section 280. Claude reviews section
+280 and the exact final snapshot at handoff; this exception does not cancel
+later independent review or accept a changed source/security baseline.
+The owner previously said
 "proceed" after the open-session concern was explained. Section 272 supersedes
 the session-exit prerequisite, without authorizing any process interruption.
 The physical move and audit are now recorded in 272.4: all bytes and other
@@ -3261,6 +3266,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-10 | Codex counter-review, exact owner metadata acceptance and prospective v2 assessment | `50dcf08e` -> section-277 source/protocol freeze and final result/record snapshot | Sole Claude record commit accepted after documentary qualifications; exact 275.4 baseline accepted by the human; no source/QC event | Object-bound four-fingerprint observer, complete-scope preflight, new one-use directory claim and guarded assessment; original implementations unchanged | Focused strict-denied tests/mutations and one bounded metadata-only preflight under 277-D3; details and pins in section 277; no full Codex suite | Historical preservation audit remains failed; new contract requires independent review before its one assessment; production and formal gates open; 313/239/49/699 unchanged | Exactly one final matching-lane push; Claude reviews section 277 and exact snapshot; no actual assessment/probe/R284 this round; monitor paused |
 | 2026-10-10 | Owner-waived pre-run review and frozen one-shot v2 assessment | `425c2ead` -> section-278 authority freeze and final result/record snapshot | Exact human waiver applies only this round; no new Claude commit exists and no independent-review acceptance is asserted | Preserve section-277 code/profile/security pins; one exclusive assessment identity, strict denial and separate bounded report authentication; no retry | Relevant focused checks and actual result recorded in section 278; no full Codex suite | Production publication, R284 and formal gates remain separate; monitor paused | Exactly one final matching-lane push; restore normal independent review at handoff, no intermediate push |
 | 2026-10-11 | Codex owner-accepted prospective device baseline and v3 contract | `736709f7` -> section-279 implementation freeze and final handoff snapshot | Exact human acceptance of prospective device 16777231 only, retaining all other security/source checks; no new Claude commit | One-way fixed-scope historical-device projection, separate policy/wrapper and new one-use identity; v1/v2 and original artifacts unchanged | Focused synthetic strict-network-denied checks and source/profile freeze in section 279; no full suite or actual observation | Spent R277 refusal preserved; no historical continuity or production readiness inferred; 313/239/49/699 unchanged | One final matching-lane push; Claude reviews section 279 before separately recorded run decision; monitor paused |
+| 2026-10-11 | Owner-waived pre-run review and single frozen v3 assessment | `0a6fb375` -> section-280 authority/protocol freeze and final result snapshot | Exact human waiver of pre-assessment review for this round only; no independent acceptance | Unchanged v3 source/profile and accepted device/attribute pins; one exclusive assessment identity and bounded external report authentication | Focused strict-denied checks and actual result in section 280; no full Codex suite | No retry, refreshed baseline or automatic production/R284 clearance; 313/239/49/699 unchanged | One final matching-lane push; restore normal independent review at handoff; monitor paused |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -41816,3 +41822,121 @@ to that exact reviewed snapshot and must disclose failures/partitions, not
 reuse the historical 10,912-pass union as current validation. The next actual
 v3 assessment remains behind the specific review/counter-review and separate
 run-freeze gates. No owner baseline question is reopened.
+
+## 280. Explicit one-round review waiver and single frozen v3 assessment, 2026-10-11
+
+### 280.1 Exact authority and initial state
+
+The owner directly said **"proceed without review for this round"** after
+the section-279 handoff stated that the new assessment was unrun pending
+Claude review. This is a new, explicit exception to the pre-assessment
+review/counter-review sequencing in 279-D4, not an extension inferred from
+the expired section-278 waiver. It covers this bounded v3 assessment round
+only. No independent review has occurred or is asserted; the existing exact
+device baseline acceptance and all remaining security/source pins are
+unchanged. The waiver does not accept drift, waive another safety boundary,
+or authorize deployment or trading.
+
+At entry, exact root/branch/HEAD/status and a matching-only remote fetch found
+clean local and remote **`0a6fb3756bd803d53ec553a9241f6875ef40c98d`** on
+`codex/strategy-analyst-revisions-v2` at
+`/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2`. No new Claude
+commit exists. Sections 277–279 remain unreviewed Codex work; prior disposed
+reviews are not replayed. All repository work remains in that exact root and
+branch. The monitor remains paused; no other chat/session is contacted.
+
+### 280.2 Frozen run and report-authentication protocol
+
+**280-D1 — one invocation of the unchanged v3 contract.** The source/profile
+freeze remains section 279.3 at implementation
+`aae4551de2760242093a1c9bb7fe24ec0e0b83a1`. The policy/wrapper hashes reproduce
+as `50137dc3446cb085e05ed50c3492c4b0a5ed122cd1ebbb3843acbb2838ccfb13` and
+`167bb650f0b4114e85d04c7af5e590608124604160996b1cd5e8f072efee2d01`;
+all six original observer/assessment/audit/shared-helper hashes also reproduce
+their 279.3 pins. The profile stays
+**`eb218425e88f4d663c67d17bc211a1a0763a75c0e459884176e5186c42e54c94`**,
+including `independent_review_required_before_assessment=true`: this human
+waiver is an external one-round exception, not a forged review receipt or
+profile change.
+
+Commit this authority/protocol record locally before invoking, at most once:
+`python -B -m scripts.assess_arv2_relocated_sources_v3 --assess
+--expected-profile-sha256 eb218425e88f4d663c67d17bc211a1a0763a75c0e459884176e5186c42e54c94`.
+Use the designated Python 3.13 environment, strict
+`(version 1)(allow default)(deny network*)`, fresh ignored in-root TMPDIR and
+bytecode-cache paths. Retain actual UTC start/end, exit status and emitted
+digest. Recheck exact root/branch/HEAD/status and absence/no-symlink of the
+fixed `artifacts/analyst_revisions_v2/relocation_trial/R279-20261010-A`
+output immediately before invocation. The entry check found it absent.
+Do not run a standalone preflight first; the single assessment includes its
+own 15-second preflight under the 60-second cooperative total budget. These
+are signal/return checks, not hard native-call interruption guarantees.
+
+Exclusive directory allocation spends the identity before source reads.
+Preserve any refusal/interruption/pending output without cleanup, retries,
+another identity, pin refresh, attribute/permission changes or source-helper
+edits. The accepted `16777232` to `16777231` projection changes only device
+ID on the exact fifteen authenticated historical file rows; every other
+metadata/security/byte/manifest check stays required. R273/R277 remain spent;
+the failed historical relocation audit remains failed.
+
+**280-D2 — one separate bounded report authentication.** If the command emits
+a report/digest, run one strict-network-denied read-only reader of only the
+exact output directory and `report.json`. Open absolute directory components
+without following links. Require owner-held 0700 directory, matching full
+held/named metadata, exact report-only inventory and no pending leaf. Before
+the no-follow/nonblocking file open, require a regular owner-held 0600
+single-link report of 1–131072 bytes on the accepted device. Match named to
+held full metadata, bounded-read the bytes once, and recheck full file and
+directory held/named metadata plus inventory afterward. Match SHA-256 to the
+actual emitted digest; parse strict JSON rejecting duplicates/nonfinite
+values and require exact canonical bytes.
+
+Bind schema, fixed profile hash, exact policy, source-device projection,
+original before/after report pins and all restrictive flags. Validate any
+present preflight's fixed schema/profile/policy/counts/inventory and vintage
+fingerprints. A successful result additionally requires exact directory/file
+key sets, complete loader-result shape and original manifest pins, the exact
+projection receipt and two SHA-256-shaped reported row digests, no refusal
+fields, both completion booleans true and actual CLI exit 0. The report's row
+digests are producer claims bound to its authenticated bytes, not a second
+independent source read or historical continuity proof. Print only hashes,
+sizes, bounded refusal codes, metadata and redacted counts/booleans, never
+source rows, raw attribute values or private exception text. Do not reread
+source artifacts or invoke native security APIs in this external reader.
+
+Only successful exit **and** authenticated successful report **and** final
+output verification can accept this mechanical diagnostic. A complete report
+left by late failure is insufficient. An absent or unauthenticated report is
+not permission to retry. Record the earliest demonstrated failure boundary;
+do not infer that later checks ran merely because earlier checks passed.
+
+**280-D3 — keep adjacent gates separate.** A pass could establish only this
+bounded fresh-use/security contract, not historical preservation, continuous
+stability, harmless opaque grants, source truth/PIT admission or production
+publication. Any next publication/probe action requires its own supported
+prospective protocol and pins; it is not silently chained to the assessment.
+No R284 preparation/launch, provider/QC/broker call, paper/live/order action,
+complete Codex suite, new paid rights or formal date/estimand/power/epoch
+completion follows. The look floor remains **313/239/49/699**: this local
+diagnostic is not a performance evaluation. Same-round operational advice is
+not independent final review. Claude reviews section 280 and the cumulative
+unreviewed range at handoff; normal review sequencing resumes afterward.
+
+### 280.3 Validation and actual outcome
+
+Pre-invocation focused validation passed **334 distinct checks in 2.82 s**:
+125 v3 policy, 123 v3 wrapper and 86 record/document checks. These ran under
+strict remote-network denial with every temporary/cache path within the
+designated root. No complete lane/repository suite, real preflight or source
+assessment was included. Source/profile reproduction is a static check, not
+source/security admission.
+
+Before this freeze, the owner further directed **"proceed to run the
+backtesting, document the result. when done, push only once"**. This confirms
+the backtest objective and one-final-push requirement; it does not waive the
+source/security/publication gates or expand the frozen attempt protocol.
+Proceed through admissible prerequisites toward R284 only if they pass; a
+concrete failed boundary must be recorded without an unsafe launch or retry.
+Actual run evidence and the result/disposition follow below. Until those
+observations exist, no successful assessment or gate clearance is claimed.

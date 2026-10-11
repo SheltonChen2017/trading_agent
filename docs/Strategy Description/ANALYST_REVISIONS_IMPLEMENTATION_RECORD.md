@@ -41940,3 +41940,68 @@ Proceed through admissible prerequisites toward R284 only if they pass; a
 concrete failed boundary must be recorded without an unsafe launch or retry.
 Actual run evidence and the result/disposition follow below. Until those
 observations exist, no successful assessment or gate clearance is claimed.
+
+**Actual single invocation:** after the clean local authority/protocol commit
+`cff48b7bf7f8146193a4060e9eba0f22a3981bc3`, the frozen command began and ended
+at **2026-10-11T19:17:59Z**, under strict network denial. Exit **1** emitted
+`complete=false sources_reauthenticated=false` and report SHA-256
+**`1631babf154ed52a3f2df338f6c4fd4b37cb1071f732ff7fdfce7613b7b0dc3c`**.
+The newly allocated `relocation_trial/R279-20261010-A` identity is spent.
+It is not retried, renamed, repaired or cleaned up.
+
+The one separate 280-D2 output-only reader succeeded under strict network
+denial. The exact **16,422-byte** canonical report matches the emitted digest,
+fixed v3 profile/policy, accepted device baseline, original history pins and
+all eight false restrictive flags. Its held/named owner-501 directory is
+0700, device `16777231`, inode `33833780`, group 20, flags 0, size 96, nlink 3;
+its sole held/named report is 0600, inode `33833781`, group 20, flags 0,
+nlink 1. Full ten-field metadata and exact report-only inventory agreed at
+the reader's sampled endpoints; no source/native attribute read occurred
+in that reader. This authenticates the refusal evidence, not source success.
+
+The bounded refusal is **`Refusal: source_preopen_identity`**. The report
+contains a valid complete metadata-only preflight for 12 directories and
+15 files, including the exact accepted vintage fingerprints, plus the fixed
+one-field projection receipt. No loader-result object exists. Control flow
+reached the guarded source loop and refused before opening its mismatching
+named leaf; the report does not identify that leaf or prove that no earlier
+leaf was read. The four fresh source loaders and final source checks did not
+complete. All publication/formal/action flags remain false; no provider/QC
+contact, R284 preparation, backtest attempt or look increment occurred.
+
+### 280.4 New-refusal discrimination protocol
+
+**280-D4 — one comparison of retained report metadata only.** The new
+`source_preopen_identity` result is genuinely actionable evidence, unlike a
+repeat probe of the old metadata barrier. Before running, commit this narrow
+follow-up protocol locally. Read only (a) the exact authenticated 280.3 report
+and (b) original `relocation_trial/R272-20261009-A/after.json`, externally
+pinned to `ca02a94e03eb67c8502e18103a8c471b72e44801b4c7ed62e28ca379b3e6236f`.
+Use component-wise no-follow directory opens, named/held regular private
+0600 single-link owner files, bounded reads (128 KiB and 32 MiB respectively),
+full held/named file metadata and directory-identity endpoint checks, exact
+digest pins and strict canonical JSON. Run under strict network denial and
+a 20-second cooperative budget. Do not access the fifteen source paths,
+invoke native security APIs, rerun preflight/loaders/assessment, mutate any
+artifact or write a new diagnostic report.
+
+Compare only the fifteen existing preflight metadata rows with the exact
+historical-after rows after the already accepted `dev`-only projection;
+reject missing/extra scope, malformed metadata or non-file source rows.
+Print only fixed relative path labels, changed metadata field names and
+old/current scalar values, matching counts and the two report digests.
+This is analysis of already collected endpoint claims, not a new source
+observation or proof that the same mismatch caused the later refusal. A
+match cannot refute transient drift. No result silently accepts new metadata,
+restores historical continuity or authorizes a new assessment. Record the
+concrete remaining boundary and any new owner decision actually needed.
+
+**280-D5 — shared QC capacity courtesy.** The owner additionally directed
+that other lanes may already be creating QC projects and, if the node is
+occupied, Codex must wait until it is available. Preserve other lanes' jobs,
+projects and controls; do not cancel, interrupt, repurpose or modify them.
+After all prerequisite gates pass, check capacity through authorized read-only
+access and wait using the available product mechanism before submission when
+occupied. This conditional instruction does not restart the paused Claude
+monitor, book an attempt or authorize contact while the present source gate
+is blocked. No node availability has been observed or claimed this round.

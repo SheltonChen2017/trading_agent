@@ -15453,3 +15453,27 @@ corrected before imports/effects; no QC attempt/look. Peer independently38green
 unresolved material finding. Original pre-release controller14812B/946d… and
 tests9575B/4e35… were never executed; final frozen identities above replace
 them. Native read/upload ABI and actual corrected QC completion remain unproved.
+
+### 75.31 Actual metadata successor bundle; fresh QC operation003
+
+Fresh compressed-bundle001 under`46845591ef3d932b94d02ae097965ff06e24389a`
+completed`2026-10-11T03:01:39.094738+00:00`, plan SHA
+`a72cdb0a4628be684decf6eae37be24bcc1a11bf03724f9a34f2b6ceb2ca8a83`.
+Exactly two metadata files/115922B,28committed source closure; no packet/
+capture/provider/outcome/API/credential/look/attempt. Root saved returned public
+bundle using apply_patch, independently verified548143B SHA
+`223efa83c9ed7ed2bc17547f31583886e7705559635a38946bf55010902f0a92`
+and byte/semantic parity of all original input/config/candidate/project identities.
+ON11/OFF9 source files, largest59854B, ONcompressed mapping single literal,
+OFF no input packet; original non-main source file text unchanged. The original
+executed public bundles/operation manifests/receipt histories remain immutable.
+
+Root will prepare only`TPR-EXT26-QC-20261010-003` from this new committed
+bundle and currentHEAD, inherited same private operations root/history and
+already owned exact project/org bindings. OFF source upload/readback first,
+then persistent reservation2 before compile. ONcompressed uploads can proceed
+within the same scope after exact private file read claims; no old uncompressed
+request26 retry or spent cleanup receipt extension. Actual data/source upload,
+compile, launch and all IDs/failures/counts must be recorded as observed,
+not inferred from successful bundle creation. ON0/OFF1attempt and17looks
+remain unchanged before the next reservation/launch.

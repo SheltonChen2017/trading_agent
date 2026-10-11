@@ -14766,3 +14766,47 @@ native reader contracts and their focused controls. No extended QC attempt has
 yet been reserved, compiled or launched. Actual own-job diagnostic/result-read
 producer remains separately registered before use; pure parser tests alone
 do not authorize an incidental private outcome read.
+
+### 75.17 Actual metadata-only bundle completion and first QC scope
+
+Under committed`01f0bb13f78a64e55abc56f54d25f26991939bdc`, actual metadata
+operation creation`2026-10-11T02:01:24Z`/24hour expiry completed at
+`2026-10-11T02:01:25.658232+00:00`. Exactly2pinned metadata reads,0payload/
+outcome/provider/credential/QC reads. Its plan SHA
+`1e7ec056d14f373de758c24d1b7af8b6eefa302256757476fc3703b0021b9fa0` binds17
+exact committed producer/package paths. It retains the two-source composition,
+non-PIT/rights-unverified/canonical-unaccepted qualifications and every spent
+scope. The rendered public source bundle is444848bytes SHA
+`19e25fec41fd30bad6d74969d906c991bd43748fd2ea6e035f56f74685bb18cc`,
+8ON/7OFF flat files and72private hash-named payload inputs totaling241804159
+bytes. Only code and metadata hashes/keys/session axes enter Git; no source rows.
+Root receives the exact emitted metadata bundle, applies it via apply_patch,
+then independently verifies its saved byte/hash identity before use. No recovery
+read or second metadata operation was needed.
+
+`TPR-EXT26-D030` — delegated initial actual QC operation, pending independent
+review. After this bundle is committed, prepare fresh
+`TPR-EXT26-QC-20261010-001` from its exact source closure and actual UTC clock,
+48hour expiry,4096bounded requests/16MiB response/30second request limits,
+50000orders and3read-only collections per own job. Authenticate using existing
+environment credentials only; create two fresh named private lane projects,
+upload exactly the72private ON inputs(32MiB/file,512MiBtotal), upload/read back
+the two frozen source sets, and durably reserve each attempt BEFORE compile.
+Compile failures/runtime failures consume their arm's3slot allowance; previous
+historical ON3/OFF1 remain immutable, not refunded or renamed. Default actions
+are explicit CLI calls, never automatic retry/poll or unscoped provider/project
+exploration. Existing owned input objects may serve only their exact frozen
+hash keys; no unrelated cloud source/project is overwritten.
+
+Both arms share the frozen2021-01-04–2026-10-09 window/economics; AR remains
+disabled, actual traded instruments are constituent stocks in six sleeves,
+not ETF-only positions or the full original canonical ETF/holdings strategy.
+No new ETF fallback, dates, signals, cost parameters or tuning is introduced.
+This is exploratory order-based comparison; current-vintage source identities/
+touch clocks and incomplete global REMX coverage remain explicit limitations.
+New attempted cloud looks are reserved before launch, on top of historical16;
+compile-only failures remain attempts without invented realized-performance
+observations. Completion requires own-job terminal/data/orders/accounting/
+all1449dailyNAV evidence, not just successful API dispatch orCompleted status.
+No ObjectStore export route, live/paper/broker authority, canonical acceptance,
+sealed-holdout use or expanded research allocation is granted.

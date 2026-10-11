@@ -14858,3 +14858,88 @@ References checked2026-10-11UTC:
 https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/create-project
 https://www.quantconnect.com/docs/v2/cloud-platform/security-and-ip
 https://www.quantconnect.com/docs/v2/cloud-platform/projects/collaboration
+
+### 75.19 Actual creation diagnosis; narrow successor registered in principle
+
+The fresh six-file operation under`3ddc30edc1941528a399b9d736e6bc2efb282f49`
+created at`2026-10-11T02:08:46Z` completed at
+`2026-10-11T02:08:48.447204+00:00`. Six files/448472bytes verified; plan SHA
+`726bc41eef9cb41bf29f4f40cefe0c87e533ef804b65a99b76049b3a10dedac8`;
+closed public receipt4187bytes SHA
+`7e167c35854290c5096afdcd6d9552272eb620ca4ad20bcab93d9f573e97e08f`;
+private unaccepted admission1616bytes SHA
+`0b7abb5cfcc7525165769e47862f73a0838f62ae1bc07dba897073e34f45ea3b`.
+Actual original creation transport succeeded: ON project37650453, Lean18178,
+64000byte file quota, exact intended name, ownerTrue and one collaborator with
+ownerTrue. Organization metadata is typed; only its digest is public. The
+isPublic field is absent, notFalse. Original wire984bytes SHA
+`bc834fd19209b27c429e109fbef4a20d248c66f7abaef3513ee476475783a523`,
+projection SHA`09a96dc9c3ae790a12825f1f61564ee52896775e7778922fe4f8cc4a705000cf`.
+No local project receipt was created by diagnosis; no network/new look/attempt.
+
+`TPR-EXT26-F005`(P1, confirmed, successor correction in progress): requiring
+explicit returned isPublicFalse rejects the actual documented creation model.
+Every other current admission condition is met; this is a lane adapter defect,
+not provider denial, account invalidity or an unsuccessful backtest.
+`TPR-EXT26-D032` — delegated narrow successor/recovery, pending independent
+review. Preserve actual executed base operations/driver/sourcebundle bytes and
+their hashes; introduce explicitly named successor modules. Admit absent
+isPublic only as documented default-private provenance, never as returned
+privacy attestation. ExactFalse remains admissible; explicitTrue/null/non-bool
+must refuse. Ownership, named project, collaborator/quota/org requirements stay.
+Use fresh operation002 and a new exclusive recovery claim before reading the
+fixed original six receipts plus independently hash-bound discovery receipt/
+admission; independently reconstruct native admission and frozen source/config/
+input/clock lineage. Write the first local ON project receipt exclusively,
+without anothercreate call, alternate name, arbitrary project adoption, attempt
+refund/reset, visibility mutation, source upload or economics change.
+
+This recovery is not yet executed. Root's early read-only successor review
+identified a package-closure mismatch: discovery includes two package init
+files while the base operations manifest permits onlyQC-prefix paths. Do not
+weaken that base allowlist or silently drop custody; the named successor must
+pin/verify both immutable package-init bytes separately, with a meaningful
+coherent nine-path recovery control before actual use. Correcting this local
+integration mismatch grants no Windows/hostile-parent or provider attestation.
+
+### 75.20 Frozen named project-admission successor before fresh operation002
+
+F005 is corrected in the named successor, actual recovery still unexecuted.
+Root completely read the successor controller/driver/tests; reproduced215
+focused passes in3.56s (successor, immutable base operations, fresh result
+driver), isolated49/52 Python3.13 runtime root, no operator database/state.
+After adding paired absent/exactFalse native privacy controls, root reproduced
+217focused passes in3.25s; both admissible paths retain attestationFalse.
+Peer read-only source agent independently read the trio and inherited paths,
+reproduced39passes in0.85s, and accepted its scoped recovery design with no new
+rejectable finding. It did not open actual private metadata or call QC; actual
+project diagnosis remains root-reproduced evidence, not agent-reproduced.
+The two package init hashes are explicit immutable custody exceptions checked
+against committed bytes; the base allowlist is unchanged. Native absent
+isPublic remains unknown/None with documented-default provenance, never
+returned or provider privacy attestation. Present non-False refuses.
+
+Named controller16552bytes SHA
+`2b40663647ad13b55388c5b11e0bbb6a62d611cfb81a17953c2f3ea175fd4723`;
+named driver6724bytes SHA
+`dca81719c7e88f8afff2db0878a3f20e986b6c9a5006d8df25c9e4149ce46bad`.
+`extended_source_bundle_successor.json`445047bytes SHA
+`799e6eaa452860e1223ff9e35e8e4b5fa814161e9cd6cbb9d0bc27a6ae590f7b`
+contains only three additional metadata producer paths (18 names total).
+Root verified canonical bytes and exact equality of all other bundle fields:
+both eight/seven cloud files, configs, candidate identities, plannedattempt1,
+input hashes and preparation hash are unchanged. Executed original bundle
+444848bytes SHA19e25fec… remains byte-identical, as do executed base controller/
+driver. This is a producer correction, not a new economic candidate or cap
+reset. Root's first serialization attempt refused on an unavailable JS helper
+before any file/process side effect; the supported JSON-copy path then froze
+the successor. No private inputs were reread to render it.
+
+D032 now selects fresh `TPR-EXT26-QC-20261010-002` with48hour/4096request bounds,
+shared immutable persistent attempt/request history and no retrospective
+renewal of operation001. Recovery will claim before fixed six plus hash-bound
+discovery/admission reads, then exclusively write first local ON receipt;
+no create/adoption/visibility change/refund/reset. OFF creation remains one
+fresh normal owned-project call. No extended QC attempt/look/result exists
+yet. All economics and authorized calendar stay frozen; final Claude review
+of this round remains pending. No checkpoint push has occurred.

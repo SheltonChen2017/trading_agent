@@ -14943,3 +14943,112 @@ no create/adoption/visibility change/refund/reset. OFF creation remains one
 fresh normal owned-project call. No extended QC attempt/look/result exists
 yet. All economics and authorized calendar stay frozen; final Claude review
 of this round remains pending. No checkpoint push has occurred.
+
+### 75.21 Actual successor scope and owned-project recovery
+
+Registered snapshot`75cf9c07472dc6851bdd411aacb35c84261a394c` contains exactly
+the named successor trio/bundle and lane record (five paths); no push.
+Actual fresh operation002 manifest SHA
+`d20d96f9a69ddaccbc8e0866794e1106897b19cbfa8aa72fc9f6f4458669ab9b`
+was prepared on that committed closure. Actual ON recovery succeeded:
+project37650453, Lean18178, ownedTrue, privacy_attestedFalse, zero network
+creates/new looks/QC attempts. Fixed original six/discovery/admission proof
+was reread only under the new exclusive claim; historical operation001 and
+its original refusal remain immutable. F005 is corrected and actual recovery
+reproduced, not merely fixture green. Fresh OFF create succeeded:
+project37650980, Lean18178, ownedTrue; distinct project/same typed organization
+validation passed. Neither project is unrelated adopted work.
+
+ON private72-item/241804159byte input upload started under this scope; OFF
+does not read/upload the signal packet. No reservation/compile/backtest/look
+has yet occurred at this entry. Root interrupted the successor agent after
+stable reviewed files/root217green rather than wait for optional mutation
+work; peer39green preceded the two extra paired privacy controls. Future
+result reading requires a separately fresh bounded metadata inventory because
+the current collector emits some hashes but not all required byte lengths;
+do not infer unknown response sizes or reopen retained evidence incidentally.
+
+### 75.22 ON upload refusal retained; OFF build remains independently in scope
+
+ON input-upload CLI terminated`refused_or_uncertain` without automatic retry,
+observed at02:20:32UTC2026-10-11. Partial/completed/input-call counts and the
+cause are not yet established; do not equate this with zero uploaded files or
+a failed QC attempt. No reservation/compile/backtest/look existed at refusal.
+All consumed claims and original responses stay immutable. Root delegated a
+named fresh bounded metadata-only diagnosis before reading upload metadata:
+exact public72 input hash names, fixed operation002 manifest and at most96
+own request-spent metadata receipts; projections/terminal reads are limited to
+exact matching ON-input object/set claims, excluding OFF files and outcomes.
+The96 bound covers72uploads+initial/auth/create+OFF source/readback+compile
+metadata while retaining an explicit finite census. No licensed payload, unrelated project/API/network,
+credential or outcome access. Scope/producer must be committed before use.
+No reupload/retry is authorized by an uncertain terminal status by implication.
+
+D033 (delegated, pending independent review) proceeds with exact frozen OFF
+source upload/readback/compile while ON-upload diagnosis is pending. OFF has
+no TPR input dependency; its selection/calendar/economics remain prospectively
+matched and unchanged. This grants no outcome-based tuning or candidate-cap
+reset. Two-arm acceptance still requires both actual evidence streams; an OFF
+result alone cannot be a paired comparison. Root started OFF source upload
+under operation002; no extended attempt/result is claimed at this entry.
+
+OFF seven-file source upload/readback completed; native envelope SHA
+`15b0ef7fe2adf7b35fa90a8390d6768f71e7817e4f888642bf0c6182fb98f8f9`,
+main SHA`2dcd622418afb6b9bd235bc65c6133e85fbaa705047496bde90063de3044a7d8`,
+config SHA`5790ca63661f0f54a7734565342d141cbaba7797eb8c7b1e488c7ad573b01bd0`.
+The immutable full source hashes remain in the committed successor bundle and
+private fresh receipts. Root will reserve OFF attempt1 BEFORE compile; planned
+remaining allowance becomes2 after that reservation, even for compile/runtime
+failure. ON remains0extended attempts, historical16looks unchanged until launch.
+
+Actual OFF reservation1 succeeded before compile. Compile
+`d47adbf27168c790b21ef77185fc5958-6ce546d5213f0fc2badfbfc72656724c`
+progressed InQueue→BuildSuccess through explicit scoped read. Attempt1 is
+consumed (2remain), regardless of later runtime/terminal outcome. Root will
+launch the frozen OFF candidate now, reserving its look before the actual
+backtests/create call; this brings total observed looks to17 on launch, not
+to paired-study completion. ON0attempts/0newlooks remains upload-blocked.
+Successor agent subsequently released its final41green in0.88s and two live
+in-memory mutation controls (explicit-null privacy refusal, package initializer
+custody), each1red→restored1green; this is attributed agent evidence, root's
+independent217green and actual recovery are separately reproduced.
+
+Actual OFF attempt1 launched on project37650980 with backtest
+`34e0636f373c5ed9ee97387335b52454`; compile ID is retained above. Explicit
+scoped status read returned completedTrue/errorTrue/terminalTrue with native
+`Runtime Error`. This is a failed extended attempt, not a completed backtest
+result;2OFF attempts remain. The new look is spent, total17(15cloud including
+this new one+2historical-local; prior baseline was14cloud+2local).
+No return/fill/valuation/accounting result has yet been read. Cause is unknown
+until a newly committed bounded own-job inventory plus fresh diagnosis reads
+the source-bound native terminal; do not correct/tune by guessing. Executed
+OFF source bytes now remain immutable; verified corrections require named
+successors while keeping the genuine OFF candidate's persistent cap/count.
+
+### 75.23 Fresh own-job inventory producer before actual error reading
+
+D034 (delegated, pending independent review) registers separately named
+`extended_result_inventory.py`14914bytes SHA
+`110d7d8df326a0f4d679177ce26f870537e79cacda0de60b30ca2a0fa5cc4217`
+and focused tests12880bytes SHA
+`284f41b9b40926051e4b938211b84460be6a45a9e23228d8fe7d50e4319dd901`.
+Root completely read both and reproduced87passes in1.18s (43inventory plus
+44unchanged reader) using isolated49/52 runtime. Agent independently43green
+in0.93s and attributed live-global-only red/restored controls for omitted
+claim, joint byte budget and native collection lineage (each1expectedfailure,
+then restored43green). No actual private/account/provider/network calls during
+these tests. Executed result reader/controller/candidate bytes stay immutable.
+
+Fresh inventory uses ten committed-source hashes and exact5compile-failure,
+9terminal-diagnostic or16+Pnative-metrics file roles, explicit own project/job/
+candidate/attempt/operation/collection/page binding, exclusive claim BEFORE
+private stat/hash/body reads,120seconds/16MiBfile/128MiBtotal/48hours. It
+independently validates original reservation/source/readback/compile/launch/
+terminal closure and, for metrics, native NAV/pagination/log lineage. It emits
+hashes/lengths and scope binding only, not outcomes/errors/fills/licensed rows.
+Incomplete/failed reads retain spent scope and unknown failed-body-byte flag.
+OFF opens no TPR/provider packet. Root will invoke fresh
+`TPR-EXT26-INVENTORY-OFF-A1-20261010-001`, then unchanged result reader under
+separate `TPR-EXT26-RESULT-OFF-A1-20261010-001`; both diagnose only the already
+spent attempt1/job, not new looks/attempts/canonical acceptance. No upload
+diagnosis is implied by these separate own-job receipts.

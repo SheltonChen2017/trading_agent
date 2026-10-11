@@ -2937,3 +2937,29 @@ closed; project-wide documents, original plan/PDF and candidate decisions stay
 frozen. This bounded offline correction is accumulated locally for the later
 single completed-round publication; the producing/closing commit identities
 are recorded in the next closure entry, not invented in their own contents.
+
+### 26.7 Local correction checkpoint closure
+
+Producing commit: `8e974be852867d1b9c2e796f0ec1b5751897895f`,
+`fix(gdr): prepare readable synthetic QC project`.
+Its exact implementation range is
+`7356e3f73fd0d67cddbd3e4b880a7b76b78543b1..8e974be852867d1b9c2e796f0ec1b5751897895f`.
+The complete still-local range after remote `b2bef5fa` is the two section-25
+documentation commits `691d2ed650f348a37d444133f89c2740e61e50fa`,
+`7356e3f73fd0d67cddbd3e4b880a7b76b78543b1`, and this producing commit.
+The first two retain the truthful historical waiver/access/policy state;
+the third implements the owner-approved correction and the locally verified
+26.3 findings. None is represented as an independently accepted Claude review.
+This closing entry changes only the lane record, not the source epoch.
+
+Post-producing root/branch/HEAD/status were verified clean. All ten changed
+Git paths are lane-owned source/tests/readmes or this handoff; all 19 native
+files, draft/plan/PDF and project-wide documents were preserved. The final
+active-document check after adding section 26 passed (1 repeated check,
+0.001s), and staged/final diff checks passed. Generated plain files remain
+ignored machine-local preparation, not a new cloud release.
+
+No push is made while the overall QC cycle needs the owner's official
+execution/source-return route. Retain the same future single-push agreement,
+the section-26.5 identities, project 37647834, zero actual attempts and PAUSED
+monitor. Next authorized action and all exclusions remain exactly 26.6.

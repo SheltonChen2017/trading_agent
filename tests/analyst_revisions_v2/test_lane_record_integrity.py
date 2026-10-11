@@ -359,3 +359,33 @@ def test_subsection_citation_classifier_flags_only_missing_subsections() -> None
         " and a dangling (244.6).\n\n### 244.5 Validation\n"
     )
     assert _dangling_subsection_citations(record) == [(244, "244.6")]
+
+
+# Every standalone 32-hex token in this record is a QuantConnect backtest ID;
+# compile IDs are hyphenated and longer digests are not 32 characters, so
+# both are excluded. Each backtest ID must also appear in the shared look
+# ledger, the look-accounting authority: the six R-177 Runtime Error IDs of
+# section 172.1 were missing from it until afb29176 (ARV2R248-006).
+_BACKTEST_ID = re.compile(r"(?<![0-9a-f-])[0-9a-f]{32}(?![0-9a-f-])")
+
+
+def _backtest_ids_missing_from_shared_ledger(record: str, ledger: str) -> list[str]:
+    return sorted(set(_BACKTEST_ID.findall(record)) - set(_BACKTEST_ID.findall(ledger)))
+
+
+def test_every_recorded_backtest_id_appears_in_the_shared_look_ledger() -> None:
+    record = RECORD.read_text(encoding="utf-8")
+    ledger = SHARED_LOOK_LEDGER.read_text(encoding="utf-8")
+    assert not _backtest_ids_missing_from_shared_ledger(record, ledger)
+
+
+def test_backtest_id_classifier_skips_compile_ids_and_longer_digests() -> None:
+    # Only a standalone ledger occurrence counts: an ID that the ledger holds
+    # solely inside a hyphenated compile ID is still missing.
+    present, absent, hidden = "a" * 32, "b" * 32, "f" * 32
+    record = (
+        f"runs `{present}`, `{absent}` and `{hidden}`, compile `{'c' * 32}-1234`,"
+        f" digest `{'d' * 64}`"
+    )
+    ledger = f"ledger `{present}`, compile `{hidden}-{'e' * 8}`"
+    assert _backtest_ids_missing_from_shared_ledger(record, ledger) == [absent, hidden]

@@ -161,6 +161,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     formal_run_protocol.py formal_runtime_projection.py
     formal_streaming_bridge.py formal_streaming_input.py
     formal_submission_adapter.py formal_terminal_disposition_builder.py
+    fresh_six_universe_captured_clock.py
     fresh_six_universe_clock_successor.py
     fresh_six_universe_clock_successor_a2.py
     fresh_six_universe_snapshot.py fresh_six_universe_snapshot_submission.py
@@ -608,6 +609,12 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.eight_universe_split_truncation_projection
         research.analyst_revisions_v2_qc.accepted_risk_eight_universe_input_qc_runtime
         research.analyst_revisions_v2_qc.eight_universe_r268_a2_diagnostic
+        """.split()
+    ),
+    "fresh_six_universe_captured_clock.py": tuple(
+        """
+        __future__ hashlib json
+        research.analyst_revisions_v2_qc.fresh_six_universe_clock_successor_a2
         """.split()
     ),
     "fresh_six_universe_clock_successor.py": tuple(
@@ -1758,6 +1765,9 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
     "eight_universe_study.py": (
         "import:os",
         "import:pathlib",
+    ),
+    "fresh_six_universe_captured_clock.py": (
+        "call:compile",
     ),
     "fresh_six_universe_clock_successor.py": (
         "call:compile", "import:pathlib",
@@ -4956,6 +4966,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.formal_streaming_input",
         "research.analyst_revisions_v2_qc.formal_submission_adapter",
         "research.analyst_revisions_v2_qc.formal_terminal_disposition_builder",
+        "research.analyst_revisions_v2_qc.fresh_six_universe_captured_clock",
         "research.analyst_revisions_v2_qc.fresh_six_universe_clock_successor",
         "research.analyst_revisions_v2_qc.fresh_six_universe_clock_successor_a2",
         "research.analyst_revisions_v2_qc.fresh_six_universe_snapshot",

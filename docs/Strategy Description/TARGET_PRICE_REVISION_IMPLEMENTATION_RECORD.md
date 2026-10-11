@@ -15,8 +15,9 @@ THE OWNER REQUESTED 2021-NOW WITH THE SAME MARKET-CAP-SELECTION /
 TPR-WEIGHT-TILT STRATEGY AND AUTHORIZED CONSUMING THE PREVIOUSLY PROTECTED
 SEPTEMBER-OCTOBER 2026 DATES AS EXPLORATORY. TARGET ENDPOINT: OCTOBER9,2026.
 NO EXTENDED STUDY, PROVIDER CAPTURE, QC ATTEMPT OR NEW LOOK HAS EXECUTED.
-FRESH ON/OFF ATTEMPT ALLOWANCE IS A SEPARATE UNANSWERED OWNER QUESTION;
-CHANGING DATES OR INPUTS DOES NOT RESET THE ORIGINAL ON3/OFF1 COUNTS.
+THE OWNER NOW EXPLICITLY AUTHORIZES A FRESH ON/OFF STUDY ALLOWANCE OF AT MOST
+THREE QC ATTEMPTS PER ARM IN SECTION75. THE ORIGINAL ON3/OFF1 COUNTS AND
+SIXTEEN OBSERVED LOOKS REMAIN PERMANENT; THIS IS NOT AN IMPLICIT RESET.
 CLAUDE NEXT REVIEWS THIS CODEX ROUND INDEPENDENTLY. SECTION73'S COMPLETE
 REVIEW OF THE PREDECESSOR ROUNDS IS HISTORY, NOT A PENDING REVIEW STOP.
 THE TWO NEW JOINT STOCK-PORTFOLIO RUNS COMPLETED: ON3 HAS352FILLED NATIVE
@@ -457,8 +458,10 @@ arithmetic, positive-return wording, source/freeze claims and mutation census.
 `TPR-CR22-001` remains explicitly open: historical receipt producers are uncommitted.
 Confirmed unknown-basis, post-tilt removal, audit-binding and unresolved-attempt
 limitations are retained, not closed by accepting a documentation review.
-The owner authorized the requested extended exploratory dates; fresh per-arm
-attempt allowance remains unanswered, so no 2021-now QC run has launched.
+The owner authorized the requested extended exploratory dates and now the
+fresh paired-study allowance: at most three QC attempts per arm, with original
+ON3/OFF1 and16looks retained. Section75 freezes both extended candidates and
+all six universes together; no 2021-now QC run has launched.
 Section 70's
 closures of `TPR-CR21-002` and `TPR-CR21-003` are accepted; the Object Store
 retention question is restated for the owner as `TPR-CR22-007`, not a gate.
@@ -555,13 +558,14 @@ The three section73 Claude commits are counter-reviewed in section74.
 Claude next reviews this Codex round independently. The owner's latest
 request is an order-based 2021-now extension of section72's cap-selected
 stock portfolio and weight-only TPR tilt, with Analyst Revisions disabled.
-The reply "yes, authorized" approves the protected-date consumption that
-was asked about, not a silent reset of the same candidate's attempt ceiling.
+The first reply "yes, authorized" approved protected-date consumption. The
+later reply "yes, authorized" explicitly answers the separate fresh ON/OFF
+allowance question from section74 and grants at most three attempts per arm.
 Proposed first/last sessions are January4,2021 and October9,2026; no future
-session or sealed 2027-2029 shared holdout is included. A separate explicit
-fresh-allowance question is outstanding. Until answered, no new ON launch
-or fresh data/cloud operation is reserved or executed. If granted, freeze
-both arms and all six universes together, implement immutable successors
+session or sealed 2027-2029 shared holdout is included. The allowance question
+is resolved by direct owner authority, not inferred from a date change.
+Both arms and all six universes are frozen together in section75. Codex
+continues this resumed authorized development round, implementing successors
 for the confirmed runtime/evidence defects, use committed bounded producers,
 and verify historical availability before launching; do not tune after results.
 Section72.5 retains the two completed diagnostics with all gates false,
@@ -13902,3 +13906,250 @@ after that push. The publication commit containing section74 is the exact
 next Claude snapshot, with parent/review base pinned in74.1; its hash is
 reported in the chat. The heartbeat remains paused during and after this
 round; no automatic rearm or checkpoint/side-branch publication.
+
+## 75. Owner-authorized extended cap-selection / TPR-tilt study — 2026-10-10
+
+### 75.1 Fresh authority and joint prospective freeze
+
+Codex's question after the completed section74 counter-review was:
+"Do you authorize a fresh ON/OFF study allowance—maximum three QC attempts
+per arm—while preserving all previous attempts/results?" The owner replied
+"yes, authorized". This explicitly resolves `TPR-EXT26-D002`'s pending
+allowance; it is a new bounded owner grant, not a reset inferred from changed
+dates. The earlier separate protected-date approval remains distinct.
+The current requested task is still "next, run a backtesting from 2021-now.
+using the same strategy". Codex resumes the authorized continuous development
+work without a routine intermediate review wait; published section74 and
+new code are not independently accepted by this owner's execution grant.
+
+Starting local/actual matching remote snapshot:
+`5cd1a7bed6e27c121cbdf0c60d4e61a44536018a`, clean, on the exact designated
+worktree and `codex/strategy-target-price-revisions`. No incoming Claude
+commit exists at registration. Prior counter-review of all three Claude
+commits remains section74, with inherited runtime/evidence readiness
+explicitly withheld. Shared Action Plan/Handoff/workflows/main/sibling
+behavior and canonical artifacts stay frozen. The heartbeat stays paused.
+
+Study: `TPR-CAP-TILT-EXT26-20261010-v1`. Both arms and all six universe
+definitions/economics/source boundaries are frozen together in
+`research/target_price_revisions_qc/extended_study_freeze.json`, SHA-256
+`90bdec5520b29bd932a3ec730f7c4c40c544ea7582731ad6680ef34ea8cf4067`.
+This is a prospective extended study under an explicitly fresh allowance,
+not a fourth original-ON attempt. At registration new ON0/OFF0, new looks0;
+old cap ON3/OFF1,14cloud +2local =16historical looks are retained permanently.
+No data or outcome has been read for this extension at registration.
+
+| Arm | Stable candidate | Maximum Codex QC attempts | Comparison |
+|---|---|---|---|
+| TPR ON | `TPR-CAP-TILT-EXT26-ON-BASE-v1` | 3 total across fixes/sessions | Cap-only selected stock identities,20% within-selected weight-transfer capacity |
+| TPR OFF | `TPR-CAP-TILT-EXT26-OFF-BASE-v1` | 3 total across fixes/sessions | Identical non-signal construction/execution,0tilt, never reads signal packet |
+
+The actual-order portfolios jointly cover SPY(S&P500proxy, not broader
+large-cap), XLV(healthcare), XLE(energy), QQQ(Nasdaq100, not all listed Nasdaq),
+SOXX(semiconductors/equipment), and REMX(QC-covered US subset of global
+rare-earth/strategic-metals holdings). They are stock-sleeve portfolios,
+not six ETF-only positions, not36independent universe jobs and not the
+canonical price-scaled ETF strategy. Unknown global REMX coverage is never
+renormalized or represented as a complete global ETF. Native membership
+effective lag7-21days, prior-session18NY cap clocks, current-vintage identity
+limitations and consolidated overlap disclosure remain unchanged.
+
+Evaluate January4,2021 through October9,2026, weekly first exchange session
+with prior-session18NY cutoffs. Source warm-up begins September1,2020 for
+the unchanged80session signal horizon; source/calendar/action state must not
+reset at a year boundary. Exact calendar/version/session/decision hashes are
+required before empirical construction or launch. Both arms retain100000USD,
+six1/6sleeves, top10cap-only known-positive names, fixed1/60slots,10%soft
+prior-close target cap, cash missing slots/no fallback/no rank11replacement,
+20%rank-tilt ON/0OFF, whole MOO09:20NY/cancel09:35,1cent/share/10bpsslippage,
+1%prior-volume and97%settled-cash buy budget/no expected sell proceeds.
+AR is fully disabled; no QCOM exclusion or optimized AR setting is imported.
+Baseline cost only; no new sweep/adverse/ablation or after-outcome tuning.
+The paired window and metrics (matched-date return/CAGR, drawdown, volatility,
+Sharpe riskfree0, annual/partial2026 results, turnover/costs, orders/fills,
+cash/exposure, coverage/selected counts, underfill and exact NAV/action parity)
+are frozen before new outcomes. Formal alpha0; adaptive/correlated exploratory
+evidence, not independent confirmation. September2026through the endpoint is
+owner-authorized exploratory consumption; remaining future validation and
+the sealed September2027-August2029 holdout are not accessed.
+
+### 75.2 Exercised decisions and fresh source-check boundary
+
+| Decision ID | Provenance | Choice/rationale | Alternatives | Scope/limitations | Review status |
+|---|---|---|---|---|---|
+| `TPR-EXT26-D008` | Direct owner affirmative reply to the separate allowance question | Fresh maximum3QC attempts per extended arm; retain all original counters/looks. | No new ON launch; eligible Mia recovery. | Owner grant is execution allowance, not acceptance of code/strategy, canonical authority or deployment. Compile/runtime/unknown terminal failures count; no incidental rename resets it. | Owner-authorized, not Claude-approved. |
+| `TPR-EXT26-D009` | Owner same-strategy request and section72 frozen semantics | Keep two cap-selected stock portfolio arms/all six sleeves and unchanged economics. | ETF-only/score-selected/cap-proportional/AR blend. | Exactly the prospective freeze above; coverage limitations and all earlier observed results remain visible. | Agent-delegated interpretation, pending independent review. |
+| `TPR-EXT26-D010` | Confirmed CR22-003 defects and no-replacement construction | For successor runtime, preserve warning/final unusable classification; rank top10by cap first, remove unusable selected slots before scores/tilt, keep slots cash/no promotion; unknownsplit factor refuses. | Filter membership before rank; default factor1; final-only exclusion. | This corrects truthful accounting/custody, not a tuned economic rule. Known factor1 needs affirmative native basis evidence, not subscription/no-event inference. No old executed bytes changed. | Agent-delegated correction design, unimplemented at registration. |
+| `TPR-EXT26-D011` | Source history/calendar continuity and the80session horizon | Explicit pre2021warmup plus global calendar, cumulative action exclusions and event-ID conflict/dedup state across shards. | Reset annual scorer; assume old Q1packet is six-year input. | Current identity/delisted snapshots and last-touch censorship remain explicit survivorship/vintage limitations, not PIT proof. | Agent-delegated, pending source/implementation verification. |
+| `TPR-EXT26-D012` | Necessary scoped source integration, delegated by owner | New committed seven-request availability probe: warmup2020window and one window per2021-2026year; limit1/date.asc,64KiB each,30s, no retries/redirects/pagination. | Blind full history capture; renew D0/oldscope; assume product docs prove account coverage. | Exactly7sampled licensed rows maximum, private only; no target/identifier/row in Git/logs. New global/per-request claims before credentials. Sample success is not complete-year/PIT/paired-target proof. | Agent-delegated bounded operation, not entitlement attestation. |
+| `TPR-EXT26-D013` | CR22-001/002/005/006 and long-window evidence bounds | Commit future producer before invocation; new manifest/hash-bound source/compile evidence, lexical decimal custody, structural redaction, terminal predecessor checks and bounded private aggregate chunks. | Recreate old producer provenance; boolean-only source audit; binary floats/substrredaction; logquota gamble; unknown launch retry. | Freeze exact successor collection budgets before any launch. No purchase/quota upgrade/related project overwrite. Historical missing producers remain missing. | Agent-delegated required design, not completed software. |
+
+Fresh source operation `TPR-EXT26-SOURCE-PROBE-20261010-001` is limited to
+Massive's existing `/benzinga/v1/ratings` endpoint at `api.massive.com` and
+the seven exact windows in the freeze. It is not a general account search,
+outcome join, QuantConnect call or historical capture replay. Fresh plan binds
+code/helper/freeze/owner instruction/currentHEAD, expires in at most48hours,
+and has a new lane-owned private destination. Request/status/byte/hash and
+schema/clock validity aggregates may be reported; provider rows, prices,
+identifiers and credentials may not. Claims survive missing credentials,
+refusals/timeouts and failures; no spent allowance is retried implicitly.
+
+Existing scoped private-processing/rights-paperwork waiver remains working
+authority, not provider attestation; known restrictions remain respected.
+No purchases, upgrades, credential changes, operator-state/database, brokers,
+funded accounts or paper/live operation. No old private capture/result/D0
+read. Full source capture and genuine QC execution require measured source
+admission and new bounded manifests; no empirical completion is claimed by
+this registration or synthetic validation. Implementation/validation and
+actual fresh source/QC attempts will follow here before the round's exactly
+one final matching-lane non-force push.
+
+### 75.3 Offline calendar and prospective successor contracts
+
+The joint continuous calendar is frozen in
+`research/target_price_revisions_qc/extended_calendar.json`, SHA-256
+`3eccdf3cf9a2542ffd249983241d5747c2ecd4e21bc4a71f7f826c77ec1fe53d`:
+85 warm-up sessions,1,449 valuation sessions and301 weekly decisions.
+Existing `exchange_calendars`4.13.2(XNYS) and
+`pandas_market_calendars`5.4.0(NYSE) independently agree on every session,
+open and close over this frozen interval. This is offline exchange-calendar
+evidence, not market outcomes or provider completeness. Every decision binds
+the previous exchange session's18:00 New York cutoff, including holidays,
+daylight saving and year boundaries; warm-up precedes the first2021 decision.
+
+Named pure successors implement only their declared contracts:
+`extended_construction.py` performs unchanged cap-only ranking followed by
+selected-slot unusable removal before ON score lookup, preserving cash and
+never promoting rank11; OFF accepts no score argument. Its known-basis
+validator requires exact positive prior/current ratios and closed identity,
+clock, provenance and source-hash claims. Supplied valid claims are not
+authenticated native factors; production factor custody/runtime integration
+remains necessary. `extended_evidence.py` retains numeric token spelling,
+structurally redacts known metadata paths without replacing digits in orders,
+requires concrete source/compile/launch bindings and refuses unresolved or
+three-consumed predecessor histories. Its caller must independently provide
+complete persistent ledger custody and authenticated response provenance;
+pure hash consistency is not that proof. Neither helper launches or completes
+a backtest. Historical executed modules and all old empirical hashes remain
+unchanged. CR22-001's historical missing producer is not retroactively fixed.
+
+Root's first focused registration/document/import-boundary union reproduced
+**273 passed,1 skipped in3.87s** using existing Python3.13.15/pytest9.1.1,
+`PYTHONDONTWRITEBYTECODE=1`, the sections49/52 isolated in-process runtime-root
+runner and `-q -p no:cacheprovider --tb=short`. Paths: new extended registration,
+lane/current active document consistency, Target import firewall, runtime-stop
+leak guard, the two explicit no-execution-ML import nodes, and the explicit
+host-Git restoration/missing-frozen-Git preregistration nodes. One Windows-only
+skip is retained; no actual operator state/database is read and macOS proves
+no Windows signer/ACL/protected-parent custody. No full lane suite ran.
+An earlier root invocation accidentally interpolated an unavailable stored
+runner as `undefined` and stopped with NameError before pytest/imports; it is
+an invocation failure, not a test result. The bundled Python lacked pytest;
+the existing project Python3.13 environment was used without installation.
+Subagent synthetic test/mutation results are attributed until the root's
+combined focused reprise; no empirical operation is authorized by green tests.
+
+### 75.4 Validation-harness incident before the real source operation
+
+`TPR-EXT26-INC001` — **confirmed; corrected and recoverably quarantined**. A subagent's driver
+mutation proof copied the driver's globals before pytest patched its lane
+root. The mutant retained the actual lane root while its remaining identity
+and probe seams used synthetic fixtures. The first negative used the real
+fixed private `source_probe` leaf and published two synthetic preparation
+files there; there was no prior leaf inventory, so new directory creation is
+not independently proven. Five failed tests are invalid harness evidence, not five valid
+mutant kills. Original driver code was restored. Root stopped the planned
+real invocation, notified the owner and independently verified the exact
+no-follow directory census and hashes. The real committed producer has not
+yet executed; no actual source access/request claim exists.
+
+| Synthetic private file | Bytes | SHA-256 |
+|---|---|---|
+| `TPR-EXT26-SOURCE-PROBE-20261010-001.driver-plan.json` | 2646 | `8dc5018bc0261b09554e00afe8bc1d631753aa6d929461bb432cb05fa355de4c` |
+| `TPR-EXT26-SOURCE-PROBE-20261010-001.driver-preparation.json` | 1532 | `6df934d509cf5da1c10af60ed9a8299980a44d6e87b852cb3e0c151c842cb72d` |
+
+Directory mode0700, file modes0600, uid501 and single-link regular files.
+Root independently verifies all seven source hashes are exactly the hashes
+of fixture strings `SYNTHETIC_` plus each relative path, with fake Git`c`*40,
+fake owner`d`*64, non-production lane/private-root declarations and preparation
+stage `not_yet_invoked_by_driver`. The executed test's patched probe callable
+performed no resolver/HTTP operation; this is attributed invocation evidence,
+not an inference that missing terminal files alone prove no network. No
+licensed row, real key, QC attempt, order or empirical outcome was involved.
+An initial root diagnostic accidentally printed a vacuous `all([])` flag;
+that flag establishes nothing and is replaced by these explicit assertions.
+
+`TPR-EXT26-D014` — agent-delegated recovery decision, **not separate human or
+Claude approval**: preserve these exact two known synthetic files, hashes and
+directory intact in a fresh incident quarantine under this study's private
+root; do not delete, overwrite, retry a spent access operation or treat the
+fake preparation as authorized execution. After fixing the synthetic test
+isolation and verifying no access claims exist, the real committed producer
+may create its originally fixed fresh leaf for the first legitimate operation.
+Alternative: stop for owner cleanup; unnecessary for agent-authored synthetic
+files when exact targets/custody are proven and the move is recoverable.
+The recovery does not renew D0, old captures or any QC counter. Add actual-root,
+real-credential and real-HTTPS test sentinels before any further mutation;
+mutants must use the live patched module globals, not a copied pre-fixture root.
+
+Recovery evidence: root moved the complete known synthetic leaf, without
+deletion or overwrite, to
+`artifacts/target_price_extended/TPR-CAP-TILT-EXT26-20261010-v1/validation_incident_TPR-EXT26-INC001/synthetic_source_probe`.
+Both exact hashes above remain unchanged and the original leaf is absent;
+the quarantine remains ignored/private and fully recoverable. No legitimate
+spent allowance was reset. Test-firewall repair/final validation and the
+first real committed probe invocation remain subsequent evidence, not claimed
+by this recoverable move.
+
+The repaired test file now has autouse sentinels refusing the actual physical
+lane/private directory before any mkdir, actual credential resolution and
+actual HTTPS. Original callable objects are restored only in an import-identity
+inspection context, never invoked. A copied-globals regression reproduces the
+dangerous stale-root shape but proves refusal before filesystem mutation.
+The subagent's repaired live-global fresh-leaf mutation yields2expected
+failures/3passes; original120controls pass. A separate pure authority mutation
+yields2expected failures/10passes. The initial unsafe five failures remain
+excluded from valid mutation evidence and the incident remains visible.
+
+### 75.5 Pre-operation validation and committed producer custody
+
+Root reproduced the final combined focused union: **681 passed,1 skipped
+in4.29s**, no failures/errors, Python3.13.15/pytest9.1.1 and the same isolated
+sections49/52 runner and boundary nodes as75.3. The union adds all four new
+extended test files and the unchanged cap-tilt helper's focused tests, not a
+complete lane/repository suite. An earlier pre-driver union was648passed,
+1skipped in4.18s; it is superseded by this final result. Source/test files
+compile in memory without bytecode; tracked/scoped whitespace checks are clean.
+The exact historical section68-through74 byte span is280,152bytes, unchanged
+at SHA-256 `dded8f771f9971c4c5488457307d24e26011a20be708de3f50b5c813585ff542`.
+
+| Prospective source / test | SHA-256 |
+|---|---|
+| `extended_construction.py` | `4be72251040a0f133ee4a39245a3b0fe96285715a8510b4328b5d06c276596a6` |
+| Its focused test | `2b9dc2b9d1fed5552aa9909d4921956d5bb63686e5200150bc668ba665a1c882` |
+| `extended_evidence.py` | `a816b1ddca5a8428f07e9029bc3a7f7db3c5e1a1f50521664992dabf556aa2d7` |
+| Its focused test | `b7082230ba59ba196d4c23c848548f683c710dc564174a72a6d43568d7b86098` |
+| `extended_source_probe.py` | `45eba071576edb1379defa05764040c66fc06c1a4692b80a8d0e4b9410383be4` |
+| `extended_source_probe_driver.py` | `c42c40a0a2adfe86b64baa0805fc5993c3e3715a7a3742fb288389432659b404` |
+| Probe/driver focused test after isolation repair | `6056416ade380b2e7c888c23470cb157538c052d722589fc87a468e98c8aca1d` |
+
+The actual invoker is committed before use; no uncommitted ad-hoc empirical
+producer is substituted. It verifies itself, probe, study freeze, the three
+reachable package initializers and immutable source-audit helper against
+current files and pinned HEAD, then retains exact driver-plan/preparation
+before the probe's eight exclusive access/request claims and credential
+resolution. Imported old helper utilities are reused; the old audit operation,
+spent D0 and private captures are never invoked/read. The fixed-source closure
+and invocation commit are retained in the private preparation receipt.
+
+Planned first invocation: existing Python3.13 with `-m
+research.target_price_revisions_qc.extended_source_probe_driver`, owner-reply
+SHA-256 `fcbf682e1cf8d9c0649f49128b1e37fc8f7b31ae75fb5a7c672a6d354d549c31`,
+creation `2026-10-11T00:40:00Z`, expiry `2026-10-12T00:40:00Z`. The reply hash
+is SHA-256 of the exact UTF-8 text `yes, authorized`; its fresh-attempt question
+context and separate date authority are75.1, not proved by a digest alone.
+These UTC clocks fall on the client's October10 local day. The original real
+probe leaf is absent after quarantine. No new provider sample/QC attempt/
+outcome exists at this pre-operation commit; actual results follow here.
+No intermediate push is made; this registration and the final durable handoff
+remain one round with exactly one final matching-lane publication.

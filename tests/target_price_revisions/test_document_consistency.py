@@ -1054,7 +1054,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         assert "five verified order-based qc runs and one zero-trade remx diagnostic" in normalized_summary_lower
         assert "claude next reviews this codex round independently" in normalized_summary_lower
         assert "codex next counter-reviews section 73" not in normalized_summary_lower
-        assert "fresh on/off attempt allowance is a separate unanswered owner question" in normalized_summary_lower
+        assert "the owner now explicitly authorizes a fresh on/off study allowance" in normalized_summary_lower
         assert "codex next counter-reviews section 69" not in normalized_summary_lower
         assert "codex next counter-reviews section 66" not in normalized_summary_lower
         assert "all six owner-named universes" in normalized_summary_lower

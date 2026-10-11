@@ -15873,3 +15873,41 @@ login/credential extraction or account change occurred. The owner then says
 this is credential-availability context, not capacity/entitlement attestation.
 A separately named own-store metadata-only producer is being prepared for
 current evidence; no old failed upload receipt is implicitly renewed.
+
+### 76.4 Prospective own-store metadata observation
+
+`TPR-EXT26-D048`, agent-delegated under current owner continuation/key context:
+use `TPR-EXT26-STORE-PROBE-20261011-001`, fresh current-HEAD≤4hour manifest,
+120second wall budget/two≤1MiB native responses, single-use claims before the
+exact owned ON project's≤8192byte local receipt and before each API request.
+Only object/list of the frozen owned input directory and object/properties of
+the exact first failed346371byte gzip key are admitted. No licensed/input
+body, Object Store export, organization-root/foreign listing, mutation,
+pagination, backtest look, attempt or implicit old-receipt renewal. Alternatives:
+blind retry risks the last OFF attempt; UI is unauthenticated; unrelated
+account or project exploration cannot establish permitted headroom.
+
+Producer extended_store_probe.py20498bytes SHA
+`ac3aae6811c8cc8f05c479381a8316e896f4a8e3f06e7f7dcde7a06257cc5cf1`;
+focused test18100bytes SHA
+`103b181f462a631f72786f2f21dd1e18ce345139d2591f10af6ea2526bca47a8`.
+Root read both completely and reproduced70 focused passes in1.21seconds with
+isolated runtime root/no actual roots, HTTPS or credentials. Exact native
+nonnegative integer tokens admit legitimate zero counts without admitting
+bool/string/decimal/exponent/negative values. Page indexing is not assumed:
+directory census completeness always remains false. Not-found is a classified
+message, not attested absence. Usage is uninterpreted; capacity/free bytes,
+sufficiency, other-lane contention and remote-content verification remain
+unknown. Same organization/project/closed mapping bound to immutable223efa…
+public bundle. Probe produces only redacted metadata/hashes, not private rows.
+Agent mutation evidence is attributed: foreign-project and realistic foreign
+listing guard removal each caused the intended red; initially malformed
+foreign fixture and initial zero-case indexing failure were corrected before
+meaningful repeat. Agent restored-control70green; independent Claude review
+pending. No actual metadata API operation has occurred at this paragraph.
+
+Root also reproduced9 focused packet-import-boundary/active SHA-document
+checks in0.87seconds; pure successor rendering and all generated cloud/source
+compilation passed, diff/hash checks clean. No complete lane/repository suite;
+macOS evidence proves no Windows signer/ACL/protected-parent custody. Existing
+fourteen frozen-Windows-Git preregistration limitations remain unchanged.

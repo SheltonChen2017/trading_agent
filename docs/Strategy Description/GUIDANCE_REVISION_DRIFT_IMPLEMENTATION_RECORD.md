@@ -1,19 +1,23 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Independent Claude review of `3c5d76ff..75ea6280` (sections
-24-27) recorded in section 28, 2026-10-11;
-Codex counter-review of section 28 pending.
-All twelve Codex commits are accepted, two after correction. The
+Status: **Codex counter-review of section 28 completed in section 29,
+2026-10-11, against exact pushed review head
+`b71be46653a29bcb436011ef6bece759f8abf247`.
+Both Claude commits are accepted, the record commit after documentation
+correction. Claude's dispositions of all twelve Codex commits are retained,
+including two accepted after correction. This counter-review is local-only;
+the next milestone and any push are paused for owner direction. The
 owner-directed synthetic-only QuantConnect evaluation (section 27) ended with
 three compiled launches that all failed before strategy initialization; the
 three-attempt ceiling is exhausted and no relaunch is authorized. Two P2 items
-need owner direction before any recovery run: QC's current AI-agent rules
-against compressed or Base64-encoded output, which the native trace export
-uses (GDR-CR28-001), and the one-LF runtime form of the project's two empty
-initializers (GDR-CR28-002). No successful native integration or empirical
+need owner direction before any recovery run: unresolved compliance of the
+compressed/Base64 synthetic trace output with QC's current AI-agent rules
+(GDR-CR28-001), and the observed one-LF runtime form of uploaded-empty
+`data/__init__.py` (GDR-CR28-002). The runtime form of the other empty
+initializer, `research/__init__.py`, remains unobserved. No successful native integration or empirical
 backtest readiness is established. The original economic, data, empirical,
 account and trading gates remain closed.**
-Current scope/evidence are sections 17 through 28. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 29. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -3393,7 +3397,7 @@ for GDR-CR28-001.
 | GDR-CR28-009 | P3 / corrected | `ae404c1a`, `native_observation.ReceiptSnapshot`; `test_native_observation.py` | LEAN's zero fee carries currency QCC; the snapshot admits QCC only on a control receipt whose quantity, price and fee are all zero. The existing QCC case is a filled receipt, refused by its status alone (O15 survived). Added `test_qcc_currency_is_admitted_only_on_a_fully_zero_control_receipt` (non-zero fee, quantity or price on submitted and canceled receipts); O15 now fails. |
 | GDR-CR28-010 | P3 / corrected | `ae404c1a`, `evaluation_cycle.CycleJournal._load`; `test_evaluation_cycle.py` | A stray file beside the retained owner-cycle records was never tried (E33 survived). Added `test_reopen_refuses_an_unexpected_entry_beside_the_retained_records`; E33 now fails. |
 | GDR-CR28-011 | P3 / documented | Sections 25.1, 27.2; `evaluation_cycle`, `evaluation.CandidateBinding` | The NE-7/NE-8 owner-cycle journal built in this range was not used for the actual three attempts: `CandidateBinding` requires a review commit and has no waiver variant, so Codex kept the attempt ledger in ignored machine-local artifacts and in this record. That was truthful, but none of the journal's custody checks (retained head, per-intent binding, three-failure ceiling) applied to the real cycle. Before any recovery cycle, either add a waiver-aware binding variant or state that this record is the authoritative attempt ledger. |
-| GDR-CR28-012 | P3 / documented, owner awareness | Sections 25.3, 27.1-27.7 | The repository is public, and the record now names the owner's QuantConnect project ID, its platform-assigned name and URL, compile and run IDs and response hashes. They need an authenticated session to use and are neither credentials nor personal data; no credential, token or e-mail address appears. Whether to keep account-scoped identifiers in a public record is the owner's choice; nothing changed. |
+| GDR-CR28-012 | P3 / documented, owner awareness; wording corrected in section 29 | Sections 25.3, 27.1-27.7 | The published record names the owner's QuantConnect project ID, its platform-assigned name and URL, compile and run IDs and response hashes. These are account-scoped operational metadata, not credential values, but may link the record to the owner's account/project and are not categorically free of privacy risk. No credential, token or e-mail address was identified in the published lane record by this review. Whether to keep these identifiers in a public record is the owner's choice; no identifier, published history or account setting was changed. Codex did not independently establish repository visibility in this counter-review. |
 
 Scripted count from this table: P0 0, P1 0, P2 2, P3 10; corrected 8, documented 4.
 
@@ -3511,3 +3515,140 @@ establishes neither native execution, QuantConnect integration nor empirical
 readiness. No GDR-1 source audit, real data, broker, paper or live step starts
 from this review. `docs/ACTION_PLAN_2026-08-20.md` and
 `docs/SESSION_HANDOFF.md` were not edited and stay frozen for both agents.
+
+## 29. Codex counter-review of section 28; owner-input pause, 2026-10-11
+
+### 29.1 Exact trigger, scope and commit dispositions
+
+This consumes one completed-review trigger, not another milestone quota.
+Publication baseline `75ea62804ed9da5d0935cd74470ffe7ef7ad8b5f` was already
+pushed exactly once. The matching remote lane ref and local clean HEAD were
+observed at `b71be46653a29bcb436011ef6bece759f8abf247`; a fetch of only that
+lane ref confirmed the object and `merge-base` returned the exact baseline.
+Section 28 explicitly identifies its completed review of that snapshot.
+Counter-review range:
+`75ea62804ed9da5d0935cd74470ffe7ef7ad8b5f..b71be46653a29bcb436011ef6bece759f8abf247`.
+Both commits and every GDR-CR28-001..012 finding were inspected against that
+exact pushed tree, with parallel read-only production, test and policy audits.
+No Claude/user dirty work was present or overwritten.
+
+| Claude commit | Disposition | Counter-review evidence/correction |
+|---|---|---|
+| `70ab46100eb1c88736b24a76bea8404e05ef7e68` | Accepted | Offline import-closure guard correction and eleven focused regression methods checked below; no native closure or uploaded candidate bytes changed. |
+| `b71be46653a29bcb436011ef6bece759f8abf247` | Accepted after correction | All section-28 findings and historical Codex dispositions retained; status header narrowed to the one observed runtime file, and account-linked metadata/privacy wording corrected. This section and its review-state pin are the durable counter-review handoff. |
+
+The owner messages quoted in 28.7(a)-(d) are present in this Codex thread;
+their scope remains the recorded waiver, readable packaging, synthetic run,
+single push and permission to ask Mia for help. They do not grant real-data
+research, policy exceptions, changed economics or a fourth manual attempt.
+Claude's separately reported owner phrase "qc is fixed" is not independent
+evidence of native completion and is not used to reopen any gate.
+
+### 29.2 Retained P0-P3 ledger and counter-review evidence
+
+All twelve Claude findings remain: P0 0, P1 0, P2 2, P3 10. The eight corrected
+items remain corrected; the four documented items remain documented. Two new
+P3 documentation corrections below do not erase or reclassify that ledger.
+
+| Retained ID | Counter-review disposition/status | Evidence and limits |
+|---|---|---|
+| GDR-CR28-001 | Accepted / P2, open owner/compliance decision | Source confirms zlib/Base64 synthetic trace fragments. Current [QC Security and IP](https://www.quantconnect.com/docs/v2/cloud-platform/security-and-ip), read 2026-10-11, prohibits obfuscating code/files and lists encoded/compressed Platform Data exports; it does not expressly resolve this invented-only output. This is unresolved compliance, not a confirmed violation or an owner-waivable platform rule. No strategy callback ran, hence no encoded trace was emitted in attempts 1-3. Claude's 87 fragments/16,922 log bytes and readable 141,691 bytes plus 8,973 metadata bytes are retained as Claude-reported measurements, not a new Codex measurement. A readable evidence redesign or authoritative QC clarification is required before a recovery launch. |
+| GDR-CR28-002 | Accepted / P2, open recovery design | Returned 21-file source map contains exactly two zero-byte initializers; other returned source files end in LF and contain no CR. Attempt 3 proves only `data/__init__.py` materialized as one LF byte. Sorted inventory refusal stops there; `research/__init__.py`, other runtime files and the responsible platform component remain unproven. Non-empty project-only initializers or a narrowly enumerated LF representation rule are alternatives, not implemented or approved recovery behavior. |
+| GDR-CR28-003 | Accepted / P3, corrected | Eight pure in-memory dangerous-loader probes refuse under the reviewed guard; seven were admitted with the original sets restored (the `sys.modules` `import_module` case already refused). The exact positive native graph is accepted in both cases. Added roots/call names cover deferred and conditional AST nodes, and bare `compile`; `re.compile` remains allowed. This explicit closure guard is not a general Python sandbox. |
+| GDR-CR28-004 | Accepted / P3, corrected | Focused test changes the final offline full-review source epoch while the native bundle remains valid, isolating `_prepare_project`'s final manifest comparison. |
+| GDR-CR28-005 | Accepted / P3, corrected | Symlinked-root-ancestor case refuses before source reads; entry-overflow case refuses before reading source. The added test establishes overflow refusal, not an exact 1,024/1,025 boundary pair. |
+| GDR-CR28-006 | Accepted / P3, corrected | Focused transport test accepts 497 lines at 99,897 bytes including LF and refuses 498 at 100,098 bytes, isolating the cumulative 100,000-byte allowance. |
+| GDR-CR28-007 | Accepted / P3, corrected | Three focused methods exercise eleven complete-output and six failed-output isolated metadata rules, unknown failure stage and 65-character binding overflow. These are validator tests, not authenticated native trace evidence. |
+| GDR-CR28-008 | Accepted / P3, corrected | A complete 752-record replay with failed end-callback metadata is refused as a native completion dossier despite consistent completed receipt/cycle inputs. |
+| GDR-CR28-009 | Accepted / P3, corrected | Zero QCC control receipt admitted; four nonzero economic-control variants refused. The prior filled-status case alone did not isolate this currency rule. |
+| GDR-CR28-010 | Accepted / P3, corrected | Valid journal reopens before a stray adjacent file is added; reopening with that file refuses without changing the retained head. |
+| GDR-CR28-011 | Accepted / P3, documented | Actual cycle did not use typed `CycleJournal`: `CandidateBinding` requires a review commit and has no owner-waiver variant. No invented review hash or typed waiver dossier is accepted. Section 27 and its retained operational `events.jsonl`/raw receipts are the authoritative historical attempt ledger for this closed failed cycle; they are not represented as typed-journal custody proof. The operational ledger records all three unsuccessful attempts and the terminal ceiling; absence of typed-journal checks does not mean no operational checks applied. Future recovery must explicitly resolve waiver-aware binding versus its authoritative ledger before launch. |
+| GDR-CR28-012 | Accepted / P3, documented after wording correction | Account-scoped identifiers are not credential values, but can be linkable metadata. The categorical privacy dismissal is withdrawn; published identifiers/history remain unchanged and no new account/privacy action is inferred. |
+
+| New counter-review ID | Priority / status | Correction |
+|---|---|---|
+| GDR-CCR29-001 | P3 / corrected | Header previously implied both empty initializers were observed as one LF at runtime. It now names only `data/__init__.py` and explicitly leaves the other runtime file unobserved; also expresses CR28-001 as uncertainty rather than a categorical output ban. |
+| GDR-CCR29-002 | P3 / corrected | CR28-012 now distinguishes non-credential identifiers from potentially linkable account metadata; no public-visibility verification or privacy guarantee is claimed. |
+
+Claude's eleven added methods and 29 added subtests match the source; six
+changed test files contain 87 methods. Reported 560/1,442 to 571/1,471 lane
+counts are arithmetically consistent. The reported mutation classes sum to
+190 (101 + 25 + 64), and the named 25 newly pinned cases match the list.
+The full lane/repository suites and 190 mutation trials remain Claude-reported
+independent validation, not rerun or reverse-certified here. The fifteen
+out-of-lane failures under GDR-CR18-005 remain reported, with no shared fix.
+
+### 29.3 Focused validation and source identity
+
+Codex validation uses existing Python 3.13.15, `-B`, and the network-denied
+`sandbox-exec` profile from the mandatory root. No dependencies installed.
+The first focused invocation passed ten methods and had one unittest loader
+error because `test_native_observation` expects the tests directory on the
+import path. This was a harness error, not a candidate defect or QC attempt.
+With the explicit repository/tests `PYTHONPATH`, all eleven new methods pass
+(5.708 s). No production/test behavior was changed to accommodate the harness.
+Closing checks after the documentation/pin corrections:
+
+| Check | Result |
+|---|---|
+| Eleven added regression methods, network-denied | 11 passed, 5.708 s; initial import-path harness error recorded above |
+| Fresh-process import boundary and active-document review-state check, network-denied | 2 passed, 0.105 s; no execution/provider/SDK imports, header limitations and owner-pause pin agree |
+| In-memory compilation (`compile`, no bytecode output) | 84 lane source/test Python files passed |
+| `git diff --check` and status | Passed; only this lane record and `test_boundaries.py` changed after the pushed review head; no production, shared or frozen project-wide document edits |
+| Complete lane/repository suite | Not run by Codex; Claude owns full independent validation |
+
+Independently rebuilt identities at the reviewed head:
+
+| Identity | Exact SHA-256 / scope |
+|---|---|
+| Full-review source after Claude's offline guard correction | `92caa26304ae57efd34ce26e1a5a3ff87b9447563faafb6cf56b81a3dd41b5ed` (previous `5159229a...` belongs to the actual failed launches) |
+| Readable QC project | `fbf824bfa2f84101ad52ed646ffb3ac7ed0849e9f1bf88aafd11a725427bca96`, 21 Python files / 278,845 bytes, unchanged |
+| Root `main.py` | `e6ed09f6bbfe1b9ce5d341464eb04c3dc005ddc023c8b5219f9e175e34e32ea2`, 15,007 bytes, unchanged |
+| Native runtime source | `beee91270427d72ccda5beafa91897ae357a5d0964845eb93efef39a0f9062e9`, unchanged |
+| Offline audit ZIP, not uploaded | `1579a3daf3f5665d63d1f0f9bdd975ca8fdad34847286475f5b8c1c4e6d4809b`, 272,862 bytes, unchanged |
+| Invented fixture | `8f35d56a335d3f7d9dad016e1e2236de7fcd2635e5c463c30081f97b7b944458`, 372 frames / 93 sessions / 43,135 bytes, unchanged |
+| Semantic draft | `b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c`, unchanged |
+
+The new full-review source hash does not retroactively rebind the three
+failed cloud attempts. Documentation/pin corrections here do not change
+source/package bytes or the exhausted candidate. No new release was saved,
+QC project modified, source uploaded, compile requested, run launched,
+existing empirical outcome read, or Mia recovery attempted this turn.
+
+### 29.4 Next milestone definition, blocked before implementation/publication
+
+The next useful bounded step would be owner-directed synthetic integration
+recovery preparation: choose a policy-compliant readable evidence route,
+preserve complete per-frame/order/account verification, eliminate uploaded
+empty-initializer ambiguity without relaxing general inventory exactness,
+and resolve truthful waiver/attempt-ledger binding. This is a proposed scope,
+not an implemented or genuinely completed milestone. The source/fixture and
+original economic proposals remain frozen while the owner chooses it.
+Any platform-rule uncertainty needs a compliant design or authoritative QC
+clarification, not self-certification by changing draft null/false fields.
+
+The three-attempt ceiling for `GDR-base372-approved-20261008` remains exhausted;
+review acceptance, a new source/project/hash or this proposed milestone does
+not reset it. No fourth manual attempt or exhausted-project edit is authorized.
+Mia recovery needs specifically scoped owner direction and an authenticated,
+controllable interface; the prior locked-Mac/access limitation is not claimed
+resolved. The owner must unlock it if needed. A later separately authorized
+evaluation must wait for an eligible shared node rather than cancel/reallocate
+another lane, retrieve every resulting source file and document every change.
+
+Per the standing serialized workflow and this heartbeat's owner-input stop,
+the monitor is to be paused after this local counter-review closure. No next
+milestone starts and no partial round is pushed. The remote remains the
+consumed Claude review head; the last Codex publication remains `75ea6280`.
+Any later authorized corrections/milestone accumulate in this same lane and
+receive exactly one successful end-of-round non-force push, only after the
+round is genuinely concluded. Do not automatically re-arm or publish merely
+because this counter-review is accepted.
+
+Offline review acceptance is not native integration evidence or empirical
+backtest readiness. Original GDR-0..6 definitions and economic/data/family/
+protected-date gates remain unresolved as recorded; real market/reference/
+action data, empirical outcomes, providers, purchases, installations,
+operator database, broker/paper/live/funded/capital authority, QC scheduler,
+PR/main merge and cross-lane changes remain excluded. Project-wide documents
+stay frozen; only this lane handoff and its active review-state pin change.

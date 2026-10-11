@@ -14810,3 +14810,51 @@ observations. Completion requires own-job terminal/data/orders/accounting/
 all1449dailyNAV evidence, not just successful API dispatch orCompleted status.
 No ObjectStore export route, live/paper/broker authority, canonical acceptance,
 sealed-holdout use or expanded research allocation is granted.
+
+### 75.18 Project-response refusal and fresh six-file diagnosis
+
+Actual operation`TPR-EXT26-QC-20261010-001` prepared under
+`02b26bbc378a57ab281e45565c44806fd46a6e3a`, manifest SHA
+`14166ebc75b0268910b2d095522c7b6017108ae5137eb76115ea94c58504f098`.
+Authenticate succeeded. The next explicit ON projects/create invocation returned
+the closed local`refused_or_uncertain` status before a local project receipt;
+OFF creation was not invoked. No source/input upload, reservation, compile,
+backtest dispatch or new performance look occurred. Do not repeat creation:
+the remote effect must first be reconciled against the retained original claim
+and response. Original producer/driver/bundle bytes remain immutable.
+
+`TPR-EXT26-D031` — delegated fresh metadata-only project diagnosis, pending
+independent review. After its nine-path closure is committed, execute named
+`TPR-EXT26-PROJECT-DIAG-20261010-001` with actual UTC creation/24hour expiry.
+An exclusive spent claim precedes hashing/content reads of exactly six fixed
+metadata files in this newly created operation: manifest001, request0002's
+projection/spent/terminal and ON.project-create's spent/transport. No arbitrary
+path, licensed packet/outcome, credential, provider, API or extra project-create.
+Bound16MiB/file,128MiBtotal,120seconds; verify operation/query/manifest/stage/
+terminal/projection lineage before exposing anonymous field presence/type/count
+census. Raw organization metadata stays only in a closed private admission
+artifact explicitlymarked unaccepted; a discovery receipt is not permission to
+adopt a foreign project or assume absent metadata means a returned false field.
+
+Root independently reviewed complete result/discovery producer and controls;
+44focused cases passed0.62s under isolated49/52. Agent44green0.53s and two
+live-globals red/restored controls (missing discovery claim; ignored expected
+hash) remain attributed. Source38919bytes SHA
+`cda6340bb84ea6f5e9e0715fed57e210f1d2e5020f273fc4d8e4651046a7c037`;
+tests22313bytes SHA`a18ac5421296e0ebebbed47a0576cf19c7975ee4c6f8d9a7f1c5477f01ab5114`.
+Its separately scoped own-job modes normalize only named retained native chart/
+orders/summary receipts, retain unavailable fields and keep individual observed
+orders private. They require explicit exact inventories before later use;
+no actual result/diagnostic read or empirical outcome has yet occurred.
+
+Primary QC CreateProject model documents owner/quota fields but notisPublic;
+the current unexecuted correction proposal is therefore to distinguish absent
+visibility metadata from explicit public/unknown values. This is not yet a
+diagnosis of the actual refusal. QC's Security and IP/Collaboration documents
+describe source as private by default unless shared. They permit normal strategy
+summary results/equity curves/order history, not dataset extraction or restricted
+ObjectStore downloads. Current work has no raw platform-data export or sharing.
+References checked2026-10-11UTC:
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/create-project
+https://www.quantconnect.com/docs/v2/cloud-platform/security-and-ip
+https://www.quantconnect.com/docs/v2/cloud-platform/projects/collaboration

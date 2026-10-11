@@ -15238,3 +15238,133 @@ object/properties and object/delete, strictTLS30s/no redirect/retry,44calls max,
 individual spent request claims before credential/network,24h. No cleanup,
 compression processing or corrected QC launch has occurred at this entry.
 ON0/OFF1attempt remains, total17looks; paired extended results are absent.
+
+### 75.27 Actual fresh lossless processing completed; bounded cleanup registration
+
+Fresh compression001 under`d4263c039b1f389fa08979380eb5e8f695513923`
+completed`2026-10-11T02:44:46.104360+00:00`, plan SHA
+`a22c899f38fa4d3cd9c2737e5758e24916dcf48ed1d0997ac8cec6c680ffd2c9`.
+All72 original inputs/241804159B were independently byte-equal after encoding/
+bounded decoding and remained unchanged;144original reads/483608318B.
+Gzip payload total21756021B, exact ratio21756021/241804159 (about9.0%,
+not an account-quota attestation); derived read/storage21813085B including
+57064B hash/key mapping. No provider/capture/source/outcome/API/upload/delete/
+attempt/look. Private original payloads and fresh negative upload receipts stay
+immutable; gzip outputs are exclusive newly prepared files, not re-opened D0.
+
+Exact processing result`TPR-EXT26-COMPRESS-20261010-001.result.json`58858B
+SHA`fac2b57ef3f70e5bb086d95c0c24237987078527667586aaea9c7dc85039dc87`;
+mapping`TPR-EXT26-COMPRESS-20261010-001.mapping.json`57064B SHA
+`1088cd012cfa0a99dc248a526ee64a01bc08b0da7061d7f722d1017a409f6933`.
+Both reside in this study's private inputs root. Fresh separately registered
+metadata-only renderer may read these exact two files under new exclusive
+claim to validate72original rows, both hash domains, fixed producer sources,
+committed original bundle and immutable config/input/candidate identities;
+no licensed packet/capture or result reads. It must render ON1/OFF2,
+preserving persistent OFF attempt1 closure/cap and source-size limits.
+New compressed upload claims must prove actual72gzip upload receipts; do not
+manufacture original plaintext completed receipts or weaken executed base
+manifest admission to conceal physical key changes.
+
+Separately fresh cleanup`TPR-EXT26-CLEANUP-20261010-001` is prospectively
+limited to exact22successfully uploaded original keys whose SHA set is in the
+68233B upload diagnostic pinned in75.26. Resolve keys/bytes only from original
+public bundle799e…; exclude failed target53cc… and every other namespace.
+Recoverability requires22original local files fresh size/SHA/MD5 verification,
+complete72compression result/mapping validation and exact fresh native
+properties key/size/MD5 validation for ALL22 before firstdelete. No
+reconstructive ObjectStore get/list/download/export. Native metadata preview
+must be discarded rather than retained/printed; only safe properties and raw
+response wire SHA persist. Fresh private evidence manifest also binds ON
+owned project37650453's typed organization (not caller-suppliedorg), original
+operation002manifestd20d…, exact upload-diagnostic result2966…, fixed immutable
+source producer hashes, compression resultfac2…/mapping1088… and fresh plan.
+Max44calls/22properties then22deletes,30s strictTLS/no redirect/retry/24h;
+each request's spent claim precedes credential/network access. Any absent,
+unknown, mismatch, denied or partial terminal stops without automatic retry.
+All original local inputs are retained for recovery. No delete yet; scoped
+producer/root review and committed manifest must precede actual operation.
+
+D038 (delegated, pending independent review) preserves original economic
+input descriptors/configs and creates a named compressed transport controller,
+not relaxed base admission. Only exact72original-to-gzip mappings may upload,
+with fresh compressed-key spent/success receipts and explicit proof before ON
+launch; no synthetic original plaintext success. Persistent genuine candidate
+history remains OFF1 consumed/ON0; planned OFF2/ON1 sources must match the actual
+counter. Both arms freeze corrected runtime together; D033 runs OFF first to
+test shared native integration before spending ON1. The original base look
+receipt field old_looks16 is historical baseline, not a current global count.
+Named successor shall bind16historical looks plus at most six persistent
+candidate/attempt look metadata records under the locked fresh operation, count
+failed OFF1, and claim each next look before launch; no cap/negative look refund.
+This bookkeeping correction changes no observation/date/economic choice.
+
+Pre-release cleanup finding `TPR-EXT26-F008`P1 (confirmed, correction before
+actual operation): inherited nested request timer refused inside armed1500s
+scope; old eight-field project schema also rejected the actual recovered ten-
+field successor receipt. Named helper corrects nesting without losing either
+deadline and validates closed actual privacy/recovery provenance, not an older
+toy shape. Peer additionally found that typed organization plus copied provenance
+digest strings alone did not independently bind destructive destination.
+D039 pins the ALREADY retained original discovery's organization SHA
+`a2d88859373df0f1fd59ede52b9b3945f847091b5fca3286841241536c38e880`
+from the exact4187B public receipt7e167c… in75.19. Root verified immutable
+extended_result_driver.py445–448 computes SHA256 of typed organization UTF8,
+not canonical JSON. Require current ON receipt organization to match that
+digest BEFORE credentials/network; raw organization is never printed. This
+uses existing independently retained metadata, no incidental private hashing,
+no provider-authenticity/rights/privacy attestation. The helper had already
+implemented the prospectively authorized one-file admission comparison, so
+retain both destination proofs: separately enumerate exactly
+`TPR-EXT26-PROJECT-DIAG-20261010-001.project-admission.json`,1616B SHA
+`0b7abb5cfcc7525165769e47862f73a0838f62ae1bc07dba897073e34f45ea3b`,
+in this fresh cleanup read manifest and claim, comparing typed organization,
+project/name/owner and closed native-response lineage. This is a fixed private
+project metadata read, not any original response wire, D0/capture or outcome.
+The draft preference to omit this redundant read was superseded before any
+operation; its scope is now explicit, not implied receipt extension.
+Altered organization while preserving
+copied provenance must fail before any native call. Stable final source/tests
+and focused evidence must be reviewed before cleanup; no actual deletion yet.
+
+### 75.28 Final cleanup producer and pre-execution validation
+
+Named cleanup producer34856B SHA
+`e2bd69359554c704a137189bc06084df11f4a0f1cf903a8c59bde6dadf9f6932`,
+focused tests23917B SHA
+`48498d677cf6fc006aaffe04fa5d67608a379016b3d6911fbd8340667dea4114`.
+Root fully read module/tests and reproduced59focused passes in0.98s with
+isolated49/52 runtime. Agent59green0.97s and attributed MD5, nested inherited
+Peer independently59green0.92s, final hashes/sizes match, accepted-after-
+correction with no unresolved material finding in this bounded scope.
+deadline and two-layer destination-bypass controls each red/restored green.
+F008's three confirmed pre-release defects are corrected in these never-
+executed files, not rewritten historical executions. Native cleanup remains
+unexecuted at this entry; final independently reviewed cloud facts must be
+retained, not inferred from tests/flags.
+
+Exact ten committed-source closure includes fixed package initializers,
+compression/core/controller/bundle/diagnostic and immutable project-admission
+successor pin. Fresh claim precedes all private existence/stat/read operations.
+Read scope: own ON.project.json, exact1616B original discovery admission,
+operation002manifest446839B/d20d…, diagnostic68233B/2966…, compression
+result58858B/fac2… and mapping57064B/1088…, plus22original payloads74557156B.
+Total≤128MiB/file≤32MiB with openedFD size/remaining budgets before body;
+24h/1500seconds aggregate/44requests×30seconds, timer nesting preserves both
+bounds. Complete72processing proof validates committed original rows and exact
+two hash domains; fresh22original SHA/size/MD5 and ALL22native properties must
+match before first deletion. Organization both independently SHA-pinned and
+mutually bound to original admission, never supplied by caller; no unrelated
+cloud reads/mutations. Native absent errors remains absent, not imputed errors0;
+returned errors must be empty and successTrue. Preview/credential echo is
+discarded/refused; only safe metadata and original wire SHA/bytes are retained.
+Unknown or failed request permanently spends that key, stops, preserves negative
+receipt/no retry. No native ObjectStore get/list/export, upgrades/purchases,
+broker/operator-state, data publication, source capture, outcome or new look.
+Originals remain recoverable locally, gzip inputs remain prepared separately.
+
+Root will invoke only`TPR-EXT26-CLEANUP-20261010-001` after this producer is
+committed, with actual freshUTC creation/24h expiration and exact currentHEAD
+guard. Expected remote5cd… remains unchanged; this is a local registration
+commit within the continuous round, not a checkpoint push. ON0/OFF1attempt,
+17observed looks and no paired2021–now result remain unchanged.

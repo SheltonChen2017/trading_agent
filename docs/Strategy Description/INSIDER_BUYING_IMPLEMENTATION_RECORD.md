@@ -22610,3 +22610,52 @@ broker/operator database/scheduler, paper/live deployment or trading action.
 None occurred. Readiness stays false; looks **0/0/0**; shared coordination files
 and original coverage/attempt accounting remain frozen. One final combined
 push follows only after the completed permitted round's final checks.
+
+## 158. Separate exact-hash counter-review and checkout handoff (2026-10-12 UTC)
+
+| Exact identity | Stage and disposition |
+|---|---|
+| `6209b3b33d203aad4a3d1d6d449a1c7d2304c8f0..86700b1c2dbbbd8234870444c3bbcf14c6a00aeb` | Complete incoming Claude range: one documentation-only commit, zero merges; ACCEPTED AFTER156.2 qualifications. Local already equaled remote; no fetch/branch switch. |
+| `fbef7a375b094839160e0a02b0bb80ebd63cdef4` | Separate completed counter-review commit156. The new finding's full minimum ledger fields were expanded in the subsequent record update before publication; no historical155 result rewritten. |
+| `bd848b4e0ccf1a40211cfe8f67b036e70c0260ea` | Separate bounded checkout milestone157: exact one-file attribute, four regression cases and lane record. Internal QA/denied verification complete; pending independent Claude review of this outgoing snapshot. |
+| This separate handoff following `bd848b4e0ccf1a40211cfe8f67b036e70c0260ea` | Exact-hash publication/handoff boundary, not a checkpoint push. Its own future hash and publication result are not invented here. |
+
+The complete outgoing scope has only three paths: the existing lane record,
+new `research/.gitattributes` and new
+`tests/test_insider_buying_qc_source_checkout.py`. No frozen QC/custody blob,
+shared document/configuration, downloaded ZIP or another strategy path changes.
+The QC source is `i/lf w/lf`, exact existing frozen hash; its Git blob remains
+`04fbdf173d041b10b6e94ed0fcaf809275e4f0c0`. The new test's final source hash is
+`1cb33b6362b22ffd343ec1508d5029532f2ba59631e800742e001fc2a1141419`.
+
+Evidence stays separately attributed: faithful scanner/admission controls156;
+632 affected passes with the pre-refinement test-image qualification; final
+four checkout passes; final160 boundary/record/checkout passes;193-file
+compileall. Shared pair remains2 failed, and Windows full-lane collection
+remains16 `fcntl` errors. Neither is a passing or skipped lane suite. The
+completed158 document/package checks are repeated below before this final
+record commit. No source/test edit follows their final validation.
+
+Recheck the designated absolute root, existing branch, HEAD, clean/expected
+status, ordered three-commit outgoing range and exact still-published
+`86700b1c` remote before committing/pushing. Make **exactly one final push**
+to `origin/codex/strategy-insider-buying`, with no force, rebase, reset,
+checkpoint, extra branch or remote overwrite. Only a subsequent read-only
+remote-tip check may establish successful publication; final user handoff
+reports the actual tip. The monitor stays PAUSED, with no automatic rearm or
+other-chat message.
+
+Next: Claude independently reviews every outgoing commit, including this
+documentation-only handoff. Input-dependent integration remains factually
+blocked on the qualified archive/identity/PIT evidence152.1/154.6 and
+supported-host custody prerequisites where needed. The completed byte fix
+does not make a Windows port choice or supply those facts. Seven P2s and
+older dispositions remain; no source/rights/PIT/readiness/look/QC/execution
+gate is promoted. All new provider/credential/licensed-row/source acquisition,
+purchase, outcome/QC/backtest, broker/database/scheduler, deployment and
+paper/live/trading actions are zero; looks **0/0/0**.
+
+Completed158 active-document/record/exact-package checks: **72 passed in8.11s**
+under OS network denial. Whitespace and exact three-path/frozen-blob checks
+are clean. This measurement is repeated after adding this receipt text before
+the final documentation commit; production/test bytes are unchanged.

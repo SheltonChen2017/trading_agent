@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 import os
 from pathlib import Path
 import stat
+import sys
 
 import pytest
 
@@ -14,6 +15,10 @@ ROOT = Path(__file__).resolve().parents[2]
 SOURCES = {name: (ROOT / name).read_bytes() for name in c.SOURCE_PATHS}
 PUBLIC_OFF = next(row["files"] for row in e.parse_json(SOURCES[c.BUNDLE])["candidates"]
     if row["candidate_id"] == c.CANDIDATE)
+MAC_CUSTODY_REASON = (
+    "Owner-selected Mac-only native custody: POSIX no-follow/UID/mode/directory-fsync "
+    "and exact working-byte source pins are not Windows custody evidence"
+)
 
 
 @pytest.fixture(autouse=True)
@@ -32,6 +37,8 @@ def deny_actual(monkeypatch):
 
 
 def fixture(tmp_path, *, action="baseline-source", reference=None, suffix="SYNTHETIC-001", root=None):
+    if sys.platform != "darwin":
+        pytest.skip(MAC_CUSTODY_REASON)
     now = datetime.now(timezone.utc)
     if root is None:
         root = tmp_path / "synthetic-mia-source"
@@ -76,14 +83,57 @@ def baseline(tmp_path):
     return values, result, reference
 
 
-def test_fixed_scope_and_immutable_off_source_bytes():
+def test_fixed_scope_and_public_off_inventory_are_portable():
     assert c.PROJECT == 37650980 and c.CANDIDATE == "TPR-CAP-TILT-EXT26-OFF-BASE-v1"
     assert c.ENDPOINT == "files/read" and c.MAX_FILES == 16
     assert (c.MAX_FILE, c.MAX_RESPONSE, c.MAX_TOTAL, c.MAX_SECONDS, c.REQUEST_SECONDS) == (
         1048576, 4194304, 8388608, 120, 40)
     assert len(PUBLIC_OFF) == 10 and len(PUBLIC_OFF["main.py"].encode()) == 59931
-    assert c._sha(SOURCES[c.BUNDLE]) == c.BUNDLE_SHA256
     assert c.EXPECTED_FILES == set(PUBLIC_OFF)
+
+
+@pytest.mark.skipif(sys.platform != "darwin", reason=MAC_CUSTODY_REASON)
+def test_native_working_off_bundle_is_exact_frozen_byte_anchor():
+    # Preserve the original byte anchor without normalizing a Windows checkout.
+    assert c._sha(SOURCES[c.BUNDLE]) == c.BUNDLE_SHA256
+
+
+def test_non_mac_fixture_skips_before_plan_or_directory_and_restores_seams(tmp_path, monkeypatch):
+    platform, plan, mkdir = sys.platform, c._plan, Path.mkdir
+    def denied(*args, **kwargs):
+        raise AssertionError("native fixture effects must not run on an unsupported host")
+    with monkeypatch.context() as patch:
+        patch.setattr(sys, "platform", "win32")
+        patch.setattr(c, "_plan", denied)
+        patch.setattr(Path, "mkdir", denied)
+        with pytest.raises(pytest.skip.Exception, match="Owner-selected Mac-only native custody"):
+            fixture(tmp_path)
+    assert sys.platform == platform and c._plan is plan and Path.mkdir is mkdir
+    assert not (tmp_path / "synthetic-mia-source").exists()
+
+
+@pytest.mark.parametrize("member", [c.BUNDLE, c.PREFIX + "extended_study_freeze.json",
+                                    c.PREFIX + "extended_calendar.json"])
+def test_pure_plan_refuses_tampered_public_hash_without_custody_or_effects(member, monkeypatch):
+    # This synthetic map tests immutable public identifiers, not working bytes.
+    hashes = dict.fromkeys(c.SOURCE_PATHS, "a" * 64)
+    hashes.update({c.BUNDLE: c.BUNDLE_SHA256,
+                   c.PREFIX + "extended_study_freeze.json": e.FREEZE_SHA256,
+                   c.PREFIX + "extended_calendar.json": c.ops.CALENDAR_SHA256})
+    def denied(*args, **kwargs):
+        raise AssertionError("pure public plan must not enter native custody or publication")
+    monkeypatch.setattr(c.files, "_directory", denied)
+    monkeypatch.setattr(c, "_publish", denied)
+    arguments = dict(action="baseline-source", operation_id="TPR-EXT26-MIA-SOURCE-BASELINE-SYNTHETIC-PUBLIC",
+        git_head="a" * 40, source_hashes=hashes, owner_instruction_sha256="b" * 64,
+        created_utc="2026-10-12T00:00:00Z", expires_utc="2026-10-12T01:00:00Z", mode="offline-fixture")
+    control = c._plan(**arguments)
+    assert control["new_looks"] == control["new_codex_attempts"] == 0
+    assert control["mia_message_or_job"] is control["automatic_retry"] is False
+    corrupted = {**hashes, member: "f" * 64}
+    with pytest.raises(c.Refusal):
+        c._plan(**{**arguments, "source_hashes": corrupted})
+    assert arguments["source_hashes"] == hashes and control["source_hashes"] == hashes
 
 
 def test_baseline_is_stable_exact_and_retains_all_notebook_and_extra_source(tmp_path):
@@ -309,6 +359,7 @@ def test_native_transport_refuses_foreign_payload_and_time_before_credentials():
             c._native_request(payload, seconds)
 
 
+@pytest.mark.skipif(sys.platform != "darwin", reason=MAC_CUSTODY_REASON)
 def test_import_closure_refuses_an_alternate_initializer(monkeypatch):
     c._imports()
     import research

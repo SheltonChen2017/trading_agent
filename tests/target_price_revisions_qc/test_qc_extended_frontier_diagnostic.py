@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 import hashlib
 import os
 from pathlib import Path
+import sys
 
 import pytest
 
@@ -12,6 +13,10 @@ from research.target_price_revisions_qc import extended_frontier_diagnostic as f
 e, N = f.e, f.e.JsonNumber
 ROOT = Path(__file__).resolve().parents[2]
 SOURCES = {name: (ROOT / name).read_bytes() for name in f.SOURCE_PATHS}
+MAC_CUSTODY_REASON = (
+    "Owner-selected Mac-only native custody: POSIX no-follow/UID/mode/directory-fsync "
+    "and exact working-byte source pins are not Windows custody evidence"
+)
 
 
 @pytest.fixture(autouse=True)
@@ -30,6 +35,8 @@ def deny_actual(monkeypatch):
 
 
 def fixture(tmp_path, action="logs", *, terminal_hashes=None):
+    if sys.platform != "darwin":
+        pytest.skip(MAC_CUSTODY_REASON)
     now = datetime.now(timezone.utc)
     root = tmp_path / "synthetic-frontier"
     root.mkdir(mode=0o700)
@@ -71,6 +78,42 @@ def test_fixed_production_terminal_and_scope_constants():
          "b5f7788177d117dd4dc95ae53c84cf6b60a15fc7410f5877b332743e618e7417"))
     assert f.PROJECT == 37650980 and f.MAX_PAGES == 20 and f.PAGE_LINES == 200
     assert f.MAX_REQUESTS == 40
+
+
+def test_non_mac_fixture_skips_before_plan_or_directory_and_restores_seams(tmp_path, monkeypatch):
+    platform, plan, mkdir = sys.platform, f._plan, Path.mkdir
+    def denied(*args, **kwargs):
+        raise AssertionError("native fixture effects must not run on an unsupported host")
+    with monkeypatch.context() as patch:
+        patch.setattr(sys, "platform", "win32")
+        patch.setattr(f, "_plan", denied)
+        patch.setattr(Path, "mkdir", denied)
+        with pytest.raises(pytest.skip.Exception, match="Owner-selected Mac-only native custody"):
+            fixture(tmp_path)
+    assert sys.platform == platform and f._plan is plan and Path.mkdir is mkdir
+    assert not (tmp_path / "synthetic-frontier").exists()
+
+
+@pytest.mark.parametrize("member", [f.PREFIX + "extended_study_freeze.json",
+                                    f.PREFIX + "extended_calendar.json"])
+def test_pure_plan_refuses_tampered_public_hash_without_custody_or_effects(member, monkeypatch):
+    hashes = dict.fromkeys(f.SOURCE_PATHS, "a" * 64)
+    hashes.update({f.PREFIX + "extended_study_freeze.json": f.FREEZE_SHA256,
+                   f.PREFIX + "extended_calendar.json": f.CALENDAR_SHA256})
+    def denied(*args, **kwargs):
+        raise AssertionError("pure public plan must not enter native custody or publication")
+    monkeypatch.setattr(f, "_directory", denied)
+    monkeypatch.setattr(f, "_publish", denied)
+    arguments = dict(action="logs", operation_id="TPR-EXT26-ENGINE-LOG-SYNTHETIC-PUBLIC",
+        git_head="a" * 40, source_hashes=hashes, owner_instruction_sha256="b" * 64,
+        created_utc="2026-10-12T00:00:00Z", expires_utc="2026-10-12T01:00:00Z", mode="offline-fixture")
+    control = f._plan(**arguments)
+    assert control["new_looks"] == control["quantconnect_attempts"] == 0
+    assert control["old_claims_renewed"] is control["cause_proved"] is control["trading"] is False
+    corrupted = {**hashes, member: "f" * 64}
+    with pytest.raises(f.Refusal):
+        f._plan(**{**arguments, "source_hashes": corrupted})
+    assert arguments["source_hashes"] == hashes and control["source_hashes"] == hashes
 
 
 @pytest.mark.parametrize("total", [0, 1, 200, 201, 401, 4000])

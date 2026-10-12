@@ -1,5 +1,19 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
+Current follow-up (section81): the owner waived this diagnosis round's review
+checkpoint only. Genuine built-in Mia diagnosis002 completed; root qualified
+its path-compatible `.json.gz` cause and rejected attempt-reset/early-stop
+overclaims. Baseline002/post002 verify all eleven cloud files unchanged.
+No patch or new backtest was authorized/performed; F017/F018/F012 stay open,
+OFF3/ON0/look19 persist, and no2021-now comparison/performance is accepted.
+Next required owner decision: a separately scoped genuine Mia repair/recovery,
+not another Codex OFF attempt. The heartbeat remains paused. This local-only
+append does not republish/replace the earlier61a81d9a review target.
+
+The following Status block records published61a81d9a/section80's historical
+handoff; its Mac-lock/owner-unlock routing is superseded for this follow-up
+by the current note and section81, not claimed as current interface state.
+
 Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN
 `f998144d..2726b5ba` IN SECTION 80 AND THE CUMULATIVE TREE. DISPOSITION:
 ACCEPTED AFTER CORRECTION OF TESTS AND RECORD QUALIFICATIONS, NOT NATIVE QC
@@ -17664,3 +17678,464 @@ not unrelated setup errors, and all mutants were restored in finally. The
 peer ceased edits at the exact release; root's final document-only reprise
 is recorded with the publication verification in this chat. No full suite
 or external effect was involved in these controls.
+
+## 81. Owner-authorized read-only Mia diagnosis while independent review is pending - 2026-10-11
+
+### 81.1 Narrow owner exception and starting state
+
+After publication61a81d9a, the owner said `proceed`. Codex measured the
+unchanged actual matching remote and asked whether to proceed with read-only
+Mia diagnosis while Claude's review is pending, with source edits and backtest
+launches blocked. The owner's `urd` was not treated as approval. Codex asked:
+
+> Did you mean “yes”—proceed with read-only Mia diagnosis, keeping edits and backtest launches blocked?
+
+The owner answered exactly `yes`.
+Exact clarification is107UTF-8bytes/SHA256
+`05cd7c08a0cfd90c02750998ba747ee54efc261eee227cf3aa82453a3c7cbde6`;
+exact answer is3bytes/SHA256
+`8a798890fe93817163b10b5f7bd2ca4d25d84c52739a645a889c173eee7d9d3d`.
+
+The confirmed scope grants only read-only diagnosis,
+not independent acceptance of61a81d9a, a new implementation milestone,
+source/test changes, compile/build, launch/relaunch, upload or a fourth OFF
+attempt. The previous publication remains the exact pending Claude target:
+`61a81d9a6a93c1a548a903414f767178b9b1ac65` and entire two-commit
+`2726b5ba87b4eab9282682d41b252c7ad1db91c2..61a81d9a6a93c1a548a903414f767178b9b1ac65`
+round. No qualifying review push has appeared; no fetch/counter-review is
+performed. All strategy/module/test bytes, frozen inputs/economics/dates,
+three consumed OFF attempts, zero ON attempts and19looks remain unchanged.
+The sole record may append the required authority/access/evidence receipts;
+this does not grant source edits or change the remote review target. No
+second publication, automatic monitor rearm or expanded gate waiver is
+inferred from this read-only exception. The earlier81-less published status/
+section8 routing describes the80.10 blocked handoff; this follow-up governs
+only the newly authorized diagnosis and its presently unobserved UI access.
+
+### 81.2 Fresh availability004 preflight scope
+
+Cooperative UI claim `TPR-EXT26-MIA-AVAILABILITY-20261012-004`, registered
+before computer-use effect:2026-10-12T05:08:00Z–05:38:00Z, exact physical/Git
+root and branch above, starting HEAD61a81d9a, own OFF37650980 only. At most
+six AX observations and two screenshots of the already-open bound native
+Safari project/Mia controls. Inspect current Mac controllability, exact
+project/authentication and task mode; no new navigation that initiates an
+IDE build, source editing, task message, login/credential extraction,
+unrelated project/account exploration, purchase/upgrade or cloud/API effect
+is permitted by this availability claim. Stop on lock, mismatched surface,
+unexpected write/compile effect or expiry. Prior availability003 and
+diagnosis001 are spent/closed and are not reused. Sourcebaseline001 remains
+immutable prior evidence, not a renewed current-source access claim.
+
+`TPR-EXT26-D072`: explicit owner confirmation authorizes read-only diagnosis
+before Claude's review lands. Chosen option: verify present access with a
+fresh bounded claim, then, only if controllable, preregister a fresh source
+baseline and an ID/time/budget-bearing diagnosis prompt before each effect.
+Alternative treating ambiguous `urd`, general `proceed`, or successful old
+sign-in as unrestricted authority is rejected. No code/test changes or
+new outcomes; independent acceptance remains pending. This scoped decision
+implements the owner's narrow answer, not approval of any proposed fix.
+
+No availability004 observation or diagnosis002 message has occurred as of
+this prospective entry. Subsequent observed results and exact prompt/access
+hashes will be appended without altering the historical80 evidence.
+
+**Availability004 actual preflight,05:09UTC:** the native Mac is controllable
+and Safari shows a connected QC owner session on the terminal/project-list
+page, not the earlier already-open OFF IDE. The exact OFF project name is
+visible in Recent Projects. No Mia task/mode, source edit, navigation, compile,
+backtest or API effect was performed. Account name and other-project contents
+are not retained in this public record. This closes004 at its observed scope,
+not an assumed usable Ask Mia state.
+
+### 81.3 Fresh exact-project navigation005 and source-read prerequisites
+
+Cooperative claim `TPR-EXT26-MIA-AVAILABILITY-20261012-005`,05:10:00Z–05:40:00Z:
+one navigation in the existing Safari tab to own37650980 only, at most six
+AX observations/two screenshots to locate and verify genuine built-in Mia.
+The ordinary IDE view previously auto-built its unchanged source on opening.
+That inherent background IDE syntax/build effect is explicitly anticipated
+and recorded under this fresh UI operation, not manually requested as a
+compile/backtest candidate or a new outcome look. No build/compile button,
+manual compiler request, backtest/job-create, code import/edit, source save,
+upload, credential/login change, purchase, upgrade or other-project action.
+Cancel any proposed import/source change; stop on unexpected manual-effect
+approval or new backtest ID. This is bounded ordinary project viewing for
+the owner's diagnosis request, not permission to repair/execute the strategy.
+Current source/compile/job binding and native accounting remain unproved.
+
+Once the exact authenticated own Mia pane is controllable, fresh two-read
+source operation `TPR-EXT26-MIA-SOURCE-BASELINE-20261012-002` will use the
+unchanged committed collector62c7c649… at HEAD61a81d9a and fresh actual
+time/access/request receipts before API effects. Its bounds remain exactly
+the80.8 collector's two requests/4MiB each/8MiBtotal,16files/1MiB each,
+120seconds aggregate/40seconds per request and private16MiB archive cap.
+No old receipt is renewed. All returned files must remain stable and the
+ten Python files must equal the frozen completion bundle before diagnosis;
+notebooks/extra files are retained but not interpreted. New task002 must
+include its ID/UTC expiry/stop-at-budget rule in its exact preregistered text.
+No task has been sent and no source API call has occurred in this follow-up.
+
+**Later explicit owner direction during this follow-up:** `skip the review this round`.
+This removes the independent-review checkpoint for the current diagnosis
+round; it is not a claim that Claude reviewed/accepted61a81d9a or that native
+QC/source/canonical gates passed. It does not lift the separately confirmed
+source-edit/backtest-launch restrictions, restore any Codex OFF slot, permit
+ON through the known failed path or add upload/trading authority. No Claude
+work/monitor is cancelled or messaged by inference. The existing heartbeat
+stays paused and no automatic rearm occurs. This later direction supersedes
+only the pending-review scheduling language above for this round.
+
+**Availability005 actual:** one click on the exact visible OFF project opened
+URL/project37650980 and its genuine Assistants/Mia pane. The connected owner
+and Read-only main.py editor were visible. As prospectively anticipated, the
+IDE itself displayed a successful background Cloud build for
+Lean2.5.0.0.18178, short token`a27ece-90ea59`, displayed terminal time5:11:26.
+This is an observed view-induced platform build, not "no compile occurred",
+not historical failed-job build binding and not a manually launched fourth
+candidate. No backtest action/ID/result was observed. The proposed import
+edit was explicitly Cancelled. Mia is presently in Full Auto Mode; no task
+is sent in that mode. Existing included resources/credits/storage capacity,
+vendor rights/PIT and native full-window accounting remain unproved.
+
+**Fresh source002 pre-effect plan:** created2026-10-12T05:12:15Z,
+expires06:12:00Z, exact operation/name/bounds above, HEAD61a81d9a and unchanged
+nine-member committed source/import closure from80.8. Owner answer8a798890…
+is bound alongside its exact contextual clarification05cd7c08… in81.1;
+the short answer alone is not a general grant. Exact canonical planSHA256
+`2db25c00d5373999c6e4ee675ce14e4e21987131c8763722bf10693a8b2271c6`.
+Prepare read only the public committed source, used no credential/private
+body/network, and created no API effect. Execution next creates exclusive
+durable global/access/request claims before credential/request effects and
+obeys the shared controller lock. No source changes or automatic retries.
+
+### 81.4 Actual baseline002 and fresh diagnosis002 pre-effect claim
+
+Sourcebaseline002 genuinely completed05:12:52.877503UTC:2HTTP200 reads,
+225681wirebytes each/451362total,11stable files; all ten Python files equal
+the immutable completion bundle, no missing/different/unexpected files.
+Notebook1029bytes/af272005… remains retained privately and unexamined.
+Projections225810bytes each/d716c760…; complete source archives224315bytes
+each, read1SHA256`aa178b6812939cba0cbe92375ec77d6bf514dbb7c93d90c5f9d85d84c92dd685`,
+read2`59acf5dc33a6e737cb7c299c911cfd57c84e02fffcb3e6e49af0d665bf9e2813`.
+The plan2db25c00…/operation is spent and all private claims/receipts are
+retained. No source/module/economics change, new launch/look, old scope
+renewal or vendor-input read occurred. Source stability is not compiled-job
+binding or provider/PIT/rights attestation; response lacked top-level
+returned project identity.
+
+Fresh cooperative UI/Mia operation
+`TPR-EXT26-MIA-DIAGNOSIS-20261012-002`,05:13:00Z–06:15:00Z, own37650980,
+sourceHEAD61a81d9a/sourceplan2db25c00…/archive59acf5dc… and exact owner
+clarification/yes provenance above. At most one task submission, twelve
+read-only own-project Python-source/exact OFF2/OFF3 failed-job tool calls
+and three official QC/LEAN source/document reads. Twelve permits source
+and exact two failed-job diagnostics without broad account exploration;
+stop at budget/expiry or any proposed write/execution. The limits are
+cooperative task controls, not a proved platform permission enforcement.
+Select and verify Ask Before Edits, refuse all code-edit/build/compile/
+backtest/execution approvals, and observe actual tool effects/response.
+No notebook/Object Store/vendor/private inputs/old captures/other projects,
+uploads/purchases/upgrade/credential changes, generic-agent substitution or
+source patches are authorized. The separately observed inherent IDE build
+in005 is not a permission for Mia to call a build/compile/launch tool.
+No real recovery job is reserved; OFF3/ON0/look19 remain unchanged.
+
+Exact prospective submitted text (UTF-8, no trailing newline):
+
+```text
+Operation TPR-EXT26-MIA-DIAGNOSIS-20261012-002. Valid only until 2026-10-12T06:15:00Z (UTC). Stop at that expiry or before exceeding twelve read-only own-project source/failed-job tool calls and three official QC/LEAN source reads. Do not renew the budget, retry an effect, or use any writing/execution tool.
+
+Diagnosis only for my existing Target-Price Revision OFF project 37650980 (TPR-CAP-TILT-EXT26-OFF-BASE-v1-private). Do not edit any source, build, compile, launch/relaunch a backtest, stop jobs, write Object Store, or access any other project. Ask Before Edits is required; this request authorizes no edits or executions. Use only included resources; do not purchase or upgrade.
+
+Read only the ten Python source files in this project and existing error/log evidence for these two failed OFF jobs: f79d3ff02644ec81f20da5cc6ca7440a (OFF2) and d7c76b7c4936c814f125a2b9a8cc2896 (OFF3). At most twelve read-only own-project source/failed-job tool calls and three official QuantConnect/LEAN documentation/source reads. Do not read research.ipynb, vendor data, Object Store input payloads, old captures, or unrelated project/account resources. Stop if diagnosis needs effects or broader access.
+
+All three Codex OFF launch slots have been consumed. The frozen exploratory study is 2021-01-04 through 2026-10-09, warmup 2020-09-01, 1449 valuation dates and 301 decisions. It selects stocks by market cap in SPY-proxy/XLV/XLE/QQQ-Nasdaq100/SOXX/REMX-US-covered-subset sleeves, top ten/fixed sixty slots; AR is entirely disabled. OFF has zero TPR tilt and never reads the TPR signal packet. Preserve dates, eligibility/selection, economics, clocks, fees, slippage, cash/volume constraints and corporate actions. No shortened window, missing-input zero fill, promotion, renormalization, or audit removal.
+
+The fresh two-read source baseline at local commit 61a81d9a6a93c1a548a903414f767178b9b1ac65 has all ten Python files exactly matching completion bundle daaf0c33fd837b9896c99d1759e67454a9f3027d478879c5e60015af1f099934. Source-plan hash 2db25c00d5373999c6e4ee675ce14e4e21987131c8763722bf10693a8b2271c6; second all-file archive 59acf5dc33a6e737cb7c299c911cfd57c84e02fffcb3e6e49af0d665bf9e2813. Compressed writer hash d661b5752c35b9dd04f783f5d78850f453d5f5f299874e5cf19700599df2356e. main.py is 59931 UTF-8 bytes. OFF2's tuple/list final aggregation boundary has a named completion adapter. OFF3 still ended Runtime Error in main1028 -> core587 -> CompressedAuditStore/native save_bytes with save_bytes/LocalObjectStore/bytes/not-supported markers. Python bytes being universally invalid is NOT proved.
+
+Native NAV stops at 2024-07-10 (852/1449 dates; 850 points do not meet the frozen 16:01 NY clock), with 3076 distinct orders but no final SUMMARY/EVIDENCE_INDEX. Final progress=1/configured end date/end-hook frames do not prove normal full-window completion. Current LEAN source permits an earlier synchronization/universe error to be masked by an end-hook export failure, but the old engine's actual causal path is unproved.
+
+Diagnose the export failure AND the premature frontier separately. Cite exact source lines/native evidence, distinguish proof from hypotheses, identify any earlier error still available, and propose the smallest complete patch without applying it. Preserve every audit row, gzip/hash/readback/index/sidecar/collision refusal and bound. Explain what evidence is still needed for genuine full-window accounting. Return a diagnosis and complete proposed change list only; no edit, build, compile, backtest or other execution.
+```
+
+The task is registered before mode selection/paste/send; actual prompt hash,
+mode/task/tool response and limits will be appended after observation.
+No diagnosis002 message has been sent as of this entry.
+
+Prompt002 is3554UTF-8bytes/SHA256
+`14b8015f9a14c36181c836ecfd427ce3e1d88a0f8db1a0941aad9cf0f5c5ad1b`.
+Its prospective05:13–06:15window is explicitly62minutes, not a one-hour
+bound; no earlier closed task's time allowance is renewed. An internal
+public-only advisory peer independently reproduced this exact hash/project/
+job/source/budget binding; this is not an independent-review checkpoint or
+native acceptance. Before paste/send, UI mode was selected and observed
+as Ask Before Edits, not Full Auto. No task was sent by these mode actions.
+
+**Diagnosis002 submitted, approximately05:15UTC:** the exact3554-character
+registered prompt was pasted into Mia's task box (not the source editor),
+then its send button was clicked once. The resulting UI disabled Configure,
+Mia, Ask Before Edits and Send while processing. The submitted mode was
+observed Ask Before Edits. No approval to edit/compile/launch was given.
+Receipt of a final response, actual read-tool census and cause acceptance
+remain pending; a busy interface alone is not diagnosis completion.
+
+By05:17UTC Mia acknowledged the read-only task, confirmed the open target
+project and read the exact OFF2/OFF3 failed-job records. It exposed OFF3's
+specific native path-not-supported message at the saved gzip object key,
+not merely a generic bytes marker. This is attributed current Mia/tool
+evidence pending independent cause verification, not a native fix. The
+response is still Running. No writing/execution approval was given.
+
+### 81.5 Root public-source cause verification scope
+
+Before independent causal claims, fresh outcome-free public-read scope
+`TPR-EXT26-MIA-PUBLIC-CAUSE-20261012-001`,05:20–06:00UTC, permits at most
+three official QuantConnect/LEAN public source/document reads, each bounded
+by the browser result, with no account/provider/private/project effect.
+First exact observed primary URL:
+https://raw.githubusercontent.com/QuantConnect/Lean/master/Engine/ObjectStore/LocalObjectStore.cs
+The purpose is to verify the native path-not-supported message/predicate,
+distinguishing current upstream compatibility from the old failed cloud
+build's unproved bytes. No source/test edit, compile, backtest, outcome look,
+gate closure or external review checkpoint follows from a public read.
+
+**Actual public verification:** the first guessed `Engine/ObjectStore` URL
+returned404. One scoped official-domain search located the generated LEAN
+class reference, and the third read retrieved the correct
+[current upstream LocalObjectStore source](https://raw.githubusercontent.com/QuantConnect/Lean/master/Engine/Storage/LocalObjectStore.cs).
+Exactly three root public reads were used; no account/private data or outcome
+was accessed. Per-request UTC start stamps were not retained; strict adherence
+to the prospective05:20 lower bound is not independently established (the
+last prior clock was05:17:56, successful final read by05:20:28). This timing
+limitation is retained, not retroactively repaired by changing the scope.
+
+The current C# `_pathRegex` at line105 permits an optional leading period,
+an ASCII body excluding periods, then at most one period before an
+alphanumeric suffix. `SaveBytes` checks this predicate before internal
+quota/storage processing, and throws the exact observed path-not-supported
+message; a second branch emits that message for more than100slashes.
+OFF3's concrete key ends `chunks00000.json.gz`, has seven slashes, and fails
+that predicate. Root's outcome-free in-memory Python equivalent for these
+ASCII strings independently rejects chunk/index/sidecar `.json.gz` names
+and accepts `.gz`, `.json` and `_json.gz` controls. This is not native CLR,
+old-engine binary identity, successful native save/readback or full-window
+evidence. An internal public-only peer agrees; no independent checkpoint is
+claimed. The native message, exact path and matching current primary-source
+predicate identify a strong, specific path-validation cause compatible with
+the failed export, not universal byte incompatibility or storage-capacity
+proof. An optional leading period is an exception to a blanket "one dot in
+any key" description; the actual bound path has no leading period.
+
+### 81.6 Completed Mia diagnosis and material factual qualifications
+
+At approximately05:27–05:29UTC the own-project Assistants pane visibly showed
+`Failed-off-job-trace-diagnosis - Completed`, disabled Stop, Ask Before Edits,
+and the final answer for operation002. This is completion of the diagnosis
+task, **not a completed backtest**. Exactly one prompt was sent; no edit,
+compile/backtest/stop-job approval or second message was given. The existing
+Read-only main.py editor and previously recorded auto-IDE build remained.
+An earlier AX observation timed out after120seconds; a subsequent screenshot
+read hit its15second deadline and reset the CUA session. Required native-app
+reacquisition succeeded; later screenshots/AX scrolling exposed the final
+answer. Those observation failures are not candidate attempts or result looks.
+No screenshot file artifact was persisted; the successful image was displayed
+inline by the native tool, not invented as a saved file.
+
+Mia's observed own-project call sequence is12: open-project inventory;
+OFF3/OFF2 backtest reads; four file searches (`path is not supported`,
+`save_bytes`, `self.quit`, `set_end_date`); three partial file reads
+(compressed store, main tail, core200–620); and two OFF3 log searches.
+Its final prose instead describes four file reads, an arithmetic inconsistency
+(its listed category counts sum13). Use the observed sequence, not that claim.
+Mia reports two official reads (docs search and correct raw LEAN source) plus
+**two additional general web-search listings**. These were not separately
+registered in the twelve-own/three-official prompt; disclose this cooperative
+scope deviation rather than silently exempting them or pretending the prompt
+enforced tool permissions. No follow-up expansion/renewal is made. The root's
+three public reads are separate from this attributed Mia census.
+
+Mia identifies the `.json.gz` physical name/path regex as the export defect
+and proposes a single-extension physical mapping for chunk, index and storage
+sidecar while leaving logical JSON names/economics unchanged. The current
+primary-source check above supports that bounded explanation. Its exact source
+coverage is limited/partly truncated, and it did not inspect seven Python
+modules at all; no complete strategy review was performed. It retrieved the
+same end-hook stack, the frozen end-date setter, and an OFF3 log-search result
+containing the old1272-minute-subscription/eight-universe warning and export
+error. The returned matching lines are not proof that no other server/worker/
+earlier exception exists. The warning is resource context, not a demonstrated
+cause of the early frontier or authority to change universe resolution.
+
+**Material claims not adopted:**
+
+- Mia recommends a patched rerun reusing `attempt-3` with a new jobID. This is
+  **rejected**: all three Codex slots stay consumed; different jobID/collision
+  space does not restore a launch allowance. Any later genuinely authorized
+  Mia recovery needs a new Mia operation/look identity and retained provenance,
+  not a fourth Codex attempt or reset/renamed candidate.
+- Mia says the only final error/end-hook frame proves no earlier in-run
+  exception or guard refusal occurred. **Not established**: section80's
+  current-engine synchronization/end-hook masking possibility remains; the
+  old build's actual causal path is unproved. No-log-match is not exclusion.
+- Mia converts the undetermined-timezone `2024-07-12 00:00:00` error stamp to
+ 20:00ET and also calls it the16:00close/one minute before16:01. That conversion
+  is internally inconsistent and **rejected**. Do not assert an exact session-
+  aligned clean stop from it. Native observed NAV still ends2024-07-10;
+  852/1449dates and850**wrong** frozen16:01NY clocks remain unchanged.
+- Mia says bytes are excluded because path validation preceded marshalling.
+  Path refusal does not prove universally valid Python bytes/native ABI;
+  managed-argument conversion must occur before that method executes. No
+  successful compressed native binary write/readback exists in this evidence.
+- Mia gives twelve slashes; independent exact count is **seven**. Its
+  blanket permanent-two-dot claim is confined to the actual non-leading-dot
+  audit keys/current predicate, not all possible keys/engine versions.
+- Mia describes the early frontier as unprovable from current artifacts.
+  Its **cause** remains open; the partial NAV frontier itself is already
+  observed. Missing final SUMMARY/index does not erase that negative evidence.
+
+`TPR-EXT26-D073`: diagnosis-only outcome. Adopt the verified path-compatible
+cause and complete **prospective** single-extension mapping requirements;
+do not apply source/tests or launch. Preserve gzip/raw bytes/hash domains,
+logical JSON index/chunk identities, job binding, bounds, full physical and
+logical collision refusals, readback and sidecar closure. All physical write/
+read/existence/sidecar name derivations must agree; replacing a suffix at one
+write site alone is insufficient. A named successor would preserve executed
+writer d661b575… rather than overwrite it. Alternative universal-bytes rewrite,
+audit removal, export bypass, silent recompression/economic changes and an
+attempt-reset rerun are rejected. This is agent factual judgment under the
+owner's narrow diagnosis grant, not human/Claude approval of a patch/recovery.
+F017 remains **open/unfixed**, now with a source-compatible identified path
+cause; F018 early/full-window census, wrong clock and missing final evidence
+remain open. F012 headroom/quota remains unproved. No accepted performance.
+
+### 81.7 Fresh post-Mia source capture preregistration
+
+Before any new API/private read, register
+`TPR-EXT26-MIA-SOURCE-POST-20261012-002`, created05:30:47Z/expiry06:10:47Z,
+HEAD61a81d9a and exact81.1 owner context/hash. Canonical plan2312bytes/SHA256
+`e2e2ac58028215662cd24e89c491d2232f639bb60708adaa0dcdf99e9ccef822`.
+The unchanged committed collector62c7c649…/nine-file import closure uses only
+two own37650980 `files/read` requests,4MiB each/8MiBtotal,16files/1MiB each,
+120seconds aggregate/40seconds per request; no retries/writes/provider inputs,
+job/results/Object Store access or renewed candidate/look allowance.
+The only referenced prior private bodies are this follow-up's exact baseline002
+result receipt and its second source archive. Baseline receipt5865bytes/SHA256
+`29fe6b46f90e62f7f4f9527f3e23f4b788747913991145dceb5077d38b4bf9be`
+was reconstructed from its returned public count/hash metadata using the
+committed canonical serializer; this is not an independent private-file hash.
+The committed collector must validate the actual baseline receipt/hash and
+224315byte archive59acf5dc… through bounded no-follow reads before comparison.
+Baseline private-read ceiling16842752bytes; new private archive/diff cap16MiB.
+Exclusive global/access/request claims and the shared controller lock precede
+credentials/requests. No D0/old capture/old baseline001 body is reopened.
+Prepare-plan used only committed public source and no credentials/private body
+or network effect. Actual post-source count/hash/every-change evidence follows.
+
+**Actual post002 terminal:** completed05:32:24.518240UTC; two HTTP200 requests,
+225681wirebytes each/451362total. The actual baseline result/archive matched
+their pinned sizes/hashes before230180bytes of bounded private processing.
+All eleven cloud files (ten Python modules plus uninterpreted notebook) are
+stable and byte-identical to baseline002; all ten Python modules still equal
+the exact completion bundle. **Every cloud edit: none**. No missing/different/
+unexpected file, candidate/source/economic mutation, new job/attempt/look or
+vendor-input access. This is current-source stability, not job-source identity,
+account/provider attestation or native recovery.
+
+| Post002 evidence | Bytes | SHA256 |
+|---|---:|---|
+| Both response projections |225810each|`d716c760d4026fcdc34d0dddad7a3c2bcff22c00fdf5aa1e8170e84450742064`|
+| All-file source archive read1 |224311|`0c21c74892e6d0b4f04465533a98c2ac7fe3a9e252f7224b1d13aa3668edb106`|
+| All-file source archive read2 |224311|`188faaef9cafe9c525f467a1ef64309b4988760be33dcc4598026dfc29cf1979`|
+| Complete private all-file diff |206|`d17f96fb791526ffa70a0f60ccc7226fdfa69b20dcdf625409c56af6077faaae`|
+
+Archive envelope sizes/hashes differ from baseline because of operation/read
+metadata, not changed file bytes. The source projection hash and complete
+per-file inventory agree. Original/private source projections, archive and
+diff, exclusive spent claims, plan/access/result receipts remain retained;
+no raw source/licensed row/credential is added to Git or logs. Post002 is spent
+and cannot be silently retried/renewed. Producer/controller process exited0
+before any dependent validation/handoff. No cloud edit is ported.
+
+### 81.8 Bounded diagnosis handoff and next authority
+
+`TPR-EXT26-D074`: preserve this finished diagnosis/negative evidence in the
+sole lane record and a local record-only commit; **no second push is inferred**
+from the narrow read-only answer or skipped checkpoint. The prior round's
+one successful publication61a81d9a remains the actual remote target. Alternatives
+silently replacing Claude's pending snapshot, resuming edits/launches or rearming
+the heartbeat are rejected. This is an agent-delegated durable-handoff choice,
+not independent review or a claim that a patch/recovery is approved.
+
+No incoming commits exist to counter-review in this follow-up. The owner's
+`skip the review this round` means checkpoint **waived**, not accepted/
+accepted-after-correction/rejected Claude commits fabricated from absent work.
+Section80's exact historical per-commit dispositions/findings remain unchanged.
+The diagnosis's credible export proposal has not closed native implementation
+acceptance. There is still no accepted matched2021-now ON/OFF return, CAGR,
+drawdown, volatility/Sharpe/risk-free/annual table, turnover/costs or independent
+per-sleeve P&L. Historical3076distinct orders and852/1449NAV dates are failed
+OFF3 evidence, not new valid observations;850clock breaches remain visible.
+ON remains unlaunched with0attempts; OFF remains3consumed; looks remain19.
+No new upload or remaining71input processing was performed. No signal, neutral
+arm, economics, dates, holdings identity, cost/slippage, decision/valuation clock,
+corporate-action or coverage rule changes occurred. CanonicalTR0-I/TPR-1/TPR-0B,
+host-Windows custody/14preregistration limitations and all other existing gates
+remain unchanged; this bounded development diagnosis does not invent a new
+canonical blocker or close one. Shared/sibling files and behavior stay frozen.
+
+Recommended next bounded action requires an explicit expansion of the current
+no-edit/no-launch grant: genuine built-in Mia repairs only the complete native-
+compatible physical audit-key mapping via a named successor, preserving every
+audit row/gzip/hash/readback/index/sidecar/collision refusal and frozen economics;
+then a separately reserved Mia recovery look (not a Codex slot refund). Before
+effect, freeze the exact source/config/baseline/operation/hash/time/resource
+receipts and source-custody/attempt mapping. Retrieve every resulting cloud file
+and independently compare/document every change before porting anything. The
+recovered final SUMMARY/index and usable native order/fill/cost/account census
+must prove1449valuationdates/301decision coverage, the frozen16:01NY clock and
+full final2026-10-09accounting. A path-only fix/Completed flag alone cannot resolve
+the July2024frontier. Preserve partial/null/negative evidence and pursue fresh
+bounded own-job/platform diagnostics if the early stop persists; no gap fill,
+date shortening, renormalization, economic retune or unrestricted support/
+external message is assumed. Current task ends with the verified diagnosis,
+not automatic implementation/recovery. The monitor stays paused.
+
+### 81.9 Root validation and local-only custody
+
+Root reproduced focused current-document/source-collector controls:
+**249passed/5.51s**. Final bounded union adds the Target import firewall,
+runtime-stop leak guard and exactly two active-document nodes (malformed SHA
+and published-account-identifier checks): **309passed,1skipped/5.94s**.
+Both use existing Python3.13/pytest, `PYTHONDONTWRITEBYTECODE=1`, `-q
+-p no:cacheprovider --tb=short`, and the isolated in-process49/52 runtime
+root before dispatch/config imports. No actual operator stop state/database,
+provider/QC effect, complete lane/repository suite, installed dependency or
+Windows signer/ACL/protected-parent custody proof. The native-Windows skip
+and14frozen-Windows-Git preregistration limitations remain. The document
+guards intentionally still pin section80's historical owner-unlock routing;
+their green result does not verify section81's new UI/task/time facts or
+turn the source/read-only exception into a launch grant. Root explicitly
+qualified that historical block in the current top note rather than change
+frozen tests to make acceptance claims.
+
+No synthetic mutation/production source change was required for this
+record-only diagnosis. The ASCII regex controls in81.5 are separately
+in-memory predicate evidence, not new backtests or native CLR writes. The
+executed source collector27079bytes/62c7c649… and its test21781bytes/4aff40f6…
+are byte-identical to61a81d9a and compile in memory without bytecode.
+All historical sections63through80 remain an exact688498byte prefix,
+SHA256`01e4495435a9ffc71fca1519c5a7ce77db79654d763be85f848c12e9cb1f009a`.
+Only the sole lane record differs; shared plans/handoff/workflows/siblings,
+executed originals and all bundles/inputs remain unchanged. `git diff --check`
+is clean. One ancillary search invocation used unmatched shell globs and
+stopped before its final file discovery; corrected `rg --files` discovery
+succeeded. This is a read-command failure, not a test or market result.
+
+Immediately before record staging/local commit, verify physical/Git root,
+branch, HEAD61a81d9a, exactly this owned record diff, staged content and actual
+matching remote61a81d9a. Stop on any concurrent advance/change. The resulting
+record-only commit hash will be reported in chat (it cannot be embedded in
+its own contents). No remote publication will occur in this diagnosis
+follow-up. A future push/source repair/Mia execution needs its governing
+authority and fresh bounded receipts; no automatic continuation is launched.

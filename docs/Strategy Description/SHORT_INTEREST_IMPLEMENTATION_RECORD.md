@@ -5,9 +5,9 @@ AFTER CHECKING SECTION 110 AND ITS EXACT PARENT `b799daa4`. NO NEW DEFECT
 AGAINST THAT COMMIT. THE OWNER EXPLICITLY AUTHORIZES CONTINUING WITH EXISTING
 SHARADAR, MASSIVE/BENZINGA AND QC ACCESS; SECTION 111 RECORDS THE PROSPECTIVE
 FULL-CAPTURED-POPULATION MASTER AND THE PRECISION TRANSPORT WORK. THE NEW
-MASTER'S TWELVE-REQUEST MAXIMUM, FULL HISTORY SELECTION AND PRIVATE RETENTION
-ARE FROZEN BEFORE ANY NEW RETRIEVAL. CAPTURE AND EXECUTION STATUS FOLLOW IN
-SECTION 111; NO COMPLETED BACKTEST IS CLAIMED BY THIS FREEZE. STRICT ORIGINAL-
+MASTER'S TWELVE REQUESTS ARE CONSUMED AND ITS PRIVATE OFFLINE RECOVERY IS
+COMPLETE. NATIVE-KEY/RATIONAL-OBSERVATION APPLICATION IS FROZEN BEFORE USE;
+ACTUAL STATUS FOLLOWS IN SECTION 111. NO COMPLETED BACKTEST IS CLAIMED. STRICT ORIGINAL-
 VINTAGE PIT REMAINS DISTINCT FROM LATEST-REVISED EXPLORATION. LOOKBACKS
 20/60/120/252 ARE UNSELECTED, CANONICAL ACTUAL LOOKS 0/0, EXPLORATORY ACTUAL
 LOOKS 0, ALPHA 0, QC ATTEMPTS 0. SOURCE P2s, SHARED `SI-CR5-005` /
@@ -16564,3 +16564,136 @@ offline reconstruction, requiring clean exact HEAD and unchanged actual remote
 `2a65d4a0`. The original capture refusal/budget remains immutable. Finalizer
 processing may inspect those licensed captures privately but makes **0** new
 provider requests and **0** credential reads; no outcome or QC action is included.
+
+### 111.7 Actual offline finalization and stored-byte verification
+
+Offline recovery ran only after clean committed checkpoint
+**`ab169b34f8763af7bd529ba98dbe151b5aa46e6c`**, with actual lane remote unchanged
+at `2a65d4a0`. It completed at **2026-10-12T06:27:48.340729Z**. The protected
+exclusive output is the original capture's `offline-parts-v1` child. Private
+index identity:
+**`e00a748e53e6e5800a7f54c3f9e2b442a3e35472ac03287f5d1ab0bb4e02ba54`**.
+Source capture/budget/refusal files remain untouched; no original report clock
+or unpersisted report bytes are retrospectively claimed.
+
+Main independently verified the stored canonical index seal/protocol and source/
+finalizer identities, exact output inventory, protected regular-file ownership/
+permissions, every ordered part's length/hash, aggregate full-byte digest and
+source-anchor/start/completion chronology. It also reloaded/revalidated all
+36 original pinned source files and the parent consumed-budget claim. The
+private report's provider rows, classifications, counts and data-fitness
+conclusions were not printed or added to Git. Recovery/verification made
+**0 new provider requests, 0 credential reads, 0 outcome looks, 0 QC attempts**.
+**SI-MASTER-005 is closed as a report-storage/software defect**; this is not
+source/empirical admission or a completed backtest. Further native identity/
+actual-input integration follows; no portfolio, performance or node availability
+result is invented from this successful source-only recovery.
+
+### 111.8 Prospective native-key/rational-observation application
+
+**SI-DEC-20261011-19** selects an immutable, batched native master index,
+protocol **`6400c7b682fabddcd0aab72ac436c12883189b89db12055e9ff6a019c0993a20`**.
+Its positive rule is restricted to **Sharadar's rewritten dataset keys**.
+The primary [FAQ](https://sharadar.com/docs/faqs) explains that Sharadar
+rewrites dataset history when tickers change and gives recycled old tickers
+numbered suffixes; native permatickers identify distinct securities/classes.
+Semantic evidence ID **SI-SOURCE-20261012-REWRITTEN-DATASET-KEY-01** pins that
+public fact and its URL. No public-document byte hash is invented. The
+[TICKERS reference](https://sharadar.com/docs/tickers) supports master fields,
+not independent historical raw-market aliases or availability intervals.
+
+The typed captured qualification is validated once on construction, with
+immutable source/cache identity seals; batched lookups do not reparse full
+archives for each security. Every master row/origin, including malformed,
+delisted, excluded and other-dataset rows, survives in the private inventory.
+Both ticker/native-ID collision axes include malformed identifiable peers;
+STOCKS/SEP and fundamentals/SF1 are explicit provider dataset groups. No
+survivor-only current-stock selection or fabricated FIGI. A fundamentals
+key requires a unique same-native STOCKS row, explicit primary/common class
+role and compatible source assertions. That binds only provider table
+membership, **not class shares, sharefactor, historical classification or a
+denominator**. Current metadata remains current. FINRA/Massive raw symbol/date
+joins must not call this as an alias authority.
+
+**SI-DEC-20261011-20** chooses a distinct v3 rational-observation binding under
+protocol **`583a288d7ccd00679cc3ce468525ab5e845ed62657d9b075a67c35acf0464394`**.
+It retains the exact already-qualified rational raw OHLC/volume tokens and
+all original tables, origins, refused and missing requested cells. No float,
+integer volume rounding, current sector backdating or issuer-share transfer.
+STOCKS/DAILY keys use the native STOCKS group; SF1 uses the stricter native
+fundamentals membership. Prior current-master contradictions and identifiable
+refused peers prevent positive observation binding. An older financial-file key
+requires exactly one prior native assertion agreeing with the later master;
+missing old metadata cannot acquire identity from a potentially recycled key.
+Actions remain unbound
+without guessed rename-field directions, payment clocks or terminal proceeds.
+This is not `LatestRevisedBundle` or a new actual-runner permit. The original
+ten-token observations remain a sentinel, not the full captured master or a
+full empirical population.
+
+The new protected offline runtime prospectively binds the exact original
+36-file master inventory/budget, canonical segmented index `e00a748e...`,
+its `ab169b34` completion and observed refusal reconstruction anchor. It
+checks ordered protected part hashes/lengths and aggregate full-byte digest
+one part at a time, then rebuilds the typed native master from the original
+archives and requires report/capture equality with the stored index. It
+rebuilds the named existing sixteen-request companion capture locally; no
+request, credential or consumed-budget restart. Native index/v3 observation
+files are separately bounded to 128 MiB, private/ignored/owned, and published
+only into a new exclusive source-derived output. Old source/refusal/completed
+directories remain immutable. Exact HEAD/remote guards precede creation and
+successful publication; start/completion chronology and closed counters bind
+the new receipt. Actual application occurs only after the clean local code/
+record freeze and is recorded below, not inferred from fabricated tests.
+
+| ID | Priority/status | Evidence and correction |
+|---|---|---|
+| SI-MASTER-009 | P2 confirmed, corrected before actual application | A same-shaped internal seal replacement kept four original references but forged its fifth digest. Resolution remained bound while its reported index hash differed from the payload. Independent fabricated standalone probe red; persistent owning-agent regression **1 failed in 0.33s** before correction. An independently retained exact initialization-seal identity anchor now rejects tuple replacement in O(1). Owning-agent **69 green in 0.48s**; independent standalone proof green. This is provenance, not an opened source/outcome gate. |
+| SI-MASTER-010 | P2 confirmed, corrected before actual application | Draft v3 could bind an older captured financial key using only a later current master when the prior metadata was missing, despite asynchronous rewiring/recycling. Main's persistent regression red (**1 failed, 29 deselected in 0.32s**); exactly one prior native assertion must now agree, with no identifiable refused peer. No generic owner flag can replace this source link. |
+| SI-MASTER-011 | P2 confirmed, corrected before actual application | Equality-spoofing string subclasses concealed changed source clock, capture identity, table and request digest from the fast source seal. Independent fabricated probe red; main's four persistent cases **4 failed, 69 deselected in 0.33s** before correction. Exact primitive string types are now checked before comparisons; source/cache seals and O(1) lookup remain. |
+
+Read-only index/runtime audit independently ran **106 focused cases in 0.81s**
+before the v3 runtime extension, with targeted compilation, no further defect.
+Nine material in-memory reverse probes red: malformed-peer retention, native
+axis uniqueness, SEP grouping, primary-class rule, same-native join, source
+seal, aggregate report bytes, canonical bool/int receipt types and ignored
+output requirement. Main's v3/index selection separately passes **98 in
+0.68s**. These are software checks, not source-fitness findings, acquisitions
+or strategy results. No full lane/repository suite is run; Claude owns it.
+
+Every admission flag remains false, with actual canonical looks **0/0**,
+exploratory actual looks **0**, allocated alpha **0**, QC attempts **0**.
+The source-specific historical raw-symbol/class join, exact class denominator,
+cashflow/terminal facts, prospective actual-look registration and qualified
+QC representation remain distinct tasks. The strict original-vintage study
+also still needs authentic originals/all corrections and availability clocks.
+No generic owner approval or institutional affiliation is required for this
+offline work; subscriptions and source facts are not conflated. Preserve the
+unchanged lookbacks, normalization, release-next-open rules and 48-book
+economics. No fixture admission bypass, actual outcome join or QC/node action
+is included in this prospective native application.
+
+Main's final pre-application selection passes **586 focused cases in 7.82s**:
+434 prior affected capture/master/precision/recovery/segment/boundary/document
+cases plus 73 native-index, 30 v3 observation and 49 offline-runtime cases.
+Empty inherited environment, network denied, CPython 3.13.15 / pytest 9.1.1,
+no skip/warning. Targeted compilation of all sixteen new/affected Python
+source/test files exits **0**, pycache outside the checkout; diff check clean.
+The four source-seal subclass reds and missing-prior red are restored green.
+No full lane/repository suite is run. A wrong focused boundary filename caused
+one no-collection invocation; corrected via file inventory before this valid
+execution, not a product failure. The read-only observation audit separately
+runs **99 in 0.70s** before the four new seal cases and proves three material
+in-memory reversions (3, 1 and 1 red); runtime extension audit separately
+runs **148 in 1.19s**, with eight valid reversions producing nine red cases.
+An initial copied-global mutation harness was excluded and corrected before
+its valid publication-guard red. None is actual provider/performance evidence.
+
+Commit this exact native application code/record locally, require clean HEAD
+and actual remote still `2a65d4a0`, then execute the bounded **offline-only**
+application. Source-provider credential reads/requests, actual outcome looks
+and QC attempts remain **0** for this application. The only new source artifact
+destination is the protected ignored `sharadar_native_binding` directory;
+original master, segmented recovery, old companion and consumed budgets stay
+unchanged. This local freeze is not an interim push. Actual completion/integrity
+and the remaining factual boundary follow below before the single final push.

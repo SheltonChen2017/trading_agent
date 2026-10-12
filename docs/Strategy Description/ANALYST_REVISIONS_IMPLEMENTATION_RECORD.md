@@ -485,8 +485,10 @@ Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE. Section 287 records the owner's explicit Massive-only
 accepted-risk continuation: do not wait for a different ratings vendor.
-Its new October 7–11 capture/receipt protocol is frozen prospectively;
-actual outcome remains pending. Formal source/identity gates are not waived.**
+Its sole October 7–11 capture failed with no accepted output; the specific
+reason was discarded by the redacted caller. No retry or receipt build ran.
+Section 287.5 adds future-use finite error labels, not a retrospective cause
+or new capture authority. Formal source/identity gates are not waived.**
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1472,11 +1474,15 @@ R284, spent security assessments or publication probes.
 The owner explicitly waives Claude review of section 287's current
 Massive-only October 7–11 accepted-risk acquisition and offline receipt,
 continuing the direct "proceed without review" instruction.
-Commit its exact D1/D2 freeze before invocation, retain all false formal
-flags, and proceed without another ratings-vendor acknowledgment. The
-current forward portfolio still lacks a current-date input extension and
-authenticated holdings/caps/security/score bindings; this capture is not a
-performance run. No monitor rearm or spent-attempt reuse follows.
+The exact D1/D2 freeze was committed at `db306644`; D1 then failed and is
+spent, while the conditional D2 build/read remain uninvoked. Do not retry or
+rename the unchanged request. Section 287.5 retains a future-use redacted
+failure classifier; root-cause-directed recovery needs a separately justified
+and frozen diagnostic contract before any new contact, not another vendor-
+choice acknowledgment. The current forward portfolio still lacks a current-
+date input extension and authenticated holdings/caps/security/score bindings;
+this capture is not a performance run. All formal flags remain false and the
+monitor remains paused.
 The owner previously said
 "proceed" after the open-session concern was explained. Section 272 supersedes
 the session-exit prerequisite, without authorizing any process interruption.
@@ -3374,6 +3380,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-12 | Codex section-283 counter-review, actual v4/probe success and guarded-publication candidate | `6e9c5562` -> `107743d8`, `b40cedc6`, this final section-284 record commit (three continuous Codex commits) | Sole Claude commit accepted after two prospective P3 corrections and documentary qualifications; exact one-shot v4 report and original synthetic publication probe/output authenticate successfully | Historical refusals remain spent; new publisher validates sources before payloads and retains original output descriptors; candidate UNREVIEWED/UNINVOKED; no production/QC action | 1,094 distinct focused strict-denied passes in 6.26 s; prior/repeated subsets and expected red omissions separately qualified; no full Codex suite; actual pins/times in 284.5/284.9 | ARV2E280-001 resolved prospectively for exact scope; ARV2E263-001 and independent formal gates remain; 313/239/49/699 unchanged | Exactly one final matching-lane push; Claude reviews every section-284 commit before any new publisher/run freeze; active quiet monitor advances to final Codex head, disposed Claude head6e9c5562 |
 | 2026-10-12 | Owner-waived publication review, authenticated C package and completed one-shot R284 | `3c8d23b0` -> `417aff5f`, `99333564`, `046bc64f`, `4fd6ae36`, this final section-285 result handoff | Human skips current publication review; no new Claude commit or independent acceptance | Sole unchanged guarded publisher/authentication, offline preparation/readback and frozen R284 A1 pass; seven public-identity matches, zero refusals; no retry | 404 distinct focused strict-denied passes; repeated record checks and one corrected documentary failure disclosed; no full suite; exact operational pins/times in 285.4–285.9 | Publication blocker resolved prospectively; formal/source/identity gates remain; actual attempt books 314/239/50/699 once | Exactly one matching-lane final push after this concluded round; source-evidence barrier in 285.10; monitor remains paused |
 | 2026-10-12 | Owner-waived fresh prior-close source-quality capture | `ba565501` -> `5f6992ba`, this final section-286 result handoff | No new Claude review; current software-review checkpoint waived, formal evidence gates preserved | One unchanged two-GET October-9 RAW-price capture and one bounded output-only read succeed before prospective October-12 cutoff; seven rows retained privately | 222 distinct strict-denied focused passes; one expected timing-regression failure corrected before use; repeat document checks not additive; no full suite | Timely local-receipt evidence only; immutable history, reviewed identities, scores and stock-first evidence still missing; 314/239/50/699 unchanged | Exactly one matching-lane final push; no capture retry, R284 replay, paid-rights change or formal admission; monitor stays paused |
+| 2026-10-12 | Massive-only accepted-risk continuation and failed fresh-window acquisition | `1d85c47b` -> `db306644`, this final section-287 diagnostic/result handoff | No new Claude review; current checkpoint waived, not independently passed | Sole October 7–11 capture exits 2 without accepted output; original cause discarded; conditional receipt build/read uninvoked; additive future-use static error labels, no retry | Focused strict-denied checks in 287.5–287.6; no full suite or strategy run | Actual contact stage unknown; no timestamp-matching artifact names observed; no retrospective cause or false source admission; 314/239/50/699 unchanged | Exactly one matching-lane final push; separately justified recovery protocol before new contact, no unchanged-request renaming; Massive remains selected and monitor paused |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -44528,15 +44535,17 @@ old packages, self-admit formal trust roots or treat R284's seven public
 identity matches as a constituent master. The ratings receipt alone cannot
 supply those bindings or a sufficient score lookback.
 
-This acquisition performs real provider access but no QC, outcomes,
+This acquisition authorizes real provider access but no QC, outcomes,
 score/return/selection calculation, mapping export or order operation.
 The booked floor remains **314 shared / 239 development / 50 infrastructure /
 699 cells**. Preserve all prior evidence and exhausted R247/R281 attempts,
 the frozen six-ETF/QCOM and AR-off/100%/200% rules, and false formal/readiness
 flags. No paid rights, vendor message, broker/funded action, paper/live
-deployment or real order is authorized. Only the lane record changes in
-this acquisition round; actual outcome, validation and final disposition
-will precede its one matching-lane final push. No intermediate push.
+deployment or real order is authorized. At the prospective freeze only the
+lane record changes. The actual failure below additionally motivates a pure
+future-use classifier and synthetic tests, without changing the frozen
+capture adapter. Actual outcome, validation and final disposition precede
+the one matching-lane final push. No intermediate push.
 
 Pre-use focused source-quality/CLI/document selection initially returned
 **109 passed / 2 failed in 1.68 s**: both failures were the lane record's
@@ -44554,3 +44563,121 @@ The final pre-use selection passes **111 tests in 2.42 s**, with no
 failures/skips/warnings: 25 source-quality/CLI and 86 record/active-document
 checks. Earlier passes overlap this set and are not additive. The process
 asserted `assistant.dispatch_fence` was absent; no full suite ran.
+
+### 287.4 Actual sole invocation: unsuccessful, no accepted output
+
+At clean freeze **`db306644e048c5e8a9534e916b72e93f4be8f8e4`**, after
+rechecking the exact root/branch/status and all five selected pins, the one
+D1 invocation ran from **2026-10-12T07:34:09.104823Z** through
+**2026-10-12T07:34:11.659659Z**. The external caller observed **exit 2** and
+nonempty stderr, not a timeout. No successful `SpooledMassiveCapture` return
+was accepted and no manifest pin, counts, receipt or usable source snapshot
+was obtained. The conditional D2 receipt build and once-only reader were
+**not invoked**. There was no retry, fallback, omitted-role capture, old
+artifact authentication or QC action.
+
+**ARV2D287-001 (P2, verified diagnostic loss):** the frozen inline caller
+caught `BaseException` and emitted only a fixed generic redacted refusal.
+Consequently the original exception and any sanitized adapter category that
+may have been present were discarded. The cause and contact stage are **unknown**.
+Do not infer invalid credentials, an HTTP denial, a transport/schema error,
+a publication fault, or zero provider contact from this exit. The failure is
+recorded, not called a cancelled or successful acquisition. This loss cannot
+be corrected retrospectively by tests or another request.
+
+A subsequent bounded read-only check under strict network denial established
+only that `MASSIVE_API_KEY` is present and satisfies the unchanged loader's
+syntactic shape (strip-identical printable ASCII, length 8–4096). No secret
+was printed or retained in this record. Shape does not authenticate the
+credential, prove current entitlement, or show whether the failed call used
+it. A names-only scan of the existing capture parent, capped at 10,000 names,
+found no normal or incomplete capture name timestamped within the exact
+external invocation interval. No private artifact contents were read. This
+bounded absence is not proof that no request, source bytes or staging ever
+existed: the adapter can clean its own unpublished staging on failure, and
+the check is limited to the frozen timestamp/name predicate. No manual
+cleanup, marker repair, old-artifact inspection or outside-root probe ran.
+
+R287-D1 is now spent. Preserve the failed event and the conditional/uninvoked
+status of D2. No look/cell increment follows: the floor remains
+**314 shared / 239 development / 50 infrastructure / 699 cells**. The number
+of provider requests made within the failed invocation was not observed and
+must not be reported as zero or as any invented exact count.
+
+### 287.5 Additive future-use diagnostic correction, no provider use
+
+Add `scripts/arv2_massive_capture_failure.py` and its focused synthetic tests;
+the original adapter and all five frozen selected sources remain unchanged.
+The import-free, I/O-free helper `classify_capture_failure` maps finite exact
+recognized adapter messages to seven static codes: `credential`,
+`unsafe_configuration`, `network_request`, `http_status`, `response_schema`,
+`persistence_publication`, or `unknown`. It never renders the exception,
+arguments, raw type name, URL, row, traceback, cause or context. Unrecognized
+class metadata/messages and nonexact argument types/shapes return `unknown`.
+The production module/name recognition is not class authentication; matching
+metadata can be spoofed. The code is a diagnostic label, not a source,
+security, entitlement or contact-accounting assertion. In particular,
+`network_request` labels the adapter's request/session boundary (including
+preparation, iteration and close), not a proven network failure.
+
+This prospectively preserves a useful redacted category **when a future
+caller actually invokes the helper**. It is not integrated into the frozen
+adapter or the spent inline invocation, cannot recover R287's original
+reason and grants no retry/contact authority. ARV2D287-001's lost historical
+reason remains unrecoverable; the additive classifier addresses the narrow
+future representation defect, not the unknown operational cause.
+
+| New selected file | SHA-256 |
+|---|---|
+| `scripts/arv2_massive_capture_failure.py` | `1276eacee3915835f8e0ef7d85373c599375e932e5ecfac9332b3bf3c053d2ce` |
+| `tests/analyst_revisions_v2/test_massive_capture_failure.py` | `f037d23aa9b895b2b11cfa1296048306458baa109bc64035d030050cb3929eab` |
+
+The author's final focused selection gave **42 passed in 1.04 s**, under
+strict network denial with fresh in-root temp/cache paths, `--noconftest`,
+disabled plugin autoload, `-B`, no cache provider, and dispatch-fence absence
+asserted. The earlier 40-pass selection is overlapping and not additive.
+Tests cover all allowlisted labels, unknown/secret-shaped messages, hostile
+rendering, string subclasses, malformed class metadata and causes/context.
+Same-round implementation/advice is not independent final review.
+Root accepted one P3 wording correction from that advice: ordinary subclass
+metadata is unknown, but a subclass with deliberately matching module/name
+can be classified, as the hostile-rendering test demonstrates. The final
+docstring now says unrecognized class metadata, not all subclasses. This
+changes no runtime behavior and is included in the final source pin above.
+
+Root's combined final selection gave **153 distinct passes in 2.34 s**:
+42 classifier, 25 source-quality/CLI and 86 record/active-document checks,
+with no failures/skips/warnings. It used the same strict network denial,
+isolated support paths and dispatch-fence absence assertion; prior author
+and pre-use subsets overlap and are not additive. All five original selected
+source pins still match the pre-use freeze, and `git diff --check` passes.
+Both new files also pass static compilation without bytecode writes. The
+final record-only check gave **86 passed in 0.84 s**, overlapping and not
+additive. A matching-branch-only fetch still returns the round baseline
+`1d85c47b0e49af1a167fde87813ce84211de348a`; no new remote review is present.
+
+### 287.6 Final disposition and next admissible step
+
+Massive remains the selected accepted-risk research source. Do not reopen
+the answered vendor-choice question or represent the immutable-history gap
+as fixed. The new concrete barrier is an unsuccessful acquisition with an
+unretained failure category, not a demand for another ratings vendor.
+No further source contact is authorized by this diagnostic utility alone.
+Recovery must first specify a separately justified prospective diagnostic
+contract that retains finite failure evidence, its exact source/protocol
+pins and bounds, and why the action is not an unchanged retry or renamed
+spent request. All existing financial/source/security exclusions remain.
+The October input extension and authenticated holdings/caps/security/score
+bindings still precede any current portfolio or strategy-performance run.
+
+Continuous round starts at `1d85c47b0e49af1a167fde87813ce84211de348a`:
+
+| Codex commit | Purpose / bounded disposition |
+|---|---|
+| `db306644e048c5e8a9534e916b72e93f4be8f8e4` | Owner's Massive-only accepted-risk choice and exact D1/D2 protocol frozen before contact; sole D1 then failed, D2 stayed uninvoked, and the generic-error limitation is retained above. |
+| This final diagnostic/result/handoff commit | Two additive future-use diagnostic files, actual failure and bounded observations, qualifications and remaining scope; no operational cause claimed, no retry or new source authority. |
+
+Exactly one matching-lane final push follows the final focused checks.
+No intermediate push, complete Codex suite, source admission, strategy run,
+Mia session, broker/paper/live action or other-lane change occurs. The monitor
+remains **PAUSED**; no recurring acquisition or automatic later retry is set.

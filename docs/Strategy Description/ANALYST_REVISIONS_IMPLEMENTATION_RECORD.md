@@ -483,7 +483,10 @@ and separate output receipt check both passed before October 12's prospective
 the earlier late-capture evidence, but does not establish full PIT admission.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
-PRODUCTION-EXECUTABLE.**
+PRODUCTION-EXECUTABLE. Section 287 records the owner's explicit Massive-only
+accepted-risk continuation: do not wait for a different ratings vendor.
+Its new October 7–11 capture/receipt protocol is frozen prospectively;
+actual outcome remains pending. Formal source/identity gates are not waived.**
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1466,6 +1469,14 @@ capture and separate output read both passed and are now spent (286.5).
 Proceed only with the actual external source/identity evidence or separately
 scoped acquisition described in 286.6; do not replay this or older captures,
 R284, spent security assessments or publication probes.
+The owner explicitly waives Claude review of section 287's current
+Massive-only October 7–11 accepted-risk acquisition and offline receipt,
+continuing the direct "proceed without review" instruction.
+Commit its exact D1/D2 freeze before invocation, retain all false formal
+flags, and proceed without another ratings-vendor acknowledgment. The
+current forward portfolio still lacks a current-date input extension and
+authenticated holdings/caps/security/score bindings; this capture is not a
+performance run. No monitor rearm or spent-attempt reuse follows.
 The owner previously said
 "proceed" after the open-session concern was explained. Section 272 supersedes
 the session-exit prerequisite, without authorizing any process interruption.
@@ -44407,3 +44418,139 @@ runs. The expected red
 clock regression and pre-use correction remain disclosed in 286.3.
 The monitor stays **PAUSED**. Do not rearm it or start/message Claude or
 another chat without new human direction.
+
+## 287. Massive-only accepted-risk continuation and new closed-window acquisition, 2026-10-12
+
+### 287.1 Actual owner choice and bounded interpretation
+
+The owner answers **"Mssive."**, then, after the historical-versus-forward
+comparison and explanation of missing versions/deletions, directs
+**"i see. no worries, lets just use massive for now, proceed"**.
+`ARV2OD287-D1`: use the existing Massive entitlement for explicitly
+accepted-risk, non-pristine research. Do not keep waiting for a different
+ratings vendor or repeat the already answered access question. This resolves
+source choice and acceptance of the known mutable-history limitation for
+this research path; it does not fabricate missing historical versions,
+independent identity evidence, formal PIT admission, or paper/live authority.
+The current Claude checkpoint remains waived, not independently passed.
+The monitor stays **PAUSED** and no new recurring acquisition is scheduled.
+
+Start at clean local/matching remote
+`1d85c47b0e49af1a167fde87813ce84211de348a`, in the designated relocated root
+and `codex/strategy-analyst-revisions-v2`. Matching-only fetch confirms the
+same remote. There is no new Claude range; the last disposed Claude head
+remains `6e9c5562e39244b02f63b5ea084c8ced9018d924`.
+
+The immediate useful acquisition is the previously uncaptured closed
+event-date window **2026-10-07 through 2026-10-11 inclusive**, after 258's
+October 5–6 window. Include the intervening weekend rather than assume that
+vendor event dates cannot fall there. This is a first local version baseline,
+not a claim of complete historical coverage, original publication, an
+October-12 full-day capture, sufficient scoring lookback, or strategy returns.
+Do not immediately recapture it or compare different event windows as if they
+were matched vintages. No spent assessment, price receipt, QC attempt or
+result reader is reopened.
+
+### 287.2 Prospective acquisition and offline-authentication freeze
+
+Commit this decision before source contact. Freeze one call to unchanged
+`scripts.capture_arv2_massive.capture_massive_history` with
+`requested_first_event_date="2026-10-07"`,
+`requested_last_event_date="2026-10-11"`, `page_limit=1000`,
+`build_input_pair=False` and the existing exact private root
+`artifacts/analyst_revisions_v2/massive_capture`. Use Python 3.13's existing
+lane environment with `-B`, in-root temporary/cache paths and a **150-second
+whole-process deadline**. Return only its in-memory `SpooledMassiveCapture`
+path, manifest/capture identities, start/end timestamps, transport and
+page/role/row counts. In particular obtain the manifest pin from the actual
+successful producer return, not an unauthenticated later marker read.
+Print only a fixed redacted refusal on an exception; never raw rows,
+credential values or exception details. A nonzero, timeout or ambiguous
+invocation has no retry, fallback or implied successful output.
+
+All three existing endpoints are required: HTTPS `api.massive.com`
+`/benzinga/v1/ratings`, `/benzinga/v1/earnings`, `/benzinga/v1/guidance`.
+First-page queries are `date.gte=2026-10-07`, `date.lte=2026-10-11`,
+`limit=1000`, `sort=date.asc`; later cursors must retain the existing exact
+endpoint/query validation. Use only the existing `MASSIVE_API_KEY` loader,
+owned default-TLS header-only transport, no redirect/retry, terminal pages,
+credential-echo refusal and private atomic page spooling. Existing ceilings
+remain 512 pages, 8 GiB stored payload, 72 MiB response/page and 60 seconds
+per request; the whole-process deadline is an additional bound, not a new
+page or complete-history promise. No source/helper/transport policy is
+patched. The adapter's existing failure path may clean only its own
+unpublished staging files and roll back its own failed publication; this
+is not authority for manual cleanup, inspection or repair of old artifacts.
+Ambiguous leftovers are retained, never reused.
+
+`ARV2OD287-D2`: only after actual successful capture, run the existing
+`scripts.run_arv2_forward_data_quality build` once with the returned exact
+path/manifest SHA and the same first/last event dates. Use its existing
+private `forward_data_quality` output root, strict remote-network denial
+and a 60-second whole-process deadline. It authenticates source pages and
+their manifest under the existing bridge before publishing one private
+content-addressed receipt. Then, once only under the same denial with a
+30-second deadline, call that module's `_read_pinned_receipt` on the returned
+receipt path/hash and `_require_receipt` on those authenticated bytes.
+Require exact capture ID/SHA/manifest/transport/timestamps/window/row count
+against the actual D1 producer return, and exact deduplicated role counts
+against D2's output. Verify the fixed false PIT/paper flags and zero
+outcome/QC counts. Emit only hashes, lengths, counts, timestamps and false
+flags, not per-event identities/versions or values. No comparison,
+republication, second read, repair or retry follows a refusal. These readers
+provide their existing POSIX no-follow/hash/endpoint checks, not a new native
+ACL/xattr contract, signed vendor timestamp, continuous security guarantee,
+or formal identity evidence.
+
+| Frozen selected source | SHA-256 |
+|---|---|
+| `scripts/capture_arv2_massive.py` | `e67cabf821a3df804d157c790b6df1c7cd1a13a7c50d717a48b55b3d32e5e906` |
+| `scripts/run_arv2_forward_data_quality.py` | `b82475a9ddbad73b4d38c7469f881f50b23bc0bbf7f57cfbd59dbcc927372557` |
+| `research/analyst_revisions_v2/forward_data_quality.py` | `2391ab4d465fead135c9836231294c0de5fce0eae959c15fc67827d82191f557` |
+| `research/analyst_revisions_v2/accepted_risk_input_pair.py` | `4aa82377661420e4ee017b3cdefd54f038af75eca2b3cf086f57d11a6c55a037` |
+| `research/analyst_revisions_v2/canonical.py` | `c1d1d1aab633b16868fccc371de7c4cf4f3a692943e04a8d785109110e17ae6e` |
+
+The selected-file pins are not whole-interpreter integrity. Recheck them
+and exact root/branch/HEAD/clean status before capture. All tests and private
+receipt parsing use strict network denial, `--noconftest`, disabled plugin
+autoload, `-B`, no cache provider and in-root temp/log/cache paths; do not
+import the shared dispatch-fence runtime. No full Codex suite is authorized.
+
+### 287.3 Scope beyond the new receipt
+
+Source selection is no longer an unanswered owner question. However, the
+current forward policy is declarative, not an executable portfolio runner;
+the previous accepted-risk latest-order input builder is fixed to September
+17–25, not a generic October input path. Any subsequent real input extension
+must be separately versioned and must actually bind captured ratings to
+current holdings/caps, exact security identities and scores. Do not relabel
+old packages, self-admit formal trust roots or treat R284's seven public
+identity matches as a constituent master. The ratings receipt alone cannot
+supply those bindings or a sufficient score lookback.
+
+This acquisition performs real provider access but no QC, outcomes,
+score/return/selection calculation, mapping export or order operation.
+The booked floor remains **314 shared / 239 development / 50 infrastructure /
+699 cells**. Preserve all prior evidence and exhausted R247/R281 attempts,
+the frozen six-ETF/QCOM and AR-off/100%/200% rules, and false formal/readiness
+flags. No paid rights, vendor message, broker/funded action, paper/live
+deployment or real order is authorized. Only the lane record changes in
+this acquisition round; actual outcome, validation and final disposition
+will precede its one matching-lane final push. No intermediate push.
+
+Pre-use focused source-quality/CLI/document selection initially returned
+**109 passed / 2 failed in 1.68 s**: both failures were the lane record's
+missing latest-section and owner-waiver navigation, not capture behavior.
+The live banner and exact-next-step now name section 287 prospectively;
+no test or production code was weakened. The initial traceback displayed
+an old compiled filename; all commands ran in the designated relocated root.
+The next validation additionally uses an in-root `PYTHONPYCACHEPREFIX` with
+`-B` so prior cache locations are not selected. Successful rerun results are
+recorded before the freeze commit; no real source invocation has occurred.
+The first navigation correction gave **110 passed / 1 failed in 2.45 s**:
+the unchanged waiver test requires the explicit owner/Claude/action wording,
+not a noun phrase. That wording is now corrected without a test change.
+The final pre-use selection passes **111 tests in 2.42 s**, with no
+failures/skips/warnings: 25 source-quality/CLI and 86 record/active-document
+checks. Earlier passes overlap this set and are not additive. The process
+asserted `assistant.dispatch_fence` was absent; no full suite ran.

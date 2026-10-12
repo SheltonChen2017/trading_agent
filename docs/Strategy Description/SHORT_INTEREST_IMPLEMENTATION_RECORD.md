@@ -1,24 +1,20 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE HAS REVIEWED ALL THREE CODEX COMMITS IN `0cdd2c6..b799daa`
-(SECTION 110) AND ACCEPTS THEM. BOTH CODEX FINDINGS AGAINST CLAUDE'S SECTION
-108 ARE CONFIRMED: ITS MUTATION TOTAL SHOULD HAVE READ FOUR OF FIVE RED, NOT
-EIGHT OF NINE, AND ONE CROSS-REFERENCE POINTED TO 108.6 INSTEAD OF 108.7. THE
-SINGLE 62-REQUEST MASSIVE ACTION SUPPLEMENT WAS FROZEN BEFORE RETRIEVAL, MADE
-EXACTLY 62 REQUESTS, AND REBUILDS BYTE FOR BYTE WITH BOTH PRIVATE V2 BINDING
-INVENTORIES; NO PROVIDER ROW, KEY OR PRIVATE DATA-USABILITY CONCLUSION IS IN
-GIT. ALL FIVE IN-MEMORY MUTATION PROBES WENT RED. NO NEW FINDING AGAINST CODEX.
-NETWORK-DENIED ON `b799daa`, THE NEW AND PACKAGE-SCANNING LANE FILES WITH
-DOCUMENT AND BOUNDARY CHECKS PASS 654. THE NEXT GATE IS THE
-FULL-POPULATION HISTORICAL IDENTITY, SAME-CLASS DENOMINATOR AND CASHFLOW
-CONTRACT, THEN LOOK REGISTRATION (`SI-CR19-003`); THE CANONICAL PIT STUDY
-REMAINS BLOCKED ON ORIGINALS, CORRECTIONS AND AVAILABILITY CLOCKS. THE THREE
-SOURCE P2s, THE SHARED P2 `SI-CR5-005` / `SI-CCR16-007` AND `SI-CR15-001` REMAIN
-OPEN. LOOKBACKS 20/60/120/252 REMAIN UNSELECTED; REAL LOOKS 0/0, ALPHA 0,
-PERMANENT LOOKS NONE, QC ATTEMPTS 0. OUTCOMES, HOLDOUT, PRODUCTION
-RANKING/SEEDS, ETF, QC HISTORY/PROJECT/UPLOAD/COMPILE/JOB/BACKTEST, PURCHASE,
-BROKER, OPERATOR DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL, ORDERS AND TRADING
-REMAIN GATED.**
+Status: **CODEX ACCEPTS CLAUDE'S SOLE COMPLETED REVIEW COMMIT `2a65d4a0`
+AFTER CHECKING SECTION 110 AND ITS EXACT PARENT `b799daa4`. NO NEW DEFECT
+AGAINST THAT COMMIT. THE OWNER EXPLICITLY AUTHORIZES CONTINUING WITH EXISTING
+SHARADAR, MASSIVE/BENZINGA AND QC ACCESS; SECTION 111 RECORDS THE PROSPECTIVE
+FULL-CAPTURED-POPULATION MASTER AND THE PRECISION TRANSPORT WORK. THE NEW
+MASTER'S TWELVE-REQUEST MAXIMUM, FULL HISTORY SELECTION AND PRIVATE RETENTION
+ARE FROZEN BEFORE ANY NEW RETRIEVAL. CAPTURE AND EXECUTION STATUS FOLLOW IN
+SECTION 111; NO COMPLETED BACKTEST IS CLAIMED BY THIS FREEZE. STRICT ORIGINAL-
+VINTAGE PIT REMAINS DISTINCT FROM LATEST-REVISED EXPLORATION. LOOKBACKS
+20/60/120/252 ARE UNSELECTED, CANONICAL ACTUAL LOOKS 0/0, EXPLORATORY ACTUAL
+LOOKS 0, ALPHA 0, QC ATTEMPTS 0. SOURCE P2s, SHARED `SI-CR5-005` /
+`SI-CCR16-007` AND PROSPECTIVE ADVISORIES ARE RETAINED. SHARED DOCUMENTS,
+SESSION HANDOFF, HOLDOUT, PRODUCTION RANKINGS/SEEDS, ETF, BROKER, OPERATOR
+DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL AND REAL ORDERS/TRADING ARE NOT
+AUTHORIZED BY THIS RESEARCH ROUND.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -16294,3 +16290,203 @@ inherited environment:
    production ranking and seeds, ETF work, any QuantConnect history/project/
    upload/compile/job/backtest, purchases, broker, operator database,
    deployment, paper/live, capital, orders and trading.
+
+## 111. Codex counter-review and full-source/QC integration — 2026-10-12
+
+### 111.1 Completed serialized counter-review
+
+This round starts with local, tracking and actual matching remote
+**`2a65d4a0defc73cad085642e61492e220f576d81`** in the designated absolute
+Short Interest worktree on `codex/strategy-short-interest`. The complete
+ordered new range is **`b799daa40084a5f9a5698ef0ac9270446edcbe1d..2a65d4a0defc73cad085642e61492e220f576d81`**:
+one linear, documentation-only Claude commit, no merge or omitted test-only
+commit. Section 110 proves completed independent review of the exact pushed
+checkpoint, not an inference from author or push activity. Fetch was limited
+to the matching ref with `--no-tags` and no force refspec. Local HEAD was
+already at the clean remote checkpoint; no fast-forward is claimed.
+
+| Commit | Disposition | Independent evidence |
+|---|---|---|
+| `2a65d4a0defc73cad085642e61492e220f576d81` | Accepted | Complete record diff and section 110 checked against its parent, the preceding implementation record and focused code. The two historical record errata, five probe dispositions, private-evidence scope and zero-outcome status are consistent. No code change or new finding. |
+
+Main Codex ran **323 focused checks in 7.89s**, empty inherited environment,
+network denied, CPython 3.13.15 / pytest 9.1.1: the three affected prior files,
+four actual-input refusal checks and document/import boundaries. The delegated
+read-only counter-review separately ran **82 in 0.95s** and the corresponding
+unmutated **25 in 0.41s**; its five in-memory guard removals produced respectively
+1, 4/9, 1/10, 4 and 1 red cases. Different selections need not match Claude's
+counts. An initial probe-harness missing future-annotations declaration was
+corrected before the valid probe, not a product defect. Claude's **654** checks
+are Claude's execution, not Codex's. No full lane/repository suite was run.
+
+### 111.2 Later authority and prospective full-master freeze
+
+**SI-AUTH-20261011-05** records the owner's later explicit instruction:
+"authorized. sharadar, qc, massive-benzinga all available on this machine. plz
+proceed", together with the standing continuous-build/backtest request and
+delegation. Existing machine access is owner-reported; successful runtime
+access and data semantics must still be observed. No generic institution,
+affiliation or permission-letter requirement is introduced. Routine design
+choices and prospective registration may be exercised without another generic
+approval; source facts, licensing, authentic identity/cashflows and platform
+behavior cannot be invented. Section 81's **SI-AUTH-20261005-02** permits the
+single final combined publication; there is no interim push.
+
+**SI-DEC-20261011-13** accepts the completed section-110 counter-review first.
+**SI-DEC-20261011-14** chooses the complete captured Sharadar STOCKS master,
+including delisted records, as the next population/identity integration input;
+the previous ten-token sentinel is not renamed a study population. A full
+captured provider master is not proof of all US listed coverage. Native
+permatickers remain namespaced and class-specific; current fields are not
+backdated into historical effective intervals.
+
+**SI-DEC-20261011-15** prospectively freezes exactly these twelve ordered GETs
+under protocol **`a14e6d22c9fd9b1e5edbd3dae8b41f2380648b8b00710bf8ca2865a4884bc44c`**:
+
+1. Fixed-origin full metadata for TICKERS, ACTIONS and DESCRIPTIONS (3).
+2. Their fixed-origin public SQLite schemas (3; parsed as text, not executed).
+3. For each table in that order: authenticated full bulk issuance followed by
+   one anonymous HTTPS download from that exact in-memory 302 Location (6).
+
+Maximum **12**, automatic retries **0**, no date/population filter, no paging,
+no five/ten-year fallback, no consumed-budget reset. Use only the specifically
+known protected direct-Sharadar credential reader and fixed header route.
+Opaque metadata inventory keys are not download/credential authority. A global
+create-exclusive protected claim survives a new time or HEAD. Request-start
+and response receipts preserve ordered clocks, exact descriptors/code identity
+and failed attempts. Existing 16- and 62-request captures remain unchanged.
+
+The authenticated issuer is fixed `api.sharadar.com`; download targets are
+detached, public-unicast DNS/IP-pinned, CA/hostname-verified HTTPS peers, without
+proxy, forwarded API key/cookies, redirects or alternate connection retries.
+Signed URLs remain in memory only. Whole/escaped URLs, query pairs and independent
+sensitive query values are checked against headers, raw and decompressed bytes
+before hashing or persistence; public short expiry numbers are not a ban on
+unrelated CSV values. All raw/source reports remain private, ignored, owned
+and protected; no row or Sharadar data-fitness conclusion is a Git/chat output.
+Metadata byte-size equality is a race sentinel only, not a source-version
+digest or proof of the identical metadata-time snapshot. Captured full-file
+hashes establish the actual received-byte provenance.
+ZIP32 layout/CRC, single exact CSV member, limits, duplicate quarantine and
+bidirectional owner uniqueness are checked. The capture itself does not open
+prices, volume, outcomes, original-vintage PIT, historical identity or QC gates.
+
+Source-route facts are from [Sharadar's API summary](https://sharadar.com/llms.txt),
+[TICKERS](https://sharadar.com/docs/tickers),
+[ACTIONS](https://sharadar.com/docs/actions),
+[DESCRIPTIONS](https://sharadar.com/docs/descriptions) and
+[FAQ](https://sharadar.com/docs/faqs). Personal local research is evaluated under
+the existing [terms](https://sharadar.com/terms), not an invented institutional
+requirement. Exact cloud processing remains a separate representation question.
+
+**SI-DEC-20261011-16** selects Massive's documented class-specific
+`share_class_shares_outstanding`, not company-wide weighted shares, for a later
+frozen dated denominator comparison. Dated period assertions are latest-revised
+inputs, not filing-time/original-vintage PIT proof. No new Massive request is
+authorized by the master inventory; any such sample/budget must be separately
+frozen before retrieval.
+
+### 111.3 Draft findings, corrections and focused evidence
+
+| ID | Priority/status | Evidence and correction |
+|---|---|---|
+| SI-MASTER-001 | P2, confirmed, closed before retrieval | Three persisted red cases admitted a current owner despite a conflicting ticker/permaticker peer. Owner lookup now requires uniqueness on both raw identity axes, including invalid peers. Delegated reverse probe 3 red; final tests green. Historical effective identity is still not inferred. |
+| SI-MASTER-002 | P2, confirmed, closed before retrieval | Two persisted red cases accepted undeclared payload between ZIP member and central directory. Exact contiguous local/descriptor/central ZIP32 validation added; positive streaming descriptor and malformed-descriptor tests retained. Delegated reverse probe 3 red; final tests green. |
+| SI-MASTER-003 | P2, confirmed, closed before retrieval | Main's multicast address regression was red because Python `is_global` alone admits multicast. DNS and connected peers now require public unicast and exact pinned IP before normal hostname TLS. Persistent negative/positive DNS, peer and anonymous-download cases green. |
+| SI-MASTER-004 | P2, confirmed, closed before retrieval | Read-only audit identified a download response echoing the ephemeral signed capability after Location was discarded. Keep Location until header/ZIP/CSV echo checks complete, then discard; never persist/hash echoing bytes. In-memory removal makes all six new echo cases red (**6 failed, 49 deselected, 0.19s**); restored cases and public SignedHeaders/expiry control green. |
+
+The capability audit additionally proved three partial-echo gaps (double-
+percent decoding, lowercase escapes and opaque path components); all are now
+closed, with a fourth JSON Unicode regression. That fourth case independently
+went red when decoder error handling swallowed the named refusal; the refusal
+now occurs outside decoder exception handling. Capture-only **59 passed in
+0.62s**; a separate read-only auditor verified all four dangerous directions
+refuse and public expiry/SignedHeaders controls pass. No secret/provider input
+was used in these regressions.
+
+Master/capture plus lane/ML boundary and active-document checks:
+**267 passed in 7.06s**, empty inherited environment/network denied, no skip or
+warning (55 capture, 123 pure master, 9 + 11 boundaries, 69 document cases).
+This selection is focused, not the full lane suite. An earlier invocation
+named nonexistent `test_active_docs.py` and collected no tests; corrected to
+the repository's `test_active_document_consistency.py`. A mixed-draft run
+during the delegated prospective protocol repin is excluded as final validation;
+it made no provider call. All material guards were corrected before actual
+retrieval. Final freeze/closing validation and acquisition result follow below.
+
+Retain all historical ledger rows and section-110 dispositions. Three source
+P2s **SI-SRC-20260928-001..003**, shared out-of-lane P2 **SI-CR5-005 /
+SI-CCR16-007**, prospective look advisory **SI-CR19-003** and commitment advisory
+**SI-CR15-001** remain open. They are not automatically closed by software or
+authenticated API availability. Canonical actual looks **0/0**, exploratory
+actual looks **0**, allocated alpha **0**, permanent look IDs **none**, QC
+attempts **0** before execution. No backtest or node-capacity read is claimed.
+
+### 111.4 Concrete precision transport, not native-economic substitution
+
+**SI-DEC-20261011-17** selects a separate explicit decimal order mirror for
+the unchanged exact-rational 48-book economics. Protocol
+**`7ce7b5c8ef5c3e49c0f5ef5de45298ce4f403cfe9809c42829fffc1d5c71fe30`**
+enumerates all 20/60/120/252 lookbacks, four 0/5/10/20 bps cost cells and three
+allocation roles without a winner. Each independent state seals its cell,
+exact Fraction cash/quantity/fees and decimal mirror. Buy transport floors to
+`1e-18` shares with two USD posting quanta reserved; closing sells use the
+existing mirrored holding, never freshly rounded economic quantity. Exact
+economic quantities, prices, fees and cash are not rounded or replaced.
+
+Mirror price/notional posts are explicitly nearest-even on a `1e-18` USD
+lattice, fees upward, conservative System.Decimal coefficient/scale bounds
+checked without ambient decimal arithmetic. Every fill binds cell, security,
+event, order, side, exact submitted quantity, price, fee, notional and cash
+posting to the sealed/recomputed pending order; partial, stale, cross-cell or
+hidden-rounded fills refuse. Combined cumulative **absolute cash plus absolute
+notional** drift is capped at **`1e-6` USD per cell**, without cancellation.
+This is a reusable transport diagnostic, not a 48-book aggregate performance
+claim, source admission, QC launch or corporate-action implementation.
+
+The reason is concrete, not generic missing owner permission: upstream
+[LEAN portfolio handling](https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Securities/SecurityPortfolioManager.cs)
+credits raw-mode dividends without properly modeling payable dates and truncates
+split-adjusted equity quantities to integers. Those native defaults cannot
+silently replace the frozen cashflow/fractional model. QC documents
+[custom symbol properties](https://www.quantconnect.com/docs/v2/writing-algorithms/importing-data/streaming-data/key-concepts#13-Set-Properties)
+and [custom fill models](https://www.quantconnect.com/docs/v2/writing-algorithms/reality-modeling/trade-fills/key-concepts);
+an actual adapter still must implement and verify the explicit postings, raw
+opening fills, corporate-action entitlement/payment/terminal journal and source
+representation. This module alone does none of those external actions.
+
+The [Morningstar migration notice](https://www.quantconnect.com/docs/v2/writing-algorithms/universes/equity/morningstar-migration)
+also says QC rebuilt fundamentals history and changes master-branch feeds on
+October 10, 2026, retiring the older feed October 31. Any native-fundamental
+candidate must freeze the observed engine/feed generation and class-specific
+field semantics rather than infer parity from the subscription or a compile.
+No actual fundamentals/outcome read occurs in this precision design.
+
+Before any actual order-based QC backtest: prospectively register the exact
+qualified candidate/look/processing representation; inspect authenticated
+capacity and recheck before launch; wait for occupied nodes without stopping,
+reassigning or overwriting another lane. At most three unsuccessful attempts
+per candidate, including compile/runtime failures, then authenticated Mia or
+owner Mia handoff. Completion is not economic parity. No such attempt has
+occurred in this freeze.
+
+### 111.5 Exact prospective checkpoint before acquisition
+
+On the final freeze tree, main Codex independently ran **366 focused checks
+in 6.44s**, empty inherited environment and network denied, no skip or warning:
+59 capture, 123 pure master, 95 precision transport, 9 lane boundary, 11 ML
+boundary and 69 active-document cases. Targeted compilation of all seven new/
+affected Python files exits **0** with pycache outside the checkout;
+`git diff --check` is clean. The only import-boundary expansion is the standard
+library `csv`, `io`, `zipfile`, `zlib` for pure byte parsing; no network,
+credential, broker or QC authority import enters the research package. Existing
+actual-input refusal and old protocol bytes remain unchanged.
+
+All eight changed files are lane-owned code/tests or this lane record. No shared
+document, root Session Handoff, ranking/seed, fixture manifest, evaluation window
+or frozen economic rule is modified. Commit this prospective checkpoint locally
+from the designated worktree, then execute the single protected master capture
+only against that clean exact HEAD and unchanged actual remote `2a65d4a0`.
+No acquisition or backtest is represented as having happened before that commit.
+One final combined push follows completed work or a precise factual blocker,
+not this interim local freeze. Acquisition and further integration follow below.

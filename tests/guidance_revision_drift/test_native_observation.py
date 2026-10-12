@@ -16,7 +16,7 @@ from data.hashing import canonical_json
 from research.guidance_revision_drift.contracts import CANDIDATE_SHA256
 from research.guidance_revision_drift import native_observation as observations
 from research.guidance_revision_drift.lean_bridge import BridgeError, fixture_frames, fixture_stream
-from research.guidance_revision_drift.trace_transport import reconstruct_trace_fragments, trace_fragment_anchor
+from research.guidance_revision_drift.readable_transport import readable_evidence_anchor, reconstruct_readable_evidence
 from guidance_revision_drift.test_lean_source import CashAmount, OrderEvent, OrderFee, Slice, sdk_shim
 
 
@@ -179,7 +179,7 @@ class NativeSourceEvidenceTests(unittest.TestCase):
 
     def output(self, algo):
         fragments = tuple(row.encode("ascii") for row in algo.log_messages)
-        envelope = reconstruct_trace_fragments(fragments, expected_sha256=trace_fragment_anchor(fragments),
+        envelope = reconstruct_readable_evidence(fragments, expected_sha256=readable_evidence_anchor(fragments),
                                                expected_runtime_context=CONTEXT)
         return observations.validate_native_metadata(envelope["metadata"], envelope["trace"]), envelope
 
@@ -295,6 +295,17 @@ class NativeSourceEvidenceTests(unittest.TestCase):
         self.assertEqual(envelope["trace"], before)
         self.assertNotIn("unbounded-secret", canonical_json(metadata))
         self.assertFalse(algo.debug_messages)
+
+
+    def test_refusal_marker_before_context_is_counted_in_the_evidence_budget(self):
+        # GDR-CR31-007: every evidence-log line, including the bare refusal
+        # marker, is reserved in the cumulative budget before it is logged.
+        algo = self.source.GuidanceRevisionDriftAlgorithm()
+        with patch.object(self.source, "_read_regular_file", return_value=fixture_stream()), self.assertRaises(ValueError):
+            algo.initialize()
+        marker = "GDR-NATIVE-REFUSED stage=initialize context_or_trace_unavailable"
+        self.assertEqual(algo.log_messages, [marker])
+        self.assertEqual(getattr(algo, "_gdr_evidence_log_bytes", None), len(marker) + 1)
 
     def test_missing_context_never_gets_expected_hashes_or_completion(self):
         algo = self.source.GuidanceRevisionDriftAlgorithm()

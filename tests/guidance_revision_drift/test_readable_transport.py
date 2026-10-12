@@ -176,5 +176,24 @@ class ReadableTransportTests(unittest.TestCase):
                     module._raw(body, limit)
 
 
+    def test_non_ascii_values_refuse_at_export_and_reconstruction(self):
+        # GDR-CR31-006: canonical_json keeps non-ASCII text, so only the two
+        # ASCII checks keep the readable route plain ASCII; no case had any.
+        label = ["observations", "objects", "algorithm", "python_type"]
+        extra = deepcopy(self.extra)
+        extra["observations"]["objects"]["algorithm"]["python_type"] = "SYN.Algorithm\u00e9"
+        with self.assertRaises(module.ReadableTransportError):
+            module.export_readable_evidence(self.trace, runtime_context=context(), metadata=extra)
+        bodies = [json.loads(raw) for raw in self.lines[:-1]]
+        target = next(row for row in bodies if row.get("metadata") == label)
+        target["value"] += "\u00e9"
+        result = tuple(canonical_json(row).encode("utf-8") for row in bodies)
+        lines = result + (canonical_json({"end": module.SCHEMA, "line_count": len(result),
+            "sha256": hash_payload([hash_bytes(raw) for raw in result])}).encode("ascii"),)
+        self.assertTrue(any(not raw.isascii() for raw in lines))
+        with self.assertRaises(module.ReadableTransportError):
+            self.reconstruct(lines)
+
+
 if __name__ == "__main__":
     unittest.main()

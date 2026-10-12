@@ -19,7 +19,8 @@ from research.guidance_revision_drift.contracts import CANDIDATE_SHA256
 from research.guidance_revision_drift.native_observation import FIXTURE_SHA256
 from research.guidance_revision_drift.simulation import Simulation
 from research.guidance_revision_drift.readable_transport import (
-    ReadableTransportError, reconstruct_readable_evidence, readable_evidence_anchor,
+    MAX_LINE_BYTES, MAX_LOG_BYTES, ReadableTransportError, reconstruct_readable_evidence,
+    readable_evidence_anchor,
 )
 
 
@@ -248,6 +249,22 @@ class LeanSourceTests(unittest.TestCase):
             with self.subTest(budget=invalid), self.assertRaises(ReadableTransportError):
                 algo._log_evidence("not emitted")
         self.assertEqual(algo.log_messages, ["SYN-observation"])
+
+
+    def test_single_evidence_line_obeys_line_and_remaining_budget_bounds(self):
+        # GDR-CR31-007: refusal markers bypass the whole-export pre-check, so
+        # the per-line guard alone keeps them inside both bounds.
+        algo = self.initialize()
+        before = list(algo.log_messages)
+        with self.assertRaisesRegex(ReadableTransportError, "budget"):
+            algo._log_evidence("x" * (MAX_LINE_BYTES + 1))
+        algo._gdr_evidence_log_bytes = MAX_LOG_BYTES - 6
+        with self.assertRaisesRegex(ReadableTransportError, "budget"):
+            algo._log_evidence("123456")
+        self.assertEqual(algo._gdr_evidence_log_bytes, MAX_LOG_BYTES - 6)
+        self.assertEqual(algo.log_messages, before)
+        algo._log_evidence("12345")
+        self.assertEqual(algo._gdr_evidence_log_bytes, MAX_LOG_BYTES)
 
     def test_live_or_changed_sidecar_cannot_initialize(self):
         algo = self.source.GuidanceRevisionDriftAlgorithm()

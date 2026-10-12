@@ -165,6 +165,57 @@ class HistoricalClosureTests(unittest.TestCase):
             with self.subTest(kind=kind, field=field), self.assertRaises(EvaluationError):
                 closure(changed)
 
+
+    def test_each_historical_custody_rule_refuses_alone(self):
+        # GDR-CR31-005: every case keeps all other replay rules satisfied, so
+        # each isolates one custody guard. The raw-anchor case changes only
+        # free text, which replays cleanly, against the original anchor.
+        base = records()
+        HistoricalCycleClosure(raw(base), hash_bytes(raw(base)))
+        def first(rows, kind, attempt=None):
+            return next(i for i, row in enumerate(rows) if row["kind"] == kind
+                        and (attempt is None or row.get("attempt") == attempt))
+        cases = {}
+        changed = deepcopy(base)
+        changed[0]["external_human_authorization"] += " (edited)"
+        cases["raw anchor"] = (raw(changed), hash_bytes(raw(base)))
+        changed = deepcopy(base)
+        changed[5]["at"] = changed[3]["at"]
+        cases["timestamps regressed"] = changed
+        changed = deepcopy(base)
+        ack, observed = first(changed, "compile_ack", 1), first(changed, "compile_observation", 1)
+        changed[ack - 1]["endpoint"], changed[observed - 1]["endpoint"] = "compile/read", "compile/create"
+        cases["response endpoint lineage"] = changed
+        changed = deepcopy(base)
+        changed[first(changed, "compile_ack", 1) - 1]["file"] = "../" + "0" * 26 + ".json"
+        cases["response file name"] = changed
+        changed = deepcopy(base)
+        changed[first(changed, "source_epoch", 2)]["external_owner_waiver_retained"] = False
+        cases["waiver not retained"] = changed
+        changed = deepcopy(base)
+        changed[first(changed, "source_epoch", 2)]["runtime_context"]["bundle_sha256"] = "e" * 64
+        cases["epoch runtime context changed"] = changed
+        changed = deepcopy(base)
+        del changed[first(changed, "source_epoch", 2)]
+        intent = changed[first(changed, "compile_intent", 2)]
+        intent["project_sha256"] = intent["source_manifest_sha256"] = "1" * 64
+        cases["second attempt without a new source epoch"] = changed
+        changed = deepcopy(base)
+        for kind in ("compile_ack", "compile_observation", "run_intent"):
+            changed[first(changed, kind, 2)]["compileId"] = "SYN_compile_1"
+        cases["compile id reused"] = changed
+        changed = deepcopy(base)
+        for kind in ("run_ack", "run_observation", "terminal"):
+            changed[first(changed, kind, 2)]["backtestId"] = "SYN_run_1"
+        cases["run id reused"] = changed
+        changed = deepcopy(base)
+        del changed[first(changed, "terminal", 3)]
+        cases["ceiling before the third terminal"] = changed
+        for label, case in cases.items():
+            payload, anchor = case if type(case) is tuple else (raw(case), hash_bytes(raw(case)))
+            with self.subTest(case=label), self.assertRaises(EvaluationError):
+                HistoricalCycleClosure(payload, anchor)
+
     def test_no_orphan_launch_response_or_mutation_after_historical_ceiling(self):
         for added in ({"kind": "file_write_intent", "endpoint": "files/update", "name": "main.py", "sha256": "a" * 64},
                       {"kind": "response", "endpoint": "compile/create", "file": "0" * 32 + ".json",

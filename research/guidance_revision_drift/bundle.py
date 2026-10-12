@@ -45,7 +45,8 @@ _MODULES = (
     "callback_plan", "comparison", "completion_evidence", "contracts", "controls", "corporate_actions", "evaluation", "events",
     "fixtures", "formulas", "integration", "lean_bridge", "lineage",
     "market_inputs", "native_bundle", "native_observation", "trace_transport", "cloud_inventory", "evaluation_cycle",
-    "paired_bridge", "persistence", "qc_adapter", "qc_project", "readiness", "recovery",
+    "paired_bridge", "persistence", "qc_adapter", "qc_project", "readable_transport", "readiness",
+    "recovery", "recovery_preparation",
     "release", "reporting", "scenario", "simulation", "specification",
     "timing", "universe", "vendor_payloads", "lean/__init__", "lean/main",
 )

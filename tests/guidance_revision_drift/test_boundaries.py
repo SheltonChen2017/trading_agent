@@ -172,9 +172,9 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         # Review-state phrase: rotate it in the same commit as each new review
         # or counter-review section so the status block cannot go stale.
         header = record.split("## 1.", 1)[0]
-        self.assertIn("Codex counter-review of section 28 completed", header)
+        self.assertIn("Codex counter-review of section 31 pending", header)
         self.assertIn("research/__init__.py`, remains unobserved", header)
-        self.assertIn("Recovery preparation implemented; independent Claude review pending", header)
+        self.assertIn("the next milestone is paused for owner direction", header)
         self.assertIn("attempt ceiling remains exhausted and no relaunch is authorized", header)
         self.assertIn("does not mark GDR-0 complete", record)
         # Shared handoff size belongs to the project-wide active-document

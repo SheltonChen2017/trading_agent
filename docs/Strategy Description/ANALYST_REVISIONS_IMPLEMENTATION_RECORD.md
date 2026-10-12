@@ -477,7 +477,10 @@ evidence gates in 285.10; no replay or replacement R284 is authorized.
 The review monitor is paused at the owner's request. Section 286 records the
 owner's further "proceed without review" direction and a separately frozen
 fresh prior-close source-quality acquisition; it does not reopen R284 or
-waive formal source/identity evidence. Its outcome is pending at this freeze.
+waive formal source/identity evidence. The one two-request October-9 capture
+and separate output receipt check both passed before October 12's prospective
+09:20 New York source-quality cutoff (286.5). Timely local receipt improves
+the earlier late-capture evidence, but does not establish full PIT admission.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1458,8 +1461,10 @@ existing monitor is PAUSED and must not be rearmed without owner direction.
 The owner explicitly waives Claude review of section 286's current bounded
 source-quality acquisition by saying "proceed without review" after R284's
 completion. This is not independent acceptance, a formal-source review waiver,
-or permission to populate the empty trust roots. Follow section 286's exact
-one-shot capture and separate output-read decision; do not replay old captures,
+or permission to populate the empty trust roots. Section 286's exact one-shot
+capture and separate output read both passed and are now spent (286.5).
+Proceed only with the actual external source/identity evidence or separately
+scoped acquisition described in 286.6; do not replay this or older captures,
 R284, spent security assessments or publication probes.
 The owner previously said
 "proceed" after the open-session concern was explained. Section 272 supersedes
@@ -3357,6 +3362,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-12 | Claude independent review of section 282: the twelve-ctime v4 contract | `34489a7a` -> this record commit | Section 283: two Codex commits `682779b7..34489a7a` disposed (2 accepted, 0 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells; no assessment, preflight, census or probe run | No code changed by Claude. Four pins, the profile and the twelve-pair digest reproduce; the map's old values equal `after.json` and its new values the R279 preflight; the projection applied in memory to the real rows equals the current state of all 27 objects; 23 in-memory guard removals tabulated; accepted `ARV2CR282-001` to `-003`; `ARV2R283-001` and `-002` documented; section 4 names section 283, banner sentence added, this row appended | Complete lane selection at `34489a7a` with every remote address refused (strict sandbox for the six groups, three parallel streams, temporary directories inside the root's ignored `.pytest_cache`; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 283.6 | 0 P0, 0 P1, 0 P2, 2 P3 | Single push of this round's Claude commit; Codex counter-reviews section 283 unless the owner changes the workflow |
 | 2026-10-12 | Codex section-283 counter-review, actual v4/probe success and guarded-publication candidate | `6e9c5562` -> `107743d8`, `b40cedc6`, this final section-284 record commit (three continuous Codex commits) | Sole Claude commit accepted after two prospective P3 corrections and documentary qualifications; exact one-shot v4 report and original synthetic publication probe/output authenticate successfully | Historical refusals remain spent; new publisher validates sources before payloads and retains original output descriptors; candidate UNREVIEWED/UNINVOKED; no production/QC action | 1,094 distinct focused strict-denied passes in 6.26 s; prior/repeated subsets and expected red omissions separately qualified; no full Codex suite; actual pins/times in 284.5/284.9 | ARV2E280-001 resolved prospectively for exact scope; ARV2E263-001 and independent formal gates remain; 313/239/49/699 unchanged | Exactly one final matching-lane push; Claude reviews every section-284 commit before any new publisher/run freeze; active quiet monitor advances to final Codex head, disposed Claude head6e9c5562 |
 | 2026-10-12 | Owner-waived publication review, authenticated C package and completed one-shot R284 | `3c8d23b0` -> `417aff5f`, `99333564`, `046bc64f`, `4fd6ae36`, this final section-285 result handoff | Human skips current publication review; no new Claude commit or independent acceptance | Sole unchanged guarded publisher/authentication, offline preparation/readback and frozen R284 A1 pass; seven public-identity matches, zero refusals; no retry | 404 distinct focused strict-denied passes; repeated record checks and one corrected documentary failure disclosed; no full suite; exact operational pins/times in 285.4–285.9 | Publication blocker resolved prospectively; formal/source/identity gates remain; actual attempt books 314/239/50/699 once | Exactly one matching-lane final push after this concluded round; source-evidence barrier in 285.10; monitor remains paused |
+| 2026-10-12 | Owner-waived fresh prior-close source-quality capture | `ba565501` -> `5f6992ba`, this final section-286 result handoff | No new Claude review; current software-review checkpoint waived, formal evidence gates preserved | One unchanged two-GET October-9 RAW-price capture and one bounded output-only read succeed before prospective October-12 cutoff; seven rows retained privately | 222 distinct strict-denied focused passes; one expected timing-regression failure corrected before use; repeat document checks not additive; no full suite | Timely local-receipt evidence only; immutable history, reviewed identities, scores and stock-first evidence still missing; 314/239/50/699 unchanged | Exactly one matching-lane final push; no capture retry, R284 replay, paid-rights change or formal admission; monitor stays paused |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -44303,3 +44309,101 @@ completeness. Direct-source entitlement or an actual immutable archive is
 a concrete external input, not another software-review acknowledgment.
 The owner is asked only whether either already exists, without requesting
 secrets or reinstating a written-permission gate for existing Massive access.
+
+### 286.5 Actual one-shot acquisition and bounded receipt result
+
+Both D1/D2 decisions, reader source/tests and selected pins were committed
+before contact at **`5f6992bab7648274bdb718fd2a289cfcb40946fd`**. Root verifies
+the designated root/branch/exact clean HEAD and rechecks adapter/helper/
+canonical hashes before the sole production invocation. Actual external
+invocation interval: **2026-10-12T05:57:57.664943Z..05:57:58.100689Z**,
+**exit 0**, well before the frozen **13:20:00Z** cutoff. The returned path,
+two hashes, seven-row count and false flags match the fixed value-free CLI
+output shape; stderr is empty. The successful unchanged code path completes
+its two scoped GETs, without redirects/retries. This is real provider-price
+access, not a zero-network or zero-financial-input claim, and not an
+independent packet-level contact audit.
+
+Private output under the designated root:
+
+`artifacts/analyst_revisions_v2/sharadar_price_capture/arv2-sharadar-prices-20261012T055757775812Z`
+
+| Retained identity | Actual value |
+|---|---|
+| Requested close session | `2026-10-09` |
+| Manifest SHA-256 | `b2c56d45d8f555f1a05438b8466043948940038308dea202a80def3a14b9061e` |
+| Capture identity SHA-256 | `85601fd0c4b91e5679459652aab7a5c255e450d6a8e996a60cd51b31991dbff2` |
+| `stocks.csv` | 1 row / 67 bytes / `d318dc55ef785c721ee0497db471f7f114ef3ad807e4748713416f8304a896b9` |
+| `funds.csv` | 6 rows / 231 bytes / `5c640c0936b760db6697d7b893fa7663a439226654aee7556b0ff018e68260c1` |
+| Manifest local receipt interval | `2026-10-12T05:57:57.775812Z..05:57:58.084981Z` |
+| Transport | `sharadar_raw_close_direct_https_owned_session` |
+
+The separately invoked, strictly network-denied output reader uses exactly
+those external path/hash pins and actual successful exit/interval, never a
+fabricated zero or a hash inferred from the marker. External reader interval
+**05:58:26.862056Z..05:58:26.926418Z**, **exit 0**, empty stderr. Its internal
+receipt interval **05:58:26.888219Z..05:58:26.920423Z** is also before cutoff.
+It authenticates the canonical four-file inventory, both raw byte bindings,
+exact one-plus-six date/ticker census, private POSIX modes/owner/single-link
+checks and held/named endpoint envelope. All four output files are confirmed
+Git-ignored without another content read. No marker rollback, timeout, manual
+cleanup, repair, capture retry or second external read occurs. The collector's
+built-in readback is separate from D2's one external loader call. Both
+one-use decisions are now **spent**; retain the outputs and freeze the
+now-used reader unchanged.
+
+In plain language: a real fresh prior-close dataset now exists locally
+before a prospectively chosen research cutoff, unlike section 262's late
+October-7 receipt. It still contains current vendor `closeunadj` observations,
+not a vendor-signed historical archive or independent permanent/QC identity
+proof. The adapter's `nyse_session_authenticated=false` is retained: the
+separate calendar choice does not silently change its stored claim. Native
+ACL/xattr authentication, continuous stability, signed clocks, original
+publication, independent source, permanent identity, formal admission, PIT,
+decision/paper/deployment/orders and performance flags all remain false.
+No raw prices, licensed rows or credentials are printed or committed.
+
+### 286.6 Disposition, remaining external inputs and final handoff
+
+This bounded source-quality milestone is complete, not a completed strategy
+or formal backtest. No old assessment, source comparison, publication probe,
+failed continuity package or spent R284 attempt was reopened. No QC contact,
+look/cell change, broker/account operation, real order, paper/live deployment
+or efficacy claim occurred. The booked floor remains
+**314 shared / 239 development / 50 infrastructure / 699 cells**.
+No shared/root policy, source registry, source adapter/helper or other-lane
+file changed. No formal dates/estimands/power hashes/epoch were populated.
+
+The next irreducible input is still actual vendor-origin immutable ratings
+availability/version/correction/deletion/completeness evidence, together
+with an independently reviewed interval-bound permanent/share-class/QC SID/
+own-ETF/vendor security master. Scores bound to that identity and price
+evidence, seven-role stock completeness and terminal payoff remain open.
+This timely private price receipt narrows one timing limitation but cannot
+replace those packages. Existing current-row re-polling cannot recover
+unobserved history. The direct Benzinga change/removal interfaces in 286.4
+are a concrete prospective lead only if existing legitimate access is
+established and a separate bounded acquisition contract is frozen; even then
+their finite replay does not itself prove immutable historical completeness.
+Do not use the current waiver to fabricate independent review or populate
+trust-root registries, construct a selector around missing sources, purchase
+new rights, or launch a replacement diagnostic. This is an external-evidence
+boundary, not an intermediate Claude acknowledgment wait. The question about
+existing source access remains unanswered at this handoff; no secrets are
+requested and no clarification email/recurring monitor is created.
+
+Continuous round starts at `ba565501fe9ca66725655208acb657d6b81c0b1c`:
+
+| Codex commit | Purpose / bounded disposition |
+|---|---|
+| `5f6992bab7648274bdb718fd2a289cfcb40946fd` | Current owner waiver, exact fresh date/cutoff/two-request contract and new bounded receipt reader/tests; actual acquisition and once-only read both accepted against this frozen protocol, not independently reviewed or formally admitted. |
+| This final result/handoff commit | Exact actual output pins/times and remaining external-evidence boundary; no additional invocation or renewed authority. |
+
+Exactly one matching-lane final push follows the final focused document,
+diff/status checks; no intermediate push is made. Root's 222-pass combined
+selection is the distinct focused count; the final document-only rerun gave
+**86 passed in 0.82 s**, overlapping and not additive. No full Codex suite
+runs. The expected red
+clock regression and pre-use correction remain disclosed in 286.3.
+The monitor stays **PAUSED**. Do not rearm it or start/message Claude or
+another chat without new human direction.

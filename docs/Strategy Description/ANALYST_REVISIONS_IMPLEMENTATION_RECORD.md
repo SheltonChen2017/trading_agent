@@ -474,7 +474,10 @@ no-order infrastructure evidence, not strategy performance or formal identity
 admission. The booked floor is now 314 shared / 239 development / 50
 infrastructure / 699 cells. Next are the unresolved formal source/identity
 evidence gates in 285.10; no replay or replacement R284 is authorized.
-The review monitor is paused at the owner's request.
+The review monitor is paused at the owner's request. Section 286 records the
+owner's further "proceed without review" direction and a separately frozen
+fresh prior-close source-quality acquisition; it does not reopen R284 or
+waive formal source/identity evidence. Its outcome is pending at this freeze.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1452,6 +1455,12 @@ independent review remains required for later new security contracts; this
 waiver does not revive sections 278/280 or permit a retry. Do not ask again
 for the same twelve values or replay spent R273/R277/R279/R282/R272. The
 existing monitor is PAUSED and must not be rearmed without owner direction.
+The owner explicitly waives Claude review of section 286's current bounded
+source-quality acquisition by saying "proceed without review" after R284's
+completion. This is not independent acceptance, a formal-source review waiver,
+or permission to populate the empty trust roots. Follow section 286's exact
+one-shot capture and separate output-read decision; do not replay old captures,
+R284, spent security assessments or publication probes.
 The owner previously said
 "proceed" after the open-session concern was explained. Section 272 supersedes
 the session-exit prerequisite, without authorizing any process interruption.
@@ -44136,3 +44145,161 @@ two CR285-002 wording qualifications; exact identifiers/pins and the once-only
 look arithmetic were consistent. Final changes are limited to this lane
 record and the specifically authorized append-only R284 look entry; no root
 handoff/action plan/shared executable or other-lane data changed.
+
+## 286. Owner-directed continuation: fresh pre-cutoff RAW-price source quality, 2026-10-12
+
+### 286.1 Current authority, baseline and bounded purpose
+
+After section 285's completed result the human says **"proceed without
+review"**. `ARV2OD286-D1`: skip the current Claude software-review checkpoint
+and proceed under 255.2's delegated lane research decisions and 262.4's
+existing direct Sharadar research access. This authorizes the bounded new
+acquisition below, not independent approval, new paid rights, a change to
+technical source checks, or formal admission. No Claude range is newly
+disposed; the last disposed Claude head remains `6e9c5562e39244b02f63b5ea084c8ced9018d924`.
+The continuous Codex round starts at clean local/matching remote
+`ba565501fe9ca66725655208acb657d6b81c0b1c`. The monitor stays **PAUSED**.
+
+R284 and its one-use result read are successfully spent. Another identity
+run or a rehash of existing reports cannot create the missing immutable
+analyst history, reviewed permanent/share-class master or score evidence.
+The smallest useful available acquisition is instead a **new date's** seven
+RAW prior-close rows received before a prospective source-quality cutoff.
+It directly addresses the late-local-receipt limitation of 262.6 without
+pretending to close the complete formal price/PIT gate. It is not a strategy
+evaluation, score calculation, selection, paper epoch or outcome look.
+
+### 286.2 Session selection and acquisition limits frozen before contact
+
+The [NYSE holiday/hours page](https://www.nyse.com/trade/hours-calendars) and
+[2026 calendar](https://www.nyse.com/publicdocs/nyse/ICE_NYSE_2026_Yearly_Trading_Calendar.pdf)
+support ordinary trading October 9 and October 12. The unchanged local
+`data.exchange_calendar` with pandas-market-calendars **5.4.0**, evaluated
+under network denial, returns exactly those two sessions in October 9–12:
+prior close **2026-10-09T20:00:00Z**, next open **2026-10-12T13:30:00Z**.
+The prospective **research source-quality cutoff** is
+**2026-10-12T13:20:00Z** (09:20 New York). This is not a populated formal
+decision date/estimand/power hash/epoch or a claim of strategy readiness.
+The actual successful CLI exit and the separate reader must both precede
+the cutoff, not merely the manifest's earlier `capture_completed_at` field.
+These are unsigned local timing observations, not signed vendor clocks.
+
+Freeze **one** unchanged production invocation:
+
+`/Users/sheltonchen/.venvs/trading_agent-py313/bin/python -B -m scripts.capture_arv2_sharadar_prices --close-session 2026-10-09`
+
+Use only the existing exact `SHARADAR_API_KEY` loader (environment or its named
+macOS Keychain entry), never another provider's credential or a broad secret
+search. The owned default-TLS session disables environment proxies/CA
+overrides and retries. Exactly the two 262.4 endpoints are permitted:
+`https://api.sharadar.com/v1.0/data/stocks` for `QCOM`, and `/v1.0/data/funds`
+for `SPY,QQQ,SOXX,XLV,REMX,XLE`. Both queries fix `from=to=2026-10-09`,
+`fields=ticker,date,closeunadj,lastupdated`, `format=csv`, `sort=ticker.asc`,
+`limit=100`, `skip=0`. At most two GETs; no redirect, retry, pagination,
+schema relaxation, immediate recapture or automatic continuation on failure.
+Require exactly one stock plus six fund rows, matching date/tickers and
+positive finite unadjusted prices, with the unchanged 1 MiB response bounds.
+
+Only a fresh exclusive timestamped child below the existing ignored private
+`artifacts/analyst_revisions_v2/sharadar_price_capture` parent may be allocated.
+No prior price capture, failed A/B, successful C, R284 control or frozen
+v4 fifteen-source inventory is read or changed. The whole subprocess is
+bounded to **150 seconds**, separately from the collector's 60-second
+connect/read-idle timeout, which is not a whole-process deadline. A timeout,
+nonzero/unknown exit, late completion or ambiguous publication spends this
+invocation and stops work on it without retry. Preserve remaining artifacts.
+The unchanged collector may revoke only its own new completion marker on
+post-link failure, as already specified/tested in 262.5; this is not authority
+for manual cleanup, old-evidence deletion, attribute stripping or repair.
+
+### 286.3 Exact implementation pins and output-read contract
+
+No production adapter or shared helper is edited. Current SHA-256 values:
+
+| Selected file | SHA-256 |
+|---|---|
+| `scripts/capture_arv2_sharadar_prices.py` | `e33ba763d1c4d8249ebbf8d8e77a5d91069f9f9bf533fb3eee34114157badf9a` |
+| `scripts/capture_arv2_sharadar.py` | `17e516b4cc721c7f97c4690f54dfcc9d2d11d8cebd413100f2e2ffa68e663ca2` |
+| `research/analyst_revisions_v2/canonical.py` | `c1d1d1aab633b16868fccc371de7c4cf4f3a692943e04a8d785109110e17ae6e` |
+| `tests/analyst_revisions_v2/test_sharadar_price_capture_adapter.py` | `a76290ce7925f210e58028fd078263fe527daddab346f54a2000a5e53af45e8f` |
+| `data/exchange_calendar.py` | `174a032efce4082b8661eabe84b0cf6094048e937722bdf1659c8cb6c7decb89` |
+
+Root reads the entire adapter/tests and relevant helper boundaries. The
+unchanged focused adapter selection gives **99 passed in 0.29 s**, with
+strict network denial, disabled plugin autoload, `--noconftest`, `-B`, no
+cache plugin and fresh in-root basetemp. `assistant.dispatch_fence` is absent.
+This is focused synthetic proof, not a full suite or provider result.
+
+`ARV2OD286-D2`: only after the successful timely actual CLI exit, use its
+returned exact path, manifest SHA and capture SHA as external input pins
+for **one** output-only loader invocation under network denial, bounded to
+**30 seconds**. Require the exact date, production transport, one-plus-six
+census, unchanged canonical manifest/raw CSV bindings and false flags.
+Bind the new output's component-wise no-follow path and held regular leaves
+before/after the existing loader, including exact four-name inventory and
+named endpoint checks. The legacy loader alone does not rewalk its final
+absolute directory path; the separately frozen operational envelope adds
+that endpoint binding. Its endpoint metadata equality is not continuous
+stability, native ACL/xattr authentication, original publication proof or
+independent vendor/identity admission. The selected code pins likewise do
+not establish whole-interpreter integrity. Any reader refusal/timeout is
+terminal; no second read or repair is authorized by this decision.
+
+The exact new output-only operational reader is
+`scripts/verify_arv2_r286_price_capture.py`, SHA-256
+`e9ac0ccb1bcfad1d163ab5a15f0c81ffc1730db2c07f28612d415c848faea959`;
+its focused test file `tests/analyst_revisions_v2/test_r286_price_capture_receipt.py`
+hashes to `7893a55a3383f44bdf57bfc1fcdbe867ab133c1b6a49d54d512aebfd821fadd6`.
+Invoke with ordered arguments `--artifact`, `--manifest-sha256`,
+`--capture-sha256`, `--started-at`, `--ended-at`, `--capture-exit 0`, populated
+only from the actual successful capture's external result. Never substitute
+zero for an unknown/nonzero exit. Its internal 15-second signal/elapsed
+budget is cooperative; the separate parent subprocess enforces 30 seconds.
+Ancestor endpoint binding uses dev/ino/mode/uid/gid rather than unrelated
+ancestor timestamps; the private final directory and four held leaves bind
+ten available metadata fields excluding atime. Regular leaf mode/owner/link/
+size and final inventory remain checked, with nonblocking outer opens.
+
+Root reads both final files completely. A same-round author initially proves
+36 synthetic checks, then reproduces the newly identified final-cleanup
+backward-clock gap with **one expected failure in 0.06 s**. Before any real
+use, require `read_end <= final_end < CUTOFF`; the final author selection is
+**37 passed in 0.11 s**. Root's final combined selection is **222 distinct
+passes in 1.18 s** (99 collector, 37 reader, 86 record/active-document), with
+the same denied-network/isolated in-root setup and dispatch-fence absence.
+Earlier 99 collector and 86 document passes are overlapping repetitions,
+not additional passes. No full suite or real-output read has run at this
+freeze. Same-round implementation/advice is not independent final review.
+
+All trust roots remain byte-identical, zero-access/empty: source authority
+`3152aca00c721f3822d1ef438c84c3ee855aeb866e35ba692527746b5d4c5805`,
+reviewed-spec `23f23d19e681a03bacf6a1d132c732ed541747a5c6136d2dc0ac5ccafd273326`,
+security master `e8c1a2a7e0408d545e45f026cabf5b4ae23956fa64bc444769a8589f35f4a5fa`.
+Floor remains **314 shared / 239 development / 50 infrastructure / 699 cells**.
+This input-only acquisition has no QC launch, strategy evaluation, formal
+alpha/cell spend, score/return calculation, mapping export or trading action.
+No new recurring capture is scheduled. Final result/dispositions and exact
+round range will be recorded before one final matching-lane push.
+
+### 286.4 External source alternatives, not inferred entitlement
+
+Current official [Benzinga removed-event documentation](https://docs.benzinga.com/api-reference/calendar-api/get-removed)
+documents `/api/v2.1/calendar-removed/` with a `ratings` type and explicit
+removed-event IDs/update fields. Its [ratings stream](https://docs.benzinga.com/ws-reference/data-websocket/get-calendar-ratings-stream)
+documents created, updated and deleted events. [Replay is cache-dependent
+and at most 100 messages](https://docs.benzinga.com/ws-reference/actions),
+not arbitrary immutable history or guaranteed gap recovery. Those direct
+Benzinga interfaces are a possible prospective improvement, not proof that
+Massive supplies them or that the existing Massive entitlement includes a
+direct Benzinga token. The pages do not establish a complete immutable
+archive; absence of such a promise here is not proof one cannot be supplied
+separately. No direct Benzinga data request, credential search, vendor email,
+paid purchase or stream connection is made in this round.
+
+This does not overturn Massive's actual 262.2 response about its mutable
+current-row API. Repeating current rows can document observed revisions,
+but cannot invent missed versions, original availability or deletion
+completeness. Direct-source entitlement or an actual immutable archive is
+a concrete external input, not another software-review acknowledgment.
+The owner is asked only whether either already exists, without requesting
+secrets or reinstating a written-permission gate for existing Massive access.

@@ -17101,8 +17101,18 @@ the run complete at 2024-07-12.
   **5,823 passed, 20 skipped**.
 - Diagnostic test module after `bbbf57d1`: **41 passed**;
   `git diff --check` clean.
-- Final-tree lane set and the complete-suite census: appended in the census
-  commit at the end of this section.
+- Final-tree lane set after the record/guard commit, designated worktree,
+  network-denied: **5,835 passed, 20 skipped** (the six CR24 regressions
+  and the six section-79 guard tests added); `compileall` of the lane
+  packages exit 0; `git diff --check` clean.
+- Complete suite at the received head `f998144d` in a read-only scratch
+  clone, six network-denied shards: **23,029 passed, 842 skipped, 114
+  failed, 37 errors**. The 114 failures are the 94 path-bound lane tests
+  (green in the worktree), the 4 shared `TPR-OOL-015` guards and the 16
+  Analyst-directory `TPR-OOL-016` failures; the 37 errors are the known
+  Analyst-directory set. The red set is identical to section 77's census;
+  passes rise by 60 with Codex's 35 diagnostic tests and other additions.
+  Codex's standing objection to the clone is recorded, unchanged.
 
 ### 79.6 Milestone and authority decision
 

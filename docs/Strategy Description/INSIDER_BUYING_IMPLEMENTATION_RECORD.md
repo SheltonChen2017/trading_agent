@@ -1,19 +1,17 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 155 (CLAUDE, WINDOWS SESSION) REVIEWS `34c323a7..6209b3b3`: THE
-TEST-ONLY TRIPWIRE/ADMISSION CORRECTION `f0b144d0` AND THE SECTION-154
-COUNTER-REVIEW `6209b3b3` ARE BOTH ACCEPTED; THE SCANNER RED/GREEN, THE THREE
-ADMISSION-CLAUSE ISOLATIONS, AND EVERY 154.3 QUALIFICATION REPRODUCE
-INDEPENDENTLY UNDER PROCESS-LEVEL NETWORK DENIAL. NEW `IBWIN-CR01` (P2,
-LANE-SPECIFIC, PRE-EXISTING): THE ACQUISITION/CUSTODY STACK IS POSIX-ONLY
-(`fcntl`, `O_DIRECTORY`), SO THE LANE GATE CANNOT RUN TO A MEANINGFUL RESULT
-ON WINDOWS; DOCUMENTED FOR AN OWNER DECISION, NOT CHANGED. `IBWIN-OBS01`
-(P3): CRLF CHECKOUTS BREAK THE QC SOURCE-BYTE PINS. THE SIX OPEN P2 FINDINGS
-OF 154 REMAIN; TWO SHARED SEP-2 GUARDS STILL FAIL (`IBSH-CR02`). NO LANE CODE
-OR TEST CHANGED IN THIS ROUND. NOT BACKTEST-READY: QUALIFIED HISTORICAL
-ACTUAL-RELEASE AND ISSUER/SHARE-CLASS/SID/LISTING/PIT INPUTS REMAIN MISSING
-(152.1, 154.6). NO NEW ACQUISITION, QC JOB, OUTCOME LOOK, BACKTEST OR TRADING;
-LOOKS 0/0/0. CODEX COUNTER-REVIEW OF THIS ROUND IS NEXT.**
+Status: **SECTION 156 COUNTER-REVIEWS CLAUDE'S EXACT `86700b1c` RECORD-ONLY
+PUSH AFTER `6209b3b3`: ACCEPTED AFTER APPEND-ONLY DOCUMENTARY QUALIFICATIONS.
+SCANNER AND THREE ADMISSION-CLAUSE MUTATIONS REPRODUCE UNDER VERIFIED OS
+PROCESS-TREE NETWORK DENIAL; ADMISSION PROBES DO NOT VALIDATE LOCKING.
+`IBWIN-CR01` REMAINS OPEN: WINDOWS CUSTODY/REPLAY SUPPORT IS NOT PROVED AND
+MAC RETAINED-ROOT RECEIPTS REMAIN ATTRIBUTED. `IBWIN-OBS01` REPRODUCES AS
+TWO QC BYTE-PIN FAILURES; A SEPARATE, LANE-ONLY CHECKOUT CORRECTION IS THE
+NEXT BOUNDED OFFLINE STEP, NOT A PLATFORM PORT. SIX EARLIER P2 FINDINGS
+REMAIN OPEN, INCLUDING BOTH SHARED FINDINGS. NOT BACKTEST-READY: ACTUAL
+EARNINGS-RELEASE AND HISTORICAL ISSUER/SHARE-CLASS/SID/LISTING/PIT INPUTS
+REMAIN MISSING (152.1, 154.6). NO ACQUISITION, QC JOB, OUTCOME LOOK,
+BACKTEST OR TRADING; LOOKS 0/0/0. MONITOR PAUSED, NO AUTOMATIC REARM.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -250,6 +248,8 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-08 | Claude review | `444c9a73` -> `117de00d` (Decimal helper, typed refusal, tripwire extension, 3 pins) -> this review record | Independent review of the owner-waived continuous build, sections 136-152 (`d05e0bc4..444c9a73`, 17 commits, 0 merges, 31 modules and 30 test files) | Read every record section; read the SEC capture loop, entry points, verifier and CLI, the event clock, the provider transport and the reconciliation refusals line by line; the rest by tests, mutants, hashes and replays. Replayed both fresh capture journals read-only (64/64/504,050 B; 256/256/2,011,446 B), hashed every private receipt and the 2006Q1 envelopes against the record, verified no contact string in Git or journals, reconciled 54 file hashes. 18 guard mutants. | Pushed `444c9a73`, network denied: complete suite (3.13) **12,812 passed, 3 failed, 38 skipped**; the 30 new test files (3.12) **2,272 passed**. Mutants **12 of 18** caught as pushed, **15 of 18** after (3 redundant). After the fix: affected files **449 passed** both Pythons, gate **137** both, compileall and diff-check clean. Final code tree, complete suite (3.13) **12825 passed, 2 failed (both `IBSH-CR02` manifest guards), 38 skipped**. **0 looks**. | `IBSUITE-CR01` P2 closed in `117de00d`; `IBSH-CR02` P2 shared/lane-caused OPEN (two repository guards red until the SEP-2 manifest names the hosted imports); `IBTEST-CR04`, `IBREC-V4-CR01`, `IBTEST-CR05` P3 closed; `IBREC-HSVCCR02` accepted against this reviewer. Four topical P2 open. No open P0 or P1. | Codex counter-reviews `117de00d` and this record. The two manifest guards stay red until integration; the lane must not edit `architecture/`. Not backtest-ready for the factual reasons in 147.6, 149.8 and 152.1. No outcome, QC, paper, or trading step is inferred. |
 | 2026-10-09 | Codex counter-review and separate handoff | Incoming `444c9a737dfc8f4a2c4d96c0469d98708105f529..34c323a7217c3bfad00e1a9e9ad472c932ab1283`; correction `f0b144d0c0d9cc9a82eec7207a5fd3ef9a786a8e`; this separate record | Counter-review both Claude commits; test-only lane hardening and documentary qualifications | `117de00d` accepted after transport-family/namespace/every-use scan correction and isolated admission pins; `34c323a7` accepted after count/mutant-attribution qualifications. Two fresh journals independently replayed read-only; archived original-plus320 receipt identities/accounting verified without repeating full-root replay. | Main affected465 passed74.42s; boundary/package/document156 passed20.68s; exact scanner7 red then10 green, admission3 deletions caught. Peer Decimal193 passed86.24s, guard271 passed20.17s; shared2 failures independently reproduced. All process-tree network-denied; private replay also write/fork-denied. No complete suite. | New `IBTEST-CCR06` P2 and `IBTEST-CCR07`/`IBDOC-CCR15301` P3 closed; six prior P2s OPEN, all prior closures retained. No shared behavior changed. | Single authorized matching-lane publication after separate exact-hash handoff and final remote/status checks. Next input-driven integration needs genuine historical actual-release and identity/PIT evidence; no fabricated readiness, new source dispatch, frozen-file thaw, monitor rearm or outcome/QC step. |
 | 2026-10-12 | Claude review (Windows session) | `6209b3b3` -> this review record | Review of `34c323a7..6209b3b3`: the test-only tripwire/admission correction `f0b144d0` and the section-154 counter-review `6209b3b3` (two commits, zero merges); every earlier commit since `653874e8` carries a disposition from the other Claude session in sections 80-153 | Reproduced the scanner red/green against the in-memory `117de00d` scanner (7 of 7 red, 10 of 10 green, real scan 22 seen/0 offenders), the three single-clause admission deletions (each caught only by its own control, the older test blind to all three), the two shared SEP-2 failures, the 156 and 271-test selections net of host artifacts, the 178-case collection count, and every section-154.3 qualification by independent git and ledger counts. Full detail in section 155, including the required 1-10 rating. | All runs under proven process-level network denial. Boundary/package/document selection 155 passed plus 1 harness artifact that passes without the harness; event clock + registered analysis 271 passed plus 2 CRLF checkout artifacts that pass on an LF copy; SEP-2 nodes 2 failed as recorded; record/active-document gates **71 passed** (measured on the tree carrying this section; the re-run after this value was written reported the same count); `git diff --check` clean. No full lane gate or complete repository suite on this host: 16 of the 95 lane test files cannot be collected on Windows (`fcntl`), so the lane gate was not run here and the macOS results in 153.5/154.4 remain the attributed lane evidence. No SEC/EDGAR, provider, credential, journal, custody, QC, broker, or trading access; **0 research looks**. | `f0b144d0` accepted; `6209b3b3` accepted. New: `IBWIN-CR01` (P2, lane-specific, pre-existing: the acquisition/custody stack is POSIX-only, documented for an owner decision) and `IBWIN-OBS01` (P3, CRLF checkout breaks the QC byte pins). No lane code or test changed. | Codex counter-reviews this round; owner decision on `IBWIN-CR01`; next work per 152.1/154.6. |
+| 2026-10-12 | Codex counter-review | Incoming `6209b3b33d203aad4a3d1d6d449a1c7d2304c8f0..86700b1c2dbbbd8234870444c3bbcf14c6a00aeb`; this separate counter-review record follows | Exact one-commit, record-only Claude review; no implementation source change | Accepted after append-only section156 qualifications of harness evidence, prior Windows documentation and platform census. Scanner and isolated admission mutations reproduce; custody replay not represented as a Windows execution. | Verified parent/child OS network refusal; lane boundary51 passed; event-clock/registered-analysis271 passed and2 reproduced QC-byte-pin failures. Other final focused results in156.4. No full repository suite or successful full Windows lane gate; looks0/0/0. | IBDOC-CCR15501 P3 qualified; IBWIN-CR01 P2 retained OPEN; IBWIN-OBS01 P3 reproduced, not closed by counter-review. Six earlier P2s retained; shared findings not fixed. | Separate lane-only LF checkout correction may proceed independently; no platform port, corpus promotion or input-dependent backtest milestone. Single final publication only after completed permitted scope and checks; monitor remains paused. |
+
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -22290,3 +22290,175 @@ sections 152.1 and 154.6 state: qualified historical actual-release and
 issuer/share-class/SID/listing/PIT inputs. Separately, the owner should decide
 whether the lane's acquisition stack is declared POSIX-only (and its tests
 platform-marked) or ported (`IBWIN-CR01`). Nothing is started by inference.
+
+## 156. Codex counter-review of the Windows Claude review (2026-10-12 UTC)
+
+**Technical completion:** the read-only remote trigger found
+`86700b1c2dbbbd8234870444c3bbcf14c6a00aeb`, after the published baseline
+`6209b3b33d203aad4a3d1d6d449a1c7d2304c8f0`. The heartbeat was immediately
+paused. The designated Windows worktree already had that exact clean HEAD,
+so no fetch, fast-forward, branch switch, configuration repair or alternate
+checkout was needed. Its verified Git directory is the main repository's
+`.git/worktrees/trading_agent_insider`; the ordinary Git failure inside the
+restricted tool environment is not evidence of a corrupt worktree. Read-only
+Git outside that restriction confirms the proper root and branch. The incoming
+range contains exactly one commit and zero merges. Its contents and section155
+identify Claude's independent review, not merely a shared author name.
+
+**Plain-language completion:** the corrected scanner and admission tests work
+as reported. The review's Windows limitations are real, but one test total and
+the claim that those limitations were never documented need narrower wording.
+Two QC byte checks fail solely because this checkout has CRLF where the frozen
+source has LF. Windows locking and Mac retained-root replay have not been
+validated here; neither successful synthetic checks nor a line-ending fix
+make the lane backtest-ready.
+
+### 156.1 Complete incoming disposition and assessment
+
+| Exact incoming commit | Disposition | Scope and independently checked evidence |
+|---|---|---|
+| `86700b1c2dbbbd8234870444c3bbcf14c6a00aeb` | **ACCEPTED AFTER the append-only documentary qualifications156.2.** | Entire record-only diff reviewed: header, contiguous session row, new ledger and section155. Scanner red/green and admission isolations reproduce under current OS denial. Commit/module/test counts and the frozen LF source pin verify. Current Windows custody support and prior Mac execution remain explicitly outside the reproduced evidence. No production correction follows from this record-only commit. |
+
+Incoming record quality: **8/10 after qualification**. Its detailed attribution
+and refusal boundaries are useful; the deductions are combining differently
+isolated results and overstating prior platform silence/census. This accepts
+the bounded review with qualifications, not Windows custody support, a complete
+corpus, rights/PIT facts or a future backtest. No new P0/P1 is identified.
+
+### 156.2 Append-only qualifications; historical section155 retained
+
+**`IBDOC-CCR15501` (P3, CLOSED by these qualifications).**
+
+1. The measured boundary result in155 is **155 passed and one harness failure**.
+   That test's separate pass without the harness is separate evidence; together
+   they are not a measured, fully denied156-pass selection. The current Codex
+   lane-boundary run includes that import-purity test under OS denial and passes
+   all51 cases without preloading socket in its child.
+2. Section155 accurately names its harness *process-level* denial. A Python
+   `sitecustomize` that patches listed seams does not establish OS process-tree
+   isolation for native calls, every socket API or non-Python children. The
+   broader phrase "every outbound socket connection" is not accepted beyond
+   the demonstrated seams. This is a proof-scope qualification, not a claim
+   that Claude made an unintended request. No new incident count is invented.
+3. The platform blocker is real, but the claim that the limitation was entirely
+   undocumented is too broad. Section87.1 already states unsupported platforms
+   refuse, Mac was tested, and Windows was neither validated nor promised.
+   `research/insider_buying/ib1b_pilot_runner.py` also explicitly checks required
+   capabilities before processing. Those notes do not solve today's `fcntl`
+   collection failure, but must remain part of its history.
+4. The static census is **five module-level / seven total production `fcntl`
+   importers**, including lazy imports in the82-quarter snapshot and master
+   runners; **two module-level / three total test-file importers**, including
+   the capture test's function-local import. **Ten modules reference
+   `O_DIRECTORY`, seventeen `O_NOFOLLOW`, union seventeen**. A no-follow leaf
+   open is not necessarily a directory open. These are source references,
+   not successful cross-platform execution measurements.
+
+`IBWIN-CR01` remains OPEN. No fake lock, automatic platform skip, changed frozen
+module, altered source epoch or shared-file fix is introduced. Choosing or
+implementing a Windows custody port is separate from the permitted byte-stable
+checkout step; that step does not depend on a positive Windows locking gate.
+
+### 156.3 Material reproductions and sensitivity
+
+All current Python probes/tests use the bundled **Python3.12.14** in the default
+restricted execution environment. Separate parent and child `connect_ex`
+probes to loopback and reserved TEST-NET address192.0.2.1 return **WSAEACCES
+10013** for all four attempts, before tests. No external service or provider
+address is used. Unlike the prior Python seam harness, current denial is an
+inherited OS restriction. Git remote/status operations are separate, authorized
+Git-only processes; tests/mutants are never elevated to obtain network access.
+
+An internal read-only peer independently re-proved parent/child denial and
+loaded exact Git scanner blobs. The seven refusal controls are all red against
+`117de00d`, its three legitimate controls pass, and all ten pass against
+`f0b144d0`. Both real95-file scans return **22 seen / zero offenders**. Current
+scanner blob SHA-256 remains
+`a1a3d47b6eefe40f080927827d3c97a7869b247d36d407353fb7c12abed66501`.
+This peer result is attributed, not relabeled as a second main-agent run.
+
+Main independently invokes the three isolating admission controls and the
+older nonisolating test: **four pass**. Each single-clause deletion is compiled
+in the original module globals in memory, and only its matching control fails
+at **"Admission must refuse before contact"**; the other two and old control
+pass. An import-only `fcntl` stand-in has a **must-not-call locking sentinel**,
+not functioning or accepted locks. No lock call occurs. This proves guard
+sensitivity only, not custody/filesystem behavior. An initial exploratory
+mutation compiled in copied globals hit contact validation rather than its
+patched sentinel; it is not counted as the faithful pre-contact proof. The
+original function is restored in `finally`; no product source is written.
+
+Exact QC working bytes reproduce the mismatch:30,321 bytes,619 CRLFs, SHA-256
+`46539f3fa5005fed293aaa7efe8b8b4f09071c4db28520870fe0af06fe4ccad5`.
+LF bytes are29,702 bytes and match frozen
+`c80ff4f585d59d1b8e4ecd0d6199605fee727de9df0a13b74e987fe4d2819f87`.
+Both package and canonical-plan consumers require that exact source hash;
+their guards remain fail closed and are not weakened to ignore line endings.
+
+### 156.4 Current validation and host limitations
+
+- Lane import-boundary file: **51 passed in17.96s**, including clean-child
+  import purity under OS denial.
+- Event-clock plus registered-analysis selection on the unchanged CRLF
+  checkout: **271 passed,2 failed in184.54s**. Both failures are the exact
+  pinned-source refusals named155, not a successful273-case gate.
+- Boundary/package/document/Decimal-guard selection: **156 passed in108.50s**,
+  including the formerly harness-affected import check under OS denial. This
+  measurement preceded the final appended156 text; final record checks follow.
+  Counts from overlapping selections are never summed.
+- Completed156 active-document/record/exact-package checks: **72 passed
+  in7.85s** under the same denied-network runner.
+- Unmodified95-file Insider collection attempt: **16 collection errors**, all
+  missing `fcntl`, exit1. No stand-in or skips in this attempt. The remaining
+  collected cases are not represented as a completed lane suite;155's6,199
+  selection remains reviewer-attributed rather than a current measured total.
+
+Pytest9.1.1 and other pure-Python dependencies are reused read-only from the
+existing repository venv by appending its package path **after** the bundled
+runtime packages, avoiding incompatible Python3.13 NumPy binaries. Disabled
+plugin autoload, `-B`, no pytest cache and fresh temporary scaffolding are used.
+Windows' Python3.12 mode0700 temporary-directory ACL is unusable inside this
+restricted environment. The runner changes only pytest's in-memory
+`make_numbered_dir` scaffolding default to0777; no product `mkdir`, `open`,
+locking, source or runtime-authority function is patched. This test setup is
+not evidence for POSIX permissions. Initial attempts failed at temporary-path
+setup, then at the3.13/3.12 NumPy import mismatch; neither is counted as a lane
+behavioral failure or passing gate. A first mistyped test path ran zero tests.
+
+The complete Windows lane gate remains blocked by unavailable `fcntl` and
+POSIX-only custody/replay prerequisites. No Mac retained-root replay is run
+or claimed here, no historical receipt is relabeled, and no full repository
+suite is run. Source roots/OS isolation required by the Mac replay are not
+available on this host. Earlier Mac results remain attributed to153/154.
+
+### 156.5 Retained P0-P3 ledger and next authorized scope
+
+| ID | Priority | Current disposition | Evidence / scope |
+|---|---|---|---|
+| IBDOC-CCR15501 | P3 | **CLOSED by156.2** | Harness proof/total, prior platform notes and source census qualified append-only. |
+| IBWIN-CR01 | P2, lane-specific | **OPEN, retained with qualified history** | Windows custody/locking and complete gate not validated. No port, fake-lock acceptance or automatic skips. |
+| IBWIN-OBS01 | P3, lane-specific | **OPEN, independently reproduced** | Two byte-pin failures; separate checkout-only correction follows if its own validation passes. |
+| IB1C-REAL-CR01, IB1BCAMP-CR01, IBSRC-CR01, IBSRC-CCR01 | P2 | **OPEN, retained** | Actual population/source/identity/PIT/rights gates152.1/154.6 remain unmet. |
+| IBQC-SHARED-META01, IBSH-CR02 | P2, shared/out of lane | **OPEN, retained** | No shared implementation/manifest edit; shared failures remain separately attributed. |
+| IBTEST-CCR06, IBTEST-CCR07, IBDOC-CCR15301 and prior resolved findings | As recorded | **Retained CLOSED at their exact scopes** | Scanner/admission evidence above; no reopening or broader closure inferred. |
+| IBREV-CR01; prior observations and45 unclassified119 survivors | As recorded | **Retained at owner-disposition / original classification** | No retroactive approval, new count or invented mutation classification. |
+| IBSH-CR01 | P3, shared | **OPEN, nonblocking, retained** | Coordinate paper-clause documentation at integration, not here. |
+
+No open P0/P1; **seven open P2s**, including five topical/platform and two
+shared. Counter-review uses a separate commit before the independently bounded
+LF-checkout implementation. Standing engineering authority permits that lane-
+only correction without a new routine approval; it does not choose Windows
+custody support. Accessible qualified actual earnings-release and historical
+issuer/share-class/CIK/SID/listing/PIT/pre-entry inputs remain indispensable
+for the next data-dependent integration. Missing inputs cannot be manufactured
+by policy, candidate feeds, fixture success or credential presence.
+
+The frozen custody files/journals, original source windows,99,394 denominator,
+19,846 retained /79,548 unattempted accounting,83,657 quarantined2006Q1 rows
+and71,679 missing relevant parents remain unchanged. No SEC/provider request,
+credential/licensed-row acquisition, purchase, outcome look, QC upload/job,
+backtest, broker/operator database/trading scheduler, deployment or paper/live/
+order/trading action. Source/readiness/execution gates are not promoted; looks
+**0/0/0**. Shared coordination files remain frozen. The monitor stays PAUSED;
+no other chat is messaged. Exactly one final push is reserved for the completed
+permitted round after final checks, not for this intermediate record commit.

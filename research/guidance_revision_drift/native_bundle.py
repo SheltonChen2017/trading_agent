@@ -41,7 +41,7 @@ NATIVE_MODULES = frozenset({
     "research.guidance_revision_drift.formulas",
     "research.guidance_revision_drift.contracts",
     "research.guidance_revision_drift.native_observation",
-    "research.guidance_revision_drift.trace_transport",
+    "research.guidance_revision_drift.readable_transport",
 })
 INITIALIZERS = frozenset({"data/__init__.py", "research/__init__.py",
     "research/guidance_revision_drift/__init__.py",

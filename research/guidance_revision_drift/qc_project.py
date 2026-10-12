@@ -23,6 +23,10 @@ MAX_PROJECT_FILES = 50
 RESERVED_PROJECT_FILES = 1  # Researcher's default research.ipynb.
 MAX_PROJECT_FILE_BYTES = 64_000  # Conservative decimal bound, strictly smaller.
 ASSET_PATH = "gdr_assets.py"
+RECOVERY_INITIALIZER_PATHS = ("data/__init__.py", "research/__init__.py")
+RECOVERY_INITIALIZER_SOURCE = (
+    b"# Synthetic QC project-only initializer; audited repository source is empty.\n"
+)
 _DIGEST = re.compile(r"[0-9a-f]{64}\Z")
 _PYTHON_PATH = re.compile(r"(?:[A-Za-z_][A-Za-z0-9_]*/)*[A-Za-z_][A-Za-z0-9_]*\.py\Z")
 
@@ -319,7 +323,32 @@ def _literal_assets(candidate: bytes, fixture: bytes) -> bytes:
     return source
 
 
-def _prepare_project() -> tuple[dict[str, bytes], dict]:
+def _recovery_initializers(files: dict[str, bytes]) -> tuple[dict[str, bytes], dict]:
+    """Replace only the two audited empty initializers in a detached project.
+
+    This is a new exact uploaded representation, not runtime normalization or
+    a change to shared repository source. Nonempty or additional empty package
+    initializers need a new reviewed preparation policy and refuse here.
+    """
+    if any(files.get(name) != b"" for name in RECOVERY_INITIALIZER_PATHS):
+        raise QCProjectError("recovery requires the two audited zero-byte initializers")
+    if any(raw == b"" and name not in RECOVERY_INITIALIZER_PATHS for name, raw in files.items()):
+        raise QCProjectError("unreviewed empty recovery source")
+    prepared = dict(files)
+    overrides = {}
+    for name in RECOVERY_INITIALIZER_PATHS:
+        prepared[name] = RECOVERY_INITIALIZER_SOURCE
+        overrides[name] = {
+            "repository": {"bytes": 0, "sha256": hash_bytes(files[name])},
+            "project": {"bytes": len(prepared[name]), "sha256": hash_bytes(prepared[name])},
+            "policy": "project-only-comment-lf-v1",
+        }
+    return prepared, overrides
+
+
+def _prepare_project(*, recovery: bool = False) -> tuple[dict[str, bytes], dict]:
+    if type(recovery) is not bool:
+        raise QCProjectError("exact readable preparation mode required")
     full_review_source = source_manifest()
     try:
         raw = build_native_bundle()
@@ -330,6 +359,9 @@ def _prepare_project() -> tuple[dict[str, bytes], dict]:
     with ZipFile(BytesIO(raw), "r", allowZip64=False) as archive:
         members = {name: archive.read(name) for name in archive.namelist()}
     files = {name: content for name, content in members.items() if name.endswith(".py")}
+    overrides = {}
+    if recovery:
+        files, overrides = _recovery_initializers(files)
     files[ASSET_PATH] = _literal_assets(members[_CANDIDATE_PATH], members[SIDECAR_PATH])
     expected_files = tuple((name, len(content), hash_bytes(content))
                            for name, content in sorted(files.items()))
@@ -338,7 +370,11 @@ def _prepare_project() -> tuple[dict[str, bytes], dict]:
             ("_GDR_CANDIDATE_JSON", "gdr0a.draft.json", _CANDIDATE_PATH),
             ("_GDR_FIXTURE_JSONL", "gdr-synthetic.jsonl", SIDECAR_PATH)))
     body = bundle["manifest"]
-    runtime_context = {"runtime_source_sha256": body["source_manifest_sha256"],
+    runtime_source = dict(body["source_manifest"])
+    for name in overrides:
+        runtime_source[name] = hash_bytes(files[name])
+    runtime_source_sha256 = hash_payload(runtime_source)
+    runtime_context = {"runtime_source_sha256": runtime_source_sha256,
         "bundle_sha256": bundle_sha256, "candidate_sha256": body["candidate_sha256"],
         "fixture_sha256": body["members"][SIDECAR_PATH]["sha256"]}
     root_source = _ROOT_TEMPLATE
@@ -354,7 +390,7 @@ def _prepare_project() -> tuple[dict[str, bytes], dict]:
     inventory = _file_manifest(files)
     fixture = body["members"][SIDECAR_PATH]
     manifest = {
-        "schema": "gdr.synthetic.python-project.v3",
+        "schema": "gdr.synthetic.recovery-python-project.v1" if recovery else "gdr.synthetic.python-project.v3",
         "purpose": "offline_readable_project_preparation_not_native_certification",
         "format": "visible_native_Python_and_plain_raw_JSON_JSONL_literals",
         "entrypoint": "main.py",
@@ -366,7 +402,7 @@ def _prepare_project() -> tuple[dict[str, bytes], dict]:
         "bundle_role": "offline_native_closure_audit_reference_not_uploaded_archive",
         "bundle_manifest_member": MANIFEST_PATH,
         "source_manifest_sha256": hash_payload(full_review_source),
-        "runtime_source_sha256": body["source_manifest_sha256"],
+        "runtime_source_sha256": runtime_source_sha256,
         "runtime_context": runtime_context,
         "reserved_project_files": RESERVED_PROJECT_FILES,
         "project_files_with_reserved_notebook": len(files) + RESERVED_PROJECT_FILES,
@@ -389,6 +425,15 @@ def _prepare_project() -> tuple[dict[str, bytes], dict]:
         "market_evidence": False,
         "point_in_time_evidence": False,
     }
+    if recovery:
+        manifest.update(
+            native_audit_source_sha256=body["source_manifest_sha256"],
+            runtime_source_manifest=runtime_source,
+            project_source_overrides=overrides,
+            initializer_policy="project-only-comment-lf-v1",
+            recovery_preparation_only=True,
+            attempt_budget_reset=False,
+        )
     try:
         verify_native_bundle(raw, expected_sha256=bundle_sha256)
         if source_manifest() != full_review_source:
@@ -410,6 +455,25 @@ def qc_project_manifest() -> dict:
 
 def verify_qc_project(files: dict[str, bytes], *, expected_sha256: str) -> dict:
     """Require the external map anchor and exact current-source reconstruction."""
+    return _verify_project(files, expected_sha256=expected_sha256, recovery=False)
+
+
+def build_recovery_qc_project() -> dict[str, bytes]:
+    """Prepare a new detached offline recovery map; never upload or launch."""
+    return dict(_prepare_project(recovery=True)[0])
+
+
+def recovery_qc_project_manifest() -> dict:
+    """Bind explicit project-only overrides; no authority or budget reset."""
+    return _prepare_project(recovery=True)[1]
+
+
+def verify_recovery_qc_project(files: dict[str, bytes], *, expected_sha256: str) -> dict:
+    """Refuse every unlisted representation, including old empty/LF variants."""
+    return _verify_project(files, expected_sha256=expected_sha256, recovery=True)
+
+
+def _verify_project(files: dict[str, bytes], *, expected_sha256: str, recovery: bool) -> dict:
     if type(files) is not dict or not 2 <= len(files) <= MAX_PROJECT_FILES:
         raise QCProjectError("exact bounded project-file dictionary required")
     snapshot = files.copy()
@@ -417,7 +481,7 @@ def verify_qc_project(files: dict[str, bytes], *, expected_sha256: str) -> dict:
     if (type(expected_sha256) is not str or not _DIGEST.fullmatch(expected_sha256)
             or hash_payload(_file_manifest(snapshot)) != expected_sha256):
         raise QCProjectError("project differs from caller-retained file-map anchor")
-    expected_files, manifest = _prepare_project()
+    expected_files, manifest = _prepare_project(recovery=True) if recovery else _prepare_project()
     if snapshot != expected_files:
         raise QCProjectError("project does not reconstruct from exact current source")
     return {"status": "verified_offline_content_only", **manifest}

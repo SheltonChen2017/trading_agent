@@ -23,7 +23,7 @@ from research.guidance_revision_drift.native_observation import (
     DeferredReceipts, ObservationError, ReceiptSnapshot, RuntimeContext,
     failure_diagnostics, observe_runtime, validate_native_metadata, valuation_checkpoint,
 )
-from research.guidance_revision_drift.trace_transport import export_trace_fragments, trace_fragment_anchor
+from research.guidance_revision_drift.readable_transport import export_readable_evidence, readable_evidence_anchor
 
 
 DATA_PATH = Path(__file__).resolve().with_name("gdr-synthetic.jsonl")
@@ -253,13 +253,15 @@ class GuidanceRevisionDriftAlgorithm(QCAlgorithm):
     def _emit_trace(self, metadata):
         trace = self.bridge.protocol_trace()
         metadata = validate_native_metadata(metadata, trace)
-        fragments = export_trace_fragments(trace,
+        fragments = export_readable_evidence(trace,
             runtime_context=self._gdr_context.to_dict(), metadata=metadata)
         for fragment in fragments:
             self.log(fragment.decode("ascii"))
-        # This anchor describes the emitted bytes only. Retrieval/authentication
-        # and independent replay remain separate evidence requirements.
-        self._gdr_last_export_anchor = trace_fragment_anchor(fragments)
+        # Readable per-record digests commit to the observed transcript; they
+        # are not lossless raw trace retrieval. Native identities and valuation
+        # observations remain literal output. Local digest reconstruction,
+        # independent replay and authenticated custody remain separate gates.
+        self._gdr_last_export_anchor = readable_evidence_anchor(fragments)
 
     def _emit_failure(self, stage, error):
         # Diagnostic errors must never replace the original runtime exception.

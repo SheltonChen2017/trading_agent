@@ -9,14 +9,22 @@ import unittest
 
 from data.financial_primitives import decimal_text, exact_decimal_multiply, exact_decimal_sum
 from data.hashing import hash_bytes
-from research.guidance_revision_drift.completion_evidence import EvidenceError, native_completion_dossier
+from research.guidance_revision_drift.completion_evidence import (
+    EvidenceError, native_completion_dossier, readable_native_completion_dossier,
+)
 from research.guidance_revision_drift.cloud_inventory import cloud_inventory_anchor, compare_cloud_inventory
 from research.guidance_revision_drift.evaluation import CandidateBinding, CompileReceipt, RunReceipt
 from research.guidance_revision_drift.evaluation_cycle import OwnerCycle, CycleJournal
 from research.guidance_revision_drift.native_observation import (
     ObservationError, failure_diagnostics, observe_runtime, validate_native_metadata,
 )
-from research.guidance_revision_drift.qc_project import build_qc_project, qc_project_manifest, verify_qc_project
+from research.guidance_revision_drift.qc_project import (
+    build_qc_project, qc_project_manifest, verify_qc_project, recovery_qc_project_manifest,
+    build_recovery_qc_project, verify_recovery_qc_project,
+)
+from research.guidance_revision_drift.readable_transport import (
+    export_readable_evidence, readable_evidence_anchor, ReadableTransportError,
+)
 from research.guidance_revision_drift.trace_transport import export_trace_fragments, trace_fragment_anchor
 from tests.guidance_revision_drift.test_completion_evidence import drive
 
@@ -59,7 +67,7 @@ class NativeDossierTests(unittest.TestCase):
         self.context = current["runtime_context"]
         self.fragments = export_trace_fragments(self.trace, runtime_context=self.context, metadata=metadata(self.trace))
 
-    def dossier(self, fragments=None, *, binding=None, run_hash=None):
+    def dossier(self, fragments=None, *, binding=None, run_hash=None, readable=False):
         fragments = self.fragments if fragments is None else fragments
         binding = self.binding if binding is None else binding
         cycle = OwnerCycle("SYN-dossier-only")
@@ -78,9 +86,13 @@ class NativeDossierTests(unittest.TestCase):
             journal.record_ambiguous(expected_head=journal.head_sha256, attempt_id="SYN-QC-one",
                 observed_at="2025-01-02T00:05:00+00:00", output_sha256="2" * 64)
             journal.record_run(expected_head=journal.head_sha256, receipt=ran, observed_at="2025-01-02T00:07:00+00:00")
-            return native_completion_dossier(fragments, expected_fragment_sha256=trace_fragment_anchor(fragments),
-                binding=binding, cycle=cycle, compile_receipt=compiled, run_receipt=ran,
+            common = dict(binding=binding, cycle=cycle, compile_receipt=compiled, run_receipt=ran,
                 cycle_snapshot=journal.to_dict(), expected_cycle_head_sha256=journal.head_sha256)
+            if readable:
+                return readable_native_completion_dossier(fragments,
+                    expected_evidence_sha256=readable_evidence_anchor(fragments), **common)
+            return native_completion_dossier(fragments,
+                expected_fragment_sha256=trace_fragment_anchor(fragments), **common)
 
     def test_actual_supplied_trace_raw_output_valuation_cycle_and_current_carrier_compose(self):
         report = self.dossier()
@@ -229,6 +241,70 @@ class NativeMetadataValidationTests(unittest.TestCase):
                      protocol_trace=lambda: {"head_sha256": "0" * 64})
         with self.assertRaises(ObservationError):
             failure_diagnostics("on_data", RuntimeError(), crowded, None)
+
+
+class ReadableNativeDossierTests(unittest.TestCase):
+    """Same complete gates, explicit new digest reconstruction/custody route."""
+
+    dossier = NativeDossierTests.dossier
+
+    @classmethod
+    def setUpClass(cls):
+        cls.trace = drive().protocol_trace()
+
+    def setUp(self):
+        current = recovery_qc_project_manifest()
+        self.binding = CandidateBinding(current["source_manifest_sha256"], current["project_sha256"],
+            current["bundle_sha256"], current["fixture_sha256"], "d" * 40, "e" * 40, "f" * 64)
+        self.context = current["runtime_context"]
+        self.fragments = export_readable_evidence(self.trace,
+            runtime_context=self.context, metadata=metadata(self.trace))
+
+    def test_readable_recovery_dossier_preserves_every_gate_and_discloses_reconstruction(self):
+        report = self.dossier(readable=True)
+        self.assertEqual(report["replay"]["account_checkpoints"], 372)
+        self.assertEqual(report["replay"]["record_count"], 752)
+        self.assertEqual(report["raw_output_sha256"], hash_bytes(b"\n".join(self.fragments) + b"\n"))
+        self.assertEqual(report["trace_reconstruction"], "digest-reconciled local reconstruction")
+        for flag in ("raw_trace_retrieved", "external_provenance_verified", "native_runtime_verified",
+                     "cloud_completed", "empirical_backtest_ready", "qc_upload_allowed", "qc_launch_allowed"):
+            self.assertIs(report[flag], False)
+        files = build_recovery_qc_project()
+        verified = verify_recovery_qc_project(files, expected_sha256=self.binding.project_sha256)
+        returned = files | {"research.ipynb": b"\x00\xffopaque notebook, never decoded"}
+        custody = compare_cloud_inventory(files, returned,
+            expected_project_sha256=verified["project_sha256"],
+            expected_returned_sha256=cloud_inventory_anchor(returned))
+        self.assertTrue(custody["python_byte_identical"])
+        self.assertEqual(custody["opaque_quarantine"], ["research.ipynb"])
+        self.assertIs(custody["automatic_port_allowed"], False)
+
+    def test_readable_route_refuses_legacy_carrier_and_wrong_raw_output_or_epoch(self):
+        with self.assertRaises(EvidenceError):
+            self.dossier(readable=False)
+        with self.assertRaisesRegex(EvidenceError, "raw trace messages"):
+            self.dossier(readable=True, run_hash="0" * 64)
+        for field in ("source_sha256", "project_sha256", "bundle_sha256"):
+            with self.subTest(field=field), self.assertRaisesRegex(EvidenceError, "current candidate"):
+                self.dossier(readable=True, binding=replace(self.binding, **{field: "0" * 64}))
+
+    def test_readable_complete_trace_failed_end_callback_still_cannot_be_a_dossier(self):
+        failed = export_readable_evidence(self.trace,
+            runtime_context=self.context, metadata=failed_metadata(self.trace))
+        with self.assertRaisesRegex(EvidenceError, "failed/partial runtime output"):
+            self.dossier(failed, readable=True)
+
+    def test_readable_evidence_refuses_bad_native_valuation_before_emitting(self):
+        for change in ("missing", "changed", "promotion"):
+            body = metadata(self.trace)
+            if change == "missing":
+                body["valuation_rows"].pop()
+            elif change == "changed":
+                body["valuation_rows"][20][2] = "1"
+            else:
+                body["observations"]["configuration_verified"] = True
+            with self.subTest(change=change), self.assertRaises(ReadableTransportError):
+                export_readable_evidence(self.trace, runtime_context=self.context, metadata=body)
 
 if __name__ == "__main__":
     unittest.main()

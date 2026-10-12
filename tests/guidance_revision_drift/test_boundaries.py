@@ -100,6 +100,8 @@ import research.guidance_revision_drift.completion_evidence
 import research.guidance_revision_drift.native_bundle
 import research.guidance_revision_drift.native_observation
 import research.guidance_revision_drift.trace_transport
+import research.guidance_revision_drift.readable_transport
+import research.guidance_revision_drift.recovery_preparation
 import research.guidance_revision_drift.cloud_inventory
 import research.guidance_revision_drift.evaluation_cycle
 blocked = {'assistant', 'risk', 'execution', 'ml', 'config', 'requests', 'httpx', 'alpaca', 'quantconnect'}

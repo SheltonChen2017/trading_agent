@@ -1,4 +1,5 @@
 """Native-only preparation boundaries, not a native SDK execution test."""
+import ast
 from io import BytesIO
 import unittest
 from unittest.mock import patch
@@ -12,6 +13,21 @@ from tests.guidance_revision_drift.test_bundle import repack
 
 
 class NativeBundleTests(unittest.TestCase):
+    def test_native_route_uses_readable_commitments_without_legacy_output_codecs(self):
+        members, _ = native_bundle._snapshot()
+        self.assertIn("research/guidance_revision_drift/readable_transport.py", members)
+        self.assertNotIn("research/guidance_revision_drift/trace_transport.py", members)
+        imported = set()
+        for name in native_bundle.SOURCE_PATHS:
+            if not name.endswith(".py"):
+                continue
+            for node in ast.walk(ast.parse(members[name])):
+                if isinstance(node, ast.Import):
+                    imported.update(alias.name.split(".")[0] for alias in node.names)
+                elif isinstance(node, ast.ImportFrom):
+                    imported.add(node.module.split(".")[0])
+        self.assertFalse(imported & {"base64", "zlib", "gzip", "zipfile"})
+
     def test_exact_closure_not_whole_review_bundle_and_notebook_headroom(self):
         raw = native_bundle.build_native_bundle()
         verified = native_bundle.verify_native_bundle(raw, expected_sha256=hash_bytes(raw))

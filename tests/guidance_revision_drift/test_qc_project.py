@@ -706,5 +706,117 @@ else:
                 self.assertEqual(result["loaded_lane"], [name])
 
 
+class RecoveryQCProjectTests(unittest.TestCase):
+    """New offline carrier bytes; neither a cloud correction nor another run."""
+
+    generated_helpers = QCProjectTests.generated_helpers
+    write_project = QCProjectTests.write_project
+    runtime = QCProjectTests.runtime
+
+    def setUp(self):
+        self.files = qc_project.build_recovery_qc_project()
+        self.anchor = project_anchor(self.files)
+
+    def test_recovery_overrides_are_exact_detached_and_dual_source_identity_is_truthful(self):
+        paths = ("data/__init__.py", "research/__init__.py")
+        original = {name: (ROOT / name).read_bytes() for name in paths}
+        self.assertEqual(original, dict.fromkeys(paths, b""))
+        expected = b"# Synthetic QC project-only initializer; audited repository source is empty.\n"
+        self.assertEqual(qc_project.RECOVERY_INITIALIZER_SOURCE, expected)
+        with ZipFile(BytesIO(native_bundle.build_native_bundle())) as archive:
+            audit = json.loads(archive.read(bundle.MANIFEST_PATH))
+            for name in sorted(native_bundle.SOURCE_PATHS - {bundle._CANDIDATE_PATH}):
+                self.assertEqual(self.files[name], expected if name in paths else archive.read(name), name)
+        manifest = qc_project.recovery_qc_project_manifest()
+        transformed = dict(audit["source_manifest"])
+        transformed.update({name: hash_bytes(expected) for name in paths})
+        self.assertEqual(manifest["runtime_source_manifest"], transformed)
+        self.assertEqual(manifest["runtime_source_sha256"], hash_payload(transformed))
+        self.assertEqual(manifest["runtime_context"]["runtime_source_sha256"], hash_payload(transformed))
+        self.assertEqual(manifest["native_audit_source_sha256"], audit["source_manifest_sha256"])
+        self.assertNotEqual(manifest["runtime_source_sha256"], manifest["native_audit_source_sha256"])
+        self.assertEqual(manifest["project_source_overrides"], {name: {
+            "repository": {"bytes": 0, "sha256": hash_bytes(b"")},
+            "project": {"bytes": len(expected), "sha256": hash_bytes(expected)},
+            "policy": "project-only-comment-lf-v1"} for name in paths})
+        self.assertEqual(manifest["candidate_sha256"], CANDIDATE_SHA256)
+        self.assertEqual(manifest["fixture_sha256"], hash_bytes(fixture_stream()))
+        self.assertEqual(manifest["schema"], "gdr.synthetic.recovery-python-project.v1")
+        for field in ("qc_upload_allowed", "qc_launch_allowed", "native_runtime_verified", "attempt_budget_reset"):
+            self.assertIs(manifest[field], False)
+        manifest["project_source_overrides"][paths[0]]["project"]["bytes"] = 0
+        self.files[paths[0]] = b"mutated detached copy\n"
+        self.assertEqual(qc_project.build_recovery_qc_project()[paths[0]], expected)
+        self.assertEqual({name: (ROOT / name).read_bytes() for name in paths}, original)
+
+    def test_recovery_and_default_carrier_contracts_stay_explicit_and_incompatible(self):
+        ordinary = qc_project.build_qc_project()
+        self.assertEqual(qc_project.qc_project_manifest()["schema"], "gdr.synthetic.python-project.v3")
+        self.assertTrue(all(ordinary[name] == b"" for name in qc_project.RECOVERY_INITIALIZER_PATHS))
+        self.assertEqual(qc_project.verify_recovery_qc_project(self.files, expected_sha256=self.anchor)["project_sha256"],
+                         self.anchor)
+        for verifier, files in ((qc_project.verify_qc_project, self.files),
+                                (qc_project.verify_recovery_qc_project, ordinary)):
+            with self.subTest(verifier=verifier.__name__), self.assertRaises(qc_project.QCProjectError):
+                verifier(files, expected_sha256=project_anchor(files))
+
+    def test_recovery_root_executes_the_exact_visible_comment_initializers_shim_only(self):
+        with TemporaryDirectory(prefix="gdr-qc-recovery-root-") as temporary:
+            directory = Path(temporary).resolve()
+            self.write_project(directory)
+            result = self.runtime(directory)
+            self.assertEqual((directory / "data/__init__.py").read_bytes(), qc_project.RECOVERY_INITIALIZER_SOURCE)
+            self.assertEqual((directory / "research/__init__.py").read_bytes(), qc_project.RECOVERY_INITIALIZER_SOURCE)
+        self.assertNotIn("error", result)
+        self.assertEqual(result["root_classes"], ["GuidanceRevisionDriftAlgorithm"])
+        self.assertEqual(result["initialized"]["symbol"], "SYN-GDR")
+        self.assertEqual(result["initialized"]["native_orders"], 0)
+        self.assertIs(result["sdk_is_shim"], True)
+        self.assertTrue(all(path.startswith(str(directory) + "/") for path in result["lane_files"]))
+
+    def test_recovery_inventory_rejects_empty_lf_space_and_same_size_tampering(self):
+        namespace = self.generated_helpers()
+        expected = qc_project.RECOVERY_INITIALIZER_SOURCE
+        for name in qc_project.RECOVERY_INITIALIZER_PATHS:
+            for bad in (b"", b"\n", b" \n", b"!" + expected[1:]):
+                with self.subTest(name=name, raw=bad), TemporaryDirectory(prefix="gdr-qc-recovery-refusal-") as temporary:
+                    directory = Path(temporary).resolve()
+                    self.write_project(directory)
+                    accepted = namespace["_gdr_inventory"](directory)
+                    self.assertEqual(accepted[name], expected)
+                    (directory / name).write_bytes(bad)
+                    with self.assertRaises(RuntimeError):
+                        namespace["_gdr_inventory"](directory)
+
+    def test_recovery_reconstruction_refuses_rehashed_variants_and_unknown_source_names(self):
+        for name in qc_project.RECOVERY_INITIALIZER_PATHS:
+            for bad in (b"", b"\n", b" \n", b"!" + qc_project.RECOVERY_INITIALIZER_SOURCE[1:]):
+                changed = self.files | {name: bad}
+                with self.subTest(name=name, raw=bad), self.assertRaises(qc_project.QCProjectError):
+                    qc_project.verify_recovery_qc_project(changed, expected_sha256=project_anchor(changed))
+        for extra in ("other/__init__.py", "research/extra.py"):
+            changed = self.files | {extra: qc_project.RECOVERY_INITIALIZER_SOURCE}
+            with self.subTest(extra=extra), self.assertRaises(qc_project.QCProjectError):
+                qc_project.verify_recovery_qc_project(changed, expected_sha256=project_anchor(changed))
+
+    def test_recovery_preparation_refuses_changed_audited_or_additional_empty_initializers(self):
+        original = {"data/__init__.py": b"", "research/__init__.py": b"", "entry.py": b"pass\n"}
+        prepared, overrides = qc_project._recovery_initializers(original)
+        self.assertEqual(original["data/__init__.py"], b"")
+        self.assertEqual(set(overrides), set(qc_project.RECOVERY_INITIALIZER_PATHS))
+        self.assertEqual(prepared["entry.py"], original["entry.py"])
+        for changes in ({"data/__init__.py": b"\n"}, {"research/__init__.py": b"# changed repository source\n"},
+                        {"another/__init__.py": b""}):
+            supplied = original | changes
+            before = dict(supplied)
+            with self.subTest(changes=changes), self.assertRaises(qc_project.QCProjectError):
+                qc_project._recovery_initializers(supplied)
+            self.assertEqual(supplied, before)
+        with self.assertRaises(qc_project.QCProjectError):
+            qc_project._recovery_initializers({"data/__init__.py": b"", "entry.py": b"pass\n"})
+        with self.assertRaises(qc_project.QCProjectError):
+            qc_project._prepare_project(recovery=1)
+
+
 if __name__ == "__main__":
     unittest.main()

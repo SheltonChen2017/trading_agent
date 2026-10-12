@@ -362,17 +362,44 @@ def native_completion_dossier(fragments, *, expected_fragment_sha256, binding, c
     Platform wrappers/other log lines must be retained separately by the
     authenticated retriever; this API does not fetch or authenticate them.
     """
+    return _native_completion_dossier(fragments, expected_fragment_sha256=expected_fragment_sha256,
+        binding=binding, cycle=cycle, compile_receipt=compile_receipt, run_receipt=run_receipt,
+        cycle_snapshot=cycle_snapshot, expected_cycle_head_sha256=expected_cycle_head_sha256,
+        readable=False)
+
+
+def readable_native_completion_dossier(lines, *, expected_evidence_sha256, binding, cycle,
+                                       compile_receipt, run_receipt, cycle_snapshot,
+                                       expected_cycle_head_sha256):
+    """Reconcile readable commitments against the explicit recovery carrier.
+
+    Frames/checkpoints are materialized locally from the fixed fixture and
+    compared with every emitted record digest. Native order/receipt identities
+    and valuation/runtime observations come from literal supplied messages.
+    This is not lossless raw transcript retrieval or authenticated execution.
+    It cannot convert the closed historical cycle into a fresh attempt budget.
+    """
+    return _native_completion_dossier(lines, expected_fragment_sha256=expected_evidence_sha256,
+        binding=binding, cycle=cycle, compile_receipt=compile_receipt, run_receipt=run_receipt,
+        cycle_snapshot=cycle_snapshot, expected_cycle_head_sha256=expected_cycle_head_sha256,
+        readable=True)
+
+
+def _native_completion_dossier(fragments, *, expected_fragment_sha256, binding, cycle,
+                               compile_receipt, run_receipt, cycle_snapshot,
+                               expected_cycle_head_sha256, readable):
     from research.guidance_revision_drift.evaluation import CandidateBinding, CompileReceipt, RunReceipt, EvaluationError
     from research.guidance_revision_drift.evaluation_cycle import OwnerCycle, validate_cycle_projection
     from research.guidance_revision_drift.native_observation import ObservationError, validate_native_metadata
-    from research.guidance_revision_drift.qc_project import qc_project_manifest
+    from research.guidance_revision_drift.qc_project import qc_project_manifest, recovery_qc_project_manifest
     from research.guidance_revision_drift.trace_transport import TraceTransportError, reconstruct_trace_fragments
+    from research.guidance_revision_drift.readable_transport import ReadableTransportError, reconstruct_readable_evidence
 
     if (type(binding) is not CandidateBinding or type(cycle) is not OwnerCycle
             or type(compile_receipt) is not CompileReceipt or type(run_receipt) is not RunReceipt):
         raise EvidenceError("exact binding/cycle/terminal receipt contracts required")
     candidate, compiled, ran = binding.to_dict(), compile_receipt.to_dict(), run_receipt.to_dict()
-    current = qc_project_manifest()
+    current = recovery_qc_project_manifest() if readable else qc_project_manifest()
     for field, manifest_field in (("source_sha256", "source_manifest_sha256"),
             ("project_sha256", "project_sha256"), ("bundle_sha256", "bundle_sha256"),
             ("candidate_sha256", "candidate_sha256"), ("fixture_sha256", "fixture_sha256")):
@@ -383,8 +410,9 @@ def native_completion_dossier(fragments, *, expected_fragment_sha256, binding, c
             or any(compiled[key] != ran[key] for key in ("attempt_id", "project_id", "compile_id", "engine", "binding_version"))):
         raise EvidenceError("native dossier requires one consistent successful compile/run")
     try:
-        retrieved = reconstruct_trace_fragments(fragments, expected_sha256=expected_fragment_sha256,
-                                                expected_runtime_context=current["runtime_context"])
+        reconstruct = reconstruct_readable_evidence if readable else reconstruct_trace_fragments
+        retrieved = reconstruct(fragments, expected_sha256=expected_fragment_sha256,
+                                expected_runtime_context=current["runtime_context"])
         if retrieved["metadata"]["status"] != "complete":
             raise EvidenceError("failed/partial runtime output cannot form a completion dossier")
         evidence = TraceEvidence.from_trace(retrieved["trace"])
@@ -393,7 +421,7 @@ def native_completion_dossier(fragments, *, expected_fragment_sha256, binding, c
         native_metadata = validate_native_metadata(retrieved["metadata"], retrieved["trace"])
         snapshot = validate_cycle_projection(cycle_snapshot, cycle=cycle,
                                              expected_head_sha256=expected_cycle_head_sha256)
-    except (TraceTransportError, ObservationError, EvaluationError) as exc:
+    except (TraceTransportError, ReadableTransportError, ObservationError, EvaluationError) as exc:
         raise EvidenceError("complete runtime transport/observations/owner-cycle did not reconcile") from exc
     output = b"\n".join(fragments) + b"\n"
     if hash_bytes(output) != ran["output_sha256"]:
@@ -403,7 +431,7 @@ def native_completion_dossier(fragments, *, expected_fragment_sha256, binding, c
             or matches[0]["compile"] != compiled or matches[0]["run"] != ran):
         raise EvidenceError("matching full owner-cycle attempt/receipts absent")
     replay = replay_completion(evidence, expected_sha256=evidence.sha256)
-    return {"schema": "gdr.synthetic.native-completion-dossier.v1", "binding_sha256": binding.sha256,
+    result = {"schema": "gdr.synthetic.native-completion-dossier.v1", "binding_sha256": binding.sha256,
         "cycle_sha256": cycle.sha256, "cycle_head_sha256": expected_cycle_head_sha256,
         "cycle_snapshot_sha256": hash_bytes(_raw(snapshot)), "raw_output_sha256": hash_bytes(output),
         "fragment_sha256": expected_fragment_sha256, "trace_sha256": evidence.sha256,
@@ -412,3 +440,9 @@ def native_completion_dossier(fragments, *, expected_fragment_sha256, binding, c
         "native_runtime_verified": False, "cloud_completed": False, "empirical_backtest_ready": False,
         "qc_upload_allowed": False, "qc_launch_allowed": False,
         "note": "Supplied output/cycle consistency is not authenticated native execution or economic acceptance."}
+    if readable:
+        result.update(schema="gdr.synthetic.readable-native-completion-dossier.v1",
+            evidence_route="readable_record_commitments_with_local_reconstruction",
+            raw_trace_retrieved=False,
+            trace_reconstruction="digest-reconciled local reconstruction")
+    return result

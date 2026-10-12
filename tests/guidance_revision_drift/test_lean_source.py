@@ -18,7 +18,9 @@ from research.guidance_revision_drift.lean_bridge import BridgeError, fixture_fr
 from research.guidance_revision_drift.contracts import CANDIDATE_SHA256
 from research.guidance_revision_drift.native_observation import FIXTURE_SHA256
 from research.guidance_revision_drift.simulation import Simulation
-from research.guidance_revision_drift.trace_transport import TraceTransportError, reconstruct_trace_fragments, trace_fragment_anchor
+from research.guidance_revision_drift.readable_transport import (
+    ReadableTransportError, reconstruct_readable_evidence, readable_evidence_anchor,
+)
 
 
 class CashAmount:
@@ -200,6 +202,15 @@ class LeanSourceTests(unittest.TestCase):
         self.assertFalse(algo.bridge.finish()["settlement_parity_verified"])
         self.assertIn("trace_count=752", algo.debug_messages[-1])
         self.assertIn(algo.bridge.finish()["protocol_trace_head_sha256"], algo.debug_messages[-1])
+        messages = tuple(row.encode("ascii") for row in algo.log_messages)
+        self.assertTrue(all(type(json.loads(row)) is dict for row in messages))
+        self.assertTrue(all(len(row) <= 200 for row in messages))
+        self.assertLessEqual(sum(len(row) + 1 for row in messages), 100000)
+        output = reconstruct_readable_evidence(messages,
+            expected_sha256=readable_evidence_anchor(messages),
+            expected_runtime_context=algo._gdr_context.to_dict())
+        self.assertEqual(output["trace"], algo.bridge.protocol_trace())
+        self.assertEqual(output["metadata"]["status"], "complete")
         with patch.object(algo.bridge, "_account_checkpoints", 371), \
              self.assertRaisesRegex(BridgeError, "incomplete native account checkpoint"):
             algo.on_end_of_algorithm()
@@ -389,13 +400,19 @@ class LeanSourceTests(unittest.TestCase):
         # Changed shadow source-volume is a deliberate shim diagnostic, not
         # the approved fixed base candidate. Reconciliation remains testable,
         # but a different receipt transcript must not export fixed completion.
-        with self.assertRaisesRegex(TraceTransportError, "complete fixed synthetic trace"):
+        with self.assertRaisesRegex(ReadableTransportError, "complete fixed synthetic trace"):
             algo.on_end_of_algorithm()
         fragments = tuple(row.encode() for row in algo.log_messages)
-        output = reconstruct_trace_fragments(fragments, expected_sha256=trace_fragment_anchor(fragments),
-                                              expected_runtime_context=algo._gdr_context.to_dict())
-        self.assertEqual(output["metadata"]["status"], "failed")
-        self.assertEqual(output["trace"], algo.bridge.protocol_trace())
+        # This deliberately changed simulator is outside the fixed-source
+        # digest route. Failure remains visible, but local fixed replay must
+        # not manufacture a matching trace from changed protocol economics.
+        if not any(row.startswith(b"GDR-NATIVE-REFUSED") for row in fragments):
+            with self.assertRaises(ReadableTransportError):
+                reconstruct_readable_evidence(fragments,
+                    expected_sha256=readable_evidence_anchor(fragments),
+                    expected_runtime_context=algo._gdr_context.to_dict())
+        else:
+            self.assertTrue(any("diagnostic_export_unavailable" in row for row in algo.log_messages))
         self.assertFalse(algo.debug_messages)
         report = algo.bridge.finish()
         self.assertEqual(report["strategy"]["orders"][0]["status"], "cancelled")

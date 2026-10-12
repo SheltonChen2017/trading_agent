@@ -111,6 +111,54 @@ def test_malformed_class_metadata_is_not_compared_or_rendered():
     assert diagnostic.classify_capture_failure(Child("capture publication failed")) == "unknown"
 
 
+def test_nonexception_class_attribute_is_never_consulted():
+    class HostileNonexception:
+        @property
+        def __class__(self):
+            raise AssertionError("nonexception class lookup forbidden")
+
+    assert diagnostic.classify_capture_failure(HostileNonexception()) == "unknown"
+
+
+def test_nonexception_cannot_impersonate_an_exception_with_class_attribute():
+    calls = []
+
+    class Impersonator:
+        @property
+        def __class__(self):
+            calls.append("class lookup")
+            return MassiveCaptureError
+
+    assert diagnostic.classify_capture_failure(Impersonator()) == "unknown"
+    assert calls == []
+
+
+def test_class_metadata_descriptor_is_not_invoked():
+    class HostileDescriptor:
+        def __get__(self, instance, owner):
+            raise AssertionError("class metadata descriptor forbidden")
+
+    class Child(MassiveCaptureError):
+        __module__ = HostileDescriptor()
+
+    assert diagnostic.classify_capture_failure(Child("capture publication failed")) == "unknown"
+
+
+def test_metaclass_metadata_descriptor_is_not_invoked():
+    class HostileMeta(type):
+        @property
+        def __module__(cls):
+            raise AssertionError("metaclass metadata descriptor forbidden")
+
+    class Child(MassiveCaptureError, metaclass=HostileMeta):
+        __module__ = "scripts.capture_arv2_massive"
+        __qualname__ = "MassiveCaptureError"
+
+    # Read the true built-in metadata, not the metaclass's property. This
+    # remains metadata matching, deliberately not authenticated class identity.
+    assert diagnostic.classify_capture_failure(Child("capture publication failed")) == "persistence_publication"
+
+
 def test_subclasses_and_nonexceptions_are_unknown():
     class Child(MassiveCaptureError):
         pass
@@ -128,6 +176,138 @@ def test_allowlist_has_unique_messages_and_only_finite_static_codes():
     for code, group in diagnostic._GROUPS:
         for message in group:
             assert diagnostic.classify_capture_failure(MassiveCaptureError(message)) == code
+
+
+def _adapter_tree():
+    # Only committed public source is inspected. No adapter invocation,
+    # artifact, credential, provider or process is needed for reachability.
+    source = Path(__file__).resolve().parents[2] / "scripts" / "capture_arv2_massive.py"
+    return ast.parse(source.read_text())
+
+
+def _capture_error_arguments(tree):
+    return [node.exc.args[0] for node in ast.walk(tree)
+            if isinstance(node, ast.Raise)
+            and isinstance(node.exc, ast.Call)
+            and isinstance(node.exc.func, ast.Name)
+            and node.exc.func.id == "MassiveCaptureError"
+            and len(node.exc.args) == 1]
+
+
+def test_every_adapter_literal_refusal_is_classified():
+    literal_messages = {argument.value for argument in _capture_error_arguments(_adapter_tree())
+                        if isinstance(argument, ast.Constant)
+                        and type(argument.value) is str}
+    assert len(literal_messages) == 145
+    for message in sorted(literal_messages):
+        assert diagnostic.classify_capture_failure(MassiveCaptureError(message)) != "unknown", message
+
+
+def _literal_call_names(tree, helper, argument_position, keyword="name"):
+    names = set()
+    for node in ast.walk(tree):
+        if not (isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+                and node.func.id == helper):
+            continue
+        value = next((item.value for item in node.keywords if item.arg == keyword), None)
+        if value is None and len(node.args) > argument_position:
+            value = node.args[argument_position]
+        if isinstance(value, ast.Constant) and type(value.value) is str:
+            names.add(value.value)
+    return names
+
+
+def _name_templates(function):
+    templates = set()
+    for argument in _capture_error_arguments(function):
+        if not isinstance(argument, ast.JoinedStr):
+            continue
+        pieces = []
+        for value in argument.values:
+            if isinstance(value, ast.Constant) and type(value.value) is str:
+                pieces.append(value.value)
+            elif (isinstance(value, ast.FormattedValue)
+                  and isinstance(value.value, ast.Name)
+                  and value.value.id == "name"
+                  and value.conversion == -1 and value.format_spec is None):
+                pieces.append("{name}")
+            else:
+                raise AssertionError("unreviewed formatted refusal shape")
+        templates.add("".join(pieces))
+    return templates
+
+
+def _assert_forwarded_name(function, helper, argument_position):
+    calls = [node for node in ast.walk(function)
+             if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+             and node.func.id == helper]
+    assert calls
+    for call in calls:
+        value = next((item.value for item in call.keywords if item.arg == "name"), None)
+        if value is None:
+            value = call.args[argument_position]
+        assert isinstance(value, ast.Name) and value.id == "name"
+
+
+def test_every_allowlist_entry_has_a_literal_or_audited_formatted_source():
+    tree = _adapter_tree()
+    functions = {node.name: node for node in tree.body if isinstance(node, ast.FunctionDef)}
+    literal_messages = {argument.value for argument in _capture_error_arguments(tree)
+                        if isinstance(argument, ast.Constant) and type(argument.value) is str}
+
+    # Exhaustive evidence for the sixteen retained name-formatted labels.
+    # Names are required at actual helper call sites; forwarding chains are
+    # checked rather than assuming arbitrary name/template combinations work.
+    assert "artifact root" in _literal_call_names(tree, "_open_directory_path", 0)
+    _assert_forwarded_name(functions["_open_directory_path"],
+                           "_require_private_directory_metadata", 1)
+    manifest_names = {"capture manifest", "capture manifest digest"}
+    assert manifest_names <= _literal_call_names(tree, "_exclusive_private_write_at", 3)
+    _assert_forwarded_name(functions["_exclusive_private_write_at"], "_write_all", 2)
+    sync_names = {"capture staging artifact", "capture root publication", "capture root rollback"}
+    assert sync_names <= _literal_call_names(tree, "_fsync_fd", 1)
+    reviewed_cases = (
+        ("_require_private_directory_metadata", "artifact root",
+         "{name} must be an owner-held private 0700 directory"),
+        ("_open_directory_path", "artifact root",
+         "{name} must not traverse a link and must be a directory"),
+        ("_open_directory_path", "artifact root", "{name} root directory is unavailable"),
+        ("_open_directory_path", "artifact root", "{name} is unavailable"),
+        ("_open_directory_path", "artifact root", "{name} could not be prepared safely"),
+        *(("_fsync_fd", name, "{name} directory sync failed") for name in sorted(sync_names)),
+        *((helper, name, template) for name in sorted(manifest_names)
+          for helper, template in (
+              ("_exclusive_private_write_at", "{name} could not be created"),
+              ("_exclusive_private_write_at", "{name} could not be durably written"),
+              ("_write_all", "{name} write failed"),
+              ("_write_all", "{name} write stalled"),
+          )),
+    )
+    formatted_messages = set()
+    for helper, name, template in reviewed_cases:
+        assert template in _name_templates(functions[helper])
+        formatted_messages.add(template.format(name=name))
+    assert len(formatted_messages) == 16
+
+    # Request/session-boundary exception names are deliberately finite; this
+    # template can describe preparation, iteration or close, not just contact.
+    sanitizer = functions["_sanitized_provider_failure"]
+    returns = [node.value for node in ast.walk(sanitizer) if isinstance(node, ast.Return)]
+    expected_template = ast.parse('f"{type(exc).__name__}: provider request failed; details redacted"', mode="eval").body
+    assert len(returns) == 1 and ast.dump(returns[0]) == ast.dump(expected_template)
+    assert any(isinstance(argument, ast.Call) and isinstance(argument.func, ast.Name)
+               and argument.func.id == "_sanitized_provider_failure"
+               for argument in _capture_error_arguments(tree))
+    network_names = {
+        "Timeout", "ConnectTimeout", "ReadTimeout", "ConnectionError", "SSLError",
+        "ProxyError", "RequestException", "ChunkedEncodingError", "ContentDecodingError",
+        "OSError", "RuntimeError", "AttributeError", "TypeError", "ValueError",
+    }
+    network_messages = {name + ": provider request failed; details redacted" for name in network_names}
+    assert len(network_messages) == 14
+    labels = {message for _, group in diagnostic._GROUPS for message in group}
+    assert labels == literal_messages | formatted_messages | network_messages
+    assert len(labels) == 175
 
 
 def test_utility_has_no_imports_or_io_and_does_not_render_exception():

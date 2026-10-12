@@ -494,12 +494,20 @@ Section 288 is the Windows-host Claude session's independent review of
 twelve owner-waived Codex commits of sections 284–287 reviewed after the
 fact, the R284 project and backtest confirmed by administrative QC reads,
 no unrecorded Analyst-lane launch, and the Massive failure classifier's
-label inventory documented as not derived from the adapter.**
+label inventory documented as not derived from the adapter.
+Section 289 counter-reviews `ef654b1d` after the owner's monitor trigger:
+accepted after three P3 record qualifications, with all 145 literal adapter
+refusals now classified and hostile metadata lookups corrected. The sixteen
+allegedly unreachable labels are valid formatted adapter messages, not
+invented messages. No failed capture was retried or privately re-read.**
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
 Operative worktree after the owner-authorized section-272 move:
 `/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2`.
+The current Windows counter-review uses only
+`C:\git\customizedAgent\trading_agent_analyst_revisions` on the same lane
+branch. This does not move, authenticate or reopen the Mac's private corpus.
 Historical old-root strings below remain historical evidence, not a direction
 to execute there. Relocation acceptance is withheld as recorded in 272.4.
 
@@ -1492,10 +1500,15 @@ monitor remains paused.
 Section 288 is the Windows-host Claude session's independent review of the
 exact pushed range `c2112b11..b295ce02` (sections 249–287), including the
 twelve owner-waived Codex commits of sections 284–287 reviewed after the
-fact. The immediate next step is that Codex must counter-review section 288
-and its record commit and answer `ARV2R288-001` and `-003`; `ARV2R248-002`,
-`-003`, `-004` and `ARV2D287-001` stay open, the floor **314 / 239 / 50 /
-699** stands, and the external evidence gates of 285.10 are unchanged.
+fact. Section 289 records the completed qualified Codex counter-review of
+that exact record commit and the corrected finite classifier. Claude must
+review section 289 and its committed correction; `ARV2R288-003`'s historical
+inline caller remains unavailable, and a future committed observation seam
+does not itself grant source contact. `ARV2R248-002`, `-003`, `-004` and
+`ARV2D287-001` stay open, the floor **314 / 239 / 50 / 699** stands, and the
+external evidence gates of 285.10 are unchanged. The owner rearmed the
+Windows review monitor; it detected `ef654b1d` and was paused before this
+round, with no automatic rearming or source acquisition.
 The owner previously said
 "proceed" after the open-session concern was explained. Section 272 supersedes
 the session-exit prerequisite, without authorizing any process interruption.
@@ -44837,3 +44850,78 @@ separately justified, committed diagnostic contract before any new Massive
 contact. No R247, R281 or R284 attempt, replacement identity, stress
 successor, levered target, paper/live deployment, broker, funded-account,
 real-order or trading action is authorised.
+
+## 289. Codex counter-review of section 288 and source-complete finite failure labels, 2026-10-12
+
+### 289.1 Exact snapshot and review disposition
+
+The owner's armed monitor fetched only the matching lane branch first.
+Local HEAD, FETCH_HEAD and origin's lane head all resolved to
+`ef654b1dc7432c003abd5a818ac67514d8ef4bff`, a clean descendant of the
+arming baseline `b295ce02558cb39e8ba8b8baf6f84fda6e3ddd6c`. The sole new
+commit contains only section 288 and its live navigation/ledger updates.
+Its contents, not shared author metadata, identify Claude's completed review.
+The one-shot heartbeat was paused before the counter-review; no branch,
+worktree, shared Git configuration or remote history was changed.
+
+| Claude commit | Disposition | Independently checked basis |
+|---|---|---|
+| `ef654b1dc7432c003abd5a818ac67514d8ef4bff` | accepted after correction | Complete diff and cumulative public source inspected. The 73-commit range, 61-plus-12 split, eight immutable code/trust-root blobs and once-only look arithmetic agree. Three documentary qualifications below correct message reachability and the historical reviewer/waiver attribution. Current QC administrative observations, original Mac receipts and complete-suite output remain Claude-reported evidence, not newly retrieved or reproduced by Codex. |
+
+No missed Claude commit is skipped. This counter-review does not rerun the
+already disposed historical review chain or claim independent acceptance
+of Codex's own new implementation. Review quality is **8/10**, not a market-
+evidence or deployment-readiness score. No P0 or P1 was found. The carried
+P2s remain open; none is repaired by a documentation qualification.
+
+### 289.2 Findings, exact dispositions and corrections
+
+| ID | Priority | Status / location | Evidence, impact, correction and verification |
+|---|---|---|---|
+| `ARV2CR289-001` / `ARV2R288-001` | P3 | partially correct; documentary claim corrected and actual literal gap fixed | The original inventory is 82 labels: 52 exact adapter literals, 14 finite sanitizer expansions and 16 name-formatted expansions. Section 288's assertion that those 16 are raised by no adapter/repository source is false: `_open_directory_path` and its forwarded metadata helper, `_fsync_fd`'s three literal names, and manifest/digest writes through `_exclusive_private_write_at` and `_write_all` supply every one. The separate 93-of-145 literal coverage gap is confirmed. Retain all valid original labels, add the missing 93 literal labels and bind the 175-message inventory to actual source literals, templates, call-site names and forwarding. New source-derived tests fail against the old inventory and pass corrected; no provider invocation is used to prove syntax. Other formatted/canonical-forwarded messages may still be safely unknown. |
+| `ARV2CR289-002` | P3 | corrected prospectively; 288.1–2 | The first 61 commits are 49 Codex commits independently reviewed in eleven Claude sections plus 12 Claude commits counter-reviewed by Codex, including `6e9c5562` in section 284. They are not sixty commits independently reviewed by Claude. The final twelve Codex commits received the direct section-288 review. Git and the existing per-commit tables establish coverage of all 73 without misattributing the reviewer or timing; original review history is retained. |
+| `ARV2CR289-003` | P3 | corrected prospectively; 288.1 | Sections 285–287 contain nine commits (five plus two plus two), not ten of the twelve tail commits. The three section-284 commits preceded those scoped waivers; 285.1 describes the already-pushed publisher series as unreviewed and waives its prospective use. Commit order and the quoted decisions establish this distinction, not author metadata. |
+| `ARV2CR289-004` | P3 | corrected; `classify_capture_failure` | The former `isinstance` can consult a nonexception's hostile `__class__`, and normal class metadata lookup can execute a metaclass descriptor. That violates the helper's no-caller-controlled-lookup contract and can replace a finite refusal with an exception. Actual `type`/`issubclass` and built-in type metadata storage descriptors avoid those hooks. Old-source execution fails the two nonexception cases and hostile metaclass case; the corrected function passes them. A retained class-descriptor case already passed old code and is strengthening, not falsely claimed as a reproduced regression. |
+| `ARV2R288-003` | P3 | confirmed; original caller unavailable | `db306644` changes only the record. The spent R287 inline invocation is not recoverable from Git, and no replacement is claimed as its original code. A committed future-use observer is the next bounded preparation step, not a reconstructed caller or renewed D1. Actual provider dispatch still needs its separately justified committed protocol. |
+| `ARV2R288-002`, `-004`, `-005`, `-006` | P3 | accepted with stated limitations | Banner correction, Windows/Darwin host classification, other-lane launch exclusion and reviewer-reported owed suite counts are internally consistent. Other-lane accounting remains documented, not fixed or independently queried here. The still-running complete suite is not a green validation result. |
+| `ARV2WL-D289-001` | P3 | validation limitation, not a confirmed shared defect | Three shared active-document reachability tests invoke Git subprocesses and are refused by this round's child-process denial: `test_a_declared_current_mainline_hash_is_really_on_the_mainline`, `test_no_document_calls_a_merged_commit_unreachable`, and `test_no_action_plan_row_calls_its_own_merged_commits_unmerged`. The as-received combined document selection returns 83 passed / 3 failed. No shared test, production file or isolation rule is weakened to make these green; Claude's 86-pass claim is not presented as a reproduced Codex count. |
+
+This section qualifies, rather than silently rewrites, section 288's
+historical report. `ARV2R248-002`, `-003`, `-004`, `ARV2D287-001`,
+`ARV2R196-001`, the other section-246 P2s and out-of-lane `ARV2CR28-008`
+retain their existing dispositions. R287's cause and contact count remain
+unknown; matching labels do not authenticate a root cause or secret validity.
+
+### 289.3 Counter-review validation and unchanged boundaries
+
+On native Python **3.13.14**, the original `b295ce02` classifier loaded
+only in memory against the final 48-case test file returns **5 failed /
+43 passed in 1.53 s**: two literal-inventory regressions and three hostile-
+lookup regressions. Corrected classifier: **48 passed in 0.98 s**, no
+failures/skips/warnings. The first combined synthetic selection including
+the future observer gives 94 passed in 1.04 s; its constituent checks are
+reported separately in this and the implementation stage, never added twice.
+The as-received lane-record/active-document selection gives **83 passed /
+3 failed in 5.21 s**, with the isolation-only shared failures above.
+
+Tests run with plugin autoload disabled, `--noconftest`, no cache provider,
+`-B` and fresh in-root basetemp. The ephemeral launcher clears inherited
+environment values without reporting or using them, blocks audited socket
+operations except local hostname metadata, child/process dispatch, additional
+ctypes library/function resolution, private artifacts and `.env` opens, and
+the dispatch-fence import. Socket creation and child-spawn probes are denied
+before tested lane imports, and `assistant.dispatch_fence` stays absent.
+Trusted Windows console and Pandas/timezone support initializes before the
+denial hook; this is Python audit-based isolation, not a claimed native OS
+sandbox or whole-interpreter integrity proof. Initial setup attempts stopped
+before tests or at collection: console native loading, local platform hostname
+and timezone native loading were refused; those are not old-code regressions.
+
+The adapter and all five selected section-287 source files remain unchanged,
+as do V16–V19, the six-universe bridge and all three zero-access trust roots.
+The complete Codex lane/repository suite is not run. No credentials, provider
+rows, private captures, prices, returns, outcomes, QC/API, broker/database,
+deployment, real orders or trading are accessed by this round. The look floor
+remains **314 shared / 239 development / 50 infrastructure / 699 cells**.
+Exactly one final matching-lane push is retained after the bounded offline
+implementation and its record/validation; no checkpoint push is made.

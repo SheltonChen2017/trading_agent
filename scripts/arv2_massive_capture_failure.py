@@ -12,6 +12,7 @@ this cannot recover the discarded reason for the spent R287 invocation.
 _GROUPS = (
     ("credential", (
         "MASSIVE_API_KEY is unavailable or malformed; refusing provider access",
+        "provider response appears to echo credential material; persistence refused",
     )),
     ("unsafe_configuration", (
         "requests is required for Massive capture",
@@ -32,6 +33,13 @@ _GROUPS = (
         "provider request was not prepared as exact GET",
         "prepared provider request changed the frozen query",
         "provider response URL changed the prepared request",
+        "physical capture contract hash is not an admitted exact version",
+        "capture transport is not reviewed",
+        "capture storage mode must be an exact boolean",
+        "capture timestamp could not form an artifact ID",
+        "offline test transport requires a synthetic key",
+        "expected capture transport is not reviewed",
+        "capture page visitor must be callable",
     )),
     # The frozen adapter uses these messages for its request/session boundary,
     # including preparation, response iteration and session close. This label
@@ -83,6 +91,76 @@ _GROUPS = (
         "capture exceeded the reviewed stored-row budget",
         "capture manifest exceeds the byte limit",
         "capture exceeds the reviewed stored-byte budget",
+        "provider row contains a non-finite number",
+        "provider row contains invalid text",
+        "provider row contains a non-string object key",
+        "provider row contains an unsupported JSON scalar",
+        "capture exceeds the reviewed retained-byte budget",
+        "provider replayed a response page",
+        "provider cursor repeats or cycles",
+        "provider page failed capture binding",
+        "capture exceeded the reviewed retained-byte budget",
+        "complete provider capture failed authentication",
+        "capture manifest is not canonical JSON",
+        "capture manifest must be an object",
+        "capture manifest schema changed",
+        "artifact ID does not match its directory",
+        "artifact ID timestamp does not match capture chronology",
+        "manifest date range is reversed",
+        "manifest stored-byte budget changed",
+        "manifest stored-row budget changed",
+        "manifest capture transport is not reviewed",
+        "manifest capture storage mode is inconsistent",
+        "production capture was not page-spooled",
+        "manifest provider-I/O classification changed",
+        "manifest source-role order changed",
+        "manifest exceeds the stored-byte budget",
+        "manifest exceeds the stored-row budget",
+        "capture manifest field is invalid",
+        "manifest role counts are incomplete",
+        "manifest page inventory is empty",
+        "manifest page inventory exceeds the bound",
+        "manifest chronology is invalid",
+        "manifest capture chronology is reversed",
+        "manifest role count must be an object",
+        "manifest role counts are out of order",
+        "manifest role count is invalid",
+        "manifest page must be an object",
+        "manifest page source role is invalid",
+        "manifest page number is invalid",
+        "manifest pages are not in canonical role order",
+        "manifest skipped a source role",
+        "manifest role page chain did not terminate",
+        "manifest terminal page was followed",
+        "manifest pages are not contiguous from one",
+        "manifest endpoint path changed",
+        "manifest query binding changed",
+        "manifest page filenames are not canonical",
+        "manifest page field is invalid",
+        "manifest page chronology is invalid",
+        "manifest cursor chain is discontinuous",
+        "manifest terminal-page state is inconsistent",
+        "manifest cursor chain repeats or cycles",
+        "manifest repeats a raw response page",
+        "manifest did not complete every source role",
+        "manifest role counts do not match pages",
+        "manifest aggregate counts do not match pages",
+        "capture transport does not match bridge expectation",
+        "persisted provider rows are not the canonical ordered extraction",
+        "manifest cursor hash does not match the exact provider response",
+        "persisted page failed capture binding",
+        "manifest page row count does not match authenticated bytes",
+        "manifest endpoint identifier changed",
+        "capture visitation was not exhaustive",
+        "capture exceeds the bridge page-count budget",
+        "capture exceeds the bridge row-count budget",
+        "capture exceeds the bridge retained-byte budget",
+        "capture exceeds the bridge provider-row byte budget",
+        "capture exceeds the active bridge budget",
+        "manifest did not contain every source role",
+        "persisted capture failed authentication",
+        "current capture identity does not reconstruct",
+        "manifest capture identity does not reconstruct",
     )),
     ("persistence_publication", (
         "artifact directory entry could not be inspected",
@@ -106,6 +184,21 @@ _GROUPS = (
         "capture manifest digest could not be durably written",
         "capture manifest digest write failed",
         "capture manifest digest write stalled",
+        "capture page did not retain exact raw response bytes",
+        "manifest logical capture identity changed",
+        "artifact manifest changed logical capture identity",
+        "timestamped capture already exists; overwrite refused",
+        "timestamped incomplete capture already exists; overwrite refused",
+        "raw response bytes disappeared before persistence",
+        "timestamped capture publication failed or overwrite was refused",
+        "capture artifact inventory is unreadable",
+        "capture artifact root inventory does not match",
+        "capture artifact page inventory does not match manifest",
+        "capture artifact inventory changed during inspection",
+        "capture artifact inventory changed",
+        "capture artifact path identity changed during visitation",
+        "capture manifest digest does not authenticate bytes",
+        "persisted page byte count or hash changed",
     )),
 )
 
@@ -117,11 +210,14 @@ def classify_capture_failure(exc: BaseException) -> str:
     unrecognized class metadata and direct built-in/network exceptions are unknown. No prefix,
     substring, regex or message parsing can accidentally echo a secret.
     """
-    if not isinstance(exc, BaseException):
-        return "unknown"
     kind = type(exc)
-    module = type.__getattribute__(kind, "__module__")
-    name = type.__getattribute__(kind, "__qualname__")
+    # isinstance can consult a nonexception's hostile __class__. Normal type
+    # lookup, even type.__getattribute__, can invoke metadata descriptors on
+    # a class or metaclass. Read the built-in storage descriptors instead.
+    if not issubclass(kind, BaseException):
+        return "unknown"
+    module = type.__dict__["__module__"].__get__(kind)
+    name = type.__dict__["__qualname__"].__get__(kind)
     if (
         type(module) is not str
         or type(name) is not str

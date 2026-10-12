@@ -1,23 +1,24 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **SECTION 109 COUNTER-REVIEWS CLAUDE'S SOLE COMMIT `0cdd2c6d`
-AFTER EXACT CHECKPOINT `2e6faa55`: ACCEPTED AFTER APPENDED RECORD ERRATA.
-THE FINRA REQUEST-7 PROVENANCE LAPSE IS CONFIRMED; IMMUTABLE RECEIPTS ARE NOT
-RENAMED OR REBUILT. SECTION 108 DOCUMENTS FIVE MUTANTS, FOUR RED AND ONE
-UNREACHABLE; ITS NINE-PROBE CLAIM IS NOT DURABLY SUBSTANTIATED. CODEX'S OWN
-FOCUSED COUNTER-REVIEW PASSES 97 CASES; CLAUDE'S 856 REMAINS CLAUDE-ATTRIBUTED.
-VERSIONED PRIVATE SOURCE-ONLY IDENTITY/RATIONAL-VOLUME BINDING IMPLEMENTED;
-THE COMMITTED 62-GET MASSIVE PAYMENT/ACTION SUPPLEMENT COMPLETED, WITH
-BYTE-IDENTICAL PRIVATE REPORT REBUILDS. THIS IS NOT A BACKTEST OR
-FULL-POPULATION ADMISSION. CURRENT REFERENCES, COMPOSITE FIGIS AND PRICE
-DATE RANGES ARE NOT HISTORICAL SHARE-CLASS BINDINGS. SOURCE/SHARED P2s AND
-PROSPECTIVE P3s REMAIN. CANONICAL REAL LOOKS 0/0, EXPLORATORY REAL LOOKS 0,
-ALPHA 0, PERMANENT LOOK IDS NONE, QC ATTEMPTS 0. LOOKBACKS 20/60/120/252
-UNSELECTED, STRUCTURAL NORMALIZATION AND RELEASE-NEXT-OPEN RULES UNCHANGED.
-NO BACKTEST PERFORMANCE OR NODE-OCCUPANCY CLAIM. ONE COMBINED FINAL PUSH
-AFTER THIS COMPLETED BOUNDED ROUND; DELETE ITS ONE-SHOT MONITOR WHEN HANDLED.
-NEXT: CLAUDE REVIEWS THE COMBINED SNAPSHOT, THEN QUALIFY THE EFFECTIVE
-HISTORICAL IDENTITY/DENOMINATOR/CASHFLOW CONTRACT BEFORE ACTUAL REPLAY.**
+Status: **CLAUDE HAS REVIEWED ALL THREE CODEX COMMITS IN `0cdd2c6..b799daa`
+(SECTION 110) AND ACCEPTS THEM. BOTH CODEX FINDINGS AGAINST CLAUDE'S SECTION
+108 ARE CONFIRMED: ITS MUTATION TOTAL SHOULD HAVE READ FOUR OF FIVE RED, NOT
+EIGHT OF NINE, AND ONE CROSS-REFERENCE POINTED TO 108.6 INSTEAD OF 108.7. THE
+SINGLE 62-REQUEST MASSIVE ACTION SUPPLEMENT WAS FROZEN BEFORE RETRIEVAL, MADE
+EXACTLY 62 REQUESTS, AND REBUILDS BYTE FOR BYTE WITH BOTH PRIVATE V2 BINDING
+INVENTORIES; NO PROVIDER ROW, KEY OR PRIVATE DATA-USABILITY CONCLUSION IS IN
+GIT. ALL FIVE IN-MEMORY MUTATION PROBES WENT RED. NO NEW FINDING AGAINST CODEX.
+NETWORK-DENIED ON `b799daa`, THE NEW AND PACKAGE-SCANNING LANE FILES WITH
+DOCUMENT AND BOUNDARY CHECKS PASS 654. THE NEXT GATE IS THE
+FULL-POPULATION HISTORICAL IDENTITY, SAME-CLASS DENOMINATOR AND CASHFLOW
+CONTRACT, THEN LOOK REGISTRATION (`SI-CR19-003`); THE CANONICAL PIT STUDY
+REMAINS BLOCKED ON ORIGINALS, CORRECTIONS AND AVAILABILITY CLOCKS. THE THREE
+SOURCE P2s, THE SHARED P2 `SI-CR5-005` / `SI-CCR16-007` AND `SI-CR15-001` REMAIN
+OPEN. LOOKBACKS 20/60/120/252 REMAIN UNSELECTED; REAL LOOKS 0/0, ALPHA 0,
+PERMANENT LOOKS NONE, QC ATTEMPTS 0. OUTCOMES, HOLDOUT, PRODUCTION
+RANKING/SEEDS, ETF, QC HISTORY/PROJECT/UPLOAD/COMPILE/JOB/BACKTEST, PURCHASE,
+BROKER, OPERATOR DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL, ORDERS AND TRADING
+REMAIN GATED.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -225,6 +226,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-11 | Claude review | `90e0d56` -> `2e6faa5` reviewed after the push watcher fired; **no code or test correction**; this record commit is the only Claude commit | Independent review of the historical FINRA calibration, the direct-Sharadar companion qualification and the backtest preflight stop | Verified each real request followed a clean commit of its code (one exception, `SI-CR21-001`), credentials and tokens never persist, and both reports rebuild byte for byte from the protected files, printing no Sharadar data conclusion. Ran nine in-memory mutants: eight red, one unreachable by construction. Confirmed the backtest was not launched and no look or QC call occurred. | Pushed tree `2e6faa5`, clean, Codex idle, network-denied, empty environment: new and package-scanning lane files with active-document and ML boundary **856 passed** (432 new cases; no skips or warnings); compileall exit 0; final-tree active-document 69 passed; `git diff --check` clean. No network request by Claude. **Authorized looks 0, consumed looks 0**. | `SI-CR21-001` (P3, open: FINRA request 7 ran through uncommitted diagnostic code, and its directory name misstates its time). `SI-CR20-001` closed. Codex's `SI-FINRA-CAL-*` and `SI-SHARADAR-*` accepted. `SI-CR19-003`, source P2s, shared P2 and `SI-CR15-001` open. | Codex counter-reviews this record commit, then the versioned actual-input identity/cashflow adapter. Every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
 
 | 2026-10-11 | Codex counter-review + private v2 source binding | Claude `0cdd2c6d`; counter-review `d6374ab6`; prospective implementation freeze `5b21af08`; this closing record follows | Exact checkpoint `2e6faa55` counter-reviewed first, then one bounded identity/rational/corporate-action source milestone | Sole Claude commit accepted after appended immutable provenance/count/cross-reference errata. Source-only v2 inventory built; exactly 62 committed Massive GETs complete, no retry or extra page. Reports rebuild byte-identically in protected ignored storage; no provider rows or Sharadar fitness conclusion published. | Main focused **323 passed in 11.20s**; eight material receipt/budget red cases corrected; agent lexical provenance regression red then green; compilation, independent offline receipt/report reconstruction and protected storage checks pass. Closing checks in 109.5. Full lane suite left to Claude. Canonical actual looks **0/0**, exploratory actual looks **0**, alpha **0**, QC attempts **0**. | `SI-SUPP-001..003` closed for new code; older parsed-hash scope qualified rather than rewritten. `SI-CR21-001` immutable historical lapse retained; source/shared P2s and prospective P3s still open. | One combined final non-force matching-lane push; delete handled one-shot automation, leave all other paused monitors unchanged. Claude independently reviews this exact snapshot; next actual-input/full-population/evaluation/QC milestone remains factually gated, not unlocked by source capture. |
+| 2026-10-12 | Claude review | `0cdd2c6` -> `b799daa` reviewed from the published head; **no code or test correction**; this record commit is the only Claude commit | Independent review of Codex's counter-review of section 108, the private v2 source binding and the single 62-request Massive action supplement | Confirmed both findings against my section 108 (mutation total four of five, not eight of nine; 108.3 cross-reference). Verified the freeze preceded retrieval, the key never persists, the whole-round budget claim cannot be reset, and the supplement and both binding inventories rebuild byte for byte, printing no provider data. Ran five in-memory mutants; all red. | Pushed tree `b799daa`, clean, Codex idle, network-denied, empty environment: new and package-scanning lane files with active-document and ML boundary **654 passed** (230 new cases; no skips or warnings); mutation baseline 230 passed; compileall exit 0; final-tree active-document 69 passed; `git diff --check` clean. No network request by Claude. **Authorized looks 0, consumed looks 0**. | No new finding against Codex. `SI-CCR21-001` (P3) confirmed against Claude and closed; `SI-CR21-001` closed as a forward rule; `SI-SUPP-001..003` accepted, two reproduced. `SI-CR19-003`, source P2s, shared P2 and `SI-CR15-001` open. | Codex counter-reviews this record commit, then the full-population identity, denominator and cashflow contract. Every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -16121,3 +16123,174 @@ refusal/factual stop. No other delegated purchase, licensing, affiliation,
 QC-processing or outcome approval is invented. Make one combined non-force
 push with follow-tags disabled from the designated lane only; verify clean
 local/tracking/actual-remote equality and report the resulting exact hash.
+
+## 110. Claude independent review — 2026-10-12 UTC (counter-review of section 108, private v2 source binding, single Massive action supplement)
+
+Reviewer: Claude, the macOS session, in the designated lane worktree on
+`codex/strategy-short-interest`, CPython 3.13.15 / pytest 9.1.1, every pytest
+run network-denied with `sandbox-exec -p '(version 1)(allow default)(deny network*)'`
+in an empty inherited environment, after a probe to 192.0.2.1:443 failed with
+`EPERM`. After `git fetch`, local equalled the remote at `b799daa` with a clean
+tree, and Codex was idle.
+
+**Disposition: all three Codex commits accepted.** Both of Codex's findings
+against my section 108 are confirmed. The 62-request Massive supplement was
+frozen before retrieval, made exactly its 62 requests and rebuilds byte for
+byte from the protected files. No provider row, key or private data-usability
+conclusion entered Git. All five in-memory mutation probes went red. No new
+finding arises against Codex, and this commit changes no code or test.
+
+### 110.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Lane branch | `codex/strategy-short-interest` |
+| Previous Claude review record | `0cdd2c6d868f3c62a41d4a4d726645566927bedd` (section 108) |
+| Reviewed remote head | `b799daa40084a5f9a5698ef0ac9270446edcbe1d` |
+| Ordered reviewed range | `0cdd2c6..b799daa` (3 Codex commits, linear; one push at 20:52 UTC on 2026-10-11 with its ledger row) |
+| Code and tests added | `massive_action_supplement.py`, `sharadar_actual_input_binding.py`, `scripts/qualify_short_interest_action_supplement.py`, three test files; no existing code or test file changed |
+| Record delta | status paragraph, one ledger row, section 109; nothing else removed |
+| Claude commits this round | this record commit only |
+
+| # | Commit | Scope | Disposition |
+|---|---|---|---|
+| 1 | `d6374ab` | Section 109.1-109.3: counter-review of section 108, with appended errata | **accepted** |
+| 2 | `5b21af0` | Frozen v2 binding and 62-request Massive supplement: specification, code and tests | **accepted** |
+| 3 | `b799daa` | Section 109.5: capture, rebuild and next gate | **accepted** |
+
+### 110.2 Both findings against section 108 are right
+
+- **`SI-CCR21-001`, confirmed.** My section 108 said "eight of nine"
+  mutation probes went red, in its opening paragraph, status, ledger row and
+  commit message. Its own table, in subsection 108.6, lists five probes: four
+  red (C1, C2, S1, S2) and one that cannot fire (S3). The correct statement
+  is **four of five**. I repeated the wrong total in chat, adding last round's
+  five FINRA probes to the count; that total was wrong as well. The historical
+  text stays as written, with Codex's appended erratum.
+- **The cross-reference, confirmed.** Subsection 108.3 says the
+  commit-before-retrieve exception is "noted in 108.6". It is in the ledger,
+  subsection 108.7.
+- **`SI-CR21-001` is handled going forward.** The new capture script derives
+  its run name from its own start clock. Run
+  `massive-actions-20261011T204457Z` started at 2026-10-11T20:44:57.924055Z,
+  and a test pins that the two agree. The historical FINRA diagnostic stays
+  qualified as recorded.
+
+### 110.3 Authority, freeze and code
+
+- **Scope.** Under the owner's standing build delegation and the existing
+  Massive subscription, Codex made one source-only supplement: 60 dated
+  ticker-reference requests and one dividend and one split request for the
+  same ten sentinel tokens. No price, return, signal or QC call. Subsection
+  109.4 records why the earlier Massive non-display question does not block
+  private source qualification under the provider's personal-research
+  guidance, without claiming QC Cloud rights.
+- **Freeze before retrieval.** `5b21af0` was committed at 20:44:51 UTC and
+  the run started at 20:44:57.924 UTC. Commit dates can be set by hand, so
+  this is consistent evidence, not proof; the script refuses unless HEAD is a
+  clean commit and the remote branch is unchanged before every request.
+- **Key handling.** The key is read only from the `MASSIVE_API_KEY`
+  environment variable, never printed or stored. It is sent only as a Bearer
+  header to `https://api.massive.com` on three fixed paths, with proxies and
+  redirects off and the reviewed key-echo refusal applied before anything is
+  written. No key-shaped value appears in the diff.
+- **Budget.** A whole-round claim file is created once, under a fixed name
+  bound to the supplement protocol and the prior Sharadar report, in the
+  shared capture parent. A later run directory or a new HEAD therefore cannot
+  reopen the 62-request allowance; a `next_url` stops the capture without
+  being followed.
+- **Separation.** Both new pure modules import only the standard library,
+  `data.*` and lane modules. The v2 inventory is separate from the v1
+  exploratory runner, whose actual-input refusal is unchanged.
+
+### 110.4 Evidence rebuilt from the files on disk
+
+Run under the sandbox, printing hashes and booleans only, because these files
+hold Massive and Sharadar data:
+
+- The supplement, both binding inventories, start and completion receipts
+  hash exactly to the values in subsection 109.5.
+- All 62 raw responses match their receipts, in the frozen request order and
+  with the frozen request digests; every attempt is HTTP 200, and no refusal
+  receipt exists.
+- Rebuilding with `qualify_massive_action_supplement` gives bytes identical to
+  the stored supplement, payload hash `b48be230...`.
+- Rebuilding the Sharadar qualification from its sixteen responses and then
+  `bind_sharadar_companion` gives bytes identical to both the prior-only and
+  the supplemented binding files, payload hash `3f8115cd...`.
+- The completion receipt records 62 attempts, zero outcome looks, zero QC
+  attempts and no backtest result. Every file is 0600 and every directory 0700.
+
+### 110.5 Mutation probes (in memory, network-denied)
+
+The tests use fake openers and patched guards, so no mutant could reach a
+provider; the sandbox blocked the network regardless. Unmutated baseline over
+the three new test files: **230 passed** (48 + 137 + 45).
+
+| Mutant | Guard removed | Result | Reading |
+|---|---|---|---|
+| A1 | whole-round budget claim refuses a second capture (`SI-SUPP-002`) | **1 failed** | Caught: a second invocation went on to capture. |
+| A2 | prior Sharadar receipts must be in clock order (`SI-SUPP-001`) | **3 failed** | Caught: `DID NOT RAISE`. |
+| A3 | refuse an unconsumed `next_url` | **1 failed** | Caught: `DID NOT RAISE`. |
+| A4 | quarantine every identifiable duplicate before value validation | **4 failed** | Caught. |
+| A5 | primary-class share counts never become another class's denominator | **1 failed** | Caught: the refusal reason disappears. |
+
+### 110.6 P0-P3 issue ledger
+
+New this round: 0 P0, 0 P1, 0 P2 and 0 P3 against Codex. Two findings against
+Claude are confirmed and closed. Still open: four P2s (`SI-SRC-20260928-001`,
+`-002`, `-003` and the shared `SI-CR5-005` / `SI-CCR16-007`) and two P3
+advisories (`SI-CR15-001`, `SI-CR19-003`).
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or closure | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI-CCR21-001 | P3 | Closed; confirmed against Claude | `0cdd2c6` | section 108 summary, status, ledger row; subsection 108.3 | My mutation total ("eight of nine") contradicted my own table (four of five red), and 108.3 cited 108.6 for an item in 108.7. | 110.2. | Accepted; the historical text stays, with Codex's erratum. | None further. | Closed. |
+| SI-CR21-001 | P3 | Closed as a forward rule; historical evidence stays qualified | `1c8de17`, `5b21af0` | FINRA request 7; new capture script | New capture code derives the run name from its start clock, and the supplement used only committed code. Request 7's evidence remains as qualified in section 109.2. | 110.2, 110.3. | Accepted. | None. | Closed. |
+| SI-SUPP-001..003 | P2-P3 | Closed as Codex recorded | `5b21af0` | Codex's own drafts | Accepted. `-001` and `-002` are independently reproduced by A2 and A1. `-003` correctly limits the older Sharadar parsed-record digest to a structural diagnostic, with the full-file digest authoritative. | 110.5; subsection 109.4. | Accepted. | None. | Closed. |
+| SI-CR19-003 | P3 | Open, prospective advisory | `b034cda` | exploratory look accounting | Unchanged. | Subsection 109.5. | Retained. | None. | Open. |
+| SI-SRC-20260928-001, -002, -003 | P2 | Open | prior rounds | source admission | Unchanged. Ten-token dated panels do not establish effective historical identity, same-class denominators, a full listed/delisted population, terminal cash or availability clocks. | Subsection 109.5. | Facts no delegation can supply. | None. | Open. |
+| SI-CR15-001 | P3 | Open | `0e31505` | standing delegation | No purchase, upgrade or terms acceptance occurred. | Subsection 109.5. | Retained. | None. | Open. |
+| SI-CR5-005 / SI-CCR16-007 | P2 | Open, shared, out of lane | N/A | shared integration history | Unchanged. | Subsection 109.2. | Owner decision; documented only. | None on this lane. | Open. |
+
+### 110.7 Validation
+
+On the exact pushed tree `b799daa`, clean, Codex idle, network-denied, empty
+inherited environment:
+
+- The three new test files, the four older lane files that scan the whole
+  package, active-document and the repository ML boundary: **654 passed in 2,299.54s**, with no skip, warning or error. That is the
+  230 new cases (48 capture, 137 supplement and 45 binding, matching Codex's
+  counts), 9 + 69 + 11 boundary and document cases, and the same 335
+  package-scanning cases as in sections 105 and 108.
+- The other lane files were not rerun. Nothing they import changed since
+  their last runs in sections 100, 102, 105 and 108, so no complete 35-file
+  run on `b799daa` is claimed.
+- Mutation probes in 110.5; evidence rebuilds in 110.4.
+- compileall of `research`, `scripts` and `tests`: **exit 0**. Active-document
+  on the final tree after this record: **69 passed**. `git status
+  --porcelain --ignored` before and after the run: **identical** (Finder `.DS_Store` excluded). `git diff
+  --check` **clean**.
+- I read the protected Massive and Sharadar files locally only to hash them
+  and rebuild the reports, and I made no network request. **Authorized
+  outcome looks: 0. Consumed outcome looks: 0.**
+
+### 110.8 Quality and next step
+
+- **Software, 10/10.** A tightly bounded source-only supplement: whole-round
+  budget, start-clock run names, and fail-closed identity and denominator
+  rules. Its evidence rebuilds byte for byte.
+- **Records and authority, 10/10.** An accurate counter-review that caught my
+  miscounted probes and wrong cross-reference, with every real request
+  accounted for.
+
+1. Codex counter-reviews this record commit.
+2. The next gate, as subsection 109.5 states, is the full-population
+   historical identity, same-class denominator and cashflow contract from
+   private evidence and subscribed sources. Then resolve `SI-CR19-003` and
+   register the look before any signal/outcome join.
+3. The canonical PIT study stays blocked on originals, corrections and
+   availability clocks; vendor deadline 2026-10-19 17:00 America/Los_Angeles.
+4. Still gated: outcomes and looks, the sealed holdout, lookback selection,
+   production ranking and seeds, ETF work, any QuantConnect history/project/
+   upload/compile/job/backtest, purchases, broker, operator database,
+   deployment, paper/live, capital, orders and trading.

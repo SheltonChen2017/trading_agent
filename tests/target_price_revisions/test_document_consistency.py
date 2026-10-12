@@ -517,6 +517,8 @@ SECTION8_ROLE_STATEMENT = (
 SECTION8_NEXT_ACTION_STATEMENT = (
     r"\b(?:(?:Claude|Codex) next (?:reviews|counter-reviews)|"
     r"Codex next captures a fresh all-file source baseline and registers diagnosis-only Mia work|"
+    r"Codex next submits source-bound diagnosis-only work to authenticated built-in Mia|"
+    r"Owner next unlocks the Mac and reopens authenticated built-in Mia for OFF37650980|"
     r"Codex continues without Claude review stops)\b"
 )
 SECTION46_CLAUDE_BASE = "9958a459f5cd56c29cb9a0de13d38737e2c3412d"
@@ -1050,7 +1052,9 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "TPR-1 remains blocked" in normalized_current
     assert "reviewed-spec registry remains empty" in normalized_current
     assert "Claude next reviews this Codex round independently" not in normalized_current
-    assert "Codex next captures a fresh all-file source baseline and registers diagnosis-only Mia work" in normalized_current
+    assert "Owner next unlocks the Mac and reopens authenticated built-in Mia for OFF37650980" in normalized_current
+    assert "Codex next submits source-bound diagnosis-only work to authenticated built-in Mia" not in normalized_current
+    assert "Codex next captures a fresh all-file source baseline and registers diagnosis-only Mia work" not in normalized_current
     assert "Codex next counter-reviews section 79" not in normalized_current
     assert "Codex next counter-reviews section 77" not in normalized_current
     assert "Codex next counter-reviews section 73" not in normalized_current
@@ -1125,7 +1129,9 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
         assert "codex has counter-reviewed every claude commit" in normalized_summary_lower
         assert "section 80" in normalized_summary_lower
-        assert "codex next captures a fresh all-file source baseline and registers diagnosis-only mia work" in normalized_summary_lower
+        assert "owner next unlocks the mac and reopens authenticated built-in mia for off37650980" in normalized_summary_lower
+        assert "codex next submits source-bound diagnosis-only work to authenticated built-in mia" not in normalized_summary_lower
+        assert "codex next captures a fresh all-file source baseline and registers diagnosis-only mia work" not in normalized_summary_lower
         assert "codex next counter-reviews section 79" not in normalized_summary_lower
         assert "codex next counter-reviews section 77" not in normalized_summary_lower
         assert "fixture-only tpr-d1 candidate awaits claude review" not in normalized_summary_lower
@@ -2105,7 +2111,7 @@ def test_section_8_carries_one_current_role_and_no_stale_commit() -> None:
 
     The recognized role grammar is Claude/Codex, optional has/independently,
     and reviewed/counter-reviewed; next actions use next reviews/counter-reviews,
-    the exact bounded Mia source-capture action, or the exact owner-directed
+    the fixed Mia preparation/submission/owner-unlock actions, or the exact owner-directed
     continuous no-review role.
     This is an explicit grammar, not an arbitrary-prose classifier. Exactly
     one recognized role and next-action statement must occur in the current
@@ -2156,7 +2162,7 @@ def test_section_8_carries_one_current_role_and_no_stale_commit() -> None:
             "one next action",
         ),
         (
-            "Codex next captures a fresh all-file source baseline and registers diagnosis-only Mia work.",
+            "Owner next unlocks the Mac and reopens authenticated built-in Mia for OFF37650980.",
             "one next action",
         ),
     ],
@@ -4320,14 +4326,19 @@ def test_section_80_guard_refuses_contradictory_grants(monkeypatch, added_grant:
         test_section_80_counterreview_records_all_commits_and_bounded_mia_authority()
 
 
-@pytest.mark.parametrize("fault", ("current_range", "current_role", "preamble_range", "preamble_role"))
+@pytest.mark.parametrize("fault", (
+    "current_range", "current_capture_role", "current_submit_role",
+    "preamble_range", "preamble_capture_role", "preamble_submit_role",
+))
 def test_section_80_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
     test_exact_next_step_names_the_current_artifacts()
     if fault.startswith("current_"):
         original_section = _record_section
         section = original_section("## 8. Exact next step")
         old, new = (SECTION80_CLAUDE_RANGE, SECTION79_CODEX_RANGE) if fault.endswith("range") else (
-            "Codex next captures a fresh all-file source baseline and registers diagnosis-only Mia work", "Codex next counter-reviews section 79")
+            "Owner next unlocks the Mac and reopens authenticated built-in Mia for OFF37650980",
+            "Codex next captures a fresh all-file source baseline and registers diagnosis-only Mia work"
+            if "capture" in fault else "Codex next submits source-bound diagnosis-only work to authenticated built-in Mia")
         pattern = r"\s+".join(re.escape(word) for word in old.split())
         assert re.search(pattern, section) is not None
         mutated = re.sub(pattern, new, section)
@@ -4336,9 +4347,51 @@ def test_section_80_current_routing_refuses_stale_range_or_role(monkeypatch, fau
     else:
         preamble = _record_preamble()
         old, new = (SECTION80_CLAUDE_SHORT_RANGE, SECTION79_CODEX_SHORT_RANGE) if fault.endswith("range") else (
-            "CODEX NEXT CAPTURES A FRESH ALL-FILE SOURCE BASELINE AND REGISTERS DIAGNOSIS-ONLY MIA WORK", "CODEX NEXT COUNTER-REVIEWS SECTION 79")
+            "OWNER NEXT UNLOCKS THE MAC AND REOPENS AUTHENTICATED BUILT-IN MIA FOR OFF37650980",
+            "CODEX NEXT CAPTURES A FRESH ALL-FILE SOURCE BASELINE AND REGISTERS DIAGNOSIS-ONLY MIA WORK"
+            if "capture" in fault else "CODEX NEXT SUBMITS SOURCE-BOUND DIAGNOSIS-ONLY WORK TO AUTHENTICATED BUILT-IN MIA")
         assert old in " ".join(preamble.split())
         mutated = " ".join(preamble.split()).replace(old, new)
         monkeypatch.setitem(globals(), "_record_preamble", lambda: mutated)
     with pytest.raises(AssertionError):
         test_exact_next_step_names_the_current_artifacts()
+
+
+def test_section_80_reported_lock_block_preserves_zero_effects_and_counts() -> None:
+    """Pin the reported preflight block; this is not independent native UI evidence."""
+    section = _record_section("## 80. Codex counter-review of Claude section 79")
+    heading = "### 80.10 Diagnosis preflight refusal and stable blocked handoff"
+    assert section.count(heading) == 1
+    block = " ".join(section.partition(heading)[2].partition("\n### ")[0].split())
+    for required in (
+        "Mac is locked and automatic unlock could not unlock it",
+        "Diagnosis001 ended at preflight refusal: no mode selection, task paste/send, Mia tool call/response, source edit, manual build/compile, backtest/stop, Object Store upload or new outcome occurred",
+        "Its one-message allowance is unused and **not renewed**",
+        "No diagnosed cause, proposed patch or Mia-completed run exists to accept/port",
+        "Looks remain19=17cloud+2historical local; OFF3/ON0 remain consumed/unused",
+        "remains PAUSED during and after this round; no automatic rearm",
+    ):
+        assert required in block, "section 80.10 reported lock/effect boundary: " + required
+
+
+@pytest.mark.parametrize("old,new", (
+    ("Mac is locked and automatic unlock could not unlock it", "Mac is unlocked"),
+    ("no mode selection, task paste/send", "one mode selection and task send"),
+    ("OFF3/ON0 remain consumed/unused", "OFF4/ON0 remain consumed/unused"),
+    ("Looks remain19=17cloud+2historical local", "Looks remain20=18cloud+2historical local"),
+    ("remains PAUSED during and after this round; no automatic rearm", "remains ACTIVE during and after this round"),
+))
+def test_section_80_reported_lock_guard_refuses_fact_drift(monkeypatch, old: str, new: str) -> None:
+    test_section_80_reported_lock_block_preserves_zero_effects_and_counts()
+    original_section = _record_section
+    section = original_section("## 80.")
+    heading = "### 80.10 Diagnosis preflight refusal and stable blocked handoff"
+    prefix, marker, tail = section.partition(heading)
+    # Normalize only the reported-block mutation, preserving all earlier scopes.
+    tail = " ".join(tail.split())
+    assert tail.count(old) == 1
+    mutated = prefix + marker + "\n\n" + tail.replace(old, new, 1)
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda title: mutated if title.startswith("## 80.") else original_section(title))
+    with pytest.raises(AssertionError, match="section 80.10 reported lock/effect boundary"):
+        test_section_80_reported_lock_block_preserves_zero_effects_and_counts()

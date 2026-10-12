@@ -452,6 +452,11 @@ Section 283 is Claude's independent review of `682779b7..34489a7a` (0 P0,
 0 P1, 0 P2, 2 P3): both Codex commits are accepted, the twelve-pair map and
 the projection reproduce against the retained reports and the current
 state, and 283.5 asks for a no-allocation baseline check before the one run.
+Section 284 counter-reviews the sole Claude commit `6e9c5562`, qualifies
+endpoint/no-byte/reboot claims, preserves the reviewed v4 source and adds
+isolated regressions plus a separately frozen operational precheck/output
+reader. Its conditional one-shot protocol does not clear source or publication
+gates merely by being implemented; actual results are recorded in that section.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1404,17 +1409,17 @@ Section 281 is Claude's independent review of the exact pushed range
 `50dcf08e..65766598` (sections 277-280). Section 282 counter-reviews its
 sole completed push and records the owner's October 11 exact twelve-ctime
 acceptance. Section 283 is Claude's independent review of the exact pushed range
-`682779b7..34489a7a` (section 282 and the v4 contract). The immediate next
-step is that Codex counter-reviews section 283 and this round's Claude
-commit, unless the owner explicitly changes this workflow; this is not an
-intermediate acknowledgement wait.
-This is the binding new-security-contract review gate, not a routine
-acknowledgement wait; the prior one-round waivers have ended. After that
-completed review push, Codex counter-reviews every new commit and, if no
-gate blocks it, freezes the separate one-shot run decision under delegated
-authority. Do not ask again for the same twelve values, infer a new waiver,
-allocate R282 early, or replay R273/R277/R279. The existing monitor remains
-active; the next trigger must be newer than this Codex round's final push.
+`682779b7..34489a7a` (section 282 and the v4 contract). Section 284
+counter-reviews its sole completed push `6e9c5562` and freezes a no-allocation
+comparison, conditional single unchanged-v4 assessment and output-only reader.
+The unchanged v4 security contract has independent review; the prior one-round
+waivers remain expired. Follow the exact pre-use commit and result gates in
+284.3, not a routine acknowledgement wait. Claude reviews section 284 and the
+exact continuous `6e9c5562..final-head` range after its one final matching-lane
+push, including new ancillary tooling, tests, dispositions and actual results.
+Do not ask again for the same twelve values, infer a new waiver, allocate R282
+early, or replay R273/R277/R279. The existing monitor remains active; the next
+trigger must be newer than this Codex round's final push.
 The owner previously said
 "proceed" after the open-session concern was explained. Section 272 supersedes
 the session-exit prerequisite, without authorizing any process interruption.
@@ -42897,3 +42902,206 @@ documentation address `192.0.2.1` with `EPERM`.
 
 The final tree differs from the pushed head `34489a7a` only by this record
 commit.
+
+## 284. Counter-review of section 283 and separately frozen v4 execution protocol, 2026-10-12
+
+### 284.1 Trigger, authority and exact disposition
+
+The matching-only fetch confirmed local and remote head
+`6e9c5562e39244b02f63b5ea084c8ced9018d924`, a clean worktree and the completed
+section-283 review record. The exact new review range is
+`34489a7a388de1b7424884ed6dff7561156a49a0..6e9c5562e39244b02f63b5ea084c8ced9018d924`:
+one record-only Claude commit, not inferred completion from authorship.
+Every repository operation uses only
+`/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2` on
+`codex/strategy-analyst-revisions-v2`. This round preserves the ten frozen
+v1/v2/v3/v4 observer/wrapper/audit/shared-helper source pins; only lane-owned
+verification tooling, tests and this record may change. Shared documents,
+other lanes and all original/spent evidence remain untouched.
+
+The standing human authority is the exact quote and narrow interpretation in
+282.1. It already accepts the twelve exact prospective ctimes and delegates
+lane research/build decisions; it does not waive review of a new security
+contract or admit arbitrary new observations. Claude's section 283 reviews
+the exact unchanged v4 security contract at `34489a7a`; the counter-review
+below, focused checks and separate pre-use freeze fulfill the remaining
+run sequencing without reusing the expired 278/280 waivers.
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `6e9c5562e39244b02f63b5ea084c8ced9018d924` | accepted after prospective operational/test corrections and documentary qualifications | Complete diff, both findings and both underlying Codex dispositions examined. The reviewed v4 production source remains unchanged. R283-001 is addressed by a separately frozen no-allocation comparison before the conditional one-shot assessment; R283-002 by isolated regressions. Qualifications below preserve the original record and evidence rather than rewriting it. |
+
+### 284.2 Findings and evidence qualifications
+
+| ID | Priority | Classification, reason and disposition |
+|---|---|---|
+| `ARV2R283-001` | P3 | Confirmed preflight limitation: `preflight_scope()` checks current metadata/security but does not compare fifteen observed rows to the projected historical rows. Add an operational precheck, not a new admitting contract: authenticate the original before/after reports, derive the unchanged v4 projection, run one existing complete-scope preflight and compare every one of the fifteen full ten-field metadata rows before allocating R282. This prevents a known stale baseline from spending the identity at that observation; subsequent drift may still refuse after allocation. A changed map without its matching canonical pin already refuses before allocation, so not every transcription error reaches a spent assessment. |
+| `ARV2R283-002` | P3 | Confirmed test-sensitivity gaps, not missing production guards. Same-round independent reproduction of each of the three selective in-memory omissions leaves all 203 original wrapper tests passing (2.31 s held-source check; 1.26 s output security; 1.28 s first preflight recheck). Add isolated dangerous-direction regressions and demonstrate the omitted guards fail them. The exact reviewed production implementation is not changed. |
+| `ARV2CR284-001` | P3 | Qualify the repeated 283.3 no-source-byte inference. Sorted source order plus an earlier preflight mismatch does not prove the later failing leaf or exclude change-and-restore between samples. R279 proves refusal before opening its failing leaf and before the loader callback, not a complete source I/O trace. No historical run or comparison is replayed. |
+| `ARV2CR284-002` | P3 | Qualify 283.3/283.5 current-state and reboot language. The reported lstat equality is a sampled endpoint, not unchanged state throughout the interval or a guarantee a future run passes. A different parent device is checked before mkdir and can refuse without allocation; a postclaim leaf mismatch spends the identity. Neither every reboot changing the device nor every reboot spending R282 follows. No boot/UUID/host probe is run. |
+| `ARV2CR284-003` | P3 | Retain section 283's outside-root logs/plugin disclosure: it is qualified independent review evidence, not fully designated-root-compliant tooling. Its full-suite union is 11,651 strict passes plus 11 nonoverlapping loopback passes = 11,662 distinct passes/8 skips at exact `34489a7a`; retain the original 11 strict failures and 35 strict-group warnings. The 73 loopback-file passes overlap by 62 and have 2 warnings; 351 focused and 86 record checks are subsets/repeats, not additive. No full Codex suite or outside-root replay is used to replace this history. |
+
+`ARV2R281-001` remains a qualified exact-device availability limitation.
+Same-round implementation, test reproduction and advisory auditing here are
+not independent Claude review of the new ancillary tooling or final result.
+They do not replace the actual independent review of the unchanged v4
+security contract in section 283.
+
+### 284.3 Prospective execution decision (must be committed before use)
+
+**284-D1 — one no-allocation comparison, conditional one reviewed assessment.**
+Keep v4 policy SHA
+`3d20990b1df38f6aac04990c01c4fa752af6bc8b14b0bf0b8372b0daa0047fa7`, wrapper
+SHA `8b3f92ec5db2d1e509d9b3314b6377efdb533b2bf9bec0790f4d2b10a4e9b2d3`,
+profile `63e286099b822faa5c33fb7ed46ce26bce80deb4152af438f104e260e1967319`
+and map `4291685e8a45ab5b4a04a9d33022be0aeffffaa2a32ad1d94bad9326ecb52d5b`
+exact. The new operational verifier's `--precheck` uses the unchanged pinned
+history reader/scope/projector once, then existing v4 `preflight_scope()` once,
+and compares all fifteen full metadata rows. It may read the two pinned
+historical reports and perform the reviewed metadata/names/vintage-fingerprint
+preflight, not consume current source contents or allocate an assessment.
+Its total cooperative budget is 60 seconds; the nested preflight stays 15
+seconds. No hard native-call interruption guarantee is asserted. Print only
+bounded summary/hash/count evidence, not historical source rows or attribute
+values. This is a new prospective check for R283-001, not a replay of the spent
+R279 retained-report comparison or an automatic baseline refresh.
+
+After this protocol and exact verifier/test pins are committed and focused
+validation passes, invoke `python -B -m scripts.verify_arv2_v4_assessment
+--precheck --expected-profile-sha256
+63e286099b822faa5c33fb7ed46ce26bce80deb4152af438f104e260e1967319` at most once.
+Any refusal stops this decision without allocating R282; no retry, delay-until-
+pass or new identity follows. Only an actual successful exact comparison
+permits the single unchanged `python -B -m scripts.assess_arv2_relocated_sources_v4
+--assess --expected-profile-sha256
+63e286099b822faa5c33fb7ed46ce26bce80deb4152af438f104e260e1967319` invocation.
+Verify root/branch/HEAD/status and absent/non-symlink fixed output immediately
+before each operation. The fixed output is
+`artifacts/analyst_revisions_v2/relocation_trial/R282-20261011-A`.
+The assessment's own complete preflight remains; the extra check does not
+eliminate syscall races or guarantee an unspent refusal. Record UTC start/end,
+actual exit status and emitted digest. Every allocated/interrupted/pending
+assessment stays spent and preserved; no cleanup, retry, pin refresh, native
+setting/attribute change or reuse of R273/R277/R279 is authorized.
+
+**284-D2 — one separate output-only authentication.** If a report/digest is
+emitted, use the verifier's `--report` with the exact profile, emitted
+`--expected-report-sha256` and actual `--assessment-exit-code`. It reads only
+the fixed output directory and report, without source or native attribute
+observations. Preserve every 278-D2/280-D2 component-wise no-follow,
+held/named full metadata, exact accepted device, private owner/0700 directory,
+owner/0600 regular single-link bounded report, exact one-file/no-pending
+inventory, bounded read, postread recheck, hash, duplicate/nonfinite rejection
+and canonical JSON safeguard. Bind exact v4 schema/profile/policy, original
+history pins, exact projection contract/receipt, preflight scope/fingerprints,
+loader shape/manifest pins and all eight restrictive false flags. A success
+requires actual exit zero, authenticated complete/source-reauthenticated true
+and final output verification; a late failed command with a complete report
+does not qualify. A refusal report is retained evidence, not retry authority.
+Print only bounded redacted summary/hash/count/refusal evidence. Row digests
+inside the report remain authenticated producer claims, not an independent
+source reread or continuous-security proof.
+
+**284-D3 — separate downstream gates and accounting.** These operations are
+offline mechanical source diagnostics, not strategy backtests or performance
+evidence. Use Python 3.13.15 under strict remote/loopback network denial;
+all temporary, bytecode, log and test/plugin paths stay inside the operative
+root. The booked floor remains **313 shared / 239 development / 49
+infrastructure / 699 cells**. Formal trust roots remain empty/zero-access;
+legitimate research entitlement is not formal source admission. No frozen
+formal date, estimand, power hash, epoch, readiness flag or shared file changes.
+The original R272 publication probe requires a separate supported decision
+and current pin after actual source success. A finite probe pass is not
+production clearance; publication needs a fresh authorized leaf/current
+builder pins/strict three-file authentication, and R284 has its own one-attempt
+no-order public-identity infrastructure contract. No QC capacity query,
+provider, broker, funded, paper/live or real-order action belongs to D1/D2.
+When a later authorized QC step is reached, occupied capacity means waiting
+without interfering with other lanes. One matching-lane final push concludes
+the continuous round, not the local prospective freeze.
+
+### 284.4 Exact pre-use tooling freeze and focused evidence
+
+The lane-owned ancillary helper implements D1/D2 without modifying any
+reviewed v4 production byte. It checks all fifteen projected metadata rows
+before allocation, and authenticates only the fixed output envelope afterward.
+Report success additionally requires the twelve accepted ctimes in its nested
+preflight; a refusal report may retain differing observations. Bounded
+entrypoint refusal codes are retained without native/OS exception text.
+The report receipt's two row hashes remain authenticated producer claims,
+not independently compared with the earlier precheck's hash pair.
+
+In plain language, the extra check can stop a known stale source baseline
+before spending the one-use assessment, while the reader rejects an incomplete,
+altered or failed-exit result. Neither tool weakens the original checks or
+establishes continuous security, formal input admission or publication safety.
+This is completion of bounded operational tooling, not of forward readiness.
+
+| Frozen object | SHA-256 |
+|---|---|
+| `scripts/verify_arv2_v4_assessment.py` | `79447dc23883e5bc264d8ddb91b6198d5b82a36f75b9578bf0af51ea7c2eb19b` |
+| `tests/analyst_revisions_v2/test_v4_assessment_verification.py` | `20cce8017bf065236625c614fd72225bcb3692973729850a009cea91e74e9857` |
+| `tests/analyst_revisions_v2/test_relocated_source_assessment_v4.py` | `41eb378f391634ff975ab27ae3c26435c6bb2c208a61228aed25228c2ef7154b` |
+
+Root-agent final focused validation: **628 passed in 5.28 s** on Python
+3.13.15: 148 unchanged v4 policy, 213 v4 wrapper, 180 verifier, 86
+record/document and one outcome-free import-closure check. The preceding
+448-pass/4.20 s root run is a subset, not additive. Strict `deny network*`,
+`PYTEST_DISABLE_PLUGIN_AUTOLOAD=1`, `--noconftest`, `-p no:cacheprovider`,
+`-B`, and fresh paths inside `.pytest_cache/r284-review-xH5vls` prevent these
+bounded tests from loading unrelated shared setup or allocating temporary
+state outside this root. The runner expressly asserted that
+`assistant.dispatch_fence` was not imported. This selection does not exercise
+shared execution behavior or substitute for Claude's complete lane suite;
+network denial is not logged-contact accounting.
+
+Root-agent finally-restored AST omission trials, with the same strict
+no-conftest isolation, catch seven whole `_require` omissions using canonical
+module globals and real-artifact tripwires:
+
+| Omitted guard | Expected red result |
+|---|---|
+| Postopen projected identity | 3 failed, 0.16 s |
+| Allocated output owner/mode | 2 failed, 0.10 s |
+| First preflight metadata recheck | 1 failed, 0.06 s |
+| Postpublication directory check | 1 failed, 0.07 s |
+| Empty-at-claim check | 1 failed, 0.07 s |
+| Periodic alarm refusal | 1 failed, 0.05 s |
+| Defensive vintage-scope check | 1 failed, 0.07 s |
+
+These failures demonstrate sensitivity, not successful tests. Swaps/drift
+are simulated observations, not a real-source race experiment. The vintage
+case substitutes an internal `_paths` seam and remains unreachable through
+the fixed production CLI. Same-round verifier-author sensitivity additionally
+catches seven omissions: full projected metadata (75 failures), report digest
+(1), eight exact-false flags (16), success exact shape (1), held-open identity
+(1), accepted success ctimes (12), final profile (1), each finally restored
+under strict no-conftest isolation. Its final 180 passes/0.81 s overlap the
+root run; earlier 162/180-pass repeats do not add identities. Read-only
+same-round advisory inspection found no additional blocking defect; it is
+not independent final review of this tooling.
+
+**ARV2CR284-004 (P3, shared test-support boundary; disclosed, shared source
+frozen).** Initial author validation used root `tests/conftest.py`. Its
+`assistant.dispatch_fence` import and teardown call `_canonical_runtime_root`,
+whose literal `/tmp/trading-agent-UID` fallback ignores `TMPDIR` and attempts
+mkdir/lstat. All guard-author pytest/mutation runs and the verifier's initial
+**162 passed / one teardown error in 1.87 s** therefore have this support-path
+qualification; the error was an allocation tripwire refusing that teardown
+call. Explicit in-root temp/cache paths did not establish every support I/O
+was confined. No outside runtime inspection, repair or shared source change
+was made. Later no-conftest runs above avoid that import entirely. Retain the
+earlier deviation/error rather than silently relabeling it; this also cautions
+against treating historical TMPDIR-only validation as proof of every support
+path's confinement. These tests concern synthetic local envelopes, not broker
+or execution-runtime behavior. Future review must account for its own shared
+fixture/import support paths.
+
+The exact current ten frozen production/helper pins were rechecked; v1-v4,
+the relocation audit and shared capture helper remain unchanged. Compilation
+and diff checks accompany the freeze. Quality assessment: **8/10 for this
+bounded operational milestone**, retaining sampled/cooperative/device-bound
+limits, unreviewed ancillary tooling pending final Claude review and no claim
+of source success before execution. The next local commit freezes this exact
+protocol and all three pins before any real D1/D2 invocation; it is not the
+round's final push.

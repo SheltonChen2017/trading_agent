@@ -1155,3 +1155,205 @@ def test_nested_budget_restores_only_unexpired_outer_alarm(monkeypatch, elapsed,
             pass
     assert timers == [5.0, 0] + ([] if remaining is None else [remaining])
     assert handlers[-1] is sentinel
+
+
+@pytest.mark.parametrize("changed_fields", [("ino",), ("ctime_ns",), ("ino", "ctime_ns")])
+def test_postopen_guard_binds_byte_identical_replacement_to_projected_identity(
+        scope, monkeypatch, changed_fields):
+    """Model the swap at stat/open, without renaming a file or changing timestamps.
+
+    The opened descriptor and every later named/held sample agree on the
+    replacement identity. Its real synthetic payload and digest are unchanged,
+    so later endpoint/hash checks do not replace the post-open binding guard.
+    """
+    source = sorted(scope.sources)[0]
+    inode = source.stat().st_ino
+    parent_inode = source.parent.stat().st_ino
+    original_open, original_stat, original_fstat = os.open, os.stat, os.fstat
+    original_digest = tool.v1._digest_held
+    opened = False
+    samples, digests, consumers = [], [], []
+
+    def replacement(info, kind):
+        if opened and info.st_ino == inode:
+            fields = {name: getattr(info, name) for name in dir(info) if name.startswith("st_")}
+            for field in changed_fields:
+                fields["st_" + field] += 1
+            samples.append(kind)
+            return SimpleNamespace(**fields)
+        return info
+
+    def open_source(path, *args, **kwargs):
+        nonlocal opened
+        fd = original_open(path, *args, **kwargs)
+        parent = kwargs.get("dir_fd")
+        if (path == source.name and parent is not None
+                and original_fstat(parent).st_ino == parent_inode):
+            opened = True
+        return fd
+
+    def named(path, *args, **kwargs):
+        return replacement(original_stat(path, *args, **kwargs), "named")
+
+    def held(fd):
+        return replacement(original_fstat(fd), "held")
+
+    def digest(fd, size):
+        digests.append(fd)
+        return original_digest(fd, size)
+
+    monkeypatch.setattr(tool.os, "open", open_source)
+    monkeypatch.setattr(tool.os, "stat", named)
+    monkeypatch.setattr(tool.os, "fstat", held)
+    monkeypatch.setattr(tool.v1, "_digest_held", digest)
+    with pytest.raises(tool.audit.Refusal, match="^current_source_metadata_changed$"):
+        tool._guarded_consume(scope.root, scope.expected,
+                              lambda: consumers.append("called"), lambda _fd: {})
+    assert opened and samples == ["held"]
+    assert digests == consumers == []
+    assert not scope.output.exists()
+
+
+@pytest.mark.parametrize("field", ["uid", "mode"])
+def test_allocated_output_security_refuses_before_sync_or_source_reads(scope, monkeypatch, field):
+    original_metadata, original_sync = tool.audit._metadata, os.fsync
+    observations, syncs = [], []
+
+    def metadata(info):
+        result = original_metadata(info)
+        if scope.output.exists() and info.st_ino == scope.output.stat().st_ino:
+            result[field] = result[field] + 1 if field == "uid" else stat.S_IFDIR | 0o750
+            observations.append(field)
+        return result
+
+    def sync(fd):
+        syncs.append(fd)
+        original_sync(fd)
+
+    monkeypatch.setattr(tool.audit, "_metadata", metadata)
+    monkeypatch.setattr(tool.os, "fsync", sync)
+    with pytest.raises(tool.audit.Refusal, match="^assessment_directory_security$"):
+        invoke()
+    assert observations == [field, field]
+    assert syncs == scope.events == []
+    assert scope.output.is_dir() and list(scope.output.iterdir()) == []
+    with pytest.raises(FileExistsError):
+        invoke()
+
+
+def test_first_preflight_recheck_detects_drift_restored_before_later_recheck(scope, monkeypatch):
+    inode = scope.root.parent.stat().st_ino
+    original_metadata = tool.audit._metadata
+    original_names, original_snapshot = tool.policy._names, tool.policy.snapshot
+    drift = False
+    names_calls = 0
+
+    def snapshot(fd):
+        nonlocal drift
+        result = original_snapshot(fd)
+        drift = True
+        return result
+
+    def metadata(info):
+        result = original_metadata(info)
+        if drift and info.st_ino == inode:
+            result["ctime_ns"] += 1
+        return result
+
+    def names(native, fd):
+        nonlocal names_calls, drift
+        names_calls += 1
+        if names_calls == 28:
+            drift = False
+        return original_names(native, fd)
+
+    monkeypatch.setattr(tool.policy, "snapshot", snapshot)
+    monkeypatch.setattr(tool.audit, "_metadata", metadata)
+    monkeypatch.setattr(tool.policy, "_names", names)
+    with pytest.raises(tool.audit.Refusal, match="^preflight_metadata_changed$"):
+        invoke("--preflight-only")
+    assert names_calls == 27 and drift
+    assert scope.events.count("snapshot") == 1
+    assert not scope.output.exists()
+
+
+def test_after_publication_directory_guard_is_independent_of_final_inventory(scope, monkeypatch, capsys):
+    original_publish = tool.audit._publish_report
+    original_metadata = tool.audit._directory_metadata
+    published = False
+
+    def publish(fd, name, raw):
+        nonlocal published
+        digest = original_publish(fd, name, raw)
+        published = True
+        return digest
+
+    def metadata(info):
+        result = original_metadata(info)
+        if published and info.st_ino == scope.output.stat().st_ino:
+            result["uid"] += 1
+        return result
+
+    monkeypatch.setattr(tool.audit, "_publish_report", publish)
+    monkeypatch.setattr(tool.audit, "_directory_metadata", metadata)
+    with pytest.raises(tool.audit.Refusal, match="^assessment_directory_changed_after_publication$"):
+        invoke()
+    assert published and scope.events.count("consume") == 1
+    report_path = scope.output / "report.json"
+    raw = report_path.read_bytes()
+    assert json.loads(raw)["complete"] is True
+    assert list(scope.output.iterdir()) == [report_path]
+    assert capsys.readouterr().out == ""
+    with pytest.raises(FileExistsError):
+        invoke()
+    assert report_path.read_bytes() == raw
+
+
+def test_empty_at_claim_guard_precedes_preflight_and_retains_allocation(scope, monkeypatch):
+    original_listdir = os.listdir
+    sampled = []
+
+    def entries(path):
+        if isinstance(path, int) and os.fstat(path).st_ino == scope.output.stat().st_ino:
+            sampled.append(path)
+            # A names-only synthetic observation; no source or retained artifact.
+            return ["synthetic-foreign.pending"]
+        return original_listdir(path)
+
+    monkeypatch.setattr(tool.os, "listdir", entries)
+    monkeypatch.setattr(tool, "preflight_scope", lambda: pytest.fail("preflight reached after nonempty claim"))
+    with pytest.raises(tool.audit.Refusal, match="^assessment_directory_not_empty_at_claim$"):
+        invoke()
+    assert len(sampled) == 1 and scope.events == []
+    assert scope.output.is_dir() and list(scope.output.iterdir()) == []
+    with pytest.raises(FileExistsError):
+        invoke()
+
+
+def test_periodic_alarm_refuses_before_timer_or_handler_mutation(monkeypatch):
+    touched = []
+    monkeypatch.setattr(tool.signal, "getitimer", lambda _kind: (5.0, 1.0))
+    monkeypatch.setattr(tool.signal, "getsignal", lambda _kind: touched.append("getsignal"))
+    monkeypatch.setattr(tool.signal, "signal", lambda *_args: touched.append("handler"))
+    monkeypatch.setattr(tool.signal, "setitimer", lambda *_args: touched.append("timer"))
+    with pytest.raises(tool.audit.Refusal, match="^periodic_alarm_not_supported$"):
+        with tool._budget(15):
+            pytest.fail("budget entered with a periodic outer alarm")
+    assert touched == []
+
+
+def test_defensive_vintage_scope_guard_isolated_at_internal_paths_seam(scope, monkeypatch):
+    """The fixed production _paths includes vintage; this is a defensive seam.
+
+    Deliberately provide a synthetic incomplete scope to characterize the
+    refusal before values, not to claim this is reachable through the fixed CLI.
+    """
+    directories, files = tool._paths()
+    monkeypatch.setattr(tool, "_paths", lambda: (
+        [path for path in directories if path != scope.vintage],
+        [path for path in files if path.parent != scope.vintage]))
+    with pytest.raises(tool.audit.Refusal, match="^preflight_vintage_outside_scope$"):
+        invoke("--preflight-only")
+    assert len(scope.observations) == 23
+    assert "snapshot" not in scope.events
+    assert not scope.output.exists()

@@ -18455,3 +18455,131 @@ will be FD/hash compared with baseline003 before a separately frozen recovery
 look; only verified lane-owned changes may be ported after genuine recovery.
 One local support/preregistration commit may precede that operation, with no
 checkpoint push; final accumulated publication remains exactly once.
+
+### 82.5 Actual Mia repair effect and fresh all-file post003 scope
+
+Support/preregistration local commit
+`0455fc2534f5951bc3d0eca35dc581cef9cca5f4`, clean afterward/actual remote61a81d9a
+unchanged; **no push**. Both corrected write requests were individually Allowed
+under owner00501bc2…; genuine Mia returned green write cards and stopped with
+a final repair-only report. New helper visible in read-only own-project editor,
+main displayed exact import delta. No new backtest/manual build/run observed.
+IDE terminal exposes automatic builds at06:16:52–54 (UI local label, not an
+independently proved UTC clock):5bfb88-5f7e58, signature70f4f0 then
+918718-5f7e58, a69022-5f7e58 on Lean2.5.0.0.18178. Those edit-tool effects
+were prospectively acknowledged; no candidate-result look/slot reset.
+
+Mia attributes successful source writes2of2/warnings only (subclass-Any/style
+AlgorithmImports notices), no other main byte/module change. This is not
+independent hash/native execution proof; all-file capture follows. Its final
+tool census "9" sums to11from its own categories; do not rely on the stated
+total or its blanket "pre-existing/cosmetic" warning characterization as
+independently reproduced. Prior refused requests/chat reads remain visible.
+Reported ~3079collision probes differs from code's3078initial targets; actual
+per-save queries/readback add separate calls. "Pure" sweep and "verbatim"
+narrow predicate descriptions are qualified, not trusted native claims.
+Both early-frontier/850clock breaches remain unresolved by design.
+
+BEFORE any next API/private effect register
+`TPR-EXT26-MIA-SOURCE-POST-20261012-003`,06:21:00Z–07:01:00Z,
+HEAD0455fc25/owner00501bc2…/unchanged nine capture hashes. Plan2312bytes/SHA256
+`50c8942263b4040d63ec9271021fedc6b44148bed7fd3061d9bfae678990dc32`.
+New exclusive claim/access/request identities/shared lock; same two fixed
+own-project files/read bounds4MiB each/8MiB total/16files/1MiB each/120seconds
+aggregate/40seconds request, full private before/after diff retention. Read
+ONLY newly captured baseline003 receipt5865bytes/SHA256
+`1d2f7cb390bcced2547a8f6b1e22b2b1a2800149e741535bf6e65e3624223f86`
+and its read2archive224315bytes/c24f20eb… under fresh bounded receipt scope,
+not old D0/input/outcome captures. Receipt descriptor is reconstructed from
+public metadata; this producer verifies the actual private FD size/SHA before
+trusting it. No API source mutation, provider/inputs/Object Store/results read,
+Mia message, compile/job or new look in this post scope. Stop/retain refusal on
+changed root/branch/HEAD/source/remote, incomplete capture or unstable inventory;
+no automatic retry. Actual capture/disposition will follow.
+
+Post003 completed06:21:54.041071Z; baseline's actual FD hash/size verified
+230180bytes total, two HTTP200source reads233559bytes each/467118total, stable
+12-file inventory. Only main changed59931→59961bytes/SHA
+`8f21e51f7db525795601a4364d627a19e9b5479e479f5f47647e113be0082477`;
+one added unknown-name-hashed source7490bytes/SHA
+`bce4182d09dc9d31132cb54d404712471ddff5e2b706c2988fbe9fcc48c93aea`.
+This is complete public metadata, not yet admission of its raw helper body.
+All other modules/notebook identities unchanged. New read2archive232051bytes/
+`24baf5029130b927f88e8e760d7828656ac25c751ecd29db6b333b9e6ed75505`;
+complete private before/after diff132576bytes/
+`83d07cded083c6dd0d40f2b77447fd4b924e0d9631e82b8a72bed5eb82db1b47`.
+Spent receipt reconstructed canonically7152bytes/
+`271d7dcf7ba074396124b1ef187b03b6f6ae634453e27da6365712e1e0462253`;
+fresh inspection verifies actual FD descriptors before disclosure. Post scopes
+are read-only: candidate_mutation=false describes collector effect, not denial
+of Mia's separately documented preceding two edits. No new market look.
+
+BEFORE further private reads register
+`TPR-EXT26-MIA-RESULT-SOURCE-INSPECT-20261012-001`,06:23:00Z–06:53:00Z,
+HEAD0455fc25/owner00501bc2…/committed support10a9c42c…/complete twelve-file
+import closure from its prepared plan. Exact plan2747bytes/SHA256
+`5a263a6e514ae86c073aec2636d117688858c976be4096822cb2650cde1c52c2`.
+Read exactly the three post003descriptors above (371779bytes observed bound;
+<=32MiB total/30seconds execution), no network/API/old body/provider/input/
+ObjectStore access. Closed all-file/main-only delta/AST/export validation may
+return ONLY admitted physical helper source plus main import diff; no source
+execution/economic/native acceptance. Exclusive claim/access/shared lock before
+private bodies; refuse/stay diagnostic on any failed descriptor/grammar/change.
+No automatic repeat/spent receipt extension. Actual disposition follows.
+
+Inspection001 CLI refused with no raw text. Independently reconstructed actual
+2746byte command argument/SHA9285a557… differs from registered canonical
+2747byte/newline SHA5a263a6e…; main's hash refusal precedes execute_plan and
+therefore before producer/private/credential/transport effect. This is root's
+command serialization error, not evidence of failed capture/repair/native job.
+Retain refusal; do not disguise it as successful inspected source. No source
+change/market look occurred. Use explicit fresh inspection002 scope rather
+than imply a spent operation renewal, same exact three post003FD descriptors
+and bounds, HEAD0455fc25/owner00501bc2…/unchanged committed producer.
+Created06:25:00Z/expiry06:55:00Z; exact canonical argument2747bytes/SHA256
+`5dbb32b43dd6878362671a3dfc03213f20acf65cb30aea3f1658c56ca08f59bf`,
+including terminating newline. Prepared plan now returns the exact argument
+string and its hash together; neither argument preparation reads private data
+nor resets a candidate attempt/look. No source execution/network in scope.
+
+Inspection002 actually spent its own claim/access at06:25:24.563333Z and
+returned FAILED_OR_UNCERTAIN:1private-body attempt/0body bytes,0APIrequests,
+source_inspection=null. Retain all private claims/refusal; do not relaunch002.
+Root identified `MIA82-S005`P2: serialized plan parses numeric descriptors as
+JsonNumber; _execute compares canonical form with a validated rebuilt plan but
+retains original unnormalized descriptor objects. Frontier `_read` compares
+expected_size>integer remaining before FD open; pure JsonNumber('7152')>32MiB
+reproduces TypeError. This local evidence-tool boundary explains the refusal;
+no assertion of bad private size/hash or Mia source/native failure is warranted.
+Typed fixture plans did not cover actual CLI deserialization. Existing source
+capture/old writer/candidate source/economics stay unchanged; no look/attempt.
+Safely correct this lane-owned read-only helper with parsed-plan/CLI synthetic
+red/green proof and canonical equality before using a fresh inspection003.
+Do not weaken number, metadata/FD/hash, time/HEAD, effect or source gates.
+
+MIA82-S005 is confirmed/corrected in a named support correction (not candidate
+change): rebuild _plan exactly once, require canonical equality, then RETAIN
+its normalized bounded descriptor integers BEFORE mode/guard/directory/claim/
+body effect. Main parses the exact registered canonical argument; no numeric
+scope drift/extra key, input/object/resource/economic gate is relaxed.
+`TPR-EXT26-D078` agent-delegated routine recovery of this software boundary:
+choose corrected committed support + fresh003, not direct private read,
+hash/FD bypass, suppressing002history or changing the captured candidate.
+Provenance is actual002failure and pure parsed-number reproduction, not
+separately human/Claude-approved implementation. Native acceptance remains false.
+
+Final corrected helper603lines/SHA256
+`64ec6b6a1e60dc78c5bc90540ceb88d7a4c296b6e5a9725bbab674ded279b929`;
+test533lines/SHA256
+`99038ec66d0a8d45820f13d4661b59982df31548a97b4e43d039135248f4e631`.
+Root read full8line helper/53line test delta. Author reproduced all three
+source/status/collection parsed paths red BEFORE correction; reverse removal
+causes six intended runtime/actual-CLI failures, restored88green/0.83s and
+final88green/1.17s. Internal peer independently checked exact frozen hashes,
+8new parsed/CLI/drift cases passed0.48s, accepted-after-correction limited to
+this support boundary. No private/API/UI/native effects by those peers/tests.
+Root reproduced88focusedcases/1.11s and final bounded union
+**397passed,1skipped/6.20s**, same isolated49/52/no bytecode/cache/full suite/
+actual stop/db/provider/hardware exclusions as82.4. In-memory compile/diff
+checks pass; no existing capture-source or candidate modification. New local
+support-correction commit must precede fresh003production; no push yet.

@@ -409,7 +409,13 @@ def _terminal(response, mia):
 
 
 def _execute(plan, sources, root, *, guard, clock, monotonic, transport):
-    if type(plan) is not dict or e.canonical(plan) != e.canonical(_plan(**{key: plan[key] for key in ARGS})): _fail()
+    if type(plan) is not dict: _fail()
+    rebuilt = _plan(**{key: plan[key] for key in ARGS})
+    if e.canonical(plan) != e.canonical(rebuilt): _fail()
+    # Retain the exact canonical scope while using the validator's normalized
+    # integer descriptors at the private FD/native runtime boundary. Parsing
+    # canonical JSON retains JsonNumber tokens, which are not OS read sizes.
+    plan = rebuilt
     if (plan["mode"] == "production" and (root != PRIVATE_ROOT or guard is not _guard or clock is not _now
             or monotonic is not time.monotonic or transport is not _native_request)
             or plan["mode"] == "offline-fixture" and (root == PRIVATE_ROOT or root.is_relative_to(LANE) or transport is _native_request)): _fail()

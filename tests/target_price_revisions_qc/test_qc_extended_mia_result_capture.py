@@ -478,3 +478,56 @@ def test_aggregate_reserves_full_fixed_response_bound_before_next_transport(tmp_
     assert result["received_bytes"].fraction() < values[0]["max_received_bytes"]
     assert result["failed_response_bytes_unknown"] is False
     assert not list(values[2].glob(values[0]["operation_id"] + ".read004.*"))
+
+
+@pytest.mark.parametrize("action", ["source-inspect", "status", "collect-native"])
+def test_parsed_cli_plan_nested_exact_numbers_normalize_before_private_effects(tmp_path, action):
+    values = list(fixture(tmp_path, action))
+    parsed = e.parse_json(e.canonical(values[0]))
+    # Mirror only the top-level/actor conversions performed by the CLI. Private
+    # source and UI-ledger descriptors intentionally still carry JsonNumbers.
+    for key in ("legacy_attempt", "codex_attempts_consumed", "observed_looks_before", "look_ordinal"):
+        if parsed.get("mia"): parsed["mia"][key] = c._integer(parsed["mia"][key], 20)
+    for key in ("max_seconds", "max_received_bytes", "request_seconds", "max_order_pages", "new_codex_attempts", "new_looks"):
+        parsed[key] = c._integer(parsed[key], m.MAX_TOTAL)
+    assert type(parsed["post_reference"]["receipt_bytes"]) is e.JsonNumber
+    if action != "source-inspect": assert type(parsed["ui_ledger"]["bytes"]) is e.JsonNumber
+    values[0] = parsed
+    reading, calls = transport()
+    result = execute(values, reading if action != "source-inspect" else None)
+    assert result["status"] == "COMPLETED_CAPTURE"
+    assert result["plan_sha256"] == m._sha(e.canonical(parsed))
+    assert result["private_read_attempts"].fraction() == (3 if action == "source-inspect" else 1)
+    assert result["private_read_bytes"].fraction() > 0
+    assert len(calls) == (0 if action == "source-inspect" else 1 if action == "status" else 6)
+    with pytest.raises(FileExistsError): execute(values, reading if action != "source-inspect" else None)
+    assert len(calls) == (0 if action == "source-inspect" else 1 if action == "status" else 6)
+
+
+@pytest.mark.parametrize("change", ["bounds", "extra"])
+def test_rebuilt_plan_normalization_does_not_accept_canonical_scope_drift(tmp_path, change):
+    values = list(fixture(tmp_path))
+    values[0] = e.parse_json(e.canonical(values[0]))
+    if change == "bounds": values[0]["max_order_pages"] = e.JsonNumber("129")
+    else: values[0]["extra_authority"] = True
+    with pytest.raises(ValueError): execute(values)
+    assert not (values[2] / (values[0]["operation_id"] + ".claim.spent.json")).exists()
+
+
+@pytest.mark.parametrize("action", ["source-inspect", "status", "collect-native"])
+def test_actual_cli_parser_normalizes_via_fixture_only_runtime_boundary(tmp_path, monkeypatch, capsys, action):
+    values = fixture(tmp_path, action); original_raw = e.canonical(values[0])
+    reading, calls = transport(); supplied = []
+    def safe_execute(plan):
+        assert plan["mode"] == "offline-fixture"
+        assert type(plan["post_reference"]["receipt_bytes"]) is e.JsonNumber
+        if action != "source-inspect": assert type(plan["ui_ledger"]["bytes"]) is e.JsonNumber
+        supplied.append(plan)
+        return m.execute_fixture(plan, values[1], values[2], clock=lambda: values[3],
+            transport=reading if action != "source-inspect" else lambda *_: pytest.fail("source inspection cannot call transport"))
+    monkeypatch.setattr(m, "execute_plan", safe_execute)
+    code = m.main(["--plan-json", original_raw.decode(), "--plan-sha256", m._sha(original_raw)])
+    assert code == 0 and len(supplied) == 1
+    result = e.parse_json(capsys.readouterr().out.encode())
+    assert result["status"] == "COMPLETED_CAPTURE" and result["plan_sha256"] == m._sha(original_raw)
+    assert len(calls) == (0 if action == "source-inspect" else 1 if action == "status" else 6)

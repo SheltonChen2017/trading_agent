@@ -1,29 +1,27 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Codex counter-review of section 31 completed in section 32,
-2026-10-11, against exact pushed head
-`da6a7bb96d3b5f7d35bdd41c87efad43627e419a`.
-Both Claude commits are accepted, the record commit after documentation
-correction. All eight CR31 findings remain retained. `4d3d8510` corrects
-the missing full-review bundle modules and obsolete native-output test helper,
-and adds custody, ASCII and budget pins. GDR-RP30 is accepted as bounded
-offline software preparation only, not native integration or launch authority;
-Offline log-headroom hardening is now owner-directed; native recovery is
-paused pending independent review and platform preflight.
-GDR-RP33 is implemented in section 33, producing `c589b3dd`; its new source
-awaits independent Claude review. It retains every record commitment in a
-489-line paired format with explicit assumed logging reserves, not verified
-platform accounting or backtest readiness.
+Status: **Independent Claude review of `da6a7bb9..5692ae39` (sections 32
+and 33, including the GDR-RP33 compact paired evidence) recorded in section 34,
+2026-10-11;
+Codex counter-review of section 34 pending.
+All three Codex commits are accepted, `c589b3dd` after one added pin
+(`7e52f03b`); this round's commits stay local until the owner authorizes
+publication.
+GDR-RP33 is accepted in section 34
+as offline software only: it retains every record digest in a 489-line paired
+format with assumed logging reserves, not verified platform accounting or
+backtest readiness.
 The section-27 evaluation still ended with three pre-initialization failures;
 the attempt ceiling remains exhausted and no manual relaunch is authorized.
-Before any recovery launch the owner still needs to settle output compliance
-with QC's AI-agent rules (GDR-CR28-001) and QC's log-length accounting for the
-new paired readable export (GDR-CR31-003); native loading of the recovery
-carrier is unverified. Only `data/__init__.py` was observed as one LF at
-runtime; `research/__init__.py`, remains unobserved. No successful native
-integration or empirical backtest readiness is established. The original
-economic, data, empirical, account and trading gates remain closed.**
-Current scope/evidence are sections 17 through 33. Sections 2 through 6 preserve
+The owner's conditional Mia-led synthetic recovery (32.4) stays
+paused pending independent review and platform preflight: output compliance
+with QC's AI-agent rules (GDR-CR28-001) and QC's log-length accounting
+(GDR-CR31-003). Native loading of the recovery carrier is unverified. Only
+`data/__init__.py` was observed as one LF at runtime;
+`research/__init__.py`, remains unobserved. No successful native integration
+or empirical backtest readiness is established. The original economic, data,
+empirical, account and trading gates remain closed.**
+Current scope/evidence are sections 17 through 34. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -4327,3 +4325,149 @@ gates remain, and no provider, real/reference/action data, empirical outcomes,
 protected dates, purchase/installation, operator database, QC scheduler,
 broker/paper/live/funded/capital, PR/main or cross-lane mutation is authorized.
 The monitor remains paused; no automatic recurring-loop/re-arm is inferred.
+
+## 34. Independent Claude review of `da6a7bb9..5692ae39`, 2026-10-11
+
+### 34.1 Scope and method
+
+Reviewed range: the three Codex commits after the section-31 push.
+
+| Commit | Content |
+|---|---|
+| `5a1cf422` | Section 32: counter-review of section 31, owner directions |
+| `c589b3dd` | GDR-RP33: compact paired readable evidence, assumed per-message and fixed log reserves, coupled budget counters |
+| `5692ae39` | Section 33 closure, the fetched remote head |
+
+The remote and the local head were both `5692ae39` at the start, and the
+worktree was clean. As GDR-CCR32-003 asks, all validation this round ran in
+the designated worktree, with HEAD and status recorded unchanged across each
+run. No export was used. Every pytest and mutation process was network-denied
+under the proved `sandbox-exec` profile, and mutants rewrote code in memory
+only. No provider, QC, broker, paper or live system was contacted. QC attempts
+stay at the exhausted three. The owner's instruction for this round was
+"review all unreviewed commits".
+
+### 34.2 Disposition of sections 32 and 33
+
+| Item | Claude disposition |
+|---|---|
+| 32.1: `4d3d8510` accepted, `da6a7bb9` accepted after documentation correction | Accepted. |
+| GDR-CCR32-001 (31.2 named the wrong carrier) | Accepted. The recovery verifier refuses empty or one-LF initializers; the default map still carries the empty initializers and verifies. |
+| GDR-CCR32-002 (failure/error split in GDR-CR31-008) | Accepted. At `efa6c74f` the split is 27 failed and 6 errors, 33 in total, as 31.5 states; the 31.4 row had it wrong. |
+| GDR-CCR32-003 (validation outside the designated root) | Accepted. Section 1 places validation in the designated worktree. The section-31 exports were used only because the tree was changing under the review. This round validated in the designated worktree, which serialized review and implementation make possible. |
+| GDR-CR31-008, partial acceptance | Accepted. The owner's no-full-Codex-suite rule governs. The consumer-inclusive focused closure in 33.3 is the agreed substitute, and this round's lane selection is green. |
+| 32.4 owner directions | Recorded only by Codex; listed in 34.7. |
+| GDR-CR31-003 under GDR-RP33 | Accepted as mitigated offline. V2 keeps all 752 record digests and 372 valuations in 489 lines and 75,260 bytes, reserving an assumed 40 bytes per message plus 2,000 fixed: 96,820 bytes in all. QC's actual accounting is still unverified, so the P2 platform gate stays open. |
+| GDR-RP33-001, GDR-RP33-002 (author QA) | Accepted. GDR-CR34-001 adds the partial-reset case that the RP33-001 regressions did not isolate. |
+
+### 34.3 Commit dispositions
+
+| Commit | Scope | Disposition | Notes |
+|---|---|---|---|
+| `5a1cf422` | Section 32 | Accepted | Its corrections to section 31 are accurate; the 32.3 identities reproduce |
+| `c589b3dd` | GDR-RP33 implementation | Accepted after correction | One pin (GDR-CR34-001); 13 of 29 mutants caught by Codex's tests, 15 redundant or unreachable |
+| `5692ae39` | Section 33 closure | Accepted | Every 33.4 identity and wire measurement reproduces exactly (34.5) |
+
+### 34.4 Findings ledger
+
+| ID | Priority / status | Location | Finding, disposition and verification |
+|---|---|---|---|
+| GDR-CR34-001 | P3 / corrected | `c589b3dd`, `lean/main.py::_reserved_evidence_log_bytes`; `test_lean_source.py` | The counter coupling has three clauses: bytes at least messages, bytes at most 201 times messages, and both or neither zero. The third follows from the first two. Codex's reset regressions only drop a counter to zero or delete it, which several clauses refuse together, so the range clauses were never isolated (LN04 survived). A partial reset keeps both counters nonzero: for example, the message counter reduced to 1 after three 147-byte messages, or the byte counter reduced to 1 with three messages counted. Without the range clauses, the lost messages' 40-byte wrapper reserves would reopen. Added `test_partially_reset_counter_cannot_reopen_reserved_capacity`; LN04 now fails in both subtests. |
+
+Scripted count from this table: P0 0, P1 0, P2 0, P3 1; corrected 1, documented 0.
+
+### 34.5 Validation
+
+| Check | Scope | Result |
+|---|---|---|
+| Lane selection plus shared `test_active_document_consistency.py` at `5692ae39` | worktree, network-denied, HEAD and status unchanged | 686 passed, 1,660 subtests, 11:11, no failures |
+| Lane selection at `7e52f03b` | worktree, network-denied, HEAD and status unchanged | 618 passed, 1,662 subtests, 11:06, no failures: one test and two subtests more than `5692ae39` |
+| Repository suite excluding `tests/analyst_revisions_v2` at `7e52f03b` | worktree, network-denied, HEAD and status unchanged | 15 failed, 11,507 passed, 56 skipped, 28 warnings, 1,662 subtests, 1:10:17. The fifteen failures are byte-identical to every earlier round (out of lane, GDR-CR18-005). The pass count rose by exactly the 14 lane tests added since 31.5's run at `4d3d8510` |
+| Section 33.4 identities at `5692ae39` | worktree, network-denied | Every identity reproduces exactly (list below) |
+| Identities after `7e52f03b` | worktree | A test-only change: no source or package identity changes |
+| `git diff --check` | worktree | passed |
+| Closing check on this record commit | worktree, network-denied | lane gate `test_boundaries.py` plus shared `test_active_document_consistency.py`: 75 passed |
+| Analyst V2 directory | not run | out of lane, as in section 12.4 |
+
+The section 33.4 identities reproduced at `5692ae39`:
+
+| Identity | Value |
+|---|---|
+| Full source | `061ff30f...` |
+| Recovery project | `c6b9443a...`, 21 files, 298,870 bytes |
+| Prepared runtime source | `5d1dc656...` |
+| Audit source | `a709cf63...` |
+| Audit ZIP | `5d081569...`, 292,740 bytes |
+| Full review bundle | `93e1a7eb...`, 684,046 bytes |
+| Root `main.py` | `57fb2484...`, 15,012 bytes |
+| V2 complete anchor | `6889a9be...`: 489 lines, 75,260 bytes, longest line 182, reserved 96,820 |
+| V2 failed anchor | `98fbddd3...`: 500 lines, 76,195 bytes, reserved 98,195 |
+| V1 anchor | `85997c34...`: 861 lines, 88,969 bytes, longest line 167 |
+
+### 34.6 Mutation trials
+
+Twenty-nine single-behaviour mutants over `c589b3dd`, run in memory,
+network-denied, three at a time, in the designated worktree. Sixteen rewrite
+functions in `readable_transport`. Thirteen rewrite `lean/main.py` through the
+source-rewriting import hook, because its tests re-import it fresh for every
+case.
+
+| Class | Count | Mutants |
+|---|---:|---|
+| Caught by Codex's tests | 13 | CP01-CP04, CP08, CP13; LN01-LN03, LN07, LN10-LN12 |
+| Survived, now caught by the added pin | 1 | LN04 (GDR-CR34-001) |
+| Redundant by construction or unreachable, no test added | 15 | See below |
+
+The 15 unpinned survivors, by reason:
+
+- **Behind the final compact re-export equality (CP13, caught) and the unchanged v1 reconstruction it expands into.**
+  - CP09: END hash.
+  - CP11: pair index.
+  - CP12: failed-only singleton valuation.
+  - CP15: reserved bound at reconstruction; the re-export applies it.
+  - CP16: unknown-schema dispatch; the v1 header refuses it.
+- **Unreachable from the bridge or the callers.**
+  - CP05, CP06: a complete bridge trace always pairs each checkpoint with its frame.
+  - CP07: the native caller validates metadata before export, and reconstruction validates it again.
+  - CP10: dispatch only routes v2 headers to this decoder.
+  - LN08: every caller passes a string.
+  - LN13: both producers emit only ASCII.
+- **Implied or repeated.**
+  - LN05: implied by the range clauses.
+  - LN06: repeated by the per-line and whole-export checks.
+  - LN09: repeated by the encoded-length check.
+- **Refusal type only.**
+  - CP14: an exhausted cursor raises `IndexError` instead of the named refusal.
+
+### 34.7 Owner confirmations, commits and next action
+
+For the owner to confirm where both roles can read it (each recorded only by
+Codex from its own channel):
+- (a) "build until backtesting ready" (32.4);
+- (b) "authorized", in answer to the conditional Mia-led, synthetic-only recovery question in 32.4. That scope still depends on independent review acceptance and on QC compliance and quota preflight.
+
+Claude's instruction for this round was "review all unreviewed commits".
+
+The status block names this section. The `test_boundaries.py` pins are rotated
+to "Codex counter-review of section 34 pending" and "GDR-RP33 is accepted in
+section 34". The `research/__init__.py` limitation, the recovery-pause and the
+attempt-ceiling pins are kept.
+
+| Commit | Scope |
+|---|---|
+| `7e52f03b` | Partial-reset counter pin (GDR-CR34-001) |
+| This record commit | Section 34, status block, `test_boundaries.py` pin rotation |
+
+The owner's instruction for this round did not include a push. Both commits
+stay local in the designated worktree until the owner authorizes this round's
+single push; never force.
+
+Next, once published, Codex counter-reviews section 34. The Mia-led recovery
+in 32.4 also remains conditional on QC output compliance (GDR-CR28-001) and log
+accounting (GDR-CR31-003) preflight. Native loading of the recovery carrier
+remains unverified. The closed cycle's three-attempt ceiling stays exhausted.
+
+Acceptance here is a software review only. It establishes neither native
+execution, QuantConnect integration nor empirical readiness.
+`docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` were not edited
+and stay frozen for both agents.

@@ -376,6 +376,21 @@ class LeanSourceTests(unittest.TestCase):
                 else:
                     self.assertEqual(getattr(algo, field), 0)
 
+    def test_partially_reset_counter_cannot_reopen_reserved_capacity(self):
+        # GDR-CR34-001: a counter reduced to a smaller nonzero value leaves
+        # both counters nonzero, so only the per-message byte range detects it;
+        # otherwise the lost messages' assumed wrapper reserve would reopen.
+        for field, value in (("_gdr_evidence_log_messages", 1), ("_gdr_evidence_log_bytes", 1)):
+            with self.subTest(field=field):
+                algo = self.initialize()
+                for index in range(3):
+                    algo._log_evidence(f"SYN-{index}-" + "x" * 140)
+                before = list(algo.log_messages)
+                setattr(algo, field, value)
+                with self.assertRaises(ReadableTransportError):
+                    algo._log_evidence("not emitted")
+                self.assertEqual(algo.log_messages, before)
+
     def test_live_or_changed_sidecar_cannot_initialize(self):
         algo = self.source.GuidanceRevisionDriftAlgorithm()
         algo.live_mode = True

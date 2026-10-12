@@ -458,9 +458,11 @@ isolated regressions plus a separately frozen operational precheck/output
 reader. Its conditional one-shot protocol does not clear source or publication
 gates merely by being implemented. The actual one-shot v4 assessment now passes
 and its report is separately authenticated (284.5); historical refusals remain
-spent. The original synthetic publication probe and any new guarded production
-publisher remain separately gated; source success alone is not publication
-clearance or R284 readiness.
+spent. The original synthetic publication probe also passed and its output
+was authenticated once (284.9); it is now spent. The new guarded production
+publisher is implemented but UNREVIEWED and UNINVOKED. Independent review and
+a separate exact run freeze remain binding; neither finite diagnostic success
+clears safe production publication or R284 readiness.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1418,8 +1420,9 @@ counter-reviews its sole completed push `6e9c5562`. The committed one-shot
 v4 assessment and external report authentication succeeded (284.5), resolving
 the scoped fresh-source refusal prospectively, not the historical audit.
 The unchanged v4 security contract has independent review; the prior one-round
-waivers remain expired. The original synthetic probe has its separate D4/D5
-freeze in 284.6/284.8. The new guarded continuity publisher in 284.7 remains
+waivers remain expired. The original synthetic probe and its D5 reader passed
+at the separate committed freeze (284.9); both are spent. The new guarded
+continuity publisher in 284.7 remains
 UNREVIEWED and UNINVOKED; independent review and a subsequent exact one-shot
 run freeze are required before use. Claude reviews section 284 and the
 exact continuous `6e9c5562..final-head` range after its one final matching-lane
@@ -3321,6 +3324,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-11 | Claude independent review of sections 277-280: the v2 and v3 contracts, their owner-waived runs and the two refusals | `65766598` -> this record commit | Section 281: nine Codex commits `50dcf08e..65766598` disposed (9 accepted, 0 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells; no assessment, preflight, census, probe or comparison parser run | No code changed by Claude. Nine pins, two profiles and both reports reproduce; the 278-D4 and 280.5 comparisons are recomputed from the retained reports; the device change is dated against the host's boot time; a current read-only stat of all 27 objects matches the v3 preflight; 29 in-memory guard removals tabulated; accepted `ARV2CR277-001`; `ARV2R281-001` to `-003` documented; section 4 names section 281, banner sentence added, this row appended | Complete lane selection at `65766598` with every remote address refused (strict sandbox for the six groups, three parallel streams, temporary directories inside the root's ignored `.pytest_cache`; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 281.6 | 0 P0, 0 P1, 0 P2, 3 P3 | Single push of this round's Claude commit; Codex counter-reviews section 281 unless the owner changes the workflow |
 | 2026-10-11 | Codex section-281 counter-review and exact twelve-ctime v4 contract | `682779b7` -> section-282 implementation freeze and final handoff snapshot | Sole Claude commit disposed with prospective corrections/qualifications; owner's exact October 11 quote accepts only twelve fixed prospective ctimes under retained gates | Separate v4 policy/wrapper: exact device plus twelve pairs, unchanged original security/source pins, branch-specific drift refusal and isolated guard tests | Focused strict-network-denied tests and mutation sensitivity, exact final pins/results in section 282; no complete suite or actual source assessment | Human baseline choice resolved; technical source reauthentication and publication remain open; no QC/look/cell action; 313/239/49/699 unchanged | One final matching-lane push; Claude reviews section 282 before separately frozen assessment; active monitor baseline advances to this round's final head |
 | 2026-10-12 | Claude independent review of section 282: the twelve-ctime v4 contract | `34489a7a` -> this record commit | Section 283: two Codex commits `682779b7..34489a7a` disposed (2 accepted, 0 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells; no assessment, preflight, census or probe run | No code changed by Claude. Four pins, the profile and the twelve-pair digest reproduce; the map's old values equal `after.json` and its new values the R279 preflight; the projection applied in memory to the real rows equals the current state of all 27 objects; 23 in-memory guard removals tabulated; accepted `ARV2CR282-001` to `-003`; `ARV2R283-001` and `-002` documented; section 4 names section 283, banner sentence added, this row appended | Complete lane selection at `34489a7a` with every remote address refused (strict sandbox for the six groups, three parallel streams, temporary directories inside the root's ignored `.pytest_cache`; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 283.6 | 0 P0, 0 P1, 0 P2, 2 P3 | Single push of this round's Claude commit; Codex counter-reviews section 283 unless the owner changes the workflow |
+| 2026-10-12 | Codex section-283 counter-review, actual v4/probe success and guarded-publication candidate | `6e9c5562` -> `107743d8`, `b40cedc6`, this final section-284 record commit (three continuous Codex commits) | Sole Claude commit accepted after two prospective P3 corrections and documentary qualifications; exact one-shot v4 report and original synthetic publication probe/output authenticate successfully | Historical refusals remain spent; new publisher validates sources before payloads and retains original output descriptors; candidate UNREVIEWED/UNINVOKED; no production/QC action | 1,094 distinct focused strict-denied passes in 6.26 s; prior/repeated subsets and expected red omissions separately qualified; no full Codex suite; actual pins/times in 284.5/284.9 | ARV2E280-001 resolved prospectively for exact scope; ARV2E263-001 and independent formal gates remain; 313/239/49/699 unchanged | Exactly one final matching-lane push; Claude reviews every section-284 commit before any new publisher/run freeze; active quiet monitor advances to final Codex head, disposed Claude head6e9c5562 |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -43371,3 +43375,130 @@ memory without entrypoint execution. The frozen v1-v4 modules, original
 builder/probe/audit and shared helpers remain byte-identical. No complete
 Codex suite ran. The next local commit freezes these D4/D5 pins/protocol and
 the uninvoked publication candidate; only D4/D5 may execute afterward.
+
+### 284.9 Actual original publication probe and once-only authentication
+
+The second local pre-use freeze is
+**`b40cedc6b11e3675cf4cd333ef47404c4a8ca273`**. Immediately before each command,
+the operative root, branch, exact HEAD and clean status were asserted. The
+probe output was absent and not a symlink before the sole D4 invocation.
+Both commands used strict network denial, `-B` and in-root temporary paths.
+The new publisher was not invoked and its future C leaf was not inspected
+or allocated.
+
+| Invocation, exactly once each | UTC start/end, 2026-10-12 | Actual exit / observed result |
+|---|---|---|
+| Original ARV2OD272-A flags probe, D4 | 02:51:12.437955 / 02:51:42.517507 | 0; two cases, two initial checks, 22 observations, zero initial/integrity refusals, complete, flags available, payloads match |
+| Fixed report/fixture reader, D5 | 02:51:54.219740 / 02:51:54.290658 | 0; report authenticated and diagnostic accepted; all 24 predicates recomputed, bounded schedule passed, both current fixtures equal original baselines, empty changed-field lists |
+
+The retained report is
+`artifacts/analyst_revisions_v2/publication_metadata/R272-20261009-A/report.json`,
+**34,808 bytes**, SHA-256
+**`deecb43649af231f09307decd52e1f52abfa4ba3e0e5f2a714c463ec02793096`**.
+The exact profile is the D4/D5 hash in 284.6. Both 48-byte synthetic leaves
+match SHA-256
+`fa084938d8b05a5d3b737acf02a56203bb671f921cfb1c5577d30785b86f74e1`.
+Only the fixed three-directory/three-file envelope was authenticated; the
+reader reports `source_objects_read=false`,
+`native_attributes_authenticated=false`,
+`continuous_stability_proven=false` and
+`production_publication_clearance=false`.
+
+**ARV2OD272-A and its D5 read are now spent.** Preserve the report and both
+fixtures; do not rerun, repair, reset their baselines or rename a replacement.
+Original R266 remains spent. This finite relocated synthetic result supports
+the proposed publication mechanism only; it does not prove perpetual
+stability, a root cause or remedy for the old Documents failures, production
+source/security equivalence, or safe publication of a real package.
+**ARV2E263-001 remains open.** The failed continuity A/B packages remain
+untouched. No production C package, provider/QC/capacity request, R284
+preparation or launch occurred, and no node availability was observed.
+
+### 284.10 Concluded round, exact handoff and next gate
+
+The complete continuous Codex range begins at Claude's disposed review head
+**`6e9c5562e39244b02f63b5ea084c8ced9018d924`** and ends at this final record
+commit. It contains exactly three commits, in order:
+
+1. **`107743d8abbe76857cdc7a7f947aa359a159dbc4`** — section-283 counter-review,
+   isolated regressions and exact pre-use v4 precheck/assessment/reader freeze.
+2. **`b40cedc6b11e3675cf4cd333ef47404c4a8ca273`** — actual v4 success,
+   separately frozen original-probe/output-reader protocol, and new uninvoked
+   guarded-publication candidate with its synthetic validation and findings.
+3. **This final section-284 record commit** — actual probe/authentication
+   outcome, final handoff and single-push ledger entry.
+
+The sole new Claude commit `6e9c5562` is **accepted after correction and
+documentary qualification**, as individually disposed in 284.1–284.2. No
+older review was replayed. Both R283 P3 findings are corrected prospectively;
+CR284-001 through -003 preserve interpretive/root-tooling limitations, and
+CR284-004 remains a shared test-support boundary qualification rather than an
+unauthorized shared fix. I284-001 through -004 are corrected in the new
+candidate but remain subject to independent review. No P0/P1 was found in
+this bounded counter-review. Quality assessment remains **8/10 for this
+bounded round**, not a rating of overall research readiness or a substitute
+for Claude's independent review.
+
+Technical result: the independently reviewed fixed-device/twelve-ctime v4
+contract completed its single real assessment and an external strict reader
+accepted its exact report. The separately frozen original synthetic
+publication diagnostic and its strict output reader also passed. New
+orchestration computes two matching continuity buffers inside the unchanged
+v4 source guard, waits for its successful return, and only then can publish
+bounded private leaves with retained original descriptors and output-only
+authentication. That new contract is implemented and synthetically tested,
+**not independently reviewed or operationally exercised**. No shared,
+execution, strategy-economic or source-admission behavior changed.
+
+In plain language, the moved source files passed the exact fresh-use check,
+and a small test of writing harmless sample files stayed unchanged throughout
+its scheduled checks. A new builder has been prepared so it cannot write a
+real research package before finishing its source checks. It still needs
+Claude's independent review before use. These results are not a backtest,
+evidence of investment performance, or permission to trade.
+
+**Concrete next barrier and authorized next step:** Claude independently
+reviews every commit in this exact pushed range, including the new publisher,
+readers, operational results and disclosed test-support deviations. Codex then
+counter-reviews every new completed Claude commit. Only if that review and
+all other gates permit may Codex freeze a separate exact one-shot publication
+decision for the already reserved C leaf, binding current source/profile/code
+pins, actual process exit and subsequent strict three-file authentication.
+Do not call the legacy builder bare, treat generic v4 callback support as run
+authority, repeat R282/R272, refresh pins to make drift pass, or use failed
+A/B leftovers. Same-round advisory agents did not provide independent final
+review. This required review barrier cannot be resolved by additional Codex
+acknowledgement tests or another authority-only round.
+
+Even successful future production publication would precede, not replace,
+the exact offline R284A1 preparation/input/manifest/profile/source/prepared
+freeze and its one-attempt public-identity/no-order QC protocol. All provider
+rights, immutable history, independent master/SID/share-class/own-ETF/vendor
+identity, PIT prior-close prices/scores, seven-role/terminal-payoff and formal
+ARV2-4..8 gates remain. No epoch/date/estimand/power hash is backfilled.
+Accounted floor stays **313 shared / 239 development / 49 infrastructure /
+699 cells**; local assessment and synthetic diagnostics add no look or cell.
+R284 is unprepared/unlaunched; R247/R281 remain exhausted. No funded, broker,
+real-order, paper/live deployment or efficacy authority was exercised.
+
+All repository work remains on the sole operative root/branch. At this
+record's pre-push freeze, the two named commits and this record are local-only;
+the matching remote still points to Claude's `6e9c5562`. No intermediate push
+occurred. After final record/diff/status checks, make exactly one successful
+matching-lane push containing all three commits and verify clean local/remote
+agreement. This record's own hash is the end of the range; resolve it from
+Git rather than inventing a self-referential hash. The existing active
+heartbeat must then advance its Codex baseline to that verified final head
+and last disposed Claude head to `6e9c5562`, preserving the quiet policy and
+all gates. These three Codex commits are not a new Claude trigger.
+
+The final combined 1,094-case focused run and compile/pin checks are in 284.8.
+The subsequent pre-probe record-only **86 passed in 0.87 s** and final handoff
+record-only **86 passed in 0.82 s** are repeats, not additions to the distinct
+test count. No full Codex suite, licensed-data acquisition, actual
+publisher/production-package validation, R284/QC test, paper deployment or
+broker test ran. The OpenAI Docs skill was used only to consult official
+automation guidance and update the existing monitor through the app; those
+documentation/tool calls are not provider/QC contact or proof of zero network
+contact by the host. Test/operational subprocess denial remains separately
+qualified as denial, not a logged-contact census.

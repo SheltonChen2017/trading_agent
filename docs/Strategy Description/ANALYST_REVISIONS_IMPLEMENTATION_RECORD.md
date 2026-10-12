@@ -43894,3 +43894,91 @@ other jobs or controls; the owner-paused monitor must not be rearmed. Any
 launch still needs a separate committed exact one-attempt decision using
 the actual pins and the unchanged section-263 protocol. Missing/ambiguous
 capacity stops launch. This read-only check adds no look or cell.
+
+### 285.8 Actual access/capacity and exact one-attempt launch decision
+
+D5 was committed at `046bc64f3fce275454a6a4aa907d544209ed94a9`. Its clean
+root/branch/HEAD and selected source pins matched. Local prepared/publication
+authentication passed; at **2026-10-12T05:19:25.329964Z**, both existing QC
+credential environment fields were present (values not printed). Exactly
+three read-only requests succeeded, with the owned reference project verified:
+
+| Endpoint | Client UTC start..end | Canonical parsed-response SHA-256 |
+|---|---|---|
+| `authenticate` | 05:19:25.343124..05:19:25.647870 | `c955e57777ec0d73639dca6748560d00aa5eb8e12f13ebb2ed9656add3908f97` |
+| `projects/read` | 05:19:25.666309..05:19:25.979843 | `48dd63b407d9145bf993b569094278bfe412703336180aad48161beacc8453ba` |
+| `projects/nodes/read` | 05:19:25.995163..05:19:27.014385 | `390f049f51e163acdcf9a74c9a0571ca47ee089497832b24960b267d0a4f80b1` |
+
+The empty request hash is
+`44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a`;
+both fixed-project request hashes are
+`dccec25efade4ffa4919c881a1d56513745ccebf7f9b874cb64172de8aa43af6`.
+These are parsed canonical response hashes, not raw wire or authenticated
+server-time evidence. The node response had **two backtest nodes, both idle,
+zero busy, zero marked active for the reference project**. This establishes
+observed organization pool availability only, not a reservation or that a
+node was assigned to the not-yet-created R284 project. No node selection,
+other-lane state change, attempt claim, project creation or look occurred.
+
+**285-D6 — exact single R284 A1 diagnostic attempt.** Under 263-C/263-H,
+bind the complete actual pin table in 285.6, exact fixed control leaf and
+unchanged selected runner/dependencies in 285.5/285.7. Commit this decision
+before any attempt. The source remains the reviewed pure projection with
+only independently public FIGI strings and aggregate source-binding hashes;
+no licensed rows, prices, subscriptions, history, orders or mapping exports.
+Retain the original one-day **2026-10-07** engine interval; the actual launch
+is now 2026-10-12 and cannot be represented as an October 7 prospective run.
+The justified no-order identity exception, qualifications and false flags
+remain unchanged. This is not strategy performance or formal PIT evidence.
+
+Immediately before launch, after fresh prepared/production authentication,
+allow one more read-only `projects/nodes/read` on the known reference project
+to avoid relying on the earlier observation through this local freeze. Use
+the same bounded transport and sanitized hash/count protocol. If no idle
+node or any ambiguity, do not invoke launch or create a claim. Occupancy
+requires waiting through a product wait mechanism without changing any
+other-lane job; this does not rearm the paused heartbeat. A capacity race
+after an idle observation must never cause a retry or cancellation.
+
+With capacity available, run exactly once:
+
+```text
+python -B -m scripts.run_arv2_identity_qc launch --control-directory /Users/sheltonchen/Code/trading_agent__analyst_revisions_v2/artifacts/analyst_revisions_v2/identity_qc/R284A1-20261008 --prepared-sha256 6efdd14434df183896b87fc07e2d07946c8cb8b893a4daa4e4f189b56ec0c5c3
+```
+
+The fixed project/backtest names remain 263.3's already-pinned names; do not
+rename the candidate/date to evade the attempt limit. Only the new owned
+project's generated `research.ipynb` can be deleted and its `main.py` updated;
+all other project files/jobs/controls are out of scope. Preserve exact source
+readback before compile and again before backtest creation. The runner spends
+the claim before credentials/cloud mutation, freezes actual returned project,
+compile and run identities, and retains all pending/failed observations.
+Any compile/runtime/transport or persistence ambiguity consumes the single
+attempt and stops; no second launch, repair, cleanup or replacement identity.
+
+On successful launch, use the unchanged `status` action with the same exact
+control/prepared arguments, at most 60 statistics-disabled observations.
+Wait at least 10 seconds between nonterminal observations with the product
+wait tool; do not busy poll. Compile remains at most 20 polls with its
+existing two-second intervals. Only exact `Completed.` permits the single
+`read` action with those same arguments; it must independently confirm fresh
+completion and all bindings before retaining the bounded custom metadata.
+No logs, charts, mapping values/hashes, financial statistics or orders may be
+exported or evaluated. A Runtime Error or unknown terminal yields no result
+read. Failure never authorizes Mia to change this spent one-attempt protocol.
+
+Record actual process exits/client intervals and retained sanitized controls
+before the final push. At the first actual attempt, append only this lane's
+new R284 entry to `docs/research/alpha-result.md` under the specific 263-D
+coordination authority: **313 -> 314 shared; 239 development unchanged;
+49 -> 50 infrastructure; 699 cells unchanged**, once even on failure.
+Preparation/read-only capacity did not spend it. No general shared-file
+permission or efficacy/trading authority follows.
+
+The final focused contact-protocol selection passed **41 tests / 296
+deselected in 7.70 s**, no warnings/skips, strict network denial and the same
+isolated in-root testing setup; `assistant.dispatch_fence` remained absent.
+It covers exact fake launch/status/read chains, pre/postclaim mode checks,
+drift refusal, cloud identity/source/compile guards and poll budgets. The
+round now has **404 distinct focused passes** (333 + 30 + 41), not a full
+suite or proof of actual QC success. No executable bytes changed.

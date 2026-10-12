@@ -16490,3 +16490,77 @@ only against that clean exact HEAD and unchanged actual remote `2a65d4a0`.
 No acquisition or backtest is represented as having happened before that commit.
 One final combined push follows completed work or a precise factual blocker,
 not this interim local freeze. Acquisition and further integration follow below.
+
+### 111.6 Actual twelve-request capture and bounded offline recovery freeze
+
+Committed acquisition code/record **`a5ac4c22499e13f04776a8fa145fd3dba72bc383`**
+was clean before the first request. The actual protected run is
+`artifacts/short_interest/sharadar_securities_master/sharadar-master-20261012T055800Z`:
+start **2026-10-12T05:58:00.479961Z**, final response
+**2026-10-12T05:58:17.321696Z**. Exactly twelve requests returned the frozen
+status sequence **200, 200, 200, 200, 200, 200, 302, 200, 302, 200, 302, 200**.
+No retry, thirteenth request, alternative year selection or new source was used.
+Protected raw archives and all request/response receipts survive unchanged.
+
+The post-download assembled report hit the runtime's **512 MiB single-report
+safety limit**. The terminal refusal **`private_report_size_limit`** was
+recorded at **2026-10-12T06:00:38.129298Z**. This is an engineering/report-storage
+refusal, not a failed entitlement, performance result or public provider-fitness
+verdict. The twelve-request budget is consumed and remains claimed; rerunning
+the acquisition to fix report representation is prohibited.
+
+**SI-DEC-20261011-18** authorizes only offline finalization of those exact retained
+bytes using prospectively committed code, no credential reader and no provider
+transport. The source inventory of exactly **36** files is pinned by
+**`af57bd5bcbfc435051946be51e6671e7de8f77b0c7739bddc23f89d0e8f48726`**;
+the existing global budget claim by
+**`76170777b03b8a1e553777494ffa564c817975f5f4f0b15fffea0651066dcdbd`**.
+Full raw/receipt digest checks precede parsing, with protected regular files,
+fixed code/protocol/descriptors, strict ordinals/status types and ordered clocks.
+Metadata-size equality is rechecked only as a race sentinel. No signed URL is
+recovered, persisted or requested again.
+
+The pure segmented storage protocol
+**`a5f158170fcf3803664a93f1f7bdb74b3895729d4e0ed4a3a32b14ba869a3abd`**
+preserves the canonical master schema and exact reconstructed bytes in ordered
+parts of at most **32 MiB**, total at most **2 GiB / 64 parts**, with complete-
+byte, part-position/length/hash, report-payload/capture-identity and index-seal
+binding. It does not relax source semantics, row retention or empirical gates.
+The actual original report clock/hash was not persisted before the size refusal;
+the new report explicitly uses the **observed refusal clock as its reconstruction
+anchor**, not an invented original clock or byte-identical original-report claim.
+The index retains source/finalizer identities and the original refused status /
+twelve consumed requests. All parts/index and conclusions stay protected,
+private and ignored. The new finalizer owns one exclusive child directory and
+cannot append to a prior completed run. Its own start/completion clocks must
+follow the source anchor; failed partial output remains retained without a
+success claim or silent overwrite.
+
+| ID | Priority/status | Evidence and correction |
+|---|---|---|
+| SI-MASTER-005 | P2, confirmed software-scale issue; recovery pending execution | All twelve downloads succeeded but monolithic report exceeded 512 MiB. Preserve source bytes/budget and use bounded indexed parts offline; no acquisition retry or provider-fitness conclusion. |
+| SI-MASTER-006 | P2, confirmed, corrected before offline execution | Draft error handling appended a refusal into an older successful output. Main's two persistent regressions red (**2 failed, 21 deselected, 0.40s**); only the current invocation's successful exclusive mkdir now grants refusal-write ownership. Existing and early-guard output stays byte-identical. |
+| SI-MASTER-007 | P3, confirmed, corrected before offline execution | Draft allowed finalization to predate the observed source anchor. Persistent start-clock regression red (**1 failed, 23 deselected, 0.37s**); start/complete chronology checked, completion reversal retains partial output/refusal without completed.json. |
+| SI-MASTER-008 | P3, confirmed, corrected before offline execution | Codec index parsing used dictionary equality that conflates False and 0. Exact canonical-JSON comparison now rejects changed authority types; delegated reversion probe **1 red**, restored persistent test green. |
+
+Delegated codec execution: **43 passed in 1.04s**, including a fabricated report
+crossing the real 32 MiB boundary; nine material in-memory reverse probes red.
+Delegated transport's final run: **95 in 0.52s**, seven material reverse probes
+red; neither is a real provider/backtest run. A probe-harness syntax error before
+pytest was corrected and excluded. Main separately validates the final code and
+record before the offline local commit. This recovery is not a new look or QC
+launch and opens no source/price/outcome gate. Actual offline execution and
+further integration will be recorded below, not inferred from passing fixtures.
+
+Main's final pre-recovery tree: **434 focused checks in 8.02s**, no skip/warning,
+empty inherited environment/network denied, including all five new/affected
+capture/master/precision/finalization/segment files and document/import checks.
+Targeted compilation of the eleven new/affected Python files exits **0** with
+pycache outside the checkout; diff check clean. Recovery reader/runtime has
+**25** persistent cases, including two material immutable-output reds restored
+green and source/start/completion chronology controls. No full lane or repository
+suite was run. Commit this code/record locally from the same worktree before
+offline reconstruction, requiring clean exact HEAD and unchanged actual remote
+`2a65d4a0`. The original capture refusal/budget remains immutable. Finalizer
+processing may inspect those licensed captures privately but makes **0** new
+provider requests and **0** credential reads; no outcome or QC action is included.

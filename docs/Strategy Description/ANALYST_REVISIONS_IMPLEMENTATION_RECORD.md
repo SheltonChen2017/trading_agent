@@ -466,8 +466,9 @@ of Claude review and the separately committed one-shot publication protocol.
 It does not claim independent approval or waive technical source/output
 checks. The actual unchanged publisher and separate strict three-file
 authentication both pass at freeze `417aff5f` (285.4), resolving publication
-prospectively for the exact C package. Offline R284 preparation is separately
-frozen in 285.5; no QC contact or launch follows merely from publication.
+prospectively for the exact C package. Offline R284 preparation and its
+bounded readback passed at `99333564` (285.6). The next step is the separately
+frozen read-only QC access/capacity check (285.7), not an unfrozen launch.
 The review monitor is paused at the owner's request.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
@@ -1434,9 +1435,10 @@ review" after being told that section-284 review was the immediate barrier.
 The owner explicitly waives Claude review of section 285's current pre-use
 publication protocol and the unchanged section-284 candidate only; section
 285 records the exact prospective publication/authentication decision, not
-independent acceptance. Both actual operations now passed (285.4); the next
-bounded step is the separately frozen offline preparation in 285.5, not a
-publisher retry or an unfrozen QC launch.
+independent acceptance. Both actual operations now passed (285.4), followed
+by successful offline preparation and readback (285.6). The next bounded
+step is the separately frozen read-only QC access/capacity check (285.7), not
+a publisher retry or an unfrozen QC launch.
 The separate run freeze and all source/output checks remain binding. Normal
 independent review remains required for later new security contracts; this
 waiver does not revive sections 278/280 or permit a retry. Do not ask again
@@ -43786,3 +43788,109 @@ authorize a repair. The one-attempt, bounded compile/status/result protocol
 and occupied-node waiting requirement of 263 remain unchanged; this offline
 decision itself does not authorize QC capacity or launch. The monitor stays
 paused, and only one final matching-lane push will conclude this round.
+
+### 285.6 Actual offline preparation and bound readback
+
+D4 was committed at `993335640819586660f9dfe080a3a6bd1d6ed988`. The exact
+root/branch/clean HEAD, runner/builder hashes and continuity profile matched;
+the single fixed control-leaf absence check passed. The sole prepare CLI ran
+**2026-10-12T05:15:53.262412Z..05:15:55.320728Z**, actual exit **0**, empty
+stderr, under strict network denial. Its canonical summary retained all
+runtime false flags and selected continuity schema/profile. The fixed
+`identity_qc/R284A1-20261008` control leaf is now prepared, not unallocated.
+
+The separately frozen bounded local readback ran once at the same clean
+freeze, **05:16:16.196550Z..05:16:16.224013Z**, exit **0** / accepted. It
+checked the exact five-name inventory both before and after consumption,
+the embedded C path and external manifest/input hashes, profile/source pins,
+all runtime false flags, and production-mode continuity authentication.
+No attempt claim, credential/client construction or QC request occurred.
+
+| Actual prepared binding | Value |
+|---|---|
+| Prepared SHA-256 (2,818 bytes) | `6efdd14434df183896b87fc07e2d07946c8cb8b893a4daa4e4f189b56ec0c5c3` |
+| Generated source SHA-256 (4,183 bytes) | `1b9c82c2db7b7d3c338cc32185556bc46bbeebd8289c7f0415881a2a5bfc66b3` |
+| Source-template SHA-256 | `d99f97835893d54df00a3c3f7639200d6e7b33974c34783f86b6de851d6d30c3` |
+| Input SHA-256 (986 bytes) | `4a5bf4cbb3abb4d453eabcb40479dfde98164996e6ca84bece509d91658f5ece` |
+| Continuity manifest SHA-256 | `529e1727fe95d9df7f05ea83b677cf1b0a7a34e40a70cbcad5c68a7f1ea1458f` |
+| Continuity profile SHA-256 | `d370cc92322a42ed736215eaa634f445413b04267925a414c1b71aecfa9d796c` |
+
+**CR285-001 (P3, documentary correction):** D2's statement that authentication
+performs no native-attribute observations is too broad. The unchanged builder
+visitor calls `_provenance_presence` on output leaves; this can list xattr
+names using `os.listxattr` or `/usr/bin/xattr -s`. It never obtains attribute
+values there. D2, preparation and its readback can therefore make bounded
+names-only output-attribute diagnostic observations. They do not repeat the
+v4 original-source/native security assessment, establish output ACL/xattr
+authentication, or read original captures. The exact API route/count used in
+the successful invocations was not separately logged; do not invent it.
+
+The read-only same-round advisory audit also confirms that the runner's first
+input read is leaf-only no-follow, before component-wise publication
+authentication; not every ancestor check precedes every input byte read.
+Control files retain the unchanged seven-field metadata contract, not the
+publisher's ten-field original-descriptor policy. Exact final inventory was
+checked by the external D4 reader because `_prepared` alone rejects pending
+names, not arbitrary extras. These qualifications do not change source pins,
+guards or the previously reviewed runner contract. Advisory work is not an
+independent final review. No new executable defect is asserted or patched.
+
+Pre-D4-commit record validation was **86 passed in 0.82 s**, a repeat, not
+additional distinct coverage. The round so far has **363 distinct focused
+passes** (333 plus 30); no full suite, QC attempt or result cell. The floor
+remains **313 / 239 / 49 / 699**. Preparation and its once-only local readback
+are spent; later frozen QC consumers perform their own required fresh
+authentication, not a replay or repair of these operations.
+
+### 285.7 Prospective read-only QC access/capacity check
+
+**285-D5** binds the actual prepared/source/template/input/manifest/profile
+pins above before any credential/client or QC contact. After this record is
+committed and the clean root/branch/HEAD plus selected code pins match,
+perform one bounded read-only access/capacity check. It authorizes no project
+creation, upload, compile, backtest, node selection/change or attempt claim.
+
+First use the existing `_Directory`/`_prepared` consumer with the exact
+five-file inventory and external prepared hash, then verify the exact
+published C lineage and `_require_production_continuity` before credentials.
+Use only existing `QC_USER_ID`/`QC_API_TOKEN` environment configuration;
+emit presence booleans only, never values. Missing configuration is a concrete
+external access barrier; do not spend a launch claim to discover it, search
+unrelated secret stores or change the credential boundary.
+
+If configured, use the unchanged bounded `production_client` and at most
+one request each to `authenticate`, `projects/read` with the already-known
+project `37165262`, and `projects/nodes/read` for that same project. Require
+successful responses, exact owned project/organization identity, a bounded
+backtest-node list, and exact boolean busy/active fields. Reauthenticate
+production continuity before each contact. Preserve only sanitized client
+intervals, canonical request/parsed-response hashes and backtest-node counts;
+discard other returned fields without evaluation. No raw account identifiers,
+other-lane names/jobs, credentials, live/research node details or raw response
+are printed or retained. No retry follows transport/schema ambiguity.
+
+The [official read-project-nodes contract](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/nodes/read-project-nodes)
+documents this read-only endpoint and its busy/active fields; section 199.1
+used this endpoint for capacity. The client already permits `projects/`.
+Use `client.request` for this separately scoped read, without modifying or
+bypassing the narrower economic-submission `_post` allowlist; that unchanged
+launch helper remains responsible for its own authorized endpoints.
+Selected dependency SHA-256 pins for this check are:
+
+| File | SHA-256 |
+|---|---|
+| `research/quantconnect.py` | `7a12fdb68194ee10f6e8c3d7c0fc49c08b34166d056bd5ea2a72937dd03be373` |
+| `research/analyst_revisions_v2_qc/six_universe_coverage_submission.py` | `e511e04eeadb5a667b7ecee361dcac3de31d6323a0d64b1ea0b42f2879aab62b` |
+| `research/analyst_revisions_v2_qc/formal_qc_transport.py` | `b8c332eda827aeaee23f0dbbddcc96dbd269c82c996812a8a31fe2a4fec62ac4` |
+
+These are selected source pins, not whole-interpreter integrity. The client
+retains its verified TLS, no-proxy/no-redirect, bounded response and no-retry
+transport. This operational read may contact QC only after its local checks;
+tests and private audit parsers remain strictly remote-network-denied.
+No account enumeration, paid rights, market history/prices or mapping export.
+An idle-node observation is point-in-time capacity evidence, not a reservation
+or authority to interrupt another lane. If occupied, wait without changing
+other jobs or controls; the owner-paused monitor must not be rearmed. Any
+launch still needs a separate committed exact one-attempt decision using
+the actual pins and the unchanged section-263 protocol. Missing/ambiguous
+capacity stops launch. This read-only check adds no look or cell.

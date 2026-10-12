@@ -12,7 +12,9 @@ import pytest
 from scripts import qualify_finra_short_interest as capture
 import os
 
-pytestmark = pytest.mark.skipif(
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
     not hasattr(os, "getuid"),
     reason=(
         "the protected-capture runtime requires POSIX ownership and mode "
@@ -73,6 +75,7 @@ def setup_responses(*pages):
             Response(metadata(), {"Data-Version": "1"}), *pages]
 
 
+@_POSIX_CAPTURE_ONLY
 def test_exact_request_fields_and_no_secret_artifacts(tmp_path):
     opener = Opener(setup_responses(Response(rows(), headers())))
     pages, receipts, digest = capture._capture(tmp_path, ("fabricated-client", "fabricated-secret"), opener,
@@ -91,6 +94,7 @@ def test_exact_request_fields_and_no_secret_artifacts(tmp_path):
         assert not any(secret in path.read_text() for secret in ("fabricated-client", "fabricated-secret", "fabricated-token"))
 
 
+@_POSIX_CAPTURE_ONLY
 def test_optional_page_count_header_uses_exact_array_length_not_unverified_completion(tmp_path):
     actual_headers = headers()
     actual_headers.pop("Total-Records-On-Page")
@@ -105,6 +109,7 @@ def test_optional_page_count_header_uses_exact_array_length_not_unverified_compl
 
 
 @pytest.mark.parametrize("change", ["missing_total", "wrong_offset", "wrong_count", "wrong_limit", "too_many", "wrong_version", "invalid_header"])
+@_POSIX_CAPTURE_ONLY
 def test_bad_pagination_refused(tmp_path, change):
     altered = headers()
     if change == "missing_total":
@@ -126,6 +131,7 @@ def test_bad_pagination_refused(tmp_path, change):
                          tickers=["AAPL"], dates=["2026-07-15"])
 
 
+@_POSIX_CAPTURE_ONLY
 def test_changed_total_across_pages_refused(tmp_path):
     second = rows()
     second[0]["symbolCode"] = "MSFT"
@@ -135,6 +141,7 @@ def test_changed_total_across_pages_refused(tmp_path):
                          tickers=["AAPL", "MSFT"], dates=["2026-07-15"])
 
 
+@_POSIX_CAPTURE_ONLY
 def test_repeated_page_and_no_progress_refused(tmp_path):
     opener = Opener(setup_responses(Response(rows(), headers(total=2)), Response(rows(), headers(total=2, offset=1))))
     with pytest.raises(capture.CaptureRefusal, match="pagination_no_progress"):
@@ -142,6 +149,7 @@ def test_repeated_page_and_no_progress_refused(tmp_path):
                          tickers=["AAPL"], dates=["2026-07-15"])
 
 
+@_POSIX_CAPTURE_ONLY
 def test_page_bound_is_not_completion(tmp_path):
     second = rows()
     second[0]["symbolCode"] = "MSFT"
@@ -152,6 +160,7 @@ def test_page_bound_is_not_completion(tmp_path):
     assert len(opener.requests) == 4
 
 
+@_POSIX_CAPTURE_ONLY
 def test_whole_round_remaining_request_budget_is_enforced_before_next_query(tmp_path):
     opener = Opener(setup_responses(Response(rows(), headers())))
     with pytest.raises(capture.CaptureRefusal, match="source_request_budget_exhausted"):
@@ -160,6 +169,7 @@ def test_whole_round_remaining_request_budget_is_enforced_before_next_query(tmp_
     assert len(opener.requests) == 3  # auth + metadata + only one data query
 
 
+@_POSIX_CAPTURE_ONLY
 def test_actual_returned_length_controls_next_offset(tmp_path):
     second = rows()
     second[0]["symbolCode"] = "MSFT"
@@ -171,6 +181,7 @@ def test_actual_returned_length_controls_next_offset(tmp_path):
     assert [item["offset"] for item in receipts] == [0, 1]
 
 
+@_POSIX_CAPTURE_ONLY
 def test_response_cannot_be_rebound_to_another_frozen_query(tmp_path):
     different = rows()
     different[0]["settlementDate"] = "2026-07-31"
@@ -196,17 +207,20 @@ def credential_file(tmp_path):
     return path
 
 
+@_POSIX_CAPTURE_ONLY
 def test_protected_known_credentials_only(credential_file):
     assert capture._read_credentials(credential_file) == ("fabricated-client", "fabricated-secret")
 
 
 @pytest.mark.parametrize("mode", [0o644, 0o640, 0o400])
+@_POSIX_CAPTURE_ONLY
 def test_bad_credential_mode_refused(credential_file, mode):
     credential_file.chmod(mode)
     with pytest.raises(capture.CaptureRefusal, match="credential_file_protection"):
         capture._read_credentials(credential_file)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_credential_symlink_refused(credential_file):
     link = credential_file.parent / "link.env"
     link.symlink_to(credential_file)
@@ -214,6 +228,7 @@ def test_credential_symlink_refused(credential_file):
         capture._read_credentials(link)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_credential_fields_are_not_shell_code(credential_file):
     credential_file.write_text('FINRA_API_CLIENT_ID=fabricated-client\nFINRA_API_SECRET=$(never-executed)\n')
     assert capture._read_credentials(credential_file)[1] == "$(never-executed)"
@@ -222,6 +237,7 @@ def test_credential_fields_are_not_shell_code(credential_file):
         capture._read_credentials(credential_file)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_redirects_are_not_followed_and_immutable_paths_not_overwritten(tmp_path):
     assert capture._NoRedirect().redirect_request(None, None, None, None, None, None) is None
     capture._publish(tmp_path, "artifact.json", b"original")
@@ -240,6 +256,7 @@ def test_failure_prints_no_external_exception_text(monkeypatch, tmp_path, capsys
     assert json.loads(printed)["reason"] == "RuntimeError"
 
 
+@_POSIX_CAPTURE_ONLY
 def test_symlinked_capture_parent_refused_before_artifact_or_credential_read(monkeypatch, tmp_path, capsys):
     root = tmp_path / "lane"
     root.mkdir()

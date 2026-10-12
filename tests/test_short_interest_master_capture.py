@@ -15,7 +15,9 @@ from data.hashing import hash_bytes
 import scripts.capture_short_interest_securities_master as capture
 import os
 
-pytestmark = pytest.mark.skipif(
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
     not hasattr(os, "getuid"),
     reason=(
         "the protected-capture runtime requires POSIX ownership and mode "
@@ -119,6 +121,7 @@ def run(tmp_path, opener):
     return capture._capture(tmp_path, tmp_path, KEY, opener, head=HEAD, remote=REMOTE)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_twelve_requests_source_bound_no_signed_URL_or_secret_persistence(tmp_path, offline):
     guards, downloads = offline
     opener = successful_opener()
@@ -274,6 +277,7 @@ def test_anonymous_download_has_no_auth_proxy_retry_or_redirect(monkeypatch, sta
     assert response.reads == (0 if status == 302 else 1)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_late_guard_change_blocks_request_after_started_receipt(tmp_path, monkeypatch):
     calls = 0
     def guard(*args):
@@ -289,6 +293,7 @@ def test_late_guard_change_blocks_request_after_started_receipt(tmp_path, monkey
     assert not opener.requests and (tmp_path / "attempt-01.started.json").exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_valid_key_checked_archive_survives_metadata_size_race(tmp_path, offline):
     responses = [Response(metadata(table, len(archive(table)) + 1 if i == 0 else None))
                  for i, table in enumerate(capture.master.TABLES)]
@@ -302,6 +307,7 @@ def test_valid_key_checked_archive_survives_metadata_size_race(tmp_path, offline
     assert (tmp_path / "attempt-08.refused.json").exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_compressed_credential_echo_is_checked_before_archive_persistence(tmp_path, offline, monkeypatch):
     monkeypatch.setattr(capture.master, "validate_archive", lambda *args: b"a,b\nfixture," + KEY.encode())
     with pytest.raises(capture.MasterCaptureRefusal, match="credential_echo"):
@@ -316,6 +322,7 @@ def test_compressed_credential_echo_is_checked_before_archive_persistence(tmp_pa
     ("CSV", capture.urllib.parse.quote(SIGNED, safe="")),
     ("CSV", SIGNED.replace("/", "\\/")),
 ])
+@_POSIX_CAPTURE_ONLY
 def test_signed_capability_echo_never_reaches_receipt_or_raw_hash(tmp_path, offline, monkeypatch, where, echo):
     def download(location, key):
         return (archive("tickers") + (echo.encode() if where == "ZIP" else b""),
@@ -357,6 +364,7 @@ def test_capture_clock_reversal_refuses_before_request(tmp_path, offline, monkey
     assert not opener.requests
 
 
+@_POSIX_CAPTURE_ONLY
 def test_new_time_or_HEAD_cannot_reset_global_budget(tmp_path, offline, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(capture, "_git", lambda root, *args: args[-1])

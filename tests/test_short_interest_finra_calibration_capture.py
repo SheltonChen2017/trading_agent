@@ -12,7 +12,9 @@ from scripts import calibrate_finra_short_interest as capture
 from scripts import qualify_finra_short_interest as base_capture
 import os
 
-pytestmark = pytest.mark.skipif(
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
     not hasattr(os, "getuid"),
     reason=(
         "the protected-capture runtime requires POSIX ownership and mode "
@@ -102,6 +104,7 @@ def args(root, *, budget=8, run_id="finra-calibration-20261010T000000Z"):
 
 
 @pytest.mark.parametrize("budget", [7, 8])
+@_POSIX_CAPTURE_ONLY
 def test_seven_queries_share_one_capture_and_prospective_attempt_receipts(tmp_path, budget):
     checked = []
     def before_open(request):
@@ -133,6 +136,7 @@ def test_seven_queries_share_one_capture_and_prospective_attempt_receipts(tmp_pa
 
 
 @pytest.mark.parametrize("budget", range(1, 7))
+@_POSIX_CAPTURE_ONLY
 def test_shared_budget_is_exact_before_later_panel_http(tmp_path, budget):
     opener = Opener(complete_responses())
     with pytest.raises(capture.CaptureRefusal, match="source_request_budget_exhausted"):
@@ -143,6 +147,7 @@ def test_shared_budget_is_exact_before_later_panel_http(tmp_path, budget):
     assert not (tmp_path / f"attempt-{budget + 1:02d}-start.json").exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_single_pagination_spare_consumes_shared_eighth_request(tmp_path):
     first = queries()[0]
     pages = [Response(rows(first), headers(total=2)), Response(rows(first, " second"), headers(total=2, offset=1))]
@@ -154,6 +159,7 @@ def test_single_pagination_spare_consumes_shared_eighth_request(tmp_path):
     assert [receipt["source_request_number"] for receipt in receipts] == list(range(1, 9))
 
 
+@_POSIX_CAPTURE_ONLY
 def test_eighth_request_cannot_reset_budget_for_final_panel(tmp_path):
     first = queries()[0]
     pages = [Response(rows(first), headers(total=2)), Response(rows(first, " second"), headers(total=2, offset=1))]
@@ -165,6 +171,7 @@ def test_eighth_request_cannot_reset_budget_for_final_panel(tmp_path):
     assert len(tuple(tmp_path.glob("attempt-*-start.json"))) == 7
 
 
+@_POSIX_CAPTURE_ONLY
 def test_http_failure_is_counted_and_persisted_before_http_without_retry(tmp_path):
     error = urllib.error.HTTPError(capture.DATA_URL, 503, "fabricated-secret-value", {}, None)
     opener = Opener(responses(error))
@@ -179,6 +186,7 @@ def test_http_failure_is_counted_and_persisted_before_http_without_retry(tmp_pat
     assert "fabricated-secret-value" not in (tmp_path / "attempt-01-failure.json").read_text()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_prior_attempt_receipt_prevents_counter_reset_and_auth(tmp_path):
     capture._publish_json(tmp_path, "attempt-01-start.json", {"source_request_number": 1})
     opener = Opener([])
@@ -187,6 +195,7 @@ def test_prior_attempt_receipt_prevents_counter_reset_and_auth(tmp_path):
     assert opener.requests == []
 
 
+@_POSIX_CAPTURE_ONLY
 def test_guard_is_immediately_before_http_and_retains_started_attempt(tmp_path):
     opener = Opener(responses())
     def refuse():
@@ -198,6 +207,7 @@ def test_guard_is_immediately_before_http_and_retains_started_attempt(tmp_path):
     assert len(tuple(tmp_path.glob("attempt-*-start.json"))) == 1
 
 
+@_POSIX_CAPTURE_ONLY
 def test_optional_header_and_zero_total_query_are_not_silently_dropped(tmp_path):
     pages = []
     for query in queries():
@@ -215,6 +225,7 @@ def test_optional_header_and_zero_total_query_are_not_silently_dropped(tmp_path)
 
 
 @pytest.mark.parametrize("change", ["missing_total", "wrong_offset", "wrong_count", "wrong_limit", "too_many", "wrong_version", "invalid_header"])
+@_POSIX_CAPTURE_ONLY
 def test_pagination_refusal_preserves_raw_and_whitelist_transport(tmp_path, change):
     transport = headers()
     if change == "missing_total":
@@ -239,6 +250,7 @@ def test_pagination_refusal_preserves_raw_and_whitelist_transport(tmp_path, chan
 
 
 @pytest.mark.parametrize("field,value", [("settlementDate", "2000-01-01"), ("symbolCode", "OUTSIDE")])
+@_POSIX_CAPTURE_ONLY
 def test_identifiable_query_mismatch_refused(tmp_path, field, value):
     different = rows()
     different[0][field] = value
@@ -247,6 +259,7 @@ def test_identifiable_query_mismatch_refused(tmp_path, field, value):
                          Opener(responses(Response(different, headers()))))
 
 
+@_POSIX_CAPTURE_ONLY
 def test_total_drift_and_no_progress_are_not_completion(tmp_path):
     first = queries()[0]
     opener = Opener(responses(Response(rows(first), headers(total=2)),
@@ -256,6 +269,7 @@ def test_total_drift_and_no_progress_are_not_completion(tmp_path):
 
 
 @pytest.mark.parametrize("second", ["repeat", "empty"])
+@_POSIX_CAPTURE_ONLY
 def test_no_progress_is_refused(tmp_path, second):
     first = queries()[0]
     next_rows = rows(first) if second == "repeat" else []
@@ -265,6 +279,7 @@ def test_no_progress_is_refused(tmp_path, second):
         capture._capture(tmp_path, ("fabricated-client", "fabricated-secret"), opener)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_two_page_bound_prevents_third_http(tmp_path):
     first = queries()[0]
     opener = Opener(responses(Response(rows(first), headers(total=3)),
@@ -306,6 +321,7 @@ def test_wrong_physical_root_refused():
 
 
 @pytest.mark.parametrize("mode", [0o644, 0o640, 0o400])
+@_POSIX_CAPTURE_ONLY
 def test_reused_credential_reader_refuses_bad_mode(tmp_path, mode):
     directory = tmp_path / "private"
     directory.mkdir(mode=0o700)
@@ -316,6 +332,7 @@ def test_reused_credential_reader_refuses_bad_mode(tmp_path, mode):
         capture._read_credentials(path)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_reused_credential_reader_refuses_symlink(tmp_path):
     directory = tmp_path / "private"
     directory.mkdir(mode=0o700)
@@ -328,6 +345,7 @@ def test_reused_credential_reader_refuses_symlink(tmp_path):
         capture._read_credentials(link)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_symlink_capture_refused_before_secret_read(monkeypatch, tmp_path, capsys):
     root = tmp_path / "lane"
     root.mkdir()
@@ -373,6 +391,7 @@ def test_external_failure_text_is_never_printed(monkeypatch, tmp_path, capsys):
 
 
 @pytest.mark.parametrize("http_status", [200, 204])
+@_POSIX_CAPTURE_ONLY
 def test_cli_complete_publishes_bound_code_protocol_report_and_final_guard(monkeypatch, tmp_path, capsys, http_status):
     fabricated_responses = complete_responses() if http_status == 200 else responses(
         *(Response(b"", headers(total=0, count=0), status=204) for query in queries()))
@@ -407,6 +426,7 @@ def test_cli_complete_publishes_bound_code_protocol_report_and_final_guard(monke
     assert stat.S_IMODE(directory.parent.stat().st_mode) == 0o700
 
 
+@_POSIX_CAPTURE_ONLY
 def test_cli_http_failure_inventory_keeps_count_without_secret_text(monkeypatch, tmp_path, capsys):
     error = urllib.error.HTTPError(capture.DATA_URL, 403, "fabricated-secret-value", {}, None)
     opener = Opener(responses(error))
@@ -429,6 +449,7 @@ def test_cli_http_failure_inventory_keeps_count_without_secret_text(monkeypatch,
 
 
 @pytest.mark.parametrize("status", [204, 206, 302])
+@_POSIX_CAPTURE_ONLY
 def test_cli_non200_source_status_is_preserved_without_admitting_or_reading_body(monkeypatch, tmp_path, capsys, status):
     class RefusedResponse(Response):
         def read(self, maximum):
@@ -531,6 +552,7 @@ def test_204_transport_is_not_an_empty_query_when_any_contract_fact_disagrees(ch
     assert len(opener.requests) == 1
 
 
+@_POSIX_CAPTURE_ONLY
 def test_capture_empty_204_preserves_actual_bytes_status_and_shared_counter(tmp_path):
     pages = [Response(b"", headers(total=0, count=0), status=204) for query in queries()]
     captured, receipts, _, attempts = capture._capture(

@@ -13,7 +13,9 @@ import research.short_interest_etf.massive_action_supplement as contract
 import scripts.qualify_short_interest_action_supplement as capture
 import os
 
-pytestmark = pytest.mark.skipif(
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
     not hasattr(os, "getuid"),
     reason=(
         "the protected-capture runtime requires POSIX ownership and mode "
@@ -79,6 +81,7 @@ def run(tmp_path, opener):
                             expected_head=HEAD, expected_remote=REMOTE)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_full_capture_has_exact_prospective_inventory_and_header_only_key(tmp_path, offline):
     ordinal = 0
     def before(request):
@@ -101,6 +104,7 @@ def test_full_capture_has_exact_prospective_inventory_and_header_only_key(tmp_pa
 
 
 @pytest.mark.parametrize("status", [204, 301, 401, 403, 429, 500, True, "secret-shaped-status"])
+@_POSIX_CAPTURE_ONLY
 def test_non_200_stops_without_read_retry_or_later_request(tmp_path, offline, status):
     response = Response(status=status)
     opener = Opener([response])
@@ -116,6 +120,7 @@ def test_non_200_stops_without_read_retry_or_later_request(tmp_path, offline, st
     (json.dumps({"k": KEY}).replace("f", "\\u0066").encode(), "application/json"),
     (b'{"status":"OK","results":[]}', "application/json; key=" + KEY),
 ])
+@_POSIX_CAPTURE_ONLY
 def test_credential_echo_never_persists_in_raw_or_receipts(tmp_path, offline, raw, ctype):
     with pytest.raises(capture.ActionSupplementCaptureRefusal, match="credential_echo"):
         run(tmp_path, Opener([Response(raw=raw, content_type=ctype)]))
@@ -123,6 +128,7 @@ def test_credential_echo_never_persists_in_raw_or_receipts(tmp_path, offline, ra
     assert not any(KEY.encode() in f.read_bytes() for f in tmp_path.iterdir())
 
 
+@_POSIX_CAPTURE_ONLY
 def test_late_head_change_stops_after_start_receipt_before_http(tmp_path, monkeypatch):
     calls = 0
     def guard(*args):
@@ -146,6 +152,7 @@ def test_late_head_change_stops_after_start_receipt_before_http(tmp_path, monkey
     b'{"status":"OK","status":"OK","results":[]}',
     b'{"status":"OK","results":[NaN]}',
 ])
+@_POSIX_CAPTURE_ONLY
 def test_invalid_page_is_retained_but_never_followed_or_used_for_complete_report(tmp_path, offline, raw):
     opener = Opener([Response(raw=raw)])
     with pytest.raises(capture.ActionSupplementCaptureRefusal):
@@ -195,6 +202,7 @@ def test_only_named_existing_environment_key_can_be_used(monkeypatch, key):
 
 
 @pytest.mark.parametrize("mode", [0o644, 0o400, 0o777])
+@_POSIX_CAPTURE_ONLY
 def test_private_source_reader_refuses_unprotected_file(tmp_path, mode):
     tmp_path.chmod(0o700)
     path = tmp_path / "known.json"
@@ -204,6 +212,7 @@ def test_private_source_reader_refuses_unprotected_file(tmp_path, mode):
         capture._protected_bytes(path, 32)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_private_source_reader_refuses_symlink_or_oversize(tmp_path):
     tmp_path.chmod(0o700)
     path = tmp_path / "known.json"
@@ -290,6 +299,7 @@ def test_fabricated_equal_clocks_are_valid_without_inventing_resolution(fabricat
     assert capture._rebuild_sharadar(root).to_payload()["fabricated_only"] is True
 
 
+@_POSIX_CAPTURE_ONLY
 def test_cli_later_directory_cannot_reset_whole_round_budget(tmp_path, monkeypatch, offline):
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(capture, "_git", lambda root, *args: args[-1])

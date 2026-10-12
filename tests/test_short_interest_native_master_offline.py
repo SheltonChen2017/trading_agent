@@ -12,7 +12,9 @@ from test_short_interest_sharadar_securities_master import archives
 from test_short_interest_sharadar_companion_qualification import report as companion_report
 import os
 
-pytestmark = pytest.mark.skipif(
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
     not hasattr(os, "getuid"),
     reason=(
         "the protected-capture runtime requires POSIX ownership and mode "
@@ -72,6 +74,7 @@ def replace(path, value):
     path.write_bytes((canonical_json(value) + "\n").encode())
 
 
+@_POSIX_CAPTURE_ONLY
 def test_actual_codec_shape_reloads_and_builds_one_private_native_index(tmp_path, source):
     directory, captures, segmented, guards = source
     before = {item.name: item.read_bytes() for item in directory.iterdir()}
@@ -111,6 +114,7 @@ def test_actual_codec_shape_reloads_and_builds_one_private_native_index(tmp_path
 
 
 @pytest.mark.parametrize("change", ["pin", "bytes", "missing_part", "extra", "permission", "symlink"])
+@_POSIX_CAPTURE_ONLY
 def test_stored_source_integrity_or_protection_refuses_before_any_new_output(tmp_path, source, monkeypatch, change):
     directory, _, _, _ = source
     part = directory / "part-001.private"
@@ -147,6 +151,7 @@ def test_stored_source_integrity_or_protection_refuses_before_any_new_output(tmp
     ("completed.json", "outcome_looks", False),
     ("completed.json", "qc_attempts", 1),
 ])
+@_POSIX_CAPTURE_ONLY
 def test_old_completion_and_clocks_must_bind_exact_committed_reconstruction(tmp_path, source, file, field, value):
     directory, _, _, _ = source
     path = directory / file
@@ -158,6 +163,7 @@ def test_old_completion_and_clocks_must_bind_exact_committed_reconstruction(tmp_
     assert not (tmp_path / build.OUTPUT).exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_source_provenance_has_old_finalizer_code_and_observed_refusal_anchor(tmp_path, source, monkeypatch):
     monkeypatch.setattr(build.finalizer, "_code_identity", lambda *args: "e" * 64)
     with pytest.raises(build.CaptureRefusal, match="provenance"):
@@ -165,6 +171,7 @@ def test_source_provenance_has_old_finalizer_code_and_observed_refusal_anchor(tm
     assert not (tmp_path / build.OUTPUT).exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_parts_read_once_at_codec_bound_without_whole_report_decode(tmp_path, source, monkeypatch):
     directory, _, _, _ = source
     original, reads = build._protected_bytes, []
@@ -180,6 +187,7 @@ def test_parts_read_once_at_codec_bound_without_whole_report_decode(tmp_path, so
     assert index.report_payload_sha256
 
 
+@_POSIX_CAPTURE_ONLY
 def test_aggregate_digest_refusal_even_when_part_and_typed_index_seals_match(tmp_path, source, monkeypatch):
     directory, _, segmented, _ = source
     old = segmented.index
@@ -196,6 +204,7 @@ def test_aggregate_digest_refusal_even_when_part_and_typed_index_seals_match(tmp
 
 
 @pytest.mark.parametrize("field", ["report_payload_sha256", "capture_identity_sha256"])
+@_POSIX_CAPTURE_ONLY
 def test_rebuilt_native_index_must_match_stored_typed_report_binding(tmp_path, source, field):
     _, captures, segmented, _ = source
     old = segmented.index
@@ -206,6 +215,7 @@ def test_rebuilt_native_index_must_match_stored_typed_report_binding(tmp_path, s
         build._native_bytes(captures, ANCHOR, changed)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_native_output_size_bound_refuses_without_partial_large_private_file(tmp_path, source, monkeypatch):
     monkeypatch.setattr(build, "MAXIMUM_NATIVE_INDEX_BYTES", 1)
     with pytest.raises(build.CaptureRefusal, match="native_owned_output_refused"):
@@ -217,6 +227,7 @@ def test_native_output_size_bound_refuses_without_partial_large_private_file(tmp
 
 @pytest.mark.parametrize("field", ["native_index_sha256", "protocol_sha256", "source_protocol_sha256",
                                    "source_report_sha256", "source_capture_identity_sha256", "binding_sha256"])
+@_POSIX_CAPTURE_ONLY
 def test_observation_source_protocol_index_and_seal_bindings_refuse_changed_payload(tmp_path, source, monkeypatch, field):
     original = build.observations.SharadarNativeObservations.to_payload
     def changed(self):
@@ -231,6 +242,7 @@ def test_observation_source_protocol_index_and_seal_bindings_refuse_changed_payl
     assert not (output / "completed.json").exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_every_retained_native_resolution_uses_the_same_sealed_master_index(tmp_path, source, monkeypatch):
     original = build.observations.SharadarNativeObservations.to_payload
     def changed(self):
@@ -245,6 +257,7 @@ def test_every_retained_native_resolution_uses_the_same_sealed_master_index(tmp_
     assert not (tmp_path / build.OUTPUT / "observations.private.json").exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_observation_type_and_size_bounds_cannot_be_bypassed_by_adapter(tmp_path, source, monkeypatch):
     monkeypatch.setattr(build, "MAXIMUM_OBSERVATION_BYTES", 1)
     with pytest.raises(build.CaptureRefusal):
@@ -254,6 +267,7 @@ def test_observation_type_and_size_bounds_cannot_be_bypassed_by_adapter(tmp_path
     assert not (output / "completed.json").exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_wrong_companion_binding_type_refuses_without_invoking_duck_typed_methods(tmp_path, source, monkeypatch):
     class WrongBinding:
         def to_payload(self):
@@ -264,6 +278,7 @@ def test_wrong_companion_binding_type_refuses_without_invoking_duck_typed_method
     assert not (tmp_path / build.OUTPUT / "observations.private.json").exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_old_companion_reload_failure_does_not_create_or_mutate_other_output(tmp_path, source, monkeypatch):
     directory, _, _, _ = source
     before = {item.name: item.read_bytes() for item in directory.iterdir()}
@@ -282,6 +297,7 @@ def test_noncanonical_master_archive_inventory_refuses_without_attribute_error()
 
 
 @pytest.mark.parametrize("early_guard_failure", [False, True])
+@_POSIX_CAPTURE_ONLY
 def test_rerun_or_early_guard_cannot_append_refusal_to_prior_output(tmp_path, source, monkeypatch, early_guard_failure):
     output = _prepare_capture_directory(tmp_path / build.OUTPUT)
     _publish_json(output, "started.json", {"fixture_old": True})
@@ -295,6 +311,7 @@ def test_rerun_or_early_guard_cannot_append_refusal_to_prior_output(tmp_path, so
 
 
 @pytest.mark.parametrize("position", [1, 2, 3, 4, 5, 6])
+@_POSIX_CAPTURE_ONLY
 def test_every_create_and_success_publication_rechecks_exact_head_and_remote(tmp_path, source, monkeypatch, position):
     calls = []
     def guard(root, head, remote):
@@ -314,6 +331,7 @@ def test_every_create_and_success_publication_rechecks_exact_head_and_remote(tmp
 
 
 @pytest.mark.parametrize("clock", ["2026-10-12T06:27:48Z", "2026-10-12T06:29:00Z"])
+@_POSIX_CAPTURE_ONLY
 def test_start_and_completion_chronology_refuse_without_false_success(tmp_path, source, monkeypatch, clock):
     clocks = iter([clock, COMPLETED, "2026-10-12T06:32:00Z"] if clock < build.SOURCE_COMPLETED_AT else
                   [STARTED, clock, "2026-10-12T06:32:00Z"])
@@ -323,6 +341,7 @@ def test_start_and_completion_chronology_refuse_without_false_success(tmp_path, 
     assert not (tmp_path / build.OUTPUT / "completed.json").exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_nonignored_destination_never_creates_private_output(tmp_path, source, monkeypatch):
     monkeypatch.setattr(build, "_git", lambda *args: "")
     with pytest.raises(build.CaptureRefusal, match="not_ignored"):
@@ -330,6 +349,7 @@ def test_nonignored_destination_never_creates_private_output(tmp_path, source, m
     assert not (tmp_path / build.OUTPUT).exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_cli_only_emits_generic_status_code_clocks_and_hashes(tmp_path, source, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
     assert build.main(["--expected-head", HEAD, "--expected-remote", REMOTE]) == 0

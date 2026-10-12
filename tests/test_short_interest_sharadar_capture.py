@@ -20,7 +20,9 @@ from research.short_interest_etf import sharadar_companion_qualification as cont
 from scripts import qualify_finra_short_interest as base_capture
 from scripts import qualify_sharadar_companion as capture
 
-pytestmark = pytest.mark.skipif(
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
     not hasattr(os, "getuid"),
     reason=(
         "the protected-capture runtime requires POSIX ownership and mode "
@@ -116,6 +118,7 @@ def assert_no_secret(directory):
     assert not any(KEY.encode() in path.read_bytes() for path in directory.rglob("*") if path.is_file())
 
 
+@_POSIX_CAPTURE_ONLY
 def test_complete_frozen_order_receipts_precede_http_and_public_output_is_not_fitness(
     tmp_path, local_guard,
 ):
@@ -172,6 +175,7 @@ def test_complete_frozen_order_receipts_precede_http_and_public_output_is_not_fi
 
 
 @pytest.mark.parametrize("position", range(10))
+@_POSIX_CAPTURE_ONLY
 def test_metadata_or_schema_refusal_stops_before_every_later_request(tmp_path, local_guard, position):
     pages = responses()
     pages[position] = Response(b"{}" if position < 5 else b"CREATE TABLE wrong (ticker TEXT);",
@@ -189,6 +193,7 @@ def test_metadata_or_schema_refusal_stops_before_every_later_request(tmp_path, l
 
 
 @pytest.mark.parametrize("status", [True, "200", 201, 204, 301, 302, 401, 403, 500])
+@_POSIX_CAPTURE_ONLY
 def test_non_200_never_reads_body_or_retries(tmp_path, local_guard, status):
     response = Response(KEY.encode(), status=status)
     opener = Opener([response])
@@ -203,6 +208,7 @@ def test_non_200_never_reads_body_or_retries(tmp_path, local_guard, status):
 
 
 @pytest.mark.parametrize("status", [301, 302, 307, 308, 401, 403, 429, 503])
+@_POSIX_CAPTURE_ONLY
 def test_http_error_never_follows_location_reads_error_or_echoes_credential(tmp_path, local_guard, status):
     error = urllib.error.HTTPError("https://example.invalid/?api_key=" + KEY, status, KEY,
                                   {"Location": "https://example.invalid/" + KEY}, UnreadableBody(KEY.encode()))
@@ -216,6 +222,7 @@ def test_http_error_never_follows_location_reads_error_or_echoes_credential(tmp_
 
 
 @pytest.mark.parametrize("status", [True, None, KEY])
+@_POSIX_CAPTURE_ONLY
 def test_invalid_http_error_status_cannot_be_published_as_secret(tmp_path, local_guard, status):
     error = urllib.error.HTTPError("https://example.invalid/", status, KEY, {}, UnreadableBody())
     with pytest.raises(capture.SharadarCaptureRefusal, match="http_not_200") as failure:
@@ -225,6 +232,7 @@ def test_invalid_http_error_status_cannot_be_published_as_secret(tmp_path, local
 
 
 @pytest.mark.parametrize("error", [urllib.error.URLError(KEY), TimeoutError(KEY), ConnectionError(KEY), OSError(KEY)])
+@_POSIX_CAPTURE_ONLY
 def test_network_failures_are_fixed_safe_code(tmp_path, local_guard, error):
     opener = Opener([error])
     with pytest.raises(capture.SharadarCaptureRefusal, match="network_failure"):
@@ -243,6 +251,7 @@ def test_each_response_kind_has_bounded_read(kind):
 
 
 @pytest.mark.parametrize("content_type", [None, 9, "x" * 257])
+@_POSIX_CAPTURE_ONLY
 def test_invalid_content_type_shape_refused_before_artifact(tmp_path, local_guard, content_type):
     opener = Opener([Response(documents()["metadata-stocks"], content_type=content_type)])
     with pytest.raises(capture.SharadarCaptureRefusal, match="content_type"):
@@ -251,6 +260,7 @@ def test_invalid_content_type_shape_refused_before_artifact(tmp_path, local_guar
 
 
 @pytest.mark.parametrize("content_type", ["text/html", "text/plain", "application/octet-stream", ""])
+@_POSIX_CAPTURE_ONLY
 def test_unexpected_metadata_media_type_stops_before_later_http(tmp_path, local_guard, content_type):
     opener = Opener([Response(documents()["metadata-stocks"], content_type=content_type)])
     with pytest.raises(capture.SharadarCaptureRefusal, match="response_contract_refused"):
@@ -259,6 +269,7 @@ def test_unexpected_metadata_media_type_stops_before_later_http(tmp_path, local_
     assert not (tmp_path / "completed.json").exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_body_secret_echo_refused_without_saving_body(tmp_path, local_guard):
     opener = Opener([Response({"echo": KEY})])
     with pytest.raises(capture.SharadarCaptureRefusal, match="credential_echo"):
@@ -268,6 +279,7 @@ def test_body_secret_echo_refused_without_saving_body(tmp_path, local_guard):
 
 
 @pytest.mark.parametrize("escaping", ["first_unicode", "all_unicode", "nested", "fieldname", "slash"])
+@_POSIX_CAPTURE_ONLY
 def test_reconstructible_json_secret_echo_is_refused_before_raw_persistence(tmp_path, local_guard, escaping):
     key = "fabricated/only\\key" if escaping == "slash" else KEY
     metadata = documents()["metadata-stocks"]
@@ -294,6 +306,7 @@ def test_reconstructible_json_secret_echo_is_refused_before_raw_persistence(tmp_
 
 
 @pytest.mark.parametrize("position", ["overwritten_value", "duplicated_fieldname"])
+@_POSIX_CAPTURE_ONLY
 def test_duplicate_json_keys_cannot_hide_escaped_credential_echo(tmp_path, local_guard, position):
     escaped = b"\\u0066" + KEY[1:].encode()
     if position == "overwritten_value":
@@ -309,6 +322,7 @@ def test_duplicate_json_keys_cannot_hide_escaped_credential_echo(tmp_path, local
     assert not (tmp_path / "attempt-01.received.json").exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_allowed_content_type_secret_echo_must_not_enter_receipt(tmp_path, local_guard):
     opener = Opener([Response(documents()["metadata-stocks"],
                               content_type="application/json; charset=" + KEY),
@@ -329,6 +343,7 @@ def test_real_capture_clock_satisfies_canonical_utc_validator():
     assert contract.validate_sharadar_metadata(sample, retrieved_at=capture._utc_now())["table"] == "stocks"
 
 
+@_POSIX_CAPTURE_ONLY
 def test_unlisted_response_headers_never_enter_receipts(tmp_path, local_guard):
     pages = responses()
     for page in pages:
@@ -394,6 +409,7 @@ def test_descriptor_drift_refuses_before_start_receipt_or_http(tmp_path, local_g
 
 
 @pytest.mark.parametrize("change", ["descriptor", "digest"])
+@_POSIX_CAPTURE_ONLY
 def test_late_final_row_request_drift_stops_before_sixteenth_receipt_and_http(
     tmp_path, local_guard, monkeypatch, change,
 ):
@@ -420,6 +436,7 @@ def test_late_final_row_request_drift_stops_before_sixteenth_receipt_and_http(
     assert not (tmp_path / "completed.json").exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_guard_rechecked_after_started_receipt_immediately_before_http(tmp_path, monkeypatch):
     monkeypatch.setattr(capture, "_utc_now", lambda: NOW)
     def guard(*args):
@@ -433,6 +450,7 @@ def test_guard_rechecked_after_started_receipt_immediately_before_http(tmp_path,
     assert (tmp_path / "attempt-01.started.json").exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_existing_started_receipt_prevents_an_attempt_counter_restart(tmp_path, local_guard):
     capture._publish_json(tmp_path, "attempt-01.started.json", {"attempt": 1})
     opener = Opener(responses())
@@ -498,12 +516,14 @@ def credential(tmp_path, monkeypatch):
 
 
 @pytest.mark.parametrize("wrapper", ["", '"', "'"])
+@_POSIX_CAPTURE_ONLY
 def test_reader_only_known_protected_file_and_key_field(credential, wrapper):
     credential.write_text("# Synthetic fixture\n\n SHARADAR_API_KEY = " + wrapper + KEY + wrapper + "\n")
     assert capture._read_key(credential) == KEY
 
 
 @pytest.mark.parametrize("mode", [0o644, 0o640, 0o400, 0o700])
+@_POSIX_CAPTURE_ONLY
 def test_credential_file_requires_exact_600(credential, mode):
     credential.chmod(mode)
     with pytest.raises(capture.SharadarCaptureRefusal, match="credential_file_protection"):
@@ -511,6 +531,7 @@ def test_credential_file_requires_exact_600(credential, mode):
 
 
 @pytest.mark.parametrize("mode", [0o755, 0o750, 0o600])
+@_POSIX_CAPTURE_ONLY
 def test_credential_parent_requires_exact_700(credential, mode):
     credential.parent.chmod(mode)
     try:
@@ -520,6 +541,7 @@ def test_credential_parent_requires_exact_700(credential, mode):
         credential.parent.chmod(0o700)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_credential_parent_wrong_owner_refuses(credential, monkeypatch):
     monkeypatch.setattr(capture.os, "getuid", lambda: credential.parent.stat().st_uid + 1)
     with pytest.raises(capture.SharadarCaptureRefusal, match="credential_directory_protection"):
@@ -527,6 +549,7 @@ def test_credential_parent_wrong_owner_refuses(credential, monkeypatch):
 
 
 @pytest.mark.parametrize("change", ["owner", "kind"])
+@_POSIX_CAPTURE_ONLY
 def test_credential_file_wrong_owner_or_nonregular_refuses(credential, monkeypatch, change):
     original = capture.os.fstat
     def changed(fd):
@@ -542,6 +565,7 @@ def test_credential_file_wrong_owner_or_nonregular_refuses(credential, monkeypat
         capture._read_key(credential)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_real_nonregular_fifo_refuses_without_waiting_for_writer(tmp_path):
     parent = tmp_path / "fifo-private"
     parent.mkdir(mode=0o700)
@@ -574,6 +598,7 @@ def test_unknown_credential_location_refuses_before_open(credential, monkeypatch
         capture._read_key(other)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_credential_symlink_and_symlink_parent_refuse(credential, monkeypatch):
     link = credential.with_name("link.env")
     link.symlink_to(credential)
@@ -590,6 +615,7 @@ def test_credential_symlink_and_symlink_parent_refuse(credential, monkeypatch):
 
 @pytest.mark.parametrize("text", ["", "# empty", "SHARADAR_API_KEY", "OTHER=fixture", "SHARADAR_API_KEY=x\nOTHER=y",
                                 "SHARADAR_API_KEY=x\nSHARADAR_API_KEY=y", "export SHARADAR_API_KEY=x"])
+@_POSIX_CAPTURE_ONLY
 def test_missing_extra_or_duplicate_credential_fields_refuse(credential, text):
     credential.write_text(text)
     with pytest.raises(capture.SharadarCaptureRefusal, match="credential_fields"):
@@ -597,12 +623,14 @@ def test_missing_extra_or_duplicate_credential_fields_refuse(credential, text):
 
 
 @pytest.mark.parametrize("value", ["", "test-api-key", "x" * 513, "bad key", "nonascii-ä", "bad\x00key", '"bad key"'])
+@_POSIX_CAPTURE_ONLY
 def test_invalid_or_sample_key_refuses(credential, value):
     credential.write_text("SHARADAR_API_KEY=" + value)
     with pytest.raises(capture.SharadarCaptureRefusal, match="credential_value"):
         capture._read_key(credential)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_oversized_credential_file_refuses(credential):
     credential.write_text("#" + "x" * 4096)
     with pytest.raises(capture.SharadarCaptureRefusal, match="credential_file_protection"):
@@ -622,6 +650,7 @@ def cli(tmp_path, local_guard, monkeypatch):
     return tmp_path / capture.CAPTURE_PARENT / "sharadar-companion-20261011T120000Z"
 
 
+@_POSIX_CAPTURE_ONLY
 def test_cli_disables_proxies_redirects_and_only_emits_safe_completion(cli, monkeypatch, capsys):
     built = []
     opener = Opener(responses())
@@ -659,6 +688,7 @@ def test_cli_preflight_refuses_before_credentials_or_opener(cli, monkeypatch, ca
     assert not cli.exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_cli_http_failure_safe_refusal_records_status_without_body(cli, monkeypatch, capsys):
     error = urllib.error.HTTPError("https://example.invalid/" + KEY, 403, KEY, {"Authorization": KEY}, UnreadableBody())
     opener = Opener([error])
@@ -672,6 +702,7 @@ def test_cli_http_failure_safe_refusal_records_status_without_body(cli, monkeypa
     assert_no_secret(cli)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_existing_capture_is_not_overwritten_or_restarted(cli, monkeypatch, capsys):
     cli.parent.mkdir(mode=0o700, parents=True)
     cli.mkdir(mode=0o700)

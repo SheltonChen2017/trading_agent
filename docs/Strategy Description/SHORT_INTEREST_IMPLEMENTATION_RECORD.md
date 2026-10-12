@@ -1,29 +1,19 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE (WINDOWS SESSION) HAS REVIEWED THE FOUR-COMMIT PUBLISHED RANGE
-`2a65d4a..a509a5e` COMMIT BY COMMIT (SECTION 112): `a5ac4c2`, `ab169b3`,
-`4acd622` AND `a509a5e` ARE ACCEPTED. NO IN-LANE P0 OR P1. ONE TEST-ONLY
-CORRECTION COMMIT `2ef9a4f`: THE FIRST COMPLETE LANE RUN ON THE SUPPORTED
-WINDOWS HOST SINCE 2026-10-05 SHOWED THAT SEVEN LANE TEST FILES EXERCISING THE
-PROTECTED-CAPTURE RUNTIME CANNOT EXECUTE THERE (ABOUT 250 CASES, ALL
-`os.getuid` OR SYMLINK PRIVILEGE); THEY NOW SKIP WITH THE REASON, AND THE
-RUNTIME'S POSIX-ONLY PLATFORM SCOPE IS AN OPEN P2 OWNER DECISION
-(`SI-CR17-002`). A REGRESSION TEST PINS THE SEGMENTS CODEC'S NESTED
-NON-ADMISSION RULE, WHICH NO TEST EXERCISED (`SI-CR17-003`). FOUR OTHER
-`SI-MASTER` GUARDS TURN THEIR TESTS RED UNDER FILE-BASED MUTATION. ONE P3
-RECORD-PRECISION NOTE: SECTION 111.10'S PRESERVED-BODY BYTE FIGURE IS NOT
-REPRODUCIBLE FROM ITS STATED RULE (`SI-CR17-004`). THE EXACT
-43-FILE SHORT INTEREST LANE ON `2ef9a4f` IS 1,990 passed, 412 skipped in 14,694.70s (4:04:54). THE PURE MODULES
-ADDED THIS ROUND PASS ON WINDOWS UNCHANGED. NO SECRET, LICENSED ROW OR DATA
-FILE ENTERED GIT. NO COMPLETED BACKTEST IS CLAIMED; STRICT ORIGINAL-VINTAGE
-PIT REMAINS DISTINCT FROM LATEST-REVISED EXPLORATION; LOOKBACKS 20/60/120/252
-ARE UNSELECTED; CANONICAL ACTUAL LOOKS 0/0, EXPLORATORY ACTUAL LOOKS 0, ALPHA
-0, QC ATTEMPTS 0. SOURCE P2s, SHARED `SI-CR5-005` / `SI-CCR16-007`,
-`SI-CR15-001` AND `SI-CR19-003` ARE RETAINED. SHARED DOCUMENTS, SESSION
-HANDOFF, HOLDOUT, PRODUCTION RANKINGS/SEEDS, ETF, BROKER, OPERATOR DATABASE,
-DEPLOYMENT, PAPER/LIVE, CAPITAL AND REAL ORDERS/TRADING ARE NOT AUTHORIZED BY
-THIS RESEARCH ROUND. CODEX COUNTER-REVIEW OF `2ef9a4f` AND THIS RECORD
-COMMIT IS NEXT.**
+Status: **CODEX ACCEPTS CLAUDE'S PUSHED `2ef9a4f` AND `ab85a032` AFTER
+THE IN-LANE TEST/RECORD CORRECTIONS IN SECTION 113. THE NESTED NON-ADMISSION
+TEST IS RETAINED. SELECTIVE POSIX MARKERS RESTORE 155 WINDOWS CASES; 257
+GENUINELY PROTECTED-I/O CASES STILL SKIP. THE HISTORICAL-BODY HASH REPRODUCES
+WITH THE EXACT PREFIX/ROW/SECTION RECIPE BELOW. HISTORICAL ISSUE IDS AND
+OWNER AUTHORITY ARE PRESERVED THROUGH APPENDED QUALIFICATIONS. THE NEXT
+BOUNDED STEP IS AN EXPLICIT PROTECTED-RUNTIME HOST PREFLIGHT, NOT A WINDOWS
+ACL-PARITY OR SOURCE-ADMISSION CLAIM. THE ORIGINAL PROTECTED MASTER/NATIVE
+INPUTS ARE ABSENT ON THIS HOST; DO NOT REPLACE CAPTURES OR SPENT BUDGETS.
+NO BACKTEST IS CLAIMED. LOOKBACKS 20/60/120/252 REMAIN UNSELECTED,
+CANONICAL ACTUAL LOOKS 0/0, EXPLORATORY ACTUAL LOOKS 0, ALPHA 0, QC ATTEMPTS
+0. SOURCE/SHARED FINDINGS AND ORIGINAL-VINTAGE VERSUS LATEST-REVISED
+SEPARATION REMAIN. NO SHARED-DOCUMENT, BROKER, OPERATOR-DATABASE,
+DEPLOYMENT, PAPER/LIVE, CAPITAL OR REAL-ORDER/TRADING AUTHORITY IS INFERRED.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -234,6 +224,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-12 | Claude review | `0cdd2c6` -> `b799daa` reviewed from the published head; **no code or test correction**; this record commit is the only Claude commit | Independent review of Codex's counter-review of section 108, the private v2 source binding and the single 62-request Massive action supplement | Confirmed both findings against my section 108 (mutation total four of five, not eight of nine; 108.3 cross-reference). Verified the freeze preceded retrieval, the key never persists, the whole-round budget claim cannot be reset, and the supplement and both binding inventories rebuild byte for byte, printing no provider data. Ran five in-memory mutants; all red. | Pushed tree `b799daa`, clean, Codex idle, network-denied, empty environment: new and package-scanning lane files with active-document and ML boundary **654 passed** (230 new cases; no skips or warnings); mutation baseline 230 passed; compileall exit 0; final-tree active-document 69 passed; `git diff --check` clean. No network request by Claude. **Authorized looks 0, consumed looks 0**. | No new finding against Codex. `SI-CCR21-001` (P3) confirmed against Claude and closed; `SI-CR21-001` closed as a forward rule; `SI-SUPP-001..003` accepted, two reproduced. `SI-CR19-003`, source P2s, shared P2 and `SI-CR15-001` open. | Codex counter-reviews this record commit, then the full-population identity, denominator and cashflow contract. Every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
 | 2026-10-12 | Codex counter-review + source integration | Sole Claude `2a65d4a0` accepted; implementation `a5ac4c22`, `ab169b34`, `4acd6222` and this closing record | Full protected native master capture, offline bounded recovery, batched native keys/exact rational observations and explicit QC decimal mirror | Twelve frozen requests consumed; monolithic storage refusal retained and recovered offline. Native index/v3 binding actually applied and independently rebuilt byte for byte. Eleven draft software findings retained/corrected with material red/green proof; no new defect against Claude's record. | Main pre-application focused **586 passed in 7.82s**, targeted sixteen-file compilation/diff checks; final checks in section 111.10. Actual source-only acquisition is twelve requests; subsequent recovery/application/rebuild adds zero provider requests/credential reads/outcome looks/QC attempts. | No in-lane software P0/P1/P2 remains from this round. Source P2s, shared P2 and prospective P3s retained. Current full master/revised source keys are not raw historical aliases or a full-study economic bundle; documented terminal cash/payment fields remain unresolved. | One combined non-force lane push, no interim push. Claude independently reviews the exact combined checkpoint before the next serialized round. Next qualify composite-to-class relations, class denominators and case-specific payment/terminal evidence before an actual-input/QC candidate; no generic owner approval, affiliation or purchase inferred. |
 | 2026-10-12 | Claude review (Windows session) | `2a65d4a` -> `a509a5e` reviewed from the published head; **test-only correction at `2ef9a4f`**; this record commit follows, so the round has two Claude commits | Independent review of the full Sharadar master capture, offline segmented recovery, native-key/rational-observation binding, precision transport mirror and closing record | Reviewed all four commits individually in the Windows lane worktree after a fast-forward from `85e61a4`. Read every new production module and script in full. Verified protocol hashes, the twelve-request inventory, the 36-file source inventory, 48 transport cells, the import-boundary expansion and the secrets/data sweep; section 111.10's preserved-body byte figure could not be reproduced under four removal rules (`SI-CR17-004`). Five file-based guard removals: four red (ZIP undeclared gap, both-axis owner uniqueness, identity-seal anchor, partial fill), one survivor now pinned (nested non-admission rule). The first complete Windows lane run since 2026-10-05 found the protected-capture runtime and seven of its test files POSIX-only. | 43-file lane on `2ef9a4f`: 1,990 passed, 412 skipped in 14,694.70s (4:04:54); before the guards the nine touched files gave **36 failed, 423 passed, 47 errors**, all `os.getuid`; the seven guarded files now **412 skipped**; segments file **47 passed** with the new test red under its mutation (**4 failed**); compileall exit 0; `git diff --check` clean; active-document **69 passed** before and **69 passed in 18.09s** after this record. Protected artifacts, provider rows and credentials were not accessed; none exist on this host. **Canonical actual looks 0/0, exploratory 0, alpha 0, QC attempts 0.** | No P0/P1. `SI-CR17-002` (P2, tests guarded, runtime platform scope open for the owner), `SI-CR17-003` (P3, closed, test-only), `SI-CR17-001` (P3, process note on lane-suite ownership across two hosts), `SI-CR17-004` (P3, record precision: the 111.10 preserved-body figure is not reproducible from the stated rule). Source P2s, `SI-CR15-001`, `SI-CR19-003` and shared `SI-CR5-005` unchanged. | Codex counter-reviews `2ef9a4f` and this record commit; the owner decides whether protected-capture runtimes need Windows parity; every source, outcome, QC-run, purchase and trading gate remains closed. Push once at the end of this round per the standing rule. |
+| 2026-10-12 | Codex Windows counter-review / host prerequisite | Exact Claude `2ef9a4f889eda9496254ae1ca43d946eb9378374`, `ab85a032759cf5b5924a51caf1c8417cae2d6adc`; counter-review commit follows | Per-commit counter-review, selective Windows test coverage and append-only record errata; protected-runtime preflight is the next bounded prerequisite | No production change in the counter-review: preserve all assertions and the nested non-admission regression; restore neutral tests without weakening protected storage. Exact byte recipe reproduces section 111.10. Preserve historical IDs and current delegated authority. | Main focused **280 passed, 257 skipped in 8.25s**; 52-case original selection **52 skipped in 1.34s**, delegated marker-only memory probe 52 green; exact historical-body 1,444,434 bytes / `608f7d99...713401`. Final host-preflight validation/publication follows in section 113. | No new P0/P1. Broad skips and issue-ID collision corrected; permission versus factual gates qualified. Actual POSIX-only storage and absent protected inputs remain factual limitations, not a new generic owner-approval gate. | Commit counter-review first, then implement and validate the named host preflight; one combined final lane push. No source recapture, consumed-budget reset, actual look or QC attempt. Retire only the handled one-shot monitor after publication. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -17073,3 +17064,119 @@ digests is the complementary control.
    America/Los_Angeles stands.
 5. Per the standing rule in section 81.1, this completed round ends with one
    push of `2ef9a4f` and this record commit.
+
+## 113. Codex Windows counter-review and protected-host prerequisite — 2026-10-12
+
+### 113.1 Exact completed trigger, serialization and dispositions
+
+The owner's 2026-10-12 instruction was: "arm a monitor for Claude's next
+review. After its push, counter review and proceed to the next step."
+The five-minute, thread-attached one-shot is
+`watch-claude-s-next-short-interest-review`, pinned to published
+`a509a5ebeeccbd80bd3942d70381ef0c0467d0a5`. It was armed without a setup
+commit while Claude had eight uncommitted review files. Unchanged/incomplete
+review checks did not edit or publish the branch. Actual remote completion
+at `ab85a032759cf5b5924a51caf1c8417cae2d6adc`, a clean matching local tree,
+and section 112's completed four-commit review establish this trigger; a
+local-only correction or author activity did not. Fetches were limited to
+the matching Short Interest ref without tags or force. No branch switch,
+new branch, merge, reset, stash or unrelated worktree edit occurred.
+
+| Exact Claude commit | Exact parent | Counter-review disposition and scope |
+|---|---|---|
+| `2ef9a4f889eda9496254ae1ca43d946eb9378374` | `a509a5ebeeccbd80bd3942d70381ef0c0467d0a5` | **Accepted after correction.** Complete eight-file test diff inspected. The four coherently re-digested nested non-admission cases are sound and retained. Seven module-wide Windows skips also suppressed 155 runnable neutral cases; selective per-function POSIX markers correct this without changing an assertion or production protection. |
+| `ab85a032759cf5b5924a51caf1c8417cae2d6adc` | `2ef9a4f889eda9496254ae1ca43d946eb9378374` | **Accepted after appended record correction.** Complete record diff/current status/ledger/section 112 inspected. Execution counts remain Claude-attributed. Qualify duplicate finding IDs, permission versus factual readiness, and the precise historical-byte recipe below. Historical rows/sections are not rewritten. |
+
+### 113.2 Persistent findings and immutable issue-ID qualification
+
+Section 112 reuses `SI-CR17-001` and `SI-CR17-002`, already the closed
+privacy correction / UTC-ledger erratum in sections 87-90. Those earlier
+meanings remain unchanged. In **section 112 only**, use these qualified
+aliases for the new Windows findings; do not merge their severities or
+statuses into the old findings:
+
+| Section-112 spelling | Unambiguous current alias | Current disposition |
+|---|---|---|
+| `SI-CR17-001` | `SI-CR-WIN-20261012-001` | P3 process note retained; each complete lane run must name its exact code tree, host and skips. Codex's focused checks do not claim to replace Claude's complete lane run. |
+| `SI-CR17-002` | `SI-CR-WIN-20261012-002` | P2 actual protected-storage platform limitation remains open. Routine lane design is already delegated; this is not a new generic owner-choice gate. Selective test coverage is restored, not Windows ACL parity. |
+| `SI-CR17-003` | `SI-CR-WIN-20261012-003` | P3 closed; new nested regression retained and independently green. |
+| `SI-CR17-004` | `SI-CR-WIN-20261012-004` | P3 precision concern confirmed and closed by the exact recipe in 113.3. The original digest is true, not withdrawn. |
+
+| ID | Priority / classification | Evidence, correction and verification |
+|---|---|---|
+| `SI-CCR-WIN-20261012-001` | P3 confirmed, closed | Module-wide skips hid valid JSON, request/status, DNS/TLS, chronology and remote-guard tests, contrary to retaining regression coverage. Main's unchanged 13-function selection gives **52 skipped in 1.34s**. Delegated marker-only in-memory removal gives **52 passed in 2.29s**. Replace the module marker in seven files with `_POSIX_CAPTURE_ONLY` on 104 protected-I/O functions; 49 neutral functions / 155 cases remain active. Main's ten-file final counter-review selection: **280 passed, 257 skipped in 8.25s**. No assertions or production protection relaxed. |
+| `SI-CCR-WIN-20261012-002` | P3 confirmed, closed | Section 112 collides with the established section-87 issue IDs. Stable-ID review rules require the qualified aliases above; preserve every original row and its status. Tracked-record evidence independently checked against sections 87-90 and 112. |
+| `SI-CCR-WIN-20261012-003` | P2 partially correct, closed by qualification | Section 112.8 and its ledger row correctly retain **unqualified actual-input/QC readiness**, but must not be read as rescinding `SI-AUTH-20261011-05` or creating a generic Windows owner-decision blocker. Sections 76.2/92.1 and 111.2 delegate routine lane choices. Choose a narrow fail-closed platform preflight now; no purchase, new entitlement, source fact, Windows ACL parity or trading approval is invented. |
+| `SI-SRC-20260928-001..003` | P2 open factual gates | Historical identity/class denominators, terminal shareholder consideration/payment and original-vintage availability remain unqualified. No fixture or platform check supplies them. |
+| `SI-CR5-005` / `SI-CCR16-007` | P2 open shared/out-of-lane | Retained with evidence in their existing sections; no shared fix or frozen document edit. |
+
+### 113.3 Exact reproducible historical-byte recipe
+
+Read **raw UTF-8 Git blob bytes**, without PowerShell text/newline conversion,
+for `2a65d4a0` and `a509a5e` at this record path. In each, keep bytes starting
+at the **first** ASCII `Current publication rule`: this excludes the title
+as well as current status, **1,443** old bytes / **1,200** new bytes. In the
+new blob only, remove the unique complete LF-terminated row beginning
+`| 2026-10-12 | Codex counter-review + source integration |`, **1,528 bytes**.
+Then truncate the new blob at the LF immediately before the section-111
+heading `## 111. Codex counter-review and full-source/QC integration`, removing
+**41,117 bytes**. Compare the remaining bytes directly before hashing.
+Main and the read-only record auditor independently reproduce equality:
+**1,444,434 bytes**, SHA-256
+**`608f7d99204b0f377e1f65dd7572dab20638170388d67c2d9e27c726cc571401`**.
+This adds the missing title/prefix exclusion; it does not normalize old bytes,
+withdraw the truthful claim or rewrite sections 111/112.
+
+### 113.4 Counter-review validation and next exact scope
+
+Main: CPython **3.13.14**, pytest **9.1.1**, repository isolation fixtures,
+fabricated home-path metadata, inherited credentials cleared, only Windows
+system-directory settings and resolved Git executable directory retained;
+plugin/cache/bytecode writes disabled, socket connect/connect_ex/DNS denied.
+The ten-file selection is seven capture-test modules plus segments, lane
+import boundaries and active documents. **280 passed, 257 skipped in 8.25s**,
+no warnings or failures. Earlier segment/boundary/document selection:
+**125 passed in 5.63s**. Delegate's seven-file final run: **155 passed,
+257 skipped in 3.30s**; separate codec run **47 passed in 3.69s**. These are
+fabricated software checks, not source or performance evidence. Claude's
+**1,990 passed / 412 skipped / 14,694.70s** remains its attributed complete
+lane run on `2ef9a4f`, not a run on this corrected tree. No complete lane or
+repository suite is run by Codex.
+
+Harness-only attempts were excluded: a quoting SyntaxError before collection,
+missing Windows socket runtime settings, missing Git executable path, and
+missing fabricated home metadata; no production defect or passed-run claim
+is inferred from them. An overstrict uniqueness assertion for the historical
+prefix was corrected to the specified **first** occurrence before the valid
+byte comparison. Diff check is clean. Final record checks and targeted
+compilation precede this counter-review commit.
+
+**SI-DEC-20261012-WIN-01** selects the next bounded prerequisite: centralized
+protected-runtime capability refusal before credentials, storage, immutable
+claims, retained-source reads or provider transport in the seven SI runtimes.
+Add unskipped Windows safe-entry regression tests; preserve POSIX protection
+and existing source budgets/protocols. This is not full Windows ACL parity,
+actual class/cashflow qualification or backtest admission. Implement only
+after committing this accepted counter-review; actual implementation/evidence
+follows below before the one combined final push.
+
+The protected `sharadar_securities_master` and `sharadar_native_binding`
+directories are absent on this host (presence checks only, no private-data
+read). Actual source continuation needs verified access to the original
+protected inputs/receipts/consumed budget claims or a hash-preserving protected
+transfer. No empty local directory authorizes reacquisition. Current source
+routes in 111.10 remain the factual next research step. No generic owner
+approval is requested; no original-vintage, actual-look/QC-capacity, licensing
+or operational gate is silently opened. Canonical actual looks **0/0**,
+exploratory **0**, alpha **0**, QC attempts **0**. After the handled round's
+verified single push, retire only its one-shot monitor and supply the exact
+Claude review range/summary. Other lane work and monitors stay untouched.
+
+Counter-review closing verification: active documents **69 passed in 2.27s**
+after this entry. In-memory compilation of all seven changed Python files
+exits **0**. Main's mechanical AST comparison against `ab85a032` removes only
+the 104 newly placed decorators and renames the private marker binding back
+to `pytestmark`: every function/assertion/body is otherwise identical. The
+edit allowlist is these seven tests and this lane record only. Reverify clean
+staging ownership and actual remote `ab85a032` before the local counter-review
+commit; no push occurs until the next bounded prerequisite closes.

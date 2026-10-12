@@ -13,7 +13,9 @@ from scripts.qualify_finra_short_interest import _prepare_capture_directory, _pu
 import scripts.finalize_short_interest_master_offline as finalize
 import os
 
-pytestmark = pytest.mark.skipif(
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
     not hasattr(os, "getuid"),
     reason=(
         "the protected-capture runtime requires POSIX ownership and mode "
@@ -89,6 +91,7 @@ def source(tmp_path, monkeypatch, *, change=None):
     return directory
 
 
+@_POSIX_CAPTURE_ONLY
 def test_all_consumed_receipts_reload_once_without_key_or_transport(tmp_path, monkeypatch):
     directory = source(tmp_path, monkeypatch)
     captures, anchor = finalize._reload(tmp_path)
@@ -101,6 +104,7 @@ def test_all_consumed_receipts_reload_once_without_key_or_transport(tmp_path, mo
 @pytest.mark.parametrize("field,value", [("attempt", True), ("http_status", 200.0),
     ("raw_bytes", 1), ("raw_sha256", "a" * 64), ("request_id", "download-actions"),
     ("received_at", "2026-10-12T05:00:00Z"), ("signed_URL_persisted_or_hashed", 0)])
+@_POSIX_CAPTURE_ONLY
 def test_response_receipt_dangerous_changes_refuse_before_qualification(tmp_path, monkeypatch, field, value):
     source(tmp_path, monkeypatch, change=lambda blobs, claim:
            blobs["attempt-08.received.json"].__setitem__(field, value))
@@ -112,6 +116,7 @@ def test_response_receipt_dangerous_changes_refuse_before_qualification(tmp_path
     ("started.json", "source_only", 1), ("started.json", "qc_launch_attempts", False),
     ("refused.json", "code", "another_failure"), ("refused.json", "backtest_result_exists", 0),
     ("refused.json", "refused_at", "2026-10-12T05:58:01Z")])
+@_POSIX_CAPTURE_ONLY
 def test_only_the_observed_post_capture_failure_can_be_finalized(tmp_path, monkeypatch, record, field, value):
     source(tmp_path, monkeypatch, change=lambda blobs, claim: blobs[record].__setitem__(field, value))
     with pytest.raises(finalize.CaptureRefusal):
@@ -119,6 +124,7 @@ def test_only_the_observed_post_capture_failure_can_be_finalized(tmp_path, monke
 
 
 @pytest.mark.parametrize("kind", ["extra", "changed_bytes", "changed_claim", "symlink", "permissions"])
+@_POSIX_CAPTURE_ONLY
 def test_protected_pinned_inventory_cannot_be_replaced_or_extended(tmp_path, monkeypatch, kind):
     directory = source(tmp_path, monkeypatch)
     if kind == "extra":
@@ -138,6 +144,7 @@ def test_protected_pinned_inventory_cannot_be_replaced_or_extended(tmp_path, mon
         finalize._reload(tmp_path)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_exclusive_offline_output_cannot_overwrite_or_reset_capture(tmp_path, monkeypatch):
     directory = source(tmp_path, monkeypatch)
     output = _prepare_capture_directory(directory / finalize.OUTPUT_NAME)
@@ -150,6 +157,7 @@ def test_exclusive_offline_output_cannot_overwrite_or_reset_capture(tmp_path, mo
 
 
 @pytest.mark.parametrize("reverse_completion_clock", [False, True])
+@_POSIX_CAPTURE_ONLY
 def test_finalizer_publishes_exact_codec_bytes_with_no_new_request_or_secret_read(tmp_path, monkeypatch, reverse_completion_clock):
     directory = source(tmp_path, monkeypatch)
     guards = []
@@ -197,6 +205,7 @@ def test_finalizer_publishes_exact_codec_bytes_with_no_new_request_or_secret_rea
 
 
 @pytest.mark.parametrize("early_guard_failure", [True, False])
+@_POSIX_CAPTURE_ONLY
 def test_failed_or_repeated_invocation_cannot_append_refusal_to_prior_completed_output(tmp_path, monkeypatch, early_guard_failure):
     directory = source(tmp_path, monkeypatch)
     output = _prepare_capture_directory(directory / finalize.OUTPUT_NAME)
@@ -212,6 +221,7 @@ def test_failed_or_repeated_invocation_cannot_append_refusal_to_prior_completed_
     assert {p.name: p.read_bytes() for p in output.iterdir()} == before
 
 
+@_POSIX_CAPTURE_ONLY
 def test_new_finalization_cannot_start_before_observed_source_refusal(tmp_path, monkeypatch):
     directory = source(tmp_path, monkeypatch)
     monkeypatch.setattr(finalize, "_guard", lambda *args: None)

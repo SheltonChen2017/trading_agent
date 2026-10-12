@@ -464,8 +464,11 @@ publisher was implemented but UNREVIEWED and UNINVOKED at the section-284
 handoff. Section 285 records the owner's new, current-milestone-only waiver
 of Claude review and the separately committed one-shot publication protocol.
 It does not claim independent approval or waive technical source/output
-checks. Neither finite diagnostic success clears safe production publication
-or R284 readiness. The review monitor is paused at the owner's request.
+checks. The actual unchanged publisher and separate strict three-file
+authentication both pass at freeze `417aff5f` (285.4), resolving publication
+prospectively for the exact C package. Offline R284 preparation is separately
+frozen in 285.5; no QC contact or launch follows merely from publication.
+The review monitor is paused at the owner's request.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1431,7 +1434,9 @@ review" after being told that section-284 review was the immediate barrier.
 The owner explicitly waives Claude review of section 285's current pre-use
 publication protocol and the unchanged section-284 candidate only; section
 285 records the exact prospective publication/authentication decision, not
-independent acceptance.
+independent acceptance. Both actual operations now passed (285.4); the next
+bounded step is the separately frozen offline preparation in 285.5, not a
+publisher retry or an unfrozen QC launch.
 The separate run freeze and all source/output checks remain binding. Normal
 independent review remains required for later new security contracts; this
 waiver does not revive sections 278/280 or permit a retry. Do not ask again
@@ -43685,3 +43690,99 @@ R284 preparation/launch has occurred. The next local commit records this
 decision before any operation. Accumulate results locally and make exactly
 one final matching-lane push when the substantive round concludes; the monitor
 remains paused. Do not describe the waiver or this commit as technical success.
+
+### 285.4 Actual guarded publication and separate authentication
+
+The exact prospective protocol was committed at
+`417aff5faccd4f2d2470676db288d4daf4d1eaa6`. Before each operation the root,
+branch, clean HEAD, publisher hash, profile and eleven selected dependency
+pins matched. The single pre-publication absence check returned
+`fixed_C_leaf_absent=true`. Under strict network denial, the unchanged
+publisher then ran exactly once from **2026-10-12T05:10:09.355491Z** to
+**05:10:10.092554Z**, with actual exit **0**, empty stderr and the bounded
+expected summary. The fixed C leaf is now allocated and spent.
+
+| Actual output binding | SHA-256 |
+|---|---|
+| Continuity manifest | `529e1727fe95d9df7f05ea83b677cf1b0a7a34e40a70cbcad5c68a7f1ea1458f` |
+| Public-only input | `4a5bf4cbb3abb4d453eabcb40479dfde98164996e6ca84bece509d91658f5ece` |
+| Publisher profile | `e3f9ecd2ce68011062d4762a30caf781976f680ecff574b8f539c166fe718b00` |
+
+The separate D2 output-only authentication ran exactly once at the same clean
+freeze, **05:10:28.181720Z..05:10:28.252338Z**, actual exit **0**, empty
+stderr. Its arguments used the actual D1 exit and emitted hashes above;
+the external caller verified the exact canonical expected summary. Strict
+three-file authentication accepted. Neither an assumed successful exit nor
+directory completeness substituted for these two actual results. No payload,
+licensed row, mapping value or native security value was printed.
+
+The summary binds 12 source directories, 15 source files, three output files
+and seven requested names. Every restrictive runtime flag remains false,
+including independent review, run authority, R284 preparation, provider/QC
+contact and formal admission. The publisher's fresh source guard completed
+before payload publication; this does not assert historical preservation,
+continuous metadata stability, output ACL/xattr authentication or immutable
+vendor/PIT evidence. **ARV2E263-001 is resolved prospectively for this exact
+C package's guarded publication and separate authentication only.** Failed
+A/B packages and all earlier refusals remain untouched and inadmissible.
+D1/D2 are spent: no repeat, repair, cleanup or automatic pin refresh.
+
+The corrected pre-freeze record selection was **86 passed in 0.78 s**,
+overlapping the 333-test selection; the earlier 1-failure documentary result
+is retained in 285.3. No executable/test bytes changed. No QC preparation,
+credential, capacity request or launch occurred in D1/D2; accounting stays
+313 shared / 239 development / 49 infrastructure / 699 cells.
+
+### 285.5 Separate prospective offline R284 preparation decision
+
+**285-D4** exercises the existing 263-C/263-H delegated diagnostic authority
+after the actual D1/D2 prerequisite passes. It does not introduce a new
+security contract or widen the current Claude-review waiver. The unchanged
+runner was independently reviewed in section 269; its selected SHA-256 is
+`2ca46d211911c61d565df09c3730db494741d8e164d785d12f19954e44eb8551`,
+its tests `35889051fe09305c9243cf897297d2e8770ba378f3197c4661b73aa7ff4e3978`,
+and unchanged continuity builder
+`f05e3b0828ef460d65cb0d728aec2bffdd69c617a5427e884d124f642a4b2484`.
+The actual continuity profile is
+`d370cc92322a42ed736215eaa634f445413b04267925a414c1b71aecfa9d796c`,
+schema `arv2-r284-public-seven-continuity-profile-v2`, mode
+`research_only_no_order_qualified_vintage_current_continuity`.
+
+Root read the complete runner and relevant publication/prepare contracts.
+The focused synthetic preparation/continuity/source-mode selection passed
+**30 tests / 307 deselected in 2.12 s**, strict network denial, no warnings or
+skips, same disabled plugins/conftest/bytecode and fresh in-root basetemp;
+`assistant.dispatch_fence` was asserted absent. These are distinct from the
+333 earlier cases, not an actual QC run or independent final review.
+
+Commit this separate decision before one invocation of the unchanged runner:
+
+```text
+python -B -m scripts.run_arv2_identity_qc prepare --control-directory /Users/sheltonchen/Code/trading_agent__analyst_revisions_v2/artifacts/analyst_revisions_v2/identity_qc/R284A1-20261008 --input /Users/sheltonchen/Code/trading_agent__analyst_revisions_v2/artifacts/analyst_revisions_v2/identity_continuity/R284A1-20261008-C/input.json --input-sha256 4a5bf4cbb3abb4d453eabcb40479dfde98164996e6ca84bece509d91658f5ece
+```
+
+Use strict denied-network execution and the same in-root temporary environment,
+verify clean root/branch/HEAD and selected code/profile pins first, and make
+one absence check of the exact fixed control leaf. Any existing object or
+nonzero/ambiguous prepare exit stops without retry, repair, replacement leaf
+or cleanup. The actual manifest pin above remains externally binding; the
+input embeds it, and preparation authenticates the held original three-file
+package before allocating controls and again on context exit. The separate
+completion marker is written only after held package checks return.
+
+After an unambiguous successful preparation, authorize one bounded local
+readback using the unchanged `_Directory`/`_prepared` consumer and
+`_require_production_continuity`, bound to the emitted prepared hash, original
+input/manifest/profile pins, generated source hash and fixed source path.
+Require exactly `input.json`, `main.py`, `prepared.json`, `prepared.sha256`,
+`prepared-complete.json`, no pending/extra leaves, and all runtime false flags.
+Print only hashes, byte counts and booleans; no input/source row payloads.
+This is post-preparation authentication, not a replay of spent D2. No `_load`
+or old source reconstruction, credential/client construction, clock call
+inside `prepare`, network request or attempt claim is permitted in this stage.
+Retain the actual generated source/template/prepared hashes before any later
+QC-contact decision. A local prepare failure adds no QC look; it does not
+authorize a repair. The one-attempt, bounded compile/status/result protocol
+and occupied-node waiting requirement of 263 remain unchanged; this offline
+decision itself does not authorize QC capacity or launch. The monitor stays
+paused, and only one final matching-lane push will conclude this round.

@@ -218,6 +218,37 @@ class LeanSourceTests(unittest.TestCase):
         with self.assertRaisesRegex(BridgeError, "cash mismatch"):
             algo.on_end_of_algorithm()
 
+    def test_repeated_readable_exports_cannot_reopen_the_evidence_log_byte_budget(self):
+        from tests.guidance_revision_drift.test_completion_evidence import drive
+        from tests.guidance_revision_drift.test_native_dossier import metadata
+        algo = self.initialize()
+        algo.bridge = drive()
+        body = metadata(algo.bridge.protocol_trace())
+        algo._emit_trace(body)
+        first = list(algo.log_messages)
+        with self.assertRaisesRegex(ReadableTransportError, "cumulative"):
+            algo._emit_trace(body)
+        self.assertEqual(algo.log_messages, first, "refuse before emitting a second transcript")
+        algo._emit_failure("on_end_of_algorithm", RuntimeError("invented failure"))
+        self.assertLessEqual(sum(len(row.encode("ascii")) + 1 for row in algo.log_messages), 100000)
+        self.assertTrue(any("diagnostic_export_unavailable" in row for row in algo.log_messages))
+
+    def test_ambiguous_log_delivery_keeps_its_reservation_and_invalid_budget_refuses(self):
+        algo = self.initialize()
+        def delivered_then_failed(message):
+            algo.log_messages.append(message)
+            raise RuntimeError("invented ambiguous delivery")
+        with patch.object(algo, "log", side_effect=delivered_then_failed):
+            with self.assertRaises(RuntimeError):
+                algo._log_evidence("SYN-observation")
+        retained = len(b"SYN-observation") + 1
+        self.assertEqual(algo._gdr_evidence_log_bytes, retained)
+        for invalid in (True, -1, 100001, "0"):
+            algo._gdr_evidence_log_bytes = invalid
+            with self.subTest(budget=invalid), self.assertRaises(ReadableTransportError):
+                algo._log_evidence("not emitted")
+        self.assertEqual(algo.log_messages, ["SYN-observation"])
+
     def test_live_or_changed_sidecar_cannot_initialize(self):
         algo = self.source.GuidanceRevisionDriftAlgorithm()
         algo.live_mode = True

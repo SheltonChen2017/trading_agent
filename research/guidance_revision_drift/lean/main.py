@@ -23,7 +23,10 @@ from research.guidance_revision_drift.native_observation import (
     DeferredReceipts, ObservationError, ReceiptSnapshot, RuntimeContext,
     failure_diagnostics, observe_runtime, validate_native_metadata, valuation_checkpoint,
 )
-from research.guidance_revision_drift.readable_transport import export_readable_evidence, readable_evidence_anchor
+from research.guidance_revision_drift.readable_transport import (
+    MAX_LOG_BYTES, MAX_LINE_BYTES, ReadableTransportError,
+    export_readable_evidence, readable_evidence_anchor,
+)
 
 
 DATA_PATH = Path(__file__).resolve().with_name("gdr-synthetic.jsonl")
@@ -255,13 +258,32 @@ class GuidanceRevisionDriftAlgorithm(QCAlgorithm):
         metadata = validate_native_metadata(metadata, trace)
         fragments = export_readable_evidence(trace,
             runtime_context=self._gdr_context.to_dict(), metadata=metadata)
+        used = self._evidence_log_bytes()
+        if used + sum(len(raw) + 1 for raw in fragments) > MAX_LOG_BYTES:
+            raise ReadableTransportError("cumulative readable evidence log byte budget exhausted")
         for fragment in fragments:
-            self.log(fragment.decode("ascii"))
+            self._log_evidence(fragment.decode("ascii"))
         # Readable per-record digests commit to the observed transcript; they
         # are not lossless raw trace retrieval. Native identities and valuation
         # observations remain literal output. Local digest reconstruction,
         # independent replay and authenticated custody remain separate gates.
         self._gdr_last_export_anchor = readable_evidence_anchor(fragments)
+
+    def _evidence_log_bytes(self):
+        used = getattr(self, "_gdr_evidence_log_bytes", 0)
+        if type(used) is not int or not 0 <= used <= MAX_LOG_BYTES:
+            raise ReadableTransportError("invalid cumulative readable evidence log budget")
+        return used
+
+    def _log_evidence(self, message):
+        raw = message.encode("ascii")
+        used = self._evidence_log_bytes()
+        if len(raw) > MAX_LINE_BYTES or used + len(raw) + 1 > MAX_LOG_BYTES:
+            raise ReadableTransportError("cumulative readable evidence log byte budget exhausted")
+        # Reserve before the SDK call: a logging error may occur after delivery.
+        # Failure diagnostics cannot reset ambiguous delivery or reopen quota.
+        self._gdr_evidence_log_bytes = used + len(raw) + 1
+        self.log(message)
 
     def _emit_failure(self, stage, error):
         # Diagnostic errors must never replace the original runtime exception.
@@ -274,7 +296,7 @@ class GuidanceRevisionDriftAlgorithm(QCAlgorithm):
             bridge = getattr(self, "bridge", None)
             deferred = getattr(self, "early_events", None)
             if bridge is None or not hasattr(self, "_gdr_context"):
-                self.log("GDR-NATIVE-REFUSED stage=" + stage + " context_or_trace_unavailable")
+                self._log_evidence("GDR-NATIVE-REFUSED stage=" + stage + " context_or_trace_unavailable")
                 return
             observations = getattr(self, "_gdr_observations_bytes", None)
             self._emit_trace({"status": "failed", "diagnostics": failure_diagnostics(stage, error, bridge, deferred, algorithm=self),
@@ -283,6 +305,6 @@ class GuidanceRevisionDriftAlgorithm(QCAlgorithm):
                 "valuation_rows": [list(row) for row in getattr(self, "_gdr_valuation_rows", [])]})
         except Exception:
             try:
-                self.log("GDR-NATIVE-REFUSED stage=" + stage + " diagnostic_export_unavailable")
+                self._log_evidence("GDR-NATIVE-REFUSED stage=" + stage + " diagnostic_export_unavailable")
             except Exception:
                 pass

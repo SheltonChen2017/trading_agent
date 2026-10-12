@@ -10,6 +10,16 @@ import scripts.build_short_interest_native_master_offline as build
 from scripts.qualify_finra_short_interest import _prepare_capture_directory, _publish, _publish_json
 from test_short_interest_sharadar_securities_master import archives
 from test_short_interest_sharadar_companion_qualification import report as companion_report
+import os
+
+pytestmark = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
 
 ANCHOR = "2026-10-12T06:01:39Z"
 STARTED = "2026-10-12T06:30:00Z"

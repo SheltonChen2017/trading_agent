@@ -212,3 +212,23 @@ def test_no_caller_permission_or_part_size_override_and_exact_contract_types(rep
     result = encode_report(report_bytes, provenance=provenance())
     with pytest.raises(SharadarMasterSegmentsError):
         SegmentedMasterReport(result.index, (report_bytes + b"X",))
+
+
+@pytest.mark.parametrize("mutation", [
+    "historical_intervals", "nested_mapping_admitted", "nested_effective_at", "nested_terminal_economics",
+])
+def test_nested_non_admission_semantics_are_closed_under_a_coherently_redigested_envelope(report_bytes, mutation):
+    payload = json.loads(report_bytes)
+    if mutation == "historical_intervals":
+        payload["historical_ticker_intervals"] = [{"ticker": "X", "from": "2000-01-01", "to": "2001-01-01"}]
+    elif mutation == "nested_mapping_admitted":
+        payload["temporal_event_candidates"] = [{"historical_mapping_admitted": True}]
+    elif mutation == "nested_effective_at":
+        payload["temporal_event_candidates"] = [{"effective_at": "2026-01-01T00:00:00Z"}]
+    else:
+        payload["excluded_or_refused_STOCKS_rows"] = [{"row": {"terminal_economics_admitted": True}}]
+    # The envelope digest, capture identity and top-level authority all stay coherent;
+    # only the recursive non-admission rule stands between this forgery and acceptance.
+    raw = encoded(payload)
+    with pytest.raises(SharadarMasterSegmentsError, match="master_authority_changed"):
+        encode_report(raw, provenance=provenance())

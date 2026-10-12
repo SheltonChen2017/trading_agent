@@ -10,6 +10,16 @@ import urllib.request
 import pytest
 
 from scripts import qualify_finra_short_interest as capture
+import os
+
+pytestmark = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
 
 
 class Response:

@@ -11,6 +11,16 @@ import pytest
 from data.hashing import canonical_json, hash_bytes, hash_payload
 import research.short_interest_etf.massive_action_supplement as contract
 import scripts.qualify_short_interest_action_supplement as capture
+import os
+
+pytestmark = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
 
 KEY = "fabricated-only-key-for-offline-tests"
 HEAD, REMOTE = "a" * 40, "b" * 40

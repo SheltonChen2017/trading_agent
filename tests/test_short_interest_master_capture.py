@@ -13,6 +13,16 @@ import pytest
 
 from data.hashing import hash_bytes
 import scripts.capture_short_interest_securities_master as capture
+import os
+
+pytestmark = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
 
 KEY = "fabricated-sharadar-key-for-offline-checks"
 NOW = "2026-10-12T02:00:00Z"

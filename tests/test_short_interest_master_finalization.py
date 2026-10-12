@@ -11,6 +11,16 @@ import pytest
 from data.hashing import canonical_json, hash_bytes, hash_payload
 from scripts.qualify_finra_short_interest import _prepare_capture_directory, _publish, _publish_json
 import scripts.finalize_short_interest_master_offline as finalize
+import os
+
+pytestmark = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
 
 START = "2026-10-12T05:58:00Z"
 END = "2026-10-12T06:01:39Z"

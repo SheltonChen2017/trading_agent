@@ -460,9 +460,12 @@ gates merely by being implemented. The actual one-shot v4 assessment now passes
 and its report is separately authenticated (284.5); historical refusals remain
 spent. The original synthetic publication probe also passed and its output
 was authenticated once (284.9); it is now spent. The new guarded production
-publisher is implemented but UNREVIEWED and UNINVOKED. Independent review and
-a separate exact run freeze remain binding; neither finite diagnostic success
-clears safe production publication or R284 readiness.
+publisher was implemented but UNREVIEWED and UNINVOKED at the section-284
+handoff. Section 285 records the owner's new, current-milestone-only waiver
+of Claude review and the separately committed one-shot publication protocol.
+It does not claim independent approval or waive technical source/output
+checks. Neither finite diagnostic success clears safe production publication
+or R284 readiness. The review monitor is paused at the owner's request.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1422,14 +1425,18 @@ the scoped fresh-source refusal prospectively, not the historical audit.
 The unchanged v4 security contract has independent review; the prior one-round
 waivers remain expired. The original synthetic probe and its D5 reader passed
 at the separate committed freeze (284.9); both are spent. The new guarded
-continuity publisher in 284.7 remains
-UNREVIEWED and UNINVOKED; independent review and a subsequent exact one-shot
-run freeze are required before use. Claude reviews section 284 and the
-exact continuous `6e9c5562..final-head` range after its one final matching-lane
-push, including new ancillary tooling, tests, dispositions and actual results.
-Do not ask again for the same twelve values, infer a new waiver, or replay
-spent R273/R277/R279/R282. The existing monitor remains active; the next
-trigger must be newer than this Codex round's final push.
+continuity publisher in 284.7 was UNREVIEWED and UNINVOKED at that handoff.
+The owner subsequently said "disarm the monitor" and then "skip the claude
+review" after being told that section-284 review was the immediate barrier.
+The owner explicitly waives Claude review of section 285's current pre-use
+publication protocol and the unchanged section-284 candidate only; section
+285 records the exact prospective publication/authentication decision, not
+independent acceptance.
+The separate run freeze and all source/output checks remain binding. Normal
+independent review remains required for later new security contracts; this
+waiver does not revive sections 278/280 or permit a retry. Do not ask again
+for the same twelve values or replay spent R273/R277/R279/R282/R272. The
+existing monitor is PAUSED and must not be rearmed without owner direction.
 The owner previously said
 "proceed" after the open-session concern was explained. Section 272 supersedes
 the session-exit prerequisite, without authorizing any process interruption.
@@ -3325,6 +3332,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-11 | Codex section-281 counter-review and exact twelve-ctime v4 contract | `682779b7` -> section-282 implementation freeze and final handoff snapshot | Sole Claude commit disposed with prospective corrections/qualifications; owner's exact October 11 quote accepts only twelve fixed prospective ctimes under retained gates | Separate v4 policy/wrapper: exact device plus twelve pairs, unchanged original security/source pins, branch-specific drift refusal and isolated guard tests | Focused strict-network-denied tests and mutation sensitivity, exact final pins/results in section 282; no complete suite or actual source assessment | Human baseline choice resolved; technical source reauthentication and publication remain open; no QC/look/cell action; 313/239/49/699 unchanged | One final matching-lane push; Claude reviews section 282 before separately frozen assessment; active monitor baseline advances to this round's final head |
 | 2026-10-12 | Claude independent review of section 282: the twelve-ctime v4 contract | `34489a7a` -> this record commit | Section 283: two Codex commits `682779b7..34489a7a` disposed (2 accepted, 0 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells; no assessment, preflight, census or probe run | No code changed by Claude. Four pins, the profile and the twelve-pair digest reproduce; the map's old values equal `after.json` and its new values the R279 preflight; the projection applied in memory to the real rows equals the current state of all 27 objects; 23 in-memory guard removals tabulated; accepted `ARV2CR282-001` to `-003`; `ARV2R283-001` and `-002` documented; section 4 names section 283, banner sentence added, this row appended | Complete lane selection at `34489a7a` with every remote address refused (strict sandbox for the six groups, three parallel streams, temporary directories inside the root's ignored `.pytest_cache`; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 283.6 | 0 P0, 0 P1, 0 P2, 2 P3 | Single push of this round's Claude commit; Codex counter-reviews section 283 unless the owner changes the workflow |
 | 2026-10-12 | Codex section-283 counter-review, actual v4/probe success and guarded-publication candidate | `6e9c5562` -> `107743d8`, `b40cedc6`, this final section-284 record commit (three continuous Codex commits) | Sole Claude commit accepted after two prospective P3 corrections and documentary qualifications; exact one-shot v4 report and original synthetic publication probe/output authenticate successfully | Historical refusals remain spent; new publisher validates sources before payloads and retains original output descriptors; candidate UNREVIEWED/UNINVOKED; no production/QC action | 1,094 distinct focused strict-denied passes in 6.26 s; prior/repeated subsets and expected red omissions separately qualified; no full Codex suite; actual pins/times in 284.5/284.9 | ARV2E280-001 resolved prospectively for exact scope; ARV2E263-001 and independent formal gates remain; 313/239/49/699 unchanged | Exactly one final matching-lane push; Claude reviews every section-284 commit before any new publisher/run freeze; active quiet monitor advances to final Codex head, disposed Claude head6e9c5562 |
+| 2026-10-12 | Owner-waived pre-use review and frozen guarded-publication protocol | `3c8d23b0` -> section-285 authority/protocol freeze and subsequent result handoff | Human explicitly skips current Claude review; no new Claude commit or independent acceptance | Unchanged section-284 publisher/profile, one C-leaf attempt and conditional separate strict three-file authentication; no retry or technical waiver | 333 focused strict-denied passes in 3.27 s before authority freeze; exact pins and operational outcome below; no full suite | Formal/source/licensing/QC gates remain separate; 313/239/49/699 unchanged before any accountable event | One matching-lane final push only after concluded round; monitor remains paused |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -43502,3 +43510,178 @@ automation guidance and update the existing monitor through the app; those
 documentation/tool calls are not provider/QC contact or proof of zero network
 contact by the host. Test/operational subprocess denial remains separately
 qualified as denial, not a logged-contact census.
+
+## 285. Owner-waived current review and exact guarded-publication run, 2026-10-11 PDT / 2026-10-12 UTC
+
+### 285.1 New human direction, scope and starting state
+
+After asking to start counter-review, the owner was told that the matching
+remote still ended at section-284 Codex head
+`3c8d23b00dd65c1a2c682ed57bf398d8e6d8457c`, with no new completed Claude push.
+The owner then said **"disarm the monitor"**; the existing
+`analyst-claude-review-forward-pair` heartbeat was updated through the app and
+its saved status verified **PAUSED**. Its configuration is retained, not
+deleted, and it must not be rearmed without a later owner direction.
+
+After the reply explained the exact section-284 review, guarded publication,
+authentication and contingent R284 sequence, the human directly said
+**"skip the claude review"**. In that immediate context this waives the
+pre-use Claude review/counter-review sequencing for the already pushed
+section-284 publisher milestone only. It is a new external owner exception to
+284.7/277-D4/275.5 for this scope, not reuse of expired 278/280 waivers, not
+independent approval, and not a standing review waiver for future contracts.
+There is no new Claude commit to dispose or counter-review. The three Codex
+commits `107743d8`, `b40cedc6`, `3c8d23b0` remain Codex-authored and unreviewed
+as a section-284 series; this round does not fabricate acceptance of them.
+
+Entry root/branch/HEAD/status and matching-only fetch verified clean local and
+remote `3c8d23b00dd65c1a2c682ed57bf398d8e6d8457c` at
+`/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2`, branch
+`codex/strategy-analyst-revisions-v2`. All repository activity remains there.
+No other chat or Claude session is started, messaged or interrupted.
+
+The waiver changes only review sequencing. Exact device, twelve prospective
+ctime pairs, native security checks, all source/history hashes and full
+held/named checks remain binding. It accepts no new metadata baseline,
+attribute/permission change, generic omission, source admission, paid rights,
+funded/broker/real-order/paper/live action or shared-file change. Same-round
+Codex/advisory checking is not independent review.
+
+### 285.2 Exact prospective publication and authentication decision
+
+**285-D1 — one unchanged, fixed C-leaf publisher invocation.** Keep
+`scripts/publish_arv2_identity_continuity_v4.py` SHA-256
+`f510e9781eec261812e48f4be7995f8377b1a9b0eb6fa3be566f32f719ce4d40`, tests
+`712e197d7a76c898890ecfbade9f3f35d9e550cfc8e988766d1ebc5fa9caa4f0`, and
+canonical profile
+`e3f9ecd2ce68011062d4762a30caf781976f680ecff574b8f539c166fe718b00` unchanged.
+The eleven selected dependency pins in its frozen `CODE_PINS` reproduced
+exactly. The profile's `independent_review_required=true` and
+`separate_run_freeze_required=true` remain unchanged; the external scoped
+waiver above is not a forged receipt or mutation of those fields. All result
+false flags, including independent review/run authority/preparation, remain
+false. This record, not those runtime flags, freezes the bounded authority.
+
+Commit this protocol locally before invoking at most once:
+
+```text
+python -B -m scripts.publish_arv2_identity_continuity_v4 --publish --expected-profile-sha256 e3f9ecd2ce68011062d4762a30caf781976f680ecff574b8f539c166fe718b00
+```
+
+Use the designated Python 3.13.15 under strict
+`(version 1)(allow default)(deny network*)`; use in-root ignored
+`.pytest_cache/r285-run-5o3kmC` for temporary paths, disable bytecode writes,
+and retain bounded stdout/stderr, UTC start/end and the actual exit in the
+external tool transcript. Do not print source rows, native values, credentials
+or raw package payloads. Root/branch/clean HEAD and source/profile pins must
+match this committed freeze immediately before execution. Make one read-only
+absence/non-symlink check of the exact fixed leaf immediately before invocation:
+`artifacts/analyst_revisions_v2/identity_continuity/R284A1-20261008-C`.
+Any existing object stops the decision; do not inspect or reuse its contents.
+
+The exclusive directory claim/fsync precedes source/history reads. The
+publisher authenticates pinned original history, the exact v4 projection,
+one full preflight and all fifteen metadata rows, then requires two equal
+in-memory documents inside the unchanged outer source guard. Payload writes
+occur only after that guard returns. Each bounded pending/link publication
+retains the original descriptor/full metadata through final output-only
+authentication. Bounds remain input 16,384 bytes, manifest 131,072 bytes,
+marker 65 bytes, three files only. Do not invoke legacy `_build`/`_load`,
+standalone preflight, spent assessment/report reader or spent R272 probe.
+This is the already reserved changed-contract C candidate, not a renamed
+unchanged retry of failed A/B.
+
+Every allocated, interrupted, refused or ambiguous attempt stays spent and
+retained. Any nonzero/unknown exit or missing/invalid summary stops; no retry,
+cleanup, repair, marker creation, new leaf, pin refresh or wait-until-pass.
+The existing CLI reports a generic bounded refusal; do not rerun merely to
+obtain a more detailed error. A failure may leave zero, partial or three final
+files; none makes the attempt admissible. Failed A/B remain untouched.
+
+**285-D2 — one conditional separate output-only authentication.** Only an
+actual unambiguous publisher exit 0 and a valid emitted exact-schema/profile
+summary with canonical manifest/input hashes permit at most one separate:
+
+```text
+python -B -m scripts.publish_arv2_identity_continuity_v4 --authenticate --expected-profile-sha256 e3f9ecd2ce68011062d4762a30caf781976f680ecff574b8f539c166fe718b00 --publisher-exit 0 --manifest-sha256 <actual-emitted-manifest-sha256> --input-sha256 <actual-emitted-input-sha256>
+```
+
+The zero above must be the observed successful exit, never inferred from
+directory completeness. Use the same clean freeze, source/code/profile pins,
+denied-network environment and bounded transcript. Require exact fixed
+three-file inventory with no pending/extra leaves; component-wise no-follow,
+private owner/mode/single-link/size checks; full ten-field held/named equality;
+bounded reads and final rechecks/digests; external input/manifest hashes,
+marker equality, strict canonical schemas/lineage and every false flag.
+Authentication must itself exit 0 with exactly the expected summary and
+emitted pins. Any refusal or ambiguity stops without repair, rerun or R284
+preparation. The unchanged legacy QC runner cannot infer actual publisher
+exit; the external observed receipt remains a mandatory prerequisite.
+
+Both operations use their existing cooperative 60-second signal/return
+budget, including publisher's 15-second preflight, not a hard whole-process
+native-call interrupt guarantee. CLI startup resolves the Darwin ABI before
+that budget; authentication performs no source or native-attribute
+observations. Neither mode establishes output ACL/xattr security, continuous
+stability, historical relocation preservation or formal source admission.
+
+**285-D3 — conditional next stage remains separate.** Actual successful D1
+plus D2 is required for the exact C package's bounded publication acceptance;
+neither earlier synthetic success nor this waiver closes ARV2E263-001.
+Only after actual acceptance may a separate prospective offline R284
+preparation decision bind the emitted package pins and existing runner/profile
+at `identity_qc/R284A1-20261008`. QC contact/capacity/launch still requires
+the resulting prepared pins and the section-263 one-attempt protocol. This
+publication decision itself authorizes no QC/provider request, new licensed
+data, mapping export, price/history/order action or strategy performance claim.
+Occupied authorized capacity means waiting without touching other lanes.
+The local package operation adds no research look: booked floor remains
+313 shared / 239 development / 49 infrastructure / 699 cells. R247/R281 stay
+exhausted; no formal date/estimand/power hash/epoch is filled. New security
+contract revisions require their normal independent review unless separately
+waived by a later explicit owner instruction.
+
+### 285.3 Pre-use checks and exclusions
+
+The exact unchanged publisher and complete synthetic test file were inspected,
+including source-before-payload ordering, one-use failure retention, full
+metadata/original-descriptor binding, bounded pending publication, final
+authentication and actual-exit gating. Same-round read-only advisory checking
+found no new code blocker and identified the startup ABI/budget qualification
+above; it made no edits, tests, entrypoint or source/artifact observations.
+No new P0/P1/P2 defect was identified in this bounded check. This is not an
+independent review or replay of prior review dispositions.
+
+Root focused validation at unchanged source: **333 passed in 3.27 s**, no
+failures/skips/warnings: 66 publisher, 180 assessment-verifier, 86 lane-record/
+active-document and one outcome-free transitive import-closure case. Strict
+OS network denial, Python 3.13.15, disabled plugin autoload, `--noconftest`,
+`-B`, no cache plugin and fresh in-root basetemp were used; the runner asserted
+that `assistant.dispatch_fence` was absent. No complete suite or native/source
+operational test ran. Prior section-284 passes and mutation trials are
+historical, not added to this count. Source and tests compile in memory;
+all eleven dependency pins and the canonical profile match; diff/status clean.
+
+The first post-edit record selection returned **1 failed / 85 passed in
+0.77 s**: section 4 quoted the human waiver but did not bind the latest
+section and explicit review-waiver wording in the same sentence required by
+the existing structural test. Only that handoff sentence was clarified;
+no test or executable contract was changed. This documentary failure is
+retained and is not an operational publication failure.
+
+The three formal trust roots were read and retain their empty/zero-access
+state and hashes `3152aca00c721f3822d1ef438c84c3ee855aeb866e35ba692527746b5d4c5805`,
+`23f23d19e681a03bacf6a1d132c732ed541747a5c6136d2dc0ac5ccafd273326`, and
+`e8c1a2a7e0408d545e45f026cabf5b4ae23956fa64bc444769a8589f35f4a5fa`.
+Research entitlement, current mappings/FIGIs and retained RAW evidence remain
+qualified, not immutable history/PIT/master admission. Source/identity/score,
+seven-role/terminal-payoff, missing-data/multiplicity/capacity/paper/dossier
+gates remain. Every old module, builder/runner, source artifact and shared/root
+record stays frozen. Only this lane record changes in the pre-use commit.
+
+At this prospective freeze no C-leaf existence check/allocation, actual
+publisher/authentication, source observation, provider/QC capacity request or
+R284 preparation/launch has occurred. The next local commit records this
+decision before any operation. Accumulate results locally and make exactly
+one final matching-lane push when the substantive round concludes; the monitor
+remains paused. Do not describe the waiver or this commit as technical success.

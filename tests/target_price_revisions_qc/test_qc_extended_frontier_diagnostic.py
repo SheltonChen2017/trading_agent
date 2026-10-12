@@ -183,7 +183,7 @@ def test_existing_controller_lock_is_preserved_without_transport(tmp_path):
     assert locked.read_bytes() == b"synthetic other lane-owned controller"
 
 
-def terminal_fixture(tmp_path, monkeypatch, *, field_change=False):
+def terminal_fixture(tmp_path, monkeypatch, *, field_change=False, status="Runtime Error"):
     tuples, payloads = [], []
     for attempt, job, _, _ in f.TERMINALS:
         statistics = {"End Equity": "152710.74", "Total Orders": "3076", "Total Fees": "192.26", "Drawdown": "15.0%"}
@@ -191,7 +191,7 @@ def terminal_fixture(tmp_path, monkeypatch, *, field_change=False):
             statistics["Total Fees"] = "192.27"
         body = {"schema": "tpr-ext26-request-response-v1", "endpoint": "backtests/read", "stage": "backtest_status",
             "request": {"projectId": f.PROJECT, "backtestId": job}, "response": {"success": True,
-            "backtest": {"backtestId": job, "projectId": f.PROJECT, "completed": True, "status": "Runtime Error",
+            "backtest": {"backtestId": job, "projectId": f.PROJECT, "completed": True, "status": status,
                 "error": "2024-07-12 00:00:00 ValueError in extended_core.py line 587; main.py line 1028; save_bytes; SYNTHETIC-TICKER",
                 "rollingWindow": {"M6_20240131": {}, "M6_20240712": {}}, "tradeableDates": 1449, "statistics": statistics}}}
         raw = e.canonical(body)
@@ -278,3 +278,77 @@ def test_private_projection_sanitizes_known_profile_fields_and_emails():
     assert projected["collaborators"][0] == {"publicId": "[redacted]", "profileImage": "[redacted]", "bio": "[redacted]"}
     assert projected["logs"] == ["contact [redacted-email]"]
     assert output["projection_sha256"] == f._sha(e.canonical(projected))
+
+
+# TPR-CR24-001 regressions: live guards that the received suite never exercised.
+# Each is red when the named guard is removed from the producer.
+
+
+def test_non_200_status_with_a_well_formed_body_is_refused_before_diagnosis(tmp_path):
+    """`http_status != 200` guard: a 502 carrying a plausible body spends the request and stops."""
+    values = fixture(tmp_path)
+    transport, calls = transport_for(1)
+    def proxied(payload):
+        raw, _status, user, token = transport(payload)
+        return raw, 502, user, token
+    result = execute(values, proxied)
+    assert result["status"] == "FAILED_OR_UNCERTAIN" and len(calls) == 1
+    assert result["all_log_pages_observed"] is False
+    assert result["requests"][0]["status"] == "failed_or_unknown"
+    assert result["jobs"][0]["diagnostics"] == [] and result["jobs"][0]["observed_lines"].fraction() == 0
+    assert result["automatic_retry"] is False
+
+
+def test_expired_plan_refuses_before_any_claim_or_transport(tmp_path):
+    """Clock-window guard: a clock at the expiry instant refuses before the claim exists."""
+    plan, sources, root, now = fixture(tmp_path)
+    expired = f._clock(plan["expires_utc"])
+    with pytest.raises(f.Refusal):
+        execute((plan, sources, root, now), lambda _: pytest.fail("no network"), clock=lambda: expired)
+    assert not list(root.iterdir())
+
+
+def test_expiry_during_pagination_stops_further_requests_and_keeps_the_claim(tmp_path):
+    """Clock-window guard inside the loop: expiry after the first body stops the second job."""
+    plan, sources, root, now = fixture(tmp_path)
+    transport, calls = transport_for(1)
+    expired = f._clock(plan["expires_utc"])
+    result = execute((plan, sources, root, now), transport, clock=lambda: expired if calls else now)
+    assert result["status"] == "FAILED_OR_UNCERTAIN" and len(calls) == 1
+    assert (root / (plan["operation_id"] + ".claim.spent.json")).exists()
+    assert not list(root.glob("*.projection.json"))
+    terminal = root / (plan["operation_id"] + ".attempt2.page00.terminal.json")
+    assert e.parse_json(terminal.read_bytes())["status"] == "failed_or_unknown"
+
+
+def test_monotonic_budget_exhaustion_stops_further_requests(tmp_path):
+    """`max_seconds` guard: once the elapsed budget is spent no further request is made."""
+    values = fixture(tmp_path)
+    transport, calls = transport_for(1)
+    budget = float(values[0]["max_seconds"])
+    result = execute(values, transport, monotonic=lambda: budget * len(calls))
+    assert result["status"] == "FAILED_OR_UNCERTAIN" and len(calls) == 1
+    assert result["all_log_pages_observed"] is False and result["automatic_retry"] is False
+
+
+def test_well_formed_substitute_terminal_with_a_different_hash_is_refused(tmp_path, monkeypatch):
+    """Exact-SHA guard: a same-size, parseable terminal whose bytes differ is not read as evidence."""
+    values = terminal_fixture(tmp_path, monkeypatch)
+    row = values[0]["terminals"][0]
+    path = values[2] / row["name"]
+    raw = path.read_bytes()
+    assert raw.count(b"3076") == 1
+    substitute = raw.replace(b"3076", b"3075")
+    assert len(substitute) == row["bytes"] and f._sha(substitute) != row["sha256"]
+    path.write_bytes(substitute); path.chmod(0o600)
+    result = execute(values, lambda _: pytest.fail("no network"))
+    assert result["status"] == "FAILED_OR_UNCERTAIN" and result["read_attempts"].fraction() == 1
+    assert not result["jobs"] and result["statistic_equality"] is None
+
+
+def test_completed_rather_than_failed_terminal_is_outside_the_fixed_scope(tmp_path, monkeypatch):
+    """Scope guard: only `Runtime Error` terminals of the two fixed jobs are diagnosable."""
+    values = terminal_fixture(tmp_path, monkeypatch, status="Completed")
+    result = execute(values, lambda _: pytest.fail("no network"))
+    assert result["status"] == "FAILED_OR_UNCERTAIN" and result["read_attempts"].fraction() == 1
+    assert not result["jobs"]

@@ -1,19 +1,22 @@
 # Short Interest ETF Strategy — implementation and session record
 
 Status: **CODEX ACCEPTS CLAUDE'S PUSHED `2ef9a4f` AND `ab85a032` AFTER
-THE IN-LANE TEST/RECORD CORRECTIONS IN SECTION 113. THE NESTED NON-ADMISSION
-TEST IS RETAINED. SELECTIVE POSIX MARKERS RESTORE 155 WINDOWS CASES; 257
-GENUINELY PROTECTED-I/O CASES STILL SKIP. THE HISTORICAL-BODY HASH REPRODUCES
-WITH THE EXACT PREFIX/ROW/SECTION RECIPE BELOW. HISTORICAL ISSUE IDS AND
-OWNER AUTHORITY ARE PRESERVED THROUGH APPENDED QUALIFICATIONS. THE NEXT
-BOUNDED STEP IS AN EXPLICIT PROTECTED-RUNTIME HOST PREFLIGHT, NOT A WINDOWS
-ACL-PARITY OR SOURCE-ADMISSION CLAIM. THE ORIGINAL PROTECTED MASTER/NATIVE
-INPUTS ARE ABSENT ON THIS HOST; DO NOT REPLACE CAPTURES OR SPENT BUDGETS.
-NO BACKTEST IS CLAIMED. LOOKBACKS 20/60/120/252 REMAIN UNSELECTED,
-CANONICAL ACTUAL LOOKS 0/0, EXPLORATORY ACTUAL LOOKS 0, ALPHA 0, QC ATTEMPTS
-0. SOURCE/SHARED FINDINGS AND ORIGINAL-VINTAGE VERSUS LATEST-REVISED
-SEPARATION REMAIN. NO SHARED-DOCUMENT, BROKER, OPERATOR-DATABASE,
-DEPLOYMENT, PAPER/LIVE, CAPITAL OR REAL-ORDER/TRADING AUTHORITY IS INFERRED.**
+THE COUNTER-REVIEW CORRECTIONS AT `c83011c`. PROTECTED-HOST PREFLIGHT
+IMPLEMENTATION IS COMMITTED AT `c4c5777`: ALL SEVEN CAPTURE/OFFLINE CLIS
+AND 27 DIRECT SENSITIVE ENTRIES REFUSE UNSUPPORTED HOSTS BEFORE PRIVATE
+ACTIONS. WINDOWS REFUSAL IS EXPLICIT, NOT WINDOWS ACL PARITY OR SOURCE
+ADMISSION. FOCUSED CHECKS: 344 PASSED, 257 POSIX-ONLY SKIPPED. ALL 34
+ENTRY-GUARD REMOVALS ARE DETECTED. CLAUDE MUST INDEPENDENTLY REVIEW THE
+COMBINED CORRECTION/IMPLEMENTATION/CLOSING RANGE. THE ORIGINAL PROTECTED
+MASTER/NATIVE INPUTS AND CONSUMED-BUDGET EVIDENCE ARE ABSENT HERE; NO
+RECAPTURE OR RESET IS AUTHORIZED BY THEIR ABSENCE. THE NEXT FACTUAL STEP
+REMAINS SECTION 111.10'S HISTORICAL/CLASS DENOMINATOR AND AUTHENTIC TERMINAL
+PAYMENT/DISCLOSURE QUALIFICATION ON VERIFIED PROTECTED INPUTS. NO BACKTEST
+IS CLAIMED. LOOKBACKS 20/60/120/252 UNSELECTED, CANONICAL ACTUAL LOOKS 0/0,
+EXPLORATORY 0, ALPHA 0, QC ATTEMPTS 0. CURRENT OWNER AUTHORITY, HISTORICAL
+ISSUE IDS, SOURCE/SHARED FINDINGS AND ORIGINAL-VINTAGE VERSUS LATEST-REVISED
+SEPARATION REMAIN. NO BROKER, OPERATOR-DATABASE, DEPLOYMENT, PAPER/LIVE,
+CAPITAL, REAL-ORDER OR TRADING AUTHORITY IS INFERRED.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -225,6 +228,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-12 | Codex counter-review + source integration | Sole Claude `2a65d4a0` accepted; implementation `a5ac4c22`, `ab169b34`, `4acd6222` and this closing record | Full protected native master capture, offline bounded recovery, batched native keys/exact rational observations and explicit QC decimal mirror | Twelve frozen requests consumed; monolithic storage refusal retained and recovered offline. Native index/v3 binding actually applied and independently rebuilt byte for byte. Eleven draft software findings retained/corrected with material red/green proof; no new defect against Claude's record. | Main pre-application focused **586 passed in 7.82s**, targeted sixteen-file compilation/diff checks; final checks in section 111.10. Actual source-only acquisition is twelve requests; subsequent recovery/application/rebuild adds zero provider requests/credential reads/outcome looks/QC attempts. | No in-lane software P0/P1/P2 remains from this round. Source P2s, shared P2 and prospective P3s retained. Current full master/revised source keys are not raw historical aliases or a full-study economic bundle; documented terminal cash/payment fields remain unresolved. | One combined non-force lane push, no interim push. Claude independently reviews the exact combined checkpoint before the next serialized round. Next qualify composite-to-class relations, class denominators and case-specific payment/terminal evidence before an actual-input/QC candidate; no generic owner approval, affiliation or purchase inferred. |
 | 2026-10-12 | Claude review (Windows session) | `2a65d4a` -> `a509a5e` reviewed from the published head; **test-only correction at `2ef9a4f`**; this record commit follows, so the round has two Claude commits | Independent review of the full Sharadar master capture, offline segmented recovery, native-key/rational-observation binding, precision transport mirror and closing record | Reviewed all four commits individually in the Windows lane worktree after a fast-forward from `85e61a4`. Read every new production module and script in full. Verified protocol hashes, the twelve-request inventory, the 36-file source inventory, 48 transport cells, the import-boundary expansion and the secrets/data sweep; section 111.10's preserved-body byte figure could not be reproduced under four removal rules (`SI-CR17-004`). Five file-based guard removals: four red (ZIP undeclared gap, both-axis owner uniqueness, identity-seal anchor, partial fill), one survivor now pinned (nested non-admission rule). The first complete Windows lane run since 2026-10-05 found the protected-capture runtime and seven of its test files POSIX-only. | 43-file lane on `2ef9a4f`: 1,990 passed, 412 skipped in 14,694.70s (4:04:54); before the guards the nine touched files gave **36 failed, 423 passed, 47 errors**, all `os.getuid`; the seven guarded files now **412 skipped**; segments file **47 passed** with the new test red under its mutation (**4 failed**); compileall exit 0; `git diff --check` clean; active-document **69 passed** before and **69 passed in 18.09s** after this record. Protected artifacts, provider rows and credentials were not accessed; none exist on this host. **Canonical actual looks 0/0, exploratory 0, alpha 0, QC attempts 0.** | No P0/P1. `SI-CR17-002` (P2, tests guarded, runtime platform scope open for the owner), `SI-CR17-003` (P3, closed, test-only), `SI-CR17-001` (P3, process note on lane-suite ownership across two hosts), `SI-CR17-004` (P3, record precision: the 111.10 preserved-body figure is not reproducible from the stated rule). Source P2s, `SI-CR15-001`, `SI-CR19-003` and shared `SI-CR5-005` unchanged. | Codex counter-reviews `2ef9a4f` and this record commit; the owner decides whether protected-capture runtimes need Windows parity; every source, outcome, QC-run, purchase and trading gate remains closed. Push once at the end of this round per the standing rule. |
 | 2026-10-12 | Codex Windows counter-review / host prerequisite | Exact Claude `2ef9a4f889eda9496254ae1ca43d946eb9378374`, `ab85a032759cf5b5924a51caf1c8417cae2d6adc`; counter-review commit follows | Per-commit counter-review, selective Windows test coverage and append-only record errata; protected-runtime preflight is the next bounded prerequisite | No production change in the counter-review: preserve all assertions and the nested non-admission regression; restore neutral tests without weakening protected storage. Exact byte recipe reproduces section 111.10. Preserve historical IDs and current delegated authority. | Main focused **280 passed, 257 skipped in 8.25s**; 52-case original selection **52 skipped in 1.34s**, delegated marker-only memory probe 52 green; exact historical-body 1,444,434 bytes / `608f7d99...713401`. Final host-preflight validation/publication follows in section 113. | No new P0/P1. Broad skips and issue-ID collision corrected; permission versus factual gates qualified. Actual POSIX-only storage and absent protected inputs remain factual limitations, not a new generic owner-approval gate. | Commit counter-review first, then implement and validate the named host preflight; one combined final lane push. No source recapture, consumed-budget reset, actual look or QC attempt. Retire only the handled one-shot monitor after publication. |
+| 2026-10-12 | Codex host-prerequisite completion | Accepted Claude `ab85a032` -> counter-review `c83011cf5ac46a55617d1ae633c95e6f9d7224da` -> implementation `c4c57770224e1ba8a601f5adefa5e974b1e0e4dc`; this record-only closing commit follows | Seven SI runtimes gain one fixed capability refusal; 64 unskipped host-boundary cases, explicit fabricated capability fixtures for 31 neutral functions | Original POSIX ownership/mode/no-follow, immutable receipts/claims, budgets, source gates and economics retained. This is host-safe refusal only, not Windows ACL parity or actual source qualification. | Main closing focused **344 passed, 257 skipped in 11.31s**; 34 entry-guard removals **34 failed / 30 passed**, restored **64 passed**; all16 changed Python files compile in memory; existing assertions and 27 protected bodies mechanically preserved. Section 113.5-113.7. | No new P0/P1; protected Windows storage and original-input source P2s remain open. Historical source/shared/prospective issues retained. Zero source requests, looks and QC attempts in this round. | Exactly one combined non-force target-ref push after closing checks, then retire only this handled one-shot monitor. Claude reviews every new commit; factual continuation needs original protected inputs, receipts and spent claims without recapture/reset. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -17180,3 +17184,191 @@ to `pytestmark`: every function/assertion/body is otherwise identical. The
 edit allowlist is these seven tests and this lane record only. Reverify clean
 staging ownership and actual remote `ab85a032` before the local counter-review
 commit; no push occurs until the next bounded prerequisite closes.
+
+### 113.5 Implemented protected-host prerequisite and preserved contracts
+
+Counter-review is committed first at
+`c83011cf5ac46a55617d1ae633c95e6f9d7224da`. The subsequent, separate
+implementation is `c4c57770224e1ba8a601f5adefa5e974b1e0e4dc`, exact parent
+`c83011cf5ac46a55617d1ae633c95e6f9d7224da`. Neither was pushed separately.
+This record-only closing commit follows both and is part of the same single
+publication. No other machine's commit or intermediate Claude commit is omitted.
+
+The existing FINRA runtime now owns `CapturePlatformRefusal`, a
+`CaptureRefusal` subtype whose sole reason/code is
+`protected_capture_platform_unavailable`, with no HTTP status. Its common
+`_require_capture_platform()` checks POSIX identity, callable UID support,
+strict positive-integer `O_NOFOLLOW`/`O_NONBLOCK` constants and a strict
+nonnegative integer UID. Missing capabilities, invalid bool/string/float
+values and failed UID probes refuse; named capability exceptions never emit
+their external text. This is a capability prerequisite, not verification of
+an artifact, credential, account, source entitlement or actual-input readiness.
+
+The first protected step in all seven command-line paths now invokes that
+check. Unsupported hosts return exit **2**, fixed reason/code and explicit
+non-readiness before root/Git checks, credentials, protected reads/writes,
+whole-round claims, provider transport or reconstruction. Five non-FINRA
+handlers recognize only the exact fixed subtype for this public code; other
+existing refusal output remains unchanged. Twenty-seven direct sensitive
+entries also guard, including transport/DNS/pinned TLS, environment-key reads,
+protected source reads, publication, budget claims and offline orchestration.
+Calling a helper instead of `main()` does not grant capture authority.
+
+Changed production files are exactly the two FINRA scripts, Sharadar
+companion, Massive action supplement, securities-master capture, offline
+master finalization and native-master offline builder. No shared module,
+dependency, processing/order/economic contract, source schema, request inventory,
+protocol digest, retry budget, vintage, lookback or actual-look rule changes.
+The 27 existing sensitive function bodies are mechanically identical after
+removing only their new first guard. POSIX ownership/modes, no-follow and
+nonblocking opens, immutable publication and spent-budget preservation remain
+enforced. There is **no Windows ACL fallback** and no source reacquisition.
+
+The new `test_short_interest_capture_platform.py` has **64 unskipped**
+fabricated-only cases: malformed/missing capabilities, exception-text
+suppression, supported capability metadata, actual-host refusal, seven CLIs
+and all 27 direct entries. Poisoned arguments and downstream denial spies
+prove refusal precedes sensitive effects without touching private state.
+The implementation changes refusal ordering, so 31 previously neutral
+functions explicitly request a test-only capability facade via
+`short_interest_capture_fixtures.py`. That facade changes only the FINRA
+module's OS binding; process OS/Path behavior and publication/protection helpers
+are not patched. It delegates real unrelated OS attributes and supplies a
+fabricated UID distinct from Windows file ownership. All existing assertions
+are byte-logically retained. No autouse fixture, blanket skip or fixture on a
+protected-filesystem/actual-host boundary test is introduced. Pure parsing
+remains portable and the original 257 protected-I/O cases still skip here.
+
+### 113.6 Red/green, mutation proof, review limits and remaining findings
+
+Main's first new-file run on unchanged `c83011c`: **64 failed in 1.34s**.
+After the source change, the wider selection without capability-fixture
+isolation: **105 failed, 239 passed, 257 skipped in 10.28s**; all failures
+are the earlier host refusal preventing the named neutral contract checks.
+A seven-file diagnostic identifies exactly **31** affected neutral functions:
+**105 failed, 50 passed, 257 skipped in 3.24s**. Their explicit fixture
+registration restores reachability, not weaker assertions or fake filesystem
+security. Code-tree eleven-file focused selection: **344 passed, 257 skipped in
+8.68s**, no warnings or failures, on CPython **3.13.14** / pytest **9.1.1**.
+It is the prior ten-file counter-review selector plus the unskipped host tests.
+
+Main compiles temporary AST copies with all **34** newly guarded sensitive
+entries/CLI calls removed in memory, retaining their original call-time globals.
+The new file detects each: **34 failed, 30 passed in 0.67s**. A `finally`
+block restores every exact original binding, verified by object identity;
+no source byte is written. Immediate restored run: **64 passed in 0.40s**.
+This proves the suite does not pass by encountering an unrelated inner refusal.
+Mechanical AST comparison proves all 27 old sensitive bodies unchanged except
+the new guard, and all five fixture-touched test modules unchanged after
+removing only 31 fixture decorators and their imports. In-memory compilation
+of all **16** Python files changed in the complete round exits **0**, without
+bytecode/cache writes. Diff checks are clean.
+
+The implementation delegate's initial new-file run was **64 passed in 1.59s**.
+A separate read-only implementation-time auditor independently passed **seven
+actual-Windows CLI probes** with filesystem/root/Git/credential/budget/
+publication actions replaced by denial functions; none was reached. These are
+implementation-time checks, **not Claude independent review of this new range**.
+The auditor's initial entirely empty-environment harness failed during the
+unchanged Sharadar import-time `Path.home()` calculation; fictional home-path
+metadata corrected it. Import startup without any home metadata remains outside
+the first-main host-guard guarantee; no credential was read. Main's harness
+retains only required Windows socket settings and Git path, clears inherited
+credentials, denies real sockets/DNS and disables plugin/cache/bytecode writes.
+One literal-line patch application mismatch was corrected before tests; no
+production finding or passed-run claim is assigned to that editing attempt.
+
+No new P0/P1 or additional confirmed source defect is found. The reviewed
+Claude implementation is assessed **9/10** and its record **8.5/10**: retain
+its sound nested regression, but correct coverage, ID collision and precision/
+authority qualifications as above. `SI-CR-WIN-20261012-002` remains a **P2
+actual protected-Windows-storage limitation**: explicit safe refusal closes the
+uncontrolled host failure direction, not full Windows protected capture parity.
+`SI-SRC-20260928-001..003`, shared `SI-CR5-005` / `SI-CCR16-007`, prospective
+`SI-CR19-003` and commitment `SI-CR15-001` retain their existing evidence and
+statuses. No shared defect, frozen root document or other lane is corrected.
+Claude owns the complete lane/repository suite and must report its exact final
+code tree/host/skips; the old 1,990-pass run is not attributed to this new tree.
+
+### 113.7 Factual next step and single-publication/one-shot handoff
+
+This bounded host-refusal prerequisite is implemented and focused-validated,
+pending Claude's independent review. It does not complete the actual-input
+research milestone. Before factual continuation, obtain verified protected
+access to the **original** master/native captures, private reports, immutable
+receipts and consumed whole-round claims on their original host, or a
+hash-preserving transfer maintaining protection. Their absence here does not
+reset a budget, authorize repeat acquisition under a new timestamp/HEAD or
+supply a private source-fitness conclusion. No provider/credential/capture
+inspection, provider request, economic outcome or QC action occurred this round.
+
+Then continue exactly section 111.10's authenticated historical composite/
+class relation and same-class denominator qualification, plus independently
+authenticated transaction/per-share consideration/payment disclosure evidence.
+Freeze any new route/sample/budget/code prospectively before requesting it.
+Existing Sharadar, Massive-Benzinga and QuantConnect authority under
+`SI-AUTH-20261011-05` and delegated routine decisions is retained, not replaced
+by generic permission letters. It does not create a new direct Benzinga M&A
+entitlement. Missing terminal proceeds remain missing, market price is not
+consideration and completion/ex-date is not shareholder payment. Keep
+original-vintage canonical and latest-revised exploratory tracks separate.
+Canonical actual looks **0/0**, exploratory **0**, alpha **0**, permanent look
+IDs **none**, QC attempts **0**; frozen 48-book economics and unselected
+20/60/120/252 lookbacks unchanged. A genuinely qualified candidate still needs
+prospective exact look/processing/order registration, authenticated capacity
+checks/rechecks, waiting for occupied other-lane nodes without stopping or
+reassigning them, and at most three failed attempts including compile/runtime
+failures before authenticated Mia or the owner's Mia input. No broker,
+operator-database, funded account, deployment, capital, real-order or trading
+authority is inferred.
+
+Read-only final guards must reverify physical root, branch, exact HEAD,
+allowlisted status and actual remote **`ab85a032759cf5b5924a51caf1c8417cae2d6adc`**
+before the closing commit and single push. The sole publication is
+`git -c push.followTags=false push origin HEAD:refs/heads/codex/strategy-short-interest`,
+non-force, no tags or other ref. The new ordered Claude review range is this
+counter-review `c83011c`, implementation `c4c5777` and this record-only closing
+commit; the closing hash is reported at handoff, not self-embedded. Reverify
+clean local/tracking/actual-remote equality afterward. No intermediate push,
+hidden merge, branch switch, stash, reset or rewrite occurred. Unexpected
+advancement or unrelated local changes require a precise stop, not omission.
+
+After verified publication, retire only
+`watch-claude-s-next-short-interest-review`, the already-triggered one-shot
+described in 113.1. Do not rearm it, change other monitors or message Claude
+without owner authorization. Its exact retirement and publication outcome
+are reported to the owner. Copyable Claude handoff: independently review every
+new commit after `ab85a032` on this same lane; inspect selective test restoration,
+the append-only ledger qualifications, first-entry host guards and explicit
+fixture isolation; run the complete lane on the exact published tree, record
+host/skips and dispositions, and keep factual source/actual-look/QC/operational
+gates distinct from routine authorization. All protected-I/O Windows cases
+need complementary POSIX validation; do not use a capability fixture to claim
+filesystem parity or replace original captures/spent budgets.
+
+Main's closing eleven-file rerun after this section/status/ledger update:
+**344 passed, 257 skipped in 11.31s**, no warnings or failures. Final metadata-
+only presence checks confirm `artifacts/short_interest` and the named
+master/native/supplement children are absent; no contents are inspected.
+The ending snapshot is the following record-only commit. Final active-document,
+append-only Git-blob, staging-ownership, diff and actual-remote checks precede
+its commit; final local/tracking/actual-remote equality and exact one-shot
+retirement are reported after the single publication.
+
+Closing record checks: active documents **69 passed in 1.92s**, no warnings.
+Main verifies **raw Git blob bytes** from `ab85a032` and the staged closing
+record: start at each first `Current publication rule`, remove the two unique
+complete current-round ledger rows from the new blob, then cut the new blob
+at the LF before section 113. Every historical byte through Claude's section
+112 is identical: **1,507,579 bytes**, SHA-256
+**`c35ac4742c206ee9bdab67745094ba7148552bcac79a2cd8b24f7e069a797e89`**.
+The record auditor's independently normalized comparison agrees; main's
+staged-blob comparison performs no newline normalization. The sole closing
+allowlist is this lane record. No further source execution is pending.
+
+The first closing shell guard refused before fetch/commit because a single
+PowerShell pipeline result was represented as a scalar instead of an array.
+Read-only Git metadata confirmed only the owned staged/unstaged lane record,
+unchanged `c4c5777` and no untracked work. Explicit array handling corrects the
+guard; this is a harness refusal, not an unexpected branch change or omitted
+user work.

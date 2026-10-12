@@ -6718,3 +6718,60 @@ diagnosis. The six identities, their earlier inclusion among the nine
 later runs counted in the original R177 entry, and the closing floor
 **313 shared / 239 ARV2 development / 49 infrastructure / 699 booked
 cells** are unchanged. This erratum adds zero looks and no authority.
+
+## R-284 — One-shot public seven-security identity diagnostic (COMPLETED; identity-only)
+
+Actual run date **2026-10-12 UTC**. Analyst lane sections 263-C/263-H freeze
+the no-order research-infrastructure exception; section 263-D authorizes
+this append-only shared census entry. Section 285 records the owner's scoped
+publication-review waiver, successful guarded C package/authentication,
+offline preparation, capacity checks and exact one-attempt launch freeze.
+This is not an economic strategy evaluation or formal-source acceptance.
+
+| Field | Exact binding |
+|---|---|
+| Candidate / attempt | R284 A1, sole attempt; now spent, no retry |
+| Source/run freeze commit | `4fd6ae36e48e6957fb246f5f14544be86a6fbfed` on `codex/strategy-analyst-revisions-v2` |
+| QC project / name | `37705240` / `ARV2 R284 PUBLIC SEVEN IDENTITY 20261007` |
+| Compile ID | `99c291f9e9607360c5a8f865048e1f92-ca917c739f63823c32925ee19f4da4d8` |
+| Backtest ID / name | `388a1656996a2bffb2bceb842ffc2cc8` / `ARV2 R284A1 public FIGI identity only 20261007` |
+| Uploaded `main.py` SHA-256 / size | `1b9c82c2db7b7d3c338cc32185556bc46bbeebd8289c7f0415881a2a5bfc66b3` / 4,183 bytes |
+| Prepared SHA-256 | `6efdd14434df183896b87fc07e2d07946c8cb8b893a4daa4e4f189b56ec0c5c3` |
+| Profile SHA-256 | `d370cc92322a42ed736215eaa634f445413b04267925a414c1b71aecfa9d796c` |
+| Input SHA-256 | `4a5bf4cbb3abb4d453eabcb40479dfde98164996e6ca84bece509d91658f5ece` |
+| Continuity manifest SHA-256 | `529e1727fe95d9df7f05ea83b677cf1b0a7a34e40a70cbcad5c68a7f1ea1458f` |
+| Engine interval / names | 2026-10-07 only, NY timezone; QCOM, SPY, QQQ, SOXX, XLV, REMX, XLE |
+| Attempt claim / launch CLI | 05:21:51.080658Z / 05:21:48.726198Z..05:21:57.866630Z, exit 0 |
+| Terminal status CLI | 05:22:17.417147Z..05:22:20.105518Z, exit 0, exact `Completed.` |
+| Single result-read CLI | 05:22:36.916701Z..05:22:39.736099Z, exit 0, fresh completion and custom bindings accepted |
+| Custom metadata SHA-256 | `898c63cb4252bf32e8eb41f2f16ed5967998793531e008bda96189b1f016c1ab` |
+| Retained private result | `artifacts/analyst_revisions_v2/identity_qc/R284A1-20261008/result.json`, 3,638 bytes, SHA-256 `e5e8dfcc21d55974c8c18335f7eb17d3f6e6f204121c373c0bcadf4edff83bda` |
+| Retained terminal SHA-256 | `cbc9433b6722b11770719c887a7bfe5be22dd90183553a2c8b86e136ee2f4a70` |
+| Result / interpretation | 7 matched, 0 refused; all seven public FIGI forward/reverse identity and distinct-SID checks passed inside QC; no mapping values or mapping hashes exported |
+| Logs / charts / economic statistics | No dedicated logs/charts query; economic fields not selected, retained as results or evaluated. Default financial fields may arrive in the full result envelope; no return, efficacy, alpha-cell or order result is admitted. |
+
+The source uses no subscriptions, history, prices, Object Store or orders.
+Only independently public reference strings and aggregate lineage hashes
+were uploaded, not licensed vendor rows. Its October 7 engine date does not
+make the October 12 execution prospective or supply cutoff-valid PIT data.
+Current/vintage continuity, missing CUSIP qualifications and incomplete
+historical identity remain. All formal admission, independent review, PIT,
+complete price-identity, decision, paper and order flags stay false. A
+successful terminal/match does not close those gates; the publisher waiver
+is not independent review of the resulting package or result.
+
+One compile poll, one statistics-disabled status and one custom read were
+made. The control leaf retains 28 files including 14 sanitized response
+observations; no pending leaf, repair, repeated launch or QC result read. Four
+earlier read-only access/capacity requests are separate (18 QC requests in
+this stage); the attempt claim precedes the attempt-chain contacts, not those
+four prerequisite reads. The
+capacity reads showed two idle nodes before launch; no other lane's project,
+job, node selection or controls were modified. Client times and parsed
+response hashes are not signed server-time/operator proof.
+
+Book the actual attempt exactly once: **313 -> 314 shared looks;
+239 ARV2 development evaluations unchanged; 49 -> 50 infrastructure looks;
+699 booked cells unchanged**. No formal-alpha spend or performance cell.
+The successful one-attempt R284 slot stays spent; R247/R281 remain exhausted.
+No funded/broker, paper/live deployment or real-order authority follows.

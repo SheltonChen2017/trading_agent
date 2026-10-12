@@ -467,8 +467,13 @@ It does not claim independent approval or waive technical source/output
 checks. The actual unchanged publisher and separate strict three-file
 authentication both pass at freeze `417aff5f` (285.4), resolving publication
 prospectively for the exact C package. Offline R284 preparation and its
-bounded readback passed at `99333564` (285.6). The next step is the separately
-frozen read-only QC access/capacity check (285.7), not an unfrozen launch.
+bounded readback passed at `99333564` (285.6). After frozen read-only capacity
+checks, the sole R284 A1 attempt at `4fd6ae36` completed and its once-only
+custom result read accepted all seven identity matches (285.9). This is
+no-order infrastructure evidence, not strategy performance or formal identity
+admission. The booked floor is now 314 shared / 239 development / 50
+infrastructure / 699 cells. Next are the unresolved formal source/identity
+evidence gates in 285.10; no replay or replacement R284 is authorized.
 The review monitor is paused at the owner's request.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
@@ -1436,9 +1441,12 @@ The owner explicitly waives Claude review of section 285's current pre-use
 publication protocol and the unchanged section-284 candidate only; section
 285 records the exact prospective publication/authentication decision, not
 independent acceptance. Both actual operations now passed (285.4), followed
-by successful offline preparation and readback (285.6). The next bounded
-step is the separately frozen read-only QC access/capacity check (285.7), not
-a publisher retry or an unfrozen QC launch.
+by successful offline preparation and readback (285.6), bounded capacity
+checks and the sole completed R284 A1 diagnostic (285.9): seven accepted
+identity matches, zero refusals, no orders or strategy-performance claim.
+R284 A1 and its result-read slot are spent. Section 285.10 identifies the
+remaining external immutable-history/PIT/security-master evidence gates;
+do not manufacture admission or start a selector around those stops.
 The separate run freeze and all source/output checks remain binding. Normal
 independent review remains required for later new security contracts; this
 waiver does not revive sections 278/280 or permit a retry. Do not ask again
@@ -3339,7 +3347,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-11 | Codex section-281 counter-review and exact twelve-ctime v4 contract | `682779b7` -> section-282 implementation freeze and final handoff snapshot | Sole Claude commit disposed with prospective corrections/qualifications; owner's exact October 11 quote accepts only twelve fixed prospective ctimes under retained gates | Separate v4 policy/wrapper: exact device plus twelve pairs, unchanged original security/source pins, branch-specific drift refusal and isolated guard tests | Focused strict-network-denied tests and mutation sensitivity, exact final pins/results in section 282; no complete suite or actual source assessment | Human baseline choice resolved; technical source reauthentication and publication remain open; no QC/look/cell action; 313/239/49/699 unchanged | One final matching-lane push; Claude reviews section 282 before separately frozen assessment; active monitor baseline advances to this round's final head |
 | 2026-10-12 | Claude independent review of section 282: the twelve-ctime v4 contract | `34489a7a` -> this record commit | Section 283: two Codex commits `682779b7..34489a7a` disposed (2 accepted, 0 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells; no assessment, preflight, census or probe run | No code changed by Claude. Four pins, the profile and the twelve-pair digest reproduce; the map's old values equal `after.json` and its new values the R279 preflight; the projection applied in memory to the real rows equals the current state of all 27 objects; 23 in-memory guard removals tabulated; accepted `ARV2CR282-001` to `-003`; `ARV2R283-001` and `-002` documented; section 4 names section 283, banner sentence added, this row appended | Complete lane selection at `34489a7a` with every remote address refused (strict sandbox for the six groups, three parallel streams, temporary directories inside the root's ignored `.pytest_cache`; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 283.6 | 0 P0, 0 P1, 0 P2, 2 P3 | Single push of this round's Claude commit; Codex counter-reviews section 283 unless the owner changes the workflow |
 | 2026-10-12 | Codex section-283 counter-review, actual v4/probe success and guarded-publication candidate | `6e9c5562` -> `107743d8`, `b40cedc6`, this final section-284 record commit (three continuous Codex commits) | Sole Claude commit accepted after two prospective P3 corrections and documentary qualifications; exact one-shot v4 report and original synthetic publication probe/output authenticate successfully | Historical refusals remain spent; new publisher validates sources before payloads and retains original output descriptors; candidate UNREVIEWED/UNINVOKED; no production/QC action | 1,094 distinct focused strict-denied passes in 6.26 s; prior/repeated subsets and expected red omissions separately qualified; no full Codex suite; actual pins/times in 284.5/284.9 | ARV2E280-001 resolved prospectively for exact scope; ARV2E263-001 and independent formal gates remain; 313/239/49/699 unchanged | Exactly one final matching-lane push; Claude reviews every section-284 commit before any new publisher/run freeze; active quiet monitor advances to final Codex head, disposed Claude head6e9c5562 |
-| 2026-10-12 | Owner-waived pre-use review and frozen guarded-publication protocol | `3c8d23b0` -> section-285 authority/protocol freeze and subsequent result handoff | Human explicitly skips current Claude review; no new Claude commit or independent acceptance | Unchanged section-284 publisher/profile, one C-leaf attempt and conditional separate strict three-file authentication; no retry or technical waiver | 333 focused strict-denied passes in 3.27 s before authority freeze; exact pins and operational outcome below; no full suite | Formal/source/licensing/QC gates remain separate; 313/239/49/699 unchanged before any accountable event | One matching-lane final push only after concluded round; monitor remains paused |
+| 2026-10-12 | Owner-waived publication review, authenticated C package and completed one-shot R284 | `3c8d23b0` -> `417aff5f`, `99333564`, `046bc64f`, `4fd6ae36`, this final section-285 result handoff | Human skips current publication review; no new Claude commit or independent acceptance | Sole unchanged guarded publisher/authentication, offline preparation/readback and frozen R284 A1 pass; seven public-identity matches, zero refusals; no retry | 404 distinct focused strict-denied passes; repeated record checks and one corrected documentary failure disclosed; no full suite; exact operational pins/times in 285.4–285.9 | Publication blocker resolved prospectively; formal/source/identity gates remain; actual attempt books 314/239/50/699 once | Exactly one matching-lane final push after this concluded round; source-evidence barrier in 285.10; monitor remains paused |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -43982,3 +43990,149 @@ It covers exact fake launch/status/read chains, pre/postclaim mode checks,
 drift refusal, cloud identity/source/compile guards and poll budgets. The
 round now has **404 distinct focused passes** (333 + 30 + 41), not a full
 suite or proof of actual QC success. No executable bytes changed.
+
+### 285.9 Actual R284 A1 completion and accepted identity-only result
+
+D6 was committed at clean freeze
+`4fd6ae36e48e6957fb246f5f14544be86a6fbfed`, with all selected code pins and
+actual prepared/source pins intact. The final immediate read-only capacity
+check ran **2026-10-12T05:21:47.749614Z..05:21:48.725984Z** and again
+reported two idle backtest nodes, zero busy, zero active for the reference
+project. Parsed response SHA-256:
+`51c72caaeaffd264f7910a0bdb8ff545a260d1ba1e790913d771fdb51c04c55a`;
+request hash unchanged from D5. No node selection or other-lane action was
+made. No occupied-node wait was necessary; this is not a continuing capacity
+reservation or claim about current availability.
+
+| Actual operation | Client UTC start..end | Exit / disposition |
+|---|---|---|
+| Sole launch CLI | 05:21:48.726198..05:21:57.866630 | 0; exact project/compile/backtest receipt |
+| Sole status CLI | 05:22:17.417147..05:22:20.105518 | 0; exact `Completed.` terminal |
+| Sole custom result-read CLI | 05:22:36.916701..05:22:39.736099 | 0; fresh completion and metadata bindings accepted |
+
+All three had empty stderr and bounded canonical summaries. There was one
+actual compile poll and one statistics-disabled status observation; no
+nonterminal polling loop, retry or repeated result read. The attempt claim
+was written **05:21:51.080658Z**, before the first R284 attempt-chain contact
+at **05:21:51.093378Z**. Last recorded contact ended **05:22:39.624409Z**.
+Client timestamps/parsed hashes are not signed server-time evidence.
+
+| Identity | Exact value |
+|---|---|
+| Candidate / attempt | R284 / A1, sole slot spent |
+| Project | `37705240`, `ARV2 R284 PUBLIC SEVEN IDENTITY 20261007` |
+| Compile | `99c291f9e9607360c5a8f865048e1f92-ca917c739f63823c32925ee19f4da4d8` |
+| Backtest | `388a1656996a2bffb2bceb842ffc2cc8`, `ARV2 R284A1 public FIGI identity only 20261007` |
+| Generated source / prepared / profile | Exact 285.6 pins, unchanged |
+| Custom metadata SHA-256 | `898c63cb4252bf32e8eb41f2f16ed5967998793531e008bda96189b1f016c1ab` |
+| Local result (3,638 bytes) SHA-256 | `e5e8dfcc21d55974c8c18335f7eb17d3f6e6f204121c373c0bcadf4edff83bda` |
+| Terminal (1,691 bytes) SHA-256 | `cbc9433b6722b11770719c887a7bfe5be22dd90183553a2c8b86e136ee2f4a70` |
+| Launch (1,669 bytes) SHA-256 | `a74e21439db6b8c1e358e0d6a7d62400ac2b666a6f1f7f4401e3c6a0b35e6781` |
+| Attempt claim (1,504 bytes) SHA-256 | `73f15fe6717db6323fb8d568f474efd2b0ca49fe69739e886cb7b590d38eca26` |
+
+Accepted custom result: **7 matched / 0 refused**. QCOM (stock) and SPY,
+QQQ, SOXX, XLV, REMX, XLE (funds) each returned `matched=true`, reason
+`matched`. The uploaded source tested USA/Equity resolution, exact public
+FIGI reverse equality and distinct SID groups inside QC. No actual SID/FIGI
+mapping values or their hashes were exported. All independent-review, PIT,
+complete-price-identity, CUSIP, vintage-range, formal-admission, decision,
+paper and order flags remain false. This does not repair missing vendor
+identifiers, authenticate permanent historical identities or backfill the
+October 7 cutoff; the engine date is fixed but the actual execution is later.
+
+The fixed control leaf retains **28 files**, including **14 sanitized response
+observations**, no pending/extra leaf: authenticate1, projects/read2,
+projects/create1, files/read3, files/delete1 (the fresh generated notebook),
+files/update1, compile/create1, compile/read1, backtests/create1,
+backtests/list1, backtests/read1. A bounded local, network-denied receipt
+parser authenticated the external prepared hash, exact launch/terminal/result
+bindings and metadata digest without another QC result read or original-source
+access. Its
+canonical sorted digest inventory of the 26 control files excluding input
+and main source hashes to
+`0494407bfa627ae684c0b9546baa182efaba9fb26cef2492c151b96d3a77ec14`.
+This local chain check is not independent review or whole-host integrity.
+No dedicated logs/charts query was made and no economic statistic was selected,
+retained as a result or evaluated. As section 263 qualifies, the full
+`backtests/read` envelope can contain default financial fields even though
+only the custom metadata is selected and retained; do not claim those fields
+could not have arrived over transport. No QC mapping values/hashes were
+exported.
+
+**CR285-002 (P3, corrected before final commit):** same-round advisory checking
+caught two overbroad draft descriptions. The claim precedes the first
+attempt-chain contact, not all QC contact: D5's three read-only requests and
+D6's one immediate capacity request precede it. There are **14 retained run
+observations plus four separate read-only access/capacity requests = 18 QC
+requests** in this stage. The draft also conflated no selected/retained/
+evaluated economic results with absence of default fields in the transported
+result envelope. The corrected descriptions above preserve that distinction;
+no new contact, artifact observation or executable correction was made by
+the advisory checker. These are documentary qualifications, not independent
+acceptance or evidence of a hidden strategy evaluation.
+
+Under 263-D, append this actual attempt once to the shared look ledger:
+**314 shared / 239 development / 50 infrastructure / 699 booked cells**.
+No formal alpha or strategy-performance cell is earned. R247/R281 stay
+exhausted; R284's one attempt and its custom-read slot are now spent even
+though successful. No launch/result rerun, renamed replacement, package
+repair or clean-up follows.
+
+### 285.10 Final disposition, remaining barrier and handoff
+
+The current owner-waived bounded milestone achieved actual guarded source
+publication, strict C-package authentication, offline preparation and a
+completed one-shot QC public-identity diagnostic. The previously open
+production-publication barrier is resolved only for the exact successful
+package. No executable code, schema, profile, source capture or security
+policy changed this round. The owner's waiver supplied current pre-use
+review sequencing authority, not independent acceptance. There is no new
+Claude range to dispose and no claim that same-round advice is independent.
+
+The concrete next barrier is external formal evidence, not another test run:
+the trust roots still lack immutable analyst history with version/correction/
+deletion/availability and completeness evidence, an independently reviewed
+security master binding QC SID/permanent share-class/own-ETF/vendor identity
+and intervals, authenticated cutoff-valid prior-NYSE-close RAW prices and
+scores, and (for stock-first) seven-role completeness and terminal payoff.
+The existing Massive current-row API, Sharadar current/vintage captures and
+this seven-name QC match do not supply that package. No existing retained
+artifact can be relabelled to satisfy these gates, and another unchanged
+R284 run cannot resolve them. Proceed only when an admissible evidence
+package or a separately scoped acquisition plan genuinely addresses a
+missing requirement; do not create claims-only readiness scaffolding,
+populate non-backfillable dates/estimands/power hashes/epoch, or construct
+a selector around a source stop. No performance evaluation or efficacy claim
+is admitted by this identity result. New contracts retain their normal
+independent-review requirement unless separately and explicitly waived.
+
+Continuous round begins at `3c8d23b00dd65c1a2c682ed57bf398d8e6d8457c`:
+
+| Codex commit | Role / bounded disposition |
+|---|---|
+| `417aff5faccd4f2d2470676db288d4daf4d1eaa6` | Current owner waiver and D1/D2 freeze; actual executions accepted against that unchanged protocol; CR285-001 qualifies its attribute-observation claim. |
+| `993335640819586660f9dfe080a3a6bd1d6ed988` | Actual publication result and D4 offline-preparation freeze; preparation/readback succeeded with exact pins. |
+| `046bc64f3fce275454a6a4aa907d544209ed94a9` | Actual prepared pins and D5 read-only capacity freeze; three bounded read-only requests succeeded. |
+| `4fd6ae36e48e6957fb246f5f14544be86a6fbfed` | Actual idle capacity and D6 one-attempt freeze; sole launch completed and custom result accepted. |
+| This final result/handoff commit | Actual R284 result, once-only look census and documentary qualifications; no new execution authority. |
+
+These are five continuous Codex commits, not a Claude-review trigger or five
+QC attempts. The last disposed Claude head remains
+`6e9c5562e39244b02f63b5ea084c8ced9018d924`. Matching-only fetch still shows
+remote `3c8d23b0`; no divergence or concurrent tracked work was observed.
+Exactly one matching-lane final push will conclude this round after final
+focused document/diff/status checks. No intermediate push was made. The
+monitor remains **PAUSED** by direct owner request; do not rearm or message
+Claude/another chat. R284 completion does not authorize funded/broker,
+paper/live deployment, real orders or shared/other-lane edits beyond the
+specific appended look entry. Failed A/B and all spent evidence are retained.
+
+Final root record/active-document selection passed **86 tests in 0.80 s**
+under strict network denial and the same isolated in-root setup. This repeats
+earlier coverage, not an addition to the **404 distinct focused passes**.
+The earlier documentary red result and its green correction remain disclosed.
+No full Codex suite ran. Same-round final document checking found only the
+two CR285-002 wording qualifications; exact identifiers/pins and the once-only
+look arithmetic were consistent. Final changes are limited to this lane
+record and the specifically authorized append-only R284 look entry; no root
+handoff/action plan/shared executable or other-lane data changed.

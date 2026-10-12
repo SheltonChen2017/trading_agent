@@ -1,0 +1,3 @@
+# Insider-only byte pin: Git must materialize the frozen QC candidate as LF.
+# No rule here changes another strategy's source or a shared checkout policy.
+/insider_buying_qc_stock_order_study.py text eol=lf

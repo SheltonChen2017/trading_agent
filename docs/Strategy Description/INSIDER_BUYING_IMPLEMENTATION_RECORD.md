@@ -1,17 +1,17 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 156 COUNTER-REVIEWS CLAUDE'S EXACT `86700b1c` RECORD-ONLY
-PUSH AFTER `6209b3b3`: ACCEPTED AFTER APPEND-ONLY DOCUMENTARY QUALIFICATIONS.
-SCANNER AND THREE ADMISSION-CLAUSE MUTATIONS REPRODUCE UNDER VERIFIED OS
-PROCESS-TREE NETWORK DENIAL; ADMISSION PROBES DO NOT VALIDATE LOCKING.
-`IBWIN-CR01` REMAINS OPEN: WINDOWS CUSTODY/REPLAY SUPPORT IS NOT PROVED AND
-MAC RETAINED-ROOT RECEIPTS REMAIN ATTRIBUTED. `IBWIN-OBS01` REPRODUCES AS
-TWO QC BYTE-PIN FAILURES; A SEPARATE, LANE-ONLY CHECKOUT CORRECTION IS THE
-NEXT BOUNDED OFFLINE STEP, NOT A PLATFORM PORT. SIX EARLIER P2 FINDINGS
-REMAIN OPEN, INCLUDING BOTH SHARED FINDINGS. NOT BACKTEST-READY: ACTUAL
-EARNINGS-RELEASE AND HISTORICAL ISSUER/SHARE-CLASS/SID/LISTING/PIT INPUTS
-REMAIN MISSING (152.1, 154.6). NO ACQUISITION, QC JOB, OUTCOME LOOK,
-BACKTEST OR TRADING; LOOKS 0/0/0. MONITOR PAUSED, NO AUTOMATIC REARM.**
+Status: **SECTION 156 ACCEPTS CLAUDE'S EXACT `86700b1c` RECORD-ONLY PUSH
+AFTER DOCUMENTARY QUALIFICATIONS; COUNTER-REVIEW COMMIT `fbef7a37`.
+SECTION 157 IMPLEMENTS AN EXACT INSIDER-ONLY LF CHECKOUT RULE FOR THE
+FROZEN QC STOCK-STUDY SOURCE: FOUR REAL GIT CHECKOUT CONTROLS, RULE-DELETION
+SENSITIVITY AND BOTH PREVIOUSLY FAILING ANALYSIS PATHS PASS. THE FROZEN QC
+BLOB AND CUSTODY CODE ARE UNCHANGED; `IBWIN-OBS01` IS CLOSED AT CHECKOUT
+SCOPE. VERIFIED OS PROCESS-TREE NETWORK DENIAL USED; NO WINDOWS LOCKING
+OR MAC RETAINED-ROOT REPLAY ACCEPTANCE. SEVEN P2 FINDINGS REMAIN OPEN,
+INCLUDING WINDOWS CUSTODY SUPPORT AND BOTH SHARED FINDINGS. NOT BACKTEST-
+READY: ACTUAL EARNINGS-RELEASE AND HISTORICAL ISSUER/SHARE-CLASS/SID/LISTING/
+PIT INPUTS REMAIN MISSING (152.1, 154.6). NO ACQUISITION, QC JOB, OUTCOME
+LOOK, BACKTEST OR TRADING; LOOKS 0/0/0. MONITOR PAUSED, NO AUTOMATIC REARM.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -249,6 +249,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-09 | Codex counter-review and separate handoff | Incoming `444c9a737dfc8f4a2c4d96c0469d98708105f529..34c323a7217c3bfad00e1a9e9ad472c932ab1283`; correction `f0b144d0c0d9cc9a82eec7207a5fd3ef9a786a8e`; this separate record | Counter-review both Claude commits; test-only lane hardening and documentary qualifications | `117de00d` accepted after transport-family/namespace/every-use scan correction and isolated admission pins; `34c323a7` accepted after count/mutant-attribution qualifications. Two fresh journals independently replayed read-only; archived original-plus320 receipt identities/accounting verified without repeating full-root replay. | Main affected465 passed74.42s; boundary/package/document156 passed20.68s; exact scanner7 red then10 green, admission3 deletions caught. Peer Decimal193 passed86.24s, guard271 passed20.17s; shared2 failures independently reproduced. All process-tree network-denied; private replay also write/fork-denied. No complete suite. | New `IBTEST-CCR06` P2 and `IBTEST-CCR07`/`IBDOC-CCR15301` P3 closed; six prior P2s OPEN, all prior closures retained. No shared behavior changed. | Single authorized matching-lane publication after separate exact-hash handoff and final remote/status checks. Next input-driven integration needs genuine historical actual-release and identity/PIT evidence; no fabricated readiness, new source dispatch, frozen-file thaw, monitor rearm or outcome/QC step. |
 | 2026-10-12 | Claude review (Windows session) | `6209b3b3` -> this review record | Review of `34c323a7..6209b3b3`: the test-only tripwire/admission correction `f0b144d0` and the section-154 counter-review `6209b3b3` (two commits, zero merges); every earlier commit since `653874e8` carries a disposition from the other Claude session in sections 80-153 | Reproduced the scanner red/green against the in-memory `117de00d` scanner (7 of 7 red, 10 of 10 green, real scan 22 seen/0 offenders), the three single-clause admission deletions (each caught only by its own control, the older test blind to all three), the two shared SEP-2 failures, the 156 and 271-test selections net of host artifacts, the 178-case collection count, and every section-154.3 qualification by independent git and ledger counts. Full detail in section 155, including the required 1-10 rating. | All runs under proven process-level network denial. Boundary/package/document selection 155 passed plus 1 harness artifact that passes without the harness; event clock + registered analysis 271 passed plus 2 CRLF checkout artifacts that pass on an LF copy; SEP-2 nodes 2 failed as recorded; record/active-document gates **71 passed** (measured on the tree carrying this section; the re-run after this value was written reported the same count); `git diff --check` clean. No full lane gate or complete repository suite on this host: 16 of the 95 lane test files cannot be collected on Windows (`fcntl`), so the lane gate was not run here and the macOS results in 153.5/154.4 remain the attributed lane evidence. No SEC/EDGAR, provider, credential, journal, custody, QC, broker, or trading access; **0 research looks**. | `f0b144d0` accepted; `6209b3b3` accepted. New: `IBWIN-CR01` (P2, lane-specific, pre-existing: the acquisition/custody stack is POSIX-only, documented for an owner decision) and `IBWIN-OBS01` (P3, CRLF checkout breaks the QC byte pins). No lane code or test changed. | Codex counter-reviews this round; owner decision on `IBWIN-CR01`; next work per 152.1/154.6. |
 | 2026-10-12 | Codex counter-review | Incoming `6209b3b33d203aad4a3d1d6d449a1c7d2304c8f0..86700b1c2dbbbd8234870444c3bbcf14c6a00aeb`; this separate counter-review record follows | Exact one-commit, record-only Claude review; no implementation source change | Accepted after append-only section156 qualifications of harness evidence, prior Windows documentation and platform census. Scanner and isolated admission mutations reproduce; custody replay not represented as a Windows execution. | Verified parent/child OS network refusal; lane boundary51 passed; event-clock/registered-analysis271 passed and2 reproduced QC-byte-pin failures. Other final focused results in156.4. No full repository suite or successful full Windows lane gate; looks0/0/0. | IBDOC-CCR15501 P3 qualified; IBWIN-CR01 P2 retained OPEN; IBWIN-OBS01 P3 reproduced, not closed by counter-review. Six earlier P2s retained; shared findings not fixed. | Separate lane-only LF checkout correction may proceed independently; no platform port, corpus promotion or input-dependent backtest milestone. Single final publication only after completed permitted scope and checks; monitor remains paused. |
+| 2026-10-12 | Codex next bounded implementation | Counter-review `fbef7a375b094839160e0a02b0bb80ebd63cdef4` -> this milestone; exact commit follows in separate handoff | Byte-stable checkout for the frozen Insider QC stock-study candidate | Exact nested Insider-only LF attribute; four local Git checkout controls; clean frozen source rematerialized without blob change; no platform port. Section157 records full evidence and retained gates. |632 affected passes on pre-final-test-isolation image; final refined four checkout controls4 passed; prior two failing analysis paths pass; rule deletion caught;193 files compileall; final gate results follow. Shared SEP-2 pair2 failed14.25s, retained. No full repository suite or successful full Windows lane gate; looks0/0/0. | IBWIN-OBS01 P3 CLOSED at byte-checkout scope; new test global-attribute isolation tightened after peer QA. Seven P2s retained; no custody thaw or Windows-lock acceptance. | One combined publication after separate exact-hash handoff and final checks. Actual historical earnings/identity/PIT inputs and supported-host custody replay still required for dependent work. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -22444,6 +22445,13 @@ available on this host. Earlier Mac results remain attributed to153/154.
 | IBREV-CR01; prior observations and45 unclassified119 survivors | As recorded | **Retained at owner-disposition / original classification** | No retroactive approval, new count or invented mutation classification. |
 | IBSH-CR01 | P3, shared | **OPEN, nonblocking, retained** | Coordinate paper-clause documentation at integration, not here. |
 
+The new documentary finding's full required disposition fields are retained
+here; the compact table above is the inherited-status summary.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IBDOC-CCR15501 | P3 | CLOSED by156.2 | Incoming `86700b1c` | Sections155.3,155.5,155.7 and current counter-review156.2 | Differently isolated test results pooled; prior Windows notes and platform census overstated, risking misleading handoff evidence. |155's155-pass/one-failure measurement; existing87.1 capability notes; exact seven-production/three-test importer and ten/seventeen flag census. | Preserve accurate evidence and prior limitations without manufacturing a new network incident or platform acceptance. | Append-only qualifications; historical155 unchanged. | Independent static review; current denied boundary51-pass and156-pass selection; peer scanner7-red/10-green; final record/package72-pass checks. |
+
 No open P0/P1; **seven open P2s**, including five topical/platform and two
 shared. Counter-review uses a separate commit before the independently bounded
 LF-checkout implementation. Standing engineering authority permits that lane-
@@ -22462,3 +22470,143 @@ order/trading action. Source/readiness/execution gates are not promoted; looks
 **0/0/0**. Shared coordination files remain frozen. The monitor stays PAUSED;
 no other chat is messaged. Exactly one final push is reserved for the completed
 permitted round after final checks, not for this intermediate record commit.
+
+## 157. Next bounded milestone: exact Insider QC checkout bytes (2026-10-12 UTC)
+
+**Technical completion:** after committing counter-review as
+`fbef7a375b094839160e0a02b0bb80ebd63cdef4`, added one exact rule in
+`research/.gitattributes`:
+`/insider_buying_qc_stock_order_study.py text eol=lf`, plus
+`tests/test_insider_buying_qc_source_checkout.py`. The rule is lane-owned in
+effect: no wildcard, shared root attribute, other strategy or other QC file
+changes. The implementation and this record form the separate next milestone;
+its exact resulting hash is named by the following handoff after creation.
+
+**Plain-language completion:** Windows can now obtain the unchanged, byte-pinned
+Insider QC candidate without Git silently changing its line endings. Real Git
+checkout tests show the protection works, and that removing or aiming it at
+the wrong file recreates the failure. This is offline checkout compatibility,
+not a Windows custody port, QC execution or historical backtest completion.
+
+### 157.1 Exact scope and frozen identity
+
+The source content is not regenerated or loosened. Its Git blob remains
+`04fbdf173d041b10b6e94ed0fcaf809275e4f0c0`; working bytes now have the existing
+frozen SHA-256
+`c80ff4f585d59d1b8e4ecd0d6199605fee727de9df0a13b74e987fe4d2819f87`,
+29,702 bytes, LF. Both production consumers still require this exact hash.
+No normalization is added to a production admission path. The test fixture
+normalizes only its input and verifies that external frozen pin before using
+it; altered source content cannot become legitimate through normalization.
+
+Attribute advancement alone may not refresh a previously clean CRLF copy.
+On this host a direct `checkout-index --force` left the cached file untouched;
+it is not represented as a successful refresh. After checking branch, exact
+HEAD, clean source diff and the known CRLF hash, the unchanged index entry was
+materialized into a fresh temporary prefix. Its exact frozen hash was checked
+before copying only that source back. Staging under the new attribute refreshed
+the index stat cache; **no staged source-content diff** remains. Existing clones
+must likewise preserve any edits and verify a clean target before refreshing
+its unchanged blob. Do not discard an edited source or rewrite a frozen hash.
+
+The four historical custody files still match their `aa0d635` Git blobs.
+No frozen v1/scale/pilot file, journal, retained root, source window or original
+attempt lineage changes. This milestone does not execute a custody replay.
+
+### 157.2 Regressions, mutations and test-isolation corrections
+
+The four new cases require:
+
+1. Exact frozen working-source bytes.
+2. A real local Git repository with `core.autocrlf=true` and `core.eol=crlf`
+   must check out the Insider candidate as LF while an invented sibling still
+   follows CRLF policy.
+3. An absent attribute rule must reproduce the hash mismatch.
+4. A rule aimed only at the sibling must also reproduce the Insider mismatch.
+
+These scratch repositories have no remote and no commit/push. System/global
+configuration and system/default-user attributes are excluded with
+`GIT_CONFIG_NOSYSTEM`, `GIT_CONFIG_GLOBAL`, `GIT_ATTR_NOSYSTEM` and a local null
+`core.attributesFile`. Local long-path support prevents long pytest fixture
+names from obscuring the checkout behavior on Windows. No real repository
+configuration is changed. Internal peer QA identified the default-attribute
+isolation gap; it was corrected before the final new-file run.
+
+After fixing only scratch-path setup, the pre-correction four-case selection
+was **2 failed,2 passed in5.31s**: wrong working hash and absent real policy.
+The initial fixture drafts additionally hit native Git permissions in the
+AppContainer's virtual Temp, then Windows long-path limits. Those are test-
+setup refusals, not attribute-mutation evidence. Subsequent scratch fixtures
+use this chat's expressly writable scratch area under inherited OS denial;
+no alternate strategy checkout or lane branch is created. Only pytest's
+temporary scaffolding has the156.4 mode adaptation; product paths/locks do not.
+
+After the rule and verified LF refresh, four new controls plus the exact two
+previously failing registered-analysis paths pass **6 in8.25s**. A faithful
+in-memory mutation returning an empty policy only for the actual attribute
+read makes the positive real-Git checkout test fail at the frozen-hash
+assertion; the original read method is restored in `finally`. The standalone
+working-byte test is not used to claim that deletion sensitivity.
+
+Internal read-only peer QA re-proved denied parent/child TCP, ran all four
+direct function controls successfully, and verified unchanged blob/attribute
+scope. That peer used the earlier test image
+`2d389a3ce480b8d8a744f681c142d7a38fb8d33b43ea54415a7cb60ac65f38bd`;
+its result is **four direct controls**, not a pytest receipt or a run of the
+subsequent default-attribute isolation refinement.
+
+### 157.3 Validation and retained failures
+
+All tests/mutations run under the156.3 proven OS process-tree denial; no
+pytest/mutant is elevated. Main affected selection covers stock-study package,
+canonical candidate, native export adapter, event clock, registered analysis
+and the four new checkout cases: **632 passed in173.70s**. That selection
+loaded the new test before its final two attribute-isolation settings; all
+production bytes were the final unchanged image. The refined new test file
+then passes **4 in9.71s**. These are separate, overlapping measurements, not
+a fabricated unique or complete lane total.
+
+`compileall` succeeds on **193 lane-owned production/test files**, placing
+bytecode only in this chat's writable scratch area. An initial virtual-Temp
+bytecode run failed at Windows renames, not Python syntax; it is not counted
+as successful compilation. No bytecode/cache is written to the lane.
+
+The exact shared SEP-2 pair
+`test_sep2_definition_of_done_is_reconstructed_not_self_asserted` and
+`test_product_dependency_manifests_cover_actual_imports` still gives
+**2 failed in14.25s**, both naming undeclared `IPython`/`QuantConnect` roots.
+An earlier selection of the dependency-declarations test plus the second
+guard gave1 passed/1 failed; it is not mislabeled as the exact pair. Shared
+manifests/config are not fixed. Windows full-lane collection remains the16
+`fcntl` errors156.4; no complete repository suite, platform skip or fake-lock
+lane pass is introduced. Final boundary/package/document/Decimal-guard plus
+new checkout selection on the refined test image: **160 passed in82.12s**,
+under OS denial. An earlier run caught a blank between two session-ledger rows
+(159 passed/1 failed in102.71s); the blank was removed, completed-record checks
+passed72 in8.34s, and the full160-case repeat above is green. No test was skipped
+or weakened to hide that documentation defect.
+
+Internal peer then verified final test SHA-256
+`1cb33b6362b22ffd343ec1508d5029532f2ba59631e800742e001fc2a1141419`
+before and after four direct control passes under independently probed OS
+denial. Its final static review found no remaining material issue. This is
+internal QA, not the future independent Claude review of the outgoing commits.
+
+### 157.4 Finding disposition and next factual step
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IBWIN-OBS01 | P3, lane-specific | **CLOSED at exact-byte checkout scope** | Pre-existing; correction in this milestone, exact hash in following handoff | Frozen stock-study QC source; new research attribute and checkout tests | CRLF checkout changes hash and makes legitimate offline package/analysis paths refuse. |271-pass/2-failure original analysis selection; exact CRLF/LF hashes156.3; corrected scratch4-case red2/green4 controls. | Preserve frozen identity across Git checkout without weakening the source guard or touching custody code. | Exact one-file eol=lf rule; hash-verified clean-target LF materialization; four real Git controls with isolated attributes. |6 focused passes,632 affected passes with test-image qualification,final4 passes; rule-deletion mutation caught;193-file compileall. |
+
+The seven open P2s and all older P0-P3 states in156.5 remain. No new owner
+choice is necessary for this isolated byte fix. Windows custody support is
+still not proved and no port/skip decision is silently made. The next useful
+data-dependent step requires152.1/154.6's actual qualified historical
+earnings-release archive and historical issuer/share-class/CIK/SID/listing/PIT/
+pre-entry evidence, plus supported-host retained-root validation where used.
+The monitor authorizes no fresh acquisition, account/credential/provider or
+licensed-row access, purchase, outcome look, QC processing/upload/job/backtest,
+broker/operator database/scheduler, paper/live deployment or trading action.
+None occurred. Readiness stays false; looks **0/0/0**; shared coordination files
+and original coverage/attempt accounting remain frozen. One final combined
+push follows only after the completed permitted round's final checks.

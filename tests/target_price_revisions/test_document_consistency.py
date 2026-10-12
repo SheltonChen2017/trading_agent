@@ -439,6 +439,16 @@ SECTION79_CODEX_COMMITS = (
     SECTION79_CODEX_HEAD,
 )
 SECTION79_DISPOSITIONS = ("accepted after correction", "accepted")
+SECTION80_CLAUDE_BASE = SECTION79_CODEX_HEAD
+SECTION80_CLAUDE_HEAD = "2726b5ba87b4eab9282682d41b252c7ad1db91c2"
+SECTION80_CLAUDE_RANGE = f"{SECTION80_CLAUDE_BASE}..{SECTION80_CLAUDE_HEAD}"
+SECTION80_CLAUDE_SHORT_RANGE = "f998144d..2726b5ba"
+SECTION80_CLAUDE_COMMITS = (
+    "bbbf57d1f72864e340d70d58c19976b4beabedd4",
+    "535e8b54554e82ece52ef55cbae82ef9e220b7de",
+    SECTION80_CLAUDE_HEAD,
+)
+SECTION80_DISPOSITIONS = ("accepted", "accepted after correction", "accepted")
 SECTION74_SCOPE_BOUNDARIES = {
     "Accepted object": "Corrected incoming review tests and record only",
     "Extended study": "Not launched; fresh attempt allowance unanswered",
@@ -506,6 +516,7 @@ SECTION8_ROLE_STATEMENT = (
 )
 SECTION8_NEXT_ACTION_STATEMENT = (
     r"\b(?:(?:Claude|Codex) next (?:reviews|counter-reviews)|"
+    r"Codex next captures a fresh all-file source baseline and registers diagnosis-only Mia work|"
     r"Codex continues without Claude review stops)\b"
 )
 SECTION46_CLAUDE_BASE = "9958a459f5cd56c29cb9a0de13d38737e2c3412d"
@@ -1021,11 +1032,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [SECTION79_CODEX_RANGE]
+    ) == [SECTION80_CLAUDE_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Claude has independently reviewed the exact Codex range"
+        "Codex has counter-reviewed the exact Claude range"
         in normalized_current
     )
     assert (
@@ -1039,7 +1050,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "TPR-1 remains blocked" in normalized_current
     assert "reviewed-spec registry remains empty" in normalized_current
     assert "Claude next reviews this Codex round independently" not in normalized_current
-    assert "Codex next counter-reviews section 79" in normalized_current
+    assert "Codex next captures a fresh all-file source baseline and registers diagnosis-only Mia work" in normalized_current
+    assert "Codex next counter-reviews section 79" not in normalized_current
     assert "Codex next counter-reviews section 77" not in normalized_current
     assert "Codex next counter-reviews section 73" not in normalized_current
     assert "no 2021-now QC run has launched" not in normalized_current
@@ -1109,11 +1121,12 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [SECTION79_CODEX_SHORT_RANGE]
+        ) == [SECTION80_CLAUDE_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert "claude has independently reviewed every codex commit" in normalized_summary_lower
-        assert "section 79" in normalized_summary_lower
-        assert "codex next counter-reviews section 79" in normalized_summary_lower
+        assert "codex has counter-reviewed every claude commit" in normalized_summary_lower
+        assert "section 80" in normalized_summary_lower
+        assert "codex next captures a fresh all-file source baseline and registers diagnosis-only mia work" in normalized_summary_lower
+        assert "codex next counter-reviews section 79" not in normalized_summary_lower
         assert "codex next counter-reviews section 77" not in normalized_summary_lower
         assert "fixture-only tpr-d1 candidate awaits claude review" not in normalized_summary_lower
         assert "fixture-only tpr-d1 candidate is accepted" in normalized_summary_lower
@@ -2091,8 +2104,9 @@ def test_section_8_carries_one_current_role_and_no_stale_commit() -> None:
     """TPR-CR16-002: refuse stale identities and duplicate recognized routing.
 
     The recognized role grammar is Claude/Codex, optional has/independently,
-    and reviewed/counter-reviewed; next actions use next reviews/counter-reviews
-    or the exact owner-directed continuous no-review role.
+    and reviewed/counter-reviewed; next actions use next reviews/counter-reviews,
+    the exact bounded Mia source-capture action, or the exact owner-directed
+    continuous no-review role.
     This is an explicit grammar, not an arbitrary-prose classifier. Exactly
     one recognized role and next-action statement must occur in the current
     block. Lowercase 7-12 or 40-hex commit identities, quoted or unquoted,
@@ -2139,6 +2153,10 @@ def test_section_8_carries_one_current_role_and_no_stale_commit() -> None:
         ),
         (
             "Codex continues without Claude review stops.",
+            "one next action",
+        ),
+        (
+            "Codex next captures a fresh all-file source baseline and registers diagnosis-only Mia work.",
             "one next action",
         ),
     ],
@@ -4118,7 +4136,8 @@ def test_section_79_review_records_the_exact_range_and_grants_nothing() -> None:
         assert required in authority, required
     assert re.search(
         r"(?:^|[.!?])\s*(?:canonical admission|real-row canonical D1|TPR-1|TPR-0B|"
-        r"live trading|QuantConnect launch|trading authority)\s+is\s+authorized\b",
+        r"live trading|QuantConnect launch|trading authority|(?:a\s+)?fourth Codex OFF attempt|"
+        r"ON launch|remaining-shard upload)\s+is\s+authorized\b",
         authority, re.I,
     ) is None, "contradictory section 79 authority"
 
@@ -4148,6 +4167,9 @@ def test_section_79_guard_refuses_disposition_drift(monkeypatch) -> None:
         "Live trading is authorized.",
         "QuantConnect launch is authorized.",
         "Trading authority is authorized.",
+        "A fourth Codex OFF attempt is authorized.",
+        "ON launch is authorized.",
+        "Remaining-shard upload is authorized.",
     ],
 )
 def test_section_79_guard_refuses_contradictory_authority(
@@ -4166,3 +4188,157 @@ def test_section_79_guard_refuses_contradictory_authority(
     )
     with pytest.raises(AssertionError, match="contradictory section 79 authority"):
         test_section_79_review_records_the_exact_range_and_grants_nothing()
+
+
+def _section_80_authority(section: str) -> str:
+    """Only 80.7 governs this review; later actual-progress subsections are separate."""
+    heading = "### 80.7 Milestone, authority and next action"
+    assert section.count(heading) == 1, "exact section 80 authority heading"
+    tail = section.partition(heading)[2]
+    return " ".join(tail.partition("\n### ")[0].split())
+
+
+def test_section_80_counterreview_records_all_commits_and_bounded_mia_authority() -> None:
+    section = _record_section("## 80. Codex counter-review of Claude section 79")
+    scope = _bounded(section, "### 80.1 Owner direction, invariant and exact scope",
+        "### 80.2 Every incoming commit disposition", "section 80 review scope")
+    assert re.findall(r"Reviewed range:\s*`([0-9a-f]{40}\.\.[0-9a-f]{40})`", scope) == [SECTION80_CLAUDE_RANGE], "exact section 80 reviewed range"
+    dispositions = _bounded(section, "### 80.2 Every incoming commit disposition",
+        "### 80.3 P0-P3 findings and corrections", "section 80 dispositions")
+    rows = tuple((match.group(1), match.group(2).lower())
+        for line in dispositions.splitlines()
+        if (match := re.match(r"\| `([0-9a-f]{40})` \| \*\*([A-Za-z ]+)\*\* \|", line)))
+    assert rows == tuple(zip(SECTION80_CLAUDE_COMMITS, SECTION80_DISPOSITIONS)), "exact section 80 dispositions"
+    assert tuple(commit for commit, _ in rows) == tuple(_git_lines("rev-list", "--reverse", SECTION80_CLAUDE_RANGE))
+    assert "**Cumulative disposition: accepted after correction.**" in section
+    authority = _section_80_authority(section)
+    for required in (
+        "Counter-review of tests and corrected record is accepted after correction",
+        "Native implementation/performance acceptance is withheld",
+        "No fourth Codex OFF attempt is authorized",
+        "no ON launch is authorized",
+        "no remaining-shard upload is authorized by this review",
+        "No canonical admission, real-row canonicalD1, broker, funded, paper/live, capital or trading authority is added",
+        "Review alone never creates data rights or closes source/manifest gates",
+        "Availability003 observed authenticated controllable built-in Mia",
+        "The next bounded action is fresh all-file source baseline capture and separately registered diagnosis-only Mia work",
+        "required before any recovery launch",
+        "A real Mia launch is a distinct prospectively reserved look",
+        "not a fourth Codex attempt or a free outcome",
+        "No hypothetical extra diagnostic-run authority is inferred from79.7",
+        "The monitor remains paused",
+        "exactly one successful final non-force push",
+        "Next independent reviewer of the final published snapshot/full round is Claude in this lane",
+    ):
+        assert required in authority, required
+    assert re.search(
+        r"(?:^|[.!?])\s*(?:(?:a\s+)?fourth Codex OFF attempt|ON launch|remaining-shard upload|"
+        r"canonical admission|real-row canonicalD1|broker trading|funded trading|paper trading|"
+        r"live trading|trading authority)\s+is\s+authorized\b|"
+        r"(?:^|[.!?])\s*review alone\s+(?:authorizes|permits)\s+"
+        r"(?:canonical admission|broker trading|paper trading|live trading)\b",
+        authority, re.I,
+    ) is None, "contradictory section 80 authority"
+
+
+@pytest.mark.parametrize("fault", ("stale", "duplicate"))
+def test_section_80_guard_refuses_review_range_drift(monkeypatch, fault: str) -> None:
+    test_section_80_counterreview_records_all_commits_and_bounded_mia_authority()
+    original_section = _record_section
+    section = original_section("## 80.")
+    original = f"Reviewed range:\n`{SECTION80_CLAUDE_RANGE}`."
+    assert section.count(original) == 1
+    replacement = f"Reviewed range:\n`{SECTION79_CODEX_RANGE}`." if fault == "stale" else original + "\n" + original
+    mutated = section.replace(original, replacement, 1)
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 80.") else original_section(heading))
+    with pytest.raises(AssertionError, match="exact section 80 reviewed range"):
+        test_section_80_counterreview_records_all_commits_and_bounded_mia_authority()
+
+
+def test_section_80_review_authority_is_separate_from_later_progress(monkeypatch) -> None:
+    """A synthetic later paragraph must not silently widen the review-authority block."""
+    test_section_80_counterreview_records_all_commits_and_bounded_mia_authority()
+    original_section = _record_section
+    section = original_section("## 80.")
+    expected = _section_80_authority(section)
+    mutated = section + "\n### 80.999 Synthetic later progress\n\nON launch is authorized.\n"
+    assert _section_80_authority(mutated) == expected
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 80.") else original_section(heading))
+    test_section_80_counterreview_records_all_commits_and_bounded_mia_authority()
+
+
+@pytest.mark.parametrize("commit", SECTION80_CLAUDE_COMMITS)
+def test_section_80_guard_refuses_skipped_commit(monkeypatch, commit: str) -> None:
+    test_section_80_counterreview_records_all_commits_and_bounded_mia_authority()
+    original_section = _record_section
+    section = original_section("## 80.")
+    rows = [line for line in section.splitlines() if line.startswith(f"| `{commit}` |")]
+    assert len(rows) == 1
+    mutated = section.replace(rows[0], "", 1)
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 80.") else original_section(heading))
+    with pytest.raises(AssertionError, match="exact section 80 dispositions"):
+        test_section_80_counterreview_records_all_commits_and_bounded_mia_authority()
+
+
+@pytest.mark.parametrize("commit,disposition", tuple(zip(SECTION80_CLAUDE_COMMITS, SECTION80_DISPOSITIONS)))
+def test_section_80_guard_refuses_disposition_drift(monkeypatch, commit: str, disposition: str) -> None:
+    test_section_80_counterreview_records_all_commits_and_bounded_mia_authority()
+    original_section = _record_section
+    section = original_section("## 80.")
+    original = f"| `{commit}` | **{disposition}** |"
+    assert section.count(original) == 1
+    mutated = section.replace(original, f"| `{commit}` | **rejected** |", 1)
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 80.") else original_section(heading))
+    with pytest.raises(AssertionError, match="exact section 80 dispositions"):
+        test_section_80_counterreview_records_all_commits_and_bounded_mia_authority()
+
+
+@pytest.mark.parametrize("added_grant", (
+    "A fourth Codex OFF attempt is authorized.",
+    "ON launch is authorized.",
+    "Remaining-shard upload is authorized.",
+    "Canonical admission is authorized.",
+    "Broker trading is authorized.",
+    "Paper trading is authorized.",
+    "Live trading is authorized.",
+    "Review alone authorizes canonical admission.",
+))
+def test_section_80_guard_refuses_contradictory_grants(monkeypatch, added_grant: str) -> None:
+    test_section_80_counterreview_records_all_commits_and_bounded_mia_authority()
+    original_section = _record_section
+    section = original_section("## 80.")
+    marker = "### 80.7 Milestone, authority and next action"
+    assert section.count(marker) == 1
+    mutated = section.replace(marker, marker + "\n\n" + added_grant, 1)
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 80.") else original_section(heading))
+    with pytest.raises(AssertionError, match="contradictory section 80 authority"):
+        test_section_80_counterreview_records_all_commits_and_bounded_mia_authority()
+
+
+@pytest.mark.parametrize("fault", ("current_range", "current_role", "preamble_range", "preamble_role"))
+def test_section_80_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
+    test_exact_next_step_names_the_current_artifacts()
+    if fault.startswith("current_"):
+        original_section = _record_section
+        section = original_section("## 8. Exact next step")
+        old, new = (SECTION80_CLAUDE_RANGE, SECTION79_CODEX_RANGE) if fault.endswith("range") else (
+            "Codex next captures a fresh all-file source baseline and registers diagnosis-only Mia work", "Codex next counter-reviews section 79")
+        pattern = r"\s+".join(re.escape(word) for word in old.split())
+        assert re.search(pattern, section) is not None
+        mutated = re.sub(pattern, new, section)
+        monkeypatch.setitem(globals(), "_record_section",
+            lambda heading: mutated if heading.startswith("## 8.") else original_section(heading))
+    else:
+        preamble = _record_preamble()
+        old, new = (SECTION80_CLAUDE_SHORT_RANGE, SECTION79_CODEX_SHORT_RANGE) if fault.endswith("range") else (
+            "CODEX NEXT CAPTURES A FRESH ALL-FILE SOURCE BASELINE AND REGISTERS DIAGNOSIS-ONLY MIA WORK", "CODEX NEXT COUNTER-REVIEWS SECTION 79")
+        assert old in " ".join(preamble.split())
+        mutated = " ".join(preamble.split()).replace(old, new)
+        monkeypatch.setitem(globals(), "_record_preamble", lambda: mutated)
+    with pytest.raises(AssertionError):
+        test_exact_next_step_names_the_current_artifacts()

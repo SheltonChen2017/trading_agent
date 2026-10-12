@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–287 retain the milestone, review, preregistration, QC
+strategy. Sections 1–289 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -499,7 +499,11 @@ Section 289 counter-reviews `ef654b1d` after the owner's monitor trigger:
 accepted after three P3 record qualifications, with all 145 literal adapter
 refusals now classified and hostile metadata lookups corrected. The sixteen
 allegedly unreachable labels are valid formatted adapter messages, not
-invented messages. No failed capture was retried or privately re-read.**
+invented messages. No failed capture was retried or privately re-read.
+Section 290 adds a committed observation-only one-call seam, with no adapter
+default, credential loader, provider dispatcher or CLI. It separates finite
+failure evidence from an opaque producer return and keeps request counts
+unknown; it is not an operational recovery or production capture entry point.**
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1502,7 +1506,8 @@ exact pushed range `c2112b11..b295ce02` (sections 249–287), including the
 twelve owner-waived Codex commits of sections 284–287 reviewed after the
 fact. Section 289 records the completed qualified Codex counter-review of
 that exact record commit and the corrected finite classifier. Claude must
-review section 289 and its committed correction; `ARV2R288-003`'s historical
+review section 290 and the combined section-289 counter-review/correction
+and section-290 observation-only preparation; `ARV2R288-003`'s historical
 inline caller remains unavailable, and a future committed observation seam
 does not itself grant source contact. `ARV2R248-002`, `-003`, `-004` and
 `ARV2D287-001` stay open, the floor **314 / 239 / 50 / 699** stands, and the
@@ -3408,6 +3413,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-12 | Owner-waived fresh prior-close source-quality capture | `ba565501` -> `5f6992ba`, this final section-286 result handoff | No new Claude review; current software-review checkpoint waived, formal evidence gates preserved | One unchanged two-GET October-9 RAW-price capture and one bounded output-only read succeed before prospective October-12 cutoff; seven rows retained privately | 222 distinct strict-denied focused passes; one expected timing-regression failure corrected before use; repeat document checks not additive; no full suite | Timely local-receipt evidence only; immutable history, reviewed identities, scores and stock-first evidence still missing; 314/239/50/699 unchanged | Exactly one matching-lane final push; no capture retry, R284 replay, paid-rights change or formal admission; monitor stays paused |
 | 2026-10-12 | Massive-only accepted-risk continuation and failed fresh-window acquisition | `1d85c47b` -> `db306644`, this final section-287 diagnostic/result handoff | No new Claude review; current checkpoint waived, not independently passed | Sole October 7–11 capture exits 2 without accepted output; original cause discarded; conditional receipt build/read uninvoked; additive future-use static error labels, no retry | Focused strict-denied checks in 287.5–287.6; no full suite or strategy run | Actual contact stage unknown; no timestamp-matching artifact names observed; no retrospective cause or false source admission; 314/239/50/699 unchanged | Exactly one matching-lane final push; separately justified recovery protocol before new contact, no unchanged-request renaming; Massive remains selected and monitor paused |
 | 2026-10-12 | Claude (Windows host) independent review of `c2112b11..b295ce02`: sections 249–283 confirmed, the twelve owner-waived Codex commits of sections 284–287 reviewed after the fact, fourth QC census | `b295ce02` -> this record commit | Review of the seventy-three commits pushed since `c2112b11`: eleven Claude review sections and their Codex counter-reviews confirmed by this host's gates; the twelve tail commits (v4 precheck and readers, the guarded publisher, the C package, R284 A1, the October 9 price receipt, the failed Massive capture and its classifier) reviewed individually (section 288) | Synced the lane clone by fast-forward from a clean tree. Immutability of V16–V19, the cap-90 bridge runtime and the three trust roots re-verified from committed blobs. QC administrative reads (zero looks) confirm the R284 project holds exactly the pinned `main.py` and that its one backtest completed inside the recorded interval; a census of 202 projects and 303 backtests finds no unrecorded Analyst-lane launch and 21 other-lane launches outside this ledger. The five new scripts read in full; the Massive classifier's label inventory does not match the adapter's messages. No production, test or ledger line changed. | Real tree at `b295ce02`: record and active-document gates **86 passed**; final record bytes **86 passed**; `compileall` exit 0; `git diff --check` clean. Guarded LF worktree: classifier tests 42 passed, the other tail test files red or uncollectable (Darwin-only tooling). Complete lane suite at `f0318d6f` (owed from section 248): 1084 failed, 6839 passed, 922 skipped, 735 errors in 2:26:36, host classes; at `b295ce02`: **in progress at push time**: started 10:59 local on 2026-10-12 and at 11% of the 11,659 collected tests when this record was committed, following the owner's section-248 direction not to hold a push for this host's run; its counts are to be recorded in the next round. | 0 P0, 0 P1, 0 P2. `ARV2R288-001` (P3, open for Codex): classifier labels not derived from the adapter (16 unreachable, 93 adapter messages unknown). `ARV2R288-002` (P3, corrected): stale banner range. `ARV2R288-003` (P3): the section-287 inline caller was never committed. `ARV2R288-004`/`-005`/`-006` (P3, documented): host class, other-lane launches in the census, owed suite counts recorded. `ARV2R248-002`/`-003`/`-004` and `ARV2D287-001` stay open. | Codex counter-reviews section 288 and answers `ARV2R288-001` and `-003`; the floor 314/239/50/699 stands; no R247, R281 or R284 attempt, stress successor, paper/live deployment, broker, funded-account, real-order or trading action is authorised. |
+| 2026-10-12 | Codex counter-review of section 288 and offline one-shot diagnostic observation preparation | `ef654b1d` -> `95f56997`, `3900bd19`, final section-290 handoff | Sole Claude record accepted after three P3 qualifications; all 145 literal refusals classified, sixteen formatted labels retained, hostile lookup corrected | Finite observation separated from opaque return; no adapter default, CLI, provider dispatch or operational recovery; actual historical caller unavailable | Classifier 48 and observer 48 pass separately; 113 code/lane-record passes; 11 import-boundary passes; 1018 public sources compile without bytecode; old-source and five memory mutations red; shared document Git checks have three isolation refusals, not a green full-suite claim | No credentials, private corpus, QC, outcomes, look/cell change or other-lane fix; 314/239/50/699 unchanged | One final combined lane push; Claude reviews the exact snapshot; separately justified compatible-host production protocol still required before contact; monitor paused after trigger |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -44925,3 +44931,152 @@ deployment, real orders or trading are accessed by this round. The look floor
 remains **314 shared / 239 development / 50 infrastructure / 699 cells**.
 Exactly one final matching-lane push is retained after the bounded offline
 implementation and its record/validation; no checkpoint push is made.
+
+## 290. Committed one-shot diagnostic observation seam, offline preparation only, 2026-10-12
+
+### 290.1 Bounded implementation contract and definition of done
+
+After committing the accepted-after-correction counter-review at
+`95f56997a9bb57b2951dd09e36a83301cb8cd410`, implement only the reviewable
+future-use observation instrument in `scripts/arv2_massive_capture_diagnostic.py`
+and its synthetic tests. This is the safe offline preparation allowed by
+287.6 and the owner's counter-review/next-step instruction. It is not a new
+source acquisition decision. No `authorized=True` flag, replacement event
+window, production adapter default, credential loader, provider dispatcher,
+file reader/writer, retry, result validator or operational CLI is added.
+Executing or importing the module calls no producer.
+
+Definition of done for this **preparation component**, not the failed
+acquisition: an explicit zero-argument callback is attempted once, its
+exception is represented by one finite code without rendering it, and its
+opaque return is kept separate from the finite observation. Dangerous
+directions must pass synthetic tests and deliberate memory-only mutations.
+The actual per-use production caller, its source/protocol pins, rights,
+window, attempt consumption, parent deadline, output validation and terminal
+handling still require the separately justified committed operational
+contract. No such contract or contact is exercised in this milestone, and
+this seam cannot renew, rename or replay R287-D1.
+
+### 290.2 Implemented behavior and limits
+
+`observe_capture_once(producer)` returns `(CaptureObservation, opaque_return)`.
+Its normal frozen/slotted dataclass has exact boolean/string fields and
+consistent terminal shapes: `not_invoked/invalid_callback`,
+`producer_raised/<finite code>`, or `producer_returned/None`. The five
+serializable observation fields are `capture_invoked`,
+`producer_return_received`, `terminal_state`, `failure_code` and
+`provider_request_count`. The last is always `None`, never an invented zero
+or count inferred from a failure category. Public construction does not
+authenticate an invocation or provide an immutable evidence trust root.
+
+`capture_invoked` means a Python call was attempted, not that a callback's
+body, credential loader or network request ran. A callable with required
+arguments is attempted once, fails with TypeError and yields unknown; a
+noncallable yields a bounded pre-invocation refusal without inspecting its
+attributes or rendering it. BaseException interruptions, diagnostic-helper
+faults and nonexact/unbounded helper returns remain finite non-success
+observations. There is no fallback, second call or retry direction.
+
+A genuine `None`, false, scalar or malformed capture-shaped return is only
+`producer_returned`, not success, authenticated publication or reader
+permission. The opaque object is never inspected, rendered or placed in the
+observation; a downstream caller must not print/serialize the entire tuple.
+This component intentionally does not validate a successful capture or read
+its artifacts. It owns no whole-process deadline, production dispatch gate
+or native host security envelope. The unchanged real adapter still requires
+its POSIX dirfd/no-follow/private-mode implementation; no Windows emulation
+or custody-rule weakening is introduced.
+
+Technical completion: the observation seam and its finite shape checks are
+implemented at `3900bd19f993e2080e7f4c416c05d9463f08d5b4`, with source-only
+dependency checks and behavioral/mutation evidence. This is self-reviewed
+preparation pending Claude's independent review, not production recovery.
+
+In plain language: a future approved capture can retain a short safe reason
+when it fails instead of throwing the useful category away. This helper
+does not fetch data itself, guess what caused the old failure, count unknown
+requests, or label an arbitrary returned object as a good dataset.
+
+### 290.3 Exact source identities, validation and mutation evidence
+
+The four selected worktree sources and committed blobs are LF, with these
+SHA-256 identities; the old section-287 pins remain historical and are not
+rewritten as if this correction had existed before the failed capture.
+
+| Source | SHA-256 |
+|---|---|
+| `scripts/arv2_massive_capture_failure.py` | `737c3a0cd5b33e42eb906a84e817a74037a6c4e55c4d534d390a19947624edc6` |
+| `tests/analyst_revisions_v2/test_massive_capture_failure.py` | `60ecdb21010b8385e1683fa913bc386d6bfdfc5feca3f65c305e7678c978ff1f` |
+| `scripts/arv2_massive_capture_diagnostic.py` | `8c571988252d5f1ee9364f98d6a163d8da22e88023730f829d11eb7cb1a7ba1a` |
+| `tests/analyst_revisions_v2/test_massive_capture_diagnostic.py` | `fcd2f200f88df9e68362ec6c91d03346a6119802b26565bed222474a5dea4417` |
+
+Same-round read-only audits helped identify the false reachability claim,
+historical count qualifications and hostile-string test sensitivity; they
+are not Claude's independent acceptance of the new code. Root reads all new
+and changed source/tests, retains all 42 original classifier tests, and adds
+two hostile-string observer cases before the implementation commit.
+
+| Stage / check | Exact result |
+|---|---|
+| Counter-review correction | 48 classifier passes in 0.98 s; old-source memory replay 5 failed / 43 passed in 1.53 s, detailed in 289.3 |
+| Initial observer selection | 46 passed in 0.56 s; superseded by two additional boundary tests, not additive |
+| Final implementation selection | 48 observer passes in 0.58 s; no failures/skips/warnings |
+| Final code plus lane-record selection | 113 distinct passes in 1.95 s: 48 classifier, 48 observer, 17 lane-record checks; no failures/skips/warnings |
+| Import-boundary selection | 11 passed in 70.52 s; no failures/skips/warnings, standard Python audit isolation; no production module change |
+| Standard scope plus both Analyst research packages | 1,018 public Python sources statically compile with no bytecode writes; no runtime execution or private artifact traversal |
+| Observer reverse mutations, selected tests | Disable category: 7 failed / 1 passed / 38 deselected in 0.85 s; discard opaque return: 5 failed / 1 passed / 40 deselected in 0.76 s; omit invocation: 7 failed / 39 deselected in 0.85 s. These selections preceded the two new cases. |
+| Two final exact-string guard mutations | Remove terminal exact-type guard: 1 failed / 47 deselected in 0.83 s; remove classification exact-type guard: 1 failed / 47 deselected in 0.55 s. |
+
+Every mutation runs only in an isolated in-memory module; published and
+worktree source bytes are never broken/reverted. The same 289.3 network,
+child-process, private-artifact and dispatch-fence refusal setup is retained.
+The shared active-document Git checks' three isolation failures remain
+documented and unchanged. No full Codex suite, real capture, private-output
+reader, current QC administrative query or economic result is run.
+
+The first final combined code/document run returned **178 passed / 4 failed
+in 11.56 s**: the three stated isolation failures plus an accidental blank
+before the new push row, which broke the lane's contiguous-table gate. Root
+removes that blank only, retaining the valid gate and all prior rows; this
+document-authoring error is disclosed rather than claimed as a new code
+defect or an intended mutation. The final combined selection returns
+**179 passed / 3 failed in 3.89 s**, with only the shared Git-subprocess
+isolation refusals, no skips or warnings. Together with the unchanged code's
+11 distinct import-boundary passes, this round covers **190 distinct passes
+and 3 isolation failures**, not a green complete lane/repository suite.
+
+### 290.4 Exact round, retained gates and handoff
+
+| Commit | Role / scope |
+|---|---|
+| `ef654b1dc7432c003abd5a818ac67514d8ef4bff` | sole Claude review record received and accepted after the section-289 qualifications |
+| `95f56997a9bb57b2951dd09e36a83301cb8cd410` | Codex counter-review, classifier literal coverage/hostile-lookup correction, tests and section 289 |
+| `3900bd19f993e2080e7f4c416c05d9463f08d5b4` | Codex offline one-call observer and its 48-case synthetic test file |
+| Final section-290 handoff commit | exact identities, stage/cumulative validation, next gate and the one combined push row |
+
+`ARV2R288-001`'s confirmed literal gap and new hostile-lookup finding are
+corrected; its alleged sixteen invented messages are withdrawn by the
+source evidence. `ARV2R288-003` is only prospectively addressed at the
+observation-instrument level: the old inline caller remains unavailable and
+the complete future production entry point/protocol is still unimplemented.
+`ARV2D287-001` cannot be repaired retrospectively. All carried in-lane and
+out-of-lane issues retain their stated limits; no other lane is fixed.
+
+The next step is Claude's independent review of this exact combined pushed
+snapshot, then a justified committed prospective provider-diagnostic contract
+on a compatible host before any new contact. Do not repeat the answered
+Massive-source choice, demand a replacement vendor for the accepted-risk
+path, or treat software acceptance as pristine PIT/source/security admission.
+Preserve section 255.2's delegated research/QC decisions, but do not convert
+them into renewal of spent source protocols. Authenticated current holdings,
+caps, security identities, scores and a separately versioned October input
+extension still precede a current portfolio/performance run.
+
+All five frozen section-287 sources, five frozen QC runtime blobs and three
+formal zero-access trust roots remain unchanged. The floor is still
+**314 shared / 239 development / 50 infrastructure / 699 cells**. This round
+accesses no credentials, licensed rows, returns/outcomes, QC/API, broker,
+operator database, deployment, paper/live operation or real order. The review
+monitor remains paused after its authenticated trigger; no new monitor,
+recurring source capture or automatic rearming follows. Exactly one final
+matching-lane push publishes the completed three-commit Codex round.

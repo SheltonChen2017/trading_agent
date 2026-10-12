@@ -1,18 +1,19 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Current follow-up (section81): the owner waived this diagnosis round's review
-checkpoint only. Genuine built-in Mia diagnosis002 completed; root qualified
-its path-compatible `.json.gz` cause and rejected attempt-reset/early-stop
-overclaims. Baseline002/post002 verify all eleven cloud files unchanged.
-No patch or new backtest was authorized/performed; F017/F018/F012 stay open,
-OFF3/ON0/look19 persist, and no2021-now comparison/performance is accepted.
-Next required owner decision: a separately scoped genuine Mia repair/recovery,
-not another Codex OFF attempt. The heartbeat remains paused. This local-only
-append does not republish/replace the earlier61a81d9a review target.
+Current follow-up (section82): owner00501bc2… explicitly authorizes genuine
+built-in Mia scoped audit-key repair/recovery, preserving the frozen strategy.
+The review checkpoint is skipped for this continued round only, not accepted
+by Claude. Fresh baseline003 is unchanged; corrected helper/main-import writes
+are approved under Repair001, actual all-file capture/native verification still
+pending. No fourth Codex OFF attempt/reset, ON launch, new outcome or accepted
+2021-now comparison/performance. OFF3/ON0/look19 and open F017/F018/F012 remain
+until factual new evidence. Read-only support is focused-tested and accepted
+after correction internally, not strategy/native acceptance. One final push
+only after a stable complete/blocked handoff; monitor remains paused.
 
 The following Status block records published61a81d9a/section80's historical
 handoff; its Mac-lock/owner-unlock routing is superseded for this follow-up
-by the current note and section81, not claimed as current interface state.
+ by the current note and sections81/82, not claimed as current interface state.
 
 Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN
 `f998144d..2726b5ba` IN SECTION 80 AND THE CUMULATIVE TREE. DISPOSITION:
@@ -18139,3 +18140,318 @@ record-only commit hash will be reported in chat (it cannot be embedded in
 its own contents). No remote publication will occur in this diagnosis
 follow-up. A future push/source repair/Mia execution needs its governing
 authority and fresh bounded receipts; no automatic continuation is launched.
+
+## 82. Owner-authorized genuine Mia audit-key repair and recovery - 2026-10-11
+
+### 82.1 New authority, unchanged strategy and source custody
+
+The owner answered exactly `yes authorzied` to:
+
+> Authorize Mia to apply the scoped audit-key repair and run recovery, preserving the frozen strategy?
+
+Answer14UTF-8bytes/SHA256
+`00501bc212073a9876149458a1be60d9326c6838f43d55af72ebeb40827b4984`;
+question100bytes/SHA256
+`761ed71496a1e6c5c4f2c302b67acca0adb6ffe8a2c6b7c0d6dfe32a1cd8e38d`.
+This explicitly expands81's no-edit/no-launch diagnosis restriction for the
+scoped **genuine QuantConnect built-in Mia** repair/recovery only. Codex may
+perform necessary bounded source/result collection, independent verification,
+focused validation and verified lane-owned port after the genuine recovery;
+it may not make a fourth OFF Codex launch, reset an attempt, change economics,
+launch ON through unverified source, or substitute a generic API agent for Mia.
+The owner's skipped review checkpoint applies to this current continued round;
+it is not Claude acceptance, a native correctness claim, a future blanket waiver
+or canonical/trading authority. No Claude task/monitor is cancelled by inference.
+The existing heartbeat remains paused; no automatic rearm is authorized here.
+
+Starting local clean snapshot`b28d07f6139dc0460e927b152fb4a87f6f2915e9` includes
+the local-only81diagnosis handoff. Actual remote remains
+`61a81d9a6a93c1a548a903414f767178b9b1ac65`; no incoming commits exist and no
+fetch/counter-review is fabricated. Every top-level repository check/edit/test/
+commit/push remains in the designated physical/Git root on the one lane branch.
+Unexpected matching-remote advance stops the round for deliberate scope
+reestablishment, not silent merge/overwrite. Shared/sibling/user work is preserved.
+The original3OFF attempts,0ON attempts and19observed looks remain permanent.
+The old81no-second-publication decision described that read-only follow-up;
+the new authorized bounded recovery uses the owner's standing one-final-push
+lane workflow, not an intermediate checkpoint push. No push occurs before a
+stable completed or genuinely blocked handoff and actual remote verification.
+
+Frozen study/economics remain90bdec…/calendar3eccdf…:2021-01-04–2026-10-09,
+warmup2020-09-01,1449valuations/301decisions, standalone cap-selected STOCKS,
+top10/fixed60slots, SPY-proxy/XLV/XLE/QQQ-Nasdaq100/SOXX/REMX-US-covered subset,
+AR wholly disabled, OFF tilt0, ON20% tied-midrank transfer, no promotion/
+renormalization/ETFfallback/QCOM exclusion; dates/capital/cost/slippage/
+timing/cash/volume/corporate-action rules, input/source/PIT limitations and all
+historical negative evidence are unchanged. This request does not change any
+signal, source, eligibility or missing-data policy, consume the sealed holdout,
+renew D0/old captures/remaining71upload scopes, buy/upgrade, expose secrets/
+licensed rows or permit operator/broker/paper/live actions. CanonicalTR0-I,
+TPR-1/TPR-0B and Windows custody gates remain distinct and unchanged.
+
+`TPR-EXT26-D075` — direct owner repair/recovery authority, not approval of a
+particular implementation or return. Choose a **two-phase Mia workflow**:
+first a bounded cloud repair with no manual compile/run; retrieve ALL cloud
+files and independently verify/freeze the exact successor source; only then
+submit a separately registered Mia-only compile/recovery operation/look.
+This lets the true changed bytes be registered before new results instead of
+claiming an unknown future source hash. No intermediate Claude checkpoint is
+inserted. Alternative blind full-auto repair+launch, direct Codex API launch,
+attempt3 refund, audit removal, parameter/date/portfolio changes are rejected.
+
+`TPR-EXT26-D076` — smallest prospective named successor, agent-delegated,
+pending factual/native verification: Mia may add only `audit_key_recovery.py`
+and change main.py's audit-class import to it. Preserve executed
+`extended_compressed_store.py`d661b575… and every other cloud file. The successor
+inherits unchanged gzip/bytes/hashes/bounds/index/economic logic and overrides
+only physical-key admission/mapping/existence/sidecar handling necessary for
+single-extension writes. Use closed injective chunk/index names ending
+`_json.gz`, distinct`storage_json.gz`; logical `.json` keys/index/raw hashes
+remain unchanged. Validate FULL new write keys/prefix/slash bound before
+native queries/writes; refuse an inadmissible dotted job prefix, never sanitize
+identity. Preserve strict bool, logical/new/legacy collision refusals and
+sidecar all-target preflight/recheck, readback/closure and partial failures.
+Native legacy read/existence keys are not falsely subjected to SaveBytes' new-
+write regex; native reads have different admission semantics. No core/runtime/
+input/config/scorer/fees/order/clock edits are permitted. Future findings beyond
+this patch need explicit prospective scope, not outcome-selected tuning.
+
+`TPR-EXT26-D077` — fresh read-only result/inspection support is necessary:
+existing Codex status/order/result producers bind old reservations/jobs and
+cannot be relabeled as new Mia provenance. A named lane-owned read-only
+successor may inspect the exact fresh post source receipt/archive/diff and
+collect only a separately bound own Mia job's terminal/log/charts/orders.
+No reserve/compile/upload/backtest-create/delete/live route; no actual operator
+state/database. Its code/tests must be committed and root-reviewed before
+production invocation; original nine-file source-capture closure stays frozen.
+All cloud edits, hashes, permissions, GUI declaration versus API binding,
+native/partial/null/failure evidence stay explicit. An internal advisory peer
+is not independent Claude review or provider/source attestation.
+
+### 82.2 Fresh baseline003 and UI availability006 before effects
+
+Before API/private effect register
+`TPR-EXT26-MIA-SOURCE-BASELINE-20261012-003`, created05:50:18Z/expiry06:35:18Z,
+HEADb28d07f6/owner00501bc2…/same unchanged collector62c7c649… and committed
+nine-file import closure. Exact canonical plan2047bytes/SHA256
+`b0101a522230634b85bf54936152f755e3d48f49a089d300caabc7621b1708e7`.
+Two own37650980files/read requests,4MiB each/8MiBtotal,16files/1MiB each,
+120seconds aggregate/40seconds per request; fresh exclusive global/access/
+request claims and shared lock before credentials. No retry, old body/capture/
+Object Store/provider/outcome operation. Baseline must equal all original ten
+completion-bundle Python modules and stable full inventory; actual descriptors
+will follow. Prepare-plan read committed public source only; no effect yet.
+
+Cooperative UI availability006 (`TPR-EXT26-MIA-AVAILABILITY-20261012-006`),
+05:50:18Z–06:20:18Z: inspect only the already-bound exact37650980Safari/Mia
+surface, at most10AX observations/four screenshots and two own-project
+navigation/mode/new-chat actions needed to reach its genuine built-in pane.
+No unrelated tab/project/account, credential/login change, edit/approval/task,
+manual build/compile/run or purchase. Existing IDE auto-build on normal view
+may be observed and recorded, not a manually requested recovery compile/look.
+Stop on Mac lock, mismatch, unexpected effect or expiry; no old scope renewal.
+The separately registered repair prompt will govern task/edit approvals only
+after fresh access/source verification. No repair task or recovery launch has
+occurred as of this preregistration.
+
+Baseline003 actually completed05:54:16.375250Z, two HTTP200 own-source reads,
+225681bytes each/451362total. Full stable11-file inventory and all ten original
+Python modules equal the frozen completion bundle; no missing/changed/unexpected
+source. Two private archives224315bytes each: read1f6159189…;
+read2`c24f20eb9733bc9f4d3dea79b86223857d4c2e99d232955066fe9939baed1af3`.
+Request payload fixes37650980; native response omits a matching project field,
+so returned-project/compiled-job binding is not proved. Scope spent;0looks/
+attempts/edits/inputs/uploads. Receipt metadata is reconstructed canonically
+from the returned public receipt for next bounded producer FD/hash verification,
+not falsely described as a separately observed private-file hash.
+
+Availability006 observed an authenticated, controllable native Safari own37650980
+project/genuine Mia, old diagnosis task completed, old auto-build only, source
+read-only. Opening one fresh chat reset its mode to Full Auto by product default;
+no task/send/edit/compile/run happened. Repair scope below includes switching
+that fresh chat back to Ask Before Edits; Full Auto is not permission to act.
+
+### 82.3 Prospective Mia repair-only001
+
+Register`TPR-EXT26-MIA-REPAIR-20261012-001`,06:01:00Z–06:31:00Z,
+owner00501bc2…/HEADb28d07f6/baseline003/all frozen hashes above. Exact prompt
+3868UTF-8bytes/SHA256
+`ac3aa03e7aef92ef2e0cc5f12d0a627c58d82db7a2fcfe60b9883960de71eb5e`.
+One send on genuine own-project Mia, <=24own-project tool calls with <=16source
+reads/1MiB per file/8MiB total, <=2approved source-write calls (add the named
+successor and exact main import substitution); no deletion/other-file edit,
+manual build/compile/backtest/live, notebook/shell, web search/provider/private
+input/Object Store/upload/credential/purchase/access change. Switch to Ask
+Before Edits with <=3mode-control clicks; inspect/approve only those matching
+two source edits, <=24AX/eight screenshot observations and <=4pane scrolls
+within this window. Stop on mismatch/lock/expiry/insufficient scope. Cooperative
+Mia tool budgets are requested constraints, not enforced platform permissions.
+All unexpected effects/refusals/extra tool requests must be retained.
+
+Prompt fixes the D076closed injective single-extension mapping, full new-write
+regex/slash/prefix admission, logical/legacy/new orphan collision refusals,
+strict bool/readback/bounded gzip/raw hash/index/sidecar/partial-error behavior,
+original writer immutability and frozen business rules. All-target sidecar
+preflight precedes first write; legacy read/existence semantics are not weakened
+or confused with new-write admission. No early-frontier/clock inference or
+economics correction is authorized. Task stops after source repair, returns
+complete change/source/tool census; separate all-file source capture/independent
+QA/freeze precedes any prospective Mia recovery operation/look. Codex remains
+3consumed, ON0, observed looks19 until a real separately reserved launch.
+
+Repair001 was sent once before06:02:08Z; genuine task`source audit key
+successor` entered Running and then Pending Input, with no approved writes.
+One AX composer click instead focused the read-only source editor; paste was
+refused visibly before effect. Root used a fresh screenshot/coordinate composer
+and verified actual text before Send; no source mutation resulted. Native UI
+observations later took47.09/95.10/47.83seconds despite requested15second tool
+timeouts; these are UI latency, not tests/jobs/market looks.
+
+Root discovered a serialization defect: intended registered3868byte prompt
+ac3aa03e… was not the exact transmitted text. JavaScript string escaping lost
+five regex backslashes; actual3863bytes/SHA256
+`1d190678d4478c2d7ffd4d3efba4c76ac85fd28414c6ee99ab2bcc44c73e6f1b`.
+The actual malformed predicate is NOT accepted as the native rule. Mia's
+proposed plan currently mirrors it; no write approval is given over that error.
+Before any further message register one clarification within the SAME Repair001
+window/tool/write budgets (no scope reset),634bytes/SHA256
+`a80943850a04abd1d78d3b308404d097e6eb60f372ffd465ed446d60ee880b49`:
+correct Python fullmatch of the native literal-dot/backslash/escaped-hyphen
+class and <=100slashes, preserving native legacy orphan queries; require
+corrected proposed diffs before edits. No manual compile/run or additional
+write is approved. The actual text will use a raw-string composer value to
+preserve every backslash and be verified before Send.
+
+Mia disclosed its create_file/edit_file tools automatically compile/syntax-check
+as part of each source write. The prospective repair scope anticipated IDE
+automatic checks but NOT manual candidate compile/recovery launch. Root may
+accept those unavoidable edit-tool checks only after exact corrected source
+scope approval and must retain returned compile/failure details; no test/native
+storage/backtest acceptance follows. Observed project source reads/searches
+and one read-open-project are within the bounded task; stated tool census is
+attributed until final observable results. No source repair/market look yet.
+
+Clarification was sent as exact634byte raw string, verified in composer; Mia's
+later rendered user text still showed escaped/HTML-entity transformation.
+It generated two **pending Allow/Deny** source proposals; Completed task label
+does NOT mean either edit occurred. Root has not approved either. The main
+proposal is exactly the required two-line import split. Helper proposal keeps
+all business methods inherited but `dict(binding)` before base initialization
+would weaken base exact-dict refusal; prospective `MIA82-F001`P2 is confirmed
+from code semantics (pairs/mapping coercion), no production defect claim.
+
+Before further effect register pre-approval clarification857bytes/SHA256
+`401b8382a99ba77ceb4aba344efab8f5b22d67b3e41fb2a3699f8307e3d37ba5`,
+same Repair001window/aggregate24tools/2approved writes (no reset): deny these
+two unexecuted proposals and require direct base(binding), not dict coercion;
+regenerate corrected proposals. Use escape-free literal-dot/hyphen-last ASCII
+predicate on the closed generated backslash-free write vocabulary, not a claim
+of universal native-path equivalence. Explicit dotted-job refusal/full-key/
+slash bound, legacy query semantics and every prior refusal remain. This
+differs from native class only outside admissible generated binding components;
+root must prove vocabulary/negative controls before a separately frozen run.
+No manual compile/run/market look or other-source change is authorized.
+
+Both unexecuted proposals were explicitly Denied; Mia reported no source
+effect and asked for guidance (attributed until all-file capture). Root sent
+the exact857byte correction, verified in composer, not a new write grant.
+Fresh UI observation-only scope`TPR-EXT26-MIA-REPAIR-UI-20261012-002`,
+06:14:00Z–06:31:00Z, same exact own37650980Safari/Mia surface: <=24AX/eight
+screenshots/six pane-scroll actions, inspect then approve ONLY corrected named
+helper/main-import proposals under existing Repair001 aggregate2actualwrites/
+24tools. This explicitly grants fresh bounded observations after earlier
+four-scroll allowance was spent; it does not renew task expiry, source-write
+count, candidate attempts, resource scope or old access receipts. No other
+project/editor/access/manual compile/run action. Stop on mismatch/expiry.
+
+The corrected textual proposals now pass direct binding to the immutable base,
+use literal-dot/hyphen-last generated-vocabulary predicate, retain only1024chunk
+and index logical mapping (storage remains internal sidecar only), explicit
+dotless-job refusal, complete3078-position logical/legacy/new collision sweep,
+strict bool and final sidecar orphan recheck/readback/closure. Base save/read/
+_index/storage_declaration and economic modules inherit unchanged. Root accepts
+this **prospective source scope after correction**, not native/economic result
+acceptance; MIA82-F001 is corrected in the proposal, actual bytes pending.
+Some helper docstrings still call a native-query collision sweep "pure" or the
+narrow predicate "verbatim"; those descriptions are not relied upon. Native
+ContainsKey/SaveBytes/CLR/quota/runtime behavior is not yet empirically proved.
+
+Before send/Allow register approval492bytes/SHA256
+`f02f03e6bc1ad3dc9e106163786e0d911e40bd223a6294f3c266c14a12eb504d`,
+same Repair00106:01–06:31window and total2successful source writes/24tools.
+Approve ONLY the two corrected displayed proposals, acknowledge unavoidable
+edit-tool automatic syntax checks, prohibit manual compile/backtest/run,
+retries/extra edits and require exact write/compile/source census then stop.
+The prior two refused requests remain in history; they are not successful
+source writes, launches or allowance refunds. Root's current approval is
+delegated under owner00501bc2…, not human/Claude acceptance of the code/result.
+
+### 82.4 Named read-only support, root/peer verification before production
+
+Add only`extended_mia_result_capture.py`41433bytes/597lines/SHA256
+`10a9c42c92c31e0effb68afee1943ab1b5a42bcf2081ad47b2c93ac2eb8bca99`
+and its own synthetic test28257bytes/480lines/SHA256
+`68ccfa28df072f280548c7e32745197b07fc0022b46ca2103d5734680b937c84`.
+Root read the complete code/tests and compilation/import closure; existing
+nine-file source capture closure, executed writer, completion bundle/freeze/
+calendar and all candidate/inputs remain byte-identical. No direct Codex
+source change, provider/private/controller production effect or launch by this
+helper's development. It has no write/upload/compile/backtest-create/delete/
+live endpoint. Commit before any production invocation.
+
+Source-inspect uses exactly three freshly described post receipt/archive/
+complete-diff bodies, <=32MiB/30seconds, no transport or source execution:
+verify all12files including unchanged notebook/original ten modules except
+exact main import split and added named repair; closed bounded disclosure AST
+and real repaired-class/export binding. It admits ordinary physical-only
+helper names/constants/base aliases, not arbitrary imports/economic hooks.
+This filter is not proof of no covert secret, native correctness or economics.
+Root must independently inspect actual admitted code before use.
+Native status/collection requires exact own-project **new** Mia job/compile,
+fresh actor/source/look20/private externally written GUI ledger/receipt hashes,
+UTC/HEAD/import identity, exclusive FD/no-follow/access/request claims and
+shared controller lock before bodies/credentials. GUI declaration is not
+authenticated compiled-source proof; request binding is separately reported.
+Only fixed read/log/chart/order endpoints;64MiB aggregate,30seconds perrequest/
+600seconds aggregate,2MiB terminal/charts/1MiB logs/orders, <=128pages of99orders.
+Every request reserves full response allowance plus oversize-detection byte
+BEFORE effect; no retry/old receipt renewal or actual stop/database access.
+Terminal/missing/loading/partial failures persist; accepted metrics/full-journal
+replay/strategy/canonical gates remain false regardless of Completed capture.
+
+Internal review ledger, not independent Claude/human approval:
+
+| Finding | Status/disposition | Evidence/correction |
+| --- | --- | --- |
+| MIA82-S001 P2: OFF1 could be relabeled new Mia | Confirmed, corrected | Refuse all three original OFF IDs independently; focused red before fix and reverse mutant fails. |
+| MIA82-S002 P2: aggregate read budget checked only after transport | Confirmed, corrected | Reserve endpoint bound+1 before request claim/transport; synthetic nonzero frontier refuses with no next effect; red/reverse-mutant evidence. |
+| MIA82-S003 P2: unrelated top constants transiently manufactured export | Confirmed transient development defect, corrected | Only repaired class or exact CompressedAuditStore=AuditKeyRecoveryStore alias supplies export; constants-present no-alias negative kills unsafe ANYAssign mutant. |
+| MIA82-S004 P2: overly narrow AST prevented ordinary physical helper source | Confirmed, corrected | Future annotations, bounded literal/regex constants, aliases/static physical mapping/sweep helpers accepted with realistic disclosure fixture and injection negatives; no economic acceptance. |
+
+Author's first fixture run1failed/37passed exposed exact int-vs-JsonNumber
+metadata comparison, corrected canonical comparison. Intermediate38/62/64/76
+greens and restored safe in-memory mutants remain attributed development,
+not independent root evidence; one orchestration IndentationError made no test/
+production effect. Author reproduced two peer-identified guard defects2failed/2passed before
+correction; no real private/API/UI effect. Final author80passed/1.04s; final
+internal peer independently reproduced8focusedcases/0.47s, checked exact final
+hashes and all three guards, disposition accepted-after-correction with no
+open material finding in these two files. Neither peer replaces Claude.
+
+Root independently reproduced80focusedcases/1.03s, then bounded union
+**389passed,1skipped/6.29s**: new support+existing source capture, Target active
+record/import-firewall/runtime-stop leak guard and exactly two active-document
+nodes. In-process49/52 isolated runtime BEFORE dispatch/config imports,
+PYTHONDONTWRITEBYTECODE=1/no cache; no actual operator stop/database, full lane/
+repository suite, provider/private effects or Windows signer/ACL/protected-
+parent custody proof. Historical Windows skip/14preregistration limitations
+remain. In-memory compilation of both new files and diff whitespace pass.
+Root source-scope approval and synthetic support tests are NOT successful
+Mia source capture, native SaveBytes/CLR proof or usable backtest/accounting.
+
+The helper/Mia candidate are deliberately separate; no locally invented source
+is substituted for genuine Mia or old job provenance. Every actual cloud edit
+will be FD/hash compared with baseline003 before a separately frozen recovery
+look; only verified lane-owned changes may be ported after genuine recovery.
+One local support/preregistration commit may precede that operation, with no
+checkpoint push; final accumulated publication remains exactly once.

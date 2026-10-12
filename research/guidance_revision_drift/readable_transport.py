@@ -26,8 +26,11 @@ from research.guidance_revision_drift.native_observation import (
 
 
 SCHEMA = "gdr.synthetic.readable-evidence.v1"
+COMPACT_SCHEMA = "gdr.synthetic.readable-evidence.v2"
 PROVENANCE = "digest-reconciled local reconstruction"
 MAX_LOG_BYTES, MAX_MESSAGES, MAX_LINE_BYTES = 100_000, 1024, 200
+PLATFORM_OVERHEAD_BYTES_PER_MESSAGE = 40
+PLATFORM_FIXED_LOG_RESERVE_BYTES = 2_000
 MAX_METADATA_BYTES = 65_536
 _TRACE_KEYS = {"schema", "genesis", "genesis_sha256", "records", "count",
                "head_sha256", "native_runtime_verified", "cloud_completed"}
@@ -129,6 +132,17 @@ def _lines(value):
             raise ReadableTransportError("readable messages must be ASCII") from exc
         _object(raw, MAX_LINE_BYTES)
     return value
+
+
+def _compact_lines(value):
+    """Reserve assumed platform overhead, not verified accounting or quota."""
+    lines = _lines(value)
+    estimated = (sum(len(raw) + 1 for raw in lines)
+                 + PLATFORM_OVERHEAD_BYTES_PER_MESSAGE * len(lines)
+                 + PLATFORM_FIXED_LOG_RESERVE_BYTES)
+    if estimated > MAX_LOG_BYTES:
+        raise ReadableTransportError("assumed platform-readable log byte budget exhausted")
+    return lines
 
 
 def _context(value):
@@ -266,6 +280,53 @@ def export_readable_evidence(trace, *, runtime_context, metadata):
     return _lines(tuple(result))
 
 
+def export_compact_readable_evidence(trace, *, runtime_context, metadata):
+    """V2 pairs two full record hashes; no digest or observed value is omitted."""
+    body, context = _trace(trace), _context(runtime_context)
+    try:
+        extra = validate_native_metadata(_object(_raw(metadata, MAX_METADATA_BYTES), MAX_METADATA_BYTES), body)
+    except (ObservationError, KeyError, TypeError, ValueError) as exc:
+        raise ReadableTransportError("native metadata differs from transcript") from exc
+    if extra["status"] == "complete" and (body["count"] != 752 or body["genesis"]["mode"] != "base"):
+        raise ReadableTransportError("complete fixed synthetic trace requires all base records")
+    result = [_line({"schema": COMPACT_SCHEMA, "status": extra["status"], "record_count": body["count"],
+                     "head_sha256": body["head_sha256"]}),
+              _line({"mode": body["genesis"]["mode"], "genesis_sha256": body["genesis_sha256"]})]
+    result.extend(_line({"context": key, "sha256": context[key]}) for key in sorted(context))
+    valuations, index = iter(extra["valuation_rows"]), 0
+    while index < body["count"]:
+        row = body["records"][index]
+        digest = hash_bytes(_raw(row, MAX_TRACE_RECORD_BYTES))
+        if row["kind"] == "account_checkpoint":
+            if index + 1 >= body["count"] or body["records"][index + 1]["kind"] != "frame":
+                if extra["status"] != "failed":
+                    raise ReadableTransportError("compact checkpoint requires its immediately following frame")
+                # V1 retained such a failed forensic prefix even though the
+                # fixed bridge replay refuses an incomplete step. Retain its
+                # digest/value, not fabricated frame or completion evidence.
+                result.append(_line({"record": index, "sha256": digest, "valuation": next(valuations)}))
+                index += 1
+                continue
+            following = body["records"][index + 1]
+            result.append(_line({"pair": [index, digest, hash_bytes(_raw(following, MAX_TRACE_RECORD_BYTES))],
+                                 "value": next(valuations)}))
+            index += 2
+        else:
+            if row["kind"] not in _EVENT_KINDS and extra["status"] != "failed":
+                raise ReadableTransportError("compact frame cannot omit its preceding checkpoint")
+            result.append(_line({"record": index, "sha256": digest}))
+            index += 1
+    for row in body["records"]:
+        if row["kind"] in _EVENT_KINDS:
+            result.extend(_line({"event": row["sequence"], "kind": row["kind"], "path": path, "value": value})
+                          for path, value in _fields(row["payload"]))
+    result.extend(_line({"metadata": path, "value": value}) for path, value in _fields(
+        {key: value for key, value in extra.items() if key != "valuation_rows"}))
+    result.append(_line({"end": COMPACT_SCHEMA, "line_count": len(result),
+                         "sha256": hash_payload([hash_bytes(raw) for raw in result])}))
+    return _compact_lines(tuple(result))
+
+
 def _instant(value):
     if type(value) is not str or len(value) > 128:
         raise ReadableTransportError("exact bounded UTC event clock required")
@@ -332,7 +393,7 @@ def _rebuild(mode, commitments, events, *, complete):
     return bridge.protocol_trace(), valuations
 
 
-def reconstruct_readable_evidence(lines, *, expected_sha256, expected_runtime_context):
+def _reconstruct_v1_evidence(lines, *, expected_sha256, expected_runtime_context):
     """Reconcile commitments, not recover an independently observed raw trace.
 
     The offline dossier must additionally run unchanged TraceEvidence/replay
@@ -413,13 +474,81 @@ def reconstruct_readable_evidence(lines, *, expected_sha256, expected_runtime_co
         "empirical_backtest_ready": False, "qc_upload_allowed": False, "qc_launch_allowed": False}
 
 
+def _reconstruct_compact_evidence(lines, *, expected_sha256, expected_runtime_context):
+    lines = _compact_lines(lines)
+    if readable_evidence_anchor(lines) != _digest(expected_sha256):
+        raise ReadableTransportError("readable messages differ from retained anchor")
+    rows = [_object(raw, MAX_LINE_BYTES) for raw in lines]
+    header, end = rows[0], rows[-1]
+    if (set(header) != {"schema", "status", "record_count", "head_sha256"}
+            or header["schema"] != COMPACT_SCHEMA
+            or type(header["record_count"]) is not int
+            or not 0 <= header["record_count"] <= MAX_TRACE_RECORDS
+            or set(end) != {"end", "line_count", "sha256"} or end["end"] != COMPACT_SCHEMA
+            or type(end["line_count"]) is not int or end["line_count"] != len(lines) - 1
+            or end["sha256"] != hash_payload([hash_bytes(raw) for raw in lines[:-1]])):
+        raise ReadableTransportError("exact complete compact readable envelope required")
+    count, commitments, cursor = header["record_count"], [], 6
+    while len(commitments) < count:
+        if cursor >= len(rows) - 1:
+            raise ReadableTransportError("incomplete compact commitments")
+        row, index = rows[cursor], len(commitments)
+        if set(row) == {"pair", "value"}:
+            pair = row["pair"]
+            if (type(pair) is not list or len(pair) != 3
+                    or type(pair[0]) is not int or pair[0] != index or index + 1 >= count):
+                raise ReadableTransportError("exact contiguous checkpoint/frame pair required")
+            commitments.extend(({"record": index, "sha256": _digest(pair[1]), "valuation": row["value"]},
+                                {"record": index + 1, "sha256": _digest(pair[2])}))
+        elif (set(row) in ({"record", "sha256"}, {"record", "sha256", "valuation"})
+              and type(row["record"]) is int and row["record"] == index
+              and ("valuation" not in row or header["status"] == "failed")):
+            commitments.append(dict(row, sha256=_digest(row["sha256"])))
+        else:
+            raise ReadableTransportError("unknown, missing or mixed-version compact commitment")
+        cursor += 1
+    expanded = [dict(header, schema=SCHEMA), *rows[1:6], *commitments, *rows[cursor:-1]]
+    expanded_lines = tuple(_line(row) for row in expanded)
+    expanded_lines += (_line({"end": SCHEMA, "line_count": len(expanded_lines),
+        "sha256": hash_payload([hash_bytes(raw) for raw in expanded_lines])}),)
+    recovered = _reconstruct_v1_evidence(expanded_lines,
+        expected_sha256=readable_evidence_anchor(expanded_lines), expected_runtime_context=expected_runtime_context)
+    if export_compact_readable_evidence(recovered["trace"], runtime_context=recovered["runtime_context"],
+                                       metadata=recovered["metadata"]) != lines:
+        raise ReadableTransportError("noncanonical, missing or reordered compact readable rows")
+    return {**recovered, "schema": "gdr.synthetic.readable-reconstructed.v2",
+            "raw_fragment_sha256": expected_sha256, "raw_fragment_hashes": [hash_bytes(raw) for raw in lines]}
+
+
+def reconstruct_readable_evidence(lines, *, expected_sha256, expected_runtime_context):
+    """Dispatch only explicit v1/v2; both reconcile every original full record."""
+    lines = _lines(lines)
+    schema = _object(lines[0], MAX_LINE_BYTES).get("schema")
+    if schema == SCHEMA:
+        return _reconstruct_v1_evidence(lines, expected_sha256=expected_sha256,
+                                        expected_runtime_context=expected_runtime_context)
+    if schema == COMPACT_SCHEMA:
+        return _reconstruct_compact_evidence(lines, expected_sha256=expected_sha256,
+                                            expected_runtime_context=expected_runtime_context)
+    raise ReadableTransportError("explicit known readable evidence schema required")
+
+
 def readable_transport_manifest(lines):
     """Exact ordered output identities and budgets; never a quota grant."""
     lines = _lines(lines)
-    return {"schema": "gdr.synthetic.readable-log-manifest.v1", "line_count": len(lines),
+    result = {"schema": "gdr.synthetic.readable-log-manifest.v1", "line_count": len(lines),
         "log_bytes_including_lf": sum(len(raw) + 1 for raw in lines),
         "line_hashes": [hash_bytes(raw) for raw in lines], "sha256": readable_evidence_anchor(lines),
         "max_line_bytes": max(map(len, lines)), "route": "log", "quota_verified": False,
         "evidence_provenance": PROVENANCE, "raw_transcript_transported": False,
         "external_provenance_verified": False, "native_runtime_verified": False, "cloud_completed": False,
         "empirical_backtest_ready": False, "qc_upload_allowed": False, "qc_launch_allowed": False}
+    if _object(lines[0], MAX_LINE_BYTES).get("schema") == COMPACT_SCHEMA:
+        _compact_lines(lines)
+        result.update({"schema": "gdr.synthetic.readable-log-manifest.v2", "evidence_schema": COMPACT_SCHEMA,
+            "assumed_platform_overhead_bytes_per_message": PLATFORM_OVERHEAD_BYTES_PER_MESSAGE,
+            "assumed_platform_fixed_log_reserve_bytes": PLATFORM_FIXED_LOG_RESERVE_BYTES,
+            "estimated_platform_log_bytes": result["log_bytes_including_lf"]
+                + PLATFORM_OVERHEAD_BYTES_PER_MESSAGE * len(lines) + PLATFORM_FIXED_LOG_RESERVE_BYTES,
+            "platform_overhead_verified": False})
+    return result

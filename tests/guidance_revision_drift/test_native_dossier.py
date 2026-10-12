@@ -3,6 +3,7 @@ from copy import deepcopy
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
+import json
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace as NS
 import unittest
@@ -23,7 +24,8 @@ from research.guidance_revision_drift.qc_project import (
     build_recovery_qc_project, verify_recovery_qc_project,
 )
 from research.guidance_revision_drift.readable_transport import (
-    export_readable_evidence, readable_evidence_anchor, ReadableTransportError,
+    COMPACT_SCHEMA, export_compact_readable_evidence, export_readable_evidence,
+    readable_evidence_anchor, ReadableTransportError,
 )
 from research.guidance_revision_drift.trace_transport import export_trace_fragments, trace_fragment_anchor
 from tests.guidance_revision_drift.test_completion_evidence import drive
@@ -305,6 +307,51 @@ class ReadableNativeDossierTests(unittest.TestCase):
                 body["observations"]["configuration_verified"] = True
             with self.subTest(change=change), self.assertRaises(ReadableTransportError):
                 export_readable_evidence(self.trace, runtime_context=self.context, metadata=body)
+
+class CompactReadableNativeDossierTests(unittest.TestCase):
+    """V2 changes output layout, never current-carrier or completion gates."""
+
+    dossier = NativeDossierTests.dossier
+
+    @classmethod
+    def setUpClass(cls):
+        cls.trace = drive().protocol_trace()
+
+    def setUp(self):
+        current = recovery_qc_project_manifest()
+        self.binding = CandidateBinding(current["source_manifest_sha256"], current["project_sha256"],
+            current["bundle_sha256"], current["fixture_sha256"], "d" * 40, "e" * 40, "f" * 64)
+        self.context = current["runtime_context"]
+        self.fragments = export_compact_readable_evidence(self.trace,
+            runtime_context=self.context, metadata=metadata(self.trace))
+
+    def test_compact_current_carrier_dossier_replays_all_records_and_v1_stays_available(self):
+        self.assertEqual(json.loads(self.fragments[0])["schema"], COMPACT_SCHEMA)
+        compact = self.dossier(readable=True)
+        old = export_readable_evidence(self.trace, runtime_context=self.context, metadata=metadata(self.trace))
+        supplied_v1 = self.dossier(old, readable=True)
+        self.assertEqual(compact["replay"], supplied_v1["replay"])
+        self.assertEqual(compact["trace_sha256"], supplied_v1["trace_sha256"])
+        self.assertEqual((compact["replay"]["record_count"], compact["replay"]["account_checkpoints"]), (752, 372))
+        self.assertEqual(compact["raw_output_sha256"], hash_bytes(b"\n".join(self.fragments) + b"\n"))
+        self.assertNotEqual(compact["raw_output_sha256"], supplied_v1["raw_output_sha256"])
+        for report in (compact, supplied_v1):
+            self.assertEqual(report["trace_reconstruction"], "digest-reconciled local reconstruction")
+            for flag in ("raw_trace_retrieved", "external_provenance_verified", "native_runtime_verified",
+                         "cloud_completed", "empirical_backtest_ready", "qc_upload_allowed", "qc_launch_allowed"):
+                self.assertIs(report[flag], False)
+
+    def test_compact_failed_output_wrong_raw_hash_and_source_epoch_cannot_form_completion(self):
+        failed = export_compact_readable_evidence(self.trace,
+            runtime_context=self.context, metadata=failed_metadata(self.trace))
+        with self.assertRaisesRegex(EvidenceError, "failed/partial runtime output"):
+            self.dossier(failed, readable=True)
+        with self.assertRaisesRegex(EvidenceError, "raw trace messages"):
+            self.dossier(readable=True, run_hash="0" * 64)
+        for field in ("source_sha256", "project_sha256", "bundle_sha256"):
+            with self.subTest(field=field), self.assertRaisesRegex(EvidenceError, "current candidate"):
+                self.dossier(readable=True, binding=replace(self.binding, **{field: "0" * 64}))
+
 
 if __name__ == "__main__":
     unittest.main()

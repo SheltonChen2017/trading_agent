@@ -24,8 +24,9 @@ from research.guidance_revision_drift.native_observation import (
     failure_diagnostics, observe_runtime, validate_native_metadata, valuation_checkpoint,
 )
 from research.guidance_revision_drift.readable_transport import (
-    MAX_LOG_BYTES, MAX_LINE_BYTES, ReadableTransportError,
-    export_readable_evidence, readable_evidence_anchor,
+    MAX_LOG_BYTES, MAX_LINE_BYTES, MAX_MESSAGES, ReadableTransportError,
+    PLATFORM_FIXED_LOG_RESERVE_BYTES, PLATFORM_OVERHEAD_BYTES_PER_MESSAGE,
+    export_compact_readable_evidence, readable_evidence_anchor,
 )
 
 
@@ -256,10 +257,13 @@ class GuidanceRevisionDriftAlgorithm(QCAlgorithm):
     def _emit_trace(self, metadata):
         trace = self.bridge.protocol_trace()
         metadata = validate_native_metadata(metadata, trace)
-        fragments = export_readable_evidence(trace,
+        fragments = export_compact_readable_evidence(trace,
             runtime_context=self._gdr_context.to_dict(), metadata=metadata)
-        used = self._evidence_log_bytes()
-        if used + sum(len(raw) + 1 for raw in fragments) > MAX_LOG_BYTES:
+        used = self._reserved_evidence_log_bytes()
+        messages = self._evidence_log_messages()
+        if (messages + len(fragments) > MAX_MESSAGES + 1
+                or used + sum(len(raw) + 1 for raw in fragments)
+                + PLATFORM_OVERHEAD_BYTES_PER_MESSAGE * len(fragments) > MAX_LOG_BYTES):
             raise ReadableTransportError("cumulative readable evidence log byte budget exhausted")
         for fragment in fragments:
             self._log_evidence(fragment.decode("ascii"))
@@ -275,14 +279,46 @@ class GuidanceRevisionDriftAlgorithm(QCAlgorithm):
             raise ReadableTransportError("invalid cumulative readable evidence log budget")
         return used
 
+    def _evidence_log_messages(self):
+        messages = getattr(self, "_gdr_evidence_log_messages", 0)
+        if type(messages) is not int or not 0 <= messages <= MAX_MESSAGES + 1:
+            raise ReadableTransportError("invalid cumulative readable evidence message budget")
+        return messages
+
+    def _reserved_evidence_log_bytes(self):
+        used, messages = self._evidence_log_bytes(), self._evidence_log_messages()
+        # Payload includes one LF per delivered/possibly delivered message.
+        # Contradictory counters cannot manufacture new capacity.
+        if (used < messages or used > (MAX_LINE_BYTES + 1) * messages
+                or (used == 0) is not (messages == 0)):
+            raise ReadableTransportError("inconsistent cumulative readable evidence log budget")
+        reserved = (used + PLATFORM_OVERHEAD_BYTES_PER_MESSAGE * messages
+                    + PLATFORM_FIXED_LOG_RESERVE_BYTES)
+        if reserved > MAX_LOG_BYTES:
+            raise ReadableTransportError("cumulative readable evidence log byte budget exhausted")
+        return reserved
+
     def _log_evidence(self, message):
-        raw = message.encode("ascii")
+        if type(message) is not str:
+            raise ReadableTransportError("exact readable evidence message required")
+        if len(message) > MAX_LINE_BYTES:
+            raise ReadableTransportError("cumulative readable evidence log byte budget exhausted")
+        try:
+            raw = message.encode("ascii")
+        except UnicodeError as exc:
+            raise ReadableTransportError("ASCII readable evidence message required") from exc
         used = self._evidence_log_bytes()
-        if len(raw) > MAX_LINE_BYTES or used + len(raw) + 1 > MAX_LOG_BYTES:
+        messages = self._evidence_log_messages()
+        reserved = self._reserved_evidence_log_bytes()
+        if (len(raw) > MAX_LINE_BYTES or messages + 1 > MAX_MESSAGES + 1
+                or reserved + len(raw) + 1 + PLATFORM_OVERHEAD_BYTES_PER_MESSAGE > MAX_LOG_BYTES):
             raise ReadableTransportError("cumulative readable evidence log byte budget exhausted")
         # Reserve before the SDK call: a logging error may occur after delivery.
         # Failure diagnostics cannot reset ambiguous delivery or reopen quota.
+        # Wrapper/fixed allowances are conservative assumptions, not verified
+        # QuantConnect accounting, remaining quota or platform permission.
         self._gdr_evidence_log_bytes = used + len(raw) + 1
+        self._gdr_evidence_log_messages = messages + 1
         self.log(message)
 
     def _emit_failure(self, stage, error):

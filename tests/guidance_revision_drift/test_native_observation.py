@@ -6,6 +6,7 @@ from copy import deepcopy
 from datetime import datetime, timezone
 from decimal import Decimal, localcontext
 import importlib
+import json
 import sys
 from types import SimpleNamespace as NS
 import unittest
@@ -16,7 +17,10 @@ from data.hashing import canonical_json
 from research.guidance_revision_drift.contracts import CANDIDATE_SHA256
 from research.guidance_revision_drift import native_observation as observations
 from research.guidance_revision_drift.lean_bridge import BridgeError, fixture_frames, fixture_stream
-from research.guidance_revision_drift.readable_transport import readable_evidence_anchor, reconstruct_readable_evidence
+from research.guidance_revision_drift.readable_transport import (
+    COMPACT_SCHEMA, MAX_LOG_BYTES, PLATFORM_FIXED_LOG_RESERVE_BYTES,
+    PLATFORM_OVERHEAD_BYTES_PER_MESSAGE, readable_evidence_anchor, reconstruct_readable_evidence,
+)
 from guidance_revision_drift.test_lean_source import CashAmount, OrderEvent, OrderFee, Slice, sdk_shim
 
 
@@ -179,6 +183,7 @@ class NativeSourceEvidenceTests(unittest.TestCase):
 
     def output(self, algo):
         fragments = tuple(row.encode("ascii") for row in algo.log_messages)
+        self.assertEqual(json.loads(fragments[0])["schema"], COMPACT_SCHEMA)
         envelope = reconstruct_readable_evidence(fragments, expected_sha256=readable_evidence_anchor(fragments),
                                                expected_runtime_context=CONTEXT)
         return observations.validate_native_metadata(envelope["metadata"], envelope["trace"]), envelope
@@ -216,6 +221,10 @@ class NativeSourceEvidenceTests(unittest.TestCase):
         self.assertEqual(metadata["terminal"]["native_nav"], metadata["terminal"]["native_cash"])
         self.assertTrue(all(len(row.encode("ascii")) <= 200 for row in algo.log_messages))
         self.assertLess(sum(len(row.encode("ascii")) + 1 for row in algo.log_messages), 100000)
+        self.assertEqual(algo._gdr_evidence_log_messages, len(algo.log_messages))
+        self.assertEqual(algo._gdr_evidence_log_bytes,
+                         sum(len(row.encode("ascii")) + 1 for row in algo.log_messages))
+        self.assertLessEqual(algo._reserved_evidence_log_bytes(), MAX_LOG_BYTES)
         self.assertFalse(metadata["observations"]["native_binding_verified"])
         self.assertIsNone(metadata["observations"]["pythonnet_version"])
         self.assertIn("no empirical", algo.debug_messages[-1])
@@ -306,6 +315,9 @@ class NativeSourceEvidenceTests(unittest.TestCase):
         marker = "GDR-NATIVE-REFUSED stage=initialize context_or_trace_unavailable"
         self.assertEqual(algo.log_messages, [marker])
         self.assertEqual(getattr(algo, "_gdr_evidence_log_bytes", None), len(marker) + 1)
+        self.assertEqual(getattr(algo, "_gdr_evidence_log_messages", None), 1)
+        self.assertEqual(algo._reserved_evidence_log_bytes(), len(marker) + 1
+                         + PLATFORM_OVERHEAD_BYTES_PER_MESSAGE + PLATFORM_FIXED_LOG_RESERVE_BYTES)
 
     def test_missing_context_never_gets_expected_hashes_or_completion(self):
         algo = self.source.GuidanceRevisionDriftAlgorithm()

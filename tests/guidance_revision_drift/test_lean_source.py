@@ -19,7 +19,9 @@ from research.guidance_revision_drift.contracts import CANDIDATE_SHA256
 from research.guidance_revision_drift.native_observation import FIXTURE_SHA256
 from research.guidance_revision_drift.simulation import Simulation
 from research.guidance_revision_drift.readable_transport import (
-    MAX_LINE_BYTES, MAX_LOG_BYTES, ReadableTransportError, reconstruct_readable_evidence,
+    COMPACT_SCHEMA, MAX_LINE_BYTES, MAX_LOG_BYTES, MAX_MESSAGES,
+    PLATFORM_FIXED_LOG_RESERVE_BYTES, PLATFORM_OVERHEAD_BYTES_PER_MESSAGE,
+    ReadableTransportError, reconstruct_readable_evidence,
     readable_evidence_anchor,
 )
 
@@ -204,9 +206,13 @@ class LeanSourceTests(unittest.TestCase):
         self.assertIn("trace_count=752", algo.debug_messages[-1])
         self.assertIn(algo.bridge.finish()["protocol_trace_head_sha256"], algo.debug_messages[-1])
         messages = tuple(row.encode("ascii") for row in algo.log_messages)
+        self.assertEqual(json.loads(messages[0])["schema"], COMPACT_SCHEMA)
         self.assertTrue(all(type(json.loads(row)) is dict for row in messages))
         self.assertTrue(all(len(row) <= 200 for row in messages))
         self.assertLessEqual(sum(len(row) + 1 for row in messages), 100000)
+        self.assertEqual(algo._gdr_evidence_log_bytes, sum(len(row) + 1 for row in messages))
+        self.assertEqual(algo._gdr_evidence_log_messages, len(messages))
+        self.assertLessEqual(algo._reserved_evidence_log_bytes(), MAX_LOG_BYTES)
         output = reconstruct_readable_evidence(messages,
             expected_sha256=readable_evidence_anchor(messages),
             expected_runtime_context=algo._gdr_context.to_dict())
@@ -227,11 +233,25 @@ class LeanSourceTests(unittest.TestCase):
         body = metadata(algo.bridge.protocol_trace())
         algo._emit_trace(body)
         first = list(algo.log_messages)
+        first_payload, first_messages = algo._gdr_evidence_log_bytes, algo._gdr_evidence_log_messages
+        # RP33 changes the contract from raw payload to an assumed wrapped
+        # cumulative budget. Derive refusal from actual retained reservations,
+        # not an unconditional assertion that any second export must overflow.
+        while (algo._reserved_evidence_log_bytes() + first_payload
+               + PLATFORM_OVERHEAD_BYTES_PER_MESSAGE * first_messages <= MAX_LOG_BYTES
+               and algo._gdr_evidence_log_messages + first_messages <= MAX_MESSAGES + 1):
+            algo._emit_trace(body)
+        before = (list(algo.log_messages), algo._gdr_evidence_log_bytes, algo._gdr_evidence_log_messages)
         with self.assertRaisesRegex(ReadableTransportError, "cumulative"):
             algo._emit_trace(body)
-        self.assertEqual(algo.log_messages, first, "refuse before emitting a second transcript")
+        self.assertEqual((algo.log_messages, algo._gdr_evidence_log_bytes, algo._gdr_evidence_log_messages),
+                         before, "refuse the complete export before emitting any new line")
+        self.assertGreaterEqual(len(algo.log_messages), len(first))
         algo._emit_failure("on_end_of_algorithm", RuntimeError("invented failure"))
-        self.assertLessEqual(sum(len(row.encode("ascii")) + 1 for row in algo.log_messages), 100000)
+        self.assertEqual(algo._gdr_evidence_log_bytes,
+                         sum(len(row.encode("ascii")) + 1 for row in algo.log_messages))
+        self.assertEqual(algo._gdr_evidence_log_messages, len(algo.log_messages))
+        self.assertLessEqual(algo._reserved_evidence_log_bytes(), MAX_LOG_BYTES)
         self.assertTrue(any("diagnostic_export_unavailable" in row for row in algo.log_messages))
 
     def test_ambiguous_log_delivery_keeps_its_reservation_and_invalid_budget_refuses(self):
@@ -244,10 +264,19 @@ class LeanSourceTests(unittest.TestCase):
                 algo._log_evidence("SYN-observation")
         retained = len(b"SYN-observation") + 1
         self.assertEqual(algo._gdr_evidence_log_bytes, retained)
+        self.assertEqual(algo._gdr_evidence_log_messages, 1)
+        self.assertEqual(algo._reserved_evidence_log_bytes(), retained
+                         + PLATFORM_OVERHEAD_BYTES_PER_MESSAGE + PLATFORM_FIXED_LOG_RESERVE_BYTES)
         for invalid in (True, -1, 100001, "0"):
             algo._gdr_evidence_log_bytes = invalid
             with self.subTest(budget=invalid), self.assertRaises(ReadableTransportError):
                 algo._log_evidence("not emitted")
+        algo._gdr_evidence_log_bytes = retained
+        for invalid in (True, -1, MAX_MESSAGES + 2, "0", 0):
+            algo._gdr_evidence_log_messages = invalid
+            with self.subTest(messages=invalid), self.assertRaises(ReadableTransportError):
+                algo._log_evidence("not emitted")
+            self.assertEqual(algo._gdr_evidence_log_messages, invalid)
         self.assertEqual(algo.log_messages, ["SYN-observation"])
 
 
@@ -258,13 +287,94 @@ class LeanSourceTests(unittest.TestCase):
         before = list(algo.log_messages)
         with self.assertRaisesRegex(ReadableTransportError, "budget"):
             algo._log_evidence("x" * (MAX_LINE_BYTES + 1))
-        algo._gdr_evidence_log_bytes = MAX_LOG_BYTES - 6
+        # A supplied coherent prior state leaves exactly 46 reserved bytes:
+        # five characters plus LF plus the assumed 40-byte wrapper.
+        algo._gdr_evidence_log_messages = 500
+        algo._gdr_evidence_log_bytes = (MAX_LOG_BYTES - PLATFORM_FIXED_LOG_RESERVE_BYTES
+            - PLATFORM_OVERHEAD_BYTES_PER_MESSAGE * 500 - 46)
+        prior = algo._gdr_evidence_log_bytes
         with self.assertRaisesRegex(ReadableTransportError, "budget"):
             algo._log_evidence("123456")
-        self.assertEqual(algo._gdr_evidence_log_bytes, MAX_LOG_BYTES - 6)
+        self.assertEqual(algo._gdr_evidence_log_bytes, prior)
+        self.assertEqual(algo._gdr_evidence_log_messages, 500)
         self.assertEqual(algo.log_messages, before)
         algo._log_evidence("12345")
-        self.assertEqual(algo._gdr_evidence_log_bytes, MAX_LOG_BYTES)
+        self.assertEqual(algo._gdr_evidence_log_bytes, prior + 6)
+        self.assertEqual(algo._gdr_evidence_log_messages, 501)
+        self.assertEqual(algo._reserved_evidence_log_bytes(), MAX_LOG_BYTES)
+
+    def test_cumulative_message_ceiling_refuses_lines_and_whole_exports_atomically(self):
+        from research.guidance_revision_drift.native_observation import failure_diagnostics
+        algo = self.initialize()
+        algo._gdr_evidence_log_messages = MAX_MESSAGES + 1
+        algo._gdr_evidence_log_bytes = 2 * (MAX_MESSAGES + 1)
+        before = algo._gdr_evidence_log_bytes, algo._gdr_evidence_log_messages
+        with self.assertRaises(ReadableTransportError):
+            algo._log_evidence("x")
+        self.assertEqual((algo._gdr_evidence_log_bytes, algo._gdr_evidence_log_messages), before)
+        self.assertFalse(algo.log_messages)
+        # A small valid failed-prefix export isolates the count guard from the
+        # byte guard; a complete ~95 KB export would hit both at this count.
+        body = {"status": "failed", "diagnostics": failure_diagnostics("on_data", RuntimeError(),
+            algo.bridge, algo.early_events, algorithm=algo),
+            "observations": json.loads(algo._gdr_observations_bytes),
+            "valuation_schema": "gdr-native-price-nav-v1", "valuation_rows": []}
+        fragments = self.source.export_compact_readable_evidence(algo.bridge.protocol_trace(),
+            runtime_context=algo._gdr_context.to_dict(), metadata=body)
+        algo._gdr_evidence_log_messages = MAX_MESSAGES + 2 - len(fragments)
+        algo._gdr_evidence_log_bytes = 2 * algo._gdr_evidence_log_messages
+        self.assertLess(algo._reserved_evidence_log_bytes()
+            + sum(len(raw) + 1 for raw in fragments)
+            + PLATFORM_OVERHEAD_BYTES_PER_MESSAGE * len(fragments), MAX_LOG_BYTES)
+        before = algo._gdr_evidence_log_bytes, algo._gdr_evidence_log_messages
+        with self.assertRaises(ReadableTransportError):
+            algo._emit_trace(body)
+        self.assertEqual((algo._gdr_evidence_log_bytes, algo._gdr_evidence_log_messages), before)
+        self.assertFalse(algo.log_messages, "count-only refusal must precede all SDK delivery")
+
+    def test_whole_export_reserves_assumed_wrappers_before_any_sdk_delivery(self):
+        from tests.guidance_revision_drift.test_completion_evidence import drive
+        from tests.guidance_revision_drift.test_native_dossier import metadata
+        algo = self.initialize()
+        algo.bridge = drive()
+        body = metadata(algo.bridge.protocol_trace())
+        fragments = self.source.export_compact_readable_evidence(algo.bridge.protocol_trace(),
+            runtime_context=algo._gdr_context.to_dict(), metadata=body)
+        payload = sum(len(raw) + 1 for raw in fragments)
+        algo._gdr_evidence_log_messages = 200
+        algo._gdr_evidence_log_bytes = (MAX_LOG_BYTES - payload - 1
+            - PLATFORM_FIXED_LOG_RESERVE_BYTES - PLATFORM_OVERHEAD_BYTES_PER_MESSAGE * 200)
+        self.assertLess(algo._reserved_evidence_log_bytes() + payload, MAX_LOG_BYTES)
+        self.assertGreater(algo._reserved_evidence_log_bytes() + payload
+            + PLATFORM_OVERHEAD_BYTES_PER_MESSAGE * len(fragments), MAX_LOG_BYTES)
+        self.assertLessEqual(algo._gdr_evidence_log_messages + len(fragments), MAX_MESSAGES + 1)
+        before = algo._gdr_evidence_log_bytes, algo._gdr_evidence_log_messages
+        with self.assertRaises(ReadableTransportError):
+            algo._emit_trace(body)
+        self.assertEqual((algo._gdr_evidence_log_bytes, algo._gdr_evidence_log_messages), before)
+        self.assertFalse(algo.log_messages, "raw payload capacity must not allow a partial wrapped-overflow export")
+
+    def test_missing_or_reset_counter_after_delivery_cannot_reopen_reserved_capacity(self):
+        # Losing one counter must not drop already reserved wrapper capacity.
+        # Deliberately erasing both counters is outside this local-state proof.
+        for field, remove in (("_gdr_evidence_log_messages", True), ("_gdr_evidence_log_bytes", True),
+                              ("_gdr_evidence_log_messages", False), ("_gdr_evidence_log_bytes", False)):
+            with self.subTest(field=field, remove=remove):
+                algo = self.initialize()
+                algo._log_evidence("SYN-observation")
+                before = list(algo.log_messages)
+                if remove:
+                    delattr(algo, field)
+                else:
+                    setattr(algo, field, 0)
+                with self.assertRaises(ReadableTransportError):
+                    algo._log_evidence("not emitted")
+                algo._emit_failure("on_data", RuntimeError("invented failure"))
+                self.assertEqual(algo.log_messages, before, "failure diagnostics cannot repair/reset poisoned counters")
+                if remove:
+                    self.assertFalse(hasattr(algo, field))
+                else:
+                    self.assertEqual(getattr(algo, field), 0)
 
     def test_live_or_changed_sidecar_cannot_initialize(self):
         algo = self.source.GuidanceRevisionDriftAlgorithm()

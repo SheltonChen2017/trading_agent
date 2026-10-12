@@ -18583,3 +18583,120 @@ Root reproduced88focusedcases/1.11s and final bounded union
 actual stop/db/provider/hardware exclusions as82.4. In-memory compile/diff
 checks pass; no existing capture-source or candidate modification. New local
 support-correction commit must precede fresh003production; no push yet.
+
+Corrected support committed locally at
+`fcf5b792cc7daf30aec58681159eec84fe7cb852`, clean/actual matching remote61a81d9a
+unchanged, no publication. New support41719bytes/64ec6b6a… and test31713bytes/
+99038ec6… compile in memory. BEFORE further body effect register fresh
+inspection003 (`TPR-EXT26-MIA-RESULT-SOURCE-INSPECT-20261012-003`),
+06:33:34Z–07:03:34Z, HEADfcf5b792/owner00501bc2…/same exact three post003
+FD size/hash descriptors and twelve-file import hashes (only support successor
+hash changes). Exact canonical argument2747bytes/SHA256
+`0532e7463fc575fb565bedbaa096326ac6940aec76411f07d4363d206cdd9467`.
+Same <=32MiB/30seconds body-only closed source inspection, exclusive fresh
+claims/access/shared lock before bodies, no API/provider/input/old captures/
+ObjectStore/source execution/look/attempt. Preserve both prior refusals;
+no scope is implicitly renewed. This fresh manifest is not candidate tuning
+or source hash/FD bypass. Actual result/disposition follows.
+
+Inspection003 actually completed06:34:03.482891Z:3FD reads371779bytes,
+zeroAPI requests, all three exact size/SHA descriptors verified. Complete
+before/after inventory and delta admission succeeded: `audit_key_recovery.py`
+7490bytes/SHA256
+`bce4182d09dc9d31132cb54d404712471ddff5e2b706c2988fbe9fcc48c93aea`,
+main59961bytes/8f21e51f… with only the two-line import replacement, other nine
+Python modules and1029byte notebook unchanged. Root read the entire admitted
+helper. Original executed d661b575… writer remains immutable; inherited
+save/read/index/storage-declaration code stays original. New closed mapping
+1024chunk logical keys plus index maps to single-extension physical keys;
+sidecar is internal only. All3078initial collision targets are queried before
+first write, with strict bool admission and final sidecar recheck/readback.
+The local predicate is equivalent only on the closed backslash-free generated
+vocabulary; its comment's blanket "verbatim" wording is not universal/native
+proof. Source inspection did not execute source, touch inputs/ObjectStore,
+observe a new market look or prove compiled-source/economics/full-window
+accounting. F017/F018 remain OPEN, look19/OFF3/ON0 unchanged. Both earlier
+refusals remain immutable/spent rather than being relabeled successful.
+
+Before any Mia recovery launch, test this exact captured helper in memory
+through a named hash-verified fixture plugin; no candidate port or manual
+fourth Codex run. Freeze actual all-file source identities and unchanged
+economics/input/calendar references, register a separate genuine Mia-only
+operation with at most one new compile/job and prospective external look20,
+then inspect native completion and usable full-window audit/accounting. This
+source QA is a routine safety check, not a reinstated independent-review
+checkpoint the owner waived for this round.
+
+### 82.6 Exact-source QA and prospectively frozen genuine Mia look20
+
+New test-only file `test_qc_mia_audit_key_recovery.py`,373lines/19838bytes/
+SHA256366b9a4e69c16955fc6a8954715bdc3a1da26ded23943ee53fb11b53d4bc62f7,
+uses a named exact7490/bce4182d… source plugin (or a later public exact port),
+otherwise explicitly skips absent captured source. No source/private body
+copied by author; no candidate port yet. Root read entire initial328lines and
+all45added lines; author ran4passed/67explicit missing-source skips0.39s.
+Root hash-verified actual-source fixture executes controlled module in memory,
+synthetic current-rule native SaveBytes model, original business methods,
+all1025logical mappings/pre-I/O refusals, collisions at first/last/index/
+sidecar, strict bool/recheck/partial readback failure/budget/closure controls.
+Same synthetic full1449NAV/301COVERAGE+SUMMARY and multichunk journals fail on
+the original two-dot writer and succeed with repaired physical names, retaining
+exact plain records/index/hash domains, gzip descriptors and sidecar readback.
+This is meaningful old-red/new-green evidence, NOT genuine native CLR proof.
+Internal peer independently reproduced16actual-source cases0.86s, exactsource
+SHA/bytes, logical-index return path and method inheritance; non-atomic native
+ContainsKey→SaveBytes custody is unchanged and remains no race-free claim.
+
+Root first59actual-source cases passed1.68s. Initial combined run428passed/
+1skipped/28setup errors arose from root's unhashable SimpleNamespace plugin,
+not repository behavior; ordinary hashable plugin restores final bounded
+union **468passed,1skipped/8.00s**. No full lane/repository suite. Same isolated
+in-process49/52 root BEFORE dispatch/config, no actual operator stop/db,
+bytecode/cache, provider/private effects or Windows custody proof. Candidate
+source unchanged, no fourth Codex attempt and no result observed.
+
+`TPR-EXT26-D079`, agent-delegated within explicit owner repair/run approval:
+choose one actual-source-frozen genuine Mia recovery after bounded QA;
+alternatives prohibited Codex4, resetting candidate, launch ON first, or
+changing economics/clock/dates are rejected. Assumptions are exact post003
+capture and included resources; native export/census/full-window validity
+remain OPEN. Not separately human-/Claude-approved implementation.
+
+BEFORE any recovery effect, freeze public metadata artifact
+`research/target_price_revisions_qc/extended_mia_audit_recovery_freeze.json`,
+5599bytes/SHA256
+`6fd8250590aafb08778f7b31477cb2502695dbcad0f119a8f22e57bd9c18e174`.
+It binds all twelve actual cloud files, source before/after/inspection receipt
+identities, unchanged study90bdec55…/calendar3eccdf3c…/input-bundle daaf0c33…/
+OFF config5790ca63…,1449/301 dates/economics/membership rules and limits.
+Original v1 evidence remains immutable; physical adapter is identified
+successor, not a candidate reset. All original AR-disabled cap selection,
+weight-only tilt, timing/cost/cash/action/missing/identity/PIT limitations,
+sealed holdout boundaries remain. No ON inputs processed/uploaded in scope.
+
+Genuine Mia-only `TPR-EXT26-MIA-RECOVERY-20261012-001`,
+06:47:00Z–07:47:00Z, owner00501bc2…/registered parentfcf5b792…;
+OFFproject37650980 only; legacy bindingattempt3/Codexconsumed3 stay3,
+look19before/prospective Mia look20 counts only actual fresh launched job
+regardless of terminal outcome. At most ONE explicit compile and ONE fresh
+backtest on that compile, zero source/config/economic edits or automatic
+retry, at most24Mia tool calls including12own-source reads<=1MiB each/8MiB
+aggregate if needed and10own-new-job read-only status/result/log/chart calls
+<=2MiB each/16MiB aggregate. No manual run/API impersonation, provider/input/
+notebook/shell/account/credential/broker/live/paper/unrelated project action,
+public export, purchase/upgrade or other-lane cancellation. Observed resource
+contention waits; unknown storage headroom is not evidence of contention.
+Keep all raw audit rows/chunks/index/sidecar/gzip/hash/readback/collision
+refusals and old failed jobs. Scope expires/refuses rather than implicit retry.
+
+Fresh UI scope `TPR-EXT26-MIA-RECOVERY-UI-20261012-001`, same window and
+owner/root/branch,<=40AX reads/12screenshots/16scrolls/4bounded composer
+messages plus exact own-task compile/run Allow actions only. Native Safari
+exact project/authenticated Mia Ask Before Edits must be freshly verified;
+old repair/UI scopes expired and are NOT renewed. Recovery prompt2879UTF8
+bytes/SHA256b8080e71e8a85ee4ee4dbef82e9b14d5175414921136e573fb0e558df1402867,
+prospectively asks exact compile+one-run proposals first, no immediate launch.
+All-file/post-job comparison and private UI ledger/status/native collection
+require their own fresh bounded receipts after actual IDs. Completed label
+alone never proves usable accounting/closed F017/F018 or accepted metrics.
+Actual effect/status will follow. Heartbeat remains PAUSED, no push yet.

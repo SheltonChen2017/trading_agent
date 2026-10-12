@@ -456,7 +456,11 @@ Section 284 counter-reviews the sole Claude commit `6e9c5562`, qualifies
 endpoint/no-byte/reboot claims, preserves the reviewed v4 source and adds
 isolated regressions plus a separately frozen operational precheck/output
 reader. Its conditional one-shot protocol does not clear source or publication
-gates merely by being implemented; actual results are recorded in that section.
+gates merely by being implemented. The actual one-shot v4 assessment now passes
+and its report is separately authenticated (284.5); historical refusals remain
+spent. The original synthetic publication probe and any new guarded production
+publisher remain separately gated; source success alone is not publication
+clearance or R284 readiness.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1410,15 +1414,18 @@ Section 281 is Claude's independent review of the exact pushed range
 sole completed push and records the owner's October 11 exact twelve-ctime
 acceptance. Section 283 is Claude's independent review of the exact pushed range
 `682779b7..34489a7a` (section 282 and the v4 contract). Section 284
-counter-reviews its sole completed push `6e9c5562` and freezes a no-allocation
-comparison, conditional single unchanged-v4 assessment and output-only reader.
+counter-reviews its sole completed push `6e9c5562`. The committed one-shot
+v4 assessment and external report authentication succeeded (284.5), resolving
+the scoped fresh-source refusal prospectively, not the historical audit.
 The unchanged v4 security contract has independent review; the prior one-round
-waivers remain expired. Follow the exact pre-use commit and result gates in
-284.3, not a routine acknowledgement wait. Claude reviews section 284 and the
+waivers remain expired. The original synthetic probe has its separate D4/D5
+freeze in 284.6/284.8. The new guarded continuity publisher in 284.7 remains
+UNREVIEWED and UNINVOKED; independent review and a subsequent exact one-shot
+run freeze are required before use. Claude reviews section 284 and the
 exact continuous `6e9c5562..final-head` range after its one final matching-lane
 push, including new ancillary tooling, tests, dispositions and actual results.
-Do not ask again for the same twelve values, infer a new waiver, allocate R282
-early, or replay R273/R277/R279. The existing monitor remains active; the next
+Do not ask again for the same twelve values, infer a new waiver, or replay
+spent R273/R277/R279/R282. The existing monitor remains active; the next
 trigger must be newer than this Codex round's final push.
 The owner previously said
 "proceed" after the open-session concern was explained. Section 272 supersedes
@@ -43105,3 +43112,262 @@ limits, unreviewed ancillary tooling pending final Claude review and no claim
 of source success before execution. The next local commit freezes this exact
 protocol and all three pins before any real D1/D2 invocation; it is not the
 round's final push.
+
+### 284.5 Actual one-shot v4 result at the committed freeze
+
+The pre-use freeze is **`107743d8abbe76857cdc7a7f947aa359a159dbc4`**.
+Root, branch, exact HEAD, clean status and absent/non-symlink R282 output were
+asserted immediately before the precheck and again before the assessment.
+No edit, rebaseline or retry occurred between them. All three commands used
+strict network denial and in-root temporary configuration, not pytest or the
+shared runtime fixture.
+
+| Invocation | UTC start/end, 2026-10-12 | Actual exit and result |
+|---|---|---|
+| D1 precheck, exactly once | 02:25:07 / 02:25:07 | 0; twelve directories/fifteen files, all projected metadata equal; no assessment allocation/source reauthentication claimed |
+| Unchanged v4 `--assess`, exactly once | 02:25:23 / 02:25:24 | 0; `complete=true`, `sources_reauthenticated=true`; R282 now allocated and spent |
+| D2 output-only authentication, exactly once | 02:25:48 / 02:25:48 | 0; `report_authenticated=true`, `assessment_accepted=true`, exact 12/15 scope and all restrictive flags verified |
+
+Precheck evidence hashes:
+
+- full preflight summary input:
+  `dddd4391767ce560324888ce30d73d93fcf35f749dddf1c64195ea05928c8bfd`;
+- historical source rows:
+  `7395db9db389aba698b64a4362908a9c5ec94fe4f6ee9de9f56084cb869d2e16`;
+- prospective projected rows:
+  `7c7d91e4ea201293b12a1912b1c54e3ce8add8559ba55dfb74c17dbfc2710a91`.
+
+The authenticated fixed report is
+`artifacts/analyst_revisions_v2/relocation_trial/R282-20261011-A/report.json`,
+**32,950 bytes**, SHA-256
+**`6656a2504fc1de06ddf722f139eae8f6e62918ba380b6e66446f77cd647262d2`**.
+Its sole final leaf is regular 0600, owner 501/group20, device16777231,
+inode36373881, nlink1, flags0, mtime_ns1791771924178260168,
+ctime_ns1791771924178766751. The private 0700 directory has inode36373878,
+same device/owner/group, nlink3, size96, flags0 and
+mtime_ns=ctime_ns=1791771924178765460. Full held/named envelope equality,
+exact inventory and digest/canonical/schema/policy/profile/history/projection/
+loader/manifest/false-flag checks passed. This does not authenticate output
+ACL/xattr properties; `output_acl_xattr_envelope_proven=false` remains.
+
+**ARV2E280-001 is resolved prospectively for this exact v4 fresh-use scope.**
+All twelve accepted ctime pairs and the exact device contract were exercised
+without weakening other pins. R279 and the historical preservation audit
+remain failed; R273/R277/R279/R282 are spent, preserved and never replayed.
+No continuous-security, benign-cause, historical audit acceptance or formal
+source admission follows. No source row or opaque attribute value was printed.
+ARV2E263-001 safe production publication remains open, as do the independent
+formal evidence gates; R284 is still unprepared/unlaunched and the look floor
+remains 313/239/49/699.
+
+### 284.6 Separate prospective publication-probe decision
+
+**284-D4 — original ARV2OD272-A, one invocation only.** Actual v4 success
+and external output authentication in 284.5 satisfy the fresh-source
+prerequisite, not production-publication clearance. Under the standing
+delegated lane authority, exercise only the original, still-uninvoked
+synthetic probe, after this separate decision, its exact current pins and
+output-reader validation are committed. Do not reuse the spent R266 default
+or introduce a replacement identity. The exact command remains
+`python -B -m scripts.diagnose_arv2_publication_flags
+--authorized-relocation-r272`, only from the operative root and lane.
+Immediately verify root/branch/HEAD/clean status and absent/non-symlink output
+`artifacts/analyst_revisions_v2/publication_metadata/R272-20261009-A`.
+
+The current independently reviewed probe source is
+`26ce17888b20df669cfff035cfe0118625ef2804f5f2b76938c67b8586645b97`, replacing
+only the obsolete pre-275 source pin, not changing its already-reviewed bytes.
+Its unchanged metadata helper is
+`b4d0573c85d302944b4fc2ac7e4502f9aed77874e4bfaf4a1ae90808817c3327` and shared
+capture helper is
+`17e516b4cc721c7f97c4690f54dfcc9d2d11d8cebd413100f2e2ffa68e663ca2`.
+Bind schema `arv2-authorized-relocation-flags-v1`, exact profile
+`7877cea0fc80e71342e1ff613e5e5a6832130edd330289c9660d8894d39fbcd7`, two
+fixed 48-byte synthetic cases, two initial checks and 22 scheduled observations
+through 30 seconds per case, 45-second cooperative maximum and no baseline
+reset. Actual exit0, complete timing, all 24 unchanged integrity checks,
+matching payloads, available flags and independently authenticated output are
+required. Any refusal/interruption spends the identity; retain every fixture
+and report, never repair, clean, retry or rename it. The probe only writes its
+new fixed synthetic output; it does not query source or native ACL/xattr data.
+
+**284-D5 — once-only output/fixture reader, no original source reads.** A
+separate frozen verifier must bind the emitted report SHA and actual probe
+exit, exact schema/profile, restrictive false flags, two-case/schedule/count
+shape and recomputed integrity booleans/change lists. It opens only the fixed
+probe output and two synthetic final leaves using component no-follow,
+full held/named ten-field metadata, private owner/mode, exact device16777231,
+single-link bounded regular files, strict inventory, canonical JSON and
+pre/post read checks. Bound report to 256 KiB and each payload to its exact
+48 bytes; bind payload digest/content to the frozen fixture. Only exact
+`report.json`, `direct_final/final.json`, `pending_link/final.json` may remain.
+An authenticated report containing failed checks is evidence, not acceptance.
+Use a 60-second cooperative reader budget and redacted summary only; no
+native attributes or original source/history reread. Commit exact verifier
+and test pins before invoking either D4 or D5.
+
+A finite passing synthetic observation still does not clear ARV2E263-001.
+Production publication needs its own justified prospective fresh leaf,
+unchanged/current builder pins and actual strict three-file reauthentication;
+failed continuity A/B remain untouched. D4/D5 grant no production package,
+R284 preparation, provider/QC/capacity contact, look increment or orders.
+
+### 284.7 Next bounded candidate: source validation must precede publication
+
+Read-only inspection of the unchanged builder and v4 consumer identifies a
+specific composition hazard, **ARV2I284-001 (P2, prospective design defect)**:
+naively invoking legacy `_build` inside `_guarded_consume` would allow the
+builder to publish and internally load its three-file package before the
+outer source endpoint/security checks run. An outer refusal could therefore
+leave a complete package that the ordinary output visitor does not know to
+reject. The old builder really reconstructs sources three times and has its
+own strict guards; the issue is the missing v4 envelope at its new outer
+completion, not an assertion that the reviewed builder only checks claims.
+The v4 profile explicitly binds a read-only source assessment, and its
+generic callback parameter is not authority to use a publishing consumer.
+
+The admissible implementation is a separately versioned, lane-owned
+publisher candidate, leaving all old v1-v4 modules, builder, runner and shared
+helpers byte-identical. Reserve only the prospective fixed new leaf
+`artifacts/analyst_revisions_v2/identity_continuity/R284A1-20261008-C`;
+no observation or allocation of that leaf is made during implementation.
+Its future reviewed protocol must claim/fsync exclusively before history or
+source reads, authenticate the same pinned history/projection/preflight,
+then call unchanged v4 `_guarded_consume` with a **memory-only** callback.
+That callback calls the reviewed builder's `_documents` twice with the exact
+production source pins, requires identical immutable input/manifest buffers,
+and returns them without publishing. Only successful completion of the outer
+guard allows any payload publication. A source refusal therefore leaves an
+empty spent claim, not an admissible package.
+
+The candidate must publish only those already-authenticated bytes using
+private exclusive pending/link discipline and verify the exact three-file
+output against the same buffers/pins. It must never invoke legacy `_load`
+afterward, since that would reread sources outside the v4 envelope. A
+separate output-only authentication mode must combine existing canonical/
+lineage/false-flag validation with a full ten-field held/named no-follow
+envelope. Actual publisher exit0 plus external final authentication is
+required before the existing R284 preparation path can use emitted pins.
+Late output/publication failures remain retained and non-admissible; they
+are distinct from the prevented source-after-publication hazard. No failed
+leaf, marker or original source may be repaired or cleaned up.
+
+This is a new security/consumption/publication composition, **UNREVIEWED and
+UNINVOKED**, not an operational reuse of spent R282. Its own profile, source
+and test pins are frozen below for Claude review, not for execution. The
+binding 275.5/277-D4 independent-review gate applies before any actual
+publisher invocation, followed by Codex counter-review and a separate exact
+one-shot run freeze. Even a passing D4/D5 probe does not waive this gate.
+The fresh C leaf is a prospective changed contract following actual source
+reauthentication, not a renamed unchanged retry of failed A/B or a new QC
+attempt. R284 remains unprepared/unlaunched; all formal and financial gates
+and booked counts remain unchanged.
+
+### 284.8 Probe-reader freeze and publication-candidate validation
+
+The D5 output-only reader is
+`scripts/verify_arv2_publication_probe.py`, SHA-256
+`69411743f324ce27a534dcd039c254d83479df9ae7640597b3b8657d795d7d16`;
+its synthetic tests are
+`tests/analyst_revisions_v2/test_publication_probe_verification.py`, SHA-256
+`bbe15faa80218ee85f87c428b39cff31c10afba1eef053b66ae8b8d99126aa19`.
+The CLI requires `--expected-profile-sha256`, the externally emitted
+`--expected-report-sha256`, and actual `--probe-exit-code`. It never invokes
+the producer, reads original source packages or queries native attributes.
+The unchanged producer profile remains the exact 284.6 hash.
+
+The reader reconstructs every change list and integrity predicate across two
+initial and 22 scheduled checks; it binds both current synthetic leaves to
+their original baselines and last observations. Complete internally refused
+reports may authenticate as evidence but cannot be accepted diagnostics.
+Partial envelopes, missing leaves or fewer than 24 checks refuse authentication
+rather than being represented as complete failure reports. Signal and
+monotonic-return checks bound the reader cooperatively to 60 seconds, not a
+hard native-call interruption guarantee. Reported timing and samples remain
+producer claims, not continuously observed security or causal attribution.
+
+The author's final **342 passed in 1.09 s** and root's **342 passed in 1.02 s**
+are the same distinct cases, not additive. Earlier author runs of 222 and
+322 passes overlap. All these runs used strict OS network denial, disabled
+pytest plugin autoload, `--noconftest`, and explicit in-root temporary paths.
+Coverage includes substituted-I/O execution of the real producer's sample
+function, all 24 integrity claims, unsafe-but-consistent baselines, current
+fixture fields, exact counts/timing/flags/exit, canonical/duplicate/nonfinite
+JSON, bounded reads, symlinks/hardlinks, every held/directory metadata field,
+late inventory checks and budget restoration. The unchanged producer's
+separate **58 passed in 0.26 s** are nonoverlapping with these cases. A
+same-round read-only advisory audit found no blocking reader defect; it is
+not independent final review or evidence of a real probe result.
+
+Same-round candidate findings are retained rather than treating the first
+draft as a reviewed contract:
+
+| ID | Priority / scope | Confirmed issue and correction rationale |
+|---|---|---|
+| `ARV2I284-001` | P2 / prospective composition | Legacy `_build` inside the v4 callback could publish before outer source validation. The new callback only computes two equal immutable document pairs; all output payloads follow successful outer return. Actual use still requires independent review. |
+| `ARV2I284-002` | P2 / new draft | Reusing the census report publisher inherited a 512 MiB readback bound, larger than the fixed continuity leaves. A new local pending writer/readback uses each leaf's exact maximum; frozen shared code is unchanged. Oversized, replaced and growing readbacks must fail within those bounds. |
+| `ARV2I284-003` | P3 / new draft | The selected code-pin list omitted the legacy security module directly called by v4 policy. Its unchanged `3435bc07573697d682f25ea15fd2bfd10c5baf8220c184f73ae877016bae4a30` pin is included and checked. This is selected dependency binding, not whole-interpreter/import-closure integrity. |
+| `ARV2I284-004` | P2 / new draft | A new final output baseline could absorb earlier-leaf replacement or metadata drift while later leaves were written. Retain original publication descriptors and full post-link metadata through final authentication; preserve post-write mtime across link/unlink, where ctime legitimately changes. Retain the original parent/output identity across final authentication and code checks. Endpoint comparisons do not prove continuous stability. |
+
+Nonzero, unknown or ambiguous publisher exit remains inadmissible even if
+three final files exist. The unchanged legacy runner does not mechanically
+know that exit: a later run freeze must bind the **actual observed** exit and
+emitted pins, never fabricate `0` or treat a complete-looking directory as
+success. Authentication's bound source counts describe the producer profile,
+not a new source read by its output-only reader.
+
+The separately reviewed-next publisher candidate pins are:
+
+| Item | SHA-256 |
+|---|---|
+| `scripts/publish_arv2_identity_continuity_v4.py` | `f510e9781eec261812e48f4be7995f8377b1a9b0eb6fa3be566f32f719ce4d40` |
+| `tests/analyst_revisions_v2/test_guarded_identity_publication_v4.py` | `712e197d7a76c898890ecfbade9f3f35d9e550cfc8e988766d1ebc5fa9caa4f0` |
+| Canonical `arv2-guarded-identity-publication-v4` profile | `e3f9ecd2ce68011062d4762a30caf781976f680ecff574b8f539c166fe718b00` |
+
+Its mutually exclusive `--publish`/`--authenticate` modes require the exact
+profile; authentication also requires actual `--publisher-exit` and external
+`--manifest-sha256`/`--input-sha256`. This describes the implemented interface,
+**not an instruction to invoke it in this round**. All eleven selected code
+pins match current bytes. The package retains the existing continuity/input
+schemas and production-source mode; new orchestration does not change source
+semantics, qualified identity rows or the unchanged QC runner. The candidate
+enforces a 60-second cooperative signal/return budget, exact device31 and the
+same v4 projected source/security pins. It neither invokes spent R282's
+assessment entrypoint nor authorizes a new assessment identity.
+
+Author final publisher validation is **66 passed in 0.36 s**. Source stages
+are synthetic seams with real-artifact/native tripwires; the output path uses
+the unchanged canonical/lineage validator on synthetic fixtures, not real
+source packages. Two earlier fixture defects are retained: **1 failed / 48
+passed in 0.30 s**, where the CLI platform seam hit a native-call tripwire
+before native execution, and **1 failed / 59 passed in 0.34 s**, where an
+empty fixture event list hit `IndexError` before the intended oversized-buffer
+check. Only the fixtures were corrected; neither is an operational source or
+publication failure.
+
+The author's finally-restored AST omissions each selected exactly one test:
+`publication_source_documents_changed`, `publication_preflight_metadata`,
+`publication_readback_replaced`, `successful_publisher_exit_required`,
+`publication_original_parent_changed`, `publication_payload_bound`,
+`publication_output_final_directory`, `publication_link_changed` and
+`publication_code_pin`: **9 failed / 0 passed**, aggregate command wall time
+0.9248 s on the earlier candidate. Final descriptor-retention revision:
+`publication_readback_replaced`, `publication_original_leaf_changed` and
+`publication_link_changed`: **3 failed / 0 passed**, aggregate command wall
+time 0.6633 s including pin reporting. Individual durations were not retained.
+Two labels overlap, hence ten distinct omitted guards across successive
+snapshots, not twelve final-tree mutation cases. Expected red results are
+sensitivity evidence, not passing tests. Same-round advisory inspection found
+no remaining blocking defect; it does not supply the independent review gate.
+
+Root final combined focused validation: **1,094 passed in 6.26 s**, comprising
+148 v4 policy, 213 v4 wrapper, 180 assessment verifier, 58 original flags probe,
+342 probe verifier, 66 new publisher, 86 record/document and one outcome-free
+import-closure check. Previous subsets/repeats are not additive. Python
+3.13.15, strict `deny network*`, disabled plugin autoload, `--noconftest`,
+`-B`, no cache plugin and fresh in-root basetemp were used; the runner asserted
+no `assistant.dispatch_fence` import. Four new source/test files compile in
+memory without entrypoint execution. The frozen v1-v4 modules, original
+builder/probe/audit and shared helpers remain byte-identical. No complete
+Codex suite ran. The next local commit freezes these D4/D5 pins/protocol and
+the uninvoked publication candidate; only D4/D5 may execute afterward.

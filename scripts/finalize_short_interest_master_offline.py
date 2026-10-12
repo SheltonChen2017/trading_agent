@@ -14,7 +14,10 @@ from data.hashing import canonical_json, hash_bytes, hash_payload
 import research.short_interest_etf.sharadar_securities_master as master
 import research.short_interest_etf.sharadar_master_segments as segments
 from scripts.capture_short_interest_securities_master import _metadata
-from scripts.qualify_finra_short_interest import CaptureRefusal, _prepare_capture_directory, _publish, _publish_json
+from scripts.qualify_finra_short_interest import (
+    CapturePlatformRefusal, CaptureRefusal, _prepare_capture_directory,
+    _publish, _publish_json, _require_capture_platform,
+)
 from scripts.qualify_sharadar_companion import _guard, _utc_now
 from scripts.qualify_short_interest_action_supplement import _clock, _parse_receipt, _protected_bytes
 
@@ -44,6 +47,7 @@ def _source_names():
 
 def _reload(root: Path):
     """Hash captured protected bytes before parsing; no latest-file lookup."""
+    _require_capture_platform()
     directory = root / SOURCE
     names = _source_names()
     # A previously created exclusive output may exist, but no source replacement
@@ -131,6 +135,7 @@ def _code_identity(root: Path, head: str) -> str:
 
 
 def _write_report(root: Path, directory: Path, captures, anchor: str, *, head: str, remote: str, started: str):
+    _require_capture_platform()
     _publish_json(directory, "started.json", {"schema": "si-master-offline-finalization-start-v1",
         "code_head": head, "source_code_head": SOURCE_HEAD,
         "source_inventory_sha256": SOURCE_INVENTORY_SHA256,
@@ -160,6 +165,7 @@ def _write_report(root: Path, directory: Path, captures, anchor: str, *, head: s
 
 
 def _finalize(root: Path, *, head: str, remote: str):
+    _require_capture_platform()
     _guard(root, head, remote)
     captures, anchor = _reload(root)
     started = _utc_now()
@@ -182,11 +188,14 @@ def main(argv=None):
     parser.add_argument("--expected-remote", required=True)
     args = parser.parse_args(argv)
     try:
+        _require_capture_platform()
         result = _finalize(Path.cwd().resolve(), head=args.expected_head, remote=args.expected_remote)
-    except (CaptureRefusal, ValueError, OSError, KeyError, UnicodeError):
+    except (CaptureRefusal, ValueError, OSError, KeyError, UnicodeError) as exc:
         # Never publish external exceptions, paths, source rows or account facts.
         result = {"status": "offline_finalization_refused", "provider_requests": 0,
                   "credential_reads": 0, "backtest_result_exists": False}
+        if type(exc) is CapturePlatformRefusal:
+            result.update(code=exc.code, ready_for_empirical_backtest=False)
         print(json.dumps(result))
         return 2
     print(json.dumps(result, sort_keys=True))

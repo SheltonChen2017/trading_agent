@@ -7,6 +7,7 @@ from pathlib import Path
 import urllib.error
 
 import pytest
+from short_interest_capture_fixtures import portable_capture_platform
 
 from data.hashing import canonical_json, hash_bytes, hash_payload
 import research.short_interest_etf.massive_action_supplement as contract
@@ -171,6 +172,7 @@ def test_existing_receipt_prevents_budget_restart(tmp_path, offline):
     assert (tmp_path / "attempt-01.started.json").read_bytes() == b"preserved"
 
 
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_protocol_tamper_refuses_before_receipt_or_http(tmp_path, offline, monkeypatch):
     original = contract.supplement_protocol()
     original["maximum_requests"] = 63
@@ -192,6 +194,7 @@ def test_run_name_and_start_clock_are_same_second():
 
 
 @pytest.mark.parametrize("key", [None, "", "short", "x" * 513, "long-key-with\nnewline", "long-key-with space"])
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_only_named_existing_environment_key_can_be_used(monkeypatch, key):
     if key is None:
         monkeypatch.delenv("MASSIVE_API_KEY", raising=False)
@@ -285,6 +288,7 @@ def fabricated_prior(monkeypatch, tmp_path):
     ("attempt-02.started.json", "started_at", "2026-10-11T22:00:11Z"),
     ("attempt-01.received.json", "received_at", "2026-10-11T22:00:12"),
 ])
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_prior_receipt_chronology_schema_and_exact_ordinal_are_required(fabricated_prior, monkeypatch, name, field, value):
     records, root, blob = fabricated_prior
     records[name][field] = value
@@ -294,6 +298,7 @@ def test_prior_receipt_chronology_schema_and_exact_ordinal_are_required(fabricat
         capture._rebuild_sharadar(root)
 
 
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_fabricated_equal_clocks_are_valid_without_inventing_resolution(fabricated_prior):
     _, root, _ = fabricated_prior
     assert capture._rebuild_sharadar(root).to_payload()["fabricated_only"] is True
@@ -316,6 +321,7 @@ def test_cli_later_directory_cannot_reset_whole_round_budget(tmp_path, monkeypat
     assert json.loads(claims[0].read_bytes())["code_head"] == HEAD
 
 
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_cli_missing_named_key_is_precise_zero_request_preflight(tmp_path, monkeypatch, offline, capsys):
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(capture, "_git", lambda root, *args: args[-1])

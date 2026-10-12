@@ -14,6 +14,7 @@ import urllib.parse
 import urllib.request
 
 import pytest
+from short_interest_capture_fixtures import portable_capture_platform
 
 from data.hashing import hash_bytes
 from research.short_interest_etf import sharadar_companion_qualification as contract
@@ -242,6 +243,7 @@ def test_network_failures_are_fixed_safe_code(tmp_path, local_guard, error):
 
 
 @pytest.mark.parametrize("kind", ["metadata", "schema", "rows"])
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_each_response_kind_has_bounded_read(kind):
     maximum = capture.MAXIMUM_BYTES[kind]
     response = Response(b"x" * (maximum + 1))
@@ -591,6 +593,7 @@ def test_real_nonregular_fifo_refuses_without_waiting_for_writer(tmp_path):
     assert result.stdout.strip() == "credential_file_protection"
 
 
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_unknown_credential_location_refuses_before_open(credential, monkeypatch):
     other = credential.with_name("other.env")
     monkeypatch.setattr(capture.os, "open", lambda *args: pytest.fail("unknown file must not be opened"))
@@ -714,6 +717,7 @@ def test_existing_capture_is_not_overwritten_or_restarted(cli, monkeypatch, caps
     assert json.loads(capsys.readouterr().out)["code"] == "local_preflight_refused"
 
 
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_nonignored_destination_does_not_create_private_market_directory(cli, monkeypatch, capsys):
     monkeypatch.setattr(capture, "_git", lambda *args: "")
     assert capture.main(args()) == 2

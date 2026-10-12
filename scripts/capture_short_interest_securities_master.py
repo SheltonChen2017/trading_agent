@@ -21,7 +21,8 @@ from data.hashing import canonical_json, hash_bytes, hash_payload
 import research.short_interest_etf.sharadar_companion_qualification as old
 import research.short_interest_etf.sharadar_securities_master as master
 from scripts.qualify_finra_short_interest import (
-    CaptureRefusal, _NoRedirect, _git, _prepare_capture_directory, _publish, _publish_json,
+    CapturePlatformRefusal, CaptureRefusal, _NoRedirect, _git,
+    _prepare_capture_directory, _publish, _publish_json, _require_capture_platform,
 )
 from scripts.qualify_sharadar_companion import (
     CREDENTIAL_PATH, SharadarCaptureRefusal, _guard, _http, _read_key,
@@ -86,6 +87,7 @@ def _metadata(raw: bytes, table: str, now: str) -> dict:
 
 
 def _issuer_location(opener, request, key: str) -> str:
+    _require_capture_platform()
     response = None
     try:
         try:
@@ -163,6 +165,7 @@ def _public_unicast(value) -> bool:
 
 
 def _public_addresses(location: str, resolve=socket.getaddrinfo):
+    _require_capture_platform()
     parsed = urllib.parse.urlsplit(location)
     try:
         port = parsed.port
@@ -198,6 +201,7 @@ class _PinnedHTTPS(http.client.HTTPSConnection):
         self._target = target
 
     def connect(self):
+        _require_capture_platform()
         if self._context.check_hostname is not True or self._context.verify_mode != ssl.CERT_REQUIRED:
             raise MasterCaptureRefusal("download_TLS_verification_required")
         family, address = self._target
@@ -217,6 +221,7 @@ class _PinnedHTTPS(http.client.HTTPSConnection):
 
 
 def _download(location: str, key: str) -> tuple[bytes, str, int]:
+    _require_capture_platform()
     parsed, target = _public_addresses(location)
     connection = _PinnedHTTPS(parsed.hostname, target, context=ssl.create_default_context())
     try:
@@ -245,6 +250,7 @@ def _download(location: str, key: str) -> tuple[bytes, str, int]:
 
 
 def _claim(directory: Path, head: str, remote: str, started: str) -> None:
+    _require_capture_platform()
     try:
         _publish_json(directory.parent, "budget-" + master.PROTOCOL_SHA256 + ".json", {
             "schema": "si-sharadar-master-whole-round-budget-v1", "run_id": directory.name,
@@ -256,6 +262,7 @@ def _claim(directory: Path, head: str, remote: str, started: str) -> None:
 
 
 def _capture(root: Path, directory: Path, key: str, opener, *, head: str, remote: str) -> dict:
+    _require_capture_platform()
     protocol = _protocol()
     archives, metadata, location = [], {}, None
     previous_clock = _clock(_utc_now())
@@ -369,8 +376,10 @@ def main(argv=None) -> int:
     parser.add_argument("--expected-head", required=True)
     parser.add_argument("--expected-remote", required=True)
     args = parser.parse_args(argv)
-    root, directory = Path.cwd().resolve(), None
+    directory = None
     try:
+        _require_capture_platform()
+        root = Path.cwd().resolve()
         _guard(root, args.expected_head, args.expected_remote)
         protocol = _protocol()
         started = _utc_now()
@@ -391,9 +400,11 @@ def main(argv=None) -> int:
         opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), _NoRedirect())
         result = _capture(root, directory, key, opener, head=args.expected_head, remote=args.expected_remote)
     except (CaptureRefusal, ValueError, OSError, KeyError, UnicodeError) as exc:
-        safe = type(exc) in (MasterCaptureRefusal, SharadarCaptureRefusal)
+        safe = type(exc) in (CapturePlatformRefusal, MasterCaptureRefusal, SharadarCaptureRefusal)
         result = {"status": "capture_refused", "code": exc.code if safe else "local_preflight_refused",
                   "http_status": exc.http_status if safe else None, "backtest_result_exists": False}
+        if type(exc) is CapturePlatformRefusal:
+            result["ready_for_empirical_backtest"] = False
         if directory is not None:
             _publish_json(directory, "refused.json", {**result, "refused_at": _utc_now(),
                 "outcome_looks_consumed": 0, "qc_launch_attempts": 0})

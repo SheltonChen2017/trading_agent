@@ -43,6 +43,35 @@ class CaptureRefusal(ValueError):
     """Named refusal; no external exception text is emitted."""
 
 
+class CapturePlatformRefusal(CaptureRefusal):
+    """Fixed refusal when this host cannot enforce the protected contract."""
+
+    def __init__(self):
+        self.code = "protected_capture_platform_unavailable"
+        self.http_status = None
+        super().__init__(self.code)
+
+
+def _require_capture_platform() -> None:
+    """Check capabilities only; never inspect paths, secrets or artifacts.
+
+    Passing this prerequisite is not proof of any file's protection. The
+    existing ownership, mode and no-follow checks still enforce that contract.
+    No Windows mode-bit or ACL fallback is claimed by this runtime.
+    """
+    uid_reader = getattr(os, "getuid", None)
+    flags = (getattr(os, "O_NOFOLLOW", None), getattr(os, "O_NONBLOCK", None))
+    if (getattr(os, "name", None) != "posix" or not callable(uid_reader)
+            or any(type(flag) is not int or flag <= 0 for flag in flags)):
+        raise CapturePlatformRefusal()
+    try:
+        uid = uid_reader()
+    except (AttributeError, OSError, RuntimeError, TypeError, ValueError):
+        raise CapturePlatformRefusal() from None
+    if type(uid) is not int or uid < 0:
+        raise CapturePlatformRefusal()
+
+
 class _NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, *args, **kwargs):
         return None
@@ -79,6 +108,7 @@ def _git(root: Path, *args: str) -> str:
 
 
 def _guard_lane(root: Path, expected_head: str) -> None:
+    _require_capture_platform()
     if not re.fullmatch(r"[0-9a-f]{40}", expected_head):
         raise CaptureRefusal("invalid_expected_head")
     if root != Path.cwd().resolve() or root != Path(__file__).resolve().parents[1]:
@@ -94,6 +124,7 @@ def _guard_lane(root: Path, expected_head: str) -> None:
 
 
 def _read_credentials(path: Path) -> tuple[str, str]:
+    _require_capture_platform()
     path = path.absolute()
     if path.resolve() != path:
         raise CaptureRefusal("credential_symlink")
@@ -126,6 +157,7 @@ def _read_credentials(path: Path) -> tuple[str, str]:
 
 
 def _publish(directory: Path, name: str, raw: bytes) -> None:
+    _require_capture_platform()
     target = directory / name
     if target.exists():
         raise CaptureRefusal("artifact_already_exists")
@@ -140,6 +172,7 @@ def _publish_json(directory: Path, name: str, value) -> None:
 
 
 def _prepare_capture_directory(target: Path) -> Path:
+    _require_capture_platform()
     # Resolve before mkdir, including every existing ancestor. Git's lexical
     # ignore match alone cannot prove where a symlink would store licensed rows.
     if target.resolve() != target or target.parent.resolve() != target.parent:
@@ -156,6 +189,7 @@ def _prepare_capture_directory(target: Path) -> Path:
 
 
 def _request(opener, request, maximum: int):
+    _require_capture_platform()
     with opener.open(request, timeout=30) as response:
         if response.status != 200:
             raise CaptureRefusal("http_not_200")
@@ -191,6 +225,7 @@ def _validate_metadata(metadata, headers) -> None:
 
 
 def _capture(directory: Path, credentials: tuple[str, str], opener, *, tickers: list[str], dates: list[str], source_request_budget: int = 8):
+    _require_capture_platform()
     if type(source_request_budget) is not int or not 1 <= source_request_budget <= 8:
         raise CaptureRefusal("invalid_source_request_budget")
     basic = base64.b64encode((credentials[0] + ":" + credentials[1]).encode()).decode()
@@ -296,6 +331,7 @@ def main(argv: list[str] | None = None) -> int:
     directory = None
     stage = "preflight"
     try:
+        _require_capture_platform()
         root = args.expected_worktree.absolute()
         _guard_lane(root, args.expected_head)
         if args.expected_protocol_sha256 != PROTOCOL_SHA256:

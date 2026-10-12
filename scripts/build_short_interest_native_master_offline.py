@@ -19,7 +19,8 @@ import research.short_interest_etf.sharadar_securities_master as master
 import scripts.finalize_short_interest_master_offline as finalizer
 import scripts.qualify_short_interest_action_supplement as companion_reader
 from scripts.qualify_finra_short_interest import (
-    CaptureRefusal, _git, _prepare_capture_directory, _publish, _publish_json,
+    CapturePlatformRefusal, CaptureRefusal, _git, _prepare_capture_directory,
+    _publish, _publish_json, _require_capture_platform,
 )
 from scripts.qualify_sharadar_companion import _guard, _utc_now
 from scripts.qualify_short_interest_action_supplement import _clock, _parse_receipt, _protected_bytes
@@ -87,6 +88,7 @@ def _code_identity(root: Path, head: str) -> str:
 
 def _source_index(root: Path, anchor: str) -> tuple[segments.MasterReportIndex, str]:
     """Verify the old reconstruction without concatenating its private report."""
+    _require_capture_platform()
     directory = root / finalizer.SOURCE / finalizer.OUTPUT_NAME
     raw = _protected_bytes(directory / "index.private.json", segments.MAXIMUM_INDEX_BYTES)
     index = segments.MasterReportIndex.from_bytes(raw)
@@ -191,6 +193,7 @@ def _observation_bytes(source, index: native.SharadarNativeMasterIndex) -> tuple
 
 
 def _build(root: Path, *, head: str, remote: str) -> dict:
+    _require_capture_platform()
     _guard(root, head, remote)
     protocol = build_protocol()
     captures, anchor = finalizer._reload(root)
@@ -263,11 +266,15 @@ def main(argv=None) -> int:
     parser.add_argument("--expected-remote", required=True)
     args = parser.parse_args(argv)
     try:
+        _require_capture_platform()
         result = _build(Path.cwd().resolve(), head=args.expected_head, remote=args.expected_remote)
-    except (CaptureRefusal, ValueError, TypeError, OSError, KeyError, UnicodeError):
-        print(json.dumps({"status": "native_master_offline_refused", "provider_requests": 0,
-                          "credential_reads": 0, "outcome_looks": 0, "qc_attempts": 0,
-                          "backtest_result_exists": False}, sort_keys=True))
+    except (CaptureRefusal, ValueError, TypeError, OSError, KeyError, UnicodeError) as exc:
+        result = {"status": "native_master_offline_refused", "provider_requests": 0,
+                  "credential_reads": 0, "outcome_looks": 0, "qc_attempts": 0,
+                  "backtest_result_exists": False}
+        if type(exc) is CapturePlatformRefusal:
+            result.update(code=exc.code, ready_for_empirical_backtest=False)
+        print(json.dumps(result, sort_keys=True))
         return 2
     print(json.dumps(result, sort_keys=True))
     return 0

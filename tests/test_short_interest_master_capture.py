@@ -10,6 +10,7 @@ import urllib.error
 import zipfile
 
 import pytest
+from short_interest_capture_fixtures import portable_capture_platform
 
 from data.hashing import hash_bytes
 import scripts.capture_short_interest_securities_master as capture
@@ -147,6 +148,7 @@ def test_twelve_requests_source_bound_no_signed_URL_or_secret_persistence(tmp_pa
 
 
 @pytest.mark.parametrize("status", [200, 301, 303, 307, 308, 401, 403, 500, True])
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_issuance_requires_exact_302_and_never_reads_body(status):
     response = Response(KEY.encode(), status=status, location=SIGNED)
     with pytest.raises(capture.MasterCaptureRefusal):
@@ -156,6 +158,7 @@ def test_issuance_requires_exact_302_and_never_reads_body(status):
 
 @pytest.mark.parametrize("location", [None, [], [SIGNED, SIGNED], "https://host.example/?key=" + KEY,
     "https://host.example/?key=" + KEY.replace("-", "%2D"), SIGNED + "\n", "x" * 16385])
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_issuance_ambiguous_or_key_echo_location_is_not_followed(location):
     response = Response(status=302, location=location)
     with pytest.raises(capture.MasterCaptureRefusal):
@@ -163,6 +166,7 @@ def test_issuance_ambiguous_or_key_echo_location_is_not_followed(location):
     assert response.reads == 0 and response.closed
 
 
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_documented_HTTPError_redirect_is_processed_without_body():
     value = urllib.error.HTTPError("https://api.sharadar.com/fixed", 302, "not printed",
                                   Headers({"Location": SIGNED}), io.BytesIO(KEY.encode()))
@@ -173,6 +177,7 @@ def test_documented_HTTPError_redirect_is_processed_without_body():
 @pytest.mark.parametrize("location", ["http://host.example/a", "https://user:secret@host.example/a",
     "https://host.example:444/a", "https://host.example/a#fragment", "https://host.example./a",
     "https://%6cost.example/a", "https://[::1]/a"])
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_download_unsafe_origin_refuses_before_DNS(location):
     def forbidden(*args, **kwargs):
         pytest.fail("must refuse before DNS")
@@ -181,6 +186,7 @@ def test_download_unsafe_origin_refuses_before_DNS(location):
 
 
 @pytest.mark.parametrize("address", ["127.0.0.1", "10.1.2.3", "169.254.169.254", "192.0.2.1", "224.0.0.1", "::1", "fc00::1"])
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_private_reserved_or_multicast_DNS_is_refused(address):
     family = socket.AF_INET6 if ":" in address else socket.AF_INET
     resolve = lambda *args, **kwargs: [(family, socket.SOCK_STREAM, socket.IPPROTO_TCP, "", (address, 443))]
@@ -188,6 +194,7 @@ def test_private_reserved_or_multicast_DNS_is_refused(address):
         capture._public_addresses(SIGNED, resolve=resolve)
 
 
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_mixed_public_private_DNS_is_refused_not_filtered_to_public():
     resolve = lambda *args, **kwargs: [(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP, "", (ip, 443))
                                       for ip in ("8.8.8.8", "127.0.0.1")]
@@ -195,12 +202,14 @@ def test_mixed_public_private_DNS_is_refused_not_filtered_to_public():
         capture._public_addresses(SIGNED, resolve=resolve)
 
 
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_public_address_is_detached_numeric_target_and_hostname_preserved():
     parsed, target = capture._public_addresses(SIGNED, resolve=lambda *args, **kwargs: [
         (socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP, "", ("8.8.8.8", 443))])
     assert parsed.hostname == "signed-storage.example" and target == (socket.AF_INET, ("8.8.8.8", 443))
 
 
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_TLS_requires_certificate_and_hostname_verification_before_connect():
     context = ssl._create_unverified_context()
     connection = capture._PinnedHTTPS("signed-storage.example", (socket.AF_INET, ("8.8.8.8", 443)), context=context)
@@ -209,6 +218,7 @@ def test_TLS_requires_certificate_and_hostname_verification_before_connect():
 
 
 @pytest.mark.parametrize("peer", ["8.8.8.8", "8.8.4.4", "127.0.0.1", "224.0.0.1"])
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_TCP_peer_is_pinned_before_normal_hostname_TLS(monkeypatch, peer):
     class FakeSocket:
         closed = False
@@ -242,6 +252,7 @@ def test_TCP_peer_is_pinned_before_normal_hostname_TLS(monkeypatch, peer):
 
 
 @pytest.mark.parametrize("status,length", [(200, None), (200, "3"), (302, None), (200, "99")])
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_anonymous_download_has_no_auth_proxy_retry_or_redirect(monkeypatch, status, length):
     raw = b"zip"
     class FakeResponse(Response):
@@ -355,6 +366,7 @@ def test_partial_nested_encoded_or_path_capability_echo_is_refused(location, raw
         capture._refuse_capability_echo(raw, "application/zip", location)
 
 
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_capture_clock_reversal_refuses_before_request(tmp_path, offline, monkeypatch):
     clocks = iter([NOW, "2026-10-12T01:59:59Z"])
     monkeypatch.setattr(capture, "_utc_now", lambda: next(clocks))

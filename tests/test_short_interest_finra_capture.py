@@ -8,6 +8,7 @@ import urllib.error
 import urllib.request
 
 import pytest
+from short_interest_capture_fixtures import portable_capture_platform
 
 from scripts import qualify_finra_short_interest as capture
 import os
@@ -246,6 +247,7 @@ def test_redirects_are_not_followed_and_immutable_paths_not_overwritten(tmp_path
     assert (tmp_path / "artifact.json").read_bytes() == b"original"
 
 
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_failure_prints_no_external_exception_text(monkeypatch, tmp_path, capsys):
     monkeypatch.setattr(capture, "_guard_lane", lambda *args: (_ for _ in ()).throw(RuntimeError("fabricated-secret-value")))
     assert capture.main(["--execute-frozen-protocol", "--expected-worktree", str(tmp_path), "--expected-head", "a" * 40,
@@ -283,6 +285,7 @@ def test_symlinked_capture_parent_refused_before_artifact_or_credential_read(mon
 
 
 @pytest.mark.parametrize("guard", ["wrong_branch", "head_changed", "dirty_worktree"])
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_lane_guards_refuse(monkeypatch, guard):
     root = Path(capture.__file__).resolve().parents[1]
     original = {("rev-parse", "--show-toplevel"): str(root), ("branch", "--show-current"): capture.BRANCH,

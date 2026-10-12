@@ -21,7 +21,7 @@ from scripts.qualify_finra_short_interest import (
     BRANCH, DATA_URL, FIELDS, METADATA_URL, TOKEN_URL, CaptureRefusal,
     _decode, _git, _guard_lane, _integer_header, _NoRedirect,
     _prepare_capture_directory, _publish, _publish_json, _read_credentials,
-    _request, _utc_now, _validate_metadata,
+    _request, _require_capture_platform, _utc_now, _validate_metadata,
 )
 
 PROTOCOL_SHA256 = calibration.PROTOCOL_SHA256
@@ -48,6 +48,7 @@ def _source_request(opener, request, maximum: int):
     A 204 is a zero-record transport observation only, not fabricated JSON
     rows or evidence of source/coverage/alias admission. Other responses refuse.
     """
+    _require_capture_platform()
     with opener.open(request, timeout=30) as response:
         status = response.status
         if type(status) is not int or not 100 <= status <= 599:
@@ -92,6 +93,7 @@ def _capture(directory: Path, credentials: tuple[str, str], opener, *,
     The injectable callback also permits fabricated-only transport tests.
     There is no retry, per-panel counter reset, or resume of an existing run.
     """
+    _require_capture_platform()
     source_request_budget = _budget(source_request_budget)
     if any(directory.glob("attempt-*-start.json")):
         raise CaptureRefusal("capture_already_started")
@@ -246,6 +248,7 @@ def main(argv: list[str] | None = None) -> int:
     directory = None
     stage = "preflight"
     try:
+        _require_capture_platform()
         root = args.expected_worktree.absolute()
         _guard_lane(root, args.expected_head)
         if args.expected_protocol_sha256 != PROTOCOL_SHA256:

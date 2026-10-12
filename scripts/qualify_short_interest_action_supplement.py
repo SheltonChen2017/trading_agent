@@ -20,7 +20,8 @@ import research.short_interest_etf.massive_action_supplement as supplement
 import research.short_interest_etf.sharadar_companion_qualification as sharadar
 from research.short_interest_etf.sharadar_actual_input_binding import bind_sharadar_companion
 from scripts.qualify_finra_short_interest import (
-    CaptureRefusal, _NoRedirect, _git, _prepare_capture_directory, _publish, _publish_json,
+    CapturePlatformRefusal, CaptureRefusal, _NoRedirect, _git,
+    _prepare_capture_directory, _publish, _publish_json, _require_capture_platform,
 )
 from scripts.qualify_sharadar_companion import (
     SharadarCaptureRefusal, _guard, _http, _refuse_credential_echo,
@@ -63,6 +64,7 @@ def _clock(value) -> datetime:
 
 
 def _existing_key() -> str:
+    _require_capture_platform()
     # No environment dump, file search, new secret entry or fallback credential.
     key = os.environ.get("MASSIVE_API_KEY")
     if (type(key) is not str or not 16 <= len(key) <= 512
@@ -72,6 +74,7 @@ def _existing_key() -> str:
 
 
 def _protected_bytes(path: Path, maximum: int) -> bytes:
+    _require_capture_platform()
     if path.absolute() != path.resolve():
         raise ActionSupplementCaptureRefusal("source_symlink")
     parent = path.parent.lstat()
@@ -115,6 +118,7 @@ def _receipt(path: Path) -> dict:
 
 def _rebuild_sharadar(root: Path):
     """Read only the named, already completed capture, with exact byte binding."""
+    _require_capture_platform()
     directory = root / SHARADAR_SOURCE
     start_raw = _protected_bytes(directory / "started.json", 65536)
     if hash_bytes(start_raw) != SHARADAR_START_FILE_SHA256:
@@ -183,6 +187,7 @@ def _validated_protocol() -> dict:
 
 
 def _claim_budget(directory: Path, *, expected_head: str, expected_remote: str, started_at: str) -> None:
+    _require_capture_platform()
     # Scope is independent of invocation time and code HEAD: another directory
     # or commit cannot silently reopen this fixed source/protocol allowance.
     name = "budget-" + supplement.PROTOCOL_SHA256 + "-" + SHARADAR_REPORT_FILE_SHA256 + ".json"
@@ -200,6 +205,7 @@ def _claim_budget(directory: Path, *, expected_head: str, expected_remote: str, 
 
 def _capture(root: Path, directory: Path, key: str, opener, qualification, *, expected_head: str,
              expected_remote: str) -> dict:
+    _require_capture_platform()
     protocol = _validated_protocol()
     captures = []
     for ordinal, request_id in enumerate(supplement.REQUEST_IDS, 1):
@@ -271,8 +277,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--expected-head", required=True)
     parser.add_argument("--expected-remote", required=True)
     args = parser.parse_args(argv)
-    root, directory = Path.cwd().resolve(), None
+    directory = None
     try:
+        _require_capture_platform()
+        root = Path.cwd().resolve()
         _guard(root, args.expected_head, args.expected_remote)
         protocol = _validated_protocol()
         started_at = _utc_now()
@@ -302,8 +310,9 @@ def main(argv: list[str] | None = None) -> int:
                           expected_head=args.expected_head, expected_remote=args.expected_remote)
     except (CaptureRefusal, ValueError, OSError, UnicodeError, KeyError) as exc:
         # Never expose external errors, raw rows, account identifiers or secrets.
-        code = exc.code if type(exc) is ActionSupplementCaptureRefusal else "local_preflight_refused"
-        status = exc.http_status if type(exc) is ActionSupplementCaptureRefusal else None
+        safe = type(exc) in (CapturePlatformRefusal, ActionSupplementCaptureRefusal)
+        code = exc.code if safe else "local_preflight_refused"
+        status = exc.http_status if safe else None
         if directory is not None:
             _publish_json(directory, "refused.json", {
                 "schema": "si-massive-action-capture-refusal-v1", "status": "capture_refused",
@@ -311,8 +320,11 @@ def main(argv: list[str] | None = None) -> int:
                 "refused_at": _utc_now(), "outcome_looks_consumed": 0,
                 "qc_launch_attempts": 0, "backtest_result_exists": False,
             })
-        print(json.dumps({"status": "capture_refused", "code": code, "http_status": status,
-                          "backtest_result_exists": False}, sort_keys=True))
+        result = {"status": "capture_refused", "code": code, "http_status": status,
+                  "backtest_result_exists": False}
+        if type(exc) is CapturePlatformRefusal:
+            result["ready_for_empirical_backtest"] = False
+        print(json.dumps(result, sort_keys=True))
         return 2
     print(json.dumps(result, sort_keys=True))
     return 0

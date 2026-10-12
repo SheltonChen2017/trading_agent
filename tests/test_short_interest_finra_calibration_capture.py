@@ -7,6 +7,7 @@ import stat
 import urllib.error
 
 import pytest
+from short_interest_capture_fixtures import portable_capture_platform
 
 from scripts import calibrate_finra_short_interest as capture
 from scripts import qualify_finra_short_interest as base_capture
@@ -290,6 +291,7 @@ def test_two_page_bound_prevents_third_http(tmp_path):
 
 
 @pytest.mark.parametrize("budget", [0, 9, True, 1.0, "8"])
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_invalid_budget_refuses_before_authentication(tmp_path, budget):
     opener = Opener([])
     with pytest.raises(capture.CaptureRefusal, match="invalid_source_request_budget"):
@@ -298,6 +300,7 @@ def test_invalid_budget_refuses_before_authentication(tmp_path, budget):
 
 
 @pytest.mark.parametrize("guard", ["wrong_branch", "head_changed", "dirty_worktree", "wrong_git_root"])
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_reused_lane_guard_refuses_before_network(monkeypatch, guard):
     root = Path(capture.__file__).resolve().parents[1]
     values = {("rev-parse", "--show-toplevel"): str(root), ("branch", "--show-current"): capture.BRANCH,
@@ -315,6 +318,7 @@ def test_reused_lane_guard_refuses_before_network(monkeypatch, guard):
         capture._guard_lane(root, "a" * 40)
 
 
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_wrong_physical_root_refused():
     with pytest.raises(capture.CaptureRefusal, match="wrong_physical_root"):
         capture._guard_lane(Path("/outside"), "a" * 40)
@@ -369,6 +373,7 @@ def test_symlink_capture_refused_before_secret_read(monkeypatch, tmp_path, capsy
     ("--run-id", "finra-source-20261010T000000Z", "invalid_run_id"),
     ("--source-request-budget", "0", "invalid_source_request_budget"),
 ])
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_cli_overrides_refused_before_credential_read(monkeypatch, tmp_path, capsys, option, value, reason):
     monkeypatch.setattr(capture, "_guard_lane", lambda *args: None)
     def forbidden(*args):
@@ -380,6 +385,7 @@ def test_cli_overrides_refused_before_credential_read(monkeypatch, tmp_path, cap
     assert json.loads(capsys.readouterr().out)["reason"] == reason
 
 
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_external_failure_text_is_never_printed(monkeypatch, tmp_path, capsys):
     def refuse(*args):
         raise RuntimeError("fabricated-secret-value")
@@ -485,6 +491,7 @@ def test_cli_non200_source_status_is_preserved_without_admitting_or_reading_body
                    for path in directory.iterdir())
 
 
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_source_http_helper_preserves_response_size_bound():
     opener = Opener([Response(b"xxxxx")])
     with pytest.raises(capture.CaptureRefusal, match="response_size_limit"):
@@ -492,6 +499,7 @@ def test_source_http_helper_preserves_response_size_bound():
     assert len(opener.requests) == 1
 
 
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_source_http_helper_preserves_200_bytes_headers_and_status():
     transport = headers(total=0, count=0)
     opener = Opener([Response(b"[]", transport)])
@@ -500,6 +508,7 @@ def test_source_http_helper_preserves_200_bytes_headers_and_status():
 
 
 @pytest.mark.parametrize("status", [True, None, "fabricated-provider-secret"])
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_source_http_helper_refuses_nonnumeric_status_without_external_text(status):
     opener = Opener([Response(b"fabricated-provider-secret", status=status)])
     with pytest.raises(capture.CaptureRefusal, match="source_http_status_invalid") as refused:
@@ -509,6 +518,7 @@ def test_source_http_helper_refuses_nonnumeric_status_without_external_text(stat
 
 
 @pytest.mark.parametrize("include_page_count", [False, True])
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_source_http_helper_accepts_empty_204_only_with_verified_zero_transport(include_page_count):
     transport = headers(total=0, count=0)
     if not include_page_count:
@@ -527,6 +537,7 @@ def test_source_http_helper_accepts_empty_204_only_with_verified_zero_transport(
     "nonzero_total", "nonzero_offset", "wrong_limit", "small_maximum", "wrong_version",
     "nonzero_count", "malformed_count", "body", "oversize_body",
 ])
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_204_transport_is_not_an_empty_query_when_any_contract_fact_disagrees(change):
     transport = headers(total=0, count=0)
     body = b""

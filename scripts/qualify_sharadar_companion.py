@@ -30,6 +30,7 @@ from research.short_interest_etf.sharadar_companion_qualification import (
     validate_sharadar_schema,
 )
 from scripts.qualify_finra_short_interest import (
+    CapturePlatformRefusal,
     CaptureRefusal,
     _NoRedirect,
     _git,
@@ -37,6 +38,7 @@ from scripts.qualify_finra_short_interest import (
     _prepare_capture_directory,
     _publish,
     _publish_json,
+    _require_capture_platform,
 )
 
 CAPTURE_PARENT = Path("artifacts/short_interest/sharadar_companion_qualification")
@@ -89,6 +91,7 @@ def _refuse_credential_echo(raw: bytes, content_type: str, key: str, status: int
 
 
 def _read_key(path: Path) -> str:
+    _require_capture_platform()
     if path.absolute() != CREDENTIAL_PATH or path.resolve() != path.absolute():
         raise SharadarCaptureRefusal("credential_location_or_symlink")
     parent = path.parent.lstat()
@@ -134,6 +137,7 @@ def _guard(root: Path, expected_head: str, expected_remote: str) -> None:
 
 
 def _http(opener, request, maximum: int) -> tuple[bytes, str, int]:
+    _require_capture_platform()
     try:
         with opener.open(request, timeout=30) as response:
             status = response.status
@@ -156,6 +160,7 @@ def _http(opener, request, maximum: int) -> tuple[bytes, str, int]:
 
 def _capture(root: Path, directory: Path, key: str, opener, *, expected_head: str,
              expected_remote: str) -> dict:
+    _require_capture_platform()
     protocol = _validated_protocol()
     ids = protocol["request_ids"]
     captures = []
@@ -257,9 +262,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--expected-remote", required=True)
     parser.add_argument("--run-id", required=True)
     args = parser.parse_args(argv)
-    root = Path.cwd().resolve()
     directory = None
     try:
+        _require_capture_platform()
+        root = Path.cwd().resolve()
         _guard(root, args.expected_head, args.expected_remote)
         if re.fullmatch(r"sharadar-companion-[0-9]{8}T[0-9]{6}Z", args.run_id) is None:
             raise SharadarCaptureRefusal("invalid_run_id")
@@ -282,16 +288,20 @@ def main(argv: list[str] | None = None) -> int:
         result = _capture(root, directory, key, opener,
                           expected_head=args.expected_head, expected_remote=args.expected_remote)
     except (CaptureRefusal, ValueError, OSError, UnicodeError) as exc:
-        code = exc.code if type(exc) is SharadarCaptureRefusal else "local_preflight_refused"
-        status = exc.http_status if type(exc) is SharadarCaptureRefusal else None
+        safe = type(exc) in (CapturePlatformRefusal, SharadarCaptureRefusal)
+        code = exc.code if safe else "local_preflight_refused"
+        status = exc.http_status if safe else None
         if directory is not None:
             _publish_json(directory, "refused.json", {
                 "schema": "si-sharadar-capture-refusal-v1", "status": "capture_refused",
                 "code": code, "http_status": status, "refused_at": _utc_now(),
                 "outcome_looks_consumed": 0, "qc_launch_attempts": 0,
             })
-        print(json.dumps({"status": "capture_refused", "code": code,
-                          "http_status": status, "backtest_result_exists": False}, sort_keys=True))
+        result = {"status": "capture_refused", "code": code,
+                  "http_status": status, "backtest_result_exists": False}
+        if type(exc) is CapturePlatformRefusal:
+            result["ready_for_empirical_backtest"] = False
+        print(json.dumps(result, sort_keys=True))
         return 2
     print(json.dumps(result, sort_keys=True))
     return 0

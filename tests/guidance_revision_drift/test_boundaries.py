@@ -175,7 +175,8 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         self.assertIn("Codex counter-review of section 31 completed in section 32", header)
         self.assertIn("research/__init__.py`, remains unobserved", header)
         self.assertIn("paused pending independent review and platform preflight", header)
-        self.assertIn("attempt ceiling remains exhausted and no relaunch is authorized", header)
+        self.assertIn("GDR-RP33 is implemented in section 33", header)
+        self.assertIn("attempt ceiling remains exhausted and no manual relaunch is authorized", header)
         self.assertIn("does not mark GDR-0 complete", record)
         # Shared handoff size belongs to the project-wide active-document
         # guard, not this lane's contract/source consistency check.

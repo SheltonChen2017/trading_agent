@@ -10,16 +10,20 @@ and adds custody, ASCII and budget pins. GDR-RP30 is accepted as bounded
 offline software preparation only, not native integration or launch authority;
 Offline log-headroom hardening is now owner-directed; native recovery is
 paused pending independent review and platform preflight.
+GDR-RP33 is implemented in section 33, producing `c589b3dd`; its new source
+awaits independent Claude review. It retains every record commitment in a
+489-line paired format with explicit assumed logging reserves, not verified
+platform accounting or backtest readiness.
 The section-27 evaluation still ended with three pre-initialization failures;
-the attempt ceiling remains exhausted and no relaunch is authorized.
+the attempt ceiling remains exhausted and no manual relaunch is authorized.
 Before any recovery launch the owner still needs to settle output compliance
 with QC's AI-agent rules (GDR-CR28-001) and QC's log-length accounting for the
-861-line readable export (GDR-CR31-003); native loading of the recovery
+new paired readable export (GDR-CR31-003); native loading of the recovery
 carrier is unverified. Only `data/__init__.py` was observed as one LF at
 runtime; `research/__init__.py`, remains unobserved. No successful native
 integration or empirical backtest readiness is established. The original
 economic, data, empirical, account and trading gates remain closed.**
-Current scope/evidence are sections 17 through 32. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 33. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -4143,3 +4147,183 @@ concluded, authorized single end-of-round publication; no intermediate push.
 Native recovery remains conditional; empirical backtesting still requires
 the original design/data/rights/family/window/comparator/action/settlement
 gates. No GDR-0..6, successful QC integration or empirical-readiness claim.
+
+## 33. Owner-directed compact evidence build toward readiness, 2026-10-11
+
+### 33.1 Bounded definition before implementation
+
+Owner direction and the conditional Mia-led recovery authorization are quoted
+in 32.4. Counter-review closure is local commit
+`5a1cf422ac6865565d34b3c661f253d4413bfd56`; no intermediate publication.
+The next bounded software step is **GDR-RP33: paired readable evidence with
+explicit log-headroom reservation**. It addresses the reproduced CR31-003
+risk, not another milestone quota, a strategy change or a QC launch.
+
+Definition of done, fixed before editing implementation:
+
+1. Explicit v2 canonical ASCII JSON pairs each observed account-checkpoint
+   commitment with its immediately following deterministic frame commitment.
+   Keep both full SHA-256 values, every exceptional record/native receipt and
+   every literal valuation; omit no digest. Named `pair`/`value` fields are
+   ordinary readable JSON, not compression, encoding or source transport.
+2. Expand pairs into the original exact sequence and run the unchanged full
+   752-record/372-checkpoint replay, metadata, context, terminal-head and
+   canonical re-export checks. V1 supplied-evidence decoding/export stays
+   available and exact; dispatch only explicit known schemas. Failed/partial
+   output remains diagnostics, not a completion dossier.
+3. Bound v2 delivery conservatively by payload bytes including LF plus an
+   explicit **assumed 40 bytes per message and 2,000 bytes fixed reserve**, all
+   within 100,000 bytes. Enforce cumulative reservation across exports and
+   refusal markers, before SDK delivery; invalid/ambiguous state never resets
+   capacity. These allowances are assumptions, not verified QC accounting,
+   remaining quota, compliance or permission to bypass platform limits.
+4. Switch only the lane native exporter; preserve current-carrier, receipt,
+   owner-cycle and dossier gates. Rebuild all changed source/package identities
+   without rebinding historical failures. No module addition/inventory drift.
+5. Focused v1/v2 success/refusal, partial/failure, bounds, native output,
+   carrier/dossier, bundle/release/preparation, import/document/compile/diff
+   checks; stable handoff for independent Claude review. No complete Codex
+   suite, cloud edit/upload/run, dependency install or immutable draft change.
+
+Read-only design measurements showed a `pair`/`value` route could retain every
+hash in 489 lines / 75,260 LF-inclusive bytes / max 182 bytes, or 96,820 bytes
+including those assumed reserves. These are design measurements, not final
+source identities or native engine evidence. Implementation and final checks
+must follow; no readiness/completion is claimed by this definition.
+
+### 33.2 Implemented behavior and compatibility
+
+Producing commit: `c589b3dddab3f1dd136d10ae7ce1851d64818906`.
+`export_compact_readable_evidence` uses explicit schema
+`gdr.synthetic.readable-evidence.v2`. Each ordinary JSON `pair` contains
+the starting sequence and the two full hashes in actual checkpoint-then-frame
+order; `value` contains the literal frame-index/mark/NAV tuple. All 752 hashes,
+372 valuations, exceptional commitments, event IDs/receipts and metadata remain.
+The decoder expands pairs to the original v1 sequence, runs its unchanged
+reconstruction and metadata checks, then requires byte-exact v2 re-export.
+Original v1 export/parser/manifest remain available for supplied historical
+consistency; native export explicitly chooses v2. Unknown/mixed schemas,
+changed/reordered/missing pairs, values/events/context and noncanonical carriers
+refuse. Original v1 evidence is not rebound to the new source epoch.
+
+Failed singleton-checkpoint/frame forensics can still be exported. An incomplete
+step still cannot reconstruct successfully; no fabricated missing frame or
+completion is inserted. Complete failed-status output cannot become a dossier
+even if all 752 records replay and supplied receipts say completed. Existing
+current-recovery-carrier, LF-output hash, receipt/cycle, metadata and complete
+replay gates stay unchanged, and all provenance/economic/permission flags remain
+false. The result remains digest-reconciled local reconstruction, not independent
+retrieval of raw native transcript bytes.
+
+The algorithm retains its LF-inclusive payload counter and adds an exact integer
+message counter. Reservation is payload + 40 times cumulative messages + one
+2,000-byte fixed reserve; both whole-export and line/count boundaries refuse
+before SDK delivery. Both counters are reserved before the call and survive
+ambiguous delivery. Missing/reset/contradictory individual counters refuse and
+failure diagnostics cannot repair them. Deliberately erasing both counters is
+outside this local-state proof. Single-line boundary tests now enforce the
+stronger reserved allowance, while retaining payload accounting and original
+atomic/ambiguous-delivery checks. No economic or shared behavior changes.
+
+The format manifest reports the explicit assumptions and
+`platform_overhead_verified=false`, `quota_verified=false`. It does not measure
+engine-generated/debug output, organization entitlements or remaining daily
+allowance. The 2,000-byte reserve is a conservative assumption for those other
+messages, not a proof they fit. Actual QC accounting/preflight remains required;
+this is not a route around a platform limit or policy uncertainty.
+
+In plain language, the same checksums and account readings are retained, but two
+adjacent records share one readable message. Extra space is reserved for message
+wrappers and other logging, and lost counters stop output instead of granting
+fresh space. This is preparation for synthetic engine validation, not evidence
+that a backtest completed or that the strategy makes money.
+
+### 33.3 Retained author-QA findings and focused validation
+
+| ID | Priority/status | Evidence/correction |
+|---|---|---|
+| GDR-CR31-003 | P2 / mitigated offline; actual platform gate open | All digests retained while base output drops to 489 lines / 75,260 bytes. Assumed reserved footprint is 96,820 bytes. Actual overhead/quota, native delivery and compliance remain unverified. |
+| GDR-RP33-001 | P2 / author-QA, corrected before commit | Independently valid counters were insufficient: losing/resetting one could discard wrapper allowance. Added coupled payload/count validation and four isolated regressions. Memory-only removal causes all four intended failures; the real guard passes without repairing poisoned state. Deliberate erasure of both is explicitly excluded. |
+| GDR-RP33-002 | P3 / author-QA, corrected before commit | Initial pairing refused an arbitrary failed half-pair that v1 could retain for forensic output. Restored explicit failed-only singleton commitments/valuation without manufacturing a missing frame; v1/v2 incomplete-step reconstruction still refuses. Regression preserves both export and refusal. |
+
+Advisory read-only QA found no further load-bearing P0-P3 defect; it is author
+QA, not independent Claude acceptance. Every test ran from the mandatory root
+using existing Python 3.13.15 `-B`, explicit test/repository paths and network
+denial. No dependency installation or complete lane/repository suite.
+
+| Final-source focused check | Result |
+|---|---|
+| Original v1 plus compact v2 transport | 16 methods / 54 subtests passed, 52.756 s; zero failures/errors/skips/warnings |
+| Native callbacks, output, reserved budgets and v1/v2 dossiers | 17 methods passed, 67.617 s; zero failures/errors/skips; no warnings observed |
+| Added wrapper-only whole-export atomic boundary, separately counted | 1 passed, 1.922 s; raw capacity and count fit but reserved export refuses before any SDK line |
+| Bundle, release/preparation CLI, native closure and generated recovery-carrier consumers | 9 passed, 171.470 s; zero failures/errors/skips; no warnings observed |
+| Boundary/document/import selection before closing header | 3 passed, 0.268 s; zero failures/errors/skips |
+| Final closing-header active-document, fresh-import and transitive checks | 3 passed, 0.258 s; zero failures/errors/skips; final source/test compilation and diff/status checks pass |
+| Final source/test compilation | 88 Python files compiled in memory, no bytecode; source epoch unchanged |
+| Pure memory-only guard mutations | Counter coupling: four intended subtest failures in 0.109 s, real guard passes 0.115 s. Whole-export count: intended failure 0.034 s. Per-line wrapper: intended failure 0.030 s. Whole-export wrapper: intended failure 1.964 s. Compact canonical equality and assumed bound each caught; restored checks passed 10.993 s. No on-disk source mutation. |
+| Additional advisory sensitivity probes | Full replay, canonical equality, separate fixed/per-message allowance sensitivity, ambiguity and counter loss pass, 9.224 s and 0.030 s; no independent/native authority claimed |
+
+The changed source/route's bundle, release/preparation and output consumers were
+included deliberately, correcting the closure-coverage gap in CR31-008 while
+honoring the no-full-Codex-suite instruction. Claude retains full independent
+validation responsibility. All original review findings remain retained.
+
+### 33.4 Exact frozen offline identities
+
+All source identities below were measured after the final production freeze,
+in memory from the mandatory root (2.174 s), not from stale section-30 artifacts.
+No new release, cloud candidate or platform file was saved/uploaded.
+
+| Identity | Exact SHA-256 / size |
+|---|---|
+| Full source | `061ff30fe4053ebfabfa27c38d2e3ccd37d950c2fe3eae4375a933463125ee9f` |
+| Recovery project | `c6b9443aa64f005c48e21f493bfea14918ecf6a730ac4f995bd3a70ee4c269a9`, 21 Python files / 298,870 bytes |
+| Prepared runtime source | `5d1dc6560ad2778fd6a8c514c16641b6e78cf82d514a0088f0a344c31783437d` |
+| Repository-native audit source | `a709cf635ff81ca6d0dc90665225ebd7954cdd9ef0985108330b26cc181f3d6a` |
+| Offline native audit ZIP, not uploaded | `5d081569a901ec5ed3fa0a38b282050cb1dddc276482dee4dbd0e6a60aaa7230`, 292,740 bytes |
+| Full-review bundle, not uploaded | `93e1a7eb7b3e8283254ab67a96504d7c5a29bb9949edb682dad5d74fd154ca38`, 684,046 bytes |
+| Generated root main.py | `57fb24849288e4856c21bfe54ba908b8ccc561696a73ca675b3e93bcc536e45a`, 15,012 bytes |
+| V2 complete base wire anchor | `6889a9bee7b793ff9029211c8baa004fc642d7ea3f7e2370c6abc419ea01c2b3`: 489 lines / 75,260 LF-inclusive bytes / max 182; estimated reserved 96,820 bytes |
+| V2 failed-complete wire anchor | `98fbddd379d9ddc660711407d56a47f14fce01666f4e5ea29193095185b51998`: 500 lines / 76,195 LF-inclusive bytes / max 182; estimated reserved 98,195 bytes; never completion evidence |
+| Current-context v1 compatibility anchor | `85997c345c9c676725bcb2be29f6590e6f9a8e12947acb53ab7e64f51c6d642c`: 861 lines / 88,969 LF-inclusive bytes / max 167; not a historical source rebind |
+
+Fixed fixture `8f35d56a335d3f7d9dad016e1e2236de7fcd2635e5c463c30081f97b7b944458`,
+semantic draft `b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c`
+and raw draft `1dd9b5969853924d7682b4b566734ea7e90f061340d6378912118fb93d132110`
+remain unchanged, as do the two project-only initializer overrides. Source
+changes create a new software epoch, not a new attempt budget or evidence of
+engine/CLR/Python binding, settlement, comparator or corporate-action parity.
+
+### 33.5 Closing handoff and next permitted action
+
+Accumulated independent-review range begins at exact Claude push
+`da6a7bb96d3b5f7d35bdd41c87efad43627e419a`: counter-review closure
+`5a1cf422ac6865565d34b3c661f253d4413bfd56`, producing implementation
+`c589b3dddab3f1dd136d10ae7ce1851d64818906`, then this record/status-pin
+closure. Only lane source/tests and this lane record changed. Shared behavior,
+immutable proposal and frozen root documents remain untouched. The bounded
+offline delivery receives one guarded non-force end-of-round publication to
+the matching branch; no intermediate push. Final publication SHA and remote
+verification are retained in thread/automation memory, not inserted recursively
+into this commit. Until that succeeds the new commits remain local-only.
+
+Next is independent Claude review of the exact new publication, then Codex
+counter-review of every pushed review commit/finding. The owner's Mia-led
+synthetic recovery authority is conditional on that acceptance and current
+QC compliance/quota preflight. It does not authorize a fourth manual attempt,
+unlimited Mia launches, changed economics or real data. Preserve the old
+three failures and every later recovery action separately. Use only the fixed
+372-frame fixture; when Mia operates, retrieve every resulting source through
+the permitted interface, diff against the exact candidate and document every
+change before accepting/porting verified lane corrections. Wait for an eligible
+shared node if occupied; never cancel/reallocate another lane.
+
+This build does **not** make the lane empirically backtest-ready. Independent
+review, actual native completion and platform prerequisites remain; the
+original design/rights/data/family/look/window decisions, real-data adapter,
+matched-SPY/corporate-action and cash-settlement parity remain unapproved or
+unproved. Original GDR-0..6 are not declared complete. All immutable null/false
+gates remain, and no provider, real/reference/action data, empirical outcomes,
+protected dates, purchase/installation, operator database, QC scheduler,
+broker/paper/live/funded/capital, PR/main or cross-lane mutation is authorized.
+The monitor remains paused; no automatic recurring-loop/re-arm is inferred.

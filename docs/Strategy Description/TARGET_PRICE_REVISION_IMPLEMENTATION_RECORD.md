@@ -4,10 +4,12 @@ Current follow-up (section82): owner00501bc2… explicitly authorizes genuine
 built-in Mia scoped audit-key repair/recovery, preserving the frozen strategy.
 The review checkpoint is skipped for this continued round only, not accepted
 by Claude. Fresh baseline003 is unchanged; corrected helper/main-import writes
-are approved under Repair001, actual all-file capture/native verification still
-pending. No fourth Codex OFF attempt/reset, ON launch, new outcome or accepted
-2021-now comparison/performance. OFF3/ON0/look19 and open F017/F018/F012 remain
-until factual new evidence. Read-only support is focused-tested and accepted
+were made under Repair001 and all-file post003/inspection003 verify exactly
+the scoped delta. Genuine Mia recovery001 launched job e3324aef… under frozen
+actual source/economics; it is still running, native verification pending.
+No fourth Codex OFF attempt/reset, ON launch or accepted 2021-now comparison/
+performance. OFF3/ON0/look20 (18cloud+2historical local) and open F017/F018/F012
+remain until factual new evidence. Read-only support is focused-tested and accepted
 after correction internally, not strategy/native acceptance. One final push
 only after a stable complete/blocked handoff; monitor remains paused.
 
@@ -18700,3 +18702,103 @@ All-file/post-job comparison and private UI ledger/status/native collection
 require their own fresh bounded receipts after actual IDs. Completed label
 alone never proves usable accounting/closed F017/F018 or accepted metrics.
 Actual effect/status will follow. Heartbeat remains PAUSED, no push yet.
+
+QA/freeze preregistration committed locally as
+`e6bf9b0972a73d715e3094ca6c7cdb071e70ed0f`; exact public metadata5599/
+6fd82505… and tests19838/366b9a4e… independently checked/in-memory compiled;
+updated active-record/import/two active-document checks232passed1skipped/
+4.97s, diff/staged/physical/Git root/branch/HEAD/status and actual remote61a81d9a
+verified. Clean afterward; no push. Fresh native Safari exact own project
+37650980 authenticated Connected owner, genuine Mia selected and Ask Before
+Edits observed. AX composer click did not focus; screenshot-guided coordinate
+focus verified actual entry area BEFORE paste (no source-edit effect). Exact
+registered recovery message visibly staged/submitted. Mia proposed one
+create_compile then create_backtest, with no actual tool/job effect yet.
+
+`TPR-EXT26-D080`, delegated routine execution-tool choice BEFORE effect:
+Mia's disclosed create_backtest includes its own compile before queue; choose
+ONE integrated genuine Mia create_backtest, ZERO separate create_compile.
+This implements freeze's total one-compile/one-job bound rather than executing
+two compiles from its initial proposal. No economics/source/attempt/scope
+expiry change, no raw API/controller masquerading as Mia. Tool-mandatory
+compile is acknowledged; exact successful compile/job binding still needs
+actual IDs/source comparison rather than narrative assertion. Alternative
+separate+automatic compile rejected as exceeding the intended total bound;
+if integrated path cannot comply with included resources/zero edits, stop.
+Approval amendment1147UTF8bytes/SHA256
+`8a99dc8384be64c4d57a37d94e8e0a0f126204cb0ee83782cc6576d03200be24`
+is registered before its submission/Allow effect, same fresh UI/run windows.
+No candidate port, actual look20 or new native outcome has occurred yet.
+
+### 82.7 Actual genuine Mia recovery launch; observed look20 retained
+
+Limited integrated approval visibly submitted; Mia itself invoked exactly
+one create_backtest and returned a genuine new job
+`e3324aef9bd2af2caf16a32468eeb101`, named
+`TPR-EXT26-MIA-RECOVERY-20261012-001`. Native own-project UI records
+build ef4179-5f7e58 at6:54:57 and request6:55:03/deployment6:55:13,
+Lean2.5.0.0.18178; UI labels are not separately asserted UTC proof. Warmup
+2020-09-01 finished at2021-01-04; fresh job observable. No separate root/API
+compile/backtest or Mia source-write card in recovery. Ask Before Edits stayed
+enabled but genuine Mia's run tool launched directly after the explicit
+limited action approval; no separate Allow card was required for this run.
+
+Observed looks now **20=18cloud+2historical local**, including exactly this
+Mia job regardless of eventual failure; Codex OFF attempts remain3of3, ON0.
+This is not candidate renaming/attempt reset/Codex4, and no new approval or
+look is manufactured for ongoing read-only collection of the same job.
+Mia attributes compile success/warnings only and zero writes; actual source
+and native terminal/accounting proof still require separate bounded capture.
+Its recovery census currently2chat reads+1integrated run (3calls), zero
+result reads; final census must be observed, not assumed. Current evolving
+dashboard metrics are outcomes of a running job, NOT accepted returns or
+the completed 2021-now comparison. Full compiled-source ID not yet returned;
+short ef4179-5f7e58 label is honest GUI observation only.
+
+Before one follow-up composer message register628UTF8bytes/SHA256
+`2d732feaa7a2f4bd157a7711ab1eba2759e4b3e773e9e7cf088b0bb3bcf61b2c`,
+within same UI/run budget/window: asks ONLY the already-approved <=10new-job
+read-only calls after completion for genuinely returned compileID, terminal/
+SUMMARY/index/dates/census. Explicitly no additional compile/run/edit/retry,
+invented compile binding or ON action. Actual hashes/all-file capture, private
+ledger and native read receipts remain separately preregistered requirements.
+
+Look20 public own-job metadata1370bytes/SHA256
+`afe5e0994e140f127ac0bd92521448e0126e296c37fe11318f89f24e7c7334a0`
+(`extended_mia_recovery_look20.json`) records genuinely observed job and
+short GUI build label only; full native compile/source proof remains false.
+Clock06:55:28Z was read BEFORE the launch observation, not claimed exact
+launch time. Earlier1349byte draft used an overprecise field label, corrected
+before any committed/private lookup or result effect; no outcomes changed.
+
+BEFORE private UI-ledger effect register
+`TPR-EXT26-MIA-LEDGER-WRITE-20261012-001`,07:09:00Z–07:39:00Z:
+write ONLY new fixed operations/TPR-EXT26-MIA-RECOVERY-20261012-001.ui-ledger.json,
+1926bytes/SHA256
+`c92291a4d68a152a014e301794b10a55ded8a61f93f8902f125f8cb323f1b115`.
+Exact own private parent/ignored path/absence/no-symlink preflight and0600
+mode, no overwrite, credentials/old private bodies/API access or candidate
+change. Binds sourcepost003/baseline003/all12file hashes/look20/exhausted3,
+actor genuine built-in Mia, jobe3324aef… and GUI label ef4179-5f7e58. This
+is a declared observed-UI provenance receipt, NOT independent full native
+compile/source attestation; compiled_source_proven=false. If a native read
+returns a different compileID, retain the refusal instead of accepting a
+short-label substitution or inventing binding.
+
+Then prepare/register a fresh own-job status-only result scope (one fixed
+backtests/read<=2MiB+oversize byte,<=30sec request/600sec aggregate, no retries)
+with committed source closure/new HEAD/time and this exact ledger descriptor
+BEFORE execution. No post/source/input/ObjectStore body reads in status scope,
+no compile/write/newjob/look. The same own job may have later separately
+bounded collection when terminal; no old/spent scope implicitly renewed.
+
+Public source diagnostic while waiting, not outcome proof: daily audit is
+scheduled16:01 but has no actual callback-clock assertion/UTC payload; native
+Plot supplies no explicit x. No explicit2024cutoff/quit path found. Reader
+requests full range/count2000 without local resampling; cloud chart sampling
+remains an alternative unless fresh summary/order coverage confirms frontier.
+Date is added before append/Plot, so append failure could leave internal count
+ahead. Future/mixed cap clocks, subscription identity, missing RAW mark/parity
+and journal bounds are source-compatible failure paths, not proved fired.
+Never snap/shift/interpolate missing/wrong-clock NAV or attribute platform-only
+cause from configured dates/final progress/end-hook frames. F018 stays OPEN.

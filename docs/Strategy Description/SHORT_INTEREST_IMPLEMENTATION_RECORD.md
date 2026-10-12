@@ -6,8 +6,9 @@ AGAINST THAT COMMIT. THE OWNER EXPLICITLY AUTHORIZES CONTINUING WITH EXISTING
 SHARADAR, MASSIVE/BENZINGA AND QC ACCESS; SECTION 111 RECORDS THE PROSPECTIVE
 FULL-CAPTURED-POPULATION MASTER AND THE PRECISION TRANSPORT WORK. THE NEW
 MASTER'S TWELVE REQUESTS ARE CONSUMED AND ITS PRIVATE OFFLINE RECOVERY IS
-COMPLETE. NATIVE-KEY/RATIONAL-OBSERVATION APPLICATION IS FROZEN BEFORE USE;
-ACTUAL STATUS FOLLOWS IN SECTION 111. NO COMPLETED BACKTEST IS CLAIMED. STRICT ORIGINAL-
+COMPLETE. NATIVE-KEY/RATIONAL-OBSERVATION APPLICATION COMPLETED OFFLINE AND
+ITS PRIVATE OUTPUTS REBUILD BYTE FOR BYTE. ACTUAL STATUS IS IN SECTION 111.
+NO COMPLETED BACKTEST IS CLAIMED. STRICT ORIGINAL-
 VINTAGE PIT REMAINS DISTINCT FROM LATEST-REVISED EXPLORATION. LOOKBACKS
 20/60/120/252 ARE UNSELECTED, CANONICAL ACTUAL LOOKS 0/0, EXPLORATORY ACTUAL
 LOOKS 0, ALPHA 0, QC ATTEMPTS 0. SOURCE P2s, SHARED `SI-CR5-005` /
@@ -223,6 +224,7 @@ Append one row before every push. Never rewrite earlier rows.
 
 | 2026-10-11 | Codex counter-review + private v2 source binding | Claude `0cdd2c6d`; counter-review `d6374ab6`; prospective implementation freeze `5b21af08`; this closing record follows | Exact checkpoint `2e6faa55` counter-reviewed first, then one bounded identity/rational/corporate-action source milestone | Sole Claude commit accepted after appended immutable provenance/count/cross-reference errata. Source-only v2 inventory built; exactly 62 committed Massive GETs complete, no retry or extra page. Reports rebuild byte-identically in protected ignored storage; no provider rows or Sharadar fitness conclusion published. | Main focused **323 passed in 11.20s**; eight material receipt/budget red cases corrected; agent lexical provenance regression red then green; compilation, independent offline receipt/report reconstruction and protected storage checks pass. Closing checks in 109.5. Full lane suite left to Claude. Canonical actual looks **0/0**, exploratory actual looks **0**, alpha **0**, QC attempts **0**. | `SI-SUPP-001..003` closed for new code; older parsed-hash scope qualified rather than rewritten. `SI-CR21-001` immutable historical lapse retained; source/shared P2s and prospective P3s still open. | One combined final non-force matching-lane push; delete handled one-shot automation, leave all other paused monitors unchanged. Claude independently reviews this exact snapshot; next actual-input/full-population/evaluation/QC milestone remains factually gated, not unlocked by source capture. |
 | 2026-10-12 | Claude review | `0cdd2c6` -> `b799daa` reviewed from the published head; **no code or test correction**; this record commit is the only Claude commit | Independent review of Codex's counter-review of section 108, the private v2 source binding and the single 62-request Massive action supplement | Confirmed both findings against my section 108 (mutation total four of five, not eight of nine; 108.3 cross-reference). Verified the freeze preceded retrieval, the key never persists, the whole-round budget claim cannot be reset, and the supplement and both binding inventories rebuild byte for byte, printing no provider data. Ran five in-memory mutants; all red. | Pushed tree `b799daa`, clean, Codex idle, network-denied, empty environment: new and package-scanning lane files with active-document and ML boundary **654 passed** (230 new cases; no skips or warnings); mutation baseline 230 passed; compileall exit 0; final-tree active-document 69 passed; `git diff --check` clean. No network request by Claude. **Authorized looks 0, consumed looks 0**. | No new finding against Codex. `SI-CCR21-001` (P3) confirmed against Claude and closed; `SI-CR21-001` closed as a forward rule; `SI-SUPP-001..003` accepted, two reproduced. `SI-CR19-003`, source P2s, shared P2 and `SI-CR15-001` open. | Codex counter-reviews this record commit, then the full-population identity, denominator and cashflow contract. Every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
+| 2026-10-12 | Codex counter-review + source integration | Sole Claude `2a65d4a0` accepted; implementation `a5ac4c22`, `ab169b34`, `4acd6222` and this closing record | Full protected native master capture, offline bounded recovery, batched native keys/exact rational observations and explicit QC decimal mirror | Twelve frozen requests consumed; monolithic storage refusal retained and recovered offline. Native index/v3 binding actually applied and independently rebuilt byte for byte. Eleven draft software findings retained/corrected with material red/green proof; no new defect against Claude's record. | Main pre-application focused **586 passed in 7.82s**, targeted sixteen-file compilation/diff checks; final checks in section 111.10. Actual source-only acquisition is twelve requests; subsequent recovery/application/rebuild adds zero provider requests/credential reads/outcome looks/QC attempts. | No in-lane software P0/P1/P2 remains from this round. Source P2s, shared P2 and prospective P3s retained. Current full master/revised source keys are not raw historical aliases or a full-study economic bundle; documented terminal cash/payment fields remain unresolved. | One combined non-force lane push, no interim push. Claude independently reviews the exact combined checkpoint before the next serialized round. Next qualify composite-to-class relations, class denominators and case-specific payment/terminal evidence before an actual-input/QC candidate; no generic owner approval, affiliation or purchase inferred. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -16697,3 +16699,168 @@ destination is the protected ignored `sharadar_native_binding` directory;
 original master, segmented recovery, old companion and consumed budgets stay
 unchanged. This local freeze is not an interim push. Actual completion/integrity
 and the remaining factual boundary follow below before the single final push.
+
+### 111.9 Actual native application and independent byte-identical rebuild
+
+The clean prospective checkpoint is
+**`4acd6222b5617af57e3ca6bb4dddf1682db9388d`**, actual remote unchanged at
+`2a65d4a0`. Application ran once from that designated worktree with empty
+inherited environment: start **2026-10-12T07:22:43.794403Z**, completed
+**2026-10-12T07:24:29.013623Z**. Runtime protocol
+**`7c19a40efb2151112eec6984899b05fae77becad1cfe5c43408129cfc578b322`**;
+code identity
+**`cacb981593ad90073017806179d8113dfb761a5792f2413454d2602aaf7ec345`**.
+The protected exclusive output is
+`artifacts/short_interest/sharadar_native_binding/native-index-source-20261012T055800Z`.
+
+| Evidence | Exact SHA-256 |
+|---|---|
+| Native index payload | `e42e6213f744c75a15e1feee2c2156aaac3749999f53bb82821fbc856dae798f` |
+| Native index bytes | `7612d2326a846c1717ec5d56a07b3ad2b1e5feb36ed7d89c3a798fde147d3b22` |
+| V3 observation binding payload | `d6b10eaccebe6f9acef1700c2d16c6999ac65921c46be23c189fcf1457aca81c` |
+| V3 observation binding bytes | `d8fff2685b60be6b9398ae911ba8bd088729ec376bd1dd901f004e1c0977204a` |
+
+Main independently reran the protected original source/budget inventory,
+stored reconstruction index/part digests and fixed completion/provenance
+checks. It verified exact new output inventory, protected regular files,
+start/completion/code/protocol/source pins and exact primitive closed counters.
+It rebuilt the native index from the original archives, rebuilt the original
+sixteen-request companion report and the v3 binding, and matched both saved
+private outputs **byte for byte**. No original source, consumed claim, refusal,
+segmented output, old companion or 62-request supplement was overwritten.
+Provider rows, identity/classification dispositions, counts and source-usability
+conclusions stay private, not in this record or chat.
+
+Application and its independent reconstruction made **0 additional provider
+requests, 0 source-provider credential reads, 0 outcome looks and 0 QC
+attempts**. The original full-master capture still consumed exactly twelve
+requests, with its size refusal and lineaged offline recovery retained. No
+requested backtest, return, performance or node-occupancy result is claimed.
+Source-key/rational binding is operational on retained inputs, not a full-study
+economic bundle or actual-runner permit. Final factual boundary and closing
+validation/publication are recorded next.
+
+### 111.10 Exact remaining factual boundary, decisions and closing handoff
+
+**Completed:** the sole exact Claude counter-review, full captured provider
+master acquisition, bounded offline recovery, private native-key/rational
+observation integration and precise decimal order-mirror module. The final
+mirror is not a cloud adapter, and the captured master is not a historical
+classification/availability contract. The original financial panels are still
+ten-token sentinels, not a full-study price/share population. No empirical
+backtest was launched or node capacity queried; actual looks **0/0** canonical,
+**0** exploratory, alpha **0**, permanent look IDs **none**, QC attempts **0**.
+
+There is a documented next identity route, not a fabricated identifier:
+[Massive ticker details](https://massive.com/docs/rest/stocks/tickers/ticker-overview)
+can return both optional composite and share-class FIGIs in one record. An
+authenticated, unambiguous observed relation may link exact Sharadar composite
+assertions to separately reported class IDs; missing/conflicting relations must
+remain unresolved. Neither copying a composite into a class field nor a current
+match establishes historical availability. Prospective sample/budget and native
+historical/class-denominator qualification still precede any such new query.
+No additional query was made during this public-document check.
+
+The immediate **cashflow/terminal factual gap** is concrete. Massive's
+[ticker-event guidance](https://massive.com/knowledge-base/article/how-does-massive-handle-ticker-changes-and-acquisitions)
+explicitly excludes acquisition, merger, spin-off and delisting event types.
+Its dividend route is not acquisition-payment evidence. The endpoint's
+`delisted_utc` description and that guidance disagree on listing-end versus
+last-trade semantics; neither makes it a shareholder-payment clock. Direct
+[Benzinga M&A](https://docs.benzinga.com/api-reference/calendar-api/get-ma)
+documents completion/expected dates, payment type and deal information. Its
+[product dictionary](https://www.benzinga.com/apis/cloud-product/benzinga-m-a-dataset/)
+describes aggregate deal size, not structured per-share consideration plus
+actual shareholder-payment timing. Free-text terms/completion are not an
+exhaustive terminal-action contract. Direct Benzinga M&A entitlement is not
+implied by an existing Massive partner subscription; no new direct credential,
+plan purchase or guessed route was attempted. These are public specification
+limits, not published private-data-fitness conclusions.
+
+**SI-DEC-20261011-21** preserves actual-input refusal and the frozen 48-book
+cashflow economics at this genuine factual boundary. Missing terminal cash is
+not zero, final market cap/price is not consideration, and completion/ex-date
+is not payment. More fixtures or a native-QC default liquidation cannot close
+this gap. A case-specific independently authenticated transaction/payment
+disclosure supplement is a possible next factual route, not admitted or
+exhaustive evidence today. Full historical listed/delisted identity, same-class
+denominators, rational price/volume/terminal coverage and a prospectively
+registered exact QC processing/order representation still precede real
+performance. Original-vintage canonical research separately still lacks
+authentic originals/all corrections and availability clocks; latest-revised
+exploration remains distinct. Existing subscriptions and owner authorization
+are not denied or replaced by generic institution/permission-letter demands.
+
+No further **generic owner approval or routine design decision** is requested.
+External/source facts cannot be supplied by delegation. The next serialized
+round is independent Claude review of this combined checkpoint, then Codex
+per-commit counter-review and factual qualification of the explicit class and
+cashflow/disclosure routes. If an exact qualified candidate becomes ready,
+prospectively register its look and representation, read/recheck authenticated
+capacity and wait for other occupied lanes; at most three unsuccessful
+attempts, then authenticated Mia or owner Mia. No backtest/node claim is
+invented from this source-only work.
+
+**Ledger:** no new P0/P1; `SI-MASTER-001..011` closed as verified software
+findings (including immutable storage recovery), not source gate admission.
+Confirmed, partial and historical false-alarm rows remain unchanged. Retain
+`SI-SRC-20260928-001..003`, shared `SI-CR5-005` / `SI-CCR16-007`, prospective
+`SI-CR19-003` and commitment `SI-CR15-001` without out-of-lane changes or
+rewriting historical FINRA-budget/clock evidence. Current counter-review
+disposition remains **accepted**, not acceptance inferred from transport.
+
+Read-only closing audit confirms the exact **18-file** allowlist: this lane
+record, sixteen new lane-owned Python source/test files and the existing
+import-boundary test's standard-library additions. No shared behavior, root
+Session Handoff, production ranking/seeds, fixture manifest, evaluation
+window or frozen economic rule changed. Before this appended closing section,
+the historical record body/ledger and Claude's section 110 are byte-preserved
+apart from the current status header and appended section 111. The independent
+closing selector passes **83 in 1.37s** (four seal, thirty observation, forty-
+nine runtime cases); no source artifacts or actual clocks were independently
+read by that agent, and main's actual rebuild evidence is separately attributed.
+No current market rows, private fitness conclusions, contacts/account IDs or
+secret literals were found in the new Git scope. Final main execution follows
+below; no complete lane/repository suite is run, which Claude owns.
+
+Exercised approvals: **SI-AUTH-20261011-05** current proceed/standing build
+delegation and **SI-AUTH-20261005-02** single-final publication. Exercised
+decisions: **SI-DEC-20261011-13** exact Claude acceptance; **-14** full captured
+master population scope; **-15** twelve-request private budget/route; **-16**
+later class-specific denominator field selection; **-17** exact economics/
+bounded decimal mirror; **-18** immutable offline segmented recovery; **-19**
+provider-key native index; **-20** separate exact-rational v3 integration;
+**-21** no fabricated economic admission at the factual boundary. No other
+purchase, account, secret, affiliation, provider-right or QC-route approval
+is invented. No email, credential issuance/terms acceptance, new purchase,
+sealed holdout, outcome join, ETF/production ranking/seed change, QC history/
+project/upload/processing/compile/job/backtest, broker, operator database,
+deployment, paper/live, capital, real orders or trading. Other paused monitors
+remain unchanged; no rearm or new scheduled work is inferred.
+
+Accumulate the final record commit locally, then make **one** combined non-force
+push from this designated worktree with follow-tags disabled, only
+`HEAD:refs/heads/codex/strategy-short-interest`. Reverify roots, branch, HEAD,
+status and actual matching remote immediately before commit/push, preserve
+user edits and stop on unexpected advancement. Verify clean local/tracking/
+actual-remote equality afterward and report the exact hash and section-111
+review-note link. There has been no interim push in this round.
+
+Final main closing selection: **586 passed in 9.59s**, empty inherited
+environment/network denied, no skip/warning; targeted compilation previously
+exited **0**, and `git diff --check` stays clean. Final active-document/privacy/
+historical-body/status checks are rechecked after this result entry. The only
+closing change after `4acd6222` is this lane record: updated current status,
+appended actual/closing sections and one new current-round table row, without
+altering earlier ledger rows or Claude's section 110. The complete ordered
+publication range after accepted Claude `2a65d4a0` is `a5ac4c22`, `ab169b34`,
+`4acd6222` and this closing record commit; no merge, hidden commit, other
+branch or interim push. Claude must review each, including the record-only
+commit, on the same long-lived lane before the next serialized round.
+
+Final active-document check: **69 passed in 0.63s**, network denied. Main's
+exact byte comparison removes only the new current-round row/status/section;
+all historical body and ledger bytes through Claude's section 110 match
+`2a65d4a0`: **1,444,434 bytes**, SHA-256
+**`608f7d99204b0f377e1f65dd7572dab20638170388d67c2d9e27c726cc571401`**.
+No other uncommitted file or pending source execution remains at closing.

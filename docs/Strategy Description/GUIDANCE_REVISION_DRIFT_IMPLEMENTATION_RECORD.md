@@ -1,14 +1,15 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Independent Claude review of `b71be466..efa6c74f` (sections 29
-and 30, including the GDR-RP30 offline recovery preparation) recorded in
-section 31, 2026-10-11;
-Codex counter-review of section 31 pending.
-All four Codex commits are accepted, three after correction; `4d3d8510`
-restores the lane selection that GDR-RP30 left red and adds custody pins. The
-recovery carrier and readable evidence route are prepared offline only.
-Beyond this round's one push,
-the next milestone is paused for owner direction.
+Status: **Codex counter-review of section 31 completed in section 32,
+2026-10-11, against exact pushed head
+`da6a7bb96d3b5f7d35bdd41c87efad43627e419a`.
+Both Claude commits are accepted, the record commit after documentation
+correction. All eight CR31 findings remain retained. `4d3d8510` corrects
+the missing full-review bundle modules and obsolete native-output test helper,
+and adds custody, ASCII and budget pins. GDR-RP30 is accepted as bounded
+offline software preparation only, not native integration or launch authority;
+Offline log-headroom hardening is now owner-directed; native recovery is
+paused pending independent review and platform preflight.
 The section-27 evaluation still ended with three pre-initialization failures;
 the attempt ceiling remains exhausted and no relaunch is authorized.
 Before any recovery launch the owner still needs to settle output compliance
@@ -18,7 +19,7 @@ carrier is unverified. Only `data/__init__.py` was observed as one LF at
 runtime; `research/__init__.py`, remains unobserved. No successful native
 integration or empirical backtest readiness is established. The original
 economic, data, empirical, account and trading gates remain closed.**
-Current scope/evidence are sections 17 through 31. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 32. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -3898,7 +3899,7 @@ GDR-CR31-003.
 | 29.2-29.4 retained ledger, identities and proposal | Accepted, with the wording correction GDR-CR31-004. The GDR-CR28-011 resolution (section 27's operational ledger is authoritative for the closed cycle) answers that finding for this cycle. |
 | 30.1 owner instruction "counter review and implement the next milestone" | Recorded only by Codex; listed in 31.7. It authorizes GDR-RP30 as offline preparation only, not a QC run. |
 | GDR-CR28-001 (compressed/Base64 trace output) | Accepted as addressed offline. The native closure now carries `readable_transport` instead of `trace_transport`, and the readable route emits only canonical ASCII JSON. Platform compliance and quota remain an open owner/QC gate; GDR-CR31-003 adds the log-headroom risk. |
-| GDR-CR28-002 (one-LF empty initializer) | Accepted as addressed offline. The recovery carrier replaces exactly the two zero-byte initializers with one 77-byte comment ending in LF, only in the generated project. The default carrier still refuses old empty or LF variants (QR01-QR05 in 31.6). Runtime loading remains unverified. |
+| GDR-CR28-002 (one-LF empty initializer) | Accepted as addressed offline. The recovery carrier replaces exactly the two zero-byte initializers with one 77-byte comment ending in LF, only in the generated project. The recovery verifier refuses old empty or LF variants (QR01-QR05 in 31.6); the default verifier still accepts its exact original empty-initializer representation. Wording corrected in section 32. Runtime loading remains unverified. |
 | GDR-CR28-011 (historical attempt custody) | Accepted. `HistoricalCycleClosure` replays the exact closed cycle with three failures and grants no attempt. |
 | GDR-RP30-001, GDR-RP30-002 (author QA) | Accepted. The cumulative-budget guards are probed by LM01-LM05 in 31.6. |
 
@@ -3922,7 +3923,7 @@ GDR-CR31-003.
 | GDR-CR31-005 | P3 / corrected | `20f82586`, `recovery_preparation._legacy_records`, `_receipt`, `_replay`; `test_recovery_preparation.py` | Ten custody rules were never isolated (RP01, RP07, RP08, RP10, RP16, RP18, RP19, RP23, RP26 and RP29 survived). Most notably, the raw-hash anchor, the only alteration detector for the retained ledger, was only tried with changes that also break replay. Added `test_each_historical_custody_rule_refuses_alone`, with ten cases that each break exactly one rule:<br>- free-text edit against the original anchor<br>- timestamp regression<br>- swapped response endpoints<br>- unsafe response file name<br>- waiver not retained<br>- changed epoch runtime context<br>- second attempt without a new epoch<br>- reused compile ID<br>- reused run ID<br>- ceiling before the third terminal<br>Each mutant now fails exactly its own case. |
 | GDR-CR31-006 | P3 / corrected | `20f82586`, `readable_transport._line`, `_lines`; `test_readable_transport.py` | `canonical_json` keeps non-ASCII text (`ensure_ascii=False`), so the route's plain-ASCII contract rests on two checks, one at export and one at reconstruction. They cover each other (RT06 and RT10 survive alone), and no test supplied a non-ASCII value, so removing both was undetected. Added `test_non_ascii_values_refuse_at_export_and_reconstruction`; the joint mutant now fails. |
 | GDR-CR31-007 | P3 / corrected | `917acc28`, `lean/main.py::_log_evidence`, `_emit_failure`; `test_lean_source.py`, `test_native_observation.py` | Refusal markers bypass the whole-export pre-check, so only `_log_evidence` keeps them inside the line and remaining-budget bounds and counts them. Neither property was tested (LM03 and LM05 survived). Added `test_single_evidence_line_obeys_line_and_remaining_budget_bounds` and `test_refusal_marker_before_context_is_counted_in_the_evidence_budget`; both mutants now fail. They were run through a source-rewriting import hook, because these tests re-import `lean/main.py` fresh for every case. |
-| GDR-CR31-008 | P3 / documented, process | Section 30.4 | Codex validated GDR-RP30 with focused selections and published it with 30 failures and 3 errors in the lane selection. The record truthfully says the full lane suite was not run, but a milestone that changes the module inventory or an output route needs the full lane selection (12-16 minutes here) before its closing push. Recommend making that part of every Codex closure. |
+| GDR-CR31-008 | P3 / documented, process | Section 30.4 | Codex validated GDR-RP30 with focused selections and published a snapshot subsequently reported by Claude as 27 failures and 6 errors in the lane selection (33 unsuccessful tests, as in 31.5; count wording corrected in section 32). The record truthfully says the full lane suite was not run. Claude recommends a full lane selection for inventory/output changes. That recommendation is not adopted under the standing owner instruction: Codex does not run a complete lane/repository suite without an explicit request, and Claude owns full independent validation. Focused closure checks must cover affected bundle, release/preparation and output consumers instead of missing those contracts. |
 
 Scripted count from this table: P0 0, P1 0, P2 3, P3 5; corrected 6, documented 2.
 
@@ -4023,3 +4024,122 @@ Acceptance here is a software review only. It establishes neither native
 execution, QuantConnect integration nor empirical readiness.
 `docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` were not edited
 and stay frozen for both agents.
+
+## 32. Codex counter-review of section 31, 2026-10-11
+
+### 32.1 Exact completed trigger and dispositions
+
+Own publication `efa6c74f6c32d025b371ceaf9d76d2af566b04ec` was already
+published once. The mandatory root/branch were clean at matching local and
+remote `da6a7bb96d3b5f7d35bdd41c87efad43627e419a`. A fetch of only the
+matching lane ref confirmed that object; ancestry and section 31's explicit
+completed-review handoff identify the exact reviewed publication. This consumes
+that trigger once. The complete counter-review range is
+`efa6c74f6c32d025b371ceaf9d76d2af566b04ec..da6a7bb96d3b5f7d35bdd41c87efad43627e419a`.
+Both commit messages and complete diffs, affected production/tests and every
+CR31 finding were inspected. Parallel audits were read-only; all commands,
+tests and memory-only probes ran from the designated lane root. No Claude/user
+dirty work was present initially or overwritten.
+
+| Claude commit | Disposition | Evidence/correction |
+|---|---|---|
+| `4d3d85106d3f48a108dec6386c7744c02999cb6d` | Accepted | Explicit review-bundle inventory and native-output helper corrections reproduce red without the correction and green with it; custody/ASCII/budget pins isolate their guards. No economic, native-project or authority behavior changes. |
+| `da6a7bb96d3b5f7d35bdd41c87efad43627e419a` | Accepted after documentation correction | All findings, earlier Codex dispositions, reported validation and mutation results retained. Corrected default-versus-recovery initializer wording and the failure/error count; full-suite recommendation is qualified by the binding owner restriction. |
+
+GDR-RP30 is accepted as bounded **offline software preparation** after Claude's
+corrections, not as native completion or original GDR-0..6 completion. Software
+assessment: 8/10. Packaging/output-consumer coverage missed by the producing
+round was material; the narrow counter-review confirms its repair. All earlier
+CR28, CCR29 and RP30 findings remain, including policy, native-loading and
+empirical limitations. No new P0, P1 or P2 defect was found in Claude's changes.
+
+### 32.2 Retained finding ledger and corrections
+
+CR31 totals remain P0 0, P1 0, P2 3, P3 5: six corrected, two documented.
+
+| Retained ID | Counter-review disposition/status | Evidence and limit |
+|---|---|---|
+| GDR-CR31-001 | Accepted / P2, corrected | Restoring the exact parent inventory only in memory refuses with the explicit source-manifest mismatch. Current bundle/release/preparation checks pass; both new modules enter only the full-review inventory. Native closure still excludes review-only recovery preparation and legacy trace transport. |
+| GDR-CR31-002 | Accepted / P2, corrected | Restoring the exact parent output helper only in memory makes all three affected methods refuse at the legacy decoder. The readable helper passes the same complete/failure/transient-account assertions, including line and cumulative bounds. |
+| GDR-CR31-003 | Accepted / P2, open pre-launch risk | Independently measured 861 lines, 88,969 LF-inclusive bytes, max 167 bytes; 11,031 bytes headroom, or 12.812 bytes/line. Adding a hypothetical 20 bytes/line gives 106,189 bytes. That is arithmetic, not observed QC accounting. Truncating the end refuses reconstruction. Current [QC Logging](https://www.quantconnect.com/docs/v2/writing-algorithms/logging) confirms tier-dependent caps but does not resolve per-line platform overhead. No organization quota, remaining daily allowance or native delivery is inferred. |
+| GDR-CR31-004 | Accepted / P3, corrected | Source bounds the binding count at 64; the fixture supplies 65 entries. The corrected section-29 wording is accurate. |
+| GDR-CR31-005 | Accepted / P3, corrected | Ten supplied-history cases isolate raw anchor, chronology, response endpoint/file lineage, retained waiver, source-epoch context/new epoch, unique compile/run IDs and terminal-before-ceiling rules. Ten memory-only single-guard mutants each fail exactly the intended subtest; actual source remains untouched. |
+| GDR-CR31-006 | Accepted / P3, corrected | Non-ASCII export and re-anchored reconstruction refuse. Removing both ASCII guards only in memory admits those values and fails the pin; either existing guard alone covers the other in the tested path. |
+| GDR-CR31-007 | Accepted / P3, corrected | Oversized single line, remaining-budget boundary and pre-context refusal-marker accounting pass. Isolated memory-only budget/marker mutants fail their owning pins; reservation-before-SDK-call semantics are unchanged. |
+| GDR-CR31-008 | Partially accepted / P3, documented | The missed packaging/output consumers were a real coverage gap. Correct total is 27 failures and 6 errors, not 30 and 3. The proposed mandatory full Codex lane run is rejected as a workflow change absent owner authorization. Future focused closure must include changed inventory, release/preparation and output consumers; Claude continues to own full independent validation. |
+
+| New ID | Priority/status | Reason and correction |
+|---|---|---|
+| GDR-CCR32-001 | P3 / corrected | Section 31.2 attributed recovery-only refusal to the default carrier. Current default map contains two empty initializers and verifies successfully; re-anchored empty/LF substitutions in the recovery map refuse. The row now distinguishes both strict representations. |
+| GDR-CCR32-002 | P3 / corrected | CR31-008's failure/error split contradicted 31.5 and its own component counts. Corrected to 27/6 and retained the 33-test total, explicitly qualifying the full-suite recommendation by the owner's no-full-Codex-suite rule. |
+| GDR-CCR32-003 | P3 / documented, process | Section 31.1 reports an early local-only look, a concurrently changing live tree and scratch-export validation. The moving-tree run is not snapshot evidence; exports remain historical informational reports, not permission to validate outside the mandatory root. The final pushed review/corrections are accepted on exact-tree inspection and the focused reproductions here. Preserve that history and serialize future review/implementation; no retrospective authorization or history rewrite. |
+
+Claude's 96 mutation categories sum correctly (42 + 12 + 2 + 40). Their
+complete campaign and lane/repository runs remain **Claude-reported**, not rerun
+or reverse-certified here. The fifteen shared/main-owned failures under
+GDR-CR18-005 remain reported and unchanged. Public GitHub repository metadata
+was checked read-only: `private=false`, `visibility=public`. That supports
+31.2's linkability warning, not permission to erase published history or change
+account settings. Only public QC documentation and repository/ref metadata
+were accessed; no QC account, licensed data or empirical outcomes were read.
+
+### 32.3 Focused verification and exact source identities
+
+Existing Python 3.13.15, `-B`, explicit repository/tests `PYTHONPATH` and the
+network-denied `sandbox-exec` profile were used. No installation or full lane/
+repository suite was performed. One initial pytest invocation could not
+collect because that interpreter lacks pytest; builtin unittest ran the exact
+selection instead. Two red-proof harness assertions initially used an incorrect
+error string/map-hash formula; corrected harnesses required no source edit.
+
+| Check | Result |
+|---|---|
+| Two bundle, two release, one preparation CLI and three native-output methods | 8 passed, 170.673 s; zero failures/errors/skips; no warnings observed |
+| Four new custody/ASCII/budget/marker pins and two positive controls | 6 passed, 7.231 s; zero failures/errors/skips |
+| Exact parent bundle inventory, memory-only | Expected refusal, 0.017 s |
+| Exact parent native-output helper, memory-only | All three expected legacy-decoder errors, 12.792 s; actual helper restored |
+| Ten isolated historical-custody mutants | Each fails exactly its intended subtest, real pin passes, 0.104 s |
+| ASCII pair and budget/marker mutants, followed by restored real pins | All intended failures detected; restored pins pass, combined 5.664 s |
+| Full-review/native-closure packaging compatibility | Passed, 0.450 s; no release saved or source extracted/executed |
+| Current recovery/default map verification, wire measurements and truncated-end refusal | Passed in memory, 2.508 s; no carrier persisted/uploaded |
+| Final active-document, fresh-import and transitive-boundary selection | 3 passed, 0.260 s; zero failures/errors/skips |
+| In-memory compilation and diff/status checks | 88 lane Python files compiled; diff check passed; only this record and its active review-state pin changed |
+
+At the exact pushed review head, full-review source is
+`4618789f7ee1a9fa892d73d554369ac92789a362b0b817d3a051100004956c87`;
+full-review bundle is
+`febde415436acccd12b2181f48d7638d5d90971cd647ec7a90a8dc9bbeca7604`
+(673,622 bytes). Recovery map remains
+`d93409f93315387a9d7686baff61d8ab93c07ebc05000d86a7d0e47e97e49924`,
+21 Python files / 288,446 bytes. Runtime, native audit, root and offline native
+ZIP remain exact section-30 identities. The wire anchor remains
+`917a1683cd9e46b47d7d0a8ee960090a2e880ae60d1a383e800cbcc6cc19261a`.
+No hash retroactively rebinds the failed section-27 attempts.
+
+### 32.4 New owner direction and continued boundaries
+
+During counter-review, the owner wrote **"build until backtesting ready"**.
+This authorizes further safe offline build toward readiness, not permission to
+self-approve original economic/data/family/date decisions. The next bounded
+engineering step addresses CR31-003 while preserving complete replay evidence.
+Its definition and implementation must be recorded separately before work.
+
+The owner also answered **"authorized"** to this exact recovery question:
+"Once the revised candidate is independently reviewed and QC compliance/quota
+checks pass, do you authorize a separate Mia-led synthetic-only recovery scope
+using only the invented 372-frame fixture? This would not authorize real data,
+changed strategy economics, or resetting the closed cycle's ledger."
+This is external human direction, not a fabricated typed waiver or flipped
+draft permission. It does not clear the stated review/platform prerequisites,
+grant a fourth manual launch or assign an unlimited recovery budget.
+
+The old cycle remains CLOSED FAILED, three unsuccessful attempts and zero
+manual attempts remaining. Zero QC project edits/uploads/compiles/runs, Mia,
+credentials, node/account/scheduler, provider, broker or empirical actions
+occurred in counter-review. The existing monitor remains paused; this request
+does not re-arm it. Root documents and shared behavior remain frozen.
+Counter-review commits accumulate in this mandatory lane for any genuinely
+concluded, authorized single end-of-round publication; no intermediate push.
+Native recovery remains conditional; empirical backtesting still requires
+the original design/data/rights/family/window/comparator/action/settlement
+gates. No GDR-0..6, successful QC integration or empirical-readiness claim.

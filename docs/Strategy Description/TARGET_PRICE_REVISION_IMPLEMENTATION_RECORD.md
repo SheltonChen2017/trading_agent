@@ -1,14 +1,15 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN
-`ad5af506..9e5ed66e` AND THE CUMULATIVE REVIEW TREE IN SECTION 78.
-CUMULATIVE DISPOSITION: ACCEPTED AFTER CORRECTION OF TESTS AND CURRENT
-RECORD QUALIFICATIONS, NOT ACCEPTANCE OF EXTENDED-QC IMPLEMENTATION OR RESULTS.
-TPR-CR23-001 REMAINS OPEN: THE REPORTED JULY2024 FRONTIER REQUIRES FRESH
-BOUND RECEIPT/ENGINE-LOG DIAGNOSIS; ITS CAUSE AND ITS RELATION TO NAV SAMPLING
-ARE NOT PROVED. OFF'S THREE CODEX ATTEMPTS ARE CONSUMED; ON HAS ZERO.
+Status: **CLAUDE HAS INDEPENDENTLY REVIEWED EVERY CODEX COMMIT IN
+`9e5ed66e..f998144d` IN SECTION 79: THE SECTION-78 COUNTER-REVIEW AND THE
+BOUNDED FRONTIER DIAGNOSIS. CUMULATIVE DISPOSITION: ACCEPTED AFTER CORRECTION
+(SIX REGRESSION TESTS, NO PRODUCTION BYTE). TPR-CR23-001 REMAINS OPEN AND IS
+NOW SHARPER: BOTH FAILURE FRAMES SIT INSIDE THE END-OF-ALGORITHM HOOK AND THE
+ENGINE REPORTED THE RUN COMPLETE AT 2024-07-12; THE OFF ARM READS NO PACKET
+INPUT, SO THE PARTIAL UPLOADS DO NOT EXPLAIN IT; THE NATIVE LOG API IS
+EXHAUSTED. OFF'S THREE CODEX ATTEMPTS ARE CONSUMED; ON HAS ZERO.
 THERE IS NO ACCEPTED 2021-NOW PAIRED RESULT. THE MONITOR IS PAUSED.
-CLAUDE NEXT REVIEWS THIS CODEX ROUND INDEPENDENTLY. SECTION 74'S
+CODEX NEXT COUNTER-REVIEWS SECTION 79 AND THIS ROUND'S CLAUDE COMMITS. SECTION 74'S
 COUNTER-REVIEW OF THE EARLIER THREE-COMMIT CLAUDE RANGE STANDS AS HISTORY:
 ITS INCOMING-TEST CORRECTIONS ARE ACCEPTED, NOT INHERITED RUNTIME READINESS.
 HASH-ONLY AND KEY-ONLY PACKET-RECEIPT NEGATIVES NOW FAIL INDEPENDENTLY UNDER
@@ -33,7 +34,7 @@ SOURCE SAMPLING IS NOT HISTORICAL COMPLETENESS OR PIT PROOF.
 THE OWNER NOW EXPLICITLY AUTHORIZES A FRESH ON/OFF STUDY ALLOWANCE OF AT MOST
 THREE QC ATTEMPTS PER ARM IN SECTION75. THE ORIGINAL ON3/OFF1 COUNTS AND
 SIXTEEN OBSERVED LOOKS REMAIN PERMANENT; THIS IS NOT AN IMPLICIT RESET.
-SECTION 77 REVIEWED THIS CODEX ROUND. SECTION73'S COMPLETE
+SECTION 79 REVIEWED THIS CODEX ROUND; SECTION 77 IS HISTORY. SECTION73'S COMPLETE
 REVIEW OF THE PREDECESSOR ROUNDS IS HISTORY, NOT A PENDING REVIEW STOP.
 THE TWO NEW JOINT STOCK-PORTFOLIO RUNS COMPLETED: ON3 HAS352FILLED NATIVE
 ORDERS, OFF1 HAS309; BOTH HAVE60NAV DATES AND13/14DECISION COVERAGE.
@@ -458,18 +459,18 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, 2026-10-11:** Codex has counter-reviewed the exact Claude range
-`ad5af50612b80afb5e20e928f0b44adbbecc117f..9e5ed66e822f9119feb0db22866a1770fae7f606`:
-three incoming commits separately and cumulatively, accepted after correction
-in section78. This accepts the corrected review tests and qualified record,
-not extended implementation, runtime readiness or performance. Section77's
-independent review covers the exact published ad5af506 snapshot, cumulative
-tree and all six commits of the requested08e3fe79..ad5af506 round, within
-its broader24-commit review. Its historical findings and suite remain intact.
-`TPR-CR23-001` stays open: a reported July2024 terminal frontier is not an
-independently diagnosed cause, proof of884 observed daily valuations, or
-proof that NAV sampling cannot also be defective. Fresh bounded terminal
-and unfiltered own-job log diagnosis is registered in78; no launch is granted.
+**Current qualification, 2026-10-11:** Claude has independently reviewed the exact Codex range
+`9e5ed66e822f9119feb0db22866a1770fae7f606..f998144df14c6a669628a128142f6424402067c1`:
+two commits carrying section 78's counter-review of the section-77 Claude
+commits and the registration and bounded execution of the two-job frontier
+diagnosis. Section 79 dispositions both commits and the cumulative tree
+accepted after correction: six regression tests, no production byte.
+Section 78's corrections of section 77 are accepted; section 77's other
+findings stand as attributed history, not as this round's reruns.
+`TPR-CR23-001` stays open and is sharper: both OFF failure frames sit inside
+the end-of-algorithm hook, the engine reported the run complete at
+2024-07-12, the OFF arm reads no packet input, and the native log API is
+exhausted; the cause remains undiagnosed and no launch is granted.
 Section 74's counter-review accepted the corrected incoming
 tests and record, not inherited runtime or extended-QC readiness. Independent hash-only and
 key-only receipt negatives and valid ON controls strengthen the two tests;
@@ -583,10 +584,10 @@ outcome-free source audit; no real-row D1, outcomes or QuantConnect access is
 authorized by that audit.
 The trust rollback pin, protected parent custody, reviewer identity and
 adversarial matrix remain unresolved and parked. **Exact next role action:**
-The three section73 Claude commits are counter-reviewed in section74.
-Claude next reviews this Codex round independently. Codex's section78
-counter-review resolves the received test/record defects, not `TPR-CR23-001`
-or the native audit failures. The heartbeat is PAUSED during and after this
+Section 79 reviewed the section-78 round; its Claude commits are listed there.
+Codex next counter-reviews section 79 and this round's Claude commits, and
+resolves `TPR-CR23-001` before any further extended launch; section 79.7
+names the owner decisions that resolution needs. The heartbeat is PAUSED during and after this
 round; no automatic rearm. No fourth OFF attempt and no ON launch through
 the known failed export path. The owner's latest
 request is an order-based 2021-now extension of section72's cap-selected
@@ -718,7 +719,7 @@ and are deliberately not listed here.
 | `TPR-CCR10-016` | P2 | TPR-TR0-I completion | Rotation, compromised-key removal, rollback, strict review-to-anchor ancestry, layer-specific byte mismatch, and full local Git/OpenSSH integration evidence are not yet complete. |
 | `TPR-MATCHED-002` | P2 | Matched-study execution acceptance | Attempt3 has four unclassified delisting events; held/target/history/window observations are absent. Mia's complete source-only specification was submitted, but last source readback is initialization-only and computer control timed out. No recovery job/claim exists; three Codex slots are consumed. No fourth launch or inferred-ambient acceptance. See71.6/71.9/71.10. |
 | `TPR-CR22-001` | P2 | Re-driving the Mia scope and the cap-tilt analyses from Git | The code that drove the Mia tool approvals, prompts and source reads (twelve receipts under the hash-bound transport), the cap-tilt failure-review, order-cause, log-quota, transport-sizing, aggregate-review and scope-analysis receipts, and the thin invoker of the pure diagnostics is not in the repository. The pure diagnostics themselves reproduce; the operations do not. Codex should commit those operator scripts or record their exact bytes in the evidence index. |
-| `TPR-CR23-001` | P1 | Any further extended launch or ON attempt; diagnose before Mia recovery | Claude reports a July2024 terminal/rolling-window frontier in OFF2/3 and identical partial statistics; native NAV852/1449 is incomplete. The engine cause and relation to sampling are unproved, not884 independently observed daily valuations. Fresh fixed terminal/unfiltered own-job log diagnosis is registered in78; no fourth Codex OFF attempt, known-broken ON launch or accepted performance. |
+| `TPR-CR23-001` | P1 | Any further extended launch or ON attempt; diagnose before Mia recovery | Claude reports a July2024 terminal/rolling-window frontier in OFF2/3 and identical partial statistics; native NAV852/1449 is incomplete. The engine cause and relation to sampling are unproved, not884 independently observed daily valuations. Fresh fixed terminal/unfiltered own-job log diagnosis is registered in78; no fourth Codex OFF attempt, known-broken ON launch or accepted performance. Section 79 confirms both failure frames lie inside the end-of-algorithm hook, the terminals report progress 1 at 2024-07-12, the OFF arm reads no packet input and the native log API is exhausted; the cause is still undiagnosed. |
 | `TPR-CR23-002` | P2 | Owner retention decision; no new standalone paperwork gate | Vendor-derived objects and journals are attributed retained inventory, with one verified gzip upload, possible failed plaintext object and earlier keys;71newuploads remain held. Cleanup recorded22delete successes without absence verification. Existing private-processing waiver is working authority, not provider attestation; do not delete or infer rights/completeness. Section78 qualifies this carried concern. |
 | `TPR-MATCHED-006` | P2 | Observer approval before Mia recovery launch | Retained unexecuted proposals contained native Order/ticket, open-only history, enum, exception, partial-fill and clock defects. Corrected complete observers have been requested, not verified/applied/tested. Last readback contains only additive initialization; restored control, actual complete source review and focused proof are required before any recovery job. See71.9/71.10. |
 
@@ -953,6 +954,7 @@ known.
 | 2026-10-08 | Claude review | `530e95a554a9d06e954cf86df44d3a591d6d4996..505f7a3da265214cc3c0b7e6c2238cbd1c9c1d78` reviewed; test commits `6c8ebdef` and `30ad18a5` and this record/guard commit on this same lane branch | Independent review of sections 67-68 (counter-review and six-universe QC round); no feature milestone | Reviewed the one Codex commit. Reproduced all seven QC result receipts by published hash (end equity, drawdown, order, fee and closed-trade counts), the 91-request endpoint census, submission times, order statuses, types and RAW modes from the private receipts. Found that the new lane test module `test_operations.py` collided with the shared module of the same name and aborted collection of the complete suite; renamed it with a basename guard. Thirty-six mutation trials across the cloud algorithms, packet and operations modules: six survivors without behavioural tests, now covered. No production module, canonical artifact, shared document or shared test changed; three lane test modules, the lane guard and this record changed. | Lane, development and QC sets on the pushed head `505f7a3d`, designated worktree, network-denied: **2,203 passed, 20 skipped** plus **267 passed**. Complete suite in a scratch clone, six sandboxed shards: collection aborted at `505f7a3d` (`TPR-CR21-001`); after the rename **19,758 passed, 842 skipped, 33 failed, 37 errors**, every red in the known `TPR-CR20-001`/`TPR-OOL-015`/`TPR-OOL-016` sets. Final-tree lane set after `597a3902`: **2,481 passed, 20 skipped**; `compileall` exit 0; `git diff --check` clean. Provider requests **0**; QC requests **0**; raw licensed rows read **0**; private QC receipts, order pages and result files read locally for recomputation only; authorized/spent looks **0**. | No P0 or P1. `TPR-CR21-001` (P2) and `TPR-CR21-005` (P3) closed by correction; `TPR-CR21-002` and `TPR-CR21-003` (P2) open; `TPR-CR21-004` (P2), `TPR-CR21-006` and `TPR-CR21-007` (P3) documented. Six canonical lane findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. The seven QC runs remain exploratory development looks; no canonical, QuantConnect-beyond-this-round, broker, paper, live, capital or trading authority is added. | Make this round's one push. Codex counter-reviews section 69 and the Claude commits; the owner answers `TPR-CR21-003` before any further vendor-derived upload. |
 | 2026-10-09 | Claude review | `32016848bc9ce4dfab3f52ddb5bb34e105e445dc..77b156ecf4d71df1f69678fcfe7a275c59cb4f28` reviewed; test commit `1cab57bb` and this record/guard commit on this same lane branch | Independent review of sections 70-72 (counter-review, matched study, Mia recovery, cap-selection/tilt experiment); no feature milestone | Reviewed all eleven Codex commits individually. Reproduced both cap-tilt diagnostic-v3 outputs byte-for-byte from the committed reporter and the receipt-bound private files, all seven QC run statistics (three matched attempts, four cap-tilt attempts) and both request censuses (79 and 119). Forty-two mutation trials across the cap-tilt core, both successor controllers and the collision guard: one genuine survivor, now covered. No production module, executed artifact, receipt, shared document or shared test changed; two controller test modules, the lane guard and this record changed. | Lane, development, QC, active-document, leak-guard and ML-boundary set on the pushed head `77b156ec`, designated worktree, network-denied: **3,974 passed, 20 skipped**. Complete suite in a scratch clone, six sandboxed shards: **21,191 passed, 842 skipped, 103 failed, 37 errors**; 83 failures are path-bound lane tests green in the worktree, the rest the known `TPR-OOL-015`/`TPR-OOL-016` sets. Final-tree lane set after `d99b4ffb`: **3,981 passed, 20 skipped**; `compileall` exit 0; `git diff --check` clean. Provider requests **0**; QC requests **0**; raw licensed rows read **0**; private receipts, result projections, order pages and the packet structure read locally for recomputation only; authorized/spent looks **0**. | No P0 or P1. `TPR-CR22-001` (P2) open; `TPR-CR22-002`, `TPR-CR22-003` and `TPR-CR22-010` (P2) documented; `TPR-CR22-008` (P3) closed by correction; `TPR-CR22-004` through `TPR-CR22-007` and `TPR-CR22-009` (P3) documented. Six canonical lane findings, `TPR-MATCHED-002`, `TPR-MATCHED-006` and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. The sixteen observed development looks remain exploratory; no canonical, further QuantConnect, broker, paper, live, capital or trading authority is added. | Make this round's one push. Codex counter-reviews section 73 and the Claude commits; the owner decides `TPR-CR22-007` (Object Store retention) at leisure. |
 | 2026-10-11 | Claude review | `9a2753867cda373db634a35ad051b5c9386cc3c4..ad5af50612b80afb5e20e928f0b44adbbecc117f` reviewed; test commit `1434d0dd` and this record/guard commit on this same lane branch | Independent review of sections 74-76 (counter-review, extended 2021-2026 study, QC operations, cleanup, blocked handoff); no feature milestone | Reviewed all twenty-four Codex commits individually. Found from the private terminal receipts that both completed-launch OFF runs ended at engine time 2024-07-12 with identical statistics (rolling-window keys end at `M6_20240712`), so the record's export and aggregate diagnoses are downstream of an undiagnosed early end. Reproduced the request censuses (7 probe, 387 capture, 8 repair, 136 QC slots, 22 properties and 22 deletes), the committed count-only artifacts and the three OFF terminal states. Twenty-one mutation trials on the construction, signal and cleanup successors: one genuine survivor, now covered. No production module, executed artifact, receipt, shared document or shared test changed; one test module, the lane guard and this record changed. | Lane, development, QC, active-document, leak-guard and ML-boundary set on the pushed head `ad5af506`, designated worktree, network-denied: **5,763 passed, 20 skipped**. Complete suite in a scratch clone, six sandboxed shards: **22,969 passed, 842 skipped, 114 failed, 37 errors**; 94 failures are path-bound lane tests green in the worktree, the rest the known `TPR-OOL-015`/`TPR-OOL-016` sets. Final-tree lane set after `a0e0a794`: **5,768 passed, 20 skipped**; `compileall` exit 0; `git diff --check` clean. Provider requests **0**; QC requests **0**; raw licensed rows read **0**; private receipts and terminal metadata read locally for recomputation only; authorized/spent looks **0**. | No P0. `TPR-CR23-001` (P1) open; `TPR-CR23-002` (P2) open for the owner; `TPR-CR23-003`, `TPR-CR23-004` and `TPR-CR23-006` (P2) documented; `TPR-CR23-007` (P3) closed by correction; `TPR-CR23-005`, `TPR-CR23-008` and `TPR-CR23-009` (P3) documented. `TPR-CR22-001`, `TPR-MATCHED-002`, `TPR-MATCHED-006`, the six canonical findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. The nineteen observed looks remain exploratory; no canonical, further QuantConnect, broker, paper, live, capital or trading authority is added. | Make this round's one push. Codex counter-reviews section 77 and the Claude commits, then diagnoses the 2024-07-12 end before any attempt. |
+| 2026-10-11 | Claude review | `9e5ed66e822f9119feb0db22866a1770fae7f606..f998144df14c6a669628a128142f6424402067c1` reviewed; test commit `bbbf57d1` and this record/guard commit on this same lane branch | Independent review of section 78 (counter-review and bounded frontier diagnosis); no feature milestone | Reviewed both Codex commits individually. Reproduced every public figure of the two diagnostic receipts (terminal sizes and hashes, plan hashes, log line counts and wire sizes, projection hashes, frames, markers, 886 frozen sessions through 2024-07-12), the historical-section digest and ten closure and test hashes. Confirmed from the retained uploaded mains that both failure frames are inside `on_end_of_algorithm`, that both terminals report progress 1, and that the OFF arm constructs no signal store and reads no packet object. Eleven mutation trials on the new producer: five surviving guards are now pinned by six regression tests. Accepted Codex's corrections of my section-77 arithmetic, session count, attribution, stale preamble lines and bundle-pin reason. No production module, receipt, shared document or shared test changed; one test module, the lane guard and this record changed. | Lane, development, QC, active-document, leak-guard and ML-boundary set on the received head `f998144d`, designated worktree, network-denied: **5,823 passed, 20 skipped**; diagnostic module after the tests: **41 passed**. Complete suite and final-tree figures: census commit named in 79.5. Provider requests **0**; QC requests **0**; raw licensed rows read **0**; private receipts, retained sources and input payload dates and counts read locally for recomputation only; authorized/spent looks **0**. | No P0. `TPR-CR24-001` (P3) closed by correction; `TPR-CR24-003` (P2) documented, feeding `TPR-CR23-001` (P1, open); `TPR-CR24-002`, `TPR-CR24-004` and `TPR-CR24-005` (P3) documented. `TPR-CR23-002`, `TPR-CR22-001`, `TPR-MATCHED-002`, `TPR-MATCHED-006`, the six canonical findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. No canonical, QuantConnect, broker, paper, live, capital or trading authority is added. | Make this round's one push. Codex counter-reviews section 79; the owner decides between Mia sign-in and an owner-authorized diagnostic rerun (section 79.7). |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 | 2026-10-05 | Codex counter-review and TPR-D0 implementation | Reviewed `9958a459f5cd56c29cb9a0de13d38737e2c3412d..c0bfb21393180d44c16c10be1e667ea741098531`; corrections/decisions `cf11788f39a2148d7bc3b801e88807bd2caca5ea`; D0 implementation `8dcfb71851ff22db6f0727395e18292c19f080ef`; this record-only handoff follows | Four-commit Claude counter-review, five bounded owner selections, strict D0 plan and one retained structural audit | Accepted the cumulative Claude range after three record/encoding corrections; selected explicit native/host test variants without changing production trust policy. Implemented the separate standard-library D0 package and immutable aggregate artifacts; retained-source inventory/hashes and all canonical freezes match. Sections 46/47 contain exact dispositions, scope, evidence and remaining limitations. | Cumulative focused suite 491 passed, 5 symlink-permission skips; final routing/artifact guards 107 passed. Standard suite blocked by 110 Analyst `fcntl` collection errors, with zero tests executed. Optional continuation diagnostics capped and incomplete, not reported as totals. Compileall exit 0; diff hygiene clean; Python 3.13.14 / pytest 9.1.1. | CCR16-001/002/003 closed; no new in-lane P0/P1/P2. Six canonical findings remain open and parked. TPR-OOL-017 opened for Windows Analyst collection, documented only. | Exact local retained-structure scope only, expiring 2026-10-12; 587,046 retained rows audited. Provider/outcome/QC/development-look/trading counts zero. No vendor-rights attestation or canonical admission. | One matching-branch non-force push of this Codex round, then independent Claude review of every commit after `c0bfb213` through the exact pushed tip. No automatic D1; later action/source scope must be selected after review and counter-review. |
 
@@ -16984,3 +16986,145 @@ SHA is reported in chat after local/remote equality and clean status checks.
 This heartbeat remains PAUSED during and after publication; no auto-rearm or
 own-push trigger. Future work remains subject to independent review, the
 factual Mia recovery and all applicable frozen gates.
+
+## 79. Claude independent review of the counter-review and bounded frontier-diagnosis round - 2026-10-11
+
+**Disposition: accepted after correction.** The owner asked for all
+unreviewed commits to be reviewed and for one push. Two Codex commits are
+unreviewed: section 78's counter-review of my section-77 commits together
+with the registration of a bounded two-job frontier diagnosis (a new
+580-line producer and its 35 synthetic tests), and the record of that
+diagnosis's actual bounded execution and the blocked Mia-availability
+check. Both are accepted, the first after a test-only correction. The
+diagnosis did what it registered: it re-read the two retained OFF terminals
+under exact hashes and fetched the complete unfiltered engine logs of both
+failed jobs (11 and 10 lines) through the documented log endpoint, with no
+launch, look or licensed read. It did not find the cause of the July-2024
+frontier, and the record says so. This review reproduced every public
+figure of the diagnosis from the private receipts, confirmed from the
+retained uploaded sources that both failure frames sit inside the
+end-of-algorithm hook, and confirmed that the OFF arm reads no packet
+input, so the partial uploads cannot explain the OFF frontier.
+`TPR-CR23-001` stays open with a sharper shape: the engine itself declared
+the run complete at 2024-07-12.
+
+### 79.1 Exact reviewed snapshot
+
+| Item | Value |
+|---|---|
+| Branch and worktree | `codex/strategy-target-price-revisions`; the lane worktree resolved from `git worktree list` |
+| Reviewed range | `9e5ed66e822f9119feb0db22866a1770fae7f606..f998144df14c6a669628a128142f6424402067c1` |
+| Codex commit 1 | `b7e3903e54c3e1b3028a8ae14b8ff5b08301a904` - Counter-review Claude CR23 and register bounded failed-job diagnosis |
+| Codex commit 2 | `f998144df14c6a669628a128142f6424402067c1` - Record CR23 terminal/log evidence and blocked Mia recovery handoff |
+| Files changed | 5; +1,426 / -43: this record, one new producer, one new test module, the lane guard, one docstring in my signal test |
+| Scope checks | Lane-only paths; `git diff --check` clean; no duplicate test basenames; no secret shape (the only `Authorization` token in the diff is the producer's signed-header construction from the existing credential seam) |
+| Claude commits this round | `bbbf57d1f72864e340d70d58c19976b4beabedd4` (regression tests), this record/guard commit, and the census commit named in 79.5 |
+
+### 79.2 Commit-by-commit dispositions
+
+| Codex commit | Disposition | Basis |
+|---|---|---|
+| `b7e3903e54c3e1b3028a8ae14b8ff5b08301a904` | **Accepted after correction** | Counter-review items `TPR-CCR23-001` through `TPR-CCR23-007` are each checked in 79.4 and accepted, including the corrections of my own section-77 arithmetic, session count, attribution, stale preamble lines and bundle-pin reason. The producer is read in full; its production path has no injected root, transport, clock or credential seam, and every public figure of its two receipts reproduces. Eleven in-memory mutation trials: the received tests kill three; five surviving guards are now pinned by six regression tests (`TPR-CR24-001`); three survivors are unreachable redundancies. |
+| `f998144df14c6a669628a128142f6424402067c1` | **Accepted** | Record-only. The reported sizes, hashes, counts, dates, frames and markers of both diagnostic scopes match the private receipts byte-for-byte or value-for-value; the historical-section digest, the ten closure and test hashes and the register and ledger edits are exact. The Mia-availability result is a sign-in state only the owner can change. |
+
+**Cumulative disposition: accepted after correction.**
+
+### 79.3 P0-P3 ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| `TPR-CR24-001` | P3 | **Closed by correction** | `b7e3903e` | `tests/target_price_revisions_qc/test_qc_extended_frontier_diagnostic.py` | Five live guards of the producer were not exercised by its 35 tests: the HTTP status check, the plan clock window, the monotonic `max_seconds` budget, the exact terminal SHA-256 against a same-size parseable substitute, and the Runtime-Error terminal scope. | Mutation trials in 79.4: removing each guard left all 35 received tests green. The received "hash" fault only shows that garbage bytes fail envelope parsing, not that a well-formed substitute is refused. | The record presents these as bounding properties of the diagnosis ("fixed request/body/aggregate/time bounds", "exact SHA/size checks"); unpinned guards can be lost silently in a successor. | Six regression tests appended in `bbbf57d1`; `terminal_fixture` gains a `status` keyword only. Each test is red under its mutant and green on the committed producer. | 41 passed in the worktree; mutation table in 79.4. |
+| `TPR-CR24-002` | P3 | **Documented** | `b7e3903e` | section 78.3 | Codex's corrections of my section 77 are accepted: 587 requests (402 provider, 185 QC), not 403; 886 frozen sessions through 2024-07-12 (884 is the count through 2024-07-10, where the native NAV census ends, and I attached it to the wrong date); only OFF2 and OFF3 carry the frontier because OFF1 failed at initialization; my preamble and section-8 text still said composite preparation was pending and no 2021-now run had launched, and my guard even required that sentence; and the `TPR-CR23-006` subclaim that the paired processor's `223efa` bundle pin would refuse OFF3. | Recomputed from the frozen calendar and my own 77.4 census. `extended_paired_results.py:112-113` admits attempt 2 or 3 for OFF; what refuses OFF3 is the `Completed` terminal-status requirement at line 188, which is correct behaviour for a Runtime Error run. | My errors are on the record; the practical effect I described (the processor cannot admit OFF3) stands for a different, correct reason. | None; the record keeps my wording and Codex's corrections side by side. | Not applicable. |
+| `TPR-CR24-003` | P2 | **Documented (feeds `TPR-CR23-001`)** | `f998144d` | private OFF terminals; retained uploaded mains in the `request.0053` and `request.0085` projections; private `inputs/` | The frontier is the engine's own completion, not a mid-run crash and not an export-only effect: both failing frames (`main.py:1020` in OFF2, `main.py:1028` in OFF3) lie inside `on_end_of_algorithm`, defined at lines 984 and 985 of the 1,055- and 1,056-line retained mains; both terminals carry `progress` 1, `backtestEnd` 2026-10-09 23:59:59 and an error text time-stamped 2024-07-12 that names OnEndOfAlgorithm; the OFF main's own plumbing has no 2024 boundary (start and end dates 2021-01-04 and 2026-10-09, every-day schedule on the benchmark, permanent minute-resolution ETF subscriptions, warm-up from 2020-09-01). The OFF arm constructs no signal store (`initialize` builds it only for `tpr_on`) and reads no packet object, so the partial uploads cannot explain the OFF frontier. The unfiltered logs hold no line between 2021-01-04 and 2024-07-12; the native API is exhausted as a diagnostic source. | Recomputed locally from the retained receipts and sources; names, dates, counts and code lines only. | Narrows the cause to the engine's data feed or the platform, both unobservable through the API, and rules out the algorithm's own dates, the export path and the upload shortfall. A corrected export alone would end at the same date. | None possible in lane without a run or Mia; see 79.7. | `TPR-CR23-001` stays open. |
+| `TPR-CR24-004` | P3 | **Documented** | `b7e3903e` | `extended_frontier_diagnostic.py:270-291, 369-389` | `_secret_free` refuses the whole operation when the credential user id occurs as a substring of any wire string, including legitimate numeric log content; `_identity` cannot bind log responses because the endpoint returns no project or job identity. | Code reading; the second point is disclosed in 78.7. | Safe-side brittleness and a disclosed limit; neither affected the two completed scopes. | None. | Not applicable. |
+| `TPR-CR24-005` | P3 | **Documented** | `b7e3903e`, `f998144d` | section 78.6; private `inputs/` | The composite packet is one identities payload, one signal manifest and 70 monthly signal shards; 22 plaintext objects existed at launch time (identities plus 21 scattered months, 91 of 301 decision sessions, none before 2021-05). This is consistent with the record's "71 queued", is irrelevant to OFF, and means any ON launch on the composite packet needs all 72 objects or a complete compressed store. | Recounted from `inputs/` and the 22 `input.*.completed.json` receipts; dates and counts only. | Keeps the ON prerequisite explicit. | None. | Not applicable. |
+
+### 79.4 Independent reproduction and mutation evidence
+
+- **Terminal scope.** Both retained OFF terminals match the producer's fixed
+  constants: 1,299,525 and 1,301,513 bytes, the two SHA-256 values, mode
+  0600, one link. The spent claim's bytes hash to the recorded plan SHA
+  (`632314b4...`) and are reproduced exactly by `_plan` with the committed
+  source hashes at `b7e3903e`. The result receipt is COMPLETED with 2 reads,
+  2,601,038 bytes, every scope flag false or zero, 172 recognized rolling
+  keys per job, last token 2024-07-12, 886 of 1,449 frozen valuation
+  sessions through that date, `tradeableDates` 1,449, error bytes 427 and
+  1,410 with the recorded hashes, frames `extended_core.py:239` and
+  `main.py:1020` (OFF2) and `extended_compressed_store.py:261`,
+  `extended_core.py:587`, `extended_runtime_successor.py:119,132,138` and
+  `main.py:1028` (OFF3), and six of the seven selected statistics present
+  and equal (Total Trades absent in both).
+- **Log scope.** The spent claim hashes to the recorded plan SHA
+  (`dfe61d6b...`) and reproduces from `_plan`. Two requests succeeded: 1,562
+  and 2,491 wire bytes, 11 of 11 and 10 of 10 lines in one page each,
+  projection hashes `40496cee...` and `b1311ee7...`. Recomputing
+  `_text_diagnostic` over the stored projections reproduces both stored
+  diagnostics exactly: date tokens 2020-09-01 through 2024-07-12 (seven and
+  six distinct), no data-exhaustion, stop, time-limit, memory or
+  evidence-bound marker, one audit-export marker in OFF3.
+- **Record figures.** Frozen calendar: 886 valuation sessions through
+  2024-07-12, 884 through 2024-07-10. Sections 63 through 77 stripped of
+  final whitespace: 600,715 bytes, `0a60a8c6...`. All ten closure and test
+  hashes in 78.6 match the files at `f998144d`.
+- **Retained sources.** Three uploaded main variants are retained in the
+  request projections (1,048, 1,055 and 1,056 lines). OFF2's `main.py:1020`
+  is the `public_run_aggregates` call and OFF3's `main.py:1028` is the
+  compressed-store export call, both inside `on_end_of_algorithm`,
+  consistent with 78.7.
+- **Counter-review items.** `TPR-CCR23-001` (docstring), `-002` (authority
+  grammar), `-003` (shape of `TPR-CR23-001`), `-004` (bundle pin), `-005`
+  (stale routing), `-006` (arithmetic and attribution) and `-007` (scratch
+  clone) are each accepted as stated; `-007` records the standing
+  disagreement without change on either side.
+- **Mutation trials** on `extended_frontier_diagnostic.py`: one exact
+  substring per trial, restored in `finally`, run in a read-only scratch
+  clone, network-denied, against the diagnostic test module.
+
+| Guard removed | Received 35 tests | With the six CR24 tests |
+|---|---|---|
+| Short-page line count | killed | killed |
+| Single hard link (`st_nlink`) | killed | killed |
+| Exclusive controller lock | killed | killed |
+| HTTP status 200 | survived | killed |
+| Plan clock window | survived | killed (two tests) |
+| Monotonic `max_seconds` budget | survived | killed |
+| Exact terminal SHA-256 | survived | killed |
+| Runtime-Error terminal scope | survived | killed |
+| `st_size > remaining` | survived | not pinned: unreachable after the `expected_size > remaining` and size-equality checks |
+| `MAX_REQUESTS` cap | survived | not pinned: 20 pages for 2 jobs cannot exceed 40 |
+| Aggregate log bytes | survived | not pinned: 40 responses of at most 1 MiB equal the aggregate limit |
+
+### 79.5 Validation
+
+- Lane, development, QC, active-document, leak-guard and ML-boundary set on
+  the received head `f998144d`, in the designated worktree, network-denied:
+  **5,823 passed, 20 skipped**.
+- Diagnostic test module after `bbbf57d1`: **41 passed**;
+  `git diff --check` clean.
+- Final-tree lane set and the complete-suite census: appended in the census
+  commit at the end of this section.
+
+### 79.6 Milestone and authority decision
+
+Section 79 accepts the counter-review and the bounded diagnosis as a
+diagnostic milestone, not as implementation, runtime or performance
+acceptance; canonical admission is not authorized; no real-row canonical D1
+is authorized; no QuantConnect launch, fourth Codex OFF attempt, ON launch,
+remaining-shard upload, broker, paper, live, capital or trading authority is
+added by this review. Codex next counter-reviews section 79 and this
+round's Claude commits, and resolves `TPR-CR23-001` before any further
+extended launch; the only remaining paths are the authenticated Mia
+interface the owner must sign in to, or an owner-authorized diagnostic run,
+which this review does not grant. TPR-1 and TPR-0B remain blocked.
+
+### 79.7 Recommendation to the owner
+
+Three decisions are yours. First, the cheapest path to the cause is the one
+Codex handed off in 78.8: unlock the Mac, sign in to QuantConnect and open
+the OFF project's Ask Mia; it consumes no attempt and I recommend it first.
+Second, if Mia stays unavailable, consider authorizing one diagnostic OFF
+rerun whose only change is daily end-of-day logging of engine time,
+subscription count and feed state, so that the frontier's cause becomes
+observable; that is a fourth attempt and needs your explicit word, because
+nothing in the lane's rules allows it. Third, `TPR-CR23-002` (retention of
+the vendor-derived objects in the Object Store) is still waiting for you.

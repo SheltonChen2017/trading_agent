@@ -1,12 +1,11 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Independent Claude review of `da6a7bb9..5692ae39` (sections 32
-and 33, including the GDR-RP33 compact paired evidence) recorded in section 34,
-2026-10-11;
-Codex counter-review of section 34 pending.
-All three Codex commits are accepted, `c589b3dd` after one added pin
-(`7e52f03b`); this round's commits stay local until the owner authorizes
-publication.
+Status: **Codex counter-review of section 34 completed in section 35,
+2026-10-12, against exact pushed review head
+`d1a57097605c2a01ebeb9805c4474161a7882b10` of publication `5692ae39`.
+Both Claude commits are accepted, the record commit after two P3 documentation
+corrections; the counter-reset pin is confirmed and retained. The review push
+is published and consumed, not local-only or a reusable trigger.
 GDR-RP33 is accepted in section 34
 as offline software only: it retains every record digest in a 489-line paired
 format with assumed logging reserves, not verified platform accounting or
@@ -14,14 +13,18 @@ backtest readiness.
 The section-27 evaluation still ended with three pre-initialization failures;
 the attempt ceiling remains exhausted and no manual relaunch is authorized.
 The owner's conditional Mia-led synthetic recovery (32.4) stays
-paused pending independent review and platform preflight: output compliance
+paused pending platform preflight: independent review and counter-review have
+accepted the unchanged source, but output compliance
 with QC's AI-agent rules (GDR-CR28-001) and QC's log-length accounting
-(GDR-CR31-003). Native loading of the recovery carrier is unverified. Only
+(GDR-CR31-003) remain unverified. Section 35.4 records insufficient remaining
+log-read allowance and the locked-Mac/Mia gate; the monitor is PAUSED, with no
+recovery launch or partial-round push. Native loading of the recovery carrier
+is unverified. Only
 `data/__init__.py` was observed as one LF at runtime;
 `research/__init__.py`, remains unobserved. No successful native integration
 or empirical backtest readiness is established. The original economic, data,
 empirical, account and trading gates remain closed.**
-Current scope/evidence are sections 17 through 34. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 35. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -4372,7 +4375,7 @@ stay at the exhausted three. The owner's instruction for this round was
 
 | ID | Priority / status | Location | Finding, disposition and verification |
 |---|---|---|---|
-| GDR-CR34-001 | P3 / corrected | `c589b3dd`, `lean/main.py::_reserved_evidence_log_bytes`; `test_lean_source.py` | The counter coupling has three clauses: bytes at least messages, bytes at most 201 times messages, and both or neither zero. The third follows from the first two. Codex's reset regressions only drop a counter to zero or delete it, which several clauses refuse together, so the range clauses were never isolated (LN04 survived). A partial reset keeps both counters nonzero: for example, the message counter reduced to 1 after three 147-byte messages, or the byte counter reduced to 1 with three messages counted. Without the range clauses, the lost messages' 40-byte wrapper reserves would reopen. Added `test_partially_reset_counter_cannot_reopen_reserved_capacity`; LN04 now fails in both subtests. |
+| GDR-CR34-001 | P3 / corrected | `c589b3dd`, `lean/main.py::_reserved_evidence_log_bytes`; `test_lean_source.py` | The counter coupling has three clauses: bytes at least messages, bytes at most 201 times messages, and both or neither zero. The third follows from the first two. Codex's reset regressions only drop a counter to zero or delete it, which several clauses refuse together, so the range clauses were never isolated (LN04 survived). A partial reset keeps both counters nonzero: for example, the message counter reduced to 1 after three 147-byte messages, or the byte counter reduced to 1 with three messages counted. Without the range clauses, corrupted accounting can reopen wrapper allowance (message-count reset) or payload allowance (byte-count reset). Added `test_partially_reset_counter_cannot_reopen_reserved_capacity`; LN04 now fails in both subtests. |
 
 Scripted count from this table: P0 0, P1 0, P2 0, P3 1; corrected 1, documented 0.
 
@@ -4406,7 +4409,7 @@ The section 33.4 identities reproduced at `5692ae39`:
 
 ### 34.6 Mutation trials
 
-Twenty-nine single-behaviour mutants over `c589b3dd`, run in memory,
+Claude reported twenty-nine single-behaviour mutants over `c589b3dd`, run in memory,
 network-denied, three at a time, in the designated worktree. Sixteen rewrite
 functions in `readable_transport`. Thirteen rewrite `lean/main.py` through the
 source-rewriting import hook, because its tests re-import it fresh for every
@@ -4436,8 +4439,12 @@ The 15 unpinned survivors, by reason:
   - LN05: implied by the range clauses.
   - LN06: repeated by the per-line and whole-export checks.
   - LN09: repeated by the encoded-length check.
-- **Refusal type only.**
-  - CP14: an exhausted cursor raises `IndexError` instead of the named refusal.
+  - CP14: after removing only the explicit cursor guard, the validated END
+    envelope cannot match a pair/record commitment and still raises
+    `ReadableTransportError`, with a different diagnostic. Section 35 corrects
+    the earlier `IndexError` rationale; the exact historical mutant script was
+    unavailable, so this is current-source sensitivity evidence, not a rerun
+    of Claude's complete campaign.
 
 ### 34.7 Owner confirmations, commits and next action
 
@@ -4471,3 +4478,169 @@ Acceptance here is a software review only. It establishes neither native
 execution, QuantConnect integration nor empirical readiness.
 `docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` were not edited
 and stay frozen for both agents.
+
+## 35. Codex counter-review of section 34 and readiness preflight, 2026-10-12
+
+### 35.1 Exact pushed snapshot, ownership and dispositions
+
+The completed Claude review of publication
+`5692ae39bdb4547b22bf7d44aa2d0aca7846f81e` was observed on the matching remote
+at `d1a57097605c2a01ebeb9805c4474161a7882b10`, also the clean local and
+remote-tracking head. Exact-baseline ancestry and the explicit section-34
+completed-review handoff were verified. No fetch was needed: these objects and
+the matching tracking ref were already present. The record's local-only wording
+in 34.7 describes its creation-time state; publication is now proven. This
+trigger is consumed. All work remains in the mandatory root and lane branch.
+
+| Claude commit | Counter-review disposition | Evidence |
+|---|---|---|
+| `7e52f03b18c970879dfc5c328d396c6114d55f9f` | accepted | Test-only partial-reset pin isolates both range clauses; original succeeds and each memory-only range mutant fails in the expected subtest. No production defect or source change. |
+| `d1a57097605c2a01ebeb9805c4474161a7882b10` | accepted after documentation correction | Complete record/status-pin diff reviewed. Correct wrapper-versus-payload failure wording and CP14 refusal rationale; source identities reproduce. Claude's complete suite/mutation results remain reported evidence, not a Codex rerun. |
+
+GDR-RP33's independent software acceptance and every section-34 disposition of
+sections 32/33 are accepted within that limited scope. GDR-CCR32-001..003,
+CR31-008's owner no-full-Codex-suite qualifier, the original v1 route and both
+RP33 author-QA findings remain retained. Current source is unchanged from
+producing `c589b3dddab3f1dd136d10ae7ce1851d64818906`; tests/docs do not create
+another producing epoch or reset an attempt ledger. Software quality is 8/10:
+the regression is sensitive and the boundary remains fail-closed, while native
+integration and actual platform accounting are not yet established.
+
+### 35.2 Retained findings and focused evidence
+
+| ID | Priority / disposition | Evidence, correction and limitation |
+|---|---|---|
+| GDR-CR34-001 | P3 / confirmed, corrected by Claude | Eight focused methods / 15 subtests pass in 10.958 s. New pin is green (2 subtests, 0.053 s); removing both ranges causes two intended failures (0.053 s), upper-only removal one message-count failure (0.052 s), lower-only removal one payload-counter failure (0.055 s). The earlier zero/deletion pin still passes the combined mutant (4 subtests, 0.107 s), proving the sensitivity gap. |
+| GDR-CCR35-001 | P3 / corrected | Resetting three-message state `(441,3)` to `(441,1)` loses 80 bytes of wrapper reservation; resetting to `(1,3)` loses 440 payload bytes, not wrapper bytes. Real refusal and failure diagnostics preserve poisoned counters and all three messages. Section 34.4 now distinguishes the directions; no production correction needed. |
+| GDR-CCR35-002 | P3 / corrected | A memory-only removal of the compact cursor guard still refuses on the disjoint END-envelope keys with `ReadableTransportError`, not `IndexError`. Section 34.6 now records this redundant refusal and the unavailable historical script. All 29 Claude-reported trials and the 13/1/15 tally are retained, not independently re-certified as a campaign. |
+| GDR-CR28-001 | P2 / platform prerequisite retained | Current official QC rules must permit the exact readable invented-only source/output route. No opaque source/log transport or Platform Data extraction is authorized; uncertain compliance stops work. |
+| GDR-CR31-003 | P2 / offline mitigation only, platform prerequisite retained | RP33's 40-byte/message and 2,000-byte fixed allowances are estimates. Section 35.4 observes 100 KB per-backtest entitlement, but actual generation/accounting and complete native delivery remain unverified; remaining log-read quota is insufficient for the payload alone. |
+| GDR-CR18-005 | out-of-lane / retained as reported | Claude's fifteen shared failures remain out of this lane. No shared behavior changed or full Codex suite run to re-certify them. |
+
+CR34 tally remains P0=0, P1=0, P2=0, P3=1 corrected. New counter-review tally:
+P0=0, P1=0, P2=0, P3=2 corrected; inherited platform prerequisites remain open.
+All focused/memory probes used existing Python 3.13.15 `-B` in the mandatory
+root with network denied; the counter-pin probes also denied file writes.
+No source reversion or on-disk mutation. Counter probes aggregate 0.433 s,
+zero failures/errors/skips/warnings on real source; deliberately mutated
+subtests failed as above. Every section-33.4 source/package/wire identity
+reproduced in memory in 2.274 s, with no new artifact saved. The exact full
+identities and fixed fixture/draft hashes in 33.4 therefore remain current.
+Closing active-document, fresh-import and transitive-boundary selection passed
+3 methods in 0.250 s, with zero failures/errors/skips/warnings. All 88 lane
+source/test Python files compiled in memory without bytecode (0.108 s wall
+time); final diff/status checks passed. Only this record and its active-state
+test pins changed. No complete lane/repository suite was run by Codex.
+
+### 35.3 Direct owner authorization and permitted next stage
+
+The owner directly answered `authorized` on 2026-10-11 to this question:
+
+> The original synthetic QC cycle exhausted its three attempts. Once the
+> revised candidate is independently reviewed and QC compliance/quota checks
+> pass, do you authorize a separate Mia-led synthetic-only recovery scope
+> using only the invented 372-frame fixture? This would not authorize real
+> data, changed strategy economics, or resetting the closed cycle's ledger.
+
+The owner also directed on 2026-10-12:
+
+> Claude is reviewing. set up a monitor and when it pushes, start counter
+> review. I pre authorize you to do anything necessary to get this lane to
+> backtesting
+
+These are direct human instructions in this Codex thread, not inferred from
+Claude or synthesized waivers. They authorize necessary in-scope engineering
+and conditional Mia-led synthetic recovery, not silent economic/data/rights/
+family/look/date choices, a fourth manual run, unlimited recovery, installation,
+purchase, resource/account changes or empirical/broker/paper/live/capital
+authority. Immutable draft null decisions and false permission fields remain.
+The monitor was explicitly re-armed, consumed this pushed review, and now
+serializes counter-review/readiness work. No other lane is modified.
+
+After counter-review, the next authorized stage was current-platform
+compliance/quota preflight. Safari was initially accessible and authenticated.
+A dedicated read-only Mia preflight was submitted
+from the Guidance-only project, with Ask Before Edits enabled and explicit
+prohibition on source edits, compiles, launches, notebooks, resource changes,
+other-project outcomes and real data. The exhausted cloud source is not the
+RP33 candidate; no new candidate was uploaded. Opening its IDE triggered a
+successful incidental IDE-load build, known only by short display ID
+`539ea9-8c8ea8` at 07:31:09 UTC for
+LEAN v2.5.0.0.18178; no controlled compile or fourth native run was requested.
+Its short display ID is not an immutable engine or binding proof. The optional
+import-insertion prompt was cancelled. All three original failures remain
+closed and separately retained; prospective recovery launches remain zero.
+
+No backtesting-ready claim is made. Proceed only after actual platform
+prerequisites pass; otherwise stop at the concrete owner/platform-input gate,
+preserve local counter-review notes without publishing a partial round, and
+pause the monitor. Source-changing delivery would still need independent
+review before evaluation. One successful end-of-round push is reserved only
+for a genuinely concluded future round; the `5692ae39` publication is not
+repeated. Shared/root documents, source/draft economics and all empirical and
+trading gates remain unchanged.
+
+### 35.4 Actual platform preflight observations and owner-input stop
+
+Authenticated Safari Organization > Resources, observed around 07:49 UTC,
+displayed **100 KB per backtest** and **32.29 KB / 3 MB remaining log-read
+quota**. The latter is retrieval headroom, not proof of remaining generation
+capacity. It is below the unchanged complete v2 payload alone (75,260 LF
+bytes), before any envelope or engine output. No full-evidence retrieval or
+native accounting gate passes on this observation. The two B2-8 nodes showed
+`-` in Project and In Use By; that is a contemporaneous availability
+observation, not a reserved node or launch guarantee. No node was selected,
+cancelled, reassigned or purchased. No other project outcomes or stored data
+were intentionally inspected; incidental storage labels are not evidence for
+this lane.
+
+Current official [QC Resources documentation](https://www.quantconnect.com/docs/v2/cloud-platform/organizations/resources)
+defines tier-based allowances and a rolling 24-hour restoration window;
+deleting projects/backtests does not restore quota. The exact reset time and
+wrapper/debug/engine accounting were not available in the UI. No deletion,
+account upgrade, quota bypass or evidence omission is authorized. The current
+100 KB entitlement does not turn the assumed 96,820-byte reserve into verified
+platform accounting. [QC Security and IP rules](https://www.quantconnect.com/docs/v2/cloud-platform/security-and-ip)
+and [logging requirements](https://www.quantconnect.com/docs/v2/writing-algorithms/logging)
+were read before platform work. Only readable lane-owned source plus the
+invented fixture is in scope; no Platform Data or source-in-log transport is
+permitted. Local AST/closure inspection found no new lane defect, but it is
+not a platform compliance decision. GDR-CR28-001 and GDR-CR31-003 remain open.
+
+The Mia submission cleared its entry field and disabled controls, but produced
+**no acknowledged new conversation, task ID, tool receipt or answer**. History
+still listed only the earlier completed read-only diagnosis, not a new
+preflight result. Selecting that prior conversation did not supply a new
+answer. Thus submission is recorded, not successful execution or completion;
+no new Mia/cloud source edit or launch is asserted from this unobserved state.
+The editor showed Mia/read-only control, so no edit-control override or blind
+duplicate submission was attempted. One reload of this same Guidance-only
+tab reached `Loading coding environment...`; before its completion could be
+checked, computer control reported that the Mac was locked and automatic
+unlock failed. Any reload-time automatic build/result remains unobserved,
+not silently counted as absent or native evidence. No controlled compilation,
+fourth manual run or separately authorized recovery run was requested.
+
+The monitor was paused through the automation tool and persisted PAUSED
+status was verified. Original cycle GDR-base372-approved-20261008 remains
+CLOSED FAILED at three unsuccessful launches / zero manual attempts left;
+prospective conditional Mia-led recovery launch ledger remains **zero**.
+Current source/package/fixture/draft identities remain those in 33.4. No new
+artifact/candidate was saved or uploaded, no production/shared/root document
+changed, and no push was made. Focused counter-review notes and active-state
+pins are retained locally; this is an owner-input stop within the same cycle,
+not a readiness outcome or an end-of-round publication.
+After recording the stop, the same three active-document/fresh-import/
+transitive-boundary methods passed again in 0.224 s with zero failures/errors/
+skips/warnings. Diff checks passed and source directories have no changes
+since the producing epoch. Advisory closure QA prompted only wording
+precision, not additional independent acceptance or a new source milestone.
+
+Next action: the owner unlocks the Mac and resumes this same consumed-review
+cycle. Resolve the unacknowledged Mia request through its authenticated
+interface, recheck actual sufficient read/generation quota and compliance,
+then proceed only if all conditional recovery gates pass. If Mia remains
+inaccessible, the owner uses it directly; no substitute connector or manual
+fourth attempt. Keep all source/economic/empirical/trading boundaries and the
+single genuinely concluded-round push agreement. The lane is not empirically
+backtest-ready, and no synthetic native integration success is established.

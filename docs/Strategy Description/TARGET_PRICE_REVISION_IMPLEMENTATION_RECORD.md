@@ -18054,9 +18054,50 @@ do not automatically rearm. No unrelated substitute work is authorized.
 
 ### 82.7 Durable commit handoff
 
-This same-branch Codex round starts at the exact incoming head above. Commit
-identities, exact final-tree tests and the resulting pushed head will be
-reported without self-referential commit/hash claims. Exactly one non-force
-push ends the round, after a fresh matching-branch fetch and clean-status
-verification; stop on unseen remote changes. The final pushed record-only
-commit can be derived unambiguously from this round's committed foundation.
+Last processed Claude review head:
+`ed558300d00a569be3ecc79195a610d6e9e6059f`. The review range in 82.1 is fully
+processed by this counter-review; no later Claude review is implied.
+
+| Outgoing Codex identity | Exact value / scope |
+|---|---|
+| Round base | `ed558300d00a569be3ecc79195a610d6e9e6059f` |
+| Codex commit 1, implementation foundation | `420e354ba90f871fd0133fe8f2bfb5e5137b19eb`; three test modules plus this lane record only |
+| Codex commit 2, final handoff | The sole direct record-only child of `420e354ba90f871fd0133fe8f2bfb5e5137b19eb` produced by this round; exact resulting head is reported with the push, not a self-referential hash in its own bytes |
+
+Claude must independently review **both** outgoing commits, in Git order,
+and the cumulative tree from the round base to the published head, including
+the record-only child. The exact head/ordered range is discoverable with
+`git rev-list --reverse ed558300d00a569be3ecc79195a610d6e9e6059f..HEAD` at
+the resulting published snapshot; do not review only the foundation or tip.
+
+Committed test blobs at the implementation foundation (not CRLF working-copy
+hashes and not native source/receipt pins):
+
+| Public artifact | Bytes | SHA-256 |
+|---|---|---|
+| `tests/target_price_revisions/test_document_consistency.py` | 215526 | `cb1decad0b652a639cb33984d7194fd1113066153d463a7452068a83ef18a19d` |
+| `tests/target_price_revisions_qc/test_qc_extended_mia_capture.py` | 24621 | `8dabd439c5a1de4f63581b1c83e0a3227b727d156fb6006457582a646cbe53d2` |
+| `tests/target_price_revisions_qc/test_qc_extended_frontier_diagnostic.py` | 21309 | `15ae54b6ddcfd6df6c0584888ca03bab3ac170b93c09f7091361b7dc3e61a91f` |
+
+The complete bounded cumulative validation command is:
+
+```text
+python -m pytest -q tests/target_price_revisions/test_document_consistency.py tests/target_price_revisions_qc/test_qc_extended_mia_capture.py tests/target_price_revisions_qc/test_qc_extended_frontier_diagnostic.py tests/target_price_revisions/test_import_firewall.py tests/target_price_revisions/test_preregistration.py::test_repository_candidate_freezes_the_approved_tpr0a_contract tests/target_price_revisions/test_preregistration.py::test_repository_authority_declarations_are_exactly_zero_access tests/target_price_revisions/test_preregistration.py::test_candidate_json_is_protected_from_checkout_translation --tb=short -rs
+```
+
+The exact selected inventory is 385 tests: 300 passes, 84 explicit Mac-native
+exclusions and one existing Windows symlink-privilege exclusion. Preparation
+produced that result in 31.64s (82.5); final handoff-candidate reprise actually
+produced **300 passed, 85 skipped in 24.43s**, zero failures/errors/warnings.
+Standard compileall plus canonical research and the two inspected production
+collector modules exited 0; compilation did not execute those modules.
+Diff checks are clean; the full outgoing path inventory is exactly these
+four files and all other tracked bytes stay unchanged. After this result-only
+record update, reprise the same inventory on the exact committed final tree
+before the single push. No other suite is represented as green.
+
+Exactly one non-force push ends this Codex round, after a fresh matching-
+branch fetch proves no unseen remote change. No history rewrite. Verify clean
+status and matching local/published heads afterwards; leave the heartbeat
+PAUSED. Claude review and owner Mac recovery/fresh scope are still required;
+this handoff grants no external effect or acceptance beyond 82.6.

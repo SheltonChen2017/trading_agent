@@ -19959,3 +19959,51 @@ or operator-state access. No code/economics/source-bundle mutation; old
 executed modules remain byte-identical. Commit/source closure and a fresh
 current-HEAD runtime plan precede discovery001. Claims/access/request and
 result receipts persist privately; no stale scope is implicitly renewed.
+
+### 87.3 Discovery001 retained refusal, not a missing-credentials claim
+
+Executed once at source snapshot`b8d1b0a9df28e001ed9f828d53b7e4ac61d421e9`,
+created22:03:41.154260Z/expiry22:18:41.154260Z/ended22:03:47.107526Z.
+Plan SHA256`7e6f3549408f1813e3843f93bf1816f7b0471a3615ab37dc015d68d183c880e2`.
+Genuine HTTP200 wire29881bytes/SHA256
+`810125c7c373e378633d2200d8291f94f4ddc722ae834e4ae262baa377754e1d`;
+private metadata projection4138bytes/SHA256
+`8cfb978f0145186d18ae71fdb347da0b45d876475c72cd9046e3aa47260c3239`.
+Metadata interpretation refused: statusFAILED_OR_UNCERTAIN, jobs/unknownIDs
+null, scope spent; process exited1. Credentials/API transport worked. No
+automatic repeated request, source/input read, compile, launch, attempt reset
+or accepted metric. Unexpected result/parameter fields were flagged and
+discarded, not used for selection/performance. Current causal stage beyond
+the retained metadata boundary is unproved until a new bounded read.
+
+Executed discovery module remains immutable. Prospective
+`TPR-EXT26-OWNER-MIA-META-INSPECT-20261013-001` may read ONLY that exact
+4138byte/hash metadata projection, once, <=30seconds under fresh currentHEAD/
+source/time/exclusive claim/access custody before body. No credential/API
+effect or oldscope renewal; only whitelisted metadata/schema facts are
+diagnostic output. Additional observed run identities/looks will be retained
+after safe interpretation, not guessed from null fields.
+
+### 87.4 Prospective exact all-source reconciliation, independent of list parsing
+
+TPR-EXT26-D087 (agent-delegated, independent review pending): use existing
+unchanged source-capture producer's post-mia-source action under NEW
+`TPR-EXT26-MIA-SOURCE-POST-20261013-005`. Source retrieval is independent of
+the list parser; no job/Mia outcome is accepted by current files. Explicit
+fresh comparison body scope permits ONLY original baseline003 result5865bytes/
+`1d2f7cb390bcced2547a8f6b1e22b2b1a2800149e741535bf6e65e3624223f86`
+and its read2archive224315bytes/
+`c24f20eb9733bc9f4d3dea79b86223857d4c2e99d232955066fe9939baed1af3`
+(230180bytes total) after new durable claims. This is a deliberately named
+before/after comparison, not incidental historical reopening or extension
+of baseline003's spent scope. Old files/hashes remain immutable.
+
+At most two ownOFF files/read requests,4MiB per wire/8MiB total,16files/1MiB
+each,120seconds/request<=40seconds, full whole-file before/after delta retained
+private0600. Current committed import closure must equal the old nine-source
+closure where required. Two current captures must agree; every unexpected/
+changed/removed file retained, no executed candidate accepted/overwritten.
+Fresh runtime plan/currentHEAD/timestamps/access/controller/request claims
+precede baseline bodies/credentials/cloud effects. No source write, compile,
+launch, input/ObjectStore/other-project/provider access, economic or attempt
+change. This registration precedes post005 effects; results follow honestly.

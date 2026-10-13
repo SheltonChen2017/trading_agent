@@ -1,11 +1,10 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Codex counter-review of section 34 completed in section 35,
-2026-10-12, against exact pushed review head
-`d1a57097605c2a01ebeb9805c4474161a7882b10` of publication `5692ae39`.
-Both Claude commits are accepted, the record commit after two P3 documentation
-corrections; the counter-reset pin is confirmed and retained. The review push
-is published and consumed, not local-only or a reusable trigger.
+Status: **Independent Claude review of `d1a57097..8e277418` (sections 35
+and 36: counter-review of section 34 and the read-only QC readiness preflight)
+recorded in section 37, 2026-10-13;
+Codex counter-review of section 37 pending.
+Both Codex commits are accepted; no source changed since producing `c589b3dd`.
 GDR-RP33 is accepted in section 34
 as offline software only: it retains every record digest in a 489-line paired
 format with assumed logging reserves, not verified platform accounting or
@@ -13,21 +12,16 @@ backtest readiness.
 The section-27 evaluation still ended with three pre-initialization failures;
 the attempt ceiling remains exhausted and no manual relaunch is authorized.
 The owner's conditional Mia-led synthetic recovery (32.4) stays
-paused pending platform preflight: independent review and counter-review have
-accepted the unchanged source, but output compliance
-with QC's AI-agent rules (GDR-CR28-001) and QC's log-length accounting
-(GDR-CR31-003) remain unverified. Read-only continuation in section 36,
-2026-10-13, found Safari accessible but only 18.89 KB of displayed remaining
-log-read headroom; Mia did not return a usable final preflight clearance.
-No new Claude review push or recovery launch occurred. The owner now requests
-one combined publication of this completed counter-review/preflight handoff,
-then a re-armed monitor for its exact next Claude review. Native loading of the
-recovery carrier is unverified. Only
+paused pending platform preflight: output compliance with QC's AI-agent rules
+(GDR-CR28-001) and log accounting remain open, with only 18.89 KB of
+organization-wide log-read quota observed against a 75,260-byte payload
+(GDR-CR31-003, GDR-CR37-002), and no recovery attempt boundary is set yet
+(GDR-CR37-001). Native loading of the recovery carrier is unverified. Only
 `data/__init__.py` was observed as one LF at runtime;
 `research/__init__.py`, remains unobserved. No successful native integration
 or empirical backtest readiness is established. The original economic, data,
 empirical, account and trading gates remain closed.**
-Current scope/evidence are sections 17 through 36. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 37. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -4830,3 +4824,93 @@ needed, return to the owner rather than changing channels or inventing another
 milestone. Wait on occupied shared nodes, never cancel or reallocate others.
 One later concluded-round push remains the rule, not intermediate publication
 or an indefinite automatic loop.
+
+## 37. Independent Claude review of `d1a57097..8e277418`, 2026-10-13
+
+### 37.1 Scope and method
+
+Reviewed range: the two Codex commits after the section-34 push.
+
+| Commit | Content |
+|---|---|
+| `f7467d21` | Section 35: counter-review of section 34, owner directions, first readiness preflight |
+| `8e277418` | Section 36: continued read-only preflight and the owner-directed publication handoff; the fetched remote head |
+
+Both change only this record and the review-state pins in `test_boundaries.py`.
+No production source, other test, data file, frozen root document, plan, PDF
+or candidate changed. Source identities remain those in 33.4, so no mutation
+trial applies. The owner's instruction for this round was to review every
+unreviewed commit, apply corrections where necessary and push once, without a
+full lane-suite review. Validation is therefore the lane gate and the shared
+active-document check, run in the designated worktree, network-denied. No
+provider, QC, broker, paper or live system was contacted by this review.
+
+### 37.2 Disposition of sections 35 and 36
+
+| Item | Claude disposition |
+|---|---|
+| 35.1: `7e52f03b` accepted, `d1a57097` accepted after documentation correction | Accepted. |
+| GDR-CCR35-001 (wrapper versus payload loss in GDR-CR34-001) | Accepted. Resetting the message counter loses wrapper allowance; resetting the byte counter loses payload allowance. The corrected 34.4 wording is accurate. |
+| GDR-CCR35-002 (CP14 rationale) | Accepted. With only the cursor guard removed, the loop reaches the END row, which is neither a pair nor a record, and raises the named `ReadableTransportError`. CP14 is redundant, not refusal-type-only, and the corrected 34.6 wording says so. |
+| 35.3 and 36.5 owner directions | Recorded only by Codex; listed in 37.5. |
+| 35.4 and 36.2 platform observations | Accepted as observations. QuantConnect shows a 100 KB per-backtest entitlement, but only 32.29 KB and later 18.89 KB of remaining log-read quota, below the 75,260-byte v2 payload alone. GDR-CR31-003 stays open. |
+| 36.3 Mia exchange and policy reading | Accepted. Mia's final reply is correctly not used as evidence. Codex's reading of Terms section 2.6 (the export prohibition targets Platform Data) is noted as a reading, not a clearance; GDR-CR28-001 stays open. |
+| 36.4 named-source comparison | Accepted. The 21 named files read back through the documented Read File API are byte-exact to the attempt-3 candidate (`fbf824bf...`, 278,845 bytes). No notebook, log, result or Object Store file was read. |
+| Incidental IDE builds (`539ea9-8c8ea8`, `e99033-8c8ea8`, `b841a7-8c8ea8`) | Accepted as recorded: successful builds only, no backtest. The engine label moved from 18178 to 18179 on master since the failed attempts. |
+
+### 37.3 Commit dispositions
+
+| Commit | Scope | Disposition | Notes |
+|---|---|---|---|
+| `f7467d21` | Section 35, status block, pin rotation | Accepted | Both GDR-CCR35 corrections are accurate; platform actions were read-only and within the owner's 2026-10-12 pre-authorization |
+| `8e277418` | Section 36 | Accepted | Identities unchanged; the read-only Read File comparison used the permitted interface |
+
+### 37.4 Findings ledger
+
+| ID | Priority / status | Location | Finding, disposition and verification |
+|---|---|---|---|
+| GDR-CR37-001 | P3 / documented, owner input before any recovery launch | Sections 32.4, 35.3, 36.2, 36.5 | The conditional Mia-led recovery authorization sets no attempt boundary. Sections 32.4 and 36.5 say only that it is not unlimited, and no attempt ledger or counting rule is named for it. Section 36.2 also records a build whose initiator is unverified (`b841a7-8c8ea8`) during a read-only Mia exchange, so Mia or the IDE can start engine actions without an explicit request. Before any Mia-led launch, the owner should set the recovery attempt cap and define what counts as an attempt, including Mia-initiated compiles or launches and how they are observed in project history. The record should name that recovery ledger, separately from the closed section-27 cycle. |
+| GDR-CR37-002 | P3 / documented, shared resource | Sections 35.4, 36.2 | The log-read quota is organization-wide, not lane-specific. It fell from 32.29 KB to 18.89 KB between two read-only observations in which this lane read no logs. Retrieving the complete v2 evidence needs at least 75,260 bytes of read headroom at that moment, so any recovery run must be timed against other lanes' log reads, or the quota question raised with QuantConnect. This is a shared-resource scheduling matter for the owner; nothing changed here. |
+
+Scripted count from this table: P0 0, P1 0, P2 0, P3 2; corrected 0, documented 2.
+
+### 37.5 Validation, owner confirmations, commits and next action
+
+| Check | Scope | Result |
+|---|---|---|
+| Lane gate `test_boundaries.py` plus shared `test_active_document_consistency.py` at `8e277418` | worktree, network-denied | 75 passed |
+| Source identities at `8e277418` | worktree, network-denied | Full source `061ff30f...`, recovery project `c6b9443a...` and prepared runtime `5d1dc656...` are unchanged from 33.4 |
+| Full lane selection and repository suite | not run | Not run, per the owner's instruction for this round; no source changed |
+| `git diff --check` | worktree | passed |
+| Closing check on this record commit | worktree, network-denied | lane gate plus shared active-document check: 75 passed |
+
+For the owner to confirm where both roles can read it (each recorded only by
+Codex from its own channel):
+- (a) the 2026-10-12 instruction "I pre authorize you to do anything necessary to get this lane to backtesting" (35.3);
+- (b) the 2026-10-13 instruction to push once, re-arm, and counter-review Claude's next push (36.5);
+- (c) the 2026-10-13 request "counter review, then continue to build until lane completion" (36.1).
+
+Claude's instruction for this round was to review every unreviewed commit,
+apply corrections where necessary and push once.
+
+The status block names this section. The `test_boundaries.py` pins are rotated
+to "Codex counter-review of section 37 pending"; the `research/__init__.py`,
+platform-preflight, GDR-RP33 and attempt-ceiling pins are kept.
+
+| Commit | Scope |
+|---|---|
+| This record commit | Section 37, status block, `test_boundaries.py` pin rotation |
+
+This round gets one push, guarded on the remote head still being `8e277418`;
+never force.
+
+Next, Codex counter-reviews section 37. Before any Mia-led recovery launch, the
+owner sets the attempt boundary and ledger (GDR-CR37-001). GDR-CR28-001
+(output compliance) and GDR-CR31-003 (log accounting, now also the
+organization-wide read quota, GDR-CR37-002) remain open. The closed cycle's
+three-attempt ceiling stays exhausted.
+
+Acceptance here is a documentation and software review only. It establishes
+neither native execution nor empirical readiness.
+`docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` were not edited
+and stay frozen for both agents.

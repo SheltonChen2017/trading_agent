@@ -1,31 +1,14 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Current follow-up (section82): owner00501bc2… explicitly authorizes genuine
-built-in Mia scoped audit-key repair/recovery, preserving the frozen strategy.
-The review checkpoint is skipped for this continued round only, not accepted
-by Claude. Fresh baseline003 is unchanged; corrected helper/main-import writes
-were made under Repair001 and all-file post003/inspection003 verify exactly
-the scoped delta. Genuine Mia recovery001 launched job e3324aef… under frozen
-actual source/economics; exact native/UI terminal is now Runtime Error,
-membership weight outside bounds on2024-07-12. Offending native row/unit/
-source date remain unknown; owner is routed to read-only Mia diagnosis.
-Fresh native collection retained terminal+one SUMMARY but refused its
-validation before index/charts/orders; this is not evidence of zero orders
-or absent index. Further bounded diagnosis is pending; no automatic retry.
-No fourth Codex OFF attempt/reset, ON launch or accepted 2021-now comparison/
-performance. OFF3/ON0/look20 (18cloud+2historical local) and open F017/F018/F012
-remain until factual new evidence. Read-only support is focused-tested and accepted
-after correction internally, not strategy/native acceptance. One final push
-only after a stable complete/blocked handoff; monitor remains paused.
-
-The following Status block records published61a81d9a/section80's historical
-handoff; its Mac-lock/owner-unlock routing is superseded for this follow-up
- by the current note and sections81/82, not claimed as current interface state.
-
 Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN
-`f998144d..2726b5ba` IN SECTION 80 AND THE CUMULATIVE TREE. DISPOSITION:
-ACCEPTED AFTER CORRECTION OF TESTS AND RECORD QUALIFICATIONS, NOT NATIVE QC
-OR PERFORMANCE ACCEPTANCE. TPR-CR23-001 REMAINS OPEN: END-HOOK ERROR FRAMES,
+`61a81d9a..ed558300` IN SECTION 82. CUMULATIVE DISPOSITION: ACCEPTED AFTER
+CORRECTION (THREE P3 RECORD/GUARD ISSUES; NO PRODUCTION OR EXECUTED BYTE).
+THE OWNER SELECTED MAC-ONLY CUSTODY WITH PORTABLE WINDOWS CHECKS. THE
+BOUNDED TWO-MODULE TEST SPLIT IS A CANDIDATE, NOT NATIVE CUSTODY ACCEPTANCE;
+TPR-CR25-003 REMAINS OPEN FOR BROADER HOST CLASSIFICATION.
+SECTION 80'S COUNTER-REVIEW OF THE THREE SECTION-79
+CLAUDE COMMITS IS ACCEPTED, NOT NATIVE QC OR PERFORMANCE ACCEPTANCE.
+TPR-CR23-001 REMAINS OPEN: END-HOOK ERROR FRAMES,
 FINAL PROGRESS 1 AND A CONFIGURED END DATE DO NOT PROVE NORMAL FULL-WINDOW
 COMPLETION OR A PLATFORM-ONLY CAUSE. OFF READS NO SIGNAL PACKET; ITS PARTIAL
 UPLOADS DO NOT EXPLAIN OFF'S FRONTIER. ONLY THE REGISTERED TERMINALS AND
@@ -34,9 +17,10 @@ OFF'S THREE CODEX ATTEMPTS ARE CONSUMED; ON HAS ZERO. THERE IS NO ACCEPTED
 2021-NOW PAIRED RESULT. THE MONITOR REMAINS PAUSED. FRESH AVAILABILITY003
 OBSERVED AUTHENTICATED CONTROLLABLE BUILT-IN MIA. SOURCEBASELINE001 IS SPENT
 AND VERIFIED. THE MAC LOCKED BEFORE MIA DIAGNOSIS; NO MIA MESSAGE OR JOB
-WAS SUBMITTED. OWNER NEXT UNLOCKS THE MAC AND REOPENS AUTHENTICATED BUILT-IN
-MIA FOR OFF37650980 UNDER SECTION80, NOT A
-FOURTH CODEX OFF ATTEMPT. SECTION 74'S
+WAS SUBMITTED. CLAUDE NEXT REVIEWS SECTION 82 AND THIS CODEX ROUND
+INDEPENDENTLY. A FRESH DIAGNOSIS-ONLY MIA SCOPE STILL WAITS ON THE OWNER
+UNLOCKING THE MAC AND REOPENING AUTHENTICATED BUILT-IN MIA FOR OFF37650980,
+NOT A FOURTH CODEX OFF ATTEMPT. SECTION 74'S
 COUNTER-REVIEW OF THE EARLIER THREE-COMMIT CLAUDE RANGE STANDS AS HISTORY:
 ITS INCOMING-TEST CORRECTIONS ARE ACCEPTED, NOT INHERITED RUNTIME READINESS.
 HASH-ONLY AND KEY-ONLY PACKET-RECEIPT NEGATIVES NOW FAIL INDEPENDENTLY UNDER
@@ -486,17 +470,23 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, 2026-10-11:** Codex has counter-reviewed the exact Claude range
-`f998144df14c6a669628a128142f6424402067c1..2726b5ba87b4eab9282682d41b252c7ad1db91c2`:
-three commits carrying six diagnostic regressions, section 79's independent
-review and guards, and the attributed full-suite census. Section 80 gives
-every incoming commit a disposition and accepts the cumulative tests/record
-after correction, not native runtime or performance acceptance. Claude's
-section 79 reviews the whole earlier two-commit Codex range retained there.
-The owner reports Mac/QC sign-in and asks to continue; fresh availability003
-observed authenticated controllable built-in Mia in the exact OFF project.
-The next bounded work is fresh all-file source baseline capture and diagnosis-only Mia registration;
-no fourth Codex OFF attempt is authorized.
+**Current qualification, 2026-10-12:** Codex has counter-reviewed the exact Claude range
+`61a81d9a6a93c1a548a903414f767178b9b1ac65..ed558300d00a569be3ecc79195a610d6e9e6059f`:
+one record/guard commit carrying section 81's independent review of the
+section-80 round. Section 82 accepts that commit and the cumulative tree
+after three P3 corrections: authority-guard sensitivity, the two-head hash
+claim and canonical-versus-runtime P1 wording. No production or executed
+byte changed. The owner selected Mac-only custody with portable Windows
+checks; the two-module test-only split is an unreviewed bounded candidate.
+Section 80 accepted the section-79 tests and record after correction, not
+native runtime or performance.
+The owner reports Mac/QC sign-in; availability003 observed authenticated
+controllable built-in Mia in the exact OFF project, and sourcebaseline001 is
+spent. Diagnosis001 was refused at preflight because the Mac was locked; no
+Mia message or job exists, and no fourth Codex OFF attempt is authorized.
+`TPR-CR25-003` remains open for broader QC/development host classification;
+the two changed modules explicitly exclude native Mac custody on Windows,
+not the portable checks. The owner confirms Mac recovery is **Not yet**.
 Section 78's corrections of section 77 are accepted; section 77's other
 findings stand as attributed history, not as this round's reruns.
 `TPR-CR23-001` stays open: the attributed OFF end-hook frames and July-2024
@@ -619,17 +609,16 @@ outcome-free source audit; no real-row D1, outcomes or QuantConnect access is
 authorized by that audit.
 The trust rollback pin, protected parent custody, reviewer identity and
 adversarial matrix remain unresolved and parked. **Exact next role action:**
-Section 80 counter-reviews all three section-79 Claude commits, accepting
-tests/record after correction, not native QC readiness. Availability003
-observed authenticated controllable built-in Mia. Sourcebaseline001 completed
-two stable all-file reads, but diagnosis001's preflight found the Mac locked
-and automatic unlock unavailable. Owner next unlocks the Mac and reopens
-authenticated built-in Mia for OFF37650980. After a fresh bounded scope and
-mode check, Codex can obtain diagnosis and resolve `TPR-CR23-001` before any
-further extended launch. The owner reports Mac/QC sign-in; that does not waive
-launch/audit gates or the exhausted Codex cap.
-Claude next independently reviews the final exact published snapshot and
-entire new Codex round. The heartbeat is PAUSED during and after this
+Section 82 counter-reviews the one section-81 Claude commit and accepts it
+after correction, not native QC readiness. Sourcebaseline001 completed two
+stable all-file reads; diagnosis001's preflight found the Mac locked and
+automatic unlock unavailable. Claude next reviews section 82 and this Codex
+round independently. A fresh diagnosis-only Mia scope still waits on the
+owner unlocking the Mac and reopening authenticated built-in Mia for
+OFF37650980; after that fresh bounded scope and mode check, Codex can obtain
+diagnosis and resolve `TPR-CR23-001` before any further extended launch. The
+owner reports Mac/QC sign-in; that does not waive launch/audit gates or the
+exhausted Codex cap. The heartbeat is PAUSED during and after this
 round; no automatic rearm. No fourth OFF attempt and no ON launch through
 the known failed export path. The owner's latest
 request is an order-based 2021-now extension of section72's cap-selected
@@ -764,8 +753,9 @@ and are deliberately not listed here.
 | `TPR-CR23-001` | P1 | Any further extended launch or ON attempt; diagnose before Mia recovery | Claude reports a July2024 terminal/rolling-window frontier in OFF2/3 and identical partial statistics; native NAV852/1449 is incomplete. The engine cause and relation to sampling are unproved, not884 independently observed daily valuations. Section78's fixed terminal/unfiltered own-job log diagnosis is complete, not renewed. Section80 qualifies section79: end-hook frames/progress1/configured end do not prove normal completion, exclude an earlier algorithm-owned cause or establish platform-only failure. OFF reads no signal packet; only registered bodies/exposed own-job logs were exhausted. Fresh controllable Mia diagnosis is next; no fourth Codex OFF attempt, known-broken ON launch or accepted performance. |
 | `TPR-CR23-002` | P2 | Owner retention decision; no new standalone paperwork gate | Vendor-derived objects and journals are attributed retained inventory, with one verified gzip upload, possible failed plaintext object and earlier keys;71newuploads remain held. Cleanup recorded22delete successes without absence verification. Existing private-processing waiver is working authority, not provider attestation; do not delete or infer rights/completeness. Section78 qualifies this carried concern. |
 | `TPR-MATCHED-006` | P2 | Observer approval before Mia recovery launch | Retained unexecuted proposals contained native Order/ticket, open-only history, enum, exception, partial-fill and clock defects. Corrected complete observers have been requested, not verified/applied/tested. Last readback contains only additive initialization; restored control, actual complete source review and focused proof are required before any recovery job. See71.9/71.10. |
+| `TPR-CR25-003` | P2 | Broader QC/development host classification and native-host validation | Native custody stays Mac-only by the direct owner reply on 2026-10-12; portable Windows checks stay active. Section 82 implements a bounded test-only split in the collector/frontier modules, pending independent review. Other QC/development modules remain unclassified here; no attributes, working-byte repair, production port or fresh Mac-native validation was performed. The reported CRLF/POSIX failures in section 81 remain historical evidence, not native acceptance. |
 
-No open finding is P0. The two P1 findings are inert while the registry is empty,
+No open finding is P0. The two canonical P1 findings are inert while the registry is empty,
 but both block any positive registry entry. Read-only checks on this Windows
 host on 2026-10-05 found neither `tpr_allowed_signers` nor `tpr_registry_anchor`
 under the frozen `C:\ProgramData\CustomizedAgent\trust` path; no key or
@@ -997,6 +987,8 @@ known.
 | 2026-10-09 | Claude review | `32016848bc9ce4dfab3f52ddb5bb34e105e445dc..77b156ecf4d71df1f69678fcfe7a275c59cb4f28` reviewed; test commit `1cab57bb` and this record/guard commit on this same lane branch | Independent review of sections 70-72 (counter-review, matched study, Mia recovery, cap-selection/tilt experiment); no feature milestone | Reviewed all eleven Codex commits individually. Reproduced both cap-tilt diagnostic-v3 outputs byte-for-byte from the committed reporter and the receipt-bound private files, all seven QC run statistics (three matched attempts, four cap-tilt attempts) and both request censuses (79 and 119). Forty-two mutation trials across the cap-tilt core, both successor controllers and the collision guard: one genuine survivor, now covered. No production module, executed artifact, receipt, shared document or shared test changed; two controller test modules, the lane guard and this record changed. | Lane, development, QC, active-document, leak-guard and ML-boundary set on the pushed head `77b156ec`, designated worktree, network-denied: **3,974 passed, 20 skipped**. Complete suite in a scratch clone, six sandboxed shards: **21,191 passed, 842 skipped, 103 failed, 37 errors**; 83 failures are path-bound lane tests green in the worktree, the rest the known `TPR-OOL-015`/`TPR-OOL-016` sets. Final-tree lane set after `d99b4ffb`: **3,981 passed, 20 skipped**; `compileall` exit 0; `git diff --check` clean. Provider requests **0**; QC requests **0**; raw licensed rows read **0**; private receipts, result projections, order pages and the packet structure read locally for recomputation only; authorized/spent looks **0**. | No P0 or P1. `TPR-CR22-001` (P2) open; `TPR-CR22-002`, `TPR-CR22-003` and `TPR-CR22-010` (P2) documented; `TPR-CR22-008` (P3) closed by correction; `TPR-CR22-004` through `TPR-CR22-007` and `TPR-CR22-009` (P3) documented. Six canonical lane findings, `TPR-MATCHED-002`, `TPR-MATCHED-006` and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. The sixteen observed development looks remain exploratory; no canonical, further QuantConnect, broker, paper, live, capital or trading authority is added. | Make this round's one push. Codex counter-reviews section 73 and the Claude commits; the owner decides `TPR-CR22-007` (Object Store retention) at leisure. |
 | 2026-10-11 | Claude review | `9a2753867cda373db634a35ad051b5c9386cc3c4..ad5af50612b80afb5e20e928f0b44adbbecc117f` reviewed; test commit `1434d0dd` and this record/guard commit on this same lane branch | Independent review of sections 74-76 (counter-review, extended 2021-2026 study, QC operations, cleanup, blocked handoff); no feature milestone | Reviewed all twenty-four Codex commits individually. Found from the private terminal receipts that both completed-launch OFF runs ended at engine time 2024-07-12 with identical statistics (rolling-window keys end at `M6_20240712`), so the record's export and aggregate diagnoses are downstream of an undiagnosed early end. Reproduced the request censuses (7 probe, 387 capture, 8 repair, 136 QC slots, 22 properties and 22 deletes), the committed count-only artifacts and the three OFF terminal states. Twenty-one mutation trials on the construction, signal and cleanup successors: one genuine survivor, now covered. No production module, executed artifact, receipt, shared document or shared test changed; one test module, the lane guard and this record changed. | Lane, development, QC, active-document, leak-guard and ML-boundary set on the pushed head `ad5af506`, designated worktree, network-denied: **5,763 passed, 20 skipped**. Complete suite in a scratch clone, six sandboxed shards: **22,969 passed, 842 skipped, 114 failed, 37 errors**; 94 failures are path-bound lane tests green in the worktree, the rest the known `TPR-OOL-015`/`TPR-OOL-016` sets. Final-tree lane set after `a0e0a794`: **5,768 passed, 20 skipped**; `compileall` exit 0; `git diff --check` clean. Provider requests **0**; QC requests **0**; raw licensed rows read **0**; private receipts and terminal metadata read locally for recomputation only; authorized/spent looks **0**. | No P0. `TPR-CR23-001` (P1) open; `TPR-CR23-002` (P2) open for the owner; `TPR-CR23-003`, `TPR-CR23-004` and `TPR-CR23-006` (P2) documented; `TPR-CR23-007` (P3) closed by correction; `TPR-CR23-005`, `TPR-CR23-008` and `TPR-CR23-009` (P3) documented. `TPR-CR22-001`, `TPR-MATCHED-002`, `TPR-MATCHED-006`, the six canonical findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. The nineteen observed looks remain exploratory; no canonical, further QuantConnect, broker, paper, live, capital or trading authority is added. | Make this round's one push. Codex counter-reviews section 77 and the Claude commits, then diagnoses the 2024-07-12 end before any attempt. |
 | 2026-10-11 | Claude review | `9e5ed66e822f9119feb0db22866a1770fae7f606..f998144df14c6a669628a128142f6424402067c1` reviewed; test commit `bbbf57d1` and this record/guard commit on this same lane branch | Independent review of section 78 (counter-review and bounded frontier diagnosis); no feature milestone | Reviewed both Codex commits individually. Reproduced every public figure of the two diagnostic receipts (terminal sizes and hashes, plan hashes, log line counts and wire sizes, projection hashes, frames, markers, 886 frozen sessions through 2024-07-12), the historical-section digest and ten closure and test hashes. Confirmed from the retained uploaded mains that both failure frames are inside `on_end_of_algorithm`, that both terminals report progress 1, and that the OFF arm constructs no signal store and reads no packet object. Eleven mutation trials on the new producer: five surviving guards are now pinned by six regression tests. Accepted Codex's corrections of my section-77 arithmetic, session count, attribution, stale preamble lines and bundle-pin reason. No production module, receipt, shared document or shared test changed; one test module, the lane guard and this record changed. | Lane, development, QC, active-document, leak-guard and ML-boundary set on the received head `f998144d`, designated worktree, network-denied: **5,823 passed, 20 skipped**; diagnostic module after the tests: **41 passed**. Complete suite and final-tree figures: census commit named in 79.5. Provider requests **0**; QC requests **0**; raw licensed rows read **0**; private receipts, retained sources and input payload dates and counts read locally for recomputation only; authorized/spent looks **0**. | No P0. `TPR-CR24-001` (P3) closed by correction; `TPR-CR24-003` (P2) documented, feeding `TPR-CR23-001` (P1, open); `TPR-CR24-002`, `TPR-CR24-004` and `TPR-CR24-005` (P3) documented. `TPR-CR23-002`, `TPR-CR22-001`, `TPR-MATCHED-002`, `TPR-MATCHED-006`, the six canonical findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. No canonical, QuantConnect, broker, paper, live, capital or trading authority is added. | Make this round's one push. Codex counter-reviews section 79; the owner decides between Mia sign-in and an owner-authorized diagnostic rerun (section 79.7). |
+| 2026-10-12 | Claude review | `2726b5ba87b4eab9282682d41b252c7ad1db91c2..61a81d9a6a93c1a548a903414f767178b9b1ac65` reviewed; this record/guard commit on this same lane branch | Independent review of section 80 (counter-review, bounded EXT26 source-only collector, spent source baseline, Mac-locked Mia preflight); no feature milestone | Reviewed both Codex commits individually and the collector in full: one fixed read-only `files/read` route to project 37650980, two requests per phase, claims and lock before credentials, no launch, compile, edit, upload or Mia route; the tests deny the real credential, connection and subprocess with an autouse fixture. Reproduced every committed size and hash in 80.8, the prompt and owner-message hashes and the three historical span digests. Corrected one stale section-8 next-action sentence and extended the guard grammar; added a no-grant pin for subsections 80.8 onward. No production module, executed artifact, receipt, shared document or shared test changed; the lane guard and this record changed. | Lane guard on the final tree: **225 passed**. Complete suite at `61a81d9a`, read-only scratch clone, 24 parallel shards: **16,197 passed, 1,281 failed, 97 skipped, 568 errors** plus 135 collection errors, over 18,138 tests. The 1,209 Target-Price reds are `TPR-CR25-003` host classes plus 26 clone-only trust-root fail-closed reads that are green in the worktree; the rest are the `TPR-OOL-015` through `TPR-OOL-018` classes. `compileall` exit 0; `git diff --check` clean. Provider requests **0**; QC requests **0**; raw licensed rows read **0**; private receipts not read (they are on the Mac); authorized/spent looks **0**. | No P0 or P1. `TPR-CR25-001` and `TPR-CR25-002` (P3) closed by correction; `TPR-CR25-003` (P2) open for the owner; `TPR-CR25-004` through `TPR-CR25-006` (P3) documented. `TPR-CR23-001` (P1), `TPR-CR23-002`, `TPR-CR22-001`, `TPR-MATCHED-002`, `TPR-MATCHED-006`, the six canonical findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. No canonical, QuantConnect, Mia, broker, paper, live, capital or trading authority is added. | Make this round's one push. Codex counter-reviews section 81; the owner unlocks the Mac for a fresh diagnosis-only Mia scope and rules on `TPR-CR25-003`. |
+| 2026-10-12 | Codex counter-review + bounded test candidate | `61a81d9a6a93c1a548a903414f767178b9b1ac65..ed558300d00a569be3ecc79195a610d6e9e6059f` reviewed; this same-branch Codex round is itemized in section 82 | Counter-review plus owner-selected Mac-only custody / portable Windows checks in two test modules; no native milestone completion | Accepted the one Claude commit after three P3 record/guard corrections. Preserved source, artifact bytes, shared coordination and historical execution evidence. Kept native assertions and effect denials; native fixture entry skips unsupported hosts before plan/directory work. | Exact separate/cumulative validation and final commit identities are in section 82.5/82.7. No provider/QC/private/outcome requests or new looks. | Three new P3 corrections closed; `TPR-CR25-003` remains open for broader host classification. Runtime, canonical and matched-study gates unchanged. Mac recovery is not yet complete. | None beyond the owner's test-boundary choice; no external or trading authority. | Claude independently reviews section 82 and the exact pushed Codex round. Fresh Mia scope still waits for owner Mac recovery. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 | 2026-10-05 | Codex counter-review and TPR-D0 implementation | Reviewed `9958a459f5cd56c29cb9a0de13d38737e2c3412d..c0bfb21393180d44c16c10be1e667ea741098531`; corrections/decisions `cf11788f39a2148d7bc3b801e88807bd2caca5ea`; D0 implementation `8dcfb71851ff22db6f0727395e18292c19f080ef`; this record-only handoff follows | Four-commit Claude counter-review, five bounded owner selections, strict D0 plan and one retained structural audit | Accepted the cumulative Claude range after three record/encoding corrections; selected explicit native/host test variants without changing production trust policy. Implemented the separate standard-library D0 package and immutable aggregate artifacts; retained-source inventory/hashes and all canonical freezes match. Sections 46/47 contain exact dispositions, scope, evidence and remaining limitations. | Cumulative focused suite 491 passed, 5 symlink-permission skips; final routing/artifact guards 107 passed. Standard suite blocked by 110 Analyst `fcntl` collection errors, with zero tests executed. Optional continuation diagnostics capped and incomplete, not reported as totals. Compileall exit 0; diff hygiene clean; Python 3.13.14 / pytest 9.1.1. | CCR16-001/002/003 closed; no new in-lane P0/P1/P2. Six canonical findings remain open and parked. TPR-OOL-017 opened for Windows Analyst collection, documented only. | Exact local retained-structure scope only, expiring 2026-10-12; 587,046 retained rows audited. Provider/outcome/QC/development-look/trading counts zero. No vendor-rights attestation or canonical admission. | One matching-branch non-force push of this Codex round, then independent Claude review of every commit after `c0bfb213` through the exact pushed tip. No automatic D1; later action/source scope must be selected after review and counter-review. |
 
@@ -17687,7 +17679,432 @@ peer ceased edits at the exact release; root's final document-only reprise
 is recorded with the publication verification in this chat. No full suite
 or external effect was involved in these controls.
 
-## 81. Owner-authorized read-only Mia diagnosis while independent review is pending - 2026-10-11
+## 81. Claude independent review of the counter-review, EXT26 source baseline and Mia preflight round - 2026-10-12
+
+**Disposition: accepted after correction.** The owner asked for every
+unreviewed commit to be reviewed and for one push. Two Codex commits are
+unreviewed. The first carries section 80's counter-review of the three
+section-79 Claude commits and a new bounded source-only collector
+(`extended_mia_capture.py`, 513 lines, with 49 synthetic tests). The second
+records the collector's one spent two-read baseline and the Mia diagnosis
+preflight that the locked Mac refused. Both are accepted, the second after
+a record and guard correction. The collector does what 80.8 registers: one
+fixed read-only endpoint, two requests per phase to the exact OFF project,
+exclusive claims and a controller lock before any credential is used, and
+no launch, compile, edit, upload or Mia route. The baseline consumed no
+look and no attempt. This review found no production defect. It found three
+other problems. Section 8 kept a stale next-action sentence that the
+guard's grammar could not see. The no-grant pin ignored the subsections
+where the actual scopes are registered. And on this Windows host, the new
+collector tests and the frontier-diagnosis tests cannot run.
+
+### 81.1 Exact reviewed snapshot
+
+| Item | Value |
+|---|---|
+| Branch and worktree | `codex/strategy-target-price-revisions`; the lane worktree resolved from `git worktree list` |
+| Reviewed range | `2726b5ba87b4eab9282682d41b252c7ad1db91c2..61a81d9a6a93c1a548a903414f767178b9b1ac65` |
+| Codex commit 1 | `591c3407cf48ad9de469482908f4ad8b93521dcb` - Counter-review Claude CR24 and register bounded EXT26 Mia source capture |
+| Codex commit 2 | `61a81d9a6a93c1a548a903414f767178b9b1ac65` - Record EXT26 source baseline and blocked Mia preflight handoff |
+| Files changed | 4; +1,716 / -48: this record, one new collector, one new test module, the lane guard |
+| Host and interpreter | Windows 11 Enterprise with `core.autocrlf=true`; the repository venv, Python 3.13.14, pytest 9.1.1. The Claude reviews in sections 69 through 79 ran on macOS; this worktree last ran the lane's tests at section 48 |
+| Scope checks | Lane-only paths; `git diff --check` clean; no secret shape (the only `Authorization` header is built inside `_native_request` from the existing credential seam) |
+| Claude commits this round | this record/guard commit |
+
+### 81.2 Commit-by-commit dispositions
+
+| Codex commit | Disposition | Basis |
+|---|---|---|
+| `591c3407cf48ad9de469482908f4ad8b93521dcb` | **Accepted** | Counter-review items `TPR-CCR24-001` through `-006` are checked in 81.4. The collector is read in full. Its production path admits no injected root, transport, guard or clock. Its only network call is one `POST /api/v2/files/read` with the fixed body `{"projectId": 37650980}`. The call is signed from the existing credential seam inside a wall deadline over a verified TLS context. The token is used only to refuse a credential echo and is never stored. Every committed size and SHA-256 in the 80.8 table matches the blobs. An autouse fixture denies the real credential, HTTPS connection, subprocess and lane-private directory, so the tests cannot reach the account even on a host where credentials are set (this host has them set). The record and guard additions are exact. The Windows behaviour of its tests is `TPR-CR25-003`; a dead status call is `TPR-CR25-005`. |
+| `61a81d9a6a93c1a548a903414f767178b9b1ac65` | **Accepted after correction** | The reported baseline figures are internally consistent: 225,681 x 2 = 451,362 wire bytes, and 59,931 = 60,000 - 69. The prompt reproduces from the record at 3,241 bytes and `d0fb7dca...`, the owner message at `649b1e07...`, and spans 63-77, 78 and 79 at their three recorded digests. The private receipts are on the Mac and are not reproduced here. Its section-8 rotation left the stale baseline-capture sentence (`TPR-CR25-001`), and its new guards pin no-grant only in 80.7 (`TPR-CR25-002`). Both are corrected in this round's record/guard commit. |
+
+**Cumulative disposition: accepted after correction.**
+
+### 81.3 P0-P3 ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| `TPR-CR25-001` | P3 | **Closed by correction** | `61a81d9a` | Section 8 current block; `SECTION8_NEXT_ACTION_STATEMENT` | After 80.9 spent the baseline and 80.10 recorded the locked preflight, section 8's current block still said "The next bounded work is fresh all-file source baseline capture and diagnosis-only Mia registration". The correct owner-unlock action sat beside it. The singleton rule (`TPR-CR16-002`) counts only phrasings in its grammar, and "The next bounded work is" was not one of them, so the contradiction passed. This is the stale-routing class that `TPR-CCR24-006` corrected in 80.7, but the correction was not swept into section 8. | Probe G2 in 81.4: inserting a second copy of the sentence left the four routing guards green. | A reader of the only current pointer could act on a spent scope. | The routing rotation replaces the sentence. The grammar now also recognizes `The next bounded (work|action) is`, and one parametrized case is new. The section-80 routing test is retargeted to the section-81 pointer with all its faults kept, plus the now-stale owner-unlock role. | The new case is red against a record carrying the sentence and green on the corrected record (81.4). |
+| `TPR-CR25-002` | P3 | **Closed by correction** | `61a81d9a` | `test_section_80_counterreview_records_all_commits_and_bounded_mia_authority` | Section 80's refusal of contradictory grants reads only 80.7, and the received `test_section_80_review_authority_is_separate_from_later_progress` proves that a later "ON launch is authorized." leaves it green. Subsections 80.8-80.10 register the source-capture, diagnosis and blocked scopes, and section 8 derives the current state from them. Yet no guard refused a fourth OFF attempt, ON launch, upload, canonical or trading grant there. | Probe G1 in 81.4: "ON launch is authorized." at the head of 80.10 left the four relevant received guards green. | Grants are the one sentence shape the lane's guards exist to refuse. | New `test_section_80_progress_subsections_grant_no_launch_or_trading` scans every subsection from 80.8 on with the same grammar, with parametrized refusals in 80.8 and 80.10. The separation test stays: it still proves the review block is unaffected. | Red under G1 and each parametrized grant; green on the record (81.4). |
+| `TPR-CR25-003` | P2 | **Open; routed to the owner** | `591c3407` and earlier QC rounds | `research/target_price_revisions_qc/` (no attribute file); `tests/target_price_revisions_qc/test_qc_extended_mia_capture.py`; `tests/target_price_revisions_qc/test_qc_extended_frontier_diagnostic.py` | On this Windows host, 46 of 49 collector tests and 38 of 41 frontier-diagnosis tests fail, for two reasons. (1) The package has no lane-scoped attributes, so all 92 files check out CRLF. The tests hash working-copy bytes, so the bundle, freeze and calendar no longer match their pins: the bundle on disk is 561,088 bytes (`bd0c7a56...`) against the 561,087-byte `daaf0c33...` blob. `TPR-CR4-001` closed this class for `research/target_price_revisions/`. (2) The custody primitives (`O_NOFOLLOW`, `O_DIRECTORY`, `dir_fd`, `getuid` and directory `fsync`) are POSIX-only, so every fixture that publishes into a private directory refuses. The development package shows the same host classes: `source_audit.py` imports `pwd` at module level, so 14 development test modules fail to collect and 4 artifact tests fail; `O_DIRECTORY` fails 53 `test_raw_run.py` tests; 3 more read the hard-coded Mac root (`TPR-CR20-001`); 2 parametrized ids exceed the Windows 32,767-character environment limit when pytest exports `PYTEST_CURRENT_TEST`; one needs the symlink privilege and one a POSIX mode. Production is unaffected: the collector runs only on the owner-pinned Mac root, where these tests passed (80.8). | Focused runs and the lane census in 81.5. A blob-versus-disk comparison of the nine pinned sources: eight differ; `research/__init__.py` is already `eol=lf`. | The repository's required complete suite is red for lane-owned tests on the owner's Windows host, and nobody on that host can verify the custody controls. | Not corrected in review. Codex's `TPR-CCR20-006` holds that portability is not a lane requirement, and an explicit platform skip is a test-design choice the lane should own. Recommendation: either add a lane-scoped `.gitattributes` for the QC package (as `TPR-CR4-001` did) and an explicit POSIX-host marker with a stated reason on the custody tests, or have the owner rule that Windows is unsupported for them. | Complete-suite census in 81.5. |
+| `TPR-CR25-004` | P3 | **Documented** | `591c3407` | Section 80.6 | Availability003's scope granted no compile, but opening the project IDE started an automatic cloud build (Lean 2.5.0.0.18178). Codex disclosed this and cancelled the IDE's import prompt. No look, launch or outcome followed. | The record's own account. | The observation route can itself produce an excluded effect. | None for this round. Future UI scopes should state that opening the IDE triggers a build, or observe through a route that does not. | Not applicable. |
+| `TPR-CR25-005` | P3 | **Documented** | `591c3407` | `extended_mia_capture.py:93` | `_guard` runs `git status --short` and discards its output, so the call only confirms that Git exits 0. Custody of the nine-member closure rests on the HEAD, branch, `git diff --quiet HEAD -- SOURCE_PATHS` and import-path checks. Those suffice for what the plan pins, so the call is dead code, not a hole. | Code reading. | A reader could mistake it for a clean-tree requirement. | None, because the executed collector's bytes are bound into the spent plan. A successor should drop the call or assert on its output. | Not applicable. |
+| `TPR-CR25-006` | P3 | **Documented** | `591c3407` | Section 80.3, `TPR-CCR24-003` | Codex again calls Claude's scratch-clone validation non-compliant with the physical-root rule. My position is unchanged from `TPR-CR21-007`: that rule pins Codex's Mac session. My standing instruction is to resolve the worktree with `git worktree list` and run the project's complete suite on the final tree, which a read-only clone does without touching the lane. This round's complete suite again ran in a read-only scratch clone at the exact received tip, on the owner's Windows host. | Section 80.3; `TPR-CR21-007`. | Governance clarity for the owner. | None. Both positions stand for the owner to rule on. | Not applicable. |
+
+No P0 or P1. The other open findings (`TPR-CR23-001` P1, `TPR-CR23-002`,
+`TPR-CR22-001`, `TPR-MATCHED-002` and `TPR-MATCHED-006` P2, the six
+canonical findings) and `TPR-OOL-011` through `TPR-OOL-018` are unchanged.
+`TPR-CR25-003` joins the open-issue register in section 8.
+
+### 81.4 Independent reproduction and mutation evidence
+
+- **Counter-review items.** `TPR-CCR24-001` is accepted as a
+  qualification. Section 79's "the engine itself declared the run complete"
+  claimed more than final progress 1 and a configured end date prove. I did
+  not re-read the LEAN sources Codex cites. I agree that the attributed facts
+  do not exclude an earlier algorithm-owned failure. `TPR-CCR24-002` is
+  confirmed: the three added grants are in the section-79 grammar and its
+  parametrized refusals. For `TPR-CCR24-003`, see `TPR-CR25-006`. On
+  `TPR-CCR24-004`, the directory `fsync` follows the file `fsync` in
+  `_publish`, before any request. Its control cannot run on this host
+  (`TPR-CR25-003`). `TPR-CCR24-005` and `-006` are accepted; the 80.7
+  qualification paragraph is present.
+- **Collector authority**, read in full:
+  - The only route is `files/read`, with fixed caps: 16 files, 1 MiB per
+    file, 4 MiB per response, 8 MiB total, 120 s aggregate and 40 s per
+    request.
+  - `_execute` refuses production unless root, transport, guard, clock and
+    monotonic clock are the module's own. Offline mode refuses lane-relative
+    roots and the native transport.
+  - Every plan carries `new_looks` 0, `mia_message_or_job` false and
+    `automatic_retry` false.
+  - Claims are published with a file and directory `fsync` before any
+    credential is used.
+  - At most 4 MiB + 1 byte of each response is read. A credential echo is
+    refused before anything is retained. Only metadata paths are redacted
+    (the `name` key is redacted only under user, account, metadata or
+    collaborator parents), so file names and contents are retained exactly.
+  - `http.client` follows no redirect, and any non-200 status refuses.
+- **Record figures (qualified by TPR-CCR25-002).** All eight rows of the
+  80.8 table match foundation `591c3407`; seven remain exact at `61a81d9a`.
+  The guard alone advances from 193,040 bytes / SHA-256
+  `6b2082f79f3f2bab3f7fa0c026a35b3f0566eca5e785ce210991d6e89bebaed5`
+  to 196,747 bytes / SHA-256
+  `218a90fb7109dc47e3c689ac88b33c67d69c264ec17ade3d89965d0818da1ee9`,
+  already recorded in 80.10. The collector and its tests are byte-identical
+  across both commits. The 80.9 prompt hash, the 80.1 owner-message hash and the three
+  historical span digests reproduce, as does the arithmetic above.
+- **Probes against the received guard.** The record was mutated, the
+  section-80 authority, section-80 lock-block, section-8 singleton and
+  current-routing tests were run, and the record was restored
+  byte-identically:
+  - G1 ("ON launch is authorized." at the head of 80.10): **4 passed**.
+  - G2 (a stale "The next bounded work is ..." sentence in section 8):
+    **4 passed**.
+- **Corrected guard.** Eight mutation trials, each applied in the worktree
+  and restored byte-identically; every one is **red**:
+  - R1: a grant under the 80.10 heading.
+  - R2: a grant opening an 80.9 paragraph.
+  - R3: the stale sentence back in section 8.
+  - R4: the 61a81d9a disposition drifted to accepted.
+  - R5: `TPR-CR25-003` dropped from the register (2 tests).
+  - R6: the stale owner-unlock role restored beside the current one (2 tests).
+  - S1: the grammar extension removed (its new case fails, the five old
+    cases pass).
+  - S2: the progress-grant assertion removed (all ten parametrized
+    refusals fail).
+
+  The first draft of the progress test missed a grant directly under a
+  heading, because a heading does not end with a sentence terminator. It
+  now treats headings and blank lines as sentence starts, and R1 proves it.
+  The restored guard is **225 passed**.
+- **Not reproduced here:** the collector's own mutation controls (they
+  cannot run on this host; see `TPR-CR25-003`), the private baseline
+  receipts on the Mac, and the native UI observations.
+
+### 81.5 Validation
+
+- Focused, on the received head in the designated worktree: lane guard
+  **200 passed**. Collector module **3 passed, 46 failed**; frontier-diagnosis
+  module **3 passed, 38 failed**. Both failure sets are `TPR-CR25-003`.
+- Complete repository suite at the received head `61a81d9a`, in a
+  read-only scratch clone on this Windows host: **16,197 passed, 1,281
+  failed, 97 skipped, 568 test errors, 27 warnings**, plus **135 collection
+  errors**, over exactly the 18,138 collected tests. Five tests carry two
+  outcome reports each: a failure or setup error, plus a teardown error.
+  - Out of lane: Analyst 716, Insider 54, Short-Interest 1 and the four
+    shared guards. These are the `TPR-OOL-015` through `TPR-OOL-018`
+    classes, documented only.
+  - Target-Price, 1,209 reds in total:
+    - **QC package, 1,105**: 676 failed, 418 errors and 11 collection
+      errors.
+    - **Development package, 78**: 62 failed, 2 errors and 14 collection
+      errors.
+    - **Canonical `test_preregistration.py`, 26.** These fail closed in the
+      clone at the trust root's authority Git read ("authority Git read
+      failed closed"). The same module is **114 passed, 3 skipped** in the
+      designated worktree.
+
+    The QC and development reds are all `TPR-CR25-003` host classes:
+    CRLF-changed hash pins; POSIX-only `O_DIRECTORY`, `O_NOFOLLOW`, `getuid`
+    and `pwd`; lane-root checks that pin the Mac checkout; the symlink
+    privilege; and the Windows environment-length limit.
+- Method, because it bears on what the numbers mean:
+  - One uninterrupted run reached only 23% in about 2 h 20 min, so I
+    stopped it.
+  - The suite was then rerun as 14 parallel file-partition shards, each
+    with its own `--basetemp`.
+  - Four of those shards stopped before running anything, because of my
+    own argument-file error: collection-error paths kept a " - reason"
+    suffix, and pytest refused them. They were relaunched under new names.
+  - One slow shard was stopped and split into eleven sub-shards: six hold
+    the nodes of one slow Analyst file, and five hold its other files.
+  - The 24 counted shards cover every collected file exactly once.
+- Final tree, designated worktree, after this round's record and guard
+  edits:
+  - Lane guard on the final record: **225 passed**. At the owner's
+    direction, no further lane-directory rerun was made after the last
+    record-only edits.
+  - Canonical and development directories together, measured before those
+    record-only edits: **1,322 passed, 62 failed, 5 skipped, 16 errors**. Every red is a `TPR-CR25-003` class: 53
+    `O_DIRECTORY`, 18 `pwd` (14 collection errors and 4 artifact tests), 3
+    Mac-root reads, 2 environment-length errors, 1 symlink privilege and 1
+    POSIX mode.
+  - `compileall -q` over the standard paths plus `research` exited 0, and
+    `git diff --check` is clean.
+
+### 81.6 Milestone and authority decision
+
+Section 81 accepts the counter-review, the source-only collector and the
+blocked handoff as reviewed records, not as native runtime, diagnosis or
+performance acceptance. This review authorizes no fourth Codex OFF attempt,
+no ON launch, no remaining-shard upload and no Mia launch; canonical
+admission is not authorized, no real-row canonical D1 is authorized, and no
+broker, paper, live, capital or trading authority is added.
+Sourcebaseline001 and diagnosis001 stay spent and unrenewed. Codex next
+counter-reviews section 81 and this round's Claude commits. A fresh
+diagnosis-only Mia scope still waits on the owner unlocking the Mac and
+reopening authenticated built-in Mia for OFF37650980. `TPR-CR23-001` stays
+open; TPR-1 and TPR-0B remain blocked.
+
+### 81.7 Recommendation to the owner
+
+You have two items. First, unlock the Mac and reopen the OFF project's Ask
+Mia so that Codex can register a fresh diagnosis-only scope. Nothing else in
+the lane can move `TPR-CR23-001`. Second, `TPR-CR25-003`: decide whether this
+Windows host is a supported host for the QC custody tests. If it is, Codex
+should add the lane attribute file and a POSIX-host marker. If it is not,
+say so, and the Windows complete suite will keep showing these failures as
+expected.
+
+## 82. Codex counter-review of Claude section 81 and bounded platform-test split
+
+### 82.1 Exact incoming range and role evidence
+
+The fetched incoming range is
+`61a81d9a6a93c1a548a903414f767178b9b1ac65..ed558300d00a569be3ecc79195a610d6e9e6059f`.
+The ordered inventory below is checked against Git, not inferred from author
+metadata. Its content is section 81's independent Claude review, issue ledger,
+reproduction evidence and authorized guard corrections on this same lane.
+
+| Identity | Exact value |
+|---|---|
+| Processed baseline | `61a81d9a6a93c1a548a903414f767178b9b1ac65` |
+| Claude review commit 1 | `ed558300d00a569be3ecc79195a610d6e9e6059f` |
+| Incoming review head | `ed558300d00a569be3ecc79195a610d6e9e6059f` |
+
+Physical/Git root is
+`C:\git\customizedAgent\trading_agent_TargetPriceRevision`, branch
+`codex/strategy-target-price-revisions`. Local and fetched remote already
+matched the review head and the checkout was clean; no fast-forward, clone,
+merge, stash, reset or checkout repair was needed. The consumed heartbeat
+`watch-claude-s-target-price-review` is PAUSED; do not automatically rearm.
+Only this lane record and three in-lane test modules change in this round.
+Shared Action Plan, Session Handoff, production and sibling lanes stay frozen.
+
+### 82.2 Commit-by-commit and cumulative dispositions
+
+| Claude commit | Disposition | Exact review basis |
+|---|---|---|
+| `ed558300d00a569be3ecc79195a610d6e9e6059f` | **Accepted after correction** | Read the complete record/test diff and cumulative governing contracts. CR25-001/002 corrections are sound but the new section-81 guard missed grants after later headings/paragraphs and omitted trading names. Qualify the two-head guard hash claim and the inherited canonical P1 wording. Historical Claude suite runs remain attributed rather than recreated as native custody. |
+
+**Cumulative disposition: accepted after correction.** No new P0, P1 or P2
+production defect was established in this incoming record/test commit. This
+accepts the corrected review record/guards, not a native job, diagnosis,
+performance result, canonical admission or the new unreviewed test candidate.
+
+### 82.3 Retained P0-P3 ledger and generalized-instance search
+
+| ID | Severity | Disposition | Evidence, correction and bounds |
+|---|---|---|---|
+| `TPR-CCR25-001` | P3 | **Closed by correction** | Section 81's whitespace-only authority normalization lost later heading/blank-line boundaries and its grant vocabulary omitted broker/funded/paper trading. Eleven new negative controls were red before correction. Reuse the sentence-boundary normalizer for sections 80 and 81, retain old denials and positive controls, add separators/vocabulary. A direct grant immediately under the opening 81.6 heading already failed; that initial suspicion is not a separate finding. |
+| `TPR-CCR25-002` | P3 | **Closed by qualification** | The eight-row 80.8 table is exact at foundation 591c3407, not wholly at both heads: seven rows stay unchanged while the guard advances to the distinct 80.10 pin at 61a81d9a. Qualify 81.4, retain the original foundation table and executed/historical bytes. |
+| `TPR-CCR25-003` | P3 | **Closed by qualification** | Section 8's two inert P1 findings refer only to canonical registry admission. Label them canonical; runtime P1 CR23-001 remains open and is not declared inert or closed. Search current pointers/register and preserve all runtime/canonical blockers. |
+
+Every CR25 finding is retained and classified:
+
+| Claude ID | Counter-review disposition |
+|---|---|
+| `TPR-CR25-001` | Confirmed; Claude's stale-routing correction is accepted, with former negative controls retained under the section-82 pointer rotation. |
+| `TPR-CR25-002` | Confirmed; the section-80 later-subsection guard correction is accepted. Section-81 generalized instances are corrected by CCR25-001. |
+| `TPR-CR25-003` | Partly confirmed as an observed-host validation limitation, not a production portability defect. Owner selects Mac-only custody with portable Windows checks. This bounded two-module candidate does not close broader QC/development classification or establish Mac-native validation. |
+| `TPR-CR25-004` | Confirmed as a disclosed historical automatic cloud IDE build. A source/read scope does not authorize compile effects. Future fresh UI scope must account for automatic builds or use a no-effect route; no new compile performed. |
+| `TPR-CR25-005` | Confirmed maintainability issue: the collector discards status-command output. Existing root/head/branch/import/diff/hash custody was inspected; no proved runtime hole is asserted. Spent collector bytes stay unchanged; only a future unexecuted successor may remove/replace that call. |
+| `TPR-CR25-006` | Retained attributed physical-root/scratch-clone governance disagreement, not verified direct owner authority exempting Claude. This public counter-review uses the specified physical worktree and no scratch clone. Historical attributed results are neither erased nor claimed as rerun. |
+
+Out-of-lane suite findings remain routed in section 9 and are not fixed here.
+No historical severity/disposition is silently rewritten.
+
+### 82.4 Owner-selected next bounded step: test-only platform boundary
+
+Direct owner replies in this chat on 2026-10-12:
+
+| Question | Exact answer and consequence |
+|---|---|
+| Native QC custody Mac-only versus full native Windows support | **Mac-only custody; portable Windows checks**. Implement a bounded test-only boundary in the collector/frontier modules; do not port production or alter source-byte anchors. |
+| Mac unlocked, QC signed in and OFF Ask Mia reopened | **Not yet**. No native Mia diagnosis or recovery scope is available. |
+
+In `test_qc_extended_mia_capture.py` and
+`test_qc_extended_frontier_diagnostic.py`, unsupported-host native fixtures
+skip before plan generation or directory creation. All original native
+assertions remain; physical Mac import closure and the raw working-byte
+bundle hash are explicitly Mac-only. Portable constants/public inventory,
+redaction, payload/time refusal and exact-diff controls remain runnable.
+New portable early-skip/restoration and public-plan tampered-hash controls
+exercise zero-authority positive controls with publication/directory sentinels.
+Real credential, HTTPS, subprocess and lane-private-directory denial remains
+autouse. No package-wide skip, byte normalization, POSIX emulation, attributes,
+working-copy repair or production change is introduced.
+
+This is a bounded candidate awaiting Claude review, not a completed native
+milestone. Other QC/development collection/custody host classes remain open
+and deferred; skipping these 84 cases does not make the entire Windows suite
+green. Strict native custody still needs a fresh exact-tree Mac validation.
+
+### 82.5 Separate and cumulative public validation
+
+Windows physical-worktree validation uses Python 3.13.14 / pytest 9.1.1 in
+the existing project venv. No private receipts or market rows are opened.
+
+- Incoming exact guard module: 225 passed in 27.16s.
+- CCR25-001 new controls before correction: 11 failed, 6 passed,
+  219 deselected in 4.35s; all eleven failures were DID NOT RAISE.
+- Corrected guard before routing rotation: 236 passed in 23.66s.
+  Finally-restored in-memory reverse mutations killed normalization (4 red),
+  separators (4 red) and vocabulary (3 red), with retained positive controls
+  and unchanged file hashes.
+- Separate two-module platform candidate: 14 passed, 84 explicit Mac-custody
+  skips in 1.83s, zero failures/errors/warnings. Collector has 46 native skips;
+  frontier has 38. Removing collector/frontier public-hash predicates produced
+  3/2 expected failures; removing each early platform guard produced one
+  denied-native-effect failure. All four mutations were restored in finally;
+  restored reprise was 14 passed, 84 skipped in 0.69s.
+
+- Root's initial new section-82 routing run was 13 failed, 252 passed,
+  84 skipped in 24.88s: a root-authored redundant assertion wrongly assumed
+  the open-register extractor excluded narrative. All thirteen failed before
+  their mutation controls. Removing that mistaken assumption retained the
+  exact canonical-P1 checks; the corrected run was 265 passed, 84 skipped
+  in 20.04s. This is implementation debugging, not red regression evidence.
+- Separate final document guards, including two qualification negatives:
+  253 passed in 19.91s. Portable import-firewall and three public canonical/
+  zero-authority checks: 33 passed, 1 Windows symlink-privilege skip in 1.94s.
+  These runs had zero failures/errors/warnings.
+- Final section-82 in-memory reverse mutations: four selected controls green
+  before/after; normalization removal killed two nested/paragraph controls,
+  trading-vocabulary removal killed one, disposition-predicate removal killed
+  one. The original functions/globals were restored in finally and all four
+  changed-file hashes stayed unchanged. Removing the canonical-P1 predicates
+  also killed its new qualification-negative control (DID NOT RAISE); the
+  restored control passed. Five meaningful reverse-mutation failures total.
+- Standard CLAUDE compileall targets plus `research/target_price_revisions`
+  exited 0; both changed QC test modules were included in `tests` compilation.
+  `git diff --check` is clean. Git emits only ordinary future LF-to-CRLF
+  checkout warnings for the record and guard; no attribute/checkout fix was
+  performed or byte anchor weakened.
+
+Bounded cumulative union on the corrected tree: **300 passed, 85 skipped in
+31.64s**, zero failures/errors/warnings. The 85 exclusions are 84 explicitly
+Mac-only native custody cases and one existing Windows symlink-privilege
+case. The union comprises the complete document guard, both changed QC
+modules, the complete import-firewall module and three public preregistration
+controls (repository candidate contract, exactly-zero authority and protected
+checkout bytes). Final committed-tree reprise is recorded in 82.7.
+Complete suite not rerun under the retained Codex focused-validation contract
+(67.3, 72.1 and 75.37); the full lane suite remains Claude-owned. This is not
+a fresh owner waiver or a claim of complete-suite green. No Mac-native run
+is claimed; current native Mac validation remains required.
+
+Independent public-blob checks reproduce the owner-message/prompt hashes and
+historical rstrip-UTF8 spans: sections63–77 600715 bytes /
+`0a60a8c6df268404e356f69111177307a890190856dab7b86c4619f42ced7424`,
+section78 30592 bytes /
+`1629286570ef6abcb9aabc5c8d1d7c10f888c2d6e5ef8c1c5cafe957c83aba5f`,
+section79 14734 bytes /
+`bd1db7e41db89ecc00cbe2e0782bd328c14c4127fcd812b29ba19587e8b20e26`.
+The section81 full-suite/shard executions remain Claude-reported, not rerun
+here. Arithmetic independently reconciles 18143 outcome reports minus five
+duplicate teardown reports to 18138 collected tests; 1984 red events comprise
+1209 TPR and 775 out-of-lane. Those counts are not current-tree acceptance.
+
+### 82.6 Authority decision and blocked external continuation
+
+This round adds no provider, QuantConnect, private-row, outcome, canonical,
+broker, funded, paper, live, capital or trading authority. Canonical admission
+is not authorized; no real-row canonical D1 is authorized. No fourth Codex
+OFF attempt, ON launch, remaining-shard upload or Mia launch is authorized.
+Sourcebaseline001 and diagnosis001 stay spent and unrenewed. No Mac unlock,
+credential access, Mia task, source/cloud edit, compile, launch/stop, Object
+Store, broker/database/scheduler or deployment occurred in this round.
+
+OFF3/ON0 and 19 observed looks (17 cloud plus two historical local) remain
+unchanged; this round consumes 0 provider/QC requests and 0 new looks.
+The 71 remaining inputs / 21409650 bytes remain unuploaded. There is no
+accepted 2021-now paired result. Runtime P1 CR23-001, CR23-002, CR22-001,
+MATCHED-002/006 and the six canonical gates stay open; TPR-1 and TPR-0B
+remain blocked. The two canonical P1s are not the open runtime P1.
+
+Claude next reviews section 82 and this Codex round independently. A fresh
+diagnosis-only Mia scope still waits on the owner unlocking the Mac and
+reopening authenticated built-in Mia for OFF37650980. The owner's answer is
+Not yet. Only after recovery can a new exact time/operation/prompt scope and
+mode check be registered prospectively; this is not renewal of diagnosis001,
+sourcebaseline001 or the consumed Codex OFF cap. The heartbeat stays PAUSED;
+do not automatically rearm. No unrelated substitute work is authorized.
+
+### 82.7 Durable commit handoff
+
+Last processed Claude review head:
+`ed558300d00a569be3ecc79195a610d6e9e6059f`. The review range in 82.1 is fully
+processed by this counter-review; no later Claude review is implied.
+
+| Outgoing Codex identity | Exact value / scope |
+|---|---|
+| Round base | `ed558300d00a569be3ecc79195a610d6e9e6059f` |
+| Codex commit 1, implementation foundation | `420e354ba90f871fd0133fe8f2bfb5e5137b19eb`; three test modules plus this lane record only |
+| Codex commit 2, final handoff | The sole direct record-only child of `420e354ba90f871fd0133fe8f2bfb5e5137b19eb` produced by this round; exact resulting head is reported with the push, not a self-referential hash in its own bytes |
+
+Claude must independently review **both** outgoing commits, in Git order,
+and the cumulative tree from the round base to the published head, including
+the record-only child. The exact head/ordered range is discoverable with
+`git rev-list --reverse ed558300d00a569be3ecc79195a610d6e9e6059f..HEAD` at
+the resulting published snapshot; do not review only the foundation or tip.
+
+Committed test blobs at the implementation foundation (not CRLF working-copy
+hashes and not native source/receipt pins):
+
+| Public artifact | Bytes | SHA-256 |
+|---|---|---|
+| `tests/target_price_revisions/test_document_consistency.py` | 215526 | `cb1decad0b652a639cb33984d7194fd1113066153d463a7452068a83ef18a19d` |
+| `tests/target_price_revisions_qc/test_qc_extended_mia_capture.py` | 24621 | `8dabd439c5a1de4f63581b1c83e0a3227b727d156fb6006457582a646cbe53d2` |
+| `tests/target_price_revisions_qc/test_qc_extended_frontier_diagnostic.py` | 21309 | `15ae54b6ddcfd6df6c0584888ca03bab3ac170b93c09f7091361b7dc3e61a91f` |
+
+The complete bounded cumulative validation command is:
+
+```text
+python -m pytest -q tests/target_price_revisions/test_document_consistency.py tests/target_price_revisions_qc/test_qc_extended_mia_capture.py tests/target_price_revisions_qc/test_qc_extended_frontier_diagnostic.py tests/target_price_revisions/test_import_firewall.py tests/target_price_revisions/test_preregistration.py::test_repository_candidate_freezes_the_approved_tpr0a_contract tests/target_price_revisions/test_preregistration.py::test_repository_authority_declarations_are_exactly_zero_access tests/target_price_revisions/test_preregistration.py::test_candidate_json_is_protected_from_checkout_translation --tb=short -rs
+```
+
+The exact selected inventory is 385 tests: 300 passes, 84 explicit Mac-native
+exclusions and one existing Windows symlink-privilege exclusion. Preparation
+produced that result in 31.64s (82.5); final handoff-candidate reprise actually
+produced **300 passed, 85 skipped in 24.43s**, zero failures/errors/warnings.
+Standard compileall plus canonical research and the two inspected production
+collector modules exited 0; compilation did not execute those modules.
+Diff checks are clean; the full outgoing path inventory is exactly these
+four files and all other tracked bytes stay unchanged. After this result-only
+record update, reprise the same inventory on the exact committed final tree
+before the single push. No other suite is represented as green.
+
+Exactly one non-force push ends this Codex round, after a fresh matching-
+branch fetch proves no unseen remote change. No history rewrite. Verify clean
+status and matching local/published heads afterwards; leave the heartbeat
+PAUSED. Claude review and owner Mac recovery/fresh scope are still required;
+this handoff grants no external effect or acceptance beyond 82.6.
+
+## 83. Owner-authorized read-only Mia diagnosis while independent review is pending - 2026-10-11 (Mac-side line, originally section 81)
+
+*Integration note (Claude, 2026-10-13): this section was written by the Mac-side Codex as section 81 in local commits `b28d07f6` through `70cef49e`, which never reached the remote while the Windows-side line published its own sections 81 and 82. At the merge it is renumbered 83; its text, including internal references to "81.x", "section81" and "section82" (now 83 and 84), is otherwise verbatim.*
 
 ### 81.1 Narrow owner exception and starting state
 
@@ -18148,7 +18565,9 @@ its own contents). No remote publication will occur in this diagnosis
 follow-up. A future push/source repair/Mia execution needs its governing
 authority and fresh bounded receipts; no automatic continuation is launched.
 
-## 82. Owner-authorized genuine Mia audit-key repair and recovery - 2026-10-11
+## 84. Owner-authorized genuine Mia audit-key repair and recovery - 2026-10-11 (Mac-side line, originally section 82)
+
+*Integration note (Claude, 2026-10-13): originally section 82 of the Mac-side line (commits `b28d07f6` through `70cef49e` and the custody commit of its uncommitted 82.8 draft); renumbered 84 at the merge, text otherwise verbatim. Its "82.x" subsection numbers are kept as written.*
 
 ### 82.1 New authority, unchanged strategy and source custody
 

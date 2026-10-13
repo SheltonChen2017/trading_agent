@@ -449,6 +449,24 @@ SECTION80_CLAUDE_COMMITS = (
     SECTION80_CLAUDE_HEAD,
 )
 SECTION80_DISPOSITIONS = ("accepted", "accepted after correction", "accepted")
+SECTION81_CODEX_BASE = SECTION80_CLAUDE_HEAD
+SECTION81_CODEX_HEAD = "61a81d9a6a93c1a548a903414f767178b9b1ac65"
+SECTION81_CODEX_RANGE = f"{SECTION81_CODEX_BASE}..{SECTION81_CODEX_HEAD}"
+SECTION81_CODEX_SHORT_RANGE = "2726b5ba..61a81d9a"
+SECTION81_CODEX_COMMITS = (
+    "591c3407cf48ad9de469482908f4ad8b93521dcb",
+    SECTION81_CODEX_HEAD,
+)
+SECTION81_DISPOSITIONS = ("accepted", "accepted after correction")
+SECTION81_OWNER_PRECONDITION = (
+    "A fresh diagnosis-only Mia scope still waits on the owner unlocking the Mac "
+    "and reopening authenticated built-in Mia for OFF37650980"
+)
+SECTION82_CLAUDE_BASE = SECTION81_CODEX_HEAD
+SECTION82_CLAUDE_HEAD = "ed558300d00a569be3ecc79195a610d6e9e6059f"
+SECTION82_CLAUDE_RANGE = f"{SECTION82_CLAUDE_BASE}..{SECTION82_CLAUDE_HEAD}"
+SECTION82_CLAUDE_SHORT_RANGE = "61a81d9a..ed558300"
+SECTION82_NEXT_ROLE = "Claude next reviews section 82 and this Codex round independently"
 SECTION74_SCOPE_BOUNDARIES = {
     "Accepted object": "Corrected incoming review tests and record only",
     "Extended study": "Not launched; fresh attempt allowance unanswered",
@@ -519,6 +537,7 @@ SECTION8_NEXT_ACTION_STATEMENT = (
     r"Codex next captures a fresh all-file source baseline and registers diagnosis-only Mia work|"
     r"Codex next submits source-bound diagnosis-only work to authenticated built-in Mia|"
     r"Owner next unlocks the Mac and reopens authenticated built-in Mia for OFF37650980|"
+    r"The next bounded (?:work|action) is|"
     r"Codex continues without Claude review stops)\b"
 )
 SECTION46_CLAUDE_BASE = "9958a459f5cd56c29cb9a0de13d38737e2c3412d"
@@ -1034,7 +1053,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [SECTION80_CLAUDE_RANGE]
+    ) == [SECTION82_CLAUDE_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
@@ -1052,7 +1071,12 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "TPR-1 remains blocked" in normalized_current
     assert "reviewed-spec registry remains empty" in normalized_current
     assert "Claude next reviews this Codex round independently" not in normalized_current
-    assert "Owner next unlocks the Mac and reopens authenticated built-in Mia for OFF37650980" in normalized_current
+    assert SECTION82_NEXT_ROLE in normalized_current
+    assert "Codex next counter-reviews section 81" not in normalized_current
+    assert SECTION81_OWNER_PRECONDITION in normalized_current
+    assert "Owner next unlocks the Mac and reopens authenticated built-in Mia for OFF37650980" not in normalized_current
+    assert "The next bounded work is fresh all-file source baseline capture" not in normalized_current
+    assert "Codex next counter-reviews section 80" not in normalized_current
     assert "Codex next submits source-bound diagnosis-only work to authenticated built-in Mia" not in normalized_current
     assert "Codex next captures a fresh all-file source baseline and registers diagnosis-only Mia work" not in normalized_current
     assert "Codex next counter-reviews section 79" not in normalized_current
@@ -1125,11 +1149,14 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [SECTION80_CLAUDE_SHORT_RANGE]
+        ) == [SECTION82_CLAUDE_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
         assert "codex has counter-reviewed every claude commit" in normalized_summary_lower
-        assert "section 80" in normalized_summary_lower
-        assert "owner next unlocks the mac and reopens authenticated built-in mia for off37650980" in normalized_summary_lower
+        assert "section 82" in normalized_summary_lower
+        assert SECTION82_NEXT_ROLE.lower() in normalized_summary_lower
+        assert "codex next counter-reviews section 81" not in normalized_summary_lower
+        assert SECTION81_OWNER_PRECONDITION.lower() in normalized_summary_lower
+        assert "owner next unlocks the mac and reopens authenticated built-in mia for off37650980" not in normalized_summary_lower
         assert "codex next submits source-bound diagnosis-only work to authenticated built-in mia" not in normalized_summary_lower
         assert "codex next captures a fresh all-file source baseline and registers diagnosis-only mia work" not in normalized_summary_lower
         assert "codex next counter-reviews section 79" not in normalized_summary_lower
@@ -2163,6 +2190,10 @@ def test_section_8_carries_one_current_role_and_no_stale_commit() -> None:
         ),
         (
             "Owner next unlocks the Mac and reopens authenticated built-in Mia for OFF37650980.",
+            "one next action",
+        ),
+        (
+            "The next bounded work is fresh all-file source baseline capture and diagnosis-only Mia registration.",
             "one next action",
         ),
     ],
@@ -4326,32 +4357,40 @@ def test_section_80_guard_refuses_contradictory_grants(monkeypatch, added_grant:
         test_section_80_counterreview_records_all_commits_and_bounded_mia_authority()
 
 
+SECTION81_STALE_NEXT_ACTIONS = {
+    "capture": "Codex next captures a fresh all-file source baseline and registers diagnosis-only Mia work",
+    "submit": "Codex next submits source-bound diagnosis-only work to authenticated built-in Mia",
+    "owner": "Owner next unlocks the Mac and reopens authenticated built-in Mia for OFF37650980",
+    "counter": "Codex next counter-reviews section 81 and this round's Claude commits",
+}
+
+
 @pytest.mark.parametrize("fault", (
-    "current_range", "current_capture_role", "current_submit_role",
-    "preamble_range", "preamble_capture_role", "preamble_submit_role",
+    "current_range", "current_capture_role", "current_submit_role", "current_owner_role",
+    "preamble_range", "preamble_capture_role", "preamble_submit_role", "preamble_owner_role",
+    "current_counter_role", "preamble_counter_role",
 ))
-def test_section_80_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
+def test_section_82_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
+    """Retain prior routing faults and reject a return to the now-processed Claude review."""
     test_exact_next_step_names_the_current_artifacts()
+    current_next = SECTION82_NEXT_ROLE
+    stale_next = SECTION81_STALE_NEXT_ACTIONS.get(fault.rsplit("_", 2)[-2], "")
     if fault.startswith("current_"):
         original_section = _record_section
         section = original_section("## 8. Exact next step")
-        old, new = (SECTION80_CLAUDE_RANGE, SECTION79_CODEX_RANGE) if fault.endswith("range") else (
-            "Owner next unlocks the Mac and reopens authenticated built-in Mia for OFF37650980",
-            "Codex next captures a fresh all-file source baseline and registers diagnosis-only Mia work"
-            if "capture" in fault else "Codex next submits source-bound diagnosis-only work to authenticated built-in Mia")
+        old, new = (SECTION82_CLAUDE_RANGE, SECTION81_CODEX_RANGE) if fault.endswith("range") else (
+            current_next, stale_next)
         pattern = r"\s+".join(re.escape(word) for word in old.split())
         assert re.search(pattern, section) is not None
         mutated = re.sub(pattern, new, section)
         monkeypatch.setitem(globals(), "_record_section",
             lambda heading: mutated if heading.startswith("## 8.") else original_section(heading))
     else:
-        preamble = _record_preamble()
-        old, new = (SECTION80_CLAUDE_SHORT_RANGE, SECTION79_CODEX_SHORT_RANGE) if fault.endswith("range") else (
-            "OWNER NEXT UNLOCKS THE MAC AND REOPENS AUTHENTICATED BUILT-IN MIA FOR OFF37650980",
-            "CODEX NEXT CAPTURES A FRESH ALL-FILE SOURCE BASELINE AND REGISTERS DIAGNOSIS-ONLY MIA WORK"
-            if "capture" in fault else "CODEX NEXT SUBMITS SOURCE-BOUND DIAGNOSIS-ONLY WORK TO AUTHENTICATED BUILT-IN MIA")
-        assert old in " ".join(preamble.split())
-        mutated = " ".join(preamble.split()).replace(old, new)
+        preamble = " ".join(_record_preamble().split())
+        old, new = (SECTION82_CLAUDE_SHORT_RANGE, SECTION81_CODEX_SHORT_RANGE) if fault.endswith("range") else (
+            current_next.upper(), stale_next.upper())
+        assert old in preamble
+        mutated = preamble.replace(old, new)
         monkeypatch.setitem(globals(), "_record_preamble", lambda: mutated)
     with pytest.raises(AssertionError):
         test_exact_next_step_names_the_current_artifacts()
@@ -4395,3 +4434,347 @@ def test_section_80_reported_lock_guard_refuses_fact_drift(monkeypatch, old: str
         lambda title: mutated if title.startswith("## 80.") else original_section(title))
     with pytest.raises(AssertionError, match="section 80.10 reported lock/effect boundary"):
         test_section_80_reported_lock_block_preserves_zero_effects_and_counts()
+
+
+SECTION80_PROGRESS_GRANT = (
+    r"(?:^|[.!?|:;])\s*(?:(?:a\s+)?fourth Codex OFF attempt|ON launch|remaining-shard upload|"
+    r"canonical admission|real-row canonical\s?D1|broker trading|funded trading|paper trading|"
+    r"live trading|trading authority)\s+is\s+authorized\b"
+)
+
+
+def _normalized_authority_sentences(text: str) -> str:
+    """Keep heading and paragraph starts visible to the explicit no-grant grammar."""
+    # Headings and blank lines start a new sentence, so a grant directly
+    # under a later heading or opening a paragraph is still sentence-initial.
+    lines = (
+        "." if not line.strip() else ". " + line if line.startswith("#") else line
+        for line in text.splitlines()
+    )
+    return " ".join(" ".join(lines).split())
+
+
+def _section_80_progress(section: str) -> str:
+    """Every section 80 subsection after the 80.7 review-authority block."""
+    marker = "### 80.8 Prospective source-only capture milestone"
+    assert section.count(marker) == 1, "exact section 80 progress heading"
+    return _normalized_authority_sentences(section.partition(marker)[2])
+
+
+def test_section_80_progress_subsections_grant_no_launch_or_trading() -> None:
+    """TPR-CR25-002: 80.8 onward registers the actual scopes, so it must refuse grants too.
+
+    The review-authority pin reads only 80.7 and deliberately ignores later
+    progress. The source-capture, diagnosis and blocked-handoff scopes that
+    section 8 routes from live in those later subsections.
+    """
+    progress = _section_80_progress(_record_section("## 80. Codex counter-review of Claude section 79"))
+    for required in (
+        "This is not a fourth Codex OFF attempt, ON permission, upload permission",
+        "no canonical admission or broker/funded/paper/live authority follows",
+    ):
+        assert required in progress, required
+    assert re.search(SECTION80_PROGRESS_GRANT, progress, re.I) is None, "section 80 progress grant"
+
+
+@pytest.mark.parametrize("added_grant", (
+    "ON launch is authorized.",
+    "A fourth Codex OFF attempt is authorized.",
+    "Remaining-shard upload is authorized.",
+    "Canonical admission is authorized.",
+    "Live trading is authorized.",
+))
+@pytest.mark.parametrize("heading", (
+    "### 80.8 Prospective source-only capture milestone",
+    "### 80.10 Diagnosis preflight refusal and stable blocked handoff",
+))
+def test_section_80_progress_guard_refuses_added_grants(
+    monkeypatch, heading: str, added_grant: str,
+) -> None:
+    test_section_80_progress_subsections_grant_no_launch_or_trading()
+    original_section = _record_section
+    section = original_section("## 80.")
+    assert section.count(heading) == 1
+    mutated = section.replace(heading, heading + "\n\n" + added_grant, 1)
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda title: mutated if title.startswith("## 80.") else original_section(title))
+    with pytest.raises(AssertionError, match="section 80 progress grant"):
+        test_section_80_progress_subsections_grant_no_launch_or_trading()
+
+
+SECTION81_HEADING = (
+    "## 81. Claude independent review of the counter-review, "
+    "EXT26 source baseline and Mia preflight round"
+)
+SECTION81_GRANT = (
+    r"(?:^|[.!?|:;])\s*(?:canonical admission|real-row canonical D1|TPR-1|TPR-0B|"
+    r"broker trading|funded trading|paper trading|live trading|"
+    r"QuantConnect launch|Mia launch|trading authority|(?:a\s+)?fourth Codex OFF attempt|"
+    r"ON launch|remaining-shard upload)\s+is\s+authorized\b"
+)
+
+
+def test_section_81_review_records_the_exact_range_and_grants_nothing() -> None:
+    """TPR-CR25: pin this review of the source-baseline and Mia-preflight round."""
+    section = _record_section(SECTION81_HEADING)
+    assert SECTION81_CODEX_RANGE in section
+    ordered_commits = tuple(
+        re.search(r"`([0-9a-f]{40})`", line).group(1)
+        for line in section.splitlines()
+        if re.match(r"[|] Codex commit [0-9]+ [|]", line)
+    )
+    assert ordered_commits == SECTION81_CODEX_COMMITS
+    assert ordered_commits == tuple(_git_lines("rev-list", "--reverse", SECTION81_CODEX_RANGE))
+    dispositions = _bounded(
+        section, "### 81.2 Commit-by-commit dispositions", "### 81.3 P0-P3 ledger",
+        "section 81 dispositions",
+    )
+    rows = tuple(
+        (match.group(1), match.group(2).lower())
+        for line in dispositions.splitlines()
+        if (match := re.match(r"\| `([0-9a-f]{40})` \| \*\*([A-Za-z ]+)\*\* \|", line))
+    )
+    assert rows == tuple(zip(SECTION81_CODEX_COMMITS, SECTION81_DISPOSITIONS)), (
+        "exact section 81 dispositions"
+    )
+    assert "**Cumulative disposition: accepted after correction.**" in section
+    ledger = _bounded(
+        section, "### 81.3 P0-P3 ledger", "### 81.4 Independent reproduction and mutation evidence",
+        "section 81 ledger",
+    )
+    statuses = dict(
+        re.findall(r"^\| `(TPR-CR25-[0-9]{3})` \| P[0-3] \| \*\*([^*]+)\*\*", ledger, re.M)
+    )
+    assert statuses == {
+        "TPR-CR25-001": "Closed by correction",
+        "TPR-CR25-002": "Closed by correction",
+        "TPR-CR25-003": "Open; routed to the owner",
+        "TPR-CR25-004": "Documented",
+        "TPR-CR25-005": "Documented",
+        "TPR-CR25-006": "Documented",
+    }, "exact section 81 ledger"
+    register = _open_issue_register()
+    assert re.search(r"^\| `TPR-CR25-003` \| P2 \|", register, re.M) is not None
+    assert re.search(r"^\| `TPR-CR23-001` \| P1 \|", register, re.M) is not None
+    authority = _normalized_authority_sentences(
+        _bounded(
+            section, "### 81.6 Milestone and authority decision", "### 81.7 Recommendation to the owner",
+            "section 81 authority",
+        )
+    )
+    for required in (
+        "not as native runtime, diagnosis or performance acceptance",
+        "canonical admission is not authorized",
+        "no real-row canonical D1 is authorized",
+        "Sourcebaseline001 and diagnosis001 stay spent and unrenewed",
+        "Codex next counter-reviews section 81",
+        SECTION81_OWNER_PRECONDITION,
+        "`TPR-CR23-001` stays open",
+    ):
+        assert required in authority, required
+    assert re.search(SECTION81_GRANT, authority, re.I) is None, "contradictory section 81 authority"
+    figures = _bounded(
+        section, "### 81.4 Independent reproduction and mutation evidence",
+        "### 81.5", "qualified section 81 figures",
+    )
+    assert "at both commits" not in figures
+    assert "seven remain exact at `61a81d9a`" in " ".join(figures.split())
+    assert "218a90fb7109dc47e3c689ac88b33c67d69c264ec17ade3d89965d0818da1ee9" in figures
+
+
+@pytest.mark.parametrize("commit,disposition", tuple(zip(SECTION81_CODEX_COMMITS, SECTION81_DISPOSITIONS)))
+def test_section_81_guard_refuses_disposition_drift(monkeypatch, commit: str, disposition: str) -> None:
+    test_section_81_review_records_the_exact_range_and_grants_nothing()
+    original_section = _record_section
+    section = original_section("## 81.")
+    original = f"| `{commit}` | **{disposition.capitalize()}** |"
+    assert section.count(original) == 1
+    drifted = "accepted" if disposition != "accepted" else "accepted after correction"
+    mutated = section.replace(original, f"| `{commit}` | **{drifted.capitalize()}** |", 1)
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 81.") else original_section(heading))
+    with pytest.raises(AssertionError, match="exact section 81 dispositions"):
+        test_section_81_review_records_the_exact_range_and_grants_nothing()
+
+
+@pytest.mark.parametrize("commit", SECTION81_CODEX_COMMITS)
+def test_section_81_guard_refuses_skipped_commit(monkeypatch, commit: str) -> None:
+    test_section_81_review_records_the_exact_range_and_grants_nothing()
+    original_section = _record_section
+    section = original_section("## 81.")
+    rows = [line for line in section.splitlines() if line.startswith(f"| `{commit}` |")]
+    assert len(rows) == 1
+    mutated = section.replace(rows[0], "", 1)
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 81.") else original_section(heading))
+    with pytest.raises(AssertionError, match="exact section 81 dispositions"):
+        test_section_81_review_records_the_exact_range_and_grants_nothing()
+
+
+@pytest.mark.parametrize("added_grant", (
+    "Canonical admission is authorized.",
+    "A fourth Codex OFF attempt is authorized.",
+    "ON launch is authorized.",
+    "Mia launch is authorized.",
+    "Remaining-shard upload is authorized.",
+    "Broker trading is authorized.",
+    "Funded trading is authorized.",
+    "Paper trading is authorized.",
+    "Live trading is authorized.",
+))
+def test_section_81_guard_refuses_contradictory_authority(monkeypatch, added_grant: str) -> None:
+    test_section_81_review_records_the_exact_range_and_grants_nothing()
+    original_section = _record_section
+    section = original_section("## 81.")
+    marker = "### 81.7 Recommendation to the owner"
+    assert section.count(marker) == 1
+    mutated = section.replace(marker, added_grant + "\n\n" + marker, 1)
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 81.") else original_section(heading))
+    with pytest.raises(AssertionError, match="contradictory section 81 authority"):
+        test_section_81_review_records_the_exact_range_and_grants_nothing()
+
+
+SECTION82_HEADING = "## 82. Codex counter-review of Claude section 81 and bounded platform-test split"
+
+
+@pytest.mark.parametrize("fault", ["two_head_hash_claim", "unqualified_inert_p1"])
+def test_counterreview_25_qualifications_reject_original_claims(monkeypatch, fault: str) -> None:
+    original_section = _record_section
+    if fault == "two_head_hash_claim":
+        test_section_81_review_records_the_exact_range_and_grants_nothing()
+        heading = SECTION81_HEADING
+        old, new = "seven remain exact at `61a81d9a`", "all eight match at both commits"
+        guard = test_section_81_review_records_the_exact_range_and_grants_nothing
+    else:
+        test_section_82_exact_review_and_bounded_owner_test_choice()
+        heading = "## 8. Exact next step"
+        old, new = "The two canonical P1 findings", "The two P1 findings"
+        guard = test_section_82_exact_review_and_bounded_owner_test_choice
+    section = original_section(heading)
+    assert old in section
+    mutated = section.replace(old, new, 1)
+    prefix = heading.partition(" ")[0] + " " + heading.split()[1]
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda requested: mutated if requested.startswith(prefix) else original_section(requested))
+    with pytest.raises(AssertionError):
+        guard()
+
+
+def test_section_82_exact_review_and_bounded_owner_test_choice() -> None:
+    section = _record_section(SECTION82_HEADING)
+    assert SECTION82_CLAUDE_RANGE in section
+    commits = tuple(
+        re.search(r"`([0-9a-f]{40})`", line).group(1)
+        for line in section.splitlines()
+        if re.match(r"[|] Claude review commit [0-9]+ [|]", line)
+    )
+    assert commits == (SECTION82_CLAUDE_HEAD,)
+    assert commits == tuple(_git_lines("rev-list", "--reverse", SECTION82_CLAUDE_RANGE))
+    dispositions = _bounded(section, "### 82.2", "### 82.3", "section 82 dispositions")
+    rows = tuple(re.findall(r"^\| `([0-9a-f]{40})` \| \*\*([^*]+)\*\*", dispositions, re.M))
+    assert rows == ((SECTION82_CLAUDE_HEAD, "Accepted after correction"),)
+    assert "**Cumulative disposition: accepted after correction.**" in dispositions
+    ledger = _bounded(section, "### 82.3", "### 82.4", "section 82 ledger")
+    assert dict(re.findall(r"^\| `(TPR-CCR25-[0-9]{3})` \| P3 \| \*\*([^*]+)\*\*", ledger, re.M)) == {
+        "TPR-CCR25-001": "Closed by correction",
+        "TPR-CCR25-002": "Closed by qualification",
+        "TPR-CCR25-003": "Closed by qualification",
+    }
+    assert set(re.findall(r"^\| `(TPR-CR25-[0-9]{3})` \|", ledger, re.M)) == {
+        f"TPR-CR25-{number:03}" for number in range(1, 7)
+    }
+    choice = " ".join(_bounded(section, "### 82.4", "### 82.5", "section 82 owner choice").split())
+    for required in (
+        "**Mac-only custody; portable Windows checks**",
+        "**Not yet**",
+        "bounded candidate awaiting Claude review",
+        "not a completed native milestone",
+        "Other QC/development collection/custody host classes remain open and deferred",
+        "Strict native custody still needs a fresh exact-tree Mac validation",
+    ):
+        assert required in choice, required
+    authority = _normalized_authority_sentences(
+        _bounded(section, "### 82.6", "### 82.7", "section 82 authority")
+    )
+    for required in (
+        "Canonical admission is not authorized",
+        "no real-row canonical D1 is authorized",
+        "Sourcebaseline001 and diagnosis001 stay spent and unrenewed",
+        "OFF3/ON0 and 19 observed looks (17 cloud plus two historical local) remain unchanged",
+        "0 provider/QC requests and 0 new looks",
+        SECTION82_NEXT_ROLE,
+        SECTION81_OWNER_PRECONDITION,
+        "The owner's answer is Not yet",
+        "The heartbeat stays PAUSED",
+        "TPR-1 and TPR-0B remain blocked",
+    ):
+        assert required in authority, required
+    assert re.search(SECTION81_GRANT, authority, re.I) is None, "contradictory section 82 authority"
+    current = " ".join(_record_section("## 8. Exact next step").split())
+    assert "The two canonical P1 findings are inert while the registry is empty" in current
+    assert "The two P1 findings are inert" not in current
+
+
+@pytest.mark.parametrize("fault", (
+    "range", "commit", "disposition", "ledger", "owner_choice", "mac_ready", "attempts",
+    "looks", "grant", "nested_grant", "paragraph_grant", "trading_grant",
+))
+def test_section_82_guard_rejects_review_or_authority_drift(monkeypatch, fault: str) -> None:
+    test_section_82_exact_review_and_bounded_owner_test_choice()
+    original_section = _record_section
+    section = original_section(SECTION82_HEADING)
+    changes = {
+        "range": (SECTION82_CLAUDE_RANGE, SECTION81_CODEX_RANGE),
+        "commit": (f"| Claude review commit 1 | `{SECTION82_CLAUDE_HEAD}` |", "| Claude review commit 1 | `" + "a" * 40 + "` |"),
+        "disposition": (f"| `{SECTION82_CLAUDE_HEAD}` | **Accepted after correction** |", f"| `{SECTION82_CLAUDE_HEAD}` | **Accepted** |"),
+        "ledger": ("| `TPR-CCR25-001` | P3 | **Closed by correction** |", "| `TPR-CCR25-001` | P3 | **Open** |"),
+        "owner_choice": ("**Mac-only custody; portable Windows checks**", "**Full Windows native custody**"),
+        "mac_ready": ("**Not yet**", "**Ready**"),
+        "attempts": ("OFF3/ON0", "OFF4/ON0"),
+        "looks": ("19 observed looks", "20 observed looks"),
+    }
+    if fault in changes:
+        old, new = changes[fault]
+        assert old in section
+        mutated = section.replace(old, new, 1)
+    else:
+        marker = "### 82.6 Authority decision and blocked external continuation"
+        grants = {
+            "grant": "Canonical admission is authorized.",
+            "nested_grant": "#### New scope\n\nMia launch is authorized.",
+            "paragraph_grant": "Unpunctuated context\n\nON launch is authorized.",
+            "trading_grant": "Scope:\nBroker trading is authorized.",
+        }
+        assert section.count(marker) == 1
+        mutated = section.replace(marker, marker + "\n\n" + grants[fault] + "\n", 1)
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 82.") else original_section(heading))
+    with pytest.raises(AssertionError):
+        test_section_82_exact_review_and_bounded_owner_test_choice()
+
+
+@pytest.mark.parametrize("context", (
+    "#### Native effect scope\n\n",
+    "Updated owner scope\n\n",
+    "Updated owner scope:\n",
+    "Updated owner scope;\n",
+))
+@pytest.mark.parametrize("added_grant", (
+    "Canonical admission is authorized.",
+    "Mia launch is authorized.",
+))
+def test_section_81_guard_refuses_contextual_authority_grants(
+    monkeypatch, context: str, added_grant: str,
+) -> None:
+    """A later heading, paragraph, colon or semicolon cannot conceal a named grant."""
+    test_section_81_review_records_the_exact_range_and_grants_nothing()
+    original_section = _record_section
+    section = original_section("## 81.")
+    marker = "### 81.6 Milestone and authority decision"
+    assert section.count(marker) == 1
+    mutated = section.replace(marker, marker + "\n\n" + context + added_grant + "\n", 1)
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 81.") else original_section(heading))
+    with pytest.raises(AssertionError, match="contradictory section 81 authority"):
+        test_section_81_review_records_the_exact_range_and_grants_nothing()

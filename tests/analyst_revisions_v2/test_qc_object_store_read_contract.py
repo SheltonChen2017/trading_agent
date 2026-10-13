@@ -85,7 +85,8 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     accepted_risk_market_cap_stock_portfolio_evaluator.py
     accepted_risk_market_cap_stock_portfolio_qc_runtime.py
     accepted_risk_market_cap_stock_portfolio_tilt.py
-    accepted_risk_massive_delta.py accepted_risk_matched_diagnostics.py
+    accepted_risk_massive_delta.py accepted_risk_massive_ratings_delta.py
+    accepted_risk_matched_diagnostics.py
     accepted_risk_matched_historical_projection.py
     accepted_risk_objective_synthetic_leverage_evaluator.py
     accepted_risk_objective_synthetic_leverage_qc_runtime.py
@@ -859,6 +860,15 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2.canonical
         research.analyst_revisions_v2_qc
         research.analyst_revisions_v2_qc.physical_accepted_risk_archive
+        """.split()
+    ),
+    "accepted_risk_massive_ratings_delta.py": tuple(
+        """
+        __future__ dataclasses datetime hashlib os pathlib stat weakref
+        research.analyst_revisions_v2
+        research.analyst_revisions_v2.accepted_risk_input_pair
+        research.analyst_revisions_v2.availability
+        research.analyst_revisions_v2.canonical scripts scripts.capture_arv2_massive
         """.split()
     ),
     "accepted_risk_preliminary_package.py": tuple(
@@ -1812,6 +1822,9 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
     "accepted_risk_latest_order_package.py": ("call:open", "import:os", "import:pathlib"),
     "accepted_risk_delta_order_package.py": ("import:pathlib",),
     "accepted_risk_massive_delta.py": ("import:os",),
+    "accepted_risk_massive_ratings_delta.py": (
+        "call:open", "import:os", "import:pathlib",
+    ),
     "accepted_risk_order_level_qc_projection.py": (
         "call:compile",
         "call:read_bytes",
@@ -3597,6 +3610,26 @@ _PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
             "research.analyst_revisions_v2.canonical",
         ),
         (
+            "research.analyst_revisions_v2_qc.accepted_risk_massive_ratings_delta",
+            "research.analyst_revisions_v2",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_massive_ratings_delta",
+            "research.analyst_revisions_v2.accepted_risk_input_pair",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_massive_ratings_delta",
+            "research.analyst_revisions_v2.availability",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_massive_ratings_delta",
+            "research.analyst_revisions_v2.canonical",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_massive_ratings_delta",
+            "scripts.capture_arv2_massive",
+        ),
+        (
             "research.analyst_revisions_v2_qc.accepted_risk_matched_diagnostics",
             "accepted_risk_six_universe_order_qc_runtime",
         ),
@@ -4876,6 +4909,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_tilt",
         "research.analyst_revisions_v2_qc.accepted_risk_massive_delta",
+        "research.analyst_revisions_v2_qc.accepted_risk_massive_ratings_delta",
         "research.analyst_revisions_v2_qc.accepted_risk_matched_diagnostics",
         "research.analyst_revisions_v2_qc.accepted_risk_matched_historical_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_objective_synthetic_leverage_evaluator",

@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–296 retain the milestone, review, preregistration, QC
+strategy. Sections 1–297 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -548,10 +548,13 @@ frozen check and output reader have now run once: Sharadar returned a validated
 single-row 200 response; FMP/Massive/EODHD stopped at credential retrieval,
 before their requests. Both modes are spent. After the owner reported prompt
 approval, the separate credential-only diagnostic passed all three reads with
-native exit 0 and valid key shapes; its parent/reader are also spent. The new
-next step is the six never-dispatched product checks, excluding Sharadar, not
-replay of either original protocol. No accepted data capture or QC run occurred.
-The monitor remains PAUSED.
+native exit 0 and valid key shapes; its parent/reader are also spent. The six
+previously undispatched product checks then verified FMP grades, Massive
+ratings and EODHD prices/calendar (HTTP 200); Massive earnings and guidance
+returned 403. All A/B/C modes are spent. Section 297 continues with a new
+rating-only October delta, because those refused products are not economic
+inputs of the existing exploratory rating score. No accepted new data capture
+or QC run has yet occurred. The monitor remains PAUSED.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1597,24 +1600,24 @@ contract and normal review/run-freeze gates apply. Monitor remains paused.
 The owner's later "proceed wihtout claude review for now" and "done. all four
 are saved in keychain. configure the connections and check that they work.
 then proceed to the next backtest" supersede that routine review wait for the
-current setup milestone. The owner explicitly waives Claude review of section
-296's current connection contract before its exact committed use. This is
+current setup and backtest-building continuation. The owner explicitly waives
+Claude review of section 297's current ratings-only continuation under the
+existing "for now" direction and 255.2 delegation, not future unrelated work.
+Section 296's exact connection uses are completed and spent. This is
 sequencing authority, not independent acceptance or technical/source clearance.
-The immediate next step is section 296's bounded four-provider connection
-setup/check, then admissible data construction toward an order-based accepted-
-risk backtest. The subsequent inventory request did not replace that work;
+The immediate next step is section 297's bounded ratings-only October source
+authentication and package construction toward the owner's new matched
+six/eight-universe, AR-off/100%/200% accepted-risk order study through October
+2026 (297.3). The subsequent inventory request did not replace that work;
 the owner reiterated "continue buildling until backtesting". A concrete data,
 technical or external-authority barrier still requires an honest stop; a
 routine acknowledgment does not. No old protocol or failed capture is renewed.
-The connection check and its reader are now spent (296.5). Sharadar's sample
-passed; the other three providers had no credential available to the caller,
-so their API access remains untested. The owner says they approved the prompts.
-Section 296's credential-only diagnostic has now passed (296.7), resolving
-current local read availability without proving A's original cause. The next
-bounded step is the six never-dispatched product checks under a new post-access
-contract, then actual data construction from usable sources. Do not claim a
-valid key shape proves endpoint entitlement or the old generic category proves
-denial or expiry.
+Section 296's credential-only diagnostic and subsequent six-product connection
+check have now completed (296.7/296.9). Ratings access works; earnings/guidance
+403s remain recorded, not prerequisites invented for the existing rating-only
+score. No capture/composer/QC action is allowed before its new exact technical
+contract and committed run freeze. Do not claim a sample proves full-window
+coverage, nor the original credential category or current 403s prove expiry.
 The owner previously said
 "proceed" after the open-session concern was explained. Section 272 supersedes
 the session-exit prerequisite, without authorizing any process interruption.
@@ -46900,3 +46903,308 @@ designated Python and in-root support. Read only C claim/report under its
 30-second alarm. Both modes then become spent/frozen. Record actual product
 results separately; a refused optional product must not fabricate success or
 automatically block an otherwise justified rating-only source successor.
+
+### 296.9 Actual API results and continuation decision
+
+D5/D6 used exact clean freeze `43e7ba82e6a9d6941e20875efd2f377939424d98`.
+The matching remote remained `ec03623869055bfaef28294f9aa52dbf2eb5f934`, with
+no intermediate push. D5 dispatched after **2026-10-13 23:38:42 UTC**;
+completion observed **23:38:48 UTC**, actual **exit 2**, normal double-LF
+`completed_with_failures` envelope and six acknowledged send intents. Report
+**2,605 bytes**, SHA-256
+`9e85682d93dcfdac8e047e819c44809aa8a0eedcb20b20558abf9015963fdb3b`.
+D6 dispatched **23:38:53 UTC**, completion observed **23:38:56 UTC**, actual
+**exit 2**, `output_authenticated=true`, `connections_responded=false`.
+Claim **369 bytes**, SHA-256
+`cd384109f2912e27b1ef894fa0427b71dee6c5d67dab682e7b632603976d4f0f`.
+Clocks are external observation brackets, not request durations. **C/D5/D6
+are spent/frozen**; no additional private-output inspection or replay follows.
+
+| Product | Actual HTTP/schema result | Retained non-secret scope |
+| --- | --- | --- |
+| FMP grades | **200**, valid nonempty | 1,806 sample rows; symbol/date/gradingCompany/previousGrade/newGrade/action present |
+| Massive ratings | **200**, valid nonempty | One sample row; all ten requested identity/rating/date/time/update fields present |
+| Massive earnings | **403** | Failed body unread; no schema or row acceptance |
+| Massive corporate guidance | **403** | Failed body unread; no schema or row acceptance |
+| EODHD EOD | **200**, valid nonempty | One sample row; date/OHLC/adjusted close/volume present |
+| EODHD earnings calendar | **200**, valid nonempty | One sample row; code/report date/fiscal date/actual/estimate/difference/percent present |
+
+Together with A's Sharadar 200 this verifies usable sample connections for
+all four saved providers, with two **product-specific refusals**, not all
+Massive access expired. `ARV2D296-002` (P2, open) retains the two current 403s;
+their reason (expiry, entitlement or another provider policy) is not known.
+No non-200 body was read and no automatic alternate request was made. The
+six acknowledged intents are not server request accounting; provider count
+remains null. No response rows or credentials were retained. Sample shape/
+field presence is not economic coverage, immutable history or formal source
+admission, and there is still no accepted October capture or new QC run.
+
+Continuation decision: use the currently working Massive ratings source for
+a separately versioned **rating-only September 26–October 12 delta**, preserving
+the earlier score's Benzinga identities and normalization. This avoids a new
+FMP-to-Benzinga identity/firm-scale substitution. FMP and EODHD remain verified
+optional capabilities, not silently substituted score inputs. The actual
+scorer uses rating changes; the refused earnings/guidance products are not
+economic inputs of this exploratory rating-only continuation. Do not mutate
+the old three-role capture contract or fabricate empty roles. Proceed with
+bounded new source authentication, preserved September prefix, original tail
+recovery and October package construction, then a separately frozen order-
+based QC candidate when complete. No routine owner acknowledgment or Claude
+wait is introduced, and no unimplemented/future contract is invoked.
+
+## 297. Rating-only October source and order-backtest continuation, 2026-10-13
+
+### 297.1 Delegated scope and evidence-driven source choice
+
+This is the same continuous owner-directed round from `ec036238`; no final
+push has yet occurred. The current head before this new implementation is
+`43e7ba82e6a9d6941e20875efd2f377939424d98`. Section 296 records actual sample
+authentication, not acquisition: Massive ratings responded 200 with the
+existing Benzinga IDs/firm/rating/date/time/update fields; earnings/guidance
+returned 403. The latter failures remain open, but static score inspection
+shows the preliminary/order score consumes directional rating changes only.
+Three roles are a frozen acquisition requirement, not additional economic
+inputs of that score. The new source contract does not change that old rule;
+it is explicitly a rating-only current-vintage successor.
+
+The owner directed continued building until backtesting, after explicitly
+waiving Claude review "for now" and selecting accepted-risk Massive research.
+Under 255.2, Codex chooses the bounded rating-only route to preserve existing
+vendor event IDs, firm-specific scales, current/conservative-censored views
+and historical comparability. No FMP-to-Benzinga identity mapping, invented
+guidance rows, renewed spent attempt or new subscription purchase is inferred.
+The current pre-use review waiver supplies sequencing only; all technical
+source, prospective run-freeze, economic, provenance and financial controls
+remain. Same-round implementation/advice is not independent acceptance.
+
+Root reread the current six trust-root/authority files: reviewed-spec,
+security-master, firm-ontology and legacy-reproduction registries are empty;
+research-source and permanent-look authorities remain zero-access with empty
+entries. This accepted-risk exploratory path does not populate or override
+them, backfill formal estimands/dates/power/epoch, or assert pristine PIT,
+formal efficacy, independent security-master admission or production readiness.
+No broker, paper/live, funded-account or real-order action is authorized.
+
+### 297.2 Prospective acquisition purpose and fixed limits
+
+Capture a first complete, authenticated **rating-only** current-vintage delta
+for **2026-09-26 through 2026-10-12 inclusive (17 calendar days)**, then use it
+only after authenticating the existing September prefix and original eligible
+tail. The fixed prospective private control/capture directory is
+`artifacts/analyst_revisions_v2/massive_ratings_delta/R297-20261013-A`, not
+inspected or allocated during implementation. The only endpoint is
+`https://api.massive.com/benzinga/v1/ratings`, initial query
+`date.gte=2026-09-26`, `date.lte=2026-10-12`, `limit=1000`, `sort=date.asc`.
+No ticker subset, earnings/guidance, fallback provider or shifted date window
+is allowed. Subsequent cursors must bind the same exact host/endpoint/query
+scope; repeated cursors and incomplete terminal chains refuse.
+
+Prospective ceilings are 16 pages / 16,000 rows, 4 MiB raw per response,
+32 MiB aggregate raw and 32 MiB aggregate canonical row bytes, and a 64 KiB
+manifest. These offer bounded headroom relative to section 192's 1,398 total
+three-role rows over nine calendar days; they do not predict the new result
+or prove completeness. A cap hit without a terminal page is a spent failure,
+not permission to truncate, increase limits or retry under another name.
+The parent has 180 seconds including preflight, claim, credential lookup,
+capture, offline authentication and publication; 5-second connect/15-second
+read idle timeouts are subordinate, not a total runtime proof under host
+suspension or uninterruptible I/O.
+
+Only the designated Darwin/POSIX Python 3.13/root/branch is compatible. Claim
+and each request-intent marker must be exclusive and fsynced before the
+corresponding key read/contact. The Massive key is read once from the exact
+Keychain item into the consuming worker only. Verified TLS, no redirect,
+retry, environment proxy, fallback or silent pin refresh; unsafe logging/key-
+logging state refuses without settings changes. Non-200 bodies remain unread,
+with validated numeric status and request ordinal retained, not an invented
+entitlement cause or server request count. HTTP-200 rows may be retained only
+privately under this new bounded acquisition contract after credential-echo,
+strict JSON, exact application status and extraction checks. No licensed rows,
+keys, request URLs containing secrets or raw exception text enter chat/logs.
+
+A separate native-network-denied worker must authenticate the external manifest
+pin, exact inventory, held/named metadata, bytes/hashes, page/query/cursor chain,
+terminal state, chronology and exact counts before minting new process-local
+ratings-delta authority. New types must never counterfeit legacy three-role
+capture/archive authority. Preserve original source IDs, firm IDs/names,
+canonical raw row hashes and receipt time. Ratings normalization retains the
+second-NYSE-session date-only rule, explicit-offset last-update censoring and
+existing invalid/out-of-window/future-touch exclusions. Acquisition remains
+non-pristine current vintage, not immutable correction/deletion history.
+
+This section currently freezes purpose/design only. No operational acquisition,
+private old archive read, composer invocation, QC capacity query, upload,
+compile or launch is authorized until the implemented exact pins, focused
+validation and corresponding committed one-use decision are recorded below.
+
+### 297.3 Owner-selected six/eight new-rule comparison
+
+The owner first selected the newer six-universe design, then clarified the
+comparison was with the earlier **six**, not eight, universe studies, and
+directed: **"ok, let's try both 6 and 8 universe with the new rule"**. Asked
+whether to reuse 2021–2025 or extend through October 2026, the owner answered
+**"2026"**; Codex stated the interpretation as the extended window with the
+same historical start for both groups. This replaces a plain replay of the
+old eight-universe R283 economics. It does not authorize a current portfolio,
+formal forward epoch, paper/live deployment or fabricated historical receipt.
+
+The intended exploratory matrix is six versus eight universes, each with
+AR-off, full AR-on100 and full AR-on200: **six cells**, not six looks already
+spent. Six uses SPY/QQQ/SOXX/XLV/REMX/XLE; eight adds XLI/XLF. A separately
+versioned retrospective implementation must apply the same new holdings-
+completeness, identity, coverage, selection, cost and same-session execution
+rules to both groups and keep common dates/source vintage. The frozen
+sections 221/227/229 forward-policy artifacts remain unchanged and
+nonexecuting; no formal readiness refusal is erased or routed around.
+The exact QC sources, input/manifest pins, project IDs, outcome dates,
+attempt/compile/status/result protocol and accounting are not yet frozen.
+
+Prospective technical choices under 255.2: preserve total 98% gross and
+9.8% **per-stock-identity** exposure cap aggregated across sleeves (not a
+9.8% total-stock budget), equal sleeve allocation within each cohort,
+and own-sleeve ETF residual/fallback; adding two sleeves redistributes that
+same total budget rather than adding exposure. Apply the ordinary five-
+positive-score AR-on admission rule to XLI/XLF; only XLE keeps its already
+documented exception. Keep 25% mapped-name/cap-weight floors, five verified
+names and top-ten cap ranking, while requiring 95–105% reported holdings
+completeness and the separate 99%-by-weight identity check. The base fee
+remains 10 bps per side, zero modeled base slippage, not the old R283
+5-bps stress result. AR100/200 are transfer fractions, not leverage.
+Six equal budgets use the historical 1e-24 floor with exact residual to XLE;
+eight budgets are exactly 0.1225 each. Reuse the established centered
+tied-midrank transfer fractions 1.00/2.00 against each name's post-cap
+baseline, with the original 1e-30 per-sleeve and aggregate donor floor and
+9.8% per-identity receiver cap. This is a new explicit implementation choice,
+not a claim that the forward policy's null transfer binding was already
+filled. Non-XLE positive-score counts govern entry/count, but identities
+remain cap-ranked from all verified cap-eligible names, not only positive
+names. All choices must be enforced/tested by the new implementation before use;
+this prose grants no executable capability.
+
+The shared scheduled decision is the first NYSE session of each ISO week,
+with inputs before 09:20 New York and market orders from actual open plus
+one minute. Original date-only rating eligibility is at 09:30 on the second
+later NYSE session. Merely reusing the old same-session score lookup at
+09:20 would therefore leak not-yet-eligible contributions. The new pre-open
+scorer must admit only contributions eligible **strictly before** that
+cutoff, preserving their original eligibility indices for decay and using
+current-session memberships. Neither shifting stored indices by one nor
+blindly scoring the preceding session is an equivalent implementation.
+The intended last weekly decision is October 12; October 13 can be the
+valuation endpoint with no forced terminal rebalance. These dates do not
+backfill formal first-observation/epoch fields.
+
+Massive is still accepted-risk current-vintage evidence, not immutable PIT.
+Fresh held/named authentication and conservative clock slicing cannot prove
+old publication/correction/deletion history. Actual historical QC callback
+availability, holdings completeness, security joins, prior-close RAW prices,
+cash/fees/fills and source/selection-execution parity remain tested runtime
+requirements. Missing evidence must yield the frozen fallback or refusal,
+not a constructed ready state. No QC/capacity request or new look has yet
+occurred; the booked floor remains 314/239/50/699.
+
+### 297.4 Implemented acquisition, pre-use corrections and validation
+
+The new offline ratings-delta authority and operational caller are implemented;
+neither has yet been operationally invoked. The caller owns its parent,
+capture worker, native-network-denied authentication worker and separate
+output reader. It never calls a spent protocol's run/claim/worker/reader or
+the old three-role capture entry point. Existing imports reuse only pinned
+stateless transport, schema, normalization, private-file and deadline helpers.
+The new source type cannot mint legacy three-role/archive authority. Selected
+source pins are not whole-interpreter or host integrity.
+
+| Pre-use issue | Disposition before any source contact |
+|---|---|
+| `ARV2D297-001`, P3 | The new canonical wrapper added a second LF although the frozen canonical helper already appends one. An independent literal-byte oracle failed before correction; manifests now use exactly one canonical LF. |
+| `ARV2D297-002`, P2 | Page reads used only broad limits, not authenticated declared lengths; now exact declared sizes are checked before opening/reading each leaf. A no-byte-read regression was red before correction. The operational normalization path also parses each page once, with a 1,000-row call-count regression, instead of once per row. |
+| `ARV2D297-003`, P2 | Same-size altered page bytes reached the provider parser before comparison with authenticated page hashes. Both raw/extracted hashes now bind before provider parsing; two pre-parser regressions were red. |
+| `ARV2D297-004`, P2 | A same-value mutable raw buffer could inherit minted snapshot authority. Exact nested frozen types and original field-type shapes now join the authority fingerprint before serialization/copy hooks; equal-value buffer, subclass, enum/record impostor and context-hook regressions refuse. |
+| `ARV2D297-005`, P2 | Authentication-channel dict equality admitted Boolean/float aliases for integer counts. Parent ingress and the output reader now validate the entire binding with exact types before equality; 14 isolating regressions were red before correction. |
+| `ARV2D297-006`, P2 | The new host-only QC-package module was initially absent from the mandatory closure inventory. Root registered its exact imports, I/O surface, reached-module and five repository-boundary edges; no forbidden import or I/O rule was broadened. |
+
+Validation is synthetic and network-denied, not proof of a provider result.
+Root final focused selection: **332 distinct passes in 14.20 s**:
+123 offline-authority + 121 caller + 86 lane-record/active-document + two
+exact import-closure checks. No failures, skips or warnings; five changed
+Python files compiled in memory, all **12 selected dependency pins** matched,
+and `git diff --check` was clean. Plugin autoload and cache provider were
+disabled, `--noconftest` and `-B` used, and all support paths remained under
+the designated root; `assistant.dispatch_fence` was absent. Native
+`sandbox-exec` denied network operations. This is not request accounting or
+a complete lane/repository suite.
+
+Retain earlier evidence rather than adding overlapping counts: offline author
+first had 84 passes/13 genuine normalization failures because the availability
+helper emits a valid nonfractional UTC spelling; the correction canonicalizes
+it exactly like the legacy path. Later 98 passes/two fixture failures were
+corrected without weakening guards. The format/read-order pair had two red
+tests; final first-author selection was 112 passes/8.24 s. The advisory
+page-hash/type corrections then had 11 red regressions/1.26 s and 123 passes/
+8.83 s. Caller initially had 82 passes/four synthetic fixture failures,
+subsequently 107 passes, and four memory-only omission checks caught actual
+exit, external report pin, selected source pin and pre-send marker removal;
+original functions were restored in `finally`. Authentication-binding aliases
+had 14 red cases/1.36 s, followed by 121 passes/1.85 s. Root closure initially
+reported one failure/one pass (unregistered module), then one failure/one pass
+while correcting a namespace edge/order transcription; final exact closure
+passed in the combined selection. These are development failures, not spent
+operational attempts. Same-round advisory agents are not independent review.
+
+| Final prospective file/profile | SHA-256 |
+|---|---|
+| `scripts/capture_arv2_massive_ratings_delta.py` | `14936a7a1b493b28554eae0a9dbddfa07363d61fa9ce5d461580ae1b009ce818` |
+| `research/analyst_revisions_v2_qc/accepted_risk_massive_ratings_delta.py` | `9c0ec2eede6daeabc03d150c1146d595026fe724028ead856edce9f29b872390` |
+| `tests/analyst_revisions_v2/test_massive_ratings_delta_capture.py` | `b8bf54f42a04ea1b1120f3c364bbfff5012a9f62359bf1648527d72750ab06da` |
+| `tests/analyst_revisions_v2/test_massive_ratings_delta.py` | `5afdbb79ca34bde06da413d2af895a03be7d949d632aeb847e9082aeb0807972` |
+| Caller profile `arv2-massive-ratings-delta-caller-v1` | `ce9c635ede7b5f781d486461443131f33b6f78650f39caf9e75c283494a8606e` |
+| Source profile `arv2-massive-ratings-delta-v1` | `2829c14ddf2443a94701e04edddc74abb22b83a0b09246e32a2544aa72dba09b` |
+
+### 297.5 Exact one-use acquisition/output decision
+
+Under the current owner pre-use Claude waiver, accepted-risk Massive access,
+2026 extension choice and 255.2 delegation, **D1** authorizes exactly one
+invocation of the unchanged final caller above at the clean commit containing
+this freeze. Pass that actual 40-character commit as `--expected-head` and
+the exact caller SHA as `--caller-sha256`, using only the designated root,
+branch and `/Users/sheltonchen/.venvs/trading_agent-py313/bin/python -B`.
+No operational output path has been inspected/allocated before this freeze.
+The fixed R297-A claim/capture leaf and limits in 297.2 are binding. This is
+not a rename/retry of the old failed three-role request: it acquires a newly
+defined rating-only delta with unchanged rating economics and terminal-chain
+authentication, while leaving both refused products and old protocols intact.
+
+The invocation's actual process exit is an externally observed fact. Record
+its finite console envelope only; never fabricate exit zero or print raw
+errors, credentials, opaque objects or provider rows. Exactly **D2** may then
+invoke the same source's `--read-output` mode once under native network
+denial, only if D1 returned an unambiguous canonical bounded envelope with
+external `report_sha256`/`report_bytes` and actual exit 0 or 2. Pass those
+exact observed values plus the same clean HEAD/caller pin. D2 reads only
+this new claim/report, not old evidence or capture pages. No valid envelope,
+unknown exit, timeout or other ambiguity means no output read and no retry.
+Acceptance requires D1 actual exit zero **and** D2 authenticated matching
+success. An accepted report followed by actual exit 2 remains inadmissible.
+
+Claim creation consumes the use even if no provider request happens; partial
+claim/publication is ambiguous/spent. Per-request intent/attempt counts are
+local observations, not server request totals. The parent owns and may
+kill/reap only its own worker. Deadline/reader alarm cannot bound suspended
+hosts or uninterruptible I/O. Late failure may leave partial or apparently
+positive files, which are retained without repair/cleanup/reuse. No limit
+increase, shifted date/ticker, fallback role, unchanged rerun or silent pin
+refresh is authorized. Failed response bodies stay unread.
+
+D1/D2 do not authorize an October composer invocation, original-private-source
+inspection, QC/capacity contact, order backtest or readiness promotion.
+Successful accepted acquisition permits the next separately pinned offline
+composition decision; substantive implementation may continue in parallel
+only after the clean operational window closes. No intermediate push or
+monitor rearm follows, and all booked looks/flags remain unchanged here.
+
+Precommit qualification: the staged-diff check, which includes new files,
+caught three surplus EOF blank lines in the new offline test file that the
+earlier unstaged diff check did not inspect. Only those blank lines were
+removed and its recorded test SHA updated; executable source/profile pins
+are unchanged. The 86 record checks passed again in 0.87 s, overlapping
+earlier coverage rather than adding distinct tests.

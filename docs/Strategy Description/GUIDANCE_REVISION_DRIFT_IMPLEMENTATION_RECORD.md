@@ -16,15 +16,18 @@ The owner's conditional Mia-led synthetic recovery (32.4) stays
 paused pending platform preflight: independent review and counter-review have
 accepted the unchanged source, but output compliance
 with QC's AI-agent rules (GDR-CR28-001) and QC's log-length accounting
-(GDR-CR31-003) remain unverified. Section 35.4 records insufficient remaining
-log-read allowance and the locked-Mac/Mia gate; the monitor is PAUSED, with no
-recovery launch or partial-round push. Native loading of the recovery carrier
-is unverified. Only
+(GDR-CR31-003) remain unverified. Read-only continuation in section 36,
+2026-10-13, found Safari accessible but only 18.89 KB of displayed remaining
+log-read headroom; Mia did not return a usable final preflight clearance.
+No new Claude review push or recovery launch occurred. The owner now requests
+one combined publication of this completed counter-review/preflight handoff,
+then a re-armed monitor for its exact next Claude review. Native loading of the
+recovery carrier is unverified. Only
 `data/__init__.py` was observed as one LF at runtime;
 `research/__init__.py`, remains unobserved. No successful native integration
 or empirical backtest readiness is established. The original economic, data,
 empirical, account and trading gates remain closed.**
-Current scope/evidence are sections 17 through 35. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 36. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -4644,3 +4647,186 @@ inaccessible, the owner uses it directly; no substitute connector or manual
 fourth attempt. Keep all source/economic/empirical/trading boundaries and the
 single genuinely concluded-round push agreement. The lane is not empirically
 backtest-ready, and no synthetic native integration success is established.
+
+## 36. Continued readiness preflight and owner-directed publication handoff, 2026-10-13
+
+### 36.1 Exact repository state and retained counter-review
+
+The owner requested `counter review, then continue to build until lane
+completion`. The mandatory root and branch were verified clean at local
+`f7467d21c2f1dfc11008e6d5ea36661fa07adaed`; matching remote remained
+`d1a57097605c2a01ebeb9805c4474161a7882b10`. A lightweight check of relevant
+Guidance refs found only that same matching lane ref. There is no new completed
+Claude review to consume or counter-review again. Section 35's per-commit
+dispositions, all retained CR34/CCR35 findings and earlier ledgers stand.
+`f7467d21` is the previously local-only counter-review/preflight closure, not
+a Claude review trigger or a new producing source epoch.
+
+The materially necessary next step is native evaluation of the independently
+accepted RP33 source, conditional on actual platform preflight and the
+separately authorized Mia-led scope. Read-only source/readiness inspection
+found no verified offline defect or authoritative unfinished engineering
+increment that would justify changing this accepted candidate merely to add
+milestones. The paired/comparator/callback prototypes remain explicitly
+separate offline work; substituting them into the approved single-symbol
+372-frame evaluation would change scope and require another exact review.
+No production source, draft economics, decision gates or source rights changed.
+This is continued preflight work, not completion of original GDR-0..6.
+
+### 36.2 Current authenticated platform observations
+
+Safari is accessible again. The authenticated Organization > Resources page
+observed around **14:09 America/Los_Angeles / 21:09 UTC, 2026-10-13** showed
+**100 KB per backtest** and **18.89 KB / 3 MB remaining Log Read Quota**.
+That displayed read headroom is below the complete RP33 payload alone
+(75,260 LF bytes). The generation-versus-read meter semantics, exact remaining
+generation allowance and wrapper/engine accounting still are not established.
+The 40-byte/message plus 2,000-byte fixed reserve remains an assumption,
+not a quota certificate. Both B2-8 nodes showed `-` in Project/In Use By;
+neither was reserved, cancelled or reassigned. No other lane's outcomes or
+stored data were used, and no account/resource/scheduler setting changed.
+
+Only the existing Guidance project **37647834, Determined Green kitten** was
+opened for its Mia interface. Optional import insertion was cancelled. Its
+cloud source is the exhausted original candidate, not RP33. Two successful
+build messages were observed during IDE load/Mia interaction:
+
+| Short display build ID | UI time, timezone not declared | Displayed LEAN version | Interpretation |
+|---|---|---|---|
+| `e99033-8c8ea8` | `9:10:01` | `2.5.0.0.18179` | Incidental IDE-load build observed; no controlled compile or backtest requested. |
+| `b841a7-8c8ea8` | `9:12:51` | `2.5.0.0.18179` | Additional build observed during read-only Mia interaction; initiating mechanism unverified. No manual compile/backtest requested. |
+
+The project still displayed `Always use Master Branch`, now v18179. This
+moving engine label is not an immutable engine/CLR/Python binding and does
+not rewrite the original v18178 failure evidence. Neither successful build is
+a completed native order-based run or an unsuccessful fourth launch. No new
+recovery candidate was created/uploaded and no run ID or native trace resulted
+from the requested work.
+
+### 36.3 Mia result and policy/accounting disposition
+
+The formerly unacknowledged preflight now appears as the completed conversation
+`verify current official policy applicability to this invented-only evidence`.
+Its initial response claimed read-only work and no edits/compiles/runs, but
+mixed in unrelated history and incorrect payload/accounting assumptions.
+Codex sent two bounded follow-ups in that same conversation: correct the
+489-line / 75,260-byte / assumed 96,820-byte quantities, then answer Mia's
+plain-purpose question. Both expressly forbade edits, compiles, launches,
+notebooks, real data, other outcomes, resource changes and restriction bypass.
+The requested purpose is native callback/order/account reconciliation:
+380 protocol records plus 372 per-frame account checkpoints, intended for the
+owner and independent code reviewers. Forty bytes is assumed per-message
+platform overhead, not content chunks or a source/log transport mechanism.
+
+Mia retracted its unsupported assumptions and visibly fetched public Terms
+and searched documentation. Its relevant intermediate assessment separated
+Platform Data from claimed invented-only observations, but did not verify the
+complete local RP33 fixture/source or actual quota/accounting semantics. The
+rendered final reply instead supplied an unsolicited, unrelated numerical
+table. Its numbers are not used, retained or accepted as lane/QC evidence.
+Conversation `Completed` and reasoning/tool activity therefore do **not** clear
+platform preflight or establish native execution. No fresh conversation,
+renaming, repackaging or alternate output channel is used to avoid that stop.
+
+Codex read current primary [QC Terms, section 2.6](https://www.quantconnect.com/terms),
+[Security and IP](https://www.quantconnect.com/docs/v2/cloud-platform/security-and-ip),
+[Resources](https://www.quantconnect.com/docs/v2/cloud-platform/organizations/resources)
+and [Mia documentation](https://www.quantconnect.com/docs/v2/ai-assistance/predefined-agents/mia).
+The explicit data-export prohibition targets Platform Data, and normal own
+source/results retrieval must not convey it. This corrects a blanket claim
+that every invented observation is necessarily prohibited; it is not a
+definitive clearance of this exact proposed output. Source-in-log transport,
+Platform Data reconstruction, internal-source collection and quota bypass
+remain prohibited. Exact-route applicability and actual accounting remain
+unresolved: **GDR-CR28-001 / P2 open; GDR-CR31-003 / P2 open**. No self-issued
+waiver, purchase, installation, credential change or launch followed.
+
+### 36.4 Complete named-source comparison through the permitted interface
+
+Using only existing configured REST access and the existing allowlisted
+client, Codex made read-only `/files/read` calls for the **21 explicitly named
+user-owned Python files** from the final attempt-3 manifest. Each response was
+HTTP 200 with `success: true`, one exact named file and project ID 37647834.
+The full UTF-8 bytes of each returned file were compared with its complete
+retained post-attempt-3 source; every file was byte-exact, with **zero changed
+named files**, 278,845 bytes total and project hash
+`fbf824bfa2f84101ad52ed646ffb3ac7ed0849e9f1bf88aafd11a725427bca96`.
+Comparison finished at `2026-10-13T21:13:20.066089+00:00`.
+This verifies the named source snapshot at that time, not every unlisted
+project path, runtime normalization, no future edit or an engine run.
+
+No notebooks, backtests/results/logs, Object Store files or platform-internal
+source were read. No credential value or authentication header was printed,
+copied, saved or reconfigured. Codex made no cloud-source edit. The normal named
+[Read File API](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/file-management/read-file)
+route, not log/notebook source transport, returned the complete file bytes.
+The resulting per-file source hashes and response-body hashes are retained
+in the local ignored observational receipt
+`artifacts/guidance_revision_drift/qc/read-only-preflight-20261013/named-source-comparison.json`,
+SHA256 `b6a32aec28b20447410d5dbd8ae08e1d32067c92c35912cb086238d84110f61f`.
+It references the unchanged complete returned sources under the section-27
+receipt directory; those local artifacts are not a portable Git-delivered
+trust root. Essential identities and limitations are recorded here for review.
+No source artifact, engine data or candidate was repackaged for upload.
+
+The accepted local RP33 identities remain exactly those in 33.4: producing
+`c589b3dddab3f1dd136d10ae7ce1851d64818906`, full source
+`061ff30fe4053ebfabfa27c38d2e3ccd37d950c2fe3eae4375a933463125ee9f`,
+recovery project
+`c6b9443aa64f005c48e21f493bfea14918ecf6a730ac4f995bd3a70ee4c269a9`
+(21 Python files / 298,870 bytes), prepared runtime
+`5d1dc6560ad2778fd6a8c514c16641b6e78cf82d514a0088f0a344c31783437d`.
+The fixed fixture and immutable draft remain unchanged. Do not confuse this
+accepted offline source with the byte-exact older cloud candidate or silently
+rebind either historical ledger.
+
+### 36.5 Owner publication direction, launch ledger and next action
+
+The owner subsequently directed in this Codex thread:
+
+> After your current run, push once. then rearm the monitor. once Claude
+> finishes and pushes, counter-review it and proceed with the rest steps
+> towards lane completion or bactesting ready.
+
+The current work is the completed read-only preflight/handoff above, not a
+new native run. This direction explicitly authorizes its combined single
+end-of-round publication, including previously local-only `f7467d21`, and
+re-arming for Claude's next completed pushed review of the resulting exact
+publication. It supersedes section 35's no-partial-publication stop only for
+this documented handoff; it does not certify readiness, waive platform checks,
+reset an attempt budget, approve a fourth manual run or resolve economic/
+rights/family/evidence-window/trading decisions. No other branch is published.
+
+Original cycle **GDR-base372-approved-20261008 remains CLOSED FAILED, three
+unsuccessful native launches / zero remaining manual attempts**. Separately
+authorized conditional Mia-led recovery launches remain **zero**. No new
+orders, checkpoints, complete native trace or empirical outcome look occurred.
+The unchanged original draft has eleven unresolved decisions and false
+external permissions; original GDR-0..6 and empirical backtest readiness are
+not complete. Independent software acceptance, a successful build and a
+source-byte match do not replace their definitions of done.
+
+Only this lane record changes in this continuation; source and frozen shared/
+root documents remain untouched. Focused active-document/fresh-import/
+transitive-boundary checks passed 3 methods in 0.262 s with zero failures,
+errors, skips or observed warnings. All 88 lane source/test Python files
+compiled in memory with no bytecode written; the retained JSON receipt and
+all 21 per-file success/exact-source observations passed structural checks.
+Diff/status checks passed. Publication still requires a fresh mandatory
+root/branch/HEAD/status and exact matching remote guard; its receipt and exact
+publication SHA are persisted in automation memory/thread state after the
+single push. No complete Codex lane/repository suite was authorized or run.
+
+Next, Claude independently reviews every commit in the new exact publication
+range starting after `d1a57097605c2a01ebeb9805c4474161a7882b10` (including
+`f7467d21` plus this continuation record). A qualifying matching-lane completed
+review then receives per-commit Codex counter-review; neither this own push nor
+older review triggers are consumed again. Continue necessary lane-owned
+readiness work only as actual gates permit. The next native stage still needs
+a usable exact-source/platform assessment, sufficient verified complete-evidence
+allowance, actual engine/binding preflight and controllable Mia under the
+existing synthetic-only authorization. If QC human/platform clarification is
+needed, return to the owner rather than changing channels or inventing another
+milestone. Wait on occupied shared nodes, never cancel or reallocate others.
+One later concluded-round push remains the rule, not intermediate publication
+or an indefinite automatic loop.

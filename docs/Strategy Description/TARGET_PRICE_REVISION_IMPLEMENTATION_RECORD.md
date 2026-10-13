@@ -20204,3 +20204,92 @@ attempt reset or additional look merely because the same run is collected.
 Await actual process exit before next controller/effect. Genuine loading or
 observed resource contention is retained and handled with a new bounded scope,
 never automatic retry, guessed sibling blame or cancelling others.
+
+### 87.10 Latest owner-reported Mia stage and EODHD credential-location reference
+
+Owner, 2026-10-13, on the additional OFF jobs: "Yes, Mia configured the run
+yesterday. The last run appeared to be failure but it failed only at the last
+step". This is new owner-origin attribution/stage evidence, not independent
+proof of a specific job ID, all ten actors, full-window completion, source
+identity or unchanged economics. The last observed relative-server job is
+look30/4936632376c0885358493a2694ed239b; verify its native terminal/census and
+every source change before accepting the owner's end-stage interpretation.
+Partial early jobs do not refute that latest-job claim. Retain look29 Completed
+and look30 Runtime Error separately, without winner selection or attempt reset.
+
+Owner also reports existing EODHD subscriptions "EOD All World" and "EOD
+Calendar", an authenticated Safari session, and authorizes access if needed
+for backtesting. The owner's explicit non-secret credential-file reference is:
+
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying/artifacts/insider_buying/private/eodhd-token.txt`
+
+Owner requested remembering this location. This lane record durably retains
+the PATH ONLY; Codex has not opened/read/hashed/printed/copied the token.
+No direct persistent-memory write tool is exposed in this session; this entry
+is not a claim of account-wide memory write or a reason to hand-edit generated
+Codex memory state. Do not put token values in memory, Git, logs or public
+artifacts. The supplied sibling file reference grants no unrelated sibling
+repository exploration/change. Before any genuinely needed EODHD credential/
+provider/private-data operation, create a fresh bounded scope and keep secret
+values private. Owner-reported subscriptions/session are not provider rights,
+historical availability or PIT attestations. No EODHD effect has occurred.
+
+TPR-EXT26-D090 (agent-delegated, independent review pending): retain EODHD
+as a concretely available owner-reported source option for an actual data gap,
+but do not silently substitute it into the frozen OFF/ON inputs, change
+economics/date/universe rules, buy/upgrade subscriptions or broaden research
+allocation. Alternatives are existing frozen inputs or a separately defined
+and authorized successor if an irreducible gap requires different data. This
+decision records source availability context, not a new strategy/design grant.
+
+### 87.11 Native batch001 facts and static-refusal diagnostic foundation
+
+COMPONENTS001 genuinely exited process0/COMPLETED_CAPTURE at
+HEAD492c96298e5930d6606dd533ebf9a986c84c814e, created22:32:28.799471Z/
+expiry22:47:28.799471Z/ended22:33:19.850831Z. Plan
+`db66e66bbde46064a6f73fdedf5615408dc3e0ef06c26d13e831fb2e53433724`;
+48 API requests,3182466 wire bytes,3218605 private artifact bytes before
+final receipt,12634 fresh reference-FD bytes. Result37968bytes/SHA256
+`ade298ebb71c066a44edc26dcb7e21229ea5df8162b713cff57c2097d6ec9d39`.
+No new job/look/attempt; exhausted OFF3 and unlaunched ON0 unchanged.
+
+All eight jobs21–28 are genuinely terminal native Runtime Error, progress1;
+compile IDs remain null. Actual account NAV census counts versus1449 are
+26,852,11,1009,9,9,9,9 respectively: incomplete, not accepted full-window
+returns or proof of the frozen16:01 NY observation clock. The expected-clock
+label in the census is a convention, not actual-clock proof for partial data.
+Every default Strategy Equity chart and first order page returned Loading;
+orders/fills/fees remain null, not zero. These actual responses are retained;
+no automatic retry, unexplained other-lane contention claim or cancellation.
+
+Looks21–23 each have one compact SUMMARY that remains refused and one
+shape-valid aggregate INDEX. INDEX hashes respectively
+`80b7908ab4af90544a1c6d1df3d070aae40c5d5d249a6c763d867db31fa5f607`,
+`cc72e5fd766c5cd8ef78cc0e3f3ebd3798f349fde973f19ca82c9129f378a06d`,
+`32d7f1c2679245ccc1b8ba5e62fbade4d7e2bdd4b739a8012647d38060d97e61`.
+Looks24–28 returned zero matching SUMMARY/INDEX log lines after genuine
+queries; this is distinct from look20's earlier unreached null components.
+No private journal replay/source/economic/accounting/performance acceptance.
+Preserve look21–28 terminal error identities in private receipts; error text
+has not been disclosed. Fresh batch002 for29–30 remains next; its scope is
+already prospectively defined above, but actual preparation must pin its new
+committed HEAD/time and await every dependent process exit.
+
+New metadata-only source-policy diagnostic20313bytes/SHA256
+`0f661bc47c1bf6d044c4cf421dfd084e355530cc21f409a4bb8946c5752010bd`,
+test10090bytes/`e7166df316fae93c33155d6b4b72f65bfbbbba6df2db91d8ca26da15956f36d5`.
+Root read complete source/test; isolated focused32passed3.78s, in-memory
+compilation and diff checks clean. Producer32passed3.48s; meaningful privacy/
+immutable-baseline/finalguard reverse mutants each failed and were restored.
+The executed predecessor81b6c557… is pinned unchanged. Fresh SOURCE-DIAG001
+will re-prove complete delta and immutable before-tree for exact post005
+artifacts, then classify conservative policy refusals by safe enum/location/
+node/literal type and length only. No source/literal/comment text or separate
+potential-secret digest disclosed; labels are predicate matches, not proven
+secrets or automatically legitimate schema. No private/API effect occurred
+in focused tests. Current-source and native accounting acceptance stay false.
+
+Root document321+diagnostic32 focused353passed10.41s. An earlier invocation
+selected a nonexistent document-control path, exited4 with no tests run;
+corrected selection used the existing test_document_consistency.py. Retain
+that selection error, not a product defect or skipped failure. No full suite.

@@ -519,10 +519,12 @@ independent review and a separate exact run freeze before invocation.
 Section 293 implements that separately versioned October-12 first-vintage
 diagnostic caller. The owner's later **"proceed without review"** instruction
 waives the current pre-use Claude checkpoint for this bounded diagnostic,
-not its technical checks or future reviews. Section 294 freezes one unchanged
-caller invocation plus a once-only bounded offline result read. At the
-prospective freeze both remain uninvoked; the actual result is recorded there
-before the round's single final push. No strategy backtest is authorized.
+not its technical checks or future reviews. Section 294's sole unchanged
+caller invocation exited 2 with `producer_raised`; its once-only offline
+reader authenticated failure evidence with finite category `http_status`.
+No capture was accepted. Both uses are spent; there is no unchanged retry.
+The exact HTTP code, failing role/page and request count remain unknown.
+No strategy backtest is authorized.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1531,13 +1533,15 @@ accepts the test correction with documentary qualifications. Section 293
 implements the bounded operational Massive caller under the existing
 delegation. The owner explicitly waives Claude review of section 294's
 current one-shot Massive diagnostic on the later "proceed without review"
-instruction. The immediate next step is the separately committed section 294
-run freeze, then one unchanged caller invocation and its once-only output
-reader if all technical gates permit. This current waiver covers the
-section-293 caller and bounded result-recording code only, not future new
-contracts or independent final acceptance. Acceptance of the observation-only
-helper alone is not contact authority. No additional vendor-choice
-acknowledgment is needed and no spent protocol is renewed.
+instruction. That invocation and its output read are now spent: a finite
+`http_status` refusal was authenticated, without an accepted capture.
+The immediate next step is the section 294 handoff's separately justified
+status-observation recovery contract, not another call to the spent R293
+entry point. This current waiver covers the section-293 caller and bounded
+result-recording code only, not future new contracts or independent final
+acceptance. Acceptance of the observation-only helper alone is not contact
+authority. No additional vendor-choice acknowledgment is needed and no spent
+protocol is renewed.
 `ARV2R288-003`'s historical
 inline caller remains unavailable, and a future committed observation seam
 does not itself grant source contact. `ARV2R248-002`, `-003`, `-004` and
@@ -3451,7 +3455,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-12 | Codex counter-review of section 288 and offline one-shot diagnostic observation preparation | `ef654b1d` -> `95f56997`, `3900bd19`, final section-290 handoff | Sole Claude record accepted after three P3 qualifications; all 145 literal refusals classified, sixteen formatted labels retained, hostile lookup corrected | Finite observation separated from opaque return; no adapter default, CLI, provider dispatch or operational recovery; actual historical caller unavailable | Classifier 48 and observer 48 pass separately; 113 code/lane-record passes; 11 import-boundary passes; 1018 public sources compile without bytecode; old-source and five memory mutations red; shared document Git checks have three isolation refusals, not a green full-suite claim | No credentials, private corpus, QC, outcomes, look/cell change or other-lane fix; 314/239/50/699 unchanged | One final combined lane push; Claude reviews the exact snapshot; separately justified compatible-host production protocol still required before contact; monitor paused after trigger |
 | 2026-10-13 | Claude independent review of sections 289-290: the source-complete failure classifier and the one-call observation seam | `c7369649` -> the test correction and this record commit | Section 291: three Codex commits `ef654b1d..c7369649` disposed (2 accepted, 1 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells; no capture, assessment, publication or probe run | Two regression tests added to `test_massive_capture_failure.py` for the classifier's module-name check and 200-character bound (`ARV2R291-001`); no production code changed. Four pins reproduce; the inventory is verified against all 145 adapter literals and 30 templates; the pre-fix classifier fails the five new tests; 10 in-memory guard removals tabulated; the second device renumbering is recorded; section 4 names section 291, banner sentence added, this row appended | Focused files and record gates at `c7369649` and on the final bytes, strict sandbox with in-root temporary paths, `compileall`, artifact and status integrity, `git diff --check`; the complete lane suite was not run this round at the owner's direction; exact counts in 291.6 | 0 P0, 0 P1, 0 P2, 1 P3 | Single push of this round's two Claude commits; Codex counter-reviews section 291 unless the owner changes the workflow |
 | 2026-10-13 | Codex counter-review of section 291 and real bounded Massive caller implementation, uninvoked | `38e2b97a` -> `52542bb0` and final section-293 caller/test/handoff commit | Both Claude commits disposed in 292: test correction accepted, record accepted after four documentary qualifications; no historical audit replay | Fixed October-12 three-role first-vintage diagnostic caller, exclusive durable claim, 150-second parent deadline, finite 16-KiB channel, separate native-network-denied physical authentication; no receipt publication or R287 renewal | Root final focused selection 289 passed in 3.29 s; changed Python sources compile without bytecode; two classifier omissions and four new-caller omissions caught; earlier missed guards and fixture failures disclosed in 292.3/293.4; no full Codex suite | Historical P2s retained; all four pre-invocation implementation/test findings in 293.3 corrected; 314/239/50/699 unchanged | Exactly one final matching-lane push; monitor remains active; Claude independently reviews section 293 before counter-review and a separate exact run freeze; no actual claim, credential, provider or QC action |
-| 2026-10-13 | Owner-waived one-shot October-12 Massive diagnostic | `fb8c87ad` -> section-294 freeze and final result/handoff commits | No new Claude range; explicit current owner waiver, not independent acceptance | Unchanged fixed caller plus separately committed bounded output-only reader; exact one-use decision and result handling in 294 | Focused validation and actual result recorded in 294 before final push; no complete suite | Historical P2s retained; no renewed R287 or formal gate clearance; 314/239/50/699 unchanged | One matching-lane final push for the concluded round; active monitor advances past own Codex commits |
+| 2026-10-13 | Owner-waived one-shot October-12 Massive diagnostic | `fb8c87ad` -> `d9a3b89a` and final section-294 result/handoff commit | No new Claude range; explicit current owner waiver, not independent acceptance | Sole unchanged caller exited 2; once-only output reader authenticated `producer_raised` / `http_status` failure evidence, not an accepted capture; both spent | 284 distinct focused passes in 2.94 s; 86 record repeat in 0.95 s not additive; two reader omissions caught; no complete suite | Exact status/role/request count unknown; historical P2s retained; no renewed R287 or formal gate clearance; 314/239/50/699 unchanged | One matching-lane final push for the concluded round; active monitor advances past own Codex commits; no unchanged retry |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -45820,3 +45824,111 @@ The booked floor remains **314 shared / 239 development / 50 infrastructure /
 All current holdings/caps/security/score/October-input and formal trust-root
 gates remain. No funded/broker/real-order, paper/live, mapping export, paid
 right, shared/root file change or other-lane mutation is authorized.
+
+### 294.4 Actual sole invocation and authenticated failure evidence
+
+The exact clean committed run freeze is
+**`d9a3b89a5ab496147313ef09015b96dc2eb79a91`**. Before launch, root/branch/
+HEAD/status and the original caller, new reader and all seven dependency
+hashes matched; live matching remote was still `fb8c87ad`. No concurrent
+tracked work or new Claude push was observed. The final pre-freeze record
+repeat passed **86 tests in 0.95 s**, not additional to the 284 distinct
+focused passes above.
+
+The one parent invocation was dispatched at **2026-10-13 22:01:27 UTC**;
+completion was externally observed at **22:01:40 UTC** with actual **exit 2**.
+These second-resolution clock observations bracket dispatch/polling; they
+are not exact internal provider times or a measured 13-second request.
+The exact finite double-LF envelope passed D2's checks and reported
+`terminal="producer_raised"`, `provider_request_count=null` and:
+
+| New output | Bytes | SHA-256 |
+|---|---|---|
+| `massive_diagnostic/R293-20261013-A/report.json` | 623 | `1634882554841cd3a9b7451271b1e2c09df10b9658093209c7a17fa1891e99c8` |
+| `massive_diagnostic/R293-20261013-A/claim.json` | 396 | `07a3ec62bdc7347b301637408074fec9eb410d43ed3462bfa8edf9a2d34027d2` |
+
+Both relative paths are below `artifacts/analyst_revisions_v2/`. Claim pins
+come from the separately executed bounded D3 read, not from a directory
+scan. The fixed reader was dispatched **22:01:52 UTC** and its completion
+observed **22:02:04 UTC**, again external polling brackets rather than exact
+reader runtime. It ran once under native network denial and its 30-second
+alarm at the same clean freeze. Actual reader **exit 2** correctly retained
+`output_authenticated=true`, **`accepted=false`**, `attempt_consumed=true`,
+`failure_code="http_status"`, actual parent exit 2 and matching report pins.
+All PIT/paper flags remained false, QC/outcome counts zero and provider
+request count null/unknown. The finite reader summary passed exact external
+key/type/framing checks. No capture/manifest/receipt success pin was returned.
+
+This is an authenticated **failure report**, not capture success, a green
+diagnostic or a cancelled test. The actual parent/report/reader agree that
+the producer raised and no output was accepted. The operational caller and
+the once-only reader are now **SPENT**. No authentication-worker receipt,
+portfolio, QC launch, strategy order, performance read or R287-D2 build/read
+was invoked after this failure. There was no retry, new leaf, marker repair,
+private corpus census, provider error-body inspection or historical replay.
+The unchanged adapter's own unpublished staging cleanup is not proof that
+no earlier bytes/contact existed; request count remains unknown.
+
+### 294.5 Failure interpretation, concrete barrier and next action
+
+`ARV2D294-001` (**P2, open operational diagnostic barrier**): the newly retained
+finite label narrows this invocation to the adapter's HTTP-status refusal
+branch, but still does not preserve the numeric status or role/page. Static
+inspection of the unchanged public source shows `http_status` maps to the
+single literal "provider returned a non-success HTTP status"; the adapter
+raises it when `type(response.status_code) is not int` or it differs from
+200, after prepared-request validation and before reading that failed
+response's body. It does not establish a specific 401, 403, 429 or 5xx, which
+endpoint/page failed, whether earlier pages were staged, current entitlement,
+rate limiting, or the exact number of requests. No such causal claim is made.
+R287's historical missing cause remains unrelated and unrecoverable.
+
+Local frozen outputs cannot recover a value the frozen adapter discarded;
+re-reading them or sending the same request would not be an admissible
+resolution. A useful next recovery must be a separately justified bounded
+**HTTP-status observation** contract that retains only validated numeric
+status, exact role/endpoint identity and attempted-request accounting,
+without response bodies, credential values, licensed rows, fallback roles
+or automatic retries. It must freeze why it is diagnostic observation rather
+than replacement acquisition, its exact host/source/rights/endpoint scope,
+claim/deadline/terminal handling and one-shot limits before any contact.
+The current owner waiver is exhausted by this run; it does not silently waive
+independent review of that future new contract. No such recovery invocation
+or provider access test has been made here. An external non-secret account
+status/error-code observation can also inform that future decision, but no
+routine vendor-choice or access acknowledgment is demanded.
+
+The three formal trust-root files were read as public code/configuration and
+remain empty/zero-access: research-source authority, reviewed-spec registry
+and permanent-look authority. No flags or source admissions were changed.
+Current holdings/caps/identities/scores and the separate October input
+extension still precede a current portfolio or performance run. The floor
+stays **314 / 239 / 50 / 699**. All historic P2s, licensing/source/security
+boundaries, exhausted R247/R281 and other-lane isolation remain binding.
+
+### 294.6 Continuous-round handoff
+
+| Commit / boundary | Role / bounded disposition |
+|---|---|
+| `fb8c87adc6a32a7cfde7699e26f1905edd261618` | clean pushed section-293 baseline, not a new Claude trigger |
+| `d9a3b89a5ab496147313ef09015b96dc2eb79a91` | owner-waived exact D2/D3 freeze plus bounded reader/tests; sole actual invocation failed and its output-only read authenticated failure evidence |
+| This final section-294 result/handoff commit | actual exit/category/pins, limitations, open operational barrier and next recovery scope; no new contact authority |
+
+Exactly two Codex commits form this continuous round after `fb8c87ad`.
+Exactly one final push targets the matching lane after final record/diff/
+status and remote concurrency checks; there was no intermediate push. The
+existing ten-minute monitor stays active and advances its baseline to that
+final pushed commit. It watches completed new Claude review pushes, lets
+Claude finish uninterrupted, and stays quiet when unchanged/nonactionable.
+It must not treat these Codex commits as a trigger, rerun R293, or reopen any
+spent reader/capture. Last disposed Claude head remains `38e2b97a`.
+No independent final review is claimed for this owner-waived round; shared
+action plan/root handoff/production sources remain frozen. No funded/broker,
+paper/live/real-order, new paid rights or other-lane action occurred.
+
+Final result/handoff record checks passed **86 tests in 1.00 s**, with
+dispatch-fence absence asserted and the same native-denied in-root setup.
+This is an overlapping repeat, not an addition to the 284 distinct focused
+passes. No historical result or private output reader was replayed. The two
+new executable/test source pins and all section-293 production pins remain
+unchanged, and final diff checking passes.

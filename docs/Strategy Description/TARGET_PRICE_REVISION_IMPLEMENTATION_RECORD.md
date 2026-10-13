@@ -19,9 +19,13 @@ NOT A NEW HOST-CHOICE GATE. OFF'S THREE CODEX ATTEMPTS ARE CONSUMED;
 ON HAS ZERO; LOOKS ARE 30 (20 PREVIOUSLY RETAINED PLUS TEN NEWLY OBSERVED
 EXTERNAL-ORIGIN RUNS IN SECTION87, NINE ERRORS AND ONE COMPLETED STATUS,
 NOT YET ACCEPTED SOURCE/ACCOUNTING). THERE IS NO ACCEPTED 2021-NOW PAIRED RESULT. THE
-MONITOR REMAINS PAUSED. CODEX NEXT VERIFIES THE OWNER-REPORTED MIA REPAIR UNDER
-FRESH BOUNDED SCOPES, THEN CONTINUES AUTHORIZED OFF/ON AND BACKTEST-READINESS
-WORK WITH FROZEN ECONOMICS AND RETAINED ATTEMPTS. SECTION 74'S
+MONITOR REMAINS PAUSED. CLAUDE NEXT REVIEWS THE COMPLETE COUNTER-REVIEW AND
+OWNER-MIA RECONCILIATION ROUND. SECTION87 ENDS FACTUALLY BLOCKED, NOT
+BACKTESTING-READY: DISPLAYED OBJECT STORE50.01MB/50MB, UNACCEPTED MEMBERSHIP
+UNIT AND STALE-MARK CHANGES, LATEST1395/1449 NAV, NO FINAL SUMMARY/INDEX OR
+VERIFIED COMPILED SOURCE. NO FOURTH OFF OR ON LAUNCH; RESUMPTION NEEDS
+PRESERVATION-COMPATIBLE HEADROOM AND VERIFIED UNCHANGED-ECONOMICS MIA
+RECOVERY. THIS IS NOT A ROUTINE REVIEW STOP OR A NEW CANONICAL GATE. SECTION 74'S
 COUNTER-REVIEW OF THE EARLIER THREE-COMMIT CLAUDE RANGE STANDS AS HISTORY:
 ITS INCOMING-TEST CORRECTIONS ARE ACCEPTED, NOT INHERITED RUNTIME READINESS.
 HASH-ONLY AND KEY-ONLY PACKET-RECEIPT NEGATIVES NOW FAIL INDEPENDENTLY UNDER
@@ -514,6 +518,14 @@ ON has consumed zero attempts;30 observed looks now remain retained
 (20 previously retained plus ten retrospectively observed external jobs);
 no accepted paired result exists. No fourth Codex OFF attempt is allowed;
 the owner-reported Mia fix requires independent result/source verification.
+Section87 has now retained all ten newer jobs and every current cloud-file
+delta. The latest native error contains end-callback/export markers, but
+only1395 of1449 NAV points, no final SUMMARY/index and unaccepted source-unit/
+stale-mark changes remain. Authenticated Safari is observed; its initial
+Resources page displays Object Store50.01MB/50MB. No exact byte/headroom or
+native-cause attestation, no cleanup/upgrade or unapproved new launch. This
+round ends genuinely blocked on preservation-compatible included storage
+and verified source/full-window recovery, not on routine Claude permission.
 Section75.15 records completed fresh composite input preparation; original
 failed capture and subsequent completed Sharadar repair remain separate.
 Section 70's
@@ -608,11 +620,12 @@ outcome-free source audit; no real-row D1, outcomes or QuantConnect access is
 authorized by that audit.
 The trust rollback pin, protected parent custody, reviewer identity and
 adversarial matrix remain unresolved and parked. **Exact next role action:**
-Section86 accepts the merged counter-review after correction. Codex next
-verifies the owner-reported Mia repair under fresh bounded scopes,
-retrieving all resulting source changes and genuine native result identities,
-then continues the authorized frozen OFF/ON and bounded lane build toward
-backtesting readiness or a concrete factual/external/safety blocker. No
+Section86 accepts the merged counter-review after correction. Claude next
+reviews the complete counter-review and owner-Mia reconciliation round.
+Section87 ends genuinely blocked on included-storage headroom and unresolved
+source/full-window evidence, not on a routine review checkpoint. Qualified
+resumption continues frozen OFF verification before ON, preserving every
+source/run/receipt, attempt cap and independent native acceptance gate. No
 launch through an unresolved path or fourth Codex OFF attempt. The old
 Windows-side Mac-unavailable precondition is historical, not current fact.
 That does not waive launch/audit gates or the
@@ -627,8 +640,8 @@ allowance question from section74 and grants at most three attempts per arm.
 Proposed first/last sessions are January4,2021 and October9,2026; no future
 session or sealed 2027-2029 shared holdout is included. The allowance question
 is resolved by direct owner authority, not inferred from a date change.
-Both arms and all six universes are frozen together in section75. Codex
-continues this resumed authorized development round, implementing successors
+Both arms and all six universes are frozen together in section75. On qualified
+resumption Codex may continue authorized development, implementing successors
 for the confirmed runtime/evidence defects, use committed bounded producers,
 and verify historical availability before launching; do not tune after results.
 Section72.5 retains the two completed diagnostics with all gates false,
@@ -20242,6 +20255,24 @@ allocation. Alternatives are existing frozen inputs or a separately defined
 and authorized successor if an irreducible gap requires different data. This
 decision records source availability context, not a new strategy/design grant.
 
+Latest owner credential-locator table (2026-10-13), retained as NON-SECRET
+references alongside the EODHD file path above:
+
+| Provider | Keychain service/item name | Account name |
+|---|---|---|
+| Financial Modeling Prep | `trading-agent-fmp` | `fmp` |
+| Sharadar | `trading-agent-sharadar` | `sharadar` |
+| Massive | `trading-agent-massive` | `massive` |
+| EODHD | `trading-agent-eodhd` | `eodhd` |
+
+No Keychain query, key retrieval, secret value, credential rotation/migration
+or provider request was performed for this memory/reference request. The table
+does not itself attest item existence/validity/rights/PIT or authorize FMP/
+other-provider input substitution, new frozen rules or unrelated exploration.
+Any future authorized use needs its own fresh bounded credential/provider
+scope; never print/store secret values in memory, Git or logs. Existing QC
+credentials and this round's scopes are unchanged by these new locators.
+
 ### 87.11 Native batch001 facts and static-refusal diagnostic foundation
 
 COMPONENTS001 genuinely exited process0/COMPLETED_CAPTURE at
@@ -20589,3 +20620,102 @@ Root read full223line source/209line test;40focusedpassed3.51s, in-memory
 compile/diff clean. Producer40passed2.91s; exact-ID enrichment1fail0.80s,
 unknown-screen5fail1.16s and finalguard1fail0.53s restored reverse proofs.
 Software accepted for fixed private review only, independent Claude pending.
+
+### 87.17 Final verified scope, outcomes and genuine blocked handoff
+
+SOURCE-JOB-VIEW001 genuinely completed/process0 atHEAD3d68b1b4bb89564dbbe6c21bd5b141f7c9d68f65,
+created23:08:58.439896Z/expiry23:18:58.439896Z/ended23:09:06.003738Z,
+plan`3e5ef2bee504a2edab41dbfa0db407c6b3faae7b34bc00eb32e85f8112cc410d`.
+Two exact401314byte FD reads;0API/jobs/attempts/looks/source execution/ports.
+Receipt34036bytes/SHA256
+`45abf89efa4ecf3850edb92302c9df1cdd4933232afa26faa6ec7631ee576517`.
+The previously opaque notebook literal exactly matches already-public look30
+job4936632376c0885358493a2694ed239b. Root read all11 normalized code cells;
+comments/docs/outputs/metadata stay withheld. Static provider-history requests
+and retrospective dates are attributed CODE, not root-executed observations,
+unit/correction/PIT evidence or permission to repeat them/extend frozen dates.
+Notebook outputs/actual executions are unverified, not assumed zero or accepted.
+
+TPR-EXT26-F023 P1 OPEN scope hazard in current notebook code: cell10 enumerates
+ALL organization Object Store keys and reads each readable value, beyond the
+own-project namespace. Actual execution is unproved because outputs/metadata
+remain uninspected; root did not execute or port this cell. Do not repeat its
+global reads, reopen D0/other captures or treat the code as a safe resource
+producer. Any future permitted resource operation must bind exact own-lane
+objects with fresh receipts and preserve unrelated resources/evidence.
+
+TPR-EXT26-D094 (agent-delegated, independent review pending): end this round
+at a genuine factual/external/safety block. Read-only alternatives retained
+all10 external jobs,15 current files/all5deltas and latest end-stage/native
+components without relaunching, deleting evidence or inferring source equality.
+UI shows an authenticated Mac session, not a stale login/unlock requirement,
+and an unexpectedly displayed full50.01MB/50MB included store. Existing-resource
+headroom for21409650 pending ON input bytes plus full audit is not available
+by assumption. No purchases/upgrades, unrelated cleanup, global enumeration,
+provider substitution, altered mark/unit rules or OFF4 are authorized recovery.
+This is NOT an invented canonical or separate-rights-paperwork blocker.
+
+Precise owner/external recovery: supply a preservation-compatible allocation
+of existing private QC storage, or explicitly authorize a separately bounded
+own-lane preservation/archive/space plan with exact objects; no preserved
+capture may be destroyed, and no upgrade/purchase is inferred. Thereafter use
+authenticated controllable genuine Mia under fresh scopes to diagnose exact
+export cause and correct only verified lane-owned native boundaries while
+preserving frozen economics. F021 requires raw-unit/correction provenance,
+not previous-total calibration; F022 requires original mark freshness or an
+independently proved settlement/action ledger, not silent warning-ID bypass.
+Retrieve exact compiled-job/all cloud source evidence and usable full1449
+NAV/301decisions, native orders/fills/fees/costs/cash/exposure/coverage and full
+audit/index/replay. ON remains0of3 until OFF is genuinely usable and fresh
+remaining-input/headroom receipts exist. No implicit old scope/attempt reset.
+
+| Frozen arm / six sleeves | Retained empirical state | Accepted full-window outcomes |
+|---|---|---|
+| OFF, joint SPY/XLV/XLE/QQQ/SOXX/REMX stock sleeves | Codex3 exhausted;10 external jobs retained,9Runtime Errors/1Completed.; latest look30 Runtime Error/end-export markers,1395/1449NAV; look29 Completed.12/1449NAV | NULL: return,CAGR,drawdown,volatility,Sharpe/risk-free,annual,turnover,costs,fills,cash/exposure,coverage and independent sleeve P&L unaccepted |
+| ON, identical cap-selected stock sleeves plus standalone20%weight tilt |0attempts/unlaunched;71remaining compressed inputs held | NULL: no matched extended study or per-sleeve return/alpha claim |
+
+Observed per-job NAV counts21–30:26,852,11,1009,9,9,9,9,12,1395. Default
+equity/order reads remain genuine Loading, not zero-trade or accepted cost/
+fill evidence. Matching queried aggregate logs are retained even when absent/
+truncated. Do not gap-fill, assign current source to older jobs, select only
+the successful status, invent sleeve P&L from overlap or claim confirmatory
+alpha from adaptive/correlated observations. Historical section68 and all
+v1/v2/native/failed/loading originals remain immutable. Looks30=28cloud+
+2historical local; this round launched0new strategy jobs and made64 bounded
+own-project API requests (1list+2source+48components001+7components002+
+6terminal001), not64new outcomes. No EODHD/FMP/Keychain/token access.
+
+Exact incoming9-commit/merge dispositions remain section86 accepted-after-
+correction for review/support, NOT QC/canonical/performance acceptance. New
+support/evidence commits in30e5ae34984b898addfea01e681a36ce340452e6..this
+final published HEAD require Claude's next independent full-tree/commit-by-
+commit review, including all12 implementation/support ancestors frome8be3333
+through3d68b1b4 and this final handoff/guard commit. Source support/root tests
+are agent-verified, not separately human/Claude approved. CanonicalTR0-I
+replay/rollback/custody/reviewer/adversarial gates remain parked;TPR-1/TPR-0B
+unclosed; OOL011 corrected-in-lane/shared sync owner-coordinated,003/004/006
+closed. Shared Action Plan/Session Handoff/workflows/main/siblings unchanged.
+
+The heartbeat remains PAUSED. Exactly one successful matching non-force
+final push is made only after stable final tests/invariants/diff/actual remote
+verification; no checkpoint push occurred. Final published object identity,
+actual remote equality and clean status are reported in this chat. An
+accepted future review does not by itself remove these factual/source gates.
+
+Final root focused validation:330 document controls+32source diagnostic+
+26static view+40public-job notebook view+45terminal successor =473passed18.95s.
+Separate import-closure/active-document topology checks2passed0.41s; no full
+lane/repository suite. All changed Python source/tests compile in memory,
+diff check clean. Byte comparison against30e5 independently preserves both
+executed extended algorithms, compressed writer, completion bundle, study
+freeze/calendar and named shared Action Plan/Session Handoff/CLAUDE files.
+Final guard adds clean-first negative coverage for forged1449 completion,
+ON consumption/reset, credential access, rearmed monitor, upgrades and
+claimed notebook execution. All validation uses isolated in-process49/52
+runtime root before dispatch/config imports; no actual operator stop/database.
+Mac/fixture tests prove no native Windows signer/ACL/protected-parent custody;
+missing-frozen-Git refusal/restoration and14 frozen-Windows limitations remain.
+Failed source/discovery/partial-native/selection-error histories above are
+not removed by green fixtures. This ends support/evidence software, not an
+accepted2021–2026 study, stock-proxy backtesting readiness or canonical lane
+completion. Next independent review covers this entire final pushed tree.

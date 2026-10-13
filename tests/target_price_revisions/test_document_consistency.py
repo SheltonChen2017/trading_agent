@@ -504,7 +504,7 @@ SECTION86_BASE = "8db2aaa6f0858696442c7f9db97ac2e740f9752b"
 SECTION86_HEAD = "30e5ae34984b898addfea01e681a36ce340452e6"
 SECTION86_RANGE = f"{SECTION86_BASE}..{SECTION86_HEAD}"
 SECTION86_SHORT_RANGE = "8db2aaa6..30e5ae34"
-SECTION86_NEXT_ROLE = "Codex next verifies the owner-reported Mia repair under fresh bounded scopes"
+SECTION86_NEXT_ROLE = "Claude next reviews the complete counter-review and owner-Mia reconciliation round"
 SECTION86_COMMITS = (
     "b28d07f6139dc0460e927b152fb4a87f6f2915e9",
     "0455fc2534f5951bc3d0eca35dc581cef9cca5f4",
@@ -5068,3 +5068,49 @@ def test_retrospective_owner_inventory_refuses_invented_acceptance_or_selection(
             "source": "compiled_source_proven", "metrics": "accepted_metrics"}[fault]
         value["jobs"][0][key] = True
     with pytest.raises(AssertionError): _assert_owner_recovery_observation_limits(value)
+
+
+def _assert_final_owner_mia_handoff(text):
+    normalized = " ".join(text.split())
+    for required in (
+        "genuine factual/external/safety block",
+        "latest look30 Runtime Error/end-export markers,1395/1449NAV",
+        "look29 Completed.12/1449NAV",
+        "ON remains0of3",
+        "No implicit old scope/attempt reset",
+        "No EODHD/FMP/Keychain/token access",
+        "The heartbeat remains PAUSED",
+        "no upgrade/purchase is inferred",
+        "Actual execution is unproved",
+    ):
+        assert required in normalized, required
+
+
+def test_final_owner_mia_handoff_preserves_block_and_credential_locators_only():
+    section = _record_section("## 87. Fresh owner-reported Mia repair discovery")
+    final = section.partition("### 87.17 Final verified scope")[2]
+    _assert_final_owner_mia_handoff(final)
+    for identity in ("TPR-EXT26-F021 P1 OPEN", "TPR-EXT26-F022 P1 OPEN", "TPR-EXT26-F023 P1 OPEN"):
+        assert identity in section
+    for service, account in (("trading-agent-fmp", "fmp"), ("trading-agent-sharadar", "sharadar"),
+                             ("trading-agent-massive", "massive"), ("trading-agent-eodhd", "eodhd")):
+        assert f"`{service}` | `{account}`" in section
+    assert "/trading_agent__insider_buying/artifacts/insider_buying/private/eodhd-token.txt`" in section
+    assert "Codex has not opened/read/hashed/printed/copied the token" in " ".join(section.split())
+
+
+@pytest.mark.parametrize("before,after", (
+    ("1395/1449NAV", "1449/1449NAV"),
+    ("Completed.12/1449NAV", "Completed.1449/1449NAV"),
+    ("ON remains0of3", "ON remains3of3"),
+    ("No implicit old scope/attempt reset", "Implicit old scope/attempt reset approved"),
+    ("No EODHD/FMP/Keychain/token access", "EODHD/FMP/Keychain/token access performed"),
+    ("The heartbeat remains PAUSED", "The heartbeat remains ACTIVE"),
+    ("no upgrade/purchase is inferred", "upgrade/purchase is approved"),
+    ("Actual execution is unproved", "Actual execution is proved"),
+))
+def test_final_owner_mia_handoff_refuses_invented_completion_or_authority(before, after):
+    test_final_owner_mia_handoff_preserves_block_and_credential_locators_only()
+    final = _record_section("## 87. Fresh owner-reported Mia repair discovery").partition("### 87.17 Final verified scope")[2]
+    assert before in final
+    with pytest.raises(AssertionError): _assert_final_owner_mia_handoff(final.replace(before, after))

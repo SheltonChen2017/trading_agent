@@ -23873,3 +23873,149 @@ No full lane/repository suite, frozen-file thaw, SEC-parent capture, QC job,
 backtest/look or trading occurs. Six carried P2s stay OPEN. Shared/project
 records remain frozen; monitor PAUSED; no push is consumed. Continue the
 authorized local build; this observed handoff is not a final readiness claim.
+
+## 169. Unattempted-only continuation, metadata custody and recovered references (2026-10-13 owner-local; precontact)
+
+### 169.1 Delegated decisions and real existing-input recovery
+
+IBDEC-169-01: preserve the completed168 root and its two permanently fenced
+starts. Implement a separately versioned246-month continuation beginning
+February2006; do not retry January, resume the old root or claim that its
+discarded response has been repaired. The supporting dates and frozen study
+economics/population are unchanged. Unknown/nonessential row fields now
+retain private raw custody and source ordinals with explicit quarantines.
+Currency is unprojected and cannot gate an otherwise valid row. No financial
+lexeme is converted, compared or evaluated. Transport/envelope/credential-
+echo failures still stop the finite campaign without retry. All14 authority
+flags remain false; this authorizes measurement, not archive admission.
+
+IBDEC-169-02: metadata needs producer-bound custody, not a fresh self-hash.
+IBEOD-CAMP-R03 was found before v2 contact: v1 and draft v2 completions bound
+raw body hashes but did not persist the metadata hash. Keep executed v1
+unchanged. Its December metadata was independently reprojected from the
+externally bound raw body in168, then reread under network/write/fork denial:
+SHA-256 `61e257f768e1ce658e3d1f893aded7c5a79121ae7e0293580a36334b5b222023`.
+This is a LATER independent custody anchor, not a retroactively invented
+v1 producer field. New v2 receipts start with metadata_sha256=null, then bind
+the exclusively published metadata digest BEFORE window completion; the
+externally pinned final receipt transitively binds every projected leaf.
+The pure assessor/secure observer require this new producer link.
+
+IBDEC-169-03: use a pure metadata-only full-cohort assessment and a separate
+isolated actual observer. Keep all6,737 all-form/5,866 relevant2006Q1 CIKs,
+aliases, collision relations, all248 planned windows, every quarantine and
+cross-window fiscal conflict. Exact/case-folded basename matches to ALREADY
+OBSERVED provider codes are discovery candidates only; no .US requests or
+historical mapping are inferred. A missing/refused month stays unavailable,
+including January after a completed continuation. Both+/-2/+/-5 diagnostics
+remain required; original event bounds need genuine parents/mapping/calendar.
+Current source observations are not backdated original availability. All
+issuer-date earnings coverage is UNKNOWN, even for empty observed windows.
+
+IBDEC-169-04: support the four explicitly supplied macOS Keychain pairs with
+a new lane-only reader. Fixed arguments, captured bounded stdout, discarded
+stderr, ten-second deadline, minimal environment, isolated process-group
+cleanup, sanitized refusals and redacted results prevent secret publication.
+No fallback discovery, credential hash, file-copy or automatic access-control
+change. Main independently checked all four item METADATA queries: exit0,
+password_requested=false; not token validity or provider entitlement. The
+actual EODHD continuation still uses the already validated private file.
+
+IBDEC-169-05: recover/reuse the exact previously supplied Sharadar artifact
+before downloading or buying again. Read-only related-chat metadata identified
+the relocated checkout; NO other checkout command, edit or message occurred.
+The same supplied artifact is present at
+/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2/artifacts/analyst_revisions_v2/sharadar_capture/arv2-sharadar-source-20260914T003329843989Z.
+Its5,998-byte regular single-link manifest matches the original external
+94251ffdf0529b118ff331b98c4a144d97bc734380d7e7333f94045e4aa6f09b pin;
+root is owned0700. Original145/147 source lineage is retained, not relabelled
+as a new capture. Main's network/all-write/fork-denied one-off call to the
+unchanged supplied audit independently verified all three full archive/member
+bytes, CRC/schema/row anchors and opaque numeric handling in30.96seconds;
+canonical report SHA-256 `845f945b59d849ef478be486a97d3d6cac91996f6bcc7bae52bfdd5d19393e63`.
+This was no new provider request, financial-value evaluation, row export or
+strategy look. The report is not published with licensed rows or data-fitness
+conclusions. Present bytes do not establish original knowledge/QC SID/rights.
+
+IBDEC-169-06: the owner answered the FMP evidence-location question with
+"other lanes are already using. skip it". Do not repeat that paperwork
+question or interrupt EODHD/Sharadar work. No FMP capture/retention/cloud
+permission is manufactured from another lane's usage, and no new FMP call
+is made here. The relevant supplier reply/account lookup remains distinct
+from credential presence; no vendor correspondence or purchase is sent.
+
+### 169.2 Implemented successors and prelaunch evidence
+
+research/insider_buying_eodhd_earnings_continuation.py retains the old global
+lock plus its own lock/interval registry, fixed c2607ac0 completion/ee6c2374
+manifest/7b650d04 execution/b94a7da3 inventory and61e257f7 metadata anchors.
+It hashes old raw bodies only and never writes/resumes that root. Exactly246
+real windows are permitted; fixture subsets cannot reach real transport.
+Main independently validated the actual preceding8-leaf/2-scope anchor
+under network/all-write/fork denial, without actual credential access.
+Source SHA-256 `75dc393040ee8aff4e98e787eb60087fc77f429d826c37ae4494fe8168502e2e`;
+tests a17e865c198af42b540442aa5544ddb1c6c205b2e58f27c9eaee075280bdc8ae.
+
+The pure assessor source is
+ddeefc1aa92cc2e497a902839bbcc2e1edfa79bfda216e2a44c0fc62fd4e16ec,
+tests3a992aa28597a9b8cddb5f4017360578da449ee2ba37580a03a19fdafe8aa1a6.
+Its typed-refusal draft had5 genuine red failures (schema container errors
+and missing status counts), corrected before52 focused passes. No source-
+file custody is inferred inside the pure factory.
+
+research/insider_buying_earnings_archive_assessment_runner.py source
+bea9afd2e50b4e221ec26c34e651e1adc565d9fe826414d9de78621c827633c2;
+tests2a43ab2e86b922aa98d8ee08155c8246a36d1fc2d2d9c07b77d8be065f0d514d.
+The actual CLI requires an external observed v2 completion digest, fixed
+census/v1 anchors, current+committed static/loaded41-source internal closure
+and private no-follow/FD/name/root/leaf inventories. Paid bodies are HASHED
+ONLY. Parent Git checks run outside the child; a separately launched worker
+enforces actual process-tree network/fork denial and writes only to a fresh
+exclusive output. Both output hashes/receipts are reattached by the parent.
+Do not nest Seatbelt profiles: the invalid nested fixture test refused with71
+BEFORE worker input; the corrected direct fixture-only isolation probe proved
+network/fork/sibling-write denial and exact-output write success. Three genuine
+directory-inventory regressions were corrected. Its author selection passed83
+in1.18s (pure+runner+exact guard), not an actual data assessment.
+
+Keychain reader source4ab2703a3f6a3c5d4597fd036b18676a77d47bcd7f0d72c5ced189af84b828e1;
+tests6500d896928ea7d30c248b8a551a4421e5de6e297076065603b8eaf7ad5a802f.
+Author244 focused passes3.87s included58 new tests; actual group-cleanup and
+secret-exception defects were red then corrected. No password/API was read.
+The additional Sharadar two-status-only candidate is validated but UNEXECUTED:
+source5f6bff1df9403fe9f1d77c1c8cc6549dc1b34f74c29584d73fca7ea9bbdedf22;
+tests7a98b206f03c90212d5b7b15228752347b21362988c7b0232b13757c5a1b1e77.
+Author344 passes3.94s included100 new tests after2 genuine red secret/start-
+binding failures. Recovered archives are reused first; do not infer that a
+candidate's fixed URLs represent executed requests or paid account evidence.
+
+Main final focused selection passed974 in7.01seconds, zero failures/skips,
+under OS process-tree network denial and isolated temp/environment: new and
+prior acquisition profiles, census/assessment/observer/Keychain/status tests,
+import boundary, record/active documents and EXACT Insider package guard.
+For R03, a memory-only omitted producer link caused1failure0.42seconds;
+finally-restored source then passed71 in0.81seconds. No source-file mutation,
+actual credential/API or full-suite run occurred in these tests. Earlier
+independent180 passes2.17s and anchor/currency/false-completion/secret reversals
+refer to preceding pre-R03 bytes; final QA/compile/frozen checks follow.
+
+Final internal QA accepted the corrected four-component source image:
+253 focused passes1.64seconds, producer/assessor/parent-output hash-binding
+reversals each1red then1green, finally restored. This is not independent
+Claude acceptance or actual data execution. Main compiled212 files under
+network/write/fork denial and preserved stock/four-file hashes. The final
+document guard correctly caught three missing separators after SHA-256
+(1failed/71passed1.08seconds); spacing/backticks corrected those documentary
+67-character tokens without changing any actual digest or source bytes.
+
+Technical milestone: unattempted-only acquisition with durable producer metadata
+identity and an isolated real-input cohort observer; secure credential and
+reference qualification candidates remain separate from actual execution.
+Plain-language milestone: finish collecting the untouched archive dates, then
+measure every issuer/gap honestly using retained reference data. Neither code,
+fixtures nor recovered current snapshots manufacture honest backtest readiness.
+Commit the validated preregistered image before real v2 contact; later observed
+results/handoff must name the already-existing implementation hash. No new
+Claude review is claimed; six carried P2s stay OPEN, original constraints and
+both historical access classifications stand. Shared/frozen files remain
+unchanged. Monitor PAUSED; one final push remains unconsumed.

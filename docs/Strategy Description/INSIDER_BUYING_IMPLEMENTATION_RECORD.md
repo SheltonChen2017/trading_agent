@@ -14,8 +14,10 @@ ARCHIVE ACCESS/COVERAGE, IDENTITY/PIT AND ORIGINAL-PARENT FACTS REMAIN MISSING;
 SECTION164 RECORDS NEW OWNER-PURCHASED EOD CALENDAR ACCESS OBSERVED IN SAFARI
 BILLING AND OWNER-CONFIRMED ROTATED PRIVATE CONFIGURATION. CONTINUATION RESUMES
 WITH A SEPARATE PAID ONE-SHOT QUALIFICATION AND FULL-QUARTER METADATA CENSUS;
-NO PAID API RESPONSE OR COMPLETE ARCHIVE CLAIM YET. LOCAL CONTINUATION,
-NO FINAL PUSH CONSUMED.
+SECTION166 RECORDS ACTUAL PAID HTTP200/277-BYTE/ONE-ROW ACCESS AND THE
+83,657-FILING OFFLINE CENSUS WITH TWO IDENTICAL DERIVATIONS. NO COMPLETE
+ARCHIVE/IDENTITY/RIGHTS OR BACKTEST-READINESS CLAIM. LOCAL CONTINUATION,
+NO FINAL PUSH CONSUMED; CURRENT EXTERNAL SOURCE/SEMANTICS INPUTS IN166.3.
 19,846 OF 99,394 PARENTS ARE REQUEST-BOUND; V3 REMAINS 1,846 OF 1,847;
 THE FOUR CUSTODY FILES AND V1/SCALE/PILOT STAY FROZEN. STRICT D23 RETAINS
 SEVEN NONEXACT QUARTERS. NOT BACKTEST-READY: REAL EARLY EARNINGS, IDENTITY,
@@ -23508,3 +23510,168 @@ final test hash is
 Main reran the same final combined selection: **511 passed in3.76s**, zero
 failures/skips. Source code and its3e0ba295 hash are unchanged. Staged
 whitespace is rechecked after restaging; no behavior/test expectation changed.
+
+## 166. Observed paid Calendar qualification and full-quarter census handoff (2026-10-13 UTC)
+
+### 166.1 Actual paid execution and independently reread custody
+
+The validated candidate/preregistration is local commit
+`fedf07eb2f5b262a1a4b6388922198df75c509b6`. Final precommit record/active-
+document/exact-package checks passed72 in1.61s and all200 source/test files
+compiled under network/all-write/fork denial. Before contact, root, branch,
+clean already-existingfedf07eb HEAD and unchanged matching origin85c7755d
+were verified; all peers had stopped edits. The actual minimal-environment
+`-B` CLI then used the owner-confirmed rotated private file. This authorized
+online qualification is separate from the denied-network fixture runs.
+No code or record changed during execution.
+
+One transport invocation returned **HTTP200**, a complete **277-byte** body
+and **one** registered2006 current-provider-reported row; timing-unknown and
+current-status-unknown counts are both0. Financial values were not evaluated,
+projected or printed. No raw licensed row, date, credential or credential hash
+is reproduced here. API access is observed, not complete actual-release
+archive semantics, coverage, historical revision/availability/identity/PIT,
+processing rights, canonical/QC/backtest readiness or execution authority.
+
+Private audit:
+`artifacts/insider_buying/eodhd_calendar_qualification/ib-eodhd-calendar-2006q1-20261013-once/`.
+Reservation **2026-10-13T22:46:07.104231Z**, started **22:46:07.300694Z**,
+completed **22:46:08.095739Z** (local observer clocks, not historical times).
+Body SHA-256:
+`94fad44bb2f931272f7077334510194a7f957541212f225a0a6d6b28dda5ebc2`;
+completion SHA-256:
+`cf816a51d50f711884ebbf94eb8d457691a65cd5b49cbf3cf83dde5283282acb`;
+six-source execution inventory:
+`fb3a8ab6d194b49dfa4ecad708de4859be7abcdec9a0bded869d23211b5cacc7`.
+The permanent reservation remains intact; never repeat/resume this profile.
+
+Main independently reopened/rehashed all five private leaves and reservation
+under OS network/all-write/fork denial, reattached the named root/audit,
+checked the hash chain, reprojected identical metadata **without actual
+credential access**, verified all six current source hashes, the existing
+execution HEAD, `fixture_only=false`,277 bytes/one row and all14false flags.
+This was custody reread, not a second request or source authentication.
+The tree stayed clean atfedf07eb afterward.
+
+### 166.2 Observed complete metadata census and exact caller lineage
+
+From the same already-existingfedf07eb implementation image, main assessed
+the pinned17,306,804-byte2006Q1 ZIP and published165's fresh private inventory:
+`artifacts/insider_buying/earnings_issuer_inventory/ib-2006q1-metadata-20261013-once/`.
+Only SUBMISSION.tsv was interpreted; other member bodies/CRCs were not
+revalidated. Canonical inventory is **27,363,300 bytes**, SHA-256
+`a36662f0d29888ee3d38543c9cae2a2d702073790419280b596fe879ea24c30f`.
+Completion SHA-256:
+`3b6016400f667a375814214a3b9ea17a3a5b7e6597f9eb3fe2f3b949dcb8d102`;
+observer completion **2026-10-13T22:49:34.851774Z**.
+
+Actual counts: **83,657 filings**, **71,679 Form4/4-A**, **11,978 context**;
+**6,737 all-form issuer CIKs**, **5,866 relevant CIKs**, **418 multi-label
+relevant issuers**, **34 multi-CIK labels**, zero empty-label relevant rows,
+one accession-year mismatch. Forms3/3-A/4/4-A/5/5-A counts respectively are
+**5,694 /534 /68,520 /3,159 /5,539 /211**. This is metadata completeness,
+not complete parents, admitted historical identities or canonical signals.
+
+Main's separate one-off `-c` caller secured/reopened the named source/output
+chains and regular leaves, reread the ZIP and invoked the pure factory a
+second time. Both canonical derivations were byte-identical to the saved
+inventory. All200 current lane source/test files were rehashed before/after;
+inventory digest
+`0f12721d7cf71d974ad12a2895c1c01b695215832012f3e20f653b41abb9fb2d`.
+Exact executed observer UTF-8 code SHA-256:
+`2005ad73c7905f4a964c871e4947076fc3e98f361e8466dbc06b9c5c40c02b8a`.
+This separate main harness is **not a production CLI committed in fedf07eb**;
+the earlier pre-probe helper-image hash was not executed. Do not relabel its
+later handoff commit as already existing during execution. Parent Git checks
+before/after observed the same clean branch/HEAD; the isolated caller cannot
+launch Git/subprocesses itself. Current code inventory is not a reconstructed
+whole historical environment.
+
+OS policy denied process-tree network/fork and confined writes to the exact
+fresh output subpath; actual loopback socket and fork probes observed
+EPERM/EACCES before source processing. Named roots/leaves were reattached
+before completion. Private output is0700/0600 and ignored. No credential,
+provider dispatch, financial table, outcome, QC job or look was used. All13
+census source/parent/PIT/identity/coverage/rights/canonical/readiness/authority
+fields remain false. This does not complete six-form parent integration,
+the82-quarter population, corpus or backtesting readiness.
+
+### 166.3 Remaining factual evidence, not routine approval or a review wait
+
+Paid access/configuration is no longer missing. Use165's full metadata
+inventory for subsequent deterministic coverage/identity reconciliation,
+retaining every ambiguity. AAPL success is not dead/reused-label/full-cohort
+coverage; appending.US to a historical label is not admitted mapping.
+Entry/diagnostic boundaries still need real original-parent availability,
+historical identity and the pinned session calendar, not filing dates alone.
+
+Current primary [Fundamentals glossary](https://eodhd.com/financial-academy/financial-faq/fundamentals-glossary-common-stock)
+describes US Earnings.History reportDate as an8-K report date; the Calendar
+document describes report_date as the results-announcement date. These are
+different documented endpoint fields. Do not infer they are always equal or
+always different. The public demo remains a report-date **field** observation;
+the paid Calendar status/date row alone cannot settle actual release versus
+filing/call date, original status/revision/availability lineage or certified
+complete empty coverage. Source semantics must be corroborated before positive
+actual-release archive admission.
+
+Precise external evidence still needed: supplier/archive confirmation of those
+historical release/timing/status/revision semantics and early/dead/reused-cohort/
+boundary coverage, plus applicable **private hosted QuantConnect processing**
+permission. Personal terms support current private local qualification but
+do not themselves establish that cloud right. The additional official-site
+search did not locate QC-specific permission; absence in search is not proof
+of a vendor refusal. No further purchase or financial commitment is made.
+Prior WSH/Intrinio and free SEC/exhibit alternatives remain162.1;8-K absence
+does not certify empty coverage. Broader source engineering is possible but
+cannot manufacture these facts or replace them with extra partial captures.
+Needed input is genuine supplier/archive evidence, not new routine engineering
+approval or another Claude checkpoint.
+
+The previously supplied Sharadar capture **and its parent directory** currently
+return ENOENT on scoped read-only checks. Locate a moved retained artifact
+before a duplicate purchase/capture; prior143/145 audits remain historical
+evidence, not proof of present accessible full historical mapping. Actual
+2006Q1 remains83,657 quarantined/71,679 relevant parents missing. Later-window
+19,846/99,394 custody and79,548 unattempted rows are not its replacement.
+No SEC parent was acquired in164-166.
+
+### 166.4 Local-only handoff, exclusions and final validation boundary
+
+Incoming85c7755d remains accepted/counter-reviewed in160; no new origin push
+arrived. Retain all per-commit dispositions/resolved findings. Six carried
+P2s remain OPEN, no openP0/P1. IBEOD-CAL-R01/R02 and IBINV-165-R01 are corrected
+before execution. UI exposure mitigation is owner-confirmed rotation, not a
+fabricated independent revocation measurement. Both older final owner access
+classifications stay distinct, without retroactive approval or invented counts.
+
+The four exact local commits enumerated163.3 remain local; new implementation
+`fedf07eb2f5b262a1a4b6388922198df75c509b6` follows019dca79, then this separate
+observed-result/handoff commit. All are **LOCAL ONLY** after exact matching
+origin `85c7755deb75b5d0c61cc4a63a385d4b87b55110`. Neither the later handoff hash
+nor new independent Claude acceptance is invented. Another computer cannot
+fetch this accumulated series yet.
+
+Main's completed candidate has511 focused passes in3.76s,72 record/active-
+document/exact-package passes in1.61s,200 memory-compiled files, historical
+four-file equality and frozen stock-study hash preserved. Repeat final
+actual-record/active-document/exact-package, diff/status and matching-origin
+checks before this handoff commit. No full lane/repository suite, historical
+root replay, new SEC/other-provider scope, QC upload/job, registered/outcome
+look, backtest, broker/operator-database/scheduler, deployment, capital,
+paper/live/order/trading action occurs; looks/jobs/backtests **0/0/0**.
+No shared/sibling file, Action Plan or SESSION_HANDOFF.md changed. Do not
+repeat either completed EODHD profile, thaw frozen files, resume stoppedv3,
+change the source window or claim82-quarter/corpus completion. The monitor
+remains PAUSED. The single final push is unconsumed: no interim checkpoint
+push is substituted while precise factual readiness evidence166.3 is missing.
+Resume this same local lane when genuine evidence arrives; configuration
+works and no further routine engineering approval is requested.
+
+Final internal read-only record QA reproduced both private completion/leaf
+hashes, recorded actual counts/flags, execution-head/source-inventory and
+separate caller lineage under network/all-write/fork denial. It read only
+completion JSON and hash-only leaves, not actual credentials or decoded paid
+rows; no factory/profile/whole-suite repetition, edit or provider call. No
+accuracy correction was needed. Its verification is attributed internal QA,
+not an independent Claude review or a second actual source observation.

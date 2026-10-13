@@ -18,7 +18,9 @@ SECTION166 RECORDS ACTUAL PAID HTTP200/277-BYTE/ONE-ROW ACCESS AND THE
 83,657-FILING OFFLINE CENSUS WITH TWO IDENTICAL DERIVATIONS. NO COMPLETE
 ARCHIVE/IDENTITY/RIGHTS OR BACKTEST-READINESS CLAIM. LOCAL CONTINUATION,
 NO FINAL PUSH CONSUMED; SECTION167 CLARIFIES LOCAL RETROSPECTIVE EARNINGS
-SCOPE AND PREREGISTERS THE BOUNDED248-MONTH SUPPORTING ARCHIVE ACQUISITION.
+SCOPE AND PREREGISTERS THE BOUNDED248-MONTH SUPPORTING ARCHIVE ACQUISITION;
+SECTION168 RECORDS ONE OBSERVED MONTH, ONE SCHEMA-REFUSED MONTH AND246
+UNATTEMPTED WINDOWS. CONTINUATION IS SEPARATELY VERSIONED, NOT A RESUME.
 19,846 OF 99,394 PARENTS ARE REQUEST-BOUND; V3 REMAINS 1,846 OF 1,847;
 THE FOUR CUSTODY FILES AND V1/SCALE/PILOT STAY FROZEN. STRICT D23 RETAINS
 SEVEN NONEXACT QUARTERS. NOT BACKTEST-READY: REAL EARLY EARNINGS, IDENTITY,
@@ -23800,3 +23802,74 @@ source rights, permanent protocol/look roots or backtesting readiness. Six
 carried P2s and both final historical access classifications remain unchanged.
 Shared documents/frozen custody bytes and strategy economics stay untouched.
 Proceed after clean committed preflight; no new Claude wait or final push yet.
+
+## 168. Observed monthly capture and separately versioned continuation decision (2026-10-13 UTC)
+
+### 168.1 Actual execution and custody evidence
+
+The full candidate/preregistration existed as clean local commit
+7b650d042a0f44c3aa6e6b2c4a34517dc77bd032 BEFORE the actual online run.
+Final record/active-document/EXACT-package checks passed72 in1.38s;202
+source/test files memory-compiled under network/all-write/fork denial.
+The fixed stock-study hash and all four frozen custody bytes relative to
+the accepted85c7755d image were preserved. Matching origin was unchanged.
+These are engineering checks, not actual provider or full-suite evidence.
+
+The minimal-environment CLI used the explicit owner-confirmed rotated file,
+not Keychain or an environment/argv secret. Two transport invocations completed:
+December2005 HTTP200,265,262 bytes,1,526 metadata rows accepted; January2006
+HTTP200,source_currency_schema_refused. January's schema-refused body was
+neither retained nor hashed; bytes/rows/currency variation are UNKNOWN.
+Do not manufacture an exact problematic currency, reinterpret HTTP200 as
+archive admission or reconstruct discarded bytes. No retry occurred. The
+campaign stopped and246 February2006..July2026 windows remain unattempted.
+
+Private root: artifacts/insider_buying/eodhd_earnings_campaign/campaigns/
+ib-eodhd-campaign-200512-202607-20261013-once/.
+Completion SHA-256 c2607ac0b5b412d5e907ce5a904fa272cbd47cee59385090646d3adc4c12f201;
+manifest SHA-256 ee6c2374ad0b1770ec27dfce781f2dd5a47c4959735f112ec059805dc7eaddf5;
+seven-source execution inventory
+b94a7da3ad295a72dedc190c0a1cae193276696630309f874c34e4946c14f07f;
+accepted body SHA-256
+9e9b8987ff59c976c727c96e0684d0a410139caad912b0d99689fa2a3d149fe3.
+All14 authority/readiness fields remain false; looks/jobs/backtests0/0/0.
+
+Main independently replayed all eight private leaves and two permanent scope
+reservations under OS network/all-write/fork denial, reattached the named
+directories, verified every manifest/scope/start/completion/body hash chain,
+reprojected the accepted raw body with NO actual token access, obtained
+identical metadata and receipt, checked source bytes, and confirmed missing
+January response/metadata leaves. This is an offline custody observation,
+not another request or source authentication. Neither a later handoff commit
+nor a future continuation image is represented as existing during this run.
+
+### 168.2 Delegated policy/engineering disposition
+
+IBEOD-CAMP-R02: an unprojected nonessential currency format was treated as a
+whole-month schema failure. Its exact source value cannot now be measured.
+Correct future ingestion in a NEW VERSIONED continuation, not by editing
+the executed v1 image/root or reissuing January. Register only the246 never-
+attempted windows, bind the exact preceding manifest/completion and global
+overlap fence, and preserve the first campaign's refused disposition.
+Currency variations must not determine earnings identity/date/status admission;
+invalid essential row fields remain ordinal-level quarantined context, not
+guessed mapping/release facts. A credential-safe valid bounded Calendar
+envelope can retain raw rows locally even when individual rows are quarantined.
+Envelope/transport/refusal failures still stop dispatch without retry.
+
+The owner delegated this routine implementation choice; it adds no new source
+dates, provider product, financial interpretation, outcome access or vendor
+right. January remains a real archive gap requiring an independently qualified
+alternative source or supplied archive; it is not hidden by246 later windows.
+Remaining engineering also includes a secure reader for the four explicitly
+supplied Keychain locators and metadata-only full-cohort reconciliation.
+These modules do not themselves verify account access or historical mapping.
+
+Technical result: observed request-bound December custody plus precise refusal/
+unattempted accounting and a non-repeating continuation definition.
+Plain-language result: the archive is partial, and the parser issue has a
+clear forward fix without pretending the missing month was acquired.
+No full lane/repository suite, frozen-file thaw, SEC-parent capture, QC job,
+backtest/look or trading occurs. Six carried P2s stay OPEN. Shared/project
+records remain frozen; monitor PAUSED; no push is consumed. Continue the
+authorized local build; this observed handoff is not a final readiness claim.

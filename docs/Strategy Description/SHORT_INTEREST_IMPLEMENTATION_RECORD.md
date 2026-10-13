@@ -3,9 +3,10 @@
 Status: **CODEX HAS ACCEPTED CLAUDE'S SOLE RECORD COMMIT `0cfb574a` AFTER
 COMPLETE COUNTER-REVIEW (SECTION 115). THE OWNER EXPLICITLY SELECTED THIS
 EXISTING REVIEW, NOT ANOTHER PUSH; ITS WAITING ONE-SHOT IS DELETED. HISTORICAL
-CLASS/DENOMINATOR AND PAYMENT QUALIFICATION NOW PROCEEDS ON THE ORIGINAL
-PROTECTED MAC INPUTS UNDER EXISTING DELEGATION. NO CAPTURE OR BACKTEST IS
-CLAIMED FROM A PROSPECTIVE FREEZE. THE ORIGINAL TWELVE-, SIXTEEN- AND
+THIS BOUNDED ROUND COMPLETED PROTECTED CLASS/DISCLOSURE/SEC-ORIGINAL SOURCE
+CAPTURES AND THE OFFLINE NATIVE/CLASS BRIDGE, NOT FULL-STUDY QUALIFICATION OR
+BACKTEST READINESS. EODHD CREDENTIAL LOCATION ONLY IS RETAINED IN SECTION 115.5;
+ITS VALUE WAS NOT READ. THE ORIGINAL TWELVE-, SIXTEEN- AND
 SIXTY-TWO-REQUEST BUDGETS REMAIN CONSUMED. CANONICAL ORIGINAL-VINTAGE PIT AND
 LATEST-REVISED EXPLORATION STAY DISTINCT. LOOKBACKS 20/60/120/252 UNSELECTED;
 CANONICAL ACTUAL LOOKS 0/0, EXPLORATORY ACTUAL LOOKS 0, ALPHA 0, PERMANENT
@@ -225,6 +226,8 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-12 | Codex Windows counter-review / host prerequisite | Exact Claude `2ef9a4f889eda9496254ae1ca43d946eb9378374`, `ab85a032759cf5b5924a51caf1c8417cae2d6adc`; counter-review commit follows | Per-commit counter-review, selective Windows test coverage and append-only record errata; protected-runtime preflight is the next bounded prerequisite | No production change in the counter-review: preserve all assertions and the nested non-admission regression; restore neutral tests without weakening protected storage. Exact byte recipe reproduces section 111.10. Preserve historical IDs and current delegated authority. | Main focused **280 passed, 257 skipped in 8.25s**; 52-case original selection **52 skipped in 1.34s**, delegated marker-only memory probe 52 green; exact historical-body 1,444,434 bytes / `608f7d99...713401`. Final host-preflight validation/publication follows in section 113. | No new P0/P1. Broad skips and issue-ID collision corrected; permission versus factual gates qualified. Actual POSIX-only storage and absent protected inputs remain factual limitations, not a new generic owner-approval gate. | Commit counter-review first, then implement and validate the named host preflight; one combined final lane push. No source recapture, consumed-budget reset, actual look or QC attempt. Retire only the handled one-shot monitor after publication. |
 | 2026-10-12 | Codex host-prerequisite completion | Accepted Claude `ab85a032` -> counter-review `c83011cf5ac46a55617d1ae633c95e6f9d7224da` -> implementation `c4c57770224e1ba8a601f5adefa5e974b1e0e4dc`; this record-only closing commit follows | Seven SI runtimes gain one fixed capability refusal; 64 unskipped host-boundary cases, explicit fabricated capability fixtures for 31 neutral functions | Original POSIX ownership/mode/no-follow, immutable receipts/claims, budgets, source gates and economics retained. This is host-safe refusal only, not Windows ACL parity or actual source qualification. | Main closing focused **344 passed, 257 skipped in 11.31s**; 34 entry-guard removals **34 failed / 30 passed**, restored **64 passed**; all16 changed Python files compile in memory; existing assertions and 27 protected bodies mechanically preserved. Section 113.5-113.7. | No new P0/P1; protected Windows storage and original-input source P2s remain open. Historical source/shared/prospective issues retained. Zero source requests, looks and QC attempts in this round. | Exactly one combined non-force target-ref push after closing checks, then retire only this handled one-shot monitor. Claude reviews every new commit; factual continuation needs original protected inputs, receipts and spent claims without recapture/reset. |
 | 2026-10-13 | Claude review (macOS session) | `ab85a03` -> `d3ac5bf` reviewed from the published head; **no code or test correction**; this record commit is the only Claude commit | Independent review of Codex's Windows counter-review, the POSIX-only test markers and the protected-host capture prerequisite | Verified the marker change is mechanical (104 decorators, no assertion changed), the guard is capability-only and placed first on all 34 sensitive paths, and POSIX behaviour is unchanged. Confirmed the original master and native-binding captures exist on this Mac with matching section-111 byte digests and 0600/0700 protection. Ran two in-memory probes of the guard; both red. | Pushed tree `d3ac5bf`, clean, network-denied, empty environment: Codex's eleven-file selection **601 passed, none skipped** (Windows: 344 passed, 257 skipped); platform baseline 64 passed; changed files compile; final-tree active-document 69 passed; `git diff --check` clean. **No complete lane suite, by owner direction.** **Authorized looks 0, consumed looks 0**. | No new finding. `SI-CCR-WIN-20261012-001..003` accepted. `SI-CR-WIN-20261012-001` (P3) and `-002` (P2) open. `SI-CR19-003`, source P2s, shared P2 and `SI-CR15-001` open. | Codex counter-reviews this record commit, then continues section 111.10's class, denominator and terminal-payment qualification on this Mac from the original captures. Every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
+
+| 2026-10-13 | Codex counter-review + bounded historical source qualification | Accepted sole Claude `0cfb574a`; new Codex `de044654`, `4539682f`, `da3edc51`, `c790bd3d`, `9e05c7f1` plus this closing record; exact hashes in115.8 | Protected class/denominator, disclosure, native-class bridge and SEC-original evidence | Exact existing review accepted before implementation. Thirty class, four disclosure and one anonymous original GETs complete under committed prospective protocols; offline bridge/replays preserve original consumed budgets. EODHD credential location only retained, token unread. Not full-study qualification or backtest readiness. | Main **576 focused passes in7.40s**,15 Python files compile in memory, active-document/diff/status and original-byte checks. Canonical actual0/0, exploratory0, alpha0, QC attempts0; Step3 not registered/executed, no node query. | Five continuation findings corrected before affected application; retained historical source/shared/Windows/prospective rows unchanged. Pre-publication ledger omission corrected in this record. | One combined final non-force matching-lane push. Claude reviews the exact combined snapshot; next qualify full-study class/count/payment facts before real-look/QC registration. Waiting one-shot deleted; other paused monitors unchanged. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -17865,3 +17868,142 @@ credential or original-source request during derivation. Commit this hash
 and record locally, require clean HEAD/unchanged actual matching remote,
 then execute once with no secret environment, retry, extra link or fallback.
 Actual success/refusal and factual backtest boundary will be recorded below.
+
+### 115.8 Actual SEC-original transport, closing gates and next handoff
+
+Clean prospective **`9e05c7f1c3184afeca0a1748a3335da4a37483c6`** preceded
+the one permitted anonymous SEC-original GET. Protected ignored run
+`artifacts/short_interest/terminal_originals/terminal-originals-20261013T224853Z`,
+start **2026-10-13T22:48:53.542354Z**, completion
+**2026-10-13T22:49:13.552376Z**. Exactly **one started/received GET, HTTP200**,
+under the prospectively pinned protocol115.7, with zero credential reads,
+retry, redirect, proxy, additional link/exhibit follow or replacement target.
+Private payload SHA
+**`57408dcd988e3a18edd0d1721571a7b176babd57859f4e5e8814c6775cd8ebc9`**;
+file SHA **`e91e9a1b16cb37fb79b514774f3bee0b8c6cde3f384ce24c2787acde0c39ac58`**.
+Main independently verified descriptor/protocol/code identity, request and
+completion chronology, raw-byte digest/report seal, the consumed global claim,
+and owned 0700/0600 non-symlink storage. Exact source URL, accession and original
+text stay private. Verified source-byte transport is not a verified shareholder
+payment, per-share consideration, historical availability or economic-admission
+finding; none is fabricated from the successful download.
+
+Actual new source GETs in this round total **35 = 30 class + 4 disclosure +
+1 SEC original**, each under its own prospective committed protocol and spent
+claim. Offline bridge/reconstruction adds zero provider requests. The original
+twelve-, sixteen- and sixty-two-request captures/claims remain unchanged and
+consumed. No EODHD/Sharadar/FINRA provider request, QC call, account interaction
+or email access was performed; original protected Sharadar inputs were read
+offline, not reacquired. Only the authorized existing named Massive environment key was used in the
+two Massive capture runtimes, never printed, logged, hashed or committed.
+The SEC original was anonymous; the owner-supplied EODHD pointer is retained,
+not its token or an inferred verified entitlement.
+
+**SI-DEC-20261013-11** closes this genuinely completed **bounded source
+qualification milestone**, not the project or the requested backtest. Step2
+now has independently replayed query-date class/particular-class-count evidence,
+a refusal-preserving native/composite/class bridge, retained disclosure
+transport and a sealed exact original. It still lacks independently qualified
+full-study effective identity/share-class relations, same-class denominators,
+and exhaustive applicable corporate-action/payment/terminal bindings. A
+ten-token, three-date route pilot cannot be relabelled the full population or
+backdated into effective/availability history. No original text was promoted
+automatically into merger consideration or payment economics. Those missing
+facts, rather than owner research permission or institutional affiliation,
+prevent actual-input admission.
+
+Step3 was **not prospectively registered or executed**: no new real look ID,
+signal/outcome join, strategy evaluation, actual prices/returns, or QC
+candidate/project/processing/upload/compile/job/backtest. No authenticated
+node-capacity query occurred; node occupancy was not inferred and no other
+lane was stopped, reassigned or overwritten. Exact permitted source processing
+and an order representation preserving all fixed48-book rational economics
+remain prerequisites alongside the full-study input contract. Neither missing
+canonical original/all-correction vintages nor a fixture's old false flag is
+used to deny a separately qualified latest-revised candidate; such a candidate
+has not yet been independently qualified here. Actual-input refusal stays
+enforced. Canonical actual looks **0/0**, exploratory actual looks **0**, alpha
+**0**, permanent real look IDs **none**, QC attempts **0**. No invented
+performance result or Completed-status claim.
+
+Preserve lookbacks **20/60/120/252** without a winner, structural normalization,
+release-next-open reranking and the fixed48-book economics. Preserve evaluation
+2023-01-03–2026-08-31, protected validation2026-09-01–2027-08-31 and sealed
+holdout2027-09-01–2029-08-31; no protected outcome was read. No FIGI cast,
+issuer-share transfer, rational-volume rounding, current-reference backdating,
+missing-terminal-cash-to-zero, completion/ex-date-to-payment, native QC
+whole-share/ex-date/delisting substitution, production/ETF/ranking/seed change,
+purchase/terms/credential issuance, broker/operator database, deployment,
+paper/live, funded capital, real orders or trading action.
+
+The retained P0–P3 ledger and Claude0cf **accepted** disposition115.1 stand.
+Confirmed continuation findings `SI-HIST-20261013-001`,
+`SI-DISC-20261013-001`, `SI-CLOCK-20261013-001`,
+`SI-BRIDGE-20261013-001` and `SI-ORIG-20261013-001` were corrected and
+proved before their affected actual application; they are not defects
+attributed to Claude's record-only commit. Historical partial/false-alarm rows
+and all source/shared/Windows/prospective gates listed115.1 remain; no shared
+behavior was changed. The privacy audit's email-shaped match was a fabricated
+SEC-URL-userinfo rejection fixture, not a private contact or secret.
+
+| ID | Priority / disposition | Closing evidence and correction |
+|---|---|---|
+| SI-HANDOFF-20261013-001 | P3 confirmed, corrected before publication | Independent closing audit found the draft lacked the section5 required row for this new push. Appended one dated row identifying all five local commits plus this closing record,35 source GETs,576 focused passes and unexecuted Step3. Mechanical record comparison removes exactly this new row and current status/appended115, then reproduces all old bytes; no historical ledger row is rewritten. |
+
+Exercised authority inventory: owner `SI-AUTH-20261013-01..03`, settled
+`SI-AUTH-20261011-05`, publication `SI-AUTH-20261005-02`; delegated choices
+`SI-DEC-20261013-01..11`, each defined above. No new generic owner approval
+is required for this completed round or to inspect the retained source evidence
+under the same delegation. Provider facts and exact platform permission cannot
+be invented. The retired waiting one-shot remains deleted; all other paused
+monitors are unchanged. No new automation is armed by inference.
+
+Main's closing affected selector: **576 passed in7.40s**, CPython3.13.15 /
+pytest9.1.1, empty inherited environment, network denied, zero skip/warning.
+It includes the new class/bridge/disclosure/original paths, affected native
+provenance, host guards, lane/ML import boundaries and active documents, not
+the complete lane or repository suite. All **15 affected Python files compile
+in memory**; diff whitespace checks pass. Exact changed-file allowlist is
+**16 files**: this record plus fifteen lane-owned source/focused-test files.
+No private receipt/data/config enters Git. Shared/project-wide documents,
+Action Plan and SESSION_HANDOFF.md stay frozen. Removing only the newly appended
+section5 publication row, current status and appended115 reproduces the old
+body through114 byte-for-byte: **1,543,894 bytes**, SHA
+**`f1c2c070b94b75a21c4cf294da87dbe1f6af640193aeeaf6da1739e43140fdf5`**.
+All old ledger rows remain. Main's final active-document check after the new
+publication row passes **69 in0.76s**, same network-denied/empty environment.
+Status, diff and actual matching-remote checks precede commit/publication.
+
+Complete ordered new Codex series for the next independent review:
+
+| Commit | Bounded role |
+|---|---|
+| `de0446545d028ce5391221babff825e5963fc7a1` | Exact Claude counter-review accepted; owner override and one-shot retirement recorded. |
+| `4539682f1aff52fc0166c30f23dfeaa6197b72db` | Protected prospective class/disclosure pilots and verified historical provenance correction. |
+| `da3edc513cb64cc758388546a57c82cd3f295437` | Actual class evidence accounting and exact derived disclosure protocol frozen before retrieval. |
+| `c790bd3d1cbb15121b27219220a2d4db7d1cceb4` | Actual disclosure accounting, EODHD location-only memory, prospective native bridge and SEC-original reader. |
+| `9e05c7f1c3184afeca0a1748a3335da4a37483c6` | Actual offline bridge accounting and exact one-original protocol frozen before retrieval. |
+| This closing record commit | Actual anonymous original accounting, retained gates/ledger, final validation and complete next handoff. |
+
+Exactly **one** combined final non-force push is authorized for this completed
+round, from the designated worktree to only
+`HEAD:refs/heads/codex/strategy-short-interest`, follow-tags disabled. No
+interim push occurred. Immediately recheck roots/branch/HEAD/status and actual
+matching remote `0cfb574a` before committing and pushing; concurrency/divergence
+means stop, not rebase/overwrite. Verify clean local/tracking/actual-remote
+equality afterward and report the exact final hash with this review-note link.
+
+**Next serialized action:** Claude independently reviews the exact final pushed
+snapshot and every Codex commit after
+`0cfb574ae64f42757912cc56801d150b5b99a5b0`, including all prospective freezes
+and this closing record; Claude owns the complete lane suite. Codex then
+counter-reviews every resulting Claude commit before the next bounded
+qualification milestone. Continue from protected retained bytes without
+repeating spent captures: qualify full-study same-class identity/count and
+payment/terminal facts, prospectively freeze any necessary admitted supplement
+(including the named EODHD alternative), then register the exact latest-revised
+evaluation/look and permitted order-based QC representation when genuinely
+ready. If a qualified candidate reaches launch, read/recheck node capacity,
+wait for other lanes, preserve the exact candidate, and enforce the three-
+unsuccessful-attempt/Mia-source-comparison rule. This handoff is not another
+request for blanket research authorization.

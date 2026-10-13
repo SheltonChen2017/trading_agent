@@ -20478,3 +20478,62 @@ provenance/earlier-cause P3 labels qualified. Meaningful root-ID4fail/2pass,
 decoded-echo2fail/7pass, duplicate1fail/8pass, ignored-number2fail/7pass,
 finalguard1fail reverse proofs0.55s/0.31s/0.31s/0.30s/0.73s. Accepted-after-
 correction for bounded software only; independent Claude review still pending.
+
+### 87.15 Genuine latest-job terminal evidence and fresh UI availability scope
+
+TERMINAL001 genuinely completed diagnostic/process0 atHEAD01991d2a4bd61a8df5db850faf685d67df495fbf,
+created22:57:50.783988Z/expiry23:12:50.783988Z/ended22:58:02.209291Z,
+plan`001c8235c285e0fb33ad8cc2c08eba8dfcbf3ac6e21e0c808c6e9bbfbbe8c225`.
+21485 exact parent/diagnostic/projection FD bytes;6 actual requests,
+2472206 wire bytes,44515 retained artifact bytes before final receipt.
+Receipt8443bytes/SHA256
+`666e6c74376dd6383fcbe2548674e63529ca6db7c221e6aa2c5d37905fafe408`.
+No new jobs/looks/attempts/source edits/ports; OFF3/ON0/looks30 unchanged.
+
+Latest look30/4936632376c0885358493a2694ed239b native terminal is genuinely
+Runtime Error, completed flag true/progress1, snapshot37743017, matching
+project37650980, unzoned created2026-10-12 23:07:42. Compile ID unobserved.
+Error1427bytes/SHA256
+`554e59448d79911a38321b6c333ca4abd21cd9bff42f84a8ec2609502844dcac`;
+safe markers observe both end-callback and compressed-audit-store strings.
+This supports the owner's final-step account, but does not prove every trade/
+date/clock/fill/fee/journal, precise cause or compiled source equivalence.
+Full terminal raw/error/statistics were NOT retained/disclosed by this selective
+diagnostic; safe envelope1620/78f1496a… and wire2437014/
+`3db9fc72fb59ae8f50b77cc57cea7b541dad3835ba7bd1e2f55f310f69d4ba4d`
+are bound to the exact request. Original failed request's cause stays unproved.
+
+Latest NAV actually has1395 of1449 points; complete_daily_account_nav false,
+not correct-clock/full-window acceptance. Strategy Equity and orders still
+Loading; orders/fills/fees null, not zero. Genuine queried SUMMARY/INDEX each
+has0matching log lines. Native full-window accounting and returns/CAGR/
+drawdown/volatility/Sharpe/annual/turnover/exposure acceptance remain null.
+Neither near-full custom chart nor end marker permits gap filling, changing
+the frozen window, native/sleeve P&L invention or confirmatory alpha claims.
+
+Independent source audit confirms F021/F022 current-source deviations, not
+proven job target/return impacts. Source totals cannot establish provider units
+or complete global membership; RAW/cache parity can agree on the same stale
+price without proving freshness. Root also fetched primary QC universe-data
+examples (fraction-valued weights) and LEAN ETFConstituentUniverse reader
+(parses supplied decimal unchanged):
+https://www.quantconnect.com/docs/v2/writing-algorithms/historical-data/universe-data
+https://www.lean.io/docs/v2/lean-engine/class-reference/ETFConstituentUniverse_8cs_source.html
+These support caution, not an attestation of every historical callback or
+permission to infer percent units for the missing original offending row.
+
+Fresh prospective cooperative UI scope
+TPR-EXT26-OWNER-MIA-UI-AVAILABILITY-20261013-001, at next stable committed
+HEAD with freshly generated <=15minute UTC access/claim receipt BEFORE CUA:
+inspect only exact own37650980 QC browser/native Safari availability, existing
+Mia pane and look29/30 result/snapshot metadata as needed. <=12 AX/DOM
+observations,4screenshots,2own-project navigation/mode actions,300seconds
+active work. No unrelated tab/project/provider/account, source-body disclosure,
+login/cookie/token extraction, credential/EODHD access, edit/approval/Mia-task
+message, manual compile/build/run/input/upload/purchase/live effect. Existing
+IDE auto-build, if normally exposed by viewing, is observation only and must
+be recorded, not requested or counted as a new recovery launch. Stop on lock,
+identity mismatch/unexpected effect/expiry; do not revive stale unavailability
+demands or renew old UI receipts. A further Mia task or job requires its own
+fresh bounded scope and retained new look before effect. This availability
+scope tests a genuine recovery alternative, not acceptance of current edits.

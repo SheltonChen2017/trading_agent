@@ -17689,3 +17689,49 @@ implementation scope. Targeted compilation/diff/historical-record checks
 precede commit. The terminal CLI stays source-pending until a separately
 recorded exact class result and derived private protocol are frozen. No
 actual provider request, look or QC attempt is predicted by these tests.
+
+### 115.4 Actual class capture and separate disclosure freeze
+
+Clean prospective checkpoint
+**`4539682f1aff52fc0166c30f23dfeaa6197b72db`** preceded the single actual class
+capture. Actual matching remote stayed `0cfb574a` through guarded requests and
+publications. Protected ignored run:
+`artifacts/short_interest/massive_class_denominator/massive-class-20261013T221700Z`.
+Start **2026-10-13T22:17:00.032993Z**, completion
+**2026-10-13T22:19:39.327892Z**. Exactly **30 request-start / 30 response
+receipts**, one globally consumed claim; no retry, paging, extra request or old
+budget reset. Permissions/ownership/no-symlink verified. Existing named key used
+only in memory/header; no Sharadar credential, new FINRA or QC request.
+
+| Evidence | SHA-256 |
+|---|---|
+| Capture protocol | `ec57348fb1ac71e16e307e735a917aa884874c094e391407454ce5a4f5297cd0` |
+| Private report payload | `f4b3317db3d83b12e824fa7d2f9055666e46502d2042a9bb4a7ff9362133250a` |
+| Private report file | `a37a030e256e558769e040f82979c74cc98dfc24cc4123aaf118848da1edbb03` |
+
+Main independently reconstructs all thirty requests/status/body-observation/
+raw-digest/clock bindings, exact source/code/protocol/claim and file inventory,
+and reproduces the private report **byte-for-byte**. This replay is empty-
+environment/network-denied, zero credential/API reads, not another capture.
+All provider rows, native/class relations and usability conclusions stay
+private; capture completion is not an admitted full empirical population.
+
+**SI-DEC-20261013-06** separately freezes the derived four-request disclosure
+protocol **`b98c369106561b291e6f01da7d1a7d5849fb1c061b494095d2946fb670a09304`**,
+with the exact source run/code/report pins above and unique private issuer
+assertions. The derived private descriptors are deterministic from those bytes
+and fixed windows/rules in115.2; no CIK/account/entity row is copied into Git.
+The terminal runtime's source/code identity uses binary blobs at the exact
+class-producing checkpoint, avoiding relabelled current-file provenance.
+Historical-code regression covers exact path/head/trailing-newline binding.
+No disclosure request occurred before this separate committed freeze.
+
+Main's post-pin disclosure/boundary/document selector passes **194 in5.65s**,
+empty environment/network denied, zero skip/warning. Explicit test-only host
+capability fixtures isolate neutral fabricated transport checks, never real
+protected filesystem or actual-host boundaries. An initial wrong fixture import
+caused collection to stop; corrected to `portable_capture_platform`, excluded
+as a harness failure, not a production or passed-run claim. Targeted in-memory
+compilation and diff checks precede the separate three-file commit. Old source
+and new class spent claims remain immutable. Canonical actual looks0/0,
+exploratory actual looks0, alpha0, permanent IDsnone, QC attempts0.

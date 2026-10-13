@@ -2,11 +2,14 @@
 from __future__ import annotations
 
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
 import scripts.qualify_short_interest_terminal_disclosure as capture
 from data.hashing import canonical_json
+from data.hashing import hash_bytes, hash_payload
+from short_interest_capture_fixtures import portable_capture_platform
 
 
 def source():
@@ -38,6 +41,7 @@ def test_missing_or_conflicting_issuer_never_falls_back(monkeypatch, change):
         capture._protocol(value)
 
 
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_pending_freeze_refuses_before_any_protected_read(monkeypatch):
     monkeypatch.setattr(capture, "CLASS_SOURCE", Path("artifacts/short_interest/massive_class_denominator/PENDING"))
     monkeypatch.setattr(capture, "_protected_bytes", lambda *args: pytest.fail("must not read source"))
@@ -64,6 +68,7 @@ def test_unsupported_host_refuses_before_source_key_or_transport(monkeypatch, en
                 capture._capture(None, None, None, None, None, head=None, remote=None)
 
 
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_all_four_exact_requests_have_started_receipts_before_transport(monkeypatch):
     protocol = capture.disclosures.freeze_disclosure_protocol(("0001234567", "0002345678"),
                                                                source_class_report_sha256="a" * 64)
@@ -97,6 +102,7 @@ def test_all_four_exact_requests_have_started_receipts_before_transport(monkeypa
 
 
 @pytest.mark.parametrize("failure", ["network", "echo", "oversize"])
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_failed_transport_stops_without_retry_or_secret_publication(monkeypatch, failure):
     protocol = capture.disclosures.freeze_disclosure_protocol(("0001234567", "0002345678"),
                                                                source_class_report_sha256="a" * 64)
@@ -119,6 +125,7 @@ def test_failed_transport_stops_without_retry_or_secret_publication(monkeypatch,
 
 
 @pytest.mark.parametrize("completed_at", ["2026-10-13T23:00:00Z", "2026-10-13T23:00:08Z"])
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_completion_clock_cannot_precede_response_or_report_retrieval(monkeypatch, completed_at):
     """Four requests finish; bad closing clock must not mint completion."""
     protocol = capture.disclosures.freeze_disclosure_protocol(("0001234567", "0002345678"),
@@ -140,6 +147,7 @@ def test_completion_clock_cannot_precede_response_or_report_retrieval(monkeypatc
     assert "completed.json" not in published
 
 
+@pytest.mark.usefixtures("portable_capture_platform")
 def test_enclosing_run_start_must_precede_first_request(monkeypatch):
     """Exercise _run composition, not an unsupported keyword/type refusal."""
     protocol = capture.disclosures.freeze_disclosure_protocol(("0001234567", "0002345678"),
@@ -169,3 +177,20 @@ def test_enclosing_run_start_must_precede_first_request(monkeypatch):
     assert "started.json" in published
     assert "attempt-01.started.json" not in published
     assert "completed.json" not in published
+
+
+@pytest.mark.usefixtures("portable_capture_platform")
+def test_old_class_code_identity_uses_binary_git_blobs_not_current_files(monkeypatch):
+    names = ("scripts/fixture-one.py", "scripts/fixture-two.py")
+    monkeypatch.setattr(capture.class_reader, "_CODE_FILES", names)
+    monkeypatch.setattr(capture, "CLASS_HEAD", "b" * 40)
+    monkeypatch.setattr(Path, "read_bytes", lambda self: pytest.fail("current source must not relabel historical capture"))
+    blobs = {name: ("old-fabricated-" + name + "\n").encode() for name in names}
+    def run(command, **kwargs):
+        assert command[:2] == ["git", "show"]
+        head, name = command[2].split(":", 1)
+        assert head == "b" * 40 and name in names
+        return SimpleNamespace(returncode=0, stdout=blobs[name])
+    monkeypatch.setattr(capture, "subprocess", SimpleNamespace(run=run))
+    assert capture._historical_class_identity(Path("/fictional-source")) == hash_payload({
+        "git_commit": "b" * 40, "files": [{"path": name, "sha256": hash_bytes(blobs[name])} for name in names]})

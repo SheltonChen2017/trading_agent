@@ -9,6 +9,8 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+import re
+import subprocess
 import urllib.parse
 import urllib.request
 
@@ -27,13 +29,13 @@ from scripts.qualify_short_interest_action_supplement import (
     _clock, _existing_key, _parse_receipt, _protected_bytes,
 )
 
-# Pin only after the actual preceding source-only capture. PENDING is a
-# refusal, not permission to find the newest capture or infer a source hash.
-CLASS_SOURCE = Path("artifacts/short_interest/massive_class_denominator/PENDING")
-CLASS_HEAD = "PENDING"
-CLASS_REPORT_BYTES_SHA256 = "PENDING"
-CLASS_REPORT_SHA256 = "PENDING"
-DISCLOSURE_PROTOCOL_SHA256 = "PENDING"
+# Pins come only from the completed preceding source-only capture, never a
+# newest-file lookup. Before that separate freeze, PENDING explicitly refused.
+CLASS_SOURCE = Path("artifacts/short_interest/massive_class_denominator/massive-class-20261013T221700Z")
+CLASS_HEAD = "4539682f1aff52fc0166c30f23dfeaa6197b72db"
+CLASS_REPORT_BYTES_SHA256 = "a37a030e256e558769e040f82979c74cc98dfc24cc4123aaf118848da1edbb03"
+CLASS_REPORT_SHA256 = "f4b3317db3d83b12e824fa7d2f9055666e46502d2042a9bb4a7ff9362133250a"
+DISCLOSURE_PROTOCOL_SHA256 = "b98c369106561b291e6f01da7d1a7d5849fb1c061b494095d2946fb670a09304"
 CAPTURE_PARENT = Path("artifacts/short_interest/terminal_disclosure")
 MAXIMUM_REQUESTS = 4
 MAXIMUM_BYTES = 4 * 1024 * 1024
@@ -51,6 +53,20 @@ def _require(condition, reason):
         raise TerminalDisclosureCaptureRefusal(reason)
 
 
+def _historical_class_identity(root):
+    """Old source provenance uses old binary blobs, never relabelled live code."""
+    _require_capture_platform()
+    _require(type(CLASS_HEAD) is str and re.fullmatch(r"[0-9a-f]{40}", CLASS_HEAD) is not None,
+             "class_source_commit")
+    files = []
+    for name in class_reader._CODE_FILES:
+        result = subprocess.run(["git", "show", CLASS_HEAD + ":" + name], cwd=root,
+                                capture_output=True, check=False)
+        _require(result.returncode == 0 and type(result.stdout) is bytes, "class_source_code_blob")
+        files.append({"path": name, "sha256": hash_bytes(result.stdout)})
+    return hash_payload({"git_commit": CLASS_HEAD, "files": files})
+
+
 def _source(root: Path) -> dict:
     """Rebuild all exact class responses, including status-only missing cells."""
     _require_capture_platform()
@@ -66,7 +82,7 @@ def _source(root: Path) -> dict:
     _require(start.get("schema") == "si-massive-class-capture-start-v1"
              and start.get("code_head") == CLASS_HEAD
              and start.get("run_id") == directory.name
-             and start.get("code_identity_sha256") == class_reader._code_identity(root, CLASS_HEAD)
+             and start.get("code_identity_sha256") == _historical_class_identity(root)
              and start.get("source_pins") == class_reader._source_pins()
              and start.get("capture_protocol_sha256") == hash_payload(protocol)
              and end.get("schema") == "si-massive-class-capture-completion-v1"

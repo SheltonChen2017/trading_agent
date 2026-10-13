@@ -255,6 +255,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-13 | Claude review (macOS session) | `618d1813` -> this review record (no code change) | Independent review of sections 154-158 (`34c323a7..618d1813`, 6 commits, 0 merges: two Codex counter-reviews, the Windows Claude session's review, the one-file LF checkout rule) | Dispositioned all six commits. Accepted `IBTEST-CCR06`, `IBTEST-CCR07` and `IBDOC-CCR15301` against this reviewer after reproducing them: the `117de00d` scanner flags 0 of 7 refusal controls and the corrected one 7 of 7; 30 + 30 added files; 178 collected cases; six open P2s in 153.7. Corrected the section-153 mutant tally to 14 of 18 caught, four redundant. Verified the LF rule on this checkout (`i/lf w/lf`, frozen hash, sibling unaffected). | Changed tests, new checkout test and gate **229 passed** on Python 3.13.15, network denied (Codex's 3.12 runtime no longer has pytest here). Real scan 22 seen / 0 offenders. No complete suite, by owner instruction; production tree byte-identical to section 153.5's. Record tests after this section **71 passed**. **0 looks**. | `IBWIN-OBS01` P3 closed at checkout scope in `bd848b4e`; `IBSH-OBS02` recorded; `IBWIN-CR01` P2 open for the owner's platform decision; `IB1C-REAL-CR01`, `IB1BCAMP-CR01`, `IBSRC-CR01`, `IBSRC-CCR01`, `IBSH-CR02`, `IBQC-SHARED-META01` P2 open. No open P0 or P1. | Codex counter-reviews this record commit. Next data-dependent work per 152.1/154.6; the platform decision is the owner's. The lane is not backtest-ready. No outcome, QC, paper, or trading step is inferred. |
 | 2026-10-13 | Codex counter-review | `618d1813bc762bc1e45e1c65c90933d7d32554a9..85c7755deb75b5d0c61cc4a63a385d4b87b55110`; this separate record follows | Exact one-commit Claude record-only review; continuous build resumes after acceptance | Entire incoming diff and six-commit reviewed range verified; frozen source, attribute scope, module counts and ledger agree. Section160 retains historical measurements as attributed and records delegated decisions. | Main229 passed13.83s; internal peer scanner0/7 to7/7,10/10 controls and real22/0; OS parent/child network denial independently proven. No full suite or retained-root replay. | Incoming85c7755d ACCEPTED, no correction needed. Platform support chosen under delegated judgment; its implementation follows. Six other P2s retained, no openP0/P1. | Continue bounded lane work and qualify real early earnings/identity evidence; one eventual final push, no checkpoint push. Monitor PAUSED. |
 | 2026-10-13 | Codex continued implementation | Counter-review `c666ebee` -> this bounded implementation; exact hash follows in final handoff | Delegated macOS/POSIX custody support and unsupported Windows collection accounting | Named IBWIN-CR01 guards precede custody imports in exactly16 affected tests; new real-child guard regression preserves supported-host collection and independent QC checkout. No production/shared edits or Windows port. | Author480 affected passes55.77s, no skips; internal peer33 passes4.72s and in-memory guard deletion caught;17 tests compile; historical custody blobs unchanged. All tests OS process-tree network-denied. | IBWIN-CR01 CLOSED at documented support/collection scope. Four topical and two shared P2s remain OPEN; no actual Windows custody validation. | Continue source qualification under current factual gates; no checkpoint push, monitor stays PAUSED. |
+| 2026-10-13 | Codex continued implementation / pre-request qualification | Platform milestone `e6f5fb5179db696723bd5cfaaa024c70122a59e1` -> this candidate; actual execution hash follows after commit | Single public EODHD reportDate-field feasibility profile | Two new lane files implement exact one-field/public-demo GET, global one-shot reservation, clean committed source identity and immutable private journals; strict scalar schema and14false authority/readiness flags. Section162 preregisters the only intended request. | Author116 passed0.66s; internal peer116 passed0.61s; main305 passed19.40s before explicit test platform guard, then167 passed2.20s on final test bytes; seven prelaunch red controls prove custody/count corrections. OS-denied tests only. | IBEOD-DEMO-R01 P2 andR02 P3 closed before launch; explicit POSIX test treatment added. No observed supplier response yet; six carried P2s remain OPEN. | Commit clean candidate before one actual bounded request; independently verify private result. No retry, broader fetch, readiness claim or checkpoint push. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -22951,3 +22952,119 @@ archive/identity qualification; the single final push remains unconsumed.
 Main's completed161 platform-regression/active-document/record/exact-package
 selection passes **105 in4.87s**, zero failures/skips/warnings, under the
 same OS denial. Its record/package subset is repeated before commit.
+
+## 162. Real source alternatives and one-field demo preregistration (2026-10-13 UTC)
+
+The owner answered the nonblocking factual-input question: **no existing
+EODHD, Intrinio/Zacks or Wall Street Horizon account/archive; the available
+products are Sharadar bundle and Massive/Benzinga**. This is an input fact,
+not withdrawal of the standing build authorization. Seven conventional
+EODHD/WSH/Intrinio environment names were absent in the internal source
+audit; its bounded lane inventory found no matching archive/configuration.
+Main's bounded supplier-inbox search found one Intrinio thread about another
+lane's Short Interest enquiry, not earnings entitlement. No unrelated mail
+was used, no credential value printed and no vendor message sent. Those
+checks alone would not prove global account absence; the owner's answer
+supplies the current classification.
+
+### 162.1 Alternatives checked and limits
+
+Current primary documentation, read2026-10-13:
+
+- [EODHD calendar specification](https://eodhd.com/financial-apis/calendar-upcoming-earnings-ipos-and-splits)
+  describes historical reported/upcoming earnings with actual report-date and
+  coarse BeforeMarket/AfterMarket/null fields, advertising1990s history.
+  This is a concrete qualification candidate, not measured whole-cohort,
+  delisted/reused-ticker coverage or original revision/availability evidence.
+- [Intrinio/Zacks actual-surprises schema](https://docs.intrinio.com/documentation/web_api/get_zacks_eps_surprises_v2)
+  exposes actual reported date/time and stable record/security identifiers.
+  Exact early/dead coverage, timestamp meaning and governing product/use terms
+  still require a genuine sample and account evidence.
+- [WSH historical product](https://www.wallstreethorizon.com/historical-data)
+  advertises history from2006 with dataset-dependent boundaries. January2006
+  and preceding boundary sessions, actual-release rather than schedule semantics,
+  revisions and the chosen SKU must be confirmed, not inferred from that label.
+- [SEC Form8-K, Item2.02](https://www.sec.gov/about/forms/form8-k.pdf)
+  can corroborate an actual release date and exhibit. Four-business-day filing
+  timing and periodic-report/presentation exceptions mean absence of an8-K
+  cannot establish complete empty release coverage. This free reconstruction
+  route is possible engineering, not proof that a paid vendor is mandatory.
+- [Massive Ticker Overview semantics](https://massive.com/docs/rest/stocks/tickers/ticker-overview)
+  describe date filtering against SEC period-of-report dates. A dated reference
+  query is therefore not, by itself, evidence of public knowledge at that date.
+  Existing Sharadar current-reference snapshots likewise do not supply the
+  missing historical CIK/share-class/SID/listing/PIT bridge.
+
+The purchased post2010 Earnings feed and2022Q4-2023Q1 parent partition still
+cannot replace the frozen early cohort. No window, population, earnings rule
+or outcome specification is changed. The actual2006Q1 assessment retains
+83,657 quarantined filings/71,679 relevant missing parents. More source
+engineering is possible, but extra partial requests cannot establish archive
+completeness, identity or rights by arithmetic.
+
+### 162.2 Exact pre-request contract
+
+[EODHD's current Fundamental specification](https://eodhd.com/financial-apis/stock-etfs-fundamental-data-feeds)
+explicitly permits a public no-signup demo for AAPL.US and nested field filters.
+IBDEC-160-04 exercises the owner's existing delegated source-qualification
+authority for **one free metadata feasibility request**, before any purchase:
+
+`GET https://eodhd.com/api/v1.1/fundamentals/AAPL.US?filter=Earnings::History::2005-12-31::reportDate&api_token=demo&fmt=json`
+
+Only the reportDate scalar for that fiscal key is requested. The public demo
+token is not a private credential. No EPS, estimate, surprise, price, other
+issuer or full-history section is requested. Success requires an exact JSON
+ISO-date string in2006Q1; null, another shape/date, HTTP denial, transport
+ambiguity or oversized/truncated response is recorded as refusal. An
+unexpected response is not admitted as extra source data. No raw row/date is
+printed; successful scalar bytes remain in a private ignored artifact.
+
+`research/insider_buying_eodhd_earnings_demo.py` is inert on import and accepts
+only CLI audit ID and exact expected committed HEAD. It verifies exact root,
+branch, clean status and all five source files against tracked Git blobs,
+then rechecks before/after the only transport. Global exclusive reservation
+prevents a second audit ID repeating this profile. Reservation and started
+records are fsynced before opening HTTP; a killed/ambiguous start cannot resume.
+Certificate verification, empty proxy configuration, no redirect/retry,
+15-second socket timeout and1-MiB bounded reads apply. Directory0700/leaf0600,
+O_NOFOLLOW/O_NONBLOCK, single-link named/FD version/hash checks and final name
+reattachment protect the immutable private journal. Timeout is not rejection
+or evidence of an exact server-request count.
+
+Planned actual audit ID: `ib-eodhd-demo-2006-reportdate-20261013-once` under
+`artifacts/insider_buying/eodhd_earnings_demo/`, whose ignore coverage is verified.
+Actual execution will start only after this code/preregistration is committed
+and the entire tree is clean; its real already-existing HEAD is recorded
+afterward. No source/record edits occur during that run. At most one real
+transport invocation, no fallback/pagination/retry or broader request.
+Fourteen coverage/actual-archive/timing/status/revision/identity/PIT/rights/
+canonical/QC/outcome/backtesting/execution flags remain false even on success.
+
+### 162.3 Prelaunch corrections and exact validation
+
+| ID | Priority | Status | Issue and concrete reason | Correction | Red/green evidence |
+|---|---|---|---|---|---|
+| IBEOD-DEMO-R01 | P2 | **CLOSED before launch** | Initial FD-only reads could authenticate displaced named bytes or miss changed permissions/link counts; final journal attachment and FIFO opening also needed explicit protection. This would overstate named custody. | Named-before/opened/FD-after/named-after versions include mode/nlink/ctime; O_NONBLOCK, repeated regular/private checks and final ancestor/audit attachment. | Three during-read swap/mode/hardlink controls, FIFO/open guard and final named-directory reattachment fail on the initial in-memory image and pass corrected. |
+| IBEOD-DEMO-R02 | P3 | **CLOSED before launch** | Initial `request_count=1` asserted measured server requests even on timeout/no response. Intent cannot supply an observed network count. | `transport_invocation_count=1` with separate `http_response_observed`; no asserted measured server count. | Count-name and timeout/no-response controls fail on the initial image and pass corrected. |
+| IBWIN-162-OBS01 | P3 | **CLOSED before launch** | New custody tests need the documented unsupported-host treatment too. | Explicit named IBWIN-CR01 module skip on non-POSIX, before the lane import. | Final Mac116-case source file plus51 boundary cases pass; no actual Windows validation claimed. |
+
+Author initial-image proof: **7 failed/108 deselected in0.39s**; corrected
+file **116 passed in0.66s**. Internal peer independently passed **116 in0.61s**
+and found no remaining material request-safety issue. Main's combined source/
+platform/import/document/hygiene/exact-package selection passed **305 in19.40s**
+before the final test-only platform guard. Main then passed the final source
+file and lane boundary **167 in2.20s**. These overlapping counts retain their
+test-image qualifications and are not a full lane/repository suite.
+All tests/mutants were OS process-tree network-denied, minimal environment,
+Python3.13.15 `-B`, plugins/cache disabled and isolated database/temp paths.
+
+Final module SHA-256:
+`cc1fbbd3a58a518da772dc44148079664eb670f06724fc8a141b20c9a906c085`.
+Final test SHA-256 after the platform guard:
+`0587b727993e7e7e48486e8dcbd3839743500ddcb957350998e62f77300d9e5b`.
+Five-source inventory SHA-256:
+`1bc5bc77b79e68dccd325ae4e552a891e418427e9cc59adc9f2f72535ac6dbee`.
+Sources compile, whitespace checks pass, frozen custody/QC files are unchanged.
+No supplier API request or observed response exists when this preregistration
+is written; it must not be relabeled as a completed capture. Six carried P2s
+remain open, no openP0/P1. Looks/jobs/backtests **0/0/0**.

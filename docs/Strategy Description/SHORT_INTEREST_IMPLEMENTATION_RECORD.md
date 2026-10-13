@@ -1,25 +1,17 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE (MACOS SESSION) HAS REVIEWED THE THREE CODEX COMMITS IN
-`ab85a03..d3ac5bf` (SECTION 114) AND ACCEPTS THEM WITH NO CORRECTION. ON THIS
-POSIX HOST CODEX'S ELEVEN-FILE SELECTION PASSES 601 WITH NONE SKIPPED,
-INCLUDING THE 257 PROTECTED-I/O CASES WINDOWS SKIPS; THE NEW PROTECTED-HOST
-GUARD PASSES HERE, SO POSIX CAPTURE BEHAVIOUR IS UNCHANGED, AND BOTH IN-MEMORY
-PROBES OF IT WENT RED. WINDOWS NOW REFUSES CAPTURE SAFELY BUT HAS NO
-PROTECTED-STORAGE PARITY (`SI-CR-WIN-20261012-002`, P2, OPEN). THE ORIGINAL
-SECURITIES-MASTER AND NATIVE-BINDING CAPTURES THAT SECTION 113 FOUND ABSENT ON
-WINDOWS ARE PRESENT ON THIS MAC, 0600/0700, WITH THE SECTION-111 BYTE DIGESTS
-MATCHING; THE NEXT FACTUAL STEP CAN CONTINUE HERE FROM THEM AND THEIR SPENT
-BUDGET. NO COMPLETE LANE SUITE WAS RUN THIS ROUND, BY OWNER DIRECTION. THE
-NEXT STEP IS SECTION 111.10'S HISTORICAL CLASS, SAME-CLASS DENOMINATOR AND
-TERMINAL-PAYMENT QUALIFICATION, THEN LOOK REGISTRATION (`SI-CR19-003`); THE
-CANONICAL PIT STUDY REMAINS BLOCKED ON ORIGINALS, CORRECTIONS AND AVAILABILITY
-CLOCKS. THE THREE SOURCE P2s, THE SHARED P2 `SI-CR5-005` / `SI-CCR16-007` AND
-`SI-CR15-001` REMAIN OPEN. LOOKBACKS 20/60/120/252 REMAIN UNSELECTED; REAL
-LOOKS 0/0, ALPHA 0, PERMANENT LOOKS NONE, QC ATTEMPTS 0. OUTCOMES, HOLDOUT,
-PRODUCTION RANKING/SEEDS, ETF, QC HISTORY/PROJECT/UPLOAD/COMPILE/JOB/BACKTEST,
-PURCHASE, BROKER, OPERATOR DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL, ORDERS
-AND TRADING REMAIN GATED.**
+Status: **CODEX HAS ACCEPTED CLAUDE'S SOLE RECORD COMMIT `0cfb574a` AFTER
+COMPLETE COUNTER-REVIEW (SECTION 115). THE OWNER EXPLICITLY SELECTED THIS
+EXISTING REVIEW, NOT ANOTHER PUSH; ITS WAITING ONE-SHOT IS DELETED. HISTORICAL
+CLASS/DENOMINATOR AND PAYMENT QUALIFICATION NOW PROCEEDS ON THE ORIGINAL
+PROTECTED MAC INPUTS UNDER EXISTING DELEGATION. NO CAPTURE OR BACKTEST IS
+CLAIMED FROM A PROSPECTIVE FREEZE. THE ORIGINAL TWELVE-, SIXTEEN- AND
+SIXTY-TWO-REQUEST BUDGETS REMAIN CONSUMED. CANONICAL ORIGINAL-VINTAGE PIT AND
+LATEST-REVISED EXPLORATION STAY DISTINCT. LOOKBACKS 20/60/120/252 UNSELECTED;
+CANONICAL ACTUAL LOOKS 0/0, EXPLORATORY ACTUAL LOOKS 0, ALPHA 0, PERMANENT
+LOOK IDS NONE, QC ATTEMPTS 0. NO ACTUAL OUTCOME JOIN OR QUALIFIED CLOUD
+CANDIDATE EXISTS YET. HISTORICAL SOURCE/SHARED/PLATFORM/PROSPECTIVE LEDGER
+ROWS REMAIN; NO FULL LANE OR REPOSITORY SUITE WAS RUN BY CODEX.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -17536,3 +17528,61 @@ environment:
    production ranking and seeds, ETF work, any QuantConnect history/project/
    upload/compile/job/backtest, purchases, broker, operator database,
    deployment, paper/live, capital, orders and trading.
+
+## 115. Codex counter-review and historical class/payment qualification — 2026-10-13
+
+### 115.1 Existing-review override and complete counter-review
+
+**SI-AUTH-20261013-01** records the owner's explicit clarification: "yes, I
+mean the existing review at 0cfb574a. don't wait for another push—counter-review
+it now, then proceed with steps 2 and 3." This supersedes the 2026-10-13
+one-shot's requirement for a new push beyond that checkpoint, not the lane
+invariant, factual gates, protected periods or single-publication rule.
+**SI-DEC-20261013-01** starts the serialized manual round on the clean
+designated Mac worktree/branch and accepts the exact completed review below.
+**SI-DEC-20261013-02** retires the waiting one-shot immediately so it cannot
+race this round. The native automation tool confirms
+`watch-claude-s-next-short-interest-review` has `deleteStatus: deleted`.
+The exchange-archive reply and old Claude-plus-QC monitors remain PAUSED and
+unchanged; no new monitor is inferred.
+
+Local HEAD, matching tracking ref and actual `origin` lane ref were all
+`0cfb574ae64f42757912cc56801d150b5b99a5b0`. Fetch was restricted to the
+matching ref, `--no-tags`, without force. Complete pending ordered range:
+`d3ac5bfdab9f95fe8800592e3ec6195d675a0044..0cfb574ae64f42757912cc56801d150b5b99a5b0`.
+It contains exactly one linear record-only Claude commit; no merge, test-only
+or code commit is omitted. Section 114 durably identifies the exact three
+Codex commits and completed independent review; no name/push inference or
+new-trigger claim is used. Local was already synchronized; no fast-forward
+is claimed. Earlier accepted reviews are context, not newly repeated work.
+
+| Exact Claude commit | Exact parent | Disposition and evidence |
+|---|---|---|
+| `0cfb574ae64f42757912cc56801d150b5b99a5b0` | `d3ac5bfdab9f95fe8800592e3ec6195d675a0044` | **Accepted**, no correction. Complete record-only +181/-17 diff, all three dispositions, selective-marker/first-guard contracts, retained ledger and zero-outcome/owner-authority distinctions independently checked. No new P0-P3 finding. |
+
+Main's own focused execution: **153 passed in 6.64s**, CPython 3.13.15 /
+pytest 9.1.1, empty inherited environment/network denied, platform file plus
+lane/ML import boundaries and active documents. The read-only counter-review
+agent separately ran **64 passed in 0.67s**, reproduced in-memory OS-guard
+removal **36 failed/28 passed** and first-master-CLI-guard removal
+**1 failed/63 passed**, with runtime bytes unchanged. Its AST comparisons
+verify 104 marker decorators preserve assertions/bodies and exactly 34
+production guard calls. Its 601-case/257-POSIX-marker check was **collection
+only**, not execution. Claude's 601 passes in section 114 remain Claude's
+execution. No complete lane/repository suite was run by Codex.
+
+Main independently verifies **84 owned 0600 files / 5 owned 0700 directories**
+with no symlink in the two original protected master/native roots. Saved
+native-index and observation bytes match the exact section-111.9 digests.
+Only metadata/byte-integrity is reported, no row or private fitness conclusion.
+These checks read no credential, request no provider, consume no outcome look
+and make no QC call. Windows protected-storage parity remains open; it does
+not block genuine protected Mac continuation.
+
+Retain every historical confirmed, partial and false-alarm row. No new P0/P1
+or correction. `SI-SRC-20260928-001..003`, shared/out-of-lane `SI-CR5-005` /
+`SI-CCR16-007`, `SI-CR-WIN-20261012-001..002`, `SI-CR19-003` and
+`SI-CR15-001` keep their existing facts/statuses. No shared correction or
+frozen project-document edit. Steps 2 and 3 continue below under existing
+personal local source authority and delegated prospective choices; no generic
+permission-letter, affiliation or repeated blanket-approval gate is added.

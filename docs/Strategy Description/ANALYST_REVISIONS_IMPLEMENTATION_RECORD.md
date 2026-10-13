@@ -531,8 +531,14 @@ Section 295 records the owner's subsequent **"disarm the monitor"** and
 **PAUSED**, with its saved prompt/schedule/baseline preserved. The fresh waiver
 covers only the bounded HTTP-status observation diagnostic and its output
 authentication, not a replay of R293/R294 or future contracts. Its exact
-prospective protocol and run decision must be committed before contact;
-no independent acceptance or capture success is inferred from this waiver.
+protocol and run decision were committed at `5a80c284` before the sole use.
+The caller and once-only offline reader both exited 2: authenticated current
+ratings status 200, earnings status 403, then stop before guidance. No body
+or capture was accepted; the specific reason for the 403 is unknown. Both
+uses and this current waiver are now spent. Section 295.6 defines the next
+access/coverage barrier; no independent acceptance or future contact authority
+is inferred. The EODHD subscription direction and token-file location are
+retained in 295.1 without reading the token or opening Safari.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1566,8 +1572,15 @@ the monitor is now paused, not deleted or automatically rearmed. The owner
 explicitly waives Claude review of section 295's current bounded HTTP-status
 diagnostic and its output authentication on the new "proceed without review"
 instruction. The immediate next step is section 295's exact committed
-one-shot status-observation protocol, subject to all technical gates; no
-spent acquisition, source reader or historical diagnostic is renewed.
+one-shot status-observation protocol, now completed once as recorded in
+295.5 and not renewed: ratings returned 200, earnings returned 403, guidance
+was not dispatched, and no capture was accepted. The next admissible work is
+to establish the existing account's earnings endpoint access, or separately
+assess the owner-authorized EODHD Calendar coverage for a justified source
+plan. Neither a 200 nor the reported EODHD subscription proves needed fields,
+PIT history or cross-vendor identity compatibility. No new provider call,
+acquisition, source substitution or strategy run is automatic; a new bounded
+contract and normal review/run-freeze gates apply. Monitor remains paused.
 The owner previously said
 "proceed" after the open-session concern was explained. Section 272 supersedes
 the session-exit prerequisite, without authorizing any process interruption.
@@ -3471,6 +3484,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-13 | Claude independent review of sections 289-290: the source-complete failure classifier and the one-call observation seam | `c7369649` -> the test correction and this record commit | Section 291: three Codex commits `ef654b1d..c7369649` disposed (2 accepted, 1 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells; no capture, assessment, publication or probe run | Two regression tests added to `test_massive_capture_failure.py` for the classifier's module-name check and 200-character bound (`ARV2R291-001`); no production code changed. Four pins reproduce; the inventory is verified against all 145 adapter literals and 30 templates; the pre-fix classifier fails the five new tests; 10 in-memory guard removals tabulated; the second device renumbering is recorded; section 4 names section 291, banner sentence added, this row appended | Focused files and record gates at `c7369649` and on the final bytes, strict sandbox with in-root temporary paths, `compileall`, artifact and status integrity, `git diff --check`; the complete lane suite was not run this round at the owner's direction; exact counts in 291.6 | 0 P0, 0 P1, 0 P2, 1 P3 | Single push of this round's two Claude commits; Codex counter-reviews section 291 unless the owner changes the workflow |
 | 2026-10-13 | Codex counter-review of section 291 and real bounded Massive caller implementation, uninvoked | `38e2b97a` -> `52542bb0` and final section-293 caller/test/handoff commit | Both Claude commits disposed in 292: test correction accepted, record accepted after four documentary qualifications; no historical audit replay | Fixed October-12 three-role first-vintage diagnostic caller, exclusive durable claim, 150-second parent deadline, finite 16-KiB channel, separate native-network-denied physical authentication; no receipt publication or R287 renewal | Root final focused selection 289 passed in 3.29 s; changed Python sources compile without bytecode; two classifier omissions and four new-caller omissions caught; earlier missed guards and fixture failures disclosed in 292.3/293.4; no full Codex suite | Historical P2s retained; all four pre-invocation implementation/test findings in 293.3 corrected; 314/239/50/699 unchanged | Exactly one final matching-lane push; monitor remains active; Claude independently reviews section 293 before counter-review and a separate exact run freeze; no actual claim, credential, provider or QC action |
 | 2026-10-13 | Owner-waived one-shot October-12 Massive diagnostic | `fb8c87ad` -> `d9a3b89a` and final section-294 result/handoff commit | No new Claude range; explicit current owner waiver, not independent acceptance | Sole unchanged caller exited 2; once-only output reader authenticated `producer_raised` / `http_status` failure evidence, not an accepted capture; both spent | 284 distinct focused passes in 2.94 s; 86 record repeat in 0.95 s not additive; two reader omissions caught; no complete suite | Exact status/role/request count unknown; historical P2s retained; no renewed R287 or formal gate clearance; 314/239/50/699 unchanged | One matching-lane final push for the concluded round; active monitor advances past own Codex commits; no unchanged retry |
+| 2026-10-13 | Owner-waived status-only Massive recovery, monitor disarm and EODHD access note | `032c81e2` -> `5a80c284` and this final section-295 result/handoff commit | No new Claude review; fresh scoped waiver, not independent acceptance or reuse of section 294's waiver | Sole current status observation and native-network-denied reader exit 2; ratings 200, earnings 403, guidance not dispatched; no response body or accepted capture; both uses spent | 224 distinct focused passes in 4.14 s; 86-test record repeats overlap; two expected red mutations with the initial harness limitation retained; no full suite | Current earnings HTTP refusal retained as ARV2D295-001; historical causes still unknown; no QC/look/cell changes, floor 314/239/50/699 | One final matching-lane push; monitor PAUSED; token location retained without token access; next source/access decision needs a separately scoped contract, not an unchanged retry |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -46200,3 +46214,115 @@ After this sole status observation and output-only read, stop at the factual
 next barrier, record all evidence/limitations and make one final lane push.
 Do not automatically launch a new acquisition, EODHD fallback, QC request,
 strategy run or another diagnostic under this waiver.
+
+### 295.5 Actual one-use result and authenticated failure evidence
+
+The exact clean run freeze is
+`5a80c2841c8586564c33336e53da7ee35b206a88`. Immediately before dispatch,
+the designated root/branch/HEAD and clean status were verified; live matching
+remote remained `032c81e2b564e8b174f50c173bda8947c3e73925`. Caller, all eight
+selected dependency pins and canonical profile matched 295.3. No intermediate
+push occurred. The actual environment was not stripped of SSLKEYLOGFILE.
+
+`ARV2OD295-D2` dispatched once at **2026-10-13 22:39:25 UTC**; completion was
+observed at **22:39:29 UTC**, with actual process **exit 2** and the normal
+finite double-LF envelope, terminal **`http_status`**. These external
+second-resolution dispatch/poll readings bracket observation; they are not
+precise provider timestamps or measured request duration. The envelope
+passed exact canonical/key/type/profile/size/hash/count checks before D3.
+
+The returned external output pin is:
+
+- `artifacts/analyst_revisions_v2/massive_diagnostic/R295-20261013-A/report.json`
+- **888 bytes**, SHA-256
+  `474617fb26b949cc457cda17c60e362e47a211114f7aad56242e77398ab9dee6`
+- Profile SHA-256
+  `3b07411ca1165a4608b1026b9cd2f0d8e1d5da0d54825c83e5f391fc1c631163`
+- `send_attempt_count=2`, `provider_request_count=null`.
+
+`ARV2OD295-D3` dispatched once at **22:39:44 UTC** under native `network*`
+denial; completion was observed at **22:39:49 UTC**, actual **exit 2**. Its
+strict canonical double-LF summary matched the actual parent exit and external
+report/profile pins. It returned **`output_authenticated=true`**,
+**`diagnostic_complete=false`**, **`attempt_consumed=true`**, and exactly:
+
+| Ordered role | Fixed endpoint | Validated current status | Terminal |
+|---|---|---|---|
+| `analyst_ratings` | `/benzinga/v1/ratings` | **200** | `status_200` |
+| `earnings` | `/benzinga/v1/earnings` | **403** | `http_status` |
+
+Both rows have `send_intent_recorded=true`. The first refusal stopped the
+sequence: **no guidance send was dispatched**. Two acknowledged local send
+intent boundaries are not a measured provider/server request count, which
+remains null/unknown. The reader authenticated the new claim as **364 bytes**,
+SHA-256 `0c86045773f2fb6208e02c4d5f506dd053f486326f2d71c8203472a4f7259d60`.
+No independent marker inventory, private corpus census or additional output
+read followed. Both the operational diagnostic and its output reader are now
+**SPENT**, as is this scoped pre-use review waiver.
+
+`capture_accepted=false`, `point_in_time_proven=false`,
+`paper_look_committed=false`, `qc_calls=0`, and `outcome_reads=0` were retained.
+No accepted capture/manifest/receipt was returned. The new protocol did not
+read response bodies, create a data capture, follow pagination, retry,
+substitute sources, call QC/capacity, or launch a strategy backtest. The
+earlier R287/R293 failures and their output leaves remain untouched.
+
+### 295.6 Disposition, concrete barrier and final handoff
+
+**Technical outcome:** the prospective bounded observation retained and
+authenticated the current role and numeric refusal that the old adapter
+discarded. **Data outcome:** no three-role capture is available. Ratings 200
+establishes only that this exact current header request returned 200, not
+body validity, row completeness, broad account entitlement or historical
+availability. Earnings 403 is an observed refusal, not an authenticated
+diagnosis of subscription scope, key restrictions, provider policy or any
+other specific cause. No failure body was read to infer such a cause.
+
+**Plain-language outcome:** the status diagnostic worked well enough to
+show where the current request stops: ratings responds, but earnings refuses
+access. Guidance remains untested. We still cannot build the required complete
+input from this run, and neither earlier failure has been retrospectively
+explained. The owner-provided EODHD access and token location are recorded
+for future work, not silently substituted into this diagnostic.
+
+| ID | P | Status / disposition |
+|---|---|---|
+| `ARV2D295-001` | P2 | **Open external access/coverage barrier:** current earnings endpoint returns 403 under the fixed request; no accepted capture. Establish existing account access with non-secret account/provider evidence, or separately assess whether the owner-authorized EODHD Calendar supplies compatible required fields and provenance. Do not assert a paid-plan cause or ask for a token to be pasted into chat. |
+| `ARV2D294-001` | P2 | Historical HTTP-status refusal remains retained; the previously discarded exact code/role is not recovered. R295 adds a separate current observation, not a retrospective cause or repair. |
+| `ARV2I295-001..004` | P2/P3 | Pre-use corrections/qualifications in 295.3 remain; no frozen production dependency changed. The current owner waiver is sequencing authority only and now exhausted. |
+
+The next admissible milestone is a separately bounded access/coverage decision,
+not another unchanged R295 invocation or an automatic acquisition. The reported
+EODHD EOD All World/EOD Calendar subscriptions and logged-in Safari permission
+may inform a future plan; they do not by themselves prove schema equivalence,
+required seven-role completeness, immutable as-of history or a security master.
+Any new acquisition/transport/source-substitution contract must preserve the
+source/financial gates, receive normal independent review unless separately
+waived, and have its own exact pre-contact run freeze. No routine vendor-choice
+or existing-access acknowledgment is demanded. Current instructions do not
+authorize buying another entitlement, changing account/security settings,
+renewing spent attempts or a strategy performance run.
+
+This concluded round contains exactly two continuous Codex commits from
+`032c81e2b564e8b174f50c173bda8947c3e73925`: `5a80c2841c8586564c33336e53da7ee35b206a88`
+(new caller/tests, owner directions and exact D2/D3 freeze), then this final
+result/handoff commit. Neither is a Claude review trigger. No new Claude
+range was present; last disposed Claude head remains
+`38e2b97a42daea7130b73e460f535cc36e02bae6`. Perform exactly one final push from
+the designated root to the matching lane branch, after clean/remote checks;
+then verify local HEAD, tracking head and live matching remote agree.
+
+Only this lane's new source/tests/record changed. No shared/root/project-wide
+or Insider Buying file changed; no EODHD token/account/session was opened or
+verified. All formal false flags, historical P2 findings and failures remain;
+booked floor **314 / 239 / 50 / 699** is unchanged. The monitor remains
+**PAUSED** until the owner explicitly rearms it. These commits and the retained
+failure evidence await any later independent review; no Claude session or
+other chat was started or messaged.
+
+Post-result record/active-document validation passed **86 tests in 1.02 s**
+under the same native network denial and in-root support, again asserting
+`assistant.dispatch_fence` absent. This repeats the earlier 86-test subset;
+the round still has **224 distinct passing tests**, not 310 or another summed
+total. Final new-source and test SHA-256 values remain exactly 295.3, and
+`git diff --check` passes. Neither operational mode was rerun for validation.

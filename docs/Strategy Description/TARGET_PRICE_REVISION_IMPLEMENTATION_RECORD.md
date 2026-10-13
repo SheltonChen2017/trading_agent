@@ -20537,3 +20537,55 @@ identity mismatch/unexpected effect/expiry; do not revive stale unavailability
 demands or renew old UI receipts. A further Mia task or job requires its own
 fresh bounded scope and retained new look before effect. This availability
 scope tests a genuine recovery alternative, not acceptance of current edits.
+
+### 87.16 Current authenticated Safari/resource observation and notebook scope
+
+UI-AVAILABILITY001 access/claim was freshly created atHEADdb6046120536fd2db5f3554dbd1f1ffc9b319f02,
+23:00:52.203287Z/expiry23:15:52.203287Z,2738bytes/plan SHA256
+`6e0d1e2a3178313c25fef37cfc3dbe0d8cd51a57de46e8ef9d07452df96a1a3a`.
+CUA selected IAB without opening a tab; filtered surface inventory found no
+exact own-project browser tab. Native Safari initial state is genuinely
+authenticated, but its preexisting active page is QC organization Resources,
+not the scoped37650980 project. STOPPED_INITIAL_SURFACE_MISMATCH;2 AX/
+inventory observations,0screenshots/navigation/task messages/edits/compiles/
+launches/provider/EODHD/credential effects. Safe own-result receipt896bytes/
+SHA256`42244b66805f38f69605d0401bbcf135ddc8918df9bc62f48bf04fe253ecf35a`.
+This is NOT an assertion Mia is unavailable or Mac is locked/logged out;
+native authentication is observed, exact-project pane availability unverified.
+No unrelated tab/account/project was intentionally opened or explored.
+
+The unexpectedly exposed initial Resources page displays Object Store usage
+50.01MB/50MB. Preserve this incidental observation, not provider entitlement/
+exact byte/free-space attestation or proof it caused the1427byte native error.
+No capacity setting, cleanup, secret, purchase, subscription or other lane
+resource action occurred. F012 remains OPEN with genuine current headroom
+concern: pending21409650bytes of ON inputs and a new full audit cannot be
+assumed to fit this displayed full included store. Existing free compute is
+not proof of storage room; do not blame active sibling jobs or cancel them.
+No knowingly unchanged full-store recovery launch or OFF4/ON launch. A safe
+preservation-compatible storage allocation is a material owner/external input,
+not a routine strategy choice or obsolete rights-paperwork gate. Source/F021/
+F022/full-window/F017/F018/F020 gates also remain independently OPEN.
+
+TPR-EXT26-D093 (agent-delegated, independent review pending): resolve the
+notebook opaque literal via NEW TPR-EXT26-OWNER-MIA-SOURCE-JOB-VIEW-20261013-001.
+ONLY14 exact already-public job literals from immutable looks30ledger and
+original discovery known-history set may join the notebook-code public literal
+set; no generic32hex/opaque/substrings/case exemption, caller-supplied IDs or
+Python-helper expansion. Credential-named assignments/literal market rows,
+unknown values/docs/comments/outputs/metadata remain refused/withheld; any
+unsafe cell suppresses all notebook code. This is safe static review, not
+actor authentication, compiled-source proof or automatic port/acceptance.
+
+Fresh current committed HEAD/source closure/<=15minute UTC plan, exact post005
+250129/56b16095…+151185/3127ecff… twoFDs401314bytes/30seconds/64KiBreceipt,
+exclusive claims/access/controller/per-body custody before effect. ZeroAPI/
+credentials/provider/input/D0/job/looks/attempts/source execution/automatic
+retry. Executed viewb0fdfc19 and discovery93b45e42 remain pinned unchanged.
+New source13909bytes/SHA256
+`91b664ab507331559488c05769c6792c4466051bc507df3e4f3120a6310cf6ff`,
+test12271/`e5082fca661acf0e5fe6a5dfef6ca6986d5ba165bd95f79e0f364d0cb7c93ad1`.
+Root read full223line source/209line test;40focusedpassed3.51s, in-memory
+compile/diff clean. Producer40passed2.91s; exact-ID enrichment1fail0.80s,
+unknown-screen5fail1.16s and finalguard1fail0.53s restored reverse proofs.
+Software accepted for fixed private review only, independent Claude pending.

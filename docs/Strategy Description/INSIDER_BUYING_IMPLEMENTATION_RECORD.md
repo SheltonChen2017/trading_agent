@@ -1,17 +1,20 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 156 ACCEPTS CLAUDE'S EXACT `86700b1c` RECORD-ONLY PUSH
-AFTER DOCUMENTARY QUALIFICATIONS; COUNTER-REVIEW COMMIT `fbef7a37`.
-SECTION 157 IMPLEMENTS AN EXACT INSIDER-ONLY LF CHECKOUT RULE FOR THE
-FROZEN QC STOCK-STUDY SOURCE: FOUR REAL GIT CHECKOUT CONTROLS, RULE-DELETION
-SENSITIVITY AND BOTH PREVIOUSLY FAILING ANALYSIS PATHS PASS. THE FROZEN QC
-BLOB AND CUSTODY CODE ARE UNCHANGED; `IBWIN-OBS01` IS CLOSED AT CHECKOUT
-SCOPE. VERIFIED OS PROCESS-TREE NETWORK DENIAL USED; NO WINDOWS LOCKING
-OR MAC RETAINED-ROOT REPLAY ACCEPTANCE. SEVEN P2 FINDINGS REMAIN OPEN,
-INCLUDING WINDOWS CUSTODY SUPPORT AND BOTH SHARED FINDINGS. NOT BACKTEST-
-READY: ACTUAL EARNINGS-RELEASE AND HISTORICAL ISSUER/SHARE-CLASS/SID/LISTING/
-PIT INPUTS REMAIN MISSING (152.1, 154.6). NO ACQUISITION, QC JOB, OUTCOME
-LOOK, BACKTEST OR TRADING; LOOKS 0/0/0. MONITOR PAUSED, NO AUTOMATIC REARM.**
+Status: **SECTION 159 RECORDS CLAUDE'S REVIEW OF THE SIX COMMITS IN
+`34c323a7..618d1813` (SECTIONS 154-158: TWO CODEX COUNTER-REVIEWS, THE WINDOWS
+CLAUDE SESSION'S REVIEW, AND THE ONE-FILE LF CHECKOUT RULE): ALL ACCEPTED, NO
+CODE CHANGE. THE THREE FINDINGS AGAINST THE REVIEWER ARE CORRECT; THE SECTION-153
+MUTANT TALLY IS CORRECTED TO 14 OF 18 CAUGHT WITH FOUR REDUNDANT SURVIVORS.
+THE QC SOURCE IS `i/lf w/lf` WITH ITS FROZEN HASH; THE REAL TRIPWIRE SCAN FINDS
+22 DIRECT TRANSPORT TESTS AND 0 OFFENDERS. SEVEN P2 FINDINGS REMAIN OPEN (FOUR
+TOPICAL, `IBWIN-CR01` FOR THE OWNER'S PLATFORM DECISION, AND TWO SHARED, WITH
+THE TWO SEP-2 GUARDS RED UNTIL INTEGRATION). 19,846 OF 99,394 PARENTS ARE
+REQUEST-BOUND; V3 REMAINS 1,846 OF 1,847; THE FOUR V3 CUSTODY FILES AND
+V1/SCALE/PILOT STAY FROZEN; STRICT D23 RETAINS SEVEN NON-EXACT QUARTERS. NOT
+BACKTEST-READY (152.1, 154.6). CODEX COUNTER-REVIEWS THIS RECORD COMMIT. BOTH
+FINAL ACCESS CLASSIFICATIONS STAND WITHOUT RETROACTIVE APPROVAL. NO NEW
+SEC/PROVIDER/CREDENTIAL/LICENSED-ROW, OUTCOME, QC, BACKTEST, BROKER, CAPITAL,
+ORDER, PAPER/LIVE, DEPLOYMENT OR TRADING AUTHORITY. LOOKS 0/0/0.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -250,6 +253,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-12 | Claude review (Windows session) | `6209b3b3` -> this review record | Review of `34c323a7..6209b3b3`: the test-only tripwire/admission correction `f0b144d0` and the section-154 counter-review `6209b3b3` (two commits, zero merges); every earlier commit since `653874e8` carries a disposition from the other Claude session in sections 80-153 | Reproduced the scanner red/green against the in-memory `117de00d` scanner (7 of 7 red, 10 of 10 green, real scan 22 seen/0 offenders), the three single-clause admission deletions (each caught only by its own control, the older test blind to all three), the two shared SEP-2 failures, the 156 and 271-test selections net of host artifacts, the 178-case collection count, and every section-154.3 qualification by independent git and ledger counts. Full detail in section 155, including the required 1-10 rating. | All runs under proven process-level network denial. Boundary/package/document selection 155 passed plus 1 harness artifact that passes without the harness; event clock + registered analysis 271 passed plus 2 CRLF checkout artifacts that pass on an LF copy; SEP-2 nodes 2 failed as recorded; record/active-document gates **71 passed** (measured on the tree carrying this section; the re-run after this value was written reported the same count); `git diff --check` clean. No full lane gate or complete repository suite on this host: 16 of the 95 lane test files cannot be collected on Windows (`fcntl`), so the lane gate was not run here and the macOS results in 153.5/154.4 remain the attributed lane evidence. No SEC/EDGAR, provider, credential, journal, custody, QC, broker, or trading access; **0 research looks**. | `f0b144d0` accepted; `6209b3b3` accepted. New: `IBWIN-CR01` (P2, lane-specific, pre-existing: the acquisition/custody stack is POSIX-only, documented for an owner decision) and `IBWIN-OBS01` (P3, CRLF checkout breaks the QC byte pins). No lane code or test changed. | Codex counter-reviews this round; owner decision on `IBWIN-CR01`; next work per 152.1/154.6. |
 | 2026-10-12 | Codex counter-review | Incoming `6209b3b33d203aad4a3d1d6d449a1c7d2304c8f0..86700b1c2dbbbd8234870444c3bbcf14c6a00aeb`; this separate counter-review record follows | Exact one-commit, record-only Claude review; no implementation source change | Accepted after append-only section156 qualifications of harness evidence, prior Windows documentation and platform census. Scanner and isolated admission mutations reproduce; custody replay not represented as a Windows execution. | Verified parent/child OS network refusal; lane boundary51 passed; event-clock/registered-analysis271 passed and2 reproduced QC-byte-pin failures. Other final focused results in156.4. No full repository suite or successful full Windows lane gate; looks0/0/0. | IBDOC-CCR15501 P3 qualified; IBWIN-CR01 P2 retained OPEN; IBWIN-OBS01 P3 reproduced, not closed by counter-review. Six earlier P2s retained; shared findings not fixed. | Separate lane-only LF checkout correction may proceed independently; no platform port, corpus promotion or input-dependent backtest milestone. Single final publication only after completed permitted scope and checks; monitor remains paused. |
 | 2026-10-12 | Codex next bounded implementation | Counter-review `fbef7a375b094839160e0a02b0bb80ebd63cdef4` -> this milestone; exact commit follows in separate handoff | Byte-stable checkout for the frozen Insider QC stock-study candidate | Exact nested Insider-only LF attribute; four local Git checkout controls; clean frozen source rematerialized without blob change; no platform port. Section157 records full evidence and retained gates. |632 affected passes on pre-final-test-isolation image; final refined four checkout controls4 passed; prior two failing analysis paths pass; rule deletion caught;193 files compileall; final gate results follow. Shared SEP-2 pair2 failed14.25s, retained. No full repository suite or successful full Windows lane gate; looks0/0/0. | IBWIN-OBS01 P3 CLOSED at byte-checkout scope; new test global-attribute isolation tightened after peer QA. Seven P2s retained; no custody thaw or Windows-lock acceptance. | One combined publication after separate exact-hash handoff and final checks. Actual historical earnings/identity/PIT inputs and supported-host custody replay still required for dependent work. |
+| 2026-10-13 | Claude review (macOS session) | `618d1813` -> this review record (no code change) | Independent review of sections 154-158 (`34c323a7..618d1813`, 6 commits, 0 merges: two Codex counter-reviews, the Windows Claude session's review, the one-file LF checkout rule) | Dispositioned all six commits. Accepted `IBTEST-CCR06`, `IBTEST-CCR07` and `IBDOC-CCR15301` against this reviewer after reproducing them: the `117de00d` scanner flags 0 of 7 refusal controls and the corrected one 7 of 7; 30 + 30 added files; 178 collected cases; six open P2s in 153.7. Corrected the section-153 mutant tally to 14 of 18 caught, four redundant. Verified the LF rule on this checkout (`i/lf w/lf`, frozen hash, sibling unaffected). | Changed tests, new checkout test and gate **229 passed** on Python 3.13.15, network denied (Codex's 3.12 runtime no longer has pytest here). Real scan 22 seen / 0 offenders. No complete suite, by owner instruction; production tree byte-identical to section 153.5's. Record tests after this section **71 passed**. **0 looks**. | `IBWIN-OBS01` P3 closed at checkout scope in `bd848b4e`; `IBSH-OBS02` recorded; `IBWIN-CR01` P2 open for the owner's platform decision; `IB1C-REAL-CR01`, `IB1BCAMP-CR01`, `IBSRC-CR01`, `IBSRC-CCR01`, `IBSH-CR02`, `IBQC-SHARED-META01` P2 open. No open P0 or P1. | Codex counter-reviews this record commit. Next data-dependent work per 152.1/154.6; the platform decision is the owner's. The lane is not backtest-ready. No outcome, QC, paper, or trading step is inferred. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -22659,3 +22663,132 @@ Completed158 active-document/record/exact-package checks: **72 passed in8.11s**
 under OS network denial. Whitespace and exact three-path/frozen-blob checks
 are clean. This measurement is repeated after adding this receipt text before
 the final documentation commit; production/test bytes are unchanged.
+
+## 159. Claude review - sections 154-158: the Windows review round and the LF checkout rule (2026-10-13 UTC)
+
+Reviewer: Claude, the macOS lane session, in the lane worktree
+`trading_agent__insider_buying` on `codex/strategy-insider-buying`. No branch,
+worktree, fork, or handoff was created or switched to. After `git fetch` the
+worktree was four commits behind the remote and clean; it was fast-forwarded
+from `6209b3b3` to `618d1813`, which the remote held for the whole review.
+
+Range: `34c323a7..618d1813`, **6 commits, 0 merges**: two by Codex on this Mac
+(`f0b144d0`, `6209b3b3`), one by the Windows Claude session (`86700b1c`), three
+by Codex on the Windows checkout (`fbef7a37`, `bd848b4e`, `618d1813`). It
+changes two existing test files, adds `research/.gitattributes` (one rule) and
+`tests/test_insider_buying_qc_source_checkout.py`, and changes this record.
+No production module changed: `research/` is byte-identical to `117de00d`
+except the new attribute file, and the four custody files still equal their
+`aa0d635` blobs.
+
+Every test and scan of this review ran network-denied on Python 3.13.15.
+Codex's bundled Python 3.12.14 runtime on this Mac no longer carries
+`pytest`, so there is no 3.12 run this round. By the owner's instruction no
+complete lane suite was run; the code tree is the one section 153.5 measured.
+
+### 159.1 Commit dispositions
+
+| Commit | Change | Claude disposition |
+|---|---|---|
+| `f0b144d0` | Family-bound tripwire scan; three isolating admission controls | **Accepted. `IBTEST-CCR06` (P2) and `IBTEST-CCR07` (P3) are correct against this reviewer** (159.2). |
+| `6209b3b3` | Section 154 | **Accepted. `IBDOC-CCR15301` is correct against this reviewer on all four points** (159.2). |
+| `86700b1c` | Section 155, the Windows Claude session's review of the two commits above | **Accepted.** Its reproductions hold here (159.3); its two findings are legitimate, and Codex's qualifications of its wording in 156.2 are right. |
+| `fbef7a37` | Section 156 | **Accepted.** |
+| `bd848b4e` | `research/.gitattributes` (`/insider_buying_qc_stock_order_study.py text eol=lf`), four real-Git checkout tests, section 157 | **Accepted.** The rule is anchored to the one Insider file; on this checkout the source is `i/lf w/lf attr/text eol=lf` with the frozen SHA-256 `c80ff4f5...` (29,702 bytes, blob `04fbdf17...`), and a sibling module carries no attribute. The four checkout tests pass here. `IBWIN-OBS01` is closed at checkout scope. |
+| `618d1813` | Section 158 | **Accepted.** |
+
+Rating of this round: **9 of 10.** Both counter-reviews are precise and
+every claim checked reproduces; the deduction is that `research/.gitattributes`
+is a new file in a directory several lanes share, so other lanes appending
+rules will collide textually at integration (an observation, `IBSH-OBS02`,
+not a defect).
+
+### 159.2 Findings against this reviewer, accepted
+
+- **`IBTEST-CCR06` (P2).** The section-153 scanner used one Boolean for all
+  connection patches, stopped at the first direct transport reference, and
+  accepted `unrelated.request.build_opener` for `_default_transport`. Loading
+  the `117de00d` scanner from Git beside the current one: the seven refusal
+  controls are flagged by **0 of 7** on the old scanner and **7 of 7** on the
+  new; the three legitimate controls pass on both. The real scan over the 96
+  lane test files still finds **22** direct-transport tests and **0**
+  offenders.
+- **`IBTEST-CCR07` (P3).** The observed-mode pin supplied an invented
+  selection, a fake transport and a temporary root at once, so no single
+  clause was isolated. The three parametrized controls in `f0b144d0` isolate
+  them; the Windows session and Codex each reproduced the single-clause
+  deletions.
+- **`IBDOC-CCR15301` (P3).** Verified: 30 added research modules (not 31) and
+  30 added test files; the registered-analysis file collects **178** cases
+  (the 1,235 figure was its line count); the 153.7 ledger holds six open P2
+  findings (the summary sentence omitted `IBQC-SHARED-META01`); and 153.4's
+  enumeration was inconsistent. The corrected tally: of the 18 guard mutants,
+  **12** were caught as pushed and **14** after `117de00d`; the **four**
+  survivors (`E04`, `R01`, `R02`, `B01`) are redundant by construction for the
+  reasons 153.4 gives. `R01` and `R02` had been written down as caught because
+  the renamed-claim pin was failing on every version of the module until the
+  typed-refusal wrap; with the wrap in place those two mutants survive, and
+  the pin now proves the wrap, not the registry rule. Section 153's text is
+  retained; this paragraph is its correction.
+
+### 159.3 The Windows review and its qualifications
+
+Section 155's reproducible claims hold on this host: the scanner red/green
+above, 22 seen / 0 offenders, and the two shared SEP-2 guards failing for
+`IPython` and `QuantConnect` (`IBSH-CR02`, unchanged). Its two findings stand:
+`IBWIN-CR01` (P2, open) - the acquisition and custody stack is POSIX-only
+(`fcntl`, `O_DIRECTORY`, `O_NOFOLLOW`), so the lane gate cannot run to a
+meaningful result on Windows; this reviewer's position is that those calls
+are the custody guarantees themselves, that section 87.1 already stated the
+Mac-only validation, and that whether to declare the stack POSIX-only or
+port it is the owner's decision. Codex's 156.2 qualifications are right: a
+`sitecustomize` seam patch is process-level denial, not OS isolation; a
+155-pass selection plus one test passing without the harness is not a
+156-pass measurement; and the import census needed exact numbers.
+
+### 159.4 Validation
+
+- Changed test files, the new checkout test, lane boundary, active-document,
+  module hygiene, overlay and ML boundaries, record, Decimal guard and the
+  exact package guard: **229 passed** on Python 3.13.15, network denied.
+- Scanner red/green and real scan: 159.2. Checkout rule: 159.1.
+- Complete suite: **not run**, by the owner's instruction; the production
+  tree is byte-identical to the one section 153.5 measured (12,825 passed,
+  2 failed on the `IBSH-CR02` guards).
+- Record tests after this section: **71 passed** on Python 3.13.15, network denied, after the final wording.
+
+### 159.5 Retained P0-P3 finding ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IBTEST-CCR06 | P2 | **CLOSED in `f0b144d0`; accepted against this reviewer** | `117de00d` | Lane boundary test | Cross-family patch accepted; later references skipped. | 159.2. | Correct. | Codex's family-bound scan. | 0/7 -> 7/7 reproduced. |
+| IBTEST-CCR07 | P3 | **CLOSED in `f0b144d0`; accepted against this reviewer** | `117de00d` | Capture test | Non-isolating admission pin. | 154.2, 155.3, 156.3. | Correct. | Three isolating controls. | Reproduced by two sessions. |
+| IBDOC-CCR15301 | P3 | **CLOSED by qualification; accepted against this reviewer** | `34c323a7` | Section 153 | Four miscounts. | 159.2. | Correct; mutant tally corrected here (14 of 18, four redundant). | 159.2. | Counts reproduced. |
+| IBDOC-CCR15501 | P3 | **Retained closed as Codex records** | `86700b1c` | Section 155 | Pooled counts; proof-scope wording. | 156.2. | Correct qualifications. | None. | 159.3. |
+| IBWIN-OBS01 | P3 | **CLOSED at checkout scope in `bd848b4e`** | pre-existing | QC source byte pin | CRLF checkouts broke the frozen hash. | 157, 159.1. | Minimal one-file rule. | `eol=lf` attribute. | `i/lf w/lf`, frozen hash, four checkout tests. |
+| IBSH-OBS02 | observation | **Recorded** | `bd848b4e` | `research/.gitattributes` | New file in a shared directory; other lanes' rules will collide textually at integration. | 159.1. | Not a defect. | None. | None. |
+| IBWIN-CR01 | P2 | **OPEN, owner decision** | pre-existing | POSIX-only custody stack | Lane gate cannot run on Windows. | 155.5, 156.2. | Declare POSIX-only or port; not the reviewer's call. | None. | None. |
+| IBSUITE-CR01, IBTEST-CR04, IBREC-V4-CR01, IBTEST-CR05 and earlier resolved findings | as recorded | **Retained closed** | earlier | earlier | Unchanged. | Sections 153-158. | Unchanged. | None. | None new. |
+| IBREV-CR01 | P1, process | **Retained closed by owner disposition** | `01a6b7e` | Sections 123-126 | Unchanged. | Sections 124-126. | Owner decision, not witnessed. | None. | None new. |
+| IB1C-REAL-CR01, IB1BCAMP-CR01, IBSRC-CR01, IBSRC-CCR01 | P2 | **OPEN, retained** | earlier | Sections 119-158 | Unchanged. | Sections 152.1, 154.6. | Unchanged; all fail closed. | None. | None new. |
+| IBSH-CR02, IBQC-SHARED-META01 | P2, shared/out of lane | **OPEN, retained** | `3e21c6db`, `195012fd` | Shared manifest; shared QC client | Unchanged; the two SEP-2 guards stay red until integration. | 153.3, 143.3. | Out of lane. | None here. | Reproduced by the Windows session. |
+| Earlier P3 findings, observations and the 45 unclassified section-119 survivors | P3 | **Retained as recorded** | earlier | earlier | Unchanged. | Sections 119-158. | Unchanged. | None. | None new. |
+| IBSH-CR01 | P3, shared/out of lane | **OPEN, non-blocking, retained** | `226c4c1` | Shared coordination documents | Reconcile the Insider-only paper clause once at main integration. | Sections 68 to 72. | Out of lane. | None here. | This range changes no shared document. |
+
+There is no open P0 or P1 finding. Seven P2 findings are open (four
+topical, `IBWIN-CR01`, and two shared); all fail closed.
+
+### 159.6 Next action
+
+Codex counter-reviews this record commit. The next data-dependent work
+remains what sections 152.1 and 154.6 state; the `IBWIN-CR01` platform
+decision is the owner's. No code changed in this round. No outcome, ETF, QC,
+paper, live, deployment, broker, capital, order, or trading authority follows
+from this section.
+
+No SEC or provider request was made: every test and scan ran OS
+network-denied and nothing else touched a network. No credential, licensed
+row, security master, outcome, ETF holding, QuantConnect, broker, operator
+database, scheduler, deployment, capital, order, live, or trading surface was
+used. No retained root or private journal was read this round. Authorized
+outcome looks: **0**. Consumed outcome looks: **0**. Research looks: **0**.

@@ -481,6 +481,10 @@ waive formal source/identity evidence. The one two-request October-9 capture
 and separate output receipt check both passed before October 12's prospective
 09:20 New York source-quality cutoff (286.5). Timely local receipt improves
 the earlier late-capture evidence, but does not establish full PIT admission.
+Section 291 is Claude's independent review of `ef654b1d..c7369649` (0 P0,
+0 P1, 0 P2, 1 P3): the three Codex commits of sections 289-290 are accepted,
+one after a test-only correction; the classifier inventory is verified
+source-complete; the host's second volume renumbering is recorded.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE. Section 287 records the owner's explicit Massive-only
@@ -1505,9 +1509,12 @@ Section 288 is the Windows-host Claude session's independent review of the
 exact pushed range `c2112b11..b295ce02` (sections 249–287), including the
 twelve owner-waived Codex commits of sections 284–287 reviewed after the
 fact. Section 289 records the completed qualified Codex counter-review of
-that exact record commit and the corrected finite classifier. Claude must
-review section 290 and the combined section-289 counter-review/correction
-and section-290 observation-only preparation; `ARV2R288-003`'s historical
+that exact record commit and the corrected finite classifier. Section 291 is Claude's
+independent review of the exact pushed range `ef654b1d..c7369649` (sections
+289 and 290). The immediate next step is that Codex counter-reviews section
+291 and this round's two Claude commits, unless the owner explicitly changes
+this workflow; this is not an intermediate acknowledgement wait.
+`ARV2R288-003`'s historical
 inline caller remains unavailable, and a future committed observation seam
 does not itself grant source contact. `ARV2R248-002`, `-003`, `-004` and
 `ARV2D287-001` stay open, the floor **314 / 239 / 50 / 699** stands, and the
@@ -1599,7 +1606,7 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 282 (section 283); for section 250 the owner
+the pushed range through section 290 (sections 288 and 291); for section 250 the owner
 directed focused checks without the complete suite. Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
@@ -3414,6 +3421,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-12 | Massive-only accepted-risk continuation and failed fresh-window acquisition | `1d85c47b` -> `db306644`, this final section-287 diagnostic/result handoff | No new Claude review; current checkpoint waived, not independently passed | Sole October 7–11 capture exits 2 without accepted output; original cause discarded; conditional receipt build/read uninvoked; additive future-use static error labels, no retry | Focused strict-denied checks in 287.5–287.6; no full suite or strategy run | Actual contact stage unknown; no timestamp-matching artifact names observed; no retrospective cause or false source admission; 314/239/50/699 unchanged | Exactly one matching-lane final push; separately justified recovery protocol before new contact, no unchanged-request renaming; Massive remains selected and monitor paused |
 | 2026-10-12 | Claude (Windows host) independent review of `c2112b11..b295ce02`: sections 249–283 confirmed, the twelve owner-waived Codex commits of sections 284–287 reviewed after the fact, fourth QC census | `b295ce02` -> this record commit | Review of the seventy-three commits pushed since `c2112b11`: eleven Claude review sections and their Codex counter-reviews confirmed by this host's gates; the twelve tail commits (v4 precheck and readers, the guarded publisher, the C package, R284 A1, the October 9 price receipt, the failed Massive capture and its classifier) reviewed individually (section 288) | Synced the lane clone by fast-forward from a clean tree. Immutability of V16–V19, the cap-90 bridge runtime and the three trust roots re-verified from committed blobs. QC administrative reads (zero looks) confirm the R284 project holds exactly the pinned `main.py` and that its one backtest completed inside the recorded interval; a census of 202 projects and 303 backtests finds no unrecorded Analyst-lane launch and 21 other-lane launches outside this ledger. The five new scripts read in full; the Massive classifier's label inventory does not match the adapter's messages. No production, test or ledger line changed. | Real tree at `b295ce02`: record and active-document gates **86 passed**; final record bytes **86 passed**; `compileall` exit 0; `git diff --check` clean. Guarded LF worktree: classifier tests 42 passed, the other tail test files red or uncollectable (Darwin-only tooling). Complete lane suite at `f0318d6f` (owed from section 248): 1084 failed, 6839 passed, 922 skipped, 735 errors in 2:26:36, host classes; at `b295ce02`: **in progress at push time**: started 10:59 local on 2026-10-12 and at 11% of the 11,659 collected tests when this record was committed, following the owner's section-248 direction not to hold a push for this host's run; its counts are to be recorded in the next round. | 0 P0, 0 P1, 0 P2. `ARV2R288-001` (P3, open for Codex): classifier labels not derived from the adapter (16 unreachable, 93 adapter messages unknown). `ARV2R288-002` (P3, corrected): stale banner range. `ARV2R288-003` (P3): the section-287 inline caller was never committed. `ARV2R288-004`/`-005`/`-006` (P3, documented): host class, other-lane launches in the census, owed suite counts recorded. `ARV2R248-002`/`-003`/`-004` and `ARV2D287-001` stay open. | Codex counter-reviews section 288 and answers `ARV2R288-001` and `-003`; the floor 314/239/50/699 stands; no R247, R281 or R284 attempt, stress successor, paper/live deployment, broker, funded-account, real-order or trading action is authorised. |
 | 2026-10-12 | Codex counter-review of section 288 and offline one-shot diagnostic observation preparation | `ef654b1d` -> `95f56997`, `3900bd19`, final section-290 handoff | Sole Claude record accepted after three P3 qualifications; all 145 literal refusals classified, sixteen formatted labels retained, hostile lookup corrected | Finite observation separated from opaque return; no adapter default, CLI, provider dispatch or operational recovery; actual historical caller unavailable | Classifier 48 and observer 48 pass separately; 113 code/lane-record passes; 11 import-boundary passes; 1018 public sources compile without bytecode; old-source and five memory mutations red; shared document Git checks have three isolation refusals, not a green full-suite claim | No credentials, private corpus, QC, outcomes, look/cell change or other-lane fix; 314/239/50/699 unchanged | One final combined lane push; Claude reviews the exact snapshot; separately justified compatible-host production protocol still required before contact; monitor paused after trigger |
+| 2026-10-13 | Claude independent review of sections 289-290: the source-complete failure classifier and the one-call observation seam | `c7369649` -> the test correction and this record commit | Section 291: three Codex commits `ef654b1d..c7369649` disposed (2 accepted, 1 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells; no capture, assessment, publication or probe run | Two regression tests added to `test_massive_capture_failure.py` for the classifier's module-name check and 200-character bound (`ARV2R291-001`); no production code changed. Four pins reproduce; the inventory is verified against all 145 adapter literals and 30 templates; the pre-fix classifier fails the five new tests; 10 in-memory guard removals tabulated; the second device renumbering is recorded; section 4 names section 291, banner sentence added, this row appended | Focused files and record gates at `c7369649` and on the final bytes, strict sandbox with in-root temporary paths, `compileall`, artifact and status integrity, `git diff --check`; the complete lane suite was not run this round at the owner's direction; exact counts in 291.6 | 0 P0, 0 P1, 0 P2, 1 P3 | Single push of this round's two Claude commits; Codex counter-reviews section 291 unless the owner changes the workflow |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -45080,3 +45088,211 @@ operator database, deployment, paper/live operation or real order. The review
 monitor remains paused after its authenticated trigger; no new monitor,
 recurring source capture or automatic rearming follows. Exactly one final
 matching-lane push publishes the completed three-commit Codex round.
+
+## 291. Independent Claude review of sections 289–290: the source-complete failure classifier and the one-call observation seam, 2026-10-13
+
+**Range reviewed:** `ef654b1d..c7369649`, the three Codex commits that no
+Claude section covers: the counter-review of section 288 with the
+classifier's literal-coverage and hostile-lookup corrections (`95f56997`),
+the one-call observation seam with its tests (`3900bd19`), and section 290
+(`c7369649`). Each is disposed of in 291.1. The twelve Codex commits of
+sections 284–287 were reviewed after the fact by the Windows-host Claude
+session in section 288 and are not re-reviewed here; `ef654b1d` is that
+session's record commit and is counter-reviewed by Codex in 289. This
+round's two Claude lane commits are the test correction `d3fa1aec` and this
+record commit; neither is in the reviewed range.
+
+**Zero research looks, development evaluations, infrastructure looks, and
+authenticated cells in this round.** This review made no provider,
+QuantConnect, mail or browser request. It ran no capture, assessment,
+preflight, publication or probe, read no private capture, and changed no
+artifact, attribute or setting. Every pytest and mutation process ran inside
+the strict sandbox of 242.6, with `TMPDIR` and every pytest temporary
+directory inside the operative root's ignored `.pytest_cache`; only this
+review's logs and its in-memory mutation plugin sit in the outside-root
+scratchpad, as before. **At the owner's direction this round reviews the
+commits only and does not run the complete lane suite**; the focused files
+and the record gates ran, and the validation table says exactly what did.
+The floor stays **314 / 239 / 50 / 699** as section 288 reconciled it.
+
+**Verdict.** All three Codex commits are accepted, one after a test-only
+correction; none is rejected. **0 P0, 0 P1, 0 P2, 1 P3.** The four pins of
+290.3 reproduce. The classifier's inventory now covers all 145 literal
+`MassiveCaptureError` messages of the adapter and its 30 formatted entries
+each match an adapter template; the pre-fix classifier fails exactly the five
+new tests 289.3 reports. The observer invokes a producer once, never inspects
+or renders it, its exception or its return, and every guard removed in memory
+fails a test. The one P3 is two classifier guards no test isolated, corrected
+here with two regression tests. The host rebooted again before this round
+and the volume's device number changed a second time (291.4).
+
+### 291.1 Per-commit disposition
+
+| Commit | What it is | Disposition | Basis |
+|---|---|---|---|
+| `95f56997` | Section 289 and the classifier correction: 93 adapter literals added, the class check moved to `issubclass` on the exact type and the built-in storage descriptors for `__module__`, `__qualname__` and `args`; six new tests | accepted after correction | Pins `737c3a0c…` and `60ecdb21…` reproduce for the files as Codex left them. An AST census of `scripts/capture_arv2_massive.py` finds 145 literal messages, all in the inventory, and 41 formatted raises; every one of the inventory's 30 non-literal entries matches an adapter f-string template, which refutes section 288's "raised by no module" claim exactly as 289.2 says. Loading the `b295ce02` classifier against the new tests fails 5 (two inventory, three hostile-lookup), and restoring only the `isinstance` and `type.__getattribute__` form fails the three hostile-lookup tests. Two guards had no isolating test (`ARV2R291-001`); this round adds the tests. |
+| `3900bd19` | `scripts/arv2_massive_capture_diagnostic.py` and its 48 tests | accepted | Pins `8c571988…` and `fcd2f200…` reproduce. `callable()` touches no attribute; the producer is called once; any `BaseException` becomes a finite observation whose code passes through the classifier under its own `BaseException` guard and an exact-string and set check; a return is handed back opaque and never inspected; the frozen dataclass refuses every inconsistent shape and keeps `provider_request_count` at `None`. The module imports only the classifier, `dataclasses` and `typing`, which its own AST test pins. Every guard removed in memory fails tests (291.4). |
+| `c7369649` | Section 290: the round's identities, validation and handoff | accepted | Record-only diff. Its pins, counts and mutation claims reproduce (291.4); it claims no contact, no run and no acceptance. |
+
+### 291.2 Findings
+
+| ID | P | Introduced by | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R291-001` | P3 | `95f56997` | Two classifier guards had no test that fails without them: the module-name check (an exception class that merely shares the name `MassiveCaptureError` and an allowlisted message was never tried; removing the check passed all 48 tests) and the 200-character bound (no allowlisted message is longer than 77 characters, so the bound can only be isolated by placing an overlong message in the inventory; removing it passed all 48). Neither is a behaviour defect: the guards exist and work. | Corrected in `d3fa1aec`: `test_same_name_class_from_another_module_is_unknown` and `test_overlong_message_is_unknown_before_inventory_lookup` added to `tests/analyst_revisions_v2/test_massive_capture_failure.py` (now 50 tests, SHA-256 `bc5a096e7d5e56ea8fcb0ef11b1b7d5896aa363152a1187d1300db231effcfec`). Each fails when its guard is removed in memory and passes otherwise; the classifier itself is unchanged and keeps its 290.3 pin. |
+
+### 291.3 What this review checked
+
+**The owner's direction and the reviewer split.** Section 288 was written on
+the Windows host after the owner's waivers for sections 285–287 and
+disposes all twelve Codex commits of 284–287 individually; 289 qualifies its
+reviewer and commit arithmetic without changing any disposition. This round
+therefore starts at `ef654b1d` and reviews only what no Claude section
+covers. The owner also directed that this round review the commits without
+the complete lane suite, which 291.6 records.
+
+**The classifier (`95f56997`).**
+
+1. **Source completeness.** The inventory holds 175 messages with no
+   duplicates: the 145 literal `MassiveCaptureError` messages of the adapter
+   and 30 formatted ones. The 14 request-boundary messages come from the
+   adapter's one sanitizer template, and the 16 name-formatted ones from the
+   `_open_directory_path`, `_fsync_fd`, `_exclusive_private_write_at` and
+   `_write_all` templates with the adapter's fixed object names; the new test
+   derives both sets from the adapter's syntax rather than pinning strings.
+2. **No caller-controlled lookup.** `type(exc)` cannot be fooled by a hostile
+   `__class__`; `issubclass` on that type consults `type`'s own check;
+   `type.__dict__["__module__"]` and `["__qualname__"]` read the class
+   dictionary without invoking a metaclass or class descriptor; `BaseException.args`
+   bypasses an instance or subclass property; the message must be an exact
+   `str` of at most 200 characters before the inventory membership test, so
+   no hostile `__eq__` or `__hash__` runs.
+3. **Safe failure direction.** Everything unrecognized is `unknown`; the
+   function renders nothing and performs no I/O, which its AST test pins.
+
+**The observer (`3900bd19`).**
+
+1. **One invocation, nothing inspected.** A non-callable is refused before
+   any attribute access; a callable is called exactly once; a callable that
+   needs arguments raises `TypeError` inside the call and is observed as
+   `unknown`, with its body never reached.
+2. **Finite codes only.** The classifier runs under a `BaseException` guard,
+   and its result must be an exact `str` in the closed code set; anything else
+   is `unknown`. Interruptions (`KeyboardInterrupt`, `SystemExit`,
+   `GeneratorExit`) are terminal observations by design, which 290.2 states;
+   the caller owns any process deadline.
+3. **Honest shape.** `CaptureObservation` is frozen and slotted, refuses
+   non-exact booleans and strings, requires the three terminal shapes, and
+   never carries a request count.
+
+**What this review did not do.** It did not run any capture or read any
+private capture artifact; it did not re-review sections 284–287 or the
+retained R282, publication, probe, R284 or R286 artifacts, which section 288
+disposed and which this host alone holds; it did not run the complete lane
+suite.
+
+### 291.4 What this review reproduced
+
+- **Pins.** `737c3a0c…`, `60ecdb21…`, `8c571988…` and `fcd2f200…` reproduce
+  at `c7369649`; the frozen v1–v4 observers and assessments, the audit
+  module and the shared helper are unchanged.
+- **Baselines.** The classifier and observer files pass **48 and 48** tests
+  at `c7369649`; the corrected classifier file passes **50**.
+- **The record gates** pass at `c7369649` and on this record's final bytes.
+- **The host rebooted again.** Boot time 2026-10-13 14:05:47 local
+  (21:05:47 UTC); the Data volume and the vintage directory now report
+  device **16777233**, after 16777232 before 2026-10-11 and 16777231
+  since. Every tool of the v4 family still pins 16777231
+  (`arv2_relocation_security_v4.PROSPECTIVE_DEVICE`, the publication-probe
+  reader), so each would now refuse. Nothing in sections 289–290 depends on
+  them, and their one-use runs are spent, but this is the second
+  renumbering in three days: `ARV2R281-001` stands, and a stable volume
+  identity is needed before any further device-bound contract.
+- **Nothing else changed.** The artifact tree has 1,883 files, unchanged
+  across this round's checks; `git status --ignored` is unchanged apart from
+  `__pycache__` and this round's test correction; the frozen documents and
+  every shared file are untouched in the reviewed range.
+- **In-memory mutation trials.** Each trial changed one guard in memory and
+  ran that module's test file inside the strict sandbox; no file was edited.
+
+Classifier, 48 tests before the correction:
+
+| Trial | Change | Result |
+|---|---|---|
+| Old classifier | the `b295ce02` source loaded whole | 5 failed (2 inventory, 3 hostile lookup), as 289.3 states |
+| `isinstance` form | `issubclass` on the type and the two storage descriptors reverted to `isinstance` and `type.__getattribute__` | 3 failed |
+| `args` property | `BaseException.args` descriptor replaced by `exc.args` | 1 failed |
+| Module check | the `__module__` comparison removed | **48 passed**; 1 failed with the correction |
+| Length bound | the 200-character bound removed | **48 passed**; 1 failed with the correction |
+
+Observer, 48 tests:
+
+| Trial | Change | Result |
+|---|---|---|
+| Callable check | the non-callable refusal removed | 6 failed |
+| Code guard | the exact-string and set check on the classifier's result removed | 5 failed |
+| Classifier guard | `except BaseException` narrowed to `except Exception` | the session aborts at the classifier-interrupt test after 31 passes |
+| Consistency | the terminal-shape check removed | 8 failed |
+| Exact types | the exact-type check removed | 3 failed |
+
+These agree with the reverse mutations 290.3 reports where the same guard
+was removed.
+
+### 291.5 Suggested next steps
+
+1. **Codex counter-reviews this section and the test correction.**
+2. **Before any new Massive contact**, the committed operational contract
+   290.4 describes: the production caller with its source and protocol pins,
+   window, attempt consumption, parent deadline and output validation, with
+   the observer wired in so that a refusal keeps its finite code; the spent
+   R287 invocation stays spent (`ARV2R288-003`).
+3. **Bind a stable volume identity before any further device-pinned tool**
+   (`ARV2R281-001`, now shown twice); the v4 family is spent and need not be
+   edited.
+4. **Everything downstream stays as sections 285.10, 286.6 and 287.6 left
+   it:** the external evidence package for the formal trust roots precedes any
+   current portfolio or performance run; no R247, R281 or R284 attempt,
+   paper or live action is authorized.
+
+### 291.6 Validation
+
+Every check ran from the operative root
+`/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2` with
+`~/.venvs/trading_agent-py313/bin/python` (3.13.15), each pytest process
+under the strict `sandbox-exec` profile of 242.6 with `TMPDIR` and
+`--basetemp` under the root's ignored `.pytest_cache/claude-review-291`.
+The host rebooted before this round, which emptied the scratchpad; the
+helper scripts were recreated from the recorded procedure.
+
+| Check | Scope | Result |
+|---|---|---|
+| Complete lane selection | — | **not run this round, at the owner's direction**; the last complete run is section 283's at `34489a7a` |
+| The two focused files at `c7369649`, strict profile | classifier and observer test files | **48 passed, 48 passed** |
+| The corrected classifier file, strict profile | `test_massive_capture_failure.py` after `d3fa1aec` | **50 passed** |
+| Pins, the adapter literal and template census, the device and boot facts, and mutation trials | as in 291.3 and 291.4 | as stated there |
+| Record gates at `c7369649` and on the final record bytes, strict profile | `test_lane_record_integrity.py` and `test_active_document_consistency.py` | 86 passed at the reviewed head; final bytes **86 passed** |
+| `python -m compileall -q` | the standard package list plus `research/analyst_revisions_v2_qc` | clean |
+| Worktree integrity across the checks | `artifacts/analyst_revisions_v2` and `git status --ignored` | every one of the 1883 files under `artifacts/analyst_revisions_v2` has the same SHA-256 before and after the checks, and `git status --ignored` is unchanged apart from `__pycache__` |
+| `git diff --check` | both commits | clean |
+| `git status --short --branch` | after this round's commits | clean; published in this round's single push |
+
+### 291.7 Carried-open findings
+
+| ID | P | Status |
+|---|---|---|
+| `ARV2E263-001` | — | Resolved for the v4 one-use run and the guarded C publication by sections 284–285, as section 288 disposed; production publication safety beyond that one package remains unclaimed. |
+| `ARV2D287-001` | P2 | Open (Codex's): the spent R287 reason is unrecoverable; the observer of 290 prevents a repeat prospectively. |
+| `ARV2R291-001` | P3 | Corrected in `d3fa1aec` (291.2). |
+| `ARV2R281-001` | P3 | Open, now shown twice (291.4). |
+| `ARV2R288-001`, `-003` | P3 | `-001` corrected in `95f56997` with its false reachability claim withdrawn; `-003` prospectively addressed by 290, the original caller unavailable. |
+| `ARV2R288-002`, `-004`, `-005`, `-006`, `ARV2CR289-001` to `-004`, `ARV2WL-D289-001` | P3 | Accepted or documented, as recorded. |
+| `ARV2R283-001`, `ARV2R283-002` | P3 | Closed by `107743d8`'s precheck and isolating tests, as section 288 disposed. |
+| `ARV2R248-002`, `ARV2R248-003`, `ARV2R248-004` | P2 | Open; partly reconciled by sections 255–257. |
+| `ARV2R196-001` | P2 | Open; the historical AR effect has the same two-year signature in every family. |
+| `ARV2D212-001` | P2 | Clock mechanism resolved by R279; forward input readiness and vendor availability remain open. |
+| `ARV2CR185-001`, `ARV2CR187-001`, `-003`, `ARV2D188-001` | P2 | Open as recorded. |
+| `ARV2R265-001`, `ARV2R265-002`, `ARV2I266-001`, `ARV2I266-002`, `ARV2I256-001` | P2 | Corrected and pinned, as recorded. |
+| Earlier P3s through section 283 | P3 | Corrected, accepted or closed, as recorded. |
+| `ARV2R248-007` | P3 | Documented; narrowed in one direction by `4496d241`. |
+
+The final tree differs from the pushed head `c7369649` only by the test
+correction `d3fa1aec` and this record commit.

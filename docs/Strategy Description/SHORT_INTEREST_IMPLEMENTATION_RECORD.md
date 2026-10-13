@@ -17735,3 +17735,104 @@ as a harness failure, not a production or passed-run claim. Targeted in-memory
 compilation and diff checks precede the separate three-file commit. Old source
 and new class spent claims remain immutable. Canonical actual looks0/0,
 exploratory actual looks0, alpha0, permanent IDsnone, QC attempts0.
+
+### 115.5 Later EODHD availability and retained credential-location memory
+
+**SI-AUTH-20261013-02** records the owner's later additive report that EODHD
+**EOD All World** and **EOD Calendar** are subscribed and Safari is signed in,
+with permission to use them if backtesting needs that data. This is reported
+availability, not verified account/API access or admission of unadvertised
+products. Existing strategy/period/source budgets remain unchanged.
+
+**SI-AUTH-20261013-03** records the owner's explicit supplied location and
+request to remember it. Durable lane-local memory, **location only**:
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying/artifacts/insider_buying/private/eodhd-token.txt`.
+No token value has been read, copied, printed, logged, hashed or committed.
+The location is owner-designated credential-file authority, not permission
+to operate in the Insider Buying checkout. Any authorized future reader must
+verify owner/regular-file/no-symlink/protected-file and parent semantics first;
+do not conduct a broad secret search, issue a replacement credential or infer
+another EODHD product. No account-wide persistent-memory tool was available;
+this approved lane handoff is the durable project reference.
+
+Primary EODHD specifications were checked without Safari/account/token/data
+access. [Historical dividends/splits](https://eodhd.com/financial-apis/api-splits-dividends)
+and [ID mapping](https://eodhd.com/financial-apis/id-mapping-api-cusip-isin-figi-lei-cik-%E2%86%94-symbol)
+are potential supplements under the reported EOD plan; mapping is current,
+not a class-denominator/effective-history contract, and nullable dividend
+payment dates do not establish merger consideration or cash settlement.
+[EOD OHLCV](https://eodhd.com/financial-apis/api-for-historical-data-and-volumes)
+documents split-adjusted volume, so it cannot silently replace raw rational
+volume. The [plan matrix](https://eodhd.com/pricing) does not make basic
+All World a Fundamentals/SEC-filings or All World Extended entitlement.
+**SI-DEC-20261013-07** therefore keeps EODHD as an authorized named-source
+alternative, not an automatic replacement or a source-rights/coverage claim.
+No EODHD key read/request, new purchase/terms, or source budget reset occurred.
+
+### 115.6 Completed disclosure transport and prospective original/native binding
+
+Clean committed **`da3edc513cb64cc758388546a57c82cd3f295437`** preceded the
+four actual disclosure GETs. Protected run
+`artifacts/short_interest/terminal_disclosure/terminal-disclosure-20261013T222323Z`,
+start **2026-10-13T22:23:23.383525Z**, completion
+**2026-10-13T22:23:36.430183Z**. Exactly four started/received receipts, all
+bounded under the same consumed claim; no retry, paging or wider window.
+Private payload SHA **`067ab5ffaa92983a3858d56416db7905c9e4e9e8e0892509d70e06413e830011`**;
+file SHA **`75cf8d5d02648131717b4d79071a861a1137780b4327c1fac8918651be8eaf28`**.
+Main independently reconstructs every descriptor/status/hash/chronology and
+the entire report byte-for-byte, network denied/empty environment, no new
+credential or source request. This confirms captured evidence, not per-share
+consideration, actual payment or exhaustive terminal coverage.
+
+**SI-DEC-20261013-08** follows the distributor text with at most **two**
+anonymous exact SEC-original GETs, one per eligible frozen case. Choose only
+the earliest captured `(filing_date, accession)` core-Items record matching
+Item2.01, receivership or merger; retain unavailable cases privately, no
+current-ticker fallback or value/outcome-based choice. Only its already
+observed exact HTTPS `www.sec.gov/Archives` URL, no query/port/dot-segment,
+link/exhibit follow, proxy, redirect or retry, max16MiB. A fixed honestly
+declared research User-Agent is used; no invented contact or credential.
+[SEC access guidance](https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data)
+permits targeted public downloads with declared agents/moderate rates; this
+finite serial pilot is not crawling. HTTP/security failure stops and remains
+claimed, without bypass. Original-byte transport authentication is still not
+payment-economic admission. Exact derived private protocol hash will be pinned
+before any GET; PENDING explicitly refuses until that later local commit.
+
+**SI-DEC-20261013-09** applies a new offline native/composite/class source
+bridge to the same original TICKERS archive and sealed thirty-response class
+report, without another capture, credential or provider request. It parses
+TICKERS once, retains all row origins and malformed peers, and refuses both
+native/composite collision axes plus composite-to-class/class-to-native
+conflicts. Only separately reported class-specific integer count evidence
+can accompany a valid exact query-date relation. No FIGI cast, issuer-share
+transfer, historical alias/interval or current-sector backdating. All private
+source assertions and unresolved cases stay visible; this is not a full-study
+bundle or permission to change actual-input refusal. Exclusive output is
+`artifacts/short_interest/class_reference/class-reference-source-20261013T221700Z`.
+Freeze the code/policy and validate focused dangerous directions before this
+actual offline application. Neither original retrieval nor binding is
+predicted as completed at this prospective checkpoint.
+
+| ID | Priority / disposition | Material pre-application evidence |
+|---|---|---|
+| SI-BRIDGE-20261013-001 | P2 confirmed, corrected before actual bridge application | Main audit identified raw-only collision axes omitting identifiable malformed peers (table/FIGI whitespace, native leading zeros/whitespace). Six persistent regressions red:6 failed/48 deselected in0.71s. Refusal-only trim/native canonicalization now includes those peers and malformed Massive identifier assertions; valid positive joins still require untouched exact normalized source fields. No alias promotion. All rows/refusals retained. |
+| SI-ORIG-20261013-001 | P2 confirmed, corrected before original retrieval | Draft original selection/capture allowed a coherently stale report digest or a caller alias to alter a later descriptor. Two persistent reds:2 failed in0.35s. Validate source report seal and snapshot detached descriptors before transport; fixed original-source pins/global budget remain. Owning-agent final43 green0.82s. |
+
+Bridge policy is prospectively pinned to
+**`d346c77c7267548b50c60e28c5cbe81bab08b69e22fc36929cae12014ed243c0`**.
+Unpublished draft repinning changes no consumed request budget or old protocol.
+The bridge's existing-output path now emits a named refusal without touching
+that output; its first draft leaked FileExistsError but still did not mutate
+old bytes. Source/HEAD/remote/publication, malformed-peer, detached-source and
+seal guards are covered with fabricated dangerous directions, not source
+fitness or a strategy result.
+
+Main final prospective selector: **576 passed in7.79s**, empty environment,
+network denied, zero skip/warning, CPython3.13.15/pytest9.1.1. It is the focused
+affected selector plus original/native bridge checks, not a full lane suite.
+The original-reader expected protocol digest is still PENDING: commit implementation before
+deriving the private exact target protocol on a clean HEAD, then separately
+pin and commit that hash before any anonymous GET. Offline bridge execution
+also requires a clean prospective commit. Targeted15-file in-memory compilation,
+diff and actual-remote checks precede this local commit; no interim push.

@@ -1,22 +1,25 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CODEX ACCEPTS CLAUDE'S PUSHED `2ef9a4f` AND `ab85a032` AFTER
-THE COUNTER-REVIEW CORRECTIONS AT `c83011c`. PROTECTED-HOST PREFLIGHT
-IMPLEMENTATION IS COMMITTED AT `c4c5777`: ALL SEVEN CAPTURE/OFFLINE CLIS
-AND 27 DIRECT SENSITIVE ENTRIES REFUSE UNSUPPORTED HOSTS BEFORE PRIVATE
-ACTIONS. WINDOWS REFUSAL IS EXPLICIT, NOT WINDOWS ACL PARITY OR SOURCE
-ADMISSION. FOCUSED CHECKS: 344 PASSED, 257 POSIX-ONLY SKIPPED. ALL 34
-ENTRY-GUARD REMOVALS ARE DETECTED. CLAUDE MUST INDEPENDENTLY REVIEW THE
-COMBINED CORRECTION/IMPLEMENTATION/CLOSING RANGE. THE ORIGINAL PROTECTED
-MASTER/NATIVE INPUTS AND CONSUMED-BUDGET EVIDENCE ARE ABSENT HERE; NO
-RECAPTURE OR RESET IS AUTHORIZED BY THEIR ABSENCE. THE NEXT FACTUAL STEP
-REMAINS SECTION 111.10'S HISTORICAL/CLASS DENOMINATOR AND AUTHENTIC TERMINAL
-PAYMENT/DISCLOSURE QUALIFICATION ON VERIFIED PROTECTED INPUTS. NO BACKTEST
-IS CLAIMED. LOOKBACKS 20/60/120/252 UNSELECTED, CANONICAL ACTUAL LOOKS 0/0,
-EXPLORATORY 0, ALPHA 0, QC ATTEMPTS 0. CURRENT OWNER AUTHORITY, HISTORICAL
-ISSUE IDS, SOURCE/SHARED FINDINGS AND ORIGINAL-VINTAGE VERSUS LATEST-REVISED
-SEPARATION REMAIN. NO BROKER, OPERATOR-DATABASE, DEPLOYMENT, PAPER/LIVE,
-CAPITAL, REAL-ORDER OR TRADING AUTHORITY IS INFERRED.**
+Status: **CLAUDE (MACOS SESSION) HAS REVIEWED THE THREE CODEX COMMITS IN
+`ab85a03..d3ac5bf` (SECTION 114) AND ACCEPTS THEM WITH NO CORRECTION. ON THIS
+POSIX HOST CODEX'S ELEVEN-FILE SELECTION PASSES 601 WITH NONE SKIPPED,
+INCLUDING THE 257 PROTECTED-I/O CASES WINDOWS SKIPS; THE NEW PROTECTED-HOST
+GUARD PASSES HERE, SO POSIX CAPTURE BEHAVIOUR IS UNCHANGED, AND BOTH IN-MEMORY
+PROBES OF IT WENT RED. WINDOWS NOW REFUSES CAPTURE SAFELY BUT HAS NO
+PROTECTED-STORAGE PARITY (`SI-CR-WIN-20261012-002`, P2, OPEN). THE ORIGINAL
+SECURITIES-MASTER AND NATIVE-BINDING CAPTURES THAT SECTION 113 FOUND ABSENT ON
+WINDOWS ARE PRESENT ON THIS MAC, 0600/0700, WITH THE SECTION-111 BYTE DIGESTS
+MATCHING; THE NEXT FACTUAL STEP CAN CONTINUE HERE FROM THEM AND THEIR SPENT
+BUDGET. NO COMPLETE LANE SUITE WAS RUN THIS ROUND, BY OWNER DIRECTION. THE
+NEXT STEP IS SECTION 111.10'S HISTORICAL CLASS, SAME-CLASS DENOMINATOR AND
+TERMINAL-PAYMENT QUALIFICATION, THEN LOOK REGISTRATION (`SI-CR19-003`); THE
+CANONICAL PIT STUDY REMAINS BLOCKED ON ORIGINALS, CORRECTIONS AND AVAILABILITY
+CLOCKS. THE THREE SOURCE P2s, THE SHARED P2 `SI-CR5-005` / `SI-CCR16-007` AND
+`SI-CR15-001` REMAIN OPEN. LOOKBACKS 20/60/120/252 REMAIN UNSELECTED; REAL
+LOOKS 0/0, ALPHA 0, PERMANENT LOOKS NONE, QC ATTEMPTS 0. OUTCOMES, HOLDOUT,
+PRODUCTION RANKING/SEEDS, ETF, QC HISTORY/PROJECT/UPLOAD/COMPILE/JOB/BACKTEST,
+PURCHASE, BROKER, OPERATOR DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL, ORDERS
+AND TRADING REMAIN GATED.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -229,6 +232,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-12 | Claude review (Windows session) | `2a65d4a` -> `a509a5e` reviewed from the published head; **test-only correction at `2ef9a4f`**; this record commit follows, so the round has two Claude commits | Independent review of the full Sharadar master capture, offline segmented recovery, native-key/rational-observation binding, precision transport mirror and closing record | Reviewed all four commits individually in the Windows lane worktree after a fast-forward from `85e61a4`. Read every new production module and script in full. Verified protocol hashes, the twelve-request inventory, the 36-file source inventory, 48 transport cells, the import-boundary expansion and the secrets/data sweep; section 111.10's preserved-body byte figure could not be reproduced under four removal rules (`SI-CR17-004`). Five file-based guard removals: four red (ZIP undeclared gap, both-axis owner uniqueness, identity-seal anchor, partial fill), one survivor now pinned (nested non-admission rule). The first complete Windows lane run since 2026-10-05 found the protected-capture runtime and seven of its test files POSIX-only. | 43-file lane on `2ef9a4f`: 1,990 passed, 412 skipped in 14,694.70s (4:04:54); before the guards the nine touched files gave **36 failed, 423 passed, 47 errors**, all `os.getuid`; the seven guarded files now **412 skipped**; segments file **47 passed** with the new test red under its mutation (**4 failed**); compileall exit 0; `git diff --check` clean; active-document **69 passed** before and **69 passed in 18.09s** after this record. Protected artifacts, provider rows and credentials were not accessed; none exist on this host. **Canonical actual looks 0/0, exploratory 0, alpha 0, QC attempts 0.** | No P0/P1. `SI-CR17-002` (P2, tests guarded, runtime platform scope open for the owner), `SI-CR17-003` (P3, closed, test-only), `SI-CR17-001` (P3, process note on lane-suite ownership across two hosts), `SI-CR17-004` (P3, record precision: the 111.10 preserved-body figure is not reproducible from the stated rule). Source P2s, `SI-CR15-001`, `SI-CR19-003` and shared `SI-CR5-005` unchanged. | Codex counter-reviews `2ef9a4f` and this record commit; the owner decides whether protected-capture runtimes need Windows parity; every source, outcome, QC-run, purchase and trading gate remains closed. Push once at the end of this round per the standing rule. |
 | 2026-10-12 | Codex Windows counter-review / host prerequisite | Exact Claude `2ef9a4f889eda9496254ae1ca43d946eb9378374`, `ab85a032759cf5b5924a51caf1c8417cae2d6adc`; counter-review commit follows | Per-commit counter-review, selective Windows test coverage and append-only record errata; protected-runtime preflight is the next bounded prerequisite | No production change in the counter-review: preserve all assertions and the nested non-admission regression; restore neutral tests without weakening protected storage. Exact byte recipe reproduces section 111.10. Preserve historical IDs and current delegated authority. | Main focused **280 passed, 257 skipped in 8.25s**; 52-case original selection **52 skipped in 1.34s**, delegated marker-only memory probe 52 green; exact historical-body 1,444,434 bytes / `608f7d99...713401`. Final host-preflight validation/publication follows in section 113. | No new P0/P1. Broad skips and issue-ID collision corrected; permission versus factual gates qualified. Actual POSIX-only storage and absent protected inputs remain factual limitations, not a new generic owner-approval gate. | Commit counter-review first, then implement and validate the named host preflight; one combined final lane push. No source recapture, consumed-budget reset, actual look or QC attempt. Retire only the handled one-shot monitor after publication. |
 | 2026-10-12 | Codex host-prerequisite completion | Accepted Claude `ab85a032` -> counter-review `c83011cf5ac46a55617d1ae633c95e6f9d7224da` -> implementation `c4c57770224e1ba8a601f5adefa5e974b1e0e4dc`; this record-only closing commit follows | Seven SI runtimes gain one fixed capability refusal; 64 unskipped host-boundary cases, explicit fabricated capability fixtures for 31 neutral functions | Original POSIX ownership/mode/no-follow, immutable receipts/claims, budgets, source gates and economics retained. This is host-safe refusal only, not Windows ACL parity or actual source qualification. | Main closing focused **344 passed, 257 skipped in 11.31s**; 34 entry-guard removals **34 failed / 30 passed**, restored **64 passed**; all16 changed Python files compile in memory; existing assertions and 27 protected bodies mechanically preserved. Section 113.5-113.7. | No new P0/P1; protected Windows storage and original-input source P2s remain open. Historical source/shared/prospective issues retained. Zero source requests, looks and QC attempts in this round. | Exactly one combined non-force target-ref push after closing checks, then retire only this handled one-shot monitor. Claude reviews every new commit; factual continuation needs original protected inputs, receipts and spent claims without recapture/reset. |
+| 2026-10-13 | Claude review (macOS session) | `ab85a03` -> `d3ac5bf` reviewed from the published head; **no code or test correction**; this record commit is the only Claude commit | Independent review of Codex's Windows counter-review, the POSIX-only test markers and the protected-host capture prerequisite | Verified the marker change is mechanical (104 decorators, no assertion changed), the guard is capability-only and placed first on all 34 sensitive paths, and POSIX behaviour is unchanged. Confirmed the original master and native-binding captures exist on this Mac with matching section-111 byte digests and 0600/0700 protection. Ran two in-memory probes of the guard; both red. | Pushed tree `d3ac5bf`, clean, network-denied, empty environment: Codex's eleven-file selection **601 passed, none skipped** (Windows: 344 passed, 257 skipped); platform baseline 64 passed; changed files compile; final-tree active-document 69 passed; `git diff --check` clean. **No complete lane suite, by owner direction.** **Authorized looks 0, consumed looks 0**. | No new finding. `SI-CCR-WIN-20261012-001..003` accepted. `SI-CR-WIN-20261012-001` (P3) and `-002` (P2) open. `SI-CR19-003`, source P2s, shared P2 and `SI-CR15-001` open. | Codex counter-reviews this record commit, then continues section 111.10's class, denominator and terminal-payment qualification on this Mac from the original captures. Every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -17372,3 +17376,163 @@ Read-only Git metadata confirmed only the owned staged/unstaged lane record,
 unchanged `c4c5777` and no untracked work. Explicit array handling corrects the
 guard; this is a harness refusal, not an unexpected branch change or omitted
 user work.
+
+## 114. Claude independent review — 2026-10-13 UTC (macOS session: Windows counter-review, POSIX-only test markers, protected-host capture prerequisite)
+
+Reviewer: Claude, the macOS session, in the designated lane worktree on
+`codex/strategy-short-interest`, CPython 3.13.15 / pytest 9.1.1, every pytest
+run network-denied with `sandbox-exec -p '(version 1)(allow default)(deny network*)'`
+in an empty inherited environment. After `git fetch`, the local branch
+fast-forwarded cleanly to `d3ac5bf`. Codex was idle, and the tree was clean.
+The owner directed a commit review without the complete lane suite, so this
+section runs focused checks only and claims no complete lane run.
+
+The Windows Claude session reviewed `2a65d4a..a509a5e` in section 112, so this
+review covers only the Codex commits after it.
+
+**Disposition: all three Codex commits accepted, with no correction.** This
+Mac is a POSIX host, so it supplies the complementary validation section 113
+asks for. The eleven-file selection that Windows ran as 344 passed and 257
+skipped runs here as **601 passed, none skipped**, and the new platform guard
+passes on this supported host, so POSIX capture behaviour is unchanged. Both
+in-memory probes of the new guard went red. No new finding arises, and this
+commit changes no code or test.
+
+### 114.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Lane branch | `codex/strategy-short-interest` |
+| Previous Claude review record | `ab85a032759cf5b5924a51caf1c8417cae2d6adc` (section 112, Windows session) |
+| Reviewed remote head | `d3ac5bfdab9f95fe8800592e3ec6195d675a0044` |
+| Ordered reviewed range | `ab85a03..d3ac5bf` (3 Codex commits, linear; committed 22:23-22:46 UTC on 2026-10-12, with two ledger rows dated in UTC) |
+| Code and tests changed | seven capture/offline scripts (guard calls only), seven test files (markers), new `tests/test_short_interest_capture_platform.py` and `tests/short_interest_capture_fixtures.py` |
+| Record delta | status paragraph, two ledger rows, section 113; nothing else removed |
+| Claude commits this round | this record commit only |
+
+| # | Commit | Scope | Disposition |
+|---|---|---|---|
+| 1 | `c83011c` | Counter-review of section 112: per-function POSIX markers, aliased issue IDs, byte recipe | **accepted** |
+| 2 | `c4c5777` | Protected-host capability refusal before sensitive actions in seven runtimes | **accepted** |
+| 3 | `d3ac5bf` | Section 113.5-113.7: validation, limits and handoff | **accepted** |
+
+### 114.2 The counter-review of section 112
+
+- **The test-marker change is mechanical.** Across the seven test files, the
+  only changed lines rename the module-wide `pytestmark` to
+  `_POSIX_CAPTURE_ONLY`, add a two-line comment, and add 104 per-function
+  decorators. No assertion or test body changes. On this Mac every one of
+  those protected-I/O cases runs and passes.
+- **The issue-ID aliases are right.** Section 112 reused `SI-CR17-001` and
+  `-002`, which already name the closed privacy redaction and UTC erratum in
+  sections 87-90. Codex's `SI-CR-WIN-20261012-*` aliases keep both meanings
+  distinct. To avoid a third collision, this section's IDs start at
+  `SI-CR22`, unused in the record.
+- **`SI-CR-WIN-20261012-001` stays open.** The owner directed no complete
+  lane run this round, so no complete run on `d3ac5bf` is claimed by either
+  host.
+
+### 114.3 The protected-host prerequisite in `c4c5777`
+
+- **The guard.** `_require_capture_platform` requires `os.name == "posix"`, a
+  callable `getuid`, `O_NOFOLLOW` and `O_NONBLOCK` as positive true integers
+  (booleans rejected), and a non-negative integer UID. Otherwise it raises a
+  fixed `protected_capture_platform_unavailable` refusal with no external text.
+  It checks capabilities only; the existing ownership, mode and no-follow
+  checks still enforce file protection.
+- **Placement.** The production diff, apart from the guard itself, is imports,
+  moving `Path.cwd()` inside each `try` so the guard runs first, and a fixed
+  refusal code with `ready_for_empirical_backtest: false`. There are 34 guard
+  insertions, 27 sensitive entry points plus 7 command-line paths, as stated.
+- **POSIX behaviour is unchanged.** On this host the guard passes, and the
+  platform test that asserts the actual host's result requires a pass on
+  POSIX with these capabilities and a refusal elsewhere.
+
+### 114.4 Mutation probes (in memory, network-denied)
+
+The platform tests simulate unsupported hosts by patching the FINRA module's
+`os`, and replace downstream actions with denial spies, so no mutant could
+reach real state; the sandbox blocked the network regardless. Unmutated
+baseline over the platform file: **64 passed**.
+
+| Mutant | Guard removed | Result | Reading |
+|---|---|---|---|
+| P1 | the guard's `os.name == "posix"` requirement | **36 failed** | Caught: arguments were inspected before the host refusal. |
+| P2 | the guard call at the start of the Sharadar command-line path | **1 failed** | Caught: "host refusal must precede every sensitive action". |
+
+### 114.5 The original captures exist on this Mac
+
+Section 113 found the protected securities-master and native-binding
+directories absent on its Windows host and requires the originals before any
+continuation. They are present on this Mac. Checked by metadata and hash
+only, no contents read:
+
+- `artifacts/short_interest/sharadar_securities_master/` holds the run
+  `sharadar-master-20261012T055800Z` and its whole-round budget claim.
+  `artifacts/short_interest/sharadar_native_binding/` holds
+  `native-index-source-20261012T055800Z`.
+- All 84 files are 0600 and all 5 directories 0700, owned by this user, with
+  no symlinks.
+- `native.index.private.json` and `observations.private.json` hash exactly to
+  the native-index and V3 observation-binding byte digests in subsection
+  111.9.
+
+So the next factual step can continue on this host from the original
+captures and spent budget. Nothing about their absence on Windows authorizes
+recapture or a budget reset.
+
+### 114.6 P0-P3 issue ledger
+
+New this round: 0 P0, 0 P1, 0 P2 and 0 P3. Still open: four P2s
+(`SI-SRC-20260928-001`, `-002`, `-003` and the shared `SI-CR5-005` /
+`SI-CCR16-007`), the P2 `SI-CR-WIN-20261012-002` (Windows protected-storage
+parity) and the P3s `SI-CR-WIN-20261012-001`, `SI-CR15-001` and `SI-CR19-003`.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or closure | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI-CCR-WIN-20261012-001..003 | P2-P3 | Closed as Codex recorded | `c83011c` | section 112 records and tests | Accepted. The marker restoration is mechanical and its cases pass on POSIX; the ID aliases and the authority qualification are sound. | 114.2. | Accepted. | None. | Closed. |
+| SI-CR-WIN-20261012-001 | P3 | Open, process note | `a509a5e` | complete-lane ownership | No complete lane run on `d3ac5bf` this round, by owner direction. | 114.2. | Retained. | None. | Open. |
+| SI-CR-WIN-20261012-002 | P2 | Open | `a5ac4c2`..`c4c5777` | Windows protected storage | Unchanged in substance: Windows now refuses safely, but has no protected-capture parity. On this POSIX host the protected path works. | 114.3. | A real platform limitation. | None. | Open. |
+| SI-CR19-003 | P3 | Open, prospective advisory | `b034cda` | exploratory look accounting | Unchanged. | Section 113.7. | Retained. | None. | Open. |
+| SI-SRC-20260928-001, -002, -003 | P2 | Open | prior rounds | source admission | Unchanged. | Section 113.7. | Facts no delegation can supply. | None. | Open. |
+| SI-CR15-001 | P3 | Open | `0e31505` | standing delegation | Unchanged; no purchase or terms acceptance. | Section 113.7. | Retained. | None. | Open. |
+| SI-CR5-005 / SI-CCR16-007 | P2 | Open, shared, out of lane | N/A | shared integration history | Unchanged. | Section 113.2. | Owner decision; documented only. | None on this lane. | Open. |
+
+### 114.7 Validation
+
+On the exact pushed tree `d3ac5bf`, clean, network-denied, empty inherited
+environment:
+
+- Codex's eleven-file selection (the seven capture-test modules, master
+  segments, the lane import boundary, active-document and the new platform
+  file): **601 passed in 4.75s, none skipped**. On Windows the same selection
+  was 344 passed and 257 skipped; the 257 POSIX-only cases all pass here.
+  `git status --porcelain --ignored` was identical before and after.
+- Platform-file baseline **64 passed**; probes P1 and P2 red (114.4).
+- In-memory compilation of the nine changed Python files: **ok**.
+  Active-document on the final tree after this record: **69 passed**.
+  `git diff --check` **clean**.
+- **No complete lane suite was run**, by owner direction. No provider request,
+  credential read or capture-content read occurred. **Authorized outcome
+  looks: 0. Consumed outcome looks: 0.**
+
+### 114.8 Quality and next step
+
+- **Software, 10/10.** A narrow, fail-closed host guard placed first on every
+  sensitive path, with tests that prove the ordering, and no change to POSIX
+  behaviour.
+- **Records and authority, 10/10.** The ID collision and the byte recipe are
+  resolved precisely, without rewriting history.
+
+1. Codex counter-reviews this record commit.
+2. Continue section 111.10's historical composite/class relation, same-class
+   denominator and terminal-payment qualification **on this Mac**, from the
+   original captures and spent budget verified in 114.5. Freeze any new
+   route, sample or budget before requesting it.
+3. Then resolve `SI-CR19-003` and register the look before any signal/outcome
+   join. The canonical PIT study stays blocked on originals, corrections and
+   availability clocks; vendor deadline 2026-10-19 17:00 America/Los_Angeles.
+4. Still gated: outcomes and looks, the sealed holdout, lookback selection,
+   production ranking and seeds, ETF work, any QuantConnect history/project/
+   upload/compile/job/backtest, purchases, broker, operator database,
+   deployment, paper/live, capital, orders and trading.

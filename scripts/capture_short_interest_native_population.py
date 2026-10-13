@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 from decimal import Decimal
 import json
+import os
 from pathlib import Path
 import urllib.parse
 import urllib.request
@@ -18,8 +19,8 @@ from scripts.qualify_finra_short_interest import (
     _publish_json, _require_capture_platform, _unique_object,
 )
 from scripts.qualify_sharadar_companion import _guard, _http, _utc_now
-from scripts.qualify_short_interest_action_supplement import _clock
-from scripts.short_interest_keychain import KeychainSecret, ShortInterestKeychainError, read_named_keychain
+from scripts.qualify_short_interest_action_supplement import _clock, _protected_bytes
+from scripts.short_interest_keychain import KeychainSecret, ShortInterestKeychainError
 
 ENDPOINT = 'https://api.massive.com/stocks/v1/short-interest'
 PARAMS = {'settlement_date.gte': '2022-01-01', 'settlement_date.lte': '2026-08-31',
@@ -30,6 +31,15 @@ PARENT = Path('artifacts/short_interest/native_population')
 CODE_FILES = ('data/hashing.py', 'ml/immutable_io.py', 'scripts/qualify_finra_short_interest.py',
               'scripts/qualify_sharadar_companion.py', 'scripts/qualify_short_interest_action_supplement.py',
               'scripts/short_interest_keychain.py', 'scripts/capture_short_interest_native_population.py')
+PRIOR_REFUSAL = PARENT / 'native-population-20261013T233128Z'
+PRIOR_PROTOCOL = 'f01bfeb383b6879468507f90d2b6ded073402427a934cff52ca2ca569c0ed72a'
+PRIOR_HEAD = '3784f4f8779b4a8a14aed109b6a9cb8354126dd7'
+PRIOR_BUDGET_SHA256 = '15a4c75a6af5f003753e6c6624c075d34647558fea30aa8e90bef410032e928d'
+PRIOR_BYTES = {
+    'protocol.json': 'e47c01ae6a6ccf880727fde8f7be3199f82882bb46e83055d34f0ac74935b705',
+    'started.json': '0137c0aba2c7bc874e4db8ba78eb19fa95fd81a63f490a3304d62e132a776b09',
+    'refused.json': '65cadbc9129840ba9b0abee5aa2cb0fed56946f4e44b9975e7413b4066ad223a',
+}
 
 
 class NativePopulationCaptureError(CaptureRefusal):
@@ -40,7 +50,11 @@ def protocol():
     return {'schema': 'si-native-population-capture-protocol-v1', 'endpoint': ENDPOINT,
             'initial_query': dict(PARAMS), 'population': 'all_reported_tickers_no_ticker_filter',
             'maximum_pages': MAXIMUM_PAGES, 'maximum_response_bytes': MAXIMUM_BYTES,
-            'authentication': 'owner_named_massive_login_Keychain_item_Bearer_header_only',
+            'authentication': 'explicit_known_MASSIVE_API_KEY_after_verified_zero_HTTP_Keychain_refusal_header_only',
+            'previous_failed_claim': {'run': str(PRIOR_REFUSAL), 'head': PRIOR_HEAD,
+                                     'protocol_sha256': PRIOR_PROTOCOL, 'file_byte_pins': dict(PRIOR_BYTES),
+                                     'budget_bytes_sha256': PRIOR_BUDGET_SHA256,
+                                     'HTTP_attempts': 0, 'old_claim_retained_not_reset': True},
             'continuation': 'exact_received_fixed_origin_path_cursor_no_secret_query',
             'automatic_retries': 0, 'restart_or_resume': False, 'proxies': False, 'redirects': False,
             'source_kind': 'latest_revised_SI_not_daily_short_volume',
@@ -48,12 +62,44 @@ def protocol():
             'outcome_looks': 0, 'qc_attempts': 0, 'ready_for_empirical_backtest': False}
 
 
-PROTOCOL_SHA256 = 'f01bfeb383b6879468507f90d2b6ded073402427a934cff52ca2ca569c0ed72a'
+PROTOCOL_SHA256 = '845ea39d5d3d16d7e852f33abc91d33796363207b32f4655ad5aa7eae30e4683'
 
 
 def _require(condition, reason):
     if not condition:
         raise NativePopulationCaptureError(reason)
+
+
+def _credential(root, *, head, remote):
+    """Explicit documented alternate, never an automatic secret search."""
+    _guard(root, head, remote)
+    directory = root / PRIOR_REFUSAL
+    _require({path.name for path in directory.iterdir()} == set(PRIOR_BYTES),
+             'prior_Keychain_refusal_inventory_changed')
+    receipts = {}
+    for name, digest in PRIOR_BYTES.items():
+        _guard(root, head, remote)
+        raw = _protected_bytes(directory / name, 65536)
+        _require(hash_bytes(raw) == digest, 'prior_Keychain_refusal_bytes_changed')
+        receipts[name] = _json(raw)
+    start, refused, old_protocol = receipts['started.json'], receipts['refused.json'], receipts['protocol.json']
+    _require(hash_payload(old_protocol) == PRIOR_PROTOCOL and start.get('code_head') == PRIOR_HEAD
+             and start.get('protocol_sha256') == PRIOR_PROTOCOL
+             and refused.get('status') == 'source_capture_refused'
+             and _clock(start['started_at']) <= _clock(refused['refused_at']),
+             'prior_zero_HTTP_refusal_binding')
+    _guard(root, head, remote)
+    raw_budget = _protected_bytes(directory.parent / ('budget-' + PRIOR_PROTOCOL + '.json'), 65536)
+    _require(hash_bytes(raw_budget) == PRIOR_BUDGET_SHA256, 'prior_consumed_claim_bytes_changed')
+    budget = _json(raw_budget)
+    _require(budget == {'schema': 'si-native-population-budget-v1', 'code_head': PRIOR_HEAD,
+             'remote_head': start['remote_head'], 'run_id': directory.name, 'protocol_sha256': PRIOR_PROTOCOL,
+             'maximum_attempts': 32, 'started_at': start['started_at'], 'restart_or_resume': False},
+             'prior_consumed_claim_changed')
+    _guard(root, head, remote)
+    value = os.environ.get('MASSIVE_API_KEY')
+    _require(type(value) is str and bool(value), 'known_MASSIVE_API_KEY_unavailable')
+    return KeychainSecret(value)
 
 
 def _next_url(value):
@@ -196,7 +242,7 @@ def run(root, *, head, remote):
             'protocol_sha256': PROTOCOL_SHA256, 'started_at': began,
             'maximum_attempts': MAXIMUM_PAGES, 'outcome_looks': 0, 'qc_attempts': 0})
         _guard(root, head, remote)
-        secret = read_named_keychain('massive')
+        secret = _credential(root, head=head, remote=remote)
         _guard(root, head, remote)
         opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), _NoRedirect())
         return capture_pages(root, directory, opener, secret, head=head, remote=remote, started_at=began)

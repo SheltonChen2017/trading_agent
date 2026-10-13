@@ -268,7 +268,7 @@ def test_run_rechecks_lane_before_each_freeze_publication_and_code_file_read(mon
         events.append("read")
         return b"fabricated-code-only"
     monkeypatch.setattr(Path, "read_bytes", read)
-    monkeypatch.setattr(capture, "read_named_keychain", lambda name: KeychainSecret(KEY))
+    monkeypatch.setattr(capture, "_credential", lambda *args, **kwargs: KeychainSecret(KEY))
     monkeypatch.setattr(capture.urllib.request, "build_opener", lambda *args: None)
     monkeypatch.setattr(capture, "capture_pages", lambda *args, **kwargs: {"status": "fabricated_complete"})
     assert capture.run(Path("/fabricated"), head=HEAD, remote=REMOTE)["status"] == "fabricated_complete"
@@ -280,7 +280,7 @@ def test_exclusive_owned_run_and_whole_protocol_budget_survive_new_head_and_time
     monkeypatch.setattr(capture, "_git", lambda *args: args[-1])
     monkeypatch.setattr(capture, "_utc_now", lambda: NOW)
     monkeypatch.setattr(capture, "CODE_FILES", ())
-    monkeypatch.setattr(capture, "read_named_keychain", lambda name: KeychainSecret(KEY))
+    monkeypatch.setattr(capture, "_credential", lambda *args, **kwargs: KeychainSecret(KEY))
     monkeypatch.setattr(capture.urllib.request, "build_opener", lambda *args: None)
     calls = []
     monkeypatch.setattr(capture, "capture_pages", lambda *args, **kwargs: calls.append(1) or {"status": "fabricated_only"})
@@ -300,3 +300,59 @@ def test_exclusive_owned_run_and_whole_protocol_budget_survive_new_head_and_time
     assert {path.name for path in second.iterdir()} == {"refused.json"}
     assert budget.read_bytes() == budget_before and len(calls) == 1
     assert before == {path.name: path.read_bytes() for path in first.iterdir()}
+
+
+@pytest.fixture
+def known_alternate(monkeypatch):
+    old = {'authentication': 'fabricated_old_named_Keychain_protocol'}
+    old_sha = hash_payload(old)
+    start = {'code_head': capture.PRIOR_HEAD, 'protocol_sha256': old_sha,
+             'remote_head': REMOTE, 'started_at': NOW}
+    refused = {'status': 'source_capture_refused', 'refused_at': NOW}
+    budget = {'schema': 'si-native-population-budget-v1', 'code_head': capture.PRIOR_HEAD,
+              'remote_head': REMOTE, 'run_id': capture.PRIOR_REFUSAL.name, 'protocol_sha256': old_sha,
+              'maximum_attempts': 32, 'started_at': NOW, 'restart_or_resume': False}
+    raws = {name: canonical_json(value).encode() for name,value in
+            [('protocol.json',old),('started.json',start),('refused.json',refused)]}
+    budget_name = 'budget-' + old_sha + '.json'
+    raws[budget_name] = canonical_json(budget).encode()
+    monkeypatch.setattr(capture, 'PRIOR_PROTOCOL', old_sha)
+    monkeypatch.setattr(capture, 'PRIOR_BYTES', {k:capture.hash_bytes(v) for k,v in raws.items() if k!=budget_name})
+    monkeypatch.setattr(capture, 'PRIOR_BUDGET_SHA256', capture.hash_bytes(raws[budget_name]))
+    monkeypatch.setattr(capture, '_guard', lambda *a: None)
+    monkeypatch.setattr(Path, 'iterdir', lambda path: iter(Path(k) for k in capture.PRIOR_BYTES))
+    monkeypatch.setattr(capture, '_protected_bytes', lambda path,maximum: raws[path.name])
+    monkeypatch.setenv('MASSIVE_API_KEY', KEY)
+    return raws
+
+
+def test_explicit_known_alternate_requires_original_zero_HTTP_pins(known_alternate):
+    secret = capture._credential(Path('/fabricated'), head=HEAD, remote=REMOTE)
+    assert secret.for_authorization_header() == KEY
+    assert KEY not in repr(secret)
+
+
+@pytest.mark.parametrize('name', ['protocol.json','started.json','refused.json'])
+def test_alternate_rejects_any_changed_prior_receipt_before_env_read(known_alternate, name, monkeypatch):
+    known_alternate[name] += b' '
+    original = capture.os.environ.get
+    def get(key, *args):
+        if key == 'MASSIVE_API_KEY':
+            pytest.fail('must not read credential')
+        return original(key, *args)
+    monkeypatch.setattr(capture.os.environ, 'get', get)
+    with pytest.raises(capture.NativePopulationCaptureError, match='prior_Keychain_refusal_bytes_changed'):
+        capture._credential(Path('/fabricated'), head=HEAD, remote=REMOTE)
+
+
+def test_alternate_rejects_prior_budget_replacement(known_alternate):
+    name = 'budget-' + capture.PRIOR_PROTOCOL + '.json'
+    known_alternate[name] += b' '
+    with pytest.raises(capture.NativePopulationCaptureError, match='prior_consumed_claim_bytes_changed'):
+        capture._credential(Path('/fabricated'), head=HEAD, remote=REMOTE)
+
+
+def test_alternate_never_searches_when_exact_known_variable_is_missing(known_alternate, monkeypatch):
+    monkeypatch.delenv('MASSIVE_API_KEY')
+    with pytest.raises(capture.NativePopulationCaptureError, match='known_MASSIVE_API_KEY_unavailable'):
+        capture._credential(Path('/fabricated'), head=HEAD, remote=REMOTE)

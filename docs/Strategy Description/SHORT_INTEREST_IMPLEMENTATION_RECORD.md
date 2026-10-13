@@ -18187,3 +18187,64 @@ source/protocol bytes and this record locally, recheck clean roots/branch/HEAD
 and actual matching remote, then apply the two fixed offline readers and the
 one frozen full supplied-population capture. Continue this owner-waived round
 after actual results; this is not its ending or publication checkpoint.
+
+### 116.6 Actual offline applications and explicit authentication alternative
+
+Clean prospective **`3784f4f8779b4a8a14aed109b6a9cb8354126dd7`** preceded
+both actual offline applications and the attempted Keychain source start.
+No push occurred; actual matching remote remained `1f90c626`.
+
+Full retained ACTIONS/DESCRIPTIONS application completed at its fixed private
+destination116.4, start **2026-10-13T23:31:13.446954Z**, completion
+**2026-10-13T23:31:29.263000Z**. Private report payload SHA
+**`d8bca5d2bf9977806106c46b42624de4cc597617af630fd525b3cef3e7735331`**;
+byte SHA **`5970e71c22cc69af2c4fd14d2ca285549bdae527ed5ed905f179b35e669fd432`**.
+Exact original-language application completed at its fixed private destination,
+start **2026-10-13T23:32:36.355960Z**, completion
+**2026-10-13T23:32:50.197023Z**; runtime protocol
+**`5a255f87019132db0e2440839ea3eb80190d258c66388091dc67fe1dad1f9112`**,
+private payload SHA **`b014f222be0d38781dfe8a877970f9cd2be9f5879764a0a8000fa606dfbf3a0a`**;
+byte SHA **`c27801fb0c7531bf927555ad4873bb0b7d38f9c632e6e78276343e7d56bf2ffc`**.
+Main independently verified both protected report-byte digests and canonical
+payload seals against completion receipts. All source assertions, quotations,
+consideration candidates, missing facts and Sharadar fitness dispositions stay
+private. Both runs add **0 provider requests,0 credential reads,0 outcome
+looks,0 QC attempts**; verified custody/source interpretation is not automatic
+payment or full empirical-input admission.
+
+First full-population start
+`artifacts/short_interest/native_population/native-population-20261013T233128Z`
+started **2026-10-13T23:31:28.189055Z**, refused
+**2026-10-13T23:31:58.138394Z**, public fixed code
+`owner_keychain_access_unavailable`. The bounded named-Keychain process did not
+return a usable value. **Zero page-start/response files and zero HTTP requests**;
+only protocol/start/refusal exist. Retain all three exact byte pins and the
+original `f01bfeb3...` global claim permanently; no restart/reset or token
+value persisted, no OS approval/security gate bypassed. Keychain selectors
+remain the canonical newly reported locations, not a claim that access worked.
+
+**SI-DEC-20261013-17** deliberately scopes a safe existing alternative under
+standing source authority: the specifically known, previously authorized
+**`MASSIVE_API_KEY`** session variable was checked by presence only and remains
+available. This later delegated decision supersedes116.2's self-imposed
+no-environment-fallback choice **only for this named Massive variable after
+this exact zero-HTTP Keychain refusal**. No other variable/file/item search,
+new credential, password/ACL change or affiliation inquiry. A new runtime
+first verifies the old protected three-file inventory/byte pins/clock and
+consumed-budget bytes
+**`15a4c75a6af5f003753e6c6624c075d34647558fea30aa8e90bef410032e928d`**.
+Only then read that exact variable in memory through the same redacted,
+nonserializable/echo-refusing wrapper. Missing/malformed values stop; no
+further fallback. Do not print/log/hash its value.
+
+Prospectively freeze a **distinct** explicit-alternative protocol
+**`845ea39d5d3d16d7e852f33abc91d33796363207b32f4655ad5aa7eae30e4683`**,
+binding the prior refusal and immutable claim. Query range/sort/population,
+32-page ceiling/32MiB bounds, no retry and source-only counters remain exactly
+as116.4. This is a named new authorization-route decision before any HTTP, not
+a silent rerun of consumed requests or an old-budget reset. Main's alternate/
+Keychain/document selector passes **136 in0.96s**, empty environment/network
+denied, zero skip/warning; changed prior receipt/budget and absent-variable
+directions refuse before credentials or requests. Both original run outputs
+remain untouched. Commit exact code/test/record locally, recheck clean lane/
+actual matching remote, then execute once and continue toward readiness.

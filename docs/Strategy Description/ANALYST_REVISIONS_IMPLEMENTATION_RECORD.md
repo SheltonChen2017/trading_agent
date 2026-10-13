@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–294 retain the milestone, review, preregistration, QC
+strategy. Sections 1–295 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -525,6 +525,14 @@ reader authenticated failure evidence with finite category `http_status`.
 No capture was accepted. Both uses are spent; there is no unchanged retry.
 The exact HTTP code, failing role/page and request count remain unknown.
 No strategy backtest is authorized.
+
+Section 295 records the owner's subsequent **"disarm the monitor"** and
+**"proceed without review"** directions. The matching-lane heartbeat is now
+**PAUSED**, with its saved prompt/schedule/baseline preserved. The fresh waiver
+covers only the bounded HTTP-status observation diagnostic and its output
+authentication, not a replay of R293/R294 or future contracts. Its exact
+prospective protocol and run decision must be committed before contact;
+no independent acceptance or capture success is inferred from this waiver.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1535,7 +1543,7 @@ delegation. The owner explicitly waives Claude review of section 294's
 current one-shot Massive diagnostic on the later "proceed without review"
 instruction. That invocation and its output read are now spent: a finite
 `http_status` refusal was authenticated, without an accepted capture.
-The immediate next step is the section 294 handoff's separately justified
+The preceding section 294 handoff identifies the separately justified
 status-observation recovery contract, not another call to the spent R293
 entry point. This current waiver covers the section-293 caller and bounded
 result-recording code only, not future new contracts or independent final
@@ -1553,6 +1561,13 @@ the matching-branch monitor is active, quiet while unchanged/nonactionable,
 and must not treat Codex's own final push as a Claude trigger. This does not
 authorize automatic source acquisition without an applicable reviewed
 contract (or exact current owner waiver) and separately committed run freeze.
+The owner's subsequent disarm instruction supersedes that active status:
+the monitor is now paused, not deleted or automatically rearmed. The owner
+explicitly waives Claude review of section 295's current bounded HTTP-status
+diagnostic and its output authentication on the new "proceed without review"
+instruction. The immediate next step is section 295's exact committed
+one-shot status-observation protocol, subject to all technical gates; no
+spent acquisition, source reader or historical diagnostic is renewed.
 The owner previously said
 "proceed" after the open-session concern was explained. Section 272 supersedes
 the session-exit prerequisite, without authorizing any process interruption.
@@ -45932,3 +45947,256 @@ This is an overlapping repeat, not an addition to the 284 distinct focused
 passes. No historical result or private output reader was replayed. The two
 new executable/test source pins and all section-293 production pins remain
 unchanged, and final diff checking passes.
+
+## 295. Owner-waived bounded Massive HTTP-status observation, 2026-10-13
+
+### 295.1 Owner decision, paused monitor and exact scope
+
+The owner next directs **"disarm the monitor"**, followed by a fresh
+**"proceed without review"**. `ARV2OD295-D1` records that current scoped
+pre-use Claude checkpoint waiver for the new status-only diagnostic and its
+bounded offline result authentication. The exhausted section-294 waiver is
+not reused. This is sequencing authority, not independent review or a waiver
+of any technical/source/financial gate, nor standing approval of future
+contracts. Same-round implementation and advisory checks are not independent
+acceptance. No new Claude review range exists to counter-review or replay.
+
+During preparation the owner additionally reports subscriptions to **EODHD
+EOD All World** and **EOD Calendar**, a logged-in Safari session, and explicitly
+permits accessing that data if backtesting needs it. `ARV2OD295-D4` retains
+that prospective existing-access permission without changing this Massive
+diagnostic's fixed transport or source choice. No EODHD account/session,
+endpoint, credential or licensed row is inspected by this round's preparation.
+The reported subscriptions are not yet independently verified field coverage,
+historical/PIT provenance, identity admission, new paid rights or third-party
+processing permission. A needed EODHD acquisition must have its own bounded
+purpose/source/protocol and applicable gates; no automatic fallback request
+or source substitution is added here.
+
+The owner then supplies the EODHD token location and asks to retain it:
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying/artifacts/insider_buying/private/eodhd-token.txt`.
+Only this owner-provided location is recorded, not the token or its shape.
+The file has not been opened, copied, hashed, validated or printed by this
+round. Future needed EODHD access may read that exact credential file under
+the owner's data-access direction; this does not authorize editing it,
+running repository commands in that sibling checkout, inspecting other
+Insider Buying files or weakening the designated Analyst root invariant.
+
+The existing `analyst-claude-review-forward-pair` heartbeat was changed to
+**PAUSED** through the app control. Readback confirmed PAUSED and unchanged
+ID, name, kind, prompt, schedule and target chat. The owner has not rearmed
+it; it must stay paused after this round. The OpenAI Docs skill guided use
+of the existing automation's pause control, not creation of another monitor.
+
+The starting clean local and fetched matching remote head is
+`032c81e2b564e8b174f50c173bda8947c3e73925`, solely in
+`/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2` on
+`codex/strategy-analyst-revisions-v2`. Last disposed Claude head remains
+`38e2b97a42daea7130b73e460f535cc36e02bae6`. Every repository operation,
+validation, commit and the single final matching-lane push stays here.
+
+This action addresses `ARV2D294-001` prospectively: determine a current
+validated numeric HTTP status and exact endpoint through a deliberately
+body-unread request. It does not recover the discarded historical status,
+identify R293's original failing role/page, repair R287's lost reason,
+replace either failed capture, or acquire rows. The new protocol's exclusive
+claim, persistent send-start evidence, bounded transport and finite output
+are substantive diagnostic changes, not an unchanged retry under a new name.
+There is no strategy evaluation; no-order operation is inherent to this
+status-only observation. Existing Massive access is used without purchasing
+rights or reopening the owner's source-choice question.
+
+### 295.2 Bounded prospective protocol
+
+New code is isolated in `scripts/run_arv2_massive_http_status_diagnostic.py`
+and its focused tests. Original capture, classifier, observer, R293 caller,
+R294 reader and all selected dependencies remain frozen. No old operational
+entry point, worker, capture, reader, publication or private corpus is run.
+The new fixed prospective control leaf is
+`artifacts/analyst_revisions_v2/massive_diagnostic/R295-20261013-A`;
+it is not inspected or allocated by preparation or tests.
+
+The fixed scope is first-page GET headers for **2026-10-12** only, with
+`date.gte=2026-10-12`, `date.lte=2026-10-12`, `limit=1`, `sort=date.asc`,
+through `https://api.massive.com/benzinga/v1/ratings`, then `/earnings`, then
+`/guidance`. Each role permits at most one send; the first non-200, invalid
+status, transport/control failure or deadline stops the sequence. There is
+no pagination, retry, backoff, fallback role, alternate date/host/path or
+automatic pin refresh. A 200 is only a current response-header observation,
+not a valid body/schema/capture or full entitlement claim.
+
+Exclusive private claim creation and fsync precede the existing credential
+loader and all contact. A completed claim consumes use even without a send;
+partial/duplicate/ambiguous claims are never safely unspent. Each persistent
+send-start marker precedes its send. A local dispatch count is not a measured
+wire/server-request count; interruption between marker and send is ambiguous.
+`provider_request_count` stays null. No cleanup, marker repair or unchanged
+repeat follows any outcome.
+
+More precisely, the finite count records successfully acknowledged dispatch
+intent boundaries. A marker can be written and then fail its final checks
+before that acknowledgement; the count is not a census of every retained
+partial marker. No send follows a failed marker write, but its private leaf
+remains spent/ambiguous and must not be inspected or repaired to renew use.
+
+The new transport uses a prepared request validated before dispatch and
+again against the response, an owned Requests HTTPAdapter with retries zero,
+default verified TLS, explicit empty proxy map, no client certificate and
+streamed/no-redirect behavior. It does not use Session redirect handling:
+Requests can consume a redirect body while preparing a next request even
+when redirect following is disabled. The direct adapter's no-preload path
+avoids that behavior; no application body API is invoked. This is not proof
+of zero network body transmission, zero kernel/TLS buffering or whole-process
+integrity. Credential material stays in the request's bearer header, never
+URLs, evidence, logs or serialized exceptions.
+
+Public implementation references are Requests 2.34.2's official
+[Session source](https://requests.readthedocs.io/en/latest/_modules/requests/sessions/)
+and [HTTPAdapter source](https://requests.readthedocs.io/en/latest/_modules/requests/adapters/).
+The repository pins Requests 2.34.2. These public documentation reads are not
+Massive requests or proof of the installed runtime's entire integrity.
+
+A present `SSLKEYLOGFILE` (including empty) must refuse in preflight before any
+Requests import or contact. urllib3's TLS setup can otherwise enable key
+logging. The value is never printed, and the operational process does not
+silently remove that setting or weaken TLS. Synthetic validation isolates
+its own environment; that is not a change to the user's account settings.
+The diagnostic additionally requires Requests' runtime version to equal the
+repository's 2.34.2 pin; version equality is not an authenticated byte-level
+inventory of every transport dependency.
+
+The compatible designated Darwin/POSIX Python 3.13 host/interpreter, exact
+clean HEAD, caller and selected dependency pins bind the run. The whole
+process has a 60-second cooperative deadline; Requests' connect/read timeout
+argument is at most 15 seconds and no greater than the remaining budget.
+That scalar is not a separate total-wall-clock bound on each send. Signals
+cannot bound uninterruptible kernel I/O or host suspension. Only fixed finite
+categories, validated integer statuses in
+100..599, constant role/endpoint identities, counts, times and hashes may
+cross the output boundary. No failed-response body, licensed row, arbitrary
+exception, opaque return or credential is printed or persisted.
+
+Before contact, commit the final source/profile pins, focused results and
+exact one-shot invocation/result-recording decision below. Actual exit and
+authenticated matching output are separate requirements. An output-only
+reader is permitted once under native network denial to authenticate only
+this new claim/report against externally observed pins and actual exit.
+Late/nonzero/unknown/malformed output never means successful acquisition.
+Normal operational reports may establish an HTTP refusal, not a capture.
+
+All three public formal trust roots remain empty/zero-access. All PIT/paper
+and formal source/security flags stay false; the booked floor remains
+**314 shared / 239 development / 50 infrastructure / 699 cells**. No QC or
+capacity request, score, portfolio, outcome, broker/funded/real-order,
+paper/live deployment, new paid right, shared/root file or other-lane change
+is in scope. All historical spent protocols and failures remain preserved.
+
+### 295.3 Final implementation pins, validation and qualifications
+
+| Selected new source / profile | SHA-256 |
+|---|---|
+| `scripts/run_arv2_massive_http_status_diagnostic.py` | `00dfbf8894b31565b88624c861e7a1479271e6b1e095249da02a5041d6e8abc2` |
+| `tests/analyst_revisions_v2/test_massive_http_status_diagnostic.py` | `94f4e94279e70896756ade4c4ece9a613ec8f98fc0fc528ab83c1c7366aabe05` |
+| Canonical `arv2-massive-http-status-diagnostic-v1` profile | `3b07411ca1165a4608b1026b9cd2f0d8e1d5da0d54825c83e5f391fc1c631163` |
+
+Eight frozen selected dependency pins are required: all seven section-293.3
+dependencies, plus the unchanged R293 helper module at
+`137743f30acd78aafb768114446f2b20cecec0bbac12fdc995233accf2911860`.
+Only its pure validation/alarm/private-file helpers are reused, never its
+spent parent, worker, claim path or operational acquisition. Root rechecked
+all eight byte pins; they match. This is selected-source binding, not whole
+interpreter/dependency integrity. The new reader is a separate CLI mode of
+the same pinned source, schema `arv2-massive-http-status-output-v1`.
+
+Author's final focused selection: **137 passed in 1.51 s**, with no failures,
+skips or warnings; the earlier 116 passed in 1.66 s overlap. Root's final
+selection: **224 distinct passes in 4.14 s** (137 new diagnostic + 86
+record/active-document + 1 current research transitive import-closure check).
+New source/tests compile in memory without bytecode; `git diff --check`
+passes. The existing research-package closure does not authenticate the
+entire script/third-party transport graph. No complete suite ran.
+
+The final prospective-record repeat passed **86 tests in 0.84 s**; it is
+already included in the 224 distinct tests above, not an additive count.
+
+All pytest and mutation processes used native `sandbox-exec` denial of
+`network*`, disabled plugin autoload, `--noconftest`, `-B`, no cache provider
+and in-root temp/cache support. Root used `.pytest_cache/r295-root-tdqG8c`;
+the process asserted `assistant.dispatch_fence` absent. Test processes remove
+SSLKEYLOGFILE from their synthetic environment only; operational invocation
+must retain its actual environment and refuse if that variable is present.
+No real credential, output leaf, capture, provider or QC call was exercised
+by validation. Native denial is not a measured zero-contact log.
+
+Two memory-only sensitivity trials caught expected failures: actual-exit
+gating omission **1 failed in 0.08 s**, external report-pin omission **2 failed
+in 0.27 s**. The first external-pin harness mistakenly used copied globals,
+masked fixture preflight substitution and yielded two passes before its own
+failure assertion. Correcting the harness to original module globals caught
+both expected failures; the initial missed sensitivity is retained. Each
+mutation restored the original function in `finally`, and no production
+source bytes were mutated. These are not additional successful test counts.
+
+| ID | P | Pre-use finding / disposition |
+|---|---|---|
+| `ARV2I295-001` | P2 | Session redirect preparation may read a body even with redirects disabled. New direct HTTPAdapter transport bypasses that path; a real adapter with a synthetic pool verifies no preload/decode/follow and poisoned body methods stay unused. TLS certificate validation and real provider behavior are not exercised by that fake-pool test. No frozen adapter was changed. |
+| `ARV2I295-002` | P3 | Failed final marker checks can leave a durable marker before the count advances. Count is narrowed to acknowledged boundaries and the explicit `send_intent_ambiguous` terminal retains the uncertainty; a partial-marker regression proves no send follows. Reader authenticates claim/report only, not marker inventory. |
+| `ARV2I295-003` | P2 | TLS key-log environment could leak transport secrets. Preflight now refuses any SSLKEYLOGFILE presence before Requests import, with tests for empty/nonempty values and no preflight subprocess. No user setting is modified. |
+| `ARV2I295-004` | P3 | A scalar Requests timeout is a connect/read timeout, not per-send total wall time. Documentation now preserves that distinction; the separate 60-second process alarm remains the total cooperative bound. |
+
+All four issues are corrected or explicitly bounded before operational use.
+Same-round implementation/advice supplies no independent final acceptance.
+Historical P2s and `ARV2D294-001` remain open pending actual evidence below.
+
+### 295.4 Exact one-shot run and result-recording freeze
+
+`ARV2OD295-D2`: after this entire prospective record and the pinned new source
+and tests are committed, use that exact clean commit as `--expected-head`.
+Permit exactly one invocation of
+`/Users/sheltonchen/.venvs/trading_agent-py313/bin/python -B -m scripts.run_arv2_massive_http_status_diagnostic`
+from the designated root/branch, supplying `--expected-head` and
+`--caller-sha256 00dfbf8894b31565b88624c861e7a1479271e6b1e095249da02a5041d6e8abc2`.
+The exact clean run commit is recorded with the observed result, not guessed
+before commit creation. Require all eight selected pins and the profile above,
+and recheck root/branch/HEAD/status plus live matching remote for concurrent
+change before invocation. No current source/profile modification is allowed
+after this freeze; any refusal/ambiguity consumes this operational decision.
+
+Use in-root support under `.pytest_cache/r295-root-tdqG8c`; do not inspect
+credentials, old outputs or the new private leaf beforehand. Do not unset
+SSLKEYLOGFILE for the actual caller. The caller performs its own exclusive
+claim and marker writes before source contact. Raw stderr is discarded, not
+printed, retained or interpreted as safe error text. Observe actual process
+exit independently of the report. External dispatch/completion clock readings
+are polling brackets, not exact provider timestamps or request duration.
+
+The normal parent envelope is one canonical JSON object plus a second LF,
+with exact keys `terminal`, `profile_sha256`, `report_sha256`, `report_bytes`,
+`send_attempt_count`, `provider_request_count`. Require an allowlisted terminal,
+exact profile, valid SHA-256, exact integer byte count in 1..16,384, exact
+integer acknowledged-intent count in 0..3, and provider count null. Unknown,
+missing, extra, malformed, trailing or nonzero output is not all-endpoint
+success. A well-formed exit-2 envelope may provide pins for the failure-only
+authentication below. A published all-200 report cannot fabricate exit zero.
+
+`ARV2OD295-D3`: only after that bounded valid parent envelope, permit one
+invocation of the same pinned module with `--read-output`, the same expected
+HEAD/caller SHA, actual external `--report-sha256`, `--report-bytes`, and
+`--actual-parent-exit` (0 or 2). Run it under native
+`sandbox-exec -p '(version 1)(allow default)(deny network*)'`, the same
+interpreter/in-root support, and its 30-second alarm. It reads only this new
+claim/report, checks the external report pin before decoding, validates strict
+schemas/types/chronology/source bindings and false flags, and retains original
+descriptors through held/named comparisons. These are bounded endpoint checks,
+not native ACL/xattr or continuous security proof. The reader's exact canonical
+double-LF envelope may emit only its fixed summary fields and finite rows.
+
+Actual parent exit 0 plus authenticated three ordered 200 statuses permits
+only `diagnostic_complete=true`; `capture_accepted` and all PIT/paper flags
+remain false. A refusal status produces actual exit 2 and an authenticated
+finite failure observation, not an accepted capture. Unknown/malformed/late/
+nonzero/ambiguous events do not grant an unchanged retry or another reader.
+After this sole status observation and output-only read, stop at the factual
+next barrier, record all evidence/limitations and make one final lane push.
+Do not automatically launch a new acquisition, EODHD fallback, QC request,
+strategy run or another diagnostic under this waiver.

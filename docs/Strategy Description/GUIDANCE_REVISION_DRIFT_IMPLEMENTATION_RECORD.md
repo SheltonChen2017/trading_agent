@@ -13,9 +13,12 @@ backtest readiness.
 The section-27 evaluation still ended with three pre-initialization failures;
 the attempt ceiling remains exhausted and no manual relaunch is authorized.
 The owner's conditional Mia-led synthetic recovery (32.4) stays
-paused pending platform preflight: output compliance with QC's AI-agent rules
-(GDR-CR28-001) and log accounting remain open, with only 18.89 KB of
-organization-wide log-read quota observed against a 75,260-byte payload
+paused pending platform preflight: refreshed quota was only 8.31 KB / 3 MB
+at about 14:54 America/Los_Angeles, 2026-10-13, below the 75,260-byte payload.
+Section 39 resumes a bounded quota/readiness wait under the owner's
+"proceed" direction. Source/policy inspection found no Platform Data or
+source-transport flow; formal QC/Mia approval is not a documented requirement
+(GDR-CR28-001). Actual cloud byte accounting remains unverified
 (GDR-CR31-003, GDR-CR37-002). The standing recovery ceiling is three
 unsuccessful attempts; section 38 names its separate prospective ledger and
 unexpected-action reconciliation rule (GDR-CR37-001). Recovery launches
@@ -25,7 +28,7 @@ Native loading of the recovery carrier is unverified. Only
 `research/__init__.py`, remains unobserved. No successful native integration
 or empirical backtest readiness is established. The original economic, data,
 empirical, account and trading gates remain closed.**
-Current scope/evidence are sections 17 through 38. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 39. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -5084,3 +5087,188 @@ or settlement parity, empirical readiness or market edge is established.
 Original economic/data/rights/family/window and all account/trading gates
 remain closed. Required human choices are not silently resolved by broad
 preauthorization.
+
+## 39. Owner-resumed quota/readiness preflight, 2026-10-13
+
+### 39.1 Direction, ownership and unchanged source
+
+After asking what blocked progress, the owner wrote **"proceed"**. This
+resumes safe preflight and the already-authorized conditional Mia-led
+synthetic recovery; it does not waive platform limits, reopen the closed
+cycle, approve real data or change economics. Root/branch were verified at
+clean local `3a0084d53014f5a6986fb498f9194684aa099048`, with live matching
+remote `2baf5a48cf21f59d20bd208224e6dbbeede5450a`. That completed Claude
+review remains consumed and accepted after section-38 documentation
+corrections. No newer review or concurrent Claude work was present.
+
+The complete readable RP33 map was rebuilt and verified in memory from the
+accepted source. Exact full source, recovery project, runtime and fixture
+identities reproduce section 38.4: 21 Python files / 298,870 bytes, compiled
+without execution or persistence. Native-file AST/import checks found no
+network/client, archive/encoded-source or dynamic-source-execution route.
+All production/design diffs from producing `c589b3dd` remain empty. No
+candidate, cloud project or source change was made to escape a restriction.
+Two read-only advisory audits checked source/policy and official logging
+source, not independent review or actual platform execution.
+
+### 39.2 Refreshed quota and nodes: an external wait, not missing approval
+
+Safari was authenticated and controllable. The existing Organization Resources
+tab was refreshed, not merely reread from its old display. Around
+**14:54 America/Los_Angeles / 21:54 UTC**, it showed **8.31 KB / 3 MB
+Remaining Log Read Quota**, with **100 KB per backtest**. Both B2-8 nodes
+still displayed `-` for Project/In Use By. No node was reserved or reassigned,
+and no other lane's data/outcomes, Object Store contents or project results
+were read. Incidental resource-list names were not used as evidence.
+
+8.31 KB is below 75,260 payload bytes even before any wrapper or fixed output.
+The quota's decline does not identify its consumer or cause. Ordinary
+generation/storage and retrieval charging must be treated conservatively:
+the UI label alone does not prove separate meters. A free node does not
+supply log capacity. No run/upload is started on this observation.
+
+Current official [Resources](https://www.quantconnect.com/docs/v2/cloud-platform/organizations/resources)
+documents 100 KB/backtest and 3 MB/day for Quant Researcher and restoration
+over a rolling 24-hour window; deletion does not restore allowance. Waiting
+and refreshing sufficient capacity is authorized and does not inherently
+require another owner permission, purchase or account change.
+
+### 39.3 Exact source/policy assessment and retained limits
+
+Inspection of the accepted candidate establishes one fixed local-file
+`SYN-GDR` custom-data subscription, exact invented-sidecar equality and
+explicit synthetic benchmark/fill/settlement configuration. There is no real
+symbol, history or provider request. `fixtures.py`/`lean_bridge.py` supply
+invented disclosure/reference/price/volume records. The readable root parses
+two plain literal data strings and materializes only candidate JSON and
+fixture JSONL; executable source remains visible static Python. The native
+closure excludes the offline ZIP builder and legacy compressed transport.
+The output route contains full record commitments, literal synthetic-account
+observations, own order receipts and bounded runtime labels, not source
+bytes or QC dataset values. This unchanged route was not renamed, encoded,
+split or rerouted to avoid a platform flag.
+
+Current primary [QC Terms, section 2.6](https://www.quantconnect.com/terms),
+[Security and IP](https://www.quantconnect.com/docs/v2/cloud-platform/security-and-ip)
+and [Logging](https://www.quantconnect.com/docs/v2/writing-algorithms/logging)
+were consulted. The prohibition concerns Platform Data extraction and quota
+circumvention, and ordinary own source/results routes remain permitted only
+when they do not convey such data. No documented formal QC staff sign-off or
+Mia approval procedure was found for this invented-only route. The earlier
+off-task reply therefore does not itself create a new approval gate.
+
+GDR-CR28-001 is mitigated at this inspected source/policy level; this is an
+explicit inference from the actual source and primary rules, not legal
+assurance, a platform waiver or native runtime proof. Any real compiler or
+platform compliance flag must still be obeyed; no retry under a new framing
+or channel is permitted to bypass it. New/mixed inputs or changed output
+require a new scoped assessment. GDR-CR31-003 remains open for actual cloud
+accounting and complete native delivery; GDR-CR37-002 remains a shared
+capacity prerequisite. Original empirical/rights/economic gates stay closed.
+
+### 39.4 Bounded Mia follow-up and public logging-source evidence
+
+One read-only logistics follow-up was sent in the existing conversation
+`verify current official policy applicability to this invented-only evidence`.
+It asked only what the quota meters, per-line charged bytes and where
+generation allowance is visible, and expressly forbade file edits/edit
+control, compiles, runs, project creation, notebooks, logs/results/data reads
+and resource changes. No new conversation or source/evidence format was
+created. The final reply is now relevant and **Completed**:
+
+- Public docs define production/storage quotas and point to Resources.
+- The exact UI "Log Read Quota" generation/retrieval split is unverified;
+  matching the documented daily denominator is only an inference.
+- The per-line charge composition is unpublished in the docs Mia could find.
+  The 40-byte wrapper allowance remains an assumption, not a verified meter.
+- Mia reports no actions/files/launches, consistent with the visible terminal:
+  only the prior successful `e99033-8c8ea8` and `b841a7-8c8ea8` builds remain.
+
+No unrelated numerical-table content was adopted. Mia is available for a
+scoped recovery when gates pass, but this answer is not a quota certificate
+or job completion. No new compile/run ID or recovery intent exists.
+
+The official public LEAN `master` source adds a 19-character algorithm-time
+stamp plus one space before ordinary Log messages:
+[PrefixWithAlgorithmTime](https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Extensions.cs),
+[DateFormat.UI](https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Global.cs),
+and stores message strings as file lines in
+[BaseResultsHandler.SaveLogs](https://raw.githubusercontent.com/QuantConnect/Lean/master/Engine/Results/BaseResultsHandler.cs).
+For the existing 489 lines, this source-path arithmetic is
+75,260 + 489 x 20 = **85,040 LF bytes**, or 85,529 with CRLF, before
+additional output. It supports the conservative reserve but does not bind
+the deployed cloud version, cloud meter, API escaping/header charges or
+engine output. No immutable public source commit was obtained; moving master
+is not the actual v18179 Git/CLR/Python binding. Keep the 96,820-byte reserved
+cost labelled assumed and accept only complete authenticated native evidence.
+
+### 39.5 Complete named-source observation after the Mia follow-up
+
+Through the documented named Read File route, existing credentials/client
+retrieved the same 21 explicitly named own Python files from project 37647834.
+At **2026-10-13T21:59:33.547887+00:00**, each HTTP 200 / `success: true`
+response identified the exact requested name/project. Complete UTF-8 bytes
+all matched retained terminal-attempt-3 source: **zero changed named files**,
+278,845 bytes, project SHA-256
+`fbf824bfa2f84101ad52ed646ffb3ac7ed0849e9f1bf88aafd11a725427bca96`.
+That is the old exhausted cloud candidate, not local RP33. No all-path
+inventory, notebook/log/result/Object Store read or runtime normalization
+proof is inferred. No credential value/header was exposed, copied, retained
+or reconfigured.
+
+The local ignored receipt
+`artifacts/guidance_revision_drift/qc/read-only-preflight-20261013/named-source-comparison-after-quota-followup.json`,
+SHA-256 `d85e2c8e61106c79061b08e6136cde61d19cf05444dd1844ed051ad607941c4c`,
+retains per-file and raw response hashes and references the complete old
+returned source already retained in section 27. It is observational custody,
+not a Git-portable trust root or new release; it is not force-staged.
+
+### 39.6 Validation, wait checkpoint and next action
+
+Only this lane record changes. Existing Python 3.13.15, `-B`, memory-only
+preparation/compilation and network-denied focused document/import checks
+are used; no full lane/repository suite, installation or native algorithm/QC
+execution. Local preparation functions do run; prepared candidate source is
+compiled/inspected, not executed.
+
+| Check | Result |
+|---|---|
+| Accepted source/recovery map/runtime/fixture identities | Reproduced exactly in memory; 21 Python files / 298,870 bytes; compile/import-source checks passed, no map saved/uploaded |
+| Active-document state, fresh imports and transitive lane/neutral import closure | 3 passed, 0.279 s; repeated after documentary qualifications: 3 passed, 0.267 s; zero failures/errors/skips or observed warnings |
+| Named own cloud source after quota-only Mia follow-up | 21 HTTP 200 / success responses, complete bytes equal retained attempt-3 files; zero changed named files |
+| Source/design/path and diff/status guards | Passed; only this lane record changed, exact mandatory root/branch/HEAD retained, production/draft/frozen-root diffs empty |
+| Full lane/repository suite | Not run; no new production milestone or source regression |
+
+The existing heartbeat resumes for **one bounded quota/readiness-to-recovery
+cycle**, not waiting again for consumed `2baf5a48`. A conservative **1 MB
+displayed remaining-capacity watch threshold** is intended to leave conservative
+headroom for one 100 KB-capped run plus complete retrieval and overhead uncertainty. It is an
+operational screening buffer, not actual QC accounting, quota reservation or
+launch authority. Below it, stay quiet and wait for restoration. At it, recheck
+actual entitlement/headroom, source/review identity, ownership, shared nodes,
+Mia control and platform requirements before any job. If a safe gate remains
+unresolved, report the specific missing evidence instead of inventing formal
+approval or silently changing candidate/output. A newly occupied node means
+wait, never cancel/reallocate another lane.
+
+The old cycle remains CLOSED FAILED 3/3 with zero manual allowance. Separate
+`GDR-Mia-base372-recovery-authorized-20261011` has **zero unsuccessful
+attempts, zero pending intents and no created journal/project**. Section 38.3
+controls remain binding: record every actual Mia/IDE action, halt/reconcile
+unknown actions, maximum three unsuccessful recovery attempts, no reset by
+name/hash/project. Complete returned source and every cloud change must be
+diffed and only verified lane-owned corrections accepted. Completed alone
+does not prove the 372 checkpoints, 752 commitments, orders or economics.
+
+Local section-38 closure and this continuation accumulate without an
+intermediate push. Own publication `8e277418` already used its single push;
+do not republish it or auto-rearm future review cycles. The resumed cycle
+concludes only at a documented native outcome, stable reviewed delivery or
+specific owner-input blocker; pause then. Eventual concluded-round publication
+still requires exactly one guarded matching-lane non-force push, not a
+partial blocked handoff inferred from "proceed".
+
+No native success, original GDR-0..6 completion, empirical readiness, market
+edge, real-data/PIT/matched-SPY/corporate-action/settlement parity or trading
+authority is claimed. All frozen root/shared documents and behavior remain
+unchanged. The external wait is not a new engineering milestone.

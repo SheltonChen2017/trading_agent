@@ -20007,3 +20007,56 @@ Fresh runtime plan/currentHEAD/timestamps/access/controller/request claims
 precede baseline bodies/credentials/cloud effects. No source write, compile,
 launch, input/ObjectStore/other-project/provider access, economic or attempt
 change. This registration precedes post005 effects; results follow honestly.
+
+### 87.5 Genuine post005 all-source capture and fresh static-read scope
+
+Post005 ran once, currentHEAD`7d22451463a307866e751a33e8de79390df50f90`,
+created22:06:33.359128Z/expiry22:21:33.359128Z/ended22:06:40.446583Z;
+plan SHA256`24398191978f3d9df0936c548a397a93892092b9984e5784e4ccf2049bb09fd8`.
+COMPLETED source capture/process0, two HTTP200 wires252010bytes each,
+504020received total. Both inventories and all15files agree; no provider
+project identity returned (own-request binding, not attestation).
+Explicit230180baseline body bytes read under this new scope; old claims not
+renewed. No job/source write/compile/launch/input/ObjectStore effect.
+
+Read2 complete current archive250129bytes/SHA256
+`56b1609572a053aaeb6651dfdca3d55488be0a0f49b4d8f85bc2f3733bd69e36`;
+complete whole-file source delta151185bytes/SHA256
+`3127ecffa93f941093affb33aa92025c75d9b878201e9415dd98f8c441bb649d`.
+Main changed to60796bytes/f42320ef9f278b01803363d700f7ee1a18fbd61e30f05df9617a6e0eae659d7a.
+Known audit helper7490/bce4182d… remains exact. Three other added files:
+6100/c753fe2c1b5d6de25d4d2fcf374a5a6915e8642293427430397e485941a09425,
+5253/ca1df38f610e29d0507cdf2be134f974211135242947effc2d63351e4b96fb14,
+4852/0c68d8fd7a33ac8a29233bbc1597073e050c15066baf15a9efd59183a2b75f78.
+Names remain hashes until safe source inspection. Other ten baseline files
+(nine source modules plus unchanged notebook) match their retained hashes.
+No current file is automatically the source compiled by an unknown owner job;
+compiled binding/economics/performance/canonical acceptance all remain false.
+
+Prospective `TPR-EXT26-OWNER-MIA-SOURCE-INSPECT-20261013-001` permits ONLY
+the named post005read2archive250129/hash and diff151185/hash above
+(401314bytes total), once under fresh currentHEAD/source/time/exclusive
+claim/access before exact-FD bodies, <=30seconds. Static source only; NEVER
+execute cloud code. Independently inspect every added/changed/removed file,
+retain complete before/after privately, and reject secret/licensed-data text
+from public output. No new API/private input/Mia/launch/attempt/economic
+effect; no implicit renewal of post005. Verified source corrections alone
+cannot close native replay/accounting/clock/PIT or compiled-source gates.
+
+### 87.6 Fixed metadata inspection source/test freeze before body
+
+New helper13402bytes/SHA256
+`e307d5d2ad5b3417162b572a6be153eaab155a58d79b0a300b8744e46430c41d`,
+test10384bytes/`68754c28107f69a1d8420fa4a1ffecdf6da5f270b4859b81749e24dff5fba9ad`.
+Root read complete helper/test and compiled both in memory; focused33passed
+0.36s. Producer inspector33 plus corrected discovery final-control1:
+34passed0.42s. Final-check reverse mutant killed1failed0.33s; independent
+discovery-final-check mutant killed1failed0.30s; both restored in finally.
+No full suite or actual private/body/API effect before this freeze.
+Production fixed descriptor/op/root, UTC15minute plan/30second execution,
+one exact-FD projection read, durable exclusive claim/access/controller;
+fixture path/descriptor cannot enter production. Security/foreign-project
+and nonmetadata fields fail closed. Clock/count/progress mismatches remain
+diagnostic facts, not default zero/UTC or accepted metadata. API/credential/
+source/input/operator reads are absent. Root software acceptance only;
+independent Claude review pending at final round handoff.

@@ -20141,3 +20141,66 @@ not stale20. Root document321+metadata-inspector33 focused354passed8.17s;
 no full suite, new strategy evaluation or operator state. Continuous next
 work remains static every-edit review and bounded native evidence for all
 ten external runs, with independent components despite bad compact SUMMARY.
+
+### 87.9 Retained source-screen refusal and prospective native-component scopes
+
+SOURCE-INSPECT001 ran once atHEAD`98695a75db5d6c326b59f505fe7deb10b3ded8e2`,
+created22:22:17.051735Z/expiry22:32:17.051735Z/ended22:22:20.868377Z;
+plan`ebd7cf608385ba5ebc466361fb48eba470f993d51931de079698eea91c71eccc`.
+Two exactFD reads401314bytes, zeroAPI/source execution or newjob/attempt.
+FAILED_OR_UNCERTAIN/process1; no source body disclosed/ported/accepted.
+Receipt2205bytes/`a96de4ac76fe3787f9eb2e34e87239226cd3fe815a098ab12ed66df57549c3c7`.
+Cause inside static validation/disclosure remains unproved; do not label it
+an actual Mia defect, credential failure or evidence that economics changed.
+Executed inspector remains immutable. A separately named fresh
+`TPR-EXT26-OWNER-MIA-SOURCE-DIAG-20261013-001` may re-read ONLY the same exact
+two artifacts401314bytes/30seconds under new committed closed source/time/
+exclusive claim/access/per-body receipts, exposing SAFE phase/refusal enum/
+static location/type/count metadata only, not secret/licensed literals.
+No old claim renewed or new API/native strategy evaluation.
+
+New native component source34481bytes/SHA256
+`4b1640a9cfdbadc30aa8a0b0e2e7da63170123227891e32d87af5e0f3de435db`,
+test23090bytes/`9febdb0368636c62a7e562111f9e70b0e0c3a88f1d4a5818030cc6d6c5a21c96`.
+Root complete source/test review,55focusedpassed1.34s and in-memory compile;
+producer55passed1.79s, independent peer55passed1.42s/restored55passed1.21s.
+Initial stdout fixture used str instead of bytes:41pass/1fail, corrected
+test-only. Peer final-guard sensitivity issue corrected via postINDEX
+processing marker; meaningful finalguard/requestclaim/chronological-batch/
+badcompact-isolation mutants each failed and restored. Software capture
+scope accepted, not source/economics/accounting/QC strategy acceptance.
+
+TPR-EXT26-D089 (agent-delegated, independent review pending): collect all
+ten unfamiliar native runs as fixed contiguous batches: prospective
+`TPR-EXT26-OWNER-MIA-COMPONENTS-20261013-001` looks21–28/batch0 and NEW
+`TPR-EXT26-OWNER-MIA-COMPONENTS-20261013-002` looks29–30/batch8, in that order.
+Each freshly prepared runtime plan pins current committed HEAD/import closure,
+public looks30ledger0d42011a…, and exact diagnostic8496/62cd94e2… plus
+projection4138/8cfb978f… (12634body bytes) before credential/API effects.
+Explicit new body authorization compares those named receipts; no oldscope
+extension. Source/economics strategy acceptance is false even if capture
+completes. Every actual request has durable exclusive pre-effect custody.
+
+Per scope <=8jobs,600seconds,30seconds/request,64MiB total wire/128MiB private
+artifacts, fixed ownOFF37650980. Terminal <=4MiB prospectively (old partial
+wire was1.3MB, capacity not an outcome/attempt change); charts<=2MiB, orders/
+marker logs<=1MiB each. <=128pages×99orders per job, no duplicates/gaps/count
+fabrication; bounded total requests<=1064. Only read/backtest, two frozen
+calendar chart names, orders and EXT26_SUMMARY/EXT26_EVIDENCE_INDEX logs;
+no unfiltered logs/dataset export/ObjectStore, source/compile/launch/edit/
+Mia/provider/private-input/broker/paper/live actions. Primary QC order docs
+require end-start<100;99 is frozen, chart2000points exceeds1449 valuations
+without expanding the date window. Marker logs are aggregate audit only,
+not a market-data export workaround.
+
+Bad/truncated compactSUMMARY remains diagnostic and cannot suppress separate
+INDEX/chart/order capture. Safe failed/loading responses retain distinct
+envelopes before acceptance; credential echoes/oversize/foreign identities
+refuse retention. Missing fills/fees/coverage/source/cash/accounting stay
+null/unverified. Own-request binding is not provider/UTC/PIT attestation.
+No normalization or independent sleeve P&L invented from page count. Parent
+Codex3 is separate from external job/look identities; no additional launch,
+attempt reset or additional look merely because the same run is collected.
+Await actual process exit before next controller/effect. Genuine loading or
+observed resource contention is retained and handled with a new bounded scope,
+never automatic retry, guessed sibling blame or cancelling others.

@@ -1138,7 +1138,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     for current_fact in (
         "OFF has consumed all three Codex attempts",
         "ON has consumed zero attempts",
-        "20 observed looks",
+        "30 observed looks now",
         "no accepted paired result exists",
         "the owner-reported Mia fix requires independent result/source verification",
     ):
@@ -5023,3 +5023,48 @@ def test_section_86_guard_refuses_per_commit_disposition_drift(monkeypatch, inde
         lambda heading: mutated if heading.startswith("## 86.") else original_section(heading))
     with pytest.raises(AssertionError, match="exact section 86 dispositions"):
         test_section_86_counterreview_binds_every_incoming_disposition_and_limits()
+
+
+OWNER_RECOVERY_IDS = (
+    "7dacf829bda2cf1bbe6d75cac5ab5ca3", "1abad98d7e15a7fa2bde33b8d6343e2c",
+    "88775c7e3c8a377bece104bf33f0ba85", "ed1dd63ea51dc5e92fc7168165f65b67",
+    "4f015ee786f90477b945b181a187a11f", "55a5f738feab1d57ce81219cc8a2be5f",
+    "8f8276efbdb6e25651a3b993f9df3f6d", "7e4c1487e6e9ca1fd10ce8f7f4cf9dbd",
+    "b20cba66e8bdec79515466d73cd9584f", "4936632376c0885358493a2694ed239b",
+)
+
+
+def _assert_owner_recovery_observation_limits(value):
+    assert value["project_id"] == 37650980 and value["new_codex_launches"] == 0
+    assert value["retained_looks_before"] == 20 and value["retained_looks_after"] == 30
+    assert value["newly_observed_jobs"] == 10 and value["retained_cloud_looks_after"] == 28
+    assert value["parent_codex_off_attempts_consumed"] == 3 and value["attempt_reset"] is False
+    assert tuple(row["backtest_id"] for row in value["jobs"]) == OWNER_RECOVERY_IDS
+    assert tuple(row["look_ordinal"] for row in value["jobs"]) == tuple(range(21, 31))
+    assert tuple(row["created_server_string"] for row in value["jobs"]) == tuple(sorted(row["created_server_string"] for row in value["jobs"]))
+    for number, row in enumerate(value["jobs"]):
+        assert row["status"] == ("Completed." if number == 8 else "Runtime Error")
+        assert row["retrospective"] is True and row["creation_timezone_known"] is False
+        assert row["origin_authenticated_as_mia"] is False and row["compiled_source_proven"] is False
+        assert row["accepted_metrics"] is None and row["economics_accepted"] is False
+    assert value["compiled_source_proven"] is value["native_accounting_verified"] is value["strategy_accepted"] is False
+
+
+def test_retrospective_owner_recovery_inventory_preserves_all_failures_and_limits():
+    raw = (ROOT / "research/target_price_revisions_qc/extended_owner_recovery_observations30.json").read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == "0d42011a1a7e2c94fe9a5df948d5fa21b9a0546e7f69b8036f2532ac7073d8ef"
+    _assert_owner_recovery_observation_limits(json.loads(raw))
+
+
+@pytest.mark.parametrize("fault", ("reset", "looks", "drop_failure", "utc", "mia", "source", "metrics"))
+def test_retrospective_owner_inventory_refuses_invented_acceptance_or_selection(fault):
+    test_retrospective_owner_recovery_inventory_preserves_all_failures_and_limits()
+    value = json.loads((ROOT / "research/target_price_revisions_qc/extended_owner_recovery_observations30.json").read_bytes())
+    if fault == "reset": value["parent_codex_off_attempts_consumed"] = 0
+    elif fault == "looks": value["retained_looks_after"] = 21
+    elif fault == "drop_failure": value["jobs"].pop()
+    else:
+        key = {"utc": "creation_timezone_known", "mia": "origin_authenticated_as_mia",
+            "source": "compiled_source_proven", "metrics": "accepted_metrics"}[fault]
+        value["jobs"][0][key] = True
+    with pytest.raises(AssertionError): _assert_owner_recovery_observation_limits(value)

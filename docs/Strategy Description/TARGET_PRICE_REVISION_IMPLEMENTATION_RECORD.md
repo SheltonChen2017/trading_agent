@@ -16,7 +16,9 @@ REPRODUCED THE JULY-2024 FRONTIER WITH THE ERROR RAISED IN THE ALGORITHM'S OWN
 MEMBERSHIP-WEIGHT GUARD; THE OFFENDING ROW IS UNKNOWN. THE LANE DIVERGENCE IS
 RETAINED AS TPR-CR26-003; THE OWNER-PINNED MAC LANE GOVERNS THIS CONTINUATION,
 NOT A NEW HOST-CHOICE GATE. OFF'S THREE CODEX ATTEMPTS ARE CONSUMED;
-ON HAS ZERO; LOOKS ARE 20. THERE IS NO ACCEPTED 2021-NOW PAIRED RESULT. THE
+ON HAS ZERO; LOOKS ARE 30 (20 PREVIOUSLY RETAINED PLUS TEN NEWLY OBSERVED
+EXTERNAL-ORIGIN RUNS IN SECTION87, NINE ERRORS AND ONE COMPLETED STATUS,
+NOT YET ACCEPTED SOURCE/ACCOUNTING). THERE IS NO ACCEPTED 2021-NOW PAIRED RESULT. THE
 MONITOR REMAINS PAUSED. CODEX NEXT VERIFIES THE OWNER-REPORTED MIA REPAIR UNDER
 FRESH BOUNDED SCOPES, THEN CONTINUES AUTHORIZED OFF/ON AND BACKTEST-READINESS
 WORK WITH FROZEN ECONOMICS AND RETAINED ATTEMPTS. SECTION 74'S
@@ -508,7 +510,8 @@ The owner authorized the requested extended exploratory dates and now the
 fresh paired-study allowance: at most three QC attempts per arm, with original
 ON3/OFF1 and16looks retained. Section75 freezes both extended candidates and
 all six universes together. OFF has consumed all three Codex attempts;
-ON has consumed zero attempts;20 observed looks remain retained;
+ON has consumed zero attempts;30 observed looks now remain retained
+(20 previously retained plus ten retrospectively observed external jobs);
 no accepted paired result exists. No fourth Codex OFF attempt is allowed;
 the owner-reported Mia fix requires independent result/source verification.
 Section75.15 records completed fresh composite input preparation; original
@@ -20060,3 +20063,81 @@ and nonmetadata fields fail closed. Clock/count/progress mismatches remain
 diagnostic facts, not default zero/UTC or accepted metadata. API/credential/
 source/input/operator reads are absent. Root software acceptance only;
 independent Claude review pending at final round handoff.
+
+### 87.7 Exact metadata facts and retrospective additional run accounting
+
+META-INSPECT001 genuinely completed diagnostic/process0 at
+HEAD`5abafcae2e24b2a14d79a53d724e81426a529483`, created22:11:37.896279Z/
+expiry22:21:37.896279Z/ended22:11:41.487122Z, plan
+`f1a8985d03b21e708db43799adb56289116f0c0eccd45992565f7e3e2261ded8`.
+One4138byte exact projection FD read; no new API. Receipt8496bytes/SHA256
+`62cd94e2b432d5410cc16a5672943cf2616f839d51c42b99e464c2a408b7447d`.
+Actual count14 equals14unique rows. Each row has matching project37650980,
+progress1 and a snapshotID. Creation strings are parseable but unzoned
+`YYYY-MM-DD HH:MM:SS`; original discovery's aware-clock predicate refused
+them. This is a confirmed conservative metadata-shape mismatch, not an API
+authentication failure or permission to invent UTC/source-clock truth.
+
+TPR-EXT26-D088 (agent-delegated, independent review pending): preserve all
+ten unfamiliar jobs, relative order by their uniform unzoned server strings,
+with retrospective observations21–30; no winner selection. Their origin is
+external/unverified. Owner reports Mia fixed a run but has no ID; list does
+not authenticate which job/person/agent produced each run. No fictitious
+pre-launch receipt, new Codex attempt, candidate reset or economics approval.
+Looks now30=28cloud+2historical local, previous20 retained. The source/attempt
+history of OFF1/2/3 and genuine Mia look20 remains immutable. ON still0.
+
+| Retrospective look | Actual backtest ID | Observed unzoned server creation | List status |
+|---|---|---|---|
+|21|7dacf829bda2cf1bbe6d75cac5ab5ca3|2026-10-12 20:46:29|Runtime Error|
+|22|1abad98d7e15a7fa2bde33b8d6343e2c|2026-10-12 21:17:59|Runtime Error|
+|23|88775c7e3c8a377bece104bf33f0ba85|2026-10-12 21:50:24|Runtime Error|
+|24|ed1dd63ea51dc5e92fc7168165f65b67|2026-10-12 22:10:48|Runtime Error|
+|25|4f015ee786f90477b945b181a187a11f|2026-10-12 22:46:40|Runtime Error|
+|26|55a5f738feab1d57ce81219cc8a2be5f|2026-10-12 22:47:40|Runtime Error|
+|27|8f8276efbdb6e25651a3b993f9df3f6d|2026-10-12 22:49:57|Runtime Error|
+|28|7e4c1487e6e9ca1fd10ce8f7f4cf9dbd|2026-10-12 23:04:37|Runtime Error|
+|29|b20cba66e8bdec79515466d73cd9584f|2026-10-12 23:06:23|Completed.|
+|30|4936632376c0885358493a2694ed239b|2026-10-12 23:07:42|Runtime Error|
+
+Public metadata-only ledger `extended_owner_recovery_observations30.json`,
+SHA256`0d42011a1a7e2c94fe9a5df948d5fa21b9a0546e7f69b8036f2532ac7073d8ef`,
+retains all snapshotIDs, original metadata descriptors, relative clocks,
+false source/economic/native acceptance and null metrics. These actual
+observed jobs are correlated/adaptive exploration, not confirmatory alpha.
+The list contains a Runtime Error after the Completed row: current source
+cannot silently be assigned to Completed look29, nor can look30 be called
+its completed successor. Terminal/full-window/inputs/orders/costs/clock and
+every cloud edit remain independently unaccepted pending exact evidence.
+
+### 87.8 Static source inspector and observation controls before execution
+
+New fixed two-FD source inspector18730bytes/SHA256
+`81b6c5571ee4208cfefbc5d74b250d48c33366128781c71c63ce7505f51e5381`;
+test14329bytes/`e9a113dcbdf167ea9f9f714c8b4c3fd0b93844e1d3399d7eee6354359cfa402a`.
+Root read full297line source/244line test, compiled in memory; focused46passed
+2.56s. Producer46passed2.17s; first43pass/1fail duplicate fixture exceeded
+the exact401314byte body budget, fixed using a small added helper, not raising
+the bound. Meaningful restored reverse mutants kill credential Dict2cases,
+public immutable before-tree1case, postinspection finalcheck1case and durable
+per-body claim1case. No effect before commit/source freeze.
+
+Complete source changes are recomputed against immutable public bundle plus
+exact unchanged notebook; every file/delta identity must agree. Never execute
+cloud code. Conservative new credential assignments/Dicts, literal market-row
+containers, private keys/email/unknown opaque literals and secret comments
+refuse disclosure. Public config hashes and non-sensitive long dictionary
+field keys are distinguished from arbitrary values. This is not a general
+covert-data/secret-absence proof. Safe static source text is for root's review,
+not automatic port/economic/compiled/native acceptance. Production exact
+two descriptors/private root/import closure/UTC/time/controller/claim/access;
+fixture seams cannot enter production. Sourceinspect001 remains a NEW scope,
+not reuse of post005. Full before/after stays private regardless of disclosure.
+
+Metadata observation controls add one exact ledger/hash/census positive and
+seven clean-first no-reset/no-dropped-failure/no-invented-UTC/Mia/source/metric
+negatives. Current preamble/current qualifier now accurately says looks30,
+not stale20. Root document321+metadata-inspector33 focused354passed8.17s;
+no full suite, new strategy evaluation or operator state. Continuous next
+work remains static every-edit review and bounded native evidence for all
+ten external runs, with independent components despite bad compact SUMMARY.

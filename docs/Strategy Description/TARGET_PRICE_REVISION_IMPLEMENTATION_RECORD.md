@@ -19878,3 +19878,84 @@ invoked document313 plus source-capture54 (a different named focused union):
 367passed9.11s. Then the intended document313 plus result-capture94 union:
 407passed9.70s. Neither is a full lane suite. All use the same isolated49/52
 runner. Existing frozen/executed code and historical source bundles are unchanged.
+
+## 87. Fresh owner-reported Mia repair discovery and evidence reconciliation — 2026-10-13
+
+### 87.1 Prospective software and bounded access design
+
+Counter-review correction snapshot is local commit
+`e8be333327c04261de1c179bbe705e6d359ed92f`; no intermediate push. This section
+continues the same authorized round. Owner has no repaired-run ID; latest
+reply permits proceeding without another routine Claude checkpoint, not a
+fourth Codex OFF launch, attempt reset or changed economics.
+
+TPR-EXT26-D086 (agent-delegated, independent review pending): use a named
+read-only metadata successor for fixed OFF project37650980, then reconcile
+every unfamiliar job in chronological order before native outcome access.
+Alternative searching unrelated projects or choosing only the best/Completed
+run is rejected. The [primary list API](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/backtest-management/list-backtests)
+documents projectId/includeStatistics only, no date filter or pagination.
+One response is a bounded observation, not complete-history attestation.
+The [file API](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/file-management/read-file)
+reads project files; [compile-read](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/compiling-code/read-compilation-result)
+returns build state/logs, not a compiled-source archive. Current source and
+snapshot identifiers cannot by themselves prove an older executed tree.
+
+Prospective operation `TPR-EXT26-OWNER-MIA-DISCOVERY-20261013-001` is restricted
+to ONE POSTbacktests/list with projectId37650980/includeStatisticsfalse,
+<=1MiB accepted wire (one-byte overrun sentinel),128rows,30seconds. Current
+committed HEAD/import-closed source hashes, exact OFF config/freeze/calendar
+and retained look20 are required. Fresh runtime plan/access/request claims
+are durable/exclusive BEFORE credential/request effects; shared controller
+lock is serialized. No automatic retry, API mutation, compile, launch,
+source/input/ObjectStore read, Mia message, order or trading action.
+Unexpected result/parameter fields are detected but stripped, names only
+hash/size; contextual profile scrub preserves numeric/job identities.
+Only body-free metadata/receipts enter stdout; complete projected response
+stays private0600 under the lane's ignored operations root. Production has
+no injected roots/transports/clocks; fixtures deny actual credentials,
+network/subprocess/lane-private roots. Config raw and rendered config module
+are distinct pinned identities, not interchangeable hashes.
+
+Discovery does not renew look20/old scopes or authenticate Mia origin,
+compiled source, accounting/economics, historical PIT or provider rights.
+OFF3/ON0 and looks20 remain until actually observed additional owner jobs
+are separately retained with retrospective provenance, never fictional
+prospective reservations or reset attempts. Full-window native OFF evidence
+comes before ON; any unavailable source/accounting remains null/unaccepted.
+Every new private/body/cloud step requires its own fresh bounded scope.
+No effect has occurred at this prospective registration.
+
+### 87.2 Exact new software, review and focused proof before effect
+
+| New lane-owned file | Bytes | SHA-256 |
+|---|---|---|
+| extended_owner_mia_discovery.py | 22029 | `93b45e421a6fe15a52411a7bcd1ca74ce3877bec038de7f662d7e91bb664403c` |
+| test_qc_extended_owner_mia_discovery.py | 18322 | `09d95b188f52b4be76487f9bfd6ae7186c2b5f4b76390915c42ad5b4abba6d9c` |
+
+Root read the complete source/test and relevant imported custody contracts;
+two peer audits covered plan/claims/PII/production refusal/provenance. Current
+software accepted after test-only correction, not separately Claude approved
+or native acceptance. Initial draft mixed raw config19a9842c… with rendered
+config5790ca63… and refused fixtures; both now separately pinned. Intermediate
+missing unexpected-field key was corrected before effect;58positive cases
+cover actual metadata success. No failed draft was dispatched to QC.
+
+TPR-CCR26-007 P3 corrected/resolved: dynamic final-check guard-call census
+retargeted an earlier guard when the final guard was removed, leaving the
+test green. Peer proved1pass0.55s with that meaningful mutant. Replaced it
+with a metadata-reached marker/retained populated jobs and unknown-ID checks;
+same final-check reverse mutant now1failed0.59s, restored in finally. No
+production defect or historical native failure inferred.
+
+Producer58passed0.80s; root complete named document313+discovery58 focused
+union371passed9.34s. Root two-file in-memory compilation passed, no bytecode.
+Peer received top/row-project and field-whitelist mutants each failed;
+producer credential-echo, whitelist, pre-request durability and128row-cap
+mutants each failed and restored. Peer58green at intermediate bytes is kept
+as intermediate, not silently final. All49/52 isolated; fixtures deny actual
+private roots/credentials/network. No full suite, strategy/outcome/provider
+or operator-state access. No code/economics/source-bundle mutation; old
+executed modules remain byte-identical. Commit/source closure and a fresh
+current-HEAD runtime plan precede discovery001. Claims/access/request and
+result receipts persist privately; no stale scope is implicitly renewed.

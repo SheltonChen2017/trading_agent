@@ -17586,3 +17586,106 @@ or correction. `SI-SRC-20260928-001..003`, shared/out-of-lane `SI-CR5-005` /
 frozen project-document edit. Steps 2 and 3 continue below under existing
 personal local source authority and delegated prospective choices; no generic
 permission-letter, affiliation or repeated blanket-approval gate is added.
+
+### 115.2 Prospective historical class and disclosure source protocols
+
+Accepted counter-review is locally committed at
+`de0446545d028ce5391221babff825e5963fc7a1`, no intermediate push.
+**SI-DEC-20261013-03** freezes exactly **30** ordered private overview GETs to
+`https://api.massive.com/v3/reference/tickers/{ticker}`: the unchanged ten
+distinct sentinel tokens crossed with **2022-10-14, 2023-02-28, 2023-05-15**,
+date parameter only. Protocol
+**`bd2f76ff97218dd4acda21bd7bc69fa37e2b3254eafbcca95c5750b4acb56d03`**.
+Automatic retries **0**, pages **1**, maximum **2 MiB** per response; no alias,
+current-symbol fallback, extra page or old budget reset. This route pilot is
+not the full study population. Missing/404, malformed, incomplete and ambiguous
+observations remain private and bound to their request/status/clock/raw bytes.
+404 bodies are not read: explicitly unobserved, not empty provider data.
+Other HTTP/transport failures stop with retained attempts and consumed claims.
+
+Only particular-class `share_class_shares_outstanding` is parsed as an exact
+positive integral JSON number. Numeric strings, fractional truncation,
+weighted/issuer-share substitution and class transfer refuse. Composite and
+class FIGIs remain distinct observed fields, never casts; equal strings are
+conservatively ambiguous, not declared provider-invalid. The
+[overview contract](https://massive.com/docs/rest/stocks/tickers/ticker-overview)
+uses SEC period-of-report dates, not filing/publication availability. It can
+supply latest-revised evidence without manufacturing original-vintage PIT.
+Historical native-key links, full-population coverage and cashflows are not
+automatically admitted by successful overview access.
+
+Original master/segmented inputs, spent claim and native/v3 byte pins are
+verified; the original companion is rebuilt before the named existing
+`MASSIVE_API_KEY` reader. No Sharadar credential or reacquisition. Owned ignored
+0700/0600 exclusive output and a global protocol/source-pin scope claim survive
+new timestamps/HEADs. Fixed HTTPS, header-only authentication, no redirect/proxy,
+echo refusal before hashing/persistence and clean designated HEAD/unchanged
+actual matching remote precede requests. Reports stay private; no source rows,
+fitness conclusions, account identifiers or secrets enter Git/chat.
+
+**SI-DEC-20261013-04** chooses the documented subscribed disclosure alternative,
+not guessed direct Benzinga M&A access. The separately pinned next pilot is
+exactly **4 GETs**: index and core 8-K text for TWTR and FRC, using each unique
+issuer CIK from the preceding authenticated class report, never current ticker
+fallback. Zero-padding a validated numeric CIK is formatting, not entity
+invention. Fixed windows **2022-10-01–2022-11-30** and **2023-04-01–2023-06-30**;
+forms 8-K and 8-K/A, ascending filing dates, index limit 10,000 / text limit100,
+one page, zero retries, maximum4MiB. Nonempty pagination remains incomplete,
+never followed. Exact private derived CIK/descriptors/source hash/protocol digest
+must be prospectively pinned after the first capture, before these four calls.
+Current PENDING pins refuse, not permit newest-file lookup. No disclosure
+request is claimed at this prospective checkpoint.
+
+[SEC EDGAR index](https://massive.com/docs/rest/stocks/filings/index) and
+[8-K text](https://massive.com/docs/rest/stocks/filings/8-k-text) are included
+during documented early-access beta. Accession/issuer/form/date/SEC-archive URL
+and raw text remain privately pinned. Core Items exclude exhibits. No phrase,
+completion/filing/ex-date, aggregate deal size, market price, missing value or
+empty response automatically becomes per-share consideration, payment time or
+zero terminal cash. Any additional original/exhibit request needs its own
+frozen exact route/budget; no broad crawl. Four requests cannot establish
+exhaustive full-population terminal coverage.
+
+**SI-DEC-20261013-05** preserves settled private personal local qualification
+authority (`SI-DEC-20261011-08,-10`, `SI-AUTH-20261011-05`) and the
+[official own-research guidance](https://massive.com/knowledge-base/article/which-plan-do-i-need-to-show-massive-data-in-my-app).
+General incorporated terms are not silently substituted for that existing
+route decision. This candidate's raw/custom third-party QC representation is
+separate, not a blanket institution/permission-letter demand. Historical fixture
+false flags do not deny later scoped local qualification; keep actual-input
+refusal intact and use a new authenticated input/registry contract when ready.
+
+### 115.3 Verified continuation defects, corrected before retrieval
+
+| ID | Priority / disposition | Evidence and correction |
+|---|---|---|
+| SI-HIST-20261013-001 | P2 confirmed, corrected | Retained finalizer receipt was checked against current working files labelled `ab169b34`; the later host guard made valid original evidence refuse `source_offline_provenance`. Main reproduced the fixed refusal on original protected inputs, network denied/no credential/API. Persistent fabricated regression red:1 failed in0.36s. Native reader now hashes binary Git blobs at the exact old commit for three fixed paths; prospective finalizer identity stays unchanged. Main's corrected original inventory/spent-budget/segmented-byte/provenance replay passes without artifact mutation. |
+| SI-DISC-20261013-001 | P3 confirmed, corrected | Draft issuer selection referenced a nonexistent report field. Persistent red:1 failed/9 deselected in0.34s. Select validated normalized ticker and unique retained CIK, no current lookup. Main's source/host tests green10 in0.30s, extended transport/echo/failed-attempt checks14 in0.30s. |
+
+These continuation defects are not attributed to Claude's record-only commit.
+Historical ledger rows remain. Further chronology regressions, final code
+validation, committed freeze and actual capture accounting follow below.
+
+| ID | Priority / disposition | Material regression and correction |
+|---|---|---|
+| SI-CLOCK-20261013-001 | P3 confirmed, corrected before either new capture | Draft runtime clocks could mint completion before report/response, or request starts outside enclosing/between-request chronology. Class agent's persistent four reds:4 failed in0.79s; independent disclosure auditor's persistent three reds:3 failed/14 deselected in0.35s. Both paths now enforce enclosing start <= request <= response <= next request <= report <= completion. Direct entry receives the enclosing clock; publication of reversed completion refuses. Main's disclosure17 cases green0.33s; class40/native50 green1.24s by owning agent. Partial captures/receipts stay retained, no successful completion on reversal. |
+
+Main's final pre-capture focused selector passes **472 in6.30s**, empty
+inherited environment/network denied, CPython3.13.15/pytest9.1.1, zero skip or
+warning. It covers the two new pure modules, two new capture runtimes, affected
+native-reader provenance, existing host guard and lane/ML/document boundaries;
+not the complete lane or repository suite. Independently attributed pure-class
+selector134, pure-disclosure96 and capture/native90 are not added to main's
+472 or treated as Claude review. Eight class and eight disclosure in-memory
+dangerous-direction mutations were red, as reported by their owning agents;
+the host-capture guard removal was independently red in five direct/CLI cases.
+No production file was mutated on disk by these probes. Source, protocol and
+chronology assertions are meaningful, not provider/performance evidence.
+
+Commit this exact prospective code/record locally before the new thirty-request
+capture; require a clean tree and unchanged actual matching remote `0cfb574a`.
+The record plus ten lane-owned Python source/test files are the only new
+implementation scope. Targeted compilation/diff/historical-record checks
+precede commit. The terminal CLI stays source-pending until a separately
+recorded exact class result and derived private protocol are frozen. No
+actual provider request, look or QC attempt is predicted by these tests.

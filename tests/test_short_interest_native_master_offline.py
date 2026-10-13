@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from types import SimpleNamespace
 
 import pytest
 
@@ -33,15 +34,30 @@ HEAD, REMOTE = "a" * 40, "b" * 40
 def source(tmp_path, monkeypatch):
     qualification = build.master.qualify_sharadar_securities_master(archives(), retrieved_at=ANCHOR)
     captures = qualification.captures
+    historical_names = ("research/short_interest_etf/sharadar_securities_master.py",
+                        "research/short_interest_etf/sharadar_master_segments.py",
+                        "scripts/finalize_short_interest_master_offline.py")
+    historical_blobs = {name: ("historical-fixture-" + name + "\n").encode() for name in historical_names}
+    historical_identity = hash_payload({"git_commit": build.SOURCE_FINALIZER_HEAD, "files": [
+        {"path": name, "sha256": hash_bytes(historical_blobs[name])} for name in historical_names]})
+    def historical_show(command, **kwargs):
+        assert command[:2] == ["git", "show"]
+        assert kwargs == {"cwd": tmp_path, "capture_output": True, "check": False}
+        commit, name = command[2].split(":", 1)
+        assert commit == build.SOURCE_FINALIZER_HEAD and name in historical_names
+        return SimpleNamespace(returncode=0, stdout=historical_blobs[name])
+    # This fabricated Git seam has no subprocess or network access. It also
+    # binds trailing newlines, which a text/strip helper would destroy.
+    monkeypatch.setattr(build, "subprocess", SimpleNamespace(run=historical_show), raising=False)
     provenance = build.segments.MasterReportProvenance(
         source_capture_receipt_sha256=build.finalizer.SOURCE_INVENTORY_SHA256,
         source_code_identity_sha256=hash_payload({"git_commit": build.finalizer.SOURCE_HEAD,
                                                  "protocol_sha256": build.master.PROTOCOL_SHA256}),
-        finalizer_code_identity_sha256="c" * 64, reconstruction_anchor_utc=ANCHOR)
+        finalizer_code_identity_sha256=historical_identity, reconstruction_anchor_utc=ANCHOR)
     segmented = build.segments.encode_report(canonical_json(qualification.to_payload()).encode(),
                                              provenance=provenance)
     monkeypatch.setattr(build, "SOURCE_INDEX_SHA256", segmented.index.to_payload()["index_sha256"])
-    monkeypatch.setattr(build.finalizer, "_code_identity", lambda *args: "c" * 64)
+    monkeypatch.setattr(build.finalizer, "_code_identity", lambda *args: historical_identity)
     monkeypatch.setattr(build.finalizer, "_reload", lambda root: (captures, ANCHOR))
     monkeypatch.setattr(build.companion_reader, "_rebuild_sharadar", lambda root: companion_report())
     source_dir = _prepare_capture_directory(tmp_path / build.finalizer.SOURCE)
@@ -72,6 +88,17 @@ def source(tmp_path, monkeypatch):
 
 def replace(path, value):
     path.write_bytes((canonical_json(value) + "\n").encode())
+
+
+@_POSIX_CAPTURE_ONLY
+def test_old_finalizer_provenance_uses_exact_historical_git_bytes_not_changed_working_files(tmp_path, source, monkeypatch):
+    directory, _, segmented, _ = source
+    # The source finalizer's code has legitimately changed since the frozen
+    # capture. Its old provenance must still bind the old committed bytes.
+    monkeypatch.setattr(build.finalizer, "_code_identity", lambda *args: "e" * 64)
+    index, digest = build._source_index(tmp_path, ANCHOR)
+    assert index.provenance.finalizer_code_identity_sha256 == segmented.index.provenance.finalizer_code_identity_sha256
+    assert digest == hash_bytes((directory / "index.private.json").read_bytes())
 
 
 @_POSIX_CAPTURE_ONLY
@@ -165,7 +192,7 @@ def test_old_completion_and_clocks_must_bind_exact_committed_reconstruction(tmp_
 
 @_POSIX_CAPTURE_ONLY
 def test_source_provenance_has_old_finalizer_code_and_observed_refusal_anchor(tmp_path, source, monkeypatch):
-    monkeypatch.setattr(build.finalizer, "_code_identity", lambda *args: "e" * 64)
+    monkeypatch.setattr(build, "_historical_finalizer_identity", lambda *args: "e" * 64)
     with pytest.raises(build.CaptureRefusal, match="provenance"):
         build._build(tmp_path, head=HEAD, remote=REMOTE)
     assert not (tmp_path / build.OUTPUT).exists()

@@ -10,6 +10,8 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import re
+import subprocess
 
 from data.hashing import canonical_json, hash_bytes, hash_payload
 import research.short_interest_etf.sharadar_native_master_index as native
@@ -40,6 +42,11 @@ _CODE_FILES = (
     "scripts/qualify_short_interest_action_supplement.py",
     "scripts/finalize_short_interest_master_offline.py",
     "scripts/build_short_interest_native_master_offline.py",
+)
+_HISTORICAL_FINALIZER_FILES = (
+    "research/short_interest_etf/sharadar_securities_master.py",
+    "research/short_interest_etf/sharadar_master_segments.py",
+    "scripts/finalize_short_interest_master_offline.py",
 )
 
 
@@ -86,6 +93,28 @@ def _code_identity(root: Path, head: str) -> str:
         {"path": name, "sha256": hash_bytes((root / name).read_bytes())} for name in _CODE_FILES]})
 
 
+def _historical_finalizer_identity(root: Path) -> str:
+    """Bind the old receipt to its exact Git blobs, not today's source files.
+
+    The prospective finalizer's _code_identity intentionally hashes its own
+    working tree. Reusing that routine for an old capture would relabel newer
+    host-guard code as the old commit and invalidate an immutable receipt.
+    Only this fixed known commit and its three fixed paths may be resolved.
+    """
+    _require_capture_platform()
+    _require(type(SOURCE_FINALIZER_HEAD) is str
+             and re.fullmatch(r"[0-9a-f]{40}", SOURCE_FINALIZER_HEAD) is not None,
+             "historical_finalizer_commit")
+    files = []
+    for name in _HISTORICAL_FINALIZER_FILES:
+        result = subprocess.run(["git", "show", SOURCE_FINALIZER_HEAD + ":" + name],
+                                cwd=root, capture_output=True, check=False)
+        _require(result.returncode == 0 and type(result.stdout) is bytes,
+                 "historical_finalizer_blob_unavailable")
+        files.append({"path": name, "sha256": hash_bytes(result.stdout)})
+    return hash_payload({"git_commit": SOURCE_FINALIZER_HEAD, "files": files})
+
+
 def _source_index(root: Path, anchor: str) -> tuple[segments.MasterReportIndex, str]:
     """Verify the old reconstruction without concatenating its private report."""
     _require_capture_platform()
@@ -122,7 +151,7 @@ def _source_index(root: Path, anchor: str) -> tuple[segments.MasterReportIndex, 
         source_capture_receipt_sha256=finalizer.SOURCE_INVENTORY_SHA256,
         source_code_identity_sha256=hash_payload({"git_commit": finalizer.SOURCE_HEAD,
                                                  "protocol_sha256": master.PROTOCOL_SHA256}),
-        finalizer_code_identity_sha256=finalizer._code_identity(root, SOURCE_FINALIZER_HEAD),
+        finalizer_code_identity_sha256=_historical_finalizer_identity(root),
         reconstruction_anchor_utc=anchor,
     )
     _require(canonical_json(index.provenance.to_payload()) == canonical_json(expected_provenance.to_payload()),

@@ -131,6 +131,7 @@ def test_daily_volume_refusal_is_bound_into_immutable_identity():
 def test_lane_package_has_no_provider_outcome_or_authority_imports():
     allowed_modules = {
         "__future__",
+        "base64",
         "bisect",
         "collections",
         "copy",
@@ -142,12 +143,15 @@ def test_lane_package_has_no_provider_outcome_or_authority_imports():
         "fractions",
         "gc",
         "hashlib",
+        "html.parser",
         "io",
         "json",
+        "math",
         "pathlib",
         "re",
         "types",
         "typing",
+        "urllib.parse",
         "zoneinfo",
         "zipfile",
         "zlib",

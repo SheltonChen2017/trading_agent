@@ -1,18 +1,16 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CODEX HAS ACCEPTED CLAUDE'S SOLE RECORD COMMIT `0cfb574a` AFTER
-COMPLETE COUNTER-REVIEW (SECTION 115). THE OWNER EXPLICITLY SELECTED THIS
-EXISTING REVIEW, NOT ANOTHER PUSH; ITS WAITING ONE-SHOT IS DELETED. HISTORICAL
-THIS BOUNDED ROUND COMPLETED PROTECTED CLASS/DISCLOSURE/SEC-ORIGINAL SOURCE
-CAPTURES AND THE OFFLINE NATIVE/CLASS BRIDGE, NOT FULL-STUDY QUALIFICATION OR
-BACKTEST READINESS. EODHD CREDENTIAL LOCATION ONLY IS RETAINED IN SECTION 115.5;
-ITS VALUE WAS NOT READ. THE ORIGINAL TWELVE-, SIXTEEN- AND
-SIXTY-TWO-REQUEST BUDGETS REMAIN CONSUMED. CANONICAL ORIGINAL-VINTAGE PIT AND
-LATEST-REVISED EXPLORATION STAY DISTINCT. LOOKBACKS 20/60/120/252 UNSELECTED;
-CANONICAL ACTUAL LOOKS 0/0, EXPLORATORY ACTUAL LOOKS 0, ALPHA 0, PERMANENT
-LOOK IDS NONE, QC ATTEMPTS 0. NO ACTUAL OUTCOME JOIN OR QUALIFIED CLOUD
-CANDIDATE EXISTS YET. HISTORICAL SOURCE/SHARED/PLATFORM/PROSPECTIVE LEDGER
-ROWS REMAIN; NO FULL LANE OR REPOSITORY SUITE WAS RUN BY CODEX.**
+Status: **OWNER-WAIVED CONTINUOUS BUILD TOWARD ACTUAL BACKTEST READINESS
+IS ACTIVE FROM PUSHED `1f90c626` (SECTION 116). DO NOT WAIT FOR CLAUDE'S
+NEXT REVIEW; THIS DOES NOT CLAIM INDEPENDENT ACCEPTANCE OF NEW CODE.
+NAMED LOGIN-KEYCHAIN ITEMS SUPERSEDE LEGACY CREDENTIAL FILE POINTERS FOR
+NEW REQUESTS. EXISTING PROTECTED CAPTURES/SPENT BUDGETS ARE RETAINED.
+STRICT ORIGINAL-VINTAGE PIT AND LATEST-REVISED EXPLORATION STAY DISTINCT;
+NO FIXTURE RELABEL, FABRICATED SOURCE FACT OR CHANGED 48-BOOK ECONOMICS.
+LOOKBACKS 20/60/120/252 UNSELECTED; CANONICAL ACTUAL LOOKS0/0,
+EXPLORATORY ACTUAL LOOKS0, ALPHA0, PERMANENT LOOK IDS NONE, QC ATTEMPTS0
+UNTIL GENUINELY QUALIFIED PROSPECTIVE EXECUTION. NO BACKTEST IS CLAIMED
+FROM SOFTWARE OR SOURCE TRANSPORT ALONE. HISTORICAL LEDGER ROWS REMAIN.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -18007,3 +18005,185 @@ ready. If a qualified candidate reaches launch, read/recheck node capacity,
 wait for other lanes, preserve the exact candidate, and enforce the three-
 unsuccessful-attempt/Mia-source-comparison rule. This handoff is not another
 request for blanket research authorization.
+
+## 116. Owner-waived continuous actual-input build — 2026-10-13
+
+### 116.1 Later instruction, exact base and continued scope
+
+**SI-AUTH-20261013-04** records the later explicit owner instruction:
+"skip the review. then build continously until backtesting ready. consider i
+preauthorize every move in this lane". It supersedes115.8's next-review wait
+and single-next-milestone stop for this continuation. Start from clean pushed
+**`1f90c626328a236c51e78f57e0fe301e0412aabf`**, with local/tracking/actual
+matching origin lane equal. **SI-DEC-20261013-12** continues without another
+generic approval/review interruption, exercises routine prospective choices,
+documents each decision and validates focused dangerous directions. This is
+owner-waived implementation, never self-described independent review.
+
+Only `/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__short_interest`
+and `codex/strategy-short-interest`; preserve others' changes, recheck roots/
+branch/HEAD/status before checks and actual matching remote before commits/
+final push. No branch/worktree switch, rebase/reset/history rewrite, other-ref
+inspection, partial push or race with Claude. The waiting one-shot remains
+deleted and other monitors unchanged. Accumulate local prospective commits,
+one final matching-lane publication only when this continuous round genuinely
+closes. Source facts or concrete security/platform limitations cannot be
+manufactured by delegation; they are not another institutional-affiliation or
+permission-letter gate.
+
+### 116.2 Updated credential-location memory, not credential publication
+
+**SI-AUTH-20261013-05** records the owner's later supplied credential storage:
+macOS **login Keychain**, machine-local
+`/Users/sheltonchen/Library/Keychains/login.keychain-db`.
+
+| Provider | Exact service/item | Exact account selector |
+|---|---|---|
+| Financial Modeling Prep | `trading-agent-fmp` | `fmp` |
+| Sharadar | `trading-agent-sharadar` | `sharadar` |
+| Massive | `trading-agent-massive` | `massive` |
+| EODHD | `trading-agent-eodhd` | `eodhd` |
+
+**SI-DEC-20261013-13** uses only these exact existing service/account pairs
+via `/usr/bin/security find-generic-password` for necessary new authorized
+requests. No binary Keychain database read, guessed item/environment/file,
+cross-lane secret search, ACL/password/Keychain mutation or new credential.
+Retain older file pointers historically; do not silently fall back to them.
+Credentials stay in memory under redacted nonserializable wrappers, fixed HTTPS
+headers and no raw/diagnostic echo persistence. OS lock/access/confirmation
+failure is a named refusal, never bypassed. Exact item access proves neither
+provider subscription nor dataset coverage or QC processing permission.
+No credential has been read merely to record this updated location table.
+
+### 116.3 Immediate connected implementation before any new source request
+
+**SI-DEC-20261013-14** reuses original protected full ACTIONS/DESCRIPTIONS and
+the completed SEC-original capture, with zero reacquisition/old-budget reset.
+[Sharadar's FAQ](https://sharadar.com/docs/faqs) documents per-acquired-share
+cash and survivor-share ratios, additive cash+stock versus alternative elections,
+distinct native permatickers for separate classes and incomplete consideration
+coverage. The earlier all-unbound action inventory is not evidence that these
+field meanings are unavailable. Validate exact captured dictionary/source
+custody and retain conflicting/missing/unsupported values privately. Final
+market capitalization is not per-share cash, contingent rights are not zero,
+and date-only acquisition/effective/filing/last-trade labels are not verified
+shareholder payment clocks. A protected offline original reader must verify
+its own exact receipt/code/protocol/claim/raw-byte/report chronology before
+producing detached private quoted assertions; language cues alone never admit
+terminal cash or a payment date.
+
+**SI-DEC-20261013-15** builds a separate native-ID/exact-rational source
+assembly interface. Existing v1 external files require class FIGIs/integer
+volume, while original v3 observations preserve native permatickers/rational
+volume. No cast or rounding to force compatibility; keep the fabricated
+launcher and its exact-input refusal unchanged. Inventory complete supplied
+provider-covered populations and pre-entry source-unavailable refusals before
+ranking; future missing held-member outcomes cannot justify dropping/reranking.
+Source assembly does not compute signal/outcome results or consume a look.
+
+All new provider routes/samples/page chains/budgets must be separately frozen
+and committed before requests, failed attempts retained and consumed limits
+not silently reset. Full-study rather than sentinel qualification remains the
+destination. Once factual source/economic prerequisites exist, prospectively
+register the exact evaluation/look and permitted order-based processing before
+any real outcome join. Preserve unselected20/60/120/252, original structural
+normalization/release-next-open and48books; no protected validation/holdout,
+winner selection or claim of canonical PIT from revised data. Existing local
+personal research authority stands. No broker/operator database, deployment,
+paper/live, funded capital, real orders, ETF/production seed/ranking change,
+new purchase/terms/email or credential issuance is inferred. Qualified QC node
+capacity must be read/rechecked, other occupied lanes waited for, and at most
+three unsuccessful attempts per exact candidate followed by Mia-source
+comparison. Actual execution, validation, exercised decisions and precise
+remaining facts will follow below, not be predicted as completed.
+
+### 116.4 Prospective full supplied-population inventory and protected application
+
+**SI-DEC-20261013-16** freezes the next actual source acquisition before any
+request: Massive `GET /stocks/v1/short-interest`, no ticker filter, inclusive
+settlement range **2022-01-01–2026-08-31**, limit **50,000**, sort
+`settlement_date.asc,ticker.asc`. Exactly one initial request followed only by
+its observed fixed-origin/path cursor chain, at most **32 total page GETs**,
+maximum **32MiB** each, zero automatic retries. Protocol
+**`f01bfeb383b6879468507f90d2b6ded073402427a934cff52ca2ca569c0ed72a`**.
+Source storage is create-exclusive protected ignored
+`artifacts/short_interest/native_population/native-population-<UTC start>`;
+one global protocol-budget claim prevents timestamp/HEAD restart. Preserve
+every complete raw page and request/response descriptor/hash/clock, including
+failed/partial attempts. No secret query parameter, external host, redirect,
+proxy, date/limit/sort expansion or cyclic pagination. Header authentication
+uses only the owner-named Massive login-Keychain item. A credential echo must
+refuse before response hashing or persistence, including encoded echoes.
+
+[Massive's endpoint contract](https://massive.com/docs/rest/stocks/fundamentals/short-interest)
+documents these filters, multi-column sort,50,000 limit and paid-plan full
+history. Actual access and complete advertised pagination still must be
+measured. This is full **reported provider-covered inventory**, not a claim
+of complete US listed-market coverage, original vintages or availability
+clocks. Missing/ambiguous/refused SI/class rows stay visible. No score,
+SI/forward-return join, outcome look, registry entry or QC operation is part
+of acquisition. Do not exclude delisted names while listed or tune the
+population using future payoff availability.
+
+The original full ACTIONS/DESCRIPTIONS and exact SEC original are applied
+offline only after the same clean committed software freeze, with source/
+code/claim/chronology checks and private exclusive outputs. No new source
+request or credential read for either application. Main will independently
+verify/reconstruct the resulting seals before using any reported fact. The
+actual native-source assembly interface is a new distinct sealed stage; its
+pending calendar/coverage/payment/registry facts must remain explicit, never
+an actual-run permission checkbox. Stdlib HTML parsing, byte encoding, exact
+integer arithmetic and URL parsing add no provider/outcome/execution imports.
+Existing strict and fabricated protocols are unchanged.
+
+### 116.5 Pre-application findings, focused validation and exact freeze
+
+| ID | Priority / status | Evidence, correction and effect |
+|---|---|---|
+| SI-BUILD-20261013-001 | P2 confirmed, corrected before application | Original-language report could accept an equality-spoofed JSON str object during coherent rebuild comparison. Persistent fabricated red1 failed0.44s; exact str guards and retained byte/seal anchor now reject replacement. No economic admission was made. |
+| SI-BUILD-20261013-002 | P2 confirmed, corrected before application | Consideration-report content could be coherently replaced/resealed without the original private byte/identity anchor. Persistent fabricated red1 failed/45 deselected0.29s; detached byte/identity binding now refuses. No source capture was accessed by that implementation agent. |
+| SI-BUILD-20261013-003 | P1 confirmed, corrected before any credential/request | New Keychain wrapper's byte-only echo check missed Unicode/slash-escaped JSON and percent-encoded body/media echoes. Persistent capture reds4 failed/2 passed0.31s; bounded in-memory ASCII-Unicode/percent/slash decoding now refuses before response hashing/persistence, including malformed/duplicate JSON. No real credential was read or persisted during these fabricated tests. |
+| SI-BUILD-20261013-004 | P3 false alarm, no production correction | Main initially mistook the FINRA clock for the imported Sharadar helper. Actual imported `_utc_now` already emits canonical Z. Injecting an invalid +00:00 clock reddened a test, not the actual production path. Unnecessary normalization was removed; actual-helper canonical-Z and invalid-offset refusal tests retained. No invented clock defect or code correction claimed. |
+| SI-BUILD-20261013-005 | P3 confirmed, corrected before application | Draft full-SI start/protocol/code-file checks reused an earlier lane guard rather than rechecking immediately at each publication/read. Guarded publication and per-file identity reads now recheck roots/branch/HEAD/status/actual remote; per-page and final protocol hashes also catch callback/global scope changes. No actual request preceded correction. |
+
+Pure original evidence policy:
+**`4b123321129531797bc90063530818f543c6e3b4bf31e5b716908b4aac1e67c6`**.
+Pure consideration policy:
+**`5ba0a5adaba3915312d604eb8479487bc610611ad4c784b5718834ac5ad7f953`**;
+offline runtime protocol
+**`2d0664665d663a1da30ba5311b0b29b80872dc56c43926d6ce4c224a31438b6a`**.
+Original extraction never turns lexical amount/date candidates into qualified
+payment facts. ACTIONS bindings never turn their warehouse date into payment.
+Native assembly retains refused raw SI bodies/source origins privately and
+does not compute S1, dollar volume or any forward outcome. No new source
+requests by implementation agents.
+
+Main first connected selector: **295 passed in6.75s**, CPython3.13.15 /
+pytest9.1.1, empty inherited environment/network denied, zero skip/warning.
+It covers seven new source/transport/Keychain families and lane/ML/active-document
+boundaries, not the whole lane or repository suite. Main separately proved
+two Keychain dangerous-direction mutations red (platform guard1 failed0.27s;
+plaintext rendering1 failed0.03s), restored only in memory, no file mutation
+or actual OS credential call. Independently attributed focused runs: original
+38, native-source44+boundary9, consideration48/runtime16+boundary9. Their
+dangerous payment/host/seal/collision/rounding/leapfrog cases were red before
+correction or under memory-only reversions. These are implementation checks,
+not Claude's review or evidence of market edge. Final focused transport result,
+targeted compilation, diff/status/privacy/preserved-ledger checks precede the
+local prospective commit. No partial push or predicted actual success.
+
+Main final prospective selector: **296 passed in6.78s**, same isolated runtime,
+zero skip/warning. All **15 Python files compile in memory**, diff clean;
+exact16-file allowlist is this record, new lane-owned source/scripts/focused
+tests and the existing lane-import boundary's four stdlib-only additions.
+Historical body/ledger through115 remains byte-identical from "Current
+publication rule"; current status and appended116 are the only record changes
+at this prospective freeze. Capture agent independently verifies39 fabricated
+transport cases, including encoded-echo refusal, exact32-page bound, retained
+failures, scope changes/cycles and per-publication guards; its publication-
+guard and terminal-page-budget removals each redden one case in0.07s.
+No agent has read real source/credential or touched QC. Commit these exact
+source/protocol bytes and this record locally, recheck clean roots/branch/HEAD
+and actual matching remote, then apply the two fixed offline readers and the
+one frozen full supplied-population capture. Continue this owner-waived round
+after actual results; this is not its ending or publication checkpoint.

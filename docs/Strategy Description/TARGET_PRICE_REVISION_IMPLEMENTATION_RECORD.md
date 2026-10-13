@@ -20719,3 +20719,14 @@ Failed source/discovery/partial-native/selection-error histories above are
 not removed by green fixtures. This ends support/evidence software, not an
 accepted2021–2026 study, stock-proxy backtesting readiness or canonical lane
 completion. Next independent review covers this entire final pushed tree.
+
+Publication preflight retained: the first shell check stopped BEFORE invoking
+git push because Codex mistyped the expected full hash for the closing commit.
+Actual observed HEAD is189e388b5f37eaf2adbe43a0fd2d543c4f18b755, parent3d68b1b4;
+physical/Git roots and branch were correct, actual remote still30e5, status
+clean. This is a local identity-pin transcription error, not concurrent history
+advance, a push failure, new strategy attempt or permission to force/reset.
+This metadata successor retains it before the one actual push. Claude reviews
+all13 prior Codex commits through189e388b plus this final metadata commit,
+the entire30e5..publishedHEAD range and cumulative tree. Publication pins use
+the actually observed full object ID, never an invented expansion of a short ID.

@@ -20730,3 +20730,73 @@ This metadata successor retains it before the one actual push. Claude reviews
 all13 prior Codex commits through189e388b plus this final metadata commit,
 the entire30e5..publishedHEAD range and cumulative tree. Publication pins use
 the actually observed full object ID, never an invented expansion of a short ID.
+
+## 88. Owner-reported 2GB upgrade and resumed OFF-first verification — 2026-10-13
+
+### 88.1 Latest authority, published base and prospective bounded scope
+
+Owner explicitly states: "I've upgraded QC storage to 2 GB. Proceed: verify
+the OFF run first, then run TPR ON once the baseline is valid." This is new
+owner-reported resource availability and conditional execution direction,
+not independent quota verification, changed economics, OFF attempt reset,
+source/economics acceptance, provider/PIT attestation or canonical promotion.
+Starting published snapshot is1d1e9635b7f2341e23f9dcc23595a613efe52857;
+physical/Git root and branch are correct, actual matching remote equals it
+and tracked worktree is clean. No concurrent Claude work/advance was observed.
+
+TPR-EXT26-D095 (agent-delegated, independent review pending): verify current
+resource metadata and fresh own-project OFF source/results. Do not carry the
+old50MB assumption forward after the owner upgrade. Fresh scopes do not
+renew old receipts or open D0/provider inputs. OFF3 remains exhausted, ON0
+remains conditional on usable full-window OFF orders/accounting and frozen
+economics/source conformity. Dates2021-01-04–2026-10-09,1449NAV/301decisions,
+six stock sleeves, cap-only fixed slots, AR-disabled weight-only tilt and
+frozen costs remain exact; no return/alpha/canonical acceptance is implied.
+
+Prospective UI operation TPR-EXT26-STORAGE-VERIFY-20261013-002:
+fresh committed HEAD/<=15minute UTC access/claim and exclusive cooperative
+controller BEFORE CUA. Only authenticated QC Resources capacity/usage metadata
+and own OFF project37650980 availability; <=12AX observations,0screenshots,
+4navigation/pane actions,300seconds active work. No ObjectStore keys/values,
+unrelated project/provider/account, source-body disclosure, login/credential
+extraction, purchase/account change/deletion, Mia message/edit/compile/job
+or new look. Incidental IDE activity is recorded, not requested. Later Mia
+effects or job-source reads require separate fresh bounded scopes.
+
+Prospective metadata successor: one own37650980 backtests/list request,
+includeStatistics=false, <=1MiB/128rows/30seconds; jobID/status/progress/
+snapshot and unzoned server-created metadata only. Preserve executed original
+and all30 looks. No unchanged rerun of the original naive-timestamp refusal,
+UTC invention, actor authentication from list fields, winner selection or
+current-files-as-compiled-source inference. New actually observed strategy
+jobs require separately retained retrospective looks and origin limits before
+outcomes; none resets OFF3 or consumes ON by fiction. Reviewed/tested committed
+source/closure/fresh claims precede effects. Native/source/Mia scopes follow
+concrete discovery; no generic API agent or fourth Codex OFF launch.
+
+Public QC storage documentation checked for the owner's fix question states
+displayed usage may lag about one hour and ObjectStore downloads are restricted;
+adding storage does not enable export:
+https://www.quantconnect.com/docs/v2/cloud-platform/organizations/object-store
+Earlier general backup advice is conditional, not export permission.
+No cleanup/purchase/export occurred. Prior read-only recheck at1d1e used fresh
+private scope, refreshed displayed50.01MB/50MB and opened exact OFF project;
+no API/job/source edit/deletion/credential read. Access2128bytes/
+a374808797d6452fbb2c245b87053ee55e56d814d0d2dadf0038f8735d1fb795
+and result1061bytes/739f74703dc1747b26de4155b1e77068d6803a4e486da9eb5ac1c03a2eea6f14
+remain immutable, not renewed by this operation.
+
+F017/F018/F019/F020 and current-source F021/F022/F023 remain OPEN unless fresh
+independent evidence closes their exact scope. Capacity alone cannot prove
+raw units, same-session/no-future marks, full journal/index/replay or compiled
+source. QC's backtesting Results documentation identifies the result Code tab
+as job-specific project files; this is a potential separately scoped source
+route, not a reason to clone/publish/rerun or assume snapshotId proves bytes:
+https://www.quantconnect.com/docs/v2/cloud-platform/backtesting/results
+
+Continuous bounded work accumulates in this SAME worktree for exactly one
+successful final matching non-force push at readiness/completion or a factual
+blocker; no checkpoint push or monitor rearm. Heartbeat stays PAUSED.
+Canonical and shared/sibling gates/documents remain unchanged. First attempted
+scope append refused because the patch anchor omitted the preceding line;
+zero tracked mutation or private/cloud effects occurred before corrected append.

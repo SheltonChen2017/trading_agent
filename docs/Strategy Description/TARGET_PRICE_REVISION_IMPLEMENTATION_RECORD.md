@@ -20384,9 +20384,97 @@ Current project source is still not proof of look29/30 compiled snapshots.
 Source14347bytes/SHA256
 `b0fdfc193f67b2376fbc9f192877de2165fbc094a099923963c834792a1ab23f`,
 test11222bytes/`a99d7c33555a5e7d6e0f9c5d530ab78ca6bfc2746bc19824b04c32d4001e0882`.
-Root read complete239line source/185line tests, focused26passed2.14s,
+Root read complete239line source/187line tests, focused26passed2.14s,
 in-memory compilation/diff checks clean. Producer26passed2.27s; meaningful
 remaining literal-policy6fail/docstring-redaction1fail/whole-notebook-
 suppression1fail reverse proofs0.71s/0.47s/0.48s, restored originals.
 Software accepted in scoped root review only; Claude independent review
 pending at the final round. Existing executed modules/hashes remain unchanged.
+
+### 87.14 Actual normalized source review and fresh refused-terminal successor
+
+SOURCE-VIEW001 genuinely completed/process0 atHEAD0d57de8b80b93b2f064ca4893a369f8a105473e2,
+created22:53:35.585629Z/expiry23:03:35.585629Z/ended22:53:41.086058Z,
+plan`c0bf2cb3dcffdbbe645369cbb55a58d0575a1601636fb93a89e929671a20181a`.
+Two exact401314byte FD reads, noAPI/credential/job/source execution/port.
+Receipt28999bytes/SHA256
+`cdbc541db9c4131589b115a83aba0bc113120617d04b1a12b8a24806bc12838c`.
+Four Python views pass the unchanged remaining screen. Root read all their
+normalized code/diff, not withheld docstrings/comments. Added mia.ipynb has
+11code cells; cell10 line20 contains an unknown32byte opaque string, so ALL
+notebook code remains withheld. No assumption that it is a credential/job ID.
+All original notebook bytes are privately retained; still not fully reviewed.
+An identified successor may allow only a literal matching an already-public
+frozen job identity, not broadly exempt opaque strings. No compiled-job proof.
+
+Current main.py delta (59931/9e19a038… to60796/f42320ef…): imports the known
+audit-key writer instead of original CompressedAuditStore, adds mia_rescale
+and mia_diag, initializes _stale_mark_delisting_acceptances, normalizes each
+membership callback before inventory with a prior-weight-total reference,
+replaces held same-day/future mark guard by fresh_mark and adds stale flag to
+private mark audit. Other nine original Python modules/config remain exact.
+Audit-key helper7490/bce4182d… preserves1024 mapping, native key validation,
+collision refusal/no-overwrite and gzip/hash/readback sidecar in this static
+view; native replay/compiled-job closure still unproved. Added notebook6100/
+c753fe2c…, mia_diag5253/ca1df38f… and mia_rescale4852/0c68d8fd… are retained,
+not silently treated as approved ports or changed economics accepted by Mia.
+
+TPR-EXT26-F021 P1 OPEN: confirmed CURRENT SOURCE heuristic membership-unit
+reinterpretation. normalize_members divides every known weight by100 when
+known_total>3 and rescaled total satisfies a0.5–1.5 prior-reference band;
+without prior reference it accepts0<total<=1.5 with each scaled weight<=1.
+No independently verified native/source-unit/correction evidence yet justifies
+these trigger/band rules. This is not proven clipping/dropping, not a proved
+original offender row or proved effect on a particular job's selection/P&L.
+Membership weights do not set cap rankings/target allocations in the frozen
+strategy; input classes/audit/PIT/covered-subset truth still cannot be changed
+by an unverified percentage heuristic. Do not port/accept this as frozen-rule
+recovery without exact source-unit proof and prospectively bounded correction.
+
+TPR-EXT26-F022 P1 OPEN: confirmed CURRENT SOURCE stale/future mark bypass.
+fresh_mark returns true immediately for IDs in warning_ids or delisted_ids,
+without testing mark clock; other IDs retain the old guard via assert_fresh_mark.
+An audit stale flag does not prove usable native delisting fill/share/cash/
+valuation accounting, nor justify every prior/future mark. Actual job impact
+and compiled binding remain unproved. The new acceptance counter is initialized
+but not incremented in the observed added helpers. Diagnostic helper also calls
+native history on a stale-mark refusal; these external-owner effects are not
+Codex permission to reopen provider/old captures or fabricate observed rows.
+Port neither acceptance relaxation until narrow independently verified lane
+correction preserves frozen economics and complete accounting. No fourth OFF.
+
+TPR-EXT26-D092 (agent-delegated, independent review pending): inspect refused
+look30 via NEW TPR-EXT26-OWNER-MIA-TERMINAL-20261013-001, not rerun it or pick
+look29. Fresh3FD access before credentials: exact COMPONENTS002 receipt8851/
+245641d8… plus diagnostic8496/62cd94e2… and projection4138/8cfb978f…,
+21485 total; immutable public looks30/parent/source/freeze/config/calendar
+bindings. At the next committed HEAD/new UTC<=15minute plan, exclusive
+claim/access/controller and per-request claims. Fixed own37650980/look30/
+4936632376c0885358493a2694ed239b only; look29 is NOT replayed. Same read-only
+terminal/chart/order/aggregate-log routes, <=133requests/600seconds,
+30seconds/request,64MiB wire/128MiB private,128×99 order pages, noObjectStore/
+source/provider/input/upload/compile/edit/Mia task/job/attempt/newlook effects.
+
+Terminal selective scanner prospectively<=4MiB/400000value nodes/10seconds,
+depth32/exact numbers/decoded duplicate keys and raw/escaped credential echo
+guards, scanning ignored trees before any hash/metadata retention. Only safe
+terminal metadata/error identity/closed stage-marker observations retained;
+no error text/statistics/parameters/market rows. Root/nested identity checks
+preserved; root chart/orders identity channels refuse. Shared original100000
+node parser and executed collector remain byte-identical. Current response
+over100000 would diagnose THIS new response, not prove earlier refusal cause.
+Independent chart/orders/index reads remain possible after terminal refusal;
+capture success or end-callback marker proves neither full accounting nor
+exact root cause. No source/economic/native result accepted by this adapter.
+
+Source37034bytes/SHA256
+`1638de111e2060a2d454b9090e726d2c971c211f05df2805d66b31ca90813a57`,
+tests19328bytes/`28091a46ed678ba3baf68ecbd1d044278b4129ff4004bd20c209f7791fde15aa`.
+Root complete source/test read;45focusedpassed2.57s, in-memory compile/diff
+clean. Producer initial27pass/6fail parent JsonNumber descriptor boundary
+corrected before effect, final45passed2.14s. Independent peer45passed2.41s,
+restored45passed2.52s; discarded root-ID P2 gap corrected before effect,
+provenance/earlier-cause P3 labels qualified. Meaningful root-ID4fail/2pass,
+decoded-echo2fail/7pass, duplicate1fail/8pass, ignored-number2fail/7pass,
+finalguard1fail reverse proofs0.55s/0.31s/0.31s/0.30s/0.73s. Accepted-after-
+correction for bounded software only; independent Claude review still pending.

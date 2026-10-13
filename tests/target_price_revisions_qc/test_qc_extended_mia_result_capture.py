@@ -531,3 +531,55 @@ def test_actual_cli_parser_normalizes_via_fixture_only_runtime_boundary(tmp_path
     result = e.parse_json(capsys.readouterr().out.encode())
     assert result["status"] == "COMPLETED_CAPTURE" and result["plan_sha256"] == m._sha(original_raw)
     assert len(calls) == (0 if action == "source-inspect" else 1 if action == "status" else 6)
+
+
+# TPR-CR26 regressions: a status defect and three guards the received suite
+# never exercised. Each is red when the named line is removed or restored.
+
+
+def test_not_terminal_status_does_not_survive_a_failed_final_check(tmp_path):
+    """TPR-CR26-001: a refusal at the final check after a running-job read is FAILED_OR_UNCERTAIN, not NOT_TERMINAL."""
+    (tmp_path / "first").mkdir(); (tmp_path / "second").mkdir()
+    counted = []
+    values = fixture(tmp_path / "first", "collect-native"); read, calls = transport(running=True)
+    happy = execute(values, read, guard=lambda _: counted.append(1))
+    assert happy["status"] == "NOT_TERMINAL" and len(calls) == 1
+    final_check = len(counted)  # the last guard call is the final check after NOT_TERMINAL is set
+    seen = []
+    def refuse_at_final_check(_head):
+        seen.append(1)
+        if len(seen) == final_check: raise ValueError("synthetic refusal at the final check")
+    plan, sources, root, now = fixture(tmp_path / "second", "collect-native"); read, calls = transport(running=True)
+    result = execute((plan, sources, root, now), read, guard=refuse_at_final_check)
+    assert len(calls) == 1 and len(seen) == final_check
+    assert result["status"] == "FAILED_OR_UNCERTAIN" and result["native_census"] is None
+    assert result["new_looks"].fraction() == 0 and (root / (plan["operation_id"] + ".result.json")).exists()
+
+
+@pytest.mark.parametrize("seam", ["lane_root", "private_root"])
+def test_fixture_mode_refuses_lane_or_private_roots_before_any_directory_open(tmp_path, seam):
+    """Fixture execution can never be pointed at the lane tree or the private root."""
+    plan, sources, _root, now = fixture(tmp_path, "status"); read, calls = transport()
+    root = m.PRIVATE_ROOT if seam == "private_root" else m.LANE / "artifacts" / "synthetic-never-created"
+    with pytest.raises(ValueError):
+        m.execute_fixture(plan, sources, root, clock=lambda: now, transport=read)
+    assert not calls and not root.exists() if seam == "lane_root" else not calls
+
+
+@pytest.mark.parametrize("offset", ["naive", "plus_five"])
+def test_fixture_clock_must_be_an_aware_utc_datetime(tmp_path, offset):
+    """The clock seam is checked for type and zero UTC offset before the claim is spent."""
+    plan, sources, root, now = fixture(tmp_path, "status"); read, calls = transport()
+    bad = now.replace(tzinfo=None) if offset == "naive" else now.astimezone(timezone(timedelta(hours=5)))
+    with pytest.raises(ValueError):
+        execute((plan, sources, root, now), read, clock=lambda: bad)
+    assert not calls and not (root / (plan["operation_id"] + ".claim.spent.json")).exists()
+
+
+def test_terminal_error_status_without_error_text_is_refused(tmp_path):
+    """A Runtime Error terminal that carries no error text is not a usable terminal."""
+    def strip(response, _count):
+        if "backtest" in response: response["backtest"]["error"] = None
+    values = fixture(tmp_path, "status"); read, calls = transport(runtime_error=True, fault=strip)
+    result = execute(values, read)
+    assert len(calls) == 1 and result["status"] == "FAILED_OR_UNCERTAIN" and result["terminal"] is None

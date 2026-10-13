@@ -497,6 +497,8 @@ def _execute(plan, sources, root, *, guard, clock, monotonic, transport):
             check()
             if report["status"] != "NOT_TERMINAL": report["status"] = "COMPLETED_CAPTURE"
         except (Exception, KeyboardInterrupt):
+            # A refusal after a NOT_TERMINAL read is still a failed scope.
+            report["status"] = "FAILED_OR_UNCERTAIN"
             if report["requests"] and report["requests"][-1]["status"] != "succeeded":
                 capture._publish(directory, operation + ".read" + f'{report["request_attempts"]:03d}' + ".terminal.json", e.canonical(report["requests"][-1]))
         report["ended_utc"] = clock().isoformat(); raw = e.canonical(report)

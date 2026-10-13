@@ -8,6 +8,11 @@ from types import SimpleNamespace
 
 import pytest
 
+pytest.importorskip(
+    "fcntl",
+    reason="IBWIN-CR01: Insider custody/acquisition/replay requires POSIX fcntl; Windows custody port deferred",
+)
+
 from data.hashing import canonical_json, hash_bytes
 from research.insider_buying_sec_complete_acquisition import SecHttpResult
 import research.insider_buying_sec_all_form4_parent_recovery_executor as executor

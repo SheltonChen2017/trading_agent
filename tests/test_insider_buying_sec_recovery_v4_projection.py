@@ -9,6 +9,11 @@ import weakref
 
 import pytest
 
+pytest.importorskip(
+    "fcntl",
+    reason="IBWIN-CR01: Insider custody/acquisition/replay requires POSIX fcntl; Windows custody port deferred",
+)
+
 from research import insider_buying_sec_recovery_v4_capture as capture
 from research import insider_buying_sec_recovery_v4_selection as selection
 from research import insider_buying_sec_recovery_v4_projection as m

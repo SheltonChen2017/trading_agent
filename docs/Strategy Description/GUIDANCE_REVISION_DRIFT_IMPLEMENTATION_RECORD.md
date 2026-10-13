@@ -3,7 +3,8 @@
 Status: **Independent Claude review of `d1a57097..8e277418` (sections 35
 and 36: counter-review of section 34 and the read-only QC readiness preflight)
 recorded in section 37, 2026-10-13;
-Codex counter-review of section 37 pending.
+Codex counter-review of section 37 completed in section 38.
+Claude's `2baf5a48` is accepted after documentation correction.
 Both Codex commits are accepted; no source changed since producing `c589b3dd`.
 GDR-RP33 is accepted in section 34
 as offline software only: it retains every record digest in a 489-line paired
@@ -15,13 +16,16 @@ The owner's conditional Mia-led synthetic recovery (32.4) stays
 paused pending platform preflight: output compliance with QC's AI-agent rules
 (GDR-CR28-001) and log accounting remain open, with only 18.89 KB of
 organization-wide log-read quota observed against a 75,260-byte payload
-(GDR-CR31-003, GDR-CR37-002), and no recovery attempt boundary is set yet
-(GDR-CR37-001). Native loading of the recovery carrier is unverified. Only
+(GDR-CR31-003, GDR-CR37-002). The standing recovery ceiling is three
+unsuccessful attempts; section 38 names its separate prospective ledger and
+unexpected-action reconciliation rule (GDR-CR37-001). Recovery launches
+remain zero, and no platform prerequisite is cleared by this documentation.
+Native loading of the recovery carrier is unverified. Only
 `data/__init__.py` was observed as one LF at runtime;
 `research/__init__.py`, remains unobserved. No successful native integration
 or empirical backtest readiness is established. The original economic, data,
 empirical, account and trading gates remain closed.**
-Current scope/evidence are sections 17 through 37. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 38. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -4839,8 +4843,8 @@ Reviewed range: the two Codex commits after the section-34 push.
 Both change only this record and the review-state pins in `test_boundaries.py`.
 No production source, other test, data file, frozen root document, plan, PDF
 or candidate changed. Source identities remain those in 33.4, so no mutation
-trial applies. The owner's instruction for this round was to review every
-unreviewed commit, apply corrections where necessary and push once, without a
+trial applies. Claude reports that the owner's instruction for this round
+was to review every unreviewed commit, apply corrections where necessary and push once, without a
 full lane-suite review. Validation is therefore the lane gate and the shared
 active-document check, run in the designated worktree, network-denied. No
 provider, QC, broker, paper or live system was contacted by this review.
@@ -4869,10 +4873,12 @@ provider, QC, broker, paper or live system was contacted by this review.
 
 | ID | Priority / status | Location | Finding, disposition and verification |
 |---|---|---|---|
-| GDR-CR37-001 | P3 / documented, owner input before any recovery launch | Sections 32.4, 35.3, 36.2, 36.5 | The conditional Mia-led recovery authorization sets no attempt boundary. Sections 32.4 and 36.5 say only that it is not unlimited, and no attempt ledger or counting rule is named for it. Section 36.2 also records a build whose initiator is unverified (`b841a7-8c8ea8`) during a read-only Mia exchange, so Mia or the IDE can start engine actions without an explicit request. Before any Mia-led launch, the owner should set the recovery attempt cap and define what counts as an attempt, including Mia-initiated compiles or launches and how they are observed in project history. The record should name that recovery ledger, separately from the closed section-27 cycle. |
-| GDR-CR37-002 | P3 / documented, shared resource | Sections 35.4, 36.2 | The log-read quota is organization-wide, not lane-specific. It fell from 32.29 KB to 18.89 KB between two read-only observations in which this lane read no logs. Retrieving the complete v2 evidence needs at least 75,260 bytes of read headroom at that moment, so any recovery run must be timed against other lanes' log reads, or the quota question raised with QuantConnect. This is a shared-resource scheduling matter for the owner; nothing changed here. |
+| GDR-CR37-001 | P3 / accepted after documentation correction in 38.2; operational prerequisites retained | Sections 32.4, 35.3, 36.2, 36.5 | The conditional question does not restate the standing three-unsuccessful-attempt ceiling; its omission is not unlimited authority or a missing numerical cap. The real gap was no named separate recovery ledger or explicit unexpected-action reconciliation procedure. The successful `b841a7-8c8ea8` observation has an unknown initiator: it does not prove a Mia launch or an unsuccessful attempt. Section 38.3 names the prospective ledger and conservative counting/reconciliation controls. No launch is authorized until the independently reviewed candidate and actual platform gates pass; unresolved action lineage or a proposed budget change returns to the owner. |
+| GDR-CR37-002 | P3 / accepted, open shared-resource prerequisite | Sections 35.4, 36.2 | Organization-wide remaining log-read quota fell from 32.29 KB to 18.89 KB between observations; this lane requested no log reads. The cause is unknown, not evidence that another lane consumed it. Complete v2 retrieval needs at least 75,260 payload bytes plus any actual platform/read overhead. Recheck headroom for launch and retrieval and wait if unavailable. Request owner coordination or QC clarification if needed; no quota reservation, scheduler change or other-lane action is authorized. |
 
-Scripted count from this table: P0 0, P1 0, P2 0, P3 2; corrected 0, documented 2.
+At Claude's review, the scripted count was P0 0, P1 0, P2 0, P3 2;
+corrected 0, documented 2. Section 38 retains both findings and qualifies
+their current dispositions above.
 
 ### 37.5 Validation, owner confirmations, commits and next action
 
@@ -4880,7 +4886,7 @@ Scripted count from this table: P0 0, P1 0, P2 0, P3 2; corrected 0, documented 
 |---|---|---|
 | Lane gate `test_boundaries.py` plus shared `test_active_document_consistency.py` at `8e277418` | worktree, network-denied | 75 passed |
 | Source identities at `8e277418` | worktree, network-denied | Full source `061ff30f...`, recovery project `c6b9443a...` and prepared runtime `5d1dc656...` are unchanged from 33.4 |
-| Full lane selection and repository suite | not run | Not run, per the owner's instruction for this round; no source changed |
+| Full lane selection and repository suite | not run | Claude reports an owner no-full-suite instruction for this review; not independently confirmed in Codex's channel. No source changed. |
 | `git diff --check` | worktree | passed |
 | Closing check on this record commit | worktree, network-denied | lane gate plus shared active-document check: 75 passed |
 
@@ -4904,8 +4910,9 @@ platform-preflight, GDR-RP33 and attempt-ceiling pins are kept.
 This round gets one push, guarded on the remote head still being `8e277418`;
 never force.
 
-Next, Codex counter-reviews section 37. Before any Mia-led recovery launch, the
-owner sets the attempt boundary and ledger (GDR-CR37-001). GDR-CR28-001
+Next, Codex counter-reviews section 37 (completed in section 38). Before any
+Mia-led recovery launch, retain the standing three-unsuccessful ceiling and
+separate ledger/action-reconciliation controls (GDR-CR37-001). GDR-CR28-001
 (output compliance) and GDR-CR31-003 (log accounting, now also the
 organization-wide read quota, GDR-CR37-002) remain open. The closed cycle's
 three-attempt ceiling stays exhausted.
@@ -4914,3 +4921,166 @@ Acceptance here is a documentation and software review only. It establishes
 neither native execution nor empirical readiness.
 `docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` were not edited
 and stay frozen for both agents.
+
+## 38. Codex counter-review of section 37 and recovery-control closure, 2026-10-13
+
+### 38.1 Exact publication, completed trigger and per-commit disposition
+
+The owner-directed preflight/handoff round was published exactly once at
+`8e2774183886d25a5fd985cb4fe711a86b977100`, after local commit
+`f7467d21c2f1dfc11008e6d5ea36661fa07adaed`. The non-force push from
+`d1a57097605c2a01ebeb9805c4474161a7882b10` targeted only the matching lane;
+matching remote/local head and clean status were verified at
+2026-10-13 21:27:12 UTC. The existing monitor was then rearmed as requested.
+No second publication of that round is permitted or performed.
+
+Claude's completed review arrived at exact matching remote and clean local
+`2baf5a48cf21f59d20bd208224e6dbbeede5450a`. Baseline ancestry was verified
+and section 37 explicitly identifies the completed review of the exact
+`d1a57097..8e277418` publication. This consumes the trigger once. The entire
+counter-review range is
+`8e2774183886d25a5fd985cb4fe711a86b977100..2baf5a48cf21f59d20bd208224e6dbbeede5450a`.
+It contains exactly one Claude commit; its full message, diff, every finding,
+reported validation and handoff were inspected. All work used the mandatory
+absolute root/branch; no dirty Claude/user work was present or overwritten.
+Two read-only advisory audits supplemented, but did not replace, this
+counter-review or Claude's independent acceptance.
+
+| Claude commit | Disposition | Evidence/correction |
+|---|---|---|
+| `2baf5a48cf21f59d20bd208224e6dbbeede5450a` | Accepted after documentation correction | Both Codex commits remain accepted; production identities unchanged. Retain both P3 findings, correct the missing-cap overstatement, qualify shared-quota causation/coordination and attribute Claude-reported owner/testing statements. Only this record and its active-state pin change. |
+
+Assessment: 8/10 for the bounded documentation/software review. The separate
+ledger and shared-quota concerns are useful; the standing recovery ceiling was
+overlooked. This score is not native integration, economics or empirical
+acceptance. Direct owner directions already present in Codex's human channel
+remain authoritative; no redundant confirmation of those directions is
+required merely because Claude cannot read that channel.
+
+### 38.2 Retained P0-P3 ledger and evidence
+
+CR37 retains P0 0, P1 0, P2 0, P3 2. No new production defect was established.
+All earlier ledgers remain, including open GDR-CR28-001/P2 exact-route
+compliance, GDR-CR31-003/P2 actual accounting/full delivery, the observed-only
+initializer limitation and shared/main-owned GDR-CR18-005. No shared behavior
+or historical failed-cycle evidence was changed.
+
+| Retained ID | Counter-review disposition/status | Evidence and correction |
+|---|---|---|
+| GDR-CR37-001 | Partially accepted / P3; documentation corrected, operational controls named in 38.3 | The machine-wide owner rule and the rearmed monitor explicitly retain at most three unsuccessful recovery attempts, counting compile failures, runtime errors and other unsuccessful terminal launches. The conditional question's omission of the numeral does not erase this rule. `evaluation_cycle.py` already fixes three, refuses another intent while pending/ambiguous and retains exact event/observation lineage. The record lacked a dedicated recovery ledger name and unexpected-action protocol, now supplied without creating launch authority. Unknown successful IDE builds remain ancillary observations, not invented Mia attempts. |
+| GDR-CR37-002 | Accepted / P3, open shared-resource prerequisite | The observations establish insufficient organization-wide read headroom, not its consumer or cause. Receipt/hash/source observations in 36.4 remain exact. Last observed 18.89 KB is below the 75,260-byte payload alone; actual read/generation accounting and usable future headroom are not established. Recheck and wait rather than reserve or alter another lane's resources. Owner/QC coordination is needed only where safe checks cannot resolve the gate. |
+
+| New ID | Priority/status | Correction |
+|---|---|---|
+| GDR-CCR38-001 | P3 / corrected | Header, CR37-001 and next action no longer claim that no numerical attempt boundary exists. Preserve the real ledger/reconciliation concern and the unchanged historical ceiling. |
+| GDR-CCR38-002 | P3 / corrected | Attribute the review's no-full-suite instruction/75-pass results to Claude, not independently observed human direction or Codex execution. Qualify CR37-002: quota decline alone cannot identify another lane or mandate a scheduler mutation. |
+
+Claude's 75-pass report is retained, not rerun or independently certified here.
+Static method counts (six boundary plus 69 shared active-document methods)
+agree with 75. The review changes only this record and one state pin;
+production diff from producing `c589b3dd` is empty. No source regression or
+new engineering milestone is manufactured from a documentation concern.
+
+### 38.3 Separate prospective recovery ledger and conservative controls
+
+The externally authorized recovery is named
+**`GDR-Mia-base372-recovery-authorized-20261011`** for operational custody.
+Its prospective receipt directory is
+`artifacts/guidance_revision_drift/qc/GDR-Mia-base372-recovery-authorized-20261011/`.
+No QC project, launch, typed waiver, cycle journal or release is created by
+naming it. This section is its zero-launch control checkpoint, distinct from
+the immutable CLOSED FAILED `GDR-base372-approved-20261008` ledger. Renaming,
+new source/project or a later review cannot replenish either budget.
+
+| Ledger | Unsuccessful attempts | Pending authorized launch | Ceiling/status |
+|---|---|---|---|
+| Original section-27 cycle | 3 | None | CLOSED FAILED, zero manual remaining; exact IDs/receipts unchanged |
+| Separately authorized Mia-led recovery | 0 | None | Standing maximum three unsuccessful attempts; NOT launch-ready while platform gates remain open |
+
+Before the first permitted recovery intent, preserve the exact external
+authorization, accepted source/review/fixture binding, complete inspected
+project map/hashes and retained ledger anchor. Use the existing passive
+`OwnerCycle`/`CycleJournal` contracts for exact supplied lineage where their
+schemas apply, alongside raw platform receipts and an action-observation
+ledger. Do not manufacture a typed approval, timestamp, binding, compile ID
+or run ID to satisfy a schema. Receipt storage is custody, not authority.
+
+Each authorized compile/run sequence is one attempt: a compile failure
+ends that attempt; a successful compile followed by runtime error or other
+unsuccessful terminal run also counts once. A compile success alone is not
+an unsuccessful terminal attempt or proof of a completed backtest. Record
+every Mia-initiated or IDE-observed action, intent/initiator if known, exact
+project/source epoch, compile/run IDs, event and observation times, status,
+engine/binding and terminal output. Retain incomplete observations without
+inventing missing identity. Mia's automatic actions are not exempt from the
+standing ceiling, and renaming or restarting its conversation cannot reset it.
+
+Any unrequested action, uncertain source/intent lineage, missing terminal
+receipt or unknown job state halts further launch/change while it is
+reconciled read-only through permitted interfaces. Do not cancel another
+lane, guess success/failure or silently discard an attempt. Where an
+unsuccessful recovery action is verified it consumes the ceiling regardless
+of initiator; where attribution/counting cannot be resolved safely, return
+to the owner before advancing. The successful incidental builds recorded
+in 36.2 remain ancillary historical observations, not retroactively created
+recovery launches. A budget increase or unresolved scope decision requires
+express owner direction. Stop at the third unsuccessful recovery attempt;
+no fourth recovery or original-cycle manual launch is inferred.
+
+### 38.4 Validation and unchanged identities
+
+Codex uses only focused active-document/import-boundary checks, in-memory
+compilation and diff/status/source guards; no full lane/repository suite,
+provider/QC/API/browser/job or empirical access occurs in this counter-review.
+Existing Python 3.13.15, `-B`, explicit lane test import path and a
+network/file-write-denied test profile were used. No runtime/dependency was
+installed, no bytecode written and no complete suite was run.
+
+| Check | Result |
+|---|---|
+| Active-document state, fresh imports and transitive lane/neutral import closure | 3 passed, 0.268 s; repeated after documentary qualifications: 3 passed, 0.283 s; zero failures/errors/skips or observed warnings |
+| In-memory source/test compilation | 88 lane Python files passed |
+| Frozen production/design and exact changed-path guards | Passed: production diff from `c589b3dd` empty; only lane record and active-state test pin changed |
+| Diff/status checks | Passed; root/branch and exact reviewed HEAD rechecked before commit; no unrelated dirty work |
+| Full lane/repository suite | Not run by Codex; Claude's reported checks retained separately |
+
+Source remains exact
+producing `c589b3dddab3f1dd136d10ae7ce1851d64818906`: full source
+`061ff30fe4053ebfabfa27c38d2e3ccd37d950c2fe3eae4375a933463125ee9f`,
+recovery project `c6b9443aa64f005c48e21f493bfea14918ecf6a730ac4f995bd3a70ee4c269a9`
+(21 Python files / 298,870 bytes), runtime
+`5d1dc6560ad2778fd6a8c514c16641b6e78cf82d514a0088f0a344c31783437d`.
+Fixed fixture `8f35d56a335d3f7d9dad016e1e2236de7fcd2635e5c463c30081f97b7b944458`
+and semantic draft `b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c`
+remain unchanged. The complete 489-line / 75,260-byte v2 route retains all
+752 hashes and 372 literal valuations; 96,820-byte reserved cost remains an
+assumption, not platform accounting. No new candidate is saved or uploaded.
+
+### 38.5 Next action and publication/monitor state
+
+The owner-requested single push and rearm completed, and its newly arrived
+review is now counter-reviewed. Continue necessary authorized readiness work
+only when actual gates permit. The next real step remains scoped native
+Mia-led synthetic recovery, not another invented offline milestone. It is
+blocked by exact-route QC compliance, actual accounting/read headroom and a
+usable scoped platform preflight. The off-task Mia output in 36.3 is not
+clearance; do not retry a new identity/framing/channel to bypass a restriction.
+Required QC/platform clarification returns to the owner. No recovery launch
+occurred, no cloud source changed and no draft permission was promoted.
+
+The consumed review and this local counter-review closure are persisted in
+automation memory/thread state. Pause the monitor at this owner/platform-input
+blocker rather than rearming an automatic next round. The baseline round's
+one push is complete; it is not blanket permission to publish future partial
+blocked rounds. This counter-review accumulates locally without an
+intermediate second push. If the blocker is resolved, resume the exact same
+recovery ledger and source-review binding, not a new allowance. A source
+change requires its next independent review before evaluation.
+
+Root Session Handoff, Action Plan, Feature Milestone Record and all shared
+documents/behavior remain frozen. No successful native integration, original
+GDR-0..6 completion, real-data adapter/PIT evidence, matched-SPY/corporate-action
+or settlement parity, empirical readiness or market edge is established.
+Original economic/data/rights/family/window and all account/trading gates
+remain closed. Required human choices are not silently resolved by broad
+preauthorization.

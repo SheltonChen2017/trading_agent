@@ -17,7 +17,8 @@ WITH A SEPARATE PAID ONE-SHOT QUALIFICATION AND FULL-QUARTER METADATA CENSUS;
 SECTION166 RECORDS ACTUAL PAID HTTP200/277-BYTE/ONE-ROW ACCESS AND THE
 83,657-FILING OFFLINE CENSUS WITH TWO IDENTICAL DERIVATIONS. NO COMPLETE
 ARCHIVE/IDENTITY/RIGHTS OR BACKTEST-READINESS CLAIM. LOCAL CONTINUATION,
-NO FINAL PUSH CONSUMED; CURRENT EXTERNAL SOURCE/SEMANTICS INPUTS IN166.3.
+NO FINAL PUSH CONSUMED; SECTION167 CLARIFIES LOCAL RETROSPECTIVE EARNINGS
+SCOPE AND PREREGISTERS THE BOUNDED248-MONTH SUPPORTING ARCHIVE ACQUISITION.
 19,846 OF 99,394 PARENTS ARE REQUEST-BOUND; V3 REMAINS 1,846 OF 1,847;
 THE FOUR CUSTODY FILES AND V1/SCALE/PILOT STAY FROZEN. STRICT D23 RETAINS
 SEVEN NONEXACT QUARTERS. NOT BACKTEST-READY: REAL EARLY EARNINGS, IDENTITY,
@@ -23675,3 +23676,127 @@ completion JSON and hash-only leaves, not actual credentials or decoded paid
 rows; no factory/profile/whole-suite repetition, edit or provider call. No
 accuracy correction was needed. Its verification is attributed internal QA,
 not an independent Claude review or a second actual source observation.
+
+## 167. Continuous-build earnings archive scope and precontact registration (2026-10-13 UTC)
+
+### 167.1 Owner direction and corrected evidence requirements
+
+The owner explicitly directed: use the configured token to acquire required
+historical earnings data, continue until honest backtesting readiness and
+push only once when done. Routine implementation/policy judgment remains
+delegated; this is not a new review wait or an interim checkpoint push.
+The owner supplied Keychain service/account names: trading-agent-fmp/fmp,
+trading-agent-sharadar/sharadar, trading-agent-massive/massive and
+trading-agent-eodhd/eodhd. These are owner-reported configuration locators,
+not independent token validity, entitlement or permission measurements.
+The already validated owner-confirmed rotated private EODHD file remains
+the explicit credential input for this campaign; no secret or credential
+hash is copied to this record, source, environment or command arguments.
+
+Append-only correction/qualification of166.3: manifest-v3/analysis-v2
+deliberately excludes earnings from causal event selection, control matching
+and order/execution clocks. The two prescribed earnings diagnostics are
+retrospective actual-release assessments. A truthful single current source
+version may use the actual2026 observation time as recorded_at_utc; a complete
+historical as-known forecast/revision archive is not an inferred prerequisite.
+Keep EODHD archive/diagnostics LOCAL against a legitimately exportable sealed
+primary order/result ledger; no EODHD licensed rows or derived earnings
+filters enter the QC primary candidate. Missing EODHD QC-upload permission
+therefore does not block this local acquisition. Other sources' rights and
+QC/native/export facts remain independent requirements. No right is invented.
+
+The official [Calendar specification](https://eodhd.com/financial-apis/calendar-upcoming-earnings-ipos-and-splits)
+and [OpenAPI](https://eodhistoricaldata.github.io/EODHD-openapi/redoc.html)
+support provider-reported announcement-date/current-reported-status candidate
+semantics and bounded monthly date-window measurement. Measure the real
+archive before demanding a supplier completeness certificate or another SKU.
+Neither empty responses nor current ticker labels certify complete no-event
+coverage, original availability or historical CIK/share-class/QC-SID identity.
+Unknown timing must remain an interval; never invent an exact release instant
+or silently claim the civil-date successor satisfies the parent exact-UTC
+diagnostic. Personal terms support private local storage/analysis, not general
+redistribution. Both +/-2 and +/-5 prescribed diagnostics stay required.
+
+Read-only primary issuer/SEC corroboration identifies Apple's January18,2006
+actual release for the December31,2005 fiscal period, separately from the
+advance conference-call announcement. The public SEC8-K page and effective
+Item2.02/form instructions were read through public web-source research, not
+a production SEC-parent request journal. Do not claim zero SEC website access
+or manufacture a backend network-request count. Filing delays/exceptions mean
+absence of8-K alone cannot certify no release. No new parent capture occurs.
+
+### 167.2 Immutable, bounded online campaign definition
+
+New candidate research/insider_buying_eodhd_earnings_campaign.py registers
+exactly248 nonoverlapping MONTHLY date windows,2005-12-01..2026-07-31, to
+GET https://eodhd.com/api/calendar/earnings with from/to/fmt=json and NO symbols
+filter. This is a conservative SUPPORTING ARCHIVE BUFFER around the frozen
+2006Q1..2026Q2 filing corpus, not changed population dates or proof of exact
+per-event coverage. No reserved2027+ outcome/holdout date is queried. All
+global/context source rows survive; never infer .US from historical labels.
+The prior AAPL2006Q1 symbols profile remains separately journaled and cannot
+repeat. The new no-symbol monthly query is not that identical request;
+overlapping returned rows must keep distinct custody/version lineage.
+
+Real CLI permits only the frozen248-window profile: partial-window callbacks
+are fake-transport tests, not real redispatch authority. Maximum ONE transport
+invocation per window; no retries, redirects, proxies, pagination or resume.
+TLS verification,15-second timeout,4MiB/window,50,000 rows/window and at least
+one second AFTER prior transport completion bound the scope. The first
+refused/ambiguous/schema-invalid window stops further dispatch and the
+immutable manifest accounts for remaining originally unattempted windows.
+No started/completed/ambiguous window may repeat under a new campaign name
+or interval decomposition. A future separately versioned unattempted-only
+continuation is not a resume or repeat and must be explicitly implemented.
+
+The POSIX global flock and persistent interval-overlap registry serialize
+starts. Each scope reservation and start is published/fsynced immediately
+before its transport, not all248 in advance. Named/FD roots, private0700/0600
+single-link leaves, leaf inventories/hashes and current+committed seven-source
+image are rechecked around every transport and publication. A changed root,
+branch, HEAD, dirty image, token file or journal stops execution. Financial
+numeric lexemes are discarded by the metadata parser; successful raw bytes
+remain private/ignored only. Non200/error/credential-echo/schema-refused bodies
+are not retained or hashed; exceptions emit fixed sanitized codes only.
+Counts-only progress is emitted every ten completed windows. All14 authority/
+readiness flags remain false; looks/jobs/backtests0/0/0.
+
+### 167.3 Prelaunch finding, correction and focused evidence
+
+Internal read-only prelaunch audit found IBEOD-CAMP-R01: the draft rejected an
+otherwise valid whole month on duplicate(code,fiscal-period) rows and discarded
+its raw source, losing potential conflict/revision context. Main corrected
+this before real contact: preserve EVERY row with source_row_ordinal and raw
+bytes, no deduplication; count duplicate fiscal rows and date/timing/current-
+reported-status disagreements only. Financial values are not compared and
+these counts are not a certified historical revision archive. The accepted
+projection retains unknown status/timing and grants no positive coverage.
+
+Main's corrected focused selection passed600 in4.23s, zero failures/skips:
+the new campaign, prior paid/demo profiles, import boundary, lane record,
+active-document consistency and EXACT Insider package guard. Process-tree OS
+network denial and isolated minimal environment/temp database were enforced;
+this is not the whole lane/repository suite or acquisition evidence. Peer's
+earlier528-pass run and151-pass audit concern preceding bytes; do not relabel
+them final-main evidence. Independent final module run passed152 in1.05s;
+parent and child network probes observed EPERM. Memory-only reversals of the
+duplicate guard, overlap fence and non200 no-read produced2/3/8 failures,
+then2/3/8 passes after finally-restored callables. No actual token/API was used.
+Candidate current source SHA-256
+dba26ac7f4b4042123482596fd175dd0ffdb8e616b4a847dfd546ad2232bbbaf;
+test SHA-256 f579ea21de8db0dc2d5d1f27382d112bbd75ade2e158810d22f83f5ea0094085.
+Finish compile/frozen/diff/origin checks before committing this preregistered
+image; no campaign contact has occurred at this entry. Actual execution/result
+hashes belong in the later observed handoff, not a claim this later commit
+existed beforehand.
+
+Technical milestone: a bounded request-bound date-window acquisition candidate
+with unresolved duplicate context retained, plus an explicit local-only
+retrospective diagnostics policy. Plain-language milestone: gather the actual
+available historical archive without filtering to surviving companies, record
+what is missing honestly, and keep paid earnings data out of the QC job.
+This does not complete actual82-quarter parents, historical identity/PIT,
+source rights, permanent protocol/look roots or backtesting readiness. Six
+carried P2s and both final historical access classifications remain unchanged.
+Shared documents/frozen custody bytes and strategy economics stay untouched.
+Proceed after clean committed preflight; no new Claude wait or final push yet.

@@ -20354,3 +20354,39 @@ Root document321+unchanged native-component55 focused376passed10.42s after
 these actual facts were added. No complete suite, new launch, operator read,
 EODHD credential/provider access or assumption that external owner-Mia jobs
 replenish the retained OFF3 allowance.
+
+### 87.13 Prospectively bounded normalized static cloud-source view
+
+TPR-EXT26-D091 (agent-delegated, independent review pending): after the
+actual SOURCE-DIAG001 identified conservative long-string and notebook
+refusals, use a named read-only AST-view successor, not bypass the executed
+screen or execute cloud code. Syntactic module/class/function docstrings
+and all comments are withheld; notebook outputs/markdown/raw/metadata are
+withheld. Every remaining literal still passes the pinned original81b6
+credential/unknown-string/literal-row policy. If any notebook code cell
+refuses, all notebook code is suppressed. Alternative blanket disclosure
+would expose unchecked literals; stopping solely at an internal conservative
+screen would leave safe static alternatives unexhausted. Exact source bytes,
+all file identities and complete before/after deltas remain privately retained.
+Normalized views are review aids, not byte-equivalent or executable ports.
+Docstring reference flags are observations, not proof of general inertness;
+no compiled-source, economic, secret-absence or native accounting acceptance.
+
+Fresh prospective operation TPR-EXT26-OWNER-MIA-SOURCE-VIEW-20261013-001:
+ONLY exact post005 source archive250129bytes/56b16095… and full delta151185/
+3127ecff… under new current committed HEAD/source closure/UTC15minute plan,
+two exclusive pre-read claims/access/controller,401314bytes/30seconds,
+64KiB maximum review receipt. Zero API/provider/credential/input/D0 reads,
+jobs/newlooks/attempts/ports/automatic retries. Complete delta and immutable
+public before-tree re-proved before any view; all15files/all5changes accounted.
+Current project source is still not proof of look29/30 compiled snapshots.
+
+Source14347bytes/SHA256
+`b0fdfc193f67b2376fbc9f192877de2165fbc094a099923963c834792a1ab23f`,
+test11222bytes/`a99d7c33555a5e7d6e0f9c5d530ab78ca6bfc2746bc19824b04c32d4001e0882`.
+Root read complete239line source/185line tests, focused26passed2.14s,
+in-memory compilation/diff checks clean. Producer26passed2.27s; meaningful
+remaining literal-policy6fail/docstring-redaction1fail/whole-notebook-
+suppression1fail reverse proofs0.71s/0.47s/0.48s, restored originals.
+Software accepted in scoped root review only; Claude independent review
+pending at the final round. Existing executed modules/hashes remain unchanged.

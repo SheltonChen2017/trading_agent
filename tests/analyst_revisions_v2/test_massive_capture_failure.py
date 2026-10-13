@@ -318,3 +318,28 @@ def test_utility_has_no_imports_or_io_and_does_not_render_exception():
     names = {node.func.id for node in ast.walk(tree)
              if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)}
     assert not names & {"str", "repr", "print", "open", "eval", "exec", "compile", "__import__"}
+
+
+def test_same_name_class_from_another_module_is_unknown():
+    # Section 291: only the production import name is recognized. A class that
+    # merely shares the name and an allowlisted message must stay unknown.
+    class MassiveCaptureError(Exception):
+        pass
+
+    # Match the production qualified name exactly so that only the module
+    # comparison can distinguish this class from the real one.
+    MassiveCaptureError.__qualname__ = "MassiveCaptureError"
+    assert MassiveCaptureError.__module__ != "scripts.capture_arv2_massive"
+    assert diagnostic.classify_capture_failure(
+        MassiveCaptureError("capture publication failed")) == "unknown"
+
+
+def test_overlong_message_is_unknown_before_inventory_lookup(monkeypatch):
+    # Section 291: the 200-character bound precedes membership, so even an
+    # allowlisted overlong message is never compared against the inventory.
+    bounded = "x" * 200
+    overlong = "x" * 201
+    monkeypatch.setattr(diagnostic, "_GROUPS",
+                        (("unsafe_configuration", (bounded, overlong)),) + diagnostic._GROUPS)
+    assert diagnostic.classify_capture_failure(MassiveCaptureError(bounded)) == "unsafe_configuration"
+    assert diagnostic.classify_capture_failure(MassiveCaptureError(overlong)) == "unknown"

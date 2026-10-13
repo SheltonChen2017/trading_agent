@@ -7,7 +7,12 @@ CONTINUOUS-BUILD AND DELEGATED-DECISION DIRECTION IS ACTIVE. SECTION161 CLOSES
 IBWIN-CR01 AT DOCUMENTED MACOS/POSIX SUPPORT/COLLECTION SCOPE:16 NAMED GUARDS,
 480 AFFECTED PASSES,33 PEER PASSES AND GUARD-DELETION SENSITIVITY; NO WINDOWS
 PORT OR EXECUTION CLAIM. SIX P2S REMAIN OPEN. HISTORICAL MUTANT AND FULL-SUITE
-COUNTS REMAIN REVIEWER-ATTRIBUTED. A BOUNDED PUBLIC DEMO PROBE IS IN PREPARATION.
+COUNTS REMAIN REVIEWER-ATTRIBUTED. SECTION163 RECORDS THE ONE ACTUAL PUBLIC
+EODHD DEMO: HTTP200,12BYTES,VALID2006 REPORT-DATE FIELD; PRIVATE RECEIPT AND
+CURRENT FIVE-SOURCE INVENTORY INDEPENDENTLY VERIFIED. FULL EARLY-COHORT
+ARCHIVE ACCESS/COVERAGE, IDENTITY/PIT AND ORIGINAL-PARENT FACTS REMAIN MISSING;
+THE OWNER CONFIRMS ONLY SHARADAR/MASSIVE-BENZINGA PRODUCTS. CONTINUATION IS
+FACTUALLY BLOCKED BEFORE READINESS; LOCAL CONTINUATION, NO FINAL PUSH CONSUMED.
 19,846 OF 99,394 PARENTS ARE REQUEST-BOUND; V3 REMAINS 1,846 OF 1,847;
 THE FOUR CUSTODY FILES AND V1/SCALE/PILOT STAY FROZEN. STRICT D23 RETAINS
 SEVEN NONEXACT QUARTERS. NOT BACKTEST-READY: REAL EARLY EARNINGS, IDENTITY,
@@ -256,6 +261,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-13 | Codex counter-review | `618d1813bc762bc1e45e1c65c90933d7d32554a9..85c7755deb75b5d0c61cc4a63a385d4b87b55110`; this separate record follows | Exact one-commit Claude record-only review; continuous build resumes after acceptance | Entire incoming diff and six-commit reviewed range verified; frozen source, attribute scope, module counts and ledger agree. Section160 retains historical measurements as attributed and records delegated decisions. | Main229 passed13.83s; internal peer scanner0/7 to7/7,10/10 controls and real22/0; OS parent/child network denial independently proven. No full suite or retained-root replay. | Incoming85c7755d ACCEPTED, no correction needed. Platform support chosen under delegated judgment; its implementation follows. Six other P2s retained, no openP0/P1. | Continue bounded lane work and qualify real early earnings/identity evidence; one eventual final push, no checkpoint push. Monitor PAUSED. |
 | 2026-10-13 | Codex continued implementation | Counter-review `c666ebee` -> this bounded implementation; exact hash follows in final handoff | Delegated macOS/POSIX custody support and unsupported Windows collection accounting | Named IBWIN-CR01 guards precede custody imports in exactly16 affected tests; new real-child guard regression preserves supported-host collection and independent QC checkout. No production/shared edits or Windows port. | Author480 affected passes55.77s, no skips; internal peer33 passes4.72s and in-memory guard deletion caught;17 tests compile; historical custody blobs unchanged. All tests OS process-tree network-denied. | IBWIN-CR01 CLOSED at documented support/collection scope. Four topical and two shared P2s remain OPEN; no actual Windows custody validation. | Continue source qualification under current factual gates; no checkpoint push, monitor stays PAUSED. |
 | 2026-10-13 | Codex continued implementation / pre-request qualification | Platform milestone `e6f5fb5179db696723bd5cfaaa024c70122a59e1` -> this candidate; actual execution hash follows after commit | Single public EODHD reportDate-field feasibility profile | Two new lane files implement exact one-field/public-demo GET, global one-shot reservation, clean committed source identity and immutable private journals; strict scalar schema and14false authority/readiness flags. Section162 preregisters the only intended request. | Author116 passed0.66s; internal peer116 passed0.61s; main305 passed19.40s before explicit test platform guard, then167 passed2.20s on final test bytes; seven prelaunch red controls prove custody/count corrections. OS-denied tests only. | IBEOD-DEMO-R01 P2 andR02 P3 closed before launch; explicit POSIX test treatment added. No observed supplier response yet; six carried P2s remain OPEN. | Commit clean candidate before one actual bounded request; independently verify private result. No retry, broader fetch, readiness claim or checkpoint push. |
+| 2026-10-13 | Codex observed qualification / separate local handoff | `c666ebeea66c15af6a0237b108a276b96e86615d`, `e6f5fb5179db696723bd5cfaaa024c70122a59e1`, `583569680db4273c6b6a5012926b0dd43e3037ec` -> this separate handoff | One actual public EODHD date-field probe; precise factual-input stop before lane readiness | Executed once from clean58356968 under fixed public-demo profile:HTTP200/12bytes,2006 date-field observed. Independent network/write/fork-denied journal/source reread reconstructs result,14false flags and exact execution HEAD. No archive/canonical promotion. | Complete SHA e032a6e127eb189298deab923b13d18093930b8e99ad446ae7a2f4d8dee5342d; response SHA ec680bd926a0d0661b11ec5021a9f127557fc1234fb15a84f26f23cfbd42f569; final document/package checks follow. | Incoming85c7755d accepted; platform support gap closed at scope; two prelaunch demo findings closed; four topical and two shared P2s open. Owner confirms no alternative archive/account. | Need qualified full-cohort historical release archive/account and historical identity/PIT/source inputs. Recommend bounded EODHDCalendar qualification first, then Zacks/WSH if required. Record locally, no checkpoint push; monitor PAUSED. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -22820,6 +22826,10 @@ survivors; source inspection supports R01/R02's explanation. The original
 18-mutant experiment and full-suite counts remain Claude-attributed, not a
 new mutant run or retained-root replay.
 
+Incoming review-record quality: **9/10**. Its exact dispositions, frozen
+identities and scoped evidence agree with independent checks; the original
+mutant experiment remains less reproducible without its durable harness/log.
+
 Main's final selection passed **229 in13.83s**, zero failures/skips/warnings:
 lane boundary, QC checkout, v4 capture, active documents, lane record,
 ML/overlay boundaries, module hygiene, Decimal guard and exact
@@ -23049,7 +23059,9 @@ canonical/QC/outcome/backtesting/execution flags remain false even on success.
 | IBWIN-162-OBS01 | P3 | **CLOSED before launch** | New custody tests need the documented unsupported-host treatment too. | Explicit named IBWIN-CR01 module skip on non-POSIX, before the lane import. | Final Mac116-case source file plus51 boundary cases pass; no actual Windows validation claimed. |
 
 Author initial-image proof: **7 failed/108 deselected in0.39s**; corrected
-file **116 passed in0.66s**. Internal peer independently passed **116 in0.61s**
+file **116 passed in0.66s** on the pre-platform-guard test image. Internal
+peer independently passed **116 in0.61s** on that same pre-guard test hash
+`29a9f511ae0b16aacca60ba1b11ef1b5adf571b181a5f038f6dd35d21f1455a5`
 and found no remaining material request-safety issue. Main's combined source/
 platform/import/document/hygiene/exact-package selection passed **305 in19.40s**
 before the final test-only platform guard. Main then passed the final source
@@ -23068,3 +23080,152 @@ Sources compile, whitespace checks pass, frozen custody/QC files are unchanged.
 No supplier API request or observed response exists when this preregistration
 is written; it must not be relabeled as a completed capture. Six carried P2s
 remain open, no openP0/P1. Looks/jobs/backtests **0/0/0**.
+
+## 163. Observed demo result and exact local handoff at the factual input boundary (2026-10-13 UTC)
+
+### 163.1 Actual clean execution and independent reread
+
+The complete source/test/preregistration candidate was committed as
+`583569680db4273c6b6a5012926b0dd43e3037ec`. Precommit active-document/record/
+exact-package checks passed **72 in2.11s**. Before contact, the exact root,
+lane branch, clean HEAD58356968 and unchanged matching origin85c7755d were
+verified; all peers stopped edits. The actual default CLI executed once
+from that already-existing committed HEAD, with minimal environment and `-B`.
+It used real certificate-verified, no-proxy/no-redirect/no-retry transport;
+this authorized online observation is separate from the OS-denied fixture
+runs. No code, test or record changed during its execution.
+
+The private reservation timestamp was **2026-10-13T21:55:14.141051Z**,
+started **21:55:14.576117Z**, completed **21:55:15.426215Z**. These are local
+observer UTC clocks, not historical publication or vendor-availability proof.
+One transport invocation returned **HTTP200** with a complete **12-byte**
+JSON scalar satisfying the fixed2006Q1 reportDate-field schema. The field's
+value is not printed or placed in Git. No financial EPS/estimate/price/outcome
+field, credential or additional issuer/window was requested or admitted.
+
+Private journal:
+`artifacts/insider_buying/eodhd_earnings_demo/ib-eodhd-demo-2006-reportdate-20261013-once/`.
+Its scope reservation and all four audit leaves retain private0700/0600,
+regular single-link named custody; ignore coverage is verified. Exact
+completion SHA-256:
+`e032a6e127eb189298deab923b13d18093930b8e99ad446ae7a2f4d8dee5342d`.
+Successful-response SHA-256:
+`ec680bd926a0d0661b11ec5021a9f127557fc1234fb15a84f26f23cfbd42f569`.
+Five-current-source inventory:
+`1bc5bc77b79e68dccd325ae4e552a891e418427e9cc59adc9f2f72535ac6dbee`.
+
+Main independently reread every leaf under **OS network, all-file-write and
+process-fork denial**, reopened/reattached the named journal, rehashed raw
+bytes and reconstructed the exact receipt from the retained scalar. It
+verified the reservation/start hash chain, real `fixture_only=false`, fixed
+URL/max-one-attempt profile, actual execution HEAD58356968, all five current
+source hashes/inventory and all14false authority/readiness flags. The tracked
+tree remained clean at58356968 afterward. This is independently executed
+custody verification, not a second API call or new archive-coverage finding.
+The global scope reservation prevents any repeat with another audit ID.
+
+### 163.2 Factual blocker and the concrete next external input
+
+The demo establishes accessible early report-date metadata for one named
+issuer. Its six-ticker public access cannot supply a complete historical
+actual-release archive for the frozen whole cohort, delisted/reused issuers
+and boundary sessions. It does not prove original revision/status/time
+lineage, CIK/share-class/SID/listing/PIT mapping or product processing rights.
+The owner expressly confirms no EODHD/Intrinio/WSH account or archive; existing
+Sharadar/Massive-Benzinga inputs retain their recorded coverage limitations.
+No routine approval, platform choice, old256 cap or Claude checkpoint is the
+blocker. Required factual source/access/coverage evidence is still absent.
+
+**IBDEC-163-01:** choose EODHD as the first bounded product-qualification
+candidate because the real public probe confirms an early metadata field and
+its documented Calendar endpoint targets the required actual report dates.
+Its [Corporate Events Calendar & News add-on pricing](https://eodhd.com/pricing)
+currently starts at **$19.99/month**; it is a separate SKU from the Fundamental
+endpoint tested here. No paid Calendar response or whole-cohort coverage has
+been observed, and no account/subscription was created or purchased. Qualify
+an actual Calendar sample against the frozen issuer/boundary inventory and
+its applicable terms before broad acquisition. The cheaper price is not a
+certificate of coverage, revision lineage or cloud-processing permission.
+
+Concrete external input: **configured historical Calendar product access or
+a supplied qualified archive/sample**, including early/dead/reused-issuer
+coverage, actual-release/timing/revision semantics and applicable use evidence.
+Provide an account configuration/archive location rather than a secret in
+chat. Intrinio/Zacks actual releases and WSH historical revisions remain
+fallback qualification candidates if EODHD cannot meet those requirements.
+A free SEC reconstruction remains possible, but8-K-only absence cannot
+certify full empty coverage; a separate complete reconciliation of release
+exhibits, periodic-report exceptions and revisions would need to establish
+the same facts. More partial captures or another software shell cannot
+substitute for that demonstrated source completeness.
+
+Once that genuine input is available, continue real source/actual-release/
+historical identity and original-parent integration against2006Q1, preserving
+all refusals and the frozen full population. Then bind full-population
+protocol/look, applicable rights and native data/parity evidence before the
+fixed order-based QC candidate. Three unsuccessful launches per distinct
+candidate and Mia recovery remain binding. No speculative look is used to
+choose the source/window/economics. This input-dependent milestone and lane
+completion/backtesting readiness are **NOT COMPLETE**.
+
+### 163.3 Exact commits, carried findings and publication disposition
+
+| Exact commit | Scope/status |
+|---|---|
+| `85c7755deb75b5d0c61cc4a63a385d4b87b55110` | Incoming pushed Claude record; **ACCEPTED** in160. Origin remains this exact tip. |
+| `c666ebeea66c15af6a0237b108a276b96e86615d` | Completed exact counter-review/delegated-decision record160; **LOCAL ONLY**. |
+| `e6f5fb5179db696723bd5cfaaa024c70122a59e1` | Support decision/16 named guards/real-child platform tests161; self/peer-validated, **LOCAL ONLY**, not independent Claude acceptance. |
+| `583569680db4273c6b6a5012926b0dd43e3037ec` | Fixed public-demo candidate and preregistration162; the actual observed source execution used this already-existing clean commit. Self/peer-validated, **LOCAL ONLY**. |
+| This separate handoff following58356968 | Actual result, source evidence, owner's input fact, factual blocker and exact local resume state; its future hash is not invented. **LOCAL ONLY** pending the completed round's permitted publication. |
+
+IBWIN-CR01 is closed only at161's documented support/collection scope;
+IBEOD-DEMO-R01/R02 and IBWIN-162-OBS01 are closed before launch; IBDOC-160-R01
+retains its exact red/green record correction. Four topical P2s and shared
+IBSH-CR02/IBQC-SHARED-META01 remain **OPEN**, six total, no openP0/P1. Earlier
+resolved findings, shared observations/P3s,45 unclassified119 survivors and
+both final access classifications stay at their exact historical scopes.
+There is no retroactive approval or invented earlier measured request/byte
+count. The public demo does not touch any SEC parent request or stopped root.
+
+Custody remains19,846/99,394;79,548 originally unattempted; stoppedv3 remains
+1,846/1,847. Four frozen custody files, IB-1C v1/scale/pilot and exact QC
+candidate source are preserved; strictD23 retains seven nonexact quarters/no
+82-quarter promotion. No full suite, retained-root replay, SEC request,
+private credential loading for the demo, broader licensed-row capture, QC upload/job, outcome look,
+backtest, broker/operator database, paper/live deployment, capital or order/
+trading action occurs. Looks/jobs/backtests **0/0/0**. Shared/project-wide
+records, Action Plan and SESSION_HANDOFF.md remain frozen.
+
+The bounded credential-name/configuration presence audit remains explicitly
+recorded in162; it is not relabeled as no account-related inspection at all.
+
+The monitor stays **PAUSED**. The source-dependent readiness milestone is
+factually blocked after the safe account/archive checks, current supplier
+documentation, SEC alternative assessment and successful bounded public demo.
+Following the heartbeat's explicit blocked-round rule, retain this work in
+local commits and notify the precise external input; **no interim checkpoint
+push** is substituted for the owner's single final publication. That push is
+still unconsumed. Another computer cannot retrieve these local commits from
+origin yet. No automatic rearm, other-chat message, new automation, branch,
+worktree, reset, force-push or overwritten concurrent work.
+
+### 163.4 Final validation and resume boundary
+
+Main completed-handoff active-document/record/exact-Insider-package checks
+passed **72 in1.21s** before the final two peer attribution qualifications;
+the same selection is repeated on this completed text before its commit.
+All **196 lane-owned Python sources/tests compile in memory** under network,
+all-write and fork denial. Whitespace checks and the exact historical
+four-file Git comparison pass. The stock-study source still hashes to
+`c80ff4f585d59d1b8e4ecd0d6199605fee727de9df0a13b74e987fe4d2819f87`.
+The completed cumulative scope is20 paths: the lane record, one new inert
+standalone source probe and18 existing/new lane tests. No shared file or
+another lane is staged. Final internal record QA confirms exact execution/
+local-only lineage and findings; its two wording qualifications are applied.
+
+Before committing this separate handoff, reverify the designated root,
+branch, exact58356968 HEAD, expected record-only status and unchanged
+85c7755d matching origin. Afterwards verify clean status, the exact ordered
+four local commits and continued PAUSED heartbeat. Resume this same lane
+from its local final handoff after the163.2 factual input arrives; do not
+repeat the completed public demo or silently reset its permanent reservation.

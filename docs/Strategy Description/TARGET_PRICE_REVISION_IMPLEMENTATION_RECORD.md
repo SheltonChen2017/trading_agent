@@ -1,7 +1,8 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Status: **CLAUDE HAS INDEPENDENTLY REVIEWED EVERY CODEX COMMIT IN
-`2726b5ba..62d4fc32` IN SECTION 85: THE LANE HAD DIVERGED INTO A PUSHED
+Status: **CODEX HAS COUNTER-REVIEWED EVERY INCOMING COMMIT IN
+`8db2aaa6..30e5ae34` IN SECTION 86. ACCEPTED AFTER CORRECTION OF RECORD/GUARDS,
+NOT NATIVE QC OR PERFORMANCE ACCEPTANCE. CLAUDE SECTION85 MERGED A PUSHED
 WINDOWS-SIDE LINE (SECTIONS 80-82) AND AN UNPUSHED MAC-SIDE LINE (NOW
 SECTIONS 83-84, THE OWNER-AUTHORIZED MIA DIAGNOSIS, AUDIT-KEY REPAIR AND
 GENUINE MIA RECOVERY RUN). SECTION 85 MERGED BOTH LINES WITHOUT REWRITING ANY
@@ -9,13 +10,16 @@ HASH. CUMULATIVE DISPOSITION: ACCEPTED AFTER CORRECTION (ONE STATUS DEFECT IN
 THE MAC-SIDE RESULT-CAPTURE SUPPORT AND FIVE REGRESSION TESTS; NO EXECUTED
 CANDIDATE BYTE). THE WINDOWS-SIDE "NOT YET" PRECONDITION IS STALE: THE MAC WAS
 UNLOCKED AND GENUINE MIA WAS USED ON 2026-10-12. TPR-CR23-001 REMAINS OPEN BUT
-IS NOW EXPLAINED TO THE TRIGGERING GUARD: THE MIA RECOVERY RUN (LOOK 20)
+IS NARROWED FOR LOOK20 TO ITS GUARD, NOT PROVED FOR HISTORICAL OFF2/OFF3:
+THE MIA RECOVERY RUN (LOOK 20)
 REPRODUCED THE JULY-2024 FRONTIER WITH THE ERROR RAISED IN THE ALGORITHM'S OWN
 MEMBERSHIP-WEIGHT GUARD; THE OFFENDING ROW IS UNKNOWN. THE LANE DIVERGENCE IS
-OPEN FOR THE OWNER AS TPR-CR26-003. OFF'S THREE CODEX ATTEMPTS ARE CONSUMED;
+RETAINED AS TPR-CR26-003; THE OWNER-PINNED MAC LANE GOVERNS THIS CONTINUATION,
+NOT A NEW HOST-CHOICE GATE. OFF'S THREE CODEX ATTEMPTS ARE CONSUMED;
 ON HAS ZERO; LOOKS ARE 20. THERE IS NO ACCEPTED 2021-NOW PAIRED RESULT. THE
-MONITOR REMAINS PAUSED. CODEX NEXT COUNTER-REVIEWS SECTION 85 AND THIS ROUND'S
-CLAUDE COMMITS, ON ONE DESIGNATED HOST AFTER FETCHING THE MERGE. SECTION 74'S
+MONITOR REMAINS PAUSED. CODEX NEXT VERIFIES THE OWNER-REPORTED MIA REPAIR UNDER
+FRESH BOUNDED SCOPES, THEN CONTINUES AUTHORIZED OFF/ON AND BACKTEST-READINESS
+WORK WITH FROZEN ECONOMICS AND RETAINED ATTEMPTS. SECTION 74'S
 COUNTER-REVIEW OF THE EARLIER THREE-COMMIT CLAUDE RANGE STANDS AS HISTORY:
 ITS INCOMING-TEST CORRECTIONS ARE ACCEPTED, NOT INHERITED RUNTIME READINESS.
 HASH-ONLY AND KEY-ONLY PACKET-RECEIPT NEGATIVES NOW FAIL INDEPENDENTLY UNDER
@@ -465,8 +469,8 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, 2026-10-13:** Claude has independently reviewed the exact range
-`2726b5ba87b4eab9282682d41b252c7ad1db91c2..62d4fc32da3d8b0360e96cf70f53a3bcba2d910b`:
+**Current qualification, 2026-10-13:** Codex has counter-reviewed the exact incoming range
+`8db2aaa6f0858696442c7f9db97ac2e740f9752b..30e5ae34984b898addfea01e681a36ce340452e6`:
 the lane had diverged into two lines after the section-79 push. The
 Windows-side line published section 80 (Codex), section 81 (a Claude review
 written on the Windows host) and section 82 (Codex's counter-review with
@@ -479,10 +483,15 @@ correction: one status defect in the Mac-side result-capture support and
 five regression tests; no executed candidate byte changed.
 The Windows-side "Not yet" precondition is stale: the Mac was unlocked and
 genuine Mia was used before that round was written. `TPR-CR23-001` stays
-open but is now explained to the level of the triggering guard: the Mia
+open: look20 is explained to its own triggering guard, not proved for old jobs. The Mia
 recovery run reproduced the July-2024 frontier with the error raised in the
 algorithm's own membership-weight guard on 2024-07-12; the offending row is
-unknown. The lane divergence itself is open for the owner as `TPR-CR26-003`.
+unknown as of look20. The existing owner-pinned Mac lane governs this round;
+future multi-host coordination stays recorded as `TPR-CR26-003`, not a new
+host-choice prerequisite to the already designated continuation. Section86
+qualifies historical causal/snapshot/validation claims and corrects the
+review-authority guard. The latest owner reports a newer Mia fix; that report
+is not yet independently verified or a reset/completed-strategy claim.
 Section 74's counter-review accepted the corrected incoming
 tests and record, not inherited runtime or extended-QC readiness. Independent hash-only and
 key-only receipt negatives and valid ON controls strengthen the two tests;
@@ -501,7 +510,7 @@ ON3/OFF1 and16looks retained. Section75 freezes both extended candidates and
 all six universes together. OFF has consumed all three Codex attempts;
 ON has consumed zero attempts;20 observed looks remain retained;
 no accepted paired result exists. No fourth Codex OFF attempt is allowed;
-a read-only Mia diagnosis of the refused membership-weight row is required.
+the owner-reported Mia fix requires independent result/source verification.
 Section75.15 records completed fresh composite input preparation; original
 failed capture and subsequent completed Sharadar repair remain separate.
 Section 70's
@@ -596,12 +605,13 @@ outcome-free source audit; no real-row D1, outcomes or QuantConnect access is
 authorized by that audit.
 The trust rollback pin, protected parent custody, reviewer identity and
 adversarial matrix remain unresolved and parked. **Exact next role action:**
-Section 85 merged and reviewed both diverged lines. Codex next
-counter-reviews section 85 and this round's Claude commits, on one
-designated host after fetching the merge, and resolves `TPR-CR23-001`
-through a read-only Mia diagnosis of the refused membership-weight row
-before any further extended launch. The Mac was unlocked and genuine Mia
-was used on 2026-10-12; the Windows-side precondition no longer applies.
+Section86 accepts the merged counter-review after correction. Codex next
+verifies the owner-reported Mia repair under fresh bounded scopes,
+retrieving all resulting source changes and genuine native result identities,
+then continues the authorized frozen OFF/ON and bounded lane build toward
+backtesting readiness or a concrete factual/external/safety blocker. No
+launch through an unresolved path or fourth Codex OFF attempt. The old
+Windows-side Mac-unavailable precondition is historical, not current fact.
 That does not waive launch/audit gates or the
 exhausted Codex cap. The heartbeat is PAUSED during and after this
 round; no automatic rearm. No fourth OFF attempt and no ON launch through
@@ -735,11 +745,11 @@ and are deliberately not listed here.
 | `TPR-CCR10-016` | P2 | TPR-TR0-I completion | Rotation, compromised-key removal, rollback, strict review-to-anchor ancestry, layer-specific byte mismatch, and full local Git/OpenSSH integration evidence are not yet complete. |
 | `TPR-MATCHED-002` | P2 | Matched-study execution acceptance | Attempt3 has four unclassified delisting events; held/target/history/window observations are absent. Mia's complete source-only specification was submitted, but last source readback is initialization-only and computer control timed out. No recovery job/claim exists; three Codex slots are consumed. No fourth launch or inferred-ambient acceptance. See71.6/71.9/71.10. |
 | `TPR-CR22-001` | P2 | Re-driving the Mia scope and the cap-tilt analyses from Git | The code that drove the Mia tool approvals, prompts and source reads (twelve receipts under the hash-bound transport), the cap-tilt failure-review, order-cause, log-quota, transport-sizing, aggregate-review and scope-analysis receipts, and the thin invoker of the pure diagnostics is not in the repository. The pure diagnostics themselves reproduce; the operations do not. Codex should commit those operator scripts or record their exact bytes in the evidence index. |
-| `TPR-CR23-001` | P1 | Any further extended launch or ON attempt; diagnose before Mia recovery | Claude reports a July2024 terminal/rolling-window frontier in OFF2/3 and identical partial statistics; native NAV852/1449 is incomplete. The engine cause and relation to sampling are unproved, not884 independently observed daily valuations. Section78's fixed terminal/unfiltered own-job log diagnosis is complete, not renewed. Section80 qualifies section79: end-hook frames/progress1/configured end do not prove normal completion, exclude an earlier algorithm-owned cause or establish platform-only failure. OFF reads no signal packet; only registered bodies/exposed own-job logs were exhausted. Section 85: the genuine Mia recovery run (look 20) reproduced the same frontier with the error raised in the algorithm's membership-weight guard on 2024-07-12 (F019), so the cause is algorithm-owned and data-triggered, masked in OFF2/OFF3 by end-hook failures; the offending ETF/security/weight row is still unidentified. A read-only Mia diagnosis of that row is next; no fourth Codex OFF attempt, known-broken ON launch or accepted performance. |
+| `TPR-CR23-001` | P1 | Any further extended launch or ON attempt through an unresolved runtime path | Historical OFF2/3 share a July2024 frontier and incomplete852/1449NAV; their initiating cause and sampling relation remain unproved. Look20 confirms its own membership-weight guard failure on2024-07-12 (F019); identical timing supports but does not prove that same cause in old jobs. No fourth Codex OFF attempt, known-broken ON launch or accepted performance. Latest owner reports a newer Mia fix; fresh bounded result/source/accounting verification follows accepted counter-review, not automatic closure or renewed old scope. |
 | `TPR-CR23-002` | P2 | Owner retention decision; no new standalone paperwork gate | Vendor-derived objects and journals are attributed retained inventory, with one verified gzip upload, possible failed plaintext object and earlier keys;71newuploads remain held. Cleanup recorded22delete successes without absence verification. Existing private-processing waiver is working authority, not provider attestation; do not delete or infer rights/completeness. Section78 qualifies this carried concern. |
 | `TPR-MATCHED-006` | P2 | Observer approval before Mia recovery launch | Retained unexecuted proposals contained native Order/ticket, open-only history, enum, exception, partial-fill and clock defects. Corrected complete observers have been requested, not verified/applied/tested. Last readback contains only additive initialization; restored control, actual complete source review and focused proof are required before any recovery job. See71.9/71.10. |
 | `TPR-CR25-003` | P2 | Broader QC/development host classification and native-host validation | Native custody stays Mac-only by the direct owner reply on 2026-10-12; portable Windows checks stay active. Section 82 implements a bounded test-only split in the collector/frontier modules, pending independent review. Other QC/development modules remain unclassified here; no attributes, working-byte repair, production port or fresh Mac-native validation was performed. The reported CRLF/POSIX failures in section 81 remain historical evidence, not native acceptance. |
-| `TPR-CR26-003` | P1 | Any further Codex work on this lane until the owner designates the working host | Two Codex instances (Mac and Windows) advanced the lane from the same base without fetching each other's work; the Mac line was never pushed and the Windows round recorded a stale "Not yet" state. Section 85 merged both lines, but only the owner can rule which host works the lane and require fetch-before-work and push-before-host-switch. |
+| `TPR-CR26-003` | P1 | Future multi-host resumption without serialized ownership and published handoff | Actual divergence and stale routing are confirmed; failure to fetch is not proved because unpublished Mac commits were unavailable remotely. Section85 preserves both histories. The existing owner-pinned absolute Mac lane and latest continuation govern this round; no new host choice blocks it. Future host switching still needs coordinated serialized handoff, actual remote equality and preserved work; global synchronization is not claimed solved. |
 
 No open finding is P0. The two canonical P1 findings are inert while the registry is empty,
 but both block any positive registry entry. Read-only checks on this Windows
@@ -19535,9 +19545,11 @@ two lines with a merge commit that keeps every hash, renumbers the Mac-side
 sections 83 and 84 with integration notes, dispositions all twelve commits,
 and corrects one status defect in the Mac-side result-capture support. The
 most important fact in the merged evidence is that the genuine Mia run
-reproduced the July-2024 frontier and finally exposed its trigger: the
-algorithm's own membership-weight guard refused a constituent-weight row on
-2024-07-12. `TPR-CR23-001` stays open on the identity of that row.
+reproduced the July-2024 frontier and exposed its own trigger: the
+algorithm's membership-weight guard refused a constituent-weight row on
+2024-07-12. Historical OFF2/OFF3 initiating cause remains unproved.
+The repeated July frontier is supporting evidence, not proof of the historical causal chain.
+`TPR-CR23-001` stays open on the rejected row and historical causal/clock limits.
 
 ### 85.1 Exact reviewed snapshot
 
@@ -19585,8 +19597,8 @@ algorithm's own membership-weight guard refused a constituent-weight row on
 |---|---|---|---|---|---|---|---|---|---|
 | `TPR-CR26-001` | P2 | **Closed by correction** | `0455fc25`, `fcf5b792` | `research/target_price_revisions_qc/extended_mia_result_capture.py`, the `collect-native` branch of `_execute` | A scope that read a still-running job set `NOT_TERMINAL` and then ran its final check; when that check failed (expiry, elapsed budget, guard or source drift) the except path kept `NOT_TERMINAL` in the result receipt, so a refused scope could read as a clean non-terminal capture. | Code reading, confirmed by a regression test that refuses exactly at the final check: red on the received module, green after the fix; the reverse mutant (removing the reset) is red. | The receipt's status is the only public summary of a private scope; a refusal misreported as `NOT_TERMINAL` could be used to justify a fresh scope without recording the failure. | The except path now resets the status to `FAILED_OR_UNCERTAIN`, as the frontier producer does; one line in `7d432b0a`. No executed candidate byte changed. | 94 passed; mutation table in 85.4. |
 | `TPR-CR26-002` | P3 | **Closed by correction** | `0455fc25` | same module, `_execute` seam checks and `_terminal` | Three live guards were not exercised by the 88 received tests: the fixture-mode refusal of lane or private roots, the aware-UTC clock requirement, and the refusal of a Runtime Error terminal without error text. | Mutation trials in 85.4: removing each left all tests green. | Unpinned guards can be lost silently in a successor. | Four regression tests in `7d432b0a`, each red under its mutant. The request cap (`5 + MAX_PAGES`) also survives removal but is unreachable: the page loop is bounded by the same constant. | 94 passed. |
-| `TPR-CR26-003` | P1 | **Open (owner decision)** | `b28d07f6` through `70cef49e`; `ed558300` through `8db2aaa6` | the lane's two hosts | Two Codex instances advanced the lane from the same base `61a81d9a` without fetching each other's work: the Mac-side line was never pushed, and the Windows-side round recorded a stale "Not yet" precondition and a Mia scope "still waiting" hours after the Mac had used genuine Mia and launched a recovery run. Both lines numbered their sections 81 and 82. | `git merge-base` and both reflogs; sections 82.4/82.6 versus 83.2 and 84.7; commit timestamps. | Without one designated host, or fetch-before-work and push-before-host-switch, the next round will diverge again, and the record's current state will be wrong on one host. | Merged here without rewriting any hash. The rule is the owner's to set. | Register row added. |
-| `TPR-CR26-004` | P2 | **Documented (feeds `TPR-CR23-001`)** | `70cef49e`, `49a7e8af` | private status-003 and native-001 envelopes; sections 84.7 and 84.8 | The genuine Mia recovery run reproduced the frontier exactly: Runtime Error, `progress` 1, `tradeableDates` 1,449, 172 rolling keys ending `M6_20240712`, and an error time-stamped 2024-07-12 00:00:00 raised in `_member_inventory` (main:55) from `_constituents_for` (main:212) and the universe callback (main:170): "membership weight outside bounds". The earlier OFF2/OFF3 runs ended at the same engine time with end-hook errors, so the end-hook failures masked this earlier algorithm-owned refusal, as section 78's `TPR-CCR23-003` hypothesized. The frontier is therefore a data-triggered refusal of a constituent-weight row on that date, not a platform stop. | Recomputed from the private receipts by size, hash and key; frames and marker only. | Narrows `TPR-CR23-001` from "undiagnosed" to "unidentified row": the ETF, security, raw weight, type and source date of the refused row are still unknown (Codex's F019), and the fix must preserve the guard, not drop, clip or renormalize the row. | None possible without the row; see 85.7. | `TPR-CR23-001` stays open. |
+| `TPR-CR26-003` | P1 | **Open (owner decision)** | `b28d07f6` through `70cef49e`; `ed558300` through `8db2aaa6` | lane multi-host coordination | Two hosts advanced separate histories, with unpublished Mac work and stale Windows routing/duplicate sections. The original inference that both failed to fetch is not established: unpublished work was unavailable remotely. | Actual graph/merge and record chronology; prior reflog claims remain attributed. | Preserve serialized ownership and published handoff before future host switching, without inventing a new choice for this already owner-pinned Mac round. | Both histories retained; current root/session scope in86, future global host coordination remains owner-directed. | Register qualified; no globally enforced lock claimed. |
+| `TPR-CR26-004` | P2 | **Documented (feeds `TPR-CR23-001`)** | `70cef49e`, `49a7e8af` | private status-003/native-001 envelopes;84.7/84.8 | Look20 reports Runtime Error, progress1, configured tradeableDates1449,172rolling keys ending `M6_20240712`, and its own2024-07-12 callback error "membership weight outside bounds". The same older OFF2/OFF3 frontier is supporting correlation, not proof of the identical earlier cause; old end-hook masking remains a source-compatible inference. | New-job frames/hash verified earlier by Codex; additional private receipt details remain Claude-attributed, not incidentally reopened. | Narrow look20 to its confirmed guard while preserving historical causal/clock uncertainty and unknown ETF/security/raw weight/type/source date. | Counter-review qualification; no runtime/economics changed. | `TPR-CR23-001` stays open until new independently verified evidence. |
 | `TPR-CR26-005` | P3 | **Documented** | `0455fc25`, `fcf5b792` | same module | Design notes from the read-only audit: the fixed job is enforced by plan content only (the plan's `backtest_id` is format-checked and excluded from the three prior jobs; the committed look-20 and freeze JSON are never loaded by code); the ui-ledger must merely equal the caller's own `mia` block; nested user-id fields are not scrubbed as the frontier producer does; `main` prints the whole receipt, including the admitted helper source, to stdout; the plan advertises 128 order pages while the 64 MiB aggregate cap refuses after roughly 55 full pages. | Code reading. | None of these affected the spent scopes; they bound what a future scope can claim. | None. | Not applicable. |
 | `TPR-CR26-006` | P3 | **Documented** | `e6bf9b09` | `tests/target_price_revisions_qc/test_qc_mia_audit_key_recovery.py` | The audit-key QA module runs 4 of 71 cases here; 67 skip because the repaired helper exists only in the cloud project and no public port is committed. Its old-red/new-green evidence in 84.6 is therefore attributed to the Mac-side session's plugin run, not reproducible from Git. | Local run: 4 passed, 67 skipped. | Any later port of the helper must re-run this module with the plugin present. | None. | Not applicable. |
 | `TPR-CR26-007` | P3 | **Documented** | `420e354b`, `8db2aaa6` | `test_qc_extended_mia_capture.py`, `test_qc_extended_frontier_diagnostic.py` | The Windows-side `TPR-CR25-003` host failures do not reproduce on this Mac: both split modules run all 98 cases with no skip, and the round's bounded command gives 384 passed with the one Windows-junction skip. The darwin-only skip is test-only and matches the owner's "Mac-only custody; portable Windows checks" answer. | Local runs on the merged tree. | Confirms the split's premise from the native host. | None. | Not applicable. |
@@ -19607,12 +19619,15 @@ algorithm's own membership-weight guard refused a constituent-weight row on
   the SUMMARY-DIAG-003 result reports the embedded-summary parse stage;
   the status-meta result is COMPLETED_METADATA. Every scope flag that must
   be false or zero is.
-- **Mac-side public files.** `extended_mia_audit_recovery_freeze.json`
+- **Received Mac-side public files at fcf5b792/e6bf9b09, before 7d432b0a.** `extended_mia_audit_recovery_freeze.json`
   (5,599 bytes), `extended_mia_recovery_look20.json` (1,370 bytes), the
   support module (41,719 bytes), its test (31,713 bytes) and the audit-key
   QA test (19,838 bytes) match the hashes in 84.4 through 84.6. The
   outcome-20 index holds counts, hashes, dates, the job and project
-  identifiers and null per-sleeve outcomes only.
+  identifiers and null per-sleeve outcomes only. Those source/test sizes are
+  historical received blobs, not the corrected final-tree sizes: at7d432b0a,
+  support41847bytes/3cffe98e86774670f4eeadb0a27b8d876c1c0ffb240084a070cf4fb4ae452287,
+  test34861bytes/b023e9fcf6d4d8d20fb114b549541f10520c833ac93627573407608003904ad6.
 - **Windows-side figures.** The three test hashes in 82.7 match the files at
   `8db2aaa6`. Sections 80 of both lines are byte-identical. The bounded
   command of 82.7 on this Mac: **384 passed, 1 skipped**. The two split
@@ -19620,11 +19635,14 @@ algorithm's own membership-weight guard refused a constituent-weight row on
 - **Frontier narrowing.** The OFF main retained in the request projections
   (section 79) has the membership guard at those lines; the recovery run's
   error is raised from the universe callback, before any end-hook. With the
-  same engine date in all three runs, the end-hook errors of OFF2 and OFF3
-  are downstream of this refusal.
-- **Mutation trials** on `extended_mia_result_capture.py`, one exact
+  same engine date in all three runs, a shared initiating failure is a
+  source-compatible inference, not independent proof of the older causal chain.
+- **Claude-reported mutation trials** on `extended_mia_result_capture.py`, one exact
   substring per trial, restored in `finally`, in a read-only scratch clone,
-  network-denied, against the module's test file:
+  network-denied, against the module's test file. They are attributed
+  historical evidence, not proof of compliance with the owner's exact
+  physical-lane/no-alternate-validation invariant; no later direct exception
+  is established. Current Codex reproductions use the designated lane:
 
 | Guard removed | Received 88 tests | With the five CR26 tests |
 |---|---|---|
@@ -19637,10 +19655,13 @@ algorithm's own membership-weight guard refused a constituent-weight row on
 
 ### 85.5 Validation
 
-- Document guards, active-document guard: green on the final tree (figure
-  in the census line of this section's final commit).
-- The round's bounded Windows command on this Mac: **384 passed, 1
-  skipped**. `test_qc_extended_mia_result_capture.py`: **94 passed**.
+- Document guards/active-document green was reported without an exact final
+  census in this section or its final commit. No absent count is inferred.
+- The pre-section85 merged-tree bounded Windows command on this Mac:
+  **384 passed, 1 skipped**, historical inventory385. Section85 adds20
+  document cases, so that same final-tree selection collects405 before
+  subsequent counter-review additions; this does not invent an executed
+  final result. `test_qc_extended_mia_result_capture.py`: **94 passed**.
   `test_qc_mia_audit_key_recovery.py`: **4 passed, 67 skipped** (plugin
   absent). All in the designated worktree, network-denied.
 - At the owner's instruction this round reviews commits only: the full lane
@@ -19661,12 +19682,199 @@ membership-weight row. TPR-1 and TPR-0B remain blocked.
 
 ### 85.7 Recommendation to the owner
 
-Three decisions are yours. First, `TPR-CR26-003`: name the host that works
-this lane, or require every Codex session to fetch before working and push
-before you switch machines; without that, the next round diverges again.
+Historical review recommendation, superseded for current routing by section86
+and latest direct owner continuation: multi-host resumption needs coordinated
+serialized handoff. This current round already has the owner-pinned Mac root;
+it does not wait on an additional host-choice reply.
 Second, authorize the read-only Mia diagnosis the Mac-side Codex proposed
 in 84.8: identify the ETF, security, raw weight, type and source date of
 the row the membership guard refused on 2024-07-12, and have Mia propose a
 correction that keeps the guard; no edit, drop, clip, renormalization or
 rerun is implied by that question. Third, `TPR-CR23-002` (Object Store
 retention) is still waiting for you.
+
+## 86. Codex counter-review of the merged Claude round and owner-Mia reconciliation — 2026-10-13
+
+### 86.1 Exact incoming range, current owner authority and serialized host
+
+Qualifying completed Claude review/handoff was published at
+`30e5ae34984b898addfea01e681a36ce340452e6`. Exact incoming graph:
+`8db2aaa6f0858696442c7f9db97ac2e740f9752b..30e5ae34984b898addfea01e681a36ce340452e6`.
+Only the matching lane ref was fetched. Baseline ancestry, both merge parents,
+clean physical/Git root and branch, and actual local/remote equality were
+verified; shared worktree already equalled30e5, so no fast-forward/merge/reset
+or overwrite. The heartbeat was PAUSED through the app before counter-review.
+
+Latest direct owner quotation,206UTF8bytes/SHA256
+`26d32c1621462f6da298b70b51b637e9818124fba58dcc80fafe57e160f8c00a` (quoted text identity, not message transport attestation):
+
+> rearm the monitor. once Claude finishes and pushes, counter-review it and proceed with the 2 and 3. Then build the lane until lane completion or backtesting ready. BTW, mia fixed the earlier launch you did.
+
+This replaces the previous one-round review skip: completed review then
+counter-review comes first. It authorizes continuous scoped OFF/Mia
+verification, ON under retained allowance, and bounded lane build toward
+backtesting readiness or a concrete factual/external/safety blocker. The
+owner-reported Mia fix is NEW ATTRIBUTED evidence, not verified job completion,
+unchanged economics, attempt reset, licensed/PIT/provider attestation or
+canonical promotion. The optional QC-link request is not a routine-choice
+approval prerequisite; root will use fresh bounded own-project discovery
+if the exact result can be identified safely.
+
+The controlling absolute Mac root remains
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__target_price_revisions`,
+branch`codex/strategy-target-price-revisions`, for EVERY repository
+command/edit/validation/commit/push. Current role ownership is this Codex
+round after Claude's clean published handoff. No alternate checkout,
+scratch clone, side branch, checkout switch, published-history rewrite,
+force push or concurrent overwrite. CR26-003's real two-host divergence is
+preserved; failure to fetch is not proved when Mac work was unpublished.
+This round uses the already owner-designated host, not an invented new
+host-choice gate. Future host switching remains owner-coordinated and must
+preserve published handoff; no claim of a globally enforced cross-host lock.
+
+### 86.2 Every incoming commit and cumulative disposition
+
+| Commit | Disposition | Independently checked basis |
+|---|---|---|
+| `b28d07f6139dc0460e927b152fb4a87f6f2915e9` | **Accepted** | Complete record diff: source-bound read-only Mia diagnosis, waiver of that checkpoint only, automatic-build/scope deviations and native-proof limits preserved. |
+| `0455fc2534f5951bc3d0eca35dc581cef9cca5f4` | **Accepted after correction** | Read-only support/contracts/tests inspected; final-check status defect corrected by7d432b0a. Caller-declared provenance/PII/stdout limitations remain explicit; old scopes are not new-job authority. |
+| `fcf5b792cc7daf30aec58681159eec84fe7cb852` | **Accepted after correction** | Exact canonical equality then typed-plan normalization is correct and six reverse cases kill its removal; inherited status defect corrected by7d432b0a. |
+| `e6bf9b0972a73d715e3094ca6c7cdb071e70ed0f` | **Accepted** | All ten public completion-source descriptors and main import-only repair agree with frozen metadata; full helper/plugin evidence remains attributed until fresh exact-source capture/port. No native readiness implied. |
+| `70cef49e7394f4d1be0e72471d035d07c3a5c3ca` | **Accepted** | Exact look20 metadata, short GUI build label, preceding-clock qualification, OFF3/ON0 and false full-compile/acceptance flags preserved. |
+| `49a7e8afb88ebcdb9baee3826baa07e11c189e60` | **Accepted** | Custody preserves existing draft/outcome index without claiming independent acceptance; null offender/native census/per-sleeve outcomes and failures retained. |
+| `62d4fc32da3d8b0360e96cf70f53a3bcba2d910b` | **Accepted** | Both parents and exact61a81d9a merge base preserved. Mac83/84 text identical after heading/integration notes; Windows prefix differs only trailing blank line. Only three Windows tests imported against Mac parent; no Mac source overwrite. |
+| `7d432b0a0648c8fd3d14fac3f99820d082fc3d0c` | **Accepted** | Narrow failed-final-check status reset and root/UTC/error regressions reproduce; in-memory reverse mutants fail at intended boundaries. No executed candidate byte changed. |
+| `30e5ae34984b898addfea01e681a36ce340452e6` | **Accepted after correction** | Correct merged range/history, but qualified historical causal/snapshot/validation/clone claims and current-host routing; strengthened contextual/vocabulary review-authority guard with red/green and reverse evidence. |
+
+**Cumulative disposition: accepted after correction.** Acceptance is for
+corrected records/support/software scope, NOT full-window QC, economics,
+canonical strategy or performance. All incoming commits, including the merge,
+custody/document/test commits and cumulative tree were covered.
+
+### 86.3 Retained P0–P3 findings and corrections
+
+| ID | Priority | Status | Evidence/correction/limits |
+|---|---|---|---|
+| TPR-CCR26-001 | P2 | Corrected/resolved qualification | New look20 proves its own guard failure; matching old frontier is supporting correlation, not proof of old initiating cause or masking. Corrected preamble/current/register/85.3/85.4; unknown original cause/clock/row remain open. |
+| TPR-CCR26-002 | P3 | Corrected/resolved | Section85 guard accepted24of25 named contextual/vocabulary grants. Reuse established sentence-boundary normalizer/full SECTION81_GRANT;25 contextual cases plus preserved old controls. No actual unauthorized grant found. |
+| TPR-CCR26-003 | P3 | Corrected/resolved qualification |384passed1skip is pre85 inventory385, not final405; promised final guard census is absent. Retain historical counts, explicitly exclude inferred execution totals; fresh root figures below. |
+| TPR-CCR26-004 | P3 | Corrected/resolved qualification |41719/31713source/test measurements match receivedfcf5b792, not post7d41847/34861. Bind both historical/final blob identities explicitly; no source pin changed. |
+| TPR-CCR26-005 | P3 | Corrected/resolved qualification | Claude-reported scratch-clone mutations do not prove exact-root compliance absent trusted exception. Retain historical table; root current reproductions use designated physical lane only. |
+| TPR-CCR26-006 | P3 | Corrected current routing, global coordination retained | Real branch divergence is confirmed, failure-to-fetch inference is not. Existing absolute Mac invariant/latest continuation settle current host; future multi-host handoff concern retained as CR26-003, no new current owner-choice loop. |
+
+Claude findings all preserved/classified: CR26-001 confirmed/corrected
+(status reset); CR26-002 confirmed/corrected (root/UTC/error sensitivity);
+CR26-003 partly correct (divergence true, missing-fetch/global-host-block
+inferences qualified); CR26-004 partly correct (look20 guard confirmed,
+historical same-cause claim unproved); CR26-005 confirmed design limitations
+by synthetic probes, no observed historical wrong binding/leak claimed;
+CR26-006 confirmed absent-helper67skips, not native failure; CR26-007
+confirmed Mac-host fixture execution, not Windows signer/ACL/custody.
+No new P0. F012/F017/F018/F019/F020 and canonical TR0-I/TPR-1/TPR-0B gates
+remain unless independently closed by later exact evidence. Shared/sibling
+behavior stays frozen; OOL011 accepted in lane/shared coordination retained,
+OOL003/004/006 closed.
+
+### 86.4 Focused evidence, invocation failures and exclusions
+
+Received exact publication: peer128passed/67skipped2.39s (94result-capture,
+4QA+67helper-absence skips,30section85 subset). Received runtime94passed1.24s;
+status reverse1failed0.36s, path2failed0.52s, UTC2failed0.08s,
+error1failed0.11s, normalization6failed; restored12cases0.54s and
+runtime94passed1.29s. Three extra in-memory declared-job/profile/stdout
+probes plus existing runtime97passed1.49s: no actual leak or bad history
+inferred. Exact82.7 command collection405 before root additions, not a
+complete suite or executed405 result.
+
+Root new regression red:25failed/1passed2.56s —24 contextual grants were
+DID NOT RAISE; missing causal qualification1failed. Correction initially
+omitted the required literal error text from the ledger;43failed/354passed
+9.38s all stopped at that positive control, implementation debugging NOT
+meaningful mutant evidence. Restoring the literal retained all checks:
+**397passed7.21s**, complete document+result-capture focused modules.
+
+Root finally-restored in-memory reverse mutants independently killed
+normalization1failed0.64s, grant vocabulary1failed0.53s, causal
+qualification1failed0.50s. No tracked source reverted. Two apply_patch
+attempts refused because of context/order mismatches; no destructive action
+or candidate edit. Earlier peer quoting/indentation and census-adapter errors
+were harness failures, not repository/test failures; retained not hidden.
+
+All root/peer pytest uses isolated49/52 module-init interception and both
+runtime-root redirects BEFORE dispatch/config/pytest configuration. No
+actual operator stop/database, private market/result bodies, provider/API/UI,
+credentials, QC effects or new empirical look in counter-review. No complete
+lane/repository suite run. Existing Python3.13.15/pytest9.1.1/macOS;
+fixture/import green proves no native CLR, full QC orders/accounting, Windows
+signer/ACL/protected-parent custody, historical PIT or alpha.
+After current-role rotation and this record's86scope, the same focused
+document/result union reprised397passed9.61s. A failed extra/no-op patch
+attempt made no record change; invocation history remains explicit.
+Focused final-tree/compile/diff/hash checks and commits follow; no result
+before the last relevant edit is silently represented as final.
+
+### 86.5 Latest delegated decisions and continuous next bounded work
+
+TPR-EXT26-D083: chosen current role/host is the already owner-pinned Mac lane
+under latest direct continuation. Rationale: merged remote is clean and
+Claude handed off; alternate hosts/branches would violate explicit invariant.
+Alternative new host-choice pause rejected for this already designated
+round; future multi-host changes still require coordination. Scope only this
+round, no globally enforced lock claim. Agent-delegated application of
+existing owner authority, not a new separately human/Claude-approved rule.
+
+TPR-EXT26-D084: first verify owner-Mia result(s) and all source changes through
+a new bounded read-only successor, not reuse look20's fixed before19/look20/
+legacy3 producer or claim current files prove an older compiled snapshot.
+Rationale: CR26-005 limitations and potentially newer owner-run identity;
+discovery does not launch/reset attempts. Preserve unfamiliar failed jobs
+chronologically, retrospective owner-origin look provenance and all cloud
+diffs. Alternative blindly reuse completed status or old receipts rejected.
+No verified newer job/source yet; optional link is missing information only.
+
+TPR-EXT26-D085: continue unchanged frozen2021-01-04–2026-10-09 cap-selected
+stock/standalone weight-only TPR ON/OFF rules, AR disabled, six joint sleeves;
+first establish usable OFF audit/full-window accounting, then gated ON under
+retained0of3. No fourth Codex OFF, economic/date/parameter/universe reset,
+extra comparison arms/sweeps, clipped/dropped/renormalized membership,
+sealed holdout, funded/broker/paper/live effect or canonical bypass.
+Verify/port only lane-owned Mia corrections; every other cloud edit remains
+documented/unaccepted. Full source provenance or factual input gaps must be
+honestly reported after safe in-scope alternatives.
+
+New helper implementation is lane-owned software only until its source,
+closed scopes, tests and fresh manifests/access are frozen BEFORE private/
+credential/API/cloud effects. The owner-reported fix is not enough to close
+F019, F017/F018/F020 or create accepted metrics. Existing71inputs21409650bytes
+are not uploaded or implicitly renewed; exact fresh resource/input operations
+follow only if governing gates are satisfied. No old D0/capture reopened
+incidentally; rights-paperwork waiver is working authority, not entitlement/
+PIT/vendor attestation. Wait on observed sibling resource contention only.
+
+Accumulate this counter-review/corrections and authorized continuous work
+in the same lane, retain all source/bundles/operations/failures/receipts,
+then EXACTLY ONE successful non-force matching-lane push at stable
+completion/backtesting-ready or genuine blocked handoff. Recheck physical/
+Git root/branch/HEAD/status/staged diff and actual remote before each commit/
+push; unexpected advance stops scope, never overwrites concurrency. After
+push local/actual matching remote and clean status must agree. Heartbeat
+stays PAUSED during/after round; no automatic rearm on own publication.
+Next independent review must cover the complete accumulated range and final
+tree, not only a successful run or foundation. Current scope grants no shared
+Action Plan/Session Handoff/workflow/main/sibling changes or provider rights
+attestation. Canonical strategy completion remains distinct from safe
+authorized stock-proxy exploratory backtesting readiness.
+
+Latest direct reply to the optional result-link question:
+"proceed without claude review. i dont have it". Claude's30e5review and this
+counter-review are already complete and preserved; proceed without another
+routine review stop in THIS continuous round. The owner has no result ID,
+so bounded own-project discovery is the next delegated action. This does
+not waive native/attempt/economic/canonical gates or fabricate Mia provenance.
+
+Final counter-review record controls add one exact nine-disposition/merged-range
+positive control and nine clean-first disposition mutations. Root intentionally
+invoked document313 plus source-capture54 (a different named focused union):
+367passed9.11s. Then the intended document313 plus result-capture94 union:
+407passed9.70s. Neither is a full lane suite. All use the same isolated49/52
+runner. Existing frozen/executed code and historical source bundles are unchanged.

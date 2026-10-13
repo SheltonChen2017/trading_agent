@@ -11,8 +11,11 @@ COUNTS REMAIN REVIEWER-ATTRIBUTED. SECTION163 RECORDS THE ONE ACTUAL PUBLIC
 EODHD DEMO: HTTP200,12BYTES,VALID2006 REPORT-DATE FIELD; PRIVATE RECEIPT AND
 CURRENT FIVE-SOURCE INVENTORY INDEPENDENTLY VERIFIED. FULL EARLY-COHORT
 ARCHIVE ACCESS/COVERAGE, IDENTITY/PIT AND ORIGINAL-PARENT FACTS REMAIN MISSING;
-THE OWNER CONFIRMS ONLY SHARADAR/MASSIVE-BENZINGA PRODUCTS. CONTINUATION IS
-FACTUALLY BLOCKED BEFORE READINESS; LOCAL CONTINUATION, NO FINAL PUSH CONSUMED.
+SECTION164 RECORDS NEW OWNER-PURCHASED EOD CALENDAR ACCESS OBSERVED IN SAFARI
+BILLING AND OWNER-CONFIRMED ROTATED PRIVATE CONFIGURATION. CONTINUATION RESUMES
+WITH A SEPARATE PAID ONE-SHOT QUALIFICATION AND FULL-QUARTER METADATA CENSUS;
+NO PAID API RESPONSE OR COMPLETE ARCHIVE CLAIM YET. LOCAL CONTINUATION,
+NO FINAL PUSH CONSUMED.
 19,846 OF 99,394 PARENTS ARE REQUEST-BOUND; V3 REMAINS 1,846 OF 1,847;
 THE FOUR CUSTODY FILES AND V1/SCALE/PILOT STAY FROZEN. STRICT D23 RETAINS
 SEVEN NONEXACT QUARTERS. NOT BACKTEST-READY: REAL EARLY EARNINGS, IDENTITY,
@@ -23229,3 +23232,279 @@ branch, exact58356968 HEAD, expected record-only status and unchanged
 four local commits and continued PAUSED heartbeat. Resume this same lane
 from its local final handoff after the163.2 factual input arrives; do not
 repeat the completed public demo or silently reset its permanent reservation.
+
+## 164. Owner-supplied Calendar access, private configuration and paid qualification preregistration (2026-10-13 UTC)
+
+### 164.1 Exact new input and operational decision provenance
+
+The owner first reported purchasing the19.99 subscription and clarified that
+the authenticated session is in **Safari**, not the in-app browser. Main used
+that existing session read-only. Billing initially named **EOD All World**,
+monthly19.99, renewal canceled, valid through2026-11-14. Its price-history
+SKU excludes the corporate calendar; there was no Calendar product listed.
+The owner then independently purchased the separately linked
+[Corporate Events Calendar & News API](https://eodhd.com/lp/calendar-and-news-api).
+Main subsequently observed **EOD Calendar** in the authenticated Billing UI,
+also monthly19.99, renewal canceled and valid through2026-11-14. Canceled
+renewal is not relabeled as already expired access. No purchase, cancellation,
+payment, account creation, agreement acceptance or supplier message was
+performed by Codex. The older163.2 no-account statement remains historical;
+this new account input supersedes it prospectively, not retroactively.
+
+**IBEOD-UI-164-01 (P2, operational credential exposure, mitigated by owner-
+confirmed rotation):** one Dashboard accessibility output included an API
+token because main's length-based masking threshold failed to recognize its
+shorter format. Main immediately notified the owner, stopped use of that
+value, discarded its retained UI-state string and changed subsequent output
+to allowlisted product/status metadata rather than whole-tree redaction.
+The token is not reproduced, hashed, saved in Git or used in a provider
+request. The owner was asked to rotate it personally; credential rotation
+was not automated. The owner now states **"saved an rotated"**. This is
+owner-confirmed remediation/input provenance, not an independently measured
+old-key-revocation test. Earlier historical access incidents remain separate.
+
+At the owner's configuration request, Codex created an empty private file at
+`artifacts/insider_buying/private/eodhd-token.txt`, with parent0700/file0600,
+single-link regular leaf and verified Git-ignore coverage, and offered its
+local editor path. The owner filled it with the rotated token. Main's
+metadata-only check observes a0600 single-link24-byte file; no contents or
+credential digest were printed. The full local path was provided at the
+owner's explicit request for use by the owner's other lanes. Sharing that
+path is not publishing its contents, account access to another person,
+cross-lane acquisition authorization or a new entitlement. Every Insider
+repository command still runs only from the designated Insider worktree.
+
+**IBDEC-164-01:** under the continuing-build/delegated-judgment instruction,
+accept the owner's explicit rotation confirmation as the operational input
+for a fresh private-file load. Do not test or reuse the exposed earlier value.
+**IBDEC-164-02:** qualify the paid Calendar endpoint locally before a broader
+archive capture, preserving the frozen population/window, every missingness
+and identity gate. The subscription observation is not source-completeness,
+original availability, rights-to-cloud-process or backtesting readiness.
+
+### 164.2 Separately versioned one-shot paid scope, before any request
+
+New standalone candidate:
+`research/insider_buying_eodhd_calendar_qualification.py`; focused tests:
+`tests/test_insider_buying_eodhd_calendar_qualification.py`.
+This is not a modification or repeat of the completed public Fundamental
+scalar profile in162-163. Import is inert and the core Insider package does
+not import the runner. Register exactly **one GET** for the entire new profile
+`eodhd-calendar-aapl-us-2006q1-v1`: endpoint
+`https://eodhd.com/api/calendar/earnings`, `symbols=AAPL.US`,
+`from=2006-01-01`, `to=2006-03-31`, `fmt=json`. The credential is supplied
+only from the explicitly named private file; the journal URL has a redacted
+token placeholder. No credential, credential hash, credential file contents,
+untrusted provider text or secret-bearing URL is printed or journaled.
+
+Boundaries: certificate-verified HTTPS, no proxy, redirect, retry, pagination
+or resume;15-second socket timeout,1MiB response ceiling and at most92 sample
+rows. Those are bounded safety limits, not completeness assertions. A permanent
+exclusive profile reservation prevents repeating a completed or ambiguous
+request even under a different audit ID. Missing/invalid private-file
+configuration is refused before reserving the unattempted profile; a started
+record is durably fsynced before actual transport. Exact clean committed
+designated root/branch/HEAD, all six inventoried source-file bytes, journal
+named/FD custody and credential file custody are rechecked before contact.
+The real transport cannot be paired with a fixture identity. Private journal
+directories/leaves are0700/0600, no-follow/single-link, with hash verification
+and final named-path reattachment. The default transport does not consume
+non200 bodies; schema/error/credential-echo bodies are not hashed or retained.
+
+The successful JSON envelope is the documented symbols envelope, with strict
+duplicate-key/nonfinite/unknown-schema refusal. Every row must be AAPL.US and
+its report date inside the registered quarter; fiscal dates, timing codes,
+financial-field types and duplicate fiscal periods are checked. Financial
+numeric lexemes are discarded, never evaluated or projected. Successful raw
+bytes may contain the endpoint's inseparable EPS/estimate/surprise columns;
+they stay private, and no price/outcome join or strategy result is made.
+The metadata projection contains only ticker, report/fiscal date, coarse
+before/after/unknown timing and current provider reported/unknown status.
+Actual-nonnull is a provider status marker, not original-publication proof.
+An empty result is not certified empty earnings coverage.
+
+The private root is separately named
+`artifacts/insider_buying/eodhd_calendar_qualification/`; planned audit ID is
+`ib-eodhd-calendar-2006q1-20261013-once`. All14 inherited source/PIT/rights/
+identity/readiness/execution flags remain false, as do rotation-independent-
+verification and any complete-archive claim. No SEC parent, stoppedv3 root,
+completed/ambiguous acquisition, wider issuer/window, QC upload/job, registered
+or outcome look, backtest, broker/operator database/scheduler, deployment,
+capital, paper/live/order/trading operation is in this scope. Tests run under
+effective OS process-tree network denial; fixture transport is not acquisition
+authority. Actual contact requires this candidate/preregistration to exist
+in an already committed clean lane snapshot after focused validation.
+
+### 164.3 Supplier evidence and continuing integration boundary
+
+Main and an internal read-only peer checked current primary
+[Calendar documentation](https://eodhd.com/financial-apis/calendar-upcoming-earnings-ipos-and-splits)
+and [personal terms](https://eodhd.com/financial-apis/terms-conditions).
+The Calendar documentation describes historical actual report dates and coarse
+timing, but not stable historical CIK/share-class/SID identities, original
+version availability, complete dead/reused-ticker coverage or revision lineage.
+Current prose says symbols narrows the date bounds; the older official
+[OpenAPI](https://eodhistoricaldata.github.io/EODHD-openapi/redoc.html)
+instead describes an override. Enforce the registered report-date scope on
+all returned rows rather than trusting that conflicting statement.
+
+Personal terms permit private noncommercial storage/manipulation/analysis and
+restrict redistribution/display/account sharing. Use this new source only
+for the owner's private local qualification; no cloud-processing right is
+inferred. Supplier terms are not a manufactured positive QC rights artifact.
+Current rename history begins2022 and current ID mapping does not provide an
+as-of availability history; neither silently supplies2006 PIT identity.
+General early-date availability is not proof of historical delisted coverage.
+
+In parallel, a bounded metadata-only full2006Q1 SUBMISSION issuer/symbol
+inventory and deterministic ambiguity-stratum selector are being built from
+the already retained source, preserving all six forms and every filing.
+This is source-qualification preparation, not parent admission or mapping
+promotion. The old supplied Sharadar capture path and its parent directory
+are currently absent; earlier retained/audited evidence is not relabeled as
+present accessible input. A moved retained artifact should be located before
+new purchase or duplicate capture. These facts do not justify narrowing the
+population, choosing successful survivors or inventing event boundary dates
+from filing dates alone. Continue152.1/154.6 real source/identity/parent
+integration after actual qualification, with factual refusals retained.
+
+The four topical and two shared P2 scopes remain OPEN; no independent Claude
+acceptance is claimed for this self/peer-validated work. Frozen custody/IB-1C/
+QC source and both owner access classifications stay unchanged. The monitor
+remains PAUSED and the single final push remains unconsumed. No interim
+checkpoint publication is substituted for the completed authorized round.
+
+### 164.4 Prelaunch corrections, evidence and exact candidate identities
+
+| ID | Priority | Status | Verified contract defect and correction | Validation |
+|---|---|---|---|---|
+| IBEOD-CAL-R01 | P2 | CLOSED before contact | A list/dict timing field could escape as untyped TypeError before durable schema disposition. Require exact string type before membership; retain a sanitized refusal and no raw/hash. | Two invented timing controls fail on the draft, pass corrected. |
+| IBEOD-CAL-R02 | P3 | CLOSED before contact | Deliberately unread HTTP403 bodies were classified as partial reads because receipt ordering checked completeness before non200 status. Classify HTTP refusal first, preserving status and no consumed/error bytes. | The real-default403/no-consume fixture reaches receipt classification and fails on the draft, passes corrected. |
+
+Author/child observed the three targeted draft failures in0.64s and the
+corrected three passes/190 deselected in0.38s; that selection preceded the
+final additions. One setup-only run reported missing temporary-parent
+errors, was corrected in the test harness and rerun; it was not an API or
+production failure. Final child **209 passed in1.02s**; author new-file/
+lane-boundary/exact-package selection **261 passed in3.10s**. Main independently
+ran new Calendar, prior demo, lane boundary, active documents, lane record
+and exact Insider package guard: **448 passed in5.49s**, zero failures/skips.
+These are overlapping focused selections, not a complete lane/repository suite.
+
+Internal read-only prelaunch peer independently ran **209 in0.86s** on the
+same hashes below. Two memory-only single-guard reversals catch date-scope
+relaxation (**2 failed/14 passed/193 deselected in0.39s**) and non200 body
+consumption (**8 failed/201 deselected in0.11s**); restored in finally.
+Parent and child loopback attempts both observed EPERM under inherited OS
+network denial. Its first harness attempted an absent temporary parent and
+reported209 setup errors before corrected rerun; no network/provider contact
+or code defect follows from that setup error.
+
+All tests are invented-source/token fixtures under process-tree network
+denial, minimal environment, Python3.13.15 `-B`, disabled plugin autoload/cache,
+isolated DB and fresh temporary roots. Neither internal agent reads the actual
+token, invokes the supplier or claims independent Claude review. Current
+candidate source SHA-256:
+`3e0ba295e99c9ec26ec7a7ecd274f80798e91c926009d3dc4c44d7496efdfeb9`;
+test SHA-256:
+`013bacaa0adff0ae262c27e84b0699d909bf1d9bde9f133cc626174e18123505`.
+Both compile in memory and whitespace checks pass. Final combined selection
+will also cover165's census candidate before committing the clean prelaunch
+snapshot. No actual paid response is asserted by this preregistration.
+
+## 165. Full-quarter metadata-only earnings source inventory candidate (2026-10-13 UTC)
+
+The owner-directed continuing build permits this bounded factual preparation
+without another review checkpoint. New standalone pure factory:
+`research/insider_buying_earnings_issuer_inventory.py`; tests:
+`tests/test_insider_buying_earnings_issuer_inventory.py`. It binds the already
+retained2006Q1 ZIP SHA
+`62becdadbe5eaff68f03edefe2ba2357c8bb498a1f825b697003e087cf98e6ce`
+at `artifacts/sec_insider/raw/2006q1_form345.zip` and the existing retained
+schema profile. It inventories the complete expected ZIP member metadata
+but opens only SUBMISSION.tsv, never other table bodies. Non-SUBMISSION CRCs
+are not represented as reverified. Full schema/length/hash/CIK/accession/form/
+quarter/dialect/size controls refuse malformed input rather than dropping it.
+
+**IBDEC-165-01:** retain all six ownership forms and every source ordinal,
+accession, raw/normalized CIK, raw symbol label, raw/normalized filing date,
+Form4/4-A relevance and accession-year mismatch. Keep context-form counts,
+missing labels, all aliases and label-to-multiple-CIK conflicts. No issuer
+names, transaction values, remarks, earnings values or outcome rows are
+projected. Aggregate chronologically using normalized ISO dates, not lexical
+DD-MON dates. The deterministic selector identifies the first lexical
+unambiguous single-label association, first multi-label issuer and first
+non-placeholder multi-CIK label, plus the separately fixed AAPL feasibility
+probe explicitly marked nonrepresentative. None is an eligible universe or
+historically admitted provider symbol. Missing strata remain explicit.
+Known historical LEH/BSC/CFC/GM labels are discovery examples, not inferred
+delisting/reuse/PIT identities or a performance-selected evaluation sample.
+
+**IBDEC-165-02:** this candidate supplies only a pure source-bound inventory
+and an exclusive private-leaf FD publisher, not a generic root executor.
+The factory's immutable-byte/token seal detects ordinary payload mutation;
+it is not a defence against arbitrary Python mutating private globals/fields
+and not external authentication. Publication protects exclusive0600 leaf
+bytes and rereads them in a caller-owned0700 directory; the caller must
+independently bind/reattach the named source/output roots. All source/parent/
+identity/PIT/rights/coverage/canonical/QC/backtest/execution fields stay false.
+No entry boundary window is derived from filing dates; real original-parent
+availability, pinned calendar and historical identity are still required.
+
+**IBINV-165-R01 (P2, CLOSED before actual census):** the initial source draft
+repeated lexical raw-date extrema. A chronological three-row fixture failed
+in0.51s, then normalized ISO aggregation with separately retained raw dates
+passes; a January31/February1 all-form control also retains chronology.
+The author's final file has **63 passed in0.91s** under OS network denial.
+An in-memory publisher exception-translation reversal is caught by the
+postpublication permission-tamper test (**1 failed in0.33s**), restored in
+finally. File/source hashes are
+`84aacac1d8d0eff85584c0453c925692412629cbdfd27002ebb07683a405edc7` and
+`50c753cc661deaa034eb367d252ac18adf5b9b98b0b2931e4520a5288edf3cbe`;
+both compile and whitespace checks pass. This is self/peer engineering
+validation, not executed full-source census or independent Claude acceptance.
+
+Preregister one bounded **offline** observation from the clean committed
+candidate: recheck the source ZIP and actual current code bytes, assess the
+full metadata, write immutable private inventory/completion under fresh
+`artifacts/insider_buying/earnings_issuer_inventory/ib-2006q1-metadata-20261013-once/`,
+reopen and rederive byte-identical inventory, and verify named-root/leaf
+attachment before any completion claim. The observer runs with OS network
+and process-fork denial and writes confined to that exact fresh output.
+Record its actual already-existing execution commit and observer/current-code
+lineage afterward, not an invented future hash. There is no provider dispatch
+or credential load in this census. Earlier metadata-only scouting found
+71,679 relevant filings/5,866 issuer CIKs,418 multi-label issuers and34 multi-CIK
+labels; its exploratory hash is not this different canonical inventory's
+future hash. An early exploratory lexical-date summary was discarded before
+the corrected scout and is not carried forward as chronological evidence.
+
+This delivers the concrete cohort inventory for subsequent coverage and
+identity reconciliation, not actual earnings integration, parent admission,
+the full82-quarter population, complete corpus or backtest readiness. Frozen
+files, source window, strategy economics, prescribed earnings diagnostics,
+both owner incident classifications and six carried P2 scopes stay unchanged.
+
+Main's final combined new-source/census/prior-demo/lane-boundary/record/active-
+document/exact-package selection passes **511 in4.38s**, zero failures/skips.
+All200 lane Python source/test files compile in memory under network,
+all-file-write and process-fork denial. Four custody files compare exactly
+against historicalaa0d635d, and the stock-study hash remains
+`c80ff4f585d59d1b8e4ecd0d6199605fee727de9df0a13b74e987fe4d2819f87`.
+Whitespace checks pass. The prelaunch candidate stages exactly the two new
+source files, their two tests and this owning record. Main rechecks the
+designated root/branch/019dca79 HEAD, expected five-path status and unchanged
+matching origin85c7755d before the single local candidate commit. Execution
+results and its actual already-existing hash belong in a later separate
+handoff; no final push has occurred or been consumed.
+
+The staged (including newly added files) whitespace check caught an extra
+blank line at the new Calendar test file's EOF, which the earlier unstaged
+check had not covered. Main removed only that blank line. Author/peer209 and
+main511-in4.38s evidence above therefore refer to pre-whitespace test hash
+`013bacaa0adff0ae262c27e84b0699d909bf1d9bde9f133cc626174e18123505`;
+final test hash is
+`49bcf107fe6f697cf4c9df5dfedcfcbae9fe81d2b771ce816c776ab289aa1f67`.
+Main reran the same final combined selection: **511 passed in3.76s**, zero
+failures/skips. Source code and its3e0ba295 hash are unchanged. Staged
+whitespace is rechecked after restaging; no behavior/test expectation changed.

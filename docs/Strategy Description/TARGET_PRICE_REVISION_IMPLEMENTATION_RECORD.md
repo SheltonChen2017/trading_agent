@@ -20293,3 +20293,64 @@ Root document321+diagnostic32 focused353passed10.41s. An earlier invocation
 selected a nonexistent document-control path, exited4 with no tests run;
 corrected selection used the existing test_document_consistency.py. Retain
 that selection error, not a product defect or skipped failure. No full suite.
+
+### 87.12 Last-two native capture and actual static-policy refusal cause
+
+COMPONENTS002 ran atHEADf57294780ae6a9b4a6039d1995a0ee62a34523b6,
+created22:42:17.557842Z/expiry22:57:17.557842Z/ended22:42:29.997009Z.
+Plan`c457b3df6ff1d15b2f4269248956ed309cf697bbbd0f567d43227142320e333a`;
+7 actual requests/2477720 wire bytes,49218 retained private artifact bytes
+before final receipt,12634 fresh diagnostic/projection FD bytes. Result8851
+bytes/SHA256`245641d84e40a69b6320803e1563b6e4099eca09e1aabcbfcc83ecc022be773d`.
+FAILED_OR_UNCERTAIN/process1; no automatic retry/newjob/look/attempt.
+
+Look29 b20cba66e8bdec79515466d73cd9584f genuinely has native Completed.,
+completed flag true/progress1/error bytes0, but only12 of1449 Account NAV
+observations. No accepted frozen16:01 clock/full-window metrics. Strategy
+Equity and first order page returned Loading. One SUMMARY compact message
+refused; one INDEX shape-valid with aggregate SHA256
+`05c86f614e5b64c1e0d12604c0cae840e5eede8889e3f10979038d425e0c04f7`.
+Compile/source identity and full private journal replay remain unproved.
+Completed look29 is not accepted as the2021–2026 OFF baseline.
+
+Look30 terminal request received2437014bytes but no safe envelope/hash/HTTP
+status was accepted; its terminal/charts/orders/logs remain unreached null,
+not absent/zero. Actual refusal cause and job-end stage remain unproved.
+Public code localization: original records wire bytes before post-transport
+guard and whole-body project_wire, and HTTP/hash/envelope only afterward.
+Thus null HTTP does NOT establish HTTP failure;2437014 is below4MiB. The
+strict JSON parser's100000-node bound is one plausible refusal, alongside
+clock/root/source/JSON/echo guards; do not claim that hypothetical cause or
+the owner's final-step explanation has been reproduced. Retain this failure.
+Use an identified fresh bounded successor if necessary; do not modify the
+executed component producer or parser/shared behavior, or relaunch OFF.
+
+SOURCE-DIAG001 genuinely completed policy diagnostic/process0 at the same
+HEAD, created22:42:50.745451Z/expiry22:52:50.745451Z/ended22:42:56.037706Z,
+plan`c8deb4296c33530d63492531fcd2b5def899127cd262f36d319fb7d9dd305ee7`.
+Two exact post005 FD reads401314bytes; noAPI/source execution/newjob.
+Receipt6958bytes/SHA256
+`34c43fa1da45911311fa48685ddc07bebb0f64e0abd0dcf0a9142ae5d5897364`.
+Complete delta and immutable public before-tree genuinely matched. Policy
+refusal on audit_key_recovery.py is line1 string1427bytes and on mia_rescale.py
+line1 string1995bytes: NEW_STRING_BYTE_BOUND. These are predicate results,
+not proof of credentials, licensed values, docstrings or economic defects.
+Added mia.ipynb6100bytes/c753fe2c… is notebook, not the previously presumed
+third Python helper; PYTHON_FILENAME_REFUSED. Current main.py/f42320ef…
+and mia_diag.py5253bytes/ca1df38f… pass the screen without body disclosure.
+All15 current files and all5delta entries are retained privately. No port.
+
+Independent scoped peer accepted diagnostic source0f661bc4/teste7166df3;
+32passed4.14s, restored32passed3.23s. Reverse literal-digest/finalguard/
+immutable-before-tree mutations each genuinely failed,0.55s/0.56s/0.64s.
+Software scope accepted only; future independent Claude review still pending.
+Safely bounded structural views may redact syntactic docstrings and notebook
+outputs/markdown rather than disclose unchecked literals; every executable
+cell/control-flow and whole-file change still requires verified static review.
+No opaque-string exemption, silent economic acceptance or general secret-
+absence proof is granted by this diagnosis.
+
+Root document321+unchanged native-component55 focused376passed10.42s after
+these actual facts were added. No complete suite, new launch, operator read,
+EODHD credential/provider access or assumption that external owner-Mia jobs
+replenish the retained OFF3 allowance.

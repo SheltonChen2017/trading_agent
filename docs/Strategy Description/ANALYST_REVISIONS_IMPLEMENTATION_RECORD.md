@@ -546,11 +546,12 @@ toward the next backtest without a routine Claude checkpoint. The Keychain
 inventory request was additive, not a cancellation of that work. Its separately
 frozen check and output reader have now run once: Sharadar returned a validated
 single-row 200 response; FMP/Massive/EODHD stopped at credential retrieval,
-before their requests. Both modes are spent. The owner says the Keychain
-prompts were approved; a separately scoped credential-only diagnostic will
-retain command/timeout/shape outcomes, not repeat the provider matrix or infer
-subscription status. No accepted data capture or QC run occurred. The monitor
-remains PAUSED.
+before their requests. Both modes are spent. After the owner reported prompt
+approval, the separate credential-only diagnostic passed all three reads with
+native exit 0 and valid key shapes; its parent/reader are also spent. The new
+next step is the six never-dispatched product checks, excluding Sharadar, not
+replay of either original protocol. No accepted data capture or QC run occurred.
+The monitor remains PAUSED.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1608,9 +1609,12 @@ routine acknowledgment does not. No old protocol or failed capture is renewed.
 The connection check and its reader are now spent (296.5). Sharadar's sample
 passed; the other three providers had no credential available to the caller,
 so their API access remains untested. The owner says they approved the prompts.
-Section 296's next bounded step is a new credential-only outcome diagnostic,
-not an unchanged provider retry; then actual data construction when access is
-resolved. Do not claim the observed generic category proves denial or expiry.
+Section 296's credential-only diagnostic has now passed (296.7), resolving
+current local read availability without proving A's original cause. The next
+bounded step is the six never-dispatched product checks under a new post-access
+contract, then actual data construction from usable sources. Do not claim a
+valid key shape proves endpoint entitlement or the old generic category proves
+denial or expiry.
 The owner previously said
 "proceed" after the open-session concern was explained. Section 272 supersedes
 the session-exit prerequisite, without authorizing any process interruption.
@@ -46764,3 +46768,135 @@ and in-root support. Its 30-second alarm applies. Read only this new B claim
 and report, never A or older leaves. Positive availability requires actual D3
 exit 0 and the authenticated all-three-valid result; valid shape alone does
 not establish provider authentication. D3 and D4 become spent after use.
+
+### 296.7 Actual credential-stage success and remaining connection scope
+
+D3/D4 ran at exact clean freeze
+`a8d63ff0d101ccfa64148f1683758eac8666f9d8`, with unchanged A pins and matching
+live remote still `ec03623869055bfaef28294f9aa52dbf2eb5f934`. D3 dispatch
+followed the external **2026-10-13 23:32:11 UTC** clock; completion observed
+**23:32:27 UTC**, actual **exit 0**, `all_credentials_valid_shape`. Its normal
+double-LF envelope authenticated report **1,070 bytes**, SHA-256
+`97ce208331cba6c531ebafc4f49c342e691d5b64cd0bedb692063373b2b98c0e`, three
+read intents and zero provider calls dispatched. D4 dispatched **23:32:32 UTC**,
+completion observed **23:32:35 UTC**, actual **exit 0**, authenticated output
+and all-three-valid true. Claim **360 bytes**, SHA-256
+`7a59cf640e515862e0b0d07b13d6f037d8f9e79c13803e25b3011aa5c933c683`.
+Both processes used native network denial and designated in-root support.
+These clocks remain external observation brackets, not exact read timestamps.
+
+Each FMP/Massive/EODHD observation retained actual native return code **0** and
+`shape_code=valid`. The current credential-availability barrier ARV2D296-001
+is resolved prospectively for those exact reads; A's original generic cause
+remains unknown. This does not prove provider authentication, subscription
+scope or any source admission. No secret, raw exception or licensed row was
+printed or saved. All readiness flags remain false and counts unchanged.
+**D3/D4 and B are spent/frozen**, with no further B output/marker inspection.
+
+The next bounded step completes the six products A never dispatched, after
+this newly authenticated credential-stage evidence. It explicitly excludes
+already-tested Sharadar, uses a new six-product profile/control identity, and
+does not invoke or alter A/B's spent operational modes. The unchanged loader
+may read each of the three credentials once anew inside that new consuming
+process; B's discarded keys are not recovered or persisted. This is a
+post-access connection/schema diagnostic, not replacement history acquisition
+or a renewed seven-product attempt. It must be committed with its exact pins
+and separate one-use parent/output decision before provider contact.
+
+### 296.8 Prospective six-product post-access connection completion
+
+The new `scripts/check_arv2_remaining_provider_connections.py` owns control
+`artifacts/analyst_revisions_v2/provider_connections/R296-20261013-C`, not
+inspected or allocated during implementation. It binds B's external accepted
+report identity and source pin without reopening B, then scopes exactly the
+first six endpoints in 296.2: FMP grades; Massive ratings, earnings, guidance;
+EODHD EOD and calendar. Sharadar is excluded. The objective is first API
+dispatch for these products after verified local credential availability,
+not replacement historical acquisition or a renamed attempt at a dispatched
+request. B does not retroactively diagnose A or guarantee the next key read.
+
+The new caller reuses A's pinned stateless endpoint descriptors, direct owned
+HTTPAdapter construction, request/logging/body/schema validators and bounded
+directory-fd writer. It has its own host/HEAD/source preflight, exclusive
+claim, held/named checks, observation loop, six-row validation, parent and
+reader. No A/B operational parent, observer, claim or reader is invoked and
+no frozen module global is patched. Eleven selected dependency pins comprise
+A's nine plus the frozen A caller and B diagnostic source; this remains
+selected-source binding, not whole-interpreter integrity.
+
+After exclusive claim/fsync, at most one fresh read of each of the three
+exact Keychain items and six fixed send intents are permitted. An exclusive
+observation marker and per-send marker prevent repeated orchestration within
+this claim; this is not a sandbox against arbitrary same-user changes. The
+parent deadline is 180 seconds, each credential read at most 20 seconds,
+request connect/read timeout at most 15 seconds, with the same uninterruptible
+I/O/host-suspension qualification. No redirects, retries, pagination, alternate
+endpoint, environment proxy or token-file fallback is permitted. HTTP TLS
+verification remains on. Unsafe HTTP logging or SSLKEYLOGFILE presence refuses
+without changing settings. Credentials and response rows stay inside only the
+consuming process; no response body is persisted. Non-200 bodies are not read.
+
+Finite independent endpoint failures may continue to other declared products;
+deadline, cancellation, control/marker ambiguity or close failure stops later
+requests. Numeric status, bounded counts and field-presence metadata are the
+only API results retained. Field booleans still mean non-null presence, not
+economic usability; key size validation remains post-read, not a pipe-memory
+ceiling. Acknowledged local send intents are not measured provider request
+counts, which stay null. Actual exit 0 plus matching authenticated output is
+mandatory for all-connections success; individual 200/sample results do not
+admit data or authorize a backtest. Partial/late/unknown outputs cannot renew
+the one-use decision. The separate 30-second output reader is native-network-
+denied and reads only the new C claim/report against external hash/size/exit.
+
+Root C validation: **197 distinct passes in 2.22 s** (111 C tests + 86 record/
+document tests), no failures/skips/warnings. In-memory compilation, all eleven
+selected dependency pins, source/test hashes and profile passed under native
+network denial and the same isolated in-root support discipline. No operational
+key, private output or provider access occurred. Author 111 passes in 1.21 s,
+earlier 104 in 1.41 s and 111 in 1.39 s overlap. Missing actual-exit and
+pre-send-marker guards each produced one expected failure (0.07 s each);
+external-pin omission produced two expected failures/five overlapping passes
+(0.06 s), all memory-only and restored in `finally`. The intent test now checks
+exact persistent claim/marker binding inside the fake send boundary, not just
+after execution. No C author fixture failure was reported. Across the round,
+the distinct focused inventory is **552** (269 A + 86 B + 111 C + 86 record/
+document), not repeated selections added together; no complete suite ran.
+
+| R296-C selected file | SHA-256 |
+| --- | --- |
+| `scripts/check_arv2_remaining_provider_connections.py` | `1ebbc0f1db260ba4062955da0d81fa6ec5b0602ff47286e0214e40c2da57a184` |
+| `tests/analyst_revisions_v2/test_remaining_provider_connections.py` | `a77c907978adadbdcc7d4bfd525cedbce4e1c930671dfcdf27eed27f718ffe5c` |
+
+Canonical `arv2-remaining-provider-connection-check-v1` profile SHA-256:
+`292b610df9408b43cb36838fba64de8bfd2fac34ee09158f17fb528396b4c345`.
+The exact eleven dependency pins are in the source, checked above, including
+A `399d898d05f8696d4e5a1e6df25053d2449f96646fd870bf4dd2d75cd748af80`
+and B `6ce06af283a8445bcc68ef06d5868996c60ef507763e9834f01452e553b3fb5c`.
+No pin refresh or new independent acceptance is claimed.
+
+**ARV2OD296-D5:** commit C's source/tests and this prospective record; bind the
+resulting clean commit to `--expected-head`. Reverify designated root/branch/
+HEAD/status, exact selected hashes and matching live remote before use. Permit
+exactly one designated Python `-B -m scripts.check_arv2_remaining_provider_connections`
+invocation with the expected HEAD and caller hash above, in-root support and
+raw stderr discarded. The actual environment's SSLKEYLOGFILE/logging/access
+settings must not be changed. Only this consuming process may retrieve the
+three declared keys and dispatch the six declared checks. Do not preinspect C
+or reread A/B. This current owner setup waiver is sequencing authority, not
+source admission or a blanket future waiver. Refusal/ambiguity spends D5;
+no unchanged retry follows.
+
+Observe the actual exit independently. Require the normal canonical double-LF
+envelope with exactly `terminal`, `profile_sha256`, `report_sha256`,
+`report_bytes`, `send_attempt_count`, `provider_request_count`; exact profile,
+valid SHA, integer size 1..16,384, integer acknowledged intents 0..6 and null
+provider count. Unknown/malformed/missing/extra/trailing output gives no result
+read authority. Normal exit 2 permits failure authentication only.
+
+**ARV2OD296-D6:** after a valid normal D5 envelope only, permit one same-source
+`--read-output` invocation bound to the same clean HEAD/caller hash, external
+report hash/size and actual D5 exit (0 or 2), with native network denial,
+designated Python and in-root support. Read only C claim/report under its
+30-second alarm. Both modes then become spent/frozen. Record actual product
+results separately; a refused optional product must not fabricate success or
+automatically block an otherwise justified rating-only source successor.

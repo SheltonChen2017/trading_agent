@@ -6,7 +6,12 @@ The review checkpoint is skipped for this continued round only, not accepted
 by Claude. Fresh baseline003 is unchanged; corrected helper/main-import writes
 were made under Repair001 and all-file post003/inspection003 verify exactly
 the scoped delta. Genuine Mia recovery001 launched job e3324aef… under frozen
-actual source/economics; it is still running, native verification pending.
+actual source/economics; exact native/UI terminal is now Runtime Error,
+membership weight outside bounds on2024-07-12. Offending native row/unit/
+source date remain unknown; owner is routed to read-only Mia diagnosis.
+Fresh native collection retained terminal+one SUMMARY but refused its
+validation before index/charts/orders; this is not evidence of zero orders
+or absent index. Further bounded diagnosis is pending; no automatic retry.
 No fourth Codex OFF attempt/reset, ON launch or accepted 2021-now comparison/
 performance. OFF3/ON0/look20 (18cloud+2historical local) and open F017/F018/F012
 remain until factual new evidence. Read-only support is focused-tested and accepted
@@ -18802,3 +18807,306 @@ ahead. Future/mixed cap clocks, subscription identity, missing RAW mark/parity
 and journal bounds are source-compatible failure paths, not proved fired.
 Never snap/shift/interpolate missing/wrong-clock NAV or attribute platform-only
 cause from configured dates/final progress/end-hook frames. F018 stays OPEN.
+
+Look/provenance preregistration committed locally at
+`70cef49e7394f4d1be0e72471d035d07c3a5c3ca`, clean/actual remote61a81d9a
+unchanged; no push. Private ledger1926/c92291a4… created under its exact
+fresh writer scope after physical/Git/branch/HEAD/status and private ignored
+parent/absence/no-symlink preflight,0600mode; no private body or credential
+read in creation. BEFORE status effect register
+`TPR-EXT26-MIA-RESULT-STATUS-20261012-001`,07:10:00Z–07:40:00Z,
+HEAD70cef49e…/owner00501bc2…/unchanged twelve-file read-only source closure
+and exact UI-ledger descriptor. Prepared canonical argument4570bytes/SHA256
+`14dd815bcfa726b1dcb2f3673c13c96742003bd95251be25caf052dfaae6ff56`.
+Action=status independently refuses all but ONE fixed own-job backtests/read;
+<=2MiB+oversize refusal byte/30sec request/600sec aggregate. Plan's generic
+read-endpoint list64MiB outer bound does not authorize collection under this
+closed action. Fresh exclusive claim/access/request/shared local controller
+lock before ledger/credentials/network, serialized actual process exit.
+No sourcepost/private-input/ObjectStore reads, source writes, compile/job/new
+look, automatic retry or acceptance; old claims untouched. If full returned
+compileID differs from observed short GUI label, preserve failed scope. Actual
+status/result and any required new binding will be recorded separately.
+
+Status001 actually completed07:11:14.837700Z, private ledger1926bytes FD/
+SHA verified; one authenticated fixed own-job HTTP200response1561bytes,
+retained envelope1910bytes/SHA256
+`161fc7a758424213920ba0bef484a014a148e480399d83557289912e8eb89b41`.
+Terminal=false/completed_flag=false/status="In Progress...", no error; full
+compileID not returned (matching flag=false, NOT full binding proof).
+COMPLETED_CAPTURE describes the evidence operation, not job completion.
+No source/input/ObjectStore/private old body read, new attempt/look or accepted
+metric; scope spent/process exited0/controller released. Later status or
+terminal collection must get new bounded identity/time; no implicit repeat.
+The genuine Mia "Backtest finished" system callback had in fact delivered
+5.2%in-progress metadata and Mia itself did not claim completion; native API
+independently confirms ongoing run. No quota/other-lane contention observed.
+
+Fresh status002 is prospectively registered BEFORE effect,
+`TPR-EXT26-MIA-RESULT-STATUS-20261012-002`,07:20:42Z–07:50:42Z,
+same HEAD70cef49e…/owner00501bc2…/exact closure/ledger/own job,
+canonical argument4570bytes/SHA256
+`7af7b180868297b122c9041c4884484291b2c26ac3e5aa8563079e0b5fe4101d`.
+Same ONE fixed read-only backtests/read/2MiB+1/30sec/600sec bounds/exclusions,
+no new launch/look or repeat of spent001. Older own source/inputs/ObjectStore
+remain outside scope. UI revealed an unowned staged asterisk in the Mia
+composer; root did not overwrite/send it or alter any source. Subsequent
+result collection can use exact read-only API rather than disturb that draft.
+
+Status002 actually completed07:21:19.674072Z: exact private ledger1926bytes,
+one HTTP200own-job response1562bytes, retained envelope1911bytes/SHA256
+`e66ffbe2bb0347f124680617ede409374f48e983d515352bedcff806521a75d3`.
+COMPLETED_CAPTURE only; terminal=false/completed=false/In Progress..., no
+error, compileID unreturned. No extra launch/look/accepted metric; scope spent,
+process exited0 and controller released.
+
+Before inspecting just its new cached DTO progress, register fresh bounded
+`TPR-EXT26-MIA-STATUS-META-20261012-001`,07:24:00Z–07:39:00Z,
+HEAD70cef49e…/owner00501bc2…; exact one1911byte/e66ffbe2… FD descriptor,
+<=1911body bytes/30seconds, no old captures or API/credentials/input/Object
+Store/source access. Header811bytes/SHA256
+`2fadeec2a799514b71147ef9f09240c0766c551bf4a86873c841396c543aead5`.
+Exclusive own claim/access before read; project/job/request identities and
+bounded0..1 progress checked. Return ONLY status/progress fraction from the
+07:21cached snapshot, not present-time progress, performance or ETA proof.
+Retain a spent refusal on invalid data/time/hash; no implicit retry/newlook.
+Owner asked current arm; root correctly clarified this genuine recovery is
+OFF(cap-only selection, tilt0, ARdisabled, six joint sleeves), ON unlaunched.
+
+Owned-status metadata001 completed07:25:24.274638Z: exactly1911body bytes,
+hash/request/project/job identity verified, snapshot status In Progress...,
+progress exact lexical fraction11100000000000001/20000000000000000
+(about55.5%) at07:21:19.674072Z. Cached progress is not current progress or
+ETA/performance/full-period proof. Exclusive own claims/access/result retained,
+zero API/source/input/ObjectStore/credential/newjob/look effect; scope spent.
+
+Owner reports "runtime err."; this is a material observation, not authority
+to retry or reset counts. BEFORE verifying exact own-job terminal register
+fresh `TPR-EXT26-MIA-RESULT-STATUS-20261012-003`,07:28:28Z–07:58:28Z,
+HEAD70cef49e…/owner00501bc2…/same exact read-only source closure and1926/
+c92291a4… ledger, jobe3324aef… only. Canonical argument4570bytes/SHA256
+`2bbeb850e66e5f5bf834c030ba75fd31a2298770f4ea3a68cb59f40f963aa59e`.
+ONE fixed native backtests/read<=2MiB+1/30sec/600sec, fresh immutable claims/
+access/request/shared lock before effect; retain terminal/error hashes/private
+projection, no source/inputs/ObjectStore/otherjob/newlaunch/look/automatic
+retry. Root will distinguish owner observation from independently verified
+failure/cause and collect fresh bounded source/accounting evidence as allowed.
+
+Status003 independently completed07:29:06.398836Z with exact ledger read,
+one own-job authenticated HTTP200 terminal1299399bytes; envelope1299746bytes/
+SHA256`aace232f310ae1cb4c109ae504b5d27ca77faea3a7978934642818d91e4df7d5`.
+Actual terminal=true/completed_flag=true/**Runtime Error**, error454UTF8bytes/
+SHA256`7e7df7da3fcb321a0d6114d88683eeaea52b8c241018ded24cb1baee770adb49`;
+full compileID not returned. Again COMPLETED_CAPTURE is evidence collection,
+not a completed accepted strategy run. Scope spent/controller exited0.
+
+Fresh exact own-project UI agrees:2024-07-12 00:00:00 "membership weight
+outside bounds", `_member_inventory` main55 → `_constituents_for` main212
+→ universe callback lambda main170. Native terminal reports1683.16seconds/
+417445168data points; this is actual engine context, not full-window proof.
+`MIA82-F002`/`TPR-EXT26-F019`P1: confirmed primary failing constituent
+validation path in this genuine new run, OPEN; exact offending ETF/security/
+raw weight/type/source date not yet known. Do not diagnose zero/negative/
+percentage scale or bad provider data from a generic bounds error alone.
+F018 frontier remains unqualified/partly explained for new look20 only; this
+does NOT prove the exact historical OFF3 initiating cause or resolve its
+wrong-clock observations. F017 native audit/export disposition still requires
+actual index/SUMMARY/readback evidence rather than absence of its old frame.
+All dashboard return/CAGR/drawdown/Sharpe figures are failed partial-period
+statistics, NOT accepted2021-now/paired/per-universe outcomes.
+
+Owner asks whether to use Mia directly; root recommends READ-ONLY diagnosis
+of this exact job/guard, identify ETF/security/exact weight/type/source date,
+then propose a frozen-strategy-preserving correction. No source edit/drop/
+clip/renormalization or new run is authorized by that question. Root continues
+read-only native/source capture, preserving any owner/Mia work and old failure.
+
+BEFORE native collection register fresh
+`TPR-EXT26-MIA-RESULT-NATIVE-20261012-001`,07:33:33Z–08:03:33Z,
+HEAD70cef49e…/owner00501bc2…/same exact own-job/ledger/source closure;
+canonical argument4578bytes/SHA256
+`b08defd8189c384da388efec744a18cbd681a092224818f275d44aa629c91d11`.
+Read only this terminal job:1backtests/read<=2MiB,2fixed SUMMARY/index log
+queries<=1MiB each,2fixed charts<=2MiB each,<=128bounded99order pages
+<=1MiB each/12672distinct orders; aggregate64MiB/600seconds/30sec request,
+oversize refusal byte reserved BEFORE each request. Exact durable claims/
+access/ledgerFD/hash/shared controller/request identities before credentials.
+Retain partial/loading/failed envelopes; no retry/source/compile/job/provider/
+input/ObjectStore/old-private body access or new look. Individually valid
+compact aggregates are diagnostic, not their cross-consistency/completion;
+1449exact16:01NY chart observations and genuine usable orders/costs/coverage
+remain acceptance requirements. Invalid/duplicate aggregate can stop later
+collection without hiding prior terminal evidence. Actual result follows.
+
+Native001 actually ended07:34:40.582498Z, process exited1/controller released,
+status FAILED_OR_UNCERTAIN. Exact ledger1926read;2authenticated HTTP200requests,
+1308333response bytes. Terminal1299399/envelope1299746/aace232f… agrees with
+status003. SUMMARY query returned8934bytes; its retained envelope9331bytes/
+SHA256`a2acd54bfe08d45d9d964d1d01ff08da5f198f9a5e20d9e28cba9850a80e84ed`.
+One SUMMARY observed, parser refused before validated aggregate publication.
+Index/chart/order requests were NOT reached: their counts/coverage/costs are
+null, not zero/absent. Exact validation cause unproved; do not blame native
+export or weaken acceptance from a generic collection failure. Original
+terminal/SUMMARY/claim/access/request/projection/failure receipts immutable;
+spent native001 will not be rerun. No new attempt/look/metric acceptance.
+
+Public source evidence independently inspected: `_member_inventory` parses
+each non-None weight via core._number and this specific bounds message arises
+only for a parsed value outside0..1. None and0 already have explicit classes;
+1and a sum-of-weights over1 do not trigger this row guard. Whole callback
+refuses before retaining its new snapshot. `_prepare_targets` passes every
+snapshot SID/ticker to cap-only construction, not the guard's positive-weight
+eligible return; weight is audited/hashed, not the cap-ranking/allocation
+signal. This does not identify raw row/unit/security/ETF/source date or license
+dropping/clipping/renormalizing/bypassing the guard. Peer agrees, no effect.
+
+BEFORE one exact new captured-SUMMARY FD read register
+`TPR-EXT26-MIA-SUMMARY-DIAG-20261012-001`,07:42:00Z–07:57:00Z,
+HEAD70cef49e…/owner00501bc2…/exact unchanged twelve-file support source closure,
+one9331byte/a2acd54b… envelope, <=9331body bytes/30seconds. Header2400bytes/
+SHA256`25e52cffd88b998508136b9def0368aac2a1a26019cb9c9d8151f145ac2e1acc`. Exact new native001
+request/project/job/marker/schema/hash checked; run original closed compact
+parser in memory only. Return bounded schema/identity flags and own-parser
+exception class/known source-literal/own-code frame, not native rows/raw logs/
+performance. Exclusive claims/access/shared controller before body; no API,
+credentials, source/input/ObjectStore/old capture read, provider effect,
+candidate edit/job/attempt/look or scope renewal. Retain failure honestly;
+do not suppress a real census/binding violation to force collection green.
+
+SummaryDiag001 ended07:42:58.810190Z, exact9331body bytes read, status
+FAILED_OR_UNCERTAIN before parser diagnostics/identity flags were produced.
+Root's diagnostic wrapper retained the failure but hid its early cause;
+not evidence of a native invalid SUMMARY and not a spent-scope retry.
+Register fresh SummaryDiag002 BEFORE effect,07:44:00Z–07:59:00Z,
+same exact FD/source/owner/HEAD/body/time/exclusions, header2400bytes/
+SHA256`47cf279ef57f1f8178617617ca8c6c2178bd1f4b4cb2ce6830092f5ade5fc959`. Diagnosis also
+captures bounded own-code frame and exact known public-source error literal
+at the envelope/identity gate; never discloses arbitrary native exception
+text/rows or relaxes those gates. Fresh exclusive scope/controller/receipt;
+001 remains immutable. No data/API/edit/launch/acceptance expansion.
+
+SummaryDiag002 ended07:44:10.628316Z after the same exact9331body FD read,
+FAILED_OR_UNCERTAIN: own evidence.parse_json118 raised the known literal
+"exact JSON parsing refused". Wrapper still did not distinguish envelope
+versus embedded-summary stage; no invalid-schema or export-cause inference.
+Prospectively register separate SummaryDiag003,07:47:00Z–08:02:00Z,
+same exact descriptor/source/owner/HEAD/body/time bounds, header2470bytes/
+SHA256`7f3cfbca16aa9421904476682015a6f16d83501d8d72ab1acee0754d72ff1820`. Record stage and
+the exact JSON loader's safe error position/category/byte length/structural
+ending only. No native values/rows/raw text/metrics; original strict parser
+remains unchanged and all checks still refuse. Exclusive claims/access/
+controller before fresh body; prior two scopes spent, no automatic renewal/
+API/newlook/edit/rerun. Diagnosis is not acceptance or a reason to weaken JSON.
+
+BEFORE fresh post-terminal own-project source effect register
+`TPR-EXT26-MIA-SOURCE-POST-20261012-004`,07:45:30Z–08:15:30Z,
+HEAD70cef49e…/owner00501bc2…/unchanged nine-file capture source closure,
+header2312bytes/SHA256
+`3de922e6cf0a742e56a924f21a5bca8210db357bad1c7c21e1d100ce409c834c`. Two files/read fixed
+OFF37650980<=4MiB each/8MiB total,<=16files/1MiB each,120seconds/40sec
+request. ONLY separately declared baseline003result5865/1d2f7cb3…+
+sources224315/c24f20eb… FD reads (230180bytes) for all-file before/after
+comparison; no incidental old captures/D0/inputs/ObjectStore/providers.
+Fresh exclusive claims/access/controller before credentials/requests;
+retain every change privately and stable inventory/hash metadata publicly.
+No source edit/Mia message/compile/job/look/attempt/automatic retry. If
+owner/Mia concurrent edits appear, preserve/record them, do not silently
+admit/overwrite. Current project capture is not full compiled-job proof.
+
+First post004 CLI invocation used the result-capture helper's --plan-json
+interface incorrectly; source-capture argparse exited2 before claims/private
+read/credentials/request/execution. No source capture scope was consumed by
+that parser refusal. Correct invocation calls its documented execute_plan
+with exact preprepared canonical plan/hash within the same unspent bounds;
+exclusive claim refuses if an unexpected prior effect/name actually exists.
+This is an invocation correction, not renewed scope or a QC retry/look.
+
+### 82.8 Verified failed recovery, source reconciliation and blocked handoff
+
+Post004 actually completed07:46:43.598109Z, controller/process exited0;
+2fixed own-project files/read HTTP200responses233559bytes each (467118total),
+exact230180baseline body bytes. Both complete12file inventories are stable
+and every hash equals prerecovery post003/frozen repair: helper7490/bce4182d…,
+main59961/8f21e51f…, other9Python files/notebook unchanged. Complete private
+diff132576/83d07cde… is identical to post003; new post004read2archive232051/
+`acd4e7afd4b17ea0b5e7212acf07714bdb76b51614a8e7e0b9cc10787a14c79b`.
+Current project source is reconciled at capture time, not invented full
+compiled-job provenance: full compileID is still unreturned and short GUI
+label remains qualified. No local candidate source port or cloud overwrite.
+
+SummaryDiag003 actually ended07:47:32.811466Z, exact9331body FD/hash verified,
+outer envelope/request/project/job identity passes. Failure is specifically
+the embedded SUMMARY JSON parse, BEFORE compact schema/census validation:
+captured line exactly8192UTF8bytes, embedded JSON8158bytes/SHA256
+`bfc8630f3b3feb243fddb90a4a0a37cc43124815a20ee7a3faffac4aa8723eda`,
+no closing brace/ellipsis. Exact loader reports unterminated string starting
+at position8145(column8146). This is strong evidence of a cut/incomplete
+captured message, NOT proof whether engine logging, transport/query or
+another layer imposed it. No invalid JSON is admitted, repaired, completed
+by guessed suffix or relabeled as a valid aggregate. Native001 is a safely
+retained failure; index/charts/orders remain unrequested/unverified, not zero.
+`TPR-EXT26-F020`P2 OPEN: complete bounded compact-summary retrieval unproved;
+any correction requires a named successor/preserved full journal, not an
+outcome-selected schema relaxation or candidate relaunch after exhausted cap.
+
+Public-only peer/source checks found no automatic attempt/config mismatch
+from the import-only Mia repair: the collector deliberately binds legacy3
+and new job, with source lineage separately retained. Partial runs can pass
+proper missing/unobserved censuses; current refusal is JSON truncation before
+those checks. Independently inspected conditional producer/consumer mismatch
+(not observed as this failure): core342–357 includes all NAVs in cash_usd,
+cash_fraction only for nav>0 and gross only when non-None, whereas reader
+coverage255requires all three observation counts equal all NAVs. Retain this
+conservative-reader limitation, not a license to weaken custody or claim it
+fired. No runtime/candidate/test changes follow from that hypothetical case.
+
+`TPR-EXT26-D081` — agent-delegated bounded stopping decision, provenance:
+owner recovery001 permitted exactly1Mia integrated job with frozen economics;
+new exact Runtime Error/SUMMARY format evidence and owner question about
+direct Mia. Chosen: preserve failed look20, reconcile all cloud source and
+route to owner genuine-Mia READ-ONLY diagnosis of ETF/member/raw weight/type/
+source date plus proposed correction. Alternatives rejected: Codex4/reset,
+ON through unresolved path, clipping/drop/renormalization, unregistered
+diagnostic launch, dashboard-as-completion. Scope: OFF look20 only, no human/
+Claude approval of an unknown correction. Assumption/limit: callback locals
+were not retained before its refusal, so the present trace cannot supply
+them; root cannot safely determine holdings class/unit from bounds alone.
+Independent-review status: current owner review checkpoint skipped only;
+this record/support is not native/economic/canonical acceptance.
+
+`TPR-EXT26-D082` — agent-delegated evidence choice: do not launch or port
+the tested audit repair as a completed native solution from mock-green or
+one malformed SUMMARY. Alternatives: retrieve more partial chart/orders or
+ObjectStore bodies would not identify the missing rejected callback row or
+produce a full-window run, and require their own fresh bounded scopes; no
+incidental old/private/provider access. Existing exact source/API/log checks
+establish a factual blocker. Retain native accounting nulls, underlying
+failure and every unsuccessful invocation/read. No API/native platform
+attestation or canonical gate closed by owner paperwork waiver/exploration.
+
+Stable round outcome: **BLOCKED**, not an accepted2021-now comparison.
+OFF3Codex attempts consumed+1genuine Mia look20 Runtime Error; ON0/unlaunched.
+Looks20=18cloud+2historical local. All six sleeves SPY/QQQ/SOXX/XLV/REMX/XLE
+have no accepted full-period return/CAGR/drawdown/volatility/Sharpe/annual
+return/turnover/cost/exposure/coverage/fill/fee or independent sleeve P&L for
+this extended paired study. Failed partial UI values are not reported as
+those outcomes. F019weight callback OPEN, F020compact message OPEN;
+F017export native readback/replay remains unclosed; F018clock/full-window
+coverage OPEN; F012resource/remaining71uploads partlyOPEN/unexecuted. Old
+OFF2/OFF3 source/terminal/captures and historical sections68–80 immutable.
+No old-capture reopening/rights attestation, new date/economics, holdout,
+remaining upload, purchase, other-lane cancellation, operator/broker/live
+effect. Canonical TR0-I/TPR-1/TPR-0B and Windows/native custody exclusions stand.
+
+Public `extended_mia_recovery_outcome20.json` is metadata-only outcome index:
+ties exact new job/terminal/source/SUMMARY descriptors, null census/per-sleeve
+accepted outcomes and pending next role. It does not supersede original
+freeze/look/execution/private receipts. Latest immediate owner action:
+ask authenticated controllable built-in Mia diagnosis ONLY, then return its
+findings/proposed patch and every cloud change for verification before any
+further edit/run authority. No new run is authorized by "shall i ask mia
+directly?". Sole lane record remains durable handoff; exactly one final
+matching non-force push follows final focused checks and actual remote
+verification. Monitor remains PAUSED/no automatic rearm. Next independent
+review, when owner resumes it, must cover every accumulated commit since
+61a81d9a and the full final tree, not inherited mock/native acceptance.

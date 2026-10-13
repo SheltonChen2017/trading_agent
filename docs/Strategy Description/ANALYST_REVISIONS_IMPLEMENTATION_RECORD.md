@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–295 retain the milestone, review, preregistration, QC
+strategy. Sections 1–296 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -539,6 +539,15 @@ uses and this current waiver are now spent. Section 295.6 defines the next
 access/coverage barrier; no independent acceptance or future contact authority
 is inferred. The EODHD subscription direction and token-file location are
 retained in 295.1 without reading the token or opening Safari.
+
+Section 296 records the owner's subsequent four-provider Keychain setup and
+explicit direction to configure/check the connections and continue building
+toward the next backtest without a routine Claude checkpoint. The Keychain
+inventory request was additive, not a cancellation of that work. A separately
+bounded connection contract is being implemented; metadata-only checks found
+all four named items, not authenticated provider access. Section 295's spent
+diagnostic stays frozen. No new provider contact, accepted data capture or QC
+run is inferred from this preparation. The monitor remains PAUSED.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1571,7 +1580,7 @@ The owner's subsequent disarm instruction supersedes that active status:
 the monitor is now paused, not deleted or automatically rearmed. The owner
 explicitly waives Claude review of section 295's current bounded HTTP-status
 diagnostic and its output authentication on the new "proceed without review"
-instruction. The immediate next step is section 295's exact committed
+instruction. The historical section-295 next step was its exact committed
 one-shot status-observation protocol, now completed once as recorded in
 295.5 and not renewed: ratings returned 200, earnings returned 403, guidance
 was not dispatched, and no capture was accepted. The next admissible work is
@@ -1581,6 +1590,18 @@ plan. Neither a 200 nor the reported EODHD subscription proves needed fields,
 PIT history or cross-vendor identity compatibility. No new provider call,
 acquisition, source substitution or strategy run is automatic; a new bounded
 contract and normal review/run-freeze gates apply. Monitor remains paused.
+The owner's later "proceed wihtout claude review for now" and "done. all four
+are saved in keychain. configure the connections and check that they work.
+then proceed to the next backtest" supersede that routine review wait for the
+current setup milestone. The owner explicitly waives Claude review of section
+296's current connection contract before its exact committed use. This is
+sequencing authority, not independent acceptance or technical/source clearance.
+The immediate next step is section 296's bounded four-provider connection
+setup/check, then admissible data construction toward an order-based accepted-
+risk backtest. The subsequent inventory request did not replace that work;
+the owner reiterated "continue buildling until backtesting". A concrete data,
+technical or external-authority barrier still requires an honest stop; a
+routine acknowledgment does not. No old protocol or failed capture is renewed.
 The owner previously said
 "proceed" after the open-session concern was explained. Section 272 supersedes
 the session-exit prerequisite, without authorizing any process interruption.
@@ -3485,6 +3506,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-13 | Codex counter-review of section 291 and real bounded Massive caller implementation, uninvoked | `38e2b97a` -> `52542bb0` and final section-293 caller/test/handoff commit | Both Claude commits disposed in 292: test correction accepted, record accepted after four documentary qualifications; no historical audit replay | Fixed October-12 three-role first-vintage diagnostic caller, exclusive durable claim, 150-second parent deadline, finite 16-KiB channel, separate native-network-denied physical authentication; no receipt publication or R287 renewal | Root final focused selection 289 passed in 3.29 s; changed Python sources compile without bytecode; two classifier omissions and four new-caller omissions caught; earlier missed guards and fixture failures disclosed in 292.3/293.4; no full Codex suite | Historical P2s retained; all four pre-invocation implementation/test findings in 293.3 corrected; 314/239/50/699 unchanged | Exactly one final matching-lane push; monitor remains active; Claude independently reviews section 293 before counter-review and a separate exact run freeze; no actual claim, credential, provider or QC action |
 | 2026-10-13 | Owner-waived one-shot October-12 Massive diagnostic | `fb8c87ad` -> `d9a3b89a` and final section-294 result/handoff commit | No new Claude range; explicit current owner waiver, not independent acceptance | Sole unchanged caller exited 2; once-only output reader authenticated `producer_raised` / `http_status` failure evidence, not an accepted capture; both spent | 284 distinct focused passes in 2.94 s; 86 record repeat in 0.95 s not additive; two reader omissions caught; no complete suite | Exact status/role/request count unknown; historical P2s retained; no renewed R287 or formal gate clearance; 314/239/50/699 unchanged | One matching-lane final push for the concluded round; active monitor advances past own Codex commits; no unchanged retry |
 | 2026-10-13 | Owner-waived status-only Massive recovery, monitor disarm and EODHD access note | `032c81e2` -> `5a80c284` and this final section-295 result/handoff commit | No new Claude review; fresh scoped waiver, not independent acceptance or reuse of section 294's waiver | Sole current status observation and native-network-denied reader exit 2; ratings 200, earnings 403, guidance not dispatched; no response body or accepted capture; both uses spent | 224 distinct focused passes in 4.14 s; 86-test record repeats overlap; two expected red mutations with the initial harness limitation retained; no full suite | Current earnings HTTP refusal retained as ARV2D295-001; historical causes still unknown; no QC/look/cell changes, floor 314/239/50/699 | One final matching-lane push; monitor PAUSED; token location retained without token access; next source/access decision needs a separately scoped contract, not an unchanged retry |
+| 2026-10-13 | Owner-directed Keychain connections and continuous backtest preparation | `ec036238` -> this section-296 implementation/run-freeze commit and subsequent result commits | No new Claude review; current owner pre-use waiver, not independent acceptance | Additive four-provider loader and fixed seven-product schema check; no old protocol renewal; actual result follows the exact committed freeze | Root 355 focused passes in 3.01 s; author subsets overlap; no complete suite | Five pre-use findings corrected/qualified; connection success cannot establish input completeness or backtest readiness; floor 314/239/50/699 unchanged | One final matching-lane push after this continuous round; monitor PAUSED; continue admissible data construction toward an order-based run, not a routine acknowledgment stop |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -46326,3 +46348,256 @@ under the same native network denial and in-root support, again asserting
 the round still has **224 distinct passing tests**, not 310 or another summed
 total. Final new-source and test SHA-256 values remain exactly 295.3, and
 `git diff --check` passes. Neither operational mode was rerun for validation.
+
+## 296. Four-provider Keychain integration and continued backtest preparation
+
+### 296.1 Owner directions, scope and starting state
+
+After section 295, the owner reported possible expiry of separately purchased
+Massive subscriptions, purchased FMP access, and saved four generic-password
+items in the macOS login Keychain. The owner directed: **"done. all four are
+saved in keychain. configure the connections and check that they work. then
+proceed to the next backtest"**, followed by a shareable inventory request and
+the clarification **"why did you stop? i just told you continue buildling until
+backtesting"**. The inventory request is additive. The current **"proceed
+wihtout claude review for now"** direction waives the pre-use Claude checkpoint
+for this current bounded integration, not source authentication, data
+completeness, financial controls or independent acceptance. No Claude review
+arrived in this round; last disposed head remains `38e2b97a`.
+
+Root, branch, HEAD and clean status were verified at
+`ec03623869055bfaef28294f9aa52dbf2eb5f934` in the designated Code worktree.
+Only the matching remote branch was fetched; local/tracking comparison was
+0 ahead / 0 behind. No old or sibling checkout is used. This round remains
+local until its one final matching-lane push. The monitor remains **PAUSED**.
+
+Metadata-only `security find-generic-password` lookups, without `-w` and with
+both output streams discarded, found each exact service/account below in
+`/Users/sheltonchen/Library/Keychains/login.keychain-db`:
+
+| Provider | Service | Account |
+| --- | --- | --- |
+| FMP | `trading-agent-fmp` | `fmp` |
+| Sharadar | `trading-agent-sharadar` | `sharadar` |
+| Massive | `trading-agent-massive` | `massive` |
+| EODHD | `trading-agent-eodhd` | `eodhd` |
+
+This inventory contains no secret and may be shared with other lanes. Presence
+does not prove a valid key, paid scope or endpoint access. Do not export keys,
+write shell profiles, copy the legacy EODHD token file, or alter Keychain access
+controls. The separately frozen original Massive/Sharadar loaders retain their
+old environment/service contracts. Additive lane code reads these new items
+into only the consuming process and has no environment/file/provider fallback.
+
+### 296.2 Prospective connection scope and purpose
+
+The new purpose is to validate the **newly configured four-provider Keychain
+connections and exact endpoint schema availability**, not to repeat the spent
+R295 acquisition/status protocol, recover a discarded historical cause, or
+obtain replacement October history. Credential storage plus seven separately
+predeclared product checks is the substantive new scope; changing a label or
+date alone would not justify a retry. No operational use is allowed until the
+completed implementation, selected pins, tests and exact one-use decision are
+committed below.
+
+The fixed prospective private control directory is
+`artifacts/analyst_revisions_v2/provider_connections/R296-20261013-A`. It has
+not been inspected or allocated during preparation. The designated compatible
+host is Darwin/POSIX Python 3.13 at
+`/Users/sheltonchen/.venvs/trading_agent-py313/bin/python`, the exact lane root
+and branch. No secret, response row, raw exception, private corpus or old
+diagnostic output is needed for preparation.
+
+| Fixed product | Host/path | Non-secret query scope |
+| --- | --- | --- |
+| FMP individual grades | `financialmodelingprep.com/stable/grades` | `symbol=AAPL` |
+| Massive ratings | `api.massive.com/benzinga/v1/ratings` | `ticker=AAPL`, `limit=1` |
+| Massive earnings | `api.massive.com/benzinga/v1/earnings` | `ticker=AAPL`, `limit=1` |
+| Massive issuer guidance | `api.massive.com/benzinga/v1/guidance` | `ticker=AAPL`, `limit=1` |
+| EODHD EOD | `eodhd.com/api/eod/AAPL.US` | `from=2026-10-12`, `to=2026-10-12`, `fmt=json` |
+| EODHD earnings calendar | `eodhd.com/api/calendar/earnings` | `symbols=AAPL.US`, `from=2026-07-01`, `to=2026-09-30`, `fmt=json` |
+| Sharadar ticker mapping | `api.sharadar.com/v1.0/data/tickers` | `ticker=AAPL`, `table=stocks`, `fields=ticker,permaticker`, `limit=1`, `format=csv` |
+
+FMP documents no limit/date parameter for individual grades; no invented
+server-side bound is credited. Sharadar CSV is explicitly documented and
+avoids guessing an undocumented JSON container. Calendar dates apply to
+`report_date`, not its separate fiscal-period `date`. Each request is a
+sample check; AAPL success is not proof of all paid symbols/history or cloud
+redistribution rights. Empty schema-valid data is not usable input coverage.
+EODHD earnings estimates are not issuer guidance, and FMP grading-company
+strings are not Benzinga firm IDs.
+
+Primary endpoint references consulted without credentials:
+[FMP grades](https://site.financialmodelingprep.com/developer/docs/stable/grades),
+[Massive ratings](https://massive.com/docs/rest/partners/benzinga/analyst-ratings),
+[Massive earnings](https://massive.com/docs/rest/partners/benzinga/earnings),
+[Massive guidance](https://massive.com/docs/rest/partners/benzinga/corporate-guidance),
+[EODHD EOD](https://eodhd.com/financial-apis/api-for-historical-data-and-volumes),
+[EODHD calendar](https://eodhd.com/financial-apis/calendar-upcoming-earnings-ipos-and-splits),
+and [Sharadar tickers](https://sharadar.com/docs/tickers).
+
+No connection result changes the formal trust roots or readiness flags. The
+booked floor stays **314 / 239 / 50 / 699**. Order-based strategy evaluations
+remain the default; these connection probes have no strategy, portfolio,
+prices-to-returns calculation, QC deployment or simulated/real orders.
+
+### 296.3 Implemented boundary and pre-use findings
+
+`scripts/arv2_keychain_connections.py` retrieves only the exact service/account
+from 296.1 using `/usr/bin/security`, captures its stdout internally, discards
+stderr and uses a maximum 20-second subprocess timeout. Only the final command
+LF is removed; accepted keys are 8..4,096 printable non-whitespace ASCII bytes.
+This is a post-read accepted-key shape limit, not a 4-KiB pipe-memory ceiling.
+The key is never a shell argument, printed value, report field or fallback
+configuration. macOS may request access; no persistent permission is changed.
+
+`scripts/run_arv2_keychain_connection_check.py` binds the exact clean host,
+root/branch/HEAD, its own external SHA-256 and nine selected dependency pins.
+Importing either new module retrieves no credential or provider data. The
+caller refuses any SSLKEYLOGFILE presence before importing Requests, rather
+than modifying the actual environment. It exclusively creates/fsyncs the
+fixed private claim and observation-start marker before any key retrieval,
+then creates/fsyncs one exclusive marker before each of at most seven sends.
+A duplicate/partial claim or marker ambiguity is spent/ambiguous and stops;
+there is no cleanup, retry, renamed request or alternate output.
+
+One Keychain retrieval per provider supplies the fixed matrix. Ordinary
+credential/endpoint refusals may continue only to the other **already declared**
+products; this is not a fallback role or host. Cancellation, deadline or
+control ambiguity stops remaining requests. Owned direct Requests 2.34.2
+HTTPAdapter sends use verified TLS, no client certificate/proxy, zero retries,
+streaming and no Session/redirect/pagination. Massive uses Bearer auth; the
+other providers use their documented query-key names internally. Query-bearing
+URLs and raw exceptions are never emitted.
+
+Only HTTP-200 bodies are read, at most 1 MiB each, without transparent
+decompression and with declared-length agreement when present. Non-200 bodies
+remain unread. Duplicate JSON keys, nonfinite values, wrong symbols/dates,
+malformed schema and credential echoes refuse. Parsed rows never persist or
+cross the output channel. The finite report contains numeric HTTP status,
+count, fixed endpoint labels and per-field non-null-presence booleans only.
+`fields_available` does **not** prove economic usability, completeness or
+scoring compatibility; empty strings may be present. Empty valid responses are
+separate from usable observations. Provider/server request count remains
+null/unknown; local acknowledged send-intent counts are not that measurement.
+
+The 180-second process alarm and monotonic deadline cover preflight, Keychain,
+sends, parsing and publication; request timeout is at most 15 seconds of
+remaining time and is a connect/read timeout, not independently total wall
+time. Host suspension and uninterruptible I/O remain limitations. The reader
+has a separate 30-second alarm and requires native network denial. It reads
+only the new bounded claim/report, checks the externally supplied report pin
+before JSON decode, authenticates strict source/profile/chronology/false-flag
+bindings, and retains file descriptors through held/named checks. This is not
+continuous whole-tree/native ACL/xattr or whole-interpreter integrity.
+
+A late publication failure may leave a positive report while actual parent
+exit is nonzero. Actual exit zero **and** authenticated matching positive
+output are required for the all-connections summary. A finite exit-2 report
+can authenticate individual endpoint observations, not all-provider success.
+No report, CLI boolean or source pin proves independent review. All formal,
+capture, backtest and paper readiness flags remain false; QC/outcome counts
+stay zero. Operational authority is solely the separate committed freeze.
+
+| ID | P | Pre-use finding and disposition |
+| --- | --- | --- |
+| `ARV2I296-001` | P2 | Initial reader allowed up to 10,000 rows for endpoints whose producer permits at most one. Both successful and retained failure counts now bind the endpoint-specific ceiling; focused regressions cover each single-row endpoint. |
+| `ARV2I296-002` | P2 | Initial broad exception handling could swallow KeyboardInterrupt/SystemExit and continue subsequent requests. Cancellation now has an explicit terminal stop across key retrieval, send, body/schema and close paths, with remaining endpoints unattempted. |
+| `ARV2I296-003` | P3 | Field-presence booleans could be mistaken for suitable economic data. Profile, tests and this record explicitly restrict them to non-null presence, not usability. |
+| `ARV2I296-004` | P3 | Key byte bound follows native command capture. It is recorded as an accepted-key shape bound rather than a hard stdout resource cap. |
+| `ARV2I296-005` | P2 | Configured HTTP debug/log handlers could print query credentials independently of explicit application output. The new caller refuses unsafe request-logger/root-handler state and HTTP debug levels; it never disables logging or changes user settings. Synthetic logger/debug cases must pass before the run freeze. |
+
+The final reader must also bind mandatory symbol/date/schema-presence flags
+to the producer's guarantees; optional economic fields may remain absent.
+Percent-encoded/plus-encoded credential echoes are refused along with plaintext
+and JSON-escaped forms. These are pre-use corrections, not actual provider
+failure explanations.
+
+Same-round advisory review is not independent Claude acceptance. No original
+Massive, Sharadar, R293/R295 caller/reader, shared helper or registry is edited.
+
+### 296.4 Validation, selected pins and exact one-use decision
+
+Root final focused validation: **355 distinct passes in 3.01 s** (269 new
+Keychain/connection tests plus 86 lane-record/active-document checks), no
+failures/skips/warnings. Three new source/test files compile in memory without
+bytecode. Root independently checked all nine dependency hashes and the final
+profile; `git diff --check` passes. This is not a complete lane/repository suite
+or provider-side validation.
+
+Author's final 269 passes in 2.21 s overlap the root selection. Earlier 217
+passes, the root's earlier 303 passes and prior author subsets are not additive.
+Retain the initial author 179-pass/one chronology-fixture failure, corrected
+by canonical microseconds, and the first logger-batch 110-pass/159-fixture-
+failure run: pytest installed capture handlers around calls; tests now supply
+a dedicated synthetic root-logging facade while testing real request-logger
+fixtures. No operational logging guard was weakened. Two author memory-only
+omissions caught one expected failure each (actual-exit gate, 0.20 s; selected
+loader pin, 0.03 s), restored in `finally`; these are not passing test counts.
+
+All pytest/mutation/import/compilation processes used native `sandbox-exec`
+network denial, `-B`, disabled plugin autoload, `--noconftest`, no cache provider,
+and in-root temp/cache support. Root support is
+`.pytest_cache/r296-root-me9v0U`; author support uses `.pytest_cache/r296-keychain-*`.
+Processes assert `assistant.dispatch_fence` absent. SSLKEYLOGFILE is removed
+only from synthetic test environments; the operational process must retain
+and refuse its actual presence. No provider/key/private operational leaf was
+read during these tests. Native denial is not measured provider-contact
+accounting. The isolated real HTTPAdapter/fake-pool test verifies no redirect,
+preload or decode, not actual TLS/provider behavior.
+
+| Selected new file | SHA-256 |
+| --- | --- |
+| `scripts/arv2_keychain_connections.py` | `bd9c0863c484810b8cf7a02e46551ed63f99ecec7bb4f322b91270fad7a28227` |
+| `scripts/run_arv2_keychain_connection_check.py` | `399d898d05f8696d4e5a1e6df25053d2449f96646fd870bf4dd2d75cd748af80` |
+| `tests/analyst_revisions_v2/test_keychain_connections.py` | `3f3701e881291fafea4ad498d58aba4948695c10c352bb23d356d01a9f8ecb43` |
+
+Canonical `arv2-keychain-provider-connection-check-v1` profile SHA-256:
+`265339f5223887ed2f86f490a0d48692251b433fbcded8c2565b8de427740d0a`.
+Nine selected pins are the seven unchanged section-293 dependencies, unchanged
+R293 helper source `137743f30acd78aafb768114446f2b20cecec0bbac12fdc995233accf2911860`,
+and the new Keychain loader above. The old helper is used for pure canonical,
+metadata, alarm and safe path operations, never its spent parent/worker/reader.
+This is selected-source binding, not whole-interpreter integrity.
+
+**ARV2OD296-D1:** commit this complete prospective record with the exact source
+and tests above. Use that resulting exact clean commit as `--expected-head`;
+record its actual value with results. Verify root/branch/HEAD/status and live
+matching remote again immediately before use. Permit exactly one invocation
+of the designated Python with `-B -m scripts.run_arv2_keychain_connection_check`,
+`--expected-head` and `--caller-sha256` bound above. Use only in-root support,
+discard raw stderr, and do not unset SSLKEYLOGFILE or change any logging/access
+setting. Do not preinspect the prospective private directory. Only the caller
+may claim it and retrieve the four keys. Any refusal/ambiguity consumes this
+exact decision; no unchanged retry follows.
+
+Observe the real process exit independently. The normal parent envelope is
+strict canonical JSON plus a second LF, with exactly `terminal`,
+`profile_sha256`, `report_sha256`, `report_bytes`, `send_attempt_count`, and
+`provider_request_count`. Require the exact profile, valid hash, integer byte
+count 1..16,384, integer acknowledged-intent count 0..7 and null provider count.
+Unknown/missing/extra/malformed/trailing output cannot authorize a result read
+or success. A bounded normal exit-2 envelope permits failure authentication,
+not another operational call. External dispatch/poll clocks are observation
+brackets, not precise provider request timestamps or durations.
+
+**ARV2OD296-D2:** only after a valid normal D1 envelope, invoke this same pinned
+module **once** with `--read-output`, the same clean HEAD/caller hash, actual
+external report hash/bytes and actual parent exit (0 or 2). Require native
+`sandbox-exec -p '(version 1)(allow default)(deny network*)'`, designated Python,
+in-root support and the reader's 30-second alarm. No other private output,
+capture or old diagnostic may be read by this operation. Authenticate the
+finite summary against the parent's externally observed result and retain
+all false flags. Both modes are then spent and frozen.
+
+Continue from the authenticated endpoint evidence with a separately justified
+data contract and exact pre-contact freeze; do not treat a connection sample
+as an accepted acquisition. In particular, static code review confirms the
+old preliminary/order scorer consumes rating changes only: earnings/guidance
+are mandatory in its frozen three-role **capture contract**, not economic
+inputs of that exploratory score. A separately versioned rating-only Massive
+successor may preserve its existing Benzinga event/firm IDs, normalization and
+conservative-censoring semantics if the actual ratings connection and later
+complete source authentication pass. Never synthesize missing roles, mutate
+old role constants, fabricate FMP/Benzinga identities or relabel September
+inputs as October. Formal PIT and source-admission flags stay false.

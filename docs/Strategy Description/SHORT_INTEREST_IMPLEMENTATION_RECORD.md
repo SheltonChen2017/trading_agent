@@ -17836,3 +17836,32 @@ deriving the private exact target protocol on a clean HEAD, then separately
 pin and commit that hash before any anonymous GET. Offline bridge execution
 also requires a clean prospective commit. Targeted15-file in-memory compilation,
 diff and actual-remote checks precede this local commit; no interim push.
+
+### 115.7 Actual offline native/class application and exact original freeze
+
+Prospective clean code/record **`c790bd3d1cbb15121b27219220a2d4db7d1cceb4`**
+preceded actual offline bridge application. Start
+**2026-10-13T22:43:47.716519Z**, completion **2026-10-13T22:43:54.493180Z**;
+exclusive protected output is the fixed115.6 destination. Runtime protocol
+**`652f9c7e6b6d32f1901a3bb5c38c96c8ca19898d34167424a9d3314d2b2b91fa`**,
+code identity **`2067b9e2cd534818a1bd69ef5f160d1f1945d05f81d2a34ee29f8f1b0d72dab1`**.
+Private payload SHA **`c7b78a72214f33cfb098ccba4ef18a4e207e1e1e3454a585b93010a07ef0743e`**;
+file SHA **`c66332cb0a6cb631f72a7593903adc0e2ce6ee09f49f86b3d5ec3af09328f829`**.
+Main independently rebuilt the sealed report byte-for-byte from original
+master/class inputs, empty environment/network denied. No source, claim or
+prior output altered; **0 provider requests, 0 credential reads, 0 outcome
+looks, 0 QC attempts**. Every actual relation/denominator disposition remains
+private, not a full-population/history/cashflow admission claim.
+
+On that same clean checkpoint, main rebuilt the original-disclosure source
+custody chain and derived the exact private target protocol. The committed
+selection yields an allowance of **one anonymous original GET**, within the
+two-case ceiling; missing case information stays private, no fabricated
+target. **SI-DEC-20261013-10** prospectively pins protocol
+**`9ca6368824557c81610e1017f45dbc47dee8fd626cc7582b10b7caca5ee9f84c`**
+before that request. Its exact observed URL/source row and request headers
+remain in the deterministic private protocol, not raw Git rows. There was no
+credential or original-source request during derivation. Commit this hash
+and record locally, require clean HEAD/unchanged actual matching remote,
+then execute once with no secret environment, retry, extra link or fallback.
+Actual success/refusal and factual backtest boundary will be recorded below.

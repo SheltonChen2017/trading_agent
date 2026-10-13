@@ -18248,3 +18248,130 @@ denied, zero skip/warning; changed prior receipt/budget and absent-variable
 directions refuse before credentials or requests. Both original run outputs
 remain untouched. Commit exact code/test/record locally, recheck clean lane/
 actual matching remote, then execute once and continue toward readiness.
+
+### 116.7 Actual retained page limit and prospective cursor continuation
+
+The explicit named-environment run from clean **`69ad639b8fde268e2272db214e2120a6d8af4b8b`**
+started **2026-10-13T23:38:20.797117Z** in protected ignored
+`artifacts/short_interest/native_population/native-population-20261013T233820Z`.
+It retained exactly **32 starts,32 response receipts,32 raw pages**, then refused
+with `whole_population_page_budget_exhausted`. The last response still advertised
+a next cursor. No complete-population report, outcome look, QC attempt or
+backtest result exists. The original32-request claim stays spent, never reset.
+Exact100-file inventory (sorted `{name,sha256,bytes}` entries) SHA
+**`f666b32dccf9eb913fa8d371e4ccb75fbcbbae289323a13aecf29ddb0078abb8`**;
+consumed claim byte SHA
+**`6a3b9281127c1a2dc3e0478077f758211e59aedfe22c1534fd69390b259bd673`**;
+last cursor URL byte SHA
+**`0f406a3ef8f6c2a6ecb91f51d5bf8169414ba75a73609892f165dc78fb20b361`**.
+The private URL itself and all source rows remain out of this record.
+
+**SI-DEC-20261013-18** exercises the continuous-build delegation for a new,
+explicitly bounded continuation, not a retry or old-budget expansion: at most
+**64 additional GETs,96 cumulative**, zero retries, exact retained next cursor
+first, unchanged endpoint/range/sort/page-size ceiling. Independently replay
+all32 original request/response/raw/chronology edges, original code identity,
+budget claim and terminal page-budget refusal before reading the same named
+credential. An exclusive lineage claim keyed to the parent/cursor prevents a
+different timestamp, HEAD or policy from obtaining another64 calls. Preserve
+the old files unchanged; combined inventory references their original origins
+without relabelling them as new requests. A failed/expired cursor or exhausted
+continuation is not complete coverage. Freeze and validate the new protocol
+before executing it; no predicted source success or final publication here.
+
+Main's separate read-only offline replay rebuilt both116.6 reports from their
+original retained sources and matched their exact report bytes, not just the
+completion hashes. It made **0 new provider requests,0 credential reads,0
+outcome looks,0 QC attempts**. The initial network-denied replay could not run
+the required matching-ref remote guard, so it stopped before source reads;
+the successful replay allowed only the existing runtime's Git guard network
+path and performed no source transport. This is a diagnostic preflight refusal,
+not a failed backtest or suite result.
+
+**SI-DEC-20261013-19** builds a distinct compact full-population class-request
+matrix rather than widening the frozen30-response pilot or duplicating every
+raw page into every cell. Preserve all raw source origins and malformed,
+duplicate and ambiguous rows as visible pre-entry refusals. No class count,
+FIGI/native relation, historical availability, ranking or outcome is invented
+from matrix generation. Actual class requests require a separate exact
+matrix-bound prospective budget.
+
+**SI-DEC-20261013-20** qualifies a public nominal-calendar alternative for the
+separate latest-revised study: three retained NYSE annual trading-calendar
+PDFs for2022/2023/2024 plus the official paired2025/2026 Short Interest calendar.
+Exactly4 fixed PDF GETs, no credential, retry, redirect or market-data row.
+Visually verify the colored annual release markings and source/render digests;
+text extraction alone is insufficient. Old release-only grids must label any
+unique chronological pairing with the captured settlement inventory as an
+inference, never an authenticated FINRA pair or actual availability clock.
+The frozen economic protocol's hypothetical calendar timing remains unchanged;
+this route cannot manufacture original vintages or strict-PIT authority.
+Source capture alone leaves visual/calendar qualification pending. Preserve
+missing/unpaired entries rather than silently leapfrogging them.
+
+### 116.8 Connected pre-request corrections and refined calendar freeze
+
+**SI-DEC-20261013-21** refines the still-unconsumed calendar proposal116.7:
+add the fixed official2025 annual grid to bridge the **December2024 settlement
+to January2025 nominal release**. The paired2025/2026 PDF begins with January2025
+settlements and cannot supply that earlier boundary. New exact budget **5 PDF
+GETs**, zero retries/credentials/market rows; the four-document proposal was
+never executed or consumed. Use the2025 annual grid only for the cross-year
+bridge and compare its overlapping release markings with explicit paired
+dates; retain conflicts, never silently choose an agreeable date. Protected
+sources and separately checked visual/render digests remain necessary.
+
+| ID | Priority / status | Independently tested draft finding, correction and effect |
+|---|---|---|
+| SI-BUILD-20261013-006 | P1 confirmed, corrected before application | Draft parent replay object retained an identity token but did not bind mutable metadata/cursor/refusal clock. Reflection could alter the first Bearer destination. Three persistent fabricated reds failed0.69s; init-false anchored factory, exact32-page metadata chain and fixed first-cursor hash/HTTPS-path checks now refuse before request or credential forwarding. No actual continuation key/request preceded correction. |
+| SI-BUILD-20261013-007 | P2 confirmed, corrected before application | Draft continuation read the named variable before its exclusive claim/start receipts, so a repeated spent claim read a credential and an unavailable credential left no owned0-HTTP refusal. Two persistent fabricated reds failed0.42s; exclusive claim/protocol/code/start publication now precedes credential access inside the refusal scope. Duplicate claim reads no key; missing key retains a protected0-HTTP refusal. |
+| SI-BUILD-20261013-008 | P2 confirmed, corrected before application | The four-document calendar proposal omitted December2024's next-year release. Persistent fabricated regression1 failed/24 deselected0.39s. The fifth official2025 annual grid closes that nominal pairing boundary only when its actual visual transcript is supplied and overlapping releases agree; conflicts remain refusals. No actual calendar acquisition preceded correction. |
+
+Prospective continuation protocol
+**`dca838952e3d991b1e98cfb334383c57dda2fcda1cc74eabc1db303de83545c1`**;
+single parent/cursor lineage claim
+**`0dc6a6bc0ddb46ddf5d184cb3cffb05b9dfd49d4ee305219302169e206e846c4`**.
+The completed protected loader replays old/new inventories, historical code,
+spent claims, all request/response/raw clocks, final cursor termination and
+exact private report bytes before yielding one source page at a time. It does
+not accept a caller's completion/admission boolean or copy/relabel the parent.
+Later matrix generation keeps compact16-byte query/24-byte refusal records,
+with symbols/date tables and original page/row hashes; all values remain
+private. Only `array`, `struct`, `sys` are added to the existing lane's stdlib
+import boundary; no network/provider/outcome or execution import is added.
+
+Main's matrix/lane-boundary/ML-boundary/active-document focused selector passes
+**126 in7.87s**, isolated empty inherited environment with network denied.
+Implementation agent's released continuation/matrix/original-transport/boundary
+selector passes **140 in1.11s**; these are attributed implementation tests,
+not independent Claude review or market validation. Matrix duplicate-admission
+and incomplete-chain memory mutants separately redden5 cases0.24s and1 case
+0.03s. Full connected post-freeze focused validation and exact code identities
+will be recorded before the local prospective commit and actual source use.
+No whole lane/repository suite, source row publication, outcome look, QC
+operation or interim push has occurred.
+
+Main's final connected prospective selector passes **427 in9.32s**:
+14 relevant focused source/transport/Keychain/evidence/calendar/boundary/document
+test files, CPython3.13.15/pytest9.1.1, empty inherited environment and network
+denied, zero skips/warnings. This is not a complete lane/repository suite.
+All **9 changed Python files compile in memory**. Five-source pure-calendar
+policy **`817e939b80ee3d6a43eb61f5c56e4027487d325ba344977f5e361b3df42e5b5e`**;
+capture protocol **`2008466397d0eb1e49fdb72105e2de9459c59d38ca054bd776ccff371255170f`**.
+Calendar agent independently executes48 focused cases0.86s and four separate
+memory-only dangerous-direction reds (source/render binding, overlap conflict,
+fresh publication guard and spent global claim). Its initial missing helper
+argument was fixed during fabricated integration before green; no actual
+source was affected. Actual visual transcripts remain pending, not inferred
+from extracted PDF text or a screenshot command that returned no pixels.
+
+Exact current10-file change allowlist: this lane record, lane import-boundary
+stdlib whitelist, two new pure matrix/calendar modules, two new protected
+source scripts and their four focused test files. Shared documents,
+Session Handoff, frozen pilot/source/economic protocols and the fabricated
+runner remain untouched. Stage/check the full new-file diff, preserve all
+historical ledger/body bytes, recheck clean physical/Git roots, branch, HEAD,
+status and matching actual remote before the local prospective commit.
+Then execute the one retained-cursor continuation and five public calendar
+GETs from that clean freeze. Keep all agents' repository writes held during
+guarded capture; continue implementation afterwards. No push at this freeze.

@@ -1,20 +1,17 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 159 RECORDS CLAUDE'S REVIEW OF THE SIX COMMITS IN
-`34c323a7..618d1813` (SECTIONS 154-158: TWO CODEX COUNTER-REVIEWS, THE WINDOWS
-CLAUDE SESSION'S REVIEW, AND THE ONE-FILE LF CHECKOUT RULE): ALL ACCEPTED, NO
-CODE CHANGE. THE THREE FINDINGS AGAINST THE REVIEWER ARE CORRECT; THE SECTION-153
-MUTANT TALLY IS CORRECTED TO 14 OF 18 CAUGHT WITH FOUR REDUNDANT SURVIVORS.
-THE QC SOURCE IS `i/lf w/lf` WITH ITS FROZEN HASH; THE REAL TRIPWIRE SCAN FINDS
-22 DIRECT TRANSPORT TESTS AND 0 OFFENDERS. SEVEN P2 FINDINGS REMAIN OPEN (FOUR
-TOPICAL, `IBWIN-CR01` FOR THE OWNER'S PLATFORM DECISION, AND TWO SHARED, WITH
-THE TWO SEP-2 GUARDS RED UNTIL INTEGRATION). 19,846 OF 99,394 PARENTS ARE
-REQUEST-BOUND; V3 REMAINS 1,846 OF 1,847; THE FOUR V3 CUSTODY FILES AND
-V1/SCALE/PILOT STAY FROZEN; STRICT D23 RETAINS SEVEN NON-EXACT QUARTERS. NOT
-BACKTEST-READY (152.1, 154.6). CODEX COUNTER-REVIEWS THIS RECORD COMMIT. BOTH
-FINAL ACCESS CLASSIFICATIONS STAND WITHOUT RETROACTIVE APPROVAL. NO NEW
-SEC/PROVIDER/CREDENTIAL/LICENSED-ROW, OUTCOME, QC, BACKTEST, BROKER, CAPITAL,
-ORDER, PAPER/LIVE, DEPLOYMENT OR TRADING AUTHORITY. LOOKS 0/0/0.**
+Status: **SECTION 160 ACCEPTS CLAUDE'S EXACT RECORD-ONLY `85c7755d` PUSH:
+229 FOCUSED CHECKS PASS; SCANNER 0/7 TO 7/7, 10/10 CONTROLS, 22 REAL TRANSPORT
+TESTS AND 0 OFFENDERS REPRODUCED. THE MONITOR IS PAUSED. THE OWNER'S LATEST
+CONTINUOUS-BUILD AND DELEGATED-DECISION DIRECTION IS ACTIVE; POSIX CUSTODY
+SUPPORT IS CHOSEN, WITH THE SCOPED IMPLEMENTATION/VALIDATION TO BE RECORDED
+NEXT. HISTORICAL MUTANT AND FULL-SUITE COUNTS REMAIN REVIEWER-ATTRIBUTED.
+19,846 OF 99,394 PARENTS ARE REQUEST-BOUND; V3 REMAINS 1,846 OF 1,847;
+THE FOUR CUSTODY FILES AND V1/SCALE/PILOT STAY FROZEN. STRICT D23 RETAINS
+SEVEN NONEXACT QUARTERS. NOT BACKTEST-READY: REAL EARLY EARNINGS, IDENTITY,
+PIT, ORIGINAL-PARENT AND FULL-POPULATION EVIDENCE REMAIN REQUIRED.
+BOTH FINAL ACCESS CLASSIFICATIONS STAND WITHOUT RETROACTIVE APPROVAL.
+LOOKS/JOBS/BACKTESTS 0/0/0. LOCAL CONTINUATION; NO ROUND PUSH YET.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -254,7 +251,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-12 | Codex counter-review | Incoming `6209b3b33d203aad4a3d1d6d449a1c7d2304c8f0..86700b1c2dbbbd8234870444c3bbcf14c6a00aeb`; this separate counter-review record follows | Exact one-commit, record-only Claude review; no implementation source change | Accepted after append-only section156 qualifications of harness evidence, prior Windows documentation and platform census. Scanner and isolated admission mutations reproduce; custody replay not represented as a Windows execution. | Verified parent/child OS network refusal; lane boundary51 passed; event-clock/registered-analysis271 passed and2 reproduced QC-byte-pin failures. Other final focused results in156.4. No full repository suite or successful full Windows lane gate; looks0/0/0. | IBDOC-CCR15501 P3 qualified; IBWIN-CR01 P2 retained OPEN; IBWIN-OBS01 P3 reproduced, not closed by counter-review. Six earlier P2s retained; shared findings not fixed. | Separate lane-only LF checkout correction may proceed independently; no platform port, corpus promotion or input-dependent backtest milestone. Single final publication only after completed permitted scope and checks; monitor remains paused. |
 | 2026-10-12 | Codex next bounded implementation | Counter-review `fbef7a375b094839160e0a02b0bb80ebd63cdef4` -> this milestone; exact commit follows in separate handoff | Byte-stable checkout for the frozen Insider QC stock-study candidate | Exact nested Insider-only LF attribute; four local Git checkout controls; clean frozen source rematerialized without blob change; no platform port. Section157 records full evidence and retained gates. |632 affected passes on pre-final-test-isolation image; final refined four checkout controls4 passed; prior two failing analysis paths pass; rule deletion caught;193 files compileall; final gate results follow. Shared SEP-2 pair2 failed14.25s, retained. No full repository suite or successful full Windows lane gate; looks0/0/0. | IBWIN-OBS01 P3 CLOSED at byte-checkout scope; new test global-attribute isolation tightened after peer QA. Seven P2s retained; no custody thaw or Windows-lock acceptance. | One combined publication after separate exact-hash handoff and final checks. Actual historical earnings/identity/PIT inputs and supported-host custody replay still required for dependent work. |
 | 2026-10-13 | Claude review (macOS session) | `618d1813` -> this review record (no code change) | Independent review of sections 154-158 (`34c323a7..618d1813`, 6 commits, 0 merges: two Codex counter-reviews, the Windows Claude session's review, the one-file LF checkout rule) | Dispositioned all six commits. Accepted `IBTEST-CCR06`, `IBTEST-CCR07` and `IBDOC-CCR15301` against this reviewer after reproducing them: the `117de00d` scanner flags 0 of 7 refusal controls and the corrected one 7 of 7; 30 + 30 added files; 178 collected cases; six open P2s in 153.7. Corrected the section-153 mutant tally to 14 of 18 caught, four redundant. Verified the LF rule on this checkout (`i/lf w/lf`, frozen hash, sibling unaffected). | Changed tests, new checkout test and gate **229 passed** on Python 3.13.15, network denied (Codex's 3.12 runtime no longer has pytest here). Real scan 22 seen / 0 offenders. No complete suite, by owner instruction; production tree byte-identical to section 153.5's. Record tests after this section **71 passed**. **0 looks**. | `IBWIN-OBS01` P3 closed at checkout scope in `bd848b4e`; `IBSH-OBS02` recorded; `IBWIN-CR01` P2 open for the owner's platform decision; `IB1C-REAL-CR01`, `IB1BCAMP-CR01`, `IBSRC-CR01`, `IBSRC-CCR01`, `IBSH-CR02`, `IBQC-SHARED-META01` P2 open. No open P0 or P1. | Codex counter-reviews this record commit. Next data-dependent work per 152.1/154.6; the platform decision is the owner's. The lane is not backtest-ready. No outcome, QC, paper, or trading step is inferred. |
-
+| 2026-10-13 | Codex counter-review | `618d1813bc762bc1e45e1c65c90933d7d32554a9..85c7755deb75b5d0c61cc4a63a385d4b87b55110`; this separate record follows | Exact one-commit Claude record-only review; continuous build resumes after acceptance | Entire incoming diff and six-commit reviewed range verified; frozen source, attribute scope, module counts and ledger agree. Section160 retains historical measurements as attributed and records delegated decisions. | Main229 passed13.83s; internal peer scanner0/7 to7/7,10/10 controls and real22/0; OS parent/child network denial independently proven. No full suite or retained-root replay. | Incoming85c7755d ACCEPTED, no correction needed. Platform support chosen under delegated judgment; its implementation follows. Six other P2s retained, no openP0/P1. | Continue bounded lane work and qualify real early earnings/identity evidence; one eventual final push, no checkpoint push. Monitor PAUSED. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -22792,3 +22789,89 @@ row, security master, outcome, ETF holding, QuantConnect, broker, operator
 database, scheduler, deployment, capital, order, live, or trading surface was
 used. No retained root or private journal was read this round. Authorized
 outcome looks: **0**. Consumed outcome looks: **0**. Research looks: **0**.
+
+## 160. Exact Claude counter-review and continuous-build decisions (2026-10-13 UTC)
+
+The rearmed heartbeat fetched only the matching lane and verified the exact
+designated root, branch, clean HEAD and remote at
+`85c7755deb75b5d0c61cc4a63a385d4b87b55110`. The complete incoming range is
+`618d1813bc762bc1e45e1c65c90933d7d32554a9..85c7755deb75b5d0c61cc4a63a385d4b87b55110`,
+one documentation-only commit and zero merges. Its contents identify the
+completed independent review of the actual outgoing snapshot, including all
+six commits in `34c323a7..618d1813`. The monitor was PAUSED before any
+counter-review mutation. No fast-forward or checkout switch was needed.
+Already counter-reviewed `86700b1c` is not reopened as unfinished work.
+
+### 160.1 Complete incoming disposition and independent validation
+
+| Commit | Disposition | Evidence and limits |
+|---|---|---|
+| `85c7755deb75b5d0c61cc4a63a385d4b87b55110` | **ACCEPTED; no issue found requiring a correction.** | Complete record diff reviewed. Exact six-commit range/five cumulative paths, 30 added research/30 test files, 96 tracked lane tests, LF rule/sibling scope, seven starting P2s and both incident dispositions agree. Research bytes equal `117de00d` except the attribute file; all four custody blobs equal exact `aa0d635d`. Main independently ran the exact229-case focused selection; internal peer independently reproduced scanner controls and real22/0 scan. |
+
+Frozen stock-study source remains29,702 bytes, SHA-256
+`c80ff4f585d59d1b8e4ecd0d6199605fee727de9df0a13b74e987fe4d2819f87`,
+Git blob `04fbdf173d041b10b6e94ed0fcaf809275e4f0c0`, `i/lf w/lf`.
+The14/18 final mutant tally is consistent with the four named redundant
+survivors; source inspection supports R01/R02's explanation. The original
+18-mutant experiment and full-suite counts remain Claude-attributed, not a
+new mutant run or retained-root replay.
+
+Main's final selection passed **229 in13.83s**, zero failures/skips/warnings:
+lane boundary, QC checkout, v4 capture, active documents, lane record,
+ML/overlay boundaries, module hygiene, Decimal guard and exact
+`tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports`.
+Internal read-only peer: historical scanner detects0/7 refusal controls,
+corrected scanner7/7; all three legitimate controls pass both, corrected
+10/10 pass; real96-file scan22 direct-transport tests/0 offenders. These
+overlapping selections are not summed into a purported suite total.
+
+Tests used Python3.13.15/pytest9.1.1, minimal environment, disabled plugin
+autoload/cache, `-B`, isolated database/temp paths and inherited OS
+process-tree network denial. Main measured parent and child loopback refusal
+with EPERM. The initial selection named a nonexistent
+`test_research_module_hygiene.py`: pytest returned exit4 and **no tests ran**.
+The corrected selection uses `test_module_hygiene.py`; the earlier command
+is neither a passing run nor a lane defect. No full lane/repository suite,
+raw-parent replay, provider API request or QC launch occurred during
+counter-review. Looks/jobs/backtests **0/0/0**.
+
+### 160.2 Owner direction and delegated decisions
+
+The owner explicitly rearmed this monitor to counter-review Claude and then
+continue building until lane completion. That direction retains the earlier
+continuous-round/no-routine-approval waiver and single-final-push instruction.
+The accepted counter-review is complete before subsequent implementation.
+New implementation remains self/peer-validated until independently reviewed;
+continued work cannot manufacture factual readiness or reviewed status.
+
+| Decision | Reason, scope and authorization provenance |
+|---|---|
+| IBDEC-160-01 | Accept the exact incoming record after independent checks. Prior resolved findings need no production correction. |
+| IBDEC-160-02 | Under the owner's existing delegated judgment, declare acquisition/custody/replay supported on the validated macOS host with its POSIX primitives and defer a Windows custody port. Preserve frozen source identities and the separately cross-platform QC checkout contract. Linux/Windows custody execution is not newly validated. Scoped test treatment follows. |
+| IBDEC-160-03 | Investigate real early actual-release and identity evidence under the earlier credentials/inbox direction. Inspect only bounded conventional account/configuration names and relevant supplier mail; no secret output or supplier message. Absence does not prove no account exists elsewhere. |
+| IBDEC-160-04 | Exhaust the publicly documented EODHD demo with one separately preregistered reportDate-field feasibility probe before purchase or an archive claim. Fixed AAPL.US fiscal key2005-12-31, reportDate only; one request, public demo token, no retry/resume/redirect or EPS/price/outcome field. A null/refusal stays refused; a date field alone grants no complete coverage, historical availability, rights or QC authority. Exact profile, clean source commit and observed outcome follow before any success claim. |
+
+### 160.3 Retained P0-P3 ledger and exclusions
+
+| ID | Priority | Status and exact disposition |
+|---|---|---|
+| IBTEST-CCR06, IBTEST-CCR07, IBDOC-CCR15301, IBDOC-CCR15501, IBWIN-OBS01 | As recorded | **RETAINED CLOSED** at earlier scopes; scanner independently reproduced, exact LF identity retained. |
+| IBWIN-CR01 | P2 | **Support decision made; scoped collection implementation/validation pending below.** No Windows port or actual Windows run claimed. |
+| IB1C-REAL-CR01, IB1BCAMP-CR01, IBSRC-CR01, IBSRC-CCR01 | P2 | **OPEN, retained**; real source/affected-quarter/identity/PIT/full-population facts remain missing. |
+| IBSH-CR02, IBQC-SHARED-META01 | P2, shared/out of lane | **OPEN, retained**; no shared manifest/client behavior changed. |
+| IBSH-OBS02; earlier findings/observations and45 unclassified section-119 survivors | As recorded | **RETAINED**, no invented closure or mutation classification. |
+| IBREV-CR01 | P1, process | **RETAINED CLOSED by owner disposition**; both final historical access classifications stay distinct, with no retroactive approval or invented measured totals. |
+| IBSH-CR01 | P3, shared/out of lane | **OPEN, nonblocking, retained** for main integration. |
+| IBDOC-160-R01 | P3 | **CLOSED before commit**; the first draft inserted a blank before its session-ledger row, producing1 failed/71 passed. Removing that blank restores the required contiguous Markdown table; the corrected record checks follow below. No historical row or test is changed. |
+
+No openP0/P1. The platform support choice will be dispositioned with its
+implementation evidence; the six other P2s remain open. Custody remains
+19,846/99,394 with79,548 originally unattempted; stoppedv3 remains1,846/1,847.
+StrictD23 retains seven nonexact quarters/no82-quarter promotion digest.
+No shared/project-wide document or root handoff changes. This local record
+is followed by bounded work and a separate exact-hash handoff; no checkpoint
+push is made.
+
+Completed160 active-document/record/exact-package checks pass **72 in1.11s**
+after the contiguous-table correction. The recorded result is repeated before
+the documentation commit; current diff checks are clean.

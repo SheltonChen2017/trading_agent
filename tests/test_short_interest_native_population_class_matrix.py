@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import copy
 import json
+import struct
 
 import pytest
 
@@ -220,3 +221,58 @@ def test_exact_96_cumulative_page_ceiling_and_factory_only_types():
     for cls in (matrix.CapturedNativePopulationPage, matrix.NativePopulationManifest, matrix.NativePopulationClassMatrix):
         with pytest.raises(matrix.NativePopulationMatrixError, match="factory"):
             cls()
+
+
+def test_fixed_protected_parts_rebuild_without_original_source_pages():
+    original = assemble({1: [row(), row("SECOND")], 33: [row(quantity=True), row("THIRD")]})
+    h, q, r = original.parts()
+    rebuilt = matrix.rebuild_native_population_class_matrix(h, q, r, original.sha256)
+    assert type(rebuilt) is matrix.NativePopulationClassMatrix
+    assert rebuilt.parts() == original.parts() and rebuilt.sha256 == original.sha256
+    assert list(rebuilt.iter_queries()) == list(original.iter_queries())
+    assert list(rebuilt.iter_refusals()) == list(original.iter_refusals())
+
+
+@pytest.mark.parametrize("change", ["authority", "count", "bool_count", "query_duplicate", "query_origin_duplicate",
+                                   "query_origin_gap", "refusal_collision", "refusal_code", "table", "date", "page"])
+def test_coherently_rehashed_parts_with_dangerous_structure_still_refused(change):
+    original = assemble({1: [row("AAA"), row("BBB"), row("DDD", quantity=True)]})
+    h, q, r = original.parts()
+    header = json.loads(h)
+    query_records = list(matrix._QUERY.iter_unpack(q))
+    refusal_records = list(matrix._REFUSAL.iter_unpack(r))
+    if change == "authority":
+        header["authority"]["source_admitted"] = True
+    elif change == "count":
+        header["source_row_count"] += 1
+    elif change == "bool_count":
+        header["query_count"] = True
+    elif change == "query_duplicate":
+        query_records[1] = (*query_records[0][:2], *query_records[1][2:])
+    elif change == "query_origin_duplicate":
+        query_records[1] = (*query_records[1][:2], *query_records[0][2:])
+    elif change == "query_origin_gap":
+        query_records[1] = (*query_records[1][:3], 99)
+    elif change == "refusal_collision":
+        refusal_records[0] = (*query_records[0][:2], *refusal_records[0][2:])
+    elif change == "refusal_code":
+        refusal_records[0] = (*refusal_records[0][:4], 7, 0)
+    elif change == "table":
+        header["symbols"] = ["BBB", "AAA", "DDD"]
+    elif change == "date":
+        header["settlements"] = ["2030-01-01"]
+    else:
+        header["page_origins"][0]["ordinal"] = 2
+    q = b"".join(matrix._QUERY.pack(*record) for record in query_records)
+    r = b"".join(matrix._REFUSAL.pack(*record) for record in refusal_records)
+    header["queries_sha256"], header["refusals_sha256"] = hash_bytes(q), hash_bytes(r)
+    h = canonical_json(header).encode()
+    with pytest.raises(matrix.NativePopulationMatrixError):
+        matrix.rebuild_native_population_class_matrix(h, q, r, matrix._matrix_digest(h, q, r))
+
+
+def test_parts_require_literal_expected_pin_and_preserve_no_raw_chain_revalidation_claim():
+    original = assemble({1: [row()]})
+    with pytest.raises(matrix.NativePopulationMatrixError, match="digest_changed"):
+        matrix.rebuild_native_population_class_matrix(*original.parts(), "0"*64)
+    assert matrix.rebuild_native_population_class_matrix(*original.parts(), original.sha256).sha256 == original.sha256

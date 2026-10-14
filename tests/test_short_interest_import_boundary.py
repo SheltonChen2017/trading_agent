@@ -134,6 +134,7 @@ def test_lane_package_has_no_provider_outcome_or_authority_imports():
         "array",
         "base64",
         "bisect",
+        "calendar",
         "collections",
         "copy",
         "csv",

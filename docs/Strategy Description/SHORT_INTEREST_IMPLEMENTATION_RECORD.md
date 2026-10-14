@@ -3,8 +3,9 @@
 Status: **OWNER-WAIVED CONTINUOUS BUILD TOWARD ACTUAL BACKTEST READINESS
 IS ACTIVE FROM PUSHED `1f90c626` (SECTION 116). DO NOT WAIT FOR CLAUDE'S
 NEXT REVIEW; THIS DOES NOT CLAIM INDEPENDENT ACCEPTANCE OF NEW CODE.
-NAMED LOGIN-KEYCHAIN ITEMS SUPERSEDE LEGACY CREDENTIAL FILE POINTERS FOR
-NEW REQUESTS. EXISTING PROTECTED CAPTURES/SPENT BUDGETS ARE RETAINED.
+NAMED LOGIN-KEYCHAIN SELECTORS ARE RECORDED; ONLY EXPLICITLY DOCUMENTED
+EXISTING CREDENTIAL ROUTES ARE USED (116.6/116.10). EXISTING PROTECTED
+CAPTURES/SPENT BUDGETS ARE RETAINED.
 STRICT ORIGINAL-VINTAGE PIT AND LATEST-REVISED EXPLORATION STAY DISTINCT;
 NO FIXTURE RELABEL, FABRICATED SOURCE FACT OR CHANGED 48-BOOK ECONOMICS.
 LOOKBACKS 20/60/120/252 UNSELECTED; CANONICAL ACTUAL LOOKS0/0,
@@ -18375,3 +18376,236 @@ status and matching actual remote before the local prospective commit.
 Then execute the one retained-cursor continuation and five public calendar
 GETs from that clean freeze. Keep all agents' repository writes held during
 guarded capture; continue implementation afterwards. No push at this freeze.
+
+### 116.9 Completed full page chain, compact source inventory and nominal dates
+
+Clean prospective **`11d6b300b6737ead079a3a0532b5bfdd693600c5`** preceded
+the continuation, calendar capture and offline applications. Actual matching
+remote remains **`1f90c626328a236c51e78f57e0fe301e0412aabf`**; no push yet.
+The continuation started **2026-10-14T00:00:48.799423Z**, completed
+**2026-10-14T00:02:41.126186Z**, and used **14 new GETs,46 cumulative**.
+Its final raw page terminates the advertised cursor chain. The original32
+calls remain spent; unused50 continuation slots cannot be repurposed or
+restarted. Protected run:
+`artifacts/short_interest/native_population_continuation/native-population-continuation-20261014T000048Z`.
+Private inventory payload SHA
+**`9ab92d072078fc35113f44e96850703558f9709cbf9717301dea8cfc0d98af6e`**;
+report bytes **`3b03b5dd3c4526f63b4c8f158e3c779408196c6ea5aec2689721aafd48685416`**;
+spent claim bytes **`a7e5bf8d6d24da777df373f8da2d7f736d98022ce8b53185c726944642dc49cb`**;
+child inventory **`79560955f5d67927dd9a60803f6ba7fd707ce1e615dcbb45873104392f7bd4e7`**.
+This establishes the captured provider-covered page chain, not universal
+listed-market coverage, original vintages, class identity or fitness.
+
+Main independently replayed the exact old/new code, budgets, request/response
+and raw-page lineage through the protected loader, then applied the frozen
+compact matrix factory. Private six-file artifact:
+`artifacts/short_interest/native_class_matrix/native-matrix-source-20261014T000048Z`.
+Started **2026-10-14T00:07:41.209664Z**, completed
+**2026-10-14T00:08:24.753782Z**. Matrix SHA
+**`e570c5b658668f0f9ab087dabbd968d4460294287eba1406ae203882144bc49e`**;
+header bytes **`149d6a72cf44232f92819041a819c46c35bb69170583c8627e72ed310005ce5e`**;
+query bytes **`48aed606d7e768042fa548c0e9de68421de82b15bb2c03f421062b08453792e0`**;
+refusal bytes **`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`**.
+All source cells/origins remain private. This application adds0 provider
+requests/credential reads/outcome looks/QC attempts. A proposed query matrix
+is not authority to perform millions of requests; the next source plan must
+freeze a scalable documented route and exact matching/budget first.
+
+The **five** public PDF GETs completed
+**2026-10-13T23:59:02.512667Z** under the116.8 protocol, protected capture
+`artifacts/short_interest/nominal_publication_calendar/nominal-calendar-20261013T235837Z`,
+inventory payload SHA **`84f1b13e5fcd3bd3465cf2cc4c79733e234f3fc80c1e6d944cf11fb459feabc4`**.
+Main rendered and viewed all six original pages with readable date/legend
+positions. Protected visual transcript completed
+**2026-10-14T00:06:37.482103Z**, payload SHA
+**`48c041259c38330d0fa96201d05c279d30c997c4b8e44cf76c454d83d57203af`**.
+The earlier screenshot calls returned no pixels and are not visual evidence.
+Fontconfig configuration warnings occurred; the rendered dates/legends were
+readable. Retain the printed future weekday/date discrepancy outside the
+evaluation rather than repairing it silently.
+
+Main checked the exact19-file original capture, spent five-request claim,
+code identity, every PDF byte/receipt/clock, visual transcript seal and six
+render byte pins. Separate offline qualification against the captured
+settlement inventory completed **2026-10-14T00:21:56.465332Z** at
+`artifacts/short_interest/nominal_calendar_qualification/qualified-source-20261013T235837Z`,
+report bytes **`64d8c8ded00aee399e2b84860f10942099407d1697911670df61a33dd954c2b6`**.
+All **112 supplied settlement dates** have a unique nominal pair; one
+unmatched annual marking remains explicitly retained. Old annual-grid
+associations remain chronological inferences, while the later paired table
+remains an official NYSE nominal schedule—not authenticated FINRA dissemination
+instants. The December2024 bridge and overlapping2025 dates agree. The last
+settlement's September nominal publication is metadata only, not permission
+to read protected September prices/outcomes. Final executable evaluation
+release must exit without a new entry and without needing a protected successor.
+
+**SI-DEC-20261013-22** continues from these completed source-only stages to
+historical class/denominator/price/cashflow preparation under the owner waiver.
+Existing reference selection permits a genuinely same-class previously
+reported observation, with its original dates/basis, rather than requiring a
+fabricated settlement-day quantity. Any more efficient source sampling is a
+new prospective source decision, not silent alteration of the old matrix or
+an assumption that issuer/primary shares belong to a secondary class. Source
+use/coverage and processing facts remain independent. No S1/outcome join,
+performance, permanent look or QC operation has occurred: canonical0/0,
+exploratory0,alpha0,QC0. Continue this round; this is not its final handoff.
+
+### 116.10 Prospective scalable source decisions, separate temporal meanings
+
+**SI-DEC-20261013-23** chooses a separately versioned **latest-reported
+denominator source cadence**, before any new class-count request or S1/outcome
+computation: first captured settlement in each quarter; first-seen class
+within a quarter when absent at its initial anchor; and first settlement at/
+after a source-bound split or class-ID transition. The concrete selected-cell
+plan must bind completed dated identity and retained action evidence, not
+caller-invented events. Select only an unambiguous prior same-class anchor
+at/before settlement and at most95 calendar days old, with a refreshed split
+basis or a named refusal. Preserve query-as-of date and actual receipt UTC
+separately; do not fabricate filing/public availability. No interpolation or
+settlement-day count claim. These sampled revised references are **not asserted
+equal to querying every settlement**, and potentially stale counts can affect
+S1. Register this source cadence in the new evidence epoch and disclose that
+limitation before evaluation. The S1 arithmetic, normalization, lookbacks,
+release-next-open and48-book cash rules do not change. The old exact-date
+native assembly and public fixture runner are not weakened or repurposed.
+Market cap remains a separate exact last-completed-session input, not a
+quarterly value relabelled as daily.
+
+**SI-DEC-20261013-24** separates full dated identity from counts. Freeze the
+[documented Massive All Tickers route](https://massive.com/docs/rest/stocks/tickers/all-tickers)
+for all112 captured settlements, **two ordered panels per date**, active=true
+then active=false, market=stocks,type=CS,limit1000,sort=ticker,order=asc.
+No ticker or financial-performance filter; no undocumented locale query.
+Retain literal response locale/type/market/primary exchange, all pages,
+outside-population rows and identifiable malformed/duplicate peers. This
+is a **US-market common-stock candidate classification**, not an issuer-
+domicile assertion or positive exchange-listed qualification without its
+separate declared venue check. Exact query-date composite-to-class-to-native
+relations cannot be fabricated from current metadata, symbol aliasing or a
+FIGI cast. Fixed ceiling64 pages/panel, **14,336 HTTP attempts**,8MiB/page,
+5,000,000 decoded rows and4GiB cumulative raw bytes; zero retries. Only the
+observed fixed-origin/path cursor chain is followed. Any exhausted/failed
+panel retains its receipts and is incomplete. Unused budget cannot be reset
+or repurposed. Preserve the existing named Massive authentication alternative
+116.6, with a new exclusive protocol claim/start before credential access.
+No source request has yet occurred under this new proposed protocol.
+
+**SI-DEC-20261013-25** chooses the already owner-supplied, previously verified
+protected **`/Users/sheltonchen/.config/trading-agent/sharadar.env`** for the
+next direct-Sharadar bounded route, explicitly superseding116.2's self-imposed
+Keychain-only choice for this one source stage. This is a deliberate known
+credential-route decision under standing delegation, **not a silent fallback,
+new secret, broad search or OS-security bypass**. Updated Keychain locations
+remain recorded. The existing protected reader must enforce exact path,
+owner0700/0600, regular no-link file, field/format and supported-host guards;
+missing/unusable access refuses with no guessed substitute. Secret stays
+memory-only inside the redacted echo-refusing wrapper and fixed HTTPS header.
+
+Prospectively slice the [documented stock-price](https://sharadar.com/docs/stocks)
+and [daily fundamental](https://sharadar.com/docs/daily) REST tables from
+**2022-01-03 through2026-08-31**,56 calendar-month slices,112 table-month
+panels. No full price ZIP containing protected later dates, ticker filter or
+current-active/survivor screen. Exact declared field sets, format=json,
+limit10000,offset0 then increments10000 only after a full prior page,
+sort=date.asc;64 pages/panel, **7,168 maximum HTTP attempts**,8MiB/page,
+**32,000,000 decoded rows** and8GiB cumulative raw bytes, zero retries.
+The earlier unconsumed10-million-row design proposal was refined before
+freeze to accommodate both complete supplied tables; no spent budget reset.
+Retain every raw page, row origin, malformed/duplicate peer and failure;
+reject out-of-slice and post-August dates before financial validation.
+Exact lexical rationals preserve unadjusted OHLC and rational volume; daily
+market-cap units remain source-bound. No source/timing/class admission from
+successful transport alone. Freeze and validate code/protocol hashes locally
+before either new route is executed. No price/return join or look occurs in
+source-only capture.
+
+Public-definition erratum: the Sharadar `sharesbas` definition describes
+cover-reported outstanding ownership units, split-adjusted; it does not
+establish that every issuer aggregates every class. Primary-table coverage
+neither proves nor disproves a particular-class quantity. Keep class binding
+unresolved until actual evidence, rather than rejecting a source on the
+unproved blanket aggregation assertion. Weighted EPS shares/sharefactor are
+not an allocation formula for another class. This erratum preserves earlier
+rows and invents no admitted data or provider-fitness conclusion.
+
+### 116.11 Connected native-source freeze and pre-access regressions
+
+The six-file matrix loader binds the exact registered byte pins116.9,
+historical committed matrix module/policy, strict closed counters, clocks and
+packed origin/slot accounting. It does not rerun46 requests or derive raw-chain
+proof from a stored completion flag. Main previously rebuilt that chain;
+the saved artifact is a retained custody anchor, not a new source permit.
+The loader has no credential, provider transport, output or QC path.
+
+The generalized dated-class parser requires source-derived sealed tickets,
+explicit exact-cell versus selected-anchor mode, exact original TICKERS,
+request/raw/UTC binding, and all identifiable malformed identifier peers.
+It preserves particular-class count units, separate native/composite/class
+identifiers and literal dated classification/venue fields. No current-master
+country/category backdating, weighted-count transfer, invented availability,
+effective interval, carry/interpolation rule or actual-run permit. The concrete
+cadence plan23 remains a later source-bound stage, not millions of implicit
+HTTP calls. Private reports retain all missing/conflicting/refused evidence.
+
+Main authenticated the registered matrix header metadata, raw byte pin116.9,
+before calculating exact112-date-list SHA
+**`d6e722d910da972acfd5b91ae6147086e36cb99a522b634657d37f6a2781a7c0`**.
+This read-only metadata check used the protected owner/no-link reader, empty
+environment and network denial after lane/actual-remote checks; it read no
+quantity row or credential and launched no source application while agents
+edited. The actual identity runtime independently checks this digest through
+the clean committed loader before starting its new capture.
+
+Prospective dated-identity policy
+**`6c5e29c1a041b14ebb3474f6d49eabe0e87ed649759cd43f71f7664c5b2fdd7b`**;
+runtime **`2ae2b0e1baeb0f04448bd23aa5f838b89da19d269af5ad7a0e6af4b59cb233ae`**.
+Prospective direct-Sharadar market-input protocol
+**`b95ecfeefdc8b0bd01a7cb9fd1ea7b250e777356a2db8f7a026810899e7582b1`**;
+single immutable source/range/field claim
+**`f72fbde4ecd72650c46ba1455120980868ee2a887420597102801537f57e4f27`**.
+Earlier unconsumed3630 protocol proposal is superseded before any request,
+not a reset. An unexpected protected/out-of-panel/unrecognizable date or
+undecodable envelope refuses **before raw body hashing/publication and
+financial validation**; retain only its fixed start/refusal receipts. The
+exception does not silently drop an in-scope malformed/duplicate financial
+peer, whose original body/origins remain privately retained. Entire trimmed
+dates must be canonical; prefixes alone cannot authorize body retention.
+Both new source runtimes require exclusive claim/protocol/code/start before
+credential access, fixed headers/URLs, no retry and whole-next-page reservation
+against cumulative hard ceilings.
+
+| ID | Priority / status | Evidence, correction and effect |
+|---|---|---|
+| SI-BUILD-20261013-009 | P3 confirmed, corrected before source use | Connected main selector212 passed/1 failed6.53s on new stdlib calendar import. Inspected monthrange-only use; added only calendar to lane stdlib boundary, no provider/outcome import. No valid test weakened or full suite run. |
+| SI-BUILD-20261013-010 | P2 confirmed, corrected before source use | Main audit found identity cumulative bounds checked after a potentially oversized final response. Persistent clean reservation reds2 failed/32 deselected0.38s; entire8MiB/1000-row allowance is now reserved before attempt/start/HTTP, reclaiming only actual successful usage. The preliminary finite-response fixture exhaustion is not presented as the causal reproduction. Oversized individual pages still retain fixed refusal, no false completion. |
+| SI-BUILD-20261013-011 | P2 confirmed, corrected before source use | Calling captured-page post-init after reflected raw replacement could re-anchor changed source evidence. Persistent revalidation red preceded correction; revalidation now checks the retained original anchor and cannot replace it. Earlier page-replacement/receipt-order regressions2 failed0.40s likewise corrected before any source request. |
+| SI-BUILD-20261013-012 | P2 confirmed, corrected before source use | Draft market capture persisted a future/out-of-panel price body before scope validation. Persistent reds5 failed0.34s; date/envelope/media checks now precede raw hashing/publication, with fixed refusal receipts and no unexpected protected body retention. Strict-suffix follow-up reds2 failed0.35s ensure a recognizable prefix is not enough. No actual future source body was received. |
+| SI-BUILD-20261013-013 | P2 confirmed, corrected before source use | Repeated source keys could append ever-growing peer lists per row, producing quadratic private output and defeating practical bounds. Persistent ten-row regression1 failed0.32s; linear per-page duplicate-delta events plus complete final groups retain all origins without repeated cumulative copying. |
+| SI-BUILD-20261013-014 | P3 confirmed, corrected before source use | Main's persistent untyped-archive test1 failed0.41s: raw attributes were read before exact archive-type rejection. Early exact TICKERS guard now provides the fixed refusal without reading an untrusted object's attributes. Subsequent main connected source selector passes199 in1.38s, zero skip/warning. |
+| SI-BUILD-20261013-015 | P2 confirmed, corrected before source use | Generalized class report seal omitted original archive table/request identity from its retained anchor. Implementation-agent persistent reds2 failed/40 deselected0.42s; raw/table/request digest identities now remain anchored. Duplicate-JSON negative-ID and weighted-share substitution memory mutants independently reddened their focused cases and were restored without file/source mutation. |
+
+Individually attributed focused implementation checks: saved loader/matrix/
+continuation/boundary133 passed1.24s; dated identity81 passed0.87s;
+class/matrix/boundary101 passed1.12s; final market/boundary49 passed0.77s.
+These are not additive counts, main executions, Claude review or empirical
+evidence. Main audits the integrated exact tree and runs the connected focused
+selector, targeted compilation, active-document/import/privacy/diff/status and
+preserved-ledger checks before this next local prospective commit. All agents
+hold repository writes during the clean actual source applications. No
+intermediate push, full suite, empirical look or QC attempt occurs here.
+
+Main's final connected source selector: **620 passed in9.82s**,19 relevant
+focused source/evidence/transport/calendar/import/active-document test files,
+CPython3.13.15/pytest9.1.1, empty inherited environment/network denied,
+zero skips/warnings. All **14 changed Python files compile in memory**;
+protocol literals independently equal their computed hashes. Exact15-file
+scope is this record, the compact matrix/from-parts change and focused test,
+stdlib-only calendar boundary addition, three new pure source modules, three
+new protected scripts and their five focused test files. No shared/project
+document, Session Handoff, frozen old pilot/fixture/economic protocol or
+production behavior changed. Preserve historical body/ledger through115;
+new current status and appended116 only. Recheck exact lane/HEAD/status/remote,
+stage only this scope, inspect complete staged diff and commit the prospective
+source freeze locally. Then apply the two newly frozen source captures once
+from the clean committed tree, retaining failures. Continue the owner's round
+after actual source facts; do not push this implementation checkpoint.

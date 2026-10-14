@@ -300,6 +300,17 @@ def _matrix_digest(header, queries, refusals):
     return digest.hexdigest()
 
 
+def _seal_matrix(header, queries, refusals, digest):
+    obj = object.__new__(NativePopulationClassMatrix)
+    anchor = (header, queries, refusals, digest)
+    for name, value in zip(("_header", "_queries", "_refusals", "_digest"), anchor):
+        object.__setattr__(obj, name, value)
+    object.__setattr__(obj, "_anchor", anchor)
+    object.__setattr__(obj, "_anchor_identity", anchor)
+    obj._guard()
+    return obj
+
+
 @dataclasses.dataclass(frozen=True, slots=True, init=False)
 class NativePopulationClassMatrix:
     _header: bytes = dataclasses.field(repr=False)
@@ -355,6 +366,119 @@ class NativePopulationClassMatrix:
                    "source_origin": {"page_ordinal": page, "row_index": row,
                         "source_file_sha256": header["page_origins"][page - 1]["raw_sha256"]},
                    "refusal_reasons": [REASONS[primary]] + ([REASONS[original]] if original and original != primary else [])}
+
+
+def rebuild_native_population_class_matrix(header_raw, queries_raw, refusals_raw, expected_matrix_sha256):
+    """Rehydrate fixed protected parts, not authenticate files or a raw chain.
+
+    The runtime must authenticate its fixed byte pins and source custody first.
+    This factory requires that exact matrix digest and verifies compact format
+    invariants without rereading original pages for every future class query.
+    """
+    maximum_rows = MAXIMUM_PAGES * 50000
+    _require(type(header_raw) is bytes and len(header_raw) <= 32 * 1024 * 1024
+             and type(queries_raw) is bytes and len(queries_raw) <= maximum_rows * _QUERY.size
+             and type(refusals_raw) is bytes and len(refusals_raw) <= maximum_rows * _REFUSAL.size,
+             "bounded_immutable_matrix_parts_required")
+    _require(_digest(expected_matrix_sha256) == _matrix_digest(header_raw, queries_raw, refusals_raw),
+             "protected_matrix_digest_changed")
+    header = _json(header_raw)
+    _require(type(header) is dict and header.get("schema") == SCHEMA
+             and header.get("format_policy_sha256") == hash_payload(matrix_policy()), "saved_matrix_policy_refused")
+    _require(canonical_json(header.get("authority")) == canonical_json(_authority()), "saved_matrix_authority_refused")
+    for field in ("source_manifest_bytes_sha256", "source_manifest_payload_sha256", "queries_sha256", "refusals_sha256"):
+        _digest(header.get(field))
+    _require(header["queries_sha256"] == hash_bytes(queries_raw)
+             and header["refusals_sha256"] == hash_bytes(refusals_raw), "saved_matrix_component_digest_changed")
+    for field in ("source_row_count", "query_count", "refusal_count"):
+        _require(type(header.get(field)) is int and 0 <= header[field] <= maximum_rows, "saved_matrix_count_refused")
+    _require(type(header.get("query_record_bytes")) is int and header["query_record_bytes"] == _QUERY.size
+             and type(header.get("refusal_record_bytes")) is int and header["refusal_record_bytes"] == _REFUSAL.size
+             and len(queries_raw) == header["query_count"] * _QUERY.size
+             and len(refusals_raw) == header["refusal_count"] * _REFUSAL.size
+             and header["source_row_count"] == header["query_count"] + header["refusal_count"],
+             "saved_matrix_record_counts_changed")
+    symbols, dates, origins = header.get("symbols"), header.get("settlements"), header.get("page_origins")
+    _require(type(symbols) is list and all(type(value) is str and _TICKER.fullmatch(value) for value in symbols)
+             and symbols == sorted(set(symbols)), "saved_matrix_symbol_table_refused")
+    _require(type(dates) is list and all(_date(value) == value for value in dates)
+             and dates == sorted(set(dates)), "saved_matrix_date_table_refused")
+    _require(type(origins) is list and PARENT_PAGES < len(origins) <= MAXIMUM_PAGES,
+             "saved_matrix_page_origins_refused")
+    previous_clock = None
+    for ordinal, origin in enumerate(origins, 1):
+        _require(type(origin) is dict and type(origin.get("ordinal")) is int and origin["ordinal"] == ordinal
+                 and origin.get("segment") == ("parent" if ordinal <= PARENT_PAGES else "child"),
+                 "saved_matrix_source_segment_changed")
+        for field in ("request_sha256", "raw_sha256"):
+            _digest(origin.get(field))
+        try:
+            clock = parse_utc_timestamp(origin.get("received_at"), "received_at")
+        except (TypeError, ValueError):
+            raise NativePopulationMatrixError("REFUSED: saved_matrix_source_clock_refused") from None
+        _require(previous_clock is None or previous_clock <= clock, "saved_matrix_source_chronology")
+        previous_clock = clock
+    for source_name, required in (("parent_source", {"run", "head", "protocol_sha256", "inventory_sha256",
+                                     "budget_bytes_sha256", "last_next_url_sha256"}),
+                                 ("child_source", {"run", "head", "protocol_sha256", "code_identity_sha256"})):
+        source = header.get(source_name)
+        _require(type(source) is dict and required <= set(source) and type(source["run"]) is str and bool(source["run"])
+                 and type(source["head"]) is str and _HEAD.fullmatch(source["head"]), "saved_matrix_lineage_refused")
+        for field in required - {"run", "head"}:
+            _digest(source[field])
+    _require(type(header.get("complete_advertised_page_chain_reconstructed")) is bool
+             and header["complete_advertised_page_chain_reconstructed"] is True
+             and header.get("refusal_codes") == list(REASONS)
+             and header.get("scope") == "reported_provider_population_not_US_universe_or_historical_PIT"
+             and header.get("publication_scope") == "private_only_no_rows_or_fitness_publication",
+             "saved_matrix_scope_refused")
+    bitmap = bytearray((len(origins) * 50000 + 7) // 8)
+    page_counts, page_max = [0] * len(origins), [-1] * len(origins)
+    def mark(page, row):
+        _require(1 <= page <= len(origins) and 0 <= row < 50000, "saved_matrix_origin_bounds")
+        number = (page - 1) * 50000 + row
+        offset, bit = divmod(number, 8)
+        _require(not bitmap[offset] & (1 << bit), "saved_matrix_duplicate_row_origin")
+        bitmap[offset] |= 1 << bit
+        page_counts[page - 1] += 1
+        page_max[page - 1] = max(page_max[page - 1], row)
+    last_key = None
+    for symbol, at, page, row in _QUERY.iter_unpack(queries_raw):
+        _require(symbol < len(symbols) and at < len(dates) and PARAMS["settlement_date.gte"] <= dates[at] <= PARAMS["settlement_date.lte"],
+                 "saved_matrix_query_index_bounds")
+        key = symbol, at
+        _require(last_key is None or last_key < key, "saved_matrix_query_slots_not_unique_sorted")
+        last_key = key
+        mark(page, row)
+    refusal_groups = {}
+    def has_query(key):
+        low, high = 0, header["query_count"]
+        while low < high:
+            middle = (low + high) // 2
+            candidate = _QUERY.unpack_from(queries_raw, middle * _QUERY.size)[:2]
+            if candidate < key:
+                low = middle + 1
+            else:
+                high = middle
+        return low < header["query_count"] and _QUERY.unpack_from(queries_raw, low * _QUERY.size)[:2] == key
+    for symbol, at, page, row, primary, original in _REFUSAL.iter_unpack(refusals_raw):
+        _require((symbol == at == -1) or (0 <= symbol < len(symbols) and 0 <= at < len(dates)),
+                 "saved_matrix_refusal_index_bounds")
+        _require(1 <= primary <= 7 and (original == primary if primary != 7 else 0 <= original <= 6),
+                 "saved_matrix_refusal_code_changed")
+        if symbol >= 0:
+            key = symbol, at
+            _require(not has_query(key), "saved_matrix_query_refusal_collision")
+            count, all_duplicate = refusal_groups.get(key, (0, True))
+            refusal_groups[key] = count + 1, all_duplicate and primary == 7
+        else:
+            _require(primary != 7, "unidentifiable_duplicate_refusal_refused")
+        mark(page, row)
+    _require(all((count >= 2 and all_duplicate) or (count == 1 and not all_duplicate)
+                 for count, all_duplicate in refusal_groups.values()), "saved_matrix_duplicate_refusal_group_changed")
+    _require(all(count == maximum + 1 for count, maximum in zip(page_counts, page_max)),
+             "saved_matrix_source_row_origin_gap")
+    return _seal_matrix(header_raw, queries_raw, refusals_raw, expected_matrix_sha256)
 
 
 def freeze_native_population_class_matrix(manifest, pages):
@@ -446,11 +570,4 @@ def freeze_native_population_class_matrix(manifest, pages):
               "publication_scope": "private_only_no_rows_or_fitness_publication", "authority": _authority()}
     hbytes = canonical_json(header).encode()
     digest = _matrix_digest(hbytes, qbytes, rbytes)
-    obj = object.__new__(NativePopulationClassMatrix)
-    anchor = (hbytes, qbytes, rbytes, digest)
-    for name, value in zip(("_header", "_queries", "_refusals", "_digest"), anchor):
-        object.__setattr__(obj, name, value)
-    object.__setattr__(obj, "_anchor", anchor)
-    object.__setattr__(obj, "_anchor_identity", anchor)
-    obj._guard()
-    return obj
+    return _seal_matrix(hbytes, qbytes, rbytes, digest)

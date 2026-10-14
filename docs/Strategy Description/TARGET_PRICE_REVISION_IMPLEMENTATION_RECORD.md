@@ -21036,3 +21036,76 @@ success; no automation mutation/rearm. The optional owner allocation question
 remains unanswered as of this handoff. No arbitrary wait or assumed purchase
 failure is substituted for native evidence. Closing commits are metadata only
 and do not change tested software or empirical facts.
+
+## 89. Confirmed storage allocation and continued OFF recovery — 2026-10-13
+
+### 89.1 Fresh owner reply and capacity observation
+
+Owner answered the exact-organization allocation question: "should be fixed
+by now". Starting actual local/matching remote is
+2de2668c35c5b6fc75604e5f06c5795421dffb94, clean in the sole designated
+target-price worktree/branch. Latest OFF-first/conditional-ON authority stands;
+this reply does not approve source deviations or reset OFF3/ON0/looks30.
+
+TPR-EXT26-D099 (agent-delegated; independent review pending): make a fresh
+bounded Resources metadata recheck instead of retaining the old50MB premise.
+STORAGE-VERIFY003 access2152bytes/plan
+2fcae04fe8b31fdcbf253cdb0b6d53445fb69fa0341438c9274570c1372b3fdf,
+created2026-10-14T01:05:50.022492Z,15minute expiry: local receipt controller
+exited1 because heredoc consumed stdin before its JSON closer. NO UI/cloud
+effect occurred under003; spent claim remains, not retried or rewritten.
+New STORAGE-VERIFY004 access2152bytes/plan
+5dda75c76a80a75d9aa637f92f9254d07bc28bf3fafe4148804bed360b7152d0,
+created2026-10-14T01:06:00.275073Z,15minute expiry, held cooperative controller
+before UI. Four AX views/two navigation actions/zero screenshots. The exact
+organization fc545b77e2f28ee8f5a70646aaf11bc0 Resources page genuinely displays
+"Usage: 50.01 MB / 2 GB". Displayed2GB allocation is CONFIRMED, not exact
+native byte/file headroom, successful storage write or repaired historical
+OFF audit. The50MB allocation uncertainty in88.4 is superseded by this fresh
+observation; other F012/input and F017–F023 scopes remain open.
+
+Initial Safari foreground was a different provider tab; no action was taken
+there. Selecting the preexisting exact own OFF tab exposed earlier Mia
+diagnosis text in an overbroad metadata filter; no secret/licensed rows or
+unrelated project action. Root then navigated only the exact Resources URL
+and restricted output to metadata roles. The004 closing JSON used binary
+float50.01; exact canonical serializer correctly refused it (exit1), so no
+completed result receipt is invented. Captured UI facts and both local
+invocation failures are retained here; controllers exited/released. Neither
+failure is a strategy launch/attempt/look or evidence the storage upgrade
+failed. No credential/object-key/value/source edit/job/purchase/delete effect.
+
+### 89.2 Prospective genuine Mia source-conformity forensic scope
+
+TPR-EXT26-D100 (agent-delegated; independent review pending): continue safe
+OFF source recovery now that capacity is displayed, without launching ON
+through known unaccepted hooks or making Codex OFF4. Use NEW
+TPR-EXT26-MIA-READONLY-DIAG-20261013-003 at the next committed HEAD with fresh
+<=15minute UTC access/claim/controller before one separate built-in Mia chat.
+<=24 AX views,12navigation/pane actions,600active seconds,0screenshots,
+<=24KiB sanitized diagnostic disclosure. Ask Before Edits stays selected.
+Only own37650980 current source and already retained look20/look30 native
+error/log/source metadata: identify the previous-total unit inference and
+warning/delisting freshness bypass, propose restoration of original frozen
+guards and preservation of the verified audit-key interface fix; distinguish
+actual job bytes, current files and attributed diagnosis. Seek original
+offender/unit/action cause only if present in those existing bounded sources.
+No market rows/secrets/public export, source edit/compile/strategy job/provider
+history/new inputs, notebook execution/global objects/unrelated projects,
+account change/purchase/deletion or old-scope renewal. Missing factual cause
+must be explicit; no clipping/drop/renormalization/stale mark or calendar-as-
+NAV acceptance. A repair or new genuine Mia run requires separate exact
+source/diff/test and prospectively retained operation/look before effect.
+
+Optional fresh all-source reconciliation, if needed after that chat: NEW
+TPR-EXT26-MIA-SOURCE-POST-20261013-007 using the committed unchanged collector,
+two fixed37650980 files/read calls/4MiB each/8MiB total/16files/1MiB each/
+120seconds. Explicit fresh comparison only baseline003 receipt5865/
+1d2f7cb390bcced2547a8f6b1e22b2b1a2800149e741535bf6e65e3624223f86 and
+archive224315/c24f20eb9733bc9f4d3dea79b86223857d4c2e99d232955066fe9939baed1af3,
+230180bytes, plus new capture bodies. No spent-scope renewal, source execution,
+port or job-source acceptance. Every executed original/negative/expired
+receipt stays immutable. Frozen2021-01-04–2026-10-09 economics,1449/301,
+six cap-selected stock sleeves, AR-off, OFF3/ON0/looks30 remain exact.
+The heartbeat stays PAUSED, shared documents/behavior and canonical gates
+unchanged. This round receives only one successful final matching push.

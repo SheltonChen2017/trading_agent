@@ -876,13 +876,18 @@ def poll_status(plan, launch_receipt, api):
     terminal = _path(plan, "terminal")
     if terminal.exists():
         return common._read(terminal)["status"]
-    listing = common._post(api, "backtests/list", {"projectId": launch_receipt["project_id"],
-        "includeStatistics": False})
+    request = {"projectId": launch_receipt["project_id"], "includeStatistics": False}
+    started_at_ns = time.time_ns()
+    listing = common._post(api, "backtests/list", request)
+    received_at_ns = time.time_ns()
     rows = listing.get("backtests")
+    matches = ([row for row in rows if type(row) is dict
+        and row.get("backtestId") == launch_receipt["backtest_id"]]
+        if type(rows) is list else [])
+    _observe_response(plan, launch_receipt, "status", request, listing,
+        matches[0] if len(matches) == 1 else None, started_at_ns, received_at_ns)
     if type(rows) is not list or listing.get("count", len(rows)) != len(rows):
         _fail("relaxed status inventory changed")
-    matches = [row for row in rows if type(row) is dict
-        and row.get("backtestId") == launch_receipt["backtest_id"]]
     if (len(matches) != 1 or matches[0].get("name") != launch_receipt["backtest_name"]
             or matches[0].get("projectId", launch_receipt["project_id"]) != launch_receipt["project_id"]
             or matches[0].get("status") not in {"In Queue...", "In Progress...", "Completed.", "Runtime Error"}):
@@ -893,6 +898,55 @@ def poll_status(plan, launch_receipt, api):
             "project_id": launch_receipt["project_id"], "backtest_id": launch_receipt["backtest_id"],
             "status": status})
     return status
+
+
+def _observe_response(plan, launch_receipt, operation, request, response,
+        observed, started_at_ns, received_at_ns):
+    """Private evidence from this response only; never backfill old controls.
+
+    Local clock intervals and canonical parsed-JSON hashes are not signed
+    server time, raw-wire authentication, operator identity or formal source
+    provenance. No response text, statistics, orders or source rows persist.
+    """
+    if (operation not in {"status", "read"}
+            or type(started_at_ns) is not int or type(received_at_ns) is not int
+            or not 0 < started_at_ns <= received_at_ns < 253402300800000000000):
+        _fail("relaxed response observation clock or operation changed")
+    def utc(value):
+        seconds, remainder = divmod(value, 1_000_000_000)
+        return time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(seconds)) + f".{remainder:09d}Z"
+    actual = observed if type(observed) is dict else {}
+    metadata = {key: actual.get(key) for key in ("projectId", "backtestId", "name", "status")}
+    try:
+        response_sha256, metadata_sha256 = _sha(response), _sha(metadata)
+    except (TypeError, ValueError, OverflowError):
+        _fail("relaxed response observation encoding changed")
+    observation = {
+        "schema": "arv2-qc-response-observation-v1",
+        "candidate_id": plan.candidate_id, "attempt": plan.attempt,
+        "endpoint": "backtests/list" if operation == "status" else "backtests/read",
+        "request_started_at_utc": utc(started_at_ns),
+        "response_received_at_utc": utc(received_at_ns),
+        "clock_source": "local_client_system_clock",
+        "requested_project_id": launch_receipt["project_id"],
+        "requested_backtest_id": launch_receipt["backtest_id"],
+        "observed_identity_matches": all(actual.get(key) == launch_receipt[expected]
+            for key, expected in (("projectId", "project_id"),
+                ("backtestId", "backtest_id"), ("name", "backtest_name"))),
+        "observed_status": (actual.get("status") if type(actual.get("status")) is str
+            and actual["status"] in _TERMINAL | {"In Queue...", "In Progress..."} else None),
+        "request_sha256": _sha(request),
+        "canonical_parsed_response_sha256": response_sha256,
+        "observed_metadata_sha256": metadata_sha256,
+        "launch_receipt_sha256": _sha(launch_receipt),
+        "server_time_authenticated": False, "operator_authenticated": False,
+    }
+    # Each actual response has its own O_EXCL sidecar. An interrupted terminal
+    # write can be retried with a new observation, never by overwriting evidence.
+    root = _path(plan, "read-claim").parent
+    path = root / (f"{plan.candidate_id}-A{plan.attempt}-qc-{operation}"
+        f"-response-{received_at_ns}.json")
+    common._write(path, observation)
 
 
 def _statistic(value, *, eight_aggregate=False):
@@ -1127,8 +1181,13 @@ def read_result_once(plan, launch_receipt, api, *, recover_r209_transport=False)
             "reason": "original_16KiB_control_writer_refused_seven_bounded_custom_statistics"})
     else:
         common._write(_path(plan, "read-claim"), expected)
-    response = common._post(api, "backtests/read", {"projectId": launch_receipt["project_id"],
-        "backtestId": launch_receipt["backtest_id"]}).get("backtest")
+    request = {"projectId": launch_receipt["project_id"], "backtestId": launch_receipt["backtest_id"]}
+    started_at_ns = time.time_ns()
+    envelope = common._post(api, "backtests/read", request)
+    received_at_ns = time.time_ns()
+    response = envelope.get("backtest")
+    _observe_response(plan, launch_receipt, "read", request, envelope,
+        response, started_at_ns, received_at_ns)
     if (type(response) is not dict or response.get("projectId") != launch_receipt["project_id"]
             or response.get("backtestId") != launch_receipt["backtest_id"]
             or response.get("name") != launch_receipt["backtest_name"]

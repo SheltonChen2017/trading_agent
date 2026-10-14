@@ -19108,3 +19108,154 @@ files compile after the final import change. No full suite, credential read,
 provider source retrieval, CLR instantiation or QC action occurs in these
 checks. Exact allowed targets and actual matching origin are audited before
 the local preparation commit; no intermediate push follows it.
+
+### 116.17 Daily identity, cached source-plan preparation and catalog recovery freeze
+
+The preceding transport/guard preparation is local-only
+**904cb16d678c31c19617e22c06992fd3aa3ba831**. Actual/tracking origin remains
+1f90c626328a236c51e78f57e0fe301e0412aabf. Continuous owner-waived implementation
+continues; no independent review acceptance, interim push or backtest result
+is implied by these preparations.
+
+**SI-DEC-20261013-39** was exercised after the first catalog invocation
+refused protected storage before claiming a request, reading credentials or
+invoking HTTP. Main independently checked the exact real owned parent
+`artifacts/short_interest/private`, then tightened only that directory from
+0755 to0700 using its held FD and inode checks. This was nonrecursive,
+restriction-only and deleted nothing. The fixed child was already0700 and
+empty. The second invocation exercised section116.16 / SI-DEC-20261013-37
+exactly once at registered local904cb16d / actual remote1f90c626. A bounded
+HTTP200 body was observed but refused as `catalog_response_refused` before
+raw storage/hash or public metadata publication. No original body is retained
+and no explanation of its schema failure is inferred from it. The original
+exclusive claim remains spent; metadata requests are not QC launch attempts.
+No project, node, upload, compile, job or backtest was touched.
+
+Main independently verified the protected owned0600/single-link original
+claim bytes SHA256
+`02bf32970fcf71e9ba6b325042a1a75d8956a9923e958d3d3a0b92239e8e9452`
+and refusal bytes SHA256
+`b21c15229beb278e8db0ab6c1a9fa9a22f0a98d773dbe7dc4dacc796bba7e307`.
+Both retain exact original registered scope; `response.raw.json` and
+`public-observation.json` are absent. The old v1 reader source remains exactly
+`a9b6cdb9e7169b266aba743dd41e3a2c78974b1e6ab9b05284c174911ad2b51a`.
+The negative observation neither invalidates QC access nor proves a public
+engine or processing entitlement.
+
+**SI-DEC-20261013-40** prepares the versioned daily-active identity and
+issuer-size adapter. All1169 nominal study-session dates are frozen in the
+source-only daily plan (digest
+`f89d3ed418b4f821516d10c41f0ff4fc04db1d2bc66d2e8f507ea9f5242cb7b2`).
+Each day is independently typed and bound to its original native master;
+current identity/currency/sector is never carried backward. Missing,
+duplicate, conflicting and same-class owner ambiguities remain negative.
+The daily-active route alone does not prove every historical inactive
+listing or lifecycle. The FMP companion uses price-free current issuer
+context and exact lexical-rational historical capitalization; issuer cap
+is a size measure, never a same-class outstanding-share denominator. A cap
+becomes USD-qualified only with independent exact same-day target/CIK/USD
+evidence. Per-CIK offsets and target-date bitsets avoid repeated full daily
+scans; one deterministically selected observed target is not a primary-class
+claim. The separate v2 prospective source budget is at most2000 total
+requests and3GiB, with8MiB/5000-row cap pages and1MiB/50-row lookup responses;
+whole-page reservations precede each START. The old v1 runtime cannot spend
+this v2 budget. No daily or FMP request has yet been made by this stage;
+concrete protected run/code/HEAD/budget freezes precede operational access.
+
+**SI-DEC-20261013-41** prepares a five-physical-file protected exact-plan
+cache, retaining every original logical split-fence byte and its digest.
+It reconstructs only the already independently observed d58b2b3d plan,
+81875 exact requests,112 dates and1340 original spent identity attempts.
+The cache has no provider/credential/QC operation and no source-admission
+flag. Its original closure pin stays PENDING until an exclusively created
+owned0700/0600 cache has been written and independently verified. Rebuilding
+requires exact original matrix, master/action/dictionary bindings, counts,
+ordinals, classes, dates, cadence, refusals and plan digest; a caller
+completion flag cannot construct the sealed plan. A forthcoming concrete
+writer runs the immutable source replay once, not once per HTTP slot.
+Subsequent slots use held source/code inode custody, not repeated large-plan
+hashes. Creator-code identity remains historical evidence; current complete
+committed-code identity is calculated once and retained in runtime start and
+receipts, not embedded in its own hashed source/protocol. This explicitly
+avoids a self-referential code-hash cycle without omitting the driver from
+the manifest. The parallel count driver remains PENDING until actual cache,
+plan, scope and protected run pins are registered. Its claim precedes a
+named key read, at most8 STARTs are prevalidated/debited before wire, and an
+unreceipted authorized debit refuses instead of returning an undercounted
+inventory. Remote advancement drains already-started captures only; no
+new source operation or Completed report is permitted.
+
+**SI-DEC-20261013-42** prospectively authorizes exactly ONE additional
+manual data-free catalog request, not an automatic retry or reset of the old
+budget. It uses the same fixed protected directory and route/method/body
+as116.16 and new exclusive claim
+`manual-schema-recovery-request.claim.json`. The original claim/refusal byte
+pins and absence of the original raw/public response must verify before the
+new claim and named QC environment access. Maximum total catalog claims is2;
+maximum additional requests1, response2,000,000 bytes,10000 rows, redirects,
+proxies and automatic retries0. New protocol SHA256 is
+`4a9e9879bd04e64317e33bbe5fb4eb84103aefcc595e5e57c92eb4c0a7b5b6c9`.
+Registered source bytes are:
+
+- `scripts/read_short_interest_qc_catalog_recovery.py`:
+  `ab0752f567a7d6f4ae7505352418b22fd75d02e9edef741a2fb2b253f746f18b`;
+- `scripts/short_interest_qc_catalog_schema.py`:
+  `32013a7ce5495b27fc8934ae22d98dfe4d3587a9fc3a7120ad6773330d5b52be`;
+- unchanged original reader: a9b6cdb9 as pinned above.
+
+The concrete registered HEAD is the clean local commit containing this
+prospective freeze; registered actual remote is1f90c626. Invocation verifies
+those exact roots/branch/clean HEAD/remote, complete source bytes and this
+record's exact measured bytes before credentials/wire. The new claim retains
+all of those pins, the decision ID and actual registration clock. The
+registration is exact canonical JSON, so booleans cannot alias integer
+budget fields. Source/schema/record mutations refuse rather than silently
+refreshing the freeze. Failure stays spent with its owned sanitized receipt.
+
+The recovery follows official
+[Version declarations](https://github.com/QuantConnect/Lean/blob/master/Common/Api/Project.cs)
+and [RestResponse defaults](https://github.com/QuantConnect/Lean/blob/master/Common/Api/RestResponse.cs):
+missing errors uses the documented empty-constructor default, whereas null
+or nonempty errors never qualifies. Nullable/private/incomplete/sentinel or
+duplicate-ID version rows remain negative. Selection requires all seven
+complete public identity fields, explicit public=true, nonnegative CSharp
+integer ID, exact40-hex hashes, safe public name/ref and actual UTC creation
+clock, preserving all seven DateTime fractional digits. Description may be
+missing/null and is always omitted from public output. Diagnostics expose
+only allowlisted presence/types/counts/ordinals, never unknown names/values,
+private branch names or descriptions. Credential echo checks precede raw
+hash/storage. This is still metadata observation, NOT an engine execution
+pin, CLR-wrapper proof, data-processing permission or actual backtest gate.
+
+Append-only ledger additions; historical001–030 remain unchanged:
+
+| ID | Priority / disposition | Evidence, correction and retained limits |
+|---|---|---|
+| SI-BUILD-20261013-031 | P1 prospective scope, confirmed/corrected | Main's two literal red controls showed bool/int dictionary equality admitted True for1 and False for0, reaching a fabricated key callback. Canonical exact JSON comparison rejects both before claim/key/wire; connected180 tests pass2.41s. No real key/request was involved in the regression. |
+| SI-BUILD-20261013-032 | P1 request accounting, confirmed/corrected | Delegated two causal failures exposed authorized debits missing receipts and second-descriptor failure after a first debit. All at most8 descriptors/clocks are now prevalidated before debit; missing debited receipt yields a fixed owned refusal and raises, never an undercounted inventory. Main independently includes both controls and the22 driver tests in the connected180 run. |
+| SI-BUILD-20261013-033 | P2 scalable issuer context, confirmed/corrected | A delegated operation-count control failed against per-row summation of all CIK offsets; incremental byte accounting corrected the quadratic path. Main's daily/FMP focused run259 passes30.99s includes the exact-date/class/context controls and seven v2 adapter tests. No actual FMP data or issuer fitness conclusion is published. |
+
+Main executed the six daily/FMP test files plus import-boundary/active-document
+selectors: **259 passed in30.99s**. After the recorded two scope reds,
+Main executed catalog recovery, cache contract/adapter, count driver and
+import-boundary/active-document selectors: **180 passed in2.41s**. All use
+empty environments, denied network, CPython3.13.15/pytest9.1.1. An initial
+selector typo found no test file and ran no tests; it is a command-selection
+error, not a source defect. No complete lane/repository suite is run. Targeted
+compilation/diff/status checks follow before the local preparation commit.
+
+Continuous build remains active. Cache publication/counts, daily raw inputs,
+same-class shares, currency/sector/size, cashflow/terminal facts and exact
+prospective evaluation/power/look/source-processing/order/runtime admission
+are still in progress. No September outcomes, sealed holdout or actual signal
+join/evaluation is accessed. Canonical actual looks0/0, exploratory looks0,
+alpha0, permanent look IDs none, QC launch attempts0 and no backtest exists.
+Shared/project documents and SESSION_HANDOFF stay frozen. This is a local
+preparation commit only; ONE final non-force lane push remains reserved for
+genuine closure, not these implementation steps.
+
+Main's final checks after appending this freeze: all21 stage Python files
+compile; import-boundary/active-document selectors **78 passed in1.18s**.
+Diff check passes. Only these21 new lane-owned files and this record are
+staged; roots, branch, HEAD, status and actual matching remote are rechecked
+immediately before the local commit. No intermediate push is made.

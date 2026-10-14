@@ -559,9 +559,10 @@ are spent and that acquisition remains refused. D3/D4 isolated one exact
 byte-identical duplicate; the separately defined V2/D5 subsequently passed
 once and prepared the October package (297.12), without retroactive source
 acceptance or formal admission. All D1–D5 operations are spent. D6 prepared
-the corrected six-cell family once at4053414e and is also spent. The next
-bounded step is D7's separately frozen QC contact/launch/result handling
-(297.14); no QC attempt has occurred yet.
+the corrected six-cell family once at4053414e and is also spent. D7 account
+discovery passed, but its sole upload returned exit2/`object_response`
+(297.15). Do not retry that upload or advance to capacity/launch. A bounded
+offline control-state diagnosis is next; no QC backtest attempt has occurred.
 The monitor remains PAUSED.
 
 Branch: `codex/strategy-analyst-revisions-v2`
@@ -1613,9 +1614,10 @@ Claude review of section 297's current ratings-only continuation under the
 existing "for now" direction and 255.2 delegation, not future unrelated work.
 Section 296's exact connection uses are completed and spent. This is
 sequencing authority, not independent acceptance or technical/source clearance.
-The immediate next step is section 297.14's separately frozen D7 contact/
-launch/result handling against the now-prepared October package and exact
-six-cell family (D6 preparation passed once and is spent), for the owner's
+The immediate next step is section 297.15's bounded diagnosis of the failed
+D7 upload, preserving the prepared October package and exact six-cell family.
+No unchanged upload retry or capacity/launch advance is authorized by its
+failure. D6 preparation passed once and is spent. This continues the owner's
 matched six/eight-universe, AR-off/100%/200% accepted-risk order study through
 October2026 (297.3/297.12). No old source operation is renewed. The subsequent
 inventory request did not replace that work;
@@ -47955,3 +47957,137 @@ accepted-risk, actual simulated-order research only: no broker/funded/real
 orders, paper/live deployment, formal PIT/master admission or efficacy claim.
 The monitor remains paused. Exactly one final matching-lane push remains due
 at the concluded continuous round; none has occurred yet.
+
+### 297.15 Actual organization success and upload refusal; no QC run
+
+At clean `a344f70a11689ea8d5fa854c23a0b1c160ef2c64`, the single
+`organization` invocation exited0 with matching family/profile/source
+envelope. External dispatch2026-10-14 00:58:18UTC; internal
+`00:58:21.782252Z..00:58:25.236083Z`. Fixed reference project37165262 passed
+its ownership/private/language checks. Organization hash
+`a2d88859373df0f1fd59ede52b9b3945f847091b5fca3286841241536c38e880`;
+the raw identifier stayed private. This establishes this scoped QC account
+connection, not Object Store capacity/rights or node availability.
+
+The single `upload` invocation dispatched00:58:40UTC and returned actual
+**exit2**, `operation_completed=false`, `failure_code=object_response`,
+stage `upload`. Its failure envelope has no internal timestamps. By the
+01:00:41UTC root/branch/HEAD/status recheck, the command was completed and
+the worktree remained clean at the freeze. Do not turn these observations
+into exact request-duration or response-timestamp claims. No capacity check,
+project creation, compile, backtest launch or result read followed. Booked
+floor remains314/239/50/699; an upload is not a research launch look.
+
+Static source establishes only that `_bounded_transport` returned an exact
+integer2xx status with bounded bytes, JSON decoding succeeded, and the value
+was not a dictionary with `success is True`. The same finite code covers
+`object/set` and `object/properties`; without a bounded control-state census,
+it does not identify endpoint/index or previously saved objects. It does not
+prove numeric status, permission denial, quota exhaustion, expiry, zero
+side effects or no earlier requests. **ARV2E297-014 remains open**: refused
+Object Store publication, exact cause unresolved, no admitted upload.
+
+**ARV2D297-013 (P2, diagnostic limitation)** is confirmed: the used host
+adapter discards endpoint/index/numeric status and any safe error category
+before its failure receipt. These cannot be recovered retrospectively from
+the finite envelope. Preserve the source, original claims/markers and all
+possible remote effects. Do not manufacture a cause, observed receipt,
+`upload-valid` marker or acceptance. This is separate from the earlier
+Massive response failure and does not imply that current ratings access failed.
+
+Read-only static comparison found no verified multipart-format defect: field
+names, CRLF framing, boundary, filename and authentication agree with the
+unchanged formal transport and QuantConnect's official
+[upload reference](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/object-store-management/upload-object-store-files).
+The [metadata reference](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/object-store-management/get-object-store-metadata)
+confirms its separate `object/properties` route. Matching documentation is not
+proof that the request succeeded. No alternative upload, arbitrary callback,
+response-body reread, cleanup or account-setting change occurred.
+
+**ARV2D297-014 (P2, prospective parser limitation)** is also confirmed:
+the used `_object` function uses plain `json.loads`, so duplicate keys are
+not rejected before its success check. A native-network-denied, synthetic
+root check showed `{"success":false,"success":true}` passes that predicate;
+the existing strict control parser rejects it. This is not evidence that the
+actual QC response contained duplicate keys or caused the refusal. Leave the
+used source frozen; any separately versioned recovery must strictly reject
+duplicate keys/nonfinite JSON. It does not turn a retained success marker
+into independent proof of all remote effects.
+
+Next admissible work is a separately committed, one-use **offline** diagnosis
+of only this new family's exact upload intent/observed-control records. It
+must authenticate exact family/preparation/source bindings, emit bounded endpoint/index
+and observation counts without organization IDs or private rows, and retain
+its own additive diagnostic claim/report without repairing old files. A later
+read-only, fixed-scope QC storage/permission diagnostic may be justified from
+that evidence; neither it nor another upload is preauthorized merely by this
+failure. Existing owner technical delegation/current review waiver applies
+to this recovery, but all source, actual-exit, bounded-contact and attempt
+gates remain. The original `organization` and `upload` calls are spent.
+
+### 297.16 Bounded offline upload-marker diagnosis and D8 freeze
+
+The additive `scripts/diagnose_arv2_newrule_upload.py` diagnoses the retained
+control sequence only. An initial draft unnecessarily authenticated D5 data
+and rebuilt projections; same-round advisory review reduced it before use.
+The final contract reads only strict canonical `family.json` bound to the
+297.14 external family hash, `preparation-claim.json`, `upload-claim.json`,
+and the exact indexed authentication/set/properties intent/observed markers.
+It does not read the D5 package/lineage payloads, organization values, raw
+responses, old output reports or upload-valid contents, and mints no operational
+FamilyPlan. Directory names are bounded by the frozen reader's18,000-file
+limit; at most128 inventory entries define257 sequential request slots.
+Unknown upload markers, orphan observations, gaps, invalid types, rollback
+timestamps and mismatched hashes refuse. Canonical equality prevents Boolean/
+integer aliases in new claim/report readback. Used sources remain unchanged.
+The external family hash is compared after bounded strict JSON parsing,
+before inventory fields are trusted; this is not pre-parser authentication.
+Per-file held/named checks and a final name-set comparison are snapshots,
+not proof of continuous all-marker metadata stability.
+
+Intent precedes dispatch; the last retained intent is **not proof of the last
+actual dispatch**. Observed markers record the frozen client's success check,
+not independent server state or metadata acceptance. No numeric error/status
+or original response is recoverable from its digest. A valid-marker filename
+is not upload acceptance; original exit2 remains an external recorded fact.
+The diagnostic reports only finite index arrays/counts and pins, not object
+keys or rows. This is not a whole-tree/continuous-security attestation.
+
+Root final focused validation: **179 distinct passes in4.77s** =93 diagnostic
+and86 record/active-document checks. Author93/5.03s and earlier73/4.13s overlap,
+not additive. Two new Python files compiled in memory; all51 inherited source
+pins matched; `assistant.dispatch_fence` was absent; diff check passed. Tests
+used native network denial, `--noconftest`, disabled plugin autoload, `-B`, no
+cache provider and in-root temporary/cache paths. No full suite or private
+operational read occurred. Same-round advice is not independent final review.
+
+| New D8 component | SHA-256 |
+|---|---|
+| Diagnostic source | `b8477fe9246b7355c9b10bec91a9ad6e6305fcd0a7e2d4f00f61da1c35ce9901` |
+| Diagnostic tests | `4d42cf49363d79b010608ea38ad34dc1dcc3ec6d96fcc5e2c87131168ad85abc` |
+| `arv2-newrule-upload-marker-diagnostic-v1` profile | `1477c74d17fdb8da4d3f2e0e364a26c6ecb05e14f0802b5f684a475f5fcbdfa4` |
+
+**D8 exact one-use decision:** under current owner direction to continue the
+six/eight study without a routine Claude checkpoint and255.2 delegation,
+invoke this new script exactly once at the clean commit containing this
+freeze, with that actual HEAD and source SHA. Use only designated Mac root/
+branch/Python3.13, sanitized environment, `-B`, in-root support paths and native
+`sandbox-exec` deny-network. This is no provider/QC/credential authority.
+Stateless frozen CLI preflight checks its original SHA and51 selected pins;
+do not invoke its old operation entry points. The120s alarm cannot bound host
+suspension or uninterruptible I/O.
+
+Exclusively claim/fsync `upload-diagnostic-v1-claim.json` inside the fixed
+R298–R303 control before the listed private reads; publish only the new
+`upload-diagnostic-v1-report.json`, with held/named and canonical readbacks.
+Both names were not inspected or allocated before this decision. No old
+marker is modified, no cleanup or upload retry occurs. The claim consumes
+this diagnostic even if no marker is read; partial claim/unknown exit is
+ambiguous/spent. Record only actual external exit and the normal bounded
+16KiB console envelope/report hash/length. Actual exit0 plus matching
+`marker_census_completed` envelope is required for admissible diagnostic
+evidence; a late positive report/nonzero exit is not enough. No separate
+report reader, rerun, repair or renewed old call is authorized. A later
+read-only metadata/permission check must be separately fixed to the resulting
+exact evidence before contact. Booked floor314/239/50/699 and all false
+readiness flags remain; monitor stays paused.

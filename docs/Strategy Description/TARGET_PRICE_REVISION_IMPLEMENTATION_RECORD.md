@@ -22126,3 +22126,86 @@ this local owner-input checkpoint does not automatically rearm the monitor.
 Final focused active-document check after90.8–90.9:330passed7.33s with isolated
 49/52; no complete suite or empirical acceptance. All effect controllers exited;
 no raw/provider/private content or credential was placed in tracked files.
+
+### 90.10 Owner-unlocked continuation and prospective ONE genuine-Mia OFF run
+
+Owner explicitly answered **"Unlocked; authorize one OFF run"** to the action-
+time question: after fresh source check ONE registered OFF diagnostic in Full
+Auto, no source/strategy changes or retries; ON blocked until valid OFF accounting.
+Exact answer SHA902034e3f16a520b5945c1e92116578b3516692145cab39704aa5150f836b17b.
+This expands only the previously source-only Full Auto effect scope for ONE
+bounded genuine-Mia simulated backtest, not OFFCodex4, new economics, purchases,
+canonical admission or a skipped future independent review by implication.
+Owner also asked whether other lanes could proceed: root said yes for their
+own repos/projects, keeping THIS Safari tab untouched briefly until submission;
+after submission Safari may be shared without changing this project or cancelling/
+reassigning shared QC resources. No cross-chat messages/cancellations were sent.
+
+Fresh invariant/status/actual matching remote check found clean local4a27440b
+and unchanged remote3dfa7d1e. SOURCE-POST-021 at15:21:51.514828UTC:
+plancd61b788befa4945114dbb20b976c02e970f9c3111597b6eb0d3b590e901359d;
+two own files/read calls537036wire/230180fresh bounded baseline bytes; ALL16
+stable/equal020, main60658/a098c087 and helper15742/1b057f25, other14 unchanged.
+Receipt9731/be4fa30c30ce02a77bdad051aa93c4cde0ce825f1b3c6c6c446526dc0274f585;
+read2archive266508/28da419eb1ba8a217fab2edfd9232fde71eef25d3a0004f8f1d019dbc0178db6;
+delta167742/681481b6ad32d627597a386b756756f4187736ffa54113f7495a81d5e8292eb2.
+This is fresh saved-source evidence, not compiled-job proof; no stale020 scope
+or old source-only permission was reused as a new effect grant.
+
+Fresh WITNESS-SOURCE-012 at15:22:30.880155UTC: access4274/
+8588d57531e1581048a4b3200267650ab5e110c53608b498ea000a5327553126;
+closer1364/a483d8f2245aa57765f889fbca3687c31b60952f91734cba5d7fdeb2ac622221.
+Actually verified unlocked/authenticated own37650980, earlier source-only Mia
+task **Completed**, no pending auto work in that task, and later NEW EMPTY chat
+with Full Auto visible. Editor reconnect countdown did not recover; an AX reload
+ID went stale/refused, a screenshot-targeted own editor reload reached an expired
+code iframe404, then ONE outer reload of the same project recovered the editor.
+No other tab/task cancelled or credentials/source changed. Ten AX/one screenshot/
+five actions, no message/compile/backtest. Seventeen observed terminal build/
+building lines include the one preexisting line and16later background events,
+below the40-event bound; short GUI IDs/clock attribution are not full native
+compile IDs or source-job proof. Manual root compilation calls remain0.
+
+Fresh DISCOVERY-SUCCESSOR-003 at15:28:50.249811UTC before new reservation:
+planf7773ac6a40f0a678e9f9b9a66aae9a3b8303d11e6067bee6bd3dd394a5bc9a4;
+one fixed own backtests/list29881wire;14known jobs, unknown_job_ids=[].
+Receipt11774/2ca0ec96c59ec2711b042074f817894d3a04a7585de9c1452192a357d26eaeb2.
+No new job/strategy look or outcome/parameter/source/private journal read.
+Clock groups remain server-unzoned, no invented UTC/global chronology.
+
+TPR-EXT26-D112 (owner-authorized single effect; routine bounded registration,
+independent review pending): NEW public
+extended_mia_first_refusal_preregistration31.json freezes prospective operation
+TPR-EXT26-MIA-FIRST-REFUSAL-20261014-001 at parent4a27440b, created15:30:45.280893UTC,
+expires16:30:45.280893UTC. ONE compile/ONE backtest/ONE Mia prompt, exact16 source
+descriptors/all4 inputs/config JSON19a9842c versus module5790ca63/freeze/calendar/
+unchanged economics; observed30/cloud28/local2 before prospective31/cloud29.
+OFFCodex3 stays spent, ON0 unused, no retry/source/engine/parameter change,
+notebook/global keys/provider upload/export/other-project/purchase action.
+The native frozen algorithm alone may read its exact existing OFF inputs and
+included QC observations and retain its job-bound unchanged audit plus two
+bounded first-refusal witnesses; post-job raw witness analysis still needs a
+SEPARATE fresh native-only scope. No current outcome or accepted performance.
+Alternative stale look20/30 labels or generic/API OFF4 are rejected. Agent-
+delegated routine design is not separately human-/Claude-approved economics.
+
+Read-only delegated audit of the actual public preregistration found no material
+prelaunch defect; all16/all4 and owner-message SHA reproduced, freeze SHA
+74d51df86fd20504000a09b05c6a6348604a92191aa33bb6188aaeacc15b4d0e.
+Root independently cross-checked exact descriptors/inputs/actor/operation/owner/
+one-effect limits/retained counters/null IDs/false acceptance. Private receipts
+were not reopened by the auditor and it is NOT independent Claude acceptance.
+Launch's ten result-read calls are NOT a full order-census grant; any subsequent
+full collection needs its own fresh bounded operation and look/job provenance.
+
+Registering this prospective freeze does NOT assert a job happened or increment
+the observed history by invention. Before ONE later effect root must commit the
+freeze/record, fresh final all16 capture, actual HEAD/status/remote check and fresh
+bounded private launch/access/look reservation. Actual new job then consumes
+look31; failed compile/effects or refusal/uncertainty remain retained. No code
+repair or second native run belongs to this scope. Full-window native source/
+orders/fills/fees/cash/exposure/clock/census/replay still govern OFF acceptance and
+ON; all parked canonical gates remain distinct and open.
+Focused preregistration/capture/active-document check406passed7.24s, isolated
+49/52; no complete suite/native/source upload/operator-state/database action.
+Root freeze8239bytes matches74d51df8; final observed looks remain30 before effect.

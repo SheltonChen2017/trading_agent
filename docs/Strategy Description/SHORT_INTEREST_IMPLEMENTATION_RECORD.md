@@ -5,7 +5,9 @@ IS ACTIVE FROM PUSHED `1f90c626` (SECTION 116). DO NOT WAIT FOR CLAUDE'S
 NEXT REVIEW; THIS DOES NOT CLAIM INDEPENDENT ACCEPTANCE OF NEW CODE.
 NAMED LOGIN-KEYCHAIN SELECTORS ARE RECORDED; ONLY EXPLICITLY DOCUMENTED
 EXISTING CREDENTIAL ROUTES ARE USED (116.6/116.10). EXISTING PROTECTED
-CAPTURES/SPENT BUDGETS ARE RETAINED.
+CAPTURES/SPENT BUDGETS ARE RETAINED. THE EXACT112-DATE IDENTITY
+CONTINUATION AND INDEPENDENT SOURCE REPLAY ARE CLOSED (116.15);
+COUNTS/DAILY INPUTS/EXECUTION ADMISSION ARE STILL IN PROGRESS.
 STRICT ORIGINAL-VINTAGE PIT AND LATEST-REVISED EXPLORATION STAY DISTINCT;
 NO FIXTURE RELABEL, FABRICATED SOURCE FACT OR CHANGED 48-BOOK ECONOMICS.
 LOOKBACKS 20/60/120/252 UNSELECTED; CANONICAL ACTUAL LOOKS0/0,
@@ -18852,3 +18854,139 @@ Diff check passes and only this append plus the single literal change are
 staged. No full lane/repository suite, provider request or QC attempt occurred
 during this validation. The source application now reauthenticates the retained
 parent from the resulting clean committed tree before its claim/key/HTTP.
+
+### 116.15 Closed identity continuation, independent replay and connected source bindings
+
+The actual application from clean **64f372ea8bfbcc542e87356a5e3e58fe07da1c27**
+closed successfully in protected ignored run
+`native_identity_continuation/native-identity-continuation-20261014T021244Z`.
+Its real start was **2026-10-14T02:12:44.887633Z** and completion
+**2026-10-14T02:46:03.229006Z**. It spent **849** additional HTTP attempts;
+the original491, including its one unclassified failed attempt, remain spent.
+The cumulative count is1340, not a reset or recapture. The original44 date
+reports plus68 continued reports cover the exact112 registered dates.
+Unused portions of the separately claimed8703 allowance are not repurposable.
+No source-admission, original-vintage, availability or backtest claim follows.
+
+Main independently checked all2619 protected child files, their directory/file
+ownership, mode, no-link/inode custody and bytes. Closed all-file inventory SHA:
+**92f3eccbfb8985256a35364c4bf6739483e8fbbe41d563d5df2a0ed0954dd5b8**.
+Global spent-claim bytes:
+**f58314801ad84ddbd0f0de203efecf18a693ebc44dc089d4bcc15751c72a064e**.
+Actual19-file capture-code identity:
+**00fd3e26b30ee6227eb734ee8afe66ceb8dd93f1b027c90bc7c4f1dd78ab55ca**.
+Protocol bytes:
+**feebd180007f8c6fc07e1b5f55fc61131bfc8431ba1775d75063de6114cf045d**.
+Started receipt bytes:
+**37379cc10e00c9c88aabf33de2498a6486c6f12d2a9f2185dafaf92714c8fa79**.
+Completed receipt bytes:
+**4e00eea1b206990164e3463533947d1ba73b0da09935e58ae26c89c3ecce46ea**.
+Private inventory receipt bytes:
+**09b63be5420d7ecfef4b5c42bcff12d7721ed715457feaf9d681764d48338e39**.
+The original1519-file parent inventory, failure and global claim remain
+byte-pinned exactly as116.12–116.14. Originals never acquire new retrieval
+dates or become child requests.
+
+**SI-DEC-20261013-32** replaces only an inefficient read-only replay driver.
+Per64KiB full Git guards spawned hundreds of subprocesses for large files.
+Main cancelled that read-only run (exit130/KeyboardInterrupt): **cancelled,
+not failed**, no new request/write/look, no budget reset. The new reader keeps
+identical per-chunk FD/inode/mode/owner/no-link checks and full physical/Git
+root, branch, HEAD and status checks around each complete source-file and
+historical Git operation. Main's28 reader/stream/custody tests passed0.59s,
+including mid-read bytes, links, directory replacement, permissions and
+closing-boundary HEAD drift. Original capture code and semantic replay checks
+are unchanged.
+
+Main's subsequent complete parent/child semantic replay and actual source-only
+anchor preflight completed from the same clean64f/actual remote1f90 in
+**1248.668 seconds**. It independently reconstructed historical binary code,
+protocol/budgets, original pages and44 byte-equal date rebuilds, the failed
+cursor, all849 child starts/receipts/raw pages,68 byte-equal child date
+rebuilds, pagination closure, real clocks and debits. Completion booleans are
+not evidence. All112 sealed date qualifications feed the exact compact matrix
+and original action/dictionary evidence. Anchor plan SHA:
+**d58b2b3d006319899e6af9cd06a2fef17128c391513ea0ee99c987c483d2af3b**.
+It selects exactly **81,875** class-overview requests. Report-reference inventory:
+**61ab8d97eea97bfcf294e752c7b315aa41dbfa25c83d07d3d29f0b769746be25**;
+matrix SHA:
+**e570c5b658668f0f9ab087dabbd968d4460294287eba1406ae203882144bc49e**.
+This preflight reads no key, issues no provider HTTP/QC request and computes no
+signal/outcome/return/performance. The operational capture/code/budget permit
+still requires a separate concrete prospective freeze.
+
+**SI-DEC-20261013-33** prepares at most eight in-flight class-count requests,
+not additional entitlement or retries. Every START reserves a whole2MiB page
+and debits its attempt before invocation. A fatal access/rate/transport/guard
+failure stops scheduling and drains started requests. Real START/receipt/end
+clocks are never rewritten into query-ordinal chronology. The original serial
+registry still rejects receipt inversions. The distinct exact typed parallel
+inventory proves each enclosing clock, request/raw/status binding, concurrency
+and reservation ledger. Discarded bodies and unstarted slots stay absent or
+refused, not synthetic404s or old-count fallbacks. The compiler accepts only
+the exact sealed parallel extension and binds full inventory/plan/clock/halt
+lineage and its wrapper digest. Serial compilation bytes and formulas remain
+identical.
+
+**SI-DEC-20261013-34** keeps daily price identity separate from112 settlement
+snapshots. The next prospective identity scope is all1169 XNYS sessions,
+2022-01-03 through2026-08-31, via documented dated active AllTickers panels.
+It is not launched here. Inactive panels/current status are not positive
+historical listing assertions. Grouped bars retain request date, original
+window timestamp and rational volume; they do not invent identity, USD,
+auction or availability facts. Existing captures are reused. No Sharadar
+usability/fitness conclusion or reconstructible provider row is published.
+
+**SI-DEC-20261013-35** selects a price-free FMP company-context alternative:
+documented CIK search/SEC company-symbol lookup, not a rich current profile
+with later prices. Main's visible public pricing-row check shows both lookups
+included in existing Starter. Official
+[authorization documentation](https://site.financialmodelingprep.com/developer/docs)
+documents the `apikey` request header, avoiding secret URLs. Current
+authenticated context identifies the request-target issuer, not historical
+class/currency/sector. Issuer-cap candidates still need independent same-day
+target CIK/USD evidence before USD-size qualification; cap is never a
+class-share denominator. The ignored single-company prototype is not actual
+access, a full-study join or an execution permit. No lookup/cap request occurs.
+
+Append-only P0–P3 ledger additions retain historical001–019 and every earlier
+partial/false-alarm row unchanged.
+
+| ID | Priority / disposition | Evidence, correction and retained limits |
+|---|---|---|
+| SI-BUILD-20261013-020 | P1 temporal correctness, confirmed/corrected | Class gaps across aliases and per-yield plan/registry sealing have causal red/green regressions; later class transitions cannot poison earlier counts. Integrated anchors/compiler retain date/class fences, failed refreshes and no old-count fallback. Publication availability/source admission remain unproved. |
+| SI-BUILD-20261013-021 | P1 source binding, confirmed/corrected | Main's MIC/plan-guard audit had7 causal failures then105 focused passes; dated active-listing audit had6 causal failures then118 connected passes. Finite MIC validation and exact dated active assertions apply before budgeting. Inactive evidence remains negative, not silently future-pruned. |
+| SI-BUILD-20261013-022 | P1 provenance/privacy, confirmed/corrected | Wrong-date, protocol drift, safe429 status, zero-HTTP key refusal and whitespace date-scope regressions prove the grouped-source safeguards. Main's four operational failures became80 passes. Original window timestamps are not auction/publication facts. Raw/failed receipts and spent budgets remain private. |
+| SI-BUILD-20261013-023 | P1 source authority, confirmed/corrected | Exact-type replay rejects JSON bool/int equality confusion: four causal failures became42 focused passes; Main's separate114/52 replay/loader selectors passed. Report restoration requires the exact replay type, original registered bytes and clocks, not raw-file/completion flags. |
+| SI-BUILD-20261013-024 | P1 request/provenance correctness, confirmed/corrected | Main reproduced three failures: discarded HTTP200 falsely required a fabricated capture; known403 could claim no invocation; overlapping whole2MiB starts were accepted against total2MiB because only final tiny bodies were checked. Discarded200 stays missing, status requires invocation, and replay proves affordable reservations at each START. Connected62 tests pass1.17s; no provider request. |
+| SI-BUILD-20261013-025 | P2 scalability, confirmed/corrected in ignored runtime | Deterministic counts prove full-alias scans per fill and quadratic history resealing. Separate compact runtime uses bounded affected-security projections with all48/all-alias cohort/report audits. Main's35 tests pass5.94s, including unchanged-kernel all48 cash/fee parity and unrelated/cancelling drift refusals. No CLR/cloud execution or financial result is claimed. |
+| SI-BUILD-20261013-026 | P2 compatibility, confirmed/corrected in ignored runtime | Main identified global event-ID uniqueness as stricter than the original `(security,event,side)` trade namespace. Delegated causal control accepts two securities sharing a release event while old compact fails; corrected typed trade/action keys pass. Action IDs remain separately cell-global. Not an observed cloud defect. |
+
+Main's integrated selector runs only the17 relevant new test files:
+**323 passed in2.97s**, empty environment/network denied,
+CPython3.13.15/pytest9.1.1. This is not the full lane/repository suite.
+Delegated runs are separately attributed; no Claude run is claimed as Main's.
+Targeted compilation/import-boundary/active-document/diff/status checks follow
+before the local preparation commit.
+
+The owner review waiver/continuous-build instruction remains active. This is
+local preparation, not final closure, an interim push or a review checkpoint.
+Counts, daily raw bars/identity, company-size currency, cashflows/terminal
+evidence and original custody still require concrete freezes/qualification.
+Exact evaluation/power/look and permitted processing/order representation
+precede actual signal/outcome joins. Strict original-vintage PIT remains
+distinct from latest-reported/latest-revised exploration. All four lookbacks
+and48-book economics stay unselected/unchanged. Canonical actual looks0/0,
+exploratory actual looks0, alpha0, permanent look IDs none, QC attempts0,
+node availability unqueried, no backtest launched. Shared/project documents
+and SESSION_HANDOFF stay frozen. Continue without another review wait and
+retain **one final push only** at genuine closure.
+
+Main's final stage checks: all31 new Python source/test files compile
+successfully; relevant Short Interest import-boundary and active-document
+selectors **78 passed in1.46s**, empty environment/network denied. Diff check
+passes after correcting a formatting-only trailing blank line. There is no
+full-suite execution, source/key access or QC action in these checks. Only the
+31 new lane-owned files and this lane record are staged for the local source
+preparation commit; the actual matching origin ref is rechecked immediately
+before commit. No successful push is made at this intermediate stage.

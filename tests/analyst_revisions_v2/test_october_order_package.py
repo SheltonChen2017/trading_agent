@@ -10,6 +10,8 @@ from types import SimpleNamespace
 
 import pytest
 
+from tests.analyst_revisions_v2._dispatch_fence_closure import assert_lane_closure_excludes_dispatch_fence
+
 from research.analyst_revisions_v2_qc import accepted_risk_october_order_package as m
 
 
@@ -20,7 +22,7 @@ def synthetic_environment(monkeypatch):
     ) if key in os.environ}
     safe["PATH"] = os.defpath
     monkeypatch.setattr(os, "environ", safe)
-    assert "assistant.dispatch_fence" not in sys.modules
+    assert_lane_closure_excludes_dispatch_fence()
 
 
 def contribution(index, event, *, firm="firm-a", view=None):

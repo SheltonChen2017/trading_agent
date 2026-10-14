@@ -6,6 +6,8 @@ from types import SimpleNamespace as NS
 
 import pytest
 
+from tests.analyst_revisions_v2._dispatch_fence_closure import assert_lane_closure_excludes_dispatch_fence
+
 import scripts
 from scripts import arv2_newrule_storage_recovery as real_recovery
 from scripts import run_arv2_newrule_storage_recovery as m
@@ -33,7 +35,7 @@ def operational_guards(monkeypatch):
 
 @pytest.fixture
 def setup(monkeypatch):
-    assert 'assistant.dispatch_fence' not in sys.modules
+    assert_lane_closure_excludes_dispatch_fence()
     calls = []
     args = NS(expected_head='a' * 40, caller_sha256='b' * 64)
     module = NS(claim=lambda *a: calls.append('claim'),

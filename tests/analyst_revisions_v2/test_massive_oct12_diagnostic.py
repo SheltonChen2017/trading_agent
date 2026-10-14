@@ -13,6 +13,8 @@ from types import SimpleNamespace
 
 import pytest
 
+from tests.analyst_revisions_v2._dispatch_fence_closure import assert_lane_closure_excludes_dispatch_fence
+
 from scripts import run_arv2_massive_oct12_diagnostic as d
 
 
@@ -615,4 +617,4 @@ def test_direct_import_boundary_excludes_execution_and_dispatch_fence():
     names = {n.module for n in imports if isinstance(n, ast.ImportFrom)}
     names.update(alias.name for node in imports if isinstance(node, ast.Import) for alias in node.names)
     assert not any(n and n.split(".")[0] in {"assistant", "execution", "ml", "risk", "quantconnect"} for n in names)
-    assert "assistant.dispatch_fence" not in sys.modules
+    assert_lane_closure_excludes_dispatch_fence()

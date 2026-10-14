@@ -13,6 +13,8 @@ from types import SimpleNamespace
 
 import pytest
 
+from tests.analyst_revisions_v2._dispatch_fence_closure import assert_lane_closure_excludes_dispatch_fence
+
 from scripts import capture_arv2_massive_ratings_delta as d
 
 HEAD, SHA, KEY = "a" * 40, "b" * 64, "SYNTHETIC-CREDENTIAL-NOT-REAL"
@@ -135,7 +137,7 @@ def test_complete_two_pages_and_authentication(control, monkeypatch):
         "page0002.raw.json", "page0002.rows.jsonl"]
     assert all(r.closed == 1 for r in adapter.responses) and adapter.closed == 1
     assert KEY not in json.dumps(result)
-    assert "assistant.dispatch_fence" not in sys.modules
+    assert_lane_closure_excludes_dispatch_fence()
 
 
 @pytest.mark.parametrize("status", [201, 301, 302, 401, 403, 429, 500, 599])
@@ -579,3 +581,24 @@ def test_reader_physical_output_refusals(control, monkeypatch, capsys, tamper):
         path.write_bytes(path.read_bytes() + b"\n")
     with pytest.raises((ValueError, OSError)):
         d.read_output(HEAD, SHA, envelope["report_sha256"], envelope["report_bytes"], code)
+
+
+def test_claim_replaced_after_first_page_stops_before_second_send(control, monkeypatch):
+    # Section 301 (ARV2R301-009): the claim is rechecked before every page's send,
+    # so a claim swapped during the capture stops it before any further contact.
+    next_url = "https://api.massive.com/benzinga/v1/ratings?cursor=second"
+
+    def change(_response):
+        if len(adapter.calls) == 1:
+            claim = control / "claim.json"
+            replacement = control / "claim-replacement.json"
+            replacement.write_bytes(claim.read_bytes())
+            replacement.chmod(0o600)
+            replacement.replace(claim)
+
+    adapter = Adapter([payload(1, next_url), payload(2)], change=change)
+    result = invoke(monkeypatch, adapter)
+    assert len(adapter.calls) == 1
+    assert result["terminal"] != "capture_completed" and result["binding"] is None
+    assert not (control / "capture/manifest.json").exists()
+    assert not (control / "send-0002-started.json").exists()

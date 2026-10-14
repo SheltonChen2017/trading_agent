@@ -10,6 +10,8 @@ import urllib.request
 
 import pytest
 
+from tests.analyst_revisions_v2._dispatch_fence_closure import assert_lane_closure_excludes_dispatch_fence
+
 from scripts import arv2_newrule_recovery_continuation_v4 as c
 
 old = c.old
@@ -265,7 +267,7 @@ def test_module_has_no_global_patch_legacy_receipt_write_or_dynamic_code():
             assert node.func.attr not in {"_uploaded","upload_inputs","prepare_family","discover_organization"}
             if node.func.attr=="write" and node.args and isinstance(node.args[0],ast.Constant):
                 assert node.args[0].value!="upload-valid.json"
-    assert "assistant.dispatch_fence" not in sys.modules
+    assert_lane_closure_excludes_dispatch_fence()
 
 
 def test_continuation_binds_only_the_separately_versioned_v4_admission():

@@ -17,6 +17,8 @@ from urllib.parse import parse_qs, quote, quote_plus, urlsplit
 
 import pytest
 
+from tests.analyst_revisions_v2._dispatch_fence_closure import assert_lane_closure_excludes_dispatch_fence
+
 from scripts import arv2_keychain_connections as keys
 from scripts import run_arv2_keychain_connection_check as d
 
@@ -583,7 +585,7 @@ def test_parent_and_reader_alarm_boundaries(monkeypatch):
 
 
 def test_no_dispatch_fence_imported():
-    assert "assistant.dispatch_fence" not in sys.modules
+    assert_lane_closure_excludes_dispatch_fence()
 
 
 @pytest.mark.parametrize("error", [KeyboardInterrupt(), SystemExit(2)])
@@ -791,3 +793,20 @@ def test_reader_requires_producer_mandatory_presence(private_control, monkeypatc
     row["fields_available"][d._required_fields(d.ENDPOINTS[index])[0]] = False
     with pytest.raises(d.Refusal):
         d._validate(claim, report, HEAD, SHA, 2)
+
+
+def test_each_request_carries_only_its_own_providers_key(private_control, monkeypatch):
+    # Section 301 (ARV2R301-009): distinct synthetic keys per provider prove the key
+    # is reloaded on every provider change and never sent to another provider's host.
+    keys_by_provider = {provider: f"SYNTHETIC-{provider.upper()}-NOT-A-CREDENTIAL"
+                        for provider in keys.SERVICES}
+    monkeypatch.setattr(keys, "load_key", lambda provider, **_kwargs: keys_by_provider[provider])
+    code, adapter = execute(monkeypatch)
+    assert code == 0 and len(adapter.calls) == 7
+    for index, request, _kwargs in adapter.calls:
+        endpoint = d.ENDPOINTS[index]
+        own = keys_by_provider[endpoint.provider]
+        carried = request.url + json.dumps(dict(request.headers))
+        assert own in carried
+        assert not any(other in carried for provider, other in keys_by_provider.items()
+                       if provider != endpoint.provider)

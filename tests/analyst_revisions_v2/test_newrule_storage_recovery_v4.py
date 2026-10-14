@@ -14,6 +14,8 @@ import urllib.request
 
 import pytest
 
+from tests.analyst_revisions_v2._dispatch_fence_closure import assert_lane_closure_excludes_dispatch_fence
+
 from scripts import run_arv2_newrule_comparison as frozen_baseline
 BASELINE_SCRIPT_MODULES = frozenset(name for name in sys.modules if name.startswith("scripts."))
 from scripts import arv2_newrule_storage_recovery_v4 as d
@@ -397,7 +399,7 @@ def test_source_literals_and_selected_executed_import_closure():
     assert caller.HELPER_SHA256 == hashlib.sha256(d.SOURCE.read_bytes()).hexdigest()
     for name, pin in {**dict(d.frozen.SOURCE_PINS), **d.ADDITIONS}.items():
         assert hashlib.sha256((d.ROOT / name).read_bytes()).hexdigest() == pin
-    assert "assistant.dispatch_fence" not in sys.modules
+    assert_lane_closure_excludes_dispatch_fence()
     selected = set(d.frozen.SOURCE_PINS) | set(d.ADDITIONS)
     selected |= {d.SOURCE.relative_to(d.ROOT).as_posix(), caller.SOURCE.relative_to(d.ROOT).as_posix()}
     for name, module in tuple(sys.modules.items()):

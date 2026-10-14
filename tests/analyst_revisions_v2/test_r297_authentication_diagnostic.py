@@ -12,6 +12,8 @@ from types import SimpleNamespace
 
 import pytest
 
+from tests.analyst_revisions_v2._dispatch_fence_closure import assert_lane_closure_excludes_dispatch_fence
+
 from scripts import diagnose_arv2_r297_authentication as d
 
 HEAD, SHA = "a" * 40, "b" * 64
@@ -66,7 +68,7 @@ def test_claim_precedes_exact_single_offline_call_and_return_is_not_acceptance(c
     assert envelope["report_sha256"] == hashlib.sha256(raw).hexdigest()
     assert envelope["report_bytes"] == len(raw)
     assert set(p.name for p in control.iterdir()) == {"claim.json", "report.json"}
-    assert "assistant.dispatch_fence" not in sys.modules
+    assert_lane_closure_excludes_dispatch_fence()
 
 
 @pytest.mark.parametrize("code", sorted(d.KNOWN_CODES))

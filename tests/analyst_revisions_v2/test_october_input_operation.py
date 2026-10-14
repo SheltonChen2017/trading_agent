@@ -9,6 +9,8 @@ from types import SimpleNamespace
 
 import pytest
 
+from tests.analyst_revisions_v2._dispatch_fence_closure import assert_lane_closure_excludes_dispatch_fence
+
 from scripts import build_arv2_october_comparison_inputs as d
 
 HEAD, SHA = "a" * 40, "b" * 64
@@ -52,7 +54,7 @@ def test_claim_precedes_only_composition_and_normal_exit_bound(control, monkeypa
     payload = (control / "report.json").read_bytes()
     assert envelope["report_bytes"] == len(payload)
     assert envelope["report_sha256"] == hashlib.sha256(payload).hexdigest()
-    assert "assistant.dispatch_fence" not in sys.modules
+    assert_lane_closure_excludes_dispatch_fence()
 
 
 def test_claim_collision_spends_ambiguously_without_source(control, monkeypatch, capsys):

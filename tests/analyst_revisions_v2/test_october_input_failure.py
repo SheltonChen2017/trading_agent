@@ -9,6 +9,8 @@ from types import MappingProxyType
 
 import pytest
 
+from tests.analyst_revisions_v2._dispatch_fence_closure import assert_lane_closure_excludes_dispatch_fence
+
 from scripts import arv2_october_input_failure as subject
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -86,7 +88,7 @@ def test_inventory_classes_and_public_codes_are_complete_distinct_and_immutable(
     for _cls, _label, _path, _name, literals in subject._TYPE_ROWS:
         assert type(literals) is MappingProxyType
         assert tuple(literals) == tuple(sorted(literals))
-    assert "assistant.dispatch_fence" not in sys.modules
+    assert_lane_closure_excludes_dispatch_fence()
 
 
 def test_capacity_and_publication_subclasses_are_not_coerced_to_parent_type():

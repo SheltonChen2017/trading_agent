@@ -14,6 +14,8 @@ from urllib.parse import urlencode
 
 import pytest
 
+from tests.analyst_revisions_v2._dispatch_fence_closure import assert_lane_closure_excludes_dispatch_fence
+
 from scripts import check_arv2_remaining_provider_connections as d
 
 HEAD = "a" * 40
@@ -439,4 +441,4 @@ def test_only_allowed_stateless_a_calls():
     assert calls <= allowed
     assert d._write_held is d.contract._write_held
     assert all(e.provider != "sharadar" for e in d.ENDPOINTS)
-    assert "assistant.dispatch_fence" not in sys.modules
+    assert_lane_closure_excludes_dispatch_fence()

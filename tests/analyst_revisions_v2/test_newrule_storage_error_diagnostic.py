@@ -13,6 +13,8 @@ import urllib.request
 
 import pytest
 
+from tests.analyst_revisions_v2._dispatch_fence_closure import assert_lane_closure_excludes_dispatch_fence
+
 from scripts import diagnose_arv2_newrule_storage_error as d
 from scripts import diagnose_arv2_newrule_upload as family
 from scripts import diagnose_arv2_newrule_object_metadata as organization
@@ -346,4 +348,4 @@ def test_retained_authentication_reads_only_bound_family_and_org(monkeypatch):
 
 def test_import_closure_excludes_dispatch_fence():
     import sys
-    assert "assistant.dispatch_fence" not in sys.modules
+    assert_lane_closure_excludes_dispatch_fence()

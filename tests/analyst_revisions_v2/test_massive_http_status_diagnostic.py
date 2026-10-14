@@ -14,6 +14,8 @@ from types import SimpleNamespace
 
 import pytest
 
+from tests.analyst_revisions_v2._dispatch_fence_closure import assert_lane_closure_excludes_dispatch_fence
+
 from scripts import run_arv2_massive_http_status_diagnostic as d
 
 HEAD = "a" * 40
@@ -632,7 +634,7 @@ def test_no_spent_or_body_call_sites():
     # dictionary .get is not needed by this frozen exact-schema implementation.
     assert not [(n.lineno, n.func.attr) for n in ast.walk(tree)
                 if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr in forbidden]
-    assert "assistant.dispatch_fence" not in sys.modules
+    assert_lane_closure_excludes_dispatch_fence()
 
 
 def test_profile_pins_and_finite_scope():

@@ -10,6 +10,8 @@ from types import SimpleNamespace
 
 import pytest
 
+from tests.analyst_revisions_v2._dispatch_fence_closure import assert_lane_closure_excludes_dispatch_fence
+
 import scripts as scripts_package
 import research.analyst_revisions_v2_qc as qc_package
 from scripts import run_arv2_newrule_recovery_continuation as d
@@ -429,4 +431,4 @@ def test_actual_wrapper_exit_zero_never_claims_original_or_formal_acceptance(mon
     assert value["operation_completed"] and value["result"]=={"state":"wait"}
     assert all(value[k] is False for k in ("original_upload_accepted","formal_forward_ready",
         "point_in_time_proven","paper_or_live_ready"))
-    assert "assistant.dispatch_fence" not in sys.modules
+    assert_lane_closure_excludes_dispatch_fence()

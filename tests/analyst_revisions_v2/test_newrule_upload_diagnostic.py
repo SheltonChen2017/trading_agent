@@ -8,15 +8,28 @@ import time
 
 import pytest
 
+from tests.analyst_revisions_v2._dispatch_fence_closure import assert_lane_closure_excludes_dispatch_fence
+
 from scripts import diagnose_arv2_newrule_upload as d
 from research.analyst_revisions_v2_qc import newrule_comparison_submission as s
 
 HEAD, SHA = "a" * 40, "b" * 64
 
 
+import socket  # noqa: E402
+import urllib.request  # noqa: E402
+
+REAL_CREATE_CONNECTION, REAL_PRODUCTION_CLIENT = socket.create_connection, s.coverage.production_client
+
+
 @pytest.fixture(autouse=True)
 def isolation(monkeypatch):
+    # Section 301 (ARV2R301-002): record every boundary hit, so a guard swallowed
+    # by a broad product handler still fails at teardown (the 298.2 class).
+    violations = []
+
     def forbidden(*_args, **_kwargs):
+        violations.append("operational_boundary")
         pytest.fail("operational access forbidden")
     for name in ("run", "_operation"):
         monkeypatch.setattr(d.frozen, name, forbidden)
@@ -25,6 +38,28 @@ def isolation(monkeypatch):
                  "poll_status_once", "read_result_once", "summarize_family", "load_family", "_session"):
         monkeypatch.setattr(s, name, forbidden)
     monkeypatch.setattr(d.frozen.prepared_input.october, "load_october_order_input_package", forbidden)
+    monkeypatch.setattr(s.QuantConnectClient, "__init__", forbidden)
+    monkeypatch.setattr(s.coverage, "production_client", forbidden)
+    monkeypatch.setattr(s.coverage, "_bounded_transport", forbidden)
+    for owner, names in ((socket, ("create_connection", "getaddrinfo")),
+                         (socket.socket, ("connect", "connect_ex")),
+                         (urllib.request.OpenerDirector, ("open",))):
+        for name in names:
+            monkeypatch.setattr(owner, name, forbidden)
+    yield violations
+    assert violations == [], "swallowed operational boundary"
+
+
+def test_isolation_records_swallowed_boundary_calls(isolation):
+    # Fails if the fixture stops recording (the former version yielded nothing).
+    assert s.coverage.production_client is not REAL_PRODUCTION_CLIENT
+    assert socket.create_connection is not REAL_CREATE_CONNECTION
+    try:
+        s._client()
+    except BaseException:
+        pass  # a broad handler swallowing the guard, as product code might
+    assert isolation == ["operational_boundary"]
+    isolation.clear()
 
 
 class MemoryDirectory:
@@ -194,7 +229,7 @@ def test_claim_precedes_authentication_and_report_is_pinned(monkeypatch, capsys)
     assert envelope["report_sha256"] == hashlib.sha256(raw).hexdigest()
     assert envelope["report_published"] is True
     assert "PRIVATE" not in json.dumps(envelope)
-    assert "assistant.dispatch_fence" not in sys.modules
+    assert_lane_closure_excludes_dispatch_fence()
 
 
 def test_repeated_diagnostic_refuses_before_source_read_or_report_overwrite(monkeypatch, capsys):

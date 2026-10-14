@@ -6,6 +6,8 @@ from types import SimpleNamespace
 
 import pytest
 
+from tests.analyst_revisions_v2._dispatch_fence_closure import assert_lane_closure_excludes_dispatch_fence
+
 from scripts import run_arv2_newrule_comparison as d
 
 HEAD, SHA = "a" * 40, "b" * 64
@@ -24,6 +26,54 @@ def args(operation="prepare", **changes):
 def no_real_operation(monkeypatch):
     monkeypatch.setattr(d, "_operation", lambda *_a: pytest.fail("real operation forbidden"))
     monkeypatch.setattr(d.subprocess, "run", lambda *_a, **_k: pytest.fail("real git forbidden"))
+
+
+# Section 301 (ARV2R301-002): the lifecycle CLI reaches the QC submission module,
+# so its real control directory, client and the network are tripwired as well.
+from research.analyst_revisions_v2_qc import newrule_comparison_submission as _submission  # noqa: E402
+import socket  # noqa: E402
+import urllib.request  # noqa: E402
+
+REAL_CONTROL, REAL_ROOT = _submission.CONTROL, _submission.ROOT
+REAL_DIRECTORY_INIT, REAL_PRODUCTION_CLIENT = _submission._Directory.__init__, _submission.coverage.production_client
+REAL_CREATE_CONNECTION = socket.create_connection
+
+
+@pytest.fixture(autouse=True)
+def operational_tripwires(monkeypatch):
+    violations = []
+
+    def forbidden(*_args, **_kwargs):
+        violations.append("operational_boundary")
+        pytest.fail("operational boundary forbidden")
+
+    def directory_init(self, *args, **kwargs):
+        if _submission.CONTROL == REAL_CONTROL or _submission.ROOT == REAL_ROOT:
+            forbidden()
+        return REAL_DIRECTORY_INIT(self, *args, **kwargs)
+
+    monkeypatch.setattr(_submission._Directory, "__init__", directory_init)
+    monkeypatch.setattr(_submission.QuantConnectClient, "__init__", forbidden)
+    monkeypatch.setattr(_submission.coverage, "production_client", forbidden)
+    monkeypatch.setattr(_submission.coverage, "_bounded_transport", forbidden)
+    for owner, names in ((socket, ("create_connection", "getaddrinfo")),
+                         (socket.socket, ("connect", "connect_ex")),
+                         (urllib.request.OpenerDirector, ("open",))):
+        for name in names:
+            monkeypatch.setattr(owner, name, forbidden)
+    yield violations
+    assert violations == [], "swallowed operational boundary"
+
+
+def test_operational_tripwires_installed_and_record_swallowed_calls(operational_tripwires):
+    # Fails if the tripwire fixture above is removed or stops recording.
+    assert _submission._Directory.__init__ is not REAL_DIRECTORY_INIT
+    assert _submission.coverage.production_client is not REAL_PRODUCTION_CLIENT
+    assert socket.create_connection is not REAL_CREATE_CONNECTION
+    with pytest.raises(pytest.fail.Exception, match="operational boundary forbidden"):
+        _submission._Directory()
+    assert operational_tripwires == ["operational_boundary"]
+    operational_tripwires.clear()
 
 
 def preflight_fixtures(monkeypatch, mutation=None):
@@ -102,7 +152,7 @@ def test_operation_exit_is_not_backtest_or_formal_success(monkeypatch, capsys):
     assert value["operation_completed"] is True
     for key in ("formal_forward_ready", "point_in_time_proven", "paper_or_live_ready"):
         assert value[key] is False
-    assert "assistant.dispatch_fence" not in sys.modules
+    assert_lane_closure_excludes_dispatch_fence()
 
 
 def test_unknown_opaque_failure_is_never_rendered(monkeypatch, capsys):
@@ -222,7 +272,8 @@ def test_preflight_refusal_never_imports_unverified_submission(monkeypatch, caps
     preflight_fixtures(monkeypatch, "pin")
     original = builtins.__import__
     def guarded(name, globals=None, locals=None, fromlist=(), level=0):
-        if "newrule_comparison_submission" in name or "newrule_comparison_submission" in fromlist:
+        # Section 301 (ARV2R301-010): the shared conftest may import with fromlist=None.
+        if "newrule_comparison_submission" in name or "newrule_comparison_submission" in (fromlist or ()):
             pytest.fail("unverified module import after preflight refusal")
         return original(name, globals, locals, fromlist, level)
     monkeypatch.setattr(builtins, "__import__", guarded)

@@ -11,6 +11,8 @@ from types import SimpleNamespace
 
 import pytest
 
+from tests.analyst_revisions_v2._dispatch_fence_closure import assert_lane_closure_excludes_dispatch_fence
+
 from scripts import characterize_arv2_r297_duplicates as d
 
 HEAD, SHA = "a" * 40, "b" * 64
@@ -90,7 +92,7 @@ def test_all_location_and_conflict_classes_and_no_identifiers(control, tmp_path,
     payload = (control / "report.json").read_bytes()
     assert envelope["report_bytes"] == len(payload)
     assert envelope["report_sha256"] == hashlib.sha256(payload).hexdigest()
-    assert "assistant.dispatch_fence" not in sys.modules
+    assert_lane_closure_excludes_dispatch_fence()
 
 
 @pytest.mark.parametrize("pages,expected", [

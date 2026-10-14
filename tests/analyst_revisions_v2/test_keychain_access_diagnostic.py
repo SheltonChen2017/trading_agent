@@ -13,6 +13,8 @@ from types import SimpleNamespace
 
 import pytest
 
+from tests.analyst_revisions_v2._dispatch_fence_closure import assert_lane_closure_excludes_dispatch_fence
+
 from scripts import diagnose_arv2_keychain_access as d
 
 HEAD = "a" * 40
@@ -319,4 +321,4 @@ def test_no_network_module_imports_or_old_operational_calls():
     source = d.SOURCE.read_text()
     for forbidden in ("keymap.load_key(", "helpers.run(", "helpers._preflight(", "helpers._worker("):
         assert forbidden not in source
-    assert "assistant.dispatch_fence" not in sys.modules
+    assert_lane_closure_excludes_dispatch_fence()

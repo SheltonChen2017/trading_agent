@@ -5,14 +5,74 @@ import hashlib
 import importlib.util
 import json
 import os
+import socket
 import sys
 from datetime import date, timedelta
 from pathlib import Path
 from types import SimpleNamespace as NS
+import urllib.request
 
 import pytest
 
+from tests.analyst_revisions_v2._dispatch_fence_closure import assert_lane_closure_excludes_dispatch_fence
+
 from research.analyst_revisions_v2_qc import newrule_comparison_submission as m
+
+# Section 301 (ARV2R301-002): the real boundaries, captured before any test
+# patches them, so the autouse tripwire below can be checked independently.
+REAL_ROOT, REAL_CONTROL = m.ROOT, m.CONTROL
+REAL_DIRECTORY_INIT, REAL_CLIENT_INIT = m._Directory.__init__, m.QuantConnectClient.__init__
+REAL_PRODUCTION_CLIENT, REAL_BOUNDED_TRANSPORT = m.coverage.production_client, m.coverage._bounded_transport
+REAL_CREATE_CONNECTION = socket.create_connection
+
+
+@pytest.fixture(autouse=True)
+def isolation(monkeypatch):
+    """Every test is synthetic: no real control directory, client or network.
+
+    The `setup` fixture redirects ROOT/CONTROL to tmp_path; a test that does not
+    must never open the production control directory (the 298.2 incident class).
+    A guard swallowed by a broad product handler still fails at teardown.
+    """
+    violations = []
+
+    def forbidden(*_args, **_kwargs):
+        violations.append("operational_boundary")
+        pytest.fail("operational boundary forbidden")
+
+    def directory_init(self, *args, **kwargs):
+        if m.CONTROL == REAL_CONTROL or m.ROOT == REAL_ROOT:
+            forbidden()
+        return REAL_DIRECTORY_INIT(self, *args, **kwargs)
+
+    monkeypatch.setattr(m._Directory, "__init__", directory_init)
+    monkeypatch.setattr(m.QuantConnectClient, "__init__", forbidden)
+    monkeypatch.setattr(m.coverage, "production_client", forbidden)
+    monkeypatch.setattr(m.coverage, "_bounded_transport", forbidden)
+    for owner, names in ((socket, ("create_connection", "getaddrinfo")),
+                         (socket.socket, ("connect", "connect_ex")),
+                         (urllib.request.OpenerDirector, ("open",)),
+                         (m.http.client.HTTPConnection, ("connect",)),
+                         (m.http.client.HTTPSConnection, ("connect",))):
+        for name in names:
+            monkeypatch.setattr(owner, name, forbidden)
+    yield violations
+    assert violations == [], "swallowed operational boundary"
+
+
+def test_isolation_tripwires_cover_real_directory_client_and_network(isolation):
+    # Fails if the autouse tripwire above is removed or narrowed.
+    assert isolation == []
+    assert m._Directory.__init__ is not REAL_DIRECTORY_INIT
+    assert m.QuantConnectClient.__init__ is not REAL_CLIENT_INIT
+    assert m.coverage.production_client is not REAL_PRODUCTION_CLIENT
+    assert m.coverage._bounded_transport is not REAL_BOUNDED_TRANSPORT
+    assert socket.create_connection is not REAL_CREATE_CONNECTION
+    assert m.CONTROL == REAL_CONTROL
+    with pytest.raises(pytest.fail.Exception, match="operational boundary forbidden"):
+        m._Directory()
+    assert isolation == ["operational_boundary"]
+    isolation.clear()
 
 
 def sha(value):
@@ -122,7 +182,7 @@ class FakeQC:
 
 @pytest.fixture
 def setup(monkeypatch, tmp_path):
-    assert "assistant.dispatch_fence" not in sys.modules
+    assert_lane_closure_excludes_dispatch_fence()
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(m, "ROOT", tmp_path)
     monkeypatch.setattr(m, "CONTROL", tmp_path / "artifacts/test-family")
@@ -413,7 +473,7 @@ def test_unsafe_transport_environment_refused(monkeypatch, unsafe):
 
 
 def test_closure_no_dispatch_fence():
-    assert "assistant.dispatch_fence" not in sys.modules
+    assert_lane_closure_excludes_dispatch_fence()
 
 
 @pytest.mark.parametrize("mismatch", [False, True])
@@ -609,3 +669,45 @@ def test_cloud_project_float_aliases_refuse(setup, phase):
     s.api.mutate = mutate
     with pytest.raises(m.NewruleSubmissionError): m.begin_attempt(s.plan, "R298", 1, **kwargs(s))
     assert (m.CONTROL / "R298-A1-claim.json").exists()
+
+
+def test_second_launch_never_creates_a_second_backtest(setup):
+    # Section 301 (ARV2R301-009): the exclusive backtest-create intent is the
+    # only guard against a second create for the same cell attempt.
+    s = setup
+    uploaded(s)
+    launched(s)
+    assert sum(endpoint == "backtests/create" for endpoint, _ in s.api.calls) == 1
+    s.clock.now += 60
+    with pytest.raises((m.NewruleSubmissionError, FileExistsError)):
+        m.launch_compiled(s.plan, "R298", 1, **kwargs(s))
+    assert sum(endpoint == "backtests/create" for endpoint, _ in s.api.calls) == 1
+    assert len(s.api.runs[next(iter(s.api.runs))]) == 1
+
+
+@pytest.mark.parametrize("shape,code", [("unexpected_name", "fresh_project_files"),
+                                        ("too_many", "fresh_project_files"),
+                                        ("duplicate", "duplicate_cloud_file")])
+def test_unexpected_or_duplicate_fresh_files_refuse_before_any_delete(setup, shape, code):
+    # Section 301 (ARV2R301-009): files/delete may remove only research.ipynb from
+    # a fresh project holding at most main.py and research.ipynb, each once.
+    s = setup
+    uploaded(s)
+
+    def mutate(endpoint, result):
+        if endpoint != "files/read" or not result.get("files"):
+            return
+        rows = {row["name"]: row for row in result["files"]}
+        notebook = dict(rows["research.ipynb"])
+        if shape == "unexpected_name":
+            result["files"] = [dict(notebook, name="other.py"), notebook]
+        elif shape == "too_many":
+            result["files"] = [*result["files"], dict(notebook, name="other.py")]
+        else:
+            result["files"] = [notebook, dict(notebook)]
+
+    s.api.mutate = mutate
+    with pytest.raises(m.NewruleSubmissionError, match=code):
+        m.begin_attempt(s.plan, "R298", 1, **kwargs(s))
+    assert not any(endpoint == "files/delete" for endpoint, _ in s.api.calls)
+    assert not any(endpoint in {"files/create", "files/update", "compile/create"} for endpoint, _ in s.api.calls)

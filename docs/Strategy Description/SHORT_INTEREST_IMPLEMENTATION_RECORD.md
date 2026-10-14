@@ -18724,3 +18724,73 @@ record and the lane-owned identity capture/test correction, inspect the complete
 staged diff, recheck root/branch/HEAD/status and actual matching remote, and make
 the next local correction/closure commit. This is not the combined final push
 or a pause in the continuous owner-directed build.
+
+### 116.13 Exact-parent manual continuation implementation and prospective permit
+
+The existing **SI-DEC-20261013-27** is refined without resetting its refused
+parent: authenticate the sorted inventory of all1519 original files, the
+original spent global budget and committed binary code at f61a40bf; rebuild
+each of the44 completed reports byte-for-byte with its original clocks, then
+retain the partial date45 active page1 and resume the exact failed page2 URL
+once. All112 source dates and the68 remaining dates are independently pinned.
+The parent's491 started attempts remain consumed, including the failed request.
+The new structural ceiling is **8703 additional attempts**, cumulative ceiling
+**9194**; original cumulative5-million-row/4GiB limits apply across both claims,
+with a full1000-row/8MiB reservation before each new request. This is a separately
+registered manual continuation, not automatic retry,490-page recapture or reuse
+of the old14336-slot allowance. Every failure remains retained without retry.
+
+Parent sorted inventory SHA
+**`c3c4b6dfe08193ab0e943aea1f36ec057279139fe17af73cd79f8504908c24f8`**;
+original budget bytes SHA
+**`33df02ba5722b3e80aea8daef5a6a432018a56d387272d48f8b3023c69e9c2e5`**;
+historical code identity SHA
+**`d73c886ac24a625d5a56f2144e4112183e85685befa2a0e6ebb67772bfc542b2`**.
+The exact protocol/start/refusal and failed-page byte pins are literal constants
+in the new lane-owned continuation script; no opaque cursor or licensed row is
+published here. The original unclassified failure remains unclassified.
+
+The named Massive Keychain item is deliberately the new route, read only after
+a fresh create-exclusive, clock/HEAD-independent global claim and prospective
+protocol/start receipts. Fixed HTTPS Bearer authentication, no proxy/redirect,
+zero automatic retries, exact matching remote checks at start/every HTTP/final
+and clean physical/Git-root/branch/HEAD/status checks remain mandatory. Secrets
+and encoded echoes are refused before new request/body hashing or publication.
+The script's source-only `--preflight` can compute a prospective protocol digest
+without claims, credential reads, HTTP or output files; its **PENDING** permit
+must reject actual application before private input access. Main must validate
+and commit the preparation, run that clean-tree preflight, register its exact
+digest in code/this record, validate and commit the freeze, then apply once.
+No continuation provider request has occurred at this preparatory stage.
+
+An independent fabricated audit confirmed a P2 output-custody defect in the
+initial new wrapper: post-prepare0755 directory drift and a replaced symlink
+could reach the inherited publisher. Correct only the new lane-owned runtime:
+anchor owned0700 directory descriptors/inodes, refuse changed resolution,
+mode/ownership before publication/key/HTTP, create-exclusive0600 files with
+no-follow descriptor-relative writes and retain immutable prefix semantics.
+Do not change the shared publisher or retroactively rewrite earlier receipts.
+The first synthetic attempt correctly refused macOS's `/tmp` symlink; the
+reproduction used physical resolved disposable directories, not real artifacts.
+Main validation and exact prospective digest are appended after execution below.
+
+| ID | Priority / status | Evidence, correction and effect |
+|---|---|---|
+| SI-BUILD-20261013-018 | P2 confirmed, corrected before first application | New-wrapper causal drift regression2 failed/57 deselected0.88s, followed by63 new tests green0.59s. Main independently reproduced both legacy-wrapper unsafe writes in disposable resolved directories, network denied, then executed the corrected connected selector below. The new runtime alone anchors parent/run directory FDs/inodes and checks file FD/named-inode/owner/mode before each write and after fsync. Changed mode, symlink/inode replacement, a validation-to-open race and duplicate targets refuse; no external replacement receives payload. The shared publisher and historical captures remain unchanged. |
+
+Main read the complete new runtime/tests and executed the relevant continuation,
+identity capture/pure identity, import-boundary and active-document selector:
+**217 passed in1.80s**, CPython3.13.15/pytest9.1.1, empty inherited environment,
+network denied, zero skips/warnings. Both new Python files compile in memory;
+diff check passes. The build auditor independently matched17 historical binary
+code blobs/protocol and literal parent pins without actual private/key access;
+its execution is not described as Main's. Only this appended lane record and
+the new continuation runtime/focused test enter this preparatory commit.
+
+The actual permit remains **PENDING**, not backtest readiness. Commit this
+validated preparation locally after root/branch/HEAD/status/actual-remote checks
+so the clean-tree source-only preflight can reconstruct the exact retained
+parent; append its actual digest/result, validate and commit the concrete freeze
+before the one continuation application. No provider request, look, alpha,
+permanent look ID or QC attempt is added here. One final push remains withheld
+while Main continues the owner-directed build.

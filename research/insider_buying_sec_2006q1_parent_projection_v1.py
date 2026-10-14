@@ -348,14 +348,28 @@ def assess_supplied_early_parents(snapshot, census, parent_inputs, *, expected_c
 def _fixed_source_identity(expected_head):
     _need(Path(__file__).resolve() == capture.bootstrap.custody.LANE_ROOT / SELF_PATH,
           "inactive_projection_draft_not_production_source")
-    identity = capture.bootstrap.custody._identity(expected_head)
-    _need(SELF_PATH in identity["source_sha256"], "committed_projection_source_required")
+    base_identity = capture.bootstrap.custody._identity(expected_head)
+    _need(SELF_PATH in base_identity["source_sha256"], "committed_projection_source_required")
+    # The general import closure need not include the two unused frozen
+    # campaign modules. Bind their held current bytes and exact HEAD blobs
+    # explicitly; absence from the import closure is not source drift.
+    current = capture.bootstrap.custody._source_bytes(capture.bootstrap.custody.LANE_ROOT, FROZEN_PATHS)
+    _need(set(current) == set(FROZEN_PATHS), "explicit_frozen_source_inventory_refused")
     frozen = {}
     for name in FROZEN_PATHS:
+        committed = capture.bootstrap.custody._git(capture.bootstrap.custody.LANE_ROOT, "show", expected_head + ":" + name)
+        _need(_sha(committed) == current[name]
+              and (name not in base_identity["source_sha256"] or base_identity["source_sha256"][name] == current[name]),
+              "current_frozen_source_differs_from_committed_blob")
         historical = capture.bootstrap.custody._git(capture.bootstrap.custody.LANE_ROOT, "show", FROZEN_COMMIT + ":" + name)
         digest = _sha(historical)
-        _need(identity["source_sha256"].get(name) == digest, "frozen_current_source_differs_from_historical_blob")
+        _need(current[name] == digest, "frozen_current_source_differs_from_historical_blob")
         frozen[name] = digest
+    _need(capture.bootstrap.custody._identity(expected_head) == base_identity
+          and capture.bootstrap.custody._source_bytes(capture.bootstrap.custody.LANE_ROOT, FROZEN_PATHS) == current,
+          "explicit_source_binding_changed")
+    sources = {**base_identity["source_sha256"], **current}
+    identity = {**base_identity, "source_sha256": sources, "source_inventory_sha256": _sha(_raw(sources))}
     return identity, frozen
 
 

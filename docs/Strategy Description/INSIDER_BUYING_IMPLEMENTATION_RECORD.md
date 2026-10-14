@@ -25394,3 +25394,62 @@ boundary/EXACT guard checks passed123 in3.27s; two memory compilations under
 network/fork/all-write denial, diff check and the frozen four-file comparison
 against origin85c7755d passed. These are focused checks, not a full suite,
 actual baseline execution or independent Claude review.
+
+## 180. Frozen-baseline preflight refusal and explicit unimported-source binding (2026-10-14 UTC)
+
+The section179 frozen-baseline CLI was invoked at clean
+6684e30edfa35f9434d86b07e699ad40927778ab and returned2. Contrary to an
+initial commentary assumption, no projection output namespace/reservation
+was created. Inputs and the64 original-body claims remain unchanged; no
+provider/SEC/QC operation occurred. Do not manufacture a completion for
+ib-2006q1-parent-projection-frozen-baseline-20261014-once.
+
+A subsequent readonly, network-denied exact source check returned the fixed
+code frozen_current_source_differs_from_historical_blob. Direct comparison
+proved every current frozen file equals its aa0d635d historical Git blob:
+
+| Frozen path | Current and historical SHA-256 |
+|---|---|
+| research/insider_buying_sec_all_form4_parent_recovery_union.py | 67a72b5cfd3be3ae9b1fc938a241da74df0a57979ca1a114d13122b675848a48 |
+| research/insider_buying_sec_all_form4_parent_campaign.py | 33f2a54944b8f5674ae92c77c4a17ff03e6455ffcf7c0d07d377945e8dbad551 |
+| research/insider_buying/sec_complete_submission.py | d15ed661d32f13fd1f3644106bd6a21c428605b1a001d58ea5fc6a3319af63a6 |
+| research/insider_buying/sec_raw_parent_projection.py | d5631b6a2684e30061be1753e00e7f50f56690643537a9d67e34e228dd20578b |
+
+IBEARLY-180-R01 P2 CLOSED: the general loaded/static import closure did not
+include the unused frozen union/campaign names; looking up their absent
+entries falsely treated omission as drift. Explicitly read/hash their held
+current bytes, compare all four to exact current-HEAD Git blobs and historical
+aa0d635d blobs, recheck the base clean identity and frozen bytes, then merge
+the four entries and recompute the current execution inventory digest.
+Do not import unused modules to manufacture execution, drop any frozen check,
+change shared inventory behavior or relabel an inventory as actual execution.
+The source-only finder's actual executed-source inventory remains separate.
+
+One genuine omission-sensitive red/two drift controls passed0.89s against
+the preceding code. Corrected255 projection/frozen-parser/v2/import-boundary/
+EXACT Insider package-guard checks passed7.81s with OS process-tree network
+denial and isolated database/output roots. Current/disk and current-Git
+drift both still refuse. Second internal peer agreed with explicit expansion;
+this is not independent Claude acceptance or a replay result.
+
+| Corrected source | Source SHA-256 | Focused test SHA-256 |
+|---|---|---|
+| research/insider_buying_sec_2006q1_parent_projection_v1.py | 27725d90afff2bfe09091523feaed170997862af580f575b4f8ec4e931ecdb40 | cf7d5112a1cf6fe3d12c0b11ddc825725476e1d7d6e3b73a6e05f5f76d9983f5 |
+
+Delegated continuation: after a new clean committed image, run NEW audit ID
+ib-2006q1-parent-projection-frozen-baseline-corrected-20261014-once with
+the same exact sealed capture7d42a663 and original preparation/input pins.
+It is an offline reanalysis of already retained bodies, not redispatch,
+resumption, thaw, modified raw bytes or readiness promotion. Preserve the
+original refused invocation's disposition. All scope/count/authority,
+write-confinement/source-only/network-denial requirements remain binding.
+Continue real-input compatibility and reference/archive integration without
+a routine review/approval pause. No interim push or monitor rearm.
+
+An independent internal peer retained exact6684e30e Git source in private
+QA and observed two genuine reds0.35s: missing frozen entries and an invented
+all-four identity hiding a different current-HEAD blob. Both became green
+against the corrected image0.35s, with the supplied base identity unmodified.
+Main record/active-document/EXACT guard checks and two denied-network/fork/
+all-write memory compilations passed; diff check is clean. No full suite or
+actual baseline success is attributed to those fixtures.

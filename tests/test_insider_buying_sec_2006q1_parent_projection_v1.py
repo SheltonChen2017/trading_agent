@@ -207,6 +207,47 @@ def test_declared_xml_profile_does_not_assert_source_timezone_or_financial_value
     assert module.XML_PROFILE["source_acceptance_clock"].startswith("original-14-digit-source-declaration")
 
 
+def _fixed_identity_fixture(monkeypatch, *, drift=None):
+    head = "a" * 40
+    frozen_raw = {name: ("invented frozen module " + str(index)).encode()
+                  for index, name in enumerate(module.FROZEN_PATHS)}
+    base_sources = {module.SELF_PATH: "b" * 64,
+        **{name: module._sha(raw) for name, raw in frozen_raw.items() if name.endswith("submission.py") or name.endswith("projection.py")}}
+    base = {"root": str(LANE), "branch": "codex/strategy-insider-buying", "head": head,
+            "clean": True, "source_sha256": base_sources,
+            "source_inventory_sha256": module._sha(module._raw(base_sources))}
+    monkeypatch.setattr(module.capture.bootstrap.custody, "_identity", lambda *_: base)
+    monkeypatch.setattr(module.capture.bootstrap.custody, "_source_bytes",
+        lambda _root, names: {name: module._sha(frozen_raw[name] + (b"drift" if drift == "current" else b"")) for name in names})
+    calls = []
+    def git(_root, command, revision):
+        assert command == "show"
+        commit, name = revision.split(":", 1)
+        assert commit in {head, module.FROZEN_COMMIT} and name in frozen_raw
+        calls.append((commit, name))
+        return frozen_raw[name] + (b"drift" if drift == "committed" and commit == head else b"")
+    monkeypatch.setattr(module.capture.bootstrap.custody, "_git", git)
+    return head, frozen_raw, base, calls
+
+
+def test_unused_frozen_sources_are_explicitly_committed_and_inventoried_not_assumed_imported(monkeypatch):
+    head, raw, base, calls = _fixed_identity_fixture(monkeypatch)
+    identity, frozen = module._fixed_source_identity(head)
+    expected = {name: module._sha(value) for name, value in raw.items()}
+    assert frozen == expected
+    assert identity["source_sha256"] == {**base["source_sha256"], **expected}
+    assert identity["source_inventory_sha256"] == module._sha(module._raw(identity["source_sha256"]))
+    assert base["source_sha256"] != identity["source_sha256"]
+    assert set(calls) == {(commit, name) for commit in (head, module.FROZEN_COMMIT) for name in raw}
+
+
+@pytest.mark.parametrize("drift", ["current", "committed"])
+def test_explicit_frozen_source_inventory_does_not_launder_current_or_git_drift(monkeypatch, drift):
+    head, _, _, _ = _fixed_identity_fixture(monkeypatch, drift=drift)
+    with pytest.raises(module.EarlyParentProjectionError):
+        module._fixed_source_identity(head)
+
+
 @pytest.mark.parametrize("key,value", [("issuer_cik", "0000123457"), ("form_type", "4/A"), ("filing_date", "2006-01-16")])
 def test_rehashed_request_identity_drift_is_refused_before_xml_not_laundered_as_grammar_quarantine(supplied, key, value):
     item = _inputs(supplied)[0];request = {**item["request"], key: value}

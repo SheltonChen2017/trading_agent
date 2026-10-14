@@ -25985,3 +25985,112 @@ Main final record/active-document/EXACT guard72 passed1.18s. Internal peer
 private helper/coordinator/boundary/EXACT guard124 passed4.30s; no real input
 or independent Claude acceptance. Active source/test memory compilation and
 frozen four-file/diff checks are required before this local commit; no push.
+
+## 185. Qualified isolated source-view replay front, prospective actual epoch (2026-10-14 UTC)
+
+### 185.1 Exact bounded operation and immutable prerequisites
+
+Section184 contracts/native preparation are locally committed in
+fc0b1072cb9d5560f951e2245fb370345d6993ce; no push or actual SDK scope.
+Define one fresh offline operation
+ib-2006q1-pem-view-source-profile-v1-20261014-once, only after the new clean
+front commit. Fixed source64 capture7d42a663 and frozen original baseline
+3263625a (section183's four exact size/hash pins) are prerequisites. The
+baseline's c1ccbc execution and35cedb27 source inventory remain distinct
+from current source-view execution. Hold/recheck its exact four-file private
+inventory BEFORE a new reservation; never retrofit, resume or rewrite it.
+
+The baseline ledger supplies externally bound parsed snapshot/lineage/census
+labels; the full hash-pinned original assessment supplies the ordered14-field
+immutable source-row identity roster digest. Baseline completion supplies
+capture ID/execution head/inventory/bootstrap lineage. Fresh worker loading
+of original raw-bound preparation and sealed capture must agree with all
+those facts. Original preparation producer/completion/assessment constants
+remain exact. A receipt literal alone is not that executed source replay.
+
+Own source-only bootstrap, fixed consumer/output namespace and current clean
+committed import closure; no callback/global override or legacy helper
+monkeypatch in production. Child imports captured Git-bound bytes and records
+actual executed sources separately from unimported current-byte inventories.
+OS network/fork/outside-output-write denial is proved BEFORE the Python audit
+hook and before input loading. Recompute the full six-form composition twice
+and require byte equality, all inputs/current sources before/after rechecked.
+Publish full128MiB-bounded assessment, separate2MiB-bounded parent ledger and
+source-view inventory, then bounded completion; exact inventories, canonical
+one-LF wire and publication bytes/sizes/context/source execution are rechecked
+by worker and parent. No truncation, financial/outcome look, provider request,
+credential read, original-body admission or readiness promotion is allowed.
+
+### 185.2 Verified readback corrections and their disposition
+
+IBVIEW-185-R01 P2 CLOSED: sum-consistent upstream summary counts differed from
+real rows. Genuine front red0.63s (47 deselected) became green with independent
+counts from every row/selected-parent state/inventory before publication and
+after readback. IBVIEW-185-R02 P2 CLOSED: three coherently rehashed mutants
+could change duplicated per-row header quarantine, nested readiness authority
+or parsed snapshot label without changing the main ledger. Internal peer
+reproduced all three0.410s; author genuine red run0.63s. Require exact canonical
+row custody/view copies from the selected-parent ledger and null copies on
+unselected rows; externally pinned source labels cannot follow mutated output.
+
+IBVIEW-185-R03 P2 CLOSED: seven rehashed completion lineage fields were not
+independently compared. Peer reproduced0.428s; author's seven genuine reds
+0.99s became green. Compare variable capture context to the authenticated
+baseline and newly loaded capture, and fixed original preparation values in
+publication/readback. IBVIEW-185-R04 P2 CLOSED: period/source-kind/v2-kind and
+an equal-count unselected accession substitution could pass. Peer reproduced
+0.519s; four genuine author reds0.62s became green. Fixed top literals and
+the complete ordered14-field immutable row roster now bind every source row,
+including context forms, not merely counts or newly selected parents.
+Strict trusted-temp descendant fencing precedes any fixture tree/known-root
+constructor; fixture labels/types remain explicit, not pretend actual83k.
+
+Main active240 helper/coordinator/front/v2/import-boundary/EXACT Insider
+package checks passed5.70s with process-tree OS network denial and isolated
+temporary database/output. Internal independent peer210 helper/coordinator/
+front/boundary/EXACT checks passed5.50s on private ec958f0f/bc684573.
+Additional28 coherent faults/14 individual memory reversals/restored green
+passed0.421s. Three memory compilations and reused exact OS network/fork/
+outside-write probes passed0.262s under all-file-write denial. An earlier
+same isolation proof/compilation passed0.296s. No actual custody/account/provider
+read by peer; this internal QA is not independent Claude review or real-input
+execution. All reproduced publication/source-population context gaps closed.
+
+| Active front/test | SHA-256 |
+|---|---|
+| research/insider_buying_sec_2006q1_pem_reassessment_runner.py | a14bdfac0316036b93229b1055bfd79b08d7b36e7aef97943eeb8a1d2f9ee47c |
+| tests/test_insider_buying_sec_2006q1_pem_reassessment_runner.py | 0e0a8ccac9bb10c337ae8c8369e53c42cf29e1c3afadb50b0c8850cb8c5a2367 |
+
+Private54,878-byte ec958f0f source/35,398-byte bc684573 tests are preserved.
+Activation wording/final LF and direct canonical research fixture imports
+produce the above distinct hashes; pre-I/O gate test explicitly uses inactive
+__file__. Do not attribute a later commit or these activated bytes to old
+baseline/capture runs. The new actual epoch remains unexecuted at this entry.
+
+### 185.3 Readonly native identity and unchanged factual blockers
+
+At clean fc0b1072, network-denied readonly native supervisor identity passed
+against its three exact committed source images (Python-monotonic0.124s),
+without namespace/SDK/account/provider access. A preceding diagnostic adding
+all-file-write denial refused local-git-operation-failed before any journal;
+it is recorded as refused, not a source identity pass or proof of its exact
+OS cause. Effective denied-network/fork/write tests and retained-input workers
+keep their required isolation; no acquisition control was weakened.
+
+Mac unlock/authenticated controllable Safari and Massive historical Earnings
+account/product linkage remain external blockers. Four earnings months and
+genuine actual-release/identity/availability/rights/full-population/protocol
+evidence remain unfulfilled. Do not silently narrow the82-quarter window,
+buy a duplicate product, retry consumed URLs, admit derived views as original
+parents, invent missing native evidence or launch a strategy backtest. The
+next authorized action is this specifically defined fresh offline replay,
+then remaining real-input work when available, without a routine Claude pause.
+No shared/frozen edit, full suite, trading action, interim push or monitor
+rearm. Preserve six open topical/shared P2s and both final owner dispositions.
+
+Main final record/active-document/EXACT guard72 passed1.39s. Author final
+private240 focused passed5.68s/two memory compilations under network/fork/
+all-write denial. Peer independently compared activation-only source/test
+changes and active210 focused passed5.65s; no actual roots read. Main memory
+compilation/frozen-four/diff/root/branch/HEAD/status checks precede the new
+local commit and actual operation. No publication to origin at this checkpoint.

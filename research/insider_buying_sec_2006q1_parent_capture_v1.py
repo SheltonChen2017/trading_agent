@@ -447,6 +447,7 @@ def _capture(selection, capture_id, contact, *, root, observed, transport, guard
             disposition, stop = "ambiguous_transport_failure_no_retry", True
             failure_phase = "response_custody"
             if response is not None:
+                persisting = False
                 try:
                     _need(type(response) is SecHttpResult and type(response.status) is int and 100 <= response.status <= 599
                           and type(response.headers) is tuple and len(response.headers) <= 64
@@ -466,11 +467,13 @@ def _capture(selection, capture_id, contact, *, root, observed, transport, guard
                         raw_sha, raw_size = _sha(raw), len(raw)
                         _need(total_bytes + raw_size <= MAX_REQUESTS * MAX_PARENT_BYTES, "total_body_bound_refused")
                         object_name = raw_sha + ".bin"
+                        persisting = True
                         if object_name in allowed_objects:
                             _need(objects.read(object_name, cap=MAX_PARENT_BYTES) == raw, "duplicate_body_object_changed")
                         else:
                             object_sha = objects.publish(object_name, raw, cap=MAX_PARENT_BYTES)
                             retained.append((objects, object_name, object_sha, MAX_PARENT_BYTES));allowed_objects.add(object_name)
+                        persisting = False
                         retained_body = True;completed += 1;total_bytes += raw_size
                         try:
                             _envelope_and_header(raw, item["request"])
@@ -480,6 +483,11 @@ def _capture(selection, capture_id, contact, *, root, observed, transport, guard
                             disposition = "complete_raw_response_retained_header_bound";header_bound = True;qualified += 1
                         stop = False  # Raw custody does not silently become XML/PIT/canonical admission.
                 except (ValueError, TypeError, KeyError, UnicodeError, RecursionError, OSError):
+                    if persisting:
+                        # Section 194 (Claude review): a local retention failure is not a
+                        # source-side refusal. As in the v4 reference capture it escapes,
+                        # leaving the consumed claim/start without a source-refusal result.
+                        raise
                     disposition = "response_privacy_framing_or_custody_refused_no_retry";stop = True
             previous_finish = monotonic_ns()
             _need(type(previous_finish) is int and previous_finish >= started, "completion_clock_refused")

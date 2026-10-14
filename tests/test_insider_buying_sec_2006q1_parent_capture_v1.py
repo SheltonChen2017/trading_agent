@@ -559,3 +559,22 @@ def test_observed_capture_requires_the_fixed_lane_root_and_real_transport(tmp_pa
             root=root, observed=True, transport=transport, guard=lambda: pytest.fail("No guard"),
             prior_open=lambda: pytest.fail("No prior roots"))
     assert not _namespace(tmp_path).exists()
+
+
+# Section 194 (Claude review): a local body-retention failure escapes; it is never
+# recorded as a source-side refusal of an HTTP-200 response.
+def test_local_retention_failure_escapes_instead_of_recording_a_source_refusal(tmp_path, monkeypatch):
+    import errno as _errno
+    publish = module.custody._Directory.publish
+    def failing(self, name, raw, **kwargs):
+        if name.endswith(".bin"):
+            raise OSError(_errno.ENOSPC, "invented disk full")
+        return publish(self, name, raw, **kwargs)
+    monkeypatch.setattr(module.custody._Directory, "publish", failing)
+    calls = []
+    with pytest.raises(OSError):
+        _run(tmp_path, calls=calls)
+    run = _namespace(tmp_path) / "runs/ib-sec-2006q1-initial64-invented"
+    assert len(calls) == 1 and (run / "request-000-start.json").is_file()
+    assert not (run / "request-000-result.json").exists()
+    assert not (run / "complete.json").exists()

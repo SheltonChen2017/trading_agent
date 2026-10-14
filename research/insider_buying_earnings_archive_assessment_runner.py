@@ -71,6 +71,12 @@ OPTIONAL_SOURCES = ("research/insider_buying_eodhd_earnings_continuation3.py",
                     "research/insider_buying_eodhd_earnings_continuation5.py")
 
 
+# Section 194 (Claude review): `-B` stops bytecode writes but not reads, so a stale
+# __pycache__ entry could run instead of the hashed source. A cache prefix with no
+# lane bytecode makes the worker compile the source it binds.
+WORKER_INTERPRETER_FLAGS = ("-B", "-X", "pycache_prefix=/var/empty/insider-buying-no-bytecode")
+
+
 class ArchiveAssessmentRunnerError(ValueError):
     """Fixed sanitized refusal, never filesystem/provider/credential text."""
 
@@ -839,7 +845,7 @@ def run_actual_assessment(*, audit_id, expected_head, expected_v2_complete_sha25
     output_path = LANE_ROOT.joinpath(*OUTPUT_PARTS, audit_id)
     policy = _policy(output_path)
     command = ["/usr/bin/env", "-i", "PATH=/usr/bin:/bin:/usr/sbin:/sbin", "/usr/bin/sandbox-exec", "-p", policy,
-               sys.executable, "-B", "-m", "research.insider_buying_earnings_archive_assessment_runner", "--worker",
+               sys.executable, *WORKER_INTERPRETER_FLAGS, "-m", "research.insider_buying_earnings_archive_assessment_runner", "--worker",
                "--audit-id", audit_id, "--expected-head", expected_head,
                "--expected-v2-complete-sha256", expected_v2_complete_sha256]
     if expected_v3_complete_sha256 is not None:

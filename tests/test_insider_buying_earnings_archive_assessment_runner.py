@@ -674,3 +674,24 @@ def test_observer_binds_v3_predecessor_claims_to_independently_read_chain(monkey
             m._bind_actual_v3_predecessor(SimpleNamespace(hashes=hashes), second, third)
     else:
         m._bind_actual_v3_predecessor(SimpleNamespace(hashes=hashes), second, third)
+
+
+# Section 194 (Claude review): the worker's interpreter flags compile the bound source,
+# not a stale __pycache__ entry whose header matches the source's mtime and size.
+def test_worker_interpreter_flags_ignore_a_forged_bytecode_cache(tmp_path):
+    import os as _os, py_compile as _py_compile, subprocess as _subprocess, sys as _sys
+    package = tmp_path / "probe";package.mkdir()
+    source = package / "target.py";source.write_text("VALUE = 'source'\n")
+    forged = tmp_path / "forged.py";forged.write_text("VALUE = 'cache1'\n")  # same size as the source
+    info = source.stat();_os.utime(forged, ns=(info.st_atime_ns, info.st_mtime_ns))
+    assert forged.stat().st_size == info.st_size and forged.stat().st_mtime_ns == info.st_mtime_ns
+    _py_compile.compile(str(forged), cfile=str(package / "__pycache__" / f"target.{_sys.implementation.cache_tag}.pyc"),
+                        doraise=True, invalidation_mode=_py_compile.PycInvalidationMode.TIMESTAMP)
+    probe = "import target; print(target.VALUE)"
+    environment = {"PATH": "/usr/bin:/bin"}
+    plain = _subprocess.run([_sys.executable, "-B", "-c", probe], cwd=package, env=environment,
+                            capture_output=True, text=True, check=True)
+    fenced = _subprocess.run([_sys.executable, *m.WORKER_INTERPRETER_FLAGS, "-c", probe], cwd=package, env=environment,
+                             capture_output=True, text=True, check=True)
+    assert plain.stdout.strip() == "cache1"  # the hazard: -B alone still loads the forged cache
+    assert fenced.stdout.strip() == "source"

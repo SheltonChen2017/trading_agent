@@ -36,10 +36,15 @@ CENSUS_PARTS = ("artifacts", "insider_buying", "earnings_issuer_inventory", "ib-
 V1_PARTS = ("artifacts", "insider_buying", "eodhd_earnings_campaign")
 V2_PARTS = ("artifacts", "insider_buying", "eodhd_earnings_continuation")
 V3_PARTS = ("artifacts", "insider_buying", "eodhd_earnings_continuation3")
+V4_PARTS = ("artifacts", "insider_buying", "eodhd_earnings_continuation4")
+PARTIAL_WITNESS_PARTS = ("artifacts", "insider_buying", "eodhd_earnings_partial_witness",
+                       "ib-eodhd-v3-partial-201809-201902-20261013-once")
 OUTPUT_PARTS = ("artifacts", "insider_buying", "earnings_archive_assessment")
 V1_ID = "ib-eodhd-campaign-200512-202607-20261013-once"
 V2_ID = "ib-eodhd-campaign-continuation-200602-202607-20261013-once"
 V3_ID = "ib-eodhd-campaign-continuation3-201809-202607-20261013-once"
+V4_ID = "ib-eodhd-campaign-continuation4-201903-202607-20261014-once"
+PARTIAL_WITNESS_SHA256 = "61d8c42efd26dbc04626cbe4eaeb599437dd496dec21827d5d38a24b66f32fa1"
 V2_PRECEDING_COMPLETE_SHA256 = "2e931f44eb896584821b459aa1bf13e130274c567454b9d7e5e9aa851918e1f6"
 INVENTORY_SHA256 = "a36662f0d29888ee3d38543c9cae2a2d702073790419280b596fe879ea24c30f"
 CENSUS_COMPLETE_SHA256 = "3b6016400f667a375814214a3b9ea17a3a5b7e6597f9eb3fe2f3b949dcb8d102"
@@ -56,7 +61,8 @@ REQUIRED_SOURCES = (
     "research/insider_buying_eodhd_earnings_demo.py", "research/insider_buying_provider_metadata_audit.py",
     "research/insider_buying_provider_metadata_transport.py", "research/quantconnect.py",
 )
-OPTIONAL_SOURCES = ("research/insider_buying_eodhd_earnings_continuation3.py",)
+OPTIONAL_SOURCES = ("research/insider_buying_eodhd_earnings_continuation3.py",
+                    "research/insider_buying_eodhd_earnings_continuation4.py")
 
 
 class ArchiveAssessmentRunnerError(ValueError):
@@ -160,10 +166,12 @@ class _Inputs:
         self.root, self.chains, self.leaves, self.locks = root, [], [], []
         self.hashes = {}
         self.inventories = []
+        self.named_chains = {}
 
     def directory(self, parts):
         chain = _Chain(self.root, parts)
         self.chains.append(chain)
+        self.named_chains[tuple(parts)] = chain
         return chain
 
     def read(self, chain, parts, name, *, limit, expected=None):
@@ -304,7 +312,8 @@ def _scope(window):
 def _load_campaign(inputs, parts, campaign_id, complete_sha, *, manifest_sha=None, fixture_only=False,
                    v1_metadata_sha256=None):
     expected_schema = {V1_PARTS: "insider-eodhd-date-window-earnings-campaign-v1",
-                       V2_PARTS: assessment.CONTINUATION_SCHEMA, V3_PARTS: assessment.CONTINUATION3_SCHEMA}[parts]
+                       V2_PARTS: assessment.CONTINUATION_SCHEMA, V3_PARTS: assessment.CONTINUATION3_SCHEMA,
+                       V4_PARTS: assessment.CONTINUATION4_SCHEMA}[parts]
     control_cap = assessment.control_byte_cap(expected_schema)
     base = inputs.directory(parts); inputs.lock(base)
     scopes_parts, campaign_parts = (*parts, "scopes"), (*parts, "campaigns", campaign_id)
@@ -367,6 +376,120 @@ def _load_campaign(inputs, parts, campaign_id, complete_sha, *, manifest_sha=Non
     inputs.inventory(source, expected_leaves); inputs.inventory(scopes, expected_scopes)
     source.recheck(); scopes.recheck()
     return assessment.ArchiveCampaignMetadata(manifest_raw, manifest_digest, complete_raw, complete_sha, tuple(evidence))
+
+
+def _load_partial_campaign(inputs, witness_sha, *, fixture_only=False):
+    """Observe all actual partial leaves, but interpret metadata of seals only.
+
+    No original producer aggregate exists. The separate current witness never
+    becomes one, and the sixth body/metadata receives hashes only.
+    """
+    if not fixture_only:
+        _need(witness_sha == PARTIAL_WITNESS_SHA256, "actual_partial_external_witness_required")
+    from research import insider_buying_eodhd_earnings_continuation4 as continuation
+    base = inputs.directory(V3_PARTS); inputs.lock(base)
+    inputs.inventory(base, {"campaigns", "scopes", "campaign.lock"})
+    parents = inputs.directory((*V3_PARTS, "campaigns")); inputs.inventory(parents, {V3_ID})
+    source_parts = (*V3_PARTS, "campaigns", V3_ID)
+    source = inputs.directory(source_parts)
+    scopes_parts = (*V3_PARTS, "scopes"); scopes = inputs.directory(scopes_parts)
+    witness_chain = inputs.directory(PARTIAL_WITNESS_PARTS)
+    inputs.inventory(witness_chain, {"witness.json"})
+    witness_raw = inputs.read(witness_chain, PARTIAL_WITNESS_PARTS, "witness.json", limit=8192, expected=witness_sha)
+    witness = (_json(witness_raw) if fixture_only else
+               continuation._witness(inputs.root, witness_chain.fd, witness_sha, fixture_only=False))
+    _need(type(witness.get("journal_leaf_sha256_and_bytes")) is dict and len(witness["journal_leaf_sha256_and_bytes"]) == 24
+          and type(witness.get("consumed_scope_sha256")) is dict and len(witness["consumed_scope_sha256"]) == 6
+          and witness.get("campaign_completion_present") is False, "partial_complete_leaf_scope_inventory")
+    expected_leaves = witness["journal_leaf_sha256_and_bytes"]
+    inputs.inventory(source, set(expected_leaves)); inputs.inventory(scopes, set(witness["consumed_scope_sha256"]))
+    leaf_raw = {}
+    for name, item in sorted(expected_leaves.items()):
+        cap = (assessment.MAX_V3_BODY_BYTES if name.endswith("-response.json") else
+               assessment.MAX_V3_METADATA_BYTES if name.endswith("-metadata.json") else assessment.MAX_V3_CONTROL_BYTES)
+        raw = inputs.read(source, source_parts, name, limit=cap, expected=item["sha256"])
+        _need(type(item.get("bytes")) is int and len(raw) == item["bytes"], "partial_witness_leaf_size_binding")
+        if name == "manifest.json" or name.endswith(("-complete.json", "-started.json")) or name.endswith("-metadata.json") and not name.startswith("window-0005"):
+            leaf_raw[name] = raw
+        # Raw financial bodies and sixth unsealed metadata are never decoded.
+    manifest_raw = leaf_raw["manifest.json"]; manifest = _json(manifest_raw)
+    _need(manifest.get("schema") == assessment.CONTINUATION3_SCHEMA and manifest.get("campaign_id") == V3_ID
+          and manifest.get("fixture_only") is fixture_only
+          and manifest.get("windows") == [list(window) for window in assessment.V3_SUPPORT_WINDOWS], "partial_manifest_actual_binding")
+    evidence = []
+    previous = assessment._utc(manifest["registered_at_utc"])
+    for index, window in enumerate(assessment.V3_SUPPORT_WINDOWS[:6]):
+        prefix = f"window-{index:04d}"
+        start_raw = leaf_raw[prefix + "-started.json"]; start = _json(start_raw)
+        scope_value = _scope(window); scope_name = _sha(_canonical(scope_value)) + ".json"
+        scope_raw = inputs.read(scopes, scopes_parts, scope_name, limit=assessment.MAX_V3_CONTROL_BYTES,
+                                expected=witness["consumed_scope_sha256"][scope_name])
+        scope = _json(scope_raw)
+        _need(start == {"schema": manifest["schema"], "window": list(window), "index": index,
+            "started_at_utc": start.get("started_at_utc"), "manifest_sha256": _sha(manifest_raw),
+            "scope_reservation_sha256": _sha(scope_raw), "maximum_attempts": 1}
+            and scope == {"schema": manifest["schema"], "scope": scope_value, "campaign_id": V3_ID,
+                "reserved_at_utc": scope.get("reserved_at_utc"), "maximum_attempts": 1}, "partial_start_scope_hash_chain")
+        _need(previous <= assessment._utc(scope["reserved_at_utc"]) <= assessment._utc(start["started_at_utc"])
+              <= assessment._utc(witness["observed_at_utc"]), "partial_start_clock_order")
+        if index < 5:
+            child_raw = leaf_raw[prefix + "-complete.json"]; child = _json(child_raw)
+            receipt = child["receipt"]
+            _need(child.get("started_sha256") == _sha(start_raw) and child.get("scope_reservation_sha256") == _sha(scope_raw)
+                  and receipt.get("calendar_window_observed") is True
+                  and receipt.get("metadata_sha256") == _sha(leaf_raw[prefix + "-metadata.json"])
+                  and receipt.get("body_sha256") == expected_leaves[prefix + "-response.json"]["sha256"]
+                  and type(receipt.get("body_size_bytes")) is int and receipt["body_size_bytes"] == expected_leaves[prefix + "-response.json"]["bytes"]
+                  and all(receipt.get(flag) is False for flag in FALSE_FLAGS), "partial_sealed_receipt_live_binding")
+            _need(assessment._utc(start["started_at_utc"]) <= assessment._utc(child["completed_at_utc"])
+                  <= assessment._utc(witness["observed_at_utc"]), "partial_seal_clock_order")
+            previous = assessment._utc(child["completed_at_utc"])
+            metadata_raw = leaf_raw[prefix + "-metadata.json"]
+            evidence.append(assessment.ArchiveWindowMetadata(child_raw, _sha(child_raw), metadata_raw, _sha(metadata_raw)))
+    inputs.recheck()
+    return assessment.ArchivePartialCampaignMetadata(manifest_raw, _sha(manifest_raw), witness_raw, witness_sha, tuple(evidence))
+
+
+def _partial_selection(root, witness_sha, v4_sha):
+    _need(witness_sha is not None, "retained_partial_requires_external_witness")
+    _digest(witness_sha)
+    present = os.path.lexists(root.joinpath(*V4_PARTS))
+    _need(not present or v4_sha is not None, "retained_v4_requires_external_completion_anchor")
+    if v4_sha is not None:
+        _digest(v4_sha); _need(present, "external_v4_anchor_requires_retained_root")
+
+
+def _bind_partial_predecessors(inputs, first, second, partial, fourth, *, fixture_only):
+    manifest = _json(partial.manifest_raw)
+    previous = manifest.get("previous_campaign_anchor")
+    _need(type(previous) is dict and previous.get("complete_sha256") == second.complete_sha256
+          and previous.get("manifest_sha256") == second.manifest_sha256
+          and previous.get("genesis_campaign_anchor", {}).get("complete_sha256") == first.complete_sha256,
+          "partial_previous_producer_binding")
+    if fixture_only:
+        if fourth is not None:
+            manifest4, complete4 = _json(fourth.manifest_raw), _json(fourth.complete_raw)
+            _need(manifest4.get("previous_campaign_anchor") == complete4.get("previous_campaign_anchor")
+                  and type(manifest4.get("previous_campaign_anchor")) is dict
+                  and manifest4["previous_campaign_anchor"].get("partial_witness_sha256") == partial.witness_sha256,
+                  "fixture_v4_partial_predecessor_binding")
+        inputs.recheck()
+        return
+    from research import insider_buying_eodhd_earnings_continuation4 as continuation
+    # Reuse the collector's full old-chain proof under the observer's held
+    # read locks, never the collector's transport or credentials.
+    locks = {chain: fd for chain, fd, _ in inputs.locks}
+    def named_lock(parts):
+        return locks[inputs.named_chains[tuple(parts)]]
+    witness_chain = inputs.named_chains[PARTIAL_WITNESS_PARTS]
+    anchor = continuation._previous_anchor(inputs.root, continuation.REGISTERED_WINDOWS,
+        named_lock(V2_PARTS), named_lock(V1_PARTS), named_lock(V3_PARTS), witness_chain.fd,
+        partial.witness_sha256, fixture_only=fixture_only)
+    if fourth is not None:
+        fourth_manifest, fourth_complete = _json(fourth.manifest_raw), _json(fourth.complete_raw)
+        _need(fourth_manifest.get("previous_campaign_anchor") == fourth_complete.get("previous_campaign_anchor") == anchor,
+              "v4_observed_partial_predecessor_binding")
+    inputs.recheck()
 
 
 def _effective_denial(*, require_fork):
@@ -449,7 +572,17 @@ def _bind_actual_v3_predecessor(inputs, second, third):
           "v3_observed_predecessor_chain_binding")
 
 
-def _assess_worker(*, root, audit_id, identity, v2_complete_sha, anchors, fixture_only, v3_complete_sha=None):
+def _archive_selection(root, v3_sha, witness_sha, v4_sha):
+    _need(not (v3_sha is not None and witness_sha is not None), "partial_and_aggregate_v3_are_exclusive")
+    if witness_sha is not None:
+        _partial_selection(root, witness_sha, v4_sha)
+    else:
+        _need(v4_sha is None and not os.path.lexists(root.joinpath(*V4_PARTS)), "v4_requires_observed_partial_predecessor")
+        _v3_selection(root, v3_sha)
+
+
+def _assess_worker(*, root, audit_id, identity, v2_complete_sha, anchors, fixture_only, v3_complete_sha=None,
+                   partial_witness_sha=None, v4_complete_sha=None):
     _effective_denial(require_fork=not fixture_only)
     if not fixture_only:
         _outside_write_denied(root, audit_id)
@@ -471,8 +604,18 @@ def _assess_worker(*, root, audit_id, identity, v2_complete_sha, anchors, fixtur
                                v1_metadata_sha256=anchors.v1_metadata_sha256)
         second = _load_campaign(inputs, V2_PARTS, V2_ID, v2_complete_sha, fixture_only=fixture_only)
         campaigns = [first, second]
-        _v3_selection(root, v3_complete_sha)
-        if v3_complete_sha is not None:
+        _archive_selection(root, v3_complete_sha, partial_witness_sha, v4_complete_sha)
+        if partial_witness_sha is not None:
+            if not fixture_only:
+                _need(v2_complete_sha == V2_PRECEDING_COMPLETE_SHA256, "partial_preceding_v2_completion_binding")
+            partial = _load_partial_campaign(inputs, partial_witness_sha, fixture_only=fixture_only)
+            fourth = (_load_campaign(inputs, V4_PARTS, V4_ID, v4_complete_sha, fixture_only=fixture_only)
+                      if v4_complete_sha is not None else None)
+            _bind_partial_predecessors(inputs, first, second, partial, fourth, fixture_only=fixture_only)
+            campaigns.append(partial)
+            if fourth is not None:
+                campaigns.append(fourth)
+        elif v3_complete_sha is not None:
             if not fixture_only:
                 _need(v2_complete_sha == V2_PRECEDING_COMPLETE_SHA256, "v3_preceding_v2_completion_binding")
             third = _load_campaign(inputs, V3_PARTS, V3_ID, v3_complete_sha, fixture_only=fixture_only)
@@ -482,7 +625,7 @@ def _assess_worker(*, root, audit_id, identity, v2_complete_sha, anchors, fixtur
         inputs.recheck()
         result = assessment.assess_earnings_archive_cohort(inventory_raw=inventory_raw,
             inventory_sha256=anchors.inventory_sha256, campaigns=tuple(campaigns))
-        _v3_selection(root, v3_complete_sha)
+        _archive_selection(root, v3_complete_sha, partial_witness_sha, v4_complete_sha)
         inputs.recheck()
         _need(_source_bytes(root, tuple(identity["source_sha256"])) == identity["source_sha256"], "worker_source_inventory_changed")
         output = _Chain(root, (*OUTPUT_PARTS, audit_id))
@@ -494,6 +637,7 @@ def _assess_worker(*, root, audit_id, identity, v2_complete_sha, anchors, fixtur
             "assessment_bytes": len(raw), "input_sha256": dict(sorted(inputs.hashes.items())),
             "input_inventory_sha256": _sha(_canonical(inputs.hashes)), "expected_v2_complete_sha256": v2_complete_sha,
             "expected_v3_complete_sha256": v3_complete_sha,
+            "expected_partial_witness_sha256": partial_witness_sha, "expected_v4_complete_sha256": v4_complete_sha,
             "v1_metadata_anchor_provenance": "later-independent-body-reprojection-not-original-producer-receipt",
             "counts": {key: body[key] for key in ("source_filings", "all_form_issuer_count", "relevant_issuer_count",
                 "source_metadata_rows", "provider_code_count", "metadata_accepted_rows", "quarantined_metadata_rows")},
@@ -510,7 +654,7 @@ def _assess_worker(*, root, audit_id, identity, v2_complete_sha, anchors, fixtur
               "published_output_inventory_or_hash")
         inputs.recheck(); output.recheck()
         _need(_source_bytes(root, tuple(identity["source_sha256"])) == identity["source_sha256"], "worker_source_inventory_changed")
-        _v3_selection(root, v3_complete_sha)
+        _archive_selection(root, v3_complete_sha, partial_witness_sha, v4_complete_sha)
         return {"audit_id": audit_id, "fixture_only": fixture_only, "assessment_sha256": result.sha256,
                 "complete_sha256": complete_sha, "counts": receipt["counts"],
                 "unavailable_window_count": receipt["unavailable_window_count"], **{flag: False for flag in FALSE_FLAGS}}
@@ -530,20 +674,23 @@ def _audit_id(value):
 
 
 def run_fixture_assessment(*, root, audit_id, expected_head, expected_v2_complete_sha256,
-                           anchors: FixtureAnchors, identity, expected_v3_complete_sha256=None):
+                           anchors: FixtureAnchors, identity, expected_v3_complete_sha256=None,
+                           expected_partial_witness_sha256=None, expected_v4_complete_sha256=None):
     """Explicit invented-root/callback path, always marked fixture-only."""
     _need(isinstance(root, Path) and root != LANE_ROOT and root.resolve() == root
           and callable(identity) and identity is not _identity and type(anchors) is FixtureAnchors,
           "fixture_root_and_explicit_identity_required")
     _audit_id(audit_id); _digest(expected_v2_complete_sha256)
-    _v3_selection(root, expected_v3_complete_sha256)
+    _archive_selection(root, expected_v3_complete_sha256, expected_partial_witness_sha256, expected_v4_complete_sha256)
     baseline = identity(expected_head)
     output = _Chain(root, (*OUTPUT_PARTS, audit_id), create=True, exclusive_last=True); output.close()
     return _assess_worker(root=root, audit_id=audit_id, identity=baseline, v2_complete_sha=expected_v2_complete_sha256,
-                         anchors=anchors, fixture_only=True, v3_complete_sha=expected_v3_complete_sha256)
+                         anchors=anchors, fixture_only=True, v3_complete_sha=expected_v3_complete_sha256,
+                         partial_witness_sha=expected_partial_witness_sha256, v4_complete_sha=expected_v4_complete_sha256)
 
 
-def _verify_worker_publication(*, root, audit_id, identity, v2_complete_sha, result, fixture_only=False, v3_complete_sha=None):
+def _verify_worker_publication(*, root, audit_id, identity, v2_complete_sha, result, fixture_only=False, v3_complete_sha=None,
+                               partial_witness_sha=None, v4_complete_sha=None):
     """Parent reattaches the output and binds the worker response to its bytes."""
     output = _Chain(root, (*OUTPUT_PARTS, audit_id))
     try:
@@ -551,6 +698,33 @@ def _verify_worker_publication(*, root, audit_id, identity, v2_complete_sha, res
         receipt_raw = _read_leaf(output.fd, "complete.json", limit=assessment.MAX_JOURNAL_BYTES)
         receipt = _json(receipt_raw)
         body = _read_leaf(output.fd, "assessment.json", limit=assessment.MAX_INVENTORY_BYTES)
+        payload = _json(body)
+        count_names = ("source_filings", "all_form_issuer_count", "relevant_issuer_count", "source_metadata_rows",
+                       "provider_code_count", "metadata_accepted_rows", "quarantined_metadata_rows")
+        declared_counts = receipt.get("counts")
+        authority_names = {"source_authenticated", "actual_earnings_coverage_complete", "historical_identity_verified",
+            "point_in_time_verified", "complete_parent_admitted", "rights_verified", "qc_processing_rights_verified",
+            "qc_entitlement_verified", "canonical_ready", "backtesting_ready", "outcome_access_authorized", "execution_authorized"}
+        _need(payload.get("schema") == assessment.SCHEMA and payload.get("source_period") == "2006Q1"
+              and payload.get("fixture_only") is fixture_only
+              and type(declared_counts) is dict and set(declared_counts) == set(count_names)
+              and all(type(declared_counts[key]) is int and declared_counts[key] >= 0
+                      and type(payload.get(key)) is int and payload[key] == declared_counts[key] for key in count_names)
+              and type(payload.get("unavailable_windows")) is list
+              and type(receipt.get("unavailable_window_count")) is int
+              and receipt["unavailable_window_count"] == len(payload["unavailable_windows"])
+              and type(payload.get("authority")) is dict and set(payload["authority"]) == authority_names
+              and all(value is False for value in payload["authority"].values())
+              and all(type(payload.get(key)) is int and payload[key] == 0
+                      for key in ("research_looks", "qc_jobs", "provider_dispatches"))
+              and payload.get("raw_financial_bytes_interpreted") is False
+              and payload.get("financial_values_evaluated_or_projected") is False
+              and receipt.get("source_file_custody_verified") is True
+              and receipt.get("effective_process_tree_network_denial") is True
+              and receipt.get("effective_process_fork_denial") is (not fixture_only)
+              and receipt.get("effective_outside_output_write_denial") is (not fixture_only)
+              and receipt.get("writes_confined_to_fresh_output_by_launcher") is (not fixture_only),
+              "parent_worker_semantic_or_isolation_receipt_binding_refused")
         _need(type(result) is dict and result.get("audit_id") == audit_id and result.get("fixture_only") is fixture_only
               and result.get("complete_sha256") == _sha(receipt_raw)
               and result.get("assessment_sha256") == _sha(body) == receipt.get("assessment_sha256")
@@ -559,8 +733,13 @@ def _verify_worker_publication(*, root, audit_id, identity, v2_complete_sha, res
               and receipt.get("fixture_only") is fixture_only
               and receipt.get("expected_v2_complete_sha256") == v2_complete_sha
               and receipt.get("expected_v3_complete_sha256") == v3_complete_sha
+              and receipt.get("expected_partial_witness_sha256") == partial_witness_sha
+              and receipt.get("expected_v4_complete_sha256") == v4_complete_sha
               and receipt.get("counts") == result.get("counts")
+              and type(result.get("counts")) is dict and set(result["counts"]) == set(count_names)
+              and all(type(result["counts"][key]) is int for key in count_names)
               and receipt.get("unavailable_window_count") == result.get("unavailable_window_count")
+              and type(result.get("unavailable_window_count")) is int
               and receipt.get("raw_financial_bodies_decoded") is False and receipt.get("credential_read") is False
               and receipt.get("looks_jobs_backtests") == [0, 0, 0]
               and all(receipt.get(flag) is False and result.get(flag) is False for flag in FALSE_FLAGS),
@@ -570,11 +749,12 @@ def _verify_worker_publication(*, root, audit_id, identity, v2_complete_sha, res
         output.close()
 
 
-def run_actual_assessment(*, audit_id, expected_head, expected_v2_complete_sha256, expected_v3_complete_sha256=None):
+def run_actual_assessment(*, audit_id, expected_head, expected_v2_complete_sha256, expected_v3_complete_sha256=None,
+                          expected_partial_witness_sha256=None, expected_v4_complete_sha256=None):
     _audit_id(audit_id); _digest(expected_v2_complete_sha256)
     baseline = _identity(expected_head)
-    _v3_selection(LANE_ROOT, expected_v3_complete_sha256)
-    _need(expected_v3_complete_sha256 is None or expected_v2_complete_sha256 == V2_PRECEDING_COMPLETE_SHA256,
+    _archive_selection(LANE_ROOT, expected_v3_complete_sha256, expected_partial_witness_sha256, expected_v4_complete_sha256)
+    _need(expected_v3_complete_sha256 is None and expected_partial_witness_sha256 is None or expected_v2_complete_sha256 == V2_PRECEDING_COMPLETE_SHA256,
           "v3_preceding_v2_completion_binding")
     output = _Chain(LANE_ROOT, (*OUTPUT_PARTS, audit_id), create=True, exclusive_last=True); output.close()
     _need(_identity(expected_head) == baseline, "parent_source_identity_changed")
@@ -586,16 +766,21 @@ def run_actual_assessment(*, audit_id, expected_head, expected_v2_complete_sha25
                "--expected-v2-complete-sha256", expected_v2_complete_sha256]
     if expected_v3_complete_sha256 is not None:
         command.extend(("--expected-v3-complete-sha256", expected_v3_complete_sha256))
+    if expected_partial_witness_sha256 is not None:
+        command.extend(("--expected-partial-witness-sha256", expected_partial_witness_sha256))
+    if expected_v4_complete_sha256 is not None:
+        command.extend(("--expected-v4-complete-sha256", expected_v4_complete_sha256))
     launched = subprocess.run(command, cwd=LANE_ROOT, input=_canonical(baseline), capture_output=True, check=False)
     _need(_identity(expected_head) == baseline, "parent_source_identity_changed")
-    _v3_selection(LANE_ROOT, expected_v3_complete_sha256)
+    _archive_selection(LANE_ROOT, expected_v3_complete_sha256, expected_partial_witness_sha256, expected_v4_complete_sha256)
     _need(launched.returncode == 0 and not launched.stderr, "isolated_worker_refused_output_preserved")
     try:
         result = json.loads(launched.stdout)
     except (ValueError, UnicodeError):
         raise ArchiveAssessmentRunnerError("isolated_worker_output_schema") from None
     _verify_worker_publication(root=LANE_ROOT, audit_id=audit_id, identity=baseline,
-                              v2_complete_sha=expected_v2_complete_sha256, result=result, v3_complete_sha=expected_v3_complete_sha256)
+                              v2_complete_sha=expected_v2_complete_sha256, result=result, v3_complete_sha=expected_v3_complete_sha256,
+                              partial_witness_sha=expected_partial_witness_sha256, v4_complete_sha=expected_v4_complete_sha256)
     return result
 
 
@@ -605,6 +790,8 @@ def main(argv=None):
     parser.add_argument("--expected-head", required=True)
     parser.add_argument("--expected-v2-complete-sha256", required=True)
     parser.add_argument("--expected-v3-complete-sha256")
+    parser.add_argument("--expected-partial-witness-sha256")
+    parser.add_argument("--expected-v4-complete-sha256")
     parser.add_argument("--worker", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args(argv)
     try:
@@ -620,11 +807,14 @@ def main(argv=None):
                                      V1_MANIFEST_SHA256, V1_METADATA_SHA256)
             result = _assess_worker(root=LANE_ROOT, audit_id=_audit_id(args.audit_id), identity=identity,
                 v2_complete_sha=_digest(args.expected_v2_complete_sha256), anchors=anchors, fixture_only=False,
-                v3_complete_sha=args.expected_v3_complete_sha256)
+                v3_complete_sha=args.expected_v3_complete_sha256, partial_witness_sha=args.expected_partial_witness_sha256,
+                v4_complete_sha=args.expected_v4_complete_sha256)
         else:
             result = run_actual_assessment(audit_id=args.audit_id, expected_head=args.expected_head,
                 expected_v2_complete_sha256=args.expected_v2_complete_sha256,
-                expected_v3_complete_sha256=args.expected_v3_complete_sha256)
+                expected_v3_complete_sha256=args.expected_v3_complete_sha256,
+                expected_partial_witness_sha256=args.expected_partial_witness_sha256,
+                expected_v4_complete_sha256=args.expected_v4_complete_sha256)
         print(json.dumps(result, sort_keys=True))
         return 0
     except (ArchiveAssessmentRunnerError, OSError, EodhdDemoError, subprocess.SubprocessError):

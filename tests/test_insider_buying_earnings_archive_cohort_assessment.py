@@ -52,7 +52,7 @@ def campaign(windows=m.SUPPORT_WINDOWS, *, schema="insider-eodhd-date-window-ear
     observed_at = (datetime.fromisoformat(registered.replace("Z", "+00:00")) + timedelta(minutes=1)).isoformat()
     completed_at = (datetime.fromisoformat(registered.replace("Z", "+00:00")) + timedelta(minutes=2)).isoformat()
     manifest = {"schema": schema, "campaign_id": name, "windows": [list(window) for window in windows],
-                "registered_at_utc": registered, "identity": {"head": "a" * 40}, "fixture_only": True}
+                "registered_at_utc": registered, "identity": {"head": "a" * 40, "source_inventory_sha256": "f" * 64}, "fixture_only": True}
     manifest_raw = enc(manifest); manifest_sha = sha(manifest_raw)
     results, evidence = [], []
     count = len(windows) if refusal is None else refusal + 1
@@ -153,6 +153,77 @@ def three_campaigns(*, third_rows=None, third_refusal=None):
     third = campaign(m.V3_SUPPORT_WINDOWS, schema=m.CONTINUATION3_SCHEMA,
         name="ib-eodhd-campaign-invented-v3", registered="2026-10-13T00:04:00Z", rows=third_rows, refusal=third_refusal)
     return first, second, third
+
+
+def four_campaigns_with_partial():
+    first, second, third = three_campaigns(third_refusal=5,
+        third_rows={"2018-09-01": [row("ABC.US", "2018-09-15")]})
+    manifest = json.loads(third.manifest_raw)
+    leaves, counts = {}, []
+    for index, item in enumerate(third.windows[:5]):
+        child = json.loads(item.complete_raw)
+        leaves[f"window-{index:04d}-complete.json"] = {"sha256": item.complete_sha256, "bytes": len(item.complete_raw)}
+        leaves[f"window-{index:04d}-metadata.json"] = {"sha256": item.metadata_sha256, "bytes": len(item.metadata_raw)}
+        counts.append({"index": index, "window": child["window"], "complete_sha256": item.complete_sha256,
+            **{key: child["receipt"][key] for key in ("sample_rows", "metadata_accepted_rows", "quarantined_rows")}})
+    witness = {"schema": "independent-partial-calendar-v3-custody-witness-candidate-v1",
+        "campaign_id": manifest["campaign_id"], "manifest_sha256": third.manifest_sha256,
+        "execution_head": manifest["identity"]["head"], "source_inventory_sha256": manifest["identity"]["source_inventory_sha256"],
+        "campaign_completion_present": False, "aggregate_completion_manufactured": False,
+        "sealed_window_count": 5, "consumed_scope_count": 6, "unsealed_started_window_count": 1,
+        "unattempted_suffix_windows": 89, "next_unattempted_window": list(m.V4_SUPPORT_WINDOWS[0]),
+        "last_unattempted_window": list(m.V4_SUPPORT_WINDOWS[-1]), "journal_leaf_sha256_and_bytes": leaves,
+        "sealed_window_counts": counts, "observed_at_utc": "2026-10-13T00:06:00Z",
+        "observed_failure_cause": "not_established_by_retained_controls"}
+    raw = enc(witness)
+    partial = m.ArchivePartialCampaignMetadata(third.manifest_raw, third.manifest_sha256, raw, sha(raw), third.windows[:5])
+    fourth = campaign(m.V4_SUPPORT_WINDOWS, schema=m.CONTINUATION4_SCHEMA, name="ib-eodhd-campaign-invented-v4",
+                      registered="2026-10-13T00:06:00Z", rows={"2019-03-01": [row("ABC.US", "2019-03-15")]})
+    return first, second, partial, fourth
+
+
+def test_partial_witness_never_manufactures_old_completion_or_admits_unsealed_window():
+    result = assess(four_campaigns_with_partial()).to_payload()
+    assert result["unavailable_windows"] == [["2006-01-01", "2006-01-31"], ["2018-08-01", "2018-08-31"], ["2019-02-01", "2019-02-28"]]
+    pending = next(item for item in result["window_accounting"] if item["window"][0] == "2019-02-01")
+    assert pending["status"] == "UNSEALED_CONSUMED_START" and pending["source_rows"] is None
+    assert pending["window_complete_sha256"] is None and pending["producer_completion_present"] is False
+    assert pending["original_http_status_established"] is False
+    assert result["campaigns"][2]["complete_sha256"] is None
+    assert result["campaigns"][2]["producer_aggregate_completion_present"] is False
+    assert result["source_metadata_rows"] == 4
+    assert not any(result["authority"].values())
+
+
+@pytest.mark.parametrize("field,value", [("campaign_completion_present", True), ("aggregate_completion_manufactured", True),
+    ("sealed_window_count", True), ("consumed_scope_count", 5), ("unsealed_started_window_count", 0),
+    ("unattempted_suffix_windows", 90), ("observed_failure_cause", "git_timeout"),
+    ("source_inventory_sha256", None)])
+def test_partial_witness_cannot_reclassify_consumed_scopes(field, value):
+    items = list(four_campaigns_with_partial()); body = json.loads(items[2].witness_raw); body[field] = value
+    raw = enc(body); items[2] = replace(items[2], witness_raw=raw, witness_sha256=sha(raw))
+    with pytest.raises(m.EarningsArchiveAssessmentError):
+        assess(tuple(items))
+
+
+@pytest.mark.parametrize("mutation", ["complete", "metadata", "count"])
+def test_partial_seals_and_metadata_must_match_independent_witness(mutation):
+    items = list(four_campaigns_with_partial()); body = json.loads(items[2].witness_raw)
+    if mutation == "count":
+        body["sealed_window_counts"][0]["sample_rows"] = 2
+    else:
+        body["journal_leaf_sha256_and_bytes"]["window-0000-" + mutation + ".json"]["sha256"] = "0" * 64
+    raw = enc(body); items[2] = replace(items[2], witness_raw=raw, witness_sha256=sha(raw))
+    with pytest.raises(m.EarningsArchiveAssessmentError):
+        assess(tuple(items))
+
+
+def test_v4_cannot_redispatch_consumed_february():
+    items = list(four_campaigns_with_partial())
+    items[3] = campaign(m.V3_SUPPORT_WINDOWS[5:], schema=m.CONTINUATION4_SCHEMA,
+        name="ib-eodhd-campaign-invented-v4", registered="2026-10-13T00:06:00Z")
+    with pytest.raises(m.EarningsArchiveAssessmentError, match="continuation4_exact"):
+        assess(tuple(items))
 
 
 def test_three_epochs_never_repair_two_attempted_refusals():

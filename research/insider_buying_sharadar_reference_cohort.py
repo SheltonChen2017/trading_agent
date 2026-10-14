@@ -4,6 +4,8 @@ Every nonfinancial projected row and every source issuer is accounted for.
 The actual observer must independently prove archive/member bytes and custody;
 these supplied projections alone prove neither that nor original availability.
 Names are retained privately as source metadata, never used as join keys.
+CSV CR/LF/TAB in names remain exact JSON-escaped metadata with a quarantine
+reason; identity/date/URL controls and invalid UTF-8 text still refuse.
 """
 from __future__ import annotations
 
@@ -88,8 +90,9 @@ def _count(value):
     return value
 
 
-def _safe_text(value):
-    if type(value) is not str or any(ord(char) < 32 for char in value):
+def _safe_text(value, *, allow_name_controls=False):
+    if type(value) is not str or any(ord(char) < 32 and not (
+            allow_name_controls and char in "\r\n\t") for char in value):
         return False
     try:
         return len(value.encode()) <= 16 * 1024
@@ -160,7 +163,8 @@ def _projection(raw, digest, *, schema, columns, manifest_digest, entry):
     for ordinal, row in enumerate(rows, 1):
         _keys(row, {"source_row_ordinal", *columns})
         _need(type(row["source_row_ordinal"]) is int and row["source_row_ordinal"] == ordinal, "projection_ordinals")
-        _need(all(_safe_text(row[field]) for field in columns), "projection_field_shape")
+        _need(all(_safe_text(row[field], allow_name_controls=field in {"name", "contraname"})
+                  for field in columns), "projection_field_shape")
     return rows
 
 
@@ -204,6 +208,8 @@ def assess_sharadar_cohort(*, inventory_raw: bytes, inventory_sha256: str, captu
     cik_groups, label_groups, exact_label_groups = defaultdict(set), defaultdict(set), defaultdict(set)
     for row in tickers:
         reasons = []
+        if any(char in "\r\n\t" for char in row["name"]):
+            reasons.append("nonessential_name_control_characters")
         security_table = row["table"] in _SECURITY_TABLES
         if not security_table:
             reasons.append("source_table_not_security_candidate")
@@ -244,6 +250,8 @@ def assess_sharadar_cohort(*, inventory_raw: bytes, inventory_sha256: str, captu
     action_reason_counts, action_labels = Counter(), Counter()
     for row in actions:
         reasons = []
+        if any(char in "\r\n\t" for field in ("name", "contraname") for char in row[field]):
+            reasons.append("nonessential_name_control_characters")
         day = _day(row["date"])
         if day is None:
             reasons.append("action_date_unknown")

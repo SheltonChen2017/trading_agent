@@ -28,6 +28,12 @@ PIT, ORIGINAL-PARENT AND FULL-POPULATION EVIDENCE REMAIN REQUIRED.
 BOTH FINAL ACCESS CLASSIFICATIONS STAND WITHOUT RETROACTIVE APPROVAL.
 LOOKS/JOBS/BACKTESTS 0/0/0. LOCAL CONTINUATION; NO ROUND PUSH YET.**
 
+Current continuation: section172 preserves the actually stopped EODHD v3
+root (five seals, sixth consumed/unsealed) and the empty refused Sharadar
+observer output. A new externally pinned partial-root witness is separate
+from producer completion. The verified private-name correction and separate
+89-window v4 are local continuing work, not archive/readiness promotion.
+
 Branch: `codex/strategy-insider-buying`
 
 Governing owner source: `INSIDER_BUYING_ETF_STRATEGY_BLUEPRINT.pdf`, 33
@@ -24275,3 +24281,271 @@ D23/v3 custody and both final non-retroactive access classifications remain
 binding. Shared/project records and SESSION_HANDOFF stay frozen. No readiness,
 outcome look, QC strategy launch, trading action, monitor rearm, other-chat
 message or successful push. The single final publication remains unconsumed.
+
+## 172. Actual partial-root custody and isolated reference refusal (2026-10-14 UTC)
+
+### 172.1 Execution lineage and permanent consumed scopes
+
+Both section171 operations were actually launched from already committed
+6849dec54ba10443097f7903f4a384f688a5ca41 on the designated Insider branch
+and worktree. No later implementation commit existed during these runs.
+The EODHD actor exited2 with the fixed private_journal_or_identity_operation_refused
+code. This is **NOT zero provider requests** and is not a completed campaign.
+The supplied-Sharadar observer separately exited2 with
+offline_reference_assessment_refused_outputs_preserved. Both processes ended;
+no active acquisition was resumed while source corrections were made.
+
+EODHD actual root:
+artifacts/insider_buying/eodhd_earnings_continuation3/campaigns/ib-eodhd-campaign-continuation3-201809-202607-20261013-once.
+Manifest101,717 bytes, SHA-256
+0b2f211f9c7d97b71ad01c6c8f7479ba7db31d67ba21ecc410645db62bb10990;
+registered2026-10-14T00:12:06.407751Z; executed nine-source inventory digest
+5721b4ecb53035763130e366ac029f519ce27fa78fda69978f266da2ee2728b7.
+Six permanent scopes and six starts are retained. Five windows sealed; the
+sixth retained raw/metadata but neither its seal nor an aggregate complete.json
+exists. Exactly24 campaign leaves and six scope leaves are preserved.
+
+| Sealed window | Rows | Metadata-accepted | Quarantined | Raw bytes | Window completion SHA-256 |
+|---|---:|---:|---:|---:|---|
+| 2018-09 | 11,642 | 1,059 | 10,583 | 2,030,167 | 6d53e8ba5238c8ce62cec39183d1f42a0dd5806029136ab7204057fb73153860 |
+| 2018-10 | 12,765 | 8,859 | 3,906 | 2,310,149 | 85adcb77ea9d4f0cb8d49cb6e28bdce073eee814cb1e84973dd41682922c63c0 |
+| 2018-11 | 20,357 | 11,454 | 8,903 | 3,647,576 | 63d6b40e6477b2cae7ae4664df5e944c9b15c7f19a94cc48b42510688cedf59b |
+| 2018-12 | 10,580 | 728 | 9,852 | 1,850,729 | d8c14237368738d0e9da551586cba389717d1046e532c5f24e63ceebc6d7fa10 |
+| 2019-01 | 5,800 | 3,690 | 2,110 | 1,048,824 | 975803f74fd84ded9c379bc57ab6248d1be204ffefaeb343c2238e9d4bf84d16 |
+
+The five seals account61,144 rows =25,790 metadata-accepted +35,354
+quarantined;10,887,445 raw retained bytes. Metadata acceptance is neither
+actual-release coverage nor identity/source/rights/canonical admission.
+February2019 started2026-10-14T00:12:29.912823Z. Its physical raw body is
+3,373,434 bytes SHA-256
+8a3f15c766d83769a6da62cddbf38755fb3bfcf2e2414a16e2a0f8d758c88d5d;
+metadata4,488,962 bytes SHA-256
+01b0c3cc5217e88630f8049808ae29e06f412e4ed7f085b26496f20ebd3e4c5e;
+start SHA-256
+5cdc509c2fb977b79e9b251dfc9fcd3aa645f2b61903d8f86f9898e9b131c47d.
+No completion-bound HTTP status, row count or acceptance is asserted for
+this sixth window. Total physically retained six raw bodies14,260,879 bytes
+is **not measured wire-transfer volume**. All six scopes remain consumed.
+
+### 172.2 Independent custody witness, not retroactive completion
+
+Main readonly bounded-leaf/hash checks passed all24 leaves. Internal
+independent audit held shared read-only generation locks, verified all24
+leaf hashes/sizes and six scopes against exact historical manifest/anchors,
+and independently compared all nine execution-source Git blobs to6849dec5.
+V2's604 leaves/151 scopes and exact genesis bindings remain unchanged.
+Manifest registration precedes all starts; each of five seal clocks precedes
+the next start. Transport-finish monotonic times were not retained, so these
+journals do not independently prove actual cooldown duration. Section171's
+invented cadence proof is not relabeled as an observed production timer.
+
+At2026-10-14T00:23:18.978958Z the internal audit produced an independent
+canonical6099-byte witness in memory. Main then published exactly those
+bytes, no terminal newline, by the existing private exclusive canonical
+artifact writer into the NEW root
+artifacts/insider_buying/eodhd_earnings_partial_witness/ib-eodhd-v3-partial-201809-201902-20261013-once/witness.json.
+Witness SHA-256
+61d8c42efd26dbc04626cbe4eaeb599437dd496dec21827d5d38a24b66f32fa1.
+It explicitly declares no producer aggregate completion, one unsealed start,
+all24 leaf sizes/hashes, six scope hashes, five seal accounting rows and89
+never-started windows March2019 through July2026. It is not an original
+producer receipt, independent Claude review, historical availability, or a
+repair of the original February request. The old root was not written.
+
+The **exact original low-level failure cause is not established**. Current
+bounded-leaf/journal/predecessor reconstruction passes. A supplementary
+diagnostic initially put Git under all-write denial and refused; corrected
+network-only-denied Git comparison passed. That deliberately over-restrictive
+forensic invocation is not evidence explaining the actual actor failure.
+November's4,846,557-byte metadata already sealed, so a first4MiB metadata
+failure is not supported. Executed source writes sixth body/metadata after
+the post-transport identity check; no direct Git call occurs between those
+leaves and the seal. Do not assign an unobserved Git timeout, disk failure,
+HTTP refusal, transferred-byte estimate or specific correction narrative.
+
+### 172.3 Reference refusal, verified correction and delegated dispositions
+
+The failed fresh output
+artifacts/insider_buying/sharadar_reference_cohort/ib-sharadar-cohort-2006q1-20261014-once
+exists and is empty; never overwrite or resume it. Independent readonly
+input reconstruction reverified the supplied5998-byte original manifest,
+all census bytes, TICKERS/ACTIONS archive/member CRC/hash/column/row binding,
+and produced29,841,795-byte TICKERS and116,139,300-byte ACTIONS projections.
+The pure assessment independently reproduced projection_field_shape refusal.
+Five of74,150 ticker names contain CR/LF/TAB CSV controls; none of698,455
+action rows has the field issue. No names or financial values were printed.
+No archive redownload or new Sharadar account access occurred.
+
+Delegated engineering decision: preserve exact private JSON-escaped CR/LF/TAB
+only in nonessential name/contraname, add nonessential_name_control_characters
+row quarantine, and never use names as identity keys. NUL/other controls,
+invalid Unicode/oversized fields and controls in identity/date/URL still
+structurally refuse. This is not historical mapping or ordinary-equity
+admission. Source SHA-256
+8ba4e7de49cdb58a49cb4951c910334df5006a6c5df7f14bc22f5b4314ef26f9;
+focused test SHA-256
+25571a41c2c7db5384b2931b71490154db9b243eeaa2d9c6d8a34d33c230eff5.
+`IBSHARA-172-R01` P3 **CLOSED** for nonessential control refusal: seven genuine
+red0.68s then97 focused green1.17s; main independently97 green1.12s under OS
+network denial. A new fresh observer ID is required after a clean committed
+corrected image; this entry does not assert that later run happened.
+
+Owner says other lanes use FMP and to skip the requested paperwork question.
+Disposition: no further routine permission question, continue already owned
+EODHD and supplied Sharadar work, no inferred FMP download/retention licence
+and no FMP request in this scope. Credential presence is not a vendor right.
+
+Continuous-build direction supplies the bounded unattempted-only successor
+decision: separate v4, exact89 months, no replay of any earlier attempted,
+refused or unsealed month, no old-root/source edits. Future sanitized failure
+controls record static stage/class/errno/fixed-code only, never exception
+text, credentials/private paths/body data. This improves future diagnosis;
+it does not establish or retroactively fix the unknown v3 cause.
+
+The extended pure/offline observer represents a partial campaign explicitly,
+reads only the five sealed metadata collections, hashes the sixth raw and
+metadata bytes without interpreting them, retains an unavailable consumed
+start and requires the externally pinned witness. A v4 root cannot silently
+appear without its own external completion pin; original v3 aggregate and
+partial-witness modes are exclusive. All source, identity, rights, PIT,
+canonical/QC/backtesting and execution gates remain false. Partial pure73
+green1.27s; combined pure/runner127 green2.53s. The initial contract-signature
+assertion needed the two new external hash parameters; a clock-invalid
+invented reservation fixture and one missing-key assertion were corrected,
+not attributed to production source failures. Main277 focused/reference/
+import/exact-package guards green4.94s. No full suite, new Claude review,
+outcome look, QC launch, trading action or final push. Six P2 findings and
+all frozen source/window/economics/access dispositions remain unchanged.
+
+Technical milestone: actual partial custody is independently accounted for
+without rewriting producer history, and the supplied-reference refusal has
+a narrow proved correction. The next separately committed image must bind
+all successor safeguards, tests and exact source hashes before further
+contact; operational early-parent bootstrap continues in parallel offline.
+
+Plain-language milestone: five additional months were saved successfully,
+and another request stopped without a final receipt. That request will not
+be repeated. We preserved the evidence, prepared a separate route for only
+months never requested, and corrected handling of harmless private company-
+name formatting. None of this makes the full strategy ready to backtest.
+
+## 173. Untouched-only successor image and precontact checks (2026-10-14 UTC)
+
+### 173.1 Specifically bounded continuing operations
+
+Under the owner's existing continuous-build/delegated-decision authorization,
+run one separately versioned v4 acquisition ID
+ib-eodhd-campaign-continuation4-201903-202607-20261014-once, exact89 calendar
+months March2019 through July2026, from a clean committed designated lane
+image. This is a new suffix, not a resumed v3. Exclude January2006,
+August2018 and all six attempted v3 windows regardless of receipt state.
+Require the hard-named independent6099-byte partial witness from172 with
+explicit external SHA61d8c42efd26dbc04626cbe4eaeb599437dd496dec21827d5d38a24b66f32fa1
+on the actual CLI. Hold four generation locks and verify complete inherited
+v1/v2 chain, every partial v3 leaf/scope and manifest/source identity against
+those independent pins before contact and throughout the new operation.
+No old financial or metadata-row decoding by the collector. Preserve all
+executed v1/v2/v3 acquisition source bytes and old-root bytes.
+
+V4 caps remain16MiB raw/256MiB metadata/200,000 rows/1MiB controls per window;
+maintain >=4GiB free disk after the conservative remaining-window raw,
+metadata, scope/start/seal and three additional campaign-control reserves.
+Finite timeout, no redirect/retry/resume/pagination/symbol query or financial
+numeric conversion; permanent scope/start precedes any request, full1-second
+cooldown after transport completion. Future failures preserve only sanitized
+static stage/class/errno/fixed-code vocabulary, sealing a new failure journal
+only if existing named current-journal custody still proves safe. No repair
+or overwrite when that safety check fails. A cause recorded by this future
+version does not establish the original v3 failure cause.
+
+After corrected reference bytes are committed, run fresh offline supplied-
+Sharadar observer ib-sharadar-cohort-2006q1-name-safe-20261014-once. Preserve
+the earlier empty refused root. Reuse the exact already retained original
+capture/sidecar/three ZIPs; TICKERS/ACTIONS only metadata-projected, complete
+FUNDAMENTALS compressed bytes hash-only. No provider/credential/API access,
+financial decoding, historical admission or replacement purchase. Actual
+worker isolation must observe process-tree network/fork denial and writes
+only into its new private output, with committed/current source inventories
+and held census/archive custody checked before and after publication.
+
+After v4 actually ends, independently verify its real completion (if one
+exists), then run the fresh extended offline earnings observer with both
+explicit partial-witness and actual v4-completion pins. Interpret only sealed
+metadata and hash opaque paid bodies; sixth v3 metadata is hash-only. The
+three earlier refused/unsealed months remain unavailable. A new partial
+failure must not be turned into a synthetic producer completion.
+
+### 173.2 Exact candidate byte image, corrections and validation
+
+| Candidate source | Source SHA-256 | Focused test SHA-256 |
+|---|---|---|
+| research/insider_buying_eodhd_earnings_continuation4.py | ddd9703a264816a109a26f2e38076af35700a99d21622ce225b28cd7e2e17f29 | e0b96f8e6734063ee1f040f6242a3d1408cb759e51e202f4ad5c54d12403cc58 |
+| research/insider_buying_earnings_archive_cohort_assessment.py | e6ef686885d05c54ce12abafae901fb7e1486d9f0fb9db79979a588e8dc58884 | 35ebfd4bec58fe4f712115f79f258579722d94011dd93f249949ad6a726f0235 |
+| research/insider_buying_earnings_archive_assessment_runner.py | 2fa42914d5ac19ccd78908c18fc7a2f3509f8d9e5902ff30dfc9713463096b7e | 85e7ab6267aae8ceada5567bc43f76897295a4e693affc205acd11aff9325ebe |
+
+The name-safe reference source/test hashes remain exactly172. The executed
+v3 source remains10aebc54366784002a8e29324f3364688fb01dfb5f6e57531379f2e75ca2c926;
+no thaw, older-caller substitution or historical execution relabeling.
+Staged diff check caught one extra v4 EOF blank line before any commit;
+removing that single whitespace byte produces the final table source digest.
+The following author/internal QA v4 results use preceding ca1d4abebc2e3857eda05e80b0907dd365a8de0063a9920eb0b03315011a03a1,
+not a later execution claim. No semantic transport/custody byte changed.
+Main final whitespace-corrected v4/document/exact-package117 focused checks
+passed7.36s. In-memory compilation111 lane research files passed under
+network/all-write/fork denial; frozen four-file comparison was empty.
+V4 author354 combined focused13.59s; independent internal45 new tests plus
+exact package guard46 green7.43s. Five combined author/reviewer guard
+reversals caught external-witness bypass, failure-code token leakage,
+insufficient disk floor and default-transport cooldown omission. Independent
+memory-only reversals3.12s: start0.00/finish0.25/next1.25, missing cooldown
+next0.25 fails, restoration1.25 passes. These are invented transport clocks,
+not observed cadence on historical production. Prelaunch readonly candidate
+anchor check matched24 actual partial leaves/six scopes/five seals/one
+unsealed without old metadata/body decoding, credentials, writes or request.
+
+`IBSOURCEOBS-173-R01` P2 **CLOSED**: parent accepted rehashed worker output
+with forged body scope/counts/readiness or false actual isolation claims.
+Nine invented publication tests genuinely failed DID NOT RAISE in0.54s.
+Correction parses canonical body, binds actual/fixture/schema/typed exact
+counts, complete unavailable count, all false authority/zero look/job/provider
+dispatch/no financial decoding, and explicit real network/fork/outside-write/
+fresh-output isolation flags. The worker already enforced its OS policy;
+this finding concerns independent parent semantic verification, not evidence
+of an actual online worker or production data promotion. Initial corrected
+tests raised the right refusal with a renamed fixed code; ten regex-only
+assertions failed until the receipt_binding substring was retained.
+Main286 focused assessment/reference/import/exact-package checks
+passed5.51s on bd00ff9b/bb63dace. Independent139 assessment/exact checks
+passed3.52s at that image; a separate0.03s invented publication probe found
+public-result-only True still equalled strict integer1. Final correction
+also requires strict integer public-result counts/unavailable count, with a
+durable tenth regression. Main final287 assessment/reference/import/exact
+checks passed5.05s at the table image; no actual forged publication occurred.
+Before this final parent correction, main650 affected acquisition/
+observer/reference/document/import/exact-package tests passed16.53s; do not
+represent that earlier run as testing the later source bytes. Internal
+precorrection130 assessment/exact checks3.57s are likewise prior-image proof.
+Three additional partial witness/unsupported-cause/live-sixth-hash guard
+reversals were red and restored green0.78s; no actual rows or requests.
+
+The offline early-parent observer draft is **unexecuted/unqualified** and is
+not in this acquisition image. To keep clean committed runtime custody while
+another internal engineer prepares it, main preserved the exact35,418-byte
+draft SHAfc0cd7fba3a23f5db345cb46639bec49023bb0eac681ef434c24b1ab016f302c
+by descriptor-relative recoverable move to the new private ignored leaf
+artifacts/insider_buying/development_drafts/parent-bootstrap-prelaunch-20261014/bootstrap_candidate.py.
+No draft bytes were changed or deleted; restore only after actual actors end.
+All source/test writers are frozen during those operations.
+
+Technical milestone: the successor and partial-aware observer are separately
+versioned contracts with externally anchored historical custody and meaningful
+refusal sensitivity; real acquisition/reference observations follow only
+after this image is committed. This is internal QA, not new Claude review.
+
+Plain-language milestone: we can safely continue only never-requested months
+and reassess the existing reference archive without overwriting either failed
+run. The strategy still needs genuine original-parent and historical identity
+evidence. No full suite, strategy outcome, QC launch, readiness claim, shared
+record edit, monitor rearm or round push is authorized by these passes alone.
+The existing six open P2s and resolved ledgers, frozen economics/window, D23,
+stopped SECv3 and both non-retroactive access classifications remain binding.

@@ -42,7 +42,7 @@ def retain_campaign(root, parts, identity, item):
         child = json.loads(existing.complete_raw)
         window = manifest["windows"][index]
         scope = {"schema": manifest["schema"], "scope": m._scope(window), "campaign_id": identity,
-                 "reserved_at_utc": manifest["registered_at_utc"], "maximum_attempts": 1}
+                 "reserved_at_utc": child["completed_at_utc"], "maximum_attempts": 1}
         scope_raw = enc(scope); scope_sha = sha(scope_raw)
         scope_name = sha(enc(m._scope(window))) + ".json"
         private_file(scopes / scope_name, scope_raw)
@@ -197,7 +197,132 @@ def test_fixture_root_cannot_be_the_actual_lane(retained):
 def test_actual_route_has_no_fixture_callback_or_anchor_override():
     import inspect
     assert tuple(inspect.signature(m.run_actual_assessment).parameters) == (
-        "audit_id", "expected_head", "expected_v2_complete_sha256", "expected_v3_complete_sha256")
+        "audit_id", "expected_head", "expected_v2_complete_sha256", "expected_v3_complete_sha256",
+        "expected_partial_witness_sha256", "expected_v4_complete_sha256")
+
+
+def retain_partial(retained):
+    """Invented valid sealed metadata plus deliberately opaque sixth metadata."""
+    root = retained["root"]
+    item = three_campaigns(third_refusal=5)[2]
+    manifest = json.loads(item.manifest_raw)
+    previous = {"complete_sha256": retained["v2"].complete_sha256, "manifest_sha256": retained["v2"].manifest_sha256,
+        "genesis_campaign_anchor": {"complete_sha256": retained["first"].complete_sha256}}
+    manifest["campaign_id"] = m.V3_ID; manifest["previous_campaign_anchor"] = previous
+    manifest_raw = enc(manifest); manifest_sha = sha(manifest_raw)
+    evidence = []
+    for old in item.windows:
+        child = json.loads(old.complete_raw); child["manifest_sha256"] = manifest_sha
+        child_raw = enc(child); evidence.append(replace(old, complete_raw=child_raw, complete_sha256=sha(child_raw)))
+    complete = json.loads(item.complete_raw); complete["campaign_id"] = m.V3_ID
+    complete["manifest_sha256"] = manifest_sha; complete["previous_campaign_anchor"] = previous
+    complete["window_results"] = [{"index": i, "window": json.loads(e.complete_raw)["window"],
+        "receipt": json.loads(e.complete_raw)["receipt"], "complete_sha256": e.complete_sha256} for i,e in enumerate(evidence)]
+    complete_raw = enc(complete)
+    item = replace(item, manifest_raw=manifest_raw, manifest_sha256=manifest_sha,
+        complete_raw=complete_raw, complete_sha256=sha(complete_raw), windows=tuple(evidence))
+    item = retain_campaign(root, m.V3_PARTS, m.V3_ID, item)
+    source = root.joinpath(*m.V3_PARTS, "campaigns", m.V3_ID)
+    (source / "complete.json").unlink(); (source / "window-0005-complete.json").unlink()
+    private_file(source / "window-0005-response.json", b"opaque consumed body; not JSON")
+    private_file(source / "window-0005-metadata.json", b"opaque consumed metadata; not JSON")
+    leaves = {path.name: {"bytes": path.stat().st_size, "sha256": sha(path.read_bytes())} for path in source.iterdir()}
+    scopes = {path.name: sha(path.read_bytes()) for path in root.joinpath(*m.V3_PARTS, "scopes").iterdir()}
+    counts = [{"index": i, "window": json.loads(e.complete_raw)["window"], "complete_sha256": e.complete_sha256,
+        **{key: json.loads(e.complete_raw)["receipt"][key] for key in ("sample_rows", "metadata_accepted_rows", "quarantined_rows")}}
+        for i,e in enumerate(item.windows[:5])]
+    witness = {"schema": "independent-partial-calendar-v3-custody-witness-candidate-v1", "campaign_id": m.V3_ID,
+        "manifest_sha256": item.manifest_sha256, "execution_head": manifest["identity"]["head"],
+        "source_inventory_sha256": manifest["identity"]["source_inventory_sha256"], "campaign_completion_present": False,
+        "aggregate_completion_manufactured": False, "journal_leaf_sha256_and_bytes": leaves, "consumed_scope_sha256": scopes,
+        "sealed_window_counts": counts, "sealed_window_count": 5, "consumed_scope_count": 6,
+        "unsealed_started_window_count": 1, "unattempted_suffix_windows": 89,
+        "next_unattempted_window": list(m.assessment.V4_SUPPORT_WINDOWS[0]),
+        "last_unattempted_window": list(m.assessment.V4_SUPPORT_WINDOWS[-1]),
+        "observed_at_utc": "2026-10-13T00:06:00Z", "observed_failure_cause": "not_established_by_retained_controls"}
+    raw = enc(witness); private_file(root.joinpath(*m.PARTIAL_WITNESS_PARTS, "witness.json"), raw)
+    return sha(raw)
+
+
+def test_partial_live_observer_hashes_unsealed_metadata_without_interpreting_it(retained):
+    pin = retain_partial(retained)
+    result = run(retained, expected_partial_witness_sha256=pin)
+    body = json.loads(retained["root"].joinpath(*m.OUTPUT_PARTS, retained["output_id"], "assessment.json").read_bytes())
+    assert body["campaigns"][2]["complete_sha256"] is None
+    assert body["campaigns"][2]["producer_aggregate_completion_present"] is False
+    assert any(item["status"] == "UNSEALED_CONSUMED_START" for item in body["window_accounting"])
+    receipt = json.loads(retained["root"].joinpath(*m.OUTPUT_PARTS, retained["output_id"], "complete.json").read_bytes())
+    assert receipt["expected_partial_witness_sha256"] == pin and receipt["expected_v3_complete_sha256"] is None
+    assert any(key.endswith("window-0005-metadata.json") for key in receipt["input_sha256"])
+    assert not (retained["root"].joinpath(*m.V3_PARTS, "campaigns", m.V3_ID, "complete.json")).exists()
+    assert result["fixture_only"] is True
+
+
+@pytest.mark.parametrize("leaf", ["window-0000-metadata.json", "window-0005-response.json", "window-0005-metadata.json"])
+def test_partial_live_changed_consumed_bytes_are_not_ignored(retained, leaf):
+    pin = retain_partial(retained)
+    path = retained["root"].joinpath(*m.V3_PARTS, "campaigns", m.V3_ID, leaf)
+    path.write_bytes(b"corrupt invented value")
+    with pytest.raises(m.ArchiveAssessmentRunnerError, match="external_input_hash_mismatch"):
+        run(retained, expected_partial_witness_sha256=pin)
+
+
+def test_partial_live_cannot_sneak_in_an_original_aggregate_completion(retained):
+    pin = retain_partial(retained)
+    private_file(retained["root"].joinpath(*m.V3_PARTS, "campaigns", m.V3_ID, "complete.json"), b"{}")
+    with pytest.raises(m.ArchiveAssessmentRunnerError, match="input_directory_inventory"):
+        run(retained, expected_partial_witness_sha256=pin)
+
+
+def test_partial_and_aggregate_anchors_are_mutually_exclusive(retained):
+    pin = retain_partial(retained)
+    with pytest.raises(m.ArchiveAssessmentRunnerError, match="exclusive"):
+        run(retained, expected_partial_witness_sha256=pin, expected_v3_complete_sha256="a"*64)
+
+
+def test_appearing_v4_root_requires_external_pin_even_with_partial_witness(retained):
+    pin = retain_partial(retained)
+    retained["root"].joinpath(*m.V4_PARTS).mkdir(mode=0o700)
+    with pytest.raises(m.ArchiveAssessmentRunnerError, match="retained_v4_requires"):
+        run(retained, expected_partial_witness_sha256=pin)
+
+
+def test_v4_live_collection_preserves_all_unavailable_predecessor_windows(retained):
+    pin = retain_partial(retained)
+    fourth = campaign(m.assessment.V4_SUPPORT_WINDOWS, schema=m.assessment.CONTINUATION4_SCHEMA,
+        name=m.V4_ID, registered="2026-10-13T00:06:00Z")
+    manifest = json.loads(fourth.manifest_raw); manifest["previous_campaign_anchor"] = {"partial_witness_sha256": pin}
+    manifest_raw = enc(manifest); manifest_sha = sha(manifest_raw)
+    evidence = []
+    for item in fourth.windows:
+        child = json.loads(item.complete_raw); child["manifest_sha256"] = manifest_sha; raw = enc(child)
+        evidence.append(replace(item, complete_raw=raw, complete_sha256=sha(raw)))
+    complete = json.loads(fourth.complete_raw); complete["manifest_sha256"] = manifest_sha
+    complete["previous_campaign_anchor"] = manifest["previous_campaign_anchor"]
+    raw = enc(complete)
+    fourth = replace(fourth, manifest_raw=manifest_raw, manifest_sha256=manifest_sha,
+        complete_raw=raw, complete_sha256=sha(raw), windows=tuple(evidence))
+    fourth = retain_campaign(retained["root"], m.V4_PARTS, m.V4_ID, fourth)
+    result = run(retained, expected_partial_witness_sha256=pin, expected_v4_complete_sha256=fourth.complete_sha256)
+    assert result["unavailable_window_count"] == 153  # fixture v2 intentionally refused its first window
+    output = retained["root"].joinpath(*m.OUTPUT_PARTS, retained["output_id"])
+    body = json.loads((output / "assessment.json").read_bytes())
+    assert len(body["campaigns"]) == 4
+    assert len([item for item in body["window_accounting"] if item.get("campaign_schema") == m.assessment.CONTINUATION4_SCHEMA]) == 89
+    assert body["campaigns"][2]["complete_sha256"] is None
+    receipt = json.loads((output / "complete.json").read_bytes())
+    assert receipt["expected_v4_complete_sha256"] == fourth.complete_sha256
+    assert receipt["raw_financial_bodies_decoded"] is False
+
+
+def test_partial_external_witness_cannot_be_substituted_for_actual(retained):
+    pin = retain_partial(retained)
+    inputs = m._Inputs(retained["root"])
+    try:
+        with pytest.raises(m.ArchiveAssessmentRunnerError, match="actual_partial_external"):
+            m._load_partial_campaign(inputs, pin, fixture_only=False)
+    finally:
+        inputs.close()
 
 
 def test_runner_has_no_acquisition_or_credential_calls():
@@ -283,6 +408,51 @@ def test_parent_does_not_relabel_fixture_publication_as_actual(retained):
     with pytest.raises(m.ArchiveAssessmentRunnerError, match="receipt_binding"):
         m._verify_worker_publication(root=retained["root"], audit_id=retained["output_id"],
             identity=retained["identity"], v2_complete_sha=retained["v2"].complete_sha256, result=result)
+
+
+@pytest.mark.parametrize("mutation", ["body_fixture", "body_count", "body_count_bool", "body_authority",
+        "declared_count_bool", "result_count_bool", "actual_network", "actual_fork", "actual_outside_write", "actual_output_scope"])
+def test_parent_rejects_rehashed_body_scope_counts_authority_and_actual_isolation(retained, mutation):
+    """Invented outputs only: a matching digest is not semantic validation."""
+    result = run(retained)
+    output = retained["root"].joinpath(*m.OUTPUT_PARTS, retained["output_id"])
+    body = json.loads((output / "assessment.json").read_bytes())
+    receipt = json.loads((output / "complete.json").read_bytes())
+    actual = mutation.startswith("actual_")
+    if actual:
+        # Isolate each actual isolation assertion from the fixture guard.
+        # This does NOT run the actual route or use an actual capture root.
+        result["fixture_only"] = receipt["fixture_only"] = body["fixture_only"] = False
+        receipt.update(effective_process_tree_network_denial=True, effective_process_fork_denial=True,
+            effective_outside_output_write_denial=True, writes_confined_to_fresh_output_by_launcher=True)
+        target = {"actual_network": "effective_process_tree_network_denial",
+            "actual_fork": "effective_process_fork_denial", "actual_outside_write": "effective_outside_output_write_denial",
+            "actual_output_scope": "writes_confined_to_fresh_output_by_launcher"}[mutation]
+        receipt[target] = False
+    elif mutation == "body_fixture":
+        body["fixture_only"] = False
+    elif mutation == "body_count":
+        body["source_filings"] += 1
+    elif mutation == "body_count_bool":
+        body["source_metadata_rows"] = True  # True == 1 must not pass integer counts.
+    elif mutation == "body_authority":
+        body["authority"]["backtesting_ready"] = True
+    elif mutation == "declared_count_bool":
+        receipt["counts"]["source_metadata_rows"] = True
+        result["counts"] = dict(receipt["counts"])
+    elif mutation == "result_count_bool":
+        result["counts"] = dict(receipt["counts"])
+        assert result["counts"]["source_metadata_rows"] == 1
+        result["counts"]["source_metadata_rows"] = True
+    raw = enc(body); private_file(output / "assessment.json", raw)
+    result["assessment_sha256"] = receipt["assessment_sha256"] = sha(raw)
+    receipt["assessment_bytes"] = len(raw)
+    receipt_raw = enc(receipt); private_file(output / "complete.json", receipt_raw)
+    result["complete_sha256"] = sha(receipt_raw)
+    with pytest.raises(m.ArchiveAssessmentRunnerError, match="receipt_binding"):
+        m._verify_worker_publication(root=retained["root"], audit_id=retained["output_id"],
+            identity=retained["identity"], v2_complete_sha=retained["v2"].complete_sha256,
+            result=result, fixture_only=not actual)
 
 
 @pytest.fixture

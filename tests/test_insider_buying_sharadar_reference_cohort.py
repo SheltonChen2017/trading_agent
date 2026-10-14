@@ -242,6 +242,45 @@ def test_invalid_unicode_source_inventory_is_sanitized():
         m.assess_sharadar_cohort(**arguments(data))
 
 
+@pytest.mark.parametrize("control", ["\r", "\n", "\t", "\r\n", "\r\n\t"])
+def test_private_multiline_company_name_is_preserved_and_quarantined(control):
+    supplied_name = "PRIVATE FIXTURE" + control + "NAME"
+    data = fixture(tickers=[ticker(name=supplied_name)])
+    args = arguments(data)
+    result = m.assess_sharadar_cohort(**args).to_payload()
+    assert result["source_ticker_rows"] == result["ticker_rows_accounted"] == 1
+    assert result["ticker_quarantine_reason_counts"]["nonessential_name_control_characters"] == 1
+    assert result["ticker_row_accounting"][0]["quarantine_reasons"] == ["nonessential_name_control_characters"]
+    assert result["issuer_relations"][0]["current_cik_candidate_permatickers"] == ["1"]
+    assert result["names_used_as_join_keys"] is False
+    projected = m._projection(args["tickers_projection_raw"], args["tickers_projection_sha256"], schema=m.TICKERS_SCHEMA,
+        columns=m.TICKER_COLUMNS, manifest_digest=args["capture_manifest_sha256"], entry=data["manifest"]["archives"][0])
+    assert projected[0]["name"] == supplied_name
+    assert result["tickers_projection_sha256"] == sha(args["tickers_projection_raw"])
+
+
+@pytest.mark.parametrize("name_field", ["name", "contraname"])
+def test_private_action_names_do_not_refuse_or_create_aliases(name_field):
+    data = fixture(actions=[action(**{name_field: "PRIVATE\r\nFIXTURE\tNAME"})])
+    result = payload(data)
+    assert result["source_action_rows"] == result["action_rows_accounted"] == 1
+    assert result["action_quarantine_reason_counts"]["nonessential_name_control_characters"] == 1
+    assert result["retrospective_action_rows"][0]["same_security_alias_admitted"] is False
+
+
+@pytest.mark.parametrize("bad_name", ["\x00", "\x01", "\x0b", "\x0c", "\ud800", "X" * 16385])
+def test_other_name_control_unicode_and_size_errors_remain_structural(bad_name):
+    with pytest.raises(m.SharadarReferenceCohortError, match="projection_field_shape"):
+        payload(fixture(tickers=[ticker(name=bad_name)]))
+
+
+@pytest.mark.parametrize("field", ["ticker", "permaticker", "secfilings", "firstpricedate", "relatedtickers"])
+def test_multiline_identity_date_or_url_is_still_structural(field):
+    data = fixture(tickers=[ticker(**{field: "PRIVATE\nIDENTITY"})])
+    with pytest.raises(m.SharadarReferenceCohortError, match="projection_field_shape"):
+        payload(data)
+
+
 def test_canonical_output_is_deterministic_and_factory_bound():
     first = m.assess_sharadar_cohort(**arguments()); second = m.assess_sharadar_cohort(**arguments())
     assert first.canonical_bytes() == second.canonical_bytes() and first.sha256 == sha(first.canonical_bytes())

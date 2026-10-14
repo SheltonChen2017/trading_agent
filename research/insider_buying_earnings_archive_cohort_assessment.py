@@ -22,10 +22,13 @@ SCHEMA = "insider-earnings-archive-cohort-assessment-v1"
 INVENTORY_SCHEMA = "insider-2006q1-earnings-issuer-label-inventory-v1"
 CAMPAIGN_SCHEMAS = frozenset({"insider-eodhd-date-window-earnings-campaign-v1",
                             "insider-eodhd-date-window-earnings-continuation-v2",
-                            "insider-eodhd-date-window-earnings-continuation-v3"})
+                            "insider-eodhd-date-window-earnings-continuation-v3",
+                            "insider-eodhd-date-window-earnings-continuation-v4"})
 CONTINUATION_SCHEMA = "insider-eodhd-date-window-earnings-continuation-v2"
 CONTINUATION3_SCHEMA = "insider-eodhd-date-window-earnings-continuation-v3"
-QUARANTINED_SCHEMAS = frozenset({CONTINUATION_SCHEMA, CONTINUATION3_SCHEMA})
+CONTINUATION4_SCHEMA = "insider-eodhd-date-window-earnings-continuation-v4"
+QUARANTINED_SCHEMAS = frozenset({CONTINUATION_SCHEMA, CONTINUATION3_SCHEMA, CONTINUATION4_SCHEMA})
+LARGE_SCHEMAS = frozenset({CONTINUATION3_SCHEMA, CONTINUATION4_SCHEMA})
 QUARANTINE_REASONS = frozenset({"source_row_not_object", "source_row_field_shape_unknown",
     "source_code_unknown", "source_report_date_unknown", "source_fiscal_date_unknown",
     "report_date_outside_registered_scope", "fiscal_date_after_report_date", "source_timing_unknown",
@@ -127,21 +130,22 @@ def supporting_windows():
 
 SUPPORT_WINDOWS = supporting_windows()
 V3_SUPPORT_WINDOWS = tuple(window for window in SUPPORT_WINDOWS if window[0] >= "2018-09-01")
+V4_SUPPORT_WINDOWS = tuple(window for window in SUPPORT_WINDOWS if window[0] >= "2019-03-01")
 
 
 def metadata_byte_cap(schema):
     _need(type(schema) is str and schema in CAMPAIGN_SCHEMAS, "campaign_identity")
-    return MAX_V3_METADATA_BYTES if schema == CONTINUATION3_SCHEMA else MAX_JOURNAL_BYTES
+    return MAX_V3_METADATA_BYTES if schema in LARGE_SCHEMAS else MAX_JOURNAL_BYTES
 
 
 def body_byte_cap(schema):
     _need(type(schema) is str and schema in CAMPAIGN_SCHEMAS, "campaign_identity")
-    return MAX_V3_BODY_BYTES if schema == CONTINUATION3_SCHEMA else 4 * 1024 * 1024
+    return MAX_V3_BODY_BYTES if schema in LARGE_SCHEMAS else 4 * 1024 * 1024
 
 
 def control_byte_cap(schema):
     _need(type(schema) is str and schema in CAMPAIGN_SCHEMAS, "campaign_identity")
-    return MAX_V3_CONTROL_BYTES if schema == CONTINUATION3_SCHEMA else MAX_JOURNAL_BYTES
+    return MAX_V3_CONTROL_BYTES if schema in LARGE_SCHEMAS else MAX_JOURNAL_BYTES
 
 
 @dataclass(frozen=True, slots=True)
@@ -158,6 +162,21 @@ class ArchiveCampaignMetadata:
     manifest_sha256: str
     complete_raw: bytes
     complete_sha256: str
+    windows: tuple[ArchiveWindowMetadata, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class ArchivePartialCampaignMetadata:
+    """Independent partial-root witness, never a producer aggregate completion.
+
+    Only the five sealed windows carry producer receipts. The consumed sixth
+    start remains unavailable and its paid body/metadata is NOT interpreted.
+    The operational observer must verify every witness leaf and scope live.
+    """
+    manifest_raw: bytes
+    manifest_sha256: str
+    witness_raw: bytes
+    witness_sha256: str
     windows: tuple[ArchiveWindowMetadata, ...]
 
 
@@ -246,7 +265,7 @@ def _rows(metadata, receipt, window):
           "metadata_acceptance_is_not_admission")
     _need(metadata["body_sha256"] == _digest(receipt["body_sha256"]), "metadata_body_binding")
     rows = metadata["rows"]
-    _need(type(rows) is list and len(rows) <= (MAX_V3_WINDOW_ROWS if metadata["schema"] == CONTINUATION3_SCHEMA else MAX_WINDOW_ROWS)
+    _need(type(rows) is list and len(rows) <= (MAX_V3_WINDOW_ROWS if metadata["schema"] in LARGE_SCHEMAS else MAX_WINDOW_ROWS)
           and len(rows) == _count(receipt["sample_rows"]), "metadata_row_accounting")
     ordinals, reported, unknown, timing, accepted = set(), 0, 0, 0, 0
     reasons_count = Counter()
@@ -300,7 +319,7 @@ def _rows(metadata, receipt, window):
 
 
 def assess_earnings_archive_cohort(*, inventory_raw: bytes, inventory_sha256: str,
-        campaigns: tuple[ArchiveCampaignMetadata, ...]) -> EarningsArchiveCohortAssessment:
+        campaigns: tuple[ArchiveCampaignMetadata | ArchivePartialCampaignMetadata, ...]) -> EarningsArchiveCohortAssessment:
     """Account all source issuers and archive windows without promoting either.
 
     Multiple manifests may declare the same still-unattempted window. Exactly
@@ -309,7 +328,7 @@ def assess_earnings_archive_cohort(*, inventory_raw: bytes, inventory_sha256: st
     """
     inventory, issuers = _inventory(inventory_raw, inventory_sha256)
     _need(type(campaigns) is tuple and 1 <= len(campaigns) <= MAX_CAMPAIGNS
-          and all(type(item) is ArchiveCampaignMetadata for item in campaigns), "campaign_collection")
+          and all(type(item) in {ArchiveCampaignMetadata, ArchivePartialCampaignMetadata} for item in campaigns), "campaign_collection")
     attempted, campaigns_seen, descriptors, periods, codes = {}, set(), [], {}, {}
     planned_union, total, last_registration, last_attempt = set(), 0, None, None
     previous_observation, previous_campaign_end = None, None
@@ -317,13 +336,60 @@ def assess_earnings_archive_cohort(*, inventory_raw: bytes, inventory_sha256: st
     all_reasons = Counter()
     for campaign in campaigns:
         manifest = _decode(campaign.manifest_raw, campaign.manifest_sha256, MAX_JOURNAL_BYTES)
-        complete = _decode(campaign.complete_raw, campaign.complete_sha256, MAX_JOURNAL_BYTES)
+        partial = type(campaign) is ArchivePartialCampaignMetadata
+        if partial:
+            witness = _decode(campaign.witness_raw, campaign.witness_sha256, 8192)
+            _need(witness.get("schema") == "independent-partial-calendar-v3-custody-witness-candidate-v1"
+                  and manifest.get("schema") == CONTINUATION3_SCHEMA
+                  and witness.get("campaign_id") == manifest.get("campaign_id")
+                  and witness.get("manifest_sha256") == campaign.manifest_sha256
+                  and witness.get("execution_head") == manifest.get("identity", {}).get("head")
+                  and witness.get("source_inventory_sha256") == manifest.get("identity", {}).get("source_inventory_sha256")
+                  and type(witness.get("source_inventory_sha256")) is str
+                  and _SHA.fullmatch(witness["source_inventory_sha256"])
+                  and witness.get("campaign_completion_present") is False
+                  and witness.get("aggregate_completion_manufactured") is False
+                  and type(witness.get("sealed_window_count")) is int and witness["sealed_window_count"] == 5
+                  and type(witness.get("consumed_scope_count")) is int and witness["consumed_scope_count"] == 6
+                  and type(witness.get("unsealed_started_window_count")) is int and witness["unsealed_started_window_count"] == 1
+                  and type(witness.get("unattempted_suffix_windows")) is int and witness["unattempted_suffix_windows"] == 89
+                  and witness.get("next_unattempted_window") == list(V4_SUPPORT_WINDOWS[0])
+                  and witness.get("last_unattempted_window") == list(V4_SUPPORT_WINDOWS[-1])
+                  and len(campaign.windows) == 5, "partial_witness_scope_or_lineage")
+            _need(type(witness.get("journal_leaf_sha256_and_bytes")) is dict
+                  and type(witness.get("sealed_window_counts")) is list
+                  and len(witness["sealed_window_counts"]) == 5, "partial_witness_leaf_inventory")
+            # These summaries derive only from five actual per-window seals.
+            # They are transient bookkeeping, NOT an invented complete.json.
+            complete = {"schema": manifest["schema"], "campaign_id": manifest["campaign_id"],
+                "manifest_sha256": campaign.manifest_sha256, "identity": manifest["identity"],
+                "fixture_only": manifest["fixture_only"], "completed_at_utc": witness["observed_at_utc"],
+                "window_results": []}
+            for index, evidence in enumerate(campaign.windows):
+                child = _decode(evidence.complete_raw, evidence.complete_sha256, MAX_V3_CONTROL_BYTES)
+                leaf = witness["journal_leaf_sha256_and_bytes"].get(f"window-{index:04d}-complete.json")
+                _need(type(leaf) is dict and leaf.get("sha256") == evidence.complete_sha256
+                      and type(leaf.get("bytes")) is int and leaf["bytes"] == len(evidence.complete_raw),
+                      "partial_sealed_external_hash_binding")
+                metadata_leaf = witness["journal_leaf_sha256_and_bytes"].get(f"window-{index:04d}-metadata.json")
+                _need(type(metadata_leaf) is dict and metadata_leaf.get("sha256") == evidence.metadata_sha256
+                      and type(evidence.metadata_raw) is bytes and type(metadata_leaf.get("bytes")) is int
+                      and metadata_leaf["bytes"] == len(evidence.metadata_raw), "partial_metadata_external_hash_binding")
+                declared = witness["sealed_window_counts"][index]
+                _need(type(declared) is dict and declared == {"index": index, "window": child["window"],
+                    "complete_sha256": evidence.complete_sha256, **{key: child["receipt"].get(key)
+                    for key in ("sample_rows", "metadata_accepted_rows", "quarantined_rows")}},
+                    "partial_sealed_witness_count_binding")
+                complete["window_results"].append({"index": index, "window": child["window"],
+                    "receipt": child["receipt"], "complete_sha256": evidence.complete_sha256})
+        else:
+            complete = _decode(campaign.complete_raw, campaign.complete_sha256, MAX_JOURNAL_BYTES)
         schema, identity = manifest.get("schema"), manifest.get("campaign_id")
         _need(type(schema) is str and schema in CAMPAIGN_SCHEMAS and complete.get("schema") == schema
               and type(identity) is str and re.fullmatch(r"ib-eodhd-campaign-[a-z0-9-]{1,80}", identity)
               and identity not in campaigns_seen and complete.get("campaign_id") == identity, "campaign_identity")
         _need(len(campaign.manifest_raw) <= control_byte_cap(schema)
-              and len(campaign.complete_raw) <= control_byte_cap(schema), "campaign_control_byte_bound")
+              and (partial or len(campaign.complete_raw) <= control_byte_cap(schema)), "campaign_control_byte_bound")
         _need(complete.get("manifest_sha256") == campaign.manifest_sha256
               and complete.get("identity") == manifest.get("identity"), "campaign_source_binding")
         _need(type(manifest.get("fixture_only")) is bool and complete.get("fixture_only") is manifest["fixture_only"], "campaign_fixture_binding")
@@ -337,13 +403,15 @@ def assess_earnings_archive_cohort(*, inventory_raw: bytes, inventory_sha256: st
         windows = _planned(manifest)
         _need(schema != CONTINUATION3_SCHEMA or windows == V3_SUPPORT_WINDOWS,
               "continuation3_exact_unattempted_scope_required")
+        _need(schema != CONTINUATION4_SCHEMA or windows == V4_SUPPORT_WINDOWS,
+              "continuation4_exact_unattempted_scope_required")
         planned_union.update(windows); campaigns_seen.add(identity)
         results = complete.get("window_results")
         _need(type(results) is list and len(results) <= len(windows)
               and type(campaign.windows) is tuple and len(campaign.windows) == len(results), "attempt_metadata_count")
-        _need(type(complete.get("planned_windows")) is int and complete["planned_windows"] == len(windows)
+        _need(partial or (type(complete.get("planned_windows")) is int and complete["planned_windows"] == len(windows)
               and type(complete.get("transport_invocation_count")) is int and complete["transport_invocation_count"] == len(results)
-              and complete.get("unattempted_windows") == [list(window) for window in windows[len(results):]], "campaign_unattempted_accounting")
+              and complete.get("unattempted_windows") == [list(window) for window in windows[len(results):]]), "campaign_unattempted_accounting")
         observed, refused = 0, 0
         for index, (summary, evidence) in enumerate(zip(results, campaign.windows, strict=True)):
             _need(type(evidence) is ArchiveWindowMetadata, "window_evidence_type")
@@ -396,7 +464,7 @@ def assess_earnings_archive_cohort(*, inventory_raw: bytes, inventory_sha256: st
                 rows, accepted, reason_counts = _rows(metadata, receipt, window)
                 total += len(rows)
                 total_cap = MAX_TOTAL_ROWS + (len(V3_SUPPORT_WINDOWS) * (MAX_V3_WINDOW_ROWS - MAX_WINDOW_ROWS)
-                    if schema == CONTINUATION3_SCHEMA or any(item["schema"] == CONTINUATION3_SCHEMA for item in descriptors) else 0)
+                    if schema in LARGE_SCHEMAS or any(item["schema"] in LARGE_SCHEMAS for item in descriptors) else 0)
                 _need(total <= total_cap, "total_metadata_row_bound")
                 quarantined_total += len(rows) - accepted
                 all_reasons.update(reason_counts)
@@ -433,12 +501,24 @@ def assess_earnings_archive_cohort(*, inventory_raw: bytes, inventory_sha256: st
                       "refused_window_cannot_carry_selected_metadata")
                 refused += 1
             attempted[window] = reference; last_attempt = window
-        _need(type(complete.get("observed_windows")) is int and complete["observed_windows"] == observed
+        _need(partial or (type(complete.get("observed_windows")) is int and complete["observed_windows"] == observed
               and type(complete.get("refused_or_ambiguous_windows")) is int and complete["refused_or_ambiguous_windows"] == refused
               and type(complete.get("all_registered_windows_observed")) is bool
-              and complete["all_registered_windows_observed"] == (observed == len(windows)), "campaign_completion_accounting")
+              and complete["all_registered_windows_observed"] == (observed == len(windows))), "campaign_completion_accounting")
+        if partial:
+            pending = windows[5]
+            _need(pending not in attempted and witness.get("observed_failure_cause") == "not_established_by_retained_controls",
+                  "partial_unsealed_start_cannot_be_promoted")
+            attempted[pending] = {"campaign_id": identity, "campaign_schema": schema, "index": 5,
+                "window": list(pending), "window_complete_sha256": None, "status": "UNSEALED_CONSUMED_START",
+                "independent_partial_witness_sha256": campaign.witness_sha256,
+                "metadata_sha256": None, "body_sha256": None, "source_rows": None,
+                "original_http_status_established": False, "producer_completion_present": False}
+            last_attempt = pending
         descriptors.append({"campaign_id": identity, "schema": schema, "manifest_sha256": campaign.manifest_sha256,
-                            "complete_sha256": campaign.complete_sha256, "fixture_only": manifest["fixture_only"]})
+                            "complete_sha256": None if partial else campaign.complete_sha256,
+                            "independent_partial_witness_sha256": campaign.witness_sha256 if partial else None,
+                            "producer_aggregate_completion_present": not partial, "fixture_only": manifest["fixture_only"]})
     _need(planned_union == set(SUPPORT_WINDOWS), "complete_planned_support_envelope_required")
     window_accounting = [attempted.get(window, {"window": list(window), "status": "UNATTEMPTED",
         "metadata_sha256": None, "body_sha256": None, "source_rows": None}) for window in SUPPORT_WINDOWS]

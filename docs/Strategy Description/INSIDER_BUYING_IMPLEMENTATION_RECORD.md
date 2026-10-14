@@ -26181,3 +26181,171 @@ Main final record/active-document/EXACT guard72 passed1.14s. Source-view
 runtime and independent readback are recorded separately from fixture tests.
 No new full suite or promotion. Reverify unchanged frozen sources and exact
 root/branch/HEAD/status/remote before this local observed-result commit.
+
+## 187. Bounded real-input title/current-reference integration (2026-10-14 UTC)
+
+### 187.1 Delegated decision and preregistered actual scope
+
+The owner's continuous-build, supplied-Sharadar reuse, documented best-judgment
+and single-final-push instructions authorize this next152.1/154.6 reference
+integration. No new routine approval or Claude checkpoint is inferred. Fresh
+offline operation ID ib-sec-title-current-reference-sourceview-v1-20261014-once
+uses only the exact observed source-view completion c3a60ed2, original64 capture
+7d42a663 and preserved original baseline3263625a, plus actual compact Sharadar
+completion07dd203d/TICKERS da2bf31d and original supplied manifest94251ffd.
+Its own namespace is artifacts/insider_buying/sec_title_current_reference_v1;
+it cannot resume or rewrite any prior namespace or redispatch any request.
+No actual result is claimed by this pre-execution entry.
+
+Preserve every83657 filing (71679 Form4/4-A;11978 accounted context) and all
+74150 TICKERS source rows. Bind the full ordered14-field source-identity digest
+d081c092c5abe29f3be51e3baa413b2ed38cd7d8709d5dd1e52c869cfeac8a99,
+original producer commits/inventories and current committed source closure.
+Both workers independently recreate genuine57 frozen projection bridges from
+all64 original bodies and retain the exact7 issuer-first parser refusals.
+Only direct nonDerivativeTransaction/nonDerivativeHolding securityTitle/value
+declarations are extracted. This is NOT all XML titles, derivative titles,
+transaction economics, ordinary-equity qualification or original-body admission.
+Decoded XML text is distinguished from lexical original XML bytes; original,
+view, XML and projection hashes/node occurrences remain distinct.
+
+Current canonical declared SEC-URL CIK claims and exact provider permatickers
+form CANDIDATE groups. Nonsecurity table claims may expose a global perma
+conflict but never supply a security-table CIK/title link. Company names,
+related tickers, CUSIP/FIGI, action counterparties and historical aliases are
+not join keys. Exact/ambiguous/missing fields, duplicate records, new conflicting
+variants, nonsecurity/malformed rows and unmatched titles remain accounted.
+No title-string match to a historical class or native SID is performed.
+
+Use the existing issuer_cik as the explicit key into one shared current CIK
+group index, with missing key meaning no candidates. Do not repeat candidate
+arrays per filing/title or form a cartesian output. Invariant alias/class
+non-admission flags live in explicit global current_group_semantics; varying
+per-group conflicts and all source-row ordinals remain. The immutable whole
+output cap stays64MiB; assessment input128MiB, TICKERS projection256MiB,
+controls1MiB,20000 title observations,4096 UTF-8 bytes/title,2MiB aggregate
+title text and4GiB disk floor. Oversize refuses without truncation. No upstream
+cap is widened. Representative synthetic full-population arrays66260027 bytes
+and dense-one-CIK arrays65147792 bytes are below the cap, but are NOT measured
+actual output, worst lexical/title bounds or a whole-result guarantee.
+
+### 187.2 Captured-source isolation and publication contract
+
+Parent preflight holds/hash-checks all five source-view publications, the old
+four baseline publications, all compact reference publications, original
+capture controls and current/original producing images before fresh reservation.
+Actions/prior Sharadar assessment are stream-hashed only; no Actions or
+Fundamentals decoding, financial getter, account, credential or provider access.
+The actual CLI parent remains outside Seatbelt to avoid nested initialization;
+it stays hash/control-only. Genuine retained-body parsing/composition occurs
+only in captured-source native workers. Native process-tree network/fork and
+outside-output-write denial are proved BEFORE Python hooks or input opening.
+The publishing worker composes twice and requires exact canonical equality.
+
+A second independent captured-source READ-ONLY worker opens the same pinned
+inputs, recreates all bridges and composes twice again. Its exact input-derived
+canonical bytes must equal the full private result, not only counts or receipt
+literals. It proves inside-output write denial too. Its separately inventoried
+source-execution receipt is retained as readonly-verification.json only after
+strict first/second summary equality and final held receipt hashes. Success
+has exactly reservation.json,assessment.json,complete.json and that verification
+leaf. Every final leaf remains locked/version/hash checked across last input
+and current-source rechecks. Failed worker controls may retain one sanitized
+worker-failure.json; no retry, reset or false success. Full historical-environment
+reconstruction remains false. No retrospective commit attribution is allowed.
+
+### 187.3 Prelaunch findings, corrections and exact qualification
+
+All following lane-owned prelaunch findings are CORRECTED; no new open P0/P1
+or topical P2 closure is claimed:
+
+| ID / severity | Finding and correction | Genuine preceding evidence |
+|---|---|---|
+| IBREF-CAND-01 / P2 | Interleaved XML child tags require per-tag XPath ordinals; missing/ambiguous value paths explicitly attempted/refused, not observed singletons | Author six path-label/global regressions failed0.72s before correction |
+| IBREF-CAND-02 / P2 | Self-reported hashes/counts cannot independently establish full result semantics; native second input-derived verifier and externally bound partitions added | Front14 failures/6 controls passed0.36s on preceding draft; fullshape twelve coherent rehash cases now reject |
+| IBREF-CAND-03 / P2 | Nonsecurity rows could hide global perma conflicts; all valid-perma records contribute conflict evidence, only security-table CIKs contribute title candidates | Author one genuine failure0.55s |
+| IBREF-CAND-04 / P2 | Repeated candidate arrays exceeded profile and could expand dense joins before whole-output guard; shared exact index and explicit global semantics preserve complete relation | Synthetic arrays74598252 bytes exceeded64MiB; shared relation regression failed0.50s |
+| IBREF-CAND-05 / P2 | Actual compact observer emits EODHD completion flags, not pure-cohort flags; validate exact producing schema and separately declare new result all-false authority | Producer-shaped compatibility regression failed0.55s before correction |
+| IBREF-CAND-06 / P2 | False==0 could pass recreated descriptor prefix; require exact integer type and strict looks/jobs/backtests integer zeros | Front boolean-prefix failure/control passed0.54s; typed receipt regression retained |
+| IBREF-CAND-07 / P2 | A,B,B could miscount repeated B as another new variant; retain per-key seen full-record hashes and explicit new-variant/repeat count semantics | Author readonly0.298s/peer0.342s reproduced0 repeats/2 conflicts; A,B,B,A regression failed0.46s before correction |
+
+Private pure da04a436b421cd1c6d436e45e496ff979d8da0e3a733c8ea687068fb68298445;
+tests dff9118024129abe1213d8773a0b59cdee9480ecb9aa6c96bdd0c88a0d47cd37.
+Private front55f9a29d55f38219d1615ce679bd7932130a3031ae347e3ec38d602c8dd3e4bf;
+tests6578662b938a74860398da053a355e0bd8e283859e6789788b7f04a0aba01e70.
+Main read the source/tests completely. Activation changes only INACTIVE doc
+wording and tests' direct research imports, with explicit inactive __file__
+fixture preserved. Active pure30848 bytes/7f8be080e38f6f62544e79ebb20ec930448623be0de8e5d437c63164d0411a70;
+front54693 bytes/a2820635974a3767760ff328f3a07925c4ccec0f132c4ddf7a6d1aefa4683569;
+tests24922 bytes/b4f4ec2407c86a4ceb5b0742b06600611399d826572911a109004f8c2cc7b936
+and32673 bytes/149459529a5def4f624c74f1c1f31790b600bd57714386f98e2a1ff5a140d27e.
+Do not label private/activated images interchangeable by hash.
+
+Main407 focused new/pure/front/PEM/reference/import-boundary/EXACT named Insider
+package checks passed10.29s under effective process-tree network denial and
+isolated temporary DB. Four source/test memory compilations plus captured
+bootstrap compilation passed under network/fork/all-write denial. Author117
+pure/boundary/EXACT checks passed5.79s/two memory compilations; front204 combined
+checks passed7.48s and standalone native readonly proof passed0.275s. These
+are fixture/control evidence, not actual retained-input execution or Claude
+review. Final independent peer and active-document/record evidence follows
+before commit/actual operation; no full lane/repository suite.
+
+### 187.4 Real access constraints and unchanged readiness boundary
+
+Native hosted SDK scope remains unconsumed: Safari again reported the Mac
+locked at the04:29UTC check. Manual unlock/controllable authenticated QC
+Research is a factual prerequisite, not approval delegated judgment can invent.
+Massive's one consumed August2018 request remains sealedHTTP403; account/product
+linkage is unresolved. Public [Earnings specification](https://massive.com/docs/rest/partners/benzinga/earnings)
+and [authentication documentation](https://massive.com/docs/rest/quickstart)
+confirm the chosen endpoint/Bearer-header format, not the cause of403 or
+entitlement. These are public documentation reads, not a new production data
+request or measured backend request count. No retry or repurchase. FMP remains
+skipped under the latest owner reply; other-lane usage is not vendor permission.
+
+All new source/PIT/rights/canonical/history/class/SID/listing/availability/QC/
+backtest/execution flags stay false. No complete-quarter/corpus, original-body,
+historical mapping, actual earnings coverage or readiness promotion. Actual
+releases still have January2006/August2018/February2019/February2020 gaps;
+both prescribed diagnostics, frozen82-quarter population, no-filing controls,
+causal ordering and strategy economics remain binding. The2022Q4–2023Q1
+19846-of99394 partition is unchanged. Six topical/shared P2s remain open;
+both final owner access classifications remain distinct without retroactive
+approval. All four v3 custody files and frozenv1/scale/pilot remain byte-frozen.
+No new production provider/SEC/credential access, SDK scope consumption, outcome look, QC job,
+backtest, funded/paper/live/order action, shared/project document edit, other-
+chat message, heartbeat rearm or interim push. Commit this lane-owned candidate
+and then execute only the specified fresh bounded offline operation; retain
+honest observed results separately. The one final matching-lane push remains
+pending at the authorized honest end, not this engineering checkpoint.
+
+Main final record/active-document/EXACT guard72 passed1.41s. Independent peer
+read/activation comparison confirmed source docstrings and direct test-import
+changes only;204 private focused/boundary/EXACT checks passed7.63s. Peer active
+1026-row/1025-group dense fixture retained all six source rows and1024 same-CIK
+links in one shared index,630444 bytes; no per-row/title candidate arrays.
+Nonsecurity global conflicts stayed separate from security-only title links;
+lowering the unchanged64MiB cap to one byte below the genuine result refused.
+A,B,B,A now retained all four rows/two exact repeats/one new variant. Thirty
+pure and sixteen front coherent faults plus fifteen/eight individual guard
+reversals/restored-green checks passed2.423s. Active native network/fork/inside-
+and-outside all-write denial, four memory compilations and exact observer-flag/
+census-constant compatibility passed0.360s. This is independent Codex peer
+fixture evidence, not Claude review or actual-input/readiness proof. No peer
+actual source/account/root read, tracked edit, commit or push occurred.
+
+The full-size synthetic array figures above are authored measurements of
+private predecessor08f8b302, not measurements of later active7f8be080 or a whole
+real publication. The later explicit count_semantics adds approximately434
+bytes outside those arrays; no maximum lexical/title guarantee is inferred.
+The exact actual whole-output cap remains binding. Staged diff checking found
+one extra blank EOF in the activated front test (not a runtime/test failure);
+format-only removal changes its final hash to
+a97e1c06d76137c25272231989bd3a325cfa92a696dfd3d012b4ae4b86aa10b2,
+32669 bytes, superseding only the earlier test14945952 image. Sources unchanged.
+
+Main final normalized-front/record/active-document/EXACT checks159 passed3.45s;
+staged diff check passed. Reverify exact clean-or-expected five-file status,
+root/branch/HEAD and matching remote before this candidate commit. No actual
+operation or push is represented as completed by this candidate entry.

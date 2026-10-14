@@ -310,4 +310,3 @@ def test_supervisor_has_no_actual_provider_sdk_browser_or_execution_api():
             name = node.func.id if isinstance(node.func, ast.Name) else node.func.attr if isinstance(node.func, ast.Attribute) else ""
             assert name not in forbidden
     assert not any(isinstance(node, ast.If) and "__name__" in ast.unparse(node.test) for node in tree.body)
-

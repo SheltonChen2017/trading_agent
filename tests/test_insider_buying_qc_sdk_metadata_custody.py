@@ -76,4 +76,3 @@ def test_production_git_identity_has_fixed_binary_no_inherited_secret_environmen
     assert kwargs["stdin"] == base.supervisor.subprocess.DEVNULL
     assert kwargs["stderr"] == base.supervisor.subprocess.DEVNULL
     assert kwargs["stdout"] == base.supervisor.subprocess.PIPE
-

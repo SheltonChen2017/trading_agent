@@ -526,4 +526,3 @@ def test_isolated_parent_stdout_refuses_extra_newlines_before_summary_validation
         module.run_observed_reassessment("ib-2006q1-parent-projection-invented",
             expected_head="a" * 40, expected_capture_report_sha256="b" * 64)
     assert seen == []
-

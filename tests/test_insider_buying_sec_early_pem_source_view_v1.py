@@ -148,4 +148,3 @@ def test_existing_complete_body_byte_and_line_bounds_still_apply(monkeypatch):
     monkeypatch.setattr(module, "MAX_ORIGINAL_BODY_BYTES", 8*1024*1024)
     monkeypatch.setattr(module, "MAX_ORIGINAL_LINES", 12)
     with pytest.raises(module.EarlyPemSourceViewError, match="line_count_profile"):_build(raw)
-

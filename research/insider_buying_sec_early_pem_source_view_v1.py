@@ -179,4 +179,3 @@ def build_early_pem_source_view(original_body, *, expected_original_body_sha256)
     object.__setattr__(result, "_factory_payload", result._payload)
     result.to_payload()
     return result
-

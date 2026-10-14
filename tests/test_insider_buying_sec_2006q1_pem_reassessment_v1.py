@@ -267,4 +267,3 @@ def test_pure_coordinator_calls_no_filesystem_network_or_process_api(supplied, m
     monkeypatch.setattr(subprocess, "run", forbidden)
     monkeypatch.setattr(module.original.capture, "_selected_sec_transport", forbidden)
     assert _assess(supplied).to_payload()["counts"]["source_filings"] == 6
-

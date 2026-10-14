@@ -360,4 +360,3 @@ def assess_2006q1_pem_source_view_identity(snapshot, census, descriptors, *,
     object.__setattr__(result, "_factory_bytes", encoded)
     result.to_payload()
     return result
-

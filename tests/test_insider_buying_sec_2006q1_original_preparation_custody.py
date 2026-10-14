@@ -117,4 +117,3 @@ def test_inactive_private_reader_cannot_open_any_production_root(monkeypatch):
     monkeypatch.setattr(module.capture.bootstrap.custody, "_Chain", lambda *_: pytest.fail("inactive reader must not open actual root"))
     with pytest.raises(module.OriginalPreparationCustodyError, match="inactive_original_reader_not_production_source"):
         module.PinnedOriginalPreparation()
-

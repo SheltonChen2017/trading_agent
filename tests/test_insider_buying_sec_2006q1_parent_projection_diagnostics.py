@@ -111,4 +111,3 @@ def test_reported_exception_diagnostic_is_revalidated_at_every_serialization(mut
     assert diagnostic == {"disposition": "offline_parent_projection_refused_outputs_preserved",
         "failure_phase": "parent_worker_result", "failure_class": "EarlyParentProjectionError", "os_errno": None}
     assert "INVENTED SECRET" not in module._raw(diagnostic).decode()
-

@@ -163,4 +163,3 @@ def test_source_has_no_dataset_or_execution_calls_or_automatic_probe():
             assert node.module != "QuantConnect.Research"
     assert not any(isinstance(node, ast.Expr) and isinstance(node.value, ast.Call) for node in tree.body)
     assert not any(isinstance(node, ast.If) and "__name__" in ast.unparse(node.test) for node in tree.body)
-

@@ -18990,3 +18990,121 @@ full-suite execution, source/key access or QC action in these checks. Only the
 31 new lane-owned files and this lane record are staged for the local source
 preparation commit; the actual matching origin ref is rechecked immediately
 before commit. No successful push is made at this intermediate stage.
+
+### 116.16 Script-composed engine transport and bounded guard preparation
+
+The preceding source-preparation commit is local-only
+**19a02b563805cddac60f1003abdd47a2b9ecb6cb**; its parent is64f372ea.
+Actual/tracking origin remains1f90c626. This additional preparation continues
+the owner's review waiver and continuous-build direction. No interim push,
+independent acceptance, source admission or performance result is claimed.
+
+**SI-DEC-20261013-31** adopts a separately versioned ending report for the
+unchanged48-book economics: realized cash is separate from authenticated
+regular cash-dividend claims earned before the evaluation cutoff but whose
+registered modeled availability is strictly later. Those claims are
+nonspendable, explicitly provisional face-value receivables; this is not bank
+receipt evidence, a terminal-cash assumption, or the original cash-only
+financial result. The existing `latest_revised_backtest._book` and its
+unpaid-claim refusal are unchanged. Missing amount, class, currency,
+entitlement, pay-date or regular-cash evidence refuses; special/due-bill,
+stock and contingent payouts are not admitted. A passed payment clock with
+an unpaid claim also refuses. An August31 pay date can remain unpaid at the
+August31 cutoff when the prospectively modeled first XNYS open strictly
+after pay date is September1; no September price or outcome is accessed.
+Source-hash assertion slots do not authenticate those facts themselves.
+
+**SI-DEC-20261013-36** integrates the compact transport with bounded
+affected-security/claim projections, incremental cash/fee controls and typed
+trade/action journal keys. Every cohort boundary reconciles all48 books and
+all registered aliases; the complete ordered journal is audited before an
+ending report. Main's unchanged-kernel fabricated parity includes every
+lookback, cost and weighting. Shared-release trade IDs remain unique by
+security/event/side; action IDs remain separately cell-global. Native pooled
+cash, margin and statistics remain diagnostics, never cell buying power or
+authoritative Fraction results. This is the joint48 software representation,
+not a qualified cloud runtime, full-population memory proof or serialized
+per-book execution adapter.
+
+The pure money/order and ending contracts live under `research/short_interest_etf`.
+The CLR/LEAN adapters live instead in
+`scripts/short_interest_lean_joint_transport.py` and
+`scripts/short_interest_compact_joint_transport.py`. Main's import-boundary
+regression correctly rejected the initial research placement. Moving the
+adapter composition preserves that valid provider/authority boundary rather
+than allowing CLR/QC imports into the pure research package. Only the exact
+stdlib `functools` module is added to the lane allowlist for the bounded
+512-entry session-open cache; provider, network, credential, job and
+authority imports remain forbidden there. Fully qualified internal imports
+preserve the existing namespace contract.
+
+**SI-DEC-20261013-38** prepares fresh local two-Git checks around every
+authorized HTTP-start/publication slot, with independent per-chunk protected
+FD custody. The actual matching origin ref is freshly read at each finite
+batch boundary (at most8 exact class-query instances, at most24 exact named
+publication slots), not cached by elapsed time or reused for another plan.
+An observed root/HEAD/branch/dirty/remote mismatch latches a halt; no new
+request or successful completion may follow. Already-started requests are
+drained without granting new source/publication authority. Main found that
+the first draft retained stale local evidence inside a batch: delegated
+literal regressions were2 failures/28 deselected, then30 passes after fresh
+local checks were added; Main independently ran those30 tests (0.40s).
+
+**SI-DEC-20261013-37** prospectively authorizes exactly ONE authenticated,
+data-free engine-catalog observation after this clean preparation freeze:
+POST `https://www.quantconnect.com/api/v2/lean/versions/read`, body `{}`,
+maximum2,000,000 response bytes, no redirect/proxy/retry and no separate
+authentication probe. Fixed protected ignored parent
+`artifacts/short_interest/private/qc_engine_metadata` has one exclusive
+global spent claim, independent of invocation time, code/head or run name.
+The claim is durable before reading only the already named QC_USER_ID and
+QC_API_TOKEN entries. The runtime requires its concrete frozen registered
+HEAD and actual matching origin1f90c626 to match the invocation, clean roots,
+branch/status and exact source bytes before wire/publication. That concrete
+HEAD is the clean commit containing this freeze and is retained with the
+frozen registration in the exclusive claim before any credential/wire use.
+Source-byte SHA for `scripts/read_short_interest_qc_engine_metadata.py`:
+**a9b6cdb9e7169b266aba743dd41e3a2c78974b1e6ab9b05284c174911ad2b51a**.
+The official [catalog](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/lean-version)
+and [authentication](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/authentication)
+contracts supply the fixed route/schema and ephemeral timestamped wire
+signature. No credential fingerprint, value, ID or signature is persisted,
+printed or committed. Echoed/malformed responses are discarded before raw
+hash/storage. Exact clean wire bytes stay protected/private; public
+observation omits descriptions/nonpublic branches. The selection rule
+(latest created public version, highest integer ID tie-break) is a catalog
+observation, not an execution pin, Python-wrapper proof, licensed-data
+processing permission or job authority. This exception authorizes NO project,
+node, history, upload, compile, job or backtest action. It is unexercised at
+this prospective freeze; actual outcome looks and candidate attempts stay0.
+
+Append-only ledger additions; historical001–026 remain unchanged:
+
+| ID | Priority / disposition | Evidence, correction and retained limits |
+|---|---|---|
+| SI-BUILD-20261013-027 | P1 prospective lineage, confirmed/corrected | Main's fabricated registered-scope control failed once (0.54s): an invocation could use another HEAD with the same frozen metadata registration. The runtime now requires exact registered HEAD/remote equality before storage/credential/wire access; the spent claim retains both. No actual catalog request had occurred. |
+| SI-BUILD-20261013-028 | P2 architecture, confirmed/corrected | Main's import-boundary check initially failed1 with77 passes, then a connected composition run exposed the unqualified parent-namespace import (1 failure/430 passes). CLR/QC transport is moved to scripts; the pure ending contract uses its fully qualified lane module. No provider/authority import exemption is added to research. The finite stdlib cache import is separately declared. |
+| SI-BUILD-20261013-029 | P1 local lane custody, confirmed/corrected | HEAD/dirty changes after batch-open must stop the next slot, not merely the following batch. Delegated2 causal reds and Main30 green tests verify fresh local checks; remote refresh is still bounded by exact query/publication batches. |
+| SI-BUILD-20261013-030 | P2 source quarantine concern, false alarm retained | A same-class survivor cannot evade the proposed daily-active duplicate peer fence through two composites onto one native: the existing exact CompositeNativeIndex factory already refuses that owner ambiguity; another-native peer makes class ownership ambiguous, and repeated original composites trigger the composite fence. Delegated natural-factory controls pass unchanged parser. Main's daily integration validation follows separately; no caller-forged index or current-source fact is accepted. |
+
+No provider request or outcome was made in these software tests. Safari still
+reported the Mac locked after the owner's unlock reply; a nonblocking manual
+unlock request was issued without attempting to bypass it. Account-specific
+processing terms are not assumed from subscription badges. Daily identity,
+counts, prices, company-size currency, cashflow/terminal evidence, exact
+evaluation/power/look registration and processing/runtime qualification
+remain in progress under the continuous instruction. No generic permission
+letter, institutional affiliation or repeated blanket approval is requested.
+The original full suite remains Claude's responsibility. This is local
+preparation and ONE final non-force lane push remains reserved for genuine
+closure, not this commit.
+
+Main's final connected selectors pass **431 tests in17.05s**, including
+the seven new QC/metadata files, bounded guard, unchanged import-boundary and
+active-document contracts. Environment is empty/network denied;
+CPython3.13.15/pytest9.1.1. The prior323 focused transport/metadata run passed
+15.96s; failures above are retained rather than erased. All15 stage Python
+files compile after the final import change. No full suite, credential read,
+provider source retrieval, CLR instantiation or QC action occurs in these
+checks. Exact allowed targets and actual matching origin are audited before
+the local preparation commit; no intermediate push follows it.

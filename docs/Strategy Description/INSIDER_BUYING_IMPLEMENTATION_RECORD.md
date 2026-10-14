@@ -26349,3 +26349,191 @@ Main final normalized-front/record/active-document/EXACT checks159 passed3.45s;
 staged diff check passed. Reverify exact clean-or-expected five-file status,
 root/branch/HEAD and matching remote before this candidate commit. No actual
 operation or push is represented as completed by this candidate entry.
+
+## 188. Preserved late title/reference refusal and prospective diagnostic correction (2026-10-14 UTC)
+
+### 188.1 Exact observed operation and disposition
+
+The section187 operation ib-sec-title-current-reference-sourceview-v1-20261014-once
+executed on clean acf66a7c9d138573823bb637eadf0f404a66c79d, with the already
+committed pure7f8be080/fronta2820635 images. CLI exited2 after58.893s, empty
+stderr, reporting ValueError/parent_preflight with outputs preserved. This is
+NOT an overall successful operation. Four retained leaves show that publishing
+and independent readonly semantic verification reached publication before the
+late refusal. Bare final checks/cleanup in that image made the fallback phase
+misleading. The exact underlying refusal was not retained and remains
+UNESTABLISHED; no later diagnostic is retroactively attributed to this run.
+Do not resume, rewrite, reset, reclassify or rerun its consumed namespace.
+
+Exact retained outputs under artifacts/insider_buying/sec_title_current_reference_v1/
+ib-sec-title-current-reference-sourceview-v1-20261014-once:
+
+| Leaf | Bytes | SHA256 |
+|---|---:|---|
+| reservation.json | 45301 | a74230456a327615ccf6c910547ed15dd49c510de0d3e3d0ac56dee2054267bd |
+| assessment.json | 57861182 | 2319b0c2fa11df1f26a27e80d3c76effb93377f2b72306bca17ebe39bd6f4aaa |
+| complete.json | 58357 | aaec35c4c1f33225b0e3c6a82d02b189f9ae83dcb270451fe67cf753d867caf4 |
+| readonly-verification.json | 16518 | d22232e07b303cb12ece39dec25eba250786222c2abf9c1e244195aa0272fdc0 |
+
+Retained publishing completion timestamp2026-10-14T04:57:57.989568+00:00 is
+not the CLI's final-success time. Its current source inventory has88 files,
+71b0f78e1f6dabb755f79575c5e21ea7180314989ce4383c21606e044e8a6a97.
+Both retained worker execution contexts list78 executed sources, digest
+9caaf151ebf6f613f14458f4ac39c6e275b8854b87b96e28c7973b90df5ab370,
+source-only local imports true/full historical environment reconstruction false.
+These are acf66a7c execution-time contexts, not later correction-commit contexts.
+
+Measured retained candidate counts, not a CLI-success/admission certificate:
+83657 filings/71679 targets/11978 context;64 selected/57 genuine view bridges/
+7 preserved parser refusals/83593 unselected. Twenty genuine parents have no
+direct nonDerivative rows; this does not mean no economic trade. Fifty-eight
+nonDerivative rows/title observations are plain, zero quarantined titles,
+nine distinct CIK/title keys; seven have one current group and two multiple
+groups, zero without. All74150 current reference rows remain;13861 quarantined,
+73546 with current canonical SEC-URL CIK candidates/604 without. There are
+43854 current perma groups, zero conflicting groups/exact repeats/new conflicting
+variants. No uninterpreted children in these58 observed row declarations.
+The title extraction scope binds379049 original-body bytes/355565 derived-view
+bytes/276207 XML bytes; it is not all64 bodies, all XML titles or all economics.
+Current groups and decoded titles are NOT historical class, issuer continuity,
+native SID, original-body admission or readiness.
+
+### 188.2 Readonly localization limits and verified engineering findings
+
+Main readonly native network/fork/all-write-denied observation reproduced the
+exact four-leaf inventory/size/hashes with no unexpected leaf. The real final
+_PinnedPublication constructor/recheck separately passed0.3387s; pinned view
+and compact reference constructor/rechecks separately passed3.082s. A separate
+network-denied minimal current-source/Git identity check passed3.507s with the
+same88-file inventory. These were control/custody diagnostics, not a repeated
+whole semantic replay, a fresh operation, namespace write or original success.
+Two independent invented full launcher controls passed0.287s and0.387s, using
+real temporary four-leaf custody but mocked inputs/children. Peer source review
+found no lazy local import/closure mutation in the final suffix; that does not
+prove which runtime condition failed.
+
+A combined all-write-denied control attempt refused at initial Git identity
+(EodhdDemoError in the unchanged _git helper), before input opening. It did not
+localize the original late refusal. A later compact readonly receipt check
+initially used an overbroad all-values-is-False diagnostic assertion; authority
+also contains strict integer zero counters, so that diagnostic assertion failed.
+Correct exact canonical authority comparison passed0.294s and reproduced the
+78-source readonly context. Neither diagnostic failure is a new operation or
+evidence the preserved candidate violated its actual authority contract.
+
+| ID / severity | Disposition | Evidence and prospective correction |
+|---|---|---|
+| IBREF-RUN-01 / P2 | CORRECTED, reporting defect only | Seven late suffix/cleanup faults were reported as preflight by the acf66a7c image. Add fixed phases for final output hold, view/reference checks, source identity/equality, final output recheck and parent cleanup. No exception text/private values emitted. |
+| IBREF-RUN-02 / P2 | CORRECTED, cleanup defect | A secondary cleanup failure could mask a primary refusal and skip later closes. Attempt all holds; preserve the active primary; fail at the precise cleanup phase when cleanup alone fails. Apply to parent and worker. |
+| IBREF-RUN-OBS01 | Actual cause UNESTABLISHED | No current retained control reproduces the actual late refusal; its generic ValueError also covers nested typed custody refusals. Correcting diagnostics is not proof of correction of that unknown condition. |
+
+Nine invented complete-parent-flow cases against exact preceding acf66a7c Git
+bytes (memory-only, no file replacement) produced8 genuine failures/1 passing
+control in0.61s: seven incorrect late phases plus masked primary/unfinished
+cleanup. Corrected source passed215 focused title/front/pure/import-boundary/
+EXACT named Insider package checks in7.69s under effective process-tree network
+denial and isolated temporary DB. New tests retain real private four-leaf custody
+with invented input/transport callbacks; they never open actual datasets or
+access accounts. No full lane/repository suite or actual operation was rerun.
+Final source/test compilation, record/active-document, frozen-byte/diff/status
+and commit-time verification follow before committing this correction.
+
+### 188.3 Continued build and unchanged external prerequisites
+
+No new source/access/readiness authority follows from the retained candidate.
+All source/PIT/rights/canonical/historical/class/SID/listing/availability/QC/
+backtest/execution gates remain false; six topical/shared P2s stay open. Both
+owner final access classifications, original-body and seven parser refusals,
+v3 unmatched start/four frozen custody images, strictD23 seven nonexact quarters,
+frozen study population/strategy economics and both earnings diagnostics remain.
+The Mac was again locked at04:57UTC; native hosted SDK scope remains unconsumed.
+Massive's sealed August2018HTTP403 remains consumed/account linkage unresolved;
+January2006 and both February gaps still lack complete release evidence. No
+secret, provider retry, duplicate SEC dispatch, outcome or QC strategy job.
+
+Useful offline groundwork is not exhausted: a separately preregistered successor
+can first identify the exact19 affected retained quarters by metadata-only
+selection, preserving all six forms/raw short CIKs/15 year mismatches and exact
+intake/census anchors. The existing hardwired2006Q1 runner cannot be silently
+looped/monkeypatched; no old82-quarter publication route is reactivated and no
+frozen v1/scale/pilot or original root is thawed. This prospective selector is
+not19 actual raw/parsed v2 integrations, original-parent admission, a complete
+corpus or a checkpoint push. Its scope/tests/source isolation and factual inputs
+must be qualified before a new real operation. Continue under delegated bounded
+engineering judgment without another routine Claude approval checkpoint; only
+the one final matching-lane push remains authorized at the honest round end.
+
+Main corrected front55492 bytes/d527cba5d49f7498c183cb60763a6d360c3645f1080eb9dfdfb8c1fd3e86c6da;
+front test39380 bytes/aefe6b3c57e26803f91b38c2a4258e26881ea3232a53da1483f9347f39b07d15.
+Both and the captured bootstrap memory-compiled under native network/fork/
+all-write denial; all four frozen custody hashes unchanged. Record/active-doc/
+EXACT guard72 passed1.44s; diff check clean. These are prospective engineering
+qualification results, not a successful repeat of the refused actual epoch.
+
+IBREF-RUN-03 P2 CORRECTED before commit: peer observed that a close callback
+rethrowing the same active primary exception object could overwrite its phase
+even while suppressed. A genuine new regression failed1.22s on the preceding
+uncommittedd527 image. Collect cleanup errors without annotating while a
+primary exists; only tag/raise the first after all closes when no primary
+exists. Peer memory-only control passed0.326s. Final front
+785f6a708d4951f53af38841c2c50212d820c1a6a4711d2692d5cabaa79f917b
+and test7c38deb47603d851cbb6b1914d1bfaf754297e9ead86930ea4b2dae96d63a38a
+supersede only the prospective d527/aefe images, not actualacf/a282 execution.
+Final216 title/front/pure/boundary/EXACT plus72 record/active-doc selection
+(one overlap)287 passed10.17s. The alias test's first insertion temporarily
+placed an existing sibling cleanup-control tail under the new test; it was
+moved back before green. No actual source/root was modified by those fixtures.
+
+## 189. Unlocked owned QC workspace, prospective type-only one-shot (2026-10-14 UTC)
+
+The owner replied Mac unlocked. Safari now visibly authenticates the existing
+owned project37465795, Adaptable Light Brown Pony. The exact project URL and
+Owner indicator were observed in the app; other-lane tabs/source remain out
+of scope. Opening this existing environment displayed an automatic cloud build
+of existing project source for Lean2.5.0.0.18179; it is not a strategy launch
+or this metadata probe's execution. An automatic-import modification dialog
+was cancelled, not accepted. An intervening tab-focus change invalidated one
+stale Cancel index; no action occurred, and fresh state restored the exact
+project before the successful cancellation. Existing research.ipynb retains
+the previously consumed native-access cell: never RunAll or rerun that cell.
+
+Under the owner's delegated continuous-build/QC-native diagnostic direction,
+consume exactly the previously defined section184.3 metadata-only scope ONLY
+after clean committed source and independent authenticated Research observation.
+Use the committed cell578097de/invocation3750bfcb/supervisor24185d23 images,
+fixed exclusive namespace qc_sdk_metadata_once_v1, five class types and four
+PropertyInfo definitions. Claim/registration/start/captured lineage must be
+fsynced before source, control and invocation paste. Select only the new cells;
+never run old native-access, all cells, History, resolver, getters, financial/
+price queries, ObjectStore, exports, algorithm/backtest or orders. No account
+key/read/upload of licensed rows is required. Failure/ambiguous execution
+consumes scope; no kernel reset/relaunch restores it. Hosted metadata will be
+retained separately, not manufactured from local/public source.
+
+No claim, source paste, explicit hosted invocation or terminal result exists
+at this preregistration. Preparation cannot itself authenticate execution or
+prove account entitlement/history return shape/PIT readiness. The supported
+actual probe is a technical observation, not a registered strategy outcome
+look or QC backtest attempt. Continue locally; no interim push.
+
+The owner separately says Massive's Earnings subscription likely expired,
+which is an owner hypothesis, not an observed account fact or proven403 cause.
+Keep that August2018 request consumed. Search official alternative coverage/
+rights/sample requirements without new provider dispatch, purchase or vendor
+message. Already retained Sharadar/EODHD data are not repurchased. A commercial
+archive or scoped independently supplied gap export needs real coverage and
+use evidence; routine engineering judgment cannot manufacture either.
+
+Main SDK-cell/supervisor/custody/boundary/EXACT plus record/active-document
+selection187 passed4.24s with process-tree network denial/private temporary DB.
+The three committed SDK source hashes above remain exact. Final prospective
+title front55539 bytes/test40045 bytes memory compilation and diff/frozen checks
+are required before the combined local188/189 correction/preregistration commit.
+No full suite, claim/paste/probe completion or push is implied by these checks.
+
+Independent Codex peer read the final title delta:43 explicit lateflow/cleanup/
+bootstrap/framing/source guards passed1.29s under native process-tree network
+denial/temp DB. Four memory-only phase reversals genuinely failed, eight
+lateflow controls restored green; alias red0.358s/control0.326s. No actual
+retained-input/provider/UI access, tracked write, commit or push by that peer.
+Main final three memory compilations/four frozen-byte checks passed0.360s.

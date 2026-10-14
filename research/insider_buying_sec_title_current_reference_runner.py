@@ -57,7 +57,9 @@ MIN_FREE_BYTES = 4 * 1024**3
 _ID = re.compile(r"ib-sec-title-current-reference-[a-z0-9-]{1,70}\Z")
 _FILES = frozenset({"reservation.json", "assessment.json", "complete.json"})
 _FINAL_FILES = _FILES | {"readonly-verification.json"}
-_PHASES = original._FAILURE_PHASES | {"parent_inputs", "worker_inputs", "parent_producer_sources"}
+_PHASES = original._FAILURE_PHASES | {"parent_inputs", "worker_inputs", "parent_producer_sources",
+    "parent_final_output_hold", "parent_final_source_view", "parent_final_reference",
+    "parent_final_source_identity", "parent_final_output_recheck", "parent_cleanup"}
 _FAILURE_CLASSES = frozenset({"SecTitleCurrentReferenceRunnerError", "OSError", "ValueError", "TypeError", "KeyError",
     "SubprocessError", "other_refusal"})
 _FAILURE_DISPOSITION = "offline_sec_title_current_reference_refused_outputs_preserved"
@@ -139,6 +141,20 @@ def _at_phase(phase, function, *args, **kwargs):
     except Exception as exc:
         exc._current_reference_failure_phase = phase
         raise
+
+
+def _close_all(phase, *objects):
+    """Close every hold; never mask a primary refusal with a cleanup error."""
+    primary = sys.exc_info()[1]
+    first = None
+    for held in objects:
+        if held is not None:
+            try: held.close()
+            except Exception as exc:
+                if first is None: first = exc
+    if first is not None and primary is None:
+        first._current_reference_failure_phase = phase
+        raise first
 
 
 def _failure_diagnostic(exc, fallback="parent_preflight"):
@@ -691,8 +707,7 @@ def _worker(audit_id, *, expected_head, context, executed_sources=None, bootstra
                 "effective_inside_output_write_denial": True, "authority": _authority()}
         return summary
     finally:
-        for held in (capture, reference, view, output):
-            if held is not None: held.close()
+        _close_all("worker_cleanup", capture, reference, view, output)
 
 
 def run_observed_assessment(audit_id, *, expected_head):
@@ -768,16 +783,18 @@ def run_observed_assessment(audit_id, *, expected_head):
             and output.read("readonly-verification.json", cap=MAX_CONTROL_BYTES) == verification_raw,
             "parent_final_readonly_verification_receipt_differs")
         output.check()
-        publication = _PinnedPublication(output.path, {"reservation.json": _sha(reservation_raw),
+        publication = _at_phase("parent_final_output_hold", _PinnedPublication, output.path, {"reservation.json": _sha(reservation_raw),
             "assessment.json": summary["assessment_sha256"], "complete.json": summary["complete_sha256"],
             "readonly-verification.json": _sha(verification_raw)})
-        for held in (view, reference): held.recheck()
-        _need(_fixed_source_identity(expected_head) == (identity, frozen), "current_reference_source_changed_at_publication")
-        publication.recheck()
+        _at_phase("parent_final_source_view", view.recheck)
+        _at_phase("parent_final_reference", reference.recheck)
+        final_identity = _at_phase("parent_final_source_identity", _fixed_source_identity, expected_head)
+        _at_phase("parent_final_source_identity", _need, final_identity == (identity, frozen),
+            "current_reference_source_changed_at_publication")
+        _at_phase("parent_final_output_recheck", publication.recheck)
         return summary
     finally:
-        for held in (publication, output, reference, view):
-            if held is not None: held.close()
+        _close_all("parent_cleanup", publication, output, reference, view)
 
 
 def main(argv=None):

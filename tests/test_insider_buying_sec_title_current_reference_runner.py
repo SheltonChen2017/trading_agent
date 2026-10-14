@@ -504,3 +504,137 @@ def test_final_output_versions_and_namespace_stay_held_across_last_source_checks
         else:os.link(root / "assessment.json", tmp_path / "linked-assessment")
         with pytest.raises(ValueError):held.recheck()
     finally:held.close()
+
+
+def _invented_parent_flow(tmp_path, monkeypatch, fault=None):
+    """Real final leaf custody; mocked inputs/children never open actual roots."""
+    root = tmp_path / "invented-parent-flow"
+    root.mkdir(mode=0o700)
+    audit = "ib-sec-title-current-reference-invented-parent-flow"
+    context = _context(); identity = context["identity"]; frozen = context["frozen_sources"]
+    events = []; source_calls = [0]; reads = {"view": 0, "reference": 0}
+
+    def source_identity(*_):
+        source_calls[0] += 1
+        if source_calls[0] == 5 and fault == "source_identity": raise ValueError("SECRET_SOURCE")
+        if source_calls[0] == 5 and fault == "source_equality": return {"changed": True}, frozen
+        return identity, frozen
+
+    def held(kind, body):
+        def recheck():
+            reads[kind] += 1
+            if reads[kind] == 4 and fault in {kind, "primary_and_cleanup" if kind == "view" else "unused"}:
+                raise ValueError("SECRET_INPUT")
+        def close():
+            events.append(("closed", kind))
+            if kind == "reference" and fault == "primary_and_cleanup": raise TypeError("SECRET_CLEANUP")
+        return SimpleNamespace(context=body, producer_identity={}, recheck=recheck, close=close)
+
+    view = held("view", context["source_view_context"])
+    reference = held("reference", context["sharadar_context"])
+    monkeypatch.setattr(module.original.capture.bootstrap.custody, "LANE_ROOT", root)
+    monkeypatch.setattr(module, "_fixed_source_identity", source_identity)
+    monkeypatch.setattr(module.original.capture, "_verify_original_committed_sources", lambda *_: None)
+    monkeypatch.setattr(module, "_PinnedSourceView", lambda: view)
+    monkeypatch.setattr(module, "_PinnedSharadar", lambda: reference)
+    monkeypatch.setattr(module, "_verify_producer_git", lambda *_: None)
+    output_path = root.joinpath(*module.OUTPUT_PARTS, audit)
+    output_path.mkdir(parents=True, mode=0o700)
+    monkeypatch.setattr(module, "_output_directory", lambda *_args, **_kw: module.original.capture.custody._Directory(output_path))
+    execution = {"executed_sources": [], "invented_source_execution_context": True}
+    monkeypatch.setattr(module, "_source_execution_context", lambda *_: execution)
+    out = module.original.capture.custody._Directory(output_path)
+    summary = _summary(); summary["audit_id"] = audit; summary["fixture_only"] = False
+    assessment = module._raw({"invented_transport_payload_only": True})
+    summary["assessment_sha256"] = module._sha(assessment)
+
+    def launched(command, **kwargs):
+        envelope = json.loads(kwargs["input"])
+        if not envelope["verify_only"]:
+            out.publish("assessment.json", assessment, cap=module.MAX_OUTPUT_BYTES)
+            summary["complete_sha256"] = out.publish("complete.json", module._raw({"invented_completion_only": True}),
+                cap=module.MAX_CONTROL_BYTES)
+            payload = summary
+        else:
+            policy = command[command.index("-p") + 1]
+            assert "(deny file-write*)" in policy and "(allow file-write*" not in policy
+            payload = {"schema": module.SCHEMA + "/readonly-verification", "verified_summary": summary,
+                "source_execution": execution, "effective_process_tree_network_denial": True,
+                "effective_process_fork_denial": True, "effective_inside_output_write_denial": True,
+                "authority": module._authority()}
+        return SimpleNamespace(returncode=0, stderr=b"", stdout=module._raw(payload) + b"\n")
+
+    monkeypatch.setattr(module.subprocess, "run", launched)
+    real_publication = module._PinnedPublication
+
+    def publication(path, hashes):
+        if fault == "output_hold": raise ValueError("SECRET_OUTPUT_HOLD")
+        result = real_publication(path, hashes)
+        real_recheck, real_close = result.recheck, result.close
+        def recheck():
+            if fault == "output_recheck": raise ValueError("SECRET_OUTPUT_RECHECK")
+            real_recheck()
+        def close():
+            real_close(); events.append(("closed", "publication"))
+            if fault == "cleanup": raise ValueError("SECRET_CLOSE")
+        result.recheck, result.close = recheck, close
+        return result
+    monkeypatch.setattr(module, "_PinnedPublication", publication)
+    try:
+        if fault is None:
+            result = module.run_observed_assessment(audit, expected_head="a" * 40)
+            assert result == summary and source_calls[0] == 5
+            assert set(os.listdir(output_path)) == module._FINAL_FILES
+            return events
+        with pytest.raises(ValueError) as raised:
+            module.run_observed_assessment(audit, expected_head="a" * 40)
+        assert set(os.listdir(output_path)) == module._FINAL_FILES
+        return module._failure_diagnostic(raised.value), events
+    finally: out.close()
+
+
+def test_invented_complete_parent_flow_retains_exact_final_custody_and_closes_all(tmp_path, monkeypatch):
+    events = _invented_parent_flow(tmp_path, monkeypatch)
+    assert events == [("closed", "publication"), ("closed", "reference"), ("closed", "view")]
+
+
+@pytest.mark.parametrize("fault,phase", [("output_hold", "parent_final_output_hold"),
+    ("view", "parent_final_source_view"), ("reference", "parent_final_reference"),
+    ("source_identity", "parent_final_source_identity"), ("source_equality", "parent_final_source_identity"),
+    ("output_recheck", "parent_final_output_recheck"), ("cleanup", "parent_cleanup"),
+    ("primary_and_cleanup", "parent_final_source_view")])
+def test_late_parent_refusal_has_precise_secret_safe_phase_without_masking_primary(tmp_path, monkeypatch, fault, phase):
+    diagnostic, events = _invented_parent_flow(tmp_path, monkeypatch, fault)
+    assert diagnostic["failure_phase"] == phase
+    assert "SECRET" not in module._raw(diagnostic).decode()
+    assert ("closed", "reference") in events and ("closed", "view") in events
+
+
+@pytest.mark.parametrize("phase", ["parent_cleanup", "worker_cleanup"])
+def test_cleanup_attempts_every_hold_and_preserves_active_primary_refusal(phase):
+    events = []
+    def close_refuse(): events.append("first"); raise TypeError("SECRET_CLOSE")
+    first = SimpleNamespace(close=close_refuse)
+    second = SimpleNamespace(close=lambda: events.append("second"))
+    with pytest.raises(TypeError) as raised: module._close_all(phase, first, None, second)
+    assert module._failure_diagnostic(raised.value)["failure_phase"] == phase
+    assert events == ["first", "second"]
+    events.clear()
+    with pytest.raises(ValueError, match="PRIMARY"):
+        try: raise ValueError("PRIMARY")
+        finally: module._close_all(phase, first, second)
+    assert events == ["first", "second"]
+
+
+def test_cleanup_rethrowing_the_same_primary_object_cannot_relabel_its_phase():
+    primary = ValueError("PRIMARY")
+    closed = []
+    def rethrow(): closed.append("alias"); raise primary
+    def initial(): raise primary
+    with pytest.raises(ValueError) as raised:
+        try: module._at_phase("parent_final_source_view", initial)
+        finally: module._close_all("parent_cleanup", SimpleNamespace(close=rethrow),
+            SimpleNamespace(close=lambda: closed.append("second")))
+    assert raised.value is primary
+    assert module._failure_diagnostic(raised.value)["failure_phase"] == "parent_final_source_view"
+    assert closed == ["alias", "second"]

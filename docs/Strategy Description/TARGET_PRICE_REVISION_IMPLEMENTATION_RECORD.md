@@ -22050,3 +22050,79 @@ reproduced538focused tests10.91s (462existing plus76capture), isolated49/52.
 No complete lane/repository suite or native/provider/private effect. Source-only
 Mia remains asynchronous/unverified at this local software checkpoint; one
 final publication remains unspent and monitor remains PAUSED.
+
+### 90.8 Actual saved native source exactly matches the public design
+
+Local software checkpoint e75e4542a47d35f94d95af0198629845122b3759 was committed
+after exact invariants/staged hashes/in-memory compilation/whitespace and actual
+unchanged matching remote3dfa7d1e checks. No push or new strategy look.
+Fresh SOURCE-POST-020 at07:07:05.592436UTC on that HEAD:
+plan084ff15058caa6703d8f518eb4c81b8d9ebb361f29324bd5688c979f2c96b4c7;
+two own files/read calls537036wire/230180fresh bounded comparison bytes,
+ALL16 stable. Receipt9731/05a5360065df1cb4395be1a224202b1dd6c6a73f65ec1935e93af6f490278a38;
+read2archive266508/b946555c384ad58365ab3c9124b75d7432278c4ba163df366f2bc3472d60379c;
+private delta167742/681481b6ad32d627597a386b756756f4187736ffa54113f7495a81d5e8292eb2.
+Actual main60658/a098c087 and helper15742/1b057f25 match planned full hashes;
+other14 files match019. This proves exactly TWO saved file-content deltas, not
+the number/timing of native save/on-save-build calls or terminal Mia handoff.
+
+Fresh bounded PRIVATE processing WITNESS-SOURCE-VERIFY-20261014-001 before
+reading ONLY020's named exact receipt/archive (276239bytes total): access2137/
+ee2948f86546d34840fb1d39e1678031de66c28d05817e5ae109230fa3354b8b;
+result972/64a03db85d7a652f7f2d53e109e2494d72deaac8a8c27c07f899aba4e3f165a6,
+ended07:08:42.406350UTC. Independently compared ALL16 complete descriptors to
+the public capture design, actual main to generated exact bytes and the exact
+inverse60012/454ed1e, actual helper's11770-byte immutable prefix, and compiled
+both saved source strings in memory. All matched. No private content/rows were
+printed, external ObjectStore/provider read/download, job, or credential access.
+Controller exited0/released owned lock. This is **saved-source conformity**, not
+compiled-job source binding, genuine native execution, accounting or acceptance.
+
+### 90.9 Observed Mac lock prevents the next native effect; owner reply pending
+
+Fresh readonly WITNESS-SOURCE-011 at07:09:23.504667UTC: access4136/
+abeaea9d0b6a91f05f153878f99443dadf8b0ca5cf29b0496197104f500b9a5f;
+closer1153/cfa7e649495c3f995db1ea09281ab968c8d30f48d168397b67238143272e0117.
+It allowed no message/source/job effect, only verify or stop the exact own
+source-only task after saved-source conformity. Native window observation gave
+cgWindowNotFound; one Safari rebind explicitly reported **Mac locked; automatic
+unlock unavailable**. No click, cancellation, source/compile/job effect followed.
+Two attempted AX observations, no screenshot/action. Boolean false UI verification
+fields mean currently UNVERIFIED/unavailable, not proof QC signed out; working
+API auth and later metadata remain distinct. Native task terminal handoff and
+actual save/build count are UNKNOWN, not Completed or absent by inference.
+Controller exited0/released its owned lock; no process is left holding the lane.
+
+Safe alternative fresh DISCOVERY-SUCCESSOR-20261014-002 at07:11:56.389670UTC:
+plana1d561b881398ccdc1c1b579369430c8b61a27554e731e3c0eed9f87bd99502e;
+one fixed own backtests/list GET29881wire; all14 retained jobs returned their
+own project fields, unknown_job_ids=[]; no new job at that capture. Receipt11774/
+d74ef932f0930e7e0f34d87a510794f69fa433f9bc5e95b20d88573654267e4d;
+projection4138/8cfb978f0145186d18ae71fdb347da0b45d876475c72cd9046e3aa47260c3239.
+No source/performance/private-journal bodies or new look were accessed. Server
+creation clocks remain unzoned, not assumed UTC. This corroborates no new own
+job so far, not native source-task completion or future absence of effects.
+
+Root asked owner to unlock and explicitly confirm the action-time expansion
+from **source-only** Full Auto to ONE prospectively registered genuine-Mia OFF
+diagnostic with exact saved source/economics unchanged and no retries. No reply
+or such expanded mode approval is assumed. Alternative is keep Full Auto
+source-only and use strengthened approval mode for a separately scoped job.
+No fourth Codex OFF/API launch is permitted while native Mia is inaccessible.
+No obsolete unconditional unlock demand was repeated: this new request follows
+fresh explicit lock evidence after this session's successful unlocked work.
+
+Continuation is temporarily awaiting that required owner input, not a closed
+round or a canonical-completion claim. Do not auto-retry unlock/launch, renew020/
+spent scopes or treat an owner reply as a fresh source/compiled-job proof. On
+resume verify actual own Mia handoff, fresh all16 source capture, freeze/reserve
+actual look31 with exact HEAD/source/input/config/identities BEFORE effect, and
+only then the ONE authorized built-in Mia job. Retain OFF3/ON0 and observed30;
+accepted extended per-arm/per-sleeve metrics remain null, ON unlaunched, all
+canonical/source/native/accounting gates unchanged. Source diagnostic is ready
+for the next bounded native step; the frozen strategy is NOT backtesting-ready.
+The round's one final push remains unspent until the round's final handoff;
+this local owner-input checkpoint does not automatically rearm the monitor.
+Final focused active-document check after90.8–90.9:330passed7.33s with isolated
+49/52; no complete suite or empirical acceptance. All effect controllers exited;
+no raw/provider/private content or credential was placed in tracked files.

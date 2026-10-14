@@ -576,9 +576,13 @@ HTTP200/API success=true, but exact listing validation refused
 `listing_incomplete_or_shape` (298.5). V2 is also spent. The separately frozen
 D11 diagnostic completed once: exact path/HTTP200/APItrue but null objects,
 page and totalPages (298.8). It establishes the fresh shape, not absence or
-completeness. No upload or launch follows from positive HTTP/API status alone.
-The upgrade is not proof of the original cause or effective permissions.
-No QC backtest attempt has occurred.
+completeness. D12 then completed six exact-key metadata observations once
+(298.11): all HTTP200/APIfalse, missing metadata and unknown error category.
+Neither presence nor absence is established; no new upload or launch occurred.
+V1/V2/D11/D12 remain spent. Same-organization allocation and Storage Create
+permission facts are the concrete external next step (298.12); the upgrade
+is not proof of the original cause or effective permissions. No QC backtest
+attempt has occurred.
 The monitor remains PAUSED.
 
 Branch: `codex/strategy-analyst-revisions-v2`
@@ -1630,12 +1634,14 @@ Claude review of section 298's current storage-recovery continuation under the
 existing "for now" direction and 255.2 delegation, not future unrelated work.
 Section 296's exact connection uses are completed and spent. This is
 sequencing authority, not independent acceptance or technical/source clearance.
-The immediate next step is section298's bounded recovery assessment after
-D11 established null object/pagination fields, not absence/completeness.
-V1, V2 and D11 are spent and retained. The owner-reported storage
+The immediate next step is section298.12's concrete same-organization
+allocation/permission clarification: D11 established null listing fields,
+and D12's exact-six-key matrix returned HTTP200/APIfalse with missing metadata
+for every key. Neither establishes presence, absence or completeness.
+V1, V2, D11 and D12 are spent and retained. The owner-reported storage
 upgrade supports reassessment but proves neither quota causality nor current
 permissions. No unchanged upload retry or capacity/launch advance follows
-from a failure. D6 preparation passed once and is spent. This continues the owner's
+from these observations. D6 preparation passed once and is spent. This continues the owner's
 matched six/eight-universe, AR-off/100%/200% accepted-risk order study through
 October2026 (297.3/297.12). No old source operation is renewed. The subsequent
 inventory request did not replace that work;
@@ -3554,6 +3560,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-13 | Owner-waived status-only Massive recovery, monitor disarm and EODHD access note | `032c81e2` -> `5a80c284` and this final section-295 result/handoff commit | No new Claude review; fresh scoped waiver, not independent acceptance or reuse of section 294's waiver | Sole current status observation and native-network-denied reader exit 2; ratings 200, earnings 403, guidance not dispatched; no response body or accepted capture; both uses spent | 224 distinct focused passes in 4.14 s; 86-test record repeats overlap; two expected red mutations with the initial harness limitation retained; no full suite | Current earnings HTTP refusal retained as ARV2D295-001; historical causes still unknown; no QC/look/cell changes, floor 314/239/50/699 | One final matching-lane push; monitor PAUSED; token location retained without token access; next source/access decision needs a separately scoped contract, not an unchanged retry |
 | 2026-10-13 | Owner-directed Keychain connections and continuous backtest preparation | `ec036238` -> this section-296 implementation/run-freeze commit and subsequent result commits | No new Claude review; current owner pre-use waiver, not independent acceptance | Additive four-provider loader and fixed seven-product schema check; no old protocol renewal; actual result follows the exact committed freeze | Root 355 focused passes in 3.01 s; author subsets overlap; no complete suite | Five pre-use findings corrected/qualified; connection success cannot establish input completeness or backtest readiness; floor 314/239/50/699 unchanged | One final matching-lane push after this continuous round; monitor PAUSED; continue admissible data construction toward an order-based run, not a routine acknowledgment stop |
 | 2026-10-13–14 | Conclusion of the same owner-directed connection/data/six-cell round | `ec036238` -> twelve exact implementation/result commits through `0051adaa`, plus final 297.20 handoff (thirteen commits total) | No new Claude range; owner waived routine current review, not independent acceptance | Provider connections checked; retained exact-duplicate recovery and October package admitted prospectively; six/eight AR-off/100/200 family prepared; QC upload refused; bounded offline and read-only metadata diagnostics completed without acceptance | Per-stage focused checks and limitations in296–297; final record/diff/status checks below; no complete Codex suite, strategy result or outcome evaluation | ARV2E297-014 OPEN: unknown Object Store refusal; ARV2D297-013/-014 and historical P2s retained; no actual begin/compile/launch, floor314/239/50/699 | Exactly one successful final matching-lane push for this continuous round; monitor PAUSED; obtain same-organization storage/permission facts before separately justified recovery, no unchanged upload retry |
+| 2026-10-13–14 | Owner-reported 2GB upgrade and bounded storage recovery | `c555fb9d` -> `94a7bb36`, `2cdfbc6a`, `9e93d116`, `875dcb1f`, final section298 handoff (five commits) | Current owner review waiver, not independent acceptance; no new Claude range | V1 test/control isolation incident preserved and corrected prospectively; V2 listing refuses; D11 observes null listing/pagination; D12 records six HTTP200/APIfalse metadata refusals without absence/admission | Per-stage focused checks in298; final261-test selection and86-record repeats overlap earlier work; no full suite | ARV2I298-001 P1 corrected prospectively with historical effects retained; ARV2E297-014 remains OPEN; no upload or strategy attempt,314/239/50/699 unchanged | One final matching-lane push; monitor PAUSED; same-organization effective allocation/Storage Create facts needed before materially justified new recovery, no unchanged retry |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -48931,3 +48938,104 @@ continuation decision is still required. Otherwise pursue only materially
 justified recovery or concrete external clarification, never infer absence
 or blindly upload. Monitor remains PAUSED;314/239/50/699 unchanged. Exactly
 one final push remains reserved for the conclusion of this continuous round.
+
+### 298.11 Actual D12 result: six negative API observations, no admission
+
+At clean exact freeze `875dcb1fa393899a5de99057e110c493c68c5f88`, the
+298.10 caller ran once with the exact expected-head/caller pins. **Actual
+exit0**, started_at2026-10-14T02:34:47.286102Z and
+finished_at2026-10-14T02:34:50.457717Z. Report3713bytes SHA256
+`0d8fa1b57c8caf25b2cd16a039c3a3361a518412db912d17cd92c058f7f82b39`,
+report_published=true, terminal=properties_matrix_completed,
+matrix_completed=true, attempt_consumed=true and failure_code=null.
+This accepts completion of the **diagnostic**, not the objects or study.
+No separate output reader/control census was invoked. The pre-freeze86-test
+record repeat passed1.05s and is not additive.
+
+All six application dispatches returned HTTP200, response_schema_valid=true,
+**api_success=false**, metadata_present=false, metadata_type=missing,
+error_category=unknown and success_with_nonempty_errors=false. Key, size,
+MD5-well-formed and MD5-match fields are null/unobserved, not false matches.
+The immutable per-index request SHA256 bindings returned are:
+
+| Index | Request SHA256 |
+|---|---|
+| 0 | `66d7248124554ac8daccecc7f1739eade6fe067db30a62df0c3e5eec19fff6a7` |
+| 1 | `86e745fffe54c0cfe60a4f78b0c213409c090dac31c64231cc1a67564ae4e1c3` |
+| 2 | `8832bbdc1d9c1e87d225e41deba4660e5695dd383f72e12e54bbe177871bf562` |
+| 3 | `0bf81def874c304e2fb82bce9f47a979e2ee9832a08dcd1f7eaf7f439c54fb64` |
+| 4 | `799052e4483129b547c022788e41710272f63cd682724dfea45e3d3bc26aa891` |
+| 5 | `6b0616728cac8c93aadd6ab2445a599c8466d2e7f2b55049580b299db06887fc` |
+
+Attempted_request_count=6 is application-dispatch accounting, not independently
+measured server contact. The category does not identify quota, permissions,
+entitlement, absence or any other cause. Unknown error text was not retained
+or printed; the historical D7/D9 refusal is not reconstructed. No fallback
+endpoint/key, upload, admission receipt, capacity/project/compile/backtest,
+outcome or other-provider request followed. All original/recovery acceptance,
+absence, source/formal/PIT/paper flags remain false;314/239/50/699 unchanged.
+D12 and its exact source/tests/control outputs are now **SPENT and frozen**.
+Do not rerun it, inspect/repair its leaf, renew a claim, or substitute another
+date/name for unchanged calls. Original family/economics/evidence are intact.
+
+### 298.12 Concrete external barrier and continuous-round handoff
+
+**ARV2E297-014 remains OPEN.** Safe finite observations have not established
+remote presence or absence of the six inputs, effective quota, or upload
+permission. Repeated generic-negative lookups and blind overwrites cannot
+resolve that uncertainty. The owner's2GB report is retained as account-change
+evidence, not verification that this allocation applies to the organization
+bound to reference project37165262. Its6objects/2,776,584bytes are modest,
+but that does not establish actual free space or granted permissions.
+
+The concrete external next step is to confirm the **same organization** in
+QuantConnect's selector, its Resources/Object Store effective used/maximum
+allocation, and the owner's Members **Storage Create** permission for the
+organization containing reference project37165262. A non-secret summary or
+redacted screenshot is sufficient; no account ID, token/password, new purchase,
+permission change or deletion is requested. The earlier bounded UI check was
+inconclusive and is not replayed here. The nonblocking owner question remains
+pending. If these facts are correct but the service still refuses, a non-secret
+QC error-code/support observation can justify a separately bounded recovery.
+No new request contract is authorized merely by this handoff.
+
+The prepared six/eight AR-off/100/200 order-based comparison still has **zero
+strategy attempts and no new backtest result**. All six cells retain their
+original geometry, source and current-vintage qualifications. The existing
+uninvoked continuation expects positive V2 admission and is currently
+inadmissible; never fabricate that receipt. Further work must preserve
+source/readiness gates, prior failures/spent protocols, isolated same-lane
+scope and three-attempt/Mia policy. This is an external evidence barrier, not
+a routine Claude-review stop; the current owner waiver does not clear it.
+Monitor stays PAUSED. No funded/broker/real-order/paper/live action occurred.
+
+This continuous round began at
+`c555fb9d60d559f58d759202abed81b2daa291ce`. No new Claude range was handled.
+These are author-side dispositions, **not independent review acceptance**:
+
+| Exact commit | Scope and disposition |
+|---|---|
+| `94a7bb36856167199c914aa6abd926f29e42e2a3` | V1 implementation/test-isolation incident and prospective isolation corrections; accidental local files retained, V1 spent, no inferred remote contact. |
+| `2cdfbc6abb345b6dd5964d1721982962f76340b3` | Mandatory-host/source V2 correction and exact one-shot freeze; actual listing refusal retained, no publication/admission. |
+| `9e93d11644f54c5ab3bc9c9b95cb2938fa5093bb` | V2 result and separate D11 shape-only diagnostic/freeze; completed fresh null-field observation accepted only diagnostically. |
+| `875dcb1fa393899a5de99057e110c493c68c5f88` | D11 result and separate D12 exact-six metadata matrix/freeze; six negative observations accepted only diagnostically. |
+| Final section298 handoff commit | Actual D12 result/pin, current navigation/ledger, per-commit dispositions and external next step; no further operational authority. |
+
+Validation counts are stage-local, not additive across overlapping runs:
+V2/continuation406, D11/record185 and D12/D11/record261 all overlap.
+ARV2I298-001's initial311passes/12failures, subsequent stale-document and
+collection failures, memory-mutation evidence and host/isolation limitations
+remain in298.2–298.10. No complete lane/repository suite was run. Only the
+lane record changes after the final code validation and actual D12 use;
+no private operational output or old diagnostic is replayed.
+
+The concluded round receives exactly **one successful final matching-lane
+push** after final focused record/diff/status checks and exact root/branch/
+HEAD verification. Preserve any concurrent or incoming change; do not reset,
+rebase or force. Verify local/tracking/live matching heads and clean status
+after the push. This final handoff is the fifth commit after the baseline.
+
+Final record/active-document check: **86 passed in1.14s**, no failures/skips/
+warnings, under the same native network/production-artifact denial and in-root
+support controls. This repeat is not additive. Diff check passed; the live
+matching remote remained exactly`c555fb9d` before the final commit/push.

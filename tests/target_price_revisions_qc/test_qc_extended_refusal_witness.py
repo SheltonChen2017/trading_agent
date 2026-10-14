@@ -257,3 +257,24 @@ def test_outcome_projection_does_not_alias_custody_descriptor(case):
     projected = witness.outcomes
     projected["membership"]["descriptor"]["plain_sha256"] = "tampered"
     assert witness.outcomes["membership"]["descriptor"]["plain_sha256"] != "tampered"
+
+
+# TPR-CR27 regressions: two store-boundary guards the received suite never exercised.
+
+
+def test_foreign_etf_is_refused_before_any_store_call(case):
+    witness, _evidence, store = case
+    assert membership(witness, etf="SYNTHETIC-NOT-AN-ETF") is False
+    assert store.calls == [] and witness.outcomes["membership"]["status"] == "failed_or_uncertain"
+
+
+def test_post_save_existence_must_be_exactly_true_before_readback(case):
+    witness, _evidence, store = case
+    original = store.contains_key
+    def contains(key):
+        result = original(key)
+        return False if len([c for c in store.calls if c[0] == "contains"]) == 1 else None
+    store.contains_key = contains
+    assert membership(witness) is False
+    assert [c[0] for c in store.calls] == ["contains", "save", "contains"]
+    assert witness.outcomes["membership"]["status"] == "failed_or_uncertain"

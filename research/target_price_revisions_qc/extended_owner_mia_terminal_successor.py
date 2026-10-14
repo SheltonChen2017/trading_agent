@@ -454,7 +454,9 @@ def _execute(plan, sources, root, *, guard, clock, monotonic, transport):
                     return response
                 except ParseRefusal as error:
                     item["refusal_classification"] = error.code; return None
-                except (Exception, KeyboardInterrupt):
+                except Exception:
+                    # A genuine interrupt propagates to the scope handler; it is
+                    # not a per-request refusal that licenses further reads.
                     item["refusal_classification"] = "closed_pipeline_refusal_or_uncertainty"; return None
             base = {"projectId": PROJECT, "backtestId": JOB}
             response = request("backtests/read", base)

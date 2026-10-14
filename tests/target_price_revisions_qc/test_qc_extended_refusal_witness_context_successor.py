@@ -123,7 +123,7 @@ def details(store, kind):
 
 def test_exact_immutable_prefix_no_new_imports():
     source = Path(w.__file__).read_bytes()
-    prefix = Path("research/target_price_revisions_qc/extended_refusal_witness.py").read_bytes()
+    prefix = (Path(__file__).resolve().parents[2] / "research" / "target_price_revisions_qc" / "extended_refusal_witness.py").read_bytes()
     assert len(prefix) == 11770
     assert hashlib.sha256(prefix).hexdigest() == "82e7298046ab1642fb54adea98f2341b311ee6be955e16dfb345f2ea335856ba"
     assert source[:11770] == prefix

@@ -210,3 +210,13 @@ def test_same_real_context_instance_limits_repeated_generated_guard_witnesses_to
     assert len(store.data)==2 and sum(kind=="save" for kind,_ in store.calls)==2
     assert all("/37650980/synthetic_context_31/" in key for key in store.data)
     assert all(row["status"]=="verified_private_witness" for row in witness.outcomes.values())
+
+
+# TPR-CR27 regression: the design output must equal the main.py identity the look-31 capture pins.
+
+
+def test_design_output_equals_the_pinned_cloud_main_identity():
+    from research.target_price_revisions_qc import extended_first_refusal_capture_successor as capture
+    pinned = {name: (size, identity) for name, size, identity in capture.SOURCES}["main.py"]
+    result = d.build_main(BUNDLE)
+    assert (result["main_bytes"], result["main_sha256"]) == pinned

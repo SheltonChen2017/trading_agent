@@ -180,7 +180,11 @@ def _execute(plan, sources, root, *, guard, clock, monotonic):
             check(); report["status"] = "COMPLETED_PUBLIC_JOB_STATIC_VIEW"
         except (Exception, KeyboardInterrupt): report["status"] = "FAILED_OR_UNCERTAIN"
         report["ended_utc"] = clock().isoformat(); raw = e.canonical(report)
-        if len(raw) > MAX_PUBLIC: _fail()
+        if len(raw) > MAX_PUBLIC:
+            # The disclosure is refused, but the spent scope still gets a receipt.
+            report["views"] = None; report["status"] = "FAILED_OR_UNCERTAIN"; report["public_size_refused"] = True
+            raw = e.canonical(report)
+            if len(raw) > MAX_PUBLIC: _fail()
         capture._publish(directory, OPERATION + ".result.json", raw)
         return raw
     finally:

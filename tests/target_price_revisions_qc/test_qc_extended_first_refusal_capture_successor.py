@@ -64,7 +64,7 @@ def payload(p, endpoint, *, start=0, query="EXT26_SUMMARY", chart="EXT26 Account
 
 
 def envelope(p, endpoint, response, **kwargs):
-    return m.retain_response(p, endpoint, payload(p, endpoint, **kwargs), e.canonical(response), 200)
+    return m.retain_response(p, endpoint, payload(p, endpoint, **kwargs), e.canonical(response), 200, credential="SYNTHETIC-TOKEN")
 
 
 def terminal(p, status="Completed", **changes):
@@ -171,7 +171,7 @@ def test_full_private_projection_keeps_numeric_tokens_and_raw_descriptor_before_
     wire = b'{"success":false,"user":{"email":"SYNTHETIC"},"measurement":1.2300,"detail":"SYNTHETIC ERROR"}'
     desc = m.wire_descriptor(p, endpoint, base(p), wire, 500)
     assert desc["sha256"] == hashlib.sha256(wire).hexdigest()
-    raw = m.retain_response(p, endpoint, base(p), wire, 500)
+    raw = m.retain_response(p, endpoint, base(p), wire, 500, credential="SYNTHETIC-TOKEN")
     body = e.parse_json(raw)
     assert body["response"]["measurement"].lexeme == "1.2300"
     assert body["response"]["user"]["email"] == "[redacted]"
@@ -179,14 +179,14 @@ def test_full_private_projection_keeps_numeric_tokens_and_raw_descriptor_before_
     with pytest.raises(ValueError): m.response_from_envelope(p, raw)
     malformed = b'{"success":true,"success":false}'
     assert m.wire_descriptor(p, endpoint, base(p), malformed, 200)["bytes"] == len(malformed)
-    with pytest.raises(ValueError): m.retain_response(p, endpoint, base(p), malformed, 200)
+    with pytest.raises(ValueError): m.retain_response(p, endpoint, base(p), malformed, 200, credential="SYNTHETIC-TOKEN")
 
 
 def test_oversize_refusal_byte_descriptor_and_credential_echo():
     p = plan(); endpoint = "backtests/read/log"; request = payload(p, endpoint)
     wire = b"x" * (dict(m.READ_LIMITS)[endpoint] + 1)
     assert m.wire_descriptor(p, endpoint, request, wire, 200)["bytes"] == len(wire)
-    with pytest.raises(ValueError): m.retain_response(p, endpoint, request, wire, 200)
+    with pytest.raises(ValueError): m.retain_response(p, endpoint, request, wire, 200, credential="SYNTHETIC-TOKEN")
     with pytest.raises(ValueError): m.wire_descriptor(p, endpoint, request, wire + b"x", 200)
     with pytest.raises(ValueError):
         m.retain_response(p, endpoint, request, b'{"success":true,"message":"SYNTHETIC-TOKEN"}', 200, credential="SYNTHETIC-TOKEN")
@@ -331,3 +331,16 @@ def test_valid_closed_index_and_cancel_propagation(monkeypatch):
     def cancelled(*_args, **_kwargs): raise KeyboardInterrupt
     monkeypatch.setattr(m.ops, "_returned_identity", cancelled)
     with pytest.raises(KeyboardInterrupt): m.compact_observation(p, raw)
+
+
+# TPR-CR27 regression: the credential-echo guard cannot be switched off by omission.
+
+
+def test_retain_response_requires_the_credential_keyword():
+    """A caller that forgets the credential gets a TypeError, not a silently unguarded envelope."""
+    p = plan()
+    endpoint = "backtests/read"
+    with pytest.raises(TypeError):
+        m.retain_response(p, endpoint, base(p), b'{"success":true,"message":"SYNTHETIC-TOKEN"}', 200)
+    with pytest.raises(ValueError):
+        m.retain_response(p, endpoint, base(p), b'{"success":true,"message":"SYNTHETIC-TOKEN"}', 200, credential="SYNTHETIC-TOKEN")

@@ -206,7 +206,7 @@ def request_budget(plan, endpoint, request_attempts, received_bytes):
             or bound["action"] == "status" and endpoint != "backtests/read"): _fail()
 
 
-def retain_response(plan, endpoint, payload, wire, http_status, *, credential=""):
+def retain_response(plan, endpoint, payload, wire, http_status, *, credential):
     """Return private envelope bytes BEFORE success/schema inspection.
 
     Known metadata is structurally redacted, exact numeric tokens preserved.

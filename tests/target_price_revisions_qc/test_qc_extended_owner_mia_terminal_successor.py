@@ -301,3 +301,15 @@ def test_stdout_is_body_free_and_no_metric_or_stage_acceptance(monkeypatch, caps
     printed = capsys.readouterr().out
     assert "PRIVATE" not in printed and "terminal" not in printed and "statistics" not in printed
     assert e.parse_json(printed.encode())["accepted_metrics"] is None
+
+
+# TPR-CR27 regression: an interrupt during one request ends the scope, it does not continue the read loop.
+
+
+def test_interrupt_during_a_request_stops_further_reads_and_fails_the_scope(tmp_path):
+    values = fixture(tmp_path); calls = []
+    def interrupted(plan, endpoint, payload, seconds, claim):
+        calls.append(endpoint); raise KeyboardInterrupt()
+    result, _raw = execute(values, interrupted)
+    assert calls == ["backtests/read"] and result["status"] == "FAILED_OR_UNCERTAIN"
+    assert result["requests"][0]["status"] == "failed_or_unknown" and result["terminal"] is None

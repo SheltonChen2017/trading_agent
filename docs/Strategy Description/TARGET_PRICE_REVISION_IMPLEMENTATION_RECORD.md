@@ -21628,3 +21628,151 @@ and independently checked; focused main-hook proof/whole-source freeze and
 separate genuine-Mia look reservation still precede any job. Observed looks30,
 OFFCodex3/ON0 remain unchanged; proposed31 is not a measured result or reset.
 Shared/root/sibling behavior and parked canonical gates remain unchanged.
+
+### 90.2 Genuine Mia source request, negative scopes and shared-UI wait
+
+Latest owner direction: "several lanes are using safari. please switch Mia to
+autopilot to reduce clikcing". At the exact mode-change confirmation, owner
+answered **"Confirm source-only Full Auto"**: no backtest launch until saved
+source is independently verified and the run separately registered. This
+changes only the bounded Mia approval mode, not candidate caps, economics,
+data/provider rights, canonical gates or other lanes' authority. **Full Auto
+has NOT yet been applied.** Last verified own-task mode was Ask Before Edits.
+
+All operations below bind HEAD066463fa5ff678c4336e582d9f08e8a248eba1d1;
+ACTUAL matching remote remained3dfa7d1ef070e58ebdbd54860a614a8c5b821d81
+at05:40:36/05:50:03UTC checks. No fetch/merge/reset/publication or concurrent
+work absorption occurred. Controllers were serialized and actually exited
+before the next source/controller operation. Old scopes were not renewed.
+
+Fresh SOURCE-POST captures each performed two fixed own-project files/read
+requests,502406wirebytes plus230180 separately declared baseline-comparison
+bytes. ALL15 files were stable and content-identical to014/013/012; restored
+main60012/454ed1e39762010997f53ef6a9f2e9064810d40a6812aae513a8fa3b090ca505,
+other14 unchanged, complete delta150377/9fc26fae003afc31315628955826f2b4ecd740d9b133ecb3d525b7a91af833b1.
+
+| Fresh operation suffix (20261014) | Created UTC / plan SHA256 | Receipt bytes / SHA256 | Read2 source archive bytes / SHA256 |
+|---|---|---|---|
+| SOURCE-POST-015 |05:33:42.193508 / b40e3765ebe3fe49105d6f23e78e7bdc6f8a24319193c685fb7e4fcf9aecf1e1 |9084 / e5d6d491b7b1be8fbc91bcc4486d8f460587f5ac0caf1f7e4e8e12a640d13eec |249321 / dca799ce192be621b7a4b174df1bfbe89be6c53b37ca337d6a2ffedaf8132019 |
+| SOURCE-POST-016 |05:41:23.820301 / 0505235f66574439db8644405981747c2464ca5b70cffbdfe494fe79b42fe0d9 |9084 / a4be7417692e8af52ed1eefc1a7fd0c32412065a69ca8f2f812f7ce2a974e369 |249321 / dc0fb90b6156f58b2ce29fad08c072bc385c9efc2556fd4ef522b8fc395980c5 |
+| SOURCE-POST-017 |05:50:37.065642 / 5de2532a94b2447bf482d8a3faef6d63573389ee1a09e43bd8608024c9de5beb |9084 / ba8c157e2b7d80392059b196de6e48b3b2f4a83cc38dc68069e6de711e4fd751 |249321 / 0a50fa7db9b0b4f5dbedf03ad28bd04d51d6683ac32727fdd0631564f30c46e0 |
+
+WITNESS-SOURCE-002 expired without a supplied closer:449byte EXPIRED receipt,
+620427b64c382a066aa3a7237640e9dcf4b4c94d3895a6e5b89a0c0f20f14acf.
+Native access did prove unlocked/authenticated QC and reached the exact OFF
+project/new empty Mia chat, but a following stale mode-element action refused.
+A reacquisition's automatic initial AX included own-organization ObjectStore
+top-folder metadata incidentally, outside the intended source-only surface.
+No folder was selected/paginated, no object values read and no ObjectStore
+write/delete/export occurred. This negative scope observation is retained,
+not a claim of zero incidental key metadata. Subsequent routing minimizes
+output to the known project/tab/toolbar and does not inspect those folders.
+
+WITNESS-SOURCE-003:3732byte access plan,
+8e9ee9c081bdd69873f2992daffd9432a8fe8835e83fa343b4675a2809e23836,
+05:34:15.166631UTC. The heredoc controller encountered EOF/JSONDecodeError,
+exited1 and released its lock; access/claim/error retained, no fabricated
+result receipt. An initial TextEdit Open panel was observed; no source read
+or edit was approved through this failed controller. Identified successor004
+used python -c with live PTY stdin rather than relabeling/reusing003.
+
+TPR-EXT26-D107 (agent-delegated; independent review pending): successor004
+allows readonly TextEdit access to exactly the committed public helper, never
+private rows or arbitrary local files, because the calling Codex file panel
+was queued/not visible. File11770/82e7298046ab1642fb54adea98f2341b311ee6be955e16dfb345f2ea335856ba
+was independently hash/size-checked from the designated root. Exact TextEdit
+URL/title and complete AX text were verified;11770characters were extracted
+from that displayed public source only. One15431character public source-only
+message was pasted/sent to native built-in Mia in the exact own OFF project,
+with **Ask Before Edits visibly selected before sending**. No clipboard
+secret was read, no filesystem/native-automation workaround or API backtest
+initialization was used. Alternative queued Codex panel was not silently
+treated as an opened editor. TextEdit source was not modified/saved.
+
+004 created05:34:45.514882UTC, access3732/
+14587e101ab73ae491c2df0dd79e7d8a48c5960a831117980a1bebd7248540e0;
+closer1173/062af56fcd400a1c7b592ccf59e1b578717eff86a82fc354a437331ab0ccf516:
+SOURCE_REQUEST_SENT_PENDING_APPROVAL,24AX/1screenshot/17actions, no approved
+source edit/manual compile/job. Exact task title is
+"create extendedrefusalwitness and update main import guards". The displayed
+5:24:27 build28859a-0381a4 was pre-existing startup evidence, not a new004
+build/strategy attempt or full native compile identity. Mia searched own
+source for DeferredPrivateEvidence, inventory and held-RAW guards; no raw
+market rows were disclosed. Mia task remained Running, not completed.
+
+005 continuation: access3879/7d9209122c79e0c2f4e8ffbe849f063072f3c62853b0fbeff7da59065e40c39e,
+created05:41:55.326084UTC; closer1234/
+0121abf0eb78fbae52c686af13da057cd5d76e10d19095ae7cef876e6f715fe2,
+UI_CONTENTION_TIMEOUT_TASK_NOT_TERMINAL. Six AX observations, one screenshot
+attempt, three routing actions; no source approval/manual compile/launch.
+A later AX took113seconds; screenshot request timed out at120seconds despite
+a20second outer request limit. Native current task/source effects were then
+unverified, not invented as terminal completion. Fresh017 subsequently proved
+all15 source files still unchanged. No new saved helper exists as of017.
+Repeated foreground drift and owner-confirmed several Safari lanes make
+blind index reuse or foreground interaction unsafe; no other actor/task was
+cancelled, overwritten or deprived of edit control.
+
+TPR-EXT26-D108 (owner-confirmed mode, agent-selected bounds; review pending):
+enable Full Auto only for the above source-only task once its exact UI is
+controllable; retain at most5 cumulative source saves/explicit on-save build
+calls across these successor scopes (zero saved source changes proved by017),
+the original no-launch instruction and later full-source/guard tests/run
+registration. Changing scope IDs does NOT renew a candidate's attempt budget
+or authorize a strategy job. Native background build counts remain attributed
+observations, not inferred zero from zero manual compilations.
+
+006 availability/mode continuation at05:54:08.498384UTC: access4339/
+0515c02fc3c7e8a3727790823bba16312d4d5d36dd331f23cb40fffd98e3a0a6;
+closer1317/05e316225203dddb08bc03d33ff26962e1febecdb426406b5e7bb7829a1114bb,
+FULL_AUTO_CONFIRMED_NOT_APPLIED_WAIT_SHARED_UI. Existing own-project IAB tab
+was absent. One fresh hidden exact-project availability tab showed Sign In /
+session expired, not authenticated Mia; a binding-assignment error after tab
+creation was retained, then exact tab binding/temporary-tab cleanup succeeded.
+Tab-bound Safari control was unavailable. Two successful AX observations/two
+navigation actions, no credentials/login/session transfer, source/mode edit,
+compile/job or data deletion. This is an isolated-interface failure, not a
+new unconditional claim that authenticated native Safari/Mia is unavailable.
+
+TPR-EXT26-D109 (agent-delegated safety wait; review pending): wait for a brief
+exclusive own-project Safari opening, as the owner previously directed when
+other lanes contend. Asked owner to reply "ready" with project37650980 open;
+no generic new agent/API job, UI takeover, cancellation of another lane,
+account/subscription change or guessed foreground action is an alternative.
+Only the irreducible shared-UI coordination is requested, not a new portfolio
+choice or stale Mac-unlock/storage recovery demand. Fresh bounded scopes and
+source drift checks are still required before later mode/source/job effects.
+
+Standalone OFF baseline remains INVALID/unaccepted; ON remains unlaunched.
+Observed looks30 (28cloud+2historical local), OFFCodex3/ON0 unchanged;
+proposed first-refusal31 has not launched or produced an observed outcome.
+F012/F017/F018/F019/F020/F023 and full-window/census/clock/native custody limits
+remain open in their existing scope. Restored guard/heuristic corrections stay
+proved only to their documented source/fixture limits. All six sleeves' new
+matched returns/CAGR/drawdown/volatility/Sharpe/annual P&L, native fill/cost and
+independent sleeve accounting remain null, not inferred from partial history.
+Next role: Codex resumes only the confirmed source-only Mia mode/patch after
+safe UI access, independently captures every saved file/diff and proves hooks,
+then separately freezes/registers a genuine Mia diagnostic; OFF full-window
+verification still precedes ON. Claude independently reviews all unreviewed
+published rounds and this eventual final snapshot. Monitor remains PAUSED;
+no final push has occurred in this resumed round yet.
+
+### 90.3 Local continuation checkpoint, not final publication
+
+Focused active-document module using the isolated in-process49/52 runner:
+330passed7.72seconds after90.2; diff whitespace clean. No complete lane or
+repository suite, private runtime dispatch, actual operator stop/database or
+new native completion test was run. Read-only delegated consistency audit of
+public90.1–90.2 found no material internal overclaim; it did NOT reproduce
+private receipt/UI claims and is not independent Claude approval. Source017
+proves content unchanged only at its capture, not future task completion.
+
+This record-only local checkpoint preserves the source-only request and
+negative scopes while waiting for owner-coordinated Safari access. It does
+not conclude the continuous build, reset an attempt/look, declare readiness
+or spend the round's one final push. No controller is left holding the lane
+lock; unknown native Mia terminal state remains explicit. The mode confirmation
+persists for the same bounded source-only task, not a generic permission to
+interact with whatever Safari window is foreground. Final publication remains
+pending a stable completed/backtesting-ready or genuinely blocked handoff.

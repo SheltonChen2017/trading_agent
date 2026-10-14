@@ -175,7 +175,8 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     global_input_schema.py historical_preopen_input_adapter.py
     in_qc_preopen_terminal_stream.py lean_source_assembly.py
     matched_mia_recovery.py newrule_comparison_projection.py
-    newrule_comparison_qc_runtime.py newrule_comparison_targets.py object_store_read_contract.py
+    newrule_comparison_qc_runtime.py newrule_comparison_submission.py
+    newrule_comparison_targets.py object_store_read_contract.py
     owner_signature_authority.py physical_accepted_risk_archive.py
     physical_firm_ontology_candidate_archive.py
     physical_firm_ontology_review_packet.py
@@ -499,6 +500,18 @@ _ZERO_EXTERNAL_IO_SOURCES = frozenset(_ZERO_EXTERNAL_IO_IMPORTS)
 # package exemption.  This both documents why the file is outside the pure
 # class and makes any new dependency a review event.
 _HOST_ONLY_ADAPTER_IMPORTS = {
+    "newrule_comparison_submission.py": tuple(
+        """
+        __future__ dataclasses hashlib http.client json os re stat time weakref
+        contextlib pathlib research.quantconnect research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_october_order_package
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_package
+        research.analyst_revisions_v2_qc.formal_qc_transport
+        research.analyst_revisions_v2_qc.newrule_comparison_projection
+        research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime
+        research.analyst_revisions_v2_qc.six_universe_coverage_submission
+        """.split()
+    ),
     "accepted_risk_massive_ratings_delta_v2.py": tuple(
         """
         __future__ dataclasses hashlib os pathlib weakref research.analyst_revisions_v2_qc
@@ -1790,6 +1803,9 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
 }
 
 _HOST_ONLY_ADAPTER_IO_SURFACE = {
+    "newrule_comparison_submission.py": (
+        "call:open", "call:read_bytes", "import:http", "import:os", "import:pathlib",
+    ),
     "accepted_risk_massive_ratings_delta_v2.py": ("import:os", "import:pathlib"),
     "newrule_comparison_projection.py": ("call:compile", "call:read_bytes", "import:pathlib"),
     "accepted_risk_october_order_package.py": (
@@ -4183,6 +4199,10 @@ _PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
             "newrule_legacy_primitives",
         ),
         (
+            "research.analyst_revisions_v2_qc.newrule_comparison_submission",
+            "research.quantconnect",
+        ),
+        (
             "research.analyst_revisions_v2_qc.physical_accepted_risk_archive",
             "research.analyst_revisions_v2",
         ),
@@ -5133,6 +5153,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.matched_mia_recovery",
         "research.analyst_revisions_v2_qc.newrule_comparison_projection",
         "research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime",
+        "research.analyst_revisions_v2_qc.newrule_comparison_submission",
         "research.analyst_revisions_v2_qc.newrule_comparison_targets",
         "research.analyst_revisions_v2_qc.object_store_read_contract",
         "research.analyst_revisions_v2_qc.owner_signature_authority",

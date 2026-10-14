@@ -555,8 +555,12 @@ returned 403. All A/B/C modes are spent. Section 297 continues with a new
 rating-only October delta, because those refused products are not economic
 inputs of the existing exploratory rating score. The one-use acquisition
 returned four pages/3,261 rows but the separate authentication refused; D1/D2
-are spent, and no October source acceptance or QC run follows. Section 297.6
-records the failure and separate offline retained-byte diagnosis route.
+are spent and that acquisition remains refused. D3/D4 isolated one exact
+byte-identical duplicate; the separately defined V2/D5 subsequently passed
+once and prepared the October package (297.12), without retroactive source
+acceptance or formal admission. All D1–D5 operations are spent. The next
+bounded step is corrected six-cell projection/preparation, then separately
+frozen QC contact/launch/result handling; no QC attempt has occurred yet.
 The monitor remains PAUSED.
 
 Branch: `codex/strategy-analyst-revisions-v2`
@@ -1608,10 +1612,12 @@ Claude review of section 297's current ratings-only continuation under the
 existing "for now" direction and 255.2 delegation, not future unrelated work.
 Section 296's exact connection uses are completed and spent. This is
 sequencing authority, not independent acceptance or technical/source clearance.
-The immediate next step is section 297's bounded ratings-only October source
-authentication and package construction toward the owner's new matched
-six/eight-universe, AR-off/100%/200% accepted-risk order study through October
-2026 (297.3). The subsequent inventory request did not replace that work;
+The immediate next step is section 297's corrected six-cell source projection
+and offline family preparation against the now-prepared October package,
+followed by separately frozen contact/launch/result handling for the owner's
+matched six/eight-universe, AR-off/100%/200% accepted-risk order study through
+October2026 (297.3/297.12). No old source operation is renewed. The subsequent
+inventory request did not replace that work;
 the owner reiterated "continue buildling until backtesting". A concrete data,
 technical or external-authority barrier still requires an honest stop; a
 routine acknowledgment does not. No old protocol or failed capture is renewed.
@@ -47642,3 +47648,226 @@ prepares accepted-risk inputs, not strategy results, original capture
 acceptance, formal readiness or permission to contact QC. A later prospective
 family/launch/result freeze must bind actual package and all six sources
 before contact. Booked counts remain314/239/50/699; monitor remains paused.
+
+### 297.12 Actual D5 prepared input and two pre-launch execution findings
+
+D5 ran once at clean `66c6599922bf442b149c27f24ccf11cc94e6094f`, under its
+frozen sanitized/native-network-denied launch. External dispatch was
+**2026-10-14 00:31:05 UTC**, completion observed **00:41:43 UTC**, actual
+**exit0**. Its internal interval was `00:31:08.556533Z` to
+`00:40:31.359987Z`; the external bracket includes observation delay and is
+not an exact operation-duration measurement. The normal finite envelope
+reported stage `new_package_authentication`, terminal
+`october_package_prepared`, no exception/code, and the following pins after
+the caller's full checks. Report **1,837 bytes**, SHA-256
+`9d1a4567fc2585c1e0179705f35345599174c789b9769fa3a5283dc8b868a8de`.
+No independent output reader ran. Clean HEAD/root/branch/status remained equal
+after completion; all agents held writes for the operation.
+
+| Prepared output | Exact binding |
+|---|---|
+| Package, under `massive_ratings_delta/R297-20261013-D5/package` | `arv2-preliminary-qc-package-411c2734da61c7d4172c4cb3`; SHA `411c2734da61c7d4172c4cb3d33c4ffdde650f40336a5e807d26e50cc7de0bad` |
+| Lineage, under the same parent | `arv2-october-lineage-e4518e06a68a18a3151fe36e5926699624fc68b97c31a8e06917d44103831fd9/lineage.json`; SHA `e4518e06a68a18a3151fe36e5926699624fc68b97c31a8e06917d44103831fd9` |
+| Activation key | `arv2/preliminary-rating/27645603c1a6e0fc9fa81655/transport-manifest.json` |
+| Activation SHA/bytes | `70f64450a44bedfa8ea371ac74a00e2134045fb79b433b93f0114be652bc6147` / 4,631 |
+| Upload bytes | 2,776,584 |
+| Contribution count | 13,061 = 13,015 preserved +2 retained-tail +44 fresh |
+| Session geometry | 3,466 sessions; last decision October12, valuation end October13 |
+
+D5/caller, V2 source authenticator, October composer and finite failure helper
+are now used/frozen. Preserve all original captures, refusals, dispositions,
+reconstruction and outputs. No original report/reader/acquisition was replayed,
+no source repair/automatic pin refresh occurred, and no provider/credential/QC
+request or outcome read occurred. `ARV2D297-007` is resolved **prospectively
+only for the separately defined retained-source V2 and this prepared package**;
+original acquisition remains exit2/refused, not retroactively accepted. No
+formal/PIT/paper/readiness flag or booked count changes. Subsequent host package
+authentication for a separately frozen projection/submission may read only this
+new package/lineage; it must not rerun D5 or reconsume historical diagnostics.
+
+While D5 ran, read-only same-round execution audit found two genuine
+pre-launch P1 issues in the inactive runtime checkpoint. These are not D5
+defects and no QC attempt has been spent:
+
+- `ARV2D297-009`: typed Split history starting at current-session midnight
+  omits midnight events because LEAN's history filter uses `EndTime > start`.
+  Existing callbacks could cause refusal; newly subscribed names could receive
+  a false factor1. Correct only the new runtime to query once from the prior
+  NYSE session, validate bounded prior/current observations, and apply only
+  current-session SplitOccurred before09:20. Prior warnings are validated and
+  excluded; unknown types refuse. A lower-bound-aware fixture/mutation must
+  prove the correction. Primary sources: LEAN
+  `Engine/HistoricalData/SubscriptionDataReaderHistoryProvider.cs`,
+  `Engine/DataFeeds/Enumerators/SplitEventProvider.cs` and
+  `Common/Data/Market/Split.cs` on official QuantConnect/Lean. Earlier API-shape
+  corroboration did not establish inclusive start semantics.
+- `ARV2D297-010`: with only regular-hours minute subscriptions, LEAN can
+  construct the first09:31 slice before scanning the overdue09:20 callback.
+  Newly added stocks are queued until `OnEndOfTimeStep` and absent from that
+  slice; current-minute execution then correctly refuses seeded prices.
+  Merely restoring algorithm09:20 time does not install those subscriptions.
+  Primary sources: LEAN `Engine/AlgorithmManager.cs`,
+  `Engine/DataFeeds/SubscriptionSynchronizer.cs`,
+  `Engine/DataFeeds/Synchronizer.cs`, `Algorithm/QCAlgorithm.Universe.cs`.
+
+Prospectively correct `-010` by using only SPY's extended-hours minute,
+fill-forward feed as a common clock and requiring a genuine09:20 `on_data`
+confirmation **after** that session's plan, before any09:31 order. Another
+early ScheduledEvent alone is insufficient. Fill-forward clock bars cannot
+supply reference, sizing or executable prices; every actual execution still
+needs a non-fill-forward current regular-hours minute. All other subscriptions
+remain regular-hours/no-fill-forward. To keep SPY premarket marks out of sizing,
+freeze **exact prior NYSE after-close portfolio NAV** as sizing NAV; only the
+initial2021-01-04 empty portfolio uses starting cash. Missing prior-session NAV
+refuses without stale fallback. Actual engine after-close NAV remains the
+performance valuation. Current cash still bounds buys; prior RAW closes plus
+same-day split factors remain share-unit denominators. Matching predecision
+split callback evidence is required for already-held split names. This is a
+new explicit sizing/clock choice, not a claim that the initial runtime already
+implemented it or that prior-close NAV equals current-market NAV. No frozen
+old runtime or formal forward policy changes. Correct/test/freeze these changes
+and the independent host aggregate validator before any QC contact.
+
+### 297.13 Corrected six-cell runtime and bounded lifecycle preparation
+
+`ARV2D297-009` and `-010` are corrected prospectively in the new runtime and
+projection, before any operational use. The prior-NYSE-midnight Split query
+validates and excludes older events/warnings, applies only today's actual
+splits and crosschecks held-name callbacks. SPY alone supplies the extended-
+hours/fill-forward clock; a real09:20 OnData confirmation must follow the plan.
+Execution refuses fill-forward or stale quotes. Sizing uses exact prior-close
+NAV (initial cash only on the first date), not mixed premarket portfolio marks.
+These are implementation findings, not changes to the source package or frozen
+old runtime. Focused projected-source fixtures exercise the unchanged package
+loader, FIGI resolver, evaluator/scorer, RAW references and predecision path
+using synthetic data only.
+
+All six candidates share **1,451 evaluation closes and302 weekly decisions**,
+2021-01-04 through2026-10-13, with last decision2026-10-12. Profiles fix six
+universes for R298/R299/R300 and eight for R301/R302/R303, respectively
+AR-off/100/200. Daily-close actual-account aggregates include return, terminal
+NAV, CAGR using365.25/calendar elapsed days and maximum drawdown from the full
+daily-close path including initial cash as a peak. Fee totals distinguish
+strategy orders and forced exits. No Sharpe is invented. The host validates
+exact identity/geometry, false readiness flags, fill/order/cash/fee safeguards,
+monthly endpoint arithmetic and aggregate reconciliation. Monthly returns
+cannot independently reconstruct the reported daily drawdown. All six actual
+common-source hashes and geometry must agree before `family_comparable=true`;
+six independent Completed statuses alone are insufficient.
+
+The new lane-owned lifecycle module prepares one fixed family at
+`artifacts/analyst_revisions_v2/newrule_comparison_qc/R298-R303-20261013`.
+It authenticates only the new D5 package/lineage, pins all six generated source
+projections before outcomes, and stores14 bounded private preparation files.
+No original capture, historical archive, D5 control/report or spent reader is
+reopened. Family/profile/projection comparisons use canonical bytes, not
+Python equality that aliases `false` with0. `ARV2D297-011` records that
+pre-use exact-binding correction; prepared-control type-alias regressions
+cover it. The source contract remains selected-file integrity, not whole-
+interpreter or arbitrary-same-user adversary isolation.
+
+After a later contact freeze, separate bounded operations discover only the
+organization of fixed owned reference project37165262, upload the fixed
+private objects activation-last with metadata readback, observe capacity,
+create one new private project per cell, verify exact source before compile,
+launch and result, and handle bounded compile/status/result calls. Native
+transport timeout is30s. Compile observations are at least10s apart (max60),
+status/capacity at least60s (max240); occupied capacity means wait, never alter
+another lane's job, node selection or project. Each attempted mutation/compile
+has an exclusive durable attempt claim; each RPC has an exclusive intent and
+observed-response digest. Unknown dispatch blocks unchanged retries. Three
+attempts per candidate maximum; a later attempt needs an exact failed-prior
+receipt and separately frozen justification. No automatic retries, fallback
+project, protocol renaming, cancellation or renewed exhausted candidate.
+
+Finite QC error evidence retains only exact public runtime-literal categories
+or known Python error classes. Raw errors/logs/rows/credentials are never
+returned or retained as diagnostic text; unknowns remain unknown and category
+is not authenticated cause. The root CLI authenticates clean designated
+host/branch/HEAD and selected source pins before the fixed consumer. Its
+failure handler no longer imports a rejected submission module:
+`ARV2D297-012` is corrected pre-use with an import-forbidden refusal regression.
+Opaque exceptions are not rendered. All CLI success envelopes are capped at
+24KiB; the `read` envelope summarizes validated account metrics and pins, while
+the private new control retains the bounded monthly statistics.
+
+Actual external exit0 and matching normal output are prerequisites for every
+downstream action. A module can write a receipt before a later parent alarm or
+output failure; the module cannot prove its caller's actual exit. Do not use a
+positive file or `summarize` to override a nonzero/unknown earlier operation.
+Unknown exit/partial claim is spent or ambiguous, not safely retryable. Parent
+deadlines also cannot bound suspension or uninterruptible I/O. Same-round
+advisory agents are not independent reviewers; the current owner pre-use
+waiver is sequencing authority only. Monitor remains paused and booked counts
+remain314 shared/239 development/50 infrastructure/699 cells until an actual
+attempt. Every actual attempt adds one shared and one development look; only
+an authenticated completed cell adds one cell. Preparation/upload/capacity
+alone add none.
+
+Final focused validation, selected pins and the exact offline preparation
+decision follow below before any invocation. No operational lifecycle function,
+new control allocation, QC credential/API/capacity/upload/launch or outcome
+read has occurred as of this implementation text.
+
+Root final focused validation: **365 distinct passes** (363 in10.90s plus two
+nonoverlapping exact transitive closures in5.41s):52 targets,103 runtime/
+projection,69 submission,53 CLI,86 record/active-document and2 closures. All51
+selected source pins and five projection pins matched; eight changed Python
+files compiled in memory; `assistant.dispatch_fence` was absent and diff check
+passed. Native network denial, `-B`, `--noconftest`, no plugin autoload/cache
+provider and in-root temporary/cache paths were enforced. No complete suite.
+Author155/6.19s, submission69/9.42s, CLI52/2.81s and closures2/5.00s overlap;
+they are not additive evidence. The CLI later gained the53rd import-refusal
+regression. Earlier runtime fixture errors concerned synthetic FIGI/security
+binding and benchmark-Symbol completeness (two groups of three), fixed in
+fixtures without weakening source checks. Submission initial46pass/1failure
+caught the accepted-result `result_cell` transition0→1; corrected before use.
+Closure's initial missing registration and subsequent sorted-edge fixture
+mistake each caused1failure/1pass and were corrected.
+
+Five runtime omissions each caused one expected failure: Split lower bound
+(2.82s), preopen frontier(.05s), prior-close sizing NAV(.05s), configured fee
+(.05s), external package result binding(.06s). Submission claim omission
+caused1expected failure/.18s and common-path comparability omission1/.50s.
+Mutations were memory-only/restored, source hashes unchanged. An initial
+comparability mutation incorrectly replaced the module's authority registry;
+that invalid experiment is not guard evidence. The corrected experiment
+changed only the function body. Root's preflight import-refusal regression
+proves no submission import follows a failed pin, rather than treating finite
+error output as authentication. Same-round advice remains non-independent.
+
+| New preparation component | SHA-256 |
+|---|---|
+| Corrected runtime | `674415b3179836a613afc6f7bdea23a966db21ab67221472fc5d87b4a742049d` |
+| Projection | `4f51d1a9a50293f4fa39be297666c1e6144462abaa82e69e342845580a1a4076` |
+| Runtime/projection tests | `530464e9d7e084a3d436bcea3fb65526115cba9eff076338c28f431ab64777f8` |
+| Submission | `cfd2456f2835bb1a4d2c04d6bb60a633b537a2af276a478ad3bfa5f2bc348d4f` |
+| Submission tests | `ccb21145956f7b2fffa66c498226d5c73215ef7efa32088237a98a21a70554d5` |
+| Submission profile | `140411d1ff9553d2c975816740dc1daa70d15f402f52ee702c24f3750b1a18f9` |
+| Fixed CLI | `533c1ebf520e9ebf836c78067b9b1480eccf49cfb01aaeb240e3a73b77087d05` |
+| CLI tests | `80456b469a930ac49e4a287d268f31b5ae7e6b9be239f6355c8fb120232a691a` |
+| CLI profile | `06765b38fc0e39ad33e614f937ff4d4b400bc134b75f8fc7cf268dc4f4015559` |
+| Exact closure registration | `3a97ff92d851cda9f7b1c0f66fa4de925029c25167cd9e3896fdffec7fa760ba` |
+
+**D6 exact offline one-shot preparation decision:** under the owner's current
+six/eight-through2026 request, explicit current review waiver and255.2
+delegation, authorize exactly one `prepare` invocation of the fixed CLI above
+at the clean commit containing this freeze, with that actual HEAD and caller
+SHA. Use only the designated Mac root/branch/Python3.13, sanitized environment,
+native deny-network, `-B` and in-root support paths. No arbitrary callback,
+endpoint, organization or private path is accepted from CLI. The120s parent
+deadline covers this new package authentication and all six projections; do
+not rerun after refusal, partial publication, timeout or ambiguous exit.
+
+Read only the new D5 package/lineage using their297.12 external pins and normal
+consumer held/named checks. Claim/fsync the previously uninspected, unallocated
+fixed R298–R303 control leaf exclusively and persist family/profile/projection
+metadata. Unlike acquisition, this offline consumer authenticates the input
+before allocating its output; no credential or contact is permitted. The
+normal finite output returns family/inventory/candidate/profile/projection
+hashes, not private records. Require actual exit0 plus matching normal
+`operation_completed=true` output, then durably freeze its actual family hash
+and the exact contact/attempt/result protocol separately **before** any QC
+request. This D6 decision authorizes no organization/capacity/Object Store or
+QC project/compile/run/result operation. No source retry, account-rights
+expansion, real/broker order, paper/live deployment or formal admission.

@@ -162,8 +162,8 @@ class NewruleComparisonAlgorithm(QCAlgorithm):
         self.universe_settings.asynchronous = False
         self.universe_settings.resolution = Resolution.DAILY
         self.universe_settings.data_normalization_mode = DataNormalizationMode.RAW
-        etfs = {{ticker: self.add_equity(ticker, Resolution.MINUTE, fill_forward=False,
-            leverage=1, extended_market_hours=False, data_normalization_mode=DataNormalizationMode.RAW).symbol
+        etfs = {{ticker: self.add_equity(ticker, Resolution.MINUTE, fill_forward=(ticker == "SPY"),
+            leverage=1, extended_market_hours=(ticker == "SPY"), data_normalization_mode=DataNormalizationMode.RAW).symbol
             for ticker in {targets.UNIVERSES!r}}}
         self.set_benchmark(etfs["SPY"])
         fundamentals = self.add_universe(self._fundamentals)
@@ -182,7 +182,7 @@ class NewruleComparisonAlgorithm(QCAlgorithm):
             slippage_model_factory=lambda: NullSlippageModel(),
             order_status_enum=_arv2_reflected_order_status(OrderStatus),
             order_status_to_int=_Arv2DotNetConvert.ToInt32, split_occurred_type=SplitType.SPLIT_OCCURRED,
-            split_data_type=Split)
+            split_warning_type=SplitType.WARNING, split_data_type=Split)
         self._driver.initialize()
         self.schedule.on(self.date_rules.every_day(etfs["SPY"]), self.time_rules.before_market_open(etfs["SPY"], 10), self._driver.on_before_open)
         self.schedule.on(self.date_rules.every_day(etfs["SPY"]), self.time_rules.after_market_open(etfs["SPY"], 1), self._driver.on_after_open)

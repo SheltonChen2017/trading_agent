@@ -21,8 +21,11 @@ import re
 SCHEMA = "insider-earnings-archive-cohort-assessment-v1"
 INVENTORY_SCHEMA = "insider-2006q1-earnings-issuer-label-inventory-v1"
 CAMPAIGN_SCHEMAS = frozenset({"insider-eodhd-date-window-earnings-campaign-v1",
-                            "insider-eodhd-date-window-earnings-continuation-v2"})
+                            "insider-eodhd-date-window-earnings-continuation-v2",
+                            "insider-eodhd-date-window-earnings-continuation-v3"})
 CONTINUATION_SCHEMA = "insider-eodhd-date-window-earnings-continuation-v2"
+CONTINUATION3_SCHEMA = "insider-eodhd-date-window-earnings-continuation-v3"
+QUARANTINED_SCHEMAS = frozenset({CONTINUATION_SCHEMA, CONTINUATION3_SCHEMA})
 QUARANTINE_REASONS = frozenset({"source_row_not_object", "source_row_field_shape_unknown",
     "source_code_unknown", "source_report_date_unknown", "source_fiscal_date_unknown",
     "report_date_outside_registered_scope", "fiscal_date_after_report_date", "source_timing_unknown",
@@ -31,6 +34,10 @@ FORMS = ("3", "3/A", "4", "4/A", "5", "5/A")
 MAX_INVENTORY_BYTES = 128 * 1024 * 1024
 MAX_JOURNAL_BYTES = 16 * 1024 * 1024
 MAX_WINDOW_ROWS = 50_000
+MAX_V3_WINDOW_ROWS = 200_000
+MAX_V3_METADATA_BYTES = 256 * 1024 * 1024
+MAX_V3_BODY_BYTES = 16 * 1024 * 1024
+MAX_V3_CONTROL_BYTES = 1024 * 1024
 MAX_CAMPAIGNS = 4
 MAX_TOTAL_ROWS = 248 * MAX_WINDOW_ROWS
 _SHA = re.compile(r"[0-9a-f]{64}\Z")
@@ -119,6 +126,22 @@ def supporting_windows():
 
 
 SUPPORT_WINDOWS = supporting_windows()
+V3_SUPPORT_WINDOWS = tuple(window for window in SUPPORT_WINDOWS if window[0] >= "2018-09-01")
+
+
+def metadata_byte_cap(schema):
+    _need(type(schema) is str and schema in CAMPAIGN_SCHEMAS, "campaign_identity")
+    return MAX_V3_METADATA_BYTES if schema == CONTINUATION3_SCHEMA else MAX_JOURNAL_BYTES
+
+
+def body_byte_cap(schema):
+    _need(type(schema) is str and schema in CAMPAIGN_SCHEMAS, "campaign_identity")
+    return MAX_V3_BODY_BYTES if schema == CONTINUATION3_SCHEMA else 4 * 1024 * 1024
+
+
+def control_byte_cap(schema):
+    _need(type(schema) is str and schema in CAMPAIGN_SCHEMAS, "campaign_identity")
+    return MAX_V3_CONTROL_BYTES if schema == CONTINUATION3_SCHEMA else MAX_JOURNAL_BYTES
 
 
 @dataclass(frozen=True, slots=True)
@@ -216,14 +239,14 @@ def _planned(manifest):
 
 
 def _rows(metadata, receipt, window):
-    v2 = metadata["schema"] == CONTINUATION_SCHEMA
+    v2 = metadata["schema"] in QUARANTINED_SCHEMAS
     _keys(metadata, {"schema", "body_sha256", "rows"} |
           ({"metadata_acceptance_is_source_coverage_or_identity_admission"} if v2 else set()), "window_metadata_schema")
     _need(not v2 or metadata["metadata_acceptance_is_source_coverage_or_identity_admission"] is False,
           "metadata_acceptance_is_not_admission")
     _need(metadata["body_sha256"] == _digest(receipt["body_sha256"]), "metadata_body_binding")
     rows = metadata["rows"]
-    _need(type(rows) is list and len(rows) <= MAX_WINDOW_ROWS
+    _need(type(rows) is list and len(rows) <= (MAX_V3_WINDOW_ROWS if metadata["schema"] == CONTINUATION3_SCHEMA else MAX_WINDOW_ROWS)
           and len(rows) == _count(receipt["sample_rows"]), "metadata_row_accounting")
     ordinals, reported, unknown, timing, accepted = set(), 0, 0, 0, 0
     reasons_count = Counter()
@@ -299,6 +322,8 @@ def assess_earnings_archive_cohort(*, inventory_raw: bytes, inventory_sha256: st
         _need(type(schema) is str and schema in CAMPAIGN_SCHEMAS and complete.get("schema") == schema
               and type(identity) is str and re.fullmatch(r"ib-eodhd-campaign-[a-z0-9-]{1,80}", identity)
               and identity not in campaigns_seen and complete.get("campaign_id") == identity, "campaign_identity")
+        _need(len(campaign.manifest_raw) <= control_byte_cap(schema)
+              and len(campaign.complete_raw) <= control_byte_cap(schema), "campaign_control_byte_bound")
         _need(complete.get("manifest_sha256") == campaign.manifest_sha256
               and complete.get("identity") == manifest.get("identity"), "campaign_source_binding")
         _need(type(manifest.get("fixture_only")) is bool and complete.get("fixture_only") is manifest["fixture_only"], "campaign_fixture_binding")
@@ -310,6 +335,8 @@ def assess_earnings_archive_cohort(*, inventory_raw: bytes, inventory_sha256: st
         last_registration = registered
         previous_campaign_end = ended
         windows = _planned(manifest)
+        _need(schema != CONTINUATION3_SCHEMA or windows == V3_SUPPORT_WINDOWS,
+              "continuation3_exact_unattempted_scope_required")
         planned_union.update(windows); campaigns_seen.add(identity)
         results = complete.get("window_results")
         _need(type(results) is list and len(results) <= len(windows)
@@ -327,7 +354,7 @@ def assess_earnings_archive_cohort(*, inventory_raw: bytes, inventory_sha256: st
                   and (last_attempt is None or SUPPORT_WINDOWS.index(last_attempt) < SUPPORT_WINDOWS.index(window)),
                   "attempted_window_duplicate_or_reordered")
             _need(summary["complete_sha256"] == evidence.complete_sha256, "window_completion_binding")
-            child = _decode(evidence.complete_raw, evidence.complete_sha256, MAX_JOURNAL_BYTES)
+            child = _decode(evidence.complete_raw, evidence.complete_sha256, control_byte_cap(schema))
             _keys(child, {"schema", "window", "index", "completed_at_utc", "manifest_sha256",
                           "started_sha256", "scope_reservation_sha256", "receipt"}, "window_completion_schema")
             _need(child["schema"] == schema and type(child["index"]) is int and child["index"] == index
@@ -359,14 +386,18 @@ def assess_earnings_archive_cohort(*, inventory_raw: bytes, inventory_sha256: st
                 _need(type(receipt.get("http_status")) is int and receipt["http_status"] == 200
                       and receipt.get("response_body_retained") is True and _count(receipt.get("body_size_bytes")) > 0,
                       "observed_response_receipt")
-                if schema == CONTINUATION_SCHEMA:
+                _need(receipt["body_size_bytes"] <= body_byte_cap(schema), "observed_response_body_bound")
+                if schema in QUARANTINED_SCHEMAS:
                     _need(receipt.get("metadata_sha256") == evidence.metadata_sha256
                           and type(receipt.get("metadata_sha256")) is str,
                           "producer_metadata_hash_binding")
-                metadata = _decode(evidence.metadata_raw, evidence.metadata_sha256, MAX_JOURNAL_BYTES)
+                metadata = _decode(evidence.metadata_raw, evidence.metadata_sha256, metadata_byte_cap(schema))
                 _need(metadata.get("schema") == schema, "metadata_schema_epoch")
                 rows, accepted, reason_counts = _rows(metadata, receipt, window)
-                total += len(rows); _need(total <= MAX_TOTAL_ROWS, "total_metadata_row_bound")
+                total += len(rows)
+                total_cap = MAX_TOTAL_ROWS + (len(V3_SUPPORT_WINDOWS) * (MAX_V3_WINDOW_ROWS - MAX_WINDOW_ROWS)
+                    if schema == CONTINUATION3_SCHEMA or any(item["schema"] == CONTINUATION3_SCHEMA for item in descriptors) else 0)
+                _need(total <= total_cap, "total_metadata_row_bound")
                 quarantined_total += len(rows) - accepted
                 all_reasons.update(reason_counts)
                 reference.update(metadata_accepted_rows=accepted, quarantined_rows=len(rows) - accepted,

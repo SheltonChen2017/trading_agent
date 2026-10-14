@@ -7,13 +7,14 @@ import hashlib
 import json
 import os
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
 pytest.importorskip("fcntl", reason="IBWIN-CR01: custody observer requires supported macOS/POSIX controls")
 
 from research import insider_buying_earnings_archive_assessment_runner as m
-from test_insider_buying_earnings_archive_cohort_assessment import campaign, inventory, enc, sha, row
+from test_insider_buying_earnings_archive_cohort_assessment import campaign, inventory, enc, sha, row, three_campaigns
 
 
 def private_file(path, raw):
@@ -60,7 +61,7 @@ def retain_campaign(root, parts, identity, item):
             child["receipt"]["body_size_bytes"] = len(raw_body)
             metadata = json.loads(metadata_raw); metadata["body_sha256"] = sha(raw_body)
             metadata_raw = enc(metadata)
-            if manifest["schema"] == m.assessment.CONTINUATION_SCHEMA:
+            if manifest["schema"] in m.assessment.QUARANTINED_SCHEMAS:
                 child["receipt"]["metadata_sha256"] = sha(metadata_raw)
             private_file(directory / (prefix + "-response.json"), raw_body)
             private_file(directory / (prefix + "-metadata.json"), metadata_raw)
@@ -196,7 +197,7 @@ def test_fixture_root_cannot_be_the_actual_lane(retained):
 def test_actual_route_has_no_fixture_callback_or_anchor_override():
     import inspect
     assert tuple(inspect.signature(m.run_actual_assessment).parameters) == (
-        "audit_id", "expected_head", "expected_v2_complete_sha256")
+        "audit_id", "expected_head", "expected_v2_complete_sha256", "expected_v3_complete_sha256")
 
 
 def test_runner_has_no_acquisition_or_credential_calls():
@@ -282,3 +283,120 @@ def test_parent_does_not_relabel_fixture_publication_as_actual(retained):
     with pytest.raises(m.ArchiveAssessmentRunnerError, match="receipt_binding"):
         m._verify_worker_publication(root=retained["root"], audit_id=retained["output_id"],
             identity=retained["identity"], v2_complete_sha=retained["v2"].complete_sha256, result=result)
+
+
+@pytest.fixture
+def retained_three(retained):
+    _, second, third = three_campaigns(third_rows={"2018-09-01": [row("ABC.US", "2018-09-15")]})
+    def named(item, identity):
+        manifest = json.loads(item.manifest_raw); manifest["campaign_id"] = identity
+        manifest_raw = enc(manifest); manifest_digest = sha(manifest_raw)
+        windows = []
+        complete = json.loads(item.complete_raw); complete["campaign_id"] = identity; complete["manifest_sha256"] = manifest_digest
+        for index, original in enumerate(item.windows):
+            body = json.loads(original.complete_raw); body["manifest_sha256"] = manifest_digest
+            raw = enc(body); digest = sha(raw)
+            windows.append(replace(original, complete_raw=raw, complete_sha256=digest))
+            complete["window_results"][index]["complete_sha256"] = digest
+        raw = enc(complete)
+        return replace(item, manifest_raw=manifest_raw, manifest_sha256=manifest_digest,
+                       complete_raw=raw, complete_sha256=sha(raw), windows=tuple(windows))
+    second = retain_campaign(retained["root"], m.V2_PARTS, m.V2_ID, named(second, m.V2_ID))
+    third = retain_campaign(retained["root"], m.V3_PARTS, m.V3_ID, named(third, m.V3_ID))
+    retained["v2"] = second; retained["v3"] = third
+    return retained
+
+
+def test_three_epoch_actual_style_fixture_retains_two_unavailable_months(retained_three):
+    result = run(retained_three, expected_v3_complete_sha256=retained_three["v3"].complete_sha256)
+    assert result["unavailable_window_count"] == 2
+    assert result["counts"]["source_metadata_rows"] == 3
+    output = retained_three["root"].joinpath(*m.OUTPUT_PARTS, retained_three["output_id"])
+    receipt = json.loads((output / "complete.json").read_bytes())
+    assert receipt["expected_v3_complete_sha256"] == retained_three["v3"].complete_sha256
+    assert receipt["raw_financial_bodies_decoded"] is False
+    m._verify_worker_publication(root=retained_three["root"], audit_id=retained_three["output_id"],
+        identity=retained_three["identity"], v2_complete_sha=retained_three["v2"].complete_sha256,
+        v3_complete_sha=retained_three["v3"].complete_sha256, result=result, fixture_only=True)
+    with pytest.raises(m.ArchiveAssessmentRunnerError, match="receipt_binding"):
+        m._verify_worker_publication(root=retained_three["root"], audit_id=retained_three["output_id"],
+            identity=retained_three["identity"], v2_complete_sha=retained_three["v2"].complete_sha256,
+            v3_complete_sha="f" * 64, result=result, fixture_only=True)
+
+
+def test_v3_retained_root_cannot_be_skipped_without_external_anchor(retained_three):
+    with pytest.raises(m.ArchiveAssessmentRunnerError, match="v3_requires_external"):
+        run(retained_three)
+
+
+def test_v3_external_completion_hash_cannot_be_self_attested(retained_three):
+    with pytest.raises(m.ArchiveAssessmentRunnerError, match="hash_mismatch|offline_input"):
+        run(retained_three, expected_v3_complete_sha256="f" * 64)
+
+
+def test_v3_external_anchor_cannot_represent_nonexistent_root(retained):
+    with pytest.raises(m.ArchiveAssessmentRunnerError, match="requires_retained_root"):
+        run(retained, expected_v3_complete_sha256="f" * 64)
+
+
+def test_added_v3_root_during_assessment_cannot_be_ignored(retained, monkeypatch):
+    real = m.assessment.assess_earnings_archive_cohort
+    def appeared(**kwargs):
+        result = real(**kwargs)
+        retained["root"].joinpath(*m.V3_PARTS).mkdir(mode=0o700)
+        return result
+    monkeypatch.setattr(m.assessment, "assess_earnings_archive_cohort", appeared)
+    with pytest.raises(m.ArchiveAssessmentRunnerError, match="v3_requires_external"):
+        run(retained)
+
+
+def test_optional_v3_source_is_inventoried_only_when_present(tmp_path, monkeypatch):
+    root = tmp_path.resolve()
+    private_file(root / "entry.py", b"# fixture entry\n")
+    monkeypatch.setattr(m, "REQUIRED_SOURCES", ("entry.py",))
+    monkeypatch.setattr(m, "OPTIONAL_SOURCES", ("continuation3.py",))
+    assert m._internal_source_paths(root) == ("entry.py",)
+    private_file(root / "continuation3.py", b"import helper\n")
+    private_file(root / "helper.py", b"# independently inventoried fixture dependency\n")
+    assert m._internal_source_paths(root) == ("continuation3.py", "entry.py", "helper.py")
+
+
+def test_new_source_file_is_not_an_actual_capture_trigger(tmp_path):
+    private_file(tmp_path / "research" / "insider_buying_eodhd_earnings_continuation3.py", b"# fixture source only\n")
+    assert m._v3_selection(tmp_path.resolve(), None) is None
+
+
+@pytest.mark.parametrize("mutate", [None, "complete_sha256", "manifest_sha256", "execution_head", "source_inventory_sha256",
+    "journal_leaf_sha256", "scope_sha256", "registered_unattempted_windows", "genesis_campaign_anchor", "old_root_resumed_or_written"])
+def test_observer_binds_v3_predecessor_claims_to_independently_read_chain(monkeypatch, mutate):
+    _, second, third = three_campaigns()
+    prior_manifest = json.loads(second.manifest_raw); prior_complete = json.loads(second.complete_raw)
+    identity = {"head": "a" * 40, "source_inventory_sha256": "b" * 64}
+    prior_manifest.update(identity=identity, previous_campaign_anchor={"invented_genesis": "c" * 64})
+    prior_complete["identity"] = identity
+    prior_raw, prior_complete_raw = enc(prior_manifest), enc(prior_complete)
+    second = replace(second, manifest_raw=prior_raw, manifest_sha256=sha(prior_raw),
+                     complete_raw=prior_complete_raw, complete_sha256=sha(prior_complete_raw))
+    monkeypatch.setattr(m, "V2_PRECEDING_COMPLETE_SHA256", second.complete_sha256)
+    leaves = {"manifest.json": second.manifest_sha256, "complete.json": second.complete_sha256}
+    scopes = {"d" * 64 + ".json": "e" * 64}
+    hashes = {"/".join((*m.V2_PARTS, "campaigns", m.V2_ID, name)): digest for name, digest in leaves.items()}
+    hashes.update({"/".join((*m.V2_PARTS, "scopes", name)): digest for name, digest in scopes.items()})
+    previous = {"campaign_id": m.V2_ID, "complete_sha256": second.complete_sha256, "manifest_sha256": second.manifest_sha256,
+        "execution_head": identity["head"], "source_inventory_sha256": identity["source_inventory_sha256"],
+        "journal_leaf_sha256": leaves, "scope_sha256": scopes,
+        "registered_unattempted_windows": [list(window) for window in m.assessment.V3_SUPPORT_WINDOWS],
+        "genesis_campaign_anchor": prior_manifest["previous_campaign_anchor"], "old_root_resumed_or_written": False,
+        "old_raw_financial_values_decoded": False}
+    if mutate:
+        previous[mutate] = True if mutate == "old_root_resumed_or_written" else "f" * 64
+    manifest, complete = json.loads(third.manifest_raw), json.loads(third.complete_raw)
+    manifest["previous_campaign_anchor"] = complete["previous_campaign_anchor"] = previous
+    manifest_raw, complete_raw = enc(manifest), enc(complete)
+    third = replace(third, manifest_raw=manifest_raw, manifest_sha256=sha(manifest_raw),
+                    complete_raw=complete_raw, complete_sha256=sha(complete_raw))
+    if mutate:
+        with pytest.raises(m.ArchiveAssessmentRunnerError, match="observed_predecessor_chain"):
+            m._bind_actual_v3_predecessor(SimpleNamespace(hashes=hashes), second, third)
+    else:
+        m._bind_actual_v3_predecessor(SimpleNamespace(hashes=hashes), second, third)

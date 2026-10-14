@@ -24019,3 +24019,259 @@ results/handoff must name the already-existing implementation hash. No new
 Claude review is claimed; six carried P2s stay OPEN, original constraints and
 both historical access classifications stand. Shared/frozen files remain
 unchanged. Monitor PAUSED; one final push remains unconsumed.
+
+## 170. Observed continuation and complete early-quarter issuer assessment (2026-10-13 UTC)
+
+### 170.1 Execution, retained custody and permanent failed scopes
+
+Implementation/preregistration already existed at clean exact lane HEAD
+`553faa37aace0106a6024156675ef1cfd40c5ca7` before both real operations.
+No later commit is backdated into either execution. Root and branch were the
+designated Insider worktree/branch throughout; only the matching lane was
+fetched and origin remained `85c7755deb75b5d0c61cc4a63a385d4b87b55110`.
+No additional incoming Claude range exists. The completed section-159 review
+was already dispositioned in160, not skipped or reviewed again as unfinished.
+
+Continuation campaign `ib-eodhd-campaign-continuation-200602-202607-20261013-once`
+registered at2026-10-13T23:42:35.449455Z and sealed at23:51:13.953397Z.
+Its exactly246 planned monthly windows generated151 actual transport calls:
+150 HTTP200 windows retained, then HTTP200 August2018 **oversized-response**
+refused. The failed body's size/rows/transfer count are NOT established and
+its body was neither retained nor hashed. Exactly95 windows September2018
+through July2026 remain originally unattempted. This is not a complete archive.
+Every started scope stays consumed; no old root is resumed or rewritten and
+January2006/August2018 will not be redispatched under this continuation.
+
+Observed v2 source rows1,251,664; metadata-accepted426,779; quarantined824,885;
+retained raw bytes222,152,364. These are metadata/custody counts, not release
+admission, authenticity, research universality or historical coverage. Exact
+completion SHA-256 `2e931f44eb896584821b459aa1bf13e130274c567454b9d7e5e9aa851918e1f6`;
+manifest `b20d99bd387ca4f431792669651870c90addd26e2392f825306aad37bb8b5fed`;
+executed8-source inventory `d66f3af11c335caa151ae7364a086b802c2df1130dab191d0d3dcaaf4324538f`.
+All14 source/research/identity/PIT/rights/QC/outcome/backtesting/execution
+flags remain literal false. File-based rotated token stayed private; no
+credential was printed, hashed, put in Git or used for unrelated account work.
+
+### 170.2 Actual isolated full-issuer observer, not a fixture or corpus promotion
+
+At the same already-existing553faa37 snapshot, the parent launched the
+committed observer once into fresh private output
+artifacts/insider_buying/earnings_archive_assessment/ib-earnings-assessment-2006q1-20261013-once.
+The worker measured effective OS network/fork denial and outside-output write
+denial, held/rechecked no-follow input inventories and externally bound the
+v2 completion above. Paid raw bodies were HASHED ONLY; no financial field,
+credential, provider request, price/outcome, QC job or backtest was accessed.
+Original v1 metadata uses the later independent61e257f7 custody observation,
+explicitly not a digest retroactively inserted into its producer receipt.
+
+Observed completion at2026-10-13T23:52:00.834786Z:83,657 source filings,
+6,737 all-form issuers,5,866 relevant issuers;1,253,190 v1+v2 source metadata
+rows,55,948 provider codes,428,305 metadata-accepted and824,885 quarantined.
+No ordinal/issuer or missing window was silently dropped. Reasons overlap:
+824,628 source-timing-unknown rows;818 source-code-unknown;1 fiscal date after
+report date. Cross-archive metadata-conflicting fiscal periods observed0;
+this does not prove original vendor revision history or economic agreement.
+Exactly97 supporting months unavailable: two failed and95 unattempted.
+No observed row/empty result is treated as proof of no actual release.
+
+Assessment17,525,191 bytes, SHA-256
+`5254d6fff3115214ec2f47b37713bd7836afb2cd3f707d4f46e04cc855517d8e`;
+completion `9463c8b96f44846fffa789ee358d166eb05bd7276619a6263a09b3075eaa586b`.
+Actual41-source observer inventory
+`321f9ed153e1a6a47ed1dc8a11bbf18ab955d94c6131c9db60470243f39b395b`;
+complete input-inventory digest
+`aaec0a1b48140a7fbad2bf3f31c9052d7f033535018de9745fd47f583ea9e92e`.
+Parent independently reattached the private assessment/completion and verified
+their hashes/counts/source identity. All authority/readiness flags stay false.
+
+### 170.3 Delegated next implementation and rights disposition
+
+The owner supplies all four Keychain service/account pairs, then responds to
+the FMP written-permission question: "other lanes are already using. skip it".
+Do not ask again for FMP paperwork in this round. Continue the actual EODHD
+and already-owned Sharadar route; other-lane usage is not evidence of FMP
+rights or a completed FMP request. No FMP acquisition is asserted or needed
+for these next operations. No API key is requested in chat.
+
+Delegated engineering decision: preserve executed v1/v2 bytes and their two
+failed scopes, implement a separately versioned v3 for only95 never-attempted
+months. Raise the per-window safety ceiling to16MiB raw/256MiB metadata and
+200,000 rows, with explicit worst-case disk reserve plus4GiB floor before
+any new root/start, production journals, all three generation locks, no
+retry/redirect/proxy/pagination/resume and at least1second AFTER prior
+transport completion. This is bounded new work under the continuing owner
+direction, not a retry of the oversized body or an inferred new source window.
+Observed filesystem availability71GiB is a current diagnostic, not a promise
+that the actual preflight can be omitted. Exact candidate precontact evidence
+is recorded next, before contact.
+
+In parallel integrate the recovered supplied TICKERS/ACTIONS against the
+complete early-quarter census in a fresh private isolated observer. Preserve
+all ordinals/malformed/unmatched/current-CIK/label-only/multi-share-class and
+counterparty relationships. Never merge corporate-action counterparties into
+same-security aliases or use names as join keys. Preserve original capture
+timestamps; today's retrieval is not2006 publication/knowledge. Decode no
+FUNDAMENTALS or financial values and make no replacement download.
+
+Technical milestone: actual source-journal replay and full-issuer archive
+metadata assessment are complete, with unresolved scopes/refusals preserved.
+Plain-language milestone: measured the retained archive against every early
+issuer and made the gaps visible; collection and historical reference work
+continue without another routine approval or Claude checkpoint. Neither this
+actual run nor passing tests establishes honest backtesting readiness.
+All six carried P2s and resolved findings remain as recorded; frozen four
+custody files/stock economics/window/D23 and both final non-retroactive access
+classifications remain unchanged. No shared document/behavior edit, new
+registered/outcome look, QC strategy job, broker/live/capital/order action,
+monitor rearm, other-chat message or interim push. One final push is unconsumed.
+
+## 171. Exact next source/reference image and precontact registration (2026-10-13 owner-local)
+
+### 171.1 Bounded profile and real-input operations after commit
+
+Continue under the owner's continuous-build/delegated engineering direction;
+no routine approval or Claude checkpoint is required. At this entry the new
+source image is validated but UNEXECUTED. Commit it cleanly in the designated
+lane before real contact/input integration; do not attribute execution to a
+commit that did not yet exist. No intermediate push is authorized.
+
+Fresh v3 campaign ID `ib-eodhd-campaign-continuation3-201809-202607-20261013-once`,
+private root artifacts/insider_buying/eodhd_earnings_continuation3, exact95
+monthly windows September2018..July2026. The identifier's date is registration
+context, not a backdated actual execution timestamp. Explicit maxima16MiB
+raw/256MiB projected metadata/200,000 rows/1MiB control per month. Finite
+worst-case remaining capture budget27,394,048,000 bytes, plus4GiB floor:
+31,689,015,296 bytes before the first new root/request. This is a safety
+reservation, not estimated or measured transfer/storage. Recheck remaining
+reserve before each start. Existing v1/v2 controls/source bytes stay unchanged;
+hold all three generation locks, bind150 previous raw/producer-metadata
+pairs and151 consumed scopes to exact170 control anchors, and verify current
+clean committed source before/after transport. At least1second AFTER previous
+transport completion;15-second timeout, no retries, proxies, redirects,
+pagination or resume. Secret echo checks include decoded representations.
+Raw values stay opaque; preserve every source ordinal/quarantine. All14
+authority/readiness claims remain false. Failed January2006/August2018 are
+not part of this95-window suffix and cannot be silently filled by replay.
+
+After v3 seals, run the three-campaign isolated earnings observer into a new
+fresh output with its externally observed completion digest. Production must
+also bind preceding v2 to the exact2e931f44 completion in170. A new v3 root
+cannot appear during observation and be silently ignored. Old profile
+body/metadata/row caps remain unchanged; only explicitly recognized v3 uses
+the new bounds. Bodies are HASHED ONLY, no financial decoding/credentials.
+
+Separately execute `ib-sharadar-cohort-2006q1-20261014-once` after clean commit,
+using the exact recovered original capture and94251ffd manifest from169.
+Read all TICKERS/ACTIONS metadata and rehash their full archives/member bytes,
+CRC/schema/row counts; FUNDAMENTALS is COMPRESSED-BYTE-HASHED ONLY, never
+decoded. Include and bind original manifest.sha256 sidecar. Keep no-follow
+ancestry and shared-locked single-link/private leaves held through output
+publication, including the fixed census; recheck hashes/versions/inventories.
+Worker network/fork denial and fresh-output-only writes are measured, not
+inferred. Parent reattaches both projections/assessment/completion, counts,
+actual scope and isolation flags. No account access, replacement download,
+financial value calculation, QC/native/outcome request or readiness promotion.
+
+### 171.2 Exact implementation/test bytes and verified corrections
+
+| Component | Source SHA-256 | Focused test SHA-256 |
+|---|---|---|
+| EODHD untouched-only v3 | 10aebc54366784002a8e29324f3364688fb01dfb5f6e57531379f2e75ca2c926 | 0ba1c951f3c11a3d13363d5be827ce5460c89f8a36df8fc124d2d5087fd70fc5 |
+| Extended earnings pure observer | 8e5b345f82e450f50032693cf346d175abd057e1ffad90243b61e82ac9c2f108 | 8fe33b1ba6425d1d529998ebdef2bef3596be5f50d06ced2cc62d263e03f14e1 |
+| Extended earnings isolated runner | 184ea32c42cea86ef23bbdfe9a7cf467217efc748afdbbd2ea4b33c06772822b | 9435747a4079288a9baa7deebb67373cab958f767c899054161a76c2ec2df156 |
+| Pure supplied-Sharadar cohort | 6b612308f4f12677feeffebbd7c43e274098b3b6d55644d766ab0d7fbc2d5616 | f49e72ee87031a2556e3f7db7f48d6f3e7c73cf2b5af059278ba2fa650a7bb18 |
+| Isolated supplied-Sharadar runner | 518808b14ef59d4bf980b176a19f7a4467f79b620753acf6ab7e7752c52c77f9 | 9239db510d7475e1d7e8e46587874a9eb7e6e6e27cd86f4a4d14259ffc5557a1 |
+| Pure2006Q1 parent locators | a06a50cbece09a141ad13c2bb486317af88cf155aceecb35aedcfb7a8d4786b1 | 53bed1d720dee729a4d6dfeaf43a12368f8bb073cfd3f6ab1e16a249dff959f5 |
+
+New source filenames are research/insider_buying_eodhd_earnings_continuation3.py,
+research/insider_buying_sharadar_reference_cohort.py,
+research/insider_buying_sharadar_reference_cohort_runner.py, and
+research/insider_buying_sec_2006q1_parent_locators.py. Earnings observer/runner
+are versioned schema extensions in their existing lane-owned files; this does
+not relabel the preceding170 run as having used the new bytes. No historical
+v1/v2 acquisition/frozen custody/stock implementation byte changed.
+
+The pure reference candidate independently recounts all six-form issuers,
+preserves exact versus casefold-only ticker candidates, table duplicates,
+competing CIK/permaticker/share-class and dated counterparty relationships.
+No name matching, automatic same-security merger or backdated current fact.
+Three genuine typed-count/Unicode failures were corrected before55 passes;
+main's explicit exact/casefold regression was then added (new source/test
+hashes above, not the preceding internal-QA image). Pure inputs prove metadata
+consistency only, not file custody or historical identity.
+
+Sharadar runner corrections: `IBSHARA-171-R01` P3 **CLOSED**, original sidecar
+misclassified as unexpected (valid fixture1 red0.43s, then74 passes1.01s).
+`IBSHARA-171-R02` P3 **CLOSED**, census-leaf changes during publication and
+fixture receipt accepted as actual (2 genuine red0.34s, corrected76 passes
+0.90s). Final actual/fixture root-exclusion checks and parent authority/count
+binding are included. Internal independent QA78 passes0.99s and two memory
+guard reversals2 red0.42s ->2 green0.04s refer to the prior pure byte image;
+main's final exact/casefold pure+runner78 passes0.53s use the table image.
+An invalid filename validation invocation ran0 tests, not a source/test
+failure. Main final reference/import/exact-guard129 passes2.73s preceded
+that last pure exact/casefold addition. A separate fixture-only OS probe
+observed network/fork/outside-write denial and fresh-output write success,
+without actual inputs or credentials. Actual execution is still absent here.
+
+V3 author309 focused checks7.86s; independent35 focused/exact-package5.16s,
+no actual provider/credential/paid-row read. Memory guards: disk2 red0.64s
+->2 green0.18s; predecessor anchor1 red0.59s ->1 green0.17s; producer metadata
+link1 red0.40s ->1 green0.40s. The true-path invented cadence probe measured
+start100.00, finish100.25, sleep1.00, next start101.25. Removing cooldown
+produced100.25/no sleep; final restoration returned101.25/sleep1.00. This
+independently exercises v3, not a claim that v2's tests validate copied code.
+
+Earnings extension108 focused/exact-package2.72s, then24 selected/83 deselected
+2.06s; genuine appearing-root omission1 red0.40s, corrected by repeated
+selection/custody checks. Locator233 focused/source/master/import/exact-guard
+4.57s, including56 new cases. Seven draft failures exposed date/form
+undercount, empty authority acceptance, inconsistent labels/dates and bool
+counts; corrected. Exposure bypass reversal6 red0.62s; ambiguous-alias
+tie-break2 red0.46s; source restored. Prior exposure is an externally supplied
+metadata input, **not** an executed operational journal bootstrap. Its <=4096
+prefix ceiling is engineering scope, not an owner-acquisition approval gate.
+No real2006 parent acquisition or canonical admission is claimed here.
+
+Main final integrated621 focused checks11.10s passed with network denial,
+minimal environment/isolated database/temp, plugins/cache/bytecode disabled:
+all affected source/reference/locator tests, record/active documents/import
+boundary and EXACT Insider package guard. In-memory compilation110 source
+files passed under network/all-write/fork denial; frozen stock digest remains
+c80ff4f585d59d1b8e4ecd0d6199605fee727de9df0a13b74e987fe4d2819f87.
+Historical four-file and stock Git comparisons to85c7755d were empty; diff
+checks passed. No complete lane/repository suite or strategy backtest ran.
+
+### 171.3 Continuing scope and next factual evidence
+
+QC credential presence was checked as BOOLEANS ONLY in the actual inherited
+environment: both QC_USER_ID and QC_API_TOKEN present. The deliberately empty
+env-i diagnostic reported false only for its minimal environment; it is NOT
+evidence that owner configuration was absent. No credential validity/tier/
+data entitlement is inferred and no QC request was made. The official API
+is the available future interface; do not rely on automated Safari controls
+when the published interface is available.
+
+Read current [QC terms](https://www.quantconnect.com/terms/) and
+[data-use documentation](https://www.quantconnect.com/docs/v2/cloud-platform/security-and-ip).
+Native reference/market-data inventories stay in QC. Normal-course strategy
+summaries and own order history have an explicit permitted-export provision;
+do not manufacture a blanket order-history prohibition. Extraction-oriented
+quote/reference ledgers are distinct. Keep third-party cloud-processing rights
+separate; token presence creates neither licence facts nor market-data export
+authority. No platform-native data was collected or exported in this review.
+Choose the actual compatible implementation after genuine source/identity
+inputs exist; a missing specific supplier right cannot be invented by
+delegated judgment, nor substituted with another approval checkpoint.
+
+Next: execute these two preregistered operations from clean committed bytes,
+independently observe their actual receipts, then continue real original-parent
+bootstrap/admission and economic historical-identity integration. Mechanical
+QC SID observation is distinct from historical economic-fact availability;
+do not require QC identifiers to have been publicly assigned in2006, or treat
+today's provider aliases/first-price dates as causal facts. All six P2s remain
+OPEN with exact earlier scopes/closures preserved. Original population/window,
+D23/v3 custody and both final non-retroactive access classifications remain
+binding. Shared/project records and SESSION_HANDOFF stay frozen. No readiness,
+outcome look, QC strategy launch, trading action, monitor rearm, other-chat
+message or successful push. The single final publication remains unconsumed.

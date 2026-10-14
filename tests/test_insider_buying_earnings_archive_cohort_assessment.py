@@ -57,7 +57,7 @@ def campaign(windows=m.SUPPORT_WINDOWS, *, schema="insider-eodhd-date-window-ear
     results, evidence = [], []
     count = len(windows) if refusal is None else refusal + 1
     for index, window in enumerate(windows[:count]):
-        v2 = schema == m.CONTINUATION_SCHEMA
+        v2 = type(schema) is str and schema in m.QUARANTINED_SCHEMAS
         projected = rows.get(window[0], []) if v2 else sorted(rows.get(window[0], []), key=lambda item: (item["report_date"], item["code"], item["fiscal_date"], item["source_row_ordinal"]))
         if v2:
             converted = []
@@ -142,6 +142,95 @@ def test_full_empty_acquisition_never_certifies_empty_issuer_coverage():
     assert not any(result["authority"].values())
     assert result["earnings_diagnostic_windows_sessions"] == [2, 5]
     assert result["earnings_used_for_execution_clock"] is False
+
+
+def three_campaigns(*, third_rows=None, third_refusal=None):
+    first = campaign(name="ib-eodhd-campaign-invented-v1", refusal=1,
+                     rows={"2005-12-01": [row("ABC.US", "2005-12-15")]})
+    second = campaign(m.SUPPORT_WINDOWS[2:], schema=m.CONTINUATION_SCHEMA,
+        name="ib-eodhd-campaign-invented-v2", registered="2026-10-13T00:02:00Z", refusal=150,
+        rows={"2006-02-01": [row("ABC.US", "2006-02-15")]})
+    third = campaign(m.V3_SUPPORT_WINDOWS, schema=m.CONTINUATION3_SCHEMA,
+        name="ib-eodhd-campaign-invented-v3", registered="2026-10-13T00:04:00Z", rows=third_rows, refusal=third_refusal)
+    return first, second, third
+
+
+def test_three_epochs_never_repair_two_attempted_refusals():
+    result = assess(three_campaigns(third_rows={"2018-09-01": [row("ABC.US", "2018-09-15", ordinal=0)]})).to_payload()
+    assert result["unavailable_windows"] == [["2006-01-01", "2006-01-31"], ["2018-08-01", "2018-08-31"]]
+    assert len(result["window_accounting"]) == 248
+    assert sum(item["status"] == "OBSERVED" for item in result["window_accounting"]) == 246
+    assert result["source_metadata_rows"] == 3 and len(result["campaigns"]) == 3
+    assert result["all_planned_acquisition_windows_observed"] is False
+    assert all(value is False for value in result["authority"].values())
+    assert result["earnings_diagnostic_windows_sessions"] == [2, 5]
+
+
+def test_v3_nullable_quarantine_and_fiscal_conflict_are_retained():
+    projected = row(None, None, ordinal=0, fiscal=None, timing=None, status="unknown")
+    projected.update(metadata_accepted=False, quarantine_reasons=["source_code_unknown", "source_report_date_unknown",
+        "source_fiscal_date_unknown", "source_timing_unknown", "current_provider_reported_status_unknown"])
+    result = assess(three_campaigns(third_rows={"2018-09-01": [projected,
+        row("ABC.US", "2018-09-15", ordinal=1)]})).to_payload()
+    assert result["quarantined_metadata_rows"] == result["rows_missing_provider_code"] == 1
+    assert result["source_metadata_rows"] == 4
+    assert result["cross_archive_conflicting_fiscal_periods"] == 1
+
+
+def test_v3_producer_metadata_hash_is_binding():
+    first, second, third = three_campaigns()
+    third = patch_window(third, 0, lambda body: body["receipt"].update(metadata_sha256="f" * 64))
+    with pytest.raises(m.EarningsArchiveAssessmentError, match="producer_metadata_hash"):
+        assess((first, second, third))
+
+
+def test_v3_scope_cannot_redispatch_prior_refusal_or_unattempted_context():
+    first, second, _ = three_campaigns()
+    third = campaign(m.SUPPORT_WINDOWS[152:], schema=m.CONTINUATION3_SCHEMA,
+        name="ib-eodhd-campaign-invented-v3", registered="2026-10-13T00:04:00Z")
+    with pytest.raises(m.EarningsArchiveAssessmentError, match="continuation3_exact_unattempted_scope"):
+        assess((first, second, third))
+
+
+def test_v3_global_campaign_observation_order_is_binding():
+    first, second, third = three_campaigns()
+    raw = json.loads(third.manifest_raw); raw["registered_at_utc"] = "2026-10-13T00:01:00Z"
+    altered = enc(raw)
+    third = replace(third, manifest_raw=altered, manifest_sha256=sha(altered))
+    complete = json.loads(third.complete_raw); complete["manifest_sha256"] = sha(altered)
+    third = replace(third, complete_raw=enc(complete), complete_sha256=sha(enc(complete)))
+    with pytest.raises(m.EarningsArchiveAssessmentError, match="campaign_observation_order"):
+        assess((first, second, third))
+
+
+def test_v3_partial_transport_refusal_preserves_remaining_unattempted():
+    result = assess(three_campaigns(third_refusal=0)).to_payload()
+    assert len(result["unavailable_windows"]) == 97
+    assert result["window_accounting"][153]["status"] == "REFUSED_OR_AMBIGUOUS"
+    assert result["window_accounting"][154]["status"] == "UNATTEMPTED"
+
+
+def test_v3_limits_do_not_broaden_old_profiles():
+    assert m.MAX_WINDOW_ROWS == 50_000 and m.MAX_JOURNAL_BYTES == 16 * 1024 * 1024
+    assert m.metadata_byte_cap(m.CONTINUATION_SCHEMA) == 16 * 1024 * 1024
+    assert m.body_byte_cap(m.CONTINUATION_SCHEMA) == 4 * 1024 * 1024
+    assert m.metadata_byte_cap(m.CONTINUATION3_SCHEMA) == 256 * 1024 * 1024
+    assert m.body_byte_cap(m.CONTINUATION3_SCHEMA) == 16 * 1024 * 1024
+    assert m.control_byte_cap(m.CONTINUATION3_SCHEMA) == 1024 * 1024
+
+
+def test_v3_row_limit_is_separate_and_old_row_limit_still_refuses():
+    rows = [{**row("ABC.US", "2018-09-15", ordinal=ordinal), "metadata_accepted": True, "quarantine_reasons": []}
+            for ordinal in range(50_001)]
+    receipt = {"body_sha256": "b" * 64, "sample_rows": len(rows), "reported_rows": len(rows),
+        "unknown_status_rows": 0, "timing_unknown_rows": 0, "metadata_accepted_rows": len(rows),
+        "quarantined_rows": 0, "all_rows_retained_in_source_order": True}
+    metadata = {"schema": m.CONTINUATION3_SCHEMA, "body_sha256": "b" * 64, "rows": rows,
+                "metadata_acceptance_is_source_coverage_or_identity_admission": False}
+    assert len(m._rows(metadata, receipt, m.V3_SUPPORT_WINDOWS[0])[0]) == 50_001
+    metadata["schema"] = m.CONTINUATION_SCHEMA
+    with pytest.raises(m.EarningsArchiveAssessmentError, match="metadata_row_accounting"):
+        m._rows(metadata, receipt, m.V3_SUPPORT_WINDOWS[0])
 
 
 def test_partial_first_campaign_continuation_cannot_fill_refused_january():

@@ -485,6 +485,11 @@ Section 291 is Claude's independent review of `ef654b1d..c7369649` (0 P0,
 0 P1, 0 P2, 1 P3): the three Codex commits of sections 289-290 are accepted,
 one after a test-only correction; the classifier inventory is verified
 source-complete; the host's second volume renumbering is recorded.
+Section 301 is Claude's independent review of `38e2b97a..9837049f` (0 P0,
+0 P1, 1 P2, 9 P3): all twenty-nine Codex commits of sections 292-300 are
+accepted, sixteen after a test-only correction that makes twenty-six new
+test files pass under the standard pytest invocation and hardens their
+isolation; two gaps remain to settle in the six-cell freeze.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE. Section 287 records the owner's explicit Massive-only
@@ -1665,6 +1670,11 @@ WAIT, never interference with another lane. The later "next checkpoint and
 push" instruction selects the completed storage recovery and documented result
 as this round's boundary, before any strategy launch. Exactly one final push
 is due at this checkpoint; no routine vendor/permission acknowledgment is needed.
+Section 301 is Claude's independent review of the exact pushed range
+`38e2b97a..9837049f` (sections 292-300). The immediate next step is that
+Codex counter-reviews section 301 and this round's two Claude commits, unless
+the owner explicitly changes this workflow; this is not an intermediate
+acknowledgement wait.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -1773,7 +1783,7 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 290 (sections 288 and 291); for section 250 the owner
+the pushed range through section 300 (section 301); for section 250 the owner
 directed focused checks without the complete suite. Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
@@ -3597,6 +3607,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-13–14 | Owner-reported 2GB upgrade and bounded storage recovery | `c555fb9d` -> `94a7bb36`, `2cdfbc6a`, `9e93d116`, `875dcb1f`, final section298 handoff (five commits) | Current owner review waiver, not independent acceptance; no new Claude range | V1 test/control isolation incident preserved and corrected prospectively; V2 listing refuses; D11 observes null listing/pagination; D12 records six HTTP200/APIfalse metadata refusals without absence/admission | Per-stage focused checks in298; final261-test selection and86-record repeats overlap earlier work; no full suite | ARV2I298-001 P1 corrected prospectively with historical effects retained; ARV2E297-014 remains OPEN; no upload or strategy attempt,314/239/50/699 unchanged | One final matching-lane push; monitor PAUSED; same-organization effective allocation/Storage Create facts needed before materially justified new recovery, no unchanged retry |
 | 2026-10-14 | Actual storage-error observation, V3 grammar refusal and owner-requested paused checkpoint | `e4e41af1` -> `ccc3efff`, `14d8c9a9`, this final section299 checkpoint (three commits) | No new Claude range or independent acceptance; scoped owner waiver and per-commit dispositions in299.9 | UI confirms effective2GB; D13 retains redacted missing-file reason; V3 refuses first exact-key grammar before any set; both spent; seven unfinished V4 files preserved with placeholder pins, no run freeze | Root499 distinct focused passes before V3 invocation; checkpoint compilation and record checks in299.9, not V4 functional validation; no full suite | ARV2D299-005 and storage admission remain OPEN; zero new strategy attempts;314/239/50/699 unchanged | Exactly one final matching-lane push requested by owner; QC remains paused for another lane until owner's all-clear; monitor stays PAUSED |
 | 2026-10-14 | Owner-resumed V4 storage correction and successful publication checkpoint | `c866592f` -> `bcc17ec3` and this final section300 result/handoff commit (two commits) | No new Claude review; scoped current owner waiver, not independent acceptance | Completed V4 exact-key grammar and dependency bindings; sole D15 exits0 with24dispatches, six sets and six exact readbacks, activation last; matching admission returned; no backtest launch | Root430 distinct focused passes12.54s, seven memory compiles,63selected pins; omission checks and limitations in300.2; document repeats not additive; no full suite | ARV2D299-005 and ARV2D300-001 corrected prospectively; ARV2E297-014's current storage barrier resolved, original cause still unknown;314/239/50/699 unchanged | Owner's next-checkpoint instruction: one final matching-lane push now; next separately freeze A1 continuation with actualexit/admission before capacity and six/eight runs; monitor PAUSED |
+| 2026-10-14 | Claude independent review of sections 292-300: Massive and provider diagnostics, October inputs, the six/eight family and the QC storage recovery | `9837049f` -> the test correction and this record commit | Section 301: twenty-nine Codex commits `38e2b97a..9837049f` disposed (13 accepted, 16 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells; no capture, diagnostic, upload, recovery or lifecycle command run | Test-only correction: a harness-independent dispatch-fence closure check replaces 27 assertions in 26 files (`ARV2R301-010`), tripwires in three files (`-002`) and six isolating tests (`-009`); no production code changed. Twenty-one code pins and the one-use report and claim pins reproduce; private modes and record hygiene checked; one P2 and nine P3s (`ARV2R301-001` to `-010`); accepted `ARV2CR292-001` to `-004`; section 4 names section 301, banner sentence added, this row appended | The 38 new and changed test files under both the standard invocation and `--noconftest`, and the record gates, under a sandbox that also refuses `/usr/bin/security` and artifact writes, with in-root temporary paths; `compileall`, artifact and status integrity, `git diff --check`; the complete lane suite was stopped unfinished at the owner's direction; exact counts in 301.6 | 0 P0, 0 P1, 1 P2, 9 P3 | Single push of this round's two Claude commits; Codex counter-reviews section 301 unless the owner changes the workflow |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -49786,3 +49797,263 @@ diagnosis/recovery, not an unchanged retry or advancement to the next cell.
 No preparation, organization discovery or upload is repeated. No routine
 access acknowledgment or vendor switch is needed; the current pause monitor
 does not authorize or automatically launch this next checkpoint.
+
+## 301. Independent Claude review of sections 292–300: the Massive and provider diagnostics, the October inputs, the six/eight family and the QC storage recovery, 2026-10-14
+
+**Range reviewed:** `38e2b97a..9837049f`, twenty-nine Codex commits: the
+counter-review of section 291 and the October-12 Massive caller (292–293),
+the two owner-waived Massive diagnostics (294–295), the four-provider
+Keychain integration and its three connection checks (296), the rating-only
+October acquisition, its retained-source recovery, the prepared six/eight
+family and the refused QC upload with its diagnostics (297), the storage
+upgrade, the V1 test-isolation incident and the listing and metadata
+diagnostics (298), the storage-error observation, V3 and the owner's pause
+(299), and V4 with the successful storage publication (300). Each commit is
+disposed of in 301.1. No Claude commit is in the range; this round's two
+Claude lane commits are the test correction `7d4b6a71` and this record
+commit, neither in that range.
+
+**Zero research looks, development evaluations, infrastructure looks, and
+authenticated cells in this round.** This review made no provider,
+QuantConnect, mail or browser request. It did not run any capture,
+diagnostic, preparation, upload, recovery or lifecycle command, read no
+Keychain item, environment credential or token file, and read no private
+capture row; it hashed retained one-use reports and claims and listed control
+file names and sizes. Every pytest process ran under a strict sandbox that
+also refused execution of `/usr/bin/security` and any write under the
+operative root's `artifacts/` (301.6). **At the owner's direction the
+complete lane suite was not run**: it was started, then stopped on that
+instruction before any group finished, and the focused files of the range
+ran instead (301.6). The floor stays
+**314 / 239 / 50 / 699**: no begun attempt, create intent or result exists for
+the six-cell family.
+
+**Verdict.** All twenty-nine Codex commits are accepted, sixteen of them
+after a test-only correction; none is rejected. **0 P0, 0 P1, 1 P2, 9 P3.**
+The P2, `ARV2R301-010`, is that twenty-six of the range's new test files
+fail or error under the repository's standard pytest invocation, because
+they assert that the dispatch fence is not imported while the shared
+`tests/conftest.py` imports it for every test; Codex's `--noconftest` runs
+hid this. It is corrected in `7d4b6a71` with a harness-independent import
+closure check, as are the incident-class tripwire gaps and six of the
+untested guards. Every recorded code pin and every one-use report
+and claim pin sampled reproduces, the new private leaves are 0700 with 0600
+files, and the added record lines carry no credential, email or raw account
+identifier. The diagnostics are bounded, one-use and redacted as recorded;
+the twelve pre-use corrections Codex found itself, including the two
+pre-launch P1 runtime defects of 297.12 and the P1 test-isolation incident of
+298.2, are handled honestly and corrected prospectively. Codex's four
+qualifications of section 291 are accepted (301.3). The nine P3s concern the
+evidence tree, the incident-class test exposure (corrected in the tests),
+two robustness and authority gaps that matter for the coming six-cell run,
+three hardening or provenance gaps, untested guards (partly corrected), and
+one process point about the owner's browser session. Code-level fixes in
+hash-pinned sources are specified for Codex rather than made in place: those
+files are bound into the prepared family and the D15 admission (301.5).
+
+### 301.1 Per-commit disposition
+
+| Commit | What it is | Disposition | Basis |
+|---|---|---|---|
+| `52542bb0` | Section 292: counter-review of 291 and the Massive diagnostic scope | accepted | Both Claude commits are disposed of correctly; the four qualifications are justified (301.3). |
+| `fb8c87ad` | Section 293: the bounded October-12 Massive caller and tests | accepted after correction | Caller pin `137743f3…` reproduces; one adapter invocation, claim before contact, finite observation. It passes the parent environment through unchanged (`ARV2R301-005`). Its test file is corrected in `7d4b6a71` (`ARV2R301-010`). |
+| `d9a3b89a` | Section 294: the owner-waived one-shot freeze and its output reader | accepted | The owner's "proceed without review" is quoted and scoped; the freeze precedes the run. |
+| `032c81e2` | Section 294 result: the spent `http_status` refusal | accepted | Report and claim pins reproduce; no capture is claimed. |
+| `5a80c284` | Section 295: the HTTP-status diagnostic and its freeze | accepted after correction | At most three body-unread requests, stop at the first non-200, key-log refusal, finite output. Its test file is corrected in `7d4b6a71` (`ARV2R301-010`). |
+| `ec036238` | Section 295 result: ratings 200, earnings 403 | accepted | Pins reproduce; the 403 is recorded without an inferred cause. The legacy token-file location is recorded (301.3). |
+| `fadb20f8` | Section 296: Keychain provider checks and the A freeze | accepted after correction | Fixed four-item allowlist, key never in argv or a child environment, every failure collapsed to a fixed code, claim before key. `ARV2R301-006` is documented. Its test file is corrected in `7d4b6a71` (`ARV2R301-010`). |
+| `a8d63ff0` | Section 296: the credential-only B diagnostic and its freeze | accepted after correction | No provider call; finite return-code and shape categories only. Its test file is corrected in `7d4b6a71` (`ARV2R301-010`). |
+| `43e7ba82` | Section 296: the six undispatched product checks (C) and freeze | accepted after correction | Fixed seven origins, verified TLS, no redirects, retries, proxies or bodies; four providers verified on samples, two Massive 403s retained. Its test file is corrected in `7d4b6a71` (`ARV2R301-010`). |
+| `21613bce` | Section 297: the rating-only October acquisition and the six/eight scope | accepted after correction | Fixed endpoint and window, 16-page and byte caps, credential-echo refusal in four encodings, network-denied authentication worker. Its test file is corrected in `7d4b6a71` (`ARV2R301-010`). |
+| `38135de5` | Section 297: the refused acquisition and the D3 diagnosis freeze | accepted after correction | Original refusal retained; D3 reports a finite exact code. Its test file is corrected in `7d4b6a71` (`ARV2R301-010`). |
+| `9156f507` | Section 297: matched inputs groundwork and the D4 duplicate characterization | accepted after correction | D4's census (3,261 rows, one byte-identical repeat in one page) is the basis of the narrow V2 rule. Its test file is corrected in `7d4b6a71` (`ARV2R301-010`). |
+| `66c65999` | Section 297: the retained-source V2 and the D5 October preparation freeze | accepted after correction | V2 admits a repeat only on identical canonical row bytes and an exact pinned census; anything else refuses the whole source. `ARV2R301-007` is documented. Its test file is corrected in `7d4b6a71` (`ARV2R301-010`). |
+| `4053414e` | Section 297: the corrected six-cell runtime and the D6 preparation freeze | accepted after correction | The two pre-launch P1s of 297.12 (midnight split history, the 09:31 subscription race) are corrected before any QC contact; prior-close NAV sizing is recorded as a new explicit choice. Its test file is corrected in `7d4b6a71` (`ARV2R301-010`). |
+| `a344f70a` | Section 297: the prepared family and the D7 bounded QC freeze | accepted | One-attempt protocol, ordered cells, own-project checks, wait on occupied capacity. `ARV2R301-003` and `-004` are documented. |
+| `712e81b2` | Section 297: the refused upload and the D8 marker diagnosis freeze | accepted after correction | No capacity, project or launch followed the refusal; two parser limitations recorded. Its test file is corrected in `7d4b6a71` (`ARV2R301-010`). |
+| `68b1cb39` | Section 297: the D8 census and the D9 metadata freeze | accepted | One read-only call; finite output only. |
+| `0051adaa` | Section 297: the negative D9 observation and the bounded UI check | accepted | The UI decision is Codex's own (`ARV2R301-008`). |
+| `c555fb9d` | Section 297.20: the handoff at the unresolved storage refusal | accepted | Record-only; the barrier is stated, not routed around. |
+| `94a7bb36` | Section 298: the storage recovery V1 and the test-isolation incident | accepted after correction | The incident is self-reported, V1 is spent, its 935-byte report pin reproduces, and the tests now bind both import paths and use tripwires (`ARV2R301-002`). Its test file is corrected in `7d4b6a71` (`ARV2R301-010`). |
+| `2cdfbc6a` | Section 298: the guarded V2 and its freeze | accepted after correction | Mandatory host, root, branch, HEAD and blob gate before any directory access, plus a pytest refusal. Its test file is corrected in `7d4b6a71` (`ARV2R301-010`). |
+| `9e93d116` | Section 298: the V2 result and the D11 listing-shape freeze | accepted | One read-only listing; shape labels only. |
+| `875dcb1f` | Section 298: the D11 result and the D12 exact-key metadata freeze | accepted | Six read-only properties calls; no write. |
+| `e4e41af1` | Section 298 result: six negative observations and the external barrier | accepted | Record-only. |
+| `ccc3efff` | Section 299: the bounded storage-error observation with redaction | accepted after correction | One call; only a redacted public-vocabulary rendering kept. Its test file is corrected in `7d4b6a71` (`ARV2R301-010`). |
+| `14d8c9a9` | Section 299: the properties-first V3 and its freeze | accepted after correction | Absence only through whole-string templates on the exact key; no list, get or delete. Its test file is corrected in `7d4b6a71` (`ARV2R301-010`). |
+| `c866592f` | Section 299: the owner-requested pause and the unfinished V4 draft | accepted after correction | No QC request after the pause; placeholder pins keep the drafts unrunnable. Its test file is corrected in `7d4b6a71` (`ARV2R301-010`). |
+| `bcc17ec3` | Section 300: the completed V4 and the D15 freeze | accepted | Pins of 300.2 reproduce; the two added templates match the observed fifteen-character prefix class; the dependency-closure omission was corrected before use. |
+| `9837049f` | Section 300 result: the verified storage admission | accepted | Report `c4db9fb8…` and admission `1a6850a8…` reproduce; no capacity, project or launch followed. |
+
+### 301.2 Findings
+
+| ID | P | Introduced by | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R301-010` | P2 | the sixteen commits marked in 301.1 | Twenty-six new test files assert `"assistant.dispatch_fence" not in sys.modules`, twenty-seven assertions in all, several inside autouse fixtures. The shared `tests/conftest.py` imports `assistant.dispatch_fence` in an autouse fixture for every test, so under the repository's standard invocation those files fail or error: two sample files gave **1 failed, 183 passed, 55 errors**. Codex validated only with `--noconftest`, which hides this and also skips the shared fixture that isolates the execution runtime stop and permits. The standing lane suite and the repository's CI would therefore be red once these files run normally. A related guard in `test_newrule_operation.py` raised `TypeError` when the conftest's teardown called `__import__` with `fromlist=None`. | Corrected in `7d4b6a71`: the new helper `tests/analyst_revisions_v2/_dispatch_fence_closure.py` checks the static import closure of the lane modules actually loaded, which is what the assertion meant, independently of what the harness imported; all twenty-seven assertions call it, the import guard accepts `fromlist=None`, and `test_dispatch_fence_closure.py` proves the helper finds the fence through `risk.execution_gate` and finds no path from the lane modules. Shared files are unchanged. |
+| `ARV2R301-001` | P3 | `21613bce` to `94a7bb36` (validation practice) | Forty-eight pytest temporary directories, about 2,970 files, sit directly inside the real lane artifact root, for example `.ratings-offline-tests.6Hi98S/pytest` and `.recovery-continuation-tests.kqWtp8/pytest`, created between 16:44 and 18:40 local on 2026-10-13 by Codex's own launchers; no repository code names them, and later runs moved to `.pytest_cache`. They mix synthetic test files, including claim-like names, with private evidence, and any whole-tree census or hash such as R272's would include them. | Documented for Codex and the owner. Nothing was deleted. A recorded decision should move them out with an inventory, or exclude them by name from any future census; keep every pytest temporary path under `.pytest_cache`. |
+| `ARV2R301-002` | P3 | `94a7bb36` onward | The incident class of 298.2 is narrowed, not closed. Protection of the real artifact tree exists only in Codex's launch profile, not in the tests: `test_newrule_submission.py` and `test_newrule_operation.py` have no autouse tripwire on the real client, directory or sockets, and `test_newrule_upload_diagnostic.py` has no teardown check for a swallowed guard. The V1 `claim()` and the D8 and D12 preflights lack the pytest and host gate the V2–V4 helpers have. No current test reaches a real path (reading, and the protected focused run in 301.6 completed with no artifact write). | Corrected in the tests in `7d4b6a71`: the three files now have autouse tripwires on the real control directory, the real client, the production client and transport, and sockets, with a teardown that fails on a swallowed guard, and each has a regression test that fails without its tripwire. The spent V1, D8 and D12 helpers are hash-pinned and stay unchanged; any successor operational helper should carry the pytest refusal. |
+| `ARV2R301-003` | P3 | `4053414e` | In `begin`, `compile` and `launch`, `_next` counts only `<stem>-NNN-intent.json`, while the project and file sub-requests write `<stem>-NNN-project-intent.json` and `-files-intent.json`. If one of those raises, the next call reuses the same NNN and fails on the exclusive create; the attempt's claim never gets a terminal file, and `_active` then blocks every other cell. This fails safe, with no remote effect, but a single transient read failure would stop the six-cell run with no recovery path. | Documented for Codex. The source is pinned by the prepared family, so resolve it in the lifecycle freeze: count every sub-request marker in the poll index, or write a terminal on sub-request failure, or record the manual recovery decision in advance. |
+| `ARV2R301-004` | P3 | `a344f70a`, `bcc17ec3` | `scripts/run_arv2_newrule_comparison.py` can still run `compile`, `launch`, `status` and `read` for A1 without the V4 admission check or the continuation caller's blob binding. It cannot begin an attempt, so it acts only on attempts begun through V4; the V4 continuation also checks admission in one session and delegates in another. | Documented for Codex. The lifecycle freeze should name the V4 continuation caller as the only permitted entry point for every lifecycle action. |
+| `ARV2R301-005` | P3 | `fb8c87ad` | The R293 caller passed `dict(os.environ)` to its capture worker, and neither it nor the frozen adapter checks `SSLKEYLOGFILE` or HTTP debug logging, which R295 and the later callers refuse. The record does not say R293 ran without that guard; R295's presence check passed about 38 minutes later, which suggests but does not prove the variable was unset. | Documented. R293 is spent; any future use of the baseline adapter needs the key-log guard and a sanitized environment. |
+| `ARV2R301-006` | P3 | `fadb20f8` | The Keychain transport's logging guard accepts a requests or urllib3 logger with no handlers at all, because `all()` over an empty list is true and WARNING records are allowed; it relies on urllib3's import-time `NullHandler` to keep a key-bearing request URL out of `logging.lastResort`. urllib3 itself is not pinned (the shared `requirements.txt` pins only requests). Stderr is discarded by the recorded launches, so nothing is known to have leaked. | Documented for Codex. Require a level above WARNING or a non-null handler in the chain; the urllib3 pin is a shared-file matter, documented only. |
+| `ARV2R301-007` | P3 | `66c65999` | The D5 caller's thirty-three source pins omit `data/exchange_calendar.py` and `accepted_risk_preliminary_rating_evaluator.py`, both imported by the October package; they build the extended session axis and the contribution records. Neither file has changed since 2026-09-16 or earlier, so D5 was in effect bound to the reviewed versions. | Documented as a provenance qualification of the prepared package; add both pins to any successor. |
+| `ARV2R301-008` | P3 | `0051adaa` | In 297.19–297.20 Codex drove the owner's signed-in Safari QuantConnect session on its own delegated decision, after the owner had only asked where to check. Opening the reference project triggered an automatic coding-environment request, a remote effect, while another lane's project tab was open. The later navigation of 299.1 followed an explicit owner request. | Documented for Codex and the owner. Use of the owner's signed-in browser sessions should rest on an explicit owner instruction recorded verbatim, and should avoid pages that start cloud resources. |
+| `ARV2R301-009` | P3 | across the range | Guards no test isolates, by reading: the R297 capture's per-page claim recheck; distinct per-provider keys, a refused request preparation, and C's real request path in the provider-check tests; a second `launch_compiled` producing no second create, the `files/delete` gating, `_active(exclude=...)` and the new-project ownership check in the submission tests; and the `minimum_position` and fresh-collision wiring in the October package build. No mutation trial was run this round. | Partly corrected in `7d4b6a71`: tests now isolate the R297 per-page claim recheck, distinct per-provider keys, a second launch producing no second create, and the `files/delete` gating by name and by duplicate, and each fails when its guard is removed in memory (301.4). The two-file count bound is implied by the name and duplicate checks and cannot be isolated. The refused request preparation, C's real request path, `_active(exclude=...)`, the new-project ownership check and the October package wiring remain for Codex. |
+
+### 301.3 Codex's findings against Claude's section 291, and what this review checked
+
+**Codex's qualifications are accepted.**
+
+- **`ARV2CR292-001` (P3) is accepted.** Section 291 hashed all 1,883 artifact
+  files while saying no private capture artifact was read. Hashing reads
+  bytes; the narrower claim is that no capture row was decoded. This round
+  words its own reads that way.
+- **`ARV2CR292-002` (P3) is accepted.** The review's logs and mutation plugin
+  sit outside the root; only pytest's temporary paths were inside.
+- **`ARV2CR292-003` (P3) is accepted.** The device and boot observation is
+  host evidence reported by Claude, not authenticated provenance, and does not
+  prove the reboot caused the renumbering.
+- **`ARV2CR292-004` (P3) is accepted.** "Last complete run" meant the last
+  cited Mac run, and "source-complete" meant the 145 literals and 30 formatted
+  expansions, not every forwarded exception.
+
+**What this review checked.**
+
+1. **Authority.** Each operational round quotes the owner's direction: the
+   two "proceed without review" waivers of 294 and 295, "proceed wihtout
+   claude review for now" with "configure the connections and check that they
+   work. then proceed to the next backtest" (296), the six/eight choice and
+   "2026" window (297.3), the 2 GB upgrade (298.1), "find the actual QC storage
+   error and fix it" (299.1), the pause (299.9) and the corrected resumption
+   (300.1). Each freeze precedes its run in commit order. The browser use of
+   297.19 is the exception noted in `ARV2R301-008`.
+2. **Credentials.** The four Keychain items are fixed; the key reaches only
+   the consuming process through a pipe, never argv or a child environment;
+   every failure is a fixed code raised `from None`; output is fixed or finite
+   JSON; response bodies are dropped and non-200 bodies are never read. The
+   record names the legacy EODHD token file's location in the Insider lane's
+   private artifacts; the token itself is not recorded and the file was not
+   opened. With the key now in the Keychain, whether to remove that plaintext
+   file is the owner's decision.
+3. **Provider and QC scope.** Every request goes to a fixed origin and path
+   with verified TLS, no redirects, retries or proxies, and bounded sizes and
+   deadlines. QC operations are limited to the endpoint allowlist; Object
+   Store writes go only to the six keys pinned by the inventory hash, after two
+   absence observations, and a mismatching present object refuses rather than
+   being overwritten; `files/delete` can remove only `research.ipynb` in a
+   project created in the same call. `backtests/create` is reachable only after
+   a compile receipt and free capacity, once per attempt, and has not been
+   called.
+4. **The October inputs.** The pre-open scorer admits contributions eligible
+   strictly before the 09:20 cutoff, keeps their original eligibility indices
+   for decay and uses current memberships; Codex's own tests catch `<=` and
+   skipped-index mutants by reading. The V2 duplicate rule is narrow: only
+   byte-identical repeats of the whole canonical row within one page collapse,
+   against an exact pinned census. The sizing uses prior after-close NAV and
+   prior RAW closes times same-day split factors, with orders on non-fill-forward
+   09:31 prices.
+5. **The incident of 298.2.** The record is accurate: the fixture replaced
+   only `sys.modules`, the real V1 helper then wrote its claim, start and
+   935-byte report into the real family directory with fixture head and
+   caller values, and refused before any credential or request. V1 is spent
+   and its files are retained; their names, sizes and the report pin
+   `d4a7abda…` reproduce.
+
+### 301.4 What this review reproduced
+
+- **Code pins.** All twenty-one sampled pins of 293.3, 296.6, 296.8, 297.7,
+  300.2 and the D5 caller reproduce, including V4 `c77e1e8b…`, `36d34915…`,
+  `1bfc5810…`, `49624d64…` and their tests.
+- **One-use evidence.** The claims and reports of R293, R295, R296 A, B and C,
+  and R297 A match their record pins; R297 D3, D4 and D5 match their report
+  pins (their claims have none recorded). The family directory holds the V1–V4,
+  D8, D9, D11, D12 and D13 controls as recorded; D15's report and admission
+  match `c4db9fb8…` and `1a6850a8…`. No attempt claim, create intent or launch
+  file exists. Every new private directory is 0700 and every file 0600.
+- **Record hygiene.** The 4,496 added record lines contain no email, personal
+  name, key-like string or raw account identifier; the only paths outside the
+  lane are the login Keychain and the legacy token file.
+- **Corrections, verified.** Each new isolating test was run with its
+  guard removed in memory, under the protective sandbox: removing the
+  exclusive backtest-create intent, the fresh-file name check, the duplicate
+  check, the per-page claim recheck or the per-provider key reload each makes
+  its new test fail; removing the two-file count bound does not, because the
+  other two checks already refuse every such shape. Each new tripwire has a
+  regression test that fails when the tripwire is absent.
+- **Agents.** Four read-only advisory agents read the Massive, provider,
+  QC-storage and October-input code statically; every finding above that rests
+  on their reading was checked against the source by this reviewer, and the
+  two speculative ones (an alarm stranding R295's report, a triple-signal
+  traceback path) are not recorded as findings.
+
+### 301.5 Suggested next steps
+
+1. **Codex counter-reviews this section.**
+2. **Validate the standard way.** Run lane tests with the shared conftest,
+   as the repository and CI do, in addition to any `--noconftest` isolation
+   run; `ARV2R301-010` shows a `--noconftest`-only discipline can leave the
+   lane suite red.
+3. **Before the six-cell lifecycle freeze**, decide `ARV2R301-003` and
+   `ARV2R301-004` in that freeze, in a versioned successor rather than by
+   editing the hash-pinned submission module, and add the `ARV2R301-005` and
+   `ARV2R301-006` guards to any successor transport; then run R298–R303 A1 in
+   order as 300.5 prescribes, waiting on occupied capacity without touching
+   other lanes.
+4. **Owner decisions**, none blocking: the temporary directories inside the
+   artifact tree (`ARV2R301-001`), the legacy plaintext EODHD token file, and
+   explicit authority for any use of the signed-in browser (`ARV2R301-008`).
+5. **Everything downstream stays as recorded:** the formal trust roots remain
+   empty, the Massive 403s and the current-vintage qualification remain, and
+   no paper or live action is authorized.
+
+### 301.6 Validation
+
+Every check ran from the operative root
+`/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2` with
+`~/.venvs/trading_agent-py313/bin/python` (3.13.15). Each pytest process ran
+under `(version 1)(allow default)(deny network*)(deny process-exec (literal
+"/usr/bin/security"))(deny file-write* (subpath "<root>/artifacts"))`, with
+`TMPDIR` and `--basetemp` under the root's ignored
+`.pytest_cache/claude-review-301`. Before use, a probe under that profile
+confirmed that a write and a `mkdir` under `artifacts/` fail with `EPERM`,
+artifact reads and in-root temporary writes succeed, executing
+`/usr/bin/security` fails with `EPERM`, and a connection to the reserved
+address `192.0.2.1` fails with `EPERM`.
+
+| Check | Scope | Result |
+|---|---|---|
+| Complete lane selection | 16,414 collected tests | **not run, at the owner's direction**: started under the protected profile, then stopped on the instruction before any group finished; no result is claimed |
+| Accidental default collection | a batch-splitting error passed no file arguments, so three pytest processes began pytest's default collection | stopped within minutes, before any finished; no result is claimed and no artifact file was added |
+| The new and changed test files of the range plus `test_dispatch_fence_closure.py`, standard invocation (shared conftest) | 38 files (the range's 37 and the new one) in three batches, after the correction | **4094 passed, 2 failed, 0 skipped**; the two failures are the `[authenticate]` cases of `test_real_tiny_child_fd_and_discarded_noise` and `test_real_synthetic_child_fd_transport_and_noise_discard`, which start their own `sandbox-exec` child and cannot run nested inside this review's sandbox (a host limitation, not a defect) |
+| The same 38 files, `--noconftest` with plugin autoload disabled (Codex's invocation) | after the correction | **4094 passed, 2 failed, 0 skipped**, the same two nested-sandbox failures |
+| Before the correction, standard invocation | `test_october_order_package.py` and `test_newrule_storage_recovery_v4.py` | **1 failed, 183 passed, 55 errors**, every error the dispatch-fence assertion |
+| Mutation trials of the new tests | six in-memory guard removals, as in 301.4 | five fail their test; the count bound is implied, as stated |
+| Pins, retained evidence, modes, record hygiene and the confirmed findings | as in 301.3 and 301.4 | as stated there |
+| Record gates on the final record bytes | `test_lane_record_integrity.py` and `test_active_document_consistency.py` | **86 passed** |
+| `python -m compileall -q` | the standard package list plus `research/analyst_revisions_v2_qc` | clean |
+| Worktree integrity across the checks | `artifacts/analyst_revisions_v2` and `git status --ignored` | every one of the 5422 files under `artifacts/analyst_revisions_v2` has the same SHA-256 before and after the checks, and `git status --ignored` is unchanged apart from `__pycache__` and the test correction |
+| `git diff --check` | final tree | clean |
+| `git status --short --branch` | after this round's commit | clean; published in this round's single push |
+
+### 301.7 Carried-open findings
+
+| ID | P | Status |
+|---|---|---|
+| `ARV2R301-010` | P2 | Corrected in `7d4b6a71` (301.2). |
+| `ARV2R301-002` | P3 | Corrected in the tests in `7d4b6a71`; successor helpers should add the pytest refusal. |
+| `ARV2R301-009` | P3 | Partly corrected in `7d4b6a71`; the remaining guards are listed in 301.2. |
+| `ARV2R301-001`, `-003` to `-008` | P3 | Documented for Codex and, where stated, the owner (301.2). |
+| `ARV2CR292-001` to `-004` | P3 | Accepted (301.3). |
+| `ARV2D295-001`, `ARV2D296-002` | P2 | Open (Codex's): the Massive earnings and guidance 403s. |
+| `ARV2D294-001`, `ARV2D297-007`, `ARV2D297-013`, `ARV2D297-014` | P2 | Retained as recorded; `-007` and `ARV2E297-014` resolved prospectively by V2/D5 and V4/D15 only. |
+| `ARV2I298-001` | P1 | Self-reported and corrected prospectively by Codex; residual exposure in `ARV2R301-002`. |
+| `ARV2D287-001` | P2 | Open; the R287 reason is unrecoverable. |
+| `ARV2R281-001` | P3 | Open design limitation. |
+| `ARV2R248-002`, `ARV2R248-003`, `ARV2R248-004` | P2 | Open; partly reconciled by sections 255–257. |
+| `ARV2R196-001` | P2 | Open; the historical AR effect has the same two-year signature in every family. |
+| `ARV2D212-001` | P2 | Clock mechanism resolved by R279; forward input readiness and vendor availability remain open. |
+| `ARV2CR185-001`, `ARV2CR187-001`, `-003`, `ARV2D188-001` | P2 | Open as recorded. |
+| Earlier P3s through section 291 | P3 | Corrected, accepted or closed, as recorded. |
+
+The final tree differs from the pushed head `9837049f` only by the test
+correction `7d4b6a71` and this record commit.

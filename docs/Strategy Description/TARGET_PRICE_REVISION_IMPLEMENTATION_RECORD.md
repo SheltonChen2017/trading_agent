@@ -21188,3 +21188,82 @@ accepted, executed or ported. Only independently proved guard restoration
 can be ported to named lane successors with focused negative tests; originals
 stay immutable. If no edit is possible, retain actual blocker and safe checks.
 OFF3/ON0/looks30/frozen strategy and remaining native-accounting gates stand.
+
+### 89.4 Exact proposal, source preflight and explicit edit-side-effect scope
+
+GUARD-RESTORE001 stopped BEFORE UI/message/effect because an inherited
+allowed-surface string still said read-only while the new field allowed main
+repair. Access4774/fa1faccf6afffa1fca7fc178d88c0383c8fdfb55b06b385dd662c71dfa518405,
+created01:19:25.706707Z; STOPPED_MANIFEST_CONFLICT receipt950/
+e8fcda00c0385dee4c60825593b8e0c60240daff0d7681a3343e1d5b46aa212a.
+Separately identified corrected GUARD-RESTORE002 atf47a5d11 had access4771/
+6f14382bfcbe46a7805591f80f03ff08de9c9df755b47d977906200b0e28ce4f,
+created01:19:48.858798Z. One exact repair-PROPOSAL prompt submitted, no
+approval/edit/job.14AX/2screenshots/9actions; receipt1279/
+0c1207db5c03f723e79b2483236d56636329e39e8cad1b4c5bbbebc4ec57cec4.
+A JS undefined-binding attempt had0UI effects. Safari changed active tabs
+during wait; stale generic-title tab recovery resolved another project URL.
+Root stopped immediately without reading that project's body or acting there.
+Do not repeat generic-tab guessing; exact URL metadata search is the successor.
+Opening own project showed an incidental successful auto-build49395e-b18f02,
+engine18179/unzoned1:20:38, not a requested compile/job or full compile ID.
+
+New REPAIR-TAB-LOCATE001 only allowed Safari tab URL metadata and exact own
+Mia task/proposal, no message/approval: access4436/
+8688e8ab78e07413d593d2f82aca67331e412cf1694e79f6ff4a2d5b28562806,
+created01:25:32.001788Z;13AX/1screenshot/7actions; receipt1249/
+5a51a294cc0c6f2404ba7331d63a29bce1117c9c74aa3d4aeb4b1a661b5295fc,
+closed before600seconds. Safari Search Tabs exact37650980 resolved only
+matching tabs, then actual own URL verified. The genuine Mia task
+"Strip miarescale miadiag raw weight restore audit guard" reached Completed
+with FOUR proposed main-only edits, no edits applied: remove two imports,
+delete11-line previous-total normalization block, restore universal original
+mark clock refusal, and remove the added "stale":accepted RAW mark field.
+The original RAW mark schema lacks that extra field. Unused initialized
+_stale_mark_delisting_acceptances remains for historical preservation; zero
+in an unwritten counter is not measured exception evidence. Mia's statement
+that False after a strict passed guard would necessarily be fabricated is
+not adopted: a passed gate establishes non-staleness. Removing the unaccepted
+field is chosen because it restores the original schema, not that assertion.
+No unit/correction/provider-support/raw native cause is newly proved.
+
+SOURCE-POST008 is fresh post-proposal/PRE-approval concurrency verification,
+not an already applied repair. Atf47a5d11, created01:36:17.929345Z/15minute
+expiry, plan67c76a58bb03172b0e8a42260f91190f1cb96018493d5bdced981d1d9df33c94,
+two own reads/504020wirebytes/230180declared baseline bytes. ALL15files stable
+and identical by content hash to007/006/005; main still60796/f42320ef.
+Read2archive250129/c2115e4950f4e37f5ec0c1953ec5c539898a07210b65c576a677e1637a2084ca,
+delta151185/3127ecffa93f941093affb33aa92025c75d9b878201e9415dd98f8c441bb649d,
+receipt9084/baf300eb6b65ed87e96e6480b0302a187a109a0bd463348a1b97340ab35b8903.
+No strategy looks/attempts or source effects occurred. All stopped/failure
+receipts remain immutable; controllers released before subsequent operations.
+
+TPR-EXT26-D102 (agent-delegated; independent review pending): approve only
+the four independently verified frozen-guard/schema-restoration edits in
+genuine Mia's existing own task. NEW
+TPR-EXT26-MIA-GUARD-RESTORE-APPROVE-20261013-001 at next committed HEAD with
+fresh15minute access/claim/controller;1approval prompt, <=24AX/4screenshots/
+12pane actions/600seconds. Expected source preflight008 above must remain
+fresh; main SHA f42320ef and all other14files are concurrency preconditions.
+Only main.py may change; prefer one atomic save, at most4 bounded saves if
+the built-in tool requires individual edits, no automatic retry. The tool's
+unavoidable on-save syntax builds are now EXPLICIT prospective Mia-owned
+effects (at most4), not manual Codex compiles, strategy jobs, research looks
+or OFF allowance resets. Retain each observed build/failed/unknown result
+and do not label unknowns zero. No backtest/optimization/notebook/history/
+provider/data-input/object/account/purchase/delete/broker effect; no control
+takeover or overwriting another active writer. If source/control differs,
+stop/wait. Existing unused hook files and every original source/result remain
+preserved. Removing the unaccepted extra field restores frozen schema; no
+new economics/valuation convention is introduced or automatically accepted.
+
+Fresh SOURCE-POST009 after that scope uses the unchanged two-read collector,
+same baseline003 exact230180bytes/16files/8MiB/120seconds. Capture EVERY
+cloud file/diff; compare with008 content hashes, independently verify only
+the four permitted main changes, and reject unrelated edits. Guard-source
+fixture tests are agent-delegated to a new focused test file against immutable
+original successor functions, not production/candidate modifications or a
+full suite. A local named port follows only after verified cloud correction;
+original executed modules/bundles remain immutable. Native invalid-row/mark
+diagnostics or a genuine Mia run need separately frozen source/instrumentation/
+operation/look BEFORE effect. Full-window OFF acceptance and ON0 gates remain.

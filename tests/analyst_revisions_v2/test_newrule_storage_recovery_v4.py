@@ -1,5 +1,6 @@
 """Synthetic six-object protocol; production artifacts and network stay denied."""
 import copy
+import ast
 import hashlib
 import io
 import json
@@ -393,6 +394,7 @@ def test_caller_refused_preflight_never_imports_or_calls_helper(monkeypatch, cap
 def test_source_literals_and_selected_executed_import_closure():
     import sys
     assert caller.FROZEN_CALLER_SHA256 == d.error_text.FROZEN_CALLER_SHA256
+    assert caller.HELPER_SHA256 == hashlib.sha256(d.SOURCE.read_bytes()).hexdigest()
     for name, pin in {**dict(d.frozen.SOURCE_PINS), **d.ADDITIONS}.items():
         assert hashlib.sha256((d.ROOT / name).read_bytes()).hexdigest() == pin
     assert "assistant.dispatch_fence" not in sys.modules
@@ -428,3 +430,58 @@ def test_caller_preimport_gate_binds_selected_sources(monkeypatch, case):
         assert len(seen) == 1 and seen[0].caller_sha256 == d.error_text.FROZEN_CALLER_SHA256
     else:
         with pytest.raises(ValueError): REAL_CALLER_PREFLIGHT(args, time.monotonic() + 300)
+
+
+@pytest.mark.parametrize("template_index,template", [(3, "File not found {key}"), (4, "File not found:{key}")], ids=["space", "colon"])
+def test_new_exact_forms_complete_full_synthetic_protocol_and_admission(monkeypatch, template_index, template):
+    f = fixture(monkeypatch)
+    for phase in ("initial", "recheck"):
+        for index in range(6):
+            f.overrides[(phase, index)] = {"success": False, "errors": [template.format(key=f.rows[index][0])]}
+    result = execute()
+    assert result["complete"] is True and result["attempted_request_count"] == 24
+    assert [(phase, index) for phase, index, *_ in f.calls] == [("initial", i) for i in range(6)] + [
+        (phase, i) for i in range(6) for phase in ("recheck", "put", "verify")]
+    assert all(entry["absence_template_index"] == template_index for entry in result["requests"] if entry["object_state"] == "absent")
+    assert caller._safe_result(result, d) == result
+    d.require_admission(f.directory, f.plan, f.record, result["receipt_sha256"])
+
+
+@pytest.mark.parametrize("template_index", [3, 4])
+@pytest.mark.parametrize("mutation", ["wrong_key", "trailing", "negated", "tab_separator", "newline_separator", "http404"])
+def test_new_form_near_matches_never_authorize_any_write(monkeypatch, template_index, mutation):
+    f = fixture(monkeypatch)
+    text = d.ABSENCE_TEMPLATES[template_index].format(key=f.rows[0][0])
+    if mutation == "wrong_key": text = text.replace(f.rows[0][0], "private-prefix/other")
+    elif mutation == "trailing": text += "."
+    elif mutation == "negated": text = "Not " + text
+    elif mutation == "tab_separator": text = "File not found\t" + f.rows[0][0]
+    elif mutation == "newline_separator": text = "File not found\n" + f.rows[0][0]
+    response = {"success": False, "errors": [text]}
+    if mutation == "http404": response = Response(old.API_BASE + "/object/properties", response, 404)
+    f.overrides[("initial", 0)] = response
+    result = execute()
+    assert result["complete"] is False and result["attempted_request_count"] == 1
+    assert [(phase, index) for phase, index, *_ in f.calls] == [("initial", 0)]
+    assert d.ADMISSION not in f.directory.data
+    assert result["failure_code"] == ("http_status" if mutation == "http404" else "absence_unproven")
+
+
+def test_v4_only_changes_explicit_provenance_grammar_and_versioned_bindings():
+    original = (d.ROOT / "scripts/arv2_newrule_storage_recovery_v3.py").read_text()
+    transformed = original.replace("len(ADDITIONS) == 6", "len(ADDITIONS) == 8")
+    transformed = transformed.replace("inventory_sha256=INVENTORY_SHA256, historical_d13_report_sha256_not_reread=D13_REPORT_SHA256,",
+        "inventory_sha256=INVENTORY_SHA256, historical_d13_report_sha256_not_reread=D13_REPORT_SHA256,\n        historical_d14_report_sha256_not_reread=D14_REPORT_SHA256,")
+    def functions(source):
+        return {node.name: ast.dump(node, include_attributes=False) for node in ast.parse(source).body if isinstance(node, ast.FunctionDef)}
+    assert functions(transformed) == functions(d.SOURCE.read_text())
+    old_caller = (d.ROOT / "scripts/run_arv2_newrule_storage_recovery_v3.py").read_text()
+    transformed_caller = old_caller.replace("storage_recovery_v3", "storage_recovery_v4").replace(
+        '0 <= entry["absence_template_index"] < 3', '0 <= entry["absence_template_index"] < len(recovery.ABSENCE_TEMPLATES)')
+    assert functions(transformed_caller) == functions(caller.SOURCE.read_text())
+    assert d.ABSENCE_TEMPLATES == ("File not found: {key}", "File not found: '{key}'", 'File not found: "{key}"',
+        "File not found {key}", "File not found:{key}")
+    assert d.MAX_REQUESTS == 24 and d.MAX_SETS == 6 and d.DEADLINE_SECONDS == 300 and d.REQUEST_SECONDS == 30
+    assert d.PROFILE["historical_d14_head_not_reread"] == "14d8c9a90eb0c477f7b1053465cece2001662e37"
+    assert d.PROFILE["historical_d14_report_sha256_not_reread"] == "8435a8605495e91341eaa7f283faa54205f327588332419d114fd73f9579c7b6"
+    assert d.PROFILE["historical_d14_report_bytes_not_reread"] == 1801

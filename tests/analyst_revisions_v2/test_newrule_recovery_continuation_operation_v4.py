@@ -33,6 +33,8 @@ NEW_NAMES = {
     "scripts/arv2_newrule_storage_recovery.py",
     "scripts/run_arv2_newrule_storage_recovery.py",
     "scripts/arv2_newrule_storage_recovery_v4.py",
+    "scripts/arv2_newrule_storage_recovery_v3.py",
+    "scripts/run_arv2_newrule_storage_recovery_v3.py",
     "scripts/arv2_newrule_storage_recovery_v2.py",
     "scripts/arv2_newrule_recovery_continuation_v4.py",
     "scripts/diagnose_arv2_newrule_upload.py",
@@ -194,6 +196,14 @@ def test_profile_preserves_all_original_pins_plus_exact_additions():
         "formal_forward_ready","paper_or_live_ready"))
 
 
+def test_recovery_profile_dependencies_are_bound_before_import():
+    selected = {**d.frozen.SOURCE_PINS, **d.NEW_PINS,
+        str(d.frozen.SOURCE.relative_to(d.ROOT)): d.FROZEN_CALLER_SHA256}
+    assert all(selected.get(name) == digest for name, digest in recovery.ADDITIONS.items())
+    assert set(recovery.PROFILE["source_pins"]) == set(d.frozen.SOURCE_PINS)
+    assert recovery.PROFILE["source_pins"] == d.frozen.SOURCE_PINS
+
+
 @pytest.mark.parametrize("operation",d.OPERATIONS)
 def test_exact_original_and_new_pins_checked_before_operation(monkeypatch,capsys,operation):
     reads,git=preflight_fixtures(monkeypatch)
@@ -226,6 +236,8 @@ def test_original_git_host_gate_remains_before_new_imports(monkeypatch,capsys,fa
     "scripts/arv2_newrule_storage_recovery.py",
     "scripts/run_arv2_newrule_storage_recovery.py",
     "scripts/arv2_newrule_storage_recovery_v4.py",
+    "scripts/arv2_newrule_storage_recovery_v3.py",
+    "scripts/run_arv2_newrule_storage_recovery_v3.py",
     "scripts/arv2_newrule_storage_recovery_v2.py",
     "scripts/diagnose_arv2_newrule_properties_matrix.py",
     "scripts/diagnose_arv2_newrule_storage_error.py",

@@ -26,11 +26,13 @@ SOURCE = ROOT / 'scripts/run_arv2_newrule_recovery_continuation_v4.py'
 FROZEN_CALLER_SHA256 = '533c1ebf520e9ebf836c78067b9b1480eccf49cfb01aaeb240e3a73b77087d05'
 FAMILY_SHA256 = '8b8ee913dcfb5ad37f4748ea70db4fcbd6ff15580e52cd160bccf2b37e10a9e5'
 NEW_PINS = {
-    'scripts/arv2_newrule_storage_recovery_v4.py': 'UNFROZEN',
+    'scripts/arv2_newrule_storage_recovery_v4.py': 'c77e1e8ba3634f6edd03ec9e825da56eeca3ecac13b48face9b3c25ce9e46c8f',
+    'scripts/arv2_newrule_storage_recovery_v3.py': '7f817962d49ac4d692351131e1a1af004efa2db7ee720eb0aaf29533757f8c4c',
+    'scripts/run_arv2_newrule_storage_recovery_v3.py': '696e04425f6fdc71f0bafa50d17939ae2e7c67f6d9666e12ce1a1437e5c763c0',
     'scripts/arv2_newrule_storage_recovery_v2.py': '02d40ea52084111cf6a04c6ffad629df0bb9008890133e16ef5b2a8f7b4406e9',
     'scripts/arv2_newrule_storage_recovery.py': 'c9952791bce1b802777c80b24a42a86be0d462a2b75a82b462200d58d6100682',
     'scripts/run_arv2_newrule_storage_recovery.py': '7b8aec7979c4df5f0818e06f86fe91f9ea8f6cefd4db085941ff8c04af7381b6',
-    'scripts/arv2_newrule_recovery_continuation_v4.py': 'UNFROZEN',
+    'scripts/arv2_newrule_recovery_continuation_v4.py': '1bfc5810214519d10499a9a9f569bcaf5c84c53b14f08069af83ad890daf9687',
     'scripts/diagnose_arv2_newrule_upload.py': 'b8477fe9246b7355c9b10bec91a9ad6e6305fcd0a7e2d4f00f61da1c35ce9901',
     'scripts/diagnose_arv2_newrule_object_metadata.py': '0a566b6b049f160daf6cc1a1bb2a507e18dd645c64d948dea50136cebbbede23',
     'scripts/diagnose_arv2_newrule_properties_matrix.py': '47b8eec8296beb0433a1223adea38c471ba2034b26ac81cb20a2e4143431f363',

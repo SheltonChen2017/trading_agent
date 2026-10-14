@@ -16,7 +16,7 @@ from scripts import run_arv2_newrule_comparison as frozen
 helpers = frozen.helpers
 SOURCE = ROOT / "scripts/run_arv2_newrule_storage_recovery_v4.py"
 HELPER_SOURCE = ROOT / "scripts/arv2_newrule_storage_recovery_v4.py"
-HELPER_SHA256 = "PENDING_FINAL_HELPER_PIN"
+HELPER_SHA256 = "c77e1e8ba3634f6edd03ec9e825da56eeca3ecac13b48face9b3c25ce9e46c8f"
 FROZEN_CALLER_SHA256 = "533c1ebf520e9ebf836c78067b9b1480eccf49cfb01aaeb240e3a73b77087d05"
 FAMILY_SHA256 = "8b8ee913dcfb5ad37f4748ea70db4fcbd6ff15580e52cd160bccf2b37e10a9e5"
 SCHEMA = "arv2-newrule-storage-recovery-operation-v4"

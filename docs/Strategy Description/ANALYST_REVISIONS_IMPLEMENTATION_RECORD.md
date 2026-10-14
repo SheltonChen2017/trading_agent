@@ -591,10 +591,14 @@ V3 recovery then refused at its first properties response because the exact
 key-bound missing-file message has a15-character prefix, outside V3's selected
 templates (299.8). V3 is spent; no set/capacity/launch occurred. The owner then
 paused this lane for another lane's exclusive QC use and requested "push for
-now" (299.9). Seven unfinished V4 source/test files are preserved as a draft,
-with placeholder pins and no operational run freeze. No QC backtest attempt
-has occurred. Wait for the owner's all-clear before resuming QC work, even
-after ten minutes. The monitor remains PAUSED; this checkpoint does not rearm it.
+now" (299.9). The seven V4 drafts were preserved with placeholder pins;
+section300 now completes their implementation and focused validation. No QC
+backtest attempt has occurred. The owner's October14 correction resumes the Analyst storage
+fix and matched six/eight study (section300), superseding that QC pause.
+The later "next checkpoint and push" direction selects the completed one-use
+storage attempt as this checkpoint, before backtest launches. Positive storage
+admission must precede capacity/backtests. The monitor remains
+PAUSED; direct resumption does not rearm it.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1641,17 +1645,22 @@ The owner's later "proceed wihtout claude review for now" and "done. all four
 are saved in keychain. configure the connections and check that they work.
 then proceed to the next backtest" supersede that routine review wait for the
 current setup and backtest-building continuation. The owner explicitly waives
-Claude review of section 299's current storage-error recovery continuation under the
+Claude review of section 300's current storage-error recovery continuation under the
 existing "for now" direction and 255.2 delegation, not future unrelated work.
 Section 296's exact connection uses are completed and spent. This is
 sequencing authority, not independent acceptance or technical/source clearance.
-The immediate next step is to honor the owner's QC pause in section 299.9:
-another lane has exclusive use, and no QC request or strategy launch resumes
-until the owner gives the all-clear, even after ten minutes. "Push for now"
-authorizes this local checkpoint and matching-lane push, not resumption.
-After that all-clear, finish and validate section 299's draft separately
-versioned exact-grammar storage recovery, bind its final source pins, and
-commit a new exact run decision before any contact. V3 is spent after its
+The owner's October14 corrected direction in section 300 explicitly resumes
+this Analyst lane and supersedes the QC pause in299.9; the earlier mention
+of Insider Buying was a mistake, not cross-lane implementation authority.
+Finish and validate the separately versioned V4 exact-grammar storage recovery,
+bind its final source pins, and commit a new exact run decision before contact.
+Require actual successful storage admission before separately frozen capacity
+and six/eight backtests; observed occupied capacity still means WAIT, never
+interference with another lane. The later "next checkpoint and push" instruction
+selects the completed one-use storage recovery attempt and documented result
+as this round's boundary, before any strategy launch. Exactly one final push
+is due this new round.
+V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
 exact-key absence afresh before any set, never rely on the redacted text. The owner
@@ -49518,3 +49527,164 @@ or unexplained divergence stops the push. The next substantive action remains
 waiting for the owner's QC all-clear, then finishing V4 and its new exact
 freeze before attempting storage recovery. Only an actually successful and
 authenticated admission can precede separately frozen six/eight backtests.
+
+## 300. Owner-resumed Analyst storage correction and matched backtests
+
+### 300.1 Scope, baseline and retained boundaries
+
+On October14 the owner corrected an initial Insider Buying reference:
+"sorry, I meant the Analyst Revision lane. QC is free now. Resume the storage
+fix and continue with the 6 and 8 universe backtests. Push only once when done."
+This is the awaited all-clear for this lane. It supersedes299.9's QC pause,
+continues the existing current-scope pre-use Claude waiver/255.2 delegated
+decisions, and reserves exactly one final matching-lane push for this new
+continuous round. It does not change or interrupt another lane, guarantee
+continuing node availability, renew a spent protocol, grant paid rights,
+clear a technical gate, or authorize funded/broker/real-order/paper/live use.
+The monitor remains PAUSED; no automatic monitoring is requested.
+
+Exact baseline is `c866592ff62ea353a957e721168e91b0567e6c6d`, verified clean on
+`codex/strategy-analyst-revisions-v2` in the designated Mac worktree. Matching
+branch-only fetch found no incoming commits or divergence. Section299's
+three-commit round ended with its one successful push; these are Codex commits,
+not a new Claude review. No independent acceptance is claimed.
+
+Resume only the seven checkpointed V4 files and this record. V3 remains
+frozen/spent; D13/D14 output pins are historical external provenance, not
+permission to replay readers or claims. No private artifact or credential
+inspection is part of implementation/testing. Native network and production
+artifact read/write denial, in-root support paths, no plugin autoload,
+`--noconftest`, `-B` and no cache provider apply to all focused tests/mutations.
+No complete Codex suite. Same-round advice is not independent final review.
+
+The existing six fixed cells and297.14 economics/source/attempt protocol stay
+unchanged. Storage recovery is a no-order publication diagnostic, not strategy
+performance evidence. Any later strategy evaluation uses simulated orders.
+Current booked floor is314shared/239development/50infrastructure/699cells,
+with zero attempts in this new six-cell family. Formal trust-root registries
+remain empty/zero-access; source/PIT/paper/readiness flags remain false.
+Only an exact successful recovery exit plus matching authenticated admission
+can precede a separately committed lifecycle decision. No new operational
+call or allocation is authorized merely by this scope record.
+
+The owner then narrowed this delivery to "ok. btw, just proceed to the next
+checkpoint and push" and added "and do not forget to document the progress".
+The next substantive checkpoint is the completed bounded storage-recovery
+attempt with its honest success/refusal evidence. Push once at that boundary,
+with this record updated; do not start the six/eight backtests before that
+handoff. Their implementation/readiness can be retained, but they require the
+separate later lifecycle freeze already prescribed.
+
+### 300.2 Completed V4 correction and focused validation
+
+V4 now replaces the draft placeholders with exact selected source pins. The
+recovery helper adds only the two full-string requested-key forms in299.8,
+new version/control names and D14 provenance; the caller permits the exact
+five-value template-index range. An AST comparison proves function bodies
+remain equal to V3 after the declared provenance/inventory-count changes and
+the caller's version/template-bound substitution. The two new forms pass
+full24-dispatch synthetic recovery, output validation and admission; wrong
+key, trailing/negated text, tab/newline separator and HTTP404 all refuse before
+any set. Raw strict response matching, not redacted output, determines absence.
+ARV2D299-005 is corrected prospectively in V4, without accepting or retrying V3.
+
+ARV2D300-001 (P2, corrected before use): the interrupted continuation draft's
+selected pin set omitted the V3 helper/caller used in V4's profile provenance.
+A new closure test failed once in2.88s before adding those two exact frozen
+pins. The selected closure now covers V4's declared profile dependencies.
+This is selected-file binding, not whole-interpreter integrity. No financial
+code, source package, candidate, old module or registry changed. The V4
+continuation still authenticates new admission before capacity/claims/contact,
+remains A1-only at its operational boundary and cannot infer actual recovery
+exit from a receipt. All actual lifecycle calls remain uninvoked here.
+
+| Final source/test | SHA256 |
+|---|---|
+| `scripts/arv2_newrule_storage_recovery_v4.py` | `c77e1e8ba3634f6edd03ec9e825da56eeca3ecac13b48face9b3c25ce9e46c8f` |
+| `scripts/run_arv2_newrule_storage_recovery_v4.py` | `36d349154e426877937a4fbaa2cf555bd4dd38253288e026c34c621296f5bf61` |
+| `tests/analyst_revisions_v2/test_newrule_storage_recovery_v4.py` | `7e7f03e2177492eee5c9a9563f4086582122214a3c2905f3917d748afd44cd9b` |
+| `scripts/arv2_newrule_recovery_continuation_v4.py` | `1bfc5810214519d10499a9a9f569bcaf5c84c53b14f08069af83ad890daf9687` |
+| `scripts/run_arv2_newrule_recovery_continuation_v4.py` | `49624d649f4552f031690e74ec0a137c8205d5be6389c86938914532cb590bdc` |
+| `tests/analyst_revisions_v2/test_newrule_recovery_continuation_v4.py` | `7b13afe3c53c13f9977631b878bc46a82821b73687b491f7a2d62d6eba3ee4be` |
+| `tests/analyst_revisions_v2/test_newrule_recovery_continuation_operation_v4.py` | `e38ea058e78ec3fbe05f804bb441d833740baac2585297f9c7cae92c36ccf8e0` |
+
+Canonical recovery profile:
+`3c15a5fb6f9176f8794a44b7972a7fcddda5c26fe8f3dab2732402dff6c2e0e8`;
+recovery operation profile:
+`48b7d9beb83a97d50114f7aba14dfb6a977193c26a4d1dabdc54d6035bb33632`;
+continuation operation profile:
+`5dd6a386ee5271b6c579c444c14825d428935243082ee0250ad78dc9d1ccb4eb`.
+
+Root final focused selection: **430 distinct passes in12.54s**
+(184recovery+159continuation+86record/document+1research transitive import
+closure), no failures/skips/warnings. Seven Python files compile in memory;
+63 distinct selected dependency pins verify and `assistant.dispatch_fence`
+is absent. Native network and production-artifact read/write denial applied,
+with the in-root/no-plugin/no-cache/noconftest/-B discipline in300.1.
+Author184passes3.38s (earlier1843.44s) and159passes7.46s overlap, not additive.
+No full Codex suite or operational/private-data behavior was exercised.
+
+Memory-only omission checks caught removal of the two new templates with
+2expected failures in0.16s, A1 gate removal with2expected failures in0.20s,
+and direct-operation preflight removal with1expected failure in0.27s before
+dependency import. Mutations were restored in finally and disk hashes stayed
+unchanged. The initial combined mutation harness completed the A1 check but
+then hit ModuleNotFoundError locating its test module; the direct-gate check
+was run separately afterward, not falsely counted from that first harness.
+All older failures and qualifications remain retained. Same-round static
+advice found no additional blocking defect but is not independent acceptance.
+
+### 300.3 Exact prospective D15 storage-only run freeze
+
+Under300.1's corrected resumption, current scoped waiver and255.2 delegation,
+authorize **one V4 recovery invocation only**, after300.1–300.3 and all final
+source/test bytes above are committed together. Use that clean commit's exact
+HEAD as `--expected-head` and the recovery-caller SHA above as `--caller-sha256`.
+Compatible host is only the designated Mac root/branch, Darwin/POSIX Python3.13
+at `/Users/sheltonchen/.venvs/trading_agent-py313/bin/python`. Use `-B` and
+in-root temp/cache paths, existing QC credential configuration without printing
+or separately inspecting credentials. All author writes/tests are held during
+the operation. Verify exact root/branch/HEAD/status before and after use.
+
+Purpose: correct D14's proven grammar incompatibility prospectively and
+reconcile/publish only the already frozen six-object family/inventory in297.14,
+not renew V3 or reconstruct the old failed upload cause. The fixed control
+parent remains `artifacts/analyst_revisions_v2/newrule_comparison_qc/R298-R303-20261013`.
+New exclusive names are `storage-recovery-v4-claim.json`, `-start.json`,
+`-report.json`, `-admission.json`, and request00–23 `-intent.json`/`-observed.json`
+with the same V4 stem. No inspection/allocation of these names precedes use.
+Claim consumes the use even if no request follows; partial/duplicate claim is
+ambiguous/spent, not safely unspent. No repair, cleanup or unchanged retry.
+
+Exclusive claim/start precede retained family/organization and pinned October
+package/lineage/payload loading; credentials follow those checks. Exactly six
+initial properties observations precede any set. Present rows require exact
+key/size/actual-payload MD5; absence requires HTTP200/APIfalse, exactly one
+whole-string template containing the exact requested key and missing/null
+metadata. Each absent row gets an immediate identical absence recheck, then
+one set and exact properties readback. Activation is last; activation-present
+with missing data refuses. Max24dispatches/6sets,30s per request,300s whole
+process. Existing source/byte pins remain unchanged. No list/get/delete,
+canary, fallback key, arbitrary source read, source reconstruction or other-lane
+action. This is not atomic absent-only publication: no documented CAS removes
+the residual concurrent-create race between recheck and put.
+
+Responses are bounded at16KiB, report256KiB and normal external envelope64KiB.
+Only finite status/count/shape and redacted vocabulary leave the operation;
+no raw errors, credentials, organization ID, key contents or licensed rows.
+Attempt counts measure application dispatch, not server-side contact. D13/D14
+pins are provenance only; their old private outputs are not reread. Fresh
+source postchecks, exact request census, claim/report/admission readback and
+held/named directory verification precede normal return. Selected dependency
+pins are not whole-interpreter authentication; alarms cannot bound host
+suspension or uninterruptible I/O.
+
+Root records the actual process exit and single bounded normal envelope only;
+no additional output reader is authorized. Exact exit0 plus complete matching
+authenticated admission is mandatory. A late failure may leave an apparently
+positive receipt; nonzero/unknown/ambiguous exit makes it inadmissible. Retain
+all partial outputs and stop the attempt. This freeze authorizes no capacity,
+project creation, compile, launch, result read or strategy cell. After its
+actual result is recorded, conclude this checkpoint with one final push.
+Future six/eight lifecycle use requires its separately committed exact freeze
+and actual successful admission. The314/239/50/699 floor remains unchanged.

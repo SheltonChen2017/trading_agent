@@ -261,7 +261,38 @@ def test_actual_cli_inactive_path_refuses_before_any_git_prior_source_or_key(mon
     monkeypatch.setattr(m, "_keychain_credential", forbidden)
     assert m.main(["--run-id", RUN, "--expected-head", HEAD, "--expected-previous-complete-sha256",
         m.PREVIOUS_HASHES["complete.json"]]) == 2
-    assert json.loads(capsys.readouterr().out) == {"disposition": "bounded_earnings_capture_refused_claims_preserved"}
+    assert json.loads(capsys.readouterr().out) == {"disposition": "bounded_earnings_capture_refused_claims_preserved",
+        "capture_failure": {"phase": "preflight", "exception_category": "earnings_gap_error", "recognized_os_errno": None}}
+
+
+@pytest.mark.parametrize("phase", ["guard_current_identity", "guard_previous_access", "guard_current_journal"])
+def test_capture_cli_exposes_only_fixed_phase_class_errno_not_exception_values(monkeypatch, capsys, phase):
+    secret = "INVENTED SECRET /not/an/actual/path"
+    error = PermissionError(13, secret, secret)
+    error._earnings_capture_failure_phase = phase
+    def refused(*args, **kwargs):raise error
+    monkeypatch.setattr(m, "run_capture", refused)
+    assert m.main(["--run-id", RUN, "--expected-head", HEAD,
+        "--expected-previous-complete-sha256", m.PREVIOUS_HASHES["complete.json"]]) == 2
+    raw = capsys.readouterr().out
+    assert secret not in raw
+    assert json.loads(raw) == {"disposition": "bounded_earnings_capture_refused_claims_preserved",
+        "capture_failure": {"phase": phase, "exception_category": "os_error",
+                            "recognized_os_errno": 13}}
+
+
+def test_real_fixture_guard_conversion_keeps_sanitized_phase_without_changing_refusal_type(tmp_path):
+    calls = []
+    def guarded(head):
+        calls.append(True)
+        if len(calls) > 1:raise PermissionError(13, "INVENTED PRIVATE SECRET")
+        return identity(head)
+    with pytest.raises(m.EarningsGapError) as caught:
+        invoke(tmp_path, ident=guarded)
+    assert m._capture_diagnostic(caught.value) == {"phase": "guard_current_identity",
+        "exception_category": "os_error", "recognized_os_errno": 13}
+    assert list(claims(tmp_path).iterdir()) == []
+    assert set(p.name for p in folder(tmp_path).iterdir()) == {"manifest.json"}
 
 
 @pytest.mark.parametrize("alias", ["literal", "case", "ancestor-case", "descendant", "symlink"])
@@ -416,7 +447,8 @@ def test_main_arbitrary_secret_exception_is_generic_not_echoed(monkeypatch, caps
     assert m.main(["--run-id", RUN, "--expected-head", HEAD,
         "--expected-previous-complete-sha256", m.PREVIOUS_HASHES["complete.json"]]) == 2
     out = capsys.readouterr().out
-    assert KEY not in out and json.loads(out) == {"disposition": "bounded_earnings_capture_refused_claims_preserved"}
+    assert KEY not in out and json.loads(out) == {"disposition": "bounded_earnings_capture_refused_claims_preserved",
+        "capture_failure": {"phase": "preflight", "exception_category": "unclassified_error", "recognized_os_errno": None}}
 
 
 def supplied_controls(tmp_path):

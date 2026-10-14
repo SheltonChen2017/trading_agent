@@ -197,7 +197,8 @@ def test_inactive_source_entry_refuses_before_any_real_identity_input_or_output_
     monkeypatch.setattr(module, "_output_directory", lambda *_args, **_kwargs: pytest.fail("must not create production output"))
     assert module.main(["--audit-id", "ib-2006q1-parent-projection-invented", "--expected-head", "a" * 40,
         "--expected-capture-report-sha256", "b" * 64]) == 2
-    assert capsys.readouterr().out == '{"disposition":"offline_parent_projection_refused_outputs_preserved"}\n'
+    assert json.loads(capsys.readouterr().out) == {"disposition": "offline_parent_projection_refused_outputs_preserved",
+        "failure_phase": "parent_preflight", "failure_class": "EarlyParentProjectionError", "os_errno": None}
 
 
 def test_declared_xml_profile_does_not_assert_source_timezone_or_financial_values():

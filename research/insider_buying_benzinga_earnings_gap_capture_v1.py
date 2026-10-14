@@ -83,6 +83,39 @@ class EarningsGapError(ValueError):
     """A fixed sanitized code, never provider text, caller values or secrets."""
 
 
+_CAPTURE_PHASES = frozenset({"preflight", "guard_current_identity", "guard_previous_access", "guard_current_journal"})
+
+
+def _capture_diagnostic(exc):
+    supplied = getattr(exc, "_earnings_capture_failure_diagnostic", None)
+    allowed_categories = {"earnings_gap_error", "os_error", "value_error", "type_error", "key_error", "unclassified_error"}
+    if (type(supplied) is dict and set(supplied) == {"phase", "exception_category", "recognized_os_errno"}
+        and type(supplied["phase"]) is str and supplied["phase"] in _CAPTURE_PHASES
+        and type(supplied["exception_category"]) is str and supplied["exception_category"] in allowed_categories
+        and (supplied["recognized_os_errno"] is None or type(supplied["recognized_os_errno"]) is int
+             and supplied["recognized_os_errno"] in {1, 2, 5, 9, 13, 17, 20, 24, 28, 30, 35})):
+        return dict(supplied)
+    phase = getattr(exc, "_earnings_capture_failure_phase", None)
+    if type(phase) is not str or phase not in _CAPTURE_PHASES:
+        phase = "preflight"
+    categories = ((EarningsGapError, "earnings_gap_error"), (OSError, "os_error"),
+                  (ValueError, "value_error"), (TypeError, "type_error"), (KeyError, "key_error"))
+    category = next((name for kind, name in categories if isinstance(exc, kind)), "unclassified_error")
+    number = exc.errno if isinstance(exc, OSError) else None
+    if type(number) is not int or number not in {1, 2, 5, 9, 13, 17, 20, 24, 28, 30, 35}:
+        number = None
+    return {"phase": phase, "exception_category": category, "recognized_os_errno": number}
+
+
+def _capture_at_phase(phase, function, *args, **kwargs):
+    _require(type(phase) is str and phase in _CAPTURE_PHASES, "internal_capture_phase_refused")
+    try:
+        return function(*args, **kwargs)
+    except Exception as exc:
+        exc._earnings_capture_failure_phase = phase
+        raise
+
+
 def _require(condition: bool, code: str) -> None:
     if not condition:
         raise EarningsGapError(code)
@@ -693,9 +726,9 @@ def _run(run_id: str, expected_head: str, *, root: Path, identity: Callable,
             "January2006_coverage_supplied": False, **{flag: False for flag in FALSE_FLAGS}}
         published["manifest.json"] = _write(folder, "manifest.json", _canonical(manifest), limit=MAX_CONTROL_BYTES)
         def guard():
-            _require(identity(expected_head) == baseline, "current_source_changed")
-            previous_guard()
-            _journal(root, parent, claims, runs, folder, run_id, lock, published, claimed,
+            _capture_at_phase("guard_current_identity", lambda: _require(identity(expected_head) == baseline, "current_source_changed"))
+            _capture_at_phase("guard_previous_access", previous_guard)
+            _capture_at_phase("guard_current_journal", _journal, root, parent, claims, runs, folder, run_id, lock, published, claimed,
                 known_runs=known_runs, lock_version=lock_version, old_runs=old_runs)
         guard()
         for index, window in enumerate(WINDOWS):
@@ -784,8 +817,12 @@ def _run(run_id: str, expected_head: str, *, root: Path, identity: Callable,
             "fixture_only": fixture_only, "looks_jobs_backtests": [0, 0, 0], **{flag: False for flag in FALSE_FLAGS}}
     except EarningsGapError:
         raise
-    except Exception:
-        raise EarningsGapError("capture_refused_claims_preserved") from None
+    except Exception as exc:
+        # Keep the existing refusal type/semantics; carry only independently
+        # sanitized diagnostic categories, never the original message/args.
+        converted = EarningsGapError("capture_refused_claims_preserved")
+        converted._earnings_capture_failure_diagnostic = _capture_diagnostic(exc)
+        raise converted from None
     finally:
         for old in old_runs.values():
             os.close(old["fd"])
@@ -1416,6 +1453,8 @@ def main(argv=None) -> int:
         refused = {"disposition": "bounded_earnings_capture_refused_claims_preserved"}
         if args.verify_only or args.verification_worker:
             refused["verification_failure"] = _safe_failure_fields(exc)
+        else:
+            refused["capture_failure"] = _capture_diagnostic(exc)
         print(_canonical(refused).decode())
         return 2
     print(_canonical(result).decode())

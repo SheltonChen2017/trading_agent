@@ -34,6 +34,7 @@ from research.insider_buying.sec_complete_submission import (
     SecCompleteSubmissionError, SecCompleteSubmissionTarget, project_sec_complete_submission,
 )
 from research.insider_buying import sec_ib1c_identity_v2 as identity_v2
+from research.insider_buying import sec_bulk_parsed_snapshot as parsed_contract
 from research.insider_buying.sec_edgar_acceptance_snapshot import _upstream_submission_filing_date
 
 
@@ -83,44 +84,138 @@ PARSER_REFUSAL_CODES = frozenset({"source_body_encoding_or_bound_refused", "sec_
     "xml_grammar_refused", "xml_target_identity_conflict", "header_xml_owner_identity_conflict",
     "unsupported_original_complete_parent_grammar"})
 SOURCE_ONLY_BOOTSTRAP = r'''
-import base64, hashlib, json, sys, types
-def need(value):
-    if not value: raise ValueError("source-only worker context refused")
-context_raw = sys.stdin.buffer.read(33554433)
-need(0 < len(context_raw) <= 33554432)
-envelope = json.loads(context_raw)
-need(type(envelope) is dict and set(envelope) == {"sources", "parent_context", "audit_id", "expected_head", "report_sha256"})
-source_rows = envelope["sources"]
-need(type(source_rows) is list)
-selected = [r for r in source_rows if r.get("path") == "research/insider_buying_affected_quarter_isolation.py"]
-need(len(selected) == 1)
-bootstrap_raw = base64.b64decode(selected[0]["source_b64"], validate=True)
-need(hashlib.sha256(bootstrap_raw).hexdigest() == selected[0]["sha256"])
-helper = types.ModuleType("_early_projection_captured_imports")
-helper.__file__ = "/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying/research/insider_buying_affected_quarter_isolation.py"
-sys.modules[helper.__name__] = helper
-exec(compile(bootstrap_raw, helper.__file__, "exec", dont_inherit=True), helper.__dict__)
-# Reuse the exact executed helper image if the consumer imports its canonical
-# name; do not execute the same bootstrap a second time through the finder.
-sys.modules["research.insider_buying_affected_quarter_isolation"] = helper
-sources = helper._decode_sources(source_rows)
-identity = envelope["parent_context"]["identity"]
-need({p: helper._sha(raw) for p,raw in sources} == identity["source_sha256"])
-finder = helper._SourceFinder(sources)
-sys.meta_path.insert(0, finder)
-# The worker first proves inherited OS denial. Installing the Python hook
-# here would intercept those probes before their required EPERM/EACCES result.
-# The worker installs it after the probes and before opening retained inputs.
-from research import insider_buying_sec_2006q1_parent_projection_v1 as consumer
-result = consumer._worker(envelope["audit_id"], expected_head=envelope["expected_head"],
-    expected_capture_report_sha256=envelope["report_sha256"], parent_context=envelope["parent_context"],
-    executed_sources=lambda: [{"path": "research/insider_buying_affected_quarter_isolation.py", "sha256": selected[0]["sha256"]}, *finder.executed])
-print(consumer._raw(result).decode())
+import base64, errno, hashlib, json, sys, types
+consumer = None
+_phase = "worker_bootstrap_context"
+try:
+    def need(value):
+        if not value: raise ValueError("source-only worker context refused")
+    context_raw = sys.stdin.buffer.read(33554433)
+    need(0 < len(context_raw) <= 33554432)
+    envelope = json.loads(context_raw)
+    need(type(envelope) is dict and set(envelope) == {"sources", "parent_context", "audit_id", "expected_head", "report_sha256"})
+    source_rows = envelope["sources"]
+    need(type(source_rows) is list)
+    selected = [r for r in source_rows if r.get("path") == "research/insider_buying_affected_quarter_isolation.py"]
+    need(len(selected) == 1)
+    bootstrap_raw = base64.b64decode(selected[0]["source_b64"], validate=True)
+    need(hashlib.sha256(bootstrap_raw).hexdigest() == selected[0]["sha256"])
+    helper = types.ModuleType("_early_projection_captured_imports")
+    helper.__file__ = "/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying/research/insider_buying_affected_quarter_isolation.py"
+    sys.modules[helper.__name__] = helper
+    exec(compile(bootstrap_raw, helper.__file__, "exec", dont_inherit=True), helper.__dict__)
+    # Reuse the exact executed helper image if the consumer imports its canonical
+    # name; do not execute the same bootstrap a second time through the finder.
+    sys.modules["research.insider_buying_affected_quarter_isolation"] = helper
+    _phase = "worker_bootstrap_source_decode"
+    sources = helper._decode_sources(source_rows)
+    identity = envelope["parent_context"]["identity"]
+    need({p: helper._sha(raw) for p,raw in sources} == identity["source_sha256"])
+    finder = helper._SourceFinder(sources)
+    sys.meta_path.insert(0, finder)
+    # The worker first proves inherited OS denial. Installing the Python hook
+    # here would intercept those probes before their required EPERM/EACCES result.
+    # The worker installs it after the probes and before opening retained inputs.
+    _phase = "worker_bootstrap_import"
+    from research import insider_buying_sec_2006q1_parent_projection_v1 as consumer
+    _phase = "worker_execution"
+    result = consumer._worker(envelope["audit_id"], expected_head=envelope["expected_head"],
+        expected_capture_report_sha256=envelope["report_sha256"], parent_context=envelope["parent_context"],
+        executed_sources=lambda: [{"path": "research/insider_buying_affected_quarter_isolation.py", "sha256": selected[0]["sha256"]}, *finder.executed])
+    print(consumer._raw(result).decode())
+except Exception as exc:
+    if consumer is not None and callable(getattr(consumer, "_failure_diagnostic", None)):
+        diagnostic = consumer._failure_diagnostic(exc, _phase)
+    else:
+        labels = ((OSError, "OSError"), (ValueError, "ValueError"), (TypeError, "TypeError"), (KeyError, "KeyError"))
+        category = next((name for kind, name in labels if isinstance(exc, kind)), "other_refusal")
+        number = exc.errno if isinstance(exc, OSError) else None
+        if type(number) is not int or number not in errno.errorcode: number = None
+        diagnostic = {"disposition": "offline_parent_projection_refused_outputs_preserved",
+            "failure_phase": _phase, "failure_class": category, "os_errno": number}
+    print(json.dumps(diagnostic, sort_keys=True, separators=(",", ":"), allow_nan=False))
+    raise SystemExit(2)
 '''
 
 
 class EarlyParentProjectionError(ValueError):
     """Fixed codes only: raw XML, identities and private exception text excluded."""
+
+
+_FAILURE_PHASES = frozenset({"parent_preflight", "parent_original_sources", "parent_output_reservation",
+    "parent_captured_sources", "parent_worker_launch", "parent_worker_result", "parent_publication_verification",
+    "worker_bootstrap_context", "worker_bootstrap_source_decode", "worker_bootstrap_import", "worker_execution",
+    "worker_preflight", "worker_output_reservation", "worker_isolation", "worker_preparation", "worker_capture",
+    "worker_composition", "worker_replay", "worker_publication", "worker_readback", "worker_cleanup"})
+_FAILURE_CLASSES = frozenset({"EarlyParentProjectionError", "EarlyParentCaptureError", "ParentBootstrapError",
+    "ArchiveAssessmentRunnerError", "Ib1cIdentityV2Error", "OSError", "ValueError", "TypeError", "KeyError",
+    "SubprocessError", "other_refusal"})
+
+
+def _failure_diagnostic(exc, fallback="parent_preflight"):
+    """Fixed phase/class/integer errno only; no str(exc), args, paths or values."""
+    if type(exc) is ReportedProjectionWorkerError:
+        try:
+            return _strict_failure(exc.diagnostic)
+        except (EarlyParentProjectionError, TypeError, ValueError, KeyError, AttributeError):
+            return {"disposition": "offline_parent_projection_refused_outputs_preserved",
+                "failure_phase": "parent_worker_result", "failure_class": "EarlyParentProjectionError", "os_errno": None}
+    phase = getattr(exc, "_early_projection_failure_phase", None)
+    if type(phase) is not str or phase not in _FAILURE_PHASES:
+        phase = fallback if fallback in _FAILURE_PHASES else "parent_preflight"
+    classes = ((EarlyParentProjectionError, "EarlyParentProjectionError"),
+        (capture.EarlyParentCaptureError, "EarlyParentCaptureError"),
+        (capture.bootstrap.ParentBootstrapError, "ParentBootstrapError"),
+        (capture.bootstrap.custody.ArchiveAssessmentRunnerError, "ArchiveAssessmentRunnerError"),
+        (identity_v2.Ib1cIdentityV2Error, "Ib1cIdentityV2Error"), (OSError, "OSError"),
+        (ValueError, "ValueError"), (TypeError, "TypeError"), (KeyError, "KeyError"),
+        (subprocess.SubprocessError, "SubprocessError"))
+    category = next((name for kind, name in classes if isinstance(exc, kind)), "other_refusal")
+    number = exc.errno if isinstance(exc, OSError) else None
+    if type(number) is not int or number not in errno.errorcode:
+        number = None
+    return {"disposition": "offline_parent_projection_refused_outputs_preserved",
+        "failure_phase": phase, "failure_class": category, "os_errno": number}
+
+
+def _strict_failure(body):
+    _need(type(body) is dict and set(body) == {"disposition", "failure_phase", "failure_class", "os_errno"}
+        and body["disposition"] == "offline_parent_projection_refused_outputs_preserved"
+        and type(body["failure_phase"]) is str and body["failure_phase"] in _FAILURE_PHASES
+        and type(body["failure_class"]) is str and body["failure_class"] in _FAILURE_CLASSES
+        and (body["os_errno"] is None or type(body["os_errno"]) is int and body["os_errno"] in errno.errorcode),
+        "worker_failure_diagnostic_refused")
+    return dict(body)
+
+
+class ReportedProjectionWorkerError(EarlyParentProjectionError):
+    """An already strict, sanitized child diagnostic; always a failed result."""
+    def __init__(self, diagnostic):
+        self.diagnostic = _strict_failure(diagnostic)
+        super().__init__("isolated_reassessment_failed_outputs_preserved")
+
+
+def _at_phase(phase, function, *args, **kwargs):
+    _need(type(phase) is str and phase in _FAILURE_PHASES, "internal_failure_phase_refused")
+    try:
+        return function(*args, **kwargs)
+    except Exception as exc:
+        # Re-raise the same exception; only allowlisted diagnostic metadata changes.
+        exc._early_projection_failure_phase = phase
+        raise
+
+
+def _raise_reported_worker_failure(child, output, *, audit_id):
+    _need(type(child.returncode) is int and child.returncode != 0 and child.stderr == b""
+        and type(child.stdout) is bytes and 0 < len(child.stdout) <= MAX_CONTROL_BYTES
+        and child.stdout.endswith(b"\n") and not child.stdout.endswith(b"\n\n"),
+        "isolated_reassessment_failed_outputs_preserved")
+    diagnostic = _strict_failure(capture._json(child.stdout.removesuffix(b"\n")))
+    _need(diagnostic["failure_phase"].startswith("worker_"), "child_failure_phase_not_worker")
+    output.publish("worker-failure.json", _raw({"schema": SCHEMA + "/worker-failure", "audit_id": audit_id,
+        "observed_at_utc": capture.custody._utc(), "diagnostic": diagnostic, "authority": _authority()}),
+        cap=MAX_CONTROL_BYTES)
+    raise ReportedProjectionWorkerError(diagnostic)
 
 
 def _need(value, code):
@@ -190,6 +285,166 @@ class EarlyParentReassessment:
     @property
     def sha256(self):
         return _sha(self.canonical_bytes())
+
+
+RAW_ID = "sec-insider-bulk-2006q1-afe9a4b0bd20acce"
+PARSED_ID = "sec-insider-parsed-2006q1-777136638dc6a1e5"
+ROWS_BYTES = 332749655
+LOCK_SHA = hashlib.sha256(b"\0").hexdigest()
+DIRECTORIES = {(): {"completion.json", "assessment.json", "ib1a", "ib1b"},
+    ("ib1a",): {RAW_ID, "." + RAW_ID + ".publication.lock"},
+    ("ib1a", RAW_ID): {"archive.zip", "manifest.json", "snapshot.commit.json"},
+    ("ib1b",): {PARSED_ID, "." + PARSED_ID + ".publication.lock"},
+    ("ib1b", PARSED_ID): {"rows.jsonl", "accessions.jsonl", "manifest.json", "snapshot.commit.json"}}
+LEAVES = {(*parts, name) for parts, names in DIRECTORIES.items() for name in names
+    if (*parts, name) not in DIRECTORIES}
+
+
+class OriginalPreparationCustodyError(ValueError): pass
+
+
+def _preparation_need(condition, code):
+    if not condition: raise OriginalPreparationCustodyError(code)
+
+
+@dataclass(frozen=True)
+class InventedPins:
+    completion_sha256: str
+    assessment_sha256: str
+    rows_sha256: str
+    rows_bytes: int
+
+
+class PinnedOriginalPreparation:
+    def __init__(self, root=None, *, invented=None):
+        self.root = PREPARATION_ROOT if root is None else root
+        self.chains, self.directory_versions, self.leaves, self.locks = {}, {}, {}, []
+        self.fixture_only = invented is not None
+        try:
+            if self.fixture_only:
+                _preparation_need(type(invented) is InventedPins, "invented_profile_required")
+                capture._fixture_root(self.root)
+                _preparation_need(not self.root.is_relative_to(PREPARATION_ROOT)
+                    and not PREPARATION_ROOT.is_relative_to(self.root), "invented_preparation_root_refused")
+                if PREPARATION_ROOT.exists():
+                    _preparation_need(all(not parent.samefile(PREPARATION_ROOT) for parent in (self.root, *self.root.parents))
+                        and all(not self.root.samefile(parent) for parent in PREPARATION_ROOT.parents),
+                        "invented_preparation_root_refused")
+                self.rows_bytes = invented.rows_bytes
+                _preparation_need(type(self.rows_bytes) is int and 0 < self.rows_bytes <= ROWS_BYTES, "invented_rows_bound_refused")
+                completion_sha, assessment_sha = invented.completion_sha256, invented.assessment_sha256
+            else:
+                _preparation_need(Path(__file__).resolve() == capture.bootstrap.custody.LANE_ROOT / SELF_PATH,
+                    "inactive_original_reader_not_production_source")
+                _preparation_need(self.root == PREPARATION_ROOT, "fixed_original_preparation_root_required")
+                self.rows_bytes = ROWS_BYTES
+                completion_sha = downstream.EXPECTED_COMPLETION_SHA256
+                assessment_sha = downstream.EXPECTED_ASSESSMENT_SHA256
+            self.open(())
+            # Root pins are established BEFORE admitting the exact public children.
+            self.pin((), "completion.json", cap=preparation.MAX_COMPLETION_BYTES, expected=completion_sha)
+            self.pin((), "assessment.json", cap=MAX_ASSESSMENT_BYTES, expected=assessment_sha)
+            for parts in DIRECTORIES: self.open(parts)
+            manifest = self.read(("ib1b", PARSED_ID), "manifest.json", cap=parsed_contract.MAX_PARSED_MANIFEST_BYTES)
+            if self.fixture_only:
+                binding = json.loads(manifest)["rows"]
+                _preparation_need(binding == {"sha256": invented.rows_sha256, "size_bytes": invented.rows_bytes}, "invented_manifest_binding_refused")
+            else:
+                identity = parsed_contract._identity_from_manifest(json.loads(manifest), directory_name=PARSED_ID)
+                _preparation_need(identity.raw_snapshot_id == RAW_ID and identity.raw_archive_sha256 == preparation.EXPECTED_ZIP_SHA256,
+                    "original_manifest_upstream_binding_refused")
+                item = next(row for row in identity.artifacts if row.name == "rows.jsonl")
+                binding = {"sha256": item.sha256, "size_bytes": item.size_bytes}
+            _preparation_need(binding["size_bytes"] == self.rows_bytes, "original_rows_exact_size_refused")
+            for parts_and_name in sorted(LEAVES):
+                parts, name = parts_and_name[:-1], parts_and_name[-1]
+                if (parts, name) in self.leaves: continue
+                cap, expected = MAX_INPUT_LEAF_BYTES, None
+                if name.endswith(".publication.lock"):
+                    cap, expected = 1, LOCK_SHA
+                elif parts == ("ib1b", PARSED_ID) and name == "rows.jsonl":
+                    cap, expected = self.rows_bytes, binding["sha256"]
+                elif parts == ("ib1a", RAW_ID) and name == "archive.zip":
+                    cap, expected = preparation.EXPECTED_ZIP_SIZE_BYTES, preparation.EXPECTED_ZIP_SHA256
+                    if self.fixture_only: expected = None
+                self.pin(parts, name, cap=cap, expected=expected)
+            self.recheck()
+        except BaseException:
+            self.close(); raise
+
+    def open(self, parts):
+        _preparation_need(parts in DIRECTORIES, "original_directory_profile_refused")
+        if parts not in self.chains:
+            chain = capture.bootstrap.custody._Chain(self.root, parts)
+            self.chains[parts] = chain
+            info = os.fstat(chain.fd)
+            _preparation_need(info.st_uid == os.geteuid() and stat.S_IMODE(info.st_mode) == (0o700 if parts == () else 0o755),
+                "original_directory_owner_or_mode_refused")
+            _preparation_need(set(os.listdir(chain.fd)) == DIRECTORIES[parts], "original_directory_inventory_refused")
+            self.directory_versions[parts] = capture.bootstrap.custody._version(info)
+        return self.chains[parts]
+
+    def pin(self, parts, name, *, cap, expected=None, collect=False):
+        _preparation_need((*parts, name) in LEAVES, "original_leaf_profile_refused")
+        chain = self.open(parts)
+        before = os.stat(name, dir_fd=chain.fd, follow_symlinks=False)
+        is_lock = name.endswith(".publication.lock")
+        _preparation_need(stat.S_ISREG(before.st_mode) and before.st_uid == os.geteuid() and before.st_nlink == 1
+            and stat.S_IMODE(before.st_mode) == (0o644 if is_lock else 0o600)
+            and 0 < before.st_size <= cap, "original_leaf_custody_or_bound_refused")
+        fd = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=chain.fd)
+        lock_owned = False
+        try:
+            _preparation_need(capture.bootstrap.custody._version(os.fstat(fd)) == capture.bootstrap.custody._version(before),
+                "original_leaf_substituted")
+            if is_lock:
+                fcntl.flock(fd, fcntl.LOCK_SH | fcntl.LOCK_NB)
+                self.locks.append((chain, name, fd, capture.bootstrap.custody._version(before)))
+                lock_owned = True
+            digest, total, chunks = hashlib.sha256(), 0, []
+            while True:
+                chunk = os.read(fd, min(65536, cap + 1 - total))
+                if not chunk: break
+                digest.update(chunk); total += len(chunk)
+                _preparation_need(total <= cap, "original_leaf_stream_bound_refused")
+                if collect: chunks.append(chunk)
+            version = capture.bootstrap.custody._version(before)
+            _preparation_need(total == before.st_size and capture.bootstrap.custody._version(os.fstat(fd)) == version
+                and capture.bootstrap.custody._version(os.stat(name, dir_fd=chain.fd, follow_symlinks=False)) == version,
+                "original_leaf_changed_during_stream")
+            observed = digest.hexdigest()
+            _preparation_need(expected is None or observed == expected, "original_leaf_external_hash_refused")
+            previous = self.leaves.get((parts, name))
+            _preparation_need(previous is None or previous == (version, observed, cap), "original_leaf_changed")
+            self.leaves[(parts, name)] = (version, observed, cap)
+            return b"".join(chunks) if collect else observed
+        finally:
+            if not lock_owned: os.close(fd)
+
+    def read(self, parts, name, *, cap, expected=None):
+        _preparation_need(name != "rows.jsonl", "original_rows_streaming_pin_only")
+        return self.pin(parts, name, cap=cap, expected=expected, collect=True)
+
+    def recheck(self):
+        for parts, chain in self.chains.items():
+            chain.recheck()
+            _preparation_need(capture.bootstrap.custody._version(os.fstat(chain.fd)) == self.directory_versions[parts]
+                and set(os.listdir(chain.fd)) == DIRECTORIES[parts], "original_directory_changed")
+        for (parts, name), (version, digest, cap) in tuple(self.leaves.items()):
+            _preparation_need(capture.bootstrap.custody._version(os.stat(name, dir_fd=self.open(parts).fd, follow_symlinks=False)) == version,
+                "original_leaf_version_changed")
+            if not name.endswith(".publication.lock"): self.pin(parts, name, cap=cap, expected=digest)
+        for chain, name, fd, version in self.locks:
+            _preparation_need(capture.bootstrap.custody._version(os.fstat(fd)) == version
+                and capture.bootstrap.custody._version(os.stat(name, dir_fd=chain.fd, follow_symlinks=False)) == version,
+                "original_publication_lock_changed")
+            os.lseek(fd, 0, os.SEEK_SET)
+            _preparation_need(os.read(fd, 2) == b"\0", "original_publication_lock_bytes_changed")
+
+    def close(self):
+        for _, _, fd, _ in self.locks: os.close(fd)
+        for chain in reversed(tuple(self.chains.values())): chain.close()
+        self.locks, self.chains = [], {}
 
 
 def _source_filings(snapshot, base):
@@ -419,11 +674,10 @@ class _PinnedRetainedInput:
 
 
 def _load_original_preparation():
-    tree = capture.bootstrap._Tree(capture.bootstrap.RootSpec("original-ib1cv2-preparation", PREPARATION_ROOT, "sealed-preparation"))
+    tree = PinnedOriginalPreparation()
     public = None
     try:
         public = _PinnedRetainedInput()
-        _tree_contents(tree)
         completion_raw = tree.read((), "completion.json", cap=preparation.MAX_COMPLETION_BYTES,
                                    expected=downstream.EXPECTED_COMPLETION_SHA256)
         tree.read((), "assessment.json", cap=MAX_ASSESSMENT_BYTES, expected=downstream.EXPECTED_ASSESSMENT_SHA256)
@@ -565,10 +819,11 @@ def _worker(audit_id, *, expected_head, expected_capture_report_sha256, parent_c
     _need(type(parent_context) is dict and set(parent_context) == {"identity", "frozen_sources"}, "worker_context_shape_refused")
     identity, frozen = parent_context["identity"], parent_context["frozen_sources"]
     _need(callable(executed_sources), "captured_source_only_worker_required")
-    capture.bootstrap._required_identity(identity, expected_head)
-    _current_bytes(identity, frozen)
-    output = _output_directory(audit_id, create=False)
+    _at_phase("worker_preflight", capture.bootstrap._required_identity, identity, expected_head)
+    _at_phase("worker_preflight", _current_bytes, identity, frozen)
+    output = _at_phase("worker_output_reservation", _output_directory, audit_id, create=False)
     inputs, raw, parents = None, None, None
+    phase = "worker_output_reservation"
     try:
         _need(set(os.listdir(output.fd)) == {"reservation.json"}, "fresh_reserved_projection_output_required")
         reservation_raw = output.read("reservation.json", cap=MAX_CONTROL_BYTES)
@@ -580,24 +835,28 @@ def _worker(audit_id, *, expected_head, expected_capture_report_sha256, parent_c
             "original_preparation_assessment_sha256": downstream.EXPECTED_ASSESSMENT_SHA256,
             "source_only_bootstrap_sha256": _sha(SOURCE_ONLY_BOOTSTRAP.encode()),
             "authority": _authority()}, "projection_reservation_context_differs")
-        _prove_worker_isolation(output.path)
+        _at_phase("worker_isolation", _prove_worker_isolation, output.path)
         sys.addaudithook(isolation._audit_event)
-        inputs, raw, snapshot, census = _load_original_preparation()
-        parents, descriptors, capture_reservation, capture_report = _load_sealed_capture(expected_capture_report_sha256)
+        inputs, raw, snapshot, census = _at_phase("worker_preparation", _load_original_preparation)
+        parents, descriptors, capture_reservation, capture_report = _at_phase("worker_capture", _load_sealed_capture, expected_capture_report_sha256)
+        phase = "worker_composition"
         _current_bytes(identity, frozen)
-        result = assess_supplied_early_parents(snapshot, census, descriptors,
+        result = _at_phase("worker_composition", assess_supplied_early_parents, snapshot, census, descriptors,
             expected_capture_report_sha256=expected_capture_report_sha256, fixture_only=False)
         payload = result.to_payload()
-        repeated = assess_supplied_early_parents(snapshot, census, descriptors,
+        phase = "worker_replay"
+        repeated = _at_phase("worker_replay", assess_supplied_early_parents, snapshot, census, descriptors,
             expected_capture_report_sha256=expected_capture_report_sha256, fixture_only=False)
         _need(repeated.canonical_bytes() == result.canonical_bytes(), "complete_reassessment_reexecution_differs")
+        phase = "worker_readback"
         inputs.recheck();raw.recheck();parents.recheck();_current_bytes(identity, frozen)
         assessment_raw = _raw(payload["assessment"])
         ledger_payload = {key: value for key, value in payload.items() if key != "assessment"}
         ledger_raw = _raw(ledger_payload)
         _need(len(ledger_raw) <= MAX_PROJECTED_LEDGER_BYTES, "projection_ledger_output_bound_refused")
-        assessment_sha = output.publish("assessment.json", assessment_raw, cap=MAX_ASSESSMENT_BYTES)
-        ledger_sha = output.publish("parent-projection.json", ledger_raw, cap=MAX_PROJECTED_LEDGER_BYTES)
+        phase = "worker_publication"
+        assessment_sha = _at_phase("worker_publication", output.publish, "assessment.json", assessment_raw, cap=MAX_ASSESSMENT_BYTES)
+        ledger_sha = _at_phase("worker_publication", output.publish, "parent-projection.json", ledger_raw, cap=MAX_PROJECTED_LEDGER_BYTES)
         completed = {"schema": SCHEMA + "/complete", "audit_id": audit_id, "fixture_only": False,
             "observed_at_utc": capture.custody._utc(), "current_execution_identity": identity,
             "frozen_sources": frozen, "reservation_sha256": _sha(reservation_raw),
@@ -616,7 +875,8 @@ def _worker(audit_id, *, expected_head, expected_capture_report_sha256, parent_c
             "source_only_bootstrap_sha256": _sha(SOURCE_ONLY_BOOTSTRAP.encode()),
             "xml_profile": XML_PROFILE, "authority": _authority()}
         inputs.recheck();raw.recheck();parents.recheck();_current_bytes(identity, frozen)
-        complete_sha = output.publish("complete.json", _raw(completed), cap=MAX_CONTROL_BYTES)
+        complete_sha = _at_phase("worker_publication", output.publish, "complete.json", _raw(completed), cap=MAX_CONTROL_BYTES)
+        phase = "worker_readback"
         _need(output.read("assessment.json", cap=MAX_ASSESSMENT_BYTES) == assessment_raw
               and output.read("parent-projection.json", cap=MAX_PROJECTED_LEDGER_BYTES) == ledger_raw
               and set(os.listdir(output.fd)) == {"reservation.json", "assessment.json", "parent-projection.json", "complete.json"},
@@ -626,28 +886,34 @@ def _worker(audit_id, *, expected_head, expected_capture_report_sha256, parent_c
             "assessment_sha256": assessment_sha, "projection_ledger_sha256": ledger_sha,
             "capture_report_sha256": expected_capture_report_sha256, "counts": payload["counts"],
             "projection_refusal_counts": payload["projection_refusal_counts"], "authority": _authority()}
+    except Exception as exc:
+        if getattr(exc, "_early_projection_failure_phase", None) not in _FAILURE_PHASES:
+            exc._early_projection_failure_phase = phase
+        raise
     finally:
         for held in (parents, raw, inputs, output):
-            if held is not None:held.close()
+            if held is not None:_at_phase("worker_cleanup", held.close)
 
 
 def run_observed_reassessment(audit_id, *, expected_head, expected_capture_report_sha256):
-    identity, frozen = _fixed_source_identity(expected_head)
+    identity, frozen = _at_phase("parent_preflight", _fixed_source_identity, expected_head)
     _digest(expected_capture_report_sha256)
     # Independent acquisition source lineage, not the current code masquerading
     # as the historical producer. No unsealed output is accepted by this path.
-    capture._verify_original_committed_sources(CAPTURE_ID, expected_capture_report_sha256)
-    output = _output_directory(audit_id, create=True)
+    _at_phase("parent_original_sources", capture._verify_original_committed_sources, CAPTURE_ID, expected_capture_report_sha256)
+    output = _at_phase("parent_output_reservation", _output_directory, audit_id, create=True)
+    phase = "parent_output_reservation"
     try:
         reservation = {"schema": SCHEMA + "/reservation", "audit_id": audit_id, "capture_id": CAPTURE_ID,
             "capture_report_sha256": expected_capture_report_sha256, "current_execution_identity": identity,
             "frozen_sources": frozen, "original_preparation_completion_sha256": downstream.EXPECTED_COMPLETION_SHA256,
             "original_preparation_assessment_sha256": downstream.EXPECTED_ASSESSMENT_SHA256,
             "source_only_bootstrap_sha256": _sha(SOURCE_ONLY_BOOTSTRAP.encode()), "authority": _authority()}
-        output.publish("reservation.json", _raw(reservation), cap=MAX_CONTROL_BYTES)
+        _at_phase("parent_output_reservation", output.publish, "reservation.json", _raw(reservation), cap=MAX_CONTROL_BYTES)
+        phase = "parent_captured_sources"
         sources = []
         for name, digest in sorted(identity["source_sha256"].items()):
-            raw = isolation._read_source(name)
+            raw = _at_phase("parent_captured_sources", isolation._read_source, name)
             _need(_sha(raw) == digest, "parent_captured_source_bytes_changed")
             sources.append({"path": name, "sha256": digest, "source_b64": base64.b64encode(raw).decode("ascii")})
         envelope = _raw({"sources": sources, "parent_context": {"identity": identity, "frozen_sources": frozen},
@@ -657,13 +923,18 @@ def run_observed_reassessment(audit_id, *, expected_head, expected_capture_repor
         policy = isolation._worker_policy(output.path)
         command = ["/usr/bin/env", "-i", "PATH=/usr/bin:/bin:/usr/sbin:/sbin", "/usr/bin/sandbox-exec", "-p", policy,
             sys.executable, "-I", "-S", "-B", "-c", SOURCE_ONLY_BOOTSTRAP]
-        child = subprocess.run(command, cwd=capture.bootstrap.custody.LANE_ROOT,
+        phase = "parent_worker_launch"
+        child = _at_phase("parent_worker_launch", subprocess.run, command, cwd=capture.bootstrap.custody.LANE_ROOT,
             input=envelope, capture_output=True, check=False, timeout=1800)
+        phase = "parent_worker_result"
         _need(_fixed_source_identity(expected_head) == (identity, frozen), "parent_source_or_head_changed")
+        if child.returncode != 0:
+            _at_phase("parent_worker_result", _raise_reported_worker_failure, child, output, audit_id=audit_id)
         _need(child.returncode == 0 and not child.stderr and len(child.stdout) <= MAX_CONTROL_BYTES,
               "isolated_reassessment_failed_outputs_preserved")
         # print adds one framing LF, not an arbitrary whitespace suffix.
         result = _strict_summary(capture._json(child.stdout.removesuffix(b"\n")), audit_id=audit_id, report_sha=expected_capture_report_sha256)
+        phase = "parent_publication_verification"
         complete_raw = output.read("complete.json", cap=MAX_CONTROL_BYTES)
         _need(_sha(complete_raw) == result["complete_sha256"],
               "worker_complete_hash_refused")
@@ -681,6 +952,10 @@ def run_observed_reassessment(audit_id, *, expected_head, expected_capture_repor
         output.check()
         _source_execution_context(complete.get("source_execution", {}).get("executed_sources"), identity)
         return result
+    except Exception as exc:
+        if getattr(exc, "_early_projection_failure_phase", None) not in _FAILURE_PHASES:
+            exc._early_projection_failure_phase = phase
+        raise
     finally:output.close()
 
 
@@ -716,10 +991,9 @@ def main(argv=None):
         print(_raw(result).decode());return 0
     except (EarlyParentProjectionError, capture.EarlyParentCaptureError, capture.bootstrap.ParentBootstrapError,
             capture.bootstrap.custody.ArchiveAssessmentRunnerError, identity_v2.Ib1cIdentityV2Error,
-            OSError, ValueError, TypeError, KeyError, subprocess.SubprocessError):
-        print('{"disposition":"offline_parent_projection_refused_outputs_preserved"}');return 2
+            OSError, ValueError, TypeError, KeyError, subprocess.SubprocessError) as exc:
+        print(_raw(_failure_diagnostic(exc)).decode());return 2
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

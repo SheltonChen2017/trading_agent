@@ -25570,3 +25570,129 @@ two memory compilations passed with network/fork/all-write denial. Diff and
 frozen four-file comparison against origin85c7755d are clean. The prospective
 three-window operation and its independent verifier remain unexecuted at
 this activation commit time.
+
+## 182. Fixed original preparation custody and prospective refusal diagnostics (2026-10-14 UTC)
+
+### 182.1 Exact legacy layout, not permission repair or generic cap expansion
+
+Embed a lane-local PinnedOriginalPreparation in the owned projection source;
+do not change the old publisher, shared tree or original input modes/bytes.
+The exact private700 outer root admits only four original owner755
+directories: ib1a/ib1b and their fixed raw/parsed snapshots
+sec-insider-bulk-2006q1-afe9a4b0bd20acce and
+sec-insider-parsed-2006q1-777136638dc6a1e5. Only their two exact publication
+locks may be owner644, single-link and the one NUL byte (SHA-256
+6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d).
+Every other control/data leaf remains owner600/single-link/no-follow.
+Bind external completion d05e0345 and assessment402fa186 BEFORE public
+children; exact inventories, held ancestors/versions/hashes and lock FDs
+are rechecked. No broad755/644 exemption or original chmod is introduced.
+
+The original parsed rows.jsonl is332,749,655 bytes, larger than the generic
+256MiB in-memory leaf cap. Its SHA-256
+7760de4233b87468406de9a00c837d4e40be59a6f1378f8029e68e3216252805
+was independently streamed against the strict parsed manifest. Production
+derives its binding through parsed_contract._identity_from_manifest, whose
+existing typed rows contract enforces512MiB, and requires this exact original
+size. Streaming custody pinning does not raise any generic/parser/output
+cap or allocate another whole-row-file copy. The existing full raw-bound
+_verify_quarter and original public raw/parsed loaders remain mandatory
+before any new assessment publication. Hash-only scouting is not that replay.
+IBEARLY-182-R01 P2 CLOSED: generic private layout cannot read this exact
+original public publisher layout. IBEARLY-182-R02 P2 CLOSED: generic256MiB
+custody collection cannot hold the already-valid typed parsed rows artifact.
+
+### 182.2 Failed child controls stay failures, with no private traceback retention
+
+Add fixed phase/class/recognized integer OS errno only to the source-only
+bootstrap, worker and parent CLI. Never retain/print exception text/args,
+paths, raw stderr/stdout, source rows, contacts or credentials. Exact
+canonical failed-child controls with empty stderr and worker_* phase may
+produce worker-failure.json ONLY in their newly reserved output, all flags
+false, before exit2. They never produce complete/success. Invalid wire or
+parent phases are refused without publishing untrusted child contents.
+Validate mutable reported-exception diagnostics again on every serialization;
+invalid fields/reassignment use a fixed sanitized fallback.
+
+Internal peer retained4 genuine baseline diagnostic reds0.42s; an additional
+3 mutation/leak reds0.37s became green after revalidation. Final private
+68 focused/boundary/EXACT guard passes3.14s, then fixed-layout combined86
+checks3.29s. Private helper c162d364/test34f07a48 admits only the exact
+observed layout; generic _Tree still refuses the invented755 fixture.
+Main transplantation287 projection/custody/diagnostic/frozen-parser/v2/
+boundary/EXACT named guard checks passed8.36s under process-tree network
+denial with isolated temporary database/output roots. Independent internal
+peer168 active/private/boundary/EXACT checks passed7.67s; three genuine
+preceding6cea child-parent-phase reds plus a valid worker positive control
+became four green. No peer actual root replay or independent Claude review
+is claimed. The prior failed runs are untouched.
+
+### 182.3 Benzinga reservation-only disposition and safe successor definition
+
+The section181 actual Benzinga CLI ran at clean
+5978156f0e9fd2d13f051138b4cdeab12cfa525f and returned2. Run
+ib-benzinga-gap-three-months-20261014-once contains manifest.json ONLY:
+7,648 bytes, SHA-256 513cb6cb1fd57c064f07c8ba97d520b5d3f97489503c3ce81fcf8a12dcfd395d,
+registered2026-10-14T03:14:06.668197Z, source inventory digest
+936f64b3595af7012c02630d39445c287d81b1592fb8adee89432c3d53bbf469.
+Independent current observation found0 global claims,0 starts,0 results
+and no raw/metadata/completion. In that exact committed path, private
+credential loading and the only transport follow durable claim/start;
+neither was reached. All three URLs remain proven never-claimed/unattempted,
+not ambiguous, consumed or successfully acquired. Preserve this manifest;
+do not retrofit a completion/failure or resume its run ID.
+
+Original exception/stage was not retained and remains unestablished. A later
+network-denied readonly reconstruction at the same5978156f passed exact
+current identity (same source inventory), prior access guard and current
+journal guard. That later success neither identifies the original cause nor
+proves the guards could never have refused transiently. Mac lock is NOT
+attributed as this capture's cause; Safari remains separately locked.
+
+IBSOURCEOBS-182-R03 P3 CLOSED: future capture refusals expose only fixed
+identity/prior-access/journal guard phase, category and recognized errno.
+Preserve same exceptions and existing EarningsGapError conversion, carrying
+only revalidated sanitized fields through it. Three genuine CLI phase reds
+0.73s and one actual invented guard-conversion red0.70s became green.
+A preceding final-tree run306 passes/one obsolete generic-output assertion
+4.27s was corrected to require the precise sanitized output without exposing
+the invented secret. Main final308 focused gap/prior-access/import/EXACT
+guard checks passed4.30s; peer255 active/private/boundary/EXACT checks
+passed4.05s, including41 adversarial shape/mutation/subclass/errno/copy and
+actual fixture guard cases. Four memory reversals/two memory compilations
+passed0.219s under network/fork/all-write denial. No peer actual access.
+
+| Active source/test | SHA-256 |
+|---|---|
+| research/insider_buying_sec_2006q1_parent_projection_v1.py | b8fba6a9978d1caca3a5ac17bc604e68c2bd082f53323be322713712af71a285 |
+| tests/test_insider_buying_sec_2006q1_parent_projection_v1.py | 749727fcaecbdd82df2b18553d2f3c1c3727c774e1aad1b1df07429698501bbd |
+| tests/test_insider_buying_sec_2006q1_original_preparation_custody.py | 0ede2593bd0c2762a07ddbba13d35598e969788e91ee734d83da192da4285dbf |
+| tests/test_insider_buying_sec_2006q1_parent_projection_diagnostics.py | 6f9ff516399cd0df6be22336435abc1477a34f112b191a262b36270489ae734e |
+| research/insider_buying_benzinga_earnings_gap_capture_v1.py | ab36c0ca6ef110132a6db0aee9eecbd6eb2e5baf8db25688945b824f967ad2d5 |
+| tests/test_insider_buying_benzinga_earnings_gap_capture_v1.py | 9f159907c1846bf4394eda50bb02f2e86d3c725fff674ddf537cd35f1954789e |
+
+Delegated next operations after a new clean committed image:
+ib-2006q1-parent-projection-public-layout-v2-20261014-once against sealed
+capture7d42a663/original preparation pins, and
+ib-benzinga-gap-three-months-diagnostic-v2-20261014-once against the exact
+same three PROVEN NEVER-STARTED supplier windows. New names do not authorize
+completed/ambiguous duplication: prior claims/manifests remain immutable and
+are inventoried before any request. Freeze tracked source/test/record bytes
+during these actors; each retains the actual execution-time commit and its
+own source inventory. Never represent a later commit as already existing.
+
+All source/PIT/rights/economic identity/canonical/full-population/protocol/
+look/QC/backtesting gates remain unfulfilled; six open topical/shared P2
+scopes retain their exact dispositions. No frozen/shared source or record,
+Action Plan, SESSION_HANDOFF.md, source window, prescribed strategy economics,
+outcome look, backtest, broker/capital/order, interim push or monitor rearm
+is changed. Continue specifically defined real-input work, not a routine
+checkpoint pause. Single final combined push remains at the honest end.
+
+Main combined focused source/reader/capture/record/active-document/boundary/
+EXACT package checks initially passed613 with one documentation spacing
+failure9.75s: an adjoining SHA-256 label made a correct64-character pin
+appear67 characters long. The separating space was corrected, not the
+digest bytes. Six memory compilations with network/fork/all-write denial,
+diff check and frozen four-file comparison are clean. No actual operation
+or full suite is attributed to this final-tree qualification.

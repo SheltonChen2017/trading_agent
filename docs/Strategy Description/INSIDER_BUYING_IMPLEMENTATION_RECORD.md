@@ -26537,3 +26537,310 @@ denial/temp DB. Four memory-only phase reversals genuinely failed, eight
 lateflow controls restored green; alias red0.358s/control0.326s. No actual
 retained-input/provider/UI access, tracked write, commit or push by that peer.
 Main final three memory compilations/four frozen-byte checks passed0.360s.
+
+## 190. Preserved SDK preparation, shared Safari coordination and source-epoch decision (2026-10-14 UTC)
+
+### 190.1 Observed preparation is not observed hosted execution
+
+After the section189 preregistration was committed, main prepared the fixed
+owned-project37465795-five-types-four-property-definitions-v1 scope on clean
+efe781a0f6cdcd3178eef0db1785207420d8911e. The independent pre-paste Safari
+observation records2026-10-14T05:27:05+00:00, SHA256
+a0061f5eb880886affbf9ba5a2acc38759a523e9c0cdc04889b85e9b78e5cbbc.
+The preparation call succeeded0.214s under process-tree network denial. It
+permanently consumed the original scope; it did not paste, transfer or invoke
+the SDK cell. Do not reset, reclaim or rename this scope to repeat it.
+
+The exact ten prepared leaves remain under the fixed private namespace
+artifacts/insider_buying/qc_sdk_metadata_once_v1. A later main readonly check
+under native network/fork/all-write denial independently validated the original
+prepared receipt schema, exact ten-leaf inventory, claimed efe781a0 Git epoch
+and lineage7ee85bb7a398b12a50fc020cb0217b6540113bb70e8127f456e11706c24792d4.
+No metadata-observation.json or completion.json exists. The nine captured
+pre-lineage leaves have these exact pins:
+
+| Leaf | Bytes | SHA256 |
+|---|---:|---|
+| scope-claim.json | 576 | f94b6d657a6be8a35bd199946d2f262ef4906118df00f618cc04dd811befab9a |
+| cell-source.py | 11628 | 578097de483ff877fab6748bfd1b1899df0e4e26201fdd12db717254a926cd0f |
+| invocation.py | 894 | 3750bfcb08d4fddb2f838a39a90335c2487d2ee89fb31fc06d697c10cf97c635 |
+| supervisor-source.py | 35621 | 24185d232ea42f7f304b874327aa81e0278744551adcf156db2c3827abb1fc4e |
+| registration.json | 660 | 23162986dc506d1fac787c120c4123aa0acef66036dfc0566de67efdab6d36af |
+| registration-bindings.json | 1103 | 4490d7a5c283accc05bf80361af0460e700f18704354660c3b57f03d66edb4a4 |
+| start.json | 376 | 7911030afb2113bd68a030647360e290f66551df20bb2bf23bcb9c3253951f6b |
+| start-bindings.json | 528 | fb73bee1c073ec07974770ad79938b07036f4a2f720edf2e08ba8059b29952ff |
+| control-input.py | 1434 | bb3914de2aa4d17fd1285fbc4d3bd8d6dbd4518115780373bcd367f40b64543f |
+
+These are local custody observations, not cloud execution, SDK entitlement,
+History return-shape, issuer/SID/PIT evidence or strategy readiness. Codex has
+performed no SDK source paste, files-API transfer or explicit hosted invocation.
+Absence of local terminal leaves is not a general claim about all cloud activity.
+
+### 190.2 Owner-supplied coordination fact and delegated engineering decision
+
+The owner now explicitly confirms multiple lanes have been using Safari.
+This explains why a selected window/tab/project could change between checks;
+it does not identify which actor performed any individual change. Preserve
+other-lane work and do not execute through a changing shared project. Fresh
+owned-project URL checks stopped unsafe selections; a toolbar add-cell action
+was not followed by SDK source paste or execution. No old native-access cell,
+RunAll, getter, History, resolver, data/export, algorithm or backtest was run.
+
+Decision under the owner's continuous-build/delegated-judgment authorization:
+qualify a separately versioned, lane-owned files-API transfer operator for one
+uniquely claim-hashed metadata-only notebook in the same owned project. It
+will contain exactly the captured source/control/invocation as three inert
+code cells, null execution counts and empty outputs. Positive named absence,
+one create and exact named byte/cell readback are the only allowed requests,
+maximum three, durable starts before I/O, no retry/update/delete/compile/launch
+or data API. Transfer is not execution and cannot authenticate execution.
+Actual use remains conditional on source/fixture/native-denial qualification,
+clean committed installation and a separately preregistered bounded operation.
+An independently controlled exact-project observation is still required before
+the one-shot invocation; shared Safari availability cannot be manufactured.
+
+The original supervisor's completion entry binds the entire claimed HEAD.
+Later ordinary lane commits would therefore prevent completion even when all
+three captured SDK images are unchanged. Do not alter those three sources,
+claim or prepared leaves to bypass it. Qualify an additive completion-v2
+verifier that separates the captured efe781a0 epoch from a clean current
+verifier epoch; require claimed-epoch ancestry and equality of all three
+captured/current/claimed-Git/current-Git source images, plus committed verifier/
+transfer-source custody. Preserve the original historical receipt fields and
+bind the two epochs in separate immutable auxiliary receipts. This is a
+prospective engineering decision, not an activated verifier or completed probe.
+No new class/property scope, second invocation or SDK/data authority follows.
+
+### 190.3 External archive alternatives and retained shared findings
+
+Official FirstRate Data earnings/fundamentals pages advertise January2000
+history, release dates, reported-versus-future status and BMO/AMC/in-hours
+timing; the product page describes one-time history access and approximately
+USD60/month updates. The upfront history price is not verified. Its public
+license permits perpetual local use and service-provider processing while
+restricting raw redistribution. Neither a headline coverage date nor public
+terms prove this owner's purchased entitlement, January2006/dead/reused-ticker
+coverage, revision lineage or usable release-time evidence. Recommendation:
+qualify representative frozen-cohort/gap samples and applicable use before a
+purchase; do not renew Massive solely as a substitute for2006, because its
+published earnings history starts2010-04-30. No new vendor request/purchase or
+contact occurred during this alternatives search.
+
+Sources: https://firstratedata.com/fundamental-data/earnings/;
+https://firstratedata.com/fundamental-data/;
+https://firstratedata.com/about/license;
+https://massive.com/docs/rest/partners/benzinga/earnings.
+Intrinio/Zacks remains an enterprise/sample/terms candidate, not established
+retail coverage; ordinary WSH historical access is not offered for individual
+personal research. The owner's likely-expired Massive hypothesis remains
+distinct from its consumed August2018HTTP403; FMP stays skipped as directed.
+Existing Sharadar/EODHD captures are not repurchased or duplicated.
+
+Two broader targeted shared guards again failed during private selector
+qualification: tests/test_project_separation_entrypoints.py::
+test_product_dependency_manifests_cover_actual_imports and
+::test_sep2_definition_of_done_is_reconstructed_not_self_asserted. The broader
+selection measured178 passed/2 failed46.36s, not an all-green result or full
+suite. They name undeclared hosted roots IPython/QuantConnect/clr in the shared
+strategy_research dependency manifest. Retain IBSH-CR02 OPEN, adding clr to its
+existing platform-import coordination evidence; do not edit the shared SEP-2
+manifest or claim the private selector caused those hosted imports. All six
+topical/shared P2s remain OPEN, no openP0/P1; both final owner incident
+classifications, all frozen source/window/economics and false readiness gates
+remain binding. Continue scoped offline build; no interim or successful final
+push has occurred in this round.
+
+## 191. Owner-requested checkpoint handoff; build and QC remain paused (2026-10-14 UTC)
+
+### 191.1 Exact authorization, incoming review and outgoing committed series
+
+After explicitly pausing work for another lane's exclusive QC use, the owner
+repeatedly directed "push for now". Treat that as one explicit checkpoint-push
+authorization, superseding this round's previous end-of-completion timing
+requirement only. Make exactly one successful matching-lane push, not one per
+repeated message. This is NOT lane completion or backtesting readiness. QC,
+Safari, acquisitions and further implementation stay paused until the owner
+gives the all-clear; do not automatically resume after ten minutes. The existing
+heartbeat stays PAUSED, with no rearm/new automation or other-chat message.
+
+The accepted incoming Claude review remains exactly
+618d1813bc762bc1e45e1c65c90933d7d32554a9..85c7755deb75b5d0c61cc4a63a385d4b87b55110:
+one documentation-only commit85c7755d, ACCEPTED with independent229-case
+validation and precise exclusions in160.1. Do not reopen already accepted
+86700b1c or relabel any Claude-attributed experiment as new Codex evidence.
+All subsequent work below is Codex implementation/self-and-internal-peer
+validation, NOT a later independent Claude review. The final handoff is a
+separate documentation commit after these exact existing hashes:
+
+| Ordered outgoing commit | Behavior / durable record |
+|---|---|
+| c666ebeea66c15af6a0237b108a276b96e86615d1 | Exact incoming counter-review accepted; section160. |
+| e6f5fb5179db696723bd5cfaaa024c70122a59e1 | Validated POSIX custody support; Windows port deferred; section161. |
+| 583569680db4273c6b6a5012926b0dd43e3037ec | Bounded public early earnings-date feasibility probe preregistration. |
+| 019dca79502d32d12cb9fb8877833d480f637d96 | Observed public-probe disposition and source-access blocker. |
+| fedf07eb2f5b262a1a4b6388922198df75c509b6 | Paid Calendar qualification and complete-quarter issuer inventory. |
+| 86c0ae96a8c02f131da8af5d56f7f28f3000e53a | Observed Calendar access and exact offline issuer census. |
+| 7b650d042a0f44c3aa6e6b2c4a34517dc77bd032 | Bounded historical actual-earnings archive capture preregistration. |
+| c376b953c66f22d2ae0131add0ea49251fef93c0 | Observed archive refusal; non-repeating continuation. |
+| 553faa37aace0106a6024156675ef1cfd40c5ca7 | Untouched continuation and isolated cohort-custody qualification. |
+| 6849dec54ba10443097f7903f4a384f688a5ca41 | Partial archive preservation and remaining source-integration scope. |
+| 6ddbced32af19f1d90a2879f29c957b4860e2332 | Partial custody and untouched earnings continuation. |
+| de9f54f76c58935fc01c97267397fb613dca2592 | Untouched earnings continuation, compact Sharadar and dual-partial assessment. |
+| 6314f5acf821df58c37a7ddd3857c225140b047c | Original-parent custody and canonical bootstrap scope. |
+| ebbee102303fbbd9f01408eab691a0aa6fc5722f | Sanitized capture diagnostics; observed initial64 parent custody. |
+| 6684e30edfa35f9434d86b07e699ad40927778ab | Complete-quarter original-parent projection accounting candidate. |
+| d2d194a588fa4f59304377761a43ab1dea494b00 | Explicit unimported four-file frozen-source/current-and-historical Git binding. |
+| 5978156f0e9fd2d13f051138b4cdeab12cfa525f | Three separately bounded Benzinga gap scopes. |
+| c1ccbc601c9c2b40217938cc55346c6281c85b5f | Typed legacy input custody and exact refusal phases. |
+| 45fc6e9a666aa5ab640dee1a8513f60611cd3990 | Exact verifier LF framing; observed original baseline and supplier refusal. |
+| fc0b1072cb9d5560f951e2245fb370345d6993ce | Contiguous source-view contract and three inert native SDK images. |
+| 0b55707f6fcf95d1ed25a224b2513d92ac22d5bd | Isolated source-view replay front and complete original provenance. |
+| 3d52635be7c22453ffc8f11111934c86b83f8ee4 | Observed full-quarter source-view operation; section186. |
+| acf66a7c9d138573823bb637eadf0f404a66c79d | Bounded title/current-reference integration candidate; section187. |
+| efe781a0f6cdcd3178eef0db1785207420d8911e | Preserved late refusal; prospective cleanup/phase corrections and SDK scope;188-189. |
+
+The pre-handoff committed range is therefore
+85c7755deb75b5d0c61cc4a63a385d4b87b55110..efe781a0f6cdcd3178eef0db1785207420d8911e,
+24 ordered commits, no merge or side branch. Individual implementation,
+validation, refusals, owner decisions and exclusions remain in160-190 rather
+than being replaced by this compact inventory. The pushed range ends at the
+new documentation handoff commit; its exact hash is obtained after commit
+and independently compared with origin after the single successful push.
+
+### 191.2 Observed results, failures and unfinished work
+
+Completed observed bounded work includes the full83657-filing2006Q1 inventory,
+compact supplied Sharadar reference assessment and77-month untouched EODHD
+continuation, the separate initial64 SEC bodies419628 bytes, preserved original
+baseline refusals and the genuine57/64 source-view bridges. Section186's
+source-view CLI succeeded151.581s on0b55707f;57 genuine bridges and7 preserved
+parser refusals leave83600 quarantined, zero original-parent admission.
+This is not a complete-quarter/corpus or a canonical backtest source stream.
+
+Keep the late title/reference operation distinct: section188's acf66a7c CLI
+exited2 after58.893s, even though its four retained leaves reached publication
+and readonly semantic verification. Its exact late cause is UNESTABLISHED.
+Preserve that consumed root; do not rewrite it as successful or run it again.
+IBREF-RUN-01/02/03 correct future reporting/cleanup only, with recorded genuine
+red/green evidence; they do not prove the unknown actual condition resolved.
+The recorded source/control/execution hashes identify the execution-time
+epochs, not later commits retrospectively assigned to those operations.
+
+The actual August2018 Massive diagnostic retains one HTTP403 product refusal
+and unknown event count; neither February gap was attempted. Do not retry or
+rename the consumed August scope. January2006, August2018, February2019 and
+February2020 remain genuine earnings-coverage gaps. Other partial/ambiguous
+roots stay preserved with unknown observations distinct from measured zeros.
+Both prescribed earnings diagnostics, historical identity/class/listing/
+availability evidence, original-parent admission and full-population protocol/
+registered-look roots remain required before a fixed order-based QC study.
+
+The section190 SDK preparation consumed its one permanent local scope on
+efe781a0 but has no Codex transfer/paste/explicit hosted invocation or terminal
+metadata evidence. Three original SDK source images and all ten local prepared
+leaves remain unchanged. A separately versioned completion bridge is still
+needed before completion on a later HEAD; do not use a historical-HEAD literal
+to bypass a clean-current-source gate. Changing shared Safari is not a safe
+execution context. No strategy launch/backtest attempt or outcome look occurred.
+
+The affected-quarter selector and additive SDK notebook-transfer/completion-v2
+work remain private ignored development drafts, NOT activated/committed/pushed
+features or observed operations. No actual selector was invoked; the exact ten
+year-mismatch quarters and complete19 affected list are still unmeasured.
+Private metadata-only selection preserves all six forms/raw short CIKs and
+source-year mismatches without reopening the old82-quarter publication route.
+Peer identified and corrected prospective constructor/nested cleanup masking;
+a verified parent aggregate form-total guard and coherent Form3-to-5 regression
+remain UNIMPLEMENTED: pause arrived before those edits/tests began. Finish
+that correction and exact final-image review/tests before any
+activation or real operation; earlier green images do not certify a later
+interrupted draft. Internal QA is not independent Claude acceptance.
+
+Main private pre-correction selector/boundary/EXACT/record/active-document
+selection201 passed18.87s; subsequent190 record/active/EXACT72 passed1.46s.
+The prospective selector author's133 passed14.49s and peer133 passed14.33s
+apply to the identified cleanup-corrected image, not a final accepted form-
+guard successor. That preserved private front is
+3d3d2c2c0d8ad6a6121461a0f6a2ec2df2a37320f907d756a85bef056396974d;
+its test image is73ccb3681b3a9560c7f4f5ed046983401a8e64edd84f8dff9a75763ef1cdd48c.
+Peer's six memory reversals restored green1.794s; no actual input was opened.
+The SDK-transfer/completion draft's last completed40 invented/mock lifecycle
+checks passed0.42s; final hashes, meaningful reversals, full peer review and
+activation qualification remain pending. Its completion lifecycle mocks the
+original core; it is not real metadata or real-scope completion evidence.
+All three internal agents confirm no validation was in flight or cancelled
+at the owner pause. No unfinished draft is included in this Git checkpoint.
+Two shared dependency-manifest failures remain as190.3,
+not discarded or included in an all-green suite. No complete lane/repository
+suite was run. Any validation actually cancelled by the owner pause is
+cancelled, not failed; a run that already finished is not relabelled cancelled.
+Checkpoint-specific final focused and compilation/diff/frozen checks follow
+before committing this handoff, without resuming actual source or QC work.
+
+### 191.3 Exact retained ledger, exclusions and next action
+
+No openP0/P1. Six P2 findings remain OPEN at their precise existing scopes:
+IB1C-REAL-CR01, IB1BCAMP-CR01, IBSRC-CR01, IBSRC-CCR01, IBSH-CR02 and
+IBQC-SHARED-META01. IBWIN-CR01 remains closed by the validated macOS/POSIX
+support disposition, not by a Windows custody port. Retain all other resolved
+findings and the existing nonblocking shared P3 ledger. Do not treat candidate
+contract tests, partial captures or view bridges as evidence closing these P2s.
+
+Keep the final owner classifications distinct, without retroactive approval:
+372 earlier requests have "historical authorization provenance not established";
+the separate reviewer incident has "reviewer-reported probable unintended SEC
+access; exact request count and transferred bytes not established". No
+conditional estimate is a newly measured count or byte total.
+
+Frozen v1/scale/pilot and the four v3 custody source images remain exact.
+Stoppedv3 stays unresolved1846 completed/1847 starts; no resume/rewrite or
+completed/ambiguous redispatch. Its separate7373-byte diagnostic/report
+206e6db9677fb169455f62357ce966384926080b6eba582094e9536e88d705b7 does
+not settle the unmatched start. Frozen2022Q4-2023Q1 remains19846 source-bound
+of99394 with79548 originally unattempted, not the full study population.
+StrictD23 still has seven nonexact quarters/no82-quarter promotion digest.
+
+No additional source/PIT/rights/canonical/mapping/look/QC/backtest/execution
+authority is asserted. No funded/paper/live/broker/order/capital action,
+shared/project-wide document or root SESSION_HANDOFF.md change, provider data
+redistribution, new automation or other-chat message. Raw datasets, local
+operations, credentials and unfinished drafts remain ignored/private rather
+than being added to Git. The owner expressly permits this checkpoint push;
+do not misrepresent it as completion of the original continuous-build goal.
+
+Next action after the owner's all-clear: inspect any incoming exact-snapshot
+review and lane state, finish qualification/activation of the already defined
+private metadata selector and SDK source-delivery/epoch bridge, then continue
+the existing honest source/identity/readiness work under delegated judgment.
+The actual archive/coverage/identity/use prerequisites remain factual, not
+routine approval gates; exhaust safe scoped alternatives without fabricating
+them or repeating consumed requests. Do not automatically rearm a monitor,
+resume QC, launch a strategy job or promote readiness after this push.
+
+### 191.4 Checkpoint-specific validation and publication boundary
+
+At the owner's checkpoint request, main independently reverified the exact
+designated worktree/branch, HEADefe781a0 and matching remote85c7755d; only the
+known lane-record append was tracked dirty. Fresh explicit title/front/pure,
+SDK-cell/supervisor/custody, import-boundary, record/active-document and EXACT
+tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports
+selection passed351 in9.46s under effective process-tree network denial,
+disabled plugin autoload/cache, -B and fresh isolated database/temp paths.
+This is focused checkpoint validation, not a complete lane/repository suite
+or a repeated actual-input operation. Twenty-seven outgoing research source
+images memory-compiled under native network/fork/all-write denial; invocation
+bytes were compiled only, never imported or executed. Loopback refusal was
+observed independently; no credentials or datasets were used by that check.
+
+All four current custody hashes equal the exact historicalaa0d635d blobs;
+the complete offline package, Action Plan, shared process/architecture and
+root Session Handoff have empty outgoing diffs. Diff checking is clean.
+Readonly internal checkpoint audit accepts190 and verifies the24 existing
+outgoing hashes, incoming disposition and frozen/shared exclusions; it does
+not re-authenticate earlier UI/artifact/vendor observations. The checkpoint
+contains only already committed work plus this separate lane-record handoff.
+Reverify exact root/branch/HEAD/expected status and fetch only the matching
+remote before commit and push; stop on unexpected advancement. No successful
+push is asserted inside this prepublication record. Compare the exact handoff
+commit with an independent matching-branch remote read after the one push.
+Final handoff record/active-document/EXACT checks72 passed1.24s; diff clean.

@@ -21573,3 +21573,58 @@ artifact/unsupported count assumptions and are retained failed diagnostics,
 not native errors or evidence of additional cloud edits. Exact generated
 frozen OFF bundle identity is the accepted comparison. It still proves no
 historical job compiled source or native financial/canonical completion.
+
+## 90. Owner-unlocked continuation of bounded Mia recovery — 2026-10-14 UTC
+
+### 90.1 Resume authority, exact baseline and fresh preflights
+
+Owner answered the exact continuation/unlock question: "unlocked". This is
+owner-reported access restoration, not yet independent UI proof or native
+financial acceptance. Resume only the already authorized OFF-first/ON-after-
+valid-baseline recovery and prospective first-refusal witness from89.6–89.7.
+Prior publication3dfa7d1ef070e58ebdbd54860a614a8c5b821d81 remains immutable;
+physical/Git root and codex/strategy-target-price-revisions verified, clean
+local HEAD equals ACTUAL matching remote. No fetch/checkout/reset or concurrent
+work was absorbed. Prior review-skip direction permits this bounded recovery
+continuation, not canonical acceptance or permanent removal of independent
+review. Claude remains independent reviewer of all published unreviewed
+rounds; no completed review is invented. Monitor stays PAUSED.
+
+NEW DISCOVERY-SUCCESSOR-20261014-001 at3dfa7d1e, created05:18:36.720773Z:
+plan0e5ee8adc3e6dca9cda29f07aca792b0d213b1b4921b531cfde9975a7eb1d6eb;
+one fixed own backtests/list request,29881wirebytes,14known jobs and ZERO
+unknown jobs, no error/parameter/source/performance bodies disclosed. All
+known historical statuses remain diagnostic; the sole short Completed is
+not accepted. Native creation clocks remain server-unzoned, not assigned UTC.
+Projection4138/8cfb978f0145186d18ae71fdb347da0b45d876475c72cd9046e3aa47260c3239;
+receipt11774/a543db09c298a580e17bb80fc5b122b408bd2b8dce1cd6c07396daa6fa1027bc.
+No new outcome look or attempt. Controller exited0/released before source work.
+
+NEW SOURCE-POST-20261014-014 at3dfa7d1e, created05:19:47.424784Z:
+plan7fc433be92912a781eaf3301779e1224c093ee7cadea4da14cf19e4c3779904f;
+two fixed own files/read calls502406wire/230180freshly declared exact baseline
+comparison bytes. ALL15 stable and every content hash equals013/012. Restored
+main60012/454ed1e39762010997f53ef6a9f2e9064810d40a6812aae513a8fa3b090ca505;
+read2archive249321/aee803428f33b2d05cbceffecbcd831461318d7ca7142d558f1b083e23ed4e02,
+delta150377/9fc26fae003afc31315628955826f2b4ecd740d9b133ecb3d525b7a91af833b1,
+receipt9084/dbe10a0f71f9326f646f49a35bc7850649afd795b019716c6b1d8576b9f534d9.
+Old access receipts are not renewed; originals/failed scopes/unused hooks and
+notebook are preserved. Native source capture is not compiled-job proof.
+
+TPR-EXT26-D106 (agent-delegated, independent review pending): NEW source-only
+WITNESS-SOURCE-20261014-002 at the then-committed HEAD/current15minute scope,
+same exact helper11770/82e72980 and current main454ed1e precondition. Permit
+only authenticated built-in Mia to add exact helper plus import, ONE persistent
+initialization and two original-guard-preserving observation hooks; at most5
+Mia saves/explicit on-save build calls and40new observed background events.
+One bounded public-code/message transfer; <=36AX/4screenshots/20actions/
+600seconds; exact own project and optional calling Codex public-file panel/
+Safari tab metadata/own resource metadata only. No private market rows in
+logs/Git, object enumeration, source-control takeover, unrelated files,
+account/provider/engine change, input upload or strategy launch. Source014
+preflight must be fresh before edits; drift/control conflict means stop/wait.
+No reuse of spent locked-Mac001. Every saved cloud file/diff will be captured
+and independently checked; focused main-hook proof/whole-source freeze and
+separate genuine-Mia look reservation still precede any job. Observed looks30,
+OFFCodex3/ON0 remain unchanged; proposed31 is not a measured result or reset.
+Shared/root/sibling behavior and parked canonical gates remain unchanged.

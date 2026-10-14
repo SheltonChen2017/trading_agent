@@ -51,6 +51,21 @@ def test_two_process_snapshot_preserves_all_local_lane_facts_and_flags():
     assert git.commands[1] == ["git", "status", "--porcelain=v2", "--branch", "--no-ahead-behind", "--untracked-files=all"]
     assert evidence["HEAD"] == HEAD and evidence["branch"] == m.BRANCH and evidence["dirty_entries"] == 0
 
+def test_actual_no_ahead_behind_placeholder_header_is_valid_not_remote_evidence():
+    git = Git()
+    git.status += b"# branch.ab +? -?\n"
+    evidence = git.guard().check().payload()
+    assert evidence["HEAD"] == HEAD and evidence["dirty_entries"] == 0
+    assert len(git.commands) == 2 and all(command[1] != "ls-remote" for command in git.commands)
+
+@pytest.mark.parametrize("extra", [b"# branch.ab +? -0\n", b"# branch.ab +0 -?\n",
+    b"# branch.ab +?? -?\n", b"# branch.ab +? -?\n# branch.ab +? -?\n"])
+def test_placeholder_header_does_not_relax_malformed_or_duplicate_status(extra):
+    git = Git()
+    git.status += extra
+    with pytest.raises(m.LaneBatchRefusal):
+        git.guard().check()
+
 
 @pytest.mark.parametrize("change", [
     lambda text: text.replace(HEAD, "c" * 40),

@@ -19480,7 +19480,89 @@ permanent look IDs none, QC launch attempts0; no backtest has run. Shared
 project documents and SESSION_HANDOFF remain frozen, with ONE final lane push
 reserved for genuine closure.
 
+### 116.20 Guard-format correction before the offline writer
+
+The prospective writer freeze is local-only
+**7dde2ce2ad005b86e0fd2a1ea2b3939249052974**. Its first invocation refused
+`porcelain_header_changed` during initial local lane validation, before
+creating the fixed cache directory or reading any source/provider key.
+Main independently verified roots, exact branch/HEAD, clean status and actual
+matching origin1f90c626. The actual clean porcelain-v2 status contains
+`# branch.ab +? -?` despite `--no-ahead-behind`; it is a valid uncomputed
+count placeholder, not a root/branch/HEAD mismatch or ancestry proof.
+No source/provider/credential/look/QC budget or capture directory was consumed.
+The failure is retained, not reported as a successful source replay.
+
+**SI-DEC-20261013-46** corrects only this lane guard's known format: permit
+the exact uncomputed `+? -?` header when the separately validated upstream
+is exactly origin/codex/strategy-short-interest. Numeric, malformed, partial,
+duplicate and other unknown headers still refuse. No dirty tracked/untracked
+entry is allowed. Physical/Git roots, branch, HEAD and fresh local two-Git
+checks remain exact; actual matching origin is still freshly queried at each
+finite batch boundary. Count placeholders do not replace remote or ancestry
+checks. The [Git status contract](https://git-scm.com/docs/git-status) documents
+optional branch headers and disabled detailed count calculation; Main's real
+Git observation supplies the exact placeholder shape.
+
+Guard source SHA256 after correction:
+`89a606d337f3f9e7a27eda7a805f9f68eb9163ba06fa9fb966e6ac1131ef1888`.
+The concrete corrective runtime HEAD is the clean commit containing this
+append. The section116.19 writer source/protocol, fixed exclusive directory,
+all original source/spent-budget pins and one offline preflight scope remain
+unchanged. Because the first invocation created no target and read no source,
+Main may start that still-unused offline write under this corrected clean
+freeze, retaining its actual complete code manifest and this new creator
+HEAD. It is not resumption/overwrite of a partial source capture or reset of
+an HTTP budget. No count/provider request is opened by this correction.
+
+**SI-DEC-20261013-47** prospectively distinguishes private returned own-QC-
+project identity metadata from credential echoes in a future source-free
+controller. Only independently returned, primary-documented typed ownerId
+and collaborator uid fields may remain in protected raw own-project metadata;
+none may enter public summaries, request descriptors, Git or chat. This does
+not directly persist/fingerprint the supplied QC_USER_ID. Tokens, timestamped
+authentication digest, full/encoded Authorization and user-ID echoes outside
+those exact typed fields still refuse before raw hash/storage. No guessed
+identity-field variant, account/all-project enumeration, key/UI capture or
+new credential is authorized. A protected body SHA is source-response custody,
+not a direct credential fingerprint. This proposal is unexercised; complete
+source-free candidate/project/budget/attempt registration remains necessary.
+
+Safari became readable after the owner's latest manual unlock. Main observed
+the already signed-in Sharadar account and followed its existing Terms & Use
+link, without accepting new terms or reading credentials/provider rows.
+The authenticated account points to the same public
+[Personal Use License](https://sharadar.com/terms). Personal local research and
+nonreconstructible derived works are distinguished from redistribution of
+raw/reconstructible data; section8 data-usability/fitness conclusions remain
+private. No generic institutional affiliation or permission-letter request is
+made. Those terms are not treated as permission to upload raw/reconstructible
+Sharadar rows to QC, and source-free mechanics grants no such permission.
+Safe documented processing/source alternatives are being checked separately.
+
+Append-only ledger addition; historical001–037 remain unchanged:
+
+| ID | Priority / disposition | Evidence, correction and retained limits |
+|---|---|---|
+| SI-BUILD-20261013-038 | P2 live-format compatibility, confirmed/corrected | Main's live zero-source writer refused a valid disabled-count header. Literal regression then failed1/34 deselected0.41s; exact-placeholder correction with wrong/duplicate/numeric/dirty/HEAD/root/remote controls passes the connected152 selector1.99s. The test does not use ahead/behind placeholders as remote evidence. No source/key/HTTP operation occurred. |
+
+Main runs only the focused guard, concrete cache, count driver and boundary/
+active-document selectors: **152 passed in1.99s**, empty environment/network
+denied, CPython3.13.15/pytest9.1.1. Both affected files compile and diff/status
+checks precede the local correction commit. No full lane/repository suite is
+run. Continuous build remains active, with ONE final non-force push only at
+genuine closure. Actual canonical looks0/0, exploratory looks0, alpha0,
+permanent look IDs none, QC launch attempts0; no backtest exists. Source
+qualification and independent evaluation/processing/order/runtime gates
+remain in progress; shared project documents and SESSION_HANDOFF stay frozen.
+
 Main's final record checks pass78 import-boundary/active-document tests in
 1.31s. Both new files compile, explicit target/status/diff checks pass, and
 the actual matching remote is checked immediately before the local commit.
 No interim push is made; this clean commit supplies the concrete writer HEAD.
+
+Append-only attribution clarification: the preserved1.31s final-check note
+above belongs to116.19's7dde2ce2 freeze. The current116.20 correction's final
+record selectors pass **78 tests in1.24s**; both affected files compile and
+explicit staging/diff/status/actual-remote checks precede its local commit.
+The writer's own c7087896 source and cc673c63 protocol remain unchanged.

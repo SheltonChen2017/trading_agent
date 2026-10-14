@@ -112,7 +112,7 @@ class LaneGuard:
         for line in lines:
             require(line.startswith("# "), "dirty_or_unrecognized_status_entry")
             field, separator, value = line[2:].partition(" ")
-            require(separator and field in {"branch.oid", "branch.head", "branch.upstream"}
+            require(separator and field in {"branch.oid", "branch.head", "branch.upstream", "branch.ab"}
                     and field not in headers and value and not any(ord(char) < 32 for char in value),
                     "porcelain_header_changed")
             headers[field] = value
@@ -120,6 +120,12 @@ class LaneGuard:
                 "lane_HEAD_or_branch_changed")
         require("branch.upstream" not in headers or headers["branch.upstream"] == "origin/" + branch,
                 "lane_upstream_changed")
+        # With --no-ahead-behind Git can still emit the exact uncomputed
+        # placeholder. It proves no ancestry or remote equality; refresh()
+        # independently reads only the actual matching origin ref.
+        require("branch.ab" not in headers or (headers["branch.ab"] == "+? -?"
+                and headers.get("branch.upstream") == "origin/" + branch),
+                "porcelain_disabled_counts_shape")
         self.binding()
         return _evidence({"schema": "si-two-Git-lane-snapshot-v1", "HEAD": head, "branch": branch,
                 "status": "clean", "dirty_entries": 0, "status_bytes_sha256": hash_bytes(raw)})

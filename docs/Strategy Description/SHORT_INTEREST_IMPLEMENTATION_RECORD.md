@@ -18794,3 +18794,61 @@ parent; append its actual digest/result, validate and commit the concrete freeze
 before the one continuation application. No provider request, look, alpha,
 permanent look ID or QC attempt is added here. One final push remains withheld
 while Main continues the owner-directed build.
+
+### 116.14 Completed clean preflight and concrete continuation freeze
+
+Main's source-only preflight ran from clean preparation
+**`82f4506fb1ed619a256fe73485fb84b46d6c02dc`** against unchanged actual lane
+remote1f90c626. It **completed**: all1519 protected original files/budget,
+historical code,44 byte-equal report replays, partial date45 page and exact
+failed cursor authenticated. No credential read, HTTP, new private artifact,
+look or QC action occurred. Prospective continuation protocol SHA
+**`feebd180007f8c6fc07e1b5f55fc61131bfc8431ba1775d75063de6114cf045d`**;
+preparation code identity SHA
+**`a45590073fd4330cca27e8aeb99956980037ef53b140527c7369d12f3409fca7`**.
+Set the runtime permit to that exact independently reconstructed protocol;
+the final freeze code identity is measured again by the actual clean application.
+This refines DEC27, not a new allowance to retry its refused parent. The
+independent auditor's final63 continuation tests passed0.97s at82f4506f, with
+no private/key/provider/QC access; Main's own217-test execution remains distinct.
+
+**SI-DEC-20261013-30** prospectively selects an available broad raw-bar
+alternative, not a new strategy: Massive's
+[grouped daily summary](https://massive.com/docs/rest/stocks/aggregates/daily-market-summary)
+is included under existing Starter with five-year depth; `adjusted=false`
+retains unadjusted source prices. Preserve exact rational fractional trading
+volume, request date and original aggregate timestamp; do not fabricate source
+identity/currency/availability fields. The complete frozen97.3–97.4/model
+contract uses raw bar opens as hypothetical order-fill proxies, not exact
+listing-auction prints. Thus a separately frozen eligible consolidated daily
+open representation can preserve next-XNYS timing and the48-book cash/fees/
+weighting rules without falsely claiming9:30 auction equality. The provider's
+[eligibility description](https://massive.com/blog/understanding-trade-eligibility)
+distinguishes consolidated bars from participant official-open values; its
+[extended-hours notes](https://massive.com/knowledge-base/article/market-data-outside-of-normal-hours)
+do not supply an actual historical dissemination clock. Source-only retrieval,
+identity/currency binding, source processing and execution/look admission remain
+separate. No grouped-price request or strategy evaluation has occurred.
+
+| ID | Priority / status | Evidence, correction and effect |
+|---|---|---|
+| SI-BUILD-20261013-019 | P2 orchestration risk, corrected in the execution driver | Main's fabricated shell probe demonstrates a failed guard followed by ordinary commands can fall through without errexit. Future driver commands use fail-fast `set -e` and standalone physical-root/Git-root/branch/expected-HEAD/actual-remote tests before mutations. All previous observed lane roots/branches/heads/remotes matched; no wrong-lane write or divergence was observed. Python source/capture guards already raise and are unchanged. No shared repository workflow/code edit is made. |
+
+The corrected compact-anchor/count and raw-market/QC drafts remain ignored,
+source-free build work, not integrated admission. Main's34 fabricated anchor
+tests passed0.74s with network denied; two independently verified draft defects
+(class-gap refresh across ticker rename and per-yield registry sealing) were
+corrected without revoking prior cells. Their code enters no current source
+permit. Validate/stage only this record and the one continuation literal,
+recheck fail-fast lane/HEAD/status/actual remote and locally commit the concrete
+freeze before applying its one named-Keychain continuation. Keep all tracked
+writes held for the complete application, retain its failure if any, and then
+continue the owner-directed build; no intermediate push or readiness claim.
+
+Main's concrete-freeze connected selector again **217 passed in1.81s**, empty
+environment/network denied, zero skips/warnings. The changed runtime compiles
+in memory; its literal exactly matches the completed source-only preflight.
+Diff check passes and only this append plus the single literal change are
+staged. No full lane/repository suite, provider request or QC attempt occurred
+during this validation. The source application now reauthenticates the retained
+parent from the resulting clean committed tree before its claim/key/HTTP.

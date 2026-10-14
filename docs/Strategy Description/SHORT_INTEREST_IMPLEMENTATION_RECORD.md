@@ -18609,3 +18609,118 @@ stage only this scope, inspect complete staged diff and commit the prospective
 source freeze locally. Then apply the two newly frozen source captures once
 from the clean committed tree, retaining failures. Continue the owner's round
 after actual source facts; do not push this implementation checkpoint.
+
+### 116.12 Actual source closure, restored named access and bounded continuation
+
+The clean prospective tree was **`f61a40bf497747cffdda367d2a20c393383c8232`**,
+with actual/tracking lane remote still **`1f90c626328a236c51e78f57e0fe301e0412aabf`**.
+All tracked writes were held during both source applications and the subsequent
+read-only custody recheck. No interim push occurred.
+
+Direct-Sharadar source capture closed at **2026-10-14T00:48:36.614551Z**:
+112 retained HTTP attempts under the frozen116.11 protocol, with source-only
+completion, not input/fitness admission. Protected path
+`artifacts/short_interest/native_market_inputs/native-market-inputs-20261014T004232Z`;
+inventory bytes SHA **`65648c794f92e9a65330949e59509b950b8de8b1565cf8eab76721cba3f7b284`**,
+payload/report SHA **`5a5523856cf1a7b7c81e5bc86eaee19086b08263951a43124f4690f622d490bf`**,
+completion bytes SHA **`9c58ad26813b746e93e89117a226a48215c649bcf3e73661d782085910e4ba0c`**.
+Main independently reread every original page/receipt with the protected reader,
+checked enclosing clocks, historical code identity, exact panel/request order,
+raw hashes/lengths and in-scope dates. That custody recheck passed with **zero
+new HTTP attempts**, no financial normalization, admission or look. Private
+data/fitness conclusions are not published here. An undersized successful page
+alone is not independent proof of universal entitlement or study coverage.
+
+Dated identity source capture did **not** complete. Protected parent
+`artifacts/short_interest/native_dated_identity/native-identity-20261014T004245Z`
+retains **491 started attempts,490 received pages,44 completed date reports**.
+Attempt491, date45 active panel page2, started at
+**2026-10-14T01:07:48.090974Z**, refused at
+**2026-10-14T01:08:19.284514Z**; enclosing refusal closed at
+**2026-10-14T01:08:19.708883Z**. Its old fixed receipt reports null HTTP status;
+no failed body/received receipt exists. The31.19354-second interval is consistent
+with the30-second transport timeout but **does not prove the cause**. Preserve
+the refused parent, partial next-date page, all completed reports and original
+spent budget. Do not call the112-date relation inventory qualified or silently
+restart the parent.
+
+**SI-DEC-20261013-26** exercises the owner's named-location update after the
+owner manually unlocked macOS. Main used the existing exact-item protected
+Keychain reader for all four explicitly named services/accounts; all four
+were readable. Zero provider HTTP attempts, secret publication/hashing,
+credential changes, ACL changes, password entry or account creation occurred.
+Existing running captures were not switched to a new credential route. Future
+source decisions may deliberately use these now-readable named items rather
+than silently changing a frozen capture. Account-specific metadata was inspected
+read-only; personal contacts, account identifiers, secret values and private
+entitlement/fitness details stay out of Git. Opening Safari incidentally showed
+an already-open QC resources page; no QC capacity API query, project/node/storage
+change, source upload, compile, job or backtest was performed. This is not a
+qualified launch-capacity check.
+
+**SI-DEC-20261013-27** proposes one explicitly manual, separately frozen
+identity continuation: authenticate the entire retained parent/code/budget,
+44 reports and partial date45 page before resuming the exact failed cursor
+once, then finish the remaining advertised panels. Count the old491 including
+its failure separately from every new attempt; no490-page recapture, automatic
+retry, old-budget reset or unused-slot repurposing. Concrete byte pins, new
+claim/budget/protocol and executable code must be validated and locally committed
+before any continuation HTTP request. The named Massive Keychain item is the
+deliberate proposed route; no continuation request has occurred yet.
+
+**SI-DEC-20261013-28** qualifies a public-contract alternative for the remaining
+daily-cap stage, not shares: FMP's
+[Historical Market Cap](https://site.financialmodelingprep.com/developer/docs/stable/historical-market-cap)
+supports a symbol and bounded from/to window with limit5000. Main independently
+inspected the rendered public
+[comparison table](https://site.financialmodelingprep.com/developer/docs/pricing):
+the Historical Market Cap row aligns to US coverage under Starter; its five-year
+depth includes the frozen study dates. No new purchase is assumed. Cap currency
+follows trading currency, not necessarily USD or Sharadar's USD-million units;
+retain exact dates/currency/native binding and missing/recycled-symbol ambiguity.
+No cap/price division can create the particular-class S1 denominator. An ignored
+fabricated prototype is not a source admission or operational capture permit.
+EODHD's extended EOD cap is explicitly today's value even for old dates, and its
+historical outstanding-share series is not authenticated particular-class
+ownership. Massive ratios are a latest snapshot, not a historical daily-cap
+fallback. These documented semantic exclusions do not demand institutional
+affiliation or generic permission letters for local personal research.
+
+**SI-DEC-20261013-29** retains a separate terminal-page proof proposal for the
+closed Sharadar capture: one prospectively pinned request at the first unobserved
+index using documented skip, with any positive tail withholding exhaustion.
+The old112 requests remain consumed. Official
+[STOCKS](https://sharadar.com/docs/stocks) and
+[DAILY](https://sharadar.com/docs/daily) docs explicitly default ticker to all
+and document offset as a skip alias; the initial unsupported-offset/default-
+sample concerns were **false alarms**, not fixes. Even empty terminal probes
+would not manufacture source coverage, source rights or canonical snapshot/PIT
+integrity. No probe request has occurred.
+
+| ID | Priority / status | Evidence, correction and effect |
+|---|---|---|
+| SI-BUILD-20261013-016 | P2 confirmed, corrected prospectively | Old identity failure handling discarded the fixed HTTP transport reason/status. Causal persistent reds3 failed/34 deselected0.49s include429 becoming null and missing network category. Follow-up malformed-code red1 failed/37 deselected0.36s proves type validation must precede whitelist membership. The v2 refusal receipt retains a bounded HTTP status and only exact-string whitelisted fixed categories; arbitrary exception text remains excluded. Old receipts are immutable and their unknown cause is not rewritten. Future behavior still refuses once, retains the spent attempt and never retries or claims completion. |
+| SI-BUILD-20261013-017 | P3 false alarms retained, no correction | Human query-guide omission suggested unsupported offset/default sample; complete official table/LLM contracts establish offset/skip aliases and omitted ticker=all. Retain this correction to the audit conclusion. Full source/entitlement/coverage remains independently unresolved; no private fitness conclusion is published. |
+
+Main's causal diagnostic red supersedes the preliminary schema-first red3 failed
+0.72s. Corrected connected identity/capture/import selector **84 passed in1.21s**,
+empty environment/network denied, zero skip/warning. A prior mistyped import-test
+filename produced **no tests run**, not a suite result; the resolved exact selector
+above executed. Compile/diff/active-document/status checks follow on the exact
+local tree. Three implementation agents developed only ignored, fabricated
+anchor/count, terminal-proof and FMP-cap drafts while the clean captures ran;
+these are **not integrated behavior, independent review or backtest readiness**.
+Main continues the owner-waived build after this honest source-closure checkpoint,
+with one combined final push still withheld. Source processing/QC representation,
+full actual binding/counts/cashflows and prospective look registration remain
+distinct prerequisites. Canonical actual looks0/0, exploratory actual looks0,
+alpha0, permanent look IDs none and QC attempts0 remain unchanged.
+
+Final main diagnostic/identity/import/active-document selector: **154 passed
+in1.52s**, empty environment/network denied, zero skips/warnings; both changed
+Python files compile in memory and diff check passes. The original f61a record
+is preserved byte-for-byte as a prefix; appended116.12 only. Stage only this
+record and the lane-owned identity capture/test correction, inspect the complete
+staged diff, recheck root/branch/HEAD/status and actual matching remote, and make
+the next local correction/closure commit. This is not the combined final push
+or a pause in the continuous owner-directed build.

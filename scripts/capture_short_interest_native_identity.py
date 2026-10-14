@@ -17,7 +17,7 @@ from scripts.qualify_finra_short_interest import (
     CaptureRefusal, _NoRedirect, _git, _prepare_capture_directory, _publish,
     _publish_json, _require_capture_platform,
 )
-from scripts.qualify_sharadar_companion import _guard, _http, _utc_now
+from scripts.qualify_sharadar_companion import SharadarCaptureRefusal, _guard, _http, _utc_now
 from scripts.qualify_short_interest_action_supplement import _clock
 from scripts.short_interest_keychain import KeychainSecret, ShortInterestKeychainError
 
@@ -46,6 +46,21 @@ class NativeIdentityCaptureError(CaptureRefusal):
 def _require(value, reason):
     if not value:
         raise NativeIdentityCaptureError(reason)
+
+
+def _failure_metadata(error, status):
+    """Retain fixed transport diagnostics, never arbitrary exception text."""
+    category = "source_or_guard_refused"
+    observed = status
+    if isinstance(error, SharadarCaptureRefusal):
+        if type(error.code) is str and error.code in {
+                "network_failure", "http_not_200", "response_size_limit", "content_type"}:
+            category = error.code
+        if type(observed) is not int:
+            observed = error.http_status
+    if type(observed) is not int or not 100 <= observed <= 599:
+        observed = None
+    return category, observed
 
 
 def source_pins():
@@ -174,12 +189,14 @@ def capture_dates(root, directory, opener, secret, dates, index, *, head, remote
                     _require(ordinal < contract.MAXIMUM_PAGES_PER_PANEL, "identity_panel_page_budget_exhausted")
                     url = following
                 except (CaptureRefusal, contract.NativeDatedIdentityError, ShortInterestKeychainError,
-                        ValueError, TypeError, OSError, KeyError):
+                        ValueError, TypeError, OSError, KeyError) as error:
                     failed = _utc_now()
                     _require(_clock(began) <= _clock(failed), "identity_failure_chronology")
-                    publish(prefix + ".refused.json", {"schema": "si-native-identity-page-refused-v1",
+                    category, failure_status = _failure_metadata(error, status)
+                    publish(prefix + ".refused.json", {"schema": "si-native-identity-page-refused-v2",
                             "query_date": at, "active_panel": active, "ordinal": ordinal,
-                            "attempt": attempts, "http_status": status if type(status) is int else None,
+                            "attempt": attempts, "http_status": failure_status,
+                            "failure_category": category,
                             "refused_at": failed, "code": "identity_page_refused_no_retry"})
                     raise
         checked = _utc_now()

@@ -11,6 +11,7 @@ from data.hashing import canonical_json, hash_payload
 import research.short_interest_etf.native_dated_identity as identity
 import scripts.capture_short_interest_native_identity as capture
 from scripts.short_interest_keychain import KeychainSecret
+from scripts.qualify_sharadar_companion import SharadarCaptureRefusal
 from test_short_interest_native_dated_identity import archive, row
 
 KEY = "fabricated-native-identity-key/one"
@@ -146,6 +147,46 @@ def test_source_media_status_JSON_or_transport_failure_keeps_attempt_and_never_r
     assert any(name.endswith(".started.json") for _, name in saved)
     assert any(name.endswith(".refused.json") for _, name in saved)
     assert not any(name == "completed.json" for _, name in saved)
+
+
+@pytest.mark.parametrize("kind,status", [("http_not_200", 429), ("network_failure", None)])
+@pytest.mark.usefixtures("portable_capture_platform")
+def test_fixed_transport_reason_and_HTTP_status_survive_without_retry_or_external_text(offline, kind, status):
+    _, saved, responses, requests = offline
+    responses.append(SharadarCaptureRefusal(kind, status=status))
+    with pytest.raises(SharadarCaptureRefusal):
+        run(offline)
+    receipt = next(value for (_, name), value in saved.items() if name.endswith(".refused.json"))
+    assert receipt["http_status"] == status
+    assert receipt["failure_category"] == kind
+    assert receipt["schema"] == "si-native-identity-page-refused-v2"
+    assert len(requests) == 1
+    assert not any(name.endswith(".raw") or name == "completed.json" for _, name in saved)
+
+
+@pytest.mark.usefixtures("portable_capture_platform")
+def test_unrecognized_external_failure_text_never_enters_durable_reason(offline):
+    _, saved, responses, requests = offline
+    responses.append(SharadarCaptureRefusal("untrusted_" + KEY, status=403))
+    with pytest.raises(SharadarCaptureRefusal):
+        run(offline)
+    receipt = next(value for (_, name), value in saved.items() if name.endswith(".refused.json"))
+    assert receipt["failure_category"] == "source_or_guard_refused"
+    assert receipt["http_status"] == 403
+    assert KEY not in canonical_json(receipt)
+    assert len(requests) == 1
+
+
+@pytest.mark.usefixtures("portable_capture_platform")
+def test_malformed_exception_code_cannot_break_fixed_refusal_publication(offline):
+    _, saved, responses, requests = offline
+    responses.append(SharadarCaptureRefusal(["untrusted"], status=503))
+    with pytest.raises(SharadarCaptureRefusal):
+        run(offline)
+    receipt = next(value for (_, name), value in saved.items() if name.endswith(".refused.json"))
+    assert receipt["failure_category"] == "source_or_guard_refused"
+    assert receipt["http_status"] == 503
+    assert len(requests) == 1
 
 
 @pytest.mark.parametrize("budget", ["rows", "bytes"])

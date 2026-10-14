@@ -26844,3 +26844,141 @@ remote before commit and push; stop on unexpected advancement. No successful
 push is asserted inside this prepublication record. Compare the exact handoff
 commit with an independent matching-branch remote read after the one push.
 Final handoff record/active-document/EXACT checks72 passed1.24s; diff clean.
+
+## 192. Resumed bounded affected-quarter selector checkpoint (2026-10-14 UTC)
+
+### 192.1 Owner direction, sequencing and exact engineering scope
+
+The owner confirmed QC is free and directed continuous build with one push at
+the next honest stopping point, then expressly narrowed this round to "just
+proceed to the next checkpoint and push" and required progress documentation.
+Decision under that direction: complete the already defined retained-archive
+affected-quarter metadata selector as this checkpoint, including a separately
+preregistered actual operation; do not silently include an unfinished SDK
+transfer or restart broader acquisition. Initial matching-lane fetch verified
+the exact designated root/branch, clean HEAD and origin both
+f89d2437a6d3d6c91c3ea8f62311afe386612912, the single successful191 checkpoint.
+No incoming Claude commit exists, no counter-review is skipped/reopened and
+no new independent Claude review is claimed. The existing monitor stays PAUSED.
+
+This implements188.3/191.3's next metadata fact closure, not the older82-quarter
+publication route or affected-quarter IB1C integration. One-pass supplied
+quarter images reconstruct the exact82-quarter census/header receipts and
+interpret only SUBMISSION metadata: accession, ownership form, source filing
+date and raw CIK. Existing integrity checks still decode every table for
+UTF8/NUL/CRC/hash validation and inspect physical headers; do not claim other
+tables were unopened or undecoded. No financial-value conversion/projection,
+parent-body interpretation, row/CIK/name export, raw/parsed IB1B publication,
+original-parent admission or source/rights/readiness promotion.
+
+The selector includes ALL six ownership forms, because valid context-form
+anomalies also identify affected source quarters. Comparison padding never
+rewrites source CIKs. Source filing/accession-year mismatches stay unmodified;
+invalid rows/dates/forms/duplicates refuse the operation rather than silently
+changing the denominator. Quarter counts are within-quarter unique source
+accessions, not purported cross-quarter global deduplication. Exact10 year-
+mismatch quarters and the complete19 list remain unmeasured before this run.
+
+The hash/control-only parent holds and rechecks all84 intake leaves:82 ZIPs,
+the exact manifest and an opaque156-byte .gitattributes control bound to its
+current Git image. Captured-source native worker proves network/fork/inside-
+and-outside all-write denial before actual input opening and before installing
+the additional Python hook. It executes two complete input derivations and
+requires byte equality; these are two executions of the same qualified code,
+not two different independent implementations. Parent accepts only strict
+bounded canonical aggregate metadata, exact counts/forms/pins and executed-
+source context. Fresh three-leaf output namespace, no resume/overwrite, final
+input/source/output rechecks and exhaustive primary-preserving cleanup apply.
+Current observer completion clock is distinct from unverified original local
+file observations; neither is official SEC acceptance/publication/PIT time.
+
+### 192.2 Exact candidate identities, findings and qualification
+
+Qualified private pureab18e633/tests61ba382e remain unchanged in behavior.
+Final private frontc1d3437a7d495cab2a9d5c4f9b99532a0e164a512c3b751ae2f528b47dab9774
+and tests535d332cef1ae54ae2176220d32ee4dcd7dd5915d80059ba5ba81e5ed38162ef
+supersede only the incomplete3d3d/73cc qualification state in191. No actual
+operation was performed on those private images. Activation uses apply_patch;
+only the INACTIVE docstring labels and direct test imports change. Exact
+active images before this candidate commit:
+
+| File | Bytes | SHA256 |
+|---|---:|---|
+| research/insider_buying_affected_quarter_selector_v1.py | 18815 | 2ce83c6d1c3a1579ad6b76dcf89f4e2d0b68e0303013f5998f1e1740aca2bfd9 |
+| research/insider_buying_affected_quarter_selector_runner.py | 39134 | 0deec6706c32dd2a9efaf218a12d5364fb7b522d6b5d5cd8d6b19dab960824c1 |
+| tests/test_insider_buying_affected_quarter_selector_v1.py | 10055 | e210b0f56c40a63161bcdc4b4e7e09089373c34b4eac0455a4182aaf23e91e89 |
+| tests/test_insider_buying_affected_quarter_selector_runner.py | 22241 | cbafd9b772e779f0c62dfccc161f29c104e400741199da26cee65e6d276f4719 |
+
+| Finding / priority | Disposition and evidence |
+|---|---|
+| IBSELECT-CLEANUP-01 / P2, private candidate | CORRECTED before activation. Both constructors could mask a primary with cleanup; first failed nested stream prevented remaining streams/directory closes. Genuine3-case precedingc08 red0.41s and corrected3green0.33s; new front alone drains its owned handles and preserves primary/phase, including alias rethrow. No reusable/shared source change or actual failure is attributed. |
+| IBSELECT-FORM-01 / P2, private candidate | CORRECTED before activation. Coherent context Form3-to-5 reassignment kept COUNT_KEYS/source pins and recomputed metadata hashes but passed the parent known-form-total guard. Genuine3d3d red1 failed0.57s; correctedgreen1 passed0.68s. Parent now requires exact six-form totals; fixtures explicitly bind deep-copied invented totals. Native pure derivation already enforced real totals; no actual source misclassification is claimed. |
+
+Author final134 focused checks passed13.61s, including31 pure/51 front/52
+boundary-and-EXACT checks; seven meaningful memory reversals killed/restored
+green2.710s. Four source/bootstrap memory compilations and native isolation
+proof passed0.317s. Independent peer fully read the corrected source/tests,
+ran134 focused checks15.06s and seven individual reversals/restored green plus
+two additional coherent substitutions2.722s; native network/fork/inside-
+and-outside all-write proof and memory compilation passed0.354s. No peer or
+author actual intake/account/provider/UI read, tracked edit, commit or push.
+
+Native proof setup refusals are retained honestly: an author -I/-S harness
+could not import pytest; peer nested sandbox_apply was refused before the
+child, then a proof relying on tempfile discovery failed under all-write
+denial. Corrected standalone native proof passed. These are invalid harness
+setups, not production selector failures, cancellations or readiness evidence.
+Main active focused/record/compilation/frozen/diff verification and independent
+activation comparison follow before commit. No complete lane/repository suite.
+
+### 192.3 Separately preregistered actual metadata operation and exclusions
+
+After exact clean committed source qualification, execute once:
+ib-affected-quarter-selector-all6-retained-v1-20261014-once, under the fixed
+artifacts/insider_buying/affected_quarter_selector_v1 namespace. Preserve any
+failure/partial output; do not reset/resume/rename a consumed operation.
+Read only the retained artifacts/sec_insider/raw inventory. Bind manifest
+34381 bytes/dc254e4e023bf9990028e085450fc4a5c1c2ae22e1d562f2efc4ada532f9f76d,
+census2c93041a1dd2641d80722bd90630c37e939fb10b65837659bb1893168bd83c33,
+header3736b0327a20040d46ff5a26fd18b4154eebb18cbf4be56706cfe232e9f889c0
+and schemaee2f201362d4002a70819e4d7123eea300aafddb8820c6a0ab9761b0ed8cdd41.
+The opaque auxiliary .gitattributes pin is
+fb4e806a1f4a7ad3addbfb805a9ab1936138c2bb1222166044fb8d403d5ee62b/156 bytes.
+
+Expected existing profile, not an observed result of this operation:82 quarters,
+4458409 submissions/4034227 Form4-or-4A;146 short-CIK rows/132 relevant,
+15 year-mismatch rows/13 relevant;9 short quarters/10 disjoint year quarters/
+19 union/zero overlap. Keep the9 short quarters2020Q4..2022Q4 and real source
+metadata unchanged; publication requires exact full source/census/header
+readback and the qualified worker's repeated derivation, not these literals
+alone. No parent dispatch, provider/credential access, QC job or research look.
+Do not edit tracked source/record or advance HEAD during the actual worker
+operation, because its clean-current-source binding remains strict.
+
+All four frozen v3 custody sources, frozenv1/scale/pilot, source window,
+strategy economics, strictD23 seven nonexact quarters, both earnings diagnostics,
+final incident classifications and six carried OPEN P2 scopes remain binding.
+The two corrected private-candidate findings above do not close a topical P2.
+SDK transfer/completion-v2 drafts remain private and incompletely qualified;
+the original three SDK images and permanently claimed ten-leaf scope are not
+thawed/reset/reclaimed. Fresh owned-project Safari opening displayed the
+existing project's automatic cloud build; main cancelled automatic import
+changes, did not run old cells/RunAll or paste/invoke SDK code. No strategy
+launch, backtest attempt, outcome look, funded/paper/live/order action or
+shared/project-wide document change. Record actual outcome and precise next
+action separately, commit an exact-hash handoff and make one successful
+matching-lane push at this expressly requested checkpoint, not an interim push.
+
+Main active pure/front/boundary/EXACT plus record/active-document selection205
+passed14.04s with process-tree network denial and isolated temp/database.
+Independent activation comparison proves production AST equality except top
+docstrings and direct test-import changes only;134 active checks passed13.40s,
+four memory compilations passed and source/test hashes stayed exact. Main
+independently memory-compiled the four active files and observed native network
+and fork refusal under all-write-denied policy; no actual intake was opened.
+Four historical custody-byte comparisons and diff check are clean. Final
+192 record/active-document/EXACT checks and exact commit-time root/branch/HEAD,
+expected five-file status and matching remote verification follow before
+this candidate commit. The actual operation is still unexecuted here.
+Final192 record/active-document/EXACT checks72 passed1.24s; operation namespace
+is absent, diff clean and matching origin remains exactf89d2437 before commit.

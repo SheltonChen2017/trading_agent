@@ -81,12 +81,26 @@ def _identity(expected_head):
     return value
 
 
+def _settled_version(info):
+    """custody._version without st_ctime_ns, plus the owner.
+
+    Section 194 (Claude review): under ~/Documents macOS sets UF_TRACKED and makes
+    one more metadata write on every new file 0.2-7 s after creation; each changes
+    only ctime. A hold taken on freshly published leaves therefore refused real
+    runs late. Callers using this must rehash the held content on every recheck.
+    """
+    return (info.st_dev, info.st_ino, info.st_mode, info.st_nlink, info.st_uid,
+            info.st_size, info.st_mtime_ns)
+
+
 class _HeldCapture:
     """Hold no-follow ancestry/leaves with shared locks for the whole read."""
-    def __init__(self, path, *, private=True):
+    def __init__(self, path, *, private=True, settle_ctime=False):
+        _need(type(settle_ctime) is bool, "capture_version_mode_refused")
         self.chain = custody._Chain(path, ())
         self.handles = []
         self.private = private
+        self._version = _settled_version if settle_ctime else custody._version
         try:
             named = os.fstat(self.chain.fd)
             _need(not private or (named.st_uid == os.geteuid() and stat.S_IMODE(named.st_mode) == 0o700),
@@ -106,21 +120,21 @@ class _HeldCapture:
               "capture_leaf_not_private_single_link_regular")
         fd = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=self.chain.fd)
         try:
-            _need(custody._version(named) == custody._version(os.fstat(fd)), "capture_leaf_substituted")
+            _need(self._version(named) == self._version(os.fstat(fd)), "capture_leaf_substituted")
             fcntl.flock(fd, fcntl.LOCK_SH | fcntl.LOCK_NB)
             stream = os.fdopen(fd, "rb")
         except BaseException:
             os.close(fd)
             raise
-        self.handles.append((name, stream, custody._version(named), cap))
+        self.handles.append((name, stream, self._version(named), cap))
         return stream
 
     def check(self):
         self.chain.recheck()
         _need(set(os.listdir(self.chain.fd)) == self.names, "capture_directory_inventory_changed")
         for name, stream, version, _ in self.handles:
-            _need(custody._version(os.fstat(stream.fileno())) == version
-                  and custody._version(os.stat(name, dir_fd=self.chain.fd, follow_symlinks=False)) == version,
+            _need(self._version(os.fstat(stream.fileno())) == version
+                  and self._version(os.stat(name, dir_fd=self.chain.fd, follow_symlinks=False)) == version,
                   "capture_leaf_changed")
 
     def close(self):

@@ -60,8 +60,11 @@ _FINAL_FILES = _FILES | {"readonly-verification.json"}
 _PHASES = original._FAILURE_PHASES | {"parent_inputs", "worker_inputs", "parent_producer_sources",
     "parent_final_output_hold", "parent_final_source_view", "parent_final_reference",
     "parent_final_source_identity", "parent_final_output_recheck", "parent_cleanup"}
+# Section 194 (Claude review): lane refusal classes are named, not collapsed to ValueError.
+_LANE_CLASS_NAMES = ("SharadarCohortRunnerError", "ArchiveAssessmentRunnerError", "PemReassessmentRunnerError",
+    "EarlyParentProjectionError", "OriginalPreparationCustodyError", "SecTitleCurrentReferenceError")
 _FAILURE_CLASSES = frozenset({"SecTitleCurrentReferenceRunnerError", "OSError", "ValueError", "TypeError", "KeyError",
-    "SubprocessError", "other_refusal"})
+    "SubprocessError", "other_refusal", *_LANE_CLASS_NAMES})
 _FAILURE_DISPOSITION = "offline_sec_title_current_reference_refused_outputs_preserved"
 
 SOURCE_ONLY_BOOTSTRAP = r'''
@@ -166,6 +169,12 @@ def _failure_diagnostic(exc, fallback="parent_preflight"):
     phase = getattr(exc, "_current_reference_failure_phase", None)
     if type(phase) is not str or phase not in _PHASES: phase = fallback if fallback in _PHASES else "parent_preflight"
     categories = ((SecTitleCurrentReferenceRunnerError, "SecTitleCurrentReferenceRunnerError"),
+        (sharadar.SharadarCohortRunnerError, "SharadarCohortRunnerError"),
+        (original.capture.bootstrap.custody.ArchiveAssessmentRunnerError, "ArchiveAssessmentRunnerError"),
+        (view_front.PemReassessmentRunnerError, "PemReassessmentRunnerError"),
+        (original.EarlyParentProjectionError, "EarlyParentProjectionError"),
+        (original.OriginalPreparationCustodyError, "OriginalPreparationCustodyError"),
+        (pure.SecTitleCurrentReferenceError, "SecTitleCurrentReferenceError"),
         (OSError, "OSError"), (ValueError, "ValueError"), (TypeError, "TypeError"),
         (KeyError, "KeyError"), (subprocess.SubprocessError, "SubprocessError"))
     category = next((label for kind,label in categories if isinstance(exc, kind)), "other_refusal")
@@ -417,7 +426,8 @@ class _PinnedPublication:
         self.tree = None
         self.hashes = dict(expected_hashes)
         try:
-            self.tree = sharadar._HeldCapture(path)
+            # Section 194: just-published leaves; recheck() rehashes their content.
+            self.tree = sharadar._HeldCapture(path, settle_ctime=True)
             _need(self.tree.names == _FINAL_FILES, "final_publication_exact_leaf_inventory_required")
             for name,digest in sorted(self.hashes.items()):
                 _digest(digest)

@@ -638,3 +638,25 @@ def test_cleanup_rethrowing_the_same_primary_object_cannot_relabel_its_phase():
     assert raised.value is primary
     assert module._failure_diagnostic(raised.value)["failure_phase"] == "parent_final_source_view"
     assert closed == ["alias", "second"]
+
+
+# Section 194 (Claude review): see the selector runner tests; same late refusal.
+def test_final_publication_hold_survives_a_ctime_only_metadata_update(tmp_path):
+    root = tmp_path / "held-final-publication-ctime";root.mkdir(mode=0o700)
+    expected = {}
+    for name in module._FINAL_FILES:
+        raw = module._raw({"invented_final_leaf": name})
+        (root / name).write_bytes(raw);(root / name).chmod(0o600);expected[name] = module._sha(raw)
+    held = module._PinnedPublication(root, expected, fixture_only=True)
+    try:
+        before = os.stat(root / "readonly-verification.json").st_ctime_ns
+        os.chmod(root / "readonly-verification.json", 0o600)
+        assert os.stat(root / "readonly-verification.json").st_ctime_ns != before
+        held.recheck()
+    finally:held.close()
+
+
+def test_held_capture_refusal_is_reported_by_its_lane_class():
+    body = module._failure_diagnostic(module.sharadar.SharadarCohortRunnerError("capture_leaf_changed"), "parent_final_output_recheck")
+    assert body["failure_class"] == "SharadarCohortRunnerError"
+    assert module._strict_failure(body) == body

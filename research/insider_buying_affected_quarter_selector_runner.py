@@ -47,8 +47,11 @@ _PHASES = frozenset({"parent_preflight", "parent_inputs", "parent_source_capture
     "worker_native_denial", "worker_current_sources", "worker_inputs", "worker_selection", "worker_input_recheck",
     "worker_rederivation", "worker_final_sources", "worker_cleanup"})
 _DISPOSITION = "offline_affected_quarter_selection_refused_outputs_preserved"
+# Section 194 (Claude review): lane refusal classes are named, not collapsed to ValueError.
+_LANE_CLASS_NAMES = ("SharadarCohortRunnerError", "ArchiveAssessmentRunnerError", "PemReassessmentRunnerError",
+    "EarlyParentProjectionError", "OriginalPreparationCustodyError", "AffectedQuarterSelectorError")
 _CLASSES = frozenset({"AffectedQuarterSelectorRunnerError", "OSError", "ValueError", "TypeError", "KeyError",
-    "SubprocessError", "other_refusal"})
+    "SubprocessError", "other_refusal", *_LANE_CLASS_NAMES})
 
 SOURCE_ONLY_BOOTSTRAP = r'''
 import base64, errno, hashlib, json, sys, types
@@ -274,7 +277,13 @@ def _failure_diagnostic(exc, fallback="parent_preflight"):
                 "failure_class":"AffectedQuarterSelectorRunnerError","os_errno":None}
     phase = getattr(exc, "_selector_failure_phase", None)
     if type(phase) is not str or phase not in _PHASES: phase = fallback if fallback in _PHASES else "parent_preflight"
-    kinds = ((AffectedQuarterSelectorRunnerError,"AffectedQuarterSelectorRunnerError"),(OSError,"OSError"),
+    kinds = ((AffectedQuarterSelectorRunnerError,"AffectedQuarterSelectorRunnerError"),
+        (held_io.SharadarCohortRunnerError,"SharadarCohortRunnerError"),
+        (original.capture.bootstrap.custody.ArchiveAssessmentRunnerError,"ArchiveAssessmentRunnerError"),
+        (view_front.PemReassessmentRunnerError,"PemReassessmentRunnerError"),
+        (original.EarlyParentProjectionError,"EarlyParentProjectionError"),
+        (original.OriginalPreparationCustodyError,"OriginalPreparationCustodyError"),
+        (pure.AffectedQuarterSelectorError,"AffectedQuarterSelectorError"),(OSError,"OSError"),
         (ValueError,"ValueError"),(TypeError,"TypeError"),(KeyError,"KeyError"),(subprocess.SubprocessError,"SubprocessError"))
     category = next((name for kind,name in kinds if isinstance(exc,kind)), "other_refusal")
     number = exc.errno if isinstance(exc,OSError) else None
@@ -570,7 +579,8 @@ class _HeldPublication:
         _need(type(pins) is dict and set(pins) == _FILES,"exact_selector_output_pins_required")
         self.tree = None;self.pins = dict(pins)
         try:
-            self.tree = held_io._HeldCapture(path)
+            # Section 194: just-published leaves; recheck() rehashes their content.
+            self.tree = held_io._HeldCapture(path, settle_ctime=True)
             _need(self.tree.names == _FILES,"exact_selector_output_inventory_required")
             for name,digest in sorted(pins.items()):
                 pure._digest(digest);self.tree.open(name,MAX_SELECTION_BYTES if name == "selection.json" else MAX_CONTROL_BYTES)

@@ -377,3 +377,45 @@ def test_captured_bootstrap_runs_with_inherited_os_network_denial_without_any_in
     assert child.returncode == 0 and child.stderr == b"",child.stdout
     assert json.loads(child.stdout) == {"fixture_only":True,"synthetic_captured_bootstrap_only":True,"native_network_denials":1}
     assert list(root.iterdir()) == []
+
+
+# Section 194 (Claude review): the real run refused at parent_final_output_check because
+# ~/Documents rewrites a new file's metadata (ctime only) seconds after creation.
+def _held_selector_publication(tmp_path):
+    root = tmp_path / "held-selector-publication";root.mkdir(mode=0o700)
+    pins = {}
+    for name in module._FILES:
+        raw = module._raw({"invented_selector_leaf": name})
+        (root / name).write_bytes(raw);(root / name).chmod(0o600);pins[name] = module._sha(raw)
+    return root, module._HeldPublication(root, pins, fixture_only=True)
+
+
+def test_final_publication_hold_survives_a_ctime_only_metadata_update(tmp_path):
+    root, held = _held_selector_publication(tmp_path)
+    try:
+        before = os.stat(root / "complete.json").st_ctime_ns
+        os.chmod(root / "complete.json", 0o600)  # same mode: only ctime moves, as the OS drift does
+        assert os.stat(root / "complete.json").st_ctime_ns != before
+        held.recheck()
+    finally:held.close()
+
+
+@pytest.mark.parametrize("kind", ["content_same_size", "mode", "replace", "link"])
+def test_final_publication_hold_still_refuses_real_changes(tmp_path, kind):
+    root, held = _held_selector_publication(tmp_path)
+    try:
+        target = root / "selection.json"
+        if kind == "content_same_size":
+            raw = target.read_bytes();target.write_bytes(raw[:-2] + b"0}" if raw[-2:] != b"0}" else raw[:-2] + b"1}")
+        elif kind == "mode":target.chmod(0o640)
+        elif kind == "replace":
+            raw = target.read_bytes();target.rename(tmp_path / "old-selection");target.write_bytes(raw);target.chmod(0o600)
+        else:os.link(target, tmp_path / "linked-selection")
+        with pytest.raises(ValueError):held.recheck()
+    finally:held.close()
+
+
+def test_held_capture_refusal_is_reported_by_its_lane_class():
+    body = module._failure_diagnostic(module.held_io.SharadarCohortRunnerError("capture_leaf_changed"), "parent_final_output_check")
+    assert body["failure_class"] == "SharadarCohortRunnerError"
+    assert module._strict_failure(body) == body

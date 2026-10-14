@@ -553,8 +553,11 @@ previously undispatched product checks then verified FMP grades, Massive
 ratings and EODHD prices/calendar (HTTP 200); Massive earnings and guidance
 returned 403. All A/B/C modes are spent. Section 297 continues with a new
 rating-only October delta, because those refused products are not economic
-inputs of the existing exploratory rating score. No accepted new data capture
-or QC run has yet occurred. The monitor remains PAUSED.
+inputs of the existing exploratory rating score. The one-use acquisition
+returned four pages/3,261 rows but the separate authentication refused; D1/D2
+are spent, and no October source acceptance or QC run follows. Section 297.6
+records the failure and separate offline retained-byte diagnosis route.
+The monitor remains PAUSED.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -47208,3 +47211,123 @@ earlier unstaged diff check did not inspect. Only those blank lines were
 removed and its recorded test SHA updated; executable source/profile pins
 are unchanged. The 86 record checks passed again in 0.87 s, overlapping
 earlier coverage rather than adding distinct tests.
+
+### 297.6 Actual acquisition refused; retained evidence, not accepted inputs
+
+The D1/D2 freeze committed as `21613bcefbc8733926caf3380083fa4ce43bccf9`
+on the exact designated root/branch with a clean tree. D1 was dispatched
+**2026-10-13 23:59:52 UTC** and completion observed **2026-10-14 00:00:07 UTC**:
+actual **exit 2**, `terminal=authentication_refused`. Its finite canonical
+double-LF envelope supplied report **1,055 bytes**, SHA-256
+`5bbc324198dad5933eadd507fdea37701261ae6cf7751f7c1c3a6a9ab00997d7`.
+D2 was dispatched **00:00:13 UTC**, completion observed **00:00:23 UTC**:
+actual **exit 2**, `output_authenticated=true`, `capture_accepted=false`,
+`attempt_consumed=true`. The claim is **401 bytes**, SHA-256
+`887014f5536caaffd591f43bd161e293c835d022538437b8957962b0e267be8a`.
+These external clocks bracket dispatch/poll observations, not provider latency.
+
+The authenticated failure report retains the producer's `capture_completed`
+binding: **four pages, 3,261 rows, 2,421,465 raw bytes, 2,420,646 extracted
+row bytes**, manifest **2,628 bytes**, SHA-256
+`2594cf2379c4a88c6ee53dc0ab3791235a01a4069f77505b7f98d560d8e9da00`.
+Producer timestamps are `2026-10-13T23:59:54.513090Z` through
+`2026-10-13T23:59:56.441851Z`; four send intents and four local send attempts
+were reported, with last status 200. Provider request count remains unknown.
+These are producer metadata, **not authenticated source acceptance**. The
+separate authentication worker did not return accepted authority. Its generic
+exit does not establish whether the cause was source bytes, metadata, row
+semantics, worker preflight, channel handling or another failure.
+
+`ARV2D297-007` (P2, open): retained acquisition lacks accepted authentication
+and a specific finite refusal reason. No October input package, receipt or
+backtest readiness follows. All formal/PIT/paper flags remain false and
+QC/outcome contacts zero; booked floor stays 314/239/50/699. D1/D2 and their
+used sources are now **spent/frozen**. Do not invoke the old parent, workers
+or reader again, repair their control leaf, repeat the provider request,
+silently refresh pins, or infer a cause from the earlier three-role failures.
+All outputs remain retained. D2 read only claim/report, not private pages.
+
+Prospective recovery decision under 255.2: implement a separate bounded,
+native-network-denied **retained-byte diagnosis**, with its own exclusive
+claim, clean-host/source pins, fixed manifest binding and deadline. It may
+observe the unchanged offline authentication code's finite refusal category
+for this exact retained capture, with no key access, provider/QC contact,
+licensed-row/error-text disclosure or output repair. Any diagnostic success
+will not rewrite D1's exit or satisfy D1/D2 acceptance retrospectively. A
+verified implementation defect or source problem must receive its own
+prospective disposition before any admissible input-use decision. The new
+diagnostic is not yet invoked or authorized by this design paragraph alone.
+
+Comparison implementation clarification: retain the earlier order study's
+**conservative-censored current-vintage** primary view for each of the six
+physical portfolio cells. Preserve both source views and bounded current-vs-
+censored eligibility/score disagreement diagnostics, but do not represent
+those as alternate-view realized portfolio returns. Full current-row-view
+performance sensitivity would be additional prospective runs/looks, not a
+hidden doubling of this six-cell comparison. The retrospective 99% check is
+explicitly QC technical identity-by-weight coverage (QC constituent SID plus
+contemporaneous QC fundamental label agreement; join by SID, not ticker-only),
+not admission of the still-missing independent permanent/share-class interval
+master. Selected economic rating identities still require the exact package
+FIGI/QC SID bridge; unknown score identity remains missing, not zero or
+automatic eligibility. This qualified research rule does not clear or replace
+the frozen formal identity/readiness gates.
+
+### 297.7 Bounded retained-byte diagnostic and exact D3 freeze
+
+`scripts/diagnose_arv2_r297_authentication.py` implements the separate offline
+diagnosis only. It calls the unchanged offline `authenticate_capture` exactly
+once after its own exclusive/fsynced claim, not the spent parent, worker,
+output reader or provider adapter. Its only private source is the fixed
+R297-A `capture` subdirectory with the exact 2,628-byte external manifest pin
+in 297.6. The new fixed control leaf is
+`artifacts/analyst_revisions_v2/massive_ratings_delta/R297-20261013-D3`, not
+inspected or allocated during preparation. No old claim/report is reread.
+Any returned opaque source authority is discarded without serialization or
+consumer access. Exact known `RatingsDeltaError` literal codes and a finite
+exact exception-type inventory can be emitted; other failures remain unknown.
+No raw exception, traceback, provider row or credential is rendered.
+
+The current owner pre-use review waiver and 255.2 delegation authorize
+**D3 exactly once** at the clean commit containing this freeze, using its
+actual HEAD and exact diagnostic source SHA on the designated Mac/root/branch
+and Python 3.13. Launch with native `/usr/bin/sandbox-exec` policy
+`(version 1)(allow default)(deny network*)`, sanitized environment, `-B`, and
+all support paths inside the designated root. The 30-second alarm covers the
+invocation, subject to host suspension/uninterruptible-I/O limits. Native
+denial is an external launch requirement, not self-attested by the script.
+Its 13 selected dependency pins, root, host, interpreter, branch, clean HEAD
+and own source pin must match without refresh. Imports precede source-file
+checks: selected current-file pins are not whole-interpreter integrity.
+
+Claim consumes D3 even without a source read; partial claim, deadline or
+publication ambiguity remains spent without cleanup or unchanged retry.
+Record the actual exit and bounded console report/hash/length only; no
+additional output reader is planned. Its held-descriptor output checks are
+not independent external reader authentication. Exit zero means only that
+the unchanged offline authentication returned **during this diagnostic**;
+all reports keep `original_capture_accepted=false`, `changes_original_exit=false`,
+and formal/PIT/backtest/paper readiness false. A report or zero diagnostic
+exit must never replace D1's actual exit 2, admit inputs retrospectively or
+authorize an October package/QC launch.
+
+| Final D3 source/profile | SHA-256 |
+|---|---|
+| `scripts/diagnose_arv2_r297_authentication.py` | `850864cb1d166526bd73144dbdfa5efce37d46dd9ffeadddd2037a7e29b9d8f9` |
+| `tests/analyst_revisions_v2/test_r297_authentication_diagnostic.py` | `2720815fb8c7cc4e26963389e4f028cfcfc599e38c5c14d3931a9cac0188fec2` |
+| `arv2-r297-retained-authentication-diagnostic-v1` profile | `6b695215355d95ea6a7e83cdb2536bae6f2a20f9430579544f9efebd6abb8ec9` |
+
+Root final focused selection passed **188 distinct tests in 2.18 s** (102
+new diagnostic plus the selected record/active-document checks), native
+network-denied with `--noconftest`, no plugin autoload/cache provider, in-root
+support paths and no `assistant.dispatch_fence`. Both new files compiled in
+memory, all 13 source pins matched, and diff check passed. No complete suite
+or operational source read occurred in validation. The earlier root selection
+collected before the author's last two tests and passed 186/2.45 s; the
+record-only repeat passed 86/0.90 s. Neither is additive. Author subsets of 100
+passes/1.13 s and final 102/1.40 s overlap rather than add. Pre-use
+`ARV2D297-008` (P3, corrected): dict-based exception-type lookup would invoke
+a hostile metaclass hash. Identity-linear comparison replaced it before the
+initial green run; a later memory-only omission mutant caught one expected
+failure/0.06 s and restored the original function in `finally`. No frozen
+used source changed. Same-round advisory inspection is not independent review.

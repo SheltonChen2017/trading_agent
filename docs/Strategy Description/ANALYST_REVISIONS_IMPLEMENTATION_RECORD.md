@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–298 retain the milestone, review, preregistration, QC
+strategy. Sections 1–299 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -579,10 +579,13 @@ page and totalPages (298.8). It establishes the fresh shape, not absence or
 completeness. D12 then completed six exact-key metadata observations once
 (298.11): all HTTP200/APIfalse, missing metadata and unknown error category.
 Neither presence nor absence is established; no new upload or launch occurred.
-V1/V2/D11/D12 remain spent. Same-organization allocation and Storage Create
-permission facts are the concrete external next step (298.12); the upgrade
-is not proof of the original cause or effective permissions. No QC backtest
-attempt has occurred.
+V1/V2/D11/D12 remain spent. Section299 records the owner's subsequent
+same-organization confirmation and explicit request to diagnose/fix the actual
+storage error and continue the study. The authenticated organization UI now
+shows50.01MB used/2GB capacity; this is current allocation evidence, not the
+original upload cause or API write permission. A new refusal-text observation
+is being prepared; no spent protocol is renewed. No QC backtest attempt has
+occurred.
 The monitor remains PAUSED.
 
 Branch: `codex/strategy-analyst-revisions-v2`
@@ -1630,18 +1633,19 @@ The owner's later "proceed wihtout claude review for now" and "done. all four
 are saved in keychain. configure the connections and check that they work.
 then proceed to the next backtest" supersede that routine review wait for the
 current setup and backtest-building continuation. The owner explicitly waives
-Claude review of section 298's current storage-recovery continuation under the
+Claude review of section 299's current storage-error recovery continuation under the
 existing "for now" direction and 255.2 delegation, not future unrelated work.
 Section 296's exact connection uses are completed and spent. This is
 sequencing authority, not independent acceptance or technical/source clearance.
-The immediate next step is section298.12's concrete same-organization
-allocation/permission clarification: D11 established null listing fields,
-and D12's exact-six-key matrix returned HTTP200/APIfalse with missing metadata
-for every key. Neither establishes presence, absence or completeness.
-V1, V2, D11 and D12 are spent and retained. The owner-reported storage
-upgrade supports reassessment but proves neither quota causality nor current
-permissions. No unchanged upload retry or capacity/launch advance follows
-from these observations. D6 preparation passed once and is spent. This continues the owner's
+The immediate next step is section 299's separately bounded refusal-text
+diagnosis under the owner's explicit fix-and-continue direction. The owner
+confirmed the same organization, and its authenticated UI shows50.01MB/2GB;
+the sole Manager member has no visible Edit Permissions action. D11's null
+listing and D12's HTTP200/APIfalse observations remain qualified: neither
+establishes presence, absence or completeness. V1,V2,D11,D12 remain spent.
+Current allocation proves neither historical quota causality nor API write
+permission. No unchanged upload retry or capacity/launch advance follows
+merely from these observations. D6 preparation passed once and is spent. This continues the owner's
 matched six/eight-universe, AR-off/100%/200% accepted-risk order study through
 October2026 (297.3/297.12). No old source operation is renewed. The subsequent
 inventory request did not replace that work;
@@ -49039,3 +49043,155 @@ Final record/active-document check: **86 passed in1.14s**, no failures/skips/
 warnings, under the same native network/production-artifact denial and in-root
 support controls. This repeat is not additive. Diff check passed; the live
 matching remote remained exactly`c555fb9d` before the final commit/push.
+
+## 299. Actual storage-error diagnosis and six/eight study continuation
+
+### 299.1 Owner direction, exact baseline and newly observed UI facts
+
+The owner explicitly directs: "proceed, find the actual QC storage error and
+fix it, then continue with the 6 and 8 universe backtests". This follows the
+owner's confirmation that the2GB upgrade applies to the same organization and
+request to navigate to member permissions. It continues the current scoped
+"without Claude review for now" sequencing exception and255.2 delegation;
+it does not waive technical/source/admission controls, renew spent protocols,
+grant paid rights, authorize security permission changes, or permit another
+lane's mutation. The monitor remains PAUSED.
+
+This continuous round starts at clean matching local/tracking/live-remote
+`e4e41af187031cd0b37a25d02dd97473c66e1adf` on the designated Mac root and
+`codex/strategy-analyst-revisions-v2`. No new Claude range is being accepted.
+Prior section298's five-commit round is concluded, not resumed for another
+push. Exactly one final matching-lane push is reserved for this new round.
+
+Read-only authenticated Safari navigation, completed before05:31UTC on
+2026-10-14 (October13 local), establishes these finite UI observations:
+
+- The visible organization identifier hashes to the fixed family binding
+  `a2d88859373df0f1fd59ede52b9b3945f847091b5fca3286841241536c38e880`.
+  The raw identifier is not recorded here.
+- Members shows one member with Manager role; the Action cell is empty and
+  there is no visible Edit Permissions action. This does not prove a missing
+  Storage Create grant, and the owner need not keep searching for that action.
+- Object Store shows **50.01MB used/2GB capacity**, with Upload/Add Folder
+  controls visible. The upgrade is effective on this UI; enabled controls are
+  not an API write-success proof.
+- The visible `arv2/preliminary-rating` directory contains four historical
+  child prefixes, page1of1. The new fixed prefix is not among them. This is
+  a UI listing observation, not an atomic absence certificate or permission
+  to overwrite an unknown object. No file contents were opened/downloaded.
+
+Another lane's project tab was present; it was left unchanged and a separate
+organization tab was used. No permission, billing, resource, project, file,
+other-lane job or security setting was changed; no upload button was used.
+These checks supersede298.12's missing-allocation-information barrier only.
+They cannot reconstruct D7's discarded response or prove its historical cause.
+
+### 299.2 Narrow prospective error observation
+
+The remaining actionable diagnostic defect is that D9/D12's exact-whole-phrase
+allowlist collapses longer provider errors to `unknown`. That safe output
+boundary preserved privacy but did not retain a useful service explanation.
+Do not replay either reader/request or re-label generic APIfalse as absence.
+A separately versioned, one-use index0 `object/properties` observation will
+retain only a bounded, redacted public-vocabulary rendering of the provider's
+error message, plus numeric HTTP/API status. It is a current refusal-text
+diagnostic, not an upload retry, acquisition, strategy run or retrospective
+reconstruction. Source pins, focused validation and its exact one-shot run
+decision must be committed before contact. No operational use is recorded
+in this subsection.
+
+The current frozen family, six candidate geometries/projections and economics
+remain297.14. Storage admission is still missing; the old uninvoked continuation
+requires a positive V2 receipt which the actual V2 failure cannot supply.
+If new evidence supports genuine recovery, use a separately versioned
+admission/continuation binding, never fabricate V2 success or `upload-valid`.
+The floor remains314shared/239development/50infrastructure/699cells and zero
+new study attempts. All source/formal/PIT/paper flags remain false.
+
+### 299.3 D13 implementation, corrections and focused validation
+
+The additive `scripts/diagnose_arv2_newrule_storage_error.py` implements the
+prospective observation only. Its source SHA256 is
+`090c0ad92811820cb87d37df7c13f8b63033d14b5d23f20cac770c729760a252`;
+`tests/analyst_revisions_v2/test_newrule_storage_error_diagnostic.py` is
+`3e293b83ae96a07beb4e22c3f420f74bdd8d45eaac457e3f127d2b2f2aabc17a`.
+Canonical `arv2-newrule-storage-error-diagnostic-v1` profile SHA256 is
+`308c68c61b7469d80e938eb9ad80d4b7d701dd99c3f46e7cabe6c82cb58a0839`.
+All54 selected original/diagnostic source pins reproduce; these are selected
+dependencies, not whole-interpreter integrity. Existing/spent code is unchanged.
+
+Mandatory clean-host/source/committed-blob preflight runs before the original
+held/named control directory is opened. The new exclusive claim is fsynced
+before family/organization metadata authentication; exact request digest and
+exclusive request-intent marker precede credentials/dispatch. Only the retained
+family/preparation and organization metadata are authenticated, not package
+payloads, source corpora or old diagnostic reports. D12's report pin is external
+historical provenance, not reread. One bounded response is parsed with strict
+duplicate/nonfinite JSON refusal. Unlike old diagnostics, this explicitly
+permits a bounded JSON error body on non2xx HTTP status. It neither downloads
+an Object Store file nor emits metadata previews, raw errors, credentials,
+identifiers, paths or licensed rows. Exact known secrets and encoded variants
+are masked; only fixed public vocabulary survives, and omitted spans remain
+visible as `[redacted]`. Thus a reported reason is lossy and not authenticated
+cause, object-specific absence, successful write or storage admission.
+
+ARV2D299-001 (P2, corrected before operational use): same-round static advice
+found the last URL decode could expose a known vocabulary-valued secret after
+the final masking pass. A final known-secret pass now follows decoding. The
+regression test was added after the fix; an in-memory omission reproduced one
+expected failure in0.21s. Mandatory-preflight omission separately caused one
+expected failure in0.05s. Both mutations were restored in memory/finally;
+source hashes stayed unchanged. Initial collection refused an artifacts stat
+under native denial (0.04s); adding `--ignore=artifacts` corrected the invocation,
+not the boundary. Initial actual selection89passes/1failure in5.44s found
+capitalized Storage/Create was stripped as a path; fixed case-insensitive
+normalization preserved that public phrase. No operational/private access
+occurred in these checks.
+
+Author final90passes in5.60s; root final focused **176 distinct passes in4.84s**
+(90diagnostic+86record/active-document), no failures/skips/warnings. Root also
+compiled both changed Python sources in memory, verified54 selected source
+pins and confirmed `assistant.dispatch_fence` absent. Native network and
+production-artifact read/write denial, plugin-autoload off, `--noconftest`,
+`-B`, no cache provider and in-root support paths applied. Captured real
+directory/client and network seams plus teardown assertions guard synthetic
+tests against swallowed access. Earlier86record-only passes and author90
+overlap, not additive. No full lane/repository suite or independent Claude
+review is claimed. Same-round advisory is not independent review.
+
+### 299.4 Exact prospective D13 one-shot run decision
+
+Under299.1's current owner direction and review waiver, D13 is authorized ONCE
+only from the clean commit containing this subsection, with that exact HEAD
+passed as `--expected-head` and299.3's source hash as `--caller-sha256`.
+Compatible host remains only the designated Mac root/branch, Darwin/POSIX
+Python3.13 at `/Users/sheltonchen/.venvs/trading_agent-py313/bin/python`.
+The exact fixed family/inventory/organization pins in the source and297.14
+remain binding; no pin refresh, fallback role/key, proxy, redirect or retry.
+
+Within original control
+`artifacts/analyst_revisions_v2/newrule_comparison_qc/R298-R303-20261013`,
+only new `storage-error-diagnostic-v1-claim.json`,
+`storage-error-diagnostic-v1-request-intent.json` and
+`storage-error-diagnostic-v1-report.json` may be created exclusively.
+No inspection/allocation of those new names precedes this run. One POST
+`object/properties` for fixed inventory index0 uses exact request SHA256
+`66d7248124554ac8daccecc7f1739eade6fe067db30a62df0c3e5eec19fff6a7`.
+No authentication probe, list, set, get, capacity, project or backtest call.
+Request limit1, request timeout30s, whole-process deadline90s; host suspension
+and uninterruptible I/O remain qualifications. Request body <=4096bytes,
+response/output <=16384bytes, <=8error strings of <=512characters. Retained
+bindings and clean source/HEAD are checked again after contact, then claim/
+report readback and held/named directory verification precede normal output.
+
+External execution records actual exit and the single bounded normal output
+envelope only; it must not invoke a second output reader or reread old reports.
+Actual exit0 plus matching report pin means this diagnostic completed, not
+that storage works. Nonzero/unknown/late publication or close failure is
+inadmissible, even if a report exists. A completed claim consumes use even
+without dispatch; a partial claim is ambiguous/consumed, never renewable.
+The finite attempted-request count marks application dispatch, not measured
+server contact. No cleanup/repair/replay, source-byte census or unchanged
+upload retry follows. D13 evidence may inform a separately committed recovery
+decision, never substitute redacted text for exact object absence or create
+positive V2 admission. The six/eight strategy and look/cell floor are unchanged.

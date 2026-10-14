@@ -313,3 +313,77 @@ def test_interrupt_during_a_request_stops_further_reads_and_fails_the_scope(tmp_
     result, _raw = execute(values, interrupted)
     assert calls == ["backtests/read"] and result["status"] == "FAILED_OR_UNCERTAIN"
     assert result["requests"][0]["status"] == "failed_or_unknown" and result["terminal"] is None
+
+
+def test_interrupt_during_order_census_stops_further_reads_and_fails_the_scope(tmp_path):
+    values = fixture(tmp_path); calls = []
+    normal, _ = transport(terminal=wire(points=0))
+    def interrupted(plan, endpoint, payload, seconds, claim):
+        calls.append(endpoint)
+        if endpoint == "backtests/orders/read": raise KeyboardInterrupt()
+        return normal(plan, endpoint, payload, seconds, claim)
+    result, _raw = execute(values, interrupted)
+    assert calls == ["backtests/read", "backtests/chart/read", "backtests/chart/read", "backtests/orders/read"]
+    assert result["status"] == "FAILED_OR_UNCERTAIN" and result["logs"] == {}
+    assert result["requests"][-1]["status"] == "failed_or_unknown"
+    assert result["orders"] is None and result["component_refusals"] == []
+
+
+def production_case(tmp_path):
+    fixture_plan, _sources, root = fixture(tmp_path)
+    arguments = {key: fixture_plan[key] for key in m.ARGS}
+    arguments.update(mode="production", source_hashes={name: m._sha(raw) for name, raw in SOURCES.items()},
+        parent_reference={"name": m.PARENT_NAME, "bytes": m.PARENT_BYTES, "sha256": m.PARENT_SHA256})
+    return m._plan(**arguments), dict(SOURCES), root
+
+
+@pytest.mark.parametrize("fault", ["root", "guard", "clock", "monotonic", "transport"])
+def test_production_seams_refuse_fixture_substitutions_in_window(tmp_path, monkeypatch, fault):
+    plan, sources, fixture_root = production_case(tmp_path)
+    # Keep the real-clock seam in-window before taking its identity, so an
+    # unrelated expired-clock refusal cannot mask removal of the guard seam.
+    monkeypatch.setattr(m, "_now", lambda: NOW)
+    kwargs = {"guard": m._guard, "clock": m._now, "monotonic": m.time.monotonic, "transport": m._native_request}
+    root = m.PRIVATE_ROOT
+    if fault == "root": root = fixture_root
+    elif fault == "guard": kwargs["guard"] = lambda _: None
+    elif fault == "clock": kwargs["clock"] = lambda: NOW
+    elif fault == "monotonic": kwargs["monotonic"] = lambda: 0.0
+    else: kwargs["transport"] = lambda *_: None
+    with pytest.raises(ValueError): m._execute(plan, sources, root, **kwargs)
+
+
+@pytest.mark.parametrize("fault", ["claim_missing", "claim_hash", "claim_bytes", "foreign_project", "foreign_job",
+    "endpoint", "timeout_zero", "timeout_large", "timeout_bool"])
+def test_native_request_invalid_claim_or_shape_refuses_before_git_private_or_credentials(tmp_path, monkeypatch, fault):
+    plan, _sources, _root = production_case(tmp_path)
+    endpoint = "backtests/read"; payload = {"projectId": m.PROJECT, "backtestId": m.JOB}; seconds = 30
+    raw = e.canonical({"endpoint": endpoint, "payload": payload, "plan_sha256": m._sha(e.canonical(plan))})
+    claim = {"bytes": len(raw), "sha256": m._sha(raw)}; guards = []
+    def denied_guard(_head):
+        guards.append(_head); raise AssertionError("native guard reached without an effect")
+    monkeypatch.setattr(m, "_guard", denied_guard)
+    if fault == "claim_missing": claim = None
+    elif fault == "claim_hash": claim["sha256"] = "f" * 64
+    elif fault == "claim_bytes": claim["bytes"] += 1
+    elif fault == "foreign_project": payload["projectId"] += 1
+    elif fault == "foreign_job": payload["backtestId"] = "foreign-job"
+    elif fault == "endpoint": endpoint = "backtests/create"
+    elif fault == "timeout_zero": seconds = 0
+    elif fault == "timeout_large": seconds = 31
+    else: seconds = True
+    with pytest.raises(ValueError): m._native_request(plan, endpoint, payload, seconds, claim)
+    assert guards == []
+
+
+def test_native_request_exact_claim_reaches_git_guard_but_no_effect(tmp_path, monkeypatch):
+    plan, _sources, _root = production_case(tmp_path)
+    endpoint = "backtests/read"; payload = {"projectId": m.PROJECT, "backtestId": m.JOB}
+    raw = e.canonical({"endpoint": endpoint, "payload": payload, "plan_sha256": m._sha(e.canonical(plan))})
+    claim = {"bytes": len(raw), "sha256": m._sha(raw)}; guards = []
+    def denied_guard(head):
+        guards.append(head); raise AssertionError("native guard reached without an effect")
+    monkeypatch.setattr(m, "_guard", denied_guard)
+    with pytest.raises(AssertionError, match="native guard reached without an effect"):
+        m._native_request(plan, endpoint, payload, 30, claim)
+    assert guards == [plan["git_head"]]

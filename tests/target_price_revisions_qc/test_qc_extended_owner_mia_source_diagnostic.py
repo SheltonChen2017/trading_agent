@@ -138,11 +138,13 @@ def test_closed_source_scope_time_and_predecessor_refuse_before_claim(tmp_path, 
 
 
 @pytest.mark.parametrize("fault", ["root", "guard", "clock", "monotonic"])
-def test_production_no_injected_seams_and_fixed_real_descriptors(tmp_path, fault):
+def test_production_no_injected_seams_and_fixed_real_descriptors(tmp_path, monkeypatch, fault):
     old, sources, root = fixture(tmp_path)
     args = {name: old[name] for name in m.ARGS}; args.update(mode="production", archive=None, diff=None)
     plan = m._plan(**args)
     assert plan["archive"] == m.predecessor.ARCHIVE and plan["diff"] == m.predecessor.DIFF
+    # Keep the clock valid so an injected guard cannot hide behind expiry.
+    monkeypatch.setattr(m, "_now", lambda: NOW)
     kwargs = {"guard": m._guard, "clock": m._now, "monotonic": m.time.monotonic}
     if fault != "root": root = m.PRIVATE_ROOT
     if fault in kwargs: kwargs[fault] = lambda *_: None

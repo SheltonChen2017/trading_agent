@@ -214,6 +214,8 @@ def retain_response(plan, endpoint, payload, wire, http_status, *, credential):
     must persist these returned bytes privately even if later inspection fails.
     No wire, free-text error, order/member row or witness is safe for public logs.
     """
+    if type(credential) is not str or re.fullmatch(r"[!-~]{1,256}", credential) is None:
+        _fail()
     descriptor = wire_descriptor(plan, endpoint, payload, wire, http_status)
     expected = descriptor["request"]
     if len(wire) > dict(READ_LIMITS)[endpoint]: _fail()

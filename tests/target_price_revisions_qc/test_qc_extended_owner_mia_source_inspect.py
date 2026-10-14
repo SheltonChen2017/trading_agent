@@ -197,10 +197,12 @@ def test_exclusive_scope_access_and_each_body_claim_precede_synthetic_fd_read(tm
 
 
 @pytest.mark.parametrize("fault", ["root", "guard", "clock", "monotonic"])
-def test_production_has_no_injected_seams_and_exact_real_descriptors(tmp_path, fault):
+def test_production_has_no_injected_seams_and_exact_real_descriptors(tmp_path, monkeypatch, fault):
     plan, sources, root = fixture(tmp_path)
     plan["mode"] = "production"; plan["archive"] = dict(m.ARCHIVE); plan["diff"] = dict(m.DIFF)
     plan = m._plan(**{key: plan[key] for key in m.ARGS})
+    # Keep the clock valid so an injected guard cannot hide behind expiry.
+    monkeypatch.setattr(m, "_now", lambda: NOW)
     kwargs = {"guard": m._guard, "clock": m._now, "monotonic": m.time.monotonic}
     if fault != "root": root = m.PRIVATE_ROOT
     if fault in kwargs: kwargs[fault] = lambda *_: None

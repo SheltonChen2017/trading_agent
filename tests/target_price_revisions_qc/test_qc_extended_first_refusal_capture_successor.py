@@ -344,3 +344,17 @@ def test_retain_response_requires_the_credential_keyword():
         m.retain_response(p, endpoint, base(p), b'{"success":true,"message":"SYNTHETIC-TOKEN"}', 200)
     with pytest.raises(ValueError):
         m.retain_response(p, endpoint, base(p), b'{"success":true,"message":"SYNTHETIC-TOKEN"}', 200, credential="SYNTHETIC-TOKEN")
+
+
+@pytest.mark.parametrize("credential", ["", None, False, b"SYNTHETIC-TOKEN", " ", "x" * 257, "\u00e9"])
+def test_retain_response_refuses_unusable_echo_guard_before_projection(monkeypatch, credential):
+    p = plan()
+    calls = []
+    def projection(*_args, **_kwargs):
+        calls.append(True)
+        return {"original_wire_sha256": "a" * 64, "projection_sha256": "b" * 64,
+                "projection": {"message": "SYNTHETIC-TOKEN"}}
+    monkeypatch.setattr(e, "project_wire", projection)
+    with pytest.raises(ValueError):
+        m.retain_response(p, "backtests/read", base(p), b'{"success":true}', 200, credential=credential)
+    assert calls == []

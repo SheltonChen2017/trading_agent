@@ -235,9 +235,11 @@ def test_fresh_frozen_source_head_time_scope_refusals_precede_claims(tmp_path,fa
 
 
 @pytest.mark.parametrize("fault",["root","guard","clock","monotonic","transport"])
-def test_production_refuses_all_injected_seams_before_private_open(tmp_path,fault):
+def test_production_refuses_all_injected_seams_before_private_open(tmp_path,monkeypatch,fault):
     old,sources,root = fixture(tmp_path); args = {name:old[name] for name in m.ARGS}; args["mode"] = "production"
     plan = m._plan(**args)
+    # Keep the clock valid so an injected guard cannot hide behind expiry.
+    monkeypatch.setattr(m, "_production_clock", lambda: NOW)
     kwargs = {"guard":m._guard,"clock":m._production_clock,"monotonic":m.time.monotonic,"transport":m._native_request}
     if fault != "root": root = m.PRIVATE_ROOT
     if fault in kwargs: kwargs[fault] = lambda *_:None

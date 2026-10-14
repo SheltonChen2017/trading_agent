@@ -258,8 +258,10 @@ def test_scope_and_frozen_identity_refusals_precede_claims_or_transport(tmp_path
 
 
 @pytest.mark.parametrize("fault", ["root", "guard", "clock", "monotonic", "transport"])
-def test_production_rejects_injected_seams_before_private_open(tmp_path, fault):
+def test_production_rejects_injected_seams_before_private_open(tmp_path, monkeypatch, fault):
     plan, sources, root = fixture(tmp_path); plan["mode"] = "production"
+    # Keep the clock valid so an injected guard cannot hide behind expiry.
+    monkeypatch.setattr(m, "_production_clock", lambda: NOW)
     kwargs = {"guard": m._guard, "clock": m._production_clock, "monotonic": m.time.monotonic, "transport": m._native_request}
     if fault != "root": root = m.PRIVATE_ROOT
     if fault in kwargs: kwargs[fault] = lambda *_: None

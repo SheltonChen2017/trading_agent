@@ -356,3 +356,72 @@ def test_body_free_stdout_does_not_print_private_job_rows_or_native_error(monkey
     output = capsys.readouterr().out
     assert "SYNTHETIC PRIVATE" not in output and "jobs" not in output
     assert e.parse_json(output.encode())["accepted_metrics"] is None
+
+
+def production_plan(tmp_path):
+    fixture_plan, _, root, _ = fixture(tmp_path)
+    args = {name: fixture_plan[name] for name in m.ARGS}
+    # The fixture ledger is synthetic; production must use the pinned public
+    # ledger so a ledger refusal cannot mask the seam check being exercised.
+    args.update(mode="production",
+        source_hashes={name: m._sha(raw) for name, raw in SOURCES.items()})
+    return m._plan(**args), dict(SOURCES), root
+
+
+@pytest.mark.parametrize("fault", ["root", "guard", "clock", "monotonic", "transport"])
+def test_production_rejects_injected_seams_before_private_open(tmp_path, monkeypatch, fault):
+    plan, sources, root = production_plan(tmp_path)
+    monkeypatch.setattr(m, "_now", lambda: NOW)
+    kwargs = {"guard": m._guard, "clock": m._now,
+        "monotonic": m.time.monotonic, "transport": m._native_request}
+    if fault != "root": root = m.PRIVATE_ROOT
+    if fault in kwargs: kwargs[fault] = lambda *_: None
+    with pytest.raises(ValueError):
+        m._execute(plan, sources, root, **kwargs)
+
+
+@pytest.mark.parametrize("fault", [
+    "missing_claim", "claim_hash", "claim_bytes", "foreign_project",
+    "foreign_job", "forbidden_endpoint", "zero_timeout", "long_timeout",
+    "bool_timeout", "offline",
+])
+def test_native_signer_invalid_bindings_refuse_before_git_private_or_credentials(tmp_path, monkeypatch, fault):
+    plan, _, _ = production_plan(tmp_path)
+    endpoint = "backtests/read"
+    payload = {"projectId": m.PROJECT, "backtestId": plan["jobs"][0]["backtest_id"]}
+    raw = e.canonical({"endpoint": endpoint, "payload": payload,
+        "plan_sha256": m._sha(e.canonical(plan))})
+    claim = {"bytes": len(raw), "sha256": m._sha(raw)}
+    seconds = 30
+    if fault == "missing_claim": claim = None
+    if fault == "claim_hash": claim["sha256"] = "0" * 64
+    if fault == "claim_bytes": claim["bytes"] += 1
+    if fault == "foreign_project": payload["projectId"] += 1
+    if fault == "foreign_job": payload["backtestId"] = "synthetic-foreign-job"
+    if fault == "forbidden_endpoint": endpoint = "backtests/create"
+    if fault == "zero_timeout": seconds = 0
+    if fault == "long_timeout": seconds = m.REQUEST_SECONDS + 1
+    if fault == "bool_timeout": seconds = True
+    if fault == "offline": plan["mode"] = "offline-fixture"
+    def denied(*_):
+        raise AssertionError("native signer must refuse before the Git boundary")
+    monkeypatch.setattr(m, "_guard", denied)
+    with pytest.raises(ValueError):
+        m._native_request(plan, endpoint, payload, seconds, claim)
+
+
+def test_native_signer_exact_request_claim_reaches_git_without_private_or_credentials(tmp_path, monkeypatch):
+    plan, _, _ = production_plan(tmp_path)
+    endpoint = "backtests/read"
+    payload = {"projectId": m.PROJECT, "backtestId": plan["jobs"][0]["backtest_id"]}
+    raw = e.canonical({"endpoint": endpoint, "payload": payload,
+        "plan_sha256": m._sha(e.canonical(plan))})
+    claim = {"bytes": len(raw), "sha256": m._sha(raw)}
+    reached = []
+    def stop_at_git(head):
+        reached.append(head)
+        raise AssertionError("synthetic Git boundary reached")
+    monkeypatch.setattr(m, "_guard", stop_at_git)
+    with pytest.raises(AssertionError, match="synthetic Git boundary reached"):
+        m._native_request(plan, endpoint, payload, 30, claim)
+    assert reached == [plan["git_head"]]

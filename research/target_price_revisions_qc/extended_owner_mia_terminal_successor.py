@@ -498,7 +498,7 @@ def _execute(plan, sources, root, *, guard, clock, monotonic, transport):
                     if (number + 1) * original.PAGE_SIZE >= total:
                         if len(ids) != total: _fail()
                         report["orders"]["classification"] = "complete_order_page_census_only"; break
-            except (Exception, KeyboardInterrupt):
+            except Exception:
                 report["component_refusals"].append("order_census_shape_refused")
             for marker in ("EXT26_SUMMARY", "EXT26_EVIDENCE_INDEX"):
                 response = request("backtests/read/log", {**base, "start": 0, "end": 100, "query": marker})

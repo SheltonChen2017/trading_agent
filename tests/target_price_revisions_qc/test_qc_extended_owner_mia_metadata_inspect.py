@@ -145,7 +145,7 @@ def test_plan_identity_clock_and_scope_refuse_before_claim(tmp_path, fault):
 
 
 @pytest.mark.parametrize("fault", ["root", "guard", "clock", "monotonic", "descriptor"])
-def test_production_has_no_fixture_path_clock_or_descriptor_seam(tmp_path, fault):
+def test_production_has_no_fixture_path_clock_or_descriptor_seam(tmp_path, monkeypatch, fault):
     fixture_plan, sources, root = fixture(tmp_path)
     args = {name: fixture_plan[name] for name in m.ARGS}; args.update(mode="production", fixture_descriptor=None)
     if fault == "descriptor":
@@ -154,6 +154,8 @@ def test_production_has_no_fixture_path_clock_or_descriptor_seam(tmp_path, fault
         return
     plan = m._plan(**args)
     assert plan["name"] == m.NAME and plan["descriptor"] == {"bytes": 4138, "sha256": m.SHA256}
+    # Keep the clock valid so an injected guard cannot hide behind expiry.
+    monkeypatch.setattr(m, "_now", lambda: NOW)
     kwargs = {"guard": m._guard, "clock": m._now, "monotonic": m.time.monotonic}
     if fault != "root": root = m.PRIVATE_ROOT
     if fault in kwargs: kwargs[fault] = lambda *_: None

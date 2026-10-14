@@ -501,3 +501,61 @@ def test_fixture_fence_rejects_real_root_ancestor_descendant_and_known_sec_root(
     with pytest.raises(module.EarlyParentCaptureError, match="fixture_root_transport_required"):
         module.run_invented_capture(_selection(), "ib-sec-2006q1-initial64-invented", root=root,
             transport=lambda *_: pytest.fail("not reached"), prior_open=lambda: {})
+
+
+# Section 194 (Claude review): the completion-spacing guard had no isolating test;
+# the shared _Ticks clock always advanced by exactly the minimum interval.
+class _OneNanosecondClock:
+    """Advances one nanosecond per read; only the injected sleep moves it further."""
+    def __init__(self):
+        self.value = 0
+
+    def __call__(self):
+        self.value += 1
+        return self.value
+
+
+def _spacing_run(tmp_path, *, calls, monotonic_ns, sleep):
+    selection = _selection()
+    return module.run_invented_capture(selection, "ib-sec-2006q1-initial64-invented", root=tmp_path,
+        transport=_wire(selection, calls=calls), prior_open=_prior(selection), clock=lambda: "2026-10-14T00:00:00Z",
+        monotonic_ns=monotonic_ns, sleep=sleep, free_bytes=lambda: module.MIN_FREE_BYTES + 64 * module.MAX_PARENT_BYTES)
+
+
+def test_completion_spacing_sleeps_the_remaining_interval_in_seconds(tmp_path):
+    clock, slept, calls = _OneNanosecondClock(), [], []
+    def sleep(seconds):
+        slept.append(seconds)
+        clock.value += round(seconds * 1_000_000_000)
+    _spacing_run(tmp_path, calls=calls, monotonic_ns=clock, sleep=sleep)
+    interval = module.MIN_COMPLETION_INTERVAL_NS / 1_000_000_000
+    assert len(calls) == module.MAX_REQUESTS and len(slept) == module.MAX_REQUESTS - 1
+    assert all(interval - 1e-6 < seconds < interval for seconds in slept)
+
+
+def test_a_sleep_that_does_not_restore_spacing_refuses_before_the_second_start(tmp_path):
+    calls = []
+    with pytest.raises(module.EarlyParentCaptureError, match="completion_spacing_refused"):
+        _spacing_run(tmp_path, calls=calls, monotonic_ns=_OneNanosecondClock(), sleep=lambda _: None)
+    run = _namespace(tmp_path) / "runs/ib-sec-2006q1-initial64-invented"
+    assert len(calls) == 1
+    assert len(list((_namespace(tmp_path) / "claims").iterdir())) == 2
+    assert (run / "request-000-result.json").is_file()
+    assert not (run / "request-001-start.json").exists()
+    assert not (run / "complete.json").exists()
+
+
+# Section 194 (Claude review): the observed-mode fixed root/transport clause had no
+# isolating test. The type-shaped selection below is deliberately UNSEALED, so even a
+# missing clause refuses before payload, contact, journal or network access.
+@pytest.mark.parametrize("invalid", ["root", "transport"])
+def test_observed_capture_requires_the_fixed_lane_root_and_real_transport(tmp_path, monkeypatch, invalid):
+    monkeypatch.setattr("http.client.HTTPSConnection", lambda *a, **k: pytest.fail("No connection"))
+    chosen = module.ObservedEarlySelection(b"", object())
+    root = tmp_path.resolve() if invalid == "root" else module.bootstrap.custody.LANE_ROOT
+    transport = module._selected_sec_transport if invalid == "root" else (lambda *a, **k: pytest.fail("No dispatch"))
+    with pytest.raises(module.EarlyParentCaptureError, match="actual_fixed_root_transport_required"):
+        module._capture(chosen, "ib-sec-2006q1-initial64-invented", lambda: pytest.fail("No contact"),
+            root=root, observed=True, transport=transport, guard=lambda: pytest.fail("No guard"),
+            prior_open=lambda: pytest.fail("No prior roots"))
+    assert not _namespace(tmp_path).exists()

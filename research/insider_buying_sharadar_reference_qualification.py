@@ -365,6 +365,16 @@ def _exclusive_body(directory: int, name: str, raw: bytes) -> str:
     return _sha(raw)
 
 
+def _outside_lane(root) -> bool:
+    """True only for a root that neither is, contains, nor lies inside the lane."""
+    try:
+        requested, actual = Path(root).resolve(), LANE_ROOT.resolve()
+    except (OSError, RuntimeError, TypeError, ValueError):
+        return False
+    lane, other = str(actual).casefold(), str(requested).casefold()
+    return lane != other and not other.startswith(lane + "/") and not lane.startswith(other + "/")
+
+
 def run_qualification(audit_id: str, expected_head: str, *, root: Path = LANE_ROOT,
                       identity: Callable = _identity, transport: Callable | None = None,
                       credential_reader: Callable | None = None, clock: Callable = _now) -> dict:
@@ -379,6 +389,13 @@ def run_qualification(audit_id: str, expected_head: str, *, root: Path = LANE_RO
     fixture = root != LANE_ROOT or identity is not _identity or transport is not None or credential_reader is not None or clock is not _now
     _require(not fixture or credential_reader is not None, "fixture_requires_invented_credential_reader")
     _require(not fixture or transport is not None, "fixture_requires_invented_transport")
+    if fixture:
+        # Section 194 (Claude review): a fixture run must never create this lane's
+        # real namespace (that would consume the one-shot scope for good) or hand
+        # the real Keychain reader or transport to injected code.
+        _require(credential_reader is not read_keychain_credential and transport is not _default_transport,
+                 "fixture_real_callback_refused")
+        _require(_outside_lane(root), "fixture_root_overlaps_lane_refused")
     baseline = identity(expected_head, root=root)
     parent = directory = None
     published = {}

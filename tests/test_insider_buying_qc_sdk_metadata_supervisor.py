@@ -6,8 +6,10 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import shutil
 import stat
 import sys
+import tempfile
 from types import SimpleNamespace
 
 import pytest
@@ -16,6 +18,23 @@ import pytest
 from research import insider_buying_qc_sdk_metadata_supervisor as supervisor
 from research import insider_buying_qc_sdk_metadata_cell as cell
 HERE = Path(supervisor.__file__).parent
+
+
+@pytest.fixture
+def tmp_path():
+    """Section 194 (Claude review): a fresh 0700 root under /tmp.
+
+    The supervisor admits fixture roots only beneath /tmp (/private/tmp on
+    macOS). Pytest's default tmp_path on macOS lives under $TMPDIR
+    (/private/var/folders/...), so the standard `python -m pytest` invocation
+    refused every fixture here. The captured supervisor image is frozen, so the
+    tests supply a root its existing guard accepts instead of loosening it.
+    """
+    root = Path(tempfile.mkdtemp(prefix="insider-qc-sdk-", dir="/tmp")).resolve()
+    try:
+        yield root
+    finally:
+        shutil.rmtree(root, ignore_errors=True)
 
 
 def sha(raw):

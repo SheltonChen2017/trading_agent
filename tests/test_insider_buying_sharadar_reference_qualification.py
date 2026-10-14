@@ -408,3 +408,28 @@ def test_default_transport_requires_completed_credential_read_before_opener(monk
     monkeypatch.setattr(m.request, "build_opener", lambda *a: pytest.fail("unsealed credential read reached opener"))
     with pytest.raises(m.SharadarReferenceQualificationError, match="real_transport_started_journal_required"):
         m._default_transport("tickers", m.KeychainCredential("sharadar", TOKEN, False), **context)
+
+
+# Section 194 (Claude review): fixture seams cannot reach the real lane scope or the real key.
+@pytest.mark.parametrize("lane_root", ["default", "inside", "parent"])
+def test_fixture_run_cannot_create_or_consume_the_real_lane_scope(monkeypatch, lane_root):
+    monkeypatch.setattr(m, "_mkdir_chain", lambda *a, **k: pytest.fail("real lane namespace touched"))
+    kwargs = {} if lane_root == "default" else {
+        "root": m.LANE_ROOT / "artifacts" if lane_root == "inside" else m.LANE_ROOT.parent}
+    with pytest.raises(m.SharadarReferenceQualificationError, match="^fixture_root_overlaps_lane_refused$"):
+        m.run_qualification(AUDIT, HEAD, identity=lambda head, root: dict(BASELINE),
+            credential_reader=lambda provider: credential(), transport=lambda table, token: response(table),
+            clock=lambda: "2026-10-13T00:00:00Z", **kwargs)
+
+
+@pytest.mark.parametrize("real", ["reader", "transport"])
+def test_fixture_run_cannot_be_handed_the_real_keychain_reader_or_transport(tmp_path, monkeypatch, real):
+    from research import insider_buying_keychain_credentials as keychain
+    monkeypatch.setattr(m.request, "build_opener", lambda *a: pytest.fail("real opener"))
+    monkeypatch.setattr(keychain.subprocess, "Popen", lambda *a, **k: pytest.fail("real Keychain read"))
+    with pytest.raises(m.SharadarReferenceQualificationError, match="^fixture_real_callback_refused$"):
+        m.run_qualification(AUDIT, HEAD, root=tmp_path, identity=lambda head, root: dict(BASELINE),
+            credential_reader=m.read_keychain_credential if real == "reader" else (lambda provider: credential()),
+            transport=m._default_transport if real == "transport" else (lambda table, token: response(table)),
+            clock=lambda: "2026-10-13T00:00:00Z")
+    assert not tmp_path.joinpath(*m.ARTIFACT_PARTS).exists()

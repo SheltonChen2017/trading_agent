@@ -8,6 +8,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).parent))
 import test_insider_buying_qc_sdk_metadata_supervisor as base
+from test_insider_buying_qc_sdk_metadata_supervisor import tmp_path  # noqa: F401  section 194: /tmp fixture root
 
 
 def test_locked_scope_claim_cannot_be_swapped_after_initial_check_before_publication(tmp_path):

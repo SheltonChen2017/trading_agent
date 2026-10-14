@@ -165,7 +165,13 @@ def test_standalone_temporary_fixture_fence_precedes_legacy_known_root_helper_or
     if kind == "external_sibling":root = LANE.parent / "invented-history-candidate"
     elif kind == "temporary_root_itself":root = trusted
     elif kind == "dotdot":root = tmp_path / ".." / "invented-history-candidate"
-    elif kind == "case_alias":root = Path(str(tmp_path).replace("/private/tmp", "/PRIVATE/TMP"))
+    elif kind == "case_alias":
+        # Section 194 (Claude review): alias the trusted temporary prefix itself, so the case
+        # variant exists wherever pytest places tmp_path. The former "/private/tmp" literal
+        # was a no-op under the default macOS $TMPDIR, leaving a valid root and a red test.
+        actual = str(tmp_path.resolve())
+        assert actual.startswith(str(trusted) + "/"), "tmp_path must lie under the trusted temporary root"
+        root = Path(str(trusted).upper() + actual[len(str(trusted)):])
     else:
         target = tmp_path / "target";target.mkdir(mode=0o700)
         root = tmp_path / "alias";root.symlink_to(target if kind == "symlink_inside" else LANE.parent)

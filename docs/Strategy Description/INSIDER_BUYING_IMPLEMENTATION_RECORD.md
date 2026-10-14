@@ -25832,3 +25832,156 @@ Its14 malformed wire cases refuse, zero or exactly one LF accepts, and a
 strip reversal wrongly admits four counterexamples; restored boundary and
 two memory compilations passed0.241s. No peer actual input/account access
 or Claude review. Diff check and frozen four-file comparison are clean.
+
+## 184. Exact source-view contract and inert native SDK preparation (2026-10-14 UTC)
+
+### 184.1 Observed refusal verification, not another supplier request
+
+At clean45fc6e9a666aa5ab640dee1a8513f60611cd3990, production verify-only
+against sealed complete0613e145 returned0, empty stderr, externally measured
+CLI elapsed5.543s. Seven held leaves were rechecked, with effective OS
+network/fork/all-write denial observed in the pure replay worker. Current
+e2750669 verifier and original c1ccbc/ab36c0ca producer Git bytes/inventory
+are separately bound; whole historical environment execution remains false.
+Terminal replay retains1 claimed/started scope,1 refusal,0 candidate metadata
+windows and0 retained raw bytes. Retained source rows0 is NOT the unknown
+provider event count. All authority flags stay false. No Keychain/provider
+read, new claim, repeated request or original receipt rewrite occurred.
+
+### 184.2 Pure exact contiguous source-view contract, not original admission
+
+Delegate the routine implementation choice to retain one narrow observed
+early SEC PEM profile. Standard ten-line373-byte prefix and39-byte suffix,
+LF only,8MiB/100000-line bounds, unique PEM/SEC markers, exact matching
+accession/opening-date shapes and canonical90-byte public-key/64-byte
+signature base64 STRUCTURE are checked. No crypto signature, origin, trust
+anchor, official acceptance/publication, timezone, availability or rights
+verification is claimed. Preserve every original byte and hash; extracted
+view is only original[373:-39], with a separate hash/size/span. No SGML/XML,
+role order, line ending, clock or frozen parser behavior is normalized.
+
+The new pure quarter coordinator joins genuine original/view receipts with
+unchanged frozen inner projections and unchanged IB-1C v2. Full six-form
+source rows remain, unsupported context and unavailable/profile/parser
+refusals are accounted, duplicated per-row contexts remain explicitly
+source_view_corroborated_noncanonical. Original capture header quarantines
+and whole-original-body admission remain false. Both whole-original and
+whole-quarter promotion digests are null. Factory seals/full byte reparsing
+protect ordinary reconstruction/mutation; they are not adversarial provenance
+authentication. Existing64-parent/64MiB aggregate/128MiB output bounds stay
+binding; a larger result is refused, never truncated or silently promoted.
+
+Prior internal readonly qualification of the sealed64 originals found
+419628 original bytes and393260 derived-view bytes,64 distinct hashes,
+ordered hash/span digest87df82728c0544b9dae87a9e7a14ffa24069bfc77117b6006ef9463513d47fd4.
+All64 header/XML identity comparisons matched their supplied targets and
+owner sets; fourteen acceptance digits only validate lexical shape. Frozen
+inner diagnostic accepted57 owner-first grammars and refused7 issuer-first
+legacy separators. Those are attributed triage facts, not yet the production
+full-quarter source-view run; the section183 frozen baseline still refuses
+all64 originals. Its existing source-only front is not replaced or thawed.
+
+IBVIEW-184-R01 P2 CLOSED in this pure contract: a coherent count mutant
+reported2 corroborations/4 quarantines on six rows containing only1/5.
+Main reproduced genuine DID NOT RAISE red0.49s, then independently recounted
+exact typed allowed row dispositions against all three totals. Private154
+helper/coordinator/v2/boundary/EXACT checks passed4.67s; active154 passed
+4.78s with process-tree network denial and private temporary database/output.
+One preceding command named an absent test file and ran0 tests; the corrected
+pathname produced the stated154 result, not an invented earlier pass.
+Four active memory compilations passed under network/fork/all-write denial.
+
+| Active source/test | SHA-256 |
+|---|---|
+| research/insider_buying_sec_early_pem_source_view_v1.py | a5697fa292974719ed6620ad4f4493418641b954d1174226644f146349676d6b |
+| research/insider_buying_sec_2006q1_pem_reassessment_v1.py | 94bb3e28b3929030fd2daf1c7ff0d276eea09d47f114eb5748feef72a28c92c9 |
+| tests/test_insider_buying_sec_early_pem_source_view_v1.py | 0f76b3b6e713143fc96b300a28da40daa524f9d82dbd8857d2dd7435ef50eafa |
+| tests/test_insider_buying_sec_2006q1_pem_reassessment_v1.py | b81c7a6864b890917d86497978ddd655c136a727f598fdd1020b469d6b36024f |
+
+Private helper7fe004e9/test411facba and corrected coordinator5e459231/
+testdf66cc53 remain unchanged. Activation changes wording/final source LF
+and uses direct canonical research imports instead of private importlib
+module installation. Passing contracts alone do not close IB1C-REAL-CR01 or
+the other open topical/shared findings. Qualify the separately owned isolated
+front and its complete publication/source-context guards before an actual
+fresh offline epoch; no actor is running at this commit's record time.
+
+### 184.3 Native SDK metadata only, external one-shot consumption not started
+
+Install cell, explicit invocation and lane-local supervisor as committed
+preparation for an authenticated controllable Safari Research workspace in
+owned project37465795. Exact scope is five allowlisted CLR classes and four
+PropertyInfo definitions (Data/Time/EndTime/Symbol), class/base/interface
+type names and Common assembly version. It creates no QuantBook/data instance,
+History/resolver/market/financial field getter, export, ObjectStore, order,
+job, outcome or backtest. The invocation is deliberately not an importable
+library/startup hook; do not execute it locally. Public LEAN class source is
+not proof of hosted return shape, full platform build, account or entitlement.
+
+One fixed project/scope namespace, not a new scope per run ID. Exclusive
+fsynced claim, captured committed cell/invocation/supervisor, registration,
+start, separate control input and independently kept pre-paste lineage precede
+any paste or explicit call. No circular self-hash; current committed images
+and later control bytes stay distinct. Failure/unknown execution/kernel reset
+does not restore authority. Supplied observation hashes declare bindings;
+the library itself authenticates neither Safari nor execution. Only an actual
+controlled authenticated observation may be recorded as observed execution.
+No production claim/start/paste/QC execution has occurred. Never prepare/consume
+the scope while Safari is inaccessible just to publish an empty checkpoint.
+
+IBSDK-184-R02 P2 CLOSED: held claim lock name/version and all prepared leaves
+are now rechecked before/after each terminal publication and after final
+source callback. Metadata/completion exact canonical bytes, size and versions
+remain pinned; namespace must be exact. Three genuine preceding77dbc terminal
+mutation reds0.06s became green. Partial or ambiguous leaves are preserved,
+not cleaned or overwritten. IBSDK-184-R03 P2 CLOSED: invented temp-only API
+now refuses non-temp sibling roots before constructors (genuine red0.04s),
+requiring owned700 resolved trusted temporary descendants/no-follow ancestry.
+IBSDK-184-R04 P2 CLOSED: local identity uses fixed/usr/bin/git, minimal PATH/
+LC_ALL environment, disabled fsmonitor, no stdin, discarded stderr and bounded
+stdout; a genuine preceding bare-Git/inherited-environment red0.04s became
+green. No shared Git helper or behavior was changed.
+
+Internal private116 SDK/custody/boundary/EXACT checks passed3.31s. An
+intermediate pinning patch omitted lineage.json from its captured dictionary
+(22 failures/92 passes3.67s); including independently bound lineage bytes
+corrected the code, not the valid guards. Active116 passed3.51s under
+process-tree network denial/private temporary database/output. Tests use
+direct research imports; production pre-I/O refusal test explicitly supplies
+an inactive __file__, not a mock license/account or actual source read.
+No actual account/QC/credential/browser/root read is attributed to these
+fixtures or internal peer; no independent Claude acceptance is claimed.
+
+| Active source/test | SHA-256 |
+|---|---|
+| research/insider_buying_qc_sdk_metadata_cell.py | 578097de483ff877fab6748bfd1b1899df0e4e26201fdd12db717254a926cd0f |
+| research/insider_buying_qc_sdk_metadata_invocation.py | 3750bfcb08d4fddb2f838a39a90335c2487d2ee89fb31fc06d697c10cf97c635 |
+| research/insider_buying_qc_sdk_metadata_supervisor.py | 24185d232ea42f7f304b874327aa81e0278744551adcf156db2c3827abb1fc4e |
+| tests/test_insider_buying_qc_sdk_metadata_cell.py | 90b2c07be09874dfa406f5350f78745049758e32a8d0187dedf7f2a241897f26 |
+| tests/test_insider_buying_qc_sdk_metadata_supervisor.py | a777466baa4442880a36033d9a3fd8bf252ebc4a3117c1cc93559479677761ac |
+| tests/test_insider_buying_qc_sdk_metadata_custody.py | 7addf5356fccf1c9a758bf7a0fc3cf74c20a12f0bb897c4c02e1ced45a975f55 |
+
+Corrected private supervisor676fbd1e/peer test14205177 and unchanged cell
+2eb7ee4b/invocationa165007e are preserved. Production wording, direct research
+test loaders and final LF change source images; use the active exact hashes
+for eventual claims, never label the private images as executed production.
+
+### 184.4 Continued work and honest unchanged boundaries
+
+Rechecking Safari between known clock observations03:49:56..03:51:22Z
+again returned only Mac locked; no authenticated workspace or notebook was
+obtained. Owner unlock and Massive historical-product/account linkage remain
+concrete external actions, not engineering permission requests. FMP remains
+out of this round under the owner's skip reply. Continue the isolated
+source-view front and available real-input work; no routine milestone pause,
+invented native data, scheduled-as-actual earnings or silent scope reduction.
+Keep all six open topical/shared P2 scopes and both final incident dispositions.
+Frozen source bytes, v1/scale/pilot, v3 ambiguity, 82-quarter study population,
+seven-nonexact D23 and prescribed strategy/earnings diagnostics remain binding.
+No complete suite, shared document edit, live/paper/funded action, interim
+push or monitor rearm. Single final combined push remains at the honest end.
+
+Main final record/active-document/EXACT guard72 passed1.18s. Internal peer
+private helper/coordinator/boundary/EXACT guard124 passed4.30s; no real input
+or independent Claude acceptance. Active source/test memory compilation and
+frozen four-file/diff checks are required before this local commit; no push.

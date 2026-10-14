@@ -58,6 +58,34 @@ class EarlyParentCaptureError(ValueError):
     """Fixed refusals only; no contact, body, URL, exception text or headers."""
 
 
+_FAILURE_PHASES = frozenset({"preflight", "verifier", "verifier_worker", "capture",
+    "prior_snapshot_validation", "namespace_reservation_validation", "reservation_publication",
+    "post_reservation_check", "private_contact_validation", "contact_validation_publication",
+    "pre_request_check", "claim_publication", "attempt_start_publication", "pre_dispatch_check",
+    "transport_dispatch", "post_dispatch_check", "response_custody", "attempt_result_publication",
+    "post_result_check", "terminal_publication", "final_journal_check"})
+
+
+def _failure_diagnostic(exc, fallback):
+    """Only fixed categories: never exception text, arbitrary args or paths."""
+    phase = getattr(exc, "_early_capture_failure_phase", None)
+    if type(phase) is not str or phase not in _FAILURE_PHASES:
+        phase = fallback if fallback in _FAILURE_PHASES else "preflight"
+    classes = ((EarlyParentCaptureError, "EarlyParentCaptureError"),
+        (bootstrap.ParentBootstrapError, "ParentBootstrapError"),
+        (bootstrap.custody.ArchiveAssessmentRunnerError, "ArchiveAssessmentRunnerError"),
+        (bootstrap.custody.EodhdDemoError, "EodhdDemoError"),
+        (custody.FreshV4CaptureError, "FreshV4CaptureError"), (OSError, "OSError"),
+        (ValueError, "ValueError"), (TypeError, "TypeError"), (KeyError, "KeyError"),
+        (subprocess.SubprocessError, "SubprocessError"))
+    category = next((name for kind, name in classes if isinstance(exc, kind)), "other_refusal")
+    number = exc.errno if isinstance(exc, OSError) else None
+    if type(number) is not int or number not in errno.errorcode:
+        number = None
+    return {"disposition": "early_parent_capture_or_verifier_refused_existing_claims_preserved",
+            "failure_phase": phase, "failure_class": category, "os_errno": number}
+
+
 def _need(value, code):
     if not value:
         raise EarlyParentCaptureError(code)
@@ -307,12 +335,14 @@ def _capture(selection, capture_id, contact, *, root, observed, transport, guard
     guard()
     prior_context = prior_open()
     folders, lock_fd, locked = [], None, False
+    failure_phase = "prior_snapshot_validation"
     try:
         prior_check = prior_context["recheck"]
         _need(callable(prior_check) and prior_context["snapshot_sha256"] == body["prior_exposure_snapshot_sha256"]
               and prior_context["exposure_sha256"] == body["prior_exposure_inventory_sha256"], "actual_prior_snapshot_changed")
         exposures = set(prior_context["exposed_accessions"])
         _need(not any(row["request"]["accession_number"] in exposures for row in body["requests"]), "prefix_already_prior_exposed")
+        failure_phase = "namespace_reservation_validation"
         path = root.joinpath(*ARTIFACT_PARTS)
         namespace = custody._Directory(path, create=True);folders.append(namespace)
         claims = custody._Directory(path / "claims", create=True);folders.append(claims)
@@ -333,6 +363,7 @@ def _capture(selection, capture_id, contact, *, root, observed, transport, guard
         info = os.fstatvfs(namespace.fd)
         capacity = free_bytes() if free_bytes is not None else info.f_bavail * info.f_frsize
         _need(type(capacity) is int and capacity >= MIN_FREE_BYTES + MAX_REQUESTS * MAX_PARENT_BYTES, "capture_disk_reserve_refused")
+        failure_phase = "reservation_publication"
         os.mkdir(capture_id, 0o700, dir_fd=runs.fd);os.fsync(runs.fd)
         run = custody._Directory(path / "runs" / capture_id);folders.append(run)
         objects = custody._Directory(run.path / "objects", create=True);folders.append(objects)
@@ -360,16 +391,20 @@ def _capture(selection, capture_id, contact, *, root, observed, transport, guard
                   and set(os.listdir(namespace.fd)) == {"claims", "runs", "capture.lock"}, "current_journal_inventory_changed")
             for directory, name, digest, cap in retained:
                 _need(_sha(directory.read(name, cap=cap)) == digest, "current_journal_leaf_changed")
+        failure_phase = "post_reservation_check"
         check()
+        failure_phase = "private_contact_validation"
         contact = custody._contact(contact() if callable(contact) else contact, observed=observed)
         contact_control = {"schema": SCHEMA + "/contact-validation", "reservation_sha256": reservation_sha,
             "contact_present": True, "validated_at_utc": custody._stamp(clock), "contact_value_stored_or_hashed": False}
+        failure_phase = "contact_validation_publication"
         contact_sha = run.publish("contact-validated.json", _raw(contact_control), cap=MAX_CONTROL_BYTES)
         retained.append((run, "contact-validated.json", contact_sha, MAX_CONTROL_BYTES));allowed_run.add("contact-validated.json")
         headers = {"User-Agent": f"InsiderBuyingResearch-2006Q1-initial64/1.0 ({contact})",
                    "Accept": "*/*", "Accept-Encoding": "identity", "Connection": "close"}
         results, completed, qualified, total_bytes, previous_finish = [], 0, 0, 0, None
         for ordinal, item in enumerate(body["requests"]):
+            failure_phase = "pre_request_check"
             check()
             info = os.fstatvfs(namespace.fd)
             capacity = free_bytes() if free_bytes is not None else info.f_bavail * info.f_frsize
@@ -377,10 +412,12 @@ def _capture(selection, capture_id, contact, *, root, observed, transport, guard
                   "remaining_capture_disk_reserve_refused")
             name = item["request"]["accession_key_sha256"] + ".json"
             _need(name not in expected_claims and item["request"]["accession_number"] not in exposures, "request_already_consumed")
+            failure_phase = "claim_publication"
             claim = {"schema": SCHEMA + "/request-claim", "capture_id": capture_id, "reservation_sha256": reservation_sha,
                      "selection_sha256": selection.sha256, "request": item, "claimed_at_utc": custody._stamp(clock)}
             claim_sha = claims.publish(name, _raw(claim), cap=MAX_CONTROL_BYTES)
             expected_claims[name] = claim_sha;retained.append((claims, name, claim_sha, MAX_CONTROL_BYTES))
+            failure_phase = "attempt_start_publication"
             if previous_finish is not None:
                 now = monotonic_ns()
                 _need(type(now) is int and now >= previous_finish, "monotonic_clock_refused")
@@ -395,16 +432,20 @@ def _capture(selection, capture_id, contact, *, root, observed, transport, guard
             start_name = f"request-{ordinal:03d}-start.json"
             start_sha = run.publish(start_name, _raw(start), cap=MAX_CONTROL_BYTES)
             retained.append((run, start_name, start_sha, MAX_CONTROL_BYTES));allowed_run.add(start_name)
+            failure_phase = "pre_dispatch_check"
             check()
             response = None
+            failure_phase = "transport_dispatch"
             try:
                 response = transport(item["request"]["url"], headers, MAX_PARENT_BYTES)
             except Exception:
                 pass  # Ambiguous fsynced start is permanently consumed, never retried.
+            failure_phase = "post_dispatch_check"
             check()  # No response/body/result publication under a changed source/custody image.
             status, raw_sha, raw_size, header_sha, framing = None, None, None, None, None
             retained_body, header_bound = False, False
             disposition, stop = "ambiguous_transport_failure_no_retry", True
+            failure_phase = "response_custody"
             if response is not None:
                 try:
                     _need(type(response) is SecHttpResult and type(response.status) is int and 100 <= response.status <= 599
@@ -449,9 +490,11 @@ def _capture(selection, capture_id, contact, *, root, observed, transport, guard
                 "body_retained": retained_body, "header_identity_bound": header_bound, "disposition": disposition,
                 "finished_utc": custody._stamp(clock), "finished_monotonic_ns": previous_finish, "authority": _authority()}
             result_name = f"request-{ordinal:03d}-result.json"
+            failure_phase = "attempt_result_publication"
             result_sha = run.publish(result_name, _raw(result), cap=MAX_CONTROL_BYTES)
             retained.append((run, result_name, result_sha, MAX_CONTROL_BYTES));allowed_run.add(result_name)
             results.append({"result_name": result_name, "result_sha256": result_sha})
+            failure_phase = "post_result_check"
             check()
             if stop:
                 break
@@ -467,13 +510,23 @@ def _capture(selection, capture_id, contact, *, root, observed, transport, guard
             "scope_terminal_accounting_complete": len(results) == MAX_REQUESTS, "results": results,
             "all_six_form_census_preserved": True, "context_filings_not_requested": body["context_filings"],
             "full_xml_projection_attempts": 0, "source_authenticated": False, "old_roots_written": False, "authority": _authority()}
+        failure_phase = "terminal_publication"
         report_sha = run.publish("complete.json", _raw(report), cap=MAX_CONTROL_BYTES)
         retained.append((run, "complete.json", report_sha, MAX_CONTROL_BYTES));allowed_run.add("complete.json")
+        failure_phase = "final_journal_check"
         check()
         return {"capture_id": capture_id, "fixture_only": not observed, "report_sha256": report_sha,
             "planned_prefix": MAX_REQUESTS, "started_requests": len(results), "raw_bodies_retained": completed,
             "header_bound_bodies": qualified, "planned_unclaimed_unattempted": MAX_REQUESTS - len(results),
             "scope_terminal_accounting_complete": len(results) == MAX_REQUESTS, "authority": _authority()}
+    except BaseException as exc:
+        # Re-raise the same exception. Diagnostics cannot change claims, retry
+        # semantics or cleanup, and never copy exception arguments or messages.
+        try:
+            exc._early_capture_failure_phase = failure_phase
+        except (AttributeError, TypeError):
+            pass
+        raise
     finally:
         if lock_fd is not None:
             try:
@@ -843,10 +896,13 @@ def main(argv=None):
     contacts.add_argument("--getpass-contact", action="store_true")
     args = parser.parse_args(argv)
     saved_echo = None
+    failure_phase = "preflight"
     try:
         if args.verify_worker:
+            failure_phase = "verifier_worker"
             result = _verify_worker(args)
         elif args.verify_only:
+            failure_phase = "verifier"
             result = verify_observed_capture(args.capture_id, expected_report_sha256=args.expected_report_sha256,
                                              expected_head=args.expected_head)
         else:
@@ -857,12 +913,13 @@ def main(argv=None):
                 expected_bootstrap_complete_sha256=args.expected_bootstrap_complete_sha256,
                 expected_accounting_sha256=args.expected_accounting_sha256, expected_snapshot_sha256=args.expected_snapshot_sha256,
                 expected_head=args.expected_head)
+            failure_phase = "capture"
             result = run_observed_capture(selected, args.capture_id, contact_mode="stdin" if args.read_contact_from_stdin else "getpass")
         print(_raw(result).decode());return 0
     except (EarlyParentCaptureError, bootstrap.ParentBootstrapError, bootstrap.custody.ArchiveAssessmentRunnerError,
             bootstrap.custody.EodhdDemoError, custody.FreshV4CaptureError, OSError, ValueError, TypeError, KeyError,
-            subprocess.SubprocessError):
-        print('{"disposition":"early_parent_capture_or_verifier_refused_existing_claims_preserved"}');return 2
+            subprocess.SubprocessError) as exc:
+        print(_raw(_failure_diagnostic(exc, failure_phase)).decode());return 2
     finally:
         _restore_stdin_echo(saved_echo)
 

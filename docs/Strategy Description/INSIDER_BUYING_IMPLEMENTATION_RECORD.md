@@ -25143,3 +25143,118 @@ quarter or study. Document every source refusal and preserve earlier attempts.
 No routine approval/review pause, no readiness claim, outcome/backtest/QC
 launch, shared document edit or interim push; continue genuine input-driven
 work. The final combined push remains one at the authorized round's end.
+
+## 178. Canonical bootstrap observed; initial64 stopped before contact/dispatch (2026-10-14 UTC)
+
+### 178.1 Corrected offline operation and exact execution lineage
+
+The separately registered bootstrap
+ib-2006q1-parent-bootstrap-canonical-20261014-once actually ran at clean
+6314f5acf821df58c37a7ddd3857c225140b047c, with bootstrap source
+864cef1b4785ee7d5446e57b161242084b83d4bc3cec82f0db217d74a865ad57.
+Worker completion is2026-10-14T02:08:18.902576Z; the parent CLI returned0
+and its independent denied-network/fork/all-write publication verification
+passed2.57s. This is the corrected operation, not retrospective success of
+the original section176 parent-exit2 run. Neither original output was
+resumed, rewritten or promoted by renaming its execution image.
+
+| Retained control | Bytes | SHA-256 |
+|---|---:|---|
+| complete.json | 8,497 | 4777fc7f1f517cb47281e72a6399c4bdaada141b5011b2aa419f4cb9372c116c |
+| exposure.json | 8,616,949 | 5454d54fb037ee35c8d3aa4bce31d6a46d7ebe784bd0e6011c4273fcd918fed3 |
+| exposure-snapshot.json | 28,497,384 | 8ef7e8ca62a7aeee9d52c62ac7e42b406f44cd16657c8050e7f1637564d7f0a8 |
+| locator-accounting.json | 93,640,493 | 1b4136c6b22fbabc0b9d2f0b0b46c39fd4568ffe1ee6dad6cba35210ffd1a700 |
+
+The47-source execution inventory digest is
+8e8e82e2f7446401cae24e98a70e43b234cddbebb7a017ae5a1a20560b0e9711.
+Byte-identical exposure/snapshot/accounting outputs do not make their
+different parent executions identical. Preserve the genuine83,657 all-form
+quarter denominator,71,679 target rows,11,978 context rows,19,852 existing
+global consumed accessions, zero2006Q1 intersection and exact64 prefix.
+This operation made zero provider/SEC requests and grants no authenticity,
+PIT, publication, XML admission, corpus completion or backtesting readiness.
+
+### 178.2 Initial64 reservation-only refusal and independent observation
+
+The registered capture ib-sec-2006q1-initial64-20261014-once ran at the
+same clean6314f5ac with section177's exact source37af6c49 and bootstrap,
+accounting and snapshot pins above. Its CLI returned2 with the fixed generic
+refusal. Its reservation timestamp is2026-10-14T02:12:32.640913+00:00,
+reservation bytes87,153 and SHA-256
+e71228cfa2fe53a922438ec52283d2afa9d803176649aca1fcd412d64a0d1bcc.
+Preserve that run and capture.lock unchanged; do not call it a completed
+capture or invent a complete.json for it.
+
+Independent read-only observation found exactly objects/ and reservation.json
+in the run, zero object leaves, an empty global claims/ directory and no
+contact-validated.json, attempt starts/results or complete.json. In the
+executed committed path, the only transport is strictly after durable
+contact validation, permanent claim and start. No SEC dispatch was reached
+by this operation; all64 requests remain unclaimed and unattempted, rather
+than completed, ambiguous or permanently consumed. The reservation records
+the plan, not acquisition. The exact original exception/stage was not
+retained, so its historical cause is NOT established.
+
+A subsequent denied-network read-only replay passed the current prior
+snapshot/exposure hashes, original bootstrap verification, current clean
+6314f5ac execution identity, held folder checks, empty claim inventory and
+reservation rehash in28.30s. This observation is subsequent evidence, not
+proof those gates could never have refused transiently during the original
+operation. An initial extra-all-write-denied Git-backed observation stopped
+at git_identity_unavailable; it is a diagnostic isolation mismatch, not the
+original online actor's cause. No original control was changed.
+
+A separate explicit-PTY, echo-disabled stdin validation under effective
+process-tree network/fork/all-write denial accepted the genuine trusted
+identifying contact and retained only booleans. No contact value/hash was
+printed, put in argv/environment/files or used in a provider request. This
+proves the chosen private input mechanism works, not why the original actor
+refused. Add sanitized fixed-phase/class diagnostics before a separately
+named successor; never print arbitrary exception text or caller values.
+
+### 178.3 Delegated continuation decision and unchanged gates
+
+Continue without routine approval: after focused red/green validation and a
+new clean committed image, use a NEW capture ID
+ib-sec-2006q1-initial64-private-stdin-v2-20261014-once with the same actual
+bootstrap/accounting/snapshot pins, explicit writable PTY and protected
+private stdin. Recheck both old and new claim inventories before dispatch.
+This is a newly registered operation for proven never-attempted requests,
+not replay/resumption of the reservation-only run, a duplicate completed or
+ambiguous request, thaw or waiver of any custody/source gate. Refuse on any
+new claim, source/custody drift or access refusal; preserve all evidence.
+
+The owner-directed FMP paperwork question remains skipped; other-lane usage
+does not establish download/retention rights and no FMP acquisition is made.
+Continue EODHD/supplied Sharadar and real original-parent admission/native
+identity work. All six topical/shared P2 scopes and false authority flags
+remain unchanged. Shared records, Action Plan, SESSION_HANDOFF.md and the
+four frozen current-byte custody files remain untouched. No outcome/QC
+strategy/backtest launch, interim push or automatic monitor rearm occurred.
+
+### 178.4 Sanitized failure visibility without altered acquisition semantics
+
+IBEARLY-178-R01 P3 CLOSED: the generic refusal concealed whether a later
+failure occurred at post-reservation custody check, private contact input,
+pre-dispatch check or another fixed phase. Add only an allowlisted phase,
+exception category and recognized integer OS errno to CLI refusal output.
+Never emit exception messages/arguments, paths, caller values, body/contact
+bytes or hashes. Internally re-raise the same exception; no journal schema,
+claim ordering, source gate, transport, retry or cleanup policy changes.
+This observability correction does not establish the original failure cause.
+
+| Source | Source SHA-256 | Focused test SHA-256 |
+|---|---|---|
+| research/insider_buying_sec_2006q1_parent_capture_v1.py | 7b053044b2465bcaf8523cf815ec631ea3ae0a896776abea7c65ff0886d55519 | 6b4e4d425e45dd7f6eb572a20e67d74e08c5918bc8f824469fec0cbf99fc7ac7 |
+
+Five genuine reds0.75s against the preceding generic CLI isolate two
+reservation-only failure phases and three preflight/verifier fallbacks with
+arbitrary secret exception fields. Corrected107 focused/boundary/EXACT
+named Insider package-guard checks passed10.87s under process-tree network
+denial. Two in-memory compilations and diff check passed with network/fork/
+all-write denial. No actual journal, contact, credential or source request
+was used in those tests; internal QA is not independent Claude review.
+Main independently passed359 capture/bootstrap/locator/record/active-document/
+import-boundary/EXACT named package-guard checks12.44s under process-tree
+network denial, with isolated temporary database/output roots. No complete
+lane/repository suite or retained-parent replay was run.

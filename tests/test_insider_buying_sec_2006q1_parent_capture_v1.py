@@ -5,6 +5,7 @@ from dataclasses import replace
 import hashlib
 import importlib.util
 import json
+import errno
 import os
 import io
 from pathlib import Path
@@ -429,6 +430,69 @@ def test_explicit_stdin_cli_disables_echo_before_preflight_without_reading_conta
     assert code == 2
     assert events[-1] == ("set-mode", 19, original[3])
     assert capsys.readouterr().out.count("refused_existing_claims_preserved") == 1
+
+
+@pytest.mark.parametrize("where,expected_phase", [
+    ("post-reservation-check", "post_reservation_check"),
+    ("private-contact", "private_contact_validation"),
+])
+def test_cli_precontact_diagnostics_are_fixed_and_preserve_unclaimed_reservation(
+        tmp_path, monkeypatch, capsys, where, expected_phase):
+    secret = "PRIVATE-CONTACT=do-not-retain@invented.invalid /private/invented-secret"
+    calls, contact_calls, guard_calls = [], [], []
+    selected = _selection()
+    def forbidden(*args, **kwargs):
+        pytest.fail("diagnostic probe reached real transport")
+    monkeypatch.setattr("http.client.HTTPSConnection", forbidden)
+    def fail():
+        raise OSError(errno.EACCES, secret, secret)
+    def guard():
+        guard_calls.append(True)
+        if where == "post-reservation-check" and len(guard_calls) == 2:
+            fail()
+    def contact():
+        contact_calls.append(True)
+        if where == "private-contact":
+            fail()
+        return "invented@unit.test"
+    monkeypatch.setattr(module, "build_observed_selection", lambda *args, **kwargs: selected)
+    monkeypatch.setattr(module, "run_observed_capture", lambda *args, **kwargs:
+        _run(tmp_path, selection=selected, guard=guard, contact=contact, calls=calls))
+    assert module.main(["--capture", "--getpass-contact",
+        "--capture-id", "ib-sec-2006q1-initial64-invented", "--expected-head", "a" * 40]) == 2
+    output = capsys.readouterr().out
+    result = json.loads(output)
+    assert result == {"disposition": "early_parent_capture_or_verifier_refused_existing_claims_preserved",
+                      "failure_phase": expected_phase, "failure_class": "OSError", "os_errno": errno.EACCES}
+    assert secret not in output and "do-not-retain" not in output and "/private" not in output
+    namespace = _namespace(tmp_path)
+    run = namespace / "runs/ib-sec-2006q1-initial64-invented"
+    assert (run / "reservation.json").exists()
+    assert set(path.name for path in run.iterdir()) == {"reservation.json", "objects"}
+    assert list((namespace / "claims").iterdir()) == [] and list((run / "objects").iterdir()) == []
+    assert calls == [] and len(contact_calls) == (where == "private-contact")
+
+
+@pytest.mark.parametrize("mode,expected_phase", [("--capture", "preflight"),
+    ("--verify-only", "verifier"), ("--verify-worker", "verifier_worker")])
+def test_cli_diagnostic_fallback_rejects_arbitrary_exception_fields(monkeypatch, capsys, mode, expected_phase):
+    secret = "private arbitrary payload, path, contact and hash"
+    class SecretSubclass(ValueError):
+        pass
+    failure = SecretSubclass(secret)
+    failure._early_capture_failure_phase = secret
+    failure.errno = secret
+    def refusal(*args, **kwargs):
+        raise failure
+    monkeypatch.setattr(module, "build_observed_selection", refusal)
+    monkeypatch.setattr(module, "verify_observed_capture", refusal)
+    monkeypatch.setattr(module, "_verify_worker", refusal)
+    assert module.main([mode, "--getpass-contact", "--capture-id", "ib-sec-2006q1-initial64-invented",
+        "--expected-head", "a" * 40, "--expected-report-sha256", "b" * 64]) == 2
+    output = capsys.readouterr().out
+    assert json.loads(output) == {"disposition": "early_parent_capture_or_verifier_refused_existing_claims_preserved",
+        "failure_phase": expected_phase, "failure_class": "ValueError", "os_errno": None}
+    assert secret not in output and "SecretSubclass" not in output
 
 
 @pytest.mark.parametrize("root", [LANE.parent, LANE / "artifacts/invented-fixture",

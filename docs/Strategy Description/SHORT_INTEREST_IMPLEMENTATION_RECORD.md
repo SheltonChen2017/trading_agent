@@ -19259,3 +19259,137 @@ compile; import-boundary/active-document selectors **78 passed in1.18s**.
 Diff check passes. Only these21 new lane-owned files and this record are
 staged; roots, branch, HEAD, status and actual matching remote are rechecked
 immediately before the local commit. No intermediate push is made.
+
+### 116.18 Catalog DateTime distinction and complete source-free engine bundle
+
+The preceding source/cache/recovery freeze is local-only
+**0368862746e3388091e50801d4f2c128ebc9fe55**; actual/tracking origin remains
+1f90c626. Section116.17 / SI-DEC-20261013-42 was exercised exactly once.
+The registered record bytes were
+`a7d7e8de830c5decc79ce206fdef1fc2732d4b4f6adf767db94ca75c473feb4e`.
+Authenticated POST began2026-10-14T04:59:55.263928Z, received04:59:56.142902Z
+and completed04:59:56.571974Z. The response was clean with2 catalog rows and
+no unknown fields. Missing errors used the documented empty default; both
+rows were negative under the preserved UTC-created selection rule. Original
+raw bytes are protected, create-exclusive and bound by SHA256
+`69d7ad80fbd3fbb4dfeff4ee03a44e9ba2833e042009006cd03f2f88fe2f409f`.
+Original request1 and manual additional request1 remain spent, total2; no
+further catalog wire request, reset or retry is permitted by these freezes.
+No project, capacity, upload, compiler, job or backtest has been accessed.
+
+Main inspected only the safe allowlisted diagnostics, then classified the
+created-literal shape offline: both explicit public rows contain a valid
+ISO-parseable `YYYY-MM-DD HH:MM:SS` DateTime with no timezone. This is new
+captured evidence, not a reconstruction of the old discarded response.
+An unspecified DateTime must not be relabeled UTC, ordered as an instant or
+used as provider publication availability. Other public identity field types,
+exact hashes, safe name/ref and row uniqueness passed the original rules.
+
+**SI-DEC-20261013-43** prospectively adopts a separate offline software-build
+identity choice: among complete, explicit public, unique nonnegative integer
+IDs, select the highest ID, NOT a latest-created or newest-build claim.
+Preserve the exact valid original created literal with explicit basis
+`unspecified_wall_clock_not_a_timestamp` when no UTC marker exists. All other
+schema/privacy/identity restrictions remain: missing/malformed/null/sentinel
+creation dates, duplicate IDs, private rows, unknown fields and malformed
+hashes/names/ref remain negative. No UTC/financial availability/source fact
+is invented. This requalification uses only the exact saved raw bytes above,
+zero credentials and zero HTTP, after this clean committed freeze.
+Its one owned create-exclusive offline receipt is
+`offline-build-identity.public.json` in the existing protected catalog
+directory; original spent claims/raw bytes remain unchanged.
+
+Offline policy SHA256:
+`59e699bada2408217bd31429e9a641cbbc5a2ac15f493be45fb9b76d9a8a2174`.
+`scripts/short_interest_qc_catalog_identity.py` source SHA256:
+`9451e193ba0ceafb7451702bcee2719b9b6628b82a2fd672b43a6ad216427012`.
+Actual invocation must match the clean commit containing this freeze,
+matching actual remote1f90c626 and exact protected captured bytes. Its result
+is an observed catalog identity, not an execution/processing permit or proof
+of the installed cloud engine. Subsequent exact project/version receiving
+receipts and observed runtime must qualify independently; default branch or
+catalog visibility does not prove permission to pin older/custom builds.
+Official [LEAN version documentation](https://www.quantconnect.com/docs/v2/cloud-platform/projects/lean-engine-versions)
+distinguishes default master from tier-dependent older/custom selection.
+The official [CLI project client](https://github.com/QuantConnect/lean-cli/blob/master/lean/components/api/project_client.py)
+uses form-encoded `projects/update` fields `versionId`/`leanEnvironment`;
+no guessed `leanVersionId` API field is adopted. No tier purchase or account
+change is made or inferred.
+
+**SI-DEC-20261013-44** prepares a complete source-free engine-mechanics
+bundle alongside continuing actual-input work. It is not another stand-in
+for unavailable data or strategy performance. The identical original Fraction
+oracle produces all48 lookback/cost/role books,7 mechanical cohorts and only3
+fabricated native IDs; fixture SHA256 remains
+`fe05f03a59539ab8d69013dd043128ac0053d314fca7cccec10e2207672896aa`.
+It exercises submitted raw decimal orders, default fee/settlement/holdings
+callback order, split, earned dividend, explicit payment and terminal events,
+and mandatory all48/all-alias reconciliation. No equity subscription,
+History, market request, Object Store, source rows or real-data evaluation
+occurs. Custom point-feed Time=EndTime is the exact frozen UTC event, without
+an added one-minute clock shift; the benchmark is constant. Native pooled
+statistics remain diagnostics, never the exact independent-cell results.
+
+The source-only bundle audits every local transitive import and package
+marker, including the pure research package's existing exports. It packages
+unchanged canonical lane money/ending/transports rather than copying an
+alternate economic kernel. Cloud per-file/count limits, installed package
+versions, Python/CLR wrapper dispatch and full-population RAM remain factual
+receiving requirements, not local compile assertions. Internal candidate
+registration is a logical registry ID, not a self-referential source hash;
+complete emitted source/bundle byte hashes are registered outside the emitted
+file before any future authorized cloud action. All registration constants
+remain PENDING in this preparation, with no upload/job entrypoint.
+
+The optional typed receiving overlay leaves economic commands and fixture
+unchanged. It checks actual CLR decimal receiving fields for cash, fees,
+fill quantities/prices, holdings and MarketOrder quantities, and returns
+invariant decimal strings before Python sees monetary getters. Published
+[converter source](https://github.com/QuantConnect/pythonnet/blob/master/src/runtime/Converter.cs)
+distinguishes outbound decimal string parsing from inbound CLR decimal-to-
+float conversion. Constructing CLR Decimal then reading it back into Python
+would reenter that lossy inbound path and is not used as a money repair.
+Receiving tests remain fabricated; no installed CLR or cloud engine has run.
+Actual versions are to be observed through explicitly named runtime/package
+fields, not by enumerating account/config/Globals credentials.
+
+A future narrow source-free compatibility exception must bind exact emitted
+source/fixture/bundle/build identity, one new lane-owned project and prospective
+attempt ledger before cloud operations. At most3 unsuccessful same-economic-
+candidate compile/runtime cycles are permitted; technical source edits do not
+reset the count. Fresh authenticated capacity immediately before launch and
+respect for other occupied lanes remain mandatory. Data-free engine mechanics
+is not an actual outcome look or a real-source processing permit. Actual-data
+input refusal, independent historical facts and prospective empirical look
+registration remain enforced.
+
+Append-only ledger additions; historical001–033 remain unchanged:
+
+| ID | Priority / disposition | Evidence, correction and retained limits |
+|---|---|---|
+| SI-BUILD-20261013-034 | P1 sealed lineage, confirmed/corrected | Main's literal regression failed1/14 deselected (2.99s): a mutable bundle manifest could be edited then rehashed into a positive assertion. The factory now retains its original canonical manifest in the immutable anchor; even recomputed hashes refuse. Connected118 tests pass16.92s. No cloud operation or positive permit was involved. |
+| SI-BUILD-20261013-035 | P2 outbound numeric concern, false alarm retained with runtime requirement | Published inbound CLR decimal-to-float behavior does not prove Python Decimal outbound conversion also loses precision. Official converter uses string parsing outbound; no changed money algorithm is justified by that suspicion alone. The separately typed receiver overlay must test the actual selected CLR receivers/overloads in the registered runtime, not treat local/fabricated probes as that proof. |
+
+Main's connected selectors: **118 passed in16.92s**, catalog identity,
+source-free candidate/bundle/receiver and import-boundary/active-document
+checks, empty environment/network denied, CPython3.13.15/pytest9.1.1.
+No full lane/repository suite, engine instantiation, source/key request or
+cloud operation was part of those tests. Targeted compilation/diff/status
+checks precede the local preparation commit. Safari independently still
+reports the Mac locked; no authentication, lock or warning is bypassed, and
+protected API/captured-source work continues without repeating a generic
+approval request.
+
+Continuous build remains active; this preparation is not final closure and
+receives no interim push. Actual count/daily/share-class/size/cashflow/terminal
+qualification and exact prospective evaluation/power/date/look, permitted
+processing and complete order/runtime admission remain separate. Canonical
+actual looks0/0, exploratory looks0, alpha0, permanent look IDs none and QC
+launch attempts0; no backtest has run. Shared/project documents and
+SESSION_HANDOFF remain frozen. ONE final non-force lane push is reserved for
+genuine closure.
+
+Main's final8 stage Python files compile; import-boundary/active-document
+checks after this record pass78 tests in1.08s. Diff/status/explicit staged
+inventory and actual matching remote are checked before the local commit.
+No intermediate push occurs.

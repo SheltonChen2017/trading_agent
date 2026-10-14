@@ -587,9 +587,14 @@ original upload cause or API write permission. D13's one new refusal-text
 observation completed atccc3efff with HTTP200/APIfalse and
 `file not found [redacted]` (299.5); it too is spent. This redacted observation
 is not exact-key absence or admission. Separately versioned properties-first
-V3 recovery is being prepared; no spent protocol is renewed. No QC backtest
-attempt has occurred.
-The monitor remains PAUSED.
+V3 recovery then refused at its first properties response because the exact
+key-bound missing-file message has a15-character prefix, outside V3's selected
+templates (299.8). V3 is spent; no set/capacity/launch occurred. The owner then
+paused this lane for another lane's exclusive QC use and requested "push for
+now" (299.9). Seven unfinished V4 source/test files are preserved as a draft,
+with placeholder pins and no operational run freeze. No QC backtest attempt
+has occurred. Wait for the owner's all-clear before resuming QC work, even
+after ten minutes. The monitor remains PAUSED; this checkpoint does not rearm it.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1640,14 +1645,20 @@ Claude review of section 299's current storage-error recovery continuation under
 existing "for now" direction and 255.2 delegation, not future unrelated work.
 Section 296's exact connection uses are completed and spent. This is
 sequencing authority, not independent acceptance or technical/source clearance.
-The immediate next step is section 299's separately bounded properties-first
-recovery under the owner's explicit fix-and-continue direction. D13 completed
+The immediate next step is to honor the owner's QC pause in section 299.9:
+another lane has exclusive use, and no QC request or strategy launch resumes
+until the owner gives the all-clear, even after ten minutes. "Push for now"
+authorizes this local checkpoint and matching-lane push, not resumption.
+After that all-clear, finish and validate section 299's draft separately
+versioned exact-grammar storage recovery, bind its final source pins, and
+commit a new exact run decision before any contact. V3 is spent after its
+first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
 exact-key absence afresh before any set, never rely on the redacted text. The owner
 confirmed the same organization, and its authenticated UI shows50.01MB/2GB;
 the sole Manager member has no visible Edit Permissions action. D11's null
 listing and D12's HTTP200/APIfalse observations remain qualified: neither
-establishes presence, absence or completeness. V1,V2,D11,D12,D13 remain spent.
+establishes presence, absence or completeness. V1,V2,V3,D11,D12,D13 remain spent.
 Current allocation proves neither historical quota causality nor API write
 permission. No unchanged upload retry or capacity/launch advance follows
 merely from these observations. D6 preparation passed once and is spent. This continues the owner's
@@ -3570,6 +3581,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-13 | Owner-directed Keychain connections and continuous backtest preparation | `ec036238` -> this section-296 implementation/run-freeze commit and subsequent result commits | No new Claude review; current owner pre-use waiver, not independent acceptance | Additive four-provider loader and fixed seven-product schema check; no old protocol renewal; actual result follows the exact committed freeze | Root 355 focused passes in 3.01 s; author subsets overlap; no complete suite | Five pre-use findings corrected/qualified; connection success cannot establish input completeness or backtest readiness; floor 314/239/50/699 unchanged | One final matching-lane push after this continuous round; monitor PAUSED; continue admissible data construction toward an order-based run, not a routine acknowledgment stop |
 | 2026-10-13–14 | Conclusion of the same owner-directed connection/data/six-cell round | `ec036238` -> twelve exact implementation/result commits through `0051adaa`, plus final 297.20 handoff (thirteen commits total) | No new Claude range; owner waived routine current review, not independent acceptance | Provider connections checked; retained exact-duplicate recovery and October package admitted prospectively; six/eight AR-off/100/200 family prepared; QC upload refused; bounded offline and read-only metadata diagnostics completed without acceptance | Per-stage focused checks and limitations in296–297; final record/diff/status checks below; no complete Codex suite, strategy result or outcome evaluation | ARV2E297-014 OPEN: unknown Object Store refusal; ARV2D297-013/-014 and historical P2s retained; no actual begin/compile/launch, floor314/239/50/699 | Exactly one successful final matching-lane push for this continuous round; monitor PAUSED; obtain same-organization storage/permission facts before separately justified recovery, no unchanged upload retry |
 | 2026-10-13–14 | Owner-reported 2GB upgrade and bounded storage recovery | `c555fb9d` -> `94a7bb36`, `2cdfbc6a`, `9e93d116`, `875dcb1f`, final section298 handoff (five commits) | Current owner review waiver, not independent acceptance; no new Claude range | V1 test/control isolation incident preserved and corrected prospectively; V2 listing refuses; D11 observes null listing/pagination; D12 records six HTTP200/APIfalse metadata refusals without absence/admission | Per-stage focused checks in298; final261-test selection and86-record repeats overlap earlier work; no full suite | ARV2I298-001 P1 corrected prospectively with historical effects retained; ARV2E297-014 remains OPEN; no upload or strategy attempt,314/239/50/699 unchanged | One final matching-lane push; monitor PAUSED; same-organization effective allocation/Storage Create facts needed before materially justified new recovery, no unchanged retry |
+| 2026-10-14 | Actual storage-error observation, V3 grammar refusal and owner-requested paused checkpoint | `e4e41af1` -> `ccc3efff`, `14d8c9a9`, this final section299 checkpoint (three commits) | No new Claude range or independent acceptance; scoped owner waiver and per-commit dispositions in299.9 | UI confirms effective2GB; D13 retains redacted missing-file reason; V3 refuses first exact-key grammar before any set; both spent; seven unfinished V4 files preserved with placeholder pins, no run freeze | Root499 distinct focused passes before V3 invocation; checkpoint compilation and record checks in299.9, not V4 functional validation; no full suite | ARV2D299-005 and storage admission remain OPEN; zero new strategy attempts;314/239/50/699 unchanged | Exactly one final matching-lane push requested by owner; QC remains paused for another lane until owner's all-clear; monitor stays PAUSED |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -49381,3 +49393,128 @@ file was written. Partial/duplicate claims are spent/ambiguous, never reset.
 This no-order publication diagnostic does not evaluate strategy performance;
 the314/239/50/699 floor and zero new candidate attempts remain until an actual
 accountable begin/result event. All formal/PIT/paper flags stay false.
+
+### 299.8 Actual D14 grammar refusal and bounded compatibility correction
+
+D14 ran ONCE from clean freeze
+`14d8c9a90eb0c477f7b1053465cece2001662e37`, exact299.7 caller hash.
+External dispatch06:00:22UTC/completion observed06:00:29UTC on2026-10-14 are
+second-resolution brackets. The operation envelope interval was
+06:00:26.160902Z–06:00:27.660414Z. Actual exit **2**, complete=false,
+failure=`absence_unproven`. Report`storage-recovery-v3-report.json` is1801bytes,
+SHA256`8435a8605495e91341eaa7f283faa54205f327588332419d114fd73f9579c7b6`.
+The single bounded envelope was recorded; no report reread or additional
+reader was invoked. V3's claim is spent. No V3 receipt was returned.
+
+Exactly one initial index0 properties dispatch occurred, HTTP200/APIfalse,
+one error, no metadata. The safe text remains `file not found [redacted]`.
+New non-secret structure facts are: exact `File not found` prefix=true,
+the complete requested key occurs exactly once, key offset15characters,
+suffix0characters. The selected colon-space template requires16characters
+before the key, while its quoted variants require17 plus a closing quote.
+Thus the actual error does not match the selected parser grammar. It does
+not prove which single separator character the provider used; do not claim
+the raw text was recovered. There was no absence acceptance, set, upload
+verification, storage admission, capacity call or strategy attempt.
+
+ARV2D299-005 (P2, prospective correction in progress): the exact absence
+parser safely refuses the observed supported-purpose response because the
+selected formatting contract is too narrow. Existing V3 code/claim/evidence
+remain frozen and are not retried. Under the owner's continuing fix-and-run
+direction, the substantive next change is separately versioned V4 adding
+only two exact whole-message alternatives: `File not found {key}` and
+`File not found:{key}`. These match the observed prefix-length class but are
+selected prospective forms, not claims of an authenticated historical
+separator. Fresh strict raw JSON must still match an entire exact requested
+key and one enumerated literal; generic/not-found substring, wrong-key,
+trailing/negated text, HTTP404 or null-only acceptance stays prohibited.
+All other publication sequencing, bounds, source/payload authentication,
+late-failure/actual-exit rules and A1-only continuation economics stay fixed.
+This is an evidence-driven compatibility correction, not a renamed unchanged
+request, renewed V3 claim or restored attempt. A new exact committed freeze
+and validation precede any V4 contact. D14's external failure pin is provenance
+only; no old private output is reread. The314/239/50/699 floor is unchanged.
+
+### 299.9 Owner-requested paused checkpoint; V4 is unfinished and uninvoked
+
+After D14 and while the V4 correction was being drafted, the owner directed:
+"pause for 10 minutes. another lane needs exclusive use of qc. i'll let you
+know when done." Codex stopped implementation agents and all QC work, and
+confirmed that it would wait for the owner's all-clear even if ten minutes
+passed. The subsequent "push for now" requests a saved lane checkpoint only;
+it does not authorize resumed QC requests, capacity inspection, uploads,
+compiles, launches, result reads or provider work. No QC request followed the
+pause. No strategy job from this lane is running. The existing monitor stays
+PAUSED; no timer, automatic resumption or other-chat message was created.
+
+Seven V4 source/test files were already present when work was interrupted.
+They are retained without finishing the implementation: the recovery caller
+still has `PENDING_FINAL_HELPER_PIN`, and the continuation caller still has
+two `UNFROZEN` pins. The ordinary caller preflights validate these as SHA256
+bindings before their operational helpers/private loads, so these draft CLI
+paths are not ready to run. This static observation is not a general security
+proof for direct helper calls or arbitrary same-user execution. No V4 claim,
+control output, receipt, provider request or QC operation was invoked, and no
+V4 exact one-shot run decision has been committed. Do not replace placeholder
+pins mechanically and run: complete the source/test and dependency review,
+focused validation and exact prospective freeze after the owner's all-clear.
+
+The V4 drafts add the two exact prospective absence forms in299.8 and D14's
+external provenance pins, retaining V3's selected contracts elsewhere. The
+continuation is mechanically versioned to the new admission. The copied
+tests have not yet been completed/validated for this changed contract; V3's
+499-pass result must not be attributed to V4. ARV2D299-005 remains OPEN, not
+corrected by the presence of draft code. No original-upload root cause or
+storage admission is claimed. The non-atomic concurrent-create limitation,
+historical refusals, source/PIT limitations, all false readiness flags and
+314shared/239development/50infrastructure/699cells remain unchanged.
+
+Saved draft byte identities below are checkpoint identities, **not approved
+execution pins**:
+
+| Draft source/test | SHA256 |
+|---|---|
+| `scripts/arv2_newrule_storage_recovery_v4.py` | `c77e1e8ba3634f6edd03ec9e825da56eeca3ecac13b48face9b3c25ce9e46c8f` |
+| `scripts/run_arv2_newrule_storage_recovery_v4.py` | `34f21c057684611d086867c2bd5aa9e0257a35c76c4b603ba74210f2e03809fb` |
+| `scripts/arv2_newrule_recovery_continuation_v4.py` | `1bfc5810214519d10499a9a9f569bcaf5c84c53b14f08069af83ad890daf9687` |
+| `scripts/run_arv2_newrule_recovery_continuation_v4.py` | `319be38582fb2e0266a7ef5d5790ef6a92f476a80bf8a488e56944fc886cc4cd` |
+| `tests/analyst_revisions_v2/test_newrule_storage_recovery_v4.py` | `e9c1db8f0df231e428b9778c28ad90fedd76401ce2e97b8c1539a039c0ca37ff` |
+| `tests/analyst_revisions_v2/test_newrule_recovery_continuation_v4.py` | `7b13afe3c53c13f9977631b878bc46a82821b73687b491f7a2d62d6eba3ee4be` |
+| `tests/analyst_revisions_v2/test_newrule_recovery_continuation_operation_v4.py` | `4c96cf8596557a2e17d9c6609b18916abbb64ec657fc60c30be0f7dca5bdf15a` |
+
+Continuous round starts at the last pushed snapshot
+`e4e41af187031cd0b37a25d02dd97473c66e1adf` and comprises exactly three commits
+after this final checkpoint is committed. Per-commit handoff dispositions:
+
+1. `ccc3efffcba40d149beba2f6a52a6671e60f8444`: retain D13's implementation,
+   corrected finite redaction and prospective freeze. Actual one-use exit0
+   in299.5 is diagnostic completion only, not absence/admission or cause proof.
+2. `14d8c9a90eb0c477f7b1053465cece2001662e37`: retain the V3 recovery and
+   A1-only continuation implementation/freeze and499-pass evidence. Actual
+   D14 exit2 in299.8 spends V3 recovery; no set occurred, and its continuation
+   remains uninvoked without positive admission. ARV2D299-005 remains open.
+3. This final checkpoint: retain D14's actual result, owner pause and unfinished
+   V4 source/test drafts. It is neither milestone completion nor run authority.
+
+These are Codex dispositions of its own work, not independent Claude review.
+There is no new Claude commit to counter-review. The same-round read-only
+checkpoint advice is also not independent final review. Root's checkpoint
+check compiled all seven draft files in memory under native network denial
+and production-artifact read/write denial; no draft imports or operations
+executed and no bytecode was written. Root's record/active-document selection
+passed **86 tests in1.08s**, with no failures/skips/warnings, under the same
+native network and production-artifact denial, disabled plugin autoload,
+`--noconftest`, `-B`, no cache provider and in-root support paths. This repeats
+the86 document checks in the earlier499-pass selection; counts are not
+additive. No V4 pytest or complete lane suite was run. Static comparison of
+all seven drafts against V3 found no obvious embedded real credentials or
+licensed rows; this is not a comprehensive secret/security audit. All prior
+validation failures, overlaps and qualifications in299.4/299.7 remain intact.
+
+Exactly one final non-force push targets only the matching lane branch for
+this continuous round. Root/branch/HEAD/status and the matching live remote
+must be checked again immediately before commit/push; any concurrent change
+or unexplained divergence stops the push. The next substantive action remains
+waiting for the owner's QC all-clear, then finishing V4 and its new exact
+freeze before attempting storage recovery. Only an actually successful and
+authenticated admission can precede separately frozen six/eight backtests.

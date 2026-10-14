@@ -354,3 +354,25 @@ def test_malformed_source_view_completion_is_a_typed_refusal(supplied, fault):
     args.update(source_view_complete_raw=raw, expected_source_view_complete_sha256=module._sha(raw))
     with pytest.raises(module.SecTitleCurrentReferenceError, match="^observed_source_view_completion_binding_refused$"):
         module.assess_sec_title_current_reference(**args)
+
+
+@pytest.mark.parametrize("fault", ["projection_not_object", "projection_null", "derived_view_not_object"])
+def test_rehashed_malformed_projection_metadata_is_a_typed_adapter_refusal(supplied, fault):
+    """Reach the inherited validator with genuine invented inputs and coherent hashes."""
+    args = arguments(supplied)
+    source = json.loads(args["source_view_assessment_raw"])
+    parent = next(row for row in source["parent_qualification_ledger"] if row["projection_bridge"] is not None)
+    if fault == "derived_view_not_object":
+        parent["source_view"]["derived_sec_document_source_view"] = []
+    else:
+        parent["projection_bridge"]["frozen_source_view_projection"] = [] if fault == "projection_not_object" else None
+    source["parent_qualification_ledger_sha256"] = module._sha(module._raw(source["parent_qualification_ledger"]))
+    assessment_raw = module._raw(source)
+    assessment_sha = module._sha(assessment_raw)
+    complete = json.loads(args["source_view_complete_raw"])
+    complete.update(assessment_sha256=assessment_sha, assessment_bytes=len(assessment_raw))
+    complete_raw = module._raw(complete)
+    args.update(source_view_assessment_raw=assessment_raw, expected_source_view_assessment_sha256=assessment_sha,
+        source_view_complete_raw=complete_raw, expected_source_view_complete_sha256=module._sha(complete_raw))
+    with pytest.raises(module.SecTitleCurrentReferenceError, match="^full_source_cohort_context_refused$"):
+        module.assess_sec_title_current_reference(**args)

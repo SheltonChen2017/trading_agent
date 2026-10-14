@@ -1,4 +1,4 @@
-"""Invented private roots/responses only; execute with OS process-tree network denial."""
+"""Invented inputs only; use OS process-tree network and /usr/bin/security exec denial."""
 from __future__ import annotations
 
 from dataclasses import replace
@@ -696,9 +696,11 @@ class _InventedSecurity:
                                         stdin=_subprocess.PIPE, stdout=_subprocess.PIPE, start_new_session=True)
         self._child.stdin.write(output);self._child.stdin.close()
         self.code = code
+        self.calls = 0
 
     def __call__(self, args, **kwargs):
         assert args == ("/usr/bin/security", "find-generic-password", "-s", "trading-agent-massive", "-a", "massive", "-w")
+        self.calls += 1
         return self._child
 
 
@@ -707,12 +709,53 @@ class _InventedSecurity:
 @pytest.mark.parametrize("value", ["", "test-api-key\n", "has newline\ninside\n", " \n", "\x00bad\n"])
 def test_keychain_loader_fixed_item_invalid_output_refused_without_account_read(monkeypatch, value):
     from research import insider_buying_keychain_credentials as keychain
-    fake = _InventedSecurity(value.encode())  # spawned before the real-Popen sentinel below
-    monkeypatch.setattr(keychain.subprocess, "Popen", lambda *a, **k: pytest.fail("real Keychain read"))
-    monkeypatch.setattr(m, "read_keychain_credential",
-                        lambda provider: keychain.read_keychain_credential(provider, _process_factory=fake))
-    with pytest.raises(m.EarningsGapError, match="^credential_unavailable$"):
-        m._keychain_credential()
+    # Preserve Popen's class identity: the shared reader uses isinstance for
+    # both bounded reads and cleanup. Only the factory is injected; replacing
+    # Popen with a function would refuse before the grammar checks under test.
+    fake = _InventedSecurity(value.encode())
+    output_sizes, refused = [], []
+    original_bounded = keychain._bounded_stdout
+    def bounded(process, deadline):
+        raw = original_bounded(process, deadline)
+        output_sizes.append(len(raw))
+        return raw
+    def reader(provider):
+        try:
+            return keychain.read_keychain_credential(provider, _process_factory=fake)
+        except keychain.KeychainCredentialError as exc:
+            refused.append(exc.args[0])
+            raise
+    monkeypatch.setattr(keychain, "_bounded_stdout", bounded)
+    monkeypatch.setattr(m, "read_keychain_credential", reader)
+    try:
+        with pytest.raises(m.EarningsGapError, match="^credential_unavailable$"):
+            m._keychain_credential()
+        assert fake.calls == 1 and output_sizes == [len(value.encode())]
+        assert refused == ["keychain_credential_refused"]
+        assert fake._child.poll() == 0 and fake._child.stdout.closed
+    finally:
+        fake._child.wait(timeout=1)
+        fake._child.stdout.close()
+
+
+def test_invented_valid_keychain_output_reaches_bounded_grammar_not_class_refusal(monkeypatch):
+    from research import insider_buying_keychain_credentials as keychain
+    fake = _InventedSecurity((KEY + "\n").encode())
+    output_sizes = []
+    original_bounded = keychain._bounded_stdout
+    def bounded(process, deadline):
+        raw = original_bounded(process, deadline)
+        output_sizes.append(len(raw))
+        return raw
+    monkeypatch.setattr(keychain, "_bounded_stdout", bounded)
+    try:
+        observed = keychain.read_keychain_credential("massive", _process_factory=fake)
+        assert observed.provider == "massive" and observed.value == KEY and observed.fixture_only is True
+        assert fake.calls == 1 and output_sizes == [len(KEY.encode()) + 1]
+        assert fake._child.poll() == 0 and fake._child.stdout.closed
+    finally:
+        fake._child.wait(timeout=1)
+        fake._child.stdout.close()
 
 
 def test_keychain_loader_uses_the_shared_reader_for_the_fixed_massive_item(monkeypatch):
@@ -1000,6 +1043,78 @@ def test_echo_found_only_during_projection_is_never_retained(monkeypatch):
     receipt, retained, metadata = m._response(_ok(raw), m.WINDOWS[0], KEY)
     assert receipt["disposition"] == "credential_echo_refused" and retained is None and metadata is None
     assert receipt["retained_raw"] is False and receipt["body_sha256"] is None
+
+
+# Codex counter-review: privacy screening must survive common nested URL encoding.
+def _percent_layers(value, depth):
+    for _ in range(depth):
+        value = "".join("%%%02X" % byte for byte in value.encode("ascii"))
+    return value
+
+
+@pytest.mark.parametrize("depth", [2, 3])
+@pytest.mark.parametrize("location", ["cursor", "nested", "key"])
+def test_nested_percent_encoded_credential_is_refused_without_body_or_metadata(depth, location):
+    echo = _percent_layers(KEY, depth)
+    value = body()
+    if location == "cursor":
+        value["next_url"] = "https://api.massive.com/benzinga/v1/earnings?cursor=" + echo
+    elif location == "nested":
+        value["results"][0]["company_name"] = {"invented": [echo]}
+    else:
+        value[echo] = "invented"
+    raw = encoded(value)
+    assert KEY.encode() not in raw
+    receipt, retained, metadata = m._response(_ok(raw), m.WINDOWS[0], KEY)
+    assert receipt["disposition"] == "credential_echo_refused"
+    assert retained is metadata is None and receipt["retained_raw"] is False
+    assert receipt["body_bytes"] is receipt["body_sha256"] is None
+
+
+@pytest.mark.parametrize("secret", ["invented+private-key", "invented private key"])
+def test_mixed_plus_and_percent_encoding_preserves_both_secret_tracks(secret):
+    from urllib.parse import quote_plus
+    echo = quote_plus(quote_plus(secret, safe=""), safe="")
+    raw = encoded(body(next_url="https://api.massive.com/benzinga/v1/earnings?cursor=" + echo))
+    assert secret.encode() not in raw
+    receipt, retained, metadata = m._response(_ok(raw), m.WINDOWS[0], secret)
+    assert receipt["disposition"] == "credential_echo_refused"
+    assert retained is metadata is None and receipt["retained_raw"] is False
+    assert receipt["body_bytes"] is receipt["body_sha256"] is None
+
+
+def test_literal_plus_secret_cannot_disappear_during_percent_unwrapping():
+    secret = "invented+private-key"
+    # Plus-aware decoding loses the literal '+' before the percent-encoded
+    # letter is unwrapped; the independent plain track is necessary here.
+    raw = encoded(body(next_url="https://api.massive.com/benzinga/v1/earnings?cursor=inv%2565nted+private-key"))
+    assert secret.encode() not in raw
+    receipt, retained, metadata = m._response(_ok(raw), m.WINDOWS[0], secret)
+    assert receipt["disposition"] == "credential_echo_refused"
+    assert retained is metadata is None and receipt["retained_raw"] is False
+    assert receipt["body_bytes"] is receipt["body_sha256"] is None
+
+
+def test_unresolved_encoding_past_the_bound_refuses_even_without_a_secret_echo():
+    # Repeatedly escaping only '%' keeps this invented benign control small.
+    echo = "%41"
+    for _ in range(12):
+        echo = echo.replace("%", "%25")
+    raw = encoded(body(next_url="https://api.massive.com/benzinga/v1/earnings?cursor=" + echo))
+    receipt, retained, metadata = m._response(_ok(raw), m.WINDOWS[0], KEY)
+    assert receipt["disposition"] == "credential_echo_refused"
+    assert retained is metadata is None and receipt["retained_raw"] is False
+    assert receipt["body_bytes"] is receipt["body_sha256"] is None
+
+
+def test_stable_benign_url_encoding_remains_metadata_candidate_not_authority():
+    raw = encoded(body())
+    value = json.loads(raw)
+    value["results"][0]["company_name"] = "Invented%2520Company+Only"
+    receipt, retained, metadata = m._response(_ok(encoded(value)), m.WINDOWS[0], KEY)
+    assert receipt["disposition"] == "candidate_metadata_observed" and receipt["retained_raw"]
+    assert retained == encoded(value) and metadata["rows"][0]["company_name"] == value["results"][0]["company_name"]
+    assert metadata["actual_release_archive_verified"] is False
 
 
 # Section 194 (Claude review): this module's own transport had no direct test.

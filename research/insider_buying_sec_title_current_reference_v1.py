@@ -96,7 +96,9 @@ def _source_inputs(raw, sha, complete_raw, complete_sha, inventory, fixture_only
         "observed_source_view_completion_binding_refused")
     context = complete["frozen_original_baseline"].get("preparation_context")
     try:preceding._validate_assessment(source, fixture_only=fixture_only, preparation_context=context)
-    except (ValueError, TypeError, KeyError):raise SecTitleCurrentReferenceError("full_source_cohort_context_refused") from None
+    except (ValueError, TypeError, KeyError, AttributeError):
+        # Nested projection metadata can be correctly hash-bound but not an object.
+        raise SecTitleCurrentReferenceError("full_source_cohort_context_refused") from None
     body = inventory.to_payload()
     _need(body == source["source_view_inventory"] and inventory.sha256 == source["source_view_inventory_sha256"]
         == complete.get("source_view_inventory_sha256") and _raw(source["counts"]) == _raw(complete.get("counts")),

@@ -51,6 +51,7 @@ MAX_ROWS = 50_000
 MAX_BODY_BYTES = 16 * 1024**2
 MAX_METADATA_BYTES = 256 * 1024**2
 MAX_CONTROL_BYTES = 1024**2
+MAX_CREDENTIAL_DECODE_STEPS = 8
 MIN_FREE_BYTES = 4 * 1024**3
 TIMEOUT_SECONDS = 20
 COOLDOWN_SECONDS = 1.0
@@ -280,10 +281,20 @@ def _screen_echo(body: object, credential: str | None) -> None:
     while pending:
         value = pending.pop()
         if type(value) is str:
-            # Section 194 (Claude review): percent-encoded echoes (e.g. in next_url)
-            # passed the literal and JSON-escape screens and were retained.
-            _require(credential not in value and credential not in unquote(value)
-                     and credential not in unquote_plus(value), "credential_echo_refused")
+            # Codex counter-review: one decoding pass still retained nested URL
+            # encodings. Keep separate tracks so a literal '+' in a credential
+            # cannot disappear in the plus-aware interpretation. This is a
+            # bounded screen, not universal encoding support: unresolved
+            # encodings at the bound conservatively refuse the whole body.
+            plain = plus = value
+            for step in range(MAX_CREDENTIAL_DECODE_STEPS + 1):
+                _require(credential not in plain and credential not in plus,
+                         "credential_echo_refused")
+                decoded_plain, decoded_plus = unquote(plain), unquote_plus(plus)
+                if decoded_plain == plain and decoded_plus == plus:
+                    break
+                _require(step < MAX_CREDENTIAL_DECODE_STEPS, "credential_echo_refused")
+                plain, plus = decoded_plain, decoded_plus
         elif type(value) is dict:
             pending.extend(value.keys())
             pending.extend(value.values())

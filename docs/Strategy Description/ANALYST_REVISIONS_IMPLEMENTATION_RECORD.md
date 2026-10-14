@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–297 retain the milestone, review, preregistration, QC
+strategy. Sections 1–298 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -567,8 +567,14 @@ Do not retry that upload or advance to capacity/launch. D9's sole read-only
 metadata observation completed with HTTP200/API success=false and unknown
 category (297.19); this does not identify the cause or accept the upload.
 Bounded organization UI inspection could not establish the needed facts
-(297.20). The next input is the same organization's storage usage/limit and
-Storage Create permission; no QC backtest attempt has occurred.
+(297.20). The owner subsequently reports upgrading storage to2GB. Section298
+records bounded post-upgrade reconciliation implementation and a test-isolation
+incident: a test wrote the new local V1 claim/start/failure report before
+refusing at the synthetic-family boundary. V1 is spent; those files stay
+preserved. A stronger separately versioned, exact-host/HEAD/source-bound
+successor and committed one-use decision are required before any new QC call.
+The upgrade is not proof of the original cause or effective permissions.
+No QC backtest attempt has occurred.
 The monitor remains PAUSED.
 
 Branch: `codex/strategy-analyst-revisions-v2`
@@ -1616,15 +1622,16 @@ The owner's later "proceed wihtout claude review for now" and "done. all four
 are saved in keychain. configure the connections and check that they work.
 then proceed to the next backtest" supersede that routine review wait for the
 current setup and backtest-building continuation. The owner explicitly waives
-Claude review of section 297's current ratings-only continuation under the
+Claude review of section 298's current storage-recovery continuation under the
 existing "for now" direction and 255.2 delegation, not future unrelated work.
 Section 296's exact connection uses are completed and spent. This is
 sequencing authority, not independent acceptance or technical/source clearance.
-The immediate next step is section 297.20's concrete organization storage/
-permission evidence barrier after D9's negative metadata observation and an
-inconclusive UI check, preserving the October package and six-cell family.
-No unchanged upload retry or capacity/launch advance is authorized by its
-failure. D6 preparation passed once and is spent. This continues the owner's
+The immediate next step is section 298's strengthened V2 recovery implementation,
+focused validation and separate committed one-shot freeze after preserving
+the accidental test claim and failure record. The owner-reported storage
+upgrade supports reassessment but proves neither quota causality nor current
+permissions. No unchanged upload retry or capacity/launch advance follows
+from a failure. D6 preparation passed once and is spent. This continues the owner's
 matched six/eight-universe, AR-off/100%/200% accepted-risk order study through
 October2026 (297.3/297.12). No old source operation is renewed. The subsequent
 inventory request did not replace that work;
@@ -48373,3 +48380,116 @@ handoff commit is the thirteenth commit after that baseline. A future useful
 recovery must use verified external facts and separately versioned strict
 response parsing/evidence retention; it must not silently refresh pins,
 rewrite old receipts, reissue the spent upload or change strategy economics.
+
+## 298. Owner storage upgrade, bounded recovery and test-isolation correction
+
+### 298.1 Scope and prospective storage-reconciliation design
+
+The owner reports "i upgraded the storage to 2g" after the section297
+external barrier. Treat this as new owner-supplied account-change evidence,
+not verified effective quota, same-organization permissions or proof that
+quota caused D7/D9's refusals. Existing six/eight, AR-off/100/200, 2021–October
+2026 order-based research authority and the current "without Claude review
+for now" direction remain. Section255.2 delegates justified lane-specific
+technical recovery; independent acceptance and formal/source/PIT/paper gates
+are not inferred. No new purchase/account mutation/provider right is needed
+or performed. Monitor stays PAUSED; floor314/239/50/699 is unchanged.
+
+The initial additive recovery implements one exact-prefix `object/list`,
+requiring a successful complete one-page exact six-object-subset listing
+before interpreting absence. Existing keys must all pass exact size/local
+payload-MD5 metadata checks before any write; only missing exact inventory
+objects may be published, followed by properties validation, activation
+last. Activation without all data refuses. Maximum13 application dispatches,
+30s transport timeout and500s parent deadline; no retries, redirects, proxy,
+delete, fallback key, broader list or response-body read on failed HTTP.
+Strict duplicate-rejecting bounded JSON replaces the old coarse parser
+prospectively. Only finite endpoint/index/status/category/count/request-body
+digest evidence is emitted; no raw errors, credentials, preview or rows.
+
+Successful actual exit plus separately pinned new report/receipt would
+precede a separately committed continuation decision. The old upload-valid
+receipt must never be fabricated. New continuation preserves the exact
+prepared family, source, geometry, capacity, compile/status/result, per-cell
+three-attempt and accounting controls, replacing only the old upload receipt
+gate with authenticated new admission. No strategy economics change.
+QC exposes no absent-only compare-and-swap here: finite check-to-put races
+remain, and metadata MD5 is not remote SHA256 byte authentication. The frozen
+runtime's SHA256 payload authentication remains required. A late failure
+can retain positive-looking files but actual nonzero/unknown exit refuses.
+
+### 298.2 Actual V1 test-isolation incident; preservation and correction
+
+Initial combined focused validation at HEAD
+`c555fb9d60d559f58d759202abed81b2daa291ce` returned **311 passed,12 failed
+in11.40s**, not a successful validation. Native network denial was active,
+but the test fixture replaced only `sys.modules`; after another test imported
+the real helper, `from scripts import ...` resolved its retained package
+attribute. The synthetic preflight/input seams therefore reached the real
+helper. This is **ARV2I298-001, P1 test/control isolation failure**, not a
+provider rejection or an authorized operational execution.
+
+The first failing test's observed finite envelope has started_at
+2026-10-14T01:43:40.312009Z and finished_at01:43:40.315694Z,
+operation_completed=false, complete=false, failure_code=genuine_family_required,
+attempted_request_count=0 and requests=[]; report935bytes SHA256
+`d4a7abda2842d67660f0ed91874e537daecb1d202ceeff6d7c4e962740c71a30`.
+The `expected_head` of forty `a`s and `caller_sha256` of sixty-four `b`s
+are **fixture values**, not actual provenance. V1 wrote its new claim,
+start and report under the existing family's control directory. Later tests
+observed claim collisions. The intended V1 use is now **SPENT**, even though
+the observed path did not reach QC. No cleanup, reset, repair or unchanged
+V1 invocation is allowed.
+
+Static ordering plus the observed refusal shows the helper read/validated
+its claim, wrote/validated its start, and listed control names before
+`require_family(object())` refused. This is private control-file and directory
+metadata access; **not zero private effects**. That exact branch stops before
+retained D8/D9 reports, prepared payloads, organization, credentials/client,
+or request code. Network denial is not measured request accounting. The
+report digest is from the observed output, not a separate artifact reread;
+no production control census or reader replay was performed after discovery.
+V1 source/runner and these outputs are retained frozen, not erased or
+retroactively admitted. No QC attempt or look/cell is added.
+
+Fixtures are being corrected to bind both package attribute and sys.modules,
+guard captured real Directory classes and production seams independently,
+and fail teardown if a broad product exception handler swallows a guard.
+All subsequent tests additionally deny native read/write access to the real
+artifact tree. Same-round static advice is not independent review.
+
+Under255.2, the admissible next implementation is a **materially changed V2**:
+mandatory helper-level exact actual host/root/branch/clean HEAD/caller/source
+preflight before opening any control directory or claiming, and authentication
+of this exact accidental V1 refusal before any credentials/contact. Its new
+exclusive claim does not revive V1. A separately committed exact one-shot
+freeze must precede that first properly bound post-upgrade reconciliation;
+any source/evidence mismatch stops. This is a demonstrated boundary correction,
+not a date/name-only renewal of D7, D9 or the consumed V1 claim. No V2 operation
+is authorized by this implementation note alone.
+
+V1 incident source pins are helper
+`c9952791bce1b802777c80b24a42a86be0d462a2b75a82b462200d58d6100682`
+and caller
+`7b8aec7979c4df5f0818e06f86fe91f9ea8f6cefd4db085941ff8c04af7381b6`.
+The helper canonical profile is
+`4d87ce462a757c19e4e7c6efe9c24525b80acdac9bf3126b262a64e7218814eb`;
+the observed caller profile is
+`b2a7609f63e91afa73d7fc7413a3b7f651c2487045166c13578d7759b2015078`.
+Other same-round pre-use findings corrected were missing D8/D9 pin checks
+before helper imports and retained request digests not bound into the pinned
+report. Overlong finite-label lookup and omitted admission checks were caught
+by expected-red tests. Same-round author/advisory checks do not grant review.
+
+After fixture hardening, root's same six-file selection was **333 passed,
+3 failed in9.77s**; all three failures were stale section-4 navigation after
+adding298, corrected prospectively. The250 new-code tests passed with native
+network AND production-artifact read/write denial; no forbidden seam was
+observed by their independent teardown guards. The corrected86 record checks
+passed separately in0.92s; counts overlap, not419 or a complete suite. The author's
+stronger-sandbox first attempt refused pytest collection's `artifacts.is_dir`
+with1 PermissionError/.03s before tests; `--ignore=artifacts` preserved the
+denial and its155-test subset passed8.83s. All8 changed Python files compile
+in memory without bytecode; all51 frozen source pins match and
+`assistant.dispatch_fence` is absent. No further production artifact read,
+write or service access occurred in these corrected validations.

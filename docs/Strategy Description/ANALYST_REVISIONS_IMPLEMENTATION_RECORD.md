@@ -571,8 +571,11 @@ Bounded organization UI inspection could not establish the needed facts
 records bounded post-upgrade reconciliation implementation and a test-isolation
 incident: a test wrote the new local V1 claim/start/failure report before
 refusing at the synthetic-family boundary. V1 is spent; those files stay
-preserved. A stronger separately versioned, exact-host/HEAD/source-bound
-successor and committed one-use decision are required before any new QC call.
+preserved. The stronger V2 then ran once at2cdfbc6a: its sole listing returned
+HTTP200/API success=true, but exact listing validation refused
+`listing_incomplete_or_shape` (298.5). V2 is also spent. A separately frozen,
+single-call read-only listing-shape diagnostic is the next bounded recovery;
+no upload or launch follows from the positive HTTP/API status alone.
 The upgrade is not proof of the original cause or effective permissions.
 No QC backtest attempt has occurred.
 The monitor remains PAUSED.
@@ -1626,9 +1629,9 @@ Claude review of section 298's current storage-recovery continuation under the
 existing "for now" direction and 255.2 delegation, not future unrelated work.
 Section 296's exact connection uses are completed and spent. This is
 sequencing authority, not independent acceptance or technical/source clearance.
-The immediate next step is section 298's strengthened V2 recovery implementation,
-focused validation and separate committed one-shot freeze after preserving
-the accidental test claim and failure record. The owner-reported storage
+The immediate next step is section 298's bounded read-only listing-shape
+diagnostic, after V2's sole HTTP200/API-success response failed its exact
+listing contract. Both V1 and V2 are spent and retained. The owner-reported storage
 upgrade supports reassessment but proves neither quota causality nor current
 permissions. No unchanged upload retry or capacity/launch advance follows
 from a failure. D6 preparation passed once and is spent. This continues the owner's
@@ -48628,3 +48631,153 @@ table above. No old source changed and no operation occurred. The86-test
 record repeat before that formatting correction passed2.95s, not additive.
 The final formatted/pin-bound406-test selection then passed in9.91s under
 the same native network/artifact denial. This repeats, not adds to406.
+
+### 298.5 Actual V2 refusal; listing shape remains unknown
+
+At clean exact freeze `2cdfbc6abb345b6dd5964d1721982962f76340b3`, the
+298.4 caller ran **once** with its exact expected-head and caller-SHA256
+arguments. Actual process exit was **2**. Its finite envelope records
+started_at2026-10-14T02:03:15.871855Z and
+finished_at2026-10-14T02:03:19.980591Z, operation_completed=false,
+complete=false and failure_code=`listing_incomplete_or_shape`.
+`storage-recovery-v2-report.json` is1258bytes SHA256
+`a58f334a146b404be5d151e3e34d1a7a9a904462a5bbdaf47deeaddb532ee2d1`.
+These are returned pins, not a separate report reread or whole-control census.
+
+The sole attempted application dispatch was ordinal0, endpoint`object/list`,
+index=null, request SHA256
+`85adb51cb0d57442e638e75f1f69181f2ba066080b93623d4ac478e85b47eb3c`.
+It returned HTTP200, API success=true, response_schema_valid=true,
+error_category=unknown. That schema flag covers the coarse strict-JSON/success
+envelope only, not the later exact listing contract. The unknown category
+does not itself establish a service error. Attempted_request_count=1 is
+application dispatch accounting, not independently measured server contact.
+The broader listing predicate refused; the exact field/type/path/page/count
+responsible is not known because raw responses are intentionally not retained.
+No quota, permission, pagination or path-normalization cause is established.
+
+No `object/properties`, `object/set`, capacity/project/compile/launch/status/
+outcome request followed. No upload admission exists from this operation;
+original_upload_accepted, formal_forward_ready, point_in_time_proven and
+paper_or_live_ready remain false. There is still no strategy attempt or
+accounting increment:314/239/50/699. V2 helper/caller and outputs are now
+**SPENT and frozen**. Do not invoke them again, renew their claim, inspect or
+repair their leaf opportunistically, or treat this as original-upload success.
+
+Under255.2/current owner continuation, the next distinct purpose is one
+read-only response-shape observation on the same exact organization/prefix.
+It may retain only fixed presence/type labels, bounded pagination values,
+exact/slash-variant path booleans and aggregate object-shape/inventory counts;
+no raw keys, names, errors, previews, credentials or licensed rows. It must
+authenticate this exact V2 failure and source binding, claim once before
+credentials, impose a parent deadline and retain safe finite terminal evidence.
+It may not load the input package, perform properties/upload calls, infer
+completeness or authorize continuation. Implementation and a separate exact
+committed run decision must precede that call.
+
+Source check qualification: an advisory's cached, unpinned SDK representation
+initially suggested omitted pagination and `isFolder`. Root's direct current
+fetch and the adviser's refetch instead show JSON `folder`, `page` and
+`totalPages`, matching the cloud documentation. The disagreement claim was
+withdrawn before implementation/use. Neither representation establishes the
+actual failed response. Official sources inspected:
+[list API](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/object-store-management/list-object-store-files)
+and [LEAN response model](https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Api/ObjectStoreResponse.cs).
+The documentation's illustrative totalPages=0 with a nonempty object list
+also cannot establish actual completeness semantics. No parser relaxation
+or publication permission is inferred from examples or same-round advice.
+
+### 298.6 Separate listing-shape diagnostic implementation
+
+`scripts/diagnose_arv2_newrule_listing_shape.py` is a distinct **read-only**
+diagnostic, not V2 publication with a renewed claim. Its direct `_run` path
+performs mandatory designated Darwin/POSIX Python3.13/root/branch/clean-HEAD
+preflight, fixed51 original and seven additional source pins, and its own
+committed-blob/caller equality before constructing a private Directory.
+No operational pytest context is permitted. CLI head/hash arguments bind
+source, not independent acceptance or generic callback authority.
+
+Its new exclusive claim precedes retained reads and credentials. It
+authenticates only the exact V2 claim/start/1258-byte failure, pinned family
+and preparation metadata, and pinned organization. It does not load private
+input payloads or construct a new FamilyPlan. The two fixed old/new admission
+name-absence checks enumerate the bounded existing control directory; this
+is not zero private metadata access, and it is not the spent D8 census replay.
+Selected evidence is checked again after the response. Existing held/named
+read/write checks plus a final directory verification are finite endpoint
+checks, not whole-tree continuous integrity or native ACL/xattr proof.
+
+One intent precedes credential loading. The exact prior request-body digest
+binds the same organization/prefix and sole `object/list` endpoint. There is
+no authentication probe, properties/get/set/delete/capacity/project/strategy
+route, proxy, redirect or retry. Thirty-second transport and ninety-second
+parent deadlines include preflight and publication, subject to uninterruptible
+I/O/host-suspension limitations. A failed HTTP body is never read. Bounded2xx
+JSON parsing rejects duplicate fields and nonfinite values; raw JSON remains
+memory-only. Fixed field/type labels, bounded page values, path-match/slash
+booleans and aggregate census counts are the only response facts retained.
+The original-initial-shape conjunction means V2's **first** listing guard,
+not its later human/page/object/activation checks. Census truncation is
+explicit and cannot establish listing completeness.
+
+Actual exit0 means only the bounded diagnostic completed; even non2xx status
+observation can complete without parsing a body. It never admits storage or
+changes the original exit. Unknown/malformed/transport/deadline/publication
+failure exits2; a partly created claim is ambiguous/spent, never unspent.
+Final output must be matched to the actual process exit and returned canonical
+report pin. No raw dynamic fields, object keys/names, errors, preview, account
+identity, credentials or licensed rows are printed. All formal/PIT/paper and
+publication-acceptance flags remain false. No new call is authorized by this
+implementation description alone; exact validation and run decision follow.
+
+### 298.7 D11 focused validation and exact one-call decision
+
+Final root focused selection: **185 distinct passes in4.67s**, no failures,
+skips or warnings:99 diagnostic +86 record/active-document tests. Native
+network and production-artifact read/write denial stayed active together;
+`--ignore=artifacts`, `--noconftest`, disabled plugin autoload, `-B`, no cache
+provider and in-root support paths were used. Author83/4.41s and99/3.88s,
+plus the earlier root86/.95s, overlap and are not additive. Tests include
+captured real Directory/client/socket guards with teardown detection of
+swallowed violations, exact synthetic reconstruction of the1258-byte prior
+failure, source/HEAD/blob checks, one-call transport, unread non2xx bodies,
+strict JSON, finite privacy, final publication checks and15-case first-guard
+differential comparison. No operational input or provider behavior was tested.
+No complete suite ran; same-round advice is not independent review.
+Two memory-only omissions each produced one expected failure: direct `_run`
+preflight removal/.20s and prior-report external size/hash removal/.05s.
+Finally restoration completed and source/test file hashes stayed unchanged.
+
+Final source SHA256:
+`292a5cafa1a7210e347d409bf18bcc282085cb751458190ae33705d31781a8ee`;
+test SHA256:
+`e60dd36cded2db20f61e41e25564ef14643d5aadc1fae5a59746c28cb080050a`;
+canonical profile:
+`5736226a17494d400750d10f42e7d4f220ec81605d0a0b9abb8a7f67bf7cc280`.
+Both files compile in memory without bytecode, all51 original/seven additional
+pins match, and `assistant.dispatch_fence` is absent. V1/V2 and all older
+used sources/evidence remain unchanged. The live matching remote was still
+`c555fb9d60d559f58d759202abed81b2daa291ce` before this freeze.
+
+**ARV2OD298-B / D11, prospective decision under255.2/current owner review
+waiver:** after this exact snapshot is committed clean in the designated
+root/branch, invoke `scripts/diagnose_arv2_newrule_listing_shape.py` **once**
+with that actual HEAD and the exact source SHA256 above. Use the designated
+Python3.13 `-B` and same-root temp/cache/bytecode prefixes. Its90s alarm and
+30s request timeout apply. Only this single fixed organization/prefix
+`object/list` contact may run without native network denial; no other QC or
+provider operation is included. No credential value is displayed or retained.
+
+New outputs are exclusively `listing-shape-diagnostic-v1-claim.json`,
+`listing-shape-diagnostic-v1-request-intent.json` and
+`listing-shape-diagnostic-v1-report.json` under the fixed R298–R303 control.
+They have not been inspected or preallocated. Claim consumes use regardless
+of whether a request follows; collisions/partial writes are ambiguous/spent.
+Record only the finite printed envelope, actual exit/timestamps and returned
+report pin, not a new control census or separate reader. Actual exit0 plus
+matching published report is necessary for accepted diagnostic evidence,
+not storage admission. Any nonzero/unknown exit or missing/malformed output
+refuses; preserve it, no unchanged retry. Response-shape facts can justify
+a separately versioned correction only after a new exact decision; they do
+not authorize V2 replay, immediate publication, capacity or any backtest.
+Monitor remains PAUSED and314/239/50/699 stays unchanged.

@@ -561,8 +561,10 @@ once and prepared the October package (297.12), without retroactive source
 acceptance or formal admission. All D1–D5 operations are spent. D6 prepared
 the corrected six-cell family once at4053414e and is also spent. D7 account
 discovery passed, but its sole upload returned exit2/`object_response`
-(297.15). Do not retry that upload or advance to capacity/launch. A bounded
-offline control-state diagnosis is next; no QC backtest attempt has occurred.
+(297.15). D8's bounded offline census passed once: authentication was observed,
+then only index0's set intent remains without a success observation (297.17).
+Do not retry that upload or advance to capacity/launch. A separately bounded
+read-only metadata check is next; no QC backtest attempt has occurred.
 The monitor remains PAUSED.
 
 Branch: `codex/strategy-analyst-revisions-v2`
@@ -1614,8 +1616,9 @@ Claude review of section 297's current ratings-only continuation under the
 existing "for now" direction and 255.2 delegation, not future unrelated work.
 Section 296's exact connection uses are completed and spent. This is
 sequencing authority, not independent acceptance or technical/source clearance.
-The immediate next step is section 297.15's bounded diagnosis of the failed
-D7 upload, preserving the prepared October package and exact six-cell family.
+The immediate next step is section 297.17's separately bounded read-only
+metadata diagnostic after D8's successful offline census of the failed upload,
+preserving the prepared October package and exact six-cell family.
 No unchanged upload retry or capacity/launch advance is authorized by its
 failure. D6 preparation passed once and is spent. This continues the owner's
 matched six/eight-universe, AR-off/100%/200% accepted-risk order study through
@@ -48091,3 +48094,139 @@ report reader, rerun, repair or renewed old call is authorized. A later
 read-only metadata/permission check must be separately fixed to the resulting
 exact evidence before contact. Booked floor314/239/50/699 and all false
 readiness flags remain; monitor stays paused.
+
+### 297.17 Actual D8 census; next read-only metadata question
+
+D8 ran once at clean `712e81b2f30f9f8dd7bb909cc6091c4688be5bee`, native
+network-denied with a sanitized environment, actual **exit0** and matching
+`marker_census_completed` normal envelope. External dispatch2026-10-14
+01:08:10UTC; internal `01:08:14.365629Z..01:08:14.517166Z`; clean
+root/branch/HEAD/status recheck01:08:26UTC. Report **1,617 bytes**, SHA-256
+`982e2d4cbb04da4ce8e6f5f3cc20f2a79abf4999f3241b0fe6aad52d2372bb11`.
+No independent output reader or replay occurred. The final pre-freeze86
+record checks/.95s were a repeat, not added to179 distinct root passes.
+
+The exact pinned inventory has **six** objects. The retained sequence is:
+one authenticate intent and successful-response observation; then
+`object/set` index0 intent with no observed-success marker. There are no
+properties intents/observations, no later set intents/observations, and no
+upload-valid filename. Total2 intents/1 observation/1 missing observation.
+The inventory SHA remains
+`b35e1bb0dfc887d6d775a7dd89155a1e8a703ee2aad148aa69cab52b718359c8`.
+Together with the frozen control flow and actual `object_response` exit2,
+this is consistent with refusal at the first set-response check. An intent
+alone does not prove dispatch; these markers do not measure request count,
+recover numeric status/error text, prove no remote object was stored, or
+authenticate current remote metadata. All D8 controls/source are now spent/
+frozen. The original upload remains refused; no acceptance marker was added.
+
+The next distinct useful question is whether **that exact inventory-index0
+object** currently exists with matching metadata, or a fresh read-only query
+returns a bounded permission/storage/refusal category. Implement a separately
+versioned one-call `object/properties` diagnostic, bound to this external D8
+report pin, exact family/source/org pins and index0. No original error-body
+reread, object download, account/card-data query, broad storage listing,
+upload retry, cleanup, new key/name or project/job action is justified here.
+Its finite evidence must retain validated numeric status and attempted-call
+accounting, not raw errors, preview, licensed rows or secrets. Even matching
+current metadata would not retroactively change D7 exit2 or authorize the
+remaining upload; any later continuation requires its own coherent decision.
+This paragraph is implementation scope, not an invocation freeze. Booked
+counts and false readiness flags remain unchanged; monitor remains paused.
+
+### 297.18 Properties-only diagnostic contract (D9, not yet invoked)
+
+The new `scripts/diagnose_arv2_newrule_object_metadata.py` asks only for
+current metadata of inventory index0. It authenticates the unchanged51
+selected source pins, original frozen CLI, D8 source/profile/head and exact
+1,617-byte D8 report pin, family/preparation and the recorded organization
+hash. It does not rerun D8 or mint an operational FamilyPlan. The new exclusive
+claim precedes these retained-record reads and credentials; a separate
+exclusive request-intent marker precedes the sole possible network dispatch.
+All original controls stay intact. Existing QC environment credentials are
+read only after those gates; no provider Keychain item is read.
+
+One fixed HTTPS POST to `object/properties` is permitted by the implementation;
+there is no authenticate/set/list/download/account request, proxy, redirect,
+automatic retry, arbitrary endpoint, fallback key or node/project action.
+The request is bounded at4KiB, response at1MiB, transport timeout30s and parent
+alarm90s. Non-2xx HTTP response bodies are not read. A2xx JSON body, including
+possible preview/error fields, is received and strictly parsed in memory;
+duplicate keys, nonfinite values or invalid schemas refuse. Preview, raw
+errors, object keys, organization values, credentials and licensed rows are
+never emitted or retained. Exact finite error phrases can produce a category;
+unknown strings remain unknown, not guessed historical causes.
+
+The safe result contains validated numeric HTTP status, attempted application
+request count0/1, exact-key/size comparison and an MD5-format flag. The latter
+is **not** MD5 content authentication. Attempted-call accounting is not a
+measurement of server contacts or lower-level connection attempts. Source/
+record checks before and after observation are scoped snapshots, not continuous
+all-metadata integrity. The90s alarm cannot bound suspension/uninterruptible
+I/O. Strict JSON parsing precedes external report-hash comparison.
+
+An exit0 means only that a bounded diagnostic observation completed; it can
+honestly contain a negative HTTP/API response. Unknown transport, timeout,
+malformed2xx JSON/schema or publication ambiguity exits2 and spends/ambiguously
+consumes the claim. Actual external exit0 plus the matching finite envelope
+is required; a positive report alone is insufficient. `original_upload_accepted`
+and all formal/PIT/paper flags remain false in every result. No value renews
+D7, repairs its receipt, proves write permission or authorizes another upload.
+
+Same-round static advisory review found no further substantive defect. Root
+compiled the source in memory and verified the51 unchanged source pins under
+native network denial; no operational/private/credential/contact call occurred.
+Focused tests, exact final pins and the invocation decision must be recorded
+below before this new contact is allowed.
+
+Root final focused validation: **191 distinct passes in5.44s** =105 D9 tests
+and86 record/active-document checks, under native network denial/in-root
+support paths, `-B`, `--noconftest`, disabled plugin autoload and no cache
+provider. Both changed Python files compiled in memory;51 inherited pins,
+the D8 source pin and both new pins matched; `assistant.dispatch_fence` was
+absent. Author105/3.71s and earlier90/3.53s overlap, not additive. Two expected
+failures/.17s caught external-D8-pin omission; one/.17s caught failed-body
+guard omission. Both mutations were memory-only and restored, hashes
+unchanged; the first used normal restoration rather than a finally guard,
+the second used finally. No full suite or operational/private/credential/QC
+call occurred during these checks.
+
+| New D9 component | SHA-256 |
+|---|---|
+| Properties diagnostic source | `0a566b6b049f160daf6cc1a1bb2a507e18dd645c64d948dea50136cebbbede23` |
+| Properties diagnostic tests | `eb0edaf5fe04ed2c854cabae1f8a87db337224f65d78b31740deccb6e5d231b8` |
+| `arv2-newrule-object-metadata-diagnostic-v1` profile | `47a452367dde1fd141a29c57aeccf2b85f66cedae8c52a856e00fe66f7602bfa` |
+
+**D9 exact one-use observation decision:** under the owner's current request
+to continue the six/eight-through2026 order study without a routine Claude
+checkpoint and255.2 delegation, authorize one invocation at the clean commit
+containing this freeze, with that actual HEAD and exact D9 source SHA. Use
+only the designated Mac root/branch/Python3.13, `-B` and in-root support paths.
+Use the already-working QC environment credentials only after the claim and
+source/retained-evidence checks; do not inspect or output environment values.
+This contact run is not native network-denied or a claim of OS network
+isolation: its fixed HTTPS endpoint, fresh no-proxy/no-redirect opener,
+single-dispatch structure, bounds and deadlines enforce the application scope.
+Unsafe HTTP debug/SSL-keylog environments refuse before credentials.
+
+The fixed existing family control receives only the additive exclusive
+`metadata-diagnostic-v1-claim.json`,
+`metadata-diagnostic-v1-request-intent.json` and
+`metadata-diagnostic-v1-report.json`. These names were not inspected or
+allocated before freeze. After claiming, read only its exact family/preparation,
+D8 report and organization claim/record bindings; the prepared market-data
+package and all old upload markers remain unread by D9. Reuse only D8's
+stateless family-binding helper, never its spent diagnostic entry point.
+Issue exactly one `object/properties` POST for index0; no further request is
+authorized by any response. No purchase, quota increase, permission change,
+deletion, upload, source fix, capacity lookup or strategy launch is included.
+
+Record actual external exit and the matching bounded normal envelope/report
+pin/length only. A valid negative observation can exit0 but does not clear
+`ARV2E297-014`. Nonzero/unknown exit, ambiguous publication, malformed output,
+or a partially created claim is terminal/spent; no unchanged retry or newname.
+There is no separate output reader planned. Preserve all new and old evidence;
+no cleanup or success-marker repair. A concrete account/permission/capacity
+barrier requires owner action, while a verified lane-owned defect may justify
+separate bounded recovery under existing authority. None is presumed now.
+Booked314/239/50/699 and all false readiness flags remain unchanged.

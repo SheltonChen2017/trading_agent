@@ -558,9 +558,10 @@ returned four pages/3,261 rows but the separate authentication refused; D1/D2
 are spent and that acquisition remains refused. D3/D4 isolated one exact
 byte-identical duplicate; the separately defined V2/D5 subsequently passed
 once and prepared the October package (297.12), without retroactive source
-acceptance or formal admission. All D1–D5 operations are spent. The next
-bounded step is corrected six-cell projection/preparation, then separately
-frozen QC contact/launch/result handling; no QC attempt has occurred yet.
+acceptance or formal admission. All D1–D5 operations are spent. D6 prepared
+the corrected six-cell family once at4053414e and is also spent. The next
+bounded step is D7's separately frozen QC contact/launch/result handling
+(297.14); no QC attempt has occurred yet.
 The monitor remains PAUSED.
 
 Branch: `codex/strategy-analyst-revisions-v2`
@@ -1612,9 +1613,9 @@ Claude review of section 297's current ratings-only continuation under the
 existing "for now" direction and 255.2 delegation, not future unrelated work.
 Section 296's exact connection uses are completed and spent. This is
 sequencing authority, not independent acceptance or technical/source clearance.
-The immediate next step is section 297's corrected six-cell source projection
-and offline family preparation against the now-prepared October package,
-followed by separately frozen contact/launch/result handling for the owner's
+The immediate next step is section 297.14's separately frozen D7 contact/
+launch/result handling against the now-prepared October package and exact
+six-cell family (D6 preparation passed once and is spent), for the owner's
 matched six/eight-universe, AR-off/100%/200% accepted-risk order study through
 October2026 (297.3/297.12). No old source operation is renewed. The subsequent
 inventory request did not replace that work;
@@ -47871,3 +47872,86 @@ and the exact contact/attempt/result protocol separately **before** any QC
 request. This D6 decision authorizes no organization/capacity/Object Store or
 QC project/compile/run/result operation. No source retry, account-rights
 expansion, real/broker order, paper/live deployment or formal admission.
+
+### 297.14 Actual D6 family and prospective bounded QC execution freeze
+
+D6 `prepare` ran once at clean
+`4053414eda29b859397835afd8b65ef9e6832b5f`, actual **exit0** and matching
+`operation_completed=true` normal envelope. External dispatch00:56:42UTC,
+completion observed00:56:51UTC on2026-10-14; internal
+`00:56:45.994463Z..00:56:48.848550Z`. Root/branch/HEAD/status were unchanged
+and clean afterward. No QC contact occurred. Preparation is now spent;
+subsequent actions use its frozen new family, not another preparation or D5.
+
+Family SHA-256:
+`8b8ee913dcfb5ad37f4748ea70db4fcbd6ff15580e52cd160bccf2b37e10a9e5`.
+Upload-inventory SHA-256:
+`b35e1bb0dfc887d6d775a7dd89155a1e8a703ee2aad148aa69cab52b718359c8`.
+Package/lineage/activation/upload-byte bindings remain297.12, and submission
+and CLI profiles remain297.13. All six actual profile hashes equal the
+prospective source-derived values; the fixed family binds full file manifests.
+
+| Candidate / axis | Profile SHA-256 | Actual projection SHA-256 |
+|---|---|---|
+| R298 / six, AR off | `b27e40dc4ae9e71b308d6eccd0fdaf83220be9157021c265a32c71e6f8b7a09b` | `f67148cd717e207be9d44f088749c0443bb696d9c4f38f512eb6cbf483fd9662` |
+| R299 / six, AR100 | `3957b3c19905608f40ffb40f808ef7410d7867ef3a0a49943de4249a80d66b0e` | `db15f37b4f428cfc7f8ff98918abcc8170af61c3d0da3689798b38fbeb6755f7` |
+| R300 / six, AR200 | `21bc95bc9752a6b90589e84eec40c42fe9c26d23bb8ce87ad996808c6ce2d6a3` | `19c7372420c0ebf19ea6dca84eca7daad99edf867f11ab478efeada9addc56ba` |
+| R301 / eight, AR off | `9c412c4fa972076283b178f9ba93cf95303d48aa6d4056dc3b37efd5d2673f4c` | `e92f99b369325788f89c516001d189dcddecb335ff22fe4f1ebb51fbeb857370` |
+| R302 / eight, AR100 | `951c9c7ff889c622d01a62ad2aaef8705c02ab021c5e12e67007efa81f666d90` | `421726e5bb888dd4f193edd575115fcad26bb335a54b09543c0b442fc536f224` |
+| R303 / eight, AR200 | `ab1f8e895e114f9f375cfa5d300c13dd3a544cbbb8c7635ee694e3fe1c6bf150` | `3145f92263561669e865ab3cd8856d988ba2dc2b49171c69bd30e329926ebb6b` |
+
+**D7 exact contact/attempt/result decision:** under the owner's explicit
+order-based six/eight comparison request, current pre-use Claude waiver and
+255.2 delegation, authorize the following fixed CLI actions at the clean
+commit containing this freeze. Every invocation supplies that actual HEAD,
+the unchanged297.13 caller SHA and the exact family SHA above. Only the
+designated Mac root/branch/Python3.13 is compatible. Use `-B`, in-root support
+paths and existing host `QC_USER_ID`/`QC_API_TOKEN` environment configuration;
+do not print credentials or inspect unrelated provider keys, Keychain items,
+token files, browser sessions, jobs or projects. The frozen client retrieves
+QC credentials only after new-package/family/source checks, with debug/keylog
+guards and its existing bounded redirect-refusing transport. This is not a
+claim that the inherited interpreter environment is wholly authenticated.
+
+1. One `organization` action against the fixed owned reference project37165262,
+   then one `upload` of the exact inventory. Require each actual exit0 and its
+   normal matching family-bound result before advancing. Organization IDs stay
+   private; output contains their hash only. Activation is last and every
+   object must pass size/MD5 metadata readback. This is qualified research
+   processing under existing rights, not new paid entitlement.
+2. Bounded read-only `capacity` observations according to the source's60s/
+   240-observation limit. If occupied, use the product wait mechanism. Do not
+   cancel/reassign nodes or alter another lane's projects/controls. There is
+   no previous claim of current availability.
+3. In exact order R298,R299,R300,R301,R302,R303, authorize **A1 only**:
+   one `begin`, bounded `compile` observations (10s/60), one `launch` after
+   BuildSuccess and fresh own-project source/ownership/capacity checks, then
+   bounded `status` observations (60s/240). Parent deadlines are respectively
+   300/60/90/60 seconds per call. Creation/compile/runtime/transport ambiguity
+   spends or ambiguously consumes this attempt; no unchanged retry or next
+   cell after a failure pending a separately justified recovery decision.
+   Existing three-attempt ceiling remains binding, but this freeze does not
+   preauthorize A2/A3 or an economic/source change after outcomes.
+4. After exact `Completed.` and successful actual status operation, one
+   `read` per cell (90s parent deadline) authenticates project/source/job and
+   only the bounded two custom aggregate statistics. Require validator
+   acceptance, actual exit0 and matching normal output; no logs, licensed-row
+   export, arbitrary statistics or result replay. Retained positive receipts
+   after nonzero/unknown CLI exit remain inadmissible. After all six accepted
+   reads, one native-network-denied `summarize` (120s) may confirm common-source
+   comparability. Report incomplete or mismatched families honestly.
+
+`organization` has60s parent deadline, `upload`300s, `capacity`60s. Host
+suspension/uninterruptible-I/O qualifications remain. All new controls are
+retained without cleanup/repair/reset; no old protocol, R247/R281 attempt or
+source reader is renewed. Record actual exits, bounded output, exact IDs/pins,
+statuses, limitations and counted events as they occur. Every `begin` attempt
+claim books +1 shared/+1 development; successful result admission adds one
+cell. The current floor remains314/239/50/699 before any such claim. Shared
+accounting files remain frozen; update this lane record only.
+
+No QC action is reported as performed in this freeze. This is retrospective,
+accepted-risk, actual simulated-order research only: no broker/funded/real
+orders, paper/live deployment, formal PIT/master admission or efficacy claim.
+The monitor remains paused. Exactly one final matching-lane push remains due
+at the concluded continuous round; none has occurred yet.

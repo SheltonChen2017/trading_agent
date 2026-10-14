@@ -573,9 +573,10 @@ incident: a test wrote the new local V1 claim/start/failure report before
 refusing at the synthetic-family boundary. V1 is spent; those files stay
 preserved. The stronger V2 then ran once at2cdfbc6a: its sole listing returned
 HTTP200/API success=true, but exact listing validation refused
-`listing_incomplete_or_shape` (298.5). V2 is also spent. A separately frozen,
-single-call read-only listing-shape diagnostic is the next bounded recovery;
-no upload or launch follows from the positive HTTP/API status alone.
+`listing_incomplete_or_shape` (298.5). V2 is also spent. The separately frozen
+D11 diagnostic completed once: exact path/HTTP200/APItrue but null objects,
+page and totalPages (298.8). It establishes the fresh shape, not absence or
+completeness. No upload or launch follows from positive HTTP/API status alone.
 The upgrade is not proof of the original cause or effective permissions.
 No QC backtest attempt has occurred.
 The monitor remains PAUSED.
@@ -1629,9 +1630,9 @@ Claude review of section 298's current storage-recovery continuation under the
 existing "for now" direction and 255.2 delegation, not future unrelated work.
 Section 296's exact connection uses are completed and spent. This is
 sequencing authority, not independent acceptance or technical/source clearance.
-The immediate next step is section 298's bounded read-only listing-shape
-diagnostic, after V2's sole HTTP200/API-success response failed its exact
-listing contract. Both V1 and V2 are spent and retained. The owner-reported storage
+The immediate next step is section298's bounded recovery assessment after
+D11 established null object/pagination fields, not absence/completeness.
+V1, V2 and D11 are spent and retained. The owner-reported storage
 upgrade supports reassessment but proves neither quota causality nor current
 permissions. No unchanged upload retry or capacity/launch advance follows
 from a failure. D6 preparation passed once and is spent. This continues the owner's
@@ -48781,3 +48782,152 @@ refuses; preserve it, no unchanged retry. Response-shape facts can justify
 a separately versioned correction only after a new exact decision; they do
 not authorize V2 replay, immediate publication, capacity or any backtest.
 Monitor remains PAUSED and314/239/50/699 stays unchanged.
+
+### 298.8 Actual D11 observation: null listing is not empty-list proof
+
+At clean freeze `9e93d11644f54c5ab3bc9c9b95cb2938fa5093bb`, the exact
+D11 caller ran once, **actual exit0**, started_at
+2026-10-14T02:15:47.041049Z, finished_at02:15:47.741797Z.
+Its report is2885bytes SHA256
+`18cde403e00abf61989ba7e01b763fbf34c6c99e4a4b39dae69012a038b23986`,
+report_published=true, terminal=listing_shape_observed, failure_code=null,
+attempt_consumed=true and attempted_request_count=1. The finite envelope
+and successful actual exit constitute accepted **diagnostic** evidence.
+No separate reader or control census was invoked. Pre-freeze record checks
+86/.98s repeat prior coverage and are not additive.
+
+The fresh response is HTTP200/API success=true with exact path, all required
+top fields present, no unknown top fields and errors missing. Storage used
+is an exact nonnegative in-range integer; its value is deliberately not
+emitted. **objects, page and totalPages are JSON null**, not empty list/zero.
+No object was scanned; object_count=null and census_complete=false. The
+original_initial_shape_conjunction is false because the list/page predicates
+fail. This establishes those fields in this fresh response, not the unseen
+bytes of V2's historical response or D7/D9's root cause. It does not prove
+zero files, absence, quota, permissions, listing completeness or upload success.
+
+D11 is now spent; retain its claim/intent/report and source/tests unchanged.
+No properties/upload/strategy/QC-capacity request followed. All publication,
+formal/PIT/paper flags remain false;314/239/50/699 unchanged. The next safe
+assessment is whether authoritative per-key metadata can establish the six
+exact expected objects' states without treating null as absence or broadening
+the namespace. Any new request/publication needs a separately justified,
+source-pinned prospective contract and committed decision. Existing V2 is
+not relaxed, rerun or retroactively accepted.
+
+### 298.9 Bounded next assessment: exact six-key metadata, no writes
+
+Current official
+[metadata documentation](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/object-store-management/get-object-store-metadata)
+defines per-key properties but no exact missing-object status/envelope. The
+[official list command](https://raw.githubusercontent.com/QuantConnect/lean-cli/master/lean/commands/cloud/object_store/list.py)
+treats null/missing objects as a display-level "No objects found" result;
+that UI heuristic is not a conditional-write or completeness guarantee.
+Accordingly this lane does not translate null, generic404, success=false or
+an unknown error into absence. A remote-absence-authorizing set remains empty.
+The owner's organization/allocation confirmation was requested nonblockingly;
+no further purchase, setting change or secret is requested.
+
+The next delegated implementation is a separately claimed read-only matrix
+over exactly the six pinned inventory keys. It authenticates D11's fresh
+report/source and the original fixed family/package/lineage/organization,
+then compares each available metadata key/size/MD5 to its authenticated local
+payload. Up to six requests, one per key; no list/properties retry, set/get/
+delete or broader namespace. Well-shaped2xx API refusal, null metadata and
+value mismatches may be recorded per key, but any non2xx status stops the
+remaining keys without reading its body. APItrue with nonempty errors is a
+contradiction and stops; transport/malformed/deadline ambiguity also stops.
+Metadata-null/refusal remains
+unknown, never proven absent. All six matches could inform a separately
+frozen positive admission decision; this diagnostic itself grants none.
+It emits only finite per-index statuses/categories/schema facts and comparison
+booleans, not preview/error/key/account strings, payloads or licensed rows.
+Local payloads and successful metadata bodies may be read in memory for these
+checks; do not claim zero private reads merely because output is redacted.
+Native tests cannot contact services or read/write production artifacts.
+Exact source/tests/profile and a committed run freeze must precede any call.
+
+### 298.10 D12 implementation, validation and exact prospective decision
+
+The separate `scripts/diagnose_arv2_newrule_properties_matrix.py` implements
+298.9's read-only diagnostic, not acquisition/publication recovery. Mandatory
+direct `_run` preflight binds the designated Darwin/POSIX Python3.13 host,
+root/branch/clean HEAD, original51 and additional8 selected source pins,
+and its own exact committed blob before opening the fixed control directory.
+An exclusive new claim precedes retained metadata, package and credential
+reads. D11's exact claim/intent/2885-byte report is externally pinned; the
+exact V2/family/preparation/organization metadata is authenticated through
+stateless helpers, not old operations. The genuine fixed October package and
+lineage are loaded only to obtain the six authenticated payloads and compare
+each descriptor/key/size/SHA256/activation flag to the frozen inventory.
+No FamilyPlan, projection, preparation or profile-control construction runs.
+
+Each exact key has one intent and at most one `object/properties` dispatch,
+with the request SHA256 bound into both its observation and final report.
+The prospective stopping rule is 298.9's: any non2xx, contradictory success
+with nonempty errors, malformed/transport/deadline ambiguity stops remaining
+keys; valid2xx APIfalse/null/value mismatches remain diagnostic observations
+and may continue to the next distinct key. No non2xx body is read. Successful
+bounded JSON is parsed in memory, including any possible preview; output is
+only finite schema/status/category/match facts. No raw errors, keys, account,
+credentials, rows or preview are printed. A neutral dependency-validation
+label does not assert a response cause. Request accounting counts attempted
+application dispatch, not measured server contact.
+
+The240s parent alarm and30s/request bound include preflight, authentication,
+requests and publication, subject to uninterruptible I/O/host suspension.
+Post-authentication rechecks exact retained evidence and rereads authenticated
+payload members via the genuine package iterator, then checks equality and
+source preflight again. Final directory verification/close precedes normal
+output. These are finite held/named endpoint checks, not whole-interpreter,
+continuous-tree or native ACL/xattr proof. A late failure may leave a report
+on disk but cannot yield accepted normal output. Actual exit0 plus matching
+published finite envelope is required; even then this is diagnostic completion
+only, never absence, publication/admission or strategy-run acceptance.
+
+Final root focused validation: **261 distinct passes in5.14s**, no failures,
+skips or warnings:76 matrix +99 imported listing diagnostic +86 record/docs.
+Native network and production-artifact read/write denial, disabled plugin
+autoload, `--noconftest`, `--ignore=artifacts`, `-B`, no cache provider and
+in-root support paths were retained. Author49/3.84s,76/3.59s and76/3.56s
+overlap and are not additive. Captured actual Directory/client/socket guards
+and teardown assertions detect swallowed operational-test boundary failures.
+Memory-only non2xx-stop and D11 external-pin omissions each produced one
+expected failure (.18s/.04s); finally restoration left file hashes unchanged.
+Both new files compile in memory; all51+8 pins match and dispatch_fence is
+absent. No full suite, actual provider behavior or private artifact access
+was exercised by tests. Same-round static advice is not independent review.
+
+Exact source SHA256:
+`47b8eec8296beb0433a1223adea38c471ba2034b26ac81cb20a2e4143431f363`;
+tests SHA256:
+`0e097ed8e14829a20bda449822d7893e0194d5d3523bf69ae4e19659064a4ac2`;
+canonical `arv2-newrule-properties-matrix-diagnostic-v1` profile:
+`af65c0beab8715809ef89cd24f1dd47ed3cf798782957189277aa138bf6d6b93`.
+All used V1/V2/D11 and original study sources remain frozen.
+
+**ARV2OD298-C / D12, prospective decision under255.2 and current owner
+continuation/review waiver:** commit this exact snapshot clean in the
+designated root/branch, then invoke the new caller **once** with that actual
+HEAD and the exact source SHA256 above. Use designated Python3.13 `-B` and
+in-root temp/cache/bytecode paths. Only up to six exact organization/key
+`object/properties` requests may run without native network denial, using
+existing QC rights. No list/set/get/delete, retries, proxy/redirect, capacity,
+project, compile, backtest or other provider operation is included.
+
+Only own new outputs under the fixed R298–R303 control are permitted:
+`properties-matrix-diagnostic-v1-claim.json`,
+`properties-matrix-diagnostic-v1-request-00` through `-05` intent/observed
+JSON files, and `properties-matrix-diagnostic-v1-report.json`. They have not
+been inspected or preallocated. The exact selected old metadata/package
+reads above are admitted solely for this new diagnostic's authentication;
+no old reader/census or spent operation is replayed. Claim consumes use even
+without contact; partial/colliding claims are ambiguous/spent. Record only
+the bounded printed envelope, actual exit/timestamps and returned report
+pin; no separate output reader or opportunistic control census. Missing,
+malformed, nonzero/unknown or ambiguous output refuses and is retained, with
+no unchanged retry. If all six positively match, a separate exact admission/
+continuation decision is still required. Otherwise pursue only materially
+justified recovery or concrete external clarification, never infer absence
+or blindly upload. Monitor remains PAUSED;314/239/50/699 unchanged. Exactly
+one final push remains reserved for the conclusion of this continuous round.

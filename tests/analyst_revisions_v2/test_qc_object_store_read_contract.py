@@ -90,6 +90,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     accepted_risk_matched_historical_projection.py
     accepted_risk_objective_synthetic_leverage_evaluator.py
     accepted_risk_objective_synthetic_leverage_qc_runtime.py
+    accepted_risk_october_order_package.py
     accepted_risk_order_level_benchmark.py accepted_risk_order_level_core.py
     accepted_risk_order_level_forced_exit.py
     accepted_risk_order_level_input_runtime.py
@@ -171,7 +172,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     fundamental_universe_discovery_worker.py global_input_bundle.py
     global_input_schema.py historical_preopen_input_adapter.py
     in_qc_preopen_terminal_stream.py lean_source_assembly.py
-    matched_mia_recovery.py object_store_read_contract.py
+    matched_mia_recovery.py newrule_comparison_targets.py object_store_read_contract.py
     owner_signature_authority.py physical_accepted_risk_archive.py
     physical_firm_ontology_candidate_archive.py
     physical_firm_ontology_review_packet.py
@@ -221,6 +222,9 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
 )
 
 _ZERO_EXTERNAL_IO_IMPORTS = {
+    "newrule_comparison_targets.py": tuple(
+        "dataclasses hashlib json decimal".split()
+    ),
     "__init__.py": (),
     "accepted_risk_order_level_benchmark.py": tuple(
         "hashlib json decimal".split()
@@ -485,6 +489,20 @@ _ZERO_EXTERNAL_IO_SOURCES = frozenset(_ZERO_EXTERNAL_IO_IMPORTS)
 # package exemption.  This both documents why the file is outside the pure
 # class and makes any new dependency a review event.
 _HOST_ONLY_ADAPTER_IMPORTS = {
+    "accepted_risk_october_order_package.py": tuple(
+        """
+        __future__ dataclasses hashlib json os sqlite3 collections datetime pathlib
+        data.exchange_calendar research.analyst_revisions_v2.accepted_risk_input_pair
+        research.analyst_revisions_v2.global_benchmark_contract
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_latest_order_package
+        research.analyst_revisions_v2_qc.accepted_risk_massive_ratings_delta
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_package
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator
+        research.analyst_revisions_v2_qc.physical_accepted_risk_archive
+        research.analyst_revisions_v2_qc.production_evidence_composer
+        """.split()
+    ),
     "eight_universe_ar_entry_only_projection.py": tuple(
         """
         ast dataclasses hashlib json decimal research.analyst_revisions_v2_qc
@@ -1747,6 +1765,9 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
 }
 
 _HOST_ONLY_ADAPTER_IO_SURFACE = {
+    "accepted_risk_october_order_package.py": (
+        "call:open", "import:os", "import:pathlib",
+    ),
     "accepted_risk_eight_universe_input_qc_projection.py": (
         "call:read_bytes",
         "import:pathlib",
@@ -3650,6 +3671,14 @@ _PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
             "accepted_risk_objective_synthetic_leverage_evaluator",
         ),
         (
+            "research.analyst_revisions_v2_qc.accepted_risk_october_order_package",
+            "research.analyst_revisions_v2.accepted_risk_input_pair",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_october_order_package",
+            "research.analyst_revisions_v2.global_benchmark_contract",
+        ),
+        (
             "research.analyst_revisions_v2_qc.accepted_risk_order_level_input_runtime",
             "accepted_risk_preliminary_rating_evaluator",
         ),
@@ -4914,6 +4943,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.accepted_risk_matched_historical_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_objective_synthetic_leverage_evaluator",
         "research.analyst_revisions_v2_qc.accepted_risk_objective_synthetic_leverage_qc_runtime",
+        "research.analyst_revisions_v2_qc.accepted_risk_october_order_package",
         "research.analyst_revisions_v2_qc.accepted_risk_order_level_benchmark",
         "research.analyst_revisions_v2_qc.accepted_risk_order_level_core",
         "research.analyst_revisions_v2_qc.accepted_risk_order_level_forced_exit",
@@ -5015,6 +5045,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.in_qc_preopen_terminal_stream",
         "research.analyst_revisions_v2_qc.lean_source_assembly",
         "research.analyst_revisions_v2_qc.matched_mia_recovery",
+        "research.analyst_revisions_v2_qc.newrule_comparison_targets",
         "research.analyst_revisions_v2_qc.object_store_read_contract",
         "research.analyst_revisions_v2_qc.owner_signature_authority",
         "research.analyst_revisions_v2_qc.physical_accepted_risk_archive",

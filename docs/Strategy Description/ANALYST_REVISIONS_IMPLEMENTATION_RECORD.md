@@ -47331,3 +47331,128 @@ a hostile metaclass hash. Identity-linear comparison replaced it before the
 initial green run; a later memory-only omission mutant caught one expected
 failure/0.06 s and restored the original function in `finally`. No frozen
 used source changed. Same-round advisory inspection is not independent review.
+
+### 297.8 Actual D3 refusal: duplicate rating IDs, not accepted capture
+
+D3 froze at clean `38135de5e9e404e6595301d7e6e55da6c7b02e14` and ran once
+under native network denial with sanitized environment. External dispatch
+**2026-10-14 00:07:14 UTC**, completion observed **00:07:29 UTC**, actual
+**exit 2**. The finite report records internal start
+`2026-10-14T00:07:16.116716Z`, finish `2026-10-14T00:07:25.110130Z`, stage
+`source_authentication`, exact exception type `ratings_delta_error`, code
+**`duplicate_rating_provider_id`**. Report **811 bytes**, SHA-256
+`0151008b814f1bea78b05a6c9a6852fc5ea12beb9d910526735e232895e7d8c5`.
+Its console envelope was returned after the new report's held/named checks;
+no independent reader was invoked. D3 is now spent/frozen. No provider/key/
+QC contact or old claim/report read occurred; source reads were the separately
+authorized retained-byte authentication. Native denial is not server accounting.
+
+This establishes a specific refusal on the retained source during D3; it does
+not reconstruct the old worker's discarded exception or prove the first failure
+had no other cause. The duplicate-ID guard worked as written. At least one
+provider event ID was repeated, but the finite output does not reveal whether
+the repeats are identical rows or conflicting versions, within/across pages,
+or whether pagination/concurrent provider changes caused them. None of these
+causes is inferred. `ARV2D297-007` remains open for source acceptance, with
+diagnostic specificity advanced. The original exit 2 and false flags remain.
+
+Next safe investigation is a separately bounded, pinned, offline duplicate
+characterization of the already retained bytes: exact group/occurrence counts,
+same-page/across-page distribution and byte-identical versus conflicting groups,
+without event IDs, licensed row values or raw exceptions in output. It must
+retain original external manifest/page/hash/held-metadata requirements and
+complete accounting. No automatic deduplication, quarantine, source-authority
+minting or new acquisition is authorized by this investigation. A duplicate
+characterization is not permission to construct a selector around this source
+stop. Pure composer/scorer/order-runtime implementation can continue using
+synthetic fixtures, but real input consumption stays blocked until a coherent
+source remedy genuinely satisfies a prospectively defined admissible contract.
+
+### 297.9 Synthetic comparison groundwork and exact D4 characterization freeze
+
+Two inactive components are implemented with synthetic fixtures only. The new
+October composer preserves the exact September-25 contribution prefix, derives
+only its later-eligible tail and a genuinely authenticated ratings-only delta,
+and commits cross-archive collision dispositions. The full original session
+axis is extended through October 13 without moving availability indices. Its
+extended inventory is expressly stale; fresh QC holdings/caps/identity joins
+remain required. October 12 is the last weekly decision, October 13 the
+valuation endpoint, not a forced final order. No actual composition ran and
+the refused R297 source cannot pass this composer's authority requirement.
+The pure target engine implements the six prospective cells, eight-book common
+input shape, qualified technical coverage, cap-ranked selection, own-ETF
+fallback and aggregate 9.8% exact-stock cap. It is not a runtime or execution
+permit. Its external context hash is not source authority; a full book-content
+binding and cross-book economic-field consistency remain next implementation
+work before runtime use. No QC runtime/projection/launch was created here.
+
+Pre-use corrections retain their evidence: composer author initially observed
+38 passes/eight errors because extended membership endpoints retained their old
+content hashes; rebuilding those records with the frozen builder corrected this
+real defect. Root required exact lineage keys/types, explicit valuation-end
+naming and a commitment to excluded tail identities/contributions. The target
+engine now requires individual selected-row technical agreement independently
+of the aggregate 99% threshold; a 0.1%-weight mismatched huge-cap row cannot
+enter selection. Zero-weight phantom names and cross-book identity aliases
+refuse. These are synthetic component checks, not authenticated real inputs.
+
+Root final focused selection: **227 distinct passes in 10.72 s** (36 D4,
+55 composer, 48 target, 86 record/active-document, two exact closure checks),
+no failures/skips/warnings. Seven changed Python files compiled in memory;
+all 14 D4 dependency pins matched; `git diff --check` passed. Native network
+denial, disabled plugin autoload/cache provider, `--noconftest`, `-B`, in-root
+support paths and absent `assistant.dispatch_fence` were enforced. No complete
+suite ran. Author final selections of 36/1.13 s, 55/6.67 s, 48/0.08 s and
+two closure checks/4.69 s overlap this total. The composer's memory-only source
+authority omission was caught by one expected failure/0.07 s and restored.
+Closure registration initially failed for two missing inventory entries, then
+for exact edge tuple ordering (one failed/one passed each); exact inventory,
+imports, I/O surface, reached nodes and two boundary edges were corrected
+without broadening any prohibited import/I/O rule. Same-round advice is not
+independent review.
+
+| Prepared component | SHA-256 |
+|---|---|
+| October composer | `995f90f6c0bc9affac3733bdf521a2e05c5357ee7a1f8b66fbba699e0cf0ce74` |
+| Composer tests | `7ade383d9e5d0a29d38e3329b0c16728448e3f52490f11eedf25e37ab91c790b` |
+| Composer profile | `076f70b9674a14390df56e8f829f0d0e8fba18a11a38edf1929c178cb03594a0` |
+| Pure target engine | `6675b7d686d35b07ad23e8960a221e65215f0f86a72fc54f07b7d195c997d0d9` |
+| Target tests | `2570241f2a9dcb10a7696a0648bfe0b2aa52c78ed3078da7d595b98a65187ac5` |
+| Exact QC-package closure test | `822581736d26f40e816972a8cbcbb37f8967d4c1613a8d0d29284c6fddef1a80` |
+
+**D4** authorizes one invocation of
+`scripts/characterize_arv2_r297_duplicates.py`, SHA-256
+`da6dca9c84ba40460e0c6d687274629650ce6893ea976982761c1520375873ee`,
+at the clean commit containing this freeze, under the current owner pre-use
+review waiver and 255.2 delegated diagnosis. Tests are
+`c1b313fe7443db04e3548bcf813349333d19d1a661a2f853e0500f75981554f1`;
+profile `arv2-r297-duplicate-characterization-v1` is
+`3a1725cae222b7fb592c6160ef0ec4ba7ac7511e7c1586b167ae4dfe99820aa2`.
+Use the actual clean HEAD and exact caller SHA, designated root/branch/Python
+3.13, sanitized environment, `-B`, native `sandbox-exec` deny-network policy
+and in-root support paths. Its fixed new claim leaf is
+`artifacts/analyst_revisions_v2/massive_ratings_delta/R297-20261013-D4`,
+not inspected or allocated before this freeze. D1/D2/D3 stay spent and frozen.
+
+D4 reads only the already retained R297-A capture under the exact external
+2,628-byte manifest/SHA in 297.6. It reads each leaf once, checks declared size
+before reading and hashes before provider parsing, validates schema/extraction/
+cursor chain and complete inventory, and retains original descriptors/full
+metadata through final held/named/ancestor checks before emitting counts.
+Its 12 finite counters account for total/valid/invalid/unique IDs, repeated
+groups/all occurrences/excess occurrences, exact canonical-row-byte equality
+versus conflict, and three disjoint within/across-page classes. No event IDs,
+row values, dates, credentials, raw exception or authority are output. All
+partial counters are discarded on refusal. The 30-second alarm has the same
+host-suspension/uninterruptible-I/O limitation; selected-file pins are not
+whole-interpreter integrity and native denial is not contact accounting.
+
+Claim consumes use even before any source read. Record actual exit and the
+bounded finite console envelope/hash/length only; no extra output reader is
+planned or authorized. A late apparently positive report with nonzero/unknown
+exit is inadmissible, and ambiguity means no repair/reuse/unchanged retry.
+Even exact exit zero means aggregate-only characterization, not source
+acceptance, deduplication, quarantine, formal admission, package permission or
+QC contact. The old source remains refused until a separately coherent
+prospective remedy genuinely satisfies its own contract. No booked look,
+readiness flag, monitor setting or provider entitlement changes here.

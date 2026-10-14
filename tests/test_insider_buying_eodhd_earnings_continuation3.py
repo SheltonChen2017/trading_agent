@@ -388,3 +388,9 @@ def test_fake_identity_cannot_reach_real_transport(tmp_path, monkeypatch):
             root=tmp_path, identity=lambda *a, **k: IDENTITY)
     with pytest.raises(m.EarningsCampaignError, match="real_transport_requires_real_lane_identity"):
         run(tmp_path, transport=m._default_transport)
+
+
+# Section 194 (Claude review): continuation5's fixture-root guard, added to this version.
+def test_fixture_transport_cannot_target_the_real_lane_registry():
+    with pytest.raises(m.EarningsCampaignError, match="^fixture_transport_actual_lane_root_refused$"):
+        m.run_continuation("ib-eodhd-campaign-invented-lane", "a" * 40, Path("/invented-token-never-read"), owner_acknowledged_rotated_token=True, root=m.LANE_ROOT, identity=lambda *a, **k: pytest.fail("identity"), transport=lambda window: pytest.fail("provider"))

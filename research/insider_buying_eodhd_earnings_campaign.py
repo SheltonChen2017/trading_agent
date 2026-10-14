@@ -432,6 +432,16 @@ def _default_transport(window: tuple[str, str], *, expected_head: str, baseline:
                 pass
 
 
+def _fixture_root_is_lane(root: Path) -> bool:
+    """Section 194 (Claude review): continuation5's guard, missing in this version."""
+    _require(isinstance(root, Path), "fixture_root_identity_refused")
+    try:
+        return root == LANE_ROOT or root.resolve() == LANE_ROOT or root.samefile(LANE_ROOT)
+    except OSError:
+        # An unverifiable fixture root never gains access to the real registry.
+        raise EarningsCampaignError("fixture_root_identity_refused") from None
+
+
 def run_campaign(campaign_id: str, expected_head: str, token_path: Path, *, windows: tuple | None = None,
                  owner_acknowledged_rotated_token: bool, root: Path = LANE_ROOT,
                  identity: Callable = _identity, transport: Callable | None = None,
@@ -450,6 +460,9 @@ def run_campaign(campaign_id: str, expected_head: str, token_path: Path, *, wind
              "real_transport_requires_real_lane_identity")
     _require(transport is not None or windows == REGISTERED_WINDOWS,
              "real_transport_requires_exact_frozen_monthly_manifest")
+    # Section 194 (Claude review): a fixture transport aimed at the real lane would
+    # write fixture scopes into the real registry that later versions pin exactly.
+    _require(transport is None or not _fixture_root_is_lane(root), "fixture_transport_actual_lane_root_refused")
     parent = scopes = campaigns = directory = lock = None
     try:
         baseline = identity(expected_head, root=root)

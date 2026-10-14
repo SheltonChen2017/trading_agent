@@ -219,6 +219,44 @@ _FAILURE_CODES = frozenset({"private_journal_custody_refused", "previous_custody
     "partial_lock_custody_refused", "partial_witness_owner_or_inventory_refused", "partial_failure_control_refused",
     "private_custody_owner_refused",
     "partial_witness_failure_or_suffix_refused", "partial_witness_sealed_counts_refused", "source_named_directory_detached"})
+# Section 194 (Claude review): this module's own fixed refusal codes were relabelled
+# unclassified_failure in its failure journal. Fixed literals only, never exception text.
+_FAILURE_CODES = _FAILURE_CODES | frozenset({
+    "ancestor_concurrent_campaign_refused",
+    "campaign_cannot_resume",
+    "campaign_id_format_refused",
+    "completed_or_ambiguous_window_cannot_repeat",
+    "concurrent_campaign_refused",
+    "credential_echo_refused",
+    "designated_worktree_required",
+    "expected_head_format_refused",
+    "explicit_finite_windows_required",
+    "fixture_root_identity_refused",
+    "fixture_transport_actual_lane_root_refused",
+    "genesis_concurrent_campaign_refused",
+    "invalid_transport_result_started_preserved",
+    "legacy_concurrent_campaign_refused",
+    "owner_rotated_token_acknowledgement_required",
+    "partial_concurrent_campaign_refused",
+    "partial_scope_external_pin_mismatch",
+    "private_directory_required",
+    "real_transport_identity_refused",
+    "real_transport_requires_exact_frozen_monthly_manifest",
+    "real_transport_requires_real_lane_identity",
+    "real_transport_started_journal_required",
+    "scope_registry_refused",
+    "source_envelope_schema_refused",
+    "source_json_schema_refused",
+    "tracked_source_bytes_mismatch",
+    "window_date_schema_refused",
+    "window_order_or_31_day_limit_refused",
+    "window_outside_frozen_support_envelope",
+    "window_schema_refused",
+    "windows_unsorted_or_overlapping",
+    "worktree_branch_head_mismatch",
+    "worktree_changed_during_identity",
+})
+
 
 
 def _failure_details(exc: BaseException, stage: str, index: int | None) -> dict:

@@ -417,3 +417,18 @@ def test_whitelist_preserves_known_disk_code_but_rejects_untyped_stage():
     result = m._failure_details(m.EarningsCampaignError("worst_case_capture_disk_reserve_insufficient"), "window_disk_preflight", 0)
     assert result["fixed_code"] == "worst_case_capture_disk_reserve_insufficient"
     assert m._failure_details(ValueError(TOKEN), {}, 0)["stage"] == "unclassified_stage"
+
+
+# Section 194 (Claude review): continuation5's fixture-root guard, added to this version.
+def test_fixture_transport_cannot_target_the_real_lane_registry():
+    with pytest.raises(m.EarningsCampaignError, match="^fixture_transport_actual_lane_root_refused$"):
+        m.run_continuation("ib-eodhd-campaign-invented-lane", "a" * 40, Path("/invented-token-never-read"), owner_acknowledged_rotated_token=True, expected_partial_witness_sha256="0" * 64, root=m.LANE_ROOT, identity=lambda *a, **k: pytest.fail("identity"), transport=lambda window: pytest.fail("provider"))
+
+
+# Section 194 (Claude review): the module's own late refusals keep their fixed code.
+@pytest.mark.parametrize("code", ["completed_or_ambiguous_window_cannot_repeat", "concurrent_campaign_refused",
+                                  "campaign_cannot_resume", "scope_registry_refused",
+                                  "invalid_transport_result_started_preserved", "partial_scope_external_pin_mismatch"])
+def test_own_fixed_refusal_codes_are_not_relabelled_unclassified(code):
+    details = m._failure_details(m.EarningsCampaignError(code), "scope_reservation", 0)
+    assert details["fixed_code"] == code and details["exception_class"].endswith("_error")

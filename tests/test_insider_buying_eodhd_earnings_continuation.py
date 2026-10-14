@@ -423,3 +423,9 @@ def test_cli_no_resume_or_dynamic_window_flags(monkeypatch, capsys):
     assert json.loads(capsys.readouterr().out) == {"campaign_refused": "previous_external_anchor_mismatch"}
     with pytest.raises(SystemExit):
         m.main(args + ["--window", "2006-01-01:2006-01-31"])
+
+
+# Section 194 (Claude review): continuation5's fixture-root guard, added to this version.
+def test_fixture_transport_cannot_target_the_real_lane_registry():
+    with pytest.raises(m.EarningsCampaignError, match="^fixture_transport_actual_lane_root_refused$"):
+        m.run_continuation("ib-eodhd-campaign-invented-lane", "a" * 40, Path("/invented-token-never-read"), owner_acknowledged_rotated_token=True, root=m.LANE_ROOT, identity=lambda *a, **k: pytest.fail("identity"), transport=lambda window: pytest.fail("provider"))

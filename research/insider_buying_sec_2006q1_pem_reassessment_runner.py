@@ -171,6 +171,24 @@ def _strict_failure(body):
     return dict(body)
 
 
+def _close_all(holds, *, phase):
+    """Close every hold; a cleanup failure never replaces the primary refusal.
+
+    Section 194 (Claude review): the earlier loops stopped at the first close
+    that raised, leaving later holds open and masking the original exception.
+    """
+    _need(phase is None or phase in _PHASES, "internal_failure_phase_refused")
+    primary, first = sys.exc_info()[1], None
+    for held in holds:
+        if held is not None:
+            try:held.close()
+            except Exception as exc:
+                if first is None:first = exc
+    if primary is None and first is not None:
+        if phase is not None:first._pem_failure_phase = phase
+        raise first
+
+
 class _PinnedBaseline:
     """Exact four-file original-body baseline, held/rechecked, never rewritten."""
     def __init__(self, expected_complete_sha256, *, fixture_only=False, root=None, leaf_pins=None):
@@ -689,8 +707,7 @@ def _worker(audit_id, *, expected_head, expected_capture_report_sha256, expected
         return _strict_summary(summary, audit_id=audit_id, report_sha=expected_capture_report_sha256,
             baseline_sha=expected_baseline_complete_sha256)
     finally:
-        for held in (parents, raw, inputs, baseline, output):
-            if held is not None:_at_phase("worker_cleanup", held.close)
+        _close_all((parents, raw, inputs, baseline, output), phase="worker_cleanup")
 
 
 def run_observed_reassessment(audit_id, *, expected_head, expected_capture_report_sha256, expected_baseline_complete_sha256):
@@ -740,8 +757,8 @@ def run_observed_reassessment(audit_id, *, expected_head, expected_capture_repor
         baseline.recheck();_need(_fixed_source_identity(expected_head) == (identity, frozen), "parent_source_changed_at_publication")
         return result
     finally:
-        if output is not None:output.close()
-        baseline.close()
+        # The parent had no cleanup phase label; untagged failures keep the fallback phase.
+        _close_all((output, baseline), phase=None)
 
 
 def main(argv=None):
@@ -760,4 +777,3 @@ def main(argv=None):
 
 
 if __name__ == "__main__":raise SystemExit(main())
-

@@ -498,3 +498,30 @@ def test_worker_uses_effective_fork_and_write_denial_before_opening_any_inputs(m
     assert worker.index("sys.addaudithook") < worker.index("original._load_original_preparation") < worker.index("original._load_sealed_capture")
     assert "executed_sources()" not in worker and "monkeypatch" not in worker
 
+
+# Section 194 (Claude review): cleanup closes every hold and never masks the primary refusal.
+class _Hold:
+    def __init__(self, fail=None):
+        self.fail, self.closed = fail, False
+    def close(self):
+        self.closed = True
+        if self.fail is not None:raise self.fail
+
+
+def test_close_all_closes_every_hold_and_preserves_the_primary_refusal():
+    holds = (_Hold(OSError("first close")), None, _Hold())
+    with pytest.raises(module.PemReassessmentRunnerError, match="^primary$"):
+        try:
+            raise module.PemReassessmentRunnerError("primary")
+        finally:
+            module._close_all(holds, phase=None)
+    assert holds[0].closed and holds[2].closed
+
+
+def test_close_all_raises_the_first_cleanup_failure_with_its_phase_when_no_primary():
+    first = OSError("first close")
+    holds = (_Hold(first), _Hold(ValueError("second close")), _Hold())
+    with pytest.raises(OSError) as caught:
+        module._close_all(holds, phase="worker_cleanup")
+    assert caught.value is first and caught.value._pem_failure_phase == "worker_cleanup"
+    assert all(hold.closed for hold in holds)

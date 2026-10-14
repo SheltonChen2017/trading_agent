@@ -330,6 +330,19 @@ def assess_earnings_archive_cohort(*, inventory_raw: bytes, inventory_sha256: st
     one actual attempted window is permitted across the collection. No source
     event date or complete earnings coverage is inferred from filing dates.
     """
+    try:
+        return _assess_earnings_archive_cohort(inventory_raw=inventory_raw, inventory_sha256=inventory_sha256,
+                                               campaigns=campaigns)
+    except EarningsArchiveAssessmentError:
+        raise
+    except (KeyError, AttributeError, TypeError, IndexError):
+        # Section 194 (Claude review): pinned-but-malformed JSON (a missing key, a
+        # list where a dict belongs) escaped the partial-campaign path untyped.
+        raise EarningsArchiveAssessmentError("campaign_metadata_shape_refused") from None
+
+
+def _assess_earnings_archive_cohort(*, inventory_raw: bytes, inventory_sha256: str,
+        campaigns: tuple[ArchiveCampaignMetadata | ArchivePartialCampaignMetadata, ...]) -> EarningsArchiveCohortAssessment:
     inventory, issuers = _inventory(inventory_raw, inventory_sha256)
     _need(type(campaigns) is tuple and 1 <= len(campaigns) <= MAX_CAMPAIGNS
           and all(type(item) in {ArchiveCampaignMetadata, ArchivePartialCampaignMetadata} for item in campaigns), "campaign_collection")

@@ -573,3 +573,29 @@ def test_import_boundary_has_no_io_provider_or_outcome_imports():
     roots |= {alias.name.split(".")[0] for node in ast.walk(tree) if isinstance(node, ast.Import) for alias in node.names}
     assert roots <= allowed
     assert not any(isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "open" for node in ast.walk(tree))
+
+
+# Section 194 (Claude review): malformed but correctly pinned partial-campaign JSON
+# escaped as AttributeError/KeyError instead of a typed refusal.
+@pytest.mark.parametrize("fault", ["identity_not_object", "campaign_id_missing_everywhere", "child_receipt_not_object"])
+def test_malformed_partial_campaign_json_is_a_typed_refusal(fault):
+    first, second, partial, fourth = four_campaigns_with_partial()
+    manifest, witness = json.loads(partial.manifest_raw), json.loads(partial.witness_raw)
+    windows = partial.windows
+    if fault == "identity_not_object":
+        manifest["identity"] = []
+    elif fault == "campaign_id_missing_everywhere":
+        del manifest["campaign_id"];del witness["campaign_id"]
+    else:
+        child = json.loads(windows[0].complete_raw);child["receipt"] = []
+        raw_child = enc(child)
+        windows = (replace(windows[0], complete_raw=raw_child, complete_sha256=sha(raw_child)), *windows[1:])
+        leaves = witness["journal_leaf_sha256_and_bytes"]
+        leaves["window-0000-complete.json"] = {"sha256": sha(raw_child), "bytes": len(raw_child)}
+        witness["sealed_window_counts"][0]["complete_sha256"] = sha(raw_child)
+    raw_manifest = enc(manifest)
+    witness["manifest_sha256"] = sha(raw_manifest)
+    raw_witness = enc(witness)
+    changed = m.ArchivePartialCampaignMetadata(raw_manifest, sha(raw_manifest), raw_witness, sha(raw_witness), windows)
+    with pytest.raises(m.EarningsArchiveAssessmentError):
+        assess((first, second, changed, fourth))

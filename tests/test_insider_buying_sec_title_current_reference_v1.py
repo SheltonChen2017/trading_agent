@@ -341,3 +341,16 @@ def test_public_readback_validator_rederives_all_metadata_instead_of_trusting_se
     body["filing_roster_sha256"]=module._sha(module._raw(body["filing_roster"]))
     with pytest.raises(module.SecTitleCurrentReferenceError,match="input_derived_title_reference_result_differs"):
         module.validate_sec_title_current_reference_payload(body,**args)
+
+
+# Section 194 (Claude review): malformed completion shapes escaped as AttributeError/KeyError.
+@pytest.mark.parametrize("fault", ["baseline_not_object", "capture_id_missing"])
+def test_malformed_source_view_completion_is_a_typed_refusal(supplied, fault):
+    args = arguments(supplied)
+    complete = json.loads(args["source_view_complete_raw"])
+    if fault == "baseline_not_object":complete["frozen_original_baseline"] = []
+    else:del complete["capture_id"]
+    raw = module._raw(complete)
+    args.update(source_view_complete_raw=raw, expected_source_view_complete_sha256=module._sha(raw))
+    with pytest.raises(module.SecTitleCurrentReferenceError, match="^observed_source_view_completion_binding_refused$"):
+        module.assess_sec_title_current_reference(**args)

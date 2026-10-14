@@ -563,8 +563,11 @@ the corrected six-cell family once at4053414e and is also spent. D7 account
 discovery passed, but its sole upload returned exit2/`object_response`
 (297.15). D8's bounded offline census passed once: authentication was observed,
 then only index0's set intent remains without a success observation (297.17).
-Do not retry that upload or advance to capacity/launch. A separately bounded
-read-only metadata check is next; no QC backtest attempt has occurred.
+Do not retry that upload or advance to capacity/launch. D9's sole read-only
+metadata observation completed with HTTP200/API success=false and unknown
+category (297.19); this does not identify the cause or accept the upload.
+Bounded read-only organization UI inspection is next; no QC backtest attempt
+has occurred.
 The monitor remains PAUSED.
 
 Branch: `codex/strategy-analyst-revisions-v2`
@@ -1616,9 +1619,9 @@ Claude review of section 297's current ratings-only continuation under the
 existing "for now" direction and 255.2 delegation, not future unrelated work.
 Section 296's exact connection uses are completed and spent. This is
 sequencing authority, not independent acceptance or technical/source clearance.
-The immediate next step is section 297.17's separately bounded read-only
-metadata diagnostic after D8's successful offline census of the failed upload,
-preserving the prepared October package and exact six-cell family.
+The immediate next step is section 297.19's bounded read-only organization UI
+inspection after D9's negative metadata observation, preserving the prepared
+October package and exact six-cell family.
 No unchanged upload retry or capacity/launch advance is authorized by its
 failure. D6 preparation passed once and is spent. This continues the owner's
 matched six/eight-universe, AR-off/100%/200% accepted-risk order study through
@@ -48230,3 +48233,59 @@ no cleanup or success-marker repair. A concrete account/permission/capacity
 barrier requires owner action, while a verified lane-owned defect may justify
 separate bounded recovery under existing authority. None is presumed now.
 Booked314/239/50/699 and all false readiness flags remain unchanged.
+
+### 297.19 Actual D9 negative observation; bounded organization UI check
+
+D9 ran once at clean `68b1cb39f719ea85d7539fab679696a16d1b4a74`.
+External dispatch2026-10-14 01:18:35UTC; internal
+`01:18:38.328250Z..01:18:38.800302Z`; actual **exit0**, normal finite
+`metadata_observation_completed` envelope. This is a completed negative
+diagnostic observation, not successful publication. The report is **1,086
+bytes**, SHA-256
+`5f8a1894781b60baea592c8fc14e9ae230681cc321b005e0a543cd0d79d13030`.
+Its path is the fixed family's `metadata-diagnostic-v1-report.json`. No
+separate output reader was invoked. Root/branch/HEAD/status were clean at
+01:19:05UTC. The final86 record checks/.95s repeat is not additive to191.
+
+One application request attempt was recorded; HTTP status **200**, valid
+response schema, API `success=false`, finite error category **unknown**.
+Metadata-schema/key/size/MD5-format fields are null. Failure-code null means
+no diagnostic-protocol failure, not successful QC service acceptance. All
+original-upload-acceptance, reconstructed-cause, measured-server-contact,
+MD5-content-authentication and formal/PIT/paper flags remain false. No raw
+response/error/preview, keys, organization values, credentials or rows were
+emitted/retained. This current response does not prove a missing object,
+quota exhaustion, subscription expiration, absent write permission, zero
+earlier remote effects or D7's original cause. **ARV2E297-014 stays OPEN.**
+D9 source/tests/claim/request/report are now frozen/spent; do not rerun,
+repair or renew them. No capacity/project/compile/launch/result call followed.
+
+The owner reports no noticed warning and asks where to check. Official QC
+documentation identifies Algorithm Lab → Organization → Object Store for
+usage, Members for Storage Create permission, and Resources for the existing
+plan/resources. A visible warning need not exist; usage display may lag.
+Do not infer account failure from an unknown API category or recommend a
+purchase before establishing the actual cause.
+
+**Bounded read-only UI decision:** under current backtest-building authority
+and255.2, permit one manual CUA observation session after this committed
+decision, at most12 navigation actions/10minutes. Safari's already-loaded
+authenticated QC page was observed only to establish access; an unrelated
+project was present and remains untouched. Open a separate tab for the
+known reference project37165262, establish its organization from visible
+UI, then inspect only that organization's Object Store usage/capacity,
+existing plan/resources and the signed-in user's storage permissions. If
+the organization binding cannot be established, record that limitation and
+do not treat another organization's facts as evidence. Passive browser
+background traffic is not measured or claimed absent. This is a scoped UI
+observation, not another API invocation or renewal of D7/D8/D9.
+
+No account/card/API-key page, payment, purchase, upgrade, settings/permission
+change, download, upload, deletion, refresh loop, project edit, Mia message,
+capacity/node/job action or source/result read is allowed. Do not interact
+with other lanes' open tabs/projects. Record only needed non-secret finite
+quota/permission/plan facts and UI limitations, not object contents or raw
+account identifiers. Stop on an authentication/permission barrier or when
+the needed facts are present; any subsequent operational recovery requires
+a separately coherent decision, never an unchanged upload retry. The
+monitor remains paused; booked314/239/50/699 and false readiness flags stay.

@@ -22209,3 +22209,250 @@ ON; all parked canonical gates remain distinct and open.
 Focused preregistration/capture/active-document check406passed7.24s, isolated
 49/52; no complete suite/native/source upload/operator-state/database action.
 Root freeze8239bytes matches74d51df8; final observed looks remain30 before effect.
+
+### 90.11 One registered dispatch attempted; owner-directed documented checkpoint
+
+Owner's latest directions: **"ok. btw, just proceed to the next checkpoint and
+push"**, then **"and do not forget to document the progress"**. These explicitly
+authorize publication of this next safe checkpoint, rather than claiming the
+lane or extended matched backtest is complete. EXACTLY ONE successful matching
+non-force publication ends this checkpoint round. The monitor remains PAUSED;
+there is no automatic rearm, second dispatch or implicit future review skip.
+
+Before the attempted effect, source freeze/record was committed locally as
+b3a4ed74116b6225c2bf9e3b5ce1e18fe1305496 after invariants/staged scope/whitespace/
+actual unchanged remote3dfa7d1e. Fresh final SOURCE-POST-022 at15:34:19.668895UTC:
+planacfeced2dec6952a84a5ce91d950844c493bd95d2244a82d13c4ff74ff4233e9;
+two own files/read calls537036wire/230180fresh bounded baseline bytes, all16
+stable/exactly equal021. Receipt9731/b78667cd6198a28a5b5adf842d4e48ecf98f296fa7001e72a72a32e3df628021;
+read2archive266508/621e462639e2b619744c7b112e632ae0ddcf494f2dda9227fa6818da1b59706b;
+delta167742/681481b6ad32d627597a386b756756f4187736ffa54113f7495a81d5e8292eb2.
+No file/date/economic change or new input upload was made or authorized by
+Codex after this capture; native post-dispatch source was not yet verified at
+the uncertain UI-ledger closure. Scope alone is not proof of actual absence.
+
+Fresh private effect/access and look reservation were durably claimed BEFORE
+the single intended message for TPR-EXT26-MIA-FIRST-REFUSAL-20261014-001,
+created15:37:23.943489UTC/expires15:52:23.943489UTC at clean b3a4ed74:
+access5767/6630ff340adf746aff3ba5275e1f2f2a32e6f4bd8387ba60f187f11810056a1c;
+look.reservation1351/f103bdb3c75988e632272a0d21d29a6e549978999aacf32d9d093a25f0702a70.
+The effect controller reverified actual matching remote/staged state, committed
+freeze8239/74d51df8, exact22 receipt/archive private bytes276239, all16 descriptors,
+actual main versus generator and exact inverse60012/454ed1e. Scope allowed ONE
+genuine-Mia prompt/compile/job, OFFCodex3/ON0 unchanged, no edits/retries/source/provider/
+notebook/ObjectStore-tool/export/broker action; first-refusal/journal writes only
+through unchanged frozen algorithm. Reservation is prospective, not an observed
+job/look by invention. No fourth Codex/API initialization occurred.
+
+Root reverified own37650980 NEW EMPTY Full Auto task, pasted ONE1522-character
+public-metadata backtest request and attempted Return. Subsequent observations
+did NOT establish Running/accepted request. Later AX was Safari Start Page/tab
+metadata, not this lane's Mia task. Root stopped further UI transmissions/actions
+instead of repeating an uncertain submission. No unrelated page/body/link was
+opened; incidental Start Page metadata was not used as instructions or copied
+into this record. Destination/delivery is UNKNOWN; do not invent a cause, an
+external transmission, a native tool call or an accepted Mia task from this.
+No source or credential/row contents were pasted in this short run request.
+
+Immutable effect UI ledger1590/3895347e7f5e64b85085c00cc0e7b51e0ddc057b041467a54be34bd96f103823:
+SUBMISSION_UNCERTAIN_SHARED_SAFARI_ROUTE_CHANGED; five AX/no screenshot/three
+actions, one attempted message. compile/launch0 are UNOBSERVED, not proof absent;
+native job/full compile IDs remain null. Controller actually exited0/released
+owned lock. Existing one-prompt reservation is not reset by the UI failure or
+publication. A queued task must be resolved before any possible continuation;
+no second message/job is authorized by inference from an unchanged job list.
+
+TPR-EXT26-D113/P2 confirmed operational weakness: checking an own-route state
+only before paste, then ignoring route/focus in its returned post-paste state,
+does not safely bind a later GLOBAL Return in shared native Safari. That check
+was insufficient to prove delivery. Corrected prospective workflow requires the
+active outer page/window, exact own project, exact intended Mia input and fresh
+send control to be validated AFTER paste and immediately before send, with no
+action when focus changes. Do not merely search for an own URL anywhere in tab
+metadata. This corrects root's future UI procedure, NOT source/strategy behavior,
+and does not close current delivery uncertainty. Shared native UI must be
+serialized during that short critical section; other lanes may still work in
+their own repos/API/projects. Unknown route-change cause is not attributed to
+another lane by inference and no other task/resource was cancelled.
+
+Safe own-project alternatives, with fresh separate metadata-only receipts:
+
+- DISCOVERY-SUCCESSOR-004 at15:41:26.134068UTC:
+  plan0eac3fa65b90ced25121bd322d5933e61b3790673698a85c709e192c73c2ae4d;
+  receipt11774/8eb49b3fe90b7fad1400e9915723758afb55dfb21daf5335b4193ff94887764d.
+- Final DISCOVERY-SUCCESSOR-005 at15:46:01.098242UTC, ended15:46:06.961234UTC:
+  plan25b3939b5ac4f8f3cde9afc0fdd845d9be44ed7e0bbfe351fdfc234e9d711931;
+  receipt11774/9b1cdd0c8df4c9e133e1031beb5bad9ad3ab72872549ed13083bb95e125c6ee6.
+
+Each made ONE fixed own backtests/list29881wire request;14known jobs returned,
+unknown_job_ids=[]; no new job observed at either capture. No outcome/parameter/
+source/private-journal body, launch or look-registry mutation. An unchanged
+list does not prove no pending Mia task and is not permission to repeat it.
+The last observation retains30 actual looks=28cloud+2historical local; look31
+remains RESERVED/UNOBSERVED, not completed, failed runtime or a reset candidate.
+
+Checkpoint readiness and findings:
+
+- Saved native source: all16 hashes/inverse/prefix verified; one immutable helper
+  added and four exact original-guard-preserving main hooks. Source-only Mia task
+  Completed observed, not a backtest acceptance. Original v1/past bundles retained.
+- Software:538focusedpassed10.91s in the previous stage;406focusedpassed7.24s
+  for prospective capture/preregistration/doc stage, isolated49/52. No complete
+  lane/repository suite, native CLR proof, real stop/db or Windows custody proof.
+- D111-F01 P2 old-job exclusion transcription and D111-F02 P2 missing compileId
+  collection blockade corrected with retained red/green/mutation evidence.
+  D113/P2 future procedure corrected; current dispatch uncertainty remains OPEN.
+- F012 remaining ON inputs/resources partly OPEN; F017 export/readback/replay,
+  F018 full-window/clock/census/accounting, F019 exact invalid membership context
+  and F020 compact journal retrieval remain OPEN. F023 old global notebook was
+  not executed in this round; historical execution is unproved, use prohibited.
+  No waiver or software green closes a material empirical
+  or canonical finding; previous scoped F013–F016/F021–F022 corrections unchanged.
+- Frozen OFF baseline NOT valid; all accepted extended return/CAGR/drawdown/
+  volatility/Sharpe/annual/matched/per-sleeve outcomes remain null for BOTH arms
+  and ALL six sleeves. OFFCodex3 remains spent; ON0/unlaunched. No independent
+  sleeve P&L, completed extended comparison or confirmatory alpha is claimed.
+- This is a software/source/preregistration plus honest dispatch-status checkpoint,
+  NOT backtesting-ready or canonical lane completion. TR0-I/TPR-1/TPR-0B and14
+  Windows preregistration/portable versus native custody limits stay parked/open;
+  OOL011 lane correction/shared synchronization coordination and003/004/006closed
+  statuses unchanged. EODHD/token/keychain locators unused; no secrets/rows in Git.
+
+Publication/review custody: actual local round before this final record commit is
+3dfa7d1ef070e58ebdbd54860a614a8c5b821d81..b3a4ed74116b6225c2bf9e3b5ce1e18fe1305496,
+six commits, followed by this record-only final checkpoint commit. Exact final
+published SHA is reported in this chat after actual matching push/equality/clean
+checks; self-referential commit hashing is not fabricated in its own tree.
+No incoming Claude commits or qualifying counter-review occurred in this
+owner-skipped round. These are implementation snapshots awaiting independent
+review, not individually Claude-accepted dispositions:
+
+| Local commit | Scope / Codex evidence disposition / independent role |
+| --- | --- |
+| 066463fa5ff678c4336e582d9f08e8a248eba1d1 | Record-only unlocked recovery/provenance; retained, Claude review pending. |
+| 3f305f1e07f550bce48805c0a5400c76d45e1f82 | Record-only bounded source/UI negative scopes; retained, Claude review pending. |
+| a4f9e3e2eb45d7403bd6f0366ce931e75d0b9317 | Context/source design/tests; focused software/prefix proof, native acceptance withheld; Claude review pending. |
+| e75e4542a47d35f94d95af0198629845122b3759 | Pure look31 capture/tests plus verified software corrections; no native effect; Claude review pending. |
+| 4a27440baffb7c393c23aa9a6f5d1ed979f416e0 | Record saved-source verification and observed Mac lock; retained, Claude review pending. |
+| b3a4ed74116b6225c2bf9e3b5ce1e18fe1305496 | Prospective ONE genuine-Mia freeze plus owner instructions/tests; no job acceptance; Claude review pending. |
+
+Next independent role: Claude review EVERY commit above plus this final record
+commit, exact pushed snapshot/full cumulative tree, source boundaries/tests,
+scope/cardinality/custody claims and all open findings. Owner one-round skip was
+not permanent acceptance. Native continuation must FIRST resolve whether the
+already attempted single Mia request is queued/received, in a controlled own
+Safari section and fresh bounded scope/HEAD/source facts. Retain any actually
+discovered job/look and every source/compile/result discrepancy; no duplicate
+dispatch, consumed-receipt renewal or attempt reset. Only genuine usable frozen
+full-window OFF orders/accounting allows the later authorized ON work. Shared
+Action Plan/Session Handoff/workflows/main/sibling behavior remain frozen.
+Final selected538focused checks after the checkpoint record passed11.50s using
+isolated49/52. Historical F023 execution wording was explicitly kept unproved;
+no full suite, native execution/acceptance or actual operator stop/database read.
+
+### 90.12 Final cloud-source reconciliation exposes a NEW syntax/freeze blocker
+
+Read-only delegated final handoff audit confirmed the six local commit IDs,
+observed30 versus reserved31, null IDs/metrics, OFF3/ON0 and open findings. It
+correctly flagged an unconditional post-dispatch no-change claim and possible
+effect-versus-scope ambiguity; root qualified both. Private native task/receipts
+were not reproduced by that auditor; this is not Claude acceptance.
+
+Immediate prepublication DISCOVERY-SUCCESSOR-006 at15:52:11.363207UTC,
+ended15:52:17.114025UTC:
+plan97ca395f2b6e9660bdfb7981ffcdb5358ec55c45d9632580f8e433e3143c3fec;
+receipt11774/cb2be8924d39de723dbf958ea0e56e8ce18242dcc9a56c3fbf9905b913690c8f.
+ONE own backtests/list29881wire,14known jobs/unknown_job_ids=[]; no actual new
+job observed. It does not prove a queued task is absent or explain compilation.
+
+Fresh final SOURCE-POST-023 at15:53:06.798450UTC:
+plan8a0fedf6e1f071e1d3f92cda1d2bd1bfa4d3968399f09f3670b1b1f3bb8547ba;
+receipt11935/e9aa5e6357782f260a6d53e0424adf11e100792ecd3a4206a4b0472ce63a235d;
+read2archive267201/c7710cfaf29adac3cb2b1248413fe48a5a90eb55e2c4d177dae56164183fc4b0;
+private full delta413388/9b16fd0f0a7c26cc05d4a117d98b2c76990d65d247909e920141d5a79e1c14b2.
+ALL16 are stable across that capture's two reads, but **ELEVEN no longer match
+the registered snapshot**. main.py, extended_core.py, mia_diag.py and the two
+notebooks remain unchanged; no current all16-conformity/readiness claim survives.
+Native actor, edit timing and platform/Mia/owner cause are UNPROVED. No cloud or
+local source was overwritten, changed, repaired or relaunched by root.
+
+Fresh bounded PRIVATE source-only processing, exactly022/023 read2 archives,
+533709bytes, no code execution/provider/ObjectStore/credential read:
+
+- DISPATCH-SOURCE-DRIFT-INSPECT-001: access1009/
+  faa5f53ee13de27634770c8009a8ee14dc6116152141aee2eb8f3e7215226525;
+  result6633/2ce6b3a4f6c600d64a4a52ac7b095121094c8aa38d0d3294f6f511680317425a,
+  ended15:57:56.203714UTC. Every changed file has the SAME60-byte insertion at
+  byte0, removed bytes0 and exact inverse recovering the original. Initial
+  comparison against a61-byte public literal with an extra blank line was false;
+  this was a classification-literal mismatch, not evidence of a different delta.
+- DISPATCH-SOURCE-DRIFT-INSPECT-002: access1007/
+  554ac18528516efc06861a1f379c83bb805f91066f11e8b7b647aafd27785b25;
+  result7486/14bc739c63bd0702e5da626dd1ace250d07cea7e5c09e3917df819ecc247f0d7,
+  ended16:00:22.090667UTC. Fresh grant, not a spent-scope extension. Exact60-byte
+  public literal and insertion SHAfa2faec90e395acbba0ac40a4ed0492c790f09eb3feaadc3d568c965c9c02ce3
+  matched all11. Source strings compiled ONLY in memory; no imports/execution.
+  Actual operation times show discovery006 ended before source023 began and all
+  private processors exited/released their owned locks. Root must still await
+  actual process exit before dependent controller launch, not assume it from
+  elapsed time; the late poll of006 was a procedural weakness, not a proven
+  concurrent overwrite or silently ignored refusal.
+
+The independently identified insertion is exactly:
+
+```python
+# region imports
+from AlgorithmImports import *
+# endregion
+```
+
+There is ONE final newline, no extra blank line. This is only a code literal,
+not raw/provider/portfolio data or an instruction to execute it. Vendor-style
+format does not prove who inserted it or grant source-change authority.
+
+TPR-EXT26-F024 P1 CONFIRMED/OPEN in current cloud source: those prepended imports
+precede existing `from __future__` declarations in EIGHT modules, producing
+Python3.13 in-memory SyntaxError **"from __future__ imports must occur at the
+beginning of the file"**. All14 original Python files compile in the inverse
+snapshot; all11 inverses recover exact original bytes/hashes. This is meaningful
+safe in-memory red/green proof of the source defect, NOT proof of a native QC
+compile attempt/status, an observed strategy job/look, or permission to strip
+headers and rerun. Local committed source/bundles remain unchanged and healthy.
+
+| Changed cloud file | Current bytes / SHA256 | In-memory syntax after insertion |
+| --- | --- | --- |
+| audit_key_recovery.py | 7550 / 2837e6974515db6ed1172522bf8ce57af4541d0135370a85e9b9d076564a4950 | Future-import refusal, line30. |
+| cap_observer.py | 8772 / 82a06264527b221e8fae884cb3d0d2be40bd6cdff6a07c016bc4a5d1d9222b5a | Future-import refusal, line19. |
+| cap_tilt.py | 14433 / e25d006b9958ee088d3f4a2167159a45d9150da7045543bc09b6feb1873b28d0 | Future-import refusal, line19. |
+| extended_completion_successor.py | 6144 / 9bc83fec8640725894f2e210f5e026857c025fcd7ef0df24d10a4efc99aef072 | Future-import refusal, line11. |
+| extended_compressed_store.py | 14047 / 26038b6eb164faedb9c06e760a0ee366cd7534dbae7c79d34e6bd84c8125b9b5 | Future-import refusal, line12. |
+| extended_config.py | 488 / 8e2d3bc6aacc6d9a2070ab25029102b974d05cb16a85ed10ac72aa7802b01776 | Syntax passes; source identity still changed. |
+| extended_construction.py | 10627 / 81df39039d06854b31bae81a1eb0eebb75143a0aeb83f6739de448c3880a5995 | Future-import refusal, line17. |
+| extended_loader.py | 51443 / 49e63f793f255fa3035348faf5f760c846e5407b40ce766d0ccf6fb21eb21de6 | Syntax passes; source identity still changed. |
+| extended_refusal_witness_context_successor.py | 15802 / 797e490c72a607636fa864a87537965d5b26ce667bba7371b5f0323f10b2cc1e | Future-import refusal, line11. |
+| extended_runtime_successor.py | 6772 / c526d2c8967adc258ad5c115157a77fb097052b04694c87961625ed8f09ffb62 | Future-import refusal, line15. |
+| mia_rescale.py | 4912 / 7919b89ec4457592cf52d64c45ad512f8da405ae1d2e33ae0742ce6aed79a059 | Syntax passes; unused original remains unaccepted. |
+
+Root did not fix current cloud files because the one authorized native effect
+forbids source edits/retries, dispatch/task provenance is unresolved, shared UI
+is not safely serialized, and OFFCodex3 prohibits direct candidate-changing/API
+relaunch. A new exact native-Mia source-only remediation scope plus controlled
+own UI and fresh source/job facts is required; no old receipt/budget renewal or
+automatic fourth attempt is safe. The verified inverse is a bounded repair
+proposal for independent review, not a claim the repair happened. Do not launch
+ON or another OFF through this known-invalid current source path.
+
+Final checkpoint qualification supersedes earlier source-readiness snapshots:
+all16 WERE verified at021/022, but current023 is divergent in11files/F024OPEN.
+Eight source syntax failures are local diagnostic evidence, not eight native
+strategy failures/looks. Actual history stays last-observed30; prospective31
+reservation/delivery/compile/job remain unresolved/null. Both arms/all sleeves'
+accepted performance and full-window readiness remain null/false. The published
+checkpoint is explicitly BLOCKED native recovery evidence, not acceptance over
+this new P1. Claude's next review must include this final source-drift evidence,
+all native-versus-reproduced distinctions and the exact full round/tree; then
+Codex counter-review and properly scoped native remediation before OFF/ON.
+Final active-document check after this qualified source-drift handoff:
+330passed8.87s, isolated49/52; cumulative diff whitespace clean. No complete
+lane/repository suite or native rerun/repair/acceptance. Every controller exited;
+all negative/uncertain receipts and both source versions remain preserved.

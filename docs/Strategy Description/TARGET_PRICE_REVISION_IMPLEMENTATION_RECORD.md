@@ -20877,3 +20877,73 @@ final test17309bytes/992d55e4f757e32f08240808e8304d61ffe1e2024cadf5fc30f7a0c9c76
 Root59focusedpassed0.75s. No external/native/canonical acceptance is implied.
 https://www.rfc-editor.org/rfc/rfc3339.html
 https://www.rfc-editor.org/info/rfc9557/
+
+### 88.3 Fresh job discovery and genuine Mia diagnosis, with retained limits
+
+DISCOVERY-SUCCESSOR001 executed once atHEAD3da96e618a651f5334e702919d16f56554fd1b85,
+created2026-10-14T00:00:27.232167Z/15minute expiry, plan
+3a1bd3aa3dd0a97bc01cbaa4a40def6fe70cb3ab85a39e78da1e289142acc8ab.
+HTTP200/29881wirebytes, wire810125c7c373e378633d2200d8291f94f4ddc722ae834e4ae262baa377754e1d.
+Metadata projection4138/8cfb978f0145186d18ae71fdb347da0b45d876475c72cd9046e3aa47260c3239
+matches original by bytes; all14 known jobs/statuses/snapshots are unchanged,
+unknown IDs empty, latestlook30 remains Runtime Error/snapshot37743017.
+Receipt11774bytes/807be6112db4e9d1351c10b60d8ffa0847b4bd068b39b6b7ac209204cb6e7697.
+No new strategy job/look/attempt; looks30=28cloud+2historical local, OFF3/ON0.
+Final pre-effect root focused59+330document+2import/topology=391passed7.73s;
+independent agent59passed0.75s with final/request/root/row guard mutants killed
+1/1/1/1, false-alarm classification retained. No full lane/repository suite.
+
+MIA-READONLY-DIAG002 fresh access3829bytes/plan
+0d0f12fd04cd7c3009d7417f5685603bec1d8818f671ab3b9cab7508ddac44ae,
+created2026-10-14T00:01:18.486274Z,15minute expiry/600second active budget,
+at same3da96e61. Genuine built-in Mia was visibly identified in a SEPARATE
+new chat; Ask Before Edits selected rather than Full Auto. Existing owner
+Pending Input conversation remained untouched. Unsolicited import modal
+cancelled; first paste was not confirmed in Mia input, then current-index
+paste was verified within input and the full exact read-only prompt appeared
+in the submitted conversation. No source edit/compile/backtest/upload/delete/
+account action was requested. Native source stability is verified separately
+below, not inferred from a successful clipboard action.
+
+Mia chat "Diagnose Job4936632376c0885358493a2694ed239b Error" visibly reached
+Completed. Mia attributes a final bounded-store refusal to native save_bytes
+not returning True at extended_compressed_store.save261, through end callback
+main1044/core587. This is useful attributed diagnosis; storage quota as exact
+cause remains UNPROVED. A non-True return does not prove False versus another
+native type, universal invalid Python bytes, or a current2GB effective limit.
+Mia's all1449-valuations/strategy-success inference from tradeableDates/progress
+is NOT accepted: the independently captured customNAV has1395points and final
+audit/index/replay remain missing. Calendar/date range is not valuation census,
+and current-source F021/F022 deviations remain material. No short Completed
+job is substituted. Full job-source inventory was not obtained by that task;
+read_open_project/current files remain distinct from compiled-job bytes.
+
+Native Safari active tab changed to Resources during waiting. Root restored
+its separate exact-own-project tab without cancelling other work. No assumption
+about which actor changed tabs; no unrelated project/provider page action.
+Only read-only requested tool scope, not a verified zero backend tool census.
+The cooperative receipt closer reached its600second timer before root submitted
+the closing metadata, so its immutable result is EXPIRED448bytes/
+4f7a5fa5bf318869905df1a9bf343106a712d49f128ee86dedbdbc12a2b3a6d1.
+No renewal/retry, no invented completed receipt. Cached UI observations above
+are retained as actual UI evidence with capture/actor/compiled-byte limitations,
+not as an unexpired automatic-effect grant. Controller exited0/released.
+
+TPR-EXT26-D097 (agent-delegated, independent review pending): separately
+verify current cloud source stability after UI interaction using fresh
+TPR-EXT26-MIA-SOURCE-POST-20261013-006 under next committed HEAD/time/claims,
+existing unchanged two-request collector and exactly declared baseline003
+receipt5865/1d2f7cb390bcced2547a8f6b1e22b2b1a2800149e741535bf6e65e3624223f86
+and archive224315/c24f20eb9733bc9f4d3dea79b86223857d4c2e99d232955066fe9939baed1af3,
+total230180 fresh comparison-body bytes. Old capture003 is not renewed.
+<=2files/read own37650980,4MiB each/8MiB total,16files/1MiB each,120seconds;
+all file bytes/diffs private, no execution/port/export/provider/input/job effect.
+Compare with post005 recorded hashes to detect any accidental source change;
+no assumption that missing draft confirmation proves harmlessness.
+
+OFF remains invalid for the frozen comparison: latest native terminal error,
+no completed full audit, no independently bound job-source conformity and OPEN
+unit/freshness findings. ON0 stays held. Owner upgrade is not rejected, but
+effective capacity/file allowance cannot be proved by the current old-limit
+display or Mia speculation. No further purchase, account change, fourth
+Codex OFF attempt, altered valuation/unit convention or discarded evidence.

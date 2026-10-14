@@ -21109,3 +21109,82 @@ receipt stays immutable. Frozen2021-01-04–2026-10-09 economics,1449/301,
 six cap-selected stock sleeves, AR-off, OFF3/ON0/looks30 remain exact.
 The heartbeat stays PAUSED, shared documents/behavior and canonical gates
 unchanged. This round receives only one successful final matching push.
+
+### 89.3 Source inspection outcomes and prospective frozen-guard restoration
+
+READONLY-DIAG003 atfbb6a64539ae370d40b5f37b393ceb788c40ef2c had fresh
+access4421/252c409dbbe9667ef49d50978cf908cada0883986a829e564023df2d247687d2,
+created01:09:05.333119Z. Native AX input was not confirmed;0prompts sent,
+12AX/8pane-input actions/0screenshots, ended before600seconds with
+STOPPED_INPUT_NOT_CONFIRMED receipt1029/
+c59be8bfeb08bb14dbbb7ffbfc932b868a9732d6ab3b251bcff9eff545c2f6bb.
+New READONLY-DIAG004 freshly bounded two visual views and the same read-only
+question, not renewal of003: access4421/
+d70a71b89a31e6141861bbc0eaec3d725642d15266e2c6d8d2b2bba2df3d9efd,
+created01:11:17.247553Z,15minute expiry. Coordinate focus plus visual check
+confirmed the exact prompt, sent ONCE to genuine built-in Mia. Separate
+"Mia Rescale Diagnostic Inspection" reached Completed.6AX/2screenshots/
+3input-pane actions; receipt1162/
+0e2c6aa86979cee77f40f2dc704789ef76f126f4a03de9336e940d4a174477c2.
+Visible source/search tools corroborate previous-total normalize_members and
+fresh_mark hooks. No exact native offending-row unit/action/job-bound source
+was obtained; backend read census remains unverified, not zero.
+
+New FORENSIC-RESULT-UI001 (zero prompts/effects) captured two source-card views
+because final answer containers were not text accessible: access4440/
+0c9caafb6623b09b109ff39711f55ea9eab6d8108d77965fb43d5503d86bcb71,
+created01:15:02.322470Z;4AX/2screenshots/2scroll actions; receipt1118/
+e70f7ebd5c2d518945f1e7f9b7e20c27795a79b1eefbcd1e4f0800184c60ca48.
+An existing module docstring attributes historical REMX percent units to QC
+support. This is retained attributed code text, not authenticated support,
+raw source-version/unit evidence or separate owner approval. No licensed row
+values are copied into Git. Project UI also exposed a file lock/Request
+Control/Mia collaborator: actor/custody duration unproved; no takeover or
+other chat cancellation. A normal successful auto-build b5e5b3-b18f02,
+engine18179/unzoned1:09:34 was observed on opening; root requested0compiles/
+strategy jobs. All cooperative controllers exited0/released before next work.
+
+Fresh SOURCE-POST007 completed/process0 atfbb6a645, created01:16:27.138147Z,
+15minute expiry, plan1c21bfe9067795575f5d65a53a172f0f2c1dc00ce7695cf5b5d0ce8280b334e0.
+Two own files/read calls/504020wirebytes/230180exact old-baseline comparison
+bytes;15stablefiles, EVERY file content hash equals post006/post005. Thus
+no current source edit occurred during the UI/Mia source-inspection tasks;
+this is still not historical compiled-job binding. Read2archive250129/
+15dbd47454d5d403e2e0988cb6b85ca3657176be8785ee179cf61b792b06863d,
+complete before/after delta151185/
+3127ecffa93f941093affb33aa92025c75d9b878201e9415dd98f8c441bb649d,
+receipt9084/5d89f2c3bb42cd7c6748b5fa96c4f4a0085a84d1347dd74ec03482a1447f7c6d.
+Current main60796/f42320ef9f278b01803363d700f7ee1a18fbd61e30f05df9617a6e0eae659d7a
+and original store13987/d661b575 remain unchanged. No source port/new look/
+attempt/input/provider/global-object/EODHD/secret effect. Root332focused
+document/import/active-topology tests passed10.50s using isolated49/52; no
+full suite. Public runtime review independently confirms exact original raw
+membership bounds35–59/198–217 and universal held RAW freshness934–944.
+Member weights are metadata, not cap ranking/target allocation. Existing
+typed final-liquidation authority840–890 does not authorize stale marks.
+
+TPR-EXT26-D101 (agent-delegated; independent review pending): use genuine
+Mia for a source-only reversal of unsupported F021/F022, not Codex candidate
+changing or OFF4. NEW TPR-EXT26-MIA-GUARD-RESTORE-20261013-001 at next
+committed HEAD/fresh15minute access/claim/controller; one separate Mia task,
+Ask Before Edits, <=24AX/2screenshots/12pane actions/600seconds. Exact own
+37650980 main current hash above is a concurrency precondition. Restore
+raw member transport plus original per-row None/zero/0..1 validation; remove
+previous-total rescaling and warning/delisted freshness exemptions; preserve
+same-day/nonfuture TradeBar and positive cache parity for all invested holdings.
+Retain verified audit-key import/transport and EVERY original file/result;
+no unrelated file/module/economics change, notebook execution/provider/history/
+ObjectStore read/upload/delete, compile or strategy launch. If another writer
+holds source control or main hash changed, wait/stop rather than take control
+or overwrite. This restores frozen guards, but does not solve the original
+unknown invalid callback or prove a successful window. Native diagnostics or
+Mia runs still require separately frozen instrumentation/source/look first.
+
+After any authorized Mia source effect, NEW SOURCE-POST008 uses the unchanged
+two-request collector and freshly declared baseline003 exact230180bytes,
+same16file/8MiB/120second bounds. Preserve all edited cloud bytes/diffs and
+compare with recorded post007 hashes. No current source is automatically
+accepted, executed or ported. Only independently proved guard restoration
+can be ported to named lane successors with focused negative tests; originals
+stay immutable. If no edit is possible, retain actual blocker and safe checks.
+OFF3/ON0/looks30/frozen strategy and remaining native-accounting gates stand.

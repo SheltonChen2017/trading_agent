@@ -120,10 +120,11 @@ class LaneGuard:
                 "lane_HEAD_or_branch_changed")
         require("branch.upstream" not in headers or headers["branch.upstream"] == "origin/" + branch,
                 "lane_upstream_changed")
-        # With --no-ahead-behind Git can still emit the exact uncomputed
-        # placeholder. It proves no ancestry or remote equality; refresh()
-        # independently reads only the actual matching origin ref.
-        require("branch.ab" not in headers or (headers["branch.ab"] == "+? -?"
+        # With --no-ahead-behind Git emits the uncomputed placeholder, or
+        # exact zero counts when the local/tracking tips are identical.
+        # Neither proves actual remote equality: refresh() independently
+        # reads only the matching origin ref, even for the zero-count form.
+        require("branch.ab" not in headers or (headers["branch.ab"] in {"+? -?", "+0 -0"}
                 and headers.get("branch.upstream") == "origin/" + branch),
                 "porcelain_disabled_counts_shape")
         self.binding()

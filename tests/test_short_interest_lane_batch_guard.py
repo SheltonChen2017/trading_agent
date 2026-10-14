@@ -58,8 +58,20 @@ def test_actual_no_ahead_behind_placeholder_header_is_valid_not_remote_evidence(
     assert evidence["HEAD"] == HEAD and evidence["dirty_entries"] == 0
     assert len(git.commands) == 2 and all(command[1] != "ls-remote" for command in git.commands)
 
+def test_synchronized_zero_count_header_is_valid_but_not_actual_remote_evidence():
+    git = Git()
+    git.status += b"# branch.ab +0 -0\n"
+    evidence = git.guard().check().payload()
+    assert evidence["HEAD"] == HEAD and evidence["dirty_entries"] == 0
+    assert len(git.commands) == 2 and all(command[1] != "ls-remote" for command in git.commands)
+    git.remote = (("c" * 40) + "\t" + m.REF + "\n").encode()
+    with pytest.raises(m.LaneBatchRefusal, match="matching_actual_remote_advanced_or_ambiguous"):
+        git.guard().refresh()
+    assert git.commands[-3] == ["git", "ls-remote", "--exit-code", "origin", m.REF]
+
 @pytest.mark.parametrize("extra", [b"# branch.ab +? -0\n", b"# branch.ab +0 -?\n",
-    b"# branch.ab +?? -?\n", b"# branch.ab +? -?\n# branch.ab +? -?\n"])
+    b"# branch.ab +?? -?\n", b"# branch.ab +? -?\n# branch.ab +? -?\n",
+    b"# branch.ab +00 -0\n", b"# branch.ab +0 -0\n# branch.ab +0 -0\n"])
 def test_placeholder_header_does_not_relax_malformed_or_duplicate_status(extra):
     git = Git()
     git.status += extra
@@ -73,7 +85,7 @@ def test_placeholder_header_does_not_relax_malformed_or_duplicate_status(extra):
     lambda text: text.replace("# branch.head " + m.BRANCH, "# branch.head (detached)"),
     lambda text: text.replace(HEAD, "(initial)"),
     lambda text: text + "# branch.oid " + HEAD + "\n",
-    lambda text: text + "# branch.ab +0 -0\n",
+    lambda text: text + "# branch.ab +1 -0\n",
     lambda text: text + "# fabricated.clean true\n",
     lambda text: text + "1 .M N... 100644 100644 100644 a b source.py\n",
     lambda text: text + "2 R. N... 100644 100644 100644 a b R100 new.py\told.py\n",

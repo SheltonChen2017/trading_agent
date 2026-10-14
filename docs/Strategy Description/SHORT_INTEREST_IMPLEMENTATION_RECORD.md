@@ -1,8 +1,8 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **OWNER-WAIVED CONTINUOUS BUILD TOWARD ACTUAL BACKTEST READINESS
-IS ACTIVE FROM PUSHED `1f90c626` (SECTION 116). DO NOT WAIT FOR CLAUDE'S
-NEXT REVIEW; THIS DOES NOT CLAIM INDEPENDENT ACCEPTANCE OF NEW CODE.
+Status: **OWNER-RESUMED SHORT INTEREST BUILD FROM PUSHED `bff9a0e8`;
+NEXT COHERENT CHECKPOINT PUBLICATION IS REQUESTED (116.23).
+THE OWNER'S REVIEW WAIVER CONTINUES; NO INDEPENDENT ACCEPTANCE IS CLAIMED.
 NAMED LOGIN-KEYCHAIN SELECTORS ARE RECORDED; ONLY EXPLICITLY DOCUMENTED
 EXISTING CREDENTIAL ROUTES ARE USED (116.6/116.10). EXISTING PROTECTED
 CAPTURES/SPENT BUDGETS ARE RETAINED. THE EXACT112-DATE IDENTITY
@@ -19791,3 +19791,114 @@ lane/repository suite. Only this record and the ten explicitly listed lane-
 owned code/test paths are staged for the owner-requested checkpoint. A final
 document/import-boundary check follows this validation note before commit.
 No provider or QC call is made as part of publication validation.
+
+### 116.23 Owner-resumed Short Interest operational-guard checkpoint — 2026-10-14
+
+**SI-AUTH-20261014-01** records the owner's release of exclusive QC use and
+immediate correction of the mistakenly named Insider Buying lane: "not
+insider trading. short interest only plz". Only the existing Short Interest
+worktree and branch are in scope. The mistaken Insider request resulted in
+read-only state/inventory checks, no edits, tests, capture, commit or push.
+The prior QC pause is released, but availability does not itself qualify
+inputs, a processing route, an order representation or a launch.
+
+**SI-AUTH-20261014-02** records the later, narrower instruction: "just proceed
+to the next checkpoint and push". **SI-AUTH-20261014-03** records the explicit
+reminder to document progress. **SI-DEC-20261014-01** closes this round at the
+first coherent operational correction, rather than starting the full long
+source-capture or empirical program before publication. This is ONE final
+non-force checkpoint push, not backtest readiness, independent review,
+completion of the continuous build or authorization to bypass a source gate.
+No new generic approval is requested and no monitor is armed by inference.
+
+Exact starting local/tracking/actual matching origin:
+**bff9a0e80abb8cacb349a4eb2dfe8874d88f1205**. Physical and Git roots are both
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__short_interest`;
+branch is `codex/strategy-short-interest`. Only the matching origin ref was
+read. No fetch/sync, new checkout/branch, rebase/reset, history rewrite,
+shared behavior change or Insider Buying write occurred. No new Claude
+commit exists in this round; there is no new counter-review range or
+per-commit Claude disposition to invent. This is owner-waived implementation.
+
+Main invoked the already registered `capture_registered_counts` composition
+at the exact clean bff9a0e8 local/actual-remote freeze. It terminated with
+`LaneBatchRefusal` at the FIRST local guard, before cache/source loading,
+output creation, budget claim, credential read or HTTP invocation. A separate
+read-only reproduction identified the fixed refusal
+`porcelain_disabled_counts_shape`: actual `git status --porcelain=v2
+--branch --no-ahead-behind --untracked-files=all` returns the valid
+`# branch.ab +0 -0` header for identical local/tracking tips, whereas the
+guard admitted only `+? -?`. Main independently verified that both the
+fixed count output directory and its global budget-claim file are absent.
+The count request budget therefore remains unspent; this was not an
+authentication failure, source-capture failure or unsuccessful QC attempt.
+No automatic source retry or substituted credential route occurred.
+
+The smallest correction accepts only the two exact supported forms,
+`+? -?` and `+0 -0`, with the exact matching upstream still required.
+Nonzero counts, malformed/mixed/leading-zero forms, duplicate headers,
+dirty entries and root/branch/HEAD changes remain refusals. Neither accepted
+form proves actual-remote equality: `refresh()` still independently reads
+only the matching origin ref. The regression drives a valid zero-count
+local snapshot and then a changed actual remote; the latter must still
+refuse. The old expectation that a clean zero-count header itself is invalid
+is replaced with the nonzero refusal case, not a relaxed dirty/remote rule.
+
+Append-only ledger addition; all historical rows001–045 remain unchanged:
+
+| ID | Priority / disposition | Evidence, correction and retained limits |
+|---|---|---|
+| SI-BUILD-20261014-001 | P2 operational false refusal, confirmed/corrected | Actual synchronized-lane invocation refused before source/key/claim on `+0 -0`. The new causal fabricated regression failed1/35 deselected in0.67s before correction. Exact two-form parsing corrects the blocker; remote advancement remains independently refused. No unsafe provider admission or budget reset was observed. |
+
+Changed tracked scope is exactly this record,
+`scripts/short_interest_lane_batch_guard.py`, and
+`tests/test_short_interest_lane_batch_guard.py`. Main's first connected
+selector passed184 tests in9.04s; the final selector adds duplicate-zero
+and leading-zero refusal controls. Final exact counts, compilation and
+diff/status checks are recorded below before publication. These are focused
+implementation checks, not Claude's full lane/repository suite or independent
+acceptance. No actual provider credentials or rows are used in the tests.
+
+The ignored QC bootstrap/controller and portable local-LEAN proposals remain
+excluded from this checkpoint. Their further audit/integration work is not
+claimed as released behavior, an installed engine, actual project receiving
+proof or a completed job. No dependency download/install, QC capacity query,
+project creation, upload, compile, job or backtest occurred. Private captures,
+spent receipts, credentials, machine dependencies and generated caches remain
+out of Git. No other lane's project/node was inspected or changed.
+
+Next bounded action: from the clean published corrected checkpoint, rebind
+the exact current code/HEAD and matching actual remote, then invoke the
+still-unspent registered full count round. Preserve its exclusive claim,
+failed receipts, 81875-request/4GiB/eight-in-flight limits and no automatic
+retry/fallback. Continue the separately registered1169-session daily-active
+qualification and exact issuer-context pins; no silent sentinel/subsample or
+budget reset. Finish and independently verify the excluded receiving/local
+engine proposals before any engine action. Actual identity, same-class shares,
+issuer-size/USD, raw rational volume and cashflow/payment/terminal facts,
+permitted processing, runtime and prospective evaluation/date/power/look
+registration still determine empirical readiness.
+
+Canonical actual looks0/0, exploratory actual looks0, alpha0, permanent look
+IDs none and QC launch attempts0. No backtest/performance result exists.
+Lookbacks20/60/120/252 remain unselected, structural normalization,
+release-next-open rules and fixed48-book economics are unchanged; protected
+validation/holdout periods stay closed. Shared/project-wide documents and
+SESSION_HANDOFF remain frozen. Before the checkpoint commit and ONE final
+push, Main rechecks roots, branch, HEAD/status and the actual matching remote;
+afterward it verifies clean local/tracking/actual-remote equality.
+
+Main's final seven-file focused selector passes **186 tests in8.59s**, zero
+skip/warning, CPython3.13.15/pytest9.1.1, empty inherited environment and
+network denied. It covers the lane guard, registered count/cache composition,
+daily operational/runtime seams and unchanged lane/import/active-document
+boundaries. Both changed Python files compile in memory; diff check passes.
+The final document/boundary checks run after this validation note. Only the
+three tracked paths above are eligible for the checkpoint; no source capture
+is restarted or allowed to continue across a code/record change. Git supplies
+the exact final hash for the publication confirmation, not a self-reference
+inside this record.
+
+The post-note lane-guard/import-boundary/active-document selector passes
+**116 tests in1.54s**, zero skip/warning. No full suite or credential/provider/
+QC invocation is included in either selector.

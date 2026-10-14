@@ -688,15 +688,51 @@ def test_prior_access_failure_closes_both_held_descriptors(monkeypatch):
     assert closed == [456, 123]
 
 
+class _InventedSecurity:
+    """Invented `security` process for the shared reader; never the real Keychain."""
+    def __init__(self, output, code=0):
+        import subprocess as _subprocess
+        self._child = _subprocess.Popen([sys.executable, "-c", "import sys; sys.stdout.buffer.write(sys.stdin.buffer.read())"],
+                                        stdin=_subprocess.PIPE, stdout=_subprocess.PIPE, start_new_session=True)
+        self._child.stdin.write(output);self._child.stdin.close()
+        self.code = code
+
+    def __call__(self, args, **kwargs):
+        assert args == ("/usr/bin/security", "find-generic-password", "-s", "trading-agent-massive", "-a", "massive", "-w")
+        return self._child
+
+
+# Section 194 (Claude review): the loader now delegates to the shared bounded reader, so
+# these five invalid outputs are refused by that reader's checks, end to end.
 @pytest.mark.parametrize("value", ["", "test-api-key\n", "has newline\ninside\n", " \n", "\x00bad\n"])
 def test_keychain_loader_fixed_item_invalid_output_refused_without_account_read(monkeypatch, value):
-    def fake(args, **kwargs):
-        assert args == ("/usr/bin/security", "find-generic-password", "-s", "trading-agent-massive", "-a", "massive", "-w")
-        assert kwargs["capture_output"] is True and kwargs["env"] == {"PATH": "/usr/bin:/bin"}
-        return SimpleNamespace(returncode=0, stdout=value.encode(), stderr=b"invented-secret-error")
-    monkeypatch.setattr(m.subprocess, "run", fake)
-    with pytest.raises(m.EarningsGapError, match="credential_unavailable"):
+    from research import insider_buying_keychain_credentials as keychain
+    fake = _InventedSecurity(value.encode())  # spawned before the real-Popen sentinel below
+    monkeypatch.setattr(keychain.subprocess, "Popen", lambda *a, **k: pytest.fail("real Keychain read"))
+    monkeypatch.setattr(m, "read_keychain_credential",
+                        lambda provider: keychain.read_keychain_credential(provider, _process_factory=fake))
+    with pytest.raises(m.EarningsGapError, match="^credential_unavailable$"):
         m._keychain_credential()
+
+
+def test_keychain_loader_uses_the_shared_reader_for_the_fixed_massive_item(monkeypatch):
+    from research import insider_buying_keychain_credentials as keychain
+    seen = []
+    def reader(provider):
+        seen.append(provider)
+        return keychain.KeychainCredential("massive", KEY, False)
+    monkeypatch.setattr(m, "read_keychain_credential", reader)
+    assert m._keychain_credential() == KEY and seen == ["massive"]
+    for refused in (keychain.KeychainCredential("massive", KEY, True), keychain.KeychainCredential("fmp", KEY, False)):
+        monkeypatch.setattr(m, "read_keychain_credential", lambda provider, refused=refused: refused)
+        with pytest.raises(m.EarningsGapError, match="^credential_unavailable$"):
+            m._keychain_credential()
+    def missing(provider):
+        raise keychain.KeychainCredentialError("keychain_item_missing")
+    monkeypatch.setattr(m, "read_keychain_credential", missing)
+    with pytest.raises(m.EarningsGapError, match="^credential_unavailable$") as caught:
+        m._keychain_credential()
+    assert caught.value.__cause__ is None and caught.value.__suppress_context__
 
 
 def test_metadata_rows_are_lossless_dates_not_a_cross_source_identity_join():
@@ -936,3 +972,79 @@ def test_verification_failure_field_whitelist_only(exc):
     assert set(observed)=={"phase","exception_category","fixed_code","recognized_os_errno"}
     assert KEY not in encoded(observed).decode()
 
+
+# Section 194 (Claude review): echo screening and retention, end to end through _response.
+def _ok(raw):
+    return m.ProviderMetadataResponse(200, raw, True, None)
+
+
+@pytest.mark.parametrize("encode", ["percent", "plus"])
+def test_percent_encoded_secret_echo_is_refused_and_never_retained(encode):
+    import urllib.parse
+    quoted = ("".join("%%%02X" % byte for byte in KEY.encode()) if encode == "percent"
+              else urllib.parse.quote_plus(KEY.replace("-", " ")))
+    secret = KEY if encode == "percent" else KEY.replace("-", " ")
+    raw = encoded(body(next_url="https://api.massive.com/benzinga/v1/earnings?cursor=" + quoted))
+    assert secret.encode() not in raw
+    receipt, retained, metadata = m._response(_ok(raw), m.WINDOWS[0], secret)
+    assert receipt["disposition"] == "credential_echo_refused" and retained is None and metadata is None
+    assert receipt["retained_raw"] is False and receipt["body_sha256"] is None
+
+
+def test_echo_found_only_during_projection_is_never_retained(monkeypatch):
+    raw = encoded(body())
+    monkeypatch.setattr(m, "_private_json", lambda raw, *, credential: None)  # an earlier screen that missed it
+    def project(raw, window, *, credential):
+        raise m.EarningsGapError("credential_echo_refused")
+    monkeypatch.setattr(m, "_project", project)
+    receipt, retained, metadata = m._response(_ok(raw), m.WINDOWS[0], KEY)
+    assert receipt["disposition"] == "credential_echo_refused" and retained is None and metadata is None
+    assert receipt["retained_raw"] is False and receipt["body_sha256"] is None
+
+
+# Section 194 (Claude review): this module's own transport had no direct test.
+def _gap_request():
+    return m.EarningsGapRequest(m.URLS[0], (("Accept", "application/json"), ("Accept-Encoding", "identity"),
+                                            ("Authorization", "Bearer " + KEY)))
+
+
+class _Stream:
+    def __init__(self, status=200, url=None, raw=None):
+        self.raw = encoded(body()) if raw is None else raw
+        self.headers = Message();self.headers["Content-Length"] = str(len(self.raw))
+        self.status, self.url, self.closed, self.offset = status, url, False, 0
+
+    def getcode(self): return self.status
+    def geturl(self): return self.url
+    def read(self, size=-1):
+        chunk = self.raw[self.offset:] if size < 0 else self.raw[self.offset:self.offset + size]
+        self.offset += len(chunk);return chunk
+    def close(self): self.closed = True
+
+
+@pytest.mark.parametrize("case", ["exact", "origin", "redirect"])
+def test_default_transport_tls_no_proxy_no_redirect_and_exact_origin(monkeypatch, case):
+    import ssl
+    seen = {}
+    stream = _Stream(status=302 if case == "redirect" else 200,
+                     url="https://evil.example/x" if case == "origin" else m.URLS[0])
+    class Opener:
+        def open(self, req, timeout):
+            seen["request"], seen["timeout"] = req, timeout
+            return stream
+    def build_opener(*handlers):
+        seen["handlers"] = handlers
+        return Opener()
+    monkeypatch.setattr(m.request, "build_opener", build_opener)
+    response = m._default_transport(_gap_request())
+    proxy, deny, https = seen["handlers"]
+    assert proxy.proxies == {} and type(deny) is m._DenyRedirect
+    assert https._context.verify_mode == ssl.CERT_REQUIRED and https._context.check_hostname is True
+    assert seen["request"].full_url == m.URLS[0] and seen["request"].get_method() == "GET"
+    assert seen["timeout"] == m.TIMEOUT_SECONDS and stream.closed
+    if case == "exact":
+        assert response.status == 200 and response.body == stream.raw and response.body_complete
+    elif case == "origin":
+        assert response.disposition == "response-origin-mismatch" and response.body == b""
+    else:
+        assert response.disposition == "redirect-refused" and response.body == b""

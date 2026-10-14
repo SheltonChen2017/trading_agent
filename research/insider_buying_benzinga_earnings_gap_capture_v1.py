@@ -27,11 +27,12 @@ import sys
 import time
 from typing import Callable
 from urllib import error, request
-from urllib.parse import parse_qsl, urlsplit
+from urllib.parse import parse_qsl, unquote, unquote_plus, urlsplit
 
 from research import insider_buying_benzinga_earnings_access as previous
 from research import insider_buying_earnings_archive_assessment_runner as custody
 from research import insider_buying_sec_2006q1_parent_bootstrap as custody_tree
+from research.insider_buying_keychain_credentials import read_keychain_credential
 from research.insider_buying_eodhd_earnings_demo import (
     FALSE_FLAGS, _git, _read_leaf, _sha, _version,
 )
@@ -279,7 +280,10 @@ def _screen_echo(body: object, credential: str | None) -> None:
     while pending:
         value = pending.pop()
         if type(value) is str:
-            _require(credential not in value, "credential_echo_refused")
+            # Section 194 (Claude review): percent-encoded echoes (e.g. in next_url)
+            # passed the literal and JSON-escape screens and were retained.
+            _require(credential not in value and credential not in unquote(value)
+                     and credential not in unquote_plus(value), "credential_echo_refused")
         elif type(value) is dict:
             pending.extend(value.keys())
             pending.extend(value.values())
@@ -447,18 +451,16 @@ def _identity(expected_head: str) -> dict:
 
 
 def _keychain_credential() -> str:
-    """Exact owner-configured item; stdout stays private in process memory."""
+    """Exact owner-configured item through the shared bounded Keychain reader.
+
+    Section 194 (Claude review): the earlier private copy buffered unbounded
+    output, inherited stdin and had no process-group cleanup.
+    """
     try:
-        result = subprocess.run(("/usr/bin/security", "find-generic-password", "-s", "trading-agent-massive",
-            "-a", "massive", "-w"), capture_output=True, check=False, timeout=15,
-            env={"PATH": "/usr/bin:/bin"})
-        _require(result.returncode == 0 and 0 < len(result.stdout) <= 4097, "credential_unavailable")
-        value = result.stdout.decode("ascii").removesuffix("\n")
-        _require(re.fullmatch(r"[!-~]{1,4096}", value) is not None and value.casefold() != "test-api-key",
-                 "credential_unavailable")
-        return value
-    except EarningsGapError:
-        raise
+        credential = read_keychain_credential("massive")
+        _require(credential.provider == "massive" and credential.fixture_only is False
+                 and type(credential.value) is str, "credential_unavailable")
+        return credential.value
     except Exception:
         raise EarningsGapError("credential_unavailable") from None
 
@@ -662,6 +664,11 @@ def _response(response: object, window: tuple[str, str], credential: str) -> tup
         metadata = _project(response.body, window, credential=credential)
     except EarningsGapError as exc:
         code = exc.args[0] if len(exc.args) == 1 and type(exc.args[0]) is str and exc.args[0] in _SCHEMA_CODES else "source_schema_refused"
+        if code == "credential_echo_refused":
+            # Section 194 (Claude review): an echo found only during projection must
+            # never reach the quarantined raw-body retention path.
+            base.update(body_bytes=None, body_sha256=None, retained_raw=False)
+            return {**base, "disposition": code}, None, None
         return {**base, "disposition": "source_metadata_quarantined", "qualification_code": code}, response.body, None
     except Exception:
         return {**base, "disposition": "source_metadata_quarantined", "qualification_code": "source_schema_refused"}, response.body, None
@@ -1465,4 +1472,3 @@ def main(argv=None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

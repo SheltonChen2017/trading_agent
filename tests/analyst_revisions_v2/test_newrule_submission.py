@@ -711,3 +711,61 @@ def test_unexpected_or_duplicate_fresh_files_refuse_before_any_delete(setup, sha
         m.begin_attempt(s.plan, "R298", 1, **kwargs(s))
     assert not any(endpoint == "files/delete" for endpoint, _ in s.api.calls)
     assert not any(endpoint in {"files/create", "files/update", "compile/create"} for endpoint, _ in s.api.calls)
+
+
+@pytest.mark.parametrize("other", ["R298-A2", "R299-A1"])
+@pytest.mark.parametrize("terminal", [None, "InProgress", "Completed", "BuildError", "Runtime Error", "Completed."])
+def test_active_excludes_only_exact_current_attempt(setup, other, terminal):
+    s = setup
+    uploaded(s)
+    started(s)
+    with m._Directory() as directory:
+        # The current nonterminal attempt is allowed only via exact exclude.
+        m._active(directory, exclude="R298-A1")
+        directory.write(other + "-claim.json", {"synthetic": True})
+        if terminal is not None:
+            directory.write(other + "-terminal.json", {"status": terminal})
+        if terminal in {"BuildError", "Runtime Error", "Completed."}:
+            m._active(directory, exclude="R298-A1")
+        else:
+            with pytest.raises(m.NewruleSubmissionError, match="another_attempt_active_or_ambiguous"):
+                m._active(directory, exclude="R298-A1")
+
+
+@pytest.mark.parametrize("other", ["R298-A2", "R299-A1"])
+def test_launch_checks_other_claims_before_any_request(setup, other):
+    s = setup
+    uploaded(s)
+    started(s)
+    with m._Directory() as directory:
+        directory.write(other + "-claim.json", {"synthetic": True})
+    calls = len(s.api.calls)
+    with pytest.raises(m.NewruleSubmissionError, match="another_attempt_active_or_ambiguous"):
+        m.launch_compiled(s.plan, "R298", 1, **kwargs(s))
+    assert len(s.api.calls) == calls
+    assert not any(endpoint == "backtests/create" for endpoint, _ in s.api.calls)
+
+
+@pytest.mark.parametrize("phase", ["created", "readback"])
+@pytest.mark.parametrize("field,bad", [("owner", False), ("public", True),
+    ("codeRunning", True), ("organizationId", "b" * 32), ("name", "foreign project"),
+    ("language", "C#"), ("collaborators", [{"owner": False}])])
+def test_new_project_ownership_gate_precedes_files_and_compile(setup, phase, field, bad):
+    s = setup
+    uploaded(s)
+    reached = []
+
+    def mutate(endpoint, response):
+        selected = endpoint == ("projects/create" if phase == "created" else "projects/read")
+        if selected and response["projects"][0]["projectId"] != m.REFERENCE_PROJECT:
+            reached.append(endpoint)
+            response["projects"][0][field] = bad
+
+    s.api.mutate = mutate
+    with pytest.raises(m.NewruleSubmissionError, match="private_owned_project"):
+        m.begin_attempt(s.plan, "R298", 1, **kwargs(s))
+    assert reached == ["projects/create" if phase == "created" else "projects/read"]
+    assert (m.CONTROL / "R298-A1-claim.json").is_file()
+    assert (m.CONTROL / "R298-project.json").exists() is (phase == "readback")
+    assert not any(endpoint in {"files/read", "files/delete", "files/update", "files/create",
+        "compile/create", "backtests/create"} for endpoint, _ in s.api.calls)

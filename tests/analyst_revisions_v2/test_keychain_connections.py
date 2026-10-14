@@ -810,3 +810,25 @@ def test_each_request_carries_only_its_own_providers_key(private_control, monkey
         assert own in carried
         assert not any(other in carried for provider, other in keys_by_provider.items()
                        if provider != endpoint.provider)
+
+
+@pytest.mark.parametrize("refused_index", range(7))
+def test_preparation_refusal_has_no_send_intent_or_request(private_control, monkeypatch, refused_index):
+    original = d._prepare
+    prepared = []
+    def prepare(endpoint, key):
+        index = d.ENDPOINTS.index(endpoint)
+        prepared.append(index)
+        if index == refused_index:
+            raise d.Refusal("synthetic-preparation-refusal")
+        return original(endpoint, key)
+    monkeypatch.setattr(d, "_prepare", prepare)
+    code, adapter = execute(monkeypatch)
+    value = read_report(private_control)
+    assert code == 2 and prepared == list(range(7))
+    assert [index for index, *_ in adapter.calls] == [i for i in range(7) if i != refused_index]
+    assert value["send_attempt_count"] == 6
+    row = value["observations"][refused_index]
+    assert row["terminal"] == "request_preparation_refused"
+    assert row["send_intent_recorded"] is False and row["status_code"] is None
+    assert not (private_control / f"send-{refused_index + 1}-started.json").exists()

@@ -20,6 +20,7 @@ import socket  # noqa: E402
 import urllib.request  # noqa: E402
 
 REAL_CREATE_CONNECTION, REAL_PRODUCTION_CLIENT = socket.create_connection, s.coverage.production_client
+REAL_DIRECTORY_INIT = s._Directory.__init__
 
 
 @pytest.fixture(autouse=True)
@@ -37,6 +38,7 @@ def isolation(monkeypatch):
                  "capacity_once", "begin_attempt", "poll_compile_once", "launch_compiled",
                  "poll_status_once", "read_result_once", "summarize_family", "load_family", "_session"):
         monkeypatch.setattr(s, name, forbidden)
+    monkeypatch.setattr(s._Directory, "__init__", forbidden)
     monkeypatch.setattr(d.frozen.prepared_input.october, "load_october_order_input_package", forbidden)
     monkeypatch.setattr(s.QuantConnectClient, "__init__", forbidden)
     monkeypatch.setattr(s.coverage, "production_client", forbidden)
@@ -58,6 +60,16 @@ def test_isolation_records_swallowed_boundary_calls(isolation):
         s._client()
     except BaseException:
         pass  # a broad handler swallowing the guard, as product code might
+    assert isolation == ["operational_boundary"]
+    isolation.clear()
+
+
+def test_direct_directory_constructor_is_tripwired(isolation):
+    # The spent D8 caller uses _Directory directly, not the patched _session.
+    # Test identity first so missing isolation fails without opening any path.
+    assert s._Directory.__init__ is not REAL_DIRECTORY_INIT
+    with pytest.raises(pytest.fail.Exception, match="operational access forbidden"):
+        s._Directory()
     assert isolation == ["operational_boundary"]
     isolation.clear()
 

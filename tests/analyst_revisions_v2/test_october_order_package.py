@@ -332,7 +332,12 @@ def test_daily_cross_archive_conflicts_preserve_prefix_and_quarantine_both():
 
 
 @pytest.fixture
-def built(tmp_path, monkeypatch, request):
+def build_derivations():
+    return []
+
+
+@pytest.fixture
+def built(tmp_path, monkeypatch, request, build_derivations):
     sessions = m._sessions()
     old_axis = m._latest._sessions()
     cutoff = sessions.index("2026-09-25")
@@ -353,15 +358,40 @@ def built(tmp_path, monkeypatch, request):
     monkeypatch.setattr(m, "require_section72_owner_waived_firm_admission", lambda value: value)
     monkeypatch.setattr(m, "require_loaded_global_benchmark_contract", lambda value: value)
     fresh = accepted_delta(tmp_path, monkeypatch)
-    collisions = frozenset({"tail"}) if getattr(request, "param", False) else frozenset()
-    monkeypatch.setattr(m, "_sources_and_collisions", lambda *_args: (tail_rows, fresh_rows, collisions, frozenset()))
-    monkeypatch.setattr(m, "_derive_rating_rows", lambda **values: (values["rows"], "b" * 64, {"rating_source_row_count": len(values["rows"])}))
+    collision_case = getattr(request, "param", False)
+    collisions = frozenset({"tail"}) if collision_case is True else frozenset()
+    fresh_collisions = frozenset({"fresh"}) if collision_case == "fresh" else frozenset()
+    monkeypatch.setattr(m, "_sources_and_collisions", lambda *_args: (tail_rows, fresh_rows, collisions, fresh_collisions))
+    def derive(**values):
+        build_derivations.append(values)
+        return values["rows"], "b" * 64, {"rating_source_row_count": len(values["rows"])}
+    monkeypatch.setattr(m, "_derive_rating_rows", derive)
     value = m.build_october_order_input_package(predecessor=old, parent_archive=archive(archive_id="parent"),
         prior_delta_archive=archive(archive_id="prior"), tail_archive=archive(), ratings_delta=fresh,
         firm_admission=firms(), global_contract=SimpleNamespace(map_hash=m._old.EXPECTED_GLOBAL_MAP_SHA256),
         output_root=tmp_path / "synthetic-package")
     monkeypatch.setattr(m._old, "_load_prior_roles", original_roles)
     return value, prior, tail_rows, fresh_rows
+
+
+def test_build_passes_first_post_prefix_session_to_both_derivations(built, build_derivations):
+    _, _, tail, fresh = built
+    assert len(build_derivations) == 2
+    for call, rows, limit in zip(build_derivations, (tail, fresh),
+                                 (m.MAX_TAIL_SOURCE_ROWS, m.MAX_NEW_RATING_ROWS), strict=True):
+        assert call["rows"] is rows
+        assert call["minimum_position"] == m._sessions().index(m.PREDECESSOR_SESSION) + 1
+        assert call["maximum_rows"] == limit
+
+
+@pytest.mark.parametrize("built", ["fresh"], indirect=True)
+def test_build_fresh_collision_wiring_excludes_every_colliding_contribution(built):
+    value, prior, tail, fresh = built
+    assert len(fresh) == 2 and value.fresh_contribution_count == 0
+    assert value.lineage["cross_boundary_rating_event_refusal_count"] == 1
+    _, roles = m._old._load_prior_roles(value.package)
+    assert roles["contributions"] == m._old._merge_contributions(prior, tail)
+    assert not any(row["common_event_id"] == "fresh" for row in roles["contributions"])
 
 
 def test_real_canonical_materialization_preserves_prefix_runtime_and_new_wrapper(built):

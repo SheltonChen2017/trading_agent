@@ -10,7 +10,7 @@ from pathlib import Path
 import sys
 import time
 from types import SimpleNamespace
-from urllib.parse import urlencode
+from urllib.parse import parse_qs, urlencode, urlsplit
 
 import pytest
 
@@ -21,6 +21,7 @@ from scripts import check_arv2_remaining_provider_connections as d
 HEAD = "a" * 40
 SHA = "b" * 64
 KEY = "SYNTHETIC-NOT-A-CREDENTIAL"
+ORIGINAL_PREPARE = d.contract._prepare
 
 
 @pytest.fixture(autouse=True)
@@ -442,3 +443,48 @@ def test_only_allowed_stateless_a_calls():
     assert d._write_held is d.contract._write_held
     assert all(e.provider != "sharadar" for e in d.ENDPOINTS)
     assert_lane_closure_excludes_dispatch_fence()
+
+
+@pytest.mark.parametrize("refused_index", range(6))
+def test_preparation_refusal_has_no_send_intent_or_request(control, monkeypatch, refused_index):
+    original = d.contract._prepare
+    prepared = []
+    def prepare(endpoint, key):
+        index = d.ENDPOINTS.index(endpoint)
+        prepared.append(index)
+        if index == refused_index:
+            raise d.contract.Refusal("synthetic-preparation-refusal")
+        return original(endpoint, key)
+    monkeypatch.setattr(d.contract, "_prepare", prepare)
+    code, adapter = execute(monkeypatch)
+    value = report(control)
+    assert code == 2 and prepared == list(range(6))
+    assert [index for index, *_ in adapter.calls] == [i for i in range(6) if i != refused_index]
+    assert value["send_attempt_count"] == 5
+    row = value["observations"][refused_index]
+    assert row["terminal"] == "request_preparation_refused"
+    assert row["send_intent_recorded"] is False and row["status_code"] is None
+    assert not (control / f"send-{refused_index + 1}-started.json").exists()
+
+
+def test_real_request_preparation_carries_only_provider_key(control, monkeypatch):
+    # Exercise C's actual stateless Requests preparation/validation path; only
+    # its transport and credential source are synthetic, with no real send.
+    keys = {provider: f"SYNTHETIC-{provider.upper()}-NOT-A-CREDENTIAL"
+            for provider in ("fmp", "massive", "eodhd")}
+    monkeypatch.setattr(d.credentials, "load_key", lambda provider, **_kwargs: keys[provider])
+    monkeypatch.setattr(d.contract, "_prepare", ORIGINAL_PREPARE)
+    code, adapter = execute(monkeypatch)
+    assert code == 0 and [index for index, *_ in adapter.calls] == list(range(6))
+    for index, request, _kwargs in adapter.calls:
+        endpoint = d.ENDPOINTS[index]
+        key = keys[endpoint.provider]
+        query = dict(endpoint.query)
+        if endpoint.auth_query:
+            query[endpoint.auth_query] = key
+        assert parse_qs(urlsplit(request.url).query) == {k: [v] for k, v in query.items()}
+        assert dict(request.headers) == ({} if endpoint.auth_query else {"Authorization": "Bearer " + key})
+        assert request.method == "GET" and request.body is None and request.hooks == {"response": []}
+        carried = request.url + json.dumps(dict(request.headers))
+        assert key in carried and all(other not in carried for provider, other in keys.items()
+                                      if provider != endpoint.provider)

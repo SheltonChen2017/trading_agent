@@ -25258,3 +25258,139 @@ Main independently passed359 capture/bootstrap/locator/record/active-document/
 import-boundary/EXACT named package-guard checks12.44s under process-tree
 network denial, with isolated temporary database/output roots. No complete
 lane/repository suite or retained-parent replay was run.
+
+## 179. Observed initial64 custody and separately registered full-quarter projection (2026-10-14 UTC)
+
+### 179.1 Exact completed successor, not rehabilitation of the stopped run
+
+The NEW operation ib-sec-2006q1-initial64-private-stdin-v2-20261014-once
+ran at clean ebbee102303fbbd9f01408eab691a0aa6fc5722f, collector source
+7b053044b2465bcaf8523cf815ec631ea3ae0a896776abea7c65ff0886d55519.
+Its source inventory digest is785702f470237fd969ff8aa9cd045889883673fe3fcd50525fc67eb58e6772e8;
+the distinct bootstrap execution remains6314f5acf821df58c37a7ddd3857c225140b047c.
+Explicit writable PTY with echo disabled accepted the identifying contact
+only in private stdin. No contact value/hash entered argv, environment,
+files, chat, Git or diagnostics. Reservation is2026-10-14T02:24:17.274766+00:00;
+completion is2026-10-14T02:49:09.062362+00:00. CLI returned0. These are
+retained UTC control times, not a separately measured wall-clock runtime.
+
+| Control | Bytes | SHA-256 |
+|---|---:|---|
+| reservation.json | 87,209 | 702fa2c2f7c222087db2ac4dee00f8d42a2722d6a2f3ee4916a11706931cf5fe |
+| complete.json | 9,621 | 7d42a6634bf378f159f00e62697eaac446b41038f276f05ca12fe524e8a9076a |
+
+Exactly64 permanent claims,64 starts,64 result controls and64 complete
+HTTP200 bodies total419,628 retained bytes. Header qualification is0;
+all64 bodies retain the original header-quarantined disposition. Zero
+unattempted selected rows and zero XML projections occurred in this
+capture. All authority flags remain false. The original reservation-only
+section178 run remains untouched, without invented completion or cause.
+These64 accessions must never be redispatched; any future selection must
+inventory this new namespace alongside the older exposure roots.
+
+Main independently ran the committed verify-only CLI at clean ebbee102
+against the external report pin above. Its isolated worker enforced OS
+process-tree network/fork/all-write denial, rechecked original producer
+Git bytes separately from the current verifier, claims/starts/results/raw
+bodies and the original header predicate; it returned0 with64 raw bodies,
+0 qualified headers and parent_xml_projection_performed false. A separate
+held-directory/version/readback check reproduced both control hashes,
+timestamps,419,628 bytes and false flags under the same denial controls.
+
+Read-only all64 structural triage locates an older outer envelope: the
+canonical SEC-DOCUMENT and SEC-HEADER openers occur inside it rather than
+at the frozen parser's first-line position. This explains the observed
+envelope refusal at the structural level, not SEC authenticity, publication,
+cryptographic signature verification or PIT. No raw body is rewritten and
+the old capture qualification is not changed. Any later compatibility
+profile must be separately bound to original bytes and exact child slices.
+
+### 179.2 Bounded offline projection definition and activation
+
+Under the owner's continuous-build/delegated engineering direction, activate
+research/insider_buying_sec_2006q1_parent_projection_v1.py as a NEW offline
+operation, audit ID ib-2006q1-parent-projection-frozen-baseline-20261014-once,
+only after a clean committed source image. Its exact input is the sealed
+64-parent capture/report above plus the original h7X8FN/candidate
+2006Q1 preparation, downstream's existing external completion/assessment
+pins and the exact public ZIP/intake hashes. No provider/SEC/QC request,
+old root mutation, new selection, resumed ambiguous request or source
+window change is permitted by this operation.
+
+Hold/recheck private named ancestors/leaves and shared capture/publication
+locks; only two exact hash/size-bound public ZIP/intake leaves may retain
+their original0644 modes. Reconstruct the complete original preparation,
+then run the unchanged frozen complete-parent parser and unchanged bounded
+IB-1C v2 assessor twice and compare exact outputs. Retain all83,657 source
+rows,71,679 Form4/4-A targets and11,978 context rows. Every selected parent
+must be projected, grammar-quarantined or unavailable; every whole-quarter
+row remains corroborated_noncanonical or explicitly quarantined. Existing
+256-parent/64-MiB corroboration caps are not raised; this run uses64 parents.
+
+The worker uses captured committed lane source bytes, minimal environment,
+Python -I -S -B, effective OS network/fork denial and writes confined to a
+fresh private output directory. Native OS-denial probes precede the later
+Python audit hook. Inventory actual executed modules separately from current
+and original acquisition identities; do not call this a reconstruction of
+the whole historical environment. Parent verifies canonical single-LF wire,
+complete14-key count partitions, actual output hashes and source identity.
+All authority/canonical/complete-corpus/backtesting flags remain false;
+unsupported envelope/XML dialect stays a fixed quarantine code.
+
+| Active source | Source SHA-256 | Focused test SHA-256 |
+|---|---|---|
+| research/insider_buying_sec_2006q1_parent_projection_v1.py | f6a241c41b48e6d0726b4be78a6d0eb1a16563870391cdf63c95d44eb4330774 | a819b5a7218aee9289f387a129c14931883017d82da5b822c8fa619cacbd5450 |
+
+### 179.3 Genuine isolation/wire sensitivity and unchanged exclusions
+
+Private preceding source61717/test4493 images remain preserved. Author
+reported249 focused/parser/v2/import/EXACT named guard passes8.37s and
+request-identity/count sensitivity. Main's peer found the early source-only
+Python hook intercepted required native-denial probes: one genuine captured
+fixture red0.47s became75 private passes4.28s after moving the hook to its
+existing post-native-proof worker location. Two extra-LF wire reds0.48s
+became green after removing exactly one print framing LF instead of an
+arbitrary suffix. Corrected private397dbc26/37395043 image passed129
+focused/boundary/EXACT guard checks7.71s. A direct isolated captured fixture
+proved native network/fork/outside-write denial and then the later Python
+hook0.061s; no actual source/capture input was read by those fixtures.
+IBEARLY-179-R01 P2 CLOSED: native proof is not masked by an early hook.
+IBEARLY-179-R02 P3 CLOSED: repeated stdout framing LFs are refused.
+
+Activation changes only fixed production wording/path and an explicit
+inactive-module-path/identity-spy test; private candidates remain immutable.
+Main active252 projection/frozen-parser/v2/import-boundary/EXACT Insider
+package-guard checks passed7.93s under process-tree network denial and
+isolated temporary database/output roots. An initial command used a
+nonexistent test filename and collected no tests; it was corrected, not
+reported as a source failure or successful validation. Internal QA is not
+independent Claude acceptance. No complete lane/repository suite occurred.
+
+The six open topical/shared P2 scopes remain unchanged. Actual January2006
+earnings coverage, identity/availability/rights, full population and permanent
+protocol/look gates remain factual requirements. Safari access observed
+during02:43:21-02:45:24 UTC was blocked by the locked Mac; owner unlock was
+requested without requesting a password or bypassing security. Continue
+available offline/source work while that concrete UI input is pending.
+FMP paperwork remains skipped and no FMP acquisition is made. Shared docs,
+Action Plan, SESSION_HANDOFF.md and all four frozen custody sources remain
+untouched. No outcome look, QC/backtest launch, interim push or monitor
+rearm occurs. After the frozen baseline, build a separately explicit additive
+profile only if the actual original envelope/identity evidence supports it.
+
+Technical milestone: exact64 complete-body custody is independently verified;
+an isolated full-quarter refusal-preserving reassessment is qualified, not
+yet represented as executed at this section's commit time.
+
+Plain language: the original filings were saved safely, but their older
+format still needs separately tested compatibility. Keep every missing
+quarter row and never mistake this small batch for a backtest-ready corpus.
+
+Before activation commit, a second internal peer independently observed129
+private projection/import-boundary/EXACT guard passes7.51s with process-tree
+network denial and isolated database/output roots; no additional material
+blocker was found and no actual inputs were read. Main record/active-document/
+boundary/EXACT guard checks passed123 in3.27s; two memory compilations under
+network/fork/all-write denial, diff check and the frozen four-file comparison
+against origin85c7755d passed. These are focused checks, not a full suite,
+actual baseline execution or independent Claude review.

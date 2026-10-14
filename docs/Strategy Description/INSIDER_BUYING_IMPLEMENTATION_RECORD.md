@@ -26094,3 +26094,90 @@ all-write denial. Peer independently compared activation-only source/test
 changes and active210 focused passed5.65s; no actual roots read. Main memory
 compilation/frozen-four/diff/root/branch/HEAD/status checks precede the new
 local commit and actual operation. No publication to origin at this checkpoint.
+
+## 186. Observed isolated source-view full-quarter result (2026-10-14 UTC)
+
+### 186.1 Actual execution and exact private publications
+
+At clean0b55707f6fcf95d1ed25a224b2513d92ac22d5bd, fresh operation
+ib-2006q1-pem-view-source-profile-v1-20261014-once exited0 with empty stderr.
+Externally measured CLI elapsed151.581s; observed completion
+2026-10-14T04:09:57.859279+00:00. Actual active front a14bdfac was already
+committed during execution, together with helper a5697fa2/pure94bb3e28.
+Current source inventory87b9999f4f4fda20d78e5abb977ec640288a3f294d25b02fe76723e42ce663db;
+72 actual executed sources, inventory digest
+e26310e7047eee5271d786e144685598d77b878ff4f6528341aecae3b59ce50b.
+Source-only lane imports and exact historical/current frozen-byte checks
+remain binding; full historical-environment reconstruction remains false.
+No later commit is retroactively attributed to this run.
+
+| Actual publication | Bytes | SHA-256 |
+|---|---:|---|
+| reservation.json | 13975 | 718f4557bbf573132b6a84533a94fec6ab882c4886a608bc59871808dd943c63 |
+| assessment.json | 79842144 | 4665fb197a8ccaa495563f46608ae9a50cef012003261ecc11fe7ce1f51045da |
+| parent-ledger.json | 338081 | 20202435af577eb523081ec0ddb54cdd136d0b8a457f031f53c45b3668cdda77 |
+| source-view-inventory.json | 193274 | 87919b50b8eb60ac961b743c5e95d50c356e70cbf263267ca2deae962b4cb49b |
+| complete.json | 26049 | c3a60ed272603a2ca3a337c8d9d5b475c1b50ea063ccec9a44874a6e11ba0641 |
+
+The actual worker reloaded original raw-bound preparation and sealed64 capture,
+matched the authenticated old baseline source/capture context, recomputed full
+composition twice and required equality before publication/readback. Effective
+OS network/fork/outside-output-write denial preceded the Python hook and input
+opening. Worker/parent source and original-input checks passed before/after.
+This is executed engineering evidence, not only a receipt comparison.
+
+### 186.2 Real count partition and unchanged admission boundary
+
+All83657 source filings remain (71679 relevant,11978 context);64 selected and
+retained original bodies total419628 bytes. Exactly64 supported contiguous
+PEM views,57 frozen inner projections and57 source_view_corroborated_noncanonical
+filings;7 source_view_frozen_parser_quarantined/legacy_blank_separator_refused.
+No PEM-profile quarantine or unavailable parent,83600 remaining quarantined
+filings and0 original bodies admitted. Both whole-original and whole-quarter
+promotion digests stay null. All authority flags false; SEC dispatches/QC jobs/
+research looks0/0/0. Four earnings gaps and real native identity/availability/
+rights/full-population/protocol gates are unchanged. No backtest was launched.
+
+This materially demonstrates exact retained-view/supplied-filing identity
+corroboration on57 real parents. It does NOT turn them into57 admitted original
+whole bodies, establish SEC authenticity/official acceptance UTC/publication
+or PIT identity, or close IB1C-REAL-CR01. The old baseline still quarantines
+all64 originals and all83657 rows; it is preserved, not superseded or rewritten.
+Current backtest_source_stream original-parent contract cannot silently consume
+these derived views. Seven issuer-first refusals stay explicit, not reordered.
+
+### 186.3 Independent post-run observation and next real-input work
+
+Main independently verified all five current publications' exact size/hash,
+canonical context/row/ledger/inventory accounting and source execution metadata,
+and rechecked all four original baseline publications under effective OS
+network/fork/all-write denial. Passed2.532s. This independent readback does
+not repeat the entire preparation or composition and is not Claude review.
+Original baseline3263625a is unchanged. Its authenticated83657 ordered
+immutable source-row identity digest is
+d081c092c5abe29f3be51e3baa413b2ed38cd7d8709d5dd1e52c869cfeac8a99;
+census digest047b92bdcd8fe82b21d76cddc05c8cca1ec31d7dec6e9c5186a1312e4cd4c5a2,
+parsed lineage777136638dc6a1e5794bdd7878672ac9c08e33226b09306ccd262c6511c6de84,
+snapshot sec-insider-parsed-2006q1-777136638dc6a1e5. No actual input/account/
+credential/provider was newly acquired in this offline run or observation.
+
+Native hosted validation remains physically blocked by the locked Mac; the
+supplier gap scope is stopped by the sealed Massive403. FMP is not acquired
+under the owner's skip reply. Routine engineering approvals/Claude checkpoints
+are not blockers. Available retained-source reference work may still advance
+current SEC security-title/CIK/permaticker CANDIDATE linkage, with real supplied
+Sharadar metadata, before authentic historical/native gates. Do not say all
+engineering is exhausted or reclassify current labels as historical/PIT data.
+Define and qualify such a narrow real-input join separately if it materially
+advances the authoritative152.1/154.6 reference work; preserve full source
+roster, all ambiguities/refusals and original/view identities.
+
+Six topical/shared P2s remain open; no frozen/shared edit, study/window change,
+source retry, outcome look, full suite, QC/strategy launch, funded/paper/live/
+order action, interim push, other-chat message or monitor rearm. The single
+final matching-lane push remains pending at the authorized honest end.
+
+Main final record/active-document/EXACT guard72 passed1.14s. Source-view
+runtime and independent readback are recorded separately from fixture tests.
+No new full suite or promotion. Reverify unchanged frozen sources and exact
+root/branch/HEAD/status/remote before this local observed-result commit.

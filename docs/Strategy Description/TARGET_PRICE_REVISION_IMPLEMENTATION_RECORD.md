@@ -21919,3 +21919,134 @@ the only one permitted in the prospective source-only scope.
 Root reran the same462 focused selectors after that correction:462passed13.89s,
 with the isolated49/52 root established before dispatch/config imports. No
 native job or private/accounting acceptance follows from that green result.
+
+### 90.6 Source-only Full Auto request submitted; asynchronous result not accepted
+
+Public design committed locally as a4f9e3e2eb45d7403bd6f0366ce931e75d0b9317,
+after exact root/branch/HEAD/status/staged scope, in-memory compilation of four
+public files, immutable-prefix/final-helper hashes, staged whitespace and actual
+matching remote3dfa7d1e checks. No push. Read-only delegated final audit found no
+material P0–P3 software finding in those four files; no test/private/UI effect
+was performed by that auditor and this is NOT independent Claude approval.
+Native identity/getter/byte-store dispatch and contains-then-save atomic custody
+remain unproved; default software acceptance does not admit native evidence.
+
+Fresh SOURCE-POST-019 at06:43:40.617670UTC on that clean HEAD:
+plan4e707e076a2f747226a9b2790d80f9cc025d76b51bcd1fb2b79b8e66e156380d;
+two fixed own files/read calls502406wire/230180fresh bounded comparison bytes;
+ALL15 stable, restored main60012/454ed1e and other14 unchanged. Receipt9084/
+4975ccad965506ea900d484438f9081491be584394d6e099024e1dd7e0826cd6;
+read2archive249321/4f9132f69dd859aaefaa4c61f12646d255de3478b52ea504a99dfb30bed6af28.
+Its15-minute scope is not renewable and does not prove later saves/compiled jobs.
+
+Fresh WITNESS-SOURCE-009 at06:44:17.546918UTC: access4602/
+25a337c2b38ace1acf479e3db547782490a153791ca0c24e8b49d81f891f66f4;
+closer1309/fbc50a4fc5ec95ef24a2ffa9e2688a2971bef4ce7e29af830029b617c3897b1d.
+Root opened ONLY exact committed public context successor in TextEdit and
+extracted complete15742-character AX source, with exact start/end and immutable
+prefix identity independently checked on disk. Initial native pipe interruption
+recovered in the same exact public file; no file edit or private clipboard read.
+Root verified own37650980 URL, new EMPTY chat and Full Auto label, then pasted
+ONE20123-character source-only request: exact fenced public helper plus four
+exact main patches, cumulative5save/on-save-build cap. Existing15files except
+main remain frozen; one new helper makes16. Request expressly forbids launch,
+manual compile, notebook, provider/ObjectStore read/listing, unrelated files,
+refactor/retry/account/engine changes. Submission visibly started own built-in
+Mia task **extendedrefusalwitnesscontextsuccessor - Running**. Source-only task
+is not a backtest, compiled-job proof, observed strategy look or OFF attempt.
+Thirteen AX observations/two screenshots/nine actions; counts include interrupted
+and conservative refused observations. Later diff-only AX lacked the unchanged
+URL and root conservatively refused route acceptance; subsequent full AX and
+screenshot proved exact own project, so that was a route-check false alarm,
+NOT evidence another lane actually displaced this tab.
+
+Fresh continuation WITNESS-SOURCE-010 at06:56:44.838819UTC, access4245/
+d84cd27035d3d3671c406b34066ebb3cad064e1fd769df02bb72fea426345127;
+closer1098/82badc0fe54850f49b2d7bba4a2a8fc91301e1aaa1378a4ad083cf1b38e4f3b7.
+Only one full AX own-project status observation, no message/action/new save
+allowance. It retained the original cumulative5-save bound, NOT five additional
+saves. Root saw only the preexisting28859a-0381a4 build and the Running task;
+zero confirmed saves means **unverified**, not proof Mia made no remote writes.
+Native observations took44/108/85/101seconds and screenshot115seconds despite
+requested20-second tool timeouts. Unknown UI/resource cause is not attributed
+to another lane by inference. Both cooperative controllers exited0 and released
+their actual owned lock. Their closers end root controllers, NOT the asynchronous
+remote task, which remains pending/unverified; no completed-source claim.
+
+TPR-EXT26-D111 (agent-delegated capture routing; independent review pending):
+prepare a small NAMED public look31 capture/plan validator instead of relabeling
+spent look20 or fixed-job look30 collectors. Existing look20 validator pins19→20;
+existing look30 terminal successor pins its exact old job; paired-results' old
+look22 cap does not fit observed30→31. Alternative stale-receipt relabeling is
+rejected. New software may retain strict own-project read/log/chart/order scopes,
+fresh source identities and null/unreached accounting, but must not execute a
+network/private/native effect or accept native accounting on fixture evidence.
+Root sole record/effect owner; delegated NEW public files only. Routine design
+choice is not separately human-/Claude-approved and does not reset OFF3/ON0.
+
+Next: genuinely verify asynchronous source completion through a NEW bounded
+all16 source capture, exact helper/main hashes and inverse/all-other-file diff;
+resolve any in-scope discrepancy before native effect. Then reserve fresh actual
+Mia operation/look31 before ONE genuine built-in Mia job. Known two witness keys
+may be read only in QC under a fresh bounded native scope, not external ObjectStore
+export/global enumeration/old notebook. Full-window OFF orders/accounting still
+precede ON. Observed looks30, OFF3, ON0/unlaunched, all accepted extended metrics
+null; no automatic continuation launch, readiness or canonical acceptance.
+
+### 90.7 Prospective look31 capture software; no native effect
+
+NEW extended_first_refusal_capture_successor.py and its focused test are a
+stdlib/pure-contract successor, not a stale look20/30 relabel or launch driver.
+It pins exact operation/actor/OFF3/30→31, all16 source descriptors including
+unchanged unused notebooks/helpers, source-preflight descriptors and UTC age,
+immutable config/freeze/calendar/inputs, actual returned own job identity and
+bounded status/log/chart/order requests. It forbids ObjectStore/export/write/
+launch endpoints; raw witnesses remain native in QC. Caller still must durably
+spend fresh receipts BEFORE credentials/effects, enforce scope before every
+request, preserve failures/cancellation and authentic Mia provenance. Pure
+supplied receipt descriptors alone prove none of these factual custody claims.
+
+Returned wire metadata is separately bounded before schema inspection; full
+structurally redacted PRIVATE projection/envelope preserves numeric tokens and
+failed/loading replies before validation. Compact truncation/duplicate/identity
+refusals remain refusals; no guessed JSON. Order census is unique ID/page/plan
+bound, not fills/fees or independent sleeve P&L. Frozen1449/16:01NY NAV normalizer
+can classify incomplete/loading evidence but cannot prove full journal replay.
+Initial receipt leaves unreached terminal/summary/index/orders/fills/fees/metrics
+null and all source/native/accounting/strategy/canonical acceptance gates false.
+
+D111-F01 P2 confirmed/corrected: agent initially transcribed one historic job
+incorrectly in the NEW old-job exclusion set. Equality against the immutable
+public observations30 ledger reproduced1failed72passed0.74s; exact retained
+look27 ID8f8276efbdb6e25651a3b993f9df3f6d corrected that new constant, then
+73passed0.52s. No old ledger/module/history/job was rewritten or relabeled.
+Subsequent cancellation/index control made final delegated74passed0.66s;
+in-memory reverse mutants killed old-job guard14cases0.37s, duplicate guard1
+with5controls0.07s and preflight age1 with7controls0.04s; disk never mutated.
+Initial handed-back module21057/e3d71c67205010247ffb1f23e99c8c9b20ac2b659d9a9072b54507590e5b632d;
+test17262/3e044780b38f6b14b900db7b5d15efffb4345e81b23b5570496eb80c6aa6a2e7.
+These are pre-correction software identities, not native/compiled source proof.
+Root completely read both files and reproduced536focused tests11.07s using
+isolated49/52 (previous462 selectors plus74 capture cases), no complete suite,
+native/provider/private/operator-state/database action or strategy look.
+
+D111-F02 P2 confirmed/corrected: terminal helper originally required a
+returned compileId even to inspect safe own-job diagnostics. An absent native
+compileId is unknown, not a foreign compile or source proof. Narrow correction
+must reject an explicit mismatch but retain missing/null as an unverified false
+indicator, while returned own-job identity and ALL acceptance gates stay strict.
+It grants no compiled-source/native accounting acceptance or launch authority.
+Delegated red missing/null compileId tests both failed0.55s (74deselected) under
+the original required-field check; corrected76focusedpassed0.66s. Returned
+missing/null now yields native_compile_id=null and matching=false; an actually
+equal returned string yields matching=true but compiled_source_proven stays
+false. Explicit foreign compile and missing/foreign native job still refuse.
+Final module21224/b49ab9cfe72074a8335df82a9c9b5af4c861ac97ce5f850dfcf97da137c4f025;
+test18403/56e66e81b5e8b82ed0b8cde15be240683cbb872f081652c039e3e80ea2849ce0.
+This closes only the lane-owned software finding, not empirical source/clock/
+census/accounting gates. No actual look31 effect or source acceptance occurred.
+Root read the final correction and request-budget boundary, then independently
+reproduced538focused tests10.91s (462existing plus76capture), isolated49/52.
+No complete lane/repository suite or native/provider/private effect. Source-only
+Mia remains asynchronous/unverified at this local software checkpoint; one
+final publication remains unspent and monitor remains PAUSED.

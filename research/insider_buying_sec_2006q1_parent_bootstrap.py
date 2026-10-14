@@ -906,7 +906,9 @@ def main(argv=None):
         else:
             result = run_actual_bootstrap(audit_id=args.audit_id, expected_head=args.expected_head,
                                          expected_snapshot_sha256=args.expected_exposure_snapshot_sha256)
-        print(json.dumps(result, sort_keys=True)); return 0
+        # The parent's strict decoder accepts canonical controls, including
+        # its child's summary. Default json.dumps spacing is not that wire format.
+        print(_canonical(result).decode()); return 0
     except (ParentBootstrapError, custody.ArchiveAssessmentRunnerError, custody.EodhdDemoError, locators.ParentLocatorError,
             OSError, ValueError, TypeError, KeyError, subprocess.SubprocessError):
         print('{"disposition":"offline_parent_bootstrap_refused_outputs_preserved"}'); return 2

@@ -24903,3 +24903,243 @@ No corpus completion, source authenticity/PIT/rights/readiness promotion,
 full suite, strategy outcome/QC launch, shared-document change, monitor rearm
 or interim push. Six open topical/shared P2s and all frozen economics/window/
 D23/SECv3/non-retroactive dispositions remain binding.
+
+## 176. Observed archive/reference integration and bootstrap wire correction (2026-10-14 UTC)
+
+### 176.1 Actual untouched v5, not earlier partial completion
+
+The actual three-operation image was
+de9f54f76c58935fc01c97267397fb613dca2592; source/test/record writers stayed
+frozen throughout its actual collectors/observers. Later source changes did
+not exist during these executions. Precommit record/active-document/named
+Form4guard checks72 passed1.28s; root/branch/expected13-file staging and
+matching-origin85c7755d were verified. No push was made.
+
+V5 registered2026-10-14T01:30:17.218793Z and completed01:44:58.763396Z:
+77 requests/77 observed/zero refused or ambiguous/zero unattempted, exactly
+March2020-July2026. Retained897,494 rows =573,310 accepted +324,184
+quarantined metadata rows,161,553,492 raw-body bytes. These are retained
+body bytes, not measured network-transfer bytes. Actual wrapper remains
+5de2553839b99e99f745e396590c39162be4f10cba9ab3a1586f47871d149daf;
+11-source inventory93628c7a6a8ce53b571745d09df42129caddf38d2d97944134d88317241ac4aa.
+Manifest126,500 bytes SHA
+6443c8caaac2b826e6759c4e1a9db6b209e927b9bc13e2f82ed15bdac968ddec;
+completion231,866 bytes SHA
+953e0071edf449b594a6e2cd20b7588a6b8dc38fb97bc9fbcb5f1f0aae2c0e24.
+Independent denied-network/all-write/fork checks confirmed310 private journal
+leaves/77 permanent scopes and all77 raw-body hashes/sizes without body-value
+decoding; final hash loop0.14s. Two exploratory readonly summary commands
+used a nonexistent receipt source_rows field and stopped before their loops;
+the corrected loop is the observed evidence, not a producer failure.
+
+No old request was repeated. V1/v2 completions and both partial witnesses
+retain their original hashes; v3/v4 unsealed starts and the four support
+gaps remain unknown. V5 completion does not complete those old roots or
+establish actual-release completeness, historical identity, PIT or rights.
+
+### 176.2 Actual isolated reference and complete-issuer metadata reassessment
+
+Compact reference IDib-sharadar-cohort-2006q1-compact-v2-20261014-once
+completed at01:30:35.998909Z, fixture_only=false. Exact178,072,103-byte
+assessment SHAdca7b071e174bd898119ef86cd7ea1892856c38c92f061a2cf9fe668ecd35fa8
+matches the earlier readonly memory result, but this is its separately
+observed operational publication at de9f54f7/final709b3c65 runner, not
+retrospective relabeling of that memory run.
+Completion7,985 bytes SHA
+07dd203d82c3d90f90e1af239b8ef2255ecba47400595d6f415a65989ee29f97;
+executed source inventory
+a3413c33147cefac8cea61140312cfc93185452eb828cd70c4845a97aab2c097.
+All83,657 filings/6,737 all-form issuers/5,866 relevant issuers retained;
+74,150 ticker rows and698,455 action rows accounted;13,861 ticker and5
+action rows quarantined. All56,266,542 candidate relations retained:
+647,444 cohort-referenced distinct action rows +51,011 unreferenced rows.
+No fundamentals/financial-value decoding, provider dispatch or look/job.
+Independent private four-leaf hash/custody check passed; projections are
+116,139,300-byte actions SHA
+27387a32fffe710e7733b8f8b225250fc92ad3d829d720efc77df77a015c5246
+and29,841,795-byte tickers SHA
+da2bf31da6436127dd405154b339d1a31ad6c14a788d0017ce620ad5217aea60.
+One exploratory summary used nonexistent completed_at_utc; corrected
+observed_at_utc and the separate hash loop are the recorded proof.
+Prior two empty failed outputs remain preserved. Current aliases/action
+context are not historical issuer/share-class/PIT admission.
+
+After actual v5 completion was independently pinned, fresh denied-network/
+fork/outside-write observer
+ib-earnings-assessment-dual-partial-2006q1-20261014-once completed at
+01:46:31.728154Z using that same de9f54f7 committed image and both explicit
+partial witness pins. Assessment22,695,675 bytes SHA
+b085438e61a3f665646f4667153f6ab7c9ef4e0f803afa5c846c1f4abfe91f7a;
+completion273,898 bytes SHA
+8a67f1d629bf1e354e8f8ade8d71cd6a00f98cc66935bdc12f3d1917ae2419b5;
+source inventory
+e7522a9c0609f9332644f6f474ec91676615e90af62822c75fd2d17cbc972967.
+All83,657 source filings remain accounted. Sealed metadata totals:
+2,358,204 rows =1,098,486 accepted +1,259,718 quarantined,78,955 provider
+codes. Unknown windows remain January2006, August2018, February2019 and
+February2020. Both unsealed partial months remain hash-only; no HTTP/row/
+aggregate producer completion was manufactured. Independent two-leaf hashes/
+inventory/counts passed under network/all-write/fork denial. This does not
+authenticate ticker/CIK identities, original availability, revision completeness,
+vendor/cloud rights or readiness; both earnings diagnostics stay separate
+from the primary event and order clock.
+
+### 176.3 Bootstrap candidate publication, not successful original parent wrapper
+
+Actual ib-2006q1-parent-bootstrap-20261014-once produced four controls with
+worker completion01:30:55.239391Z, but the actual parent CLI exited2 with
+offline_parent_bootstrap_refused_outputs_preserved. Preserve this distinction.
+It is not an originally successful fully accepted parent operation.
+
+Worker completion8,487 bytes SHA
+9e4ff38b500e90d654cf6937f7498d3784fec79f6b6fff949c79629f7e6a2656;
+execution de9f54f7/47-source inventory
+a50519733d28fd9da2fd6ba37bf20ac833078e129bb3ce4b11053fed958d29d4.
+Exposure8,616,949 bytes SHA
+5454d54fb037ee35c8d3aa4bce31d6a46d7ebe784bd0e6011c4273fcd918fed3;
+snapshot28,497,384 bytes SHA
+8ef7e8ca62a7aeee9d52c62ac7e42b406f44cd16657c8050e7f1637564d7f0a8;
+locator accounting93,640,493 bytes SHA
+1b4136c6b22fbabc0b9d2f0b0b46c39fd4568ffe1ee6dad6cba35210ffd1a700.
+Candidate counts:83,657 source filings,71,679 fresh Form4/4-A locators,
+19,852 prior exposed accessions,64 selected. Context11,978 remains excluded
+from the Form4-only capture. Main denied-network/all-write/fork readonly
+parent publication verification passed3.34s; separately current parent
+identity equalled the worker's complete47-source identity with no changed keys.
+That later green check does not relabel the original CLI exit or reconstruct
+an unretained original exception stage.
+
+IBBOOT-176-R01 P2 CLOSED in candidate correction: worker CLI emitted default
+spaced JSON, while its parent required canonical JSON. A safe invented worker/
+parent wire probe reproduced deterministic refusal and canonical acceptance
+without any real worker, input/output constructor or custody callback.
+A durable regression was genuinely red1.02s before canonical CLI output;
+final233 bootstrap/locator/import/named-guard checks passed4.48s. Original
+stdout/exception stage was not retained, so this source-level sufficient
+failure is not asserted to be the uniquely observed historical failure cause.
+Do not weaken the canonical decoder or rewrite the published old controls.
+
+Before the next acquisition, run a NEW offline-only bootstrap ID
+ib-2006q1-parent-bootstrap-canonical-20261014-once from the corrected clean
+committed image and the same external8ef7 exposure pin. Fully observe its
+parent success and independently pin its new completion before capture.
+This reprocesses existing inputs; it repeats no provider/SEC request and does
+not resume or overwrite the original failed wrapper/root.
+
+Technical milestone: untouched archive suffix and lossless full-issuer
+reference assessment actually completed, with dual-partial unknowns retained
+and a verified worker/parent wire correction prepared.
+
+Plain language: the remaining monthly collection finished and the retained
+reference data processed without discarding records. Four months are still
+missing; original filings and trustworthy historical identities are still
+needed. No readiness/corpus promotion, full suite, QC/strategy launch,
+outcome look, shared record change, monitor rearm or interim/final push.
+Six open P2s and frozen economics/window/D23/SECv3/access classifications stand.
+
+## 177. Separately defined initial64 original-parent custody (2026-10-14 UTC)
+
+### 177.1 Bounded decision, production registration and exclusions
+
+Under existing source-access/continuous-build/delegated-decision authorization,
+activate the separately versioned exact2006Q1 prefix64 capture after the
+corrected offline bootstrap actually succeeds. Planned capture ID
+ib-sec-2006q1-initial64-20261014-once. Bind the newly observed bootstrap ID,
+completion/accounting/exposure snapshot hashes explicitly on its actual CLI;
+never guess a future receipt or confuse bootstrap execution HEAD with the
+later capture HEAD. Before any request require the same actual83,657-row
+all-six-form census,71,679 Form4/4-A target,11,978 accounted context rows,
+335,578-row byte-bound master and genuine exact64 locator prefix.
+
+Use a NEW private namespace sec_2006q1_parent_capture_v1 with held exclusive
+global accession-claim lock and immutable runs/claims. It is not an append,
+resumption, rewrite or thaw of any v3/v4/legacy root. Hold/recheck all15 known
+prior exposure roots and source closure before contact and around every
+request; initial quarter intersection is empty. Claim exactly one accession
+just in time, fsync the permanent claim and start BEFORE its only fixed
+official SEC HTTPS request. Unfinished claim/start is consumed forever, never
+a retry or an assertion of a completed response. Planned-only suffix remains
+planned. Later bootstrap/exposure logic must explicitly inventory this new
+claim namespace before selecting another batch.
+
+Source limits:64 requests,8MiB complete raw body each, at least500ms spacing
+after completion, remaining worst-case body reserve plus8GiB free floor.
+No master refetch, redirect, retry, resumed old request, broader window,
+Form3/5 target, financial interpretation or inferred price/outcome access.
+Use the selected fixed SEC transport/framing rules and the frozen header
+validator without modifying any frozen file. Adapt the exact decoded master
+hash explicitly; index/filer-agent CIK is not automatically issuer CIK.
+Raw HTTP body retention, header qualification and full XML/identity/PIT/
+official acceptance/publication/canonical admission are separate facts.
+Quarantine unsupported headers while preserving safe complete bodies.
+
+Use the genuine connected owner's Gmail profile email only as identifying
+SEC contact in private stdin/getpass after durable new reservation. Its
+value/hash is not put in files, argv, environment, chat, Git or exception
+text; PTY echo is disabled before preflight. This is contact provenance, not
+a credential or retrospective permission. Every result retains genuine
+observed framing rather than synthetic Content-Length. Stop on any refused/
+ambiguous request or custody/source drift; ledger planned/claimed/started/
+terminal/retained/header-qualified/quarantined/unattempted separately.
+All authority/complete-corpus/backtesting flags remain false.
+
+Once capture ends, the independent verifier inventories/rechecks the exact
+report pin, all claimed starts/results/raw bodies and current plus original
+committed source identities under effective process-tree network/fork/all-
+write denial. Full XML original-parent projection/admission is the next
+separate real-input step, preserving all83,657 quarter rows and missing/
+conflicting parents. Only then build the additive native historical identity/
+continuous-seasoning reference route in owned QC project37465795; keep
+native panels within QC, do not repeat143/147 diagnostics, do not pretend
+253 pre-entry sessions prove an exact first IPO. Complete source population,
+real economic identity/continuity, no-filing controls, actual releases, rights
+and permanent protocol/look gates remain necessary before strategy launch.
+
+### 177.2 Exact activation image and genuine refusal sensitivity
+
+| Candidate | Source SHA-256 | Focused test SHA-256 |
+|---|---|---|
+| research/insider_buying_sec_2006q1_parent_bootstrap.py | 864cef1b4785ee7d5446e57b161242084b83d4bc3cec82f0db217d74a865ad57 | 23703628cae7ed5929b80bd2f07296e8293cbe553a6e9c954ccb03e5099f1fa6 |
+| research/insider_buying_sec_2006q1_parent_capture_v1.py | 37af6c49fbdf72f3da7e9de95821a1ae877b764fa75391536129a06803ec8f80 | 3f42f2afda2fd94038a90262106d3bb12c99de28de09d1badfb90bd343e9539e |
+
+The inactive source/test draft was preserved at722ae9e5/80163973; author94
+draft/import/named-guard tests12.08s and memory compilation use that image.
+Main then found two real-inode alias gaps and the strict-verifier CLI framing
+mismatch (three genuine reds/two passes0.42s), and three rehashed terminal/
+context forgeries were accepted (three genuine DID NOT RAISE reds0.36s).
+IBEARLY-177-R01 P2 CLOSED: literal/resolved/same-inode ancestor/descendant
+fixture fences now precede callbacks and filesystem constructors.
+IBEARLY-177-R02 P2 CLOSED: CLI results use the verifier's canonical wire.
+IBEARLY-177-R03 P2 CLOSED: strict terminal HTTP/disposition/stop policy and
+all64 selected/unattempted prefix rows, complete form/context counts and
+prefix hash are verified, not merely rehashed count-shaped controls.
+Main corrected inactive102 focused/import/named-guard checks13.41s at
+cc544356/f21504b; neither input bodies nor actual source contacts were used.
+
+Transplant preserved those private files. Active header clarifies production
+requires the fixed path and clean commit; active tests use the research
+source and explicitly skip unsupported Windows POSIX/termios custody.
+First activation281 passes/two failures12.63s identified a now-obsolete
+inactive-path expectation and missing family-specific connection tripwire
+before a real transport REFERENCE; no actual connection was invoked.
+IBEARLY-177-R04 P3 CLOSED: test now deliberately moves the module path with
+identity spy, and a proper http.client.HTTPSConnection tripwire precedes the
+transport reference. No shared scanner was weakened or edited. Final table
+image283 capture/bootstrap/locator/import/named-guard checks passed15.55s
+under isolated temporary roots/database and process-tree network denial.
+Internal QA is not independent Claude acceptance or actual capture evidence.
+Main final468 capture/bootstrap/locator/earnings-reference-observer/import/
+record/active-document/named Form4guard checks passed17.87s. In-memory
+compilation114 lane research files passed under network/all-write/fork
+denial; frozen four-file comparison and diff check are clean. Exact source
+images above, not fixture patches, govern the upcoming actual operations.
+
+Technical milestone: an additive single-attempt original-parent custody path
+and isolated replay contract are qualified for exact64 real inputs without
+altering older frozen acquisition behavior.
+
+Plain language: acquire the first64 original filings safely, not a complete
+quarter or study. Document every source refusal and preserve earlier attempts.
+No routine approval/review pause, no readiness claim, outcome/backtest/QC
+launch, shared document edit or interim push; continue genuine input-driven
+work. The final combined push remains one at the authorized round's end.

@@ -11,6 +11,7 @@ import stat
 from dataclasses import replace
 import subprocess
 import sys
+import io
 
 import pytest
 
@@ -27,6 +28,16 @@ def _raw(body):
 
 def _sha(raw):
     return hashlib.sha256(raw).hexdigest()
+
+
+def test_worker_cli_canonical_summary_is_accepted_by_its_actual_parent_decoder(monkeypatch, capsys):
+    invented = {"fixture_only": True, "counts": {"selected_prefix": 2}, "audit_id": "invented-wire-only"}
+    monkeypatch.setattr(bootstrap, "_required_identity", lambda *args: None)
+    monkeypatch.setattr(bootstrap, "_worker", lambda **kwargs: invented)
+    monkeypatch.setattr(bootstrap.sys, "stdin", io.TextIOWrapper(io.BytesIO(b"{}")))
+    assert bootstrap.main(["--worker", "--audit-id", "ib-2006q1-parent-bootstrap-wire-invented",
+        "--expected-head", "a" * 40, "--expected-exposure-snapshot-sha256", "b" * 64]) == 0
+    assert bootstrap._json(capsys.readouterr().out.encode()) == invented
 
 
 def _file(root, name, raw, mode=0o600):

@@ -1,38 +1,20 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 160 ACCEPTS CLAUDE'S EXACT RECORD-ONLY `85c7755d` PUSH:
-229 FOCUSED CHECKS PASS; SCANNER 0/7 TO 7/7, 10/10 CONTROLS, 22 REAL TRANSPORT
-TESTS AND 0 OFFENDERS REPRODUCED. THE MONITOR IS PAUSED. THE OWNER'S LATEST
-CONTINUOUS-BUILD AND DELEGATED-DECISION DIRECTION IS ACTIVE. SECTION161 CLOSES
-IBWIN-CR01 AT DOCUMENTED MACOS/POSIX SUPPORT/COLLECTION SCOPE:16 NAMED GUARDS,
-480 AFFECTED PASSES,33 PEER PASSES AND GUARD-DELETION SENSITIVITY; NO WINDOWS
-PORT OR EXECUTION CLAIM. SIX P2S REMAIN OPEN. HISTORICAL MUTANT AND FULL-SUITE
-COUNTS REMAIN REVIEWER-ATTRIBUTED. SECTION163 RECORDS THE ONE ACTUAL PUBLIC
-EODHD DEMO: HTTP200,12BYTES,VALID2006 REPORT-DATE FIELD; PRIVATE RECEIPT AND
-CURRENT FIVE-SOURCE INVENTORY INDEPENDENTLY VERIFIED. FULL EARLY-COHORT
-ARCHIVE ACCESS/COVERAGE, IDENTITY/PIT AND ORIGINAL-PARENT FACTS REMAIN MISSING;
-SECTION164 RECORDS NEW OWNER-PURCHASED EOD CALENDAR ACCESS OBSERVED IN SAFARI
-BILLING AND OWNER-CONFIRMED ROTATED PRIVATE CONFIGURATION. CONTINUATION RESUMES
-WITH A SEPARATE PAID ONE-SHOT QUALIFICATION AND FULL-QUARTER METADATA CENSUS;
-SECTION166 RECORDS ACTUAL PAID HTTP200/277-BYTE/ONE-ROW ACCESS AND THE
-83,657-FILING OFFLINE CENSUS WITH TWO IDENTICAL DERIVATIONS. NO COMPLETE
-ARCHIVE/IDENTITY/RIGHTS OR BACKTEST-READINESS CLAIM. LOCAL CONTINUATION,
-NO FINAL PUSH CONSUMED; SECTION167 CLARIFIES LOCAL RETROSPECTIVE EARNINGS
-SCOPE AND PREREGISTERS THE BOUNDED248-MONTH SUPPORTING ARCHIVE ACQUISITION;
-SECTION168 RECORDS ONE OBSERVED MONTH, ONE SCHEMA-REFUSED MONTH AND246
-UNATTEMPTED WINDOWS. CONTINUATION IS SEPARATELY VERSIONED, NOT A RESUME.
-19,846 OF 99,394 PARENTS ARE REQUEST-BOUND; V3 REMAINS 1,846 OF 1,847;
-THE FOUR CUSTODY FILES AND V1/SCALE/PILOT STAY FROZEN. STRICT D23 RETAINS
-SEVEN NONEXACT QUARTERS. NOT BACKTEST-READY: REAL EARLY EARNINGS, IDENTITY,
-PIT, ORIGINAL-PARENT AND FULL-POPULATION EVIDENCE REMAIN REQUIRED.
-BOTH FINAL ACCESS CLASSIFICATIONS STAND WITHOUT RETROACTIVE APPROVAL.
-LOOKS/JOBS/BACKTESTS 0/0/0. LOCAL CONTINUATION; NO ROUND PUSH YET.**
-
-Current continuation: section172 preserves the actually stopped EODHD v3
-root (five seals, sixth consumed/unsealed) and the empty refused Sharadar
-observer output. A new externally pinned partial-root witness is separate
-from producer completion. The verified private-name correction and separate
-89-window v4 are local continuing work, not archive/readiness promotion.
+Status: **SECTION 194 RECORDS CLAUDE'S REVIEW OF THE 27 CODEX COMMITS IN
+`85c7755d..84367fc8` (SECTIONS 160-193) AND, AT THE OWNER'S DIRECTION, ITS
+CORRECTIONS IN SEVEN COMMITS. THE TWO LATE REAL-RUN REFUSALS (SELECTOR AND TITLE)
+HAVE AN ESTABLISHED CAUSE, ~/DOCUMENTS CTIME DRIFT ON FRESH LEAVES, AND THE FINAL
+HOLDS NOW IGNORE CTIME ONLY WHILE REHASHING CONTENT. ALSO FIXED: 36 TESTS FAILING
+UNDER THE DEFAULT MACOS PYTEST TEMP, AN UNFENCED SHARADAR FIXTURE PATH ON A LIVE
+ONE-SHOT, UNTESTED CAPTURE SPACING, OLDER EODHD FIXTURE GUARDS, BENZINGA ENCODED
+ECHOES, UNTYPED ESCAPES, CLEANUP MASKING, STALE-BYTECODE BINDING AND LOCAL-FAILURE
+CLASSIFICATION. NO REAL KEYCHAIN, PROVIDER OR SEC ACCESS BY THE REVIEW. SEVEN P2
+FINDINGS REMAIN OPEN AND FAIL CLOSED. V1 AND THE FOUR V3 CUSTODY FILES ARE FROZEN;
+STRICT D23 RETAINS SEVEN NON-EXACT QUARTERS. NOT BACKTEST-READY (152.1, 154.6,
+193). CODEX COUNTER-REVIEWS THE EIGHT CLAUDE COMMITS. BOTH FINAL ACCESS
+CLASSIFICATIONS STAND WITHOUT RETROACTIVE APPROVAL. NO NEW SEC/PROVIDER/
+CREDENTIAL/LICENSED-ROW, OUTCOME, QC, BACKTEST, BROKER, CAPITAL, ORDER,
+PAPER/LIVE, DEPLOYMENT OR TRADING AUTHORITY. LOOKS 0/0/0.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -276,6 +258,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-13 | Codex continued implementation | Counter-review `c666ebee` -> this bounded implementation; exact hash follows in final handoff | Delegated macOS/POSIX custody support and unsupported Windows collection accounting | Named IBWIN-CR01 guards precede custody imports in exactly16 affected tests; new real-child guard regression preserves supported-host collection and independent QC checkout. No production/shared edits or Windows port. | Author480 affected passes55.77s, no skips; internal peer33 passes4.72s and in-memory guard deletion caught;17 tests compile; historical custody blobs unchanged. All tests OS process-tree network-denied. | IBWIN-CR01 CLOSED at documented support/collection scope. Four topical and two shared P2s remain OPEN; no actual Windows custody validation. | Continue source qualification under current factual gates; no checkpoint push, monitor stays PAUSED. |
 | 2026-10-13 | Codex continued implementation / pre-request qualification | Platform milestone `e6f5fb5179db696723bd5cfaaa024c70122a59e1` -> this candidate; actual execution hash follows after commit | Single public EODHD reportDate-field feasibility profile | Two new lane files implement exact one-field/public-demo GET, global one-shot reservation, clean committed source identity and immutable private journals; strict scalar schema and14false authority/readiness flags. Section162 preregisters the only intended request. | Author116 passed0.66s; internal peer116 passed0.61s; main305 passed19.40s before explicit test platform guard, then167 passed2.20s on final test bytes; seven prelaunch red controls prove custody/count corrections. OS-denied tests only. | IBEOD-DEMO-R01 P2 andR02 P3 closed before launch; explicit POSIX test treatment added. No observed supplier response yet; six carried P2s remain OPEN. | Commit clean candidate before one actual bounded request; independently verify private result. No retry, broader fetch, readiness claim or checkpoint push. |
 | 2026-10-13 | Codex observed qualification / separate local handoff | `c666ebeea66c15af6a0237b108a276b96e86615d`, `e6f5fb5179db696723bd5cfaaa024c70122a59e1`, `583569680db4273c6b6a5012926b0dd43e3037ec` -> this separate handoff | One actual public EODHD date-field probe; precise factual-input stop before lane readiness | Executed once from clean58356968 under fixed public-demo profile:HTTP200/12bytes,2006 date-field observed. Independent network/write/fork-denied journal/source reread reconstructs result,14false flags and exact execution HEAD. No archive/canonical promotion. | Complete SHA e032a6e127eb189298deab923b13d18093930b8e99ad446ae7a2f4d8dee5342d; response SHA ec680bd926a0d0661b11ec5021a9f127557fc1234fb15a84f26f23cfbd42f569; final document/package checks follow. | Incoming85c7755d accepted; platform support gap closed at scope; two prelaunch demo findings closed; four topical and two shared P2s open. Owner confirms no alternative archive/account. | Need qualified full-cohort historical release archive/account and historical identity/PIT/source inputs. Recommend bounded EODHDCalendar qualification first, then Zacks/WSH if required. Record locally, no checkpoint push; monitor PAUSED. |
+| 2026-10-14 | Claude review (macOS session) and owner-directed corrections | `84367fc8` -> `5c29b437`, `afceee4e`, `69530b09`, `23893727`, `104ed76b`, `36377f70`, `51ff264c` -> this review record | Independent review of sections 160-193 (`85c7755d..84367fc8`, 27 commits, 0 merges, 29 modules and 32 test files) | Read every section; four read-only agents read the module groups and every finding was verified here before acceptance. Diagnosed both late real-run refusals (ctime drift on fresh leaves under ~/Documents, from the leaves' own stat and a direct probe). Fixed, with tests red on the pushed code: default-temp test failures, the Sharadar fixture fence, capture spacing and observed-mode pins, the final-hold drift and diagnostics, older EODHD fixture guards and failure codes, Benzinga echo screening and Keychain reader, untyped escapes, cleanup masking, stale bytecode, local-failure classification, trailing blank lines. Keychain probe found no real read; tripwire scan 36 tests, 0 offenders. | Final tree, network and Keychain exec denied: 34 files **1,811 passed**; compileall and this round's diff check clean. Complete suite not run, by owner instruction (an earlier start was stopped at 36 % with 0 failures). Record tests 71 passed. **0 looks**. | `IBHOLD-CR01`, `IBTEST-CR06`, `IBSHAR-CR01`, `IBCAP1-CR01` P2 closed; ten P3 closed; `IBEOD-CR03` P3 open; `IBSH-OBS03` shared; `IBSELECT-OBS-01` cause established. Four topical P2 and two shared P2 open. No open P0 or P1. | Codex counter-reviews the eight Claude commits. Selector or title reruns need a new registered front. The lane is not backtest-ready. No outcome, QC, paper, or trading step is inferred. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -27153,3 +27136,264 @@ Post-wording record/active-document/EXACT selection72 passed1.22 seconds.
 Immediate pre-handoff verification again found exact designated root/branch,
 HEADf7759b789974a5828ec53ef16bb97b76ab7c3028, only this lane record modified,
 diff clean and matching origin exactf89d2437a6d3d6c91c3ea8f62311afe386612912.
+
+## 194. Claude review - sections 160-193 and the continuous-build corrections (2026-10-14 UTC)
+
+Reviewer: Claude, the macOS lane session, in the lane worktree
+`trading_agent__insider_buying` on `codex/strategy-insider-buying`. No branch,
+worktree, fork, or handoff was created or switched to. After `git fetch`,
+local and remote were both `84367fc8` and the tree was clean; the remote
+stayed there for the whole review.
+
+Range: `85c7755d..84367fc8`, **27 Codex commits, 0 merges**. It adds 29
+research modules and 32 test files, adds a collection guard to 16 existing
+test files, and changes this record. No existing production module was
+modified; the four custody files still equal their `aa0d635` blobs.
+
+Owner instructions for this round, in order: review all unreviewed commits;
+do not run the full lane suite; fix the errors found along the way; push
+once when review and correction are done. A complete suite started before
+the second instruction was stopped at 36 % (5,582 passed, 1 skipped, 0
+failed in the portion run); no complete suite result is claimed.
+
+Authority recorded by Codex and not witnessed here: the owner's purchase of
+EODHD Calendar access and its token rotation (164.1), the owner's Keychain
+item names (169), the continuous-build direction, "push for now" (191) and
+"just proceed to the next checkpoint and push" (193). Codex records these
+external operations in the range: one public EODHD demo request (163), one
+paid Calendar request (166), the EODHD archive campaign and continuations
+(168-176), one Massive/Benzinga request refused HTTP 403 (183), 64 new SEC
+2006Q1 original-parent requests, 419,628 retained bytes (179), and Safari
+use of the owned QC project, where only an automatic cloud build ran and the
+SDK one-shot scope was prepared and consumed locally without a paste or a
+hosted invocation (189-190). Codex also records that a Dashboard output once
+displayed an EODHD token, which the owner rotated (IBEOD-UI-164-01). No new
+authority follows from this section.
+
+### 194.1 How the range was reviewed
+
+Every section 160-193 was read for authority, operations and claims. Four
+read-only review agents (no execution allowed) read the new modules in four
+groups: the SEC 2006Q1 parent chain, the EODHD chain, the Benzinga, Sharadar
+and QC SDK modules, and the offline assessment and selector runners. Every
+finding they reported was checked by this reviewer against the code before
+it was accepted, and each correction below was proved red on the pushed code
+and green after. All tests and mutants ran on Python 3.13.15 under an OS
+sandbox denying all network access and exec of `/usr/bin/security`, so no
+test could reach a provider, the SEC or the owner's Keychain.
+
+- **Keychain probe:** all 48 changed test files ran with a probe that records
+  and refuses any real `/usr/bin/security` exec: **no real Keychain read**.
+- **Connection tripwire:** the real scan over the 128 lane test files on the
+  pushed tree finds 36 direct transport tests and **0 offenders**; on the final
+  tree, 128 files, 39 transport tests, **0 offenders**.
+- **Private custody:** every new namespace under `artifacts/insider_buying` is
+  git-ignored, directories 0700 and files 0600; nothing under `artifacts/` was
+  added to Git. No owner contact address occurs in any private artifact or in
+  any lane file. The 64 email-shaped strings in the 2006Q1 raw bodies are
+  `@www.sec.gov` addresses inside the SEC filings themselves.
+
+### 194.2 Commit dispositions
+
+| Commits | Change | Claude disposition |
+|---|---|---|
+| `c666ebee` | Section 160 (counter-review of 159) | **Accepted.** |
+| `e6f5fb51` | Custody support scope, 16 collection guards | **Accepted.** `IBWIN-CR01` closed at the support-decision scope Codex states. |
+| `58356968`, `019dca79` | EODHD public demo and its observed result | **Accepted.** |
+| `fedf07eb`, `86c0ae96` | Paid Calendar qualification, issuer inventory | **Accepted.** |
+| `7b650d04` | EODHD archive campaign | **Accepted after correction in `69530b09`** (`IBEOD-CR01`). |
+| `c376b953` | Section 168 | **Accepted.** |
+| `553faa37` | Continuation 1, cohort assessment and runner, Sharadar qualification | **Accepted after correction** in `5c29b437` (`IBSHAR-CR01`), `69530b09` (`IBEOD-CR01`), `104ed76b` (`IBARCH-CR01`) and `36377f70` (`IBARCH-CR02`). |
+| `6849dec5` | Continuation 3, Sharadar cohort runner | **Accepted after correction in `69530b09`** (`IBEOD-CR01`). |
+| `6ddbced3` | Continuation 4 | **Accepted after correction in `69530b09`** (`IBEOD-CR01`, `IBEOD-CR02`). |
+| `de9f54f7` | Continuation 5 and its inputs | **Accepted after correction in `69530b09`** (`IBEOD-CR02`). |
+| `6314f5ac`, `ebbee102`, `6684e30e`, `d2d194a5` | 2006Q1 bootstrap, capture, projection | **Accepted after correction** in `5c29b437` (`IBCAP1-CR01`) and `36377f70` (`IBCAP1-CR02`). |
+| `5978156f` | Benzinga gap capture | **Accepted after correction in `23893727`** (`IBBZ-CR01`, `IBBZ-CR02`). |
+| `c1ccbc60`, `45fc6e9a` | Typed legacy custody, verifier framing | **Accepted.** |
+| `fc0b1072` | Source-view contract, QC SDK images | **Accepted after correction in `5c29b437`** (`IBTEST-CR06`) and `51ff264c` (`IBHYG-CR01`). |
+| `0b55707f`, `3d52635b` | PEM source-view runner and its observed run | **Accepted after correction** in `5c29b437` (`IBTEST-CR06`) and `104ed76b` (`IBPEM-CR01`). |
+| `acf66a7c`, `efe781a0` | Title/current-reference integration | **Accepted after correction** in `afceee4e` (`IBHOLD-CR01`, `IBDIAG-CR01`) and `104ed76b` (`IBTITLE-CR01`). |
+| `f89d2437` | Section 191 checkpoint | **Accepted.** |
+| `f7759b78`, `84367fc8` | Affected-quarter selector and its observed refusal | **Accepted after correction in `afceee4e`**; `IBSELECT-OBS-01` is diagnosed (194.3). |
+
+Rating of this round: **6 of 10.** The engineering is careful and every
+refusal is preserved honestly, but the round shipped two real-run failures
+whose cause was environmental and diagnosable, 36 tests that fail under the
+standard macOS pytest temp location, an unfenced fixture path that could
+burn a live one-shot scope, and several acquisition guards without an
+isolating test.
+
+### 194.3 The two late refusals: cause established and fixed
+
+**`IBHOLD-CR01` (P2, closed in `afceee4e`).** Both the selector run (193) and
+the title run (188) refused at the final held-output recheck. The retained
+leaves show why: `complete.json` and `selection.json` have ctime 4.62 s and
+2.87 s after mtime, and `readonly-verification.json` 3.63 s, all with flag
+`0x40` (UF_TRACKED). A fresh file under `~/Documents` was measured here: its
+ctime changed 0.26 s after creation and it gained `0x40`, with mtime
+unchanged; the same probe under `/private/tmp` showed no change. The runners
+took their hold right after publishing, spent about 5 s on input and source
+rechecks, and then compared the full version tuple, which includes ctime.
+The two final publication holds now use a settled version: every field of
+the old tuple except ctime, plus the owner, with the content rehash kept.
+Inode, mode, link count, size, mtime, inventory and bytes are still enforced.
+A ctime-only update (same-mode `chmod`) now passes; content, mode,
+replacement and hard-link changes still refuse.
+
+**`IBDIAG-CR01` (P3, closed in `afceee4e`).** Both runners' diagnostics
+reported every lane refusal class as `ValueError`, which is why the cause
+was not visible. They now name the lane error classes; the fixed refusal
+code is still not carried, by the existing schema.
+
+`IBSELECT-OBS-01` therefore has an established cause. Its failed run stays
+preserved and unpromoted; a rerun needs Codex's own new-front registration.
+
+### 194.4 Other corrections
+
+- **`IBTEST-CR06` (P2, closed in `5c29b437`).** Under the standard
+  `python -m pytest` on macOS, 36 new tests failed: the QC SDK supervisor
+  admits fixture roots only under `/tmp`, while pytest's default `tmp_path` is
+  under `$TMPDIR`, and one PEM-runner case built its case alias from a
+  `/private/tmp` literal. Codex's runs always set a private basetemp. The
+  supervisor's captured bytes are frozen, so the tests now supply a 0700 root
+  under `/tmp`, and the alias is built from the trusted temporary prefix.
+- **`IBSHAR-CR01` (P2, closed in `5c29b437`).** The unexecuted Sharadar
+  qualification counted any injected seam as a fixture run but never checked
+  the root: a fixture call with the default root would create the real
+  namespace and consume its one-shot latch, and the real Keychain reader or
+  transport could be handed to injected code. Both now refuse first.
+- **`IBCAP1-CR01` (P2, closed in `5c29b437`, tests only).** The 2006Q1
+  capture's completion-spacing sleep and check had no test that could fail:
+  the shared test clock always advanced by exactly the minimum interval.
+  Deleting the sleep, deleting the check, or sleeping in milliseconds all
+  passed. Two tests now pin them, and a third pins the observed-mode
+  root/transport clause.
+- **`IBEOD-CR01` (P3, closed in `69530b09`).** Only continuation 5 refused a
+  fixture transport aimed at the lane root. The campaign and continuations
+  1, 3 and 4 now refuse it too, so a misdirected fixture run cannot write
+  fixture scopes into real registries that later versions pin.
+- **`IBEOD-CR02` (P3, closed in `69530b09`).** Continuations 4 and 5
+  relabelled their own late refusals, including
+  `completed_or_ambiguous_window_cannot_repeat`, as `unclassified_failure`.
+  Their failure journals now keep the module's own fixed codes.
+- **`IBBZ-CR01` (P3, closed in `23893727`).** A 200 body echoing the key
+  percent- or plus-encoded passed the screens and was retained, and an echo
+  found only during projection was retained as a quarantined body. Both now
+  refuse without retention. The route itself can no longer run (its URLs are
+  claimed), so this protects any reuse.
+- **`IBBZ-CR02` (P3, closed in `23893727`).** The module's private Keychain
+  copy buffered unbounded output with no process-group cleanup. It now uses
+  the shared bounded reader, and its transport has direct TLS, proxy,
+  redirect and origin tests.
+- **`IBARCH-CR01`, `IBTITLE-CR01` (P3, closed in `104ed76b`).** Malformed but
+  correctly pinned partial-campaign and title-completion JSON escaped as
+  `AttributeError` or `KeyError`; they now refuse with the lane's typed
+  errors.
+- **`IBPEM-CR01` (P3, closed in `104ed76b`).** The PEM runner's cleanup loops
+  stopped at the first failing close and replaced the primary refusal.
+- **`IBARCH-CR02` (P3, closed in `36377f70`).** `-B` stops bytecode writes,
+  not reads. The test shows a forged `__pycache__` entry loaded under `-B`
+  alone; the worker now uses a no-bytecode cache prefix.
+- **`IBCAP1-CR02` (P3, closed in `36377f70`).** A local body-retention
+  failure, such as a full disk, was recorded as a source-side refusal of an
+  HTTP-200 response. It now escapes, as in the v4 reference capture.
+- **`IBHYG-CR01` (P3, closed in `51ff264c` for 10 of 13 files).** `git diff
+  --check` flagged a trailing blank line in 17 new files; Codex's check ran
+  before they were tracked. Four were fixed by the edits above and ten in
+  `51ff264c`. The three QC SDK sources keep their bytes, because the consumed
+  SDK scope's completion requires them to equal its captured images.
+
+Every correction's new tests fail on the pushed code: 36 temp-location
+failures; 5 Sharadar; 3 spacing and 1 observed-mode mutant survivals; 4
+late-refusal; 16 EODHD; 9 Benzinga; 3 cohort, 2 title and 2 PEM-cleanup;
+1 retention and 1 bytecode. No real artifact or namespace was touched by a
+red run; the Sharadar real namespace is still absent.
+
+### 194.5 Findings recorded, not fixed
+
+- **`IBEOD-CR03` (P3, open).** Each EODHD version's no-repeat fence is its
+  own git-ignored registry. If that registry is lost while the token file
+  remains, the real path could send already-attempted windows again, and no
+  version reads its successors' registries. Recommendation: commit a
+  retirement guard for spent real paths. Not done here, because retiring
+  entry points is a policy choice for Codex and the owner.
+- **`IBCAP1-OBS01` (observation).** The 2006Q1 verifier requires the capture
+  namespace to equal its reservation-time inventory plus its own run, so any
+  later run there makes the initial64 replays refuse. Separately, the
+  bootstrap does not yet inventory this namespace, and simply adding it would
+  deadlock on the capture lock. Both fail closed. They belong to the
+  successor-batch design the record already defers.
+- **`IBEOD-OBS01` (observation).** The v4/v5 overlap fence is masked in the
+  reachable fixture flow: a second run refuses earlier, at the
+  previous-anchor preflight.
+- **`IBQCSDK-OBS01` (observation).** The supervisor admits only `/tmp`
+  fixture roots while the PEM fence uses `tempfile.gettempdir()`. The
+  supervisor bytes are frozen with the SDK scope.
+- **`IBDUR-OBS01` (observation, lane-wide).** On macOS `fsync` is not a full
+  durability barrier (`F_FULLFSYNC`). A power loss after dispatch could lose
+  a fsynced start.
+- **`IBPRIV-OBS01` (observation).** Two pre-existing directories are 0755:
+  `qc_native_access/` with its run directory, and the `sec_recovery_v4_reconciliation/`
+  parent. Their files are 0600.
+- **`IBSH-OBS03` (P3, shared/out of lane).** The owner's email address is
+  hard-coded in the shared `data/pit_universe.py` since `046afc3e` on `main`.
+  Out of lane; recorded for integration.
+- **`IBSH-CR02`** now also names `clr` among the undeclared hosted imports;
+  the two SEP-2 guards still fail on that manifest only.
+
+### 194.6 Validation
+
+- Pushed `84367fc8`: the 48 changed test files under the Keychain probe; the
+  only failures were the 36 temp-location ones above.
+- Final tree: every changed test file plus the lane gate (34 files):
+  **1,811 passed**, network and Keychain exec denied, default pytest temp.
+  `compileall` of every changed file and `git diff --check 84367fc8..HEAD`
+  are clean. The two SEP-2 guards still fail as `IBSH-CR02` records.
+- Complete suite: **not run**, by the owner's instruction.
+- Record tests after this section: **71 passed**, network denied, after the final wording.
+
+### 194.7 Retained P0-P3 finding ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IBHOLD-CR01 | P2 | **CLOSED in `afceee4e`** | `acf66a7c`, `f7759b78` | Selector and title final holds | ctime drift under ~/Documents refused two real runs. | 194.3 stat evidence and probe. | Diagnosed environmental cause. | Settled version plus content rehash. | 4 tests red on pushed, green after. |
+| IBTEST-CR06 | P2 | **CLOSED in `5c29b437`** | `fc0b1072`, `0b55707f` | QC SDK and PEM runner tests | 36 failures under default macOS pytest temp. | 194.4. | Standard validation must pass. | Test-supplied /tmp roots; prefix-based alias. | 130 pass both ways. |
+| IBSHAR-CR01 | P2 | **CLOSED in `5c29b437`** | `553faa37` | Sharadar qualification | Fixture run could consume the live scope or read the real key. | 194.4. | Protect an unexecuted one-shot. | Root and real-callback fences. | 5 red on pushed; 2 mutants caught. |
+| IBCAP1-CR01 | P2 | **CLOSED in `5c29b437`** (tests) | `6314f5ac` | 2006Q1 capture tests | Spacing and observed-mode guards untested. | Mutants S1-S3, O1 survived. | Acquisition guards need isolating tests. | Three pins. | All four mutants caught after. |
+| IBDIAG-CR01 | P3 | **CLOSED in `afceee4e`** | `acf66a7c`, `f7759b78` | Runner diagnostics | Lane refusals collapsed to ValueError. | 194.3. | Diagnosis needs the class. | Named lane classes. | Red/green tests. |
+| IBEOD-CR01, IBEOD-CR02 | P3 | **CLOSED in `69530b09`** | `7b650d04`, `553faa37`, `6849dec5`, `6ddbced3`, `de9f54f7` | EODHD versions | Missing fixture-root guard; own codes relabelled. | 194.4. | Protect retained registries; keep diagnostics. | Guard; whitelist. | 16 red on pushed. |
+| IBBZ-CR01, IBBZ-CR02 | P3 | **CLOSED in `23893727`** | `5978156f` | Benzinga gap capture | Encoded echoes retained; private Keychain copy; transport untested. | 194.4. | Never retain a key. | Screens, shared reader, tests. | 9 red on pushed. |
+| IBARCH-CR01, IBTITLE-CR01, IBPEM-CR01 | P3 | **CLOSED in `104ed76b`** | `553faa37`, `acf66a7c`, `0b55707f` | Offline paths | Untyped escapes; cleanup masking. | 194.4. | Typed fail-closed refusals. | Wrappers, guards, close-all. | 7 red on pushed. |
+| IBARCH-CR02, IBCAP1-CR02 | P3 | **CLOSED in `36377f70`** | `553faa37`, `6314f5ac` | Archive worker; capture | Stale bytecode could run; local failure recorded as source refusal. | 194.4. | Bind executed source; honest dispositions. | Cache prefix; escape. | 2 red on pushed. |
+| IBHYG-CR01 | P3 | **CLOSED for 14 of 17 (4 in earlier edits, 10 in `51ff264c`); 3 retained** | `fc0b1072` and others | 17 new files | Trailing blank lines. | git diff --check. | Hygiene. | Stripped except the frozen SDK images. | Diff check clean this round. |
+| IBEOD-CR03 | P3 | **OPEN** | EODHD versions | Local registries | Registry loss could allow repeat paid requests. | 194.5. | Policy choice. | None here. | None. |
+| IBCAP1-OBS01, IBEOD-OBS01, IBQCSDK-OBS01, IBDUR-OBS01, IBPRIV-OBS01 | observation | **Recorded** | various | various | 194.5. | 194.5. | Design or frozen. | None. | None. |
+| IBSELECT-OBS-01 | P2 | **Cause established; fixed prospectively in `afceee4e`** | `f7759b78` | Selector run | Late refusal. | 194.3. | Preserved, not promoted. | Settled hold. | 194.3. |
+| IBWIN-CR01 | P2 | **Closed at support scope (Codex, 161); accepted** | `e6f5fb51` | Custody platform | As 161 states. | Guards pass in the gate. | Owner-delegated support decision. | None. | Gate. |
+| IB1C-REAL-CR01, IB1BCAMP-CR01, IBSRC-CR01, IBSRC-CCR01 | P2 | **OPEN, retained** | earlier | Sections 119-193 | Unchanged. | Sections 152.1, 154.6, 193. | Unchanged; all fail closed. | None. | None new. |
+| IBSH-CR02, IBQC-SHARED-META01 | P2, shared/out of lane | **OPEN, retained** | earlier | Shared manifest; shared QC client | IBSH-CR02 now also names `clr`. | 190.3, 194.5. | Out of lane. | None here. | Two guards fail on 3.13. |
+| IBSH-OBS03 | P3, shared/out of lane | **Recorded** | `046afc3e` (main) | `data/pit_universe.py` | Owner email in a shared module. | 194.5. | Out of lane. | None here. | None. |
+| Codex's R-series findings of 160-193 and every earlier entry | as recorded | **Retained as recorded** | range | range | Unchanged. | Sections 160-193. | Unchanged. | None. | None new. |
+| IBREV-CR01 | P1, process | **Retained closed by owner disposition** | `01a6b7e` | Sections 123-126 | Unchanged. | Sections 124-126. | Owner decision, not witnessed. | None. | None new. |
+
+There is no open P0 or P1 finding. Seven P2 findings remain open (the four
+topical ones, `IBSELECT-OBS-01` until a new front runs, and the two shared
+ones); all fail closed.
+
+### 194.8 Next action
+
+Codex counter-reviews `5c29b437`, `afceee4e`, `69530b09`, `23893727`,
+`104ed76b`, `36377f70`, `51ff264c` and this record. Any rerun of the
+selector or title operation needs a new registered front; the fixes here do
+not reopen the spent ones. The lane is not backtest-ready for the reasons
+sections 152.1, 154.6 and 193 state. No outcome, ETF, QC, paper, live,
+deployment, broker, capital, order, or trading authority follows from this
+section.
+
+No SEC, provider or Keychain access was made by this review: every test and
+mutant ran with network and `/usr/bin/security` exec denied, and the review
+agents executed nothing. No credential, licensed row, QuantConnect, broker,
+operator database, scheduler, deployment, capital, order, live, or trading
+surface was used. Private artifacts were read for metadata (modes,
+ownership, hashes, email-shaped counts) only. Authorized outcome looks:
+**0**. Consumed outcome looks: **0**. Research looks: **0**.

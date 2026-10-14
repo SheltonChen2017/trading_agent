@@ -48493,3 +48493,138 @@ denial and its155-test subset passed8.83s. All8 changed Python files compile
 in memory without bytecode; all51 frozen source pins match and
 `assistant.dispatch_fence` is absent. No further production artifact read,
 write or service access occurred in these corrected validations.
+
+### 298.3 Material V2 boundary; old evidence and economics unchanged
+
+Commit `94a7bb36856167199c914aa6abd926f29e42e2a3` preserves the entire
+initial implementation, the accidental V1 use, corrected isolation tests
+and the incident disposition. No push occurred at that intermediate commit.
+V1 helper/caller bytes and its consumed outputs remain frozen. The continuation
+helper/caller had not been invoked; they are updated prospectively to accept
+only V2 admission, never the accidental V1 record.
+
+The V2 helper independently checks actual Darwin/POSIX Python3.13 at the
+designated interpreter, exact designated root/cwd/branch, actual clean HEAD,
+fixed caller source digest and helper/caller equality to committed HEAD blobs,
+and selected original51/V1/D8/D9 pins **before Directory/claim access**.
+Execution inside pytest is additionally refused; that is defense in depth,
+not an authorization flag. Both claim and recovery require the boundary.
+Unit seams cannot supply a production-shaped plan/HEAD to bypass the real
+host check accidentally. Tests additionally deny production artifacts at
+the native OS boundary, use synthetic controls and dual import bindings,
+and retain teardown detection of swallowed guard failures.
+
+After its own exclusive claim/start, and before retained source/private
+payload/credential/request use, V2 authenticates only the known V1 claim,
+start and externally pinned935-byte refusal with their exact synthetic
+head/caller and empty request/coverage lists. The profile/report bind that
+incident pin. It does not rerun a V1 entrypoint, manufacture real provenance
+from fixture values or census unrelated controls. Failure or ambiguity
+consumes the new claim and stops; no unchanged retry follows. Its bounded
+post-upgrade reconciliation preserves the same fixed family/input/inventory,
+exact prefix/endpoints, finite request evidence, source checks and publication
+ordering described in298.1. This is a prospective correction of the demonstrated
+missing control boundary, not retroactive validation of V1 or D7/D9.
+
+Actual successful exit and its returned externally pinned V2 admission are
+still mandatory before any separately frozen capacity/begin/compile/launch/
+status/result/summarize action. All old controls and false flags remain;
+no strategy attempt, outcome or ledger increment occurs during implementation.
+
+### 298.4 Final focused validation and exact V2 one-shot decision
+
+Root's final six-file selection: **406 distinct passes in10.51s**, no failures,
+skips or warnings:153 V2 helper +35 V2 caller +53 continuation +79 continuation
+caller +86 record/active-document. Native network denial and native read/write
+denial of the entire production `artifacts` tree were simultaneous; pytest
+used `--ignore=artifacts`, `--noconftest`, disabled plugin autoload, `-B`, no
+cache provider and in-root temp/cache/log support. Initial147/153 helper,
+35 caller,118/132 continuation and earlier V1 selections overlap, not additive.
+No complete suite ran. Two V2 memory-only omissions caught one expected
+failure each: missing claim runtime gate/.19s and missing claim incident
+authentication/.06s, with finally restoration and unchanged file hashes.
+The35 caller selection previously passed5.02s;132 continuation passed10.66s.
+Preserve298.2's actual incident and the collection/document failures; these
+later passes do not erase them. Same-round advice is not independent review.
+
+Source-only inspection confirms the publication/list/property implementation
+is unchanged from V1 apart from V2 names, mandatory runtime/source proof and
+prior-refusal evidence. The uninvoked continuation changes only its admission
+import to V2 and finite helper-error preservation after verified import. Both
+callers now retain approved helper refusal categories rather than collapsing
+the new gate failures to an unknown label; no error-path import, raw exception
+or private detail is emitted. All selected immutable pins reproduce,10 related
+source/test files compile in memory without bytecode, and dispatch_fence is
+absent. Selected pins/HEAD blobs are not whole-interpreter or continuous
+same-user integrity. Native tests do not measure remote contact accounting.
+
+| Component | Final SHA-256 |
+|---|---|
+| `scripts/arv2_newrule_storage_recovery_v2.py` | `02d40ea52084111cf6a04c6ffad629df0bb9008890133e16ef5b2a8f7b4406e9` |
+| V2 helper tests | `895839d4a85113102da0abd174b3c6a591da7651e26494c07294127d8258de39` |
+| `scripts/run_arv2_newrule_storage_recovery_v2.py` | `e9ebb920b9cde45c43cf1edb2c9a21bc9eda1fbd613bd8d35d8212f90e78f86b` |
+| V2 caller tests | `24162e4b7b171c0735ba8e95428f8f3063de5f170500e83109d850dd16b2b32c` |
+| `scripts/arv2_newrule_recovery_continuation.py` | `18603380974b8bc7e7ca3d896d3649dae072b4faa7a500c5592dcb5a940b1a49` |
+| Continuation tests | `c804152d8e45956f5960dc4cddb76d24bf4646ae39c9478640a655c334cfe954` |
+| `scripts/run_arv2_newrule_recovery_continuation.py` | `267f08ec00f3bd3473c7bf5fee580acf1cac64547bd3762da7ec8711e312e3f7` |
+| Continuation caller tests | `4cbd90ddef4274d46921f01fbaf37b3145c3f9248de7e863c3dc69a2534891b3` |
+
+Canonical V2 helper profile:
+`21dec8243021cea476806a2a3c759e3940af741c0746bf4b3868dce580f6aef9`;
+V2 caller profile:
+`be4c05843a0f92117e356fe09bd71f4d88ebd99ee0f69f69f551f2aa7e923bcb`;
+continuation caller profile:
+`2da85cb4fe322deea6d96bfd99bb2e0ad87f6932c4d3eaae4e79a66be219eea7`.
+V1/D8/D9 sources, original51 pins, five prepared runtime sources and exact
+package/lineage/family/inventory remain at their297/298.2 pins, unchanged.
+
+**ARV2OD298-A, exercised prospective decision under255.2/current owner
+review waiver:** after this exact commit is clean on the designated root and
+branch, invoke the fixed V2 caller **once**, using that actual40-hex HEAD and
+the caller hash above as CLI bindings. Use only
+`/Users/sheltonchen/.venvs/trading_agent-py313/bin/python -B`, same-root temp,
+cache and bytecode prefixes; no inline callback, bare adapter or old V1 call.
+The500s parent alarm covers preflight, claim, input authentication, recovery
+and final output. Uninterruptible I/O/host suspension remain limitations.
+Native network denial is removed only for this exact fixed QC operation;
+no source-provider, account setting, plan/payment or node/strategy call is in
+its scope. Live matching remote was still c555fb9d before this freeze.
+
+Fixed control root is
+`artifacts/analyst_revisions_v2/newrule_comparison_qc/R298-R303-20261013`;
+new outputs are only `storage-recovery-v2-claim.json`, `-start.json`,
+`-request-NN-intent.json`, `-request-NN-observed.json`, `-report.json` and,
+conditionally, `-admission.json`. Claim is exclusive/consumed even if no
+request occurs; no inspection/pre-allocation of V2 outputs preceded this
+decision. Claim authenticates the exact accidental V1 evidence before
+returning for input loading; recovery reauthenticates it after its start and
+admission consumers reauthenticate it as evidence binding, never invoking
+the spent V1 operation. The original failed upload-valid marker is not created.
+
+One exact-prefix complete list, existing-properties-before-writes, missing
+objects only and activation-last publication are bounded to13 attempted
+requests under298.1. A partial list, unknown refusal, conflict, malformed
+response, HTTP error or transport/publication ambiguity is terminal, never
+absence or permission to retry. Preserve every old/new output. Record only
+the finite caller envelope, actual exit, timestamps and report/receipt pins;
+do not perform an opportunistic control census, private response read or
+separate spent reader. Actual exit0 **and** matching successful authenticated
+output are required. Nonzero/unknown actual exit remains inadmissible even
+if a positive-looking report/receipt exists.
+
+This decision does **not** authorize capacity/begin/compile/launch/result:
+if recovery succeeds, first commit its actual result and externally supplied
+receipt pin with a separate exact continuation freeze. Otherwise record the
+failure and pursue only a materially justified in-scope recovery or concrete
+external input; never reset this claim. Booked314/239/50/699 and all false
+formal/PIT/paper flags remain. Exactly one successful final lane push remains
+reserved for the conclusion of this continuous round, not this run freeze.
+
+Before commit, the staged diff check caught one extra blank EOF line in each
+new V2 helper/caller/test file that the unstaged check had not covered while
+those files were untracked. Commit did not occur. Only those four blank lines
+were removed and dependent source/profile pins updated prospectively in the
+table above. No old source changed and no operation occurred. The86-test
+record repeat before that formatting correction passed2.95s, not additive.
+The final formatted/pin-bound406-test selection then passed in9.91s under
+the same native network/artifact denial. This repeats, not adds to406.

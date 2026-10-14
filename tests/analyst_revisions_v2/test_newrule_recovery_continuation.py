@@ -268,6 +268,13 @@ def test_module_has_no_global_patch_legacy_receipt_write_or_dynamic_code():
     assert "assistant.dispatch_fence" not in sys.modules
 
 
+def test_continuation_binds_only_the_separately_versioned_v2_admission():
+    assert c.recovery.__name__ == "scripts.arv2_newrule_storage_recovery_v2"
+    imports=[node for node in ast.walk(ast.parse(inspect.getsource(c))) if isinstance(node,ast.ImportFrom)]
+    selected=[alias.name for node in imports if node.module == "scripts" for alias in node.names]
+    assert selected == ["arv2_newrule_storage_recovery_v2"]
+
+
 @pytest.mark.parametrize("boundary", ["directory_alias", "client_alias", "opener", "socket", "input_loader"])
 def test_independent_guards_block_production_stale_aliases(operational_guards, boundary):
     calls = {

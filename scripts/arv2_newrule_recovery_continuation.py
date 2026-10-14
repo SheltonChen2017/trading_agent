@@ -1,9 +1,10 @@
-"""Additive six-cell continuation after separately admitted storage recovery.
+"""Additive six-cell continuation after separately admitted V2 storage recovery.
 
 The frozen upload and its legacy receipt remain untouched. Capacity and begin
 retain their original bodies except that the new receipt is authenticated in
 place of `_uploaded`. Other lifecycle methods are delegated only after the
-same admission check. No global patch, invented upload-valid receipt, altered
+same V2 admission check; the spent V1 recovery supplies no continuation proof.
+No global patch, invented upload-valid receipt, altered
 candidate, reset attempt, changed projection, or automatic retry is involved.
 
 Successful actual recovery exit is an external observed prerequisite: the
@@ -14,7 +15,7 @@ response/ambiguity limitations remain unchanged.
 from __future__ import annotations
 
 from research.analyst_revisions_v2_qc import newrule_comparison_submission as old
-from scripts import arv2_newrule_storage_recovery as recovery
+from scripts import arv2_newrule_storage_recovery_v2 as recovery
 
 SCHEMA = "arv2-newrule-storage-recovery-continuation-v1"
 FROZEN_SUBMISSION_SHA256 = "cfd2456f2835bb1a4d2c04d6bb60a633b537a2af276a478ad3bfa5f2bc348d4f"

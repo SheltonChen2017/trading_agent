@@ -5,6 +5,7 @@ import hashlib
 import json
 import sys
 import time
+from contextlib import contextmanager
 from types import SimpleNamespace
 
 import pytest
@@ -13,14 +14,20 @@ import scripts as scripts_package
 import research.analyst_revisions_v2_qc as qc_package
 from scripts import run_arv2_newrule_recovery_continuation as d
 from scripts import arv2_newrule_recovery_continuation as continuation
-from scripts import arv2_newrule_storage_recovery as recovery
+from scripts import arv2_newrule_storage_recovery as spent_recovery
+from scripts import arv2_newrule_storage_recovery_v2 as recovery
 from research.analyst_revisions_v2_qc import newrule_comparison_submission as submission
 
 HEAD, SHA, RECEIPT = "a"*40, "b"*64, "c"*64
 REAL_OPERATION = d._operation
+REAL_DISPATCH = continuation.dispatch
+REAL_CAPACITY = continuation.capacity_once
+REAL_BEGIN = continuation.begin_attempt
 REAL_DIRECTORY = submission._Directory
 NEW_NAMES = {
     "scripts/arv2_newrule_storage_recovery.py",
+    "scripts/run_arv2_newrule_storage_recovery.py",
+    "scripts/arv2_newrule_storage_recovery_v2.py",
     "scripts/arv2_newrule_recovery_continuation.py",
     "scripts/diagnose_arv2_newrule_upload.py",
     "scripts/diagnose_arv2_newrule_object_metadata.py",
@@ -50,7 +57,8 @@ def no_operations(monkeypatch):
     # All patches are fixture-scoped and restored by monkeypatch teardown.
     for package,name,module in (
         (scripts_package,"arv2_newrule_recovery_continuation",continuation),
-        (scripts_package,"arv2_newrule_storage_recovery",recovery),
+        (scripts_package,"arv2_newrule_storage_recovery",spent_recovery),
+        (scripts_package,"arv2_newrule_storage_recovery_v2",recovery),
         (qc_package,"newrule_comparison_submission",submission)):
         monkeypatch.setattr(package,name,module)
         monkeypatch.setitem(sys.modules,package.__name__+"."+name,module)
@@ -69,8 +77,9 @@ def no_operations(monkeypatch):
         "prepare_family","discover_organization","upload_inputs","capacity_once","begin_attempt",
         "poll_compile_once","launch_compiled","poll_status_once","read_result_once","summarize_family"):
         monkeypatch.setattr(submission,name,forbidden("submission_"+name))
-    for name in ("claim","recover","require_admission","_retained","_payloads","_request"):
-        monkeypatch.setattr(recovery,name,forbidden("recovery_"+name))
+    for module,label in ((spent_recovery,"spent_recovery_"),(recovery,"recovery_v2_")):
+        for name in ("claim","recover","require_admission","_retained","_payloads","_request"):
+            monkeypatch.setattr(module,name,forbidden(label+name))
     for name in ("dispatch","capacity_once","begin_attempt"):
         monkeypatch.setattr(continuation,name,forbidden("continuation_"+name))
     yield
@@ -110,13 +119,16 @@ def preflight_fixtures(monkeypatch, *, bad_source=None, git_failure=None):
 
 
 def test_import_and_package_attribute_seams_share_guarded_real_modules():
-    from scripts import arv2_newrule_storage_recovery as imported_recovery
+    from scripts import arv2_newrule_storage_recovery as imported_spent_recovery
+    from scripts import arv2_newrule_storage_recovery_v2 as imported_recovery
     from scripts import arv2_newrule_recovery_continuation as imported_continuation
     from research.analyst_revisions_v2_qc import newrule_comparison_submission as imported_submission
-    assert imported_recovery is recovery is scripts_package.arv2_newrule_storage_recovery
+    assert imported_spent_recovery is spent_recovery is scripts_package.arv2_newrule_storage_recovery
+    assert imported_recovery is recovery is scripts_package.arv2_newrule_storage_recovery_v2
     assert imported_continuation is continuation is scripts_package.arv2_newrule_recovery_continuation
     assert imported_submission is submission is qc_package.newrule_comparison_submission
-    assert sys.modules["scripts.arv2_newrule_storage_recovery"] is recovery
+    assert sys.modules["scripts.arv2_newrule_storage_recovery"] is spent_recovery
+    assert sys.modules["scripts.arv2_newrule_storage_recovery_v2"] is recovery
     assert sys.modules["scripts.arv2_newrule_recovery_continuation"] is continuation
     assert sys.modules["research.analyst_revisions_v2_qc.newrule_comparison_submission"] is submission
 
@@ -128,13 +140,14 @@ def test_real_alias_directory_and_all_operational_seams_are_guarded():
     for module,names in ((submission,("load_family","_session","_client","_rpc","_object",
         "prepare_family","discover_organization","upload_inputs","capacity_once","begin_attempt",
         "poll_compile_once","launch_compiled","poll_status_once","read_result_once","summarize_family")),
+        (spent_recovery,("claim","recover","require_admission","_retained","_payloads","_request")),
         (recovery,("claim","recover","require_admission","_retained","_payloads","_request")),
         (continuation,("dispatch","capacity_once","begin_attempt"))):
         assert all(getattr(module,name).__name__ == "guard" for name in names)
     assert d.frozen.prepared_input.october.load_october_order_input_package.__name__ == "guard"
 
 
-def test_profile_preserves_all_original_pins_plus_exact_four_additions():
+def test_profile_preserves_all_original_pins_plus_exact_six_additions():
     profile=d.profile_record()
     assert len(d.frozen.SOURCE_PINS)==51
     assert profile["source_pins"]==dict(d.frozen.SOURCE_PINS)
@@ -176,6 +189,8 @@ def test_original_git_host_gate_remains_before_new_imports(monkeypatch,capsys,fa
     "scripts/diagnose_arv2_newrule_upload.py",
     "scripts/diagnose_arv2_newrule_object_metadata.py",
     "scripts/arv2_newrule_storage_recovery.py",
+    "scripts/run_arv2_newrule_storage_recovery.py",
+    "scripts/arv2_newrule_storage_recovery_v2.py",
     "scripts/arv2_newrule_recovery_continuation.py",
     "scripts/run_arv2_newrule_comparison.py",
     "scripts/run_arv2_newrule_recovery_continuation.py",
@@ -199,7 +214,7 @@ def test_bad_source_digest_prevents_helper_import_and_private_or_contact_calls(m
 
 def test_unfrozen_placeholder_prevents_any_operation(monkeypatch,capsys):
     preflight_fixtures(monkeypatch)
-    d.NEW_PINS["scripts/arv2_newrule_storage_recovery.py"]="0"*64
+    d.NEW_PINS["scripts/arv2_newrule_storage_recovery_v2.py"]="0"*64
     operations=[]
     monkeypatch.setattr(d,"_operation",lambda *_:operations.append(True))
     assert d.run(args())==2 and operations==[]
@@ -311,6 +326,53 @@ def test_finite_frozen_refusal_preserved(monkeypatch,capsys):
     monkeypatch.setattr(d,"_operation",refuse)
     assert d.run(args())==2
     assert json.loads(capsys.readouterr().out)["failure_code"]=="capacity_wait"
+
+
+@pytest.mark.parametrize("operation",d.OPERATIONS)
+@pytest.mark.parametrize("reason,expected",[
+    ("admission_pin","admission_pin"),
+    ("PRIVATE-UNAPPROVED-ADMISSION-DETAIL","unknown_exception"),
+])
+def test_v2_admission_refusal_is_finite_before_any_downstream_operation(
+        monkeypatch,capsys,operation,reason,expected):
+    preflight_fixtures(monkeypatch)
+    monkeypatch.setattr(d,"_operation",REAL_OPERATION)
+    monkeypatch.setattr(continuation,"dispatch",REAL_DISPATCH)
+    monkeypatch.setattr(continuation,"capacity_once",REAL_CAPACITY)
+    monkeypatch.setattr(continuation,"begin_attempt",REAL_BEGIN)
+    value,plan,directory,record=object(),object(),object(),object()
+    observed=[]
+    def load(*_a,**_k):
+        observed.append("input")
+        return value
+    def family(actual,**_k):
+        assert actual is value
+        observed.append("family")
+        return plan
+    @contextmanager
+    def session(actual,pin):
+        assert actual is plan and pin==d.FAMILY_SHA256
+        observed.append("session")
+        yield directory,record
+    def refuse(actual_directory,actual_plan,actual_record,pin):
+        assert (actual_directory,actual_plan,actual_record)==(directory,plan,record)
+        assert pin==RECEIPT
+        observed.append("admission")
+        raise recovery.StorageRecoveryError(reason)
+    monkeypatch.setattr(d.frozen.prepared_input.october,"load_october_order_input_package",load)
+    monkeypatch.setattr(submission,"load_family",family)
+    monkeypatch.setattr(submission,"_session",session)
+    monkeypatch.setattr(recovery,"require_admission",refuse)
+    # The autouse guards remain active on all clients, delegates, and real
+    # directories: even a caught attempted operation fails fixture teardown.
+    assert d.run(args(operation))==2
+    output=capsys.readouterr().out
+    assert "PRIVATE" not in output
+    report=json.loads(output)
+    assert report["failure_code"]==expected
+    assert report["stage"]==operation and report["operation_completed"] is False
+    assert "result" not in report
+    assert observed==["input","family","session","admission"]
 
 
 def test_deadline_after_dispatch_cannot_emit_success(monkeypatch,capsys):

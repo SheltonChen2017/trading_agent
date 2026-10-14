@@ -22,8 +22,10 @@ SOURCE = ROOT / 'scripts/run_arv2_newrule_recovery_continuation.py'
 FROZEN_CALLER_SHA256 = '533c1ebf520e9ebf836c78067b9b1480eccf49cfb01aaeb240e3a73b77087d05'
 FAMILY_SHA256 = '8b8ee913dcfb5ad37f4748ea70db4fcbd6ff15580e52cd160bccf2b37e10a9e5'
 NEW_PINS = {
+    'scripts/arv2_newrule_storage_recovery_v2.py': '02d40ea52084111cf6a04c6ffad629df0bb9008890133e16ef5b2a8f7b4406e9',
     'scripts/arv2_newrule_storage_recovery.py': 'c9952791bce1b802777c80b24a42a86be0d462a2b75a82b462200d58d6100682',
-    'scripts/arv2_newrule_recovery_continuation.py': '6679b019ce60cf0b1759127ef7ee4ec346f27e37682518f00078622aa72953b3',
+    'scripts/run_arv2_newrule_storage_recovery.py': '7b8aec7979c4df5f0818e06f86fe91f9ea8f6cefd4db085941ff8c04af7381b6',
+    'scripts/arv2_newrule_recovery_continuation.py': '18603380974b8bc7e7ca3d896d3649dae072b4faa7a500c5592dcb5a940b1a49',
     'scripts/diagnose_arv2_newrule_upload.py': 'b8477fe9246b7355c9b10bec91a9ad6e6305fcd0a7e2d4f00f61da1c35ce9901',
     'scripts/diagnose_arv2_newrule_object_metadata.py': '0a566b6b049f160daf6cc1a1bb2a507e18dd645c64d948dea50136cebbbede23',
 }
@@ -87,13 +89,21 @@ def _operation(args, deadline):
     return result
 
 
+def _failure(error, submission, recovery):
+    if recovery is not None and type(error) is recovery.StorageRecoveryError:
+        return recovery.finite_failure(error)
+    return frozen._failure(error, submission)
+
+
 def run(args):
     started, stage, submission = helpers._utc_now(), 'preflight', None
+    recovery = None
     deadline = time.monotonic() + frozen.DEADLINES.get(args.operation, 1)
     try:
         with helpers._alarm(deadline):
             _preflight(args, deadline)
             from research.analyst_revisions_v2_qc import newrule_comparison_submission as submission
+            from scripts import arv2_newrule_storage_recovery_v2 as recovery
             stage = args.operation
             result = _operation(args, deadline)
             helpers._remaining(deadline)
@@ -110,7 +120,7 @@ def run(args):
         print(helpers.canonical_json_bytes({'schema': SCHEMA,
             'operation': args.operation if args.operation in OPERATIONS else 'unknown',
             'operation_completed': False, 'stage': stage,
-            'failure_code': frozen._failure(error, submission),
+            'failure_code': _failure(error, submission, recovery),
             'attempt_consumption': 'consult_exact_claim_no_automatic_retry',
             'original_upload_accepted': False, 'formal_forward_ready': False,
             'point_in_time_proven': False, 'paper_or_live_ready': False}).decode('ascii'))

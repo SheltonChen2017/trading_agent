@@ -22,9 +22,9 @@ from scripts.qualify_sharadar_companion import _utc_now, SharadarCaptureRefusal
 from scripts.short_interest_keychain import KeychainSecret, read_named_keychain
 
 ANCHOR_PLAN_SHA256 = "d58b2b3d006319899e6af9cd06a2fef17128c391513ea0ee99c987c483d2af3b"
-CACHE_CLOSURE_SHA256 = "PENDING"
-PARALLEL_PLAN_SHA256 = "PENDING"
-PROTOCOL_SHA256 = "PENDING"
+CACHE_CLOSURE_SHA256 = "51190cff010622a7c8422c54dd8be6084caa07a2c748444631655844e9f46d56"
+PARALLEL_PLAN_SHA256 = "d1c9d08b939022bf5eafa2cdde47f9555fe1bbd04c28e7650fb6bdb4d5a5ee56"
+PROTOCOL_SHA256 = "45a554213ed8fb12ac6f334bb0b87053b0d1a899603e093bdc4bfe06daf47354"
 MAXIMUM_TOTAL_RESPONSE_BYTES = 4 * 1024 * 1024 * 1024
 
 

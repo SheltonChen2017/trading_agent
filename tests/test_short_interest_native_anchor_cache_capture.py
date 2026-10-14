@@ -163,6 +163,15 @@ def test_held_file_change_refuses_before_next_slot_without_any_source_reload(mon
 @pytest.mark.parametrize("kind", ["head", "code", "closure", "path"])
 def test_reader_pending_registration_refuses_before_protected_file_access(monkeypatch, kind):
     monkeypatch.setattr(m, "_require_capture_platform", lambda: None)
+    # Exercise each individual pending field; do not rely on the live module
+    # still having every default pending after its first qualified cache.
+    target, name = {
+        "head": (m, "REGISTERED_CREATOR_HEAD"),
+        "code": (m, "REGISTERED_CREATOR_CODE_SHA256"),
+        "closure": (m.contract, "REGISTERED_CLOSURE_SHA256"),
+        "path": (m, "REGISTERED_CACHE_PATH"),
+    }[kind]
+    monkeypatch.setattr(target, name, "PENDING")
     monkeypatch.setattr(m.lane, "LaneGuard", lambda *args, **kwargs: pytest.fail("private preflight reached"))
     with pytest.raises(m.contract.AnchorCacheRefusal, match="registration_pending"):
         with m.load_registered_cache(None, runtime_head=CURRENT, actual_remote=REMOTE):

@@ -26,9 +26,9 @@ from scripts.qualify_sharadar_companion import _utc_now
 
 TARGET = Path("artifacts/short_interest/native_anchor_cache/cache-d58-v1")
 WRITER_PROTOCOL_SHA256 = "cc673c635e19050f0dd0c0fddf8b9b446f53cbcd70fe535746ea84ea4e51d087"
-REGISTERED_CACHE_PATH = "PENDING"
-REGISTERED_CREATOR_HEAD = "PENDING"
-REGISTERED_CREATOR_CODE_SHA256 = "PENDING"
+REGISTERED_CACHE_PATH = "artifacts/short_interest/native_anchor_cache/cache-d58-v1"
+REGISTERED_CREATOR_HEAD = "91f4158b6c9a9b4bf0099e60e5a50d2d9727587b"
+REGISTERED_CREATOR_CODE_SHA256 = "f0d6d86dabadac5455223600d96920e5522783c1631655674ce71b0ff42a28bc"
 MODULE_PATH = "scripts/capture_short_interest_native_anchor_cache.py"
 WRITER_CODE_FILES = tuple(dict.fromkeys((*capture.CODE_FILES, *native_builder._CODE_FILES,
     "data/hashing.py", "research/short_interest_etf/contracts.py",

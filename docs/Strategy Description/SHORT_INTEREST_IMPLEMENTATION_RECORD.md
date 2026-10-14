@@ -19566,3 +19566,228 @@ above belongs to116.19's7dde2ce2 freeze. The current116.20 correction's final
 record selectors pass **78 tests in1.24s**; both affected files compile and
 explicit staging/diff/status/actual-remote checks precede its local commit.
 The writer's own c7087896 source and cc673c63 protocol remain unchanged.
+
+### 116.21 Completed offline cache and current source-capture registration
+
+The preceding local correction is
+**91f4158b6c9a9b4bf0099e60e5a50d2d9727587b**. Actual/tracking origin is still
+1f90c626328a236c51e78f57e0fe301e0412aabf. The owner-waived continuous build
+continues; this is not independent-review acceptance or a final push.
+
+The section116.20 corrective offline writer completed successfully at that
+clean HEAD. It invoked zero provider requests, read zero credentials and
+consumed zero outcome looks or QC launch attempts. Main then independently
+opened the exact five protected, owned, single-link files; verified their
+original byte hashes and exact closure; and checked all46 historical creator
+code blobs against the creator commit. No saved completion flag substitutes
+for that verification. The source-only cache pins are now registered:
+
+- Cache path: artifacts/short_interest/native_anchor_cache/cache-d58-v1.
+- Closure bytes SHA256:
+  51190cff010622a7c8422c54dd8be6084caa07a2c748444631655844e9f46d56.
+- Creator HEAD: 91f4158b6c9a9b4bf0099e60e5a50d2d9727587b.
+- Creator complete-code SHA256:
+  f0d6d86dabadac5455223600d96920e5522783c1631655674ce71b0ff42a28bc.
+- Exact anchor plan remains d58b2b3d,112 dates and81875 requests.
+- Underlying query plan:
+  2da93a3b84dfaa21dc9f4c8359b81082af4ab5081b27764f470dd0322e8a288a.
+- Prospective parallel plan:
+  d1c9d08b939022bf5eafa2cdde47f9555fe1bbd04c28e7650fb6bdb4d5a5ee56.
+- Prospective count protocol:
+  45a554213ed8fb12ac6f334bb0b87053b0d1a899603e093bdc4bfe06daf47354.
+
+**SI-DEC-20261013-48** registers this exact source-only count round under
+the owner's standing delegation. Only the observed frozen anchor tickets may
+be requested, at most81875 attempts,4GiB total bounded bodies and8 in flight.
+The existing named Massive login-Keychain item supplies a Bearer header in
+memory only. A stable source/plan/protocol claim precedes credentials;
+automatic retries, budget reset and unplanned fallback are forbidden.
+404 remains body-unobserved negative evidence, not an empty provider record.
+Material transport/auth/rate/guard failures halt new STARTs and drain only
+already-started slots. The five-file cache is reconstructed by the registered
+pure factory before a claim; its own factory must reproduce the parallel
+plan/protocol pins above. Runtime code is a separately measured complete
+committed manifest at the clean HEAD containing this freeze, not the
+historical creator manifest or a self-referential source hash. Root/branch/
+HEAD/status, held source/code inodes and finite actual-remote boundaries
+remain enforced. The fixed exclusive output is
+artifacts/short_interest/native_reported_counts/count-round-45a554213ed8fb12.
+No request has yet been made by this registration.
+
+The FMP v2 operational driver is now lane-owned and independently tested.
+Its exact source-closure/daily-index/selected-plan/runtime-plan/protocol pins
+remain PENDING; no actual FMP claim, key read or request is enabled. Oversized
+full source plans refuse before claim/key rather than silently selecting the
+first1000 issuers. It retains every original failed/negative stage and
+streams semantic replay to exhaustion; partial iteration is not completed
+coverage. Capitalization remains issuer-size data, never class shares.
+
+Append-only calendar clarification: section116.17's preserved f89d3ed4
+digest is the ordered1169-session array, not the full daily request plan.
+Main's source-free reconstruction gives calendar bytes SHA256
+a22344dd29a80869f8c816e71dd5526f9872754d2a6f595131e93a3565228c6e
+and full daily plan SHA256
+029173c8fa4eeb6ff29f0325011aeec44eb4044ab504a2caddb011c6dba47ad8.
+No study dates, protected periods or outcome counters changed.
+
+Main executed the ignored FMP proposal plus two existing pure adapter
+selectors:78 passed in3.31s, empty environment/network denied. A later
+canonical connected run initially reported4 failures/112 passes in4.04s:
+the old parametrized pending-reader test did not actually use its kind
+parameter and relied on all production defaults staying PENDING. The now
+genuinely registered cache correctly reached its guard. Main corrected the
+test to inject each individual PENDING field explicitly; the same focused
+five-file selection passes **116 tests in3.56s**. Two selector typos ran no
+tests and are command-selection errors, not source failures.
+
+| ID | Priority / disposition | Evidence, correction and retained limits |
+|---|---|---|
+| SI-BUILD-20261013-043 | P2 pending-reader regression, partial/test-only corrected | The four failures exposed a fixture relying on obsolete production defaults, not an admission bypass. Explicit head/code/closure/path injection proves each isolated pending field refuses before protected access;116 focused tests pass. No real provider/key/request was used by these regressions. |
+
+Main read the primary [Massive Individuals terms](https://www.massive.com/legal/individuals-terms-of-service),
+[Market Data terms](https://www.massive.com/legal/market-data-terms-of-service),
+[Stocks research/backtesting documentation](https://massive.com/docs/flat-files/stocks/overview),
+[EODHD personal-use terms](https://eodhd.com/financial-apis/terms-conditions)
+and [QC user-content rules](https://www.quantconnect.com/terms/).
+Personal local use is distinguished from transfer to a third-party service;
+Massive's separate non-display/derived-work restrictions and order-form
+precedence are retained. These public documents do not establish raw or
+provider-derived QC Cloud upload permission. No generic institutional-
+affiliation or permission-letter demand is made and no new terms accepted.
+The separate fully local LEAN alternative is being prepared; no actual
+licensed-input engine evaluation has occurred. Sharadar usability/fitness
+conclusions and reconstructible rows stay private.
+
+Continuous build remains active. Canonical actual looks0/0, exploratory
+actual looks0, alpha0, permanent look IDs none and QC launch attempts0.
+The two spent engine-catalog requests are not launch attempts. No actual
+signal/outcome join, validation/holdout access, node query, project, upload,
+compile, job, backtest, broker or real trading action is implied here.
+Shared/project documents and SESSION_HANDOFF remain frozen. All round
+commits accumulate locally; ONE final non-force push remains reserved for
+genuine closure.
+
+### 116.22 Owner-requested publication checkpoint; QC remains paused
+
+**SI-AUTH-20261013-06** records the owner's explicit instruction to pause
+for10 minutes because another lane needs exclusive QC use, with the owner
+to report when that lane is done. Main stopped its delegated work and made
+no project, upload, compile, node, job or backtest request. Resuming QC
+requires the owner's release and a fresh authenticated node-capacity check
+immediately before any qualified launch; elapsed time alone is not a release.
+
+**SI-AUTH-20261013-07** records the later explicit instruction, "push for now."
+It authorizes ONE non-force checkpoint push of the accumulated lane work
+despite the earlier instruction reserving publication for final closure.
+This is a publication-only exception, not completion of the continuous build,
+new source/QC execution, review acceptance or resumption of QC. No new monitor
+is armed to resume work during the owner's pause. Other automations remain
+unchanged.
+
+The exact already committed pending range is
+1f90c626328a236c51e78f57e0fe301e0412aabf..91f4158b6c9a9b4bf0099e60e5a50d2d9727587b,
+with13 local commits in order:
+3784f4f8779b4a8a14aed109b6a9cb8354126dd7;
+69ad639b8fde268e2272db214e2120a6d8af4b8b;
+11d6b300b6737ead079a3a0532b5bfdd693600c5;
+f61a40bf497747cffdda367d2a20c393383c8232;
+a2df1ead47705d2477e3669bf5be18fd72f5c380;
+82f4506fb1ed619a256fe73485fb84b46d6c02dc;
+64f372ea8bfbcc542e87356a5e3e58fe07da1c27;
+19a02b563805cddac60f1003abdd47a2b9ecb6cb;
+904cb16d678c31c19617e22c06992fd3aa3ba831;
+0368862746e3388091e50801d4f2c128ebc9fe55;
+ab85bdb6939ef7e899e330e8273d225deac44d48;
+7dde2ce2ad005b86e0fd2a1ea2b3939249052974;
+91f4158b6c9a9b4bf0099e60e5a50d2d9727587b.
+This record and the current ten lane-owned code/test paths form the closing
+checkpoint commit after that range. Its exact commit hash will be supplied
+by Git and in the publication confirmation, not self-embedded in its content.
+
+**SI-DEC-20261013-49** registers the integrated daily-active source controller
+for the next explicitly resumed source-only action. Full plan029173c8 and
+calendar a22344dd are pinned as clarified in116.21. Producer protocol is
+dc25d57e5b181c7028385ea689805e72b62a09c6e687cd11ac1eb6b7c5e139ce;
+controller protocol is
+d9bfd50ae4f9ad44c939832482066683b98304c160893b1b914bfcb138156126.
+The exact protected source remains the original TICKERS archive with bytes
+SHA256 da2204eab9c20bd9c5203d52238c2ad75878cb63733c78a4febca11e6299e572
+and the five original spent-proof byte pins retained in the controller.
+The twelve-request master budget is still consumed; no recapture is authorized
+by this registration. Output is the fixed create-exclusive owned0700/0600
+private native_daily_active/daily-029173c8-v1 directory, with a stable whole-
+round claim independent of runtime HEAD/time. All1169 sessions, at most74816
+requests/4GiB/74816000 rows and8 day chains are frozen; no automatic retry,
+subsample or missing-day completion flag is allowed. A current external
+42-file complete committed-code manifest and clean HEAD/actual-remote
+registration must verify before claim/key. Main independently inspected the
+transitive local import closure, including dynamic calendar imports and both
+ml immutable-allocation files. These are custody helpers, not ML inference
+or broker execution.
+
+Three optional producer seams preserve the original default behavior:
+the exact local lane guard, guarded HTTP transport with actual invocation
+callback, and typed daily qualification observer. A pre-wire refusal counts
+zero HTTP invocations. Actual remote evidence is cardinality-bound per at
+most8 starts, never a timed cache; every local start/publication checks roots,
+branch, HEAD/status and held code/source custody. Each successful day requires
+its actual typed report and all original owned raw-page receipt witnesses.
+The inventory is explicitly provisional. The post-publication
+round.closed.json is authoritative and performs a fresh remote observation
+even for negative/failed rounds; a later advancement closes Refused rather
+than Completed. Active-only daily evidence still does not prove an inactive
+listing lifecycle, historical availability, class denominator or source
+admission. No daily request has yet occurred.
+
+Append-only ledger additions; historical rows are retained, including043
+recorded above. The numbering reflects when the findings were allocated,
+not a claim that missing numbers were silently resolved.
+
+| ID | Priority / disposition | Evidence, correction and retained limits |
+|---|---|---|
+| SI-BUILD-20261013-039 | P1 protected custody, confirmed/corrected | Delegated literal chmod control showed a retained source file missed its parent changing from0700 to0755. The integrated held parent FD now checks owner/mode/identity each slot. Parent replacement was already refused by the old file inode check; that direction is retained as a false alarm, not a second allow-through defect. Main includes the controls in120 focused passing tests. |
+| SI-BUILD-20261013-044 | P1 complete runtime manifest, confirmed/corrected | Three delegated causal failures exposed omitted calendar/key dependencies and missing negative final-remote evidence. Main's independent AST closure additionally found the ml package/immutable allocator omission; its delegated control failed once. Exact42-path membership and fresh negative/post-inventory closure are integrated. All1169 fabricated typed witnesses are exercised; no actual source admission follows. |
+| SI-BUILD-20261013-040 | P1 own-project phase/freshness, confirmed/proposal corrected only | Delegated three causal failures exposed a late project update and reuse of old project/source receiving proof after compile or a long node wait. Ignored proposals now forbid late updates, invalidate proof at terminal compile/runtime states and require fresh readbacks. They are NOT integrated or authorized for actual dispatch at this checkpoint. |
+| SI-BUILD-20261013-041 | P1 private identity echo, confirmed/proposal corrected only | Main's two fabricated numeric/exponent USER_ID echo controls failed in0.56s. Delegated secondary exact Decimal screening corrects the gap before raw hash/storage while preserving the narrow typed returned-identity exception. No real credentials were used; this code remains an ignored proposal. |
+| SI-BUILD-20261013-042 | P2 immutable pure plan, confirmed/proposal corrected only | Main's two fabricated mutation/re-hash controls failed in0.05s. The ignored controller now retains an original canonical payload/identity anchor. This is a pure-plan contract gap; external dispatch defenses were not shown to have been bypassed. No actual cloud request occurred. |
+| SI-BUILD-20261013-045 | P1 dependency custody, confirmed/proposal corrected only | Delegated two causal failures exposed reflected request mutation and a changing caller archive stream. Fixed URL snapshots and an owned no-follow held archive reader are prepared and39 focused tests pass, but installation/source extraction/SDK or engine execution has NOT occurred and these drafts remain excluded from Git. |
+
+Main's final integrated daily selection passes **120 tests in35.37s**,
+empty environment/network denied. The ignored QC proposal's delegated
+104-test result and dependency proposal's delegated39-test result are
+explicitly not Main's own execution. Their partial/draft followups are held
+and excluded from this push, along with all private captures, credentials,
+machine dependencies and generated caches. The proposed count remote-
+boundary optimization is also unfinished and excluded; the current registered
+count driver retains its original guarded boundary behavior and remains
+unexecuted. The future cloud bootstrap-to-full-controller seam remains pending;
+no default environment is guessed or actual project created.
+
+Remaining work after owner release: independently finish/integrate the held
+operational and local-engine drafts; perform only prospectively frozen
+source-only count/daily/issuer-context captures; qualify actual identity,
+same-class shares, issuer-size/USD, raw rational volume and cashflow/payment/
+terminal facts; and register the precise permitted processing/order/runtime
+and evaluation/date/power/look scope before actual signal/outcome joins.
+Fully local execution is a separate route from uncertain provider-data Cloud
+transfer. SDK/package availability, fabricated48 parity or a source receipt
+does not establish actual backtest readiness. No new milestone is marked
+complete solely by this publication checkpoint.
+
+Canonical looks remain0/0, exploratory actual looks0, alpha0, permanent look
+IDs none and QC launch attempts0. Candidate lookbacks20/60/120/252, structural
+normalization, release-next-open rules, fixed48-book economics and protected
+validation/holdout periods remain unchanged. No performance result exists.
+Shared/project-wide documents and SESSION_HANDOFF remain frozen. Only the
+designated branch/worktree will be published, with follow-tags disabled;
+roots, HEAD/status and actual matching remote are rechecked immediately
+before commit and push, followed by clean local/tracking/actual-remote equality.
+
+Main's checkpoint validation on the integrated tree: the nine affected focused
+test files plus Short Interest import-boundary and active-document checks
+pass **314 tests in43.36s**, empty environment/network denied. All ten affected
+Python files compile in memory; diff check passes. This is not the complete
+lane/repository suite. Only this record and the ten explicitly listed lane-
+owned code/test paths are staged for the owner-requested checkpoint. A final
+document/import-boundary check follows this validation note before commit.
+No provider or QC call is made as part of publication validation.

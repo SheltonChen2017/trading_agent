@@ -18,8 +18,8 @@ from scripts.short_interest_keychain import KeychainSecret, read_named_keychain
 from scripts.capture_short_interest_native_grouped_market import build_protected_opener, _opener
 import research.short_interest_etf.native_daily_active_reference as contract
 
-PLAN_SHA256 = 'PENDING'
-PROTOCOL_SHA256 = 'PENDING'
+PLAN_SHA256 = '029173c8fa4eeb6ff29f0325011aeec44eb4044ab504a2caddb011c6dba47ad8'
+PROTOCOL_SHA256 = 'dc25d57e5b181c7028385ea689805e72b62a09c6e687cd11ac1eb6b7c5e139ce'
 
 
 def protocol():
@@ -47,7 +47,8 @@ def validated(plan):
 
 def capture_with_seams(root, directory, plan, index, *, head, remote, started_at,
         verify_sources, verify_code, claim_budget, publish, publish_json,
-        read_secret=read_named_keychain, clock=_utc_now):
+        read_secret=read_named_keychain, clock=_utc_now,
+        lane_guard=None, transport=None, on_qualified_day=None):
     """Root-only injected prototype; no provider calls authorized by import.
 
     The concrete main must freeze exact pins and prove all custody/publication
@@ -67,7 +68,7 @@ def capture_with_seams(root, directory, plan, index, *, head, remote, started_at
 
     def guard():
         validated(plan)
-        _guard(root, head, remote)
+        (_guard if lane_guard is None else lane_guard)(root, head, remote)
         verify_code(plan)
         verify_sources(plan, index)
 
@@ -172,12 +173,24 @@ def capture_with_seams(root, directory, plan, index, *, head, remote, started_at
                 opener = build_protected_opener(); _opener(opener)
                 request = urllib.request.Request(url, method='GET', headers={
                     'Accept': 'application/json', 'Authorization': 'Bearer ' + secret.for_authorization_header()})
-                with state_lock:
-                    if not fatal.is_set():
+                def mark_http_start():
+                    nonlocal invoked
+                    with state_lock:
+                        contract._require(invoked is False, 'one_HTTP_start_per_attempt')
+                        contract._require(not fatal.is_set(), 'cooperative_fatal_before_HTTP')
                         state['http_invocations'] += 1
                         invoked = True
+                if transport is None:
+                    with state_lock:
+                        if not fatal.is_set():
+                            mark_http_start()
+                    if invoked:
+                        raw, media, status = _http(opener, request, contract.MAXIMUM_RESPONSE_BYTES)
+                elif not fatal.is_set():
+                    raw, media, status = transport(opener, request, contract.MAXIMUM_RESPONSE_BYTES,
+                        on_http_start=mark_http_start)
+                    contract._require(invoked is True, 'injected_transport_must_record_actual_HTTP_start')
                 if invoked:
-                    raw, media, status = _http(opener, request, contract.MAXIMUM_RESPONSE_BYTES)
                     observed = type(raw) is bytes
                     contract._require(observed and len(raw) <= contract.MAXIMUM_RESPONSE_BYTES
                         and type(media) is str and len(media) <= 256
@@ -273,6 +286,8 @@ def capture_with_seams(root, directory, plan, index, *, head, remote, started_at
                 if url is None:
                     qualified = contract.qualify_daily_active_reference(plan, day, tuple(pages), index,
                         started_at=day_start, retrieved_at=last)
+                    if on_qualified_day is not None:
+                        on_qualified_day(qualified)
                     raw = qualified.to_bytes()
                     store(f'day-{day:04d}.qualified.private.json', raw, raw=True)
                     value = {'schema': 'si-daily-active-day-result-v1', 'day_ordinal': day,

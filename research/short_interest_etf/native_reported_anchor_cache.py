@@ -16,7 +16,7 @@ import research.short_interest_etf.native_dated_class_reference as references
 import research.short_interest_etf.sharadar_securities_master as master
 import research.short_interest_etf.native_reported_anchor_plan as reported
 
-REGISTERED_CLOSURE_SHA256 = "PENDING"
+REGISTERED_CLOSURE_SHA256 = "51190cff010622a7c8422c54dd8be6084caa07a2c748444631655844e9f46d56"
 KNOWN = {"plan_sha256": "d58b2b3d006319899e6af9cd06a2fef17128c391513ea0ee99c987c483d2af3b",
     "request_budget": 81875, "date_count": 112, "source_attempts": 1340,
     "parent_attempts": 491, "child_attempts": 849,

@@ -21477,3 +21477,99 @@ No external raw-witness download or export workaround is planned; native
 bounded in-QC readback/analysis remains distinct from export and from the
 owner's working rights-paperwork waiver. This is not an obsolete new blanket
 paperwork/canonical blocker. Full native accounting still precedes ON.
+
+### 89.7 Fresh native-interface blocker; stable unpublished handoff
+
+SOURCE-POST013 is a NEW pre-witness source check at committeda09795e1,
+created2026-10-14T02:31:41.528416Z, plan
+cea60089ba45c1add26072a02422e1437497d9d3fd19ce96380ad423370146c9.
+Two own files/read calls502406wire/230180declared exact baseline bytes;
+all15stable, every content hash unchanged from012 (restored main60012/
+454ed1e39762010997f53ef6a9f2e9064810d40a6812aae513a8fa3b090ca505).
+Read2archive249321/40e30c180ba68395422f01dd44e6660ceebc6c9cbc5e23029965ab2bd8d26315,
+delta150377/9fc26fae003afc31315628955826f2b4ecd740d9b133ecb3d525b7a91af833b1,
+receipt9084/2ab6f411ac2643de6bbabc616ad7c98ca274f17871c5aa55be028243772b3e90.
+No new helper or witness hook is present in cloud; no native strategy run.
+
+Fresh WITNESS-SOURCE-20261014-001 at that HEAD allowed one source-only Mia
+message, exact public helper11770bytes, only main plus new helper, at most5
+Mia saves/explicit on-save tool calls and40new observed background events,
+<=36AX/4screenshots/20actions/600seconds; launch/data inputs forbidden.
+Access3567/21266325f83b4fdb9babfcab2488e5071737f0bc879eb9cb92e003ee388cf080,
+created02:32:37.723173Z. Exact public helper open_in_codex returned QUEUED,
+not an observed editor or clipboard copy. The first Safari native AX attempt
+then explicitly reported Mac locked and automatic unlock unsuccessful.
+No additional Mia chat/message/native Allow, clipboard copy, file save,
+compile or launch occurred. Root did not extract credentials, attempt login,
+take control, retry automatic unlock, or disguise an API backtest as Mia.
+BLOCKED_MAC_LOCKED_NO_MIA_PROMPT receipt1348/
+d402fef080650e19d1ca5e47804a222f28875ca8253cab14b02efed39a309023;
+1failed AX attempt/0screenshots/0navigation, process0/controller released.
+This scope's authenticated/interface false flags mean NOT VERIFIED while
+locked, not proof QC logged out or existing API credentials stopped working.
+The Mac was previously usable in this round; this is fresh external state,
+not reuse of an older unconditional unlock demand. Owner asked to unlock via
+this chat/asynchronous question; no reply or successful unlock is assumed.
+
+Current stable result is BLOCKED, not backtesting-ready or completed. OFF
+stock-proxy candidate still has no accepted full-window baseline: historical
+Runtime Errors/short Completed/partial observations stay immutable. ON is
+unlaunched0of3. Six sleeves SPY/XLV/XLE/QQQ/SOXX/REMX have no accepted extended
+matched returns/CAGR/drawdown/volatility/Sharpe/annual or independent sleeve
+P&L/cost comparison; those remain NULL, not zero. Frozen economics/calendar/
+universes/rights/PIT/source limitations and canonical parked gates remain.
+Only storage-display and active unsupported-hook correction facets resolved.
+F012 remaining ON inputs/native capacity, F017 full native export/readback,
+F018 complete accounting/clocks, F019 exact raw unit/source and F020 native
+compact/full audit remain OPEN to their documented scope. No result tuning,
+parameter sweep, attempt reset or new development look occurred: observed
+looks30=28cloud+2historical local; OFFCodex3 exhausted/ON0, prospective31 NOT
+launched/observed. Proposed witness helper is tested public software, NOT
+installed cloud candidate or native dispatch/financial acceptance.
+
+Next recovery: owner unlocks Mac; root must use a NEW bounded interface/source
+preflight at then-actual HEAD/time, inspect source/control concurrency, pass
+the exact helper through authenticated built-in Mia only, capture EVERY
+saved file and verify original main guards plus one persistent instance/bare
+re-raises. Then separately freeze source/engine/private scope and reserve the
+next ACTUAL genuine-Mia look before one bounded re-execution. Native witness
+and full-window OFF order/fill/fee/cash/RAW mark/clock/census/index/replay proof
+precede fresh necessary ON inputs and an ON launch under preserved0allowance.
+No fourth Codex OFF launch is an alternative to locked Mia. Wait on actual
+other-lane contention without cancellation; no such contention is inferred
+from this Mac lock or a formerly insufficient storage display.
+
+Independent-review handoff: the current unpublished round began after actual
+published2de2668c35c5b6fc75604e5f06c5795421dffb94 and contains
+fbb6a64539ae370d40b5f37b393ceb788c40ef2c (capacity/forensic scope),
+f47a5d11e87c3bbba3ec64b25a7666fada75f51c (Mia guard restoration scope),
+7f1f03615fdbcbf154476538767cb2aeec96ae4d (exact approval/build scope),
+fa21a9cf6dd8cb8f08364cc0afeacf2692aa2a28 (verified restoration/35tests),
+a09795e172e863b8c1ef8ae290ecb5c009a26db8 (private witness/39tests), and the
+final stable handoff commit. ALL are awaiting Claude's independent per-commit
+disposition and full cumulative-tree review; no human/Claude approval is
+invented. Preserve prior unreviewed18commits from30e5..2de noted in88, all
+incoming ranges/merge custody, failed scopes/results and open P0–P3 ledger.
+Current code scope changes ONLY the lane record, two focused test files and
+new refusal helper; no shared/main/sibling/Action Plan/Session Handoff/workflow
+or historical executed source is modified. Monitor stays PAUSED; no rearm.
+Exactly ONE final non-force matching publication remains, after final checks
+and actual-remote invariant. Its exact published HEAD/equality will be reported
+in this chat, not fabricated through a self-referential commit hash in source.
+
+Final check on authored handoff:406focusedpassed14.18s, same exact isolated
+selectors as89.6; three new files compiled in memory without imports/bytecode;
+diff/whitespace clean and changed-path census exactly those four lane files.
+Stronger public-only restoration identity proof: reconstruct main from exact
+OFF main in immutable completion bundle daaf0c33 (main59931/9e19a038), change
+only audit-key import and add the unused initialized counter. Expected
+60012/454ed1e39762010997f53ef6a9f2e9064810d40a6812aae513a8fa3b090ca505
+equals captured012/013 hash. Thus complete captured main bytes, INCLUDING
+comments/docstrings, match that precise known construction—not merely masked
+AST. No cloud source executed/ported/private archive reopened for this check.
+Three preliminary public-only checks based on a raw template or guessed
+small template/bundle diff counts refused; they used the wrong comparison
+artifact/unsupported count assumptions and are retained failed diagnostics,
+not native errors or evidence of additional cloud edits. Exact generated
+frozen OFF bundle identity is the accepted comparison. It still proves no
+historical job compiled source or native financial/canonical completion.

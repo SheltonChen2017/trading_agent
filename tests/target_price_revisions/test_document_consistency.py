@@ -576,6 +576,9 @@ SECTION91_DISPOSITIONS = (
     "accepted",
 )
 SECTION91_NEXT_ROLE = "Codex next counter-reviews section 91 and this round's Claude commits"
+SECTION92_RANGE = "1bc751f878c083836dd9bd967231144fb52acd87..557b2250aa82f330a995362ebd75c4f30ab03a34"
+SECTION92_SHORT_RANGE = "1bc751f8..557b2250"
+SECTION92_NEXT_ROLE = "Claude next reviews this counter-review snapshot"
 SECTION86_COMMITS = (
     "b28d07f6139dc0460e927b152fb4a87f6f2915e9",
     "0455fc2534f5951bc3d0eca35dc581cef9cca5f4",
@@ -1174,11 +1177,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [SECTION91_RANGE]
+    ) == [SECTION92_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Claude has independently reviewed the exact range"
+        "Codex has counter-reviewed the exact incoming range"
         in normalized_current
     )
     assert (
@@ -1192,7 +1195,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "TPR-1 remains blocked" in normalized_current
     assert "reviewed-spec registry remains empty" in normalized_current
     assert "Claude next reviews this Codex round independently" not in normalized_current
-    assert SECTION91_NEXT_ROLE in normalized_current
+    assert SECTION92_NEXT_ROLE in normalized_current
+    assert SECTION91_NEXT_ROLE not in normalized_current
     assert SECTION86_NEXT_ROLE not in normalized_current
     assert SECTION85_NEXT_ROLE not in normalized_current
     assert SECTION82_NEXT_ROLE not in normalized_current
@@ -1273,11 +1277,12 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [SECTION91_SHORT_RANGE]
+        ) == [SECTION92_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert "claude has independently reviewed every codex commit" in normalized_summary_lower
-        assert "section 91" in normalized_summary_lower
-        assert SECTION91_NEXT_ROLE.lower() in normalized_summary_lower
+        assert "codex has counter-reviewed every incoming commit" in normalized_summary_lower
+        assert "section 92" in normalized_summary_lower
+        assert SECTION92_NEXT_ROLE.lower() in normalized_summary_lower
+        assert SECTION91_NEXT_ROLE.lower() not in normalized_summary_lower
         assert SECTION86_NEXT_ROLE.lower() not in normalized_summary_lower
         assert SECTION85_NEXT_ROLE.lower() not in normalized_summary_lower
         assert SECTION82_NEXT_ROLE.lower() not in normalized_summary_lower
@@ -4491,6 +4496,7 @@ SECTION81_STALE_NEXT_ACTIONS = {
     "counter": "Codex next counter-reviews section 81 and this round's Claude commits",
     "review": SECTION82_NEXT_ROLE,
     "reconcile": SECTION86_NEXT_ROLE,
+    "previous": SECTION91_NEXT_ROLE,
 }
 
 
@@ -4500,16 +4506,17 @@ SECTION81_STALE_NEXT_ACTIONS = {
     "current_counter_role", "preamble_counter_role",
     "current_review_role", "preamble_review_role",
     "current_reconcile_role", "preamble_reconcile_role",
+    "current_previous_role", "preamble_previous_role",
 ))
-def test_section_91_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
+def test_section_92_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
     """Retain prior routing faults and reject a return to the now-processed Claude review."""
     test_exact_next_step_names_the_current_artifacts()
-    current_next = SECTION91_NEXT_ROLE
+    current_next = SECTION92_NEXT_ROLE
     stale_next = SECTION81_STALE_NEXT_ACTIONS.get(fault.rsplit("_", 2)[-2], "")
     if fault.startswith("current_"):
         original_section = _record_section
         section = original_section("## 8. Exact next step")
-        old, new = (SECTION91_RANGE, SECTION86_RANGE) if fault.endswith("range") else (
+        old, new = (SECTION92_RANGE, SECTION91_RANGE) if fault.endswith("range") else (
             current_next, stale_next)
         pattern = r"\s+".join(re.escape(word) for word in old.split())
         assert re.search(pattern, section) is not None
@@ -4518,7 +4525,7 @@ def test_section_91_current_routing_refuses_stale_range_or_role(monkeypatch, fau
             lambda heading: mutated if heading.startswith("## 8.") else original_section(heading))
     else:
         preamble = " ".join(_record_preamble().split())
-        old, new = (SECTION91_SHORT_RANGE, SECTION86_SHORT_RANGE) if fault.endswith("range") else (
+        old, new = (SECTION92_SHORT_RANGE, SECTION91_SHORT_RANGE) if fault.endswith("range") else (
             current_next.upper(), stale_next.upper())
         assert old in preamble
         mutated = preamble.replace(old, new)
@@ -5167,10 +5174,10 @@ def test_final_owner_mia_handoff_preserves_block_and_credential_locators_only():
     _assert_final_owner_mia_handoff(final)
     for identity in ("TPR-EXT26-F021 P1 OPEN", "TPR-EXT26-F022 P1 OPEN", "TPR-EXT26-F023 P1 OPEN"):
         assert identity in section
-    for service, account in (("trading-agent-fmp", "fmp"), ("trading-agent-sharadar", "sharadar"),
-                             ("trading-agent-massive", "massive"), ("trading-agent-eodhd", "eodhd")):
-        assert f"`{service}` | `{account}`" in section
-    assert "/trading_agent__insider_buying/artifacts/insider_buying/private/eodhd-token.txt`" in section
+    assert "EODHD token-file locator in the Insider" in section
+    assert "Their exact service/account names need not be repeated" in section
+    assert not re.search(r"/Users/[^\n`]+/private/[^\n`]+token[.]txt", section)
+    assert "trading-agent-" not in section
     assert "Codex has not opened/read/hashed/printed/copied the token" in " ".join(section.split())
 
 
@@ -5271,3 +5278,61 @@ def test_section_91_guard_refuses_contradictory_authority(monkeypatch, added_gra
         lambda heading: mutated if heading.startswith("## 91.") else original_section(heading))
     with pytest.raises(AssertionError, match="contradictory section 91 authority"):
         test_section_91_review_records_every_commit_and_grants_nothing()
+
+
+def test_section_92_counterreview_records_both_commits_and_closed_scope():
+    section = _record_section("## 92. Codex counter-review of Claude section 91")
+    assert SECTION92_RANGE in section
+    dispositions = _bounded(section, "| Incoming commit |", "**Cumulative disposition:", "section 92 dispositions")
+    rows = tuple(re.findall(r"^\| `([0-9a-f]{40})` \| \*\*([^*]+)\*\*", dispositions, re.M))
+    expected = (("273d5c96fe44f1f733ab7ffff9108bd5641e1e1e", "Accepted after correction"),
+                ("557b2250aa82f330a995362ebd75c4f30ab03a34", "Accepted after correction"))
+    assert rows == expected, "exact section 92 dispositions"
+    assert tuple(commit for commit, _ in rows) == tuple(_git_lines("rev-list", "--reverse", SECTION92_RANGE))
+    scope = _bounded(section, "<!-- TPR-CCR27-SCOPE:START -->", "<!-- TPR-CCR27-SCOPE:END -->", "section 92 scope")
+    scope_rows = tuple((a.strip(), b.strip()) for a, b in re.findall(r"^\| ([^|]+) \| ([^|]+) \|$", scope, re.M)
+                       if a.strip() not in {"Boundary", "---"})
+    assert scope_rows == (
+        ("Counter-review", "Both incoming Claude commits and cumulative tree"),
+        ("Local inputs", "Public committed source, artifacts and synthetic fixtures only"),
+        ("Private/provider/cloud/UI effects", "None in this round"),
+        ("Executed candidates and frozen economics", "Unchanged"),
+        ("QC launches and new observed looks", "Zero"),
+        ("Publication", "Exactly one matching-lane non-force final push"),
+        ("Monitor", "PAUSED; no automatic rearm"),
+        ("Next independent role", "Claude review of this exact counter-review snapshot")), "closed section 92 scope"
+    assert re.search(SECTION81_GRANT, scope, re.I) is None, "contradictory section 92 authority"
+    assert "Cumulative disposition: accepted after correction." in section
+    for number in range(1, 9): assert f"TPR-CCR27-{number:03d}" in section
+    for required in ("source_inspect/source_view still have the oversized-receipt defect",
+                     "Actor/time/cause remain unproved", "OFF3 spent, ON0 unlaunched",
+                     "prospective31 reserved/delivery unresolved", SECTION92_NEXT_ROLE):
+        assert required in " ".join(section.split()), required
+
+
+@pytest.mark.parametrize("before,after", (
+    ("**Accepted after correction**", "**Accepted**"),
+    ("None in this round", "Cloud effects permitted"),
+    ("QC launches and new observed looks | Zero", "QC launches and new observed looks | One"),
+    ("PAUSED; no automatic rearm", "ACTIVE; automatically rearmed"),
+))
+def test_section_92_guard_refuses_disposition_or_scope_drift(monkeypatch, before, after):
+    test_section_92_counterreview_records_both_commits_and_closed_scope()
+    original = _record_section
+    section = original("## 92.")
+    assert before in section
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda heading: section.replace(before, after, 1) if heading.startswith("## 92.") else original(heading))
+    with pytest.raises(AssertionError): test_section_92_counterreview_records_both_commits_and_closed_scope()
+
+
+@pytest.mark.parametrize("locator", [
+    "/Users/synthetic/private/synthetic-token.txt", "trading-agent-synthetic",
+])
+def test_owner_locator_hygiene_guard_rejects_precise_public_locator(monkeypatch, locator):
+    test_final_owner_mia_handoff_preserves_block_and_credential_locators_only()
+    original = _record_section
+    section = original("## 87.") + "\n" + locator
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda heading: section if heading.startswith("## 87.") else original(heading))
+    with pytest.raises(AssertionError): test_final_owner_mia_handoff_preserves_block_and_credential_locators_only()

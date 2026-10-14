@@ -26982,3 +26982,174 @@ expected five-file status and matching remote verification follow before
 this candidate commit. The actual operation is still unexecuted here.
 Final192 record/active-document/EXACT checks72 passed1.24s; operation namespace
 is absent, diff clean and matching origin remains exactf89d2437 before commit.
+
+## 193. Owner-requested selector checkpoint: actual late refusal, preserved evidence and durable handoff (2026-10-14)
+
+### 193.1 Exact round, authorization and observed operation
+
+The owner's latest endpoint is "just proceed to the next checkpoint and push",
+with an explicit reminder to document progress. This narrows the resumed round
+to192's qualified retained-archive metadata selector and its preregistered
+operation, not a claim of lane completion. The separate implementation commit
+is f7759b789974a5828ec53ef16bb97b76ab7c3028; this entry is its subsequent
+documentation-only handoff. Outgoing range starts exclusively at
+f89d2437a6d3d6c91c3ea8f62311afe386612912. Matching-lane fetch at16:04:00UTC
+verified origin still exactf89d2437, local HEAD exactf7759b78 and a clean tree.
+There are ZERO incoming commits for this resumed round; no pending Claude
+commit is skipped, no previously accepted review is reopened, and no new
+independent Claude review is claimed. The monitor remains PAUSED.
+
+The single preregistered actual invocation
+ib-affected-quarter-selector-all6-retained-v1-20261014-once ran from clean
+f7759b789974a5828ec53ef16bb97b76ab7c3028, with the exact active pure/front
+and test identities in192.2. Its actual terminal result was EXIT2 after
+66.924 seconds, stderr0 bytes and stdout168 bytes. The strict diagnostic was
+offline_affected_quarter_selection_refused_outputs_preserved / ValueError /
+parent_final_output_check / os_errno=null. This is a FAILED overall operation,
+not successful publication or an accepted actual-selector milestone. The
+worker returned validated aggregate metadata and the parent published three
+leaves before its final held-output recheck refused. A complete.json filename
+or its boolean isolation assertions do not override the terminal refusal.
+
+Retained private namespace:
+artifacts/insider_buying/affected_quarter_selector_v1/
+ib-affected-quarter-selector-all6-retained-v1-20261014-once. Exact three-leaf
+inventory, sizes and hashes independently read back under native network,
+fork and all-write denial:
+
+| Leaf | Bytes | SHA256 |
+|---|---:|---|
+| reservation.json | 27812 | 08a11e4dea01408970ad5ab6df12a31b411ae12472fdf9a712195b01515fe8d8 |
+| selection.json | 91237 | d1dd4e093d5505fac6373562bb24198c7ad6fc61ef7745912a40bff84528aaef |
+| complete.json | 39794 | ca0fb475cbb102505cc07bf33e7a67568919ecfc4687bee7b9475162c3045e57 |
+
+The receipt's current observer publication clock is
+2026-10-14T15:53:39.831274+00:00; there was NO CLI-success clock. It is not an original
+source capture clock, SEC acceptance/publication clock or PIT evidence.
+Current execution source inventory digest is
+e23a401dfed8342bb10e461248a4fe2b1470dcfcd15c306080c1fd445a76d326.
+The captured worker inventory contains78 executed source images, digest
+1aba05a0e8043bfecd3f3cc43838ded7ff733e8a1fb2dee5354f7bdc2686aca3.
+It is source-only lane execution, not reconstruction of a complete historical
+environment. Execution provenance is the already-existing f7759b78 source
+commit; do not relabel this later handoff commit as present during the run.
+No semantic rerun, namespace resume/overwrite, renamed retry or provider/SEC
+redispatch has occurred. The failed root stays preserved and unpromoted.
+
+### 193.2 Candidate metadata observations, not authority or corpus completion
+
+The retained candidate reports82 quarters,4458409 submissions and4034227
+Form4/4-A rows. All six form counts agree with192's fixed source profile:
+Form3=331258,3/A=15819,4=3934823,4/A=99404,5=74654,5/A=2451.
+Short raw CIKs occur in146 rows/132 relevant rows; accession/source-filing-year
+mismatches occur in15 rows/13 relevant rows. These are aggregate observations
+from the refused candidate output, not successful final custody acceptance.
+Counts remain within-quarter unique accession counts, not cross-quarter
+global deduplication. Raw dates, CIKs, source rows and denominator are unchanged.
+
+| Candidate affected-quarter category | Exact ordered quarters | Count |
+|---|---|---:|
+| Accession/source-filing-year mismatch | 2006Q1,2007Q3,2007Q4,2011Q3,2011Q4,2015Q2,2017Q4,2018Q2,2018Q3,2018Q4 | 10 |
+| Short raw CIK | 2020Q4,2021Q1,2021Q2,2021Q3,2021Q4,2022Q1,2022Q2,2022Q3,2022Q4 | 9 |
+| Union / overlap | Above19 quarters in source-window order / no overlap | 19 / 0 |
+
+Neither the19-quarter candidate list nor passing fixture/contract tests admit
+a complete parent, integrate affected-quarter IB1C, promote scale, publish
+IB1B, establish issuer/share-class/CIK/QC-SID/listing/PIT identity or processing
+rights, resolve strictD23, or grant canonical/QC/backtesting/execution authority.
+Every authority bit remains FALSE; sec_dispatches,qc_jobs,research_looks are0.
+No actual accession/CIK/name rows or financial values are exported to this
+record. The candidate list may guide a future qualified fact-closure scope;
+it is not an authorization to fetch parents or launch a strategy evaluation.
+
+### 193.3 Precise unresolved finding and bounded read-only diagnosis
+
+| Finding / priority | Status, evidence and required next action |
+|---|---|
+| IBSELECT-OBS-01 / P2, lane-owned observed operation | OPEN. Exact clean-f775 actual operation exited2 at parent_final_output_check with ValueError after publishing three pinned leaves. Original exception text/stack were not captured, so no exact cause is established. Preserve the root and terminal failure; do not infer successful final custody from a later readback. Next: establish the late refusal's cause with privacy-safe controls/diagnostics, apply only a verified new-front correction with meaningful red/green evidence, then define any additional offline verification explicitly before execution. No silent rerun or weakened custody gate. |
+
+Independent main read-only control sequence used fresh held handles for the
+same three pinned output leaves, constructed/rechecked the original84-leaf
+intake hashes, ran the real exact-f775 current/Git/frozen-source identity check
+and then rechecked those output handles. It PASSED in4.981 seconds under
+effective process-tree network denial; all three output streams remained open
+at every checkpoint and the source inventory digest stayed exacte23a401d.
+This control interprets no ZIP rows, rederives no selection, publishes nothing
+and makes no source/acquisition/account request. It does NOT reproduce or
+resolve the original late refusal. An earlier all-write-denied control setup
+refused EodhdDemoError in Git identity, before final output checking: that
+harness incompatibility is NOT the actual operation's cause.
+
+The selector author separately inspected source and ran invented-temp-only
+real intake/source-hash/output-check controls: five rounds and125 independent
+descriptor open/check/close cycles passed0.537 seconds with unchanged output
+stream descriptors/versions/cursors/open states. A deliberately closed-stream
+control produced ValueError, but that is not evidence an actual stream was
+closed. No peer or selector author read actual archives/output roots/accounts/UI or edited
+shared/frozen behavior. No speculative correction is presented as a fix.
+
+IBSELECT-CLEANUP-01 and IBSELECT-FORM-01 remain corrected as192 records; those
+verified preactivation corrections do not close IBSELECT-OBS-01. The earlier
+title/reference operation's late ValueError remains separately unresolved;
+similar exception classes are not proof of a shared cause. Six carried OPEN
+P2 scopes remain unchanged: IB1C-REAL-CR01,IB1BCAMP-CR01,IBSRC-CR01,
+IBSRC-CCR01,sharedIBSH-CR02 and sharedIBQC-SHARED-META01. No openP0/P1 or
+previously resolved finding is silently changed by this checkpoint.
+
+### 193.4 Checkpoint progress, exclusions and next action
+
+Technical progress: the committed new selector/front and meaningful focused
+qualification are complete; one real retained-archive operation reached a
+validated aggregate result but failed final custody and is preserved. Thus
+this is an implementation-and-failure-evidence checkpoint, not completion of
+the actual-selector operation. The precise19-quarter candidate list and
+hash-bound failure handoff replace an unmeasured-quarter guess without
+changing the admission/readiness gates. Final focused record/active-document,
+compilation, import-boundary, EXACT Insider package guard, frozen-byte,
+diff/status and matching-remote checks follow before this separate handoff
+commit and ONE successful owner-requested checkpoint push.
+
+Plain-language progress: the new offline tool found the source quarters that
+need closer identity review, but its final safety check rejected the run.
+The evidence is saved; it has not been called a successful or backtest-ready
+dataset. The next engineering task is diagnosing that rejection and qualifying
+any verified correction, not another purchase, new SEC request, QC launch or broader
+strategy study. No additional routine owner approval is requested for this
+diagnosis. A real vendor/account/evidence blocker, if encountered in later
+data work, cannot be manufactured by delegated judgment.
+
+This handoff preserves the frozen82-quarter window, both earnings diagnostics,
+strategy economics, strictD23 seven nonexact quarters/no82-quarter promotion,
+frozenv1/scale/pilot and all four current-byte-hashed v3 files. Stoppedv3 stays
+1846 completed/1847 starts with its unmatched start unresolved; the separate
+7373-byte diagnostic/report206e6db9677fb169455f62357ce966384926080b6eba582094e9536e88d705b7
+does not resolve or rewrite it. The current2022Q4-2023Q1 denominator stays
+99394,19846 source-bound and79548 originally unattempted, not a full-study
+replacement. Both final owner incident classifications remain distinct,
+without retroactive approval, exactly as190-192 record them.
+
+SDK transfer/completion drafts remain ignored, local and excluded from this
+push; no full independent qualification or actual transfer/invocation is
+claimed. Original SDK scope/images remain permanently claimed/unexecuted,
+not reset/reclaimed/thawed. No new provider/credential access, SEC acquisition,
+QC job/strategy launch/backtest attempt, outcome look, scheduler/operator-
+database/broker change, capital/funded/paper/live/order action or shared-doc,
+Action Plan or SESSION_HANDOFF edit. No complete lane/repository suite.
+Keep monitoring PAUSED; no automatic rearm or other-chat message.
+
+Final main focused pure/front, lane-record/active-document, import-boundary and
+the exact tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports
+selection205 passed13.84 seconds under process-tree network denial with an
+isolated temporary database/test root. Four active source/test images compiled
+in memory; independent native loopback/fork/inside-and-outside-write denial
+probes passed. All four frozen current images equal exact historical Git bytes;
+diff check is clean. Independent source/doc-only peer confirms no verified
+premature output-close path and reviewed this handoff; its wording corrections
+distinguish main actual readbacks from author/peer fixture-only work and state
+that no CLI success occurred. Final post-wording record checks and commit-time
+root/branch/HEAD/status/remote verification follow. No actual semantic replay,
+full suite, SDK activation, intermediate push or additional acquisition.
+Post-wording record/active-document/EXACT selection72 passed1.22 seconds.
+Immediate pre-handoff verification again found exact designated root/branch,
+HEADf7759b789974a5828ec53ef16bb97b76ab7c3028, only this lane record modified,
+diff clean and matching origin exactf89d2437a6d3d6c91c3ea8f62311afe386612912.

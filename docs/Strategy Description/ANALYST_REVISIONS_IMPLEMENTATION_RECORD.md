@@ -596,9 +596,12 @@ section300 now completes their implementation and focused validation. No QC
 backtest attempt has occurred. The owner's October14 correction resumes the Analyst storage
 fix and matched six/eight study (section300), superseding that QC pause.
 The later "next checkpoint and push" direction selects the completed one-use
-storage attempt as this checkpoint, before backtest launches. Positive storage
-admission must precede capacity/backtests. The monitor remains
-PAUSED; direct resumption does not rearm it.
+storage attempt as this checkpoint, before backtest launches. D15/V4 now
+passed once atbcc17ec3: all six objects were uploaded/verified, actual exit0
+and matching admission returned (300.4). Storage is admitted prospectively;
+the original upload's cause is still unknown. No capacity or strategy operation
+followed. Next is the separately frozen six/eight A1 lifecycle. The monitor
+remains PAUSED; direct resumption does not rearm it.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1652,14 +1655,16 @@ sequencing authority, not independent acceptance or technical/source clearance.
 The owner's October14 corrected direction in section 300 explicitly resumes
 this Analyst lane and supersedes the QC pause in299.9; the earlier mention
 of Insider Buying was a mistake, not cross-lane implementation authority.
-Finish and validate the separately versioned V4 exact-grammar storage recovery,
-bind its final source pins, and commit a new exact run decision before contact.
-Require actual successful storage admission before separately frozen capacity
-and six/eight backtests; observed occupied capacity still means WAIT, never
-interference with another lane. The later "next checkpoint and push" instruction
-selects the completed one-use storage recovery attempt and documented result
+The V4 correction and one-use recovery have now completed successfully at the
+exact300.3 freeze; actual exit0 and authenticated matching admission are in300.4.
+D15 is spent, not rerunnable. The next substantive action is a separately
+committed exact V4 continuation freeze binding that actual exit, receipt pin,
+final caller/profile/source, current clean HEAD and297.14's unchanged A1
+protocol, then capacity and six/eight backtests. Occupied capacity still means
+WAIT, never interference with another lane. The later "next checkpoint and
+push" instruction selects the completed storage recovery and documented result
 as this round's boundary, before any strategy launch. Exactly one final push
-is due this new round.
+is due at this checkpoint; no routine vendor/permission acknowledgment is needed.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -3591,6 +3596,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-13–14 | Conclusion of the same owner-directed connection/data/six-cell round | `ec036238` -> twelve exact implementation/result commits through `0051adaa`, plus final 297.20 handoff (thirteen commits total) | No new Claude range; owner waived routine current review, not independent acceptance | Provider connections checked; retained exact-duplicate recovery and October package admitted prospectively; six/eight AR-off/100/200 family prepared; QC upload refused; bounded offline and read-only metadata diagnostics completed without acceptance | Per-stage focused checks and limitations in296–297; final record/diff/status checks below; no complete Codex suite, strategy result or outcome evaluation | ARV2E297-014 OPEN: unknown Object Store refusal; ARV2D297-013/-014 and historical P2s retained; no actual begin/compile/launch, floor314/239/50/699 | Exactly one successful final matching-lane push for this continuous round; monitor PAUSED; obtain same-organization storage/permission facts before separately justified recovery, no unchanged upload retry |
 | 2026-10-13–14 | Owner-reported 2GB upgrade and bounded storage recovery | `c555fb9d` -> `94a7bb36`, `2cdfbc6a`, `9e93d116`, `875dcb1f`, final section298 handoff (five commits) | Current owner review waiver, not independent acceptance; no new Claude range | V1 test/control isolation incident preserved and corrected prospectively; V2 listing refuses; D11 observes null listing/pagination; D12 records six HTTP200/APIfalse metadata refusals without absence/admission | Per-stage focused checks in298; final261-test selection and86-record repeats overlap earlier work; no full suite | ARV2I298-001 P1 corrected prospectively with historical effects retained; ARV2E297-014 remains OPEN; no upload or strategy attempt,314/239/50/699 unchanged | One final matching-lane push; monitor PAUSED; same-organization effective allocation/Storage Create facts needed before materially justified new recovery, no unchanged retry |
 | 2026-10-14 | Actual storage-error observation, V3 grammar refusal and owner-requested paused checkpoint | `e4e41af1` -> `ccc3efff`, `14d8c9a9`, this final section299 checkpoint (three commits) | No new Claude range or independent acceptance; scoped owner waiver and per-commit dispositions in299.9 | UI confirms effective2GB; D13 retains redacted missing-file reason; V3 refuses first exact-key grammar before any set; both spent; seven unfinished V4 files preserved with placeholder pins, no run freeze | Root499 distinct focused passes before V3 invocation; checkpoint compilation and record checks in299.9, not V4 functional validation; no full suite | ARV2D299-005 and storage admission remain OPEN; zero new strategy attempts;314/239/50/699 unchanged | Exactly one final matching-lane push requested by owner; QC remains paused for another lane until owner's all-clear; monitor stays PAUSED |
+| 2026-10-14 | Owner-resumed V4 storage correction and successful publication checkpoint | `c866592f` -> `bcc17ec3` and this final section300 result/handoff commit (two commits) | No new Claude review; scoped current owner waiver, not independent acceptance | Completed V4 exact-key grammar and dependency bindings; sole D15 exits0 with24dispatches, six sets and six exact readbacks, activation last; matching admission returned; no backtest launch | Root430 distinct focused passes12.54s, seven memory compiles,63selected pins; omission checks and limitations in300.2; document repeats not additive; no full suite | ARV2D299-005 and ARV2D300-001 corrected prospectively; ARV2E297-014's current storage barrier resolved, original cause still unknown;314/239/50/699 unchanged | Owner's next-checkpoint instruction: one final matching-lane push now; next separately freeze A1 continuation with actualexit/admission before capacity and six/eight runs; monitor PAUSED |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -49688,3 +49694,95 @@ project creation, compile, launch, result read or strategy cell. After its
 actual result is recorded, conclude this checkpoint with one final push.
 Future six/eight lifecycle use requires its separately committed exact freeze
 and actual successful admission. The314/239/50/699 floor remains unchanged.
+
+### 300.4 Actual D15 success; current storage barrier resolved prospectively
+
+D15 ran ONCE at clean freeze
+`bcc17ec34bf8f821f38a6755d21611e287040608`, with300.2's exact recovery caller
+and profile. External dispatch **2026-10-14 15:46:21UTC**, completion observed
+**15:46:36UTC**, actual process **exit0**. The normal envelope's internal
+interval was `2026-10-14T15:46:24.623074Z` through
+`2026-10-14T15:46:35.858789Z`. The external second-resolution bracket is not
+an exact provider timing measurement. `operation_completed=true`,
+`complete=true`, `failure_code=null`, exact HEAD/caller/profile all matched.
+Root/branch/HEAD/status remained equal and clean afterward; all authors held
+writes/tests. No second reader or report reinspection was performed.
+
+Under the same fixed control parent, the returned authenticated outputs are:
+
+| Output | Bytes | SHA256 |
+|---|---:|---|
+| `storage-recovery-v4-report.json` | 15,506 | `c4db9fb85a0105bc733faad3f26e930515585cc6d04af92277f5d164cec057cc` |
+| `storage-recovery-v4-admission.json` | 1,165 | `1a6850a8fbefeeab8dea2fead19b3b5f656ca29987da9ef180be1e7cc59322a3` |
+
+The single bounded envelope records exactly24 attempted application
+dispatches, all HTTP200: six initial properties calls, then for each fixed
+index0–5 one absence recheck, one set and one properties verification. All
+initial/recheck responses matched exact V4 template index3,
+`File not found {key}`; this is a fresh observation of the supported space
+separator, not retrospective reconstruction of D14's discarded raw message.
+All six sets returned APItrue, and all six subsequent readbacks returned
+APItrue/present with exact key/size/actual-payload MD5 validation. Index5, the
+activation manifest, was last. The exact existing2,776,584bytes were published;
+no alternate key, overwritten known object, new data acquisition or modified
+strategy input was used. This finite protocol does not eliminate its disclosed
+check-then-put race or prove perpetual cloud-object integrity.
+
+Actual exit0 follows successful local source postchecks, exact request census,
+claim/report/admission readback and directory verification. Therefore this
+specific V4 admission is usable by its bound future continuation. The producer
+and its new controls are now spent/frozen; do not replay D15, renew its claim,
+repair outputs or silently refresh its pins. Future approved consumers may
+reauthenticate the admission through their prescribed V4 consumer path; that
+is not a rerun of the publication operation.
+
+ARV2E297-014 is **resolved prospectively for current storage publication and
+admission**. D7's original HTTP/API refusal and cause remain unknown and
+unaccepted; current success cannot establish prior quota/permissions causality
+or erase earlier local/remote ambiguity. ARV2D299-005's grammar correction is
+also exercised successfully in this fresh scope. No claim of independent
+review, immutable/PIT history, security-master admission or strategy efficacy
+follows. Formal/paper/readiness flags remain false. Historical open findings
+unrelated to this scoped recovery remain open.
+
+No capacity request, QC project creation, compile, backtest launch, result
+read or outcome evaluation followed D15. Node availability is not observed.
+The six/eight family still has zero begun attempts and zero result cells;
+the booked floor remains314shared/239development/50infrastructure/699cells.
+
+### 300.5 Checkpoint handoff and next bounded action
+
+This completes the owner's requested next storage checkpoint, not the full
+six/eight evaluation. The continuous range from
+`c866592ff62ea353a957e721168e91b0567e6c6d` contains exactly two new commits:
+
+1. `bcc17ec34bf8f821f38a6755d21611e287040608`: completed V4 caller/test
+   bindings and exact D15 prospective decision. Retain as exercised successfully
+   under the current scoped owner waiver; do not label it independently reviewed.
+   The missing dependency-pin finding was corrected before this freeze.
+2. This result/handoff commit: records the single actual successful use,
+   exact output pins/exits, limits, unchanged look counts and next action.
+   It contains no new operational authorization or code change.
+
+Root's430-test final code selection remains300.2. The pre-freeze86record repeat
+passed in0.93s and overlaps that selection. Final86record/document checks
+passed in0.88s, with no failures/skips/warnings; counts are not additive.
+Diff checks are clean. No complete suite, source corpus census,
+old operational replay, unrelated lane mutation or provider request occurred.
+Only the fixed QC storage operation ran. All source/test identities in300.2
+remain unchanged. Exactly one final non-force push targets the matching lane
+branch; verify local/tracking/live remote agreement and clean status afterward.
+
+Next checkpoint: commit a separate exact V4 continuation run decision binding
+the observed D15 exit0, admission SHA
+`1a6850a8fbefeeab8dea2fead19b3b5f656ca29987da9ef180be1e7cc59322a3`,
+caller SHA`49624d649f4552f031690e74ec0a137c8205d5be6389c86938914532cb590bdc`,
+profile`5dd6a386ee5271b6c579c444c14825d428935243082ee0250ad78dc9d1ccb4eb`,
+current clean HEAD, fixed package/family and297.14's source/economic/exit
+protocol. Then observe bounded read-only capacity; wait if occupied and leave
+other lanes untouched. Execute R298,R299,R300,R301,R302,R303 in order, A1 only,
+with their exact compile/launch/status/read checks. A failure needs coherent
+diagnosis/recovery, not an unchanged retry or advancement to the next cell.
+No preparation, organization discovery or upload is repeated. No routine
+access acknowledgment or vendor switch is needed; the current pause monitor
+does not authorize or automatically launch this next checkpoint.

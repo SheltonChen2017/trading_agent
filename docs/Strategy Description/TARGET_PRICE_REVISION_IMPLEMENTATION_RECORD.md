@@ -20800,3 +20800,80 @@ blocker; no checkpoint push or monitor rearm. Heartbeat stays PAUSED.
 Canonical and shared/sibling gates/documents remain unchanged. First attempted
 scope append refused because the patch anchor omitted the preceding line;
 zero tracked mutation or private/cloud effects occurred before corrected append.
+
+### 88.2 Current UI facts and fresh metadata software freeze before effects
+
+STORAGE-VERIFY002 genuinely used HEAD8fa322b862537efa6e9617b9964e9d9041343845,
+created23:53:58.786370Z/expiry00:08:58.786370Z (expiry2026-10-14), access2229bytes/
+c09e06841f85fd517bb8e1f602668684bb69c26c29e99f8241fbab9458576815.
+After page refresh this exact organization still displays50.01MB/50MB.
+Owner2GB upgrade remains reported, not disproved; display lag/pending activation/
+different allocation are UNPROVED possibilities, not assigned causes. No
+purchase/account/secret/object-value or other-lane action occurred. Eight AX
+observations/four navigation-or-pane actions/zero screenshots. Exact own OFF
+project is authenticated; its Assistants panel exposes existing "source audit
+key successor - Pending Input" chat. It was not overwritten/messaged. An
+unsolicited import-edit modal was explicitly cancelled without accepting edits.
+Mia identity/actionability remains unverified until a fresh scoped new-chat
+check, not a new Mac-login requirement.
+
+Normal IDE viewing exposed a successful auto-build log short17d503-b18f02,
+engine18179, unzoned11:55:13. Root requested zero compiles/jobs and did not
+change engine/version/source. This observed build is NOT a native full compile
+ID, a failed Codex launch attempt or proof of historical job bytes. Public UI
+filtering briefly included an existing runtime-docstring line and incidental
+tab titles; no token/license row/body or unrelated tab action occurred. Later
+filters restricted roles/own-pane ranges. Result1170bytes/SHA256
+d92882b50f7bf2324f5f882130a6c9fd183214ce4d7e585f24934103a0454a56
+retains distinctions and counts; controller exited0/released before other work.
+
+New named metadata-only successor and focused test are agent-verified:
+research/target_price_revisions_qc/extended_owner_mia_discovery_successor.py
+19836bytes/ab6fd4700c7566862821933fdf3e8ed1ec2e42d2aa037c3eca18232851f72c5a;
+test16570bytes/63c7a1174a6721710a35766193544d00ddde72d28f296878eddb1930595bab7d.
+Original93b45e42 and looks30ledger0d42011a remain unchanged. Main read both
+complete files. Fresh successor prefix cannot reuse the old operation; exact
+source/clock/TLS/claims/controller/FD budgets and all14 known jobs remain bound.
+Explicit-offset/server-unzoned creation groups retain exact fractional precision;
+presentation order between groups is not chronology. No automatic look update,
+new job/attempt/source/error/statistic read or native/strategy acceptance.
+Agent56passed0.79s, reverse mutants killed1/1/3/1 cases for naive refusal/
+missing10knownjobs/fraction truncation/final scope check. Root focused56+330
+document controls=386passed7.45s, no full suite. First root invocation used
+a nonexistent development-test path: pytest exit4/no tests ran0.00s; corrected
+actual target path above. In-memory compilation/diff checks pass. All tests use
+isolated in-process49/52 runtime root before dispatch/config; no actual stop/db.
+
+TPR-EXT26-D096 (agent-delegated, independent review pending): use NEW
+TPR-EXT26-OWNER-MIA-DISCOVERY-SUCCESSOR-20261013-001, one fixed own-project
+metadata response under next committed source/currentHEAD/<=15minute UTC
+access/claims BEFORE credentials/request. No old001 refusal retry or old scope
+renewal. Retain every status, provenance/unknowns and unchanged look accounting.
+
+Prospective further read-only genuine-Mia diagnosis scope
+TPR-EXT26-MIA-READONLY-DIAG-20261013-002, only after current list and fresh
+committed access/controller: create a separate own37650980 chat without touching
+the existing Pending Input conversation. One read-only prompt; <=24AX views/
+12navigation-or-pane actions/600seconds/zero screenshots/<=24KiB sanitized
+diagnostic disclosure. Check effective ObjectStore max_size/max_files and exact
+look30/job4936632376c0885358493a2694ed239b native error/stage and job-source
+conformity. No source edits/compile/strategy job/upload/delete/account/purchase,
+global keys/values/unrelated providers/projects/D0, market-row output or secrets.
+Pure quota metadata evaluation, if Mia needs it, is a prospectively recorded
+non-order diagnostic because it evaluates storage limits, not strategy returns;
+no price/signal/order join or development look is granted. Do not execute the
+unsafe global notebook cell. Ask Before Edits stays enabled. Reject any tool
+request outside this scope; a repair/re-execution still needs separate frozen
+sources, exact Mia operation and next retained look BEFORE effect.
+
+Independent subagent review reproduced56green0.63s and the four existing
+reverse proofs. A suggested negative-zero-offset refusal was independently
+checked by root against RFC3339/9557 and closed as FALSE ALARM: UTC time is
+known even when local offset is unknown; existing parser does not assert a
+local timezone. Root's provisional refusal test1failed0.39s established
+acceptance, not a chronology defect, and was replaced with three evidence-
+aware literal-preservation cases. Runtime sourceab6fd470 stays unchanged;
+final test17309bytes/992d55e4f757e32f08240808e8304d61ffe1e2024cadf5fc30f7a0c9c7648737.
+Root59focusedpassed0.75s. No external/native/canonical acceptance is implied.
+https://www.rfc-editor.org/rfc/rfc3339.html
+https://www.rfc-editor.org/info/rfc9557/

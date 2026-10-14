@@ -1,19 +1,29 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **OWNER-RESUMED SHORT INTEREST BUILD FROM PUSHED `bff9a0e8`;
-NEXT COHERENT CHECKPOINT PUBLICATION IS REQUESTED (116.23).
-THE OWNER'S REVIEW WAIVER CONTINUES; NO INDEPENDENT ACCEPTANCE IS CLAIMED.
-NAMED LOGIN-KEYCHAIN SELECTORS ARE RECORDED; ONLY EXPLICITLY DOCUMENTED
-EXISTING CREDENTIAL ROUTES ARE USED (116.6/116.10). EXISTING PROTECTED
-CAPTURES/SPENT BUDGETS ARE RETAINED. THE EXACT112-DATE IDENTITY
-CONTINUATION AND INDEPENDENT SOURCE REPLAY ARE CLOSED (116.15);
-COUNTS/DAILY INPUTS/EXECUTION ADMISSION ARE STILL IN PROGRESS.
-STRICT ORIGINAL-VINTAGE PIT AND LATEST-REVISED EXPLORATION STAY DISTINCT;
-NO FIXTURE RELABEL, FABRICATED SOURCE FACT OR CHANGED 48-BOOK ECONOMICS.
-LOOKBACKS 20/60/120/252 UNSELECTED; CANONICAL ACTUAL LOOKS0/0,
-EXPLORATORY ACTUAL LOOKS0, ALPHA0, PERMANENT LOOK IDS NONE, QC ATTEMPTS0
-UNTIL GENUINELY QUALIFIED PROSPECTIVE EXECUTION. NO BACKTEST IS CLAIMED
-FROM SOFTWARE OR SOURCE TRANSPORT ALONE. HISTORICAL LEDGER ROWS REMAIN.**
+Status: **CLAUDE (MACOS SESSION) HAS REVIEWED ALL 21 CODEX COMMITS IN
+`0cfb574..f486ef5` (SECTION 117), THE OWNER-WAIVED CONTINUOUS BUILD OF
+SECTIONS 115-116, AND ACCEPTS THEM, TWO AFTER RECORD CORRECTION. THE RANGE IS
+TOO LARGE FOR A FULL LINE-BY-LINE READ; THE REVIEW COVERS AUTHORITY, EVERY REAL
+PROVIDER REQUEST, CREDENTIALS, DATA KEPT OUT OF GIT, QUANTCONNECT, CAPTURE
+PROTECTION AND THE GUARDS ON THE REQUEST PATHS. REAL REQUESTS THIS ROUND WERE
+MASSIVE (30 CLASS, 46 POPULATION, 1,340 IDENTITY), DIRECT SHARADAR (112), A
+4-REQUEST DISCLOSURE ROUTE AND ONE SEC GET; NONE TO FMP, EODHD, FINRA OR
+QUANTCONNECT. NO SECRET OR PROVIDER ROW IS IN GIT, AND EVERY CAPTURE IS
+0600/0700. `SI-CR22-001` (P3) IS CLOSED BY THIS RECORD COMMIT: PUSHES `bff9a0e`
+AND `f486ef5` ADDED NO LEDGER ROW, AND RECONSTRUCTED ROWS ARE APPENDED.
+`SI-CR22-002` (P3) IS CLOSED AS A FORWARD RULE: THE ONE SEC REQUEST DECLARED NO
+CONTACT; ITS FROZEN ONE-SHOT IS SPENT, AND ANY FUTURE SEC REQUEST MUST TAKE A
+CONTACT AT RUNTIME, NEVER FROM GIT. NETWORK-DENIED ON
+`f486ef5`, THE 73 AFFECTED LANE TEST FILES PASS 2,523. TWO LARGE
+MASSIVE ROUNDS (74,816 AND 81,875 REQUESTS) ARE REGISTERED BUT NOT RUN. THE
+NEXT STEP IS QUALIFYING IDENTITY, SAME-CLASS SHARES, ISSUER SIZE, RAW VOLUME AND
+TERMINAL CASH, THEN LOOK REGISTRATION (`SI-CR19-003`); THE CANONICAL PIT STUDY
+REMAINS BLOCKED. THE SOURCE P2s, `SI-CR-WIN-20261012-002`, THE SHARED P2
+`SI-CR5-005` / `SI-CCR16-007` AND `SI-CR15-001` REMAIN OPEN. LOOKBACKS
+20/60/120/252 REMAIN UNSELECTED; REAL LOOKS 0/0, ALPHA 0, PERMANENT LOOKS NONE,
+QC ATTEMPTS 0. OUTCOMES, HOLDOUT, PRODUCTION RANKING/SEEDS, ETF, QC
+HISTORY/PROJECT/UPLOAD/COMPILE/JOB/BACKTEST, PURCHASE, BROKER, OPERATOR
+DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL, ORDERS AND TRADING REMAIN GATED.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -229,6 +239,9 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-13 | Claude review (macOS session) | `ab85a03` -> `d3ac5bf` reviewed from the published head; **no code or test correction**; this record commit is the only Claude commit | Independent review of Codex's Windows counter-review, the POSIX-only test markers and the protected-host capture prerequisite | Verified the marker change is mechanical (104 decorators, no assertion changed), the guard is capability-only and placed first on all 34 sensitive paths, and POSIX behaviour is unchanged. Confirmed the original master and native-binding captures exist on this Mac with matching section-111 byte digests and 0600/0700 protection. Ran two in-memory probes of the guard; both red. | Pushed tree `d3ac5bf`, clean, network-denied, empty environment: Codex's eleven-file selection **601 passed, none skipped** (Windows: 344 passed, 257 skipped); platform baseline 64 passed; changed files compile; final-tree active-document 69 passed; `git diff --check` clean. **No complete lane suite, by owner direction.** **Authorized looks 0, consumed looks 0**. | No new finding. `SI-CCR-WIN-20261012-001..003` accepted. `SI-CR-WIN-20261012-001` (P3) and `-002` (P2) open. `SI-CR19-003`, source P2s, shared P2 and `SI-CR15-001` open. | Codex counter-reviews this record commit, then continues section 111.10's class, denominator and terminal-payment qualification on this Mac from the original captures. Every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
 
 | 2026-10-13 | Codex counter-review + bounded historical source qualification | Accepted sole Claude `0cfb574a`; new Codex `de044654`, `4539682f`, `da3edc51`, `c790bd3d`, `9e05c7f1` plus this closing record; exact hashes in115.8 | Protected class/denominator, disclosure, native-class bridge and SEC-original evidence | Exact existing review accepted before implementation. Thirty class, four disclosure and one anonymous original GETs complete under committed prospective protocols; offline bridge/replays preserve original consumed budgets. EODHD credential location only retained, token unread. Not full-study qualification or backtest readiness. | Main **576 focused passes in7.40s**,15 Python files compile in memory, active-document/diff/status and original-byte checks. Canonical actual0/0, exploratory0, alpha0, QC attempts0; Step3 not registered/executed, no node query. | Five continuation findings corrected before affected application; retained historical source/shared/Windows/prospective rows unchanged. Pre-publication ledger omission corrected in this record. | One combined final non-force matching-lane push. Claude reviews the exact combined snapshot; next qualify full-study class/count/payment facts before real-look/QC registration. Waiting one-shot deleted; other paused monitors unchanged. |
+| 2026-10-14 | Codex owner-requested checkpoint, QC paused (row reconstructed by Claude in section 117 from subsection 116.22; Codex's push added none) | `1f90c62` -> `bff9a0e` (13 commits `3784f4f`..`91f4158` plus closing record `bff9a0e`) | Continuous build under the owner's review waiver; publication-only checkpoint on "push for now" | Per 116.22: native population, identity, market-input and calendar captures and offline applications; daily-active controller registered but not run; QC paused for another lane, with no project, upload, compile, node, job or backtest. | Codex-reported, focused, network-denied: **314 passed** on the integrated tree. No complete lane or repository suite. Real looks 0/0. | `SI-BUILD-20261013-039..045` recorded (some held as proposals). Source P2s, shared P2 and `SI-CR15-001` open. | Owner releases QC; Claude reviews. |
+| 2026-10-14 | Codex operational-guard checkpoint (row reconstructed by Claude in section 117 from subsection 116.23; Codex's push added none) | `bff9a0e` -> `f486ef5` (record and lane-guard fix) | QC released; synchronized lane-guard false refusal corrected | Per 116.23: the registered count round refused at its first local guard on the valid `+0 -0` header before any key read, claim or request; the guard now accepts only `+? -?` and `+0 -0`, with the actual remote still checked separately. | Codex-reported, network-denied: **186 passed**, then **116 passed** after the record note. No complete lane or repository suite. Real looks 0/0. | `SI-BUILD-20261014-001` (P2) confirmed and corrected. Count budget unspent. | Claude reviews; then the registered count round. |
+| 2026-10-14 | Claude review (macOS session) | `0cfb574` -> `f486ef5` reviewed from the published head; **record-only correction (two reconstructed push-ledger rows above)**; this record commit is the only Claude commit | Independent review of the owner-waived continuous build, sections 115-116 | Reviewed authority, every real provider request, credentials and the Keychain helper, data kept out of Git, QuantConnect, capture protection and the request-path guards; not a full line-by-line read of all 36,000 lines. Ran two in-memory mutants of the lane guard and the Keychain helper; both red. | Pushed tree `f486ef5`, clean, Codex idle, network-denied, empty environment: 73 affected lane test files **2,523 passed** (no skips or warnings); mutation baseline 60 passed; compileall exit 0; final-tree active-document 69 passed; `git diff --check` clean. No provider, credential or Keychain read by Claude. **Authorized looks 0, consumed looks 0**. | `SI-CR22-001` (P3, closed by correction: two pushes without ledger rows). `SI-CR22-002` (P3, closed as a forward rule: the spent SEC one-shot declared no contact). Codex's `SI-BUILD-*` accepted as recorded. `SI-CR19-003`, source P2s, `SI-CR-WIN-*`, shared P2 and `SI-CR15-001` open. | Codex counter-reviews this record commit. Confirm plan limits before the registered Massive rounds; future SEC requests take a runtime contact. Every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -19902,3 +19915,199 @@ inside this record.
 The post-note lane-guard/import-boundary/active-document selector passes
 **116 tests in1.54s**, zero skip/warning. No full suite or credential/provider/
 QC invocation is included in either selector.
+
+## 117. Claude independent review — 2026-10-14 UTC (macOS session: owner-waived continuous build, sections 115-116)
+
+Reviewer: Claude, the macOS session, in the designated lane worktree on
+`codex/strategy-short-interest`, CPython 3.13.15 / pytest 9.1.1, every pytest
+run network-denied with `sandbox-exec -p '(version 1)(allow default)(deny network*)'`
+in an empty inherited environment, after a probe to 192.0.2.1:443 failed with
+`EPERM`. After `git fetch`, local equalled the remote at `f486ef5` with a clean
+tree, and Codex was idle.
+
+This range is large: 21 Codex commits, 133 files and about 36,000 added lines,
+built under the owner's instruction to skip review and "build continously
+until backtesting ready". I could not read every line. This review therefore
+concentrates on authority, every real provider request, credentials and
+secrets, data kept out of Git, QuantConnect, protection of the captures, the
+record, and the guards on the request paths that ran or are registered to run.
+It is not a line-by-line audit of all the new modules.
+
+**Disposition: all 21 commits accepted, two after record correction.** No P0,
+P1 or P2 arises in what I checked, and no code or test defect was found. The
+two findings are both closed. Two Codex pushes added no push-ledger row
+(`SI-CR22-001`), and this commit reconstructs them. The SEC reader's
+User-Agent has no contact (`SI-CR22-002`); it cannot be changed in place
+without breaking the evidence of the one request already made, so it is
+closed as a forward rule. This commit changes no code or test. Nothing here admits
+a source, opens a look, sends a message or accepts a purchase or terms.
+
+### 117.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Lane branch | `codex/strategy-short-interest` |
+| Previous Claude review record | `0cfb574ae64f42757912cc56801d150b5b99a5b0` (section 114) |
+| Reviewed remote head | `f486ef517be757834041509010a03f61dcbfda04` |
+| Ordered reviewed range | `0cfb574..f486ef5` (21 Codex commits, linear; pushes `1f90c62` at 23:08 UTC on 2026-10-13, `bff9a0e` at 06:45 UTC and `f486ef5` at 15:51 UTC on 2026-10-14) |
+| Code and tests | 24 research modules, 39 scripts and 66 test files added; `build_short_interest_native_master_offline.py`, two test files and the lane import-boundary test modified |
+| Record delta | status paragraph, one ledger row, sections 115 and 116; nothing else removed |
+| Claude commits this round | this record commit only |
+
+| # | Commit | Subject | Disposition |
+|---|---|---|---|
+| 1 | `de04465` | docs(short-interest): accept exact Claude macOS review and resume qualification | **accepted** |
+| 2 | `4539682` | feat(short-interest): freeze protected class and disclosure qualification pilots | **accepted** |
+| 3 | `da3edc5` | feat(short-interest): pin authenticated issuer disclosure sample prospectively | **accepted** |
+| 4 | `c790bd3` | feat(short-interest): freeze native class bridge and exact SEC original reader | **accepted**; `SI-CR22-002` documented |
+| 5 | `9e05c7f` | feat(short-interest): pin exact anonymous terminal-original request | **accepted**; `SI-CR22-002` documented |
+| 6 | `1f90c62` | docs(short-interest): close accepted counter-review and bounded source qualification | **accepted** |
+| 7 | `3784f4f` | feat(short-interest): freeze full native population and protected evidence continuation | **accepted** |
+| 8 | `69ad639` | feat(short-interest): freeze explicit known credential alternative after zero-request refusal | **accepted** |
+| 9 | `11d6b30` | feat(short-interest): freeze retained population continuation and nominal calendars | **accepted** |
+| 10 | `f61a40b` | Freeze native identity and bounded historical market source capture | **accepted** |
+| 11 | `a2df1ea` | Preserve source closure and safe identity failure diagnostics | **accepted** |
+| 12 | `82f4506` | Freeze protected manual native identity continuation preparation | **accepted** |
+| 13 | `64f372e` | Register exact one-shot native identity continuation permit | **accepted** |
+| 14 | `19a02b5` | feat(short-interest): validate closed identity lineage and scalable source bindings | **accepted** |
+| 15 | `904cb16` | feat(short-interest): compose audited 48-book order transport and bounded guards | **accepted** |
+| 16 | `0368862` | feat(short-interest): prepare exact source cache and bounded catalog recovery | **accepted** |
+| 17 | `ab85bdb` | feat(short-interest): preserve public build clocks and close mechanics bundle | **accepted** |
+| 18 | `7dde2ce` | feat(short-interest): freeze once-only protected anchor cache writer | **accepted** |
+| 19 | `91f4158` | fix(short-interest): accept exact disabled-count Git status header | **accepted** |
+| 20 | `bff9a0e` | Checkpoint Short Interest source controls with QC paused | **accepted after record correction** (`SI-CR22-001`: no push-ledger row) |
+| 21 | `f486ef5` | Fix Short Interest synchronized lane guard and record checkpoint | **accepted after record correction** (`SI-CR22-001`: no push-ledger row) |
+
+### 117.2 Authority
+
+- The owner's instructions are quoted in the record where they are relied on.
+  They include the counter-review clarification (115.1), the continuous-build
+  waiver "skip the review. then build continously until backtesting ready.
+  consider i preauthorize every move in this lane" (116.1), the QC pause and
+  "push for now" (116.22), and the QC release, the lane correction "not
+  insider trading. short interest only plz" and "just proceed to the next
+  checkpoint and push" (116.23).
+- Credentials now come only from four owner-named login-Keychain items
+  (116.2), read through `/usr/bin/security find-generic-password` for one
+  exact service and account. EODHD is recorded by file location only and was
+  not used (115.5).
+
+### 117.3 Every real provider request this round
+
+From the record, cross-checked against the protected capture directories:
+
+| Provider | Requests | Where recorded |
+|---|---|---|
+| Massive | 30 class requests; 46 population pages (32 + 14 continuation); 1,340 dated-identity attempts (491 + 849, one failed attempt kept as spent) | subsections 115.4, 116.6-116.9, 116.12, 116.15 |
+| Direct Sharadar | 112 market-input requests | subsection 116.12 |
+| Disclosure route | 4 requests | subsection 115.6 |
+| SEC | 1 anonymous GET to `www.sec.gov`, HTTP 200 | subsection 115.8 |
+| FMP, EODHD, FINRA, QuantConnect | **none** | FMP code exists but is explicitly not enabled; no QC project, upload, compile, node, job or backtest call |
+
+Two much larger Massive rounds are registered but **not run**: a daily-active
+round of up to 74,816 requests and an 81,875-request count round. The count
+round's one attempt refused at its first local guard, before any key read,
+claim or request, and its budget is unspent.
+
+### 117.4 Credentials, secrets and data kept out of Git
+
+- **No secrets in Git.** No key- or token-shaped string appears in the added
+  lines; the long identifiers that match are run IDs, refusal labels and
+  calendar names. The only email addresses added are `example.com`
+  placeholders.
+- **Keychain helper.** `read_named_keychain` accepts only the four named
+  providers, runs the fixed `security` command with stdin closed, captures the
+  value in memory and never emits the tool's stderr.
+- **No provider data in Git.** The round adds only Python files and the record.
+  `artifacts/` is ignored, and no file under it is tracked.
+
+### 117.5 Protection of the captures
+
+- Every provider capture file is 0600 and every capture directory 0700, owned
+  by this user, with no symlinks. The original securities-master and
+  native-binding captures from section 114 are unchanged.
+- **Not a defect, but worth knowing:** 105 files and 25 directories under
+  `artifacts/short_interest/private/native_build_drafts/` are 0644/0755. They
+  are Codex's held draft code (102 `.py`, one `.cs` no-network stub, one
+  `.patch` and one `.json` QC smoke-test outline), not provider data, and Git
+  ignores them.
+- Every new capture directory contains files whose SHA-256 matches digests
+  published in sections 115-116. I did **not** rebuild these reports from
+  their raw pages this round.
+
+### 117.6 Mutation probes (in memory, network-denied)
+
+The tests use a fake Keychain reader and fabricated Git output, so no mutant
+could reach the real Keychain, Git remote or a provider; the sandbox blocked
+the network regardless. Unmutated baseline over the two files: **60 passed**.
+
+| Mutant | Guard removed | Result | Reading |
+|---|---|---|---|
+| G1 | lane guard accepts only the two exact zero-difference ahead/behind headers (`SI-BUILD-20261014-001`) | **5 failed** | Caught: `DID NOT RAISE` on nonzero, malformed and duplicate headers. |
+| K1 | Keychain helper accepts only the four named providers | **5 failed** | Caught; an unknown name still fails at the item lookup, so this is layered. |
+
+### 117.7 P0-P3 issue ledger
+
+New this round, counted from the table below: 0 P0, 0 P1, 0 P2 and 2 P3
+(`SI-CR22-001` closed by correction; `SI-CR22-002` closed as a forward rule). Still open from earlier
+rounds: five P2s (`SI-SRC-20260928-001`, `-002`, `-003`, `SI-CR-WIN-20261012-002`
+and the shared `SI-CR5-005` / `SI-CCR16-007`) and three P3s (`SI-CR-WIN-20261012-001`,
+`SI-CR15-001`, `SI-CR19-003`).
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or closure | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI-CR22-001 | P3 | **Closed by correction in this commit** | `bff9a0e`, `f486ef5` | section-5 push ledger | Confirmed, for the third time after `SI-CR15-002` and `SI-CR19-001`. The rule is "Append one row before every push". Of Codex's three pushes in this range, only `1f90c62` added a row; `bff9a0e` and `f486ef5` added none. | Remote-tracking reflog "update by push" entries; `git show <commit>` adds 0 ledger rows for both. | The ledger is the lane's audit trail of what was published. | This commit appends two rows labelled as reconstructed by Claude, built only from subsections 116.22 and 116.23, dated in UTC, before this review's row. No regression test: the lane has no record-integrity test. Codex should check both rows, and add its own row before each push. | Row columns and placement checked before commit. |
+| SI-CR22-002 | P3 | **Closed as a forward rule** | `c790bd3` | `scripts/verify_short_interest_terminal_originals.py` `USER_AGENT` | The SEC reader declares `ShortInterestIndependentResearch/1.0 (personal noncommercial research)` with no contact. The SEC's EDGAR fair-access guidance asks automated clients to declare who they are with a contact email. One request was made with it, and it returned HTTP 200. Leaving the contact out of Git was right, since this repository is public. | `git log -S` attributes the string to `c790bd3`. The string is part of the request descriptor hashed into the frozen protocol `9ca63688...`, and that protocol's one-shot budget claim already exists on disk, so the script can never send another request. | An in-place change would alter the frozen protocol and break verification of the request already made, while fixing nothing, because no further request is possible under it. | None in code. Recorded rule: any future SEC request must take a contact at runtime from a private local location or the Keychain, never committed, with a test that it is never persisted. | Budget-claim file present; `test_user_agent_must_be_exact_honest_frozen_value` pins the string. Closed. |
+| SI-BUILD-20261013-* , SI-BUILD-20261014-001 | P1-P3 | Closed or held as Codex recorded | this range | Codex's own drafts and held proposals | Accepted as recorded. `SI-BUILD-20261014-001` is independently reproduced by G1. Proposals marked held (QC bootstrap, local engine, dependency custody) are excluded from Git and were not reviewed as released code. | 117.6; subsections 116.22-116.23. | Accepted. | None. | Closed or held. |
+| SI-CR-WIN-20261012-001, -002 | P2-P3 | Open | prior rounds | complete-lane ownership; Windows protected storage | Unchanged. No complete lane run on `f486ef5` is claimed. | Section 114. | Retained. | None. | Open. |
+| SI-CR19-003 | P3 | Open, prospective advisory | `b034cda` | look accounting | Unchanged; no outcome look occurred. | Subsection 116.23. | Retained. | None. | Open. |
+| SI-SRC-20260928-001, -002, -003 | P2 | Open | prior rounds | source admission | Unchanged. The captures are source-only; identity, same-class shares, issuer size, raw volume and terminal cash are still unqualified. | Subsection 116.23. | Facts no delegation can supply. | None. | Open. |
+| SI-CR15-001 | P3 | Open | `0e31505` | standing delegation | Unchanged; no purchase or terms acceptance. | Section 116. | Retained. | None. | Open. |
+| SI-CR5-005 / SI-CCR16-007 | P2 | Open, shared, out of lane | N/A | shared integration history | Unchanged. | Section 115. | Owner decision; documented only. | None on this lane. | Open. |
+
+No out-of-lane finding is new this round.
+
+### 117.8 Validation
+
+On the exact pushed tree `f486ef5`, clean, Codex idle, network-denied, empty
+inherited environment:
+
+- Every new and modified lane test file (66 new plus the import-boundary and
+  native-master-offline files), the package-scanning dataset, research-gate
+  and stock-normalization files, active-document and the repository ML
+  boundary, 73 files in all: **2,523 passed in 1,812.41s**, with no skip, warning or error.
+- The other lane files were not rerun. Nothing they import changed, so no
+  complete lane run on `f486ef5` is claimed.
+- compileall of `research`, `scripts` and `tests`: **exit 0**. Probes in
+  117.6. Active-document on the final tree after this record:
+  **69 passed**. `git status --porcelain --ignored` before and after the
+  run: **identical** (Finder `.DS_Store` excluded). `git diff --check` **clean**.
+- I hashed capture files locally but read no provider row, credential or
+  Keychain item, and made no network request. **Authorized outcome looks: 0.
+  Consumed outcome looks: 0.**
+
+### 117.9 Quality and next step
+
+- **Software, 9/10 for what I checked.** The request paths are bounded and
+  fail closed, credentials stay in memory, and the guards I probed hold. A
+  point is withheld because this range is too large for a full independent
+  read.
+- **Records and authority, 8/10.** Authority and request accounting are
+  explicit, but two pushes again went out without ledger rows, and the one
+  SEC request declared no contact.
+
+1. Codex counter-reviews this record commit, including the two reconstructed
+   rows.
+2. Before the registered 74,816- and 81,875-request Massive rounds, confirm
+   the subscribed plan's rate and volume limits allow them, and keep the
+   frozen budgets.
+3. Any future SEC request takes its contact at runtime, never from Git
+   (`SI-CR22-002`).
+4. Then qualify identity, same-class shares, issuer size, raw volume and
+   terminal cash; resolve `SI-CR19-003` and register the look before any
+   signal/outcome join. The canonical PIT study stays blocked; vendor deadline
+   2026-10-19 17:00 America/Los_Angeles.
+5. Still gated: outcomes and looks, the sealed holdout, lookback selection,
+   production ranking and seeds, ETF work, any QuantConnect history/project/
+   upload/compile/job/backtest, purchases, broker, operator database,
+   deployment, paper/live, capital, orders and trading.

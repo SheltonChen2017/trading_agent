@@ -12,11 +12,14 @@ format with assumed logging reserves, not verified platform accounting or
 backtest readiness.
 The section-27 evaluation still ended with three pre-initialization failures;
 the attempt ceiling remains exhausted and no manual relaunch is authorized.
-The owner's conditional Mia-led synthetic recovery (32.4) stays
-paused pending platform preflight: refreshed quota was only 8.31 KB / 3 MB
-at about 14:54 America/Los_Angeles, 2026-10-13, below the 75,260-byte payload.
-Section 39 resumes a bounded quota/readiness wait under the owner's
-"proceed" direction. Source/policy inspection found no Platform Data or
+The owner's conditional Mia-led synthetic recovery (32.4) remains
+paused pending platform preflight and a later explicit owner resume.
+The owner stopped the monitor on 2026-10-13; section 40 records the stop and
+the later "ok push for now" publication-only exception. Last verified quota
+was 36.8 KB / 3 MB at the 22:39 America/Los_Angeles heartbeat, below the
+75,260-byte payload; it is historical capacity, not current launch clearance.
+Section 39 records the preceding bounded quota/readiness wait under the
+owner's "proceed" direction. Source/policy inspection found no Platform Data or
 source-transport flow; formal QC/Mia approval is not a documented requirement
 (GDR-CR28-001). Actual cloud byte accounting remains unverified
 (GDR-CR31-003, GDR-CR37-002). The standing recovery ceiling is three
@@ -26,9 +29,11 @@ remain zero, and no platform prerequisite is cleared by this documentation.
 Native loading of the recovery carrier is unverified. Only
 `data/__init__.py` was observed as one LF at runtime;
 `research/__init__.py`, remains unobserved. No successful native integration
-or empirical backtest readiness is established. The original economic, data,
-empirical, account and trading gates remain closed.**
-Current scope/evidence are sections 17 through 39. Sections 2 through 6 preserve
+or empirical backtest readiness is established. The original economic,
+empirical, account and trading gates remain closed; section 40.3's scoped
+EODHD access direction is not verified entitlement, PIT evidence, QC-upload
+rights or real-data evaluation authority.**
+Current scope/evidence are sections 17 through 40. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -5272,3 +5277,141 @@ No native success, original GDR-0..6 completion, empirical readiness, market
 edge, real-data/PIT/matched-SPY/corporate-action/settlement parity or trading
 authority is claimed. All frozen root/shared documents and behavior remain
 unchanged. The external wait is not a new engineering milestone.
+
+## 40. Owner-stopped monitor and authorized notes-only publication, 2026-10-13
+
+### 40.1 Explicit publication exception and exact custody
+
+After the quota wait, the owner directed **"stop the monitor."** The existing
+`guidance-claude-push-counter-review` heartbeat was set to **PAUSED** through
+the app tool and its saved status verified at 2026-10-13 22:50:38
+America/Los_Angeles / 2026-10-14 05:50:38 UTC. Prompt, target chat and cadence
+were preserved. The subsequent status-summary request was read-only.
+
+The owner's later **"ok push for now"** explicitly authorizes one notes-only
+publication now. This supersedes section 39.6's no-intermediate-publication
+restriction only for this push. It does not resume the monitor, authorize a
+QC action, declare the synthetic recovery complete, replenish an attempt
+budget, start a new milestone/review loop or grant future partial pushes.
+The original `8e2774183886d25a5fd985cb4fe711a86b977100` publication already
+completed exactly one successful push; it is not being republished as a new
+round. This is the later owner-directed publication of accumulated notes.
+
+Publication base is the live matching lane remote
+`2baf5a48cf21f59d20bd208224e6dbbeede5450a`; the clean pre-handoff local head
+is `9764408a887728f3b06e83df94c974cddbbab557`, ahead exactly two commits.
+Every command, edit, validation, commit and push uses
+`/Users/sheltonchen/.codex/worktrees/guidance-revision-drift/trading_agent`
+on `codex/strategy-guidance-revision-drift`, with origin
+`https://github.com/SheltonChen2017/trading_agent.git`. No other checkout,
+branch, worktree, stash/reset or force push is used.
+
+| Accumulated commit | Scope and retained disposition |
+|---|---|
+| `3a0084d53014f5a6986fb498f9194684aa099048` | Section-38 counter-review closure and one lane-local review-state test pin. Claude's exact `2baf5a48` remains consumed and accepted after documentation correction; both P3 findings and corrections remain recorded. No production change. |
+| `9764408a887728f3b06e83df94c974cddbbab557` | Section-39 read-only preflight and bounded quota wait. Documentation only; no candidate, cloud project or launch. |
+| This section's handoff commit | Current paused state, explicit notes-publication exception and scoped owner data-access direction. Documentation only; not independently accepted or a native outcome. |
+
+A read-only advisory pre-push audit inspected both existing commits
+individually and found no unintended source, behavior or authority change.
+It is author-side QA, not another independent Claude review. No old review
+trigger is consumed again. No shared/main-owned finding is corrected.
+
+### 40.2 Last observations, attempts and unresolved prerequisites
+
+The last successful authenticated Resources refresh was in the
+2026-10-13 **22:39:41 America/Los_Angeles** heartbeat
+(2026-10-14 05:39:41 UTC): **36.8 KB / 3 MB remaining Log Read Quota**,
+**100 KB/backtest**, both B2-8 nodes with Project/In Use By `-`. These are
+historical observations, not a current entitlement check or node reservation.
+The later 22:44:41 heartbeat's Safari-control observations/binding checks
+timed out three times; the middle timeout reset the control kernel.
+No fresh quota or Mia state was observed and no cloud recovery action was
+requested. This publication performs no new browser/QC/provider access.
+
+36.8 KB is below the complete **75,260-byte** readable payload even before
+overhead, and below the retained **1 MB** operational screening buffer.
+The buffer is not a QC requirement, metering certificate or launch approval.
+Actual cloud log accounting/full native delivery (GDR-CR31-003) and shared
+quota headroom (GDR-CR37-002) remain unresolved. Section 39.3's inspected
+source/policy mitigation is retained without inventing a formal QC/Mia
+sign-off requirement or ignoring any actual platform flag. Authenticated,
+controllable Mia, exact accepted source/review binding, ownership, available
+nodes and current platform/dependency/engine requirements must be rechecked
+before a later permitted launch. No quota purchase, deletion, reassignment,
+scheduler change or another lane's cancellation is authorized.
+
+`GDR-base372-approved-20261008` remains immutable **CLOSED FAILED 3/3**, with
+zero manual attempts remaining; section 27's exact receipts and source are
+preserved, and project 37647834 is not modified or relaunched. Separate
+`GDR-Mia-base372-recovery-authorized-20261011` remains **zero unsuccessful
+attempts, zero pending intents, no journal/project/launch**, maximum three
+unsuccessful attempts. Section 38.3's intent binding, all-Mia-action counting,
+unknown-action reconciliation, full returned-source comparison and verified
+lane-only correction controls remain binding. No compiler/run ID, native
+checkpoint, order/cash reconciliation or successful outcome is fabricated.
+
+### 40.3 Scoped EODHD owner direction; no data acquisition
+
+The owner reported on 2026-10-13: **"Now i have EODHD subscriptions for EOD
+All World and EOD Calendar. the session is logged in in safari. If backtesting
+needs this data, feel free to access it"**. This is owner-reported subscription
+and session availability, not independently verified entitlement, dataset
+coverage, historical availability or licensing. Relevant access to those
+subscribed datasets through the existing authenticated Safari session is
+authorized when needed for backtesting; it specifically supersedes older
+blanket EODHD provider-access prohibitions, not other gates.
+
+The accepted fixed 372-frame recovery needs no EODHD and remains strictly
+invented-only. No real data is mixed into it, no parallel acquisition is
+started, and quota-wait checks are not provider-browsing permission. Before
+a subsequent real-data stage, verify necessary coverage, historical/PIT
+evidence and permitted processing/QC-upload rights, bind the work to an
+actually authorized frozen research/evaluation scope and preserve independent
+review. No other product, new purchase/account, credential exposure or
+reconfiguration, changed economics, family/look allocation, protected-date
+decision, automatic empirical evaluation or trading is inferred. Immutable
+draft null/false permissions and unresolved decisions remain unchanged.
+No credential values or credential-storage locators are included here.
+
+### 40.4 Verification, publication guard and next action
+
+Accepted producing source remains
+`c589b3dddab3f1dd136d10ae7ce1851d64818906`. Byte-level Git comparisons retain
+the production source, invented fixture, original plan/PDF, neutral helpers
+and immutable draft unchanged; exact full-source, recovery-map, runtime,
+fixture and semantic-draft hashes remain those retained in section 38.4.
+No new candidate/source map is generated, saved or uploaded for this push.
+Only this record changes in the present handoff; the accumulated publication
+also includes section 38's one lane-local test-state pin. Root Session Handoff,
+Action Plan, Feature Milestone Record and all shared documents stay frozen.
+
+Focused active-document/import-boundary checks and source/diff/status guards
+are used before committing. No full lane or
+repository suite, native algorithm execution, empirical outcome, provider
+access or cloud launch is part of this notes-only publication.
+
+| Verification | Observed result |
+|---|---|
+| Active-document state, fresh imports and transitive lane/neutral import closure | Three focused methods passed in 0.275 s on Python 3.13.15; zero failures, errors, skips or observed warnings. Sanitized environment, `-B`, network/file-write audit fences in parent and child. |
+| In-memory compilation and narrow new-diff secret-shape scan | All 88 lane source/test Python files compiled without execution or bytecode; no credential-shaped values found in the new record diff. |
+| Production/design/fixture/draft comparison against producing `c589b3dd` | Byte-level Git diff empty; no source/candidate change. |
+| Frozen root/shared-document comparison against publication base `2baf5a48` | Empty. Only this lane record is dirty; existing lane-local review-state test pin remains the sole non-record path in the accumulated range. |
+| Diff/status and live remote checks | Passed before staging; mandatory root/branch, clean pre-handoff head and matching remote verified. Recheck immediately before commit and push. |
+| Full lane/repository suite and native QC run | Not run; outside this notes-only publication. |
+
+Publication is pending while this handoff is prepared; no success is claimed
+in advance. Recheck root/branch/HEAD/status and the live matching remote before
+commit/push, stage only this record, then make exactly one successful
+non-force push of the final committed tip to the matching lane branch.
+The exact final commit and remote verification receipt belong in thread and
+automation memory; do not make a second push merely to record push success.
+
+After publication, stop. Monitor remains **PAUSED** and the recovery unfinished.
+A later explicit owner resume may continue the same authorized synthetic
+scope after fresh prerequisites pass, without repeating the synthetic-only
+permission, waiting again for consumed review `2baf5a48` or resetting either
+ledger. Source-changing work still requires its next independent review before
+evaluation. Nothing here completes original GDR-0..6, establishes native
+integration/PIT/matched-SPY/corporate-action/settlement parity, proves market
+edge or opens an empirical, account, broker, paper/live or capital gate.

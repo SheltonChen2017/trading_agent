@@ -25696,3 +25696,139 @@ appear67 characters long. The separating space was corrected, not the
 digest bytes. Six memory compilations with network/fork/all-write denial,
 diff check and frozen four-file comparison are clean. No actual operation
 or full suite is attributed to this final-tree qualification.
+
+## 183. Observed original-parent baseline and supplier access refusal (2026-10-14 UTC)
+
+### 183.1 Completed baseline preserves original-body quarantine
+
+At clean c1ccbc601c9c2b40217938cc55346c6281c85b5f, run
+ib-2006q1-parent-projection-public-layout-v2-20261014-once exited0 and
+completed2026-10-14T03:33:37.312398+00:00. Executed projection source is
+b8fba6a9978d1caca3a5ac17bc604e68c2bd082f53323be322713712af71a285,
+current/source inventory35cedb27c44c92935e3edd5a554382d1fdcf7ec8023b588d9ff75a8ce1e8a419.
+Its69 actually executed sources have inventory digest
+77ac8e756151ff031690184281ebc4cc8f415800f957c36de597c317704b7213.
+This observed replay uses captured committed sources and exact legacy
+preparation controls with OS network/fork/output-write confinement. It
+replays the original preparation and full-quarter composition twice,
+requiring byte equality; it is not the entire historical environment.
+No exact runtime timer was retained, so no elapsed-duration claim is made.
+
+| Actual publication | Bytes | SHA-256 |
+|---|---:|---|
+| reservation.json | 11658 | b0cf6c3d5e4d1530afacf9e1cd882e7a741f6437f66a0a903d9b7a131270abbe |
+| assessment.json | 63409871 | 3000a184944aa1718854dba90842ec774032c269fc36740dc46ddbe90c1f1525 |
+| parent-projection.json | 42116 | 44d3e228121fdfe2f15d1c7e7af6de1a9610c67fcc72f2d49443ff8f946a8e95 |
+| complete.json | 23590 | 3263625af39268bc1ab4d2c44522e6ce0b8a3a6df80f61202bb6b725df567434 |
+
+Counts remain83657 source filings,71679 targets and11978 unsupported context;
+64 selected/retained original bodies total419628 bytes. All64 receive
+sec_document_envelope_refused,0 frozen projections/corroborations and0
+unavailable selected parents/conflicts. All83657 filings stay quarantined,
+including71679 relevant rows missing complete parents. All authority flags
+stay false and whole-quarter promotion digest stays null. A separate main
+network/fork/all-write-denied four-publication hash/size/named-directory
+observation passed0.41s; it does not independently repeat the whole replay.
+The original capture and earlier failed baseline namespaces remain unchanged.
+
+This is a completed engineering baseline, not accepted original parents or
+readiness. The next separately versioned offline source-view assessment may
+test the exact retained PEM envelope, preserving original-body identity,
+derived-view identity, frozen parser refusals and noncanonical status. It
+must not rewrite this baseline, authenticate SEC provenance, infer public
+availability or turn an inner view into original-body admission.
+
+### 183.2 One sealed HTTP403, not earnings acquisition completion
+
+At the same actual c1ccbc601c9c2b40217938cc55346c6281c85b5f, new run
+ib-benzinga-gap-three-months-diagnostic-v2-20261014-once registered
+2026-10-14T03:31:16.363109Z and completed terminal accounting
+2026-10-14T03:31:24.597319Z. Original producer source is
+ab36c0ca6ef110132a6db0aee9eecbd6eb2e5baf8db25688945b824f967ad2d5;
+source inventory70ef08696ffae8e9d9528368315edc9cbcab8ec280b2f62144959c4f1aa63edd.
+Exit0 means sealed terminal-refusal accounting, NOT data/corpus success.
+The private credential read succeeded before the sole2018-08-01..31
+transport. HTTP403/body_complete true yielded product_access_refused,
+retained_raw false and qualification null. No raw/metadata was retained;
+the provider event count is unknown, not zero.
+
+| Actual control | Bytes | SHA-256 |
+|---|---:|---|
+| manifest.json | 7662 | acbbc8f417dd2255231ff1e5012ed75b41d2a5baa4f495aac7732215516e4f80 |
+| 00-started.json | 613 | ba3b493b93ede3307af6791f8d5ea334a85ece78d030b987c031b76e91d2e099 |
+| 00-complete.json | 1322 | b1a8bfe811793b2ccd52fd7793fb5f02d7e4fa2fe023373c8c6f6c65a94318bc |
+| complete.json | 8597 | 0613e145fd580ca0e5749634dbb12de469a40111853b0658c95fc73ab468ec5d |
+
+Exactly1 claim/start/result,0 candidate windows,1 access refusal and2
+unattempted scopes (2019-02-01..28 and2020-02-01..29). No further request,
+August retry, repurchase or claim duplication occurs. All flags false;
+looks/jobs/backtests0/0/0. Main fixed-control hash/shape observation passed
+0.27s under network/fork/all-write denial; it is not the production verifier.
+Purchased-product owner statements stay distinct from observed403 and the
+unestablished current Keychain-account/product-entitlement linkage.
+Required external action: confirm historical Benzinga Earnings access belongs
+to the account issuing trading-agent-massive/account massive. Give account
+configuration status, not a secret. No authority to manufacture entitlement.
+
+### 183.3 Exact verifier framing correction, with producer lineage retained
+
+The current actual verify-only invocation at c1ccbc returned2 with sanitized
+isolated_worker/earnings_gap_error/unclassified_failure, errno null. A
+preceding direct invocation also refused verification_input_custody_refused.
+Neither is a successful verification. The original child's precise failure
+control was not retained; do not assert a sole historical cause.
+
+Source inspection found a sufficient CLI incompatibility: production main
+uses print, adding one LF, while _launch_verify_worker passed those bytes to
+the strict canonical decoder unchanged. IBBENZ-183-R01 P2 CLOSED by accepting
+exactly one trailing print LF via removesuffix, not arbitrary whitespace.
+A genuine production-wrapper fixture red and three noncanonical refusal
+controls passed through red qualification0.68s; final312 gap/prior-access/
+boundary/EXACT named package-guard checks passed4.36s with process-tree
+network denial and isolated database/output. Repeated LF, space-LF and CRLF
+remain refused. This correction changes no acquisition policy or claim.
+
+| Corrected active file | SHA-256 |
+|---|---|
+| research/insider_buying_benzinga_earnings_gap_capture_v1.py | e2750669ee662a202b80b8986ede1344e083f116e3115ba5b03d4dd0423e05c6 |
+| tests/test_insider_buying_benzinga_earnings_gap_capture_v1.py | b6d4e8b0a7378f8c09fe78aa7c4ceb796f2ef9e67f9fbb1e9c7705cae4ec3072 |
+
+After the new clean commit, independently run verify-only against sealed
+complete0613e145, binding corrected verifier separately from original c1ccbc
+producer Git bytes. That future verification is not yet observed here and
+does not call Keychain/provider. Preserve every original result/body/claim.
+
+### 183.4 Concrete blockers and continuing authorized work
+
+Native Safari reported the Mac locked at2026-10-14T02:43:21..02:45:24Z and
+again about03:14Z. No unlock bypass, QC source/data probe, strategy launch
+or backtest occurs. The owner has been asked to unlock the Mac; this is
+missing controllable authenticated interface, not missing routine approval.
+An existing QC credential pair and public SDK source cannot substitute for
+observed hosted SDK/identity/history availability or native access rights.
+
+The owner said other lanes already use FMP and to skip the paperwork question.
+Honor that by asking no repeat question and making no FMP acquisition. A
+narrow inbox search did not establish FMP download/retention permission;
+other-lane activity is not proof of vendor permission. Narrow Massive
+purchase/support searches returned other-product support correspondence,
+not proof of this token's earnings entitlement; do not label that as proof
+no purchase exists. No mail was sent or changed and no secrets were logged.
+
+Continue the separate exact-source-view assessment and hosted-native
+metadata qualification preparation under continuous-build delegated judgment.
+No routine Claude checkpoint is required, and internal QA is not independent
+Claude acceptance. Preserve six open topical/shared P2s, frozen four-file
+bytes, full study population, both earnings diagnostics, original v3 ambiguity
+and both final owner classifications. All evidence/PIT/rights/canonical/
+protocol/look/QC/backtesting gates remain unfulfilled. No shared document,
+strategy economics, source window, outcome, funded/paper/live action or
+interim push. One final combined push remains at the authorized honest end.
+
+Main final record/active-document/EXACT guard72 passed1.28s; two memory
+compilations passed under network/fork/all-write denial. Internal peer259
+active/private/boundary/EXACT guard checks passed3.94s on corrected e2750669.
+Its14 malformed wire cases refuse, zero or exactly one LF accepts, and a
+strip reversal wrongly admits four counterexamples; restored boundary and
+two memory compilations passed0.241s. No peer actual input/account access
+or Claude review. Diff check and frozen four-file comparison are clean.

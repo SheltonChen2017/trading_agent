@@ -1351,7 +1351,9 @@ def _launch_verify_worker(payload: dict, *, root: Path) -> dict:
         timeout=180, env={"PATH": "/usr/bin:/bin:/usr/sbin:/sbin"})
     _require(launched.returncode == 0 and not launched.stderr and type(launched.stdout) is bytes and
         0 < len(launched.stdout) <= MAX_VERIFIER_OUTPUT_BYTES, "verification_worker_refused")
-    return _json(launched.stdout)
+    # The production worker CLI uses print, adding exactly one framing LF.
+    # Removing arbitrary whitespace would admit rehashed noncanonical wire.
+    return _json(launched.stdout.removesuffix(b"\n"))
 
 
 def _verification_round(run_id: str, expected_head: str, expected_complete_sha256: str, *, root: Path,

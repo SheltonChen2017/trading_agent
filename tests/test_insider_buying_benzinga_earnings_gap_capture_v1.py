@@ -295,6 +295,23 @@ def test_real_fixture_guard_conversion_keeps_sanitized_phase_without_changing_re
     assert set(p.name for p in folder(tmp_path).iterdir()) == {"manifest.json"}
 
 
+def test_verifier_launcher_accepts_exact_one_print_framing_lf(monkeypatch, tmp_path):
+    result = {"fixture_only": True, "sanitized_fixture": True}
+    monkeypatch.setattr(m.subprocess, "run", lambda *_args, **_kwargs: SimpleNamespace(
+        returncode=0, stderr=b"", stdout=m._canonical(result)+b"\n"))
+    payload = {"run_id": RUN, "current_identity": {"head": HEAD}, "expected_complete_sha256": "a" * 64}
+    assert m._launch_verify_worker(payload, root=tmp_path) == result
+
+
+@pytest.mark.parametrize("suffix", [b"\n\n", b" \n", b"\r\n"])
+def test_verifier_launcher_refuses_noncanonical_or_repeated_framing(monkeypatch, tmp_path, suffix):
+    monkeypatch.setattr(m.subprocess, "run", lambda *_args, **_kwargs: SimpleNamespace(
+        returncode=0, stderr=b"", stdout=b'{}'+suffix))
+    payload = {"run_id": RUN, "current_identity": {"head": HEAD}, "expected_complete_sha256": "a" * 64}
+    with pytest.raises(m.EarningsGapError, match="control_json_refused"):
+        m._launch_verify_worker(payload, root=tmp_path)
+
+
 @pytest.mark.parametrize("alias", ["literal", "case", "ancestor-case", "descendant", "symlink"])
 def test_fixture_actual_root_and_alias_fence_before_callbacks(tmp_path, monkeypatch, alias):
     called = []

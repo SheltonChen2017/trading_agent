@@ -21776,3 +21776,146 @@ lock; unknown native Mia terminal state remains explicit. The mode confirmation
 persists for the same bounded source-only task, not a generic permission to
 interact with whatever Safari window is foreground. Final publication remains
 pending a stable completed/backtesting-ready or genuinely blocked handoff.
+
+### 90.4 Owner-ready handover, Full Auto verified and packaging successor
+
+Owner answered the brief own-project Safari handover request **"ready"**.
+Local record-only checkpoint3f305f1e07f550bce48805c0a5400c76d45e1f82 was
+committed from the designated root/branch after staged diff/actual-remote
+verification. Active-document rerun after90.3:330passed8.19seconds. No push;
+remote3dfa7d1e unchanged. These checks prove no native runtime/accounting.
+
+Fresh SOURCE-POST-018 at that clean HEAD, created06:04:16.705583UTC:
+plan547a3348c53fdbb7fd8e77e4168ae9060e16e09fc6b158a4f68635f855f25ea8;
+two fixed own files/read calls502406wire/230180fresh baseline-comparison
+bytes; ALL15 still stable/content-identical to017, main60012/454ed1e.
+Receipt9084/9b16ab1eb4e63278929ed35bef0d71d0cdc405a3b9ee25c7e44bd6a845db8148;
+read2archive249321/576125c23cdf9ff9f667bf551329a281cb83f18fca48129743e7a268f5826f72;
+complete delta150377/9fc26fae003afc31315628955826f2b4ecd740d9b133ecb3d525b7a91af833b1.
+
+Fresh WITNESS-SOURCE-007 at06:04:45.601118UTC, access4571/
+2f211d666959a47f38fcf072ab8dba3d9428e218dab4736c0381363628a8379e;
+closer1262/081d46c2ee8b5872d4866940f27f69ad5deb449389b31f45de28228cd6cb713d.
+Exact own root-created task was Pending Input, mode/Stop disabled. Native Mia
+reported its file-write tool's60800character cap and current main60012; its
+proposed inline context builders would exceed the remaining788characters.
+This is attributed Mia tool-limit evidence, not a reproduced oversized write
+or proof that every QC transport has that cap. No such write was attempted.
+Root answered only this own task to stop without edits/build/objects/launch;
+it visibly became Completed/stopped. This is **Mia task completion**, not a
+backtest result. Existing completed-task mode click had no observable effect;
+no other task was cancelled or edit control requested. Eight AX observations,
+two screenshots/seven actions; no source approval/job. Full Auto remained
+unapplied to that preserved completed chat.
+
+Fresh WITNESS-SOURCE-008,06:11:37.473650UTC, access4553/
+6f4f986793db590bd13fa92e118f94c9e87266095e9a6b5af27adffdccd27961;
+closer1118/e5a67af2c2ed2aaa937f811ff38ab689adb0c6120836323873db2529f65844c1.
+Only one NEW EMPTY built-in Mia continuation was opened in exact37650980.
+**Full Auto Mode was visibly selected in AX and screenshot**, as the new
+conversation's observed default; no global/account toggle is claimed. Two AX,
+one screenshot/one action. No message, source edit, provider/ObjectStore access,
+compile or job. This supersedes90.2's historical unapplied-mode status ONLY
+for this fresh empty continuation. Owner action-time confirmation covers this
+same bounded source-only work; it does not grant a generic automatic run.
+
+TPR-EXT26-D110 (agent-delegated packaging; independent review pending): keep
+exact v1 helper11770/82e72980 immutable and create a NAMED single-file public
+successor extended_refusal_witness_context_successor.py: exact original
+prefix plus an injected-core/TradeBar ContextRefusalWitness subclass providing
+protected first-context methods. No native/runtime/private import, constructor
+I/O or candidate/economic change. Main gets only import, ONE constructor and
+two thin nested-Exception-protected hooks/bare original re-raises; actual main
+character budget must be measured BEFORE any Mia save. The single new native
+module retains the existing16-file source-capture bound and five-save bound.
+Alternative extra context module would add17th file/extra-save coordination;
+trimming frozen source or dropping context/guards is rejected. Routine packaging
+choice is not separately owner-/Claude-approved and does not reset OFF3 or
+create a genuinely new economic candidate. No revised helper/source is accepted
+merely because Mia proposed it; public focused prefix/AST/behavior/mutation
+checks and exact hashes precede a fresh source-only Mia request.
+
+Delegated public-only implementation/test tasks own separate NEW successor and
+source-design/test files. They have no private/cloud/UI/provider/commit/push
+authority. Root owns sole record and native effects. Existing executable
+originals/bundles, all15 cloud files, original no-launch gates and pending
+look31 registration remain unchanged at this decision. Full Auto selection
+does not authorize another Codex OFF attempt, implicit source-template rewrite,
+native evidence export or ON before a valid full-window OFF baseline.
+
+### 90.5 Public successor/source design verified; still unapplied and unlaunched
+
+Owned public-only successors (originals unchanged):
+
+- Context successor final15742bytes/1b057f254fba91eee98862bbb63b2141cea63962905c458459d7a47531215a0f;
+  exact11770byte82e72980 prefix preserved; no new imports/runtime/constructor
+  effects. Positional injected-core/TradeBar adapter, per-kind context consumed
+  before getters, all ordered native/member SID/index uniqueness and selected
+  raw-to-canonical parity, nullable optional facts, observational flags only.
+  Contexttest11942/8314a3f6c2672e914dca9eef4de043ccdad755ca05eb77a3aab2c32f9e809cff.
+- Pure source-design generator6027/eb1a655faedc81734b7289a23701223ed976951aa95346db8e79d034f9c7e792;
+  designtest12801/9271a9648cc4bc781166a6e5a767283b249b2351966dd00bad8cb2f2170bc90d.
+  It accepts only the immutable public completion bundle daaf0c33, reconstructs
+  exact59931/9e19a038 OFF source plus previously verified transport-import/unused
+  counter into60012/454ed1e, then adds only approved instrumentation.
+  Planned main60658bytes=characters/a098c087c14507c154a4740d0145f7af1c448ec24905f4c8b66e82869d917d86:
+ 142characters below the reported60800 limit. Exact inverse recovers restored
+  bytes AND whole AST; no old guard/comment/docstring is trimmed or reformatted
+  outside the two indentation/wrapper replacements. One unconditional persistent
+  constructor after evidence; mark locals reset per holding; nested ordinary-error
+  containment and bare original re-raise, including diagnostic getter failure.
+
+Root completely read new source/context bodies and focused tests, then reproduced
+70helper/context tests0.41s and combined462focused tests13.46s (v1helper39,
+context31,design27,frozen35,active-document330), isolated49/52 before dispatch/
+config imports. No full lane/repository suite/native module execution/provider/
+operator database or actual stop state. Selected AST bodies and synthetic native-
+shaped fixtures prove software behavior only, not CLR ABI or usable backtesting.
+Root in-memory raw-parity removal killed2 intended cases with1pass0.61s;
+bare-original-raise removal killed6 intended cases1.55s. Both controllers exited0
+after asserting expected pytest reds; disk sources untouched, no genuine backtest
+failure/look. Native write overload, job binding, independent persistence and
+full-window/census/clock/accounting remain unproved.
+
+Attributed delegated evidence: context31passed0.69s; context-reservation mutant
+killed1, raw-parity mutant killed2. Design27passed3.02s; five bounded reverse
+mutants killed bare raise6, ordinary context containment3 (3controls passed),
+per-row context reset1, duplicate constructor1 and character-cap1. Original
+files restored in finally. Initial design fixture failures7failed18passed then
+1failed24passed were copied-list identity, unhashable synthetic symbol and wrong
+argument slice; fixed WITHOUT generator changes, retained as fixture failures
+not strategy attempts/red-to-green bug claims. A synthetic60657-character cap
+refused60658, exact60658 accepted; the real60800 bound was never raised or exceeded.
+
+Review hypothesis that canonical guard text might be an unsupported rational
+string was disproved by reading actual core._text (48-digit deterministic decimal)
+and core._number (Decimal-to-Fraction). Context records that exact canonical
+input text; no inferred percent/fraction unit, zero replacement or correction is
+introduced. No finding correction was needed on that false-alarm hypothesis.
+Optional period may remain an unsupported-type/null classification, not proof of
+exact native TimeSpan or provider source/version/date. Missing optional getters
+remain nullable; no full bar inventory, current typed settlement authority,
+native data quality or universal CLR scalar compatibility is claimed.
+
+Fresh source-only Mia effect still requires committed public exact hashes,
+new own-project preflight and bounded scope. Planned batch: create ONLY named
+context successor, four exact main patches (five cumulative saves/build calls),
+then STOP. Full Auto may execute those source edits but no job, notebook,
+ObjectStore/provider read, retry, refactor, new file or economic alteration.
+All16 saved files and every delta must independently match the exact planned
+hashes/inverse before a separately registered genuine-Mia diagnostic look31.
+Current verified cloud remains018's15file restoration; no successor applied,
+no new launch/look, OFF3/ON0/observed30 unchanged. Both extended arms/per-sleeve
+accepted performance remain null. This is a reviewed/tested public design,
+not native completion, canonical acceptance or separately Claude-approved work.
+
+Final staged whitespace check caught one extra blank line at the end of the new,
+previously untracked context successor. Root removed ONLY that final blank line;
+the initial synthetic-tested15743/ea3920dd version above was never installed or
+launched in QC. The exact immutable11770byte v1 prefix and all semantics remain
+unchanged. Retain that negative staged check as a packaging correction, not a
+native failure or candidate/attempt reset. The final15742/1b057f25 identity is
+the only one permitted in the prospective source-only scope.
+Root reran the same462 focused selectors after that correction:462passed13.89s,
+with the isolated49/52 root established before dispatch/config imports. No
+native job or private/accounting acceptance follows from that green result.

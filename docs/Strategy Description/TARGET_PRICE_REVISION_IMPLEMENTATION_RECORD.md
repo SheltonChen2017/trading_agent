@@ -21403,3 +21403,77 @@ git diff --check clean. New test SHA256
 8e7cab7f33368e41d18e502245b5c5408e3e963e06f51749f3d58c4e486e18fc.
 No full suite/native job/provider/operator read. These observations are
 software evidence, not resolution of F019/F017/F018 or native economics.
+
+### 89.6 Bounded first-refusal helper: software readiness, no launch yet
+
+TPR-EXT26-D105 (agent-delegated, root reviewed and agent cross-reviewed;
+independent Claude/human approval NOT claimed): author only new
+extended_refusal_witness.py and test_qc_extended_refusal_witness.py. Original
+executed modules/bundles/operations remain untouched. Helper11770bytes/
+82e7298046ab1642fb54adea98f2341b311ee6be955e16dfb345f2ea335856ba;
+test11846bytes/7ffff4594671ece92e998cfea675779876fad88e38c028602fab5fddbf166de2.
+Stdlib-only import, ONE persistent instance per algorithm; at most one
+attempt per membership/mark kind, including failed writes, two fixed private
+native-job-bound objects of at most4096plain/4096gzip bytes each. Native
+DeferredPrivateEvidence binding must prove exact OFF37650980/config/freeze/
+calendar/retained attempt3 before each contains/save/read and after readback;
+input-hash identity is rechecked too. No fake/configured job, key enumeration,
+shared cache clear, deletion, public raw output or strategy decision change.
+Collision/nonboolean write/unknown readback refuses; deterministicgzip0/
+SHA/exact returned bytes required. Ordinary diagnostic Exceptions are
+contained; genuine KeyboardInterrupt/SystemExit cancellation propagates.
+Caller MUST retain original bare ValueError re-raise and avoid reinstantiation.
+Public outcomes contain status/descriptor only; licensed raw type/value/clock/
+selected mark context stays private in QC. Source-version/unit/source-date
+remain unverified/null, never inferred from total/type or callback date.
+
+Root review corrected input-hash custody rechecks; cross-review corrected
+pre-copy bytearray bounds and misleading all-failure containment wording.
+Root requested no-unit-scaling/full-price-bar label precision, not new
+economic behavior. Initial focused predecessor run had35passed/1fixture failure:
+a local mock class had a deliberately refused <locals> type name; top-level
+fixture corrected, production type grammar unchanged. Final39passed0.49s by
+author and39passed0.43s independently. Reverse in-memory input-hash gate
+omission killed5intended cases; readback equality omission killed1case while
+two other refusals still passed. Cross-review also killed post-read custody,
+exact-True save and first-attempt cap omissions; an initial unmatched mutation
+anchor is excluded from red proof. Root reproduced406focusedpassed10.33s:
+new39, prior35,330document, two selected import/active checks; isolated49/52,
+no cache/bytecode, no actual operator stop/db or full suite. Whitespace clean.
+Native Python-bytes/CLR overloads, persistence beyond immediate same-store
+readback, atomic CAS and full-window completion remain unproved; diagnostic
+write failure cannot authorize a guard waiver or successful baseline.
+
+Chosen next bounded step: genuine built-in Mia may copy that exact public
+helper into its own OFF project, add only one initialization plus two
+first-refusal observation hooks, preserve every original guard/typed action/
+audit path/economic input, then STOP for independent all-file source capture.
+No Codex OFF4, input upload, other project, date/parameter/unit conversion,
+stale exemption or strategy launch at this source-write stage. Golden helper,
+all main deltas, runtime identity/engine and new private namespace must be
+tested/frozen with fresh source/operation/access/look BEFORE a separately
+authorized single genuine-Mia re-execution. Prospective operation
+TPR-EXT26-MIA-FIRST-REFUSAL-20261014-001 uses next actual look31; it is NOT
+already observed or spent as a strategy look. Observed looks remain30,
+OFF Codex3/ON0. If membership refuses first, held-mark witness is unreached;
+neither is a complete financial result. Alternatives: unchanged blind rerun
+does not identify cause; heuristic rescaling or stale bypass is rejected;
+external export/public log workaround is prohibited. Only guard-preserving
+native evidence is chosen under the owner's continuous recovery authority.
+
+Primary-source check (2026-10-14UTC) narrows expectations but proves no
+historical row fix: current LEAN ETF reader parses supplied decimal Weight
+without /100; QC's Dec2024 documentation example uses fractional weights.
+See [LEAN reader](https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Data/UniverseSelection/ETFConstituentUniverse.cs)
+and [QC universe history](https://www.quantconnect.com/docs/v2/writing-algorithms/historical-data/universe-data).
+The current [initialization contract](https://www.quantconnect.com/docs/v2/writing-algorithms/initialization)
+defines DailyPreciseEndTime True as market-close and False as following
+midnight; actual native job/settings/event evidence, not general defaults,
+governs our clocks. No universal unit-switch, authenticated support statement
+or warning/delisting freshness waiver is independently proved.
+QC's [Object Store download contract](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/object-store-management/get-object-store-file)
+restricts external downloads to permissioned Institution/derived-data use.
+No external raw-witness download or export workaround is planned; native
+bounded in-QC readback/analysis remains distinct from export and from the
+owner's working rights-paperwork waiver. This is not an obsolete new blanket
+paperwork/canonical blocker. Full native accounting still precedes ON.

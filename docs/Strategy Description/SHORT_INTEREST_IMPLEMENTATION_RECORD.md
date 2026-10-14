@@ -19393,3 +19393,94 @@ Main's final8 stage Python files compile; import-boundary/active-document
 checks after this record pass78 tests in1.08s. Diff/status/explicit staged
 inventory and actual matching remote are checked before the local commit.
 No intermediate push occurs.
+
+### 116.19 Exact cache-writer operational freeze
+
+The preceding source-free/catalog preparation is local-only
+**ab85bdb6939ef7e899e330e8273d225deac44d48**. Actual/tracking origin remains
+1f90c626. Section116.18 / SI-DEC-20261013-43 was exercised offline with zero
+credentials/HTTP. It retained an exclusive protected
+`offline-build-identity.public.json` receipt and qualified2 public catalog
+identities. The deterministic selected public build is ID18179, master,
+ref `refs/heads/master`, LEAN hash
+`80e7843f645673bcbeaab963049f76f20f6785e1`, cloud hash
+`520b1e700f58f7c71652f59b7038e64407336e85`.
+Its original creation literal `2026-10-12 17:59:17` retains basis
+`unspecified_wall_clock_not_a_timestamp`; no UTC, newest-build, financial
+availability or processing claim is made. This is software catalog evidence,
+not an account identifier. No project, node, compiler or job has been used.
+
+**SI-DEC-20261013-45** prospectively freezes the concrete offline cache
+writer, `scripts/capture_short_interest_native_anchor_cache.py`, source SHA256
+`c7087896348d63b4760a91089452774581a41f3d6d3a2c28aa6034086824cb79`.
+Writer protocol SHA256:
+`cc673c635e19050f0dd0c0fddf8b9b446f53cbcd70fe535746ea84ea4e51d087`.
+Exactly one new exclusive owned0700 directory is permitted at
+`artifacts/short_interest/native_anchor_cache/cache-d58-v1`, containing only
+`header.private.json`, `anchors.private.bin`, `cells.private.bin`,
+`events.private.bin` and `closure.private.json`, each owned0600/single-link.
+No existing directory or partial prefix is overwritten, reset or retried.
+The writer creates the fixed directory before the expensive immutable source
+replay, runs the canonical full112-date preflight once, and verifies every
+published byte by protected reread before closure. Original master, parent,
+child, matrix and spent budgets are preserved; no source recapture occurs.
+This operation performs zero provider requests, credential reads, outcome
+looks or QC actions and cannot admit a source or backtest itself.
+
+The exact observed d58b2b3d plan81875-request/112-date/1340-source-attempt
+anchors remain section116.15/116.17's immutable evidence. The full original
+112-date replay is required, not a saved completion flag. The operational
+writer retains its actual source-preflight summary and all46 complete current
+committed-code manifest entries in the existing cache closure, including
+shared primitives/calendar/custody/package exports and its own source bytes.
+Main's direct local import-closure check found no omitted local imported
+module in the50-file count manifest. Every manifest code file is compared
+with its exact clean commit blob once. Runtime HEAD is the concrete clean
+commit containing this prospective freeze; actual matching remote stays
+1f90c626. Both are checked before invocation and at finite whole-file/remote
+boundaries. Source/code protection is independently held and checked per
+chunk, without reissuing Git operations for every64KiB chunk. Creator code
+identity is calculated outside its own source/protocol bytes and retained
+in the closure, avoiding self-reference while including the writer itself.
+The SHA pin of the actual cache closure and creator identity remain PENDING
+until this actual exclusive write/reread succeeds.
+
+The separate concrete reader remains disabled until Main registers that
+exact fixed path, actual closure bytes, creator HEAD and creator manifest
+SHA. It proves creator and64f372ea ancestry, verifies historical creator Git
+blobs independently of later current code, loads the original matrix and
+master/action/dictionary once, and reconstructs the exact sealed plan. Held
+cache/source/current-code FDs retain ownership, permissions, links, inode,
+size and clocks across slots; cache directory inventory remains exactly five
+names. A source/custody failure stops the next slot without rehashing all
+large buffers or silently reloading/retrying. The reader's current complete
+manifest is distinct from the historical creator identity and is retained
+with later runtime receipts. Count protocol/path/budget pins are still
+PENDING and no count HTTP request is authorized by this offline freeze.
+
+Append-only ledger additions; historical001–035 remain unchanged:
+
+| ID | Priority / disposition | Evidence, correction and retained limits |
+|---|---|---|
+| SI-BUILD-20261013-036 | P2 protected resource custody, confirmed/corrected | Delegated failed-protection constructor test had1 failure/15 deselected0.34s: the just-opened file FD leaked before it entered the validated-entry list. Every created FD is now closed on constructor refusal. Main independently runs this regression in the connected160 selector. No actual source or key was read by the control. |
+| SI-BUILD-20261013-037 | P1 closed cache inventory, confirmed/corrected | Delegated sixth-file control had1 failure/16 deselected0.62s: an unbound new cache file could appear between slots. Cheap exact-five-name held-directory checks now refuse it before the next source slot. Main independently includes this control in the160 connected passes; no per-slot full source replay is substituted. |
+
+Main's concrete writer/reader, pure cache, adapter, count driver and boundary/
+active-document selectors **160 passed in2.19s**, empty environment/network
+denied, CPython3.13.15/pytest9.1.1. Both new Python files compile; diff/status
+checks precede the local freeze commit. No full lane/repository suite, actual
+source/key/HTTP/QC access occurs in these software tests. After the clean
+prospective commit, Main performs the one offline writer and records its
+actual success/refusal without inventing a closure. Continuous implementation
+continues afterward; this commit is not final closure or an interim push.
+Actual inputs, payment/terminal coverage, size/currency/sector, permitted
+processing and exact evaluation/power/date/look/order/runtime qualifications
+remain separate. Canonical actual looks0/0, exploratory looks0, alpha0,
+permanent look IDs none, QC launch attempts0; no backtest has run. Shared
+project documents and SESSION_HANDOFF remain frozen, with ONE final lane push
+reserved for genuine closure.
+
+Main's final record checks pass78 import-boundary/active-document tests in
+1.31s. Both new files compile, explicit target/status/diff checks pass, and
+the actual matching remote is checked immediately before the local commit.
+No interim push is made; this clean commit supplies the concrete writer HEAD.

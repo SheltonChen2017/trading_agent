@@ -1,26 +1,20 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Status: **CODEX HAS COUNTER-REVIEWED EVERY INCOMING COMMIT IN
-`8db2aaa6..30e5ae34` IN SECTION 86. ACCEPTED AFTER CORRECTION OF RECORD/GUARDS,
-NOT NATIVE QC OR PERFORMANCE ACCEPTANCE. CLAUDE SECTION85 MERGED A PUSHED
-WINDOWS-SIDE LINE (SECTIONS 80-82) AND AN UNPUSHED MAC-SIDE LINE (NOW
-SECTIONS 83-84, THE OWNER-AUTHORIZED MIA DIAGNOSIS, AUDIT-KEY REPAIR AND
-GENUINE MIA RECOVERY RUN). SECTION 85 MERGED BOTH LINES WITHOUT REWRITING ANY
-HASH. CUMULATIVE DISPOSITION: ACCEPTED AFTER CORRECTION (ONE STATUS DEFECT IN
-THE MAC-SIDE RESULT-CAPTURE SUPPORT AND FIVE REGRESSION TESTS; NO EXECUTED
-CANDIDATE BYTE). THE WINDOWS-SIDE "NOT YET" PRECONDITION IS STALE: THE MAC WAS
-UNLOCKED AND GENUINE MIA WAS USED ON 2026-10-12. TPR-CR23-001 REMAINS OPEN BUT
-IS NARROWED FOR LOOK20 TO ITS GUARD, NOT PROVED FOR HISTORICAL OFF2/OFF3:
-THE MIA RECOVERY RUN (LOOK 20)
-REPRODUCED THE JULY-2024 FRONTIER WITH THE ERROR RAISED IN THE ALGORITHM'S OWN
-MEMBERSHIP-WEIGHT GUARD; THE OFFENDING ROW IS UNKNOWN. THE LANE DIVERGENCE IS
-RETAINED AS TPR-CR26-003; THE OWNER-PINNED MAC LANE GOVERNS THIS CONTINUATION,
-NOT A NEW HOST-CHOICE GATE. OFF'S THREE CODEX ATTEMPTS ARE CONSUMED;
-ON HAS ZERO; LOOKS ARE 30 (20 PREVIOUSLY RETAINED PLUS TEN NEWLY OBSERVED
-EXTERNAL-ORIGIN RUNS IN SECTION87, NINE ERRORS AND ONE COMPLETED STATUS,
-NOT YET ACCEPTED SOURCE/ACCOUNTING). THERE IS NO ACCEPTED 2021-NOW PAIRED RESULT. THE
-MONITOR REMAINS PAUSED. CLAUDE NEXT REVIEWS THE COMPLETE COUNTER-REVIEW AND
-OWNER-MIA RECONCILIATION ROUND. SECTION87 ENDS FACTUALLY BLOCKED, NOT
+Status: **CLAUDE HAS INDEPENDENTLY REVIEWED EVERY CODEX COMMIT IN
+`30e5ae34..1bc751f8` IN SECTION 91: THE SECTION-86 COUNTER-REVIEW AND THE
+OWNER-MIA RECONCILIATION, STORAGE-UPGRADE, GUARD-RESTORATION AND LOOK-31
+PREREGISTRATION ROUNDS OF SECTIONS 87 THROUGH 90. CUMULATIVE DISPOSITION:
+ACCEPTED AFTER CORRECTION (THREE DEFECTS IN LANE-OWNED EVIDENCE SUPPORT AND
+SIX REGRESSION TESTS; NO EXECUTED CANDIDATE BYTE). THE CLOUD-SOURCE DRIFT
+F024 IS INDEPENDENTLY REPRODUCED: ELEVEN OF SIXTEEN CLOUD FILES CARRY THE SAME
+60-BYTE VENDOR IMPORT HEADER AND EIGHT NO LONGER COMPILE; NO OFF OR ON RUN
+CAN START ON THAT SOURCE (TPR-CR27-005, P1). THE ATTEMPTED LOOK-31 DISPATCH
+IS UNRESOLVED; LOOKS ARE 30 (20 RETAINED PLUS TEN EXTERNAL-ORIGIN RUNS, NINE
+ERRORS AND ONE COMPLETED STATUS WITH 12 OF 1,449 NAV POINTS). OFF'S THREE
+CODEX ATTEMPTS ARE CONSUMED; ON HAS ZERO. THERE IS NO ACCEPTED 2021-NOW
+PAIRED RESULT. THE MONITOR REMAINS PAUSED. CODEX NEXT COUNTER-REVIEWS SECTION
+91 AND THIS ROUND'S CLAUDE COMMITS, THEN REMOVES THE HEADERS THROUGH A
+SOURCE-ONLY MIA TASK BEFORE ANY RUN. SECTION87 ENDS FACTUALLY BLOCKED, NOT
 BACKTESTING-READY: DISPLAYED OBJECT STORE50.01MB/50MB, UNACCEPTED MEMBERSHIP
 UNIT AND STALE-MARK CHANGES, LATEST1395/1449 NAV, NO FINAL SUMMARY/INDEX OR
 VERIFIED COMPILED SOURCE. SECTION88 RESUMES OFF-FIRST VERIFICATION ON THE
@@ -479,29 +473,24 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, 2026-10-13:** Codex has counter-reviewed the exact incoming range
-`8db2aaa6f0858696442c7f9db97ac2e740f9752b..30e5ae34984b898addfea01e681a36ce340452e6`:
-the lane had diverged into two lines after the section-79 push. The
-Windows-side line published section 80 (Codex), section 81 (a Claude review
-written on the Windows host) and section 82 (Codex's counter-review with
-the platform-test split). The Mac-side line, never pushed, carried five
-Codex commits and an uncommitted draft with the owner-authorized Mia
-diagnosis, audit-key repair and genuine Mia recovery run, now sections 83
-and 84. Section 85 merges both lines without rewriting any hash,
-dispositions every commit, and accepts the cumulative tree after
-correction: one status defect in the Mac-side result-capture support and
-five regression tests; no executed candidate byte changed.
-The Windows-side "Not yet" precondition is stale: the Mac was unlocked and
-genuine Mia was used before that round was written. `TPR-CR23-001` stays
-open: look20 is explained to its own triggering guard, not proved for old jobs. The Mia
-recovery run reproduced the July-2024 frontier with the error raised in the
-algorithm's own membership-weight guard on 2024-07-12; the offending row is
-unknown as of look20. The existing owner-pinned Mac lane governs this round;
-future multi-host coordination stays recorded as `TPR-CR26-003`, not a new
-host-choice prerequisite to the already designated continuation. Section86
-qualifies historical causal/snapshot/validation claims and corrects the
-review-authority guard. The latest owner reports a newer Mia fix; that report
-is not yet independently verified or a reset/completed-strategy claim.
+**Current qualification, 2026-10-14:** Claude has independently reviewed the exact range
+`30e5ae34984b898addfea01e681a36ce340452e6..1bc751f878c083836dd9bd967231144fb52acd87`:
+thirty-one Codex commits carrying section 86's counter-review of section 85
+and the owner-Mia reconciliation rounds of sections 87 through 90: ten
+external-origin runs discovered and retained as looks 21 to 30, the owner's
+storage upgrade, the restoration of the original membership and mark
+guards through genuine Mia, the first-refusal witness design and its saved
+cloud source, the look-31 preregistration, one attempted dispatch of
+unknown delivery, and the final cloud-source drift. Section 91 dispositions
+every commit and accepts the cumulative tree after correction: three
+defects in lane-owned evidence support and six regression tests; no
+executed candidate byte changed. Section 86's corrections of section 85
+are accepted. The cloud-source drift is reproduced independently: eleven
+of sixteen cloud files carry the same vendor import header and eight no
+longer compile, so no run can start on that source (`TPR-CR27-005`).
+`TPR-CR23-001` stays open: look 20 is explained to its own guard, the
+refused row is still unidentified, and the witness that would identify it
+has not run. The owner-reported Mia fix requires independent result/source verification.
 Section 74's counter-review accepted the corrected incoming
 tests and record, not inherited runtime or extended-QC readiness. Independent hash-only and
 key-only receipt negatives and valid ON controls strengthen the two tests;
@@ -624,14 +613,14 @@ outcome-free source audit; no real-row D1, outcomes or QuantConnect access is
 authorized by that audit.
 The trust rollback pin, protected parent custody, reviewer identity and
 adversarial matrix remain unresolved and parked. **Exact next role action:**
-Section86 accepts the merged counter-review after correction. Claude next
-reviews the complete counter-review and owner-Mia reconciliation round.
-Section87 ends genuinely blocked on included-storage headroom and unresolved
-source/full-window evidence, not on a routine review checkpoint. Qualified
-resumption continues frozen OFF verification before ON, preserving every
-source/run/receipt, attempt cap and independent native acceptance gate. No
-launch through an unresolved path or fourth Codex OFF attempt. The old
-Windows-side Mac-unavailable precondition is historical, not current fact.
+Section 91 reviewed the section-86 counter-review and sections 87 through
+90. Codex next counter-reviews section 91 and this round's Claude commits,
+then resolves the attempted look-31 dispatch and removes the vendor import
+headers from the eleven drifted cloud files through a source-only Mia task
+before any OFF or ON run; the frozen OFF verification before ON, every
+source/run/receipt, the attempt cap and the independent native acceptance
+gates are preserved. No launch through an unresolved path or fourth Codex
+OFF attempt.
 That does not waive launch/audit gates or the
 exhausted Codex cap. The heartbeat is PAUSED during and after this
 round; no automatic rearm. No fourth OFF attempt and no ON launch through
@@ -770,6 +759,7 @@ and are deliberately not listed here.
 | `TPR-MATCHED-006` | P2 | Observer approval before Mia recovery launch | Retained unexecuted proposals contained native Order/ticket, open-only history, enum, exception, partial-fill and clock defects. Corrected complete observers have been requested, not verified/applied/tested. Last readback contains only additive initialization; restored control, actual complete source review and focused proof are required before any recovery job. See71.9/71.10. |
 | `TPR-CR25-003` | P2 | Broader QC/development host classification and native-host validation | Native custody stays Mac-only by the direct owner reply on 2026-10-12; portable Windows checks stay active. Section 82 implements a bounded test-only split in the collector/frontier modules, pending independent review. Other QC/development modules remain unclassified here; no attributes, working-byte repair, production port or fresh Mac-native validation was performed. The reported CRLF/POSIX failures in section 81 remain historical evidence, not native acceptance. |
 | `TPR-CR26-003` | P1 | Future multi-host resumption without serialized ownership and published handoff | Actual divergence and stale routing are confirmed; failure to fetch is not proved because unpublished Mac commits were unavailable remotely. Section85 preserves both histories. The existing owner-pinned absolute Mac lane and latest continuation govern this round; no new host choice blocks it. Future host switching still needs coordinated serialized handoff, actual remote equality and preserved work; global synchronization is not claimed solved. |
+| `TPR-CR27-005` | P1 | Any OFF or ON run, including the reserved look 31, until the cloud source compiles again | Eleven of the sixteen cloud files carry an identical 60-byte vendor import header prepended after the attempted look-31 dispatch; eight of them now fail to compile because the header precedes their `from __future__` line. The exact inverse is known, but the authorized single-effect scope forbids source edits, the dispatch's delivery is unresolved, and only a fresh source-only Mia task can remove the headers. |
 
 No open finding is P0. The two canonical P1 findings are inert while the registry is empty,
 but both block any positive registry entry. Read-only checks on this Windows
@@ -1006,6 +996,7 @@ known.
 | 2026-10-12 | Claude review | `2726b5ba87b4eab9282682d41b252c7ad1db91c2..61a81d9a6a93c1a548a903414f767178b9b1ac65` reviewed; this record/guard commit on this same lane branch | Independent review of section 80 (counter-review, bounded EXT26 source-only collector, spent source baseline, Mac-locked Mia preflight); no feature milestone | Reviewed both Codex commits individually and the collector in full: one fixed read-only `files/read` route to project 37650980, two requests per phase, claims and lock before credentials, no launch, compile, edit, upload or Mia route; the tests deny the real credential, connection and subprocess with an autouse fixture. Reproduced every committed size and hash in 80.8, the prompt and owner-message hashes and the three historical span digests. Corrected one stale section-8 next-action sentence and extended the guard grammar; added a no-grant pin for subsections 80.8 onward. No production module, executed artifact, receipt, shared document or shared test changed; the lane guard and this record changed. | Lane guard on the final tree: **225 passed**. Complete suite at `61a81d9a`, read-only scratch clone, 24 parallel shards: **16,197 passed, 1,281 failed, 97 skipped, 568 errors** plus 135 collection errors, over 18,138 tests. The 1,209 Target-Price reds are `TPR-CR25-003` host classes plus 26 clone-only trust-root fail-closed reads that are green in the worktree; the rest are the `TPR-OOL-015` through `TPR-OOL-018` classes. `compileall` exit 0; `git diff --check` clean. Provider requests **0**; QC requests **0**; raw licensed rows read **0**; private receipts not read (they are on the Mac); authorized/spent looks **0**. | No P0 or P1. `TPR-CR25-001` and `TPR-CR25-002` (P3) closed by correction; `TPR-CR25-003` (P2) open for the owner; `TPR-CR25-004` through `TPR-CR25-006` (P3) documented. `TPR-CR23-001` (P1), `TPR-CR23-002`, `TPR-CR22-001`, `TPR-MATCHED-002`, `TPR-MATCHED-006`, the six canonical findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. No canonical, QuantConnect, Mia, broker, paper, live, capital or trading authority is added. | Make this round's one push. Codex counter-reviews section 81; the owner unlocks the Mac for a fresh diagnosis-only Mia scope and rules on `TPR-CR25-003`. |
 | 2026-10-12 | Codex counter-review + bounded test candidate | `61a81d9a6a93c1a548a903414f767178b9b1ac65..ed558300d00a569be3ecc79195a610d6e9e6059f` reviewed; this same-branch Codex round is itemized in section 82 | Counter-review plus owner-selected Mac-only custody / portable Windows checks in two test modules; no native milestone completion | Accepted the one Claude commit after three P3 record/guard corrections. Preserved source, artifact bytes, shared coordination and historical execution evidence. Kept native assertions and effect denials; native fixture entry skips unsupported hosts before plan/directory work. | Exact separate/cumulative validation and final commit identities are in section 82.5/82.7. No provider/QC/private/outcome requests or new looks. | Three new P3 corrections closed; `TPR-CR25-003` remains open for broader host classification. Runtime, canonical and matched-study gates unchanged. Mac recovery is not yet complete. | None beyond the owner's test-boundary choice; no external or trading authority. | Claude independently reviews section 82 and the exact pushed Codex round. Fresh Mia scope still waits for owner Mac recovery. |
 | 2026-10-13 | Claude review + merge | `2726b5ba87b4eab9282682d41b252c7ad1db91c2..62d4fc32da3d8b0360e96cf70f53a3bcba2d910b` reviewed; custody commit `49a7e8af`, merge `62d4fc32`, correction `7d432b0a` and this record/guard commit on this same lane branch | Independent review of the diverged Windows-side (sections 80-82) and Mac-side (sections 83-84) lines; merge of both; no feature milestone | Dispositioned all twelve commits of both lines. Verified the Mac-side private receipts by size and hash (ui-ledger, three status envelopes, the native terminal and SUMMARY envelopes, post-003/004 archives and diffs) and the five public file hashes; the recovery run's terminal shows Runtime Error, progress 1, rolling window ending `M6_20240712`, the membership-weight guard frames and the 454-byte error hash. Ran the Windows round's bounded command on this Mac (384 passed, 1 skipped) and both split modules without skips (98 passed). Six mutation trials on the result-capture support: one status defect corrected, three guards pinned, one redundant cap documented. No executed candidate, receipt, shared document or shared test changed. | Document guards, the bounded Windows command, the Mac result-capture module (94 passed) and the audit-key QA module (4 passed, 67 plugin skips) on the final tree, designated worktree, network-denied; the full lane set and the complete suite were not run this round at the owner's instruction. Provider requests **0**; QC requests **0**; raw licensed rows read **0**; private receipts read locally for recomputation only; looks **0** by Claude (look 20 is Codex-Mac's genuine Mia run). | No P0. `TPR-CR26-003` (P1) open for the owner; `TPR-CR26-001` (P2) closed by correction; `TPR-CR26-004` (P2) documented, feeding `TPR-CR23-001` (P1, open); `TPR-CR26-002` (P3) closed by correction; `TPR-CR26-005`, `TPR-CR26-006`, `TPR-CR26-007` (P3) documented. `TPR-CR25-003`, `TPR-CR23-002`, `TPR-CR22-001`, `TPR-MATCHED-002`, `TPR-MATCHED-006`, the six canonical findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. No canonical, QuantConnect, broker, paper, live, capital or trading authority is added. | Make this round's one push. Codex counter-reviews section 85 on one designated host; the owner rules on the working host and authorizes the read-only Mia diagnosis of the refused weight row (85.7). |
+| 2026-10-14 | Claude review | `30e5ae34984b898addfea01e681a36ce340452e6..1bc751f878c083836dd9bd967231144fb52acd87` reviewed; correction commit `273d5c96` and this record/guard commit on this same lane branch | Independent review of section 86 (counter-review) and sections 87-90 (owner-Mia reconciliation, storage upgrade, guard restoration, look-31 preregistration, cloud-source drift); no feature milestone | Dispositioned all thirty-one Codex commits. Reproduced the cloud-source drift from the post-022/post-023 archives (eleven files, the exact 60-byte header, eight in-memory syntax failures), the drift-inspect and discovery receipts, the look-31 preregistration and observations-30 hashes, and the ten-job census (nine Runtime Error, one Completed). Audited the fifteen new modules: three defects corrected in lane-owned support (credential default, swallowed interrupt, vanishing receipt), six regression tests, six mutants killed; the same vanishing-receipt defect in two hash-pinned predecessors is documented. Accepted all six CCR26 items. No executed candidate, receipt, shared document or shared test changed. | The fifteen new test modules and document guards on the final tree, designated worktree, network-denied; the full lane set had already completed at the received head (**6,756 passed, 87 skipped**) before the owner's instruction not to run it; the complete suite was not run. Provider requests **0**; QC requests **0**; raw licensed rows read **0**; private receipts read locally for recomputation only; looks **0** by Claude. | No P0. `TPR-CR27-005` (P1) open for Codex; `TPR-CR27-001`, `TPR-CR27-002` (P2) closed by correction; `TPR-CR27-003` (P2) partly closed; `TPR-CR27-006` (P2) documented; `TPR-CR27-004` (P3) closed by correction; `TPR-CR27-007`, `TPR-CR27-008`, `TPR-CR27-009` (P3) documented. `TPR-CR26-003`, `TPR-CR25-003`, `TPR-CR23-001`, `TPR-CR23-002`, `TPR-CR22-001`, `TPR-MATCHED-002`, `TPR-MATCHED-006`, the six canonical findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. No canonical, QuantConnect, broker, paper, live, capital or trading authority is added. | Make this round's one push. Codex counter-reviews section 91, resolves the look-31 dispatch, and removes the drifted headers through a source-only Mia task before any run. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 | 2026-10-05 | Codex counter-review and TPR-D0 implementation | Reviewed `9958a459f5cd56c29cb9a0de13d38737e2c3412d..c0bfb21393180d44c16c10be1e667ea741098531`; corrections/decisions `cf11788f39a2148d7bc3b801e88807bd2caca5ea`; D0 implementation `8dcfb71851ff22db6f0727395e18292c19f080ef`; this record-only handoff follows | Four-commit Claude counter-review, five bounded owner selections, strict D0 plan and one retained structural audit | Accepted the cumulative Claude range after three record/encoding corrections; selected explicit native/host test variants without changing production trust policy. Implemented the separate standard-library D0 package and immutable aggregate artifacts; retained-source inventory/hashes and all canonical freezes match. Sections 46/47 contain exact dispositions, scope, evidence and remaining limitations. | Cumulative focused suite 491 passed, 5 symlink-permission skips; final routing/artifact guards 107 passed. Standard suite blocked by 110 Analyst `fcntl` collection errors, with zero tests executed. Optional continuation diagnostics capped and incomplete, not reported as totals. Compileall exit 0; diff hygiene clean; Python 3.13.14 / pytest 9.1.1. | CCR16-001/002/003 closed; no new in-lane P0/P1/P2. Six canonical findings remain open and parked. TPR-OOL-017 opened for Windows Analyst collection, documented only. | Exact local retained-structure scope only, expiring 2026-10-12; 587,046 retained rows audited. Provider/outcome/QC/development-look/trading counts zero. No vendor-rights attestation or canonical admission. | One matching-branch non-force push of this Codex round, then independent Claude review of every commit after `c0bfb213` through the exact pushed tip. No automatic D1; later action/source scope must be selected after review and counter-review. |
 
@@ -22456,3 +22447,188 @@ Final active-document check after this qualified source-drift handoff:
 330passed8.87s, isolated49/52; cumulative diff whitespace clean. No complete
 lane/repository suite or native rerun/repair/acceptance. Every controller exited;
 all negative/uncertain receipts and both source versions remain preserved.
+
+## 91. Claude review of the counter-review and owner-Mia reconciliation rounds - 2026-10-14
+
+**Disposition: accepted after correction.** The owner asked for every
+unreviewed commit to be reviewed, with no full lane suite and one push.
+Thirty-one Codex commits are unreviewed: section 86's counter-review of my
+section 85, and sections 87 through 90, in which Codex discovered ten
+external-origin runs the owner had made through Mia, verified the owner's
+storage upgrade, had genuine Mia restore the original membership and mark
+guards that an earlier Mia fix had rewritten, designed and had Mia save a
+first-refusal witness into the cloud source, preregistered one owner-
+authorized OFF diagnostic run as look 31, attempted its dispatch with
+unknown delivery, and then found eleven cloud files drifted by a vendor
+import header that breaks compilation. Every commit is accepted; five after
+corrections to lane-owned evidence support. No candidate byte that has
+executed changed. The round ends where Codex says it ends: blocked on a
+compiling cloud source and an unresolved dispatch, with looks at 30 and
+look 31 reserved but unobserved.
+
+### 91.1 Exact reviewed snapshot
+
+| Item | Value |
+|---|---|
+| Branch and worktree | `codex/strategy-target-price-revisions`; the lane worktree resolved from `git worktree list` |
+| Reviewed range | `30e5ae34984b898addfea01e681a36ce340452e6..1bc751f878c083836dd9bd967231144fb52acd87` (thirty-one commits, no merges, in `git rev-list --reverse` order below) |
+| Commit 1 | `e8be333327c04261de1c179bbe705e6d359ed92f` - Counter-review merged Claude TPR round and qualify native evidence |
+| Commit 2 | `b8d1b0a9df28e001ed9f828d53b7e4ac61d421e9` - Freeze bounded own-project owner Mia discovery successor |
+| Commit 3 | `7d22451463a307866e751a33e8de79390df50f90` - Retain bounded discovery refusal and preregister exact source comparison |
+| Commit 4 | `5abafcae2e24b2a14d79a53d724e81426a529483` - Freeze exact retained metadata diagnostic and source capture evidence |
+| Commit 5 | `98695a75db5d6c326b59f505fe7deb10b3ded8e2` - Retain all external OFF looks and freeze exact static source inspection |
+| Commit 6 | `492c96298e5930d6606dd533ebf9a986c84c814e` - Freeze independent bounded native components for all external OFF runs |
+| Commit 7 | `f57294780ae6a9b4a6039d1995a0ee62a34523b6` - Retain owner EODHD location and prepare private source-policy diagnosis |
+| Commit 8 | `49c90ebd6c98a12dc3503af01cdb96b71506099b` - Retain failed native capture and independently diagnosed source-screen facts |
+| Commit 9 | `0d57de8b80b93b2f064ca4893a369f8a105473e2` - Freeze safe static Mia source-view successor before inspection |
+| Commit 10 | `01991d2a4bd61a8df5db850faf685d67df495fbf` - Record unaccepted Mia semantics and freeze bounded look30 terminal diagnosis |
+| Commit 11 | `db6046120536fd2db5f3554dbd1f1ffc9b319f02` - Retain late-failure evidence and scope fresh QC interface availability |
+| Commit 12 | `3d68b1b4bb89564dbbe6c21bd5b141f7c9d68f65` - Preserve full-store observation and freeze narrow public-job notebook view |
+| Commit 13 | `189e388b5f37eaf2adbe43a0fd2d543c4f18b755` - Finalize blocked TPR reconciliation and nonsecret credential references |
+| Commit 14 | `1d1e9635b7f2341e23f9dcc23595a613efe52857` - Retain refused publication preflight and exact observed identity |
+| Commit 15 | `8fa322b862537efa6e9617b9964e9d9041343845` - Register upgraded-storage OFF-first verification scope |
+| Commit 16 | `3da96e618a651f5334e702919d16f56554fd1b85` - Freeze fresh OFF metadata verification without clock or attempt resets |
+| Commit 17 | `a7b4178214b8015945013614b9785f64f0fcdc0a` - Retain unchanged OFF history and scoped Mia diagnosis before source verification |
+| Commit 18 | `2de2668c35c5b6fc75604e5f06c5795421dffb94` - Close OFF verification with preserved source and unresolved native evidence |
+| Commit 19 | `fbb6a64539ae370d40b5f37b393ceb788c40ef2c` - Record confirmed QC allocation and bounded OFF forensic scope |
+| Commit 20 | `f47a5d11e87c3bbba3ec64b25a7666fada75f51c` - Freeze Mia-only restoration of original OFF safety guards |
+| Commit 21 | `7f1f03615fdbcbf154476538767cb2aeec96ae4d` - Register exact Mia guard approval and unavoidable syntax builds |
+| Commit 22 | `fa21a9cf6dd8cb8f08364cc0afeacf2692aa2a28` - tpr: verify Mia guard restoration and focused refusal tests |
+| Commit 23 | `a09795e172e863b8c1ef8ae290ecb5c009a26db8` - tpr: build bounded private first-refusal witness for Mia |
+| Commit 24 | `3dfa7d1ef070e58ebdbd54860a614a8c5b821d81` - tpr: record verified restoration and native Mia lock blocker |
+| Commit 25 | `066463fa5ff678c4336e582d9f08e8a248eba1d1` - tpr: resume owner-unlocked bounded Mia diagnostic recovery |
+| Commit 26 | `3f305f1e07f550bce48805c0a5400c76d45e1f82` - tpr: retain bounded Mia request and shared UI recovery evidence |
+| Commit 27 | `a4f9e3e2eb45d7403bd6f0366ce931e75d0b9317` - Add bounded first-refusal context successor and exact source design |
+| Commit 28 | `e75e4542a47d35f94d95af0198629845122b3759` - Retain Full Auto source task and bounded look31 capture successor |
+| Commit 29 | `4a27440baffb7c393c23aa9a6f5d1ed979f416e0` - Verify saved Mia diagnostic source and retain fresh Mac lock blocker |
+| Commit 30 | `b3a4ed74116b6225c2bf9e3b5ce1e18fe1305496` - Preregister the owner-authorized single genuine Mia OFF diagnostic |
+| Commit 31 | `1bc751f878c083836dd9bd967231144fb52acd87` - Document checkpoint dispatch uncertainty and cloud source syntax blocker |
+| Files changed | 31; +10,886 / -60: this record (+2,868), fifteen new producer modules, fifteen new test modules, two public JSON ledgers, the lane guard |
+| Claude commits this round | `273d5c96fe44f1f733ab7ffff9108bd5641e1e1e` (corrections and tests), this record/guard commit |
+| Scope checks | Lane-only paths; `git diff --check` clean; no duplicate test basenames; no secret value in the diff (four signed-header constructions from the existing credential seam; one credential-file path, see `TPR-CR27-008`) |
+
+### 91.2 Commit-by-commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `e8be333327c04261de1c179bbe705e6d359ed92f` | **Accepted** | Section 86 counter-review of section 85: all six `TPR-CCR26` items are accepted (85.3 arithmetic and figure qualifications, the causal-inference wording, the authority grammar, the host routing). It rewrote my 85.7 recommendation rather than qualifying it; noted in `TPR-CR27-009`, original text in `30e5ae34`. |
+| `b8d1b0a9df28e001ed9f828d53b7e4ac61d421e9` | **Accepted** | Record and bounded evidence commit of the owner-Mia reconciliation; its public figures that this review could recompute (receipt sizes and hashes, job census, source identities) agree, and it grants no launch, reset or acceptance. |
+| `7d22451463a307866e751a33e8de79390df50f90` | **Accepted** | Record and bounded evidence commit of the owner-Mia reconciliation; its public figures that this review could recompute (receipt sizes and hashes, job census, source identities) agree, and it grants no launch, reset or acceptance. |
+| `5abafcae2e24b2a14d79a53d724e81426a529483` | **Accepted** | Record and bounded evidence commit of the owner-Mia reconciliation; its public figures that this review could recompute (receipt sizes and hashes, job census, source identities) agree, and it grants no launch, reset or acceptance. |
+| `98695a75db5d6c326b59f505fe7deb10b3ded8e2` | **Accepted** | Record and bounded evidence commit of the owner-Mia reconciliation; its public figures that this review could recompute (receipt sizes and hashes, job census, source identities) agree, and it grants no launch, reset or acceptance. |
+| `492c96298e5930d6606dd533ebf9a986c84c814e` | **Accepted** | Record and bounded evidence commit of the owner-Mia reconciliation; its public figures that this review could recompute (receipt sizes and hashes, job census, source identities) agree, and it grants no launch, reset or acceptance. |
+| `f57294780ae6a9b4a6039d1995a0ee62a34523b6` | **Accepted** | Record-only; it retains the path of another lane's credential file and Keychain locators as "non-secret references" (`TPR-CR27-008`): no secret value, but a location the record did not need. |
+| `49c90ebd6c98a12dc3503af01cdb96b71506099b` | **Accepted** | Record and bounded evidence commit of the owner-Mia reconciliation; its public figures that this review could recompute (receipt sizes and hashes, job census, source identities) agree, and it grants no launch, reset or acceptance. |
+| `0d57de8b80b93b2f064ca4893a369f8a105473e2` | **Accepted** | Record and bounded evidence commit of the owner-Mia reconciliation; its public figures that this review could recompute (receipt sizes and hashes, job census, source identities) agree, and it grants no launch, reset or acceptance. |
+| `01991d2a4bd61a8df5db850faf685d67df495fbf` | **Accepted after correction** | Look-30 terminal successor: its per-request handler swallowed `KeyboardInterrupt` and kept issuing reads (`TPR-CR27-002`); corrected. The selective parser and component reads are read-only and whitelisted. |
+| `db6046120536fd2db5f3554dbd1f1ffc9b319f02` | **Accepted** | Record and bounded evidence commit of the owner-Mia reconciliation; its public figures that this review could recompute (receipt sizes and hashes, job census, source identities) agree, and it grants no launch, reset or acceptance. |
+| `3d68b1b4bb89564dbbe6c21bd5b141f7c9d68f65` | **Accepted after correction** | Public-job notebook view: an oversized public receipt raised after the private reads and left no result file (`TPR-CR27-003`); corrected with a body-free failure receipt. The same defect in the hash-pinned `source_inspect` and `source_view` predecessors is documented, not corrected. |
+| `189e388b5f37eaf2adbe43a0fd2d543c4f18b755` | **Accepted** | Record and bounded evidence commit of the owner-Mia reconciliation; its public figures that this review could recompute (receipt sizes and hashes, job census, source identities) agree, and it grants no launch, reset or acceptance. |
+| `1d1e9635b7f2341e23f9dcc23595a613efe52857` | **Accepted** | Record and bounded evidence commit of the owner-Mia reconciliation; its public figures that this review could recompute (receipt sizes and hashes, job census, source identities) agree, and it grants no launch, reset or acceptance. |
+| `8fa322b862537efa6e9617b9964e9d9041343845` | **Accepted** | Record and bounded evidence commit of the owner-Mia reconciliation; its public figures that this review could recompute (receipt sizes and hashes, job census, source identities) agree, and it grants no launch, reset or acceptance. |
+| `3da96e618a651f5334e702919d16f56554fd1b85` | **Accepted** | Record and bounded evidence commit of the owner-Mia reconciliation; its public figures that this review could recompute (receipt sizes and hashes, job census, source identities) agree, and it grants no launch, reset or acceptance. |
+| `a7b4178214b8015945013614b9785f64f0fcdc0a` | **Accepted** | Record and bounded evidence commit of the owner-Mia reconciliation; its public figures that this review could recompute (receipt sizes and hashes, job census, source identities) agree, and it grants no launch, reset or acceptance. |
+| `2de2668c35c5b6fc75604e5f06c5795421dffb94` | **Accepted** | Record and bounded evidence commit of the owner-Mia reconciliation; its public figures that this review could recompute (receipt sizes and hashes, job census, source identities) agree, and it grants no launch, reset or acceptance. |
+| `fbb6a64539ae370d40b5f37b393ceb788c40ef2c` | **Accepted** | Record and bounded evidence commit of the owner-Mia reconciliation; its public figures that this review could recompute (receipt sizes and hashes, job census, source identities) agree, and it grants no launch, reset or acceptance. |
+| `f47a5d11e87c3bbba3ec64b25a7666fada75f51c` | **Accepted** | Record and bounded evidence commit of the owner-Mia reconciliation; its public figures that this review could recompute (receipt sizes and hashes, job census, source identities) agree, and it grants no launch, reset or acceptance. |
+| `7f1f03615fdbcbf154476538767cb2aeec96ae4d` | **Accepted** | Record and bounded evidence commit of the owner-Mia reconciliation; its public figures that this review could recompute (receipt sizes and hashes, job census, source identities) agree, and it grants no launch, reset or acceptance. |
+| `fa21a9cf6dd8cb8f08364cc0afeacf2692aa2a28` | **Accepted** | Record and bounded evidence commit of the owner-Mia reconciliation; its public figures that this review could recompute (receipt sizes and hashes, job census, source identities) agree, and it grants no launch, reset or acceptance. |
+| `a09795e172e863b8c1ef8ae290ecb5c009a26db8` | **Accepted after correction** | First-refusal witness: writes at most two bounded gzip objects under a job-bound key through the native store only; two store-boundary guards (foreign ETF, post-save existence) are now pinned by tests (`TPR-CR27-004`). |
+| `3dfa7d1ef070e58ebdbd54860a614a8c5b821d81` | **Accepted** | Record and bounded evidence commit of the owner-Mia reconciliation; its public figures that this review could recompute (receipt sizes and hashes, job census, source identities) agree, and it grants no launch, reset or acceptance. |
+| `066463fa5ff678c4336e582d9f08e8a248eba1d1` | **Accepted** | Record and bounded evidence commit of the owner-Mia reconciliation; its public figures that this review could recompute (receipt sizes and hashes, job census, source identities) agree, and it grants no launch, reset or acceptance. |
+| `3f305f1e07f550bce48805c0a5400c76d45e1f82` | **Accepted** | Record and bounded evidence commit of the owner-Mia reconciliation; its public figures that this review could recompute (receipt sizes and hashes, job census, source identities) agree, and it grants no launch, reset or acceptance. |
+| `a4f9e3e2eb45d7403bd6f0366ce931e75d0b9317` | **Accepted after correction** | First-refusal context successor and public source design: the hooks re-raise the original refusal and change no weight, selection, order or date; the design output is now bound by test to the pinned cloud `main.py` identity and the witness prefix test no longer depends on the working directory (`TPR-CR27-004`). |
+| `e75e4542a47d35f94d95af0198629845122b3759` | **Accepted after correction** | Look-31 capture successor and tests: `retain_response` defaulted its credential to an empty string, which switched the wire echo guard off for any caller that omitted it (`TPR-CR27-001`); corrected in `273d5c96`. The request whitelist, budgets and fixed job binding are as described. |
+| `4a27440baffb7c393c23aa9a6f5d1ed979f416e0` | **Accepted** | Record and bounded evidence commit of the owner-Mia reconciliation; its public figures that this review could recompute (receipt sizes and hashes, job census, source identities) agree, and it grants no launch, reset or acceptance. |
+| `b3a4ed74116b6225c2bf9e3b5ce1e18fe1305496` | **Accepted** | Look-31 preregistration (8,239 bytes, hash verified): one compile, one backtest, one prompt, all sixteen source descriptors and four inputs frozen; no source or economics edit. |
+| `1bc751f878c083836dd9bd967231144fb52acd87` | **Accepted** | Record-only: the cloud-source drift (F024) and the dispatch uncertainty. Reproduced independently in 91.4; the eleven changed files, the 60-byte literal and the eight syntax failures match exactly. |
+
+**Cumulative disposition: accepted after correction.**
+
+### 91.3 P0-P3 ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| `TPR-CR27-001` | P2 | **Closed by correction** | `e75e4542` | `extended_first_refusal_capture_successor.py`, `retain_response` | The credential keyword defaulted to an empty string; `project_wire` skips its echo check for an empty credential, so any caller that omitted the token would retain token echoes silently. The tests themselves called it without a credential. | Code reading; `extended_evidence.project_wire` guards only `if credential`. | The envelope is the one artifact that must never carry the token. | The keyword is now required; the four test call sites pass a synthetic token and a regression asserts the omission is a `TypeError`. Red under the restored default. | 77 passed. |
+| `TPR-CR27-002` | P2 | **Closed by correction** | `01991d2a` | `extended_owner_mia_terminal_successor.py`, the per-request handler | The handler caught `KeyboardInterrupt` with ordinary exceptions and returned `None`, so an interrupt during the first read was recorded as a refusal and the loop kept issuing up to about 130 further reads and could still finish `COMPLETED_DIAGNOSTIC_CAPTURE`. | Code reading; a regression with an interrupting transport is red on the received module (the loop continues) and green after the fix. | A cancelled scope must stop spending requests and must be recorded as failed. | The handler catches `Exception` only; the interrupt reaches the scope handler, which records `FAILED_OR_UNCERTAIN` and still publishes the receipt. | 46 passed; mutant killed. |
+| `TPR-CR27-003` | P2 | **Partly closed by correction** | `3d68b1b4`, `5abafcae`, `0d57de8b` | `extended_owner_mia_source_job_view.py`, `extended_owner_mia_source_inspect.py`, `extended_owner_mia_source_view.py` | The public-size check sat after the failure handler, so an oversized disclosure raised after both private reads and left no `result.json` while the scope was spent. | Code reading; a regression with a lowered `MAX_PUBLIC` is red on the received job view and green after the fix. | A spent scope with no receipt is exactly the state the lane's custody rules exist to prevent. | The job view now writes a body-free `FAILED_OR_UNCERTAIN` receipt with `public_size_refused`. The two predecessors have the same defect, but their hashes are pinned by their successors (`PREDECESSOR_SHA256` in the diagnostic, the view hash in the job view), so correcting them means rotating those pins in a Codex successor; documented here. | 41 passed; mutant killed. |
+| `TPR-CR27-004` | P3 | **Closed by correction** | `a4f9e3e2`, `a09795e1` | `test_qc_extended_refusal_source_design.py`, `test_qc_extended_refusal_witness.py`, `test_qc_extended_refusal_witness_context_successor.py` | No test linked the design's generated `main.py` to the identity the look-31 capture pins; two witness store-boundary guards (foreign ETF, post-save existence) had no test; the prefix test opened a working-directory-relative path. | Mutation trials in 91.4. | The design output is the only public statement of what Mia saved; the witness guards decide whether a refusal is recorded. | One link test (red when the design text changes), two guard tests (red under their mutants), one absolute path. | 199 passed across the four modules. |
+| `TPR-CR27-005` | P1 | **Open** | `1bc751f8` | private post-022 and post-023 archives; drift-inspect receipts; section 90.12 | After the attempted look-31 dispatch, eleven of sixteen cloud files carry the same 60-byte header (`# region imports` / `from AlgorithmImports import *` / `# endregion`) prepended at byte 0; eight of them now fail Python 3.13 compilation because the header precedes `from __future__`. `main.py`, `extended_core.py`, `mia_diag.py` and the two notebooks are unchanged. | Recomputed from the two private archives: eleven changed names, exact prefix on every one, the literal's 60 bytes and hash, eight `SyntaxError` results from in-memory `compile` only, the record's table of sizes and hashes exact. | No OFF or ON run, including the reserved look 31, can start on that source; a compile would fail. The header is the form QuantConnect's editor writes into Python files it creates or re-saves, which is consistent with a platform-side save during or after the dispatch, but who or what triggered it is unproved. | None possible in lane: the authorized single-effect scope forbids source edits and the dispatch is unresolved. The exact inverse is known; a fresh source-only Mia task can remove the headers (or move them below the `from __future__` lines) under a new scope. | Register row added. |
+| `TPR-CR27-006` | P2 | **Documented** | `b8d1b0a9` through `01991d2a` | the seven production-seam tests of the owner-Mia modules | Removing `guard is not _guard` from the production seam check survives in every module that has a seam test, because the guard fault runs against the real clock, which already lies outside the fixture window, so the test passes through a clock refusal instead. `components` and `terminal_successor` have no seam test and no `_native_request` test at all. | Audit reading of the seven tests; the discovery module's test confirmed by reading. | The seam check is the line that keeps fixture seams out of production. | Left to Codex: in each seam test, monkeypatch the module clock to an in-window time for the guard fault so that only the seam check can refuse. | Not applicable. |
+| `TPR-CR27-007` | P3 | **Documented** | `a09795e1`, `e75e4542` | `extended_refusal_witness.py`, `extended_first_refusal_capture_successor.py` | The witness records no source date or version (both hard-coded `None`), and the look-31 capture plan forbids Object Store reads, so the plan that would observe look 31 cannot retrieve the witness it exists for. A duplicate ticker or identity in the member rows makes the witness refuse before recording even when the guard refused an earlier out-of-range row. | Code reading. | Identifying the refused row needs a separate, fresh read scope and a witness that records the row's source date. | None; design note for the successor. | Not applicable. |
+| `TPR-CR27-008` | P3 | **Documented** | `f5729478` | section 87.10 | The record retains the absolute path of another lane's private credential file and the Keychain service and account names as "non-secret references". No secret value is recorded, but a public Git record is the wrong place for the location of a secret, and the owner's "remember this" is better served by the private memory the agent keeps. | Record reading. | Hygiene. | None by Claude (Codex's text); recommend Codex replace the path with a pointer such as "the owner's EODHD token file in the Insider Buying lane's private root" in its next record commit. | Not applicable. |
+| `TPR-CR27-009` | P3 | **Documented** | `e8be3333` | section 85.7 and 85.3 as edited by section 86 | The counter-review replaced my recommendation paragraph with a note that it is superseded, and rewrote the text of two ledger rows, rather than qualifying them beside the original. The qualifications themselves are accepted; the original wording is in `30e5ae34`. | Diff of section 85 between `30e5ae34` and `1bc751f8`. | Counter-review corrections should be additive so that the reviewer's judgment and the correction both stay legible. | None; practice note. | Not applicable. |
+
+### 91.4 Independent reproduction and mutation evidence
+
+- **Cloud-source drift.** From the private post-022 and post-023 source
+  archives: sixteen files on both sides, eleven changed, every changed file
+  equal to the 60-byte literal plus its post-022 bytes, the literal's hash
+  `fa2faec9...`, eight in-memory `SyntaxError`s at the record's line
+  numbers, and the record's eleven sizes and hashes exact. The two
+  drift-inspect results (6,633 and 7,486 bytes) and the discovery-006,
+  post-022 and post-023 receipts match their recorded sizes and hashes.
+- **Looks.** `extended_owner_recovery_observations30.json` (6,980 bytes)
+  holds ten newly observed jobs, nine Runtime Error and one Completed,
+  four known historical jobs, looks 20 to 30 with 28 cloud and 2 local, no
+  new Codex launch, origin unverified. The look-31 preregistration (8,239
+  bytes, hash `74d51df8...`) matches; its reservation, access and ui-ledger
+  receipts exist and no job was observed by discovery 004 to 006.
+- **Receipt inventory.** 524 private receipts dated 10-13 and 10-14 under
+  the operations root, all mode 0600, in the operation families the record
+  names (19 source-post captures, 12 witness-source scopes, components,
+  terminal, discovery and successor, metadata and source views, guard
+  restore and approvals, storage verify, summary diagnostics).
+- **Counter-review items.** `TPR-CCR26-001` through `-006` are accepted as
+  stated; `-005` records the standing scratch-clone disagreement.
+- **Section 85 edits.** Codex's changes to my section 85 are limited to
+  qualifying sentences, two ledger-row texts and the 85.7 paragraph; the
+  ledger statuses are unchanged.
+- **Commit counts.** 14 commits to `1d1e9635`, 18 to `2de2668c`, 24 to
+  `3dfa7d1e` and 6 more to `b3a4ed74`, as the sections state.
+- **Mutation trials** (one exact substring per trial, restored in
+  `finally`, read-only scratch clone, network-denied):
+
+| Module | Guard removed or restored | Received tests | With the CR27 tests |
+|---|---|---|---|
+| first-refusal capture successor | credential default restored to empty | survived | killed |
+| refusal witness | `if etf not in ETFS` removed | survived | killed |
+| refusal witness | post-save `is not True` weakened to `is False` | survived | killed |
+| refusal source design | unused-counter text changed | survived | killed (hash link) |
+| terminal successor | interrupt caught per request | survived | killed |
+| public-job view | oversized receipt raises | survived | killed |
+
+### 91.5 Validation
+
+- Fifteen new test modules after the corrections, designated worktree,
+  network-denied: **608 passed** (602 received plus the six regressions); document
+  guards and active-document guard: **438 passed**; `compileall` of the lane
+  packages exit 0; `git diff --check` clean.
+- The full lane set had already completed at the received head before the
+  owner's instruction not to run it: **6,756 passed, 87 skipped**. It was
+  not re-run, and the complete suite was not run.
+
+### 91.6 Milestone and authority decision
+
+Section 91 accepts the counter-review and the reconciliation rounds as
+evidence and tooling, not as implementation, runtime or performance
+acceptance; canonical admission is not authorized; no real-row canonical D1
+is authorized; no QuantConnect launch, fourth Codex OFF attempt, ON launch,
+remaining-shard upload, broker, paper, live, capital or trading authority is
+added by this review. Codex next counter-reviews section 91 and this
+round's Claude commits, then resolves the attempted look-31 dispatch and
+removes the drifted headers through a source-only Mia task before any run;
+it resolves `TPR-CR23-001` before any further extended launch. TPR-1 and
+TPR-0B remain blocked.
+
+### 91.7 Recommendation to the owner
+
+Four items are yours. First, the cloud source does not compile; authorize
+Codex to have Mia remove the vendor import header from the eleven files
+(the exact inverse is on record) in a source-only task, and only then
+re-attempt the single OFF diagnostic. Second, before that, let Codex check
+the Mia chat for the request it pasted on 2026-10-14; if that task is
+queued, it must be cancelled or observed, not duplicated. Third, the record
+now carries the location of your EODHD token file; it holds no secret, but
+ask Codex to replace the path with a plain pointer. Fourth,
+`TPR-CR23-002` (Object Store retention) is still waiting for you.

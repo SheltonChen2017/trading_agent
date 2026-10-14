@@ -505,6 +505,77 @@ SECTION86_HEAD = "30e5ae34984b898addfea01e681a36ce340452e6"
 SECTION86_RANGE = f"{SECTION86_BASE}..{SECTION86_HEAD}"
 SECTION86_SHORT_RANGE = "8db2aaa6..30e5ae34"
 SECTION86_NEXT_ROLE = "Claude next reviews the complete counter-review and owner-Mia reconciliation round"
+SECTION91_BASE = "30e5ae34984b898addfea01e681a36ce340452e6"
+SECTION91_HEAD = "1bc751f878c083836dd9bd967231144fb52acd87"
+SECTION91_RANGE = f"{SECTION91_BASE}..{SECTION91_HEAD}"
+SECTION91_SHORT_RANGE = "30e5ae34..1bc751f8"
+SECTION91_COMMITS = (
+    "e8be333327c04261de1c179bbe705e6d359ed92f",
+    "b8d1b0a9df28e001ed9f828d53b7e4ac61d421e9",
+    "7d22451463a307866e751a33e8de79390df50f90",
+    "5abafcae2e24b2a14d79a53d724e81426a529483",
+    "98695a75db5d6c326b59f505fe7deb10b3ded8e2",
+    "492c96298e5930d6606dd533ebf9a986c84c814e",
+    "f57294780ae6a9b4a6039d1995a0ee62a34523b6",
+    "49c90ebd6c98a12dc3503af01cdb96b71506099b",
+    "0d57de8b80b93b2f064ca4893a369f8a105473e2",
+    "01991d2a4bd61a8df5db850faf685d67df495fbf",
+    "db6046120536fd2db5f3554dbd1f1ffc9b319f02",
+    "3d68b1b4bb89564dbbe6c21bd5b141f7c9d68f65",
+    "189e388b5f37eaf2adbe43a0fd2d543c4f18b755",
+    "1d1e9635b7f2341e23f9dcc23595a613efe52857",
+    "8fa322b862537efa6e9617b9964e9d9041343845",
+    "3da96e618a651f5334e702919d16f56554fd1b85",
+    "a7b4178214b8015945013614b9785f64f0fcdc0a",
+    "2de2668c35c5b6fc75604e5f06c5795421dffb94",
+    "fbb6a64539ae370d40b5f37b393ceb788c40ef2c",
+    "f47a5d11e87c3bbba3ec64b25a7666fada75f51c",
+    "7f1f03615fdbcbf154476538767cb2aeec96ae4d",
+    "fa21a9cf6dd8cb8f08364cc0afeacf2692aa2a28",
+    "a09795e172e863b8c1ef8ae290ecb5c009a26db8",
+    "3dfa7d1ef070e58ebdbd54860a614a8c5b821d81",
+    "066463fa5ff678c4336e582d9f08e8a248eba1d1",
+    "3f305f1e07f550bce48805c0a5400c76d45e1f82",
+    "a4f9e3e2eb45d7403bd6f0366ce931e75d0b9317",
+    "e75e4542a47d35f94d95af0198629845122b3759",
+    "4a27440baffb7c393c23aa9a6f5d1ed979f416e0",
+    "b3a4ed74116b6225c2bf9e3b5ce1e18fe1305496",
+    "1bc751f878c083836dd9bd967231144fb52acd87",
+)
+SECTION91_DISPOSITIONS = (
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted after correction",
+    "accepted",
+    "accepted after correction",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted after correction",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted after correction",
+    "accepted after correction",
+    "accepted",
+    "accepted",
+    "accepted",
+)
+SECTION91_NEXT_ROLE = "Codex next counter-reviews section 91 and this round's Claude commits"
 SECTION86_COMMITS = (
     "b28d07f6139dc0460e927b152fb4a87f6f2915e9",
     "0455fc2534f5951bc3d0eca35dc581cef9cca5f4",
@@ -624,9 +695,9 @@ PER_ROUND_PENDING_PHRASES = (
 )
 # The superseded pointer token that must no longer appear in current blocks.
 PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD = (
-    "ed558300d00a569be3ecc79195a610d6e9e6059f"
+    "8db2aaa6f0858696442c7f9db97ac2e740f9752b"
 )
-PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD = "ed558300"
+PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD = "8db2aaa6"
 EXPECTED_POLICY_CODE_REPO_PATHS = (
     "research/__init__.py",
     "research/target_price_revisions/__init__.py",
@@ -1103,11 +1174,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [SECTION86_RANGE]
+    ) == [SECTION91_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Codex has counter-reviewed the exact incoming range"
+        "Claude has independently reviewed the exact range"
         in normalized_current
     )
     assert (
@@ -1121,7 +1192,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "TPR-1 remains blocked" in normalized_current
     assert "reviewed-spec registry remains empty" in normalized_current
     assert "Claude next reviews this Codex round independently" not in normalized_current
-    assert SECTION86_NEXT_ROLE in normalized_current
+    assert SECTION91_NEXT_ROLE in normalized_current
+    assert SECTION86_NEXT_ROLE not in normalized_current
     assert SECTION85_NEXT_ROLE not in normalized_current
     assert SECTION82_NEXT_ROLE not in normalized_current
     assert "Codex next counter-reviews section 81" not in normalized_current
@@ -1201,11 +1273,12 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [SECTION86_SHORT_RANGE]
+        ) == [SECTION91_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert "codex has counter-reviewed every incoming commit" in normalized_summary_lower
-        assert "section 86" in normalized_summary_lower
-        assert SECTION86_NEXT_ROLE.lower() in normalized_summary_lower
+        assert "claude has independently reviewed every codex commit" in normalized_summary_lower
+        assert "section 91" in normalized_summary_lower
+        assert SECTION91_NEXT_ROLE.lower() in normalized_summary_lower
+        assert SECTION86_NEXT_ROLE.lower() not in normalized_summary_lower
         assert SECTION85_NEXT_ROLE.lower() not in normalized_summary_lower
         assert SECTION82_NEXT_ROLE.lower() not in normalized_summary_lower
         assert "codex next counter-reviews section 81" not in normalized_summary_lower
@@ -4417,6 +4490,7 @@ SECTION81_STALE_NEXT_ACTIONS = {
     "owner": "Owner next unlocks the Mac and reopens authenticated built-in Mia for OFF37650980",
     "counter": "Codex next counter-reviews section 81 and this round's Claude commits",
     "review": SECTION82_NEXT_ROLE,
+    "reconcile": SECTION86_NEXT_ROLE,
 }
 
 
@@ -4425,16 +4499,17 @@ SECTION81_STALE_NEXT_ACTIONS = {
     "preamble_range", "preamble_capture_role", "preamble_submit_role", "preamble_owner_role",
     "current_counter_role", "preamble_counter_role",
     "current_review_role", "preamble_review_role",
+    "current_reconcile_role", "preamble_reconcile_role",
 ))
-def test_section_86_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
+def test_section_91_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
     """Retain prior routing faults and reject a return to the now-processed Claude review."""
     test_exact_next_step_names_the_current_artifacts()
-    current_next = SECTION86_NEXT_ROLE
+    current_next = SECTION91_NEXT_ROLE
     stale_next = SECTION81_STALE_NEXT_ACTIONS.get(fault.rsplit("_", 2)[-2], "")
     if fault.startswith("current_"):
         original_section = _record_section
         section = original_section("## 8. Exact next step")
-        old, new = (SECTION86_RANGE, SECTION85_RANGE) if fault.endswith("range") else (
+        old, new = (SECTION91_RANGE, SECTION86_RANGE) if fault.endswith("range") else (
             current_next, stale_next)
         pattern = r"\s+".join(re.escape(word) for word in old.split())
         assert re.search(pattern, section) is not None
@@ -4443,7 +4518,7 @@ def test_section_86_current_routing_refuses_stale_range_or_role(monkeypatch, fau
             lambda heading: mutated if heading.startswith("## 8.") else original_section(heading))
     else:
         preamble = " ".join(_record_preamble().split())
-        old, new = (SECTION86_SHORT_RANGE, SECTION85_SHORT_RANGE) if fault.endswith("range") else (
+        old, new = (SECTION91_SHORT_RANGE, SECTION86_SHORT_RANGE) if fault.endswith("range") else (
             current_next.upper(), stale_next.upper())
         assert old in preamble
         mutated = preamble.replace(old, new)
@@ -5114,3 +5189,85 @@ def test_final_owner_mia_handoff_refuses_invented_completion_or_authority(before
     final = _record_section("## 87. Fresh owner-reported Mia repair discovery").partition("### 87.17 Final verified scope")[2]
     assert before in final
     with pytest.raises(AssertionError): _assert_final_owner_mia_handoff(final.replace(before, after))
+
+
+def test_section_91_review_records_every_commit_and_grants_nothing() -> None:
+    """TPR-CR27: pin the review of the counter-review and owner-Mia reconciliation rounds."""
+    section = _record_section("## 91. Claude review of the counter-review and owner-Mia reconciliation rounds")
+    assert SECTION91_RANGE in section
+    ordered = tuple(
+        re.search(r"`([0-9a-f]{40})`", line).group(1)
+        for line in section.splitlines() if re.match(r"[|] Commit [0-9]+ [|]", line)
+    )
+    assert ordered == SECTION91_COMMITS, "ordered section 91 commits"
+    assert ordered == tuple(_git_lines("rev-list", "--reverse", SECTION91_RANGE))
+    dispositions = _bounded(section, "### 91.2 Commit-by-commit dispositions", "### 91.3 P0-P3 ledger", "section 91 dispositions")
+    rows = tuple(
+        (match.group(1), match.group(2).lower())
+        for line in dispositions.splitlines()
+        if (match := re.match(r"\| `([0-9a-f]{40})` \| \*\*([A-Za-z ]+)\*\* \|", line))
+    )
+    assert rows == tuple(zip(SECTION91_COMMITS, SECTION91_DISPOSITIONS)), "exact section 91 dispositions"
+    assert "Cumulative disposition: accepted after correction." in section
+    ledger = _bounded(section, "### 91.3 P0-P3 ledger", "### 91.4 Independent reproduction and mutation evidence", "section 91 ledger")
+    statuses = dict(re.findall(r"^\| `(TPR-CR27-[0-9]{3})` \| P[0-3] \| \*\*([^*]+)\*\*", ledger, re.M))
+    assert statuses == {
+        "TPR-CR27-001": "Closed by correction",
+        "TPR-CR27-002": "Closed by correction",
+        "TPR-CR27-003": "Partly closed by correction",
+        "TPR-CR27-004": "Closed by correction",
+        "TPR-CR27-005": "Open",
+        "TPR-CR27-006": "Documented",
+        "TPR-CR27-007": "Documented",
+        "TPR-CR27-008": "Documented",
+        "TPR-CR27-009": "Documented",
+    }
+    register = _open_issue_register()
+    assert re.search(r"^\| `TPR-CR27-005` \| P1 \|", register, re.M) is not None
+    assert "from __future__" in ledger and "60-byte" in ledger
+    authority = _normalized_authority_sentences(_bounded(section, "### 91.6 Milestone and authority decision", "### 91.7 Recommendation to the owner", "section 91 authority"))
+    for required in (
+        "canonical admission is not authorized",
+        "no real-row canonical D1 is authorized",
+        SECTION91_NEXT_ROLE,
+        "resolves `TPR-CR23-001` before any further extended launch",
+        "QuantConnect launch",
+        "trading authority",
+    ):
+        assert required in authority, required
+    assert re.search(SECTION81_GRANT, authority, re.I) is None, "contradictory section 91 authority"
+
+
+@pytest.mark.parametrize("index", range(len(SECTION91_COMMITS)))
+def test_section_91_guard_refuses_disposition_drift(monkeypatch, index: int) -> None:
+    test_section_91_review_records_every_commit_and_grants_nothing()
+    original_section = _record_section
+    section = original_section("## 91.")
+    commit, disposition = SECTION91_COMMITS[index], SECTION91_DISPOSITIONS[index]
+    original = f"| `{commit}` | **{disposition.capitalize()}** |"
+    assert section.count(original) == 1, original
+    mutated = section.replace(original, f"| `{commit}` | **Rejected** |", 1)
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 91.") else original_section(heading))
+    with pytest.raises(AssertionError, match="exact section 91 dispositions"):
+        test_section_91_review_records_every_commit_and_grants_nothing()
+
+
+@pytest.mark.parametrize("added_grant", [
+    "Canonical admission is authorized.",
+    "Live trading is authorized.",
+    "ON launch is authorized.",
+    "A fourth Codex OFF attempt is authorized.",
+    "Paper trading is authorized.",
+])
+def test_section_91_guard_refuses_contradictory_authority(monkeypatch, added_grant: str) -> None:
+    test_section_91_review_records_every_commit_and_grants_nothing()
+    original_section = _record_section
+    section = original_section("## 91.")
+    marker = "### 91.7 Recommendation to the owner"
+    assert section.count(marker) == 1
+    mutated = section.replace(marker, added_grant + "\n\n" + marker, 1)
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 91.") else original_section(heading))
+    with pytest.raises(AssertionError, match="contradictory section 91 authority"):
+        test_section_91_review_records_every_commit_and_grants_nothing()

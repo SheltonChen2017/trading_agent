@@ -23,12 +23,14 @@ INVENTORY_SCHEMA = "insider-2006q1-earnings-issuer-label-inventory-v1"
 CAMPAIGN_SCHEMAS = frozenset({"insider-eodhd-date-window-earnings-campaign-v1",
                             "insider-eodhd-date-window-earnings-continuation-v2",
                             "insider-eodhd-date-window-earnings-continuation-v3",
-                            "insider-eodhd-date-window-earnings-continuation-v4"})
+                            "insider-eodhd-date-window-earnings-continuation-v4",
+                            "insider-eodhd-date-window-earnings-continuation-v5"})
 CONTINUATION_SCHEMA = "insider-eodhd-date-window-earnings-continuation-v2"
 CONTINUATION3_SCHEMA = "insider-eodhd-date-window-earnings-continuation-v3"
 CONTINUATION4_SCHEMA = "insider-eodhd-date-window-earnings-continuation-v4"
-QUARANTINED_SCHEMAS = frozenset({CONTINUATION_SCHEMA, CONTINUATION3_SCHEMA, CONTINUATION4_SCHEMA})
-LARGE_SCHEMAS = frozenset({CONTINUATION3_SCHEMA, CONTINUATION4_SCHEMA})
+CONTINUATION5_SCHEMA = "insider-eodhd-date-window-earnings-continuation-v5"
+QUARANTINED_SCHEMAS = frozenset({CONTINUATION_SCHEMA, CONTINUATION3_SCHEMA, CONTINUATION4_SCHEMA, CONTINUATION5_SCHEMA})
+LARGE_SCHEMAS = frozenset({CONTINUATION3_SCHEMA, CONTINUATION4_SCHEMA, CONTINUATION5_SCHEMA})
 QUARANTINE_REASONS = frozenset({"source_row_not_object", "source_row_field_shape_unknown",
     "source_code_unknown", "source_report_date_unknown", "source_fiscal_date_unknown",
     "report_date_outside_registered_scope", "fiscal_date_after_report_date", "source_timing_unknown",
@@ -41,7 +43,7 @@ MAX_V3_WINDOW_ROWS = 200_000
 MAX_V3_METADATA_BYTES = 256 * 1024 * 1024
 MAX_V3_BODY_BYTES = 16 * 1024 * 1024
 MAX_V3_CONTROL_BYTES = 1024 * 1024
-MAX_CAMPAIGNS = 4
+MAX_CAMPAIGNS = 5
 MAX_TOTAL_ROWS = 248 * MAX_WINDOW_ROWS
 _SHA = re.compile(r"[0-9a-f]{64}\Z")
 _CIK = re.compile(r"[0-9]{10}\Z")
@@ -131,6 +133,7 @@ def supporting_windows():
 SUPPORT_WINDOWS = supporting_windows()
 V3_SUPPORT_WINDOWS = tuple(window for window in SUPPORT_WINDOWS if window[0] >= "2018-09-01")
 V4_SUPPORT_WINDOWS = tuple(window for window in SUPPORT_WINDOWS if window[0] >= "2019-03-01")
+V5_SUPPORT_WINDOWS = tuple(window for window in SUPPORT_WINDOWS if window[0] >= "2020-03-01")
 
 
 def metadata_byte_cap(schema):
@@ -169,8 +172,9 @@ class ArchiveCampaignMetadata:
 class ArchivePartialCampaignMetadata:
     """Independent partial-root witness, never a producer aggregate completion.
 
-    Only the five sealed windows carry producer receipts. The consumed sixth
-    start remains unavailable and its paid body/metadata is NOT interpreted.
+    Only the explicitly witnessed sealed windows carry producer receipts.
+    The consumed next start remains unavailable and its paid body/metadata is
+    NOT interpreted. The two supported real partial shapes are frozen below.
     The operational observer must verify every witness leaf and scope live.
     """
     manifest_raw: bytes
@@ -338,9 +342,12 @@ def assess_earnings_archive_cohort(*, inventory_raw: bytes, inventory_sha256: st
         manifest = _decode(campaign.manifest_raw, campaign.manifest_sha256, MAX_JOURNAL_BYTES)
         partial = type(campaign) is ArchivePartialCampaignMetadata
         if partial:
-            witness = _decode(campaign.witness_raw, campaign.witness_sha256, 8192)
-            _need(witness.get("schema") == "independent-partial-calendar-v3-custody-witness-candidate-v1"
-                  and manifest.get("schema") == CONTINUATION3_SCHEMA
+            profile = {CONTINUATION3_SCHEMA: ("independent-partial-calendar-v3-custody-witness-candidate-v1", 5, 6, 89, V4_SUPPORT_WINDOWS, 8192, "journal_leaf_sha256_and_bytes"),
+                       CONTINUATION4_SCHEMA: ("independent-partial-calendar-v4-custody-observation-candidate-v1", 11, 12, 77, V5_SUPPORT_WINDOWS, 65536, "journal_leaf_sha256_bytes_versions")}
+            _need(manifest.get("schema") in profile, "partial_campaign_supported_shape")
+            witness_schema, sealed_count, consumed_count, suffix_count, suffix, cap, leaf_key = profile[manifest["schema"]]
+            witness = _decode(campaign.witness_raw, campaign.witness_sha256, cap)
+            _need(witness.get("schema") == witness_schema
                   and witness.get("campaign_id") == manifest.get("campaign_id")
                   and witness.get("manifest_sha256") == campaign.manifest_sha256
                   and witness.get("execution_head") == manifest.get("identity", {}).get("head")
@@ -349,17 +356,17 @@ def assess_earnings_archive_cohort(*, inventory_raw: bytes, inventory_sha256: st
                   and _SHA.fullmatch(witness["source_inventory_sha256"])
                   and witness.get("campaign_completion_present") is False
                   and witness.get("aggregate_completion_manufactured") is False
-                  and type(witness.get("sealed_window_count")) is int and witness["sealed_window_count"] == 5
-                  and type(witness.get("consumed_scope_count")) is int and witness["consumed_scope_count"] == 6
+                  and type(witness.get("sealed_window_count")) is int and witness["sealed_window_count"] == sealed_count
+                  and type(witness.get("consumed_scope_count")) is int and witness["consumed_scope_count"] == consumed_count
                   and type(witness.get("unsealed_started_window_count")) is int and witness["unsealed_started_window_count"] == 1
-                  and type(witness.get("unattempted_suffix_windows")) is int and witness["unattempted_suffix_windows"] == 89
-                  and witness.get("next_unattempted_window") == list(V4_SUPPORT_WINDOWS[0])
-                  and witness.get("last_unattempted_window") == list(V4_SUPPORT_WINDOWS[-1])
-                  and len(campaign.windows) == 5, "partial_witness_scope_or_lineage")
-            _need(type(witness.get("journal_leaf_sha256_and_bytes")) is dict
+                  and type(witness.get("unattempted_suffix_windows")) is int and witness["unattempted_suffix_windows"] == suffix_count
+                  and witness.get("next_unattempted_window") == list(suffix[0])
+                  and witness.get("last_unattempted_window") == list(suffix[-1])
+                  and len(campaign.windows) == sealed_count, "partial_witness_scope_or_lineage")
+            _need(type(witness.get(leaf_key)) is dict
                   and type(witness.get("sealed_window_counts")) is list
-                  and len(witness["sealed_window_counts"]) == 5, "partial_witness_leaf_inventory")
-            # These summaries derive only from five actual per-window seals.
+                  and len(witness["sealed_window_counts"]) == sealed_count, "partial_witness_leaf_inventory")
+            # These summaries derive only from actual per-window seals.
             # They are transient bookkeeping, NOT an invented complete.json.
             complete = {"schema": manifest["schema"], "campaign_id": manifest["campaign_id"],
                 "manifest_sha256": campaign.manifest_sha256, "identity": manifest["identity"],
@@ -367,11 +374,11 @@ def assess_earnings_archive_cohort(*, inventory_raw: bytes, inventory_sha256: st
                 "window_results": []}
             for index, evidence in enumerate(campaign.windows):
                 child = _decode(evidence.complete_raw, evidence.complete_sha256, MAX_V3_CONTROL_BYTES)
-                leaf = witness["journal_leaf_sha256_and_bytes"].get(f"window-{index:04d}-complete.json")
+                leaf = witness[leaf_key].get(f"window-{index:04d}-complete.json")
                 _need(type(leaf) is dict and leaf.get("sha256") == evidence.complete_sha256
                       and type(leaf.get("bytes")) is int and leaf["bytes"] == len(evidence.complete_raw),
                       "partial_sealed_external_hash_binding")
-                metadata_leaf = witness["journal_leaf_sha256_and_bytes"].get(f"window-{index:04d}-metadata.json")
+                metadata_leaf = witness[leaf_key].get(f"window-{index:04d}-metadata.json")
                 _need(type(metadata_leaf) is dict and metadata_leaf.get("sha256") == evidence.metadata_sha256
                       and type(evidence.metadata_raw) is bytes and type(metadata_leaf.get("bytes")) is int
                       and metadata_leaf["bytes"] == len(evidence.metadata_raw), "partial_metadata_external_hash_binding")
@@ -405,6 +412,8 @@ def assess_earnings_archive_cohort(*, inventory_raw: bytes, inventory_sha256: st
               "continuation3_exact_unattempted_scope_required")
         _need(schema != CONTINUATION4_SCHEMA or windows == V4_SUPPORT_WINDOWS,
               "continuation4_exact_unattempted_scope_required")
+        _need(schema != CONTINUATION5_SCHEMA or windows == V5_SUPPORT_WINDOWS,
+              "continuation5_exact_unattempted_scope_required")
         planned_union.update(windows); campaigns_seen.add(identity)
         results = complete.get("window_results")
         _need(type(results) is list and len(results) <= len(windows)
@@ -506,10 +515,12 @@ def assess_earnings_archive_cohort(*, inventory_raw: bytes, inventory_sha256: st
               and type(complete.get("all_registered_windows_observed")) is bool
               and complete["all_registered_windows_observed"] == (observed == len(windows))), "campaign_completion_accounting")
         if partial:
-            pending = windows[5]
-            _need(pending not in attempted and witness.get("observed_failure_cause") == "not_established_by_retained_controls",
+            pending = windows[sealed_count]
+            unknown_cause = (witness.get("observed_failure_cause") == "not_established_by_retained_controls"
+                if schema == CONTINUATION3_SCHEMA else witness.get("historical_custody_change_cause_established") is False)
+            _need(pending not in attempted and unknown_cause,
                   "partial_unsealed_start_cannot_be_promoted")
-            attempted[pending] = {"campaign_id": identity, "campaign_schema": schema, "index": 5,
+            attempted[pending] = {"campaign_id": identity, "campaign_schema": schema, "index": sealed_count,
                 "window": list(pending), "window_complete_sha256": None, "status": "UNSEALED_CONSUMED_START",
                 "independent_partial_witness_sha256": campaign.witness_sha256,
                 "metadata_sha256": None, "body_sha256": None, "source_rows": None,

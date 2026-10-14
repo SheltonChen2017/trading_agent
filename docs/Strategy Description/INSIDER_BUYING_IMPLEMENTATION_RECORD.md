@@ -24549,3 +24549,357 @@ evidence. No full suite, strategy outcome, QC launch, readiness claim, shared
 record edit, monitor rearm or round push is authorized by these passes alone.
 The existing six open P2s and resolved ledgers, frozen economics/window, D23,
 stopped SECv3 and both non-retroactive access classifications remain binding.
+
+## 174. Second retained partial root and lossless reference scale correction (2026-10-14 UTC)
+
+### 174.1 Actual v4 execution and independent partial witness
+
+The173 image was committed6ddbced32af19f1d90a2879f29c957b4860e2332 before
+either operation launched. Exact lane root/branch/HEAD/status were clean;
+matching-origin fetch remained85c7755deb75b5d0c61cc4a63a385d4b87b55110.
+No push. V4 registered2026-10-14T00:40:25.909694Z; manifest108,278 bytes SHA
+da91c236bf2c7a5b609fb2b467c6dd0cdb2ac03b0d0334e40319a3d0b2883eed;
+executed ten-source inventory
+dba4fd0626c43e5e4049451ec5fa252324b4367993339677375cc4bb6e8798e6.
+Exited2 at index11: current_journal_check / custody_helper_error /
+custody_leaf_changed, errno_class null. New1030-byte failure.json sealed SHA
+8f5d7466484441e04194bcc61378734e4601c76c744784a2ab36d183a7abd59b,
+explicitly without manufactured aggregate completion.
+
+V4 has49 leaves,12 consumed scopes/starts,11 seals March2019–January2020,
+and unsealed February2020 raw/metadata. No complete.json. Eleven seals:
+146,376 rows =71,081 metadata-accepted +75,295 quarantined;26,156,914 raw
+retained bytes. Last sealed January2020 completion00:41:20.265365Z.
+February raw3,494,159 bytes SHA
+329ebf5ef942f52a9a715d77d0a1b8fec5f26a651e0becba0d5afe86319677f8;
+metadata4,640,120 bytes SHA
+be2b411c72646a7918453ab935ec37347671788fe5f7c64513856a1940f1fdf3.
+No missing producer HTTP/count/acceptance receipt is inferred. Exactly77
+never-started months March2020–July2026 remain. Never resume v4 or repeat
+any of its12 scopes; retained raw byte sizes are not wire-transfer measures.
+
+Internal independent audit under measured network/write/fork denial held
+all four generation read-only locks, reattached current49 leaves/12 scopes
+twice, replayed v3/v2/genesis anchors twice, checked11 seal/start/scope/body/
+metadata chains and execution-source digests. Main readonly control inventory
+agrees. A supplementary xattr-name diagnostic was unavailable (Python lacks
+os.listxattr); it decoded no paid rows and explains no acquisition failure.
+Original changed leaf/version field/external actor are **not established**.
+Retained state is consistent with post-metadata/pre-seal checking; current
+versions/hashes are stable. No old-v3 cause or weaker ctime check is inferred.
+
+Independent canonical20,416-byte witness observed00:44:35.049336Z, SHA
+dfcb8c2872e729e19de3a1b2c6dbc01e4ddb3c185c8fb51c52572a58a6021f02,
+was retained in audit memory, then published after main's scoped internal
+authorization via private exclusive canonical artifact writer into NEW
+artifacts/insider_buying/eodhd_earnings_partial_witness/ib-eodhd-v4-partial-201903-202002-20261014-once/witness.json.
+Exact bytes reread;0700 ancestry/0600 owned single-link leaf. It includes49
+hashes/sizes/string-precision observed versions,12 scopes,11 count rows,
+failure/predecessor pins/unsealed classification/77-month suffix. Versions
+attest this observation, not immutable lifetime ctime. No old root/source/
+producer completion changed.
+
+Delegated engineering choice: separately version v5 for only those77 months.
+At most three **LOCAL complete reattachments**, only exact custody_leaf_changed:
+each rechecks named-before/opened-FD/final/named-after full versions, expected
+SHA/size, initial dev/inode/mode/nlink/size/ownership and root attachment.
+Mtime/ctime must be stable within an accepted read; they may change between
+failed local attempts. Structural swap/bad mode/link/size/hash/detachment,
+other/folded errors and persistent churn refuse. No provider/network retry,
+source resume or ignored ctime. Old executed validators stay unchanged and
+their folded errors are not retried. Exact image must be committed before
+contact; original16MiB/256MiB/200,000-row/control/disk/cadence caps remain.
+
+### 174.2 Actual reference refusal and lossless v2 real-input proof
+
+Fresh name-safe observer also exited2 and left an empty output root
+ib-sharadar-cohort-2006q1-name-safe-20261014-once. Preserve both empty failed
+roots. Actual readonly input/pure reconstruction reproduced assessment_byte_limit,
+not another name failure. Separate in-memory canonicalization size observation
+kept the refusal: report551,368,771 bytes >268,435,456-byte cap;74,150 ticker/
+698,455 action rows and56,266,542 issuer/action relationships. No cap bypass,
+publication, provider request or financial decoding. Repeated per-issuer
+ordinal lists enlarged the representation, not the source population.
+
+Delegated choice: assessment/observer v2 uses one folded-source-label ordinal
+index and each issuer's exact label-union/count; a genuine factory accessor
+expands its complete set. Preserve all rows/duplicate lineage/unmatched rows/
+relations/reasons. Casefold/counterparty discovery is not historical identity
+or a same-security merge. Keep256MiB pure cap; align observer cap to it (old
+observer512MiB did not prevent the pure256MiB refusal). Require full worst-case
+three256MiB publications +4MiB controls +4GiB remaining-free disk before inputs
+and publication; no data truncation or unbounded cap.
+
+Actual readonly **uncommitted candidate** used base6ddbced3 plus explicit
+pure SHAceeeea5e1fcd44df56412fced3d4379c86c5859a88910c0b9138d19a4329e5af
+and then-runner SHAdff7f3dd7594bf0a342bc54d643a790b2b76d81093b6ac8be3dd49188de5335a.
+Both rechecked before/after; archives/census held/rechecked; OS network/write/
+fork denied. V2 canonical178,072,103 bytes SHA
+dca7b071e174bd898119ef86cd7ea1892856c38c92f061a2cf9fe668ecd35fa8;
+38,293 index labels,83,657 filings/6737 all-form/5866 relevant issuers.
+All74,150/698,455 ticker/action rows accounted;13,861 ticker/5 action rows
+quarantined;647,444 cohort-referenced unique action rows/51,011 unreferenced;
+all56,266,542 relations retained. This is not a later committed image,
+operational observer receipt, published assessment or historical/source/
+rights/readiness promotion. No real financial values printed.
+
+Internal independent equivalence loaded exact committed6ddbced3 v1 in memory,
+tested100 deterministic invented cases/10,000 action rows/27,576 relationships,
+and expanded only intentional schema/index differences to reproduce complete
+canonical v1 bytes in0.40s under network/write/fork denial. Includes case/
+duplicate/ambiguity/unknown/future/unrelated context. This fixture proof is
+distinct from main's actual178MB uncommitted candidate observation.
+
+IBSHARA-174-R02 P2 **CLOSED**: parent equality accepted boolean/negative
+counts despite correctly typed child output. Five invented rehashed cases
+genuinely failed DID NOT RAISE0.47s (result/body/receipt/combined bool or negative).
+Correction binds exact count keysets and strict nonnegative integers before
+equality. Main166 reference/import/named exact-package checks2.66s passed;
+internal115 pure/runner/whole-package-import checks1.40s passed. Typed-count
+and counterparty-index guard reversals red then restored green0.74s; exact
+disk threshold passes, one byte short refuses. Hardened runner
+1ffe3915582a02b0d1ebbaf9e660286a414c00c97e865d188ce7eb1706ee2a94
+did NOT exist during the preceding actual in-memory proof. Pure tests
+0abc9e0c47e2e31a5c99e4581989749923db81492e4e924cb9c0b78e8e385ed3;
+runner tests8bc3ca84a98401a63bcd1e80a1afa93c76c0c543610f01263425c301ab9da3b3.
+
+### 174.3 Exact guard attribution and continuing factual scope
+
+Append-only internal QA reporting correction:46 v4,139/130 earnings,115/110
+Sharadar and combined185 v4+earnings selected
+tests/test_insider_buying_lane_import_boundary.py::test_importing_the_whole_package_loads_no_network_capable_lane_module,
+NOT the owner's specifically named EXACT Form4 guard. Earlier internal
+EXACT wording for those runs was reporting error; totals/pass results stand,
+but selection must not be relabeled. Main's explicitly named Form4 runs
+(including117/287/650/166) remain observed. Current independent148 bootstrap/
+locator run separately selects the exact owner node
+tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports.
+
+Early-parent source investigation identifies15 actual preexisting exposure
+roots,19,852 consumed accessions (not19,846 source-bound), no2006Q1 census
+intersection. Main's internal16-root wording was mistaken shorthand, not a
+missing input/new approval gate. Two pinned historical metadata inventories
+are0644: narrowly retain owner/single-link/no-follow/no group-world write/
+exact named SHA and version checks; preserve old files, new outputs0600.
+Stopped SECv3's one unmatched start and both final non-retroactive access
+classifications stand. This is candidate source analysis, not an actual
+full early-quarter bootstrap/capture/admission.
+
+Native next step is not repeated authentication/access diagnostics:143/147
+already retain successes in owned project37465795. Native master/reference/
+bar panels stay in QC; bind actual parent CIK/title/acceptance to historical
+native identity/economic/pre-entry facts, causal source-stock protocol and
+complete controls. Export only permitted own normal-course summary/order
+history; mechanical QC SID observation is not economic knowledge. ETF holdings
+are a later stock-pass-gated stage, not a stock-null rescue/input shortcut.
+No new QC call/strategy launch; credentials/access do not settle entitlement,
+historical facts or registered-look/backtest authority.
+
+Technical milestone: second immutable partial campaign independently accounted;
+reference scale corrected without truncation/wider caps. Further real operations
+need their exact clean image/external pins/isolation, not another routine
+owner or Claude checkpoint.
+
+Plain language: eleven additional months were saved, but a strict file check
+stopped another request and it will not be repeated. The reference archive now
+fits at full scale. Genuine original-parent/identity evidence remains needed.
+No full suite/readiness promotion/new review/shared-doc edit/outcome look/
+backtest/trading/monitor rearm/final push. Six open P2s and frozen scope,
+economics/D23/SECv3/access dispositions stay binding.
+
+## 175. Exact untouched-suffix and isolated offline bootstrap image (2026-10-14 UTC)
+
+### 175.1 Precontact registration and delegated decisions
+
+Continue under the owner's explicit continuous-build, existing source-access,
+delegated engineering-decision and single-final-push direction. No routine
+milestone/Claude approval checkpoint is introduced. The previous two partial
+EODHD roots remain immutable; local success after failure is not evidence of
+the original changing leaf, field, actor or cause. No request is repeated.
+
+Register fresh v5 ID
+ib-eodhd-campaign-continuation5-202003-202607-20261014-once for exactly77
+never-started monthly windows March2020 through July2026. Actual CLI requires
+external v4 witness SHA
+dfcb8c2872e729e19de3a1b2c6dbc01e4ddb3c185c8fb51c52572a58a6021f02
+and the already owner-rotated private EODHD token; never expose its value.
+Five generation locks and both held witness directories bind the complete
+prior chain, every retained leaf/scope and old source identities. Exclude
+January2006, August2018, six v3 starts and twelve v4 starts, regardless of
+completion. Preserve all executed v1-v4 sources and root bytes.
+
+V5 keeps16MiB raw/256MiB metadata/200,000 rows/1MiB controls, a worst-case
+remaining-window publication reserve plus three aggregate controls and4GiB
+free floor, one provider attempt per permanent fsynced scope/start, finite
+timeout, no redirects/retries/resume/pagination, and at least1-second spacing
+after transport completion. It adds at most three LOCAL whole-file reads
+only for the exact custody_leaf_changed code in its own expected-leaf reader.
+Each accepted read retains full before/open/final/named-after version checks,
+stable within-read mtime/ctime, fixed original device/inode/mode/link count/
+size/effective owner, attachment checks and the external expected SHA/length.
+Structural/hash/type/owner/attachment changes refuse immediately; persistent
+version churn refuses after three reads. This is not a provider retry, ctime
+waiver, historical cause determination or modification of older helpers.
+Sanitized future failure controls remain fixed vocabulary and are published
+only when current journal custody is safe; no failed root is repaired.
+
+Run a new isolated offline compact-reference observer
+ib-sharadar-cohort-2006q1-compact-v2-20261014-once after committing this image.
+Preserve both prior empty refused roots. Reuse the exact supplied archive;
+TICKERS/ACTIONS metadata only, FUNDAMENTALS compressed-byte hash only. The
+lossless global action-label index retains all original rows, duplicates,
+ambiguity, unknown/future/unmatched context and all56,266,542 candidate
+relationships without duplicating each issuer's full action list. Keep the
+256MiB cap, with strict typed parent counts and the conservative disk reserve.
+The real-input178,072,103-byte memory result in174 precedes the final runner
+typed-count fix and is not this new operational receipt.
+
+Run fresh offline original-parent bootstrap
+ib-2006q1-parent-bootstrap-20261014-once with explicit expected snapshot SHA
+8ef7e8ca62a7aeee9d52c62ac7e42b406f44cd16657c8050e7f1637564d7f0a8.
+Hold/hash all15 historical exposure roots, frozen master/census and source
+closure; parse all335,578 master rows and account all83,657 census filings.
+The exact exposure SHA is
+5454d54fb037ee35c8d3aa4bce31d6a46d7ebe784bd0e6011c4273fcd918fed3.
+Never interpret a planned-only request as dispatched; starts/permanent claims
+remain consumed without completion, including the stopped v3 unmatched start.
+Diagnostics join their exact original request-SHA controls, not guessed
+accessions. Only the two exact named0644 metadata hashes in174 are exceptions;
+all new outputs are0600. Publish four hash-bound metadata controls into a
+fresh private root; no financial parent bodies, token, provider call or SEC
+dispatch in this bootstrap. Initial locator prefix is64 Form4/4-A parents;
+all11,978 other-form/context rows stay accounted and excluded from the frozen
+Form4-only capture target. This prefix does not mean complete quarter coverage.
+Parent and worker pre-input checks, and each immediate publication, require
+the held private output's typed available disk to exceed a conservative
+512MiB four-leaf budget plus4GiB remaining floor; receipts bind both observed
+resource checks without enlarging any individual cap.
+
+After v5 ends, verify its actual producer completion if one exists and run
+the extended offline earnings observer with explicit v2-completion, both
+partial-witness and actual v5-completion pins. V3/v4 consumed unsealed metadata
+and paid raw bodies remain hash-only, not decoded or assigned producer HTTP/
+row counts. Only sealed metadata is assessed; no synthetic prior aggregate.
+If v5 completes, January2006, August2018, February2019 and February2020
+remain explicitly unavailable rather than silently filled. Further failures
+require honest additional partial accounting, not this predicted completion.
+
+Both offline actual workers enforce process-tree network/fork denial,
+fresh-output-only writes, observed outside-write refusal, held input custody
+and before/after current-plus-committed source inventories. Do not nest an
+outside Seatbelt policy around their parents. Freeze every tracked source,
+test and record while the actual actors run. The next64-parent capture is
+only an inactive private draft during that interval, not source-image drift,
+contact or an already authorized execution receipt.
+
+Owner supplied Keychain item names and asked to skip further FMP permission
+questions because other lanes use it. Do not ask again; leave FMP acquisition
+out of this image. Other-lane usage does not establish this lane's download/
+retention entitlement. Continue EODHD and supplied Sharadar, no FMP call,
+license inference, purchase or secret read. Native QC successes in143/147
+are retained evidence, not permission to duplicate one-shot diagnostics or
+launch a strategy before real source/identity/protocol/look/rights gates.
+
+### 175.2 Exact source/test image and internal counterchecks
+
+| Source | Source SHA-256 | Focused test SHA-256 |
+|---|---|---|
+| research/insider_buying_eodhd_earnings_continuation5.py | 5de2553839b99e99f745e396590c39162be4f10cba9ab3a1586f47871d149daf | fb8e7434897868953f2ad6931b26ddc9b1784a83cff9131beca2af199b71023f |
+| research/insider_buying_sec_2006q1_parent_bootstrap.py | 5e9793e0aed42c5e87d487a3e178cde64bb4f00f1706aa8cac6df056d946c783 | b8a4e0f9a395558631b55265b8d11d2c0cc0cc4f0c67cbcc71f58a0e51195792 |
+| research/insider_buying_earnings_archive_cohort_assessment.py | 3192ca836c0cf4ad5f13fe5f6d4584b913ca22827abc09ff831b30a109000bca | d4233f7303c17b57751424508a28451f7321528047cb9c808fba3f1e13495e59 |
+| research/insider_buying_earnings_archive_assessment_runner.py | f6a346bfc9e3711bb4124405825c7851a48cfab3d01e53a4215965b001c103d4 | 443f1573cc960e8c9cb26fec7b1222b163031bada7e8ec9d33cb153bd7c2de85 |
+| research/insider_buying_sharadar_reference_cohort.py | ceeeea5e1fcd44df56412fced3d4379c86c5859a88910c0b9138d19a4329e5af | 0abc9e0c47e2e31a5c99e4581989749923db81492e4e924cb9c0b78e8e385ed3 |
+| research/insider_buying_sharadar_reference_cohort_runner.py | 709b3c658fb36310e6503d39d4383688b3e36d42bb5649f35105865d1698a5ef | 94df74b2fa1b103db2859c941219a8b30a08c751e86ae173a43873dd3f17981b |
+
+Bootstrap author observed actual readonly17.19-second control replay at the
+preceding d11062be source,19,852 exposed/one unmatched start; no new bootstrap
+publication or source contact. Five genuine linkage/shape reds0.83s preceded
+seven greens0.56s; boolean-public-count red0.85s preceded208 greens4.76s at
+the preceding image. Final ordinal-qualified pending key retains start2
+after start1/start2/same-accession/finish1 (one genuine red/one pass0.68s),
+then211 focused/import/exact-guard checks4.80s. Independent final160 bootstrap/
+locator/specifically named Form4guard checks1.98s; three memory reversals
+1.10s tested exact0644 SHA, pending ambiguity and diagnostic typed linkage.
+These preceding d110 image tests prove refusal sensitivity, not unsafe actual
+admission or the later fixture/resource additions in the table image.
+
+IBSOURCEOBS-175-R02 P2 CLOSED: additional lexical fixture fences allowed
+actual Sharadar lane/capture symlink and same-inode case aliases to reach
+preflight. Six safe constructor/preflight-spy cases produced four genuine
+reds/two passes0.58s before correction; no real source/output read/write.
+Final literal/resolved/same-inode lane and archive checks now precede all
+fixture preflight, source and output calls. Author final121 reference/
+specifically named Form4guard checks passed2.02s; all six aliases executed.
+
+IBSOURCEOBS-175-R03 P2 CLOSED: bootstrap public/private fixture paths did not
+fully exclude actual lane/custody aliases or outside invented master inputs.
+Six genuine reds/one pass used sentinels before actual I/O. Final canonical
+invented roots must contain the declared master, and may not be actual
+custody ancestors/descendants/same-inode aliases. Both public route and private
+fixture worker enforce this before callback/output/resource/input calls.
+IBRESOURCE-175-R01 P3 CLOSED: bounded offline publication had no explicit
+production disk floor. Typed512MiB+4GiB reserve now applies to parent/worker
+pre-input and immediately before each of four publications; parent validates
+resource receipt shape/floor arithmetic. Exact-boundary acceptance,
+one-byte-short/malformed-stat/per-publication regressions passed. Final
+author232 bootstrap/locator/import/named-guard checks passed4.66s. No actual
+low-disk run, source dispatch or prior observation is relabeled by this fix.
+
+V5 internal final129 focused/import/specifically named Form4guard checks
+16.64s and independent78 focused/named-guard checks17.17s. Earlier424 checks
+34.19s belong to the preceding unhardened image, not the table source. Nine
+author and five independent memory reversals cover full-version/structural/
+hash/attachment/owner/disk/cooldown and literal/resolved/same-inode actual-root
+fixture fencing, with restored green. Author actual old-anchor replay
+0.98s used four old locks and both witness directories; no metadata-row/raw
+decoding, credential or request. V5 fixture fencing and effective-owner check
+are narrow new-candidate corrections, not historical incident reclassification.
+
+IBSOURCEOBS-175-R01 P2 CLOSED: lexical fixture-root inequality did not
+exclude the real lane's macOS case alias, allowing invented callbacks to
+reach source selection/output creation. Independent reproduction stopped at
+a constructor sentinel BEFORE actual filesystem I/O. Main safe regression
+was one genuine red/two passes0.64s; exact literal/resolved/samefile fence
+now refuses before selection, identity callbacks or output. Main207 focused/
+import/named-guard checks5.70s; independent final156 focused/named-guard checks
+4.98s, all three literal/symlink/case tests executed without skips. No actual
+fixture write/archive access or retrospective acquisition safety is claimed.
+Prior153 peer checks4.41s and main670 integrated checks33.44s precede this
+fence. Independent memory predecessor proof binds V2,V1,V3,V4 lock order,
+both witness directories and nested prior anchors; unsealed-to-observed
+mutation is red/restored green0.057s. Full two-partial actual assessment
+requires external pins, not the invented anchors used by these tests.
+
+Sharadar preceding 1ffe3915 author166 reference/import/named-guard checks2.66s and independent
+115 reference/whole-package-import checks1.40s. Typed-count/index memory
+reversals0.74s and exact disk boundary demonstrate refusal sensitivity.
+Independent100 invented cases/10,000 actions/27,576 relationships compare
+the expanded compact report to exact6ddb preceding canonical v1 bytes0.40s;
+no actual private archive read in that peer proof. The whole-package node is
+not relabeled as the owner's named exact Form4guard.
+
+Main preceding fixture/resource additions integrated673 checks passed33.71s;
+this does not replace final-image validation. Main in-memory compilation113
+lane research files passed under effective
+network/all-write/fork denial. Frozen four-file comparison is empty. Diff
+check identified and removed an extra record EOF blank before any commit;
+no source semantics changed. Main final table image700 focused acquisition/
+observer/reference/bootstrap/locator/import/record/active-document and the
+specifically named Form4guard checks passed31.69s under minimal-environment
+process-tree network denial and temporary isolated database/test roots.
+All12 staged Python images matched current bytes; staged diff check passed.
+The exact execution HEAD is recorded with actual observations after commit;
+the listed candidates remain internally checked, not independently Claude
+reviewed or historically existing during earlier runs.
+
+Technical milestone: lossless bounded reference accounting, dual-partial
+earnings lineage and isolated original-parent bootstrap are internally
+accepted engineering contracts with explicit new execution scopes.
+
+Plain language: preserve every attempted request, collect only untouched
+months, and process the retained reference data without discarding records.
+Original-parent and genuine historical identity evidence are still required.
+No corpus completion, source authenticity/PIT/rights/readiness promotion,
+full suite, strategy outcome/QC launch, shared-document change, monitor rearm
+or interim push. Six open topical/shared P2s and all frozen economics/window/
+D23/SECv3/non-retroactive dispositions remain binding.

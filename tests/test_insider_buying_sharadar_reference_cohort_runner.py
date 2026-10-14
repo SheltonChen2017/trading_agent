@@ -9,6 +9,7 @@ import json
 import os
 from pathlib import Path
 import stat
+from types import SimpleNamespace
 import zipfile
 
 import pytest
@@ -159,6 +160,30 @@ def test_parent_rejects_changed_output(retained):
                               result=result, manifest_sha=retained["manifest_sha"], fixture_only=True)
 
 
+@pytest.mark.parametrize("mutation", ["result_bool", "body_bool", "receipt_bool", "all_bool", "all_negative"])
+def test_parent_rejects_rehashed_boolean_or_negative_counts(retained, mutation):
+    """Invented outputs: equality cannot substitute exact count typing."""
+    result = run_fixture(retained)
+    output = retained["root"].joinpath(*m.OUTPUT_PARTS, retained["audit_id"])
+    body = json.loads((output / "assessment.json").read_bytes())
+    receipt = json.loads((output / "complete.json").read_bytes())
+    assert body["source_action_rows"] == receipt["counts"]["source_action_rows"] == result["counts"]["source_action_rows"] == 1
+    if mutation in {"result_bool", "all_bool", "all_negative"}:
+        result["counts"]["source_action_rows"] = -1 if mutation == "all_negative" else True
+    if mutation in {"body_bool", "all_bool", "all_negative"}:
+        body["source_action_rows"] = -1 if mutation == "all_negative" else True
+    if mutation in {"receipt_bool", "all_bool", "all_negative"}:
+        receipt["counts"]["source_action_rows"] = -1 if mutation == "all_negative" else True
+    raw = enc(body); write(output / "assessment.json", raw)
+    result["assessment_sha256"] = receipt["assessment_sha256"] = sha(raw)
+    receipt["assessment_bytes"] = len(raw)
+    receipt_raw = enc(receipt); write(output / "complete.json", receipt_raw)
+    result["complete_sha256"] = sha(receipt_raw)
+    with pytest.raises(m.SharadarCohortRunnerError, match="parent_.*count"):
+        m._verify_publication(root=retained["root"], audit_id=retained["audit_id"], identity=retained["identity"],
+                              result=result, manifest_sha=retained["manifest_sha"], fixture_only=True)
+
+
 def test_census_leaf_mutation_during_publication_refuses_before_seal(retained, monkeypatch):
     original = m._publish
     def changed(directory, name, raw, cap):
@@ -204,5 +229,59 @@ def test_fixture_worker_cannot_read_actual_root(retained):
         m._worker(**retained)
 
 
+@pytest.mark.parametrize("scope", ["lane", "capture"])
+@pytest.mark.parametrize("alias", ["literal", "symlink", "case"])
+def test_fixture_actual_scope_alias_refused_before_any_preflight_or_input(retained, tmp_path, monkeypatch, scope, alias):
+    """Only directory identity metadata is observed; custody is a forbidden spy."""
+    actual = m.LANE_ROOT if scope == "lane" else m.CAPTURE_ROOT
+    if alias == "literal":
+        path = actual
+    elif alias == "symlink":
+        path = tmp_path / (scope + "-alias")
+        path.symlink_to(actual, target_is_directory=True)
+    else:
+        path = actual.with_name(actual.name.upper())
+        if not path.exists() or not path.samefile(actual):
+            pytest.skip("actual volume does not expose this case alias")
+    retained["root" if scope == "lane" else "capture_path"] = path
+    touched = []
+
+    def forbidden(*args, **kwargs):
+        touched.append(True)
+        raise AssertionError("fixture reached isolation preflight, source, output, or capture")
+
+    monkeypatch.setattr(m.custody, "_effective_denial", forbidden)
+    monkeypatch.setattr(m.custody, "_source_bytes", forbidden)
+    monkeypatch.setattr(m.custody, "_Chain", forbidden)
+    monkeypatch.setattr(m, "_inputs", forbidden)
+    with pytest.raises(m.SharadarCohortRunnerError, match="invented_scope"):
+        m._worker(**retained)
+    assert touched == []
+
+
 def test_validated_platform_collection_scope():
     assert os.name == "posix" and hasattr(os, "O_NOFOLLOW")
+
+
+def test_compact_report_keeps_existing_cap_and_worst_case_disk_floor():
+    assert m.MAX_REPORT_BYTES == m.cohort.MAX_REPORT_BYTES == 256 * 1024**2
+    assert m.MAX_PUBLICATION_BYTES == 3 * 256 * 1024**2 + 4 * 1024**2
+
+
+@pytest.mark.parametrize("available,allowed", [(m.MIN_FREE_BYTES, False),
+    (m.MIN_FREE_BYTES + m.MAX_PUBLICATION_BYTES - 1, False),
+    (m.MIN_FREE_BYTES + m.MAX_PUBLICATION_BYTES, True)])
+def test_compact_publication_requires_full_disk_reserve(monkeypatch, available, allowed):
+    monkeypatch.setattr(m.os, "statvfs", lambda _: SimpleNamespace(f_bavail=available, f_frsize=1))
+    if allowed:
+        m._disk_reserve(123)
+    else:
+        with pytest.raises(m.SharadarCohortRunnerError, match="disk_reserve"):
+            m._disk_reserve(123)
+
+
+def test_insufficient_disk_refuses_before_private_inputs(retained, monkeypatch):
+    monkeypatch.setattr(m.os, "statvfs", lambda _: SimpleNamespace(f_bavail=m.MIN_FREE_BYTES, f_frsize=1))
+    monkeypatch.setattr(m, "_inputs", lambda **_: pytest.fail("input read before sufficient disk"))
+    with pytest.raises(m.SharadarCohortRunnerError, match="disk_reserve"):
+        run_fixture(retained)

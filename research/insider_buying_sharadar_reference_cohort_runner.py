@@ -31,14 +31,16 @@ from research.insider_buying_eodhd_earnings_demo import FALSE_FLAGS, EodhdDemoEr
 from research.insider_buying_provider_metadata_audit import _exclusive_json
 
 
-SCHEMA = "insider-sharadar-reference-cohort-observer-v1"
+SCHEMA = "insider-sharadar-reference-cohort-observer-v2"
 LANE_ROOT = custody.LANE_ROOT
 LANE_BRANCH = custody.LANE_BRANCH
 CAPTURE_ROOT = Path("/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2/artifacts/analyst_revisions_v2/sharadar_capture/arv2-sharadar-source-20260914T003329843989Z")
 CAPTURE_MANIFEST_SHA256 = supplied.MANIFEST_SHA256
 OUTPUT_PARTS = ("artifacts", "insider_buying", "sharadar_reference_cohort")
 MAX_PROJECTION_BYTES = 256 * 1024 * 1024
-MAX_REPORT_BYTES = 512 * 1024 * 1024
+MAX_REPORT_BYTES = cohort.MAX_REPORT_BYTES
+MIN_FREE_BYTES = 4 * 1024**3
+MAX_PUBLICATION_BYTES = 2 * MAX_PROJECTION_BYTES + MAX_REPORT_BYTES + 4 * 1024 * 1024
 MAX_FIELD_BYTES = 128 * 1024
 MAX_METADATA_ROWS = 2_000_000
 COUNT_FIELDS = ("source_filings", "all_form_issuer_count", "relevant_issuer_count", "source_ticker_rows",
@@ -245,9 +247,32 @@ def _publish(directory, name, raw, cap):
     _need(_read_leaf(directory, name, limit=cap) == raw, "publication_reattachment_refused")
 
 
+def _disk_reserve(directory):
+    """Retain every private row/relationship without enlarging output caps."""
+    info = os.statvfs(directory)
+    _need(type(info.f_bavail) is int and type(info.f_frsize) is int and info.f_bavail >= 0 and info.f_frsize > 0
+          and info.f_bavail * info.f_frsize >= MIN_FREE_BYTES + MAX_PUBLICATION_BYTES,
+          "offline_publication_disk_reserve_insufficient")
+
+
+def _fixture_capture_is_actual(path):
+    """Reject named, resolved and same-inode aliases before capture custody."""
+    _need(isinstance(path, Path), "invented_scope_identity_refused")
+    try:
+        return path == CAPTURE_ROOT or path.resolve() == CAPTURE_ROOT or path.samefile(CAPTURE_ROOT)
+    except OSError:
+        raise SharadarCohortRunnerError("invented_scope_identity_refused") from None
+
+
 def _worker(*, root, audit_id, identity, capture_path, manifest_sha, inventory_sha, census_complete_sha, fixture_only=False):
-    _need(type(fixture_only) is bool and (not fixture_only or (root != LANE_ROOT and capture_path != CAPTURE_ROOT)),
-          "invented_scope_cannot_read_actual_inputs")
+    _need(type(fixture_only) is bool, "invented_scope_cannot_read_actual_inputs")
+    if fixture_only:
+        try:
+            actual_lane = custody._fixture_root_is_lane(root)
+        except custody.ArchiveAssessmentRunnerError:
+            raise SharadarCohortRunnerError("invented_scope_identity_refused") from None
+        _need(not actual_lane and not _fixture_capture_is_actual(capture_path),
+              "invented_scope_cannot_read_actual_inputs")
     _need(fixture_only or (root == LANE_ROOT and capture_path == CAPTURE_ROOT
           and manifest_sha == CAPTURE_MANIFEST_SHA256 and inventory_sha == custody.INVENTORY_SHA256
           and census_complete_sha == custody.CENSUS_COMPLETE_SHA256), "actual_scope_requires_fixed_inputs")
@@ -258,6 +283,7 @@ def _worker(*, root, audit_id, identity, capture_path, manifest_sha, inventory_s
     capture = census = None
     try:
         _need(os.listdir(output.fd) == [], "output_cannot_resume_or_overwrite")
+        _disk_reserve(output.fd)
         if not fixture_only:
             sibling = root.joinpath(*OUTPUT_PARTS, "isolation-" + audit_id + ".probe")
             try:
@@ -286,6 +312,7 @@ def _worker(*, root, audit_id, identity, capture_path, manifest_sha, inventory_s
         capture.check(); census.check()
         _need(custody._source_bytes(root, tuple(identity["source_sha256"])) == identity["source_sha256"],
               "worker_source_image_changed")
+        _disk_reserve(output.fd)
         _publish(output.fd, "tickers_projection.json", tickers, MAX_PROJECTION_BYTES)
         _publish(output.fd, "actions_projection.json", actions, MAX_PROJECTION_BYTES)
         _publish(output.fd, "assessment.json", raw, MAX_REPORT_BYTES)
@@ -336,6 +363,11 @@ def _verify_publication(*, root, audit_id, identity, result, manifest_sha=CAPTUR
               "parent_output_inventory_refused")
         receipt_raw = _read_leaf(output.fd, "complete.json", limit=4 * 1024 * 1024)
         receipt = custody._json(receipt_raw)
+        _need(type(result) is dict and type(result.get("counts")) is dict and type(receipt.get("counts")) is dict
+              and set(result["counts"]) == set(receipt["counts"]) == set(COUNT_FIELDS)
+              and all(type(result["counts"][key]) is int and result["counts"][key] >= 0
+                      and type(receipt["counts"][key]) is int and receipt["counts"][key] >= 0 for key in COUNT_FIELDS),
+              "parent_typed_counts_refused")
         _need(type(result) is dict and result.get("audit_id") == audit_id
               and result.get("complete_sha256") == _sha(receipt_raw) and receipt.get("schema") == SCHEMA
               and receipt.get("execution_identity") == identity and receipt.get("capture_manifest_sha256") == manifest_sha
@@ -357,6 +389,11 @@ def _verify_publication(*, root, audit_id, identity, result, manifest_sha=CAPTUR
             if name == "assessment.json":
                 _need(_sha(raw) == result.get(key) and receipt.get("assessment_bytes") == len(raw), "parent_output_hash_refused")
                 body = custody._json(raw)
+                _need(body.get("schema") == cohort.SCHEMA
+                      and body.get("action_relation_representation") == "folded_source_label_index_union_v1"
+                      and body.get("action_source_rows_or_relations_dropped") is False, "parent_compact_relation_profile_refused")
+                _need(all(type(body.get(key)) is int and body[key] >= 0 for key in COUNT_FIELDS),
+                      "parent_typed_counts_refused")
                 _need(receipt["counts"] == {field: body.get(field) for field in COUNT_FIELDS}, "parent_output_counts_refused")
                 _need(all(body.get(flag) is False for flag in cohort.FALSE_FLAGS), "parent_assessment_authority_refused")
         output.recheck()

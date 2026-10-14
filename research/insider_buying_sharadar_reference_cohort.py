@@ -23,7 +23,7 @@ from research.insider_buying_earnings_archive_cohort_assessment import (
 from research.insider_buying_provider_reference_identity import _sec_cik_url
 
 
-SCHEMA = "insider-sharadar-reference-cohort-assessment-v1"
+SCHEMA = "insider-sharadar-reference-cohort-assessment-v2"
 TICKERS_SCHEMA = "insider-sharadar-tickers-cohort-projection-v1"
 ACTIONS_SCHEMA = "insider-sharadar-actions-cohort-projection-v1"
 TICKER_COLUMNS = ("table", "permaticker", "ticker", "name", "exchange", "isdelisted", "category",
@@ -181,6 +181,23 @@ class SharadarReferenceCohortAssessment:
     def to_payload(self):
         return json.loads(self.canonical_bytes())
 
+    def candidate_action_ordinals(self, issuer_cik):
+        """Losslessly expand one private discovery relation, never an alias.
+
+        Label-index unions replace repeated whole action lists in v2. This
+        accessor requires a genuine unchanged factory object, not supplied
+        mutable JSON. It does not grant identity or historical admission.
+        """
+        body = self.to_payload()
+        _need(type(issuer_cik) is str and re.fullmatch(r"[0-9]{10}", issuer_cik), "issuer_relation_required")
+        matches = [item for item in body["issuer_relations"] if item["issuer_cik"] == issuer_cik]
+        _need(len(matches) == 1, "issuer_relation_required")
+        index = {item["folded_source_label"]: item["source_row_ordinals"] for item in body["candidate_action_label_index"]}
+        row = matches[0]
+        result = sorted({ordinal for label in row["candidate_action_source_labels"] for ordinal in index[label]})
+        _need(len(result) == row["candidate_action_source_row_count"], "lossless_action_relation_count")
+        return result
+
     @property
     def sha256(self):
         return _sha(self.canonical_bytes())
@@ -290,7 +307,8 @@ def assess_sharadar_cohort(*, inventory_raw: bytes, inventory_sha256: str, captu
                            "historical_mapping_admitted": False})
         for perma in set(direct) | label_candidates:
             source_labels.update(label.casefold() for label in groups[perma]["tickers"])
-        action_ordinals = sorted({ordinal for label in source_labels for ordinal in action_by_label[label]})
+        indexed_labels = sorted(label for label in source_labels if action_by_label.get(label))
+        action_ordinals = {ordinal for label in indexed_labels for ordinal in action_by_label[label]}
         referenced_actions.update(action_ordinals)
         competing = any(groups[perma]["competing_cik_candidates"] for perma in set(direct) | label_candidates)
         disposition = ("conflicting_current_cik_candidates" if competing else "multiple_current_share_class_candidates"
@@ -299,7 +317,8 @@ def assess_sharadar_cohort(*, inventory_raw: bytes, inventory_sha256: str, captu
         dispositions[disposition] += 1
         relations.append({**issuer, "current_cik_candidate_permatickers": direct,
             "candidate_label_relations": labels, "label_candidate_permatickers": sorted(label_candidates),
-            "candidate_action_source_ordinals": action_ordinals, "candidate_disposition": disposition,
+            "candidate_action_source_labels": indexed_labels, "candidate_action_source_row_count": len(action_ordinals),
+            "candidate_disposition": disposition,
             "historical_mapping_admitted": False, "original_parent_corroborated": False})
     duplicate_tickers = [{"source_ordinals": [row["source_row_ordinal"] for row in rows],
                           "conflicting_nonfinancial_projection": len({_canonical({key: value for key, value in row.items()
@@ -322,7 +341,11 @@ def assess_sharadar_cohort(*, inventory_raw: bytes, inventory_sha256: str, captu
         "retrospective_action_rows": action_reports, "duplicate_ticker_primary_keys": duplicate_tickers,
         "duplicate_action_nonfinancial_keys": [ordinals for _, ordinals in sorted(action_keys.items()) if len(ordinals) > 1],
         "cohort_referenced_unique_action_rows": len(referenced_actions), "unreferenced_action_rows": len(actions) - len(referenced_actions),
-        "cohort_action_relation_count": sum(len(item["candidate_action_source_ordinals"]) for item in relations),
+        "cohort_action_relation_count": sum(item["candidate_action_source_row_count"] for item in relations),
+        "action_relation_representation": "folded_source_label_index_union_v1",
+        "candidate_action_label_index": [{"folded_source_label": label, "source_row_ordinals": sorted(set(ordinals))}
+            for label, ordinals in sorted(action_by_label.items()) if ordinals],
+        "action_source_rows_or_relations_dropped": False,
         "financial_fields_projected_or_evaluated": False, "names_used_as_join_keys": False,
         "future_action_context_is_historical_selection_information": False, "qc_identifier_observation_is_economic_knowledge": False,
         "provider_requests": 0, "qc_jobs": 0, "outcome_looks": 0, "backtests": 0,

@@ -136,8 +136,10 @@ def test_exact_and_casefold_only_candidates_are_not_silently_equivalent():
 
 
 def test_future_counterparty_does_not_union_security_ids():
-    result = payload(); issuer = result["issuer_relations"][2]
-    assert issuer["candidate_action_source_ordinals"] == [2]
+    assessment = m.assess_sharadar_cohort(**arguments()); result = assessment.to_payload(); issuer = result["issuer_relations"][2]
+    assert assessment.candidate_action_ordinals(issuer["issuer_cik"]) == [2]
+    assert issuer["candidate_action_source_row_count"] == 1
+    assert "candidate_action_source_ordinals" not in issuer
     assert issuer["current_cik_candidate_permatickers"] == ["3"]
     assert result["future_action_context_is_historical_selection_information"] is False
     assert result["qc_identifier_observation_is_economic_knowledge"] is False
@@ -165,6 +167,55 @@ def test_duplicate_keys_retain_every_nonfinancial_row():
     assert result["duplicate_action_nonfinancial_keys"] == [[1, 2]]
     assert result["cohort_referenced_unique_action_rows"] == 2
     assert result["cohort_action_relation_count"] == 4
+
+
+def test_v2_shared_index_preserves_exact_unions_without_repeating_lists():
+    data = fixture(actions=[action(ticker="ABC", contra="abc"), action(ticker="OLD", contra="ABC"),
+                            action(ticker="UNRELATED", contra=""), action(ticker="OLD", contra="OLD")])
+    assessment = m.assess_sharadar_cohort(**arguments(data)); body = assessment.to_payload()
+    assert body["schema"] == "insider-sharadar-reference-cohort-assessment-v2"
+    assert body["action_relation_representation"] == "folded_source_label_index_union_v1"
+    assert body["source_action_rows"] == body["action_rows_accounted"] == 4
+    assert body["action_source_rows_or_relations_dropped"] is False
+    assert body["candidate_action_label_index"] == [
+        {"folded_source_label": "abc", "source_row_ordinals": [1, 2]},
+        {"folded_source_label": "old", "source_row_ordinals": [2, 4]},
+        {"folded_source_label": "unrelated", "source_row_ordinals": [3]}]
+    assert assessment.candidate_action_ordinals("0000000001") == [1, 2]
+    assert assessment.candidate_action_ordinals("0000000002") == [1, 2]
+    assert assessment.candidate_action_ordinals("0000000003") == [2, 4]
+    assert body["cohort_action_relation_count"] == 6
+    assert body["cohort_referenced_unique_action_rows"] == 3
+    assert body["unreferenced_action_rows"] == 1
+    assert all(row["historical_mapping_admitted"] is False for row in body["issuer_relations"])
+
+
+def test_shared_index_unknown_labels_keep_rows_but_create_no_relation():
+    assessment = m.assess_sharadar_cohort(**arguments(fixture(actions=[action(ticker="", contra="")])));
+    body = assessment.to_payload()
+    assert body["candidate_action_label_index"] == []
+    assert body["source_action_rows"] == body["unreferenced_action_rows"] == 1
+    assert body["action_quarantined_rows"] == 1
+    assert assessment.candidate_action_ordinals("0000000001") == []
+
+
+@pytest.mark.parametrize("cik", [True, None, "1", "0000000099"])
+def test_shared_index_accessor_requires_a_source_issuer_and_factory(cik):
+    assessment = m.assess_sharadar_cohort(**arguments())
+    with pytest.raises(m.SharadarReferenceCohortError, match="issuer_relation_required"):
+        assessment.candidate_action_ordinals(cik)
+
+
+def test_shared_index_accessor_rejects_mutated_or_forged_factory_bytes():
+    assessment = m.assess_sharadar_cohort(**arguments()); body = assessment.to_payload()
+    body["candidate_action_label_index"][0]["source_row_ordinals"] = []
+    object.__setattr__(assessment, "_raw", enc(body))
+    with pytest.raises(m.SharadarReferenceCohortError, match="genuine_unchanged"):
+        assessment.candidate_action_ordinals("0000000001")
+
+
+def test_v2_keeps_original256mib_report_safety_bound():
+    assert m.MAX_REPORT_BYTES == 256 * 1024 * 1024
 
 
 def test_noncanonical_original_manifest_remains_hash_bound():

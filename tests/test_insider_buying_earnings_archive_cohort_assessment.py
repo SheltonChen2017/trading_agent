@@ -226,6 +226,61 @@ def test_v4_cannot_redispatch_consumed_february():
         assess(tuple(items))
 
 
+def five_campaigns_with_two_partial():
+    first, second, third, _ = four_campaigns_with_partial()
+    fourth = campaign(m.V4_SUPPORT_WINDOWS, schema=m.CONTINUATION4_SCHEMA,
+        name="ib-eodhd-campaign-invented-v4", registered="2026-10-13T00:06:00Z", refusal=11,
+        rows={"2019-03-01": [row("ABC.US", "2019-03-15")]})
+    manifest = json.loads(fourth.manifest_raw); leaves, counts = {}, []
+    for index, item in enumerate(fourth.windows[:11]):
+        child = json.loads(item.complete_raw)
+        leaves[f"window-{index:04d}-complete.json"] = {"sha256": item.complete_sha256, "bytes": len(item.complete_raw), "versions": ["invented"]}
+        leaves[f"window-{index:04d}-metadata.json"] = {"sha256": item.metadata_sha256, "bytes": len(item.metadata_raw), "versions": ["invented"]}
+        counts.append({"index": index, "window": child["window"], "complete_sha256": item.complete_sha256,
+            **{key: child["receipt"][key] for key in ("sample_rows", "metadata_accepted_rows", "quarantined_rows")}})
+    witness = {"schema": "independent-partial-calendar-v4-custody-observation-candidate-v1",
+        "campaign_id": manifest["campaign_id"], "manifest_sha256": fourth.manifest_sha256,
+        "execution_head": manifest["identity"]["head"], "source_inventory_sha256": manifest["identity"]["source_inventory_sha256"],
+        "campaign_completion_present": False, "aggregate_completion_manufactured": False,
+        "sealed_window_count": 11, "consumed_scope_count": 12, "unsealed_started_window_count": 1,
+        "unattempted_suffix_windows": 77, "next_unattempted_window": list(m.V5_SUPPORT_WINDOWS[0]),
+        "last_unattempted_window": list(m.V5_SUPPORT_WINDOWS[-1]), "journal_leaf_sha256_bytes_versions": leaves,
+        "sealed_window_counts": counts, "observed_at_utc": "2026-10-13T00:08:00Z",
+        "historical_custody_change_cause_established": False}
+    raw = enc(witness)
+    partial = m.ArchivePartialCampaignMetadata(fourth.manifest_raw, fourth.manifest_sha256, raw, sha(raw), fourth.windows[:11])
+    fifth = campaign(m.V5_SUPPORT_WINDOWS, schema=m.CONTINUATION5_SCHEMA, name="ib-eodhd-campaign-invented-v5",
+        registered="2026-10-13T00:08:00Z", rows={"2020-03-01": [row("ABC.US", "2020-03-15")]})
+    return first, second, third, partial, fifth
+
+
+def test_two_partial_generations_leave_both_consumed_unsealed_months_unavailable():
+    body = assess(five_campaigns_with_two_partial()).to_payload()
+    assert body["unavailable_windows"] == [["2006-01-01", "2006-01-31"], ["2018-08-01", "2018-08-31"],
+        ["2019-02-01", "2019-02-28"], ["2020-02-01", "2020-02-29"]]
+    assert sum(item.get("status") == "UNSEALED_CONSUMED_START" for item in body["window_accounting"]) == 2
+    assert len(body["campaigns"]) == 5 and body["source_metadata_rows"] == 5
+    assert body["campaigns"][2]["complete_sha256"] is body["campaigns"][3]["complete_sha256"] is None
+    assert not any(body["authority"].values())
+
+
+@pytest.mark.parametrize("field,value", [("sealed_window_count", 12), ("consumed_scope_count", 11),
+    ("unattempted_suffix_windows", True), ("historical_custody_change_cause_established", True)])
+def test_partial_v4_witness_cannot_invent_cause_or_consumed_scope_classification(field, value):
+    items = list(five_campaigns_with_two_partial()); body = json.loads(items[3].witness_raw); body[field] = value
+    raw = enc(body); items[3] = replace(items[3], witness_raw=raw, witness_sha256=sha(raw))
+    with pytest.raises(m.EarningsArchiveAssessmentError):
+        assess(tuple(items))
+
+
+def test_v5_cannot_redispatch_unsealed_february2020():
+    items = list(five_campaigns_with_two_partial())
+    items[4] = campaign(m.V4_SUPPORT_WINDOWS[11:], schema=m.CONTINUATION5_SCHEMA,
+        name="ib-eodhd-campaign-invented-v5", registered="2026-10-13T00:08:00Z")
+    with pytest.raises(m.EarningsArchiveAssessmentError, match="continuation5_exact"):
+        assess(tuple(items))
+
+
 def test_three_epochs_never_repair_two_attempted_refusals():
     result = assess(three_campaigns(third_rows={"2018-09-01": [row("ABC.US", "2018-09-15", ordinal=0)]})).to_payload()
     assert result["unavailable_windows"] == [["2006-01-01", "2006-01-31"], ["2018-08-01", "2018-08-31"]]

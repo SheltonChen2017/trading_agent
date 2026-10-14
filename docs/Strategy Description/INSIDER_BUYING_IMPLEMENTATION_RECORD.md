@@ -25453,3 +25453,120 @@ against the corrected image0.35s, with the supplied base identity unmodified.
 Main record/active-document/EXACT guard checks and two denied-network/fork/
 all-write memory compilations passed; diff check is clean. No full suite or
 actual baseline success is attributed to those fixtures.
+
+## 181. Original public preparation layout and new cross-provider metadata scope (2026-10-14 UTC)
+
+### 181.1 Second frozen-baseline refusal remains unresolved, not rewritten
+
+The NEW corrected-baseline CLI ran at clean
+d2d194a588fa4f59304377761a43ab1dea494b00 with source27725d90 and returned2.
+ib-2006q1-parent-projection-frozen-baseline-corrected-20261014-once retains
+only reservation.json:11,667 bytes, SHA-256
+a83355fe6690f2f9d19bdf148befff0cb492340d47d1f3994b4c795a4b588133.
+No assessment/ledger/complete is present; all64 original capture claims and
+bodies remain unchanged. The failed child's original traceback/stage was
+not retained, so no sole historical cause is asserted.
+
+A separate network/fork/all-write-denied readonly gate reproduced
+private_directory_owner_required while opening the original preparation.
+Its outer candidate root is owner700; ib1a/ib1b public SEC snapshot
+namespaces are owner755; the externally pinned assessment/completion
+controls are owner600. The sealed64-parent reader independently passes.
+The generic private700 tree is incompatible with the original public
+publisher's nested layout. This is a verified sufficient refusal, not proof
+of the exact unretained original child stage. Do not chmod or rewrite the
+retained preparation, broaden shared custody rules or manufacture success.
+Qualify a lane-local exact public-snapshot-layout reader under the private
+outer root, preserving external pins, all named ancestry/version/hash and
+full raw-bound preparation replay. Add fixed-phase failure visibility before
+another NEW offline operation; a failure receipt must never become completion.
+
+### 181.2 Delegated three-window Benzinga qualification, not an EODHD retry
+
+Under the owner's purchased Massive/Benzinga Earnings and continuous-build
+direction, define NEW run ib-benzinga-gap-three-months-20261014-once after
+clean source commit. Exactly three previously unrequested Massive scopes:
+2018-08-01..2018-08-31,2019-02-01..2019-02-28,2020-02-01..2020-02-29.
+Endpoint https://api.massive.com/benzinga/v1/earnings with exact date.gte,
+date.lte, limit50000 and sort=date.asc; no symbols filter, redirects, proxy,
+retry, resumption or pagination. These corroborate three missing post2010
+metadata months; they do NOT request January2006, replace the failed EODHD
+bytes/controls, or repeat the old2010-04-30 provider access probe.
+The purchased product's scheduled-or-reported/confirmed fields are not
+silently promoted to authentic historical actual releases or revision lineage.
+Primary endpoint semantics: https://massive.com/docs/rest/partners/benzinga/earnings.
+Private personal source custody stays within the documented supplier scope;
+no licensed rows or reconstructible financial data enter Git/public output.
+
+Bind the exact unchanged prior access controls, including complete.json
+81bd2401ff26251428fb1ed278960a174d626f9ed8446902509464122de910ba.
+Publish durable manifest then irreversible global URL claim and start before
+loading only Keychain service trading-agent-massive/account massive into
+private captured process memory. Never put values in argv/env/chat/logs/Git.
+Maximum one transport per claim,3 total; stop on access/transport/framing/
+schema/underfill/custody/source refusal, preserving claimed/unattempted
+windows distinctly. At least1s spacing after complete processing,16MiB raw,
+256MiB metadata/50000-row bounds and4GiB free floor plus remaining worst case.
+Financial numeric tokens are lexically validated but not evaluated/projected;
+only field presence/nullness is metadata. Framing/privacy-valid unknown
+metadata JSON remains private with fixed quarantine and unknown row count;
+malformed/framing/credential-echo refusals do not become usable raw custody.
+
+The independent actual verifier binds current clean committed import closure
+separately from original producer Git bytes and its static dependencies,
+holds/rechecks the full private namespace/claim/run/leaf inventory and lock,
+and replays terminal/raw/metadata accounting in an effectively OS network/
+fork/all-write-denied minimal-environment child. Native denial probes are
+observed; do not call current verification whole historical-environment
+execution. Canonical Python JSON bytes carry nanosecond versions without
+JavaScript numeric round-tripping. All readiness/rights/PIT/source/actual-
+release/outcome flags remain false and looks/jobs/backtests stay0/0/0.
+
+### 181.3 Exact activation and meaningful refusal sensitivity
+
+| Active source | Source SHA-256 | Focused test SHA-256 |
+|---|---|---|
+| research/insider_buying_benzinga_earnings_gap_capture_v1.py | f1777dbeed32eac9a236be798ee54983e7767c84953464a546e8b206b3bb9d35 | ee6c799c8e363241c81269de33ad75446143ef0f399d3c841a0137ded65cb5b8 |
+
+Preceding private1e7a74d6/4201e712 images remain byte-exact. Main found six
+genuine numeric/framing reds0.19s -> green0.10s: nested financial count
+misinterpretation, duplicate/unsupported/conflicting HTTP framing and
+overdelivery. Five custody/private-raw-retention reds0.20s -> green0.12s
+preserve schema-quarantined raw and known-run inventory before another claim.
+Held ancestor/lock versions, original/future run fencing and fixed source
+closure are load-bearing, not acquisition safety granted by test patches.
+
+Internal verifier author qualified private7c07f9a2/cafd17ff with210 focused/
+boundary/EXACT guard passes3.98s. A genuine arbitrary failure-field leakage
+red24 other passes0.57s and a zero-byte package-init red0.33s became green
+without arbitrary diagnostic text or weakened source hashing. Two verifier
+guard reversals/two memory compilations passed0.198s under network/fork/
+all-write denial. Final actual OS-denied INVENTED worker bound18 fixture
+leaves and distinct producer/current identities0.192s. A preceding invented
+probe lost nanosecond precision through JavaScript JSON conversion; passing
+canonical Python bytes corrected the test handoff, not custody comparisons.
+No actual provider/account/credential/body/journal was read by those fixtures.
+
+Activation only changes production wording, research loader and deliberately
+inactive __file__ treatment for pre-I/O refusal tests. Main active304 gap/
+prior-access/import-boundary/EXACT named Insider package-guard checks passed
+4.17s with process-tree network denial and isolated database/output roots.
+This is internal QA, not independent Claude review or actual capture evidence.
+
+Continue original-parent/source-view, reference and honest archive work.
+January2006 coverage, genuine identity/availability/rights/full-population
+and permanent protocol/look gates remain open factual inputs; no source
+window narrowing or readiness invention. Public FMP terms still distinguish
+account access from prior written copy/download permission; the owner asked
+to skip that paperwork question, so no repeated question or FMP acquisition
+occurs. Other-lane usage is not vendor permission. Source:
+https://site.financialmodelingprep.com/terms-of-service.
+No shared/frozen edits, outcome look, strategy QC/backtest launch, interim
+push or automatic monitor rearm. The single combined push remains at the
+authorized round's honest end, after a separate durable final handoff.
+
+Main final record/active-document/EXACT guard checks passed72 in1.37s;
+two memory compilations passed with network/fork/all-write denial. Diff and
+frozen four-file comparison against origin85c7755d are clean. The prospective
+three-window operation and its independent verifier remain unexecuted at
+this activation commit time.

@@ -583,9 +583,12 @@ V1/V2/D11/D12 remain spent. Section299 records the owner's subsequent
 same-organization confirmation and explicit request to diagnose/fix the actual
 storage error and continue the study. The authenticated organization UI now
 shows50.01MB used/2GB capacity; this is current allocation evidence, not the
-original upload cause or API write permission. A new refusal-text observation
-is being prepared; no spent protocol is renewed. No QC backtest attempt has
-occurred.
+original upload cause or API write permission. D13's one new refusal-text
+observation completed atccc3efff with HTTP200/APIfalse and
+`file not found [redacted]` (299.5); it too is spent. This redacted observation
+is not exact-key absence or admission. Separately versioned properties-first
+V3 recovery is being prepared; no spent protocol is renewed. No QC backtest
+attempt has occurred.
 The monitor remains PAUSED.
 
 Branch: `codex/strategy-analyst-revisions-v2`
@@ -1637,12 +1640,14 @@ Claude review of section 299's current storage-error recovery continuation under
 existing "for now" direction and 255.2 delegation, not future unrelated work.
 Section 296's exact connection uses are completed and spent. This is
 sequencing authority, not independent acceptance or technical/source clearance.
-The immediate next step is section 299's separately bounded refusal-text
-diagnosis under the owner's explicit fix-and-continue direction. The owner
+The immediate next step is section 299's separately bounded properties-first
+recovery under the owner's explicit fix-and-continue direction. D13 completed
+once with a redacted `file not found` reason; the new contract must establish
+exact-key absence afresh before any set, never rely on the redacted text. The owner
 confirmed the same organization, and its authenticated UI shows50.01MB/2GB;
 the sole Manager member has no visible Edit Permissions action. D11's null
 listing and D12's HTTP200/APIfalse observations remain qualified: neither
-establishes presence, absence or completeness. V1,V2,D11,D12 remain spent.
+establishes presence, absence or completeness. V1,V2,D11,D12,D13 remain spent.
 Current allocation proves neither historical quota causality nor API write
 permission. No unchanged upload retry or capacity/launch advance follows
 merely from these observations. D6 preparation passed once and is spent. This continues the owner's
@@ -49195,3 +49200,184 @@ server contact. No cleanup/repair/replay, source-byte census or unchanged
 upload retry follows. D13 evidence may inform a separately committed recovery
 decision, never substitute redacted text for exact object absence or create
 positive V2 admission. The six/eight strategy and look/cell floor are unchanged.
+
+### 299.5 Actual D13 observation and substantive recovery decision
+
+D13 was invoked ONCE at clean freeze
+`ccc3efffcba40d149beba2f6a52a6671e60f8444`, with the exact299.3 source hash.
+External dispatch bracket05:42:30UTC and completion observation05:42:37UTC
+on2026-10-14 are second-resolution orchestration observations. The report's
+own operation interval is05:42:36.223057Z–05:42:36.980306Z, not an exact
+provider-request timing claim. Actual process exit was **0**. The normal
+bounded output bound `storage-error-diagnostic-v1-report.json` to1478bytes,
+SHA256`d5a00781879ef8d6561ea19ce52fbddb78c5006df643d7654e496cb4df4db07c`.
+No second output-reader invocation or report reread occurred.
+
+The actual response was HTTP200/APIfalse, one error, metadata absent. Its
+safe retained text is **`file not found [redacted]`**, with one redacted span.
+The new diagnostic completed and its claim is spent. Exactly one application
+request dispatch was counted, not measured server contacts. This is a current
+QC-reported missing-file reason for the index0 request; it does not recover
+the discarded original set response, prove a quota/permissions cause, or by
+itself establish exact object-specific absence. Redacted text cannot be the
+predicate authorizing a write. All diagnostic/admission/readiness distinctions
+in299.4 remain; no upload, capacity, project, strategy attempt or cell resulted.
+
+The current UI allocation plus this new service reason supports a materially
+different properties-first recovery, not a replay of spent listing-dependent
+V2 or the original upload. Prepare separately versioned V3 which authenticates
+the same six payloads/family, observes each exact key's properties, accepts
+present objects only on exact key/size/payload-MD5 equality, and treats absence
+only through a prospective finite full error grammar bound to the actual
+requested key in memory. Generic/redacted not-found, null, unknown or mismatch
+must stop. No old report is reread; D13's external pin is provenance only.
+
+Before any put, the complete initial six-key census must pass. Existing
+activation with any missing data refuses. Each initially absent key then
+requires a fresh immediate exact-absence observation, one set and exact
+properties verification; a changed recheck state stops. Activation remains
+last. Maximum24requests and6sets; no list/get/delete/canary/alternate prefix,
+unchanged retry or object overwrite. No documented conditional-create/CAS
+exists, so this is absence-gated publication under exclusive lane ownership,
+not an atomic race-free no-overwrite guarantee. New safe error retention will
+preserve any actual set refusal. A separately pinned new admission and actual
+exit0 must precede a new continuation binding; failed V2 remains failed.
+Implementation is in progress, not operational authorization. Exact source/
+test/profile pins, validation and a clean committed run freeze still precede
+new contact. Frozen297.14 economics and A1-only attempt protocol remain.
+
+### 299.6 Prospective V3 implementation and pre-use findings
+
+The new `arv2_newrule_storage_recovery_v3.py` helper and
+`run_arv2_newrule_storage_recovery_v3.py` caller reuse only frozen pure
+multipart/positive-properties checks and stateless authenticated payload
+loading. They do not invoke V1/V2/D11/D12/D13 operational entrypoints or read
+their reports. The new recovery owns its exclusive claim before any retained
+family/organization/package reads. The exact supported absence forms are
+`File not found: {key}`, `File not found: '{key}'` and
+`File not found: "{key}"`, with the entire exact requested key substituted;
+HTTP200, APIfalse, one error and missing/null metadata are also required.
+These are prospective supported forms, not a reconstruction of D13's raw
+message. Official metadata documentation exposes only a string-array error
+field, and public LEAN API code forwards cloud errors without defining that
+grammar. Unrelated local-file messages are not evidence for this API.
+The original multipart fields/framing match the public upload specification;
+no speculative serialization change is justified by the lost D7 response.
+
+V3 authenticates all six initial observations before any put, refuses positive
+metadata mismatches/contradictory errors and activation-with-missing-data,
+then follows the exact6+3m request sequence described in299.5. Each request's
+intent, phase/index/body digest and finite observed status are retained.
+Local payload/family/source authentication repeats before a successful report
+and new admission. Only these new sidecars can admit the new continuation;
+original upload-valid and V2 success are never manufactured. Existing-object
+and newly published metadata are finite observations, not continuously held
+remote objects. Actual successful parent exit remains external evidence,
+separate from report/admission publication, because a late close or output
+failure may follow publication. No cleanup/retry/rollback occurs on failure.
+
+The additive V3 continuation substitutes the new admission check only at
+capacity/begin and before delegated original lifecycle methods. Its actual
+caller permits A1 only; the original helper's three-attempt/recovery mechanics
+remain historical/future constraints, not automatic A2/A3 permission. Direct
+internal operation also performs the mandatory clean-host/source/HEAD gate
+before private input access. Frozen family/projections/economics, attempt IDs,
+bounded polling and exact `Completed.`/aggregate validation remain unchanged.
+
+Pre-use findings, none encountered operationally:
+
+| Finding | Severity/disposition | Evidence and correction |
+|---|---|---|
+| ARV2D299-002 | P3, corrected | Root static read found a mistyped original caller hash in the initial new caller. The exact frozen literal was corrected before the first test; no pin refresh or old-source change. |
+| ARV2D299-003 | P2, corrected | Same-round static advice found a non2xx error JSON without `success` was safely parsed with `api_success=null`, then rejected by the new finite-output validator. Null is now allowed only for diagnostic observation; complete admission still requires the exact state-specific True/False result. |
+| ARV2D299-004 | P2, corrected | Same-round static advice found generated `dependency_validation_refused` missing from the new finite failure-code set. Its safe failure/report evidence is now retained instead of discarded by the caller. |
+
+Root's initial suspicion of missing V1/D11 transitive import pins was withdrawn
+after source inspection: V1 references are constants and D11's import occurs
+only in an unused D12 operational helper. Selected executed dependencies are
+the original51 plus six additions; this is not whole-interpreter integrity.
+Same-round author/advisory work is not independent Claude review. Final pins,
+test results and operational decisions follow; this subsection alone grants
+no provider/storage/capacity or backtest call.
+
+### 299.7 Final V3 pins, validation and exact D14 recovery freeze
+
+| Source/test | SHA256 |
+|---|---|
+| `scripts/arv2_newrule_storage_recovery_v3.py` | `7f817962d49ac4d692351131e1a1af004efa2db7ee720eb0aaf29533757f8c4c` |
+| `scripts/run_arv2_newrule_storage_recovery_v3.py` | `696e04425f6fdc71f0bafa50d17939ae2e7c67f6d9666e12ce1a1437e5c763c0` |
+| `tests/analyst_revisions_v2/test_newrule_storage_recovery_v3.py` | `9922238b569efe3153f87d7c89d49faaeb165650d59b22b7243635bbad2b530c` |
+| `scripts/arv2_newrule_recovery_continuation_v3.py` | `331a3ef113489f98dbe11d21c448798840c461af0fda6e99f4e6aef32d64a2aa` |
+| `scripts/run_arv2_newrule_recovery_continuation_v3.py` | `65c4874c2b3c3095998ef5ff97478d1ab3cdb63cc357913f20e55180dc25e6dd` |
+| `tests/analyst_revisions_v2/test_newrule_recovery_continuation_v3.py` | `5f8452e7518d3f916b1e829f2fc570684ea139c282fb641a023b967f5acf11ae` |
+| `tests/analyst_revisions_v2/test_newrule_recovery_continuation_operation_v3.py` | `2cd3d37d5a9de0484d8f2461bc0455fc7e04119d7d1d68e67dbd0b552ad00adf` |
+
+Canonical recovery profile:
+`5b0275f0913f17d8ffd363831882dd12b790e6a0af5b0d7f918084d6014ed937`;
+recovery operation profile:
+`1385222245c297f21434efd89d68e9d1d9940cd9ffebf395241d6b5eb7cf3b2c`;
+continuation operation profile:
+`5529482d26e540eda4e45a2e6ea595b625a29ad01370bdbe8b0c448d7b1a7849`.
+
+Root final focused selection: **499 distinct passes in9.13s**
+(167V3recovery+156V3continuation+90D13+86record/document), no failures/skips/
+warnings. Seven new Python files compile in memory;61 distinct selected
+dependency pins in the union verify, and `assistant.dispatch_fence` is absent.
+Same native network and production-artifact read/write denial, disabled plugin
+autoload, `--noconftest`, `-B`, no cache provider and in-root support paths.
+No full Codex suite. Root's earlier176selection and86pre-freeze record repeat
+in1.50s overlap this selection, not additive. Author final recovery167passes
+in3.60s and continuation156passes in7.65s also overlap.
+
+Recovery's initial159passes/2fixture failures in4.11s are retained: one fixture
+incorrectly expected success=0 to produce a parsed observation (it correctly
+refused sooner); another demanded the original frozen import tree be entirely
+covered by its selected51 pins, discovering a pre-existing unpinned builder.
+Tests now qualify that baseline rather than claim whole-interpreter integrity.
+Root additionally identified collection-order contamination in that fixture;
+newly introduced imports are snapshotted immediately, not inferred from later
+unrelated test imports. The complete combined selection passes.
+
+Memory-only omission checks: exact-absence guard1expected failure in0.13s,
+activation-before-write guard1expected failure in0.05s; the final census still
+refused both mutated protocols, so these prove the required early refusal was
+lost, not that admission was bypassed. A1-only continuation guard2expected
+failures in0.25s; direct-operation preflight1expected failure in0.21s before
+private access. Every mutation was restored in finally and source bytes
+unchanged. Advisory/author results do not substitute independent review.
+
+**D14 is authorized ONCE** under299.1/255.2 after this exact subsection and
+all seven files are committed together. Use only the designated clean Mac
+root/branch, Darwin/POSIX Python3.13 executable, that commit's exact HEAD and
+the above recovery-caller SHA as explicit arguments. No pre-run allocation/
+inspection of the new V3 names. This authorizes the new recovery only, not a
+continuation call before success is observed and separately frozen.
+
+Fixed control remains `newrule_comparison_qc/R298-R303-20261013` under the
+designated artifact root; exclusive new files are `storage-recovery-v3-claim`,
+`-start`, `-report`, `-admission` and ordinal00–23 request `-intent`/`-observed`
+JSON sidecars. Claim precedes exact retained family/org and the same pinned
+October package/lineage/payload authentication; credentials follow. No old
+source acquisition, family reconstruction, report replay, list/get/delete,
+canary, fallback prefix or overwrite is authorized. Up to24requests/6sets,
+30s/request and300s whole-process deadline; host suspension/uninterruptible
+I/O remain qualifications. Same six fixed inventory bytes totaling2,776,584
+bytes may be uploaded only after the exact absent predicate and immediate
+recheck, activation last. Unknown/mismatch/change stops; no automatic retry.
+
+Responses <=16384bytes; new private report <=256KiB and external envelope
+<=64KiB. Only finite per-request status/state, redacted vocabulary and optional
+non-authorizing exact-key occurrence/prefix/suffix-length facts may leave the
+process; no raw error, body, key, organization, credential, preview or licensed
+row. Exact absence must be determined from the fresh strict raw JSON in memory,
+not from those output facts. Final local/source checks, request census,
+exclusive report/admission publication, readback and directory verification
+all precede normal return. External handling records the actual exit and
+the single bounded normal envelope/returned pins, with no extra private reader.
+Only actual exit0 plus complete authenticated matching admission permits a
+subsequent separately committed continuation freeze. Any nonzero/unknown or
+late failure keeps all outputs and refuses continuation, even if an admission
+file was written. Partial/duplicate claims are spent/ambiguous, never reset.
+This no-order publication diagnostic does not evaluate strategy performance;
+the314/239/50/699 floor and zero new candidate attempts remain until an actual
+accountable begin/result event. All formal/PIT/paper flags stay false.

@@ -95,6 +95,7 @@ class Book:
 @dataclasses.dataclass(frozen=True, slots=True)
 class Target:
     source_snapshot_sha256: str
+    input_books_sha256: str
     universe_count: int
     ar_percent: int
     weights: tuple
@@ -103,6 +104,8 @@ class Target:
 
     def record(self):
         value = {"schema": SCHEMA, "source_snapshot_sha256": self.source_snapshot_sha256,
+                 "input_books_sha256": self.input_books_sha256,
+                 "source_hash_is_independent_authority": False,
                  "universe_count": self.universe_count, "ar_percent": self.ar_percent,
                  "weights": [[sid, kind, str(weight)] for sid, kind, weight in self.weights],
                  "sleeves": json.loads(self.diagnostics_bytes),
@@ -142,7 +145,11 @@ def _validated(book):
 
 
 def build_target(books, *, universe_count, ar_percent, source_snapshot_sha256):
-    """Construct one actual arm, with every uninvested sleeve cent retained."""
+    """Bind actual books and external context, not authenticate their origin.
+
+    The supplied context digest is never an authority assertion. The runtime
+    must separately authenticate its package and actual callback provenance.
+    """
     cohort(universe_count)
     require(type(ar_percent) is int and ar_percent in AR_PERCENTS, "arm")
     require_sha(source_snapshot_sha256)
@@ -157,13 +164,17 @@ def build_target(books, *, universe_count, ar_percent, source_snapshot_sha256):
     require(not own_ids.intersection(row.economic_id for book in books
                                     for row in book.members if row.economic_id),
             "stock_own_etf_collision")
-    economic_to_sid, sid_to_economic = {}, {}
+    economic_to_sid, sid_to_economic, economic_facts = {}, {}, {}
     for book in books:
         for row in book.members:
             if row.economic_id is not None:
                 require(economic_to_sid.setdefault(row.economic_id, row.qc_sid) == row.qc_sid
                         and sid_to_economic.setdefault(row.qc_sid, row.economic_id) == row.economic_id,
                         "cross_book_identity_collision")
+                facts = (row.economic_name, row.market_cap, row.score)
+                require(economic_facts.setdefault(row.economic_id, facts) == facts,
+                        "cross_book_economic_facts_conflict")
+    books_sha256 = book_digest(books)
     with localcontext() as context:
         context.prec = 96
         stocks, etfs, diagnostics, sleeve_rows = {}, {}, [], []
@@ -265,10 +276,23 @@ def build_target(books, *, universe_count, ar_percent, source_snapshot_sha256):
         require(sum((weight for _, _, weight in weights), Decimal(0)) == GROSS, "gross_conservation")
         payload = canonical(diagnostics)
         semantic = {"schema": SCHEMA, "source_snapshot_sha256": source_snapshot_sha256,
+            "input_books_sha256": books_sha256, "source_hash_is_independent_authority": False,
             "universe_count": universe_count, "ar_percent": ar_percent,
             "weights": [[sid, kind, str(weight)] for sid, kind, weight in weights],
             "sleeves": diagnostics, "primary_view": PRIMARY_VIEW,
             "point_in_time_proven": False, "formal_identity_admitted": False,
             "formal_forward_ready": False}
-        return Target(source_snapshot_sha256, universe_count, ar_percent, weights,
+        return Target(source_snapshot_sha256, books_sha256, universe_count, ar_percent, weights,
                       payload, digest(semantic))
+
+
+def book_digest(books):
+    """Canonical complete-book content binding, including unselected rows."""
+    return digest([{"universe": book.universe, "own_etf_id": book.own_etf_id,
+        "unavailable_reason": book.unavailable_reason,
+        "members": [[row.qc_sid, row.constituent_label, row.fundamental_label,
+            str(row.reported_weight), row.economic_id, row.economic_name,
+            str(row.market_cap) if row.market_cap is not None else None,
+            str(row.score) if row.score is not None else None]
+            for row in sorted(_validated(book), key=lambda item: item.qc_sid)]}
+        for book in books])

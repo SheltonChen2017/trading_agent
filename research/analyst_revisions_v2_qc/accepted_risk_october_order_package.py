@@ -26,7 +26,7 @@ from research.analyst_revisions_v2.global_benchmark_contract import (
 )
 
 from . import accepted_risk_latest_order_package as _latest
-from . import accepted_risk_massive_ratings_delta as _ratings
+from . import accepted_risk_massive_ratings_delta_v2 as _ratings
 from . import accepted_risk_preliminary_package as _compact
 from . import accepted_risk_preliminary_rating_evaluator as _evaluator
 from . import physical_accepted_risk_archive as _archive
@@ -65,6 +65,11 @@ _LINEAGE_KEYS = frozenset((
     "inventory_is_current_holdings", "point_in_time", "formal", "three_role_complete", "orders", "trading",
     "paper_or_live_ready", "recovered_tail_contribution_count", "fresh_contribution_count",
     "cross_boundary_rating_event_refusal_count", "cross_archive_daily_ambiguity_count",
+))
+_RATINGS_LINEAGE_KEYS = frozenset((
+    "manifest_sha256", "manifest_byte_count", "page_count", "source_row_count", "row_count",
+    "duplicate_group_count", "duplicate_excess_count", "duplicate_disposition_sha256",
+    "normalization_profile_sha256", "capture_id", "first_event_date", "last_event_date",
 ))
 
 
@@ -180,6 +185,25 @@ def require_october_order_input_package(value):
             or lineage.get("predecessor_lineage_sha256") != EXPECTED_PREDECESSOR_LINEAGE_SHA256
             or lineage.get("ancestral_package_sha256") != _old.EXPECTED_DELTA_PACKAGE_SHA256):
         _refuse("october_scope_binding")
+    ratings = lineage["ratings_delta"]
+    if (type(ratings) is not dict or set(ratings) != _RATINGS_LINEAGE_KEYS
+            or ratings["normalization_profile_sha256"] != _ratings.SOURCE_PROFILE_SHA256
+            or ratings["manifest_sha256"] != _ratings.EXPECTED_MANIFEST_SHA256
+            or ratings["first_event_date"] != _ratings.FIRST_DATE
+            or ratings["last_event_date"] != _ratings.LAST_DATE):
+        _refuse("october_ratings_normalization_binding")
+    for key, expected in (
+        ("manifest_byte_count", _ratings.EXPECTED_MANIFEST_BYTE_COUNT),
+        ("source_row_count", _ratings.EXPECTED_SOURCE_ROW_COUNT),
+        ("row_count", _ratings.EXPECTED_UNIQUE_ROW_COUNT),
+        ("duplicate_group_count", _ratings.EXPECTED_DUPLICATE_GROUP_COUNT),
+        ("duplicate_excess_count", _ratings.EXPECTED_DUPLICATE_EXCESS_COUNT),
+    ):
+        if type(ratings[key]) is not int or ratings[key] != expected:
+            _refuse("october_ratings_normalization_count")
+    if type(ratings["page_count"]) is not int or not 1 <= ratings["page_count"] <= 16:
+        _refuse("october_ratings_page_count")
+    _compact._safe_sha(ratings["duplicate_disposition_sha256"], "rating duplicate disposition")
     return value
 
 
@@ -286,7 +310,7 @@ def _sources_and_collisions(parent, prior_delta, tail, fresh):
     _PINNED_SEMANTIC_FOLD(prior_delta, visit_prior)
     # This also detects mutation of the separately authenticated snapshot while
     # the historical folds were running. It never authenticates a refused run.
-    _ratings.require_authenticated_ratings_delta(fresh)
+    _ratings.require_authenticated_ratings_delta_v2(fresh)
     return tuple(tail_rows), fresh_rows, frozenset(tail_collisions), frozenset(fresh_collisions)
 
 
@@ -385,7 +409,7 @@ def build_october_order_input_package(*, predecessor, parent_archive, prior_delt
                                     global_contract, output_root: Path):
     """Require authenticated, externally pinned inputs before materialization."""
     predecessor = _require_predecessor(predecessor)
-    fresh = _ratings.require_authenticated_ratings_delta(ratings_delta)
+    fresh = _ratings.require_authenticated_ratings_delta_v2(ratings_delta)
     parent, prior_delta, tail = _require_archives(predecessor, parent_archive, prior_delta_archive, tail_archive)
     firms = require_section72_owner_waived_firm_admission(firm_admission)
     contract = require_loaded_global_benchmark_contract(global_contract)
@@ -424,7 +448,12 @@ def build_october_order_input_package(*, predecessor, parent_archive, prior_delt
         "original_tail_archive": _latest._archive_binding(tail),
         "ratings_delta": {"manifest_sha256": fresh.manifest_sha256,
             "manifest_byte_count": fresh.manifest_byte_count, "page_count": fresh.page_count,
-            "row_count": fresh.row_count, "capture_id": fresh.context.capture_id,
+            "source_row_count": fresh.source_row_count, "row_count": fresh.row_count,
+            "duplicate_group_count": fresh.duplicate_group_count,
+            "duplicate_excess_count": fresh.duplicate_excess_count,
+            "duplicate_disposition_sha256": fresh.duplicate_disposition_sha256,
+            "normalization_profile_sha256": _ratings.SOURCE_PROFILE_SHA256,
+            "capture_id": fresh.context.capture_id,
             "first_event_date": fresh.context.first_event_date, "last_event_date": fresh.context.last_event_date},
         "tail_source_disposition_sha256": derived[0][1], "fresh_source_disposition_sha256": derived[1][1],
         "merge_disposition_sha256": merge_digest,
@@ -459,7 +488,7 @@ def build_october_order_input_package(*, predecessor, parent_archive, prior_delt
         history_batch_security_count=_compact.HISTORY_BATCH_SECURITY_COUNT,
         scoring_sessions_per_callback=_compact.SCORING_SESSIONS_PER_CALLBACK,
         signal_seed_contributions_per_callback=_compact.SIGNAL_SEED_CONTRIBUTIONS_PER_CALLBACK)
-    _ratings.require_authenticated_ratings_delta(fresh)
+    _ratings.require_authenticated_ratings_delta_v2(fresh)
     _require_predecessor(predecessor)
     package = _compact._materialize(output_root=output_root, evaluator_manifest=evaluator_manifest,
         session_records=_old._session_records(sessions), membership_records=memberships,

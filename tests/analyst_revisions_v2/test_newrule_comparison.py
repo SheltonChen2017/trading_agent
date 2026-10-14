@@ -237,3 +237,20 @@ def test_mutated_target_binding_refuses():
 def test_source_hash_must_be_explicit_sha256():
     with pytest.raises(subject.NewruleError, match="digest"):
         subject.build_target(books(), universe_count=6, ar_percent=0, source_snapshot_sha256="")
+
+
+def test_unselected_book_change_changes_binding_even_with_reused_context_hash():
+    original = build()
+    changed = build(replace_row(books(), book_index=7, market_cap=D(12345)))
+    assert original.weights == changed.weights
+    assert original.source_snapshot_sha256 == changed.source_snapshot_sha256
+    assert original.input_books_sha256 != changed.input_books_sha256
+    assert original.target_sha256 != changed.target_sha256
+    assert original.record()["source_hash_is_independent_authority"] is False
+
+
+@pytest.mark.parametrize("changes", [{"market_cap": D(123)}, {"score": D(-2)},
+                                    {"economic_name": "different name"}])
+def test_shared_security_facts_must_agree_across_sleeves(changes):
+    with pytest.raises(subject.NewruleError, match="cross_book_economic_facts_conflict"):
+        build(replace_row(books(shared=True), **changes))

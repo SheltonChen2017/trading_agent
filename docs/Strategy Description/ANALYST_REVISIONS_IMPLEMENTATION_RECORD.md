@@ -47456,3 +47456,189 @@ acceptance, deduplication, quarantine, formal admission, package permission or
 QC contact. The old source remains refused until a separately coherent
 prospective remedy genuinely satisfies its own contract. No booked look,
 readiness flag, monitor setting or provider entitlement changes here.
+
+### 297.10 D4 observed one identical repeat; prospective narrow recovery
+
+D4 ran once at clean `9156f50763e03d08d1b428b043dd61a76ff6acc0`, with native
+network denial and the frozen sanitized launch. External dispatch
+**2026-10-14 00:16:01 UTC**, completion observed **00:16:05 UTC**, actual
+**exit 0**. Internal timestamps are `00:16:03.059280Z` through
+`00:16:03.242172Z`. These are separate clock observations, not provider timing.
+The finite normal envelope binds an **1,117-byte** report, SHA-256
+`5102bcb119b49870bad2dabd488934bd0c7f6e2d2ed848a38cb10afed52ff701`.
+No independent output reader ran. D4 and its source are now spent/frozen.
+
+All 3,261 rows have valid provider IDs: 3,260 unique IDs, one repeated group
+containing two occurrences (one excess occurrence). That group is canonical-
+row-byte identical and entirely within one page. There are zero conflicting
+groups, zero across-page-only groups and zero mixed within/across-page groups.
+No IDs or row values were disclosed. These observations followed complete
+source/hash/held-metadata guards; they do not establish vendor causality,
+immutable history, continuous security, original acquisition acceptance or a
+new successful provider call. D1/D2/D3 failures and false readiness remain.
+
+Under current delegated judgment, the next coherent remedy is a **separately
+versioned, exact retained-source transport-idempotence contract**, not a
+different date, redownload, general deduplication waiver or selector around a
+conflicting source stop. It will independently authenticate the original
+complete retained capture and preserve every occurrence in a disposition
+commitment, admitting one economic event only when all repeated occurrences
+have exactly identical canonical row bytes. Any conflicting repeated ID,
+unexpected census, external pin mismatch or physical-integrity refusal stops
+the entire new authority. The exact expected census is 3,261 occurrences,
+3,260 unique events, one identical group/one excess occurrence, no invalid
+IDs or conflicts. The original v1 authenticator and all operational callers
+remain frozen and refused; no caught v1 error is converted into acceptance.
+
+This is a prospective correction to transport multiplicity only. It cannot
+restore discarded error details, assert why the provider repeated a row,
+erase evidence, introduce rows/versions, change rating economics, or admit
+formal PIT/identity history. A new source type and source/profile/disposition
+lineage must bind all consumers; it cannot masquerade as the old v1 or
+three-role authority. Pure implementation and synthetic tests may proceed
+now. Actual retained-source authentication/composition still require a separate
+committed one-shot run freeze with exact sources, inputs, output scope and
+exit handling. No provider, capacity or QC action follows from D4 alone.
+
+Preparation may perform one bounded metadata-only location check for the
+already named September-25 archive basename, whose parent directory was not
+recorded in 192.1. Inspect only immediate children of the lane artifact root
+and, among at most 20 non-symlink `physical_accepted_risk*` parent directories,
+the exact known `arv2-physical-accepted-risk-f87c0cb219a7e5f8d51a33b8` child.
+Do not read source/report/page bytes or enumerate their children. This is path
+resolution for a future pinned composition, not corpus authentication, a
+private-file census, a historical diagnostic replay or permission to use it.
+
+The one native-network-denied metadata-only lookup resolved exactly
+`physical_accepted_risk_latest_20260925/arv2-physical-accepted-risk-f87c0cb219a7e5f8d51a33b8`
+under the lane artifact root. No child inventory or leaf bytes were read.
+
+### 297.11 Exact retained-source V2, inactive comparison runtime and D5 freeze
+
+The separately versioned retained-source V2 now implements 297.10's exact
+transport-idempotence contract. It reauthenticates the fixed external manifest,
+every raw/extracted page, terminal cursor chain, inventory, held/named metadata
+and ancestors before minting a distinct in-process authority. It retains all
+occurrence locators and hashes in its disposition commitment and admits the
+first representative only for byte-identical repeated IDs. Conflicts, invalid
+IDs, changed expected counts or physical drift refuse the entire source. Three
+post-guards cover traversal, collapse and authority fingerprinting. The frozen
+v1 rejection is never caught and promoted to success. This is not original
+capture acceptance, vendor completeness, immutable history or formal admission.
+
+October composition now requires that distinct V2 authority and binds its
+profile, counts and disposition into exact lineage. It preserves all 13,015
+September-25 contributions and their original availability/decay positions,
+derives only the later eligible retained tail and fresh September26–October12
+ratings, and commits collision dispositions including excluded tail events.
+The session axis extends through October13; inventory extension is expressly
+stale, not new current holdings or a permanent identity-master assertion.
+The frozen firm/global definitions remain unchanged. Actual authentication and
+composition have **not** run as of this pre-use freeze.
+
+The inactive pre-open scorer uses original eligibility strictly before the
+decision session without shifting decay indices; original and conservative
+views remain separate. The strengthened target engine binds all eight actual
+books, independently of the external context digest, and refuses cross-book
+economic-ID/SID/name/cap/score conflicts. The new order runtime/projection is
+an inactive synthetic checkpoint: actual 09:31 market orders, sell-before-buy,
+whole shares, synchronous fill/fee/cash/quantity reconciliation, current-minute
+quotes, original RAW prior-close references, and a separately bounded typed
+same-session Split history bridge before the 09:20 snapshot. Split history is
+qualified QC retrospective data, not independent PIT availability. Fees are
+10 bps of the model's current quote; actual fill prices are separately recorded.
+Zero modeled slippage does not assert zero spread. October13 is valuation-only.
+Dynamic/reference/history bounds are explicitly 192/256/400 for this new
+contract; no frozen old bound is edited. Selected old read/accounting methods
+are AST-extracted with exact pins; no legacy MOO initializer/executor is used.
+Strict host result acceptance and operational submission are still pending;
+this checkpoint does not authorize QC, Object Store or capacity contact.
+
+Root focused validation: **1,146 distinct passes in 19.63 s**: 54 V2, 55
+composer, 69 scorer, 52 targets, 39 runtime/projection, 25 D5 orchestration,
+764 finite failure-classifier, 86 record/active-document and two exact import
+closures. Native network denial, `-B`, `--noconftest`, disabled plugin autoload
+and cache provider, in-root support paths and absent `assistant.dispatch_fence`
+were enforced. Sixteen changed Python files compiled in memory, all 34 D5
+selected pins matched and diff check passed. No complete suite or operational
+source/provider/QC access occurred. Author subsets overlap: V2/composer
+109/14.50 s; targets/runtime 91/3.39 s; scorer69/1.69 s;
+classifier764/2.90 s; closures2/4.65 s. Earlier D5 22/2.99 s overlaps.
+Pre-commit staged diff check caught one trailing blank line in the previously
+untracked classifier; removing that whitespace changed its source and selected
+D5/profile pins below before any operation. The affected classifier/D5 repeat
+passed789/.44 s, not additive. Record repeat86/.86 s also overlaps.
+
+Preserve pre-use evidence: scorer initial67 passes/one fixture-assumption
+failure (1.72 s) exposed the frozen Decimal median's fractional-decay rounding,
+not a scorer-vs-reference mismatch; the fixture was corrected and an exact
+power-of-two zero case added without changing old arithmetic. Classifier
+initial763 passes/one census-assumption failure (3.19 s) expected six rather
+than seven public special subclasses; the test-only expectation was corrected.
+Closure initially one failure/one pass (2.47 s) caught four missing module
+registrations. V2 conflict-guard omission caught four expected failures/.17 s;
+scorer cutoff omission one/.97 s; classifier argument-bound omission one/.08 s.
+All mutations were memory-only and restored. The finite classifier covers 650
+public literals across 16 exact classes from nine pinned sources; unknown
+formatted/forwarded failures stay unknown. It never hashes/renders private
+runtime messages. A finite code is a category, not authenticated root cause.
+Same-round advisory inspection is not independent review.
+
+| D5 selected new component | SHA-256 |
+|---|---|
+| Retained-source V2 | `ba736022c91e759e6fce899e8e8b85286bfa9113ce3a063c5ec12fff7b2d5138` |
+| V2 tests | `2b3b431f4065851ccac22b57a55bd9e2c94671bca91514f2baf9188f2b74f08b` |
+| V2 profile | `c1b364d04e4a3a181009e16adb55d42a68507c6b2ad2e34ea182d907ce57e1a6` |
+| October composer | `655eec765a8b99d489881f7de7ddc339ab6b2c0bb0470feb814c6ef005d03c0a` |
+| Composer tests | `cef907c524b179497a42aeac2e4daf3206bdddff738fed71ed9520983f634c05` |
+| Composer profile | `a9c176724f9955199c89e82d34a48a4282b567a1c370eb02e1cb2ddcc5b0ccdc` |
+| Finite failure classifier | `d0d90fb4a80bf649a99cc4e11d63937f49e635559d364664abf6c115b6c66f3c` |
+| Classifier tests | `07724c71880a99367b2edd53ca52b41e8616fc517fc68942b92646ae1176acae` |
+| D5 caller | `8ac19a46ba6c8394aaed5b9e3767df882ef5d78340ca8337a8416e6a0549d269` |
+| D5 tests | `85a5a43bf76d10bc6b2bdc6975a9b3b25d1d1272255b439cfa88ff82f5efa6ac` |
+| D5 canonical profile | `b40d4e35aacc6c5aba3f1f95bf520641dc257325e91f2b78d9ca1c21a1f3a3d8` |
+
+**D5 exact one-shot decision:** under current owner direction to continue
+without Claude review for now, §255.2 technical delegation and the selected
+six/eight comparison through2026, authorize one invocation of
+`scripts/build_arv2_october_comparison_inputs.py` at the clean commit containing
+this freeze. Supply that actual clean HEAD and exact caller SHA above. Use only
+the designated root/branch, Darwin/POSIX Python3.13 at
+`/Users/sheltonchen/.venvs/trading_agent-py313/bin/python`, sanitized environment,
+native `sandbox-exec` deny-network, `-B` and in-root support paths. Its 34 exact
+selected source/specification pins are committed in the caller; none are
+automatically refreshed and they are not whole-interpreter integrity.
+
+Claim/fsync the new private leaf
+`artifacts/analyst_revisions_v2/massive_ratings_delta/R297-20261013-D5`
+exclusively **before** any source read. This leaf was not inspected or allocated
+before freeze. Freshly authenticate only the R297 retained capture with the
+297.6 external manifest pin, exact September-25 package/lineage pins, and the
+three fixed parent/prior/tail physical archives with their original source
+manifests. Reconstruct the frozen firm proposal/owner decision/admission and
+global contract under the new leaf, then compose and reauthenticate the new
+October package/lineage there. Stateless old loaders/constants are reused,
+never old run/build/claim/acquisition/reader entry points. Do not replay D1–D4,
+their output readers or any provider request; no source repair or pin refresh.
+Archive guards retain their existing scoped Darwin rehash qualifications.
+
+The 1,800-second parent alarm is justified by the historical multi-minute full
+archive/composition path; it cannot bound host suspension or uninterruptible
+I/O. This is a bounded but potentially large read: inherited limits include
+4 GiB archive reports, 1 GiB derived shards, 512 MiB firm material and 768 MiB
+package decompression. It is not a tiny diagnostic or corpus census. New
+reconstruction/package files and partial failures remain retained; no cleanup.
+The normal report is capped at16 KiB and contains only finite status, public
+paths, source/package/lineage/activation pins and counts—not rows, IDs, opaque
+authorities, raw exceptions or credentials. Claim consumes use even if later
+authentication fails; partial claim/unknown exit is ambiguous/spent.
+
+Record actual process exit plus only its normal bounded console envelope and
+reported hash/length. The report's claim and held/named/ancestor checks precede
+normal return, but no independent output reader is planned. Exact exit0 plus
+matching successful envelope is mandatory; late positive report/nonzero or
+unknown exit is inadmissible. No repair/reuse/unchanged retry. Success only
+prepares accepted-risk inputs, not strategy results, original capture
+acceptance, formal readiness or permission to contact QC. A later prospective
+family/launch/result freeze must bind actual package and all six sources
+before contact. Booked counts remain314/239/50/699; monitor remains paused.

@@ -86,6 +86,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     accepted_risk_market_cap_stock_portfolio_qc_runtime.py
     accepted_risk_market_cap_stock_portfolio_tilt.py
     accepted_risk_massive_delta.py accepted_risk_massive_ratings_delta.py
+    accepted_risk_massive_ratings_delta_v2.py
     accepted_risk_matched_diagnostics.py
     accepted_risk_matched_historical_projection.py
     accepted_risk_objective_synthetic_leverage_evaluator.py
@@ -103,6 +104,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     accepted_risk_preliminary_rating_evaluator.py
     accepted_risk_preliminary_rating_policy.py
     accepted_risk_preliminary_submission_adapter.py
+    accepted_risk_preopen_rating_score.py
     accepted_risk_preopen_terminal_authority.py
     accepted_risk_qc_symbol_resolution.py
     accepted_risk_qqq_order_level_qc_runtime.py
@@ -172,7 +174,8 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     fundamental_universe_discovery_worker.py global_input_bundle.py
     global_input_schema.py historical_preopen_input_adapter.py
     in_qc_preopen_terminal_stream.py lean_source_assembly.py
-    matched_mia_recovery.py newrule_comparison_targets.py object_store_read_contract.py
+    matched_mia_recovery.py newrule_comparison_projection.py
+    newrule_comparison_qc_runtime.py newrule_comparison_targets.py object_store_read_contract.py
     owner_signature_authority.py physical_accepted_risk_archive.py
     physical_firm_ontology_candidate_archive.py
     physical_firm_ontology_review_packet.py
@@ -222,6 +225,13 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
 )
 
 _ZERO_EXTERNAL_IO_IMPORTS = {
+    "accepted_risk_preopen_rating_score.py": tuple(
+        """
+        dataclasses collections decimal fractions accepted_risk_preliminary_rating_evaluator
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator
+        """.split()
+    ),
     "newrule_comparison_targets.py": tuple(
         "dataclasses hashlib json decimal".split()
     ),
@@ -489,6 +499,21 @@ _ZERO_EXTERNAL_IO_SOURCES = frozenset(_ZERO_EXTERNAL_IO_IMPORTS)
 # package exemption.  This both documents why the file is outside the pure
 # class and makes any new dependency a review event.
 _HOST_ONLY_ADAPTER_IMPORTS = {
+    "accepted_risk_massive_ratings_delta_v2.py": tuple(
+        """
+        __future__ dataclasses hashlib os pathlib weakref research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_massive_ratings_delta
+        """.split()
+    ),
+    "newrule_comparison_projection.py": tuple(
+        """
+        ast dataclasses hashlib json pathlib research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_october_order_package
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_package
+        research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime
+        research.analyst_revisions_v2_qc.newrule_comparison_targets
+        """.split()
+    ),
     "accepted_risk_october_order_package.py": tuple(
         """
         __future__ dataclasses hashlib json os sqlite3 collections datetime pathlib
@@ -496,7 +521,7 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2.global_benchmark_contract
         research.analyst_revisions_v2_qc
         research.analyst_revisions_v2_qc.accepted_risk_latest_order_package
-        research.analyst_revisions_v2_qc.accepted_risk_massive_ratings_delta
+        research.analyst_revisions_v2_qc.accepted_risk_massive_ratings_delta_v2
         research.analyst_revisions_v2_qc.accepted_risk_preliminary_package
         research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator
         research.analyst_revisions_v2_qc.physical_accepted_risk_archive
@@ -1765,6 +1790,8 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
 }
 
 _HOST_ONLY_ADAPTER_IO_SURFACE = {
+    "accepted_risk_massive_ratings_delta_v2.py": ("import:os", "import:pathlib"),
+    "newrule_comparison_projection.py": ("call:compile", "call:read_bytes", "import:pathlib"),
     "accepted_risk_october_order_package.py": (
         "call:open", "import:os", "import:pathlib",
     ),
@@ -2103,6 +2130,22 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
 }
 
 _QC_RUNTIME_IMPORTS = {
+    "newrule_comparison_qc_runtime.py": tuple(
+        """
+        hashlib itertools json datetime decimal zoneinfo newrule_legacy_primitives
+        newrule_comparison_targets accepted_risk_preopen_rating_score
+        accepted_risk_order_level_core accepted_risk_order_level_input_runtime
+        accepted_risk_preliminary_qc_figi accepted_risk_order_level_forced_exit
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_runtime
+        research.analyst_revisions_v2_qc.newrule_comparison_targets
+        research.analyst_revisions_v2_qc.accepted_risk_preopen_rating_score
+        research.analyst_revisions_v2_qc.accepted_risk_order_level_core
+        research.analyst_revisions_v2_qc.accepted_risk_order_level_input_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_figi
+        research.analyst_revisions_v2_qc.accepted_risk_order_level_forced_exit
+        """.split()
+    ),
     "accepted_risk_eight_universe_input_qc_runtime.py": tuple(
         """
         hashlib json decimal accepted_risk_six_universe_coverage_qc_runtime
@@ -2349,6 +2392,7 @@ _QC_RUNTIME_IMPORTS = {
     ),
 }
 _QC_RUNTIME_IO_SURFACE = {
+    "newrule_comparison_qc_runtime.py": ("call:history", "call:set_summary_statistic"),
     "accepted_risk_eight_universe_input_qc_runtime.py": (
         "call:set_summary_statistic",
     ),
@@ -3751,6 +3795,10 @@ _PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
             "research.analyst_revisions_v2.preregistration",
         ),
         (
+            "research.analyst_revisions_v2_qc.accepted_risk_preopen_rating_score",
+            "accepted_risk_preliminary_rating_evaluator",
+        ),
+        (
             "research.analyst_revisions_v2_qc.accepted_risk_preopen_terminal_authority",
             "research.analyst_revisions_v2.canonical",
         ),
@@ -4105,6 +4153,34 @@ _PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
         (
             "research.analyst_revisions_v2_qc.in_qc_preopen_terminal_stream",
             "preopen_terminal_semantics",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime",
+            "accepted_risk_order_level_core",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime",
+            "accepted_risk_order_level_forced_exit",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime",
+            "accepted_risk_order_level_input_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime",
+            "accepted_risk_preliminary_qc_figi",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime",
+            "accepted_risk_preopen_rating_score",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime",
+            "newrule_comparison_targets",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime",
+            "newrule_legacy_primitives",
         ),
         (
             "research.analyst_revisions_v2_qc.physical_accepted_risk_archive",
@@ -4471,6 +4547,14 @@ _PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
 
 _PINNED_PROJECTED_SIBLING_IMPORTS = frozenset(
     {
+        ("research.analyst_revisions_v2_qc.accepted_risk_preopen_rating_score", "accepted_risk_preliminary_rating_evaluator"),
+        ("research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime", "accepted_risk_order_level_core"),
+        ("research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime", "accepted_risk_order_level_forced_exit"),
+        ("research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime", "accepted_risk_order_level_input_runtime"),
+        ("research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime", "accepted_risk_preliminary_qc_figi"),
+        ("research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime", "accepted_risk_preopen_rating_score"),
+        ("research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime", "newrule_comparison_targets"),
+        ("research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime", "newrule_legacy_primitives"),
         (
             "research.analyst_revisions_v2_qc.accepted_risk_eight_universe_input_qc_runtime",
             "accepted_risk_six_universe_coverage_qc_runtime",
@@ -4939,6 +5023,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_tilt",
         "research.analyst_revisions_v2_qc.accepted_risk_massive_delta",
         "research.analyst_revisions_v2_qc.accepted_risk_massive_ratings_delta",
+        "research.analyst_revisions_v2_qc.accepted_risk_massive_ratings_delta_v2",
         "research.analyst_revisions_v2_qc.accepted_risk_matched_diagnostics",
         "research.analyst_revisions_v2_qc.accepted_risk_matched_historical_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_objective_synthetic_leverage_evaluator",
@@ -4959,6 +5044,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator",
         "research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_policy",
         "research.analyst_revisions_v2_qc.accepted_risk_preliminary_submission_adapter",
+        "research.analyst_revisions_v2_qc.accepted_risk_preopen_rating_score",
         "research.analyst_revisions_v2_qc.accepted_risk_preopen_terminal_authority",
         "research.analyst_revisions_v2_qc.accepted_risk_qc_symbol_resolution",
         "research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime",
@@ -5045,6 +5131,8 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.in_qc_preopen_terminal_stream",
         "research.analyst_revisions_v2_qc.lean_source_assembly",
         "research.analyst_revisions_v2_qc.matched_mia_recovery",
+        "research.analyst_revisions_v2_qc.newrule_comparison_projection",
+        "research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime",
         "research.analyst_revisions_v2_qc.newrule_comparison_targets",
         "research.analyst_revisions_v2_qc.object_store_read_contract",
         "research.analyst_revisions_v2_qc.owner_signature_authority",

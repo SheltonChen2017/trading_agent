@@ -38,9 +38,11 @@ def provider_row(**changes):
         "rating_action": "upgrades", "rating": "Buy", "previous_rating": "Hold", **changes}
 
 
-def accepted_delta(tmp_path, rows=None):
-    d = m._ratings
-    raw = d.canonical_bytes({"status": "OK", "results": [provider_row()] if rows is None else rows})
+def accepted_delta(tmp_path, monkeypatch, rows=None):
+    d = m._ratings._transport
+    source_rows = [provider_row()] if rows is None else rows
+    source_rows = [*source_rows, source_rows[0]]
+    raw = d.canonical_bytes({"status": "OK", "results": source_rows})
     extracted, _ = d._capture._response_rows_and_next_url(raw, page_limit=d.PAGE_LIMIT)
     page = d.build_page_record(page_number=1, raw_response=raw, provider_rows=extracted,
         response_received_at="2026-10-13T23:00:01.000000Z", request_cursor_sha256=None)
@@ -55,7 +57,11 @@ def accepted_delta(tmp_path, rows=None):
     for name, data in files.items():
         (path / name).write_bytes(data)
         (path / name).chmod(0o600)
-    return d._authenticate_capture(path, digest, len(payload))
+    monkeypatch.setattr(m._ratings, "EXPECTED_MANIFEST_SHA256", digest)
+    monkeypatch.setattr(m._ratings, "EXPECTED_MANIFEST_BYTE_COUNT", len(payload))
+    monkeypatch.setattr(m._ratings, "EXPECTED_SOURCE_ROW_COUNT", len(source_rows))
+    monkeypatch.setattr(m._ratings, "EXPECTED_UNIQUE_ROW_COUNT", len(source_rows) - 1)
+    return m._ratings._authenticate_retained_capture(path, digest, len(payload))
 
 
 def firms():
@@ -189,7 +195,7 @@ def test_exact_original_tail_archive_bindings(monkeypatch, field, bad):
 
 
 def test_genuine_delta_keeps_original_eligibility_and_economic_deltas(tmp_path, monkeypatch):
-    fresh = accepted_delta(tmp_path)
+    fresh = accepted_delta(tmp_path, monkeypatch)
     rows = tuple(m._ratings.iter_authenticated_rating_rows(fresh))
     result, digest, census = derive(rows, monkeypatch)
     assert len(result) == 2 and len(digest) == 64
@@ -200,7 +206,7 @@ def test_genuine_delta_keeps_original_eligibility_and_economic_deltas(tmp_path, 
 
 
 def test_new_row_fold_matches_frozen_economic_oracle(tmp_path, monkeypatch):
-    fresh = accepted_delta(tmp_path, [provider_row(), provider_row(benzinga_id="fixture-rating-2", date="2026-10-02")])
+    fresh = accepted_delta(tmp_path, monkeypatch, [provider_row(), provider_row(benzinga_id="fixture-rating-2", date="2026-10-02")])
     rows = tuple(m._ratings.iter_authenticated_rating_rows(fresh))
     observed = derive(rows, monkeypatch)
     monkeypatch.setattr(m._compact, "_PINNED_ITER_ACCEPTED_ROWS", lambda _archive: iter(rows))
@@ -211,7 +217,7 @@ def test_new_row_fold_matches_frozen_economic_oracle(tmp_path, monkeypatch):
 
 
 def test_predecessor_prefix_is_not_rederived_or_clamped(tmp_path, monkeypatch):
-    rows = tuple(m._ratings.iter_authenticated_rating_rows(accepted_delta(tmp_path)))
+    rows = tuple(m._ratings.iter_authenticated_rating_rows(accepted_delta(tmp_path, monkeypatch)))
     position = m._sessions().index(rows[0].current_view.eligible_session)
     result, _, census = derive(rows, monkeypatch, minimum_position=position + 1)
     assert result == () and census["no_included_preliminary_view"] == 1
@@ -220,7 +226,7 @@ def test_predecessor_prefix_is_not_rederived_or_clamped(tmp_path, monkeypatch):
 
 
 def test_oct13_eligibility_is_retained_not_shifted_into_last_decision(tmp_path, monkeypatch):
-    rows = tuple(m._ratings.iter_authenticated_rating_rows(accepted_delta(tmp_path, [provider_row(date="2026-10-09")])) )
+    rows = tuple(m._ratings.iter_authenticated_rating_rows(accepted_delta(tmp_path, monkeypatch, [provider_row(date="2026-10-09")])) )
     result, _, _ = derive(rows, monkeypatch)
     assert rows[0].current_view.eligible_session == "2026-10-13"
     assert all(row["eligible_session_index"] == len(m._sessions()) - 1 for row in result)
@@ -234,27 +240,27 @@ def test_oct13_eligibility_is_retained_not_shifted_into_last_decision(tmp_path, 
     ({"rating": "Hold"}, "firm_delta_contradicts_direction"),
 ])
 def test_refusal_economics_do_not_fabricate_contributions(tmp_path, monkeypatch, change, reason):
-    rows = tuple(m._ratings.iter_authenticated_rating_rows(accepted_delta(tmp_path, [provider_row(**change)])))
+    rows = tuple(m._ratings.iter_authenticated_rating_rows(accepted_delta(tmp_path, monkeypatch, [provider_row(**change)])))
     result, _, census = derive(rows, monkeypatch)
     assert result == () and census[reason] == 1
 
 
 @pytest.mark.parametrize("limit", [0, 1])
 def test_row_capacity_refuses_before_processing(tmp_path, monkeypatch, limit):
-    rows = tuple(m._ratings.iter_authenticated_rating_rows(accepted_delta(tmp_path)))
+    rows = tuple(m._ratings.iter_authenticated_rating_rows(accepted_delta(tmp_path, monkeypatch)))
     with pytest.raises(m.OctoberOrderInputPackageError, match="row_bound"):
         derive(rows * 2, monkeypatch, maximum_rows=limit)
 
 
 def test_spool_capacity_is_not_silently_increased(tmp_path, monkeypatch):
-    rows = tuple(m._ratings.iter_authenticated_rating_rows(accepted_delta(tmp_path)))
+    rows = tuple(m._ratings.iter_authenticated_rating_rows(accepted_delta(tmp_path, monkeypatch)))
     monkeypatch.setattr(m._compact, "MAX_SQLITE_SPOOL_BYTES", 1)
     with pytest.raises(m.OctoberOrderInputPackageError, match="spool_bound"):
         derive(rows, monkeypatch)
 
 
 def test_same_archive_dedup_and_conflict_follow_frozen_rules(tmp_path, monkeypatch):
-    rows = tuple(m._ratings.iter_authenticated_rating_rows(accepted_delta(tmp_path)))
+    rows = tuple(m._ratings.iter_authenticated_rating_rows(accepted_delta(tmp_path, monkeypatch)))
     selected, _, census = derive(rows * 2, monkeypatch)
     assert len(selected) == 2 and census["identical_daily_duplicate_candidate_count"] == 2
     other = dataclasses.replace(rows[0], provider_event_id="other-event")
@@ -281,7 +287,7 @@ def id_row(event, role=m.MassiveSourceRole.ANALYST_RATINGS):
 
 
 def test_old_rejected_ids_still_quarantine_tail_and_fresh(tmp_path, monkeypatch):
-    fresh = accepted_delta(tmp_path, [provider_row(benzinga_id="new-reused")])
+    fresh = accepted_delta(tmp_path, monkeypatch, [provider_row(benzinga_id="new-reused")])
     seen = install_fold(monkeypatch, {
         "tail": (id_row("tail-reused"), id_row("tail-safe")),
         "parent": (id_row("tail-reused"), id_row("new-reused")),
@@ -296,21 +302,21 @@ def test_old_rejected_ids_still_quarantine_tail_and_fresh(tmp_path, monkeypatch)
 
 
 def test_new_reuses_tail_id_is_quarantined(tmp_path, monkeypatch):
-    fresh = accepted_delta(tmp_path)
+    fresh = accepted_delta(tmp_path, monkeypatch)
     install_fold(monkeypatch, {"tail": (id_row("fixture-rating-1"),), "parent": (), "prior": ()})
     result = m._sources_and_collisions("parent", "prior", "tail", fresh)
     assert result[-1] == frozenset({m._compact._PINNED_COMMON_EVENT_ID("fixture-rating-1")})
 
 
 def test_terminal_fold_failure_never_returns_provisional_rows(tmp_path, monkeypatch):
-    fresh = accepted_delta(tmp_path)
+    fresh = accepted_delta(tmp_path, monkeypatch)
     install_fold(monkeypatch, {"tail": (id_row("x"),), "parent": (), "prior": ()}, fail_last=True)
     with pytest.raises(ValueError, match="terminal authentication"):
         m._sources_and_collisions("parent", "prior", "tail", fresh)
 
 
 def test_changed_fold_dependency_refuses_before_any_call(tmp_path, monkeypatch):
-    fresh = accepted_delta(tmp_path)
+    fresh = accepted_delta(tmp_path, monkeypatch)
     monkeypatch.setattr(m._archive, "_fold_authenticated_physical_accepted_risk_rows", lambda *_args: None)
     with pytest.raises(m.OctoberOrderInputPackageError, match="fold_dependency"):
         m._sources_and_collisions(None, None, None, fresh)
@@ -344,7 +350,7 @@ def built(tmp_path, monkeypatch, request):
         "security_master_admission_sha256": m._old.EXPECTED_SECURITY_MASTER_ADMISSION_SHA256}}, roles))
     monkeypatch.setattr(m, "require_section72_owner_waived_firm_admission", lambda value: value)
     monkeypatch.setattr(m, "require_loaded_global_benchmark_contract", lambda value: value)
-    fresh = accepted_delta(tmp_path)
+    fresh = accepted_delta(tmp_path, monkeypatch)
     collisions = frozenset({"tail"}) if getattr(request, "param", False) else frozenset()
     monkeypatch.setattr(m, "_sources_and_collisions", lambda *_args: (tail_rows, fresh_rows, collisions, frozenset()))
     monkeypatch.setattr(m, "_derive_rating_rows", lambda **values: (values["rows"], "b" * 64, {"rating_source_row_count": len(values["rows"])}))
@@ -370,6 +376,10 @@ def test_real_canonical_materialization_preserves_prefix_runtime_and_new_wrapper
     assert value.lineage["inventory_is_current_holdings"] is False
     assert value.lineage["fresh_QC_holdings_caps_identity_join_required"] is True
     assert value.lineage["historical_prefix_rederived"] is False
+    delta = value.lineage["ratings_delta"]
+    assert delta["source_row_count"] == 2 and delta["row_count"] == 1
+    assert delta["duplicate_excess_count"] == delta["duplicate_group_count"] == 1
+    assert len(delta["duplicate_disposition_sha256"]) == 64
     assert value.valuation_end_session == "2026-10-13"
     assert value.lineage["tail_collision_disposition_sha256"] == m._sha({
         "colliding_common_event_ids": [], "excluded_contribution_ids": []})

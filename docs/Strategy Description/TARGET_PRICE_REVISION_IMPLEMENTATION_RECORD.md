@@ -21267,3 +21267,139 @@ full suite. A local named port follows only after verified cloud correction;
 original executed modules/bundles remain immutable. Native invalid-row/mark
 diagnostics or a genuine Mia run need separately frozen source/instrumentation/
 operation/look BEFORE effect. Full-window OFF acceptance and ON0 gates remain.
+
+### 89.5 Actual Mia saves, verified restoration and retained automatic builds
+
+Latest owner answer: storage allocation "should be fixed by now". Exact own
+Resources already independently displayed 50.01 MB / 2 GB (89.1); that display
+facet is resolved, not native byte/file capacity, complete inputs or accounting.
+Owner instruction remains verify OFF first, then ON only after valid baseline.
+No strategy launch, ON upload, provider/EODHD/credential/operator-state read or
+accepted extended metric occurred in this section. OFF Codex3/ON0/looks30 stand.
+
+APPROVE001 at7f1f0361: access4439/2d7f81b64676b9727c6fdbe922d6851ffdf5e60ad7cfb0ae722e60a529a657a9,
+created01:42:11.844128Z; one approval message,12AX/2screenshots/9actions;
+receipt1272/29bfddd01f60358719ba5b823399124717de37e90053dacce9d16a735c6dae24,
+closed before600seconds. Mia's Completed label meant a pending native edit
+permission, not saved source. Fresh SOURCE-POST009 independently found all15
+files unchanged (main60796/f42320ef): plan77a062ffe6c1f68289a74cac3d8ca6e728b5a8d46689dd6e62543bfc7bda38dd,
+created01:52:24.590208Z; two reads504020wire/230180baseline bytes;
+archive250129/da13653bd0aa58338fadea7449ed939d3d424bc5fa258713c286e125990f6703,
+delta151185/3127ecffa93f941093affb33aa92025c75d9b878201e9415dd98f8c441bb649d,
+receipt9084/029470aeaa417b1012e16ec5976d21361372fa6637d070dbd4e529ad6885730e.
+
+APPROVE002 was a fresh successor, access4439/1acb7f98c8d976b51ef7b6ad92f5b415644c469e37569dc74d00189f7a1b1481,
+created01:56:05.720609Z. Root reviewed the exact two-import deletion and
+clicked native Allow for save1. Mia attributed main60645 and one clean main
+on-save build. Root missed the600second closure: EXPIRED receipt456/
+0b822ac19d8a4a412728b5b1aa4f72fe7cd3a8f471e191ac1578c38897742230,
+process exited0/controller released. Actual UI save remains evidence, but
+EXPIRED is not rewritten as completed and no scope is implicitly extended.
+SOURCE-POST010 then independently confirmed save1 only: all14other file hashes
+unchanged, stable main60645/43e4063afe45c040054b9c7e48f6b05cb1f978b8dcea411d4d3d323b21a0cf7f;
+created02:07:38.124714Z, planed7410d20abe4992b55a7a2c7df6109178255dc9aa04898c35b42e91284468e0,
+two reads503714wire/230180baseline bytes, read2archive249976/
+a5880bb762769b76e2080c01320b038c466a83d429f050468b27291c98f6e01f,
+delta151032/57630be89fbe1f66118a716cbf25afc16a01cb2827e615b4d21cbe6df8f970ea,
+receipt9084/8f2afeace1cd338ade581578a3ce4275d95927b14a49ec6760af8dcb9e9a5602.
+
+APPROVE003 freshly pinned save1 source; access4685/
+7241b73e637c632c68c6c4b1bbd6068f1a9ad109a197cd50215d12db22856b42,
+created02:11:21.246488Z. Root reviewed and allowed only save2 (delete the
+12-line prior-total inference/normalization block; proposal's11-line count
+was imprecise).7AX/0screenshots/5actions, HOLD_AUTOMATIC_BUILD_MULTIPLICITY
+receipt1243/6cab4a41dffee1d71092984ef5971c84ae65d2260be6fc66f3b122b675a9cf3d.
+Mia attributed main59999/build2; no manual root compile or job. The IDE
+displayed more background builds than the assumed one-per-save: seven
+e5b24c short labels at2:00:20..2:05:45 and five4bb185 labels at2:11:45..53,
+plus an earlier49395e-b18f02. Source/control actor and full native IDs are
+unproved; these are not silently collapsed into two measured compiles.
+Root stopped discretionary edits, closed/released003, and preregistered004
+to distinguish explicit Mia on-save tool calls from platform background
+events, not to retroactively waive or erase the earlier limit discrepancy.
+SOURCE-POST011 independently confirmed save2 and unchanged other14files:
+main59999/07890f31d90850b1a6525c2dd8a2e0e62838838d8811732c892aa7ed5188fa90,
+created02:12:17.717819Z, plana073779ca240883b6cccad3e30331043a18a7756650e81b878ff343cc5405b87,
+two reads502378wire/230180baseline; read2archive249308/
+8d8bbb035dd631baa388b22dbba30158267e8b4cdb29fed04b23b4a2fa7450cd,
+delta150364/e9cc3ffbd5c39e559d79337146c28fd65780d629e296664627f3a884c2e43016,
+receipt9084/cd29d37340e765a514a2eb3fdcaa7062671e242b7bb7cd403fe0c1e625a8300f.
+
+TPR-EXT26-D103 (agent-delegated, independent review pending): fresh004
+allowed only the remaining two known main saves, original total4, at most2
+explicit Mia on-save build calls and20new displayed background events.
+Access5013/922ad67e813f2e454b265780f99c320bc62dc34e99d9762c50e6c94cd5dca5e5,
+created02:12:42.018935Z. Root separately reviewed/allowed save3 universal
+same-session/nonfuture RAW held mark guard and save4 original raw_marks
+schema.10AX/0screenshots/7actions, receipt1436/
+70299ea4c8fd3cab5db13fa0504e83a07eff74009ee1417e43675ce06148292a.
+Mia attributed final60012 and four saves complete. Seven additionalafc2ad
+short build labels at2:12:53..2:13:00 were visible; final save4 full build
+census/IDs remain unknown. No backtest, manual build, control takeover,
+Full Auto change, unrelated edit or notebook execution. Safari repeatedly
+changed to Resources (actor unproved); exact Search Tabs37650980 recovered
+the own task. One numeric-index parsing error occurred before setValue;
+no source effect. Controllers released before every dependent operation.
+
+SOURCE-POST012 at7f1f0361, created02:14:23.054094Z, plan266866f01edfd8a22b22b64f6ef89b29a9100b60a88e57ebbdb700c430248001:
+two own reads502406wire/230180baseline, all15stable; main60012/
+454ed1e39762010997f53ef6a9f2e9064810d40a6812aae513a8fa3b090ca505;
+other14files EXACTLY unchanged from005–011. Read2archive249321/
+737bbf166d72233f68d6dc2985371681f6a9b50d5185dcde928baa3796fb18fc,
+delta150377/9fc26fae003afc31315628955826f2b4ecd740d9b133ecb3d525b7a91af833b1,
+receipt9084/25df7f5c299322b788df97ad6f2edd14373ce2d45b7ce65781c37c29b276da77.
+Fresh RESTORED-SOURCE-VIEW001 consumed two fixed399698byte source/diff reads
+but failed an inline JsonNumber-versus-int identity assertion, before any
+code disclosure/execution/port. Access/claims retained, controller released,
+no completed result fabricated. Separately registered002 corrected only
+that parser boundary and read the exact same captured sources under a NEW
+bounded scope: plan2614/984bad6554f6e9f07386cc3b603f817ac8d001e12e957aa9c92e6ff47f627f02,
+created02:15:47.080460Z; receipt9692/
+db1ea9c3267c8a1405b2acd108872fbebf7d80dfd27024293e7b0f1e15235e19.
+All file deltas recomputed against exact immutable bundle. Static normalized
+main differs ONLY by verified audit-key import and unused initialized counter;
+original membership/freshness/schema functions are restored. Helper normalized
+AST preserves original1024mapping/gzip/hash/readback/storage sidecar/collision
+refusals; invalid internal-dot physical suffixes become chunksNNNNN_json.gz,
+index_json.gz/storage_json.gz. Comments/docstrings/notebook bodies withheld;
+static view is not byte-equivalent executable port or historical compiled-job
+proof. Original writer and all unused hook/notebook evidence remain immutable.
+F021/F022 unsupported active hooks are corrected in current source; their
+historical result impact remains unproved. F019 exact raw offender/unit and
+F017/F018 native full-window readback/accounting remain OPEN; no native
+baseline/TPR acceptance follows from restoration or clean syntax builds.
+
+New focused test_qc_extended_frozen_guards.py executes only exact immutable
+successor AST functions with synthetic identities/marks.35passed2.80s under
+isolated49/52 after root removed one redundant inaccurate-key assertion;
+no dispatch/config import before isolation and no actual stop/db/cloud.
+Nine source-only in-memory mutations were killed (1–6failed each), covering
+None coercion, lower/upper weight bounds, percent normalization, snapshot
+before validation, warning/delisted stale exemptions and date/future predicates.
+An initial mutation harness failed to reach the collected module and stayed
+green: retained as failed proof, not claimed red evidence. The synthetic
+per-row-valid total4 case tests transport/no-normalization, NOT complete ETF
+holdings or physical coverage. Local green proves no native CLR/full-window/
+Windows custody/ACL/signer/protected-parent acceptance. No full suite ran.
+
+TPR-EXT26-D104 (agent-delegated, independent review pending): next useful
+genuine-Mia effect is a prospectively frozen first-refusal witness, not an
+unchanged blind rerun or OFF4. Observe at most the first offending raw native
+membership value/type/ETF/SID/source clock, and if reached one refused held
+RAW mark/action context. Store only bounded private job-bound objects with
+hash/readback and collision refusal; never licensed rows in logs/Git, global
+key enumeration or a stale/weight bypass. Re-raise ORIGINAL guard refusals
+even if witness export fails. Expected units versus actual unverified units
+must remain separate. A real Mia re-execution needs a new reserved look before
+launch; OFF3 stays consumed, ON0. If F019 stops first, F022 is unreached, not
+zero or resolved. Root must inspect/test/freeze the helper, every main hook
+and all cloud files before any such launch. No source port/job authorized by
+this design paragraph alone until those prerequisites are actually met.
+
+Final89.5 focused validation at7f1f0361 plus authored record/test changes:
+367passed10.81s (35guard fixtures,330document checks, two selected import/
+active-document checks), isolated49/52 before dispatch/config, no cache/bytecode;
+git diff --check clean. New test SHA256
+8e7cab7f33368e41d18e502245b5c5408e3e963e06f51749f3d58c4e486e18fc.
+No full suite/native job/provider/operator read. These observations are
+software evidence, not resolution of F019/F017/F018 or native economics.

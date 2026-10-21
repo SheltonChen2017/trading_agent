@@ -22891,3 +22891,65 @@ No secrets or licensed rows in Git/logs. No purchases/account/provider changes,
 broker/funded/paper/live/deployment authority. Canonical and carried findings
 remain at their exact prior scope; source_inspect/view unsafe receipt paths
 remain excluded pending named successors. Validation/access results follow.
+
+### 93.2 New actual jobs retained; fresh saved-source inventory
+
+Fresh DISCOVERY-SUCCESSOR-20261021-001 at5aafea1e ended23:49:30.321363UTC:
+one fixed own metadata request33339wirebytes, plan099a79ef7829db19d260efd19e520ed12d1414d8af998179978f2a1d8d48272c;
+receipt13402/c3937e6b864c087a405b8f270bc4a825916711b0d2e552de7d410f6ab456c3bb,
+COMPLETED_METADATA. All14 known jobs retained; THREE newly observed jobs below.
+No new Codex launch/attempt, no statistics/errors/source bodies in this list.
+All server creation clocks are unzoned; chronology is relative within that
+clock group, not assigned UTC or authenticated Mia ownership.
+
+| Retrospectively observed look | Actual job | Native metadata status | Snapshot ID | Server-unzoned created |
+| --- | --- | --- | --- | --- |
+|31|3bcfc642896ea36e26b5cbca2988220c|Runtime Error|37830348|2026-10-14 16:12:12|
+|32|1e3ffa97bfa73b25e6c46b54da8a5b5c|Runtime Error|37832726|2026-10-14 17:02:38|
+|33|0407bbff60ee6ca57219743062090e5c|Completed.|37834838|2026-10-14 17:40:16|
+
+Actual observed history now33=31cloud+2historical local. These are retrospective
+external-origin observations, NOT fabricated preregistration/Mia attribution or
+new allowances. The old20261014 operation001 prospective look31 reservation is
+still an UNMATCHED intended-effect record; do not assign it to actual job31 by
+similar timestamp or relabel jobs32/33 to hide failures. All3 require genuine
+terminal/source/accounting verification; Completed is not baseline acceptance.
+OFFCodex3 remains spent, ON0 unused. No winner selection or accepted metric.
+
+Fresh SOURCE-BASELINE-20261021-001 at5aafea1e ended23:49:53.761002UTC:
+planf711e36436d4b3bdecdb8eab0d314e486a1e2d840fd0abcfa4fccc857428c203;
+receipt8053/8516f9a783e4d1a6804e7958de92b953990847360f2845bcdc0906a1594b5542.
+Two own fixed files/read requests541432wirebytes;16 files stable, no original
+expected file missing. BASELINE_MISMATCH is the expected original-template
+diagnostic classification, not failure of the read or a successful repair claim.
+Read2archive268709/f071f76317aa3f6abf1cfb65fec197ec9970a59b25b6959079cdcf17dba708b3;
+read1archive268709/5f99f61ad8858f4c78400773459f58560b582c8ddfe3c6b97ba645c81e79b2dc.
+All source remains private, unexecuted; current source is not compiled-job proof.
+
+TPR-EXT26-D116 (agent-delegated source inspection; review pending): fresh
+TPR-EXT26-REPAIR-SOURCE-INSPECT-20261021-001 may read ONLY the above exact read2
+archive268709 bytes through nofollow/hash/mode-bound FD, at current committed
+HEAD/new UTC<=15minute window,<=120seconds. Public committed completion bundle,
+source design/context and original descriptors may be used as comparison
+inputs. No old private capture/D0/receipt body, provider, credential, native
+source execution/notebook, ObjectStore or network operation. Persist0600
+claim/access/result with exclusive lock; body-free failure receipt and raw
+archive hash/bound are retained even if classification fails.
+Output<=32KiB: file sizes/hashes, syntax enum/line, exact known-header inverse
+hash checks, AST/node/function change locations/counts and unchanged-source
+booleans. Comments/string literals/unknown identifiers/raw source/market rows
+never go to stdout; full before/after source remains in the original private
+archive/public frozen bundle. Exact file identity/AST parity is software
+evidence only, never strategy/native/accounting acceptance.
+
+Public-only collector audit confirms old look20/look30/result/paired controllers
+cannot honestly process these new jobs by relabeling: they pin old identities,
+operation patterns or22-look ceilings. Root delegates a NAMED minimal read-only
+terminal successor bound to exactly jobs31–33 and this fresh discovery receipt,
+all local source hashes/current HEAD, dynamic UTC scopes, max3 fixed own
+backtests/read calls/4MiB each/12MiB total/30seconds each/120seconds overall,
+no retry/launch or raw error/statistics-value stdout. No execution until source
+and meaningful focused tests are committed and a fresh per-effect manifest
+exists. Separate native-only complete audit/index/sidecar/chunk/replay scope
+will still be required before any OFF acceptance. No new outcome consumed
+merely by observing a status or collecting an already-counted job.

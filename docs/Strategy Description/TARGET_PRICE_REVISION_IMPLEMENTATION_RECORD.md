@@ -1,5 +1,12 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
+**Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly".
+For this round ONLY, bypass the section92 next-Claude-review checkpoint and
+continue fresh owner-Mia OFF repair/source/accounting verification, then ON
+only after a valid baseline. Section93 is the active continuation; the last
+published status below is retained as history. No source, launch, attempt,
+receipt, economics, canonical or native-accounting gate is waived.
+
 Status: **CODEX HAS COUNTER-REVIEWED EVERY INCOMING COMMIT IN
 `1bc751f8..557b2250` IN SECTION 92. CUMULATIVE DISPOSITION: ACCEPTED AFTER
 CORRECTION OF EVIDENCE SUPPORT, TEST SENSITIVITY AND RECORD QUALIFICATIONS;
@@ -22827,3 +22834,60 @@ commit, individually and cumulatively. The owner-led Mia repair is subsequent
 new evidence to reconcile, not a hidden effect in this round. All open findings,
 gates/attempts/looks/null results and PAUSED monitor remain unchanged. No second
 push or automatic rearm is authorized by this completed counter-review.
+
+## 93. Owner-skipped review checkpoint; OFF repair verification before ON — 2026-10-21
+
+### 93.1 Direct owner scope and fresh discovery registration
+
+Owner explicitly overrides ONLY the just-recommended step1: "skip 1, proceed
+to 2 and 3 directly". Exact message SHA256
+4cbdbec4c54b5db78455516442f96c25d636af6e54a214209cef5419e301b9aa.
+Proceed without another Claude checkpoint this round: reconcile EVERY owner-Mia
+cloud file/diff and actual run, resolve prior uncertain dispatch before any
+duplicate effect, verify usable full-window OFF source/orders/accounting, then
+launch frozen TPR ON only if all actual prerequisites pass. This is neither
+permanent review removal nor permission to infer a completed Mia repair,
+changed economics, an attempt reset or canonical acceptance. Existing single-
+lane/one-final-push/sole-record workflow applies; monitor stays PAUSED.
+
+Starting physical/Git root is the owner-pinned target-price worktree, branch
+codex/strategy-target-price-revisions; clean local and ACTUAL matching remote
+both2a46f41aa780237d8d13785c28cdd0ab28d356b3. No new review push or concurrent
+work absorbed. OFF37650980 has consumed3 Codex attempts, ON37650453 has0;
+last observed30looks, prospective31 reserved/dispatch uncertain. Frozen window
+2021-01-04–2026-10-09, warmup2020-09-01,1449valuations/301decisions and all stock
+cap-selection/weight-only TPR/AR-disabled rules remain unchanged. No date
+extension to today's date, parameter change, new arm or extra control/sweep.
+
+TPR-EXT26-D115 (agent-delegated routine verification; independent review pending):
+first use existing committed own-OFF discovery successor under fresh scope
+TPR-EXT26-OWNER-MIA-DISCOVERY-SUCCESSOR-20261021-001. At the new committed HEAD,
+prepare current UTC creation/expiry<=15minutes and use one fixed backtests/list
+request, includeStatistics=false, <=1MiB/128rows/30seconds, no retry. Exclusive
+claim/access/request receipts precede normal existing QC auth. Body-free output
+only; all newly observed jobs require retained look accounting and no invented
+Mia actor/UTC/source binding. No launch, source edit, project/resource mutation,
+ObjectStore/provider/private-input read, unrelated project or actual stop/db.
+
+Then a SEPARATE fresh current-source inventory scope may make exactly2 fixed
+files/read requests to OFF37650980, <=16files/1MiB perfile/4MiB perresponse/8MiB
+total/120seconds, with private0600 exact archives before inspection. Use fresh
+baseline-source identity TPR-EXT26-MIA-SOURCE-BASELINE-20261021-001, not a stale
+post022/023 grant. A mismatch versus the original59931-byte main is expected
+diagnostic history, not automatic failure/acceptance; do not import/execute
+returned source or notebooks. No historical source/private body is reopened
+by these initial scopes. Fresh bounded processing and all-file hash/diff/source
+economics/compile checks follow; source snapshots alone do not bind a run.
+
+Choice rationale: establish actual job/source facts before asking for IDs or
+issuing a native request. Alternatives rejected: repeated uncertain prompt,
+generic/API OFF4, old receipt renewal, assuming source fixed, reading global
+keys, or launching ON into an invalid source path. Public-only delegate audits
+collector/replay feasibility without private/cloud/credential/effect authority.
+Root owns all actual operations and record. Every controller must actually exit
+before a dependent controller starts. Preserve failures/loading/uncertainty;
+wait only on genuinely observed resource contention, never cancel other lanes.
+No secrets or licensed rows in Git/logs. No purchases/account/provider changes,
+broker/funded/paper/live/deployment authority. Canonical and carried findings
+remain at their exact prior scope; source_inspect/view unsafe receipt paths
+remain excluded pending named successors. Validation/access results follow.

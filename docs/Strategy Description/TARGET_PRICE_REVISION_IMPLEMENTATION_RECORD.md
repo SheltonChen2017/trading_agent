@@ -22989,3 +22989,43 @@ hex. No source execution/export/network/credentials/candidate change. If policy
 refuses disclosure, retain enum/hash/size only, not a raw-source workaround.
 Complete source versions remain private. Resolve actual guard/economic deltas
 before acceptance or ON; source-date/native audit/clock/census gates remain.
+
+### 93.4 Verified stale-mark bypass; further bounded reconciliation
+
+Fresh REPAIR-SOURCE-INSPECT-20261021-002 ended23:54:43.376809UTC atd59e508f,
+one exact268709-byte source archive read; result8945/
+325c675d016cfb5613bfae6d70dabcb4d2290ac72ffa193cec0cf406b34f9417.
+Pure masked-AST utilities ONLY were called, never the excluded effect drivers.
+main imports mia_rescale/mia_diag, transforms members with mia_rescale.guard
+before original inventory refusal, and replaces the original daily stale/future
+clock raise with mia_diag.gate. The safe view of gate/fresh_mark confirms that
+warning/delisted IDs return True and bypass that clock refusal. This is a
+material frozen-guard deviation, not a syntax-only repair or accepted baseline.
+All source remains unported/unaccepted; a Completed result cannot approve it.
+Public/synthetic-only delegate is proving the exact clock boundary against the
+public generated frozen guard, not executing captured private code.
+
+The mia_rescale review was POLICY_REFUSED because a1995-byte standalone string
+expression is not a syntactic docstring after the vendor import. No refused
+literal was disclosed. TPR-EXT26-D118 (agent-delegated, review pending): NEW
+REPAIR-SOURCE-INSPECT-20261021-003 may re-read only that same hash/268709-byte
+archive under fresh currentHEAD/UTC<=15minutes/120seconds. For normalized
+review ONLY, withhold ALL standalone string expressions (not only syntactic
+docstrings), report their line/count/length, then retain the unchanged strict
+literal/credential/market-row screen for the remaining mia_rescale function
+AST. No byte-equivalence/docstring-inertness/executable-port claim. Max32KiB
+body-free receipt; no raw source/comments/string body, source execution,
+notebook, network/provider/credential or other private input. This is tighter
+disclosure, not a permission to bypass a refused secret/market-row predicate.
+
+TPR-EXT26-D119 (agent-delegated availability check, review pending): fresh
+MIA-VERIFY-20261021-001 may inspect authenticated built-in Mia ONLY in own
+OFFproject37650980. <=10AX/2screenshots/3own-project routing actions/300seconds,
+new currentHEAD/time/access/closer. No message, source/mode change, compile,
+launch, notebook/ObjectStore/account action or unrelated page-body inspection.
+If native Safari is shared, use own-route checks and stop on lost focus; no
+blind global Return or other-lane cancellation. Mac/session availability is
+unverified NOW, not assumed from old locked/unlocked evidence. A later actual
+Mia effect, if safe/needed, requires its own separately bounded source/identity/
+authority scope and no duplicate of the unresolved old task. No fourth Codex
+OFF attempt, no ON through the changed frozen guard and no new real look here.

@@ -22953,3 +22953,39 @@ and meaningful focused tests are committed and a fresh per-effect manifest
 exists. Separate native-only complete audit/index/sidecar/chunk/replay scope
 will still be required before any OFF acceptance. No new outcome consumed
 merely by observing a status or collecting an already-counted job.
+
+### 93.3 Saved-source syntax repair verified; financial guard changes unresolved
+
+REPAIR-SOURCE-INSPECT-20261021-001 at7c04c53d ended23:53:12.735984UTC:
+one exact268709-byte FD read; result7897/4acdb7a7adaa698c87d70aee94007748452b0600fa0a83ae2d9c273ba51dac02.
+All14 Python files now compile IN MEMORY, no source imported/executed. The
+previous future-import syntax blocker is repaired in current saved source;
+this is not compiled-job proof or financial/source acceptance. Ten modules
+plus the unused loader/config have only known-header/newline inverse changes
+as classified in the receipt; exact per-file booleans, not a guessed total,
+govern. Original extended_core is byte/hash-identical706ed5ef; the receipt's
+AST-false field for that unchanged file is a classifier limitation (it removes
+an original AlgorithmImports import), NOT evidence of a core change. Byte
+equality is authoritative here; no native behavior defect is inferred.
+
+main.py is60692/590d3438c19b56e8770e991661bccf9a5ca26d63d855435a0ffad3a0632a4ea3,
+not registered60658/a098c087. Two known public functions have changed AST:
+TargetPriceExtendedAlgorithm._constituents_for and ._daily_audit. The latter
+has one fewer raise/if in its AST; this is a review lead, not yet a proved
+economic bypass/cause. mia_diag.py and mia_rescale.py also changed. No source
+delta is ported or accepted from syntax success, Completed or owner attribution.
+
+TPR-EXT26-D117 (agent-delegated safe review; independent review pending): fresh
+REPAIR-SOURCE-INSPECT-20261021-002 may re-read ONLY that same exact archive,
+268709bytes, new current-HEAD UTC<=15minute/120second scope. Repeated read is
+explicitly bounded, not an old claim renewal. Compare main to the public exact
+generated design and inspect ONLY main.py/mia_diag.py/mia_rescale.py through
+existing PURE masked-AST/literal-policy utilities; do NOT invoke excluded
+source_inspect/source_view effect controllers. Withhold comments/docstrings,
+notebook outputs/metadata, opaque/secret/market-row literals and any refused
+view. Max32KiB output/body-free failure receipt; exact3 discovered job IDs and
+already-published hashes are the only opaque-literal exceptions, not arbitrary
+hex. No source execution/export/network/credentials/candidate change. If policy
+refuses disclosure, retain enum/hash/size only, not a raw-source workaround.
+Complete source versions remain private. Resolve actual guard/economic deltas
+before acceptance or ON; source-date/native audit/clock/census gates remain.

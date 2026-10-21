@@ -1,13 +1,19 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 195 COMPLETES COUNTER-REVIEW OF ALL EIGHT CLAUDE COMMITS IN
+Status: **SECTION 196 REGISTERS THE OWNER-AUTHORIZED NEXT OFFLINE SELECTOR
+VERIFICATION AFTER THE EXPLICIT CLAUDE-WAIT WAIVER. ACTUAL EXECUTION IS NOT
+YET CLAIMED; A CLEAN COMMITTED VERSIONED FRONT, QUALIFICATION, EXIT 0 AND
+SEPARATE RECEIPT/INPUT/SOURCE CUSTODY CHECKS ARE REQUIRED. THE FAILED V1 ROOT
+IS PRESERVED. NO TITLE/SDK/ACQUISITION OR BACKTEST MILESTONE IS ACTIVATED.
+SECTION 195 COMPLETES COUNTER-REVIEW OF ALL EIGHT CLAUDE COMMITS IN
 `84367fc8..bbf34ab6`, INCLUDING THE DOCUMENTATION-ONLY REVIEW. THE REVIEW IS
 ACCEPTED AFTER NARROW BENZINGA ECHO/KEYCHAIN-TEST AND TITLE TYPED-REFUSAL
 CORRECTIONS IN `2bff49fc` AND APPEND-ONLY FACTUAL QUALIFICATIONS BELOW.
 THE CTIME-ONLY FAILURE MECHANISM IS REPRODUCED AND FIXED PROSPECTIVELY; THE
 ORIGINAL EXCEPTIONS/HELD TUPLES WERE NOT CAPTURED, SO THE TWO ORIGINAL RUNS
 REMAIN FAILED, PRESERVED AND UNPROMOTED. SEVEN P2 FINDINGS REMAIN OPEN,
-INCLUDING IBSELECT-OBS-01; ALL FAIL CLOSED. NO NEXT MILESTONE THIS ROUND.
+INCLUDING IBSELECT-OBS-01; ALL FAIL CLOSED BEFORE THE NEW VERIFICATION.
+NO FURTHER MILESTONE BEYOND SECTION 196'S BOUNDED SELECTOR SCOPE.
 V1 AND THE FOUR V3 CUSTODY FILES ARE FROZEN; STRICT D23 RETAINS SEVEN NONEXACT
 QUARTERS. NOT BACKTEST-READY (152.1, 154.6, 193, 195).
 BOTH FINAL ACCESS CLASSIFICATIONS STAND WITHOUT RETROACTIVE APPROVAL.
@@ -30,9 +36,11 @@ stays frozen and this record is the lane's status and handoff.
 The later explicit owner exception in section 139 removes Claude waiting
 for this continuous Codex build; the historical review entries remain
 historical evidence, not a claim that a new independent review occurred.
-The owner's later clarified review-only direction supersedes continuous
-building for the current section-195 round: counter-review and push, with
-NO next milestone or SDK activation.
+The owner's later clarified review-only direction superseded continuous
+building for the completed section-195 round. The still later explicit
+"skip, proceed to 2 and 3 directly" instruction activates only section196's
+fresh offline selector verification and acceptance, without waiting for
+Claude. No SDK activation or further milestone follows by inference.
 
 ## 1. Canonical V1 contract
 
@@ -262,6 +270,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-13 | Codex observed qualification / separate local handoff | `c666ebeea66c15af6a0237b108a276b96e86615d`, `e6f5fb5179db696723bd5cfaaa024c70122a59e1`, `583569680db4273c6b6a5012926b0dd43e3037ec` -> this separate handoff | One actual public EODHD date-field probe; precise factual-input stop before lane readiness | Executed once from clean58356968 under fixed public-demo profile:HTTP200/12bytes,2006 date-field observed. Independent network/write/fork-denied journal/source reread reconstructs result,14false flags and exact execution HEAD. No archive/canonical promotion. | Complete SHA e032a6e127eb189298deab923b13d18093930b8e99ad446ae7a2f4d8dee5342d; response SHA ec680bd926a0d0661b11ec5021a9f127557fc1234fb15a84f26f23cfbd42f569; final document/package checks follow. | Incoming85c7755d accepted; platform support gap closed at scope; two prelaunch demo findings closed; four topical and two shared P2s open. Owner confirms no alternative archive/account. | Need qualified full-cohort historical release archive/account and historical identity/PIT/source inputs. Recommend bounded EODHDCalendar qualification first, then Zacks/WSH if required. Record locally, no checkpoint push; monitor PAUSED. |
 | 2026-10-14 | Claude review (macOS session) and owner-directed corrections | `84367fc8` -> `5c29b437`, `afceee4e`, `69530b09`, `23893727`, `104ed76b`, `36377f70`, `51ff264c` -> this review record | Independent review of sections 160-193 (`85c7755d..84367fc8`, 27 commits, 0 merges, 29 modules and 32 test files) | Read every section; four read-only agents read the module groups and every finding was verified here before acceptance. Diagnosed both late real-run refusals (ctime drift on fresh leaves under ~/Documents, from the leaves' own stat and a direct probe). Fixed, with tests red on the pushed code: default-temp test failures, the Sharadar fixture fence, capture spacing and observed-mode pins, the final-hold drift and diagnostics, older EODHD fixture guards and failure codes, Benzinga echo screening and Keychain reader, untyped escapes, cleanup masking, stale bytecode, local-failure classification, trailing blank lines. Keychain probe found no real read; tripwire scan 36 tests, 0 offenders. | Final tree, network and Keychain exec denied: 34 files **1,811 passed**; compileall and this round's diff check clean. Complete suite not run, by owner instruction (an earlier start was stopped at 36 % with 0 failures). Record tests 71 passed. **0 looks**. | `IBHOLD-CR01`, `IBTEST-CR06`, `IBSHAR-CR01`, `IBCAP1-CR01` P2 closed; ten P3 closed; `IBEOD-CR03` P3 open; `IBSH-OBS03` shared; `IBSELECT-OBS-01` cause established. Four topical P2 and two shared P2 open. No open P0 or P1. | Codex counter-reviews the eight Claude commits. Selector or title reruns need a new registered front. The lane is not backtest-ready. No outcome, QC, paper, or trading step is inferred. |
 | 2026-10-14 | Codex counter-review only / separate final handoff | Exact incoming `84367fc8217043e5ddb7988717747597aa464a75..bbf34ab61eaae9d925f0b7b17b5bec43b73e5b4e`, eight commits / zero merges; correction `2bff49fc6e46fa3e6f0d42384bcb48ef86b4ac2c` | Every incoming commit dispositioned; bounded privacy/test/refusal corrections, not a next milestone | Accepted after nested-encoding refusal, genuine bounded Keychain grammar controls and typed malformed title metadata; ctime engineering accepted with original-cause qualification. Claude's full declared 27-commit range includes both latest checkpoint commits and all preceding unaccepted implementation. | Main focused incoming-changed plus boundary/document/exact package selection **1591 passed in57.72s**, denied network and Keychain exec; meaningful red/green and separate internal sensitivity checks in195.3-195.4. No full suite or actual semantic rerun. | Three new P3 follow-ups closed in2bff49fc; historical record qualification195.2. No openP0/P1; seven carried P2s and IBEOD-CR03 retained OPEN at exact scopes. Prior closures/observations/classifications unchanged. | NO next milestone this round. Finish this separate handoff and one matching-lane push; verify exact remote tip. Monitor PAUSED, no automatic rearm, SDK/source acquisition or other-chat message. |
+| 2026-10-21 | Codex owner-waived bounded offline verification preregistration | Starting clean local/origin `725b81ceb9e8584aa1bebdcceb66ae66cef82aaf`; no incoming commits | New registered corrected selector verification and independent receipt acceptance only | Owner explicitly skipped the next Claude checkpoint and directed recommended steps2/3. Preserve all original failure artifacts; new front, operation ID, namespace and source epoch; no actual invocation claimed yet. | Focused invented-input, guard-sensitivity, compilation, import/package/document and exact source/frozen qualification precede the clean-source actual operation. No complete suite. | IBSELECT-OBS-01 and six other P2s stay OPEN before actual success/verification. Prior195 corrections remain internally checked, not newly independently Claude-reviewed. | Execute the exact196 one-shot only after qualification/commit; document actual success or precise preserved failure and make one final matching-lane push. No title/source acquisition, QC/SDK, next milestone, monitor rearm or other-chat message. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -27677,3 +27686,221 @@ three correction closures, historical-cause and isolation qualifications,
 seven openP2s, retained P3s and explicit review-only endpoint; it finds no
 missing completion blocker. Post-append document/record/EXACT checks72 passed
 in1.33s; repeat after the final isolation wording before committing.
+
+## 196. Owner-waived fresh offline selector verification preregistration (2026-10-21)
+
+### 196.1 Explicit owner direction and bounded scope
+
+After the recommendation to (1) obtain Claude review of the latest two Codex
+commits, (2) undertake a newly registered corrected offline selector front,
+and (3) require exit0, verified receipts and successful final custody checks,
+the owner directed **"skip, proceed to 2 and 3 directly"**. This explicitly
+waives waiting for that Claude checkpoint for this one implementation and
+actual offline verification round. It supersedes195's completed review-only
+endpoint only at this stated scope. It is NOT independent acceptance of
+`2bff49fc6e46fa3e6f0d42384bcb48ef86b4ac2c` or its separate handoff
+`725b81ceb9e8584aa1bebdcceb66ae66cef82aaf`.
+
+Initial matching-lane-only fetch verifies clean local HEAD and origin both
+exact725b81ce, no new incoming commits. All work remains in
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying`
+on `codex/strategy-insider-buying`. No counter-review is skipped/reopened,
+branch switched, side worktree created or concurrent work overwritten.
+Monitor stays PAUSED. No next title/reference verification, affected-quarter
+integration, provider/SEC access, SDK transfer/invocation, QC job or backtest
+is activated. No source acquisition or outcome look is needed for this
+retained-input metadata checkpoint. All shared/project-wide records remain
+frozen; this lane record is the durable handoff.
+
+### 196.2 New immutable operation and definition of done
+
+Activate the separately versioned production front
+`research/insider_buying_affected_quarter_selector_verification_v2.py` only
+after focused qualification and a clean source/preregistration commit.
+Exact one-shot ID:
+`ib-affected-quarter-selector-ctime-verified-v2-20261021-once`.
+Fresh output namespace:
+`artifacts/insider_buying/affected_quarter_selector_verification_v2/`
+followed by that exact ID. No arbitrary ID, fixture-to-real-root route,
+resume, overwrite, reset, renamed retry or extra run is permitted. Failure
+consumes this new namespace too; stop and retain its exact evidence.
+
+This is a newly authorized verification of the prospectively corrected
+source epoch, NOT reclassification or continuation of the original v1 run.
+Bind its immutable registration payload/digest to the new front, source
+inventory, exact source window, fixed old operation and all three old pins:
+
+| Preserved v1 leaf | Bytes | SHA256 |
+|---|---:|---|
+| reservation.json | 27812 | 08a11e4dea01408970ad5ab6df12a31b411ae12472fdf9a712195b01515fe8d8 |
+| selection.json | 91237 | d1dd4e093d5505fac6373562bb24198c7ad6fc61ef7745912a40bff84528aaef |
+| complete.json | 39794 | ca0fb475cbb102505cc07bf33e7a67568919ecfc4687bee7b9475162c3045e57 |
+
+The old ID is `ib-affected-quarter-selector-all6-retained-v1-20261014-once`
+under the original affected_quarter_selector_v1 namespace. Its EXIT2 after
+66.924s, unknown original precise exception/held tuples and unpromoted status
+remain permanent. Hold/recheck its exact three outputs read-only through
+the new operation; no old namespace or receipt write is permitted.
+
+Keep all84 intake leaves exactly as192:82 chronological retained ZIPs,
+34381-byte manifest SHA
+`dc254e4e023bf9990028e085450fc4a5c1c2ae22e1d562f2efc4ada532f9f76d`,
+and156-byte opaque .gitattributes SHA
+`fb4e806a1f4a7ad3addbfb805a9ab1936138c2bb1222166044fb8d403d5ee62b`.
+Bind the original retained capture commit, census
+`2c93041a1dd2641d80722bd90630c37e939fb10b65837659bb1893168bd83c33`,
+header `3736b0327a20040d46ff5a26fd18b4154eebb18cbf4be56706cfe232e9f889c0`
+and schema profile
+`ee2f201362d4002a70819e4d7123eea300aafddb8820c6a0ab9761b0ed8cdd41`.
+Preserve all82 quarters2006Q1-2026Q2, six ownership forms, raw short CIKs,
+source filing/accession-year mismatches, original unverified local observation
+clocks and refusal accounting. Existing integrity checks inspect/decode all
+tables for hash/CRC/UTF8/header integrity; only SUBMISSION metadata fields
+are semantically interpreted. No source rows/names/CIKs/financial values
+are exported or newly interpreted as signals.
+
+Definition of done, conjunctive rather than receipt-literal acceptance:
+
+1. Actual CLI executes once from the already-existing clean committed
+   candidate, binding current tracked sources/Git and four historical frozen
+   validators. No source, test, record or HEAD edit during the operation.
+2. Captured-source worker independently proves native process-tree network,
+   fork, inside-output and outside-output all-write denial before input
+   opening; Python hooks are additional protection, not the isolation proof.
+3. Read/hash all84 inputs and execute two complete ordered source/header/
+   census/selection derivations with byte equality. These are two executions
+   of the same implementation, not two independent implementations.
+4. Strict parent metadata validation preserves exact totals/forms/pins and
+   captured executed-source lineage. Fresh reservation, selection and
+   complete leaves publish with bounded bytes, private single-link custody
+   and no extra leaf. Only fresh output holds settle ctime while rehashing;
+   intake/source and content/inode/mode/link/size/mtime guards remain binding.
+5. Final input/source/predecessor/output rechecks and cleanup succeed, and
+   the observing controller actually measures terminal **exit0** with exact
+   canonical bounded success stdout and empty stderr. A completion filename
+   or caller-provided success boolean does not establish this fact.
+6. A separate read-only metadata/custody verification checks the three new
+   receipt hashes, canonical schemas, registration/authority/context,
+   source/input lineage and final inventories against externally observed
+   CLI hashes. It performs no semantic rederivation/publication. Terminal
+   CLI status remains separately observed, not authenticated by a boolean.
+
+Expected fixed source profile, not an already observed v2 result:82 quarters,
+4458409 submissions,4034227 Form4/4-A; six forms331258/15819/3934823/99404/
+74654/2451;146 short-CIK rows/132 relevant,15 year mismatches/13 relevant,
+9 short quarters/10 disjoint year quarters/19 union. Source-derived receipt
+equality and final custody, not those expected constants alone, establish
+this verification checkpoint. Only after all six criteria may
+IBSELECT-OBS-01 close at the corrected successor-operation acceptance scope;
+the original failed run and unique historical cause remain unpromoted/unknown.
+
+### 196.3 Engineering decisions, exclusions and publication
+
+Use an explicit immutable versioned front and reuse qualified pure/custody
+helpers, rather than change module globals at runtime, weaken the original
+front's namespace guards or silently replace failed receipts. A source-only
+bootstrap must execute the actual new front image under the captured-source
+finder; current/Git identity and inventories are rechecked by the parent.
+Independent internal code/test QA is not a new Claude review. Native-denied
+focused regressions and meaningful guard reversals must precede actual
+operation. No complete lane/repository suite is authorized.
+
+Retain all seven OPEN P2s until actual acceptance; then close only the exact
+verified selector scope. Do not close IB1C-REAL-CR01, IB1BCAMP-CR01,
+IBSRC-CR01, IBSRC-CCR01 or the two shared P2s by fixture/selector success.
+Retain IBEOD-CR03 and all other P3/observation/resolved findings from195.
+Frozenv1/scale/pilot, four v3 sources, three SDK images and ignored private
+drafts remain unchanged. Stoppedv3 stays1846/1847 unresolved; current2022Q4-
+2023Q1 stays19846 source-bound of99394/79548 unattempted, not full population.
+StrictD23 remains seven nonexact quarters/no82-quarter promotion digest.
+Both owner incident classifications remain distinct without retroactive
+approval as195.6 records. All rights/PIT/identity/canonical/QC/look/backtest/
+execution authority stays FALSE. Looks/jobs/backtests0/0/0.
+
+Record actual code/test identities, qualification, observer journal,
+terminal status, receipt readback and any precise blocker in the final
+separate handoff after implementation hashes exist. Preserve any failure,
+do not repeat/rename it or substitute a different milestone. Accumulate this
+one bounded round in the same lane; one successful matching-lane final push
+only after root/branch/HEAD/status and no-remote-advancement checks, followed
+by independent remote-tip verification. No interim push, automatic monitor
+rearm or other-chat message.
+
+### 196.4 Qualified candidate and observing controller before actual execution
+
+The new front is a deliberate versioned snapshot of the qualified coordinator,
+reusing the unchanged pure selector and custody/source helpers. This avoids
+runtime global substitution and preserves the original coordinator as a
+historical operation interface. It is not a generic new framework or a claim
+that all copied helper code is newly implemented. Exact candidate images:
+
+| Image | Bytes | SHA256 |
+|---|---:|---|
+| research/insider_buying_affected_quarter_selector_verification_v2.py | 52111 | e5d3839ab630e1df3c1b3d1c0e23b0191a4105fa887b400bd49700cdae48daf3 |
+| tests/test_insider_buying_affected_quarter_selector_verification_v2.py | 28085 | 9740a89e4d6d4158eafcc9e4c5f06e707e92c7f06b7d11830993b1edb9d383fa |
+
+Main final new/unchanged selector/front plus record, active-document, lane
+import boundary and EXACT package selection:278 passed27.84s. Independent
+internal new/unchanged selector three-file selection155 passed23.82s with
+before/after source/test hashes unchanged; the new file alone67 passed12.46s.
+Selections overlap and are not summed. All use Python3.13.15, env-i,
+disabled plugin autoload/cache, isolated database/temp and effective native
+process-tree network plus /usr/bin/security exec denial. No complete suite.
+
+`IBSELECT-V2-CLEANUP-01` / P2, preactivation candidate: the first read-only
+verifier's sequential cleanup could skip output descriptors if intake close
+failed after an otherwise successful verification body. Its genuine full
+synthetic positive path plus cleanup fault and a faithful in-memory old-finally
+reversal catch undrained output handles/ancestry; corrected _TreeCloser in one
+exhaustive primary-preserving close-all passes. Red/green0.588s; bindings
+restored and leaked invented descriptors explicitly drained. No actual
+operation failure is attributed to this draft defect.
+
+Four separate internal memory reversals caught removal of exact registered
+ID admission, the worker registration pin, settled output ctime treatment and
+output content rehash; restored controls pass0.446s. One first harness used
+the wrong expected ValueError subtype for a ctime reversal and was corrected;
+that setup is not production failure evidence. Native network/fork/two-
+location all-write proof and two source memory compilations passed0.010s.
+An earlier145-pass run overlapped test-author changes and was correctly
+discarded as final-tree evidence, not a failing test run. The initial117-pass
+selection preceded the new verifier and is not final-image qualification.
+
+Actual observation is a separate private git-ignored controller at
+`artifacts/insider_buying/selector_verification_v2_observer.py`, not a tracked
+source presented as existing in a future commit. Its exclusive0700 journal
+is under `artifacts/insider_buying/selector_verification_v2_observer/`
+followed by the same registered ID, outside the exact three-leaf operation
+root. It records its own executed code SHA, clean source HEAD/inventory,
+Python/registration/policy identities, actual subprocess terminal status,
+bounded canonical stdout validation and separate metadata-readback result.
+It publishes private0600 records exclusively, never overwriting a consumed
+observer or operation namespace. No raw stderr/credential/row text is emitted.
+
+The CLI parent and readback inherit native network/Keychain-exec denial and
+write protection of actual intake, failed predecessor and all inventoried
+source parents. Readback additionally denies new output writes. Parent Git
+identity checks require subprocesses and may refresh Git metadata; do not
+claim fork/all-write denial for those parents. The semantic worker has the
+stricter proven network/fork/all-write policy. A fresh -B/pycache-prefix path
+avoids reading stale lane bytecode. Each observed child uses its own process
+group with timeout/interrupt group cleanup and reaping; no semantic retry.
+The actual CLI cap is1900s and metadata readback180s. Both terminal reports
+must be real; passing a success hint to the verifier alone grants nothing.
+Final controller image/qualification and commit-time root/branch/HEAD/status/
+matching-remote checks follow. Actual execution remains unclaimed here.
+
+The final private observer image is11041 bytes/SHA256
+`e8cdc43898f3555577c86eccef69e803bb654bd178808820c0da10ee807d8e79`.
+Its source-only preflight runs in a separate clean interpreter before any
+observer/operation reservation, so the private runpy controller is not
+misrepresented as a committed lane module. That subprocess authenticates
+the actual front's clean source/root/branch/HEAD/inventory; the observer
+verifies the canonical returned control and separately records its own
+private executed bytes. This is metadata-only source preflight, not another
+semantic selector invocation. A first controller design would have included
+its ignored runpy.__main__ in the committed-module closure; source inspection
+caught that harness incompatibility before any actual invocation or claim.
+Earlier controller helper QA (unchanged run_child) independently exercised
+invented success and descendant/parent timeout with group kill/reap and
+pipe drain under1s; no observer main or actual root was executed.

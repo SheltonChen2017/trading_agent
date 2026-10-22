@@ -347,3 +347,22 @@ def test_public_native_read_preregistration_binds_exact_corrected_program_withou
     assert prereg["prompt"].endswith("```python\n" + program + "\n```")
     assert "no-op scope check" in prereg["prompt"] and "do not retry or launch" in prereg["prompt"]
     assert prereg["deadline_utc"] == "2026-10-22T01:10:00Z"
+
+
+# TPR-CR28 regressions: two guards the received suite never exercised.
+
+
+def test_scope_failure_right_after_the_first_read_marks_that_object_refused_and_opens_no_second_key():
+    store = Store()
+    def scope_check():
+        return False if any(call[0] == "read_bytes" for call in store.calls) else None
+    result = d.read_native_witnesses(store, observed_project_id=d.PROJECT, scope_check=scope_check)
+    assert result["status"] == "failed_or_uncertain" and result["read_calls"] == 1
+    assert [call[0] for call in store.calls] == ["contains_key", "read_bytes"]
+    assert result["objects"][0]["status"] == "failed_or_refused" and len(result["objects"]) == 1
+
+
+def test_mark_session_must_be_a_zero_padded_iso_date_even_when_strptime_accepts_it():
+    body = payload("mark"); body["details"]["session"] = "2021-1-4"
+    with pytest.raises(ValueError):
+        d.project_witness(encoded(body), kind="mark")

@@ -505,3 +505,28 @@ def test_seventeenth_registered_notebook_is_retained_twice_as_unexpected_private
                 "candidate_mutation", "mia_message_or_job", "canonical_admission", "trading"):
         assert result[key] is False
     assert result["new_codex_attempts"].fraction() == result["new_looks"].fraction() == 0
+
+
+# TPR-CR28 regression: every production seam is checked on its own, with the
+# real clock held in-window so only the seam under test can refuse.
+
+
+@pytest.mark.parametrize("fault", ["root", "transport", "guard", "clock", "monotonic"])
+def test_each_production_seam_refuses_a_fixture_substitution_on_its_own(tmp_path, monkeypatch, fault):
+    values = fixture(tmp_path)
+    plan = c._plan(**{key: "production" if key == "mode" else values[0][key] for key in c._ARGUMENTS})
+    monkeypatch.setattr(c, "_production_clock", lambda: values[3])
+    # The real guard is replaced by a sentinel so that reaching it (instead of
+    # refusing at the seam check) is a failure wherever pytest runs from.
+    def reached_guard(_head): raise AssertionError("seam check did not refuse before the guard")
+    monkeypatch.setattr(c, "_guard", reached_guard)
+    kwargs = {"guard": c._guard, "clock": c._production_clock, "monotonic": c.time.monotonic, "transport": c._native_request}
+    root = c.PRIVATE_ROOT
+    if fault == "root": root = values[2]
+    elif fault == "transport": kwargs["transport"] = lambda *args: pytest.fail("transport")
+    elif fault == "guard": kwargs["guard"] = lambda _: None
+    elif fault == "clock": kwargs["clock"] = lambda: values[3]
+    else: kwargs["monotonic"] = lambda: 0
+    with pytest.raises(c.Refusal):
+        c._execute(plan, values[1], root, **kwargs)
+    assert not list(values[2].iterdir())

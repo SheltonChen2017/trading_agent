@@ -159,3 +159,15 @@ def test_fixed_deadline_cannot_be_implicitly_renewed_by_later_start():
     after = datetime.fromisoformat(d.DEADLINE_UTC)+timedelta(seconds=1)
     assert invoke(qb, started_utc=after, utc_now=lambda: after)["status"] == "failed_or_uncertain"
     assert qb.object_store.calls == []
+
+
+# TPR-CR28 regression: the wrapper source bound is enforced before the cell is built.
+
+
+def test_oversized_wrapper_module_is_refused_even_with_a_matching_hash():
+    raw = Path(d.__file__).read_bytes() + b"#" * (16385 - len(Path(d.__file__).read_bytes()) + 1) + b"\n"
+    assert len(raw) > 16384
+    with pytest.raises(ValueError):
+        d.build_notebook_cell(raw, expected_module_sha256=hashlib.sha256(raw).hexdigest(),
+            reader_raw=Path(base.d.__file__).read_bytes(),
+            witness_raw=(base.PUBLIC / "extended_refusal_witness_context_successor.py").read_bytes(), capsule=capsule())

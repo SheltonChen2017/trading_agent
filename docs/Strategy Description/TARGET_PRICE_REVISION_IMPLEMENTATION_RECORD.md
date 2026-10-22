@@ -23029,3 +23029,78 @@ unverified NOW, not assumed from old locked/unlocked evidence. A later actual
 Mia effect, if safe/needed, requires its own separately bounded source/identity/
 authority scope and no duplicate of the unresolved old task. No fourth Codex
 OFF attempt, no ON through the changed frozen guard and no new real look here.
+
+### 93.5 Guard proof, rescale deviation and fresh terminal successor
+
+REPAIR-SOURCE-INSPECT-20261021-003 ended23:58:36.670092UTC at70c221e3:
+one exact268709-byte archive read; result3643/
+e51e23cc1e1420e6fd86e588eb950768b855be3cb33df68684f698daf2e3f8dc.
+Four standalone strings at lines4/52/82/102 (1995/316/339/185bytes) were
+withheld before the unchanged literal screen. The remaining normalized
+mia_rescale AST uses total-known-weight>3, divides every known weight by100,
+and accepts the result within one-half to three-halves of the preceding
+snapshot total (or a broad no-reference band). This is a percent-unit
+HEURISTIC, not provider/source-date/row-unit proof. No actual membership row
+was read in this inspection. Membership weight is audited, not a cap-ranking
+or allocation input, but this inferred normalization is still unaccepted.
+No clipping/dropping/renormalizing or source-unit claim is authorized by it.
+
+Confirmed OPEN P1 TPR-EXT26-F025: current saved-source mia_diag bypasses the
+frozen stale/future RAW mark refusal for warning/delisted held identities;
+it can admit an invalid mark into daily NAV. Reason to refuse acceptance:
+violates the frozen pricing/clock/accounting contract, even if a job says
+Completed. Exact public generated main a098c087 rejects four synthetic danger
+cases (warning/delisted x stale/same-day-future); replacing ONLY that one guard
+with an attributed synthetic transcription admits all four. Fresh/current
+controls agree; unrelated identities still refuse. This proves software
+semantics, NOT captured-code execution, historical compiled-job identity,
+actual bad market marks or native completion. OPEN P2 F026: the rescale unit
+heuristic lacks exact source/date/unit evidence; no native offender or cause
+proved. Both remain unported/unaccepted. Prior F024 syntax blocker is partly
+resolved for current saved source only, not historical compiled jobs.
+
+Product/test commit8dffc990 follows full root source/test reading. Root isolated
+49/52 focused union133passed12.06s, no skips/failures/warnings; public source
+design/frozen guards plus new terminal/guard tests, not the complete suite.
+Delegate terminal50passed2.77s, six actual collected in-memory mutants killed
+(credential/cancellation/production guard/refusal-byte reservation/parse
+deadline/overflow). Guard20passed4.09s and83-test union9.18s; both corrected
+collected-module mutations killed all four danger cases. Functions restored
+in finally; candidate bytes unchanged. Initial shell-quoting/setup failures
+and a wrong-module mutation that falsely passed are retained as harness
+negatives, corrected before the reported proof; no market look/effect.
+Root compiled all3 new Python files in memory and diff check passed.
+
+New named unexecuted collector extended_owner_repair_terminal_capture.py:
+24104/4b59be122dffd4178d38bf19d90aee21937591102ad432b8a9eceb2bd108aa63;
+tests17107/aaf2d062e97e6877a2b06e56421a96aaaf2ee0a49cc620cc9b729eb7f4c33319;
+guard tests8390/b286f7ace147c14a7393fff6098429f8e377a7836083a4c97bf87f4f2f2ef58e.
+Executed predecessors and pinned parser6e9d5cdc remain unchanged. Required
+nonempty echo credential, source closure/currentHEAD, fresh exclusive claims,
+expiry, per-request guards, cancellation, bounded selective parser, identity/
+snapshot verification, all3 outcomes and body-free overflow receipt are tested.
+Native compile ID is nullable; missing source binding remains false/null.
+
+TPR-EXT26-D120 (routine delegated read; independent review pending): after this
+record is committed, fresh OWNER-REPAIR-TERMINAL-20261022-001 may read ONLY
+the new discovery001 receipt13402/c3937e6b864c087a405b8f270bc4a825916711b0d2e552de7d410f6ab456c3bb
+and exactly3 fixed own backtests/read jobs31–33 above. Source closure is the
+committed collector and inherited pinned support, currentHEAD/newUTC<=15min.
+Clarification BEFORE effects to93.2's12MiB proposal: reserve4MiB+1 perrequest
+and12MiB+3 TOTAL including three oversize-refusal witness bytes,30seconds
+perrequest,120seconds overall,10second parsing deadline perresponse; no retry.
+Retain private selective projections/wire hashes before schema acceptance;
+no raw error/source/parameter/statistic values in logs/Git. No outcome metrics
+accepted, compiled source or final accounting inferred, new launch/attempt/look,
+ObjectStore export, provider/input read or unrelated project access.
+
+Native MIA-VERIFY-20261021-001 closed at current70c221e3 with result564/
+2a2166c65801d017d23948c7fa43d72f81f7f36cadfd5bc3ddf22edcdbd67d76.
+One initial AX observation verifies Mac unlocked and authenticated Safari QC;
+it opened own-organization Resources, not the own project/Mia task. Resource/
+sibling-folder/project metadata incidentally appeared on bind; no folder,
+resource, project, message, source, mode or job action followed. Task and old
+dispatch remain UNVERIFIED; availability is not an actor/job binding. Scope
+actually exited and lock released before the terminal collector. Next native
+own-project read requires a new bounded scope; no stale unconditional unlock
+request and no duplication/cancellation of an unresolved owner-Mia task.

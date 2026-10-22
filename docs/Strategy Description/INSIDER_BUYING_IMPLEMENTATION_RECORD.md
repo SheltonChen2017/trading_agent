@@ -1,19 +1,21 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 196 REGISTERS THE OWNER-AUTHORIZED NEXT OFFLINE SELECTOR
-VERIFICATION AFTER THE EXPLICIT CLAUDE-WAIT WAIVER. ACTUAL EXECUTION IS NOT
-YET CLAIMED; A CLEAN COMMITTED VERSIONED FRONT, QUALIFICATION, EXIT 0 AND
-SEPARATE RECEIPT/INPUT/SOURCE CUSTODY CHECKS ARE REQUIRED. THE FAILED V1 ROOT
-IS PRESERVED. NO TITLE/SDK/ACQUISITION OR BACKTEST MILESTONE IS ACTIVATED.
+Status: **SECTION 197 RECORDS A NATIVE STARTUP BLOCKER FOR THE OWNER-WAIVED
+OFFLINE SELECTOR VERIFICATION. CLEAN CANDIDATE `3c5734fd` QUALIFIED, BUT THE
+NESTED SANDBOX LAUNCH RETURNED 71 BEFORE PYTHON: ZERO SELECTOR EXECUTIONS,
+NO NEW SELECTOR ROOT OR SUCCESS RECEIPTS. THE OBSERVER JOURNAL IS PRESERVED;
+NO RETRY, RESET OR WEAKENED ISOLATION. EIGHT P2 FINDINGS REMAIN OPEN,
+INCLUDING IBSELECT-OBS-01 AND IBSELECT-V2-STARTUP-01. THE FAILED V1 ROOT
+IS PRESERVED. A SEPARATELY SCOPED LAUNCHER/ISOLATION DECISION IS NEEDED
+BEFORE ANOTHER ACTUAL ATTEMPT. NO TITLE/SDK/ACQUISITION OR BACKTEST MILESTONE.
 SECTION 195 COMPLETES COUNTER-REVIEW OF ALL EIGHT CLAUDE COMMITS IN
 `84367fc8..bbf34ab6`, INCLUDING THE DOCUMENTATION-ONLY REVIEW. THE REVIEW IS
 ACCEPTED AFTER NARROW BENZINGA ECHO/KEYCHAIN-TEST AND TITLE TYPED-REFUSAL
 CORRECTIONS IN `2bff49fc` AND APPEND-ONLY FACTUAL QUALIFICATIONS BELOW.
 THE CTIME-ONLY FAILURE MECHANISM IS REPRODUCED AND FIXED PROSPECTIVELY; THE
 ORIGINAL EXCEPTIONS/HELD TUPLES WERE NOT CAPTURED, SO THE TWO ORIGINAL RUNS
-REMAIN FAILED, PRESERVED AND UNPROMOTED. SEVEN P2 FINDINGS REMAIN OPEN,
-INCLUDING IBSELECT-OBS-01; ALL FAIL CLOSED BEFORE THE NEW VERIFICATION.
-NO FURTHER MILESTONE BEYOND SECTION 196'S BOUNDED SELECTOR SCOPE.
+REMAIN FAILED, PRESERVED AND UNPROMOTED. ALL EIGHT OPEN P2S FAIL CLOSED.
+NO FURTHER MILESTONE BEYOND THE ATTEMPTED SECTION 196 SCOPE.
 V1 AND THE FOUR V3 CUSTODY FILES ARE FROZEN; STRICT D23 RETAINS SEVEN NONEXACT
 QUARTERS. NOT BACKTEST-READY (152.1, 154.6, 193, 195).
 BOTH FINAL ACCESS CLASSIFICATIONS STAND WITHOUT RETROACTIVE APPROVAL.
@@ -271,6 +273,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-14 | Claude review (macOS session) and owner-directed corrections | `84367fc8` -> `5c29b437`, `afceee4e`, `69530b09`, `23893727`, `104ed76b`, `36377f70`, `51ff264c` -> this review record | Independent review of sections 160-193 (`85c7755d..84367fc8`, 27 commits, 0 merges, 29 modules and 32 test files) | Read every section; four read-only agents read the module groups and every finding was verified here before acceptance. Diagnosed both late real-run refusals (ctime drift on fresh leaves under ~/Documents, from the leaves' own stat and a direct probe). Fixed, with tests red on the pushed code: default-temp test failures, the Sharadar fixture fence, capture spacing and observed-mode pins, the final-hold drift and diagnostics, older EODHD fixture guards and failure codes, Benzinga echo screening and Keychain reader, untyped escapes, cleanup masking, stale bytecode, local-failure classification, trailing blank lines. Keychain probe found no real read; tripwire scan 36 tests, 0 offenders. | Final tree, network and Keychain exec denied: 34 files **1,811 passed**; compileall and this round's diff check clean. Complete suite not run, by owner instruction (an earlier start was stopped at 36 % with 0 failures). Record tests 71 passed. **0 looks**. | `IBHOLD-CR01`, `IBTEST-CR06`, `IBSHAR-CR01`, `IBCAP1-CR01` P2 closed; ten P3 closed; `IBEOD-CR03` P3 open; `IBSH-OBS03` shared; `IBSELECT-OBS-01` cause established. Four topical P2 and two shared P2 open. No open P0 or P1. | Codex counter-reviews the eight Claude commits. Selector or title reruns need a new registered front. The lane is not backtest-ready. No outcome, QC, paper, or trading step is inferred. |
 | 2026-10-14 | Codex counter-review only / separate final handoff | Exact incoming `84367fc8217043e5ddb7988717747597aa464a75..bbf34ab61eaae9d925f0b7b17b5bec43b73e5b4e`, eight commits / zero merges; correction `2bff49fc6e46fa3e6f0d42384bcb48ef86b4ac2c` | Every incoming commit dispositioned; bounded privacy/test/refusal corrections, not a next milestone | Accepted after nested-encoding refusal, genuine bounded Keychain grammar controls and typed malformed title metadata; ctime engineering accepted with original-cause qualification. Claude's full declared 27-commit range includes both latest checkpoint commits and all preceding unaccepted implementation. | Main focused incoming-changed plus boundary/document/exact package selection **1591 passed in57.72s**, denied network and Keychain exec; meaningful red/green and separate internal sensitivity checks in195.3-195.4. No full suite or actual semantic rerun. | Three new P3 follow-ups closed in2bff49fc; historical record qualification195.2. No openP0/P1; seven carried P2s and IBEOD-CR03 retained OPEN at exact scopes. Prior closures/observations/classifications unchanged. | NO next milestone this round. Finish this separate handoff and one matching-lane push; verify exact remote tip. Monitor PAUSED, no automatic rearm, SDK/source acquisition or other-chat message. |
 | 2026-10-21 | Codex owner-waived bounded offline verification preregistration | Starting clean local/origin `725b81ceb9e8584aa1bebdcceb66ae66cef82aaf`; no incoming commits | New registered corrected selector verification and independent receipt acceptance only | Owner explicitly skipped the next Claude checkpoint and directed recommended steps2/3. Preserve all original failure artifacts; new front, operation ID, namespace and source epoch; no actual invocation claimed yet. | Focused invented-input, guard-sensitivity, compilation, import/package/document and exact source/frozen qualification precede the clean-source actual operation. No complete suite. | IBSELECT-OBS-01 and six other P2s stay OPEN before actual success/verification. Prior195 corrections remain internally checked, not newly independently Claude-reviewed. | Execute the exact196 one-shot only after qualification/commit; document actual success or precise preserved failure and make one final matching-lane push. No title/source acquisition, QC/SDK, next milestone, monitor rearm or other-chat message. |
+| 2026-10-21 | Codex actual startup rejection / separate blocked handoff | Implementation/preregistration `3c5734fd6316389912907c66b4456a5a5c96e9a9`, followed by this separate handoff; incoming range empty | One observer launch, zero selector executions; no accepted actual verification | macOS nested sandbox refused before Python: exit71,0.007495s,stdout0/stderr53, fixed sandbox_apply refusal hash. New selector namespace absent; observer reservation+terminal and all old failed receipts preserved. No semantic retry, reset or new scope. | Main278 focused passes27.84s; internal155 passes23.82s; compile/frozen checks; five synthetic topology controls independently confirm nesting restriction and reject weakened inheritance as equivalence. Exact pins/validation197. | IBSELECT-V2-STARTUP-01 P2 OPEN; IBSELECT-OBS-01 remains OPEN. Eight P2s total, no openP0/P1. Draft cleanup corrected but does not establish actual success. | Stop before another actual attempt. Owner decision needed for a separately scoped isolation-safe launcher design, including any explicit change to parent native isolation; no backtest, acquisition, SDK or title milestone. One final documented matching-lane publication at this concrete blocker; monitor PAUSED. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -27904,3 +27907,209 @@ caught that harness incompatibility before any actual invocation or claim.
 Earlier controller helper QA (unchanged run_child) independently exercised
 invented success and descendant/parent timeout with group kill/reap and
 pipe drain under1s; no observer main or actual root was executed.
+
+## 197. Selector-v2 native startup rejection and exact blocked handoff (2026-10-21)
+
+### 197.1 Observed operation, not a completed selector verification
+
+The owner explicitly waived the Claude wait and authorized196's bounded
+steps2/3. New front/tests/preregistration are committed together at
+`3c5734fd6316389912907c66b4456a5a5c96e9a9`, from clean published baseline
+`725b81ceb9e8584aa1bebdcceb66ae66cef82aaf`. No new incoming Claude range
+exists; no review is skipped other than the owner's named wait waiver, and
+no independent Claude acceptance of this work is claimed. Source/test/record
+and HEAD remained unchanged throughout the observed attempt.
+
+The private controller's source-only preflight succeeded for that clean
+committed candidate. It exclusively published its own reservation, then
+attempted to launch the CLI under the registered native parent policy.
+Actual terminal result: **EXIT71 after0.007495s**, stdout0 bytes and stderr53
+bytes, SHA256
+`d34a4e4359a4dc36526cf5b363da32f7b7594a3a09eea17cbdfd6425b052d93e`.
+This exactly matches the fixed native sandbox_apply Operation-not-permitted
+startup refusal. The observer returned2 after preserving the measured
+terminal record, with terminal_success_observed=False.
+
+Python never started in that rejected CLI launch: **zero selector workers,
+zero semantic derivations and zero CLI intake/ZIP reads**. The new selector
+namespace remains absent; no reservation/selection/complete leaf from the
+v2 selector exists. The separate metadata completion verifier was not called,
+because there was no successful CLI or new completion to verify. This is
+NOT a recurrence of the old late ValueError and NOT a failed source parsing
+or final custody result. It is a pre-Python launcher/isolation failure.
+
+No ordinary retry, renamed operation, reused observer namespace, receipt
+rewrite or automatic reduction of the sandbox controls is permitted or
+performed. The observer ID is permanently reserved. Its registered semantic
+allowance was1 but actual semantic executions were0; that arithmetic is NOT
+permission to reset the observer or attempt an unregistered launcher.
+
+### 197.2 Exact retained observer and predecessor evidence
+
+Private observer root:
+`artifacts/insider_buying/selector_verification_v2_observer/`
+`ib-affected-quarter-selector-ctime-verified-v2-20261021-once`.
+Independent metadata-only reread under native network/fork/all-write denial
+confirmed exactly the following0600 leaves, the v2 output root absent and
+all three old193 pins unchanged:
+
+| Observer leaf | Bytes | SHA256 |
+|---|---:|---|
+| reservation.json | 1845 | 6309966fea99f54bf293b30d096c778de56b929f6b79ea29d05212996dd9360b |
+| terminal.json | 522 | 734d734f93887a288ee59b4148ebd3d115c2f22d1fec5fb80163b70f2de16929 |
+
+| Observed lineage | Exact value |
+|---|---|
+| Actual already-existing clean execution HEAD | `3c5734fd6316389912907c66b4456a5a5c96e9a9` |
+| Source-only preflight inventory SHA256 | `1cb2d7f7728ecede2f214081e2dd06eed56e54d997bd84831f5f64bc50e6b711` |
+| Committed operation registration SHA256 | `bb6f2d720ecc86abeddf863b75c3d9eb823a9cf3ef695c47f5474a9ccdd916ee` |
+| Executed private observer SHA256 / bytes | `e8cdc43898f3555577c86eccef69e803bb654bd178808820c0da10ee807d8e79` /11041 |
+| Parent launch policy SHA256 | `048ff0983323ad5e6571a56b1074ea6052fc6ec861e93b7fc6655ec9e1c7b768` |
+| Actual Python | 3.13.15 |
+| CLI stdout SHA256 / bytes | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` /0 |
+
+These are controller/source-preflight observations, NOT a worker executed-
+source inventory or successfully produced selector receipt. The private
+observer is explicitly untracked and separately hashed; neither this later
+handoff nor a future hash is assigned to its execution retrospectively.
+Raw stderr text and source rows are not copied into this record. No private
+artifact or controller file is added to Git. Existing input/capture/source
+lineage is not re-authenticated as SEC origin, publication, PIT or rights.
+
+### 197.3 Confirmed native topology blocker and safe alternatives checked
+
+`IBSELECT-V2-STARTUP-01` / **P2, OPEN**, lane-owned launch integration:
+the intended whole-tree native parent profile cannot apply another native
+profile to an already-sandboxed descendant on this host. The controller
+encountered that restriction before CLI Python startup; the existing CLI
+would also need to install its stronger worker profile later. The mocked
+parent orchestration and source-only bootstrap controls do not prove this
+real nested-launch topology. Qualification was insufficient to establish
+actual startup, despite all focused functional checks passing.
+
+Independent invented-only native matrix: four cases in0.129s plus a
+standalone strong-profile case under0.001s:
+
+| Synthetic control | Observed outcome / interpretation |
+|---|---|
+| Direct child inherits the parent profile without reapplication | Exit0; network, Keychain-exec and protected-path writes refuse errno1. Fork and other writes remain allowed: NOT equivalent to the required worker controls. |
+| Nested identical profile | Exit71 before Python, stdout0/stderr53, exact same native refusal SHA as the actual attempt. |
+| Nested stronger worker profile | Same exit71/0/53 and exact native refusal SHA; no stronger profile installed. |
+| Native named sandbox_init reapplication inside existing sandbox | Return-1/errno1; fork and unprotected writes still allowed, so the stronger policy was not applied. |
+| Independently launched strong single profile | Network, fork and both invented-location writes all refuse errno1. This verifies that the strong profile works alone, not that the current two-role publisher/worker topology is equivalent. |
+
+The installed primary SDK header
+`/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sandbox.h`,
+lines23-26, independently documents that applying sandbox_init to an
+already-sandboxed process ignores the new profile and returns an error.
+Main read that primary text and independently matched the actual error's
+fixed byte length/hash without printing arbitrary stderr or source data.
+All diagnostic cases used invented child code/paths only, no actual front,
+observer main, retained input, provider, credential or QC surface.
+
+No verified same-topology alternative meets both current native layers.
+Simply removing the parent profile, ignoring sandbox-exec refusal, replacing
+native worker fork/write denial with Python hooks, or treating an inherited
+network-only profile as the stronger worker policy would weaken196's contract.
+No such workaround was made. This is a concrete platform/contract blocker,
+not a missing subscription or a request to repeat the failed source run.
+
+### 197.4 Retained ledger, completed qualification and remaining decision
+
+| Finding / scope | Status and evidence |
+|---|---|
+| IBSELECT-V2-STARTUP-01 / P2 | **OPEN.** Actual native startup rejection plus five isolation controls above. A separately defined launcher/isolation design and explicit disposition of the parent boundary are required before another actual attempt. |
+| IBSELECT-OBS-01 / P2 | **OPEN.** Neither exit0 nor v2 receipts/final custody exist. The original v1 exit2/66.924s remains failed/preserved; its unique original exception/held tuple is still unknown. |
+| IB1C-REAL-CR01, IB1BCAMP-CR01, IBSRC-CR01, IBSRC-CCR01 / P2 | **OPEN, unchanged.** No affected-quarter integration, legacy replacement/thaw, D23 adjudication or source/PIT/readiness promotion. |
+| IBSH-CR02, IBQC-SHARED-META01 / P2 shared | **OPEN, unchanged.** Shared dependency/envelope issues are not corrected or relabeled green here. |
+| IBSELECT-V2-CLEANUP-01 / P2, preactivation draft | **CLOSED in3c5734fd at cleanup scope only** with the genuine synthetic red/restored-green proof in196.4. It has no actual-run success implication. |
+| IBEOD-CR03 and all other P3/observations/resolved findings in195 | **Retained at exact scopes.** No silent closure/deletion, shared edit or new mutation classification. |
+
+No openP0/P1; **eight P2s are OPEN**, including the newly confirmed launch
+integration issue. Main final focused selection278 passed27.84s; independent
+three-file155 passed23.82s; new-file67 passed12.46s; these overlap, not a
+unique summed suite. Main preregistration document/record/EXACT72 passed1.19s.
+Final source/test images match196.4. Three final source/test/controller images
+memory-compiled under native network/fork/all-write denial. Independent nine
+current/baseline comparisons confirm four v3, three SDK, original runner and
+pure selector unchanged; four v3 also equal exact historicalaa0d635d Git
+bytes. No complete lane/repository suite was requested or run.
+
+Technical progress: the new registered source-only verification candidate,
+its strict read-only receipt verifier and meaningful focused qualification
+are committed. The observing control preserves an actual native startup
+refusal before semantic execution. Definition of done196.2 is NOT met.
+Plain-language progress: the corrected metadata logic passed its fixtures,
+but macOS refused the planned safety-wrapper startup. It did not process the
+archives or produce a new accepted result. No old failure is called successful.
+
+**Required next decision:** authorize a separately scoped launcher/isolation
+redesign before another actual run. A potential design is a minimal trusted
+hash/control-only publisher outside the worker's single native sandbox,
+with the worker retaining proven network/fork/all-write denial and exact
+immutable interfaces. That would change the parent native-isolation boundary
+and must be explicitly approved/reviewed as such, not silently substituted
+under196. Another design must demonstrate equivalent controls. No owner
+decision, privileged helper, system configuration or weaker policy is inferred
+from the earlier general completion delegation. Do not start that redesign,
+reserve another namespace, retry this observer or invoke a selector meanwhile.
+
+### 197.5 Exact final handoff and unchanged exclusions
+
+The new outgoing range starts exclusively at
+`725b81ceb9e8584aa1bebdcceb66ae66cef82aaf`: implementation/preregistration
+`3c5734fd6316389912907c66b4456a5a5c96e9a9`, followed by this separate durable
+blocker/evidence handoff. There is no incoming review or independent Claude
+acceptance claimed. Code remains byte-exact to the actual startup attempt;
+this record is subsequent evidence, not part of the prior execution epoch.
+The entire outgoing diff is only the new front, its new tests and this lane
+record. Raw artifacts, local observer, journals and unfinished SDK drafts
+stay ignored/private. No new branch/worktree, history rewrite or concurrent
+overwrite; no shared/project-wide document, Action Plan or SESSION_HANDOFF
+change. The same monitor remains PAUSED, with no automatic rearm or message
+to another chat.
+
+Preserve frozen82-quarter2006Q1-2026Q2 window, six forms, strategy economics,
+both earnings diagnostics and causal/refusal accounting. StrictD23 keeps
+seven nonexact quarters/no82-quarter promotion digest. Frozenv1/scale/pilot,
+the four v3 source images and three SDK images remain unchanged. Stoppedv3
+stays1846 completed/1847 starts unresolved, without resume/rewrite or any
+completed/ambiguous redispatch. Current2022Q4-2023Q1 stays19846 source-bound
+of99394/79548 originally unattempted; no full-population substitution.
+Separate7373-byte diagnostic/report
+`206e6db9677fb169455f62357ce966384926080b6eba582094e9536e88d705b7`
+does not resolve the original unmatched start or establish authenticity/PIT/
+rights/readiness. Both final owner classifications remain distinct, without
+retroactive approval, exactly as195.6 records them.
+
+No new SEC/provider/credential/licensed-row access, purchase, QC upload/job/
+SDK invocation/strategy launch/backtest attempt, registered/outcome look,
+broker/operator-database/scheduler change, deployment/capital/funded/paper/
+live/order/trading action occurred. Source/input/identity/availability/rights/
+canonical/QC/look/backtest/execution readiness remains FALSE. Looks/jobs/
+backtests0/0/0. No next title/reference, source integration or broader milestone.
+Stop at this concrete blocker, validate the final record/compilation/diff/
+status and preserved bytes, and make the round's one documented final
+matching-lane push after no-advancement checks; independently verify its exact
+remote tip afterward. This is publication of qualified code plus failure
+evidence, NOT acceptance or completion of the requested actual verification.
+
+### 197.6 Final blocked-round validation and publication boundary
+
+Main final blocker-record, active-document, lane import boundary and EXACT
+Insider package selection passed123 in4.35s under process-tree native
+network/Keychain-exec denial with a fresh isolated database/test root and
+plugin/cache disabled. Final source, test and private observer hashes still
+equal the exact execution/qualification images in196-197; no source patch
+or actual retry followed the startup rejection. Diff check is clean.
+Read-only internal final handoff QA accepts the exact evidence, epoch,
+five-control interpretation, eight OPEN P2 scopes, historical exclusions
+and required next boundary decision without a wording correction. That is
+documentation QA, not independent Claude acceptance or operation success.
+
+Only the expected lane-record handoff is dirty above the existing3c5734fd
+implementation/preregistration commit. Repeat document/package checks after
+this entry, reverify exact designated root/branch/HEAD/status, fetch only
+the matching remote and stop on advancement before this separate handoff
+commit and the single final push. Confirm the exact remote tip and clean
+tree after publication; do not invent an already published future hash here.

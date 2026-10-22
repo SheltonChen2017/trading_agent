@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 from types import SimpleNamespace
+import subprocess
 import sys
 
 import pytest
@@ -576,3 +577,79 @@ def test_hash_coherent_receipt_tampering_still_refuses_semantic_or_custody_subst
         _verify(state, **arguments)
     assert all(stream.closed for stream in streams)
     assert len(captures) == 1 and captures[0].handles == [] and captures[0].chain.fds == []
+
+
+# Claude review section 201: in-memory mutants that each of the following
+# guards survived. Each test fails if its guard is removed.
+
+def test_parent_recomputes_executed_sources_and_binds_the_reported_selection_hash(supplied, monkeypatch):
+    # _registered_result stubs _source_context to echo the reported value, so
+    # the comparison itself needs a recomputation that differs.
+    context, body, _ = _registered_result(supplied, monkeypatch)
+    recomputed = copy.deepcopy(body["source_execution"])
+    recomputed["executed_source_inventory_sha256"] = "e" * 64
+    monkeypatch.setattr(module, "_source_context", lambda *_: copy.deepcopy(recomputed))
+    with pytest.raises(module.AffectedQuarterSelectorRunnerError, match="worker_executed_source_context_differs"):
+        module._validate_worker_result(body, audit_id=module.AUDIT_ID, context=context)
+    context, body, _ = _registered_result(supplied, monkeypatch)
+    body["selection_sha256"] = "e" * 64
+    with pytest.raises(module.AffectedQuarterSelectorRunnerError, match="worker_selection_bytes_binding_differs"):
+        module._validate_worker_result(body, audit_id=module.AUDIT_ID, context=context)
+
+
+def test_two_derivations_that_differ_refuse(monkeypatch):
+    results = iter([SimpleNamespace(canonical_bytes=lambda: b"first"),
+                    SimpleNamespace(canonical_bytes=lambda: b"second")])
+    monkeypatch.setattr(module.pure, "select_affected_quarters", lambda **_: next(results))
+    held = SimpleNamespace(source_arguments=dict, recheck=lambda: None)
+    with pytest.raises(module.AffectedQuarterSelectorRunnerError, match="independent_full_selector_rederivation_differs"):
+        module._derive_twice(held)
+
+
+def _worker_failure():
+    return {"disposition": module._DISPOSITION, "failure_phase": "worker_execution",
+            "failure_class": "ValueError", "os_errno": None}
+
+
+def test_child_result_requires_empty_stderr_and_canonical_framing():
+    canonical = module._raw(_worker_failure()) + b"\n"
+    with pytest.raises(module.ReportedSelectorWorkerError):
+        module._child_result(subprocess.CompletedProcess(["invented"], 2, canonical, b""), context={})
+    for stdout, stderr, code in ((canonical, b"x", "selector_child_refused_outputs_preserved"),
+            (json.dumps(_worker_failure(), indent=1).encode() + b"\n", b"", "strict_selector_child_framing_required")):
+        with pytest.raises(module.AffectedQuarterSelectorRunnerError) as caught:
+            module._child_result(subprocess.CompletedProcess(["invented"], 2, stdout, stderr), context={})
+        assert type(caught.value) is module.AffectedQuarterSelectorRunnerError and str(caught.value) == code
+
+
+def test_control_json_refuses_duplicate_keys():
+    # The hook's own duplicate code is re-labelled by the outer ValueError
+    # catch; the refusal itself is what this pins (IBSELECT-V2-OBS01).
+    with pytest.raises(module.AffectedQuarterSelectorRunnerError, match="malformed_control_json_refused"):
+        module._opaque_json(b'{"counts":1,"counts":2}')
+    assert module._opaque_json(b'{"counts":1}') == {"counts": "1"}
+
+
+def test_inside_write_that_succeeds_is_not_accepted_as_denial(tmp_path, monkeypatch):
+    monkeypatch.setattr(module.original, "_prove_worker_isolation", lambda *_: None)
+    with pytest.raises(module.AffectedQuarterSelectorRunnerError, match="effective_inside_write_denial_not_observed"):
+        module._prove_allwrite_denial(tmp_path)
+
+
+@pytest.mark.parametrize("kind", ["fixture_intake", "other_head"])
+def test_worker_refuses_fixture_intake_or_another_head_before_identity_or_inputs(supplied, monkeypatch, kind):
+    context, _, _ = _registered_result(supplied, monkeypatch)
+    context = {key: context[key] for key in ("identity", "frozen_sources", "intake_context",
+        "operation_registration", "operation_registration_sha256")}
+    head = context["identity"]["head"]
+    if kind == "fixture_intake":
+        context["intake_context"] = {**context["intake_context"], "fixture_only": True}
+    else:
+        head = "f" * 40 if head != "f" * 40 else "e" * 40
+    monkeypatch.setattr(module, "_prove_allwrite_denial", lambda *_: None)
+    monkeypatch.setattr(module.sys, "addaudithook", lambda *_: None)
+    monkeypatch.setattr(module.original.capture.bootstrap, "_required_identity", lambda *_: pytest.fail("identity reached"))
+    monkeypatch.setattr(module, "_HeldIntake", lambda: pytest.fail("input reader reached"))
+    with pytest.raises(module.AffectedQuarterSelectorRunnerError, match="strict_actual_worker_context_required"):
+        module._worker(module.AUDIT_ID, expected_head=head, context=context,
+                       executed_sources=[], bootstrap_source={})

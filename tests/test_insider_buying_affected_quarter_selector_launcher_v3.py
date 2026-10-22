@@ -777,3 +777,85 @@ print(json.dumps(proof,sort_keys=True,separators=(',',':')))
         "child_control": {"input_bytes": 19, "input_sha256": module._sha(b"invented-input-only")}}
     assert regular.read_bytes() == b"preserved-invented-regular-file"
     assert list(output.iterdir()) == []
+
+
+# Claude review section 201: in-memory mutants that each of the following
+# guards survived. Each test fails if its guard is removed.
+
+def test_child_transport_timeout_kills_the_whole_session_not_only_the_direct_child(tmp_path):
+    code = ("import subprocess,sys,time;"
+            "g=subprocess.Popen([sys.executable,'-I','-S','-B','-c','import time;time.sleep(30)']);"
+            "print(g.pid,flush=True);time.sleep(30)")
+    grandchild = None
+    try:
+        with pytest.raises(subprocess.TimeoutExpired) as caught:
+            module.run_child([sys.executable, "-I", "-S", "-B", "-c", code],
+                cwd=tmp_path, env={"PATH": "/usr/bin:/bin"}, timeout=2)
+        grandchild = int(caught.value.stdout.strip())
+        deadline = time.monotonic() + 5
+        while True:
+            try:
+                os.kill(grandchild, 0)
+            except ProcessLookupError:
+                break
+            assert time.monotonic() < deadline, "descendant survived the timeout kill"
+            time.sleep(0.05)
+    finally:
+        if grandchild is not None:
+            try:
+                os.kill(grandchild, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+
+
+def test_git_and_observer_admission_require_minimal_environment_and_the_lane_cwd(tmp_path):
+    guard = module.ParentAuditGuard("readback", head=HEAD)
+    command = ["/usr/bin/git", "rev-parse", "HEAD"]
+    guard("subprocess.Popen", (command[0], command, module.LANE_ROOT, {"PATH": "/usr/bin:/bin"}))
+    for environment in ({"PATH": "/usr/bin:/bin", "GIT_DIR": "/invented"}, None, {"PATH": "/invented"}):
+        with pytest.raises(PermissionError):
+            guard("subprocess.Popen", (command[0], command, module.LANE_ROOT, environment))
+    role = module._role_command("semantic", HEAD, tmp_path / "unused")
+    observer = module.ParentAuditGuard("observer", head=HEAD, commands=[role])
+    with pytest.raises(PermissionError):
+        observer("subprocess.Popen", (sys.executable, role, tmp_path, ENV))
+    observer("subprocess.Popen", (sys.executable, role, module.LANE_ROOT, ENV))
+
+
+def test_consumed_semantic_namespace_refuses_before_the_observer_scope_is_spent(tmp_path, monkeypatch):
+    root, state, _ = _orchestration(tmp_path, monkeypatch)
+    root.joinpath(*module.SEMANTIC_PARTS, module.SEMANTIC_ID).mkdir(parents=True, mode=0o700)
+    with pytest.raises(module.TrustedSelectorLauncherError, match="semantic_namespace_already_consumed"):
+        module.main(["--audit-id", module.AUDIT_ID, "--expected-head", HEAD])
+    assert state["roles"] == ["preflight"]
+    assert not root.joinpath(*module.OUTPUT_PARTS).exists()
+
+
+def test_launcher_journal_hold_settles_only_ctime_and_still_rehashes_content(tmp_path, monkeypatch):
+    root = tmp_path / "invented-journal"
+    root.mkdir(mode=0o700)
+    pins = {}
+    for name in ("reservation.json", "terminal.json"):
+        raw = module._raw({"invented": name})
+        (root / name).write_bytes(raw)
+        (root / name).chmod(0o600)
+        pins[name] = module._sha(raw)
+    journal = front.original.capture.custody._Directory(root)
+    real, drifted = front.held_io._hash_stream, []
+    def drifting(stream, cap):
+        # A ctime-only metadata transition on the first leaf, already held.
+        if not drifted:
+            before = (root / "reservation.json").stat()
+            (root / "reservation.json").chmod(0o600)
+            after = (root / "reservation.json").stat()
+            assert before.st_ctime_ns != after.st_ctime_ns and before.st_mtime_ns == after.st_mtime_ns
+            drifted.append(True)
+        return real(stream, cap)
+    monkeypatch.setattr(front.held_io, "_hash_stream", drifting)
+    try:
+        module._verify_journal(front, journal, pins)
+        assert drifted == [True]
+        with pytest.raises(ValueError):
+            module._verify_journal(front, journal, {**pins, "terminal.json": "0" * 64})
+    finally:
+        journal.close()

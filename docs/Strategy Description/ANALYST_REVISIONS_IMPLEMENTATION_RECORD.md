@@ -610,7 +610,12 @@ next completed push, counter-review and one final push only, explicitly
 excluding the next milestone. Section302 counter-reviews the two section301
 commits, corrects test-only gaps and qualifies the review evidence. The
 monitor is to be paused immediately after that single verified final push;
-the six/eight lifecycle remains uninvoked and is not authorized by this round.
+the six/eight lifecycle remained uninvoked in that round. On October 21 the
+owner approved the recommended bounded launch-readiness successor (section
+303). This resumes implementation, not the spent storage publication or an
+unreviewed QC launch. The monitor remains paused. Independent review,
+counter-review and a separately committed exact execution decision precede
+the first six/eight backtest.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1678,12 +1683,15 @@ Section 301 is Claude's independent review of the exact pushed range
 `38e2b97a..9837049f` (sections 292-300). Section302 counter-reviews its two
 completed pushed commits. The owner's later explicit monitor direction limits
 this round to counter-review, documentation and one final push, with no next
-milestone. The immediate next step is the section 302 final handoff and
-monitor pause; Claude should review section 302's test corrections if the
-owner resumes the review loop. No Claude session/message is started here.
-The earlier continuation instructions above are deferred, not a current
-run freeze: resolve the carried lifecycle/transport qualifications and commit
-an exact later decision before any capacity or strategy operation.
+milestone. That round concluded at `68bdff2f` and the monitor was paused.
+The owner subsequently approved the October 21 launch-readiness recommendation.
+Section 303 implements the separately versioned successor; Claude should
+review its exact final pushed snapshot together with the section 302 test
+corrections before Codex counter-review and a later exact execution decision.
+No Claude session/message is started here. The earlier V4 continuation
+instructions above are deferred, not a current run freeze: do not call the
+legacy lifecycle, renew D15, or observe capacity before the successor's
+applicable review and run-freeze gates pass.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -3618,6 +3626,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-14 | Owner-resumed V4 storage correction and successful publication checkpoint | `c866592f` -> `bcc17ec3` and this final section300 result/handoff commit (two commits) | No new Claude review; scoped current owner waiver, not independent acceptance | Completed V4 exact-key grammar and dependency bindings; sole D15 exits0 with24dispatches, six sets and six exact readbacks, activation last; matching admission returned; no backtest launch | Root430 distinct focused passes12.54s, seven memory compiles,63selected pins; omission checks and limitations in300.2; document repeats not additive; no full suite | ARV2D299-005 and ARV2D300-001 corrected prospectively; ARV2E297-014's current storage barrier resolved, original cause still unknown;314/239/50/699 unchanged | Owner's next-checkpoint instruction: one final matching-lane push now; next separately freeze A1 continuation with actualexit/admission before capacity and six/eight runs; monitor PAUSED |
 | 2026-10-14 | Claude independent review of sections 292-300: Massive and provider diagnostics, October inputs, the six/eight family and the QC storage recovery | `9837049f` -> the test correction and this record commit | Section 301: twenty-nine Codex commits `38e2b97a..9837049f` disposed (13 accepted, 16 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells; no capture, diagnostic, upload, recovery or lifecycle command run | Test-only correction: a harness-independent dispatch-fence closure check replaces 27 assertions in 26 files (`ARV2R301-010`), tripwires in three files (`-002`) and six isolating tests (`-009`); no production code changed. Twenty-one code pins and the one-use report and claim pins reproduce; private modes and record hygiene checked; one P2 and nine P3s (`ARV2R301-001` to `-010`); accepted `ARV2CR292-001` to `-004`; section 4 names section 301, banner sentence added, this row appended | The 38 new and changed test files under both the standard invocation and `--noconftest`, and the record gates, under a sandbox that also refuses `/usr/bin/security` and artifact writes, with in-root temporary paths; `compileall`, artifact and status integrity, `git diff --check`; the complete lane suite was stopped unfinished at the owner's direction; exact counts in 301.6 | 0 P0, 0 P1, 1 P2, 9 P3 | Single push of this round's two Claude commits; Codex counter-reviews section 301 unless the owner changes the workflow |
 | 2026-10-14 | Owner-limited counter-review of Claude301, no next milestone | `fda3c81f` -> `a49ce9fa` and this section302 handoff commit (two commits) | Exact incoming `9837049f..fda3c81f`: both Claude commits accepted after correction/qualification; every301finding disposed in302.2 | Test-only closure/runtime and direct-directory tripwire corrections, remaining guard coverage; no operational source, economics, private evidence or registry mutation | Root3189distinct passes/2known nested-sandbox cases deselected/72.20s; seven memory compiles; overlapping author/red/mutation evidence and final record repeat in302.4–302.5; no full suite | Two new P2 test defects corrected; documentary qualifications retained; old operational/source gates and314/239/50/699 unchanged | Exactly one final matching-lane push, then pause monitor and stop; no successor, run freeze, capacity or six/eight backtest this round |
+| 2026-10-21 | Owner-approved bounded QC launch-readiness successor | `68bdff2f` -> `86bd51dc` and this section303 final handoff commit (two commits) | No new Claude range; same-round advice is not independent review | Additive V5 one-session admission-bound A1 lifecycle, exact exclusive operation batches and ambiguity stops, cooperative lock, fixed environment/logging/client boundaries and selected source pins; frozen economics/storage unchanged | Root665 distinct focused passes66.88s; six memory compiles;66 selected bindings verified; overlapping author/mutation/smoke and final caller/record checks in303.5–303.6; no full suite | Five P2 and one P3 pre-use implementation findings corrected; historical gates retained; zero operational calls/attempts/results,314/239/50/699 unchanged | One final matching-lane push for independent review, then counter-review and separately committed exact execution decision; monitor remains PAUSED; no backtest or storage replay this round |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -50239,3 +50248,296 @@ may be replayed; no automatic backtest or request to another agent follows
 this handoff. This round performs zero QC/provider/browser calls, adds no
 attempt or result cell, and makes no efficacy, broker, funded, real-order,
 paper or live claim.
+
+## 303. Owner-approved launch-readiness successor, 2026-10-21
+
+### 303.1 Scope, baseline and execution boundary
+
+After the section 302 review-only round concluded, the owner asked for the
+next recommended step. Codex recommended one bounded QC launch-readiness
+milestone addressing interrupted requests, admission-bound execution,
+logging/environment and selected dependencies, followed by independent
+review, an exact execution decision and the frozen six/eight comparison.
+The owner replied **"ok, proceed"**. This is the authority for this additive
+implementation round; it is not a new pre-use independent-review waiver.
+
+The starting local HEAD and live matching remote are
+`68bdff2f351fa1035ea6afdd781b52fc5deb1b98`, with a clean worktree. There is no
+new Claude range to counter-review. Every repository action uses only
+`/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2` on
+`codex/strategy-analyst-revisions-v2`. Shared files, other lanes, the frozen
+strategy economics and all exercised sources remain unchanged. Section
+255.2 supplies bounded technical judgment, not renewal of a spent protocol.
+
+D15's actual exit 0 and exact authenticated admission in 300.4 remain the
+prospective input to a later approved consumer, not a reason to rerun the
+upload or inspect its old controls now. No private artifact, credential,
+provider or QC operation is part of this implementation round. No capacity,
+project, compile, launch, status or result call occurs. The six matched cells
+R298–R303 remain unbegun; the booked floor stays **314 shared / 239 development
+/ 50 infrastructure / 699 cells**. This is not a new source acquisition,
+strategy choice, parameter search, evidence epoch or portfolio evaluation.
+
+The successor is uninvoked and must be independently reviewed, then
+counter-reviewed, before a separately committed exact one-shot execution
+decision binds the actual admission, source/profile/HEAD and result/exit
+handling. A matching persisted result alone never proves actual process
+exit 0. No authorization boolean, automatic retry, fallback role, marker
+repair, reset, cleanup or replacement attempt is introduced. The original
+three-attempt/Mia recovery rule remains; the current successor exposes A1
+only, not A2/A3 or revival of exhausted R247/R281.
+
+The one final matching-lane push will hand off the complete implementation
+and this record together. The existing monitor remains paused; no automatic
+rearming or message to Claude/another chat follows. Same-round advisers are
+not independent reviewers.
+
+### 303.2 Separately versioned continuation and environment contract
+
+The new files are `scripts/arv2_newrule_recovery_continuation_v5.py`,
+`scripts/arv2_newrule_execution_environment.py` and
+`scripts/run_arv2_newrule_recovery_continuation_v5.py`, with three corresponding
+focused test modules. They do not replace or edit the frozen V4 modules or
+the original submission, transport, input, evaluator or strategy sources.
+
+The V5 dispatcher exposes only capacity, begin, compile, launch, status, read
+and local summary. All candidate operations require A1, and beginning a later
+candidate requires the preceding candidates' validated completed results in
+the fixed R298–R303 order. It never delegates a legacy public lifecycle method
+that would open a second family session. Admission authentication, action and
+postchecks share one held directory session. A nonblocking advisory lock on
+that held directory serializes cooperating V5 actions before credential
+construction; it is not a global QC lock or enforcement against another
+program that ignores it. Other lanes and legacy entry points remain untouched
+and are not authorized by this successor.
+
+Each remote-capable action exclusively claims a named V5 batch before its
+first request. Its claim fixes the finite allowed output names; completion
+binds the exact outputs and result digest. Subsequent actions authenticate
+every completed batch and refuse incomplete, altered, orphaned or mixed
+legacy lifecycle evidence before credentials. A request exception, malformed
+response, interrupted write or failed postcheck leaves evidence and blocks
+automatic continuation. No terminal status is invented, and earlier remote
+effects are not assumed absent. A failed begin can have created a project;
+a failed launch can have submitted a backtest. These states require an
+independently admissible diagnostic/recovery decision, not another invocation.
+
+The original bounded polling intervals and limits remain. A fully completed
+capacity-only observation may return `state=wait` and be followed by another
+authorized observation after the original interval. Busy begin does not write
+an attempt claim; busy launch retains its already-booked attempt without
+another launch or look. A duplicate create/read intent or completed launch
+refuses before further contact. Successful completion files are still not
+proof of a successful actual caller exit: the external execution record must
+establish exit 0 and matching bounded output before any next action.
+
+The new environment boundary permits only a specified minimal environment,
+with in-root temporary/cache paths and the two existing QC credential variable
+names. It does not print, inspect separately, copy into a record or acquire
+new credentials. Key-log/debug/proxy and unrelated inherited environment
+configuration is refused rather than silently stripped. Darwin's native-added
+`__CF_USER_TEXT_ENCODING` is allowed only as a bounded numeric descriptor.
+Environment and selected-source checks precede credential acquisition. The
+exact frozen client/base/timeout and bounded transport are checked after
+client construction and again before each request; this is not a claim that
+the instantiated client is inspected before it exists. Git subprocesses
+receive no QC credential variables. No HTTP response body, credential or
+licensed-row logging is introduced.
+
+Library imports and dispatch never configure logging. Only the explicit V5
+CLI, in its dedicated process, can install one exact standard-library
+`NullHandler` on an untouched default root logger. Existing owner handlers,
+filters or custom logging routes are refused, not removed or reconfigured.
+The guard verifies no-output routing across all log levels, including
+ERROR/CRITICAL and `lastResort`; raising a level above WARNING is not treated
+as sufficient. This is process-local prevention of accidental transport
+disclosure, not disabling a machine audit/security facility or claiming
+whole-interpreter integrity.
+
+The caller binds the exact D15 admission SHA from 300.4, original family and
+package, clean designated host/branch/HEAD, its own source bytes and selected
+dependency pins before private input or contact. Calendar and evaluator bytes
+are explicitly bound for this new consumer. That prospective binding does
+not repair the historical D5 runtime-provenance omission or change its old
+package/lineage pins. All earlier selected source pins remain unchanged.
+
+Future invocation remains restricted to the designated Darwin/POSIX Python
+3.13 host. Parent deadlines include bootstrap, preflight and the action, but
+cannot bound uninterruptible I/O or host suspension. The candidate provides
+no new compile/run attempt, result acceptance, storage retry, independent
+source admission, formal PIT claim, readiness flag or paper/live authority.
+An exact future execution decision must also prescribe native network denial
+for local summary, minimal environment construction without secret output,
+actual exit/envelope handling and product waits when capacity is occupied.
+
+### 303.3 Pre-use implementation findings and corrections
+
+These are author/root/same-round advisory findings in an uninvoked candidate,
+not a new Claude review or independent acceptance. No P0/P1 issue was
+established in this implementation. Each item below is prospectively
+corrected; historical findings, failures and qualifications remain recorded.
+
+| ID | Priority/status | Evidence and correction |
+| --- | --- | --- |
+| ARV2I303-001 | P2 / corrected before use | Initial caller/helper integration retained legacy retry keywords that the new A1 dispatcher does not accept; finite error handling also depended on an absent helper interface. The caller now passes only the two supported bindings, uses a finite helper error alias/inventory, handles partially imported modules without rendering opaque exceptions, and safely rejects malformed operation arguments. Composition and failure tests cover these paths. |
+| ARV2I303-002 | P2 / corrected before use | Initial environment checks followed Git subprocesses, and those subprocesses could inherit QC variables. Source-bound minimal-environment validation now precedes Git; its child environment omits both QC credential variables. Private input and client construction remain later guarded stages. |
+| ARV2I303-003 | P2 / corrected before use | A custom log-record factory could act before a null handler; logger thresholds did not prove absence of high-level fallback output. The guard requires the standard factory/manager, exact non-emitting handlers and safe ancestry, rejects custom routes before bootstrap, and tests ERROR/CRITICAL/arbitrarily higher levels. Existing owner configuration is not overwritten. |
+| ARV2I303-004 | P2 / corrected before use | Separate bootstrap/run deadline construction could restart the bounded budget. The CLI now supplies the same deadline to bootstrap and execution; deadline failures remain finite non-success output. |
+| ARV2I303-005 | P2 / corrected before use | Early completion inventories allowed subsets, and per-operation claims alone did not serialize different operations. V5 now checks exact outcome-specific output sets and paired request markers, holds a nonblocking cooperative directory lock, rejects duplicate launches before contact, validates terminal/compile identity, and rechecks prior V5 evidence before completion. Incomplete or changed evidence cannot authorize the next action. |
+| ARV2I303-006 | P3 / corrected before use | A fresh native Darwin process adds a non-secret encoding descriptor even with a minimal environment. The initial clean-process smoke refused it. The new allowlist admits only the bounded numeric `__CF_USER_TEXT_ENCODING` grammar; arbitrary values and unrelated environment names still refuse. This is not a proxy, loader, debug or key-log exception. |
+
+The new consumer addresses the prospective lifecycle, environment and selected
+dependency requirements retained from 302.2. It does not retroactively cure
+the old D5 provenance omission, establish the original D7 failure cause or
+convert D15 storage publication into strategy acceptance. Exact immutable
+history/security-master/PIT, source-admission and paper/live gates remain
+unchanged. Cooperative locking and scoped held/named checks are not a
+same-user sandbox or continuous integrity proof. Actual process exit remains
+an externally observed requirement even if a completion marker exists.
+
+### 303.4 Exact prospective source and profile bindings
+
+These are new implementation bindings, not authority to invoke the candidate.
+Only the two new-module placeholders in the new caller were replaced after
+their authors froze the files; no old source or evidence pin was refreshed.
+
+| New file | SHA256 |
+| --- | --- |
+| `scripts/arv2_newrule_execution_environment.py` | `bacf030e82b309111d8e7788991880860620f6d876bbd750246345c95d7c3194` |
+| `scripts/arv2_newrule_recovery_continuation_v5.py` | `aea96da3bd9bb193341901609bbf525ece96f682e86606ed354deb5382a4803c` |
+| `scripts/run_arv2_newrule_recovery_continuation_v5.py` | `8336290f51d42e308b20e25f7562fb3741fb6b93016a6185254ac75b45a04d26` |
+| `tests/analyst_revisions_v2/test_newrule_execution_environment.py` | `34d6c6f138b3c5ccb447ca077d06a42b80435aca3b929596b251fb03363a598b` |
+| `tests/analyst_revisions_v2/test_newrule_recovery_continuation_v5.py` | `cf4ba75e47a7436be0c38b796a0e1cb2eea33e037fa404f6bf1e3456976799c7` |
+| `tests/analyst_revisions_v2/test_newrule_recovery_continuation_operation_v5.py` | `3f85d4682dcd3c11652a3c75edaf89a36f4cf0d78df287b64dfcda77cb032555` |
+
+Canonical caller profile `arv2-newrule-recovery-continuation-operation-v5`
+SHA256 is
+`9a50425d2a9ad431eea2c8d29918fff67898fe8eb3157b55ed91b1616740168d`.
+Canonical lifecycle profile `arv2-newrule-recovery-continuation-v5` SHA256 is
+`6010aed3bcdc6c97acc65e2afb52aef85c2bdbe552cd0c400f6fccf4bedfef4b`.
+
+The original caller's 51 dependency pins, 15 new-map entries (one overlapping
+original evaluator pin) and the frozen original caller itself yield **66
+distinct selected source bindings**, excluding the externally bound new
+caller. Root verified every current source hash and the overlap's equality;
+no placeholder remains. This is selected-source authentication, not an
+interpreter, standard-library, native-library or machine integrity claim.
+
+The explicit calendar pin is
+`174a032efce4082b8661eabe84b0cf6094048e937722bdf1659c8cb6c7decb89`;
+the retained evaluator pin is
+`2fb9bc8a8f74e37b57acb97f4d20b5820be04b9ee470fc2f34b3a8ea2c804910`.
+The caller fixes family
+`8b8ee913dcfb5ad37f4748ea70db4fcbd6ff15580e52cd160bccf2b37e10a9e5`
+and D15 admission
+`1a6850a8fbefeeab8dea2fead19b3b5f656ca29987da9ef180be1e7cc59322a3`.
+These constants were checked against frozen source/record declarations only;
+no private package or D15 control was reread for this implementation.
+
+### 303.5 Focused validation and retained limitations
+
+Root's combined final selection passed **665 distinct tests in 66.88 s**, with
+no failures, skips or warnings. Selection: the three new V5 test modules;
+frozen submission and both V4 continuation/caller regression modules; lane
+record and active-document checks; and the single research transitive-import
+closure check. This is a focused integration/regression selection, not the
+complete Analyst lane or repository suite. The new modules account for 317
+tests; earlier author subsets overlap this total and are not additive.
+
+Every pytest/mutation run used native `sandbox-exec` network denial, denied
+production `artifacts` reads/writes and `/usr/bin/security` execution, disabled
+plugin autoload, `--noconftest`, `-B`, no cache provider and in-root temporary,
+cache and bytecode-cache paths. No shared `tests/conftest.py` was loaded.
+The fixtures use synthetic data, credentials, transports and temporary family
+directories; lifecycle tests guard direct production-directory constructors
+and credential/client boundaries with teardown-checked tripwires. Native
+denial is not measured provider-contact accounting. The six-cell fixture is
+not six real QC runs, real source validation or performance evidence.
+
+Root compiled all six new source/test files in memory without bytecode and
+verified the 66 selected bindings plus the new file/profile hashes in 303.4
+under the same native network/private-artifact/Keychain denial. That import
+probe asserted `assistant.dispatch_fence` absent. No operational entry point,
+private artifact parser, credential loader or capacity/provider call ran.
+
+Author evidence and non-additive qualifications:
+
+- Lifecycle final: **121 passed in 33.80 s**. Earlier 94/25.87 s and
+  114/28.44 s selections overlap. Three memory-only, `finally`-restored guard
+  omissions each produced one expected failure: admission-before-credentials
+  (1.20 s), candidate ordering (0.22 s), cooperative lock (0.21 s). No
+  unexpected lifecycle author failure was reported. Lock contention was
+  exercised on Darwin; unsupported native-lock environments refuse before
+  the private session rather than pretending to serialize.
+- Caller/environment final: **196 passed in 3.65 s**. Earlier 192/3.28 s and
+  195/3.58 s overlap. Early fixture work mistakenly patched global logging
+  state, causing a pytest logging-plugin cascade with no completed summary;
+  the final fixture uses a private logging facade. Subsequent author runs
+  retained 67 passes/one wrong credential-class fixture failure and 85
+  passes/one overlapping evaluator-pin fixture failure; both fixture errors
+  were corrected. They are not production failures or extra passing tests.
+- Five corrected memory-only, `finally`-restored omissions each yielded one
+  expected failure: no-output guard (0.15 s), request recheck (0.04 s),
+  environment before Git (0.09 s), shared deadline (0.05 s), record factory
+  (0.05 s). The initial mutation harness was invalid after its first case:
+  copied globals/missing class-name mangling caused irrelevant failures in
+  cases 2–4 and a false pass in case 5. The corrected live-global harness
+  reran all five; invalid results are not credited as mutation sensitivity.
+- A real fresh-process smoke imported the actual caller/lifecycle and
+  exercised only default logging bootstrap/repeated guard plus synthetic
+  ERROR, CRITICAL and level-1,000,000 logs. It passed with no emitted log
+  output under outer native network/artifact/Keychain denial and a minimal
+  environment, without credentials, `main`, `run` or `_operation`. Its first
+  refusal of Darwin's numeric encoding descriptor is retained in
+  ARV2I303-006. This smoke proves neither a real QC response nor operational
+  readiness; it is not independent review.
+
+Same-round advisory static review found no remaining functional blocker in
+the reviewed candidate after these corrections, but is not Claude acceptance.
+No historical failed/spent output was traversed, operational gate tested by
+contact, native policy weakened, evidence cleaned up, shared source edited,
+licensed row disclosed or strategy economics changed. No look, attempt,
+result cell, efficacy claim or readiness/paper flag changed.
+
+### 303.6 Commit disposition and handoff
+
+This is one owner-approved additive implementation round starting at
+`68bdff2f351fa1035ea6afdd781b52fc5deb1b98`, not a new counter-review of an
+incoming Claude range. Implementation commit
+`86bd51dc09680ad711da6dc46daeaa8a27cdf32b` contains only the six new Python
+source/test files and is handed off for independent review, not self-accepted.
+The final handoff commit contains this lane record and removal of one extra
+terminal blank line from the new caller. Staged whitespace checking reported
+that extra line; no functional change was made. The 665-test run preceded
+this whitespace-only correction. Its original caller hash was
+`4cac7ac32cc3b20298b7ced8897bcf937ddf7e9c402563b701cdf68c9435e977`;
+the final prospective caller hash is the one in 303.4. Caller/profile logic
+and all dependency pins are unchanged. Final focused caller/record checks
+and diff hygiene are recorded below before the single matching-lane push.
+
+After the whitespace-only correction, root's final caller/record selection
+passed **195 tests in 4.88 s** (109 caller plus 86 record/document tests),
+without failures, skips or warnings. These overlap the 665-test selection
+and are not additive. That process asserted `assistant.dispatch_fence`
+absent after pytest and compiled the final caller in memory. Full-round
+`git diff --check` passed after the correction. The final changed-file set
+is exactly the six additive Python files and this lane record; no frozen
+operational, strategy, shared or other-lane file changed.
+
+Claude should independently review the exact final pushed section 303
+snapshot, including the section 302 test corrections and the new contracts.
+Codex then counter-reviews every new Claude commit. Only after acceptance and
+all technical gates pass may a separate exact prospective execution decision
+bind the reviewed source/profile/clean HEAD, D15 actual exit/admission,
+minimal environment, first operation, deadlines, actual exit/finite output
+handling, poll budgets and accountable look/cell updates. A persisted
+completion marker is never sufficient by itself. No A2/A3 continuation,
+source refresh or changed strategy parameter is implied.
+
+At this checkpoint the implementation remains **UNREVIEWED and UNINVOKED**,
+the six/eight cells remain unbegun, and the monitor remains **PAUSED**.
+No new Claude session/message or next operational milestone follows this
+push. The floor remains **314 shared / 239 development / 50 infrastructure /
+699 cells**; formal source/PIT/security-master and financial boundaries stay
+unchanged. The next required input is independent review of this exact
+snapshot, not another routine vendor acknowledgment or renewed storage call.

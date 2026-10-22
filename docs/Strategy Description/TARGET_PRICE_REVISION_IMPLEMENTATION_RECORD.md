@@ -23708,3 +23708,35 @@ The five delegate guard mutants are attributed, not root native proof.
 Exact final cell depends on actual creation metadata and will be frozen
 only AFTER independent empty-notebook verification, BEFORE execution. No
 synthetic1/2hash capsule or example cell is real provenance or effect authority.
+
+### 93.20 Fresh Mac-lock blocker; metadata-only comparison remains safe
+
+Create-only successor002 at580d8511 created access1195/
+3150e9ece3804fcedd7b89026d3e8f0bc798217b14257d98da1cee593ef57c34,
+expiry01:21:10.445846UTC, same exact public create prompt48d47894... .
+The FIRST attempted CUA call reported: Mac locked, automatic unlock could
+not unlock it; manual owner unlock required. This is a NEW observed lock,
+not the stale historical Mac-unavailable assumption rejected in earlier
+sections. ZERO successful UI reads/inputs/new chats/messages/notebook
+creations/executions or jobs in this scope. Root asked for manual unlock;
+no password, security bypass, repeated automatic-unlock or unrelated-window
+action. Close the current scope/owned lock before commits; no silent reuse
+of its spent identity. Its exact closed receipt is recorded after exit.
+No empty notebook or actual capsule/cell/native witness is invented.
+
+The only remaining safe work before a blocked handoff is bounded local/
+metadata verification. Root read the complete comparator278lines/tests258
+and the final small status-type/production-seam/budget test deltas. Delegate
+reports74passing0.69seconds after the first66green; root independently
+reproduced the earlier66passing0.63seconds. Final root validation follows.
+Comparator SHA80c2018c9adea922b9bc3bf2437cdf882debd7b338c8a62d76075db8954ae90f;
+test SHAe846d7a522d86ec344846285dcc9004078c36ba5c5dc370c207d2e6a87c422df.
+Its four production-seam negatives now run within a valid synthetic clock
+window, independently rejecting injected guard/clock/monotonic/root; no old
+outside-window false-positive is claimed as sensitivity. Self source closure,
+fixed004/005metadata descriptors and FD/mode/hash checks precede2reads/
+16106bytes; no source archive/credentials/provider/API/actual operator stop/db.
+Any failure is retained body-free, no automatic retry, metrics/ON/native
+acceptance false. D134 authorizes only its one fresh scoped execution after
+commit, not a renewed old capture. The authenticated-browser blocker does
+not prohibit this already-authorized metadata-only local check.

@@ -23336,3 +23336,24 @@ blind global Return. If completion cannot be verified, retain uncertainty,
 do not send again. This is the first deliberate submission, not a resend of
 an accepted task. All D123 source-only constraints and post-source all-file
 verification still apply. No fourth Codex OFF, new strategy look or ON here.
+
+Source-only submission successor002 REFUSED BEFORE SEND: fresh own-route
+check found Safari on an unrelated page, so no input, message, mode edit,
+source edit, compile/job or new chat followed. Only surface metadata classified,
+no unrelated body inspected. Result676/
+8e144bf453f1ff901b67150e757f4db8b7b2cdca88bc2dad83fd94cc0229746d;
+controller exited and lock released. Root asked for a brief own-QC control
+window and waited, honoring the owner's other-lane contention direction.
+Owner now says "i've told other lanes to stop using qc for now. you can
+proceed". This is trusted renewed own-QC availability direction, not proof
+of a source repair, permission to touch unrelated pages or a changed mode.
+
+TPR-EXT26-D126: fresh submission successor
+MIA-FROZEN-GUARDS-SOURCEONLY-20261022-003 may complete that same FIRST send
+of original nonce001, same exact prompt/fresh003 source identities and D125
+source-only limits. <=12AX/4cropped-control images/8own-route inputs/600seconds;
+allow selection of the previously created dedicated own-QC Safari tab by
+current tab metadata and its verified37650980 route. Do not overwrite another
+page, assume a generic QC tab is this project, cancel others or blindly send.
+If existing draft/route cannot be bound, refuse. No new chat/mode/compile/job
+or data effect; preserve the two spent predecessors and no duplicate message.

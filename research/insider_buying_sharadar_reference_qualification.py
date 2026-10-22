@@ -27,7 +27,7 @@ import subprocess
 from types import MappingProxyType
 from typing import Callable
 from urllib import error, request
-from urllib.parse import unquote
+from urllib.parse import unquote, unquote_plus
 
 from research.insider_buying_eodhd_earnings_demo import EodhdDemoError, FALSE_FLAGS, _git, _read_leaf, _sha
 from research.insider_buying_keychain_credentials import KeychainCredential, KeychainCredentialError, read_keychain_credential
@@ -70,6 +70,7 @@ _KEYCHAIN_CODES = frozenset({
 })
 _UTC = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|\+00:00)\Z")
 _SIZE_LABEL = re.compile(r"[0-9]{1,20}(?:\.[0-9]{1,2})? (?:B|KB|MB|GB|TB)\Z")
+MAX_CREDENTIAL_DECODE_STEPS = 8
 
 
 class SharadarReferenceQualificationError(ValueError):
@@ -196,8 +197,20 @@ def _screen_credential(raw: bytes, body: dict, credential: KeychainCredential) -
     while pending:
         value = pending.pop()
         if type(value) is str:
-            _require(credential.value not in value and credential.value not in unquote(value),
-                     "credential_echo_refused")
+            # Claude review section 201: one unquote pass let nested encodings
+            # through. Same bounded two-track screen as the Benzinga capture:
+            # the plain track keeps a literal '+' in the key, the plus track
+            # decodes form-encoded spaces, and an encoding still changing at
+            # the bound refuses the body rather than passing it.
+            plain = plus = value
+            for step in range(MAX_CREDENTIAL_DECODE_STEPS + 1):
+                _require(credential.value not in plain and credential.value not in plus,
+                         "credential_echo_refused")
+                decoded_plain, decoded_plus = unquote(plain), unquote_plus(plus)
+                if decoded_plain == plain and decoded_plus == plus:
+                    break
+                _require(step < MAX_CREDENTIAL_DECODE_STEPS, "credential_echo_refused")
+                plain, plus = decoded_plain, decoded_plus
         elif type(value) is dict:
             pending.extend(value.keys())
             pending.extend(value.values())

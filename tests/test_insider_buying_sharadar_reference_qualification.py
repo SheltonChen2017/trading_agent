@@ -154,6 +154,45 @@ def test_credential_echo_is_refused_before_any_successful_body_hash(table, style
     assert TOKEN not in json.dumps(receipt)
 
 
+def _percent(text, layers):
+    for _ in range(layers):
+        text = "".join("%" + format(ord(c), "02x") for c in text)
+    return text
+
+
+@pytest.mark.parametrize("table", ["tickers", "actions"])
+@pytest.mark.parametrize("layers,place", [(2, "value"), (3, "nested-key"), (8, "value")])
+def test_nested_percent_encoded_echo_is_labelled_an_echo_not_a_schema_error(table, layers, place):
+    # Claude review section 201 (IBSHAR-CR02): one unquote pass let a twice-
+    # encoded echo fall through to the schema check, which hid that the
+    # provider had reflected the key. The body is refused either way.
+    body = json.loads(encode(TICKERS if table == "tickers" else ACTIONS))
+    if place == "value":
+        body["ignored"] = _percent(TOKEN, layers)
+    else:
+        body["ignored"] = {"nested": [{_percent(TOKEN, layers): 1}]}
+    receipt, projection = m._receipt(table, response(table, raw=encode(body)), credential())
+    assert projection is None and receipt["disposition"] == "credential_echo_refused"
+    assert receipt["body_sha256"] is receipt["body_size_bytes"] is None
+
+
+def test_echo_screen_keeps_a_plus_aware_track_and_refuses_unresolved_encodings():
+    # Only the plus-aware track decodes a form-encoded space.
+    spaced = m.KeychainCredential("sharadar", "invented sharadar key", True)
+    for value in ("invented+sharadar+key", _percent("invented+sharadar+key", 2)):
+        with pytest.raises(m.SharadarReferenceQualificationError, match="credential_echo_refused"):
+            m._screen_credential(b"{}", {"v": value}, spaced)
+    # Only the plain track keeps a literal '+' that the key itself contains.
+    plus_key = m.KeychainCredential("sharadar", "invented+sharadar+key", True)
+    with pytest.raises(m.SharadarReferenceQualificationError, match="credential_echo_refused"):
+        m._screen_credential(b"{}", {"v": "invented+sharadar%2Bkey"}, plus_key)
+    unresolved = _percent("unrelated", m.MAX_CREDENTIAL_DECODE_STEPS + 1)
+    with pytest.raises(m.SharadarReferenceQualificationError, match="credential_echo_refused"):
+        m._screen_credential(b"{}", {"v": unresolved}, credential())
+    stable = {"v": "unrelated%20text", "w": ["plain"]}
+    assert m._screen_credential(encode(stable), stable, credential()) is None
+
+
 @pytest.mark.parametrize("field,bad", [("table", "actions"), ("table", True), ("name", "evil.csv.zip"),
     ("size", True), ("size", -1), ("size", 2**63), ("size", "1"), ("size", 1.5),
     ("sizeLabel", "secret"), ("sizeLabel", 123), ("modified", "2026-10-13"),

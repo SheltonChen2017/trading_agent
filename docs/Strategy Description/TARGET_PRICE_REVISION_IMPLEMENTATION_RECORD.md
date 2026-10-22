@@ -7,7 +7,7 @@ only after a valid baseline. Section93 is the active continuation; the last
 published status below is retained as history. No source, launch, attempt,
 receipt, economics, canonical or native-accounting gate is waived.
 
-Status: **OWNER-SKIPPED OFF SOURCE/RESULT VERIFICATION IN SECTION93; NOT
+Status: **SECTION93 ENDS BLOCKED ON A FRESHLY OBSERVED MAC LOCK; NOT
 BACKTESTING-READY, PERFORMANCE OR CANONICAL ACCEPTANCE.** The last completed
 counter-review is section92, `1bc751f8..557b2250`, accepted after correction
 of evidence support, tests and record qualifications, not native acceptance.
@@ -27,8 +27,10 @@ F017/F018/F019 and CR23-001 remain OPEN; full-window OFF accounting remains unpr
 No new job was observed after the source-only restoration.
 Monitor remains PAUSED; the review skip is this round ONLY.
 
-The bounded native failure-witness diagnostic is being verified before any
-further Mia recovery. Genuine original compiled source, missing source/unit
+The ephemeral native-read task reported STOP with zero tool/data effects;
+the separately staged empty-notebook request was NOT sent because the Mac
+locked. No new notebook/cell or native witness is claimed. Genuine original
+compiled source, missing source/unit
 provenance and full-window native orders/accounting cannot be inferred from
 saved source or a Completed. status. No protected dates, frozen economics,
 selection rules or attempts are reset. Claude next reviews this owner-skipped OFF verification and Mia-source recovery round.
@@ -548,8 +550,11 @@ adversarial matrix remain unresolved and parked. **Exact next role action:**
 Section92 accepts section91 after correction within evidence support only.
 Claude next reviews this owner-skipped OFF verification and Mia-source recovery round.
 The owner bypassed the immediate section92 checkpoint for this round ONLY;
-this does not remove subsequent independent review. Continue the bounded
-native witness diagnostic while its fresh scopes remain valid. Preserve all
+this does not remove subsequent independent review. A newly observed Mac
+lock prevented even the empty-notebook request; its scope is closed without
+Send. Manual device unlock and fresh bounded manifests are operational
+prerequisites to later native diagnosis, not old stale lock assumptions.
+No native witness/notebook execution is claimed. Preserve all
 source/run/receipt history and independent acceptance gates; if missing
 source-unit/native accounting evidence cannot be recovered safely under the
 frozen rules, stop at that factual blocker, not an invented canonical gate.
@@ -23740,3 +23745,26 @@ Any failure is retained body-free, no automatic retry, metrics/ON/native
 acceptance false. D134 authorizes only its one fresh scoped execution after
 commit, not a renewed old capture. The authenticated-browser blocker does
 not prohibit this already-authorized metadata-only local check.
+
+Create-only002 closed receipt533/
+11f8e42e87e7b5cc21615efddb6d3b1acd57e3c9a3340ee5bd436974ff761e23,
+with failed availability attempt1, successful AX0/inputs0/Send0/creations0/
+executions0. Its controller exited and released its own lock before this
+commit. All current create/read scopes are closed; no live Mia action or
+implicit retry is left running. The new notebook does not exist by our action.
+
+For reproducibility, the exact D134 invoker below runs only after the49/52
+isolated-runtime setup and invariant checks, at a fresh committed HEAD. It
+creates a NEW120second scope and performs the two already-registered metadata
+reads; it is not a recipe for replaying the spent operation. Preserve this
+text and the resulting claim/access/result descriptors, including refusals.
+
+```python
+from datetime import datetime,timedelta,timezone
+import hashlib
+from research.target_price_revisions_qc import extended_source_inventory_compare as c
+created=datetime.now(timezone.utc)
+prepared=c.prepare_plan(owner_instruction_sha256="4cbdbec4c54b5db78455516442f96c25d636af6e54a214209cef5419e301b9aa",created_utc=created.isoformat(),expires_utc=(created+timedelta(seconds=120)).isoformat())
+raw=c.execute_plan(prepared["plan"])
+print(c.e.canonical({"plan_sha256":prepared["plan_sha256"],"receipt_bytes":len(raw),"receipt_sha256":hashlib.sha256(raw).hexdigest(),"result":c.e.parse_json(raw)}).decode())
+```

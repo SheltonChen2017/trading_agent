@@ -1,24 +1,18 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 200 RECORDS SUCCESSFUL ACTUAL OFFLINE SELECTOR VERIFICATION
-FROM CLEAN `43a44417`: ONE NATIVE-DENIED WORKER, EXIT0/83.232658s, SEPARATE
-EXIT0/10.444719s METADATA READBACK, EXACT PRIVATE RECEIPTS AND FINAL CUSTODY.
-THE OWNER EXPLICITLY APPROVED THE TRUSTED UNSANDBOXED PUBLISHER BOUNDARY;
-NATIVE NETWORK/FORK/ALL-WRITE WORKER CONTROLS REMAIN UNCHANGED (198-200).
-IBSELECT-OBS-01 AND IBSELECT-V2-STARTUP-01 CLOSE ONLY AT THEIR PROSPECTIVE
-VERIFICATION/APPROVED-TOPOLOGY SCOPES; SIX CARRIED P2s REMAIN OPEN.
-OLD V1, TITLE, NESTED-STARTUP AND ZERO-SEMANTIC PREFLIGHT FAILURES REMAIN
-FAILED/PRESERVED; THEIR MISSING ORIGINAL TRACES ARE NOT INVENTED.
-SECTION 195 COMPLETES THE PRECEDING EIGHT-COMMIT CLAUDE COUNTER-REVIEW;
-NO INDEPENDENT CLAUDE REVIEW OF THIS OWNER-WAIVED BUILD IS CLAIMED.
-LATEST OWNER DIRECTION PREAUTHORIZES CONTINUED ENGINEERING TOWARD
-BACKTESTING BUT EXPLICITLY HOLDS ALL QC WORK UNTIL THE OWNER RELEASES IT.
-REAL HISTORICAL EARNINGS/PARENT/SECURITY-IDENTITY INPUT GAPS REMAIN (200.4);
-DELEGATED APPROVAL CANNOT SUPPLY MISSING FACTS. NOT BACKTEST-READY.
-FROZEN V1/FOUR V3 SOURCES, POPULATION/ECONOMICS, STRICT D23 AND BOTH FINAL
-NON-RETROACTIVE ACCESS CLASSIFICATIONS REMAIN BINDING. LOOKS/JOBS/BACKTESTS
-0/0/0. NO FUNDED/PAPER/LIVE/CAPITAL/REAL-ORDER/TRADING AUTHORITY.
-THE EXISTING REVIEW MONITOR STAYS PAUSED; ONE FINAL MATCHING-LANE PUSH ONLY.**
+Status: **SECTION 201 RECORDS CLAUDE'S REVIEW OF THE SEVEN CODEX COMMITS IN
+`bbf34ab6..272132e4` (SECTIONS 195-200). ALL SEVEN ARE ACCEPTED, TWO AFTER
+TEST CORRECTIONS. THE SELECTOR VERIFICATION FROM CLEAN `43a44417` IS ACCEPTED
+AT ITS STATED SCOPE: THE RETAINED RECEIPTS, SOURCE HASHES AND BINDINGS WERE
+CHECKED INDEPENDENTLY. CORRECTIONS: THE UNEXECUTED SHARADAR ONE-SHOT NOW
+SCREENS NESTED KEY ECHOES (`9013b407`), AND THIRTEEN LAUNCHER/V2 GUARDS THAT
+MUTANTS SURVIVED ARE PINNED (`11b4cf0d`). NO REAL KEYCHAIN, PROVIDER, SEC OR QC
+ACCESS BY THE REVIEW. SIX P2 FINDINGS REMAIN OPEN AND FAIL CLOSED. THE OWNER'S
+QC HOLD (199.2) STAYS IN FORCE. THE V1 RUN AND THE OTHER FAILED ATTEMPTS STAY
+FAILED. FROZEN V1/FOUR V3 SOURCES, POPULATION/ECONOMICS, STRICT D23 AND BOTH
+FINAL ACCESS CLASSIFICATIONS REMAIN BINDING. NOT BACKTEST-READY (200.4).
+CODEX COUNTER-REVIEWS SECTION 201. LOOKS/JOBS/BACKTESTS 0/0/0. NO FUNDED/
+PAPER/LIVE/CAPITAL/REAL-ORDER/TRADING AUTHORITY.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -46,6 +40,8 @@ NO-QC restriction until the owner releases the shared workspace. Missing
 factual source/identity/rights inputs are not manufactured by preauthorization.
 No SDK draft activation, real-outcome look or backtest follows from selector
 success alone;200 is the actual verification/evidence handoff.
+Section 201 is Claude's later review of sections 195-200; it changes no
+gate and does not release the QC hold.
 
 ## 1. Canonical V1 contract
 
@@ -278,6 +274,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-21 | Codex owner-waived bounded offline verification preregistration | Starting clean local/origin `725b81ceb9e8584aa1bebdcceb66ae66cef82aaf`; no incoming commits | New registered corrected selector verification and independent receipt acceptance only | Owner explicitly skipped the next Claude checkpoint and directed recommended steps2/3. Preserve all original failure artifacts; new front, operation ID, namespace and source epoch; no actual invocation claimed yet. | Focused invented-input, guard-sensitivity, compilation, import/package/document and exact source/frozen qualification precede the clean-source actual operation. No complete suite. | IBSELECT-OBS-01 and six other P2s stay OPEN before actual success/verification. Prior195 corrections remain internally checked, not newly independently Claude-reviewed. | Execute the exact196 one-shot only after qualification/commit; document actual success or precise preserved failure and make one final matching-lane push. No title/source acquisition, QC/SDK, next milestone, monitor rearm or other-chat message. |
 | 2026-10-21 | Codex actual startup rejection / separate blocked handoff | Implementation/preregistration `3c5734fd6316389912907c66b4456a5a5c96e9a9`, followed by this separate handoff; incoming range empty | One observer launch, zero selector executions; no accepted actual verification | macOS nested sandbox refused before Python: exit71,0.007495s,stdout0/stderr53, fixed sandbox_apply refusal hash. New selector namespace absent; observer reservation+terminal and all old failed receipts preserved. No semantic retry, reset or new scope. | Main278 focused passes27.84s; internal155 passes23.82s; compile/frozen checks; five synthetic topology controls independently confirm nesting restriction and reject weakened inheritance as equivalence. Exact pins/validation197. | IBSELECT-V2-STARTUP-01 P2 OPEN; IBSELECT-OBS-01 remains OPEN. Eight P2s total, no openP0/P1. Draft cleanup corrected but does not establish actual success. | Stop before another actual attempt. Owner decision needed for a separately scoped isolation-safe launcher design, including any explicit change to parent native isolation; no backtest, acquisition, SDK or title milestone. One final documented matching-lane publication at this concrete blocker; monitor PAUSED. |
 | 2026-10-22 | Codex owner-approved trusted publisher / observed offline verification | Published `e600841c` -> `fcc3a733` failed zero-semantic preflight -> corrected `43a44417` actual success -> this separate handoff | Explicit trusted-parent/single-native-worker boundary and genuine selector completion | One semantic CLI exit0/83.232658s; separate metadata readback0/10.444719s; exact seven new receipts,84 intake leaves,90 current/79 executed sources,82-quarter/19-affected selection; all old failures preserved, no retrospective acceptance. | Main final387 passed/2 intentional topology skips38.97s, separate2 topology passes1.95s; real stdio red/green, cleanup/guard reversals, strong-native independent metadata/custody observations, compilation/frozen checks; no full suite or look/job/backtest. | IBSELECT-OBS-01 and IBSELECT-V2-STARTUP-01 CLOSED only at prospective verification/approved topology; new stdio/owned-cleanup defects corrected; six carried P2s remain OPEN. | Latest QC HOLD stays binding until explicit owner release; no workspace/account/job access. Genuine missing earnings/parent/historical identity inputs remain; no routine approval request or fabricated readiness. One final accumulated matching-lane push only; monitor PAUSED. |
+| 2026-10-22 | Claude review (macOS session) and corrections | `272132e4` -> `9013b407`, `11b4cf0d` -> this review record | Independent review of sections 195-200 (`bbf34ab6..272132e4`, 7 commits, 0 merges: two new selector modules, one correction commit, four records) | All seven accepted, two after test corrections. Retained selector receipts, 90 source hashes and bindings checked on metadata. Sharadar nested-echo screen fixed; thirteen surviving-mutant guards pinned; record ctime claim corrected. | Final tree: 367 and 187/2 skipped focused passes, 2 topology passes, guards 107 with the 2 known SEP-2 failures; network and Keychain exec denied. No complete suite. Looks 0/0/0. | IBSHAR-CR02, IBSELECT-V3-TEST01, IBSELECT-V2-TEST01 closed; IBREC-CR20101 corrected; IBSELECT-V3-OBS01-05, IBSELECT-V2-OBS01, IBEOD-OBS02 recorded; IBREC-CCR19401 accepted against Claude; six P2 open | Codex counter-reviews section 201; QC hold stays |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -28692,3 +28689,250 @@ row. Final record/active-document/lane-boundary/EXACT checks passed123 in3.63s
 after those corrections, with diff check clean. No code, actual root or
 execution-time record was edited retrospectively; only this subsequent
 durable handoff changes above43a44417.
+
+## 201. Claude review - sections 195-200 and corrections (2026-10-22 UTC)
+
+### 201.1 Scope and method
+
+Range `bbf34ab6..272132e4`: seven Codex commits, no merges. Four carry
+code (`2bff49fc`, `3c5734fd`, `fcc3a733`, `43a44417`; the last three also
+carry record sections) and three are record-only (`725b81ce`, `e600841c`,
+`272132e4`). Two new modules: the selector verification front v2 and
+the trusted selector launcher v3. Both are consumed one-shots: their
+namespaces exist, so neither can run again on this host.
+
+Owner directions quoted in 196.1 ("skip, proceed to 2 and 3 directly") and
+198.1 (approval of the trusted unsandboxed publisher and preauthorization
+toward backtesting) are Codex-attributed. This review did not witness them
+and takes them as the record states. `fcc3a733` and `43a44417` ran before
+this review, under that waiver.
+
+Method:
+- Read sections 195-200 in full and every code diff.
+- Two read-only agents (no code execution): one on the launcher, one on the
+  v2 front plus `2bff49fc`. Every agent finding below was checked against the
+  code before it was accepted, and one was narrowed (F4, 201.4).
+- Mutation: 38 launcher and 31 v2 mutants in memory, 6 launcher mutants on
+  disk (restored in `finally`, file hash checked), 4 Sharadar mutants.
+- Metadata-only checks of the retained private outputs (201.3).
+- No Keychain read, provider, SEC, EDGAR or QC access, and no outcome look.
+  Every test and mutant ran with network and `/usr/bin/security` exec denied;
+  mutants also ran with writes under `artifacts/` denied.
+
+### 201.2 Commit dispositions
+
+| Commit | Change | Claude disposition |
+|---|---|---|
+| `2bff49fc` | Benzinga nested-echo screen, Keychain grammar tests, title AttributeError boundary | **Accepted.** All three corrections are correct and their tests fail on the old code. The search for other instances found a weaker screen in the unexecuted Sharadar qualification, fixed in `9013b407` (`IBSHAR-CR02`), and literal-only screens in the consumed EODHD modules (`IBEOD-OBS02`). |
+| `725b81ce` | Section 195, counter-review of round 194 | **Accepted.** `IBREC-CCR19401` is confirmed against this reviewer: 194.2 lists 17 commits accepted after correction and 10 accepted; the `bbf34ab6` message said "fourteen". |
+| `3c5734fd` | Selector verification v2 and its tests; section 196 | **Accepted after test corrections** in `11b4cf0d` (`IBSELECT-V2-TEST01`) and one record correction (`IBREC-CR20101`). |
+| `e600841c` | Section 197, nested-sandbox startup refusal | **Accepted.** A native sandbox cannot be applied inside another on this host; this reviewer has hit the same refusal. |
+| `fcc3a733` | Trusted launcher v3 and its tests; section 198 | **Accepted.** Its stdio defect was found and fixed by Codex in `43a44417` before any semantic run. |
+| `43a44417` | Launcher stdio corrections; section 199 | **Accepted after test corrections** in `11b4cf0d` (`IBSELECT-V3-TEST01`), with the observations in 201.5. |
+| `272132e4` | Section 200, observed selector completion | **Accepted.** The retained outputs and bindings were checked independently (201.3). |
+
+### 201.3 Independent check of the accepted selector run
+
+Metadata only, under native network, fork and Documents-write denial:
+
+- All twelve leaves match their records: four new observer leaves and three
+  new semantic leaves (200.2), the two blocked-observer leaves (197.2) and
+  the three v1 leaves (196.2). Bytes and SHA-256 are equal. Every leaf is
+  0600 and single-link in a 0700 root, and all are git-ignored.
+- `complete.json` names 90 source paths. Each hash equals the
+  `43a44417` blob and the current file. The 79 executed-trace entries are a
+  subset of them with equal hashes.
+- `complete.json` binds the selection's SHA-256 and byte count and the
+  reservation's SHA-256, and its identity equals the reservation's. Its counts
+  equal the selection's. The six form counts sum to 4,458,409; Form 4 and 4/A
+  sum to 4,034,227.
+- The observer's `final.json` pins the other three journal leaves and both
+  semantic hashes. Terminal and readback show exit 0 and empty stderr, as
+  recorded.
+- Bytecode: no `research/__pycache__` exists. The 3.13 bytecode for the four
+  `data/` and `ml/` closure modules has valid headers for the current source
+  and compiles to identical code. No user site-packages exists, and the
+  lane-root modules (`baskets`, `config`, `market_analytics`) shadow nothing in
+  the standard library. The unconstrained trusted parent (201.5, OBS04) had no
+  path to other code in the current state; its state at run time is not
+  recoverable.
+
+Not checked here: the derivation itself (not rerun), the exit codes Codex
+observed, and the owner's approvals. The readback cannot be repeated at the
+new HEAD, because it binds the `43a44417` identity.
+
+The record's closures of `IBSELECT-OBS-01` (prospective verification scope),
+`IBSELECT-V2-STARTUP-01` (approved topology), `IBSELECT-V3-STDIO-01`,
+`IBSELECT-V3-CLEANUP-01` and `IBSELECT-V2-CLEANUP-01` are accepted at the
+scopes stated. The v1 run stays failed, and its original cause remains
+unestablished.
+
+### 201.4 Corrections
+
+- **`IBSHAR-CR02` (P3, closed in `9013b407`).** The Sharadar qualification is
+  an unexecuted one-shot. Its echo screen decoded each string once with
+  `unquote`. A twice-encoded key in an extra field therefore fell through to
+  the schema check and was recorded as `source_envelope_schema_refused`,
+  hiding that the provider had reflected the key. No body could be kept
+  either way: the module never stores raw bodies, and it hashes only bodies
+  whose strict schema fields cannot hold a key. Agent finding F4's "kept in
+  the stored body" therefore does not apply to this module. The fix uses the
+  same bounded two-track screen as Benzinga. All seven new tests failed on
+  the old code. Four mutants (no plus track, no bound refusal, no plain
+  track, single pass) are each caught.
+- **`IBSELECT-V3-TEST01` (P3, closed in `11b4cf0d`, tests only).** Five
+  launcher guards survived in-memory mutants and now have tests, each red
+  against its mutant:
+  - process-group kill on timeout (L19; a direct-child kill left the
+    grandchild alive);
+  - the exact git environment (L08);
+  - the observer's lane working directory (L15);
+  - the consumed-semantic-namespace check, which must run before the
+    observer scope is spent (L25);
+  - the journal hold's settled ctime (L35; the drift is injected after the
+    leaf is held).
+- **`IBSELECT-V2-TEST01` (P3, closed in `11b4cf0d`, tests only).** Eight v2
+  guards survived and now have tests, each red against its mutant:
+  - the parent's executed-source recomputation (V08, agent F1; the shared
+    test helper stubs it to echo the reported value);
+  - the selection-hash binding (V06);
+  - derive-twice equality (V09);
+  - empty child stderr (V11) and canonical framing (V10);
+  - duplicate control keys (V21);
+  - the inside-write probe (V15);
+  - the worker's head and fixture-intake check (V31, agent F2).
+
+  Production bytes of both modules are unchanged.
+
+### 201.5 Findings recorded, not fixed
+
+- **`IBREC-CR20101` (P3, corrected here).** 196.2 item 4 says only fresh
+  output holds settle ctime, and 198.4 says the predecessor holds stay
+  strict. That is not what the code does. The v2 predecessor hold reuses the
+  v1 runner's `_HeldPublication`, which this reviewer set to
+  `settle_ctime=True` in `afceee4e`. It holds the 8-day-old v1 leaves with
+  ctime ignored. Content and size are still rehashed against the pins
+  (`_HeldPredecessorPublication.recheck`), so nothing can change undetected.
+  The launcher's prior-observer hold is strict, as recorded.
+- **`IBSELECT-V3-OBS01` to `OBS05` (P3, launcher observations).** Not fixed:
+  the launcher can never run again (both namespaces exist). Carry them into
+  any successor:
+  1. A parent killed by a signal leaves its child session running. There is
+     no SIGTERM or SIGHUP handler, and only a Python exception reaches the
+     group kill.
+  2. After the reservation, only a timeout or the launcher's own refusal
+     produces `terminal.json`. The top-level refusal is one constant body that
+     drops the fixed code, class and phase. The `fcc3a733` cause had to be
+     reconstructed for this reason (199.1, 199.3).
+  3. `final.json` is published before the last prior-observer recheck,
+     journal check and cleanup. A late failure would leave a `final.json`
+     claiming success beside exit 2. Acceptance in 200.1 rests on the outer
+     exit 0 that Codex observed, not on `final.json` alone.
+  4. The trusted parent's interpreter flags and environment are neither
+     checked nor recorded. The child commands lack `-I`/`-s`/`-P`. The guard
+     does not block `ctypes`. The "unchanged worker isolation" registration
+     claim is asserted rather than checked; it is true at `43a44417`, where only
+     the launcher changed under `research/` since `e600841c`. 201.3 records
+     the current bytecode and site-packages state.
+  5. Four stdio child tests import the launcher from the hard-coded lane
+     root, so in a clone they test this worktree's file.
+- **`IBSELECT-V2-OBS01` (P3).** `_opaque_json`'s outer `except ValueError`
+  re-labels its own `duplicate_control_key_refused` and
+  `nonfinite_control_token_refused` codes as `malformed_control_json_refused`.
+  The refusal itself holds and is now pinned. The front is consumed, so its
+  bytes are left unchanged.
+- **`IBEOD-OBS02` (P3).** The EODHD calendar qualification, the campaign and
+  continuations 1, 3, 4 and 5 screen only the literal key, with no percent
+  decoding. All are consumed one-shots; `IBEOD-CR03` already covers re-run
+  risk. No leak is alleged. Checking the retained bodies would need the key,
+  which this review does not read.
+- **Surviving mutants left unpinned.** Seven launcher survivors are real but
+  guard only the consumed orchestration:
+  - L21: the v2 front pin in `_identity`;
+  - L24: the readback exit code;
+  - L26 and L27: observer and role identity at start and end;
+  - L32: the prior-observer rehash on recheck;
+  - L33: the `_front` registration check;
+  - L38: the preflight exit code.
+
+  The `cwd`/`__file__` guard was not mutated. Seven v2 survivors guard only
+  the consumed readback or final hold:
+  - V04: exact output inventory;
+  - V07: form counts;
+  - V23: the readback's complete-hash pin;
+  - V24 and V25: reservation and completion equality;
+  - V28 and V29: the readback's predecessor recheck and held rehash.
+
+  201.3 checks on the retained bytes what each of these protects. Pin them in
+  any successor that reuses the code.
+
+  Redundant by construction:
+  - L03 and L04: the later `subprocess.Popen` admission refuses the same
+    child.
+  - L06, L07 and L13: the exact frame and code identity already limit which
+    descriptor or name can be opened.
+  - L20: the shared custody identity refuses an unclean tree.
+  - L30: the second rehash loop repeats the digest check.
+  - V13: the exclusive `mkdir` refuses an existing namespace.
+  - V23's selection half: `_validate_worker_result` binds the selection hash.
+
+  L05 survived in memory only; an existing child test catches it on disk.
+
+### 201.6 Validation
+
+- **Pushed `272132e4`**, default pytest temp, network and Keychain exec
+  denied:
+  - Benzinga and title under the Keychain probe: **255 passed**.
+  - v2 and launcher: **176 passed, 2 skipped**.
+- **Final tree:**
+  - Benzinga, title and Sharadar under the Keychain probe: **367 passed**.
+    The probe logged no `security` exec.
+  - v2 and launcher: **187 passed, 2 skipped**.
+  - The two skipped topology tests, from an unsandboxed parent (they apply
+    their own `sandbox-exec`; nesting is refused): **2 passed**. They use
+    invented code, a loopback connect and `tmp_path` roots, and the parent
+    carried a Python audit hook refusing sockets and Keychain exec.
+  - Lane import boundary (including the tripwire scan), EXACT package guard,
+    decimal guard, module hygiene, project separation and ML boundary:
+    **107 passed, 2 failed**. The failures are the two SEP-2 guards that
+    `IBSH-CR02` records; they fail the same way at `bbf34ab6`.
+- **Mutation.**
+  - Launcher: 18 of 38 killed in memory. On disk, 1 of 6 is killed by an
+    existing child test. 5 more are killed after `11b4cf0d`.
+  - v2: 15 of 31 killed, then 8 more after `11b4cf0d`.
+  - Sharadar: 4 of 4.
+- **Compile and diff.** The four changed files compile in memory and
+  `git diff --check` is clean. An earlier `compileall` wrote four bytecode
+  files under `research/` and `tests/`; they were removed.
+- **Record checks** (record, active documents, lane boundary, EXACT package
+  guard) after this section: **123 passed**, network denied.
+- **Complete suite:** not run, by the owner's standing instruction.
+
+### 201.7 Retained P0-P3 finding ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IBSHAR-CR02 | P3 | **CLOSED in `9013b407`** | `553faa37` | Sharadar qualification | Nested key echo labelled a schema refusal. | 201.4. | Unexecuted one-shot; diagnosis matters. | Bounded two-track screen. | 7 red before; 4 mutants caught. |
+| IBSELECT-V3-TEST01 | P3 | **CLOSED in `11b4cf0d`** (tests) | `fcc3a733`, `43a44417` | Launcher tests | Five guards removable with tests green. | Mutants L08, L15, L19, L25, L35. | Reusable primitives and scope order. | Four tests. | All five mutants caught. |
+| IBSELECT-V2-TEST01 | P3 | **CLOSED in `11b4cf0d`** (tests) | `3c5734fd` | v2 tests | Eight guards removable with tests green. | Mutants V06, V08, V09, V10, V11, V15, V21, V31. | Evidence-binding checks. | Six tests. | All eight mutants caught. |
+| IBREC-CR20101 | P3 | **Corrected in 201.5** | `3c5734fd`, `fcc3a733` | Sections 196.2, 198.4 | Predecessor hold settles ctime, contrary to the record. | Runner `_HeldPublication`. | Record accuracy. | Append-only correction. | Code read. |
+| IBSELECT-V3-OBS01 to OBS05, IBSELECT-V2-OBS01 | P3 | **Recorded** | `fcc3a733`, `43a44417`, `3c5734fd` | Launcher, v2 | 201.5. | Agent reports, checked. | Consumed one-shots. | None; carry into successors. | None. |
+| IBEOD-OBS02 | P3 | **Recorded** | EODHD versions | Echo screens | Literal-only screens. | 201.5. | Consumed one-shots. | None. | None. |
+| IBREC-CCR19401 | P3 | **Accepted against Claude** | `bbf34ab6` | Commit message | "fourteen" should be 17. | 194.2 table. | History is not rewritten. | 195.2 qualification. | Count. |
+| IBBZ-CCR01, IBBZ-CCR02, IBTITLE-CCR01 | P3 | **Accepted closed in `2bff49fc`** | `23893727`, `104ed76b` | Benzinga, title | 195.3. | Agent and tests. | Correct. | Codex's. | 255 pass. |
+| IBSELECT-OBS-01, IBSELECT-V2-STARTUP-01, IBSELECT-V3-STDIO-01, IBSELECT-V3-CLEANUP-01, IBSELECT-V2-CLEANUP-01 | P2 | **Accepted closed at Codex's stated scopes** | `3c5734fd`, `fcc3a733`, `43a44417` | Selector front and launcher | 200.3. | 201.3. | Retained outputs check out. | Codex's. | 201.3. |
+| IB1C-REAL-CR01, IB1BCAMP-CR01, IBSRC-CR01, IBSRC-CCR01 | P2 | **OPEN, retained** | earlier | Sections 119-200 | Unchanged. | Sections 152.1, 154.6, 200.4. | Unchanged; all fail closed. | None. | None new. |
+| IBSH-CR02, IBQC-SHARED-META01 | P2, shared/out of lane | **OPEN, retained** | earlier | Shared manifest; shared QC client | Unchanged. | 190.3, 194.5. | Out of lane. | None here. | Two guards fail on 3.13. |
+| IBEOD-CR03, IBSH-OBS03 and every observation in 194.5 | P3 / observation | **Retained as recorded** | earlier | various | Unchanged. | 194.5, 195.5. | Unchanged. | None. | None. |
+| Codex's findings of 195-200 and every earlier entry | as recorded | **Retained as recorded** | range | range | Unchanged. | Sections 195-200. | Unchanged. | None. | None new. |
+
+There is no open P0 or P1 finding. Six P2 findings remain open (the four
+topical ones and the two shared ones); all fail closed.
+
+### 201.8 Next action
+
+Codex counter-reviews this section and `9013b407` and `11b4cf0d`. The
+owner's QC hold (199.2) stays in force; nothing here releases it. The
+selector verification is accepted at its stated scope. The lane is not
+backtest-ready: the real input gaps in 200.4 remain. No looks, jobs or
+backtests (0/0/0), and no capital, order or trading authority.

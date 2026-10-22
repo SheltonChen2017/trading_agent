@@ -468,6 +468,75 @@ print(json.dumps(proof,sort_keys=True,separators=(',',':')))
     assert list(protected.iterdir()) == []
 
 
+def test_installed_observer_guard_allows_real_bounded_child_transport_but_not_arbitrary_devnull_writes(tmp_path):
+    root = (tmp_path / "invented-observer-transport-lane").resolve()
+    root.mkdir(mode=0o700)
+    script = """import json,os,sys
+from pathlib import Path
+from research import insider_buying_affected_quarter_selector_launcher_v3 as m
+m.LANE_ROOT=Path(sys.argv[1])
+command=[sys.executable,'-I','-S','-B','-c',"print('invented-child-control')"]
+environment={'PATH':'/usr/bin:/bin:/usr/sbin:/sbin','PYTEST_DISABLE_PLUGIN_AUTOLOAD':'1'}
+guard=m.ParentAuditGuard('observer',head='1'*40,commands=[command])
+sys.addaudithook(guard)
+proof={}
+try: descriptor=os.open('/dev/null',os.O_RDWR)
+except PermissionError: proof['arbitrary_devnull_write_refused']=True
+else: os.close(descriptor);proof['arbitrary_devnull_write_refused']=False
+try: m.run_child(command[:-1]+["print('unknown-command')"],cwd=m.LANE_ROOT,env=environment,timeout=10,cap=100)
+except PermissionError: proof['unknown_child_devnull_refused']=True
+child=m.run_child(command,cwd=m.LANE_ROOT,env=environment,timeout=10,cap=100)
+proof.update(exit_code=child.returncode,stdout_sha256=m._sha(child.stdout),stderr_bytes=len(child.stderr),
+             exact_role_command_consumed=tuple(command) in guard.used_commands)
+print(json.dumps(proof,sort_keys=True,separators=(',',':')))
+"""
+    child = module.run_child([sys.executable, "-B", "-c", script, str(root)],
+        cwd=module.LANE_ROOT, env=ENV, timeout=30)
+    assert child.returncode == 0 and child.stderr == b""
+    assert json.loads(child.stdout) == {"arbitrary_devnull_write_refused": True,
+        "unknown_child_devnull_refused": True,
+        "exit_code": 0, "stdout_sha256": module._sha(b"invented-child-control\n"),
+        "stderr_bytes": 0, "exact_role_command_consumed": True}
+    assert list(root.iterdir()) == []
+
+
+def test_installed_semantic_guard_crosses_real_stdin_pipe_wrapper_before_a_stubbed_exec_only(tmp_path):
+    """No inner launch: stub only _execute_child, after real CPython pipe setup."""
+    root = tmp_path.resolve()
+    script = """import json,os,subprocess,sys
+from pathlib import Path
+from types import SimpleNamespace
+from research import insider_buying_affected_quarter_selector_launcher_v3 as m
+m.LANE_ROOT=Path(sys.argv[1]);policy='(version 1)(allow default)(deny network*)(deny file-write*)(deny process-fork)'
+worker="print('invented-preexec-only')"
+fixture=SimpleNamespace(SOURCE_ONLY_BOOTSTRAP=worker,
+ original=SimpleNamespace(isolation=SimpleNamespace(_worker_policy=lambda *_args,**_kwargs:policy)))
+command=['/usr/bin/env','-i','PATH=/usr/bin:/bin:/usr/sbin:/sbin','/usr/bin/sandbox-exec','-p',policy,
+ sys.executable,'-I','-S','-B','-c',worker]
+read_fd,write_fd=os.pipe()
+class InventedPreexecReached(OSError):pass
+def no_child_execution(*_args,**_kwargs):raise InventedPreexecReached('invented-no-execution')
+subprocess.Popen._execute_child=no_child_execution
+guard=m.ParentAuditGuard('semantic',head='1'*40);guard.front=fixture
+sys.addaudithook(guard)
+proof={}
+try:
+ try:os.fdopen(write_fd,'wb',closefd=False)
+ except (PermissionError,ValueError,OSError):proof['unknown_pipe_wrapper_refused']=True
+ try:subprocess.run(command,cwd=m.LANE_ROOT,input=b'invented-only',capture_output=True,check=False,timeout=10)
+ except InventedPreexecReached:proof['genuine_stdin_pipe_wrapper_reached_stubbed_exec']=True
+finally:os.close(read_fd);os.close(write_fd)
+proof['inner_child_executions']=0
+print(json.dumps(proof,sort_keys=True,separators=(',',':')))
+"""
+    child = module.run_child([sys.executable, "-B", "-c", script, str(root)],
+        cwd=module.LANE_ROOT, env=ENV, timeout=30)
+    assert child.returncode == 0 and child.stderr == b""
+    assert json.loads(child.stdout) == {"unknown_pipe_wrapper_refused": True,
+        "genuine_stdin_pipe_wrapper_reached_stubbed_exec": True, "inner_child_executions": 0}
+    assert list(root.iterdir()) == []
+
+
 def _orchestration(tmp_path, monkeypatch, *, fault=None):
     root = (tmp_path / "invented-lane").resolve()
     root.mkdir(mode=0o700)
@@ -660,3 +729,51 @@ raise SystemExit(child.returncode)
     assert proof == {"network": errno.EPERM, "fork": errno.EPERM, "inside": errno.EPERM,
         "outside": errno.EPERM, "before_input": True, "source_rows_read": 0}
     assert list(inside.iterdir()) == [] and list(outside.iterdir()) == []
+
+
+@pytest.mark.skipif(sys.platform != "darwin" or os.environ.get("IB_SELECTOR_V3_NATIVE_TOPOLOGY") != "1",
+    reason="input-PIPE topology requires separately selected trusted unsandboxed synthetic harness")
+def test_installed_semantic_guard_allows_real_input_pipe_but_not_unknown_regular_descriptor_writes(tmp_path):
+    """Use the exact production command shape, but only invented stdin bytes."""
+    root = tmp_path.resolve()
+    regular = root / "invented-regular-file"
+    regular.write_bytes(b"preserved-invented-regular-file")
+    output = root / "invented-worker-output"
+    output.mkdir()
+    policy = front.original.isolation._worker_policy(output, readonly=True)
+    worker = "import hashlib,json,sys;body=sys.stdin.buffer.read(64);print(json.dumps({'input_bytes':len(body),'input_sha256':hashlib.sha256(body).hexdigest()},sort_keys=True,separators=(',',':')))"
+    script = """import json,os,subprocess,sys
+from pathlib import Path
+from types import SimpleNamespace
+sys.path.insert(0,sys.argv[1])
+from research import insider_buying_affected_quarter_selector_launcher_v3 as m
+m.LANE_ROOT=Path(sys.argv[2]);policy=sys.argv[3];worker=sys.argv[4]
+regular_fd=os.open(sys.argv[5],os.O_RDWR)
+unknown_pipe_read,unknown_pipe_write=os.pipe()
+fixture=SimpleNamespace(SOURCE_ONLY_BOOTSTRAP=worker,
+ original=SimpleNamespace(isolation=SimpleNamespace(_worker_policy=lambda *_args,**_kwargs:policy)))
+guard=m.ParentAuditGuard('semantic',head='1'*40);guard.front=fixture
+sys.addaudithook(guard)
+proof={}
+try:
+ try: os.fdopen(regular_fd,'wb',closefd=False)
+ except (PermissionError,ValueError,OSError): proof['unknown_regular_fd_write_refused']=True
+ try: os.fdopen(unknown_pipe_write,'wb',closefd=False)
+ except (PermissionError,ValueError,OSError): proof['unknown_pipe_write_refused']=True
+ command=['/usr/bin/env','-i','PATH=/usr/bin:/bin:/usr/sbin:/sbin','/usr/bin/sandbox-exec','-p',policy,
+  sys.executable,'-I','-S','-B','-c',worker]
+ child=subprocess.run(command,cwd=m.LANE_ROOT,input=b'invented-input-only',capture_output=True,check=False,timeout=10)
+ proof.update(exit_code=child.returncode,stderr_bytes=len(child.stderr),worker_launches=guard.worker_launches)
+ if child.returncode==0:proof['child_control']=json.loads(child.stdout)
+finally:os.close(regular_fd);os.close(unknown_pipe_read);os.close(unknown_pipe_write)
+print(json.dumps(proof,sort_keys=True,separators=(',',':')))
+"""
+    child = module.run_child([sys.executable, "-I", "-S", "-B", "-c", script,
+        str(module.LANE_ROOT), str(root), policy, worker, str(regular)],
+        cwd=root, env={"PATH": "/usr/bin:/bin"}, timeout=30)
+    assert child.returncode == 0 and child.stderr == b""
+    assert json.loads(child.stdout) == {"unknown_regular_fd_write_refused": True, "unknown_pipe_write_refused": True,
+        "exit_code": 0, "stderr_bytes": 0, "worker_launches": 1,
+        "child_control": {"input_bytes": 19, "input_sha256": module._sha(b"invented-input-only")}}
+    assert regular.read_bytes() == b"preserved-invented-regular-file"
+    assert list(output.iterdir()) == []

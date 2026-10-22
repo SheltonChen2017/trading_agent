@@ -18,6 +18,7 @@ from pathlib import Path
 import re
 import selectors
 import signal
+import stat
 import subprocess
 import sys
 import tempfile
@@ -158,6 +159,48 @@ class ParentAuditGuard:
             and frame.f_locals.get("name") == value, "audit_relative_open_publisher_required")
         return self._path(value, owner.fd)
 
+    def _known_devnull_open(self, path, mode, flags):
+        """Only CPython's known-child stdin sink, never a generic write bypass."""
+        allowed_flags = {os.O_RDWR, os.O_RDWR | getattr(os, "O_CLOEXEC", 0)}
+        if (self.role != "observer" or type(path) is not str or path != "/dev/null"
+                or os.devnull != "/dev/null" or mode is not None
+                or type(flags) is not int or flags not in allowed_flags):
+            return False
+        frame = sys._getframe(2)
+        owner = frame.f_locals.get("self")
+        if frame.f_code is not subprocess.Popen._get_devnull.__code__ or type(owner) is not subprocess.Popen:
+            return False
+        command = tuple(owner.args) if type(owner.args) in {list, tuple} else ()
+        return command in self.commands and command not in self.used_commands
+
+    def _semantic_worker_command(self):
+        front = self.front
+        return ("/usr/bin/env", "-i", "PATH=/usr/bin:/bin:/usr/sbin:/sbin",
+            "/usr/bin/sandbox-exec", "-p", front.original.isolation._worker_policy(
+                LANE_ROOT.joinpath(*SEMANTIC_PARTS, SEMANTIC_ID), readonly=True),
+            sys.executable, "-I", "-S", "-B", "-c", front.SOURCE_ONLY_BOOTSTRAP)
+
+    def _known_semantic_stdin_pipe(self, path, mode, flags):
+        """Permit only the known child's anonymous input pipe, not file writes."""
+        base_flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC
+        if (self.role != "semantic" or self.front is None or self.worker_launches != 0
+                or type(path) is not int or path < 0 or mode != "w" or type(flags) is not int
+                or flags not in {base_flags, base_flags | getattr(os, "O_CLOEXEC", 0)}):
+            return False
+        frame = sys._getframe(2)
+        owner = frame.f_locals.get("self")
+        if frame.f_code is not subprocess.Popen.__init__.__code__ or type(owner) is not subprocess.Popen:
+            return False
+        command = tuple(owner.args) if type(owner.args) in {list, tuple} else ()
+        local = frame.f_locals
+        if (command != self._semantic_worker_command() or local.get("p2cwrite") != path
+                or local.get("stdin") != subprocess.PIPE or local.get("stdout") != subprocess.PIPE
+                or local.get("stderr") != subprocess.PIPE or owner.text_mode
+                or not self._lane_cwd(local.get("cwd")) or local.get("env") is not None):
+            return False
+        return (stat.S_ISFIFO(os.fstat(path).st_mode)
+            and fcntl.fcntl(path, fcntl.F_GETFL) & os.O_ACCMODE == os.O_WRONLY)
+
     def _git(self, executable, command, cwd, env):
         if executable != "/usr/bin/git" or type(command) not in {list, tuple}:
             return False
@@ -198,11 +241,7 @@ class ParentAuditGuard:
                 self.used_commands.add(candidate)
                 return
             if self.role == "semantic" and self.front is not None:
-                front = self.front
-                expected = ("/usr/bin/env", "-i", "PATH=/usr/bin:/bin:/usr/sbin:/sbin",
-                    "/usr/bin/sandbox-exec", "-p", front.original.isolation._worker_policy(
-                        LANE_ROOT.joinpath(*SEMANTIC_PARTS, SEMANTIC_ID), readonly=True),
-                    sys.executable, "-I", "-S", "-B", "-c", front.SOURCE_ONLY_BOOTSTRAP)
+                expected = self._semantic_worker_command()
                 if (executable == "/usr/bin/env" and tuple(command) == expected
                         and self._lane_cwd(cwd) and env is None and self.worker_launches == 0):
                     self.worker_launches += 1
@@ -214,6 +253,10 @@ class ParentAuditGuard:
             path, mode, flags = args
             writable = (type(flags) is int and bool(flags & (os.O_WRONLY | os.O_RDWR | os.O_CREAT | os.O_TRUNC | os.O_APPEND)))
             if writable or (type(mode) is str and any(letter in mode for letter in "wax+")):
+                if self._known_devnull_open(path, mode, flags):
+                    return
+                if self._known_semantic_stdin_pipe(path, mode, flags):
+                    return
                 self._write(self._open_write_path(path))
         elif event == "os.mkdir":
             path, _mode, directory_fd = args

@@ -28304,3 +28304,133 @@ P2s in197 remain OPEN pending real results. Run final document/package
 checks after this append, verify exact designated root/branch/HEAD/expected
 three-file status and unchanged matching remote, then commit the candidate
 before its one registered actual observation. No interim push.
+
+## 199. Zero-semantic launcher preflight refusal and continued offline scope (2026-10-22 UTC)
+
+### 199.1 Exact observed epoch and preserved non-consumption
+
+Section198's candidate/preregistration exists as
+`fcc3a7336c2992c143db986641adfa3edbf13c49`, from exact published e600841c.
+Main final preregistration record/active-document/EXACT checks72 passed2.21s;
+root/branch/HEAD/expected three-file staging and unchanged matching origin
+were verified before commit. The actual entry used that already-existing
+CLEAN fcc3a733 and exact198.4 images; no tracked write or HEAD advance
+occurred during its execution.
+
+Observed trusted launcher entry exited2 after0.045465s and emitted only its
+fixed sanitized refusal. Subsequent read-only inspection found BOTH new
+observer base and v2 semantic base ABSENT: no reservation, terminal,
+selection or completion was published and ZERO semantic workers/rederivations
+ran. This is a pre-publication control failure, not another late selector
+failure or a failed retained-source derivation. The committed candidate and
+tool-observed refusal remain preserved. It is not called successful and
+no unique original exception stack is invented from that sanitized result.
+
+A separate permitted read-only source-preflight role at the same clean fcc
+passed: exact full source inventory digest
+e757ca6178b0e1238caf066d13cf120b94ea058bad2d3ce98a88605e80ddb040,
+four unchanged frozen source hashes, correct root/branch/HEAD and clean flag.
+It performed source/Git metadata checks only, not the selector or archive
+parse. This later green control does not retroactively accept the failed
+launcher entry. Diagnose and correct the fresh launcher's process plumbing
+with invented installed-hook subprocess tests before any new actual entry.
+
+### 199.2 Latest owner restriction and prospective correction boundary
+
+During diagnosis the owner explicitly directed: do NOT access QuantConnect
+because another lane is using it; the owner will release it later. This
+restriction is now binding over the broader preauthorization: no QC browser,
+account, API, SDK, upload, project or job access meanwhile. Offline work may
+continue, and routine engineering remains delegated. This is not permission
+to bypass vendor/source/identity evidence or launch a strategy backtest.
+
+Both registered namespaces are unclaimed and measured semantic count is0.
+After a verified prospective plumbing correction and new clean committed
+qualification, the same198 approved scope may make its first reservation
+and FIRST semantic invocation. Do not reset/reuse a published namespace,
+redispatch any consumed source request, rename a semantic retry, weaken the
+native worker or replace old refusal evidence. A new source-preflight entry
+before any reservation is explicitly distinguished from a repeated semantic
+operation; document its exact corrected commit and terminal outcome.
+All eight actual/topical/shared OPEN P2s remain OPEN until relevant genuine
+results meet their scoped acceptance contracts. The new-launcher owned-
+cleanup correction remains closed only at its qualified prospective scope.
+
+### 199.3 Verified standard-stream integration defect and narrow correction
+
+`IBSELECT-V3-STDIO-01` / P2, new-launcher integration: installed CPython's
+Popen._get_devnull opens /dev/null O_RDWR even for DEVNULL stdin. The new
+write hook refused that standard transport setup before launching its
+registered role. A genuine fresh-child installed-observer-hook regression
+failed1.37s before correction. This is a deterministic sufficient startup
+mechanism; the actual sanitized199.1 result retained no exception stack,
+so the later reproduction is not relabeled a captured original trace.
+
+A second foreseeable integration defect was found BEFORE any actual new
+entry: Popen.__init__ wraps the existing input pipe with io.open(fd,'wb').
+The audit event describes a writable integer FD, so the hook attempted
+filesystem F_GETPATH on a pipe and refused before the worker's Popen audit
+event. The opt-in installed-semantic-hook/real-input-pipe regression failed
+1.08s on the preceding candidate. It uses only invented input and a harmless
+single native child, not an actual selector bootstrap/source root.
+
+Correct only these known standard-library transport operations. For DEVNULL
+require observer role, exact /dev/null, safe O_RDWR flags, exact trusted
+Popen._get_devnull code/frame/class and an unused registered role argv.
+For the input pipe require semantic role, exact Popen.__init__ frame/class,
+its own p2cwrite FD/stdin=PIPE/binary mode, the exact unused immutable native
+worker command and actual FIFO/write-end identity. Direct /dev/null opens,
+unknown subprocesses and ordinary writable file descriptors remain refused.
+No new data/source/output path is admitted, no arbitrary pipe/file exception
+or native-policy change is made, and v2 code/registration remain unchanged.
+This fixes transport plumbing; it does not change the approved trust boundary.
+
+Earlier direct-hook/mocked orchestration and separate native-worker controls
+were insufficient to qualify real installed-hook Popen stream setup. Add
+both durable installed-hook handoff controls and read them with the actual
+CPython code before a corrected clean source-preflight/first semantic entry.
+Retain the fcc refusal epoch separately and never infer readiness from fixture
+passes or a success hint. Final corrected images/observations follow.
+
+### 199.4 Corrected clean-entry qualification and first-semantic registration
+
+Final corrected launcher29858 bytes/SHA256
+0dd9aeb6106afe77dcbabb2d5c81096147e74b95df06c139c6ef8b38861b6795;
+test40616 bytes/SHA256
+634fc203656eab9c453a48dd14553987ff91c668764d55bdf31ac95e17bfba7a.
+Main final eight-path focused selection387 passed/2 intentional topology
+skips38.97s, hashes unchanged before/after. Main separately selected BOTH
+real topology controls:2 passed1.95s. The second passes19 invented stdin
+bytes through the installed semantic guard and the exact production command
+shape into one harmless strictly native child, while direct regular-file
+and unknown-pipe write wrappers refuse. The first proves native network/
+fork/inside/outside writes refuse before input. These trusted-parent tests
+are deliberately outside an inherited native profile, not mislabeled native
+parent denial. Ordinary selection remains native network/Keychain-exec denied.
+
+Author ordinary109 passed/2 skips1.98s; independent final peer109/2 in2.04s;
+these overlap and are not added. Main compiled both corrected images with
+native network/fork/all-write denial. The durable DEVNULL regression became
+green1.05s after its genuinely preceding red; the corresponding PIPE actual
+handoff is independently green in main's separately selected control above.
+Ordinary tests additionally execute genuine CPython stdin wrapping with ONLY
+the eventual _execute_child replaced by a no-execution sentinel; this is
+stdio compatibility, not native-worker success. Peer found no further
+confirmed integration issue. No actual archive, acquisition or QC access
+occurred in these qualifications.
+
+IBSELECT-V3-STDIO-01 is CLOSED at prospective corrected transport scope with
+the two genuine preceding reds and final installed-hook controls. The eight
+actual/topical/shared P2s remain OPEN pending actual acceptance; no fixture
+result closes them. Preserve fcc3a733's exact failed entry, old v1 failed
+root and197's permanently claimed observer. The v2 operation registration
+and output ID are unchanged; the new observing ID is also unchanged and
+still unclaimed. After document checks, exact root/branch/HEAD/status and
+no-remote-advancement verification, commit these three files separately.
+Then freeze the corrected clean committed epoch and enter that SAME unused
+registered launcher scope for its FIRST reservation/semantic invocation.
+No semantic retry or source request occurs. Actual terminal/readback/final
+custody must all succeed before any scoped acceptance; preserve failure
+without reset or further semantic invocation otherwise. No intermediate push
+and no QuantConnect access while the owner's new exclusivity restriction
+remains in force.

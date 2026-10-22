@@ -1,21 +1,26 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **OWNER-RESUMED LOCAL SOURCE QUALIFICATION CLOSED WITH TWO REFUSED
-CAPTURES (SECTION 119), NOT BACKTEST READINESS. COUNT:48 START DEBITS/47 HTTP;
-DAILY:3,586 START DEBITS/3,585 HTTP,593 COMPLETE CHAINS OF1,169.
-BOTH ORIGINAL WHOLE-ROUND CLAIMS ARE SPENT; NO AUTOMATIC RETRY OR RESET.
-VERIFIED CONCURRENT CACHE-STREAM FALSE REFUSAL CORRECTED; ORIGINAL RECEIPTS
-AND UNKNOWN FAILURE CAUSES ARE NOT RETROACTIVELY REWRITTEN.
-QUANTCONNECT PAUSED BY OWNER, INCLUDING CAPACITY/METADATA ACCESS, UNTIL RELEASE.
-TWO HISTORICAL QC METADATA REQUESTS AND FIVE NYSE CALENDAR GETS REMAIN
-RECORDED; NO NEW QC REQUEST OR BACKTEST LAUNCH OCCURRED.
-SECTION118'S ACCEPTANCE OF CLAUDE3faa7fd8 IS PRESERVED; NO NEW CLAUDE REVIEW
-OR FULL LANE SUITE IS CLAIMED. RECOVERY/REPLAY/DIVIDEND DRAFTS STAY IGNORED,
-UNINTEGRATED AND UNDISPATCHED. FULL INPUT/PROCESSING/EVALUATION GATES REMAIN.
-LOOKBACKS20/60/120/252 UNSELECTED; CANONICAL ACTUAL LOOKS0/0, EXPLORATORY
-ACTUAL LOOKS0, ALPHA0, PERMANENT LOOK IDS NONE, QC LAUNCH ATTEMPTS0.
-ONE COMBINED FINAL NON-FORCE PUSH; OTHER MONITORS AND FROZEN SHARED FILES
-UNCHANGED. NO HOLDOUT, ETF, DEPLOYMENT, PAPER/LIVE, CAPITAL OR TRADING ACTION.**
+Status: **CLAUDE (MACOS SESSION) HAS REVIEWED THE THREE CODEX COMMITS IN
+`3faa7fd..66fb823` (SECTION 120) AND ACCEPTS THEM WITH NO CORRECTION. ALL FOUR
+`SI-CCR23` FINDINGS AGAINST CLAUDE'S SECTION 117 ARE CONFIRMED: ITS REQUEST
+INVENTORY OMITTED TWO HISTORICAL QC METADATA REQUESTS AND FIVE NYSE CALENDAR
+GETS, ITS CREDENTIAL-ORIGIN AND EODHD STATEMENTS WERE OVERBROAD, ITS G1 READING
+OVERSTATED DUPLICATE-HEADER COVERAGE, AND ITS MODIFIED-TEST COUNT DOUBLE-COUNTED.
+THE CACHE-CUSTODY FIX IN `a0e0d34` IS SOUND; AN IN-MEMORY MUTANT RESTORING THE
+SHARED DIRECTORY STREAM TURNS ITS REGRESSION RED. THE OWNER-RESUMED LOCAL SOURCE
+QUALIFICATION RAN BOTH REAL MASSIVE ROUNDS ON COMMITTED CODE: COUNT 48 START
+DEBITS / 47 HTTP AND DAILY 3,586 START DEBITS / 3,585 HTTP, 593 OF 1,169 DAY
+CHAINS COMPLETE; BOTH CLOSED REFUSED WITH THEIR CLAIMS SPENT, AND THEIR CLAIM,
+INVENTORY AND CLOSURE FILES MATCH THE PUBLISHED DIGESTS. NEITHER SUBSET IS
+BACKTEST INPUT. QUANTCONNECT PAUSED BY OWNER, INCLUDING CAPACITY/METADATA ACCESS,
+UNTIL RELEASE; NO QC REQUEST OCCURRED THIS ROUND. NETWORK-DENIED ON `66fb823`
+THE AFFECTED TEST FILES PASS 162. NO COMPLETE LANE SUITE, BY OWNER DIRECTION.
+THE THREE SOURCE P2s, `SI-BUILD-20261021-002`, `SI-CR-WIN-20261012-002`, THE
+SHARED P2 `SI-CR5-005` / `SI-CCR16-007` AND `SI-CR15-001` REMAIN OPEN.
+LOOKBACKS 20/60/120/252 UNSELECTED; CANONICAL ACTUAL LOOKS 0/0, EXPLORATORY
+ACTUAL LOOKS 0, ALPHA 0, PERMANENT LOOK IDS NONE, QC LAUNCH ATTEMPTS0. NO
+HOLDOUT, ETF, PURCHASE, BROKER, OPERATOR DATABASE, DEPLOYMENT, PAPER/LIVE,
+CAPITAL, ORDER OR TRADING ACTION.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -236,6 +241,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-14 | Claude review (macOS session) | `0cfb574` -> `f486ef5` reviewed from the published head; **record-only correction (two reconstructed push-ledger rows above)**; this record commit is the only Claude commit | Independent review of the owner-waived continuous build, sections 115-116 | Reviewed authority, every real provider request, credentials and the Keychain helper, data kept out of Git, QuantConnect, capture protection and the request-path guards; not a full line-by-line read of all 36,000 lines. Ran two in-memory mutants of the lane guard and the Keychain helper; both red. | Pushed tree `f486ef5`, clean, Codex idle, network-denied, empty environment: 73 affected lane test files **2,523 passed** (no skips or warnings); mutation baseline 60 passed; compileall exit 0; final-tree active-document 69 passed; `git diff --check` clean. No provider, credential or Keychain read by Claude. **Authorized looks 0, consumed looks 0**. | `SI-CR22-001` (P3, closed by correction: two pushes without ledger rows). `SI-CR22-002` (P3, closed as a forward rule: the spent SEC one-shot declared no contact). Codex's `SI-BUILD-*` accepted as recorded. `SI-CR19-003`, source P2s, `SI-CR-WIN-*`, shared P2 and `SI-CR15-001` open. | Codex counter-reviews this record commit. Confirm plan limits before the registered Massive rounds; future SEC requests take a runtime contact. Every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
 | 2026-10-14 | Codex counter-review only | Exact Claude range `f486ef517be757834041509010a03f61dcbfda04` -> `3faa7fd877b82b0b34dc5388bc16009faa974d24`; one documentation commit, accepted after appended record correction; this section-118 closing record/test commit follows | No next milestone; complete the owner-requested one-shot counter-review and publish once | Verified both reconstructed checkpoint rows, the SEC forward rule, every ordered review disposition and the declared limited review scope. Appended metadata/credential/file-count/mutation errata; no production or capture-protocol change. | Main's focused checks and memory-only mutation counts are recorded in118.5; Claude's 2,523-test execution is not Codex's. Zero new source/credential/QC/outcome access. | `SI-CR22-001` confirmed and retained; `SI-CR22-002` accepted as forward-only; `SI-CCR23-001..004` corrected/qualified in appended errata. Existing source/full-lane/Windows/shared/prospective findings remain. | ONE final matching-lane non-force push, verify clean local/tracking/actual-remote equality, delete only this one-shot automation. Stop without starting the next milestone. |
 | 2026-10-22 | Codex local source qualification | Starting exact local/tracking/actual remote `f67bbf2fc5ab4c7ce822c7e52b57b560cd670682`; this bounded correction/section-119 closing snapshot follows | Owner-approved steps1–3 attempted; source rounds refused; QC paused | Ran the unchanged registered count and daily rounds. Preserved both spent claims/all receipts; corrected the verified shared-directory-stream cache defect only after both captures closed. No backtest or complete source admission. | Exact counts, focused validation, causal reds and exclusions in119. No full suite; canonical0/0, exploratory0, alpha0, QC attempts0. | SI-BUILD-20261021-001 corrected; source coverage/failure-cause gaps retained. Held proposals are not released or dispatched. | One final matching-lane non-force push; Claude reviews this exact checkpoint. New recovery needs its own prospective immutable protocol, not reset/resume; no QC access until owner release. |
+| 2026-10-22 | Claude review (macOS session) | `3faa7fd` -> `66fb823` reviewed from the published head; **no code or test correction**; this record commit is the only Claude commit | Independent review of Codex's counter-review of section 117, the cache-custody fix and the owner-resumed count and daily rounds | Confirmed all four `SI-CCR23` findings against my section 117. Verified the fresh-directory-stream fix and turned its regression red with an in-memory mutant. Matched the count and daily rounds' claim, inventory and closure files to their published digests and confirmed 0600/0700 protection; no QC request this round. | Pushed tree `66fb823`, clean, network-denied, empty environment: affected test files **162 passed**; G1 and cache-stream probes as expected; compileall exit 0; record-regression and active-document checks pass after this record; `git diff --check` clean. **No complete lane suite, by owner direction.** **Authorized looks 0, consumed looks 0**. | No new finding against Codex. `SI-CCR23-001..004` confirmed against Claude and closed. `SI-BUILD-20261021-001` accepted; `-002` open. `SI-CR19-003`, source P2s, `SI-CR-WIN-*`, shared P2 and `SI-CR15-001` open. | Codex counter-reviews this record commit. Any recovery needs a newly frozen protocol carrying the spent claims, after checking plan rate limits. QuantConnect stays paused until the owner releases it. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -20552,3 +20558,156 @@ Main's final post-note record/import-boundary/active-document controls pass
 **87 tests in1.34s**, zero skips/warnings, empty environment/network denied;
 diff check remains clean. The combined push result and exact final hash are
 reported after Git verifies them, not preclaimed in this record.
+
+## 120. Claude independent review — 2026-10-22 UTC (macOS session: counter-review of section 117, cache-custody fix, owner-resumed count and daily rounds)
+
+Reviewer: Claude, the macOS session, in the designated lane worktree on
+`codex/strategy-short-interest`, CPython 3.13.15 / pytest 9.1.1, every pytest
+run network-denied with `sandbox-exec -p '(version 1)(allow default)(deny network*)'`
+in an empty inherited environment. After `git fetch`, local equalled the remote
+at `66fb823` with a clean tree, and Codex was idle. Focused checks only; no
+complete lane suite is claimed.
+
+**Disposition: all three Codex commits accepted, with no correction.** All
+four findings Codex raised against my section 117 are confirmed. The
+cache-custody fix is sound, and an in-memory mutant restoring the old shared
+directory stream turns its regression red. Both real Massive rounds were run on
+committed code under the owner's instruction, both closed refused with their
+claims spent, and their claim, inventory and closure files match the published
+digests. No QuantConnect request occurred. No new finding arises, and this
+commit changes no code or test.
+
+### 120.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Lane branch | `codex/strategy-short-interest` |
+| Previous Claude review record | `3faa7fd877b82b0b34dc5388bc16009faa974d24` (section 117) |
+| Reviewed remote head | `66fb823bfb1fd1427b9d26673b778b5b839ee579` |
+| Ordered reviewed range | `3faa7fd..66fb823` (3 Codex commits, linear; pushes `f67bbf2` at 17:10 UTC on 2026-10-14 and `66fb823` at 00:50 UTC on 2026-10-22, each with its own ledger row) |
+| Code and tests | `scripts/capture_short_interest_native_anchor_cache.py` (+30/-4); new `tests/test_short_interest_counter_review_record.py` and `tests/test_short_interest_native_cache_directory_stream.py` |
+| Record delta | status paragraph, two ledger rows, sections 118 and 119; nothing else removed |
+| Claude commits this round | this record commit only |
+
+| # | Commit | Scope | Disposition |
+|---|---|---|---|
+| 1 | `f67bbf2` | Section 118: counter-review of section 117, errata, record regressions | **accepted** |
+| 2 | `a0e0d34` | Fresh directory stream for each cache-custody scan; section 119 | **accepted** |
+| 3 | `66fb823` | Closing record of the committed keyless custody re-check | **accepted** |
+
+### 120.2 The findings against section 117 are right
+
+- **`SI-CCR23-001`, confirmed.** My subsection 117.3 and status said there were
+  no QuantConnect requests. Subsections 116.17-116.18 record two authenticated
+  engine-catalog metadata POSTs (one refused after an HTTP 200, one manual
+  recovery), and 116.8-116.9 record five public NYSE calendar PDF GETs. Neither
+  was a launch, look or provider data request, but my table claimed to list
+  every request.
+- **`SI-CCR23-002`, confirmed.** My subsection 117.2 said credentials came only
+  from the Keychain and that EODHD was recorded by location only. Subsection
+  116.12 records all four Keychain items, EODHD included, read after the owner
+  unlocked the Mac. Massive also used `MASSIVE_API_KEY` for some stages, Sharadar
+  used the protected `sharadar.env` file, and the catalog POSTs used `QC_USER_ID`
+  and `QC_API_TOKEN`.
+- **`SI-CCR23-003`, partially right, as Codex says.** Re-running G1 here fails
+  exactly four malformed, mixed or leading-zero headers and one nonzero header.
+  The duplicate-header cases still pass because an earlier, separate duplicate
+  check stops them. My "and duplicate headers" overstated what G1 showed.
+- **`SI-CCR23-004`, confirmed.** Subsection 117.1 listed "two test files and the
+  lane import-boundary test" as modified. There were exactly two modified test
+  files, and the import-boundary test is one of them.
+
+### 120.3 The cache-custody fix in `a0e0d34`
+
+- **The defect.** Concurrent custody scans called `os.listdir` on one retained
+  directory descriptor. A `dup()` shares the same open-file description, so
+  concurrent scans could consume each other's read position and falsely report
+  an inventory other than the exact five files. Section 119 reproduced this
+  false refusal in 18 of 512 local keyless checks, and correctly does not
+  assign it as the cause of the count round's recorded refusal at ordinal 47,
+  which has no stage diagnostic.
+- **The fix.** Each scan opens a fresh open-file description with
+  `os.open(".", O_RDONLY | O_DIRECTORY | O_NOFOLLOW, dir_fd=retained)`, checks
+  that device, inode, owner and 0700 mode match before and after the scan,
+  and closes the fresh descriptor in `finally` while keeping both custody
+  boundaries. The exact five-name requirement is unchanged.
+- **Probe.** Restoring the old behaviour in memory, so the scan reads the
+  retained descriptor again, fails the new test with "concurrent custody
+  reused the retained directory stream". Unmutated, both tests pass.
+
+### 120.4 The two real Massive rounds
+
+The owner's "yeah proceed with123" authorized both; the owner's later QC pause
+was honoured, with zero QuantConnect requests this round.
+
+| Round | Requests | Outcome | Evidence checked here |
+|---|---|---|---|
+| Count | 48 start debits, 47 HTTP requests, all HTTP 200 | Refused at ordinal 47 before any HTTP call; that refusal has no stage diagnostic, so no cause is assigned; the 81,875-slot claim is spent | The spent-claim file matches `008e56b2...`. The 146-file parent-manifest digest is computed over files, so it has no single file to match. |
+| Daily | 3,586 start debits, 3,585 HTTP requests, 3,584 HTTP 200 pages, about 967 MB | Refused: 593 of 1,169 day chains complete; one failure about 31 seconds into a 30-second timeout, cause not recorded | The spent-claim, inventory and closure files match `1d585743...`, `4b2fd1cb...` and `e0f10319...`. |
+
+Both capture trees are fully protected: 147 and 12,554 files, all 0600; all
+directories 0700; owned by this user; no symlinks. Neither round's subset is
+backtest input. A recovery needs a newly frozen protocol carrying the spent
+claims and negative evidence, as subsection 119.5 states.
+
+### 120.5 P0-P3 issue ledger
+
+New this round: 0 P0, 0 P1, 0 P2 and 0 P3 against Codex. Four findings against
+Claude are confirmed and closed. Still open: five P2s (`SI-SRC-20260928-001`,
+`-002`, `-003`, `SI-CR-WIN-20261012-002`, the shared `SI-CR5-005` /
+`SI-CCR16-007`), Codex's `SI-BUILD-20261021-002` (P2, source coverage), and the
+P3s `SI-CR-WIN-20261012-001`, `SI-CR15-001` and `SI-CR19-003`.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or closure | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI-CCR23-001..004 | P3 | Closed; confirmed against Claude | `3faa7fd` | section 117 | My request inventory omitted two QC metadata POSTs and five NYSE PDF GETs; my credential-origin and EODHD statements were overbroad; my G1 reading claimed duplicate-header coverage it did not show; my modified-test count double-counted. | 120.2. | Accepted; section 117 stays as written, with Codex's errata in section 118. | None further. | Closed. |
+| SI-BUILD-20261021-001 | P2 | Closed as Codex recorded | `a0e0d34` | cache-custody scan | Accepted and independently reproduced by the in-memory probe in 120.3. | 120.3. | Accepted. | `a0e0d34`. | Closed. |
+| SI-BUILD-20261021-002 | P2 | Open | `66fb823` | source coverage | Both whole-round claims closed refused; neither the count prefix nor 593 daily chains establishes complete input coverage. | 120.4. | Facts still missing. | None. | Open. |
+| SI-BUILD-20261021-003..008 | P1-P3 | Closed or held as Codex recorded | this range | diagnostics and held drafts | Accepted as recorded. Held suffix, replay and dividend drafts are out of Git and were not reviewed as released code. | Subsection 119.4. | Accepted. | None. | Closed or held. |
+| SI-CR-WIN-20261012-001, -002 | P2-P3 | Open | prior rounds | complete-lane ownership; Windows protected storage | Unchanged. | Section 114. | Retained. | None. | Open. |
+| SI-CR19-003 | P3 | Open, prospective advisory | `b034cda` | look accounting | Unchanged; no outcome look occurred. | Subsection 119.5. | Retained. | None. | Open. |
+| SI-SRC-20260928-001, -002, -003 | P2 | Open | prior rounds | source admission | Unchanged. | Subsection 119.5. | Facts no delegation can supply. | None. | Open. |
+| SI-CR15-001 | P3 | Open | `0e31505` | standing delegation | Unchanged. | Section 119. | Retained. | None. | Open. |
+| SI-CR5-005 / SI-CCR16-007 | P2 | Open, shared, out of lane | N/A | shared integration history | Unchanged. | Section 118. | Owner decision; documented only. | None on this lane. | Open. |
+
+### 120.6 Validation
+
+On the exact pushed tree `66fb823`, clean, network-denied, empty inherited
+environment:
+
+- The two new test files, the four existing anchor-cache and anchor-safety
+  files, the lane import boundary, active-document and the repository ML
+  boundary: **162 passed in 7.90s**, with no skip, warning or error.
+  `git status --porcelain --ignored` was identical before and after.
+- Probe G1 re-run (5 failed, as in 120.2) and the cache-stream probe (red
+  with the old behaviour, 2 passed restored).
+- compileall of `scripts` and `tests`: **exit 0**. After this record, the
+  record-regression and active-document files: **78 passed** (9 + 69).
+  `git diff --check` **clean**.
+- **No complete lane suite**, by owner direction. I hashed capture files
+  locally but read no provider row, credential or Keychain item, and made no
+  network request. **Authorized outcome looks: 0. Consumed outcome looks: 0.**
+
+### 120.7 Quality and next step
+
+- **Software, 10/10.** A precise fix for a real concurrency false refusal,
+  with a regression that fails on the old behaviour.
+- **Records and authority, 10/10.** A careful counter-review that caught four
+  real errors in my section 117, and an honest refusal accounting for both
+  rounds.
+
+1. Codex counter-reviews this record commit.
+2. A recovery for the count and daily rounds needs a newly frozen protocol
+   that carries the spent claims and negative evidence forward, with its own
+   budget, before any request. Confirm the plan's rate limits first: the one
+   daily failure is consistent with a timeout.
+3. QuantConnect stays paused until the owner releases it.
+4. Then qualify identity, same-class shares, issuer size, raw volume and
+   terminal cash; resolve `SI-CR19-003` and register the look before any
+   signal/outcome join. The canonical PIT study stays blocked: the 2026-10-19
+   vendor deadline has passed, and the record shows no source that supplies
+   originals, corrections and availability clocks.
+5. Still gated: outcomes and looks, the sealed holdout, lookback selection,
+   production ranking and seeds, ETF work, any QuantConnect access, purchases,
+   broker, operator database, deployment, paper/live, capital, orders and
+   trading.

@@ -31,7 +31,7 @@ FROZEN_CALLER_SHA256 = '533c1ebf520e9ebf836c78067b9b1480eccf49cfb01aaeb240e3a73b
 FAMILY_SHA256 = '8b8ee913dcfb5ad37f4748ea70db4fcbd6ff15580e52cd160bccf2b37e10a9e5'
 NEW_PINS = {
     'scripts/arv2_newrule_execution_environment.py': 'bacf030e82b309111d8e7788991880860620f6d876bbd750246345c95d7c3194',
-    'scripts/arv2_newrule_recovery_continuation_v5.py': 'aea96da3bd9bb193341901609bbf525ece96f682e86606ed354deb5382a4803c',
+    'scripts/arv2_newrule_recovery_continuation_v5.py': '1218ce91f4cc7b4714df2766ec3ca6c5b7649d84a91ff9d9cdf05eee96336a13',
     'data/exchange_calendar.py': '174a032efce4082b8661eabe84b0cf6094048e937722bdf1659c8cb6c7decb89',
     'research/analyst_revisions_v2_qc/accepted_risk_preliminary_rating_evaluator.py': '2fb9bc8a8f74e37b57acb97f4d20b5820be04b9ee470fc2f34b3a8ea2c804910',
     'scripts/arv2_newrule_storage_recovery_v4.py': 'c77e1e8ba3634f6edd03ec9e825da56eeca3ecac13b48face9b3c25ce9e46c8f',

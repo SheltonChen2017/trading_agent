@@ -271,3 +271,11 @@ def test_deadline_is_not_swallowed_as_success(monkeypatch, capsys):
     monkeypatch.setattr(d,'_operation',stop)
     assert d.run(args()) == 2
     assert json.loads(capsys.readouterr().out)['failure_code'] == 'deadline'
+
+
+def test_v5_module_pins_bind_current_sources():
+    # Section 305: a corrected lifecycle/environment source must be re-pinned
+    # in this caller, never left behind a stale binding.
+    for name in ('scripts/arv2_newrule_execution_environment.py',
+                 'scripts/arv2_newrule_recovery_continuation_v5.py'):
+        assert hashlib.sha256((d.ROOT / name).read_bytes()).hexdigest() == d.NEW_PINS[name]

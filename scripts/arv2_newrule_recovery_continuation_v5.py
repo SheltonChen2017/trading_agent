@@ -41,6 +41,10 @@ ContinuationRefused = old.NewruleSubmissionError
 FINITE_CODES = old.FINITE_REFUSAL_CODES | frozenset(("mixed_lifecycle_state", "v5_family_binding",
     "batch_claim", "batch_completion", "batch_output_collision", "batch_output_changed",
     "batch_clock", "batch_outputs", "candidate_order", "continuation_busy", "native_lock_unavailable"))
+# Real QC backtest statuses observed in this lane's earlier runs (section 305);
+# the compact compile/read states are a different enum and stay unchanged.
+BACKTEST_PENDING = frozenset(("In Queue...", "In Progress..."))
+BACKTEST_TERMINAL = frozenset(("Completed.", "Runtime Error"))
 _BATCH_RE = re.compile(r"v5-(capacity|R(?:298|299|30[0-3])-A1-(begin|compile|launch|status|read))-(\d{3})-batch-claim\.json")
 _LIFECYCLE_RE = re.compile(r"(?:capacity(?:-|\.)|R(?:298|299|30[0-3])-(?:A\d+(?:-|\.)|project\.))")
 
@@ -131,8 +135,8 @@ def _outputs_match(operation, marker, candidate, allowed, outputs, outcome):
         valid = outcome in {"success", "wait"}
         if outcome == "wait": required -= _rpc_names(marker + "-backtest-create") | {stem + "-launch.json"}
     elif operation == "status":
-        valid = outcome in {"InQueue", "InProgress", "Completed.", "Runtime Error"}
-        if outcome not in {"Completed.", "Runtime Error"}: required.remove(stem + "-terminal.json")
+        valid = outcome in BACKTEST_PENDING | BACKTEST_TERMINAL
+        if outcome not in BACKTEST_TERMINAL: required.remove(stem + "-terminal.json")
     else:
         valid = operation == "read" and outcome == "success"
     return valid and (set(outputs) == required or set(outputs) == required | optional)
@@ -335,7 +339,7 @@ def _launch(directory, plan, record, marker, candidate):
         {"projectId": compiled["project_id"], "compileId": compiled["compile_id"], "backtestName": name}).get("backtest")
     old._require(type(result) is dict and type(result.get("projectId")) is int
         and result["projectId"] == compiled["project_id"] and result.get("name") == name
-        and result.get("status") in {"InQueue", "InProgress"}, "created_backtest")
+        and result.get("status") in BACKTEST_PENDING, "created_backtest")
     receipt = {**compiled, "backtest_id": old._id(result.get("backtestId")), "backtest_name": name}
     directory.write(stem + "-launch.json", receipt)
     return receipt
@@ -350,15 +354,17 @@ def _status(directory, plan, record, marker, candidate):
     old._require(type(rows) is list and type(response.get("count")) is int
         and response["count"] == len(rows) == 1, "backtest_census")
     row = rows[0]
-    old._require(type(row) is dict and type(row.get("projectId")) is int
-        and row["projectId"] == launch["project_id"] and row.get("backtestId") == launch["backtest_id"]
+    # Proven list parsers treat a summary row's projectId as optional; when
+    # present it must still be the exact launched project.
+    old._require(type(row) is dict and ("projectId" not in row or (type(row["projectId"]) is int
+        and row["projectId"] == launch["project_id"])) and row.get("backtestId") == launch["backtest_id"]
         and row.get("name") == launch["backtest_name"]
-        and row.get("status") in {"InQueue", "InProgress", "Completed.", "Runtime Error"}, "backtest_status")
+        and row.get("status") in BACKTEST_PENDING | BACKTEST_TERMINAL, "backtest_status")
     result = {**launch, "status": row["status"]}
     if row["status"] == "Runtime Error":
         result["failure_evidence"] = old._failure_evidence(row, "runtime_error")
     directory.write(marker + "-valid.json", result)
-    if row["status"] in {"Completed.", "Runtime Error"}:
+    if row["status"] in BACKTEST_TERMINAL:
         directory.write(stem + "-terminal.json", result)
     return result
 

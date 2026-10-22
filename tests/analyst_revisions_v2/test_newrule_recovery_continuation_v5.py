@@ -59,6 +59,16 @@ def setup(monkeypatch, tmp_path):
     value = base.setup.__wrapped__(monkeypatch, tmp_path)
     old.discover_organization(value.plan, expected_family_sha256=value.plan.family_sha256)
     value.api.calls.clear()
+    # Section 305: real QC backtests report the spaced/ellipsis statuses; the
+    # shared legacy fake's compact strings never occurred in this lane's runs.
+    value.api.status = "In Progress..."
+    compact_request = value.api.request
+    def realistic_request(endpoint, payload):
+        result = compact_request(endpoint, payload)
+        if endpoint == "backtests/create" and result["backtest"].get("status") == "InQueue":
+            result["backtest"]["status"] = "In Queue..."
+        return result
+    value.api.request = realistic_request
     value.sessions, value.active, value.admissions, value.environment_checks = [], [], [], []
     real_session = old._session
     @contextmanager
@@ -484,7 +494,7 @@ def test_malformed_completed_batch_cannot_authorize_next_action(setup, change):
 
 @pytest.mark.parametrize("operation,outcome", [("capacity", "wait"), ("begin", "wait"), ("begin", "success"),
     ("compile", "Building"), ("compile", "BuildSuccess"), ("compile", "BuildError"),
-    ("launch", "wait"), ("launch", "success"), ("status", "InProgress"),
+    ("launch", "wait"), ("launch", "success"), ("status", "In Queue..."), ("status", "In Progress..."),
     ("status", "Completed."), ("status", "Runtime Error"), ("read", "success")])
 def test_completion_inventory_rejects_missing_required_rpc_pairs(setup, operation, outcome):
     item = setup.plan._projections[0]
@@ -571,3 +581,64 @@ def test_gap_in_complete_group_ordinals_refuses_even_when_claim_hash_matches(set
     with pytest.raises(old.NewruleSubmissionError, match="poll_budget"):
         call(setup, "capacity")
     assert setup.api.calls == before
+
+
+def test_real_qc_backtest_status_vocabulary_launches_polls_and_reads(setup):
+    # Section 305 (ARV2R305-001): this lane's real QC runs reported
+    # `In Queue...`/`In Progress...`; the compact strings refused after create.
+    value = setup
+    prepared(value)
+    launch = call(value, "launch")
+    assert [row["status"] for row in value.api.runs[launch["project_id"]]] == ["In Queue..."]
+    assert "R298-A1-launch.json" in names()
+    for status in ("In Queue...", "In Progress..."):
+        value.api.status = status
+        assert call(value, "status")["status"] == status
+        value.clock.now += old.STATUS_INTERVAL
+    assert "R298-A1-terminal.json" not in names()
+    value.api.status = "Completed."
+    assert call(value, "status")["status"] == "Completed."
+    assert call(value, "read")["result_cell"] == 1
+    assert {f"v5-R298-A1-status-00{index}-batch-complete.json" for index in (1, 2, 3)} <= names()
+
+
+@pytest.mark.parametrize("phase", ["launch", "status"])
+@pytest.mark.parametrize("compact", ["InQueue", "InProgress"])
+def test_compact_backtest_statuses_are_not_the_provider_vocabulary(setup, phase, compact):
+    value = setup
+    if phase == "launch":
+        prepared(value)
+        realistic = value.api.request
+        def compact_create(endpoint, payload):
+            result = realistic(endpoint, payload)
+            if endpoint == "backtests/create":
+                result["backtest"]["status"] = compact
+            return result
+        value.api.request = compact_create
+    else:
+        launched(value)
+        value.api.status = compact
+    with pytest.raises(old.NewruleSubmissionError, match="created_backtest" if phase == "launch" else "backtest_status"):
+        call(value, phase)
+    assert f"v5-R298-A1-{phase}-001-batch-complete.json" not in names()
+
+
+@pytest.mark.parametrize("project", ["absent", "other", "bool", "float"])
+def test_status_row_project_binding_optional_but_exact_when_present(setup, project):
+    value = setup
+    launched(value)
+    def mutate(endpoint, response):
+        if endpoint == "backtests/list":
+            row = response["backtests"][0]
+            if project == "absent": row.pop("projectId")
+            elif project == "other": row["projectId"] += 1
+            elif project == "bool": row["projectId"] = True
+            else: row["projectId"] = float(row["projectId"])
+    value.api.mutate = mutate
+    if project == "absent":
+        assert call(value, "status")["status"] == "In Progress..."
+        assert "v5-R298-A1-status-001-batch-complete.json" in names()
+    else:
+        with pytest.raises(old.NewruleSubmissionError, match="backtest_status"):
+            call(value, "status")
+        assert "v5-R298-A1-status-001-batch-complete.json" not in names()

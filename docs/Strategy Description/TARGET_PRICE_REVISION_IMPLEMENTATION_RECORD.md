@@ -23137,3 +23137,12 @@ Observe task status before any proposed source-only remediation; do not
 duplicate/cancel an uncertain task. A clone, if actually necessary, is a
 separate scoped cloud mutation, never OFF4 or a monkeypatched project pin.
 Current files/read and snapshotId alone cannot prove historical executed bytes.
+
+MIA-HISTORY-VERIFY-20261022-001 setup retained: access652/
+60a9d8ac0d850a399a0415ca4e7704623620c37ca186567126f2df5a4e5377c3
+was claimed atfe310de7, but passing Python through a stdin heredoc caused
+input() EOF before any CUA call. Controller exited1 and finally released its
+owned lock; no UI action/read, credentials, message or job occurred, no result
+receipt was fabricated. The claim/access remain spent. Identified successor
+MIA-HISTORY-VERIFY-20261022-002 has the SAME D121 limits and fresh HEAD/time,
+using Python -c with PTY input to retain a genuine closer. No old scope reused.

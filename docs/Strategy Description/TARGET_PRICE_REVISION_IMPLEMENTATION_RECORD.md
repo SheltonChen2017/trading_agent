@@ -23189,3 +23189,60 @@ stop on lost ownership/focus, never cancel another task/lane. If inaccessible
 after safe AX/visual alternatives, preserve the factual control limitation.
 Any actual Mia source-only task needs a separate effect scope and resolution
 of existing task ambiguity; current request does not silently grant Full Auto.
+
+### 93.8 Completed Mia header; source-only restoration scope
+
+MIA-CONTROL-VERIFY-20261022-001 atc82802ff genuinely closed with result944/
+4ef892f6a2f637c2a932d84ad0f28de7124de35235b4e881b46115394f8d6f61:
+2AX,2native screenshot captures,3cropped toolbar/header images,1history-control
+click. Own project route verified; visible built-in assistant context-module
+task header says Completed and system header says backtest finished. This
+proves the displayed task is not currently running, not global task census or
+authenticated attribution of the old uncertain launch. History selector still
+gave no usable state; no cancellation, message, source/mode edit or launch.
+All image work was in memory; source/task bodies withheld by toolbar crops.
+Retain setup negatives: sharp import's JSON dependency unsupported; first PNG
+metadata interpretation invalid for native JPEG (no body emitted); jpeg-js
+then decoded/cropped successfully. No native failure/strategy look inferred.
+
+Root public-source verification agrees with delegated architecture audit:
+frozen _daily_audit requires every invested holding's typed same-day/nonfuture
+RAW mark/cache parity, including warning/final IDs. Existing final-delisting
+compatibility is fill-only: exact actual current full-close native Market fill,
+flat native position, historical RAW order, fee/currency/custody. Target
+removal does not erase holdings or create cash. Restoring the two original
+guards is source-only; solving an actual mark/fill transport defect may remain
+source-only IF it transports the same authentic observations. Carrying an old
+mark, dropping a position, synthetic settlement/writeoff or new liquidation
+timing would change economics and requires prospective design, not a bypass.
+No exact native offender/cause is established by this static audit.
+
+TPR-EXT26-D123 (routine delegated preservation/repair, review pending): FIRST
+fresh MIA-SOURCE-BASELINE-20261022-002 may capture exactly2 own37650980
+files/read requests under the same93.1 file/byte/time limits, at new committed
+HEAD/currentUTC<=15minutes, exclusive fresh claims/private0600 archives. No
+old source grant renewal, source execution or provider/ObjectStore read. If
+the exact16 current file identities differ from93.2/93.3, stop/re-establish
+repair scope before any effect; do not silently fold drift into the repair.
+
+THEN fresh MIA-FROZEN-GUARDS-SOURCEONLY-20261022-001 may use authenticated
+built-in Mia in own project after verifying the displayed current task remains
+Completed and own route. At most ONE clearly nonduplicative source-only
+request (new chat if necessary), nonce/receipt before send, <=20AX/6cropped
+screens/12UI actions/600seconds; no retries or blind global Return. Do not
+alter any approval mode, including Full Auto, or weaken a confirmation gate.
+Request ONLY main's original universal stale/future-mark raise, removal of
+mia_rescale.guard transformation before original inventory validation, and
+removal of their now-unused imports; preserve other files and all guard/witness/
+audit/1024chunk/gzip/hash/readback/index/sidecar/collision semantics. No compile,
+backtest/job, notebook/History/provider/private-input/ObjectStore processing,
+account/resource operation or outcome-based change. If source cannot be saved
+without those effects, stop. No synthetic fill, normalization or stale carry.
+
+This new source-restoration request is distinct from the unmatched historical
+launch request; it does not retry that job or create an OFF4. Retain prior
+unmatched dispatch rather than assigning an actor/job without proof. New
+source-only task is not a strategy look or Codex attempt. Capture every saved
+cloud file afterward with a separate fresh scope and review every delta before
+port/acceptance. Any actual job/data diagnostic needs a new bounded manifest/
+look and exact native facts; no launch is authorized by this source-only scope.

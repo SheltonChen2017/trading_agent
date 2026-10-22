@@ -7,124 +7,37 @@ only after a valid baseline. Section93 is the active continuation; the last
 published status below is retained as history. No source, launch, attempt,
 receipt, economics, canonical or native-accounting gate is waived.
 
-Status: **CODEX HAS COUNTER-REVIEWED EVERY INCOMING COMMIT IN
-`1bc751f8..557b2250` IN SECTION 92. CUMULATIVE DISPOSITION: ACCEPTED AFTER
-CORRECTION OF EVIDENCE SUPPORT, TEST SENSITIVITY AND RECORD QUALIFICATIONS;
-NOT NATIVE QC, PERFORMANCE OR CANONICAL ACCEPTANCE. NO EXECUTED CANDIDATE
-BYTE CHANGED. CLAUDE SECTION91 AND ALL ITS HISTORICAL FINDINGS ARE RETAINED.
-F024/TPR-CR27-005 REMAINS OPEN AT THE LAST VERIFIED CLOUD SNAPSHOT: ELEVEN
-OF SIXTEEN FILES DRIFTED, EIGHT FUTURE-IMPORT SYNTAX FAILURES. THE OWNER IS
-ASKING MIA TO FIX IT; NO REPAIR OR NEW JOB IS ASSUMED. LOOK31 DISPATCH REMAINS
-UNRESOLVED, LAST OBSERVED LOOKS30, OFF CODEX3 SPENT, ON0/UNLAUNCHED, ALL
-ACCEPTED EXTENDED METRICS NULL. MONITOR REMAINS PAUSED. CLAUDE NEXT REVIEWS
-THIS COUNTER-REVIEW SNAPSHOT; THEN CODEX RECONCILES THE OWNER-MIA REPAIR
-BEFORE ANY QUALIFIED OFF DIAGNOSTIC OR ON. SECTION87 ENDS FACTUALLY BLOCKED, NOT
-BACKTESTING-READY: DISPLAYED OBJECT STORE50.01MB/50MB, UNACCEPTED MEMBERSHIP
-UNIT AND STALE-MARK CHANGES, LATEST1395/1449 NAV, NO FINAL SUMMARY/INDEX OR
-VERIFIED COMPILED SOURCE. SECTION88 RESUMES OFF-FIRST VERIFICATION ON THE
-OWNER-REPORTED2GB UPGRADE: THE SAME ORGANIZATION STILL DISPLAYS50MB, NOT PROOF
-THE PURCHASE FAILED. FRESH ALL14JOBS/15CURRENTFILES ARE UNCHANGED; GENUINE MIA
-READ-ONLY DIAGNOSIS COMPLETED, NOT A VALID BASELINE OR NEW STRATEGY JOB.
-NO FOURTH CODEX OFF OR ON LAUNCH THROUGH AN UNRESOLVED PATH; RECOVERY NEEDS
-PRESERVATION-COMPATIBLE HEADROOM AND VERIFIED UNCHANGED-ECONOMICS MIA
-RECOVERY. THIS IS NOT A ROUTINE REVIEW STOP OR A NEW CANONICAL GATE. SECTION 74'S
-COUNTER-REVIEW OF THE EARLIER THREE-COMMIT CLAUDE RANGE STANDS AS HISTORY:
-ITS INCOMING-TEST CORRECTIONS ARE ACCEPTED, NOT INHERITED RUNTIME READINESS.
-HASH-ONLY AND KEY-ONLY PACKET-RECEIPT NEGATIVES NOW FAIL INDEPENDENTLY UNDER
-SAFE MUTATIONS; VALID ON CONTROLS REACH A SYNTHETIC LAUNCH. PRODUCTION,
-EXECUTED SOURCE, FROZEN INPUTS AND HISTORICAL SECTIONS 68 THROUGH 73 ARE
-UNCHANGED. CLAUDE'S PRIVATE-RECEIPT REPRODUCTIONS AND SCRATCH-CLONE SUITE
-REMAIN ATTRIBUTED HISTORY; THE CLONE DOES NOT SATISFY THE PHYSICAL-ROOT RULE.
-TPR-CR22-001 REMAINS OPEN; THE OTHER UNCORRECTED RUNTIME/AUDIT FINDINGS ARE
-RETAINED IN SECTION74.3 AND REQUIRE SUCCESSORS BEFORE A NEW QUALIFIED RUN.
-THE OWNER REQUESTED 2021-NOW WITH THE SAME MARKET-CAP-SELECTION /
-TPR-WEIGHT-TILT STRATEGY AND AUTHORIZED CONSUMING THE PREVIOUSLY PROTECTED
-SEPTEMBER-OCTOBER 2026 DATES AS EXPLORATORY. TARGET ENDPOINT: OCTOBER9,2026.
-THE FRESH SOURCE AVAILABILITY PROBE COMPLETED SEVEN HTTP200 SAMPLES;
-THE FRESH FULL SOURCE CAPTURE FAILED AFTER ALL74MASSIVE WINDOWS TERMINATED;
-NAMED DIAGNOSIS CONFIRMED A FALSE LOCAL TICKER-COLLATION ASSERTION;
-FRESH SHARADAR-ONLY REPAIR COMPLETED BOTH DATASETS WITH ZERO ROW REFUSALS.
-THE FAILED ORIGINAL REMAINS IMMUTABLE; FRESH COMPOSITE PREPARATION COMPLETED.
-THREE EXTENDED OFF ATTEMPTS FAILED; NINETEEN LOOKS ARE RETAINED IN SECTION76.
-NO EXTENDED PERFORMANCE OR PAIRED STUDY IS ACCEPTED. MIA RECOVERY IS REQUIRED;
-NO FOURTH CODEX OFF ATTEMPT OR ON LAUNCH THROUGH THE KNOWN FAILED AUDIT PATH.
-SOURCE SAMPLING IS NOT HISTORICAL COMPLETENESS OR PIT PROOF.
-THE OWNER NOW EXPLICITLY AUTHORIZES A FRESH ON/OFF STUDY ALLOWANCE OF AT MOST
-THREE QC ATTEMPTS PER ARM IN SECTION75. THE ORIGINAL ON3/OFF1 COUNTS AND
-SIXTEEN OBSERVED LOOKS REMAIN PERMANENT; THIS IS NOT AN IMPLICIT RESET.
-SECTION 79 REVIEWED THIS CODEX ROUND; SECTION 77 IS HISTORY. SECTION73'S COMPLETE
-REVIEW OF THE PREDECESSOR ROUNDS IS HISTORY, NOT A PENDING REVIEW STOP.
-THE TWO NEW JOINT STOCK-PORTFOLIO RUNS COMPLETED: ON3 HAS352FILLED NATIVE
-ORDERS, OFF1 HAS309; BOTH HAVE60NAV DATES AND13/14DECISION COVERAGE.
-OBSERVED MEMBERSHIP/CAP/SELECTION/BASE-WEIGHT/PRIOR-MARK INPUT PATHS MATCH.
-ON RETURN -5.018489895%, OFF -4.66415821%; ON DID WORSE BY35.4331685BPS.
-SHARED JAN13CAP REFUSAL, NONAMBIENT FINAL DELISTING AND API-UNREPORTED NATIVE
-FEE/MONETARY UNITS KEEP EVERY ACCEPTANCE/PAIR/ALPHA GATE FALSE. SECTION72.5
-RETAINS FAILURES, COMPLETE IDS/HASHES, EXPLORATORY METRICS AND LIMITATIONS.
-NEW ON'S3ATTEMPTS ARE ALSO FULLY CONSUMED; OFF1, FOUR NEW CLOUD LOOKS PLUS
-TWELVE HISTORICAL = SIXTEEN CONSUMED/OBSERVED LOOKS. NO RETUNE/FOURTH ON RUN.
-THE PRIOR FROZEN MATCHED STUDY REMAINS BLOCKED
-ON THE EXTERNAL MIA COMPUTER-CONTROL INTERFACE IN SECTION 71.10. ALL THREE
-CODEX ON-BASE ATTEMPTS ARE CONSUMED; THE COMPLETED THIRD RUN REMAINS A
-DELISTING DIAGNOSTIC. NO MIA RECOVERY JOB OR LOOK IS RESERVED OR LAUNCHED;
-THAT PRIOR STUDY'S TWELVE OBSERVED RUNS AND FIVE UNLAUNCHED ARMS REMAIN EXPLICIT.
-SECTION 73 REVIEWED THAT FINAL PUSHED SNAPSHOT. RESTORED CONTROL AND
-REVIEWED COMPLETE OBSERVERS ARE REQUIRED BEFORE RECOVERY; NO FOURTH CODEX
-ATTEMPT. SECTION 69 REMAINS ATTRIBUTED HISTORY.
-TPR-CR20-001 IS CLOSED BY SUCCESSOR QUALIFICATION:
-THE OWNER'S EXACT PHYSICAL-ROOT PIN REMAINS REQUIRED, AND FUTURE PORTABILITY
-IS NOT A CURRENT BUILD GATE. SECTION 68 RECORDS ALL SIX OWNER-NAMED UNIVERSES:
-FIVE VERIFIED ORDER-BASED QC RUNS AND ONE ZERO-TRADE REMX DIAGNOSTIC.
-ALL SIX CONFIGURATIONS WERE FROZEN TOGETHER BEFORE NEW OUTCOMES. SEVEN QC
-LAUNCHES AND TWO HISTORICAL LOCAL LOOKS REMAIN VISIBLE; SPY'S FIRST FAILED
-DIAGNOSTIC IS NOT ERASED. SECTION 69 REPRODUCED ALL SEVEN QC RESULT RECEIPTS
-BY HASH AND THE 91-REQUEST OPERATIONAL CENSUS.
-THE FULL SIX-CASE ORDER-BASED OBJECTIVE IS NOT ACHIEVED: REMX HAS NO POSITIVE
-ADMITTED TARGET IN THE FROZEN WINDOW. FULL CANONICAL ETF READINESS IS NOT
-CLAIMED. THE COUNTER-REVIEW ITSELF DID NOT CONSUME A NEW OUTCOME.
-THE HEARTBEAT IS PAUSED; THIS CONTINUOUS ROUND HAS ONE FINAL PUSH.
-THE FIXTURE-ONLY TPR-D1 CANDIDATE IS
-ACCEPTED; TPR-D2 IS AUTHORIZED ONLY AS A FIXTURE-ONLY CANDIDATE AND NO REAL-ROW
-D1 IS AUTHORIZED. THE OWNER DIRECTED ONE CONTINUOUS PRE-BACKTEST SOFTWARE
-ROUND IN SECTION 57, WITH NO INTERMEDIATE PUSH OR REVIEW STOP. TPR-D0 IS
-COMPLETE AND INDEPENDENTLY REVIEWED; ITS ONE COMPLETED AUDIT IS NOT RENEWED.
-THE OWNER'S DIRECT INSTRUCTION IN SECTION 58 REMOVED REVIEW STOPS FROM
-CODEX'S CONTINUOUS BUILD; THE OWNER SEPARATELY REQUESTED THIS REVIEW OF THE
-PUSHED RANGE. THE LATEST TARGET IS BACKTESTING, NOT FORWARD-LOOKING
-OPERATION, AS CORRECTED IN SECTION 59. THE PRIOR FINAL-REVIEW STOP WAS AN INCORRECT
-WORKFLOW INTERPRETATION AND IS SUPERSEDED. SYNTHETIC SOFTWARE CANDIDATES ARE
-NOT REAL BACKTEST READINESS. SECTION 60 SUPERSEDES THE FIXTURE-ONLY ACCESS
-CEILING FOR ONE BOUNDED OUTCOME-FREE SOURCE AUDIT AND QUALIFIES THE DEVELOPMENT
-VERSUS CANONICAL GATES. THE CONSUMED MONITOR IS PAUSED, NOT A BUILD GATE.
-THE SHARED RUNTIME-STOP CORRECTIONS ARE ACCEPTED; TPR-OOL-011 STILL REQUIRES
-OWNER-COORDINATED SYNCHRONIZATION. THE COMPREHENSIVE CLAUDE WHOLE-LANE AUDIT
-REMAINS COMPLETE. THE NON-AUTHORIZING TPR-TR0-I IMPLEMENTATION CANDIDATE IS
-CHECKPOINTED BUT REMAINS INCOMPLETE AND PARKED. NO KEY PROVISIONING OR POSITIVE
-AUTHORITY IS AUTHORIZED. THE EMPTY REGISTRY, CANONICAL CANDIDATE, SOURCE/LOOK
-AUTHORITIES, PERMANENT 1/80 CEILING AND SHARED HOLDOUT KEEP THEIR EXACT BYTES.
-TPR-1 AND TPR-0B REMAIN BLOCKED. SECTION 60'S TWO FIXED AUTHENTICATED
-SOURCE-AUDIT REQUESTS ARE SPENT. SECTION 61 RECORDS THE OWNER'S FOLLOW-UP
-AUTHORITY FOR ONE FRESH SHARADAR METADATA-ONLY DIAGNOSTIC, NOW SPENT. SECTION 62
-RECORDS THE OWNER-APPROVED RICHER INSPECTION, ALSO SPENT, AND ITS CONFIRMED
-DESIGN LIMITATION. SECTION 63 RECORDS THE OWNER'S EXPLICIT APPROVAL OF THE
-FRESH STATUS FOLLOW-UP AND CONTINUOUS DEVELOPMENT TOWARD BACKTEST READINESS.
-NO PREVIOUS SPENT REQUEST IS RENEWED. SECTION 64 RECORDS THE OWNER'S LATER
-INSTRUCTION TO WAIVE SEPARATE RIGHTS PAPERWORK AND START A PRIVATE DEVELOPMENT
-BACKTEST. IT SCOPES FRESH SOURCE ADMISSION AND ONE FROZEN LOCAL EXPLORATORY
-RUN, NOT CANONICAL ADMISSION OR A CLAIM OF VERIFIED CONTRACTUAL RIGHTS.
-SECTION 65 RESOLVES THAT PRICE-REQUEST FAILURE WITH FIXED THREE-STOCK BATCHES
-OVER THE FULL FROZEN INVENTORY. TWO LOCAL ORDER-BASED DEVELOPMENT RESULTS NOW
-EXIST: THE ORIGINAL AND A SEPARATELY RESERVED CASH-DIVIDEND INTERPRETATION
-CORRECTION. THE CORRECTED Q1-2025 RETURN IS -39.35818894%, MAXIMUM DRAWDOWN
-39.60072803%; ALL 60 SESSIONS ARE VALUED AND NO ACTION REMAINS UNRESOLVED.
-UNFILLED DAY ORDERS KEEP ENGINE_COMPLETE FALSE. THIS IS AN EXPLORATORY
-NOMINAL-REVISION PROXY, NOT CANONICAL ETF VALIDATION, A PROVEN EDGE OR QC
-COMPLETION. ALL PRIOR FAILURES, RESULTS AND SPENT RECEIPTS REMAIN INTACT.
-NO QC JOB, BROKER ACTION, PAPER/LIVE DEPLOYMENT, CAPITAL OR TRADING AUTHORITY
-IS GRANTED BY THAT HISTORICAL LOCAL SCOPE. SECTION 67 RECORDS THE LATER
-OWNER-AUTHORIZED EXPLORATORY QC ROUTE; IT GRANTS NO BROKER, PAPER/LIVE,
-CAPITAL OR TRADING AUTHORITY. MACHINE-LOCAL TRUST ABSENCE IS QUALIFIED IN
-SECTION 37.**
+Status: **OWNER-SKIPPED OFF SOURCE/RESULT VERIFICATION IN SECTION93; NOT
+BACKTESTING-READY, PERFORMANCE OR CANONICAL ACCEPTANCE.** The last completed
+counter-review is section92, `1bc751f8..557b2250`, accepted after correction
+of evidence support, tests and record qualifications, not native acceptance.
+Latest owner direction: "skip 1, proceed to 2 and 3 directly".
+
+Section93 is the active owner-skipped continuation.
+33 observed looks now (31cloud+2historical local).
+OFF has consumed all three Codex attempts; no fourth Codex OFF launch.
+ON has consumed zero attempts and remains unlaunched.
+All accepted extended metrics remain NULL; no accepted paired result exists.
+Looks31/32 Runtime Error; look33 Completed, source/economics/accounting unaccepted.
+F025/F026 are corrected only in the current active main path; historical job33 remains unaccepted.
+All14 saved Python files compile only; the eight syntax failures are historical.
+Mia source-only nonce001 received one deliberate Send after owner-confirmed draft custody.
+Fresh current main.py matches the registered 60658-byte source exactly; other15files are unchanged.
+F017/F018/F019 and CR23-001 remain OPEN; full-window OFF accounting remains unproved.
+No new job was observed after the source-only restoration.
+Monitor remains PAUSED; the review skip is this round ONLY.
+
+The bounded native failure-witness diagnostic is being verified before any
+further Mia recovery. Genuine original compiled source, missing source/unit
+provenance and full-window native orders/accounting cannot be inferred from
+saved source or a Completed. status. No protected dates, frozen economics,
+selection rules or attempts are reset. Claude next reviews this owner-skipped OFF verification and Mia-source recovery round.
+The non-authorizing TPR-TR0-I implementation candidate is checkpointed but
+remains incomplete and parked. No key provisioning or positive authority is
+authorized. The comprehensive Claude whole-lane audit remains complete;
+its historical full-suite observations are not Codex's focused reruns.
+The sole lane record retains all earlier sections, negative outcomes and
+canonical/TPR-1/TPR-0B gates; this exploratory stock-proxy recovery closes none.
 
 Sibling-lane changes and their independent reviews remain on their respective
 branches. Their integration into `main` grants this target branch visibility;
@@ -477,17 +390,38 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, 2026-10-14:** Codex has counter-reviewed the exact incoming range
+**Current qualification, 2026-10-22:** Section93 is the active owner-skipped continuation.
+Owner direction: "skip 1, proceed to 2 and 3 directly". For this round ONLY,
+continue OFF/Mia verification, then ON only after a valid frozen baseline;
+the next independent role remains Claude after the one final push.
+
+Section93 is the active owner-skipped continuation.
+33 observed looks now (31cloud+2historical local).
+OFF has consumed all three Codex attempts; no fourth Codex OFF launch.
+ON has consumed zero attempts and remains unlaunched.
+All accepted extended metrics remain NULL; no accepted paired result exists.
+Looks31/32 Runtime Error; look33 Completed, source/economics/accounting unaccepted.
+F025/F026 are corrected only in the current active main path; historical job33 remains unaccepted.
+All14 saved Python files compile only; the eight syntax failures are historical.
+Mia source-only nonce001 received one deliberate Send after owner-confirmed draft custody.
+Fresh current main.py matches the registered 60658-byte source exactly; other15files are unchanged.
+F017/F018/F019 and CR23-001 remain OPEN; full-window OFF accounting remains unproved.
+No new job was observed after the source-only restoration.
+Monitor remains PAUSED; the review skip is this round ONLY.
+
+The last completed counter-review is section92. Codex has counter-reviewed the exact incoming range
 `1bc751f878c083836dd9bd967231144fb52acd87..557b2250aa82f330a995362ebd75c4f30ab03a34`:
 both Claude commits separately, then the cumulative tree. Section92 accepts
 the corrections/review after two residual evidence-support corrections,
 isolated seam tests and additive record qualifications. Section91's thirty-one
 Codex dispositions and findings remain historical reviewer judgments, not
 runtime acceptance. Executed candidates, freezes, inputs and cloud source were
-not changed in this counter-review. The last verified cloud source still has
-F024/TPR-CR27-005; no new cloud or private read was performed. The owner says
-"im asking mia to fix it"; that is attributed work in progress, not completion,
-an attempt reset or permission to duplicate/cancel an owner task. The refused
+not changed in this counter-review. At section92's historical handoff the cloud source still had
+F024/TPR-CR27-005 and no new cloud/private read had been performed in that
+counter-review. Section93 supersedes that snapshot with fresh complete source
+captures, retained three additional jobs and verified source-only restoration.
+For historical outcomes, the owner-reported Mia fix requires independent result/source verification;
+saved source restoration is not historical compiled-source or accounting proof. The refused
 row and look31 delivery remain unresolved. A genuinely bounded refusal
 diagnostic may investigate CR23-001 once its actual source/dispatch gates are
 met; it does not accept a strategy over that finding. OFF-first full-window
@@ -508,18 +442,15 @@ The owner authorized the requested extended exploratory dates and now the
 fresh paired-study allowance: at most three QC attempts per arm, with original
 ON3/OFF1 and16looks retained. Section75 freezes both extended candidates and
 all six universes together. OFF has consumed all three Codex attempts;
-ON has consumed zero attempts;30 observed looks now remain retained
-(20 previously retained plus ten retrospectively observed external jobs);
-no accepted paired result exists. No fourth Codex OFF attempt is allowed;
-the owner-reported Mia fix requires independent result/source verification.
-Section87 has now retained all ten newer jobs and every current cloud-file
-delta. The latest native error contains end-callback/export markers, but
-only1395 of1449 NAV points, no final SUMMARY/index and unaccepted source-unit/
-stale-mark changes remain. Authenticated Safari is observed; its initial
-Resources page displays Object Store50.01MB/50MB. No exact byte/headroom or
-native-cause attestation, no cleanup/upgrade or unapproved new launch. This
-round ends genuinely blocked on preservation-compatible included storage
-and verified source/full-window recovery, not on routine Claude permission.
+ON has consumed zero attempts and remains unlaunched;33 observed looks now
+remain retained. No fourth Codex OFF attempt is allowed. Section93's current
+source repair removes both unapproved active-path changes; historical
+Completed look33 remains unaccepted. Fresh catalogue003 saw the same17jobs.
+Section87's50MB display,1395/1449NAV and changed source are historical, not
+current operator state. Later2GB storage display does not attest available
+headroom, original input rights/PIT or successful full-window native recovery.
+Current work addresses actual source/runtime/accounting evidence, not a stale
+Mac-lock, paperwork or routine Claude gate. No new ON or OFF launch here.
 Section75.15 records completed fresh composite input preparation; original
 failed capture and subsequent completed Sharadar repair remain separate.
 Section 70's
@@ -615,12 +546,15 @@ authorized by that audit.
 The trust rollback pin, protected parent custody, reviewer identity and
 adversarial matrix remain unresolved and parked. **Exact next role action:**
 Section92 accepts section91 after correction within evidence support only.
-Claude next reviews this counter-review snapshot; then Codex reconciles the
-owner-Mia repair before any qualified OFF diagnostic or ON. Preserve every
-source/run/receipt, all attempt caps and independent native acceptance gates;
-no duplicate uncertain dispatch, launch through invalid source or fourth
-Codex OFF attempt. This owner-requested round ends after counter-review and
-one matching-lane push, not a cloud remediation or backtesting milestone.
+Claude next reviews this owner-skipped OFF verification and Mia-source recovery round.
+The owner bypassed the immediate section92 checkpoint for this round ONLY;
+this does not remove subsequent independent review. Continue the bounded
+native witness diagnostic while its fresh scopes remain valid. Preserve all
+source/run/receipt history and independent acceptance gates; if missing
+source-unit/native accounting evidence cannot be recovered safely under the
+frozen rules, stop at that factual blocker, not an invented canonical gate.
+No duplicate uncertain dispatch, fourth Codex OFF attempt or ON through an
+unresolved path. One final matching-lane push carries the stable endpoint.
 That does not waive launch/audit gates or the
 exhausted Codex cap. The heartbeat is PAUSED during and after this
 round; no automatic rearm. No fourth OFF attempt and no ON launch through
@@ -23506,3 +23440,48 @@ archived Python is AST-parsed, never imported or executed. The synthetic
 literal-secret guard is narrow, not universal proof that arbitrary text is
 secret-free. No historical CR22-001 closure, complete UI replay, native
 accounting, attempt renewal or new effect authority follows from this archive.
+
+### 93.15 Exact native-read design, precision correction and one-message scope
+
+TPR-EXT26-D130 (delegated routine diagnostic; independent review pending):
+freeze extended_refusal_witness_native_read_20261022.json,
+SHA256c998e4d4006225753fa4029dbf0dd723d497d3add313ef8990b02e38abe47249,
+before one genuine built-in Mia read-only message nonce
+TPR-EXT26-MIA-WITNESS-READONLY-20261022-001. It embeds the exact corrected
+23986-byte public program/c7b677612b01ace2bb019e94f3047449cbf6c98cc55614b8ad5de9bb11f7e88e.
+Reader21592/6ee5593ed2fe5e504fcef867219e5ba4a0c5883d0294a6544c3636440a8b1d22;
+tests now50cc1bb0975f4148e813bec2de4a1be4c5f78052904a66a528dc5b15afeb7c03.
+Root read both complete first versions and all later deltas. Root independently
+reproduced100focused reader/prereg tests; the preceding three-module selection
+had154passing before the precision extension. No actual private/native read
+was involved. The delegate's99green and14red/4positive precision mutation
+results are separately attributed. Earlier routing tests exposed a record
+capitalization mismatch (45failed/9passed), corrected before continuation;
+a later mixed selection had133passing/21failing due to mutation test heading/
+case mechanics. These failures are retained; current-routing green is still
+pending correction, not claimed by the reader's100passing.
+
+Second-eye synthetic review confirmed one P2 diagnostic defect BEFORE use:
+Python truncates a native100ns nonzero fractional clock suffix. The reader now
+refuses nonzero discarded precision, while lossless extra zero digits remain
+accepted. It cannot silently publish false exact ordering. The unexecuted
+older program/prereg draft was replaced before any native effect, not a
+rewritten executed artifact. No frozen/executed strategy byte changed.
+Seven earlier isolated in-memory reader mutants were killed according to
+the delegate, restoring originals in finally; root does not relabel these as
+native proof or Claude review. No material software finding remains accepted
+over the known precision counterexample.
+
+Fresh current-HEAD manifest/access must precede any UI message. Own project
+37650980 only; <=16AX/4cropped-control images/12own inputs/one new own chat/
+one message, <=600seconds and no later than2026-10-22T01:10:00Z. No mode,
+source/notebook creation or edit, old notebook execution, compile/backtest,
+provider/History, enumeration/write or raw external export. Only the exact
+failed job31's two witness keys may be checked/read (each<=4096compressed/plain
+after native allocation), <=2contains+2reads, no retries. A genuine existing
+ephemeral native store, observed own project and real deadline/project scope
+guard are prerequisites; a constant project/no-op guard is not evidence.
+If unavailable, report a body-free STOP and zero data effects. The program
+does not manufacture these native capabilities or hard-bound SDK time/initial
+allocation. Closed diagnostic output only; no SID/raw values/clocks/rows leave
+QC. This consumes no new study look/attempt and cannot authorize OFF/ON.

@@ -20536,3 +20536,19 @@ row (normalized SHA256
 Section118's exact preserved digest is
 `03213d0a1cf36db335ff17c44d8dac0b92594a73d71e1753d3f5067ab7e5cb4a`.
 No active capture or pending HTTP worker remains before staging.
+
+**SI-DEC-20261021-05:** on committed correction
+`a0e0d3448001fdbe1d9241dde92b6c5d6aec8197`, Main repeated the512 concurrent
+keyless pre-wire custody checks against the original retained cache, with
+exact current committed code/old source lineage and equal actual lane remote.
+**512 passed,0 failures**; provider HTTP and named-key calls were disabled,
+socket network denied, no new claim/receipt/source request, provider credential
+read or QC request. This contrasts with the original18/512 false refusals.
+Only local custody/control behavior is tested, not data usability/admission,
+historical coverage, source completion or outcomes. The closing commit after
+this code snapshot changes only this record.
+
+Main's final post-note record/import-boundary/active-document controls pass
+**87 tests in1.34s**, zero skips/warnings, empty environment/network denied;
+diff check remains clean. The combined push result and exact final hash are
+reported after Git verifies them, not preclaimed in this record.

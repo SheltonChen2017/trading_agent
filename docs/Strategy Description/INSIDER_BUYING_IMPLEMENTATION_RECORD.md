@@ -28113,3 +28113,194 @@ this entry, reverify exact designated root/branch/HEAD/status, fetch only
 the matching remote and stop on advancement before this separate handoff
 commit and the single final push. Confirm the exact remote tip and clean
 tree after publication; do not invent an already published future hash here.
+
+## 198. Explicit trusted-publisher approval and single-worker preregistration (2026-10-21)
+
+### 198.1 Latest owner direction and changed boundary
+
+The owner answered197's precise required decision: "yes proceed. consider I
+preauthorize every move you need to get backtesting started" after Codex
+proposed a trusted hash/control publisher outside the native worker sandbox.
+This explicitly approves that parent-boundary change; it is not inferred
+from the older general delegation. It also directs continued lane work
+toward honest backtesting readiness without routine checkpoint-approval or
+Claude-wait interruptions. Source, identity, actual availability, applicable
+use rights and permanent protocol/look facts still require genuine evidence.
+No funded/paper/live deployment, capital or real-order authority is granted.
+The same lane root/branch, frozen population/economics, preserved failures,
+single-final-push and paused-monitor constraints remain binding.
+
+Implement a minimal new committed launcher, not a patch to the frozen sources,
+original selector or qualified v2 coordinator. The supervisor and hash/control
+publisher are explicitly TRUSTED/UNSANDBOXED at the native OS level. Fresh
+role interpreters install a process-level audit hook before importing the
+unchanged v2 front: refuse network/socket/HTTP, credential execution, unknown
+subprocesses and writes outside the exact new publication scope. This hook
+is defense in depth, NOT a tamper-proof native sandbox or equivalent to the
+worker's controls. Allow only exact local Git identity commands and the one
+fixed semantic-worker command where required. Do not weaken or bypass the
+semantic worker's single native network/fork/all-write-denied profile,
+source-only bootstrap, pre-input denial probes or current/frozen-source
+rechecks. The approved topology avoids native sandbox reapplication entirely.
+
+### 198.2 New launcher scope, preserved predecessor and completion criteria
+
+Register exactly one new observing-launcher scope:
+`ib-selector-trusted-publisher-v3-20261021-once`, under
+`artifacts/insider_buying/selector_trusted_publisher_v3/` followed by that ID.
+It binds197's blocked observer reservation/terminal hashes, original failed
+v1 pins and the unchanged v2 operation registration. The old observer scope
+is permanently claimed and must not be edited, reset, retried or renamed.
+The v2 semantic namespace is still absent and its measured executions remain
+ZERO. This new approved launcher permits its FIRST actual semantic invocation
+using the SAME registered v2 audit ID/three-leaf namespace, not a duplicate
+or resumed source operation. No actual invocation is claimed by this entry.
+
+Before first actual invocation: qualify real invented-only single-native-child
+startup and denial controls; test exact scope admission, minimal environment,
+exclusive0700/0600 journal publication, bounded canonical terminal reports,
+failure-preserving process-group kill/reap and separate metadata readback.
+Inspect current source/captured closure consistency across fresh preflight,
+semantic-parent and readback interpreters. Commit implementation/tests/this
+preregistration together, verify clean exact HEAD and unchanged remote, then
+freeze all tracked bytes/HEAD through actual CLI and separate readback.
+Never put the trusted launcher itself inside another native sandbox.
+
+Accept the prospective verification only after observed CLI EXIT0, strict
+bounded stdout and empty stderr, exact selection/complete hashes, successful
+separate metadata-only completion readback at that same clean HEAD, final
+intake/source/predecessor/output custody checks and preserved exclusive
+observer records. A boolean success hint alone authenticates no terminal
+result. One semantic invocation only; no semantic retry after failure,
+namespace reset or replacement receipt. Real failures remain failed.
+
+On acceptance close IBSELECT-V2-STARTUP-01 only for this approved trusted-
+parent/single-native-worker topology, and IBSELECT-OBS-01 only for prospective
+corrected selection/custody verification. The original v1 operation stays
+FAILED and its precise unique original cause stays unestablished. Neither
+closure would establish actual IB-1C affected-quarter ingestion, complete
+parents, canonical/PIT identity, processing rights, strictD23 promotion,
+QC entitlement, a registered strategy launch or backtesting readiness.
+
+### 198.3 Continued-build sequencing, evidence and exclusions
+
+After genuine acceptance continue the authoritative factual/engineering
+path toward the first fixed order-based backtest using delegated routine
+judgment, documenting each decision's scope, provenance and validation.
+Check the retained inputs and later plan dispositions rather than treating
+an obsolete request cap or prior review wait as a new approval gate. Missing
+external source/availability/identity/rights evidence is not manufactured
+by this delegation; exhaust safe available alternatives and report only a
+concrete needed input if such a factual blocker remains.
+
+Eight OPEN P2s remain exactly197.4 until actual evidence supports a scoped
+closure. IBEOD-CR03, other P3/observations and resolved findings remain at
+their recorded scopes. Four v3 custody sources, frozenv1/scale/pilot, three
+SDK source images, private SDK drafts and both consumed old namespaces are
+preserved. No automatic SDK invocation, repeated completed/ambiguous source
+request, corpus/window narrowing, weakened custody guard or shared-file
+remediation is permitted. Current selector work is retained-input-only and
+does not itself authorize or perform provider/QC/outcome access. No complete
+lane/repository suite; focused native-denied checks and exact package guard
+only. Keep observed Codex evidence distinct from fixtures, internal QA and
+earlier Claude-attributed runs. No new independent Claude acceptance is
+claimed. Record exact implementation/operation lineage before the separate
+final handoff and exactly one matching-lane final push.
+
+Append-only sequencing clarification:167.1's later retrospective diagnostic
+policy remains controlling over the older152 wording. A truthful current
+actual-release archive version is permitted for the two LOCAL diagnostics;
+historical as-known forecasts/full revision history and EODHD QC-upload rights
+are not newly imposed gates. Current EODHD documentation advertises historical
+earnings into the1990s, so missing January2006 is a capture gap, not proof of
+vendor coverage absence. January2006's consumed HTTP200 currency-schema
+refusal and August2018's consumed oversized-response refusal retained no
+body. The two February2019/February2020 consumed unsealed starts do retain
+hash-bound bodies; any new offline interpretation must preserve their absent
+original producer completion/HTTP evidence and cannot retro-seal the old run.
+Do not repeat/decompose any of those consumed request intervals. Historical
+issuer/share-class/listing/native-SID mapping, complete original-parent
+source accounting and permanent pre-outcome registration remain separate
+real-input requirements. Do not treat a type-only SDK probe, current aliases
+or the selector's candidate list as satisfying them.
+
+### 198.4 Candidate qualification and preactivation correction
+
+Final candidate images before clean commit:
+
+| New image | Bytes | SHA256 |
+|---|---:|---|
+| research/insider_buying_affected_quarter_selector_launcher_v3.py | 27437 | 8d8bccc2a22e3cfe3448ffdac28d9a472fe721bd109c694fa1e6245c98ecca72 |
+| tests/test_insider_buying_affected_quarter_selector_launcher_v3.py | 33651 | e7d3d8460827e4faf38cad8b9b7a13e29b243e84c40513fbf47afc92d8f1a541 |
+
+`IBSELECT-V3-CLEANUP-01` / P2, preactivation new-launcher defect: the first
+prior-observer constructor could mask its inventory/hash refusal with a
+cleanup error; convenience close could stop at one leaf and skip siblings/
+ancestry. Final-journal and main cleanup had the corresponding primary-error
+risk. Reuse unchanged qualified v2 _close_tree/_close_all only for these
+new owned holds, detach before draining, and attempt every known handle.
+No shared helper or preceding operation bytes changed. Four new durable
+regressions and faithful in-memory preceding-cleanup reversals each caught
+the defect; finally-restored controls pass4/4, internal0.008781s/whole
+Python0.551s. The fix preceded these new tests; do not claim a chronological
+on-disk test-red-before-fix or attribute an actual operation failure to it.
+One initial reversal harness reused an invented namespace for red/green;
+it was corrected to fresh fixture roots, not a production failure.
+
+Four other in-memory reversals caught readback bool/int coercion, removal of
+the one-worker limit, protected-write fence and fixed-scope-before-I/O guard;
+restored controls pass4/4, internal0.004996s/whole Python0.557s. All probes
+use invented controls under native network/fork/all-write/credential-exec
+denial, with zero retained-input reads or source writes. New file author's
+ordinary selection107 passed/1 intentional topology skip1.75s; overlapping
+four cleanup checks passed0.94s. These are not a full lane/repository suite.
+
+Main independently selected the real single-worker topology control:
+1 passed1.75s. Its synthetic trusted parent intentionally has NO inherited
+native sandbox and a Python network/unknown-child guard; the ONE native
+worker proves loopback connection, fork and inside/outside write EPERM
+before input, zero rows read. Native socket allocation alone is not a
+connection-denial proof. The author's earlier topology expectation used
+allocation and was corrected; no actual archive operation occurred. Both
+parents remain honestly labeled trusted, not natively denied process trees.
+Ordinary focused regressions use the separate native network/Keychain-exec-
+denied harness, env-i, Python3.13.15, fresh temp/database/cacheprefix, plugin
+autoload and pytest cache disabled. Main's preceding pre-cleanup selection
+376 passed/1 topology skip34.35s is not final-image qualification.
+
+Independent internal code-only compatibility control passed2.684s: fresh-c
+role and simulated tracked-main imports inventory the same89 source paths,
+path-list digestbdf4f08b131207bd7c597c887858fccc1e4092250740b0694184eeb62caecf83,
+including the new launcher. The actual preflight audit hook preceded front
+import; three real exact local Git controls passed. This dirty-candidate
+control is NOT a clean committed full identity or actual selector result.
+Real custody._Directory.publish crosses the installed audit hook in a fresh
+invented child; unknown relative writers, protected paths, extra leaves and
+duplicate publication refuse. CPython's open audit omits dir_fd: resolve
+relative writes only from that exact known publisher code/class frame and
+its held descriptor, not arbitrary basename allowance. The hook stays a
+cooperative defense, not a native security boundary.
+
+Exact Git helpers are trusted known local metadata subprocesses outside the
+worker's sandbox; no fetch/remote/unknown command is admitted by the hook.
+Read-only effective core.fsmonitor/core.hooksPath/core.sshCommand/
+core.untrackedCache checks were unset. Both new images memory-compiled under
+native network/fork/all-write denial. Four v3 bytes still equal exact
+aa0d635d Git images; unchanged v2/pure/original front and three SDK images
+equal e600841c. Fresh journal leaves alone use settled-ctime identity plus
+two content-hash passes; old intake/predecessor holds remain strict.
+Final main qualification and no-advancement checks follow before the clean
+implementation/preregistration commit. No actual invocation is claimed yet.
+
+Main final eight-path focused selection passed385/1 intentional topology
+skip37.71s, with the final source/test hashes above unchanged before/after.
+It covers new launcher, unchanged v2/original/pure selector, lane record,
+active documents, lane import boundary and EXACT Insider package guard.
+The separately observed topology pass supplies the intentionally excluded
+single-profile integration control; do not sum overlapping runs as a full
+suite. IBSELECT-V3-CLEANUP-01 is CLOSED at this candidate's owned-cleanup
+scope with the explicit reversals above; all eight actual/topical/shared
+P2s in197 remain OPEN pending real results. Run final document/package
+checks after this append, verify exact designated root/branch/HEAD/expected
+three-file status and unchanged matching remote, then commit the candidate
+before its one registered actual observation. No interim push.

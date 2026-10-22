@@ -599,6 +599,8 @@ SECTION93_CURRENT_FACTS = (
     "Fresh current main.py matches the registered 60658-byte source exactly; other15files are unchanged",
     "F017/F018/F019 and CR23-001 remain OPEN; full-window OFF accounting remains unproved",
     "No new job was observed after the source-only restoration",
+    "Fresh Mac lock blocked the empty-notebook request; no new notebook, cell execution or native witness is claimed",
+    "All native-read/create UI scopes are closed with no automatic retry",
     "Monitor remains PAUSED; the review skip is this round ONLY",
 )
 SECTION86_COMMITS = (
@@ -4594,6 +4596,8 @@ def test_section_93_current_routing_refuses_stale_range_or_role(monkeypatch, fau
     ("Fresh current main.py matches the registered 60658-byte source exactly; other15files are unchanged", "Current source is proved bound to historical job33"),
     ("F017/F018/F019 and CR23-001 remain OPEN; full-window OFF accounting remains unproved", "All native accounting gates are closed by compilation"),
     ("No new job was observed after the source-only restoration", "Source-only restoration launched and accepted a new job"),
+    ("Fresh Mac lock blocked the empty-notebook request; no new notebook, cell execution or native witness is claimed", "The new notebook ran and retrieved a valid native witness"),
+    ("All native-read/create UI scopes are closed with no automatic retry", "A live native task keeps retrying automatically"),
     ("Monitor remains PAUSED; the review skip is this round ONLY", "Monitor remains ACTIVE; future review is permanently removed"),
 ))
 def test_section93_current_fact_mutants_do_not_invent_native_success_or_reset(monkeypatch, surface, before, after):

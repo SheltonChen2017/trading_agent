@@ -25,6 +25,8 @@ Mia source-only nonce001 received one deliberate Send after owner-confirmed draf
 Fresh current main.py matches the registered 60658-byte source exactly; other15files are unchanged.
 F017/F018/F019 and CR23-001 remain OPEN; full-window OFF accounting remains unproved.
 No new job was observed after the source-only restoration.
+Fresh Mac lock blocked the empty-notebook request; no new notebook, cell execution or native witness is claimed.
+All native-read/create UI scopes are closed with no automatic retry.
 Monitor remains PAUSED; the review skip is this round ONLY.
 
 The ephemeral native-read task reported STOP with zero tool/data effects;
@@ -409,6 +411,8 @@ Mia source-only nonce001 received one deliberate Send after owner-confirmed draf
 Fresh current main.py matches the registered 60658-byte source exactly; other15files are unchanged.
 F017/F018/F019 and CR23-001 remain OPEN; full-window OFF accounting remains unproved.
 No new job was observed after the source-only restoration.
+Fresh Mac lock blocked the empty-notebook request; no new notebook, cell execution or native witness is claimed.
+All native-read/create UI scopes are closed with no automatic retry.
 Monitor remains PAUSED; the review skip is this round ONLY.
 
 The last completed counter-review is section92. Codex has counter-reviewed the exact incoming range
@@ -698,7 +702,7 @@ and are deliberately not listed here.
 | `TPR-MATCHED-006` | P2 | Observer approval before Mia recovery launch | Retained unexecuted proposals contained native Order/ticket, open-only history, enum, exception, partial-fill and clock defects. Corrected complete observers have been requested, not verified/applied/tested. Last readback contains only additive initialization; restored control, actual complete source review and focused proof are required before any recovery job. See71.9/71.10. |
 | `TPR-CR25-003` | P2 | Broader QC/development host classification and native-host validation | Native custody stays Mac-only by the direct owner reply on 2026-10-12; portable Windows checks stay active. Section 82 implements a bounded test-only split in the collector/frontier modules, pending independent review. Other QC/development modules remain unclassified here; no attributes, working-byte repair, production port or fresh Mac-native validation was performed. The reported CRLF/POSIX failures in section 81 remain historical evidence, not native acceptance. |
 | `TPR-CR26-003` | P1 | Future multi-host resumption without serialized ownership and published handoff | Actual divergence and stale routing are confirmed; failure to fetch is not proved because unpublished Mac commits were unavailable remotely. Section85 preserves both histories. The existing owner-pinned absolute Mac lane and latest continuation govern this round; no new host choice blocks it. Future host switching still needs coordinated serialized handoff, actual remote equality and preserved work; global synchronization is not claimed solved. |
-| `TPR-CR27-005` | P1 | Any OFF or ON run, including the reserved look 31, until the cloud source compiles again | Eleven of the sixteen cloud files carry an identical 60-byte vendor import header prepended after the attempted look-31 dispatch; eight of them now fail to compile because the header precedes their `from __future__` line. The exact inverse is known, but the authorized single-effect scope forbids source edits, the dispatch's delivery is unresolved, and only a fresh source-only Mia task can remove the headers. |
+| `TPR-CR27-005` | P1 | Historical compiled-source reliance; current syntax component corrected | Section91's Open disposition and original eleven-file/eight-syntax-failure evidence remain immutable history. Section93 independently verifies current main restoration, all14saved Python compilation and exact sixteen-file stability. Do not repeat those old syntax failures as present state. Historical compiled-job custody and look31 dispatch remain unproved; accepting a current source repair does not accept those past jobs. This finding's syntax component does not itself block read-only diagnosis now; the independent runtime/source/accounting gates still govern any new OFF/ON run. |
 
 No open finding is P0. The two canonical P1 findings are inert while the registry is empty,
 but both block any positive registry entry. Read-only checks on this Windows
@@ -947,6 +951,8 @@ known.
 | 2026-10-06 | Codex durable handoff and publication request | `9bb1e775321fa014341209a8c20fa240e4a243df` -> this following record-only commit | Section 52 exact dispositions, findings, validation and post-push monitor plan | Rotated current routing to all three reviewed Claude commits; preserved historical qualification, eight-row scope, inherited classifications, quality 8/10 and owner gates. Shared Action Plan/Session Handoff remain frozen. | Stable working-byte reprise 373 passed, 3 skipped in 2.45s before this exact-commit/ledger append; final tree is checked again before one push. Provider/retained-row/outcome/look/QC counts 0. | No new open production finding; shared/sibling and six canonical blockers unchanged. | Monitoring is authorized by owner's latest words, but not armed until verified remote/local agreement after publication. | Claude independently reviews all commits after `67aade0e`; one qualifying completed review triggers counter-review only, with no next implementation milestone. |
 
 | 2026-10-06 | Codex counter-review + one continuous software round | Reviewed `fa2838de5acfa66d37f65305c88ed35534f4f572..b78c51385a321b80404e484b3b161d8516f07138`; every new commit remains on this lane | Accepted incoming review after successor evidence qualification; owner's direct single-round override | Completed synthetic D2 scoring/residual rank/ETF/targets, D3 readiness/run-spec/ledger prerequisites and small order-accounting parity contract; one connected D1-to-transition fixture; documented every delegated choice. Sections 56/57 are the sole durable handoff. No intermediate milestone push/review. | Focused stable pre-handoff union 551 passed, 3 existing platform skips; meaningful red/green plus internal second-reader and source-in-memory mutation proof, frozen hash/import/compilation/diff checks. No full lane/repository suite. | Incoming one-commit accepted after correction; closed candidate findings retained, including false-alarm/partially-correct hypotheses. Six canonical and shared synchronization/factual gates remain. | Synthetic fixtures and approved committed D0 aggregate only; owner decisions 6-15 recorded; no renewed audit, data/outcome/look/QC/operator/trading access. | One final matching-lane non-force push, actual-head verification, then stop for Claude review of every new commit and cumulative tree. Monitor remains paused. Real backtest readiness false. |
+
+| 2026-10-22 | Codex owner-skipped continuation / blocked handoff | Published baseline `2a46f41aa780237d8d13785c28cdd0ab28d356b3` through this final checkpoint; ordered commits in93.21 | Saved-source guard restoration and bounded native diagnostic support; not backtesting readiness | Retained three extra old jobs, verified all16 saved-file identities, restored main to exact frozen generated source through one Mia source-only task, retained genuine zero-effect native capability refusal and two pre-Send create-scope refusals; fresh Mac lock stops notebook prerequisite. | Final focused results in93.21;33looks retained, OFFCodex3spent/ON0, no new backtest/native-witness read; all accepted extended metrics NULL. | F025/F026 corrected only active main; four new software/custody/test issues corrected or qualified with failures retained; empirical/shared/canonical gates stay open. | One-round immediate review skip only; routine diagnostics within frozen strategy, no new economics/source-rights/canonical/trading authority. | One final matching-lane push, actual equality/clean check, then Claude reviews entire owner-skipped round; manual device unlock plus fresh scopes required before later native diagnosis. |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
 
@@ -23768,3 +23774,141 @@ prepared=c.prepare_plan(owner_instruction_sha256="4cbdbec4c54b5db78455516442f96c
 raw=c.execute_plan(prepared["plan"])
 print(c.e.canonical({"plan_sha256":prepared["plan_sha256"],"receipt_bytes":len(raw),"receipt_sha256":hashlib.sha256(raw).hexdigest(),"result":c.e.parse_json(raw)}).decode())
 ```
+
+### 93.21 Stable blocked handoff, decisions, outcomes and review boundary
+
+D134 atf026cb96 genuinely completed at01:14:49.024257UTC:
+planf25e08be4c0415d7b4b798ade3b051804285d6020972e9f3654a54004c8a43ba;
+receipt1424/54539c233dafb5b47e92f64cf1fb0219397079c1cc4dacbac7c9ee6bc79d2854.
+Exactly2 metadata receipt FD reads/16106bytes,0API/credential/source-archive
+reads. All16 before/after inventory identities are equal,0changed entries;
+canonical inventory hashfe91cf56fcbb62714814a41b37084fb7b152fbf80fd2cc2921788c401026d44d.
+Restored main60658/a098c087c14507c154a4740d0145f7af1c448ec24905f4c8b66e82869d917d86
+is independently verified. No source bodies were reopened/executed. Equality
+is saved inventory metadata only; every compiled/native/economic/baseline/
+ON/canonical acceptance flag remains false. Controller exited, lock released.
+
+| New/retained finding | Priority | Status | Evidence and retained scope |
+|---|---|---|---|
+| `TPR-EXT26-F025` | P1 | **Closed by active-path restoration** | Confirmed stale/future-mark bypass on warning/final IDs. Current main byte-for-byte restoration removes it; historical job33 remains unaccepted, not retroactively repaired. See93.3/93.13. |
+| `TPR-EXT26-F026` | P2 | **Closed by active-path restoration** | Confirmed unsupported magnitude/previous-snapshot percent heuristic. Current main restores original membership guard; actual provider row/unit/source date remain unproved. No divide/clamp/drop/renormalize acceptance. |
+| `TPR-RR28-001` | P2 | **Closed by correction** | New diagnostic's native100ns ordering truncation reproduced synthetically, corrected before use with conservative nonzero-submicrosecond refusal; lossless trailing zeros preserved, red/green and removal mutant retained. |
+| `TPR-RR28-002` | P2 | **Closed by correction** | Create-only permission manifest contradicted its own0/1 flags. Refused beforeUI, preserved, corrected only in identified successor; AST guard rejects predecessor plus six isolated permission mutants. |
+| `TPR-RR28-003` | P3 | **Closed by correction and qualification** | Stale image closure/multi-line filter and fifth-vs-fourth crop exceeded scope001. Stopped, retained failure; current-bound crop and corrected explicit routing used in successor. No old rendered/task snippet is empirical evidence. Full UI deterministic replay is not claimed. |
+| `TPR-RR28-004` | P2 | **Closed by correction** | Current document mutation harness could fail on flattened anchors/case before intended assertions. It now preserves bounded extraction/history and requires the exact missing-fact assertion, with clean controls. No factual guard weakened. |
+
+These are Codex/delegate software judgments, NOT separate owner or Claude
+approval. No P0 was found. F017/F018/F019, CR23-001 and all other registered
+open/shared/canonical findings remain scoped and open; no implementation/
+native/QC acceptance over an unresolved material empirical finding.
+CR27-005's original historical row stays Open; its current register now
+qualifies the corrected syntax component rather than falsely claiming eight
+current compile failures. The old dispatch/compiled-job custody is not solved.
+
+| Arm / six sleeves | Actual extended state | Accepted metrics / independently observed sleeve P&L |
+|---|---|---|
+| OFF / project37650980 | Codex3spent; retained jobs31/32 RuntimeError and33Completed; source repair verified, native full-window baseline NOT valid | NULL for returns/CAGR/drawdown/volatility/Sharpe/annual results/turnover/costs/failures/cash/exposure/coverage/selected counts; no independent sleeve P&L invented |
+| ON / project37650453 |0attempts, unlaunched; no launch through unresolved OFF path | NULL, not zero |
+| SPY/XLV/XLE/QQQ/SOXX/REMX | Frozen cap-selected STOCK proxies unchanged; AR entirely off;1449valuations/301decisions remain required | No accepted matched extended outcome for any sleeve; overlap does not create observed sleeve accounts |
+
+No new backtest launch or native witness read occurred in this continuation.
+Three old additional jobs were retained retrospectively, so33observed looks
+=31cloud+2historical local; no reset/candidate renaming. The single successful
+source-only Mia restoration and single subsequent capability task are NOT
+backtest looks. Two empty-notebook custody scopes ended BEFORE Send (first
+contradictory manifest, second actualMaclock). No notebook/cell was created/
+executed by this round. The fixed01:25/01:35diagnostic design clocks and all
+spent scopes MUST NOT be renewed by implication. A later actual creation
+needs fresh bounded identity, collision refusal, independently verified
+creation metadata and a cell hash frozen before execution, not a synthetic
+capsule. Original executed modules/captures/failures remain preserved.
+
+Delegated decisionsD115–D136 are documented at their effects with provenance,
+chosen option, safe alternatives/refusal, assumptions/limits and independent
+review pending. D130ephemeral native read was preferred to source mutation,
+then genuinely unavailable; D132/D135 stage a unique new notebook rather than
+execute old captures; D136 rejects contradictory permissions instead of
+broadening a spent scope. None authorize changed economics, new study dates,
+extra arms, data-unit assumptions, other-lane edits, purchases, account
+changes, actual operator stop/database, broker/funded/paper/live/deployment.
+The safe alternative notebook route is prepared/tested but physically blocked.
+
+Review the ENTIRE owner-skipped continuation after published baseline
+`2a46f41aa780237d8d13785c28cdd0ab28d356b3`, every commit below separately,
+then the cumulative tree including this final checkpoint/validation record
+commit(s). No independent Claude round was received in this continuation;
+section92 remains the last completed counter-review. No self-review is
+mislabelled as Claude acceptance. The exact final published SHA is reported
+in this chat and verified against the actual matching remote after the ONE
+final push; this record cannot contain its own commit hash.
+
+| Ordered implementation/custody commit | Purpose | Independent disposition |
+|---|---|---|
+| `5aafea1ec375ce09495a5be7493a56cf47bff23d` | Register owner-directed OFF repair verification before frozen ON study | Pending Claude |
+| `7c04c53d64707b5ee3f652727753b80a2bc519c7` | Retain three additional owner OFF runs and bound saved-source inspection | Pending Claude |
+| `d59e508f7bb779c5dc6a25348d1c9bdfe0bc154e` | Record repaired syntax and scope exact Mia guard delta review | Pending Claude |
+| `70c221e34c041f033d201cbfbc3aff4c7391b684` | Retain frozen-mark guard deviation and scope safe membership review | Pending Claude |
+| `8dffc99044e0a26e288acb90af448888e6c40a12` | Bound owner repair terminal metadata and prove frozen mark deviation | Pending Claude |
+| `70fb45065e6916b09e60dcd04e2265ab9c2ff3cf` | Record frozen guard findings and bound three terminal reads | Pending Claude |
+| `fe310de73fb0ab72876131da5a3b7380ac15a783` | Retain all three terminal statuses and scope historical source check | Pending Claude |
+| `5763c969b4ece20b4796389ae5baf0658fe510cd` | Retain native scope setup refusal and register bounded successor | Pending Claude |
+| `c82802ff41b01e29e92fb430f5d84729029b9b7a` | Retain historical guard evidence and bound native task-control diagnostic | Pending Claude |
+| `2fd7e13a207fde0fb40355587f5d617d5108d4f3` | Bound Mia source-only restoration without a launch or policy change | Pending Claude |
+| `b23601625c5bbadcdeeb4c8e25c2146e0e38eee2` | Retain uncertain source-only draft and scope final source and job recheck | Pending Claude |
+| `ceaa1f3af8252f5c0db7f19185202ab87efe090a` | Retain owner draft confirmation and bound first source-only submission | Pending Claude |
+| `9bacf2d09fcbbf709197e1ed0f5dda6ee1b386b7` | Retain shared UI contention and scope owner-enabled first submission | Pending Claude |
+| `f592ef25f143368f30c9b1d821ff6d8206811812` | Retain single Mia submission and require independent source and job readback | Pending Claude |
+| `a301422c0b36ef5135efd48ea44f70baaa52c43f` | Retain exact frozen main restoration and bound all-file source inspection | Pending Claude |
+| `70623a5f19e47a4d1c2550f27c19a30d3c6600c4` | Qualify restored source and preserve native diagnostic gates | Pending Claude |
+| `d32f0ee859442945e2ae8b93c8d07a42329a31bc` | Retain public operator recipes with bounded retrospective custody tests | Pending Claude |
+| `700ba355b74966c7941a5a78171739d6a2cb4ded` | Freeze exact-key native witness diagnostic and restore truthful current routing | Pending Claude |
+| `296ae4a16c244c5b255e7e51bdfd9d610f3be1f7` | Bind native read scope custody and prove current-state mutation guards | Pending Claude |
+| `4dcf6393935f4bf4c8c9ca3b325ede6c266364de` | Retain refused read-only UI scope and freeze explicit no-duplicate successor | Pending Claude |
+| `be9ea5b13cf01bb758d608cc71d114b581100150` | Retain genuine Mia capability refusal and register bounded native notebook alternative | Pending Claude |
+| `d3faefc51eab9fc33d7ab494651c0a719a0991ae` | Freeze collision-refusing empty notebook prerequisite and complete source custody successor | Pending Claude |
+| `580d8511537c50db60f2203f060774ba9a408412` | Correct create-only manifest and prove native notebook deadline identity guards | Pending Claude |
+| `74ec7144918d6f89c7366971ff8db63ee2fee061` | Retain fresh Mac-lock blocker and bounded source-inventory metadata comparator | Pending Claude |
+| `f026cb965473dec6fb68f3568c5ee197b86f1a5c` | Close blocked native scopes and retain exact metadata verification invoker | Pending Claude |
+| Final checkpoint/validation record commit(s) carrying93.21 | Complete outcome/null/gate/decision/validation and one-push handoff | Pending Claude |
+
+Only lane-owned research support/tests and this sole lane record changed.
+Shared ActionPlan/SessionHandoff/workflows/main/sibling behavior stay frozen.
+Canonical TR0-I replay/rollback/parent custody/reviewer/adversarial validation
+remain parked; sourceTPR-1/TPR-0B gates not closed by exploratory QC/waiver.
+Mac fixture green proves no Windows signer/ACL/protected-parent custody; host
+split/frozenGit refusal/restoration and14preregistration limitations persist.
+OOL011 stays corrected-in-lane/shared sync owner-coordinated;003/004/006closed.
+
+Checkpoint outcome: genuine external device-lock blocker, NOT backtesting-
+ready or lane-complete. Manual unlock is needed for later browser/Mia work;
+no stale demand to sign in again or retrieve an unknown old link is invented.
+Claude next reviews this owner-skipped OFF verification and Mia-source recovery round.
+No new routine owner portfolio choice is requested. The monitor stays PAUSED;
+no automatic rearm or own-push trigger. Publication remains exactly one
+non-force matching-lane push after final focused/compilation/diff/hash/status
+checks, with actual remote/local equality and clean status verification.
+
+Final prepublication working-tree validation atf026cb96 plus this checkpoint:
+451relevant focused tests passed in7.67seconds (isolated49/52runtime root,
+no actual operator stop/db), following447passing7.62seconds before the four
+new Mac-lock/closed-scope fact mutants. The selection is the collector,
+guard-reconciliation, operator archive, exact witness reader/preregistration,
+notebook wrapper, capture17 successor, create-manifest coherence, metadata
+comparator and selected current/history/document/imported-artifact guards;
+it is NOT a complete lane/repository suite. No full suite run or cancellation
+is fabricated. Earlier red/failed/setup/uncertain results remain above.
+All18changed Python files AST-parse and compile in memory;4public JSON
+artifacts parse. No bytecode files or captured cloud source were executed.
+All23changed paths are lane-owned support/tests or this sole record; no
+shared ActionPlan/SessionHandoff/workflow/main/sibling change. Exact original
+sections63–92 retain1074035bytes, SHA
+c98e54f5f4756f20c1baa3c2735118fd9fc7fff4dce132c913148bbe9eaa2272,
+verified as the unchanged entire historical suffix of the published baseline.
+Diff whitespace/status checks pass. No scratch clone/othercheckout/sidebranch,
+reset/force/history rewrite, Windows signer/ACL proof or trading authority.
+The following final record/guard commit carries this evidence and is part
+of Claude's required entire-round review, not an independently accepted
+implementation milestone. Before commit/push recheck physical/Git roots,
+branch/HEAD/status/staged diff and ACTUAL matching remote2a46f41a; unexpected
+advance means stop. After the one successful push verify clean local/actual
+remote equality; no monitor rearm or further automatic effect follows.

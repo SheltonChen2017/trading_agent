@@ -618,6 +618,11 @@ records the scoped current review waiver, pre-use verification and exact V5
 execution freeze. It does not claim independent acceptance. This checkpoint
 stops at the committed freeze: no capacity or backtest operation has run.
 The monitor remains paused, and all technical/source/exit gates remain.
+Section 305 is Claude's independent review of `fda3c81f..0318b99a` (0 P0,
+1 P1, 0 P2, 6 P3): all five Codex commits are accepted, two after the V5
+correction `4421da78`, which makes the lifecycle accept QC's real
+`In Queue...`/`In Progress...` backtest statuses. Section 304's freeze is
+superseded and must not be used.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1698,6 +1703,13 @@ and pushing it, before any capacity or backtest invocation. On later execution,
 use only that freeze and its exact clean commit, not a new generic HEAD or
 the earlier V4 continuation directions above. No legacy lifecycle, D15 replay,
 automatic retry, Claude session/message or monitor rearming is authorized.
+Section 305 is Claude's independent review of the exact pushed range
+`fda3c81f..0318b99a` (sections 302-304). Its correction `4421da78` makes the
+V5 lifecycle accept QC's real backtest statuses and supersedes section 304's
+freeze, whose HEAD and caller pins no longer apply; that freeze must not be
+used. The immediate next step is that Codex counter-reviews section 305 and
+this round's two Claude commits, unless the owner explicitly changes this
+workflow; a new exact execution decision follows only after that.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -1806,7 +1818,7 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 300 (section 301); for section 250 the owner
+the pushed range through section 304 (section 305); for section 250 the owner
 directed focused checks without the complete suite. Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
@@ -3634,6 +3646,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-14 | Owner-limited counter-review of Claude301, no next milestone | `fda3c81f` -> `a49ce9fa` and this section302 handoff commit (two commits) | Exact incoming `9837049f..fda3c81f`: both Claude commits accepted after correction/qualification; every301finding disposed in302.2 | Test-only closure/runtime and direct-directory tripwire corrections, remaining guard coverage; no operational source, economics, private evidence or registry mutation | Root3189distinct passes/2known nested-sandbox cases deselected/72.20s; seven memory compiles; overlapping author/red/mutation evidence and final record repeat in302.4–302.5; no full suite | Two new P2 test defects corrected; documentary qualifications retained; old operational/source gates and314/239/50/699 unchanged | Exactly one final matching-lane push, then pause monitor and stop; no successor, run freeze, capacity or six/eight backtest this round |
 | 2026-10-21 | Owner-approved bounded QC launch-readiness successor | `68bdff2f` -> `86bd51dc` and this section303 final handoff commit (two commits) | No new Claude range; same-round advice is not independent review | Additive V5 one-session admission-bound A1 lifecycle, exact exclusive operation batches and ambiguity stops, cooperative lock, fixed environment/logging/client boundaries and selected source pins; frozen economics/storage unchanged | Root665 distinct focused passes66.88s; six memory compiles;66 selected bindings verified; overlapping author/mutation/smoke and final caller/record checks in303.5–303.6; no full suite | Five P2 and one P3 pre-use implementation findings corrected; historical gates retained; zero operational calls/attempts/results,314/239/50/699 unchanged | One final matching-lane push for independent review, then counter-review and separately committed exact execution decision; monitor remains PAUSED; no backtest or storage replay this round |
 | 2026-10-21 | Current owner review waiver and exact V5 A1 execution freeze | `12ea96aa` -> this section304 record-only commit | No new Claude range; current review explicitly waived, not independently accepted or counter-reviewed | Fixed existing caller/source/profile/clean-HEAD/input/admission bindings, minimal environment, six-cell sequence, deadlines, wait/ambiguity rules, output/actual-exit acceptance and accounting; no code or private state change | Genuine credential-free host/source/logging preflight passed under native denial;318 focused code/import passes39.79s; record checks in304.5; no full suite | All prior findings/qualifications retained; zero current QC/provider/credential/private operations and no new look/attempt/result;314/239/50/699 unchanged | One final matching-lane push, then stop at the requested freeze checkpoint; later execution uses only304; monitor stays PAUSED |
+| 2026-10-22 | Claude independent review of sections 302-304: the section 302 counter-review, the V5 launch-readiness successor and its execution freeze | `0318b99a` -> `4421da78` and this record commit | Section 305: five Codex commits `fda3c81f..0318b99a` disposed (3 accepted, 2 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells; no lifecycle, capacity, upload, recovery or diagnostic command run | The V5 lifecycle now accepts QC's real `In Queue...`/`In Progress...` backtest statuses and an absent list-row `projectId` (`ARV2R305-001`, `-002`), with the caller re-pinned and eleven regression tests; section 304's freeze superseded (`-004`); `ARV2CR302-001` to `-006` accepted; section 4 names section 305, banner sentence added, this row appended | 328 V5 tests and 1,509 focused tests under `--noconftest` in a sandbox refusing network, `/usr/bin/security` and artifact reads and writes; six in-memory mutations all caught; 66 selected bindings and Codex's 303.4 hashes reproduce; record gates 86 passed; artifact metadata census unchanged; complete lane suite not run at the owner's direction | 0 P0, 1 P1, 0 P2, 6 P3 | Single push of this round's two Claude commits; Codex counter-reviews section 305, then a new exact execution decision |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -50785,3 +50798,172 @@ All six cells remain unbegun and the floor remains 314/239/50/699. The monitor
 stays PAUSED. Later execution begins only with this freeze's capacity operation
 and unchanged runtime gates; no storage replay, next-contract implementation,
 review session or automatic retry follows this checkpoint push.
+
+## 305. Independent Claude review of sections 302–304: the counter-review, the V5 launch-readiness successor and its execution freeze, 2026-10-22
+
+**Range reviewed:** `fda3c81f..0318b99a`, five Codex commits: the section 302
+counter-review's test correction and record (`a49ce9fa`, `68bdff2f`), the V5
+launch-readiness implementation and its record (`86bd51dc`, `12ea96aa`), and
+the section 304 waiver and exact V5 execution freeze (`0318b99a`). No Claude
+commit is in the range. This round's two Claude lane commits are the V5
+correction `4421da78` and this record commit.
+
+**Zero research looks, development evaluations, infrastructure looks, and
+authenticated cells in this round.** This review made no QuantConnect,
+provider, mail or browser request, and ran no capacity, begin, compile,
+launch, status, read, summary, upload, recovery or diagnostic command. It
+read no Keychain item, environment credential or token file, and interpreted
+no private capture row; the round-start byte-hash census (305.2) read
+artifact bytes only to hash them. It listed only the names in the family
+control directory (114 files, none a lifecycle or V5 name). Every pytest, mutation and import probe ran
+under a sandbox that refused network access, execution of
+`/usr/bin/security`, and both reads and writes under the operative root's
+`artifacts/` (305.5). At the owner's direction the complete lane suite was
+not run; the range's focused files ran instead. The floor stays
+**314 / 239 / 50 / 699**; the six-cell family is unbegun.
+
+**Verdict.** All five Codex commits are accepted, two of them after the
+correction in `4421da78`; none is rejected. **0 P0, 1 P1, 0 P2, 6 P3.**
+The P1, `ARV2R305-001`, is that the V5 lifecycle accepts only the compact
+backtest statuses `InQueue`/`InProgress`, while this lane's real QC runs
+report `In Queue...`/`In Progress...`. Under the section 304 freeze the first
+R298 launch would have created a backtest, then refused the creation response, leaving
+an incomplete batch, a consumed A1 look and a running backtest. It is corrected
+and re-pinned in `4421da78`. Because that correction and this record change
+the lane HEAD and the caller pin, **the section 304 freeze can no longer be
+executed** (`ARV2R305-004`): a new exact execution decision is required after
+Codex's counter-review. Codex's six section 302 dispositions are accepted.
+Its 303.4 hashes, profiles and 66 selected bindings reproduce, and the V5
+design otherwise holds up: one held session, a cooperative lock, exclusive
+batches with exact output inventories, A1 only, fixed candidate order, and
+stop rather than repair on any ambiguity.
+
+### 305.1 Per-commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `a49ce9fa` | Accepted | Test-only. The closure helper now adds parent-package initializers, rejects a fence start node, caches parsed content rather than module names, and keeps the runtime absence check outside the exact shared harness; its 16 tests and the new guard tests (Keychain/provider preparation refusal, October minimum-position and fresh-collision wiring, exact active-attempt exclusion, created/readback ownership, the upload-diagnostic directory tripwire) pass in the focused selection. No production source changed. |
+| `68bdff2f` | Accepted | Section 302 disposes of every section 301 finding. All six `ARV2CR302` items are accepted (305.2). |
+| `86bd51dc` | Accepted after correction | The V5 lifecycle, caller and environment guard are sound in structure (305.3), but the lifecycle's backtest status vocabulary is wrong (`ARV2R305-001`, P1), and its status poll requires a list-row `projectId` that no proven parser requires (`ARV2R305-002`). Both are corrected in `4421da78`, with regression tests. |
+| `12ea96aa` | Accepted after correction | Section 303's claims reproduce: the six file hashes, both canonical profiles, the 66 selected bindings and 317 tests in the three new modules. Its V5 lifecycle and caller pins are superseded by `4421da78` (305.4). The whitespace-only caller change is confirmed. |
+| `0318b99a` | Accepted as a record of owner authority; freeze superseded | The scoped waiver quotes the owner exactly and claims no independent acceptance. The execution freeze is superseded: it binds HEAD `0318b99a` and caller `8336290f`, and as written it would have consumed R298's A1 at launch (`ARV2R305-004`). |
+
+### 305.2 Counter-review of section 302
+
+All six `ARV2CR302` items are accepted. `-001`: my 301 claim that the closure
+check was at least as strict as the former runtime assertion was wrong, for
+the reasons given; the corrected helper is reviewed above. `-002`: the
+upload-diagnostic fixture missed the direct directory constructor; the
+correction is right. `-003` and `-005`: the qualifications of my 301-003,
+301-004, 301-006 and 301-007 wording are accepted. `-004`: my 301 census read
+private artifact bytes, and equal endpoints are not continuous integrity.
+At the start of this round, before reading section 302, I again took a
+byte-hash census of the 5,422 artifact files; after reading `-004` I
+switched to a metadata-only census, did not re-hash, and denied artifact
+reads to every test process. `-006`: verified. The D8–D12 diagnostics
+(`diagnose_arv2_newrule_upload.py`, `_object_metadata`, `_properties_matrix`,
+`_storage_error`) all delegate to the frozen caller's `_preflight`, so my
+301 claim that their host gates were absent was a false alarm.
+
+### 305.3 The V5 status vocabulary and the other findings
+
+| ID | Priority/status | Evidence and disposition |
+|---|---|---|
+| `ARV2R305-001` | P1 / corrected in `4421da78` | `_launch` required a created backtest's status in `{"InQueue","InProgress"}`, `_status` required a list row's status in `{"InQueue","InProgress","Completed.","Runtime Error"}`, and `_outputs_match` used the same set for status batches. The real QC backtest statuses recorded in this lane are `In Queue...` and `In Progress...`: (75.5) records a launch receipt's initial `In Queue...`; (176.2), (181.2), (182.1), (184.1), (187.2), (199.9) and (202.2) record real status polls and creations moving through `In Queue...` and `In Progress...` to `Completed.` or `Runtime Error`. The proven `formal_submission_adapter.BACKTEST_PENDING_STATUSES`, the six-universe tilt-ladder and coverage submissions, and the R279 successor all use that vocabulary. The legacy submission module has the same compact strings, and so does the shared test fake (`FakeQC` returns `InQueue` on create and `InProgress` on list), so the author tests and same-round advice could not see the defect. The compact compile/read states (`InQueue`, `Building`, `BuildSuccess`, `BuildError`) are a different, correct enum. Consequence under 304.4: R298 begin and compile would pass, then launch would create the backtest, refuse with `created_backtest`, write no launch receipt and leave an incomplete batch, which stops the family with the A1 look consumed and the backtest running. The correction uses the observed vocabulary in all three places. The family-pinned legacy module is not edited. |
+| `ARV2R305-002` | P3 / corrected in `4421da78` | `_status` required an integer `projectId` on the list row. Every proven list parser (`formal_submission_adapter.parse_statistics_free_backtest_list`, the coverage and tilt-ladder submissions, the R279 successor) treats it as optional and binds it only when present; no retained observation establishes that `backtests/list` rows carry it. V5 now accepts its absence and still refuses a present value that is not the exact launched project (including `True` and floats). Identity remains bound by the project-scoped request, the exact backtest id and name, and a single row. |
+| `ARV2R305-003` | P3 / documented | `_status`, and the legacy `_prior_inventory` that V5 begin calls, require `backtests/list` to return an integer `count`. The proven parsers treat `count` as optional. No retained response shows it absent, and the proven parsers' allowed top-level keys include it, so it is left unchanged. If it were absent, begin would refuse with `prior_run_census` after project creation, consuming the look. The next execution decision should either accept this risk explicitly or have Codex add a V5-owned fresh-project inventory with the same optional-but-exact rule. |
+| `ARV2R305-004` | P3 / documented | The section 304 freeze is superseded. Its `--expected-head` (`0318b99a`) and caller pin (`8336290f`) no longer describe the lane: `_source_preflight` refuses any HEAD other than `--expected-head`, and the caller's own blob must hash to `--caller-sha256`. The freeze would therefore refuse cleanly before any private input or credential. Its 304.4 table also describes the wrong status vocabulary. A new exact decision must bind the post-counter-review clean HEAD, the 305.4 caller/profile/lifecycle hashes and the corrected status vocabulary. This review grants no execution authority. |
+| `ARV2R305-005` | P3 / documented | `_capacity` counts a backtest node as available only when it is not busy and either `autoSelectNode` is true or the node is active for the project. Section 285.8 retained only counts for the reference project (two idle nodes, zero active), not the auto flag. If the reference project's `autoSelectNode` were false, every capacity and begin observation would report `wait` with 0 available, and the family would wait until its budget runs out. That outcome is safe (no claim, no look), and the returned `auto_select` and `selected_count` fields make it visible. An operator should read `auto_select=false` with `selected_count=0` as a configuration barrier, not occupied capacity. |
+| `ARV2R305-006` | P3 / documented | Two edge cases can stop the family after a remote effect has already happened. First, `_run` checks the deadline and the 24 KiB output bound only after `dispatch` has written the batch completion, so a successful action that ends near its deadline, or an oversized read summary, exits 2 with a complete batch, and 304.3 then stops the family. Second, the control directory's `MAX_CONTROL_FILES` (18,000) is below the worst case of the stated poll budgets (about 33,000 files across six candidates), so a refusal inside `_finish` is possible near the ceiling (114 files today). Neither is likely; the next decision should say how a complete batch with exit 2 is adjudicated, rather than leaving it to a generic stop. |
+
+Checked and not findings: the frozen deadlines (capacity 60, begin 300,
+compile 60, launch 90, status 60, read 90, summarize 120 s) and poll budgets
+(compile 60 at 10 s, all others 240 at 60 s) match 304.4. The family-wide
+capacity group, per-candidate begin and launch waits, contiguous ordinals,
+exact output inventories, the read-claim-before-contact order, the active
+attempt and candidate-order gates, and the post-action re-admission all
+behave as 303.2 describes. Git children receive no QC variables. Under the
+exact 304.3 minimal environment, a local `ssl.create_default_context()`
+loaded 187 CA certificates with no network access, so the absence of `HOME`
+and `SSL_CERT_FILE` does not block TLS trust. No request was made.
+
+### 305.4 Corrected bindings
+
+These are the new prospective bindings after `4421da78`. They are not
+authority to invoke anything.
+
+| Binding | SHA256 |
+|---|---|
+| `scripts/arv2_newrule_recovery_continuation_v5.py` | `1218ce91f4cc7b4714df2766ec3ca6c5b7649d84a91ff9d9cdf05eee96336a13` |
+| `scripts/run_arv2_newrule_recovery_continuation_v5.py` | `bb29fe79eab18d4691a7b55e9cecf5de60eaa1eed41afb2d1c3d2d5e58848769` |
+| `scripts/arv2_newrule_execution_environment.py` (unchanged) | `bacf030e82b309111d8e7788991880860620f6d876bbd750246345c95d7c3194` |
+| Caller profile `arv2-newrule-recovery-continuation-operation-v5` | `a431c9db962a460e398a012160381156efa0238a68a7c2928d9539292ba0b6d7` |
+| Lifecycle profile `arv2-newrule-recovery-continuation-v5` (unchanged) | `6010aed3bcdc6c97acc65e2afb52aef85c2bdbe552cd0c400f6fccf4bedfef4b` |
+| `tests/analyst_revisions_v2/test_newrule_recovery_continuation_v5.py` | `29757ffff37907adc283b6c7cdb47f602a09ea83a1b3ad408d5c4b7b0d3d85e0` |
+| `tests/analyst_revisions_v2/test_newrule_recovery_continuation_operation_v5.py` | `d1fb7e6d00b719636d37e854982d6778cc6438ded1aebb2097279ea1342f92d7` |
+
+The lifecycle profile does not contain the status vocabulary, so it is
+unchanged; the source pin binds it. The caller profile changes only because
+its `new_pins` entry changes. All 66 selected bindings (51 original, 15 new
+with one overlap, plus the frozen original caller) match the current files,
+read through the caller's own `_source_digest` and by plain SHA-256. From the
+`0318b99a` blobs, Codex's caller `8336290f`, lifecycle `aea96da3` and
+environment `bacf030e` hashes reproduce, as does the caller profile
+`9a50425d` when the old lifecycle pin is restored in memory.
+
+### 305.5 Validation
+
+All runs used `/Users/sheltonchen/.venvs/trading_agent-py313/bin/python -B`
+with `--noconftest`, `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1`, no cache provider,
+`--ignore=artifacts`, and TMPDIR, `PYTHONPYCACHEPREFIX` and `--basetemp`
+under `.pytest_cache/claude-review-305`. The sandbox profile denied
+`network*`, execution of `/usr/bin/security`, and `file-read*`/`file-write*`
+under `artifacts/`. It was proven first: an artifact listing and an artifact
+write both failed with EPERM, an in-root temporary write succeeded,
+`/usr/bin/security` could not execute (126), and an HTTP request to
+192.0.2.1 failed to connect (7). The standard invocation with the shared
+`tests/conftest.py` was not repeated this round: its dispatch-fence
+initializer touches an outside-root runtime path (`ARV2CR302-004`), and
+Codex's 302.4 boundary is adopted.
+
+- The three V5 modules: **328 passed in 35.95 s** (317 original, 11 new).
+- The range's focused files plus regressions: `test_dispatch_fence_closure`,
+  `test_keychain_connections`, `test_newrule_submission`,
+  `test_newrule_upload_diagnostic`, `test_october_order_package`,
+  `test_remaining_provider_connections`, the three V5 modules, the V4
+  continuation and caller modules, `test_newrule_storage_recovery_v4` and
+  `test_dataset_and_import_firewall`: **1,509 passed in 113.18 s**, with no
+  failure, skip or error. This overlaps the 328 above.
+- In-memory mutations (nothing written to disk), against the eleven
+  new tests plus the full six-cell lifecycle test: compact launch statuses
+  (10 failed, 1 passed); compact status-row statuses (4 failed); compact
+  status-batch outcomes (2 failed); a required row `projectId` (1 failed);
+  an unchecked present `projectId` (3 failed); the stale `aea96da3` caller
+  pin (1 failed). Every mutation was caught.
+- A fresh process importing the V5 caller, lifecycle and environment modules
+  found `assistant.dispatch_fence` absent. All four changed Python files
+  compile; `git diff --check` is clean.
+- The record and active-document gates are reported in 305.6.
+
+The fake's statuses are now the real ones, but the fake is still synthetic.
+These tests prove the named guards and the corrected vocabulary, not that QC
+will return exactly these shapes on the next call.
+
+### 305.6 Handoff
+
+The record and active-document gates passed **86 tests** on the
+final record bytes, under the same sandbox. The artifact metadata census
+(7,389 entries: names, inodes, sizes, modification and change times, modes
+and link counts) is identical, compared in sorted order, between the start
+and the end of this round, and `git status`
+shows only the ignored `.pytest_cache/`, `artifacts/` and `__pycache__/`
+paths, the latter last written on 2026-10-14.
+
+The immediate next step is that Codex counter-reviews section 305 and its two
+Claude commits (`4421da78` and this record commit), unless the owner
+explicitly changes this workflow. After that, an exact new execution decision
+must bind the then-clean HEAD, the 305.4 hashes and the corrected status
+vocabulary, and must settle `ARV2R305-003` and `ARV2R305-006` before the
+first capacity call. Section 304's freeze must not be used. No capacity
+observation, lifecycle action, monitor change or message to another session
+follows from this review.

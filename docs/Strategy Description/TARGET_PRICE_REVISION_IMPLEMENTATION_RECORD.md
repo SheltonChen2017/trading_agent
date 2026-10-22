@@ -23501,3 +23501,39 @@ bounded result or expiry. It is custody support, not a native tool. No raw
 source/market/credential or new launch authority is embedded. Actual effects
 and absence of forbidden effects still need independent evidence, not a
 self-reported result or a live lock by itself.
+
+### 93.16 Read-only UI scope001 refused before Send; bounded successor
+
+Native-read UI001 at296ae4a1 created access1012/
+0161de6c011303a6c8a846856ec051fd85f9e739e5762f7d85b1c9b76b5f0197;
+expiry01:01:54.968460UTC. Prompt25974characters/SHA
+54e732bb569c07e799d9bec133666952c4a3c985827e4d0e3ce480fd2ba99da6
+matched the committed public artifact. Own37650980/new-conversation controls
+were observed, but click/paste/setValue left the AX input placeholder empty;
+nonce was NOT verified. ZERO deliberate Send or native reads/jobs. Do not
+infer that a failed draft population is a submitted native diagnostic.
+
+UI001 was closed REFUSED_UI_SCOPE_BOUND:7AX,1metadata inventory,2screenshots,
+5emitted crops,4inputs,1new own chat. The fifth crop exceeded the promised
+four; root stopped rather than broadening the spent scope. The old crop
+function retained an earlier image binding; its two misleading crops showed
+own historical task/source context instead of the fresh image. An initial
+multi-line AX filter also retained own previously known source snippets. No
+credential or licensed data row was emitted; those incidental historical
+snippets are NOT accepted evidence or used for decisions. A newly bound crop
+with explicit current-image bounds showed the actual new empty conversation.
+Closed receipt565/b2d23a6b49566f36da392ba5d88529d0fffa014fe98762d682725b9ba806a2f5;
+controller exited and owned lock released. No retry of its spent identity.
+
+TPR-EXT26-D131 (routine UI custody correction; review pending): identified
+extended_refusal_witness_mia_scope_successor.py registers a NEW fresh scope
+TPR-EXT26-MIA-WITNESS-READONLY-20261022-002 for the same original nonce001's
+FIRST deliberate Send, same exact committed public prompt/program. It is
+not another research look, attempt or duplicated native task. No new chat or
+mode change. Reverify own route/current empty entry, use current visible
+input coordinates if AX entry actions fail, then require nonce before Send.
+<=16AX/4screenshots/4current-bound control crops/12own inputs/1metadata
+inventory/600seconds, same absolute01:10UTC deadline and all D130 native/data
+limits. Keep old scopes/outputs and refuse uncertain delivery rather than
+send twice. The caller-supplied/native context and no-hard-timeout limits
+remain unproved; source/accounting/economics acceptance is still false.

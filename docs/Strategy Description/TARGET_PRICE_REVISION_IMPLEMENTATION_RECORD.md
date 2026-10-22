@@ -23421,3 +23421,70 @@ Classifier's asymmetric vendor-import AST field remains qualified; exact byte
 equality and inverse checks govern. Verify original main's imports no longer
 reference mia_diag/mia_rescale; unused preserved helpers do not become accepted
 APIs. Any remaining native/data failure stays open until genuine evidence.
+
+### 93.13 Current source guards corrected; native cause/clock/accounting still open
+
+Post-task metadata003 atf592ef25 ended00:32:22.993256UTC: same17exactjobs,
+one33339-byte list request, no additional observed compile/backtest launch;
+plan0635840636edbb56b30b125401527877a11e1393f7a49bf60ff9653d5d7e139a;
+receipt13402/805df102125f11e31016515473fa1367df90e1b097888507d8164fa125cbd412.
+No compile list was requested, so absence of an incidental compile is NOT
+proved.33actuallooks=31cloud+2historical local remain; OFFCodex3/ON0 unchanged.
+
+REPAIR-SOURCE-INSPECT-20261022-004 ata301422c ended00:33:31.531543UTC,
+one exact268675-byte private FD read, no network/source execution; result5772/
+c571ff48cd2be420b533ce8d64b06a2d5f62681184c9dac52158edea818bc66e.
+All14 Python files compile in memory. Main is byte/hash-identical to the
+registered60658-byte generated design and has ZERO changed function nodes;
+the active membership transformation and stale/future bypass are removed.
+Other publicly comparable modules have zero changed functions and exact
+known-header/single-newline inverses; audit-key helper has the registered
+header inverse. Core remains exact706ed5ef. The asymmetric vendor-import AST
+field is false for exact core/main because the classifier removes an original
+import; byte equality is authoritative, not a new semantic change. Unused
+mia_diag/rescale files and notebooks remain preserved, NOT approved APIs.
+
+F025/F026 are corrected ONLY in the current active main path, by independently
+verified source restoration. Historical job33 and all prior changed source
+remain unaccepted as frozen-strategy evidence. This does not correct historical
+results or prove the initiating source/data defect, compiled job binding,
+full-window orders/fees/cash/coverage, final journal or replay. F017/F018/F019
+and CR23-001 remain OPEN at their documented scope. No fourth Codex OFF, new
+Mia job, ON, date extension, economic relaxation or positive alpha claim.
+
+Root opened the current [official LEAN reader](https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Data/UniverseSelection/ETFConstituentUniverse.cs):
+CSV weight is parsed and assigned without a magnitude-based rescale; LastUpdate
+is distinct from requested-file Time and EndTime. The [official QC example](https://www.quantconnect.com/docs/v2/writing-algorithms/universes/equity/etf-constituents-universes)
+uses weights directly in portfolio targets. Inference: the normal convention
+is fractional allocation, not support for inferring percent units from a total
+or outlier. These mutable current sources do NOT prove a retained cloud reader
+build, actual offending row/unit/source date or historical correction chain.
+No provider-account/data access occurred for this public verification.
+
+TPR-EXT26-D129 (pure diagnostic design, not effect authority; review pending):
+build/test a minimal native-only reader for failed actual job31's TWO exact
+first-refusal witness keys under its already-public operation/project/job
+prefix. No enumeration, writes, old notebook, source edits, provider/History,
+compile/job or external raw ObjectStore export. Synthetic tests must prove
+strict single-member gzip and4096-byte compressed/plain validation, exact
+schema/binding/input-digest checks and closed redacted projections. Native
+read_bytes size refusal is AFTER retrieval; no invented pre-allocation bound
+or SDK hard timeout. Availability/creation hashes are observations, not
+independent original-write proof. Hardcoded legacy operation/look31 fields
+do not authenticate the unmatched dispatch or actual later look ordinals.
+Membership source_date/version/unit_expected are NULL by design; mark action
+flags are NULL and cache_price may be NULL before its original refusal. Do
+not manufacture their missing meaning. No SID/weights/prices/raw clocks/rows
+leave QC. A real ephemeral native-Mia read, if available, needs a NEW committed
+program/source identity and fresh bounded manifest/access before submission;
+if a notebook/file mutation is required, STOP for separately bounded design.
+
+The new public owner_repair_operation_scripts_20261021.json retrospectively
+retains19 exact Python invoker/inspection/UI-holder texts and selected CUA
+effect statements plus the registered public prompt. It grants NO effect or
+replay authority and cannot fabricate earlier preregistration. It includes
+failed scopes and setup limitations, no captured cloud source/market rows or
+credentials. Focused schema/hash/AST-only validation is delegated before its
+commit. It is source evidence, not a second handoff or closure of older
+CR22-001's uncommitted historical operations. This round's live task/review
+truth remains ONLY in this record; the monitor stays PAUSED.

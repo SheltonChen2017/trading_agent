@@ -23104,3 +23104,36 @@ dispatch remain UNVERIFIED; availability is not an actor/job binding. Scope
 actually exited and lock released before the terminal collector. Next native
 own-project read requires a new bounded scope; no stale unconditional unlock
 request and no duplication/cancellation of an unresolved owner-Mia task.
+
+### 93.6 Three native terminal records verified; historical source not yet bound
+
+Fresh OWNER-REPAIR-TERMINAL-20261022-001 at70fb4506 ended00:04:17.557878UTC:
+plan9b21b3b3c17d98bfed21b9567627ac004f181de485359ee4b67bd112ff8363a2;
+receipt10142/80fdb07e528dca75f379ba9a5b52557411ccf7ca2b5738557c005d71d87677e9.
+Three exact read requests5376939total wirebytes, complete selective projections
+and request descriptors retained; controller actually exited/lock released.
+All3 own project/job/snapshot identities passed. Looks31/32 are genuinely
+terminal Runtime Error with ValueError markers,495/179 errorbytes and hashes
+ee2b0277b590d24e4d2fdae686b6d9cbbe110d2b963b462f71bdec4900ae48c1 /
+69b4d332dfac308e47f3631c5cf01a418ab26b4eba4479ed3c095b1e3775e0d1.
+No known public-file trace frame matched this projection; no guessed cause.
+Look33 is genuinely terminal Completed., progress1, nullerror. All3 return
+native compile ID NULL and only the already-attributed unzoned creation
+date. No start/end valuation/census/fees/fills/returns were obtained here.
+These are terminal-status facts, not historical source/economics/accounting
+acceptance. Every accepted extended metric stays NULL; OFF3/ON0 and33actual
+observed looks remain unchanged. Old prospective31 remains unmatched.
+
+TPR-EXT26-D121 (routine delegated native read; review pending): fresh
+MIA-HISTORY-VERIFY-20261022-001 may route Safari to own OFF37650980 and its
+exact known Completed job0407bbff60ee6ca57219743062090e5c, inspect built-in
+Mia task status and job-specific Results/Code availability. New currentHEAD/
+UTC<=600seconds,<=20AX/4screens/12routing actions. Navigation/read only:
+NO message, source/mode edit, Restore, Re-run, clone/project creation,
+compile/job, notebook/ObjectStore read, account/resource action or unrelated
+page-body inspection. Do not emit source, task prompt, market rows or private
+outcome values; retain only own-route/status/control presence/custody facts.
+Observe task status before any proposed source-only remediation; do not
+duplicate/cancel an uncertain task. A clone, if actually necessary, is a
+separate scoped cloud mutation, never OFF4 or a monkeypatched project pin.
+Current files/read and snapshotId alone cannot prove historical executed bytes.

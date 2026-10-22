@@ -23146,3 +23146,46 @@ owned lock; no UI action/read, credentials, message or job occurred, no result
 receipt was fabricated. The claim/access remain spent. Identified successor
 MIA-HISTORY-VERIFY-20261022-002 has the SAME D121 limits and fresh HEAD/time,
 using Python -c with PTY input to retain a genuine closer. No old scope reused.
+
+### 93.7 Historical Code view links the suspect repair; task status still unproved
+
+MIA-HISTORY-VERIFY-20261022-002 at5763c969 genuinely closed00:10:09UTC:
+access652/317404f4132afb7395de05278c167f5f38f3f17719b20fca312d0bbcda02d257;
+result990/e9e9937d37ea239454d46295e29377abc339c7a466f37a4236b4124a564d496d.
+20AX,0screenshots,11routing actions; owned lock released. Dedicated Safari tab
+opened own37650980, then Backtests Results. The latest Completed row's native
+created17:40:16 matched the fresh exact job catalogue; its historical Code tab
+later visibly included exact job0407bbff60ee6ca57219743062090e5c. Selected
+mia_diag.py in that historical file menu. Its normalized known-token structure
+shows `if sid in algorithm._warning_ids or sid in algorithm._delisted_ids:
+return True`, followed by assert_fresh_mark/returnFalse. This supports F025 in
+the job-specific Code view, NOT a byte-exact compiled source/hash guarantee.
+All files/config/economics and full native accounting remain unaccepted.
+
+Retain native-inspection limitations: initial routing incidentally displayed
+own organization resource/sibling metadata and Safari Start Page metadata;
+none selected. One faulty disclosure regex matched 'table' inside 'settable'
+and emitted own history statistics. Those observations are not accepted
+performance, a new run, market-data/PIT proof or a reason to choose a winner;
+future disclosure uses exact word-boundary/closed markers. No source, token,
+market journal or task prompt was exported to files/Git. False contiguous
+guard regex checks reflect rendered AX token boundaries, not absence; the
+masked known-token structure above is the positive observation. Difference-
+only AX false-presence checks also do not prove a source section was hidden.
+Browse-chats controls were present, but clicks yielded no usable task state;
+no active/completed task or old dispatch was authenticated/attributed. No
+message, source/mode edit, clone/Restore/Re-run, compile/job or ObjectStore
+operation occurred. Controller stopped at its limit, not a permanent UI block.
+
+TPR-EXT26-D122 (routine bounded UI diagnostic; independent review pending):
+MIA-CONTROL-VERIFY-20261022-001 may inspect ONLY the existing own37650980 tab
+and built-in Mia controls, <=10AX/3cropped screenshots/8UI routing actions/
+600seconds at new currentHEAD/time. Pure in-memory image crop may withhold
+the source/task body and expose only native toolbar/header/control regions;
+do not emit raw source, task prompt, journal/market rows or secret fields.
+No message/mode/source change, new task, launch/compile/notebook/ObjectStore/
+account action or unrelated tab. Reconfirm own route before every input;
+stop on lost ownership/focus, never cancel another task/lane. If inaccessible
+after safe AX/visual alternatives, preserve the factual control limitation.
+Any actual Mia source-only task needs a separate effect scope and resolution
+of existing task ambiguity; current request does not silently grant Full Auto.

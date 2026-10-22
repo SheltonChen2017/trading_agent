@@ -612,10 +612,12 @@ commits, corrects test-only gaps and qualifies the review evidence. The
 monitor is to be paused immediately after that single verified final push;
 the six/eight lifecycle remained uninvoked in that round. On October 21 the
 owner approved the recommended bounded launch-readiness successor (section
-303). This resumes implementation, not the spent storage publication or an
-unreviewed QC launch. The monitor remains paused. Independent review,
-counter-review and a separately committed exact execution decision precede
-the first six/eight backtest.
+303). That implementation was pushed at `12ea96aa`. The owner then said
+"proceed with 1 2 and 3" and explicitly "skip the claude review". Section 304
+records the scoped current review waiver, pre-use verification and exact V5
+execution freeze. It does not claim independent acceptance. This checkpoint
+stops at the committed freeze: no capacity or backtest operation has run.
+The monitor remains paused, and all technical/source/exit gates remain.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1684,14 +1686,18 @@ Section 301 is Claude's independent review of the exact pushed range
 completed pushed commits. The owner's later explicit monitor direction limits
 this round to counter-review, documentation and one final push, with no next
 milestone. That round concluded at `68bdff2f` and the monitor was paused.
-The owner subsequently approved the October 21 launch-readiness recommendation.
-Section 303 implements the separately versioned successor; Claude should
-review its exact final pushed snapshot together with the section 302 test
-corrections before Codex counter-review and a later exact execution decision.
-No Claude session/message is started here. The earlier V4 continuation
-instructions above are deferred, not a current run freeze: do not call the
-legacy lifecycle, renew D15, or observe capacity before the successor's
-applicable review and run-freeze gates pass.
+The owner subsequently approved the October 21 launch-readiness recommendation;
+section 303 was pushed at `12ea96aa`. By the later "skip the claude review"
+direction, the owner explicitly waives the current pre-use Claude review of section 304's
+section-303-based execution freeze, including the supporting section 302
+test corrections, not future changed contracts or technical gates. No new
+Claude commit exists, so no Claude counter-review is fabricated. Codex's
+source/preflight/synthetic checks are not independent acceptance. Section 304
+freezes the exact V5 A1 operation sequence; this round stops after documenting
+and pushing it, before any capacity or backtest invocation. On later execution,
+use only that freeze and its exact clean commit, not a new generic HEAD or
+the earlier V4 continuation directions above. No legacy lifecycle, D15 replay,
+automatic retry, Claude session/message or monitor rearming is authorized.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -3627,6 +3633,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-14 | Claude independent review of sections 292-300: Massive and provider diagnostics, October inputs, the six/eight family and the QC storage recovery | `9837049f` -> the test correction and this record commit | Section 301: twenty-nine Codex commits `38e2b97a..9837049f` disposed (13 accepted, 16 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells; no capture, diagnostic, upload, recovery or lifecycle command run | Test-only correction: a harness-independent dispatch-fence closure check replaces 27 assertions in 26 files (`ARV2R301-010`), tripwires in three files (`-002`) and six isolating tests (`-009`); no production code changed. Twenty-one code pins and the one-use report and claim pins reproduce; private modes and record hygiene checked; one P2 and nine P3s (`ARV2R301-001` to `-010`); accepted `ARV2CR292-001` to `-004`; section 4 names section 301, banner sentence added, this row appended | The 38 new and changed test files under both the standard invocation and `--noconftest`, and the record gates, under a sandbox that also refuses `/usr/bin/security` and artifact writes, with in-root temporary paths; `compileall`, artifact and status integrity, `git diff --check`; the complete lane suite was stopped unfinished at the owner's direction; exact counts in 301.6 | 0 P0, 0 P1, 1 P2, 9 P3 | Single push of this round's two Claude commits; Codex counter-reviews section 301 unless the owner changes the workflow |
 | 2026-10-14 | Owner-limited counter-review of Claude301, no next milestone | `fda3c81f` -> `a49ce9fa` and this section302 handoff commit (two commits) | Exact incoming `9837049f..fda3c81f`: both Claude commits accepted after correction/qualification; every301finding disposed in302.2 | Test-only closure/runtime and direct-directory tripwire corrections, remaining guard coverage; no operational source, economics, private evidence or registry mutation | Root3189distinct passes/2known nested-sandbox cases deselected/72.20s; seven memory compiles; overlapping author/red/mutation evidence and final record repeat in302.4–302.5; no full suite | Two new P2 test defects corrected; documentary qualifications retained; old operational/source gates and314/239/50/699 unchanged | Exactly one final matching-lane push, then pause monitor and stop; no successor, run freeze, capacity or six/eight backtest this round |
 | 2026-10-21 | Owner-approved bounded QC launch-readiness successor | `68bdff2f` -> `86bd51dc` and this section303 final handoff commit (two commits) | No new Claude range; same-round advice is not independent review | Additive V5 one-session admission-bound A1 lifecycle, exact exclusive operation batches and ambiguity stops, cooperative lock, fixed environment/logging/client boundaries and selected source pins; frozen economics/storage unchanged | Root665 distinct focused passes66.88s; six memory compiles;66 selected bindings verified; overlapping author/mutation/smoke and final caller/record checks in303.5–303.6; no full suite | Five P2 and one P3 pre-use implementation findings corrected; historical gates retained; zero operational calls/attempts/results,314/239/50/699 unchanged | One final matching-lane push for independent review, then counter-review and separately committed exact execution decision; monitor remains PAUSED; no backtest or storage replay this round |
+| 2026-10-21 | Current owner review waiver and exact V5 A1 execution freeze | `12ea96aa` -> this section304 record-only commit | No new Claude range; current review explicitly waived, not independently accepted or counter-reviewed | Fixed existing caller/source/profile/clean-HEAD/input/admission bindings, minimal environment, six-cell sequence, deadlines, wait/ambiguity rules, output/actual-exit acceptance and accounting; no code or private state change | Genuine credential-free host/source/logging preflight passed under native denial;318 focused code/import passes39.79s; record checks in304.5; no full suite | All prior findings/qualifications retained; zero current QC/provider/credential/private operations and no new look/attempt/result;314/239/50/699 unchanged | One final matching-lane push, then stop at the requested freeze checkpoint; later execution uses only304; monitor stays PAUSED |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -50541,3 +50548,240 @@ push. The floor remains **314 shared / 239 development / 50 infrastructure /
 699 cells**; formal source/PIT/security-master and financial boundaries stay
 unchanged. The next required input is independent review of this exact
 snapshot, not another routine vendor acknowledgment or renewed storage call.
+
+## 304. Owner-waived current review and exact V5 execution freeze, 2026-10-21
+
+### 304.1 Owner scope and actual starting state
+
+After the section 303 checkpoint, the owner directed **"proceed with 1 2 and
+3"**, referring to the proposed Claude review, Codex counter-review and exact
+execution freeze. Local/tracking/live matching remote remained
+`12ea96aa0c92f3b0fbd8e7c7cb51a4dbe18b8ac7`, clean, with no newer completed
+Claude push. On being told that review was the remaining prerequisite, the
+owner explicitly directed **"skip the claude review"**.
+
+`ARV2OD304-A`: waive only this current pre-use review checkpoint for the
+unchanged section 303 V5 implementation, its supporting section 302 test
+corrections and this exact execution decision. This supersedes 303.6's
+current wait for Claude, not its technical/source/exit requirements. No new
+Claude range exists; there is no invented independent review or counter-review.
+Codex performs bounded pre-use verification under the waiver. Normal review
+requirements remain for later materially changed contracts unless separately
+waived. No third-party session/message or monitor rearming follows.
+
+`ARV2OD304-B`: complete the requested execution-freeze checkpoint and make one
+final matching-lane push. **Do not invoke capacity, begin, compile, launch,
+status, read or summary in this round.** The following prospective protocol
+is the exact later execution decision, not a report that any operation has
+occurred or that all runtime inputs are currently authenticated. No new
+operational code, private artifact, credential configuration, source package,
+strategy rule, shared file or other lane is modified. The existing monitor
+remains PAUSED. The six cells remain unbegun; the floor remains
+**314 shared / 239 development / 50 infrastructure / 699 cells**.
+
+### 304.2 Fixed source, input and successful storage bindings
+
+Use ONLY `/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2` on
+`codex/strategy-analyst-revisions-v2`, Darwin/POSIX Python 3.13 at
+`/Users/sheltonchen/.venvs/trading_agent-py313/bin/python`, with `-B`.
+The only permitted lifecycle entry is the unchanged
+`scripts/run_arv2_newrule_recovery_continuation_v5.py` CLI. No direct library
+dispatch, bare legacy caller, arbitrary callback, preparation, organization
+discovery, upload or recovery-producer invocation is permitted.
+
+| Binding | Exact value |
+| --- | --- |
+| V5 caller SHA256 | `8336290f51d42e308b20e25f7562fb3741fb6b93016a6185254ac75b45a04d26` |
+| Caller profile SHA256 | `9a50425d2a9ad431eea2c8d29918fff67898fe8eb3157b55ed91b1616740168d` |
+| Lifecycle source SHA256 | `aea96da3bd9bb193341901609bbf525ece96f682e86606ed354deb5382a4803c` |
+| Lifecycle profile SHA256 | `6010aed3bcdc6c97acc65e2afb52aef85c2bdbe552cd0c400f6fccf4bedfef4b` |
+| Environment source SHA256 | `bacf030e82b309111d8e7788991880860620f6d876bbd750246345c95d7c3194` |
+| Family SHA256 | `8b8ee913dcfb5ad37f4748ea70db4fcbd6ff15580e52cd160bccf2b37e10a9e5` |
+| Package SHA256 | `411c2734da61c7d4172c4cb3d33c4ffdde650f40336a5e807d26e50cc7de0bad` |
+| Lineage SHA256 | `e4518e06a68a18a3151fe36e5926699624fc68b97c31a8e06917d44103831fd9` |
+| D15 admission SHA256 | `1a6850a8fbefeeab8dea2fead19b3b5f656ca29987da9ef180be1e7cc59322a3` |
+
+The 66 selected dependency bindings are the unchanged exact maps in 303.4
+and the caller; no pin refresh is authorized. Package/lineage paths are the
+caller's fixed paths under `massive_ratings_delta/R297-20261013-D5/package`.
+The sole control parent remains
+`artifacts/analyst_revisions_v2/newrule_comparison_qc/R298-R303-20261013`.
+No new control leaf or fallback artifact path is introduced.
+
+The actual D15 **exit 0**, successful normal envelope and admission are the
+external observations in 300.4 at clean freeze
+`bcc17ec34bf8f821f38a6755d21611e287040608`; no exit is inferred from files.
+Only the prescribed V5 consumer may reauthenticate the V4 admission and its
+bounded report/claim/start/request census, family/organization binding and
+fixed package payloads before action and during postchecks. This explicitly
+permits that existing consumer traversal under 300.4; it is not receipt-only
+validation, an ad-hoc corpus census or permission to rerun D15/its readers.
+
+For all calls, `--expected-head` must be the exact clean commit containing
+this completed section 304 freeze, resolved and recorded after commit and
+before first execution; `--caller-sha256` and `--receipt-sha256` must equal
+the table above. Do not substitute a later HEAD, dirty tree or amended source
+without a new coherent decision. Before/after each call verify root, branch,
+HEAD and status; stop on concurrent work or an unexpected remote change.
+All other writers/tests are held during execution. The caller's source/blob
+checks and native-host restrictions remain mandatory.
+
+### 304.3 Execution environment and finite external evidence
+
+Start each CLI in a fresh dedicated process. Construct an explicit child
+environment through the process API, with `PATH=/usr/bin:/bin:/usr/sbin:/sbin`,
+`LANG=en_US.UTF-8`, `PYTHONDONTWRITEBYTECODE=1`, and absolute non-symlink
+TMPDIR/PYTHONPYCACHEPREFIX paths beneath a fresh in-root `.pytest_cache`
+support directory. Any optional TMP/TEMP/XDG_CACHE_HOME paths must be under
+the same support directory. Darwin's bounded native numeric descriptor may
+remain; no unrelated inherited variable, proxy, key-log, debug, loader or
+Python override is passed. Preserve the owner's parent environment unchanged.
+
+For remote-capable actions, pass only the two existing QC credential variables
+to that child in memory via its environment, never in argv, shell interpolation,
+recorded command text, stdout/stderr, a file, or a debug dump. Do not query
+Keychain, inspect token files, source an unrelated environment script, open a
+browser, change account settings or fall back to another credential/provider.
+If the existing configuration is unavailable, stop and report that concrete
+barrier. No credential presence/value check occurred in this freeze round.
+The fixed client acquires credentials only after its prescribed input/source/
+admission checks. The CLI may perform only its existing default-only,
+process-local NullHandler bootstrap; never disable or rewrite owner logging.
+
+Capture the actual process exit independently of its output. Accept exactly
+one bounded canonical JSON normal envelope in schema
+`arv2-newrule-recovery-continuation-operation-v5`, ending in exactly the
+canonical payload's one LF plus `print`'s additional LF, with no other trailing
+message/traceback and empty stderr. Canonical JSON plus its first LF is at
+most 24 KiB; allow only the single additional print LF. Require exact
+operation, clean freeze HEAD, caller/admission/profile bindings,
+`operation_completed=true`, coherent UTC times, the expected candidate/A1 and
+stage result where applicable, and all original-upload/PIT/formal/paper flags
+false. Actual exit **0 AND matching valid output** are required for advancement;
+neither substitutes for the other. Preserve the bounded envelope and its
+digest, dispatch/completion observations, actual exit, returned identities
+and stage decision in the lane record; do not fabricate precise provider
+timing from external polling brackets. During the fixed clean-HEAD sequence,
+retain external events in the execution tool transcript and existing immutable
+operation controls; append the result record at the completed or blocked
+checkpoint before the final push. Do not make the worktree dirty between
+calls. An earlier evidence commit requires stopping and explicitly rebinding
+a new exact continuation decision, not silently changing `--expected-head`.
+Unexpected/oversize/raw output is not
+to be pasted into chat, interpreted as success or parsed by a broad ad-hoc
+private reader. No extra result/control reader is authorized.
+
+A completed local batch does not prove actual caller exit 0. Timeout, nonzero,
+unknown exit, missing/malformed/trailing output, incomplete claim/batch,
+changed/orphan/mixed lifecycle evidence or transport ambiguity stops the whole
+family. Retain evidence without cleanup, marker repair, replacement path or
+unchanged retry. A project or backtest may already exist after a failed call;
+do not infer no remote effect or manufacture a terminal. The 24-KiB bound and
+process alarms do not guarantee termination during host suspension or
+uninterruptible I/O, and selected pins do not authenticate the whole interpreter.
+
+### 304.4 Exact A1 sequence, deadlines and accounting
+
+The first later action is `capacity` with no candidate/attempt arguments.
+Then use only the following fixed candidate order and unchanged 297.14
+profile/projection hashes: **R298 six/AR-off, R299 six/AR100, R300 six/AR200,
+R301 eight/AR-off, R302 eight/AR100, R303 eight/AR200**. Every candidate call
+supplies its exact `--candidate` and `--attempt 1`. Omit both retry arguments.
+AR100/200 retain the frozen transfer fractions, not new leverage. The frozen
+evaluation runs from 2021-01-04 through 2026-10-13 with common geometry; no
+source/date/selection rule changes or new outcome-driven tuning are allowed.
+Complete begin → compile → launch → status → read for each candidate, and
+require that candidate's validated read with actual exit 0 before beginning
+the next candidate. Fixed order does not permit overlapping candidate runs.
+
+| Operation | Parent deadline | Exact permitted continuation |
+| --- | ---: | --- |
+| `capacity` | 60 s | At most 240 completed observations, at least 60 s after prior completion. Require available capacity; `state=wait` means product wait, not advance. |
+| `begin` | 300 s | At most 240 batches per candidate, with 60 s between completed capacity-only waits. A busy observation creates no attempt claim/look. Exactly one actual A1 claim/project/compile sequence; once claimed, no repeated begin. |
+| `compile` | 60 s | At most 60 observations, at least 10 s after prior completion. Continue only InQueue/Building; exact BuildSuccess releases launch. BuildError stops the family even with process exit 0. |
+| `launch` | 90 s | At most 240 batches, with 60 s between completed capacity-only waits. Preserve the existing attempt on busy; exactly one actual launch after BuildSuccess and fresh own-project source/ownership/capacity checks. |
+| `status` | 60 s | At most 240 observations, at least 60 s after prior completion. Continue only InQueue/InProgress; exact Completed. releases the one read. Runtime Error stops the family even with process exit 0. |
+| `read` | 90 s | Once per candidate after accepted Completed. status. Authenticate exact project/source/job and the two bounded custom aggregate statistics; require validator acceptance and actual exit 0. |
+| `summarize` | 120 s | Once, only after all six admitted reads; native network denial and no QC credential variables. Confirm matching common-source hash and geometry, not merely six terminal strings. Require `family_complete=true`, `family_comparable=true` and `comparability_mismatch=false` before reporting a successful matched comparison; exit 0 alone is insufficient. |
+
+Use product waits, not busy polling, while respecting intervals measured from
+prior completed batches. Never cancel, interrupt, reassign or repurpose another
+lane's nodes, jobs, projects or controls. No node availability is asserted now.
+Compile/create/runtime/transport failure or exhausted polling budget requires
+a separately justified diagnostic/recovery decision; no automatic next cell,
+A2/A3, renamed candidate or renewal of exhausted R247/R281. The original
+three-unsuccessful-attempt/Mia checkpoint remains, but this freeze grants only
+A1 for each fixed candidate and no source/economic changes after outcomes.
+
+Book each actual A1 claim once as +1 shared/+1 development, including a claimed
+attempt that later fails; do not wait for a successful launch to hide the look.
+An ambiguous exit never establishes absence of a claim: preserve the unresolved
+event and stop until its accounting can be resolved admissibly. A successful
+admitted read adds one result cell. Capacity-only waits, repeated compile/status
+observations and local summary add no extra looks/cells. Starting floor is
+314/239/50/699; six actual claims and six admitted reads would yield
+320/245/50/705, **not booked prospectively**. Update only this lane record.
+
+This is accepted-risk retrospective simulated-order research, not pristine
+immutable/PIT evidence or a formal strategy admission. No funded/broker/real
+orders, QC Paper/live deployment, paid-rights change, licensed-row disclosure,
+shared holding-period claim or efficacy assertion follows. Frozen financial,
+provenance, missing-data, selection/execution parity, multiplicity and dossier
+gates remain intact. Failure or lack of comparability must be reported honestly.
+
+### 304.5 Pre-use verification and handoff
+
+Root verified clean local/tracking/live `12ea96aa` and read the current source
+and authority records. Under native network/production-artifact-read/write/
+Keychain-command denial, a fresh no-credential process ran only the genuine
+host/source preflight, default logging bootstrap and full non-operational
+preflight. It passed exact host/root/branch/clean-HEAD/blob checks, all 66
+selected bindings and both canonical profiles, and asserted
+`assistant.dispatch_fence` absent. `main`, `run`, `_operation`, lifecycle
+dispatch, private input/admission consumers and credential/client construction
+were not invoked. This is stronger than a mocked host check but is not current
+private-source authentication, QC access/capacity evidence or independent review.
+
+The implementation and all six source/test hashes remain exactly 303.4; this
+round changes only this lane record. Same-round read-only advice checked
+sequence/budgets/accounting and the admission-consumer scope; it is not Claude
+review. No new P0/P1/P2/P3 defect is claimed or historical finding erased.
+Focused validation results are recorded below before the one final push.
+
+Root's three unchanged V5 test modules plus the research import-closure test
+passed **318 distinct tests in 39.79 s**, without failures, skips or warnings.
+The test process asserted `assistant.dispatch_fence` absent afterward. Native
+network denial, production-artifact read/write denial and Keychain-command
+denial remained active; plugin autoload/shared conftest/cache provider were
+disabled, with `-B` and all support paths under the designated root. These
+tests overlap earlier 303 coverage and are not new operational evidence.
+No complete lane/repository suite or historical operational reader was run.
+
+The first record/document selection returned **85 passed / 1 failed in
+1.22 s**: the live next-step wording did not bind the owner directly to the
+explicit waiver in the required form. The wording was corrected without
+weakening the test or expanding the waiver. Same-round static advice also
+made the per-candidate completion-before-next-begin sequence and the three
+summary comparability booleans explicit; both preserve unchanged V5 behavior.
+
+The corrected record/document selection passed **86 tests in 1.13 s** under
+the same native network/artifact/Keychain-command denial and in-root support
+discipline. This makes **404 distinct passing checks** in this round (318
+code/import plus 86 record/document), not 489; the initial 85 passing record
+checks overlap the corrected selection. The original red result remains
+recorded. `git diff --check` passed; only this lane record is changed.
+
+Outgoing disposition: one record-only commit after exact baseline
+`12ea96aa0c92f3b0fbd8e7c7cb51a4dbe18b8ac7` records the scoped owner waiver and
+unchanged-code prospective freeze, not independent acceptance or a fabricated
+Claude disposition. Verify root/branch/HEAD/status and matching live remote,
+then make exactly one nonforce matching-lane final push and stop. Its resulting
+commit is the sole section 304 clean execution HEAD, to be stated in the final
+handoff rather than substituted with an arbitrary later snapshot.
+
+No operational QC/provider/private-input/credential invocation, attempt claim,
+project, compile, launch, result or new look/cell occurred in this round.
+All six cells remain unbegun and the floor remains 314/239/50/699. The monitor
+stays PAUSED. Later execution begins only with this freeze's capacity operation
+and unchanged runtime gates; no storage replay, next-contract implementation,
+review session or automatic retry follows this checkpoint push.

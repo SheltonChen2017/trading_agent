@@ -23485,3 +23485,19 @@ If unavailable, report a body-free STOP and zero data effects. The program
 does not manufacture these native capabilities or hard-bound SDK time/initial
 allocation. Closed diagnostic output only; no SID/raw values/clocks/rows leave
 QC. This consumes no new study look/attempt and cannot authorize OFF/ON.
+
+Current-routing correction follow-up:54 root-selected document/imported
+artifact/role/fact/history/register checks now pass in1.12seconds with the
+isolated49/52 runner. The failed mutation harness flattened newline anchors
+and assumed uppercase. It now mutates only the extracted current block,
+preserves history/anchors, matches case/whitespace, and requires the intended
+missing-fact AssertionError. No acceptance fact was weakened. The delegate
+separately reports54passing0.94seconds; current test SHA
+c0db332b11dd054a3c2b6a21a906127b6a0b19bf45d6d9513f0038572bed5d83.
+The new public extended_refusal_witness_mia_scope.py retains this operation's
+exact holder, binds its own committed bytes and the frozen preregistration,
+uses fresh O_EXCL claim/access and its owned controller lock, then retains a
+bounded result or expiry. It is custody support, not a native tool. No raw
+source/market/credential or new launch authority is embedded. Actual effects
+and absence of forbidden effects still need independent evidence, not a
+self-reported result or a live lock by itself.

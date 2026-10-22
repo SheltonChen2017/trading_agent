@@ -579,6 +579,28 @@ SECTION91_NEXT_ROLE = "Codex next counter-reviews section 91 and this round's Cl
 SECTION92_RANGE = "1bc751f878c083836dd9bd967231144fb52acd87..557b2250aa82f330a995362ebd75c4f30ab03a34"
 SECTION92_SHORT_RANGE = "1bc751f8..557b2250"
 SECTION92_NEXT_ROLE = "Claude next reviews this counter-review snapshot"
+# The owner skips that next checkpoint for ONE bounded continuation, not
+# historical review or future independent review. Keep section92's constants
+# immutable for its own disposition/scope guards below.
+SECTION93_BASE = "2a46f41aa780237d8d13785c28cdd0ab28d356b3"
+SECTION93_LAST_REVIEWED_RANGE = SECTION92_RANGE
+SECTION93_LAST_REVIEWED_SHORT_RANGE = SECTION92_SHORT_RANGE
+SECTION93_NEXT_ROLE = "Claude next reviews this owner-skipped OFF verification and Mia-source recovery round"
+SECTION93_CURRENT_FACTS = (
+    "Section93 is the active owner-skipped continuation",
+    "33 observed looks now (31cloud+2historical local)",
+    "OFF has consumed all three Codex attempts",
+    "ON has consumed zero attempts and remains unlaunched",
+    "All accepted extended metrics remain NULL",
+    "Looks31/32 Runtime Error; look33 Completed, source/economics/accounting unaccepted",
+    "F025/F026 are corrected only in the current active main path; historical job33 remains unaccepted",
+    "All14 saved Python files compile only; the eight syntax failures are historical",
+    "Mia source-only nonce001 received one deliberate Send after owner-confirmed draft custody",
+    "Fresh current main.py matches the registered 60658-byte source exactly; other15files are unchanged",
+    "F017/F018/F019 and CR23-001 remain OPEN; full-window OFF accounting remains unproved",
+    "No new job was observed after the source-only restoration",
+    "Monitor remains PAUSED; the review skip is this round ONLY",
+)
 SECTION86_COMMITS = (
     "b28d07f6139dc0460e927b152fb4a87f6f2915e9",
     "0455fc2534f5951bc3d0eca35dc581cef9cca5f4",
@@ -1127,6 +1149,15 @@ def _current_integration_state(section: str) -> str:
     )
 
 
+def _assert_section93_current_facts(text: str) -> None:
+    """Positive, bounded current facts; never scan old sections for stale dates."""
+    normalized = " ".join(text.split()).lower()
+    for required in (*SECTION93_CURRENT_FACTS, SECTION93_NEXT_ROLE,
+                     "last completed counter-review", "skip 1, proceed to 2 and 3 directly"):
+        assert required.lower() in normalized, required
+    assert SECTION92_NEXT_ROLE.lower() not in normalized, "section92-only routing is superseded for this round"
+
+
 @pytest.mark.parametrize("missing", ["opening", "closing"])
 def test_current_document_extractors_fail_closed_on_missing_anchor(missing: str) -> None:
     """TPR-CCR7-003: an absent boundary cannot silently widen a current block."""
@@ -1177,7 +1208,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [SECTION92_RANGE]
+    ) == [SECTION93_LAST_REVIEWED_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
@@ -1195,7 +1226,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "TPR-1 remains blocked" in normalized_current
     assert "reviewed-spec registry remains empty" in normalized_current
     assert "Claude next reviews this Codex round independently" not in normalized_current
-    assert SECTION92_NEXT_ROLE in normalized_current
+    assert SECTION93_NEXT_ROLE in normalized_current
+    _assert_section93_current_facts(current)
     assert SECTION91_NEXT_ROLE not in normalized_current
     assert SECTION86_NEXT_ROLE not in normalized_current
     assert SECTION85_NEXT_ROLE not in normalized_current
@@ -1214,7 +1246,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     for current_fact in (
         "OFF has consumed all three Codex attempts",
         "ON has consumed zero attempts",
-        "30 observed looks now",
+        "33 observed looks now",
         "no accepted paired result exists",
         "the owner-reported Mia fix requires independent result/source verification",
     ):
@@ -1277,11 +1309,9 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [SECTION92_SHORT_RANGE]
+        ) == [SECTION93_LAST_REVIEWED_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert "codex has counter-reviewed every incoming commit" in normalized_summary_lower
-        assert "section 92" in normalized_summary_lower
-        assert SECTION92_NEXT_ROLE.lower() in normalized_summary_lower
+        _assert_section93_current_facts(summary_pointer)
         assert SECTION91_NEXT_ROLE.lower() not in normalized_summary_lower
         assert SECTION86_NEXT_ROLE.lower() not in normalized_summary_lower
         assert SECTION85_NEXT_ROLE.lower() not in normalized_summary_lower
@@ -1294,7 +1324,6 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         assert "codex next counter-reviews section 79" not in normalized_summary_lower
         assert "codex next counter-reviews section 77" not in normalized_summary_lower
         assert "fixture-only tpr-d1 candidate awaits claude review" not in normalized_summary_lower
-        assert "fixture-only tpr-d1 candidate is accepted" in normalized_summary_lower
         assert "claude next reviews the counter-review and tpr-d0" not in normalized_summary_lower
         assert "claude next reviews sections 49 and 50" not in normalized_summary_lower
         assert "codex next counter-reviews section 51" not in normalized_summary_lower
@@ -1304,15 +1333,10 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         assert "codex next counter-reviews section 55" not in normalized_summary_lower
         assert "claude next reviews sections 56 and 57" not in normalized_summary_lower
         assert "codex continues without claude review stops" not in normalized_summary_lower
-        assert "five verified order-based qc runs and one zero-trade remx diagnostic" in normalized_summary_lower
         assert "claude next reviews this codex round independently" not in normalized_summary_lower
         assert "codex next counter-reviews section 73" not in normalized_summary_lower
-        assert "the owner now explicitly authorizes a fresh on/off study allowance" in normalized_summary_lower
         assert "codex next counter-reviews section 69" not in normalized_summary_lower
         assert "codex next counter-reviews section 66" not in normalized_summary_lower
-        assert "all six owner-named universes" in normalized_summary_lower
-        assert "section 58" in normalized_summary_lower
-        assert "tpr-d2 is authorized only as a fixture-only candidate" in normalized_summary_lower
         assert "tpr-d2 is not authorized" not in normalized_summary_lower
         assert "tpr-d0 is not authorized" not in normalized_summary_lower
         assert "no next implementation milestone is authorized" not in normalized_summary_lower
@@ -1324,6 +1348,22 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         assert "comprehensive claude whole-lane audit remains complete" in (
             normalized_summary_lower
         )
+
+
+def test_section93_current_routing_keeps_historical_claims_in_their_own_scopes():
+    """Condensing Status must not erase the old evidence or mint new authority.
+
+    Sections50/51/57/58/67-77 and their dedicated guards retain the detailed
+    fixture/continuous-round/six-case/study evidence. A compact current Status
+    must not repeat all those expired stages as if each were the resume step.
+    """
+    assert "Fixture-only candidate" in _record_section("## 50.")
+    assert "TPR-D1" in _record_section("## 51.")
+    assert SECTION57_OWNER_CONTINUATION_SCOPE in " ".join(_record_section("## 57.").split())
+    assert "review" in _record_section("## 58.").lower()
+    assert "REMX" in _record_section("## 68.")
+    assert "three" in _record_section("## 75.").lower()
+    assert "OFF has consumed" in _record_section("## 76.")
 
 
 def test_latest_counterreview_records_the_exact_claude_output() -> None:
@@ -2286,7 +2326,9 @@ def test_section_8_carries_one_current_role_and_no_stale_commit() -> None:
     assert len(next_actions) == 1, f"section 8 must name one next action: {next_actions}"
     ranges = re.findall(r"`([0-9a-f]{40})\.{2}([0-9a-f]{40})`", normalized)
     assert len(ranges) == 1, ranges
-    allowed = {*ranges[0], *SECTION8_STABLE_COMMITS}
+    # This is the explicitly named current-round starting snapshot, not an
+    # accepted source/strategy artifact or a second counter-review range.
+    allowed = {*ranges[0], *SECTION8_STABLE_COMMITS, SECTION93_BASE}
     full = set(re.findall(r"(?<![0-9a-f])([0-9a-f]{40})(?![0-9a-f])", normalized))
     assert full <= allowed, f"section 8 names a stale commit: {sorted(full - allowed)}"
     short = set(re.findall(r"\b([0-9a-f]{7,12})\b", normalized))
@@ -4497,6 +4539,7 @@ SECTION81_STALE_NEXT_ACTIONS = {
     "review": SECTION82_NEXT_ROLE,
     "reconcile": SECTION86_NEXT_ROLE,
     "previous": SECTION91_NEXT_ROLE,
+    "completed": SECTION92_NEXT_ROLE,
 }
 
 
@@ -4507,11 +4550,12 @@ SECTION81_STALE_NEXT_ACTIONS = {
     "current_review_role", "preamble_review_role",
     "current_reconcile_role", "preamble_reconcile_role",
     "current_previous_role", "preamble_previous_role",
+    "current_completed_role", "preamble_completed_role",
 ))
-def test_section_92_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
-    """Retain prior routing faults and reject a return to the now-processed Claude review."""
+def test_section_93_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
+    """Retain old routing mutants; reject routing only to the skipped checkpoint."""
     test_exact_next_step_names_the_current_artifacts()
-    current_next = SECTION92_NEXT_ROLE
+    current_next = SECTION93_NEXT_ROLE
     stale_next = SECTION81_STALE_NEXT_ACTIONS.get(fault.rsplit("_", 2)[-2], "")
     if fault.startswith("current_"):
         original_section = _record_section
@@ -4524,13 +4568,59 @@ def test_section_92_current_routing_refuses_stale_range_or_role(monkeypatch, fau
         monkeypatch.setitem(globals(), "_record_section",
             lambda heading: mutated if heading.startswith("## 8.") else original_section(heading))
     else:
-        preamble = " ".join(_record_preamble().split())
+        preamble = _record_preamble()
         old, new = (SECTION92_SHORT_RANGE, SECTION91_SHORT_RANGE) if fault.endswith("range") else (
-            current_next.upper(), stale_next.upper())
-        assert old in preamble
-        mutated = preamble.replace(old, new)
+            current_next, stale_next)
+        pattern = r"\s+".join(re.escape(word) for word in old.split())
+        assert re.search(pattern, preamble, flags=re.I) is not None
+        mutated = re.sub(pattern, lambda _: new, preamble, flags=re.I)
         monkeypatch.setitem(globals(), "_record_preamble", lambda: mutated)
     with pytest.raises(AssertionError):
+        test_exact_next_step_names_the_current_artifacts()
+
+
+@pytest.mark.parametrize("surface", ["current", "preamble"])
+@pytest.mark.parametrize("before,after", (
+    ("Section93 is the active owner-skipped continuation", "Section92 is the only active checkpoint"),
+    ("33 observed looks now (31cloud+2historical local)", "30 observed looks now (28cloud+2historical local)"),
+    ("OFF has consumed all three Codex attempts", "OFF has a fresh fourth Codex attempt"),
+    ("ON has consumed zero attempts and remains unlaunched", "ON has already launched"),
+    ("All accepted extended metrics remain NULL", "All extended performance metrics are accepted"),
+    ("Looks31/32 Runtime Error; look33 Completed, source/economics/accounting unaccepted",
+     "Look33 Completed proves accepted source/economics/accounting"),
+    ("F025/F026 are corrected only in the current active main path; historical job33 remains unaccepted", "F025/F026 corrections accept historical job33"),
+    ("All14 saved Python files compile only; the eight syntax failures are historical", "Saved source compilation proves native completion"),
+    ("Mia source-only nonce001 received one deliberate Send after owner-confirmed draft custody", "Mia source-only nonce001 received zero deliberate Sends"),
+    ("Fresh current main.py matches the registered 60658-byte source exactly; other15files are unchanged", "Current source is proved bound to historical job33"),
+    ("F017/F018/F019 and CR23-001 remain OPEN; full-window OFF accounting remains unproved", "All native accounting gates are closed by compilation"),
+    ("No new job was observed after the source-only restoration", "Source-only restoration launched and accepted a new job"),
+    ("Monitor remains PAUSED; the review skip is this round ONLY", "Monitor remains ACTIVE; future review is permanently removed"),
+))
+def test_section93_current_fact_mutants_do_not_invent_native_success_or_reset(monkeypatch, surface, before, after):
+    """Mutate only bounded live pointers, not attributed historical snapshots."""
+    test_exact_next_step_names_the_current_artifacts()
+    pattern = r"\s+".join(re.escape(word) for word in before.split())
+    if surface == "current":
+        original = _record_section
+        section = original("## 8. Exact next step")
+        # Keep both extractor anchors and the entire historical suffix intact.
+        # Flattening the whole section erased the newline closing boundary and
+        # made these mutants fail before reaching their intended fact guard.
+        text = _current_qualification(section)
+        assert re.search(pattern, text, flags=re.I) is not None
+        changed = re.sub(pattern, lambda _: after, text, flags=re.I)
+        assert re.search(pattern, changed, flags=re.I) is None
+        mutated = section.replace(text, changed, 1)
+        monkeypatch.setitem(globals(), "_record_section",
+            lambda heading: mutated if heading.startswith("## 8.") else original(heading))
+    else:
+        text = _record_preamble()
+        assert re.search(pattern, text, flags=re.I) is not None
+        changed = re.sub(pattern, lambda _: after, text, flags=re.I)
+        assert re.search(pattern, changed, flags=re.I) is None
+        monkeypatch.setitem(globals(), "_record_preamble",
+            lambda: changed)
+    with pytest.raises(AssertionError, match=re.escape(before)):
         test_exact_next_step_names_the_current_artifacts()
 
 

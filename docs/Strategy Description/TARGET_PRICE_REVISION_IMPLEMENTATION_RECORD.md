@@ -23301,3 +23301,38 @@ scope; no source or backtest acceptance through this recheck. If source remains
 unaccepted and native dispatch cannot be safely reconciled, hand off this
 genuine safety/external blocker with one final matching push, not a routine
 review checkpoint or manufactured canonical blocker.
+
+### 93.10 Owner confirms draft; first deliberate submission successor
+
+Fresh SOURCE-BASELINE-20261022-003 atb2360162 ended00:21:17.137436UTC:
+plan d602467a1ed89a2fe2f12276e578fef969855538b10b32acc9866f44ae0ace73;
+receipt8053/6fbaf1ba33a59c54650ee4671297c22de6fcd4bf7d394d54112113791b47d131.
+All16 saved file identities still exactly match93.2/93.9; two source reads
+541432wirebytes. Read1archive268709/fefb7165205c4f786d91946dfd4c4726efdd9c9cce383e1022beb9286ab5a6ab;
+read2archive268709/21ba96a890b0aca090798bc32a37ed275ab019d423b46210bd106b191a775428.
+Discovery-SUCCESSOR-20261022-002 then ended00:21:50.165835UTC, one request
+33339bytes, same17jobs/no additional observed launch; plan08e40c890260aa377121ce55b49c81c13476295fbd6f68a660fab60efd1ff8b2;
+receipt13402/27788cd2da619a8e9940048a5629a7c22b021a8dab71debe74c79e5ee61f092a.
+These are observed source/catalogue snapshots, not proof of future absence.
+
+Owner answered "1" to the explicit three-option question (Still a draft /
+Submitted to Mia / I can't tell), confirming the FIRST option: still a draft.
+This trusted new owner observation resolves the new source-only request's
+unsubmitted state, not the historical unmatched look31 launch or a claim that
+AX/rendering agrees globally. Retain93.9's uncertainty and failed-control
+observations as history, now qualified by this direct reply. No instruction
+to launch or duplicate the request was inferred.
+
+TPR-EXT26-D125 (routine completion of one authorized source-only request,
+review pending): fresh MIA-FROZEN-GUARDS-SOURCEONLY-20261022-002 may submit
+the EXISTING draft nonce001 exactly ONCE after own project/nonce/control
+checks. Same exact1789-character public prompt270611202ba1a7287a3e7d71180676a918e8018c77945f7a464093d742890e1b;
+pre-source is fresh003 above. <=10AX/4cropped controls/6inputs/600seconds at
+new committed HEAD/time; no new chat, approval-mode change, compile/job,
+private-input/provider/History/ObjectStore/notebook/account effect. Native
+AX's54-character truncation is not by itself proof of incomplete text; use
+the already registered exact prompt and explicit own send control, not a
+blind global Return. If completion cannot be verified, retain uncertainty,
+do not send again. This is the first deliberate submission, not a resend of
+an accepted task. All D123 source-only constraints and post-source all-file
+verification still apply. No fourth Codex OFF, new strategy look or ON here.

@@ -23609,3 +23609,63 @@ new job/look or unexpected edit honestly. Their exact prospective public
 invokers are retained in owner_repair_read_invokers_20261022.json, granting no
 replay/access authority after spend. No native/data/source acceptance follows
 from Mia's zero-effect report alone. No old receipt/scope is renewed.
+
+### 93.18 Independent saved-source/job readback; staged notebook prerequisite
+
+Source005 atbe9ea5b1 ended01:05:12.275377UTC,2reads541366wirebytes,
+16stablefiles; restored main remains60658/a098c087c14507c154a4740d0145f7af1c448ec24905f4c8b66e82869d917d86.
+Plan c29239ec50215ba275ff4c33e5be44ec1d84e9a5c49bef18c358659e9e35a8bd;
+receipt8053/abf8bcf5af37cc13eaa6629c4278838ab4cf7e955bcb256caddc6af83753b4a3.
+Read1archive268675/2ebabc37d0c921f52fb5d994abb7f17e7b8bf44f1e658db19847dd68dfe49bc9;
+read2archive268675/d28cf355f77c1ee027cdadd21c88986017b75e3639ceb6b6d54ad677b30c113c.
+BASELINE_MISMATCH is still against the older completion template, not a
+new main failure. Exact all16 identity comparison against004 is separately
+scoped below; source stability within005 does not itself prove equality
+between captures or a historic compiled job.
+
+Only after actual source-controller exit, metadata004 atbe9ea5b1 ended
+01:05:17.678669UTC,1request33339bytes, same17jobs and no additional observed
+job. Plan cea3885538ccebbf46d64ad058f41779237314fb3b24551395f50e7456bfb680;
+receipt13402/bb77dc1d82de9779be109b2d0e70f02384edfe0ebe2074d83b57e4f787dbc8a5.
+Native compile enumeration was not requested; no absence-of-compile proof.
+33looks/OFFCodex3/ON0/NULL accepted metrics remain. No native witness yet.
+
+TPR-EXT26-D134 (fresh metadata-only comparison; review pending): build/test
+one named comparator for ONLY the two exact8053-byte004/005 receipt identities
+in93.12/93.18,16106total, no source archives/raw rows. Fresh currentHEAD/time,
+O_EXCL claim/access/owned lock and mode/FD/hash custody precede reads;
+<=120seconds/4KiB body-free result. Compare all16 public inventory entries
+and restored main's exact identity; do not reopen D0, source bodies, other
+private files, provider/credentials/API or infer economic/native acceptance.
+Commit its exact code/tests before actual invocation; no spent scope renewal.
+
+The identified extended_mia_capture_notebook_successor.py is a copy of the
+preserved capture, with ONLY docstring/self MODULE identity and MAX_FILES16
+to17 changed. Root reviewed the exact production diff and complete new test
+file;56focused tests independently pass. It preserves both entire private
+source archives,4MiBresponse/8MiBtotal/16MiBarchive,120s/40srequest, no-follow/
+mode/hash/fresh committed closure and refusals. The extra own notebook remains
+unexpected/hash-only publicly, not executed or economically admitted.
+Root does not reuse the old producer's baseline as this successor's baseline;
+fresh successor baseline/post claims are required before its effects.
+Delegate reports four killed safe in-memory mutants, attributed not native
+proof. No original capture/candidate byte is rewritten.
+
+TPR-EXT26-D135 (routine staged design; review pending): D132 is staged to avoid
+fabricating future creation metadata. FIRST create a NEW EMPTY own notebook,
+then independently verify its saved bytes/tool context, THEN freeze the exact
+capsule-dependent cell/notebook hash BEFORE any execution under a separate
+fresh scope. The public create preregistration
+extended_refusal_witness_notebook_create_20261022.json has SHA
+d439555e255928b41769a91f7c93c2d202025bbd024733d805e8abe388d3f077;
+its exact empty JSON/prompt and identified notebook_create_scope holder are
+committed before effect. This first stage permits one own project metadata
+read, one exact-name collision check and one new empty notebook creation,
+one Mia message/new own chat, <=16AX/4screenshots/4current-bound crops/
+12own inputs/600seconds and no later than01:25UTC. No existing file edit,
+cell/notebook execution, QuantBook initialization, ObjectStore/History/
+provider read, mode/account change, compile/backtest or retry. Wrong project,
+collision/required resource contention or nonconforming creation means STOP;
+no overwrite, cancellation, purchase or substituted notebook/project.
+The task's tool/project/source descriptors are evidence to verify, not
+provider/PIT/source-time/cryptographic/native acceptance.

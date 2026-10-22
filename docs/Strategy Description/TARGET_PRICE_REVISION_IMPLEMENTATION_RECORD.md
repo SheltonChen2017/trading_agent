@@ -23389,3 +23389,35 @@ unexpected source/effect as unaccepted; do not treat task-idle as compliance.
 No new launch, mode/account/provider/ObjectStore/notebook/private-input action.
 If source changed, a NEW bounded exact-archive inspection is required before
 port or any economic acceptance. No history overwrite or hash-pin rotation.
+
+### 93.12 Main restored byte-for-byte; all-file inspection registered
+
+Post-Mia SOURCE-BASELINE-20261022-004 atf592ef25 ended00:31:36.290388UTC:
+plan8de4985f745f8445507afe3abfb5a123964e7bf0d610b479d7138bcd2c1f4f27;
+receipt8053/267c70a21f5e26c246cd7c11edd3ab031da26b6f16f46028ad9193bafd96ca0e.
+Two own source reads541366wirebytes,16stablefiles. ONLY main.py changed from
+preceding003; it is now60658/a098c087c14507c154a4740d0145f7af1c448ec24905f4c8b66e82869d917d86,
+EXACTLY the registered generated frozen main. All other15file sizes/hashes
+unchanged, including now-unused mia_diag/mia_rescale and both notebooks.
+Read1archive268675/1d276c1a7ca87a970143706459eefe84107fb4501a19d990a829dd98cdb5241e;
+read2archive268675/71ce903151bc17526b8dcf160e8ea5bcc02431c30becabab5a4eb5457d14b94e.
+This independently verifies source restoration, not Mia's task narrative,
+historical compiled-job identity or a full-window valid baseline. The old
+changed main and every earlier archive remain immutable. No local executed
+candidate/helper changed or port was necessary: the exact intended public
+generated main was already retained locally. BASELINE_MISMATCH still compares
+against the older template, not a failure of this specific restored identity.
+
+TPR-EXT26-D128 (routine mandatory static inspection; review pending): NEW
+REPAIR-SOURCE-INSPECT-20261022-004 may read ONLY exact post004 read2archive
+268675/71ce903151bc17526b8dcf160e8ea5bcc02431c30becabab5a4eb5457d14b94e,
+one FD/mode/hash-bound read under fresh currentHEAD/time<=15minutes/120seconds.
+Compare every Python file to the same public bundle/generated-main/context
+identities as93.3, check exact known-header/newline inverses and compile in
+memory, report only names/hashes/syntax/count/known-public-function deltas,
+max32KiB/body-free failure. Do not execute/import captured source, notebooks,
+provider/ObjectStore/credentials/network/private-input processing or old D0.
+Classifier's asymmetric vendor-import AST field remains qualified; exact byte
+equality and inverse checks govern. Verify original main's imports no longer
+reference mia_diag/mia_rescale; unused preserved helpers do not become accepted
+APIs. Any remaining native/data failure stays open until genuine evidence.

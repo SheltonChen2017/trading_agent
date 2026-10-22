@@ -23537,3 +23537,75 @@ inventory/600seconds, same absolute01:10UTC deadline and all D130 native/data
 limits. Keep old scopes/outputs and refuse uncertain delivery rather than
 send twice. The caller-supplied/native context and no-hard-timeout limits
 remain unproved; source/accounting/economics acceptance is still false.
+
+### 93.17 Genuine Mia capability STOP; native notebook alternative is separate
+
+Read-only successor002 at4dcf6393 created access1071/
+1e18f0154f58145f66a7d87671e07f0f74324bae637ba60b40dc8a32ed2dc069,
+expiry01:05:39.927506UTC. A current visible-input coordinate click/paste bound
+the original nonce001 to the actual draft. Root deliberately clicked Send
+ONCE; controls disabled, then Stop became active, then disabled/idle, with
+the own task header "native-witness-read-only design - Completed". The long
+public program was above the final response; scrolling within the own pane
+was necessary. The draft's complete25974bytes were not independently read
+back before Send; local exact prompt identity and later visible source are
+not byte-exact server execution proof.
+
+Root parsed the final777-character closed JSON report in the native Mia pane:
+STOP_EPHEMERAL_NATIVE_TOOL_UNAVAILABLE, effects0,tool_calls_made0,
+keys_touched[],original_refusal_preserved=true. Mia attributes the missing
+capability to absence of an executable ephemeral native ObjectStore/project
+namespace. It lists research-notebook execution and job execution as available
+but excluded by this exact task; its MCP line reader is not native bytes or
+an injectable store. These are genuine Mia-reported capability/zero-effect
+facts, NOT independent native execution or absence-of-edit attestations.
+The task did NOT retrieve the witness and does not settle its absence/cause.
+Receipt828/cf1c8176af19b0314982e4b452ceb9dad3d606874b12f15747e8536301119abc;
+7AX/1capture/2current-bound crops/5inputs,1Send,0new chat,controller exited
+and owned lock released. No compile/backtest requested; old attempt/look
+and all acceptance counters unchanged.
+
+Root's selected collector/guard/archive/reader/current-document union now
+passes277tests in7.64seconds, isolated49/52, no actual operator state/db.
+No full suite. These are software tests, not native evidence.
+
+TPR-EXT26-D132 (delegated routine next safe alternative; review pending):
+the prior notebook prohibition was specific to D130, not a universal safety
+gate. Build/freeze/test a NEW own-project research notebook diagnostic under
+a NEW scope before effect. It may create exactly one unique new own notebook
+tpr_ext26_witness_read_20261022_001.ipynb only if absent, with one public cell,
+one fresh QuantBook initialization and one cell execution, no retry. Preserve
+every old notebook/source/object; no algorithm edit, explicit History/price/
+provider request, enumeration/write, compile/backtest or raw external export.
+Its only requested data reads remain the same TWO exact retained witness
+keys. QuantBook initializes native platform/API/market-metadata infrastructure;
+do not claim those four store calls are literally its only initialization I/O.
+Included resource contention means wait, not cancellation or purchases.
+Freeze exact wrapper/program/notebook hashes and source-capture17file
+successor BEFORE this new effect. No permission is inferred to execute old
+notebooks or relax frozen economics/native acceptance.
+
+Root checked the [official Research getting-started documentation](https://www.quantconnect.com/docs/v2/research-environment/key-concepts/getting-started)
+and [Research Object Store examples](https://www.quantconnect.com/docs/v2/research-environment/object-store)
+(direct fetch twice timed out; the official indexed page returned the API
+examples). QuantBook/object_store/contains_key/read_bytes/project_id are
+documented. Organization-wide storage is not isolated by project identity;
+exact-key limits remain mandatory. [QuantBook source](https://raw.githubusercontent.com/QuantConnect/Lean/master/Research/QuantBook.cs)
+assigns ProjectId from runtime Globals and initializes handlers/ObjectStore.
+[Globals source](https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Globals.cs)
+derives that from configuration. Runtime-config identity is mutable metadata,
+not cryptographic custody or proof of this cloud build. No configuration or
+credentials were read/dumped. A fresh native qb.project_id check can bind
+the requested diagnostic context without pretending it proves canonical
+identity or source vintage. API wrappers/native allocations still have no
+proved hard timeout or pre-allocation byte limit.
+
+TPR-EXT26-D133 (mandatory independent readback; review pending): fresh
+SOURCE-BASELINE-20261022-005 and, only after its exit,
+DISCOVERY-SUCCESSOR-20261022-004 use the unchanged93.1/D124 fixed bounds,
+new current-HEAD/time claims and no retry. Capture all16 current files twice
+and list the own OFF project's metadata once; compare with004 and retain any
+new job/look or unexpected edit honestly. Their exact prospective public
+invokers are retained in owner_repair_read_invokers_20261022.json, granting no
+replay/access authority after spend. No native/data/source acceptance follows
+from Mia's zero-effect report alone. No old receipt/scope is renewed.

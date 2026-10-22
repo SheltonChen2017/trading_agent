@@ -23669,3 +23669,42 @@ collision/required resource contention or nonconforming creation means STOP;
 no overwrite, cancellation, purchase or substituted notebook/project.
 The task's tool/project/source descriptors are evidence to verify, not
 provider/PIT/source-time/cryptographic/native acceptance.
+
+### 93.19 Create-manifest contradiction refused before UI; native wrapper proof
+
+The first create-only holder atd3faefc5 produced access1183/
+d2a7c963d108ceb77268d78192b396220fd9bb282172ae2ea5d5ef7a38451b5c,
+expiry01:18:58.353895UTC/prompt48d4789439ffc4021d8a2bd6766edf1cce4edc5a3eb05677d08dc82816d7a159.
+Root found a P2 custody-support contradiction: its copied combined field
+notebook_creation_or_execution=0 conflicted with new_notebook_creations=1.
+It was refused BEFORE ANY UI action/message/data effect. Closed receipt433/
+c98d7947fd2b87f75e032e643743614c8f0ff21a10d17f211120872969f06046,
+controller actually exited/owned lock released. No cloud notebook exists by
+inference from this failed local scope, and no spent ID is retried.
+
+TPR-EXT26-D136 (routine verified lane-owned correction; review pending): NEW
+notebook_create_scope_successor.py uses fresh scope
+TPR-EXT26-MIA-WITNESS-NOTEBOOK-CREATE-20261022-002 for the original create001
+prompt's FIRST Send. It replaces the contradictory combined flag with exact
+notebook_creations1/notebook_executions0, preserves native reads0/compiles0/
+jobs0 and all D135 limits. No other behavior/economics changes. The new AST-
+only guard rejects the preserved predecessor and six individual in-memory
+permission mutations, with clean positives after each; no holder/private
+execution in those tests. Do not reinterpret a contradictory manifest as
+permission because another field is broader.
+
+Root read the complete new notebook wrapper/tests and reproduced140focused
+tests (132wrapper/reader plus8manifest checks) in0.58seconds, isolated49/52.
+Wrapper9087/74e59a1c6a1178867b04b8c975edaa9a502295a2b39ba5a70f5f32c1cf5489f0;
+tests8343/7b29a4e65f429ac204d2659a14fb8480dac57acdb2ce0ad1ad76d4bcce787d67.
+The generated single cell uses ONE actual QuantBook, real UTC/monotonic
+guard, native ReferenceEquals store binding and actual qb.project_id plus
+an exact own-notebook tool capsule. No constant project substitutes for the
+native observation. Native project metadata remains mutable/config-derived;
+cryptographic custody/capsule authentication/historical compiled-source
+claims stay false. Construction time counts within600seconds and fixed
+01:35UTC; unavailable/expired context refuses, no retry/implicit renewal.
+The five delegate guard mutants are attributed, not root native proof.
+Exact final cell depends on actual creation metadata and will be frozen
+only AFTER independent empty-notebook verification, BEFORE execution. No
+synthetic1/2hash capsule or example cell is real provenance or effect authority.

@@ -23246,3 +23246,58 @@ source-only task is not a strategy look or Codex attempt. Capture every saved
 cloud file afterward with a separate fresh scope and review every delta before
 port/acceptance. Any actual job/data diagnostic needs a new bounded manifest/
 look and exact native facts; no launch is authorized by this source-only scope.
+
+### 93.9 Source-only draft custody uncertain; no deliberate send or retry
+
+Fresh MIA-SOURCE-BASELINE-20261022-002 at2fd7e13a ended00:15:05.560117UTC:
+plan a790dfae447716a4a131db4327178ae14d496f7bed1ced8e367f32b770ca5f14;
+receipt8053/ac7b0f2c895d18f2cfe49a5f33c5a8d225b35697c87351a53dbf318f2678b514.
+Two fixed own source reads541432wirebytes; exact16 file identities match the
+earlier93.2 inventory, including main590d3438/mia_diage649e02f/rescale62966fba.
+No intervening source change folded into repair. Read1archive268709/
+e043aa8a6ecd51bc1a69a226c5975ab4ee46ceb9c16ba31d58260536c3ce8399;
+read2archive268709/1e6d31190a996cff342dc0f5e5ff8dc147cd5b5e6ad6351c7214f049723be143.
+BASELINE_MISMATCH remains the original-template comparison, not repair proof.
+
+MIA-FROZEN-GUARDS-SOURCEONLY-20261022-001 access1132/
+e3da665d677d470c1bb789583cf8788c149f8aa9db7b10aa887358139b0e29d6;
+public-instruction prompt1789characters SHA256
+270611202ba1a7287a3e7d71180676a918e8018c77945f7a464093d742890e1b.
+One own New-chat action exposed a blank editable area and already-selected
+Full Auto; NO mode change was made. Root filled the registered draft using
+setValue, then clipboard paste of identical text to check multiline delivery.
+AX exposes only a54-character truncated value, nonce/prefix but not full tail.
+No deliberate Send click/Return occurred. A cropped bottom control view instead
+showed a rendered empty entry/Stop control and older conversation header;
+it did not agree with the own-nonce draft AX state. Stop presence does NOT
+prove a running task (it may be inactive); neither surface authenticates task
+or dispatch state. No blind send, new prompt retry, cancellation, mode/source
+edit, compile or job was deliberately requested. A bounded helper slice also
+incidentally included own result-summary values; none are accepted or used to
+choose/change strategy. No private source/journal/credential body emitted.
+
+Controller genuinely closed00:19:41UTC, result1108/
+30392593e6fcb1106fb15681b9b22335b9110de8fc841050daef45696c053474,
+8AX/1capture/1crop/6inputs as retained. Bound Safari app inventory confirmed
+running app only; no window selector was returned, no unrelated body inspected.
+Draft may remain: do not assume accepted/rejected delivery, repeat it, assign
+the old launch, or silently treat a source change as ours. New source-only
+dispatch is UNPROVED, not a completed repair or strategy look. Existing default
+Full Auto is not reapproved/extended by this observation. Known limitations of
+native AX/render/focus prevent a safe deliberate Send through this surface;
+this is an external control/custody issue, not an obsolete Mac-unlock demand.
+
+TPR-EXT26-D124 (routine final factual recheck; review pending): at a fresh
+committed HEAD/newUTC<=15minutes, source BASELINE-20261022-003 may make the same
+exact2files/read calls and preserve all16 current files, followed only after
+controller exit by DISCOVERY-SUCCESSOR-20261022-002's one fixed own metadata
+list request (includeStatisticsfalse,1MiB/128rows/30seconds). No actual outcome
+values, project/source edits, launch/provider/ObjectStore/native-body reads.
+Compare identities/catalogue with the fresh preceding captures. Any new job
+is retained as another retrospectively observed look, not attributed to this
+unproved draft or a reset. These reads establish only observed source/catalogue
+state, never future absence of a pending effect. Preserve every failed/uncertain
+scope; no source or backtest acceptance through this recheck. If source remains
+unaccepted and native dispatch cannot be safely reconciled, hand off this
+genuine safety/external blocker with one final matching push, not a routine
+review checkpoint or manufactured canonical blocker.

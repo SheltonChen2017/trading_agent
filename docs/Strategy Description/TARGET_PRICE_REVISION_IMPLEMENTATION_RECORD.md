@@ -23357,3 +23357,35 @@ current tab metadata and its verified37650980 route. Do not overwrite another
 page, assume a generic QC tab is this project, cancel others or blindly send.
 If existing draft/route cannot be bound, refuse. No new chat/mode/compile/job
 or data effect; preserve the two spent predecessors and no duplicate message.
+
+### 93.11 One deliberate source-only send; independent readback required
+
+Successor003 at9bacf2d0 selected the previously created ninth own-QC tab
+from current tab metadata (ten tabs now; no generic-title assumption alone).
+Own route37650980 and registered draft nonce001 both verified BEFORE input.
+Root clicked that pane's explicit send control ONCE, no global Return/new
+chat/mode change. Submission first disabled its controls, then showed enabled
+Stop; a later full AX showed Stop disabled and send/Mia/mode controls enabled.
+This is evidence of task activity returning idle, NOT independent proof of
+saved source, obeyed scope, a completed backtest or accepted strategy. The
+cropped native header remained on the earlier Completed context view, so
+AX/render agreement is still unproved. No claim that the old launch dispatch
+is matched, or that a source-only task resets an attempt.
+
+Fresh access1233/da1b18386ace34edd99862153eabc79911ae3af84d2426db2026fe357b3ad828;
+closed result1076/f1194fb9df3eeabbe788eca723944455d0c3553bb1b60a7ca14e7f06fb210ece.
+The controller's exact output is the custody descriptor, not acceptance.
+5AX/1capture/1crop/2inputs,
+one deliberate source-only submission,0deliberate compile/jobs; controller
+actually exited and owned lock released before any dependent API process.
+
+TPR-EXT26-D127 (routine mandatory independent readback; review pending):
+fresh SOURCE-BASELINE-20261022-004 captures exactly2 own files/read responses
+under93.1 bounds at new committed HEAD/time; preserve every file/raw private
+archive and compare all16 identities with fresh003. Separately, after exit,
+fresh DISCOVERY-SUCCESSOR-20261022-003 may issue one fixed metadata-only list
+under D124 limits. Retain any additional job as a real observed look and any
+unexpected source/effect as unaccepted; do not treat task-idle as compliance.
+No new launch, mode/account/provider/ObjectStore/notebook/private-input action.
+If source changed, a NEW bounded exact-archive inspection is required before
+port or any economic acceptance. No history overwrite or hash-pin rotation.

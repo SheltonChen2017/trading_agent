@@ -255,6 +255,36 @@ def _candidate(plan, summary, *, head, code_sha, code_entries, prepared_at):
     return result
 
 
+def _inventory_names(directory_fd, *, boundary):
+    """Use a fresh directory stream for each concurrent custody scan.
+
+    dup() shares the retained descriptor's open-file description and is not
+    sufficient: concurrent listdir() calls can otherwise consume its cursor.
+    """
+    boundary()
+    fresh = None
+    try:
+        require(type(directory_fd) is int and directory_fd >= 0, "inventory_directory_fd_required")
+        before = os.fstat(directory_fd)
+        stamp = lambda info: (info.st_dev, info.st_ino, info.st_uid, stat.S_IMODE(info.st_mode))
+        require(stat.S_ISDIR(before.st_mode) and before.st_uid == os.getuid()
+                and stat.S_IMODE(before.st_mode) == 0o700, "inventory_owned_directory_required")
+        expected = stamp(before)
+        fresh = os.open(".", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=directory_fd)
+        require(stat.S_ISDIR(os.fstat(fresh).st_mode) and stamp(os.fstat(fresh)) == expected,
+                "inventory_fresh_directory_identity_changed")
+        names = tuple(sorted(os.listdir(fresh)))
+        require(stamp(os.fstat(directory_fd)) == expected and stamp(os.fstat(fresh)) == expected,
+                "inventory_directory_changed_during_scan")
+        return names
+    finally:
+        try:
+            if fresh is not None:
+                os.close(fresh)
+        finally:
+            boundary()
+
+
 def write_cache(root, *, runtime_head, actual_remote):
     _require_capture_platform()
     guard = lane.LaneGuard(root, expected_head=runtime_head, expected_remote=actual_remote)
@@ -273,7 +303,7 @@ def write_cache(root, *, runtime_head, actual_remote):
         candidate = _candidate(plan, summary, head=runtime_head, code_sha=code_sha,
                 code_entries=entries, prepared_at=_utc_now())
         adapter.publish_owned_cache(candidate, owned, boundary=guard.check)
-        require(tuple(sorted(os.listdir(owned._anchor[2]))) == tuple(sorted(NAMES)), "cache_exact_five_file_inventory")
+        require(_inventory_names(owned._anchor[2], boundary=owned.check) == tuple(sorted(NAMES)), "cache_exact_five_file_inventory")
         for name, raw in candidate.iter_files():
             guard.check()
             received = adapter.protected.read_owned_source(owned, name, max(1, len(raw)))
@@ -300,7 +330,7 @@ class RegisteredCache:
         for source in sources:
             source.check()  # FD/stat/object identity only, not source rehash/replay.
         cache_directories = sources[0]._anchor[0]
-        require(len(cache_directories) == 1 and tuple(sorted(os.listdir(cache_directories[0][1]))) == tuple(sorted(NAMES)),
+        require(len(cache_directories) == 1 and _inventory_names(cache_directories[0][1], boundary=sources[0].check) == tuple(sorted(NAMES)),
                 "held_cache_exact_five_file_inventory_changed")
 
     def code_custody(self):

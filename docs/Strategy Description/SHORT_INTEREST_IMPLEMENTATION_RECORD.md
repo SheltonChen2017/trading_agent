@@ -1,23 +1,21 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CODEX ACCEPTS SOLE CLAUDE COMMIT `3faa7fd8` AFTER APPENDED RECORD
-CORRECTIONS (SECTION 118). CLAUDE'S REVIEW OF EXACT PUSHED `f486ef51`
-ACCOUNTS FOR ALL 21 CODEX COMMITS, WITH ITS DECLARED AUTHORITY/REQUEST-PATH
-SCOPE; NO FULL LINE-BY-LINE AUDIT OR COMPLETE LANE SUITE IS CLAIMED.
-COUNTER-REVIEW ONLY; NO NEXT MILESTONE THIS ROUND. TWO HISTORICAL QC METADATA
-REQUESTS AND FIVE NYSE PUBLIC-CALENDAR GETS ARE RETAINED, NOT ZERO REQUESTS
-AND NOT BACKTEST LAUNCHES. EXACT AUTHORIZED KEYCHAIN, ENVIRONMENT AND
-PROTECTED-FILE ROUTES ARE DISTINGUISHED; NO NEW CREDENTIAL OR SOURCE ACCESS
-OCCURRED IN THIS COUNTER-REVIEW. HISTORICAL LEDGER ROWS REMAIN UNCHANGED.
-COUNT/DAILY ROUNDS REMAIN REGISTERED BUT UNEXECUTED; ORIGINAL SPENT BUDGETS
-ARE PRESERVED. ACTUAL INPUT/PROCESSING/EVALUATION PREREQUISITES REMAIN UNMET.
+Status: **OWNER-RESUMED LOCAL SOURCE QUALIFICATION CLOSED WITH TWO REFUSED
+CAPTURES (SECTION 119), NOT BACKTEST READINESS. COUNT:48 START DEBITS/47 HTTP;
+DAILY:3,586 START DEBITS/3,585 HTTP,593 COMPLETE CHAINS OF1,169.
+BOTH ORIGINAL WHOLE-ROUND CLAIMS ARE SPENT; NO AUTOMATIC RETRY OR RESET.
+VERIFIED CONCURRENT CACHE-STREAM FALSE REFUSAL CORRECTED; ORIGINAL RECEIPTS
+AND UNKNOWN FAILURE CAUSES ARE NOT RETROACTIVELY REWRITTEN.
+QUANTCONNECT PAUSED BY OWNER, INCLUDING CAPACITY/METADATA ACCESS, UNTIL RELEASE.
+TWO HISTORICAL QC METADATA REQUESTS AND FIVE NYSE CALENDAR GETS REMAIN
+RECORDED; NO NEW QC REQUEST OR BACKTEST LAUNCH OCCURRED.
+SECTION118'S ACCEPTANCE OF CLAUDE3faa7fd8 IS PRESERVED; NO NEW CLAUDE REVIEW
+OR FULL LANE SUITE IS CLAIMED. RECOVERY/REPLAY/DIVIDEND DRAFTS STAY IGNORED,
+UNINTEGRATED AND UNDISPATCHED. FULL INPUT/PROCESSING/EVALUATION GATES REMAIN.
 LOOKBACKS20/60/120/252 UNSELECTED; CANONICAL ACTUAL LOOKS0/0, EXPLORATORY
 ACTUAL LOOKS0, ALPHA0, PERMANENT LOOK IDS NONE, QC LAUNCH ATTEMPTS0.
-NO BACKTEST OR READINESS IS INFERRED FROM SCOPED REVIEW OR FIXTURE TESTS.
-ONE FINAL NON-FORCE COUNTER-REVIEW PUSH; THEN RETIRE THIS ONE-SHOT MONITOR.
-SOURCE, FULL-LANE/WINDOWS, SHARED AND PROSPECTIVE FINDINGS STAY RETAINED.
-NO HOLDOUT, PRODUCTION RANKING/SEEDS, ETF, QC JOB, BROKER, OPERATOR DATABASE,
-DEPLOYMENT, PAPER/LIVE, CAPITAL, REAL ORDER OR TRADING AUTHORITY IS OPENED.**
+ONE COMBINED FINAL NON-FORCE PUSH; OTHER MONITORS AND FROZEN SHARED FILES
+UNCHANGED. NO HOLDOUT, ETF, DEPLOYMENT, PAPER/LIVE, CAPITAL OR TRADING ACTION.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -237,6 +235,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-14 | Codex operational-guard checkpoint (row reconstructed by Claude in section 117 from subsection 116.23; Codex's push added none) | `bff9a0e` -> `f486ef5` (record and lane-guard fix) | QC released; synchronized lane-guard false refusal corrected | Per 116.23: the registered count round refused at its first local guard on the valid `+0 -0` header before any key read, claim or request; the guard now accepts only `+? -?` and `+0 -0`, with the actual remote still checked separately. | Codex-reported, network-denied: **186 passed**, then **116 passed** after the record note. No complete lane or repository suite. Real looks 0/0. | `SI-BUILD-20261014-001` (P2) confirmed and corrected. Count budget unspent. | Claude reviews; then the registered count round. |
 | 2026-10-14 | Claude review (macOS session) | `0cfb574` -> `f486ef5` reviewed from the published head; **record-only correction (two reconstructed push-ledger rows above)**; this record commit is the only Claude commit | Independent review of the owner-waived continuous build, sections 115-116 | Reviewed authority, every real provider request, credentials and the Keychain helper, data kept out of Git, QuantConnect, capture protection and the request-path guards; not a full line-by-line read of all 36,000 lines. Ran two in-memory mutants of the lane guard and the Keychain helper; both red. | Pushed tree `f486ef5`, clean, Codex idle, network-denied, empty environment: 73 affected lane test files **2,523 passed** (no skips or warnings); mutation baseline 60 passed; compileall exit 0; final-tree active-document 69 passed; `git diff --check` clean. No provider, credential or Keychain read by Claude. **Authorized looks 0, consumed looks 0**. | `SI-CR22-001` (P3, closed by correction: two pushes without ledger rows). `SI-CR22-002` (P3, closed as a forward rule: the spent SEC one-shot declared no contact). Codex's `SI-BUILD-*` accepted as recorded. `SI-CR19-003`, source P2s, `SI-CR-WIN-*`, shared P2 and `SI-CR15-001` open. | Codex counter-reviews this record commit. Confirm plan limits before the registered Massive rounds; future SEC requests take a runtime contact. Every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
 | 2026-10-14 | Codex counter-review only | Exact Claude range `f486ef517be757834041509010a03f61dcbfda04` -> `3faa7fd877b82b0b34dc5388bc16009faa974d24`; one documentation commit, accepted after appended record correction; this section-118 closing record/test commit follows | No next milestone; complete the owner-requested one-shot counter-review and publish once | Verified both reconstructed checkpoint rows, the SEC forward rule, every ordered review disposition and the declared limited review scope. Appended metadata/credential/file-count/mutation errata; no production or capture-protocol change. | Main's focused checks and memory-only mutation counts are recorded in118.5; Claude's 2,523-test execution is not Codex's. Zero new source/credential/QC/outcome access. | `SI-CR22-001` confirmed and retained; `SI-CR22-002` accepted as forward-only; `SI-CCR23-001..004` corrected/qualified in appended errata. Existing source/full-lane/Windows/shared/prospective findings remain. | ONE final matching-lane non-force push, verify clean local/tracking/actual-remote equality, delete only this one-shot automation. Stop without starting the next milestone. |
+| 2026-10-22 | Codex local source qualification | Starting exact local/tracking/actual remote `f67bbf2fc5ab4c7ce822c7e52b57b560cd670682`; this bounded correction/section-119 closing snapshot follows | Owner-approved steps1–3 attempted; source rounds refused; QC paused | Ran the unchanged registered count and daily rounds. Preserved both spent claims/all receipts; corrected the verified shared-directory-stream cache defect only after both captures closed. No backtest or complete source admission. | Exact counts, focused validation, causal reds and exclusions in119. No full suite; canonical0/0, exploratory0, alpha0, QC attempts0. | SI-BUILD-20261021-001 corrected; source coverage/failure-cause gaps retained. Held proposals are not released or dispatched. | One final matching-lane non-force push; Claude reviews this exact checkpoint. New recovery needs its own prospective immutable protocol, not reset/resume; no QC access until owner release. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -20317,3 +20316,223 @@ Exact final commit is supplied by Git at publication, not self-embedded here.
 The final post-note record/import-boundary/active-document selector passes
 **84 tests in1.26s**, zero skips/warnings. The one-shot deletion result is
 reported after the final push; no completed deletion is preclaimed here.
+
+## 119. Owner-resumed local source qualification — 2026-10-21–22 UTC
+
+### 119.1 Later authority, exact starting snapshot and QC pause
+
+The owner answered **“yeah proceed with123”** to the recommended registered
+same-class count capture, remaining historical input qualification, and
+prospective research-look/order-based preparation and execution where facts
+permit. Decision **SI-AUTH-20261021-01** records that later direct instruction:
+it supersedes section118's completed counter-review-only stopping scope,
+not its historical facts or the independent-review requirement. No new Claude
+commit is counter-reviewed in this round; sole3faa7fd8 remains accepted after
+the appended corrections in118.
+
+Starting physical/Git root was the designated Short Interest worktree,
+branch `codex/strategy-short-interest`, clean local/tracking/actual matching
+remote **f67bbf2fc5ab4c7ce822c7e52b57b560cd670682**. No fetch, alternate
+checkout/branch, rebase, reset, history rewrite or other-lane change occurred.
+All operations/validation stay in that same absolute worktree. Both actual
+captures used this unchanged committed code/HEAD; no tracked or nonignored
+file was edited while either was active.
+
+During the source round the owner instructed: **“do not access quant connect
+yet. another lane is using it. i'll let you know when it is ready”**.
+**SI-AUTH-20261021-02** pauses **all** QuantConnect access, including capacity/metadata,
+until a later explicit owner release. This is not permission to poll the
+occupied node. No QC endpoint, capacity read, project, upload, compile, job,
+backtest or other-lane interruption occurred.
+
+### 119.2 Executed original count round; preserved negative prefix
+
+**SI-DEC-20261021-01:** invoke only the already registered original count
+controller, with the exact prospective plan, held source/code custody,
+eight-request boundaries, create-exclusive protected ignored output and
+claim-before-key. Use its named existing Massive Keychain route, no broad
+secret search, environment fallback, credential publication or new terms.
+
+| Operational item | Observed value |
+|---|---|
+| Original count protocol | `45a554213ed8fb12ac6f334bb0b87053b0d1a899603e093bdc4bfe06daf47354` |
+| Original anchor plan | `d58b2b3d006319899e6af9cd06a2fef17128c391513ea0ee99c987c483d2af3b` |
+| Original parallel plan | `d1c9d08b939022bf5eafa2cdde47f9555fe1bbd04c28e7650fb6bdb4d5a5ee56` |
+| Retained cache closure | `51190cff010622a7c8422c54dd8be6084caa07a2c748444631655844e9f46d56` |
+| Runtime code identity | `52e988dfd219b378846afea7176d3a9784c1e9bd5118641f3e221b43dd1219f1` |
+| Start / refusal UTC | 2026-10-21T23:53:01.391185Z / 23:53:35.979300Z |
+| Debits / HTTP | **48 START debits /47 HTTP**, all47 observed HTTP200 |
+| Original ordinal47 | Pre-wire material refusal: no HTTP invocation/status/body; no raw file |
+| Terminal state | Halted, started prefix drained, no completed source capture |
+| Original spent-claim byte hash | `008e56b20a5dafa1a9f7af71dbe91e79cfc96a282cb9680a1e3488936a189d7c` |
+| Exact146-file parent manifest hash | `f6f5baf16c0fac2ffa26f994cf82122bcef9dfa842526530797531bc5c8f55c6` |
+
+The original maximum81,875 slots/4GiB and the old claim remain unchanged;
+48 debits is **not**81,875 observed HTTP calls. All48 START/receipt pairs,
+47 raw bodies and original protocol/start/refusal files remain protected
+and ignored. The returned in-memory inventory was not separately persisted;
+any later reconstruction is a **replayed inventory**, not the lost original
+return object's clock/hash. Ordinal47's original generic refusal has no
+stage diagnostic and must not be retroactively assigned a specific cause.
+
+### 119.3 Independent daily round closed refused, not full coverage
+
+**SI-DEC-20261021-02:** run the separately registered full daily-reference
+round on the same unchangedF67 code, while diagnosing the count problem
+read-only. It is source-only work, not prices/outcome evaluation. The complete
+42-path code manifest was independently generated from exact committed blobs
+and checked by the operational controller. The fixed calendar/plan, full
+1,169-session population, original native source and original spent master
+proofs were not replaced with a sentinel or recaptured.
+
+| Operational item | Observed value |
+|---|---|
+| Daily plan | `029173c8fa4eeb6ff29f0325011aeec44eb4044ab504a2caddb011c6dba47ad8` |
+| Producer protocol | `dc25d57e5b181c7028385ea689805e72b62a09c6e687cd11ac1eb6b7c5e139ce` |
+| Complete42-file manifest | `8c1ff8c4db5e4dd63cd6a553883777467cf04ea347db93d68daedf3b6b7c41b4` |
+| Start / inventory retrieval UTC | 2026-10-21T23:59:05.593486Z /2026-10-22T00:36:56.274169Z |
+| Debits / actual HTTP | **3,586 START debits /3,585 HTTP** |
+| Actual received HTTP200 pages | 3,584 |
+| Planned / started / complete day chains | **1,169 /601 /593** |
+| Invoked failure | Attempt3539, day587 page6: no observed HTTP status/body; generic page/chain refusal |
+| Cooperative drained refusal | Attempt3586: START retained, HTTP not invoked after fatal signal |
+| Charged bytes / rows | 966,979,249 bytes /3,347,428 charged rows;3,346,428 observed rows |
+| Publication / pending receipt slots | Publication did not fail; final pending slots0 |
+| Authoritative closure | **refused**, complete_frozen_sequence=false; actual matching remote stillF67 |
+| Global spent-claim byte hash | `1d5857437edbf2cd48510b01c7e2ccc8674621dcc509892552b9d5f08aef2c64` |
+| Inventory byte hash | `4b2fd1cb404516724da494fd8b34a59f2444b6b43b39be57fef631efcad883e8` |
+| Authoritative closure byte hash | `e0f1031919a15ed66a15702902dd7d2dfb6a9259a7c36a6599004e24c9a1711c` |
+
+The invoked failure elapsed approximately31.3s; the transport configures a
+30s timeout. That is **compatible with**, not proof of, a timeout: the
+original receipt deliberately retained no exception text/cause. No429,
+invalid subscription, particular server error, or second provider denial is
+inferred from an unknown status. The601 returned day records include eight
+incomplete chains. Positive593 chains are not a complete1,169-day issuer/
+identity input and are not backtest readiness.
+
+The final post-publication audit independently observed equal actual remote,
+zero pending slots and a refused round. A provisional inventory success flag
+is not substituted for that closure. No automatic restart, retry, resumption or budget reset
+was performed. The original whole-round claim stays spent even though most
+of its74,816-slot ceiling was not used.
+
+### 119.4 Verified cache correction, retained ledger and held work
+
+Main's keyless/HTTP-free diagnostic had512/512 lane-guard checks pass, then
+18 `AnchorCacheRefusal` failures in512 exact pre-wire local checks, all at
+the concurrent exact-five inventory scan. Independent disposable five-file
+testing reproduced3,817/8,000 bad shared-FD scans and3,639/8,000 with
+`dup()`; fresh relative directory opens had0/8,000. These are independent
+agent executions, not Main's own stress-run counts.
+
+**SI-DEC-20261021-03:** after both actual captures ended, apply the smallest
+lane-owned fix. Each scan now obtains a **fresh open-file description** via
+`os.open(".", O_RDONLY|O_DIRECTORY|O_NOFOLLOW, dir_fd=retained)`, verifies
+the original directory's inode/device/owner/0700 mode before/after, and closes
+the fresh FD in nested `finally` while retaining both custody boundaries.
+Writer and reader still require the exact same five names; sixth-file,
+replacement, permission, link and source/code guards are not weakened.
+No protocol constant, historical manifest/closure/receipt or source budget
+was changed. The original47 cause remains unclassified.
+
+Main's deterministic held regression was red **2 failed in0.60s** onF67:
+eight concurrent existing custody calls reuse the retained stream; the
+cleanup helper did not exist. The tracked correction plus full cache
+capture controls is green **19 passed in0.87s**. Independent review found
+no material issue; its actual corrected-helper stress had8,000 scans,
+zero mismatches,16,000 custody boundaries and FD_delta0, and its focused
+two tests passed in0.65s.
+
+| ID | Priority | Disposition and evidence |
+|---|---|---|
+| SI-BUILD-20261021-001 | P2 | Confirmed/corrected: concurrent shared directory-stream custody can falsely refuse an unchanged exact inventory. Narrow red/green and independent stress above; original private receipts remain unchanged. |
+| SI-BUILD-20261021-002 | P2 source qualification | Open: both original whole-round claims closed refused; count prefix and593 daily chains do not establish complete historical same-class/daily input coverage. All debits/unknown observations remain negative. |
+| SI-BUILD-20261021-003 | P3 diagnostic hypothesis | False alarm in the bounded experiment: concurrent lane-Git checks were suspected, but512/512 passed; the repeated reproduced failure was the cache listing boundary. Not a claim that Git can never fail or that original47 recorded this cause. |
+| SI-BUILD-20261021-004 | P3 diagnostic hypothesis | Partial/unresolved: daily3539 timing is timeout-compatible, not authenticated root cause. Unknown HTTP status is not429 or an entitlement finding. |
+| SI-BUILD-20261021-005 | P1–P2 held proposal only | Confirmed/corrected before integration: suffix draft policy/driver binding, partial publication, fresh closure, backwards clocks, complete diagnostics, ordinary Future draining and negative-clock sanitization. Main's independent29-case selection passes2.24s; no child claim/request occurred. |
+| SI-BUILD-20261021-006 | P2 held proposal only | Confirmed/corrected: complete-source row/byte verification after the final yielded report could be skipped by taking exactly1,169 reports. Author moved verification before that yield; independent seven audit controls plus existing1001-CIK cap test pass8/8 in2.33s. The real refused closure cannot activate this complete-only draft. |
+| SI-BUILD-20261021-007 | P2 held proposal only | Confirmed/corrected: dividend draft surrogate normalization, fixed-code diagnostics and raw/encoded URL-control boundaries. Draft author's54 fabricated tests pass1.36s; no actual data or dividend route dispatched. Future helper-text leakage is fault-injection evidence, not demonstrated current provider-body leakage. |
+
+| SI-BUILD-20261021-008 | P3 record authoring | Confirmed/corrected before commit: the first119 insertion preceded118's last validation paragraph. The new exact-preservation test failed1/285 passed in36.42s and an independent reader confirmed the misplaced attribution.119 was moved after the entire original118, without changing its text. |
+
+Prior confirmed, partial and false-alarm rows, source P2s, Windows/full-lane/
+shared issues and prospective SI-CR19-003 remain retained. No historical
+ledger row is edited or promoted to acceptance by this source attempt.
+
+**SI-DEC-20261021-04:** hold all new suffix/replay/dividend proposals in
+ignored private drafts; do not promote pending pins, provisional markers,
+partial universes, invented clocks or fixtures into source admission.
+The proposed count suffix would retain original47/48 and only consider
+unstarted49–81,875 under a separately frozen manual child; it was **not
+integrated, registered, claimed or dispatched**. Daily replay remains
+complete-only/PENDING because the actual round refused. Dividend pay_date
+is a source date, not account cash receipt or a complete merger/terminal
+payment contract. These drafts are not released implementation or progress
+toward an actual performance result.
+
+### 119.5 Validation, exclusions and precise next action
+
+Main's pre-capture focused controls passed155 tests in2.07s; its separate
+daily operational/runtime/source controls passed120 in36.98s. Both used the
+empty environment/network-denied harness, no complete lane/repository suite.
+Corrected suffix-proposal controls passed29 in2.24s, still ignored; no
+other agent's validation is attributed to Main. Final integrated selectors,
+targeted in-memory compilation, active-document/import-boundary, exact
+historical-preservation, diff and status checks are recorded below before
+commit/publication. Four new/updated public-record controls were first red
+(4 failed/5 passed in0.57s) before this section/header/ledger update.
+
+Only the cache correction, its focused tests, the public record regression
+and this canonical record enter Git. No shared/project-wide document,
+SESSION_HANDOFF, package/dependency/runtime or unrelated lane is changed.
+No new source/admission flag, request budget, winner, empirical look or
+execution permission was manufactured. Private licensed/reconstructible
+rows, Sharadar usability conclusions, contacts, account identifiers and
+credential values stay out of Git/chat. No email, new secret, terms,
+purchase, direct unknown Benzinga product, broker/operator database,
+deployment, paper/live, funded capital, real order or trading action.
+
+**Step1 was attempted, not completed; step2 remains factually incomplete;
+step3 is not registered/executed.** A new recovery must prospectively freeze
+its exact original-byte lineage, carried negative evidence, remaining source
+scope and cumulative budgets/code **before** any request. It cannot silently
+resume either spent protocol or declare the593-day subset the full study.
+After complete input qualification still come same-class/issuer-size,
+rational raw volume, original dividend/merger/terminal cash and payment,
+and independently permitted processing facts. Only then may a prospective
+evaluation/date/power/permanent-look registration and exact48-book,
+order-based representation precede any actual signal/outcome join. Owner
+delegation does not invent provider facts. No further generic institutional
+affiliation or blanket approval is demanded; the specific QC pause itself
+requires the owner's later release.
+
+Canonical actual looks0/0, exploratory actual looks0, alpha0, permanent look
+IDs none and QC launch attempts0 remain unchanged. Lookbacks20/60/120/252,
+structural normalization, release-next-open, fixed48 books and protected
+validation/holdout periods are unchanged. No backtest or performance result
+exists from this round. The original12-request master remains spent.
+Historical two QC metadata requests/five NYSE calendar GETs remain in118;
+this round added **zero** QC requests. Other monitors remain unchanged; no
+automation is created/rearmed and the old one-shot stays retired.
+
+Finish this bounded source-attempt/correction checkpoint with **one combined
+final matching-lane non-force push**, with follow-tags/submodule pushes
+disabled. Reverify roots/branch/HEAD/status and actual matching remote before
+the commit and final push; stop on concurrent advancement. Verify clean
+local/tracking/actual-remote equality afterward. Claude's next review should
+cover this exact correction/record snapshot and the refusal accounting, not
+infer completed steps1–3 or backtest readiness.
+
+Main's final integrated **11-file focused selection:286 passed in35.10s**,
+zero skips/warnings, CPython3.13.15/pytest9.1.1, empty inherited environment
+and denied socket network. This includes count/cache, daily operational/
+runtime/source, import-boundary, active-document and nine record controls;
+it is not the full lane suite. Three changed Python files compile in memory
+and diff check is clean. The ENTIRE historical body from “Current publication
+rule” through118 equals exactF67 bytes after removing only the new section-5
+row (normalized SHA256
+`2aec47a4065273b95a40cec839046bf5dcda130d1127314f63963e391b56b1a4`).
+Section118's exact preserved digest is
+`03213d0a1cf36db335ff17c44d8dac0b92594a73d71e1753d3f5067ab7e5cb4a`.
+No active capture or pending HTTP worker remains before staging.

@@ -10,10 +10,11 @@ def _text():
     return RECORD.read_text(encoding="utf-8")
 
 
-def test_current_status_does_not_erase_recorded_qc_metadata_or_extend_scope():
+def test_current_status_retains_metadata_and_later_owner_source_scope():
     header = " ".join(_text().split("Current publication rule", 1)[0].split())
     assert "TWO HISTORICAL QC METADATA REQUESTS" in header
-    assert "COUNTER-REVIEW ONLY; NO NEXT MILESTONE" in header
+    assert "LOCAL SOURCE QUALIFICATION" in header
+    assert "QUANTCONNECT PAUSED BY OWNER" in header
     assert "QC LAUNCH ATTEMPTS0" in header
 
 
@@ -59,3 +60,28 @@ def test_counter_review_is_appended_after_exact_preserved_claude_review():
     assert text.index(current) > text.index(prior)
     original = text[text.index(prior):text.index(current)].rstrip() + "\n"
     assert hashlib.sha256(original.encode()).hexdigest() == "d65b88e4fb573f4d14374154f2a55e2be5b0a76efd691d01e63d9634f8b2d7ad"
+
+
+def test_resumed_source_round_preserves_the_entire_previous_counter_review():
+    text = _text()
+    start = text.index("## 118. Codex counter-review only")
+    end = text.index("## 119. Owner-resumed local source qualification")
+    original = text[start:end].rstrip() + "\n"
+    assert hashlib.sha256(original.encode()).hexdigest() == "03213d0a1cf36db335ff17c44d8dac0b92594a73d71e1753d3f5067ab7e5cb4a"
+
+
+def test_source_round_preserves_spent_claims_and_records_owner_qc_pause():
+    current = _text().split("## 119. Owner-resumed local source qualification", 1)[1]
+    for value in ("SI-AUTH-20261021-01", "SI-AUTH-20261021-02", "48 START", "47 HTTP",
+                  "3,586 START", "3,585 HTTP", "593", "1,169", "not backtest readiness"):
+        assert value in current
+    assert "No automatic restart, retry, resumption or budget reset" in current
+    assert "including capacity/metadata" in current
+
+
+def test_resumed_round_has_its_own_pre_push_row():
+    ledger = _text().split("## 5.", 1)[1].split("## 6.", 1)[0]
+    rows = [line for line in ledger.splitlines() if line.startswith("| 2026-10-22 | Codex local source qualification |")]
+    assert len(rows) == 1
+    assert "f67bbf2fc5ab4c7ce822c7e52b57b560cd670682" in rows[0]
+    assert "119" in rows[0] and "QC paused" in rows[0]

@@ -172,11 +172,12 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         # Review-state phrase: rotate it in the same commit as each new review
         # or counter-review section so the status block cannot go stale.
         header = record.split("## 1.", 1)[0]
-        self.assertIn("Codex counter-review of section 41 completed in section 42", header)
+        self.assertIn("Codex counter-review of section 43 pending", header)
         self.assertIn("Claude's `863a0dcd` is accepted after documentation correction", header)
         self.assertIn("Monitor remains PAUSED", header)
         self.assertNotIn("This review commit stays local", header)
         self.assertGreater(record.index("\n## 42."), record.index("\n## 41."))
+        self.assertGreater(record.index("\n## 43."), record.index("\n## 42."))
         self.assertIn("research/__init__.py`, remains unobserved", header)
         self.assertIn("paused pending platform preflight", header)
         self.assertIn("GDR-RP33 is accepted in section 34", header)

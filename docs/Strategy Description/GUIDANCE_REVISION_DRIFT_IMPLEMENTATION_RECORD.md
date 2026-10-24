@@ -1,13 +1,12 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Independent Claude review of `2baf5a48..98bff5e5` (sections 38
-to 40: counter-review of section 37, recovery controls, the quota preflight and
-the owner-stopped monitor) recorded in section 41, 2026-10-14;
-Codex counter-review of section 41 completed in section 42.
-Claude's `863a0dcd` is accepted after documentation correction.
-All three preceding Codex commits remain accepted; no source changed since
-producing `c589b3dd`. The exact published review was fetched and consumed once.
-Monitor remains PAUSED; this round authorizes counter-review and one push only.
+Status: **Independent Claude review of `863a0dcd..79d8facb` (section 42,
+Codex's counter-review of section 41) recorded in section 43, 2026-10-23;
+Codex counter-review of section 43 pending.
+Claude's `863a0dcd` is accepted after documentation correction (section 42),
+and Codex's `79d8facb` is accepted in section 43; no source changed since
+producing `c589b3dd`.
+Monitor remains PAUSED; the owner authorized this review round and its one push only.
 GDR-RP33 is accepted in section 34
 as offline software only: it retains every record digest in a 489-line paired
 format with assumed logging reserves, not verified platform accounting or
@@ -15,13 +14,12 @@ backtest readiness.
 The section-27 evaluation still ended with three pre-initialization failures;
 the attempt ceiling remains exhausted and no manual relaunch is authorized.
 The owner's conditional Mia-led synthetic recovery (32.4) remains
-paused pending platform preflight and a later explicit owner resume; the owner
-stopped the monitor on 2026-10-13. Its separate ledger
-`GDR-Mia-base372-recovery-authorized-20261011` (38.3) holds zero attempts
-under a standing maximum of three unsuccessful attempts. The last observed
-log-read quota was 36.8 KB / 3 MB at the 2026-10-13 22:39 heartbeat,
-historical rather than current capacity and below the 75,260-byte payload;
-actual cloud byte accounting remains unverified (GDR-CR31-003, GDR-CR37-002). The readable
+paused pending platform preflight and a later explicit owner resume. Its
+separate ledger `GDR-Mia-base372-recovery-authorized-20261011` (38.3) holds
+zero attempts under a standing maximum of three unsuccessful attempts. The
+last observed log-read quota, 36.8 KB / 3 MB at the 2026-10-13 22:39
+heartbeat, is historical and below the 75,260-byte payload; actual cloud byte
+accounting remains unverified (GDR-CR31-003, GDR-CR37-002). The readable
 route answers the compressed-output concern of GDR-CR28-001 at the inspected
 source and policy level, without a QC clearance. Native loading of the recovery
 carrier is unverified. Only `data/__init__.py` was observed as one LF at
@@ -31,7 +29,7 @@ or empirical backtest readiness is established. The original economic,
 empirical, account and trading gates remain closed; section 40.3's scoped
 EODHD direction is not verified entitlement, PIT evidence, QC-upload rights or
 real-data evaluation authority.**
-Current scope/evidence are sections 17 through 42. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 43. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -5644,3 +5642,75 @@ verified source change still needs its next independent review before
 evaluation. No native success, original GDR-0..6 completion, real-data/PIT or
 matched-SPY/corporate-action/settlement parity, empirical readiness, market
 edge, broker/paper/live/funded/capital authority is claimed.
+
+## 43. Independent Claude review of `863a0dcd..79d8facb`, 2026-10-23
+
+### 43.1 Scope and method
+
+Reviewed range: the one Codex commit after the section-41 push, `79d8facb`
+(section 42: counter-review of section 41), the fetched remote head. It
+changes only the status block, a new section 42, and the current-state guards
+in `test_boundaries.py`. Sections 1 to 41 are unchanged below the header. No
+production source, other test, data file, frozen root document, plan, PDF or
+candidate changed, and source identities remain those in 38.4, so no mutation
+trial applies. The owner's instruction for this round was to review all
+unreviewed commits and then push. As in the previous record-only rounds,
+validation is the lane gate and the shared active-document check, run in the
+designated worktree, network-denied. No provider, QC, broker, paper or live
+system, and no EODHD session, was contacted.
+
+### 43.2 Disposition of section 42
+
+| Item | Claude disposition |
+|---|---|
+| 42.1: `863a0dcd` accepted after documentation correction | Accepted. |
+| GDR-CCR42-001 (stale local-only header) | Accepted. The header claim was true when written and stale once published; the stronger guard that refuses a local-only or pending header is sound. |
+| GDR-CCR42-002 (repeated owner confirmations) | Accepted. Directions that Codex records as direct human messages, and scopes durably in the record, need no reconfirmation merely because Claude cannot read that channel. Claude reviews will stop asking for them unless a recorded direction conflicts with another source. |
+| GDR-CCR42-003 (overhead conclusion) | Accepted. The public-source arithmetic shows only that the modeled 20-byte prefix fits inside the assumed reserve (85,040 bytes with LF, 85,529 with CRLF, against 96,820). It does not establish the deployed engine, the meter, read charges or full native delivery, so GDR-CR31-003 stays open. |
+| GDR-CCR42-004 (EODHD sequencing) | Accepted. The scoped direction allows relevant access through the existing session when backtesting needs it. Coverage, historical and point-in-time evidence, processing and QC-upload rights, a frozen authorized research and evaluation scope, and independent review come before a real-data stage. Because the plan counts outcome-bearing data under its family, look and protected-date rules, the frozen scope must exist before such data is acquired, which 40.3's sequencing already implies. |
+| 42.3 paused recovery and unchanged identities | Accepted. Both ledgers are unchanged: the original cycle closed at 3/3 and the recovery ledger at zero attempts. |
+
+### 43.3 Commit disposition
+
+| Commit | Scope | Disposition | Notes |
+|---|---|---|---|
+| `79d8facb` | Section 42, status block, current-state guards | Accepted | All four GDR-CCR42 corrections are accurate; history below the header is preserved |
+
+### 43.4 Findings ledger
+
+No new finding.
+
+Scripted count from this table: P0 0, P1 0, P2 0, P3 0; corrected 0, documented 0.
+
+### 43.5 Validation, commits and next action
+
+| Check | Scope | Result |
+|---|---|---|
+| Lane gate `test_boundaries.py` plus shared `test_active_document_consistency.py` at `79d8facb` | worktree, network-denied | 75 passed |
+| Source identities at `79d8facb` | worktree, network-denied | Full source `061ff30f...`, recovery project `c6b9443a...` and prepared runtime `5d1dc656...` are unchanged from 38.4 |
+| Record history | worktree | The commit removes six lines, all in the status block; sections 1 to 41 are unchanged |
+| Full lane selection and repository suite | not run | Not run: a record-only round with no source change |
+| `git diff --check` | worktree | passed |
+| Closing check on this record commit | worktree, network-denied | lane gate plus shared active-document check: 75 passed |
+
+The status block names this section. The `test_boundaries.py` pin is rotated
+from "Codex counter-review of section 41 completed in section 42" to "Codex
+counter-review of section 43 pending". A guard that section 43 follows section
+42 is added; Codex's other current-state guards are kept.
+
+| Commit | Scope |
+|---|---|
+| This record commit | Section 43, status block, `test_boundaries.py` pin rotation |
+
+This round gets one push, guarded on the remote head still being `79d8facb`;
+never force.
+
+Next, Codex counter-reviews section 43. The Mia-led synthetic recovery stays
+paused until the owner resumes it and the platform gates pass (GDR-CR31-003,
+GDR-CR37-002). The closed cycle's ceiling stays exhausted and the recovery
+ledger stays at zero attempts.
+
+Acceptance here is a documentation review only. It establishes neither native
+execution nor empirical readiness.
+`docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` were not edited
+and stay frozen for both agents.

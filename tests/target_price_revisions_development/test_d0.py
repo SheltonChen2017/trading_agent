@@ -123,9 +123,10 @@ def test_plan_caller_cannot_mutate_nested_authority(capture):
     assert plans.plan_body()["accepted_risks"]
 
 
-def test_report_is_complete_aggregate_only_and_zero_authority(capture, capsys):
+def test_report_is_complete_aggregate_only_and_zero_authority(capture, capsys, aggregate_only):
     payload = audit(capture)
     report = plans.strict_artifact(payload)
+    aggregate_only(report)
     assert report["input"] == {"pages": 1, "rows": 1, "bytes": len(capture["raw"])}
     bucket = report["years"]["2012"]
     assert bucket["targets"]["price_target"]["positive"] == 1
@@ -472,3 +473,92 @@ def test_publication_kind_refuses_before_write(tmp_path, prefix):
     with pytest.raises(plans.DevelopmentError, match="unsupported"):
         plans.write_immutable(tmp_path, prefix, plans.canonical({"count": 1}))
     assert not list(tmp_path.iterdir())
+
+
+@pytest.mark.parametrize("leak", [
+    "top_level_digest_list", "identifier_digest_list", "bucket_digest_string",
+    "bucket_integer_encoded_digest", "interpretation_extra_key", "risk_substitution",
+    "bool_disguised_as_count",
+])
+def test_aggregate_only_contract_rejects_derived_row_data(capture, aggregate_only, leak):
+    """TPR-CR16-001: a digest of a provider ID is derived row data, not a count.
+
+    The raw-value absence check above cannot see it, so the contract must close
+    the whole key tree and leaf types.  The clean synthetic report passes first,
+    so each refusal below is attributable to the injected shape alone.
+    """
+    report = plans.strict_artifact(audit(capture))
+    aggregate_only(report)
+    row_digest = plans.digest(BASE["benzinga_id"].encode())
+    bucket = report["years"]["2012"]
+    if leak == "top_level_digest_list":
+        report["identifier_digests"] = [row_digest]
+    elif leak == "identifier_digest_list":
+        report["identifiers"]["digests"] = [row_digest]
+    elif leak == "bucket_digest_string":
+        bucket["clocks"]["update_same_event_day"] = row_digest
+    elif leak == "bucket_integer_encoded_digest":
+        bucket["targets"]["price_target"]["row"] = int(row_digest, 16)
+    elif leak == "interpretation_extra_key":
+        report["interpretation"]["row"] = row_digest
+    elif leak == "risk_substitution":
+        report["accepted_risks"] = [row_digest]
+    else:
+        bucket["rows"] = True
+    with pytest.raises(AssertionError):
+        aggregate_only(report)
+
+
+def test_frozen_bucket_shape_matches_the_auditor(frozen_bucket_contract):
+    """TPR-CR16-001: any change to the auditor's bucket must edit the contract."""
+    shape, key_tree = frozen_bucket_contract
+    assert key_tree(structural._bucket()) == shape
+
+
+@pytest.mark.parametrize("leak", [
+    "interpretation_value", "schema", "confirmatory_alpha", "existing_integer_count",
+])
+def test_aggregate_only_contract_rejects_existing_leaf_substitution(capture, aggregate_only, leak):
+    """Replacing an existing allowed leaf must not evade the publication guard."""
+    report = plans.strict_artifact(audit(capture))
+    aggregate_only(report)
+    row_digest = plans.digest(BASE["benzinga_id"].encode())
+    if leak == "interpretation_value":
+        report["interpretation"]["next"] = row_digest
+    elif leak in ("schema", "confirmatory_alpha"):
+        report[leak] = row_digest
+    else:
+        report["years"]["2012"]["horizon_probes"]["price_target_horizon_present"] = int(row_digest, 16)
+    with pytest.raises(AssertionError):
+        aggregate_only(report)
+
+
+@pytest.mark.parametrize("broken", [
+    "target_partition", "action_partition", "currency_partition", "time_partition",
+    "direction_partition", "pair_bounds", "year_rows", "identifier_rows", "identifier_repeats",
+])
+def test_aggregate_only_contract_checks_count_accounting(capture, aggregate_only, broken):
+    """Plausible integer leaves still have to satisfy aggregate accounting."""
+    report = plans.strict_artifact(audit(capture))
+    aggregate_only(report)
+    bucket = report["years"]["2012"]
+    if broken == "target_partition":
+        bucket["targets"]["price_target"]["positive"] = 0
+    elif broken == "action_partition":
+        bucket["actions"]["raises"] = 0
+    elif broken == "currency_partition":
+        bucket["currencies"]["USD"] = 0
+    elif broken == "time_partition":
+        bucket["clocks"]["event_time_valid"] = 0
+    elif broken == "direction_partition":
+        bucket["pairs"]["direction_agrees"] = 0
+    elif broken == "pair_bounds":
+        bucket["pairs"]["positive_adjusted"] = 0
+    elif broken == "year_rows":
+        report["input"]["rows"] = 2
+    elif broken == "identifier_rows":
+        report["identifiers"]["unique"] = 0
+    else:
+        report["identifiers"]["repeated_groups"] = 1
+    with pytest.raises(AssertionError):
+        aggregate_only(report)

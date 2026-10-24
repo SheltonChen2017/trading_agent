@@ -1,0 +1,186 @@
+{
+  "schema": "tpr-qc-matched-freeze-v1",
+  "study_id": "TPR-MATCHED-20261008-v1",
+  "review_baseline": "32016848bc9ce4dfab3f52ddb5bb34e105e445dc",
+  "owner_direction": "Claude has started review. after the review lands, start counter review. on the backtest, here is notes from another lane (analyst revision)",
+  "methodology_attachment_sha256": "eb5f635121ef0e9e06c5e681c44d0a8b5cfe12c7b019e43281c896f83e79f083",
+  "purpose": "Exploratory matched three-arm portfolio comparison across six universes; constituent-stock proxy versus signal-free constituent control and actual ETF basket, NOT canonical ETF alpha or independent confirmation.",
+  "independent_review_status": "pending_for_new_candidate",
+  "universes": [
+    {
+      "etf": "SPY",
+      "case": "sp500",
+      "definition": "Lagged QC-covered US-equity SPY constituents; S&P500 ETF proxy, not broader all-US-largecap index or unbiased official-index replication."
+    },
+    {
+      "etf": "XLV",
+      "case": "healthcare",
+      "definition": "Lagged QC-covered US-equity XLV constituents: S&P500 healthcare, not all healthcare stocks."
+    },
+    {
+      "etf": "XLE",
+      "case": "energy",
+      "definition": "Lagged QC-covered US-equity XLE constituents: S&P500 energy, not all clean/renewable energy stocks."
+    },
+    {
+      "etf": "QQQ",
+      "case": "nasdaq100",
+      "definition": "Lagged QC-covered US-equity QQQ constituents: Nasdaq100 proxy, NOT all Nasdaq-listed stocks."
+    },
+    {
+      "etf": "SOXX",
+      "case": "semiconductors",
+      "definition": "Lagged QC-covered US-equity SOXX constituents: semiconductor manufacturing/equipment, not broad technology."
+    },
+    {
+      "etf": "REMX",
+      "case": "rare_earth_strategic_metals",
+      "definition": "Lagged QC-covered US-equity REMX slice; incomplete global rare-earth/strategic-metals exposure, not broad mining/gold/uranium. The ETF basket trades full REMX ETF, unlike constituent controls."
+    }
+  ],
+  "membership": {
+    "source": "QuantConnect US ETF Constituents / Security Master, cloud simulated receipt clocks; no verified historical publication vintage.",
+    "source_url": "https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/quantconnect/us-etf-constituents",
+    "minimum_lag_calendar_days": 7,
+    "maximum_age_calendar_days": 21,
+    "rule": "Latest snapshot received by prior-session 18:00NY cutoff and effective7–21calendar days earlier; no future receipts.",
+    "unknown": "Missing member weights, identity/signal states or snapshots retained distinctly; not zero signals; incomplete callback slice never renormalized to full global holdings.",
+    "overlap": "Six sleeves overlap; consolidate exact native Symbol identities; account P&L only, not independently invented sleeve returns.",
+    "missing_snapshot": "Stock arms refuse the whole decision if any sleeve's lagged snapshot is missing, consistently for ON/OFF; incomplete global weight is recorded, not equated to no snapshot. ETF basket fixed instruments do not depend on constituent snapshots; missing callback is context-only diagnostic, not an invented ETF execution gate."
+  },
+  "arms": [
+    {
+      "id": "tpr_on",
+      "traded": "Constituent stocks",
+      "selection": "Same historical frozen raw nominal target-price revision scores, positive top10 per sleeve, native source-ID tie-break; no price/liquidity substitution; explicit source-identity missing/refused/ineligible states.",
+      "weights": "Each selected sleeve slot1/60 of prior-close NAV; aggregate exact native Symbol identity across sleeves, at most10% for six overlapping slots; unselected slots remain cash."
+    },
+    {
+      "id": "tpr_off",
+      "traded": "Constituent stocks",
+      "selection": "Top10 positive known lagged ETF holding weights, descending weight then native SymbolID; no TPR packet read, source identity, signal coverage, score, eligibility, ranking, weights or fallback dependence.",
+      "weights": "Same1/60 per slot, consolidation, volume/cash/accounting constraints; missing slots cash. Non-signal membership rules identical; removes TPR signal/source-admission effects jointly, not pure weight-only ablation."
+    },
+    {
+      "id": "etf_basket",
+      "traded": "SPY,XLV,XLE,QQQ,SOXX,REMX ETFs only",
+      "selection": "All six fixed ETFs; no TPR or AR inputs; actual orders.",
+      "weights": "Each ETF1/6 prior-close NAV; deliberate ETF position-cap difference from10% individual stock aggregate. Same fees/slippage, whole shares, volume cap and cash buffer. No stock fallback."
+    }
+  ],
+  "analyst_revisions": "Completely disabled; no AR import, score, eligibility, selection, ranking, weights or fallback. AR historical dates/capital/QCOM exclusion/caps/fees/timing are attributed notes not adopted approval.",
+  "economics": {
+    "window_start": "2025-01-02",
+    "window_end": "2025-03-31",
+    "warmup_start": "2024-12-02",
+    "expected_valuation_days": 60,
+    "expected_decisions": 14,
+    "initial_cash": "100000",
+    "currency": "USD",
+    "rebalance": "Same14 weekly first-session dates/cutoffs as immutable original packet.",
+    "execution": "MOO09:20NY; cancel remaining09:35; no daily retry or anticipated sale proceeds.",
+    "sizing": "Whole-share floor of frozen weight*prior-close NAV/current-split-basis prior close. Sell-first; target weights are PRIOR-CLOSE SOFT TARGETS, not guaranteed execution-time namecaps.",
+    "fees_per_share": "0.01",
+    "baseline_slippage": "0.001",
+    "adverse_slippage": "0.0015",
+    "cost_order": "All3 baseline runs before predefined5bps-additional adverse runs; no tuning between arms/costs.",
+    "volume_cap": "1% prior completed-session raw shares, pre-cap submitted quantity; requested-minus-submitted explicit capacity shortfall, not partial fill.",
+    "cash_buffer": "97% of preexisting cash budget including fee/slippage;3%gapbuffer; leverage1; actual opening rejection not concealed.",
+    "corporate_actions": "RAW native actions; maintain admitted membership subscriptions/custody before cutoff; refuse unknown action basis rather than default missing split=1; explicit delisting/order-failure diagnostics; immediate dividends/settlement.",
+    "risk": "Longonly/unlevered cash nonnegative, gross<=1 with penny accounting tolerance. Open gaps can change individual weights; report target vs realized economics, never silently reinterpret targetcap as hard."
+  },
+  "inputs": {
+    "signal_packet_path": "artifacts/target_price_qc6/TPR-QC6-20261008-v1/signal-packet.json",
+    "signal_packet_sha256": "4dd3a9d800b7c1cb8114272c829ee18239972cc0a15c71e47a3e86ed6491a316",
+    "new_access": "One explicit fresh hash-bound read of the previously executed derived packet, under this new bounded matched-study manifest; no D0/source captures re-opened, no provider refresh. New private ObjectStore copy under tpr-matched/study/hash.",
+    "original_freeze_sha256": "3cf40af7325265b15f7de5e03f0667a1554c889fdd2db02de228a01b2fa97ccf",
+    "identity_caveat": "Current-vintage Sharadar identities and censored-last-touch nominal targets are NOT PIT; horizon/share-basis unverified. Neutral does not inherit source-presence eligibility.",
+    "signal_formula": "Unchanged raw new/prior-1 clip[-1,1],firmmedian,20sessionhalf/80maxage,date-onlysecondopen/correctionavailability; not canonical price-scaled alpha.",
+    "private_rows_in_git": false
+  },
+  "evaluation": {
+    "metrics": [
+      "matched-observation account returns",
+      "CAGR with90-day short-window caveat",
+      "daily-close drawdown",
+      "sample daily volatility annualizedsqrt252",
+      "Sharpe arithmetic excess daily mean/std annualizedsqrt252 withriskfree0",
+      "annual partial2025 return only notfullyear",
+      "turnover/fillnotional andfees",
+      "modelcost conditions",
+      "orders/fills/failures",
+      "cash/gross/selectedcounts",
+      "per-sleeve coverage andmissingstates",
+      "noindependent sleevePnL",
+      "accountingresidual/sourceparity"
+    ],
+    "prior_observed_runs": 9,
+    "prior_runs": "Two local and seven cloud looks, including SPYfailedattempt1 and REMXzero-trade diagnostic. Historical returns retained; weak prior outcomes motivated controls, not retuning scores/dates.",
+    "new_looks": "Every compile/backtest candidate attempt counted prospectively; failures retained. Six planned portfolio candidates, not36universejobs.",
+    "interpretation": "Exploratory adaptive same-window correlated comparison; confirmatoryalpha0. TPR-on REMX zero selections remain diagnostic; controls may expose membership vs signal limits without manufacturing positiveTPRorders.",
+    "canonical_admission": false,
+    "sealed_holdout_access": false,
+    "research_allocation_changed": false
+  },
+  "operations": {
+    "operation_id": "TPR-MATCHED-ACCESS-20261008-001",
+    "maximum_attempts_per_candidate": 3,
+    "maximum_projects": 6,
+    "maximum_requests": 1000,
+    "maximum_response_bytes": 16777216,
+    "request_wall_timeout_seconds": 30,
+    "expiry_hours": 48,
+    "private_prefix": "tpr-matched/TPR-MATCHED-20261008-v1",
+    "attempt_rule": "Reserve before compile; fixes/retries/sessions never reset counts; after3unsuccessfulstopCodex andauthenticatedcontrollableMiaonly, elsepreciseownerrecovery.",
+    "source_policy": "Readable committed successor modules, sourcebundles hashbound, cloudreadback+BuildSuccess verified beforelaunch; exactlocaldirtysourcehashes retained, nohistoricalcleancommitfiction.",
+    "canonical_trust": "Cooperative localreceipts only, not Windowscustody/antirollback acceptance.",
+    "allowed": "Fresh lane-private projects, ownsource/readback,oneprivatepacketcopy,compile/backtests/readlogs/orders only.",
+    "forbidden": [
+      "brokers",
+      "paper/live",
+      "purchases/upgrades",
+      "otherprojects/providers",
+      "operatorstate/database",
+      "publiclicensedrows",
+      "credentialexposure/rotation"
+    ]
+  },
+  "candidates": [
+    {
+      "candidate_id": "TPR-MATCHED-ON-BASE-v1",
+      "arm": "tpr_on",
+      "cost": "baseline",
+      "slippage": "0.001"
+    },
+    {
+      "candidate_id": "TPR-MATCHED-OFF-BASE-v1",
+      "arm": "tpr_off",
+      "cost": "baseline",
+      "slippage": "0.001"
+    },
+    {
+      "candidate_id": "TPR-MATCHED-ETF-BASE-v1",
+      "arm": "etf_basket",
+      "cost": "baseline",
+      "slippage": "0.001"
+    },
+    {
+      "candidate_id": "TPR-MATCHED-ON-ADVERSE-v1",
+      "arm": "tpr_on",
+      "cost": "adverse",
+      "slippage": "0.0015"
+    },
+    {
+      "candidate_id": "TPR-MATCHED-OFF-ADVERSE-v1",
+      "arm": "tpr_off",
+      "cost": "adverse",
+      "slippage": "0.0015"
+    },
+    {
+      "candidate_id": "TPR-MATCHED-ETF-ADVERSE-v1",
+      "arm": "etf_basket",
+      "cost": "adverse",
+      "slippage": "0.0015"
+    }
+  ]
+}

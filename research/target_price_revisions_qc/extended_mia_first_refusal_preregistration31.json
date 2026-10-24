@@ -1,0 +1,193 @@
+{
+  "schema": "tpr-ext26-genuine-mia-first-refusal-preregistration-v1",
+  "operation_id": "TPR-EXT26-MIA-FIRST-REFUSAL-20261014-001",
+  "actor": "quantconnect-built-in-mia",
+  "registered_parent_head": "4a27440baffb7c393c23aa9a6f5d1ed979f416e0",
+  "owner_instruction": "Unlocked; authorize one OFF run",
+  "owner_confirmation_context": "After a fresh source check, exactly one registered OFF diagnostic in Full Auto; no source or strategy changes and no retries; ON remains blocked until valid OFF accounting.",
+  "owner_instruction_sha256": "902034e3f16a520b5945c1e92116578b3516692145cab39704aa5150f836b17b",
+  "created_utc": "2026-10-14T15:30:45.280893+00:00",
+  "expires_utc": "2026-10-14T16:30:45.280893+00:00",
+  "project_id": 37650980,
+  "candidate_id": "TPR-CAP-TILT-EXT26-OFF-BASE-v1",
+  "study_id": "TPR-CAP-TILT-EXT26-20261010-v1",
+  "new_codex_attempts": 0,
+  "codex_attempts_consumed": 3,
+  "legacy_binding_attempt": 3,
+  "observed_looks_before": 30,
+  "cloud_looks_before": 28,
+  "historical_local_looks": 2,
+  "prospective_mia_look_ordinal": 31,
+  "prospective_cloud_look_ordinal": 29,
+  "new_look_count_on_actual_new_job": 1,
+  "reserved_before_effect": true,
+  "actual_new_job_observed": false,
+  "actual_backtest_id": null,
+  "actual_full_compile_id": null,
+  "no_attempt_allowance_reset": true,
+  "no_automatic_retry": true,
+  "no_source_or_economics_edit": true,
+  "compile_limit": 1,
+  "backtest_limit": 1,
+  "native_mia_prompt_limit": 1,
+  "mia_tool_calls_max": 24,
+  "source_read_limit_files": 16,
+  "source_read_max_each": 1048576,
+  "source_read_max_total": 8388608,
+  "result_read_calls_max": 10,
+  "result_read_max_each": 2097152,
+  "result_read_max_total": 16777216,
+  "existing_included_resources_only": true,
+  "no_purchases_upgrades_or_other_project_actions": true,
+  "cloud_files": {
+    "cap_observer.py": {
+      "bytes": 8712,
+      "sha256": "cad8a3306f6b459bc8bf187c8fd8b8bb980c7b1dc0d85465fba11dd318b70c4d"
+    },
+    "cap_tilt.py": {
+      "bytes": 14373,
+      "sha256": "262f568b7c0fe0b08af8a26896431465c17746bcd32e9addc568f58631e11a5c"
+    },
+    "extended_completion_successor.py": {
+      "bytes": 6084,
+      "sha256": "336e67bff64f484b57e49e92209e22bf9471118c0ee8b8d13c3ff7b8b2511fb6"
+    },
+    "extended_compressed_store.py": {
+      "bytes": 13987,
+      "sha256": "d661b5752c35b9dd04f783f5d78850f453d5f5f299874e5cf19700599df2356e"
+    },
+    "extended_config.py": {
+      "bytes": 428,
+      "sha256": "5790ca63661f0f54a7734565342d141cbaba7797eb8c7b1e488c7ad573b01bd0"
+    },
+    "extended_construction.py": {
+      "bytes": 10567,
+      "sha256": "e61bd56ad3ff5147eedf3220b40ef77743f8e13bff9919f80bc3f684a3fe27c0"
+    },
+    "extended_core.py": {
+      "bytes": 37572,
+      "sha256": "706ed5efdcb3999400c5349dc8b5200be1d48c4bb01cbfc7fb080608a679d5da"
+    },
+    "extended_loader.py": {
+      "bytes": 51383,
+      "sha256": "f5cc9d9cb56ebbae2a22f02d6b6b7041468eadbc77d87ed2e161c9ce119a3820"
+    },
+    "extended_runtime_successor.py": {
+      "bytes": 6712,
+      "sha256": "2e6bb5c82f356ee7ece4811c9d634ce57d48533d408d4b57b8aee41de062517b"
+    },
+    "main.py": {
+      "bytes": 60658,
+      "sha256": "a098c087c14507c154a4740d0145f7af1c448ec24905f4c8b66e82869d917d86"
+    },
+    "research.ipynb": {
+      "bytes": 1029,
+      "sha256": "af27200522531d426185f4daa25d23610c164134e3ab7fdf38919616d0d5b344"
+    },
+    "mia.ipynb": {
+      "bytes": 6100,
+      "sha256": "c753fe2c1b5d6de25d4d2fcf374a5a6915e8642293427430397e485941a09425"
+    },
+    "mia_diag.py": {
+      "bytes": 5253,
+      "sha256": "ca1df38f610e29d0507cdf2be134f974211135242947effc2d63351e4b96fb14"
+    },
+    "mia_rescale.py": {
+      "bytes": 4852,
+      "sha256": "0c68d8fd7a33ac8a29233bbc1597073e050c15066baf15a9efd59183a2b75f78"
+    },
+    "audit_key_recovery.py": {
+      "bytes": 7490,
+      "sha256": "bce4182d09dc9d31132cb54d404712471ddff5e2b706c2988fbe9fcc48c93aea"
+    },
+    "extended_refusal_witness_context_successor.py": {
+      "bytes": 15742,
+      "sha256": "1b057f254fba91eee98862bbb63b2141cea63962905c458459d7a47531215a0f"
+    }
+  },
+  "frozen_inputs_and_economics": {
+    "config_json_sha256": "19a9842cfceb695d1f8256f429745247387c89bb725ee2b8be44fe98a726322a",
+    "config_module_sha256": "5790ca63661f0f54a7734565342d141cbaba7797eb8c7b1e488c7ad573b01bd0",
+    "study_freeze_sha256": "90bdec5520b29bd932a3ec730f7c4c40c544ea7582731ad6680ef34ea8cf4067",
+    "calendar_sha256": "3eccdf3cf9a2542ffd249983241d5747c2ecd4e21bc4a71f7f826c77ec1fe53d",
+    "immutable_completion_bundle_sha256": "daaf0c33fd837b9896c99d1759e67454a9f3027d478879c5e60015af1f099934",
+    "input_hashes": {
+      "calendar.json": "3eccdf3cf9a2542ffd249983241d5747c2ecd4e21bc4a71f7f826c77ec1fe53d",
+      "identities.json": "2cf0efc355e551fa853db3a00a4a10f235509a729a8119425845fe7575b06561",
+      "preparation.json": "08e1d006b9ffef3554873722d5c40ebf739ff7e6dd2c372e78069ddf6cf2808f",
+      "signal-manifest.json": "a9cbf9ad3ec485a11a2bf5c699326b4ca792579c43efb0e5b3a388a24ab36838"
+    },
+    "start": "2021-01-04",
+    "end": "2026-10-09",
+    "warmup": "2020-09-01",
+    "valuations": 1449,
+    "decisions": 301,
+    "stock_sleeves": [
+      "SPY",
+      "XLV",
+      "XLE",
+      "QQQ",
+      "SOXX",
+      "REMX"
+    ],
+    "off_signal_packet_reads": 0,
+    "ar_disabled": true,
+    "cap_only_selection_and_neutral_off_unchanged": true,
+    "no_new_date_universe_timing_cost_parameter_or_economic_change": true,
+    "no_outcome_tuning": true,
+    "no_gap_fill_or_partial_window_relabel": true,
+    "no_etf_fallback_member_promotion_or_renormalization": true,
+    "source_input_clock_pit_survivorship_overlap_limits_unchanged": true,
+    "remaining_on_uploads_not_authorized_by_this_scope": true
+  },
+  "native_data_scope": {
+    "only_frozen_existing_off_inputs_and_included_qc_observations": true,
+    "no_external_provider_read_or_upload": true,
+    "no_global_object_keys_or_notebook": true,
+    "no_raw_or_bulk_data_export": true,
+    "job_bound_original_private_journal_preserved": true,
+    "first_refusal_diagnostic_max_keys": 2,
+    "first_refusal_gzip_max_each": 4096,
+    "first_refusal_plain_max_each": 4096,
+    "first_refusal_key_template": "tpr-ext26/refusal-witness/TPR-EXT26-MIA-FIRST-REFUSAL-20261014-001/37650980/<actual-native-job-id>/<membership-or-mark>_json.gz",
+    "no_overwrite_collision_or_guard_bypass": true,
+    "post_job_witness_read_requires_separate_fresh_native_scope": true
+  },
+  "engine_observation": {
+    "version": "master v18179",
+    "always_master_observed": true,
+    "actual_job_engine_verified": false,
+    "no_engine_change_authorized": true
+  },
+  "readiness_reference": {
+    "source_operation": "TPR-EXT26-MIA-SOURCE-POST-20261014-021",
+    "source_receipt_bytes": 9731,
+    "source_receipt_sha256": "be4fa30c30ce02a77bdad051aa93c4cde0ce825f1b3c6c6c446526dc0274f585",
+    "source_archive_bytes": 266508,
+    "source_archive_sha256": "28da419eb1ba8a217fab2edfd9232fde71eef25d3a0004f8f1d019dbc0178db6",
+    "source_diff_bytes": 167742,
+    "source_diff_sha256": "681481b6ad32d627597a386b756756f4187736ffa54113f7495a81d5e8292eb2",
+    "ui_operation": "TPR-EXT26-MIA-WITNESS-SOURCE-20261014-012",
+    "ui_result_sha256": "a483d8f2245aa57765f889fbca3687c31b60952f91734cba5d7fdeb2ac622221",
+    "source_task_completed_observed": true,
+    "new_empty_full_auto_observed": true,
+    "discovery_operation": "TPR-EXT26-OWNER-MIA-DISCOVERY-SUCCESSOR-20261014-003",
+    "discovery_receipt_sha256": "2ca0ec96c59ec2711b042074f817894d3a04a7585de9c1452192a357d26eaeb2",
+    "known_jobs": 14,
+    "unknown_jobs": 0,
+    "fresh_final_all16_source_check_before_effect_required": true
+  },
+  "acceptance": {
+    "compiled_source_proven": false,
+    "full_window_native_accounting_proven": false,
+    "accepted_metrics": null,
+    "genuine_completed_status_alone_is_insufficient": true,
+    "original_guards_and_errors_preserved": true,
+    "native_nav_dates_and_frozen_1601_ny_clock_required": true,
+    "native_orders_fills_fees_cash_exposure_coverage_required": true,
+    "complete_journal_index_sidecar_chunk_hash_readback_replay_required": true,
+    "diagnostic_failure_does_not_justify_source_repair_or_rerun_in_this_scope": true,
+    "canonical_admission": false,
+    "trading": false
+  }
+}

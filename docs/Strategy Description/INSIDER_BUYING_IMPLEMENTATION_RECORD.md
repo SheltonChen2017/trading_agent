@@ -29199,3 +29199,109 @@ economics, sources, failed roots, stoppedv3, strictD23 and both distinct
 non-retroactive incident classifications exactly as202.4. Source/identity/
 availability/rights/canonical/QC/look/backtest/execution gates remain false;
 looks/jobs/backtests0/0/0 and no funded/paper/live/capital/real-order authority.
+
+## 203. Owner-requested Sharadar access check (Codex, 2026-10-24)
+
+### 203.1 Scope, authorization and exact execution identity
+
+After the owner reported that Sharadar was reset and explicitly said "try
+access it", Codex activated the existing reviewed two-status qualification,
+not a source-row capture or continued build. Sections169/201/202 identify
+this candidate as previously UNEXECUTED; the earlier generic credential-
+missing probe made zero Sharadar HTTP requests. Before this activation the
+qualification namespace was absent. Designated root/branch, clean localHEAD
+and matching-branch-only fetched origin were all exact
+`1344a74e946db484c5c8b28da1c238535197091b`; no incoming commits or concurrent
+changes were observed. No new code, alternate checkout or branch was used.
+
+AuditID `ib-sharadar-reference-20261024-access-once` used the production
+`research.insider_buying_sharadar_reference_qualification` CLI with default
+production callbacks. Its adapter SHA256 remained
+`9e0a46915ef4cf5ff20cdcf78c8e387152fbbfe7f1636fd04bd502eb64f78bd6`;
+seven-source inventory digest
+`4f6251352dfd4a357a8fcac6c13299722b6ae27f2898943b4a726a1b73dc7991`.
+The operation ran on already-existing1344a74e, not this later record commit.
+Its unchanged historical `owner_direction` literal names the earlier scope;
+this entry separately records the owner's current activation instruction.
+
+Both fixed scopes were reserved before the single Keychain read from
+`trading-agent-sharadar` / `sharadar`. The secret was used only in the fixed
+`x-api-key` header, never printed or written to a journal, argument, environment
+or Git. No proxy, redirect, retry or fallback was introduced. The two fixed
+requests are TICKERS current-file status followed by ACTIONS full-history
+file status, maximum one dispatch each, stopping at the first refusal.
+
+### 203.2 Observed result and immutable refusal accounting
+
+The Keychain read completed (`configured-keychain-credential-read`). Exactly
+ONE transport invocation occurred: TICKERS status returned HTTP200 but its
+body failed the existing strict top-level envelope contract with
+`source_envelope_schema_refused`. There were ZERO accepted metadata responses.
+ACTIONS was NOT dispatched (`not-attempted-after-prior-refusal`, count0).
+The production CLI exited2 with `stopped-status-qualification`, completed at
+`2026-10-24T19:11:13.047065Z`. HTTP200 plus a readable local key is NOT proof
+that the credential is valid, the subscription is active or archive downloads
+are entitled. No cause of the unexpected response has been established.
+
+The rejected response was not retained or hashed. Its contents, byte count
+and precise schema difference are therefore not established by the retained
+journal; do not invent an error message, claim a subscription denial or call
+this a successfully qualified account. No table-row download was requested,
+no price/fundamental values evaluated, and no rejected body is in Git.
+
+Private evidence remains under
+`artifacts/insider_buying/sharadar_reference_qualification/`:
+
+- Global `scope-reservation.json` SHA256
+  `ed5045a36be8db8478d8da1d66b362e33ac4e41796f5982bafd3341b9add19c2`.
+- Audit child `complete.json`,3946 bytes, SHA256
+  `d0da5b96b9c41bfd66f89d19c0c7979dac4f4f1bcab1ecf1fe784531a8d85594`.
+- Seven total JSON leaves (global reservation plus six child leaves),0600,
+  same owner/single links,0700 roots, exact inventories/held ancestry and
+  all published hashes independently checked read-only after execution.
+  Global reservation and completion paths are Git-ignored.
+
+The global two-scope reservation is now consumed: preserve it, including the
+unattempted ACTIONS disposition. Do not delete/reset/rename the namespace,
+redispatch the TICKERS request, automatically attempt ACTIONS or weaken the
+schema to manufacture success. A new supplier response format or separately
+defined diagnostic would need its own justified contract/scope; this access
+check does not activate one.
+
+### 203.3 Validation, decisions, exclusions and next action
+
+Before actual access,171 focused qualification/Keychain/EXACT package-guard
+tests passed in3.54s, with invented credentials/transports under native
+process-tree network denial, Keychain-exec denial and repository-write denial.
+Python3.13.15/pytest9.1.1, minimal env-i, -I/-B, fresh private temp/pycache,
+plugin autoload and pytest cache disabled. Those offline controls are
+separate from, and do not authorize, the explicitly requested online status
+operation. The post-operation seven-leaf metadata/hash/permission check ran
+under native network/fork/all-write/Keychain-exec denial; no repeat API or
+credential read. Final record/boundary checks are recorded below when observed.
+No complete lane/repository suite or retained-root replay was run.
+
+Disposition: account access remains UNQUALIFIED. The next practical external
+input is confirmation that the newly active Sharadar API credential/account
+is the one configured in the existing Keychain item, or a redacted supplier
+account/status-format confirmation. Do not send a key in chat. Subscription
+reset alone does not resolve this schema refusal. No additional purchase is
+recommended on this observation alone.
+
+This observation creates no evidence-based P2 closure. All six carried P2s,
+earlier scoped resolutions, frozen82-quarter population/economics, four v3
+custody sources, strictD23, stoppedv3 and both distinct non-retroactive owner
+incident classifications remain as202.4. All readiness/rights/PIT/identity
+and execution flags remain false. QC hold remains in force: no QC account,
+browser, API, SDK, upload/job or backtest was accessed. Looks/jobs/backtests
+remain0/0/0. No new row capture, build milestone, supplier email, outcome,
+broker/scheduler/database/deployment/funded/paper/live/order/trading action.
+Only this lane record changes; shared documents and all production code stay
+frozen. The monitor stays paused. This request does not ask for another push;
+the operational handoff is recorded locally, with no remote publication claim.
+
+Final focused record/active-document/lane-import-boundary/EXACT package-guard
+selection:124 passed in3.80s under the same native network/Keychain-exec/
+repository-write-denied offline profile. This is not a complete lane suite;
+the earlier171 selection overlaps and is not added to it. Diff check is
+clean; the sole tracked change is this append-only operational handoff.

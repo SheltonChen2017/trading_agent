@@ -1,17 +1,19 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Independent Claude review of `863a0dcd..79d8facb` (section 42,
-Codex's counter-review of section 41) recorded in section 43, 2026-10-23;
-Codex counter-review of section 43 completed in section 44.
-Claude's `c6834173` is accepted after documentation correction.
+Status: **Independent Claude review of `c6834173..b40aae1f` (sections 44
+to 46: counter-review of section 43, the four-provider coverage audit and the
+GDR-COV1 offline coverage preflight) recorded in section 47, 2026-10-24;
+Codex counter-review of section 47 pending.
+Claude's `c6834173` is accepted after documentation correction (section 44).
 The published `c6834173` review is consumed once.
-Claude's `863a0dcd` is accepted after documentation correction (section 42),
-and Codex's `79d8facb` is accepted in section 43.
-New offline coverage-source epoch awaits independent review (section 46).
-Accepted RP33 remains retained at exact producing `c589b3dd`; its existing
-runtime/draft/fixture files are unchanged, and no carrier is regenerated.
-Monitor remains PAUSED after the one-shot next-Claude-push watch was fulfilled.
-This counter-review is local-only; no push is authorized by the current request.
+Claude's `863a0dcd` is accepted after documentation correction (section 42).
+The section-46 coverage-source epoch is accepted in section 47
+after `62d4afb8` registered its module in the review bundle and pinned six
+inventory rules. The owner directed this round's one push, which publishes
+Codex's three local commits together with this review.
+Accepted RP33 remains at exact producing `c589b3dd`; its runtime, draft and
+fixture files are unchanged, and no carrier is regenerated.
+Monitor remains PAUSED.
 GDR-RP33 is accepted in section 34
 as offline software only: it retains every record digest in a 489-line paired
 format with assumed logging reserves, not verified platform accounting or
@@ -19,32 +21,28 @@ backtest readiness.
 The section-27 evaluation still ended with three pre-initialization failures;
 the attempt ceiling remains exhausted and no manual relaunch is authorized.
 The owner's conditional Mia-led synthetic recovery (32.4) remains
-paused pending platform preflight; the later resume and disarm/manual-step
-directions are recorded in 44.3, not missing repeat authorization. Its
-separate ledger `GDR-Mia-base372-recovery-authorized-20261011` (38.3) holds
-zero attempts under a standing maximum of three unsuccessful attempts.
+paused pending platform preflight, and the owner's current instruction not to
+access QC yet prevails. Its separate ledger
+`GDR-Mia-base372-recovery-authorized-20261011` (38.3) holds zero attempts under
+a standing maximum of three unsuccessful attempts.
 Codex last observed 0 KB / 3 MB at 2026-10-21 around 23:54 UTC, superseding
-the older 36.8 KB reading. Both are historical, not current capacity;
-no QC query occurs in this counter-review. Actual cloud byte
-accounting remains unverified (GDR-CR31-003, GDR-CR37-002). The readable
-route answers the compressed-output concern of GDR-CR28-001 at the inspected
-source and policy level, without a QC clearance. Native loading of the recovery
+the older 36.8 KB reading; both are historical, not current capacity. Actual
+cloud byte accounting remains unverified (GDR-CR31-003, GDR-CR37-002).
+Initial Safari attachment incidentally displayed its existing QC tab on
+2026-10-24, with no QC interaction afterwards (46.2). The readable route
+answers the compressed-output concern of GDR-CR28-001 at the inspected source
+and policy level, without a QC clearance. Native loading of the recovery
 carrier is unverified. Only `data/__init__.py` was observed as one LF at
 runtime;
-`research/__init__.py`, remains unobserved. No successful native integration
-or empirical backtest readiness is established. The original economic,
-empirical, account and trading gates remain closed; section 40.3's scoped
-EODHD direction is not verified entitlement, PIT evidence, QC-upload rights or
-real-data evaluation authority.
-The October 24 targeted account-metadata checks and offline build are in
-section 46, superseding section 45's owner-reported Massive Basic assumption
-with observed Stocks Starter; Sharadar Bundle 5Y is owner-reported.
-Initial Safari attachment incidentally displayed its existing QC tab;
-no QC interaction, navigation, reload, quota check or API request followed.
-No new datasource purchase is made or recommended yet. The proposed six-usable-
-year common-history floor, guidance/NBBO, rights and real-data/native integration
-gaps prevent empirical readiness; the owner's QC prohibition remains in force.**
-Current scope/evidence are sections 17 through 46. Sections 2 through 6 preserve
+`research/__init__.py`, remains unobserved. Existing subscriptions show no
+versioned issuer-guidance source, no historical stock or SPY NBBO and no
+six-usable-year common history, and no purchase is recommended yet (45, 46).
+No successful native integration or empirical backtest readiness is
+established. The original economic, empirical, account and trading gates remain
+closed; the scoped EODHD direction (40.3) and the account-metadata checks
+(46.2) are not verified entitlement, PIT evidence, processing or QC-upload
+rights, or real-data evaluation authority.**
+Current scope/evidence are sections 17 through 47. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -6214,3 +6212,119 @@ Sections 1–45 remain byte-exact below the active header; root Session Handoff,
 Action Plan, Feature Milestone Record, process/shared docs and plan/PDF remain
 frozen. Preserve the accumulated local commits, disarmed monitor and original
 attempt/publication history at handoff.
+
+## 47. Independent Claude review of `c6834173..b40aae1f`, 2026-10-24
+
+### 47.1 Scope and method
+
+Reviewed range: the three Codex commits after the section-43 push.
+
+| Commit | Content |
+|---|---|
+| `91043b17` | Section 44: counter-review of section 43 |
+| `b4414f68` | Section 45: four-provider documented-coverage audit |
+| `b40aae1f` | GDR-COV1 offline coverage preflight (`coverage_preflight.py` and its tests) and section 46 |
+
+All three were local and unpushed when this review began; the remote head was
+still `c6834173`, and the worktree was clean. The owner's instruction for this
+round was to review every unreviewed commit, apply corrections where
+necessary, and push once. That push therefore publishes Codex's three local
+commits together with this review.
+
+Following the owner's standing preference, validation is focused rather than
+the full lane selection or the repository suite. It covers:
+- the new module's tests and the new pins;
+- the bundle, release and preparation-CLI consumers that the module inventory affects;
+- the lane gate and the shared active-document check;
+- mutation trials on the new module.
+
+Every run used the designated worktree, network-denied, with HEAD and status
+unchanged across it. No provider account, QC page or EODHD session was
+contacted by this review.
+
+### 47.2 Disposition of sections 44 to 46
+
+| Item | Claude disposition |
+|---|---|
+| 44.1: `c6834173` accepted after documentation correction | Accepted. |
+| GDR-CCR44-001 (stale header: missing resume, old quota reading, scope) | Accepted. The October 21 directions and the 0 KB observation supersede what section 43 carried forward. |
+| 44.3 owner directions | Recorded by Codex as direct human messages; not reconfirmed, per GDR-CCR42-002. |
+| Section 45 four-provider audit | Accepted. It uses public documentation only. Its conclusions follow from the cited documents: no versioned issuer-guidance archive, no historical NBBO, explicit normalization differences between the daily products, and unverified processing and retention rights. |
+| 46.2 account metadata and the incidental QC-tab display | Accepted. These were read-only observations on existing provider pages, with credential fields suppressed. The unintended display of the existing QC tab is disclosed, and no QC action followed. |
+| 46.3 substantive blockers | Accepted. The six-year floor comes from the immutable draft (`history_feasibility_min_years` = 6). The listed subscriptions, individually at five years or less, do not establish it. |
+| 46.4 GDR-COV1 module, GDR-COV46-001 and GDR-COV46-002 | Accepted after correction (GDR-CR47-001, GDR-CR47-002). The module accepts only a strict known-product inventory, refuses aliases, future observations, unanchored bytes and contradictory tiers, always reports `blocked`, and cannot promote itself. The CLI exits 2, and the 1,289-byte metadata manifest reproduces `b8a32bb9...`. |
+| Subscription products and displayed end dates, now also in `observed_manifest()` | Same class as GDR-CR41-001: account-linked metadata, not credentials. The owner directed their inclusion (42.2), so this is not reconfirmed. |
+
+### 47.3 Commit dispositions
+
+| Commit | Scope | Disposition | Notes |
+|---|---|---|---|
+| `91043b17` | Section 44 | Accepted | GDR-CCR44-001 is accurate |
+| `b4414f68` | Section 45 | Accepted | Documentation only; no account, data or QC access |
+| `b40aae1f` | GDR-COV1 and section 46 | Accepted after correction | `62d4afb8` registers the module and adds two pins; 16 of 26 mutants caught by Codex's tests |
+
+### 47.4 Findings ledger
+
+| ID | Priority / status | Location | Finding, disposition and verification |
+|---|---|---|---|
+| GDR-CR47-001 | P2 / corrected | `b40aae1f`, `bundle._MODULES`; `test_boundaries.py` | The new `coverage_preflight` module was not added to the explicit review-bundle inventory, so the full review bundle refused with "source manifest differs from explicit bundle inventory". At `b40aae1f`, 21 `test_bundle.py` tests failed, 6 `test_release.py` tests errored and 3 `test_preparation_cli.py` tests failed. This is the same break as GDR-CR31-001; Codex's focused closure did not include those consumers. `62d4afb8` registers the module. It also adds `test_every_package_module_is_in_the_explicit_review_bundle_inventory`, which compares `source_manifest()` with the bundle inventory, so the boundary tests Codex always runs now catch a missed registration. The guard fails against the old inventory, and the 30 consumer tests pass again. |
+| GDR-CR47-002 | P3 / corrected | `b40aae1f`, `coverage_preflight._day`, `_subscription`, `assess_coverage`; `test_coverage_preflight.py` | Six input rules were never isolated (CV01, CV03, CV10, CV11, CV18 and CV27 survived). The most significant: a duplicated provider with four rows in total hid a missing provider, so the "missing metadata" blocker disappeared. An unknown provider, with its guard removed, raised a `KeyError` that echoed the caller's text, breaking the module's no-echo contract. Added `test_each_inventory_rule_refuses_alone`, covering basic-format dates, an unknown provider, an owner report carrying a displayed end date or an account reference, an empty product list, and the duplicated provider. Each mutant now fails exactly its own case. |
+
+Scripted count from this table: P0 0, P1 0, P2 1, P3 1; corrected 2, documented 0.
+
+### 47.5 Validation and mutation trials
+
+| Check | Scope | Result |
+|---|---|---|
+| Bundle, release, preparation-CLI, coverage and gate tests at `b40aae1f` | worktree, network-denied, HEAD and status unchanged | 24 failed, 90 passed, 6 errors: GDR-CR47-001 (21 + 6 + 3) |
+| The same selection at `62d4afb8` | worktree, network-denied | 122 passed, 101 subtests, no failures |
+| Inventory guard against the old inventory | worktree, in memory | Fails, as required |
+| Identities after `62d4afb8` | worktree, network-denied | Only the full-review source changes, to `dc1ea037...`. The recovery project `c6b9443a...` and prepared runtime `5d1dc656...` are unchanged. The full review bundle builds again: `ad5a7d50...`, 697,005 bytes. |
+| Full lane selection and repository suite | not run | Not run, per the owner's standing preference for focused review validation |
+| `git diff --check` | worktree | passed |
+| Closing check on this record commit | worktree, network-denied | lane gate plus shared active-document check: 76 passed |
+
+Twenty-six single-behaviour mutants of `coverage_preflight`, run in memory,
+network-denied, against `test_coverage_preflight.py`:
+
+| Class | Count | Mutants |
+|---|---:|---|
+| Caught by Codex's tests | 16 | CV02, CV04, CV05, CV07-CV09, CV12-CV17, CV19-CV21, CV23 |
+| Survived, now caught by added pins | 6 | CV01, CV03, CV10, CV11, CV18, CV27 (GDR-CR47-002) |
+| Redundant or label-only, no test added | 4 | See below |
+
+The four unpinned survivors:
+- **CV06:** exact equality with the expected integer or null already refuses every non-integer value, and the strict decoder rejects floats.
+- **CV22:** more than four rows must repeat a provider, which the duplicate check refuses.
+- **CV25, CV26:** change coverage labels only. The blocker list is fixed, so no decision changes.
+
+### 47.6 Commits and next action
+
+The status block names this section. In `test_boundaries.py`, the pins are
+rotated to "Codex counter-review of section 47 pending" and "The section-46
+coverage-source epoch is accepted in section 47". The stale "This
+counter-review is local-only; no push is authorized" pin becomes a guard
+against that wording, and section-order guards for 45 and 47 are added.
+
+| Commit | Scope |
+|---|---|
+| `62d4afb8` | Review-bundle registration, inventory guard and coverage pins (GDR-CR47-001, GDR-CR47-002) |
+| This record commit | Section 47, status block, `test_boundaries.py` pin rotation |
+
+This round gets one push, guarded on the remote head still being `c6834173`;
+never force. It publishes `91043b17`, `b4414f68`, `b40aae1f`, `62d4afb8` and
+this record commit.
+
+Next, Codex counter-reviews section 47. QC stays untouched while the owner's
+instruction not to access it holds, and the Mia-led recovery stays paused. The
+empirical route stays blocked, per 46.3, until all of the following exist:
+- a licensed, versioned issuer-guidance source;
+- historical stock and SPY NBBO;
+- six usable common years of history;
+- verified processing and retention rights;
+- an independently reviewed real-data adapter.
+
+Acceptance here is a software and documentation review only. It establishes
+neither native execution nor empirical readiness.
+`docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` were not edited
+and stay frozen for both agents.

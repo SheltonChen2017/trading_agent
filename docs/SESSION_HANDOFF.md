@@ -1,7 +1,7 @@
 # Session handoff — current project state
 
-Latest generic-workflow update: **2026-09-14, Fundamental Inflection Alpha
-four-version design candidate**, recorded in section 0D below. Existing
+Latest generic-workflow update: **2026-10-07, Guidance Revision Drift
+ENG-7..ENG-16 engineering candidates**, recorded in section 0E below. Existing
 strategy-lane implementation state remains in each lane's own record.
 
 Historical baseline preparation: 2026-08-29 by Codex after the owner directed a separate
@@ -12,6 +12,28 @@ generic-workflow handoff for the root project and preserves the 2026-08-28
 deferred-remediation state below. The original three strategy lanes remain
 independent; this amendment changes shared coordination only and does not edit
 their lane-owned artifacts.
+
+## 0E. Guidance Revision Drift lane, 2026-10-07
+
+Claude's completed review push `c1be751a` is accepted after Codex correction.
+ENG-7..16 implemented as offline candidates; independent review pending, not
+original GDR-0..6 completion. Work only on
+`codex/strategy-guidance-revision-drift` in
+`/Users/sheltonchen/.codex/worktrees/guidance-revision-drift/trading_agent`.
+Read `docs/Strategy Description/GUIDANCE_REVISION_DRIFT_IMPLEMENTATION_RECORD.md`
+sections 13-15 for exact commits/dispositions, corrections, evidence and limits.
+Batch code: `0d32ebb813f11c4a5136de0a507a16bfe5487b6b`.
+
+96 focused counter-review checks and 148 batch checks passed; Python3.12.14/macOS.
+Seven stitched scenarios retain 93 dates and exact journal replay, including
+explicit refusal/parity blockers. LEAN source/shim callbacks are not a verified
+SDK/cloud run. Shared/main findings remain recorded, not repaired. No full
+lane/repository suite, provider/outcome/QC/broker/paper/live action or empirical look.
+
+One authorized matching-lane push includes this handoff; verify its remote HEAD.
+Next: Claude reviews every commit in `c1be751a..HEAD` and runs the full lane
+suite. No PR/merge or automatic next milestone. Original rights/freeze/research/
+QC/account/capital gates remain closed; this one-cycle monitor stops here.
 
 ## 0D. Fundamental Inflection Alpha design, 2026-09-14
 

@@ -1,0 +1,108 @@
+"""Native-only preparation boundaries, not a native SDK execution test."""
+import ast
+from io import BytesIO
+import unittest
+from unittest.mock import patch
+from zipfile import ZipFile
+
+from data.hashing import hash_bytes, hash_payload
+from research.guidance_revision_drift import bundle, native_bundle, qc_project
+from research.guidance_revision_drift.lean_bridge import fixture_stream
+from research.guidance_revision_drift.reporting import source_manifest
+from tests.guidance_revision_drift.test_bundle import repack
+
+
+class NativeBundleTests(unittest.TestCase):
+    def test_native_route_uses_readable_commitments_without_legacy_output_codecs(self):
+        members, _ = native_bundle._snapshot()
+        self.assertIn("research/guidance_revision_drift/readable_transport.py", members)
+        self.assertNotIn("research/guidance_revision_drift/trace_transport.py", members)
+        imported = set()
+        for name in native_bundle.SOURCE_PATHS:
+            if not name.endswith(".py"):
+                continue
+            for node in ast.walk(ast.parse(members[name])):
+                if isinstance(node, ast.Import):
+                    imported.update(alias.name.split(".")[0] for alias in node.names)
+                elif isinstance(node, ast.ImportFrom):
+                    imported.add(node.module.split(".")[0])
+        self.assertFalse(imported & {"base64", "zlib", "gzip", "zipfile"})
+
+    def test_exact_closure_not_whole_review_bundle_and_notebook_headroom(self):
+        raw = native_bundle.build_native_bundle()
+        verified = native_bundle.verify_native_bundle(raw, expected_sha256=hash_bytes(raw))
+        with ZipFile(BytesIO(raw)) as archive:
+            self.assertEqual(set(archive.namelist()), native_bundle.SOURCE_PATHS | {bundle.MANIFEST_PATH, bundle.SIDECAR_PATH})
+            self.assertEqual(archive.read(bundle.SIDECAR_PATH), fixture_stream())
+            self.assertNotIn("research/guidance_revision_drift/evaluation_cycle.py", archive.namelist())
+            for path in native_bundle.SOURCE_PATHS:
+                self.assertEqual(archive.read(path), (native_bundle.ROOT / path).read_bytes())
+        self.assertIs(verified["manifest"]["qc_upload_allowed"], False)
+        project = qc_project.qc_project_manifest()
+        self.assertLess(project["bundle_bytes"], native_bundle.MAX_NATIVE_BUNDLE_BYTES)
+        self.assertLessEqual(project["project_files_with_reserved_notebook"], qc_project.MAX_PROJECT_FILES)
+        self.assertEqual(project["reserved_project_files"], 1)
+        self.assertEqual(project["source_manifest_sha256"], hash_payload(source_manifest()))
+        self.assertEqual(project["runtime_source_sha256"], verified["manifest"]["source_manifest_sha256"])
+
+    def test_omission_extra_changed_content_and_noncanonical_bytes_refuse(self):
+        raw = native_bundle.build_native_bundle()
+        path = native_bundle.ENTRYPOINT
+        def change(info, content):
+            return info, content + b"\n" if info.filename == path else content
+        for bad in (repack(raw, omit=(path,)), repack(raw, extra=(("evil.py", b"pass"),)),
+                    repack(raw, change=change), repack(raw, reverse=True), raw + b"suffix"):
+            with self.subTest(anchor=hash_bytes(bad)), self.assertRaises(bundle.BundleError):
+                native_bundle.verify_native_bundle(bad, expected_sha256=hash_bytes(bad))
+        with self.assertRaises(bundle.BundleError):
+            native_bundle.verify_native_bundle(raw, expected_sha256="0" * 64)
+
+    def test_all_syntactic_import_edges_and_dynamic_calls_are_checked(self):
+        members, _ = native_bundle._snapshot()
+        for bad in (b"\nimport requests\n", b"\nfrom research.guidance_revision_drift.evaluation import CandidateBinding\n",
+                    b"\nif False:\n    from . import bad\n", b"\n__import__('requests')\n",
+                    b"\nfrom AlgorithmImports import QCAlgorithm\n",
+                    b"\nfrom importlib import import_module as hidden_loader\nif False:\n    hidden_loader('requests')\n",
+                    b"\nimport builtins as hidden\n", b"\nloader = exec\n"):
+            # AlgorithmImports is permitted ONLY in the actual entrypoint.
+            path = "research/guidance_revision_drift/contracts.py"
+            with self.subTest(bad=bad), self.assertRaises(bundle.BundleError):
+                native_bundle._import_closure(members | {path: members[path] + bad})
+        changed = members | {native_bundle.ENTRYPOINT: b"pass\n"}
+        with self.assertRaises(bundle.BundleError):
+            native_bundle._import_closure(changed)
+
+    def test_other_stdlib_loaders_compile_and_unimported_loader_calls_refuse(self):
+        # GDR-CR28-003: pkgutil and zipimport import arbitrary modules without
+        # importlib, compile() builds executable code without eval/exec, and a
+        # loader reached through sys.modules needs no import statement at all.
+        members, _ = native_bundle._snapshot()
+        path = "research/guidance_revision_drift/contracts.py"
+        for bad in (b"\nimport pkgutil\n", b"\nfrom pkgutil import resolve_name as hidden\n",
+                    b"\nimport zipimport\n", b"\nloader = compile\n",
+                    b"\nimport sys\nif False:\n    sys.modules['importlib'].import_module('requests')\n",
+                    b"\nimport sys\nif False:\n    sys.modules['pkgutil'].resolve_name('requests:get')\n",
+                    b"\nimport sys\nif False:\n    sys.modules['zipimport'].zipimporter('x').load_module('requests')\n",
+                    b"\nimport sys\nif False:\n    spec.loader.exec_module(sys.modules['json'])\n"):
+            with self.subTest(bad=bad), self.assertRaises(bundle.BundleError):
+                native_bundle._import_closure(members | {path: members[path] + bad})
+        # The exact reviewed closure, which uses re.compile, still passes.
+        native_bundle._import_closure(members)
+
+    def test_offline_only_review_change_does_not_change_runtime_payload(self):
+        raw = native_bundle.build_native_bundle()
+        full = source_manifest()
+        changed = full | {"research/guidance_revision_drift/evaluation_cycle.py": "0" * 64}
+        with patch.object(native_bundle, "source_manifest", return_value=changed):
+            self.assertEqual(native_bundle.build_native_bundle(), raw)
+        self.assertNotEqual(hash_payload(full), hash_payload(changed))
+
+    def test_preparation_detects_source_epoch_change_not_just_runtime_change(self):
+        full = source_manifest()
+        changed = full | {"research/guidance_revision_drift/evaluation_cycle.py": "0" * 64}
+        with patch.object(native_bundle, "source_manifest", side_effect=[full, changed]), self.assertRaises(bundle.BundleError):
+            native_bundle.build_native_bundle()
+
+
+if __name__ == "__main__":
+    unittest.main()

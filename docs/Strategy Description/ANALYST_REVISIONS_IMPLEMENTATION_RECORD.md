@@ -664,9 +664,17 @@ evidence, not an authenticated recovery or cause. Next is bounded offline
 stage reconciliation, not a third launch or another source purchase.
 Section 310 records the later direct request to restore the exact missing/stub/
 default source and reach a running backtest, plus the owner's explicit scoped
-review waiver for reconciliation and conditional third/final recovery. A1/A2
-remain spent. New preparation is not an actual reader, cloud upload or launch;
-all three-stage source, input, attempt and actual-exit gates remain binding.
+review waiver for reconciliation and conditional third/final recovery. D1 passed
+once: A2 has no recorded RPC or compile/backtest receipt. The exact real-projection
+constructor defect is corrected only in the new helper. D2/A3 then exited2 after
+one projects/read dispatch at `owned_idle`/`code_running`, before any file write,
+compile or launch. The observed API value was not exactly false; its actual type/
+value is not retained and an active backtest is not established. A1/A2/A3 and
+D1 are now spent; floor317/242/50/699, no accepted result cell. Mandatory stop/Mia
+checkpoint applies. A read-only Mia request was submitted in authenticated Safari;
+its final response was not fully read because the user was concurrently using
+Safari. No fourth attempt, guard removal, project/session cancellation or next
+cell is authorized. The monitor remains PAUSED.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1776,14 +1784,19 @@ section308 implementation it invokes; this is not independent acceptance.
 The section 309 evidence and conditional same-project A2 sequence is now SPENT:
 evidence passed and recovery refused. The owner's separately authorized
 read-only Mia diagnosis is complete but did not identify the exact guard.
-The next step is section 310's separately frozen bounded offline reconciliation
-of the new recovery's retained markers/receipts, followed only if admitted by
-the conditional third/final exact-source recovery. The owner explicitly waives
-Claude review of section 310's current reconciliation and exact same-project
-third-attempt recovery; this is not independent acceptance or a future waiver.
-Preparation alone does not authorize invocation. Do not infer the local claim from
-a project name, repeat begin, change frozen economics or use another lane's
-jobs. Browser permission is not a blanket technical-gate waiver.
+Section 310's owner-waived D1/D2 sequence is now SPENT: reconciliation passed,
+third/final recovery refused `owned_idle` after one projects/read dispatch and
+before mutations/compile/launch. Booked floor317/242/50/699. Next is the mandatory
+Mia diagnostic checkpoint: read the already-requested bounded diagnostic reply
+when Safari is available, and establish the exact codeRunning type/value and its
+documented relationship to IDE versus job state before considering a separately
+authorized recovery. Do not run a fourth attempt or remove the guard by inference.
+Claude must review section 310's pushed implementation/evidence/qualifications
+before any future new contract unless separately waived; the current execution
+waiver is consumed, not independent acceptance. The current paused monitor does
+not automatically start that review. Do not infer a local claim from a project
+name, repeat begin, change economics or use another lane's jobs. Browser
+permission is not a blanket technical-gate waiver.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -3727,7 +3740,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-24 | Authenticated Safari/Mia inspection and same-project R298 recovery preparation | `e061d441` -> this section-308 checkpoint | No new Claude range; same-round advice is not independent review | UI identifies project38364439 and partial source; editor-open automatic build disclosed; new bounded evidence/recovery code is uninvoked, not a repeat begin or replacement project | Focused synthetic validation and limitations in308; no complete suite or actual recovery reader/caller | Old error cause/local claim remain unresolved pending admissible evidence; no backtest or accepted result; current review/run gate retained | One final matching-lane checkpoint push; obtain current recovery review or scoped waiver, then exact freeze before use; monitor stays PAUSED |
 | 2026-10-23 PDT | Scoped owner waiver and exact R298 same-project recovery run decision | `0b054ddf` -> section309 freeze/result round | No new Claude range or independent acceptance; owner selected option1 for this particular recovery | Evidence once, then conditional same-project A2; unchanged source/economics, no old begin replay | Unchanged322 focused checks remain historical; genuine source/host preflight passed; new record checks recorded below | Actual outcomes and looks are not booked prospectively; every technical gate remains | Execute only committed309 decision, stop at its running/terminal/blocked checkpoint and push once; monitor PAUSED |
 | 2026-10-24 UTC | Actual R298 evidence success, A2 refusal and bounded Mia diagnosis | `0b054ddf` -> `dfa3490a` -> section309 final result | No new Claude range; current waiver consumed, not independent acceptance | D1 exit0 authenticated A1; D2 exit2 remote_refused; A2 consumed; Mia reports unchanged four filenames/sizes and zero backtests but lacks raw metadata | Actual bounded channels and unchanged-source control flow; record checks below; no operational replay or full suite | 316/241/50/699; no accepted result; exact failing label lost and remote effects not independently authenticated | Preserve all evidence; separately gated offline marker/receipt reconciliation before any A3; one final push, monitor PAUSED |
-| 2026-10-24 | Owner-scoped reconciliation and final R298 restoration/launch recovery | `f9fd0932` -> section310 round | No incoming Claude range; explicit current waiver, not independent review | Separate read-only A2 marker reconciliation and conditional A3 exact-source restoration; all spent operations and strategy bytes frozen | Focused synthetic checks and actual results recorded in310; no full suite | Starting316/241/50/699; third attempt not booked by preparation; historical failures retained | Commit exact decisions before invocation, stop on running/terminal/concrete barrier; one final matching-lane push; monitor PAUSED |
+| 2026-10-24 | Owner-scoped reconciliation and final R298 recovery refusal | `f9fd0932` -> `e3d53276` -> `0a2400d7` -> this record commit | No incoming Claude range; explicit scoped waiver now consumed, not independent review | D1 authenticated zero-recorded-RPC A2 prefix; corrected real projection ID; A3 refused code_running before mutation/compile/launch; all attempts spent | 376 distinct focused passes5.72s; record repeats overlap; no full suite; actual exit/pins in310 | Booked317/242/50/699; no result cell; raw codeRunning value unknown; user-concurrent Safari prevented reading final Mia reply | Mandatory stop/Mia checkpoint, no A4; one final matching-lane push; monitor PAUSED |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -52390,3 +52403,87 @@ capacity wait, preserve other lanes and stop without retry. Any third failure
 requires stop and the authenticated Mia diagnostic checkpoint under the standing
 rule, not A4. Mia may diagnose; unrelated cloud edits or a changed run are not
 automatically accepted. No further execution contract is authorized by this D2.
+
+### 310.8 D2 actual refusal, final attempt accounting and concrete blocker
+
+At clean D2 freeze `0a2400d76af48ad339a6f573d28e82b27dca9382`, the sole A3
+parent dispatched2026-10-24T18:52:41.718106Z and completion was observed
+18:52:54.619586Z; these are external brackets, not server timestamps. Actual
+exit2; empty stderr; stdout609bytes SHA256
+`4fdc7b941e59f7b3fa3dbde7b7544effeaeadbaf56459e575e4458dd4ddd043b`.
+The separate credential-free native-network/artifact-denied output validator
+authenticated the exact finite double-LF failure envelope. No operation-success
+or normal-report pin was returned. We did not reread the new A3 control leaf.
+
+Finite evidence: `remote_refused`, helper`owned_idle`, predicate`code_running`,
+last_stage`inspect`, intent`inspect-project`, endpoint`projects/read`,
+last_event`observed`, application_dispatch_count1, category`unknown`,
+http_statusnull and provider_request_countnull. All readiness/result flags false.
+The immutable control flow places this after exclusive claim, new-reader output
+authentication, fresh input admission and client construction, but before file
+inventory/completion, compile, capacity or launch. The one application request
+returned sufficiently to validate earlier project identity/organization/name/
+language/owner/private predicates, then failed exact `codeRunning is False`.
+This does not expose the rejected field's actual value/type: true, absence,
+null or another type remain distinguishable possibilities not preserved here.
+It is not an HTTP failure, proof of a running backtest or a storage diagnosis.
+
+`ARV2E310-001` — P2 external/contract barrier OPEN: exact project-idleness
+predicate refused. No fourth attempt, silent resume, new name/project, repeated
+parent/worker, raw retained-response reconstruction, guard weakening or cloud
+source mutation follows. This parent issued no file write/compile/launch; it
+does not prove no concurrent external cloud change. A3 consumed one shared and
+development look: current booked floor **317shared/242development/50infrastructure/
+699cells**. A1/A2/A3 are exhausted, no accepted result cell and no strategy
+backtest is confirmed running. D1 and both new operational contracts are frozen
+and spent. Pre-use D2 record checks86passes0.99s overlap the376 distinct total.
+
+### 310.9 Mandatory Mia checkpoint, UI qualification and handoff
+
+After notifying the owner of the third failure, used the already-authenticated
+Safari project38364439 tab and its existing Mia conversation, Ask Before Edits.
+Submitted one explicitly read-only diagnostic: inspect this project's observable
+state/own backtests, explain codeRunning's IDE-versus-job meaning, distinguish
+observations from hypotheses, and report unavailable raw fields honestly. It
+explicitly forbids file edits/uploads/deletions, builds/runs, job cancellation,
+settings/other-project/Object Store actions or removing the guard. The request
+also corrects the older Mia attribution of A2 to an upload/metadata failure.
+No code or licensed data was sent; only exact project and finite failure context.
+
+The conversation displayed Running then Completed, but the latest rich-text
+reply was below the viewport and was not fully captured/read. Safari switched
+to the user's other tab during the attempted scroll; a subsequent selection
+was rejected by the UI tool because the user changed Safari. A read-only state
+check confirmed the user tab. Further UI actions stopped; the owner was asked
+to indicate when Safari is free. This is not a completed/accepted Mia diagnosis,
+and no cause or corrective cloud action is attributed to its unread reply.
+
+Visible cloud-terminal history already contained multiple automatic builds of
+the partial project, and new lines appeared at displayed6:53:13,6:53:33,6:54:03
+(unknown UI timezone; IDs26b8ff-4795fc,aec602-4795fc,c5f89e-4795fc). No Build/Run
+button was clicked. These UI events are not A3 API calls, strategy attempts or
+accepted exact-source compiles; they qualify any claim of zero browser-side
+effects. The partial/default project must never be launched as the strategy.
+
+Public QC Project.cs describes codeRunning only as whether the project is
+running; this does not resolve IDE-session versus job semantics. QC's IDE docs
+warn that concurrent tabs can update one project, not that codeRunning can be
+ignored. Sources: `https://github.com/QuantConnect/Lean/blob/master/Common/Api/Project.cs`
+and `https://www.quantconnect.com/docs/v2/cloud-platform/projects/ide`.
+Neither public docs nor filtered Mia views authenticate this account's actual
+rejected field. Next useful input is Mia's already-requested reply when Safari
+is available, then an exact non-secret field/type observation and supported
+semantics. No new provider or operational probe is authorized by that need.
+
+This round comprises exactly three commits afterf9fd0932: additive implementation/
+D1 freezee3d53276, D1 result/D2 freeze0a2400d7, and this final documentary outcome.
+No new Claude review was received. Both P2 implementation defects are corrected
+prospectively; ARV2E310-001 remains open. One final nonforce matching-lane push
+follows exact root/branch/HEAD/status/live-remote checks. No next milestone,
+other-lane change, evidence cleanup, pin refresh, paid right, funded/broker/
+real-order/paper/live action or efficacy claim. All frozen economics/formal
+source/security/PIT/readiness gates and prior failures remain. Monitor PAUSED.
+Final record/active-document validation passed86 in1.09s under the same native
+network/artifact/Keychain denial and in-root support discipline, no failures,
+skips or warnings; this overlaps376 and is not additional distinct coverage.
+Final diff checks passed. No full suite or operational replay followed D2.

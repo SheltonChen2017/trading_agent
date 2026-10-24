@@ -1,5 +1,12 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
+**Owner-directed offline continuation, 2026-10-24 (section 96):** Sharadar's
+older-history gap is explained by the owner-confirmed **5 Years** subscription
+and matching API controls. Pure coverage/runtime-successor preparation is
+fixture-validated; QC remains forbidden. This extends the unreviewed Codex work, not
+Claude's independent acceptance. The last completed counter-review remains
+section 95. The lane is **not backtesting-ready**.
+
 **Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly" applied
 to the section-93 round ONLY; section 94 is the Claude review that follows it.
 
@@ -24308,3 +24315,212 @@ no concurrency is silently absorbed or overwritten. Publish exactly once,
 non-force, to `HEAD:refs/heads/codex/strategy-target-price-revisions`, then verify
 actual local/remote equality and clean status. This paragraph is the protocol;
 the final published identity and observed verification are reported in chat.
+
+## 96. Sharadar history diagnosis and offline preparation - 2026-10-24
+
+### 96.1 Latest owner authority and exact starting state
+
+Owner: "proceed to investigate why Sharadar’s older history is empty. don’t
+access QC yet, and let me know if anything needs changing in my subscription
+before I buy more data." Also: "continue building until the lane is ready for
+backtesting. do not access qc yet". When asked only for the history label,
+the owner answered **"5 Years"**. This permits bounded provider investigation
+and lane-owned offline software preparation, not QC access or purchases.
+
+Starting HEAD `3f83c589995b1d75b0edac899c9e55bd1b483111`, branch
+`codex/strategy-target-price-revisions`, physical/Git root
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__target_price_revisions`.
+The starting tree was clean. No incoming Claude review was claimed or silently
+accepted. Section 95 and its preceding correction still need Claude review;
+this explicitly owner-requested offline continuation extends that work.
+No historical executed candidate, pinned predecessor, private capture or
+spent operation was modified or reused. No QC access occurred.
+
+<!-- TPR-OFFLINE96-SCOPE:START -->
+| Boundary | Scope |
+|---|---|
+| Provider access | Thirteen fresh bounded Sharadar GETs; redacted metadata only |
+| QC access | Forbidden; zero API, UI, Mia, notebook, upload or launch effects |
+| Offline build | Pure runtime-successor and coverage-diagnostic software with synthetic tests |
+| Executed strategy and inputs | Unchanged; no provider substitution or unit conversion |
+| Attempts and looks | OFF three spent; ON zero; 33 observed looks unchanged |
+| Subscription changes | None; owner confirms 5 Years; no purchase or upgrade performed |
+| Canonical gates | Unchanged; no PIT, rights, registry or TR0-I admission |
+<!-- TPR-OFFLINE96-SCOPE:END -->
+
+### 96.2 Historical retrieval cause and purchase recommendation
+
+Fresh operation `TPR-PROVIDER-COVERAGE-20261024-004` made ten fixed GETs with
+the approved Sharadar Keychain entry and documented header authentication.
+The current TSLA market-cap control returned one row. AAPL's September-2020
+requests returned empty with both explicit from/to and date.gte/date.lte
+filters. October 22, 2021 was empty; October 25, 2021 and January 3, 2022
+each returned a dated row. An ascending September-2020-to-October-2026
+request's first returned date was October 25, 2021. A November-2021 action
+sample also returned a row. Each query was bounded to one row; no cap,
+action value, security row or credential was retained in the public report.
+
+Both DAILY/ACTIONS bulk-status metadata responses advertised 5y, 10y and
+full files. These are file-availability flags, NOT account entitlement.
+Fresh operation `TPR-PROVIDER-COVERAGE-20261024-005` then made three DAILY
+download-gate requests: **5 years HTTP302; 10 years HTTP403; full history
+HTTP403**. The 302 was deliberately NOT followed. No Location/signed URL
+was read/retained and no file was downloaded. The endpoint may have created
+a transient signed URL; no account setting, purchase or subscription changed.
+
+Together with the owner's **5 Years** answer, these observations explain the
+missing warm-up/early-2021 samples as the current history allowance, not a
+demonstrated bad ticker, absence of underlying history, default one-year
+filter problem or need for a different vendor. Account invoice and provider attestation were not read.
+The owner statement is attributed evidence; it is not a provider-signed account
+attestation or complete historical-symbol census.
+
+Official sources checked in this round:
+
+- `https://sharadar.com/subscribe`: Bundle and history length are separate;
+  published choices are 5 Years, 10 Years and Full History.
+- `https://sharadar.com/docs/getting-started`: explicit from/to and comparison
+  filters; the one-year default applies only without a lower date bound.
+- `https://sharadar.com/llms.txt`: direct API/authentication, free sample versus
+  subscription-gated bulk download, history options and table coverage.
+
+**Recommendation:** do not buy another provider. If a fresh Sharadar history
+capture is actually needed for this lane, extend the existing entitlement to
+at least **10 Years**, which covers September 2020 through the frozen study
+end at October 9, 2026. Full History is not required for the frozen dates.
+If paid confirmation instead shows longer history, ask Sharadar to repair key
+linkage/provisioning rather than paying twice. This recommendation does not
+authorize an upgrade, a new capture or replacing the frozen QC-native inputs.
+The existing exploratory stock-subset baseline uses native cap/membership
+inputs; the Sharadar limit is not invented as an unrelated blocker to that
+already-authorized future recovery.
+
+### 96.3 Access custody and evidence limits
+
+Both scopes were frozen before credential/provider effects, with one Keychain
+read per scope, exact source/helper/plan hashes, exclusive spent claims,
+absolute/elapsed deadlines, small response caps, no retries or pagination,
+and no automatic redirects. Interrupted/refused observations remain retained.
+The thirteen responses were observed by this producer; no independent wire
+capture or provider-log attestation is claimed. These are access/schema/date
+samples, not a signal/outcome join or research look.
+
+| Operation | Fresh plan SHA-256 | Redacted summary SHA-256 |
+|---|---|---|
+| `TPR-PROVIDER-COVERAGE-20261024-004` | `b82d26060aee5307a898db550ad8efaf45969cfc5aca63cbf015ee04ee603f00` | `fd5049a882fc23289190b102e4d9782d0aeb04d52068359479bf7ba37dd07db8` |
+| `TPR-PROVIDER-COVERAGE-20261024-005` | `cce7467553e9bece4020e17347f72671cca608ef6cc1e3441451027d51c27b2b` | `10a88a7890f42736b438b7b68f3c3a8cbf68e0b3554bb06d0bc09d072191eeba` |
+
+Local scopes/claims/redacted receipts and diagnostic invokers remain under
+ignored `artifacts/target_price_provider_coverage/` at their operation IDs.
+They are not a Git-reproducible historical data capture or independently
+reviewed production adapter. Earlier scopes 001/002/003 remain immutable:
+27 original four-provider requests plus five Sharadar reset samples, followed
+by this round's thirteen = **45 cumulative provider GET observations**.
+No earlier private packets, D0 rows or licensed captures were reopened.
+No secrets, credential hashes or licensed financial rows enter Git.
+
+### 96.4 Offline software and delegated choices
+
+Two named, pure successor modules are added rather than modifying pinned or
+executed predecessors:
+
+- `research/target_price_revisions_development/sharadar_history_coverage.py`
+  validates closed, bounded aggregate access observations. Empty samples,
+  advertised files, redirects and current-master samples cannot independently
+  establish a paid tier, complete history, point-in-time availability, rights
+  or backtest readiness. Conditional history options do not authorize buying.
+- `research/target_price_revisions_qc/extended_refusal_witness_runtime_successor.py`
+  prepares intrinsic UTC/monotonic elapsed/deadline, actual supplied project,
+  store-reference and immutable context/contract checks before/after bounded
+  reads. Synthetic validation only: no controller, active permit, generated
+  program, notebook, QuantBook, native dispatch or current scope is created.
+  Closed body-free results retain bounded accounting, not raw witness values.
+
+Neither module changes a strategy import path, source/economics, public
+execution authority, dependency, migration or live behavior. New scoped
+software is agent-implemented and pending independent review, not separately
+human- or Claude-approved. Native clock/custody/CLR conversion and actual
+provider-history completeness remain unproved.
+
+| Decision ID | Provenance and chosen option | Rationale / alternatives / scope and limitations | Review status |
+|---|---|---|---|
+| `TPR-OFF96-D001` | Owner history investigation; fixed filter/boundary/control then no-follow access gates | Resolve default/filter/free-sample/history hypotheses with thirteen bounded reads. No bulk download, key extraction, account mutation or QC; metadata availability alone rejected. | Agent-delegated, pending Claude review; owner confirms 5 Years only. |
+| `TPR-OFF96-D002` | Owner purchase question; existing-provider ten-year option if needed | Dates require more than five years but not all history. Alternative extra FMP/EODHD/Massive purchase is not justified; no actual upgrade/capture/input substitution follows. | Advice, not purchase authority or provider attestation. |
+| `TPR-OFF96-D003` | Owner offline build and CCR28-003; named pure runtime successor | Preserve executed/expired bodies. Prepare intrinsic guards and closed output via fixtures; do not fabricate a valid permit, native evidence, unit correction or fourth OFF attempt. | Agent-delegated software, independent review pending. |
+| `TPR-OFF96-D004` | Coverage evidence discipline; pure closed aggregate diagnostic | Preserve missingness, contradictory evidence and account/PIT/rights uncertainty. A sample is not a census; no provider is silently substituted into the frozen study. | Agent-delegated software, independent review pending. |
+
+### 96.5 Readiness, findings and exact next checkpoint
+
+**Not backtesting-ready.** `TPR-CCR28-003 remains OPEN`: this pure successor
+does not supply the future reviewed controller, lock-before-claim custody,
+failure receipts, genuine native project/tool binding or a dispatched program.
+The old reader/holders remain retired. CCR28-005 / CR27-003 predecessor
+overflow limitations are not silently closed by this work.
+F017/F018/F019/CR23-001 remain OPEN. No percent conversion, clipping,
+missing-as-zero, stale-mark bypass, source-date inference or fabricated unit
+diagnosis is implemented. Historical source/inputs, failed/Completed jobs and
+all section-68/75/93 evidence remain unchanged.
+
+OFF still has no accepted full-window native order/fill/fee/cash/NAV/clock
+accounting. ON remains unlaunched, with all accepted performance metrics NULL;
+no independently observed sleeve P&L is manufactured. Dates, six stock sleeves,
+AR-disabled weight-only TPR rules, costs, source identities and holdouts are
+unchanged. No fourth Codex OFF attempt is permitted. Canonical TPR-1/TPR-0B
+and parked TR0-I gates are distinct and unclosed; OOL003/004/006 stay closed,
+OOL011 synchronization remains owner-coordinated.
+
+Next independent review must cover every Codex commit after
+`e1e074aaeb0c616a0e9ecba7d5b78db22bc77863` through the final published
+snapshot, including the still-unreviewed section-95 round and this offline
+continuation, then the cumulative tree. No new Claude review occurred here.
+No automatic monitor rearm or follow-up QC access is authorized.
+While QC is forbidden, native source-unit/refusal/full-window recovery cannot
+be truthfully verified. After owner release of QC and required review, the
+remaining sequence is a fresh corrected bounded witness/controller operation,
+evidence-bound genuine Mia OFF recovery and full-window accounting, then ON
+under its preserved zero-of-three allowance. The present user instruction
+does not waive those native proof requirements.
+
+### 96.6 Focused validation and publication custody
+
+Validation uses the section-49/52 isolated in-process runtime-root pattern
+BEFORE dispatch/config/pytest imports, with network sockets denied and only
+synthetic objects/public source. No actual operator stop/database is read.
+The initial new section-96 guard run failed six cases in 0.31s because the
+section did not yet exist; final positive/clean-first mutation checks follow
+after this record and the exact software tree are complete. No complete
+lane/repository suite is run. macOS fixtures prove no Windows signer/ACL/
+protected-parent custody, native CLR behavior or actual provider/PIT facts.
+Final focused counts, correction identities and publication state follow
+below after measurement, rather than being guessed in advance.
+
+Implementation/test commit:
+`bd81734ec096d255d69bc9d9df079b516ea43a4b` (five new Python files only).
+This following record-only commit completes the local round. Source and
+test contracts remain pending Claude review; no independent acceptance is
+claimed for agent-to-agent checks within this implementation.
+
+| Measured check | Result and exact limitation |
+|---|---|
+| New coverage reducer | Agent focused control **69 passed in 0.36s**; twelve final in-memory mutants killed, restored controls green. An initial unknown-key mutant survived because an independent size bound rejected the chosen extra row key; the below-size-limit metadata regression now isolates and kills the unknown-key guard mutation. |
+| New runtime successor | Agent final new-module control **90 passed**; neighbor reader/notebook/import set **255 passed, 1 existing platform skip in 0.68s**. Four project/store/capsule/permit mutants killed by matching behavioral regressions. |
+| Runtime accounting correction | Before validate-before-merge correction, four bad plain metadata cases failed in **0.46s** because a fallback reset spent counts to zero. All four now pass with contains/read counts preserved and no second-key read. Cancellation during projection also preserves closed counts. Unhashable/subclass status cases now raise the fixed body-free refusal. This was an unexecuted local candidate defect, not a rewritten historical job. |
+| Root first focused integration | **327 passed, 1 skipped in 0.86s**, before the final three status-type cases. New coverage/runtime/handoff modules, predecessor reader/notebook and Target import firewall only. |
+| Root final focused integration | **882 passed, 1 skipped in 14.18s**, repeated after the measured ledger was added: **882 passed, 1 skipped in 12.94s**, no failures/errors/warnings. The nine modules are document consistency, shared active-document, Target import firewall, runtime-stop leak guard, the new offline handoff/coverage/runtime modules and predecessor reader/notebook. This is not a complete lane/repository suite. |
+| Compilation and hygiene | All five new Python files parse/compile in memory; staged diff checks clean. The one skip is the existing Windows-junction platform exclusion, not custody validation. |
+
+All in-memory mutations restore real definitions; no tracked predecessor or
+executed candidate is reverted. Runtime successor source is 14,372 bytes,
+SHA `cf8cd1a2c58af31643f14061cc170e99e020172f22ca7619588d801c4dae9d4f`.
+The redacted provider receipts are diagnostic producer observations, not
+software-fixture results or independent empirical replication.
+
+Immediately before both commits and the single final matching-lane non-force
+push, reverify physical/Git roots, branch, HEAD, status, staged diff and actual
+matching remote. The actual remote remained the starting `3f83c589` before
+the implementation commit. Stop on unexpected remote advance; do not silently
+absorb concurrent work. The final published hash and post-push actual equality/
+clean-status verification are reported in chat, not fabricated here before
+the record commit exists. No monitor is rearmed and no QC access follows the
+publication. This checkpoint remains blocked on the native proof/review steps
+above, not on an imagined requirement to purchase another provider.

@@ -20,6 +20,7 @@ import research.short_interest_etf.native_population_class_matrix as matrices
 import research.short_interest_etf.native_reported_anchor_plan as anchors
 import research.short_interest_etf.native_grouped_market_source as grouped
 import research.short_interest_etf.native_parallel_reported_count_registry as parallel
+import research.short_interest_etf.native_count_recovery_registry as recovery
 
 SCHEMA = "si-compact-native-source-draft-v1"
 _CELL = struct.Struct("<IIIIQiiIIi")
@@ -130,10 +131,14 @@ class CompactNativeSource:
             prior_denominator = None if prior_record is None else json.loads(prior_record)
             prior_reasons = [] if prior_values is None else header["registry_reason_sets"][prior_values[7]]
             def denominator_reference(index, value, refused):
-                return None if refused or value is None else {
+                result = None if refused or value is None else {
                     "registry_sha256": header["count_registry_sha256"], "anchor_index": index,
                     "source_count": value["same_class_count"], "query_asof_date": value["query_asof_date"],
                     "actual_receipt_UTC": value["actual_receipt_UTC"], "source_origin": value["source_origin"]}
+                if result is not None and type(self._registry) is recovery.CountRecoveryRegistry:
+                    result["count_recovery_reference"] = {name: value[name] for name in (
+                        "original_count_position", "source_segment", "segment_query_ordinal", "source_epoch")}
+                return result
             yield {"cell_ordinal": ordinal, "ticker": header["symbols"][symbol],
                    "settlement_date": header["settlements"][day], "source_short_quantity": quantity,
                    "provider_security_id": native_class[0], "share_class_figi": native_class[1],
@@ -237,7 +242,8 @@ def _replay_quantities(matrix, pages):
 
 def compile_native_source(matrix, registry, pages, calendar):
     _require(type(matrix) is matrices.NativePopulationClassMatrix
-             and type(registry) in (anchors.NativeReportedCountRegistry, parallel.ParallelReportedCountRegistry)
+             and type(registry) in (anchors.NativeReportedCountRegistry, parallel.ParallelReportedCountRegistry,
+                                   recovery.CountRecoveryRegistry)
              and type(calendar) is QualifiedNominalCalendar, "exact_sealed_compiler_sources_required")
     registry._guard()
     _require(registry._plan._matrix is matrix, "count_registry_matrix_lineage_changed")
@@ -333,6 +339,20 @@ def compile_native_source(matrix, registry, pages, calendar):
         _require(header["count_registry_sha256"] == registry.sha256
                  and header["parallel_count_lineage"]["full_provider_coverage_admitted"] is False,
                  "typed_parallel_compiler_lineage_changed")
+    elif type(registry) is recovery.CountRecoveryRegistry:
+        lineage = registry.to_payload()
+        _require(lineage["schema"] == "si-native-count-recovery-registry-v1"
+                 and lineage["complete_composite_source_sequence"] is True
+                 and lineage["original_round_complete"] is False
+                 and lineage["full_provider_coverage_admitted"] is False,
+                 "typed_recovery_compiler_lineage_changed")
+        header["count_recovery_lineage"] = {key: lineage[key] for key in (
+            "schema", "economic_evidence_epoch", "source_epoch", "anchor_plan_sha256",
+            "parent_inventory_sha256", "child_inventory_sha256", "mapping_sha256",
+            "parent_file_manifest_sha256", "child_file_manifest_sha256",
+            "child_marker_sha256", "child_closure_sha256", "complete_composite_source_sequence",
+            "original_round_complete", "full_provider_coverage_admitted", "cumulative_starts",
+            "cumulative_http_invocations", "cumulative_charged_response_bytes")}
     raw, packed = canonical_json(header).encode(), bytes(cells)
     value = object.__new__(CompactNativeSource)
     calendar.to_bytes()  # Initial complete digest/seal verification, never per-cell rebuild.

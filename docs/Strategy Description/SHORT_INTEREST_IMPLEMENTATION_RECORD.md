@@ -2,9 +2,10 @@
 
 Status: **OWNER-RESUMED EXISTING-SUBSCRIPTION BUILD ACTIVE (SECTION 122),
 TOWARD LOCAL BACKTEST READINESS OR A CONCRETE FACTUAL BLOCKER; NO PURCHASES
-AND NO QC ACCESS. FOUR EXACT NAMED KEYCHAIN PREFLIGHT READS SUCCEEDED,
-ZERO PROVIDER HTTP; A NEW SIX-REQUEST ACCESS PROTOCOL IS FROZEN BELOW BUT
-NOT YET EXECUTED. LOCAL SOURCE QUALIFICATION REMAINS INCOMPLETE: ORIGINAL
+AND NO QC ACCESS. FOUR EXACT NAMED KEYCHAIN PREFLIGHT READS SUCCEEDED;
+THE SEPARATE FROZEN SIX-REQUEST ACCESS AUDIT CLOSED WITH SIX HTTP200
+RESPONSES, 15,660 CHARGED BYTES AND NO SOURCE ADMISSION. LOCAL SOURCE
+QUALIFICATION REMAINS INCOMPLETE: ORIGINAL
 COUNT 48 START DEBITS /47 HTTP; DAILY 3,586 START DEBITS /3,585 HTTP,
 593 OF 1,169 CHAINS COMPLETE. BOTH ORIGINAL CLAIMS REMAIN SPENT. NO REFUSED
 SUBSET OR METADATA RESPONSE IS BACKTEST INPUT. CODEX COUNTER-REVIEW OF `cc1e44f` COMPLETE;
@@ -21026,3 +21027,206 @@ documents. Four changed Python files compile in memory; exact prior121
 preservation and diff check pass. This first local commit freezes code and
 authority before any new provider HTTP; it is not a push, source completion
 or independent Claude acceptance. The six observations remain pending.
+
+### 122.4 Actual six-route access observations and original count custody
+
+The preceding prospective text is retained as the freeze, not rewritten as
+if results were known beforehand. Main committed **acf04aff1b2e78bba5d642b350c4f983ac53caf8**
+locally, with unchanged actual matching remoteB211 and a clean worktree,
+then invoked the registered access runtime exactly once. Its exclusive
+claim is now **spent**. All six fixed routes returned HTTP200 and passed
+their bounded response-schema checks: **six START debits, six actual HTTP
+invocations,15,660 charged response bytes**. No retry, redirect, fallback,
+provider error text, credential value/hash or EOD account body/hash was
+published. No new source request was made while another author edited code.
+
+The catalog/account routes demonstrate only their limited response contracts;
+the dated Massive overview and single-date FMP cap demonstrate those exact
+source responses, not whole-history coverage. No subscription renewal or
+purchase is presently indicated by these observations. Expiry, full history,
+same-class quantity integrity, rights and backtest admission are not inferred
+from200. Sanitized private receipts remain in the registered ignored run.
+The exact committed protocol and33-path manifest are122.2's pins; they were
+not changed during execution. Actual source/outcome/QC readiness flags remain
+false, and all look/alpha/QC-attempt counters remain zero.
+
+Main next authenticated the **original** count prefix read-only, with no
+new claim, credential read or HTTP. The retained five-file registered cache,
+original52e9… runtime-code identity, exact146-file count manifest
+`f6f5baf16c0fac2ffa26f994cf82122bcef9dfa842526530797531bc5c8f55c6`
+and original spent-claim bytes
+`008e56b20a5dafa1a9f7af71dbe91e79cfc96a282cb9680a1e3488936a189d7c`
+matched. Forty-seven raw bodies were hashed/length-bound without decoding
+market rows;48 START/terminal controls were semantically checked against
+the exact descriptors, chronology and original eight-inflight plan.
+The original pre-wire47 negative remains intact. Reconstructed halted
+inventory accounts for **48 START /47 HTTP /2,159,332 charged bytes**;
+it is not the lost original in-memory return object or a new original clock.
+
+This diagnostic used the ignored suffix draft's pure prefix verifier with
+ephemeral, non-authorizing in-memory evidence pins. It did **not** call its
+operational entrypoint, patch a real capture controller, fill its driver pin,
+create a child claim or dispatch a request. Integrated recovery must instead
+bind its actual committed driver and complete code closure independently.
+
+**SI-DEC-20261024-03:** the prospective new count child may separately
+re-observe original position47 and observe previously unstarted49–81,875.
+Its81,828 local ordinals map to original count positions and then the
+original source-matrix ordinals. Canonical tuple-pair mapping SHA256 is
+`f36b28e9e4d0ebc76d2e5d8806e413604b5c52c8e443ff828b69f910ac9f2e9d`.
+Cumulative START ceiling is explicitly **81,876**, one more than the old
+81,875 ceiling because47 is a separately authorized new observation, not
+an erased retry. Cumulative response ceiling remains4GiB; child ceiling
+is **4,292,807,964 bytes**, after charging the old2,159,332. The original
+claim stays refused/spent, with both retrieval epochs preserved. Source-only
+capture and combined coverage cannot themselves admit a denominator or
+actual-input runner. Exact operational code/tests/registration are reviewed
+and committed before any child request; no child request is claimed here.
+
+For the distinct latest-reported descriptive candidate,116.9–116.10 already
+freeze first-seen/quarterly/split/identity-refresh anchors and at-most95-day
+carry, explicitly not exact settlement-day shares or historical-as-known
+data. Report-period rather than filing-publication selection is therefore
+not alone a blocker to this candidate. Actual same-class/unit/split-basis
+coverage and named exclusions must still be qualified. Weighted/all-class,
+issuer, diluted or market-cap-derived shares cannot replace class shares.
+Canonical original-vintage requirements remain separate. No exhausted
+existing-source alternative or purchase requirement has yet been established.
+
+### 122.5 New count recovery implementation and pre-dispatch corrections
+
+**SI-DEC-20261024-04:** freeze the distinct manual-child runtime in
+`scripts/capture_short_interest_count_recovery.py`, not the ignored suffix
+draft. Its prospective protocol SHA256 is
+`5876de333c792b63253390bae32d3dfe58e8f760b215859ffb324afed969219b`.
+Main independently reconstructed its exact51-path static local import closure,
+including package initializers: no missing or extraneous paths. The complete
+relative-path/current-byte manifest SHA256 is
+`f8ae2fa45d0e2b5403e6be3387f184d5a00b512125d249e882a8188ea71ce4a6`.
+Operational composition requires these exact bytes in committed Git blobs
+under the externally supplied clean runtime HEAD, plus unchanged actual
+matching remoteB211; no future/self HEAD literal is embedded in code.
+
+The child has a fixed new output and exclusive parent claim before its one
+named Massive key read. It uses the authenticated original parent/cached
+source, at most eight exact selected requests per remote-bound batch, no
+retries/fallback/resumption and the cumulative ceilings122.4. Preclaim
+descriptor headroom must be independently available (at least96 spare FDs);
+the controller never changes the host/process limit. A separate local host
+observation returned soft limit1,048,575 and four open FDs before source
+handles were loaded, not a guarantee of later capacity. Loaded custody is
+checked again before the claim. A negative new47 is not promoted, and a
+positive new47 cannot erase the old negative or claim old-round completion.
+
+| ID | Priority / verified status | Evidence and correction before any new child HTTP |
+|---|---|---|
+| SI-BUILD-20261024-004 | P2 misleading provisional closure, confirmed/corrected | An independent fabricated regression moved the actual matching remote immediately after `child.completed.json`; publication-batch closing raised outside the refused-closure handler. Main independently reproduced red1 failed in0.59s, moved final marker publication inside that handler, then green13 passed in1.03s. A second causal case moved remote after the qualified closure write; Main reproduced red1 failed in0.38s and added a final fresh remote check, fixed negative closure and no successful return. Combined14 passed in0.88s. Both provisional/qualified files may coexist with a refused marker; offline reconciliation must reject that directory rather than prefer success. |
+| SI-BUILD-20261024-005 | P2 refused accounting/negative loss, confirmed/corrected | Main reproduced three independent fabricated regressions: red3 failed/15 passed in0.93s. Refusal omitted cumulative charged-byte evidence, unreceipted clock/worker failures lost whole-page charges, and an earlier missing ordinal was filtered out when a later receipt existed. Refusal now binds explicit receipted/missing ordinal sets, full-page charge per unreceipted START, known HTTP counts/exactness and every unresolved diagnostic. Green18 passed in0.91s. No actual source failure or secret was used. |
+| SI-BUILD-20261024-006 | P3 descriptor capacity advisory, qualified/prevented | Public code-path accounting identified many simultaneously retained code/cache/source FDs; this is not proof of the old47 cause. A focused low-limit case verifies refusal before spending the new claim, key or HTTP and forbids changing process limits. No real low-FD failure occurred in this round. |
+
+The delegated author subsequently ran the same18-test focused file in0.89s;
+that is the child's execution, not Main's. Tests use only fabricated source
+objects, requests and temporary private outputs with sockets denied. They
+also cover exact selected mapping, parent raw/claim/old-code tamper, original47
+negative, exclusive-claim collision,404 status-only evidence, started-slot
+draining, output replacement, partial publication and code-manifest refusal.
+No full lane/repository suite, real child claim or child HTTP is implied by
+these tests. Original claims, source facts, ledgers, outcome counters and all
+owner exclusions remain intact. Typed cross-epoch reconciliation is separate
+from this source-only runtime; capture alone is not actual-input admission.
+
+### 122.6 Typed reconciliation and daily recovery code, before actual dispatch
+
+`native_count_recovery_registry.py` provides a distinct sealed provenance
+union, not a cast/subclass of the original serial/parallel registry. Its
+factory requires the exact original81,875-position source and original
+refused inventory, complete selected child inventory, both raw-file manifests,
+actual protected child membership and the exact source-only marker/closure.
+Every body, START, receipt and404 diagnostic is bound to its original bytes;
+the old47 negative remains in parent lineage while the new observation has
+its own retrieval epoch. Cumulative controls and final membership finish
+**before** any outward count iterator becomes available. A refused or unknown
+sibling overrides apparently qualified files. No source/admission/PIT or
+backtest flag is opened by this source-stage factory.
+
+The compact source compiler has a narrow explicit exact-type branch for that
+new registry, preserving parent/child manifests, mapping, epochs and budgets
+in its lineage. Current and immediate-prior references retain their source
+segment; old serial and parallel behavior is unchanged. Private source
+replay is not an S1 calculation, price/outcome join or actual-input execution.
+Operational reloading still must authenticate the child's exclusive spent
+claim, committed runtime code and complete receipt set, reconstruct its exact
+typed inventory and keep protected custody live through reconciliation.
+
+The delegated author reports **88 focused tests passed in2.08s**, including
+33 new union/compiler controls and relevant existing compact/parallel/import
+controls. An in-memory directory-membership-equality mutant was red4 failed/
+29 deselected in0.21s; restored new controls passed33 in0.99s. Main raised
+a possible JSON-string/compact accessor mismatch; read-through showed both
+current/prior paths already decode JSON, and exhaustive new consumer tests
+pass. This suspicion is **false alarm retained**, not a code defect. A new
+package-root research import did violate the existing boundary in development
+(author red1 failed/87 passed); the import spelling was corrected without
+changing the allowlist. These are the author's executions; Main independently
+validates the integrated frozen bytes below before dispatch.
+
+Daily code reuses the original full1,169-session plan/index, protected source
+bundle, eight-chain transport/gates and exact typed day qualifier. The only
+producer seam is a factory-sealed optional recovery scope; default full-scope
+behavior and its historical protocol stay unchanged. The operational module
+adds only the new pure dependency to its closed current-code manifest; its
+original42-path historical manifest is still authenticated atF67, not silently
+expanded retroactively. A separate driver owns the child claim/closure and
+offline whole-chain union. The old complete-only replay draft is untouched.
+
+**SI-DEC-20261024-05:** before any daily child HTTP, measure the exact original
+protected12,554-file manifest read-only, verify the pinned original claim,
+inventory/closure and historical code, replay all593 claimed complete chains
+through the existing qualifier and derive the **exact**576-day complement.
+No assumption that593 is a prefix is accepted. Original3539/3586 negatives,
+all3,586 START debits and refused closure survive. New incomplete-day chains
+start at their first URL and are never stitched to old partial pages. New
+global ceilings are reduced by original charged bytes/rows/STARTs and each
+day's64-page ceiling by that day's original STARTs. The exact manifest,
+derived scope, child protocol and complete current-code pins must be recorded
+and locally committed **before** the new exclusive child claim/request. This
+paragraph freezes the diagnostic/derivation step, not unmeasured source facts.
+
+### 122.7 Daily pre-dispatch regression ledger and integrated validation
+
+| ID | Priority / verified status | Actual evidence and smallest correction |
+|---|---|---|
+| SI-BUILD-20261024-007 | P2 daily closure/publication, confirmed/corrected before integration | Independent read-only audit identified in-memory inventory being cached before durable publication and negative closure returning normally. The author reproduced red2 failed/14 deselected in0.47s, then stores inventory only after successful exclusive publication, forces negative closure on producer/publication errors and raises on a negative operational result. Original-date/source qualification is not waived. |
+| SI-BUILD-20261024-008 | P2 final daily marker race, confirmed/corrected before actual capture | Main found the final post-publication audit marker still lacked a subsequent remote check after author handoff. Its new causal test moved remote during that final write: red1 failed in0.50s. Main added a final fresh check and dominant negative sibling/no completed return. That test plus durable-inventory, typed-negative-return and clean-closure controls are green4 passed in0.45s. Offline union refuses the negative sibling even when positive files exist. |
+| SI-BUILD-20261024-009 | P2 held marker decoding, corrected before integration | A serialized original runtime marker must be decoded before comparing with original control dictionaries. Main's read-through raised this; the author had corrected it during development. The real typed refused-parent fixture now executes `original_reports()` for non-prefix completed days1,3, and full synthetic whole-chain replay exhausts1..1,169. No actual parent replay is preclaimed. |
+| SI-BUILD-20261024-010 | P3 import boundary / consumer suspicion | New research package-root imports were corrected to fully qualified imports, without loosening either lane/ML boundary. The count JSON-string/compact-accessor suspicion in122.6 was a false alarm: both current/prior accessors already decode JSON. Retain it without claiming a defect or unrelated behavior change. |
+
+Daily author's focused capture/runtime/recovery selection passed **83 tests
+in43.57s**, followed by **nine** import-boundary controls in0.70s. Its five
+files compile and exact44-path static controller closure matches; these are
+the author's checks, not Main's. Root owns the later final-marker regression
+and correction above. No actual daily claim/key/request or private source
+read was made by any delegate. All earlier ledger statuses remain preserved.
+
+Main's integrated focused selection and code/diff/historical-preservation
+checks follow before the clean local code-freeze commit. That commit is not
+the final push or backtest readiness. Count runtime may spend only its newly
+registered budget at clean committed code; daily requests still wait for the
+read-only authenticated parent audit and a second prospective scope freeze.
+
+Main's integrated12-file focused selection passes **286 tests in50.51s**,
+zero skips/warnings, CPython3.13.15/pytest9.1.1, empty inherited environment,
+macOS network-denying sandbox and explicit socket denial. It covers the three
+new recovery/union files, original compact/parallel registry, daily capture/
+operational/runtime, public record, lane/ML import boundaries and active docs.
+This is not a full lane or repository suite. All ten changed Python files
+compile in memory; diff check passes. Independent static reconstruction matches
+all51 count paths and44 daily-controller paths. The count manifest remains
+122.5'sf8ae… pin; the daily44-path relative/current-byte manifest SHA256 is
+`f35ba6fc762455889e8905e861fb8a51a7fcf317a4ad8c5bcc98627680795139`.
+Every historical byte from Current publication rule through the end of121
+remains an exact prefix of the new record, with only one additional newline
+separating the appended122; an initially overstrict whole-prefix equality
+check rejected that separator, not a historical content change. No private
+row, provider/key or QC call was made by this validation. Local code freeze
+precedes actual recovery; the round remains active and **unpublished**.

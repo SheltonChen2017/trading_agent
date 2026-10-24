@@ -17,6 +17,7 @@ from scripts.qualify_sharadar_companion import _guard, _http, _utc_now, Sharadar
 from scripts.short_interest_keychain import KeychainSecret, read_named_keychain
 from scripts.capture_short_interest_native_grouped_market import build_protected_opener, _opener
 import research.short_interest_etf.native_daily_active_reference as contract
+from research.short_interest_etf.native_daily_recovery import DailyRecoveryScope
 
 PLAN_SHA256 = '029173c8fa4eeb6ff29f0325011aeec44eb4044ab504a2caddb011c6dba47ad8'
 PROTOCOL_SHA256 = 'dc25d57e5b181c7028385ea689805e72b62a09c6e687cd11ac1eb6b7c5e139ce'
@@ -48,7 +49,7 @@ def validated(plan):
 def capture_with_seams(root, directory, plan, index, *, head, remote, started_at,
         verify_sources, verify_code, claim_budget, publish, publish_json,
         read_secret=read_named_keychain, clock=_utc_now,
-        lane_guard=None, transport=None, on_qualified_day=None):
+        lane_guard=None, transport=None, on_qualified_day=None, recovery_scope=None):
     """Root-only injected prototype; no provider calls authorized by import.
 
     The concrete main must freeze exact pins and prove all custody/publication
@@ -56,6 +57,11 @@ def capture_with_seams(root, directory, plan, index, *, head, remote, started_at
     """
     _require_capture_platform()
     contract._require(type(index) is contract.CompositeNativeIndex, 'exact_source_index_required')
+    contract._require(recovery_scope is None or type(recovery_scope) is DailyRecoveryScope,
+                      'exact_audited_recovery_scope_required')
+    selected_days = tuple(range(1, len(plan.sessions()) + 1)) if recovery_scope is None else recovery_scope.days(plan, index)
+    maximum_attempts, maximum_bytes, maximum_rows = ((contract.MAXIMUM_REQUESTS,
+        contract.MAXIMUM_TOTAL_BYTES, contract.MAXIMUM_ROWS) if recovery_scope is None else recovery_scope.limits())
     began_at = contract._clock(started_at)
     fatal = threading.Event()
     state_lock, publication_lock = threading.RLock(), threading.RLock()
@@ -68,6 +74,8 @@ def capture_with_seams(root, directory, plan, index, *, head, remote, started_at
 
     def guard():
         validated(plan)
+        if recovery_scope is not None:
+            recovery_scope.check(plan, index)
         (_guard if lane_guard is None else lane_guard)(root, head, remote)
         verify_code(plan)
         verify_sources(plan, index)
@@ -78,15 +86,19 @@ def capture_with_seams(root, directory, plan, index, *, head, remote, started_at
             (publish if raw else publish_json)(directory, name, value)
 
     guard()
-    claim_budget({'schema': 'si-daily-active-spent-whole-round-prototype-v1',
+    claim_value = {'schema': 'si-daily-active-spent-whole-round-prototype-v1',
         'plan_sha256': plan.sha256, 'protocol_sha256': PROTOCOL_SHA256,
         'code_head': head, 'remote_head': remote, 'started_at': started_at,
-        'maximum_attempts': contract.MAXIMUM_REQUESTS,
-        'maximum_total_bytes': contract.MAXIMUM_TOTAL_BYTES,
-        'maximum_total_rows': contract.MAXIMUM_ROWS,
+        'maximum_attempts': maximum_attempts,
+        'maximum_total_bytes': maximum_bytes,
+        'maximum_total_rows': maximum_rows,
         'maximum_day_chains': contract.MAXIMUM_DAY_CHAINS,
         'maximum_pages_per_day': contract.MAXIMUM_PAGES_PER_DAY,
-        'restart_or_resumption_allowed': False})
+        'restart_or_resumption_allowed': False}
+    if recovery_scope is not None:
+        claim_value.update(schema='si-daily-recovery-spent-whole-round-v1',
+            recovery_scope_sha256=recovery_scope.sha256)
+    claim_budget(claim_value)
     try:
         guard()
         secret = read_secret('massive')
@@ -119,12 +131,12 @@ def capture_with_seams(root, directory, plan, index, *, head, remote, started_at
                 # A successful in-flight page can free only its unused reserved
                 # ceiling. Wait for that known byte/row accounting, not a retry
                 # or reset of a consumed attempt/failed-body allowance.
-                contract._require(state['attempts'] < contract.MAXIMUM_REQUESTS
-                    and state['charged_bytes'] + contract.MAXIMUM_RESPONSE_BYTES <= contract.MAXIMUM_TOTAL_BYTES
-                    and state['charged_rows'] + contract.MAXIMUM_PAGE_ROWS <= contract.MAXIMUM_ROWS,
+                contract._require(state['attempts'] < maximum_attempts
+                    and state['charged_bytes'] + contract.MAXIMUM_RESPONSE_BYTES <= maximum_bytes
+                    and state['charged_rows'] + contract.MAXIMUM_PAGE_ROWS <= maximum_rows,
                     'daily_active_whole_page_budget')
-                if (state['charged_bytes'] + state['reserved_bytes'] + contract.MAXIMUM_RESPONSE_BYTES <= contract.MAXIMUM_TOTAL_BYTES
-                    and state['charged_rows'] + state['reserved_rows'] + contract.MAXIMUM_PAGE_ROWS <= contract.MAXIMUM_ROWS):
+                if (state['charged_bytes'] + state['reserved_bytes'] + contract.MAXIMUM_RESPONSE_BYTES <= maximum_bytes
+                    and state['charged_rows'] + state['reserved_rows'] + contract.MAXIMUM_PAGE_ROWS <= maximum_rows):
                     break
                 capacity_changed.wait(timeout=0.1)
             if fatal.is_set():
@@ -223,7 +235,7 @@ def capture_with_seams(root, directory, plan, index, *, head, remote, started_at
                 decoded_rows = rows
                 with state_lock:
                     state['rows'] += rows
-                    contract._require(state['rows'] <= contract.MAXIMUM_ROWS, 'daily_active_row_budget')
+                    contract._require(state['rows'] <= maximum_rows, 'daily_active_row_budget')
                 next_value = payload.get('next_url')
                 next_page = None if next_value is None else contract.next_url(next_value, date)
                 return page, next_page, received
@@ -273,7 +285,8 @@ def capture_with_seams(root, directory, plan, index, *, head, remote, started_at
         url = contract.first_url(plan, day)
         last = day_start
         try:
-            for ordinal in range(1, contract.MAXIMUM_PAGES_PER_DAY + 1):
+            page_limit = contract.MAXIMUM_PAGES_PER_DAY if recovery_scope is None else recovery_scope.page_limit(day)
+            for ordinal in range(1, page_limit + 1):
                 if fatal.is_set():
                     break
                 contract._require(url not in seen, 'daily_active_repeated_cursor')
@@ -297,7 +310,7 @@ def capture_with_seams(root, directory, plan, index, *, head, remote, started_at
                         'qualification_sha256': hash_bytes(raw), 'source_admitted': False}
                     store(f'day-{day:04d}.completed.json', value)
                     return value
-                contract._require(ordinal < contract.MAXIMUM_PAGES_PER_DAY, 'daily_active_page_limit')
+                contract._require(ordinal < page_limit, 'daily_active_page_limit')
         except Exception:
             fatal.set()
         ended = clock()
@@ -314,7 +327,7 @@ def capture_with_seams(root, directory, plan, index, *, head, remote, started_at
                 state['publication_failed'] = True
         return value
 
-    total, next_day, pending = len(plan.sessions()), 1, {}
+    total, next_day, pending = len(selected_days), 1, {}
     with ThreadPoolExecutor(max_workers=contract.MAXIMUM_DAY_CHAINS) as pool:
         while pending or next_day <= total:
             while not fatal.is_set() and next_day <= total and len(pending) < contract.MAXIMUM_DAY_CHAINS:
@@ -324,10 +337,11 @@ def capture_with_seams(root, directory, plan, index, *, head, remote, started_at
                         break
                     day_start = clock()
                     contract._require(began_at <= contract._clock(day_start), 'daily_active_day_start_clock')
-                    store(f'day-{next_day:04d}.started.json', {'schema': 'si-daily-active-day-start-v1',
-                        'day_ordinal': next_day, 'query_date': plan.sessions()[next_day - 1],
+                    day = selected_days[next_day - 1]
+                    store(f'day-{day:04d}.started.json', {'schema': 'si-daily-active-day-start-v1',
+                        'day_ordinal': day, 'query_date': plan.sessions()[day - 1],
                         'started_at': day_start, 'plan_sha256': plan.sha256})
-                    pending[pool.submit(day_chain, next_day, day_start)] = next_day
+                    pending[pool.submit(day_chain, day, day_start)] = day
                     next_day += 1
                 except Exception:
                     fatal.set()
@@ -351,7 +365,7 @@ def capture_with_seams(root, directory, plan, index, *, head, remote, started_at
     done = clock()
     contract._require(state['latest_receipt'] <= contract._clock(done), 'daily_active_final_clock')
     complete_sequence = (not fatal.is_set() and not state['publication_failed']
-        and len(days) == total and set(days) == set(range(1, total + 1))
+        and len(days) == total and set(days) == set(selected_days)
         and len(attempts) == state['attempts']
         and all(d['complete_advertised_chain'] for d in days.values()))
     value = {'schema': 'si-daily-active-capture-inventory-prototype-v1',
@@ -365,6 +379,11 @@ def capture_with_seams(root, directory, plan, index, *, head, remote, started_at
         'complete_frozen_sequence': complete_sequence, 'source_admitted': False,
         'historical_identity_admitted': False, 'outcome_looks': 0, 'qc_attempts': 0,
         'ready_for_empirical_backtest': False}
+    if recovery_scope is not None:
+        value.update(schema='si-daily-recovery-capture-inventory-v1',
+            recovery_scope_sha256=recovery_scope.sha256,
+            complete_recovery_scope=complete_sequence, complete_frozen_sequence=False,
+            original_planned_days=len(plan.sessions()))
     store('inventory.private.json', value)
     if state['publication_failed']:
         raise contract.DailyActiveReferenceError('REFUSED: daily_active_publication_failed_after_drain')

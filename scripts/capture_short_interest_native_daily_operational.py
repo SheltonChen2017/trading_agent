@@ -40,6 +40,7 @@ REQUIRED_CODE_PATHS=(
     "research/short_interest_etf/availability.py","research/short_interest_etf/contracts.py",
     "research/short_interest_etf/finra_source_qualification.py","research/short_interest_etf/massive_action_supplement.py",
     "research/short_interest_etf/massive_class_denominator.py","research/short_interest_etf/native_daily_active_reference.py",
+    "research/short_interest_etf/native_daily_recovery.py",
     "research/short_interest_etf/native_dated_class_reference.py","research/short_interest_etf/native_dated_identity.py",
     "research/short_interest_etf/native_grouped_market_source.py","research/short_interest_etf/native_listed_venue_namespace.py",
     "research/short_interest_etf/native_parallel_count_contract.py","research/short_interest_etf/native_population_class_matrix.py",

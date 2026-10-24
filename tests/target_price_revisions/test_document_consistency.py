@@ -1219,11 +1219,12 @@ def _current_integration_state(section: str) -> str:
 def _assert_section93_current_facts(text: str) -> None:
     """Positive, bounded current facts; never scan old sections for stale dates."""
     normalized = " ".join(text.split()).lower()
-    for required in (*SECTION93_CURRENT_FACTS, SECTION94_NEXT_ROLE,
+    for required in (*SECTION93_CURRENT_FACTS, SECTION95_NEXT_ROLE,
                      "last completed counter-review", "skip 1, proceed to 2 and 3 directly"):
         assert required.lower() in normalized, required
     assert SECTION92_NEXT_ROLE.lower() not in normalized, "section92-only routing is superseded for this round"
     assert SECTION93_NEXT_ROLE.lower() not in normalized, "section93 routing is reviewed, not current"
+    assert SECTION94_NEXT_ROLE.lower() not in normalized, "section94 routing is counter-reviewed, not current"
 
 
 @pytest.mark.parametrize("missing", ["opening", "closing"])
@@ -1276,11 +1277,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [SECTION94_RANGE]
+    ) == [SECTION95_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Claude has independently reviewed the exact range"
+        "Codex has counter-reviewed the exact incoming range"
         in normalized_current
     )
     assert (
@@ -1294,7 +1295,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "TPR-1 remains blocked" in normalized_current
     assert "reviewed-spec registry remains empty" in normalized_current
     assert "Claude next reviews this Codex round independently" not in normalized_current
-    assert SECTION94_NEXT_ROLE in normalized_current
+    assert SECTION95_NEXT_ROLE in normalized_current
+    assert SECTION94_NEXT_ROLE not in normalized_current
     assert SECTION93_NEXT_ROLE not in normalized_current
     _assert_section93_current_facts(current)
     assert SECTION91_NEXT_ROLE not in normalized_current
@@ -1378,7 +1380,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [SECTION94_SHORT_RANGE]
+        ) == [SECTION95_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
         _assert_section93_current_facts(summary_pointer)
         assert SECTION91_NEXT_ROLE.lower() not in normalized_summary_lower
@@ -4610,6 +4612,7 @@ SECTION81_STALE_NEXT_ACTIONS = {
     "previous": SECTION91_NEXT_ROLE,
     "completed": SECTION92_NEXT_ROLE,
     "skipped": SECTION93_NEXT_ROLE,
+    "reviewed": SECTION94_NEXT_ROLE,
 }
 
 
@@ -4622,16 +4625,17 @@ SECTION81_STALE_NEXT_ACTIONS = {
     "current_previous_role", "preamble_previous_role",
     "current_completed_role", "preamble_completed_role",
     "current_skipped_role", "preamble_skipped_role",
+    "current_reviewed_role", "preamble_reviewed_role",
 ))
-def test_section_94_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
+def test_section_95_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
     """Retain old routing mutants; reject routing only to the skipped checkpoint."""
     test_exact_next_step_names_the_current_artifacts()
-    current_next = SECTION94_NEXT_ROLE
+    current_next = SECTION95_NEXT_ROLE
     stale_next = SECTION81_STALE_NEXT_ACTIONS.get(fault.rsplit("_", 2)[-2], "")
     if fault.startswith("current_"):
         original_section = _record_section
         section = original_section("## 8. Exact next step")
-        old, new = (SECTION94_RANGE, SECTION92_RANGE) if fault.endswith("range") else (
+        old, new = (SECTION95_RANGE, SECTION94_RANGE) if fault.endswith("range") else (
             current_next, stale_next)
         pattern = r"\s+".join(re.escape(word) for word in old.split())
         assert re.search(pattern, section) is not None
@@ -4640,7 +4644,7 @@ def test_section_94_current_routing_refuses_stale_range_or_role(monkeypatch, fau
             lambda heading: mutated if heading.startswith("## 8.") else original_section(heading))
     else:
         preamble = _record_preamble()
-        old, new = (SECTION94_SHORT_RANGE, SECTION92_SHORT_RANGE) if fault.endswith("range") else (
+        old, new = (SECTION95_SHORT_RANGE, SECTION94_SHORT_RANGE) if fault.endswith("range") else (
             current_next, stale_next)
         pattern = r"\s+".join(re.escape(word) for word in old.split())
         assert re.search(pattern, preamble, flags=re.I) is not None
@@ -5581,3 +5585,68 @@ def test_section_94_guard_refuses_contradictory_authority(monkeypatch, added_gra
         lambda heading: mutated if heading.startswith("## 94.") else original_section(heading))
     with pytest.raises(AssertionError, match="contradictory section 94 authority"):
         test_section_94_review_records_every_commit_and_grants_nothing()
+
+
+SECTION95_RANGE = "510292a54a4878d0c3e51f0bfb9f49de4f07632d..e1e074aaeb0c616a0e9ecba7d5b78db22bc77863"
+SECTION95_SHORT_RANGE = "510292a5..e1e074aa"
+SECTION95_COMMITS = (
+    "2545c56a03df23252a3ad3029e9c1ed4ca71d8ab",
+    "e1e074aaeb0c616a0e9ecba7d5b78db22bc77863",
+)
+SECTION95_NEXT_ROLE = "Claude next reviews this section-95 counter-review and its complete Codex round"
+SECTION95_SCOPE = (
+    ("Counter-review", "Two incoming Claude commits and cumulative tree"),
+    ("Correction inputs", "Public committed code, synthetic fixtures and Git objects only"),
+    ("Private/provider/credential reads", "Forbidden"),
+    ("QC/UI/notebook/upload/launch effects", "Forbidden"),
+    ("New backtest attempts/looks", "Zero"),
+    ("Executed candidate/economics changes", "Forbidden"),
+    ("Publication", "One matching-lane non-force final push"),
+    ("Monitor", "Remain PAUSED; no automatic rearm"),
+)
+
+
+def test_section95_counterreview_binds_both_commits_and_zero_effect_scope():
+    section = _record_section("## 95. Codex counter-review of Claude section 94")
+    assert SECTION95_RANGE in section
+    assert tuple(_git_lines("rev-list", "--reverse", SECTION95_RANGE)) == SECTION95_COMMITS
+    table = _bounded(section, "### 95.2 Per-commit dispositions", "### 95.3 Findings and qualifications", "section95 dispositions")
+    rows = tuple(re.findall(r"^\| `([a-f0-9]{40})` \| \*\*([^*]+)\*\* \|", table, re.M))
+    assert rows == tuple(zip(SECTION95_COMMITS, ("Accepted", "Accepted after correction"))), "section95 dispositions"
+    scope = _bounded(section, "<!-- TPR-CCR28-SCOPE:START -->", "<!-- TPR-CCR28-SCOPE:END -->", "section95 scope")
+    rows = tuple(tuple(part.strip() for part in line.strip("|").split("|"))
+                 for line in scope.splitlines() if line.startswith("| "))[1:]
+    assert rows == SECTION95_SCOPE, "section95 closed scope"
+    assert re.search(r"^\| `TPR-CCR28-003` \| P2 \|", _open_issue_register(), re.M)
+    for required in ("Cumulative disposition: accepted after correction.",
+                     "Percent units remain a hypothesis, not an identified source-unit diagnosis.",
+                     "Old standalone native-read programs and scope holders are retired from operational use.",
+                     "Historical private observations remain attributed, not re-read or reproduced here.",
+                     "No implementation or QC acceptance is given over the open native findings.",
+                     SECTION95_NEXT_ROLE):
+        assert required in section, required
+
+
+@pytest.mark.parametrize("fault", ("disposition", "scope", "unit_diagnosis", "retirement"))
+def test_section95_guard_rejects_review_or_authority_drift(monkeypatch, fault):
+    test_section95_counterreview_binds_both_commits_and_zero_effect_scope()
+    section = _record_section("## 95.")
+    before, after = {
+        "disposition": (f"| `{SECTION95_COMMITS[1]}` | **Accepted after correction** |", f"| `{SECTION95_COMMITS[1]}` | **Accepted** |"),
+        "scope": ("| New backtest attempts/looks | Zero |", "| New backtest attempts/looks | One |"),
+        "unit_diagnosis": ("Percent units remain a hypothesis, not an identified source-unit diagnosis.", "Percent units are independently proved."),
+        "retirement": ("Old standalone native-read programs and scope holders are retired from operational use.", "Old native programs may be replayed."),
+    }[fault]
+    assert section.count(before) == 1
+    changed = section.replace(before, after, 1)
+    original = _record_section
+    monkeypatch.setitem(globals(), "_record_section", lambda heading: changed if heading.startswith("## 95.") else original(heading))
+    with pytest.raises(AssertionError):
+        test_section95_counterreview_binds_both_commits_and_zero_effect_scope()
+
+
+def test_section95_historical_digest_boundary_is_explicit_and_reproducible():
+    raw = (STRATEGY_DIR / RECORD).read_bytes()
+    historical = raw[raw.index(b"## 63.") - 1:raw.index(b"## 93.") - 1]
+    assert len(historical) == 1074035
+    assert hashlib.sha256(historical).hexdigest() == "c98e54f5f4756f20c1baa3c2735118fd9fc7fff4dce132c913148bbe9eaa2272"

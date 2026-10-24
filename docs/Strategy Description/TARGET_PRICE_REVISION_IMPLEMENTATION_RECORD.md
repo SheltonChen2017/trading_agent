@@ -3,12 +3,12 @@
 **Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly" applied
 to the section-93 round ONLY; section 94 is the Claude review that follows it.
 
-Status: **CLAUDE HAS INDEPENDENTLY REVIEWED EVERY CODEX COMMIT IN
-`557b2250..510292a5` IN SECTION 94: THE SECTION-92 COUNTER-REVIEW AND THE
-OWNER-SKIPPED OFF VERIFICATION AND MIA-SOURCE RECOVERY ROUND OF SECTION 93.
-CUMULATIVE DISPOSITION: ACCEPTED AFTER CORRECTION (FOUR REGRESSION TESTS; NO
-PRODUCTION BYTE). NOT BACKTESTING-READY, PERFORMANCE OR CANONICAL ACCEPTANCE.**
-The last completed counter-review is section 92.
+Status: **CODEX HAS COUNTER-REVIEWED BOTH CLAUDE COMMITS IN
+`510292a5..e1e074aa` IN SECTION 95, SEPARATELY AND CUMULATIVELY.
+CUMULATIVE DISPOSITION: ACCEPTED AFTER CORRECTION WITHIN REVIEW EVIDENCE
+AND PUBLIC SUPPORT ONLY. NO EXECUTED CANDIDATE BYTE CHANGED.
+NOT BACKTESTING-READY, PERFORMANCE OR CANONICAL ACCEPTANCE.**
+The last completed counter-review is section 95.
 Section 94 reviewed the owner-skipped continuation of section 93.
 33 observed looks now (31cloud+2historical local).
 OFF has consumed all three Codex attempts; no fourth Codex OFF launch.
@@ -31,7 +31,9 @@ locked. No new notebook/cell or native witness is claimed. Genuine original
 compiled source, missing source/unit
 provenance and full-window native orders/accounting cannot be inferred from
 saved source or a Completed. status. No protected dates, frozen economics,
-selection rules or attempts are reset. Codex next counter-reviews section 94 and this round's Claude commits.
+selection rules or attempts are reset. Claude next reviews this section-95 counter-review and its complete Codex round.
+Old standalone native-read programs and scope holders are retired from operational use;
+no expired scope is renewed. Percent units remain a hypothesis, not a verified diagnosis.
 The non-authorizing TPR-TR0-I implementation candidate is checkpointed but
 remains incomplete and parked. No key provisioning or positive authority is
 authorized. The comprehensive Claude whole-lane audit remains complete;
@@ -390,15 +392,17 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, 2026-10-22:** Claude has independently reviewed the exact range
-`557b2250aa82f330a995362ebd75c4f30ab03a34..510292a54a4878d0c3e51f0bfb9f49de4f07632d`:
-twenty-eight Codex commits carrying section 92's counter-review of section
-91 and the owner-skipped continuation of section 93. The owner's direction
-"skip 1, proceed to 2 and 3 directly" applied to that round ONLY; the last
-completed counter-review is section 92. Section 94 reviewed the
-owner-skipped continuation of section 93 and dispositions every commit,
-accepting the cumulative tree after correction: four regression tests, no
-production byte. Section 92's corrections of section 91 are accepted.
+**Current qualification, 2026-10-23:** Codex has counter-reviewed the exact incoming range
+`510292a54a4878d0c3e51f0bfb9f49de4f07632d..e1e074aaeb0c616a0e9ecba7d5b78db22bc77863`:
+both Claude commits separately and cumulatively in section 95. The last
+completed counter-review is section 95; its cumulative disposition is accepted
+after correction within review evidence and public support only, not runtime,
+performance or canonical acceptance. Section 94 reviewed the owner-skipped continuation of section 93.
+The owner's direction "skip 1, proceed to 2 and 3 directly" applied to that round ONLY.
+The incoming regression tests are accepted; the historical digest reproduces with
+the explicit boundary in section 95, while percent units remain an unproved
+hypothesis. No executed candidate byte changed. Old native programs/holders
+and both raw operator archives are forensic-only predecessors, not replay authority.
 33 observed looks now (31cloud+2historical local).
 OFF has consumed all three Codex attempts; no fourth Codex OFF launch.
 ON has consumed zero attempts and remains unlaunched.
@@ -540,8 +544,8 @@ outcome-free source audit; no real-row D1, outcomes or QuantConnect access is
 authorized by that audit.
 The trust rollback pin, protected parent custody, reviewer identity and
 adversarial matrix remain unresolved and parked. **Exact next role action:**
-Section 94 reviewed section 92 and the owner-skipped round of section 93.
-Codex next counter-reviews section 94 and this round's Claude commits.
+Section 95 counter-reviewed section 94 and both incoming Claude commits.
+Claude next reviews this section-95 counter-review and its complete Codex round.
 The owner bypassed the immediate section92 checkpoint for this round ONLY;
 this does not remove subsequent independent review. A newly observed Mac
 lock prevented even the empty-notebook request; its scope is closed without
@@ -692,6 +696,7 @@ and are deliberately not listed here.
 | `TPR-CR25-003` | P2 | Broader QC/development host classification and native-host validation | Native custody stays Mac-only by the direct owner reply on 2026-10-12; portable Windows checks stay active. Section 82 implements a bounded test-only split in the collector/frontier modules, pending independent review. Other QC/development modules remain unclassified here; no attributes, working-byte repair, production port or fresh Mac-native validation was performed. The reported CRLF/POSIX failures in section 81 remain historical evidence, not native acceptance. |
 | `TPR-CR26-003` | P1 | Future multi-host resumption without serialized ownership and published handoff | Actual divergence and stale routing are confirmed; failure to fetch is not proved because unpublished Mac commits were unavailable remotely. Section85 preserves both histories. The existing owner-pinned absolute Mac lane and latest continuation govern this round; no new host choice blocks it. Future host switching still needs coordinated serialized handoff, actual remote equality and preserved work; global synchronization is not claimed solved. |
 | `TPR-CR27-005` | P1 | Historical compiled-source reliance; current syntax component corrected | Section91's Open disposition and original eleven-file/eight-syntax-failure evidence remain immutable history. Section93 independently verifies current main restoration, all14saved Python compilation and exact sixteen-file stability. Do not repeat those old syntax failures as present state. Historical compiled-job custody and look31 dispatch remain unproved; accepting a current source repair does not accept those past jobs. This finding's syntax component does not itself block read-only diagnosis now; the independent runtime/source/accounting gates still govern any new OFF/ON run. |
+| `TPR-CCR28-003` | P2 | Any reuse of the retired native reader/holder route | Section95 confirms externally supplied scope/project assertions, absent standalone deadline, claim-before-lock failure custody and unconstrained result dictionaries. Existing operations are expired/closed, and the notebook wrapper already enforces stronger runtime checks. Old programs/holders remain forensic-only; a named safe successor must prove its own runtime/project/closed-result boundary before any new effect. This does not block public synthetic counter-review. |
 
 No open finding is P0. The two canonical P1 findings are inert while the registry is empty,
 but both block any positive registry entry. Read-only checks on this Windows
@@ -24080,3 +24085,226 @@ conversion with the original guard kept, not the magnitude heuristic Mia
 wrote. Third, the operator-script archives in the research tree are
 runnable; ask Codex to make them inert. Fourth, `TPR-CR23-002` (Object
 Store retention) is still waiting for you.
+
+## 95. Codex counter-review of Claude section 94 - 2026-10-23
+
+### 95.1 Owner scope and exact snapshot
+
+Owner: "ok, start counter review" after the read-only lane/data-source sync.
+This round counter-reviews Claude's completed section-94 publication, corrects
+verified lane-owned evidence support, and hands off once. It does not resume
+the earlier expired source-only or notebook operations, buy data, inspect
+subscriptions/accounts, implement a unit conversion, or launch a backtest.
+
+Physical root and Git toplevel are both
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__target_price_revisions`;
+branch `codex/strategy-target-price-revisions`. Clean local HEAD and ACTUAL
+matching remote agreed at `e1e074aaeb0c616a0e9ecba7d5b78db22bc77863`.
+Only that lane ref was fetched. It was already present in the shared checkout;
+no switch, merge, reset, scratch clone or alternate validation root was used.
+The exact incoming range is
+`510292a54a4878d0c3e51f0bfb9f49de4f07632d..e1e074aaeb0c616a0e9ecba7d5b78db22bc77863`.
+Ancestry, both complete diffs, their messages and the cumulative tree were
+checked. Author metadata is not the evidence of independent review: section
+94's complete reviewed-range/disposition table is.
+
+<!-- TPR-CCR28-SCOPE:START -->
+| Boundary | Scope |
+|---|---|
+| Counter-review | Two incoming Claude commits and cumulative tree |
+| Correction inputs | Public committed code, synthetic fixtures and Git objects only |
+| Private/provider/credential reads | Forbidden |
+| QC/UI/notebook/upload/launch effects | Forbidden |
+| New backtest attempts/looks | Zero |
+| Executed candidate/economics changes | Forbidden |
+| Publication | One matching-lane non-force final push |
+| Monitor | Remain PAUSED; no automatic rearm |
+<!-- TPR-CCR28-SCOPE:END -->
+
+### 95.2 Per-commit dispositions
+
+| Commit | Disposition | Independently verified basis |
+|---|---|---|
+| `2545c56a03df23252a3ad3029e9c1ed4ca71d8ab` | **Accepted** | Four regression functions/eight parametrized cases correctly isolate the post-read scope, canonical session date, wrapper size and production seams. All 196 affected-module tests pass; six matching in-memory mutants are killed with restoration. No production byte changed. |
+| `e1e074aaeb0c616a0e9ecba7d5b78db22bc77863` | **Accepted after correction** | Exact 28-commit preceding round and its table/ledger/authority guards are coherent. Qualify source-unit inference, archive replay preconditions, the reproduced historical digest and distinct two/three-module scopes. Add terminal guard sensitivity, inert successor custody and truthful current routing; keep historical section 94 unchanged. Private-source/result observations are attributed, not independently re-opened. |
+
+**Cumulative disposition: accepted after correction.** This accepts the review
+and bounded public evidence support, not the old native programs for execution,
+the frozen strategy's empirical result or any canonical gate.
+No implementation or QC acceptance is given over the open native findings.
+
+### 95.3 Findings and qualifications
+
+| ID | Priority | Classification/status | Evidence and correction/remaining limit |
+|---|---|---|---|
+| `TPR-CCR28-001` | P3 | Confirmed; incoming correction accepted | `CR28-001/002/003` are genuine missing-regression findings. The affected three modules pass 196 cases and each of the six documented mutants fails its new regression. No broader test sensitivity or native completion is inferred. |
+| `TPR-CCR28-002` | P2 | Partly correct; safer successor and retirement recorded | `CR28-004`: the two JSON archives are already inert as files; no executable consumer was found beyond AST-only tests. Deliberate extraction of their 21 Python bodies can run effects and their false authority labels are not a sandbox. Root/branch/HEAD/source/claim/budget checks also exist, so "only" the claim barrier overstates the total preconditions. Retain both exact forensic predecessors and create `owner_repair_inert_operator_catalog_v2.json`: each default body is only one string-literal expression, with original count/hash and full predecessor custody. Both invokers now have exact static custody tests. Deliberate decoding/editing of forensic originals is not made impossible; replay remains prohibited. |
+| `TPR-CCR28-003` | P2 | Open (partly correct; future native successor) | `CR28-005`: standalone generated reader lacks its own deadline and trusts external scope/project assertions; old holders burn claims before lock/access and accept unconstrained result dictionaries. Successors do pin the same preregistration hash, but do not pin/disable predecessor holders. The later notebook wrapper already has fixed-deadline, actual-clock and native-reference checks. These spent/expired holders/programs are retired, not patched or implicitly renewed. A future native successor must enforce its own actual runtime/project checks, lock/claim failure custody and a closed body-free result schema before effect. No new native design or authority is created here. |
+| `TPR-CCR28-004` | P3 | Confirmed; corrected in focused tests | `CR28-006`: independent pre-network scope/claim/clock/guard/credential-format cases and a cwd-independent per-seam sentinel now exercise the boundary. Credential format is necessarily checked AFTER reading a synthetic/actual credential, not before reading it. Production code remains unchanged. All fixture effects use temporary synthetic state and a failing network sentinel. |
+| `TPR-CCR28-005` | P3 | Confirmed; documented/retired pending named successor | `CR28-007`: notebook capture's final-size check lacks a body-free overflow fallback; the stated approximately 25KiB maximum is not independently proved. Production credential loading already rejects empty tokens; an empty token can be supplied through a fixture transport. Preserve pinned bytes; this predecessor is not selected for future use until an identified successor addresses fallback/custody. No material observed production overflow or credential leak is established. |
+| `TPR-CCR28-006` | P3 | Digest/count false alarms; reproducibility qualification closed | `CR28-008`: the exact historical hash reproduces with the boundary below; "two" local corrections versus "three" cumulative modules are different scopes, not a contradiction. Distinct measured wire/source byte changes remain distinct; there is no demonstrated wire/source equality invariant. Add explicit boundary/census guards; do not alter historical measurements or fabricate the reason for the two-byte difference. |
+| `TPR-CCR28-007` | P2 | Partly correct; closed by qualification, original P1 OPEN | `CR28-009`: dividing by 100 and bypassing stale marks together, followed by Completed, supplies a useful hypothesis, not an identified affected sleeve/date/unit. Historical compiled-source binding, actual input consumption and complete accounting remain unproved. No unit conversion is implemented or approved, and no stale-mark bypass is reinstated. `F019`/`CR23-001` stay OPEN. |
+| `TPR-CCR28-008` | P3 | Confirmed provenance qualification | Section 94.4 explicitly reports a scratch clone for mutations, while 94.5 identifies the designated worktree for focused validation. Preserve those separate attributed claims; they do not establish compliance of the scratch-clone trials with the physical-root mandate. All current commands and validations use the pinned lane; no historical compliance is retroactively cured. |
+
+Percent units remain a hypothesis, not an identified source-unit diagnosis.
+Old standalone native-read programs and scope holders are retired from operational use.
+Historical private observations remain attributed, not re-read or reproduced here.
+Retirement covers the section-93 ephemeral reader/holder route, both notebook
+create/read holder pairs and the pinned notebook capture predecessor; these
+are evidence, not reusable authority. Their testable pure functions remain
+available for synthetic validation, not a concealed native operation.
+
+The nine CR28 items retain their original priorities and history: 001-003
+corrections accepted; 004/005 partly correct with the limitations above;
+006 corrected by tests; 007 documented; 008 qualified with two false alarms;
+009 a hypothesis with the original native P1 unresolved. No P0 is found.
+All inherited open P0-P3 findings remain at their recorded scope. Shared and
+sibling issues are recorded only; no shared/main/sibling behavior changes.
+
+### 95.4 Reproducible public custody and delegated decisions
+
+Let `raw` be the UTF-8 bytes of this record, or its published `510292a5`
+version, and use Python's exact half-open byte slice:
+
+```python
+historical = raw[raw.index(b"## 63.") - 1 : raw.index(b"## 93.") - 1]
+```
+
+This includes the LF preceding the section-63 heading and excludes the final
+separator LF before section 93: **1,074,035 bytes**, SHA-256
+`c98e54f5f4756f20c1baa3c2735118fd9fc7fff4dce132c913148bbe9eaa2272`.
+The more intuitive heading-to-heading slice has the same size but a different
+boundary/hash. Independently, heading-to-heading with its final LF removed
+equals the complete `2a46f41a` section-63-to-EOF suffix: **1,074,034 bytes**,
+SHA `75f91b5779b1bbf6efe9a9926a03dfabc863197422fa979d9681df345fa7bad1`.
+Sections 63-94 are not rewritten by this counter-review.
+
+Section 92.4 names two modules changed by Codex in `557b2250..2a46f41a`;
+92.5's three refer to `1bc751f8..2a46f41a`, including Claude's public-job-view
+correction. Source main sizes 60,692 minus 60,658 give 34 bytes; wire totals
+541,432 minus 541,366 give 66, not 68. Wire responses include more than source
+bytes; without the private bodies no cause is asserted. Do not change either
+observed total to make an assumed relationship hold.
+
+The two forensic JSON predecessors remain unchanged: operations 64,218 bytes,
+SHA `2f1e68f03ecd87c44a84f1ce7261bb3c4e8b0e32f3e2b39120bd1937ff5ece96`;
+invokers 3,017 bytes,
+SHA `d7c02276e396e0b97240031a7ecc7039be0b87869cc1d1e0d4b3b080f21162ba`.
+The named inert catalog is 70,273 bytes,
+SHA `2152ce6a87dfb012771e37eabda82ba0f57132af322ec4f26842c8accee0aad5`.
+Its support-only schema is `tpr-ext26-inert-owner-repair-operator-catalog-v2`;
+no production API/schema changes. Its 21 literal bodies round-trip to exact original UTF-8 source hashes without
+compiling, importing or executing any recovered operator program.
+
+| Decision ID | Provenance/choice | Rationale, alternatives, scope/limits | Independent-review state |
+|---|---|---|---|
+| `TPR-CCR28-D001` | Owner counter-review request; public-only verification | Reproduce code/tests/Git identities, not fresh private captures or QC state. Earlier receipts/scopes are spent. Alternative live re-discovery would exceed this review's bounded scope. | Agent-delegated; not separately owner/Claude-approved. |
+| `TPR-CCR28-D002` | Confirmed archive-risk qualification; inert successor | Preserve forensic predecessors and original source hashes, add literal-only default presentation and both-invoker tests. Do not mutate executed originals, pretend labels are enforcement, or claim deliberate extraction impossible. | Agent-delegated; pending review of this exact round. |
+| `TPR-CCR28-D003` | Native-program/holder audit; retire rather than renew | Unsafe or expired routes are unavailable for operation; any later successor needs independent runtime checks, bounded closed outputs and fresh scopes. No new job, notebook or source-unit change is authorized. | Agent-delegated limitation; pending review. |
+| `TPR-CCR28-D004` | Research evidence discipline; keep unit hypothesis conditional | Simultaneous source changes plus Completed cannot prove units or full-window accounting. Alternatives clipping, magnitude inference, bypass and a fourth OFF launch remain rejected. | Agent-delegated qualification; pending review. |
+
+### 95.5 Focused validation and exclusions
+
+Every pytest process redirects initialization/runtime roots under the exact
+section-49/52 in-process runner BEFORE dispatch/config/pytest import. Network
+connects are denied; no actual operator stop/database, private receipt, token,
+provider row or QC state is read. Tests use the existing lane environment
+`/Users/sheltonchen/.venvs/trading_agent-py313/bin/python3`, Python 3.13.15,
+pytest 9.1.1. Initial bundled/system interpreter probes had no pytest;
+a disposable `/tmp` environment with repository-pinned pytest was then found
+to lack `pandas_market_calendars` (71 setup errors, zero semantic test bodies).
+The existing lane environment resolves that setup limitation. No repository
+dependency or production runtime changed.
+
+Received/current focused control by root: **712 passed in 11.09s** over document,
+active-document and the three incoming affected QC modules. The delegated
+reviewer independently ran those three QC modules: **196 passed**, restored
+control **196 passed in 1.04s**, six in-memory mutants killed. The terminal
+test correction: **71 passed in 2.98s**, 14 in-memory mutants killed with
+restored controls. Inert catalog/archive controls: **107 passed in 1.32s**,
+three in-memory validator mutants killed with restored controls. These are
+separate overlapping sets, not a summed suite count or native evidence.
+Root's new section-95 guard initially fails on the absent section (**1 failed
+in 0.60s**), then is rerun after its record exists. Final cumulative focused
+results and exact correction commits follow in 95.7 before publication.
+
+No complete lane or repository suite was run. Claude's historical 913/516
+validation, private source/job reproductions and scratch-clone mutations
+remain attributed with host/path limits. macOS/fixture green proves no native
+Windows signer/ACL/protected-parent custody; frozen-Git refusal/restoration
+and fourteen historical preregistration limitations are not weakened.
+
+### 95.6 Readiness, outcomes and next role
+
+| Arm/sleeves | Current accepted result | Attempts and limitations |
+|---|---|---|
+| OFF, all six frozen stock sleeves | No accepted full-window return, CAGR, drawdown, volatility, Sharpe, turnover, fill/fee/cash/exposure or coverage comparison | Three Codex attempts spent; historical Mia/owner jobs retained. Runtime, source-unit/clock and accounting evidence remain OPEN. |
+| ON, all six frozen stock sleeves | Unlaunched; accepted outcomes NULL | Zero attempts used. OFF-first usable full-window accounting still governs ON. |
+
+No independent sleeve P&L is invented for overlapping consolidated positions.
+Study dates stay 2021-01-04 through 2026-10-09, warm-up 2020-09-01,
+1,449 valuations/301 decisions; 33 observed looks = 31 cloud + two historical
+local. This round adds **zero** actual attempts/looks and changes no frozen
+economics, inputs, target-price or AR rules, cost/timing assumptions or data
+subscriptions. F017/F018/F019/CR23-001 remain OPEN. Existing prepared inputs
+are not a full PIT/as-published history proof; canonical source, TPR-0B and
+parked TR0-I replay/custody/reviewer/adversarial gates remain distinct.
+
+Quality assessment: **8/10 for the scoped review/regression support**, not
+strategy readiness. The review improves test sensitivity and evidence routing;
+the runtime and actual data-quality deficiencies remain visible and blocked.
+Claude next reviews this section-95 counter-review and its complete Codex round.
+The next native milestone is a separately registered, corrected refusal-witness
+diagnostic with a safe successor runtime boundary; then evidence-bound OFF
+recovery/full-window accounting, and only thereafter eligible ON. It is not
+started by this counter-review or by the preceding data-source advice.
+No ordinary launch proceeds over the open native findings. No fourth Codex
+OFF attempt, automatic scope renewal, provider purchase, broker, paper/live
+or canonical admission follows. Monitor remains PAUSED with no rearm.
+
+### 95.7 Exact correction and publication handoff
+
+Correction commit `46a3262c6f6f2bd6a83890eff13d100cad30757d` retains the inert
+catalog and the archive/terminal regressions. The original two archive hashes
+are unchanged. The following record/guard commit completes this exact two-commit
+Codex round; its own hash is reported after publication rather than fabricated
+inside its contents. Claude reviews EVERY commit after
+`e1e074aaeb0c616a0e9ecba7d5b78db22bc77863` through the final published tip,
+including this handoff and the cumulative tree.
+
+Root independently reproduced the historical suffix digest on both current
+bytes and Git's exact published `510292a5` object; original archive and inert
+catalog identities match the figures in 95.4. The preceding reviewed range
+really has 35 paths, 6,260 additions and 211 deletions. Sections 63-94 remain
+byte-identical, disregarding only the final section separator; no historical
+finding, negative outcome, executed candidate/source bundle, private receipt
+or source/input/calendar/config identity is rewritten.
+
+Final cumulative focused set: **956 passed, 1 skipped in 14.99s**, repeated
+after the final open-register/schema qualification: **956 passed, 1 skipped
+in 15.31s**, with no failures/errors/warnings. The skip is the existing Windows-junction regression
+on macOS. The nine modules are document consistency, shared active-document,
+Target import firewall, runtime-stop leak guard, the three incoming reader/
+notebook/capture modules, terminal capture and operator archive tests. This is
+NOT a complete lane/repository suite. All three changed Python test files
+parse and compile in memory; the one new JSON parses; diff hygiene is clean.
+The new routing retains all stale-role negatives and adds section-94 stale
+role rejection, exact incoming dispositions, closed scope and four clean-first
+drift cases. The explicit historical digest boundary is independently pinned.
+
+There are exactly five changed paths in this round: the sole lane record,
+its document guard, the terminal test, the archive test and the named inert
+catalog. No production algorithm, API/schema, dependency, migration, native
+candidate or shared/sibling behavior changes. All access/launch/look counters
+for this review are zero; no actual Mac/QC state or account entitlement is
+claimed from the old observations. All native-read/create scopes remain spent
+or closed. The monitor remains PAUSED and is not rearmed by this publication.
+
+Immediately before each commit and the final push reverify physical/Git roots,
+branch, HEAD, status, staged diff and ACTUAL matching remote. Matching remote
+remained `e1e074aaeb0c616a0e9ecba7d5b78db22bc77863` before the correction commit.
+An unexpected advance stops this round for explicit scope reconciliation;
+no concurrency is silently absorbed or overwritten. Publish exactly once,
+non-force, to `HEAD:refs/heads/codex/strategy-target-price-revisions`, then verify
+actual local/remote equality and clean status. This paragraph is the protocol;
+the final published identity and observed verification are reported in chat.

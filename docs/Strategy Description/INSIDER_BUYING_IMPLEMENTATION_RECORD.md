@@ -1,17 +1,18 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTIONS 203-210 RECORD THE OWNER-REQUESTED SHARADAR ACCESS REPAIR
-AND COVERAGE AUDIT. ACTUAL TICKERS AND ACTIONS STATUS METADATA NOW VALIDATE;
-NO ARCHIVE OR ROW DOWNLOAD, PAID ENTITLEMENT OR BACKTEST READINESS IS CLAIMED.
-THE FIVE EARLIER FAILED/PARTIAL STATUS OPERATIONS STAY PRESERVED. SIX CARRIED
-P2 FINDINGS REMAIN OPEN; THE TWO NEW METADATA-COMPATIBILITY FINDINGS ARE
-CLOSED ONLY AT THEIR OBSERVED PROSPECTIVE SCOPES. SECTION 202'S COMPLETED
-COUNTER-REVIEW AND CLAUDE'S PRIOR ACCEPTANCES STAND; THIS NEW CODEX WORK IS
-NOT INDEPENDENTLY REVIEWED. THE OWNER'S QC HOLD REMAINS IN FORCE. FROZEN
-V1/FOUR V3 SOURCES, POPULATION/ECONOMICS, STRICT D23 AND BOTH FINAL ACCESS
-CLASSIFICATIONS REMAIN BINDING. LOOKS/JOBS/BACKTESTS 0/0/0. NO FUNDED/PAPER/
-LIVE/CAPITAL/REAL-ORDER/TRADING AUTHORITY. MONITOR PAUSED; FINAL LANE PUSH
-PENDING AT HANDOFF PREPARATION.**
+Status: **SECTIONS 212-214 RECORD THE OWNER'S CONTINUED SOURCE QUALIFICATION.
+THE TWO RETAINED EARNINGS WINDOWS HAVE A NEW OBSERVED OFFLINE SUPPLEMENT;
+ORIGINAL MISSING HTTP/SEAL EVIDENCE IS NOT REPAIRED. PRIVATE SHARADAR REFERENCE
+QUALIFICATION AND ONE DATES-ONLY GET COMPLETED; FULL-STUDY PRICE/DELISTING
+COVERAGE IS NOT ESTABLISHED. OWNER CONFIRMS A 5-YEAR PLAN AND NO ADDITIONAL
+MISSING-MONTH EXPORTS. ORIGINAL64 STRUCTURAL PARSER/TYPED-CONSUMER ENGINEERING
+IS IN PROGRESS UNDER214, NOT YET AN OBSERVED ACTUAL RUN. BACKTEST READINESS
+REMAINS FALSE. SIX CARRIED P2S, OLD FAILED/PARTIAL ROOTS AND HISTORICAL
+REVIEW DISPOSITIONS ARE PRESERVED. THIS CODEX WORK IS NOT INDEPENDENTLY
+REVIEWED. NO QC ACCESS: THE OWNER'S HOLD REMAINS BINDING. FROZEN V1/FOUR V3
+SOURCES, POPULATION/ECONOMICS, STRICT D23 AND BOTH FINAL ACCESS CLASSIFICATIONS
+ARE UNCHANGED. LOOKS/JOBS/BACKTESTS 0/0/0; NO FUNDED/PAPER/LIVE/CAPITAL/REAL-
+ORDER/TRADING AUTHORITY. MONITOR PAUSED; ONE FINAL LANE PUSH PENDING.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -51,6 +52,13 @@ and "Investigate the Sharadar response-format issue and get access working,
 then continue the coverage audit. No QC access yet" authorize203-210's
 separately bounded metadata repair and retained-evidence/public-document
 audit. They do not activate a new archive/row capture or release QC.
+The still later explicit "Proceed with qualifying Sharadar price/delisting
+coverage and the two retained earnings windows ... continue to build until
+the lane is fully ready for backtesting" authorizes212 onward's separately
+bounded source qualifications and continued available-input engineering.
+The explicit NO-QC hold, actual source/rights/identity facts and frozen
+population/economics remain binding; the confirmed5-Year subscription and
+missing supplier exports cannot be changed by an internal approval entry.
 
 ## 1. Canonical V1 contract
 
@@ -30390,3 +30398,329 @@ reads/dispatches. No qualification rows decoded. Activated source36371 bytes/
 SHA256`a87ae193b959748aea16cf489d009b200bdb9368eb81eda4b79751ff3228ceac`
 compiled in memory; diff clean. Reverify expected two tracked paths and
 unchanged origin9ce3d5bb, then commit before invoking actual capture.
+
+### 213.4 Observed one-shot dates-only capture and account boundary
+
+Activation/preregistration committed as
+`de41c32ce7660ee25d0f713b75cc9be19e0a536a` BEFORE invocation. From that
+already-existing clean HEAD the default production capture exited0 in20.979s,
+HTTP200, dispositiondeclared-stock-date-metadata-observed, completed
+2026-10-24T21:06:59.845493Z. ExactlyONE transport invocation andONE configured
+Keychain credential read were observed. No secret was emitted/retained.
+Only the declared three metadata columns were requested/decoded; source
+price/volume/fundamental/return values, looks/QC jobs/backtests remain zero.
+No retry, redirect, paging, fallback, account browser or bulk request.
+
+Completion15680 bytes/SHA256
+`ba14fc03b14e367e1136100656a1b498ab028611ceb1b261de0e18b885259cfd`;
+private response28199 bytes/SHA256
+`b1101e32ca9d17e76318f310ac29ef5da2b7c898624e27747fa2634ad9b38b14`;
+private metadata408 bytes/SHA256
+`b21d809e16b439e3518d25c4477a81de8e61bbaf111f69162c3901969aeb787f`;
+scope-reservation digest
+`9dd25e7dc486c839a35f91b81c8553c6fdd280e255594678b29a1ef0423be855`.
+Execution source inventory
+`eb448d42a3a4271bb12482a2b2d1d36bbd2ea5f99dae674a448735dd803eef0a`.
+Independent native network/fork/all-write/Keychain-exec-denied readback
+verified all EIGHT leaves, exact sizes/hashes, canonical completion and
+producer/input context, final all-leaf content rehash and the three-leaf
+offline plan. It did not redispatch, read credentials or decode action rows.
+
+Keep per-symbol dates/counts, zero-row cases and supplier-quality conclusions
+in the ignored private metadata under the direct terms; do not publish rows
+or assert full-study/delisting/paid-bulk entitlement. A successful finite
+metadata operation is NOT historical coverage acceptance. The frozen plan's
+missing cases and partial dates remain explicit; no early-price history,
+terminal-consideration/identity/PIT facts or canonical stream is fabricated.
+
+Fresh official [Stocks documentation](https://sharadar.com/docs/stocks)
+confirms from/to/fields/ticker/sort/limit syntax; the query did not accidentally
+use an undocumented date filter. The public [subscription page](https://sharadar.com/subscribe)
+now explicitly separates5-Year,10-Year andFull-History plans, says bulk history
+matches the purchased tier, and identifies the advertised29/month Bundle as
+5-Year rather thanFull-History. This is public product information, NOT this
+account's verified plan, a payment authorization or a conclusion that a
+particular missing symbol exists in another tier. The owner has been asked
+for the account's history-tier name/redacted receipt, not an API key or an
+automatic purchase. No repeated request or entitlement bypass is attempted.
+
+### 213.5 Continued local engineering, not a routine checkpoint stop
+
+The owner asked to build continuously to honest readiness. Sources200.4 and
+210.3 explicitly identify the64 retained originals as available additional
+engineering inputs. Internal read-only advisory confirms the current PEM
+consumer deliberately hardcodes original-body admission0 and cannot accept
+issuer-first original grammar through the exact frozen projection type.
+Proceed to the separately versioned original-body structural projection and
+typed64-only quarter consumer in214; do not stop merely to await Claude or
+routine approval. This is not broad corpus acquisition or a source-window
+change. Real missing earnings/price/history/identity/rights inputs and the
+explicit QC hold remain factual boundaries; account tier and separately
+identified supplier exports cannot be manufactured by delegated judgment.
+
+## 214. Retained original64 structural admission: fresh offline epoch preregistration (2026-10-24)
+
+### 214.1 Defined deliverable, authority and exact inputs
+
+Under the latest owner's continuous-build direction and200.4/210.3, implement
+a NEW pure original-complete-PEM-body structural parser, genuine typed
+projection and explicit versioned2006Q1 consumer, plus an isolated observed
+runner. Support the exact observed LF-only373-byte/39-byte PEM envelope,
+canonical framing/base64 structure and directly parsed owner-first OR
+issuer-first legacy header topology. No role/byte/header/clock rewriting,
+subclass/forgery of frozen SecCompleteSubmissionProjection, frozen global
+monkeypatch or relabeling of derived views as originals. Reuse immutable
+read-only lexical/document/XML guards where appropriate, with new coordinator
+validating all roles/sequence/document count/XML/target/owner identities.
+Factory seals and reparsing protect ordinary mutation, not adversarial
+authentication or signature trust. A structurally bound original is still
+NONCANONICAL and grants no official source/acceptance/PIT/rights/readiness.
+
+Inputs are EXACT existing retained initial64 capture, no newSEC requests:
+`artifacts/insider_buying/sec_2006q1_parent_capture_v1/runs/ib-sec-2006q1-initial64-private-stdin-v2-20261014-once`,
+reportSHA256`7d42a6634bf378f159f00e62697eaac446b41038f276f05ca12fe524e8a9076a`.
+Each original body stays at its exact held objects/{sha256}.bin; all capture
+claims/starts/results/body bytes and old header-quarantine dispositions are
+preserved. Prior observed419628 bytes/64 distinct originals and57/7 topology
+split are historical controls, not prewritten results of this new operation.
+
+Original preparation is fixed
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/insider-buying-ib1c-v2-2006q1-20261006.h7X8FN/candidate`;
+completion`d05e0345124b96599fbbd82a81828452ea63d39a90b3be28b599ef1e462bbfd0`,
+assessment`402fa1860bd9549f6d0eadcf7dc9a956cc0dc006d91f038290c294c102083ad5`.
+Its exact raw/parsed manifests, public-publisher layout/locks, ZIP and
+332749655-byte parsed row stream retain existing strict intake custody.
+Public2006Q1ZIP17306804 bytes/SHA256
+`62becdadbe5eaff68f03edefe2ba2357c8bb498a1f825b697003e087cf98e6ce`.
+Use held loaders only inside the denied worker for actual SOURCE interpretation;
+parent binds original-source hashes/control/lineage only. Its independent
+readback may validate the NEW published identity-only metadata rows/ledger/
+counts/full roster, never reparse original XML/body/financial source values.
+Do not call the old consumed
+public reassessment operation, reinterpret its failed roots as successful,
+or change any original capture/preparation bytes/modes/receipts.
+
+### 214.2 Acceptance, isolation and finite operation
+
+New consumer conserves every ordered source row/all six form totals, raw
+short CIK and filing/accession-year metadata, exact selected request/capture
+and genuine new original projections. Keep unsupported context forms and
+every unavailable/grammar/identity refusal explicit; no all-quarantined
+fixture substitutes for actual admission. Bound64 parents/8MiB each/64MiB
+aggregate and128MiB full assessment. The new type is NOT passed through v2's
+exact frozen type gate by forgery; a new explicit consumer owns its semantics.
+Whole-quarter/promotion/canonical digests remain null while rows unresolved.
+
+Fresh offline fixed namespace:
+`artifacts/insider_buying/sec_2006q1_original_admission_v1/ib-2006q1-original64-structural-admission-20261024-once`.
+Default production only after exact clean committed source qualification.
+Source-only captured Git-bound worker with-I/-S/-B/emptycache/minimalenv;
+native process-tree network/fork/Keychain-exec/all-write denial except fresh
+exclusive output, with actual denial probes BEFORE raw input interpretation.
+Parent independently checks current/Git source closure, source/input/output
+identity/inventory and all-leaf content. Use explicit output-only settled
+ctime policy with continuous full rehash and inode/owner/mode/link/size/mtime/
+ancestry checks; ORIGINAL intake stays strict. No stale-HEAD literal bypass,
+namespace resume/overwrite, provider/credential access, financial-value
+projection, outcome look, QC/SDK activation or backtest.
+
+Meaningful invented red/green/mutation and focused/record/active-document/
+import/compilation/EXACT package checks precede actual invocation. No full
+suite. Record precise new images/validation/operation lineage and every
+result/refusal only after observation. Keep six carried P2s and all resolved
+findings at their exact scopes;64 structural bindings cannot close the full
+IB1C source/identity evidence gates or establish all82-quarter completion.
+One final combined push only, after actual work or concrete factual blocker
+and separate exact-hash handoff; no new review-wait, checkpoint or QC access.
+
+### 214.3 Later owner answers: factual inputs, not another routine approval
+
+While the original64 implementation was in progress, the owner answered
+that no additional January2006/August2018 export exists beyond what is
+already available here, and explicitly confirmed the current Sharadar plan
+is5-Year. Treat the latter as owner-supplied account configuration, not a
+new measured supplier entitlement response or proof of complete delisted
+coverage. The frozen2006Q1-2026Q2 population is not narrowed to fit the plan.
+Public history tiers distinguishFullHistory from5/10Years; a FullHistory
+Prices tier or existing-Bundle history upgrade is the relevant prospective
+entitlement for this source, not another purchase of already retainedSF1.
+No purchase/plan change or retry was performed. Even a plan upgrade would
+still need actual source/adjustment/terminal/identity qualification.
+
+Two additional bounded connected-inbox checks searched for this account's
+Sharadar subscription/history-tier receipt: the first returned five messages
+and no further page, of which supplier/support context concerned an older
+different-lane metadata enquiry, not an applicable paid-history receipt;
+the second receipt/invoice-specific query returned no IDs/no further page.
+Only relevant metadata/snippets were assessed, no attachment/key was opened,
+no email/draft was sent or modified. Those messages do not license this
+lane or prove an absent account; no other lane's activity is treated as
+authority. The owner's explicit5-Year answer is the account-tier input.
+
+Continue the defined retained-original64 engineering with available inputs.
+After its observed qualification, remaining missing original parents across
+the frozen full population, actual full-history price/reference inputs,
+separately identified missing earnings exports and the explicit QC hold are
+real evidence/external-action boundaries. Do not substitute a fixture,
+renamed consumed request, narrower study or green dummy backtest.
+
+### 214.4 Qualified candidate, prospective fixes and exact source images
+
+All new original64 sources/tests are now frozen for combined qualification.
+No actual root/body or credential/provider/QC was opened by either author or
+advisory reviewer. Pure parser directly validates both role topologies and
+full original/header/XML identities; the new consumer conserves all source
+rows/old dispositions rather than manufacturing frozen projections. Parent
+holds authenticated OLD baseline metadata/full immutable roster and exact
+64 selected capture-result controls BEFORE a fresh claim; worker independently
+rechecks those facts after native denial. New output readback independently
+recounts every metadata row/ledger/form/disposition and matches copied lineage,
+not simply coherent summary counts or a worker assertion.
+
+| New-candidate finding | Correction / evidence; no historical-cause claim |
+|---|---|
+| IBORIG-21401 / P3 | Parser accepted a canonically equivalent but byte-mutated context. Add explicit canonical context-byte equality in addition to full original and factory-payload reparsing. Meaningful context reversal caught; no source rewriting or authenticity claim. |
+| IBORIG-21402 / P2 | Main found initial fresh-output control reads still called a strict-ctime legacy reader despite settled held-output policy. Replace ONLY the NEW output wrapper's initial control read with FD-relative version/size/private-custody/full-hash checks omitting output ctime. Genuine benign ctime-only change is accepted; inode/mode/mtime/content/extra-name mutations refuse. Old source/control intake remains strict, no frozen helper changed. |
+| IBORIG-21403 / P2 | Advisory QA found final metadata readback checked executed source rows but not the complete recomputed execution wrapper, and only syntax-checked old baseline assessment/accounting digests. Require full wrapper equality and both exact authenticated baseline digests. Faithful reversals caused5 and1 DID-NOT-RAISE failures; restored runner69 passed1.61s. Proposed missing copied census check was a FALSE ALARM: it already existed, not a repaired defect. |
+| IBORIG-21404 / P2, prospective control | Native Keychain-exec probe initially used posix_spawn under denied forks. That failure alone did not independently observe exec denial. Probe direct harmless security help via execve; only EPERM/EACCES passes, unexpected execution replaces worker and cannot emit a success receipt. No Keychain item is read. Production policy already denies execution except the bound Python bootstrap. |
+
+Parser author's final214 focused checks passed0.47s; four memory-only
+reversals caught owner/XML agreement(two cases), blank-boundary, accession-key
+and coherent context mutation. A single hash-guard deletion remained refused
+by a separate later hash check; layered defense was not misreported a bug.
+Pure sources/tests received read-only advisory QA with no additional material
+finding. Runner author's184 focused checks passed4.22s with8/8 meaningful
+memory reversals (full roster/execution wrapper/baseline pins/capture anchors/
+output hash/fixed64 header profile/genuine type/isolation-before-input).
+Independent internal peer183 focused checks passed4.40s, plus the specific
+5+1 reversal failures above. Those overlapping selections are NOT summed
+and none is an independent Claude review or actual retained-root operation.
+
+Main independently passed214 parser/frozen-contract checks1.55s. Its expanded
+seven-path run first observed333 passed/4 failed9.02s: the TEST-LAUNCH profile
+denied fork, so four OLD invented bootstrap tests could not create their
+intended child. This was a harness topology error, not a semantic regression.
+With parent forks allowed while OS process-tree network/Keychain-exec/repo-
+write denial remained inherited, the exact selection passed337 in6.94s.
+No product source was changed for this correction. Actual worker native
+fork denial remains binding. A separate main INITIAL-profile invented
+probe passed0.964s: actual native network/fork/direct-security-exec/outside-
+write denial plus allowed fresh-output write; no retained input opened.
+Final combined/document/compile/diff checks follow before clean commit.
+
+| Source/test | SHA256 |
+|---|---|
+| research/insider_buying_sec_early_original_parent_v1.py | 8b1e2de2cfb29cd109888ba9f900e1df03203316a5234e4d4aa428b4cc64c345 |
+| tests/test_insider_buying_sec_early_original_parent_v1.py | edc3d04ce03b44f76732fb23a43756bd57d418aaf779280e56804efa23be83fb |
+| research/insider_buying_sec_2006q1_original_admission_v1.py | 810e03ccd6e50082d04fe29bb60041cfa111f8d00b5c6193406a569bd851faa1 |
+| tests/test_insider_buying_sec_2006q1_original_admission_v1.py | c404f5fcb2c606c4a33605b3aab77c432bb2d9c1e2be3757f7ffe4e92574a67a |
+| research/insider_buying_sec_2006q1_original_admission_runner.py | 6777f473edac35f4672fe7c0cff540b192cb5368d324c34d832dd22d6288f4b2 |
+| tests/test_insider_buying_sec_2006q1_original_admission_runner.py | a0a73b855902ead3ffdcbf20ed0e9c028af6209e17dd85bf347d9b8b45d4d9b0 |
+
+Current technical scope is structural_original_corroborated_noncanonical,
+not canonical original-parent admission. Production counts use explicit
+structurally_bound names. All source/authenticity/PIT/rights/readiness gates
+stay false. This deliberately distinguishes genuine new full-original
+structural parsing from the old inner-view-only bridge without claiming
+that64 originals complete the full quarter or the frozen study.
+
+## 215. Owned EODHD alternative: one historical PRICE-DATE scalar preregistration (2026-10-24)
+
+Do NOT turn the confirmed5-Year Sharadar tier into a requirement to buy an
+upgrade before checking already owned alternatives. The owner previously
+confirmed paid EODHistorical plusCalendar subscriptions and directed use of
+existing providers before additional purchases. Under that continuing
+delegation, qualify ONE narrow historical-price DATE capability, not a
+financial-value capture or outcome/research look. This is separate from
+214's retained-original work and all consumed EARNINGS intervals.
+
+Fresh official [EOD endpoint documentation](https://eodhd.com/financial-apis/api-for-historical-data-and-volumes)
+documents inclusive from/to, daily ascending history and the exhaustive
+`filter=last_date` scalar. [Delisted documentation](https://eodhd.com/financial-apis/delisted-stock-companies-data-2)
+describes retained delisted history and separate symbol-list discovery.
+The public [EODHistorical plan](https://eodhd.com/)
+advertises30+ years. These are product claims, NOT measured full-population
+coverage, this account's current entitlement, terminal-payment treatment,
+historical ticker identity or readiness. Do not bypass unknown coverage with
+current aliases or assume a current delisted-symbol list is a PIT universe.
+
+New fixed profile: exactlyONE GET to`https://eodhd.com/api/eod/A.US`,
+from2005-01-01,to2006-01-31,periodd,ordera,filterlast_date,fmtjson, using
+ONE locally configured EODHD Keychain credential at most. A.US is a public
+availability-control symbol, NOT a selected strategy security or certified
+historical-identity link. Record a redacted fixed URL/template only; token
+query, request exception, headers/body and credentials never enter logs/Git/
+stdout. Require exact production context/started journal, current clean
+committed source closure, input/output identities immediately before opener.
+No proxy/redirect/retry/fallback/paging,15s/4KiB. Non200 bodies are never
+read/hashed/retained. Screen bounded credential-echo encodings before any
+retention/hash, then accept only a lexically exact single valid ISO date
+in the declared window (optional JSON quotes/one newline as explicitly
+tested). Never parse a returned OHLC list, financial number or error as a
+valid scalar; refuse ignored-filter/schema/empty/truncation/oversize safely.
+
+Fresh fixed private namespace:
+`artifacts/insider_buying/eodhd_price_date_probe_v1/ib-eodhd-price-date-2006-capability-20261024-once`.
+Source qualification, meaningful native-denied focused/guard tests, exact
+hash/preregistration and clean committed HEAD precede actual activation.
+No writer during this or214's actual operation. Preserve any refusal/partial
+scope permanently; do not rename or redispatch it. This is a DIFFERENT
+price-date endpoint/field, not an earnings download, January2006/August2018
+retry/decomposition, financial outcome capture, missing archive workaround,
+new vendor purchase or QC access. All readiness flags false/looks/jobs/
+backtests0/0/0; date capability cannot prove prices, delistings, historical
+identity, adjustment/cashflows or full-source coverage. Keep earnings export
+and complete-parent/reference/protocol/QC boundaries separate. Record actual
+result only after observation; one final matching-lane push at the honest
+end, not an interim checkpoint or substituted completion.
+
+### 215.1 Candidate corrections, exact images and combined preactivation evidence
+
+New EODHD source25049 bytes/SHA256
+`e218cf93eb1a0afb9ec5b68435dbab331310f8441e172914df6263bb224874e5`;
+final tests21716 bytes/SHA256
+`46ee3b8e0aa83cb9c6f09696327ee36b9988308522d670dc8537c72465bbe71e`.
+Main source inspection confirmed lexical date-only parsing before source JSON
+decoding, credential-echo screening before retained-body hashes, redacted
+query-token handling, exact started/current-source checks, strict HTTP framing
+and non200 no-read, wall-clock alarm and no endpoint/filter fallback.
+No actual input/credential/provider/QC was used during candidate qualification.
+
+IBEODDATE-21501/P2 CLOSED prospectively: main found stopped CLI returned0 and
+first directory-close failure could skip parent cleanup/mask the primary.
+Four genuine pre-correction test failures1.06s; fix stopped CLIexit2 and
+drain both handles, preserving active primary and sanitized cleanup failures,
+including constructor cleanup. No old capture is relabeled by this correction.
+Final author151 focused checks passed3.39s; seven memory-only reversals caught
+credential screening(4),4KiB cap(1), fixedlast_dateURL(1), same-inode/size/
+restored-mtime content mutation(1), no-site guard(1), stoppedexit(1) and
+forbidden source JSON decoding(4). Restored23 controls passed0.07s. An initial
+copied-globals mutation harness masked the no_site spy; it was stopped and
+restored, then corrected actual-module-globals control caught the mutation.
+No false survivor is claimed. Isolated stdlib/source-only import/compile
+passed0.159s under native network/fork/Keychain-exec/all-write denial.
+
+Main's first twelve-path combined run observed651 passed/1 failed/1 intentional
+native-topology skip11.59s. The existing direct-transport boundary correctly
+required an explicit opener tripwire in the new negative fixture-callback
+test. Author added that must-not-open patch only; productione218 unchanged.
+Exact fixture/boundary pair passed2 in1.86s. Internal peer's final152 focused
+checks passed2.97s, including the tripwire boundary; extra reversals caught
+non200-body-read(5) and duplicateContentLength(1), restored final green.
+
+Main FINAL twelve-path combined qualification passed652 with1 intentional
+native-topology skip in12.24s: all SEVEN new source contract/regression files,
+Keychain, lane record, active documents, import boundaries and EXACT Insider
+package guard. No complete lane/repository suite, no warnings. The skip is
+the previously documented nested Seatbelt topology test, not actual native
+isolation evidence; main's separately observed initial-profile proof in214.4
+is distinct. All FOURTEEN new source/test images compiled in memory under
+native network/fork/all-write/Keychain-exec denial; new original runner and
+EODHD source imported with-I/-S/-B/emptycache without site packages. No actual
+input was opened by compilation/import. Images match212.5/213.3/214.4 and the
+two current EODHD hashes above. Historical four-v3 byte comparison, diff,
+namespace freshness and exact root/branch/HEAD/expected nine-path status plus
+matching-only remote verification precede commit. Actual214/215 operations
+remain unexecuted until that already-existing clean commit is obtained.
+Require-I/-S/-B in the actual parent commands too; EODHD additionally requires
+the exact `/var/empty/insider-eodhd-price-date-no-bytecode` cacheprefix.

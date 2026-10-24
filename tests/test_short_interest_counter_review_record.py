@@ -132,3 +132,21 @@ def test_latest_counter_review_status_does_not_open_source_or_qc_gates():
     assert "No next milestone" in current
     assert "including capacity/metadata" in current
     assert "No provider, credential, private capture or QC access" in current
+
+
+def test_existing_subscription_build_preserves_entire_previous_counter_review():
+    text = _text()
+    start = text.index("## 121. Codex counter-review only")
+    end = text.index("## 122. Owner-resumed existing-subscription build")
+    original = text[start:end].rstrip() + "\n"
+    assert hashlib.sha256(original.encode()).hexdigest() == "c9ad8afe3da38c5a9d1e50e0bcbe7e80cfac181b8f64d309ad79d3975a7304e1"
+
+
+def test_existing_subscription_build_has_exact_new_authority_and_finite_preflight():
+    current = _text().split("## 122. Owner-resumed existing-subscription build", 1)[1]
+    for value in ("SI-AUTH-20261024-02", "SI-DEC-20261024-02", "six requests",
+                  "393,216", "No QC access", "No purchase", "one final push",
+                  "6d1013dbe2f6fd1cf3e1d5123c9adb63d59ac2334d66b44251986ce00d8788bd"):
+        assert value in current
+    assert "old count/daily claims remain spent" in current
+    assert "No signal/outcome join" in current

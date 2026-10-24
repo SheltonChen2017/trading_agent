@@ -12,6 +12,8 @@ import stat
 import subprocess
 import sys
 from urllib.parse import unquote_to_bytes
+from urllib.parse import urlencode
+from urllib.request import Request
 
 KEYCHAIN = Path('/Users/sheltonchen/Library/Keychains/login.keychain-db')
 ITEMS = {
@@ -47,6 +49,16 @@ class KeychainSecret:
     def for_authorization_header(self) -> str:
         """Release only to the fixed HTTPS runtime's in-memory header builder."""
         return self.__value
+
+    def eodhd_internal_user_request(self) -> Request:
+        """Exact documented account-metadata route; never a general URL accessor.
+
+        The query credential exists only in the in-memory Request. Callers must
+        never serialize/hash/log that Request or exception text containing it.
+        """
+        return Request('https://eodhd.com/api/internal-user?' + urlencode({
+            'api_token': self.__value, 'fmt': 'json'}), method='GET',
+            headers={'Accept': 'application/json'})
 
     def echoed_in(self, raw: bytes) -> bool:
         if type(raw) is not bytes:

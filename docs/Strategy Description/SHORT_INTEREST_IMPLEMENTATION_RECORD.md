@@ -1,23 +1,21 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CODEX COUNTER-REVIEW OF `cc1e44f` COMPLETE; ACCEPTED AFTER DOCUMENTATION CORRECTION
-(SECTION 121). CLAUDE'S EXACT-CHECKPOINT REVIEW OF `66fb823` AND THE CACHE FIX
-ARE ACCEPTED; THREE P3 RECORD ERRATA ARE APPENDED, NOT REWRITTEN INTO SECTION 120.
-`SI-CCR23-003` REMAINS PARTIALLY CORRECT, NOT A FULL DUPLICATE-HEADER PROOF.
-TWO HISTORICAL QC METADATA REQUESTS AND FIVE NYSE CALENDAR GETS REMAIN ACCOUNTED
-FOR. LOCAL SOURCE QUALIFICATION REMAINS INCOMPLETE: COUNT 48 START DEBITS /47
-HTTP; DAILY 3,586 START DEBITS /3,585 HTTP, 593 OF 1,169 DAY CHAINS COMPLETE.
-BOTH ORIGINAL CLAIMS REMAIN SPENT. COUNT'S RECOMPUTED FILE MANIFEST IS NOT A
-PERSISTED ORIGINAL RETURN INVENTORY; DAILY HAS SEPARATE CLAIM/INVENTORY/CLOSURE
-FILES. NEITHER REFUSED SUBSET IS BACKTEST INPUT. SIX P2s AND FOUR P3s REMAIN
-OPEN AS ENUMERATED IN 121.3, INCLUDING THE UNRESOLVED DAILY FAILURE CAUSE.
-QUANTCONNECT PAUSED BY OWNER, INCLUDING CAPACITY/METADATA ACCESS, UNTIL RELEASE.
-NO PROVIDER, CREDENTIAL, PRIVATE CAPTURE OR QC ACCESS THIS COUNTER-REVIEW.
-NO NEXT MILESTONE OR FULL LANE/REPOSITORY SUITE. LOOKBACKS 20/60/120/252
-UNSELECTED; CANONICAL ACTUAL LOOKS 0/0, EXPLORATORY ACTUAL LOOKS 0, ALPHA 0,
-PERMANENT LOOK IDS NONE, QC LAUNCH ATTEMPTS0. NO HOLDOUT, ETF, PURCHASE,
+Status: **OWNER-RESUMED EXISTING-SUBSCRIPTION BUILD ACTIVE (SECTION 122),
+TOWARD LOCAL BACKTEST READINESS OR A CONCRETE FACTUAL BLOCKER; NO PURCHASES
+AND NO QC ACCESS. FOUR EXACT NAMED KEYCHAIN PREFLIGHT READS SUCCEEDED,
+ZERO PROVIDER HTTP; A NEW SIX-REQUEST ACCESS PROTOCOL IS FROZEN BELOW BUT
+NOT YET EXECUTED. LOCAL SOURCE QUALIFICATION REMAINS INCOMPLETE: ORIGINAL
+COUNT 48 START DEBITS /47 HTTP; DAILY 3,586 START DEBITS /3,585 HTTP,
+593 OF 1,169 CHAINS COMPLETE. BOTH ORIGINAL CLAIMS REMAIN SPENT. NO REFUSED
+SUBSET OR METADATA RESPONSE IS BACKTEST INPUT. CODEX COUNTER-REVIEW OF `cc1e44f` COMPLETE;
+ACCEPTED AFTER DOCUMENTATION CORRECTION (121); ITS HISTORICAL FACTS AND LEDGER
+ARE PRESERVED. TWO HISTORICAL QC METADATA REQUESTS AND FIVE NYSE CALENDAR
+GETS REMAIN ACCOUNTED FOR. QUANTCONNECT PAUSED BY OWNER INCLUDING
+CAPACITY/METADATA; NO NEW QC REQUEST. LOOKBACKS 20/60/120/252 UNSELECTED;
+CANONICAL ACTUAL LOOKS 0/0, EXPLORATORY ACTUAL LOOKS 0, ALPHA 0, PERMANENT
+LOOK IDS NONE, QC LAUNCH ATTEMPTS0. NO OUTCOME JOIN, HOLDOUT, ETF,
 BROKER, OPERATOR DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL, REAL ORDER OR
-TRADING ACTION.**
+TRADING ACTION. ONE FINAL PUSH ONLY AT ROUND END.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -20879,3 +20877,152 @@ A second Codex child read the final correction diff and found no material
 issue after the future-publication wording was narrowed. Final post-note
 focused controls, exact scope and remote/status checks precede commit/push;
 the actual successful final publication is reported afterward.
+
+## 122. Owner-resumed existing-subscription build — 2026-10-24 UTC
+
+### 122.1 Later authority and unchanged exclusions
+
+**SI-AUTH-20261024-02** records the owner's later direct instruction:
+“Proceed with steps1–4 using my existing subscriptions. Do not access QC or
+buy anything. Build until backtest-ready or a concrete blocker, document
+progress, and push only once when done.” This activates the existing-source
+access audit, safe new recovery, historical-input qualification and local
+preparation described in the preceding advice. It supersedes121's historical
+counter-review-only stopping scope, not121's evidence or source gates.
+No QC access includes capacity, account metadata, history, project, upload,
+compile, job and backtest. No purchase, renewal, upgrade, terms acceptance,
+new credential, email, other-lane, broker or real-order action is authorized.
+
+Starting physical/Git root is the designated Short Interest worktree, branch
+`codex/strategy-short-interest`, clean local/tracking/actual matching origin
+**b211db7f81103df9cc3d736a05a4cc82d8efe4b0**. There is no new remote Claude
+commit to counter-review. Work stays here; local commits accumulate for
+**one final push**, never an intermediate or other-branch publication.
+Shared/project documents and SESSION_HANDOFF remain frozen.
+
+The public-document/record audit is a capability assessment, not authenticated
+entitlement or data admission. Relevant official sources: [Sharadar FAQ](https://sharadar.com/docs/faqs),
+[EODHD dividend fields](https://eodhd.com/financial-apis/api-splits-dividends),
+[EODHD share semantics](https://eodhd.com/financial-academy/financial-faq/fundamentals-glossary-common-stock),
+[Massive dated reference semantics](https://massive.com/docs/rest/stocks/tickers/ticker-overview),
+[FMP documentation](https://site.financialmodelingprep.com/developer/docs).
+Current reference identifiers are not backdated availability facts; report
+period is not filing publication; historical issuer/diluted shares are not
+same-class basic shares. Sharadar's public merger-consideration support must
+not be denied by a blanket missing-fields claim, but it does not establish
+every payment/election/CVR outcome. Ordinary dividend modeled availability
+remains the separately frozen first XNYS open after the provider pay day;
+no new actual-bank-UTC requirement is invented. No private Sharadar usability
+conclusion or reconstructible row is published.
+
+### 122.2 Actual credential preflight and prospective access freeze
+
+Main made exactly **four** named login-Keychain availability reads at unchanged
+B211: Sharadar, EODHD, Massive and FMP, each once via the existing protected
+`read_named_keychain`. All returned the redacted secret wrapper successfully;
+**zero provider HTTP**, no value/length/hash/credential output or fallback.
+Physical/Git root, branch, HEAD/status and actual matching remote were checked
+around each read. This proves accessible saved credentials, not validity,
+active subscription, historical access, source rights or source coverage.
+
+**SI-DEC-20261024-02:** freeze a new independent access audit before any new
+provider request. Exact code is
+`scripts/audit_short_interest_provider_access.py`, with the narrowly scoped
+no-argument EODHD query-request builder in `short_interest_keychain.py`.
+The builder targets only the documented account route; it is not a general
+query-secret accessor. [EODHD User/OpenAPI](https://eodhd.com/financial-apis/user-api)
+documents query authentication. The key-bearing Request/URL, error headers,
+error bodies and exception text are never serialized, hashed or printed.
+
+| Ordinal | Fixed source-only request | Maximum |
+|---|---|---|
+| 1 | Sharadar stocks file status, `status=True&years=full`, x-api-key header | 65,536 bytes; one invocation |
+| 2 | EODHD `/api/internal-user`, fixed in-memory query authentication | 65,536 bytes; one invocation; no account body or body hash retained |
+| 3 | Massive ticker types, stocks/us, Bearer header | 65,536 bytes; one invocation |
+| 4 | FMP available exchanges, apikey header | 65,536 bytes; one invocation |
+| 5 | Massive AAPL overview dated2022-01-03 | 65,536 bytes; one invocation; private source only |
+| 6 | FMP AAPL historical market cap, from=to2022-01-03, limit1 | 65,536 bytes; one invocation; private source only, not a denominator |
+
+The exact ceiling is **six requests /393,216 response bytes**,30-second
+timeout per call, zero redirects/proxies/automatic retries. Stable exclusive
+parent claim `provider-access-20261024-v1.spent.json` precedes all new key
+reads. Fixed ignored run is `private/provider_access/provider-access-20261024-v1`.
+Missing credentials or one route refusal stay negative while independently
+registered routes may still run; no fallback or restart repurposes a slot.
+Current code, HEAD/actual remote and owned retained run/parent directory FDs
+are checked before every request/hash/publication. All available secrets are
+screened in raw and decoded JSON strings/numbers before a body hash/write.
+EODHD retains only a bounded allowlisted subscription/feed/quota projection,
+never contacts, account IDs, payment fields, invitation tokens or raw body.
+
+Prospective protocol SHA256:
+`6d1013dbe2f6fd1cf3e1d5123c9adb63d59ac2334d66b44251986ce00d8788bd`.
+Complete33-file relative-path/current-byte manifest SHA256:
+`6a0a07b1d06ca6302e2bdd00aed366900bc5ac9d49c7b954197d8c5645a4e329`.
+Main independently reconstructed the static local import closure, including
+package initializers: exactly33 paths, no omissions/extras. Runtime HEAD is
+supplied externally from the clean commit containing this freeze; actual
+matching remote staysB211 until the one final publication. No future/self
+HEAD literal, caller-supplied source admission or credential hash is used.
+
+Metadata200 proves only a completed credential-bearing request, not paid-tier
+validation. A single dated response proves neither complete history nor
+publication-aware data. No source/input-ready flag becomes true. Actual audit
+results are pending and will be appended, not preclaimed here.
+
+### 122.3 Pre-access corrections, retained ledger and continuation rules
+
+| ID | Priority / verified status | Evidence and scope |
+|---|---|---|
+| SI-BUILD-20261024-001 | P1 private output custody, corrected before integration | Main identified the proposal's path-based publication could accept a replacement owned0700 directory. The author's causal replacement test was red1 failed; reuse of existing `_OwnedOutput` retained parent/run FDs is green. No actual private payload or request existed in the flawed draft. |
+| SI-BUILD-20261024-002 | P1 possible credential echo, corrected before integration | A numeric secret reflected as a JSON exponent escaped raw/string-only screening. The author's regression was red1 failed/20 deselected; bounded Decimal/int normalized screening corrects it before any hash/persistence. No real credential echo occurred. |
+| SI-BUILD-20261024-003 | P3 access attribution, partially correct/corrected | A draft metadata200 observation said credential_accepted. Independent review correctly narrowed it to completed credential-bearing request; paid/independent credential validity remains unverified. Historical route observations are separately labeled source-only. |
+
+The author's final new-provider/keychain focused selector is **44 passed
+in0.74s**; these are the child's results, not Main's. Another Codex child
+independently checked the33-path closure, final privacy/custody and narrow
+authority, finding no remaining material issue; it made no provider/key call.
+Main compiled the three changed Python files in memory and independently
+recomputed both digests above. Main's two new public-record checks were red
+**2 failed,14 passed in0.84s** before this appended section. Main's integrated
+focused validation follows before the first local freeze commit; no full
+lane/repository suite is run or claimed.
+
+All existing confirmed, partial and false-alarm findings remain retained,
+including121.3's six open P2s/four P3s and the unknown original47/daily3539
+causes. The **old count/daily claims remain spent**, as does the original
+12-request master. The new six-request audit is a distinct finite budget,
+not their reset or resumption. No signal/outcome join, return/performance,
+new actual look, permanent look ID or alpha allocation occurs in access work.
+Canonical looks0/0, exploratory actual looks0, alpha0 and QC attempts0;
+lookbacks20/60/120/252, structural normalization, release-next-open and all
+48-book economics/protected dates remain unchanged.
+
+Recovery planning must verify original immutable bytes and negative receipts
+before freezing a child scope. A full count child may separately re-observe
+original position47 and request unstarted49..81875 with a new local-to-original
+mapping/claim; it must preserve the old47 failure and new retrieval time,
+never complete the original claim synthetically. Daily recovery must preserve
+the exact completed-day set, not assume593 is a prefix, and separately recover
+the576 missing/incomplete chains with cumulative request/byte/row budgets.
+Neither held suffix nor complete-only replay draft is activated by filling
+pins or relabeling a refused parent. Large captures wait for verified route
+access, rate/budget and denominator semantics rather than assuming metadata
+success. Latest-revised qualification remains distinct from canonical
+original-vintage requirements; unknown source facts cannot be waived.
+
+Continue steps1–4 under the owner's scope until local readiness or a concrete
+blocker, without a new blanket permission/institution demand. Do not bypass
+the actual-input refusal, upload to a cloud service or execute a strategy
+look merely to make a run complete. No purchase, no QC access, no other-lane
+interference. Subsequent actual observations and exact validation/progress
+are appended here before the one final matching-lane push.
+
+Main's pre-access six-file focused selection passes **149 tests in7.43s**,
+zero skips/warnings, CPython3.13.15/pytest9.1.1, empty inherited environment,
+macOS sandbox and socket network denial. It covers the new access runtime,
+existing named Keychain, public record, lane/ML import boundaries and active
+documents. Four changed Python files compile in memory; exact prior121
+preservation and diff check pass. This first local commit freezes code and
+authority before any new provider HTTP; it is not a push, source completion
+or independent Claude acceptance. The six observations remain pending.

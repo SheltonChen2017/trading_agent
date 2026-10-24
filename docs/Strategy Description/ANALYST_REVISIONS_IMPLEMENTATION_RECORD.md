@@ -684,6 +684,11 @@ post-Mia recovery caller are implemented and focused-tested, both uninvoked.
 A1/A2/A3 remain spent and the booked floor is unchanged.
 Normal independent review applies unless the owner separately waives this new
 recovery; no additional launch authority is inferred from the old waiver.
+Section 312 records the owner's fresh explicit waiver and exactly one additional
+post-Mia attempt. D1's one-shot current-idleness observation is frozen before
+use; A4 remains conditional on its valid idle/zero-backtest result and a separate
+committed D2 decision. The ordinary three-attempt ceiling and all prior failures
+remain; no new technical gate is waived. Monitor remains PAUSED.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1816,6 +1821,12 @@ the exhausted three-attempt allowance is not silently renewed. No old caller,
 reader, worker or backtest is replayed; A2/A3/reconciliation control leaves stay
 unread. A future fresh admission intentionally authenticates pinned family/D15
 evidence and package payloads, not a repeated old operation. Monitor remains PAUSED.
+Section 312 supersedes the pending-approval barrier: the owner explicitly waives
+Claude review of section 312 for this recovery and permits one additional A4
+attempt. Execute only the separately frozen D1, then bind its actual successful
+idle/zero-backtest result into a separate D2 freeze before unchanged A4 use.
+Any ambiguity or failed gate stops; no old attempt is renewed, and no broader
+future waiver or fifth attempt is authorized.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -3761,6 +3772,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-24 UTC | Actual R298 evidence success, A2 refusal and bounded Mia diagnosis | `0b054ddf` -> `dfa3490a` -> section309 final result | No new Claude range; current waiver consumed, not independent acceptance | D1 exit0 authenticated A1; D2 exit2 remote_refused; A2 consumed; Mia reports unchanged four filenames/sizes and zero backtests but lacks raw metadata | Actual bounded channels and unchanged-source control flow; record checks below; no operational replay or full suite | 316/241/50/699; no accepted result; exact failing label lost and remote effects not independently authenticated | Preserve all evidence; separately gated offline marker/receipt reconciliation before any A3; one final push, monitor PAUSED |
 | 2026-10-24 | Owner-scoped reconciliation and final R298 recovery refusal | `f9fd0932` -> `e3d53276` -> `0a2400d7` -> this record commit | No incoming Claude range; explicit scoped waiver now consumed, not independent review | D1 authenticated zero-recorded-RPC A2 prefix; corrected real projection ID; A3 refused code_running before mutation/compile/launch; all attempts spent | 376 distinct focused passes5.72s; record repeats overlap; no full suite; actual exit/pins in310 | Booked317/242/50/699; no result cell; raw codeRunning value unknown; user-concurrent Safari prevented reading final Mia reply | Mandatory stop/Mia checkpoint, no A4; one final matching-lane push; monitor PAUSED |
 | 2026-10-24 | Post-Mia R298 idleness diagnosis and exact-source recovery preparation | `7c462a01` -> section311 round | No incoming Claude review; scoped new waiver/extra attempt requested, not assumed | Mia reply qualified; supported UI stopped only R298's code environment; additive observer and A4 candidate implemented but uninvoked | 472 focused implementation/helper passes plus record checks below; expected-red sensitivities retained; no old operational replay or full suite | A1/A2/A3 spent; floor317/242/50/699 unchanged; API idleness and current source unverified | Review or scoped waiver plus exact new run freeze before contact; one final matching-lane push; monitor PAUSED |
+| 2026-10-24 | Scoped owner waiver and one additional post-Mia R298 attempt | `45a96f61` -> section312 round | Current explicit waiver, not independent acceptance; no incoming review | Freeze unchanged D1 first; exact-source A4 conditional on a separate D2 decision | Current pins and focused record checks; actual results recorded below | Floor317/242/50/699 until actual A4 claim; old attempts stay spent | Restore only exact frozen source and obtain own running status if gates pass; one final push; monitor PAUSED |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -52752,3 +52764,75 @@ warnings; it repeats the same558 distinct cases and is not additive coverage.
 The final nonforce matching-lane push follows root/branch/HEAD/status/live-remote
 verification; its resulting SHA and local/tracking/live agreement are reported
 externally, without an acknowledgement-only follow-up commit or second push.
+
+## 312. Scoped post-Mia execution waiver and one additional R298 attempt, 2026-10-24
+
+### 312.1 Owner decision and immutable starting point
+
+The owner now states: "Yes, skip Claude review for this recovery and use one
+additional attempt. Upload the 7 missing modules, replace the stub and main.py
+with the exact code, and proceed until the backtest is running." The owner also
+permits consulting Mia. This explicitly resolves311.6's two pending choices
+for the current post-Mia recovery only. It is not independent acceptance,
+technical/source-gate clearance, a new ordinary attempt ceiling, a fifth attempt
+or a blanket future review waiver. A1/A2/A3 remain spent. Mia consultation, if
+needed, must stay in the exact authenticated project and not authorize unrelated
+edits, alternate strategy economics or another launch by implication.
+
+Starting clean local/tracking/live matching head is
+`45a96f61b44777ec1030760b441ccbc134b7c65a`. There is no incoming Claude commit.
+All repository work remains in the designated Code-root worktree and lane
+branch. Shared/root documents remain frozen; monitor stays PAUSED. Accumulate
+this round locally and make exactly one final matching-lane push. Source/test
+files and all311.5 pins remain unchanged. Prior558 focused passes are historical
+implementation evidence, not an operational success or repeated count.
+
+### 312.2 D1 exact one-shot post-stop metadata observation, before use
+
+Under the current explicit waiver, authorize exactly ONE invocation of
+`scripts/observe_arv2_r298_idleness.py` at the clean commit containing this D1
+freeze. Bind `--expected-head` to that commit and `--caller-sha256` to
+`b2b62f12d669753e765c183a2811ba3a9353066e52e447c67d660577946c662a`.
+Canonical profile is
+`c3a82a0fc5a4272c46280a2b40dfaff12990260b0e67ad3369e86e393c6c77d2`;
+all five selected source pins stay fixed. Compatible host is only Darwin/POSIX
+Python3.13 at `/Users/sheltonchen/.venvs/trading_agent-py313/bin/python`,
+with explicit designated root cwd, `-B`, exact clean branch/HEAD and no concurrent
+work. The fixed leaf remains
+`artifacts/analyst_revisions_v2/newrule_idleness/R311-20261024-A`; it is not
+inspected or allocated in preparation. No before-stop API measurement exists.
+
+The operational parent gets a minimal allowed environment: fixed PATH/LANG,
+in-root `.pytest_cache` temporary/cache paths, PYTHONDONTWRITEBYTECODE=1, and
+only the two existing QC credential variables passed in memory. No values are
+printed or placed in argv, and no new Keychain/token-file lookup is needed.
+Do not pass pytest/plugin/debug/PYTHONPATH or unrelated inherited variables.
+The unchanged observer enforces its60-second deadline, exclusive claim before
+credentials/contact, ordered two metadata calls, finite state/false flags and
+no mutation/capacity/compile/launch endpoints. No shared/development look is
+added. Duplicate/partial/unknown claim is consumed/ambiguous, never retried.
+
+External process observation is bounded to75seconds and64KiB per channel. It
+records actual child exit, UTC dispatch/completion brackets, stdout/stderr
+lengths and SHA256. It may kill/reap only its own child on deadline/size failure.
+No raw buffers are printed. A separate credential-free native-network/artifact-
+read/write/Keychain-denied validator receives stdout via stdin, requires empty
+stderr externally and applies the unchanged pure validator for exact actual
+exit0 (canonical single-LF success) or exact exit2 (finite failure). That
+validation is itself bounded to15seconds. Unknown output is hash/length only.
+Actual exit is an observed process fact, never supplied as assumed zero; a
+report alone is insufficient. The successful envelope/report pin is internally
+authenticated by canonical reconstruction, not a new private artifact reread.
+
+D1 permits no upload or launch. Only a validated actual exit0 result with
+present boolean codeRunning=False and zero prior backtests may support a
+separate committed D2 decision. Any other result stops without consuming the
+additional strategy attempt, while preserving the spent observation claim.
+A false result supports the editor-session hypothesis but cannot retrospectively
+prove A3's rejected field or its cause. All formal/PIT/readiness flags stay false.
+
+Pre-freeze record/active-document checks passed86 in0.91s under the existing
+native network/artifact/Keychain denial and in-root support discipline. Both
+current source/profile pins and all5/73 selected dependency pins match; imports
+exclude assistant.dispatch_fence. No operational entrypoint was invoked during
+these checks; no full suite or repeated historical operation ran.

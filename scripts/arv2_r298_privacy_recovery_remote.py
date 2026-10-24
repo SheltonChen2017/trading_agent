@@ -256,4 +256,3 @@ class PrivacyRecovery(post_mia.PostMiaRecovery):
 
 # Preserve the caller's injected-policy interface without modifying old modules.
 OwnerRecovery = PrivacyRecovery
-

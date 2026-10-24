@@ -53888,3 +53888,33 @@ failure and any known launch/status receipt, never success. Unknown validation
 prints only finite lengths/hash/context, not raw buffers. All formal/paper/PIT/
 accepted flags remain false even on running/Completed. status. No next family
 cell, funded/broker/real-order/paper/live action or efficacy claim is authorized.
+
+### 313.6 Pre-use formatting correction and final exact pins
+
+Commit `4fe89ff999d5a5221c5590b09ccb33369d9c682e` records the implementation and
+initial freeze, but was NOT invoked. Its staged diff check reported one extra
+blank EOF line in the new helper and its test; the shell command then continued
+to commit. This is disclosed rather than calling that staged check green.
+Before any operation, remove only those two final blank lines and explicitly
+update the new caller's helper source binding. No executable logic, old frozen
+source, protocol allowance, output leaf or strategy source changes. This is a
+prospective pre-use pin correction, not automatic refresh of drift or renewal
+of a consumed attempt.313.5's initial exact pins are superseded for the sole
+still-unused A5 by the following, with all its remaining conditions unchanged:
+
+- Helper14551bytes SHA256 `5be59e13e760c6e7deacdf5fe9296968ad40a3d4140a9e544ec3de7d41b6a5fd`.
+- Caller34457bytes SHA256 `98ce1ee2a2d8a54523e383d9ca578575ad2c2510a171f2d772e2144de92d0e98`.
+- Helper tests30702bytes SHA256 `dce2765a698c8fa4559ffaf46878b04cd2342264433e4cdd6ed130e9cd06bfc9`.
+- Caller tests57224bytes remain `aad7c05afc471b5347cd12ec392158f08db5158aa4f7e7da46fb4657e9bcbfd5`.
+- Final canonical profile SHA256 `fecc7cda952546563d7f4e7308079a1482d358da9418362e423c599c87fbe7f0`.
+
+Use ONLY the clean commit containing this correction as --expected-head and
+98ce1ee2a2d8a54523e383d9ca578575ad2c2510a171f2d772e2144de92d0e98 as
+--caller-sha256. The prior unused freeze must not be run. Root native-denied
+memory compilation and all77 selected pin checks passed after this correction;
+dispatch_fence stayed absent. The pre-freeze86record repeat1.02s overlaps547.
+No credential/private/control/QC operational access or attempt occurred during
+this correction. The single final push instruction is unchanged.
+The final exact corrected tree passed the same547distinct focused selections
+in12.56s with no failures/skips/warnings; this fully overlaps the earlier547,
+not1094passes. Final diff checks now pass.

@@ -37,7 +37,7 @@ FALSE_FLAGS = dict(a3.FALSE_FLAGS)
 WORKERS = ('admission-initial-worker', 'admission-launch-worker', 'admission-final-worker')
 NEW_PINS = {
     'scripts/run_arv2_r298_owner_recovery.py': '02a2464c3dc04eea24e75791e9f7f4d7d33cd6febacacad2b9443147e53a9a41',
-    'scripts/arv2_r298_privacy_recovery_remote.py': 'ec64870a0f097a644a1505d666c76239980c8b2d92f998ba9ff6dbd8536d4dd1',
+    'scripts/arv2_r298_privacy_recovery_remote.py': '5be59e13e760c6e7deacdf5fe9296968ad40a3d4140a9e544ec3de7d41b6a5fd',
     'scripts/run_arv2_r298_post_mia_recovery.py': '6c592c76e4b35b1b496907f532221c4f49a20ae536a387968fef873f2f362706',
     'scripts/arv2_r298_owner_recovery_remote.py': '570bdf830aa8b06e68c99a1c6a1c19662837d965e18c793a62e8ea965020b85b',
     'scripts/run_arv2_r298_final_recovery.py': 'ba555b6f639555285bb3022a8c53a963b80794b702377064d18762bb576cb783',

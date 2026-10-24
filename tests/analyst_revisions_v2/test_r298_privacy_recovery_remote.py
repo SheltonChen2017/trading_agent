@@ -200,7 +200,6 @@ def test_dedicated_owner_is_exact_typed_and_matches_owner_id(cloud, field, value
         cloud.runner.inspect()
     assert [endpoint for endpoint, _ in cloud.calls] == ['projects/read', m.COLLABORATION_ENDPOINT]
 
-
 @pytest.mark.parametrize('rows', [None, [], [False], [{'owner': True}, {'owner': True}], [{}]])
 def test_dedicated_exactly_one_complete_owner(cloud, rows):
     cloud.dedicated['collaborators'] = rows

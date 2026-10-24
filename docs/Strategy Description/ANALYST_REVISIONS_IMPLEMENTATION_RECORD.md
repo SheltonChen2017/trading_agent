@@ -688,10 +688,17 @@ Section 312 records the owner's fresh explicit waiver and exactly one additional
 post-Mia attempt. D1 is SPENT after a collaborator refusal; D2 is SPENT after
 observing codeRunning=False and two collaborator entries. The UI labels the
 extra entry Mia; the owner's specifically approved removal failed with
-Collaboration not found. Mia cannot authenticate its provenance. The own editor
-session was stopped again; dedicated collaboration-record diagnosis is next.
-A4 remains unused and requires fresh satisfactory technical evidence and a
-separate committed run decision.
+Collaboration not found. D3 is now SPENT: the dedicated view contains only the
+owner, while the general view also contains the exact Mia row. Its true
+codeRunning observation coincided with a subsequently owner-confirmed manual
+default sample run. That run is preserved/excluded from Analyst results and
+booked once; floor318/243/50/699. The owner explicitly freed R298/Safari again;
+its code environment was stopped. The prospective exact-owner/manual-history/
+supported-edit-lock recovery adaptation is implemented and synthetic-tested.
+The valid cross-ledger identity gate now exposes the manual run's missing shared
+census entry; narrowly scoped append-only authority is requested, not assumed.
+A4 remains unused pending that resolution, fresh satisfactory technical evidence
+and a separate committed run decision.
 The ordinary three-attempt ceiling and all prior failures remain; no new
 technical gate is waived. Monitor remains PAUSED.
 
@@ -1830,9 +1837,16 @@ Section 312 supersedes the pending-approval barrier: the owner explicitly waives
 Claude review of section 312 for this recovery and permits one additional A4
 attempt. D1 and D2 are spent. D2 observed exact boolean codeRunning=False but
 two collaborator entries, not sole ownership; the UI Mia-removal failed.
-The next distinct investigation is the dedicated collaboration-record endpoint,
-with separate source/claim/run freeze and no permission or file mutation.
-A4 remains unused pending fresh acceptable guards and a separate run freeze.
+D3 then observed sole owner in the dedicated list and the exact additional Mia
+row only in general metadata. The owner confirmed the intervening manual
+default sample and freed R298/Safari; its editor session is stopped again.
+Section312.11 defines prospective exact-owner/manual-history/edit-lock recovery
+adaptation, not permission to remove guards or reuse D1–D3. Floor318/243/50/699
+includes the owner manual outcome once. The adaptation is implemented in312.12;
+all401 new tests pass, but the record-to-shared-ledger identity gate correctly
+fails for that manual run. Next is the requested narrow append-only accounting
+authority, then the exact run freeze if the gate is resolved. A4 remains unused;
+no shared-file permission or operational success is inferred.
 No old attempt is renewed, and no broader future waiver or fifth attempt is
 authorized.
 V3 is spent after its
@@ -3780,7 +3794,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-24 UTC | Actual R298 evidence success, A2 refusal and bounded Mia diagnosis | `0b054ddf` -> `dfa3490a` -> section309 final result | No new Claude range; current waiver consumed, not independent acceptance | D1 exit0 authenticated A1; D2 exit2 remote_refused; A2 consumed; Mia reports unchanged four filenames/sizes and zero backtests but lacks raw metadata | Actual bounded channels and unchanged-source control flow; record checks below; no operational replay or full suite | 316/241/50/699; no accepted result; exact failing label lost and remote effects not independently authenticated | Preserve all evidence; separately gated offline marker/receipt reconciliation before any A3; one final push, monitor PAUSED |
 | 2026-10-24 | Owner-scoped reconciliation and final R298 recovery refusal | `f9fd0932` -> `e3d53276` -> `0a2400d7` -> this record commit | No incoming Claude range; explicit scoped waiver now consumed, not independent review | D1 authenticated zero-recorded-RPC A2 prefix; corrected real projection ID; A3 refused code_running before mutation/compile/launch; all attempts spent | 376 distinct focused passes5.72s; record repeats overlap; no full suite; actual exit/pins in310 | Booked317/242/50/699; no result cell; raw codeRunning value unknown; user-concurrent Safari prevented reading final Mia reply | Mandatory stop/Mia checkpoint, no A4; one final matching-lane push; monitor PAUSED |
 | 2026-10-24 | Post-Mia R298 idleness diagnosis and exact-source recovery preparation | `7c462a01` -> section311 round | No incoming Claude review; scoped new waiver/extra attempt requested, not assumed | Mia reply qualified; supported UI stopped only R298's code environment; additive observer and A4 candidate implemented but uninvoked | 472 focused implementation/helper passes plus record checks below; expected-red sensitivities retained; no old operational replay or full suite | A1/A2/A3 spent; floor317/242/50/699 unchanged; API idleness and current source unverified | Review or scoped waiver plus exact new run freeze before contact; one final matching-lane push; monitor PAUSED |
-| 2026-10-24 | Scoped owner waiver and one additional post-Mia R298 attempt | `45a96f61` -> section312 round | Current explicit waiver, not independent acceptance; no incoming review | D1 spent collaborator refusal; distinct D2 shape diagnostic; A4 unused |280 focused passes and exact source/profile bindings; actual results below | Floor317/242/50/699 until actual A4 claim; old attempts stay spent | Restore only exact frozen source and obtain own running status if gates pass; one final push; monitor PAUSED |
+| 2026-10-24 | Scoped owner waiver and one additional post-Mia R298 attempt | `45a96f61` -> section312 round | Current explicit waiver, not independent acceptance; no incoming review | D1–D3 spent; UI Mia removal refused; owner manual sample identified/preserved, exclusive handoff renewed; additive A4 replacement implemented but unused |518 distinct focused passes through D3; A4 selection486passes/1cross-ledger failure9.22s plus1closure2.26s, overlapping counts not additive; exact bindings below | Floor318/243/50/699 includes manual sample once, before actual A4 claim; old attempts stay spent; shared census append authority requested | Resolve narrowly scoped shared accounting, freeze and use same A4 only if gates pass; one final push at concluded round; monitor PAUSED |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -53146,3 +53160,226 @@ establish its exact Mia-only target under the explicit owner approval; absent
 that evidence, no guessed ID, forced lock, collaboration-policy weakening or
 unchanged removal retry is permitted. A later A4 needs a separate current
 technical decision/run freeze and all unchanged source/admission guards.
+
+### 312.10 D3 actual result; owner-confirmed concurrent manual sample
+
+At clean freeze `90fdd5d2882e5f12bbbf26ce2c48eb002dc0111c`, D3 ran ONCE.
+External dispatch2026-10-24T20:04:02.466730Z, completion observed20:04:07.127968Z,
+actual exit0, stderr0bytes, no external bound. stdout2970bytes SHA256
+`f7148f13225b2de3233ac822a94a07050f946dcb11efd0807cc7be69aaf43d4e`.
+The separate native-denied pure validator exited0, empty stderr, accepted the
+finite envelope. Report binding2865bytes SHA256
+`bc0dc6ae2b9d37906095db6e0ed9b2508d9e21604fca1f789ef11255d4a16103`.
+Two application dispatches; provider count unknown. No output/control reread.
+D3 is SPENT. The pre-freeze86 record checks0.97s repeat earlier coverage.
+
+The general project view has codeRunning exactly true and two records: one
+true owner with positive-integer UID equal to ownerId, and one exact-name-Mia
+nonowner with null UID, bounded nonempty ASCII publicId (not mia-ai), write
+permission and liveControl true. The dedicated collaboration view contains
+exactly ONE record: the same canonical owner row, write/liveControl true;
+userPermissions is write and userLiveControl is true. Owner-row SHA256
+`707a30618e122e49fe6fa75364451b5b7c50e1019a68a89ffc0cd3ae3c8e0b78`;
+Mia-row SHA256
+`6e3fb9db0a3303a202fdebd062e91cd8a974ac564cab784dbccedc361477f44f`.
+The two-view multisets differ. This explains the absence of a removable Mia
+target in the dedicated response, not backend synthetic/persistence proof.
+No alternate deletion is justified; ownership and permission flags remain as
+observed, not changed. D3 does not itself authorize launch or accept edit control.
+
+The following read-only Safari check unexpectedly found the editor reopened
+and a completed backtest, `Casual Yellow Kangaroo`, ID
+`bbd2202cc3000e8b1c14751bf088dd16`. UI Cloud Terminal shows build
+`1ca57c-4795fc`, displayed8:00:01, request8:00:03, completion8:00:08
+(timezone unspecified). The displayed algorithm dates are2020-01-01 through
+2020-12-31 and the visible result is the default SPY-era sample, not the frozen
+2021–October2026 Analyst projection. Result statistics were incidentally present
+in the UI state; no result API, chart/report/order download or performance-driven
+strategy change followed. UI labels/dates are not byte authentication of that
+run's historical source. No Codex upload/build/backtest command caused this run.
+
+Codex stopped remote actions and asked about the concurrent change. The owner
+confirmed "yes i tried that", then explicitly confirmed R298/Safari are free
+for closing the editor and continuing exact-source recovery (answer1 to that
+specific question). This resolves attribution and current coordination, not
+historical source identity. Returning to Projects and stopping only R298's
+owner-released code environment removed its row and active sidebar link. No
+other session/project/job was changed. The earlier D2 false and D3 true
+observations bracket intervening owner IDE activity, not a platform-defect or
+causal diagnosis. Fresh false idleness remains mandatory before recovery.
+
+The owner manual run is preserved and explicitly excluded from the Analyst
+candidate's attempt/result identity. It does not consume Codex's unused A4
+allowance or produce an accepted comparison cell. Conservatively book this
+new observed manual development outcome ONCE as +1shared/+1development:
+floor **318 shared /243 development /50 infrastructure /699 cells**. This is
+not an A4 claim; A4, if actually claimed later, adds its own one shared and one
+development look. No lower count is restored and no strategy efficacy is inferred.
+
+### 312.11 Prospective recovery adaptation under current owner handoff
+
+The old section311 A4 caller remains UNINVOKED, not spent; its zero-history and
+general-view sole-entry assumptions are now inappropriate for this exact known
+state. Do not invoke it merely to reproduce the known refusal. A separately
+versioned replacement may implement the same one approved A4, preserving the
+old source and controls unchanged. This is prospective revision before use,
+not renewal of A1–A3, a renamed failed retry or a fifth-attempt permission.
+
+The owner still requests the exact eleven frozen files and one launch after
+the explicit scoped review waiver, additional-attempt approval and exclusive
+handoff. The replacement must retain strict false codeRunning, exact project/
+organization/name/language/requester ownership/privacy, current admission and
+all byte/source checks. It must require the dedicated collaborator list to be
+exactly the owner with matching numeric UID and write rights, and require the
+general-view owner record to match it canonically. Only the exact D3-bound Mia
+record, if present, may supplement that owner; no arbitrary assistant/person,
+missing-list coercion or name-only exemption. This distinguishes documented
+collaboration records from the observed assistant representation without
+claiming its backend provenance or disabling authorization checks.
+
+Before source mutation, acquire QC's supported edit lock once using a fixed
+codeSourceId and send that same ID on every file request. The owner's current
+handoff and Mia's completed task supply coordination, not a promise of an
+unstealable/continuous lease. Refusal or ambiguity stops; no force mode, omitted
+source ID, permission grant, second removal, repeated acquire or other-lane
+interruption. The API documents no lease token/expiry/CAS, and the record must
+retain that limitation. Fresh exact readbacks before each mutation and full
+eleven-file equality before compile/launch remain required.
+
+Prelaunch history must be EXACTLY the owner-confirmed manual ID/name with
+Completed. status, never a broad exemption for earlier runs. Postlaunch
+inventory must be exactly that preserved manual run plus the one new A4 ID;
+unknown/extra/duplicate/running rows refuse. No statistics/result read is needed.
+The fixed economics/projection and candidate identity are unchanged. The
+600-second parent bound,20 compile polls,90-second launch reserve and one own
+status observation remain; the prospective dispatch cap must cover the added
+collaboration/lock calls explicitly rather than silently exceed the old60.
+
+These are lane-owned recovery corrections, not shared-client changes. The
+new implementation still needs focused validation, exact source/profile pins
+and a separate committed one-shot run decision before any operational use.
+Current authority is scoped to this same recovery; no general future review
+waiver, new project, next family cell, cleanup or formal-source clearance.
+References: https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/collaboration/lock-project,
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/file-management/update-file,
+https://raw.githubusercontent.com/QuantConnect/mcp-server/master/src/tools/files.py.
+
+### 312.12 Additive owner-handoff A4 implementation and focused evidence
+
+The new pure `scripts/arv2_r298_owner_recovery_remote.py` and operational
+`scripts/run_arv2_r298_owner_recovery.py` implement the312.11 adaptation without
+editing or invoking the old A4 caller. The fixed new control leaf is
+`artifacts/analyst_revisions_v2/newrule_owner_recovery/R312-20261024-A`; it has
+not been inspected or allocated during preparation. A1/A2/A3 remain spent.
+The replacement is the SAME unused A4 allowance, not an additional fifth slot.
+
+The supported lock is acquired once after exact owner/idleness/manual-history
+checks and before file inspection, with fixed codeSourceId
+`Codex ARV2 R298 A4 20261024`. All file requests carry it. Unknown collaborators,
+drift of the exact optional Mia-row hash, unknown/extra backtests, changed source,
+lock refusal or ambiguous request stop. The initially present core and forced-
+exit modules must already equal the exact projection, enforcing at most seven
+creates and two updates. The inherited full evolving inventory is authenticated
+before each write; exact eleven-file equality precedes compile and launch.
+Owner/idleness checks occur at stage entry, not continuously or before each
+individual write. A successful lock response is not a lease/expiry/CAS proof.
+
+The caller has75 selected dependency pins, a600-second parent deadline,
+20 compile observations separated by10seconds, a90-second prelaunch reserve,
+and one statistics-disabled own-status observation after60seconds. The64
+application-dispatch cap covers the explicit61 worst case: nine file writes,
+all20 compile polls, four dedicated collaboration reads and one edit-lock
+acquisition. It is not measured provider-contact accounting. Only this project
+and this A4 name may be used, and the known manual backtest cannot be returned
+as the new launch identity. Capacity-wait or In Queue... is not running.
+
+Three credential-free native-network-denied workers authenticate the fresh
+frozen family/D15 admission and package payloads before contact, before launch
+and before terminal publication. This is current admission, not a replay of
+spent operational readers. Old controls, including D1/D2/D3 and unused old A4,
+remain unread. No original economics, data policy, source pin, storage object,
+shared client or readiness flag changes. Selected pins are not whole-interpreter
+integrity; deadlines cannot bound host suspension or uninterruptible I/O.
+
+| Binding | Bytes | SHA256 |
+| --- | --- | --- |
+| New operational caller | 32005 | `02a2464c3dc04eea24e75791e9f7f4d7d33cd6febacacad2b9443147e53a9a41` |
+| Pure remote helper | 12019 | `570bdf830aa8b06e68c99a1c6a1c19662837d965e18c793a62e8ea965020b85b` |
+| Caller tests | 49816 | `1b9f1936c8f524857e6fdf334abc14e6f8f6b29337f646f044a4f3af3e692aa6` |
+| Helper tests | 25204 | `f12180db59d4260c57e41bfd561517de34ee20a32c922eb2398b4f6a6837ac6e` |
+| Canonical arv2-r298-owner-recovery-v1 profile | n/a | `0e425ce92f71d1554511eafc603a720d166864e19a3033d4a34ce26a995c8502` |
+
+Helper author:204passed2.76s, after one initial collection error0.03s/no tests
+caused by omitting --ignore=artifacts; correcting that invocation retained
+native production-artifact denial. Caller author:197passed8.32s after an
+earlier195passed/1obsolete fixture-label failure8.54s; the corrected expectation
+matches the stricter project_owner_match refusal, not a weakened guard. The
+external result validator initially omitted an explicit new-ID != manual-ID
+check; the correction and forged-self-consistent-output regression are present.
+Memory-only omission caused one expected failure0.19s; restored in finally.
+Same-round advisory inspection found no remaining concrete blocker, but is not
+independent review. The specific owner waiver governs this recovery only.
+
+Root focused union: **486passed/1failed in9.22s**, no skips/warnings. All401 new
+caller/helper cases passed. The sole failure is the valid cross-ledger identity
+check: the owner-confirmed manual backtest is now recorded in this lane but not
+yet in the frozen shared ledger. Do not hide the ID, weaken the test, drop its
+look or report a green suite. Root requested narrowly scoped append-only owner
+authority for the Analyst attempt/manual accounting; no shared file has changed
+pending that decision. Four new files compile in memory; all75 pins and the
+canonical profile match; dispatch_fence is absent and git diff --check passes.
+That unstaged diff check did not include the four then-untracked files. Staging
+exposed redundant EOF blank lines in the new caller/test; removed before use
+with no semantic change. The table binds their final bytes prospectively;
+the helper,75 dependency pins and canonical profile are unchanged. The earlier
+caller/test hashes were respectively f215b86347f477f985defd1753eb745b92866654bb1f2539a5c3b412fce052a6
+and9843cda33c7aae91ab7f3e4151e9efdcf10573e79cf0adc1e87cffeb5a0d01d0,
+not operational freezes. No silent refresh of a spent/frozen source occurred.
+All pytest/mutation runs use native network, production-artifact and Keychain
+denial, in-root support paths, no conftest/plugin autoload/cache/bytecode. No
+complete suite, private operational control read or A4 invocation occurred.
+Author and previous observer/document selections overlap, not additive totals.
+The additional research-package transitive import-closure check passed1 in2.26s
+under the same native denial; it is nonoverlapping with the487-case root union.
+
+`ARV2D312-002` — P2 OPEN: the lane-record/shared-look-ledger identity closure
+fails for the owner manual run. Its count is already conservatively booked in
+this lane; the frozen shared record is missing that identity and the references
+to A1–A3's previously booked conservative attempt looks. No hidden or reduced
+count, test exception, shared edit or false-green claim is permitted. The
+requested owner exception is limited to append-only Analyst R298 accounting;
+all historical entries and other lanes remain frozen. Until resolved, the new
+A4 caller remains uninvoked and no operational run freeze is claimed.
+
+### 312.13 Local preparation checkpoint; accounting authority pending
+
+Final focused selection after EOF-only corrections: **487passed/1failed in
+11.17s**, no skips/warnings. This is401 caller/helper +85 passing record/document
++1 research closure; the same one cross-ledger test remains red. The preceding
+486pass selection and separate closure are fully overlapping, not additional
+passes. No operational source or admission gate has been relaxed to proceed.
+
+This local series starts at45a96f61 and contains, in order:
+
+| Commit | Scope / disposition |
+| --- | --- |
+| `7331b4db79f6f60818497e470e9c4d1f0a52bb28` | Scoped owner waiver and D1 freeze; actual D1 refusal retained, not accepted idleness/collaboration evidence. |
+| `7a6ea94f3e9bf72517518ac64e31c166c6dc3f31` | D1 disposition and distinct D2 finite shape diagnostic/freeze; actual D2 accepted only as qualified metadata evidence. |
+| `90fdd5d2882e5f12bbbf26ce2c48eb002dc0111c` | D2/UI/Mia qualifications and distinct D3 two-view diagnostic/freeze; actual D3 accepted only as qualified comparison evidence. |
+| Commit containing312.12–312.13 | Additive unused-A4 replacement, tests, D3/manual-run disposition and accounting blocker. Preparation only, not independent acceptance or operational run authority. |
+
+All four are Codex work under the current scoped owner waiver, not an incoming
+Claude review/counter-review range. No independent review is claimed. The
+matching remote remains45a96f61 at the last check; no successful push occurred
+yet and the round is still local/in progress, awaiting the requested narrow
+shared-ledger coordination decision. Another computer cannot fetch this new
+preparation yet. The single final push is still reserved for the concluded round.
+
+Next: if the owner grants the precise append-only exception, append the already
+booked A1–A3 references and manual sample once without rebooking them, rerun the
+record gate, and commit a separate exact A4 run freeze before invocation. If the
+shared ledger remains frozen, preserve the explicit red gate and unused A4;
+do not conceal the run identity or grant shared authority by inference. No
+upload, explicit compile, node-capacity call, A4 claim or launch occurred here.
+The owner's last exclusive handoff and UI stop are point-in-time coordination;
+fresh false idleness and all exact current guards still precede any future use.

@@ -2,11 +2,14 @@
 
 Status: **Independent Claude review of `863a0dcd..79d8facb` (section 42,
 Codex's counter-review of section 41) recorded in section 43, 2026-10-23;
-Codex counter-review of section 43 pending.
+Codex counter-review of section 43 completed in section 44.
+Claude's `c6834173` is accepted after documentation correction.
+The published `c6834173` review is consumed once.
 Claude's `863a0dcd` is accepted after documentation correction (section 42),
 and Codex's `79d8facb` is accepted in section 43; no source changed since
 producing `c589b3dd`.
-Monitor remains PAUSED; the owner authorized this review round and its one push only.
+Monitor remains PAUSED after the one-shot next-Claude-push watch was fulfilled.
+This counter-review is local-only; no push is authorized by the current request.
 GDR-RP33 is accepted in section 34
 as offline software only: it retains every record digest in a 489-line paired
 format with assumed logging reserves, not verified platform accounting or
@@ -14,11 +17,13 @@ backtest readiness.
 The section-27 evaluation still ended with three pre-initialization failures;
 the attempt ceiling remains exhausted and no manual relaunch is authorized.
 The owner's conditional Mia-led synthetic recovery (32.4) remains
-paused pending platform preflight and a later explicit owner resume. Its
+paused pending platform preflight; the later resume and disarm/manual-step
+directions are recorded in 44.3, not missing repeat authorization. Its
 separate ledger `GDR-Mia-base372-recovery-authorized-20261011` (38.3) holds
-zero attempts under a standing maximum of three unsuccessful attempts. The
-last observed log-read quota, 36.8 KB / 3 MB at the 2026-10-13 22:39
-heartbeat, is historical and below the 75,260-byte payload; actual cloud byte
+zero attempts under a standing maximum of three unsuccessful attempts.
+Codex last observed 0 KB / 3 MB at 2026-10-21 around 23:54 UTC, superseding
+the older 36.8 KB reading. Both are historical, not current capacity;
+no QC query occurs in this counter-review. Actual cloud byte
 accounting remains unverified (GDR-CR31-003, GDR-CR37-002). The readable
 route answers the compressed-output concern of GDR-CR28-001 at the inspected
 source and policy level, without a QC clearance. Native loading of the recovery
@@ -29,7 +34,7 @@ or empirical backtest readiness is established. The original economic,
 empirical, account and trading gates remain closed; section 40.3's scoped
 EODHD direction is not verified entitlement, PIT evidence, QC-upload rights or
 real-data evaluation authority.**
-Current scope/evidence are sections 17 through 43. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 44. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -5714,3 +5719,133 @@ Acceptance here is a documentation review only. It establishes neither native
 execution nor empirical readiness.
 `docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` were not edited
 and stay frozen for both agents.
+
+## 44. Codex counter-review of section 43, 2026-10-23
+
+### 44.1 Exact snapshot, trigger and disposition
+
+The owner directed: "ok, monitor claude's next push. when done, start counter
+review". This is one completed-review watch and counter-review, not authority
+to publish, resume the old quota/Mia monitor or begin another milestone.
+The existing heartbeat was armed against clean local/live matching
+`79d8facb2234583cce59251207885a1e2cab9aae`. During the arming closure, the
+next complete Claude push arrived as
+`c68341731b0d69f7603f3d0209e683a97322d892`; local HEAD had already advanced
+to the same clean object. A lane-only fetch and live matching-remote check
+verified it. Section 43 explicitly completes the review and hands ownership
+to Codex. No unpublished moving snapshot, reset, branch switch or worktree
+creation was used. The one-shot monitor was paused once this handoff was
+claimed, before any counter-review edit, to prevent another trigger.
+
+Every repository action uses
+`/Users/sheltonchen/.codex/worktrees/guidance-revision-drift/trading_agent`,
+branch `codex/strategy-guidance-revision-drift`, origin
+`https://github.com/SheltonChen2017/trading_agent.git`.
+The exact ordered range is
+`79d8facb2234583cce59251207885a1e2cab9aae..c68341731b0d69f7603f3d0209e683a97322d892`:
+ONE Claude commit. Its complete message/diff, dispositions, reported checks,
+current header and cumulative tree were reviewed. Two read-only advisory
+audits checked documentary scope/history and guard sensitivity; they are not
+independent Claude acceptance of this closure.
+
+| Commit | Disposition | Evidence/reason |
+|---|---|---|
+| `c68341731b0d69f7603f3d0209e683a97322d892` | Accepted after documentation correction | Section 43 correctly accepts section 42's four documentary corrections and preserves all source/economic gates. Refresh current custody/observations under 44.2; retain its independent review and reported checks as history. |
+
+The published `c6834173` review is now consumed once. Earlier `863a0dcd`,
+`2baf5a48` and older reviews are not reconsumed. The `8e277418`, `98bff5e5`
+and `79d8facb` publications each remain finished exactly-one-push rounds.
+Claude's newly observed `c6834173` publication is distinct; it does not grant
+Codex an automatic push or another recovery allowance.
+
+Assessment: **9/10 for the documentation review**. Its substantive
+dispositions are sound and no production defect is established; current-state
+currency needs one bounded P3 correction. This is not software-runtime,
+native-order, economic or empirical acceptance.
+
+### 44.2 Finding and corrections
+
+P0 0, P1 0, P2 0; one new P3, corrected below. Section 43's zero-new-finding
+ledger remains its historical review result, not this counter-review's count.
+
+| ID | Priority/status | Evidence, reason, correction and verification |
+|---|---|---|
+| GDR-CCR44-001 | P3 / corrected | The active header and section 43's next-action wording carry forward a missing "later explicit owner resume", the October 13 36.8 KB reading as last observed, and one-push scope without distinguishing the current human request. Later direct owner messages resumed the existing bounded scope, then disarmed the monitor and directed manual steps; Codex's October 21 Resources observation was 0 KB /3 MB. The current request is only watch/counter-review. Correct the active header and 44.3, preserve sections 1–43, and pin the completed/current review, consumed identity, historical observation, local-only/no-push scope and section order. Neither historical quota value is current readiness, and no repeated synthetic permission or new platform approval is invented. New guards fail on the uncorrected header, then pass after correction; in-memory regression probes test the dangerous stale states. |
+
+Section 43's GDR-CCR42-004 disposition is accepted: an authorized frozen scope
+must precede outcome-bearing acquisition under family/look/protected-date
+controls. It does not impose a blanket freeze on every non-outcome structural
+metadata inspection or universal formal sign-off before any provider read.
+The existing conditional EODHD direction is neither erased nor expanded.
+The logging arithmetic disposition also remains accepted: 85,040 LF /
+85,529 CRLF models only the retained 20-byte prefix; it is not actual deployed
+metering, API/read charges, total output or complete delivery proof.
+
+### 44.3 Current authority, observations and unchanged gates
+
+On October 21 the owner said "good, proceed" after the readiness/recovery
+recommendation, then "disarm the monitor. go with 1, 2 and 3". The latter
+disarmed automatic monitoring while retaining manual authority for those
+conditional steps. Codex observed authenticated controllable Safari Resources
+at approximately 2026-10-21 23:54 UTC: 0 KB /3 MB, 100 KB/backtest, both
+B2-8 nodes with Project/InUseBy dash, not reserved. Mia itself was not checked
+or prompted because capacity was insufficient. This retained thread/memory
+observation supersedes October 13's 36.8 KB as the last Codex observation;
+neither is current capacity. This counter-review makes no QC/browser query.
+The operational 1 MB screening buffer still certifies neither actual
+accounting nor reservation/launch permission.
+
+The October 23 watch request activates only waiting for the next completed
+Claude review and this counter-review. That trigger is fulfilled; the saved
+monitor is PAUSED, and no automatic old recovery loop or next review round is
+rearmed. Existing bounded synthetic permission need not be repeated, but this
+task does not launch recovery. Fresh actual headroom, ownership, exact accepted
+source/review, authenticated controllable Mia and current platform/dependency/
+engine requirements remain prerequisites for any later authorized action.
+
+Original `GDR-base372-approved-20261008` remains immutable CLOSED FAILED3/3,
+zero manual attempts; exhausted project 37647834 is untouched. Separate
+`GDR-Mia-base372-recovery-authorized-20261011` remains zero unsuccessful
+attempts, zero pending intents, no journal/project/launch, maximum THREE
+unsuccessful attempts. Unknown/unrequested/unresolved Mia actions still halt
+launch/change for reconciliation or owner direction. No review/name/hash or
+project resets either ceiling. Complete own resulting-cloud-source comparison
+and every-action accounting remain required for a later permitted recovery.
+
+Producing source remains `c589b3dddab3f1dd136d10ae7ce1851d64818906`, with
+exact full-source/project/runtime/fixture/semantic identities retained in
+38.4. Git comparisons show lane production/design/fixture/draft, neutral
+helpers and original plan/PDF unchanged; no carrier/map is regenerated to
+reconfirm this documentation-only review. Immutable null/false permissions,
+original economics and source-rights/research gates remain unchanged. The
+fixed 372-frame recovery is invented-only, needs no additional datasource,
+and is not a real-data adapter. Later subscription advice/owner reports do
+not independently verify entitlement, PIT evidence, processing/QC-upload
+rights or authorize acquisition/evaluation/purchase. No family/look/protected-
+date, economic, broker/paper/live/funded/capital decision is inferred.
+
+### 44.4 Focused verification and local-only handoff
+
+Only this record/current header and lane-local current-state guards change.
+Sections 1–43 remain unchanged below the header. Source-changing milestones,
+full lane/repository suites, provider data/outcomes, QC/native runs, operator
+database, PR/main, credential/account/resource/security changes and cross-lane
+mutation are excluded. Claude's two 75-pass reports remain Claude-reported,
+not independently certified by Codex or rerun as a full suite here.
+
+| Check | Observed result |
+|---|---|
+| Pushed review baseline | Six named lane boundary/document methods passed in 0.234 s, Python 3.13.15; zero failures/errors/skips or observed warnings. Sanitized environment, `-B`, network/file-write fences in parent and import child. |
+| Red/green guard evidence | The strengthened current-state guard failed on the uncorrected header as intended; the other five methods passed. A subsequent section-order failure caught Codex's temporary misplaced appendix before commit; it was moved after section 43. Green rerun: six methods passed in 0.255 s, zero failures/errors/skips or observed warnings. |
+| Regression sensitivity and compilation | Seven in-memory mutations independently failed: pending review, wrong review hash, unconsumed review, rearmed monitor, automatic publication, stale quota observation and out-of-order appendix. All 88 lane source/test files compiled in memory without execution or bytecode. Actual files were not changed by mutation probes. |
+| Frozen paths/history and diff | Git byte comparisons against producing `c589b3dd` and prior published `79d8facb` passed for applicable frozen paths. Sections 1–43 compared byte-exact below the header against reviewed `c6834173`. Diff check passed; only record/current-state guards change. Final exact-tree focused/status/remote guards are repeated before local commit, with the final result retained in thread/memory. |
+
+Recheck root/branch/HEAD/status and live matching remote before any local
+commit. The reviewed base/head and complete findings above are durable; the
+closure commit is local-only and will be identified in thread/automation
+memory after creation. Do not publish automatically: the current owner asked
+for watch/counter-review, not a push. Root Session Handoff, Action Plan,
+Feature Milestone Record, process/shared files and original plan/PDF stay
+frozen. No next milestone starts. After local closure, stop with the monitor
+PAUSED and await the owner's next direction; no new native/empirical or
+original GDR-0..6 completion is claimed.

@@ -646,10 +646,15 @@ Confirmed floor314/239/50/699 is retained with a separate unresolved possible
 R298 A1 addition of one shared/development look, not a claim of zero addition.
 No ad-hoc control reader or remote reconciliation has run. A separately
 versioned offline failure-evidence diagnostic is the next bounded work.
-The owner's subsequent Safari/Mia direction is recorded in 307.8. Safari
-reached QC's expired-session notice and login page; no project or Mia was
-accessible. Owner sign-in is the current external barrier, not a diagnosis
-of the section-307 API failure or authority to repeat its begin operation.
+The owner's subsequent Safari/Mia direction is recorded in 307.8. Section
+308 supersedes its sign-in barrier: the owner signed in and the exact R298
+project is visible as `38364439`, with a partial four-file upload and default
+SPY main. Opening the editor automatically built that partial source; it was
+not launched. Mia's read-only advice is qualified below, not acceptance or a
+diagnosis of the API failure. Additive same-project recovery is implemented
+but unreviewed and uninvoked. Claude review of section 308's new recovery contract,
+or a separately explicit current waiver, and an exact committed run decision
+must precede use. The failed begin remains spent and unchanged.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1742,8 +1747,8 @@ and supporting corrections, not future changed contracts or technical gates.
 Section 307 execution has now stopped after capacity passed and the sole
 R298 begin returned actual exit2 / request_ambiguous. The current sequencing
 waiver is consumed for those actions, not a waiver for a new recovery
-contract. The immediate next step is a separately versioned, bounded offline
-failure-evidence diagnostic as specified in section 307, with normal review
+contract. Section 307 specified a separately versioned, bounded offline
+failure-evidence diagnostic, with normal review
 and a fresh one-shot decision before use unless explicitly waived anew.
 No repeat begin, next candidate, ad-hoc control reader or remote reconciliation
 is authorized by this failed sequence. The former QC hold remains released,
@@ -1751,13 +1756,14 @@ but no node/job may be changed; availability was only observed at capacity.
 Section 304 and section 305 pins remain superseded. The monitor stays PAUSED;
 no review session or other-chat message is started.
 The later owner specifically authorizes Safari and QC Mia assistance and
-directs continuation until backtesting is running (307.8). Browser access
-currently requires owner sign-in after QC reported Session Expired. Once
-authenticated, inspect only this lane's exact R298 project and seek bounded
-Mia diagnostic assistance; do not infer the local claim from a project name,
-repeat begin, change frozen economics or use another lane's jobs. Any new
-recovery contract still needs its applicable review/run decision. Browser
-permission is not a blanket technical-gate waiver.
+directs continuation until backtesting is running (307.8). The owner completed
+sign-in and said "ok, proceed". Section 308 records exact-project inspection,
+qualified Mia advice and additive recovery preparation. Claude must review
+section 308 before use unless the owner explicitly waives this particular
+new review; a separately committed exact one-shot decision remains required. The current
+preparation does not authorize invocation. Do not infer the local claim from
+a project name, repeat begin, change frozen economics or use another lane's
+jobs. Browser permission is not a blanket technical-gate waiver.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -3698,6 +3704,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-24 | Codex counter-review of section 305; bounded V5 corrections only | `de0911a0` -> `b707ab98` and this section-306 record commit | Both incoming commits `0318b99a..de0911a0` disposed separately; code accepted, record accepted after correction/qualification; all six findings classified | V5-only optional-but-exact list counts, fresh-A1 empty inventory and preclaim control-file reservation; 37 added regression cases; caller re-pinned; no legacy/economics/shared-file changes | 365 focused V5 passes in 40.47 s; expected red proof 8 failed/29 passed before correction; source/import/document checks in 306.5; no complete suite or private census | 0 P0, 0 P1, 1 P2 and 3 P3 counter-review findings corrected/qualified; historical findings remain; 314/239/50/699 unchanged | Exactly one final nonforce matching-lane push, then stop; Claude reviews new corrections; QC hold remains, monitor PAUSED, no new run freeze or next milestone |
 | 2026-10-24 | Owner releases QC hold and waives current review; exact corrected V5 A1 freeze | `bde2df5a` -> section-307 freeze and eventual result/handoff commit | No new Claude range; direct current waiver, not independent acceptance | Exact unchanged section-306 caller and 66 bindings, original family/package/D15 admission, actual-exit evidence and corrected status vocabulary; capacity then sequential six/eight study only | Native-denied genuine source/host/logging preflight passed; record checks and actual outcomes in 307; no complete suite | Historical findings and false readiness flags retained; starting floor314/239/50/699, no prospective look/cell booking | One final matching-lane push at completed/blocked checkpoint; no intermediate push or storage replay; monitor stays PAUSED |
 | 2026-10-24 | Owner-authorized Safari/Mia investigation; browser authentication blocked | `5f6dcf99` -> this section-307.8 record commit | No new Claude range, review or gate clearance | QC Safari Algorithm Lab reported Session Expired; login opened and no usable saved-login suggestion appeared; no project or Mia inspection, edit, compile or launch | Public-source-only identifier/order advisory; focused record checks below; no operational/private reader or complete suite | R298 ambiguity and possible look addition unchanged; browser login required, not evidence of API failure cause | One final matching-lane record push; owner signs in, then bounded exact-project reconciliation/Mia diagnosis; monitor stays PAUSED |
+| 2026-10-24 | Authenticated Safari/Mia inspection and same-project R298 recovery preparation | `e061d441` -> this section-308 checkpoint | No new Claude range; same-round advice is not independent review | UI identifies project38364439 and partial source; editor-open automatic build disclosed; new bounded evidence/recovery code is uninvoked, not a repeat begin or replacement project | Focused synthetic validation and limitations in308; no complete suite or actual recovery reader/caller | Old error cause/local claim remain unresolved pending admissible evidence; no backtest or accepted result; current review/run gate retained | One final matching-lane checkpoint push; obtain current recovery review or scoped waiver, then exact freeze before use; monitor stays PAUSED |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -51504,3 +51511,301 @@ Documentation-only validation: 86 record/active-document tests passed in
 Keychain-command denial, disabled plugin autoload/shared conftest/cache and
 in-root support paths. This repeats existing record coverage, not 86 new
 tests. No complete suite, production-code change or operational rerun.
+
+## 308. Safari/Mia partial-project diagnosis and bounded same-project recovery candidate, 2026-10-24
+
+### 308.1 Scope and observed project state
+
+Starting clean snapshot `e061d441102dce4c8d22c1c480526328fca8f825`, designated
+Mac root and branch unchanged. The owner completed Safari sign-in and said
+"ok, proceed", continuing the existing instruction to use Safari/Mia until
+backtesting is running. The section-307 begin is not renewed. This round has
+no new Claude range or independent acceptance. A separate concise question
+asks whether the owner waives review for this particular recovery; lack of
+a reply is not a waiver. Offline implementation can proceed meanwhile.
+
+Authenticated Safari shows the exact project
+`ARV2 R298 NEWRULE SIX OFF 2021 OCT2026`, ID **38364439**. The visible main
+editor contains the 406-byte QC `BasicTemplateAlgorithm`: SPY, 2020-01-01 to
+2021-01-01, cash100000. It is **not** the frozen Analyst candidate and must
+not be run. Mia was placed in **Ask Before Edits** and given a diagnostic-only
+prompt prohibiting edits, build/run, deletion, other-project changes and
+Object Store access. It reported this four-file inventory:
+
+| File | UI/Mia observation, not an API hash authentication |
+|---|---|
+| `main.py` | 406-byte default template, also directly visible in editor |
+| `accepted_risk_order_level_core.py` | Mia reports30349 bytes |
+| `accepted_risk_order_level_forced_exit.py` | Mia reports16313 bytes |
+| `accepted_risk_order_level_input_runtime.py` | Mia reports one-byte `#` placeholder |
+
+The frozen projection has **eleven** files, so seven later modules are also
+missing from that reported inventory. No exact API source hashes, local
+attempt claim or original failure endpoint have yet been authenticated by
+this observation. Matching name/content appearance alone does not admit
+source, establish untouched history or resolve look accounting.
+
+**Editor side effect:** opening the project automatically triggered a cloud
+build. Cloud Terminal displayed missing-import suggestions at `5:02:43`
+for the three support files, followed at `5:02:45` by built project, LEAN
+`2.5.0.0.18203`, build ID `87b209-4795fc`. Those are UI display times with
+unestablished timezone, not asserted UTC process brackets. Codex did not
+press Build or Backtest. This is an observed automatic build of partial,
+noncandidate source, not the frozen compile, a strategy launch, an accepted
+cell or proof that the earlier begin compiled. No launch followed it.
+
+### 308.2 Mia advice dispositions and causal limits
+
+Mia's first suggestion to replace only main and input-runtime was incomplete:
+it omitted the seven absent files. Codex corrected it, and Mia acknowledged
+the eleven-file requirement. Mia's claim that no compile metadata existed
+was also corrected against the visible Cloud Terminal build. Its read-only
+tools' limited visibility does not imply platform-wide absence.
+
+Mia further hypothesized an internal create-placeholder/content-write split,
+file-size rejection or transport interruption. These are **unconfirmed**:
+the retained API exception was discarded, and neither Mia nor a `#` file
+establishes numeric HTTP status, internal transaction order, exact cause,
+original contact count or which bytes previously arrived. The official
+[Create File API](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/file-management/create-file)
+documents the project/name/content request and success/error response, not
+the asserted internal two-phase mechanism. The official
+[project quotas](https://www.quantconnect.com/docs/v2/cloud-platform/projects/files)
+are tier-dependent; the observed Researcher organization and the candidate's
+bounded file sizes do not establish a historical size refusal. No subscription,
+quota, permission, shared library or cloud settings were changed on a hunch.
+No further Mia edit/run instruction was issued. Its advice is not independent
+review, source authentication or permission to retry the old begin.
+
+### 308.3 Additive offline evidence contract
+
+`scripts/arv2_r298_recovery_evidence.py` reconstructs the **same** R298 code
+from thirteen fixed public-source pins and the already frozen activation
+descriptor. It reproduces profile
+`b27e40dc4ae9e71b308d6eccd0fdaf83220be9157021c265a32c71e6f8b7a09b`
+and complete projection
+`f67148cd717e207be9d44f088749c0443bb696d9c4f38f512eb6cbf483fd9662`.
+Actual file names/bytes/lengths/hashes must agree with the immutable projection
+record. This reconstruction reads public code only: it is not a market-data
+package read, an export, admission or historical continuity proof.
+
+The separate collector, **not invoked**, selects only the fixed family,
+organization, V4 admission, V5 first-begin claim/intent/observed controls and
+R298 claim/project receipt. It uses the unchanged held/named per-leaf reader,
+checks the bounded control-directory names before/after selected reads and
+again after its second selected-document check. This is a bounded name census
+and endpoint reauthentication, not continuous whole-tree stability. It does
+not read unselected private leaf contents, source captures, results or old
+one-shot reports; it does not write or repair the old directory.
+
+The pure validator requires the exact family/admission/organization/project,
+R298-A1 identity and original request hashes, a sequential observed prefix
+ending in one unmatched intent, and no completion, compile or later lifecycle
+record. It supports only post-project/pre-compile failure. Any different
+retained state refuses; it is not silently adapted to the actual artifacts.
+Its finite output can establish a retained claim and last recorded intent,
+not the server's cause or contact count. The organization identifier remains
+inside the private evidence bundle, never the public envelope.
+
+### 308.4 Same-project reconciliation contract
+
+`scripts/arv2_r298_recovery_remote.py` is an injected-client helper, not an
+operational command. Its separately gated caller must bind the original
+failed attempt, selected sources, fresh input authentication and actual prior exit.
+The fixed destination is project38364439 only. It checks exact private owner,
+organization, name, Python language, idle state, owner-only collaborators
+and zero existing backtests. It admits only the eleven expected filenames,
+exact frozen bytes, exact `#`/`#\n` placeholders, or the exact browser-observed
+406-byte template in main. Unknown or changed content refuses before overwrite.
+
+Completion rechecks the evolving whole manifest before each missing/stub
+write, skips already exact files, and requires exact full readback. There is
+no delete, replacement project, shared-library change, renamed candidate,
+old begin call or old batch-complete fabrication. A compile is submitted
+only after full source agreement. The only launchable compile is this
+recovery's returned ID, freshly observed `BuildSuccess`; the project,
+zero-prior-run state, exact files and capacity are checked again before the
+sole launch. Occupied capacity is a wait/stop, never cancellation or another
+lane's reassignment. Finite status observations use `backtests/list` with
+`includeStatistics:false`, not the outcome reader. Optional returned project
+IDs/counts retain the frozen compatibility rule: exact type/value if present.
+
+**Attempt correction before use:** same-project completion is not authority
+to renew spent A1. The original failed setup remains A1; a future separately
+authorized recovery execution is conservatively **R298 A2**, still using
+project38364439 and unchanged candidate/profile/economics. Its exclusive
+recovery claim books an additional shared/development look even if it never
+reaches launch. The generic ceiling remains three attempts for R298, not
+three more. If the original A1 claim and a new A2 claim are both actually
+authenticated, the resulting floor would be316/241/50/699; this is a
+conditional calculation, **not current booking**. No silent A3 or next cell
+follows a failed/ambiguous recovery. The original V5 batch remains incomplete
+and immutable; the new protocol never manufactures its completion.
+
+Each application request requires an exclusive fsynced intent before dispatch
+and records a bounded response digest afterwards. Digests do not recover
+discarded responses or prove measured server contact. There is no server-side
+compare-and-swap: endpoint rechecks cannot eliminate all same-user concurrent
+cloud edits. An interrupted/ambiguous request remains consumed, with partial
+effects preserved; no automatic retry or substitute path is authorized.
+No simultaneous same-project editing is admissible during a future run.
+
+### 308.5 Separately gated operational caller, uninvoked
+
+`scripts/run_arv2_r298_recovery.py` implements two separately one-use operations,
+`evidence` and `recover`, not a bare helper callback. Its fixed prospective
+control leaf is
+`artifacts/analyst_revisions_v2/newrule_recovery/R298-20261024-A`;
+that leaf has **not been inspected or allocated operationally**. Exact designated
+Mac root/branch, Darwin/POSIX Python3.13 at
+`/Users/sheltonchen/.venvs/trading_agent-py313/bin/python`, clean committed HEAD,
+caller blob/hash and selected dependency pins precede either operation. These
+arguments bind source, not authority or proof of independent review. A future
+exact run decision must also bind externally observed actual exit, bounded
+double-LF output, evidence/report pins and conditional recovery scope.
+
+The evidence parent exclusively creates/fsyncs its own leaf/claim and dispatches
+one inherited-descriptor child under native network denial and Keychain-command
+denial. Only that child calls the fixed original-control collector, once. The
+parent accepts only bounded metadata and actual child exit0; it never parses
+the private document bundle. A future `recover` first exclusively claims A2
+and its +1 shared/+1 development look, then uses a **second native-denied worker**
+to revalidate the new bundle against the supplied external SHA and the completed
+evidence-parent record. This worker never recollects the old controls. Only the
+private bounded organization binding crosses back for the fixed QC client;
+it is never emitted in the public report. Partial claims remain consumed or
+ambiguous, not reusable. A caller report cannot prove actual process exit0.
+
+The recovery authenticates the existing October input/lineage, exact family,
+unchanged projection and D15 admission with generic consumers before credentials,
+before launch, and after the own-status/capacity-wait observation. This is a
+future freeze-scoped fresh use, not replay of spent capture, begin, publication
+or result-reader operations. It then uses the unchanged guarded QC client and
+the exact same-project reconciliation above. Maximum compile polling is20
+observations, each after10 seconds; after one admitted launch it waits60 seconds
+and makes one statistics-disabled own-status observation. It reserves time
+before launch and has a300-second parent deadline covering preflight and work.
+The alarm/deadline cannot bound uninterruptible I/O or host suspension. Only its
+own evidence child may be killed/reaped. Occupied capacity returns a wait/stop;
+this contract has no repeated launch, automatic resumption, next cell or A3.
+Static maximum is60 application RPC dispatches and154 normal control files
+including both worker phases/reports, below the256-file control bound; the
+deadline may stop earlier. These are prospective bounds, not actual contacts.
+`Runtime Error`, `BuildError`, nonzero/unknown exit and malformed output do not
+become success. A status of `Completed.` alone does not admit strategy results.
+
+Own control files use exclusive creation, fsync, no-follow held/named checks,
+owner/mode/link/size/full metadata checks and bounded names. The directory-link
+rule is the designated APFS host's entry-count rule, not a portable POSIX
+assumption. Native evidence workers deny artifact writes except the exact new
+leaf. These selected controls and endpoint snapshots are not a whole-interpreter,
+continuous whole-tree or arbitrary same-user tamper-proof sandbox claim.
+
+Prospective request failures retain only endpoint, intent marker, application
+dispatch count, finite category and validated numeric HTTP status when the
+unchanged transport makes it available, plus the private failure-file pin.
+Application dispatch is not measured provider contact; provider count remains
+unknown. The frozen bounded transport can discard non-2xx status, so the exact
+known refusal remains `status_or_bound_refusal` with numeric status null rather
+than an invented401/403/429. No raw exception, response body, credentials,
+source payload or licensed rows are emitted. This cannot recover the old cause.
+
+| Selected new source | SHA256 |
+|---|---|
+| `scripts/arv2_r298_recovery_evidence.py` | `dc41adea9285671d2c39a1ee0afbfa517a3641d9fdaa49a2ea77cc44c4d759d3` |
+| `tests/analyst_revisions_v2/test_r298_recovery_evidence.py` | `bc04380f6f5ecde766eccd46d125551dd461cb2074ee6fc31c6386efbf2d8209` |
+| `scripts/arv2_r298_recovery_remote.py` | `114645ff490246c61e1f79f0ef8b321b2eb77f06ef34e1be80e8b9964f4cd19a` |
+| `tests/analyst_revisions_v2/test_r298_recovery_remote.py` | `8aa0ab914d7f5b2b7f987a5db9a345a4f7f4bb9b3f23b72799b007d978b800d1` |
+| `scripts/run_arv2_r298_recovery.py` | `c33a3b110072d072d9ef1b9272b128981e1115744caf9e980fd7df1d654b01e4` |
+| `tests/analyst_revisions_v2/test_r298_recovery_caller.py` | `f9f9350d3db6a868e905625e32a36ecc94b0e708f83ca51feca75e575a84b396` |
+
+Canonical `arv2-r298-same-project-recovery-v1` profile:
+`3e9038f4a8ec8fbb2dceecd887d8b8d9ea3de6b234fc51fe3c710925cbeb5978`.
+Root verified all69 selected dependency pins, including the frozen V5/legacy
+sources, without refresh. Preparation does not authorize invocation.
+
+### 308.6 Validation and pre-use dispositions
+
+Root final focused selection: **322 distinct passes in6.19s** =71 evidence
++83 remote +82 caller +86 record/active-document checks, no failures/skips/
+warnings. Root also compiled all six new Python files in memory, verified the
+profile and selected pins, and asserted `assistant.dispatch_fence` absent
+after import. These static checks are not extra pytest passes. Native denial
+covered network, production artifact reads/writes and `/usr/bin/security`;
+all temporary/cache/log/plugin support paths were in-root, plugin autoload,
+shared conftest and cache provider disabled, with `-B`. No complete suite or
+private collector/provider behavior was exercised.
+Final record/active-document repeat:86 passed in1.12s under the same isolation;
+these overlap the root322 and are not additive.
+
+Author final subsets71 in3.86s,83 in0.12s and82 in4.64s overlap the root322;
+earlier66/58/81/71-pass subsets are not additive. Evidence's memory-only
+request-hash omission produced one expected failure in3.83s. Remote journal
+omission produced one expected failure in0.06s and recognized-content omission
+two in0.04s, before the later A2-label correction; each mutation restored in
+`finally`, disk hashes unchanged. These are expected red checks, not green
+production executions or independent review.
+
+Retained initial failures: caller collection without `--ignore=artifacts`
+refused before tests; no suite ran. The first caller fixture run had29 passes,
+10 failures and10 setup errors because it assumed directory nlink2 on APFS;
+corrected before use. A later70-pass/1-failure run exposed macOS refusal to apply
+a nested native sandbox. Real synthetic-child tests now validate the exact
+production command but bypass only that nested sandbox launcher, inheriting
+the test parent's native denial and asserting socket-bind denial inside the
+child. They cover both worker-channel variants, inherited descriptors,
+stderr/noise, oversized/trailing/malformed output, nonzero after plausible
+metadata, and timeout kill/reap. This is **not** production-worker coverage.
+A separate standalone tiny synthetic child used the actual `sandbox-exec`
+and exact production profile with minimal environment and an in-root synthetic
+directory descriptor: exit0 in0.029s, descriptor and native socket-bind denial
+confirmed. It did not execute source main/worker, inspect private artifacts or
+exercise QC. Root's earlier integration had236 passes/2 document failures
+in4.94s; stale next-step wording and missing active review verb were corrected.
+All these earlier runs overlap final coverage and remain disclosed.
+
+| Finding | Priority / disposition |
+|---|---|
+| `ARV2CR308-001` | P3 / Mia two-file completion advice corrected to eleven-file exact reconstruction; no cloud edit applied |
+| `ARV2CR308-002` | P3 / Mia no-build claim corrected; automatic editor build and uncertain display timezone retained |
+| `ARV2CR308-003` | P3 / placeholder/size/rate-limit causal suggestions unconfirmed; original API failure remains unknown |
+| `ARV2CR308-004` | P2 / pre-use private-bundle parsing in the network-capable parent corrected to a separate native-denied validation worker; no operational bundle was read |
+| `ARV2CR308-005` | P2 / pre-use A1-reuse/accounting ambiguity corrected to conservative same-project A2 with its own exclusive +1/+1 claim; A1 stays spent |
+| `ARV2CR308-006` | P2 / prospective wrapper failure context initially would have been lost; safe finite observation and private evidence pin now reach actual exit2 envelope, without claiming numeric status always survives frozen transport |
+| `ARV2CR308-007` | P3 / APFS fixture incompatibility corrected; nested-sandbox limitation explicitly qualified and standalone actual-profile smoke added; synthetic coverage is not operational proof |
+| `ARV2E307-001`, `ARV2D307-001` | P2 / remain OPEN until admissible actual evidence and successful recovery; preparation is not resolution |
+
+An initial concern that projection reconstruction did not bind actual file
+bytes was a **false alarm**: `Projection.to_record()` already includes actual
+hashes/lengths; explicit manifest equality also remains. Same-round agents
+provided implementation/advice, not independent final review. Shared/root
+files, old caller/lifecycle/transport, strategy economics and pinned source
+modules were not modified.
+
+### 308.7 Checkpoint handoff and next gate
+
+The confirmed floor stays **314shared/239development/50infrastructure/
+699cells**, plus the unresolved possible R298-A1 shared/development look.
+No new A1 claim, accepted result, provider capture, Object Store operation,
+local private evidence reader, recovery invocation or backtest launch has
+occurred in this preparation. The observed automatic partial-source build is
+disclosed above; do not falsely claim zero cloud activity. All spent controls,
+source/economic pins, historical failures and false PIT/formal/paper flags
+remain unchanged. The monitor stays PAUSED.
+
+Claude review of section 308's new recovery, or a separately explicit owner
+waiver, must precede a committed exact run freeze and actual invocation.
+The user has been asked about that particular waiver; no response is assumed.
+No other chat or Claude session is messaged or started. Accumulate this whole
+round locally, verify unchanged remote/local state, and push once at its
+completed/blocked checkpoint; do not claim the six/eight tests are running.
+The continuous incoming review range is empty; this is one Codex implementation
+commit after `e061d441102dce4c8d22c1c480526328fca8f825`, not acceptance of a new
+Claude push. Its disposition is **prepared for review, not operationally
+admitted**. The three new modules, three tests and this lane record are the
+entire intended diff. The next admissible action is the explicit review/waiver
+gate followed by a separate exact evidence/recovery run freeze, never replay
+of the old begin. The final nonforce push must target only the matching lane;
+verify local/tracking/live equality and clean status afterwards. No monitor
+rearm, other-lane change, provider capture, new rights, paper/live/funded/broker
+action or efficacy claim is included.

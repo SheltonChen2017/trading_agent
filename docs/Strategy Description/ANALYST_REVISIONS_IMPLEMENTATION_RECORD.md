@@ -662,6 +662,11 @@ reports the same four filename/size pairs and zero backtests, but cannot expose
 the raw metadata needed to identify the failed guard. This is qualified tool
 evidence, not an authenticated recovery or cause. Next is bounded offline
 stage reconciliation, not a third launch or another source purchase.
+Section 310 records the later direct request to restore the exact missing/stub/
+default source and reach a running backtest, plus the owner's explicit scoped
+review waiver for reconciliation and conditional third/final recovery. A1/A2
+remain spent. New preparation is not an actual reader, cloud upload or launch;
+all three-stage source, input, attempt and actual-exit gates remain binding.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1771,8 +1776,12 @@ section308 implementation it invokes; this is not independent acceptance.
 The section 309 evidence and conditional same-project A2 sequence is now SPENT:
 evidence passed and recovery refused. The owner's separately authorized
 read-only Mia diagnosis is complete but did not identify the exact guard.
-The next step is a separately frozen bounded offline reconciliation of the new
-recovery's retained markers/receipts, not a third attempt. Preparation alone does not authorize invocation. Do not infer the local claim from
+The next step is section 310's separately frozen bounded offline reconciliation
+of the new recovery's retained markers/receipts, followed only if admitted by
+the conditional third/final exact-source recovery. The owner explicitly waives
+Claude review of section 310's current reconciliation and exact same-project
+third-attempt recovery; this is not independent acceptance or a future waiver.
+Preparation alone does not authorize invocation. Do not infer the local claim from
 a project name, repeat begin, change frozen economics or use another lane's
 jobs. Browser permission is not a blanket technical-gate waiver.
 V3 is spent after its
@@ -3718,6 +3727,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-24 | Authenticated Safari/Mia inspection and same-project R298 recovery preparation | `e061d441` -> this section-308 checkpoint | No new Claude range; same-round advice is not independent review | UI identifies project38364439 and partial source; editor-open automatic build disclosed; new bounded evidence/recovery code is uninvoked, not a repeat begin or replacement project | Focused synthetic validation and limitations in308; no complete suite or actual recovery reader/caller | Old error cause/local claim remain unresolved pending admissible evidence; no backtest or accepted result; current review/run gate retained | One final matching-lane checkpoint push; obtain current recovery review or scoped waiver, then exact freeze before use; monitor stays PAUSED |
 | 2026-10-23 PDT | Scoped owner waiver and exact R298 same-project recovery run decision | `0b054ddf` -> section309 freeze/result round | No new Claude range or independent acceptance; owner selected option1 for this particular recovery | Evidence once, then conditional same-project A2; unchanged source/economics, no old begin replay | Unchanged322 focused checks remain historical; genuine source/host preflight passed; new record checks recorded below | Actual outcomes and looks are not booked prospectively; every technical gate remains | Execute only committed309 decision, stop at its running/terminal/blocked checkpoint and push once; monitor PAUSED |
 | 2026-10-24 UTC | Actual R298 evidence success, A2 refusal and bounded Mia diagnosis | `0b054ddf` -> `dfa3490a` -> section309 final result | No new Claude range; current waiver consumed, not independent acceptance | D1 exit0 authenticated A1; D2 exit2 remote_refused; A2 consumed; Mia reports unchanged four filenames/sizes and zero backtests but lacks raw metadata | Actual bounded channels and unchanged-source control flow; record checks below; no operational replay or full suite | 316/241/50/699; no accepted result; exact failing label lost and remote effects not independently authenticated | Preserve all evidence; separately gated offline marker/receipt reconciliation before any A3; one final push, monitor PAUSED |
+| 2026-10-24 | Owner-scoped reconciliation and final R298 restoration/launch recovery | `f9fd0932` -> section310 round | No incoming Claude range; explicit current waiver, not independent review | Separate read-only A2 marker reconciliation and conditional A3 exact-source restoration; all spent operations and strategy bytes frozen | Focused synthetic checks and actual results recorded in310; no full suite | Starting316/241/50/699; third attempt not booked by preparation; historical failures retained | Commit exact decisions before invocation, stop on running/terminal/concrete barrier; one final matching-lane push; monitor PAUSED |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -52129,3 +52139,186 @@ under the same native network/artifact-read/write/Keychain-command denial,
 disabled plugin/shared conftest/cache, `-B` and in-root support paths. These
 overlap the pre-freeze86 and section308 record checks, not additional distinct
 coverage. Diff checks passed; no full suite or operational replay occurred.
+
+## 310. Owner-waived exact-source R298 reconciliation and final recovery, 2026-10-24
+
+### 310.1 Authority, immutable baseline and bounded intent
+
+The owner directs: "ok, upload the missing files and replace the stub and
+default main.py with the exact local code, then proceed until the backtest is
+running." Asked specifically whether to skip Claude review for reconciliation
+of attempt2, exact frozen-file restoration in project38364439, and the third/
+final attempt if all checks pass, the owner answered **"Yes—skip review for
+this recovery"**. This is current sequencing authority for that exact recovery,
+not independent acceptance, changed strategy economics, a fourth attempt,
+replacement project, evidence repair, another lane's resources, paper/live/
+funded/broker/real orders or future blanket waiver. Monitor stays PAUSED.
+
+Starting clean HEAD and live matching remote are
+`f9fd09327e23d7ac5e88c264d21258405cf1922c`. There is no new Claude review range.
+Every command/edit/test/commit/push remains in the designated Code-root
+worktree on `codex/strategy-analyst-revisions-v2`. The old A1, evidence and A2
+parents/workers, controls, pins and operation claims remain spent and frozen.
+This round never replays them, refreshes pins, deletes or repairs evidence, or
+uses another project. Same-round agents provide implementation and advisory
+checks, not independent final review. All shared/root documents stay frozen.
+
+The current source destination is project38364439 only. Seven missing modules,
+the one-byte input-runtime stub and default406-byte main are the reported
+incomplete upload; prior Mia filename/size reports do not authenticate current
+contents. Future mutation must authenticate the entire current source inventory,
+permit only the exact frozen bytes, recognized stub/default bytes or absence,
+and refuse unexpected content. It must read back all eleven normalized/generated
+projection files; raw repository source copies are not interchangeable with the
+frozen projection. The projection remains
+`f67148cd717e207be9d44f088749c0443bb696d9c4f38f512eb6cbf483fd9662`, with unchanged
+six-universe/AR-off economics, dates, family, package, lineage and D15 admission.
+
+### 310.2 Preparation and unresolved diagnosis
+
+The retained A2 envelope does not identify its failed predicate. Initial static
+advice incorrectly found no constructor mismatch; genuine public-projection
+regression below caught it. No journal filename-regex defect was found. Current
+official QC `projects/read` and
+`files/read` documentation describes the required ownership/idle/collaborator
+and file-project fields used by the guards. Documentation is not an account
+response, and Mia's filtered missing fields do not justify weakening them.
+References: `https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/read-project`
+and `https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/file-management/read-file`.
+
+The new offline reader is restricted to the new A2 leaf's exact finite claims,
+completion markers, journals, inventories and receipts. The old evidence corpus
+and `evidence.json` bytes are excluded. Its separate exclusive claim/output
+cannot repair or resume A2. A valid recorded prefix is not a recovered discarded
+cause, continuous integrity, measured provider contact or proof of no
+unjournaled effects. Any inconsistent prefix or existing/ambiguous launch
+blocks another launch pending separate reconciliation.
+
+The prospective A3 boundary preserves source/ownership/idleness/zero-prior-run/
+readback/compile/capacity gates and retains exact-type allowlisted helper error
+codes, last stage/intent and application dispatch count. It never emits raw
+exceptions, bodies, credentials or licensed rows; application dispatch is not
+measured provider contact. The fixed organization digest is the already
+authenticated historical binding, not a new account or automatic pin refresh.
+
+No reader or A3 operation is admitted by this draft preparation. Exact source
+and protocol pins, focused validation and separate clean-HEAD run decisions
+must be recorded below before their sole invocation. Starting booked floor
+is316shared/241development/50infrastructure/699cells. The offline diagnostic
+does not add a strategy attempt. A3's actual exclusive claim, if reached,
+adds one shared/development look; preparation does not. A third unsuccessful
+attempt requires the mandatory stop and authenticated Mia recovery checkpoint,
+not a renamed retry or fourth launch.
+
+### 310.3 Confirmed projection-identity defect and pre-use correction
+
+`ARV2CR310-001` — **P2, confirmed**: section308's frozen
+`RemoteRecovery.__init__` requires projection record `candidate_id == "R298"`.
+But the unchanged real `newrule_comparison_qc_runtime.make_profile` emits
+`arv2-newrule-6-ar0-2026-v1` for this frozen six/AR0 projection. `R298` is the
+family cell identifier, not that embedded profile identifier. The old remote
+tests synthesized the wrong identifier and therefore did not cover real
+construction. The new real public-projection smoke initially produced109
+passes/1 failure in3.84s, refusing `projection_binding` before any injected
+request or journal. This is a deterministic source incompatibility, not a
+vendor, quota, permission or HTTP diagnosis.
+
+Only the new A3 helper corrects the comparison to the exact actual identifier,
+while preserving the exact projection SHA and true-byte manifest checks. The
+spent old helper/caller remain unchanged. A regression invokes the old pure
+constructor with the genuine reconstructed projection and forbidden callbacks,
+proving its refusal before dispatch, and requires the new constructor to admit
+that same exact public projection with no callback. This does not rerun an
+operational parent, worker, collector or private input. Earlier same-round
+static advice missed the defect and is explicitly corrected here. The planned
+one-use marker reader still reconciles actual retained state before any A3;
+the lost error literal is not fabricated retrospectively.
+
+### 310.4 Final additive contracts, pins and focused validation
+
+The spent sources remain frozen. New reader source SHA256 is
+`3a73ad7f9d9ab08469592e8c856397bf312737872b0a22606c32371d77c4252a`, tests
+`f0f0f036c397a698db54681bf15a9d4373246f945dd9beb520bc3dca196aaa97`, canonical
+`arv2-r298-a2-stage-reconciliation-v1` profile
+`4240569a8d1c2a57154209818fba2ad71f20e9f7444bc96488a87e0468e0049c`.
+New exact-source helper SHA256 is
+`e9e0b9da61e04da7b6b97d30d95c2e51d00b25019098f51eef4d7930b41c60f5`, tests
+`4f0916c2e20680fd05f00caffdc9f7ebbea1042a7c6da2cfb3d3954b194fde6a`.
+New final caller SHA256 is
+`ba555b6f639555285bb3022a8c53a963b80794b702377064d18762bb576cb783`, tests
+`52b834544a1fb966d5a9909501e606013006ab25dcbaad463ae9a7b465fb9b79`, canonical
+`arv2-r298-final-recovery-v1` profile
+`5c8824046e528e8b52cf40c1584ea561f95f874b5589de6f71abfeba545aba50`.
+All72 selected dependency pins match; this is not whole-interpreter integrity.
+
+The reader claims a separate `newrule_reconciliation/R310-20261024-A` leaf
+before old finite-marker reads. Its exact native sandbox denies network,
+Keychain execution, old evidence.json bytes, sibling artifact bytes and ancestor
+directory census; ancestor traversal uses Darwin O_SEARCH. It retains selected
+file descriptors/full metadata through validation. The A3 caller uses only that
+new reader's two pinned outputs, actual externally observed reader exit0 and
+fresh package/lineage/family/D15 admission in credential-free native-denied
+workers. A2-leaf reads are denied to A3. It admits only a pre-mutation recorded
+prefix with no compile/backtest receipt; unknown/ambiguous state refuses.
+
+A3 exclusively claims its separate `newrule_final_recovery/R310-20261024-A`
+before credentials/contact, restores only exact permitted files, verifies all11,
+compiles once, checks exact ownership/idle/source/zero-prior-run/capacity before
+one launch, waits60s then reads own status once and reauthenticates admission.
+The parent deadline is300s, compile polls at most20 at10s, application dispatches
+at most60, and remaining time must exceed90s before launch. Only own children
+may be killed/reaped. Host suspension/uninterruptible I/O can exceed alarms.
+The parent is not placed inside a nested sandbox; each private worker uses its
+native profile. Channels are bounded24KiB; raw errors/bodies/credentials/rows
+are excluded. Actual parent exit0 plus matching authenticated output is required,
+not report presence or Completed. alone. Capacity wait cannot authorize retry.
+
+`ARV2CR310-002` — P2 confirmed/corrected before use: the first additive caller
+lost finite context for post-workflow source/deadline/report-publication errors.
+Same-round advisory caught this; state now extends through the final `report`
+stage and regressions assert retained stage/intent/dispatch count. This was
+fail-closed, not false success. No independent-review claim is made.
+
+Root final focused selection: **376 distinct passes in5.72s**, no failures,
+skips or warnings (80reader+120helper+90caller+86record/active-document).
+All6 new source/test files compiled in memory without bytecode; dispatch_fence
+was absent after import. Native network/artifact-read/write/Keychain-command
+denial, no conftest/plugin autoload/cacheprovider and in-root support paths were
+used. Earlier root120passes3.90s and86passes0.90s overlap. Author reader80/2.89s,
+helper120/3.35s and caller90/4.61s overlap; initial109/1 true-projection failure,
+74/3regexwarnings and earlier subsets remain disclosed, not additive. Memory-only
+binding omission caught1 expected failure0.07s, wrong projection ID caught1
+expected failure3.00s, and reader-exit omission caught2 expected failures0.10s;
+restoredfinally with unchanged disk hashes. Separate standalone native synthetic
+reader and worker smokes passed; nested native sandboxing was not represented
+as supported. No production operation or complete suite ran during validation.
+
+### 310.5 D1 exact offline stage-reader decision, before use
+
+Under the explicit scoped owner waiver, authorize exactly ONE invocation of
+`scripts/read_arv2_r298_a2_stage.py` at the clean commit containing this freeze,
+with `--expected-head` equal to that commit and `--reader-sha256` equal to the
+310.4 pin. Exact host is designated Code-root/branch, Darwin/POSIX Python3.13
+`/Users/sheltonchen/.venvs/trading_agent-py313/bin/python`. Invoke under its exact
+frozen native SANDBOX and minimal credential-free environment, `-B`, in-root
+temp/cache paths. The external observer permits45s, bounded64KiB stdout/stderr,
+records actual exit/time/byte/hash, and accepts only exact canonical single-LF
+reader envelope, correct schema/false flags, pure validated summary and matching
+summary-to-report pin. It prints only finite validated metadata; unknown output
+is hash/length-only. It may kill/reap only this child on bound/deadline failure.
+
+The reader has30s internal deadline. Existing/partial claim, failure, unknown
+exit or output ambiguity spends/ambiguously consumes D1; no retry/repair or
+renaming. It may read only the frozen A2 control's allowlisted finite records;
+never old evidence.json, original collectors, source corpus, credentials or QC.
+Output `artifacts/analyst_revisions_v2/newrule_reconciliation/R310-20261024-A`
+has not been inspected/allocated in preparation. No shared/development look is
+added. Actual successful output must be recorded and separately bind a committed
+D2 decision before A3; this D1 freeze alone does not authorize A3 invocation.
+
+The first post-document focused invocation omitted `--ignore=artifacts` and
+failed collection (1 error,0.03s) when pytest attempted denied artifact metadata.
+No test ran and the native denial was preserved. The corrected invocation
+restores that explicit exclusion; it is not an operational retry.
+Corrected record/active-document selection passed86 in0.89s, overlapping the
+final376; no failures/skips/warnings and no operational artifact access.

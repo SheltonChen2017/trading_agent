@@ -1,16 +1,17 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 202 COMPLETES CODEX'S COUNTER-REVIEW OF ALL THREE CLAUDE
-COMMITS IN `272132e4..8f6ee687`. THE SHARADAR CORRECTION AND TEST-ONLY GUARDS
-ARE ACCEPTED; THE DOCUMENTATION IS ACCEPTED AFTER TWO APPEND-ONLY FACTUAL
-QUALIFICATIONS. NO NEW PRODUCTION CORRECTION OR NEXT MILESTONE THIS ROUND.
-CLAUDE'S ACCEPTANCE OF THE SEVEN PRECEDING CODEX COMMITS AND THE PROSPECTIVE
-SELECTOR VERIFICATION STANDS AT ITS RECORDED SCOPE. OLD FAILURES STAY FAILED.
-SIX CARRIED P2 FINDINGS REMAIN OPEN; NOT BACKTEST-READY (200.4). THE OWNER'S
-QC HOLD REMAINS IN FORCE. FROZEN V1/FOUR V3 SOURCES, POPULATION/ECONOMICS,
-STRICT D23 AND BOTH FINAL ACCESS CLASSIFICATIONS REMAIN BINDING.
-LOOKS/JOBS/BACKTESTS 0/0/0. NO FUNDED/PAPER/LIVE/CAPITAL/REAL-ORDER/TRADING
-AUTHORITY. EXISTING MONITOR REMAINS PAUSED; ONE FINAL MATCHING-LANE PUSH.**
+Status: **SECTIONS 203-210 RECORD THE OWNER-REQUESTED SHARADAR ACCESS REPAIR
+AND COVERAGE AUDIT. ACTUAL TICKERS AND ACTIONS STATUS METADATA NOW VALIDATE;
+NO ARCHIVE OR ROW DOWNLOAD, PAID ENTITLEMENT OR BACKTEST READINESS IS CLAIMED.
+THE FIVE EARLIER FAILED/PARTIAL STATUS OPERATIONS STAY PRESERVED. SIX CARRIED
+P2 FINDINGS REMAIN OPEN; THE TWO NEW METADATA-COMPATIBILITY FINDINGS ARE
+CLOSED ONLY AT THEIR OBSERVED PROSPECTIVE SCOPES. SECTION 202'S COMPLETED
+COUNTER-REVIEW AND CLAUDE'S PRIOR ACCEPTANCES STAND; THIS NEW CODEX WORK IS
+NOT INDEPENDENTLY REVIEWED. THE OWNER'S QC HOLD REMAINS IN FORCE. FROZEN
+V1/FOUR V3 SOURCES, POPULATION/ECONOMICS, STRICT D23 AND BOTH FINAL ACCESS
+CLASSIFICATIONS REMAIN BINDING. LOOKS/JOBS/BACKTESTS 0/0/0. NO FUNDED/PAPER/
+LIVE/CAPITAL/REAL-ORDER/TRADING AUTHORITY. MONITOR PAUSED; FINAL LANE PUSH
+PENDING AT HANDOFF PREPARATION.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -40,11 +41,16 @@ No SDK draft activation, real-outcome look or backtest follows from selector
 success alone;200 is the actual verification/evidence handoff.
 Section 201 is Claude's later review of sections 195-200; it changes no
 gate and does not release the QC hold.
-The owner's latest "ok, start counter review" is applied as review-only
+The owner's then-current "ok, start counter review" was applied as review-only
 for section202, consistent with this chat's earlier counter-review-only
 round instruction. It does not restart the older continuous build. The
 immediately preceding datasource advisory was read-only; no acquisition,
 subscription, shared-account audit or QC release is inferred from it.
+The later explicit coverage-audit direction, Sharadar-reset/access request
+and "Investigate the Sharadar response-format issue and get access working,
+then continue the coverage audit. No QC access yet" authorize203-210's
+separately bounded metadata repair and retained-evidence/public-document
+audit. They do not activate a new archive/row capture or release QC.
 
 ## 1. Canonical V1 contract
 
@@ -29733,3 +29739,282 @@ finally; no on-disk reversal, provider call or credential read in tests.
 Production-opener tripwires and native denial cover positive and negative
 controls; the action start is01-actions and custody is checked before open.
 No actual v6 request has occurred at this preregistration point.
+
+## 209. Observed ACTIONS metadata success and exact access-repair boundary (2026-10-24)
+
+208's code/test/preregistration now exists as already-committed clean
+`7185d471f8b56b9c835431f54a804634fe226c1b`. The production ACTIONS-only
+operation used that exact HEAD and default production credential/transport
+callbacks, auditID `ib-sharadar-reference-20261024-actions-inventory-v6-once`.
+It completed at`2026-10-24T20:15:37.267796Z`, exit0,
+`completed-status-qualification`: planned1/observed1 transport, ONE Keychain
+read, HTTP200, ONE accepted metadata response. No TICKERS redispatch occurred.
+Its exact seven-source inventory SHA256 is
+`58697e74fa86ff92b28c4bb0f77fb910fcbf03ee9c16513438ecf1c062617200`.
+Neither a later record commit nor later documentation existed during that
+execution. All preceding completions/reservations are unchanged and consumed.
+
+The accepted private ACTIONS response is809 bytes, SHA256
+`c95cfcebee706bbf1711ebf990e63feb9d07c95581e4a2fab872f1545f0a666d`.
+Actual histories are exactly5y/10y/full. The root has table/files plus the
+seven known selected-full metadata fields; no unknown root field was
+silently dropped. Every advertised file validated, full was selected and
+root-selected fields matched it. The selected file advertises
+`actions.csv.zip`, historyfull, availabletrue, size10667984 bytes and
+modified`2026-10-24T14:28:42.604Z`. That size is SUPPLIER FILE METADATA,
+not transferred archive bytes: no ZIP/presign/download was requested.
+No storage lookup key is emitted by the projection or copied to this record.
+
+Private completion:13660 bytes/SHA256
+`32a5ca56ae812ae25c40b06b5514d0c33c461719efe2c164fab939bad895b6e9`;
+global reservation SHA256
+`3fa27aecd219b1c08a42d4f95769fef413020505f41044d54fa3ed9ed749b1c0`.
+Read-only independent main inspection under native network/fork/all-write/
+Keychain-exec denial checked all EIGHT closed child leaves plus the global
+reservation, hashes/private owner/modes/single links/held ancestry and all
+five predecessor bindings. It checked clean execution identity in the stored
+receipt, source inventory, exact planned/observed/accepted counts, all-false
+readiness flags and looks/jobs/backtests0/0/0. It did not reread a credential,
+redispatch, decode source rows, reexecute a campaign or call QC.
+
+Two preceding LOCAL preflight harness refusals occurred before any v6
+reservation/credential/transport: the first forbade process-fork while asking
+the identity helper to run Git; a second allowed Git forks but all-write
+denial also prevented Git opening/dev/null read-write. A diagnostic reproduced
+the latter exact OS error. The corrected READ-ONLY preflight retained network/
+Keychain-exec denial and denied regular-file writes, permitting only/dev/null
+and the required Git forks; clean exact7185d471, all predecessor custody and
+absent v6 namespace then passed. No production guard or frozen custody policy
+was changed. These harness refusals are not provider attempts or failures of
+the subsequent actual operation; denied-fork readback needed neither Git nor
+the/dev/null exception.
+
+`IBSHAR-ACTIONS-01` / P2: CLOSED ONLY for prospective ACTIONS advertised-
+inventory/full-selection metadata compatibility at7185d471, after actual
+strict success. `IBSHAR-CCR20301` remains CLOSED ONLY for207/208's actual
+TICKERS wrapper/storage-key compatibility at75acdf56. Their distinct causes
+are established by accepted byte-bound bodies, not guesses about bad keys or
+expired subscriptions. Older five failed/partial epochs stay failed/partial;
+the v5 ACTIONS refusal is not relabeled successful by v6's later success.
+
+This task's v2-through-v6 operations made SIX status-GET invocations and FIVE
+Keychain reads; including203's preceding access check yields SEVEN GETs/SIX
+reads across both tasks. These are journaled distinct correction epochs,
+not source-row requests or automatic retries in one operation. Successful
+TICKERS metadata is reused, never redispatched by v6. No more status scope is
+activated. No claim of complete historical data, paid download entitlement,
+SEC authenticity, historical availability/PIT, applicable processing rights,
+canonical admission, QC entitlement or backtesting readiness follows.
+
+Technical completion: strict finite schema compatibility now handles the
+actual supplier TICKERS wrapper and ACTIONS multi-history/selected-full
+envelope without arbitrary extra-field acceptance, secret projection,
+short-history fallback, weakened custody or repeated successful requests.
+Plain language: the metadata connection now works. The original failures
+remain documented, and file availability is not mistaken for having acquired
+or qualified the historical datasets.
+
+## 210. Updated four-provider coverage audit and recommended next steps (2026-10-24)
+
+### 210.1 Evidence scope and retained-data measurements
+
+Owner authorization is the latest Sharadar repair/coverage-audit request,
+continuing the earlier audit across Sharadar, EODHD, Massive and FMP. Use
+delegated judgment to fix metadata compatibility and prioritize existing
+sources, not buy another subscription or manufacture missing facts. Public
+official documentation is source-capability evidence; current actual status
+receipts are metadata-access evidence; old retained completions are stored
+audit evidence. These categories are not interchangeable. No new source-row,
+ZIP, price, fundamental, earnings-value or outcome acquisition occurred here.
+No account browser session, supplier mail mutation, purchase or QC access.
+
+Main independently read selected retained completion metadata under native
+network/fork/all-write/Keychain-exec denial, not raw CSV/ZIP/source rows:
+
+- Existing EODHD dual-partial earnings assessment
+  `earnings_archive_assessment/ib-earnings-assessment-dual-partial-2006q1-20261014-once/complete.json`:
+  273898 bytes/SHA256
+  `8a67f1d629bf1e354e8f8ade8d71cd6a00f98cc66935bdc12f3d1917ae2419b5`.
+  It accounts for2358204 source-metadata rows:1098486 accepted metadata,
+  1259718 quarantined,78955 provider codes and FOUR unavailable windows.
+  This does not mean2358204 usable actual-release events or resolved identities.
+- Existing compact supplied-Sharadar cohort completion
+  `sharadar_reference_cohort/ib-sharadar-cohort-2006q1-compact-v2-20261014-once/complete.json`:
+  7985 bytes/SHA256
+  `07dd203d82c3d90f90e1af239b8ef2255ecba47400595d6f415a65989ee29f97`.
+  It accounts for74150 TICKERS rows (13861 quarantined) and698455 ACTIONS
+  rows (5 quarantined), zero dispatch/credential reads for that offline
+  assessment, fundamentals_decodedfalse. Identity/PIT/backtesting remain
+  false. This is corroboration of retained metadata, not a new complete raw
+  replay, history proof or acceptance of every row.
+
+### 210.2 What the owned providers can and cannot yet supply
+
+| Existing source | Current evidence | Still unqualified / appropriate use |
+|---|---|---|
+| Sharadar bundle | SF1/FUNDAMENTALS plus supplied TICKERS/ACTIONS already retained; actual direct-API metadata now works. Official [table index](https://sharadar.com/llms.txt) distinguishes the direct API/key from Nasdaq Data Link and identifies SEP/stocks and SFP/funds. | No retained SEP daily-price archive has been established here. Qualify the owned full-history price entitlement, real cohort/dead-security coverage, adjustment/terminal consideration and historical identity/classification evidence before acquisition/integration. Status does not establish download rights; do not repurchase SF1. |
+| EODHD Calendar | Existing retained assessment above; official [calendar documentation](https://eodhd.com/financial-apis/calendar-upcoming-earnings-ipos-and-splits) advertises historical depth and announcement-day/BMO-AMC fields. | Four actual lane windows remain unavailable/unqualified. Advertised depth is not measured cohort completeness, exact timestamp or issuer/PIT identity. No new Calendar purchase is justified by a locally missing month. |
+| Massive/Benzinga Earnings | Official [earnings specification](https://massive.com/docs/rest/partners/benzinga/earnings) begins2010-04-30; the prior August2018 HTTP403 remains consumed. | Cannot fill January2006 regardless of renewal. Current addon entitlement is unestablished; later post2010 windows remain unattempted after that refusal. Do not retry or renew solely on the old403, or call last_updated first-public availability. |
+| FMP | Configured Keychain identity and owner-reported subscription, but exact plan remains unconfirmed; "started access" is not assumed to mean Starter. Official [pricing](https://site.financialmodelingprep.com/pricing-plans) advertises Starter5years/Premium30years generically. | No FMP source capture was performed. Generic depth is not a2006 actual-earnings/dead-ticker guarantee. The applicable download permission remains unbound under [section2.2.1](https://site.financialmodelingprep.com/developer/docs/terms-of-service); preserve the owner's prior skip disposition and do not repeat the paperwork question or infer supplier permission from other lanes. Use only if it demonstrably fills a residual gap. |
+
+No new purchase is recommended yet. Subscription ownership, credential
+presence, provider metadata and valid API schema do not prove that all needed
+historical records and processing uses are available. Sharadar EVENTS dates
+are SEC8-K filing dates, not silently substituted actual earnings releases.
+The [ACTIONS specification](https://sharadar.com/docs/actions) includes active/
+delisted securities and advertises1998 history; measured cohort coverage and
+cash/share terminal consideration still need evidence, not vendor marketing
+or a generalized claim that every delisting yields a correct return.
+
+### 210.3 Ordered remaining inputs and decisions
+
+1. Measure existing Sharadar price/reference coverage before buying anything:
+   qualify owned SEP and, where applicable, SFP history, delisted securities,
+   action/terminal-payment semantics and historical identifier/classification
+   intervals. Any actual archive acquisition needs a separately bounded
+   capture/custody scope; this metadata operation is not that capture.
+2. Repair the FOUR earnings windows without reissuing consumed requests:
+   January2006 and August2018 need independently identified supplier exports
+   or another qualified real archive, because their original raw bodies were
+   discarded. February2019 and February2020 have retained unsealed bodies;
+   separately registered OFFLINE supplemental qualification may assess them,
+   preserving absent producer HTTP/seal evidence. A supplier export request
+   should name release-day/timing/status, historical/dead/reused-ticker
+   identity and the applicable local-use scope; no email was sent here.
+3. Complete actual original-parent admission/integration for the19 affected
+   quarters, with complete refusal/underfill accounting. The64 retained early
+   originals are real available engineering inputs;57 inner views are not
+   original-body admission and seven issuer-first headers need directly
+   validated grammar without changing/reordering frozen bytes.2006Q1 retains
+   83657 quarantined filings,71679 relevant rows missing complete parents.
+   Current2022Q4-2023Q1 custody is19846/99394 with79548 originally unattempted,
+   not the full82-quarter study population.
+4. Bind issuer/share-class/CIK/native-SID/listing intervals and causal/PIT
+   availability against real data, plus pre-entry industry/size/value/
+   momentum/ADV/spread,252 preceding open-to-open six-factor/RF intervals,
+   adjustment/terminal-delisting treatment and5/20/60-session outcomes. Bind
+   PIT reverse-ETF holdings/mapping, ETF price/universe/execution calendars
+   and frozen costs/economics as required by the canonical strategy; this
+   audit does not establish that current holdings equal historical holdings.
+   Those ETF-stage inputs are not newly imposed prerequisites for the
+   already chosen stock-first diagnostic; the later ETF reserve is unspent.
+   Use existing legitimately available sources first, preserve every missing
+   field, and establish permanent full-population protocol/look roots and
+   applicable processing rights before promoting an order-based candidate.
+5. Keep QC untouched until explicit release. Native entitlement, actual
+   cloud-candidate validation and an observed completed order-based backtest
+   are later steps, not accomplished by local tests or these metadata GETs.
+
+The LOCAL retrospective earnings policy in167/200.4 remains binding: a truthful
+present source version is acceptable. A universal historical as-known forecast/
+full revision archive and EODHD QC-upload rights are NOT newly imposed gates
+for those LOCAL diagnostics. Availability/status uncertainty still receives
+its prescribed causal/conservative treatment, not invented exact timestamps.
+Both earnings diagnostics, frozen82-quarter2006Q1-2026Q2 window and economics
+remain unchanged; no narrower window or all-quarantined fixture is substituted.
+
+Six carried P2s remain OPEN at their prior exact scopes: IB1C-REAL-CR01,
+IB1BCAMP-CR01, IBSRC-CR01, IBSRC-CCR01, sharedIBSH-CR02 and
+sharedIBQC-SHARED-META01. There is no OPEN P0/P1. Earlier P3s, observations,
+resolved findings and every historical per-commit review disposition remain
+preserved; passing metadata/tests closes neither topical evidence nor shared
+behavior. No new independent Claude review is claimed for this Codex work.
+StrictD23 retains seven nonexact quarters/no82-quarter promotion digest;
+stoppedv3 remains1846 completed/1847 starts unresolved. No thaw, resume,
+redispatch or rewritten receipt. The separate7373-byte diagnostic/report
+`206e6db9677fb169455f62357ce966384926080b6eba582094e9536e88d705b7`
+does not settle its unmatched start. The372-request classification remains
+"historical authorization provenance not established" and the separate
+reviewer incident remains "reviewer-reported probable unintended SEC access;
+exact request count and transferred bytes not established", without retroactive
+approval. No conditional count/byte estimate becomes a measurement.
+
+This is an access-repair/audit checkpoint, not a backtest-ready lane. No new
+earnings/SEC/licensed-row acquisition, SDK draft activation, QC account/API/
+upload/job, registered/outcome look, backtest, shared remediation, operator-
+database/scheduler/broker/deployment/capital/funded/paper/live/order/trading
+action. Private source bodies/receipts and secrets remain ignored/out of Git.
+Shared/project records, Action Plan and SESSION_HANDOFF stay frozen. All
+readiness flags remain false; looks/jobs/backtests0/0/0. These changes remain
+local pending final durable handoff; no publication or new automation is
+claimed. Do not manufacture factual completion or request another routine
+engineering approval instead of reporting the concrete missing inputs.
+
+## 211. Separate durable access-repair/audit handoff and publication boundary (2026-10-24)
+
+All implementation/preregistration hashes below already exist. This is a
+subsequent record-only handoff; its own future hash and push result are not
+invented or assigned to earlier operations. The matching remote has remained
+`1344a74e946db484c5c8b28da1c238535197091b`; there is NO incoming independent
+review in this task. Existing202 dispositions stand unchanged. This new
+Codex implementation has internal/advisory QA only, not independent Claude
+acceptance or a new counter-review of Codex's own work.
+
+| Existing local commit | Purpose / exact observed disposition, not independent review |
+|---|---|
+| `f3c1763ada7431162ebb850ad63221f0ee6b74d3` | Preceding owner-requested access-check record203. Actual default1344a74e request refused; its failed scope remains consumed. |
+| `9cc2286925def0e3615fc036678d69d44fce809e` | New diagnostic and prereg204; actual one-file-wrapper shape observed, strict projection still refused. |
+| `85c5e1f758881462aba75ed85ea007f28f76786b` | Strict wrapped snapshot candidate/prereg205; actual descriptor refused, preserved. |
+| `9fa883808f9d9d5b0f8b6a55fa226a80e3a5c627` | Optional-known-metadata candidate/prereg206; actual extra-field refusal, preserved. |
+| `75acdf5656625e02dc68f31f275c30fb7d390f4f` | Official-public-client field validation/prereg207. Actual TICKERS metadata accepted, ACTIONS refused; overall partialexit2 remains partial. |
+| `7185d471f8b56b9c835431f54a804634fe226c1b` | ACTIONS-only strict inventory correction/prereg208. Actual clean-source operation209 completedexit0; TICKERS not repeated. |
+
+The final outgoing range is exclusively1344a74e..this subsequent handoff,
+containing only those SIX known local commits and the record-only handoff.
+No unrelated local commit is silently bundled. Changed tracked paths are
+ONLY the Sharadar adapter, its new diagnostic/regression test file and this
+lane record. All actual private namespaces/response bodies/receipts stay
+ignored and are not staged. All four v3 sources independently compare
+byte-equal to historicalaa0d635d; none is thawed. No shared/project file,
+Action Plan, SESSION_HANDOFF, frozen v1/scale/pilot or SDK source changes.
+
+Final main seven-path focused qualification after209/210/current-status
+updates:554 passed12.92s, no skips/failures/warnings. Native process-tree
+network/Keychain-exec/repository-write denial, minimal environment, isolated
+temp/bytecode/database, plugin autoload/cache disabled. No full lane/repository
+suite. Two code/test images compiled in memory under network/fork/all-write/
+Keychain-exec denial and retain208's exact SHA256s. Diff check is clean.
+The earlier554 passed13.08s is pre-activation evidence, not this later final
+record-tree run. Agent372-path and reversal results overlap; totals are not
+summed. Final append-only record/package checks follow this handoff update.
+Read-only internal advisory QA independently checked209/210's arithmetic,
+supplier limits, LOCAL policy, FMP-plan ambiguity, QC hold and scoped
+compatibility closures without edits/tests/network/credentials/QC. No
+material issue was found; its ETF-stage/stock-first clarification is included
+in210.3. This is Codex-internal QA, not independent Claude review.
+Final handoff record/active-document/import-boundary/EXACT package selection
+passed124 in3.43s, no skips/failures/warnings, under the same native denial.
+Both actual accepted-metadata completion paths are independently Git-ignored.
+Root/branch/exact7185d471 and expected record-only status were reverified;
+the matching-lane-only fetch still returned1344a74e. No later remote result
+or this handoff's future hash is claimed by that precommit observation.
+
+Owner decisions exercised and documented: fix supplier response compatibility
+with finite verified contracts rather than assert a bad key/expired plan;
+retain failed/partial epochs and reserve each prospective correction before
+access; reuse completed TICKERS evidence and dispatch only ACTIONS atv6;
+recommend measuring owned coverage before any purchase; preserve LOCAL
+earnings policy, actual missing evidence and explicit QC hold. No change in
+vendor terms, frozen research/window/economics or authority is manufactured.
+The next recommended work is210.3, not silently executed by this audit.
+
+This request's repair/audit checkpoint is complete; honest backtest readiness
+is NOT. The single-final-push standing instruction applies to this finished
+bounded round, not an interim claim of completed corpus. Before this final
+handoff commit and push, reverify designated exact root, branch, HEAD and
+expected record-only status; fetch ONLY the matching lane and stop on any
+unexpected advancement. Stage ONLY this record, commit the handoff separately
+from the existing implementation hashes, then make exactly ONE successful
+combined push to origin/codex/strategy-insider-buying. Independently verify
+the exact remote tip and clean status afterward; final owner report supplies
+observed publication, not a prewritten successful-push statement. Leave the
+monitor PAUSED; no new automation, rearm or other-chat message.
+
+Resume from209/210 and the exact historical instruction/review chain, not
+an old unqualified-account diagnosis. TICKERS/ACTIONS STATUS ACCESS works;
+paid archive access/actual coverage and every remaining source/identity/
+availability/rights/canonical/QC/look/backtest/execution gate still need their
+own real evidence. Six carried P2s stay OPEN; two metadata-compatibility P2s
+are CLOSED only as209 states. All prior P3/observation/resolution scopes and
+both final non-retroactive access classifications persist. No QC until
+explicit owner release; no funded/paper/live/capital/real-order authority.

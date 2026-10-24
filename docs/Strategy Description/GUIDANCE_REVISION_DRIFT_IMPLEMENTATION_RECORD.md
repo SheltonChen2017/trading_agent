@@ -33,8 +33,11 @@ runtime;
 or empirical backtest readiness is established. The original economic,
 empirical, account and trading gates remain closed; section 40.3's scoped
 EODHD direction is not verified entitlement, PIT evidence, QC-upload rights or
-real-data evaluation authority.**
-Current scope/evidence are sections 17 through 44. Sections 2 through 6 preserve
+real-data evaluation authority.
+The October 24 public-document coverage audit is recorded in section 45:
+no additional purchase is recommended yet, no private entitlement is certified,
+and the owner's current prohibition on QC access is in force.**
+Current scope/evidence are sections 17 through 45. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -5849,3 +5852,168 @@ Feature Milestone Record, process/shared files and original plan/PDF stay
 frozen. No next milestone starts. After local closure, stop with the monitor
 PAUSED and await the owner's next direction; no new native/empirical or
 original GDR-0..6 completion is claimed.
+
+## 45. Four-provider documented-coverage audit, 2026-10-24
+
+### 45.1 Scope, custody and account reports
+
+The owner requested a coverage audit across Sharadar, EODHD, Massive and FMP,
+advice on what is still missing before another purchase, and recommended next
+steps. The explicit restriction is: "do not access qc yet, another lane is
+using it". This audit uses public primary provider documentation and local
+lane contracts only. No QC page, documentation, account, quota, API, Mia,
+project, build, run, source, log or outcome is accessed. The monitor remains
+PAUSED; no resource is inspected, reserved, cancelled or reassigned.
+
+The mandatory worktree/branch/origin in section 44.1 are unchanged. Starting
+clean local HEAD is `91043b1734f8452c9084d4e63fbc7544c5c61b54`, one known
+local-only counter-review commit ahead of live matching remote
+`c68341731b0d69f7603f3d0209e683a97322d892`. That review is already consumed;
+this audit neither reconsumes it nor publishes the local closure. No concurrent
+or unexpected lane changes were observed. There is no current push request.
+
+| Provider | Owner-reported subscription | Remaining account-level uncertainty |
+|---|---|---|
+| Sharadar | Bundle, clarified during this audit | Purchased history depth (5Y/10Y/Full), acquisition channel and actual agreement |
+| EODHD | EOD All World and EOD Calendar; previously reported authenticated Safari session | Current active products/history and processing/retention terms; no assumption of Extended, All-In-One or other products |
+| Massive | Stocks Basic and Analyst Ratings; Ratings may have expired | Current active status, history and additional agreements; Corporate Guidance/Advanced are not reported owned |
+| FMP | Starter access, clarified during this audit | Actual account/grandfathered endpoint scope and agreement; higher-tier products are not presumed included |
+
+These are owner reports, not independently verified entitlement, completeness,
+licensing or historical availability. No private account/session, credentials,
+licensed rows, API examples returning data, samples, downloads or outcomes are
+accessed. No purchase, vendor contact, acquisition, capture or evaluation occurs.
+This is a documented-coverage assessment, not completion of original GDR-1.
+
+### 45.2 Requirement-to-provider assessment
+
+The frozen design source remains the original plan, not provider marketing.
+The signal is issuer guidance, not analyst ratings/consensus. The intended
+order-based route needs eligible stocks and matched SPY, dated identities and
+sectors, correct actions/terminal proceeds, consistent raw price/volume,
+minute trade-volume and historical bid/ask evidence. No daily-bar fallback or
+new economic assumption is adopted to fit an existing plan.
+
+| Provider | What public documentation establishes | What it does not establish for this lane |
+|---|---|---|
+| Sharadar Bundle | All Fundamentals, Prices and Investors tables; daily active/delisted stock and fund prices, reference metadata and actions. Bundle membership and purchased history depth are separate. [Bundle](https://sharadar.com/bundle), [history tiers](https://sharadar.com/blog/posts/upgrade-pause-resume). | No demonstrated numerical management-guidance revision archive or intraday NBBO. Actual SPY/date coverage and history selection were not queried. |
+| Sharadar detail | SF1 as-reported versus most-recent vintages; permanent identifiers; historical SIC/exchange changes and much cash/share merger consideration. [SF1](https://sharadar.com/docs/fundamentals), [tickers](https://sharadar.com/docs/tickers), [actions](https://sharadar.com/docs/actions), [FAQ](https://sharadar.com/docs/faqs). | Filing-date indexing is not an intraday first-availability clock. SIC needs a reviewed mapping to the required sector taxonomy; CVRs are excluded. Complete terminal-event treatment remains unverified. |
+| EODHD EOD + Calendar | Daily stock/ETF prices, splits/dividends and calendar/analyst-estimate information. OHLC and volume adjustment conventions differ. [EOD](https://eodhd.com/financial-apis/api-for-historical-data-and-volumes), [actions](https://eodhd.com/financial-apis/api-splits-dividends), [calendar](https://eodhd.com/financial-apis/calendar-upcoming-earnings-ipos-and-splits). | Analyst trends are not issuer guidance. Reported plans do not demonstrate historical NBBO; separate [intraday](https://eodhd.com/financial-apis/intraday-historical-data-api) OHLCV and [tick](https://eodhd.com/financial-apis/us-stock-market-tick-data-api) trade products are not assumed owned and are not quote archives. |
+| Massive reported products | Basic documents two rolling years of OHLCV bars available after EOD. [Bars](https://massive.com/docs/rest/stocks/aggregates/custom-bars). | Basic lacks historical tick trades/NBBO. [Trades](https://massive.com/docs/rest/stocks/trades-quotes/trades), [quotes](https://massive.com/docs/rest/stocks/trades-quotes/quotes). Analyst Ratings is not management guidance. |
+| Massive separate Corporate Guidance | EPS/revenue ranges, basis, fiscal identity, currency, publication fields and previous values; advertised history from 2011-09-12 and two-hour refresh. [Schema](https://massive.com/docs/rest/partners/benzinga/corporate-guidance). | Immediate comparable predecessor, immutable revisions, withdrawals, original first-delivery clocks and complete provenance are unproved. Candidate for inquiry only, not a recommended purchase yet. |
+| FMP Starter | Published Starter card lists up to five years, US coverage, annual fundamentals, historical prices and reference/news data; intraday and transcripts are advertised in higher tiers. [Plan cards](https://site.financialmodelingprep.com/datasets/market-data-historic). | No presumed Starter entitlement to transcripts/intraday or ready versioned issuer-guidance database. FMP describes [guidance workflow building blocks](https://site.financialmodelingprep.com/insights/enterprise/earnings-data-apis-how-to-access-transcripts-guidance-and-actual); [analyst estimates](https://site.financialmodelingprep.com/education/calendar/build-an-earnings-revision-pressure-signal-estimate-drift-monitor) are current consensus, not a historical revision timeline. Even documented [minute OHLCV](https://site.financialmodelingprep.com/developer/docs/stable/intraday-1-min) is not NBBO. |
+
+Normalization must be explicit: Sharadar's documented split-adjusted OHLCV
+requires the stated CloseUnadj/Close transformation and reciprocal volume
+correction for raw inputs; EODHD has raw OHLC but split-adjusted volume and
+split/dividend-adjusted close. Mixing those columns without normalization is
+not the plan's contemporaneous raw-dollar-volume calculation. Neither daily
+product is execution-quote evidence. [Sharadar stocks](https://sharadar.com/docs/stocks),
+[funds](https://sharadar.com/docs/funds), [EOD normalization](https://eodhd.com/financial-apis/api-for-historical-data-and-volumes).
+
+Historical/current reference endpoints are not automatically PIT masters.
+EODHD [delisted history](https://eodhd.com/financial-apis/delisted-stock-companies-data-2)
+varies by date/product. Massive's [dated overview](https://massive.com/docs/rest/stocks/tickers/ticker-overview)
+warns SEC fields use report-period rather than filing-publication dates;
+[ticker events](https://massive.com/docs/rest/stocks/corporate-actions/ticker-events)
+currently cover ticker changes, not a full terminal-settlement ledger. FMP
+[delisted coverage](https://site.financialmodelingprep.com/faqs?code=data) is
+limited to select US companies. None proves complete historical sectors or
+terminal proceeds merely by exposing a date filter or delisted flag.
+
+### 45.3 Unresolved capabilities and purchase disposition
+
+**Do not buy or upgrade another product yet.** Existing daily/reference data
+substantially overlap; no additional broad fundamentals, calendar or analyst-
+ratings subscription is justified solely by this lane's current gaps.
+
+1. Establish an auditable issuer-guidance source: FY adjusted-EPS and GAAP-
+   revenue ranges, same issuer/FY/basis/currency/units/share basis and the
+   immediately preceding comparable disclosure. Retain source evidence,
+   corrections, removals/withdrawals, timezone/DST, official-versus-expected
+   status, publication and historical first-availability/receipt clocks.
+   A licensed structured feed or separately engineered issuer-disclosure
+   pipeline could supply it; neither is established by current subscriptions.
+   Massive/Benzinga is a targeted candidate, not automatic acceptance.
+   Benzinga distinguishes [confirmed and generated expected records](https://docs.benzinga.com/api-reference/guides/guidance-process-explained).
+   Its [product field descriptions](https://www.benzinga.com/apis/cloud-product/corporate-guidance/)
+   describe prior/year-ago values differently from Massive's same-period
+   wording; resolve semantics and the missing confirmed/removal mapping before
+   purchase or use. [Removed-record route](https://docs.benzinga.com/api-reference/calendar-api/get-removed).
+2. Verify sufficient-depth historical NBBO and minute trade-volume coverage
+   for eligible stocks AND SPY, with sessions/adjustments/conditions suitable
+   for the frozen order model. Massive Advanced is documented as a possible
+   quote source, but actual required history, entitlement and rights need
+   verification. Existing execution-platform coverage may later avoid a new
+   purchase; this audit does not access that platform or claim it is covered.
+3. Verify the existing Bundle history and lifecycle/classification coverage
+   before considering supplemental reference data. A Bundle label alone is
+   not a Full-history grant, and action rows alone do not settle every merger,
+   election, bankruptcy, CVR or delisting correctly.
+4. Resolve actual allowed use and retained evidence. Provider product access
+   is distinct from local non-display research, archival/derived-data
+   retention and later external-cloud processing/upload. Massive's standard
+   terms distinguish display/non-display strategy use and require appropriate
+   licensing; FMP, EODHD and Sharadar terms also constrain transfer/retention
+   in differing ways. Actual agreements/order forms may govern exceptions.
+   This is a rights-verification requirement, not a universal prohibition or
+   legal conclusion. [Massive terms](https://massive.com/legal/market-data-terms-of-service),
+   [FMP terms](https://site.financialmodelingprep.com/terms-of-service),
+   [EODHD terms](https://eodhd.com/financial-apis/terms-conditions),
+   [Sharadar terms](https://sharadar.com/terms),
+   [Nasdaq terms if applicable](https://data.nasdaq.com/terms).
+
+Current historical rows, previous-value fields and last_updated do not prove
+the original available version. New snapshots cannot retrospectively supply
+receipt timestamps. Historical reconstruction may remain explicitly non-PIT
+exploratory under an authorized frozen scope; confirmation requires real
+availability evidence or separately authorized prospective capture. No date,
+family/look allocation, source-rights or evaluation permission is inferred.
+
+### 45.4 Recommended sequence, software gaps and local handoff
+
+Recommended next steps, not automatically started work:
+
+1. Verify account metadata/history and actual contracts without exposing keys;
+   resolve the targeted guidance semantics, history and processing/retention
+   questions with vendors before buying. No vendor is contacted here.
+2. Once rights and a bounded non-outcome scope are established, perform a
+   small structural coverage/PIT audit, including stock-plus-SPY and failed/
+   inactive lifecycle cases. Define exploratory versus prospective evidence
+   and freeze authorized sources/windows before outcome-bearing acquisition.
+3. Independently review that source contract and a real-data ingestion/PIT/
+   reference adapter. Current vendor_payloads/market_inputs are synthetic-only;
+   subscriptions do not implement real ingestion, matched-SPY/action or
+   equity-settlement parity. No source/contract code is changed in this audit.
+4. Only after the owner releases QC access, reassess the same bounded Mia-led
+   synthetic recovery's actual platform/headroom/ownership controls. That
+   invented 372-frame recovery requires NO additional datasource and is not
+   replaced by a real-data run. Empirical backtesting needs its own resolved
+   research/evidence gates after integration, not merely a Completed label.
+
+Original `GDR-base372-approved-20261008` stays CLOSED FAILED3/3, zero manual
+attempts; project 37647834 is untouched. Separate
+`GDR-Mia-base372-recovery-authorized-20261011` remains zero unsuccessful
+attempts, zero pending intents, no journal/project/launch, maximum three.
+Producing `c589b3dddab3f1dd136d10ae7ce1851d64818906` and the exact source,
+project/runtime/fixture/semantic identities in 38.4 remain unchanged. No
+candidate, immutable null/false permission, source right, economics,
+protected-date/family/look decision, original GDR-0..6 status or trading gate
+is changed. No full lane/repository suite or native test is run.
+
+This record/header is the only repository change. Sections 1–44 are preserved
+byte-exact below the header. Focused checks observed:
+
+| Check | Result |
+|---|---|
+| Initial interpreter selection | System `/usr/bin/python3` could not import the existing dataclass `slots` contract; stopped before any test ran. No lane failure or source fix is inferred. |
+| Supported bundled interpreter | Python 3.12.14: six named boundary methods passed in 0.246 s, zero failures/errors/skips or observed warnings; sanitized environment, `-B`, network/file-write fences including the fresh import child. |
+| Frozen source/design paths | Git comparison with producing `c589b3dd` passed for the lane package, neutral primitives and original plan/PDF; no preparation or carrier regenerated. |
+
+History/frozen-path comparisons and final diff/status guards are repeated
+before the local documentation commit; exact closure results and the commit
+identity are retained in thread/private memory. Public-doc research and
+advisory agent QA are not independent Claude acceptance, account entitlement
+certification or licensed-data completeness evidence. Root/project-wide docs
+remain frozen. This round is local-only: NO push, no new review watch, no QC
+monitor rearm and no automatic next milestone.

@@ -34,6 +34,16 @@ def file_manifest(files):
     return encoded([{"name": name, "sha256": hash_bytes(raw), "bytes": len(raw)} for name, raw in sorted(files.items())])
 
 
+def test_original_directory_count_does_not_include_external_spent_claim():
+    # Original controls bind 3,586 START/terminal pairs, 3,584 raw HTTP200
+    # bodies, 601 day starts, 593 complete/report pairs, eight refused days
+    # and two global controls. The separately pinned claim is in the parent.
+    inside = 2 * 3586 + 3584 + 601 + 2 * 593 + 8 + 2
+    assert inside == 12553
+    assert m.SOURCE_COUNTS["files"] == inside
+    assert inside + 1 == 12554
+
+
 def original(monkeypatch):
     """Explicit small original fixture: completed1,3; partial2; noninvoked4."""
     case = setup(monkeypatch); plan, index = case[:2]

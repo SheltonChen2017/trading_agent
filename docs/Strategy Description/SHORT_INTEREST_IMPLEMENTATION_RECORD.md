@@ -21230,3 +21230,39 @@ separating the appended122; an initially overstrict whole-prefix equality
 check rejected that separator, not a historical content change. No private
 row, provider/key or QC call was made by this validation. Local code freeze
 precedes actual recovery; the round remains active and **unpublished**.
+
+### 122.8 First actual offline daily check: directory/claim count correction
+
+At clean local **71c2e7a849aaed577a8a0e62b6d822e07b6b5f77**, unchanged
+actual remoteB211, Main started the registered read-only parent measurement.
+It refused before reading/hashing any original body, creating a manifest,
+claiming a child budget, reading credentials or invoking HTTP:
+`exact_original_daily_member_names_required`. The fixed negative diagnostic
+is retained in the separate ignored `recovery_registration/daily-parent-20261024-v1`
+directory. This was an offline audit refusal, not a provider rejection or
+spent source-retrieval round; both old provider claims remain unchanged.
+
+**SI-BUILD-20261024-011, P2 operational false refusal, confirmed/corrected:**
+the new validator confused12,554 total protected evidence files with the
+number **inside** the old run directory. Main's held-directory read found
+**12,553** run members, all matching the fixed control/page filename grammar,
+zero foreign names. Bound accounting implies12,553 inside:3,586 START and
+terminal pairs,3,584 raw HTTP200 bodies,601 day starts,593 completed/report
+pairs, eight refused days and two global controls. The separately pinned
+spent claim is the12,554th protected file, in the parent directory. No file
+was removed, recreated, ignored or supplied to fill this discrepancy.
+Full byte/control authentication is still required; a name count is not
+proof of unchanged source content.
+
+Main's causal accounting test was red **1 failed in0.33s**, then the one
+directory-count constant was corrected to12,553 with an explicit sibling
+claim comment. Exact membership/negative/byte/code checks are unchanged.
+The new whole daily-recovery file plus relevant record/import/active-document
+controls pass **117 tests in11.43s**, network denied. The corrected44-path
+daily code manifest SHA256 is
+`fefe571ccb6c79d3d36c6308632385e01ec515caf0a9437900fe8151e4c14f85`,
+superseding122.7's pre-diagnostic code bytes only. Count runtime/protocol and
+its51-path f8ae… manifest are unchanged. Source facts, all spent debits and
+actual look/QC counters remain unchanged. A separately named offline v2
+diagnostic under corrected committed code may now measure/authenticate the
+same original bytes; this is not a silent provider-budget restart.

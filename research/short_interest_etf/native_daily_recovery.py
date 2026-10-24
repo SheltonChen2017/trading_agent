@@ -22,7 +22,9 @@ SOURCE_PINS = {
 }
 SOURCE_PROTOCOL = "dc25d57e5b181c7028385ea689805e72b62a09c6e687cd11ac1eb6b7c5e139ce"
 SOURCE_OPERATIONAL = "d9bfd50ae4f9ad44c939832482066683b98304c160893b1b914bfcb138156126"
-SOURCE_COUNTS = {"files": 12554, "attempts_claimed": 3586, "http_invocations": 3585,
+# The separately pinned spent claim is a sibling in the parent directory:
+# 12,553 run members plus that one claim are 12,554 protected source files.
+SOURCE_COUNTS = {"files": 12553, "attempts_claimed": 3586, "http_invocations": 3585,
     "days_started": 601, "days_returned": 601, "complete_days": 593,
     "charged_bytes": 966979249, "charged_rows": 3347428, "rows": 3346428}
 ROOT = "/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__short_interest/"

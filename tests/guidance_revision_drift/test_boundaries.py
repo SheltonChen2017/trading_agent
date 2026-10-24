@@ -62,6 +62,14 @@ class GuidanceBoundaryTests(unittest.TestCase):
         self.assertIn(ROOT / "data/hashing.py", visited)
         self.assertIn(ROOT / "data/financial_primitives.py", visited)
 
+    def test_every_package_module_is_in_the_explicit_review_bundle_inventory(self):
+        # GDR-CR47-001: a module missing from bundle._MODULES makes the full
+        # review bundle refuse, which only the slower bundle, release and CLI
+        # suites exercised. This focused boundary check catches it directly.
+        from research.guidance_revision_drift import bundle
+        from research.guidance_revision_drift.reporting import source_manifest
+        self.assertEqual(set(source_manifest()), bundle._SOURCE_PATHS)
+
     def test_fresh_process_imports_no_execution_or_provider_package(self):
         code = """
 import json, sys

@@ -144,6 +144,32 @@ class CoveragePreflightTests(unittest.TestCase):
         with self.assertRaises(CoverageError):
             self.assess(body)
 
+    def test_each_inventory_rule_refuses_alone(self):
+        # GDR-CR47-002: each case breaks exactly one rule no other case isolated.
+        def row(body, provider):
+            return next(item for item in body["subscriptions"] if item["provider"] == provider)
+        cases = {
+            "basic-format date": lambda body: body.update(as_of_date="20261024"),
+            "unknown provider": lambda body: row(body, "eodhd").update(provider="example_vendor"),
+            "owner report with displayed end": lambda body: row(body, "sharadar").update(
+                displayed_access_end_date="2026-11-14"),
+            "owner report with account reference": lambda body: row(body, "sharadar").update(
+                evidence_ref="authenticated_subscription_page"),
+            "empty product list": lambda body: row(body, "eodhd").update(products=[]),
+        }
+        for label, change in cases.items():
+            body = json.loads(self.raw)
+            change(body)
+            with self.subTest(case=label), self.assertRaises(CoverageError) as raised:
+                self.assess(body)
+            self.assertNotIn("example_vendor", str(raised.exception))
+        # A duplicated provider must not mask a missing one: four rows, Sharadar absent.
+        body = json.loads(self.raw)
+        rows = body["subscriptions"]
+        rows[rows.index(row(body, "sharadar"))] = json.loads(json.dumps(row(body, "eodhd")))
+        with self.assertRaisesRegex(CoverageError, "duplicate provider"):
+            self.assess(body)
+
     def test_cancellation_is_not_expired_but_end_date_is_not_future_authority(self):
         report = self.assess()
         massive = next(row for row in report["subscriptions"] if row["provider"] == "massive")

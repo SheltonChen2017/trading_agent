@@ -893,10 +893,21 @@ def _outside_lane(root) -> bool:
     """True only for a root that neither is, contains, nor lies inside the lane."""
     try:
         requested, actual = Path(root).resolve(), LANE_ROOT.resolve()
+        lane, other = str(actual).casefold(), str(requested).casefold()
+        if lane == other or other.startswith(lane + "/") or lane.startswith(other + "/"):
+            return False
+        # Section 218 (Claude review): spellings are not identities. A macOS
+        # firmlink such as /System/Volumes/Data/Users/... names the lane under
+        # a different resolved string, so compare device/inode as well.
+        lane_id = (actual.stat().st_dev, actual.stat().st_ino)
+        lane_chain = {(item.st_dev, item.st_ino) for item in map(os.stat, (actual, *actual.parents))}
+        for item in (requested, *requested.parents):
+            if item.exists() and (item.stat().st_dev, item.stat().st_ino) == lane_id:
+                return False
+        return not (requested.exists()
+                    and (requested.stat().st_dev, requested.stat().st_ino) in lane_chain)
     except (OSError, RuntimeError, TypeError, ValueError):
         return False
-    lane, other = str(actual).casefold(), str(requested).casefold()
-    return lane != other and not other.startswith(lane + "/") and not lane.startswith(other + "/")
 
 
 def run_qualification(audit_id: str, expected_head: str, *, root: Path = LANE_ROOT,

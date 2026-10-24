@@ -522,3 +522,38 @@ def test_cli_output_keeps_private_metadata_private(monkeypatch,capsys):
     assert m.main(["--expected-head",HEAD])==0
     text = capsys.readouterr().out
     assert TOKEN not in text and "private-ticker" not in text and "qc_jobs" in text
+
+
+# Claude review section 218 (IBSHAR-CR03, IBPRICE-CR01).
+@pytest.mark.parametrize("where", ["lane", "inside"])
+def test_fixture_fence_refuses_a_firmlink_spelling_of_the_lane(monkeypatch, where):
+    import sys
+    alias = Path("/System/Volumes/Data") / m.LANE_ROOT.relative_to("/")
+    if sys.platform != "darwin" or not alias.exists() or not alias.samefile(m.LANE_ROOT):
+        pytest.skip("this host has no firmlink spelling of the lane")
+    monkeypatch.setattr(m.request, "build_opener", lambda *args, **kwargs: pytest.fail("production opener must not run"))
+    monkeypatch.setattr(m, "_Plan", lambda *args, **kwargs: pytest.fail("real lane inputs opened"))
+    with pytest.raises(m.PriceCoverageError, match="^fixture_root_overlaps_lane_refused$"):
+        run(alias if where == "lane" else alias / "artifacts", m.FixtureAnchors("a"*64, "b"*64, "c"*64))
+    from research import insider_buying_sharadar_reference_qualification as reference
+    assert m._outside_lane is reference._outside_lane
+
+
+def test_plan_is_parsed_from_the_hashed_bytes_not_an_unhashed_reread(monkeypatch, tmp_path):
+    # _version omits ctime, so equal versions cannot bind a second read.
+    anchors = seed(tmp_path)
+    plan, _, _ = source_inputs()
+    swapped = m._canonical({**plan, "requested_tickers": ["AAA"], "request": m._request_profile(["AAA"])})
+    real, reads = m._leaf, []
+    def leaf(directory, name, cap):
+        raw, version = real(directory, name, cap)
+        reads.append(name)
+        if name == "probe-plan.json" and reads.count(name) == 2:
+            return swapped, version
+        return raw, version
+    monkeypatch.setattr(m, "_leaf", leaf)
+    monkeypatch.setattr(m, "_validate_plan", lambda plan, *args: pytest.fail("substituted plan parsed"))
+    with pytest.raises(m.PriceCoverageError, match="^capture_custody_or_input_refused$|^offline_input_changed$"):
+        run(tmp_path, anchors)
+    assert reads.count("probe-plan.json") == 2
+    assert not output(tmp_path).exists()

@@ -4,6 +4,7 @@ import io
 import json
 import os
 from pathlib import Path
+import sys
 from types import SimpleNamespace
 from urllib import error
 
@@ -472,3 +473,29 @@ def test_fixture_run_cannot_be_handed_the_real_keychain_reader_or_transport(tmp_
             transport=m._default_transport if real == "transport" else (lambda table, token: response(table)),
             clock=lambda: "2026-10-13T00:00:00Z")
     assert not tmp_path.joinpath(*m.ARTIFACT_PARTS).exists()
+
+
+# Claude review section 218 (IBSHAR-CR03): the section-194 fence compared
+# resolved spellings only, and a macOS firmlink spelling of the lane passed.
+def _firmlink_spelling(path):
+    alias = Path("/System/Volumes/Data") / path.relative_to("/")
+    if sys.platform != "darwin" or not alias.exists() or not alias.samefile(path):
+        pytest.skip("this host has no firmlink spelling of the lane")
+    return alias
+
+
+@pytest.mark.parametrize("where", ["lane", "inside", "parent"])
+def test_fixture_fence_compares_filesystem_identity_not_only_the_spelling(monkeypatch, where):
+    alias = _firmlink_spelling(m.LANE_ROOT)
+    root = {"lane": alias, "inside": alias / "artifacts", "parent": alias.parent}[where]
+    assert root.resolve() != m.LANE_ROOT.resolve()
+    monkeypatch.setattr(m, "_mkdir_chain", lambda *a, **k: pytest.fail("real lane namespace touched"))
+    with pytest.raises(m.SharadarReferenceQualificationError, match="^fixture_root_overlaps_lane_refused$"):
+        m.run_qualification(AUDIT, HEAD, root=root, identity=lambda head, root: pytest.fail("identity reached"),
+            credential_reader=lambda provider: credential(), transport=lambda table, token: response(table),
+            clock=lambda: "2026-10-13T00:00:00Z")
+
+
+def test_fixture_fence_still_admits_an_unrelated_root_and_refuses_the_filesystem_root(tmp_path):
+    assert m._outside_lane(tmp_path) and m._outside_lane(tmp_path / "not-created-yet")
+    assert not m._outside_lane(Path("/")) and not m._outside_lane(m.LANE_ROOT / "not-created-yet")

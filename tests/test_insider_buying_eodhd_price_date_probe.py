@@ -391,3 +391,17 @@ def test_constructor_failure_preserves_primary_and_drains_created_handles(tmp_pa
     with pytest.raises(m.PriceDateProbeError, match="^constructor_primary_refused$"):
         m._Context(tmp_path, True, HEAD, lambda head, root:identity(root), identity(tmp_path))
     assert calls == [(*m.OUTPUT_PARTS, m.AUDIT_ID), m.OUTPUT_PARTS]
+
+
+# Claude review section 218 (IBSHAR-CR03): this probe reuses the price
+# capture's fence, which compared resolved spellings only.
+def test_fixture_fence_refuses_a_firmlink_spelling_of_the_lane():
+    import sys
+    alias = Path("/System/Volumes/Data") / m.LANE_ROOT.relative_to("/")
+    if sys.platform != "darwin" or not alias.exists() or not alias.samefile(m.LANE_ROOT):
+        pytest.skip("this host has no firmlink spelling of the lane")
+    assert alias.resolve() == alias
+    with pytest.raises(m.PriceDateProbeError, match="^invented_outside_lane_callbacks_required$"):
+        m.run_probe(HEAD, root=alias, identity=lambda *a, **k: pytest.fail("identity reached"),
+                    credential_reader=lambda *a: pytest.fail("reader reached"),
+                    transport=lambda *a, **k: pytest.fail("transport reached"))

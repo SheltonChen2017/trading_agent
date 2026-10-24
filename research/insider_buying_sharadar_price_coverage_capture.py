@@ -32,7 +32,7 @@ from research.insider_buying_eodhd_earnings_demo import FALSE_FLAGS
 from research.insider_buying_keychain_credentials import KeychainCredential, read_keychain_credential
 from research.insider_buying_provider_metadata_audit import _now
 from research.insider_buying_provider_metadata_transport import ProviderMetadataResponse, _DenyRedirect
-from research.insider_buying_sharadar_reference_qualification import _screen_credential
+from research.insider_buying_sharadar_reference_qualification import _outside_lane, _screen_credential
 
 
 LANE_ROOT = custody.LANE_ROOT
@@ -288,8 +288,14 @@ class _Plan:
         self.versions = {}
         try:
             self.check()
-            self.plan = _json(_leaf(self.chain.fd, "probe-plan.json", MAX_PLAN_BYTES)[0])
-            complete = _json(_leaf(self.chain.fd, "complete.json", MAX_PLAN_BYTES)[0])
+            # Section 218 (Claude review): parse exactly the bytes whose hash is
+            # pinned. _version omits ctime, so equal versions cannot bind a re-read.
+            plan_raw = _leaf(self.chain.fd, "probe-plan.json", MAX_PLAN_BYTES)[0]
+            complete_raw = _leaf(self.chain.fd, "complete.json", MAX_PLAN_BYTES)[0]
+            _need(_sha(plan_raw) == anchors.plan_sha256 and _sha(complete_raw) == anchors.complete_sha256,
+                  "offline_input_changed")
+            self.plan = _json(plan_raw)
+            complete = _json(complete_raw)
             _need(complete.get("plan_sha256") == anchors.plan_sha256, "offline_plan_hash_mismatch")
             self.tickers = _validate_plan(self.plan, complete, anchors.qualification_sha256, fixture)
             self.binding = {"plan_sha256": anchors.plan_sha256, "complete_sha256": anchors.complete_sha256,
@@ -503,14 +509,6 @@ def _csv_projection(raw, tickers, credential):
         raise
     except (csv.Error, StopIteration, ValueError, OverflowError):
         raise PriceCoverageError("csv_schema_refused") from None
-
-
-def _outside_lane(root):
-    try:
-        other, lane = str(Path(root).resolve()).casefold(), str(LANE_ROOT.resolve()).casefold()
-        return other != lane and not other.startswith(lane + "/") and not lane.startswith(other + "/")
-    except (OSError, RuntimeError, TypeError, ValueError):
-        return False
 
 
 def run_capture(expected_head, *, root=LANE_ROOT, identity=_identity, credential_reader=None,

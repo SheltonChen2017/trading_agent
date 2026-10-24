@@ -21,6 +21,7 @@ AUDIT = "ib-sharadar-reference-diagnostic-invented"
 CORRECTION_AUDIT = "ib-sharadar-reference-correction-invented"
 FINAL_AUDIT = "ib-sharadar-reference-final-invented"
 CATALOGUE_AUDIT = "ib-sharadar-reference-catalogue-invented"
+ACTIONS_AUDIT = "ib-sharadar-reference-actions-invented"
 BASELINE = {
     "root": "invented", "branch": m.LANE_BRANCH, "head": HEAD, "clean": True,
     "source_sha256": {"invented.py": "b" * 64}, "source_inventory_sha256": "c" * 64,
@@ -82,6 +83,24 @@ def test_catalogue_explicit_known_fields_contract(catalogue):
         assert projected["file"]["canDownload"] is catalogue["canDownload"]
 
 
+@pytest.mark.parametrize("top_history", [False, True])
+def test_actions_inventory_explicit_selected_snapshot_contract(top_history):
+    full = dict(ACTIONS["files"][0])
+    selected = {key: full[key] for key in ("name", "size", "sizeLabel", "modified")}
+    if top_history:
+        selected.update(history="full", historyLabel="Full History", available=True)
+    body = {"table": "actions", "files": [full], **selected}
+    raw = encode(body)
+    with pytest.raises(m.SharadarReferenceQualificationError, match="source_envelope_schema_refused"):
+        m._projection("actions", raw, credential(), wrapped_snapshot=True,
+                      optional_snapshot_metadata=True, catalogue_fields=True)
+    projected = m._action_inventory_projection(raw, credential())
+    assert projected["table"] == "actions"
+    assert projected["file"]["name"] == "actions.csv.zip"
+    assert projected["inventory_histories"] == ["full"]
+    assert projected["provider_reported_metadata_only"] is True
+
+
 def encode(value):
     return json.dumps(value, separators=(",", ":")).encode()
 
@@ -96,7 +115,8 @@ def response(table, *, raw=None, status=200, complete=True, disposition=None):
     return m.ProviderMetadataResponse(status, raw, complete, disposition)
 
 
-def run(root, *, diagnostic=False, correction=False, final=False, catalogue=False, audit_id=None, reader=None, transport=None, identity=None):
+def run(root, *, diagnostic=False, correction=False, final=False, catalogue=False, actions_only=False,
+        audit_id=None, reader=None, transport=None, identity=None):
     kwargs = {"diagnostic": diagnostic}
     if correction:
         kwargs["correction"] = correction
@@ -104,8 +124,10 @@ def run(root, *, diagnostic=False, correction=False, final=False, catalogue=Fals
         kwargs["final"] = final
     if catalogue:
         kwargs["catalogue"] = catalogue
+    if actions_only:
+        kwargs["actions_only"] = actions_only
     return m.run_qualification(
-        audit_id or (CATALOGUE_AUDIT if catalogue else FINAL_AUDIT if final else CORRECTION_AUDIT if correction else AUDIT if diagnostic else PRIOR_AUDIT), HEAD, root=root,
+        audit_id or (ACTIONS_AUDIT if actions_only else CATALOGUE_AUDIT if catalogue else FINAL_AUDIT if final else CORRECTION_AUDIT if correction else AUDIT if diagnostic else PRIOR_AUDIT), HEAD, root=root,
         identity=identity or (lambda head, root: dict(BASELINE)),
         credential_reader=reader or (lambda provider: credential()),
         transport=transport or (lambda table, key: response(table)),
@@ -1250,3 +1272,279 @@ def test_catalogue_requires_all_prior_mode_guards_before_identity(tmp_path, flag
         run(tmp_path, diagnostic=flags[0], correction=flags[1], final=flags[2], catalogue=True,
             identity=lambda *args, **kwargs: calls.append("identity"))
     assert calls == [] and list(tmp_path.iterdir()) == []
+
+
+def action_inventory(histories=("5y", "10y", "full"), *, selected=True, key=True, available=True):
+    profiles = {"5y": ("actions-5Y.csv.zip", "5 Years"), "10y": ("actions-10Y.csv.zip", "10 Years"),
+                "full": ("actions.csv.zip", "Full History")}
+    rows = []
+    for index, history in enumerate(histories):
+        name, label = profiles[history]
+        row = {**ACTIONS["files"][0], "name": name, "history": history, "historyLabel": label,
+               "size": 1000 * (index + 1), "available": available}
+        if key:
+            row["key"] = "reference/" + name
+        rows.append(row)
+    body = {"table": "actions", "files": rows}
+    if selected:
+        full = next(row for row in rows if row["history"] == "full")
+        body.update({name: value for name, value in full.items() if name != "key"})
+    return body
+
+
+@pytest.mark.parametrize("histories", [("full",), ("5y", "full"), ("full", "10y"),
+                                     ("5y", "10y", "full"), ("full", "10y", "5y")])
+@pytest.mark.parametrize("selected", [False, True])
+def test_actions_inventory_selects_exact_full_not_first_advertised_history(histories, selected):
+    body = action_inventory(histories, selected=selected)
+    projected = m._action_inventory_projection(encode(body), credential())
+    full = next(row for row in body["files"] if row["history"] == "full")
+    assert projected["table"] == "actions"
+    assert projected["file"]["name"] == "actions.csv.zip"
+    assert projected["file"]["size"] == full["size"]
+    assert projected["file"]["history"] == "full"
+    assert projected["file"]["available"] is True
+    assert projected["inventory_histories"] == list(histories)
+    assert "key" not in projected["file"]
+    assert "reference/" not in json.dumps(projected)
+
+
+@pytest.mark.parametrize("mutation", ["empty", "too-many", "duplicate-full", "missing-full", "unknown-history",
+                                     "bad-short-name", "bad-short-label", "bad-short-available", "unknown-short-field",
+                                     "bad-short-key", "short-missing-core", "wrong-table", "upper-table", "unknown-root",
+                                     "null-files", "dict-file", "null-row"])
+def test_actions_inventory_validates_every_advertised_history_and_root(mutation):
+    body = action_inventory()
+    if mutation == "empty": body["files"] = []
+    elif mutation == "too-many": body["files"] += [dict(body["files"][0])]
+    elif mutation == "duplicate-full": body["files"] = [dict(body["files"][-1]), dict(body["files"][-1])]
+    elif mutation == "missing-full": body["files"] = body["files"][:-1]
+    elif mutation == "unknown-history": body["files"][0]["history"] = "2y"
+    elif mutation == "bad-short-name": body["files"][0]["name"] = "actions.csv.zip"
+    elif mutation == "bad-short-label": body["files"][0]["historyLabel"] = "5 years"
+    elif mutation == "bad-short-available": body["files"][0]["available"] = 1
+    elif mutation == "unknown-short-field": body["files"][0]["extra"] = "unselected must still refuse"
+    elif mutation == "bad-short-key": body["files"][0]["key"] = "../actions-5Y.csv.zip"
+    elif mutation == "short-missing-core": del body["files"][0]["size"]
+    elif mutation == "wrong-table": body["table"] = "tickers"
+    elif mutation == "upper-table": body["table"] = "ACTIONS"
+    elif mutation == "unknown-root": body["extra"] = None
+    elif mutation == "null-files": body["files"] = None
+    elif mutation == "dict-file": body["files"] = body["files"][0]
+    elif mutation == "null-row": body["files"][0] = None
+    with pytest.raises(m.SharadarReferenceQualificationError):
+        m._action_inventory_projection(encode(body), credential())
+
+
+@pytest.mark.parametrize("field,value", [("name", "actions-5Y.csv.zip"), ("size", 321),
+                                        ("sizeLabel", "99 KB"), ("modified", "2026-10-25T00:00:00Z"),
+                                        ("history", "5y"), ("historyLabel", "5 Years"), ("available", False),
+                                        ("key", "different/actions.csv.zip"), ("canDownload", False)])
+def test_actions_inventory_selected_top_snapshot_must_match_full(field, value):
+    body = action_inventory()
+    if field == "canDownload":
+        body["files"][-1][field] = True
+    body[field] = value
+    with pytest.raises(m.SharadarReferenceQualificationError):
+        m._action_inventory_projection(encode(body), credential())
+
+
+def test_actions_inventory_partial_top_snapshot_cannot_omit_core():
+    body = action_inventory(selected=False)
+    body["available"] = True
+    with pytest.raises(m.SharadarReferenceQualificationError):
+        m._action_inventory_projection(encode(body), credential())
+
+
+@pytest.mark.parametrize("encoded", [False, True])
+def test_actions_inventory_screens_unselected_history_and_top_for_secret(encoded):
+    body = action_inventory()
+    body["files"][0]["unknown"] = percent(TOKEN, 2) if encoded else TOKEN
+    with pytest.raises(m.SharadarReferenceQualificationError, match="credential_echo_refused"):
+        m._action_inventory_projection(encode(body), credential())
+
+
+def seed_catalogue(root):
+    old = seed_final(root)
+    result = run(root, diagnostic=True, correction=True, final=True, catalogue=True,
+                 transport=lambda table, key: response(table, raw=encode(
+                     catalogue_body(table, can_download=None) if table == "tickers" else action_inventory())))
+    assert result["transport_invocation_count"] == 2
+    assert result["observed_status_metadata_count"] == 1
+    assert result["disposition"] == "stopped-status-qualification"
+    assert result["receipts"][0]["table"] == "tickers"
+    assert result["receipts"][0]["status_metadata_observed"] is True
+    assert result["receipts"][1]["table"] == "actions"
+    assert result["receipts"][1]["disposition"] == "source_envelope_schema_refused"
+    return (*old, snapshot(root.joinpath(*m.CATALOGUE_ARTIFACT_PARTS)))
+
+
+def actions_directory(root):
+    return root.joinpath(*m.ACTIONS_ARTIFACT_PARTS, ACTIONS_AUDIT)
+
+
+@pytest.mark.parametrize("available", [False, True])
+def test_actions_only_scope_dispatches_once_never_repeats_completed_tickers(tmp_path, available):
+    old = seed_catalogue(tmp_path)
+    calls = []
+    def reader(provider):
+        directory = actions_directory(tmp_path)
+        assert (directory.parent / "scope-reservation.json").is_file()
+        assert (directory / "credential-read-started.json").is_file()
+        reservation = json.loads((directory / "reservation.json").read_bytes())
+        assert [item["table"] for item in reservation["requests"]] == ["actions"]
+        calls.append("credential")
+        return credential()
+    def transport(table, key):
+        calls.append(table)
+        assert table == "actions", "a completed TICKERS scope must never be repeated"
+        return response(table, raw=encode(action_inventory(available=available)))
+    result = run(tmp_path, diagnostic=True, correction=True, final=True, catalogue=True, actions_only=True,
+                 reader=reader, transport=transport)
+    assert calls == ["credential", "actions"]
+    assert result["schema"] == m.ACTIONS_SCHEMA
+    assert result["planned_status_requests"] == result["transport_invocation_count"] == result["observed_status_metadata_count"] == 1
+    assert result["disposition"] == "completed-status-qualification"
+    assert len(result["receipts"]) == 1 and result["receipts"][0]["table"] == "actions"
+    assert result["receipts"][0]["provider_reported_full_history_available"] is available
+    assert type(result["catalogue_predecessor"]) is dict
+    assert all(result[flag] is False for flag in m.FALSE_FLAGS)
+    assert result["research_looks"] == result["qc_jobs"] == result["backtests"] == 0
+    for parts, before in zip((m.ARTIFACT_PARTS, m.DIAGNOSTIC_ARTIFACT_PARTS, m.CORRECTION_ARTIFACT_PARTS,
+                              m.FINAL_ARTIFACT_PARTS, m.CATALOGUE_ARTIFACT_PARTS), old):
+        assert snapshot(tmp_path.joinpath(*parts)) == before
+
+
+def test_actions_only_requires_partial_catalogue_before_reading_credential(tmp_path):
+    seed_final(tmp_path)
+    calls = []
+    with pytest.raises(m.SharadarReferenceQualificationError):
+        run(tmp_path, diagnostic=True, correction=True, final=True, catalogue=True, actions_only=True,
+            reader=lambda provider: calls.append("credential"))
+    assert calls == []
+
+
+@pytest.mark.parametrize("when", ["before", "credential", "response"])
+def test_actions_only_catalogue_predecessor_tamper_stops_at_its_boundary(tmp_path, when):
+    seed_catalogue(tmp_path)
+    path = catalogue_directory(tmp_path) / "complete.json"
+    calls = []
+    if when == "before": path.write_bytes(b"{}")
+    def reader(provider):
+        calls.append("credential")
+        if when == "credential": path.write_bytes(b"{}")
+        return credential()
+    def transport(table, key):
+        calls.append(table)
+        if when == "response": path.write_bytes(b"{}")
+        return response(table, raw=encode(action_inventory()))
+    with pytest.raises(m.SharadarReferenceQualificationError):
+        run(tmp_path, diagnostic=True, correction=True, final=True, catalogue=True, actions_only=True,
+            reader=reader, transport=transport)
+    assert calls == ([] if when == "before" else ["credential"] if when == "credential" else ["credential", "actions"])
+    assert not (actions_directory(tmp_path) / "complete.json").exists()
+
+
+def test_actions_only_scope_cannot_be_retried_by_renaming(tmp_path):
+    seed_catalogue(tmp_path)
+    run(tmp_path, diagnostic=True, correction=True, final=True, catalogue=True, actions_only=True,
+        transport=lambda table, key: response(table, raw=encode(action_inventory())))
+    calls = []
+    with pytest.raises(m.SharadarReferenceQualificationError, match="existing_completed_or_ambiguous_scope_refused"):
+        run(tmp_path, diagnostic=True, correction=True, final=True, catalogue=True, actions_only=True,
+            audit_id=ACTIONS_AUDIT + "-retry", reader=lambda provider: calls.append("credential"))
+    assert calls == []
+
+
+def test_actions_only_catalogue_metadata_change_stops_dispatch(tmp_path):
+    seed_catalogue(tmp_path)
+    calls = []
+    def reader(provider):
+        path = catalogue_directory(tmp_path) / "complete.json"
+        info = path.stat()
+        os.utime(path, ns=(info.st_atime_ns, info.st_mtime_ns + 1_000_000))
+        return credential()
+    with pytest.raises(m.SharadarReferenceQualificationError):
+        run(tmp_path, diagnostic=True, correction=True, final=True, catalogue=True, actions_only=True,
+            reader=reader, transport=lambda *args: calls.append(args))
+    assert calls == []
+
+
+def test_actions_only_refusal_has_one_request_and_no_tickers_fallback(tmp_path):
+    old = seed_catalogue(tmp_path)
+    calls = []
+    def transport(table, key):
+        calls.append(table)
+        return response(table, status=403, raw=("private " + TOKEN).encode())
+    result = run(tmp_path, diagnostic=True, correction=True, final=True, catalogue=True, actions_only=True,
+                 transport=transport)
+    assert calls == ["actions"]
+    assert result["disposition"] == "stopped-status-qualification"
+    assert result["planned_status_requests"] == result["transport_invocation_count"] == 1
+    assert result["observed_status_metadata_count"] == 0
+    assert result["receipts"][0]["body_sha256"] is result["receipts"][0]["body_size_bytes"] is None
+    for parts, before in zip((m.ARTIFACT_PARTS, m.DIAGNOSTIC_ARTIFACT_PARTS, m.CORRECTION_ARTIFACT_PARTS,
+                              m.FINAL_ARTIFACT_PARTS, m.CATALOGUE_ARTIFACT_PARTS), old):
+        assert snapshot(tmp_path.joinpath(*parts)) == before
+
+
+@pytest.mark.parametrize("flags", [(False, False, False, False), (True, True, True, False), (True, True, False, True)])
+def test_actions_only_requires_every_prior_mode_before_identity(tmp_path, flags):
+    calls = []
+    with pytest.raises(m.SharadarReferenceQualificationError):
+        run(tmp_path, diagnostic=flags[0], correction=flags[1], final=flags[2], catalogue=flags[3], actions_only=True,
+            identity=lambda *args, **kwargs: calls.append("identity"))
+    assert calls == [] and list(tmp_path.iterdir()) == []
+
+
+@pytest.mark.parametrize("changed", [False, True])
+def test_actions_only_real_transport_uses_one_action_start_and_checks_catalogue(monkeypatch, changed):
+    # Install the real-network tripwire before touching the production callback;
+    # the later fake opener is an invented local stream, never an HTTP request.
+    monkeypatch.setattr(m.request, "build_opener", lambda *args: pytest.fail("real opener forbidden"))
+    prior = {"complete_sha256": "e" * 64}
+    catalogue = {"complete_sha256": "a" * 64}
+    published = {"reservation.json": "d" * 64, "credential-read-started.json": "a" * 64,
+                 "credential-read-completed.json": "b" * 64, "01-actions-started.json": "c" * 64}
+    profile, url = m.PROFILES["actions"]
+    reservation = {"identity": BASELINE, "fixture_only": False,
+        "owner_direction": m.DIAGNOSTIC_OWNER_DIRECTION,
+        "predecessor": prior, "diagnostic_predecessor": prior, "correction_predecessor": prior,
+        "final_predecessor": prior, "catalogue_predecessor": catalogue,
+        "requests": [{"table": "actions", "profile": profile, "method": "GET", "url": url,
+                      "maximum_attempts": 1}]}
+    completed = {"schema": m.ACTIONS_SCHEMA, "fixture_only": False,
+        "credential_read_observed": True, "disposition": "configured-keychain-credential-read",
+        "started_sha256": published["credential-read-started.json"]}
+    started = {"profile": profile, "url": url, "maximum_attempts": 1,
+               "reservation_sha256": published["reservation.json"]}
+    monkeypatch.setattr(m, "_identity", lambda *args, **kwargs: BASELINE)
+    monkeypatch.setattr(m, "_check_journal", lambda *args, **kwargs: None)
+    monkeypatch.setattr(m, "_read_leaf", lambda directory, name, limit: encode(
+        reservation if name == "reservation.json" else completed if name == "credential-read-completed.json" else started))
+    for name in ("_predecessor", "_diagnostic_predecessor", "_correction_predecessor", "_final_predecessor"):
+        monkeypatch.setattr(m, name, lambda root: prior)
+    monkeypatch.setattr(m, "_catalogue_predecessor", lambda root: {"complete_sha256": "f" * 64} if changed else catalogue)
+    stream, calls = io.BytesIO(encode(action_inventory())), []
+    stream.headers = {}
+    stream.getcode = lambda: 200
+    stream.geturl = lambda: url
+    def opener(*handlers):
+        calls.append("opener")
+        def open_item(item, timeout):
+            assert item.full_url == url
+            calls.append("actions")
+            return stream
+        return SimpleNamespace(open=open_item)
+    monkeypatch.setattr(m.request, "build_opener", opener)
+    kwargs = dict(expected_head=HEAD, baseline=BASELINE, parent=1, directory=2, audit_id=ACTIONS_AUDIT,
+                  latch_sha="f" * 64, published=published, diagnostic=True, correction=True,
+                  final=True, catalogue=True, actions_only=True)
+    if changed:
+        with pytest.raises(m.SharadarReferenceQualificationError, match="catalogue_predecessor_custody_refused"):
+            m._default_transport("actions", m.KeychainCredential("sharadar", TOKEN, False), **kwargs)
+        assert calls == []
+    else:
+        result = m._default_transport("actions", m.KeychainCredential("sharadar", TOKEN, False), **kwargs)
+        assert result.status == 200
+        assert calls == ["opener", "actions"] and stream.closed

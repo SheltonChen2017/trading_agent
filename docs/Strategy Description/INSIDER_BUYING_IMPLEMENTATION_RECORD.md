@@ -29637,3 +29637,99 @@ suite. Two changed Python images compiled in memory; diff check clean.
 Adapter SHA256 `6818c3ca6c67e16377bf8f33d765fd12fdf472df67d8293cfd35377851dda3a2`;
 test SHA256 `3be45643a0054daba63ee8ac223ad369537247b6fc6f8cb0beca2564d70850c0`.
 No actual catalogue-mode request has occurred at this preregistration point.
+
+## 208. TICKERS metadata access qualified; ACTIONS-only inventory verification (2026-10-24)
+
+207's implementation/preregistration exists as already-committed clean
+`75acdf5656625e02dc68f31f275c30fb7d390f4f`. Its actual catalogue operation
+completed at`2026-10-24T20:06:15.606504Z`, exactly TWO transports, one accepted
+metadata response, exit2/`stopped-status-qualification`. This is a partial
+operation, NOT overall success. TICKERS returned HTTP200 and validated;
+ACTIONS returned HTTP200 but a different broader status envelope and refused.
+
+TICKERS's accepted private metadata body is233 bytes, SHA256
+`5dace8f3f81cf2aa2744d20e3e071d3c88f6b076fb303350bb617b7ad86fa788`.
+Independent read-only inspection confirmed eight descriptor fields: the
+seven known full-snapshot fields plus `key`, with NO canDownload field.
+The storage lookup value was not printed or added to the projection/record.
+This establishes the extra-field cause and prospective TICKERS compatibility
+at75acdf56, not a bad-key or subscription-denial diagnosis. It does NOT prove
+paid archive entitlement, source history/content, PIT/rights or readiness.
+
+`IBSHAR-CCR20301` / P2: CLOSED ONLY for prospective TICKERS metadata
+wrapper/storage-key compatibility at75acdf56, following its actual strict
+success and observed byte-bound body. Earlier failed requests stay failed.
+No TICKERS redispatch is permitted or needed for the next verification.
+
+The partial v5 complete is12974 bytes/SHA256
+`1ef40d4657dd726b05fb3d8b369cab3a4f62b5f4f880da5345d14cd245f1e576`;
+scope SHA256
+`cf6aa3d7d302bb0de78f7b4060e295e52c3dc615b165f15982ffe3fda9c6ae69`;
+seven-source inventory
+`4389746a3ec41e47994ec1a4862891d9355f6fc7f4959402f3badc16c3e99778`.
+Native denied-network/fork/write/Keychain-exec readback verified its ten
+closed child leaves plus global reservation and unchanged earlier custody.
+Accepted TICKERS body/projection are preserved, rejected ACTIONS body is not
+retained or hashed. No additional credential or request in that readback.
+
+`IBSHAR-ACTIONS-01` / P2 OPEN: despite the full-history filter, the observed
+ACTIONS status advertises THREE files plus top-level selected-file metadata.
+The captured safe shape shows table=`actions`, core top-level file fields
+and three other root fields, and the first descriptor has the known seven
+field types plus one unknown. The first history/name is not full (consistent
+with shorter histories, not proof of its exact values). Current official
+ACTIONS docs show three advertised histories, but suggest years filters the
+array. Actual response diverges from that single-file assumption. Do not
+drop arbitrary fields or silently select the first/shorter descriptor.
+
+Add a strict ACTIONS inventory projector: mandatory table/files, only known
+selected-file metadata fields at root, one-to-three descriptors, no unknown
+fields or duplicate histories. Validate EVERY descriptor against the finite
+official5y/10y/full history/name/label mapping and existing size/UTC/boolean/
+storage-key/credential controls. Exactly one full-history descriptor MUST
+exist. Select only that full descriptor. If root selected-file metadata is
+present, all four core fields are required and every present field, including
+sizeLabel and any co-present storage key, must agree with the full entry.
+No missing selected metadata is imputed. Observed history labels stay source
+metadata, not an expanded source window or file download.
+
+Register ONE new ACTIONS-only operation under the owner's continuing format-
+repair direction: schema `insider-sharadar-actions-inventory-status-v6`,
+private sibling `artifacts/insider_buying/sharadar_actions_inventory_v6/`,
+auditID `ib-sharadar-reference-20261024-actions-inventory-v6-once`, selected
+only by --verify-actions. Reserve exactly ONE fixed GET of
+`https://api.sharadar.com/v1.0/data/actions?status=True&years=full`, ONE
+Keychain read, maximum one dispatch, no retry/fallback. Reuse and bind the
+accepted TICKERS receipt through the exact partial-v5 completion and every
+earlier immutable completion/reservation, inventory/hash/custody identity.
+The new context checks a single01-actions-started publication and requests
+list; it cannot fall through to the two-request mode. Planned/observed counts
+are ONE, not a manufactured second TICKERS observation. Clean committed
+source identity, private journals, TLS/timeout/body limits and all false
+readiness flags remain binding. No QC, rows, ZIP, price/outcome/fundamental,
+SEC, presign/download or purchase. Stop on an unresolved refusal.
+
+Two invented selected-file roots first proved the old projector's actual
+envelope refusal and then failed the missing inventory helper (2 failed
+0.64s). Later fixture green/mutation and the actual outcome follow when
+observed; neither public documentation nor fixtures supply missing raw data.
+
+Pre-activation main validation:554 passed13.08s on the same seven explicit
+focused paths, including record/active-document/import-boundary and the exact
+Insider package guard, under native process-tree network/Keychain-exec and
+repository-write denial. No full lane/repository suite. Both changed Python
+files compiled in memory under network/fork/all-write/Keychain-exec denial;
+diff check clean. Adapter SHA256
+`934c069b31089cc418163b0364148a60ff0a405409c8b995a8fb846d254f3089`;
+test SHA256
+`f335d157eb4b70603ba1efb2315cf4eaaf04b43fd75d3ae1576c1cf9220fb5e3`.
+The test agent additionally observed372 passed8.14s on the new/original
+adapter paths and caught five memory-only reversals: selecting first rather
+than full (4 failed/6 passed0.60s); skipping shorter-history validation
+(3 failed0.03s); bypassing root-selected/full crosschecks (9 failed0.03s);
+bypassing partial-v5 predecessor custody (3 failed1.38s); reserving both
+profiles instead of ACTIONS-only (2 failed0.95s). Attributes restored in
+finally; no on-disk reversal, provider call or credential read in tests.
+Production-opener tripwires and native denial cover positive and negative
+controls; the action start is01-actions and custody is checked before open.
+No actual v6 request has occurred at this preregistration point.

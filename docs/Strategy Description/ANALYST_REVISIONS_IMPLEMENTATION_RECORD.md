@@ -675,6 +675,15 @@ checkpoint applies. A read-only Mia request was submitted in authenticated Safar
 its final response was not fully read because the user was concurrently using
 Safari. No fourth attempt, guard removal, project/session cancellation or next
 cell is authorized. The monitor remains PAUSED.
+Section 311 records the subsequently read Mia reply and the owner's new exact
+idleness/restoration request. Mia's editor-session explanation remains a
+hypothesis, not a recovered raw API value. The supported Safari Projects Stop
+control removed only R298's code environment from the displayed list; no file
+or backtest action followed. The bounded post-stop metadata observer and separate
+post-Mia recovery caller are implemented and focused-tested, both uninvoked.
+A1/A2/A3 remain spent and the booked floor is unchanged.
+Normal independent review applies unless the owner separately waives this new
+recovery; no additional launch authority is inferred from the old waiver.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1797,6 +1806,16 @@ waiver is consumed, not independent acceptance. The current paused monitor does
 not automatically start that review. Do not infer a local claim from a project
 name, repeat begin, change economics or use another lane's jobs. Browser
 permission is not a blanket technical-gate waiver.
+Section 311 supersedes the unread-Mia checkpoint: the reply is now read and
+qualified, and the owner's exact idleness-fix request permits stopping only
+R298's editor code session. That UI stop is visibly complete; API idleness is
+not yet measured. Claude must review section 311's new diagnostic/recovery
+contracts before operational use unless explicitly waived anew. The request for
+one additional post-Mia attempt and this recovery's review waiver is pending;
+the exhausted three-attempt allowance is not silently renewed. No old caller,
+reader, worker or backtest is replayed; A2/A3/reconciliation control leaves stay
+unread. A future fresh admission intentionally authenticates pinned family/D15
+evidence and package payloads, not a repeated old operation. Monitor remains PAUSED.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -3741,6 +3760,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-23 PDT | Scoped owner waiver and exact R298 same-project recovery run decision | `0b054ddf` -> section309 freeze/result round | No new Claude range or independent acceptance; owner selected option1 for this particular recovery | Evidence once, then conditional same-project A2; unchanged source/economics, no old begin replay | Unchanged322 focused checks remain historical; genuine source/host preflight passed; new record checks recorded below | Actual outcomes and looks are not booked prospectively; every technical gate remains | Execute only committed309 decision, stop at its running/terminal/blocked checkpoint and push once; monitor PAUSED |
 | 2026-10-24 UTC | Actual R298 evidence success, A2 refusal and bounded Mia diagnosis | `0b054ddf` -> `dfa3490a` -> section309 final result | No new Claude range; current waiver consumed, not independent acceptance | D1 exit0 authenticated A1; D2 exit2 remote_refused; A2 consumed; Mia reports unchanged four filenames/sizes and zero backtests but lacks raw metadata | Actual bounded channels and unchanged-source control flow; record checks below; no operational replay or full suite | 316/241/50/699; no accepted result; exact failing label lost and remote effects not independently authenticated | Preserve all evidence; separately gated offline marker/receipt reconciliation before any A3; one final push, monitor PAUSED |
 | 2026-10-24 | Owner-scoped reconciliation and final R298 recovery refusal | `f9fd0932` -> `e3d53276` -> `0a2400d7` -> this record commit | No incoming Claude range; explicit scoped waiver now consumed, not independent review | D1 authenticated zero-recorded-RPC A2 prefix; corrected real projection ID; A3 refused code_running before mutation/compile/launch; all attempts spent | 376 distinct focused passes5.72s; record repeats overlap; no full suite; actual exit/pins in310 | Booked317/242/50/699; no result cell; raw codeRunning value unknown; user-concurrent Safari prevented reading final Mia reply | Mandatory stop/Mia checkpoint, no A4; one final matching-lane push; monitor PAUSED |
+| 2026-10-24 | Post-Mia R298 idleness diagnosis and exact-source recovery preparation | `7c462a01` -> section311 round | No incoming Claude review; scoped new waiver/extra attempt requested, not assumed | Mia reply qualified; supported UI stopped only R298's code environment; additive observer and A4 candidate implemented but uninvoked | 472 focused implementation/helper passes plus record checks below; expected-red sensitivities retained; no old operational replay or full suite | A1/A2/A3 spent; floor317/242/50/699 unchanged; API idleness and current source unverified | Review or scoped waiver plus exact new run freeze before contact; one final matching-lane push; monitor PAUSED |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -52487,3 +52507,248 @@ Final record/active-document validation passed86 in1.09s under the same native
 network/artifact/Keychain denial and in-root support discipline, no failures,
 skips or warnings; this overlaps376 and is not additional distinct coverage.
 Final diff checks passed. No full suite or operational replay followed D2.
+
+## 311. Post-Mia R298 editor-session repair and bounded recovery, 2026-10-24
+
+### 311.1 Current owner scope and immutable starting point
+
+Starting clean local HEAD, matching tracking baseline and live matching remote:
+`7c462a0136d26eca201f0af5c8cb3f42e93a087a`. The owner now directs: "ok, fix the
+QC idleness issue, upload the 7 missing modules, replace the stub and default
+main.py, and proceed until the backtest is running." This authorizes the named
+project's supported editor-session repair and exact-source restoration, not
+other lanes, altered economics, a replacement project or replay of A1/A2/A3.
+Because the three attempts and previous waiver are exhausted, a concise
+specific question requests one additional post-Mia attempt and Claude-review
+waiver for this recovery. No response or blanket waiver is assumed here.
+All repository work stays in the designated Code root and lane branch. Shared
+files remain frozen; monitor stays PAUSED; exactly one final push is planned.
+
+### 311.2 Mia checkpoint and supported editor-session action
+
+After the owner made Safari available, the existing completed Mia reply was
+read. Its project-filtered tools report the same four filename/size pairs,
+zero backtests, zero optimizations and no prior live deployment. These are
+qualified tool observations, not fresh true-byte authentication or continuous
+absence proof. Mia cannot expose raw codeRunning, owner or collaborator fields.
+Its hypothesis is that an open IDE code session explains the refusal. This is
+not a diagnosis of A3's rejected field, whose type/value were not retained.
+Mia's claim that a later false value would confirm cause is too strong: it
+would support, not prove, the session hypothesis. A persistent non-false value
+would require further diagnosis, not automatically establish a platform bug.
+
+Official QC documentation says opening a project starts a code session and
+that the Projects page Stop icon stops that session; logout does not stop it.
+The Read Project schema calls codeRunning a required boolean but does not
+explicitly distinguish IDE sessions from backtest jobs. References:
+https://www.quantconnect.com/docs/v2/cloud-platform/projects/code-sessions and
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/read-project.
+Historical section138 also observed codeRunning true with a Completed. latest
+backtest; that is corroborating history, not a current measurement.
+
+In authenticated Safari, the exact project38364439 tab remained open and its
+terminal showed automatic builds of the partial source through displayed
+7:16:28 (unknown UI timezone; latest observed ID3b5720-4795fc). No Build or Run
+button was clicked. Navigating that tab to Projects displayed only R298 under
+Code Environments. Under the owner's new fix instruction, the stop icon beside
+that exact R298 environment was clicked once. The resulting screenshot shows
+the Code Environments section and R298 active left-navigation entry gone,
+while R298 remains under Recent Projects and My Projects. The project was not
+deleted or reopened. No other project's session/job/control was changed.
+
+This is a visibly completed supported UI session stop, not yet API-idleness
+proof, a source upload, compile acceptance or backtest launch. No pre-stop raw
+codeRunning value was captured, so the forthcoming observation cannot prove
+before/after causality. A new bounded current-metadata observer may retain exact
+presence/type and boolean/null value after this action; it must not replay the
+spent A3 caller merely to expose that missing evidence. Booked floor remains
+317shared/242development/50infrastructure/699cells with no accepted result cell.
+
+### 311.3 Additive current-state observer, implemented but uninvoked
+
+`scripts/observe_arv2_r298_idleness.py` is a distinct metadata observation,
+not an A3 replay or an upload/launch caller. Its prospective fixed private leaf
+is `artifacts/analyst_revisions_v2/newrule_idleness/R311-20261024-A`; this turn
+has neither inspected nor allocated it. After exact designated Darwin/POSIX
+Python3.13, clean branch/HEAD/self/selected-source preflight, the observer
+exclusively claims and fsyncs before credentials or contact. Only one ordered
+`projects/read` and `backtests/list` pair is permitted, two application
+dispatches, with a 60-second parent alarm/deadline. No file, node/capacity,
+compile, backtest-create or session-control endpoint exists in this contract.
+It consumes one observation claim, not a strategy/shared/development look.
+
+Project identity/organization/name/language/ownership/privacy/collaborators
+remain checked. Unlike an execution gate, this observer can retain non-idle
+evidence: exact field presence, finite JSON-type label and actual boolean or
+null, never arbitrary strings/containers. Backtest output is a bounded count
+and finite status-count map, not source, result rows or private response text.
+Its application-dispatch count is not measured provider-contact accounting;
+provider_request_count remains null. A true/missing/malformed codeRunning field
+does not become False, and a completed observation does not authorize recovery.
+
+Intent and finite observations are saved once; original output descriptors,
+full metadata and held/named bytes remain checked through exit. Partial claims
+are consumed/ambiguous, never repaired or retried. Failure evidence retains the
+finite stage/endpoint/dispatch prefix and any already-observed typed state.
+The pure external success validator requires actual integer exit0 and one
+canonical LF-terminated envelope, exact binding/flags, coherent observations
+and a report SHA/length equal to its reconstructed canonical report. A separate
+exit2 validator accepts only finite coherent failure evidence, not success.
+Neither validator rereads current artifact bytes or supplies the process exit;
+actual exit and empty stderr must come from a separately bounded external
+process observer. Unknown/malformed output must be retained as length/hash only,
+not printed as arbitrary stdout. A late publication failure remains failure.
+
+### 311.4 Separate post-Mia exact-source recovery candidate, uninvoked
+
+`scripts/run_arv2_r298_post_mia_recovery.py` is a separately named A4 candidate,
+not an increased ordinary ceiling or renamed A3 retry. Prospective output is
+`artifacts/analyst_revisions_v2/newrule_post_mia_recovery/R311-20261024-A`, also
+not inspected/allocated. It requires a new scoped owner continuation decision,
+independent review or an exact current waiver, and a separate clean committed
+run freeze. Preparation supplies none of these by itself. A1/A2/A3 remain spent.
+
+The substantive prospective change is the supported editor-session stop plus
+typed idleness evidence and a bounded longer recovery window: 600-second parent
+deadline, at most60 application dispatches, at most20 compile polls10seconds
+apart, at least90seconds reserved before launch, and one own-job status read
+after60seconds. Only this candidate's child processes may be killed/reaped.
+Uninterruptible I/O, host suspension and provider-side asynchronous work are
+not fully bounded by a local alarm. One claim would add one shared and one
+development look (318/243/50/699), but no claim has happened and the current
+floor remains317/242/50/699. No look is booked for preparation or the UI stop.
+
+The new caller does not invoke old A3 main/execute/recover/worker/child/workflow
+entrypoints or patch their globals. It reuses frozen pure helpers and admission
+logic inside its own new credential-free native-network-denied workers. Those
+workers deny old A2/A3/reconciliation control reads. They intentionally perform
+fresh authentication of the pinned family, October package/lineage and D15
+admission/report/claim/start/organization/census evidence. Accordingly, this is
+not a claim of no historical/private bytes read during a future admission, and
+does not re-run old storage publication, captures or operational readers.
+
+The unchanged exact eleven-file projection is
+`f67148cd717e207be9d44f088749c0443bb696d9c4f38f512eb6cbf483fd9662`, with genuine
+embedded candidate `arv2-newrule-6-ar0-2026-v1`, not the R298 attempt label.
+Only the seven absent modules, exact known one-byte input-runtime stub and exact
+known default main.py may be replaced if current inventory confirms them. The
+two known complete modules must match the projected bytes. Unexpected files or
+bytes refuse, never overwrite. Projection is reconstructed by the frozen public
+builder, not exported as arbitrary repository source. All eleven remote files
+must read back exactly before an accepted compile/launch.
+
+Ownership, exact `codeRunning is False` and zero-prior-backtests gates remain.
+The new callback durably retains typed codeRunning before the unchanged guard.
+Ownership/idleness are checked at stage entry; full source inventory is checked
+before each individual write. This is not continuous/atomic ownership or
+idleness protection. Fresh compile status, project identity, exact complete
+source, native-denied input admission and authorized read-only capacity checks
+must pass before the single backtests/create call. Occupied capacity produces
+wait without cancelling or changing any other lane. No replacement project,
+fallback file, retry, result extraction, second cell or changed strategy rule.
+
+Pure external output validation requires exact double-LF canonical framing,
+source/run binding, actual integer exit0 for success, all false readiness flags,
+typed false idleness and the exact A4 launch/status or capacity-wait shape.
+Its report pin must equal the reconstructed canonical report bytes. Exit2 is
+accepted only as finite failure evidence; report existence alone is never
+success. Empty stderr and actual exit provenance remain external requirements.
+An accepted envelope with `capacity_wait` or `In Queue...` does NOT mean running.
+Only exact own `In Progress...` supports running; `Completed.` means already
+finished, not accepted performance. A queued outcome needs a separately bounded
+follow-up, never a silent repeated parent/status loop.
+
+### 311.5 Selected source pins, corrections and focused evidence
+
+| Item | SHA256 |
+|---|---|
+| New idleness observer | `b2b62f12d669753e765c183a2811ba3a9353066e52e447c67d660577946c662a` |
+| Observer tests | `9ccfd2e8f95a124eafd432c48bb065e326cc3787d1fc6d6d7d4055b9cf51a81b` |
+| Canonical observer profile | `c3a82a0fc5a4272c46280a2b40dfaff12990260b0e67ad3369e86e393c6c77d2` |
+| New post-Mia caller | `6c592c76e4b35b1b496907f532221c4f49a20ae536a387968fef873f2f362706` |
+| Caller tests | `2ecbc11e40c033ee34b91f8e201659a38ff7b6d7309d36c9fb3e67f2b64f3885` |
+| Canonical post-Mia profile | `6c961e56ccd7c8ae07a2d419cb2db4267d226acab1c5efb0a6e6c89365c88d23` |
+
+The observer's five selected direct transport/source pins and caller's73
+selected frozen dependency pins are exact matches, not whole-interpreter or
+complete transitive-source integrity. All old callers/helpers/readers remain
+unchanged, including their spent paths and evidence qualifications.
+
+`ARV2CR311-001` — P2 implementation defect corrected before operational use:
+the initial observer output validator checked report-pin syntax without binding
+the SHA/length to reconstructed report bytes. Root review found it; two
+regressions failed as expected in0.14s, then passed with exact binding. The new
+caller received the same generalized binding requirement before handoff; its
+memory-only omission mutation caught2 expected failures in0.15s. Neither new
+script had been invoked. Same-round advisory review is not independent review.
+
+The observer author's first run was86passes/1failure0.19s: a pluralized state-key
+typo failed before correct backtest evidence assembly; fixed. Its expanded run
+was132passes/11fixturefailures0.37s from pytest environment leakage; isolated
+synthetic environment fixtures corrected that test setup without weakening
+production preflight. A separate expired-alarm regression failed once0.10s:
+remaining time must be evaluated before replacing SIGALRM's handler; corrected.
+Final observer selection191passes0.33s includes these cases. An actual-exit
+omission memory mutation caught6 expected failures0.13s and restored finally.
+
+Final caller author selection161passes6.00s; earlier92/105/161 subsets overlap.
+Typed-observation omission caught1 expected failure0.14s, restored finally.
+Tiny actual synthetic-child tests exercised descriptor passing, bounded
+stdout/stderr, noise/nonzero/trailing/oversize channels, timeout and kill/reap,
+not production admission/credentials/provider behavior.
+
+Root's final combined implementation selection is472distinct passes6.24s:
+191observer +161caller +120unchanged final-remote helper. No failures, skips or
+warnings. These overlap author runs and are not additive. All pytest/mutations
+used native network denial, production-artifact read/write denial and Keychain
+command denial, no plugin autoload/conftest/cacheprovider, -B and in-root
+temp/cache/log/plugin support paths. No full lane/repository suite ran. Record
+checks, memory compilation and final source/diff/state checks are recorded in
+the closing handoff below, not represented as operational evidence.
+
+### 311.6 Current outcome and next admissible action
+
+The supported R298 code-session stop is complete. API idleness is still unknown;
+ARV2E310-001 remains OPEN, not resolved by a UI observation alone. Seven missing
+modules, stub and default main.py have NOT been uploaded/replaced this round.
+No new observer, recovery parent/worker, private admission read, provider/QC API
+request, capacity/compile/backtest/result call or operational output allocation
+occurred. The only remote mutation was the separately described own editor
+session stop, with automatic IDE-build history qualified in311.2.
+
+The concrete continuation barrier is the pending additional-attempt/review
+decision after three failures. A successful review does not renew the attempt
+budget. Upon explicit scoped authorization, first commit the exact one-shot
+post-stop metadata observation decision, including clean run HEAD/source/profile,
+host/deadline, external actual-exit capture and safe bounded envelope handling.
+After an accepted exit0 observation of exact false idleness and zero prior
+backtests, separately commit the recovery decision binding that result and all
+current pins. Only then invoke this fresh recovery once if all technical gates
+still pass. Non-false/ambiguous observation stops; never coerce, refresh, rename
+or replay. No old waiver supplies new authority. No credential values or raw
+provider/exception text belongs in output.
+
+No incoming Claude commits were present. This checkpoint's sole new commit
+after `7c462a0136d26eca201f0af5c8cb3f42e93a087a` contains the four additive
+source/test files and this lane record: supported UI outcome, uninvoked bounded
+contracts and their focused evidence. Disposition is implemented/prepared,
+independently unreviewed and operationally uninvoked, not accepted execution.
+Claude must review section311 unless the owner supplies a fresh scoped waiver.
+No next milestone, formal-source/PIT/security-master/readiness clearance,
+new paid rights, other-lane work, broker/funded/real-order/paper/live action,
+evidence cleanup, pin refresh or efficacy claim. Monitor remains PAUSED.
+
+Closing validation:86 record/active-document passes0.99s, for **558 distinct
+focused passes** with the472 implementation/helper selection; no failures,
+skips or warnings in those final selections. Four new files compile in memory
+without bytecode, five observer and73 caller selected pins match, both canonical
+profiles match311.5, and imported support excludes assistant.dispatch_fence.
+These additional checks are not more pytest cases. Final diff checks pass.
+The first staged diff check caught one extra blank line at the observer test's
+EOF; removed before commit, with no behavior change. The table pins that final
+test file rather than its earlier whitespace-only variant.
+The final combined selection then passed558 in7.47s with no failures, skips or
+warnings; it repeats the same558 distinct cases and is not additive coverage.
+The final nonforce matching-lane push follows root/branch/HEAD/status/live-remote
+verification; its resulting SHA and local/tracking/live agreement are reported
+externally, without an acknowledgement-only follow-up commit or second push.

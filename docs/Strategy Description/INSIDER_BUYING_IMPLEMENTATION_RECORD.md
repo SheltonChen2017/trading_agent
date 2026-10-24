@@ -30280,3 +30280,113 @@ remote before committing, then invoke ONLY the two offline actual scopes
 from their resulting clean already-committed HEAD. No tracked writes while
 an actual operation runs. Bind the resulting real plan before any online
 price-metadata activation; no interim push or new Claude wait.
+
+## 213. Observed offline qualifications and bound dates-only activation (2026-10-24)
+
+### 213.1 Execution lineage and retained-earnings result
+
+Section212's seven-path candidate was committed as
+`464fe148da1aff0dce59f2cdf3e4cd734f986d83` before either actual operation.
+Both ran from that already-existing clean commit in the exact designated
+Insider root/branch with default production inputs and isolated minimal
+interpreter workers. No tracked edits or provider/QC work occurred during
+either operation. These are observed Codex runs, not independent review.
+
+The fresh `ib-earnings-retained-supplement-201902-202002-20261024-once`
+operation exited0 in6.031s, qualified_at2026-10-24T21:02:04.597175Z.
+Completion31069 bytes/SHA256
+`fb94407bad56f785ad855e23ac85c2525fe9be95f190f0e9730427390652b354`.
+It accounted for38297 original ordinals:21083 structurally accepted,
+17214 quarantined; unknown timing17191 remains unknown. February2019:
+18825 rows,10181 accepted/8644 quarantined,8633 unknown timing and13
+unknown source code. February2020:19472 rows,10902 accepted/8570
+quarantined,8558 unknown timing and14 unknown code. Reasons overlap;
+their sum is not a unique refusal count. Both reported-status counts equal
+their total rows; this is a supplier assertion, not verified publication.
+
+The parent independently verified all published leaves and held inputs after
+worker exit. The worker observed process-tree network/fork/Keychain-exec
+denial and write confinement before raw structural decoding. Financial
+numeric lexemes stayed opaque; no EPS value/return was interpreted or
+published. A second read-only native-denied verification checked the exact
+completion and all leaf hashes without raw reprojection. Input inventory94
+leaves digest`f6cb337db9d0c6af8aa41e8b50efb7586a124ed91f45c9a7c8e6a92fb56c3c49`;
+source inventory`666043049b385ff1782519d0a5c9434f3e63a3a1899115f4e5644f4040ad633d`.
+Isolation leaf`e627755a2464bb10c1595cc41d2e532fc3ed2ef0cfc8d7c4185a09d30aef1c6b`;
+201902 metadata`e8986267909a2996265e4457ed6bd0c0d4acac68a6c3a5712ac850d3e7a926a4`;
+202002 metadata`738780842914025439a909b48af3933ff93c508c9e527a299fa86aaf7c811e04`.
+
+This NEW supplemental qualification does not repair either old root, supply
+an absent original HTTP status/seal/aggregate completion, prove historical
+availability/authenticity/PIT, or change the old2358204-row assessment.
+Original producer HTTP remainsnull and seals absent. All readiness flags
+remain false; looks/jobs/backtests0/0/0. January2006/August2018 missing bodies
+remain unavailable; their consumed requests are NOT repeated/decomposed.
+The owner has been asked for separately identified supplier exports, not an
+API secret, routine approval or purchase. No reply is assumed.
+
+### 213.2 Observed private Sharadar reference qualification
+
+The fresh `ib-sharadar-delisting-qualification-20261024-once` operation
+exited0 in9.838s on the same clean464fe148. Completion8185 bytes/SHA256
+`4af2cad2b8b24a0b43ff04fb973c25714f5cc2a057a5c4f52edc2ca4a92c8f30`;
+private qualification268448608 bytes/SHA256
+`c998ac6b2e4550902e9eb39c9ca15511a917541009ebcfaf666384645d569805`;
+plan8258 bytes/SHA256
+`aa43c94d7eff5f991b9436c89bf69021c078b4316ded19e5efa9a8ef85380ebe`.
+Source inventory digest
+`4df217a552cd3d7be019488e4fa95a288abaceda1ce801e48815bc7e3f3dec9e`.
+Both retained ZIPs and exact members/CRC/header/all-row accounting were
+checked, with original strict intake custody. The fundamentals ZIP was not
+opened/decoded. No price/return was read, no provider request or credential
+read occurred. Worker isolation and parent all-leaf rechecks passed. The
+second independent native-denied readback verified the three-leaf closure,
+actual producer identity and exact hashes, without reopening source ZIPs.
+
+The detailed action ledger, values, source rows, discovery refusals and
+quality conclusions remain private ignored artifacts under the direct
+terms, not source-data publication in Git. This engineering result freezes
+a finite three-case probe plan; it does not establish complete delisting
+cashflows, elections/CVRs, adjustment correctness, historical symbol identity,
+all-case coverage or supplier fitness for the study. Every unavailable case
+remains explicit in the private plan. Never infer paid bulk or QC rights.
+
+### 213.3 Activation preregistration: exactly one dates-only request
+
+Main now binds the three exact observed hashes above in the NEW price
+metadata capture. Producer lineage stays464fe148; this later activation
+commit did not exist during either producer execution. The exact sorted
+symbols and request are held in the byte-pinned private probe-plan.json;
+no handwritten or caller-selected symbol substitution is accepted. Request
+method/path/fields/window/limits and namespace are exactly212.3: ONE direct
+stocks CSV GET, ticker/date/lastupdated ONLY,2005-01-01..2026-06-30,
+sortdate.asc,limit100000,15s/8MiB; no prices/volumes/returns/fundamentals,
+redirect/retry/paging/fallback. ONE configured Sharadar Keychain read max.
+Non200 bodies are not read/hashed/retained. Credential-echo/framing/CSV/
+row-limit/source/closed-output guards stay binding. The268MiB private ledger
+is streamed for a hash, not decoded or materialized by this online parent.
+
+This is a delegated routine engineering activation under the owner's exact
+price/delisting qualification instruction, not new outcome/research authority.
+Require meaningful focused regressions and a clean already-committed complete
+source image before invocation. Reverify exact root/branch/HEAD/remote and
+namespace freshness. No tracked writer during the one-shot call. On refusal,
+preserve its exact disposition, no retry/renamed scope or archive workaround.
+Actual outcome and precise capture hash follow only AFTER observation.
+No QC access, registered/outcome look, backtest or interim push.
+
+Activation validation: main's seven-path focused selection passed335 in5.48s,
+including new capture/delisting, Keychain, lane record, active documents,
+lane import boundaries and EXACT Insider package guard, under native
+process-tree network/Keychain-exec/repository-write denial with invented
+callbacks only. A preliminary command named a nonexistent abbreviated
+record-test path and exited4/no tests ran; corrected path above passed.
+No complete suite. Independent advisory static QA found producer/consumer
+schema/request/cap/production-control compatibility; it did not open actual
+artifacts or claim observed validation. Main separately observed the real
+three-leaf `_Plan` compatibility/rehash under native network/fork/all-write/
+Keychain-exec denial before any scope claim: three symbols, zero credential
+reads/dispatches. No qualification rows decoded. Activated source36371 bytes/
+SHA256`a87ae193b959748aea16cf489d009b200bdb9368eb81eda4b79751ff3228ceac`
+compiled in memory; diff clean. Reverify expected two tracked paths and
+unchanged origin9ce3d5bb, then commit before invoking actual capture.

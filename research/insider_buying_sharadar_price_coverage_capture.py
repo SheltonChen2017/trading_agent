@@ -48,11 +48,11 @@ PLAN_SCHEMA = "insider-sharadar-sep-dates-probe-plan-v1"
 PLAN_AUDIT_ID = PLAN_PARTS[-1]
 OFFLINE_SCHEMA = "insider-sharadar-delisting-qualification-v1"
 CAPTURE_MANIFEST_SHA256 = "94251ffdf0529b118ff331b98c4a144d97bc734380d7e7333f94045e4aa6f09b"
-# MAIN must replace all three None values with the observed, byte-bound
-# offline completion/plan/qualification hashes before real activation.
-PLAN_SHA256 = None
-OFFLINE_COMPLETE_SHA256 = None
-QUALIFICATION_SHA256 = None
+# Observed offline producer ran on clean, already-existing 464fe148. These
+# immutable receipts were independently rechecked before this activation.
+PLAN_SHA256 = "aa43c94d7eff5f991b9436c89bf69021c078b4316ded19e5efa9a8ef85380ebe"
+OFFLINE_COMPLETE_SHA256 = "4af2cad2b8b24a0b43ff04fb973c25714f5cc2a057a5c4f52edc2ca4a92c8f30"
+QUALIFICATION_SHA256 = "c998ac6b2e4550902e9eb39c9ca15511a917541009ebcfaf666384645d569805"
 MAX_BODY_BYTES = 8 * 1024 * 1024
 MAX_PLAN_BYTES = 4 * 1024 * 1024
 MAX_QUALIFICATION_BYTES = 512 * 1024 * 1024

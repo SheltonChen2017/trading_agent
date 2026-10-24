@@ -696,8 +696,12 @@ booked once; floor318/243/50/699. The owner explicitly freed R298/Safari again;
 its code environment was stopped. The prospective exact-owner/manual-history/
 supported-edit-lock recovery adaptation is implemented and synthetic-tested.
 The owner approved the narrow shared-census append, resolving the missing manual
-identity without rebooking prior looks; all488 focused checks now pass. A4
-remains unused before the exact312.15 clean-commit run freeze and fresh guards.
+identity without rebooking prior looks; all488 focused checks passed. Sole A4
+then exited2 at owned_private after one projects/read; codeRunning was explicitly
+false, but the undocumented required public field did not satisfy the new
+verifier. No file/lock/capacity/compile/launch followed. A4 is SPENT, floor319/
+244/50/699; no fifth attempt exists. Establish documented privacy evidence and
+a separately authorized recovery decision; do not replay or drop the guard.
 The ordinary three-attempt ceiling and all prior failures remain; no new
 technical gate is waived. Monitor remains PAUSED.
 
@@ -1843,9 +1847,14 @@ Section312.11 defines prospective exact-owner/manual-history/edit-lock recovery
 adaptation, not permission to remove guards or reuse D1–D3. Floor318/243/50/699
 includes the owner manual outcome once. The adaptation is implemented in312.12;
 the earlier cross-ledger refusal is now corrected by the specifically approved
-Analyst-only appendix in312.14, with488 focused passes. Next is the exact312.15
-clean-commit A4 invocation if every fresh guard permits. A4 remains unused here;
-shared permission is limited to this accounting, not other-lane changes.
+Analyst-only appendix in312.14, with488 focused passes. Sole312.15 A4 is now
+SPENT after owned_private refused before uploads/compile/launch;312.16–312.17
+retain the finite failure and unsupported privacy-schema assumption. Current
+floor319/244/50/699. Next is documented authenticated privacy/sharing evidence
+and a separately coherent recovery decision; no fifth attempt is authorized.
+Claude must review section 312's resulting evidence and privacy-contract
+qualifications before a future new operational contract unless separately
+waived. The consumed current waiver does not establish independent acceptance.
 No old attempt is renewed, and no broader future waiver or fifth attempt is
 authorized.
 V3 is spent after its
@@ -3793,7 +3802,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-24 UTC | Actual R298 evidence success, A2 refusal and bounded Mia diagnosis | `0b054ddf` -> `dfa3490a` -> section309 final result | No new Claude range; current waiver consumed, not independent acceptance | D1 exit0 authenticated A1; D2 exit2 remote_refused; A2 consumed; Mia reports unchanged four filenames/sizes and zero backtests but lacks raw metadata | Actual bounded channels and unchanged-source control flow; record checks below; no operational replay or full suite | 316/241/50/699; no accepted result; exact failing label lost and remote effects not independently authenticated | Preserve all evidence; separately gated offline marker/receipt reconciliation before any A3; one final push, monitor PAUSED |
 | 2026-10-24 | Owner-scoped reconciliation and final R298 recovery refusal | `f9fd0932` -> `e3d53276` -> `0a2400d7` -> this record commit | No incoming Claude range; explicit scoped waiver now consumed, not independent review | D1 authenticated zero-recorded-RPC A2 prefix; corrected real projection ID; A3 refused code_running before mutation/compile/launch; all attempts spent | 376 distinct focused passes5.72s; record repeats overlap; no full suite; actual exit/pins in310 | Booked317/242/50/699; no result cell; raw codeRunning value unknown; user-concurrent Safari prevented reading final Mia reply | Mandatory stop/Mia checkpoint, no A4; one final matching-lane push; monitor PAUSED |
 | 2026-10-24 | Post-Mia R298 idleness diagnosis and exact-source recovery preparation | `7c462a01` -> section311 round | No incoming Claude review; scoped new waiver/extra attempt requested, not assumed | Mia reply qualified; supported UI stopped only R298's code environment; additive observer and A4 candidate implemented but uninvoked | 472 focused implementation/helper passes plus record checks below; expected-red sensitivities retained; no old operational replay or full suite | A1/A2/A3 spent; floor317/242/50/699 unchanged; API idleness and current source unverified | Review or scoped waiver plus exact new run freeze before contact; one final matching-lane push; monitor PAUSED |
-| 2026-10-24 | Scoped owner waiver and one additional post-Mia R298 attempt | `45a96f61` -> section312 round | Current explicit waiver, not independent acceptance; no incoming review | D1–D3 spent; UI Mia removal refused; owner manual sample identified/preserved, exclusive handoff renewed; additive A4 replacement implemented but unused |518 distinct focused passes through D3; final A4 union488passes11.19s after authorized ledger correction; historical failures/overlaps retained below | Floor318/243/50/699 includes manual sample once, before actual A4 claim; old attempts stay spent; approved shared census synchronized without rebooking | Freeze and use same A4 only if gates pass; one final push at concluded round; monitor PAUSED |
+| 2026-10-24 | Scoped owner waiver and one additional post-Mia R298 attempt | `45a96f61` -> section312 final handoff (six commits) | Current explicit waiver, not independent acceptance; no incoming review | D1–D3 spent; failed UI Mia removal; owner manual sample preserved; additive A4 ran once and refused owned_private after1projects/read, explicit codeRunning=false observation; no upload/compile/launch |518 distinct focused passes through D3; final A4 union488passes11.19s after authorized ledger correction; historical failures/overlaps retained below | Floor319/244/50/699 counts manual and A4 once; A1–A4 spent; shared census synchronized; unsupported privacy contract remains OPEN | One final push now, then stop at privacy/attempt barrier; no fifth attempt, missing-field default, new contract or next cell; monitor PAUSED |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -53491,3 +53500,135 @@ action, then make the one final matching-lane push with exact local/tracking/
 live equality verification. The monitor remains PAUSED. No formal PIT/security-
 master/readiness/paper or economic-performance acceptance follows this waiver,
 compile, launch, terminal status or push.
+
+### 312.16 A4 actual consumed failure; idleness observed, privacy unresolved
+
+At clean freeze `efdd75822a7ba8f4286e068501550ccde5269186`, the new A4 caller
+ran exactly ONCE. The credential-free native-denied host/source/profile/pin
+preflight passed, including75 dependencies, exact caller/helper/tests, clean
+root/branch/HEAD and absence of dispatch_fence. External dispatch was
+2026-10-24T20:39:47.991654Z; completion observed20:39:57.811992Z. Actual parent
+exit2, stderr0bytes, external bound null. stdout976bytes SHA256
+`cf7552f22634988b3618b1309a1be6cc71e7a206c5f2a1a6524e66bd7d40d631`.
+These timestamps bracket the process, not exact provider receipt/processing.
+The external wrapper itself completed normally; its exit0 is NOT the actual
+parent exit, which remains2. The separate credential-free native-network/
+production-artifact/Keychain-denied pure output validator exited0, stderr0,
+accepted the exact finite failure envelope. No operational control reread.
+
+The result is operation_completed=false, attempt_consumption=
+consumed_or_ambiguous_no_retry, failure_code=remote_refused. Finite observation:
+helper_code=owned_private, predicate=public, last_stage=inspect,
+intent_marker=inspect-project, endpoint=projects/read, last_event=observed,
+application_dispatch_count=1, category=unknown, http_status=null,
+provider_request_count=null. codeRunning is explicitly present, boolean,false.
+All formal_forward_ready/paper_or_live_ready/point_in_time_proven/
+strategy_result_accepted flags remain false. No normal success report pin,
+source inventory/completion, compile, launch or own-status receipt was returned.
+
+This result plus the fixed workflow establishes that exclusive claim and initial
+admission preceded the one dispatch. The project response was observed, and
+the explicit privacy predicate refused before dedicated collaborator/history/
+lock/file/capacity/compile/launch operations. No missing module, stub or main.py
+was changed by A4; the current full remote file inventory was not read, so do
+not present the older four-file inventory as a fresh byte census. Idleness is
+a current point-in-time observation, not continuous inactivity or proof of a
+particular stop action's causality. No fifth attempt or silent continuation.
+
+The approved shared appendix records this actual consumed Analyst event once:
+floor **319 shared /244 development /50 infrastructure /699 cells**. The manual
+sample and A1–A3 are not rebooked. This is a conservative protocol-attempt look,
+not a successfully launched strategy test. The added A4 allowance and current
+operational waiver are now consumed; the unused old A4 implementation cannot
+be substituted to evade that fact. All output/evidence/control leaves remain
+untouched; no cleanup, repair, worker replay or private-source census followed.
+
+### 312.17 Privacy-contract defect and prior-evidence qualification
+
+`ARV2E312-003` — P2 OPEN: the new helper requires
+row.get('public') is False, but the official QC Read Project documentation's
+Project schema does not define a public field. Its separate LeanVersion schema
+does define public; that cannot be transplanted onto the Project row. The
+pre-use synthetic fixtures supplied public=False and therefore did not establish
+provider compatibility for this condition. This is a concrete unsupported
+response-contract assumption in our verifier, not an established QC outage or
+evidence that R298 was made public. Public documentation inspected after A4:
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/read-project.
+
+The actual finite failure proves only that public was absent or not the exact
+boolean False. It does not retain presence/type/value, so missing, true, null
+and other types cannot be distinguished without new admissible evidence.
+Do not claim a specific raw cause from the documentation alone. No authenticated
+QC request, Safari/Mia project opening or response/control reread was made to
+investigate after A4; only frozen source and public documentation were read.
+
+Static comparison confirms D1,D2,D3 and the old A3 helper instead used
+row.get('public',False) is False: absent OR explicit false passed. Their prior
+"privacy authenticated/passed" wording is therefore overbroad; at most they
+showed no contradictory supplied public field under that old defaulting policy.
+They never established a present explicitfalse privacy value. The new strict
+check is a real contract delta, not unchanged privacy behavior as earlier
+same-round advice implied. That advice is corrected prospectively. No old
+result, failed operation, file or source pin is rewritten to fabricate proof.
+
+Do not fix this by restoring a missing=>private default, substituting an
+unrelated encrypted field, stripping the guard or changing project settings.
+Next technical work must establish a documented and authenticated privacy/
+sharing boundary for this exact project, with finite presence/type evidence
+and retained unknowns. Then define a separately versioned recovery contract
+and justify its checks before any new launch decision. The spent A4 source
+and tests remain frozen. There is no fifth-attempt authority and no inference
+of a broader future review waiver. The earlier Mia checkpoint remains valid
+as a completed diagnostic, not approval to exceed the new one-attempt limit.
+
+`ARV2E312-001` remains OPEN for actual recovery readiness: the candidate's exact
+two-view collaboration policy was synthetic-tested but not reached in A4.
+It must not be marked operationally resolved by D3 or the failed A4. The ledger
+identity issue ARV2D312-002 is resolved by the owner-approved appendix and passing
+record tests, not by concealing counts. No P0/P1 or strategy-economics change is
+claimed in this round; the two open P2 operational/evidence barriers remain.
+
+### 312.18 Concluded-round handoff and exclusions
+
+The exact continuing round is45a96f61 through this final record/accounting
+commit, with exactly six Codex commits. No incoming Claude commit is present:
+
+| Commit | Per-commit disposition / limitation |
+| --- | --- |
+| `7331b4db79f6f60818497e470e9c4d1f0a52bb28` | D1 freeze and owner waiver; actual D1 refusal retained. Privacy-default semantics now qualified by312.17. |
+| `7a6ea94f3e9bf72517518ac64e31c166c6dc3f31` | D2 shape contract/freeze and D1 disposition; finite metadata evidence only, not positive privacy proof. |
+| `90fdd5d2882e5f12bbbf26ce2c48eb002dc0111c` | D3 dedicated-view contract/freeze and UI/Mia qualifications; finite two-view evidence only. |
+| `5002abb5e2a79faca755cf8cb98811c3e156541f` | Additive A4 implementation and synthetic coverage; current operational acceptance withheld for ARV2E312-003, unsupported required privacy field. Preparation not independently reviewed. |
+| `efdd75822a7ba8f4286e068501550ccde5269186` | Owner-approved shared-census synchronization and exact A4 freeze; invoked once, now spent. Authority did not waive technical refusal. |
+| This final handoff commit | Actual A4 failure, once-only accounting, explicit privacy-contract correction and stop. No executable change or new invocation authority. |
+
+These are self-accounted implementation dispositions under the scoped waiver,
+not independent-review acceptance. The old frozen modules remain unchanged.
+The only shared-file change is the explicitly authorized append-only Analyst
+R298 census; no prior ledger entry, other-lane count/code, root handoff, action
+plan, trust root, source policy or strategy economics was modified. The failed
+Mia deletion did not remove anyone; no settings/permissions alteration succeeded.
+The only editor sessions stopped were the owner's explicitly released R298
+sessions. No other job/project/node was cancelled, interrupted or repurposed.
+
+Validation: final code union488distinct passes11.19s; pre-freeze record repeat
+86passes0.87s and final record/document86passes0.90s are overlapping. Earlier fixture/collection/mutation and ledger-red
+evidence is preserved above. No full lane/repository suite. Source/profile75pins
+and native-denied preflight passed before A4; after it no code changed. A4
+actualexit2 and accepted finite failure are not contradicted by green synthetic
+tests, wrapper exit0 or pure-validator exit0. There is no result-performance
+claim, accepted family cell or funded/broker/real-order/paper/live operation.
+Final read-only same-round factual audit found no remaining accounting/output
+misstatement; it is advisory, not independent review. Caller/helper/test hashes
+are unchanged after A4, and git diff --check passes. Only the two authorized
+documents are modified for this closing commit.
+
+Proceed now only with the one final nonforce push to the matching lane after
+root/branch/HEAD/status/diff and live-remote checks. Verify local/tracking/live
+agreement and report the exact final SHA externally; no acknowledgement-only
+follow-up commit/push. Monitor remains PAUSED. Stop this recovery at the concrete
+privacy-contract and exhausted-extra-attempt barriers. Do not inspect/repair/
+reallocate its control leaf, rerun a worker/reader, reopen QC/Mia, restore an old
+default, use another project/name or invoke the superseded unused A4 caller.
+A further recovery needs a supported exact privacy proof and a new explicit
+attempt decision; broad prior "proceed" is not a fifth-attempt grant.

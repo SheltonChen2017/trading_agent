@@ -6811,3 +6811,33 @@ and a separate committed run freeze. Only an actual A4 claim adds its own
 one shared and one development look. No fifth attempt, automatic retry,
 paper/live deployment, funded account, broker/real order or efficacy authority
 follows. The manual sample never substitutes for A4's identity or source.
+
+### R-298 A4 actual owner-handoff refusal — 2026-10-24
+
+The sole additional A4 ran at clean freeze
+`efdd75822a7ba8f4286e068501550ccde5269186`, source SHA256
+`02a2464c3dc04eea24e75791e9f7f4d7d33cd6febacacad2b9443147e53a9a41`,
+profile `0e425ce92f71d1554511eafc603a720d166864e19a3033d4a34ce26a995c8502`.
+External dispatch2026-10-24T20:39:47.991654Z, completion observed20:39:57.811992Z;
+actual exit2, empty stderr, no external bound. These are process observation
+brackets, not exact provider event times. The finite stdout is976bytes, SHA256
+`cf7552f22634988b3618b1309a1be6cc71e7a206c5f2a1a6524e66bd7d40d631`;
+the separate native-denied pure validator exited0 and accepted it as FAILURE
+evidence only. No private-control reread or report-success pin followed.
+
+One application dispatch, projects/read, observed at inspect-project. Failure:
+remote_refused / owned_private / predicate public. codeRunning was explicitly
+boolean false. Provider-contact count is unknown. The privacy predicate requires
+an explicit public=False; absence, true, null or a different type all refuse,
+and the retained finite result does not distinguish those cases. It is not
+evidence that the project is public. No collaborator/lock/file/capacity request,
+source mutation, explicit compile, backtest launch or accepted comparison cell
+occurred in A4. Initial admission and the consumed claim precede that dispatch.
+
+Book A4 exactly once: **318 ->319 shared /243 ->244 Analyst development /
+50 infrastructure unchanged /699 booked cells unchanged**. This conservative
+attempt look is not a measured launched strategy evaluation. A1–A4 are now
+spent, no fifth allowance exists, and the owner's manual sample is not rebooked.
+The documented-API/privacy-contract mismatch is recorded in Analyst312.17;
+source/gate correction and any further attempt need a separately coherent
+decision, not a replay or missing-field default. Other lanes remain untouched.

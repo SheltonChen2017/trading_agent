@@ -685,10 +685,12 @@ A1/A2/A3 remain spent and the booked floor is unchanged.
 Normal independent review applies unless the owner separately waives this new
 recovery; no additional launch authority is inferred from the old waiver.
 Section 312 records the owner's fresh explicit waiver and exactly one additional
-post-Mia attempt. D1's one-shot current-idleness observation is frozen before
-use; A4 remains conditional on its valid idle/zero-backtest result and a separate
-committed D2 decision. The ordinary three-attempt ceiling and all prior failures
-remain; no new technical gate is waived. Monitor remains PAUSED.
+post-Mia attempt. D1 is now SPENT after a collaborator refusal before idleness
+or backtest observation; A4 remains unused. D2 freezes a distinct one-query
+collaborator-shape diagnostic, not upload/launch acceptance. A4 still requires
+fresh satisfactory technical evidence and a separate committed run decision.
+The ordinary three-attempt ceiling and all prior failures remain; no new
+technical gate is waived. Monitor remains PAUSED.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1823,10 +1825,12 @@ unread. A future fresh admission intentionally authenticates pinned family/D15
 evidence and package payloads, not a repeated old operation. Monitor remains PAUSED.
 Section 312 supersedes the pending-approval barrier: the owner explicitly waives
 Claude review of section 312 for this recovery and permits one additional A4
-attempt. Execute only the separately frozen D1, then bind its actual successful
-idle/zero-backtest result into a separate D2 freeze before unchanged A4 use.
-Any ambiguity or failed gate stops; no old attempt is renewed, and no broader
-future waiver or fifth attempt is authorized.
+attempt. D1 refused collaborators before recording idleness and is spent.
+Execute only the separately frozen D2 collaborator-shape observation next;
+its finite evidence is diagnostic, not an execution-policy exemption or A4
+authority. A4 remains unused pending fresh acceptable guards and a separate
+run freeze. No old attempt is renewed, and no broader future waiver or fifth
+attempt is authorized.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -3772,7 +3776,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-24 UTC | Actual R298 evidence success, A2 refusal and bounded Mia diagnosis | `0b054ddf` -> `dfa3490a` -> section309 final result | No new Claude range; current waiver consumed, not independent acceptance | D1 exit0 authenticated A1; D2 exit2 remote_refused; A2 consumed; Mia reports unchanged four filenames/sizes and zero backtests but lacks raw metadata | Actual bounded channels and unchanged-source control flow; record checks below; no operational replay or full suite | 316/241/50/699; no accepted result; exact failing label lost and remote effects not independently authenticated | Preserve all evidence; separately gated offline marker/receipt reconciliation before any A3; one final push, monitor PAUSED |
 | 2026-10-24 | Owner-scoped reconciliation and final R298 recovery refusal | `f9fd0932` -> `e3d53276` -> `0a2400d7` -> this record commit | No incoming Claude range; explicit scoped waiver now consumed, not independent review | D1 authenticated zero-recorded-RPC A2 prefix; corrected real projection ID; A3 refused code_running before mutation/compile/launch; all attempts spent | 376 distinct focused passes5.72s; record repeats overlap; no full suite; actual exit/pins in310 | Booked317/242/50/699; no result cell; raw codeRunning value unknown; user-concurrent Safari prevented reading final Mia reply | Mandatory stop/Mia checkpoint, no A4; one final matching-lane push; monitor PAUSED |
 | 2026-10-24 | Post-Mia R298 idleness diagnosis and exact-source recovery preparation | `7c462a01` -> section311 round | No incoming Claude review; scoped new waiver/extra attempt requested, not assumed | Mia reply qualified; supported UI stopped only R298's code environment; additive observer and A4 candidate implemented but uninvoked | 472 focused implementation/helper passes plus record checks below; expected-red sensitivities retained; no old operational replay or full suite | A1/A2/A3 spent; floor317/242/50/699 unchanged; API idleness and current source unverified | Review or scoped waiver plus exact new run freeze before contact; one final matching-lane push; monitor PAUSED |
-| 2026-10-24 | Scoped owner waiver and one additional post-Mia R298 attempt | `45a96f61` -> section312 round | Current explicit waiver, not independent acceptance; no incoming review | Freeze unchanged D1 first; exact-source A4 conditional on a separate D2 decision | Current pins and focused record checks; actual results recorded below | Floor317/242/50/699 until actual A4 claim; old attempts stay spent | Restore only exact frozen source and obtain own running status if gates pass; one final push; monitor PAUSED |
+| 2026-10-24 | Scoped owner waiver and one additional post-Mia R298 attempt | `45a96f61` -> section312 round | Current explicit waiver, not independent acceptance; no incoming review | D1 spent collaborator refusal; distinct D2 shape diagnostic; A4 unused |280 focused passes and exact source/profile bindings; actual results below | Floor317/242/50/699 until actual A4 claim; old attempts stay spent | Restore only exact frozen source and obtain own running status if gates pass; one final push; monitor PAUSED |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -52836,3 +52840,130 @@ native network/artifact/Keychain denial and in-root support discipline. Both
 current source/profile pins and all5/73 selected dependency pins match; imports
 exclude assistant.dispatch_fence. No operational entrypoint was invoked during
 these checks; no full suite or repeated historical operation ran.
+
+### 312.3 D1 actual refusal; A4 remains unused
+
+At clean D1 freeze `7331b4db79f6f60818497e470e9c4d1f0a52bb28`, the observer
+ran ONCE. External dispatch2026-10-24T19:38:58.747443Z, completion observed
+19:39:02.471459Z; these are client brackets, not provider timestamps. Actual
+exit2; stderr0bytes; stdout539bytes SHA256
+`6a922aeb5fae81779b37ca08f0422cc686ee6f34364a6f382f912b34b938920b`.
+No external deadline/channel bound fired. The separate native-denied pure
+validator accepted only finite FAILURE evidence, not success:
+failure_code`collaborators`, stage`project`, endpoint`projects/read`,
+last_event`response_received`, application_dispatch_count1,
+project_observationnull, backtest_observationnull, provider_request_countnull,
+and all readiness/result/retry-authority flags false. No normal report pin.
+
+The current observer checked project/organization/name/language/owner/privacy
+before collaborators and did not reach typed codeRunning capture or the
+backtests/list call. Thus present idle state remains unknown. The inherited A3
+guard's order differs (idleness before collaborators); A3 did not establish the
+collaborator predicate either. No causal before/after inference is available.
+The refusal could mean missing/null/non-list collaborators, more than one entry,
+a non-dict entry, or an absent/non-boolean/non-true owner flag; this finite code
+does not distinguish them. The response body was not exposed or retained for
+posthoc parsing. No old/new control leaf is reread. D1 is SPENT, never rerun,
+repaired or relabelled. A4 was not invoked; no file write/compile/capacity/launch
+followed. Floor stays317/242/50/699.
+
+`ARV2E312-001` — P2 OPEN: current collaborator metadata does not satisfy the
+existing sole-owner policy. This is not yet a confirmed provider/schema defect
+or evidence of an unexpected person. Official Read Project documentation
+describes a required Collaborator Array with boolean owner; no evidence
+supports treating missing/null as empty or dropping the guard. QC's official
+collaborator-create/update examples also use `mia-ai`, establishing only that
+Mia can be represented as a collaborator, not that this account's actual array
+contains it. References: https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/read-project
+and https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/collaboration/create-project-collaborator.
+No collaborator is removed or granted permissions.
+
+The next safe in-scope diagnostic has a distinct prospective purpose: retain
+finite collaborator field/entry/owner shapes and exact boolean idleness, without
+names/emails/raw identifiers or policy acceptance. It is not another attempt to
+obtain the failed D1 success or permission to upload. It needs its own source,
+profile, claim, validation and committed one-shot decision before contact. The
+owner's current recovery waiver covers this bounded diagnostic, not weakening
+ownership/collaboration controls. A4's one additional allowance stays unused.
+
+### 312.4 Additive collaborator-shape observation and focused checks
+
+The separately versioned `scripts/observe_arv2_r298_access_shape.py` is a
+diagnostic-only response to ARV2E312-001. It authenticates exact project,
+organization, name, language, requester ownership and existing privacy contract
+before retaining typed codeRunning and finite collaborator shapes. One
+projects/read request only; no backtest listing, source, capacity, mutation,
+compile or launch endpoint. The exclusive fresh leaf is
+`artifacts/analyst_revisions_v2/newrule_access_shape/R312-20261024-A`, not
+inspected or allocated during preparation. D1 stays spent.
+
+Only presence/JSON types, bounded list/dict/owner counts, positive-integer UID
+equality-to-owner counts and exact public `mia-ai` sentinel counts are retained.
+No arbitrary names, emails, identifiers, keys, credential values or response
+body is printed/serialized. A response SHA is an integrity reference, not a
+retained body. After same-round advice identified lost row association, the
+uninvoked draft gained five finite joint counts: owner-true with matching UID,
+owner-false with either individual Mia sentinel, owner-false with both sentinels,
+and owner-true with either sentinel. These establish only those exact joint
+predicates, not arbitrary row identity, permissions, edit-lock ownership or an
+authorized assistant exemption. collaborator_policy_accepted,
+project_ready, retry authority and all formal/readiness/result flags stay false.
+Unknown/malformed fields are diagnosed, never coerced to an acceptable policy.
+
+The new entrypoint owns its preflight, claim, deadline and held/named output
+checks. It reuses only pinned pure canonical/type helpers from the old observer,
+never its spent operational entrypoint or controls. Selected six dependency
+pins are not whole-interpreter integrity. A60-second alarm does not bound host
+suspension or uninterruptible I/O. Partial/ambiguous claim remains consumed;
+no cleanup/retry. A failure without a report pin does not prove no persistence.
+The pure output validator requires actual observed exit, exact source/HEAD/profile,
+canonical single-LF bytes, coherent finite fields and reconstructed report pin;
+it never rereads a private leaf or supplies actual exit itself.
+
+| Binding | SHA256 |
+| --- | --- |
+| Observer | `30741256b41d145873f58c4b20824f8bf24ab1f949f0f1f966f66408179c3e83` |
+| Observer tests | `94645f328fe4a1f7573bbf6d1a1678f51ad0bb1340e69c9f6363adc43521047c` |
+| Canonical arv2-r298-access-shape-v1 profile | `6c1399c022bfeafc5540f4459cce7b26a21e693ab1de46178b7f97a560c486df` |
+
+Root final focused selection passed280 in1.27s:194 new diagnostic tests plus86
+record/document checks, no failures/skips/warnings. Root's earlier257 in1.23s,
+author194passes0.43s,171passes0.37s and157passes0.27s overlap, not additive.
+The final23 cases cover the joint counts/coherence/profile. Two initial author collection
+setup failures hit denied ancestor artifact stat before any tests; explicit
+--ignore=artifacts corrected invocation without weakening isolation. An
+in-memory report-pin omission produced4 expected failures and12 overlapping
+passes0.16s; restored in finally, source unchanged. The real minimal-environment
+absolute-script --help smoke proves import/CLI startup only, never operational
+entrypoint execution. Both files compile in memory, all six pins match and
+assistant.dispatch_fence is absent. All checks use native network/artifact/
+Keychain denial and in-root support, disabled plugin autoload/conftest/cache,
+-B; no complete suite. Same-round source/validator advice found no blocker but
+is not independent review; the remaining finite-joint-count qualification is
+retained above. Draft source/profile pins were finalized prospectively before
+any invocation; this is not an operational pin refresh.
+
+### 312.5 D2 exact one-shot shape-observation freeze, before contact
+
+The current explicit recovery waiver permits one invocation of the312.4
+observer at the clean commit containing this freeze. Bind --expected-head to
+that exact commit and --caller-sha256 to the observer pin above; require the
+exact canonical profile and all six unchanged dependency pins. Exact designated
+Mac root/branch, Darwin/POSIX Python3.13 at the existing pinned interpreter,
+minimal allowed environment and in-memory existing QC credentials only, as in
+312.2. No Keychain/token-file read or credential output is needed. The new claim
+and intent fsync before contact; one projects/read maximum. No old leaf is read.
+
+External handling remains75seconds/64KiB per channel, actual exit and UTC
+dispatch/completion observations, empty stderr required and unknown buffers
+hash/length-only. A separate credential-free native-network/artifact/Keychain-
+denied15-second pure validator authenticates only this exact single-LF envelope
+for actual exit0 or finite exit2. Only its validated finite projection may be
+shown. It reconstructs the report binding, not filesystem evidence. Deadline or
+ambiguity stops without retry. No look or additional strategy attempt is booked.
+
+D2 means this distinct diagnosis, not the previously conditional A4 freeze in
+312.2. It cannot authorize uploads, accept collaborators or establish edit-lock
+ownership. Any later A4 requires a separately justified current policy, fresh
+guards and committed run decision. A4 remains uninvoked; no fifth attempt,
+strategy change, new project, other-lane action or formal-source clearance.

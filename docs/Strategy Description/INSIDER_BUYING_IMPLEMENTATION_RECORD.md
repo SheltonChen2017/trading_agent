@@ -29389,3 +29389,93 @@ Main then added two direct default-transport predecessor guard-order controls,
 including a reached-opener positive control; these are in the361 result.
 No source was reversed on disk. Advisory internal QA found no material
 scope/privacy/acceptance issue; this is not independent Claude review.
+
+## 205. Observed wrapper mismatch and strict correction-verification preregistration (2026-10-24)
+
+The separately committed diagnostic/preregistration now exists as
+`9cc2286925def0e3615fc036678d69d44fce809e`. Its already-existing CLEAN source
+image executed204's production CLI, with the fixed Keychain/header and no
+source edits through execution. The old203 scope/completion and all child
+bytes/identities were checked before access and remained preserved. V2 made
+exactly ONE TICKERS GET, HTTP200, then stopped before ACTIONS. It again
+exited2/`stopped-status-qualification`, zero accepted metadata, completed at
+`2026-10-24T19:45:02.104925Z`. Neither failed operation is relabeled successful.
+
+This time the safe structural diagnostic established the mismatch: exact
+top-level keys `table` (string) and `files` (array), table value `tickers`,
+ONE file, zero unknown top-level fields. No known error class was identified.
+The existing strict flat-object contract therefore refused a wrapped snapshot.
+This does NOT establish an authentication failure, actual inner descriptor
+values, account tier or entitlement. The rejected body remains discarded,
+unhashed and unavailable for retrospective parsing. The observed shape is
+not a stored raw-body claim or a complete reconstruction of203's response.
+
+V2 retained seven total private JSON leaves. Its complete.json is5916 bytes,
+SHA256 `59a3031b18848b5c1d78e7090b7078f086d3bded71dbf215b1be0bdae06fbfb2`;
+global scope SHA256
+`78d9f9c93b659af2cd69508edc79b7b195e97910150bc2390c184795187dd9ed`;
+seven-source inventory
+`522b6a628dc5b32f101840d958438aecdb1531f221da3bf080cbc390d32a7e9c`.
+Independent metadata-only readback under native network/fork/all-write/
+Keychain-exec denial verified exact closed inventory/hashes/private modes,
+held ancestry and unchanged original predecessor. No second API/key read.
+
+`IBSHAR-CCR20301` / P2 is confirmed for prospective adapter compatibility:
+the supplier currently wraps the TICKERS snapshot while our original contract
+accepts only the documented flat example. It remains OPEN pending actual
+correction verification. Official docs still show flat TICKERS status, but
+confirm one full snapshot independent of requested tier; generic full-history
+file descriptors are documented for ACTIONS/DAILY. The new compatibility
+candidate is therefore a narrow engineering inference, NOT a falsely quoted
+official TICKERS inner schema or an observed inner-body fact.
+
+Preserve default v1 and diagnostic-v2 strict acceptance. ONLY explicit
+`--verify-correction` may additionally accept exact `{table,files}` with
+table=`tickers`, one dictionary and filename=`tickers.csv.zip`. The descriptor
+must be either the exact existing four fields (name/size/sizeLabel/modified)
+or those plus history=`full`, historyLabel=`Full History`, available=bool.
+All existing integer/size/UTC/credential-echo checks remain; unknown fields,
+other histories/files, arrays/duplicates, coercion or missing values refuse.
+TICKERS remains a current-reference status, not proof of historical content.
+
+Register ONE final prospective correction-verification operation in new
+private sibling `artifacts/insider_buying/sharadar_reference_correction_v3/`,
+schema `insider-sharadar-reference-status-correction-v3`, auditID
+`ib-sharadar-reference-20261024-wrapper-correction-v3-once`. The owner's
+explicit get-access-working instruction covers this narrow verification of
+the now-observed defect; it is not a renamed attempt against204's consumed
+contract. Bind BOTH immutable predecessors (203 and204 actual hashes above),
+their closed inventories, content and custody identities before credential
+read, at every checkpoint and immediately before dispatch. V1/v2 namespace
+reset/resume/rewrite/redispatch remains forbidden.
+
+At most two fixed status GETs, TICKERS then ACTIONS full-history, one each,
+same public URLs/header, ONE Keychain read, stop at first refusal; no row,
+archive, price/fundamental/outcome, redirect/proxy/fallback, QC or purchase.
+Execute only after the corrected code, tests and this preregistration exist
+as a clean exact committed source image; record its real hash later, never
+assign this future commit to earlier tests or executions. All authority and
+readiness flags remain false. V2's bounded structural diagnostic remains
+available on rejection, never a relaxation into arbitrary text retention.
+
+Invented four-field/seven-field wrapper tests first proved actual default
+schema refusal, then failed on the missing explicit compatibility contract
+(2 failed0.58s). The correction's subsequent green/sensitivity validation and
+actual outcome follow when observed. This is not independent Claude review,
+not acceptance of previous failed requests, and not a dataset capture.
+
+Final pre-verification main selection:403 passed in6.27s across the same
+seven focused paths; two changed Python images compiled in memory and diff
+check clean. Adapter SHA256
+`07ea23a6e3aa9fba4b8e5b1c8cc3ec00064fd15f13c8cdf513865940cecb263a`;
+test SHA256 `e08e64df4c80822a87b87bed92f57e7f87ccc959ee09df2191381273df1a4f85`.
+The preceding main selection was402 passed/1 failed6.04s: the lane's static
+boundary guard correctly required an explicit opener tripwire in one new
+fixture callback-refusal test. Adding that tripwire corrected the test;
+native process-tree network/Keychain-exec denial was already effective and
+no production callback/request occurred. No existing guard was weakened.
+Internal overlapping109-new/112-original selection221 passed1.15s after
+four caught memory-only reversals: removed wrapper support2 failures,
+default-mode leakage2, skipped v2 rechecks3, reused namespace3. Reversals
+were finally-restored, never written to disk. No full suite or actual
+provider verification is claimed by these fixture results.

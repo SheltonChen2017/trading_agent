@@ -685,10 +685,13 @@ A1/A2/A3 remain spent and the booked floor is unchanged.
 Normal independent review applies unless the owner separately waives this new
 recovery; no additional launch authority is inferred from the old waiver.
 Section 312 records the owner's fresh explicit waiver and exactly one additional
-post-Mia attempt. D1 is now SPENT after a collaborator refusal before idleness
-or backtest observation; A4 remains unused. D2 freezes a distinct one-query
-collaborator-shape diagnostic, not upload/launch acceptance. A4 still requires
-fresh satisfactory technical evidence and a separate committed run decision.
+post-Mia attempt. D1 is SPENT after a collaborator refusal; D2 is SPENT after
+observing codeRunning=False and two collaborator entries. The UI labels the
+extra entry Mia; the owner's specifically approved removal failed with
+Collaboration not found. Mia cannot authenticate its provenance. The own editor
+session was stopped again; dedicated collaboration-record diagnosis is next.
+A4 remains unused and requires fresh satisfactory technical evidence and a
+separate committed run decision.
 The ordinary three-attempt ceiling and all prior failures remain; no new
 technical gate is waived. Monitor remains PAUSED.
 
@@ -1825,12 +1828,13 @@ unread. A future fresh admission intentionally authenticates pinned family/D15
 evidence and package payloads, not a repeated old operation. Monitor remains PAUSED.
 Section 312 supersedes the pending-approval barrier: the owner explicitly waives
 Claude review of section 312 for this recovery and permits one additional A4
-attempt. D1 refused collaborators before recording idleness and is spent.
-Execute only the separately frozen D2 collaborator-shape observation next;
-its finite evidence is diagnostic, not an execution-policy exemption or A4
-authority. A4 remains unused pending fresh acceptable guards and a separate
-run freeze. No old attempt is renewed, and no broader future waiver or fifth
-attempt is authorized.
+attempt. D1 and D2 are spent. D2 observed exact boolean codeRunning=False but
+two collaborator entries, not sole ownership; the UI Mia-removal failed.
+The next distinct investigation is the dedicated collaboration-record endpoint,
+with separate source/claim/run freeze and no permission or file mutation.
+A4 remains unused pending fresh acceptable guards and a separate run freeze.
+No old attempt is renewed, and no broader future waiver or fifth attempt is
+authorized.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -52967,3 +52971,178 @@ D2 means this distinct diagnosis, not the previously conditional A4 freeze in
 ownership. Any later A4 requires a separately justified current policy, fresh
 guards and committed run decision. A4 remains uninvoked; no fifth attempt,
 strategy change, new project, other-lane action or formal-source clearance.
+
+### 312.6 D2 actual shape result and scoped Safari follow-up
+
+At clean D2 freeze `7a6ea94f3e9bf72517518ac64e31c166c6dc3f31`, the new
+observer ran ONCE. External dispatch2026-10-24T19:50:50.068585Z and completion
+observed19:50:53.902299Z; actual exit0, stderr0bytes, no external bound.
+stdout1648bytes SHA256
+`d2e564034a7d5193a11ca9dde16d2a71917ab79008000fa9320dd0d0e82d42c2`.
+The separate native-denied pure validator exited0 with empty stderr and accepted
+the exact finite envelope. Its report binding is1543bytes SHA256
+`bb3e75ce1b69d517c8c103224c8064dad3bb8da593109bd37a97f4e7c086083d`.
+No private output/control reread. D2 is now SPENT, never replayed or repaired.
+
+One projects/read application dispatch; provider request count remains unknown.
+Exact project/organization/name/language/requester ownership/privacy checks
+passed. codeRunning was present boolean false at this observation. The list
+contained exactly two dict entries, each with boolean owner: one true, one false.
+The true-owner entry's positive-integer uid matched the positive-integer
+project ownerId. The other uid was null. All individual and joint `mia-ai`
+sentinel counts were zero. No backtest inventory was requested. Thus this
+observation establishes point-in-time idle state, not current sole ownership,
+Mia API identity, exclusive edit control, source readiness or launch authority.
+ARV2E310-001 has a prospective idle observation, not retrospective cause proof;
+ARV2E312-001 remains OPEN. A4 is unused; floor317/242/50/699 is unchanged.
+
+Safari follow-up used only the existing Analyst tab. The Projects list had no
+R298 code environment. Opening exact project38364439 for collaborator/Mia
+inspection started its code session and an automatic IDE build: Cloud Terminal
+display7:51:49 (timezone unspecified), short buildId`2041ab-4795fc`, engine
+2.5.0.0.18203. No explicit build/run command or strategy attempt was made; this
+partial-source IDE build is not A4 or verification of the frozen projection.
+The sidebar displayed only the owner avatar and Mia, "You have edit permission",
+and the prior Mia task as Completed. This is authenticated UI evidence, not an
+API identifier or continuous exclusive-lock guarantee. The UI activity makes
+the earlier idle observation stale for a future run; close/stop only this own
+editor session before any future fresh guards.
+
+The owner separately approved: "Yes—remove only Mia from R298 and proceed."
+That approval changes no other collaborator/project/account and does not
+authorize forced locks or broad permission changes. Opening only Mia's settings
+and clicking Remove User ONCE returned "Collaboration not found. REF:
+#f54a1e0acj" (displayed log7:53:10, timezone unspecified). Removal did not
+succeed; Mia remains displayed, owner preserved. No retry, alternative deletion,
+permission save, file upload, capacity call or launch followed.
+
+Under the owner's permission to consult Mia, one read-only follow-up was sent
+in the existing exact-project conversation. It supplies only the finite shape
+observations/UI refusal and asks whether the assistant is synthetic and how to
+preserve exclusive editing. It explicitly prohibits edits, permission changes,
+builds, launches, cancellations, result reads, other-project access and repeated
+file/backtest/live/optimization censuses. Mia's reply is pending at this point;
+it is diagnostic advice, not authority or automatic acceptance.
+
+### 312.7 Mia follow-up: limits retained; own session stopped again
+
+Mia completed the new follow-up, reporting documentation lookups/reasoning only,
+no edits, launches or repeated censuses. Its final answer explicitly cannot
+authenticate whether the displayed Mia entry is synthetic: its tools do not
+expose collaboration records. It offers two hypotheses (virtual assistant
+representation versus an identifier mismatch), and the dedicated
+projects/collaboration/read and supported codeSourceId edit-lock mechanism as
+possible next steps. These are not operational facts or permission to bypass
+the existing sole-owner check.
+
+Counter-qualifications: a dedicated read can establish its returned record
+shape and exact comparison, not necessarily settle backend persistence or
+virtuality. The published quota table alone cannot prove a stored row impossible
+or synthetic identity near-certain. The UI's completed task is evidence about
+that task, not all concurrent sessions. The official lock-acquire response
+documents success/errors only, with no owner token, lease/expiry or explicit
+non-stealing semantics. Same source tagging should accompany a supported lock
+and file operations; omitting codeSourceId must not be used to force past a
+conflict. Mia's suggested `projects/files/*` spelling is not the actual frozen
+`files/*` transport namespace, and a historical30,349-byte file does not prove
+current upload acceptance. None of these suggestions was executed.
+
+The editor changed to read-only/Request Edit Control during this Mia follow-up,
+consistent with agent session activity but not proof of its backend mechanism.
+No Request Edit Control click, lock API, source write or removal retry occurred.
+After Mia was Completed, returned to Projects and stopped only the newly opened
+R298 code environment using its own Stop control. The code-environment row and
+active project link disappeared; R298 remains in Recent/My Projects. This is
+UI evidence, not a fresh raw idleness result. Other projects/lanes untouched.
+
+Next bounded investigation is the distinct dedicated collaboration-record read,
+with exact project authentication first, finite redaction, no deletion/lock/file
+or launch authority and a separate committed one-shot freeze under the current
+recovery waiver. It diagnoses the UI-removal refusal using the provider's
+documented collaboration endpoint, not a repeated D1/D2 or A4 invocation.
+The owner's removal approval remains specific to Mia in this project; absent a
+safe authenticated target, no alternate deletion or permissions change follows.
+References: official Read Project Collaborators, Lock Project and Collaboration
+documentation, https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/collaboration/read-project-collaborators,
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/collaboration/lock-project,
+https://www.quantconnect.com/docs/v2/cloud-platform/projects/collaboration.
+
+### 312.8 Dedicated collaborator-record comparison, additive and bounded
+
+`scripts/observe_arv2_r298_collaborator_records.py` implements the distinct
+read-only comparison proposed above. It authenticates the exact project and
+positive-integer ownerId using projects/read, then reads only
+projects/collaboration/read for project38364439. The new private leaf is
+`artifacts/analyst_revisions_v2/newrule_collaborator_records/R312-20261024-A`;
+it has not been inspected or allocated during preparation. Claim/intent fsync
+precedes credentials/contact. Two application dispatches maximum, in that order;
+an ambiguous request consumes its position. No deletion, edit-lock acquisition,
+file/capacity/backtest/result call, old-control read, cleanup or retry exists.
+
+The new narrow client retains the unchanged client class/base URL, bounded
+transport,30-second timeout and environment/logging checks. It does not patch
+the frozen general allowlist. Seven selected dependency pins are bound, not
+whole-interpreter integrity. Up to8 rows per view retain only exact types,
+owner/UID-to-project-owner predicates, publicId shape/exact mia-ai predicate,
+exact-name-Mia boolean, finite permissions/liveControl, and canonical parsed-row
+SHA256. Arbitrary names, emails, identifiers, bodies and credentials are not
+retained. Hashes are opaque integrity fingerprints, not anonymity claims or
+original wire-byte hashes. Sorted row-hash multiset comparison retains
+multiplicity. Sequential endpoint responses are not an atomic snapshot or
+continuous-stability proof. All policy/readiness/stored-record/synthetic-entry/
+edit-lock/retry/result flags remain false, even if the views agree.
+
+Source/test/profile bindings:
+
+| Binding | SHA256 |
+| --- | --- |
+| Observer | `0a4532af010699a6fe57a3067f9f099cd805efac71ed8cb34ecb7e49b4631e43` |
+| Observer tests | `f652f67ff88341b02cf83dc1110c0cff37c35ebb0c255914321641c601731b6c` |
+| Canonical arv2-r298-collaborator-records-v1 profile | `509e6321c676221ffcccd36839cc8e10179b6a9bb9066c9bd5d4f6a82322c387` |
+
+Same-round advice found one concrete validator omission: the same canonical row
+hash could accompany contradictory finite projections within or between views.
+The final validator requires identical full projections for repeated hashes,
+using the same in-memory project ownerId. Two regression cases failed as
+expected before correction (236 deselected,0.13s); the final author selection
+passed238 in3.81s. Root's focused union passed518 in5.22s:238 new observer cases,
+194 shape-observer cases and86 record/document cases, no failures/skips/warnings.
+The earlier280 root and238 author selections overlap this union, not additive.
+Both new files compile in memory,7 pins match and dispatch_fence is absent.
+Tests include the real absolute-script minimal-environment --help startup,
+client order/whitelist/ambiguous consumption, transport/environment boundaries,
+claim/output/failure/privacy/coherence/actual-exit/pin checks. Native network,
+production-artifact and Keychain denial, all support in root, no conftest/plugin
+autoload/cache/bytecode. No complete suite or operational entrypoint ran.
+Same-round advice is not independent review; the current scoped owner waiver
+governs sequencing without changing technical acceptance.
+
+### 312.9 D3 exact one-shot dedicated-record freeze, before contact
+
+At the clean commit containing this freeze, permit exactly ONE invocation of
+the312.8 observer with --expected-head bound to that exact commit and
+--caller-sha256 bound to its source pin above. Verify the exact canonical profile
+and7 selected dependencies. Use only the designated Mac root/branch and pinned
+Darwin/POSIX Python3.13 interpreter, minimal allowed environment, existing two QC
+credential variables passed only in memory, no Keychain/token-file lookup or
+credential output. The60-second parent alarm covers preflight/claim/requests/
+publication, subject to host suspension and uninterruptible-I/O limitations.
+Partial/duplicate claim is consumed or ambiguous; no alternate leaf or replay.
+
+External handling is the previously described75-second/64KiB-per-channel own
+child observation, actual exit and UTC brackets, empty stderr required, unknown
+buffers hash/length-only. A separate credential-free native-network/artifact/
+Keychain-denied pure validator gets stdout via stdin with15-second deadline and
+24,576-byte envelope limit. It checks actual exit0 or finite exit2, canonical
+single-LF framing, exact HEAD/source/profile, coherent finite projections and
+reconstructed report pin. Only validated finite output may be shown. This is
+not a private output reread, fresh provider authentication or permission grant.
+Late/ambiguous publication stops without replay; report alone never suffices.
+
+D3 is diagnostic comparison of two documented views after the failed UI
+removal, not another attempt at D1/D2 success or A4. No look is added;
+floor317/242/50/699 stays. A4 remains unused. Any subsequent mutation must
+establish its exact Mia-only target under the explicit owner approval; absent
+that evidence, no guessed ID, forced lock, collaboration-policy weakening or
+unchanged removal retry is permitted. A later A4 needs a separate current
+technical decision/run freeze and all unchanged source/admission guards.

@@ -729,6 +729,14 @@ explicit compile or launch was reached. A1–A6/R314 are SPENT; floor321/246/50/
 699, no accepted cell.315.5–315.7 own the actual evidence and current handoff:
 obtain the exact QC-side error and reconcile that first write before any newly
 authorized recovery. No A7 or automatic retry. Monitor remains PAUSED.
+Section316 records the owner's subsequent "yes, proceed" to read-only error/
+file-effect diagnosis. Safari currently showed the target as#, not a byte-
+authenticated readback; Mia reports no historical-response retrieval tool.
+The consultation exposed a new Mia/session entry, and the editor reported
+its final save was skipped because Mia held the lock; no edit control was
+requested. The editor is closed. A separately bounded three-read observer is
+implemented but uninvoked; its contract still requires review or an explicit scoped
+waiver and a committed freeze before invocation. A6 is not renewed.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1905,6 +1913,13 @@ write, not a payload guess, weakened success check or replay. A7 is not
 authorized; further operational recovery needs a new explicit attempt decision
 and a committed protocol. Claude must review a future new contract unless the
 owner separately waives it. Do not replay A5/A6/R314 or begin another family cell.
+The owner subsequently approved proceeding with read-only diagnosis; section
+316 owns that narrowed work. Claude must review section 316's new three-read
+contract before invocation unless the owner separately waives that specific
+review. The scoped waiver question is pending, not inferred from an earlier
+spent allowance. Current Safari evidence and Mia's qualified consultation are
+recorded separately from API authentication; no A7, upload, lock or launch is
+authorized. The new observer is not an unchanged recovery retry.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -3852,6 +3867,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-24 | Post-Mia R298 idleness diagnosis and exact-source recovery preparation | `7c462a01` -> section311 round | No incoming Claude review; scoped new waiver/extra attempt requested, not assumed | Mia reply qualified; supported UI stopped only R298's code environment; additive observer and A4 candidate implemented but uninvoked | 472 focused implementation/helper passes plus record checks below; expected-red sensitivities retained; no old operational replay or full suite | A1/A2/A3 spent; floor317/242/50/699 unchanged; API idleness and current source unverified | Review or scoped waiver plus exact new run freeze before contact; one final matching-lane push; monitor PAUSED |
 | 2026-10-24 | Scoped owner waiver and one additional post-Mia R298 attempt | `45a96f61` -> section312 final handoff (six commits) | Current explicit waiver, not independent acceptance; no incoming review | D1–D3 spent; failed UI Mia removal; owner manual sample preserved; additive A4 ran once and refused owned_private after1projects/read, explicit codeRunning=false observation; no upload/compile/launch |518 distinct focused passes through D3; final A4 union488passes11.19s after authorized ledger correction; historical failures/overlaps retained below | Floor319/244/50/699 counts manual and A4 once; A1–A4 spent; shared census synchronized; unsupported privacy contract remains OPEN | One final push now, then stop at privacy/attempt barrier; no fifth attempt, missing-field default, new contract or next cell; monitor PAUSED |
 | 2026-10-24 | Owner-authorized A5, bounded collaborator diagnostic and sole A6 recovery | `8877caba` -> `4fe89ff9`, `13cc0ae7`, `7a2c756e`, `388594b6` and this final section315 result/handoff commit | No incoming Claude review; scoped owner waivers, not independent acceptance | A5 spent after post-lock refusal; R314 observed exact current A5 environment row; new verifier passed actual A6 initial/post-lock checks; first files/update then refused in-band at HTTP200, with ambiguous write effect and no compile/launch | Root1111 distinct focused passes13.90s; final document repeats in315.7 overlap; no full suite or operational replay | A1–A6/R314 spent; ARV2E313-001 resolved prospectively for actual A6 checks, ARV2E315-001 OPEN; floor321/246/50/699, no accepted cell | One final nonforce matching-lane push; exact provider-error/reconciliation barrier, no A7 or next cell; monitor PAUSED |
+| 2026-10-24 | Owner-directed read-only file-effect diagnosis | `ff9d00bf` -> section316 preparation handoff | No incoming Claude review; new observer review/waiver and exact run freeze required before use | Current UI target shows#, documentation-only Mia cannot retrieve old response; false payload-field claim rejected against official docs; separate one-file observer implemented but UNINVOKED | Root541distinct focused passes11.74s, four new files compiled in memory,83selected pins matched; no full suite or old operational replay | A1–A6/R314 remain spent, ARV2E315-001 OPEN;321/246/50/699 unchanged; UI consultation changed session representation, not accepted write authority | No upload/lock/compile/launch/A7; next review/waiver and exact one-shot freeze for bounded current-byte evidence only |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -54647,3 +54663,230 @@ agreement after the push; do not claim it occurred before observing success.
 Monitor remains PAUSED. No next family cell, other-lane mutation, paid-rights
 change, provider request, paper/live action, funded account, broker/real order
 or efficacy claim is authorized by this checkpoint.
+
+## 316. Read-only R298 file-effect reconciliation — 2026-10-24
+
+### 316.1 Owner scope and synchronized baseline
+
+After the section315 final report recommended obtaining QC's exact refusal
+and reconciling the target read-only before another attempt, the owner answered
+"yes, proceed". This authorizes current read-only diagnosis, not A7, a repeated
+file update, lock/permission changes, compile, capacity or backtest launch.
+The previous one-A6 waiver remains exhausted. The owner was separately asked
+whether to waive Claude review of this specific new three-read reconciliation;
+that answer is pending at preparation. Implementation alone is not a run freeze.
+
+The completed preceding round was exactly five commits after8877caba through
+`ff9d00bf8b4bff8cd8c40bdf35c31b4dba3c5128`; exactly one matching-lane nonforce
+push succeeded, with local/tracking/live heads equal and a clean worktree.
+Current preparation starts at that exact synchronized clean baseline, in the
+designated Code root and branch only. No new Claude push was present. Monitor
+remains PAUSED. Floor321shared/246Analyst development/50infrastructure/699cells
+is unchanged; a read-only metadata/file diagnostic is not a strategy look.
+
+### 316.2 Actual Safari observation and bounded Mia consultation
+
+Using the owner's Safari/read-only/Mia access directions, root selected the
+existing QC terminal tab and opened only R298 project38364439. Its editor
+displayed accepted_risk_order_level_input_runtime.py with a single visible#.
+No code was typed or pasted into an editor, and no build/backtest/edit-control/
+sharing/permission action was selected. This is current UI evidence, not exact
+stored-byte authentication, an atomic snapshot, or proof of A6's effects.
+The displayed terminal included an older build message; no new build was
+requested and the historical display does not identify an A6 compile.
+
+Mia received one documentation-only consultation explicitly prohibiting all
+authenticated project/file/account APIs, edits, locks, collaborator/settings
+changes, compiles and launches. It reported no tool capable of retrieving the
+historical files/update response and no supported documented history view it
+could identify. This is a tool-capability limitation, not proof that no QC
+server-side log exists. A support investigation might have separate evidence,
+but no support ticket was sent and no such capability is promised.
+
+The UI initially showed only the owner; after the consultation it displayed
+Mia, a read-only editor and Request Edit Control. Closing our editor produced
+a visible message that final cloud save was skipped because that session did
+not hold the collaboration write lock, which was held by Mia. The terminal
+page subsequently replaced the editor, verified by23:27:56Z plus the following
+UI observation (external observation context, not a provider-event timestamp).
+No control request/removal/release was attempted. Consequently this was not
+zero-effect UI activity: opening/closing a coding environment and consulting
+Mia affected the visible session representation. Exact backend causes and
+post-close lock state remain unverified. Neither the old A5-row assumption nor
+the earlier exclusive handoff can be silently reused for a future write.
+
+The initial native-app selection also automatically exposed an unrelated
+provider-account accessibility view containing a credential. Root did not use
+that credential, repeat its value, write it into repository files or send it
+to Mia/QC. The tool's initial view cannot be claimed not to have contained it;
+no raw account view or screenshot was exported into the lane record. Subsequent
+interaction was restricted to QC. This incidental view is not an authorized
+credential inspection, connection test or permission to use another provider.
+
+### 316.3 Counter-check of Mia guidance and public source
+
+Mia's claim that codeSourceId is undocumented for files/update is **false**:
+the official [Update File request model](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/file-management/update-file)
+explicitly includes it for content updates. Do not remove it or weaken the
+success check on that advice. Mia's suggestions to log full raw bodies or
+conduct a changed write are not adopted; neither fits current authority or
+the credential/licensed-data constraints. Its assertion that the original
+errors array certainly contained the reason is also unproved: retained A6
+evidence does not distinguish false/missing/null/mistyped success or an empty
+body. A browser network panel would not retrospectively capture an external
+Python client's request. No blanket claim of irrecoverable server-side data.
+
+Earlier acceptance of a larger module makes a simple unchanged per-file limit
+less plausible, but does not prove every size/encoding/endpoint/time-dependent
+constraint is excluded. The raw local target is24637bytes; a native-network/
+production-artifact/Keychain-denied AST check verified raw SHA256
+`a08098648d98a95736471113d48a3e1183f04969d2c2561b1a4f5d6bfc80d7ee`
+and produced the exact normalized23055bytes SHA256
+`c34e42d894dc88e74ce37899622a7f728bafdac9320ce2775736ba06b7ad463e`.
+The public frozen render_projection path normalizes that unchanged source
+before forming the11-file projection. Thus24.6KB describes raw local source,
+not the exact upload size. This check read no production artifact and grants
+no package admission or operational retry.
+
+The official [Read File request model](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/file-management/read-file)
+supports projectId with a single name; codeSourceId is optional. A new observer
+will explicitly omit that optional field, not acquire a lock or bulk-read all
+files. This choice applies to the read-only request only; it is not evidence
+to change the frozen update payload or its environment identity.
+
+### 316.4 New read-only policy and prospective protocol
+
+Implemented scripts/arv2_r298_file_effect.py with injected pure seams and
+scripts/observe_arv2_r298_file_effect.py as the separately bounded caller.
+Exactly three ordered reads: projects/read, projects/collaboration/read, then
+files/read for only accepted_risk_order_level_input_runtime.py in38364439.
+No old observer/worker/claim is invoked, no old control is inspected and no
+credential/source bytes or raw provider errors are printed. New fixed control
+artifacts/analyst_revisions_v2/newrule_file_effect/R316-20261024-A is not
+inspected or allocated during preparation.
+
+The new read-context policy differs deliberately from the unchanged frozen
+write-access policy. It requires authenticated exact project/org/name/Py,
+owner=True and a strict positive ownerId, plus one unambiguous dedicated owner
+with matching uid and explicit read/write permissions. At most8 bounded
+dedicated rows may be observed; non-owner rows cannot authorize the read.
+General collaborators, codeRunning and liveControl are bounded diagnostic
+hashes/counts, not write authority. Read-only file reconciliation does not
+need an idle editor or exclusive write control; applying those conditions here
+would conflate reading current content with permission to mutate it. This does
+not preserve whole-owner-row historical continuity, authenticate an extra
+account as synthetic, accept a collaborator policy, or clear a future write
+gate. The old verifier and all A5/A6 pins remain unchanged.
+
+The exact bounded single-file response must identify the requested name and
+contain only that file. Project scope comes from the authenticated fixed
+request and preceding project metadata; an optional echoed projectId must
+match exactly, but an absent echo is not fabricated as response evidence.
+Content is checked in memory against the
+frozen normalized bytes and separately against# and# plus LF. Output contains
+only size/hash/finite classification. "Desired source" means current matching
+bytes, not A6 causality; "permitted placeholder" is not proof of unchanged
+bytes because A6 admitted two placeholder encodings. Sequential metadata and
+file reads are not atomic. A mismatched/ambiguous response cannot fall through
+to another request, broader query, lock or upload. Actual final pins, tests,
+review disposition and any exact execution decision must be recorded before
+credential access or invocation.
+
+### 316.5 Final source pins, focused validation and dispositions
+
+Final candidate files (SHA256; bytes):
+
+| File | SHA256 | Bytes |
+| --- | --- | ---: |
+| scripts/arv2_r298_file_effect.py | `088adbad3bccaac5b6bf1abe35e0b11ef6288ae4998e3783a3cfa08a514eb438` | 20075 |
+| tests/analyst_revisions_v2/test_r298_file_effect.py | `353f5240f3081574b57671171270b1e4800332e829b5c91f0b1d6214d76716f8` | 24700 |
+| scripts/observe_arv2_r298_file_effect.py | `26e208fd490ef0399ff239abc3fa88754715c12ef30aff44684176c674e2729b` | 18114 |
+| tests/analyst_revisions_v2/test_r298_file_effect_observer.py | `ecd805381f93870fb4cad7eb47a1704e4110b09171de62924e4b6d70d3dd4e4a` | 24828 |
+
+Canonical pure profile arv2-r298-file-effect-v1 SHA256
+`0d46e8214b645656bf99cb48452bb697ccfdb9c0c726c206ba65084880f66848`;
+caller profile arv2-r298-file-effect-observation-v1 SHA256
+`74dfbb35a156926b4ae28d36ba1bbbff96cf27e84621087367ba51143d349107`.
+All83 selected dependency pins matched. This includes the prior80 unchanged
+A6 selections plus the A6 caller, R314 observer and new pure helper. It does
+not mean whole-interpreter integrity or invoke their spent entry points.
+The caller's own bytes must separately match its CLI pin and clean committed
+HEAD. The reconstructed public projection also matches the frozen target
+size/hash, without a production package/control read.
+
+Root final focused selection: **541 distinct passed in11.74s**, consisting of
+268 pure-helper tests,187 caller tests and86 record/active-document tests;
+no failures, skips or warnings. It ran with native network denial, production
+artifact and Keychain read/write denial, security-command execution denial,
+and writes denied outside the designated in-root .pytest_cache support paths
+except /dev/null. Plugin autoload was disabled, --noconftest, -B and no cache
+provider were used, artifacts were excluded from collection, and root asserted
+assistant.dispatch_fence absent. Four new source/test files compiled in memory
+without bytecode in a separate native-denied check. No complete lane/repository
+suite, private census or operational replay was run. Denial is not request
+accounting and synthetic success does not validate actual QC behavior.
+
+Author results overlap:268pure passes0.26s;187caller passes9.24s; preliminary
+182caller passes9.18s preceded final pure-pin binding and added boundary tests.
+These are not additive to541. The initial pure-test collection failed with
+one pytest reserved-parameter error in0.12s before tests executed; the fixture
+parameter was corrected before the passing selection. Removing the exact
+expected-source digest check in memory caused one expected failure0.10s with
+267 deselected. Fabricating actual exit0 inside the external validator caused
+one expected failure0.61s. Both mutations were restored in finally blocks;
+source hashes remained unchanged. These expected red results are not erased.
+The final record-only repeat passed86 in1.20s; it overlaps the root541 and
+does not enlarge the distinct count.
+
+Root reviewed both implementations and tests. Same-round read-only advice
+found no remaining material code blocker and caught a documentary overclaim:
+an absent response projectId is not echoed identity evidence (corrected in
+316.4). Advice also prompted boolean/null hash-kind coherence checks with
+regressions. This is implementation self/counter-check, **not independent
+Claude review** or acceptance of the spent A6 contract.
+
+| Finding | Severity/status | Disposition |
+| --- | --- | --- |
+| ARV2E315-001 | P2, remains OPEN | A6 update effect and exact refusal remain unknown; UI# is not byte authentication or causality. No unchanged retry. |
+| ARV2D316-001 | P3, documentary advice corrected | Mia's undocumented-codeSourceId assertion is false against the official request model; no payload change adopted. |
+| ARV2D316-002 | P3, qualified | Current UI/Mia consultation altered session representation; closing the editor reported Mia held the lock. No zero-effect or current exclusivity assertion. |
+| ARV2D316-003 | P3, corrected prospectively | A file response need not echo projectId; exact request/context supplies scope and contradictory optional echoes refuse. |
+
+### 316.6 Uninvoked checkpoint and next permitted action
+
+The new parent is an exclusively claimed, three-read observer, not a repair
+caller. A prospective invocation has a90s parent alarm with30s per-request
+timeouts; host suspension and uninterruptible I/O are not bounded by that
+alarm. The claim must be fsynced before credentials. Partial/existing claims
+are spent or ambiguous, never a retry allowance. Up to8 own control files
+cover claim, six intent/response journals and report; a failure record may
+occupy an unused slot within that ceiling, never overwrite an existing file.
+A late failure after all8 files exist can leave a positive report but actual exit2 and no
+failure pin. Require actual observed exit0 plus exact finite matching output
+and report pin; never accept the report alone or manufacture exit0. No file
+body, opaque account response, credential or raw error is output. Only the
+current named-file digest/size/classification and bounded metadata observations
+are retained. Sequential reads do not prove an atomic snapshot.
+
+At this checkpoint the scoped review-waiver question remains unanswered.
+The existing A6 waiver does not apply to this new read-context contract.
+Claude must review section316's exact pushed implementation, followed by
+Codex counter-review, unless the owner explicitly waives that specific review.
+Then commit a separate exact one-shot run decision binding current source/
+profile/HEAD, intended read scope, actual-exit capture and the bounded external
+output validation. That execution freeze has NOT been committed here. The
+new fixed control has not been inspected or allocated, credentials have not
+been obtained for this caller, and the actual parent/three reads/output check
+have NOT run. Preparation does not silently consume R316 or authorize A7.
+
+This round contains no incoming Claude commits to dispose. The one local
+implementation/handoff commit afterff9d00bf records actual UI/docs diagnosis
+and the uninvoked candidate; it is not an independent acceptance or an
+operational success. Make exactly ONE final matching-lane nonforce push after
+root/branch/HEAD/status and live-origin agreement checks, then verify local/
+tracking/live equality. No intermediate push or future-milestone launch.
+The monitor remains PAUSED; no automation change is needed. Do not inspect
+old controls or change frozen strategy economics, source admission, ownership,
+collaborators, lock state, storage, shared ledgers or other lanes. Floor
+321/246/50/699 and all false readiness flags remain unchanged. The actual
+Analyst R298 candidate is still not running.

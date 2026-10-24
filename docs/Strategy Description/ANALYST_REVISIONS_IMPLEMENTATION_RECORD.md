@@ -695,10 +695,9 @@ default sample run. That run is preserved/excluded from Analyst results and
 booked once; floor318/243/50/699. The owner explicitly freed R298/Safari again;
 its code environment was stopped. The prospective exact-owner/manual-history/
 supported-edit-lock recovery adaptation is implemented and synthetic-tested.
-The valid cross-ledger identity gate now exposes the manual run's missing shared
-census entry; narrowly scoped append-only authority is requested, not assumed.
-A4 remains unused pending that resolution, fresh satisfactory technical evidence
-and a separate committed run decision.
+The owner approved the narrow shared-census append, resolving the missing manual
+identity without rebooking prior looks; all488 focused checks now pass. A4
+remains unused before the exact312.15 clean-commit run freeze and fresh guards.
 The ordinary three-attempt ceiling and all prior failures remain; no new
 technical gate is waived. Monitor remains PAUSED.
 
@@ -1843,10 +1842,10 @@ default sample and freed R298/Safari; its editor session is stopped again.
 Section312.11 defines prospective exact-owner/manual-history/edit-lock recovery
 adaptation, not permission to remove guards or reuse D1–D3. Floor318/243/50/699
 includes the owner manual outcome once. The adaptation is implemented in312.12;
-all401 new tests pass, but the record-to-shared-ledger identity gate correctly
-fails for that manual run. Next is the requested narrow append-only accounting
-authority, then the exact run freeze if the gate is resolved. A4 remains unused;
-no shared-file permission or operational success is inferred.
+the earlier cross-ledger refusal is now corrected by the specifically approved
+Analyst-only appendix in312.14, with488 focused passes. Next is the exact312.15
+clean-commit A4 invocation if every fresh guard permits. A4 remains unused here;
+shared permission is limited to this accounting, not other-lane changes.
 No old attempt is renewed, and no broader future waiver or fifth attempt is
 authorized.
 V3 is spent after its
@@ -3794,7 +3793,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-24 UTC | Actual R298 evidence success, A2 refusal and bounded Mia diagnosis | `0b054ddf` -> `dfa3490a` -> section309 final result | No new Claude range; current waiver consumed, not independent acceptance | D1 exit0 authenticated A1; D2 exit2 remote_refused; A2 consumed; Mia reports unchanged four filenames/sizes and zero backtests but lacks raw metadata | Actual bounded channels and unchanged-source control flow; record checks below; no operational replay or full suite | 316/241/50/699; no accepted result; exact failing label lost and remote effects not independently authenticated | Preserve all evidence; separately gated offline marker/receipt reconciliation before any A3; one final push, monitor PAUSED |
 | 2026-10-24 | Owner-scoped reconciliation and final R298 recovery refusal | `f9fd0932` -> `e3d53276` -> `0a2400d7` -> this record commit | No incoming Claude range; explicit scoped waiver now consumed, not independent review | D1 authenticated zero-recorded-RPC A2 prefix; corrected real projection ID; A3 refused code_running before mutation/compile/launch; all attempts spent | 376 distinct focused passes5.72s; record repeats overlap; no full suite; actual exit/pins in310 | Booked317/242/50/699; no result cell; raw codeRunning value unknown; user-concurrent Safari prevented reading final Mia reply | Mandatory stop/Mia checkpoint, no A4; one final matching-lane push; monitor PAUSED |
 | 2026-10-24 | Post-Mia R298 idleness diagnosis and exact-source recovery preparation | `7c462a01` -> section311 round | No incoming Claude review; scoped new waiver/extra attempt requested, not assumed | Mia reply qualified; supported UI stopped only R298's code environment; additive observer and A4 candidate implemented but uninvoked | 472 focused implementation/helper passes plus record checks below; expected-red sensitivities retained; no old operational replay or full suite | A1/A2/A3 spent; floor317/242/50/699 unchanged; API idleness and current source unverified | Review or scoped waiver plus exact new run freeze before contact; one final matching-lane push; monitor PAUSED |
-| 2026-10-24 | Scoped owner waiver and one additional post-Mia R298 attempt | `45a96f61` -> section312 round | Current explicit waiver, not independent acceptance; no incoming review | D1–D3 spent; UI Mia removal refused; owner manual sample identified/preserved, exclusive handoff renewed; additive A4 replacement implemented but unused |518 distinct focused passes through D3; A4 selection486passes/1cross-ledger failure9.22s plus1closure2.26s, overlapping counts not additive; exact bindings below | Floor318/243/50/699 includes manual sample once, before actual A4 claim; old attempts stay spent; shared census append authority requested | Resolve narrowly scoped shared accounting, freeze and use same A4 only if gates pass; one final push at concluded round; monitor PAUSED |
+| 2026-10-24 | Scoped owner waiver and one additional post-Mia R298 attempt | `45a96f61` -> section312 round | Current explicit waiver, not independent acceptance; no incoming review | D1–D3 spent; UI Mia removal refused; owner manual sample identified/preserved, exclusive handoff renewed; additive A4 replacement implemented but unused |518 distinct focused passes through D3; final A4 union488passes11.19s after authorized ledger correction; historical failures/overlaps retained below | Floor318/243/50/699 includes manual sample once, before actual A4 claim; old attempts stay spent; approved shared census synchronized without rebooking | Freeze and use same A4 only if gates pass; one final push at concluded round; monitor PAUSED |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -53278,8 +53277,12 @@ checks and before file inspection, with fixed codeSourceId
 `Codex ARV2 R298 A4 20261024`. All file requests carry it. Unknown collaborators,
 drift of the exact optional Mia-row hash, unknown/extra backtests, changed source,
 lock refusal or ambiguous request stop. The initially present core and forced-
-exit modules must already equal the exact projection, enforcing at most seven
-creates and two updates. The inherited full evolving inventory is authenticated
+exit modules must already equal the exact projection, enforcing at most nine
+missing/recognized-placeholder restorations. The observed four-file inventory
+would require seven creates and two updates; the helper does not separately cap
+each type, so if either recognized stub/default is absent, more creates and
+fewer updates are possible within the same nine-file bound. No arbitrary bytes
+may be overwritten. The inherited full evolving inventory is authenticated
 before each write; exact eleven-file equality precedes compile and launch.
 Owner/idleness checks occur at stage entry, not continuously or before each
 individual write. A successful lock response is not a lease/expiry/CAS proof.
@@ -53383,3 +53386,108 @@ do not conceal the run identity or grant shared authority by inference. No
 upload, explicit compile, node-capacity call, A4 claim or launch occurred here.
 The owner's last exclusive handoff and UI stop are point-in-time coordination;
 fresh false idleness and all exact current guards still precede any future use.
+
+### 312.14 Owner-approved shared census synchronization
+
+The owner answered1/Yes to the explicit question permitting only the Analyst
+R298 attempt accounting and manual sample to be appended to
+`docs/research/alpha-result.md`, leaving all historical entries and other lanes
+unchanged. This is the narrow coordination exception previously missing; it
+does not unfreeze shared code, other documents, other lanes or historical rows.
+The appendix records A1–A3's already-booked conservative looks and the exact
+owner-confirmed manual ID, preserving the distinction between attempt slots,
+actual launches and admitted results. It adds no second look for any event.
+Current floor stays318shared/243development/50infrastructure/699cells. No private
+control, old reader, provider or QC operation was used to make the append.
+
+The old red cross-ledger check is retained as historical evidence. Its missing
+identity is now present in the shared census without hiding it or modifying the
+test. `ARV2D312-002` is corrected by this authorized append and focused record
+verification: **488passed in11.19s**, no failures/skips/warnings, comprising197
+caller +204 helper +86 record/document +1 research closure. Previous red and
+author selections overlap this union; no full suite ran. Native network,
+production-artifact/Keychain denial and in-root support discipline are unchanged.
+Same-round advice also corrected a documentary overclaim: the helper enforces
+nine total restorations, not separate maxima of seven creates/two updates.
+Those are the expected counts for the previously observed inventory, not proof
+of the fresh inventory. This clarification changes no code, pin or economics.
+All other source/economic/readiness gates
+remain unchanged. Preparation commit is
+`5002abb5e2a79faca755cf8cb98811c3e156541f`; the one final matching push for this
+continuing round has still not occurred.
+
+### 312.15 Exact one-shot A4 replacement run freeze, before use
+
+After the accounting/record checks pass and this decision is committed in a
+clean designated worktree, permit ONE invocation of
+`scripts/run_arv2_r298_owner_recovery.py recover`, with --expected-head bound to
+that exact clean commit and --caller-sha256 bound to
+`02a2464c3dc04eea24e75791e9f7f4d7d33cd6febacacad2b9443147e53a9a41`.
+Verify the75 unchanged selected dependencies, helper/test bindings in312.12
+and canonical profile
+`0e425ce92f71d1554511eafc603a720d166864e19a3033d4a34ce26a995c8502`.
+Use only the designated Mac Code-root/branch and
+`/Users/sheltonchen/.venvs/trading_agent-py313/bin/python`, Darwin/POSIX3.13.
+No pin refresh, old A4 invocation or entrypoint substitution is allowed.
+
+This consumes the SAME one additional A4 approved by the owner under the
+current recovery review waiver, after the mandatory Mia diagnostic checkpoint.
+The owner confirmed R298/Safari free and only its code environment was stopped.
+That is point-in-time coordination, not a guarantee of continued idleness;
+fresh exact false codeRunning and every owner/manual-history guard must pass.
+Unknown concurrent activity refuses. Do not reopen the editor or interrupt
+another session. Do not remove Mia again, force edit access or weaken a guard.
+
+The fixed leaf is the uninspected/unallocated
+`artifacts/analyst_revisions_v2/newrule_owner_recovery/R312-20261024-A`.
+Exclusive claim/fsync precedes credentials/contact; actual claim consumes A4
+even if launch is never reached. Partial/ambiguous claim is spent or ambiguous,
+never a permission to retry. Native-network-denied fresh admission workers use
+only the pinned family/D15/payload evidence; A1–A3/reconciliation/D1–D3 observer
+controls and the unused old-A4 leaf stay unread. This does not prohibit the
+explicitly permitted fresh authentication of already-used frozen D15 evidence. Pass
+only the minimal allowed support environment and existing QC_USER_ID/QC_API_TOKEN
+variables in memory, never print them, consult Keychain/token files or serialize
+raw exceptions, provider responses or licensed rows. Only the bounded pure
+eleven-file frozen source projection may be uploaded.
+
+If admitted, the exact project38364439 sequence is: sole-owner/two-view and
+known-manual-history validation; one supported codeSourceId lock; exact current
+inventory; at most nine exact missing/recognized-placeholder restorations
+(expected seven creates/two updates for the observed inventory); eleven-file
+readback; one explicit compile; at most20 bounded compile
+polls; fresh admission; exact compile/owner/history/source checks; one read-only
+capacity check; one A4 backtest create only if capacity is free; one own status
+observation after60seconds; final admission and bounded report. Capacity is
+observed only inside this admitted sequence; no other lane/project is changed.
+No extra result read, next comparison cell or performance analysis is authorized
+by this freeze. Capacity-wait or queued status is not a running backtest.
+
+Keep600-second parent deadline,64application-dispatch cap,90-second launch
+reserve and24,576-byte finite result envelope. External observer bounds only
+its own child to615seconds and64KiB per stdout/stderr channel, with kill/reap
+only of that child if exceeded. Record actual exit and UTC dispatch/completion
+brackets; these are external process times, not exact provider event times.
+Host suspension/uninterruptible I/O limitations remain. No second attempt
+follows timeout, nonzero, unknown exit, malformed output or ambiguity.
+
+Require actual exit0 AND empty stderr AND a matching canonical double-LF
+envelope validated by the pinned pure validate_output function in a separate
+credential-free native-network/production-artifact/Keychain-denied subprocess
+with15-second deadline. Feed only captured stdout via stdin, enforce24,576-byte
+bound, exact HEAD/caller/profile, report hash/length reconstruction and finite
+own-status identities. Never accept a report alone or fabricate an exit.
+On actual exit2, the same pure validator may authenticate only finite failure
+evidence, not success. Unknown buffers retain only lengths/hashes. This is not
+a private output reread. Do not inspect the active control leaf or issue status
+polls outside the committed sequence while the parent runs.
+
+On actual A4 claim, conservatively book exactly +1shared/+1development:
+318/243/50/699 to **319/244/50/699**, including a refusal/ambiguous unsuccessful
+attempt. The approved appendix may record that actual Analyst event, but must
+not rebook the manual sample or A1–A3. A fourth failure stops; no fifth allowance
+exists. Record actual outcome, exclusions, limitations and the next concrete
+action, then make the one final matching-lane push with exact local/tracking/
+live equality verification. The monitor remains PAUSED. No formal PIT/security-
+master/readiness/paper or economic-performance acceptance follows this waiver,
+compile, launch, terminal status or push.

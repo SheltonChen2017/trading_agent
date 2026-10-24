@@ -6775,3 +6775,39 @@ Book the actual attempt exactly once: **313 -> 314 shared looks;
 699 booked cells unchanged**. No formal-alpha spend or performance cell.
 The successful one-attempt R284 slot stays spent; R247/R281 remain exhausted.
 No funded/broker, paper/live deployment or real-order authority follows.
+
+## R-298 — Analyst six-universe new-rule recovery attempts and separate owner sample — 2026-10-24
+
+Owner-approved append-only coordination: the owner explicitly approved adding
+only the Analyst R298 attempt accounting and manual sample to this shared
+ledger. All prior entries and other lanes remain unchanged. This reconciles
+already-booked lane accounting from Analyst implementation-record sections
+307–312; it does not add those looks a second time, accept a strategy result,
+or supply independent review.
+
+Candidate: `arv2-newrule-6-ar0-2026-v1`, project `38364439`,
+`ARV2 R298 NEWRULE SIX OFF 2021 OCT2026`; order-based research only. Frozen
+projection SHA256 `f67148cd717e207be9d44f088749c0443bb696d9c4f38f512eb6cbf483fd9662`.
+The prospective candidate period is2021-01-04..2026-10-13, with warmup from
+2020-11-01. It is distinct from the owner's default-sample period below.
+
+| Event | Exact source/execution binding | Observed outcome and limitation | Already-booked conservative delta |
+| --- | --- | --- | --- |
+| A1 | Clean execution freeze `9cddf9de31f2be96b4324e21318aaa2e23340ca9`; claim later authenticated once at `dfa3490a411ea895ed9ae8e2cbf43dbfccf4998f` | Begin exited2, request_ambiguous. Begin path did not launch a backtest; original failed operation cause remains unknown. Claim authentication is not another attempt. | +1shared/+1development,314/239 to315/240 |
+| A2 | `dfa3490a411ea895ed9ae8e2cbf43dbfccf4998f` | Recovery exited2, remote_refused. Later bounded reconciliation at `e3d53276604e89892ec60309a7863794acd7e991` found8basefiles,0RPC journals and no compile/launch receipt. This recorded prefix is not measured zero contact or a recovered raw cause. | +1shared/+1development,315/240 to316/241 |
+| A3 | `0a2400d76af48ad339a6f573d28e82b27dca9382` | Recovery exited2 at owned_idle after one projects/read dispatch, before source mutation, explicit compile or launch. Original codeRunning type/value was not retained. | +1shared/+1development,316/241 to317/242 |
+| Owner manual sample, not candidate A4 | Backtest `bbd2202cc3000e8b1c14751bf088dd16`, `Casual Yellow Kangaroo`; UI short build `1ca57c-4795fc`. Historical source commit/bytes not authenticated. | Owner confirmed they launched it. Safari displayed Completed. and default SPY-era2020 dates. No Analyst projection, performance or comparison cell is admitted. No result API/download or performance-driven strategy change followed; UI statistics were incidentally visible. | +1shared/+1development,317/242 to318/243 |
+
+Closing already-booked floor: **318 shared /243 Analyst development /
+50 infrastructure /699 booked cells**. The three consumed protocol attempts
+are not three measured successful launches. No accepted new-family result cell
+exists. D1/D2/D3 metadata diagnostics and the reconciliation reader add no
+strategy looks; no historical artifact is reread for this append.
+
+A1–A3 remain spent. The owner separately approved one additional A4 and a
+scoped review waiver; A4 is still unused at this entry. Its additive replacement
+must satisfy the exact owner/manual-history/edit-lock/source/admission gates
+and a separate committed run freeze. Only an actual A4 claim adds its own
+one shared and one development look. No fifth attempt, automatic retry,
+paper/live deployment, funded account, broker/real order or efficacy authority
+follows. The manual sample never substitutes for A4's identity or source.

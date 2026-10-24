@@ -7,6 +7,11 @@ from dataclasses import replace
 
 import pytest
 
+pytest.importorskip(
+    "fcntl",
+    reason="IBWIN-CR01: Insider custody/acquisition/replay requires POSIX fcntl; Windows custody port deferred",
+)
+
 from data.hashing import canonical_json, hash_bytes, hash_payload
 import research.insider_buying_sec_selected_parent_runner as runner
 import research.insider_buying_sec_selected_parent_projection_adapter as adapter

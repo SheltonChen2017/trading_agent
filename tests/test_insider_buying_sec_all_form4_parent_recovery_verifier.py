@@ -1,12 +1,17 @@
 """Read-only v3 replay tests use invented parents and injected transport only."""
 from __future__ import annotations
 
-import fcntl
 import json
 import os
 
 import pytest
 
+pytest.importorskip(
+    "fcntl",
+    reason="IBWIN-CR01: Insider custody/acquisition/replay requires POSIX fcntl; Windows custody port deferred",
+)
+
+import fcntl
 from research.insider_buying_sec_complete_acquisition import SecHttpResult
 from data.hashing import canonical_json, hash_bytes
 import research.insider_buying_sec_all_form4_parent_recovery_executor as executor

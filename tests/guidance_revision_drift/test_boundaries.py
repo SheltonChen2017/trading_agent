@@ -68,6 +68,7 @@ import json, sys
 import research.guidance_revision_drift.contracts
 import research.guidance_revision_drift.formulas
 import research.guidance_revision_drift.readiness
+import research.guidance_revision_drift.coverage_preflight
 import research.guidance_revision_drift.__main__
 import research.guidance_revision_drift.archive
 import research.guidance_revision_drift.artifacts
@@ -179,10 +180,13 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         self.assertIn("Monitor remains PAUSED", header)
         self.assertIn("This counter-review is local-only; no push is authorized", header)
         self.assertIn("0 KB / 3 MB at 2026-10-21", header)
+        self.assertIn("New offline coverage-source epoch awaits independent review (section 46)", header)
+        self.assertIn("Initial Safari attachment incidentally displayed its existing QC tab", header)
         self.assertNotIn("This review commit stays local", header)
         self.assertGreater(record.index("\n## 42."), record.index("\n## 41."))
         self.assertGreater(record.index("\n## 43."), record.index("\n## 42."))
         self.assertGreater(record.index("\n## 44."), record.index("\n## 43."))
+        self.assertGreater(record.index("\n## 46."), record.index("\n## 45."))
         self.assertIn("research/__init__.py`, remains unobserved", header)
         self.assertIn("paused pending platform preflight", header)
         self.assertIn("GDR-RP33 is accepted in section 34", header)

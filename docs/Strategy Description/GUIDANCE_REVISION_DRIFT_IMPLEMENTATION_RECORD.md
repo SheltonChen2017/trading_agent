@@ -6,8 +6,10 @@ Codex counter-review of section 43 completed in section 44.
 Claude's `c6834173` is accepted after documentation correction.
 The published `c6834173` review is consumed once.
 Claude's `863a0dcd` is accepted after documentation correction (section 42),
-and Codex's `79d8facb` is accepted in section 43; no source changed since
-producing `c589b3dd`.
+and Codex's `79d8facb` is accepted in section 43.
+New offline coverage-source epoch awaits independent review (section 46).
+Accepted RP33 remains retained at exact producing `c589b3dd`; its existing
+runtime/draft/fixture files are unchanged, and no carrier is regenerated.
 Monitor remains PAUSED after the one-shot next-Claude-push watch was fulfilled.
 This counter-review is local-only; no push is authorized by the current request.
 GDR-RP33 is accepted in section 34
@@ -34,10 +36,15 @@ or empirical backtest readiness is established. The original economic,
 empirical, account and trading gates remain closed; section 40.3's scoped
 EODHD direction is not verified entitlement, PIT evidence, QC-upload rights or
 real-data evaluation authority.
-The October 24 public-document coverage audit is recorded in section 45:
-no additional purchase is recommended yet, no private entitlement is certified,
-and the owner's current prohibition on QC access is in force.**
-Current scope/evidence are sections 17 through 45. Sections 2 through 6 preserve
+The October 24 targeted account-metadata checks and offline build are in
+section 46, superseding section 45's owner-reported Massive Basic assumption
+with observed Stocks Starter; Sharadar Bundle 5Y is owner-reported.
+Initial Safari attachment incidentally displayed its existing QC tab;
+no QC interaction, navigation, reload, quota check or API request followed.
+No new datasource purchase is made or recommended yet. The proposed six-usable-
+year common-history floor, guidance/NBBO, rights and real-data/native integration
+gaps prevent empirical readiness; the owner's QC prohibition remains in force.**
+Current scope/evidence are sections 17 through 46. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -6017,3 +6024,193 @@ advisory agent QA are not independent Claude acceptance, account entitlement
 certification or licensed-data completeness evidence. Root/project-wide docs
 remain frozen. This round is local-only: NO push, no new review watch, no QC
 monitor rearm and no automatic next milestone.
+
+## 46. Targeted subscription checks and offline coverage preflight, 2026-10-24
+
+### 46.1 Owner scope, exact custody and bounded definition of done
+
+The owner clarified "sharadar: bundle 5 yrs", then directed targeted coverage
+checks for guidance revisions and historical bid/ask using existing
+subscriptions first, no QC or purchase, and building toward backtest readiness.
+The later reply states credentials are stored in Keychain Access. Credential
+location is not permission to extract/copy keys or change authentication.
+Existing authenticated Safari pages were sufficient for the observations
+below; no Keychain item, API key or password was extracted, submitted or
+reconfigured. No new agreement was accepted or vendor contacted.
+
+All repository work remains at the mandatory absolute worktree/branch/origin
+in 44.1. Starting clean local HEAD is
+`b4414f6859615e3a6fc0ef8d63cd9f50b376b4c6`, ahead TWO known local-only
+commits of live matching remote `c68341731b0d69f7603f3d0209e683a97322d892`.
+The existing Claude review is consumed, not a new trigger. No dirty or
+concurrent lane ownership change was observed. No branch/worktree is created
+or switched; there is no current push instruction and the monitor stays PAUSED.
+
+Bounded deliverable GDR-COV1: a reproducible, strictly metadata-only offline
+preflight for the targeted checks, with a pinned draft, retained input hash,
+explicit evidence class/date and missing requirements. It must never certify
+entitlement, PIT, rights, completeness, market edge or evaluation authority.
+It is an implementation candidate pending independent Claude review, not
+original GDR-0 freeze, GDR-1 completion or empirical readiness. Source contract,
+rights, common-history, independent review and native integration remain hard
+limits on the owner's broader readiness objective; no approval is invented.
+
+### 46.2 Refreshed account metadata and operational deviation
+
+Read-only Safari observations on October 24, refreshed at the corresponding
+existing provider pages, supersede earlier owner-reported assumptions:
+
+| Provider/page | Displayed or reported scope | Limit of the observation |
+|---|---|---|
+| Massive `/dashboard/subscriptions` | Stocks Starter, Benzinga Analyst Ratings and Benzinga Analyst Insights; each cancellation pending November 6, 2026 | Not Stocks Basic; Ratings was not yet displayed as expired. No Corporate Guidance or Advanced product appeared in the active-plan inventory. No endpoint, row-level history or non-display license is verified. |
+| EODHD `/cp/dashboard` | EOD All World and EOD Calendar marked cancelled, each available until November 14, 2026 | Cancellation is not already-expired access; no Extended/All-In-One/intraday product is inferred. Credential fields were suppressed from emitted observations; no data request was sent. |
+| FMP subscription tab | Starter, cancelled but active until November 13, 2026 | No higher-tier/grandfathered endpoint grant is established by the plan label; key fields were suppressed, and no data endpoint was used. |
+| Sharadar | Owner reports Bundle, five-year history | Not an account query or independently verified Full-history grant. |
+
+Displayed end dates are metadata, not exact expiry instants or post-expiry
+retention rights. No billing, cancellation, renewal, resource, account or
+security setting changed. Massive's Legal Agreements page displayed no
+agreements to fill out; that is NOT verification of adequate processing rights
+or acceptance of its standard terms for this proposed use. No payment details
+or account identifiers enter code, fixtures, commits or this record.
+
+Operational deviation: attaching native Safari automatically emitted its
+already-open QC terminal/home tab before a provider tab could be selected.
+That passive UI observation was unintended and is not described as "no QC
+access". Codex immediately switched to the existing Massive provider tab;
+there was no QC click, navigation, refresh, quota query, API/source/log read,
+Mia prompt, upload, compile or run. No incidental QC content was used as lane
+evidence or copied into this record. The owner was told of the deviation.
+Further UI work stayed on provider pages; QC remained untouched by actions.
+
+### 46.3 Targeted result and substantive readiness blockers
+
+1. Existing Massive Starter documents five rolling years of minute/other
+   aggregate OHLCV with delayed recency, improving the candidate for minute
+   trade-volume inputs over the earlier Basic assumption. It still explicitly
+   excludes the historical NBBO endpoint; bars are not quotes. Actual stock/
+   SPY/date/conditions/normalization completeness was not queried.
+   [Bars](https://massive.com/docs/rest/stocks/aggregates/custom-bars),
+   [historical quotes](https://massive.com/docs/rest/stocks/trades-quotes/quotes).
+2. EODHD All World documents delayed current bid/ask snapshots. These are not
+   historical time-series, verified NBBO provenance or a retrospective receipt
+   archive. No prospective capture was started. [Snapshot documentation](https://eodhd.com/financial-apis/live-v2-for-us-stocks-extended-quotes-2025).
+3. EODHD Calendar consensus, Massive Ratings/Insights and FMP's source-text
+   building blocks do not establish the required versioned issuer FY adjusted-
+   EPS/GAAP-revenue disclosure pair. Separate Corporate Guidance remains a
+   vendor inquiry, not an owned feed or a purchase recommendation. Immediate
+   comparable predecessor, confirmed/expected distinctions, corrections,
+   withdrawals, provenance and publication/first-availability clocks remain
+   unresolved. [Calendar](https://eodhd.com/financial-apis/calendar-upcoming-earnings-ipos-and-splits),
+   [Insights](https://massive.com/docs/rest/partners/benzinga/analyst-insights),
+   [guidance schema](https://massive.com/docs/rest/partners/benzinga/corporate-guidance),
+   [FMP building blocks](https://site.financialmodelingprep.com/insights/enterprise/earnings-data-apis-how-to-access-transcripts-guidance-and-actual).
+4. Original plan 7B and the immutable draft require at least SIX usable common
+   historical years before the proposed historical exploration. Sharadar 5Y,
+   FMP Starter and Massive Starter do not individually establish that floor.
+   This is a planning feasibility minimum, not statistical power. EODHD's
+   wider advertised daily history does not prove six common years of guidance,
+   quotes, identities, actions and permitted processing. No dates are selected,
+   floor relaxed, source/vintage stitched or upgrade performed to make it fit.
+5. Actual local non-display research/retention and future cloud-processing
+   rights, historical availability, dated identity/sector and complete terminal
+   accounting remain unverified. No market rows, samples, API/demo-data calls,
+   raw disclosures, capture, future-price joins, empirical outcomes or looks
+   were acquired. Current subscription UI is evidence of displayed products,
+   not a legal or PIT certification. No additional purchase is justified yet.
+
+### 46.4 Offline implementation, source epoch and QA
+
+Added `research/guidance_revision_drift/coverage_preflight.py` and focused
+`tests/guidance_revision_drift/test_coverage_preflight.py`. The pure
+`assess_coverage(candidate, manifest_bytes, expected_sha256=...)` accepts only
+a bounded strict JSON inventory of known products, metadata dates, evidence
+class and displayed access-end dates. It rejects unknown/duplicate fields,
+floats/nonfinite values, bool/int aliases, contradictory product/history,
+unanchored bytes, future observations and caller-supplied rights/PIT/ready
+claims. Missing providers remain explicit unknowns, never omitted requirements.
+No provider client, URL fetch, credential read, file write, scheduler, native
+run or real-data decoder is added. `python -B -m
+research.guidance_revision_drift.coverage_preflight` emits the dated built-in
+metadata assessment to stdout and exits 2 (blocked); it does not inspect live
+accounts or create an approval. Pure assessment performs no I/O; the CLI only
+loads the already-pinned local draft. Existing helpers/strict decoder are reused.
+
+The report preserves the original eleven unresolved gates and false/null
+authority, explicitly binds stock AND SPY quote requirements, the draft's
+six-year floor and unverified rights/common history, and cannot promote itself.
+Its twelve substantive blockers do not become evidence merely because they
+are serialized. `metadata_authenticity_verified` remains false even for input
+labelled account UI: an input label and SHA prove neither authenticity nor
+source rights. The manual October 24 inventory is dated, not a fresh check.
+
+The retained 1,289-byte metadata manifest SHA256 is
+`b8a32bb90ed44c1aae5368e2ef19ffa30f16eb289e22adcc8f19d659f61bea38`.
+The new full offline source SHA256 is
+`3ec067c06dff6322e78d361f0a9c6ec4a1e5b487fd61222841c108bf1484fb0b`.
+These do not replace any accepted RP33 source/review/candidate identity.
+Adding a package module changes `source_manifest()`'s full review hash;
+accepted producing `c589b3dddab3f1dd136d10ae7ce1851d64818906` and its exact
+38.4 source/project/runtime/fixture/semantic identities remain retained.
+Existing runtime files, native closure/NATIVE_MODULES, draft and fixtures are
+unchanged; no carrier/release/project/map is regenerated or rebound. A new
+package module was chosen over an unclassified shared `scripts/` entry point;
+no shared manifest or project-wide document is changed. This new offline epoch
+needs independent review and exact-source reconciliation before any later
+evaluation; the old review is not acceptance of this source addition.
+
+Two read-only design/public-doc agents and one advisory code-QA agent assisted.
+They are not independent Claude acceptance. Two P3 issues were corrected in
+author QA: GDR-COV46-001, a stock-only Massive metadata subset labelled as
+analyst products (product-sensitive classification and subset tests); and
+GDR-COV46-002, a mutation-sensitivity gap in projection isolation (the expected
+dictionary could share a mutated reference too). Capture expected canonical
+bytes before mutation; the formerly surviving shared-documentation mutant now
+fails. Production already copied that dictionary. Neither changes economics
+or permissions. Resolved findings remain recorded; no P0/P1/P2 source defect
+was identified.
+
+### 46.5 Focused verification, exclusions and next action
+
+Test-first import failed as expected before the new module existed (one loader
+error, zero actual test methods); initial green ran ten new methods in 0.014 s
+on bundled Python 3.12.14. Final focused selection: eighteen methods (twelve
+coverage plus six existing boundary/import/active-doc methods) passed in
+0.252 s, zero failures/errors/skips or observed warnings. Sanitized environment,
+`-B`, network/file-write fences in parent and the fresh import child. The
+actual CLI path is checked to open only the pinned draft read-only, emit the
+dated blocked report and exit 2. Eight isolated in-memory mutants fail for
+ready/authenticity flags, omitted SPY blocker, relaxed history floor, ignored
+retained hash, removed expiry screen, unconditional product classification and
+shared documentation projection. The initial mutation harness needed its
+exception-class identity patched alongside the recompiled function; its
+spurious errors were not lane failures. All 90 lane source/test files compiled
+in memory, without executing native code, writing bytecode or changing files.
+Final diff/frozen-history/source/status checks are repeated before local
+closure; exact results and commit are retained in thread/private memory.
+Only focused methods are authorized; no full lane/repository suite is run.
+No independent review, native completion or original GDR-0..6 is claimed.
+
+Original `GDR-base372-approved-20261008` stays CLOSED FAILED3/3, zero manual
+attempts; project 37647834 is not modified or relaunched. Separate
+`GDR-Mia-base372-recovery-authorized-20261011` stays zero unsuccessful
+attempts, zero pending intents, no journal/project/launch, maximum three.
+The accepted invented-only recovery needs no additional datasource, but the
+owner's current QC prohibition prevails. All provider/outcome/source-rights,
+financial/family/look/protected-date, account and trading boundaries persist;
+this targeted authorization does not open an empirical study or change the
+immutable draft's false/null fields.
+
+Further empirical implementation is blocked on a usable, licensed guidance/
+quote/common-history contract and independently reviewed real-data adapter,
+matched-SPY/action/settlement and native integration. Existing data should be
+used first once those checks pass; no blind renewal, purchase, daily-bar
+fallback or changed study design is selected. Vendor clarification/account
+evidence and an owner-reviewed history decision are next, not automatic
+acquisition. Separately, independent Claude review of this exact source epoch
+is required before the next source-changing milestone/evaluation. This work
+stays local pending publication direction; no automatic push or review watch.
+Sections 1–45 remain byte-exact below the active header; root Session Handoff,
+Action Plan, Feature Milestone Record, process/shared docs and plan/PDF remain
+frozen. Preserve the accumulated local commits, disarmed monitor and original
+attempt/publication history at handoff.

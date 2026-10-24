@@ -6870,3 +6870,36 @@ Earlier manual sample/A4/UI events are not rebooked. The later owner-authorized
 two-read collaborator diagnostic adds no strategy look and no sixth recovery
 allowance. All original evidence, strategy/source gates and other lanes remain
 unchanged; see Analyst313.7–314 for the bounded continuation and qualifications.
+
+### R-298 A6 actual first-file-update refusal — 2026-10-24
+
+The owner explicitly approved one additional A6 and waived review of this
+specific collaborator-verifier recovery. The sole invocation used clean freeze
+`388594b68f287a08bd2b5450140e072b6aa73aa5`, caller SHA256
+`1e02200da124c4143437c022e9a29ff251d5d284ceb3158431187ded0686608e`,
+profile `431bac897bd1b4bf60951fb5ae9bb11a3be5dc7662d599bda58087ef1483208f`.
+External dispatch2026-10-24T21:53:54.622983Z, completion observed21:54:08.938168Z;
+actual parent exit2, stderr0bytes, no external bound. These are process
+observation brackets, not provider timestamps. Finite stdout1028bytes SHA256
+`9f939a6f5a0b8318072ceca226702d87ae2e2fac53f7c941643a809422dbe350`;
+the separate native-denied pure validator exited0 and authenticated FAILURE
+evidence only. No private-control reread or unchanged retry followed.
+
+The initial and post-lock collaborator checks passed. Eleven application
+dispatches reached the first files/update, complete-write-02, targeting
+accepted_risk_order_level_input_runtime.py. The result was remote_refused /
+request_ambiguous, category http_failure, HTTP200: the shared client's in-band
+success contract was not satisfied. Exact provider reason and provider-contact
+count remain unknown. No readback followed, so the remote update's effect is
+ambiguous, not proven absent. No later seven module creates/main.py update,
+explicit compile, capacity or backtest launch/status request was reached.
+No running or accepted Analyst candidate/comparison cell follows from A6.
+
+Book A6 exactly once: **320 ->321 shared /245 ->246 Analyst development /
+50 infrastructure unchanged /699 booked cells unchanged**. This conservative
+attempt look is not a measured successful launch. A1–A6 and the two-read R314
+diagnostic remain spent; R314 adds no look and earlier sample/attempts are not
+rebooked. No A7 allowance exists. Analyst315.5–315.7 retain the exact evidence,
+prospective collaborator correction, open API-refusal/effect barrier and next
+bounded diagnostic decision. All historical entries and other lanes remain
+unchanged under the owner's append-only Analyst accounting exception.

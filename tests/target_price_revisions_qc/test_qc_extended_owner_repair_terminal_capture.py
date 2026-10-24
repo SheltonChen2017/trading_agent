@@ -1,9 +1,11 @@
 """Synthetic only: no retained captures, native QC, credentials or network."""
 from copy import deepcopy
+from contextlib import nullcontext
 from datetime import datetime, timedelta, timezone
 import json
 import os
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -207,6 +209,11 @@ def test_fixture_cannot_route_into_native_root_transport_or_production(tmp_path,
 @pytest.mark.parametrize("field", ["guard", "clock", "monotonic", "transport", "root"])
 def test_production_identity_seams_refuse_before_private_effect(tmp_path, monkeypatch, field):
     monkeypatch.setattr(m, "_now", lambda: NOW)
+    class ReachedGuard(RuntimeError):
+        pass
+    def guard(_head):
+        raise ReachedGuard("seam refusal must precede even a synthetic guard")
+    monkeypatch.setattr(m, "_guard", guard)
     plan, sources, _ = fixture(tmp_path); plan["mode"] = "production"
     arguments = {"root": m.PRIVATE_ROOT, "guard": m._guard, "clock": m._now,
         "monotonic": m.time.monotonic, "transport": m._native_request}
@@ -278,6 +285,109 @@ def test_native_request_rejects_forged_claim_before_any_credentials_or_private_r
     plan, _, _ = fixture(tmp_path); plan["mode"] = "production"
     with pytest.raises(ValueError): m._native_request(plan, {"projectId": m.PROJECT, "backtestId": m.JOBS[0][0]}, 30,
         {"bytes": 1, "sha256": "a" * 64})
+
+
+class ReachedSyntheticNetwork(RuntimeError):
+    """A sentinel, never a socket or an actual transport."""
+
+
+def native_request_fixture(tmp_path, monkeypatch, *, fault=None, token=TOKEN):
+    """Exercise the native boundary using only synthetic custody and credentials.
+
+    The directory descriptor belongs to pytest's temporary directory. No real
+    private directory, credential, TLS connection, subprocess or API is used.
+    """
+    plan, _, _ = fixture(tmp_path)
+    plan["mode"] = "production"
+    payload = {"projectId": m.PROJECT, "backtestId": m.JOBS[0][0]}
+    request = m._request(plan, payload)
+    claim = {"bytes": len(request), "sha256": m._sha(request)}
+    expected = [m.e.canonical(plan), m._access(plan), request]
+    events = []
+
+    def guard(_head):
+        events.append("guard")
+        stage = "post" if events.count("claim_read") == 3 else "pre"
+        if fault == "guard_" + stage:
+            m._fail()
+
+    def now():
+        stage = "post" if events.count("claim_read") == 3 else "pre"
+        if fault == "clock_" + stage + "_early":
+            return m.capture._clock(plan["created_utc"]) - timedelta(microseconds=1)
+        if fault == "clock_" + stage + "_expired":
+            return m.capture._clock(plan["expires_utc"])
+        return NOW
+
+    def directory(path, *, private):
+        assert path == m.PRIVATE_ROOT and private is True
+        events.append("directory")
+        return os.open(tmp_path, os.O_RDONLY)
+
+    def read(_directory, name, *, expected_size, expected_sha256, remaining, private):
+        number = events.count("claim_read")
+        events.append("claim_read")
+        assert private is True and remaining == m.MAX_RECEIPT
+        assert expected_size == len(expected[number]) and expected_sha256 == m._sha(expected[number])
+        assert name in {plan["operation_id"] + ".claim.spent.json", plan["operation_id"] + ".access.json",
+            plan["operation_id"] + ".request." + claim["sha256"] + ".spent.json"}
+        if fault == "claim_" + str(number):
+            m._fail()
+        return expected[number]
+
+    def credential():
+        events.append("credential")
+        return "synthetic-user", token
+
+    def connection(*_args, **_kwargs):
+        events.append("network_sentinel")
+        raise ReachedSyntheticNetwork("no network call was made")
+
+    monkeypatch.setattr(m, "_guard", guard)
+    monkeypatch.setattr(m, "_now", now)
+    monkeypatch.setattr(m.files, "_directory", directory)
+    monkeypatch.setattr(m.files, "_read", read)
+    monkeypatch.setattr(m.ops, "credential", credential)
+    monkeypatch.setattr(m.ops, "wall_deadline", lambda _seconds: nullcontext())
+    monkeypatch.setattr(m.ssl, "SSLContext", lambda _protocol: SimpleNamespace(load_default_certs=lambda: None))
+    monkeypatch.setattr(m.http.client, "HTTPSConnection", connection)
+    return plan, payload, claim, events
+
+
+def test_native_request_synthetic_control_reaches_transport_only_after_all_custody(tmp_path, monkeypatch):
+    plan, payload, claim, events = native_request_fixture(tmp_path, monkeypatch)
+    with pytest.raises(ReachedSyntheticNetwork):
+        m._native_request(plan, payload, m.REQUEST_SECONDS, claim)
+    assert events == ["guard", "directory", "claim_read", "claim_read", "claim_read", "guard",
+        "credential", "network_sentinel"]
+
+
+@pytest.mark.parametrize("fault", ["mode", "seconds_zero", "seconds_high", "seconds_bool", "seconds_nan",
+    "clock_pre_early", "clock_pre_expired", "clock_post_early", "clock_post_expired",
+    "guard_pre", "guard_post", "claim_0", "claim_1", "claim_2"])
+def test_native_request_each_scope_and_claim_guard_refuses_before_credentials(tmp_path, monkeypatch, fault):
+    plan, payload, claim, events = native_request_fixture(tmp_path, monkeypatch, fault=fault)
+    seconds = m.REQUEST_SECONDS
+    if fault == "mode":
+        plan["mode"] = "offline-fixture"
+        request = m._request(plan, payload)
+        claim = {"bytes": len(request), "sha256": m._sha(request)}
+    if fault == "seconds_zero": seconds = 0
+    if fault == "seconds_high": seconds += 1
+    if fault == "seconds_bool": seconds = True
+    if fault == "seconds_nan": seconds = float("nan")
+    with pytest.raises(m.e.EvidenceError):
+        m._native_request(plan, payload, seconds, claim)
+    assert "credential" not in events and "network_sentinel" not in events
+
+
+@pytest.mark.parametrize("token", ["", None, 1, "a b", "a\n", "x" * 257])
+def test_native_request_credential_format_refuses_before_network(tmp_path, monkeypatch, token):
+    plan, payload, claim, events = native_request_fixture(tmp_path, monkeypatch, token=token)
+    with pytest.raises(m.e.EvidenceError):
+        m._native_request(plan, payload, m.REQUEST_SECONDS, claim)
+    assert events.count("claim_read") == 3 and events.count("credential") == 1
+    assert "network_sentinel" not in events
 
 
 def test_scope_expiration_after_response_prevents_subsequent_reads(tmp_path):

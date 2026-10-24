@@ -225,3 +225,182 @@ def test_json_contract_rejects_duplicate_keys_and_nonfinite_values():
     for value in ("NaN", "Infinity", "-Infinity"):
         with pytest.raises(ValueError, match="non-finite"):
             json.loads(value, parse_constant=_reject_constant)
+
+
+# Retire the default presentation without rewriting forensic predecessor bytes.
+# This successor is not a sandbox against deliberate extraction or code edits.
+INERT_CATALOG = ROOT / "research/target_price_revisions_qc/owner_repair_inert_operator_catalog_v2.json"
+PREDECESSORS = {
+    "owner_repair_operation_scripts_20261021.json": (
+        64218, "2f1e68f03ecd87c44a84f1ce7261bb3c4e8b0e32f3e2b39120bd1937ff5ece96"),
+    "owner_repair_read_invokers_20261022.json": (
+        3017, "d7c02276e396e0b97240031a7ecc7039be0b87869cc1d1e0d4b3b080f21162ba"),
+}
+INVOKER_IDENTITIES = {
+    "source005": (1246, "32dfa24fce2d897e628465de6db1b753182e821e0c28b546c3ece6c1273efb8a"),
+    "discovery004": (1281, "bbaa105214180c2308a720ad058cbd52ad625689b1dcf9011c700c45e4b09aca"),
+}
+CATALOG_KEYS = {
+    "schema", "lane_branch", "study_id", "owner_instruction_sha256", "retrospective",
+    "canonical_admission", "effect_authority", "replay_authority", "predecessor_archives",
+    "entries", "scope", "warning",
+}
+INERT_ENTRY_KEYS = {
+    "predecessor_archive", "predecessor_key", "language", "original_bytes",
+    "original_sha256", "inert_bytes", "inert_sha256", "inert_source",
+}
+
+
+def load_inert_catalog():
+    return json.loads(INERT_CATALOG.read_text(encoding="utf-8"),
+                      object_pairs_hook=_unique_pairs, parse_constant=_reject_constant)
+
+
+def forensic_originals():
+    """Read public JSON and parse original text; never import or execute it."""
+    originals = {}
+    for name, (count, digest) in PREDECESSORS.items():
+        raw = (ARCHIVE.parent / name).read_bytes()
+        assert len(raw) == count and hashlib.sha256(raw).hexdigest() == digest, "predecessor bytes unchanged"
+        value = json.loads(raw, object_pairs_hook=_unique_pairs, parse_constant=_reject_constant)
+        if name == ARCHIVE.name:
+            validate_archive(value)
+            sources = {entry["session_store_key"]: entry["source"] for entry in value["entries"]}
+            identities = IDENTITIES
+        else:
+            assert set(value) == {"schema", "prospective", "effect_authority", "replay_authority", "scope", "scripts"}
+            assert value["schema"] == "tpr-ext26-public-read-invokers-20261022-v1"
+            assert value["effect_authority"] is False and value["replay_authority"] is False
+            sources, identities = value["scripts"], INVOKER_IDENTITIES
+            assert type(sources) is dict and set(sources) == set(identities), "exact two historical invokers"
+        for key, source in sources.items():
+            assert type(source) is str
+            encoded = source.encode("utf-8")
+            assert (len(encoded), hashlib.sha256(encoded).hexdigest()) == identities[key], "exact original source custody"
+            ast.parse(source)  # Syntax custody only; do not compile or execute originals.
+            originals[(name, key)] = source
+    assert len(originals) == 21
+    return originals
+
+
+def validate_inert_catalog(catalog):
+    assert type(catalog) is dict and set(catalog) == CATALOG_KEYS, "closed inert catalog schema"
+    assert catalog["schema"] == "tpr-ext26-inert-owner-repair-operator-catalog-v2"
+    assert catalog["lane_branch"] == "codex/strategy-target-price-revisions"
+    assert catalog["study_id"] == "TPR-CAP-TILT-EXT26-20261010-v1"
+    assert catalog["owner_instruction_sha256"] == OWNER_SHA256
+    assert catalog["retrospective"] is True, "retrospective only"
+    assert all(catalog[field] is False for field in AUTHORITY_FIELDS), "no catalog authority"
+    assert catalog["predecessor_archives"] == [
+        {"path": "research/target_price_revisions_qc/" + name, "bytes": count, "sha256": digest}
+        for name, (count, digest) in PREDECESSORS.items()
+    ], "exact immutable predecessor bindings"
+    assert type(catalog["scope"]) is str and all(fragment in catalog["scope"] for fragment in (
+        "Forensic successor only", "one inert string-literal expression", "exact historical UTF-8",
+        "Original archives and all original programs remain unchanged",
+    )), "forensic scope"
+    assert type(catalog["warning"]) is str and all(fragment in catalog["warning"] for fragment in (
+        "spent and retired", "do not extract or execute recovered originals", "not an execution sandbox",
+        "Deliberate extraction or editing", "not made impossible", "not runnable default entries",
+    )), "truthful inertness and retained predecessor limits"
+    originals = forensic_originals()
+    entries = catalog["entries"]
+    assert type(entries) is list and len(entries) == 21, "exact twenty-one inert entries"
+    seen = set()
+    for entry in entries:
+        assert type(entry) is dict and set(entry) == INERT_ENTRY_KEYS, "closed inert entry schema"
+        identity = (entry["predecessor_archive"], entry["predecessor_key"])
+        assert identity in originals and identity not in seen, "exact unique original mapping"
+        seen.add(identity)
+        assert entry["language"] == "python-literal-only"
+        source = originals[identity]
+        original = source.encode("utf-8")
+        assert type(entry["original_bytes"]) is int and entry["original_bytes"] == len(original), "original byte custody"
+        assert entry["original_sha256"] == hashlib.sha256(original).hexdigest(), "original hash custody"
+        inert = entry["inert_source"]
+        assert type(inert) is str
+        raw = inert.encode("utf-8")
+        assert type(entry["inert_bytes"]) is int and entry["inert_bytes"] == len(raw), "inert byte custody"
+        assert entry["inert_sha256"] == hashlib.sha256(raw).hexdigest(), "inert hash custody"
+        tree = ast.parse(inert, filename="<retired-inert-operator-literal>")
+        assert len(tree.body) == 1 and isinstance(tree.body[0], ast.Expr), "one inert expression only"
+        literal = tree.body[0].value
+        assert isinstance(literal, ast.Constant) and type(literal.value) is str, "string literal only"
+        assert all(type(node) in {ast.Module, ast.Expr, ast.Constant} for node in ast.walk(tree)), "no executable AST nodes"
+        assert ast.literal_eval(literal) == source, "exact original roundtrip without execution"
+        assert inert == repr(source) + "\n", "canonical literal wrapper"
+    assert seen == set(originals), "complete original census"
+
+
+def test_named_inert_catalog_preserves_both_forensic_archives_and_all_twenty_one_sources():
+    validate_inert_catalog(load_inert_catalog())
+
+
+@pytest.mark.parametrize("index", range(21))
+def test_each_default_wrapper_is_only_a_literal_and_cannot_contain_effect_nodes(index):
+    entry = load_inert_catalog()["entries"][index]
+    tree = ast.parse(entry["inert_source"])
+    assert len(tree.body) == 1 and isinstance(tree.body[0], ast.Expr)
+    assert isinstance(tree.body[0].value, ast.Constant)
+    assert type(tree.body[0].value.value) is str
+    assert not any(isinstance(node, (ast.Import, ast.ImportFrom, ast.Call, ast.Attribute,
+                                    ast.Name, ast.Assign, ast.FunctionDef, ast.ClassDef))
+                   for node in ast.walk(tree))
+    original = forensic_originals()[(entry["predecessor_archive"], entry["predecessor_key"])]
+    assert ast.literal_eval(tree.body[0].value) == original
+
+
+@pytest.mark.parametrize("field", AUTHORITY_FIELDS)
+@pytest.mark.parametrize("value", [True, 0, None, "false"])
+def test_inert_catalog_permission_labels_remain_strictly_false(field, value):
+    clean = load_inert_catalog()
+    validate_inert_catalog(clean)
+    bad = deepcopy(clean)
+    bad[field] = value
+    with pytest.raises(AssertionError, match="authority"):
+        validate_inert_catalog(bad)
+
+
+@pytest.mark.parametrize("mutation", [
+    "unknown_key", "predecessor_hash", "predecessor_count", "retrospective", "missing",
+    "duplicate", "unknown_original", "original_hash", "original_bytes", "wrapper_hash",
+    "wrapper_bytes", "wrapper_content", "extra_field", "warning", "scope",
+])
+def test_inert_catalog_custody_provenance_and_census_corruptions_refuse(mutation):
+    clean = load_inert_catalog()
+    validate_inert_catalog(clean)
+    bad = deepcopy(clean)
+    entry = bad["entries"][0]
+    if mutation == "unknown_key": bad["new_authority"] = False
+    elif mutation == "predecessor_hash": bad["predecessor_archives"][0]["sha256"] = "0" * 64
+    elif mutation == "predecessor_count": bad["predecessor_archives"][0]["bytes"] += 1
+    elif mutation == "retrospective": bad["retrospective"] = False
+    elif mutation == "missing": bad["entries"].pop()
+    elif mutation == "duplicate": bad["entries"][-1] = deepcopy(entry)
+    elif mutation == "unknown_original": entry["predecessor_key"] = "unregistered"
+    elif mutation == "original_hash": entry["original_sha256"] = "0" * 64
+    elif mutation == "original_bytes": entry["original_bytes"] += 1
+    elif mutation == "wrapper_hash": entry["inert_sha256"] = "0" * 64
+    elif mutation == "wrapper_bytes": entry["inert_bytes"] += 1
+    elif mutation == "wrapper_content": entry["inert_source"] += "pass\n"
+    elif mutation == "extra_field": entry["execute_original"] = False
+    elif mutation == "warning": bad["warning"] = "Runtime sandbox prevents any extraction."
+    else: bad["scope"] = "Current operations are approved."
+    with pytest.raises(AssertionError):
+        validate_inert_catalog(bad)
+
+
+@pytest.mark.parametrize("source", [
+    "import os\n", "__import__('os')\n", "source = 'forensic'\n", "pass\n", "'one'\n' two'\n",
+])
+def test_hash_consistent_executable_or_nonliteral_replacement_still_refuses(source):
+    clean = load_inert_catalog()
+    validate_inert_catalog(clean)
+    bad = deepcopy(clean)
+    entry = bad["entries"][0]
+    entry["inert_source"] = source
+    raw = source.encode("utf-8")
+    entry["inert_bytes"] = len(raw)
+    entry["inert_sha256"] = hashlib.sha256(raw).hexdigest()
+    with pytest.raises(AssertionError):
+        validate_inert_catalog(bad)

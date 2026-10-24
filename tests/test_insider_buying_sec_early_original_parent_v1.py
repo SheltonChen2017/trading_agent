@@ -267,3 +267,31 @@ def test_original_body_byte_and_line_limits_are_enforced_before_materialization(
     monkeypatch.setattr(module, "MAX_ORIGINAL_BODY_BYTES", 8 * 1024 * 1024)
     monkeypatch.setattr(module.pem, "MAX_ORIGINAL_LINES", 16)
     with pytest.raises(module.EarlyOriginalParentError, match="original_pem_envelope_refused"):_project(raw)
+
+
+# Claude review section 218: three grammar guards that in-memory mutants
+# survived. Each test fails if its guard is removed.
+
+def test_duplicate_document_sequence_is_refused_while_distinct_sequences_pass():
+    two = _document(_xml(), filename=b"ownership.xml") + _document(
+        b"<html>invented</html>\n", filename=b"cover.htm", form=b"EX-99")
+    header = _legacy_header().replace(b"PUBLIC DOCUMENT COUNT:\t1", b"PUBLIC DOCUMENT COUNT:\t2")
+    distinct = two.replace(b"<SEQUENCE>1\n<FILENAME>cover.htm", b"<SEQUENCE>2\n<FILENAME>cover.htm")
+    assert _project(_wrap(_inner(header=header, document=distinct))).raw_bytes
+    with pytest.raises(module.EarlyOriginalParentError, match="^original_duplicate_document_sequence_refused$"):
+        _project(_wrap(_inner(header=header, document=two)))
+
+
+def test_unknown_header_line_directly_before_the_first_role_is_not_skipped():
+    # The existing material_before case puts a blank line after the extra
+    # line, so the separator guard refuses it first.
+    header = _legacy_header().replace(b"DATE AS OF CHANGE:\t20221107\n\n",
+                                      b"DATE AS OF CHANGE:\t20221107\nPRIVATE\n")
+    with pytest.raises(module.EarlyOriginalParentError, match="^legacy_role_topology_refused$"):
+        _project(_wrap(_inner(header=header)))
+
+
+def test_rendered_xsl_named_xml_document_is_not_taken_as_the_ownership_xml():
+    raw = _wrap(_inner()).replace(b"<FILENAME>ownership.xml", b"<FILENAME>xslownership.xml")
+    with pytest.raises(module.EarlyOriginalParentError, match="^original_xml_filename_refused$"):
+        _project(raw)

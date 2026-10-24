@@ -704,6 +704,14 @@ verifier. No file/lock/capacity/compile/launch followed. A4 is SPENT, floor319/
 a separately authorized recovery decision; do not replay or drop the guard.
 The ordinary three-attempt ceiling and all prior failures remain; no new
 technical gate is waived. Monitor remains PAUSED.
+Section 313 supersedes only the further-attempt/review barrier: the owner now
+explicitly permits one additional A5, waives Claude review of this privacy
+recovery, and requests a single final push. A1–A4 remain spent. A5 preparation
+uses documented owner/collaborator access and a separate exact-backtest sharing
+observation, not a nonexistent Project.public field or an encryption substitute.
+No A5 operational invocation is authorized by implementation alone; the exact
+sharing observation and committed run freeze must precede it. The booked floor
+remains319/244/50/699 until an actual A5 claim. Monitor remains PAUSED.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1857,6 +1865,11 @@ qualifications before a future new operational contract unless separately
 waived. The consumed current waiver does not establish independent acceptance.
 No old attempt is renewed, and no broader future waiver or fifth attempt is
 authorized.
+The later explicit owner decision in section313 supplies exactly one A5 and
+this recovery's review waiver, superseding that prior exhausted-allowance stop
+only. It does not waive technical access/source/attempt gates. Current work is
+the additive supported-access correction and exact sharing evidence, followed
+by a separately committed one-shot run decision if all prerequisites pass.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -53632,3 +53645,246 @@ reallocate its control leaf, rerun a worker/reader, reopen QC/Mia, restore an ol
 default, use another project/name or invoke the superseded unused A4 caller.
 A further recovery needs a supported exact privacy proof and a new explicit
 attempt decision; broad prior "proceed" is not a fifth-attempt grant.
+
+## 313 — Owner-authorized A5 privacy-contract recovery — 2026-10-24
+
+### 313.1 Scope, baseline and exhausted-history preservation
+
+The owner explicitly says: "Yes, fix the privacy verification and use one
+additional attempt. Skip Claude review for this recovery and proceed until the
+backtest is running. Document the progress and push once when done."
+This is one new A5 for the exact existing R298 candidate/project38364439 and a
+scoped sequencing waiver, not independent acceptance, a renewed A1–A4, another
+project, changed strategy economics, or a sixth attempt. The normal three-use
+rule and completed Mia checkpoint stay in history. The monitor remains PAUSED.
+No incoming Claude review is present. Starting local HEAD, matching tracking
+ref and live remote were all `8877caba1187df0ded2709ddeb793f6ffa9a1a96`, with a
+clean worktree. Every command/edit/test/commit/push stays in the designated
+Code worktree and matching codex/strategy-analyst-revisions-v2 branch.
+
+The earlier explicit shared-ledger exception permits only append-only Analyst
+R298 accounting, not other-lane or historical changes. The current booked floor
+is319 shared /244 Analyst development /50 infrastructure /699 cells. A5
+preparation adds nothing. An actual exclusive A5 claim adds one shared and one
+development look, to320/245/50/699, even if later refused before launch. No
+accepted result cell follows merely from a launch or terminal status.
+
+### 313.2 Supported privacy/access contract and bounded evidence
+
+ARV2E312-003 is confirmed: Project.public is not a documented Project property.
+The official Read Project schema and LEAN Project.cs instead place public on
+the separate LeanVersion/Version object. A4's exact required False was an
+unsupported mandatory-field assumption. Its finite failure remains ambiguous
+as to absence/type/value; no old control or response is reread to manufacture
+that missing detail. Neither missing=>private nor encrypted=>private is adopted.
+
+Primary sources inspected for this correction:
+
+- https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/read-project
+- https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Api/Project.cs
+- https://www.quantconnect.com/docs/v2/cloud-platform/security-and-ip
+- https://www.quantconnect.com/docs/v2/cloud-platform/projects/collaboration
+- https://www.quantconnect.com/docs/v2/cloud-platform/backtesting/results
+- https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/collaboration/read-project-collaborators
+
+These describe ordinary code as private unless explicitly shared, dedicated
+collaborator access separately from backtest publication, and a Make Public /
+Make Private control on each backtest. A public backtest can disclose associated
+project files even after project deletion. Thus owner-only collaborator evidence
+is not proof of historical links being absent, nor is public=False on an
+unexpected project field an authenticated global privacy property.
+
+The new bounded contract requires positive exact project/name/language/org and
+owner identity, current codeRunning=False, the dedicated sole-owner writable
+collaborator record, the same canonical owner in the general view, and at most
+the exact previously pinned Mia general-view row. Unknown collaborators or any
+other row change refuse. An unexpectedly supplied public field may only be
+exact False as a contradiction check; absence is merely not-supplied. No sharing,
+forum, permission-change, encryption-change or publication endpoint is allowed.
+Existing manual-history, edit-lock, full source-readback and admission gates
+remain. This is point-in-time access authentication under the documented
+private-default service contract, not proof of universal/historical/continuous
+privacy, a native lease, or backend persistence semantics for Mia.
+
+Before the run freeze, independently inspect the exact manual backtest
+`bbd2202cc3000e8b1c14751bf088dd16` / Casual Yellow Kangaroo in authenticated
+Safari, read its sharing control without clicking it, and record the result.
+Make Public supports currently unshared at that observation; Make Private or
+an unavailable/ambiguous control blocks this recovery rather than changing a
+setting. No A5 contact or claim occurs before this condition is resolved.
+On the first navigation from terminal to R298, QC requested its coding
+environment; before the next observation, Safari's active page changed to
+Massive Legal Agreements. Codex stopped UI interaction and asked when Safari
+was free. No sharing control was observed and no sharing setting was changed.
+The potentially opened R298 code environment must be stopped through its
+supported UI after the owner's release, before A5's own idle check.
+
+Two same-round advisory tasks checked public schema/access semantics and the
+inherited source/launch contract. Their advice is not independent review.
+They also found that documented backtest-create responses can already be
+Completed. or Runtime Error: the former queued/running-only verifier could
+discard a valid returned ID. A5 must retain finite identity/status for both,
+never turn Runtime Error into success, and never relaunch. This is diagnostic
+identity handling, not a strategy or success-definition change.
+
+### 313.3 Preparation state
+
+Additive A5 helper/caller and focused regression coverage are prepared.
+All spent callers/helpers/readers and controls stay frozen. No A5 control leaf,
+credential, private source, provider request, source upload, compile, capacity
+request or backtest launch has been accessed or consumed by this preparation.
+The only QC interaction this round so far is the described Safari navigation.
+No result statistics are used for a strategy decision. Exact source/profile
+pins, tests, execution boundary and final run authority will be recorded before
+any actual invocation; this preparation text is not that authority.
+
+### 313.4 Sharing observation and implementation/validation evidence
+
+After the owner answered "proceed" to the Safari-availability question, Codex
+resumed only the exact R298 view. The backtest list displayed one known sample,
+Casual Yellow Kangaroo, Completed. Its result links contained exact ID
+bbd2202cc3000e8b1c14751bf088dd16 and its Share Results label was **Make Public**,
+observed between external clocks21:20:32 and21:21:15UTC on2026-10-24. No public/
+private/publish control was clicked. This is current UI evidence of an unshared
+manual backtest under the documented control semantics; it is not proof that
+it was never shared or that no historical copy exists. Some sample summary
+statistics were incidentally visible while navigating; no statistics-driven
+decision, chart/order/log download or licensed-row extraction followed.
+
+Opening R298's code environment caused visible automatic IDE builds with short
+IDs c4f7e6-4795fc and e8aeb8-4795fc (UI local times9:20:21 and9:20:34). These are
+not explicit Codex compile/create dispatches, A5 source completion, or new
+backtests; the results list still contained only the owner sample. Therefore
+the earlier preparation statement of no compile applies to the operational
+caller, not to every IDE side effect. The UI now showed only the owner avatar;
+that is not a successful repetition or retrospective repair of the failed Mia
+removal. The new API gate still authenticates both views rather than relying
+on this avatar count. Codex then returned to Projects and clicked only R298's
+editor-environment Stop; its completion is checked before the run freeze.
+
+Implementation is additive; old A4 caller/helper/tests retain the exact312.12
+hashes. New files and SHA256:
+
+| Path | Bytes | SHA256 |
+| --- | ---: | --- |
+| scripts/arv2_r298_privacy_recovery_remote.py |14552|ec64870a0f097a644a1505d666c76239980c8b2d92f998ba9ff6dbd8536d4dd1|
+| scripts/run_arv2_r298_privacy_recovery.py |34457|4784d40dc561ea20cfda39c1fb9c70674a8597acf25b85ddd1991e4e7f6fde38|
+| tests/analyst_revisions_v2/test_r298_privacy_recovery_remote.py |30703|9e75e4fedb5ba58bb055df6b73c81eecae3e737f5df0745ea0d1d60a62381ef1|
+| tests/analyst_revisions_v2/test_r298_privacy_recovery.py |57224|aad7c05afc471b5347cd12ec392158f08db5158aa4f7e7da46fb4657e9bcbfd5|
+
+Canonical arv2-r298-privacy-recovery-v1 profile SHA256
+`d62651f1baa04687adf97c019946827a4b2ef83ac74defca7c35596c2e0f25e8`.
+All77 selected dependency pins matched actual files in a native-denied static
+check; all four new files compiled in memory without bytecode and
+assistant.dispatch_fence was absent. Selected-source pins are not whole-
+interpreter integrity. The profile's required external observation is a
+contract prerequisite recorded here, not a magic authorization boolean or a
+machine-generated privacy attestation. The same-round final advisory report's
+stale "pending helper pin" sentence is corrected: the actual inspected final
+caller4784d40d contains ec64870a and all77 pins match; no pending pin remains.
+
+Root final focused union: **547 distinct passes in13.15s**, no failures/skips/
+warnings:233 newhelper +227 newcaller +86record/document +1research transitive
+closure. All pytest/mutation/private-parser work used native network denial,
+production-artifact and Keychain denial, disabled plugin autoload, no conftest/
+cacheprovider, -B and in-root temporary/cache paths. No full lane/repository
+suite. This validates synthetic protocol behavior, not actual QC compatibility
+or strategy performance. Prior author225helperpasses4.31s, final233passes3.54s
+and227callerpasses9.89s overlap; do not add them to547.
+
+Same synthetic documented Project without public refuses the frozen pure A4
+policy at owned_private and passes A5's positive identity/collaborator gates;
+no old operational caller/control is used. Encrypted does not substitute for
+privacy/ACL evidence. Unexpected supplied public values other than exactFalse,
+wrong owner IDs, extra collaborators/history, altered source, missing lock,
+manual-ID relabeling and A4 names refuse. Immediate terminal create IDs are
+preserved before durable publication; Runtime Error remains nonzero and never
+relaunches. Completed. has a distinct create_terminal_observed result; queued
+or capacity_wait does not establish the owner's running goal.
+
+Memory-only omission evidence, restored in finally with source hashes unchanged:
+restoring A4's required-public predicate produced1expectedfailure plus1overlap
+pass223deselected0.13s; an initial harness also had an extraneous Mia-pin fixture
+failure0.16s because copied globals missed the fixture patch, then was corrected.
+Omitting dedicated-owner authentication produced1expectedfailure232deselected
+0.15s. Omitting the immediate Runtime Error guard produced1expectedfailure plus
+1overlap pass225deselected0.40s. These deliberate failures are not green passes
+or operational attempts. ARV2E312-003 is corrected prospectively in code; actual
+access/source/run readiness, including ARV2E312-001, still awaits A5's gates.
+
+### 313.5 Exact one-shot A5 run freeze
+
+The Projects UI subsequently removed exactly R298's active-environment link
+and Code Environments row after its Stop click. No other project/job/node was
+stopped or changed. This is UI completion, not a substitute for fresh explicit
+codeRunning=False in the API. The owner's renewed exclusive handoff and the
+exact unshared-manual observation above now satisfy the external prerequisites.
+
+Under313.1's explicit one-additional-attempt decision and current review waiver,
+the clean commit containing this section prospectively freezes ONE invocation
+of the exact313.4 caller's recover operation. Bind --expected-head to that full
+clean commit SHA and --caller-sha256 to4784d40dc561ea20cfda39c1fb9c70674a8597acf25b85ddd1991e4e7f6fde38.
+Host is only Darwin/POSIX Python3.13 at
+/Users/sheltonchen/.venvs/trading_agent-py313/bin/python, exact designated root/
+branch. This source binding does not itself confer authority;313.1 and this
+prospective decision do, with all technical checks still mandatory. There is
+no intermediate push. Actual results and final handoff will precede the sole
+matching-lane final push.
+
+Fixed new exclusive control leaf:
+artifacts/analyst_revisions_v2/newrule_privacy_recovery/R313-20261024-A.
+It has not been inspected or allocated before this decision. The parent claims
+and fsyncs exclusively before credentials/contact; partial claim or ambiguous
+dispatch consumes/ambiguously consumes A5. A1–A4, D1–D3 and all older controls
+remain spent and unread; no cleanup, repair, renamed retry or superseded-caller
+fallback. Fresh credential-free native-network-denied admission workers may
+authenticate the exact pinned family/D15 evidence and package payloads at
+initial, prelaunch and final stages, not repeat old operational readers. Retain
+original controls and every new journal/receipt, including failures.
+
+The fixed project38364439, organization hash, candidate/projection/family/package/
+lineage/D15 pins and source economics remain unchanged from312.11–312.15.
+A5 name is ARV2 R298 NEWRULE SIX OFF 2021 OCT2026 A5 f67148cd; source lock ID
+Codex ARV2 R298 A5 20261024. No new project/role/library/date/economics. The
+existing two retained modules must be exact; full evolving inventory is checked
+before every write, and all11 exact projected files before compile and launch.
+At most9 restorations: historic4-file inventory implies7creates+2updates, but
+that split is not asserted until current inventory is authenticated. Recognized
+stub/default absence can change the create/update split within9; unknown bytes
+refuse. One supported lock with consistent codeSourceId, no force/reacquire/
+permission or public-sharing mutation. Lock success is not continuous ownership.
+
+Parent budget600seconds/max64 application dispatches/24KiB finite output;
+20 compile polls10seconds apart; prelaunch reserve90seconds; one own-status
+poll after60seconds for queued/running creates. Immediate Completed. needs no
+poll; immediate Runtime Error is terminal failure with retained identity. Any
+unknown/malformed/ambiguous response, nonzero exit or deadline is inadmissible
+for success and never renews A5. Capacity occupied returns capacity_wait without
+launch/cancelling other jobs; queued remains queued, not running. Any later
+wait/read continuation must be separately bounded and must not relaunch.
+No strategy statistics/log/chart/order/result-aggregate API access is included.
+
+Before dispatch, a separate credential-free native-network/production-artifact/
+Keychain-denied process checks clean root/branch/HEAD, exactcaller/profile/tests,
+all77 selected pins, compile checks and dispatch_fence absence. Only afterwards
+the external observer may pass the two existing QC environment credentials in
+memory to the exact parent; no Keychain/tokenfile lookup, printing or serialization.
+Use minimal non-secret environment with all temp/cache support paths in-root.
+External budget615seconds and64KiB perchannel, finite selectors capture, and
+kill/reap only its own child on bounds.600/615seconds cannot guarantee interruption
+of uninterruptible I/O or host suspension. Record actual parent exit separately
+from wrapper exit, UTC dispatch/completion brackets, stdout/stderr lengths/hashes
+and any external bound. Never print unvalidated/raw exception/response/credential
+bytes. Application dispatch accounting is not measured provider contact.
+
+Then, once, a separate credential-free native-network/production-artifact/
+Keychain-denied15second validator may parse only the bounded captured envelope
+through the exact caller's pure validate_output, with the observed actual exit
+and frozen args. Require empty parent stderr and canonical double-LF envelope;
+report hashes must match the exact reconstructed report bytes. No control-file
+or result reread. Exit0 plus authenticated matching output is necessary, not
+proof of running if the finite status is queued/capacity_wait. Exit2 preserves
+failure and any known launch/status receipt, never success. Unknown validation
+prints only finite lengths/hash/context, not raw buffers. All formal/paper/PIT/
+accepted flags remain false even on running/Completed. status. No next family
+cell, funded/broker/real-order/paper/live action or efficacy claim is authorized.

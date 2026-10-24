@@ -187,3 +187,19 @@ def test_wrong_cli_hash_never_executes(monkeypatch, capsys):
     monkeypatch.setattr(m, "execute_plan", lambda *_: pytest.fail("bad hash cannot execute"))
     assert m.main(["--plan-json", "{}", "--plan-sha256", "a" * 64]) == 1
     assert e.parse_json(capsys.readouterr().out.encode())["source_text_returned"] is False
+
+
+# TPR-CR29 regression: an oversized public receipt leaves a body-free failure receipt, not no receipt.
+
+
+def test_oversized_public_receipt_is_refused_with_a_body_free_receipt(tmp_path, monkeypatch):
+    (tmp_path / "full").mkdir(); (tmp_path / "small").mkdir()
+    plan, sources, root = fixture(tmp_path / "full")
+    full = m.execute_fixture(plan, sources, root, clock=lambda: NOW)
+    assert e.parse_json(full)["views"] is not None
+    monkeypatch.setattr(m, "MAX_PUBLIC", len(full) - 1)
+    values = fixture(tmp_path / "small"); plan, _sources, root = values
+    result = execute(values)
+    assert result["status"] == "FAILED_OR_UNCERTAIN" and result["views"] is None and result["public_size_refused"] is True
+    assert result["private_read_attempts"].fraction() == 2
+    assert (root / (plan["operation_id"] + ".result.json")).exists()

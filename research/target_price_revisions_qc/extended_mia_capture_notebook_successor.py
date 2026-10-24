@@ -422,6 +422,9 @@ def _execute(plan, sources, root, *, guard, clock, monotonic, transport):
                 if type(status) is not int or not 100 <= status <= 599:
                     _fail()
                 request.update(response_bytes=len(raw), http_status=status)
+                # An unusable echo credential must refuse before any projection is retained.
+                if type(token) is not str or re.fullmatch(r"[!-~]{1,256}", token) is None:
+                    _fail()
                 check(); projection = e.project_wire(raw, credential=token)
                 request["projection"] = _publish(directory, stage + ".projection.json", e.canonical(projection))
                 if status != 200:
@@ -454,7 +457,15 @@ def _execute(plan, sources, root, *, guard, clock, monotonic, transport):
         report["ended_utc"] = clock().isoformat()
         raw_report = e.canonical(report)
         if len(raw_report) > MAX_RECEIPT:
-            _fail()
+            # The disclosure is refused, but the spent scope still gets a receipt.
+            for key in ("inventory", "changes", "complete_private_diff"):
+                report[key] = None
+            for key in ("missing_expected_files", "different_expected_files", "unexpected_files"):
+                report[key] = []
+            report["status"] = "FAILED_OR_UNCERTAIN"; report["public_size_refused"] = True
+            raw_report = e.canonical(report)
+            if len(raw_report) > MAX_RECEIPT:
+                _fail()
         _publish(directory, operation + ".result.json", raw_report)
         return raw_report
     finally:

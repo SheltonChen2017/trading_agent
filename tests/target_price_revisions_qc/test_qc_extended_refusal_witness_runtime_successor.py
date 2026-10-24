@@ -333,3 +333,39 @@ def test_intrinsic_guard_mutants_are_killed_by_the_matching_behavioral_regressio
             check()
     assert m.read_runtime_witnesses is original
     check()
+
+
+# TPR-CR29 regressions: three intrinsic guards the received suite never exercised.
+
+
+def test_clock_regression_inside_the_window_is_refused():
+    times = [NOW, NOW, NOW, NOW + timedelta(seconds=10), NOW + timedelta(seconds=10), NOW + timedelta(seconds=5)]
+    def utc_now():
+        return times.pop(0) if len(times) > 1 else times[0]
+    qb = NS(project_id=m.PROJECT, object_store=base.Store())
+    result = invoke(qb, utc_now=utc_now)
+    assert result["status"] == "failed_or_uncertain" and result["read_calls"] <= 1
+    assert_safe(result)
+
+
+def test_monotonic_budget_exhaustion_is_refused_even_when_utc_stays_still():
+    ticks = [10, 10, 10, 10 + permit()["max_elapsed_seconds"]]
+    def monotonic_clock():
+        return ticks.pop(0) if len(ticks) > 1 else ticks[0]
+    qb = NS(project_id=m.PROJECT, object_store=base.Store())
+    result = invoke(qb, monotonic_clock=monotonic_clock)
+    assert result["status"] == "failed_or_uncertain" and result["read_calls"] <= 1
+    assert_safe(result)
+
+
+def test_projection_hash_must_match_the_bytes_actually_read(monkeypatch):
+    original = m.predecessor.project_witness
+    def mismatched(encoded, *, kind):
+        projected = dict(original(encoded, kind=kind)); projected["gzip_sha256"] = "f" * 64
+        return projected
+    monkeypatch.setattr(m.predecessor, "project_witness", mismatched)
+    qb = NS(project_id=m.PROJECT, object_store=base.Store())
+    result = invoke(qb)
+    assert result["status"] == "failed_or_uncertain" and result["read_calls"] == 1
+    assert result["objects"][0]["status"] == "failed_or_refused" and result["objects"][0]["gzip_sha256"] is None
+    assert_safe(result)

@@ -254,7 +254,11 @@ def _execute(plan, sources, root, *, guard, clock, monotonic):
             check(); report["inspection"] = inspected; report["status"] = "COMPLETED_SOURCE_INSPECTION"
         except (Exception, KeyboardInterrupt): report["status"] = "FAILED_OR_UNCERTAIN"
         report["ended_utc"] = clock().isoformat(); raw = e.canonical(report)
-        if len(raw) > MAX_PUBLIC: _fail()
+        if len(raw) > MAX_PUBLIC:
+            # The disclosure is refused, but the spent scope still gets a receipt.
+            report["inspection"] = None; report["status"] = "FAILED_OR_UNCERTAIN"; report["public_size_refused"] = True
+            raw = e.canonical(report)
+            if len(raw) > MAX_PUBLIC: _fail()
         capture._publish(directory, operation + ".result.json", raw)
         return raw
     finally:

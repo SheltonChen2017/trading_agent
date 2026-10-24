@@ -464,7 +464,21 @@ def test_identified_successor_changes_only_self_identity_and_inventory_capacity(
         'MODULE = PREFIX + "extended_mia_capture.py"',
         'MODULE = PREFIX + "extended_mia_capture_notebook_successor.py"', 1).replace(
         "MAX_FILES, MAX_FILE = 16, 1024 * 1024",
-        "MAX_FILES, MAX_FILE = 17, 1024 * 1024", 1)
+        "MAX_FILES, MAX_FILE = 17, 1024 * 1024", 1).replace(
+        '                request.update(response_bytes=len(raw), http_status=status)\n'
+        '                check(); projection = e.project_wire(raw, credential=token)\n',
+        '                request.update(response_bytes=len(raw), http_status=status)\n'
+        '                # An unusable echo credential must refuse before any projection is retained.\n'
+        '                if type(token) is not str or re.fullmatch(r"[!-~]{1,256}", token) is None:\n'
+        '                    _fail()\n'
+        '                check(); projection = e.project_wire(raw, credential=token)\n', 1).replace(
+        '        raw_report = e.canonical(report)\n        if len(raw_report) > MAX_RECEIPT:\n            _fail()\n',
+        '        raw_report = e.canonical(report)\n        if len(raw_report) > MAX_RECEIPT:\n'
+        '            # The disclosure is refused, but the spent scope still gets a receipt.\n'
+        '            for key in ("inventory", "changes", "complete_private_diff"):\n                report[key] = None\n'
+        '            for key in ("missing_expected_files", "different_expected_files", "unexpected_files"):\n                report[key] = []\n'
+        '            report["status"] = "FAILED_OR_UNCERTAIN"; report["public_size_refused"] = True\n            raw_report = e.canonical(report)\n            if len(raw_report) > MAX_RECEIPT:\n                _fail()\n', 1)
+    # TPR-CR29: the two safety blocks above are the only other permitted differences.
     assert SOURCES[c.MODULE].decode() == expected
     assert c.MODULE == c.PREFIX + "extended_mia_capture_notebook_successor.py"
     assert c.MODULE in c.SOURCE_PATHS
@@ -530,3 +544,28 @@ def test_each_production_seam_refuses_a_fixture_substitution_on_its_own(tmp_path
     with pytest.raises(c.Refusal):
         c._execute(plan, values[1], root, **kwargs)
     assert not list(values[2].iterdir())
+
+
+# TPR-CR29 regressions: an unusable echo credential refuses before projection, and an
+# oversized public receipt leaves a body-free failure receipt instead of no receipt.
+
+
+@pytest.mark.parametrize("token", ["", " ", "x" * 257, None])
+def test_unusable_echo_credential_refuses_before_any_projection_is_retained(tmp_path, token):
+    values = fixture(tmp_path); transport, calls = cloud(token=token)
+    result, _raw = execute(values, transport)
+    assert len(calls) == 1 and result["status"] == "FAILED_OR_UNCERTAIN"
+    assert result["requests"][0]["status"] == "failed_or_unknown" and result["requests"][0]["projection"] is None
+    assert not list(values[2].glob("*.projection.json"))
+
+
+def test_oversized_public_receipt_is_refused_with_a_body_free_receipt(tmp_path, monkeypatch):
+    (tmp_path / "full").mkdir(); (tmp_path / "small").mkdir()
+    transport, _calls = cloud()
+    _full_result, full = execute(fixture(tmp_path / "full"), transport)
+    monkeypatch.setattr(c, "MAX_RECEIPT", len(full) - 1)
+    values = fixture(tmp_path / "small")
+    result, _raw = execute(values, cloud()[0])
+    assert result["status"] == "FAILED_OR_UNCERTAIN" and result["public_size_refused"] is True
+    assert result["inventory"] is None and result["read_attempts"].fraction() == 2
+    assert (values[2] / (values[0]["operation_id"] + ".result.json")).exists()

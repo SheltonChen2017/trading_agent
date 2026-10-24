@@ -22,7 +22,7 @@ predecessor, capture, e, files = diagnostic.predecessor, diagnostic.capture, dia
 LANE, PRIVATE_ROOT = diagnostic.LANE, diagnostic.PRIVATE_ROOT
 MODULE = capture.PREFIX + "extended_owner_mia_source_view.py"
 SOURCE_PATHS = (*diagnostic.SOURCE_PATHS, MODULE)
-DIAGNOSTIC_SHA256 = "0f661bc47c1bf6d044c4cf421dfd084e355530cc21f409a4bb8946c5752010bd"
+DIAGNOSTIC_SHA256 = "9683fd0861e743bf47fbef518ebaf575c96955142c46c8e2c498f16544210a3c"
 OPERATION = "TPR-EXT26-OWNER-MIA-SOURCE-VIEW-20261013-001"
 ARGS = diagnostic.ARGS
 MAX_PRIVATE, MAX_SECONDS, MAX_PUBLIC = diagnostic.MAX_PRIVATE, 30, 64 * 1024
@@ -196,7 +196,11 @@ def _execute(plan, sources, root, *, guard, clock, monotonic):
             check(); report["status"] = "COMPLETED_STATIC_SOURCE_VIEW"
         except (Exception, KeyboardInterrupt): report["status"] = "FAILED_OR_UNCERTAIN"
         report["ended_utc"] = clock().isoformat(); raw = e.canonical(report)
-        if len(raw) > MAX_PUBLIC: _fail()
+        if len(raw) > MAX_PUBLIC:
+            # The disclosure is refused, but the spent scope still gets a receipt.
+            report["views"] = None; report["status"] = "FAILED_OR_UNCERTAIN"; report["public_size_refused"] = True
+            raw = e.canonical(report)
+            if len(raw) > MAX_PUBLIC: _fail()
         capture._publish(directory, OPERATION + ".result.json", raw)
         return raw
     finally:

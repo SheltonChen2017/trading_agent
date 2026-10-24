@@ -652,9 +652,10 @@ project is visible as `38364439`, with a partial four-file upload and default
 SPY main. Opening the editor automatically built that partial source; it was
 not launched. Mia's read-only advice is qualified below, not acceptance or a
 diagnosis of the API failure. Additive same-project recovery is implemented
-but unreviewed and uninvoked. Claude review of section 308's new recovery contract,
-or a separately explicit current waiver, and an exact committed run decision
-must precede use. The failed begin remains spent and unchanged.
+but not independently reviewed. Section309 records the owner's explicit current
+waiver for this particular recovery and its separate exact one-shot decision.
+Only that committed decision permits its conditional evidence/recovery sequence;
+the failed begin remains spent and unchanged. No successful recovery is inferred.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1758,10 +1759,11 @@ no review session or other-chat message is started.
 The later owner specifically authorizes Safari and QC Mia assistance and
 directs continuation until backtesting is running (307.8). The owner completed
 sign-in and said "ok, proceed". Section 308 records exact-project inspection,
-qualified Mia advice and additive recovery preparation. Claude must review
-section 308 before use unless the owner explicitly waives this particular
-new review; a separately committed exact one-shot decision remains required. The current
-preparation does not authorize invocation. Do not infer the local claim from
+qualified Mia advice and additive recovery preparation. The owner explicitly
+waives Claude review of section 309's exact current recovery decision and the
+section308 implementation it invokes; this is not independent acceptance.
+The current next step is the exact committed section 309 evidence and conditional
+same-project A2 sequence. Preparation alone does not authorize invocation. Do not infer the local claim from
 a project name, repeat begin, change frozen economics or use another lane's
 jobs. Browser permission is not a blanket technical-gate waiver.
 V3 is spent after its
@@ -3705,6 +3707,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-24 | Owner releases QC hold and waives current review; exact corrected V5 A1 freeze | `bde2df5a` -> section-307 freeze and eventual result/handoff commit | No new Claude range; direct current waiver, not independent acceptance | Exact unchanged section-306 caller and 66 bindings, original family/package/D15 admission, actual-exit evidence and corrected status vocabulary; capacity then sequential six/eight study only | Native-denied genuine source/host/logging preflight passed; record checks and actual outcomes in 307; no complete suite | Historical findings and false readiness flags retained; starting floor314/239/50/699, no prospective look/cell booking | One final matching-lane push at completed/blocked checkpoint; no intermediate push or storage replay; monitor stays PAUSED |
 | 2026-10-24 | Owner-authorized Safari/Mia investigation; browser authentication blocked | `5f6dcf99` -> this section-307.8 record commit | No new Claude range, review or gate clearance | QC Safari Algorithm Lab reported Session Expired; login opened and no usable saved-login suggestion appeared; no project or Mia inspection, edit, compile or launch | Public-source-only identifier/order advisory; focused record checks below; no operational/private reader or complete suite | R298 ambiguity and possible look addition unchanged; browser login required, not evidence of API failure cause | One final matching-lane record push; owner signs in, then bounded exact-project reconciliation/Mia diagnosis; monitor stays PAUSED |
 | 2026-10-24 | Authenticated Safari/Mia inspection and same-project R298 recovery preparation | `e061d441` -> this section-308 checkpoint | No new Claude range; same-round advice is not independent review | UI identifies project38364439 and partial source; editor-open automatic build disclosed; new bounded evidence/recovery code is uninvoked, not a repeat begin or replacement project | Focused synthetic validation and limitations in308; no complete suite or actual recovery reader/caller | Old error cause/local claim remain unresolved pending admissible evidence; no backtest or accepted result; current review/run gate retained | One final matching-lane checkpoint push; obtain current recovery review or scoped waiver, then exact freeze before use; monitor stays PAUSED |
+| 2026-10-23 PDT | Scoped owner waiver and exact R298 same-project recovery run decision | `0b054ddf` -> section309 freeze/result round | No new Claude range or independent acceptance; owner selected option1 for this particular recovery | Evidence once, then conditional same-project A2; unchanged source/economics, no old begin replay | Unchanged322 focused checks remain historical; genuine source/host preflight passed; new record checks recorded below | Actual outcomes and looks are not booked prospectively; every technical gate remains | Execute only committed309 decision, stop at its running/terminal/blocked checkpoint and push once; monitor PAUSED |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -51809,3 +51812,161 @@ of the old begin. The final nonforce push must target only the matching lane;
 verify local/tracking/live equality and clean status afterwards. No monitor
 rearm, other-lane change, provider capture, new rights, paper/live/funded/broker
 action or efficacy claim is included.
+
+## 309. Owner-waived same-project R298 recovery: exact one-shot decision, 2026-10-23 PDT
+
+### 309.1 Current scoped authority and immutable starting point
+
+The owner answered **option1 / yes** to the explicit question: "May I skip
+Claude review for this specific R298 recovery: authenticate the failed attempt,
+complete the exact frozen source in the existing project, then verify and
+launch it? No strategy changes, replacement project, or replay of the failed
+begin call." This waives only pre-use Claude review for section308's exact
+recovery and this current decision. It is not independent acceptance, future
+review waiver, renewed A1, evidence repair, technical-gate bypass, other-lane
+authority or paper/live/funded/broker/real-order permission. The earlier QC hold
+is released, but fresh capacity still precedes launch. Monitor remains PAUSED.
+
+Starting local/tracking/live matching branch is clean
+`0b054ddf49aee189d09f9bb522ad0b356d619aab`; the matching branch alone was fetched.
+All work stays at `/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2`
+on `codex/strategy-analyst-revisions-v2`. There is no incoming Claude range.
+Only this lane record changes in the run round. Commit this freeze before any
+operation; its resolved exact HEAD is the `--expected-head` for both conditional
+operations and will be recorded with the actual results. No intermediate push,
+writer/test during execution, arbitrary helper call, browser edit, Mia prompt,
+shared change or source-pin refresh. A new commit or unexplained concurrent
+state/remote change terminates this clean-HEAD sequence pending reassessment.
+
+### 309.2 Exact caller, source and host bindings
+
+The sole entry is `scripts/run_arv2_r298_recovery.py` from section308, SHA256
+`c33a3b110072d072d9ef1b9272b128981e1115744caf9e980fd7df1d654b01e4`,
+canonical profile
+`3e9038f4a8ec8fbb2dceecd887d8b8d9ea3de6b234fc51fe3c710925cbeb5978`.
+The six new source/test hashes in308.5 and all69 selected source dependencies
+remain exact. R298 profile/projection, package/lineage/family/D15 admission and
+the eleven source files remain308/307.2's unchanged values. This is selected
+integrity, not whole-interpreter integrity. The only cloud destination is
+project38364439; no replacement project or alternate candidate is permitted.
+
+Use the designated Darwin/POSIX Python3.13 executable
+`/Users/sheltonchen/.venvs/trading_agent-py313/bin/python -B` directly for the
+parent. Do not wrap that parent in another native sandbox: its own fixed
+evidence workers apply the native sandbox, and nested sandbox application is
+known to refuse. Parent300-second deadline and fixed child sandbox remain
+unchanged. No operation is invoked through pytest, patched imports or an
+arbitrary callback.
+
+A dedicated observer process builds each child's minimal environment in memory:
+PATH `/usr/bin:/bin:/usr/sbin:/sbin`, LANG `en_US.UTF-8`, bytecode disabled,
+and absolute nonsymlink TMPDIR/TMP/TEMP/XDG_CACHE_HOME/PYTHONPYCACHEPREFIX in a
+fresh in-root `.pytest_cache/r309-*` directory. Evidence receives no credentials.
+Only conditional recovery receives the two existing QC environment values
+`QC_USER_ID`/`QC_API_TOKEN`, in memory and never in argv, files, printed values,
+shell expansion or records. Presence may be checked without outputting values;
+it proves neither authentication nor rights. No Keychain/token-file/browser
+credential fallback. The existing logging/environment/transport gates stay
+binding; no owner logger or security setting is changed.
+
+### 309.3 Frozen sequence and conditional accounting
+
+**D1 — evidence, once.** Invoke `evidence --expected-head <this clean freeze>
+--caller-sha256 <exact308 caller>`. Only its defined new leaf
+`artifacts/analyst_revisions_v2/newrule_recovery/R298-20261024-A` may be allocated.
+The date in this fixed leaf is UTC; this owner decision is October23 in
+America/Los_Angeles. The original fixed control parent is read only by the
+native-denied worker's selected collector. No separate shell census, old
+reader, old begin or artifact repair precedes/follows it. Require actual exit0,
+empty stderr and matching finite envelope; exact project38364439 and
+`attempt_claim_authenticated=true` are necessary. Record its actual evidence
+and report SHA/byte pins externally. A failure/ambiguity stops before D2;
+the evidence operation is not retried or renamed.
+
+D1 success confirms the previously unresolved A1 claim's +1 shared/+1
+development booking: floor becomes315/240/50/699, without adding a result cell.
+This is reconciliation of the original claim, not a new A1 or a second look.
+Until actual D1 success, floor remains314/239/50/699 plus the unresolved possible
+A1 increment. Neither floor is advanced merely by this decision.
+
+**D2 — recovery, once and only after D1 admission.** Invoke `recover` with the
+same exact clean HEAD/caller and `--evidence-sha256` set only to D1's accepted
+actual evidence pin. This is a prospective output binding, not automatic pin
+refresh. Its exclusive A2 claim precedes validation/credentials and books one
+additional shared/development look; successful authenticated A1+A2 claims yield
+316/241/50/699. Partial/nonzero A2 remains consumed or ambiguously consumed,
+never assumed absent. Do not reread the control leaf ad hoc to improve the
+accounting. The new native-denied worker revalidates only the new pinned bundle,
+and existing generic package/family/D15 consumers run within the exact308
+scope before credentials, before launch and after the final observation.
+
+The fixed sequence is exact own-project/source inspection, completion of only
+recognized missing/stub/template files, full readback, one compile, at most20
+compile observations separated by10 seconds, fresh own-source/ownership/zero-
+prior-backtest/capacity checks, at most one A2 launch, then one own statistics-
+disabled status observation after60 seconds. No simultaneous project editor
+changes are allowed. No use of the default SPY template or an arbitrary compile
+ID. Capacity wait, failed build, runtime error, unknown/nonzero exit, mismatched
+output or deadline stops this operation; no automatic resume, A3 or next cell.
+Only its own process/child may be killed/reaped by the bounded watchdog.
+
+`In Queue...`/`In Progress...` plus admitted actual output establishes only the
+corresponding observed job state. `Completed.` is terminal status, not accepted
+strategy evidence. This freeze includes no aggregate/result read, outcome
+summary, R299–R303 launch, reupload or additional provider acquisition. A later
+bounded status/result continuation needs its own compatible exact decision.
+The generic three-attempt ceiling remains; this decision grants only A2.
+
+### 309.4 External observation and stop rules
+
+The observer captures only the invoked parent's stdout/stderr and actual exit,
+not private files. It bounds each channel to24KiB plus the permitted final
+print LF, uses a315-second watchdog (300s plus15s exit margin), and records UTC
+external dispatch/completion brackets, byte counts/hashes, actual exit and
+whether timeout/bound/trailing/malformed output occurred. UTC brackets are
+external observations, not provider timestamps. No secret/raw exception or
+unexpected bytes are printed; malformed output is represented only by finite
+metadata. The observer kills/reaps only its own launched process on timeout
+or oversize and never retries.
+
+Normal output must be exactly canonical ASCII JSON with one canonical LF and
+one extra print LF, schema `arv2-r298-same-project-recovery-v1`, exact operation,
+freeze HEAD/caller/profile/project binding, `operation_completed=true` and all
+four false flags preserved. Report/evidence pin fields must be exact SHA256 and
+bounded positive byte counts. D2 accepts only capacity-wait or the exact A2
+launch/status shapes and matching project/projection/name/compile/backtest IDs.
+Actual exit0 is separately mandatory; a plausible report alone is inadmissible.
+Finite nonzero failure output may be retained as failure evidence only, never
+success. No raw reason, credential, licensed row, opaque source or response
+body crosses the observation boundary.
+
+The fixed late-failure and transport limitations in308 remain: cloud effects
+can precede nonzero exit, numeric HTTP status may be unavailable, provider
+request count remains unknown, endpoint checks are not an atomic cloud
+transaction, and alarms cannot bound host suspension/uninterruptible I/O.
+No repair, evidence deletion, security disabling, unchanged retry, replacement
+name or fabricated success. At the running/terminal/blocked checkpoint, record
+actual evidence, unresolved findings, look accounting and exact validation,
+then make one final nonforce matching-lane push and verify clean local/tracking/
+live agreement. Do not rearm the monitor or claim the whole six/eight comparison
+complete from a single job.
+
+### 309.5 Pre-use validation boundary
+
+At clean `0b054ddf`, a credential-free native network/artifact-read/write/
+Keychain-command-denied process passed the genuine caller `_preflight`, default
+logging bootstrap and safe environment check; its canonical profile matched
+and `assistant.dispatch_fence` was absent. It invoked no main/worker/collector,
+private input or client. Section308's322 focused passes and smoke qualifications
+remain unchanged-code evidence, not a newly repeated suite or independent
+review. Record/diff checks and actual outcomes will be recorded separately.
+The first new record selection had84 passes/2 failures in0.92s because the live
+next-step text omitted the space in "section309"; corrected to name section309
+and the scoped owner waiver explicitly. No operational call had occurred.
+A second selection had85 passes/1 failure in0.93s because the gate requires
+the explicit active wording "owner explicitly waives Claude review of section";
+that accurate current-scope wording is now used. Tests were not changed.
+Final pre-freeze record/active-document validation:86 passed in0.87s, with no
+failures/skips/warnings under native network/artifact/Keychain-command denial,
+in-root support paths, disabled plugin/shared conftest/cache and `-B`. Earlier
+selections overlap; no complete suite. Diff checks passed.

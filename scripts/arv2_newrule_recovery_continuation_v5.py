@@ -40,7 +40,8 @@ PROFILE_SHA256 = old._sha(old._canonical(PROFILE))
 ContinuationRefused = old.NewruleSubmissionError
 FINITE_CODES = old.FINITE_REFUSAL_CODES | frozenset(("mixed_lifecycle_state", "v5_family_binding",
     "batch_claim", "batch_completion", "batch_output_collision", "batch_output_changed",
-    "batch_clock", "batch_outputs", "candidate_order", "continuation_busy", "native_lock_unavailable"))
+    "batch_clock", "batch_outputs", "candidate_order", "continuation_busy", "native_lock_unavailable",
+    "control_budget"))
 # Real QC backtest statuses observed in this lane's earlier runs (section 305);
 # the compact compile/read states are a different enum and stay unchanged.
 BACKTEST_PENDING = frozenset(("In Queue...", "In Progress..."))
@@ -208,7 +209,13 @@ def _batch(directory, plan, record, operation, candidate, receipt, batches):
     claim = {**_binding(plan, receipt), "operation": operation, "candidate_id": candidate,
              "attempt": None if candidate is None else 1, "ordinal": len(previous) + 1,
              "epoch": now, "allowed_outputs": sorted(_allowed(operation, marker, candidate, item))}
-    if ROOT_RECEIPT not in directory.names():
+    names = set(directory.names())
+    # Reserve even optional outputs before creating any batch evidence or making
+    # contact. This preserves the cap; it does not promise all poll budgets fit.
+    reserved = set(claim["allowed_outputs"]) | {ROOT_RECEIPT,
+        marker + "-batch-claim.json", marker + "-batch-complete.json"}
+    old._require(len(names | reserved) <= old.MAX_CONTROL_FILES, "control_budget")
+    if ROOT_RECEIPT not in names:
         directory.write(ROOT_RECEIPT, _binding(plan, receipt))
     before_names = set(directory.names())
     prior_hashes = {name: old._sha(old._canonical(directory.read(name))) for name in sorted(before_names)
@@ -267,6 +274,23 @@ def _capacity(directory, plan, _record, marker, _candidate):
     return {**value, "state": "available" if value["available_count"] else "wait"}
 
 
+def _backtest_rows(response, expected_count, code):
+    """Match the ordinary list parser: count is optional, not coercible."""
+    rows = response.get("backtests")
+    old._require(type(rows) is list and len(rows) == expected_count
+        and ("count" not in response or (type(response["count"]) is int
+            and response["count"] == len(rows))), code)
+    return rows
+
+
+def _fresh_a1_inventory(directory, plan, api, marker, project):
+    # V5 permits only A1. No prior run, fallback attempt, or recovery matching is
+    # admitted; the frozen legacy multi-attempt inventory remains untouched.
+    response = old._rpc(directory, plan, api, marker, "backtests/list",
+        {"projectId": project, "includeStatistics": False})
+    _backtest_rows(response, 0, "prior_run_census")
+
+
 def _begin(directory, plan, record, marker, candidate):
     cell, item, stem = old._cell(plan, record, candidate, 1)
     api = environment.guarded_client()
@@ -284,7 +308,7 @@ def _begin(directory, plan, record, marker, candidate):
     directory.write(candidate + "-project.json", {"family_sha256": plan.family_sha256,
         "candidate_id": candidate, "project_id": project})
     old._read_project(directory, plan, api, marker + "-owned-project", project, cell)
-    old._prior_inventory(directory, plan, api, marker + "-prior-runs", cell, project, 1)
+    _fresh_a1_inventory(directory, plan, api, marker + "-prior-runs", project)
     rows = old._rpc(directory, plan, api, marker + "-initial-files", "files/read", {"projectId": project}).get("files")
     old._require(type(rows) is list and len(rows) <= 2 and all(type(row) is dict
         and type(row.get("projectId")) is int and row["projectId"] == project
@@ -350,12 +374,11 @@ def _status(directory, plan, record, marker, candidate):
     launch = old._launch(directory, compiled, stem)
     response = old._rpc(directory, plan, environment.guarded_client(), marker, "backtests/list",
         {"projectId": launch["project_id"], "includeStatistics": False})
-    rows = response.get("backtests")
-    old._require(type(rows) is list and type(response.get("count")) is int
-        and response["count"] == len(rows) == 1, "backtest_census")
+    rows = _backtest_rows(response, 1, "backtest_census")
     row = rows[0]
-    # Proven list parsers treat a summary row's projectId as optional; when
-    # present it must still be the exact launched project.
+    # The ordinary list parser permits an absent summary projectId; when
+    # present it must still be the exact launched project. Unknown-run recovery
+    # has a stricter identity contract and is not performed here.
     old._require(type(row) is dict and ("projectId" not in row or (type(row["projectId"]) is int
         and row["projectId"] == launch["project_id"])) and row.get("backtestId") == launch["backtest_id"]
         and row.get("name") == launch["backtest_name"]

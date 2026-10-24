@@ -279,3 +279,24 @@ def test_v5_module_pins_bind_current_sources():
     for name in ('scripts/arv2_newrule_execution_environment.py',
                  'scripts/arv2_newrule_recovery_continuation_v5.py'):
         assert hashlib.sha256((d.ROOT / name).read_bytes()).hexdigest() == d.NEW_PINS[name]
+
+
+def test_deadline_after_operation_return_is_still_terminal_failure(monkeypatch, capsys):
+    fixtures(monkeypatch)
+    returned = []
+    remaining = d.helpers._remaining
+    def operation(*_args):
+        returned.append("synthetic_operation_returned")
+        return {"state": "available"}
+    def check(deadline):
+        if returned:
+            raise d.helpers.Deadline()
+        return remaining(deadline)
+    monkeypatch.setattr(d, "_operation", operation)
+    monkeypatch.setattr(d.helpers, "_remaining", check)
+    assert d.run(args()) == 2
+    output = json.loads(capsys.readouterr().out)
+    assert returned == ["synthetic_operation_returned"]
+    assert output["operation_completed"] is False
+    assert output["failure_code"] == "deadline"
+    assert "result" not in output

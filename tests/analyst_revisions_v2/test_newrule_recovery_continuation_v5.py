@@ -642,3 +642,83 @@ def test_status_row_project_binding_optional_but_exact_when_present(setup, proje
         with pytest.raises(old.NewruleSubmissionError, match="backtest_status"):
             call(value, "status")
         assert "v5-R298-A1-status-001-batch-complete.json" not in names()
+
+
+@pytest.mark.parametrize("status", ["In Queue...", "In Progress..."])
+def test_each_real_pending_status_is_accepted_on_creation(setup, status):
+    prepared(setup)
+    def mutate(endpoint, response):
+        if endpoint == "backtests/create":
+            response["backtest"]["status"] = status
+    setup.api.mutate = mutate
+    assert call(setup, "launch")["backtest_id"]
+    assert "v5-R298-A1-launch-001-batch-complete.json" in names()
+
+
+@pytest.mark.parametrize("operation", ["begin", "status"])
+@pytest.mark.parametrize("count", ["absent", "exact", None, True, False, 0.0, -1, 2, "1"])
+def test_backtest_list_count_is_optional_but_exact(setup, operation, count):
+    if operation == "status":
+        launched(setup)
+    def mutate(endpoint, response):
+        if endpoint == "backtests/list":
+            if count == "absent":
+                response.pop("count")
+            elif count == "exact":
+                response["count"] = len(response["backtests"])
+            else:
+                response["count"] = count
+    setup.api.mutate = mutate
+    complete = f"v5-R298-A1-{operation}-001-batch-complete.json"
+    if count in ("absent", "exact"):
+        assert call(setup, operation)
+        assert complete in names()
+    else:
+        with pytest.raises(old.NewruleSubmissionError,
+                           match="prior_run_census" if operation == "begin" else "backtest_census"):
+            call(setup, operation)
+        assert complete not in names()
+
+
+@pytest.mark.parametrize("rows", [None, {}, [{}], [{}, {}]])
+def test_fresh_a1_inventory_still_requires_an_empty_list(setup, rows):
+    def mutate(endpoint, response):
+        if endpoint == "backtests/list":
+            response.pop("count")
+            response["backtests"] = rows
+    setup.api.mutate = mutate
+    with pytest.raises(old.NewruleSubmissionError, match="prior_run_census"):
+        call(setup, "begin")
+    assert "R298-A1-claim.json" in names()
+    assert "R298-A1-compile.json" not in names()
+    assert not any(endpoint == "compile/create" for endpoint, _ in setup.api.calls)
+
+
+@pytest.mark.parametrize("operation", ["capacity", "begin", "compile", "launch", "status", "read"])
+@pytest.mark.parametrize("spare", [-1, 0])
+def test_control_room_checked_before_batch_or_remote_effect(setup, monkeypatch, operation, spare):
+    if operation == "compile":
+        call(setup, "begin")
+    elif operation == "launch":
+        prepared(setup)
+    elif operation == "status":
+        launched(setup)
+    elif operation == "read":
+        completed(setup)
+    candidate = None if operation == "capacity" else "R298"
+    item = None if candidate is None else setup.plan._projections[0]
+    marker = c._stem(operation, candidate) + "-001"
+    before_names, before_calls = names(), list(setup.api.calls)
+    reserved = c._allowed(operation, marker, candidate, item) | {
+        c.ROOT_RECEIPT, marker + "-batch-claim.json", marker + "-batch-complete.json"}
+    limit = len(before_names | reserved) + spare
+    monkeypatch.setattr(old, "MAX_CONTROL_FILES", limit)
+    if spare < 0:
+        with pytest.raises(old.NewruleSubmissionError, match="control_budget"):
+            call(setup, operation)
+        assert names() == before_names
+        assert setup.api.calls == before_calls
+    else:
+        assert call(setup, operation)
+        assert marker + "-batch-complete.json" in names()
+        assert len(names()) <= limit

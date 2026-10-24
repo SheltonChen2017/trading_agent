@@ -29305,3 +29305,87 @@ selection:124 passed in3.80s under the same native network/Keychain-exec/
 repository-write-denied offline profile. This is not a complete lane suite;
 the earlier171 selection overlaps and is not added to it. Diff check is
 clean; the sole tracked change is this append-only operational handoff.
+
+## 204. Owner-authorized Sharadar format investigation preregistration (2026-10-24)
+
+The owner now explicitly directs: investigate the response-format issue, get
+Sharadar access working, then continue the owned-source coverage audit, with
+NO QC access. This is a new bounded diagnostic authorization after203, not
+retroactive acceptance, a reset of its latch or permission to repeat other
+consumed source windows. Begin from clean local
+`f3c1763ada7431162ebb850ad63221f0ee6b74d3`, one known record-only commit above
+unchanged matching fetched origin1344a74e. No incoming Claude review or new
+independent review of Codex's own work is claimed.
+
+Current official [API guide](https://sharadar.com/llms.txt) explicitly supports
+the existing `x-api-key` header and distinguishes direct Sharadar from Nasdaq
+Data Link. [TICKERS](https://sharadar.com/docs/tickers) and
+[ACTIONS](https://sharadar.com/docs/actions) document the strict envelopes
+already accepted by v1. Therefore no header-to-query migration or permissive
+schema correction is justified by public evidence. The rejected203 body was
+discarded; its actual mismatch and cause remain unknown before this diagnostic.
+Keep secrets in the header, out of URLs/arguments/environments/logs/Git.
+
+The existing lane adapter now has an explicit strict-boolean `--diagnostic`
+successor mode. Its default v1 schema/namespace/profiles/strict acceptance and
+consumed refusal remain unchanged. The new fixed schema is
+`insider-sharadar-reference-status-diagnostic-v2`; private sibling namespace
+`artifacts/insider_buying/sharadar_reference_diagnostic_v2/`; auditID
+`ib-sharadar-reference-20261024-format-diagnostic-v2-once`. Production runs
+only on its already-committed clean exact source epoch, supplied as full
+`--expected-head` after that commit exists. No actual invocation is claimed
+in this preregistration.
+
+Reserve both fixed GET profiles before ONE Keychain read, then at most ONE
+dispatch each, in order: TICKERS current status and ACTIONS full-history
+status. Exact nonsecret URLs remain
+`https://api.sharadar.com/v1.0/data/tickers?status=True` and
+`https://api.sharadar.com/v1.0/data/actions?status=True&years=full`.
+Stop after the first refusal. No redirect, proxy, fallback, automatic retry,
+row/ZIP download, SEP price/outcome/fundamental request or QC operation.
+Existing15s/1MiB transport limits, private0700/0600 exclusive journals,
+source/branch/HEAD/dirt and held successor-ancestry guards remain binding.
+
+Before new reservation, before/after every publication and immediately before
+actual transport, recheck203's pinned original scope/completion plus all
+six closed child leaves and private inventories. Capture/recompare their
+device/inode/mode/owner/link/size/mtime/ctime identities; never write old
+evidence. Only an entirely new diagnostic namespace may be claimed once.
+Fixtures must remain outside the lane with invented reader/transport and
+invented failed predecessor; they cannot fall through to real access.
+
+A complete rejected HTTP200 response can publish only safe structural data:
+fixed root types, allowlisted field types, bounded counts and fixed table/
+error-class enums. No arbitrary names/scalars, URLs, error snippets, rejected
+raw bytes or rejected-body hashes. Duplicate/nonfinite/malformed JSON,
+resource limits (4096nodes/24depth/8192string/128dictionary entries), and
+literal/Unicode/nested plain/plus-percent credential screens fail closed.
+No structural output follows a credential echo, partial response, non200 or
+transport refusal. Unknown supplier prose stays unknown; fixed error classes
+are not an inferred successful authentication or entitlement claim. Documented
+strict success bodies alone retain private raw metadata as before.
+
+Focused tests and in-memory guard reversals precede actual use; all tests deny
+process-tree network and Keychain execution, use invented inputs, and cannot
+write production roots. This is not a complete lane/repository suite. After
+actual diagnosis, correct only evidence-supported lane compatibility issues;
+do not relax schemas or invent activation. Continue the coverage audit using
+retained inputs/current official docs, preserving consumed EODHD/Massive
+windows, missing rights/identity facts, frozen sources/population/economics,
+the six carried P2s and all readiness flags. No purchase is authorized by an
+unexpected response. Monitor stays paused; QC hold is explicit and unlifted.
+
+Pre-activation main qualification:361 passed in5.21s across the two Sharadar
+files, Keychain, lane record, active documents, lane import boundary and the
+EXACT package guard; no complete suite. Two changed Python images compiled in
+memory under native network/fork/all-write denial; diff check clean. Adapter
+SHA256 `68f1f639999800997754e11ea6123ca9d23ea73a18c16246ed969bc59692f964`;
+new67-case test SHA256
+`226dd4b11bb851ad25a2cf6060069aaef85e2656ede6f9d6b2d34cd245d59393`.
+Internal Codex overlapping65-new/112-existing selection177 passed, then five
+memory-only reversals were all caught (screen8 failures; allowlist1;
+predecessor2; namespace1; resource4), finally177 restored green0.64s.
+Main then added two direct default-transport predecessor guard-order controls,
+including a reached-opener positive control; these are in the361 result.
+No source was reversed on disk. Advisory internal QA found no material
+scope/privacy/acceptance issue; this is not independent Claude review.

@@ -85,3 +85,50 @@ def test_resumed_round_has_its_own_pre_push_row():
     assert len(rows) == 1
     assert "f67bbf2fc5ab4c7ce822c7e52b57b560cd670682" in rows[0]
     assert "119" in rows[0] and "QC paused" in rows[0]
+
+
+def _latest_counter_review():
+    return _text().split("## 121. Codex counter-review only", 1)[1]
+
+
+def test_latest_counter_review_preserves_claude_section_120_exactly():
+    text = _text()
+    start = text.index("## 120. Claude independent review")
+    end = text.index("## 121. Codex counter-review only")
+    original = text[start:end].rstrip() + "\n"
+    assert hashlib.sha256(original.encode()).hexdigest() == "9bd70a4486589fdc03b01df120b89a38c9eff0bba9dc1aaea4ab4f39a4142451"
+
+
+def test_latest_counter_review_corrects_numstat_and_evidence_attribution():
+    current = _latest_counter_review()
+    for value in ("SI-CCR-20261024-001", "+32/-2", "SI-CCR-20261024-002",
+                  "recomputed 146-file parent manifest", "no persisted original inventory",
+                  "daily claim/inventory/closure"):
+        assert value in current
+
+
+def test_latest_counter_review_retains_partial_and_false_alarm_dispositions():
+    current = _latest_counter_review()
+    for value in ("SI-CCR-20261024-003", "SI-BUILD-20261021-004",
+                  "Partial/unresolved", "SI-CCR-20261024-004", "False alarm",
+                  "six open P2s", "SI-CCR23-003", "partially correct"):
+        assert value in current
+
+
+def test_latest_counter_review_publication_has_its_own_scoped_ledger_row():
+    ledger = _text().split("## 5.", 1)[1].split("## 6.", 1)[0]
+    rows = [line for line in ledger.splitlines() if line.startswith("| 2026-10-24 | Codex counter-review only |")]
+    assert len(rows) == 1
+    assert "66fb823bfb1fd1427b9d26673b778b5b839ee579" in rows[0]
+    assert "cc1e44fc3e937efe9aa19b38ca7b72cbb5399f5b" in rows[0]
+    assert "121" in rows[0] and "No next milestone" in rows[0]
+
+
+def test_latest_counter_review_status_does_not_open_source_or_qc_gates():
+    header = " ".join(_text().split("Current publication rule", 1)[0].split())
+    assert "CODEX COUNTER-REVIEW OF `cc1e44f` COMPLETE" in header
+    assert "ACCEPTED AFTER DOCUMENTATION CORRECTION" in header
+    current = _latest_counter_review()
+    assert "No next milestone" in current
+    assert "including capacity/metadata" in current
+    assert "No provider, credential, private capture or QC access" in current

@@ -52322,3 +52322,71 @@ No test ran and the native denial was preserved. The corrected invocation
 restores that explicit exclusion; it is not an operational retry.
 Corrected record/active-document selection passed86 in0.89s, overlapping the
 final376; no failures/skips/warnings and no operational artifact access.
+
+### 310.6 D1 actual authenticated outcome and A2 disposition
+
+At clean freeze `e3d53276604e89892ec60309a7863794acd7e991`, D1 ran ONCE,
+2026-10-24T18:51:03.323078Z..18:51:07.069902Z (external child dispatch/completion
+brackets), actual exit0, empty stderr, canonical single-LF stdout1705bytes
+SHA256 `56a7bf45e3452edd0fee9ea3188a7e87ece1de5bf9a6b23d12797b2467d909f3`.
+The bounded native-denied observer authenticated the envelope and report binding.
+New report1394bytes SHA256
+`19dcd0395d1139a2688ef3513a37c2f5f05538826f7e555d8f11681011187dfe`;
+new claim610bytes SHA256
+`0676f3f8955dde6f7e5c7c194d502582480b7279e60a272491b7492cf84b9b3a`.
+D1 is now SPENT, retained, never rerun or repaired.
+
+The exact old A2 leaf had8 expected base files and zero recorded RPC intents,
+observations or failures; no inventory, compile, launch, status or normal-recovery
+receipt. All last-marker/endpoint/status and cloud IDs are null. This confirms
+the recorded pre-dispatch prefix and is consistent with the deterministic
+constructor defect. Guarded-client construction is statically non-dispatching.
+Nevertheless provider_request_count and recorded_application_dispatch_count
+remain null: this is not server-side contact measurement, recovery of the lost
+literal, or proof of absence of unjournaled effects. All four readiness/result
+flags, lost_cause_recovered and operational_retry_authority remain false.
+No old evidence.json bytes, original collectors, QC/provider/credential action
+or strategy look were consumed by D1. Booked floor remains316/241/50/699.
+
+### 310.7 D2 exact third/final recovery decision, before use
+
+Given the owner's specific waiver and D1's authenticated pre-dispatch prefix,
+authorize exactly ONE `recover` invocation of
+`scripts/run_arv2_r298_final_recovery.py`, with 310.4's caller/profile/72pins,
+at the clean commit containing this separate D2 freeze. Bind `--expected-head`
+to that commit, `--caller-sha256` to the exact310.4 caller pin,
+`--reader-head e3d53276604e89892ec60309a7863794acd7e991`,
+`--reader-report-sha256 19dcd0395d1139a2688ef3513a37c2f5f05538826f7e555d8f11681011187dfe`,
+`--reader-claim-sha256 0676f3f8955dde6f7e5c7c194d502582480b7279e60a272491b7492cf84b9b3a`,
+and `--reader-exit-code 0` as the actual externally observed fact above.
+Only designated host/root/branch/Python is compatible. Fixed project38364439,
+projectionf67148cd... and organization digest
+`a2d88859373df0f1fd59ede52b9b3945f847091b5fca3286841241536c38e880`
+remain binding; no pin refresh or new project. Exact launch name is
+`ARV2 R298 NEWRULE SIX OFF 2021 OCT2026 A3 f67148cd`.
+
+The operational parent is launched with minimal environment and only existing
+QC_USER_ID/QC_API_TOKEN values passed in memory, never printed or placed in argv.
+No unrelated credentials, logging/debug overrides or browser action is needed.
+Its four credential-free private workers use the committed native-denial profile;
+the new reconciliation worker never rereads A2. The new A3 output leaf has not
+been inspected or allocated during preparation. An exclusive completed claim
+consumes A3 even if no request follows; partial/unknown claim is ambiguous/spent.
+On actual claim, book317shared/242development/50infrastructure/699cells once.
+
+External observer:315s wall deadline,64KiB/channel bound, actual child exit and
+UTC dispatch/completion brackets, stdout/stderr byte/hash evidence. It may
+kill/reap only its own child. Native-network/artifact-denied finite-envelope
+validation must require exact canonical double-LF, exact schema/binding/false
+flags, actual exit0 and no stderr for success; retain validated finite failure
+context on nonzero. Unknown/trailing/malformed/oversize output is not success.
+No raw exceptions/body/credential/row output or posthoc success fabrication.
+The report pin emitted by the parent binds its exact finite result; this is not
+a separate whole-tree/continuous-integrity proof or independent acceptance.
+
+On valid own running/queued/Completed. status, record exactly that status and
+stop this recovery; no next cell, result extraction or efficacy assertion. On
+capacity wait, preserve other lanes and stop without retry. Any third failure
+requires stop and the authenticated Mia diagnostic checkpoint under the standing
+rule, not A4. Mia may diagnose; unrelated cloud edits or a changed run are not
+automatically accepted. No further execution contract is authorized by this D2.

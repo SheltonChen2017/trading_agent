@@ -652,10 +652,16 @@ project is visible as `38364439`, with a partial four-file upload and default
 SPY main. Opening the editor automatically built that partial source; it was
 not launched. Mia's read-only advice is qualified below, not acceptance or a
 diagnosis of the API failure. Additive same-project recovery is implemented
-but not independently reviewed. Section309 records the owner's explicit current
-waiver for this particular recovery and its separate exact one-shot decision.
-Only that committed decision permits its conditional evidence/recovery sequence;
-the failed begin remains spent and unchanged. No successful recovery is inferred.
+but not independently reviewed. Section309 records the owner's scoped waiver,
+exact freeze and now-SPENT operations: evidence passed; recovery exited2 with
+`remote_refused` and no detailed observation. A1 is authenticated and A2 consumed;
+the booked floor is316/241/50/699. No successful launch is confirmed. The caller
+collapsed the helper's finite error label, so remote effects/stage remain unknown.
+No retry/A3 or private-leaf reread. Owner-authorized read-only Mia diagnosis
+reports the same four filename/size pairs and zero backtests, but cannot expose
+the raw metadata needed to identify the failed guard. This is qualified tool
+evidence, not an authenticated recovery or cause. Next is bounded offline
+stage reconciliation, not a third launch or another source purchase.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1762,8 +1768,11 @@ sign-in and said "ok, proceed". Section 308 records exact-project inspection,
 qualified Mia advice and additive recovery preparation. The owner explicitly
 waives Claude review of section 309's exact current recovery decision and the
 section308 implementation it invokes; this is not independent acceptance.
-The current next step is the exact committed section 309 evidence and conditional
-same-project A2 sequence. Preparation alone does not authorize invocation. Do not infer the local claim from
+The section 309 evidence and conditional same-project A2 sequence is now SPENT:
+evidence passed and recovery refused. The owner's separately authorized
+read-only Mia diagnosis is complete but did not identify the exact guard.
+The next step is a separately frozen bounded offline reconciliation of the new
+recovery's retained markers/receipts, not a third attempt. Preparation alone does not authorize invocation. Do not infer the local claim from
 a project name, repeat begin, change frozen economics or use another lane's
 jobs. Browser permission is not a blanket technical-gate waiver.
 V3 is spent after its
@@ -3708,6 +3717,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-24 | Owner-authorized Safari/Mia investigation; browser authentication blocked | `5f6dcf99` -> this section-307.8 record commit | No new Claude range, review or gate clearance | QC Safari Algorithm Lab reported Session Expired; login opened and no usable saved-login suggestion appeared; no project or Mia inspection, edit, compile or launch | Public-source-only identifier/order advisory; focused record checks below; no operational/private reader or complete suite | R298 ambiguity and possible look addition unchanged; browser login required, not evidence of API failure cause | One final matching-lane record push; owner signs in, then bounded exact-project reconciliation/Mia diagnosis; monitor stays PAUSED |
 | 2026-10-24 | Authenticated Safari/Mia inspection and same-project R298 recovery preparation | `e061d441` -> this section-308 checkpoint | No new Claude range; same-round advice is not independent review | UI identifies project38364439 and partial source; editor-open automatic build disclosed; new bounded evidence/recovery code is uninvoked, not a repeat begin or replacement project | Focused synthetic validation and limitations in308; no complete suite or actual recovery reader/caller | Old error cause/local claim remain unresolved pending admissible evidence; no backtest or accepted result; current review/run gate retained | One final matching-lane checkpoint push; obtain current recovery review or scoped waiver, then exact freeze before use; monitor stays PAUSED |
 | 2026-10-23 PDT | Scoped owner waiver and exact R298 same-project recovery run decision | `0b054ddf` -> section309 freeze/result round | No new Claude range or independent acceptance; owner selected option1 for this particular recovery | Evidence once, then conditional same-project A2; unchanged source/economics, no old begin replay | Unchanged322 focused checks remain historical; genuine source/host preflight passed; new record checks recorded below | Actual outcomes and looks are not booked prospectively; every technical gate remains | Execute only committed309 decision, stop at its running/terminal/blocked checkpoint and push once; monitor PAUSED |
+| 2026-10-24 UTC | Actual R298 evidence success, A2 refusal and bounded Mia diagnosis | `0b054ddf` -> `dfa3490a` -> section309 final result | No new Claude range; current waiver consumed, not independent acceptance | D1 exit0 authenticated A1; D2 exit2 remote_refused; A2 consumed; Mia reports unchanged four filenames/sizes and zero backtests but lacks raw metadata | Actual bounded channels and unchanged-source control flow; record checks below; no operational replay or full suite | 316/241/50/699; no accepted result; exact failing label lost and remote effects not independently authenticated | Preserve all evidence; separately gated offline marker/receipt reconciliation before any A3; one final push, monitor PAUSED |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -51970,3 +51980,152 @@ Final pre-freeze record/active-document validation:86 passed in0.87s, with no
 failures/skips/warnings under native network/artifact/Keychain-command denial,
 in-root support paths, disabled plugin/shared conftest/cache and `-B`. Earlier
 selections overlap; no complete suite. Diff checks passed.
+
+### 309.6 Actual one-use results and consumed attempts
+
+Both actual operations used the clean committed freeze
+`dfa3490a411ea895ed9ae8e2cbf43dbfccf4998f`, exact caller/profile above,
+designated root/branch and minimal process environments. No writer/test was
+active during either operation. Local HEAD/status remained unchanged and clean;
+the live matching remote stayed at starting `0b054ddf` because this round has
+no intermediate push. No Keychain, token-file, alternate-credential or browser
+fallback was used. All times below are external **UTC** dispatch/completion
+brackets; in America/Los_Angeles both operations occurred late October23.
+
+**D1 evidence: actual exit0 and accepted matching output.** Dispatched
+`2026-10-24T06:59:23.245170Z`, completion observed
+`2026-10-24T06:59:30.046166Z`. Stdout845 bytes, SHA256
+`0fcb8ab1a6b4998c0704dc896a00d02414189154e96f37cabc6b73d4c8f78f4e`;
+stderr0 bytes; no observer timeout/bound/format failure. The exact canonical
+double-LF envelope binds the freeze, caller, profile and project38364439,
+`operation_completed=true`, `attempt_claim_authenticated=true`, provider count
+null and all four readiness/result flags false. It returned:
+
+| Newly produced D1 output | Bytes | SHA256 |
+|---|---:|---|
+| `evidence.json` | 36337 | `c4fc71e3bdcda49db183fc283953f66f181497e802017460134fb5dc6ada928f` |
+| `evidence-report.json` | 648 | `8449b555f253f2df204e4e2e1286f5b04f67d630d087b19bba4f7012cb7223b7` |
+
+These are under the exact new recovery leaf in309.3. The external observer read
+only process channels, not either file. D1 authenticated the previously unresolved
+original A1 claim, reconciling its one shared/development look. It did not recover
+the old discarded HTTP cause, prove measured provider contact or accept results.
+D1 is now spent: no collector/parent/worker replay or new alias.
+
+**D2 recovery: actual exit2, authenticated FAILURE output, not success.**
+Dispatched `2026-10-24T06:59:43.204627Z`, completion observed
+`2026-10-24T06:59:52.461386Z`; stdout332 bytes, SHA256
+`883beb95537e11baf923c0e908e0f15495d9a8e6f0709a646916ffe898f389ac`;
+stderr0; no observer timeout/bound/format failure. Finite envelope:
+`operation_completed=false`, `failure_code=remote_refused`,
+`failure_observation=null`, `attempt_consumption=consumed_or_ambiguous_no_retry`,
+all readiness/result flags false. No normal recovery-report/launch/status pin
+was returned. The actual evidence pin supplied was exactly D1's accepted pin,
+not its report pin. D2 is spent and was not rerun.
+
+At this exact frozen source, the `remote_refused` category is emitted only for
+the exact `RecoveryError` class from construction/workflow of `RemoteRecovery`.
+Those calls occur **after** the A2 claim's exclusive write/fsync/readback,
+accepted native evidence-check child, public reconstruction, initial fresh
+package/family/D15 admission and guarded-client construction return. Thus A2
+claim consumption is supported by exact control flow plus the actual typed
+failure; this is not a new private-file read. It adds one shared/development look.
+Current booked floor is therefore **316shared/241development/50infrastructure/
+699cells**, with no accepted result cell. A1 remains spent; A2 is consumed;
+no third attempt is authorized by this failed one-shot decision.
+
+The finite category does **not** identify which helper check failed or prove
+HTTP status, request/dispatch count, authentication success, updated files,
+compile or launch effects. Null observation is not zero contact: it can follow
+a local pre-dispatch refusal, an observed response that fails validation or a
+failed failure-journal write. The elapsed external bracket is not used to infer
+an endpoint or absence of a launch. No private control traversal, operational
+reader, capacity request, retry, repair, new candidate or outcome read followed.
+All partial evidence/effects are preserved. No successful launch is confirmed.
+
+### 309.7 New diagnostic limitation and owner-authorized Mia inquiry
+
+`ARV2D309-001` — **P2, OPEN**: `finite_failure` recognizes exact helper
+`RecoveryError` but collapses its bounded literal reason to `remote_refused`.
+`failure_observation` admits only `RequestFailed`, so the actual helper category
+was not preserved in this envelope. Section308's prospective request-failure
+observation path works as specified, but it does not cover every helper refusal.
+The earlier same-round advisory missed this separate limitation; tests accepting
+generic rejection of hostile/unallowlisted error text did not establish useful
+allowlisted helper categories survive. This is confirmed by static source, not
+a reconstruction of the actual missing label or an assertion of an HTTP cause.
+The spent caller/helpers remain frozen and are not patched for a retry.
+
+The owner then said **"you can ask Mia why it failed"**. This supplies a new
+read-only diagnostic inquiry within the existing project, superseding only
+this round's prior no-Mia-prompt exclusion. It does not renew A2 or authorize
+edits, compile, launch/A3, Object Store, other projects, settings or cleanup.
+The existing authenticated Safari tab remains on project38364439, Mia in
+Ask Before Edits. Codex asked for only current project metadata field types,
+filename/byte-size inventory and backtest count/status, redacting account and
+organization identities, and explicitly prohibited all mutations/retries.
+The question distinguished local `remote_refused` from an HTTP/runtime error
+and requested observed facts versus hypotheses. Mia's returned diagnosis and
+its limits will be recorded before this round's final push.
+
+Mia completed the read-only inquiry. It reports two project metadata reads,
+four one-line file reads for file-size metadata and one backtest listing, with
+no edits/build/run/retry. These are **Mia-reported tool operations**, not this
+caller's measured dispatch count. It reports exact project name and language
+`Py`, four files with the same previously reported sizes: core30349,
+forced_exit16313, input_runtime1 (`#`), main406 (default template); backtests
+empty, `totalPages=0`. Its result remains scoped to the existing browser project
+URL38364439. Matching names/sizes do not prove byte equality, continuous
+stability, zero transient effects or no earlier request. No independent API
+manifest/hash authentication or result acceptance followed.
+
+Mia explicitly cannot expose raw project metadata. Its filtered view omits
+numeric project ID, owner, codeRunning and collaborators; public is also absent.
+It therefore cannot identify the exact failing guard. Its absent-field/type
+mismatch suggestion is a **hypothesis only**: our caller uses the actual REST
+`projects/read` response, not Mia's filtered view, so omissions in Mia's tool
+cannot be treated as omissions in that response. No ownership/idle/collaborator
+guard was weakened based on this suggestion. Mia's earlier size/internal-upload
+mechanism theories likewise remain unproven. Codex did not share private raw
+responses, credentials, account identifiers or licensed rows with Mia and did
+not follow its suggestion to provide raw A1/A2 payloads. No further mutation,
+compile or launch instruction was sent; the existing tab was not reloaded.
+
+### 309.8 Blocked handoff, exclusions and next bounded action
+
+The executed waiver and D1/D2 are now exhausted. `ARV2D309-001` and the original
+`ARV2E307-001`/`ARV2D307-001` remain OPEN; the original A1 claim uncertainty is
+resolved only for its accounting/identity. No new source contract, source price,
+security master, PIT/formal gate or efficacy claim was admitted. A source
+purchase is not the current blocker. The concrete blocker is the unidentified
+helper refusal after A2 admission and incomplete remote source, with no
+admitted backtest launch/result. Mia reports zero backtests; that report does
+not replace the missing authenticated operational continuation evidence.
+
+The next bounded diagnostic should be a separately reviewed/frozen, native-
+network-denied, read-only reader of **only the new recovery leaf's** exact claim,
+check-completion, finite RPC intent/observed/failure markers, inventory and
+compile/launch/status receipts. It may establish last recorded stage and
+receipt presence/identity with strict held/named validation and finite output;
+it must not reopen the original A1 collector, read arbitrary bodies, repair
+markers, retry or contact QC. It cannot reconstruct an error literal never
+retained. Any future execution contract should preserve an exact-type bounded
+allowlisted helper code and last stage/dispatch information without raw
+exception text. Neither diagnostic nor A3 is implemented/invoked by this
+record; current permission to ask Mia is not a new operational waiver.
+
+This concluded round contains exactly the local pre-use freeze
+`dfa3490a411ea895ed9ae8e2cbf43dbfccf4998f` and this final record commit after
+`0b054ddf49aee189d09f9bb522ad0b356d619aab`. No production/test source changed.
+Verify exact root/branch/HEAD/status and unchanged matching remote before one
+successful nonforce final push; verify local/tracking/live equality and clean
+status afterward. Monitor remains PAUSED. No evidence cleanup, capture/upload
+replay, provider acquisition, Object Store change, other-lane action, new paid
+right, paper/live/funded/broker/real-order action or outcome summary occurred.
+Record validation for this final documentary tree follows; code's earlier
+focused passes remain historical and are not repeated or inflated.
+Final record/active-document checks passed86 in1.01s, no failures/skips/warnings,
+under the same native network/artifact-read/write/Keychain-command denial,
+disabled plugin/shared conftest/cache, `-B` and in-root support paths. These
+overlap the pre-freeze86 and section308 record checks, not additional distinct
+coverage. Diff checks passed; no full suite or operational replay occurred.

@@ -1,22 +1,19 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTIONS 212-216 RECORD THE OWNER'S CONTINUED SOURCE QUALIFICATION.
-THE TWO RETAINED EARNINGS WINDOWS HAVE A NEW OBSERVED OFFLINE SUPPLEMENT;
-ORIGINAL MISSING HTTP/SEAL EVIDENCE IS NOT REPAIRED. PRIVATE SHARADAR REFERENCE
-QUALIFICATION AND ONE DATES-ONLY GET COMPLETED; FULL-STUDY PRICE/DELISTING
-COVERAGE IS NOT ESTABLISHED. OWNER CONFIRMS A 5-YEAR PLAN AND NO ADDITIONAL
-MISSING-MONTH EXPORTS. ACTUAL ORIGINAL64 STRUCTURAL PARSER/TYPED-CONSUMER
-ASSESSMENT COMPLETED WITH64 FULL-ORIGINAL BINDINGS, ALL83657 ROWS RETAINED;
-71615 RELEVANT ROWS STILL LACK ORIGINAL BINDINGS. ONE EODHD DATES-ONLY GET
-OBSERVED2006 CAPABILITY UNDER THE EXISTING ACCOUNT, NOT FULL PRICE/DELISTING
-COVERAGE. NO ADDITIONAL PURCHASE IS RECOMMENDED YET. BACKTEST READINESS
-REMAINS FALSE AT CONCRETE SOURCE/IDENTITY/PROTOCOL INPUT GAPS AND THE QC HOLD.
-SIX CARRIED P2S, OLD FAILED/PARTIAL ROOTS AND HISTORICAL
-REVIEW DISPOSITIONS ARE PRESERVED. THIS CODEX WORK IS NOT INDEPENDENTLY
-REVIEWED. NO QC ACCESS: THE OWNER'S HOLD REMAINS BINDING. FROZEN V1/FOUR V3
-SOURCES, POPULATION/ECONOMICS, STRICT D23 AND BOTH FINAL ACCESS CLASSIFICATIONS
-ARE UNCHANGED. LOOKS/JOBS/BACKTESTS 0/0/0; NO FUNDED/PAPER/LIVE/CAPITAL/REAL-
-ORDER/TRADING AUTHORITY. MONITOR PAUSED; ONE FINAL LANE PUSH PENDING.**
+Status: **SECTION 218 RECORDS CLAUDE'S REVIEW OF THE 13 CODEX COMMITS IN
+`8f6ee687..c43fb081` (SECTIONS 202-217). ALL 13 ARE ACCEPTED, THREE AFTER
+CORRECTION. THE RANGE'S NINE PROVIDER REQUESTS (SEVEN SHARADAR STATUS, ONE
+SHARADAR DATES-ONLY, ONE EODHD DATE) AND EIGHT KEYCHAIN READS MATCH THEIR
+RECEIPTS; EVERY NEW PRIVATE OUTPUT WAS CHECKED BY HASH. CORRECTIONS: THE LANE
+FIXTURE FENCE NOW COMPARES FILESYSTEM IDENTITY, NOT ONLY THE PATH SPELLING
+(`6605db25`), THE PRICE CAPTURE PARSES ITS HASHED PLAN BYTES (`6605db25`), AND
+THREE PARSER GRAMMAR GUARDS ARE PINNED (`fc7f0349`). NO REAL KEYCHAIN,
+PROVIDER, SEC OR QC ACCESS BY THE REVIEW. SIX P2 FINDINGS REMAIN OPEN AND FAIL
+CLOSED. THE OWNER'S QC HOLD STAYS IN FORCE. NOT BACKTEST-READY: THE INPUTS IN
+216.3 ARE STILL MISSING. FROZEN V1/FOUR V3 SOURCES, POPULATION/ECONOMICS,
+STRICT D23 AND BOTH FINAL ACCESS CLASSIFICATIONS REMAIN BINDING. CODEX
+COUNTER-REVIEWS SECTION 218. LOOKS/JOBS/BACKTESTS 0/0/0. NO FUNDED/PAPER/
+LIVE/CAPITAL/REAL-ORDER/TRADING AUTHORITY.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -63,6 +60,8 @@ bounded source qualifications and continued available-input engineering.
 The explicit NO-QC hold, actual source/rights/identity facts and frozen
 population/economics remain binding; the confirmed5-Year subscription and
 missing supplier exports cannot be changed by an internal approval entry.
+Section 218 is Claude's later review of sections 202-217; it changes no
+gate and does not release the QC hold.
 
 ## 1. Canonical V1 contract
 
@@ -297,6 +296,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-22 | Codex owner-approved trusted publisher / observed offline verification | Published `e600841c` -> `fcc3a733` failed zero-semantic preflight -> corrected `43a44417` actual success -> this separate handoff | Explicit trusted-parent/single-native-worker boundary and genuine selector completion | One semantic CLI exit0/83.232658s; separate metadata readback0/10.444719s; exact seven new receipts,84 intake leaves,90 current/79 executed sources,82-quarter/19-affected selection; all old failures preserved, no retrospective acceptance. | Main final387 passed/2 intentional topology skips38.97s, separate2 topology passes1.95s; real stdio red/green, cleanup/guard reversals, strong-native independent metadata/custody observations, compilation/frozen checks; no full suite or look/job/backtest. | IBSELECT-OBS-01 and IBSELECT-V2-STARTUP-01 CLOSED only at prospective verification/approved topology; new stdio/owned-cleanup defects corrected; six carried P2s remain OPEN. | Latest QC HOLD stays binding until explicit owner release; no workspace/account/job access. Genuine missing earnings/parent/historical identity inputs remain; no routine approval request or fabricated readiness. One final accumulated matching-lane push only; monitor PAUSED. |
 | 2026-10-22 | Claude review (macOS session) and corrections | `272132e4` -> `9013b407`, `11b4cf0d` -> this review record | Independent review of sections 195-200 (`bbf34ab6..272132e4`, 7 commits, 0 merges: two new selector modules, one correction commit, four records) | All seven accepted, two after test corrections. Retained selector receipts, 90 source hashes and bindings checked on metadata. Sharadar nested-echo screen fixed; thirteen surviving-mutant guards pinned; record ctime claim corrected. | Final tree: 367 and 187/2 skipped focused passes, 2 topology passes, guards 107 with the 2 known SEP-2 failures; network and Keychain exec denied. No complete suite. Looks 0/0/0. | IBSHAR-CR02, IBSELECT-V3-TEST01, IBSELECT-V2-TEST01 closed; IBREC-CR20101 corrected; IBSELECT-V3-OBS01-05, IBSELECT-V2-OBS01, IBEOD-OBS02 recorded; IBREC-CCR19401 accepted against Claude; six P2 open | Codex counter-reviews section 201; QC hold stays |
 | 2026-10-23 | Codex counter-review ONLY | Fetched clean local/origin `8f6ee687a69427f2ee2ea96ab08fb6269db33a57`; incoming `272132e4..8f6ee687`, three commits, zero merges | Accept Sharadar correction and thirteen test guards; qualify documentation without a new milestone | All three incoming commits have separate dispositions in202.1. Successful status-body retention and intentionally ignored ctime are precisely distinguished; original operations are not repeated or reclassified. | Main677 passed/2 intentional topology skips24.16s before the added record guard; Sharadar112 passed1.25s; new guard cases11 passed3.55s; four echo and thirteen selector reversals caught; metadata-only twelve-leaf/source audit passed. Final validation follows below. No full suite; looks/jobs/backtests0/0/0. | Two P3 record findings corrected in202.2; six carried P2s OPEN and all earlier findings retained at exact scopes | NO next milestone this round; QC hold remains in force. Separate durable handoff after exact review hash exists, then one final matching-lane push; monitor PAUSED. |
+| 2026-10-24 | Claude review (macOS session) and corrections | `c43fb081` -> `6605db25`, `fc7f0349` -> this review record | Independent review of sections 202-217 (`8f6ee687..c43fb081`, 13 commits, 0 merges: Sharadar status repair, three qualification modules, original-64 parser and EODHD date probe) | All 13 accepted, three after correction. Nine provider requests and eight Keychain reads match their receipts; every new private output checked by hash. Fixture fence now compares filesystem identity; price capture parses hashed plan bytes; three parser guards pinned. | Final tree: 705/1 skipped and 93 focused passes, 1 topology pass, 717 on the corrected files, guards 107 with the 2 known SEP-2 failures; network and Keychain exec denied. No complete suite. Looks 0/0/0. | IBSHAR-CR03, IBPRICE-CR01, IBORIG-TEST01 closed; IBREC-CCR20101/20102 accepted against Claude; eight P3 observation groups recorded; six P2 open | Codex counter-reviews section 218; QC hold stays |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -30966,3 +30966,242 @@ hashes; no source edits followed the actual operations. Stage/commit only
 this record, then reverify before the one final push and independently read
 the exact matching remote tip. No already-existing or future success is
 invented by this prepublication statement.
+
+## 218. Claude review - sections 202-217 and corrections (2026-10-24 UTC)
+
+### 218.1 Scope and method
+
+Range `8f6ee687..c43fb081`: 13 Codex commits, no merges.
+- **Record-only:** `0ee0d279` (with one record test), `1344a74e`,
+  `f3c1763a`, `9ce3d5bb` and `c43fb081`.
+- **Sharadar status adapter:** `9cc22869`, `85c5e1f7`, `9fa88380`,
+  `75acdf56` and `7185d471`.
+- **New modules:** `464fe148` (retained earnings supplement, Sharadar
+  delisting qualification, Sharadar price coverage), `de41c32c` (price
+  activation), and `ed7fbb05` (original-parent parser, admission consumer,
+  runner, EODHD date probe).
+
+The owner directions quoted in 203.1, 204, 212.1 and 214.3 are
+Codex-attributed. That includes the 5-Year plan and that no further export
+exists. This review did not witness them and takes them as the record states.
+
+The range made nine provider requests with eight Keychain reads, according
+to the stored receipts:
+- seven Sharadar status GETs on six reads (203-209);
+- one Sharadar dates-only stocks GET (213.4);
+- one EODHD date-scalar GET (216.2).
+
+Codex also ran bounded searches of the owner's connected inbox (212.4,
+214.3) and read public documentation.
+
+Method:
+- Read sections 202-217 and every code diff.
+- Three read-only agents read the three module groups without running code.
+  Every finding was checked against the code; one (F2) was narrowed, as
+  `IBDELIST-OBS01` records.
+- In-memory mutants, plus probes of each survivor:
+  - 8 on the EODHD probe;
+  - 9 on the price capture;
+  - 6 on the delisting qualification;
+  - 6 on the earnings supplement;
+  - 12 on the original-parent parser.
+- Metadata-only checks of every new private output (218.3).
+- No Keychain read, and no provider, SEC, EDGAR or QC access. Every test and
+  mutant ran with network and `/usr/bin/security` exec denied; mutants also
+  had writes under `artifacts/` denied.
+
+### 218.2 Commit dispositions
+
+| Commit | Change | Claude disposition |
+|---|---|---|
+| `0ee0d279` | Section 202, counter-review of round 201, plus a record test | **Accepted.** Both corrections against this reviewer are confirmed. `IBREC-CCR20101`: successful status bodies are retained (`_exclusive_body` in `run_qualification`), so "never stores raw bodies" was wrong. `IBREC-CCR20102`: "nothing can change undetected" was too broad for a hold that ignores ctime. |
+| `1344a74e` | Section 202 handoff | **Accepted.** |
+| `f3c1763a` | Section 203, refused Sharadar access check | **Accepted.** |
+| `9cc22869`, `85c5e1f7`, `9fa88380`, `75acdf56` | Sharadar diagnostic and correction modes, sections 204-207 | **Accepted.** Each schema widening was registered as its own one-shot before contact and admits only a finite, evidenced field set. That is acceptable for a status endpoint; it is not research data. P3 observations in 218.5. |
+| `7185d471` | ACTIONS inventory mode, section 208 | **Accepted**, with the test gaps in 218.5. |
+| `9ce3d5bb` | Sections 209-211 | **Accepted.** |
+| `464fe148` | Three new qualification modules, section 212 | **Accepted after correction** in `6605db25` (`IBSHAR-CR03`, `IBPRICE-CR01`). |
+| `de41c32c` | Price activation, section 213 | **Accepted after correction** in `6605db25`. |
+| `ed7fbb05` | Original-parent parser, admission, runner, EODHD probe; sections 214-215 | **Accepted after test corrections** in `fc7f0349` (`IBORIG-TEST01`). The EODHD probe reuses the price capture's fence, which `6605db25` fixes. |
+| `c43fb081` | Sections 216-217 | **Accepted.** |
+
+### 218.3 Independent check of the observed operations
+
+Metadata only, under native network, fork, Documents-write and Keychain-exec
+denial:
+
+- **Sharadar status scopes.** Six namespaces hold 48 leaves, each 0600 and
+  single-link in a 0700 directory.
+  - Every completion and reservation hash matches 203.2 and 205-209, as do
+    the accepted 233-byte TICKERS and 809-byte ACTIONS bodies.
+  - The receipts show one transport each for v1-v4 (ACTIONS not attempted),
+    two for v5 and one for v6: seven GETs on six reads.
+  - The first access run executed the adapter byte-equal to `9013b407`
+    (SHA-256 `9e0a4691...`).
+- **The five new namespaces.** Twenty-nine leaves, each 0600 and
+  single-link, and every hash the record names matches:
+  - the earnings completion and both window metadata leaves;
+  - the delisting completion, qualification and plan;
+  - the price completion, response, metadata and scope;
+  - the original-64 assessment, parent admission and completion;
+  - the EODHD completion, scalar, metadata and scope.
+- **Dates-only scope.** The retained stocks CSV has exactly the header
+  `ticker,date,lastupdated`, and every data line is ticker, date, date. The
+  EODHD body is a bare 12-byte date. No price or volume column exists.
+  Per-symbol results are not repeated here: the Sharadar terms keep
+  usability evaluations private (212.4).
+
+Not checked here: the derivations (not rerun), the HTTP exchanges, the
+owner's statements and the inbox searches.
+
+### 218.4 Corrections
+
+- **`IBSHAR-CR03` (P3, closed in `6605db25`; the origin is this reviewer's).**
+  - The fixture fence `_outside_lane`, added in `5c29b437` (section 194),
+    compared resolved path strings. The lane's macOS firmlink spelling
+    `/System/Volumes/Data/Users/...` resolves to a different string for the
+    same directory. The fence also admitted `/` as a fixture root.
+  - The price capture copied the fence, and the EODHD probe reuses that copy.
+  - With the alias, a fixture run would have opened the real lane's offline
+    inputs read-only, then refused on a hash or fixture mismatch. Nothing
+    would have been written.
+  - Fix: the fence also compares device and inode against the lane and its
+    parents, and the price capture imports it instead of keeping a copy.
+  - Tests: six new fence tests failed on the old code, each stopping at a
+    sentinel ("identity reached", "real lane inputs opened"). Both halves of
+    the identity check are each caught by a mutant. A string-level change for
+    `/` was reverted as redundant: its mutant survived because the identity
+    check already refuses `/`.
+- **`IBPRICE-CR01` (P3, closed in `6605db25`).**
+  - `_Plan` hashed its three inputs in `check()`, then parsed a second read
+    of the plan and completion. Only `_version` equality bound that read, and
+    `_version` omits ctime. An in-place same-size rewrite with restored mtime,
+    undone before the final check, would have been parsed.
+  - Fix: parse exactly the hashed bytes.
+  - The test failed on the old code ("substituted plan parsed"), and its
+    mutant is caught. The scope was already consumed, so there was no effect
+    on the run.
+- **`IBORIG-TEST01` (P3, closed in `fc7f0349`, tests only).** Seven of the
+  twelve parser mutants were killed. Probes classified the five survivors:
+  - O01 (opener accession) and O08 (preamble whitespace) are caught by the
+    PEM envelope and by the date and target checks.
+  - Three were real gaps:
+    - O04: duplicate document sequences were accepted under the mutant.
+    - O10: an unknown header line directly before the first role marker was
+      silently skipped. The existing case has a blank line, which the
+      separator check refuses first.
+    - O12: an `xsl`-prefixed XML filename was accepted.
+  - Each now has a test that fails against its mutant. The parser is the
+    reusable module for the remaining original parents.
+
+### 218.5 Findings recorded, not fixed
+
+These are diagnostics, test gaps in consumed one-shots, or observations.
+
+- **`IBEODDATE-OBS01` (P3).** The last identity check before the EODHD
+  request runs inside the transport's `try`, so a lane refusal there is
+  recorded as `transport-error`, with the transport count at 1. No request
+  is sent. Consumed.
+- **`IBEODDATE-TEST01` (P3).** Untested guards:
+  - mutant survivors E2 (exact URL equality on top of the ordered-parameter
+    check), E3 (response-origin mismatch) and E7 (the in-deadline recheck);
+  - the started and credential-read journal contents;
+  - the `..`/absolute path guards in the identity check.
+- **`IBPRICE-OBS01` (P3).** Survivors P7 (the `test-api-key` refusal), P8
+  (production refusing a fixture credential) and P9 (an identity change
+  while the plan loads) are untested. P3 is redundant: the row unpack and the
+  fixed-width regexes refuse first.
+- **`IBDELIST-OBS01` (P3, partially correct).** A row with a valid numeric
+  lexeme and an invalid date counts toward `numeric_values_validated`, but its
+  status is the invalid-date bucket. These are two different measures, and no
+  consumer assumes they are equal. Survivors D1 (the regex already excludes
+  negatives and non-finite values) and D4 (four case labels) are redundant.
+  The bare `Decimal(value)` on a regex-validated lexeme is correct; it is a
+  rule-wording difference only, and the decimal guard passes.
+- **`IBRETAIN-OBS01` (P3).** Survivors R2, R3 and R6 are untested: the
+  consistency of row reasons with scope, period and status. R5 is redundant
+  under the metadata pin.
+- **`IBSHAR-OBS04` (P3).** All of the following concern namespaces that are
+  now consumed:
+  - The transport's final and catalogue predecessor rechecks are untested.
+  - The audit ID is checked only by its regex, so a mode would have accepted
+    a predecessor's ID.
+  - The `--verify-final`, `--verify-catalogue` and `--verify-actions`
+    switches have no dispatch test.
+  - A malformed fixture predecessor escapes as `IndexError`.
+- **`IBORIG-OBS01` (P3).** The admission consumer records every parser
+  refusal as `early_original_parser_refused`, discarding the parser's fixed
+  code. The actual run had zero parser quarantines. Keep typed refusal counts
+  before applying the consumer to the remaining parents.
+- **`IBORIG-OBS02` (P3).** Several runner guards were exercised only by the
+  actual run, because `_PinnedEvidence` has no fixture seam:
+  - the 64-control inventory;
+  - the unchanged header-quarantine requirement;
+  - capture and baseline lineage equality;
+  - the worker's evidence-equals-parent check;
+  - double-composition equality.
+
+### 218.6 Validation
+
+- **Pushed `c43fb081`**, default pytest temp, network and Keychain exec
+  denied:
+  - The eight changed test files other than EODHD, plus the Keychain reader
+    tests, under the Keychain probe: **699 passed, 1 skipped**. The probe
+    logged no exec.
+  - EODHD: **92 passed** with native Keychain-exec denial. Under the Python
+    probe, 41 tests failed: the module's fixture guard runs `security -h` and
+    requires the native EPERM, and the probe refuses without an errno.
+  - The skipped earnings topology test, from an unsandboxed parent with a
+    socket-refusing audit hook (it applies its own `sandbox-exec`):
+    **1 passed**. It uses invented code and `tmp_path` roots only.
+  - Guards and record tests: **179 passed, 2 failed**. The failures are the
+    two SEP-2 guards that `IBSH-CR02` records; the undeclared roots are
+    unchanged.
+- **Final tree:**
+  - Probe run: **705 passed, 1 skipped**, no exec.
+  - EODHD: **93 passed**.
+  - Topology: **1 passed**.
+  - Guards: **107 passed, 2 failed** (the same two).
+  - The corrected modules' files plus the lane import boundary:
+    **717 passed**.
+- **Mutation:**
+  - EODHD: 5 of 8 killed.
+  - Price capture: 5 of 9.
+  - Delisting: 4 of 6.
+  - Earnings supplement: 2 of 6.
+  - Parser: 7 of 12, then 3 more after `fc7f0349`.
+  - The two fixes: 3 of 4 (the fourth is the reverted redundant change).
+- **Compile and diff.** All six changed files compile in memory, and
+  `git diff --check` is clean. No bytecode was written.
+- **Record checks** (record, active documents, lane boundary, EXACT package
+  guard) after this section: **124 passed**, network denied.
+- **Complete suite:** not run, by the owner's standing instruction.
+
+### 218.7 Retained P0-P3 finding ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IBSHAR-CR03 | P3 | **CLOSED in `6605db25`** | `5c29b437` (Claude), `464fe148`, `ed7fbb05` | Fixture fence, three modules | A firmlink spelling of the lane, or `/`, passed; reads only. | 218.4. | Fences must compare identity. | Device/inode check; one shared fence. | 6 red before; 2 mutants caught. |
+| IBPRICE-CR01 | P3 | **CLOSED in `6605db25`** | `464fe148` | Price capture `_Plan` | Parsed an unhashed re-read. | 218.4. | Receipts must bind parsed inputs. | Parse the hashed bytes. | Red before; mutant caught. |
+| IBORIG-TEST01 | P3 | **CLOSED in `fc7f0349`** (tests) | `ed7fbb05` | Original-parent parser | Three grammar guards removable with tests green. | Mutants O04, O10, O12. | Reusable parser. | Three tests. | All three caught. |
+| IBREC-CCR20101, IBREC-CCR20102 | P3 | **Accepted against Claude** | `8f6ee687` | Section 201 | Overbroad retention and custody wording. | 202.2; code at `_exclusive_body`. | Record accuracy. | 202.2. | Code read. |
+| IBEODDATE-OBS01, IBEODDATE-TEST01, IBPRICE-OBS01, IBDELIST-OBS01, IBRETAIN-OBS01, IBSHAR-OBS04, IBORIG-OBS01, IBORIG-OBS02 | P3 | **Recorded** | range | various | 218.5. | Agents and mutants, checked. | Consumed one-shots, diagnostics, test gaps. | None; carry into successors. | None. |
+| Codex's findings of 202-217 (IBSHAR-CCR20301, IBSHAR-ACTIONS-01, IBRETAIN-21201, IBPRICE-21201/21202, IBPUB-21201, IBORIG-21401 to 21404, IBEODDATE-21501) | as recorded | **Accepted at Codex's stated scopes** | range | range | Unchanged. | Sections 205-215. | Checked against the code where reviewed. | Codex's. | Tests pass. |
+| IB1C-REAL-CR01, IB1BCAMP-CR01, IBSRC-CR01, IBSRC-CCR01 | P2 | **OPEN, retained** | earlier | Sections 119-217 | Unchanged; 216.3 lists the missing inputs. | 152.1, 154.6, 216.3. | All fail closed. | None. | None new. |
+| IBSH-CR02, IBQC-SHARED-META01 | P2, shared/out of lane | **OPEN, retained** | earlier | Shared manifest; shared QC client | Unchanged. | 190.3, 194.5. | Out of lane. | None here. | Two guards fail on 3.13. |
+| Every earlier entry | as recorded | **Retained as recorded** | earlier | earlier | Unchanged. | Sections 1-217. | Unchanged. | None. | None new. |
+
+There is no open P0 or P1 finding. Six P2 findings remain open; all fail
+closed.
+
+### 218.8 Next action
+
+Codex counter-reviews this section, `6605db25` and `fc7f0349`. The QC hold
+stays in force. The lane is not backtest-ready: the missing inputs in 216.3
+remain, namely:
+- the January 2006 and August 2018 earnings exports;
+- the remaining original parents;
+- qualified full price, delisting and identity history.
+
+No looks, jobs or backtests (0/0/0), and no capital, order or trading
+authority.

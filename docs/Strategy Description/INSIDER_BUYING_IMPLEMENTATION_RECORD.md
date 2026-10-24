@@ -30018,3 +30018,265 @@ own real evidence. Six carried P2s stay OPEN; two metadata-compatibility P2s
 are CLOSED only as209 states. All prior P3/observation/resolution scopes and
 both final non-retroactive access classifications persist. No QC until
 explicit owner release; no funded/paper/live/capital/real-order authority.
+
+## 212. Owner-authorized retained-earnings and Sharadar coverage qualification (2026-10-24; preregistration)
+
+### 212.1 Latest direction, exact base and scope separation
+
+The owner's latest explicit direction is: "Proceed with qualifying Sharadar
+price/delisting coverage and the two retained earnings windows. No QC access
+yet. continue to build until the lane is fully ready for backtesting.
+Document the results and push once when done." This reactivates continuous
+local/source engineering without a new Claude wait or routine checkpoint
+approval. It does NOT release QC, grant funded/paper/live/order authority,
+repair unavailable evidence by assertion or allow repeated consumed requests.
+
+Starting clean exact local HEAD and matching-lane-only fetched origin are
+`9ce3d5bbae3db9a6354998e0226835c98a429434`; no incoming commit or dirt.
+All commands/edits/tests/commits/push remain in the designated absolute
+Insider worktree on codex/strategy-insider-buying. The last round's actual
+metadata successes209 stand at their exact execution commits; this later
+build is not their independent review or a new TICKERS/ACTIONS request.
+The existing monitor remains PAUSED. Accumulate local commits, a separate
+exact-hash final handoff and exactly ONE final matching-lane push for the
+completed authorized work or concrete factual-blocker disposition; do not
+publish an interim readiness claim.
+
+Work is separated into two OFFLINE actual-input qualifications and ONE
+bounded prospective online price-METADATA scope. The offline inputs are
+owner-supplied/retained bytes, not new licensed-row requests. Structural
+earnings parsing discards numeric lexemes; delisting-action semantics may
+validate narrowly named consideration/unit fields with Decimal, but no
+stock-price numeric values, event/return alignment, tuning or outcome look
+is performed. The prospective stock request selects only ticker/date/
+lastupdated. It cannot establish complete SEP price quality or replace a
+separately defined full-price capture/adjustment/terminal-return protocol.
+
+### 212.2 Exactly two retained earnings windows: new additive offline epoch
+
+Implement research/insider_buying_retained_earnings_supplement.py and its
+new focused tests. Fixed fresh output parent earnings_retained_supplement_v1,
+auditID `ib-earnings-retained-supplement-201902-202002-20261024-once`.
+No old campaign, start, scope, witness, body, metadata, completion or
+assessment is written, reset, resumed, resealed or reinterpreted as producer
+success. The old assessment's FOUR unavailable windows remain its historical
+result; any later supplement has its own source epoch/time and limitations.
+
+| Window / original campaign | Fixed retained response | Fixed retained metadata | Fixed original start |
+|---|---|---|---|
+| 2019-02-01..2019-02-28; continuation3/campaigns/ib-eodhd-campaign-continuation3-201809-202607-20261013-once | window-0005-response.json;3373434 bytes;8a3f15c766d83769a6da62cddbf38755fb3bfcf2e2414a16e2a0f8d758c88d5d | window-0005-metadata.json;4488962 bytes;01b0c3cc5217e88630f8049808ae29e06f412e4ed7f085b26496f20ebd3e4c5e | window-0005-started.json;357 bytes;5cdc509c2fb977b79e9b251dfc9fcd3aa645f2b61903d8f86f9898e9b131c47d |
+| 2020-02-01..2020-02-29; continuation4/campaigns/ib-eodhd-campaign-continuation4-201903-202607-20261014-once | window-0011-response.json;3494159 bytes;329ebf5ef942f52a9a715d77d0a1b8fec5f26a651e0becba0d5afe86319677f8 | window-0011-metadata.json;4640120 bytes;be2b411c72646a7918453ab935ec37347671788fe5f7c64513856a1940f1fdf3 | window-0011-started.json;358 bytes;d3bfb23735f2dc0ebf3ff212db9a02e88b349ce5f0ed076711653b1b87094bbd |
+
+All table paths are under the existing artifacts/insider_buying/eodhd_earnings_
+prefixes; the exact code pins spell out the directories, not a guessed name
+derived from a witness. Bind independent v3 witness61d8c42efd26dbc04626cbe4eaeb599437dd496dec21827d5d38a24b66f32fa1
+and v4 witnessdfcb8c2872e729e19de3a1b2c6dbc01e4ddb3c185c8fb51c52572a58a6021f02,
+all24/49 closed source leaves,6/12 consumed scope reservations and shared
+campaign locks with no-follow private custody and before/after hash/version/
+inventory checks. Bind the original dual-partial assessment completion
+273898 bytes/8a67f1d629bf1e354e8f8ade8d71cd6a00f98cc66935bdc12f3d1917ae2419b5.
+
+Reproject only the two pinned raw JSON bodies with their genuine v3/v4
+structural projectors, token=None and opaque numeric markers; compare exact
+canonical rows/body hash/schema against retained metadata. Preserve every
+source ordinal/quarantine, missing timing/current-status uncertainty and
+duplicate/revision ambiguity. Independently validate accounting; do not
+construct a fake ProviderMetadataResponse or producer HTTP200/count receipt.
+The new report must explicitly retain original producer_http_statusnull,
+window_seal_presentfalse and aggregate_completion_presentfalse. New offline
+qualification time is not historical availability, producer transport proof,
+source authenticity, identity/PIT, applicable rights or backtest readiness.
+Raw JSON is structurally decoded; financial numeric VALUES are not interpreted.
+Publish private additive metadata, not paid rows/numbers in Git or chat.
+
+### 212.3 Existing Sharadar delisting inventory and deterministic price probe
+
+Implement research/insider_buying_sharadar_delisting_qualification.py and
+focused tests as a separately versioned OFFLINE observer. Fixed fresh parent
+sharadar_delisting_qualification_v1, auditID
+`ib-sharadar-delisting-qualification-20261024-once`. Reuse the exact recovered
+capture path already bound by the cohort observer and manifest SHA256
+94251ffdf0529b118ff331b98c4a144d97bc734380d7e7333f94045e4aa6f09b;
+do not follow an obsolete missing supplied path or another checkout.
+Independently bind ZIP/member bytes, CRC/header/row accounting and held
+no-follow ancestry/leaves/shared locks. TICKERS/ACTIONS only: no fundamentals
+decoding and no new reference API request. All rows and unsupported action
+types remain accounted rather than silently excluded.
+
+Assess listing/delisting and named cash/stock/election/classification/venue
+action semantics without constructing an investment payoff. Preserve missing
+consideration, mutually exclusive elections, unknown counterparty identity,
+unknown source availability and excluded contingent-value rights. Current
+provider dates/aliases/classifications are discovery evidence, not original
+listing/publication/PIT identity or complete terminal return proof. Relevant
+public sources are [stocks](https://sharadar.com/docs/stocks),
+[ACTIONS](https://sharadar.com/docs/actions),
+[FAQs](https://sharadar.com/docs/faqs) and
+[terms](https://sharadar.com/terms), freshly inspected2026-10-24.
+
+The private offline result also freezes a deterministic price-metadata probe
+plan BEFORE provider contact: choose earliest lexicographically ordered
+eligible provider-stock rows whose firstpricedate<=2006-01-01 in the named
+active-common, delisted-common, secondary-common and independently evidenced
+reuse-related categories; deduplicate at most SIX exact current provider
+symbols. Missing/ambiguous categories stay explicitly missing, not invented.
+Selection is by metadata, NEVER prices, returns, future strategy success or
+an assertion of historical eligibility. Current provider rewired symbols
+are not a security-master crosswalk. Price-date metadata is not an IPO date.
+
+Prospective new research/insider_buying_sharadar_price_coverage_capture.py
+and tests reserve ONE combined CSV GET to the fixed direct API stocks path:
+format=csv, ticker=the exact frozen sorted plan symbols, from2005-01-01,
+to2026-06-30, fields=ticker,date,lastupdated, sort=date.asc, limit100000.
+This is a declared finite coverage probe, NOT whole-table pagination or a
+replacement for253 verified pre-entry listed sessions. Maximum ONE dispatch,
+ONE configured Sharadar Keychain read,15s/8MiB, TLS verified, no proxies/
+redirect/retry/paging/fallback. Deny duplicate/ambiguous HTTP framing and
+truncate/refuse at the row bound. Strict exact CSV columns/symbol/date/order/
+duplicate/resource rules and bounded credential-echo screening precede raw
+retention/hash. Retain zero-row symbols/refusal explicitly, never call empty
+coverage complete or drop delisted failures.
+
+Online fixed fresh parent sharadar_price_coverage_v1, auditID
+`ib-sharadar-price-metadata-coverage-20261024-once`. Actual activation waits
+for the offline plan/completion to EXIST, independently verified exact hashes
+and closed custody, a clean committed complete source image, meaningful
+focused guard/mutation proof, and a subsequent append-only entry pinning
+the exact actual plan/request. No live request has occurred at this entry.
+No unbounded stock archive, bulk redirect, presign/download or price-value
+request is authorized by this probe. A full capture is a later specifically
+bounded stage if actual data/rights facts permit, not implicit curl-L.
+
+### 212.4 Isolation, rights, current blockers and continuous-build boundary
+
+Each actual OFFLINE worker must observe effective process-tree network/fork/
+Keychain-exec denial and all writes denied except its exclusive fresh output,
+including real denied-network/fork/outside-write probes, minimal env-i,
+isolated interpreter/empty bytecode-prefix and exact current+committed source
+closure. Parent rechecks clean exact lane identity and independently validates
+publication/input custody after worker exit. Tests use invented outside-lane
+inputs and effective process-tree network/Keychain-exec denial, never real
+credentials or source scopes. No complete lane/repository suite. Final checks
+include focused regressions, active-document/record/import/compilation/diff/
+status and EXACT Insider package guard. All readiness flags remain false and
+looks/jobs/backtests0/0/0; no event/outcome alignment is preregistered here.
+
+Personal local research is the intended use. Current direct Sharadar terms
+limit use to individuals, restrict onward data sharing and disclosure of
+usability evaluations, and require source-copy deletion after termination;
+keep raw/derived source rows and detailed supplier-quality conclusions in
+private ignored artifacts, not Git/public release. Do not infer commercial,
+organizational, Nasdaq-license or QC-upload permission. Report custody hashes
+and bounded engineering behavior in the lane record; no key or signed URL.
+No vendor term or account entitlement is manufactured by owner delegation.
+
+Two narrowly scoped connected-inbox searches for new supplier archive/export/
+rights correspondence AFTER2026-10-21 returned no messages/no further pages
+(EODHD separately; Sharadar/FMP/Massive separately). No attachment/body/key
+was opened, no email/draft was sent/changed. This does not prove no account
+or archive exists elsewhere. January2006/August2018 missing bodies remain
+separate factual inputs; do not repeat/decompose consumed API intervals.
+Both LOCAL diagnostics retain167's truthful current-version/interval policy;
+no historical forecast/revision archive or EODHD QC-upload gate is reinstated.
+
+Continue useful authorized local/source engineering after these qualifications
+while factual gates permit; no routine next-checkpoint/Claude approval is
+requested. Actual source/identity/rights gaps and the explicit QC hold cannot
+be solved by tests or relabeling a fixture as production. Preserve frozen
+82 quarters/economics, both final access classifications, six carried P2s,
+strictD23/seven nonexact quarters/no promotion digest and stoppedv3's unresolved
+1846/1847. No frozen-source thaw, repeated completed/ambiguous request,
+SDK draft activation, shared remediation, QC access, registered/outcome look,
+backtest, scheduler/operator-database/broker/deployment/capital/funded/paper/
+live/order/trading action. Implementation hashes/validation and actual
+results follow only after they exist, not prewritten success.
+
+### 212.5 Pre-activation findings and source-image qualification
+
+These are verified defects/risks in the NEW unexecuted candidate, not new
+explanations for old failed roots. No actual scope was consumed while fixing
+them. Six carried P2s and every earlier scoped resolution remain unchanged.
+
+| Finding | Scope / correction / proof |
+|---|---|
+| IBRETAIN-21201 / P2 | Main found parent verification called the raw structural projector outside the denied worker. Split retained-metadata validation from raw reprojection: trusted parent hashes original bodies only, worker independently probes native denial before raw reads. A faithful parent-decode reversal trips the new spy; source-hash disagreement still refuses. No actual raw decode or credential leak occurred before correction. |
+| IBPRICE-21201 / P2 | Main found price capture allowed only16MiB for a complete private action ledger whose producer permits512MiB. Align the qualification cap and stream/hash those bytes without decoding/materializing its action rows; CSV stays8MiB. An invented report over the old cap and faithful old-cap reversal fail before correction. Mutation/truncation/inode controls preserve custody. |
+| IBPRICE-21202 / P2 | Main and advisory QA independently found the producer's new effective_keychain_exec_denial field missing from the consumer's exact schema. Align the exact producer/consumer shape and require the observed control; false/missing controls refuse. Strict schemas are not weakened to arbitrary extra fields. |
+| IBPUB-21201 / P2, prospective mechanism | New-output readers initially reused strict ctime holds, reintroducing the established fresh-file macOS UF_TRACKED late-refusal mechanism; earnings readback also lacked a final all-leaf content rehash. Use the EXISTING explicit settled-ctime publication hold ONLY for the NEW generated outputs, retaining owner/device/inode/mode/link/size/mtime, ancestry/inventory and exact content rehash. Old raw source/campaign intake remains strict. A changed-output-during-readback test genuinely failed before correction; content/identity/mode/mtime negatives remain, benign output-ctime-only change is distinguished from strict source-ctime change. No historical failure's cause is established by these new tests. |
+
+Both new offline worker launchers use explicit-I/-S/-B and an empty bytecode
+prefix, exact lane cwd/bootstrap and minimal env-i. Native isolation and
+interpreter-envelope guards precede actual input interpretation; no ambient
+user/global site hooks supply unbound code. The output-only ctime policy
+neither alters the four frozen v3 sources nor authenticates an input by
+changing its trust_scope. Source current+Git byte hashes remain binding.
+
+Earnings agent's final overlapping selection:202 passed/1 intentional native
+topology skip6.19s; separate INITIAL-profile invented native isolation and
+source-only-I/-S/-B import/compile passed0.172s. macOS refuses installing a
+second Seatbelt profile inside an existing one; the skipped topology wrapper
+is not a failed semantic test or evidence that actual native isolation ran.
+The separately observed initial-profile probe denied network/fork/Keychain
+exec/outside writes and allowed its fresh output. Four faithful reversals
+caught raw/metadata equality (2 reds), parent raw decode (1), producer/authority
+claims (6) and typed ordinals (1), then10 restored controls passed0.90s.
+The two added site/interpreter reversals caught1+5 reds with7 restored greens.
+Publication mutation first failed1.30s; final-rehash/ctime reversals caught
+one each, with2 restored greens0.23s. No on-disk source reversal, actual
+input, provider or credential was used by these invented controls.
+
+Price agent's final overlapping selection:109 passed1.88s including EXACT
+package guard, native process-tree network/Keychain-exec/repository-write
+denial. Eight final-tree memory-only reversals were caught: credential echo
+(3 failures), inclusive row limit (1), date order (1/14 passes), duplicate
+date (1/14), exact request profile (3/31), pre-opener custody (1/4), non200
+no-read (5/1), old qualification cap (1). Callables finally restored; no
+actual input/credential/provider/QC. Source images compiled in memory.
+Finite ordered unavailable-case complements and exact typed count/archive/
+plan bindings are checked, not merely caller assertions.
+
+Main final combined selection, latest delisting-output controls, exact
+source/test hashes and actual operation results follow after observed. Do
+not sum overlapping test selections or claim an independent Claude review.
+Production price pins remain UNBOUND at this checkpoint and refuse before
+identity/credential/dispatch. The offline actual qualifications are still
+prospective until clean committed preflight and execution are observed.
+
+Main's first nine-path selection observed490 passed/1 failed/1 intentional
+native-topology skip10.12s. The failure was the valid lane boundary scan:
+one new fixture-refusal test lacked an explicit opener tripwire even though
+its earlier refusal and native denial prevented access. Main added the
+must-not-open connection patch; the exact behavioral+boundary pair then
+passed2 in1.63s. No production source or acquisition behavior was changed
+to make that guard green. The subsequent FINAL ten-path selection, including
+all three new test files, old archive observer/pure contracts, Keychain,
+record/active-document/lane-import and EXACT Insider guard, passed536 with
+1 intentional topology skip in10.23s, no warnings. No complete suite.
+
+Final delisting-agent overlap:46 passed0.47s including EXACT; additional
+memory-only new-publication reversals caught strict-output-ctime(1 red),
+weakened-source-ctime(1), removed continuous content rehash(1), suppressed
+held identity(3), with finally-restored callables. Old source inputs still
+reject ctime changes; new outputs distinguish ctime-only settling from
+actual content/inode/mode/mtime mutation. These tests did not read the actual
+capture. All SIX new Python images independently compiled in memory under
+native network/fork/all-write/Keychain-exec denial; all three sources imported
+with-I/-S/-B/empty cache and no site packages. Diff clean; four v3 sources
+still byte-equal to historicalaa0d635d. Current storage has about80GB free;
+existing minimum disk guards remain, no estimate proves a full corpus fits.
+
+| New image | Pre-activation SHA256 |
+|---|---|
+| research/insider_buying_retained_earnings_supplement.py | 540c6dec23e1a4cc692893ae08c484cf0e2873876ac4853e529418b15d745b23 |
+| tests/test_insider_buying_retained_earnings_supplement.py | 5fed0917546f773ed7569b0af01204ad354a1edc9a2a05718a859bf74e183ee9 |
+| research/insider_buying_sharadar_delisting_qualification.py | 6ded02b4686cb043f34d301da9ae2da9c1797ab8cde1d2de0afde987c5b40cdb |
+| tests/test_insider_buying_sharadar_delisting_qualification.py | 2fb3450ac9e81d94d7968746ccbba9b35a03aa92042fdaabb1e353e9651e2bef |
+| research/insider_buying_sharadar_price_coverage_capture.py; still disabled/unbound | 17067ab564541e79e1e859263d2b2f2d03799836d47c03218e78d0601621d846 |
+| tests/test_insider_buying_sharadar_price_coverage_capture.py; includes main's tripwire | 7dbe123528b203eedfbf5c656bea758f92f43035d3400216e074782ff1468bc0 |
+
+This is the complete candidate preflight, not observed source qualification.
+Reverify root/branch/exact9ce3d5bb/expected seven paths and matching-only
+remote before committing, then invoke ONLY the two offline actual scopes
+from their resulting clean already-committed HEAD. No tracked writes while
+an actual operation runs. Bind the resulting real plan before any online
+price-metadata activation; no interim push or new Claude wait.

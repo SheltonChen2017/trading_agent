@@ -29554,3 +29554,86 @@ failures; default-v3 leakage2; skipped v3 custody rechecks3; descriptor
 allowlist bypass1. No on-disk reversal. One earlier test-only assertion
 mistook the fixed unknown_field_count key for a leaked quoted scalar;
 the corrected precise scalar assertion, not production code, is in this tree.
+
+## 207. One extra descriptor field: preserved refusal and new public-client evidence (2026-10-24)
+
+206's final candidate/preregistration exists as clean already-committed
+`9fa883808f9d9d5b0f8b6a55fa226a80e3a5c627`. Its one actual TICKERS request
+returned HTTP200 and `source_file_schema_refused`, zero accepted metadata,
+then stopped without ACTIONS, exit2, complete at
+`2026-10-24T19:58:26.330764Z`. The deep safe shape now establishes all seven
+known descriptor field types, canonical TICKERS filename, full history/label,
+available=true, and EXACTLY ONE additional unknown descriptor field. Its name
+and value were NOT captured. Neither missing optional bookkeeping nor a bad
+key/subscription is thereby established as the cause. The new observation
+narrows the issue to an extra field, not arbitrary schema acceptance.
+
+V4 complete.json9759 bytes/SHA256
+`d29b614ca4b0a72c52f68c3d26aa52904fce8520a1e380dd4e8398e608912001`;
+scope SHA256
+`54a70900190a1d236dce0755febd41c1402dfe831294e56694d17fc54c268c63`;
+seven-source inventory
+`8ed588b9297d603a9aeb7194264ca0d38f534db3c24c94bf7dc6b1a89189b4a6`.
+Independent denied-network/fork/write/Keychain-exec metadata readback checked
+its closed private journal and unchanged preceding custody. All four failed
+roots stay consumed and immutable; no old namespace is resumed or rewritten.
+
+After this refusal, new PUBLIC evidence was investigated without any account,
+token or API-data request. The current official
+[documentation client](https://sharadar.com/_next/static/chunks/pages/docs/%5BpageKey%5D-f219048c7886d7c1.js)
+is110476 bytes, SHA256
+`a51d274541206ebf67694780fc3307db819ae3e2e217b0637e210611b8901fe0`.
+Main and internal read-only investigation independently observed its bulk
+catalogue using `key` as a storage lookup and `canDownload` as a boolean
+permission flag. Code was read as untrusted public source, NOT executed;
+no presign/download route or its credentials were invoked. A public static
+asset request without browser User-Agent returned403; public Mozilla-header
+reads succeeded. Those public HTML/JS reads are not account/provider-data
+attempts. The app describes a related catalogue, NOT the status parser:
+neither field is asserted to be the actual unknown field before verification.
+
+Delegated decision under the continuing owner instruction to get access
+working: this newly evidenced finite vocabulary justifies a separately
+registered compatibility candidate, not an automatic retry authorized by206.
+206's exhausted scope is preserved. No new owner subscription/rights decision
+is invented and no arbitrary unknown field is ignored. Add only `key` and
+`canDownload` as optional fields for TICKERS/ACTIONS descriptors in a new
+explicit catalogue mode; all older modes' contracts remain unchanged.
+
+When present, key MUST be a1..512-character relative storage path from
+`[A-Za-z0-9_./-]`, without empty/dot/dotdot segments, URL/query/percent/colon
+syntax, and equal to or ending in the exact canonical table filename.
+It is checked only after full-body credential screening, never returned in
+the projection, printed, followed or presigned. canDownload MUST be an actual
+bool; when present it remains a provider-reported flag, not independent
+rights/entitlement evidence. Core metadata/UTC/size and the finite optional
+snapshot fields retain their preceding strict checks. Other extras refuse.
+
+Register ONE new metadata-only catalogue verification:
+schema `insider-sharadar-reference-status-catalogue-v5`, private fixed sibling
+`artifacts/insider_buying/sharadar_reference_catalogue_v5/`, auditID
+`ib-sharadar-reference-20261024-public-catalogue-v5-once`, selected only by
+--verify-catalogue. Bind all FOUR preceding actual completions/reservations,
+closed inventories/hashes/custody identities before credential read, at all
+checkpoints and immediately before dispatch. Require its clean already-
+committed exact source image. ONE Keychain read, at most one TICKERS status
+GET then one ACTIONS full-history status GET, stop at any refusal; same fixed
+URLs/header/TLS/time/body bounds. No row/ZIP/price/fundamental/outcome/QC or
+purchase. No fallback or automatic further scope. An unresolved new format
+after this candidate is reported honestly, not weakened into acceptance.
+
+Two new invented cases first proved v4's actual extra-field schema refusal
+and failed the missing explicit catalogue contract (2 failed0.73s). Internal
+205-new/112-original focused selection317 passed4.40s after five caught
+memory-only reversals: storage-path guard21 failures, download-bool guard5,
+v4 leakage2, skipped v4 custody rechecks3, reused v4 namespace2. Finally-
+restored module attributes, no on-disk reversal or real acquisition. Actual
+verification, final main counts and coverage-audit findings follow when
+observed; fixtures do not identify the supplier's eighth field.
+
+Pre-activation main validation:499 passed10.04s on the same seven focused
+paths under native network/Keychain-exec/repository-write denial, no full
+suite. Two changed Python images compiled in memory; diff check clean.
+Adapter SHA256 `6818c3ca6c67e16377bf8f33d765fd12fdf472df67d8293cfd35377851dda3a2`;
+test SHA256 `3be45643a0054daba63ee8ac223ad369537247b6fc6f8cb0beca2564d70850c0`.
+No actual catalogue-mode request has occurred at this preregistration point.

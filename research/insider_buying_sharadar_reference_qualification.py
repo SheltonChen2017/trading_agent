@@ -27,6 +27,11 @@ fourth fixed scope: the four core snapshot fields remain mandatory, and
 each of the three known ancillary fields is optional but strictly checked
 when present. No absent history or availability is synthesized. Earlier
 modes retain their preceding contracts; all consumed publications are pinned.
+The separately registered --verify-catalogue scope additionally validates
+only the official public bulk client's key/canDownload fields. A key must
+be a safe relative lookup path ending in the canonical filename, never a
+URL or API credential, and is never emitted by the projection. No presign,
+download or arbitrary-extra-field acceptance exists.
 """
 from __future__ import annotations
 
@@ -71,6 +76,10 @@ FINAL_ARTIFACT_PARTS = ("artifacts", "insider_buying", "sharadar_reference_final
 FINAL_SCHEMA = "insider-sharadar-reference-status-final-v4"
 CORRECTION_COMPLETE_SHA = "bec43f96fc970f135339cd70d749bff163b1493a3d8f34e1108397ff0fe5eab1"
 CORRECTION_SCOPE_SHA = "2fd418c8603c7cbe1b1e16980acd60ef575128e2bdfbb974e2b9f4812064fa69"
+CATALOGUE_ARTIFACT_PARTS = ("artifacts", "insider_buying", "sharadar_reference_catalogue_v5")
+CATALOGUE_SCHEMA = "insider-sharadar-reference-status-catalogue-v5"
+FINAL_COMPLETE_SHA = "d29b614ca4b0a72c52f68c3d26aa52904fce8520a1e380dd4e8398e608912001"
+FINAL_SCOPE_SHA = "54a70900190a1d236dce0755febd41c1402dfe831294e56694d17fc54c268c63"
 PROFILES = MappingProxyType({
     "tickers": ("sharadar-tickers-current-reference-file-status-v1",
                 "https://api.sharadar.com/v1.0/data/tickers?status=True"),
@@ -146,13 +155,14 @@ def _identity(expected_head: str, *, root: Path = LANE_ROOT) -> dict:
 
 
 def _mkdir_chain(root: Path, *, create: bool = True, diagnostic: bool = False,
-                 correction: bool = False, final: bool = False) -> int:
+                 correction: bool = False, final: bool = False, catalogue: bool = False) -> int:
     _require(type(diagnostic) is bool, "diagnostic_mode_refused")
     _require(type(correction) is bool and (not correction or diagnostic), "correction_mode_refused")
     _require(type(final) is bool and (not final or correction), "final_mode_refused")
+    _require(type(catalogue) is bool and (not catalogue or final), "catalogue_mode_refused")
     descriptor = os.open(root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
     try:
-        parts = FINAL_ARTIFACT_PARTS if final else CORRECTION_ARTIFACT_PARTS if correction else DIAGNOSTIC_ARTIFACT_PARTS if diagnostic else ARTIFACT_PARTS
+        parts = CATALOGUE_ARTIFACT_PARTS if catalogue else FINAL_ARTIFACT_PARTS if final else CORRECTION_ARTIFACT_PARTS if correction else DIAGNOSTIC_ARTIFACT_PARTS if diagnostic else ARTIFACT_PARTS
         for name in parts:
             if create:
                 try:
@@ -174,9 +184,9 @@ def _mkdir_chain(root: Path, *, create: bool = True, diagnostic: bool = False,
 
 def _check_journal(parent: int, directory: int, audit_id: str, latch_sha: str,
                    published: dict[str, str], *, root: Path, diagnostic: bool = False,
-                   correction: bool = False, final: bool = False) -> None:
+                   correction: bool = False, final: bool = False, catalogue: bool = False) -> None:
     def attached():
-        current = _mkdir_chain(root, create=False, diagnostic=diagnostic, correction=correction, final=final)
+        current = _mkdir_chain(root, create=False, diagnostic=diagnostic, correction=correction, final=final, catalogue=catalogue)
         try:
             named_parent, held_parent = os.fstat(current), os.fstat(parent)
             _require((named_parent.st_dev, named_parent.st_ino) == (held_parent.st_dev, held_parent.st_ino)
@@ -358,6 +368,53 @@ def _correction_predecessor(root: Path) -> dict:
             os.close(parent)
 
 
+def _final_predecessor(root: Path) -> dict:
+    """Pin the observed one-extra-field refusal; never reinterpret it as accepted."""
+    parent = directory = None
+    try:
+        parent = _mkdir_chain(root, create=False, diagnostic=True, correction=True, final=True)
+        latch_raw = _read_leaf(parent, "scope-reservation.json", limit=4 * MAX_BODY_BYTES)
+        audit = _json(latch_raw)["audit_id"]
+        _require(type(audit) is str and re.fullmatch(r"ib-sharadar-reference-[a-z0-9-]{1,80}", audit) is not None,
+                 "final_predecessor_custody_refused")
+        directory = os.open(audit, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=parent)
+        raw = _read_leaf(directory, "complete.json", limit=4 * MAX_BODY_BYTES)
+        complete, latch_sha, complete_sha = _json(raw), _sha(latch_raw), _sha(raw)
+        production = root == LANE_ROOT
+        _require(not production or (audit == "ib-sharadar-reference-20261024-final-snapshot-v4-once"
+                 and complete_sha == FINAL_COMPLETE_SHA and latch_sha == FINAL_SCOPE_SHA), "final_predecessor_custody_refused")
+        shape = complete["receipts"][0]["safe_shape"]
+        _require(complete["schema"] == FINAL_SCHEMA and complete["fixture_only"] is (not production)
+                 and complete["audit_id"] == audit and complete["scope_reservation_sha256"] == latch_sha
+                 and complete["disposition"] == "stopped-status-qualification"
+                 and complete["transport_invocation_count"] == 1 and complete["observed_status_metadata_count"] == 0
+                 and complete["receipts"][0]["http_status"] == 200
+                 and complete["receipts"][0]["disposition"] == "source_file_schema_refused"
+                 and complete["receipts"][1]["transport_invocation_count"] == 0
+                 and shape["descriptor_unknown_field_count"] == 1
+                 and shape["descriptor_name_class"] == "tickers"
+                 and complete["predecessor"] == _predecessor(root)
+                 and complete["diagnostic_predecessor"] == _diagnostic_predecessor(root)
+                 and complete["correction_predecessor"] == _correction_predecessor(root), "final_predecessor_custody_refused")
+        published = dict(complete["published_leaf_sha256"])
+        published["complete.json"] = complete_sha
+        _require(set(published) == {"reservation.json", "credential-read-started.json",
+                 "credential-read-completed.json", "01-tickers-started.json", "01-tickers-completed.json",
+                 "complete.json"}, "final_predecessor_custody_refused")
+        _check_journal(parent, directory, audit, latch_sha, published, root=root, diagnostic=True, correction=True, final=True)
+        custody = _custody_identity(parent, directory, published)
+        _check_journal(parent, directory, audit, latch_sha, published, root=root, diagnostic=True, correction=True, final=True)
+        return {"audit_id": audit, "complete_sha256": complete_sha, "scope_reservation_sha256": latch_sha,
+                "published_leaf_sha256": published, "custody_identity": custody}
+    except (OSError, KeyError, TypeError, ValueError, EodhdDemoError):
+        raise SharadarReferenceQualificationError("final_predecessor_custody_refused") from None
+    finally:
+        if directory is not None:
+            os.close(directory)
+        if parent is not None:
+            os.close(parent)
+
+
 def _unique(pairs):
     result = {}
     for key, value in pairs:
@@ -410,10 +467,26 @@ def _screen_credential(raw: bytes, body: dict, credential: KeychainCredential) -
 
 
 def _file_descriptor(row: object, *, actions: bool, full_snapshot: bool = False,
-                     optional_metadata: bool = False) -> dict:
+                     optional_metadata: bool = False, catalogue_fields: bool = False) -> dict:
     _require(type(full_snapshot) is bool, "snapshot_mode_refused")
     _require(type(optional_metadata) is bool and (not optional_metadata or not actions and not full_snapshot),
              "snapshot_mode_refused")
+    _require(type(catalogue_fields) is bool, "catalogue_mode_refused")
+    _require(type(row) is dict, "source_file_schema_refused")
+    download_allowed = None
+    if catalogue_fields:
+        # The official public bulk client treats key as a storage lookup, NOT
+        # an API credential/URL. Never output it or follow/presign anything.
+        if "key" in row:
+            key = row["key"]
+            expected_name = "actions.csv.zip" if actions else "tickers.csv.zip"
+            _require(type(key) is str and re.fullmatch(r"[A-Za-z0-9_./-]{1,512}", key) is not None
+                     and all(part not in {"", ".", ".."} for part in key.split("/"))
+                     and (key == expected_name or key.endswith("/" + expected_name)), "source_storage_key_refused")
+        if "canDownload" in row:
+            _require(type(row["canDownload"]) is bool, "source_download_flag_refused")
+            download_allowed = row["canDownload"]
+        row = {field: value for field, value in row.items() if field not in {"key", "canDownload"}}
     fields = {"name", "size", "sizeLabel", "modified"}
     if actions or full_snapshot:
         fields |= {"history", "historyLabel", "available"}
@@ -448,14 +521,18 @@ def _file_descriptor(row: object, *, actions: bool, full_snapshot: bool = False,
         result.update(history="full", available=row["available"])
     if optional_metadata:
         result.update({field: row[field] for field in ("history", "available") if field in row})
+    if download_allowed is not None:
+        result["canDownload"] = download_allowed
     return result
 
 
 def _projection(table: str, raw: bytes, credential: KeychainCredential, *,
-                wrapped_snapshot: bool = False, optional_snapshot_metadata: bool = False) -> dict:
+                wrapped_snapshot: bool = False, optional_snapshot_metadata: bool = False,
+                catalogue_fields: bool = False) -> dict:
     _require(type(wrapped_snapshot) is bool, "snapshot_mode_refused")
     _require(type(optional_snapshot_metadata) is bool and (not optional_snapshot_metadata or wrapped_snapshot),
              "snapshot_mode_refused")
+    _require(type(catalogue_fields) is bool and (not catalogue_fields or wrapped_snapshot), "catalogue_mode_refused")
     body = _json(raw)
     _screen_credential(raw, body, credential)
     if table == "tickers":
@@ -467,9 +544,10 @@ def _projection(table: str, raw: bytes, credential: KeychainCredential, *,
             # The observed v2 shape establishes the one-file wrapper, not its
             # inner values. These two exact descriptor variants remain strict
             # compatibility candidates until actual prospective verification.
-            full_snapshot = set(row) == {"name", "size", "sizeLabel", "modified", "history", "historyLabel", "available"}
+            descriptor_fields = set(row) - {"key", "canDownload"} if catalogue_fields else set(row)
+            full_snapshot = descriptor_fields == {"name", "size", "sizeLabel", "modified", "history", "historyLabel", "available"}
             descriptor = _file_descriptor(row, actions=False, full_snapshot=full_snapshot and not optional_snapshot_metadata,
-                                          optional_metadata=optional_snapshot_metadata)
+                                          optional_metadata=optional_snapshot_metadata, catalogue_fields=catalogue_fields)
         else:
             _require(set(body) == {"table", "name", "size", "sizeLabel", "modified"}
                      and body["table"] == "tickers" and type(body["table"]) is str,
@@ -479,7 +557,7 @@ def _projection(table: str, raw: bytes, credential: KeychainCredential, *,
         _require(set(body) == {"table", "files"} and body["table"] == "actions"
                  and type(body["table"]) is str and type(body["files"]) is list and len(body["files"]) == 1,
                  "source_envelope_schema_refused")
-        descriptor = _file_descriptor(body["files"][0], actions=True)
+        descriptor = _file_descriptor(body["files"][0], actions=True, catalogue_fields=catalogue_fields)
     return {"table": table, "file": descriptor, "provider_reported_metadata_only": True}
 
 
@@ -550,10 +628,12 @@ def _diagnostic_shape(raw: bytes, credential: KeychainCredential, *, descriptor:
 
 
 def _receipt(table: str, response: object, credential: KeychainCredential, *,
-             diagnostic: bool = False, correction: bool = False, final: bool = False) -> tuple[dict, dict | None]:
+             diagnostic: bool = False, correction: bool = False, final: bool = False,
+             catalogue: bool = False) -> tuple[dict, dict | None]:
     _require(type(diagnostic) is bool, "diagnostic_mode_refused")
     _require(type(correction) is bool and (not correction or diagnostic), "correction_mode_refused")
     _require(type(final) is bool and (not final or correction), "final_mode_refused")
+    _require(type(catalogue) is bool and (not catalogue or final), "catalogue_mode_refused")
     _require(type(response) is ProviderMetadataResponse and type(response.body) is bytes
              and type(response.body_complete) is bool and (response.status is None or
              (type(response.status) is int and 100 <= response.status <= 599))
@@ -575,7 +655,7 @@ def _receipt(table: str, response: object, credential: KeychainCredential, *,
         else:
             try:
                 projection = _projection(table, response.body, credential, wrapped_snapshot=correction,
-                                         optional_snapshot_metadata=final)
+                                         optional_snapshot_metadata=final, catalogue_fields=catalogue)
                 disposition = ("full-history-available-status-observed" if table == "actions" and projection["file"].get("available") is True
                                else "full-history-unavailable-status-observed" if table == "actions"
                                else "current-reference-file-status-observed")
@@ -592,7 +672,9 @@ def _receipt(table: str, response: object, credential: KeychainCredential, *,
         "source_table_rows_requested_or_downloaded": False, "price_or_fundamental_values_evaluated": False,
         **{flag: False for flag in FALSE_FLAGS}}
     if diagnostic:
-        receipt["schema"] = FINAL_SCHEMA if final else CORRECTION_SCHEMA if correction else DIAGNOSTIC_SCHEMA
+        receipt["schema"] = CATALOGUE_SCHEMA if catalogue else FINAL_SCHEMA if final else CORRECTION_SCHEMA if correction else DIAGNOSTIC_SCHEMA
+        if catalogue:
+            receipt["provider_reported_download_allowed"] = None if projection is None else projection["file"].get("canDownload")
         receipt["safe_shape"] = None
         if (not observed and response.status == 200 and response.body_complete
                 and response.disposition is None and len(response.body) <= MAX_BODY_BYTES
@@ -608,18 +690,19 @@ def _receipt(table: str, response: object, credential: KeychainCredential, *,
 def _default_transport(table: str, credential: KeychainCredential, *, expected_head: str, baseline: dict,
                        parent: int, directory: int, audit_id: str, latch_sha: str,
                        published: dict[str, str], diagnostic: bool = False,
-                       correction: bool = False, final: bool = False) -> ProviderMetadataResponse:
+                       correction: bool = False, final: bool = False, catalogue: bool = False) -> ProviderMetadataResponse:
     _require(type(diagnostic) is bool, "diagnostic_mode_refused")
     _require(type(correction) is bool and (not correction or diagnostic), "correction_mode_refused")
     _require(type(final) is bool and (not final or correction), "final_mode_refused")
-    schema = FINAL_SCHEMA if final else CORRECTION_SCHEMA if correction else DIAGNOSTIC_SCHEMA if diagnostic else SCHEMA
+    _require(type(catalogue) is bool and (not catalogue or final), "catalogue_mode_refused")
+    schema = CATALOGUE_SCHEMA if catalogue else FINAL_SCHEMA if final else CORRECTION_SCHEMA if correction else DIAGNOSTIC_SCHEMA if diagnostic else SCHEMA
     owner = DIAGNOSTIC_OWNER_DIRECTION if diagnostic else OWNER_DIRECTION
     _require(type(table) is str and table in PROFILES and type(credential) is KeychainCredential
              and credential.provider == "sharadar" and credential.fixture_only is False,
              "real_transport_profile_refused")
     _require(_identity(expected_head) == baseline, "real_transport_identity_refused")
     _check_journal(parent, directory, audit_id, latch_sha, published, root=LANE_ROOT,
-                   diagnostic=diagnostic, correction=correction, final=final)
+                   diagnostic=diagnostic, correction=correction, final=final, catalogue=catalogue)
     reservation = json.loads(_read_leaf(directory, "reservation.json", limit=4 * MAX_BODY_BYTES))
     ordinal = 1 if table == "tickers" else 2
     start_name = f"{ordinal:02d}-{table}-started.json"
@@ -651,6 +734,8 @@ def _default_transport(table: str, credential: KeychainCredential, *, expected_h
     if final:
         _require(reservation["correction_predecessor"] == _correction_predecessor(LANE_ROOT),
                  "correction_predecessor_custody_refused")
+    if catalogue:
+        _require(reservation["final_predecessor"] == _final_predecessor(LANE_ROOT), "final_predecessor_custody_refused")
     url = PROFILES[table][1]
     opener = request.build_opener(request.ProxyHandler({}), _DenyRedirect(),
                                  request.HTTPSHandler(context=ssl.create_default_context()))
@@ -710,7 +795,8 @@ def _outside_lane(root) -> bool:
 def run_qualification(audit_id: str, expected_head: str, *, root: Path = LANE_ROOT,
                       identity: Callable = _identity, transport: Callable | None = None,
                       credential_reader: Callable | None = None, clock: Callable = _now,
-                      diagnostic: bool = False, correction: bool = False, final: bool = False) -> dict:
+                      diagnostic: bool = False, correction: bool = False, final: bool = False,
+                      catalogue: bool = False) -> dict:
     """Consume both globally fixed scopes once; stop after the first refusal.
 
     No production function parameter chooses providers, URLs, service/account,
@@ -720,7 +806,8 @@ def run_qualification(audit_id: str, expected_head: str, *, root: Path = LANE_RO
     _require(type(diagnostic) is bool, "diagnostic_mode_refused")
     _require(type(correction) is bool and (not correction or diagnostic), "correction_mode_refused")
     _require(type(final) is bool and (not final or correction), "final_mode_refused")
-    schema = FINAL_SCHEMA if final else CORRECTION_SCHEMA if correction else DIAGNOSTIC_SCHEMA if diagnostic else SCHEMA
+    _require(type(catalogue) is bool and (not catalogue or final), "catalogue_mode_refused")
+    schema = CATALOGUE_SCHEMA if catalogue else FINAL_SCHEMA if final else CORRECTION_SCHEMA if correction else DIAGNOSTIC_SCHEMA if diagnostic else SCHEMA
     owner = DIAGNOSTIC_OWNER_DIRECTION if diagnostic else OWNER_DIRECTION
     _require(type(audit_id) is str and re.fullmatch(r"ib-sharadar-reference-[a-z0-9-]{1,80}", audit_id) is not None,
              "audit_id_format_refused")
@@ -738,10 +825,11 @@ def run_qualification(audit_id: str, expected_head: str, *, root: Path = LANE_RO
     predecessor = _predecessor(root) if diagnostic else None
     diagnostic_predecessor = _diagnostic_predecessor(root) if correction else None
     correction_predecessor = _correction_predecessor(root) if final else None
+    final_predecessor = _final_predecessor(root) if catalogue else None
     parent = directory = None
     published = {}
     try:
-        parent = _mkdir_chain(root, diagnostic=diagnostic, correction=correction, final=final)
+        parent = _mkdir_chain(root, diagnostic=diagnostic, correction=correction, final=final, catalogue=catalogue)
         _require(not os.listdir(parent), "existing_completed_or_ambiguous_scope_refused")
         scopes = [{"table": table, "profile": profile, "method": "GET", "url": url, "maximum_attempts": 1}
                   for table, (profile, url) in PROFILES.items()]
@@ -758,8 +846,10 @@ def run_qualification(audit_id: str, expected_head: str, *, root: Path = LANE_RO
                 _require(_diagnostic_predecessor(root) == diagnostic_predecessor, "diagnostic_predecessor_custody_refused")
             if final:
                 _require(_correction_predecessor(root) == correction_predecessor, "correction_predecessor_custody_refused")
+            if catalogue:
+                _require(_final_predecessor(root) == final_predecessor, "final_predecessor_custody_refused")
             _check_journal(parent, directory, audit_id, latch_sha, published, root=root,
-                           diagnostic=diagnostic, correction=correction, final=final)
+                           diagnostic=diagnostic, correction=correction, final=final, catalogue=catalogue)
         def publish(name, value):
             check()
             published[name] = _exclusive_json(directory, name, value)
@@ -772,6 +862,7 @@ def run_qualification(audit_id: str, expected_head: str, *, root: Path = LANE_RO
             **({"predecessor": predecessor} if diagnostic else {}),
             **({"diagnostic_predecessor": diagnostic_predecessor} if correction else {}),
             **({"correction_predecessor": correction_predecessor} if final else {}),
+            **({"final_predecessor": final_predecessor} if catalogue else {}),
             **{flag: False for flag in FALSE_FLAGS}})
         publish("credential-read-started.json", {"schema": schema, "started_at_utc": clock(),
             "reservation_sha256": published["reservation.json"], "maximum_credential_reads": 1})
@@ -816,13 +907,14 @@ def run_qualification(audit_id: str, expected_head: str, *, root: Path = LANE_RO
                 try:
                     response = _default_transport(table, credential, expected_head=expected_head, baseline=baseline,
                         parent=parent, directory=directory, audit_id=audit_id, latch_sha=latch_sha, published=published,
-                        diagnostic=diagnostic, correction=correction, final=final)
+                        diagnostic=diagnostic, correction=correction, final=final, catalogue=catalogue)
                 except SharadarReferenceQualificationError:
                     raise
                 except Exception:
                     response = ProviderMetadataResponse(None, b"", False, "transport-error")
             check()
-            receipt, projection = _receipt(table, response, credential, diagnostic=diagnostic, correction=correction, final=final)
+            receipt, projection = _receipt(table, response, credential, diagnostic=diagnostic,
+                                            correction=correction, final=final, catalogue=catalogue)
             if projection is not None:
                 body_name = f"{ordinal:02d}-{table}-response.json"
                 check()
@@ -839,6 +931,7 @@ def run_qualification(audit_id: str, expected_head: str, *, root: Path = LANE_RO
             **({"predecessor": predecessor} if diagnostic else {}),
             **({"diagnostic_predecessor": diagnostic_predecessor} if correction else {}),
             **({"correction_predecessor": correction_predecessor} if final else {}),
+            **({"final_predecessor": final_predecessor} if catalogue else {}),
             "credential_disposition": credential_disposition, "planned_status_requests": 2,
             "transport_invocation_count": sum(row["transport_invocation_count"] for row in receipts),
             "observed_status_metadata_count": observed, "receipts": receipts,
@@ -871,9 +964,12 @@ def main(argv=None) -> int:
                       help="New fixed strict wrapper-compatibility verification; binds both consumed predecessors")
     mode.add_argument("--verify-final", action="store_true",
                       help="New fixed snapshot-ancillary-metadata verification; preserves all three predecessors")
+    mode.add_argument("--verify-catalogue", action="store_true",
+                      help="New fixed public-catalogue-field verification; preserves all four predecessors")
     args = parser.parse_args(argv)
     try:
-        result = (run_qualification(args.audit_id, args.expected_head, diagnostic=True, correction=True, final=True) if args.verify_final
+        result = (run_qualification(args.audit_id, args.expected_head, diagnostic=True, correction=True, final=True, catalogue=True) if args.verify_catalogue
+                  else run_qualification(args.audit_id, args.expected_head, diagnostic=True, correction=True, final=True) if args.verify_final
                   else run_qualification(args.audit_id, args.expected_head, diagnostic=True, correction=True) if args.verify_correction
                   else run_qualification(args.audit_id, args.expected_head, diagnostic=True) if args.diagnostic
                   else run_qualification(args.audit_id, args.expected_head))

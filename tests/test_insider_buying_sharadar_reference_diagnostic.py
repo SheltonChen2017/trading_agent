@@ -20,6 +20,7 @@ PRIOR_AUDIT = "ib-sharadar-reference-prior-invented"
 AUDIT = "ib-sharadar-reference-diagnostic-invented"
 CORRECTION_AUDIT = "ib-sharadar-reference-correction-invented"
 FINAL_AUDIT = "ib-sharadar-reference-final-invented"
+CATALOGUE_AUDIT = "ib-sharadar-reference-catalogue-invented"
 BASELINE = {
     "root": "invented", "branch": m.LANE_BRANCH, "head": HEAD, "clean": True,
     "source_sha256": {"invented.py": "b" * 64}, "source_inventory_sha256": "c" * 64,
@@ -66,6 +67,21 @@ def test_final_explicit_optional_snapshot_contract(ancillary):
         assert projected["file"][name] == value
 
 
+@pytest.mark.parametrize("catalogue", [{"key": "tickers/tickers.csv.zip"}, {"canDownload": True}])
+def test_catalogue_explicit_known_fields_contract(catalogue):
+    body = optional_tickers(("history", "historyLabel", "available"))
+    body["files"][0].update(catalogue)
+    raw = encode(body)
+    with pytest.raises(m.SharadarReferenceQualificationError, match="source_file_schema_refused"):
+        m._projection("tickers", raw, credential(), wrapped_snapshot=True, optional_snapshot_metadata=True)
+    projected = m._projection("tickers", raw, credential(), wrapped_snapshot=True,
+                              optional_snapshot_metadata=True, catalogue_fields=True)
+    assert projected["file"]["name"] == "tickers.csv.zip"
+    assert "key" not in projected["file"]
+    if "canDownload" in catalogue:
+        assert projected["file"]["canDownload"] is catalogue["canDownload"]
+
+
 def encode(value):
     return json.dumps(value, separators=(",", ":")).encode()
 
@@ -80,14 +96,16 @@ def response(table, *, raw=None, status=200, complete=True, disposition=None):
     return m.ProviderMetadataResponse(status, raw, complete, disposition)
 
 
-def run(root, *, diagnostic=False, correction=False, final=False, audit_id=None, reader=None, transport=None, identity=None):
+def run(root, *, diagnostic=False, correction=False, final=False, catalogue=False, audit_id=None, reader=None, transport=None, identity=None):
     kwargs = {"diagnostic": diagnostic}
     if correction:
         kwargs["correction"] = correction
     if final:
         kwargs["final"] = final
+    if catalogue:
+        kwargs["catalogue"] = catalogue
     return m.run_qualification(
-        audit_id or (FINAL_AUDIT if final else CORRECTION_AUDIT if correction else AUDIT if diagnostic else PRIOR_AUDIT), HEAD, root=root,
+        audit_id or (CATALOGUE_AUDIT if catalogue else FINAL_AUDIT if final else CORRECTION_AUDIT if correction else AUDIT if diagnostic else PRIOR_AUDIT), HEAD, root=root,
         identity=identity or (lambda head, root: dict(BASELINE)),
         credential_reader=reader or (lambda provider: credential()),
         transport=transport or (lambda table, key: response(table)),
@@ -1009,5 +1027,226 @@ def test_final_requires_both_prior_mode_guards_before_identity(tmp_path, diagnos
     calls = []
     with pytest.raises(m.SharadarReferenceQualificationError):
         run(tmp_path, diagnostic=diagnostic, correction=correction, final=True,
+            identity=lambda *args, **kwargs: calls.append("identity"))
+    assert calls == [] and list(tmp_path.iterdir()) == []
+
+
+def catalogue_body(table="tickers", *, key=True, can_download=True):
+    body = optional_tickers(("history", "historyLabel", "available")) if table == "tickers" else json.loads(encode(ACTIONS))
+    row = body["files"][0]
+    if key:
+        row["key"] = "retained/2026/" + row["name"]
+    if can_download is not None:
+        row["canDownload"] = can_download
+    return body
+
+
+def catalogue_projection(table, body):
+    return m._projection(table, encode(body), credential(), wrapped_snapshot=True,
+                         optional_snapshot_metadata=True, catalogue_fields=True)
+
+
+@pytest.mark.parametrize("table", ["tickers", "actions"])
+@pytest.mark.parametrize("fields", [(), ("key",), ("canDownload",), ("key", "canDownload")])
+def test_catalogue_accepts_only_four_combinations_and_omits_storage_key(table, fields):
+    body = catalogue_body(table, key="key" in fields, can_download=False if "canDownload" in fields else None)
+    projected = catalogue_projection(table, body)
+    assert projected["table"] == table
+    assert projected["file"]["name"] == table + ".csv.zip"
+    assert "key" not in projected["file"]
+    assert "retained/2026/" not in json.dumps(projected)
+    assert ("canDownload" in projected["file"]) is ("canDownload" in fields)
+    if "canDownload" in fields:
+        assert projected["file"]["canDownload"] is False
+    if fields:
+        with pytest.raises(m.SharadarReferenceQualificationError, match="source_file_schema_refused"):
+            m._projection(table, encode(body), credential(), wrapped_snapshot=True, optional_snapshot_metadata=True)
+
+
+@pytest.mark.parametrize("key", ["tickers.csv.zip", "a/tickers.csv.zip", "full-history/2026_10/tickers.csv.zip"])
+def test_catalogue_valid_relative_paths_are_checked_not_published(key):
+    body = catalogue_body(can_download=None)
+    body["files"][0]["key"] = key
+    projected = catalogue_projection("tickers", body)
+    assert "key" not in projected["file"]
+
+
+@pytest.mark.parametrize("key", ["", "/tickers.csv.zip", "./tickers.csv.zip", "../tickers.csv.zip",
+                                "a/../tickers.csv.zip", "a/./tickers.csv.zip", "a//tickers.csv.zip",
+                                "a/tickers.csv.zip/", "a/actions.csv.zip", "https://example/tickers.csv.zip",
+                                "a:tickers.csv.zip", "a?x/tickers.csv.zip", "a#x/tickers.csv.zip",
+                                "a%2F/tickers.csv.zip", "a\\tickers.csv.zip", "a space/tickers.csv.zip",
+                                "a" * 513 + "/tickers.csv.zip", None, 1, True, []],
+                         ids=["empty", "absolute", "dot", "dotdot", "embedded-dotdot", "embedded-dot",
+                              "empty-segment", "trailing-slash", "wrong-name", "url", "colon", "query",
+                              "fragment", "percent", "backslash", "space", "too-long", "null", "integer", "bool", "list"])
+def test_catalogue_refuses_unsafe_storage_paths(key):
+    body = catalogue_body(can_download=None)
+    body["files"][0]["key"] = key
+    with pytest.raises(m.SharadarReferenceQualificationError):
+        catalogue_projection("tickers", body)
+
+
+@pytest.mark.parametrize("value", ["true", 1, 0, None, []])
+def test_catalogue_download_availability_is_boolean_not_truthy(value):
+    body = catalogue_body()
+    body["files"][0]["canDownload"] = value
+    with pytest.raises(m.SharadarReferenceQualificationError):
+        catalogue_projection("tickers", body)
+
+
+@pytest.mark.parametrize("table", ["tickers", "actions"])
+def test_catalogue_rejects_other_unknown_fields(table):
+    body = catalogue_body(table)
+    body["files"][0]["downloadUrl"] = "https://example.invalid/private"
+    with pytest.raises(m.SharadarReferenceQualificationError, match="source_file_schema_refused"):
+        catalogue_projection(table, body)
+
+
+@pytest.mark.parametrize("encoded", [False, True])
+def test_catalogue_secret_screen_runs_before_relative_key_validation(encoded):
+    body = catalogue_body(can_download=None)
+    body["files"][0]["key"] = "private/" + (percent(TOKEN, 2) if encoded else TOKEN) + "/tickers.csv.zip"
+    with pytest.raises(m.SharadarReferenceQualificationError, match="credential_echo_refused"):
+        catalogue_projection("tickers", body)
+
+
+def seed_final(root):
+    original, diagnostic, correction = seed_correction(root)
+    result = run(root, diagnostic=True, correction=True, final=True,
+                 transport=lambda table, key: response(table, raw=encode(catalogue_body(can_download=None))))
+    assert result["disposition"] == "stopped-status-qualification"
+    assert result["transport_invocation_count"] == 1
+    assert result["observed_status_metadata_count"] == 0
+    assert result["receipts"][0]["disposition"] == "source_file_schema_refused"
+    shape = result["receipts"][0]["safe_shape"]
+    assert shape["descriptor_unknown_field_count"] == 1
+    assert shape["descriptor_name_class"] == "tickers"
+    assert shape["descriptor_history_class"] == shape["descriptor_label_class"] == "full"
+    assert shape["descriptor_available_class"] == "true"
+    return original, diagnostic, correction, snapshot(root.joinpath(*m.FINAL_ARTIFACT_PARTS))
+
+
+def catalogue_directory(root):
+    return root.joinpath(*m.CATALOGUE_ARTIFACT_PARTS, CATALOGUE_AUDIT)
+
+
+@pytest.mark.parametrize("can_download", [False, True])
+def test_catalogue_success_preserves_four_failed_scopes_and_never_grants_readiness(tmp_path, can_download):
+    old = seed_final(tmp_path)
+    calls = []
+    def reader(provider):
+        directory = catalogue_directory(tmp_path)
+        assert (directory.parent / "scope-reservation.json").is_file()
+        assert (directory / "credential-read-started.json").is_file()
+        calls.append("credential")
+        return credential()
+    def transport(table, key):
+        ordinal = 1 if table == "tickers" else 2
+        assert (catalogue_directory(tmp_path) / f"{ordinal:02d}-{table}-started.json").is_file()
+        calls.append(table)
+        return response(table, raw=encode(catalogue_body(table, can_download=can_download)))
+    result = run(tmp_path, diagnostic=True, correction=True, final=True, catalogue=True,
+                 reader=reader, transport=transport)
+    assert calls == ["credential", "tickers", "actions"]
+    assert result["schema"] == m.CATALOGUE_SCHEMA not in {m.SCHEMA, m.DIAGNOSTIC_SCHEMA, m.CORRECTION_SCHEMA, m.FINAL_SCHEMA}
+    assert result["disposition"] == "completed-status-qualification"
+    assert result["transport_invocation_count"] == result["observed_status_metadata_count"] == 2
+    assert type(result["final_predecessor"]) is dict
+    assert result["final_predecessor"]["complete_sha256"] == hashlib.sha256(
+        (final_directory(tmp_path) / "complete.json").read_bytes()).hexdigest()
+    assert result["receipts"][0]["disposition"] == "current-reference-file-status-observed"
+    assert result["receipts"][0]["provider_reported_full_history_available"] is None
+    assert all(result[flag] is False for flag in m.FALSE_FLAGS)
+    assert result["research_looks"] == result["qc_jobs"] == result["backtests"] == 0
+    for parts, before in zip((m.ARTIFACT_PARTS, m.DIAGNOSTIC_ARTIFACT_PARTS, m.CORRECTION_ARTIFACT_PARTS,
+                              m.FINAL_ARTIFACT_PARTS), old):
+        assert snapshot(tmp_path.joinpath(*parts)) == before
+    for table, ordinal in (("tickers", 1), ("actions", 2)):
+        projected = json.loads((catalogue_directory(tmp_path) / f"{ordinal:02d}-{table}-metadata.json").read_bytes())
+        assert "key" not in projected["file"]
+        assert projected["file"]["canDownload"] is can_download
+    assert TOKEN not in json.dumps(result)
+
+
+def test_catalogue_missing_final_predecessor_stops_before_credential(tmp_path):
+    seed_correction(tmp_path)
+    calls = []
+    with pytest.raises(m.SharadarReferenceQualificationError):
+        run(tmp_path, diagnostic=True, correction=True, final=True, catalogue=True,
+            reader=lambda provider: calls.append("credential"))
+    assert calls == []
+
+
+@pytest.mark.parametrize("when", ["before", "credential", "response"])
+def test_catalogue_final_predecessor_tamper_is_not_a_retry(tmp_path, when):
+    seed_final(tmp_path)
+    path = final_directory(tmp_path) / "complete.json"
+    calls = []
+    if when == "before": path.write_bytes(b"{}")
+    def reader(provider):
+        calls.append("credential")
+        if when == "credential": path.write_bytes(b"{}")
+        return credential()
+    def transport(table, key):
+        calls.append(table)
+        if when == "response": path.write_bytes(b"{}")
+        return response(table, raw=encode(catalogue_body(table)))
+    with pytest.raises(m.SharadarReferenceQualificationError):
+        run(tmp_path, diagnostic=True, correction=True, final=True, catalogue=True, reader=reader, transport=transport)
+    assert calls == ([] if when == "before" else ["credential"] if when == "credential" else ["credential", "tickers"])
+    assert not (catalogue_directory(tmp_path) / "complete.json").exists()
+
+
+def test_catalogue_final_predecessor_metadata_change_stops_dispatch(tmp_path):
+    seed_final(tmp_path)
+    calls = []
+    def reader(provider):
+        path = final_directory(tmp_path) / "complete.json"
+        info = path.stat()
+        os.utime(path, ns=(info.st_atime_ns, info.st_mtime_ns + 1_000_000))
+        return credential()
+    with pytest.raises(m.SharadarReferenceQualificationError):
+        run(tmp_path, diagnostic=True, correction=True, final=True, catalogue=True, reader=reader,
+            transport=lambda *args: calls.append(args))
+    assert calls == []
+
+
+def test_catalogue_scope_cannot_be_retried_by_renaming(tmp_path):
+    seed_final(tmp_path)
+    run(tmp_path, diagnostic=True, correction=True, final=True, catalogue=True,
+        transport=lambda table, key: response(table, raw=encode(catalogue_body(table))))
+    calls = []
+    with pytest.raises(m.SharadarReferenceQualificationError, match="existing_completed_or_ambiguous_scope_refused"):
+        run(tmp_path, diagnostic=True, correction=True, final=True, catalogue=True,
+            audit_id=CATALOGUE_AUDIT + "-retry", reader=lambda provider: calls.append("credential"))
+    assert calls == []
+
+
+def test_catalogue_other_unknown_field_still_stops_actions(tmp_path):
+    old = seed_final(tmp_path)
+    body = catalogue_body()
+    body["files"][0]["arbitrary"] = "DO_NOT_PERSIST"
+    calls = []
+    def transport(table, key):
+        calls.append(table)
+        return response(table, raw=encode(body))
+    result = run(tmp_path, diagnostic=True, correction=True, final=True, catalogue=True, transport=transport)
+    assert calls == ["tickers"]
+    assert result["disposition"] == "stopped-status-qualification"
+    assert result["receipts"][0]["body_sha256"] is result["receipts"][0]["body_size_bytes"] is None
+    assert result["receipts"][1]["transport_invocation_count"] == 0
+    for raw in snapshot(catalogue_directory(tmp_path)).values():
+        assert b"DO_NOT_PERSIST" not in raw and TOKEN.encode() not in raw
+    for parts, before in zip((m.ARTIFACT_PARTS, m.DIAGNOSTIC_ARTIFACT_PARTS, m.CORRECTION_ARTIFACT_PARTS,
+                              m.FINAL_ARTIFACT_PARTS), old):
+        assert snapshot(tmp_path.joinpath(*parts)) == before
+
+
+@pytest.mark.parametrize("flags", [(False, False, False), (True, False, False), (True, True, False), (False, True, True)])
+def test_catalogue_requires_all_prior_mode_guards_before_identity(tmp_path, flags):
+    calls = []
+    with pytest.raises(m.SharadarReferenceQualificationError):
+        run(tmp_path, diagnostic=flags[0], correction=flags[1], final=flags[2], catalogue=True,
             identity=lambda *args, **kwargs: calls.append("identity"))
     assert calls == [] and list(tmp_path.iterdir()) == []

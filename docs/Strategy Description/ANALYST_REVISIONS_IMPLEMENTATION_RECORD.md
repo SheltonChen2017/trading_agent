@@ -737,6 +737,11 @@ its final save was skipped because Mia held the lock; no edit control was
 requested. The editor is closed. A separately bounded three-read observer is
 implemented but uninvoked; its contract still requires review or an explicit scoped
 waiver and a committed freeze before invocation. A6 is not renewed.
+Section317 supersedes that pending-waiver status: the owner answered
+"Yes—read-only reconciliation only". It freezes exactly one unchanged R316
+three-read invocation and once-only external output validation. No A7, upload,
+lock change, compile, launch or old-control read is authorized. Actual result
+must follow below; waiver/freeze is not evidence of successful execution.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1920,6 +1925,12 @@ review. The scoped waiver question is pending, not inferred from an earlier
 spent allowance. Current Safari evidence and Mia's qualified consultation are
 recorded separately from API authentication; no A7, upload, lock or launch is
 authorized. The new observer is not an unchanged recovery retry.
+The owner explicitly waives Claude review of section 317's exact read-only
+reconciliation using the unchanged section316 implementation. Section 317
+owns the one-shot decision and actual-result handoff; its narrow waiver does
+not authorize A7, repair, uploads, locks, compile, capacity or launch. No
+independent acceptance is claimed. All technical source/claim/output gates
+remain mandatory and this use cannot be retried unchanged.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -3868,6 +3879,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-24 | Scoped owner waiver and one additional post-Mia R298 attempt | `45a96f61` -> section312 final handoff (six commits) | Current explicit waiver, not independent acceptance; no incoming review | D1–D3 spent; failed UI Mia removal; owner manual sample preserved; additive A4 ran once and refused owned_private after1projects/read, explicit codeRunning=false observation; no upload/compile/launch |518 distinct focused passes through D3; final A4 union488passes11.19s after authorized ledger correction; historical failures/overlaps retained below | Floor319/244/50/699 counts manual and A4 once; A1–A4 spent; shared census synchronized; unsupported privacy contract remains OPEN | One final push now, then stop at privacy/attempt barrier; no fifth attempt, missing-field default, new contract or next cell; monitor PAUSED |
 | 2026-10-24 | Owner-authorized A5, bounded collaborator diagnostic and sole A6 recovery | `8877caba` -> `4fe89ff9`, `13cc0ae7`, `7a2c756e`, `388594b6` and this final section315 result/handoff commit | No incoming Claude review; scoped owner waivers, not independent acceptance | A5 spent after post-lock refusal; R314 observed exact current A5 environment row; new verifier passed actual A6 initial/post-lock checks; first files/update then refused in-band at HTTP200, with ambiguous write effect and no compile/launch | Root1111 distinct focused passes13.90s; final document repeats in315.7 overlap; no full suite or operational replay | A1–A6/R314 spent; ARV2E313-001 resolved prospectively for actual A6 checks, ARV2E315-001 OPEN; floor321/246/50/699, no accepted cell | One final nonforce matching-lane push; exact provider-error/reconciliation barrier, no A7 or next cell; monitor PAUSED |
 | 2026-10-24 | Owner-directed read-only file-effect diagnosis | `ff9d00bf` -> section316 preparation handoff | No incoming Claude review; new observer review/waiver and exact run freeze required before use | Current UI target shows#, documentation-only Mia cannot retrieve old response; false payload-field claim rejected against official docs; separate one-file observer implemented but UNINVOKED | Root541distinct focused passes11.74s, four new files compiled in memory,83selected pins matched; no full suite or old operational replay | A1–A6/R314 remain spent, ARV2E315-001 OPEN;321/246/50/699 unchanged; UI consultation changed session representation, not accepted write authority | No upload/lock/compile/launch/A7; next review/waiver and exact one-shot freeze for bounded current-byte evidence only |
+| 2026-10-24 | Scoped owner-waived one-shot R298 read-only reconciliation | `91daf58f` -> section317 freeze/result round | No incoming Claude review; explicit read-only waiver only | Commit exact unchanged R316 run freeze before one three-read observation and external finite output validation | Prior541focused passes apply to unchanged code; current record/source/preflight and actual result below | A1–A6/R314 remain spent; no new attempt/look;321/246/50/699 unchanged | Retain result honestly; no upload/lock/compile/capacity/launch/A7 or unchanged retry; one final push |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -54890,3 +54902,97 @@ old controls or change frozen strategy economics, source admission, ownership,
 collaborators, lock state, storage, shared ledgers or other lanes. Floor
 321/246/50/699 and all false readiness flags remain unchanged. The actual
 Analyst R298 candidate is still not running.
+
+## 317. Owner-waived one-shot R298 read-only reconciliation — 2026-10-24
+
+### 317.1 Exact owner scope and baseline
+
+The owner answered **"Yes—read-only reconciliation only"** to the question
+whether to skip Claude review for reading R298 project/access metadata and
+only the input-runtime file, retaining its size/hash and whether it matches
+the placeholder or exact intended code. The question explicitly excluded
+upload, lock changes, compile, launch and A7. This is a new scoped waiver for
+section316's unchanged read-only contract, not an extension of spent A6,
+independent acceptance, privacy clearance or future write authority.
+
+At entry, designated root/branch were exact, worktree clean, and local HEAD
+and live matching origin were91daf58ff8a46f994e3f4d3d249b7eda6729d52d.
+The preceding round made one successful push of that sole commit after
+ff9d00bf. There is no new Claude range. Preserve sections315–316's unknown
+upload effect, visible Mia session/lock qualification and closed editor;
+do not reopen Safari or request edit control for this read-only API check.
+Monitor remains PAUSED. Floor321/246/50/699 stays unchanged.
+
+### 317.2 Exact prospective D1/D2 freeze
+
+The clean commit containing this section authorizes **D1 ONCE**, the unchanged
+scripts/observe_arv2_r298_file_effect.py with --expected-head equal to that
+complete commit and --caller-sha256
+26e208fd490ef0399ff239abc3fa88754715c12ef30aff44684176c674e2729b.
+All four source/test hashes and sizes in316.5, all83 selected dependency pins,
+pure profile0d46e8214b645656bf99cb48452bb697ccfdb9c0c726c206ba65084880f66848,
+caller profile74dfbb35a156926b4ae28d36ba1bbbff96cf27e84621087367ba51143d349107,
+projectionf67148cd717e207be9d44f088749c0443bb696d9c4f38f512eb6cbf483fd9662
+and target23055bytes/c34e42d894dc88e74ce37899622a7f728bafdac9320ce2775736ba06b7ad463e
+remain binding. No source edits, automatic pin refresh, injected production
+callback or spent entry point. Exact designated Darwin/POSIX Python3.13 at
+/Users/sheltonchen/.venvs/trading_agent-py313/bin/python is mandatory.
+
+Before D1, one credential-free native-network/production-artifact/Keychain-
+denied preflight checks exact clean root/branch/HEAD, source/test/profile pins,
+in-memory compilation,83 dependencies and dispatch_fence absence. It does not
+allocate or inspect the fixed prospective
+artifacts/analyst_revisions_v2/newrule_file_effect/R316-20261024-A. D1 claims
+and fsyncs that leaf before the caller reads inherited QC credential values.
+The external launcher passes only the existing QC_USER_ID/QC_API_TOKEN in
+memory under a minimal environment; no separate Keychain/token-file lookup,
+argument exposure or printing. This does not claim those values were first
+obtained globally after the claim. All temp/cache paths stay under in-root
+.pytest_cache; no environment/security setting is disabled or rewritten.
+
+Exactly projects/read then projects/collaboration/read, each with projectId
+38364439; only after the new strict read-context check passes, files/read
+with that projectId and name accepted_risk_order_level_input_runtime.py.
+No codeSourceId, bulk file read, history/result/capacity request, remote mutation
+or provider request. Three application dispatches maximum, no retry. Parent
+alarm90seconds, request timeout30seconds. Native transport can receive up to
+its frozen16MiB bound before the new strict1MiB JSON/64000byte content bounds
+reject; this is not a claim that larger upstream bodies cannot be read into
+memory. Nothing raw is emitted. Sequential reads are not an atomic snapshot,
+historical proof, A6 causality, or future collaborator/write acceptance.
+
+External standard-library selector capture bounds the parent to95seconds
+and64KiB per stdout/stderr channel, retaining actual process exit, UTC dispatch/
+completion brackets, byte counts and channel hashes without printing raw
+channels. Only its own child may be killed/reaped. Host suspension and
+uninterruptible I/O remain qualifications. The sole child invocation is spent
+or ambiguous on timeout/nonzero/unknown result/partial claim; no alternate
+reader or unchanged retry follows.
+
+**D2 ONCE** is a separate credential-free native-network/production-artifact/
+Keychain-denied15second pure output-validation process. It consumes only the
+captured finite stdout in memory through this exact caller's validate_output,
+plus the externally observed actual D1 exit. Require no external capture
+bound, empty D1 stderr, exact canonical framing and matching reconstructed
+report pin. Do not reread the output leaf or file bytes. A validated exit2
+remains failure evidence; only actual exit0 plus completed matching validation
+permits a current-file classification. D2 may emit only that validated finite
+record; malformed output or its own error is recorded only as bounded status/
+length/hash, never raw exception, credential, code or licensed rows. Positive
+report with late nonzero D1 exit is not successful observation.
+
+This freeze authorizes no A7 or strategy run regardless of classification.
+Preserve all claims/evidence and false readiness flags. Record actual D1/D2
+results and limitations, commit the final handoff, then make exactly one
+matching-lane nonforce push for this whole round after state/remote checks.
+No intermediate push. No shared-ledger update is needed because this diagnostic
+consumes zero strategy/development/infrastructure looks and no new attempt.
+
+Pre-freeze record/active-document selection:86passed in1.07s with native
+network/production-artifact/Keychain denial, in-root support paths,
+--noconftest, -B, disabled plugin autoload and no cache provider. This repeats
+the existing document tests, not an additional541-code-test result. The code
+tree is unchanged from section316. Same-round read-only invocation audit
+found no new blocker and confirmed the env-backed client constructor makes no
+extra authenticate request; it is not independent review. No operational D1
+or D2, fresh control or credential read occurred before this commitment.

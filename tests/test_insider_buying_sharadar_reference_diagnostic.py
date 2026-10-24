@@ -19,6 +19,7 @@ TOKEN = "invented_diagnostic_key_1234"
 PRIOR_AUDIT = "ib-sharadar-reference-prior-invented"
 AUDIT = "ib-sharadar-reference-diagnostic-invented"
 CORRECTION_AUDIT = "ib-sharadar-reference-correction-invented"
+FINAL_AUDIT = "ib-sharadar-reference-final-invented"
 BASELINE = {
     "root": "invented", "branch": m.LANE_BRANCH, "head": HEAD, "clean": True,
     "source_sha256": {"invented.py": "b" * 64}, "source_inventory_sha256": "c" * 64,
@@ -51,6 +52,20 @@ def test_correction_explicit_wrapped_tickers_compatibility(full_history):
         assert projected["file"]["available"] is True
 
 
+@pytest.mark.parametrize("ancillary", [{"available": True}, {"history": "full"}])
+def test_final_explicit_optional_snapshot_contract(ancillary):
+    descriptor = {key: value for key, value in TICKERS.items() if key != "table"}
+    descriptor.update(ancillary)
+    raw = encode({"table": "tickers", "files": [descriptor]})
+    with pytest.raises(m.SharadarReferenceQualificationError, match="source_file_schema_refused"):
+        m._projection("tickers", raw, credential(), wrapped_snapshot=True)
+    projected = m._projection("tickers", raw, credential(), wrapped_snapshot=True,
+                              optional_snapshot_metadata=True)
+    assert projected["file"]["name"] == "tickers.csv.zip"
+    for name, value in ancillary.items():
+        assert projected["file"][name] == value
+
+
 def encode(value):
     return json.dumps(value, separators=(",", ":")).encode()
 
@@ -65,12 +80,14 @@ def response(table, *, raw=None, status=200, complete=True, disposition=None):
     return m.ProviderMetadataResponse(status, raw, complete, disposition)
 
 
-def run(root, *, diagnostic=False, correction=False, audit_id=None, reader=None, transport=None, identity=None):
+def run(root, *, diagnostic=False, correction=False, final=False, audit_id=None, reader=None, transport=None, identity=None):
     kwargs = {"diagnostic": diagnostic}
     if correction:
         kwargs["correction"] = correction
+    if final:
+        kwargs["final"] = final
     return m.run_qualification(
-        audit_id or (CORRECTION_AUDIT if correction else AUDIT if diagnostic else PRIOR_AUDIT), HEAD, root=root,
+        audit_id or (FINAL_AUDIT if final else CORRECTION_AUDIT if correction else AUDIT if diagnostic else PRIOR_AUDIT), HEAD, root=root,
         identity=identity or (lambda head, root: dict(BASELINE)),
         credential_reader=reader or (lambda provider: credential()),
         transport=transport or (lambda table, key: response(table)),
@@ -770,3 +787,227 @@ def test_correction_transport_rechecks_diagnostic_before_constructing_opener(mon
         result = m._default_transport("tickers", m.KeychainCredential("sharadar", TOKEN, False), **kwargs)
         assert result.status == 200 and result.body == encode(wrapped_tickers())
         assert calls == ["opener"] and stream.closed
+
+
+OPTIONAL_SUBSETS = [tuple(name for index, name in enumerate(("history", "historyLabel", "available"))
+                         if mask & (1 << index)) for mask in range(8)]
+
+
+def optional_tickers(fields=("available",), *, available=True):
+    body = wrapped_tickers()
+    values = {"history": "full", "historyLabel": "Full History", "available": available}
+    body["files"][0].update({name: values[name] for name in fields})
+    return body
+
+
+@pytest.mark.parametrize("fields", OPTIONAL_SUBSETS, ids=lambda fields: "+".join(fields) or "core-only")
+def test_final_accepts_exact_eight_optional_subsets_without_inventing_history(fields):
+    body = optional_tickers(fields, available=False)
+    raw = encode(body)
+    projected = m._projection("tickers", raw, credential(), wrapped_snapshot=True,
+                              optional_snapshot_metadata=True)
+    assert projected["file"]["name"] == "tickers.csv.zip"
+    assert projected["file"]["size"] == TICKERS["size"]
+    assert projected["file"]["modified"] == TICKERS["modified"]
+    assert ("history" in projected["file"]) is ("history" in fields)
+    assert ("available" in projected["file"]) is ("available" in fields)
+    if "history" in fields:
+        assert projected["file"]["history"] == "full"
+    if "available" in fields:
+        assert projected["file"]["available"] is False
+    assert projected["provider_reported_metadata_only"] is True
+    # Original v1/v2 never accept the wrapper. The consumed v3 recognizes only
+    # core-only and the complete optional trio, not this successor's subsets.
+    with pytest.raises(m.SharadarReferenceQualificationError, match="source_envelope_schema_refused"):
+        m._projection("tickers", raw, credential())
+    if len(fields) in {0, 3}:
+        assert m._projection("tickers", raw, credential(), wrapped_snapshot=True) == projected
+    else:
+        with pytest.raises(m.SharadarReferenceQualificationError, match="source_file_schema_refused"):
+            m._projection("tickers", raw, credential(), wrapped_snapshot=True)
+
+
+@pytest.mark.parametrize("field,value", [("history", "recent"), ("history", None), ("history", True),
+                                        ("historyLabel", "full history"), ("historyLabel", None),
+                                        ("available", 0), ("available", "true"), ("available", None),
+                                        ("unrecognized", "DO_NOT_ACCEPT")])
+def test_final_optional_fields_remain_strict_and_no_unknown_keys(field, value):
+    body = optional_tickers(())
+    body["files"][0][field] = value
+    with pytest.raises(m.SharadarReferenceQualificationError):
+        m._projection("tickers", encode(body), credential(), wrapped_snapshot=True,
+                      optional_snapshot_metadata=True)
+
+
+def seed_correction(root):
+    original, diagnostic = seed_diagnostic(root)
+    result = run(root, diagnostic=True, correction=True,
+                 transport=lambda table, key: response(table, raw=encode(optional_tickers())))
+    assert result["disposition"] == "stopped-status-qualification"
+    assert result["transport_invocation_count"] == 1
+    assert result["observed_status_metadata_count"] == 0
+    assert result["receipts"][0]["disposition"] == "source_file_schema_refused"
+    assert "descriptor_types" not in result["receipts"][0]["safe_shape"]
+    return original, diagnostic, snapshot(root.joinpath(*m.CORRECTION_ARTIFACT_PARTS))
+
+
+def final_directory(root):
+    return root.joinpath(*m.FINAL_ARTIFACT_PARTS, FINAL_AUDIT)
+
+
+@pytest.mark.parametrize("available", [False, True])
+def test_final_scope_preserves_all_three_consumed_scopes_and_accepts_optional_snapshot(tmp_path, available):
+    original, diagnostic, correction = seed_correction(tmp_path)
+    calls = []
+    raw = encode(optional_tickers(available=available))
+    def reader(provider):
+        directory = final_directory(tmp_path)
+        assert (directory.parent / "scope-reservation.json").is_file()
+        assert (directory / "credential-read-started.json").is_file()
+        calls.append("credential")
+        return credential()
+    def transport(table, key):
+        ordinal = 1 if table == "tickers" else 2
+        assert (final_directory(tmp_path) / f"{ordinal:02d}-{table}-started.json").is_file()
+        calls.append(table)
+        return response(table, raw=raw if table == "tickers" else None)
+    result = run(tmp_path, diagnostic=True, correction=True, final=True, reader=reader, transport=transport)
+    assert calls == ["credential", "tickers", "actions"]
+    assert result["schema"] == m.FINAL_SCHEMA not in {m.SCHEMA, m.DIAGNOSTIC_SCHEMA, m.CORRECTION_SCHEMA}
+    assert result["disposition"] == "completed-status-qualification"
+    assert result["transport_invocation_count"] == result["observed_status_metadata_count"] == 2
+    assert type(result["correction_predecessor"]) is dict
+    assert result["correction_predecessor"]["complete_sha256"] == hashlib.sha256(
+        (correction_directory(tmp_path) / "complete.json").read_bytes()).hexdigest()
+    assert result["receipts"][0]["disposition"] == "current-reference-file-status-observed"
+    assert result["receipts"][0]["provider_reported_full_history_available"] is None
+    assert (final_directory(tmp_path) / "01-tickers-response.json").read_bytes() == raw
+    assert all(result[flag] is False for flag in m.FALSE_FLAGS)
+    assert result["research_looks"] == result["qc_jobs"] == result["backtests"] == 0
+    assert snapshot(tmp_path.joinpath(*m.ARTIFACT_PARTS)) == original
+    assert snapshot(tmp_path.joinpath(*m.DIAGNOSTIC_ARTIFACT_PARTS)) == diagnostic
+    assert snapshot(tmp_path.joinpath(*m.CORRECTION_ARTIFACT_PARTS)) == correction
+
+
+def test_final_requires_sealed_correction_before_reading_credential(tmp_path):
+    seed_diagnostic(tmp_path)
+    calls = []
+    with pytest.raises(m.SharadarReferenceQualificationError):
+        run(tmp_path, diagnostic=True, correction=True, final=True,
+            reader=lambda provider: calls.append("credential"))
+    assert calls == []
+
+
+def test_final_rejects_successful_correction_as_failed_predecessor(tmp_path):
+    seed_diagnostic(tmp_path)
+    run(tmp_path, diagnostic=True, correction=True,
+        transport=lambda table, key: response(table, raw=encode(wrapped_tickers()) if table == "tickers" else None))
+    calls = []
+    with pytest.raises(m.SharadarReferenceQualificationError):
+        run(tmp_path, diagnostic=True, correction=True, final=True,
+            reader=lambda provider: calls.append("credential"))
+    assert calls == []
+
+
+@pytest.mark.parametrize("when", ["before", "credential", "response"])
+def test_final_correction_predecessor_tampering_stops_at_its_boundary(tmp_path, when):
+    seed_correction(tmp_path)
+    path = correction_directory(tmp_path) / "complete.json"
+    calls = []
+    if when == "before": path.write_bytes(b"{}")
+    def reader(provider):
+        calls.append("credential")
+        if when == "credential": path.write_bytes(b"{}")
+        return credential()
+    def transport(table, key):
+        calls.append(table)
+        if when == "response": path.write_bytes(b"{}")
+        return response(table, raw=encode(optional_tickers()))
+    with pytest.raises(m.SharadarReferenceQualificationError):
+        run(tmp_path, diagnostic=True, correction=True, final=True, reader=reader, transport=transport)
+    assert calls == ([] if when == "before" else ["credential"] if when == "credential" else ["credential", "tickers"])
+    assert not (final_directory(tmp_path) / "complete.json").exists()
+
+
+def test_final_correction_predecessor_metadata_change_is_detected(tmp_path):
+    seed_correction(tmp_path)
+    calls = []
+    def reader(provider):
+        path = correction_directory(tmp_path) / "complete.json"
+        info = path.stat()
+        os.utime(path, ns=(info.st_atime_ns, info.st_mtime_ns + 1_000_000))
+        return credential()
+    with pytest.raises(m.SharadarReferenceQualificationError):
+        run(tmp_path, diagnostic=True, correction=True, final=True, reader=reader,
+            transport=lambda *args: calls.append(args))
+    assert calls == []
+
+
+def test_final_scope_cannot_be_retried_under_new_name(tmp_path):
+    seed_correction(tmp_path)
+    run(tmp_path, diagnostic=True, correction=True, final=True,
+        transport=lambda table, key: response(table, raw=encode(optional_tickers()) if table == "tickers" else None))
+    calls = []
+    with pytest.raises(m.SharadarReferenceQualificationError, match="existing_completed_or_ambiguous_scope_refused"):
+        run(tmp_path, diagnostic=True, correction=True, final=True, audit_id=FINAL_AUDIT + "-retry",
+            reader=lambda provider: calls.append("credential"))
+    assert calls == []
+
+
+def test_final_refusal_stops_actions_and_adds_structural_descriptor_only(tmp_path):
+    seed_correction(tmp_path)
+    body = optional_tickers()
+    hidden_name, hidden_value = "UNKNOWN_DESCRIPTOR_KEY", "PRIVATE_DESCRIPTOR_VALUE"
+    body["files"][0][hidden_name] = hidden_value
+    calls = []
+    def transport(table, key):
+        calls.append(table)
+        return response(table, raw=encode(body))
+    result = run(tmp_path, diagnostic=True, correction=True, final=True, transport=transport)
+    assert calls == ["tickers"]
+    assert result["observed_status_metadata_count"] == 0
+    assert result["receipts"][1]["transport_invocation_count"] == 0
+    receipt = result["receipts"][0]
+    assert receipt["body_sha256"] is receipt["body_size_bytes"] is None
+    assert receipt["response_body_retained"] is False
+    shape = receipt["safe_shape"]
+    assert shape["descriptor_types"] == {"name": "string", "size": "integer", "sizeLabel": "string",
+                                         "modified": "string", "available": "boolean"}
+    assert shape["descriptor_unknown_field_count"] == 1
+    assert shape["descriptor_name_class"] == "tickers"
+    assert shape["descriptor_history_class"] == shape["descriptor_label_class"] == "absent"
+    assert shape["descriptor_available_class"] == "true"
+    for raw in snapshot(final_directory(tmp_path)).values():
+        assert hidden_name.encode() not in raw and hidden_value.encode() not in raw and TOKEN.encode() not in raw
+
+
+@pytest.mark.parametrize("field,value,classification", [("history", "full", "full"), ("history", "recent", "other"),
+                                                       ("historyLabel", "Full History", "full"),
+                                                       ("historyLabel", "full history", "other"),
+                                                       ("available", True, "true"), ("available", False, "false"),
+                                                       ("available", "unknown", "other")])
+def test_final_descriptor_shape_has_only_fixed_enum_values(field, value, classification):
+    body = optional_tickers(())
+    body["files"][0][field] = value
+    shape = m._diagnostic_shape(encode(body), credential(), descriptor=True)
+    key = {"history": "descriptor_history_class", "historyLabel": "descriptor_label_class",
+           "available": "descriptor_available_class"}[field]
+    assert shape[key] == classification
+    if value in {"recent", "full history", "unknown"}:
+        assert json.dumps(value) not in json.dumps(shape)
+
+
+def test_final_descriptor_shape_screen_precedes_all_new_fields():
+    body = optional_tickers()
+    body["files"][0]["unknown"] = percent(TOKEN, 2)
+    with pytest.raises(m.SharadarReferenceQualificationError, match="credential_echo_refused"):
+        m._diagnostic_shape(encode(body), credential(), descriptor=True)
+
+
+@pytest.mark.parametrize("diagnostic,correction", [(False, False), (True, False), (False, True)])
+def test_final_requires_both_prior_mode_guards_before_identity(tmp_path, diagnostic, correction):
+    calls = []
+    with pytest.raises(m.SharadarReferenceQualificationError):
+        run(tmp_path, diagnostic=diagnostic, correction=correction, final=True,
+            identity=lambda *args, **kwargs: calls.append("identity"))
+    assert calls == [] and list(tmp_path.iterdir()) == []

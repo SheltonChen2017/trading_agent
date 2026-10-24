@@ -29479,3 +29479,78 @@ four caught memory-only reversals: removed wrapper support2 failures,
 default-mode leakage2, skipped v2 rechecks3, reused namespace3. Reversals
 were finally-restored, never written to disk. No full suite or actual
 provider verification is claimed by these fixture results.
+
+## 206. Preserved descriptor refusal and final finite snapshot contract (2026-10-24)
+
+The205 code/tests/preregistration exist as already-committed
+`85c5e1f758881462aba75ed85ea007f28f76786b`; its clean exact source executed
+the new correction CLI once. It returned HTTP200 for ONE TICKERS request,
+then `source_file_schema_refused`, zero accepted metadata, no ACTIONS dispatch,
+exit2/`stopped-status-qualification`, completed
+`2026-10-24T19:51:12.626814Z`. The outer one-file wrapper remains observed;
+the rejected body's inner contents were again discarded, not retained/hashed.
+The four-or-seven-field hypothesis was insufficient; do not call it a verified
+fix, infer a five-field response as an observation, or relabel earlier failures.
+
+The v3 completion is7677 bytes, SHA256
+`bec43f96fc970f135339cd70d749bff163b1493a3d8f34e1108397ff0fe5eab1`;
+scope SHA256
+`2fd418c8603c7cbe1b1e16980acd60ef575128e2bdfbb974e2b9f4812064fa69`;
+seven-source inventory
+`18c777282614376b7edf3d1672b443212c5012c649a57f0998ac15a03b98e4ae`.
+Native network/fork/all-write/Keychain-exec-denied metadata readback verified
+its closed private inventory/hash chains and all unchanged predecessor
+identities. All three consumed roots remain preserved, no retry/resume/reset.
+`IBSHAR-CCR20301` remains OPEN pending prospective actual qualification.
+
+Delegated engineering decision under the owner's get-access-working request:
+for a single full TICKERS snapshot, history/label/availability bookkeeping
+must not be treated as inseparably co-present if the four independently
+validated core file fields are present. Add a FINAL explicit mode with a
+finite eight-subset contract: name/size/sizeLabel/modified always mandatory;
+the only optional fields are history, historyLabel and available. When
+present they MUST respectively be string`full`, string`Full History`, and
+an actual bool. No unknown fields, null/coerced values, wrong filenames,
+additional files, malformed integers/UTC dates or secret echoes are accepted.
+No missing history/availability is imputed. The original v1, v2 diagnostic
+and v3 four-or-seven-field contracts remain unchanged. This is a principled
+candidate metadata contract, not an assertion of unobserved supplier fields.
+
+Preregister ONE final metadata verification, selected only by --verify-final:
+schema `insider-sharadar-reference-status-final-v4`, fixed private namespace
+`artifacts/insider_buying/sharadar_reference_final_v4/`, auditID
+`ib-sharadar-reference-20261024-final-snapshot-v4-once`. Require the already-
+committed clean exact final source image, all three pinned predecessor
+completions/reservations, closed inventories and repeatedly compared content/
+custody identities. Reserve before ONE Keychain read. At most ONE TICKERS
+status GET and then ONE ACTIONS full-history status GET, stopping after any
+refusal. Same fixed URLs/header/TLS/no-proxy/no-redirect/15s/1MiB bounds;
+no source table rows, ZIP, price/outcome/fundamental or QC access. No purchase.
+
+If it still refuses, this final mode's screened structural diagnostic adds
+only allowlisted first-descriptor types, unknown-field count and fixed
+canonical-name/history/label/availability categories. No arbitrary descriptor
+names/values, URLs, snippets, raw rejected bodies or body hashes are exposed.
+Resource and credential screens precede every structural projection. Preserve
+the refusal and report an actual remaining supplier/input blocker if the
+strict known-field contract remains insufficient; no automatic fifth scope
+is authorized by this preregistration. Readiness/rights/identity/PIT flags
+remain false even on two successful status observations.
+
+Two invented five-field cases first proved v3's actual schema refusal and
+then failed the missing explicit optional-metadata contract (2 failed0.74s).
+Subsequent green/reversal validation and the real final outcome follow when
+observed. The previous red/green/mutation counts remain attributed to their
+own exact source epochs; no later commit is assigned to earlier execution.
+
+Final pre-activation main qualification:443 passed7.45s, same seven focused
+paths/native network and Keychain-exec/repository-write denial, no full suite.
+Two changed Python images compiled in memory; diff check clean. Adapter SHA256
+`319d993900176ba8baf398ea6210c6de6e98e017779114ea9b5f56c8a4af39b6`;
+test SHA256 `f5c1934ecc96e0550ca2d43c62cd722255a98507052131909a6bed80f0338ce9`.
+Overlapping internal149-new/112-original selection261 passed2.21s restored,
+after four caught memory-only reversals: optional compatibility removal2
+failures; default-v3 leakage2; skipped v3 custody rechecks3; descriptor
+allowlist bypass1. No on-disk reversal. One earlier test-only assertion
+mistook the fixed unknown_field_count key for a leaked quoted scalar;
+the corrected precise scalar assertion, not production code, is in this tree.

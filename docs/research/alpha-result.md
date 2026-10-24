@@ -6841,3 +6841,32 @@ spent, no fifth allowance exists, and the owner's manual sample is not rebooked.
 The documented-API/privacy-contract mismatch is recorded in Analyst312.17;
 source/gate correction and any further attempt need a separately coherent
 decision, not a replay or missing-field default. Other lanes remain untouched.
+
+### R-298 A5 actual post-lock collaborator refusal — 2026-10-24
+
+Under the owner's separate one-additional-attempt decision and current scoped
+review waiver, A5 ran ONCE at clean freeze
+`13cc0ae7e9dda97f9c1871b9bcf4053f98d86d48`. Caller SHA256
+`98ce1ee2a2d8a54523e383d9ca578575ad2c2510a171f2d772e2144de92d0e98`;
+profile `fecc7cda952546563d7f4e7308079a1482d358da9418362e423c599c87fbe7f0`.
+External dispatch2026-10-24T21:24:55.139203Z, completion observed21:25:09.210283Z;
+actual parent exit2, stderr0, no external bound. These are process brackets,
+not provider-event timestamps. Finite stdout1057bytes SHA256
+`91a1406cf96cae622d14d3dfac4d8eea28dfca951a97abaafaaf931e8c11f5f6`;
+separate native-denied pure validation accepted FAILURE evidence, not success.
+
+Seven application dispatches reached complete-collaborators after initial
+access/history/inventory checks and one supported edit-lock acquisition.
+The completion-stage general-view extra row failed the exact allowed Mia
+shape/hash (`remote_refused` / `project_mia_pin`). Last endpoint context
+projects/collaboration/read does not identify the dedicated response as the
+failing record; numeric provider-request count and exact raw mismatch remain
+unknown. No source write, explicit compile, capacity, backtest/create or
+own-status call was reached. No candidate is running or accepted from A5.
+
+Book A5 exactly once: **319 ->320 shared /244 ->245 Analyst development /
+50 infrastructure unchanged /699 booked cells unchanged**. A1–A5 are spent.
+Earlier manual sample/A4/UI events are not rebooked. The later owner-authorized
+two-read collaborator diagnostic adds no strategy look and no sixth recovery
+allowance. All original evidence, strategy/source gates and other lanes remain
+unchanged; see Analyst313.7–314 for the bounded continuation and qualifications.

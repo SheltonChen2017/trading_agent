@@ -639,7 +639,13 @@ releases that hold and explicitly waives this current pre-use review.
 Section 307 replaces the superseded execution decisions with an exact
 corrected V5 freeze for the fixed six-cell comparison. It is not independent
 acceptance, a blanket waiver, renewed storage authority or permission to
-interfere with another lane. Actual outcomes are recorded only after use.
+interfere with another lane. Section 307.6 now records actual capacity success
+and the sole R298 begin's `request_ambiguous` refusal at freeze `9cddf9de`.
+The entire family is STOPPED, with no retry or backtest launch operation.
+Confirmed floor314/239/50/699 is retained with a separate unresolved possible
+R298 A1 addition of one shared/development look, not a claim of zero addition.
+No ad-hoc control reader or remote reconciliation has run. A separately
+versioned offline failure-evidence diagnostic is the next bounded work.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1729,11 +1735,17 @@ commits and recorded two bounded V5 corrections. The owner subsequently
 said "qc is free. skip the reveiw and proceed". The owner explicitly waives
 Claude review of section 307's current section-306-based execution decision
 and supporting corrections, not future changed contracts or technical gates.
-The immediate next step is execution under section 307's committed exact
-clean snapshot: capacity first, then the fixed A1 sequence only if every gate
-permits. The former QC hold is released, but actual busy capacity still means
-wait, never interference. Section 304 and section 305 pins remain superseded.
-The monitor remains PAUSED; no review session or other-chat message is started.
+Section 307 execution has now stopped after capacity passed and the sole
+R298 begin returned actual exit2 / request_ambiguous. The current sequencing
+waiver is consumed for those actions, not a waiver for a new recovery
+contract. The immediate next step is a separately versioned, bounded offline
+failure-evidence diagnostic as specified in section 307, with normal review
+and a fresh one-shot decision before use unless explicitly waived anew.
+No repeat begin, next candidate, ad-hoc control reader or remote reconciliation
+is authorized by this failed sequence. The former QC hold remains released,
+but no node/job may be changed; availability was only observed at capacity.
+Section 304 and section 305 pins remain superseded. The monitor stays PAUSED;
+no review session or other-chat message is started.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -51335,3 +51347,103 @@ denial, plugin/shared-conftest/cache disable and in-root support paths, with
 no failures/skips/warnings. Diff checks passed. Actual operations and
 accounting are recorded only after their observed outcomes, followed by one
 final matching-lane push.
+
+### 307.6 Actual capacity success and ambiguous first begin; family stopped
+
+Both actual invocations used the sole clean freeze
+`9cddf9de31f2be96b4324e21318aaa2e23340ca9`, unchanged caller/profile/source
+bindings above and the fixed process environment. Root/branch/HEAD/status
+were clean before and after each, and the live matching remote remained the
+starting `bde2df5a` because this round has no intermediate push. No other
+writer/test was active during either invocation. The existing QC environment
+was available; no Keychain, token file or browser fallback occurred. This is
+not a new entitlement or authentication claim based on credential presence.
+
+The external observer dispatched the fixed CLI once per action, captured its
+actual exit independently, bounded stdout/stderr in memory, and validated the
+exact canonical double-LF envelope without printing raw/unexpected output.
+Neither invocation hit the external watchdog or output bound. The following
+hashes include **both** terminating LFs and bind stdout, not private report
+files. External observation times are process brackets, not provider times.
+
+| Action | External dispatch / completion observed (UTC) | Actual exit / stdout | Validated result |
+|---|---|---|---|
+| capacity, no candidate | `2026-10-24T02:05:11.005107Z` / `02:05:18.501555Z` | 0; 747 bytes; SHA256 `b93f5ab3eb675c0b20da1a51b6fe757229af4a12a6ed04e18fc7f89617e5acda`; stderr0 | Matching normal schema/HEAD/caller/admission/profile; operation_completed=true. node_count2, busy_count0, selected_count0, auto_select=true, available_count2, state=available. Internal caller times `02:05:14.100292Z..02:05:18.416441Z`. All four original-upload/PIT/formal/paper flags false. |
+| begin R298 A1, sole invocation | `2026-10-24T02:05:37.746630Z` / `02:05:50.038354Z` | 2; 343 bytes; SHA256 `f835094fb1abd4667fdbed3d754ba4f60ff6970e7e74ebea2ad5e8d7c26067d2`; stderr0 | Exact finite failure schema/operation=begin, operation_completed=false, stage=begin, failure_code=request_ambiguous, attempt_consumption=consult_exact_claim_no_automatic_retry. Four flags false. No normal result or internal timestamps/identities returned; failure envelopes do not themselves carry the normal source/HEAD bindings. Those bindings are established by the fixed external invocation and unchanged state, not invented inside the failure payload. |
+
+Capacity succeeded only at that observation. It does not prove later capacity,
+permissions for project creation or compilation, absence of other jobs, or
+whole-account safety. The R298 failure is **not** an authenticated failed QC
+backtest or proof of a timeout, quota issue, expired subscription, HTTP code,
+permission denial or no remote effect. The run sequence stops here even if
+an operation marker might exist; no result is inferred from a filename.
+
+Static unchanged source establishes that `request_ambiguous` is emitted by
+the legacy `_rpc` when `api.request` raises an Exception after its intent is
+written. The guarded request can fail before transport or during request,
+HTTP/JSON/API handling. The code discards the underlying exception, and the
+finite envelope has no endpoint/status/request count. No raw exception is
+recovered or guessed. Begin's reference-project/capacity requests precede its
+candidate attempt claim; project creation and later requests follow it.
+Therefore this envelope cannot determine whether `R298-A1-claim.json` exists,
+which request was attempted, whether a project was created, whether source
+files were written or a compile job was submitted. The exact begin path does
+not call `backtests/create`: **no backtest-launch operation was invoked by
+this sequence**. That is not a census of unrelated account jobs.
+
+No compile-poll, launch, status, result-read, summary, repeated capacity,
+repeated begin, next candidate, private marker census or operational reader
+followed the failure. All potential controls/effects are preserved; no cleanup,
+repair, reset, replacement path or source/economic modification. R298 A1 is
+unresolved/spent-for-retry, not safely unspent; R299-R303 were not invoked.
+
+**Accounting:** confirmed booked floor remains314shared/239development/
+50infrastructure/699cells, plus one explicitly **unresolved possible R298 A1
+look** (+1shared/+1development if its claim is authenticated). Do not report
+confirmed315/240, confirmed zero additional looks or an admitted result cell.
+The uncertainty blocks continuation and must be resolved by admissible
+evidence, not by renewing the attempt. No performance result was observed.
+
+### 307.7 Findings, concrete barrier and handoff
+
+| ID | Priority / status | Evidence and next action |
+|---|---|---|
+| `ARV2E307-001` | P2 / OPEN, concrete execution blocker | Sole R298 begin has actual exit2 and validated request_ambiguous failure. Stage, local attempt claim and remote effects are not resolved by its envelope. Stop the family; no unchanged retry, next cell or fabricated acceptance. |
+| `ARV2D307-001` | P2 / OPEN, diagnostic limitation | The frozen `_rpc` erases endpoint and underlying finite request/error context from the outer failure. Retained intent/observed markers may establish local progress, not recover discarded HTTP/error text from response hashes. Do not alter the now-exercised sources or inspect controls through a bare helper. |
+
+Safe read-only alternatives were checked against public source only. The V5
+dispatcher parses lifecycle state but refuses incomplete batches; its `read`
+operation is for a completed backtest, not failure diagnosis. Existing newrule
+diagnostics are storage-specific spent/frozen contracts, not an admissible
+reader for this begin. No appropriate existing operational reader was found.
+Same-round static advice independently checked these source distinctions but
+is not independent review or private evidence authentication.
+
+The next bounded recovery is a **separately versioned one-shot offline
+failure-evidence reader**, designed/tested without provider access and frozen
+before use under normal independent review or a separately explicit waiver.
+It should admit only fixed R298 first-begin batch/intent-observed markers,
+candidate claim and any project/compile receipts, authenticate held/named
+paths and exact schemas/bindings under native network denial, and emit only
+finite last-recorded-stage, claim-presence and validated identity evidence.
+It must not read arbitrary source payloads, log raw errors/credentials,
+repair markers or invoke the lifecycle. This is a next design, **not an
+implemented or invoked reader or current read authorization**. If remote
+reconciliation is then necessary, freeze a separate read-only decision bound
+to those authenticated identities; never repeat begin or rename the attempt.
+
+The continuous round is `bde2df5a..` this final result/handoff commit and
+contains exactly two commits: `9cddf9de31f2be96b4324e21318aaa2e23340ca9`
+(current owner waiver and exact prospective freeze) and this result record.
+No production/test code changed. Final record/active-document checks passed
+**86 tests in0.89s**, with no failures/skips/warnings, under the same native
+network/artifact-read/write/Keychain-command denial, disabled plugin/shared
+conftest/cache support and in-root temporary paths. These repeat the pre-freeze
+86 checks and are not additive. Diff checks passed; no complete suite or
+operational rerun occurred. Before the sole nonforce push, verify root/branch/HEAD/status,
+unchanged live remote, and local/tracking/live agreement after success.
+The monitor stays PAUSED. No new paid data/provider capture, QC deployment,
+paper/live/funded/broker/real-order action, formal/PIT/master admission or
+efficacy claim; all historical failures, unresolved gates and other-lane
+boundaries remain intact. The earlier review waiver did not clear this
+technical failure or authorize a new recovery contract automatically.

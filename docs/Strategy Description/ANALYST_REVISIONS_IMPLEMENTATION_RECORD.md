@@ -716,7 +716,13 @@ any source write, explicit compile or launch. A5 is now SPENT; floor320/245/50/
 699, no accepted cell. No sixth attempt or automatic pin refresh.313.7–313.8
 record the finite failure and new lock/access compatibility barrier. Section314
 records the owner's later narrow read-only diagnostic waiver: two metadata
-reads only, no sixth attempt or cloud mutation. Monitor remains PAUSED.
+reads only, no sixth attempt or cloud mutation. That observation passed once
+at7a2c756e and is SPENT: current general-view extra name/publicId exactly match
+our A5 environment label, while the dedicated list remains the same sole owner.
+Section314.5 records exact pins and limitations. Section315 records the later
+explicit owner approval of one additional A6 and its narrow review waiver;
+the separately versioned verifier/caller must pass and be frozen before use.
+A5 and R314 remain spent, not automatically retried. Monitor remains PAUSED.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1879,7 +1885,12 @@ or launch.313.7–313.8 own current handoff: floor320/245/50/699 and a concrete
 post-lock collaborator-identity barrier, not another recovery authority.
 The owner explicitly waives Claude review of section 314 only for its bounded
 read-only metadata diagnostic; no lock/file/compile/launch action or sixth
-attempt follows from it.
+attempt follows from it. The diagnostic passed once at7a2c756e and is now spent;
+the extra row matches the exact A5 environment label while dedicated access
+remains owner-only. The owner explicitly waives Claude review of section 315
+for this specific verifier fix and approves one additional A6 recovery. Continue
+only the separately versioned exact-source recovery after its committed freeze;
+do not replay A5/R314, assume A7, or begin another family cell.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -3826,6 +3837,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-24 | Owner-scoped reconciliation and final R298 recovery refusal | `f9fd0932` -> `e3d53276` -> `0a2400d7` -> this record commit | No incoming Claude range; explicit scoped waiver now consumed, not independent review | D1 authenticated zero-recorded-RPC A2 prefix; corrected real projection ID; A3 refused code_running before mutation/compile/launch; all attempts spent | 376 distinct focused passes5.72s; record repeats overlap; no full suite; actual exit/pins in310 | Booked317/242/50/699; no result cell; raw codeRunning value unknown; user-concurrent Safari prevented reading final Mia reply | Mandatory stop/Mia checkpoint, no A4; one final matching-lane push; monitor PAUSED |
 | 2026-10-24 | Post-Mia R298 idleness diagnosis and exact-source recovery preparation | `7c462a01` -> section311 round | No incoming Claude review; scoped new waiver/extra attempt requested, not assumed | Mia reply qualified; supported UI stopped only R298's code environment; additive observer and A4 candidate implemented but uninvoked | 472 focused implementation/helper passes plus record checks below; expected-red sensitivities retained; no old operational replay or full suite | A1/A2/A3 spent; floor317/242/50/699 unchanged; API idleness and current source unverified | Review or scoped waiver plus exact new run freeze before contact; one final matching-lane push; monitor PAUSED |
 | 2026-10-24 | Scoped owner waiver and one additional post-Mia R298 attempt | `45a96f61` -> section312 final handoff (six commits) | Current explicit waiver, not independent acceptance; no incoming review | D1–D3 spent; failed UI Mia removal; owner manual sample preserved; additive A4 ran once and refused owned_private after1projects/read, explicit codeRunning=false observation; no upload/compile/launch |518 distinct focused passes through D3; final A4 union488passes11.19s after authorized ledger correction; historical failures/overlaps retained below | Floor319/244/50/699 counts manual and A4 once; A1–A4 spent; shared census synchronized; unsupported privacy contract remains OPEN | One final push now, then stop at privacy/attempt barrier; no fifth attempt, missing-field default, new contract or next cell; monitor PAUSED |
+| 2026-10-24 | Owner-authorized A5, bounded collaborator diagnostic and prospective A6 correction | `8877caba` -> sections313–315 round | No incoming Claude review; scoped owner waivers, not independent acceptance | A5 spent after post-lock refusal; R314 two-read diagnostic completed once; exact current A5 environment representation pinned in new pure policy; owner explicitly approved one additional A6 | Focused source/protocol/document validation and exact actual results in313–315; all author/subset repeats overlap; no full suite | A1–A5/R314 spent, floor320/245/50/699 before actual A6; source/privacy/attempt gates remain | One final matching-lane push only after this bounded recovery's result/handoff; no automatic A7 or next family cell; monitor PAUSED |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -54188,3 +54200,298 @@ Final exact observer tree: **417 distinct focused passes in8.18s**, no failures,
 skips or warnings. This is330observer +86record/document +1research closure;
 all earlier author/root subsets overlap. New-file/working diff checks pass;
 the historical frozen A5 helper-test EOF warning remains explicitly qualified.
+
+### 314.5 Actual one-shot observation — completed and spent
+
+At clean freeze `7a2c756e9c11f57a06f1f58feb917f90c9a6d39b`, separate native-
+denied credential-free preflight passed. The exact observer then ran ONCE:
+dispatch2026-10-24T21:37:06.788466Z; completion observed21:37:11.113381Z;
+actual parent exit0, stderr0bytes, externalboundnull. These are process brackets,
+not precise provider-event timestamps. Finite stdout4759bytes SHA256
+`273f515a5cb8996ae922497202340156731fd3a9b381d0b81379ff59e4832e3d`.
+The separate credential-free native-network/production-artifact/Keychain-denied
+pure validator exited0 with stderr0 and authenticated the complete envelope.
+Its report pin is4654bytes SHA256
+`147bd1d2d0b33c22240fc2472b08ddfedd24b98b71621ae626398554ddc7efda`.
+No output/control reread followed. R314-20261024-A and observer/tests are now
+spent/frozen; never renew this claim, its two reads or its validator.
+
+Exactly2 application dispatches completed; provider_request_count remainsnull.
+General project list has2rows, dedicated list1row. Each has exactly1true-owner
+row, and those canonical owner rows are identical:
+`707a30618e122e49fe6fa75364451b5b7c50e1019a68a89ffc0cd3ae3c8e0b78`.
+Both owner UIDs equal the authenticated projectownerId; permissionwrite and
+liveControltrue. Dedicated userPermissionswrite/userLiveControltrue. General
+codeRunning is explicitlyfalse; Project.public is absent, not private-by-default
+evidence on its own. These sequential reads are not atomic or continuous.
+
+The extra general row has ownerfalse, uidpresentnull, permissionwrite,
+liveControltrue, and BOTH name/publicId exactly equal the frozen literal
+Codex ARV2 R298 A5 20261024. Their canonical value hash is
+`15e48aff3d3825cdf4a012845e4c99d68555eaede93252ebe3a35ad05d304cec`.
+codeSourceId field itself is absent. Name is notMia and whole row is not the
+old D3-Mia pin. Exact new row SHA256:
+`f9a933141393262edb66e3e8248ed75ebf4518668039e1a27af6734f26f58b9d`.
+Its publicId has spaces, so the observer's non-space ASCII shape flag isfalse;
+that flag is not an API identifier validity rule. No raw IDs/names/unknownkeys
+or collaborator PII were disclosed.
+
+This authenticates the CURRENT A5-associated representation and explains why
+the frozen Mia-only predicate would reject it. It does not reconstruct the
+earlier failed response, prove that lock acquisition caused the row, establish
+that it is synthetic/nonpersistent, or grant operational authority. A pure
+canonical six-known-field reconstruction hashes to
+`01b1e9a3cb8ac9c967c30e27177364f27a26620549b7b01703f3a3e4e556b6f7`,
+NOT the observed whole-row pin. Thus unexposed fields are material to the
+whole-row binding: do not claim an exact six-field schema or derive a future
+agent-name row hash from these limited observations. No additional private
+read is authorized to fill that gap automatically.
+
+No permission/lock/file/compile/backtest/capacity endpoint or strategy outcome
+was accessed by the diagnostic. All false flags stayedfalse, including
+collaborator_policy_accepted, privacy_verified, synthetic_entry_proven,
+edit_lock_proven and a6_authorized. No new look; floor320/245/50/699 unchanged.
+Continue only a separately versioned offline verifier correction using these
+exact bounded facts. Actual recovery remains subject to a new explicit attempt
+decision and its own source/run freeze; A5 cannot be replayed.
+
+### 314.6 Verified offline collaborator-policy correction
+
+ARV2E313-001 is confirmed as a contract mismatch against the observed CURRENT
+representation: the fixed A5 request label is present in general metadata, but
+frozen A5 only allows the historical Mia row. No claim is made that this proves
+the exact historical failed-response bytes or backend causality. The new pure
+scripts/arv2_r298_collaborator_access.py accepts only the exact pinned owner,
+alone or with the exact R314 A5 whole-row pin and all observed typed predicates.
+The dedicated list must remain sole-owner, matching ownerId and whole owner
+bytes, with explicit write/liveControl facts. Exact project/name/Py/org/idle
+checks remain, and an unexpectedly supplied public value other thanFalse
+refuses without inventing a missing-field privacy guarantee.
+
+There is no caller/CLI/transport/credential/claim/lock/file/compile/launch or
+attempt interface. The verifier receives two supplied JSON responses and takes
+bounded canonical memory snapshots; provenance and exact endpoint scope remain
+the future caller's responsibility. Its result is a matched representation,
+not an operational authorization or privacy/lease/synthetic-account proof.
+The whole owner row is pinned as well as the extra row; changes to unreported
+fields, other labels, the old Mia row, extra dedicated rows, missing/null/type
+drift and unknown collaborators refuse. Pins are source constants grounded in
+314.5, never refreshed from runtime responses or supplied by a caller.
+
+Synthetic regression reproduces the old frozen A5 pure policy's project_mia_pin
+refusal using only two injected in-memory responses and object.__new__, then
+shows the new verifier accepts the same qualified shape under synthetic pins.
+No old operational constructor/entrypoint/control/network path is invoked.
+This is not a real-source reauthentication or recovery replay. Current raw
+R314 records were not retained/disclosed for a new invocation; actual future
+compatibility still requires fresh authenticated responses and every other
+gate. Tests never use private rows or replace the real source pins.
+
+Official codeSourceId denotes an environment, not an attempt. A future caller
+could deliberately bind the same existing A5 environment label while using
+a NEW authorized attempt/control/backtest identity; this would need its own
+explicit source/run decision and retained exact-row checks, not renewal of A5.
+Changing to an unobserved new label is NOT automatically accepted or hash-
+derived. No such caller or sixth attempt is implemented/authorized by this
+pure correction. The owner was asked separately whether to allow one A6 and
+waive review of that specific recovery; the subsequent explicit approval is
+recorded in315.1, not inferred from this pure module.
+
+Same-round static audit confirmed a pre-serialization boundary defect: JSON
+round trips normalized tuples and builtin subclasses before exact-type tests.
+The new policy now validates exact JSON types, finite floats, string keys and
+depth/node bounds before encoding. A second advisory correction includes
+already queued nodes in the pre-extension budget. Both are corrected before
+use; no spent module is edited. The1MiB bound is serialized response size, not
+a guarantee of total allocation or transport bounds. Synthetic fixtures use
+synthetic pins; they do not replay actual private R314 bytes or establish a
+synthetic account/continuous lease. Advisory audit is not independent review.
+
+Final pure policy9067bytes SHA256
+`57333e2d6932f3b75bb42bc59214ebda2ce9afdf65b9054b7edc7ee5cbd37d93`;
+tests16939bytes SHA256
+`f7146766d127268d01c607140ae96ec3ad19304d96746bfa33b7a01d0d3cbe00`;
+canonical profile
+`7daeddc9e4810c74c73f5cea92822b694f9653277a672310de4b412613344c79`.
+Author171focusedpasses3.49s; earlier151passes3.55s/169passes3.67s overlap.
+Whole-row-pin and pre-encoding-type omissions each caused1expectedfailure0.07s,
+restoredfinally; compile/EOF/unique-defs/diff checks passed. Root's earlier
+568passes6.88s used the preceding151-test policy tree and is NOT final validation
+of this expanded tree. Final combined checks follow in315 before commitment.
+
+## 315. Owner-authorized one additional A6 exact-source recovery — 2026-10-24
+
+### 315.1 Scope and attempt decision
+
+The owner answered the exact scoped request: "Yes—skip review and allow one A6
+attempt." This authorizes the specific collaborator-verifier fix and ONE new
+R298 recovery to upload the exact frozen files and launch only if every gate
+passes. It supersedes314's no-sixth-attempt stop, not any technical condition.
+A1–A5, the R314 diagnostic and all previous review waivers remain spent.
+No A7, unrelated family cell, changed source economics, replacement project,
+permission/share mutation, provider data request or paper/live action follows.
+Same-round implementation/advice is not independent acceptance. Monitor stays
+PAUSED; the original one final matching-lane push remains pending.
+
+The original round baseline remains8877caba1187df0ded2709ddeb793f6ffa9a1a96.
+Local HEAD at this new preparation is7a2c756e9c11f57a06f1f58feb917f90c9a6d39b;
+live matching remote still equals8877caba. No new Claude range or unexplained
+concurrent change. Only root-authored record and the new pure policy/tests
+were dirty. All work remains in the designated Code root and matching branch.
+
+Current floor320shared/245Analyst development/50infrastructure/699cells.
+Preparation adds nothing. The actual exclusive A6 claim adds exactly one shared
+and one development look, to321/246/50/699, even if later refused. The prior
+append-only Analyst R298 shared-ledger exception applies to this accounting;
+no other-lane or historical entry changes. No accepted result follows merely
+from a launch or terminal status.
+
+### 315.2 Separately versioned recovery contract
+
+Prepare scripts/arv2_r298_access_recovery_remote.py and
+scripts/run_arv2_r298_access_recovery.py with a NEW A6 control/schema/backtest
+identity. Deliberately reuse the exact existing environment label
+Codex ARV2 R298 A5 20261024: codeSourceId identifies an environment, not an
+attempt. Its reuse does not renew A5; A6's claim/name/accounting are separate.
+Only the fixed R314 whole owner/extra pins and typed predicates are admitted
+by the new pure policy. No new-label hash derivation, automatic pin refresh,
+Mia fallback, ignored extra row or generic UID-null exemption.
+
+Fixed new control is
+artifacts/analyst_revisions_v2/newrule_access_recovery/R315-20261024-A.
+It remains uninspected/unallocated in preparation. The parent must claim and
+fsync exclusively before credentials/contact, authenticate current exact
+family/D15 inputs in native-network-denied workers, bind selected source pins
+and clean host/HEAD, then perform the bounded existing-project recovery.
+Every old control, including R313 and R314, is excluded from worker reads.
+The source projection remainsf67148cd717e207be9d44f088749c0443bb696d9c4f38f512eb6cbf483fd9662;
+all11 file bytes, candidate economics and original family/package/lineage/D15
+pins remain unchanged. Positive owner/access/idle, exact manual history, one
+supported edit lock, full inventory before each write, exact post-write and
+precompile/prelaunch readback, fresh admission, bounded compile/capacity/status
+checks and external actual-exit authentication remain mandatory.
+
+The current owner-approved exclusive handoff and313.4's exact manual-backtest
+Make Public observation remain the scoped external basis. Neither agent nor
+owner reports subsequent sharing/editor changes; no new editor is opened to
+repeat that observation. Fresh API identity/idle/history checks must still pass.
+This is qualified current access under the private-default service contract,
+not universal/historical privacy or a continuous lock. Unknown changes refuse.
+No actual new control, private source, credential, lock, file upload, compile,
+capacity or backtest contact occurs until the exact final source/run freeze.
+
+### 315.3 Prospective execution bounds and result handling
+
+The planned exact clean commit binds the final caller/helper/policy/tests and
+selected dependencies listed in315.4. That commit, not a prior freeze or dirty
+tree, must be --expected-head. Source-binding arguments are not authorization
+booleans;315.1 supplies one A6 and this scoped review waiver, with every technical
+check still mandatory. No intermediate push. Fixed project38364439, candidate
+arv2-newrule-6-ar0-2026-v1 and exact original projection are unchanged.
+A6 backtest name is ARV2 R298 NEWRULE SIX OFF 2021 OCT2026 A6 f67148cd.
+
+At most9 restorations, with the evolving complete inventory checked immediately
+before every write and all11 exact files checked afterward. The two previously
+retained core/forced-exit modules must already be exact. Historic4-file inventory
+implies7creates+2updates, but current inventory determines the observed split;
+no unknown source may be overwritten. Only one supported lock acquisition,
+no force/reacquire/share/permission/delete/replacement-project operation. One
+compile/create, at most20compile/read polls10seconds apart, fresh admission
+before launch, then exact source/history/idle checks and read-only capacity.
+Occupied capacity returns capacity_wait without launch or other-lane changes.
+One backtests/create only if available. A queued/running create permits one
+own-status read after60seconds; immediate Completed. is retained without that
+read and immediate Runtime Error remains failure with its exact ID retained.
+Queued/capacity_wait is not the owner's running goal; no automatic relaunch or
+expanded wait contract follows.
+
+Parent600second/max64application-dispatch/24KiB envelope bounds remain; require
+90seconds prelaunch reserve. Only its own children may be killed/reaped. Fresh
+claim consumes A6 even if no QC dispatch follows; partial claim/unknown exit or
+effect is ambiguous/spent. Keep every old/new artifact and failure; no cleanup,
+marker repair, renewed claim, pin refresh, renamed retry or bare caller fallback.
+No result statistics/log/chart/order/aggregate download is included. This is
+an order-based candidate launch, not a non-order performance substitute.
+
+Before contact, separate credential-free native-network/production-artifact/
+Keychain-denied preflight checks exact clean host/HEAD, source/profile/tests,
+selectedpins, in-memory compilation and dispatch_fence absence. Only designated
+Darwin/POSIX Python3.13 at /Users/sheltonchen/.venvs/trading_agent-py313/bin/python
+in the designated Code root/branch may run it. External capture passes only the
+existing QC_USER_ID/QC_API_TOKEN in memory, no Keychain/tokenfile lookup or
+printing; minimal environment and in-root temporary/cache support paths.
+External615second/64KiBperchannel selectors capture preserves actual parent
+exit, UTC dispatch/completion brackets, channel lengths/hashes and any bound.
+These clocks cannot guarantee interruption of uninterruptibleI/O/host suspension
+or identify provider-event timestamps. Application dispatch counts are not
+measured provider-contact counts.
+
+Once only, a separate credential-free native-network/production-artifact/
+Keychain-denied15second validator may consume the captured finite envelope via
+this exact caller's pure validate_output and externally observed actual exit.
+Require empty stderr, canonical double-LF framing and exact reconstructed report
+pin. No output-leaf reread. Exit0 plus matching validated output is necessary;
+exit2 remains failure with any retained launch/status receipt. Invalid output
+is reported only as finite hash/length/context, never raw exceptions or response
+bytes. All formal/PIT/paper/accepted flags stayfalse. Actual evidence and look
+accounting must be documented before the round's one final nonforce lane push.
+
+### 315.4 Final tested sources and exact one-shot freeze
+
+| Source | Bytes | SHA256 |
+| --- | ---: | --- |
+| scripts/arv2_r298_collaborator_access.py |9067|57333e2d6932f3b75bb42bc59214ebda2ce9afdf65b9054b7edc7ee5cbd37d93|
+| scripts/arv2_r298_access_recovery_remote.py |12085|0659ddcadd0f2c138c08d88fd88ea3f436db8113ad9f0c646f980f0641db6709|
+| scripts/run_arv2_r298_access_recovery.py |35279|1e02200da124c4143437c022e9a29ff251d5d284ceb3158431187ded0686608e|
+| tests/analyst_revisions_v2/test_r298_collaborator_access.py |16939|f7146766d127268d01c607140ae96ec3ad19304d96746bfa33b7a01d0d3cbe00|
+| tests/analyst_revisions_v2/test_r298_access_recovery_remote.py |37739|5db5648eeff4b8beee38b6edffbe762f8d4203c4d14dd29f21f755871b342551|
+| tests/analyst_revisions_v2/test_r298_access_recovery.py |60903|c15df146b86eff0efa5d3890167f56ee4eea2b60626e443f83a4d246504aa699|
+
+Canonical arv2-r298-access-recovery-v1 profile SHA256
+`431bac897bd1b4bf60951fb5ae9bb11a3be5dc7662d599bda58087ef1483208f`.
+Root verified all80selectedpins against actual public files, compiled all6new
+files in memory without bytecode, checked unique top-level definitions and
+single-LF endings, and asserted dispatch_fence absent under native denial.
+All selected A5/older pins and all spent R314 source/test hashes stay unchanged.
+Selected pins are not whole-interpreter or same-user memory integrity.
+
+Root final exact code union: **1111 distinct focused passes in13.90s**, no
+failures/skips/warnings:171purepolicy+289A6helper+234A6caller+330R314observer+
+86record/document+1research transitiveclosure. No complete lane/repository suite.
+All tests/mutations/private parsers use native network/production-artifact/
+Keychain denial, disabledautoload, --noconftest, -B, no cacheprovider and in-root
+support paths. Author/subset/record repeats are overlapping, never additive.
+Working/new-file diff checks pass; cumulative baseline retains the frozen A5
+test EOF cosmetic warning recorded313.6/313.8, not a falsely green whole diff.
+
+Helper author289passes4.92s. Initial251passes/2fixturefailures4.17s expected
+the new policy's two-read project-ID refusal, but the preserved typed observer
+correctly refuses malformed projectId afterone read with owned_project_id.
+Only those expectations were corrected; the early gate remains. Other access
+failures consume both metadata reads, not history/lock/files. Policy omission
+and strict-RPC normalization omission produced1expectedfailure each0.14s/0.13s,
+288deselected, restoredfinally with no file mutation. New tests also cover
+post-lock whole-row drift, every later access gate and A5-name rejection at
+create/receipt/status. The strict JSON check precedes transport-response
+normalization, preserving the pure policy's type contract.
+
+Caller author234passes9.52s. First231passes/3failures13.47s were an explicitly
+in-progress helper hash, a stale synthetic client repr expectation, and a
+minimal --help child exceeding its existing5second timeout under concurrent
+host load despite normal usage/empty stderr. The final source was prospectively
+bound before use, repr expectation corrected and the same unchanged timeout
+passed. No bound was weakened. Memory-only A5-name reversion caused1expected
+failure0.33s, restoredfinally; disk hashes unchanged. Same-round static audits
+and root inspection found no remaining blocker within this scoped contract;
+they are not Claude's independent review or actual QC compatibility evidence.
+
+Under315.1's explicit approval, the clean commit containing this final section
+freezes ONE recover invocation with --expected-head equal to that complete
+commit and --caller-sha256 equal to
+1e02200da124c4143437c022e9a29ff251d5d284ceb3158431187ded0686608e.
+The entire315.2–315.3 scope, external prerequisites, fresh claim/admission,
+deadlines, once-only external output validation and actual-exit requirements
+apply. R315-20261024-A has not been inspected or allocated before commitment.
+Do not run an earlier dirty/source version, R313/R314 again, or any alternate
+callback. Real post-lock hidden-field stability remains unproven; drift must
+refuse, not refresh. No strategy/effectiveness or source-readiness flag changes.

@@ -646,6 +646,10 @@ Confirmed floor314/239/50/699 is retained with a separate unresolved possible
 R298 A1 addition of one shared/development look, not a claim of zero addition.
 No ad-hoc control reader or remote reconciliation has run. A separately
 versioned offline failure-evidence diagnostic is the next bounded work.
+The owner's subsequent Safari/Mia direction is recorded in 307.8. Safari
+reached QC's expired-session notice and login page; no project or Mia was
+accessible. Owner sign-in is the current external barrier, not a diagnosis
+of the section-307 API failure or authority to repeat its begin operation.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1746,6 +1750,14 @@ is authorized by this failed sequence. The former QC hold remains released,
 but no node/job may be changed; availability was only observed at capacity.
 Section 304 and section 305 pins remain superseded. The monitor stays PAUSED;
 no review session or other-chat message is started.
+The later owner specifically authorizes Safari and QC Mia assistance and
+directs continuation until backtesting is running (307.8). Browser access
+currently requires owner sign-in after QC reported Session Expired. Once
+authenticated, inspect only this lane's exact R298 project and seek bounded
+Mia diagnostic assistance; do not infer the local claim from a project name,
+repeat begin, change frozen economics or use another lane's jobs. Any new
+recovery contract still needs its applicable review/run decision. Browser
+permission is not a blanket technical-gate waiver.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -3685,6 +3697,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-22 | Claude independent review of sections 302-304: the section 302 counter-review, the V5 launch-readiness successor and its execution freeze | `0318b99a` -> `4421da78` and this record commit | Section 305: five Codex commits `fda3c81f..0318b99a` disposed (3 accepted, 2 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells; no lifecycle, capacity, upload, recovery or diagnostic command run | The V5 lifecycle now accepts QC's real `In Queue...`/`In Progress...` backtest statuses and an absent list-row `projectId` (`ARV2R305-001`, `-002`), with the caller re-pinned and eleven regression tests; section 304's freeze superseded (`-004`); `ARV2CR302-001` to `-006` accepted; section 4 names section 305, banner sentence added, this row appended | 328 V5 tests and 1,509 focused tests under `--noconftest` in a sandbox refusing network, `/usr/bin/security` and artifact reads and writes; six in-memory mutations all caught; 66 selected bindings and Codex's 303.4 hashes reproduce; record gates 86 passed; artifact metadata census unchanged; complete lane suite not run at the owner's direction | 0 P0, 1 P1, 0 P2, 6 P3 | Single push of this round's two Claude commits; Codex counter-reviews section 305, then a new exact execution decision |
 | 2026-10-24 | Codex counter-review of section 305; bounded V5 corrections only | `de0911a0` -> `b707ab98` and this section-306 record commit | Both incoming commits `0318b99a..de0911a0` disposed separately; code accepted, record accepted after correction/qualification; all six findings classified | V5-only optional-but-exact list counts, fresh-A1 empty inventory and preclaim control-file reservation; 37 added regression cases; caller re-pinned; no legacy/economics/shared-file changes | 365 focused V5 passes in 40.47 s; expected red proof 8 failed/29 passed before correction; source/import/document checks in 306.5; no complete suite or private census | 0 P0, 0 P1, 1 P2 and 3 P3 counter-review findings corrected/qualified; historical findings remain; 314/239/50/699 unchanged | Exactly one final nonforce matching-lane push, then stop; Claude reviews new corrections; QC hold remains, monitor PAUSED, no new run freeze or next milestone |
 | 2026-10-24 | Owner releases QC hold and waives current review; exact corrected V5 A1 freeze | `bde2df5a` -> section-307 freeze and eventual result/handoff commit | No new Claude range; direct current waiver, not independent acceptance | Exact unchanged section-306 caller and 66 bindings, original family/package/D15 admission, actual-exit evidence and corrected status vocabulary; capacity then sequential six/eight study only | Native-denied genuine source/host/logging preflight passed; record checks and actual outcomes in 307; no complete suite | Historical findings and false readiness flags retained; starting floor314/239/50/699, no prospective look/cell booking | One final matching-lane push at completed/blocked checkpoint; no intermediate push or storage replay; monitor stays PAUSED |
+| 2026-10-24 | Owner-authorized Safari/Mia investigation; browser authentication blocked | `5f6dcf99` -> this section-307.8 record commit | No new Claude range, review or gate clearance | QC Safari Algorithm Lab reported Session Expired; login opened and no usable saved-login suggestion appeared; no project or Mia inspection, edit, compile or launch | Public-source-only identifier/order advisory; focused record checks below; no operational/private reader or complete suite | R298 ambiguity and possible look addition unchanged; browser login required, not evidence of API failure cause | One final matching-lane record push; owner signs in, then bounded exact-project reconciliation/Mia diagnosis; monitor stays PAUSED |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -51447,3 +51460,47 @@ paper/live/funded/broker/real-order action, formal/PIT/master admission or
 efficacy claim; all historical failures, unresolved gates and other-lane
 boundaries remain intact. The earlier review waiver did not clear this
 technical failure or authorize a new recovery contract automatically.
+
+### 307.8 Owner-authorized Safari/Mia investigation; sign-in barrier
+
+After the single section-307 push at
+`5f6dcf99c2c4526c1969e84f2b9dbc2f491345ef`, the owner said browser changes
+were permitted, clarified **Safari**, authorized asking **Mia** for help,
+and directed **"proceed until the backtesting is running"**. This supplies
+browser/Mia assistance authority for the existing Analyst task, not a new
+strategy, automatic retry, discarded-evidence repair, other-lane change or
+funded/paper/live action. Root/branch/local/live matching remote were that
+clean snapshot at entry. No new review or acceptance is fabricated.
+
+Safari opened QC in a new tab without changing the owner's prior tab.
+Algorithm Lab displayed **"Session Expired" / "Your session has expired.
+Please log in again."** Its Log In action opened the QC login page.
+Focusing Email and opening Safari's password AutoFill control yielded no
+usable saved-account suggestion. No credential was read, entered, printed,
+changed or recovered from another source; no account security setting changed.
+The owner was asked to sign in directly and report completion, without
+sending secrets in chat. Mia is not yet authenticated or controllable.
+This browser observation does **not** establish the cause of the earlier
+API `request_ambiguous`, API-token validity, subscription state or entitlement.
+
+Read-only public-source advice confirmed exact R298 project name
+`ARV2 R298 NEWRULE SIX OFF 2021 OCT2026` and reference project `37165262`.
+There is still no authenticated created R298 project identity or local claim
+result. After sign-in, bounded UI project presence/identity/creation/status
+observations may narrow remote progress, but name matches/absence alone
+cannot authenticate the local claim or renew A1. Any Mia advice or cloud
+change must be compared with the exact local candidate before acceptance;
+frozen economics, original failures and source pins remain binding.
+
+No project, file, compile, backtest, result, Object Store or private local
+artifact was inspected or changed this browser round. No Mia prompt, API
+fallback, capacity call, begin retry or launch occurred. Booked floor and
+unresolved possible R298 A1 addition remain exactly307.6. The concrete next
+external input is owner completion of QC sign-in in Safari; until then this
+round stops without changing the backtest state. Monitor remains PAUSED.
+
+Documentation-only validation: 86 record/active-document tests passed in
+1.02s, no failures/skips/warnings, under native network/artifact-read/write/
+Keychain-command denial, disabled plugin autoload/shared conftest/cache and
+in-root support paths. This repeats existing record coverage, not 86 new
+tests. No complete suite, production-code change or operational rerun.

@@ -46,19 +46,24 @@ FALSE_FLAGS = dict(a3.FALSE_FLAGS)
 FALSE_FLAGS.update(backtest_created=False, capacity_observed=False, launch_authorized=False)
 WORKERS = ('admission-initial-worker', 'admission-final-worker')
 STORAGE_CONTROL = ROOT / 'artifacts/analyst_revisions_v2/newrule_plain_storage/R322-20261025-B'
-# These must be filled only from the actual successful D2 observation and its
-# separately committed freeze. Placeholders deliberately refuse all operation.
-STORAGE_FREEZE = {'actual_exit': None, 'expected_head': None, 'caller_sha256': None,
-    'profile_sha256': None, 'source_manifest_sha256': None,
-    'files': {'broker-report.json': None, 'worker-result.json': None,
-        'organization-binding.json': None, storage.REPORT: None, storage.ADMISSION: None}}
+# Externally observed successful D2, never inferred from a report or refreshed.
+STORAGE_FREEZE = {'actual_exit': 0, 'expected_head': '8feb75dbda9d174e95dc5f49d3c8d29c12ff459c',
+    'caller_sha256': '7c233e51b07c7bd0b8af43b4a12beef714b9010dedb59205b7a37c671eb694a4',
+    'profile_sha256': 'b1081df0c1bd80cf33892865c0db1bf07fc6bd4d5d4394730c379f6c65f81446',
+    'source_manifest_sha256': '8dfc3d3e16c0f6b555c565d9cac5d4e86a2fe35d037f95538e2a7dfe70a7bfa9',
+    'files': {
+        'broker-report.json': {'byte_count': 2300, 'sha256': 'ca49028ac9baa9b58f293306430df33980eadba8286b610894c39de3145e3d42'},
+        'worker-result.json': {'byte_count': 980, 'sha256': 'c25e272e99c0921daecdb82b531ae8dbf8933b7dfa101cda1e5be3378f82e375'},
+        'organization-binding.json': {'byte_count': 421, 'sha256': 'b2712e444aa1767429a795a47919202da1937e4babe4a9ccc4a915d3096fd52e'},
+        storage.REPORT: {'byte_count': 15462, 'sha256': '2928c7d9aa92cec912429081e65429a3042f60b16280a1bc0d001ae8bf591e8c'},
+        storage.ADMISSION: {'byte_count': 1037, 'sha256': '5e97a7b3987994f32663fd0f019b53be7767f4a3d71d2eef627b68ba3c4d7202'}}}
 RUNTIME = ROOT / '.pytest_cache/arv2-r298-plain-readiness'
 NEW_PINS = {
     'scripts/arv2_r298_plain_readiness_remote.py': '5cd7b3209f499157c4e8d1f2d8ed9528008c2a90f3a8d7c8e404a831d5313564',
     'scripts/arv2_r298_plain_source_boundary.py': '3f0274b2ef618a1c6af8e6fb5c828a351d502c1cbfe2925b236f3bbf12ff9240',
     'scripts/prepare_arv2_newrule_plain_transport.py': '858d631f3aecd4107581ee768fbb606eb5f48addacbf0c1c43ecabf5b615158a',
     'scripts/arv2_newrule_plain_storage.py': 'b7be26c1bee3d9ff07b2daeb2c61d7731d85d0f54f7e1dd25978d81cce9de022',
-    'scripts/run_arv2_plain_storage_publication.py': '0' * 64,
+    'scripts/run_arv2_plain_storage_publication.py': '7c233e51b07c7bd0b8af43b4a12beef714b9010dedb59205b7a37c671eb694a4',
     'scripts/run_arv2_r298_handoff_recovery.py': '48dd4e68d08f900fb9648ee20fc5cdd558d9b9974f753c70188a7b2efb56cf74',
     'scripts/run_arv2_r298_access_recovery.py': '1e02200da124c4143437c022e9a29ff251d5d284ceb3158431187ded0686608e',
     'scripts/arv2_r298_handoff_recovery_remote.py': '4bd4be3c0fed06735dbeba67dce1e25ac3122ffaca6aeebec1588cf785db497c',
@@ -111,7 +116,7 @@ SANDBOX = ('(version 1)(allow default)(deny network*)'
 STAGES = frozenset(('claim', 'admission_initial', 'credentials', 'construct', 'inspect',
     'complete', 'compile', 'compile_poll', 'ready', 'admission_final', 'report'))
 FINITE = a3.FINITE | frozenset(('client', 'credential_handoff', 'storage_binding', 'public_packet'))
-REMOTE_CODES = remote.FINITE | remote.predecessor.FINITE_CODES
+REMOTE_CODES = remote.FINITE | remote.predecessor.FINITE_CODES | remote.access.FINITE_CODES
 
 
 def remaining(deadline):
@@ -121,6 +126,10 @@ def remaining(deadline):
 
 
 def helper_failure(error):
+    if type(error) is remote.access.AccessRefused:
+        code = remote.access.finite_error(error)['code']
+        return {'helper_code': code,
+            'predicate': remote.predecessor.OWNERSHIP_PREDICATES.get(code)}
     if type(error) is remote.Refused:
         return {'helper_code': remote.finite(error), 'predicate': None}
     return remote.predecessor.finite_error(error)
@@ -144,7 +153,7 @@ def _storage_freeze():
 
 
 def finite_code(error):
-    if type(error) is remote.Refused:
+    if type(error) in (remote.Refused, remote.access.AccessRefused):
         return 'remote_refused'
     if type(error) is Refused:
         args = BaseException.args.__get__(error)
@@ -702,7 +711,7 @@ def authenticate_storage(plain, projected, deadline):
             require(len(raw) == pin['byte_count'] and sha(raw) == pin['sha256'], 'input_admission')
             pinned[name] = parse(raw)
         broker = pinned['broker-report.json']
-        result_fields = ('worker_result', 'summary', 'organization_binding', 'attempt_consumed',
+        result_fields = ('worker_result', 'worker_result_file', 'worker_failure_code', 'summary', 'organization_binding', 'attempt_consumed',
             'organization_dispatches', 'storage_dispatches', 'worker_exit')
         require(set(broker) == set(expected_binding) | set(result_fields) | set(publication.FALSE_FLAGS)
             and canonical({key: broker[key] for key in expected_binding}) == canonical(expected_binding)
@@ -713,6 +722,8 @@ def authenticate_storage(plain, projected, deadline):
             'complete': True, 'failure_code': None, 'result': result, **publication.FALSE_FLAGS}
         publication.validate_output(canonical(envelope) + b'\n', actual_exit=selected['actual_exit'], expected_binding=expected_binding)
         require(broker['organization_binding'] == selected['files']['organization-binding.json']
+            and broker['worker_result_file'] == selected['files']['worker-result.json']
+            and broker['worker_failure_code'] is None
             and pinned['worker-result.json'] == {**expected_binding, 'result': broker['worker_result']}, 'input_admission')
         organization = publication.validate_organization_binding(pinned['organization-binding.json'], expected_binding)
         rows, payloads = storage._inventory(plain, remote.PACKAGE_SHA256, remote.ACTIVATION_SHA256)
@@ -796,6 +807,10 @@ def _worker(args, deadline):
             'source_pairs': [[item.project_path, item.source_bytes.decode('ascii')]
                              for item in projected.source_files]}
         _validate_worker_result(packet)
+        _preflight(args, deadline)
+        environment.require_safe_environment()
+        store.verify()
+        remaining(deadline)
         return packet
 
 
@@ -1079,13 +1094,6 @@ def _recover(args, store, deadline, state):
                 'category': state['category'], 'http_status': state['http_status'], 'provider_request_count': None})
             raise
 
-    def observe(marker, observation):
-        require(state['endpoint'] == 'projects/read' and state['intent_marker'] == marker
-            and state['last_event'] == 'observed', 'journal')
-        _validate_code_running(observation)
-        state['code_running'] = parse(canonical(observation))
-        store.write('idle-' + marker + '.json', {**binding(args), 'observation': observation})
-
     def observe_access(marker, packet):
         remaining(deadline)
         require(marker in ('inspect-access', 'complete-access', 'compile-access', 'ready-access')
@@ -1166,7 +1174,7 @@ def main(argv=None):
             result = _execute(args, deadline)
             payload = canonical({'schema': SCHEMA, 'operation': args.operation, 'binding': binding(args),
                 'result': result, 'operation_completed': True, **FALSE_FLAGS})
-            require(len(payload) <= (WORKER_MAX_OUTPUT if args.operation in WORKERS else MAX_OUTPUT), 'bound')
+            require(len(payload) + 1 <= (WORKER_MAX_OUTPUT if args.operation in WORKERS else MAX_OUTPUT), 'bound')
             print(payload.decode('ascii'))
             return 0
     except BaseException as error:

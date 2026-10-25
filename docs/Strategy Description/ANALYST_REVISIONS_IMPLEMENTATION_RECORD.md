@@ -57133,3 +57133,195 @@ does not authorize a failed-output repair or source upload. A11 caller is saved
 only as an incomplete, UNINVOKED draft with deliberately refusing storage-pin
 placeholders and no tests yet; it is outside D2's import closure. A11 needs actual
 D2 success pins, completed validation and a separate committed exact run freeze.
+
+### 322.10 Actual D2 publication — passed and spent
+
+At clean freeze8feb75dbda9d174e95dc5f49d3c8d29c12ff459c, the sole D2 parent
+was dispatched2026-10-25T05:35:26Z and completion observed05:35:57Z, actual
+exit0; its native worker also exited0. These are external dispatch/poll brackets,
+not server timestamps or measured request durations. Six exact new objects
+totaling19,164,859bytes were published/verified with24storage application
+dispatches and two fixed organization reads. The parent/worker dispatch census
+agreed; these counts are application attempts, not measured network/server-contact
+totals. Activation was last. No source, compile, capacity or backtest call ran.
+
+The separate output-only validator's first shell command at05:36:20Z exited65
+because of a sandbox-profile parenthesis syntax error, before Python or the
+validator executed. No output consumption/artifact access occurred in that
+failed wrapper. After correcting only that command syntax, the sole actual
+validator was dispatched05:36:39Z, completion observed05:36:47Z, exit0,
+output_authenticated=true/accepted=true with actual parent exit0. Native
+network/artifact/user-and-system-Keychain/security denial remained active;
+the validator consumed only captured finite stdout and external exit/binding,
+never reopened a private artifact. D2 and that actual output validation are
+now SPENT. Their code, control and evidence are frozen; no retry or repair.
+
+Authenticated output pins within newrule_plain_storage/R322-20261025-B:
+
+| File | Bytes | SHA256 |
+|---|---:|---|
+| broker-report.json | 2300 | ca49028ac9baa9b58f293306430df33980eadba8286b610894c39de3145e3d42 |
+| worker-result.json | 980 | c25e272e99c0921daecdb82b531ae8dbf8933b7dfa101cda1e5be3378f82e375 |
+| organization-binding.json | 421 | b2712e444aa1767429a795a47919202da1937e4babe4a9ccc4a915d3096fd52e |
+| plain-storage-report.json | 15462 | 2928c7d9aa92cec912429081e65429a3042f60b16280a1bc0d001ae8bf591e8c |
+| plain-storage-admission.json | 1037 | 5e97a7b3987994f32663fd0f019b53be7767f4a3d71d2eef627b68ba3c4d7202 |
+
+The authenticated new project-source manifest is
+8dfc3d3e16c0f6b555c565d9cac5d4e86a2fe35d037f95538e2a7dfe70a7bfa9.
+The activation is5901bytes at
+arv2/newrule-plain-v1/95405d1b569d4bfeeb6c6d87/transport-manifest.json,
+SHAffdc80e1b6e76410ddd4840e5a21e49aea1dbdd5c735b6bcbd88bfe832e0233b.
+Package/profile/projection remain exactly322.6. This authenticates only the
+new scoped publication/admission, not old-failure cause, source-policy acceptance,
+continuous security, formal/PIT admission or strategy performance. Original
+objects/failed controls remain preserved. The floor remains325shared/
+250development/50infrastructure/699cells; D2 is not A11 or a research look.
+
+Root's post-freeze document repeat86passes0.96s and exact profile/selected-source
+pin checks preceded commit; those86 overlap322.8. Postoperation local HEAD and
+branch remained exact and worktree clean before subsequent implementation.
+Next: finish A11's new native storage-admission consumer using these externally
+observed pins, complete focused validation, then commit its own once-only
+source/compile readiness decision. No A11 invocation is authorized merely by
+this publication result, and no backtest launch is in the readiness contract.
+
+### 322.11 A11 implementation and pre-use corrections
+
+The owner reiterated continuous work toward backtesting readiness with in-scope
+preauthorization. Section322.1's current review waiver applies to this specific
+functional plain-data recovery; it is not independent acceptance, an old-attempt
+renewal, or permission to change strategy economics. A1–A10 remain spent.
+The completed caller binds the five actual D2 pins and its externally observed
+exit0 from322.10; it does not infer that exit from a report or refresh any pin.
+
+Two separate credential-free native-network-denied admission workers freshly
+reconstruct the genuine plain package and public projection, before credentials
+are acquired by the QC client and again after the READY checks. They authenticate
+the new D2 control's five externally pinned files before parsing, then both
+exact control/request censuses and all108 protocol files using the pinned
+private organization binding. They invoke no spent publisher/reader and issue
+no QC requests. Held/named descriptors remain checked through consumption.
+Only the exact projection record, eleven public source files and finite admission
+receipt cross the640KiB worker channel; no private data rows or credentials.
+The credential-bearing parent validates the fixed projection digest and every
+source pair before constructing the remote helper. Selected98 dependency pins
+are not whole-interpreter integrity or continuous source/security proof.
+
+The remote helper retains strict owner/known-A5 access, codeRunning=false,
+exact predecessor inventory, the one known historical manual sample and owned
+edit-lock gates. Nine modules must equal the original projection; only the
+plain input loader and four main transport bindings differ. Every permitted
+write is followed by exact read-back; one compile and at most20 sequential
+ten-second polls precede fresh source/access/compile checks. The final native
+admission is sequential, not simultaneous or continuous cloud integrity.
+READY means exact source plus successful compile, not strategy execution,
+performance, formal source admission or paper/live readiness.
+
+Confirmed pre-use corrections: ARV2I322-009(P2) binds D2's final worker-result
+file and failure-code fields, rather than the incomplete draft schema;
+ARV2I322-010(P2) adds post-admission worker source/environment/held-control
+reauthentication; ARV2I322-011(P2) counts the final print newline in both
+worker and parent output limits; ARV2I322-012(P3) preserves the existing finite
+AccessRefused category without relaxing its policy. Failed admission-worker
+exits remain safely classified as child_failed; their more specific finite
+cause is not retained. This diagnostic limitation is explicit, not a success
+or authority for an unchanged retry.
+
+Author focused validation:109caller +78channel =187distinct passes5.47s.
+Earlier deep fixtures produced72passes/20errors3.66s from a nonexistent
+publication.access fixture, then78passes/14failures4.08s from a nonexistent
+storage.Refused exception reference. Both were test-only corrections, not
+production-policy weakening. The channel author's first75passes/3failures5.08s
+included the two real final-newline bound omissions and one fixture expecting
+the wrong exception for non-JSON bytes. Corrected78passes4.60s overlaps the
+187 selection. Memory-only post-worker source-check omission caught one
+expected failure0.16s; actual-exit bool-type omission caught one expected
+failure0.12s, restored finally. No operational/private reads were used by
+these tests. Same-round author/advisory audits are not independent review.
+
+Caller SHAec7f08b6483dcac360f1cffdaa54c956f9b734543ab6f7a7579c84b7253d94e3,
+test SHAafb4cc5052c0193a77741f1c87e3c0ba129c55adca9f85ed918cb18ef76f720a,
+canonical profiled48d5eb61709d4d9551c529d6c878b3a01da201010009a3990c874581123dbef.
+The separate external observer captures actual exit and stdout/stderr separately;
+the terminal tool's combined channel is not treated as proof of empty stderr.
+Its output-only validator runs under native network/all-artifact/user-and-system
+Keychain/security-tool denial. It consumes captured finite stdout and the
+externally observed exit, never rereads operational artifacts. A11 remains
+UNINVOKED pending final observer validation and the separate decision below.
+
+Root final focused validation: **548distinct passes14.77s** (129readiness
+helper,70source boundary,109caller,78channels,75observer,86record/active-document,
+1research transitive-import closure). All98 selected pins and both final
+profiles matched; new caller/observer/tests compiled in memory without bytecode.
+All tests ran under native remote-network, production-artifact, user/system
+Keychain and security-tool denial, plugin autoload disabled, --noconftest,
+-B, no cache provider and in-root temp/cache/log support. The root asserted
+assistant.dispatch_fence absent. No full lane/repository suite or operational
+call was used. Earlier187 and75 author selections overlap this548. The observer
+author's actual-exit bool guard omission caught one expected failure with11
+overlapping passes0.08s, restored finally. Tiny real synthetic children test
+channel bounds, distinct stdout/stderr, own-child kill/reap and genuine caller
+import/environment compatibility, not QC acceptance or private-source admission.
+
+Final observer scripts/observe_arv2_r298_plain_readiness.py is15,119bytes,
+SHA256 9a90b60f82ce8996f8a8fb50c3af965b724332e835291c840dffd1264807ecab;
+test SHA1079206952b94eb184d30625590cabebbb1a3bcbe6f1d74dfd2409e318aaa3af;
+canonical observer profile684a1878cec5e74715ba76cbe5f90cf6b71dcc45721cfad3f9f607d469033c18.
+The observer reuses only pinned pure support/environment/capture data types
+from an older module; it never invokes the old operational observer or control.
+
+### 322.12 D3 prospective A11 source/compile readiness decision
+
+Under the owner's current in-scope readiness delegation and explicit review
+waiver, authorize ONE A11 recovery through the exact external observer at the
+clean commit containing this decision, binding that commit as --expected-head,
+the322.11 caller SHA and the final observer SHA recorded below. This is the
+functional plain-data successor following D1/D2, not another submission of the
+refused compressed-data loader. No A1–A10 claim or old operational reader is
+renewed. New control artifacts/analyst_revisions_v2/newrule_plain_readiness/R322-20261025-C
+has NOT been inspected or allocated. Claim/partial claim is consumed or
+ambiguous; no automatic retry, cleanup, repair, alternate project or fallback.
+
+Compatible host remains only the designated Mac worktree/branch and Python3.13
+at /Users/sheltonchen/.venvs/trading_agent-py313/bin/python. The external observer
+checks inherited credential shape before subprocess dispatch, sanitizes the
+child environment and reauthenticates clean HEAD/source before and after the
+parent. No credential lookup, value/length disclosure, Keychain operation or
+arbitrary callback. The parent checks shape before claiming and invokes only
+the two fixed native admission workers and exact project38364439 helper.
+All five D2 evidence pins, actual exit0 and public source-manifest pin are
+literal322.10 bindings, not refreshed observations. Fresh native admission of
+those new controls is explicitly allowed for this consumer; spent publisher,
+assessment and output-reader entrypoints remain forbidden.
+
+The900second parent budget covers initial admission, up to64 application
+dispatches, output publication and final admission. Normal worst-case source
+completion uses57 dispatches with20 compile polls; every request still has the
+unchanged bounded transport. Only one compile/create, no capacity or
+backtests/create/status/result method, no permission/share/collaborator mutation.
+Only its own worker may be killed/reaped. The930second external capture budget
+excludes bounded source/Git checks,15second output validator and5second reap;
+uninterruptible I/O and host suspension remain unbounded qualifications.
+Parent stdout128KiB, stderr4KiB, native admission public channel640KiB,
+validator stdout132KiB and observer envelope144KiB are hard finite limits.
+Observed-channel hashes cover bytes actually read, not an unread tail.
+
+The external observer dispatches the operational parent at most once and then
+at most one native-network/all-artifact/Keychain/security-denied output-only
+validator. Only the exact actual parent exit0 AND empty stderr AND matching
+validated READY envelope/report pin admits readiness. A late-failure report,
+unknown/nonzero exit, malformed/trailing/bounded output or failed validator
+does not. Finite failure evidence may be authenticated with actual exit2;
+that is not success and does not renew use. No ad-hoc artifact result reread.
+Source/compile checks and the final native admission occur sequentially;
+no claim of continuous cloud state, original source historical preservation,
+PIT/master admission, runtime success or backtest performance follows.
+
+On an actual accountable A11 claim, append exactly one shared and one Analyst
+development look under the existing owner-authorized Analyst-only shared-ledger
+exception:325/250/50/699 becomes326/251/50/699. D1/D2, the native workers and
+output validator add no separate look or comparison cell. Preserve every older
+entry and other lane. If exact READY is established, document it and conclude
+this round with exactly one matching-lane final push; do not launch a backtest
+as part of this readiness contract. Any new refusal stays retained and requires
+a coherent evidence-led recovery, never an unchanged replay or weakened gate.

@@ -827,10 +827,12 @@ its one detail read refused the complete decoded response's canonical size.
 A16/F are SPENT. Section323.22 records that failure and completed read-only Mia
 diagnosis. A17's failure-only diagnostic/selected-response correction is frozen,
 but its sole use stopped on general collaborator count before any source/job;
-A17/G are now SPENT(323.25). Next reconcile the post-Mia current metadata
-without weakening actual ownership/permissions or replaying G, then continue
-the failure-only RAW diagnostic and consistent six/eight comparison only after
-a verified justified fix. No stale-price or dropped-holding bypass.
+A17/G are now SPENT(323.25). H completed the two-view observation and is spent:
+dedicated owner-only, general owner+A5+an exact new Mia-labelled row, old policy
+still refused(323.27). Next separately freeze the exact observed-representation
+contract/consumer without changing actual ownership/permissions or replaying
+H/G, then continue the failure-only RAW diagnostic and consistent six/eight
+comparison only after a verified justified fix. No stale-price/holding bypass.
 One final push; no funded or paper/live deployment authority is inferred.
 
 Branch: `codex/strategy-analyst-revisions-v2`
@@ -2117,9 +2119,10 @@ guessed stale-price replacement. Then continue the consistent six-cell
 projection preserving current-data/side-price/cash/fee checks. Do not replay A12/A13/A14/A15/A16/C
 or remove the freshness guard to obtain a terminal success.
 The subsequent frozen A17 diagnostic stopped before mutation/job on current
-general collaborator representation(323.25); it is spent. First complete the
-separate H current-metadata observation(323.26), preserve the old access helper
-and decide a justified correction from authenticated evidence, not labels.
+general collaborator representation(323.25); it is spent. H current-metadata
+observation completed(323.27), with exact third-row pin and dedicated owner-only
+but no policy acceptance. Preserve the old access helper; separately freeze
+the exact current-view correction/consumer, not a generic label waiver/retry.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
 V3 is spent after its
@@ -58920,3 +58923,180 @@ for identifier_matches.uid, which the redactor intentionally does not expose.
 Fixture corrected to UIDtype plus known publicId label; production unchanged.
 Retain that initial failure; no false claim of UID-value authentication.
 No H allocation/contact or new look during implementation; final push pending.
+
+### 323.27 Actual H current-view observation; exact pinned representation decision
+
+At clean283ec2c3ce0bdc04499dbf476bc42d2b1bb76442, sole H parent
+2026-10-25T22:11:24.380090Z..22:11:28.525983Z exited0/stderr0/no bound.
+Stdout5,400bytes SHAc4b870bbea662f954044766b45e8f3d031ba3f1830a8d381e2df82e8d5f20657.
+Native supplied-output validator22:11:28.526158Z..22:11:31.818683Z exited0/
+stderr0; output_authenticated=true. Report5,271bytes
+SHA156d7f98e8c68819ef507d15f6d0390729f82afb3bb00f3054de61458a0d7171.
+Exactly2metadata application dispatches; terminalobserved, strict old-policy
+checkREFUSED/general_collaborators. H was a successful observation of refusal,
+NOT access-policy acceptance or launch clearance. H/caller/validator/control
+are now SPENT/frozen, no reread/retry. No look or result cell; floor332/257/50/699.
+
+Current general list is exactly3dict rows: owner707a30618e122e49fe6fa75364451b5b7c50e1019a68a89ffc0cd3ae3c8e0b78,
+known A5 f9a933141393262edb66e3e8248ed75ebf4518668039e1a27af6734f26f58b9d,
+and Mia-labelled full-row SHA710488e487086c93979cd034cf19a073d870e63cf92bdc7904cf2c97f5b0fcf2.
+The third row has ownerfalse, UIDpresentnull, permissionwrite, liveControltrue,
+nameMia, publicIdtype string, emailtype string, codeSourceIdabsent. Its name
+value canonical SHA d3ba6498b5b5c62237890fa07b167a2ae9099dd90b19e91f3f7901f2e917e33d;
+publicId canonical SHA4802c36d758c1b43bbbd50cb3428192a80dc3ea0fee517416285436bdf6e6f14.
+That publicId is NOT the literalMia, mia-ai or A5label; its value is not
+exported or guessed. Whole-row pin includes unreported fields, not just these
+visible shapes. No unknown row is admitted by label or UIDnull alone.
+
+Dedicated view has EXACTLY the sole pinned owner707a, UIDint matches project
+owner, permissionwrite/liveControltrue; caller permissionswrite/true. Dedicated
+response SHA924558b9d04888f46f4705e24260a62e4c482f647e081d18ba5b09be115d9127,
+same as earlierC endpoint, NOT continuous stability proof. Current scoped
+project response SHAf14dd2c3a0c974ffbae0f161c7b68064de4fccac1bb742afc09d243659bdb9bc;
+project/org/name/language/owner match; codeRunningexactfalse, publicfieldabsent.
+No privacy/exclusive-lease/synthetic-account proof or source readback follows.
+No metadata/file/lock/permission/source/compile/job change occurred in H.
+
+Decision under continuing owner implementation/review waiver: implement a
+SEPARATE immutable exact current-view representation verifier. Keep frozen
+57333access helper unchanged; retain all its project/org/owner/dedicated/
+permission/idleness/privacy-contradiction checks. General rows may be a UNIQUE
+subset of only the pinned owner, pinned A5 and this exact H-row, with the owner
+mandatory and at most one of each, maximum3. Third row must independently
+satisfy exact current type/label/publicId-hash/whole-row pin; no refresh,
+arbitrary names/IDs, duplicate, genericMia or UIDnull waiver. Explicitly verify
+and remove only that exact row in a bounded memory snapshot before delegating
+remaining original strict owner/A5 checks; no production module/global patch
+or API permission mutation. Preserve original source response's full pin in
+the new finite receipt; do not call a transformed snapshot whole-response truth.
+
+This is a disclosed prospective contract correction for two API representations,
+not proof the third entry is synthetic, no account exists, permission never
+changed, views are atomic, Mia cannot edit or lease is exclusive. The new
+receipt must preserve synthetic_entry_proven/privacy_proven/edit_lock_proven/
+operational_retry_authority and all financial readiness flagsfalse. It never
+grants an operational call by itself. Further drift/active unknown actors
+refuse. The old count-two policy still correctly refuses its own unsupported
+representation; no historical approval is rewritten. ARV2E323-003 remains OPEN
+until the new independently source-bound consumer's fresh checks pass.
+
+Next separately freeze ONE A18 failure-only RAW diagnostic under this exact
+representation policy with fresh source/input/access/history/compile/capacity
+and original result/actual-exit gates. Cloud remains quote3735/b4ed and history
+manual+A12+A14+A16; A17 had no job or source change. A18 is justified by the
+new current observation/pinned policy and actual owner control remediation,
+not a name-only repeat of G. It must not reopen H/G/F/C or silently refresh
+pins, drop holdings, accept a stale price or count a diagnostic as a family
+cell. Continue toward verified fixes/comparison; one final push remains pending.
+
+### 323.28 A18 prospective consumer of exact current representation
+
+Selected ONE separately versioned A18 use, schema
+arv2-r298-raw-reference-diagnostic-a18-v1, name
+ARV2 R298 RAW REFERENCE DIAGNOSTIC R323 A18, project38364439.
+New control artifacts/analyst_revisions_v2/newrule_raw_reference_diagnostic/R323-20261025-I
+is uninspected/unallocated before invocation. G/H and every old control remain
+spent/frozen; no read/repair/reuse/retry is authorized. The concrete new facts
+are H's exact current third-row observation/dedicated owner-only separation
+and the owner's scoped edit-control recovery, followed by a separately
+versioned observed-representation contract. This is not a new name alone,
+automatic pin refresh or retrospective approval of A17's refused gate.
+
+New pure arv2_r298_mia_access_representation.py explicitly pins H's whole
+third row/publicId hash, preserves original response pins before detaching
+only that exact row in memory, then delegates every remaining owner/A5/project/
+org/dedicated/permission/idleness/privacy-contradiction guard to frozen57333.
+All original supplied objects remain untouched. Unknown/duplicate/drifted rows
+or any extra dedicated account refuse. Its receipt remains a non-capability;
+synthetic/account/privacy/lease/source-permission/operational/funded readiness
+is not asserted. No live-control flag is toggled or other human access granted.
+The owner has explicitly waived Claude review until further notice; this
+unreviewed contract is implemented under that waiver, not represented as
+independent acceptance or whole-interpreter/source-security continuity.
+
+A18 remote directly imports and invokes the new verifier at EVERY _access
+guard, including before and after own A5 lock, each update and final source/
+compile/capacity preflight. No global monkeypatch of old57333, ready, A17 or
+submission is permitted. New finite inventory/exception handling is source-
+bound in its caller/validator. Retain native initial/final genuine October/
+D2/A11 admission, old9dde->quote3735->diagnosticdc1 reconstruction with exact
+held patchers. Fresh current cloud must still be all elevenquote3735/b4ed
+bytes despite UI autosave; history must be exactlymanual+A12+A14+A16, adding
+only own A18 after create. No A17/H job exists. H report/actual0 and UI facts
+are documentary context, not an access-authorized boolean or replayed reader.
+
+Same diagnosticdc1 projection, internal4f5385profile, e811manifest and
+failure-only RAW probe of323.23–24; no stock omission, price fallback, order/
+fee/quote-policy change or strategy tuning. Exactly legacy/main updates,
+one compile, one own job, one mutually exclusive finite failure-detail OR
+two-statistic completed read. All original source/access/history/compile/
+capacity/result checks, poll bounds, source pins, actual-exit and native
+output authentication remain. Parent15,120seconds/420application dispatches/
+1024records; compile120>=1second, capacity3>=60seconds, status240>=60seconds.
+Bounded wait leaves other lanes' environments/jobs untouched; only own child
+kill/reap. Ambiguous/partial/nonzero/late-publish never becomes fabricated0.
+
+Probe always preserves original missing-census refusal and never consumes
+probe prices. Diagnostic-only=true, accepted-risk=true, family-comparable=false,
+result_cell=0 even if strict completed aggregates/final admission succeed.
+Do not pool with323.18's unlaunched family or count partial failed returns.
+An actual claim books exactlyone shared/Analystdevelopment332/257 ->333/258;
+infra50/cells699 unchanged. Tests/preparation/H metadata add no extra look.
+No provider/subscription/storage/project/other-lane mutation or paper/live/
+funded/broker action follows. Record actual result and continue only verified
+justified recovery/comparison under owner scope, not a routine review wait.
+
+### 323.29 A18 exact source/profile/run freeze and validation
+
+Authorize ONE observe of scripts/run_arv2_r298_raw_reference_diagnostic_a18.py,
+--expected-head the clean commit containing this323.27–29freeze,
+--caller-sha2568633694f7c705a83b197e310f916c59c9083956e9afa034824c42668d6c4be40.
+Designated Darwin/POSIX Python3.13 executable/root/branch only. All new/pure
+source pins are fixed below; no unreviewed auto-update or current-response pin
+refresh occurs. Under the owner's explicit continuing waiver this is an
+unreviewed implementation, not Claude acceptance. All technical gates bind.
+
+| New A18 source/test | SHA256 |
+|---|---|
+| arv2_r298_mia_access_representation.py | 18cfacf19757fd6359747f1c78b93e662daf7492ac658f48673dd4d628d56a04 |
+| test_r298_mia_access_representation.py | b68e0796aa25663757598e6cca66a912cdfa855843d531ae2d4ec002ac3e60bc |
+| arv2_r298_raw_reference_diagnostic_a18_remote.py | 8553ac2b4819cb13948e1c4358bb4cf1dfd26c46427eeaced0931643f04adc30 |
+| test_r298_raw_reference_diagnostic_a18_remote.py | c88f1ca237cfda317d302c55bb2af11cb4150e7c3ec467997f7b2d694948598f |
+| run_arv2_r298_raw_reference_diagnostic_a18.py | 8633694f7c705a83b197e310f916c59c9083956e9afa034824c42668d6c4be40 |
+| test_r298_raw_reference_diagnostic_a18_caller.py | 9f7c2ec045406d61a2835a6a3ab6e29f3f7a0ed0d5aeb8aecea68cd5fd77ea0f |
+
+Pure canonical-plus-LF profile1,782bytes
+SHAc7c46b2efa35bd5d357192e755a7444c136e8d651989cc67774b22311a2afb47;
+remote profile4,807bytes SHA132de1377b166635151b089237ce58ca3d68d3705522919503791e72b9f021db;
+parent profile20,817bytes SHAf5d9fb542be7222b5d031503f6b73c848992515e60b80b29931fc02288177983.
+Cloud/diagnostic projection/profile/source/policy pins remain323.24, NOT new
+quote economics or silently rederived family pins. Old access57333/C/H/A17/
+selector/RAW projector and all used operational modules remain frozen.
+
+Root final382distinct focused passes13.86s(126pure access+33remote+136caller+
+86record/document+1research closure), no failures/skips/warnings. All123selected
+public pins and exact profiles matched; six new files compiled in memory.
+Native remote-network/production-artifact/Keychain/security denial, explicit
+--ignore=artifacts, --noconftest, disabled plugin autoload/cacheprovider, -B,
+inroot support paths and absent dispatch_fence remained. No complete suite or
+actual private/QC/provider operation in tests. Initial root381passes/1record
+failure10.31s caught labelA5 concatenated to its64-character SHA, appearing as
+66hexcharacters; separated the label before use. No code/pin changed from that
+run; do not erase the initial failure or add381to382.
+
+Author126passes0.12s/33passes5.79s/136passes8.23s overlap382, not additive.
+Earlier pure109/114 subsets and remote33passes5.97s overlap their finals.
+Initial parent sandbox syntax failed before Python; corrected native run had
+135passes/1fixture AST-normalization error8.29s (observer prefix18maskedto16
+instead of17); corrected test only before136green. No isolation was relaxed.
+Pure memory-only full-Mia-row omission and old-strict-verifier omission each
+caused1expected failure0.06s/0.04s, restored finally, hashes unchanged.
+Three-row synthetic lifecycle, exact row drift, added dedicated Mia, all old
+access/source/history/compile/capacity/refusal paths and selected-only read
+remain covered; this is not actual lease/security/LEAN proof.
+
+No I inspection/allocation, update, compile/capacity/job/result or extra look
+occurred in implementation. Accumulate locally, invoke only this one-use
+freeze and honestly record outcome. Supplied bounded observer bytes may be
+retained in memory for disposition; no old control/output reader or private
+corpus census is needed. One final matching-lane push remains pending.

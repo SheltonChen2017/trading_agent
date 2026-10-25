@@ -101,3 +101,45 @@ def test_offline98_guards_reject_clean_first_authority_and_provenance_drift(befo
     assert before in text
     with pytest.raises(AssertionError):
         _assert98(text.replace(before, after, 1))
+
+
+CENSUS98_FACTS = (
+    ('Census source commit', '`35edf3cb0f158b3ea0a54b9149620235fc698b9d`'),
+    ('Authenticated projection bytes', '8,381,144 across eight files; all hashes verified before fields'),
+    ('TICKERS rows / distinct tickers / distinct permatickers', '21,007 / 21,007 / 21,007; current-vintage only'),
+    ('ACTIONS rows / earliest / latest', '49,716 / 2025-10-13 / 2026-10-09'),
+    ('ACTIONS years 2020 / 2021 / 2022 / 2023 / 2024 / 2025 / 2026', '0 / 0 / 0 / 0 / 0 / 12,803 / 36,913'),
+    ('Warm-up / before 2021-10-11 / missing dates / invalid dates', '0 / 0 / 0 / 0'),
+    ('Modified original inputs / provider requests / QC access / new looks', '0 / 0 / 0 / 0'),
+    ('Native baseline / ON admission / historical entitlement / PIT completeness', 'Unproved / unproved / unproved / unproved'),
+)
+
+
+def _assert98_census(text):
+    start = text.index('<!-- TPR-OFFLINE98-CENSUS:START -->')
+    end = text.index('<!-- TPR-OFFLINE98-CENSUS:END -->', start)
+    rows = tuple(tuple(p.strip() for p in line.strip('|').split('|'))
+        for line in text[start:end].splitlines() if line.startswith('| '))[1:]
+    assert rows == CENSUS98_FACTS, 'offline98 census facts changed'
+    for phrase in ('No lower date bound was sent', 'an upgrade alone would not correct that query',
+                   'No historical packet is overwritten', 'no additional provider purchase is justified'):
+        assert phrase in text, phrase
+
+
+def test_offline98_census_separates_retained_rows_from_entitlement_and_readiness():
+    _assert98_census(_section98())
+
+
+@pytest.mark.parametrize('before,after', (
+    (CENSUS98_FACTS[1][1], 'All captures were read'),
+    (CENSUS98_FACTS[3][1], '49,716 / 2020-09-01 / 2026-10-09'),
+    (CENSUS98_FACTS[4][1], 'Complete history in every year'),
+    (CENSUS98_FACTS[6][1], '0 / 0 / 1 / 1'),
+    (CENSUS98_FACTS[7][1], 'Valid / admitted / proved / complete'),
+    ('an upgrade alone would not correct that query', 'an upgrade repairs all inputs automatically'),
+))
+def test_offline98_census_guard_rejects_clean_first_coverage_and_acceptance_inflation(before, after):
+    text = _section98(); _assert98_census(text)
+    assert before in text
+    with pytest.raises(AssertionError):
+        _assert98_census(text.replace(before, after, 1))

@@ -24718,6 +24718,16 @@ predecessor programs:
   not overwrite earlier results or another process's lock. Access/lock/read/
   cleanup failures are body-free; cancellation persists known accounting and
   propagates. An unreturned native result leaves counts null, not zero.
+- `extended_sharadar_history_design.py` subsequently addresses the omission
+  found by the actual local census below. It is a PURE prospective query and
+  coverage contract, not a provider controller: three supplied public freeze/
+  calendar byte strings must match independent pins; ACTIONS queries require
+  exact `from=2020-09-01`, `to=2026-10-09`, fields, CSV/date order, 10,000-row
+  page and bounded offsets. There is no I/O, credential, active capture or
+  permit. Empty results, complete pagination and observations in every year
+  still cannot attest complete history or admit ON. The executed old producer
+  and its default-window packet are preserved; actual recapture/comparison
+  remain separate and unperformed.
 
 Only synthetic stores, clocks, native modules, contexts and local temporary
 directories are used in validation, including the composed controller ->
@@ -24790,6 +24800,7 @@ upgrade or new provider is purchased by this implementation.
 | `TPR-OFF98-D002` | Remaining controller/runtime gap: build integrated prospective assembly | Complete local source/program/receipt/claim boundaries before later genuine tool access. Alternative old expired holder/program replay remains prohibited. | Agent implementation and focused verification, not independent Claude acceptance. |
 | `TPR-OFF98-D003` | Evidence discipline: qualify then census retained packet | Current five-year access is not retrospective entitlement proof. Prefer a small hash-bound local census over buying/rebuilding on an unproved assertion. | Agent-delegated processing design under current offline authority; no source completeness/PIT admission. |
 | `TPR-OFF98-D004` | No-QC priority: retain native readiness as unproved | Synthetic success establishes local composition, not native source/unit/mark/order/fee/cash/NAV/clock proof. No paid upgrade, attempt reset or source substitution is used to evade that boundary. | Agent-delegated routine implementation choice. |
+| `TPR-OFF98-D005` | Actual packet census and preserved query freeze: prepare explicit-range successor policy | Prevent a new capture from silently relying on a default lower date. Alternative rewriting the executed producer/input is rejected. Query construction is pure; fresh rights/entitlement/access/custody and actual coverage/comparison are still required. Native OFF recovery is not blocked by this prospective input design. | Agent-delegated offline implementation; no independent acceptance or new capture authority. |
 
 Native backtesting readiness remains unproved. `TPR-CCR28-003` has a prepared
 offline controller/program successor, but genuine adapter/tool custody,
@@ -24847,6 +24858,7 @@ in memory; `git diff --check` is clean.
 | `extended_refusal_witness_controller_successor.py` | 19,793 | `1e907cc0efdeadeccf284c7b2954e95c06901d9368ca43e795d98f91d63f745e` |
 | `extended_refusal_witness_program_successor.py` | 12,801 | `4d4ec88689d0c22742f981d13e1288122684b4e300e26286ddb468cbdad47110` |
 | `extended_sharadar_capture_census.py` | 32,331 | `5f92da2c7de122373a9264ef5595ad46e34e3bf2c6920bc4e302924f778b95a2` |
+| `extended_sharadar_history_design.py` | 7,668 | `1d5a4088488b881b322dc43a1c45c4fee7367499c750194e2ee2d576f7a99ee2` |
 
 The named local runner `artifacts/target_price_provider_coverage/offline_runner_20261024_v2.py`
 is 1,867 bytes, SHA `40d20baab905c205e47a9b598997395a24325c1276dc85888da9089825850d01`.
@@ -24861,3 +24873,125 @@ worktree and makes exactly one final matching-lane non-force push at a stable
 completed or genuinely blocked checkpoint. Before every commit/push verify
 physical/Git roots, branch, HEAD, status/staged diff and actual matching remote;
 unexpected remote movement stops the round, not a silent merge/overwrite.
+
+### 98.6 Actual local census: retained history is not a full-window capture
+
+Producer/source and initial handoff were committed together as
+`35edf3cb0f158b3ea0a54b9149620235fc698b9d` before any actual census invocation.
+Both fresh operations ran at that unchanged clean HEAD on October 25 UTC
+(October 24 on the owner Mac). Owner-instruction digest
+`a306e814ba92c4333d8dcf275ca4aa084bf274dadfe7c54a08f086a0cfeec64f`
+binds the exact latest instruction quoted in 98.1. Each operation has its own
+five-minute plan, immutable spent claim and unique body-free result under
+`artifacts/target_price_extended/TPR-CAP-TILT-EXT26-20261010-v1/sharadar_coverage_census/`.
+Both completed **diagnostic-only**, with cleanup complete and no failed-read
+byte uncertainty. They may not be replayed or renewed by implication.
+
+| Operation | Plan SHA-256 | Newly produced metadata |
+|---|---|---|
+| `TPR-EXT26-SHARADAR-CENSUS-INDEX-20261024-001` | `decea4635369c284e5e77c929596f798c1aca1e12b902e2d1ae4e32e2076634e` | One exact 7,871-byte index read; 1,881-byte inventory, SHA `d22dbc09070a60e2aa8da910b19fd8cae24479c2aa7ef55fecedfcb75b332ff9` |
+| `TPR-EXT26-SHARADAR-CENSUS-PAGES-20261024-001` | `8801ed689920edd13aaa8029e85ea1c7bfe26757c5483339705f4269811621fb` | Nine completed reads: the new inventory plus eight exact projections, 8,383,025 actual bytes; 8,397,528 reserved including the inventory ceiling. Census 1,298 bytes, SHA `5f3357f4e1c446b9276e928de9648ea9ddfb0a8944e563bfca6e847b56ce6bed` |
+
+The two new aggregate outputs were then read back at exact size/hash through
+the committed safe reader; no old input or wire was reopened for that check.
+The inventory authenticates all eight individual projection hashes/sizes and
+is preserved, not replaced by a paraphrased list. All eight payloads were
+hash-verified before the first field count. No old access scope, D0, original
+failed capture, Massive wire, signal preparation or outcome was opened.
+
+<!-- TPR-OFFLINE98-CENSUS:START -->
+| Observation | Result |
+|---|---|
+| Census source commit | `35edf3cb0f158b3ea0a54b9149620235fc698b9d` |
+| Authenticated projection bytes | 8,381,144 across eight files; all hashes verified before fields |
+| TICKERS rows / distinct tickers / distinct permatickers | 21,007 / 21,007 / 21,007; current-vintage only |
+| ACTIONS rows / earliest / latest | 49,716 / 2025-10-13 / 2026-10-09 |
+| ACTIONS years 2020 / 2021 / 2022 / 2023 / 2024 / 2025 / 2026 | 0 / 0 / 0 / 0 / 0 / 12,803 / 36,913 |
+| Warm-up / before 2021-10-11 / missing dates / invalid dates | 0 / 0 / 0 / 0 |
+| Modified original inputs / provider requests / QC access / new looks | 0 / 0 / 0 / 0 |
+| Native baseline / ON admission / historical entitlement / PIT completeness | Unproved / unproved / unproved / unproved |
+<!-- TPR-OFFLINE98-CENSUS:END -->
+
+There are 48 retained duplicate-row observations, zero conflicting or refused
+rows, 351 total ticker lexical descents and no missing ticker/permaticker
+values. These audit counts do not attest to complete corporate actions,
+historical identities, survivorship or source availability at decision time.
+
+**New finding `TPR-OFF98-010` (P1, OPEN: retained-input historical coverage).**
+The packet's ACTIONS history is approximately one year, not even the five-year
+allowance. Its exact minimum date is observed packet evidence, not an inferred
+account tier. The public repair freeze (SHA
+`0d0f67a6d02915ff7357018ef51108fdeb3e334cbcccc7e2fa65bbeb1f1d6097`)
+sets `lower_date_bound` to null. The preserved public producer's ACTIONS
+query contains `to=2026-10-09` but no `from`. No lower date bound was sent.
+This fits the one-year default documented in section 96; it is a supported
+explanation, not new provider-log attestation. Pagination termination proved
+only that the returned default-window pages ended, not full study history.
+Thus an upgrade alone would not correct that query. A fresh named successor
+must explicitly bound the intended history, prove returned-date coverage,
+preserve duplicates/missingness and compare the resulting identity/action
+support before any changed input is admitted. No historical packet is overwritten.
+No alias, incidental parameter change or new capture can reset OFF's cap.
+The new pure history-design module prepares that exact query boundary with
+focused fixtures, but does not close the actual packet gap or execute a new
+capture. Four matching in-memory mutants are killed: omitted `from` (1 test
+failure), removed public-byte SHA binding (3 failures, 9 passes), allowed page
+128 (1 failure, 8 passes), and pagination-as-complete-history (1 failure).
+Each mutated namespace was restored in `finally`; agent's final control was
+43 passed in 0.32s. Root independently reproduced all 43 tests in 0.33s.
+
+The current owner's five-year entitlement still cannot retrieve the frozen
+September-2020 warm-up today, as the separately attributed section-96 explicit-
+range probes established. If a new Sharadar capture is chosen, the existing
+ten-year option is sufficient for these dates; Full History or a different
+provider is not established as necessary. This round makes no request, upgrade,
+recapture or source substitution. In particular, no additional provider purchase is justified
+by the packet's default-window omission. The ON identity/signal-bridge input
+question remains OPEN; this is not an invented new blocker to native OFF
+membership/cap recovery, which uses its frozen native inputs.
+
+### 98.7 Stable offline checkpoint and remaining authorized sequence
+
+Offline controller/program assembly and the bounded local coverage diagnosis
+are complete at this checkpoint. Native backtesting readiness remains unproved.
+No valid full-window OFF baseline, matched ON run, usable paired metrics or
+independent sleeve P&L has been produced here. All accepted return/CAGR/
+drawdown/volatility/Sharpe/cost/exposure results remain NULL. OFF three Codex
+attempts, ON zero, 33 historical looks and all failed/Completed diagnostic
+history remain unchanged. No fourth Codex OFF attempt is permitted.
+
+The next actual native milestone requires QC access, which the owner still
+forbids. That is a factual safety boundary, not a routine review stop: the
+current review waiver has been honored, and no old monitor is rearmed.
+The future sequence is a freshly bound genuine witness/native adapter and
+Mia OFF recovery, usable full-window order/fill/fee/cash/NAV/clock accounting,
+then ON only with admitted historical input coverage and preserved allowance.
+No current native permit or automatic launch has been prepared. This
+checkpoint does not alter canonical TR0-I/TPR-1/TPR-0B gates or shared behavior.
+
+New source and local-census interpretation are agent-implemented evidence,
+not an independent Claude acceptance. The next independent reviewer should
+review every commit after `7a6fd7e22568bf4fa820a729d7058fca2d49c30b` through
+this round's final publication and its cumulative tree, including the current
+waiver, intrinsic production-seam fix, census provenance and negative native
+readiness. No review is automatically scheduled or made a new owner purchase.
+The initial new census-fact guard failed before this subsection existed:
+**1 failed in 0.54s**. Final clean-first mutation/document validation follows
+after this result text; no measured result is fabricated in advance.
+The intermediate result-text/document/scope control is **559 passed in 11.75s**.
+
+Final root eleven-module focused union, adding the explicit-history design to
+the ten modules identified in 98.5 and retaining the census clean-first
+negative guards: **1,038 passed, 1 existing platform skip in 21.39s**. All ten
+changed/new Python source/test files compile in memory; diff hygiene is clean.
+No whole lane/repository suite, provider access, credential read, QC request or
+native run was part of these controls. The new history-design test file is
+7,421 bytes, SHA `3e088c2697e4962b3d11ea3eb3f97f59ed3b242b2657517c71a0519047d805b5`.
+
+This final follow-up commit records the actual census, query-default finding,
+pure successor policy and focused validation after the producer commit
+`35edf3cb0f158b3ea0a54b9149620235fc698b9d`. The round publishes both together
+in exactly one successful non-force matching-lane push. Actual final published
+identity, local/remote equality and clean status are verified afterward and
+reported in chat; no self-referential commit hash or completed publication is
+invented in advance. No automatic monitor rearm or QC continuation follows.

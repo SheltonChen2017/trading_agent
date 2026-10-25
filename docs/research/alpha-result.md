@@ -7181,3 +7181,26 @@ Book A17 claim once: **331 ->332 shared /256 ->257 Analyst development /
 UI or later read-only current access census. No accepted result cell or
 historical cause is fabricated. This owner-authorized R298 append preserves
 all earlier/other-lane entries and false formal/PIT/paper/live flags.
+
+### R-298 A18 held-stock RAW-reference diagnostic refusal — 2026-10-25 UTC
+
+At clean `ff7de3dd20ba7e20b94614d74e4780baf7634e84`, sole A18 parent
+22:25:44.425719Z..22:30:17.678830Z exited2/stderr0/no bound. Stdout3,981bytes
+SHA256 `b4e9403c4f6af53a8621a09fecb1e7d3306ea7c3ddd1290ea3db652e9051ac75`.
+Native supplied-output validator exited0 and authenticated FAILURE; outer2.
+Report3,852bytes SHA256
+`071515e58fd03478bf0b6ec21695c6767ba6e3bc09f7f91fa840981eb08552d2`.
+Fresh exact-view access/source/input/compile/capacity passed; one job
+`78ba7a236450cdeffea5efe07d087637`/ARV2 R298 RAW REFERENCE DIAGNOSTIC R323 A18
+ran in project38364439. Runtime Error after36application dispatches; the
+corrected selected reader retained requested48/returned47/missing1heldstock.
+One bounded probe returned4earlier-session bars and no exact-reference bar;
+no probe prices were used. Actual reference/decision dates and identity were
+not retained, so neither is fabricated from A16. No aggregate/performance cell.
+
+Book A18 once: **332 ->333 shared /257 ->258 Analyst development /
+50 infrastructure unchanged /699 cells unchanged**. No extra look for probe,
+native validation or H's metadata observation. A18/I remain spent/frozen.
+Analyst323.30 owns exact evidence, limitations and private-identity diagnostic
+next action. Historical/other-lane entries and all false formal/PIT/paper/live
+flags remain unchanged; no new job, provider price query or fallback followed.

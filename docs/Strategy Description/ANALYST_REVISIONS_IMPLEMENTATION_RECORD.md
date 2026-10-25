@@ -812,7 +812,7 @@ prior readiness-only boundary has concluded. The new launch/result
 contract and six-cell public specification preceded A12. A12 actually launched
 and failed the fresh-price guard on2021-02-22; it is now SPENT, with no accepted
 performance cell. A13 then stopped during access metadata before any mutation,
-compile or job; it too is SPENT. Current floor332/257/50/699. Section323.6–10
+compile or job; it too is SPENT. Current floor333/258/50/699. Section323.6–10
 owns retained failure evidence and the completed read-only Mia consultation.
 The separately frozen current-access observation in323.12 passed the unchanged
 owner-only policy; its use is now SPENT. No permission change or historical
@@ -829,10 +829,13 @@ diagnosis. A17's failure-only diagnostic/selected-response correction is frozen,
 but its sole use stopped on general collaborator count before any source/job;
 A17/G are now SPENT(323.25). H completed the two-view observation and is spent:
 dedicated owner-only, general owner+A5+an exact new Mia-labelled row, old policy
-still refused(323.27). Next separately freeze the exact observed-representation
-contract/consumer without changing actual ownership/permissions or replaying
-H/G, then continue the failure-only RAW diagnostic and consistent six/eight
-comparison only after a verified justified fix. No stale-price/holding bypass.
+still refused(323.27). The separately frozen exact-representation A18 consumer
+then passed fresh gates and ran. Its retained failure identified1held stock
+missing a required RAW close among48 identities; its probe returned4earlier
+bars and no exact-reference bar(323.30). A18/I are SPENT, no result cell.
+Next privately identify the missing holding from a bounded failure witness
+and authenticated input join, then fix verified source/identity defects before
+the consistent six/eight comparison. No guessed stale-price/holding bypass.
 One final push; no funded or paper/live deployment authority is inferred.
 
 Branch: `codex/strategy-analyst-revisions-v2`
@@ -2121,8 +2124,13 @@ or remove the freshness guard to obtain a terminal success.
 The subsequent frozen A17 diagnostic stopped before mutation/job on current
 general collaborator representation(323.25); it is spent. H current-metadata
 observation completed(323.27), with exact third-row pin and dedicated owner-only
-but no policy acceptance. Preserve the old access helper; separately freeze
-the exact current-view correction/consumer, not a generic label waiver/retry.
+but no policy acceptance. The separately frozen exact current-view A18 consumer
+passed fresh access/source/compile and ran; actual RAW absence is retained in
+323.30. Preserve all spent controls and old helpers. Next a bounded private
+identity witness/join, not a generic label waiver, old probe replay or guessed
+price substitution; then verified correction and consistent six/eight runs.
+Section323.31–32 now freezes that prospective A19 witness/native join; it is
+uninvoked until the exact clean source/HEAD freeze and every fresh gate pass.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
 V3 is spent after its
@@ -59100,3 +59108,210 @@ occurred in implementation. Accumulate locally, invoke only this one-use
 freeze and honestly record outcome. Supplied bounded observer bytes may be
 retained in memory for disposition; no old control/output reader or private
 corpus census is needed. One final matching-lane push remains pending.
+
+### 323.30 Actual A18 run and authenticated held-stock RAW-reference absence
+
+At cleanff7de3dd20ba7e20b94614d74e4780baf7634e84, sole A18 parent ran
+2026-10-25T22:25:44.425719Z..22:30:17.678830Z, actualexit2/stderr0/no bound.
+Stdout3,981bytes SHAb4e9403c4f6af53a8621a09fecb1e7d3306ea7c3ddd1290ea3db652e9051ac75.
+Native supplied-output validator22:30:17.679422Z..22:30:21.379823Z exited0/
+stderr0, output_authenticated=true, outer2. Report3,852bytes
+SHA071515e58fd03478bf0b6ec21695c6767ba6e3bc09f7f91fa840981eb08552d2.
+A18/I/parent/reader and all previous protocols are now SPENT/frozen. No reread,
+cleanup, source pin refresh, retry or extra price/metadata query followed.
+
+Fresh new exact-view access, genuine admitted October/D2/A11 and current
+quote3735/b4ed eleven-file readback passed. Own A5 lock, two exact legacy/main
+updates, diagnosticdc1/e811 readback, compile and capacity succeeded. Compile
+ed8233767e663d42a2ea3c9d5590d8f5-e3908e134c5314de5875830686db3b0b;
+job78ba7a236450cdeffea5efe07d087637, nameARV2 R298 RAW REFERENCE DIAGNOSTIC R323 A18.
+36application dispatches; terminalRuntime Error and the sole selected error
+read succeeded prospectively. No complete-response canonicalization or bound
+refusal suppressed this error, and ignored outcome subtrees were not exported.
+This proves I323-011's selected-reader correction for this scope, not whole-
+body authentication, wire accounting or absence of parsed HTTP bytes.
+
+Known categoryraw_reference_census_incomplete, Pythoncategorynull,
+cause_authenticated=false/raw_error_retained=false. Closed observed context:
+requested48, returned47, missing1; missing-held1/unheld-target0/unknown0;
+stock1/ownETF0/unknown0; technicalSIDDateon_or_before_reference1, other date
+buckets0. One failure-only RAW probe invoked for the1missing identity, status
+complete, identity_valid=true,4processed batches/4items: before_reference4,
+exact_reference0, after_reference_before_cutoff0. Probe_prices_used=false,
+sizing_repaired=false, diagnostic_only=true. No price or identity was exposed.
+
+This establishes a returned-bar absence for a held stock, not its public
+symbol, permanent/share-class mapping, actual listing date, halt/delisting,
+vendor root cause or remedy. SID.Date is still only technical map metadata.
+The bounded probe's4earlier bars cannot supply a stale sizing value. A18's
+context did NOT contain actual reference/decision dates: do not retroactively
+assert its refusal occurred on A16's2022-10-24 from source equality alone.
+No human UI read or new Mia chat was used after A18 to infer those dates.
+No completed aggregate/performance cell, partial return acceptance, portfolio
+retuning, source omission or other-cell launch. Current cloud is diagnostic
+dc1/e811; exact job history nowmanual+A12+A14+A16+A18, no A17/H job.
+
+Book A18 once332/257/50/699 ->333/258/50/699. No result cell or extra look for
+probe/native validation. ARV2E323-003 access representation is resolved
+PROSPECTIVELY for these fresh pinned checks, not historical metadata cause,
+actual account identity, continuous owner-only access or exclusive lease.
+Practical completion E323-001 stays OPEN at required RAW-reference completeness;
+all formal/PIT/master/paper/live flags remainfalse. Final record86passes1.03s
+overlap the382focused selection, not additive; no full suite or tests during
+the actual run. All frozen access/projector/selector/A18 hashes remain binding.
+
+Next substantive diagnostic: identify the missing holding PRIVATELY with a
+bounded, domain-separated hash witness of actual reference/decision sessions
+and internal security_id, joined exactly once to the genuine admitted runtime
+binding catalog in a separate credential-free native worker. Do not repeat
+A18's answered extra RAW probe. Keep original primary history/success path,
+all earlier guards and unconditional refusal; no stale/current/quote price
+substitution or dropping the holding. New dates/witness are prospective
+observations, not historical repair. Actual hash-match evidence is not source
+admission or a provider locator invented from hashes; later any exact-date
+source repair needs its own authenticated private route/contract.
+
+### 323.31 A19 prospective dated identity witness and private catalog join
+
+The owner directs continued verified Analyst fixes/comparison and explicitly
+waives Claude review until further notice. No independent acceptance is
+claimed. This scope does not clear formal PIT/master/paper/live or authorize
+funded/broker orders, shared/other-lane changes or new paid rights. A18 proved
+a missing held-stock reference bar but retained no identity/date. Select ONE
+new failure-only identity diagnostic, not an unchanged acquisition/probe retry:
+arv2-r298-reference-identity-diagnostic-a19-v1, attempt19, exact name
+ARV2 R298 REFERENCE IDENTITY DIAGNOSTIC R323 A19, project38364439. New fixed
+control artifacts/analyst_revisions_v2/newrule_reference_identity/R323-20261025-J
+is uninspected/unallocated before invocation. All old controls remain spent.
+
+The pure projection replaces ONLY the prior failure instrumentation, preserving
+the original primary History query, all earlier guards, successful execution
+AST and unconditional original missing-census refusal. No extra History probe,
+price fallback, target/holding omission, terminal-payoff or economic change.
+New closed context arv2-raw-reference-identity-context-v2 contains exact
+reference/decision sessions,09:20 and the pinned full input calendar digest,
+aggregate holding/kind/technical-SID-date buckets and at most16 sorted unique
+hash witnesses. Each witness is the legacy canonical-ASCII/no-LF SHA of exactly
+schema=arv2-missing-reference-identity-v1, internal security_id,
+reference_session and decision_session. Public pinned-calendar adjacency and
+decision membership must agree. Complete witness counts/buckets must reconcile;
+over16 skips all witnesses, unavailable construction emits no partial set.
+No raw identity, SID, ticker, price or licensed row is exported. Hashing is not
+anonymity, historical identity admission, independent calendar proof or cause.
+
+New selected-response receiver validates identity and shallow bounded context
+BEFORE canonicalizing; old16MiB wire/64KiB selected/two-custom-statistic bounds
+remain. Unknown chart/order/trade/performance subtrees are not traversed or
+hashed. Selected pin authenticates only the selection, not the full response.
+Original runtime-error literal plus its one v2 context share one category;
+multiple codes/contexts remain ambiguous, never falsely successful.
+
+Only a complete exact-own-job Runtime Error witness permits one worker2.
+Parent exclusively persists its binding/terminal intent before dispatch; native
+worker is credential-free/network/Keychain/security/write denied, authenticates
+held-directory/intent, then performs fresh genuine October/D2/A11 admission and
+constructs a genuine PlainTransport. It compares source/projection snapshots,
+joins all witnesses uniquely, reconstructs and reauthenticates afterward.
+Genuine registry/fingerprint/PID, exact old public-admission binding, every
+selected role descriptor/stream/count, all catalog row FIGI/lineage invariants,
+unique security/FIGI/row pins and exact full calendar are required. It parses
+only evaluator_manifest/session_axis/runtime_symbol_bindings; fresh source
+construction still reads/authenticates other payloads, so no no-byte claim.
+Only closed row/source/field hashes and counts leave the worker. Current ticker
+is display-only, not an inferred historical provider route. No new provider
+contact, private routing capability, source repair or sizing readiness results.
+
+Actual0 plus strict matching join receipt is required for joined. Native actual2
+may retain only a closed finite unavailability code. Timeout/nonzero/malformed/
+missing/mismatched output never becomes success or a second dispatch. A failed
+join preserves the original runtime-error receipt and actual parent2; diagnostic
+receipt alone cannot clear a source stop. Held/named endpoint checks and these
+selected source pins are not arbitrary same-user or whole-interpreter security.
+
+Fresh current cloud must be exactly A18 diagnostic dc1d/e811 eleven files;
+history exactly manual+A12+A14+A16+A18, adding only A19 after create. Compile
+must be new and not any prior compiled candidate. Exact observed-representation
+access helper18cf remains direct at every guard; no new row/pin refresh. Exactly
+legacy/main edits, one compile/job and one mutually exclusive selected error or
+completed aggregate read. Same parent15120seconds/420application-dispatch/
+1024record, compile120>=1second/capacity3>=60seconds/status240>=60seconds
+bounds; only own child kill/reap. Host suspension/uninterruptible I/O are not
+bounded. No UI/editor or other-lane job changes are required.
+
+Always diagnostic-only/accepted-risk, family-comparable=false/result_cell0,
+even if Completed. and strict aggregates pass. A consumed claim books exactly
+one shared/development333/258 ->334/259; infrastructure50/cells699 unchanged.
+No extra look for join/projection/validation, no pooling with proposed family.
+All formal/source/immutable-history/readiness flags remain false. Continue
+only with verified separately bounded source/identity recovery after the
+actual result; do not guess a route from display metadata or relabel a retry.
+
+### 323.32 A19 exact one-shot source/run freeze and focused verification
+
+Authorize ONE observe of scripts/run_arv2_r298_reference_identity_diagnostic.py,
+--expected-head the clean commit containing323.30–32,
+--caller-sha256 cd039fd8e47a2b0d0032040a3ba7c1bf8113e561a3a02a4239bc96bbea09618d.
+Only designated Darwin/POSIX Python3.13 executable/root/branch; parent and
+native supplied-output validator both enforce exact committed current source,
+all128 selected unchanged/new dependencies and clean HEAD. Actual exit and
+finite output are captured separately; parent actual2 is diagnostic failure,
+not acceptance even if worker2 uniquely joins a row. Retain only supplied
+bounded envelope/report pin for disposition; never reread J or old controls.
+
+| New A19 source/test | SHA256 |
+|---|---|
+| arv2_newrule_reference_identity_projection.py | 97e2c5bc33a3eb820a9b2c28b2b254fd90ce6ff511f36d92fbfbb8c37dd1beba |
+| test_reference_identity_projection.py | 3f441c6ccef36fa86a76fc9aaae1bdff68d37823862b9a8fb16a925f8400fbac |
+| arv2_newrule_reference_identity_response.py | 9703fa8ea178811a6b5f5eca86cff87dc8daa33d939179006fd04905cae182ec |
+| test_reference_identity_response.py | bc0e70969b18f384b32239316126c1830b52cab71d6308e6007a8b8a97c43e20 |
+| arv2_r298_reference_identity_join.py | 742895938a69e2ab40c64a222542162d281077769fa0142c9bfeb929b73afd71 |
+| test_r298_reference_identity_join.py | 70f49af42b6e9954b5ad3fb87c697a42104622fab3a12b58de0ef17376c0962a |
+| arv2_r298_reference_identity_remote.py | 1e437c6d82eefcef9660b4e15099bf0e26e88b325d971c1bc2c1b97d9c08ef3a |
+| test_r298_reference_identity_remote.py | 8956b3a79d065f54f2ebcb9b636702801d32162b0e045923545335a313845f37 |
+| run_arv2_r298_reference_identity_diagnostic.py | cd039fd8e47a2b0d0032040a3ba7c1bf8113e561a3a02a4239bc96bbea09618d |
+| test_r298_reference_identity_diagnostic_caller.py | dfdca97c25eac110cc3eac9275f3242e6602fbbdb809a415e9903ec24f9e9974 |
+
+Projection4,479bytes SHA83255174a37e1aa69ec8436c2b77561c9988007e526d0ad2ced630826e10589f;
+internal profile86f12ed5705d2413575855e61d6b92ec2a02856b2a8cbe07dcc048b32ed7809d;
+full profile27,759bytes SHAf3302a5e2bf1e9b46f686e364f40380b592c8c75a52df8ed3186c5d1062db102.
+Canonical-plus-LF eleven-source manifest1,668bytes
+SHA7a852d8e1d575843340cc87d4e1495133cf3a045702094c89b852b25360294a7.
+New legacy18,743bytes SHA62a731eded8710f34c968f2ab61bc80052ad6486a2e41fa893e3ed8a9487ce84;
+main34,953bytes SHAddadd00c23729fcdb8c5fe881f62b2225030da36b5e44b6a0337500f761bb3e9;
+runtime c7b829020ac20704ec6f813997ebef396ed2069b8ad60c77bf3dc84cd67e2814 unchanged.
+Eleven sources281,651bytes. Remote canonical-plus-LF profile5,109bytes
+SHA5f809d1cbf4f755a66f01c1b61262a0111622595efc1fc86e9863d554e5f6c93;
+caller22,383bytes SHAe418ffd419319d98280047c92773ad8f78331e98ac78a298144cfd074e011a4d;
+selector755bytes SHAa96b0a6002a990b6d36693ce2984e401a535fc160e8c14acce3b7ec6a3b0062d;
+join1,350bytes SHAd6a24305de13624ff5d6b821c276c3deadd2cd9c76ecf73d0bbd5f9790e38be8.
+
+Root final457distinct focused passes19.12s(83projection/selector+64join+
+31remote+192caller+86record/document+1research closure), no failures/skips/
+warnings. Native remote-network/production-artifact/Keychain/security denial,
+--ignore=artifacts/--noconftest/-B/no plugin/cache, inroot support paths and
+absent dispatch_fence remained. All128pins/four public profiles matched;
+ten new files compiled in memory. Initial pin-check shell quoting emitted
+literal backslash-n and Python syntax-refused before checks; corrected command
+ran successfully without code or isolation changes. No full suite, private
+source or operational use in tests. Same-round advisory found no remaining
+concrete defect; this is not independent review or native LEAN proof.
+
+Author83passes6.42s/64passes4.81s/192passes8.91s and rootremote31passes5.93s
+overlap457, not additive. Pure initial56pass/24dependent calendar failures:
+host strict canonical rejected tuple(axis), corrected to list(axis), preserving
+legacy calendar digest. Earlier80/82/62subsets overlap finals. Before use,
+hostile non-string witness-row keys were found to risk rehashing; exact key-type
+guard/regression added before set(row), no emitted cloud-body behavior change.
+Join initial39pass/23context-integration failures5.51s reflected draftAPI/axis;
+corrected before64green. Parent initial156pass/1pending-pin failure/16stale-axis
+fixture errors/1deselected9.51s, then191pass/1pin-test deselected8.92s, overlap
+final192; none is operational success. Memory-only FIGI-validator omission and
+post-public-packet binding omission each caught1expected failure0.24s/0.12s;
+postjoin fresh-snapshot equality omission caught1expected failure0.30s. All
+restored finally; held source hashes unchanged. Synthetic registered capability
+fixtures/public-admission seams are not genuine private D2/A11 evidence.
+
+No J inspection/allocation, credential/provider/QC capacity/source update/
+compile/job/error read or new look occurred before this freeze. Accumulate
+locally; one final matching-lane push remains pending. After actual result,
+preserve exact failures and continue only coherent admissible recovery.

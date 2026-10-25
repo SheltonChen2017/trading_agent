@@ -7099,3 +7099,24 @@ This is attempt accounting, not an asserted runtime failure. A separately
 frozen read-only current-access diagnosis adds no new strategy look. Analyst
 323.10 owns the exact limitations and prospective boundary. No historical or
 other-lane entry is changed; all formal/PIT/paper/live flags remain false.
+
+### R-298 A14 finite quote diagnostic runtime refusal — 2026-10-25 UTC
+
+At clean `9eec227695f360a90e875340f70e6683a5b313f8`, sole diagnostic parent
+20:38:25.027866Z..20:39:57.548705Z exited2/stderr0/no bound. Stdout3,385bytes
+SHA256 `2b9ff847e2541ef71e90c82fe18a2ffafb1790da5aa6b2d643b4ce5a58ca140f`.
+Native supplied-output validator exited0 and authenticated FAILURE; outer2.
+Report3,256bytes SHA256
+`c8d14b163bc214f78ed912271035deac88bbb9e6bd1cd7583d7d502151ffd5fe`.
+Backtest `45ffd36c48e59adfbb212cfd3324dfeb`, exact name
+`ARV2 R298 QUOTE DIAGNOSTIC R323 A14`,33application dispatches. Runtime context:
+generic cached TradeBar not current, current TradeBar missing, current QuoteBar
+fresh/non-fill-forward; trade-price equality unknown. This is diagnostic
+context, not engine causality, historical cause or accepted performance.
+
+Book A14 once: **328 ->329 shared /253 ->254 Analyst development /
+50 infrastructure unchanged /699 cells unchanged**. No completed result cell,
+repeat claim or old operational reader. The separate current-access metadata
+observation adds no strategy look. Analyst323.15 owns exact evidence and the
+prospective quote-aware correction boundary. All history/other lanes and all
+formal/PIT/paper/live false flags remain unchanged.

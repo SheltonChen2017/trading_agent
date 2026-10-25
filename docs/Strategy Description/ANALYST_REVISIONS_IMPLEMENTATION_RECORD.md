@@ -812,12 +812,13 @@ prior readiness-only boundary has concluded. The new launch/result
 contract and six-cell public specification preceded A12. A12 actually launched
 and failed the fresh-price guard on2021-02-22; it is now SPENT, with no accepted
 performance cell. A13 then stopped during access metadata before any mutation,
-compile or job; it too is SPENT. Current floor328/253/50/699. Section323.6–10
+compile or job; it too is SPENT. Current floor329/254/50/699. Section323.6–10
 owns retained failure evidence and the completed read-only Mia consultation.
 The separately frozen current-access observation in323.12 passed the unchanged
 owner-only policy; its use is now SPENT. No permission change or historical
-A13 cause is inferred. Prepare the corrected A14 forward quote diagnostic,
-then continue verified diagnosis/fixes
+A13 cause is inferred. A14 then completed its diagnostic use with an authenticated
+fresh QuoteBar/missing current TradeBar/stale generic-cache refusal(323.15).
+Prepare a coherent versioned quote-aware execution policy, then verified fixes
 and then the consistent six/eight comparison without a routine review wait.
 One final push; no funded or paper/live deployment authority is inferred.
 
@@ -2099,10 +2100,10 @@ final push. Section323's first launch/result contract was committed and A12
 failed at the per-security fresh-price check; A13 stopped during access reads
 before any source edit or new job. The read-only reconciliation in323.10–12
 subsequently passed the unchanged owner-only/current-idle policy. The immediate
-next step is the separately frozen A14 quote diagnostic with corrected finite
-exception handling, then verified correction and the consistent remaining
-cells when admitted. Do not replay A12
-or A13 or remove the freshness guard to obtain a terminal success.
+next step after the authenticated A14 diagnostic failure in323.15 is a separately
+versioned quote-aware execution policy and consistent six-cell projection,
+preserving current-data/side-price/cash/fee checks. Do not replay A12/A13/A14/C
+or remove the freshness guard to obtain a terminal success.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
 V3 is spent after its
@@ -58174,3 +58175,102 @@ No full suite, private input, QC/provider call or output allocation in these
 checks. Same-round advisory inspection is not independent Claude acceptance.
 The sole prospective invocation is323.13, at the clean commit containing this
 freeze, with the exact caller SHA above and that HEAD; no intermediate push.
+
+### 323.15 Actual A14 failure context and verified pricing-contract limitation
+
+At clean9eec227695f360a90e875340f70e6683a5b313f8, sole A14 parent
+2026-10-25T20:38:25.027866Z..20:39:57.548705Z exited2/stderr0/no bound.
+Stdout3,385bytes SHA2b9ff847e2541ef71e90c82fe18a2ffafb1790da5aa6b2d643b4ce5a58ca140f.
+Separate native-denied supplied-output validator20:39:57.549038Z..
+20:40:01.490525Z exited0/stderr0 and authenticated FAILURE; outer exit2.
+Report3,256bytes SHAc8d14b163bc214f78ed912271035deac88bbb9e6bd1cd7583d7d502151ffd5fe.
+No control/output reread. A14/caller/validator/control are now SPENT/frozen.
+
+Thirty-three application dispatches included exact eleven-file admission,
+two diagnostic source updates/readbacks, compile and one actual job. Compile
+c8398c515fb7425391986ac7b3d84429-79837ae21b59dee4b69ddb000301b67d;
+backtest45ffd36c48e59adfbb212cfd3324dfeb, name ARV2 R298 QUOTE DIAGNOSTIC R323 A14.
+Terminal Runtime Error. Failure-only detail retained exactly:
+execution_price_end_not_current; cache_class=trade_bar;
+trade_bar=missing; quote_bar=fresh_non_fill_forward; price_trade=unknown.
+Here not-current means EndTime differed from now, not proof its direction.
+No security, timestamp, price, raw error/stack or failed performance statistic
+was retained by the caller. No completed aggregate read or accepted cell.
+
+This authenticates the predicate/context, not an underlying engine defect or
+historical A12/A13 cause. The current slice has a genuine current non-fill-
+forward QuoteBar while no current TradeBar is present; the generic cache does
+not satisfy the old contract. The proposed narrow typed-TradeBar correction
+is therefore NOT supported. Fresh quotes do not establish fresh security.price
+or equality to its midpoint/side. No stale price, clock-bar price, invented
+trade, per-name execution delay or silent missing-name skip is authorized.
+
+Book A14 once:+1shared/+1Analystdevelopment,328/253 ->329/254, infrastructure50
+and cells699 unchanged. C's metadata observation adds no look. ARV2E323-001
+remains OPEN; its next admissible correction must be a genuinely VERSIONED
+quote-aware execution contract with side-specific cash and fee binding,
+consistent across all six comparison cells. This is an explicit economic/
+implementation revision, not a claim that the old price semantics survived.
+The owner's continuing development/review waiver permits justified fixes,
+not unchanged retry or formal/PIT/paper/live promotion. The preliminary
+185pass selection and post-document86passes1.11s overlap, not additive;
+no tests ran concurrently with the actual parent.
+
+### 323.16 Prospective common quote-aware execution-v1 decision
+
+Under the continuing owner scope323.6, select a coherent quote-aware successor
+before observing any new strategy outcome. This is an explicit execution/fee
+revision, not a witness-only bug fix, blanket freshness waiver or optimization
+based on failed performance. Preserve 09:20 prior-close target quantities,
+09:31 same-session execution, original 2021–2026 dates/input geometry,
+whole-long-only holdings, sell-before-buy ordering, 98percent gross target,
+9.8percent aggregate stock cap, RAW split bridge, no modeled slippage,
+forced-delisting accounting and actual cash/holdings reconciliation.
+
+For each strategy order at09:31, require the security's OWN typed current-slice
+QuoteBar with exact SID,09:30start/09:31end/one-minute period, exact
+non-fill-forward flag, both sides present and finite positive noncrossed
+bid/ask closes. Bind the corresponding typed cache QuoteBar and security
+bid/ask to those fields; never mutate/seed/repair a cache to create freshness.
+Use ask for buys and bid for sells. Buy affordability is floor(current cash /
+(ask *1.001)); target quantities still come from the frozen prior-RAW-close
+plan. Each strategy intent snapshots the side price. Its reentrant fee
+calculation must bind signed order quantity, symbol and tag to that intent
+and charge10bps of its side notional. Validate actual synchronous fill price
+against the bound side within the existing fixed absolute decimal-bridge
+tolerance1e-7, retain the existing fee check and reconcile actual cash/holdings.
+
+Do not impose a09:31 quote requirement on unrelated engine-created forced
+delisting events: retain their existing non-intent fee basis and separate
+forced-exit accounting, not a false claim every engine fee uses the strategy
+quote. An unexpected fee request conflicting with an active strategy intent
+must refuse, not silently take the external-order path. No missing/one-sided/
+crossed/stale/fill-forward quote, unrelated clock bar, security.price fallback,
+per-name waiting, skipped target or time-window change may satisfy readiness.
+Finite refusals and unknown failures stay non-success; a new failure supplies
+evidence for a justified next correction, never an unchanged automatic retry.
+
+The same versioned runtime and economic policy must serve all six eventual
+comparison cells. A first R298 technical run may precede their family adapter,
+but its profile/runtime must be byte-identically reconstructed in that family
+before comparison. Old A12/A14 or earlier compressed/plain-family partial
+results cannot be pooled or relabeled. A success is still accepted-risk
+retrospective research, not formal/PIT/master/paper/live admission.
+
+Primary-source basis (current public source, NOT authenticated cloud-engine
+revision): QuantConnect LEAN SubscriptionManager.IsDefaultDataType excludes
+equity QuoteBars while SecurityCache can still update bid/ask separately;
+EquityFillModel's market path uses ask for buys and bid for sells. QuoteBar
+Close can be a midpoint or single-side value and is not a side executable
+price. BacktestingBrokerage can evaluate fees before or after fill generation,
+so the intent fee helper must be pure/reentrant. Sources:
+https://github.com/QuantConnect/Lean/blob/master/Common/Data/SubscriptionManager.cs
+https://github.com/QuantConnect/Lean/blob/master/Common/Securities/SecurityCache.cs
+https://github.com/QuantConnect/Lean/blob/master/Common/Data/Market/QuoteBar.cs
+https://github.com/QuantConnect/Lean/blob/master/Common/Orders/Fills/EquityFillModel.cs
+https://github.com/QuantConnect/Lean/blob/master/Brokerages/Backtesting/BacktestingBrokerage.cs
+Actual runtime side/fill/fee checks remain mandatory. A non-fill-forward minute
+QuoteBar alone does not prove independently updated sides, executable liquidity,
+market impact or future brokerage equivalence. This decision grants only
+implementation; exact source/protocol/one-use run pins must be committed before
+new QC contact. A14 remains spent and current floor329/254/50/699 unchanged.

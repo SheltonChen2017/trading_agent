@@ -788,9 +788,9 @@ PER_ROUND_PENDING_PHRASES = (
 )
 # The superseded pointer token that must no longer appear in current blocks.
 PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD = (
-    "510292a54a4878d0c3e51f0bfb9f49de4f07632d"
+    "e1e074aaeb0c616a0e9ecba7d5b78db22bc77863"
 )
-PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD = "510292a5"
+PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD = "e1e074aa"
 EXPECTED_POLICY_CODE_REPO_PATHS = (
     "research/__init__.py",
     "research/target_price_revisions/__init__.py",
@@ -1220,7 +1220,7 @@ def _current_integration_state(section: str) -> str:
 def _assert_section93_current_facts(text: str) -> None:
     """Positive, bounded current facts; never scan old sections for stale dates."""
     normalized = " ".join(text.split()).lower()
-    for required in (*SECTION93_CURRENT_FACTS, SECTION98_NEXT_ROLE,
+    for required in (*SECTION93_CURRENT_FACTS, SECTION99_NEXT_ROLE,
                      "last completed counter-review", "skip 1, proceed to 2 and 3 directly"):
         assert required.lower() in normalized, required
     assert SECTION92_NEXT_ROLE.lower() not in normalized, "section92-only routing is superseded for this round"
@@ -1228,6 +1228,7 @@ def _assert_section93_current_facts(text: str) -> None:
     assert SECTION94_NEXT_ROLE.lower() not in normalized, "section94 routing is counter-reviewed, not current"
     assert SECTION95_NEXT_ROLE.lower() not in normalized, "section95 routing is reviewed, not current"
     assert SECTION97_NEXT_ROLE.lower() not in normalized, "owner waived the current counter-review checkpoint"
+    assert SECTION98_NEXT_ROLE.lower() not in normalized, "section98 waiver round is reviewed, not current"
 
 
 @pytest.mark.parametrize("missing", ["opening", "closing"])
@@ -1280,7 +1281,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [SECTION97_RANGE]
+    ) == [SECTION99_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
@@ -1298,7 +1299,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "TPR-1 remains blocked" in normalized_current
     assert "reviewed-spec registry remains empty" in normalized_current
     assert "Claude next reviews this Codex round independently" not in normalized_current
-    assert SECTION98_NEXT_ROLE in normalized_current
+    assert SECTION99_NEXT_ROLE in normalized_current
+    assert SECTION98_NEXT_ROLE not in normalized_current
     assert SECTION97_NEXT_ROLE not in normalized_current
     assert SECTION95_NEXT_ROLE not in normalized_current
     assert SECTION94_NEXT_ROLE not in normalized_current
@@ -1385,7 +1387,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [SECTION97_SHORT_RANGE]
+        ) == [SECTION99_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
         _assert_section93_current_facts(summary_pointer)
         assert SECTION91_NEXT_ROLE.lower() not in normalized_summary_lower
@@ -4624,6 +4626,7 @@ SECTION81_STALE_NEXT_ACTIONS = {
     "reviewed": SECTION94_NEXT_ROLE,
     "counterreviewed": "Claude next reviews this section-95 counter-review and its complete Codex round",
     "pending": "Codex next counter-reviews section 97 and this round's Claude commits",
+    "waiver": "Offline implementation continues under the owner's one-round review waiver; QC access remains forbidden",
 }
 
 
@@ -4639,16 +4642,17 @@ SECTION81_STALE_NEXT_ACTIONS = {
     "current_reviewed_role", "preamble_reviewed_role",
     "current_counterreviewed_role", "preamble_counterreviewed_role",
     "current_pending_role", "preamble_pending_role",
+    "current_waiver_role", "preamble_waiver_role",
 ))
-def test_section_97_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
+def test_section_99_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
     """Retain old routing mutants; reject routing only to the skipped checkpoint."""
     test_exact_next_step_names_the_current_artifacts()
-    current_next = SECTION98_NEXT_ROLE
+    current_next = SECTION99_NEXT_ROLE
     stale_next = SECTION81_STALE_NEXT_ACTIONS.get(fault.rsplit("_", 2)[-2], "")
     if fault.startswith("current_"):
         original_section = _record_section
         section = original_section("## 8. Exact next step")
-        old, new = (SECTION97_RANGE, SECTION95_RANGE) if fault.endswith("range") else (
+        old, new = (SECTION99_RANGE, SECTION97_RANGE) if fault.endswith("range") else (
             current_next, stale_next)
         pattern = r"\s+".join(re.escape(word) for word in old.split())
         assert re.search(pattern, section) is not None
@@ -4657,7 +4661,7 @@ def test_section_97_current_routing_refuses_stale_range_or_role(monkeypatch, fau
             lambda heading: mutated if heading.startswith("## 8.") else original_section(heading))
     else:
         preamble = _record_preamble()
-        old, new = (SECTION97_SHORT_RANGE, SECTION95_SHORT_RANGE) if fault.endswith("range") else (
+        old, new = (SECTION99_SHORT_RANGE, SECTION97_SHORT_RANGE) if fault.endswith("range") else (
             current_next, stale_next)
         pattern = r"\s+".join(re.escape(word) for word in old.split())
         assert re.search(pattern, preamble, flags=re.I) is not None
@@ -5625,6 +5629,19 @@ SECTION97_DISPOSITIONS = (
 )
 SECTION97_NEXT_ROLE = "Codex next counter-reviews section 97 and this round's Claude commits"
 SECTION98_NEXT_ROLE = "Offline implementation continues under the owner's one-round review waiver; QC access remains forbidden"
+SECTION99_BASE = "7a6fd7e22568bf4fa820a729d7058fca2d49c30b"
+SECTION99_HEAD = "6bdd0c1cfb0ee9a45845bdca48a53c6c95409469"
+SECTION99_RANGE = f"{SECTION99_BASE}..{SECTION99_HEAD}"
+SECTION99_SHORT_RANGE = "7a6fd7e2..6bdd0c1c"
+SECTION99_COMMITS = (
+    "35edf3cb0f158b3ea0a54b9149620235fc698b9d",
+    "6bdd0c1cfb0ee9a45845bdca48a53c6c95409469",
+)
+SECTION99_DISPOSITIONS = (
+    "accepted after correction",
+    "accepted",
+)
+SECTION99_NEXT_ROLE = "Codex next counter-reviews section 99 and this round's Claude commits"
 SECTION95_SCOPE = (
     ("Counter-review", "Two incoming Claude commits and cumulative tree"),
     ("Correction inputs", "Public committed code, synthetic fixtures and Git objects only"),
@@ -5757,3 +5774,80 @@ def test_section_97_guard_refuses_contradictory_authority(monkeypatch, added_gra
         lambda heading: mutated if heading.startswith("## 97.") else original_section(heading))
     with pytest.raises(AssertionError, match="contradictory section 97 authority"):
         test_section_97_review_records_every_commit_and_grants_nothing()
+
+
+def test_section_99_review_records_every_commit_and_grants_nothing() -> None:
+    """TPR-CR30: pin the review of the owner-waived offline round."""
+    section = _record_section("## 99. Claude review of the owner-waived offline round")
+    assert SECTION99_RANGE in section
+    ordered = tuple(
+        re.search(r"`([0-9a-f]{40})`", line).group(1)
+        for line in section.splitlines() if re.match(r"[|] Commit [0-9]+ [|]", line)
+    )
+    assert ordered == SECTION99_COMMITS, "ordered section 99 commits"
+    assert ordered == tuple(_git_lines("rev-list", "--reverse", SECTION99_RANGE))
+    dispositions = _bounded(section, "### 99.2 Commit-by-commit dispositions", "### 99.3 P0-P3 ledger", "section 99 dispositions")
+    rows = tuple(
+        (match.group(1), match.group(2).lower())
+        for line in dispositions.splitlines()
+        if (match := re.match(r"\| `([0-9a-f]{40})` \| \*\*([A-Za-z ]+)\*\* \|", line))
+    )
+    assert rows == tuple(zip(SECTION99_COMMITS, SECTION99_DISPOSITIONS)), "exact section 99 dispositions"
+    assert "Cumulative disposition: accepted after correction." in section
+    ledger = _bounded(section, "### 99.3 P0-P3 ledger", "### 99.4 Independent reproduction and mutation evidence", "section 99 ledger")
+    statuses = dict(re.findall(r"^\| `(TPR-CR30-[0-9]{3})` \| P[0-3] \| \*\*([^*]+)\*\*", ledger, re.M))
+    assert statuses == {
+        "TPR-CR30-001": "Closed by correction",
+        "TPR-CR30-002": "Closed by correction",
+        "TPR-CR30-003": "Closed by correction",
+        "TPR-CR30-004": "Closed by correction",
+        "TPR-CR30-005": "Documented",
+        "TPR-CR30-006": "Documented",
+    }
+    assert "NATIVE_ADAPTER_PERMITTED = False" in ledger and "2025-10-13" in section
+    authority = _normalized_authority_sentences(_bounded(section, "### 99.6 Milestone and authority decision", "### 99.7 Recommendation to the owner", "section 99 authority"))
+    for required in (
+        "canonical admission is not authorized",
+        "no real-row canonical D1 is authorized",
+        SECTION99_NEXT_ROLE,
+        "QuantConnect launch",
+        "trading authority",
+        "QuantConnect access stays forbidden until the owner releases it",
+    ):
+        assert required in authority, required
+    assert re.search(SECTION81_GRANT, authority, re.I) is None, "contradictory section 99 authority"
+
+
+@pytest.mark.parametrize("index", range(len(SECTION99_COMMITS)))
+def test_section_99_guard_refuses_disposition_drift(monkeypatch, index: int) -> None:
+    test_section_99_review_records_every_commit_and_grants_nothing()
+    original_section = _record_section
+    section = original_section("## 99.")
+    commit, disposition = SECTION99_COMMITS[index], SECTION99_DISPOSITIONS[index]
+    original = f"| `{commit}` | **{disposition.capitalize()}** |"
+    assert section.count(original) == 1, original
+    mutated = section.replace(original, f"| `{commit}` | **Rejected** |", 1)
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 99.") else original_section(heading))
+    with pytest.raises(AssertionError, match="exact section 99 dispositions"):
+        test_section_99_review_records_every_commit_and_grants_nothing()
+
+
+@pytest.mark.parametrize("added_grant", [
+    "Canonical admission is authorized.",
+    "Live trading is authorized.",
+    "ON launch is authorized.",
+    "A fourth Codex OFF attempt is authorized.",
+    "Paper trading is authorized.",
+])
+def test_section_99_guard_refuses_contradictory_authority(monkeypatch, added_grant: str) -> None:
+    test_section_99_review_records_every_commit_and_grants_nothing()
+    original_section = _record_section
+    section = original_section("## 99.")
+    marker = "### 99.7 Recommendation to the owner"
+    assert section.count(marker) == 1
+    mutated = section.replace(marker, added_grant + "\n\n" + marker, 1)
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 99.") else original_section(heading))
+    with pytest.raises(AssertionError, match="contradictory section 99 authority"):
+        test_section_99_review_records_every_commit_and_grants_nothing()

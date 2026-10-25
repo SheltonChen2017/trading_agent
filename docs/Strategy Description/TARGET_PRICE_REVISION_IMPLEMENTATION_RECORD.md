@@ -1,27 +1,22 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Current owner continuation, 2026-10-24 (section 98):** "skip the review" applies
-to this offline development round. No formal Codex counter-review of section
-97 is claimed. Offline implementation continues under the owner's one-round
-review waiver; QC access remains forbidden. Broad preauthorization does not
-override the explicit no-QC boundary, frozen economics or retained attempts.
-
-**Section 97 (2026-10-24) is the Claude review of the section-95 counter-review and the
-owner-directed offline continuation of section 96.** Sharadar's older-history
-gap is explained by the owner-confirmed **5 Years** subscription; the offline
-coverage and runtime-successor software is reviewed and corrected. QC remains
+**Section 99 (2026-10-25) is the Claude review of the owner-waived offline round of
+section 98.** Its local census is reproduced: the frozen packet's corporate-action
+history spans 2025-10-13 to 2026-10-09 only, because the frozen capture sent no
+lower date bound (`TPR-OFF98-010`, P1, open). The offline controller, program,
+census and history-design software is reviewed and corrected. QC access remains
 forbidden. The lane is **not backtesting-ready**.
 
 **Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly" applied
 to the section-93 round ONLY; section 94 is the Claude review that follows it.
 
 Status: **CLAUDE HAS INDEPENDENTLY REVIEWED EVERY CODEX COMMIT IN
-`e1e074aa..a5979bf6` IN SECTION 97: THE SECTION-95 COUNTER-REVIEW, THE INERT
-OPERATOR CATALOG AND THE SECTION-96 SHARADAR DIAGNOSIS AND OFFLINE PREPARATION.
-CUMULATIVE DISPOSITION: ACCEPTED AFTER CORRECTION (FIVE DEFECTS FIXED IN
-LANE-OWNED EVIDENCE SUPPORT WITH THEIR PIN CHAIN ROTATED, THREE GUARD
-REGRESSIONS; NO EXECUTED CANDIDATE BYTE). NOT BACKTESTING-READY, PERFORMANCE
-OR CANONICAL ACCEPTANCE.**
+`7a6fd7e2..6bdd0c1c` IN SECTION 99: THE OWNER-WAIVED OFFLINE CONTROLLER AND
+PROGRAM PREPARATION, THE LOCAL SHARADAR CAPTURE CENSUS AND THE EXPLICIT-RANGE
+HISTORY DESIGN OF SECTION 98. CUMULATIVE DISPOSITION: ACCEPTED AFTER CORRECTION
+(NINE DEFECTS FIXED IN LANE-OWNED OFFLINE SOFTWARE; NO EXECUTED CANDIDATE
+BYTE). THE PACKET'S ONE-YEAR ACTION HISTORY IS REPRODUCED FROM THE PRIVATE
+PROJECTIONS. NOT BACKTESTING-READY, PERFORMANCE OR CANONICAL ACCEPTANCE.**
 The last completed counter-review is section 95.
 Section 94 reviewed the owner-skipped continuation of section 93.
 33 observed looks now (31cloud+2historical local).
@@ -45,7 +40,7 @@ locked. No new notebook/cell or native witness is claimed. Genuine original
 compiled source, missing source/unit
 provenance and full-window native orders/accounting cannot be inferred from
 saved source or a Completed. status. No protected dates, frozen economics,
-selection rules or attempts are reset. Offline implementation continues under the owner's one-round review waiver; QC access remains forbidden.
+selection rules or attempts are reset. Codex next counter-reviews section 99 and this round's Claude commits.
 Old standalone native-read programs and scope holders are retired from operational use;
 no expired scope is renewed. Percent units remain a hypothesis, not a verified diagnosis.
 The non-authorizing TPR-TR0-I implementation candidate is checkpointed but
@@ -406,24 +401,24 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, 2026-10-24:** Claude has independently reviewed the exact range
-`e1e074aaeb0c616a0e9ecba7d5b78db22bc77863..a5979bf63173e879786fcd84e778122523a09d23`:
-four Codex commits carrying section 95's counter-review of section 94 with
-the inert operator catalog, and section 96's owner-directed Sharadar history
-diagnosis and offline preparation. The last completed counter-review is
-section 95. Section 94 reviewed the owner-skipped continuation of section 93.
-The owner's direction "skip 1, proceed to 2 and 3 directly" applied to that round ONLY.
-Section 97 dispositions every commit and accepts the cumulative tree after
-correction: the oversized-receipt defect is fixed in the two hash-pinned
-source views with their pin chain rotated, the notebook capture successor
-refuses an unusable echo credential and writes a body-free oversized
-receipt, and three intrinsic guards of the witness runtime successor are
-pinned; no executed candidate byte changed. The historical digest reproduces
-with the explicit boundary in section 95; percent units remain an unproved
-hypothesis. Old native programs/holders and both raw operator archives are
-forensic-only predecessors, not replay authority. The Sharadar 5-year
-restriction is confirmed from the redacted receipts; a 10-year history is the
-smallest option covering the frozen window if a fresh capture is ever needed.
+**Current qualification, 2026-10-25:** Claude has independently reviewed the exact range
+`7a6fd7e22568bf4fa820a729d7058fca2d49c30b..6bdd0c1cfb0ee9a45845bdca48a53c6c95409469`:
+two Codex commits carrying section 98, the round the owner waived review for
+("skip the review ... Do not access QC yet"): the offline witness controller and
+program successors, the local Sharadar capture census and the explicit-range
+history design. The last completed counter-review is section 95. Section 94
+reviewed the owner-skipped continuation of section 93. The owner's direction
+"skip 1, proceed to 2 and 3 directly" applied to that round ONLY. Section 99
+dispositions both commits and accepts the cumulative tree after correction:
+nine defects fixed in the lane-owned offline software, no executed candidate
+byte changed. The census's P1 is reproduced from the private projections: the
+frozen packet's 49,716 corporate-action rows span 2025-10-13 to 2026-10-09
+because the frozen capture sent `to` without `from`; that qualifies section
+97's entitlement inference and keeps the ON identity-input question open.
+Old native programs/holders and both raw operator archives are forensic-only
+predecessors, not replay authority. The Sharadar 5-year restriction is
+confirmed from the redacted receipts; a 10-year history with an explicit
+lower bound is the smallest option covering the frozen window.
 33 observed looks now (31cloud+2historical local).
 OFF has consumed all three Codex attempts; no fourth Codex OFF launch.
 ON has consumed zero attempts and remains unlaunched.
@@ -565,8 +560,8 @@ outcome-free source audit; no real-row D1, outcomes or QuantConnect access is
 authorized by that audit.
 The trust rollback pin, protected parent custody, reviewer identity and
 adversarial matrix remain unresolved and parked. **Exact next role action:**
-Section 97 reviewed the section-95 counter-review and the section-96 offline round.
-Offline implementation continues under the owner's one-round review waiver; QC access remains forbidden.
+Section 99 reviewed the owner-waived offline round of section 98.
+Codex next counter-reviews section 99 and this round's Claude commits; QC access remains forbidden.
 The owner bypassed the immediate section92 checkpoint for this round ONLY;
 this does not remove subsequent independent review. A newly observed Mac
 lock prevented even the empty-notebook request; its scope is closed without
@@ -957,6 +952,7 @@ known.
 | 2026-10-14 | Claude review | `30e5ae34984b898addfea01e681a36ce340452e6..1bc751f878c083836dd9bd967231144fb52acd87` reviewed; correction commit `273d5c96` and this record/guard commit on this same lane branch | Independent review of section 86 (counter-review) and sections 87-90 (owner-Mia reconciliation, storage upgrade, guard restoration, look-31 preregistration, cloud-source drift); no feature milestone | Dispositioned all thirty-one Codex commits. Reproduced the cloud-source drift from the post-022/post-023 archives (eleven files, the exact 60-byte header, eight in-memory syntax failures), the drift-inspect and discovery receipts, the look-31 preregistration and observations-30 hashes, and the ten-job census (nine Runtime Error, one Completed). Audited the fifteen new modules: three defects corrected in lane-owned support (credential default, swallowed interrupt, vanishing receipt), six regression tests, six mutants killed; the same vanishing-receipt defect in two hash-pinned predecessors is documented. Accepted all six CCR26 items. No executed candidate, receipt, shared document or shared test changed. | The fifteen new test modules and document guards on the final tree, designated worktree, network-denied; the full lane set had already completed at the received head (**6,756 passed, 87 skipped**) before the owner's instruction not to run it; the complete suite was not run. Provider requests **0**; QC requests **0**; raw licensed rows read **0**; private receipts read locally for recomputation only; looks **0** by Claude. | No P0. `TPR-CR27-005` (P1) open for Codex; `TPR-CR27-001`, `TPR-CR27-002` (P2) closed by correction; `TPR-CR27-003` (P2) partly closed; `TPR-CR27-006` (P2) documented; `TPR-CR27-004` (P3) closed by correction; `TPR-CR27-007`, `TPR-CR27-008`, `TPR-CR27-009` (P3) documented. `TPR-CR26-003`, `TPR-CR25-003`, `TPR-CR23-001`, `TPR-CR23-002`, `TPR-CR22-001`, `TPR-MATCHED-002`, `TPR-MATCHED-006`, the six canonical findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. No canonical, QuantConnect, broker, paper, live, capital or trading authority is added. | Make this round's one push. Codex counter-reviews section 91, resolves the look-31 dispatch, and removes the drifted headers through a source-only Mia task before any run. |
 | 2026-10-22 | Claude review | `557b2250aa82f330a995362ebd75c4f30ab03a34..510292a54a4878d0c3e51f0bfb9f49de4f07632d` reviewed; test commit `2545c56a` and this record/guard commit on this same lane branch | Independent review of section 92 (counter-review) and section 93 (owner-skipped OFF verification and Mia-source recovery); no feature milestone | Dispositioned all twenty-eight Codex commits. Verified from the private captures that the current cloud source compiles (fourteen Python files) with main.py restored to the registered 60,658-byte identity, that the three owner-run jobs are one Completed and two Runtime Error, and that both witness-read routes ended without effect; the historical-suffix byte count reproduces but not its hash. Accepted all eight CCR27 items. Audited the fifteen new modules and files: three test gaps corrected (four regression tests, eight cases, six mutants killed), the runnable operator-script archives and the Mia-supplied scope check documented. No production module, receipt, shared document or shared test changed. | New and modified QC test modules and document guards on the final tree, designated worktree, network-denied (figures in 94.5); no full lane suite and no complete suite, per the owner. Provider requests **0**; QC requests **0**; raw licensed rows read **0**; private receipts read locally for recomputation only; looks **0** by Claude. | No P0. `TPR-CR28-001`, `TPR-CR28-002`, `TPR-CR28-003` (P3) closed by correction; `TPR-CR28-004`, `TPR-CR28-005`, `TPR-CR28-009` (P2) documented; `TPR-CR28-006`, `TPR-CR28-007`, `TPR-CR28-008` (P3) documented. `TPR-CR27-005` current-source component resolved, historical component open; `TPR-CR26-003`, `TPR-CR25-003`, `TPR-CR23-001`, `TPR-CR23-002`, `TPR-CR22-001`, `TPR-MATCHED-002`, `TPR-MATCHED-006`, the six canonical findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. No canonical, QuantConnect, broker, paper, live, capital or trading authority is added. | Make this round's one push. Codex counter-reviews section 94; the owner unlocks the Mac and decides on a unit-aware membership-weight successor and the operator-archive hygiene (94.7). |
 | 2026-10-24 | Claude review | `e1e074aaeb0c616a0e9ecba7d5b78db22bc77863..a5979bf63173e879786fcd84e778122523a09d23` reviewed; correction commit `4db9b62a` and this record/guard commit on this same lane branch | Independent review of section 95 (counter-review, inert catalog) and section 96 (Sharadar history diagnosis, offline runtime successor); no feature milestone | Dispositioned all four Codex commits. Fixed, not only documented: the oversized-receipt defect in the two hash-pinned source views with the three-link pin chain rotated, the notebook capture successor's missing echo-credential check and oversized-receipt fallback, and three unexercised intrinsic guards of the witness runtime successor; eleven mutation trials on the two new modules, eight killed by the received tests, three now killed by regressions. Verified the forty-five cumulative provider request claims and the two redacted summary and plan hashes by key. Accepted all eight CCR28 items, including the digest-boundary closure of my CR28-008. No executed candidate, receipt, shared document or shared test changed. | Whole QC test package plus the two new development and offline test files on the final tree, designated worktree, network-denied (figures in 97.5); no full lane suite and no complete suite, per the owner. Provider requests **0**; QC requests **0**; raw licensed rows read **0**; private receipts read locally for recomputation only; looks **0** by Claude. | No P0. `TPR-CR29-001`, `TPR-CR29-002` (P2) closed by correction; `TPR-CR29-003` (P3) closed by correction; `TPR-CR29-004` (P2) documented, feeding the ON input question; `TPR-CR29-005` (P3) documented. `TPR-CCR28-003`, `TPR-CR26-003`, `TPR-CR25-003`, `TPR-CR23-001`, `TPR-CR23-002`, `TPR-CR22-001`, `TPR-MATCHED-002`, `TPR-MATCHED-006`, the six canonical findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. No canonical, QuantConnect, broker, paper, live, capital or trading authority is added. | Make this round's one push. Codex counter-reviews section 97; the owner decides on the Sharadar history upgrade before any fresh capture (97.7). |
+| 2026-10-25 | Claude review | `7a6fd7e22568bf4fa820a729d7058fca2d49c30b..6bdd0c1cfb0ee9a45845bdca48a53c6c95409469` reviewed; correction commit `d44925a7` and this record/guard commit on this same lane branch | Independent review of section 98 (owner-waived offline controller and program preparation, local Sharadar census, history design); no feature milestone | Dispositioned both Codex commits. Reproduced the census from the private repair projections: 21,007 TICKERS rows, 49,716 ACTIONS rows spanning 2025-10-13 to 2026-10-09, none before late 2021 and none in the warm-up, and the frozen query's missing lower bound. Fixed, not only documented: the controller's unenforced synthetic-only mode, its text-only lane boundary and three receipt-durability gaps; the census's text-only lane boundary and cleanup status; the history design's missing request bounds and weak boundary-year check. Nine mutants killed. No executed candidate, receipt, shared document or shared test changed; no provider or QC access. | Whole QC test package plus the development and offline test files on the final code tree, designated worktree, network-denied (figures in 99.5); no full lane suite and no complete suite, per the owner. Provider requests **0**; QC requests **0**; raw licensed rows read **0** by Claude beyond counts and dates recomputed locally from the private projections; looks **0** by Claude. | No P0. `TPR-CR30-001`, `TPR-CR30-002`, `TPR-CR30-003` (P2) closed by correction; `TPR-CR30-004` (P3) closed by correction; `TPR-CR30-005` (P2) documented (controller design limits for the future adapter); `TPR-CR30-006` (P3) documented; `TPR-OFF98-010` (P1, Codex) reproduced and open; `TPR-CR29-004` qualified. `TPR-CCR28-003`, `TPR-CR26-003`, `TPR-CR25-003`, `TPR-CR23-001`, `TPR-CR23-002`, `TPR-CR22-001`, `TPR-MATCHED-002`, `TPR-MATCHED-006`, the six canonical findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. No canonical, QuantConnect, broker, paper, live, capital or trading authority is added; QC access stays forbidden. | Make this round's one push. Codex counter-reviews section 99; the owner decides on the explicit-range Sharadar re-capture (99.7). |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 | 2026-10-05 | Codex counter-review and TPR-D0 implementation | Reviewed `9958a459f5cd56c29cb9a0de13d38737e2c3412d..c0bfb21393180d44c16c10be1e667ea741098531`; corrections/decisions `cf11788f39a2148d7bc3b801e88807bd2caca5ea`; D0 implementation `8dcfb71851ff22db6f0727395e18292c19f080ef`; this record-only handoff follows | Four-commit Claude counter-review, five bounded owner selections, strict D0 plan and one retained structural audit | Accepted the cumulative Claude range after three record/encoding corrections; selected explicit native/host test variants without changing production trust policy. Implemented the separate standard-library D0 package and immutable aggregate artifacts; retained-source inventory/hashes and all canonical freezes match. Sections 46/47 contain exact dispositions, scope, evidence and remaining limitations. | Cumulative focused suite 491 passed, 5 symlink-permission skips; final routing/artifact guards 107 passed. Standard suite blocked by 110 Analyst `fcntl` collection errors, with zero tests executed. Optional continuation diagnostics capped and incomplete, not reported as totals. Compileall exit 0; diff hygiene clean; Python 3.13.14 / pytest 9.1.1. | CCR16-001/002/003 closed; no new in-lane P0/P1/P2. Six canonical findings remain open and parked. TPR-OOL-017 opened for Windows Analyst collection, documented only. | Exact local retained-structure scope only, expiring 2026-10-12; 587,046 retained rows audited. Provider/outcome/QC/development-look/trading counts zero. No vendor-rights attestation or canonical admission. | One matching-branch non-force push of this Codex round, then independent Claude review of every commit after `c0bfb213` through the exact pushed tip. No automatic D1; later action/source scope must be selected after review and counter-review. |
 
@@ -24995,3 +24991,118 @@ in exactly one successful non-force matching-lane push. Actual final published
 identity, local/remote equality and clean status are verified afterward and
 reported in chat; no self-referential commit hash or completed publication is
 invented in advance. No automatic monitor rearm or QC continuation follows.
+
+## 99. Claude review of the owner-waived offline round - 2026-10-25
+
+**Disposition: accepted after correction.** The owner asked for every
+unreviewed commit to be reviewed, for corrections where necessary, and for
+one push. Two Codex commits are unreviewed, both from the round the owner
+told Codex to run without review and without touching QuantConnect. In it
+Codex assembled an offline controller and program successor for the
+future witness read, ran a bounded local census of the frozen Sharadar
+repair packet, and found that the packet's corporate-action history is one
+year long because the frozen capture sent an upper date bound and no lower
+one. I reproduced that census directly from the private projections. Both
+commits are accepted, the software one after nine corrections: the
+controller's synthetic-only mode is now enforced rather than labelled, both
+modules decide the lane boundary by identity rather than text, every escape
+path leaves a durable receipt, and the history design carries the frozen
+request bounds. No executed candidate byte changed, QuantConnect was not
+touched, and the lane is not backtesting-ready.
+
+### 99.1 Exact reviewed snapshot
+
+| Item | Value |
+|---|---|
+| Branch and worktree | `codex/strategy-target-price-revisions`; the lane worktree resolved from `git worktree list` |
+| Reviewed range | `7a6fd7e22568bf4fa820a729d7058fca2d49c30b..6bdd0c1cfb0ee9a45845bdca48a53c6c95409469` (two commits, no merges, in `git rev-list --reverse` order below) |
+| Commit 1 | `35edf3cb0f158b3ea0a54b9149620235fc698b9d` - Prepare offline witness controller and bounded Sharadar census |
+| Commit 2 | `6bdd0c1cfb0ee9a45845bdca48a53c6c95409469` - Record retained-history gap and pin explicit-range successor |
+| Files changed | 11; +3,072 / -6: this record (+351), four new producer or design modules, four new and two modified test modules, the lane guard |
+| Claude commits this round | `d44925a7b14e45047b3705ad2755f6e4edfa8481` (fixes and tests), this record/guard commit |
+| Scope checks | Lane-only paths; `git diff --check` clean; no duplicate test basenames; no secret value, URL or credential in the diff; no provider or QC access by Codex or by this review |
+
+### 99.2 Commit-by-commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `35edf3cb0f158b3ea0a54b9149620235fc698b9d` | **Accepted after correction** | Four new modules and tests. The controller's "synthetic only" mode was a label, its lane boundary was a text comparison, and three escape paths lost receipts or cancellation (`TPR-CR30-001` to `-003`); the census shared the text-only boundary and the cleanup-status defect (`-002`, `-003`); the history design lacked request bounds and accepted an unobserved boundary year (`-004`). All corrected in `d44925a7`. The program successor's generated text pins its runtime, reader and helper by hash, reads two fixed keys only and prints hashes and counts. |
+| `6bdd0c1cfb0ee9a45845bdca48a53c6c95409469` | **Accepted** | Record-only: the owner's waiver is quoted, the census is run under two bounded local scopes on the committed producer, and the one-year action history (`TPR-OFF98-010`) is reproduced here from the same projections. Its qualification of my CR29-004 is accepted: the packet gap comes from the missing lower bound, and current entitlement does not prove the tier at capture time. |
+
+**Cumulative disposition: accepted after correction.**
+
+### 99.3 P0-P3 ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| `TPR-CR30-001` | P2 | **Closed by correction** | `35edf3cb` | `extended_refusal_witness_controller_successor.py`, `execute_prepared_read` | "Offline-prepared, synthetic only" was a label: the plan's mode and the permit's `effects_authorized` were string and boolean checks, and any callable was accepted as the native adapter, so nothing in the code would have refused a genuine QuantConnect adapter. | Code reading; a plain unmarked adapter was accepted by the received module (mutant survived its tests). | The owner has forbidden QuantConnect access; the module that would perform the read must refuse by construction, not by docstring. | `NATIVE_ADAPTER_PERMITTED = False` and an adapter must declare `tpr_synthetic_adapter = True` or the controller refuses before any claim; permitting a genuine adapter is now a reviewed code change. Test adapters are marked in the test helper. | 65 passed; mutant killed. |
+| `TPR-CR30-002` | P2 | **Closed by correction** | `35edf3cb` | controller `_validate_plan` and `_open_directory`; census `execute` | The lane boundary was a text comparison: the controller refused only the lane itself and its parents, so a receipt directory inside the repository or the private roots was accepted; the census's fixture-mode check used `is_relative_to`, which a case alias or firmlink spelling of the packet path defeats on macOS, reaching the real hash-matching packet. | Code reading; mutants restoring the text checks survive the received tests. | The boundary is what keeps fixture runs out of the repository and the private roots. | A shared identity test (real paths plus directory inode) in both modules; regressions for a directory inside the lane and for the upper-cased lane alias. | Mutants killed. |
+| `TPR-CR30-003` | P2 | **Closed by correction** | `35edf3cb` | controller execute path; census cleanup | Three receipt-durability gaps: a `SystemExit` from the native read left a burned claim and access record with no receipt; a cleanup failure after a cancellation overwrote the status with failed; a receipt-publish failure after a cancellation converted the cancellation into a `ValueError`. The census shared the cleanup-status defect. | Code reading; five regressions red on the received modules. | Receipts are the lane's only durable account of a spent scope. | `BaseException` handler that writes the receipt before re-raising; cleanup keeps the cancelled status; a cancelled run whose receipt cannot be written still raises the cancellation. | Mutants killed. |
+| `TPR-CR30-004` | P3 | **Closed by correction** | `35edf3cb` | `extended_sharadar_history_design.py` | The design set page and row limits only, with no elapsed, per-request, byte, redirect or retry bound, although the frozen capture had all of them; and its year check accepted a census whose boundary date's year had zero observations. | Code reading; both mutants survive the received tests. | A fresh capture must not run looser than the frozen one, and a coverage summary must not pass an impossible census. | `LIMITS` mirroring the frozen capture's bounds in the design output, and the boundary-year check; regressions for both. | 47 passed; mutants killed. |
+| `TPR-CR30-005` | P2 | **Documented** | `35edf3cb` | controller clocks and guard; result binding | By design the controller's clocks and repository guard are injected and the native read has no wall deadline; the result is validated by shape and operation id but not bound to the invocation id or program hash. This is acceptable for synthetic mode, now that the adapter gate makes synthetic mode real, but the future genuine adapter must use intrinsic clocks, a wall deadline and invocation-bound results. | Code reading. | Design requirements for the successor, not current exposure. | None; recorded for the adapter design. | Not applicable. |
+| `TPR-CR30-006` | P3 | **Documented** | `35edf3cb` | census and program successor | The census re-attests the producer's duplicate and descent counts rather than recomputing them, checks the owner-instruction digest for shape only, and does not check the index's fetch time or per-dataset byte totals; its `before_2021_10_11` constant and the coverage reducer's five-year cutoff differ by one day. The program successor's in-program payload hashes are computed from the same strings they check, so only the controller's rebuild binds them. | Code reading. | None of these affected the census result, which I reproduced independently. | None. | Not applicable. |
+
+### 99.4 Independent reproduction and mutation evidence
+
+- **Census.** From the eight private repair projections, read locally for
+  counts and dates only: 21,007 TICKERS rows; 49,716 ACTIONS rows, earliest
+  2025-10-13, latest 2026-10-09, by year 12,803 in 2025 and 36,913 in 2026,
+  none before 2021-10-11 and none in the 2020 warm-up; 8,381,144 projection
+  bytes. The census plans, claims and inventory match the recorded hashes;
+  both results are COMPLETED_DIAGNOSTIC_ONLY. The frozen capture's ACTIONS
+  query carries `to` and no `from`, and the repair freeze records a null
+  lower bound. `TPR-OFF98-010` is therefore reproduced, and my CR29-004
+  attribution to the entitlement alone is qualified as Codex says.
+- **Guards and tests.** The received guard rotation, the section-98 scope
+  guard and the census-fact guard pass; the whole QC package passes after
+  the corrections.
+- **Mutation trials** (one exact substring per trial, restored in
+  `finally`, read-only scratch clone, network-denied):
+
+| Module | Guard removed or restored | Received tests | With the CR30 tests |
+|---|---|---|---|
+| controller | adapter gate removed | not present | killed |
+| controller | text-only lane boundary restored | not present | killed |
+| controller | `BaseException` receipt handler removed | not present | killed |
+| controller | cancelled status not kept through cleanup | not present | killed |
+| controller | cancellation lost on receipt-publish failure | not present | killed |
+| census | text-only lane boundary restored | not present | killed |
+| census | cancelled status not kept through cleanup | not present | killed |
+| history design | boundary-year check removed | not present | killed |
+| history design | request bounds removed | not present | killed |
+
+### 99.5 Validation
+
+- Whole QC test package plus the development and offline test files on the
+  final code tree, designated worktree, network-denied: **5,269 passed, 67
+  skipped** (the skips are the audit-key QA cases whose cloud-only helper is
+  absent); document guards, active-document guard and offline-scope guards:
+  **569 passed**; `compileall` of the lane packages exit 0; `git diff --check`
+  clean.
+- No full lane suite and no complete suite this round, per the owner.
+
+### 99.6 Milestone and authority decision
+
+Section 99 accepts the owner-waived offline round as software and evidence,
+not as implementation, runtime or performance acceptance; canonical
+admission is not authorized; no real-row canonical D1 is authorized; no
+QuantConnect launch, fourth Codex OFF attempt, ON launch, notebook creation,
+provider purchase or capture, remaining-shard upload, broker, paper, live,
+capital or trading authority is added by this review. QuantConnect access
+stays forbidden until the owner releases it, and the controller now refuses
+any adapter that is not declared synthetic until a reviewed change permits
+one. Codex next counter-reviews section 99 and this round's Claude commits;
+no ordinary launch proceeds over the open native findings. TPR-1 and TPR-0B
+remain blocked.
+
+### 99.7 Recommendation to the owner
+
+Two decisions are yours. First, the frozen packet's corporate-action history
+is one year long, so the ON arm cannot be admitted on it; if you want that
+arm, extend Sharadar to 10 years and authorize one fresh capture under the
+explicit-range design (lower bound 2020-09-01) with the frozen request
+bounds, followed by a comparison against the frozen packet. The OFF arm's
+native recovery does not depend on this. Second, when you release
+QuantConnect, the witness read needs a reviewed genuine adapter; the
+controller will refuse anything else. `TPR-CR23-002` (Object Store
+retention) is still waiting.

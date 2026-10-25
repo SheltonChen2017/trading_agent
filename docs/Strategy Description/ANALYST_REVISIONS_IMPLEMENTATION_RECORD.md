@@ -56949,3 +56949,187 @@ Failure stops this exact claim; further work must address verified evidence.
 The first root record check found84passes/2failures because the exact-next-step
 navigation still named321; that live navigation was corrected before D1. This
 is documentary pre-use evidence, not an operational failure or discarded test.
+
+### 322.6 Actual D1 result — passed and spent
+
+At clean freeze d95198e014926ba1a578db61a5c21c4887293a26, the sole native-denied
+preparation was dispatched2026-10-25T05:12:25Z and completion observed05:12:34Z,
+actual exit0. These are external second-resolution brackets, not exact private
+read times. The finite stdout validated once with observed exit0 under separate
+native network/artifact/Keychain/security denial (dispatch05:13:06Z, completion
+observed05:13:38Z). That validator consumed only supplied bytes, not files.
+D1 and its output validation are now SPENT; no rerun/repair/reset.
+
+Authenticated report:13,873bytes, SHA256
+11ee089e4f16247a87bfd4afed58b1f86f353f9e45eafe7b462a23126263ad7c.
+Preparation profile:f4843fd4421583f053ac3eeacc5a01d4d3a9d4a050a21a01120236ad3e532c72.
+The six new objects total19,164,859bytes, below unchanged44MiB. This actual
+conversion preserves ordered canonical streams/old lineage and generates:
+
+| Binding | SHA256 |
+|---|---|
+| New package | 1ab48d0b9c87710b05e109f234795a6bfbf5ea1b756664f8b58305dcb41173f2 |
+| New activation | ffdc80e1b6e76410ddd4840e5a21e49aea1dbdd5c735b6bcbd88bfe832e0233b |
+| New parent proof | 95405d1b569d4bfeeb6c6d87fdb430f2fd27b8b7a31d6dcde7f82276d9903cd1 |
+| New R298 profile | 89d6ac9bb0f1be8bd8f307f0b00d5725620e33b402fecb7ee2ff06daecc2106e |
+| New R298 projection | 9dde39783bcb401d1f36aeb5beb1b1983882250b0472c2afd22dca1408c2a5f5 |
+
+No new data payload was persisted, uploaded or printed. Original input leaves,
+old objects and all historical failures remain unchanged by this operation.
+No provider/QC request, A11, strategy run or look was consumed; floor remains
+325shared/250development/50infrastructure/699cells. This is scoped fresh input
+authentication, not historical/continuous security or formal/PIT admission.
+The next implementation is native-denied private authentication plus a narrow
+credential-bearing storage broker, then exact source/compile readiness if all
+technical gates pass. No new storage or A11 invocation is frozen by this result.
+Final prefreeze record/document repeat86passes1.12s follows the corrected
+84pass/2fail navigation result; it is not additive to those same86tests.
+
+### 322.7 New publication/readiness boundaries — implementation, not contact
+
+The new storage helper is a separate six-object protocol, not a call to the
+spent V4 publisher. It authenticates the externally pinned D1 metadata and
+freshly reconstructed genuine plain capability, then requires two source
+rechecks. Only fixed object/properties and object/set requests are available:
+six initial observations, then immediate absence recheck, one put and one
+verification for each missing object, activation last, at most24 application
+dispatches. The existing exact absence templates and size/hash checks remain.
+No deletion, listing, fallback key, old-control repair or overwrite is added.
+
+A separate operational caller is being validated. A credential-free native
+network-denied worker owns private parsing and the genuine capability. Its
+inherited framed pipe carries bounded opaque object payloads to a credential-
+bearing parent that never parses licensed rows. The parent verifies exact
+phase/order/key/length/hash/request-body bindings and journals actual application
+dispatches. Lost replies remain unknown to the worker, not zero; parent and
+worker counts must agree on success. Neither Python audit hooks nor a custom
+callback substitutes for the native private-reader boundary. This is selected
+source and inherited-channel authentication, not whole-interpreter integrity
+or a sandbox against arbitrary same-user changes.
+
+The source-recovery helper is also separate: only the new input reader and
+four main bindings differ; nine cloud modules must equal the frozen originals.
+It accepts only the known input/main placeholders or exact predecessor bytes,
+requires strict owner/known-A5 access and the one historical manual sample,
+then reads back every exact write before a single compile. At most20 sequential
+compile polls and a final fresh access/source/compile check can produce READY.
+There is no capacity, backtest-create, result or launch method. A new one-response
+boundary binds the actual normalized plain loader16093bytes,
+SHA256 b3f48e1b1c6fc6cc665d9f8b475292260074feec5571eab6e8f0d1c1a091fd35;
+the old23055byte refused upload is not replayed. READY is not a completed
+strategy backtest, economics acceptance, formal admission or paper clearance.
+
+Root interim focused selection:379distinct passes4.09s (110storage helper,
+106framing,93readiness helper,70source boundary). The first root command had a
+sandbox-profile parenthesis syntax error and exited65 before Python/tests;
+correcting that command preserved all denial rules. No test or operational
+failure is concealed by the subsequent green selection. Author storage first
+61pass/41fixturefail used an invalid synthetic secret-count fixture, corrected
+to four explicit synthetic values; earlier102 overlaps final110. Readiness
+first82pass/1fixturefail used a nonexistent fixture module name, corrected to
+the real forced-exit name; later93 overlaps. Framing's first mutation harness
+collected zero tests due to the missing explicit artifact-ignore option, then
+was corrected without relaxing artifact denial. Memory-only omissions caught
+final source recheck, payload hash, the nine-file unchanged-source guard and
+the new loader pin; restored finally. Source-boundary AST checks retain the
+frozen guard methods, with only the new binding/representation changing.
+The new output-only READY receipt validator is an additional pre-use change,
+so the93-test helper result is not its final validation. Same-round author and
+advisory work is not independent review. No full suite or operational call ran.
+
+### 322.8 Publication caller corrections and final focused validation
+
+Before use, ARV2I322-005(P2) tightened the broker handshake: the native worker
+sends its already-authenticated13,873byte D1 metadata report, not private rows.
+The parent checks the external size/SHA before parsing that supplied metadata
+and mechanically binds all six descriptors and the public source-manifest hash.
+It never opens the artifact itself. Source-bound worker attestation alone is
+no longer the sole descriptor binding. ARV2I322-006(P2) corrected the original
+64-name control budget and added an exact success-only whole-control census:
+108files at24storage dispatches, including the private organization binding.
+Arbitrary extra names refuse; ambiguous failure leaves remain untouched.
+ARV2I322-007(P2) makes nested failure result validation as strict as success,
+retaining parent-known dispatch counts and worker unknown/lower-bound semantics.
+ARV2I322-008(P3) retains a completed early worker's finite fallback code when
+bounded draining/schema/binding/exit checks succeed. Exhausted deadlines,
+noise or malformed output remain unknown, never raw exception output.
+
+The organization identifier needed for later offline request-hash validation
+is retained only in a0600 private organization-binding.json, after the two
+fixed authenticated project reads agree with the existing organization digest.
+Only its SHA/size crosses the finite terminal envelope. It is not a credential,
+new entitlement, capacity observation or other-lane modification. A future
+native admission reader must authenticate that external pin before use.
+Native workers deny both user/system Keychains, security-tool execution and
+network. Filesystem guarantees remain held/named endpoint checks, not continuous
+all-tree/native-ACL/xattr security or protection against arbitrary same-user code.
+
+Root final focused selection: **664distinct passes8.70s** (110storage helper,
+106framing,129readiness helper,70source boundary,163publication caller,
+86record/active-document). Source compiles in memory, including the deliberately
+incomplete A11 caller draft; no bytecode. Earlier379 and129 selections overlap.
+The publication author's first collection lacked --ignore=artifacts and was
+denied with zero tests; corrected103passes3.06s. A nested-child experiment had
+140passes/1failure5.46s with EOF and no retained stderr cause; no root cause is
+invented. The revised tiny child inherits the outer native sandbox. Later
+145passes6.27s,146passes6.06s and final163passes6.34s overlap. Memory-only
+actual-exit and external-inventory-comparison omissions were each caught by
+one expected failing test (0.24s/0.62s), restored finally. The root selection
+includes real tiny inherited-FD framing/noise/finite-failure tests and synthetic
+full six-object/24-dispatch worker/broker sequencing, not an operational adapter.
+No full lane/repository suite ran. Credential handoff shape was observed present
+without printing values or inspecting Keychain; it is not authentication proof.
+
+| Newly selected source | SHA256 |
+|---|---|
+| arv2_newrule_plain_storage.py | b7be26c1bee3d9ff07b2daeb2c61d7731d85d0f54f7e1dd25978d81cce9de022 |
+| arv2_plain_storage_rpc.py | f79a83fc15fe8b45ddd32103d76ca72d3149e9cd51da0fe37f4fc8772f70ce1a |
+| run_arv2_plain_storage_publication.py | 7c233e51b07c7bd0b8af43b4a12beef714b9010dedb59205b7a37c671eb694a4 |
+| arv2_r298_plain_readiness_remote.py | 5cd7b3209f499157c4e8d1f2d8ed9528008c2a90f3a8d7c8e404a831d5313564 |
+| arv2_r298_plain_source_boundary.py | 3f0274b2ef618a1c6af8e6fb5c828a351d502c1cbfe2925b236f3bbf12ff9240 |
+
+Publication caller test SHA013f6bc59984eea9966a7576a2254cfa9f2c024cb153e053cfb8f8a97c6a35ae;
+canonical publication profile b1081df0c1bd80cf33892865c0db1bf07fc6bd4d5d4394730c379f6c65f81446.
+The helper profile is e68db455b2a903be5c1b126de2a38d4faa6eeae0ee25072ff090301171c06dc0.
+All inherited pins remain literal; no old source or reader is changed.
+
+### 322.9 D2 prospective once-only new storage publication freeze
+
+Under322.1 owner delegation and current readiness review waiver, authorize ONE
+publish invocation of the exact322.8 caller at the clean commit containing this
+decision, with that exact --expected-head and --caller-sha256. This is a new
+functional plain-data transport publication, not a renamed D15 or A10 retry.
+Fresh exclusive control artifacts/analyst_revisions_v2/newrule_plain_storage/R322-20261025-B
+has NOT been inspected or allocated. Claim or partial claim consumes this use;
+failure is terminal for this protocol, with no repair/cleanup/unchanged retry.
+
+Only the designated Mac root/branch/Python3.13 is compatible. Sanitize inherited
+environment into the existing exact-key execution contract, preserving QC
+credentials in memory only, never argv/logs; check nonempty shape before claim.
+Native worker has no credentials, network, Keychain or security-tool access;
+parent opens no private input rows. Worker reads only the fixed D1 source input
+and new D1 metadata as a fresh publication consumer, never invokes spent D1 or
+its reader, and compares newly reconstructed bytes initially/finally. The
+parent's only possible remote operations are two projects/read requests for
+37165262 and38364439, then at most24 object/properties or object/set application
+dispatches for the six exact new keys authenticated by D1 metadata. No other
+project mutation, source upload, capacity, compile, backtest, result or provider
+data call is allowed by D2. The storage publication itself is not an A11 look.
+
+Parent deadline600seconds, storage subdeadline300seconds; only its own child
+may be killed/reaped. Uninterruptible I/O/host suspension remain limitations.
+Canonical framed headers32KiB, each payload32MiB+4096, finite stdout64KiB,
+metadata/control files256KiB, control census at most128names. Original44MiB
+aggregate and16MiB role-shard bounds remain. The old objects and failed controls
+remain untouched. Absence-check/put is not an atomic server compare-and-set;
+concurrent alteration must refuse on observed checks, not become a safety claim.
+
+Retain external actual parent exit, finite double-LF output and exact result
+pins. ONE separate native-network/artifact/Keychain/security-denied output-only
+validate_output invocation may consume only captured stdout, the actual exit
+and exact frozen binding. Exit0 plus validated matching success is mandatory;
+a helper admission/report left by a late parent failure is inadmissible. This
+does not authorize a failed-output repair or source upload. A11 caller is saved
+only as an incomplete, UNINVOKED draft with deliberately refusing storage-pin
+placeholders and no tests yet; it is outside D2's import closure. A11 needs actual
+D2 success pins, completed validation and a separate committed exact run freeze.

@@ -5,6 +5,9 @@ directory. Only object/properties and object/set are available here. Existing
 D15 controls/objects are neither read nor reused. Endpoint source rechecks are
 fresh held/named authentication supplied by a fixed caller, not continuous
 retention of original source descriptors or historical security continuity.
+This module runs in a credential-free, natively network-denied worker. Its
+required fixed-caller dispatch seam returns finite observations, never raw
+provider responses. The credential-bearing parent is a separate broker.
 """
 from __future__ import annotations
 
@@ -37,11 +40,13 @@ PROFILE = {'schema': SCHEMA, 'exact_object_count': MAX_OBJECTS, 'request_limit':
     'initial_all_properties_before_set': True, 'immediate_absence_recheck': True,
     'activation_last': True, 'initial_final_source_recheck_required': True,
     'actual_preparation_exit_zero_required': True, 'retry_redirect_proxy': False,
+    'native_denied_credential_free_worker': True, 'finite_parent_broker_reply': True,
+    'lost_reply_dispatch_count_unknown': True,
     'old_control_or_object_access': False, 'get_list_delete': False, **FLAGS}
 _CODES = frozenset(('hash', 'bound', 'json', 'preparation', 'organization', 'source_check',
     'source_check_result', 'callback', 'inventory', 'deadline', 'journal', 'claim', 'request_scope',
     'activation_without_data', 'recheck_changed', 'verification_failed', 'set_refused',
-    'request_census', 'report', 'admission', 'actual_exit', 'unknown_exception'))
+    'request_census', 'report', 'admission', 'actual_exit', 'dispatch_packet', 'unknown_exception'))
 FINITE_CODES = _CODES | wire.FINITE_FAILURE_CODES
 
 
@@ -81,7 +86,7 @@ def remaining(deadline):
 def finite_failure(error):
     if type(error) is PlainStorageError:
         args = BaseException.args.__get__(error)
-        if len(args) == 1 and type(args[0]) is str and args[0] in _CODES:
+        if len(args) == 1 and type(args[0]) is str and args[0] in FINITE_CODES:
             return args[0]
     code = wire.finite_failure(error)
     return code if type(code) is str and code in FINITE_CODES else 'unknown_exception'
@@ -197,31 +202,79 @@ def _verify(directory):
         raise PlainStorageError('journal') from None
 
 
-def _request(directory, api, binding, plain, phase, index, row, payload, state, deadline):
+PACKET_FIELDS = frozenset(('attempted', 'http_status', 'observation', 'error_shape',
+    'object_state', 'absence_template_index', 'failure_code'))
+
+
+def validate_dispatch_packet(packet, phase, row):
+    """Validate finite broker evidence, not server-contact measurement."""
+    require(type(phase) is str and phase in ('initial', 'recheck', 'put', 'verify')
+        and type(row) in (tuple, list) and len(row) == 4 and type(row[0]) is str
+        and row[0].startswith(transport.KEY_PREFIX + '/'), 'dispatch_packet')
+    require(type(packet) is dict and set(packet) == PACKET_FIELDS
+        and len(canonical(packet)) <= 16 * 1024
+        and type(packet['attempted']) is bool, 'dispatch_packet')
+    status, failure = packet['http_status'], packet['failure_code']
+    require(status is None or type(status) is int and 100 <= status <= 599, 'dispatch_packet')
+    require(failure is None or type(failure) is str and failure in FINITE_CODES, 'dispatch_packet')
+    observation = packet['observation']
+    if observation is not None:
+        wire._validate_observation(observation)
+    wire._validate_error_shape(packet['error_shape'])
+    require(packet['object_state'] is None or type(packet['object_state']) is str
+        and packet['object_state'] in ('absent', 'present', 'published'), 'dispatch_packet')
+    choice = packet['absence_template_index']
+    require(choice is None or type(choice) is int and 0 <= choice < len(wire.ABSENCE_TEMPLATES), 'dispatch_packet')
+    if failure is not None:
+        require(packet['object_state'] is None and choice is None, 'dispatch_packet')
+        if packet['attempted'] is False:
+            require(status is None and observation is None and packet['error_shape'] is None, 'dispatch_packet')
+        return json.loads(canonical(packet))
+    require(packet['attempted'] is True and status == 200 and observation is not None
+        and observation['success_with_errors'] is False, 'dispatch_packet')
+    result = packet['object_state']
+    require(result == 'published' if phase == 'put' else result in ('present', 'absent'), 'dispatch_packet')
+    if result == 'absent':
+        require(type(choice) is int and observation['api_success'] is False
+            and observation['error_count'] == 1 and observation['errors_present'] is True
+            and observation['metadata_present'] is False, 'dispatch_packet')
+        wanted = wire._error_shape({'errors': [wire.ABSENCE_TEMPLATES[choice].format(key=row[0])]}, row[0])
+        require(packet['error_shape'] == wanted, 'dispatch_packet')
+    else:
+        require(choice is None and packet['error_shape'] is None
+            and observation['api_success'] is True and observation['error_count'] == 0
+            and observation['metadata_present'] is (phase != 'put'), 'dispatch_packet')
+    return json.loads(canonical(packet))
+
+
+def _request(directory, organization, transport_request, binding, plain, phase, index, row, payload, state, deadline):
     remaining(deadline)
     transport.require_plain_transport(plain)
     require(type(index) is int and 0 <= index < MAX_OBJECTS
         and phase in ('initial', 'recheck', 'put', 'verify')
         and len(state['requests']) < MAX_REQUESTS, 'request_scope')
-    endpoint, body, content_type = wire._body(phase, api.organization_id, row, payload)
+    endpoint, body, _ = wire._body(phase, organization, row, payload)
     require(endpoint in ('object/properties', 'object/set') and type(body) is bytes
         and 0 < len(body) <= transport.MAX_OBJECT_BYTES + 4096, 'request_scope')
     entry = {'ordinal': len(state['requests']), 'phase': phase, 'endpoint': endpoint, 'index': index,
-        'request_sha256': sha(body), 'attempted': False, 'http_status': None,
+        'request_sha256': sha(body), 'attempted': None, 'http_status': None,
         'observation': None, 'error_shape': None, 'object_state': None,
         'absence_template_index': None, 'failure_code': None}
     state['requests'].append(entry)
     stem = _stem(entry['ordinal'])
     _write(directory, stem + '-intent.json', _intent(binding, entry))
+    # An intent or IPC send is not proof of actual dispatch. A missing reply
+    # cannot restore the previous known count or assert zero contact.
+    state['dispatch_count_known'] = False
+    state['attempted_request_count'] = None
     try:
-        response = wire._transport(api, endpoint, body, content_type, api.organization_id,
-            row[0], entry, state, deadline)
-        if phase == 'put':
-            require(type(response) is dict and set(response) <= {'success', 'errors'}
-                and response.get('success') is True and response.get('errors', []) == [], 'set_refused')
-            entry['object_state'] = 'published'
-        else:
-            entry['object_state'], entry['absence_template_index'] = wire._properties_state(response, row, payload)
+        packet = transport_request(phase, index, tuple(row), payload, entry['request_sha256'], deadline)
+        packet = validate_dispatch_packet(packet, phase, row)
+        entry.update(packet)
+        state['attempted_request_count_lower_bound'] += int(packet['attempted'])
+        state['dispatch_count_known'] = True
+        state['attempted_request_count'] = state['attempted_request_count_lower_bound']
+        require(packet['failure_code'] is None, packet['failure_code'] or 'dispatch_packet')
         return entry['object_state']
     except BaseException as error:
         entry['failure_code'] = finite_failure(error)
@@ -242,6 +295,9 @@ def _census(directory, report, binding, rows, payloads, organization, *, final=F
     require(report.get('published_indices') == missing and report.get('validated_indices') == present + missing
         and type(report.get('attempted_request_count')) is int
         and report['attempted_request_count'] == len(expected) <= MAX_REQUESTS
+        and type(report.get('attempted_request_count_lower_bound')) is int
+        and report['attempted_request_count_lower_bound'] == len(expected)
+        and report.get('dispatch_count_known') is True
         and report.get('source_rechecks') == 2, 'request_census')
     trace = report.get('requests')
     require(type(trace) is list and len(trace) == len(expected), 'request_census')
@@ -277,29 +333,31 @@ def _census(directory, report, binding, rows, payloads, organization, *, final=F
     require({name for name in directory.names() if name.startswith(STEM)} == names, 'request_census')
 
 
-def publish(directory, api, plain, *, deadline, expected_package_sha256,
+def publish(directory, organization, plain, *, deadline, expected_package_sha256,
             expected_activation_sha256, expected_preparation_sha256,
-            preparation_record, actual_preparation_exit, source_recheck):
+            preparation_record, actual_preparation_exit, source_recheck, transport_request):
     """One bounded new publication, never a retry of D15 or a new QC attempt.
 
     directory supplies exclusive fsynced write/read/verify/names. The fixed
     caller's source_recheck(plain) must authenticate original input endpoints,
     freshly reconstruct and compare all plain bytes, then return exactly None.
-    api.organization_id is separately authenticated by the caller and checked
-    against the fixed organization hash here. The observed actual parent exit
+    organization is separately authenticated by the caller and checked against
+    the fixed organization hash here. transport_request is a fixed caller IPC
+    function, not a CLI callback, and never receives mutable trace/state or any
+    credentials. The observed actual parent exit
     remains external: a written success report alone is never admissible.
     """
     remaining(deadline)
     rows, payloads = _inventory(plain, expected_package_sha256, expected_activation_sha256)
     _preparation(preparation_record, actual_preparation_exit, expected_preparation_sha256, plain)
-    require(callable(source_recheck), 'callback')
-    organization = api.organization_id
+    require(callable(source_recheck) and callable(transport_request), 'callback')
     require(type(organization) is str and re.fullmatch('[0-9a-f]{32}', organization)
         and sha(organization.encode('ascii')) == access.ORGANIZATION_SHA256, 'organization')
     binding = _binding(expected_package_sha256, expected_activation_sha256, expected_preparation_sha256, rows)
     claim = {**binding, 'attempt_consumed': True}
     _write(directory, CLAIM, claim)  # Exclusive before recheck, credentials or dispatch.
-    state = {'attempted_request_count': 0, 'requests': [], 'initial_states': [],
+    state = {'attempted_request_count': 0, 'attempted_request_count_lower_bound': 0,
+        'dispatch_count_known': True, 'requests': [], 'initial_states': [],
         'published_indices': [], 'validated_indices': [], 'source_rechecks': 0}
     complete, failure, stage = False, None, 'source_initial'
     try:
@@ -308,7 +366,7 @@ def publish(directory, api, plain, *, deadline, expected_package_sha256,
         _verify(directory)
         stage = 'initial_properties'
         for index, row in enumerate(rows):
-            result = _request(directory, api, binding, plain, 'initial', index, row, payloads[index], state, deadline)
+            result = _request(directory, organization, transport_request, binding, plain, 'initial', index, row, payloads[index], state, deadline)
             state['initial_states'].append(result)
             if result == 'present': state['validated_indices'].append(index)
         require(state['initial_states'][5] != 'present' or all(
@@ -316,13 +374,13 @@ def publish(directory, api, plain, *, deadline, expected_package_sha256,
         for index, row in enumerate(rows):
             if state['initial_states'][index] == 'present': continue
             stage = 'absence_recheck'
-            require(_request(directory, api, binding, plain, 'recheck', index, row, payloads[index], state, deadline)
+            require(_request(directory, organization, transport_request, binding, plain, 'recheck', index, row, payloads[index], state, deadline)
                 == 'absent', 'recheck_changed')
             stage = 'publish_missing'
-            _request(directory, api, binding, plain, 'put', index, row, payloads[index], state, deadline)
+            _request(directory, organization, transport_request, binding, plain, 'put', index, row, payloads[index], state, deadline)
             state['published_indices'].append(index)
             stage = 'verify_publication'
-            require(_request(directory, api, binding, plain, 'verify', index, row, payloads[index], state, deadline)
+            require(_request(directory, organization, transport_request, binding, plain, 'verify', index, row, payloads[index], state, deadline)
                 == 'present', 'verification_failed')
             state['validated_indices'].append(index)
         stage = 'source_final'
@@ -343,6 +401,8 @@ def publish(directory, api, plain, *, deadline, expected_package_sha256,
     require(canonical(_read(directory, REPORT)) == canonical(report), 'report')
     result = {'complete': complete, 'failure_code': failure, 'report_sha256': sha(canonical(report)),
         'report_byte_count': len(canonical(report)), 'attempted_request_count': state['attempted_request_count'],
+        'attempted_request_count_lower_bound': state['attempted_request_count_lower_bound'],
+        'dispatch_count_known': state['dispatch_count_known'],
         'admission_sha256': None, 'admission_byte_count': None, **FLAGS}
     if complete:
         admission = {**binding, 'report_sha256': result['report_sha256'],

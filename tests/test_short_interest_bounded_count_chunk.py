@@ -375,3 +375,62 @@ def test_insufficient_FD_headroom_is_preclaim_not_new_spent_debit(monkeypatch, t
         h.run()
     assert not (h.root / chunk.CLAIM).exists()
     assert "key" not in h.events and h.calls == []
+
+
+@pytest.mark.parametrize("phase", ["claim_original_read", "protocol_publication", "named_credential_read"])
+def test_initialization_diagnostics_distinguish_pre_key_and_key_failures(monkeypatch, tmp_path, phase):
+    h = Harness(monkeypatch, tmp_path)
+    if phase == "claim_original_read":
+        original = chunk.old.cache.HeldFiles.read
+        def read(held, path, maximum):
+            if path.name == chunk.CLAIM:
+                raise TypeError("https://private.invalid/?token=SECRET")
+            return original(held, path, maximum)
+        monkeypatch.setattr(chunk.old.cache.HeldFiles, "read", read)
+    elif phase == "protocol_publication":
+        def publish(owned, name, raw, **kwargs):
+            if name == "protocol.private.json":
+                raise OSError(13, "SECRET path")
+            return h.real_publish(owned, name, raw, **kwargs)
+        monkeypatch.setattr(chunk._OwnedOutput, "publish", publish)
+    else:
+        def secret(provider):
+            h.events.append("key")
+            raise chunk.diagnostics.ShortInterestKeychainError("owner_keychain_item_unavailable")
+        h.secret = secret
+    assert h.run() is None
+    result = h.payload("run.refused.json")
+    assert result["fixed_diagnostic"]["stage"] == phase
+    assert result["fixed_diagnostic"]["category"] != "unknown_local_error"
+    assert result["START_debits"] == result["known_HTTP_invocations"] == 0
+    assert h.calls == [] and "SECRET" not in repr(result)
+    assert ("key" in h.events) == (phase == "named_credential_read")
+
+
+def test_worker_local_contract_is_fixed_diagnostic_not_a_hidden_retry(monkeypatch, tmp_path):
+    h = Harness(monkeypatch, tmp_path)
+    def refused(*args):
+        raise chunk.BoundedRecoveryRefusal("REFUSED: new_claim_original_bytes_changed")
+    monkeypatch.setattr(chunk.old.original, "_wire_request", refused)
+    assert h.run() is None
+    receipt = h.payload("attempt-00001.received.json")
+    assert receipt["failure_stage"] == "request_build"
+    assert receipt["local_diagnostic"] == {"category": "local_contract_refusal",
+        "errno_name": None, "contract_code": "new_claim_original_bytes_changed"}
+    result = h.payload("run.refused.json")
+    assert result["fixed_diagnostic"]["local_diagnostic"] == receipt["local_diagnostic"]
+    assert result["START_debits"] == 3 and result["known_HTTP_invocations"] == 0
+    assert result["charged_bytes"] == 3 * chunk.MAXIMUM_RESPONSE_BYTES
+    assert h.calls == [] and not (h.directory / "chunk.closed.json").exists()
+
+
+def test_post_batch_failure_and_closure_expose_only_safe_fixed_fields(monkeypatch, tmp_path):
+    h = Harness(monkeypatch, tmp_path)
+    def audit():
+        raise TypeError("SECRET https://private.invalid/")
+    assert h.run(source_final_audit=audit) is None
+    result = h.payload("run.refused.json")
+    assert result["fixed_diagnostic"] == {"stage": "closure", "category": "local_type_error",
+        "errno_name": None, "contract_code": None}
+    assert result["START_debits"] == result["known_HTTP_invocations"] == 3
+    assert "SECRET" not in repr(result) and "private.invalid" not in repr(result)

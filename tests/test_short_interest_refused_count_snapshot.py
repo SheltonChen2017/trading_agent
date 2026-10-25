@@ -300,3 +300,76 @@ def test_context_exit_alone_rejects_inplace_change_to_previously_read_raw(monkey
         with snapshot.load_refused_child(tmp_path, source, guard, hash_bytes(manifest)) as held:
             held.read("query-00000001.raw", 64)
             (directory / "query-00000001.raw").write_bytes(files["query-00000001.raw"] + b" ")
+
+
+def _zero_fixture(monkeypatch, tmp_path, *, mutation=None):
+    source, guard, unused_directory, unused_files, unused_manifest = _fixture(monkeypatch, tmp_path)
+    queries = source.query_plan
+    names = tuple(sorted(set((*snapshot.old.expected_code_paths(),
+        "scripts/capture_short_interest_bounded_count_chunk.py", "scripts/short_interest_recovery_transport.py",
+        "scripts/short_interest_refused_count_snapshot.py"))))
+    code = b"fabricated committed historical code"
+    entries = tuple({"path": name, "sha256": hash_bytes(code)} for name in names)
+    monkeypatch.setattr(snapshot, "ZERO_CODE_MANIFEST_SHA256", hash_payload({r["path"]: r["sha256"] for r in entries}))
+    began = "2026-10-25T04:44:53.825641Z"
+    claim = {"schema": "si-bounded-count-spent-claim-v2", "protocol_sha256": snapshot.ZERO_PROTOCOL,
+        "query_plan_sha256": queries.sha256, "restart_allowed": False, "started_at": began,
+        "maximum_attempts": 528, "maximum_extra_attempts": 16, "prior_STARTs": 13992,
+        "prior_charged_bytes": 23452681, "maximum_cumulative_bytes": 4 * 1024**3,
+        "registration": {"head": snapshot.ZERO_HEAD, "remote": snapshot.ZERO_REMOTE,
+            "code_identity_sha256": hash_payload({"git_commit": snapshot.ZERO_HEAD, "files": entries})}}
+    authority = {"source_only": True, "source_admitted": False, "denominator_admitted": False,
+        "historical_PIT_admitted": False, "ready_for_backtest": False, "outcome_looks": 0,
+        "qc_attempts": 0, "trading_authority": False}
+    negative = {"schema": "si-bounded-count-refused-v2", "protocol_sha256": snapshot.ZERO_PROTOCOL,
+        "code": "key_or_initial_publication_refused_after_claim", "START_debits": 0,
+        "known_HTTP_invocations": 0, "charged_bytes": 0, "resolved_descriptors": 0,
+        "HTTP_count_exact": True, "cumulative_STARTs": 13992, "cumulative_charged_bytes": 23452681,
+        "started_at": began, "refused_at": "2026-10-25T04:44:54.681859Z",
+        "unreceipted_attempts": [], "receipt_not_persisted_attempts": [],
+        "unpublished_observed_diagnostics": [], "authority": authority}
+    if mutation == "source_authority": negative["authority"]["source_admitted"] = True
+    if mutation == "nonzero": negative["START_debits"] = 1
+    if mutation == "boolean_debit": negative["charged_bytes"] = False
+    if mutation == "budget": claim["prior_STARTs"] = 0
+    if mutation == "query": claim["query_plan_sha256"] = "0" * 64
+    if mutation == "clock": negative["refused_at"] = "2026-10-24T00:00:00Z"
+    if mutation == "code": claim["registration"]["code_identity_sha256"] = "0" * 64
+    claim_raw = canonical_json(claim).encode()
+    monkeypatch.setattr(snapshot, "ZERO_CLAIM_SHA256", hash_bytes(claim_raw))
+    negative["new_claim_sha256"] = hash_bytes(claim_raw)
+    raw = canonical_json(negative).encode()
+    monkeypatch.setattr(snapshot, "ZERO_REFUSAL_SHA256", hash_bytes(raw))
+    directory = tmp_path / snapshot.ZERO_DIRECTORY
+    directory.mkdir(mode=0o700)
+    _write(directory.parent / snapshot.ZERO_CLAIM, claim_raw)
+    _write(directory / "run.refused.json", raw)
+    if mutation == "positive_sibling": _write(directory / "chunk.closed.json", b"{}")
+    return guard, queries, directory
+
+
+def test_zero_start_claim_is_authenticated_but_never_resumed(monkeypatch, tmp_path):
+    guard, queries, directory = _zero_fixture(monkeypatch, tmp_path)
+    with snapshot.load_zero_start_predecessor(tmp_path, guard, queries) as proof:
+        proof.check(); proof.full_check()
+        (directory.parent / "fresh-successor").mkdir(mode=0o700)
+        _write(directory.parent / "fresh-successor.spent.json", b"{}")
+        proof.check()
+    with pytest.raises(Exception): proof.check()
+
+
+@pytest.mark.parametrize("mutation", ["source_authority", "nonzero", "boolean_debit", "budget",
+    "query", "clock", "code", "positive_sibling"])
+def test_zero_start_rehashed_controls_do_not_erase_negative_or_budget(monkeypatch, tmp_path, mutation):
+    guard, queries, unused = _zero_fixture(monkeypatch, tmp_path, mutation=mutation)
+    with pytest.raises((snapshot.RefusedSnapshotError, snapshot.old.parallel.ParallelCountRefusal)):
+        with snapshot.load_zero_start_predecessor(tmp_path, guard, queries):
+            pytest.fail("changed predecessor must not be accepted")
+
+
+def test_zero_start_live_claim_mutation_breaks_custody(monkeypatch, tmp_path):
+    guard, queries, directory = _zero_fixture(monkeypatch, tmp_path)
+    with pytest.raises(Exception):
+        with snapshot.load_zero_start_predecessor(tmp_path, guard, queries) as proof:
+            _write(directory.parent / snapshot.ZERO_CLAIM, b"changed")
+            proof.check()

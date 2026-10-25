@@ -22,6 +22,7 @@ from research.short_interest_etf import native_dated_class_reference as referenc
 from scripts import capture_short_interest_count_recovery as old
 from scripts import short_interest_lane_batch_guard as lane
 from scripts import short_interest_recovery_transport as transport
+from scripts import short_interest_recovery_diagnostics as diagnostics
 from scripts import short_interest_refused_count_snapshot as snapshot
 from scripts.continue_short_interest_native_identity import _OwnedOutput
 from scripts.qualify_finra_short_interest import _prepare_capture_directory, _require_capture_platform
@@ -29,8 +30,8 @@ from scripts.qualify_sharadar_companion import _utc_now
 from scripts.short_interest_keychain import KeychainSecret, read_named_keychain
 
 DRIVER = "scripts/capture_short_interest_bounded_count_chunk.py"
-OUTPUT = old.OUTPUT.parent / "count-bounded-20261024-v2-chunk001"
-CLAIM = "count-bounded-20261024-v2-chunk001.spent.json"
+OUTPUT = old.OUTPUT.parent / "count-bounded-20261024-v3-chunk001"
+CLAIM = "count-bounded-20261024-v3-chunk001.spent.json"
 FIRST_POSITION = 13_991
 DESCRIPTORS = 512
 EXTRA_ATTEMPTS = 16
@@ -47,11 +48,10 @@ MAXIMUM_CUMULATIVE_BYTES = 4 * 1024 ** 3
 # Frozen after the original-byte, read-only manifest measurement, before any
 # successor claim/key/HTTP. PENDING is deliberately a hard operational gate.
 PREDECESSOR_MANIFEST_SHA256 = "9be5d93cbc48527c1de98afa7e5b3599abfca63bdb9bdc5eef0f05d727aac4d7"
-PROTOCOL_SHA256 = "b0eb4dc35db8787ef02e0ef9f6e514f81fd0eaa8855838bde2efdb47f822a2c5"
+PROTOCOL_SHA256 = "1004b9b4753be8ae3bf15b56d51feed08d0c4c1cc92ee814ee20dc6c81ab9e3f"
 
 
-class BoundedRecoveryRefusal(ValueError):
-    pass
+BoundedRecoveryRefusal = diagnostics.RecoveryLocalRefusal
 
 
 def require(value, code):
@@ -67,9 +67,12 @@ def authority():
 
 
 def protocol():
-    return {"schema": "si-bounded-count-chunk-v2", "driver": DRIVER,
+    return {"schema": "si-bounded-count-chunk-v3", "driver": DRIVER,
         "predecessor_protocol_sha256": old.PROTOCOL_SHA256,
         "predecessor_manifest_sha256": PREDECESSOR_MANIFEST_SHA256,
+        "zero_START_predecessor_claim_sha256": snapshot.ZERO_CLAIM_SHA256,
+        "zero_START_predecessor_refusal_sha256": snapshot.ZERO_REFUSAL_SHA256,
+        "zero_START_predecessor_status": "spent_refused_never_restart;new_independent_successor_claim",
         "anchor_plan_sha256": old.original.ANCHOR_PLAN_SHA256,
         "original_positions": [FIRST_POSITION, FIRST_POSITION + DESCRIPTORS - 1],
         "descriptors": DESCRIPTORS, "maximum_new_STARTs": MAXIMUM_ATTEMPTS,
@@ -105,11 +108,12 @@ def registered():
 def code_paths():
     return tuple(sorted(set((*old.expected_code_paths(), DRIVER,
         "scripts/short_interest_recovery_transport.py",
+        "scripts/short_interest_recovery_diagnostics.py",
         "scripts/short_interest_refused_count_snapshot.py"))))
 
 
 class _ComposedCodeCustody:
-    """Reuse the saved cache's exact base-code FDs; hold only four additions."""
+    """Reuse the saved cache's exact base-code FDs; hold only five additions."""
     def __init__(self, root, base, extras):
         require(type(base) is old.cache.HeldFiles and type(extras) is old.cache.HeldFiles,
                 "exact_composed_code_custody_required")
@@ -187,7 +191,7 @@ def _capture_chunk(queries, *, registration, check, refresh, owned, get_secret,
     held_claim, claim_sha = None, None
     previous_start, last_batch = old.parallel.clock(started), begin_tick - 1
     queue = deque((query, 1, None, begin_tick) for query in tickets)
-    failure = None
+    failure, failure_detail = None, None
 
     def local(*, negative=False):
         (refusal_check if negative else check)(); owned.check(); registered()
@@ -239,7 +243,7 @@ def _capture_chunk(queries, *, registration, check, refresh, owned, get_secret,
         require(tuple(sorted(os.listdir(descriptor))) == tuple(sorted(published)), "chunk_final_membership_changed")
         local()
 
-    def negative(code):
+    def negative(code, *, detail=None):
         # This path must remain available when actual remote evidence has
         # advanced. Local inode/code/branch safety is still mandatory.
         local(negative=True)
@@ -247,7 +251,8 @@ def _capture_chunk(queries, *, registration, check, refresh, owned, get_secret,
         missing = tuple(row["attempt"] for row in attempts if row["attempt"] not in observed)
         unpublished = tuple(row["attempt"] for row in attempts if row["attempt"] not in persisted_receipts)
         charged = charges + len(missing) * MAXIMUM_RESPONSE_BYTES
-        publish("run.refused.json", {"schema": "si-bounded-count-refused-v2", "code": code,
+        publish("run.refused.json", {"schema": "si-bounded-count-refused-v3", "code": code,
+            "fixed_diagnostic": detail,
             "protocol_sha256": PROTOCOL_SHA256, "started_at": started, "refused_at": clock(),
             "START_debits": len(attempts), "known_HTTP_invocations": sum(row["http_invoked"] for row in receipts),
             "HTTP_count_exact": not missing, "unreceipted_attempts": missing,
@@ -259,7 +264,7 @@ def _capture_chunk(queries, *, registration, check, refresh, owned, get_secret,
             "authority": authority()}, negative=True)
 
     local(); refresh(); old.require_fd_headroom()
-    claim = {"schema": "si-bounded-count-spent-claim-v2", "protocol_sha256": PROTOCOL_SHA256,
+    claim = {"schema": "si-bounded-count-spent-claim-v3", "protocol_sha256": PROTOCOL_SHA256,
         "registration": registration, "started_at": started, "query_plan_sha256": queries.sha256,
         "predecessor_manifest_sha256": PREDECESSOR_MANIFEST_SHA256,
         "maximum_attempts": MAXIMUM_ATTEMPTS, "maximum_extra_attempts": EXTRA_ATTEMPTS,
@@ -268,20 +273,30 @@ def _capture_chunk(queries, *, registration, check, refresh, owned, get_secret,
     claim_raw = canonical_json(claim).encode()
     claim_sha = hash_bytes(claim_raw)
     owned.publish(CLAIM, claim_raw, parent=True)
+    initial_stage = "claim_custody_open"
     try:
         claim_path = owned._anchor[1] / CLAIM
         held_claim = lifecycle.enter_context(old.cache.HeldFiles((claim_path,), protected=True, boundary=check))
+        initial_stage = "claim_original_read"
         require(held_claim.read(claim_path, 65536) == claim_raw, "new_claim_original_bytes_changed")
+        initial_stage = "protocol_publication"
         publish("protocol.private.json", frozen.encode())
+        initial_stage = "start_control_publication"
         publish("started.json", claim)
-        local(); secret = get_secret("massive"); local()
+        initial_stage = "credential_pre_guard"
+        local(); initial_stage = "named_credential_read"
+        secret = get_secret("massive")
+        initial_stage = "credential_post_guard"
+        local(); initial_stage = "credential_exact_type"
         require(type(secret) is KeychainSecret, "exact_named_existing_key_required")
-    except Exception:
-        negative("key_or_initial_publication_refused_after_claim")
+    except Exception as error:
+        negative("initialization_refused_after_spent_claim", detail={"stage": initial_stage,
+            **diagnostics.fixed_local_failure(error)})
         return None
 
     def worker(query, start):
         raw, media, status, invoked = None, None, None, False
+        local_diagnostic = None
         stage = "local_custody"
         diagnostic = {"code": "local_refused", "phase": "local", "failure_class": "local",
                       "http_status": None, "retryable": False, "errno_name": None}
@@ -307,14 +322,16 @@ def _capture_chunk(queries, *, registration, check, refresh, owned, get_secret,
         except transport.RecoveryTransportFailure as error:
             raw, media, status = None, None, error.http_status
             diagnostic = error.diagnostic()
-        except Exception:
+        except Exception as error:
             raw, media = None, None
+            local_diagnostic = diagnostics.fixed_local_failure(error)
         try:
             at = clock()
             require(old.parallel.clock(start["started_at"]) <= old.parallel.clock(at), "receipt_clock_refused")
-        except Exception:
+        except Exception as error:
             at, raw, media = None, None, None
             stage = "receipt_clock"
+            local_diagnostic = diagnostics.fixed_local_failure(error)
             diagnostic = {"code": "clock_refused", "phase": "local", "failure_class": "local",
                           "http_status": None, "retryable": False, "errno_name": None}
         receipt = {"attempt": start["attempt"], "query_ordinal": start["query_ordinal"],
@@ -324,7 +341,7 @@ def _capture_chunk(queries, *, registration, check, refresh, owned, get_secret,
             "http_invoked": invoked, "http_status": status, "body_observed": raw is not None,
             "raw_path": None, "raw_sha256": None, "raw_bytes": None,
             "content_type": media if raw is not None else None, "diagnostic": diagnostic,
-            "failure_stage": stage,
+            "failure_stage": stage, "local_diagnostic": local_diagnostic,
             "charged_bytes": len(raw) if raw is not None else MAXIMUM_RESPONSE_BYTES}
         return receipt, raw
 
@@ -347,7 +364,7 @@ def _capture_chunk(queries, *, registration, check, refresh, owned, get_secret,
                     require(previous_start <= parsed, "START_clock_backdated")
                     previous_start = parsed
                     ticket = query.to_payload()
-                    start = {"schema": "si-bounded-count-START-v2", "attempt": len(attempts) + 1,
+                    start = {"schema": "si-bounded-count-START-v3", "attempt": len(attempts) + 1,
                         "query_ordinal": ticket["query_ordinal"], "try_number": number, "retry_of": retry_of,
                         "original_position": FIRST_POSITION + ticket["query_ordinal"] - 1,
                         "request": ticket["request"], "request_sha256": ticket["request_sha256"],
@@ -362,15 +379,19 @@ def _capture_chunk(queries, *, registration, check, refresh, owned, get_secret,
                 require(ready, "empty_or_unaffordable_batch")
                 for query, start in ready:
                     pending.append((query, start, pool.submit(worker, query, start)))
-            except Exception:
+            except Exception as error:
                 failure = "batch_guard_START_or_submission_refused"
+                failure_detail = {"stage": "batch_guard_START_or_submission",
+                    **diagnostics.fixed_local_failure(error)}
             # Always drain every submitted future, even after another worker
             # or local publication fails. No later batch starts after failure.
             for query, start, future in pending:
                 try:
                     receipt, raw = future.result()
-                except Exception:
+                except Exception as error:
                     failure = "worker_result_unusable"
+                    failure_detail = {"stage": "worker_result",
+                        **diagnostics.fixed_local_failure(error)}
                     continue
                 receipts.append(receipt); charges += receipt["charged_bytes"]
                 try:
@@ -380,8 +401,10 @@ def _capture_chunk(queries, *, registration, check, refresh, owned, get_secret,
                         publish(receipt["raw_path"], raw)
                     publish(name + ".received.json", receipt)
                     persisted_receipts.add(start["attempt"])
-                except Exception:
+                except Exception as error:
                     failure = "immutable_attempt_publication_refused"
+                    failure_detail = {"stage": "attempt_publication",
+                        **diagnostics.fixed_local_failure(error)}
                     continue
                 resolved = receipt["received_at"] is not None and (raw is not None or (
                     receipt["http_invoked"] and receipt["http_status"] == 404))
@@ -399,14 +422,19 @@ def _capture_chunk(queries, *, registration, check, refresh, owned, get_secret,
                             monotonic() + BACKOFF_SECONDS[start["try_number"] - 1]))
                     else:
                         failure = "unrecovered_attempt_no_more_STARTs"
+                        failure_detail = {"stage": receipt["failure_stage"],
+                            "local_diagnostic": receipt["local_diagnostic"],
+                            "transport_diagnostic": receipt["diagnostic"]}
             try:
                 local(); refresh(); local()
-            except Exception:
+            except Exception as error:
                 failure = "post_batch_remote_or_custody_refused"
+                failure_detail = {"stage": "post_batch_remote_or_custody",
+                    **diagnostics.fixed_local_failure(error)}
     if failure is not None or len(chosen) != DESCRIPTORS or len(receipts) != len(attempts):
-        negative(failure or "incomplete_chunk")
+        negative(failure or "incomplete_chunk", detail=failure_detail)
         return None
-    result = {"schema": "si-bounded-count-transport-inventory-v2", "protocol_sha256": PROTOCOL_SHA256,
+    result = {"schema": "si-bounded-count-transport-inventory-v3", "protocol_sha256": PROTOCOL_SHA256,
         "query_plan_sha256": queries.sha256, "registration": registration,
         "new_claim_sha256": claim_sha,
         "started_at": started, "completed_at": clock(), "START_debits": len(attempts),
@@ -434,14 +462,15 @@ def _capture_chunk(queries, *, registration, check, refresh, owned, get_secret,
         publish("chunk.completed.provisional.json", {"inventory_sha256": hash_payload(result), "authority": authority()})
         local(); refresh(); source_final_audit(); audit_files()
         require(monotonic() - begin_tick <= MAXIMUM_SECONDS, "chunk_final_close_deadline_exceeded")
-        publish("chunk.closed.json", {"schema": "si-bounded-count-transport-close-v2",
+        publish("chunk.closed.json", {"schema": "si-bounded-count-transport-close-v3",
             "inventory_sha256": hash_payload(result), "protocol_sha256": PROTOCOL_SHA256,
             "new_claim_sha256": claim_sha,
             "matching_remote_equal": True, "authority": authority()})
         local(); refresh(); source_final_audit(); audit_files()
         require(monotonic() - begin_tick <= MAXIMUM_SECONDS, "chunk_final_audit_deadline_exceeded")
-    except Exception:
-        negative("postpublication_chunk_refused")
+    except Exception as error:
+        negative("postpublication_chunk_refused", detail={"stage": "closure",
+            **diagnostics.fixed_local_failure(error)})
         return None
     return result
 
@@ -473,17 +502,20 @@ def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest)
             and prior.inventory.to_payload()["charged_response_bytes"] == 21_293_349
             and prior.inventory.to_payload()["halted"] is True, "refused_predecessor_debits_required")
         queries = freeze_queries(saved.plan)
+        zero = stack.enter_context(snapshot.load_zero_start_predecessor(root, guard, queries))
         target = root / OUTPUT
         require(old.cache._git(root, ["check-ignore", str(target)], guard).strip() == str(target).encode(),
             "fixed_chunk_output_must_be_ignored")
         directory = _prepare_capture_directory(target)
         owned = stack.enter_context(_OwnedOutput(directory, guard.check))
         def check():
-            guard.check(); composed.check(); saved.source_custody(); saved.code_custody(); prior.check()
+            guard.check(); composed.check(); saved.source_custody(); saved.code_custody(); prior.check(); zero.check()
+        def source_final_audit():
+            prior.full_check(); zero.full_check()
         def refusal_check():
             # A failed old-source audit must still be able to record a new
             # dominant negative, but never bypass lane/code/output custody.
             guard.check(); current.check(); saved.code_custody()
         return capture_chunk(queries, registration={"head": runtime_head, "remote": actual_remote,
             "code_identity_sha256": code_sha}, check=check, refresh=guard.refresh, owned=owned,
-            source_final_audit=prior.full_check, refusal_check=refusal_check)
+            source_final_audit=source_final_audit, refusal_check=refusal_check)

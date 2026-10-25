@@ -2,9 +2,11 @@
 
 Status: **CODEX COUNTER-REVIEW OF CLAUDE `b648f60` ACCEPTED AFTER ONE APPENDED
 COUNT-SCOPE ARITHMETIC ERRATUM (SECTION 124). OWNER-DIRECTED BOUNDED RECOVERY
-AND SECRET-SAFE DIAGNOSTICS ARE IMPLEMENTED; ACTUAL REPLAY AND FIRST-CHUNK
-DISPATCH REMAIN PENDING; ITS OFFLINE-MEASURED MANIFEST/PROTOCOL ARE NOW FROZEN
-IN SECTION124.4. ALL OLD CLAIMS,
+AND SECRET-SAFE DIAGNOSTICS ARE IMPLEMENTED. ACTUAL V2 INITIALIZATION REFUSED
+WITH ZERO NEW START/HTTP/BYTES; ITS CLAIM IS SPENT AND THE CAUSE IS UNKNOWN.
+FRESH V3 BOUNDED SUCCESSOR IS REGISTERED IN SECTION124.5; DISPATCH PENDING.
+OWNER NOW DIRECTS CONTINUATION UNTIL LOCAL BACKTEST READINESS, WITHOUT QC.
+ALL OLD CLAIMS,
 NEGATIVES AND CHARGES REMAIN SPENT/IMMUTABLE. NO BACKTEST READINESS IS CLAIMED.
 SIX PRIOR P2s AND ACTUAL TRANSPORT/COVERAGE FINDING `SI-BUILD-20261024-012`
 REMAIN UNRESOLVED. TWO HISTORICAL QC METADATA REQUESTS REMAIN RECORDED.
@@ -21795,3 +21797,100 @@ Main's post-pin focused chunk/record/active-document check passed125tests
 in1.11s; the54 relative-path/current-byte mapping SHA256 is
 `7d304cc9fa66d8dbb2a3f22bdc26846f46537becff43b9fbb21ee1f69c367fb0`.
 This registration commit remains local until the round's single final push.
+
+### 124.5 Actual zero-START refusal, stage diagnostics and fresh successor
+
+**SI-AUTH-20261024-05:** the owner subsequently directed, "continue building
+until the lane is backtesting ready. consider i preauthorize your every move.
+Do not access QC yet." This prospectively supersedes the section124 pilot-only
+stop for independent review: continue bounded lane implementation and source
+qualification toward local readiness, preserving the independent review of
+the final pushed snapshot. It does not erase spent budgets, source provenance,
+financial/PIT gates or private-data restrictions. No QC access or purchase,
+outcome join, S1/rank/order study, deployment or trading is exercised here.
+Accumulate local commits and make one final matching-lane push when this round
+is done; no intermediate push or new Claude/build monitor is armed here.
+
+Local registration checkpoint
+`e9771c52824edc3fb123d586230ffca36bcfdd8f` was invoked once with its complete
+54-file code manifest and actual matching originB648. Exec33298 terminated
+exit2. Original cache/source and full refused-child typed replay passed before
+the new claim. The v2 chunk then refused during initialization, before any
+protocol/start control file or credential read. Its external claim is SPENT;
+the exact output contains only `run.refused.json`. STARTdebits0, knownHTTP0,
+chargedbytes0 and resolveddescriptors0; cumulative **13992 STARTs** and
+**23452681 charged bytes** remain unchanged. Nothing was refunded, resumed,
+removed, overwritten or qualified. Claim SHA256
+`3a7b6aaf1f59acac715c71d599a16928e5ad388c2278e3cff9ee6cf667ddb90b`;
+negative SHA256
+`3e8af0d070ed41ae162bfb6c1dab071299c71bcfceaa6b236ffaa3cabe2bdf39`.
+Actual UTC interval: 2026-10-25T04:44:53.825641Z through
+2026-10-25T04:44:54.681859Z. This is not a successful source capture.
+
+**SI-BUILD-20261024-021 (P2, historical cause unresolved; prospective
+observability corrected):** v2's broad
+`key_or_initial_publication_refused_after_claim` cannot distinguish held-claim
+open/read from the first publication guard. The missing protocol control proves
+the named key reader was not reached; it does not prove a Keychain failure or
+any other specific cause. A separate network-denied, credential-free read-only
+diagnostic (exec24328, exit0) authenticated the spent claim and actual old
+prefix, then passed held-claim open/read and the normal prepublication check
+with the existing chunk present. It reproduced no cause and made no writes.
+Do not represent that diagnostic as fixing the old failure.
+
+The new fixed classifier exposes only allowlisted category, numeric errno name
+and exact controlled contract code, never exception formatting, arbitrary text,
+URL, body, credential, dynamic type or retry authority. v3 records fixed
+initialization stages and safe worker/batch/publication/closure diagnostics.
+Only the separately frozen statusless transient transport classification may
+authorize a retry; local errors never do. Every attempt still has its own
+START, receipt and full unknown-page debit.
+
+**SI-DEC-20261024-10:** one fresh independent v3 first chunk uses output
+`count-bounded-20261024-v3-chunk001` and its corresponding new spent claim.
+It never calls v2 again. A sealed offline observer authenticates the exact
+zero-START v2 claim/negative, clocks, unchanged budgets and historical E977
+54-file code identity; a positive sibling or mutation refuses. The old negative
+remains dominant for v2, not silently promoted to positive source evidence.
+Existing original and first-refused capture proofs remain independently held.
+The new output is a separate prospective claim under current owner authority.
+
+Scope remains original positions13991..14502, 512descriptors, maximum528new
+STARTs including16shared extra attempts, at most3tries per descriptor with
+fixed2/10second backoff, <=8inflight and one-hour START/closure window.
+Worst cumulative STARTs14520 and chargedbytes1130748937 stay below the old
+81876START/4GiB ceilings; neither is enlarged. Prospective v3 protocol SHA256
+`1004b9b4753be8ae3bf15b56d51feed08d0c4c1cc92ee814ee20dc6c81ab9e3f`;
+complete55-path/current-byte mapping SHA256
+`2ce27bfef1020d57c6b3847f1cc538545a9e5d76d23dcc36633d3337b1ccffbd`.
+The exact clean committed runtime HEAD is separately bound at invocation;
+there is no self-referential future HEAD literal. The old 41835-member
+manifest remains pinned9be5; no private market rows or usability conclusion
+is published here. Static local import closure is exactly55files, including
+package initializers; all55 plus affected tests compile in memory.
+
+Main's first current v3 chunk/snapshot/diagnostics selection passed117tests
+in2.89s under empty inherited environment and macOS network denial. Two new
+worker/closure diagnostic tests then exposed one incorrect expected category
+literal in the fixture (118passed/1failed in2.66s); the fixture now expects the
+classifier's fixed `local_type_error`, not a changed production classification.
+Delegated diagnostics/import-boundary checks passed51tests in0.96s; causal
+privacy mutations that formatted exception text or bypassed the literal code
+allowlist each failed five tests. No actual provider request occurred during
+these checks. Historical validations remain explicitly historical.
+
+Main's final nine-file focused/import-boundary/active-document selection passed
+**338tests in5.19s**, no skips or warnings, with network denied and inherited
+environment empty. Diff whitespace checks passed. No full lane suite was run.
+Software quality remains8/10 and records/authority9/10: the fixed diagnostics
+and causal refusal tests improve observability, but do not yet prove actual
+v3 transport closure or any additional empirical source readiness.
+
+Next: focused integrated validation, clean lane/code/actual-remote check and
+one local checkpoint, then the v3 claim at most once. While any pinned actual
+operation runs, no code/test/commit/push. After authenticated terminal closure,
+continue bounded count/daily unions and original monthly-market/corporate-action
+qualification toward readiness; never substitute fixtures or a transport close
+for empirical qualification. Canonical/exploratory actual looks0/0 and0,
+alpha0, permanent look IDsnone, QC launch attempts0. Independent Claude review
+of this accumulated final snapshot remains pending.

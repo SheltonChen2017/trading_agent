@@ -398,6 +398,105 @@ def measure_manifest(root, guard):
         snapshot.close()
 
 
+ZERO_DIRECTORY = old.OUTPUT.parent / "count-bounded-20261024-v2-chunk001"
+ZERO_CLAIM = "count-bounded-20261024-v2-chunk001.spent.json"
+ZERO_HEAD = "e9771c52824edc3fb123d586230ffca36bcfdd8f"
+ZERO_REMOTE = "b648f60112af141efc2a12fbaef03b38846d219d"
+ZERO_PROTOCOL = "b0eb4dc35db8787ef02e0ef9f6e514f81fd0eaa8855838bde2efdb47f822a2c5"
+ZERO_CLAIM_SHA256 = "3a7b6aaf1f59acac715c71d599a16928e5ad388c2278e3cff9ee6cf667ddb90b"
+ZERO_REFUSAL_SHA256 = "3e8af0d070ed41ae162bfb6c1dab071299c71bcfceaa6b236ffaa3cabe2bdf39"
+ZERO_CODE_MANIFEST_SHA256 = "7d304cc9fa66d8dbb2a3f22bdc26846f46537becff43b9fbb21ee1f69c367fb0"
+
+
+class _ZeroStartPredecessor:
+    """A spent zero-request claim, not an unused/resumable source budget."""
+    def __init__(self, directory, held, queries, claim_raw, refusal_raw):
+        fd = next(fd for path, fd, unused in held._anchor[0] if path == directory)
+        self._anchor = self._identity = (directory, held, queries, claim_raw, refusal_raw,
+            fd, _directory_stamp(directory.lstat()))
+        self.full_check()
+
+    def check(self):
+        require(type(self) is _ZeroStartPredecessor and self._anchor is self._identity
+            and type(self._anchor) is tuple and len(self._anchor) == 7,
+            "zero_start_predecessor_binding_changed")
+        directory, held, queries, unused_claim, unused_refusal, fd, stamp = self._anchor
+        held.check(); queries._guard()
+        require(_directory_stamp(directory.lstat()) == stamp
+            == _directory_stamp(os.fstat(fd)), "zero_start_closed_directory_changed")
+
+    def full_check(self):
+        self.check()
+        directory, held, unused_queries, claim_raw, refusal_raw, fd, unused_stamp = self._anchor
+        require(old.cache._inventory_names(fd, boundary=held.check) == ("run.refused.json",),
+            "zero_start_exact_negative_membership_required")
+        require(held.read(directory.parent / ZERO_CLAIM, 65536) == claim_raw
+            and held.read(directory / "run.refused.json", 65536) == refusal_raw,
+            "zero_start_original_bytes_changed")
+        self.check()
+
+
+@contextmanager
+def load_zero_start_predecessor(root, guard, queries):
+    """Authenticate the failed v2 invocation; its claim is never called again."""
+    require(root == lane.ROOT and type(guard) is lane.LaneGuard
+        and type(queries) is old.references.NativeClassQueryPlan, "exact_zero_start_source_bindings")
+    guard.check(); queries._guard()
+    directory = root / ZERO_DIRECTORY
+    paths = (directory.parent / ZERO_CLAIM, directory / "run.refused.json")
+    with old.cache.HeldFiles(paths, protected=True, boundary=guard.check) as held:
+        claim_raw, refusal_raw = (held.read(path, 65536) for path in paths)
+        require(hash_bytes(claim_raw) == ZERO_CLAIM_SHA256
+            and hash_bytes(refusal_raw) == ZERO_REFUSAL_SHA256, "zero_start_frozen_control_hashes_required")
+        claim, refused = old._parse(claim_raw), old._parse(refusal_raw)
+        require(claim.get("schema") == "si-bounded-count-spent-claim-v2"
+            and claim.get("protocol_sha256") == ZERO_PROTOCOL
+            and claim.get("query_plan_sha256") == queries.sha256
+            and claim.get("restart_allowed") is False
+            and all(type(claim.get(key)) is int and claim[key] == expected
+                for key, expected in (("maximum_attempts", 528), ("maximum_extra_attempts", 16),
+                    ("prior_STARTs", 13_992), ("prior_charged_bytes", 23_452_681),
+                    ("maximum_cumulative_bytes", 4 * 1024 ** 3)))
+            and type(claim.get("registration")) is dict
+            and claim["registration"].get("head") == ZERO_HEAD
+            and claim["registration"].get("remote") == ZERO_REMOTE,
+            "zero_start_claim_lineage_changed")
+        require(refused.get("schema") == "si-bounded-count-refused-v2"
+            and refused.get("code") == "key_or_initial_publication_refused_after_claim"
+            and refused.get("protocol_sha256") == ZERO_PROTOCOL
+            and refused.get("new_claim_sha256") == ZERO_CLAIM_SHA256
+            and all(type(refused.get(key)) is int and refused[key] == 0
+                for key in ("START_debits", "known_HTTP_invocations", "charged_bytes", "resolved_descriptors"))
+            and refused.get("HTTP_count_exact") is True
+            and refused.get("cumulative_STARTs") == 13_992
+            and refused.get("cumulative_charged_bytes") == 23_452_681
+            and all(refused.get(key) == [] for key in ("unreceipted_attempts",
+                "receipt_not_persisted_attempts", "unpublished_observed_diagnostics")),
+            "zero_start_negative_or_debits_changed")
+        require(old._exact(refused.get("authority"), {"source_only": True,
+            "source_admitted": False, "denominator_admitted": False,
+            "historical_PIT_admitted": False, "ready_for_backtest": False,
+            "outcome_looks": 0, "qc_attempts": 0, "trading_authority": False}),
+            "zero_start_never_source_or_readiness_authority")
+        require(old.parallel.clock(claim["started_at"]) == old.parallel.clock(refused["started_at"])
+            <= old.parallel.clock(refused["refused_at"]), "zero_start_actual_clocks_required")
+        names = tuple(sorted(set((*old.expected_code_paths(),
+            "scripts/capture_short_interest_bounded_count_chunk.py",
+            "scripts/short_interest_recovery_transport.py",
+            "scripts/short_interest_refused_count_snapshot.py"))))
+        require(len(names) == 54 and old.cache._git(root,
+            ["merge-base", "--is-ancestor", ZERO_HEAD, guard.binding()[1]], guard) == b"",
+            "zero_start_exact_historical_code_membership")
+        entries = tuple({"path": name, "sha256": hash_bytes(old.cache._git(root,
+            ["show", ZERO_HEAD + ":" + name], guard))} for name in names)
+        require(hash_payload({row["path"]: row["sha256"] for row in entries}) == ZERO_CODE_MANIFEST_SHA256
+            and hash_payload({"git_commit": ZERO_HEAD, "files": entries})
+                == claim["registration"].get("code_identity_sha256"), "zero_start_historical_code_changed")
+        proof = _ZeroStartPredecessor(directory, held, queries, claim_raw, refusal_raw)
+        yield proof
+        proof.full_check(); guard.check()
+
+
 @contextmanager
 def load_refused_child(root, source, guard, expected_manifest_sha256):
     """Require an externally frozen manifest digest, then replay under custody."""

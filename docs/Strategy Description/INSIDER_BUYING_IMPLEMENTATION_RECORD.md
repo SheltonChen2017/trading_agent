@@ -34142,3 +34142,128 @@ temporary roots, plugin/cache/bytecode writes off. The pilot bridge's own final
 qualification remains separate. No result is claimed independently Claude-
 reviewed. Commit264 images/notes, then keep building; activate262 only after
 all outstanding writers finish and the designated tree is committed/clean.
+
+## 265. Distinct archive-v2 collector qualified before activation (2026-10-25)
+
+New source73,097B SHA
+`2b0f80eef1abe4b026f3b0d97535df9ee46c457ff3aca53dbe9390a1061b60d8`;
+tests36,224B SHA `ffc5c4e178e00936908f0c9cf2cab1cde94259d200d1007afee4467dd0dcc584`.
+No actual v2 preflight, namespace, contact or provider request yet. Frozen v1
+source/tests, June18 FAILED root and all four historical custody files are
+unchanged. Distinct v2 worker/module/schema/lock/output namespace targets ONLY
+261's June16 URL; exact minimum-unused-row proof excludes consumed June18.
+The unwritable empty-cache label intentionally matches unchanged retained-
+directory helpers' strict initial flags; it is not an artifact/URL scope alias.
+No helper globals were mutated to bypass compatibility.
+
+`IBARCHIVE-PERF-01` P2 CLOSED prospectively in v2 only. A reverse recognizer
+inspects at most67 trailing character positions, enforcing the same64-character
+pending-token refusal as frozen v1, without whole-chunk quadratic suffix search.
+Unicode→HTML→percent order is unchanged; transforms are skipped only when
+their introducer/recognized byte token is absent. Lowercasing is computed once
+per stage. Decoded-contact variants, chunk tails, depth limits, binary handling,
+compressed AND decoded screening, prehash safety, caps and900s guard remain.
+Native invented1MiB screen timings on scanner-identical preceding image:
+plain0.025256s, early percent0.029057s, binary/percent0.212861s, long valid run
+0.106065s, invalid run0.078716s, each within its2s fixture budget. Differential
+suffix/transform tests and all-split finite-screen tests agree with frozen v1.
+This does NOT establish June18's actual cause or guarantee every permitted
+8GiB input completes before900s; `IBARCHIVE-OBS-01` stays OPEN.
+
+New native input preflight reads ONLY v1's six old run controls plus one claim
+and lock (eight physical leaves total); validates their exact known complete
+pin, registration/crosslinks/input-plan hash, immutable no-body inventory and
+current/original source pins. Original predecessor/directory/new64 identities
+are Git-proved by the trusted parent before acceptance. SH|NB held lock and
+strict before/after/final versions protect old metadata, with no old-root write.
+Unknown June18 membership remains unknown; no parsed overlap/zero exposure
+is invented. Existing old+new64 accession claims are reobserved independently.
+
+`IBARCHIVE-V2-PRE01` P2 CLOSED before actual activation: independent Codex peer
+found the first-read ctime window in the new predecessor reader. Inherited
+NEW-output reader intentionally omits ctime; v2 originally sampled strict old
+version only AFTER its first read. A faithful invented mode0640→0600 change
+during FIRST os.read, same bytes/inode/size/mtime, was wrongly accepted.
+Genuine one-red test then strict version capture BEFORE read, immediate
+comparison AFTER and retention through final checks closed that exact gap.
+Frozen v1 was not edited. Peer independently reran four relevant checks green
+1.54s and reread the final corrected delta; no actual artifacts or calls.
+
+Attributed author final683 focused passed8.01s;22-image strong-native proof
+0.616458125s. Preceding682 passed7.94s and22-image0.618853875s belong only to
+`ccac6708eb4ab61a067da9a04fb973ccb8ac7ac4904c95d8c51be1cd7d017957` /
+tests`79b99db8b04b60b8f74912cf6a19a2a9567e1713db6b3c4e5b5450462fa50f57`.
+Eight preceding memory reversals produced16 reds/restored16; final three
+affected reversals produced3 reds/restored4 controls. Initial author test-path
+typo collected0, corrected selection passed; no acquisition occurred in tests.
+These are Codex peer/author observations, not independent Claude acceptance.
+
+## 266. Pilot production source bridge, exact validation and activation boundary (2026-10-25)
+
+New OUTER orchestrator source21,547B SHA
+`7d1d50587a44253499b65d8ef52e5145b9b3bdd40f26f152e7afca65ee941166`;
+tests18,621B SHA `eb7d9a1b758ec9898adf3cdcb7d31ee7b628e973c9f1c6feb574d51f662db1d6`.
+It lives outside the provider-free package because its genuine full-census
+contract depends on protected source runners; import performs no provider work.
+No existing frozen/full-study source or shared guard changed.
+
+The new production-callable binding requires the genuine pilot plan and full
+25-quarter PilotSecRoster, exact calendar/phase/economics and both earnings
+policies plus hash-rooted pre-outcome registration/whole-pilot one-look CLAIM.
+It is NOT the final admitted-parent/event-inventory protocol, an authenticated
+permanent reservation, rights or outcome authority. Output explicitly retains
+`permanent_look_authority_granted_here=false`,
+`full_admitted_parent_inventory_bound=false` and
+`final_event_population_registration_required=true`. A census-only root cannot
+replace the final source-event population before any outcome access.
+
+Each entry separately consumes an already genuine parsed/cutoff-filtered
+StreamSourceEvidence and genuine V2 window quarters, never a fabricated seal
+or a25-quarter stream forced through a30-session consumer. Exact31-label window,
+entry date/MOO-minus2-minute cutoff, all-six-form census counts and raw ZIP/
+SUBMISSION hashes are crosslinked. Existing entry-context metadata validation
+is invoked; the SAME genuine source object is retained for next composition.
+Future facts remain excluded; unresolved amendment eligibility is not zero.
+Actual price/listing proof, causal lots/events, full original admission,
+earnings evaluation, enabled production interval analyzer, engine parity and
+readiness remain explicitly FALSE/unimplemented, not silently completed.
+
+Attributed author301 focused passed6.95s; restored41 own+51 boundary+EXACT guard
+93 passed4.64s. Eight memory reversals23 intended reds; source-only initial
+native network/fork/ALL-write/security-exec proof0.487405084s. Eight initial
+test-construction failures were corrected invented census-member hashes, not
+weakened upstream validation. Main's genuine import red/restored green is264.
+
+Main final **1,629 passed29.17s**, TWENTY-THREE explicit focused targets:
+new archive-v2/consumer/bridge; unchanged archive-v1/CIK-capture/cloud-control;
+pilot-plan/full-census/source-stream; civil-date earnings; complete-submission/
+raw-parent/fixed64-projection; retained inventory/profile/both directory/
+stopped-control; QC client, import/record/active-document and EXACT package
+guard. Native process-tree network/security-exec/lane-write denial, secret-free
+isolated invented roots, plugin/cache/bytecode writes off. NO full suite.
+
+Main final separate source-only strong-native network/fork/ALL-write/security-
+exec denial proof1.435425458s compiled/rehash28 explicit images, inventory
+`20864370c8c87415dd6fab511667c8420799c600e6bebff6e60b08bf44192283`;
+134 loaded/explicit closure images, inventory
+`f285b66caf505e7131ce6a9b43b2566646b4eb4101ef4c917093870833117014`.
+All six new/current pair hashes matched264–266, current/frozen source guards
+and unexecuted consumer capacity passed. This is uncommitted candidate/
+bootstrap proof with synthesized source-only identity, NOT actual clean-Git
+preflight. Initial main proof mistakenly assumed exposure module had SELF_PATH
+and stopped before source-image proof; corrected explicit paths passed. No
+actual business input/namespace/provider/QC/credential access in either proof.
+
+Commit265–266 new images/notes after exact root/branch/HEAD/expected-status and
+matching-origin checks, then freeze ALL source writers. Activate only261's
+different-day archive and262's separate read-only consumer once clean. The
+native reference-corroboration successor remains DESIGN ONLY/unregistered:
+no History/fundamentals/price call follows automatically. Full corpus/reference/
+availability/rights/earnings/order/protocol gates still apply. No final handoff
+or push yet; continue building under delegated judgment, no routine Claude or
+owner checkpoint. Six carried P2s and actual `IBARCHIVE-OBS-01` remain OPEN.
+
+Post-append main record/active-document/boundary/EXACT checks124 passed4.33s
+under the same native denial/isolated-fixture controls. Main returned existing
+project edit control from Mia; Safari visibly confirmed You have edit permission.
+No extra account/security permission, file edit, cell execution or job followed.

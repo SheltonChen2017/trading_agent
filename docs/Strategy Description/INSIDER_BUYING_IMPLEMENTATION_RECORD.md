@@ -32557,3 +32557,156 @@ network/fork/ALL-write/direct-security-exec denial; trusted launcher separately
 checks clean Git/source identity before/after. No new directory request,
 archive download, locator diagnosis or native QC data call has yet occurred
 at this source-qualification entry. No final push yet.
+
+## 233. Observed all-form locator result and FAILED directory scope (2026-10-25)
+
+Both registered operations used ALREADY-EXISTING CLEAN
+`2e3224d6d69e4eb9ce2c877505b9ea2473b0ceb3`, with all writers frozen.
+No later correction/reader existed during execution. No strategy/QC data
+call, backtest or outcome look occurred.
+
+### 233.1 Actual all-form retained-master diagnosis completed
+
+`ib-pilot-sec-locator-allforms-20261025-once` exited0, guarded parent span
+25.136922s. Initial native network/fork/ALL-write/security-exec-denied worker
+hash-held ALL25 compressed masters and scanned exactly the five affected
+quarters once each:2022Q2,2025Q1,2025Q2,2025Q3,2026Q1. It diagnosed all12
+quarantines (11 pilot), without raw ZIP/body/financial access or provider call.
+Exact witness/source/control checks and trusted parent final Git check passed.
+
+| Observed evidence | SHA256 |
+|---|---|
+|validated public result|`d295249bee34698d1e7526eedbd2d21f683812374026f02b2ad5a30169c36c6b`|
+|diagnostic batch|`70d22f2d6c798fccfe9cfa27ab649283877d219b43c2e8791f88fbb8a74bd47a`|
+|25 master descriptors|`ce42d7a291e848e29a7e517719778c405c765df3ad55aa135b9bb0aa6e2f42a0`|
+|original quarantine JSONL|`70ecf4dca9038cf6adf83057517ca1584914292ff91ae73e63414d5d41b30bb7`|
+|original worker stdout678,998B, before witness stripping|`762199135f92945d0aa62856805d97fbca66dc870adb884a365bfba8caa46f72`|
+|execution source inventory|`9fb7b74f12bd711bf3f85b5c1d06fec288194f630edb619579e5c85c16ada0e4`|
+
+| Period/source ordinal | Accession | Source filing date | ALL-FORM retained-master result |
+|---|---|---|---|
+|2022Q2/5288|`0001070235-22-000111`|2022-06-27|No matching accession row.|
+|2022Q2/46340|`0001562180-22-003120`|2022-04-04|No matching accession row.|
+|2025Q1/17797|`0001225208-25-003519`|2025-03-20|No matching accession row.|
+|2025Q1/41267|`0000950170-25-003425`|2025-01-08|No matching accession row.|
+|2025Q1/63244|`0000950170-25-000398`|2025-01-02|No matching accession row.|
+|2025Q2/37859|`0001641172-25-013948`|2025-06-06|No matching accession row.|
+|2025Q2/48700|`0000950170-25-049350`|2025-04-02|No matching accession row.|
+|2025Q3/6729|`0001193125-25-212761`|2025-09-23|No matching accession row.|
+|2025Q3/6741|`0001193125-25-212753`|2025-09-23|No matching accession row.|
+|2025Q3/6762|`0001193125-25-212747`|2025-09-23|No matching accession row.|
+|2025Q3/6968|`0001193125-25-212764`|2025-09-23|Two physical Form4 aliases, BOTH dated2025-07-01.|
+|2026Q1/42906(context)|`0001248580-26-000001`|2026-03-10|No matching accession row.|
+
+For the date conflict, physical ALL-FORM row6267 is issuer1030894/CELESTICA
+INC, archive`edgar/data/1030894/0001193125-25-212764.txt`, original78-byte
+five-column lineSHA`29c4579922c145c57e83c5c31606166b92a0ead6cedf39cdbf8c48d53b59adbd`.
+Physical row226704 is2082884/Wilson Michael Max, archive
+`edgar/data/2082884/0001193125-25-212764.txt`, original83-byte lineSHA
+`4baa75e202633ee3c7dcd3e6afe446d0e1cddd4d31516c76d09a8d83f0fa3138`.
+Duplicate physical evidence is preserved, not collapsed into one assumed
+issuer path. This proves absence/disagreement in THESE exact retained full
+masters, not absence from EDGAR/all history or which source date is correct.
+No URL/date guess, quarantine clearing, SEC authenticity/PIT or canonical
+admission follows. Further genuine archive/parent evidence is still needed.
+
+### 233.2 Actual one-directory operation FAILED; claim/start preserved
+
+`ib-sec-feed-directory-2021q1-20261025-once` actually exited2 with the fixed
+generic refusal message, NOT a successful inventory. Metadata-only observation
+showed TOTAL five leaves: scope.lock, one canonical-URL claim, and
+run/{reservation.json,contact-validated.json,request-start.json}. Reservation
+was14,281B. NO request-result, response, response-header, inventory or complete
+leaf was published. The identifying contact was supplied privately AFTER the
+reservation, with echo disabled and no contact print/hash/persistence.
+
+The URL claim filename is
+`32bf5df1fcd432520aba2b2aef7229e982a728f222f660d464acd0cb6b5fd430.json`.
+This is the canonical GET-URL key, NOT a measured response/body hash. Preserve
+the entire failed namespace and consumed URL; no reset, resumed namespace,
+semantic/renamed retry, fallback, archive follow or rewritten receipt.
+The generic failure plus absent result is not itself proof an HTTP request
+was sent, HTTP403/429 occurred, or measured request/transfer counts were zero.
+No such claim is made here.
+
+New **P2 OPEN `IBFEED-OBS-01`**: the real directory operation failed after
+durable start without a terminal result. Exact retained-control diagnosis and
+a validated correction are required. Six carried topical/shared P2s remain
+OPEN in addition; no earlier resolved finding is reopened by inference.
+
+Source-only investigation found a deterministic candidate failure mechanism:
+the same32-key dictionary resource limit used for FOREIGN directory JSON is
+also applied to OWN canonical controls, including the production-sized source
+inventory in the reservation. Main's initial strong-native invented-only
+proof0.558560583s observed32 entries accepted,33 and102 entries refused with
+`json_resource_bound_refused`. No artifact/provider input was read. The author
+separately reproduced that refusal in a genuine context with invented102-entry
+controls before its raw callback/alarm latches. Those are SYNTHETIC/code-path
+observations, not measured actual HTTP-zero evidence or yet an authenticated
+read of the failed reservation. An earlier source-only attempt to generate a
+real Git identity under ALL-write denial could not establish Git and stopped
+with`git_identity_unavailable` BEFORE artifact/provider access; that diagnostic
+launch limitation is not asserted as the original operation's cause.
+
+## 234. Registered additive stopped-control diagnosis; no URL retry (2026-10-25)
+
+Build/qualify TWO NEW lane files for
+`ib-sec-feed-directory-2021q1-stopped-controls-20261025-once`. Preserve the
+executed v1 source/test bytes and original failed operation unchanged. The
+new reader is offline-only: trusted launcher establishes/rechecks current
+clean Git/source identity; an initially native network/fork/ALL-write/
+direct-security-exec-denied child holds ONLY the exact five failed leaves
+and their ancestry, verifies scope/claim/start/contact-presence/source/head
+crosslinks and complete namespace, and reports raw control sizes/hashes.
+No contact value, raw SEC body, transport, acquisition/contact function, QC,
+credential or outcome access is allowed. Original execution head remains2e3224;
+the later reader execution head must be recorded separately.
+
+Use a distinct bounded own-control decoder and exact typed schemas, not a
+blanket weakening of foreign JSON limits. Reproduce the ORIGINAL v1 decoder
+against the EXACT retained reservation bytes, with fixed sanitized codes.
+Carry only original metadata-control witnesses through bounded IPC so parent
+can independently check links and failed-source anchors before stripping them.
+Source-code unreachability, missing instrumented terminal evidence and actual
+network observations must stay separate. The new decoder must meaningfully
+accept production-sized33/100+ inventories while the foreign32-key candidate
+profile remains unchanged. Any future corrected producer must preflight its
+complete genuine source identity/control roundtrip BEFORE consuming a new
+namespace/contact/start; no new online producer is activated by this reader.
+
+Qualify/commit the new reader/tests first, freeze writers, then execute that
+one diagnosis. It cannot resume, retry, promote or manufacture a terminal
+receipt for the failed directory operation. No final push yet.
+
+### 234.1 Qualified reader images and observed validation
+
+New reader22,203B SHA256
+`d2f95bff32c9fa38b0fac9a944e621522f8591dff29d46b04f8e7fce0c165b4b`;
+new tests15,211B SHA256
+`9868b4d12f2b19dbb9392f0d763a9b2c28bffa347682c7a64c9efadac695ebb4`.
+The original v1 pair remains EXACTLY c40fb29f/6abc8a6c from232.1.
+Main source inspection found no additional material defect. Main OBSERVED
+**248 passed in5.91s**: new reader, unchanged directory, lane import boundary,
+implementation-record, active-document and EXACT package-guard tests. Initial
+native process-tree network/security-exec/repository-write denial, isolated
+minimal environment, no bytecode/cache/plugin autoload; invented fixtures
+alone may write outside the lane. This was NOT a complete lane/repository
+suite and read no actual stopped controls/provider/QC data.
+
+Main separately OBSERVED initial native network/fork/ALL-write/direct-security-
+exec denial and effective denial probes, compiling all FOUR new/original
+source/test images in memory in0.582361917s; exact hashes above/232.1 matched.
+Attributed author evidence:176 focused checks passed3.57s, four memory-only
+reversals caused six expected reds and restored176 greens. A prospective
+inherited parent-guard refusal of exact FAILED_HEAD Git source readback was
+first reproduced with one red, then fixed ONLY in the new reader's allowlist;
+unknown commits, traversal and nonsource commands remain refused. Peer QA
+was read-only Codex assistance, NOT independent Claude review.
+
+Production-size14,281B reservation and28,562-character lossless IPC witness
+tests exercise the actual size class, independently of the untouched foreign
+32-key/16KiB-string profile. Trusted parent, not the fork-denied child, checks
+every original inventory entry against2e3224 Git bytes. Original HTTP count
+and transfer bytes remain nullable/unmeasured; diagnosis cannot fabricate a
+terminal result or reopen its consumed URL. Commit this qualified source and
+record, then freeze all writers for234's single offline operation.

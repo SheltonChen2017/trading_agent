@@ -7056,3 +7056,27 @@ plain-data preparation/publication and native workers/output validation add no
 separate look. No accepted comparison cell is added. Analyst322.13–322.14 own
 the exact evidence, limitations and handoff. This owner-authorized append changes
 no historical entry or other lane; immutable/PIT/master/paper/live flags stay false.
+
+### R-298 A12 actual runtime failure — 2026-10-25 UTC
+
+At clean `e3afe7efab1b3960b0fd883d1ce185bb30d35470`, new owner-authorized A12
+launched one exact plain-source job in existing project38364439, then observed
+Runtime Error after8 application dispatches. Parent19:04:31.087193Z..
+19:05:50.531763Z, actualexit2/stderr0/no bound; stdout2,361bytes SHA256
+`efa245a692a265a7db56d918be629d87500916ad3335fcef7e75caab2c9b5570`.
+Native output-only validator exited0 and authenticated FAILURE; outer retained2.
+Report2,232bytes SHA256
+`a56e8faed5bfa43e945c789e999b241523d7f9302cf43258affabecacd26c8e4`.
+Backtest `e5c358608fa75d62b3a26a1be26d301f`, exact name
+`ARV2 R298 NEWRULE SIX OFF 2021 OCT2026 R323 A12 9dde3978`.
+No aggregate reader or accepted result cell followed. Subsequent authenticated
+Safari error UI reports2021-02-22 09:31 execution_price_not_current_minute;
+exact missing/stale/fill-forward predicate and security remain unknown.
+Incidental partial failed-run UI statistics are not accepted performance.
+
+Book A12 exactly once: **326 ->327 shared /251 ->252 Analyst development /
+50 infrastructure unchanged /699 booked cells unchanged**. A11 is not rebooked.
+The owner directs continued verified diagnosis/fixes/Mia and waives Claude
+review until further notice. A12 remains spent; no unchanged retry or live
+clearance follows. Analyst323.6 owns the exact evidence and current diagnosis.
+This append leaves all historical entries and other lanes unchanged.

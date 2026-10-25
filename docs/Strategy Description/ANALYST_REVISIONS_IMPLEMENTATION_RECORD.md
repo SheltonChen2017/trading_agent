@@ -805,12 +805,17 @@ readiness checks once (322.6/322.10/322.13). QC accepted the exact new loader;
 all eleven intended R298 files were read back and the exact compile succeeded.
 This is prospective technical readiness for R298 only, not historical cause,
 formal acceptance, runtime success or a completed six/eight comparison.
-D1/D2/A11 are SPENT. Floor326/251/50/699; R298 READY, no backtest launched.
+D1/D2/A11 are SPENT. Their prior READY floor was326/251/50/699.
 The owner now directs R298 execution followed by the six/eight comparison and
 explicitly skips current Claude review. Section323 owns this new round; the
 prior readiness-only boundary has concluded. Freeze the new launch/result
-contract and six-cell public specification before contact, then execute and
-continue the fixed comparison without a routine review wait. One final push.
+contract and six-cell public specification preceded A12. A12 actually launched
+and failed the fresh-price guard on2021-02-22; it is now SPENT, with no accepted
+performance cell. Current floor327/252/50/699. Section323.6–7 owns retained
+failure evidence, the completed read-only Mia consultation and the distinct
+failure-only A13 diagnostic being prepared. Continue verified diagnosis/fixes
+and then the consistent six/eight comparison without a routine review wait.
+One final push; no funded or paper/live deployment authority is inferred.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -2086,8 +2091,11 @@ candidates are ready. The monitor stays PAUSED; no routine review-authorization
 question is needed within the owner's existing scope.
 The later owner explicitly waives Claude review of section 323 and directs
 R298 execution followed by the six/eight comparison, documentation and one
-final push. The immediate next step is section323's separately committed
-launch/result contract, followed by the fixed remaining cells when admitted.
+final push. Section323's first launch/result contract was committed and A12
+failed at the per-security fresh-price check. The immediate next step is the
+separately frozen, failure-only A13 quote diagnostic in323.7, then verified
+correction and the consistent remaining cells when admitted. Do not replay A12
+or remove its freshness guard to obtain a terminal success.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
 V3 is spent after its
@@ -57634,3 +57642,251 @@ Caller canonical profilefb4fe0492b6565b106a71ab5ebeb7286ebd04144b73380e40e12c2a6
 The caller/source arguments bind source only;323.1/323.4 supply the current
 owner direction and prospective use. All older operational modules and pins
 remain unchanged. One new claim is allowed, never an automatic retry.
+
+### 323.6 Actual A12 failure and extended owner direction
+
+At clean e3afe7efab1b3960b0fd883d1ce185bb30d35470, sole parent brackets
+2026-10-25T19:04:31.087193Z..19:05:50.531763Z, actualexit2/stderr0/no bound.
+Stdout2,361bytes SHAefa245a692a265a7db56d918be629d87500916ad3335fcef7e75caab2c9b5570.
+Native-denied supplied-output validator19:05:50.532077Z..19:05:53.766649Z
+exited0/stderr0 and authenticated FAILURE only; outer observer retained exit2.
+No extra operational artifact/result reader was invoked. Retained report
+2,232bytes SHAa56e8faed5bfa43e945c789e999b241523d7f9302cf43258affabecacd26c8e4.
+
+Eight application dispatches launched exactly one job, then observed terminal
+Runtime Error. Exact project38364439, compile5bd25474163eb6cf13a005139d1c4998-2a348312a9ff411534083f2012d355b5,
+backtest e5c358608fa75d62b3a26a1be26d301f,
+name ARV2 R298 NEWRULE SIX OFF 2021 OCT2026 R323 A12 9dde3978.
+The original finite status projection could not classify the runtime string;
+known_runtime_code/python_error_category remained null. No aggregate read,
+accepted result cell, final successful source admission or later-cell launch
+followed. A12/control/observer are now SPENT and preserved.
+
+ARV2E323-001 remains OPEN: R298 cannot yet complete under the exact current
+fresh-execution-price contract. The retained failure proves that a guard
+refused, not whether the guard, cache representation or market-data availability
+is defective. Diagnostic instrumentation is not itself resolution of that issue.
+
+The owner then explicitly directed continued diagnosis/fixes after failures,
+allowed Mia at blockers, waived Claude review until further notice, and
+preauthorized lane development toward live/small-cash readiness. This extends
+development beyond the comparison, without supplying an actual funded account,
+mode, capital/order/loss-limit deployment mandate. No routine review permission
+question is needed. Readiness must reflect real completed research/risk evidence
+and remaining prospective/source gates; current retrospective work alone does
+not make formal or paper/live flags true.
+
+Book A12 once:326->327shared/251->252Analyst development,50infrastructure/
+699cells unchanged. A11 stays separately booked; no successful cell or measured
+provider-request count is inferred. The exact failed run may now be inspected
+through authenticated Safari/Mia for diagnosis under the new owner direction;
+this is not replay of the spent operational aggregate reader or permission to
+change economics without a separately versioned, justified prospective decision.
+
+Actual Safari inspection of the exact run found reported engine time
+2021-02-22 09:31:00 and exception execution_price_not_current_minute, at
+_current_execution_price invoked by on_after_open (normalized cloud runtime
+line579/621). The guard combines missing data, end-time mismatch and fill-forward
+data, so this message alone does not identify which predicate or security failed.
+The failed-result UI incidentally displayed partial statistics/asset charts;
+they are incomplete failed-run output and are not retained as an accepted
+performance result or used to tune the candidate. No Orders/Trades/log export.
+
+Opening the existing editor automatically built current cloud source at its
+displayed7:07:36, Lean2.5.0.0.18203, shortcompile8cc0d9-2a3483; root clicked
+no Build/Backtest button. This automatic UI effect is disclosed, not a new
+accepted candidate compile or strategy attempt. Mia was asked only to inspect
+this run's exception metadata and public source and distinguish callback ordering
+from an absent/stale/fill-forward first-minute bar. Explicitly no edits, uploads,
+compile, launch, permissions, Object Store/private rows, purchases or support
+contact were requested. No guessed fix was applied.
+
+### 323.7 Read-only Mia disposition and prospective A13 diagnostic purpose
+
+Mia completed its read-only response by2026-10-25T19:26Z. It agreed that the
+run began2021-01-04, failed mid-run at the per-security freshness guard, and
+that the retained conjunctive error cannot distinguish missing data, stale
+end-time or fill-forward data, nor identify the security. Its response also
+reported order/fill details beyond the requested error/public-source scope;
+those were not independently authenticated or retained as performance evidence.
+No economic conclusion, exact failing instrument, data-source cause, replay
+determinism or remedy is inferred from that advisory response. Mia made no
+reported source changes. Future source checks still compare all eleven exact
+files, rather than accepting that statement as source authentication.
+
+Closing the completed editor session showed the platform's notification that
+it skipped a final cloud save because Mia held the collaboration write lock.
+This is a disclosed editor-session effect, not permission to bypass idleness,
+accept an arbitrary collaborator or force a lock. The new operation must pass
+the unchanged exact current access representation and acquire only its own
+permitted edit lock before any file mutation.
+The subsequent UI observation confirmed return to the terminal/project list;
+no editor or Mia task was left running by root. This does not replace the
+future two-endpoint API access/idleness check.
+
+The next distinct use is **A13, diagnostic instrumentation only**, not an
+unchanged retry or a claimed trading-rule fix. Additive pure projection
+arv2_newrule_quote_diagnostic_projection.py splits only the existing three
+short-circuit predicates into execution_price_missing,
+execution_price_end_not_current and execution_price_fill_forward. Success still
+returns number(security.price, positive=True); there is no stale-price waiver,
+clock-price substitution, delay, skip, changed order or changed economics.
+The other nine cloud files, including the plain input loader, remain byteequal.
+Runtime/main and their profile/source identities are separately versioned;
+the old9dde projection and A12 evidence remain frozen. This prospective
+diagnostic may identify which predicate a new run encounters; it cannot
+retrospectively recover A12's missing predicate or prove identical recurrence.
+
+Before any invocation, this was expanded with failure-only closed metadata:
+cache class(trade_bar/quote_bar/other/missing), current-slice trade/quote state
+(missing/fresh_non_fill_forward/fresh_fill_forward/stale/invalid), and whether
+the cached price equals the slice trade-bar close(equal/different/unknown).
+Here stale means end_time!=now, including a possible future time; it does not
+prove the datum is older. Observation errors yield invalid/unknown and do not
+mask the original predicate. Passing checks do not perform these observations.
+No identity, timestamp, price, quantity, raw class name, market row or raw
+exception is retained. The three predicates times300context combinations form
+900closed codes; that inventory size is not900separate test passes.
+
+The final public diagnostic projection is3,824bytes,
+1f366e402b3754e9f1f8ba89d08f250df771431b2ae98d19da953cfb722db293;
+profile1133de6d18fb8d8b5355fb906d5a2f38f97e1f97460b80bd1f4c9014e901ad70,
+source manifested8bd6c988d6d9fc31586b9dd8df058e8235a79702f52d78a172c31a1e64b190.
+Normalized runtime53,969bytes SHA38d65a94de2435852f374b54eaaf445a7e2ff90a0ec08f05427263d89e146ac1;
+main33,705bytes SHA604f3691c8a7a8abc101267de63c5c9d8ef2cc5f78ab343eb82109d18df43ec8.
+Patcher SHA227a00f8ecec730c9ddf2524b510eda24205e797192c388542137812b2d5b177;
+tests18747f2c3bf9a3d0154dc7baa7a6155340c36c632af3e241b97bc7c3c4b3c457.
+Author86focused passes11.39s under native remote-network/production-artifact/
+Keychain denial, no conftest/plugins/bytecode/cacheprovider and all support
+paths inroot; no operational call or input read. Earlier52passes11.17s overlap,
+predate the context expansion and are not additive. A fill-forward omission
+on the early pre-context patcher was caught by3expected failing cases/3passing
+cases in3.56s, memory-only and restored finally; this was not a mutation run
+against the final227a00 source or a production edit. A separate exact caller,
+source/claim/deadline/actual-exit freeze and focused checks still precede use.
+
+### 323.8 Prospective A13 source/compile/diagnostic execution decision
+
+Under323.1/323.6 and the owner's continuing development/review waiver, authorize
+ONE observe invocation of scripts/run_arv2_r298_quote_diagnostic.py at the clean
+commit containing this exact freeze, bound by its externally supplied committed
+caller SHA and expected HEAD. The sole new private control is
+artifacts/analyst_revisions_v2/newrule_quote_diagnostic/R323-20261025-B;
+it has not been inspected, allocated or claimed before this decision. A12's
+control and every old operational entrypoint remain spent and unread. There is
+no Object Store republication, provider acquisition, project replacement,
+permission change, force lock, alternate role or unchanged retry.
+
+The new parent exclusively claims/fsyncs before private admission or QC contact.
+The initial credential-free native-network-denied worker freshly consumes only
+the explicitly pinned D2/A11 evidence and current October input under the
+existing admission helper; it constructs the separately pinned diagnostic
+projection. This is a fresh consumer, not replay of the old operational reader.
+The parent verifies exact owner/organization/current access and idleness,
+exactly the excluded manual run plus failed A12, and all eleven old9dde source
+files before acquiring its permitted fixed A5 edit environment. It repeats
+access/history/source checks after lock acquisition, changes ONLY runtime and
+main once each, and immediately reads back the entire exact eleven-file set.
+It compiles once, polls that exact compile at most120times at least1second
+apart, and requires BuildSuccess before a fresh access/history/source/compile
+and capacity check permits one new named A13 backtest in project38364439.
+No Mia/arbitrary collaborator row is accepted by inference from the UI.
+
+Capacity has at most3observations at least60seconds apart; job status has at
+most240observations at least60seconds apart. Both newly created identity and
+fast terminal state are retained immediately. Exactly one mutually exclusive
+detail read is allowed: after Runtime Error, authenticate that exact job and
+project/source/access/compile again, then retain ONLY the finite error category
+and closed quote context; discard statistics, raw errors and every other body
+field. After Completed., instead read and strictly validate the two bounded
+custom aggregate statistics against the new exact profile, then freshly
+reconstruct the native input packet and require exact equality. Compile errors
+retain only finite compile evidence; they never launch. A list status alone,
+terminal Completed., report text or diagnostic category is not accepted success.
+
+Confirmed pre-use ARV2I323-006(P2): list-row error availability was unproven and
+could lose the new context again. The separate error-only read addresses that
+transport gap prospectively; it does not recover A12's discarded API message.
+If the exact new error remains unavailable, one read-only Safari error-panel
+reconciliation of the retained new A13 ID is admissible under the owner's
+diagnosis direction, without source edits, orders/trades/log exports or a new
+job. Missing or ambiguous metadata must remain unknown, never manufactured.
+ARV2I323-007(P2): the copied300request joint cap could truncate the advertised
+compile/status ceilings. The new cap is420application dispatches, with1024
+immutable control records; the mutually exclusive protocol paths fit that cap.
+Neither budget promises all maxima fit the joint15,120second parent deadline.
+Own-child kill/reap only; inherited FD/intent-bound initial/final workers,
+finite separate stdout/stderr and a separate native-network/production-artifact/
+Keychain-denied supplied-output validator bind the actual parent exit. Late
+publication failure/nonzero/unknown/ambiguous actual exit is never accepted.
+Timeout, partial claim or ambiguous response spends this use; no automatic retry.
+Native denial is not measured zero contacts or a same-user/interpreter sandbox;
+endpoint metadata equality is not continuous integrity. Host suspension and
+uninterruptible I/O remain outside the deadline guarantee.
+
+Any full A13 aggregate is a diagnostic R298 result under its NEW profile, not
+an accepted substitute for the old ee8df6 six-cell family. No manual or failed
+A12 partial performance is pooled. A subsequent comparable study needs a
+consistent versioned common runtime/profile/source family for every arm,
+including any justified execution-policy correction, frozen before its results.
+All financial/source/formal/PIT/paper/live flags stay false. Book a genuinely
+claimed A13 once as +1shared/+1Analystdevelopment from327/252/50/699; no count
+is advanced merely for preparing/testing this contract. Admit a result cell
+only after actual exit0 AND authenticated matching completed aggregates.
+
+### 323.9 A13 final pre-use validation and source freeze
+
+Root final focused selection: **352distinct passes18.21s** (86projection,
+113remote protocol,66caller,86record/active-document,1research transitive
+closure), no failures/skips/warnings. Native remote-network/production-artifact/
+user-and-system-Keychain/security denial, --noconftest, plugin autoload/cache
+provider disabled, -B, inroot temp/cache paths and absent dispatch_fence were
+verified. No full suite, provider/private operational read or QC contact.
+All106selected pins independently matched. The public3,824byte projection,
+eleven source files/273,552bytes, exact profile and source manifest were
+independently rebuilt; all six new source/test files compiled in memory.
+Final record/active-document repeat86passes0.93s overlaps352 and is not additive.
+
+The first root wrapper lost delivery of its command result when orchestration
+attempted to store an absent session ID; no pass/exit claim is made for it.
+The next observed selection stopped at collection with1error/0.03s because
+pytest attempted stat(artifacts) under the native production-read denial.
+Adding explicit --ignore=artifacts avoids that discovery before stat; the
+denial remained unchanged. This is not a relaxation or successful private read.
+Author's initial59passes5.36s/64passes5.19s/66passes5.83s and final66passes5.12s
+overlap the root selection; the intermediate63pass/1synthetic nested-sandbox
+child exit71 failure5.41s remains disclosed. Corrected fixture inherits the
+required outer native denial and checks real inherited descriptors; it does
+not model the production parent's unsandboxed launch of a sandboxed child.
+Actual operational workers will supply that separate evidence only on use.
+
+Remote author's initial80passes3.48s/97passes5.48s/110passes6.06s overlap final
+113passes5.45s and root352. Memory-only history-gate omission and exact detail-ID
+omission each produced1expected failure0.11s, restored finally. The last
+pre-use consistency correction preserves known list code/context/category when
+detail is unknown; conflicting known values refuse while preserving the old
+terminal receipt and consuming the read. This avoids interpreting contradictory
+same-job representations as a verified remedy. Advisory audit found no other
+material open implementation blocker after006/007; it is not independent review.
+The actual fresh-price failure ARV2E323-001 remains OPEN pending real evidence.
+
+| A13 source/test | SHA256 |
+|---|---|
+| arv2_newrule_quote_diagnostic_projection.py | 227a00f8ecec730c9ddf2524b510eda24205e797192c388542137812b2d5b177 |
+| test_quote_diagnostic_projection.py | 18747f2c3bf9a3d0154dc7baa7a6155340c36c632af3e241b97bc7c3c4b3c457 |
+| arv2_r298_quote_diagnostic_remote.py | bed3653baeeeb5c1338127832ccd51af4587d957d733e18cdde33a11ef27c6e0 |
+| test_r298_quote_diagnostic_remote.py | f0d73cf17718e7858d1c477ce95a1d7cc2d0ed98be0cd5913cc10d56fa8c71e5 |
+| run_arv2_r298_quote_diagnostic.py | 770ce5b92fcd46e862a40a763b492d6561b55a82b4e244242a900eda71509257 |
+| test_r298_quote_diagnostic_caller.py | 0a403e2108ece72e8216477f2ee55945adb4e2fe3df0281fa9fc2461e15414a8 |
+
+Root removed two trailing blank lines from the caller after the352selection;
+this changes only its source-byte pin, not its AST or canonical caller profile.
+Exact pre-format hash reconstructed by appending two LF bytes and whole-AST
+equality were checked; final caller+record repeat152passes6.02s overlaps352.
+Canonical caller profilec791c0f5f79b8b4ccef00aca5fe3dc173e768343c8702677dd404091d06f9100.
+The exact committed caller/HEAD are source bindings, not authorization booleans;
+323.6/323.8 supplies the current one-use owner-directed diagnostic decision.
+No runtime/main mutation or new compile/backtest has happened at this freeze.
+After committing this freeze, invoke it once, retain actual exit/output/IDs,
+record the honest result and continue verified correction/consistent comparison
+under the owner's current scope. Do not push an intermediate acknowledgement.

@@ -806,6 +806,11 @@ all eleven intended R298 files were read back and the exact compile succeeded.
 This is prospective technical readiness for R298 only, not historical cause,
 formal acceptance, runtime success or a completed six/eight comparison.
 D1/D2/A11 are SPENT. Floor326/251/50/699; R298 READY, no backtest launched.
+The owner now directs R298 execution followed by the six/eight comparison and
+explicitly skips current Claude review. Section323 owns this new round; the
+prior readiness-only boundary has concluded. Freeze the new launch/result
+contract and six-cell public specification before contact, then execute and
+continue the fixed comparison without a routine review wait. One final push.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -2079,6 +2084,12 @@ fresh access/idleness/capacity checks only when that protocol permits. This
 round does not implement or invoke it, and does not claim all six/eight cloud
 candidates are ready. The monitor stays PAUSED; no routine review-authorization
 question is needed within the owner's existing scope.
+The later owner explicitly waives Claude review of section 323 and directs
+R298 execution followed by the six/eight comparison, documentation and one
+final push. The immediate next step is section323's separately committed
+launch/result contract, followed by the fixed remaining cells when admitted.
+This supersedes the prior round's readiness-only endpoint, preserves all spent
+attempts and does not require another routine permission question.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -57439,3 +57450,187 @@ The plain-data transport removed the immediate upload blocker without changing
 the strategy rules. We have not yet run the strategy or produced performance
 results. The next bounded job is launch/result handling for this exact candidate,
 not another upload attempt or an assumed green light for all six/eight tests.
+
+## 323. R298 execution and six/eight plain-data comparison — 2026-10-25
+
+### 323.1 Owner scope and starting snapshot
+
+Owner: "Proceed with the R298 backtest, then continue the 6 and 8 universe
+comparison. Skip Claude review for now, document the progress, and push once
+when done." This explicitly opens the next execution round after322; it waives
+current Claude sequencing, not technical gates or independent acceptance.
+Start local/tracking/live matching head3c905d4235617d3d2a56b636c8e0be77ee790686,
+clean designated worktree/branch. No incoming Claude range is being reviewed.
+No intermediate push is authorized. The existing AFK delegated implementation
+scope and Analyst-only accounting exception persist; no funded/broker/paper/live,
+new paid rights or other-lane/project changes follow.
+
+R298's exact eleven-file source/compile is the322.13 checkpoint. A1–A11 remain
+spent; do not invoke their entrypoints or repair their controls. The owner's
+new execution direction supplies ONE additional A12 for the compiled functional
+successor, not an automatic reset of the ordinary three-attempt/Mia rule. A12
+creates at most one job; compile/runtime/transport ambiguity remains consumed.
+The monitor stays PAUSED. Current floor326shared/251development/50infrastructure/
+699booked cells changes only on actual accountable events.
+
+### 323.2 Fixed comparison specification before outcomes
+
+The additive pure newrule_plain_comparison.py constructs the six proposed
+profiles/source inventories without private input reads; its actual capability
+builder separately requires genuine original-family/October/plain-transport
+capabilities and matches that specification. It retains exact original economics
+except package/source/profile identities. The same six plain objects serve all
+arms; ten cloud modules are byte-identical across cells, with only main varying.
+R298 remains exactly the existing89d6 profile/9dde projection/8df source manifest.
+The new host generator is bound externally, never added into R298's profile.
+
+All six share2021-01-04..2026-10-13,1,451 daily closes/302 weekly decisions,
+last decisionOct12; six uses SPY/QQQ/SOXX/XLV/REMX/XLE, eight addsXLI/XLF.
+09:20 snapshot,09:31 market submission, prior NYSE RAW close/NAV sizing,
+98% gross,9.8% aggregate stock cap, whole shares/sells before buys and10bp fees
+remain frozen. October13 is valuation only. No outcome-driven tuning or mixing
+old compressed-package results into the new common-source comparison.
+
+Public specification13,977bytes SHA256
+ee8df6e992c0763c3448bd0f601f0cb789f8abe9bdc86497274163805a424a13;
+common geometrybe1ff1b545a7d453969ca34237141a20e580236a8f74e01beae23c8943d03e08.
+These are source-derived proposal bindings, not private source admission.
+
+| Candidate | Universes / AR | New profile SHA256 | New projection SHA256 |
+|---|---|---|---|
+| R298 | 6 / off | 89d6ac9bb0f1be8bd8f307f0b00d5725620e33b402fecb7ee2ff06daecc2106e | 9dde39783bcb401d1f36aeb5beb1b1983882250b0472c2afd22dca1408c2a5f5 |
+| R299 | 6 / 100 | a67237dfa93eb983fe7e61fb005e7c1c9829388f6edcae87e8a30bce5a5a4a54 | 09f7b6143e9ca0e754a719a20e46d22407773299aa8469f1c50ae43b56770a85 |
+| R300 | 6 / 200 | 1695ed7cea8d9cfc4b7cbd82f2c10e1cdb99e1e33ebf19712bbbfda4a9f8d226 | d2f30b9dd71a492f0fc962e054b9751cab2d2eff092d2258b417a057a7150654 |
+| R301 | 8 / off | db5d8e0a260374f6a9843a3194b66c65bace010149d63df91458712b6ce7d35b | 055c54b49e0efdd805f58b879f8ca04621384cce8256bf671cfc30e1b313c6f3 |
+| R302 | 8 / 100 | 39c8b630ddefe108e230109cfe18d2380b11e92215bb24efb87da12954359197 | eb66a438092e58003e35703ad76131913a2603f9f7d17a48c9e8e905873ef79a |
+| R303 | 8 / 200 | 4fa7b6ee153ba7ce9be44b4b3dae5ea67c379749623df725463ad00c2bdf42a1 | 0270f83167efe6f967eff0b3d7c4223041e0c11f87a38342cd2b1c19af47d0b9 |
+
+### 323.3 New launch/admission implementation and qualifications
+
+arv2_r298_launch_admission.py has no operational entrypoint. A credential-free
+native worker freshly constructs genuine inputs, authenticates the exact D2
+control using its existing pure consumer, and reads ONLY A11's pinned10,684byte
+report while retaining the report descriptor/full metadata. It hashes before
+parsing, reconstructs the original double-LF envelope, validates the externally
+observed A11 exit0 and exact compile/source binding, then compares fresh inputs
+and all selected public sources again. It never reruns the spent caller/reader.
+Only the public projection/source files and finite storage/readiness receipt
+cross the640KiB worker channel. All old failures remain preserved.
+
+arv2_r298_plain_launch.py is an injected finite protocol, with fresh strict
+owner/known-A5 access, explicit idle state, exact eleven-file equality, exact
+BuildSuccess compile and the known excluded manual sample before capacity.
+It may create exactly one R298 job when available; fast Completed./Runtime Error
+creation retains identity. Thereafter history must be exactly the manual sample
+plus its own ID/name, never filtered to hide an extra run. Real pending strings
+are In Queue.../In Progress...; success is exactly Completed. One aggregate
+read follows fresh access/source/compile checks and validates only the two
+bounded ARV2_NEWRULE custom statistics with the new profile. Raw QC response,
+logs, source data and arbitrary error strings are not retained or printed.
+
+The operational caller uses a fresh exclusive control, held directory and
+exclusive0600/fsynced immutable records. Leaf descriptors close after checked
+read-back, preventing descriptor exhaustion during240 polls; subsequent named
+full-metadata checks are endpoint authentication, not continuous integrity.
+Only its own children may be killed/reaped. Initial/final native admission,
+source/HEAD checks and a separate native-denied output validator retain actual
+exit and report-pin binding. Environment/transport is checked before each
+request. The frozen generic guarded-client whitelist excludes the dedicated
+collaborator endpoint, so this new caller uses the same exact old._client with
+its own narrow endpoint/payload guard; it does not change the frozen whitelist.
+
+Confirmed pre-use corrections: ARV2I323-001(P2) corrected list/tuple directory
+identity comparison;002(P2) normalizes finite journal event underscores in
+filenames;003(P2) supplies the required collaborator endpoint without weakening
+the old client;004(P2) strictly validates failure-state fields/IDs/counts before
+emission;005(P3) catches observer credential/support setup inside the finite
+failure envelope. No implementation failure is a QC attempt. Advisory agents
+are same-round collaborators, not independent reviewers.
+
+Author results:117launch-helper passes2.98s,81admission passes3.87s,
+65family passes19.55s. Earlier82/115 helper and64 family86.25s selections overlap.
+Family fixture optimization initially produced63pass/2fixturefail19.38s due a
+synthetic seam retained in two real-validator tests; corrected fixture scope.
+A pre-use lineage LF assumption was corrected against the unchanged canonical
+contract. Admission initially62pass/2malformed-parser failures3.73s; finite
+parse classification corrected. Memory-only omissions caught cloud-source
+check(1failure0.10s), external report hash/actual-exit/final-input checks
+(1expected failure each0.18/0.04/0.05s), main AST semantics(1failure1.90s), and
+economic-mask sensitivity(1failure0.46s, secondary R298 guard retained). All
+were restored finally. Root initial30caller+81admission=111passes4.18s overlaps
+the final selection to follow. No full suite or operational call has run here.
+
+### 323.4 Prospective one-use R298 A12 launch/result freeze
+
+Under323.1, authorize ONE observe invocation of
+scripts/run_arv2_r298_plain_backtest.py at the clean commit containing this
+decision, binding that exact --expected-head and actual --caller-sha256 after
+final focused validation. Compatible host is only the designated Mac root/branch
+and Python3.13. Inherited existing QC credential shape is checked before any
+child; the sanitized parent authenticates inputs before constructing the QC
+client. No new credential search or entitlement is needed. Source/protocol pins
+below are literal, with no silent refresh.
+
+Fresh control artifacts/analyst_revisions_v2/newrule_plain_backtest/R323-20261025-A
+has NOT been inspected or allocated. Exclusive claim/partial claim consumes
+this use; no cleanup, repair, renamed unchanged retry or duplicate launch.
+This freeze binds the exact A11 report/hash/exit0/compile in322.13 and the five
+D2 evidence pins in322.10 as dependencies, not renewed old operations.
+Its only remote mutations are ONE backtests/create in existing project38364439.
+No upload, new compile, project creation, permission change or other-lane action.
+
+Before create, fresh access/manual history/source/compile/capacity must pass.
+Capacity may be observed at most3 times at least60s apart. Busy state waits;
+no cancellation, reassignment or repeated launch. Zero selected nodes with
+autoSelectNode=false is a configuration barrier. After create, max240 sequential
+status observations at least60s apart, then one exact Completed. aggregate read.
+Parent15,120s/300application-dispatch/1,024control-file limits remain hard;
+maximal poll budgets may not fit slow requests. External capture allows30s
+extra, native admission120s each, output validator20s, own-child reap5s.
+Host suspension/uninterruptible I/O remain qualifications. Parent output128KiB,
+observer132KiB, stderr4KiB, public admission640KiB are bounded.
+
+The external observer captures separate channels/actual exit; its sole native
+network/all-artifact/Keychain/security-denied validator authenticates supplied
+output and reconstructs the report hash. A successful result needs actualexit0,
+empty stderr, exact launch/result identity, full new-profile statistics and
+final fresh admission. Runtime Error/nonzero/unknown/malformed/bounded output
+is failure or ambiguity even if a report exists. Retain known launch identity
+on later failure. No extra operational output reader is authorized.
+
+Book the actual new A12 claim exactly once:+1shared/+1development to327/252/
+50/699, retaining A11's separate already-booked readiness look. Successful
+result admission adds one cell, to700, under297.14 accounting. No additional
+look for status/native workers/validator. R299–R303 follow only after admissible
+R298 completion and their own exact source/admission/lifecycle contracts; the
+public specification alone does not create a project or grant arbitrary calls.
+User's current waiver covers verified implementation within this comparison;
+no further routine Claude authorization question is required. Accumulate local
+commits and push exactly once at the concluded round.
+
+### 323.5 Final pre-use validation and selected pins
+
+Root final selection: **390distinct passes23.27s** (40caller,81admission,
+117remote protocol,65family,86record/active-document,1research transitive
+closure), no failures/skips/warnings. All103 selected source pins matched;
+the public specification was independently reconstructed as13,977bytes/exact
+ee8df6 hash; source/tests compiled in memory without bytecode. Native remote
+network/production-artifact/user-and-system-Keychain/security denial,
+--noconftest, disabled plugin autoload/cache provider, -B and in-root all
+temporary/cache paths were enforced; dispatch_fence absent. No full suite.
+Earlier author/root selections overlap this390. No operational/private input
+or QC action was used in these tests. The final read-only advisory audit found
+no remaining material blocker after004/005 corrections; same-round advice is
+not independent review. Maxima are ceilings, not promises all polls fit15,120s.
+
+| New source | SHA256 |
+|---|---|
+| run_arv2_r298_plain_backtest.py | 56b286ddff9ec934c9309e58753618264b089069b8de95436c900c9658a9e654 |
+| arv2_r298_plain_launch.py | c292e23de517713aa4f61e9b019d422d40dbd0a9d1b8a7e2c7650a0a8c802bb7 |
+| arv2_r298_launch_admission.py | 009b18fb5ea52d59a19e4706d40b1a90d5f501f691fbd96fdb92caae4804ffcc |
+| newrule_plain_comparison.py | 7f6a23d157488ae5029510029811fced5c01a363bb5647a2667ed5fe8e92f407 |
+
+Caller canonical profilefb4fe0492b6565b106a71ab5ebeb7286ebd04144b73380e40e12c2a64edbb3b9.
+The caller/source arguments bind source only;323.1/323.4 supply the current
+owner direction and prospective use. All older operational modules and pins
+remain unchanged. One new claim is allowed, never an automatic retry.

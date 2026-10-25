@@ -813,8 +813,11 @@ contract and six-cell public specification preceded A12. A12 actually launched
 and failed the fresh-price guard on2021-02-22; it is now SPENT, with no accepted
 performance cell. A13 then stopped during access metadata before any mutation,
 compile or job; it too is SPENT. Current floor328/253/50/699. Section323.6–10
-owns retained failure evidence, the completed read-only Mia consultation and
-the distinct read-only access reconciliation now being prepared. Continue verified diagnosis/fixes
+owns retained failure evidence and the completed read-only Mia consultation.
+The separately frozen current-access observation in323.12 passed the unchanged
+owner-only policy; its use is now SPENT. No permission change or historical
+A13 cause is inferred. Prepare the corrected A14 forward quote diagnostic,
+then continue verified diagnosis/fixes
 and then the consistent six/eight comparison without a routine review wait.
 One final push; no funded or paper/live deployment authority is inferred.
 
@@ -2094,9 +2097,11 @@ The later owner explicitly waives Claude review of section 323 and directs
 R298 execution followed by the six/eight comparison, documentation and one
 final push. Section323's first launch/result contract was committed and A12
 failed at the per-security fresh-price check; A13 stopped during access reads
-before any source edit or new job. The immediate next step is the separately
-frozen read-only post-Mia access reconciliation in323.10–11, then verified
-correction and the consistent remaining cells when admitted. Do not replay A12
+before any source edit or new job. The read-only reconciliation in323.10–12
+subsequently passed the unchanged owner-only/current-idle policy. The immediate
+next step is the separately frozen A14 quote diagnostic with corrected finite
+exception handling, then verified correction and the consistent remaining
+cells when admitted. Do not replay A12
 or A13 or remove the freshness guard to obtain a terminal success.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
@@ -58025,3 +58030,147 @@ Author results overlap244; no full suite or actual input/QC operation in checks.
 No additional material advisory scope escape was found. Exact actor identity,
 access/refusal cause and future operational permission remain unknown until
 the single current observation and its honest disposition.
+
+### 323.12 Actual current-access observation and disposition
+
+At clean6eda8f4098e22dc2a6afa2e73cc2e4d682890212, sole parent
+2026-10-25T20:13:05.903423Z..20:13:09.642620Z exited0/stderr0/no bound;
+stdout3,741bytes SHAf38ff3e7317bb56e192517738a6a0addf8a8343f942b2a6d7cd85d004af7f5ff.
+Separate native-denied supplied-output validator20:13:09.642800Z..
+20:13:12.796722Z exited0/stderr0 and authenticated the diagnostic observation.
+Report3,612bytes SHA625111ca3458ec173c0c9f1dfcbab70222a27bec23bd1b56342fc23488830a6f.
+No control/output reread. R323-C/caller/validator are now SPENT/frozen.
+
+Both scoped application requests returned bounded successful metadata. The
+unchanged strict access policy PASSED, access_failure_codenull. General and
+dedicated views each have exactly one row: the known owner whole-row
+SHA707a30618e122e49fe6fa75364451b5b7c50e1019a68a89ffc0cd3ae3c8e0b78,
+UID matching projectownerId, permissionwrite/liveControltrue. Dedicated user
+permissionwrite/liveControltrue. Project codeRunning explicitlyfalse, public
+field absent, exact project/name/Py/owner/organization bound. There is no
+extra A5 or other row in either view at these endpoints. Public absence remains
+absence, not independent privacy proof. All helper/caller operational and
+formal/PIT/paper/live flags stayedfalse; actual0 is not policy clearance.
+
+Project-response SHA028046bc17e4892d8bd67ab056a315fb7d5eacab11a335692116d98d512ba051;
+dedicated-response SHA924558b9d04888f46f4705e24260a62e4c482f647e081d18ba5b09be115d9127.
+No raw identifiers/emails, provider rows, file source, history or strategy
+outcomes were read/retained. Exactly2application dispatches, no measured wire
+count. No permission/lock/file/compile/capacity/backtest operation followed;
+no strategy look/cell, floor328/253/50/699 unchanged.
+
+This establishes CURRENT metadata compatibility only. It cannot reconstruct
+A13's earlier response or prove Mia, a session lease or transport caused it.
+No user removal, owner/A5 pin refresh, policy relaxation or identity guess was
+needed. ARV2I323-008's classifier defect is verified independently and the
+new observation path handles it; the spent A13 failure remains unknown.
+The next forward diagnostic uses a new exact attempt/caller identity with
+corrected finite error handling and fresh current gates. It is not revival of
+A13's control or retrospective acceptance. No trading source has yet received
+the new diagnostic instrumentation, so the first actual instrumented strategy
+run remains prospective. A12 is still the only actual new strategy job.
+
+### 323.13 Prospective A14 forward diagnostic after observability correction
+
+Under323.6 and the completed current observation323.12, authorize ONE observe
+invocation of scripts/run_arv2_r298_quote_diagnostic_a14.py at the clean commit
+containing this freeze, bound to that exact committed caller SHA and HEAD.
+New control is artifacts/analyst_revisions_v2/newrule_quote_diagnostic/R323-20261025-D,
+not inspected or allocated beforehand. A12/A13/C and all earlier operational
+entrypoints/controls remain SPENT and are not renewed or reread. The continuing
+owner development/review waiver applies; no routine authorization request.
+
+This is a distinct forward use with corrected finite foreign-error handling,
+request/response accounting, new immutable claim and new protocol/job identity,
+not a claim that A13's historical cause was fixed or a date/name-only retry.
+A13 never edited/compiled/launched. C now independently shows that the unchanged
+current access policy passes, without any pin/permission change, and the exact
+local classifier defect is verified. A14 will freshly recheck access again;
+the C actual exit0/report3,612byte625111ca pin in its profile is documentary
+context, not a substitute for current checks or an authorization boolean.
+
+The additive remote helper is whole-AST identical to the frozen A13 helper
+after masking ONLY SCHEMA, ATTEMPT and BACKTEST_NAME literals and its top
+docstring. Identity is attempt14, schemaarv2-r298-quote-diagnostic-a14-v1,
+name ARV2 R298 QUOTE DIAGNOSTIC R323 A14. Public diagnostic projection
+1f366e402b3754e9f1f8ba89d08f250df771431b2ae98d19da953cfb722db293,
+profile1133de6d18fb8d8b5355fb906d5a2f38f97e1f97460b80bd1f4c9014e901ad70,
+manifested8bd6c988d6d9fc31586b9dd8df058e8235a79702f52d78a172c31a1e64b190
+and all eleven source bytes remain the previously frozen, UNUPLOADED diagnostic
+projection. There is no trading-rule, date, target, sizing, fee or price change.
+Its successful price path stays identical; finite failure-only context is not
+performance tuning or root-cause authentication.
+
+Retain all323.8 source/access/history/lock/readback/compile/capacity/job and
+mutually exclusive failure-detail/completed-result gates. Authenticate all
+eleven OLD9dde files and exactly manual+A12 before own A5 lock; after lock
+repeat current checks, update exactly runtime/main once each, read back the
+full eleven files after each write, compile once, require exact BuildSuccess,
+then fresh exact source/access/history/compile/capacity before one new job.
+After creation the exact census is manual+A12+ownA14, with immediate retained
+job identity even on fast terminal response. No A13 job is invented. Only
+newly completed matching aggregates with actual parent exit0 and native output
+authentication may be admitted; RuntimeError/BuildError/nonzero/unknown remains
+failure, and finite error metadata never authorizes an unchanged retry.
+
+Initial/final input admission workers are credential-free and natively network
+denied. New worker policy additionally denies reads of spent A13 and C controls;
+all earlier scoped denials remain. Fresh permitted D2/A11 evidence consumers
+are not old operational reader replays. Parent15,120second joint deadline,
+420application requests,1024immutable control records, compile120x>=1second,
+capacity3x>=60seconds and status240x>=60seconds are ceilings, not promises all
+fit. Only own child kill/reap, finite separate channels, strict actual-exit/
+report-binding native validator, exact clean source/HEAD checks, no cleanup or
+marker repair, and no uninterruptible-I/O/host-suspension/same-user/continuous-
+integrity guarantee remain. No provider acquisition, Object Store republication,
+project replacement, permission change, other-lane action or paid right.
+
+New caller retains exact finite access refusals and known foreign source/client
+categories without raw exception formatting. State distinguishes application
+intent count from returned-response count, last endpoint and received flag.
+ARV2I323-008 is corrected prospectively, not retroactively in A13. Pre-use
+ARV2I323-009(P3): the copied capacity-wait branch bypassed the common parent
+postflight; corrected in A14 before use with a focused regression. The old
+native validator already required its own source preflight, so this was not
+an accepted-success bypass, and neither A12 nor A13 took that branch.
+
+Any admitted A14 aggregate remains diagnostic R298 only, not an old-family
+substitution; a subsequent comparable six-arm family must share a consistent
+versioned common runtime. Book a genuinely claimed A14 once from328/253/50/699
+to329/254/50/699, never for tests/preparation; add a result cell only upon actual
+exit0 plus matching authenticated completed aggregates. Continue verified
+diagnosis/correction under the owner scope, never weaken the fresh-price guard
+or use failed partial statistics. ARV2E323-001 stays OPEN until real execution
+evidence resolves it; all formal/PIT/paper/live flags remainfalse.
+
+### 323.14 A14 final source freeze and focused validation
+
+| A14 source/test | SHA256 |
+|---|---|
+| run_arv2_r298_quote_diagnostic_a14.py | 283468d50fb22fa68143266a3074c83eac3658d8bb934094d1c8ad1f72dcc65c |
+| test_r298_quote_diagnostic_a14_caller.py | 8e6146a3cbbe3bdcaa571cc2f719a7569c9bce3f0abe047c75e1ef35913389ce |
+| arv2_r298_quote_diagnostic_a14_remote.py | 58cbc1b1f2fec140a5d4cd19660e6f2f61a94ab728a3da20ce011b7687f478f8 |
+| test_r298_quote_diagnostic_a14_remote.py | 80613eb9772472c7f931eaea39700f4d76ee3c51d3c363d2827d4594d00f15d6 |
+
+Caller canonical profile396f5ae29eb48cc948e2a67a278370455d4581108f67188020a1674a1c3803b1;
+remote profile1,026bytes SHA52c905ea4c949ad724c6a98e73204767e071e279172e1baa5f567604c8398d07.
+The finite inventory now explicitly handles exact frozen access, submission,
+recovery, QC client and environment errors. Malformed arguments, hostile
+subclasses and other unexpected aggregate/runtime exceptions remain safely
+unknown/refused; this is not a claim of universal error attribution.
+
+Root final focused selection185distinct passes8.32s(64caller+34remote+
+86record/document+1research transitive closure), no failures/skips/warnings.
+Native remote-network/production-artifact/Keychain/security denial, explicit
+--ignore=artifacts, --noconftest, no plugin autoload/cacheprovider, -B and all
+inroot support paths remained; dispatch_fence absent. All108selected pins,
+exact caller/helper profiles and four in-memory compilations matched.
+Author98passes9.11s and earlier95passes9.27s overlap185, not additive.
+Initial helper31passes/3fixture-label failures were corrected only in tests;
+final helper34passes5.75s overlaps. Memory-only omissions killed exact access
+mapping(1expected failure0.19s), capacity-wait postflight(1expected failure0.05s)
+and submission/recovery mappings(2expected failures0.20s); all restored finally.
+No full suite, private input, QC/provider call or output allocation in these
+checks. Same-round advisory inspection is not independent Claude acceptance.
+The sole prospective invocation is323.13, at the clean commit containing this
+freeze, with the exact caller SHA above and that HEAD; no intermediate push.

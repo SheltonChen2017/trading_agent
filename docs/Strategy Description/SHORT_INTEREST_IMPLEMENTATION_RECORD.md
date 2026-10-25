@@ -8,9 +8,13 @@ A FILE-CUSTODY GUARD; THE PRECISE CAUSE IS STILL UNKNOWN. A LOCAL NONCLAIM
 V1 PROBE PASSED WITHOUT REPRODUCING IT; V2 STOPPED BEFORE OUTPUT PREPARATION.
 THE NEW NONCLAIM V3 PROBE HAS NOW REPRODUCED A CTIME-ONLY REFUSAL ON ITS FIRST
 NEW METADATA FILE. THE ACTOR AND HISTORICAL COUNT FAILURE REMAIN UNKNOWN;
-SECTION124.13 PRESERVES THAT NEGATIVE. FURTHER CLAIMS ARE HELD. RETAINED MONTHLY
+SECTION124.13 PRESERVES THAT NEGATIVE. THE CREATOR-ONLY PROBE THEN SEALED/READ
+ONE FILE BUT REFUSED ITS LATER POSTSEAL STAMP CHANGE (SECTION124.15); NO LOCAL
+POLICY CLOSURE OR HISTORICAL REPAIR IS CLAIMED. FURTHER CLAIMS ARE HELD. RETAINED MONTHLY
 INPUTS HAVE CLOSED OFFLINE SOURCE-ONLY NORMALIZATION (SECTION124.9), WITHOUT
 SOURCE FITNESS, INPUT ADMISSION OR BACKTEST READINESS.
+A SOURCE-ONLY SPENT-EPOCH LEDGER IS IMPLEMENTED (SECTION124.16); ITS FRESH
+ACTUAL OFFLINE CONTEXT REPLAY IS STILL PENDING.
 OWNER NOW DIRECTS CONTINUATION UNTIL LOCAL BACKTEST READINESS, WITHOUT QC.
 ALL OLD CLAIMS,
 NEGATIVES AND CHARGES REMAIN SPENT/IMMUTABLE. NO BACKTEST READINESS IS CLAIMED.
@@ -22540,3 +22544,186 @@ Post-record Main creator/driver/record/selected active-document selection:
 **124passed in11.38s**, no skips or warnings. Staged exact five-file source/
 test/record whitespace check passes. No production change followed the
 272-test Main run; only this appended validation attribution was added.
+
+### 124.15 Actual creator-only probe: dominating postseal refusal
+
+The ONE registered NONCLAIM operation at clean
+`c492abad9a2b75592c48490daed49a569802e5ba` / matching tracking and actual
+origin `b648f60112af141efc2a12fbaef03b38846d219d` terminated exec20594 with
+exit2. It published one186-byte safe file, completed its unique first seal and
+read that original file once. Three bounded samples (normal guard work counts
+toward elapsed quiet time) achieved at least1second exact-stamp quiet;
+preseal ctime changes observed0. The later failure is fixed stage
+`provisional_publication`, category `local_contract_refusal`, contract
+`new_metadata_stamp_changed_after_seal`, errno null, held-field observation
+null. A stage includes callbacks/audits and is not forensic actor attribution.
+All external wrapper seam counters were0: provider/socket, credential and
+capture attempts. ProviderHTTP0, newclaims0, sourceSTART0, chargedbytes0,
+outcome/QC0. This is NOT a provider or transport request failure.
+
+Main's independently guarded read-only terminal receipt authentication
+exec78546 exited0. Exact protected run membership is
+`run.completed.provisional.json`, RAW SHA256
+`50dfa0dc99cb627b89d13eb627d50dcd18e55200a3097f860f5f81d5cdb9947b`,
+plus dominating `run.refused.json`, RAW SHA256
+`599af0a8c12dc33016f5b1253ab6efde9259f59c240199c65f1f0e05a84cdac9`.
+NO run.closed.json exists. Original parent metadata is protected0600/singlelink,
+exactly186 registered bytes, RAW SHA256
+`12ae326d30644e70437533d333360dc75e1fb9d72f8e6c6edaa93917ff7b7404`;
+its CURRENT full8-field stamp hash does NOT match the original sealed
+observation. Matching current bytes do not undo the original postseal refusal;
+the read-only inspection's current stamp is never substituted for that seal.
+Original source/claim/control pins, provisional RAW linkage, complete58-file
+mapping and false authority were independently matched. Runtime code identity
+is `e03059992ba625ff9edf6bd74aa61a141f167c3e778306c0d2945b696e577825`.
+Original started_at is2026-10-25T07:40:48.281523Z; completed_at is null and
+context_closure is provisional_source_and_code_contexts_not_successfully_closed.
+No missing terminal clock or successful closure is invented afterward.
+
+**SI-BUILD-20261025-006 (P2, actual postseal failure remains open):** bounded
+new-inode preparation and its initial original read completed, but a later
+strict stamp comparison refused. The negative dominates the provisional
+control and actual exit2 independently vetoes success. This is not a repaired
+historical count invocation, closed prospective creation policy, source
+fitness or backtest readiness. The precise actor remains UNKNOWN; original
+count finding022 is not backfilled. Preserve every original artifact and this
+failed namespace permanently. No rerun/restart/reset, longer window, additional
+probe namespace, postseal rebaseline, weaker guard, refund or provider claim
+is authorized to guess around this result. Source claims stay held.
+
+**SI-DEC-20261025-02**, under continuing SI-AUTH-20261024-05, selects the next
+implementable OFFLINE software slice: a sealed source-only count-epoch ledger
+and authenticated loader for the existing original-prefix/refused-child/
+zero-START spent epochs. It must derive original-position coverage/debits from
+the genuine authenticated producer/snapshot APIs, not inferred sequence
+arithmetic, copied maxima or a caller's complete flag. Retained transport
+coverage is not usable-count qualification. No positive closed bounded chunk
+exists; this first slice has no count/cell iterator, compiler-input cast,
+denominator/source admission or provider-claim authority. Complete FINAL
+membership, original external spent claims, all retry/unknown/full-page charges
+and historical code remain bound; zero-START spent claims never become
+reusable reservations. The immutable cumulative13992START/13991HTTP/
+23452681chargedbytes and old81876START/4GiB ceiling remain. The prospective
+at-least-one-START shortfall, plus any later retry costs, must be surfaced.
+
+Plain language: the file guard correctly stopped this local probe after its
+seal. Development can still improve safe offline accounting without spending
+another request or pretending the source is ready. The new ledger will make
+preserved evidence and remaining limits explicit, not repair the failed probe
+or produce backtest inputs. No implementation milestone, readiness, actual
+strategy evaluation, QC access, purchase or interim publication is claimed.
+All pinned invocations are now terminal; actual looks0/0 and0, alpha0,
+permanent look IDsnone, QC attempts0. Claude has not reviewed the eight
+unpublished local commits; one final combined push remains pending.
+
+### 124.16 Source-only spent-epoch ledger: bounded software checkpoint
+
+Technical: SI-DEC-20261025-02 now has a pure sealed
+`native_count_epoch_ledger.py` and an OFFLINE
+`load_short_interest_count_epoch_ledger.py` context loader. The fixed roster
+is original48, refused13944, v2zero and v3zero ONLY. Genuine typed original
+source plans, the original recovery binding, complete FINAL parent/child
+membership, original external spent claims, every all-START receipt/raw or
+unknown-body full-page debit and genuine v2/v3 negative controls/historical
+code are authenticated before sealing. Claim maxima are never substituted
+for actual debits. Original-position contributions are derived from exact
+source ticket mappings; retained positions must be disjoint. The new ledger
+has no count/cell iterator, compact-compiler or old-registry cast, positive
+bounded-chunk branch, source/denominator/actual-input admission or permission
+to spend another claim. Positive closed chunk count is fixed0.
+
+Plain language: this checkpoint accounts for preserved evidence and spent
+limits without calling that evidence usable backtest input. Recorded HTTP
+invocation flags, recorded-not-invoked STARTs and unknown BODY/full-page
+charges are separate facts. A START-based HTTP upper bound is explicitly a
+loose conservative ceiling, NOT an observation of additional HTTP traffic or
+uncertainty about a recorded False flag; actual wire-count proof is not
+invented. Zero-START spent epochs neither refund debits nor become reusable
+reservations. The old81876START/4GiB cap remains unchanged; the minimum extra
+START allowance needed for still-missing transport observations is derived
+without granting it or concealing future retry costs.
+
+Ordinary wrapper access is source-held and provisional. Every public failure
+latches permanently. An independent exact-original issued-witness binding
+permits a detached closed summary ONLY after the consumer returns with its
+original LIVE binding, all original source/code full sweeps and context exits
+succeed, a fresh58-file committed-Git/current-byte/stamp audit completes and
+terminal UTC/monotonic/deadline checks pass. Source exits are observations of
+original evidence at those boundaries, not a promise that released filesystem
+objects can never change later. Original saved-source and code exit audits
+remain explicit; close errors veto closure. No report runner, output namespace,
+claim creation, metadata publication, provider, key or outcome route is added.
+The whole registered initialization/closure window is1800seconds, not a retry.
+
+Pre-release findings, corrected before registration/actual execution:
+
+| ID | Priority / disposition | Evidence and correction |
+|---|---|---|
+| SI-BUILD-20261025-007 | P2, corrected before commit | The draft could trust caller-mutable closure phase/bytes, silently overwrite an altered consumer-return phase, or accept a constructor-minted witness before actual exits. Peer reproduced an exact valid-looking closed dictionary escaping during LIVE even though the later return refused. Original wrapper/model anchors and the terminal-issued witness are now independently factory-bound, the LIVE-to-CLOSING transition validates the untouched original state, and restoration cannot clear a failure. Fixed clocks, exact keyset, source summary, runtime/code/protocol and false authority bind the issued receipt. Late source/exit/final-code/deadline failures still veto every provisional result. No actual source was used by the reproduction. |
+| SI-BUILD-20261025-008 | P3, corrected before commit | Main found the draft research model imported weakref and used package-root child imports, both outside the unchanged lane import rule. Absolute child-module imports and process-local strong original-object provenance maps replace them; no shared boundary was changed. The finite registered first slice creates four epochs/one ledger once. Its source-only proof objects are intentionally retained until process exit; it is not a general long-running registry/service. Script-level weak witness identities do not enter the research package dependency boundary. |
+
+Fabricated validation is deliberately bounded. Pure tests use a genuine small
+six-anchor typed source/profile, not a reflective counterfeit81875-object
+source. Loader lifecycle tests reconstruct genuine small49-ticket original/
+child manifests, external claims and v2/v3 proofs, with expensive cache/Git
+seams fabricated. Their one explicitly named toy cumulative-linkage seam
+bridges toy50START totals to the existing actual-sized prior controls; a
+separate unmodified production gate MUST reject that domain mismatch. The
+genuine v3 producer-backed fixed_diagnostic consumer remains unchanged and
+wrong-key controls refuse before ledger sealing. Such fixtures are NOT full
+actual-domain operational proof, source usability or Claude review.
+
+After a clean committed snapshot and exact protocol/code registration, Main
+may perform ONE fresh read-only OFFLINE context replay of these EXISTING
+epochs, with provider/socket/key/capture/output-creation seams denied in
+memory. It creates no new artifact/claim/probe and never reruns an old spent
+operation. Successful actual process termination plus a genuinely issued
+post-context closed summary are required before reporting operational ledger
+closure. A negative/unknown/nonzero result is not repaired by a provisional
+summary. All source qualification, identity/class/date/USD, daily coverage,
+corporate-action/cash and actual-input gates remain open; count/daily claims
+stay held. No actual replay has been invoked at this entry.
+
+Registered protocol SHA256
+`5eae769189f3324bcc7cb256b60f4a22b3c734daa24d53f02e3c1cf5cc4dddce`;
+exact58-path list SHA256
+`8ad8c2358a74fdc45b8aabf2fe2d99cc52d218ee7675f45767937ef5c4811444`;
+complete relative-path/current-byte mapping SHA256
+`a8265d3b4d15f065daa3deac228d21409e06679c04901f8a0c0d65938f93c08a`.
+The58-path closure is the original diagnostic56 plus this pure model and
+loader, NOT the separate creator-only helper/driver. Runtime clean HEAD is
+bound separately after commit; actual/tracking matching origin must remainB648.
+
+Main read both complete production/test pairs and the original producer and
+source-exit contracts. After the final protocol literal was frozen, Main's
+new ledger/loader, original refused-snapshot/diagnostic/error-projection,
+unchanged import-boundary/record and three selected active-document checks
+passed **234tests in19.83s**, no skips or warnings, with empty inherited
+environment and OS network denied. No complete lane/repository suite ran.
+Main's memory-only removal of the exact issued-witness predicate produced
+the expected **1failed in0.68s**; original bytes were never changed and the
+module was restored in memory. Exact AST import closure58, every own fixed
+contract/stage catalogue, all58 sources and both new tests compile in memory.
+
+Delegated evidence, NOT Main reruns or independent Claude review: final pure
+author35/.60s plus unchanged import selection2passed/7deselected/.73s; final
+loader author33/15.57s; independent development peer77/16.44s including all9
+unchanged lane import tests. Peer separately reproduced the constructor gap,
+then proved the corrected issued-witness predicate causal by reversal1fail/.95s
+and fresh restored1pass/.95s. Author causal reversals separately cover retained
+overlap, unknown-body full-page charges, factory provenance, original wrapper
+guard and consumer-return phase. All reversals were memory-only and restored.
+After peer freeze Main changed ONLY the PENDING protocol literal to its
+computed hash; no production behavior changed after Main's234-test execution.
+Claude has not reviewed any of these accumulating local commits. Historical
+validation elsewhere in this record remains prior execution, not new evidence.
+
+Post-record fresh-process Main ledger/loader/import/record/selected active-doc
+selection: **100passed in16.60s**, no skips or warnings. The entire historical
+body after the current status header remains an exact C492 prefix, including
+every byte of Claude's section123; only the current header and124.15+ append
+change. Original source/capture/custody/diagnostic/helper and shared document
+bytes are unchanged. Staged five-file whitespace and explicit status checks
+are required before the local checkpoint commit. All development agents are
+finished/frozen before Main's prospective pinned OFFLINE replay; no actual
+source result or readiness is substituted for these fabricated validations.

@@ -1,19 +1,18 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Independent Claude review of `c6834173..b40aae1f` (sections 44
-to 46: counter-review of section 43, the four-provider coverage audit and the
-GDR-COV1 offline coverage preflight) recorded in section 47, 2026-10-24;
-Codex counter-review of section 47 skipped at the owner's direction;
-section 48 records the subsequent offline input-engineering checkpoint.
-This waiver is not counter-review acceptance. No QC access occurs in section 48.
+Status: **Independent Claude review of `a5cd640c..ddaa5e54` (section 48,
+the GDR-RP48 offline input layer) recorded in section 49, 2026-10-25;
+Codex counter-review of section 49 pending.
+The section-48 input-layer epoch is accepted in section 49
+after `23d06504` pinned thirty input-layer guards; no production source changed
+in this review. The owner directed this round's one push, which publishes
+Codex's local `ddaa5e54` together with this review.
+Codex counter-review of section 47 skipped at the owner's direction (48.1);
+that waiver is not counter-review acceptance.
 Claude's `c6834173` is accepted after documentation correction (section 44).
 The published `c6834173` review is consumed once.
 Claude's `863a0dcd` is accepted after documentation correction (section 42).
-The section-46 coverage-source epoch is accepted in section 47
-after `62d4afb8` registered its module in the review bundle and pinned six
-inventory rules. That section-47 round published Codex's three local commits
-together with Claude's corrections/review as `a5cd640c`. Section 48 is local
-only; no new publication or monitor rearm is directed.
+The section-46 coverage-source epoch is accepted in section 47.
 Accepted RP33 remains at exact producing `c589b3dd`; its runtime, draft and
 fixture files are unchanged, and no recovery carrier is regenerated.
 Monitor remains PAUSED.
@@ -37,15 +36,16 @@ answers the compressed-output concern of GDR-CR28-001 at the inspected source
 and policy level, without a QC clearance. Native loading of the recovery
 carrier is unverified. Only `data/__init__.py` was observed as one LF at
 runtime;
-`research/__init__.py`, remains unobserved. Existing subscriptions show no
-versioned issuer-guidance source, no historical stock or SPY NBBO and no
-six-usable-year common history, and no purchase is recommended yet (45, 46).
+`research/__init__.py`, remains unobserved. The input layer parses supplied
+local files only; existing subscriptions still show no versioned
+issuer-guidance source, no historical stock or SPY NBBO and no six-usable-year
+common history, and no purchase is recommended yet (45, 46, 48.4).
 No successful native integration or empirical backtest readiness is
 established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 48. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 49. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -6525,3 +6525,128 @@ No original GDR-0..6 completion, alpha, market edge or backtest readiness is
 claimed. Sections 1–47 remain byte-exact below the active header; root Session
 Handoff, Action Plan, Feature Milestone Record, shared/process docs and the
 original plan/PDF stay frozen.
+
+## 49. Independent Claude review of `a5cd640c..ddaa5e54`, 2026-10-25
+
+### 49.1 Scope and method
+
+Reviewed range: the one Codex commit after the section-47 push, `ddaa5e54`
+(GDR-RP48 offline input layer and section 48). It adds four lane modules:
+- `input_contracts`;
+- `guidance_inputs`;
+- `historical_market`;
+- `input_preparation`.
+
+It also adds their tests and registers the modules in `bundle._MODULES`. The
+commit was local and unpushed at the start; the remote head was still
+`a5cd640c`, and the worktree was clean. The owner's instruction for this round
+was to review every unreviewed commit, apply corrections where necessary and
+push when done. The push therefore publishes `ddaa5e54` together with this
+review.
+
+Following the owner's standing preference, validation is focused rather than
+the full lane selection or the repository suite. It covers:
+- the four modules' tests and the new pins;
+- the bundle, release and preparation-CLI consumers;
+- the coverage preflight;
+- the lane gate and the shared active-document check;
+- 118 mutation trials over the four modules.
+
+Every run used the designated worktree, network-denied, with HEAD and status
+unchanged across it. No QC page, provider account, EODHD session or real data
+was contacted. Every exercised row is invented.
+
+### 49.2 Disposition of section 48
+
+| Item | Claude disposition |
+|---|---|
+| 48.1 owner direction to skip the section-47 counter-review and keep building | Recorded by Codex as a direct human message; not reconfirmed (GDR-CCR42-002). The skipped counter-review stays a waiver, not acceptance. |
+| 48.2 `input_contracts` | Accepted. Strict bounded JSON, duplicate and float refusal, exact decimals, and canonical clocks, dates and identifiers. GDR-CR49-001 pins the clock and date forms. |
+| 48.2 `guidance_inputs` | Accepted after correction. Replay is cut off at validation time. The immediate same-fiscal-year predecessor is chosen by publication time, never by vendor `previous_*` fields. Out-of-order corrections and withdrawals quarantine the issuer, and comparison uses the existing exact range formulas. GDR-CR49-003 pins the document and comparison rules no case isolated. |
+| 48.2 `historical_market` | Accepted after correction. Its constants match the frozen draft and the simulator: a 0.005 spread fraction, 1% of completed-minute volume, a 60-second quote age and a 10:00 New York decision. There is no fallback to an older valid quote, and slicing requires a wholly post-submission minute. GDR-CR49-002 pins the envelope, session and slicing rules. |
+| 48.2 `input_preparation` | Accepted after correction. It snapshots supplied bytes before hashing and reads basenames only. It requires an exact disjoint inventory, distinct stock and SPY identities with identical sessions, and one issuer and provider epoch, and it screens protected dates on the callback and market session. Guidance receipts are deliberately not date-screened: plan section 7 quarantines outcomes from 2026-09-01 and treats collecting raw inputs as a separate decision. GDR-CR49-004 pins the manifest and status rules. |
+| GDR-IN48-001..005 (author QA) | Accepted. GDR-CR47-001 is not repeated: the four modules are registered, and the review bundle builds. |
+| 48.3 identities | Reproduced: full source `330fc9d5...` with 53 members, and the full review bundle `5053affd...`, 761,926 bytes. The recovery project `c6b9443a...` and prepared runtime `5d1dc656...` are unchanged. |
+| 48.4 remaining readiness gates | Accepted. The input layer removes parsing, journaling and paired-preparation work, not the evidence gaps: guidance source, NBBO, six-year history, rights, dated reference data and a native real-equity adapter. |
+
+### 49.3 Commit disposition
+
+| Commit | Scope | Disposition | Notes |
+|---|---|---|---|
+| `ddaa5e54` | GDR-RP48 input layer and section 48 | Accepted after correction | `23d06504` adds nine test methods pinning 30 guards; 71 of 118 mutants caught by Codex's tests, 17 redundant or unreachable |
+
+### 49.4 Findings ledger
+
+| ID | Priority / status | Location | Finding, disposition and verification |
+|---|---|---|---|
+| GDR-CR49-001 | P3 / corrected | `input_contracts.utc`, `day`; `test_input_contracts.py` | On Python 3.11 and later, `datetime.fromisoformat` and `date.fromisoformat` accept non-canonical forms, such as a space separator, a missing seconds field, basic format or ISO week dates. Only the explicit patterns refuse them, and no case supplied one (IC02 and IC03 survived). Added `test_only_canonical_extended_iso_clock_and_date_forms_are_accepted`. |
+| GDR-CR49-002 | P3 / corrected | `historical_market._decode`, `subsequent_minute`; `test_historical_market.py` | Six envelope and session rules were never isolated: a non-Massive provider, an unknown role, a weekend session, an open other than 09:30, a close other than 13:00 or 16:00, and bounds on another day (HM09, HM10 and HM12-HM15 survived). Two slicing rules were also never isolated: a caller-supplied decision quote stamped after submission, and an execution quote stamped exactly at the submission instant (HM33, HM34). Added `test_envelope_and_regular_session_rules_each_refuse_alone` and `test_execution_rejects_late_decision_quote_and_quote_at_submission_instant`. |
+| GDR-CR49-003 | P3 / corrected | `guidance_inputs._range`, `_period`, `GuidanceDocument`, `compare_revision`, `_nearest`; `test_guidance_inputs.py` | Thirteen rules were never isolated (GI01, GI02, GI05, GI10-GI14, GI16-GI18, GI20 and GI44 survived). Removing them would let these through: an unknown range kind or event kind; integer bounds; a fiscal-year label that differs from the end year; a disclosure that supersedes something; unknown positioning or release type; period-inventory mismatches; duplicate fiscal years. In comparisons, it would also let through a changed security, a later "predecessor", secondary positioning and a non-baseline accounting basis. The last two would otherwise become active qualifying comparisons in the ledger. Separately, an already-expired fiscal year could be chosen as the nearest comparison year. Added `test_document_rules_each_refuse_alone`, `test_comparison_gates_each_refuse_alone` and `test_expired_fiscal_year_is_never_the_nearest_comparison_year`. |
+| GDR-CR49-004 | P3 / corrected | `input_preparation._manifest`, `prepare_inputs`, `main`; `test_input_preparation.py` | Seven rules were never isolated (IP01, IP03, IP04, IP09, IP10, IP22 and IP25 survived). The most significant: a quarantined or refused guidance observation still reported `structurally_prepared`. Also, without the basename check, a `../` file name would make `inspect_local_inputs` read outside the manifest folder. The others: the candidate binding, the data class, one raw payload backing two documents, an unused inventory file, and the CLI's exit code for a blocked report. Added `test_manifest_rules_each_refuse_alone`, `test_one_raw_payload_cannot_back_two_guidance_documents` and `test_quarantined_guidance_blocks_preparation_and_the_cli_exit`. |
+
+Scripted count from this table: P0 0, P1 0, P2 0, P3 4; corrected 4, documented 0.
+
+### 49.5 Validation and mutation trials
+
+| Check | Scope | Result |
+|---|---|---|
+| Four input test files, plus bundle, release, preparation-CLI, coverage and gate tests, at `ddaa5e54` | worktree, network-denied, HEAD and status unchanged | 187 passed, 258 subtests, no failures |
+| Four input test files after `23d06504` | worktree, network-denied | 74 passed, 186 subtests |
+| 30 targeted mutants against the new pins | worktree, in memory | All 30 caught, each in its own case |
+| Identities | worktree, network-denied | 48.3 reproduced (49.2); a test-only correction, so no source identity changes |
+| Full lane selection and repository suite | not run | Not run, per the owner's standing preference for focused review validation |
+| `git diff --check` | worktree | passed |
+| Closing check on this record commit | worktree, network-denied | lane gate plus shared active-document check: 76 passed |
+
+One hundred and eighteen single-behaviour mutants, run in memory and
+network-denied against the four modules' tests:
+
+| Class | Count | Mutants |
+|---|---:|---|
+| Caught by Codex's tests | 71 | the remainder of IC01-IC12, HM01-HM35, IP01-IP25 and GI01-GI46 |
+| Survived, now caught by added pins | 30 | IC02, IC03 (GDR-CR49-001); HM09, HM10, HM12-HM15, HM33, HM34 (GDR-CR49-002); GI01, GI02, GI05, GI10-GI14, GI16-GI18, GI20, GI44 (GDR-CR49-003); IP01, IP03, IP04, IP09, IP10, IP22, IP25 (GDR-CR49-004) |
+| Redundant by construction or unreachable, no test added | 17 | See below |
+
+The 17 unpinned survivors, by reason:
+- **GI29:** a mapping change also changes the document's semantics, which the caught conflict check (GI31) refuses.
+- **GI36:** any comparison against a withdrawn predecessor is refused first (GI39, caught).
+- **GI41:** a comparison has no refusal reasons exactly when its arithmetic passes, because each failing check adds one reason.
+- **GI46:** active observations already have baseline bases, and the comparability check requires the bases to match.
+- **HM03, HM04:** any quote condition already refuses the quote's use.
+- **HM21:** a participant time no later than the SIP time makes the participant age at least the SIP age, and HM23 is caught.
+- **HM28:** quote freshness refuses an off-session instant.
+- **HM30:** the minute-start rule refuses a callback at or before submission.
+- **HM35:** decision-before-submission plus execution-after-submission already rule out equal quotes.
+- **IC05, IC09:** the digit and exponent bounds refuse what these remove.
+- **IP06:** the role inventory allows at most 14 files.
+- **IP07:** zero receipts fail the single-epoch check.
+- **IP08:** `GuidanceReceipt` repeats the clock-order check.
+- **IP23:** a manifest cannot contain its own hash.
+- **IP24:** `prepare_inputs` repeats the aggregate bound.
+
+### 49.6 Commits and next action
+
+The status block names this section. In `test_boundaries.py`, the pins are
+rotated to "Codex counter-review of section 49 pending" and "The section-48
+input-layer epoch is accepted in section 49", and a section-49 ordering guard
+is added. The section-47 waiver pin and the other current-state guards are
+kept.
+
+| Commit | Scope |
+|---|---|
+| `23d06504` | Thirty input-layer regression pins (GDR-CR49-001..004) |
+| This record commit | Section 49, status block, `test_boundaries.py` pin rotation |
+
+This round gets one push, guarded on the remote head still being `a5cd640c`;
+never force. It publishes `ddaa5e54`, `23d06504` and this record commit.
+
+Next, Codex counter-reviews section 49. QC stays untouched while the owner's
+instruction holds, and the Mia-led recovery stays paused. Further real-data
+work needs the concrete contracts in 48.4: a licensed, versioned guidance
+source, stock and SPY NBBO, six usable common years, verified rights, dated
+reference inputs and a reviewed native adapter.
+
+Acceptance here is a software review only. It establishes neither native
+execution nor empirical readiness.
+`docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` were not edited
+and stay frozen for both agents.

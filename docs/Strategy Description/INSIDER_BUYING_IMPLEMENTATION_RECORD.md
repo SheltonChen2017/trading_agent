@@ -31780,3 +31780,82 @@ created. Continue genuine available offline work after the audit; if required
 source evidence or external input truly blocks that work, record the precise
 fact and next action rather than manufacturing readiness or stopping merely
 at another routine engineering checkpoint.
+
+## 224. Pilot metadata/reuse implementation qualification (2026-10-25)
+
+Preregistration commit is`39b1e6a6` (local-only; no interim push). Five NEW
+source/test pairs implement223 without modifying any existing collector,
+frozen parser, old schema bound/cap, source artifact or historical namespace.
+`pilot_sec_roster` streams the exact25 context SUBMISSION tables, uses each
+quarter's era-specific header/member profile, preserves raw metadata and
+accounts every six-form occurrence. `pilot_sec_exposure` composes historical
+operational-root custody, adds the later2006 claim root explicitly, binds
+completed master/event/result controls and separately stream-hashes retained
+original-body candidates. XML/index-only requests remain auxiliary. No
+financial parent parsing is performed. `pilot_sec_parent_audit` joins exact
+source identities and independently reparsed master aliases; it conserves
+cross-quarter occurrences, suppresses all consumed accessions, retains
+ambiguity and body/identity conflicts, and hashes the FULL source/disposition/
+fresh-candidate streams. Its bounded preview is NOT an executed/full published
+queue. Any cross-quarter repeat marks the whole inert queue provisional for
+reconciliation rather than silently dropping source occurrences.
+
+`pilot_sec_parent_readback` enforces typed counts, all25 ordered quarters,
+form/target/consumption conservation, source/manifest/selector/master/control
+crosslinks, complete stream framing, exact false authority maps and separate
+pre-hash/current-hash candidate inventories. `pilot_sec_parent_audit_runner`
+binds clean committed source, freezes all four current v3 hashes, launches one
+initial native-denied worker, and publishes only fresh private controls under
+its trusted parent. Outputs are continuously held and fully rehashed through
+final exact-three-leaf validation. Only NEW controls use the already documented
+owner/mode/inode/nlink/size/mtime plus SHA policy that excludes transient macOS
+ctime-only UF_TRACKED changes; all historical intake custody remains strict.
+Maximum report is128MiB with a4GiB remaining disk floor. Fixed registration
+SHA256 is`b9cfa669cec41df7a24f0e837442304a3d2f31c31f802615405bf59bd8e57c22`.
+
+| New pair (research source / matching test basename) | Source SHA256 | Test SHA256 |
+|---|---|---|
+| `insider_buying_pilot_sec_roster` | `e14c0e23d22604ee583cbb4958ab371ec56b619741a5a2e5da7211db73c7eaf4` | `914fb29161d87c5553be4b3bc1546356e57908afff3dd31e089589e68c2f83aa` |
+| `insider_buying_pilot_sec_exposure` | `44a1f7db5265880ada2ce313f5387619e51ca48f649952b93d47bde4b902a246` | `81dfaec05070d6e1408435b2fc2a2be3319e454e2731e36985280b360bab2072` |
+| `insider_buying_pilot_sec_parent_audit` | `eb88a3e9c10f7d4911c313a41b36abe98f476ad4831f657651bf1d19b11f8971` | `5c7756911e3a0ac9b0a66d7879e083d8cca73c77e7d5c00739679bb1b8018ad9` |
+| `insider_buying_pilot_sec_parent_readback` | `72eb97957225b1213ea1075e49df0005b0aa93a4194e98e2ece93c4cd1d157f0` | `ff8bfb431f2204a93f0b6d17fc8b13e81aa0c4bbf9231cabfd65a93a3568a5d3` |
+| `insider_buying_pilot_sec_parent_audit_runner` | `5ca121b6d80a175d817d84b0d41bb180fe395ba6927ba8f7b3694d256fea450d` | `98d3abbeaacf66f0b371d408752f3852c9facb36068b913d2748f4f8f2f0c797` |
+
+### 224.1 Prospective defects corrected before actual data activation
+
+These are draft implementation findings, not newly observed historical data
+defects or an independent Claude review. All previous resolved findings stay
+resolved at their original scopes; no carried P2 is closed by these tests.
+
+| ID | Priority/status | Reason and correction | Observed verification |
+|---|---|---|---|
+| IBPSEC-DRAFT01 | P3 CLOSED | A2006-only auxiliary ZIP-name helper would refuse later source eras; new reader uses the frozen per-era member/header profile without changing consumed helpers. | Invented era fixtures and source-binding/header reversals red; restored49 roster checks green. |
+| IBPSEC-DRAFT02 | P3 CLOSED | Global accession dedup/refusal would contradict the quarter-occurrence denominator; preserve occurrences/conflicts, suppress later repeated queue entries, mark the entire candidate queue provisional. | Full25-quarter invented conservation/repeat tests; compiler51 checks green, eight guard reversals detected. |
+| IBPSEC-DRAFT03 | P3 CLOSED | Descriptor-only or incomplete controls must not imply body coverage; bind response/item/result/commit evidence, support exact shard paths, preserve missing-completion consumption, and rehash opaque bodies separately. | Observer31 checks plus EXACT guard green; six faithful reversals detected. |
+| IBPSEC-DRAFT04 | P3 CLOSED | Fresh output ctime-only metadata and incomplete final readback could misstate success; use continuous new-output holds/full hashes and strict nested accounting. Simple-JSONL virtual event names bind the whole journal, not a nonexistent leaf. | Output content/inode/mode/inventory/resume regressions; readback32 checks green; five readback reversals detected. |
+| IBPSEC-DRAFT05 | P3 CLOSED | Subclassing the trusted guard adds a stack frame, so its inherited exact-child `/dev/null` exemption refused before worker launch. A no-data real control probe reproduced this, with no semantic intake or consumed operation. | Narrow CPython known-child sink correction; real control-stack regression green; initial-native network/fork/all-write/direct-security-exec proof subsequently exit0/stderr0. |
+
+Main final focused selection: **470 passed,1 skipped in19.44s**, covering all
+five new pairs, existing master-index and pilot coverage tests, lane import
+boundary, active documents, record checks and EXACT
+`tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports`.
+The one intentional existing nested-native fixture skip is not a failed run.
+All tests used initial process-tree network/Keychain-exec/repository-write
+denial, minimal environment, no plugins/cache writes in the lane. Separate
+initial network/fork/ALL-write/security-exec-denied source-only import and
+memory compilation passed all10 new images. No complete lane/repository suite
+was run. Agent12-run runner/readback mutation probe killed10; two isolated
+coverage survivors (`-S` deletion and incomplete final set) were explicitly
+reported, not hidden as100% sensitivity; both now have direct command/final-set
+assertions in the main tests, with worker no-site denial still independently
+binding. No actual audit/source semantic execution has occurred at this point.
+
+Next immediately: reverify exact root/branch/HEAD/status/matching origin,
+commit this implementation, freeze every tracked/untracked lane writer, then
+execute the single registered protected read-only audit on that existing
+clean commit. Continue offline retained-parent structural corroboration under
+a separately registered, committed source image after the audit, rather than
+mistaking a SHA-matching body or metadata contract for original-parent/PIT
+admission. Acquisition, if later necessary under the standing source-build
+direction, requires its OWN bounded fresh scope/production claims/journal and
+never retries a completed/claimed/ambiguous request. QC stays untouched.

@@ -818,8 +818,9 @@ The separately frozen current-access observation in323.12 passed the unchanged
 owner-only policy; its use is now SPENT. No permission change or historical
 A13 cause is inferred. A14 then completed its diagnostic use with an authenticated
 fresh QuoteBar/missing current TradeBar/stale generic-cache refusal(323.15).
-Prepare a coherent versioned quote-aware execution policy, then verified fixes
-and then the consistent six/eight comparison without a routine review wait.
+The coherent quote-aware successor and common six-cell economic pins are now
+frozen in323.16–19. Next is its sole A15 source/compile/run/result use, then
+verified fixes and the consistent six/eight comparison without a review wait.
 One final push; no funded or paper/live deployment authority is inferred.
 
 Branch: `codex/strategy-analyst-revisions-v2`
@@ -2101,8 +2102,8 @@ failed at the per-security fresh-price check; A13 stopped during access reads
 before any source edit or new job. The read-only reconciliation in323.10–12
 subsequently passed the unchanged owner-only/current-idle policy. The immediate
 next step after the authenticated A14 diagnostic failure in323.15 is a separately
-versioned quote-aware execution policy and consistent six-cell projection,
-preserving current-data/side-price/cash/fee checks. Do not replay A12/A13/A14/C
+versioned quote-aware A15 use frozen in323.16–19, then the consistent six-cell
+projection preserving current-data/side-price/cash/fee checks. Do not replay A12/A13/A14/C
 or remove the freshness guard to obtain a terminal success.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
@@ -58274,3 +58275,167 @@ QuoteBar alone does not prove independently updated sides, executable liquidity,
 market impact or future brokerage equivalence. This decision grants only
 implementation; exact source/protocol/one-use run pins must be committed before
 new QC contact. A14 remains spent and current floor329/254/50/699 unchanged.
+
+### 323.17 Prospective A15 quote-aware source/compile/result use
+
+Under323.6/323.16, authorize ONE observe invocation of the new
+scripts/run_arv2_r298_quote_execution.py at the clean commit containing its
+final source/pin freeze below, with --expected-head that exact commit and
+--caller-sha256 the frozen caller SHA. Compatible designated Mac/Python/root/
+branch remain unchanged. New control is
+artifacts/analyst_revisions_v2/newrule_quote_execution/R323-20261025-E,
+not inspected or allocated during implementation. All A1–A14 and C operational
+entrypoints/controls remain spent; no retry, cleanup, marker repair or old
+artifact reader is revived. This is A15 recovery accounting and the FIRST use
+of the explicitly revised quote-aware economic candidate, not a name-only
+retry of A12/A14. Continuing owner waiver covers this implementation/run;
+same-round advice is not independent Claude acceptance.
+
+Fresh native credential-free admission must reconstruct and authenticate the
+same genuine October input and D2/A11 consumer evidence under selected pins,
+then derive the new pure quote-aware projection from the authenticated old9dde
+public checkpoint. This does not pretend cloud source is still9dde: before
+locking/mutating, authenticate all eleven CURRENT A14 diagnostic source bytes
+against1f366e402b3754e9f1f8ba89d08f250df771431b2ae98d19da953cfb722db293 /
+manifested8bd6c988d6d9fc31586b9dd8df058e8235a79702f52d78a172c31a1e64b190.
+Require unchanged strict owner/known-A5 access and exactly manual+A12+A14 in
+history; A13/C have no job. After own A5 lock repeat access/history/full source,
+write exactly runtime/main once each with full eleven-file readback after each,
+compile once and require exact BuildSuccess. No other source, settings,
+permissions, project, data acquisition or Object Store mutation is authorized.
+
+Before one named ARV2 R298 QUOTE EXECUTION R323 A15 job, repeat source/access/
+history/compile and admissible capacity checks. Immediately retain its exact
+ID even on fast terminal response. Thereafter history must be exactly the
+three prior rows plus own A15. Poll ceilings remain compile120 at>=1second,
+capacity3 at>=60seconds and status240 at>=60seconds, within joint parent15,120
+seconds/420application dispatches/1024immutable records. These are ceilings,
+not proof all polls fit, measured wire counts, continuous source integrity or
+bounds on uninterruptible I/O/host suspension. Kill/reap only own child; no
+other lane's job/project/session may be changed. Claim consumes use even if
+no actual QC request occurs; unknown/partial claim stays ambiguous/spent.
+
+Only one own-job read is allowed: finite failure-only detail after Runtime
+Error, OR the two strict completed aggregate statistics. No failed-run
+performance values, raw error/stack, rows, credentials or private symbol/price
+is emitted. Native output-only validator binds actual parent exit, source/
+HEAD/profile, report pin and exact supplied result bytes without rereading
+old controls. Actual0 PLUS matching authenticated completed aggregates PLUS
+final fresh input admission is required for an accepted R298 result cell;
+capacity-wait0 or terminal Completed alone is not one. Nonzero, missing,
+unknown, malformed or late-failed publication cannot be fabricated into0.
+All formal/PIT/master/paper/live flags stayfalse. A successful R298 is not yet
+a comparable completed family: later all-six reconstruction must match its
+exact common quote-aware runtime/profile/package first.
+
+Documentary A14 actualexit2/report3,256bytec8d14b163bc214f78ed912271035deac88bbb9e6bd1cd7583d7d502151ffd5fe
+is historical context only and must not be reopened. Native worker policy
+explicitly denies spent A12/A13/C/A14 controls; permitted fresh D2/A11 evidence
+consumers are not old operational entrypoint replays. Known finite foreign
+error/request-response accounting corrections and capacity-wait postflight
+remain. Unexpected errors still refuse safely without invented cause.
+Book a genuinely claimed A15 once:+1shared/+1Analystdevelopment329/254 ->330/255,
+infrastructure50 unchanged, cells699 until an actually admitted full result.
+No preparation/test look is booked. Preserve all failed evidence and continue
+only with a verified justified successor under the owner's development scope.
+
+### 323.18 Quote-aware public source/economic freeze for six cells
+
+Pure projector scripts/arv2_newrule_quote_execution_projection.py
+SHAebc6d921c5dbaa5e9bc83379ab45c167780fb87db8441dbd9d618b3efcb1715f;
+test_quote_execution_projection.py SHA80fa3e63b03891ede4fa54ca7ed7e9b02df8d9aafefecbd9fe1d74f1f61495ce.
+R298 public projection5,583bytes SHA3735a7764f658ba867edb338615666844ceb8f81d7aebdc36d8b7b6495e67779;
+INTERNAL profile digestcf6e4063796cd297b28aaa1620056a2a86e8bfe7f65a194de1e531f97dc64569.
+Full27,425canonical profile bytes(including that internal field) separately
+hash tod7403524daca42b8591b1302e6b87affe81b3bd37dc590752c73853ac3dc4661.
+Remote source manifest1,668bytes SHA b4ed1a5f3cb5da08bed86589b1d06fa8fa620b90a809b264b78661a723b3e907.
+New runtime56,089bytes SHAc7b829020ac20704ec6f813997ebef396ed2069b8ad60c77bf3dc84cd67e2814;
+main34,613bytes SHA161cb6fb9eb5e42f2a4e0c29d3f44e73eee3e19bf72415b712375c71d2a0a186.
+Eleven cloud sources276,580bytes; only runtime/main differ from old9dde.
+Policy1,663bytes SHA406b55ce45c270c9494208524bdec1f086bee3800b16c870c4fe8e4fd18cb66f.
+
+The host projection and cloud make_profile receive the same explicit policy
+and candidate suffix-quote-aware-v1; initialize recomputes their whole profile
+equality, not a caller-only assertion. QuoteBar period is witnessed by typed
+Time/EndTime and exact60second difference (its documented EndTime=Time+Period),
+not uncertain Python.NET TimeSpan coercion. Whole-tree restoration proves all
+other runtime/main semantics unchanged. The result parser is AST-identical.
+The following six public profile/main pins were independently derived under
+native network/artifact/Keychain/security denial BEFORE any A15 outcome, from
+the frozen17-source plain public specification and the held projector. All ten
+non-main files, including the new runtime, are byte-identical across six cells.
+
+| Cell / universes / AR arm | Internal profile SHA256 | Main SHA256 |
+|---|---|---|
+| R298 /6 /0 | cf6e4063796cd297b28aaa1620056a2a86e8bfe7f65a194de1e531f97dc64569 | 161cb6fb9eb5e42f2a4e0c29d3f44e73eee3e19bf72415b712375c71d2a0a186 |
+| R299 /6 /100 | 38236b5be5ff411481e6cfd3af90fb8ada2e72de0557b9cc7c3a96495a1259aa | 016c66817f087b4f8f95462ac5b5f8feba12b6675eba3e9f2b073f88239e805c |
+| R300 /6 /200 | 5b5c157190d8a9da92fa469223cf9c6dc8a5315fa47a4433f811ba051d62cfdf | d51146a1ae8124011824d2b502ccbd68659ebc5a20285779eee31c67ec9bf1b6 |
+| R301 /8 /0 | 3990e5ed545fe6172298e22f3d815ce4933e3816ce6a81d777c7a0387660ca63 | 4b97aea66bc6ccb57b67c8b82b48ee7b30d2fbeab810ecb5342add6bf0286ef9 |
+| R302 /8 /100 | d24482b481996d1fd196af47e605d427c22db2ae7b5aa031bf2f8f5eb91f6674 | 793b0c050baee852e9510fbf0a9d4ccfded51b6e3282a7e1b829ba8870678e30 |
+| R303 /8 /200 | f6da6d0f1d4720188794172e0a1dfca768b81205bf5e76268f00aa9b85d4d863 | ebcee2141f7fb636fdf5f9b292c76993ddcda93552bf3be1f78a1e494af19d5e |
+
+This freezes proposed economic/common-source bytes only, NOT private source
+admission, a completed family builder, QC project creation or other-cell run
+authority. A15 is the separately bounded R298 use323.17; later genuine family
+and per-cell caller contracts must authenticate these same pins before use.
+Other mains34,617bytes except R30134,613. No later project was created/read.
+
+Author64native-denied passes6.49s cover typed slice/cache/side/time guards,
+repeated strategy fee estimates and unchanged outside-intent forced fee basis,
+real-axis cloud make_profile equality, both buy/sell submit callbacks and actual
+cash/fee/holding reconciliation. Five in-memory guard omissions were caught
+(period, cache binding, fee order, dispatch-time/quote and fill-price checks),
+restored finally. First run1pass/60 shared fixture setup errors exposed a
+Store-versus-Load AST constructor anchor defect; corrected before use.
+Intermediate61passes6.29s overlap64, not additive. No full suite/private/ops.
+Native LEAN fee estimates may still use a different dummy-order binding, or
+actual fills may diverge from the side quote: these must fail closed, not be
+claimed proven by synthetic tests or current public-master source.
+
+### 323.19 A15 final source/protocol freeze and validation
+
+| New A15 source/test | SHA256 |
+|---|---|
+| arv2_r298_quote_execution_remote.py | 5777c6cefd93a738817f2ef523ccbadee6763a9183cc6c14a96c43140f216893 |
+| test_r298_quote_execution_remote.py | e9bec59df63e5eb7746519d0fc62b21b5c4b1b6ea4b2e5a66494519eb636e527 |
+| run_arv2_r298_quote_execution.py | bc3e8039a9f86b39a82b26079f2acfda6738acb935cd2ca909249b0233a13152 |
+| test_r298_quote_execution_caller.py | 1a773cf5e622cbe31a16615adc7c28292b83796802edb5ed7e4f4e55c941ca86 |
+
+Remote canonical profile1,981bytes SHA956643aeecb202d796b1475d8f778fb7edb19e752b4b51f65466fddf87f8dc73;
+caller canonical profile17,083bytes SHA5118bdd1309037703babf6ff63ec237dc50c1c6336f95008ed5fe7549afda082.
+The projector/test and resulting cloud pins are323.18. Caller explicitly binds
+accepted_risk_only=true, family_comparable=false, execution_semantics_changed=true
+and common_new_runtime_family_reconstruction_required=true. These characterize
+research evidence, not granted formal/paper/live authority. The run command is
+323.17 with exact callerbc3e8039 and the clean commit containing this freeze.
+
+Root final focused selection322distinct passes13.68s(64projector+63remote+
+108caller+86record/document+1research transitive closure), no failures/skips/
+warnings. Native remote-network/production-artifact/Keychain/security denial,
+explicit --ignore=artifacts, --noconftest, disabled plugin autoload/cacheprovider,
+-B and inroot temp/cache/log paths remained; dispatch_fence absent. All111
+selected public source pins, exact caller/helper profiles and six in-memory
+compilations matched. No complete suite or actual private/QC/provider call.
+Author64passes6.49s/63passes5.49s/108passes8.17s overlap322. Remote earlier
+62passes4.07s with1genuine-public test deselected overlaps its final63.
+Remote A14-history compile omission and old-source-manifest omission each
+produced1expected failure(0.12s/0.05s), restored finally; frozen A14 hashes held.
+
+Pre-use ARV2I323-010(P2): the copied parent finite-output whitelist omitted the
+new pure projector's FINITE inventory even though finite() could return those
+codes; a real projection refusal could therefore lose authenticated finite
+output. Corrected in A15 before use; parameterized all new projector codes
+through validate_output, and an in-memory whitelist omission produced1expected
+failure0.19s, restored finally. Unknown/malformed errors still refuse without
+raw exception formatting. This does not repair or reattribute a past attempt.
+Other same-round inspection found no material admitted unsafe path; advice and
+synthetic coverage are not independent Claude review or actual LEAN proof.
+
+No prospective E control inspection/allocation, source upload, new compile,
+capacity/job/result or extra look has occurred during implementation. Parent
+retains only the two frozen CustomStatistics plus finite identity/terminal
+metadata. The outer observer's bounded supplied bytes and actual-exit record
+may be retained in session memory and summarized for the lane result record;
+no old artifact reread, raw logs/order/holding export or opaque private value
+is needed. Accumulate locally and make one final matching-lane push only after
+the concluded substantive round, not this pre-run freeze.

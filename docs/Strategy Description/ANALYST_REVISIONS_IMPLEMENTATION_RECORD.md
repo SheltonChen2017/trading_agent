@@ -808,12 +808,13 @@ formal acceptance, runtime success or a completed six/eight comparison.
 D1/D2/A11 are SPENT. Their prior READY floor was326/251/50/699.
 The owner now directs R298 execution followed by the six/eight comparison and
 explicitly skips current Claude review. Section323 owns this new round; the
-prior readiness-only boundary has concluded. Freeze the new launch/result
+prior readiness-only boundary has concluded. The new launch/result
 contract and six-cell public specification preceded A12. A12 actually launched
 and failed the fresh-price guard on2021-02-22; it is now SPENT, with no accepted
-performance cell. Current floor327/252/50/699. Section323.6–7 owns retained
-failure evidence, the completed read-only Mia consultation and the distinct
-failure-only A13 diagnostic being prepared. Continue verified diagnosis/fixes
+performance cell. A13 then stopped during access metadata before any mutation,
+compile or job; it too is SPENT. Current floor328/253/50/699. Section323.6–10
+owns retained failure evidence, the completed read-only Mia consultation and
+the distinct read-only access reconciliation now being prepared. Continue verified diagnosis/fixes
 and then the consistent six/eight comparison without a routine review wait.
 One final push; no funded or paper/live deployment authority is inferred.
 
@@ -2092,10 +2093,11 @@ question is needed within the owner's existing scope.
 The later owner explicitly waives Claude review of section 323 and directs
 R298 execution followed by the six/eight comparison, documentation and one
 final push. Section323's first launch/result contract was committed and A12
-failed at the per-security fresh-price check. The immediate next step is the
-separately frozen, failure-only A13 quote diagnostic in323.7, then verified
+failed at the per-security fresh-price check; A13 stopped during access reads
+before any source edit or new job. The immediate next step is the separately
+frozen read-only post-Mia access reconciliation in323.10–11, then verified
 correction and the consistent remaining cells when admitted. Do not replay A12
-or remove its freshness guard to obtain a terminal success.
+or A13 or remove the freshness guard to obtain a terminal success.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
 V3 is spent after its
@@ -57890,3 +57892,136 @@ No runtime/main mutation or new compile/backtest has happened at this freeze.
 After committing this freeze, invoke it once, retain actual exit/output/IDs,
 record the honest result and continue verified correction/consistent comparison
 under the owner's current scope. Do not push an intermediate acknowledgement.
+
+### 323.10 Actual A13 pre-write refusal and next diagnostic boundary
+
+At clean433831fc50c16eb57d1c867a3a7df058b28ae144, the sole A13 parent ran
+2026-10-25T19:54:02.800469Z..19:54:13.746378Z, actualexit2/stderr0/no bound.
+Stdout637bytes SHA4c0f7b212706cd8903e5582908b38a285ac550e436aaacc081a51f97c0074f9a.
+The separate native-denied supplied-output validator19:54:13.746513Z..
+19:54:16.783316Z exited0/stderr0 and authenticated FAILURE; the observer retained
+actual2. No output/control reread, report-success pin or fabricated exit0.
+Failure state: stageprepare, application dispatch count2, compile/launch/
+terminalnull, finite codeunknown_exception, provider_request_countnull.
+These are process brackets and application intents, not exact wire counts or
+proof that both API responses succeeded. Initial local admission returned before
+the two scoped project-access requests; there was no file readback/mutation,
+lock acquisition, compile, capacity check or new backtest. A13/control/observer
+are now SPENT and frozen. All eleven trading source files remain unmodified by
+this operation; actual cloud authentication beyond the failed access stage was
+not reached. The last strategy job is still the failed A12, not a second run.
+
+Book A13 exactly once:+1shared/+1Analystdevelopment to328/253/50/699; no accepted
+result cell. This is the frozen attempt/claim accounting, not a claim that a
+strategy runtime/compile was attempted. The separate metadata diagnosis below
+adds no strategy look under the existing314.5/316.1 distinction.
+
+ARV2I323-008(P2), confirmed static classifier defect: the spent caller only
+delegates to the remote finite classifier when the exception's exact type is
+remote.Refused. The unchanged access verifier instead raises its own exact
+AccessRefused; the helper's delegated classifier knows that type, but that
+delegation is bypassed. An exact access refusal would therefore collapse to
+unknown_exception. This proves an observability defect, not that AccessRefused
+or Mia was the actual A13 cause; a foreign API exception could also be unknown.
+No actual owner, idle, privacy, collaborator or response predicate is inferred.
+Do not patch the spent caller or refresh any owner/A5/source pin automatically.
+
+The next distinct purpose is one READ-ONLY current-access reconciliation,
+not another upload or strategy retry. Under the owner's continuing diagnosis/
+development direction, prepare a new bounded caller and pure projection for
+exactly projects/read and projects/collaboration/read on38364439. Retain only
+the exact finite access predicate, response/row hashes, fixed field types,
+closed boolean/enum observations and bounded row counts; no raw IDs, names,
+emails, credentials, arbitrary messages or rows. Authenticate exact current
+project/name/Py/owner/organization scope before interpreting access metadata.
+Capture exact-class AccessRefused safely, plus distinguish request intent from
+observed response. No permission, lock, file, compile, capacity, job or result
+endpoint is permitted. New control proposed:
+artifacts/analyst_revisions_v2/newrule_post_mia_access/R323-20261025-C,
+not inspected/allocated. Its one-use source/claim/deadline/actual-exit freeze
+must be committed separately before the two new calls. Historical controls and
+reports are preserved and not reread. A current metadata observation is not
+continuous access assurance or authority to accept an unknown collaborator.
+
+### 323.11 Prospective one-use current-access reconciliation freeze
+
+Under323.6/323.10, authorize ONE observe invocation of
+scripts/observe_arv2_r298_post_mia_access.py at the clean commit containing this
+freeze, externally bound to its exact committed SHA and HEAD. The previously
+uninspected/unallocated control is exactly
+artifacts/analyst_revisions_v2/newrule_post_mia_access/R323-20261025-C.
+This is a separately justified observability correction and current read-only
+reconciliation, not replay of A13, permission-policy acceptance or A14 authority.
+The owner's continuing development/review waiver supplies current sequencing;
+no new routine authorization question is required for this bounded diagnosis.
+
+Exact designated Mac/root/branch/Python3.13 and clean committed source pins are
+checked before contact and after observation. The parent exclusively claims,
+fsyncs and retains immutable0600 records before either API request. Existing
+credentials are handed in-memory to its one child; no Keychain/tokenfile lookup
+or credential output. Only projects/read then projects/collaboration/read,
+each with projectId38364439, once each. The fixed real QC client, API base,
+bounded transport and30second timeout remain unchanged; unsafe environments
+refuse. Each request intent and any received response are distinguished by
+closed state/counts; only response byte counts/SHA are journaled, never bodies.
+The pure helper authenticates exact project/name/Py/owner/organization scope
+and applies the unchanged strict policy, retaining its exact finite refusal
+without mistaking a completed observation for granted access.
+
+At most8rows per view; only fixed field types, closed booleans/permissions,
+whole-row hashes, known owner/A5 equality, and exact Mia/mia-ai/A5 literal
+matches are retained. Canonical JSON+LF hashes of name/publicId/codeSourceId
+allow offline comparison of already known labels; no raw identifier/email/UID
+or arbitrary string is emitted. Literal Mia/mia-ai matches are observations,
+not authenticated actor identity; neither general environment names nor the
+official example identifier prove a dedicated collaborator. No UID/email
+field-specific hash is retained. Missing fields and present nulls differ.
+The helper's flags for provenance, privacy, edit-lock, access, source upload,
+compile, backtest, retry, strategy results and formal/PIT/paper/live stayfalse.
+
+Parent deadline120seconds, outer child deadline150seconds, finite64KiB stdout/
+4KiB stderr, at most8own control records, own-child kill/reap only. A separate
+credential-free native-network/production-artifact/Keychain/security-denied
+20second validator authenticates supplied bytes and actual parent exit without
+reopening any control. Actual0 plus exact report/observation binding denotes
+completed DIAGNOSTIC observation only, including a refused strict access check;
+actual2 denotes authenticated failure, never access acceptance. Unknown exits,
+late publication failure, malformed/trailing output or contradictory binding
+must refuse; no retry/cleanup/marker repair. Endpoint equality is not continuous
+integrity, native denial is not measured zero contact or same-user isolation,
+and uninterruptible I/O/host suspension is not bounded by the deadline.
+
+No permission/lock/file/capacity/compile/backtest/result endpoint, private input,
+old control, provider acquisition, strategy outcome or new strategy look is
+authorized. Floor stays328/253/50/699. After the one honest observation, use only
+verified lane-owned corrections with a separately committed forward run decision;
+do not infer a new actor pin, stale-price waiver or real-money readiness.
+
+| Current-access source/test | SHA256 |
+|---|---|
+| arv2_r298_post_mia_access.py | 09705275244935bce92c096e18d3beaaedd3eed13ab31deb8ef8788fb9df8672 |
+| test_post_mia_access.py | 36b87d143e0d2dc24fb4d74ae3fef06c3aab756072eae5e254b98ce34133bac0 |
+| observe_arv2_r298_post_mia_access.py | 11958e8387755871b78f7ee0f24d7f286811974a89350e19402e260debdf9b08 |
+| test_r298_post_mia_access_caller.py | 1423d9739eb843d589c1c9e0c874892cffc824c4cda1a6b2354831f5f9ed8a5a |
+
+Helper canonical profile1,400bytes SHAa2c977f2f7dbfca07cfa5ed52ae0b2b61a060f2bc16499ac3939d36fb700bb54;
+caller canonical profilec25758b02965d758a1b888ef6a9032a85996aff29265d7fc82b93ca4ac71c3aa.
+Author final157distinct focused passes3.31s(73caller+84helper), native denied,
+no failures/skips/warnings; earlier55caller3.40s/150combined3.73s and77helper
+passes overlap. Initial author's TMPDIR did not exist, so its first invocation
+stopped before collection; only inroot support directories were created before
+the successful run, with denial unchanged. An exact-class AccessRefused catch
+omission was killed by1expected failure0.13s and restored finally; an earlier
+mutation wrapper lost result delivery and has no result claim. No actual
+metadata/provider/private call has occurred while implementing these files.
+
+Root final selection244distinct passes2.48s(84helper+73caller+86record/document+
+1research transitive closure), no failures/skips/warnings, under unchanged
+native remote-network/production-artifact/Keychain/security denial with explicit
+--ignore=artifacts, --noconftest, no plugin autoload/cacheprovider, -B, inroot
+temporary/cache paths and absent dispatch_fence. All108selected pins and exact
+caller/profile hashes matched; four new source/test files compiled in memory.
+Author results overlap244; no full suite or actual input/QC operation in checks.
+No additional material advisory scope escape was found. Exact actor identity,
+access/refusal cause and future operational permission remain unknown until
+the single current observation and its honest disposition.

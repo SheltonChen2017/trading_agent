@@ -7080,3 +7080,22 @@ The owner directs continued verified diagnosis/fixes/Mia and waives Claude
 review until further notice. A12 remains spent; no unchanged retry or live
 clearance follows. Analyst323.6 owns the exact evidence and current diagnosis.
 This append leaves all historical entries and other lanes unchanged.
+
+### R-298 A13 access-stage refusal before write/compile/job — 2026-10-25 UTC
+
+At clean `433831fc50c16eb57d1c867a3a7df058b28ae144`, sole quote-diagnostic
+parent ran19:54:02.800469Z..19:54:13.746378Z, actualexit2/stderr0/no bound.
+Stdout637bytes SHA256
+`4c0f7b212706cd8903e5582908b38a285ac550e436aaacc081a51f97c0074f9a`.
+Native supplied-output validator exited0; outer retained the authenticated
+failure/actualexit2. Stageprepare,2application dispatch intents, codeunknown_exception,
+compile/launch/terminalnull. No mutation, lock, compile, capacity or new backtest
+followed. This does not prove which API/access predicate failed or two wire
+successes. A13 is spent; A12 remains the last actual failed strategy job.
+
+Book the A13 claim once: **327 ->328 shared /252 ->253 Analyst development /
+50 infrastructure unchanged /699 cells unchanged**. No accepted result cell.
+This is attempt accounting, not an asserted runtime failure. A separately
+frozen read-only current-access diagnosis adds no new strategy look. Analyst
+323.10 owns the exact limitations and prospective boundary. No historical or
+other-lane entry is changed; all formal/PIT/paper/live flags remain false.

@@ -1,6 +1,13 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CODEX COUNTER-REVIEW OF CLAUDE `b648f60` ACCEPTED AFTER ONE APPENDED
+Status: **NEW OWNER-DIRECTED OFFLINE CUSTODY-FIRST CONTINUATION (SECTION125),
+PROSPECTIVE 84005 CUMULATIVE COUNT STARTS / UNCHANGED4GiB. REVIEW SKIPPED BY
+EXPLICIT OWNER EXCEPTION, NOT INDEPENDENT ACCEPTANCE. NO NEW RETRIEVAL UNTIL
+CUSTODY IS VERIFIED; NO PURCHASE. QC/SAFARI ARE CONDITIONALLY AUTHORIZED ONLY
+AFTER THE NEXT TARGET PRICE REVISION LANE PUSH (SECTION125.3); THAT GATE IS
+STILL CLOSED.
+LOCAL BACKTEST READINESS REMAINS FALSE.
+PRIOR ROUND: CODEX COUNTER-REVIEW OF CLAUDE `b648f60` ACCEPTED AFTER ONE APPENDED
 COUNT-SCOPE ARITHMETIC ERRATUM (SECTION 124). OWNER-DIRECTED BOUNDED RECOVERY
 AND SECRET-SAFE DIAGNOSTICS ARE IMPLEMENTED. ACTUAL V2 AND V3 INITIALIZATION
 REFUSED WITH ZERO NEW START/HTTP/BYTES; BOTH CLAIMS ARE SPENT. V3 IDENTIFIES
@@ -22983,3 +22990,306 @@ not extra Claude review or delegated source qualification. All agents are now
 finished/frozen. The single matching origin read/push route was verified
 without emitting its URL; final root/branch/HEAD/status/ref checks still apply
 immediately before commit and publication.
+
+## 125. Owner-authorized custody-first local-readiness continuation
+
+### 125.1 Authority, preserved history and prospective recovery allowance
+
+**SI-AUTH-20261025-01** records the owner's later direct instruction:
+“ok, proceed with that plan. fix custody offline first, then recover within
+84,005 cumulative STARTs and the 4 GiB cap. keep building until backtest-ready.
+no QC or purchases, and push once when done.” The preceding “skip the review”
+direction is a scoped exception to waiting for Claude before this continuation,
+NOT independent review or acceptance of the published eleven Codex commits.
+The clean published baseline is
+`d50c9fe981b391a2f9634491b4b9512ccf3216d7`; local, tracking and actual matching
+origin were independently equal at this new round's start. Section124.19
+remains an immutable historical handoff; this new authority supersedes its
+prospective cap/review stop only. No source, financial, custody or outcome gate
+is waived. Shared documents remain frozen and this record remains the handoff.
+
+The accepted prospective plan covers67885 still-missing original transport
+positions in133 disjoint chunks:132*512 plus301. Each chunk may spend at most16
+extra STARTs, each position at most3 tries, fixed2/10second backoff and at most8
+inflight. Thus13992 old spent +67885 base +2128 extra =84005 cumulative STARTs.
+The final chunk has at most317 STARTs, not528. This is a separately versioned
+prospective allowance, never a rewrite of old81876 protocols, spent claims,
+receipts or unknown-body charges. Zero-START failures remain spent. Nothing
+refunds the preserved23452681 charged bytes or two full-page unknown debits.
+The unchanged4294967296-byte ceiling leaves4271514615 bytes at the baseline.
+Every future START must also fit the byte cap with full2MiB unknown-body and
+inflight reservations;84005 is a ceiling, NOT a promise that all allowed retries
+can be afforded. Statusless/no-body attempts never refund their full-page debit.
+Daily source budgets remain separate and are not enlarged by this count cap.
+
+**SI-DEC-20261025-05** selects offline custody strengthening FIRST. Existing
+failed namespaces/claims/files are never adopted, cleared, resealed or retried.
+No longer quiet window or weaker ctime guard is authorized. Read-only inspection
+of the two old safe186-byte NONCLAIM files found the recognized attribute name
+com.apple.provenance on both, no other attributes, and no stat drift during
+that inspection. This does NOT establish when/by whom it was added or explain
+historical022; actors001/006 remain UNKNOWN. A Python attribute-name API was
+unavailable, so the inspection used the system name-listing utility only; no
+attribute value, private row, credential or market request was read or emitted.
+
+The prospective engineering alternative is an FD-anchored kernel-immutable
+flag on THIS-invocation exclusively created NEW evidence before its FIRST seal,
+with flag, inode, owner, mode, link, size, mtime, ctime and bytes all strict
+afterward. Existing source custody and old creation policies stay unchanged.
+The system fchflags manual and Apple documentation describe UF_IMMUTABLE as
+preventing file changes; actual finite offline tests must establish support
+and the strengthened procedure here, not assume it from documentation. A
+failed flag/set/seal/check must fail closed without clearing the flag, adopting
+another file, spending a source claim or starting another guessed namespace.
+No new actual offline operation or provider recovery has occurred at this entry.
+
+Next: implement and causally validate that lane-specific prospective publisher,
+then a committed, finite NONCLAIM offline proof with all provider/key/capture
+seams denied. Only verified actual closure plus newly frozen source/budget/code
+policy can release bounded count recovery. Later positive-chunk reloading/union,
+daily whole-chain coverage, dated native/class/CIK/USD, eligibility, corporate
+actions/terminal cash and actual-input gates still need honest closure. No
+canonical-PIT/latest-revised relabeling or fixture-based readiness is allowed.
+Actual looks0/0 and0, alpha0, permanent look IDsnone, QC attempts0. No QC of any
+kind, purchase, new terms/credential, outcome join/S1/rank/order/strategy
+evaluation/backtest, broker/operator database, paper/live/deployment or order.
+One final matching-lane push is reserved for readiness or a factual irreducible
+gate, not an interim checkpoint. No automation is rearmed by this entry.
+
+### 125.2 Later owner resource-release monitor and completion direction
+
+**SI-AUTH-20261025-02** records the later direct owner instruction to arm a
+monitor on the Analyst Revision lane and consider QC/Safari free after that
+lane's NEXT push. Until further notice Claude review is not necessary and work
+continues toward either completed backtesting with a good result or a concrete
+blocker preventing progress. The owner authorizes as many backtests as needed
+within that lane-completion direction. This supersedes the earlier no-QC stop
+ONLY after the explicit resource-release signal; it does not claim that signal
+has occurred, that inputs are qualified or that backtesting produced a result.
+It grants no purchase/renewal/new terms, live/broker/order or other-lane mutation.
+
+The new one-shot heartbeat `analyst-push-releases-short-interest-qc` is ACTIVE,
+five-minute cadence, in this chat. Its baseline actual remote ref is
+`refs/heads/codex/strategy-analyst-revisions-v2` at
+`3c905d4235617d3d2a56b636c8e0be77ee790686`, independently read at about
+2026-10-25T19:19Z from this designated Short Interest worktree. This hash and
+already-observed older pushes are excluded. A new unambiguous actual matching
+remote SHA is the owner's resource-release signal, not evidence of Analyst
+review, readiness or performance. Missing/ambiguous/error state does not open
+the gate. No other checkout/ref, Analyst private source/artifact or work is
+accessed; there is no fetch, interruption or cross-chat message. All other
+automations, including the separate paused Analyst review monitor, are left
+unchanged. This is NOT a reactivation of either old deleted Short Interest
+monitor. On release it records the exact hash, deletes itself, and resumes this
+same authorized lane work when no pinned exact-code operation would be harmed.
+
+No QC of ANY kind or Safari interaction occurs before that future signal.
+After it, actual data/licensing/input gates still precede uploads/jobs. Frozen,
+prospectively logged candidates, financial correctness, source lineage,
+execution parity and honest look/attempt/multiplicity accounting remain
+required. The new overall backtest permission is not a reason to relabel
+latest-revised inputs historical PIT, retune acceptance criteria after seeing
+results, repeat a holdout until it looks good, refund attempts or claim success
+from Completed alone. The standing per-distinct-candidate failed-launch/Mia
+diagnosis procedure remains a failure-management rule, not an overall limit
+on separately frozen valid candidates. A claimed good result must meet its
+predeclared out-of-sample/cost/robustness criteria; otherwise report the actual
+result or concrete gate. All source/custody/spent-budget caps remain, including
+84005 cumulative count STARTs and4GiB. Actual looks/alpha/IDs/QC launches are
+still0 at this entry; the two historical QC metadata requests remain accounted.
+
+Main used the OpenAI Docs skill to establish the product scheduling path and
+created the heartbeat through the app, not a shell cron or second task. Local
+uncommitted work remains the seven explicitly authored section125 paths only;
+HEAD remains the clean published baseline plus those intentional edits. No
+provider operation, source claim, actual offline proof or backtest has yet run.
+
+### 125.3 Owner correction: Target Price Revision replaces Analyst trigger
+
+**SI-AUTH-20261025-03:** “switch the monitor from monitoring analyst revision's
+push, to monitoring target price revision's push”. This replaces the resource
+trigger in125.2; an Analyst push no longer opens QC/Safari. All other current
+lane scope, caps, no-review/completion direction and notification intent remain.
+
+Main resolved the active chat titled `Feature - Target Price Revision` and
+read ONLY matching remote branch metadata from the designated Short Interest
+worktree. Fresh armed ref is
+`refs/heads/codex/strategy-target-price-revisions`, baseline
+`b07fafdc17590185809d7a5a7059302496997605` at about2026-10-25T19:23Z.
+This existing hash and older pushes do not count. A future valid unambiguous
+different hash on ONLY that exact actual origin ref is the release signal.
+No target checkout, source/private artifact or process was accessed/modified;
+there was no message to that chat, fetch, Safari or QC access.
+
+The SAME one-shot heartbeat was updated, not duplicated. Its retained internal
+ID is `analyst-push-releases-short-interest-qc`, display name now
+`Target Price push releases Short Interest QC`. It stays ACTIVE every5minutes
+in this chat, quiet on unchanged/non-actionable state; its prompt explicitly
+excludes Analyst triggers. All other automations are unchanged. On the next
+qualifying Target Price push, record the full hash and delete this one-shot
+monitor; only then may in-scope QC/Safari access begin after applicable input
+and licensing gates. The gate remains CLOSED at this correction; no readiness,
+outcome, QC attempt or positive result is asserted.
+
+### 125.4 Mia assistance after the resource gate
+
+**SI-AUTH-20261025-04:** the owner permits consulting Mia whenever an issue
+arises while working with QC/Safari. Assistance need not wait for three failed
+launches. The Target Price next-push resource gate in125.3 still controls first
+access; no QC/Safari/Mia call has occurred at this entry. Source-rights/input
+gates, candidate provenance and attempt/look accounting are unchanged. Do not
+send private/licensed/reconstructible rows or secrets to an assistant merely
+because help is authorized. If Mia changes project source, retrieve and compare
+the exact cloud/local candidate, document root cause and every cloud change,
+and port only verified lane-specific corrections. Do not silently accept
+changed strategy economics or treat Completed as a good-result finding.
+
+### 125.5 Prospective kernel-immutable metadata primitive and finite proof
+
+Technical: the NEW lane-only `short_interest_immutable_metadata.py` wraps the
+unchanged original exclusive creator; it cannot receive/adopt an old path or
+caller-created capability. Exact initial flags must be0. Darwin's fixed
+`fchflags(int,unsigned int)` in `/usr/lib/libSystem.B.dylib` sets ONLY
+UF_IMMUTABLE on the original readonly inode FD BEFORE its one original seal.
+Original8-field custody plus strict flags form one9-field seal; the original
+HeldFiles/creator/OwnedOutput and every old source/capture/diagnostic byte are
+unchanged. No production clear-flag, postseal resampling, second construction,
+adoption or retry exists. The owner can unset a user-immutable flag, so this
+is prevention plus strict drift detection, NOT perpetual protection against
+a trusted owner or a forensic attribution of historical001/006/022.
+The [Apple fchflags manual](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/fchflags.2.html)
+and installed local manual establish the API contract; fabricated tests alone
+do NOT establish actual kernel behavior on this volume.
+
+Plain language: newly created evidence receives a stronger OS protection
+before being sealed; old evidence is never repaired by changing its stamp.
+Factory-original identities, an independent refusal latch, original selected
+seal/held identities and a separate terminal-issued closed witness prevent
+caller flags/raw bytes from inventing closure. The original readonly duplicate
+survives inner context exit, then its close and a final same-original9 stamp
+check must succeed before closed_summary exists. No source/input authority
+comes from this metadata capability.
+
+Pre-release findings, corrected before any actual invocation:
+
+| ID | Priority / disposition | Verified correction |
+|---|---|---|
+| SI-BUILD-20261025-010 | P2, corrected | Draft closed_summary trusted caller-accessible mutable phase/raw state, permitting a LIVE forged closed value before later exit refusal. Independent factory-terminal issuance now binds exact original object/anchor/raw/seal/policy; LIVE forgery, restored phase, replaced raw/seal and latch-reset regressions refuse permanently. This does not explain old custody actors. |
+| SI-BUILD-20261025-011 | P2, corrected | Minimum-hold loop initially sampled raw monotonic values outside validation; a NaN/forward-then-back sample could skip the hold unnoticed. Every comparison now uses the checked, monotone, finite bounded tick. The whole120s window begins before initial registration/root/remote checks. |
+| SI-BUILD-20261025-012 | P2, corrected | A draft terminal boundary audited code before output close and omitted the original output-parent anchor afterward. Fresh60-file committed-code audit now follows all original contexts; original directory AND parent identities, original9 file stamp/bytes and clocks are audited afterward without selecting a new baseline. Output-close code/stamp/parent replacement and original/final code-close-error regressions refuse. |
+| SI-BUILD-20261025-013 | P3, corrected | Fixed fsetxattr challenge must return exact int0/-1 with exact EPERM for denial; arbitrary nonzero/bool/float/malformed errno cannot be called kernel proof. |
+
+Under SI-DEC-20261025-05, the ONE separately registered prospective offline
+proof is `diagnose_short_interest_immutable_metadata.py run_registered`, new
+fixed namespace `kernel-immutable-metadata-20261025-v1` and ONE186-byte safe
+`one-safe-nonclaim.private.json` INSIDE it. This is NOT a provider capture,
+spent claim, old namespace retry or original-source replay. Old failed source/
+metadata evidence is not reopened. At most120seconds whole initialization/
+closure, at least5seconds checked postseal hold, one creation, no retry.
+It must observe actual kernel EPERM for write-open, same-mode fchmod and one
+fixed FD-based fsetxattr challenge on ONLY that new inode. No blanket Python
+write/chmod/xattr denial may counterfeit those kernel results. Every original
+stamp/byte remains strict, including after all original context/FD closes.
+All provider/socket/DNS, exact source credential and capture seams are denied;
+Git may read only this lane's exact metadata/current committed60-file closure.
+No private rows or attribute values are emitted. The new file stays protected
+and immutable after success OR failure; no cleanup/unlock is performed.
+
+Success requires known actual exit0 AND the original returned post-context
+`closed_offline_new_inode_only` summary with matching protocol/code, genuinely
+issued helper-closure hash, original9 seal/raw, fixed denied challenges and
+zero external seam counters. There are no invented persistent report controls;
+actual terminal safe stdout is authenticated separately. Nonzero/unknown
+termination or any mismatch vetoes closure. Even success establishes only
+this prospective publication primitive, not historical repair, source/coverage/
+denominator/input qualification or permission to dispatch an unfrozen runner.
+
+Frozen proof protocol SHA256
+`92a899007f297c9297e7310b78be1936dc5e8c1595fd385e7d55f1b04bd38476`;
+immutable helper policy SHA256
+`ba4a3704b64d59add1e833efbc8c9c38231308e9e45e113977563805fbd3ff59`;
+exact60-path list SHA256
+`fe25a1e2f121012d77b2d23dc2689388aec35adc2d702b3c27b304ca378ad788`;
+current60-byte mapping SHA256
+`7eedbe9e496c345f3a400860f36bb13ea73748de351b764ac32b2c98a17f3947`.
+Runtime exact clean HEAD is bound AFTER commit, not self-referenced here;
+matching tracking/actual Short Interest origin remainsD50. No actual proof,
+provider/key/claim/START/charged byte or QC/Safari/Mia access has occurred.
+
+### 125.6 Source-only prospective count plan, not an operational permit
+
+**SI-DEC-20261025-06**, under SI-AUTH-20261025-01, implements the new pure
+`native_count_recovery_budget.py` without changing the old81,876 ledger or
+any claim/protocol/receipt. Its exact typed baseline ledger SHA isb3a8… from
+124.18; source ticket mappings and retained provenance derive67885 missing
+positions,133 chunks, final301/317 and the new84,005 arithmetic. Prior spent
+attempts count toward the conservative three-total-tries bound. Policy SHA256
+is `1e6e5191c35f5dff01592ff5964b77cf13b6bd9017c7226ff475fc10882852c6`.
+
+Factory-bound plans and one finite coordinator per baseline-policy prevent a
+fresh mutable object from resetting allowance. The checked single-caller
+skeleton atomically appends full2MiB reservations and permanently stops on an
+entered failure. It has NO release/refund/durability boolean, actual START/
+HTTP observation, claim, source-held loader or dispatch authority. Therefore
+it cannot itself complete the remaining retrieval by retaining every page
+forever; a later authenticated receipt/raw durability and operational closure
+adapter is required before dispatch. This honest limitation is not source
+qualification or local readiness. Toy8-anchor genuine typed factories, not
+actual data, validate this software slice; actual baseline debt is not reset.
+
+Delegated development evidence, not Main reruns or Claude review: helper37new
+plus50unchanged creator tests87/.67s; causal flag-boundary removal1fail/.13s,
+same-original post-close stamp removal1fail/.08s, terminal-issuance removal
+1fail/.09s, all memory-only/restored. Budget35 plus9unchanged import checks
+44/1.73s; byte-gate reversal2fail/.12s and latch reversal8fail/.27s restored.
+Independent development peer's final fabricated helper/driver59/5.32s at
+the frozen pre-registration-literal bytes, OS network denied, real kernel
+setting disabled. Its first system-interpreter launch lacked pytest and ran
+no tests; an earlier loaded-byte run is not final evidence. Main changed only
+the PENDING registration literal afterward. No full suite or empirical result.
+
+### 125.7 Checkpoint validation and registered actual-proof harness
+
+Main read the complete new production/test pairs and original custody/closure
+contracts. After protocol freeze, the six-file focused helper/driver/budget/
+original-creator/import/record selection plus three selected active-document
+checks passed **176tests in6.95s**, no skips/warnings, empty inherited
+environment and OS network denied. A later test-fixture-only adjustment makes
+the backdated clock reversal specifically causal rather than relying on a
+second incidental clock reset; production bytes are unchanged. Main's
+memory-only removal of the final original-parent sweep produced1expected
+missing-refusal failure/.49s. Restoring unchecked hold-loop samples produced
+2expected missing-refusal failures/.29s. No source file was reversed on disk;
+fresh-process restored verification follows before commit.
+
+Exact AST transitive closure is60 paths, including package initializers;
+new pure budget/test code and all new proof/helper tests compile in memory.
+Every literal own contract is covered by its fixed diagnostic catalogue.
+No original source/capture/custody/helper or shared document changes. Historical
+record bodies, including complete Claude123, are preserved; only current status
+and this appended125 change. Fabricated validation is not real kernel/source
+proof, empirical testing or Claude acceptance.
+
+The separately frozen actual wrapper policy is
+`si-offline-kernel-metadata-proof-harness-v1`, SHA256
+`a23b34f682eda3a88e272dfc9d07f7b185f7d8c944d4ea5235345d894c405165`.
+It binds the exact125.5 protocol/60-file mapping, one186-byte new inode,
+120seconds/no retry and zero source replay/claim/key/HTTP/START/bytes.
+Python provider sockets/DNS/exact credential/capture entrypoints are denied
+and counted. Subprocesses are restricted to exact designated-root lane Git
+root/status/matching-origin/current60-blobs/check-ignore commands. Real fixed
+Darwin fchflags/fchmod/write-open/fsetxattr primitives are NOT replaced or
+blanket-denied, so a wrapper denial cannot masquerade as the required kernel
+EPERM challenge results. The wrapper accepts only original post-context closed
+status, exact authorities/protocol/code and zero denied-seam attempts; actual
+exit0 remains mandatory. It prints only safe aggregate hashes/fixed diagnostics.
+It creates no persistent report controls or extra probe namespace. Main must
+freeze all agents, verify clean committed runtime and actual matching origin,
+then invoke ONCE; never repeat the stored command. No actual invocation at
+this entry, no QC/Safari/Mia access, no interim push.
+
+Fresh-process Main restored verification after the causal fixture correction:
+the same focused/three-active-doc selection **176passed in5.93s**, no skips or
+warnings, network denied. The earlier176/6.95s remains separately attributed.
+All development agents are completed/frozen; no actual operation or test
+session is active. Only the seven declared new-round paths may be staged.

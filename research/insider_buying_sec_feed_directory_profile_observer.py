@@ -23,10 +23,12 @@ from research import insider_buying_pilot_sec_parent_audit_runner as base
 
 SELF_PATH = "research/insider_buying_sec_feed_directory_profile_observer.py"
 TEST_PATH = "tests/test_insider_buying_sec_feed_directory_profile_observer.py"
-SCHEMA = "insider-sec-feed-directory-profile-observer-v1"
-AUDIT_ID = "ib-sec-feed-directory-2021q2-profile-observation-20261025-once"
+SCHEMA = "insider-sec-feed-directory-profile-observer-v2"
+AUDIT_ID = "ib-sec-feed-directory-2021q2-profile-observation-v2-20261025-once"
 LANE_ROOT, LANE_BRANCH = base.LANE_ROOT, base.LANE_BRANCH
-EMPTY_CACHE_PREFIX = "/var/empty/insider-sec-feed-directory-profile-no-bytecode"
+EMPTY_CACHE_PREFIX = "/var/empty/insider-sec-feed-directory-profile-v2-no-bytecode"
+PRECEDING_OBSERVER_HEAD = "20e5dbfc7c3b640b9f3054273767a330ea61883f"
+PRECEDING_OBSERVER_SOURCE_SHA256 = "807512fc7f9f13883acb26238b62e45a9ff9ec25e3afde8fb9f07e1958cb15c8"
 PRODUCER_HEAD = "6011ae9d561fb7308249c55677055e4fa62c1150"
 PRODUCER_SOURCE_SHA256 = "c04c226f77e7dde3a94d31b83c23abea25e736997bf624caf49801da166e66a4"
 PRODUCER_TEST_SHA256 = "8bfa62da7376162a823cdb03e99b135b84c9ef57bcf92ee7c5849643cbb976b2"
@@ -66,6 +68,10 @@ ACTUAL_PINS = CapturePins("1590c2723a1f0745247791116dddada391708819cd50c713bb3a6
     "fa08fe5fefb4f4514a71e2c0192614dd649b05285e9050d1986e134fa602775c", 8695,
     PRODUCER_HEAD, 106, "eaa86f0d7384a3103cac3c0c2e7203e9d351f074b10bc40091b8988213cebb54")
 REGISTRATION = {"schema": SCHEMA+"/registration", "audit_id": AUDIT_ID,
+    "preceding_observer_execution_head":PRECEDING_OBSERVER_HEAD,
+    "preceding_observer_source_sha256":PRECEDING_OBSERVER_SOURCE_SHA256,
+    "preceding_observer_disposition":"parent-observed source_identity_refused before launcher/audit hook/retained inputs; no observation payload",
+    "preceding_observer_failure_rewritten":False,
     "producer_audit_id": producer.AUDIT_ID, "producer_execution_head": PRODUCER_HEAD,
     "producer_source_sha256": PRODUCER_SOURCE_SHA256, "producer_test_sha256": PRODUCER_TEST_SHA256,
     "complete_sha256": ACTUAL_PINS.complete_sha256, "response_sha256": ACTUAL_PINS.response_sha256,
@@ -318,7 +324,10 @@ class _Guard(base._ParentGuard):
 
 
 def _committed_identity(head):
-    identity=base.custody._identity(head);own=base.custody._source_bytes(LANE_ROOT,(SELF_PATH,TEST_PATH))
+    identity=base.custody._identity(head)
+    # Loaded/static Python closure binds modules, not their TEST_PATH literals.
+    # Bind both producer images explicitly before its unchanged validator runs.
+    own=base.custody._source_bytes(LANE_ROOT,(SELF_PATH,TEST_PATH,producer.SELF_PATH,producer.TEST_PATH))
     for name,digest in own.items():_need(_sha(base.custody._git(LANE_ROOT,"show",head+":"+name))==digest,"profile_uncommitted_source")
     sources={**identity["source_sha256"],**own}
     identity=_identity({**identity,"source_sha256":sources,"source_inventory_sha256":_sha(_raw(sources))});_current(identity)

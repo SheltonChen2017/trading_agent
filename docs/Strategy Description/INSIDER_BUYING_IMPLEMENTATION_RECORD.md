@@ -33094,3 +33094,161 @@ Commit these four images/registrations clean, then freeze ALL writers for
 No new directory request, archive download, native dataset query, QC project/
 notebook/job, strategy launch, outcome look or backtest is activated here.
 No final push yet; continuous work remains authorized after these checks.
+
+## 243. First profile-reader front refused before retained input (2026-10-25)
+
+Main committed239–242 and both qualified pairs in ALREADY-EXISTING clean
+`20e5dbfc7c3b640b9f3054273767a330ea61883f`; final record/active-document checks
+were72 passed1.46s and staged diff checks passed. All writers were frozen.
+240's one offline observation attempt exited1 at `_committed_identity` →
+unchanged producer `_source_identity`, fixed code`source_identity_refused`.
+The failure preceded command construction, child launch and retained response/
+control access; it is NOT an observed foreign profile, second Q2 request,
+archive download, authentication call or corpus-absence finding. No complete
+observation/result digest was produced and no total application wall span was
+measured. Source/Git preflight reads are not mislabeled retained input reads.
+
+`IBFEED-PROFILE-OBS01` P2 **OPEN**: the actual reader front does not yet traverse
+its current source-roster validator. Apparent cause to verify with a meaningful
+actual-shaped fixture: inherited current closure includes loaded producer
+source but not the producer test path, whereas its reused validator requires
+both; the prior synthetic identity supplied both and did not test construction
+from the real front. Preserve20e5dbfc's exact failed source in Git and all
+executed producer/stopped-reader/helper bytes and original private artifacts.
+Current delegated engineering authority permits a corrected, explicitly
+versioned offline reader after red/green and source qualification. Register
+its separate observation before use; never retry the consumed Q2 GET or
+pretend this failed observer completed. This is an implementation correction,
+not a new owner approval requirement or permission to weaken the validator.
+
+## 244. Official authentication succeeds; independent receipt replay (2026-10-25)
+
+241's ONE authentication POST executed on the same ALREADY-EXISTING CLEAN
+`20e5dbfc7c3b640b9f3054273767a330ea61883f`, writers still frozen. Fixed isolated
+`-I -S -B` interpreter inherited existing configuration; native direct
+`/usr/bin/security` execution was effectively denied. Genuine full source/
+control preflight preceded permanent namespace/reservation/read intent, then
+one `from_env` read, validated completion and durable request-start. Transient
+signature was generated after source/custody checks immediately before raw
+transport. Observed one transport invocation, HTTP200, qualified boolean
+authentication_success=true, safely retained16B body; CLIexit0. No full CLI
+duration measured; source-check/polling waits are not transport timing claims.
+No credential/header/account value or persistent credential fingerprint was
+printed or retained. No project, data, notebook, agent, job or backtest API.
+
+| Actual authentication evidence | SHA256 |
+|---|---|
+|complete report|`a521f6e3806bf531c8cbee122f93c37449a8430cab0214503ac70125fe663c24`|
+|strict16B original status body|`c955e57777ec0d73639dca6748560d00aa5eb8e12f13ebb2ed9656add3908f97`|
+|106-source execution inventory|`9dfccbef17249a0c7504e0df51fb4e1677243dcd5f45f22c884a0990a4582510`|
+
+241's independent readback ran ONCE on20e5dbfc, exit0/stderr0, observed guarded
+parent span6.017096417s. Initially native network/fork/ALL-write/security-exec-
+denied SECRET-FREE child replayed exact typed reservation/intent/credential-
+read-complete/start/status/framing/body/result/complete/inventory. Required
+static/loaded source closure passed before actual artifact access; trusted
+parent independently checked clean full Git/source identity before/after.
+Worker stdout1,235B SHA
+`f9b284e228ad3160b074e052f88d394698c051335ce9a038b8b53711743e3658`;
+public resultSHA
+`05526c6f9945b0d8e937953aa888b620314ec9ba6f751563aa8a9796f0572f8a`.
+Readback credential/provider/platform-data/project/job/look/backtest counts
+were zero. The original one-shot namespace is permanently consumed; do not
+repeat authentication merely as another preflight.
+
+Authentication establishes ONLY that configured official authentication route.
+It is not paid node/storage/agent/data entitlement, a verified CIK/SID/listing
+mapping, historical prices, source/PIT/rights/canonical readiness or a completed
+backtest. No candidate launch attempt or outcome look was spent. Existing
+owner QC/Mia authority remains scoped by actual evidence; no routine approval
+is sought. Continue genuine source/identity/price qualification and the
+supported cloud-only diagnostic route; no checkpoint push or automatic
+monitor rearm. Six carried P2s remain OPEN plus243's local reader finding.
+
+## 245. Corrected v2 offline profile front; prospective registration (2026-10-25)
+
+243's apparent cause is CONFIRMED by a genuine `_committed_identity` regression:
+an invented loaded-module-shaped closure omitted the producer test, triggering
+the unchanged producer validator's exact`source_identity_refused` before the
+fix. Corrected construction explicitly reads/current-hashes and Git-byte-
+checks all FOUR observer/producer source/test images before that same validator;
+worker/parent current/frozen rechecks continue unchanged. No weaker validator
+or fabricated source count is substituted. Frozen/producer/stopped-reader/
+auth images remain unchanged; preceding failed reader bytes are retained at
+20e5dbfc, not retroactively relabeled completed.
+
+Register a separate ZERO-REQUEST read-only observation
+`ib-sec-feed-directory-2021q2-profile-observation-v2-20261025-once`, fresh v2
+schema/cache prefix, exact preceding head/source/failure lineage in registration.
+Only239's same pinned controls/body may be read under240's native/IPC/source
+controls. No repeated GET, archive fetch, prior claim reset or producer widening.
+All writers freeze after clean commit and before this corrected observation.
+
+| Corrected image | Bytes | SHA256 |
+|---|---:|---|
+|observer source|23,553|`72545fc8c431ba8035e31d0cc8051505a4f41cfb6da3673cc809bac05573a487`|
+|observer tests|20,571|`dc7e237cecdd24c784cf706153317f278ddcaa6442ba079fbf146d8551ae68ac`|
+
+Attributed author evidence: three meaningful memory front reversals produced
+3 reds (missing explicit producer-test binding, bypassed Git byte proof,
+bypassed current bound producer recheck); restored316 focused passed4.44s.
+Strong-native eight-image memory compilation/denial passed0.595s. Read-only
+Codex peer/main inspected the exact diff; no actual retained body/control or
+provider/QC input used. `IBFEED-PROFILE-OBS01` remains OPEN pending corrected
+actual front traversal; fixture green is not that observation or readiness.
+
+## 246. Mia advisory and existing QC resources, no data execution (2026-10-25)
+
+Under the owner's explicit permission to consult Mia when QC/Safari issues
+arise, main used only existing Insider project37465795. Mia remained in
+**Ask Before Edits**; new prompt explicitly authorized advice/doc search only,
+forbidding files/commands/cells/datasets/Object Store/agents/builds/launches/
+optimization/backtests/permissions/purchases and old SDK/count-probe activation.
+Mia visibly completed with documentation-search tools and attributed claim
+that nothing was edited/executed/fetched from the project. No requested edit
+or launch was approved. That claim is attributed advisory evidence, not a
+cryptographic comparison of project sources.
+
+Main independently observed the project's read-only Resources panel listing
+R1-4 Research and A1-1 Assistant families plus two B2-8 backtest nodes. This
+is visible inventory, NOT proof of current free capacity, Object Store create
+permission/quota or a completed Research/data operation. No node was selected,
+added or bought; no live resource operated. After Mia's chat completed,
+the existing same-owner Request Edit Control action returned **You have edit
+permission**, removing the collaborator editor lock without granting a new
+recipient access. Existing source/notebook/JSON preview was not changed or
+executed. Old SDK and ten-leaf namespaces remain preserved and unactivated.
+
+Mia and independent [official Research documentation](https://www.quantconnect.com/docs/v2/cloud-platform/research/getting-started)
+support selecting/running one cell, not Run All. Do not accept Mia's implication
+that the visible collaboration lock requires new organization permission:
+the same-owner control actually resolved it. [Official MCP requirements](https://www.quantconnect.com/docs/v2/ai-assistance/mcp-server/key-concepts)
+describe paid Agent capacity, separately from Research; no enabled connector
+or new security grant was configured. No undocumented direct REST Jupyter
+endpoint is inferred from authentication success. [Official Object Store
+documentation](https://www.quantconnect.com/docs/v2/research-environment/object-store)
+requires storage-create permission; a same-node readback is not fresh-node
+persistence proof. Existing-key saves overwrite, so presence-check-plus-save
+is NOT atomic create-if-absent. Keep future dataset/reference evidence in
+cloud, return only own-source/control acknowledgements, and do not follow
+Mia's suggested delete as part of immutable one-shot custody.
+
+Opening the existing project displayed an automatic Cloud Terminal build
+status for default non-algorithm main.py, LEAN2.5.0.0.18203/Idfb4ed9-a195e1.
+Main did not click compile/build/backtest/debug/optimize/live controls; this
+display is not an observed strategy/candidate run or spent launch attempt.
+No data query, cell execution, Object Store write, source upload, outcome look
+or backtest occurred in this UI advisory/resource/edit-lock inspection.
+
+### 246.1 Corrected observer final validation before activation
+
+Main OBSERVED572 passed6.98s, the same explicit ten focused targets242 on
+the corrected245 pair and unchanged auth/client/producer helpers. Initial
+native process-tree network/security-exec/lane-write denial, SECRET-FREE
+isolated tests and invented external temporary fixtures applied; no full
+suite. Main separately proved native network/fork/ALL-write/security-exec
+denial and rehashed/compiled all EIGHT observer/old-helper images in memory
+in0.595952042s; exact245 source/test hashes and frozen previous helper hashes
+passed. Final record/active-document and diff checks follow this append;
+commit then freeze ALL writers before245's one corrected observation. No
+actual profile/controls were read by this validation. No interim push.

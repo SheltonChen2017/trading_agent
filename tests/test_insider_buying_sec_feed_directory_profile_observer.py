@@ -269,6 +269,53 @@ def test_parent_failure_does_not_launch_or_read_capture(monkeypatch):
     with pytest.raises(m.DirectoryProfileError):m.run_actual_observation("d"*40)
 
 
+@pytest.mark.parametrize("fault",("none","producer_git_mismatch","producer_drift"))
+def test_committed_front_binds_producer_test_absent_from_real_shaped_loaded_roster(monkeypatch,fault):
+    names=(m.SELF_PATH,m.TEST_PATH,m.producer.SELF_PATH,m.producer.TEST_PATH)
+    raw={name:(m.LANE_ROOT/name).read_bytes() for name in names}  # Public source images only, never artifacts.
+    hashes={name:m._sha(value) for name,value in raw.items()}
+    # Static/loaded Python closure includes the producer module, not its test.
+    loaded={name:hashes[name] for name in (m.SELF_PATH,m.producer.SELF_PATH)}
+    identity={"root":str(m.LANE_ROOT),"branch":m.LANE_BRANCH,"head":"e"*40,"clean":True,
+        "source_sha256":loaded,"source_inventory_sha256":m._sha(m._raw(loaded))}
+    reads=[];git_reads=[]
+    monkeypatch.setattr(m.base.custody,"_identity",lambda head:copy.deepcopy(identity))
+    def source_bytes(root,requested):
+        assert root==m.LANE_ROOT;requested=tuple(requested);reads.append(requested)
+        if requested==tuple(m.base.FROZEN):return m.base.FROZEN
+        fixed={**m.producer.REUSED_HELPER_SHA256,m.producer.SELF_PATH:m.PRODUCER_SOURCE_SHA256,
+            m.producer.TEST_PATH:m.PRODUCER_TEST_SHA256}
+        if requested==tuple(fixed):return fixed
+        assert set(requested)<=set(hashes)
+        value={name:hashes[name] for name in requested}
+        if fault=="producer_drift" and len(reads)>1:value[m.producer.TEST_PATH]="0"*64
+        return value
+    def git(root,*args):
+        assert root==m.LANE_ROOT and args[0]=="show";head,_,name=args[1].partition(":")
+        assert head==identity["head"] and name in raw;git_reads.append(name)
+        return raw[name]+b"# invented mismatch" if fault=="producer_git_mismatch" and name==m.producer.TEST_PATH else raw[name]
+    monkeypatch.setattr(m.base.custody,"_source_bytes",source_bytes)
+    monkeypatch.setattr(m.base.custody,"_git",git)
+    if fault!="none":
+        with pytest.raises(m.DirectoryProfileError,match="profile_uncommitted_source" if fault=="producer_git_mismatch" else "profile_current_or_frozen_source_changed"):
+            m._committed_identity(identity["head"])
+        return
+    result=m._committed_identity(identity["head"])
+    assert set(names)<=set(result["source_sha256"])
+    assert {m.producer.SELF_PATH,m.producer.TEST_PATH}<=set(git_reads)
+    assert any({m.producer.SELF_PATH,m.producer.TEST_PATH}<=set(row) for row in reads[1:])
+
+
+def test_corrected_observation_is_fresh_v2_and_preserves_exact_preceding_failure():
+    assert m.SCHEMA=="insider-sec-feed-directory-profile-observer-v2"
+    assert m.AUDIT_ID=="ib-sec-feed-directory-2021q2-profile-observation-v2-20261025-once"
+    assert m.REGISTRATION["preceding_observer_execution_head"]=="20e5dbfc7c3b640b9f3054273767a330ea61883f"
+    assert m.REGISTRATION["preceding_observer_source_sha256"]=="807512fc7f9f13883acb26238b62e45a9ff9ec25e3afde8fb9f07e1958cb15c8"
+    assert m.REGISTRATION["preceding_observer_failure_rewritten"] is False
+    assert m.ACTUAL_PINS.execution_head=="6011ae9d561fb7308249c55677055e4fa62c1150"
+    assert m.REGISTRATION["new_provider_requests"]==0 and m.REGISTRATION["original_namespace_mutated"] is False
+
+
 def test_cli_refusal_is_fixed_and_secret_free(monkeypatch,capsys):
     monkeypatch.setattr(m,"run_actual_observation",lambda _:(_ for _ in ()).throw(ValueError("PRIVATE")))
     assert m.main(["--expected-head","d"*40])==2

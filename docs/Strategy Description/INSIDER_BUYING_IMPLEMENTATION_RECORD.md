@@ -32311,3 +32311,249 @@ and stopped pytest initialization; no source/provider input was reached;
 the corrected native policy produced the reported runs. Test fixtures never
 gain real selection authority. Every new actual operation follows ONLY after
 this clean committed activated image and all lane writers are frozen.
+
+## 230. Observed first64 input preflight, capture and independent readback (2026-10-25)
+
+All three operations below ran on ALREADY-EXISTING CLEAN
+`1bb03b8ee44088cad82872c12a6cd7f38e9ef961`, with every repository writer
+frozen. No later source/record commit is represented as existing during them.
+The matching origin remained`41d729aff80752cdc1ad6ef73690d9c59711d712`
+when fetched again after the readback; exact designated root/branch/HEAD and
+clean status were reverified before releasing writers.
+
+The separately registered
+`ib-pilot-sec-first64-input-preflight-20261025-once` succeeded: guarded
+launcher elapsed29.137174s, exit0/stderr0, resultSHA
+`a8c1cd69af3e629d39713c607ac11845dda244c50c7c5dfa8cfc500598f6feba`.
+It genuinely held all84 intake leaves, independently checked the current2021Q1
+master and exact228 selector controls, and found ZERO prior-consumed
+accessions among the64 selected. Source inventorySHA
+`908600f5c405dcc4fe21c7a77c7c1bb58e9c3d98be8dd8fd02d3b3beefaa284a`.
+The initially native network/fork/ALL-write/direct-security-exec-denied child
+did not create a namespace or access contact, credentials, provider, QC or
+outcomes. Trusted launcher Git identity before/after matched; the child did
+not pretend to run Git under fork denial.
+
+The NEW registered capture
+`ib-sec-pilot-2021q1-first64-20261025-once` then actually exited0 with
+`capture_completed_without_refusal=true`. It created64 permanent accession
+claims,64 starts and64 terminal result records;64 complete HTTP200 raw bodies
+were retained, all64 header-bound, zero header quarantines, zero unattempted
+suffix. Total retained RAW body bytes: **650,349**. Exact complete reportSHA:
+`a407d79f06e8257a9a7344a8a64398547e0e51209eae169e4acaa58b92839749`.
+No retry, redirect, proxy, broadened target, prior consumed accession or old
+root write occurred. Contact came from the owner's connected Gmail profile,
+privately passed through echo-disabled stdin only AFTER reservation. That
+identifying contact was not printed, persisted or hashed; no API credential
+was requested by the SEC capture. The64 observed requests are ACTUAL execution
+counts, not the zeros in the inert promotion-authority map.
+
+Registered independent readback
+`ib-pilot-sec-first64-capture-readback-20261025-once` succeeded under INITIAL
+native process-tree network/fork/ALL-write/security-exec denial. Guarded
+launcher span2.589388s, exit0/stderr0; worker stdout1,158B/SHA
+`c97c2b2236000d1143876810781ce70a228207e086143d8e305e20e604b0f46b`.
+It rehashed/replayed the exact report, reservation, selection, claims, starts,
+results, full raw bodies and header dispositions; continuously checked the
+private namespace and current/frozen source bytes; and reproduced ALL counts
+above. Trusted parent independently rechecked clean Git/source identity before
+and after. No new provider request, credential, QC access, outcome look or
+backtest occurred in the readback.
+
+This is successful bounded acquisition and HEADER binding, not full ownership
+XML/financial projection, exact historical availability/authenticity,
+canonical admission, rights, full-pilot coverage or backtesting readiness.
+The19,852 OLD structurally qualified pilot candidates in226 remain a different
+evidence tier from these64 newly header-bound bodies. Neither changes the
+historical19,846 source-bound2022Q4-2023Q1 receipt. Before any later accession
+selection/dispatch, explicitly include this new permanent claim root and its
+header/schema request fields in a qualified, separately versioned exposure
+inventory. The successful first64 is not a new64-request approval ceiling.
+
+## 231. Observed QC resource access and advisory-only Mia consultation (2026-10-25)
+
+After228.1's independently observed Short Interest push and confirmed monitor
+pause, Safari reached the authenticated QC Researcher workspace and existing
+owned project37465795, `Adaptable Light Brown Pony`. Existing
+`research.ipynb`, main source and old native-count preview were visible.
+The old notebook cell was NOT executed or edited; no SDK draft/claimed
+namespace was activated. After opening the existing environment, Cloud
+Terminal reported a successful environment build: LEAN2.5.0.0.18203,
+build`ac9af6-a195e1` at displayed8:21:24, consistent with an automatic
+environment build. No explicit build/launch button was clicked. The displayed
+time alone does not independently bind its UTC date or executed source hash.
+This is an OBSERVED build-status message, not a claim of no compile activity,
+a strategy candidate launch, a completed backtest or a consumed outcome look.
+
+The owner's later express instruction permits Mia at ANY QC/Safari issue,
+without waiting for three failures. Selected Mia's tighter **Ask Before
+Edits** mode and sent an advisory-only public API question expressly forbidding
+edits, commands/cells, data requests/downloads, builds, backtests, optimization
+or launches. The response completed; UI showed a fundamental-company-data
+skill load but no approved edit/command/job. The notebook then displayed
+read-only/Mia collaboration and an ordinary Request Edit Control link. No new
+edit permission was granted and the old source was not intentionally changed.
+Before any future execution, independently compare the exact cloud source;
+Mia's statement that it did not edit is attributed, not a source hash proof.
+
+Mia suggested historical Fundamentals for CIK/share-class candidates and
+backward-only history. This is ADVICE, not executed data evidence. Independent
+official-document/source inspection established material qualifications:
+
+- Current public LEAN makes `Fundamentals` an obsolete alias of
+  `FundamentalUniverse`; official examples do not establish Mia's exact
+  symbol-free generic overload. Current Morningstar migration rebuilt history
+  and can leave retired fields that compile but throw when accessed. Bind the
+  ACTUAL engine/feed/runtime shape before using it; calendar labels alone do
+  not prove a09:28 ET pre-entry PIT observation.
+- Corporate CIK is not unique share-class identity. Preserve one-to-many native
+  SIDs, security-level identifiers and historical class/status evidence;
+  never reconstruct a historical security by today's ticker.
+- The smaller `qb.cik(cik,trading_date=...)` route scans the static security
+  database and native map files but FALLS BACK TO THE LAST MAPPED TICKER when
+  the requested date lacks a mapping. It does not check date-active listing
+  status; database-load failure can become an empty result. Thus neither a
+  returned Symbol nor zero candidates proves exhaustive historical eligibility
+  or contemporaneous CIK association.
+-253 prior listed regular-session opens require distinct actual backward-only
+  observations with fill-forward disabled and explicit timestamp/session
+  checks. IPO date, SID date, a SPY calendar,253 fundamentals or API success
+  cannot substitute. No such new native data diagnostic has run here.
+
+Primary references: [QC fundamental research](https://www.quantconnect.com/docs/v2/research-environment/datasets/equity-fundamental-data),
+[Morningstar migration](https://www.quantconnect.com/docs/v2/writing-algorithms/universes/equity/morningstar-migration),
+[official resolver](https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Securities/SecurityDefinitionSymbolResolver.cs),
+[native identifiers](https://www.quantconnect.com/docs/v2/writing-algorithms/key-concepts/security-identifiers).
+These public-source inspections are not an observation of this account's
+historical dataset capability. Routine engineering remains delegated; no
+Claude checkpoint or renewed QC owner hold is manufactured. Three unsuccessful
+launches per genuine candidate and documented Mia recovery remain binding.
+
+## 232. Next bounded qualification work; no fabricated corpus or purchase (2026-10-25)
+
+Continue building under the owner's current waiver/delegated judgment, with
+one final matching-lane push only at completed/blocked round end. Six carried
+topical/shared P2s remain OPEN exactly as219.2; none is closed by230. New work
+is Codex engineering, NOT independently Claude-reviewed.
+
+Register the additive read-only operation
+`ib-pilot-sec-locator-allforms-20261025-once`: qualify/commit its new pure
+batch and protected runner first, freeze writers, then scan the already
+retained ALL-FORM master once per affected quarter for228's exact12 quarantine
+rows. Bind the exact selector controls and all25 context master descriptors to
+the frozen82-entry master report/commit. No parent body, source ZIP, new
+provider request, credential or QC access. Preserve every physical duplicate,
+other-form alias and date contradiction; absence from the old Form4 parser
+must not be mislabeled absence from the full master/SEC. Trusted parent owns
+Git checks; all input reads occur in an initially native network/fork/
+ALL-write/security-exec-denied worker. Bounded raw-free stdout and strict IPC
+validation do not mint a genuine pure factory from serialized assertions.
+
+Public documentation identifies free SEC Feed/Oldloads archives as possible
+XML/header sources, and a smaller sec-api.io Form4 archive advertises original
+ownership XML plus timezone-offset EDGAR-acceptance `filedAt` metadata. The
+canonical source policy requires exactly complete PRIMARY ownership XML plus
+acceptance metadata; it does NOT inherently require a separate full-parent
+HTTP GET for each accession. An additive archive adapter may therefore be
+qualified without weakening or relabeling frozen full-parent custody.
+Commercial catalogue/terms/sample/entitlement and2026March tail completeness
+remain UNVERIFIED; no account was created or purchase made. Its ticker
+metadata must not be promoted to historical PIT identity. No new purchase is
+recommended on documentation alone. Free daily all-form archive volumes are
+potentially substantial; advertised directory sizes are not measured body
+transfer or proven corpus coverage.
+
+Register ONE new SEC metadata-only qualification
+`ib-sec-feed-directory-2021q1-20261025-once`, fixed URL
+`https://www.sec.gov/Archives/edgar/Feed/2021/QTR1/index.json`. Qualify and commit
+new source/tests before any request. One GET only,512KiB complete-response
+bound,30-second absolute deadline, exclusive permanent canonical-URL claim
+and fsynced start, private contact AFTER reservation, no proxy/redirect/retry/
+fallback/archive follow. This is NOT an accession/body dispatch or activation
+of an old scope. For a safe complete200 response, screen raw headers/body for
+contact BEFORE hashing, retain untouched bytes BEFORE candidate-profile
+parsing, then stop if the genuine JSON shape is unknown. Such refusal permits
+later OFFLINE qualification of the retained bytes, not URL redispatch. Non200
+bodies remain unread. Directory size units/mtime semantics remain explicit
+unknowns until evidenced; an omitted date is not proof no filing exists.
+Register its independent exact readback under initial native denial. No
+archive payload or overlap policy is exercised by this directory-only step.
+
+Before ANY future bulk-body acquisition, explicitly dispose of incidental
+already-consumed members versus accession-specific redispatch, retain an
+overlap ledger, and preserve every original claim/ambiguous start. A different
+URL alone is not permission to retry an accession. Before any new native
+QC identity diagnostic, register a fresh exact runtime/source/output scope
+with durable evidence; do not run an ephemeral throwaway probe that cannot
+retain the identity evidence needed later. No such cell is activated here.
+
+Preserve the original82-quarter study and separate2021-2025 pilot economics,
+both earnings diagnostics, all refusal/underfill accounting and actual
+source/identity/rights/protocol/look gates. No new actual operation above has
+occurred at this registration entry. No strategy job/outcome/backtest or
+funded/paper/live/broker/capital/order action is included.
+
+### 232.1 Exact candidate images and preactivation validation
+
+| New image | Bytes | SHA256 |
+|---|---:|---|
+|`research/insider_buying_pilot_sec_locator_diagnostic.py`|35,734|`bff214f14b25ac5916c489d880179b48b6215f994f7b2ca4c895c1a1d4ac8306`|
+|`tests/test_insider_buying_pilot_sec_locator_diagnostic.py`|19,357|`14a2d00ce5faf471299fd0f07db83f6e2a73d90a6066e9af78ca87368e637b3e`|
+|`research/insider_buying_pilot_sec_locator_diagnostic_runner.py`|23,979|`18e9e7a2fd20f27b0d846dbe44d31d5301706d3f414f19f3b91eafb9798c43ea`|
+|`tests/test_insider_buying_pilot_sec_locator_diagnostic_runner.py`|20,339|`36352640b87fc5cf3f22b17cb5aef0c198fda1ac0793e3f72eef28e10f26482a`|
+|`research/insider_buying_sec_feed_directory_inventory.py`|32,302|`c40fb29f3cb01fe0d27dc7305db8c41f87df2439e31151572d20bb0337b2199f`|
+|`tests/test_insider_buying_sec_feed_directory_inventory.py`|16,166|`6abc8a6cee7f8e5a538f2f22036953151c7151ad0f81de00fbfd74575390a80e`|
+
+The locator worker supplies lossless PUBLIC metadata-control witnesses for
+the exact selector3 controls and masters-v3 commit/report. Parent independently
+reconstructs/re-hashes the externally pinned controls, derives the exact12
+quarantine membership and25 master descriptors, and validates their diagnostic
+crosslinks. It opens no original input path, decodes no raw master/ZIP/parent,
+and never remints a genuine factory from IPC assertions. Witnesses are stripped
+from public return only AFTER validation; original worker stdout bytes/SHA
+remain separately measured. Thus232's raw-free output means no raw master,
+filing ZIP, ownership financial body or private account data; bounded original
+public metadata controls may cross the trusted IPC boundary for verification.
+
+Prospective corrections are CLOSED BEFORE ACTUAL ACTIVATION, not retrospective
+claims that a real operation failed or that a topical evidence gate closed:
+
+| Finding | Severity/disposition | Actual proof and limitation |
+|---|---|---|
+|`IBLOC-PRE01` Parent initially trusted diagnostic labels without independently rooting exact row/descriptor membership.|P3 CLOSED.|Exact externally pinned selector and master-control witnesses now root both inventories. Author's five memory-only reversals each triggered the intended negative (membership, master witness, final current source, typed zero, genuine factory). No actual artifact/operation was used in these tests.|
+|`IBFEED-PRE01` Private runner mode front did not independently reject production/fixture callback substitution.|P2 CLOSED.|Two genuinely failing invented regressions before the correction; fixed mode/root/transport/contact and genuine durable-start context checks precede dispatch. Native denial protected every test.|
+|`IBFEED-PRE02` Rehashed controls could exploit Python bool/int equality.|P3 CLOSED.|Four failing coherent-control negatives; typed counts plus exact canonical expected control bytes now refuse.|
+|`IBFEED-PRE03` Strict UTF8 screening discarded a safe complete unknown-format response before opaque retention.|P3 CLOSED.|One failing invented invalid-UTF8 response now remains original-byte opaque after privacy/framing qualification. Finite Latin1/UTF8/valid UTF16LE/BE/UTF32LE/BE screening views catch tested multibyte echoes BEFORE header/body hashes or retention; this is not an arbitrary-encoding privacy guarantee.|
+|Directory transport-front invocation/deadline accounting and one exception-swallowed test tripwire.|P3 CLOSED within the unexecuted candidate.|The deadline bounds only the actual raw transport, not preceding custody checks; a pre-transport local refusal is not falsely journaled as a measured HTTP invocation. Hash-input assertions are checked after the intended privacy handler rather than swallowed inside it. No actual request was made.|
+
+Main OBSERVED **1,050 passed in32.48s** on an explicit19-target focused
+selection: the three new test files; existing pilot capture/selection/roster/
+exposure/audit/readback/structure contracts; unchanged complete-submission and
+quarterly-master contracts; lane import boundary, implementation record,
+active documents and EXACT
+`tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports`.
+Initial native process-tree network/direct-Keychain-exec/repository-write
+denial, minimal isolated environment, no bytecode/cache or plugin autoload;
+only owned outside-lane invented test directories writable. No complete lane
+or repository suite. Main's separate initially native network/fork/ALL-write/
+direct-security-exec-denied source-only proof compiled all SIX exact images
+in memory, passed effective denial probes and reported the table hashes in
+0.507476334s. No actual source artifact/provider/account/QC access in either.
+
+Attributed Codex subagent evidence: locator217 focused checks passed18.17s;
+feed120 passed3.19s, four corrected memory reversals produced10 expected reds
+and restored120 greens; both authors separately passed initial-native strong
+source-only proofs. Initial feed7 regressions were corrected before activation.
+An initial in-memory mutation harness did not share the target module globals;
+its native-denied failure was a harness issue, not an actual source request.
+Read-only peer QA accepted the exact final source images; it ran no tests or
+actual inputs and is NOT independent Claude review.
+
+After the qualified sources/this registration are committed clean, freeze
+ALL writers for232's actual locator diagnostic and the single directory
+request. Register directory readback
+`ib-sec-feed-directory-2021q1-readback-20261025-once` under initial native
+network/fork/ALL-write/direct-security-exec denial; trusted launcher separately
+checks clean Git/source identity before/after. No new directory request,
+archive download, locator diagnosis or native QC data call has yet occurred
+at this source-qualification entry. No final push yet.

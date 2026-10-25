@@ -812,7 +812,7 @@ prior readiness-only boundary has concluded. The new launch/result
 contract and six-cell public specification preceded A12. A12 actually launched
 and failed the fresh-price guard on2021-02-22; it is now SPENT, with no accepted
 performance cell. A13 then stopped during access metadata before any mutation,
-compile or job; it too is SPENT. Current floor331/256/50/699. Section323.6–10
+compile or job; it too is SPENT. Current floor332/257/50/699. Section323.6–10
 owns retained failure evidence and the completed read-only Mia consultation.
 The separately frozen current-access observation in323.12 passed the unchanged
 owner-only policy; its use is now SPENT. No permission change or historical
@@ -825,9 +825,12 @@ lane's environment unchanged in the UI. A16 passed fresh access/source/compile
 checks and launched, then failed the strict RAW-reference census on2022-10-24;
 its one detail read refused the complete decoded response's canonical size.
 A16/F are SPENT. Section323.22 records that failure and completed read-only Mia
-diagnosis. Next is a separately frozen failure-only RAW diagnostic plus a
-selected-response reader correction, then the consistent six/eight comparison
-only after a verified justified fix. No stale-price or dropped-holding bypass.
+diagnosis. A17's failure-only diagnostic/selected-response correction is frozen,
+but its sole use stopped on general collaborator count before any source/job;
+A17/G are now SPENT(323.25). Next reconcile the post-Mia current metadata
+without weakening actual ownership/permissions or replaying G, then continue
+the failure-only RAW diagnostic and consistent six/eight comparison only after
+a verified justified fix. No stale-price or dropped-holding bypass.
 One final push; no funded or paper/live deployment authority is inferred.
 
 Branch: `codex/strategy-analyst-revisions-v2`
@@ -2113,6 +2116,10 @@ versioned failure-only diagnostic and selected-response correction, not a
 guessed stale-price replacement. Then continue the consistent six-cell
 projection preserving current-data/side-price/cash/fee checks. Do not replay A12/A13/A14/A15/A16/C
 or remove the freshness guard to obtain a terminal success.
+The subsequent frozen A17 diagnostic stopped before mutation/job on current
+general collaborator representation(323.25); it is spent. First complete the
+separate H current-metadata observation(323.26), preserve the old access helper
+and decide a justified correction from authenticated evidence, not labels.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
 V3 is spent after its
@@ -58792,3 +58799,124 @@ occurred during implementation. Next invoke only the frozen one-use contract,
 record its actual result and preserve every failed control; no review wait or
 interim push. Future verified correction/family reconstruction still requires
 its own coherent technical/source/attempt contract, not renewal of this one.
+
+### 323.25 Actual A17 access refusal and scoped current UI reconciliation
+
+At clean52eb8956c5bbfe7b2f8e6f81402977b975b0c289, sole A17 parent ran
+2026-10-25T21:59:23.790868Z..21:59:36.075705Z, actualexit2/stderr0/no bound.
+Stdout755bytes SHAfbcb3c200ee9acac2bd4549e714ab60b5c181f0750c0495a65231cb66ea7710c.
+Native supplied-output validator21:59:36.076041Z..21:59:39.508384Z exited0/
+stderr0; authenticated FAILURE and outer2. Retained finite
+access_general_collaborators, stageprepare,2application intents/2returned
+responses, lastprojects/collaboration/read receivedtrue; compile/launch/
+terminalnull. A17/G/read budget are SPENT/frozen, no report success pin or
+result cell. No lock/source readback/update, compile/capacity/job/error-detail
+or RAW probe followed. Current cloud remains quote3735/b4ed and actual history
+manual+A12+A14+A16; do not invent an A17 job or call this a runtime failure.
+
+Book A17 claim once331/256/50/699 ->332/257/50/699. No new cell. This is
+attempt accounting, not evidence against the unexercised diagnostic source.
+The finite predicate alone does not identify raw rows or their count.
+
+Current authenticated Safari project38364439 panel separately showed exactly
+xiao chen(Owner), Codex ARV2 R298 A5 20261024 andMia. This is label evidence,
+not a full API row/UID/hash or proof every entry is an independent account.
+Opening the project from its terminal avatar implicitly allocated an editor
+and auto-built unchanged source: Lean2.5.0.0.18203, displayed10:00:40,
+shortaa2a25-3eb607. No manual build/backtest clicked. Clicking onlyMia's
+Remove User under standing scoped owner authority returned exact
+"Collaboration not found"; the entry remained. No successful deletion is
+claimed and the action was not retried. Owner/A5/other lanes were untouched.
+
+The panel's Request Edit Control was then clicked only for R298. The same
+panel visibly changed to "You have edit permission" and the active file no
+longer displayed Read-only; all three avatars remained. This reacquires the
+existing owner's editing control, not new data rights, account permission,
+source update, accepted access policy or formal lock-continuity proof. Official
+QC documentation distinguishes edit control for assistant/code environments
+from actual project membership:
+https://www.quantconnect.com/docs/v2/local-platform/development-environment/collaboration
+and lock acquisition for a named codeSourceId:
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/collaboration/lock-project.
+Neither source proves this particular Mia API row's identity/shape; fresh
+scoped metadata authentication remains required, not a generic label waiver.
+
+Clicked only R298's Close. The UI briefly said Saving files despite no content
+edit, then returned to terminal with R298 absent from Code Environments and
+the other lane's existing environment still present. These implicit platform
+effects are disclosed, not assumed no writes or source stability. Future
+full source readback must still match every pinned byte; no source editor,
+settings, other collaborator or job was deliberately changed. No new Mia task
+was started. Exact cause of persistent general metadata remains unresolved.
+
+ARV2E323-003(P2 operational) is the current access-representation barrier;
+old strict helper remains frozen. Next is one separately frozen read-only
+current post-Mia/access census after these concrete UI events, retaining only
+redacted field types, row/response/identifier hashes and finite known-label
+comparisons from two exact project/access requests. It grants no access or
+retry authority and cannot reopen any old control. Do not blindly add a
+third collaborator or refresh pins from labels. Preserve all source/security/
+formal/PIT/paper/live false flags. Continue safe scoped recovery without a
+routine permission/review wait; one final push remains pending.
+
+### 323.26 Prospective H read-only post-A17/Mia metadata observation
+
+Authorize ONE observe of the separately versioned post-A17 access caller at
+the clean commit containing this freeze and its exact caller SHA below.
+Control artifacts/analyst_revisions_v2/newrule_post_mia_access/R323-20261025-H
+is NOT inspected/allocated before use. This is a fresh current-state census
+after the completed Mia session, A17 refusal, failed scoped Remove User,
+successful owner edit-control UI change and R298 editor closure. It is not
+a repeat to make C/A17 pass or a forensic reread of their spent controls.
+No C/G/F or other historical operational entrypoint is invoked.
+
+Exactly one projects/read and one projects/collaboration/read request for
+project38364439, existing configured credentials, bounded120second parent,
+selected unchanged transport/source pins, new exclusive immutable claim and
+native supplied-output/actual-exit authentication. Only the fixed existing
+pure09705275 redactor runs on supplied responses, retaining scope, finite
+strict-policy predicate, project flag/types, bounded row field types, whole
+row/response/identifier hashes and known-label equality. No ownerID/account/
+email/credential value or raw response body is emitted. No private input/
+capture corpus, source readback or old artifact reread; no lock/update/upload/
+permission/compile/capacity/job/result/provider-data request. Sequential view
+observations are not an atomic/exclusive-session guarantee. Nonzero/unknown/
+partial observation stays spent and cannot be promoted to operational success.
+No new strategy look or result cell for this two-request metadata diagnostic.
+
+H must not auto-accept/refresh a new row or mutate the frozen strict access
+helper. UIDnull/Mia/mia-ai labels alone do not prove a synthetic entry or
+absence of an account; QC's own create-collaborator example usesmia-ai as a
+collaboratorUserId:
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/collaboration/create-project-collaborator.
+The failed deletion and completed Mia chat do not prove membership either.
+Any later representation correction needs a separate immutable explicitly
+justified contract/current row pins and regression coverage, direct use at
+all fresh guards, no production global monkeypatch. Actual dedicated owner/
+org/permission/idleness/privacy-contradiction/source/history remain binding;
+no synthetic/privacy/exclusive-lease or operational authority is inferred.
+
+H source scripts/observe_arv2_r298_post_mia_access_a17.py
+SHA21c1f99db2b0ab3029ad3a1957eaf9cb122c76465ae22445c2ad2c6f6621580c;
+test_r298_post_mia_access_a17_caller.py
+SHA3772150cef79b9d29f5c4b2e2cc3dd79c1c991b9d354640c9171d76cdf4ae491.
+Canonical profile16,351bytes SHA226ef1d47011002d9d1ae15b020c3c41a7d8ce89dadacecb7de9c0c39f5cb4a2.
+Use observe --expected-head the clean commit containing this323.26freeze,
+--caller-sha25621c1f99db2b0ab3029ad3a1957eaf9cb122c76465ae22445c2ad2c6f6621580c.
+All120selected public dependency pins match, including final A17 caller1f2f88,
+frozen C11958 and pure redactor097052. Operational lifecycle AST equals C
+after masking only runtime-temp identity; new source/purpose/documentary facts/
+pin closure do not renew C or any old action. Exact host, HEAD and clean worktree
+are mandatory before/after the actual invocation; no edits during it.
+
+Root247distinct focused passes2.70s(84unchanged pure redactor+76Hcaller+
+86record/document+1research transitive closure), no failures/skips/warnings.
+Both new files compiled in memory;120pins/profile verified. Native remote-
+network/artifact/Keychain/security denial, --ignore=artifacts, --noconftest,
+disabled plugin autoload/cacheprovider, -B, inroot temp/cache/log paths and
+dispatch_fence absence remained. No complete suite/private/QC operation.
+Author76passes3.62s overlap247; initial75passes/1fixture mistake3.68s asked
+for identifier_matches.uid, which the redactor intentionally does not expose.
+Fixture corrected to UIDtype plus known publicId label; production unchanged.
+Retain that initial failure; no false claim of UID-value authentication.
+No H allocation/contact or new look during implementation; final push pending.

@@ -7161,3 +7161,23 @@ Mia/UI or native output validation. A16/F remain spent; no old read/retry is
 revived. Analyst323.22 owns exact evidence and the prospective failure-only
 diagnostic boundary. Historical/other-lane entries and all false formal/PIT/
 paper/live flags are preserved.
+
+### R-298 A17 general-collaborator refusal before mutation/job — 2026-10-25 UTC
+
+At clean `52eb8956c5bbfe7b2f8e6f81402977b975b0c289`, sole A17 parent
+21:59:23.790868Z..21:59:36.075705Z exited2/stderr0/no bound. Stdout755bytes
+SHA256 `fbcb3c200ee9acac2bd4549e714ab60b5c181f0750c0495a65231cb66ea7710c`.
+Native supplied-output validator exited0 and authenticated FAILURE; outer2.
+Exactaccess_general_collaborators, stageprepare,2application intents/2responses;
+compile/launch/terminalnull. No lock, source readback/update, compile, capacity,
+job, failure-detail read or RAW diagnostic probe followed. A17/G remain spent.
+This is NOT a strategy runtime result. Later R298-only UI showed owner+A5+Mia,
+refused removal ofMia with Collaboration not found, restored owner's edit
+control and closed the editor; no source edit or strategy job was requested.
+Implicit editor build/save UI effects are qualified in Analyst323.25.
+
+Book A17 claim once: **331 ->332 shared /256 ->257 Analyst development /
+50 infrastructure unchanged /699 cells unchanged**. No extra look for scoped
+UI or later read-only current access census. No accepted result cell or
+historical cause is fabricated. This owner-authorized R298 append preserves
+all earlier/other-lane entries and false formal/PIT/paper/live flags.

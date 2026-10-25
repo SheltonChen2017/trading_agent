@@ -744,6 +744,12 @@ not the desired23055bytes; three application dispatches, provider count unknown.
 General collaborators count2 and dedicated count1 do not authenticate the
 extra row or clear a future write gate. No A7, upload, lock change, compile,
 launch or old-control read occurred.317.3–317.4 own the evidence and next barrier.
+Section318 implements the owner's next offline fix: capture bounded, redacted
+QC response evidence before the shared client loses an HTTP200 in-band error.
+This additive candidate is not wired into a production recovery or invoked
+against QC. A1–A6/R314/R316 remain spent; the old cause and extra general
+collaborator row remain unresolved. No A7 allowance or new review waiver is
+inferred. Monitor PAUSED; floor321/246/50/699 unchanged.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1939,6 +1945,13 @@ the original update reason and effect/history remain unresolved. Stop before
 further contact: a new explicitly authorized recovery allowance and committed
 protocol with safe exact failure evidence are required before any new write.
 Normal Claude review applies to that future contract unless separately waived.
+The owner next directed "proceed. apply the next fix"; section 318 owns the
+additive offline response-evidence fix. Claude must review section 318's exact
+pushed candidate before future operational integration unless the owner
+explicitly waives that review. This is not an A7 allowance, run freeze or
+permission to reuse a spent caller. A future recovery must bind the new seam,
+reconcile current access/source state, retain actual exit/output evidence and
+obtain a separate explicit attempt decision before any new write or launch.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -3888,6 +3901,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-24 | Owner-authorized A5, bounded collaborator diagnostic and sole A6 recovery | `8877caba` -> `4fe89ff9`, `13cc0ae7`, `7a2c756e`, `388594b6` and this final section315 result/handoff commit | No incoming Claude review; scoped owner waivers, not independent acceptance | A5 spent after post-lock refusal; R314 observed exact current A5 environment row; new verifier passed actual A6 initial/post-lock checks; first files/update then refused in-band at HTTP200, with ambiguous write effect and no compile/launch | Root1111 distinct focused passes13.90s; final document repeats in315.7 overlap; no full suite or operational replay | A1–A6/R314 spent; ARV2E313-001 resolved prospectively for actual A6 checks, ARV2E315-001 OPEN; floor321/246/50/699, no accepted cell | One final nonforce matching-lane push; exact provider-error/reconciliation barrier, no A7 or next cell; monitor PAUSED |
 | 2026-10-24 | Owner-directed read-only file-effect diagnosis | `ff9d00bf` -> section316 preparation handoff | No incoming Claude review; new observer review/waiver and exact run freeze required before use | Current UI target shows#, documentation-only Mia cannot retrieve old response; false payload-field claim rejected against official docs; separate one-file observer implemented but UNINVOKED | Root541distinct focused passes11.74s, four new files compiled in memory,83selected pins matched; no full suite or old operational replay | A1–A6/R314 remain spent, ARV2E315-001 OPEN;321/246/50/699 unchanged; UI consultation changed session representation, not accepted write authority | No upload/lock/compile/launch/A7; next review/waiver and exact one-shot freeze for bounded current-byte evidence only |
 | 2026-10-24 | Scoped owner-waived one-shot R298 read-only reconciliation | `91daf58f` -> `1d751b23` -> section317 final result/handoff | No incoming Claude review; explicit read-only waiver exhausted | D1/D2 each once exit0; current target exactly1byte#; three application reads, no remote mutation or new attempt | Prior541focused passes apply to unchanged code;83pins and clean native-denied preflight passed;86record checks1.07s plus final repeat below | A1–A6/R314/R316 remain spent; original update reason/history unresolved;321/246/50/699 unchanged | No upload/lock/compile/capacity/launch/A7 or unchanged retry; separate recovery authority/protocol needed; one final push |
+| 2026-10-24 UTC | Owner-directed offline R298 response-evidence fix | `a9165774` -> section318 round | No incoming Claude review; implementation and same-round advice are not independent acceptance | Additive pure redaction and one-use response boundary; unchanged shared parser retains strict success semantics; no operational integration or invocation | Focused synthetic validation and limitations in318; no complete suite or spent replay | ARV2E315-001 remains OPEN; no new attempt/look/cell;321/246/50/699 unchanged | One final matching-lane push; separate review/waiver, A7 allowance and committed operational contract before contact |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -55099,3 +55113,165 @@ a replacement project. Request a separate explicit recovery/attempt decision;
 normal independent review applies to a new contract unless specifically waived.
 Conclude now with one matching-lane nonforce push after final document/diff/
 root/branch/HEAD/status/remote checks, then verify local/tracking/live equality.
+
+## 318. Offline R298 response-evidence correction, 2026-10-24 UTC
+
+### 318.1 Scope, baseline and verified defect
+
+Owner direction: "proceed. apply the next fix". Starting local HEAD, matching
+tracking ref and live matching remote were
+`a91657744fdef8c987470473498d3abe46684764`, with a clean worktree at the
+designated Code root on codex/strategy-analyst-revisions-v2. No incoming Claude
+commit or new operational waiver is present. Implement this bounded offline
+fix, document it, and make one final matching-lane push; do not renew A6 or
+infer A7 authority. Shared files, frozen callers/readers and strategy economics
+remain unchanged. Monitor PAUSED; no ledger delta or new attempt.
+
+Static source examination confirms the reason-loss chain: the existing
+coverage transport rejects non-2xx before returning a body; for a returned
+HTTP200 response, research.quantconnect.QuantConnectClient.request converts
+missing/non-true success and errors/messages into a raw exception; the A6
+caller retains only a finite category/status and the helper reduces that to
+request_ambiguous. The recorded A6 HTTP200 refusal therefore lacks its original
+reason. Section317's current one-byte placeholder does not reconstruct the
+reason or historical write effect. No old evidence or private source is read.
+
+The new scope fixes future evidence loss **after the unchanged bounded
+transport returns**. It deliberately does not intercept below that transport:
+non-2xx/transport exceptions still have unknown response details at this seam.
+No production failure was reproduced and no payload cause is invented.
+
+### 318.2 Public response contract and limits
+
+QuantConnect's [Update File documentation](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/file-management/update-file)
+documents boolean success and a string-array errors field, and permits
+codeSourceId. It does not publish a closed files/update numeric-error catalog.
+The [official CLI parser](https://github.com/QuantConnect/lean-cli/blob/master/lean/components/api/api_client.py)
+also handles messages and Message, and recognizes two authentication-related
+text prefixes. The new projector uses only exact matches of the public
+literals "Hash doesn't match." and "UserID not valid" as observed-text labels,
+never inferred root causes; unmatched suffixes or other text stay unknown.
+No invented lock/quota/entitlement cause or undocumented numeric-code list.
+Do not copy that CLI's raw-response logging, retry or HTTP500 heuristic.
+
+Unknown text, keys, source content, headers, credentials and arbitrary numeric
+provider values must not be emitted. Finite response shape, bounded lengths,
+hashes and boolean success evidence can aid a later diagnosis, but cannot
+guarantee an actionable reason. Hashes are not secret encryption or proof of
+provenance. An in-band success still does not prove remote effect or readback.
+
+### 318.3 Additive implementation
+
+The additive pure module scripts/arv2_r298_qc_response_evidence.py projects
+strict supplied status/bytes into a finite record. It enforces the existing
+16MiB response ceiling and a64KiB parse ceiling, checks nesting before decode,
+then bounds the decoded tree to4096 nodes. The node limit is post-decode, not
+a claim that it prevents all decoder allocation. Duplicate keys, invalid UTF-8,
+nonfinite numbers and invalid Unicode refuse interpretation. Larger bounded
+bodies retain their whole digest/size with parse_bound; no partial parse is
+presented as complete. success presence/type/bool-only value remains distinct
+from absent/null/false/mistyped states. errors/messages/Message are independent;
+at most32 list-item descriptors per field include only types, string lengths/
+hashes and exact pattern labels, with full count and explicit omitted count.
+The pure validator checks finite shape/coherence, not truth or provenance.
+
+scripts/arv2_r298_qc_response_boundary.py adds the actual shared-parser seam
+using only a supplied client and synthetic injection in this round. Its sole
+safe entry binds the exact project38364439, input-runtime filename,
+23055-byte/c34e42d8… intended content and unchanged A5 codeSourceId; it does not
+rewrite the payload. It consumes entry before validation and dispatch before
+calling the delegate, snapshots the finite projection as immutable bytes,
+passes only those bytes to the sink before returning the original response
+tuple to the unchanged shared client, and refuses repeat calls. A malformed,
+duplicate-key, excessive or non-object interpretation cannot proceed to the
+shared success parser. Sink failure stops processing; it cannot trigger retry.
+Missing/non-true success remains a shared-client refusal. The safe entry emits
+only finite exception categories, with raw cause/context removed; arbitrary
+Python debugger/traceback-local inspection is not a privacy sandbox. A retained
+snapshot or sink return does not itself authenticate durable publication.
+The supplied shared parser can return success=true with nonempty errors; this
+seam preserves that behavior and never treats the return as accepted write
+effect. The one-entry/one-dispatch contract assumes serialized single-thread
+use; synchronous reentry is refused, but unsynchronized concurrent threads
+are not covered by a thread-atomic or durable claim guarantee.
+
+The selected existing transport/client source hashes are recorded in the new
+profile but are not mechanically authenticated by this offline seam. Future
+production integration must authenticate them, bind the real unchanged
+coverage transport and supply the missing lifecycle controls. Explicit
+application dispatch accounting is not measured provider-contact accounting.
+
+This offline candidate has no CLI, credentials lookup, persistent claim,
+deadline, production caller binding or operational run authority. A fresh
+recovery must provide those controls separately; injected callbacks are not
+authorization. No QC/project/access/file/capacity/compile/backtest call,
+Safari/Mia interaction, private artifact/Keychain access, provider request or
+shared-ledger edit occurs in this round. A1–A6/R314/R316 remain spent and the
+floor stays321 shared/246 Analyst development/50 infrastructure/699 cells.
+
+### 318.4 Exact candidate pins and validation
+
+| New file | Bytes | SHA256 |
+| --- | ---: | --- |
+| scripts/arv2_r298_qc_response_evidence.py |12294|d8088312fac7879e3489780429c5a2e1247cd3a237ed6e331a51df134e0804f3|
+| tests/analyst_revisions_v2/test_arv2_r298_qc_response_evidence.py |16860|41f0d7f8dfc63240fb19c7ad43861e950c32882796b7cd1298d365ba61d4154d|
+| scripts/arv2_r298_qc_response_boundary.py |10760|ac6d9f23b875ea8457c2b5f26ff8b676c551f361017a3614fd6a5eec59a6d1f7|
+| tests/analyst_revisions_v2/test_r298_qc_response_boundary.py |16534|843b6fe14fb969dd19f7f713f7af638fd74335e7010add99181793e5e6c997a6|
+
+Pure profile SHA256
+`a06056fca802923bb890eac4cdc82af453a8a0859fc51019136beb51d712f72d`
+uses the pure canonical encoding without LF. Boundary profile SHA256
+`b2be530cf127df4ebde39d61557f0731322e4dcf7dd5637962a68e6996a2484f`
+uses its canonical encoding plus one LF. These are source-contract bindings,
+not source authentication, independent acceptance or invocation permission.
+The three selected shared/transport hashes in the boundary profile were
+verified against the unchanged public files by its focused test; all old
+sources, readers, projection/economics and controls remain frozen.
+
+Root final focused selection on Python3.13.15: **324 distinct passes in4.30s**
+(182 pure evidence +56 boundary +86 record/active-document), no failures,
+skips or warnings. Four new source/test files compiled in memory without
+bytecode; final-LF and diff checks passed. Native sandbox denied all network,
+production artifacts, Keychain access and security-tool execution; writes were
+limited to in-root .pytest_cache and /dev/null, with minimal environment,
+in-root temp/cache paths, --noconftest, -B, disabled plugin autoload and no
+cache provider. Root asserted assistant.dispatch_fence absent. Denial is not
+measured contact accounting. No complete lane/repository suite ran.
+
+The integration fixture uses the real unchanged shared parser with synthetic
+credentials and a synthetic transport, plus the exact normalized public
+input-runtime source; no production adapter call or private capture is used.
+It proves tuple/body preservation, immutable finite evidence before an in-band
+refusal, distinct absent/null/mistyped success, malformed/duplicate/nonfinite/
+bounded-response refusal, sink failures, direct-call refusal, single-thread
+reentry/no retry, exact payload/client binding and no raw exception cause or
+context. The module-body no-I/O test reexecutes after dependencies are already
+imported; it is not a claim that Python import machinery reads no files.
+
+Author pure182passes0.13s, early boundary54passes3.15s and final boundary
+56passes3.16s overlap the final selection and are not additive. Pure memory-only duplicate-key omission caught
+1 expected failure/181 deselected in0.08s; item-validator omission caught
+2 expected failures/180 deselected in0.08s. All mutations were restored in
+finally and file hashes stayed unchanged. Boundary strict-object omission
+caught1 expected failure/55 deselected in3.19s: a duplicate success key could
+otherwise reach the shared parser and return. This was memory-only, restored
+in finally, with unchanged source/test hashes. Pre-commit record-only repeat
+86passed in1.01s; it is not additional distinct coverage.
+Same-round static advice found no
+remaining material blocker for this offline scope; it corrected an overly
+broad concurrency claim to serialized single-thread only. This is not Claude
+independent review or acceptance of an operational recovery.
+
+### 318.5 Findings, exclusions and handoff
+
+| ID | Priority / status | Evidence, correction and remaining limitation |
+| --- | --- | --- |
+| ARV2I318-001 | P2 / corrected offline, operational integration pending | Shared parser discarded HTTP200 refusal structure before A6's finite reducer; new boundary snapshots only typed/redacted evidence before that parser, proven by focused synthetic integration. No historical error recovered and no production recovery is wired to it yet. |
+| ARV2E315-001 | P2 / OPEN | Original QC update refusal/history and the extra general collaborator row remain unresolved. Current placeholder bytes are not a causal explanation or new write-gate acceptance. |
+
+ARV2E315-001 stays P2 OPEN for the original update refusal/history. The current
+extra general collaborator row is not identified or accepted under the frozen
+write policy. No automatic pin refresh, fallback, new project, unknown-row
+acceptance or unchanged retry is introduced. The backtest is not running.
+Normal independent review and a separately explicit A7 decision plus exact
+run freeze remain prerequisites for a future operational recovery.

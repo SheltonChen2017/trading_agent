@@ -6966,3 +6966,33 @@ their controls remain spent. The later owner-approved ONE A9 handoff correction
 adds no look until an actual accountable claim. Analyst320.6–320.7 retain the
 exact failure, limits and new bounded preparation; all prior history and other
 lanes remain unchanged under the owner's append-only accounting exception.
+
+### R-298 A9 actual initial extra-row refusal — 2026-10-25 UTC
+
+After disclosure of A8's local handoff failure, the owner explicitly allowed
+ONE A9 and waived review for that handoff fix. Sole clean freeze:
+`158f2fd0fabcf55f588e324158632652ef6826f6`; caller SHA256
+`48dd4e68d08f900fb9648ee20fc5cdd558d9b9974f753c70188a7b2efb56cf74`,
+profile `d53fdd14ed7e0609bd2807dd5f9b4a6c7f7449e2ea14ff65631eda4359ea4467`.
+The committed observer used the credential-bearing execution context and
+observed the parent03:48:22.862246Z–03:48:33.991644Z, actual exit2, stderr0,
+no bound. Parent stdout1120bytes SHA256
+`fdc0b4b25927a623991060dc550360bcbcd72baf26d7d534db842eb2168a5fc7`.
+One source-reauthenticated native-denied validator exited0 and accepted FAILURE
+evidence only; outer observer correctly retained exit2. No control/output reread.
+
+Two application metadata dispatches reached inspect-collaborators, then the
+current general-view extra row failed `access_extra_row_shape`. codeRunning was
+explicit false. Pinned static ordering places dedicated single-owner/pin checks
+before this predicate; the last endpoint does not identify the dedicated list
+as the failing record. Exact extra identity/field/hash and provider-request
+count remain unknown. No lock, inventory, source write, compile, capacity,
+backtest launch/status or result read followed. The original QC upload refusal
+remains unexplained and the requested candidate is NOT running.
+
+Book A9 exactly once: **323 ->324 shared /248 ->249 Analyst development /
+50 infrastructure unchanged /699 booked cells unchanged**. This consumed recovery
+look is not a successful launch or result cell. A1–A9 remain spent; no A10 is
+authorized. Analyst320.10–320.11 retain the current access-observation barrier,
+qualifications and exact handoff. All earlier entries and other lanes remain
+unchanged under the owner's append-only Analyst accounting exception.

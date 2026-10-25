@@ -776,6 +776,13 @@ Floor323/248/50/699, no accepted cell. The owner subsequently approved ONE A9
 and scoped review waiver for this handoff fix; original A8 remains failed.
 Section320.6 onward owns the evidence and additive preclaim-guard continuation;
 no A9 invocation or future acceptance is inferred from that approval alone.
+That A9 is also now SPENT at clean158f2fd0. Its credential handoff worked, but
+two initial metadata dispatches ended at access_extra_row_shape: the dedicated
+owner/pin checks passed while the general project's extra row did not match the
+frozen A5 shape. codeRunning=false. No lock/upload/compile/capacity/launch or
+QC upload-error observation occurred. Floor324/249/50/699, no accepted cell.
+Section320.10–320.11 own the final evidence, limitations and exact barrier;
+no A10, current-row pin refresh, repeated removal or spent-reader replay.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -2007,6 +2014,13 @@ specific credential-handoff fix. Section 320 requires a separate exact A9
 freeze and preclaim credential-presence guard in the credential-bearing
 execution context. Original QC error remains unknown; no A9 contact may occur
 before that new freeze, and a refused diagnostic must still stop without retry.
+The sole A9 has now stopped at its initial extra-row shape guard after two
+metadata requests. Its scoped waiver/attempt is exhausted; the backtest is NOT
+running. Next identify the current general-view extra row through a separately
+bounded read-only observation, with review or a specific owner waiver, before
+designing any verified correction. No upload/lock/launch or A10 follows from
+current evidence. Section 320.10–320.11 retain the source-bound result and final
+handoff; Claude reviews section 320 unless the owner changes the workflow.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -3958,6 +3972,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-24 | Scoped owner-waived one-shot R298 read-only reconciliation | `91daf58f` -> `1d751b23` -> section317 final result/handoff | No incoming Claude review; explicit read-only waiver exhausted | D1/D2 each once exit0; current target exactly1byte#; three application reads, no remote mutation or new attempt | Prior541focused passes apply to unchanged code;83pins and clean native-denied preflight passed;86record checks1.07s plus final repeat below | A1–A6/R314/R316 remain spent; original update reason/history unresolved;321/246/50/699 unchanged | No upload/lock/compile/capacity/launch/A7 or unchanged retry; separate recovery authority/protocol needed; one final push |
 | 2026-10-24 UTC | Owner-directed offline R298 response-evidence fix | `a9165774` -> section318 round | No incoming Claude review; implementation and same-round advice are not independent acceptance | Additive pure redaction and one-use response boundary; unchanged shared parser retains strict success semantics; no operational integration or invocation | Focused synthetic validation and limitations in318; no complete suite or spent replay | ARV2E315-001 remains OPEN; no new attempt/look/cell;321/246/50/699 unchanged | One final matching-lane push; separate review/waiver, A7 allowance and committed operational contract before contact |
 | 2026-10-24 PDT /25 UTC | Owner-authorized one additional A7 exact-source recovery | `b477c236` -> `50e59113` and final section319 result/handoff commit | Explicit current review waiver now consumed, not independent acceptance; no new Claude range | Access passed; sole first files/update returned HTTP200/success=false with one unclassified477byte error; redacted evidence authenticated, no later upload/compile/launch |760distinct focused checks, exact-final274repeat12.12s, four memory compiles/84pins; exact actual-exit evidence in319; no full suite or spent replay | A1–A7/R314/R316 spent; QC-refusal barrier OPEN, floor322/247/50/699, no accepted cell | Exactly one final matching-lane push at concrete refusal barrier; no A8 or next family cell; monitor PAUSED |
+| 2026-10-24 PDT /25 UTC | Owner-authorized A8 diagnostic and one additional A9 credential-handoff recovery | `35081915` -> `8df52a03`, `158f2fd0` and this final section320 result/handoff commit | No incoming Claude review; exact owner waivers consumed, not independent acceptance | A8 stopped locally at credentials with zero application dispatches; corrected A9 handoff reached two metadata calls, then current extra-row shape refused before upload/compile/launch | Root717 focused passes before A8 and608 before A9, overlapping selections not additive; final record repeat in320.11; no full suite or spent replay | A1–A9 spent; current access metadata and original QC upload error remain OPEN; floor324/249/50/699, no accepted cell or running candidate | Exactly one final nonforce matching-lane push; separately bounded read-only current-row observation needs review or scoped waiver; no A10, pin refresh or next cell; monitor PAUSED |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -56098,3 +56113,106 @@ append only the authorized actual Analyst ledger delta, then final focused
 document/diff/status checks and one combined matching-lane push. Monitor stays
 PAUSED. The user goal is not complete unless this exact candidate is actually
 running or a concrete remaining barrier is reported honestly.
+
+### 320.10 Actual A9 initial-access refusal — SPENT
+
+Exact clean freeze158f2fd0fabcf55f588e324158632652ef6826f6 passed the genuine
+credential-free native-denied caller/observer clean-host/HEAD/source/profile
+preflight, including85selected sources and three test pins, without artifacts,
+credentials or claim allocation. The committed observer was then invoked ONCE
+from the normal exec_command context. It observed a successfully spawned parent
+2026-10-25T03:48:22.862246Z–03:48:33.991644Z, actual exit2, no bound,
+stderr0bytes. Parent stdout1120bytes SHA256
+fdc0b4b25927a623991060dc550360bcbcd72baf26d7d534db842eb2168a5fc7.
+These are external process brackets, not provider timestamps.
+
+The observer reauthenticated public clean sources and dispatched its sole
+credential-free native-denied validator03:48:34.107305Z–03:48:38.132825Z.
+Validator actual exit0, no bound, stderr0, stdout1162bytes SHA256
+0b1d6c9e284818d351036735724056b0532db0e949d6d7f23d522dfb11750d36.
+It performed its own source-only preflight and validated the parent exit2
+FAILURE envelope. The outer observer correctly exited2 with output_validated=true
+and failure_code=null: the latter means no observer-layer failure, NOT a
+successful parent. Both source/profile bindings match320.8–320.9. No output
+leaf/control was reread and no separate second validator was invoked.
+
+The actual parent failure is remote_refused / access_extra_row_shape,
+predicate=extra_row_shape, last_stage=inspect, application_dispatch_count=2,
+intent_marker=inspect-collaborators, endpoint=projects/collaboration/read,
+last_event=observed. code_running is present/boolean/false. Category remains
+unknown; HTTPstatus, response boundary code/observation and launch/status
+receipts are null. Provider-request count remains unknown, not an invented2.
+Operation_completed and formal/PIT/paper/strategy-result acceptance flags are
+all false. This is a local verifier rejection of returned metadata, not a
+captured upload refusal or a transport/authentication cause.
+
+Static pinned verify_access ordering establishes the limited meaning: the
+project identity/organization/owner/public-contradiction/idleness checks,
+dedicated exact single-owner permissions/whole-row pin, general1–2row shape
+and exact owner match precede extra_row_shape. The general view therefore had
+an extra row that failed at least one frozen A5 requirement (owner=false,
+uid present/null, write/liveControl=true, exact name/publicId, no codeSourceId).
+The finite result does NOT identify the row, the mismatching field, its current
+hash, a new collaborator, Mia or a legitimate replacement environment. The
+last endpoint context does not mean the dedicated collaborator response was
+the failing record. No whole-extra-row hash check or access acceptance followed.
+Earlier Mia UI/session observations are not current authenticated row evidence.
+
+No history/inventory read, supported edit-lock acquisition, file update/create,
+readback, explicit compile, capacity, backtest launch/status or result access
+was reached in A9. Its corrected credential handoff worked sufficiently to make
+the two metadata calls; credential validity/entitlement beyond those responses
+and the original A7 file-update error remain separate and unresolved. Do not
+remove a guessed row, broaden the whitelist, substitute the dedicated list for
+the general-view guard or silently refresh pins to get past this refusal.
+
+Book actual A9 exactly once: **323 ->324shared /248 ->249Analyst development /
+50infrastructure /699cells unchanged**. This is a conservative consumed recovery
+look, not a launch or accepted comparison cell. A1–A9/R314/R316 and both current
+external validators remain spent. The exact candidate is NOT running, and the
+original QC upload error has still not been observed as safe explanatory text.
+No A10, retry, browser mutation, additional provider/QC call or private-control
+inspection followed this failure.
+
+### 320.11 Final dispositions, exclusions and handoff
+
+| Finding | Priority / status | Evidence and next boundary |
+| --- | --- | --- |
+| ARV2I320-001 | P2 / corrected before A8 use | Nested-entry sensitive-context ownership, marker redaction and cross-view coherence corrected and regression-proven; no shared parser/transport change. |
+| ARV2I320-002 | P2 / A8 local handoff defect corrected prospectively in A9 | Credential-empty observer runtime caused an invalid handoff; new preclaim guards plus credential-bearing committed observer reached actual metadata requests. Original A8 remains failed/spent and its exception remains unretained. |
+| ARV2I320-003 | P2 / corrected before A9 use | Observer concrete-Path mismatch and stale-source validation gap fixed; real Path/source/concurrency and native child tests plus omission proof retained. |
+| ARV2E320-004 | P2 / OPEN current general-view extra-row mismatch | A9 identifies the exact failed predicate but not the row/field/hash; a separately admitted read-only metadata observation is needed before any verified correction. |
+| ARV2E319-002 | P2 / OPEN original QC update refusal | A7's HTTP200/success=false unknown477byte error remains unexplained; A8/A9 never reached their diagnostic update. |
+| ARV2E315-001 | P2 / historical cause/effect remains OPEN | Neither later metadata failure nor local credential handoff can retroactively explain A6's lost reason or write effect. |
+
+No new P0/P1, independent review or formal-readiness clearance is asserted.
+Mia consultation/UI auto-build/session effects and failed removal stay qualified
+in320.2. The old diagnostic/readers/claims are not renewed. Safe static checks
+exhaust the retained evidence: they cannot reconstruct the missing current
+extra row or old error body. Normal independent review applies to any new
+security/access-observation contract unless separately waived; any further
+recovery launch also needs a new explicit attempt allowance. A read-only
+diagnosis is not an A10 or permission to change permissions/collaborators.
+No outcome read, next six/eight cell, new paid right, source-admission/paper/live
+flag, other-lane job/control or strategy economics changed. Monitor stays PAUSED.
+
+This round contains exactly three local commits after35081915130886ff435d6a2a58b88b87785fe66a:
+8df52a036f33c95d41a9be5d178488c3be9133a8 (A8 diagnostic source/run freeze),
+158f2fd0fabcf55f588e324158632652ef6826f6 (actual A8 failure, authorized A9
+handoff fix and exact freeze), and this final A9 failure/result/handoff commit.
+No Claude commit was received or counter-reviewed. Final document/diff/status
+checks precede exactly ONE nonforce push to the matching lane, after rechecking
+the live35081915 baseline. Verify local/tracking/live equality and status after
+success. No intermediate push occurred; no later milestone begins at this stop.
+
+Final handoff validation after the A9 result and push-ledger update: **86
+record/active-document checks passed in0.99s**, no failures/skips/warnings,
+under native network, production-artifact and Keychain/security-tool denial;
+in-root support paths, disabled plugins/conftest/cache and no bytecode writes.
+The root asserted assistant.dispatch_fence absent. This repeats the same86
+checks already included in the608-test A9 selection; counts are not additive.
+The final read-only same-round documentation audit confirmed appended A8/A9
+accounting, unchanged historical entries and consistent failure limitations;
+it is not independent review or new operational verification. No source/test
+changed after the158f2fd0 freeze. Final diff/status checks and remote baseline
+verification remain required immediately before the one push.

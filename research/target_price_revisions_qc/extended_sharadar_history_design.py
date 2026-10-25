@@ -17,6 +17,9 @@ PINS = {'repair': '0d0f67a6d02915ff7357018ef51108fdeb3e334cbcccc7e2fa65bbeb1f1d6
     'calendar': '3eccdf3cf9a2542ffd249983241d5747c2ecd4e21bc4a71f7f826c77ec1fe53d'}
 START, END = '2020-09-01', '2026-10-09'
 MAX_PAGES, PAGE_ROWS = 128, 10000
+# The frozen capture's request bounds; a fresh capture may not run looser.
+LIMITS = {'max_elapsed_seconds': 5400, 'max_requests': MAX_PAGES, 'max_response_bytes': 4 * 1024 ** 2,
+    'request_seconds': 30, 'redirects': 0, 'retries': 0}
 YEARS = tuple(str(year) for year in range(2020, 2027))
 _CENSUS_KEYS = frozenset(('page_rows terminated earliest_date latest_date in_window_year_counts '
     'before_window_rows after_window_rows invalid_date_rows missing_date_rows').split())
@@ -81,7 +84,7 @@ def build_design(*, repair_freeze_raw, study_freeze_raw, calendar_raw):
         'public_source_sha256': dict(PINS), 'provider': 'sharadar', 'method': 'GET',
         'host': 'api.sharadar.com', 'endpoint': '/v1.0/data/actions',
         'requested_from': START, 'requested_to': END, 'max_pages': MAX_PAGES,
-        'page_rows': PAGE_ROWS, 'fresh_identified_capture_required': True,
+        'page_rows': PAGE_ROWS, 'limits': dict(LIMITS), 'fresh_identified_capture_required': True,
         'fresh_source_custody_and_access_scope_required': True,
         'historical_entitlement_verified': False, 'requested_date_coverage_proven': False,
         'current_tickers_is_historical_identity_series': False,
@@ -133,6 +136,9 @@ def coverage_summary(*, repair_freeze_raw, study_freeze_raw, calendar_raw, censu
                 or (last > END) != bool(counts['after_window_rows'])): _fail()
         for year in YEARS:
             if years[year] and not first[:4] <= year <= last[:4]: _fail()
+        # The years of the retained boundary dates must themselves be observed.
+        if first >= START and not years[first[:4]]: _fail()
+        if last <= END and not years[last[:4]]: _fail()
     observed = [year for year in YEARS if years[year]]
     return {'schema': 'tpr-ext26-sharadar-coverage-observation-v1', 'study_id': STUDY,
         'requested_from': START, 'requested_to': END, 'page_count': len(pages), 'retained_rows': total,

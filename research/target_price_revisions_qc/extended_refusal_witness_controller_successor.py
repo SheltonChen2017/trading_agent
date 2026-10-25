@@ -125,6 +125,35 @@ def _program_bytes(plan, capsule, sources):
         permit=plan["permit"], capsule=capsule).encode("utf-8")
 
 
+NATIVE_ADAPTER_PERMITTED = False
+
+
+def _lane_identity(path, lane):
+    """True when `path` is the lane, one of its parents, or inside it, decided by
+    real paths and directory identity rather than text, so case aliases and
+    firmlinks cannot slip past the boundary."""
+    candidate, lane_real = Path(path), Path(os.path.realpath(lane))
+    real = Path(os.path.realpath(candidate))
+    if (candidate == lane or candidate in lane.parents or candidate.is_relative_to(lane)
+            or real == lane_real or real in lane_real.parents or real.is_relative_to(lane_real)):
+        return True
+    try:
+        lane_info = os.stat(lane)
+    except OSError:
+        return False
+    current = candidate
+    while True:
+        try:
+            info = os.stat(current)
+        except OSError:
+            info = None
+        if info is not None and (info.st_dev, info.st_ino) == (lane_info.st_dev, lane_info.st_ino):
+            return True
+        if current.parent == current:
+            return False
+        current = current.parent
+
+
 def _validate_plan(plan, capsule):
     """Pure prospective shape check; not owner authorization or registration."""
     _closed(plan, _PLAN_KEYS)
@@ -143,7 +172,7 @@ def _validate_plan(plan, capsule):
     _hash(plan["program_sha256"])
     path = plan["receipt_directory"]
     if (type(path) is not str or not 1 <= len(path) <= 1024 or not Path(path).is_absolute()
-            or str(Path(path)) != path or Path(path) == LANE or Path(path) in LANE.parents):
+            or str(Path(path)) != path or _lane_identity(path, LANE)):
         _fail()
     _closed(plan["source_hashes"], frozenset(SOURCE_PATHS))
     for value in plan["source_hashes"].values():
@@ -252,7 +281,7 @@ def _publish(directory, name, raw):
 
 def _open_directory(path):
     path = Path(path)
-    if (not path.is_absolute() or path.resolve() != path or path == LANE or path in LANE.parents):
+    if (not path.is_absolute() or path.resolve() != path or _lane_identity(path, LANE)):
         _fail()
     fd = os.open(path, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
     info = os.fstat(fd)
@@ -278,6 +307,10 @@ def execute_prepared_read(plan, capsule, directory, *, program_raw, native_read,
             or str(Path(directory)) != checked["receipt_directory"]
             or not all(callable(item) for item in (native_read, repository_guard, utc_now, monotonic_clock))):
         _fail()
+    # Synthetic-only is enforced, not labelled: an adapter must declare itself
+    # synthetic until a reviewed change permits a genuine native adapter.
+    if not NATIVE_ADAPTER_PERMITTED and getattr(native_read, "tpr_synthetic_adapter", None) is not True:
+        _fail()
     frozen_plan, frozen_capsule = _canonical(checked), runtime.validate_capsule(capsule, operation_id=checked["operation_id"])
     receipt = {"schema": "tpr-ext26-witness-controller-receipt-v1", "operation_id": checked["operation_id"],
         "invocation_id": uuid.uuid4().hex, "plan_sha256": _sha(frozen_plan), "status": "failed_or_uncertain",
@@ -291,6 +324,7 @@ def execute_prepared_read(plan, capsule, directory, *, program_raw, native_read,
         raise ControllerReceiptUnavailable("prepared witness receipt unavailable; no read attempted") from None
     lock = None
     cancelled = False
+    escaped = None
     start = previous_tick = None
     previous_now = None
     issued = runtime._clock_text(checked["permit"]["issued_utc"])
@@ -375,6 +409,10 @@ def execute_prepared_read(plan, capsule, directory, *, program_raw, native_read,
             receipt["status"] = "cancelled"
         except Exception:
             receipt["status"] = "failed_or_uncertain"
+        except BaseException as error:
+            # SystemExit and friends still get a durable receipt before escaping.
+            receipt["status"] = "failed_or_uncertain"
+            escaped = error
         finally:
             if lock is not None:
                 try:
@@ -384,12 +422,12 @@ def execute_prepared_read(plan, capsule, directory, *, program_raw, native_read,
                         os.fsync(fd)
                         receipt["lock_cleanup_complete"] = True
                     else:
-                        receipt["status"], receipt["failure_stage"] = "failed_or_uncertain", "cleanup"
+                        receipt["status"], receipt["failure_stage"] = ("cancelled" if cancelled else "failed_or_uncertain"), "cleanup"
                 except KeyboardInterrupt:
                     cancelled = True
                     receipt["status"], receipt["failure_stage"] = "cancelled", "cleanup"
                 except Exception:
-                    receipt["status"], receipt["failure_stage"] = "failed_or_uncertain", "cleanup"
+                    receipt["status"], receipt["failure_stage"] = ("cancelled" if cancelled else "failed_or_uncertain"), "cleanup"
                 finally:
                     try:
                         os.close(lock)
@@ -397,12 +435,20 @@ def execute_prepared_read(plan, capsule, directory, *, program_raw, native_read,
                         cancelled = True
                         receipt["status"], receipt["failure_stage"] = "cancelled", "cleanup"
                     except Exception:
-                        receipt["status"], receipt["failure_stage"] = "failed_or_uncertain", "cleanup"
+                        receipt["status"], receipt["failure_stage"] = ("cancelled" if cancelled else "failed_or_uncertain"), "cleanup"
         try:
             final = validate_receipt(receipt)
-            _publish(fd, checked["operation_id"] + ".attempt-" + receipt["invocation_id"] + ".result.json", _canonical(final))
         except Exception:
             raise ControllerReceiptUnavailable("prepared witness receipt unavailable; no automatic retry") from None
+        try:
+            _publish(fd, checked["operation_id"] + ".attempt-" + receipt["invocation_id"] + ".result.json", _canonical(final))
+        except Exception:
+            if cancelled:
+                # A cancellation stays a cancellation even when its receipt cannot be written.
+                raise ControllerCancelled(final) from None
+            raise ControllerReceiptUnavailable("prepared witness receipt unavailable; no automatic retry") from None
+        if escaped is not None:
+            raise escaped
         if cancelled:
             raise ControllerCancelled(final) from None
         return final

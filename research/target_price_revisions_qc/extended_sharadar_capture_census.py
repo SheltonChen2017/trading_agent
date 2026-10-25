@@ -419,6 +419,32 @@ def _now():
     return datetime.now(timezone.utc)
 
 
+def _lane_identity(path, lane):
+    """True when `path` is the lane, one of its parents, or inside it, decided by
+    real paths and directory identity rather than text, so case aliases and
+    firmlinks cannot slip past the boundary."""
+    candidate, lane_real = Path(path), Path(os.path.realpath(lane))
+    real = Path(os.path.realpath(candidate))
+    if (candidate == lane or candidate in lane.parents or candidate.is_relative_to(lane)
+            or real == lane_real or real in lane_real.parents or real.is_relative_to(lane_real)):
+        return True
+    try:
+        lane_info = os.stat(lane)
+    except OSError:
+        return False
+    current = candidate
+    while True:
+        try:
+            info = os.stat(current)
+        except OSError:
+            info = None
+        if info is not None and (info.st_dev, info.st_ino) == (lane_info.st_dev, lane_info.st_ino):
+            return True
+        if current.parent == current:
+            return False
+        current = current.parent
+
+
 def execute(plan, *, input_root=INPUT_ROOT, output_root=OUTPUT_ROOT,
             guard=_guard, source_identity=_sources, clock=_now,
             monotonic=time.monotonic):
@@ -428,7 +454,7 @@ def execute(plan, *, input_root=INPUT_ROOT, output_root=OUTPUT_ROOT,
             or clock is not _now or monotonic is not time.monotonic): _fail()
     input_root, output_root = Path(input_root), Path(output_root)
     if (plan['mode'] == 'production' and (input_root != INPUT_ROOT or output_root != OUTPUT_ROOT)
-            or plan['mode'] == 'offline-fixture' and (input_root.is_relative_to(LANE) or output_root.is_relative_to(LANE))): _fail()
+            or plan['mode'] == 'offline-fixture' and (_lane_identity(input_root, LANE) or _lane_identity(output_root, LANE))): _fail()
     operation, stage = plan['operation_id'], plan['stage']
     frozen = _canonical(plan)
     start = last_tick = monotonic(); last_now = None
@@ -499,7 +525,7 @@ def execute(plan, *, input_root=INPUT_ROOT, output_root=OUTPUT_ROOT,
                 except KeyboardInterrupt:
                     cancelled = True; receipt['status'] = 'CANCELLED'; receipt['failure_stage'] = 'cleanup'
                 except Exception:
-                    receipt['status'] = 'FAILED_OR_UNCERTAIN'; receipt['failure_stage'] = 'cleanup'
+                    receipt['status'] = 'CANCELLED' if cancelled else 'FAILED_OR_UNCERTAIN'; receipt['failure_stage'] = 'cleanup'
             if lock is not None:
                 try:
                     named, owned = os.stat(operation + '.lock', dir_fd=out, follow_symlinks=False), os.fstat(lock)
@@ -509,13 +535,13 @@ def execute(plan, *, input_root=INPUT_ROOT, output_root=OUTPUT_ROOT,
                 except KeyboardInterrupt:
                     cancelled = True; receipt['status'] = 'CANCELLED'; receipt['failure_stage'] = 'cleanup'
                 except Exception:
-                    receipt['status'] = 'FAILED_OR_UNCERTAIN'; receipt['failure_stage'] = 'cleanup'
+                    receipt['status'] = 'CANCELLED' if cancelled else 'FAILED_OR_UNCERTAIN'; receipt['failure_stage'] = 'cleanup'
                 finally:
                     try: os.close(lock)
                     except KeyboardInterrupt:
                         cancelled = True; receipt['status'] = 'CANCELLED'; receipt['failure_stage'] = 'cleanup'
                     except Exception:
-                        receipt['status'] = 'FAILED_OR_UNCERTAIN'; receipt['failure_stage'] = 'cleanup'
+                        receipt['status'] = 'CANCELLED' if cancelled else 'FAILED_OR_UNCERTAIN'; receipt['failure_stage'] = 'cleanup'
         _publish(out, operation + '.attempt-' + nonce + '.result.json', _canonical(receipt))
         if cancelled: raise KeyboardInterrupt('local census cancelled; preserve spent scope')
         return receipt

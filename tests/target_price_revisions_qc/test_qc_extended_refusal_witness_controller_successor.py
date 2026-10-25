@@ -51,8 +51,10 @@ def invoke(directory, *, contract=None, context=None, seam=None, **kwargs):
     if context is not None and context.get("tool_project_id") != m.runtime.PROJECT:
         m.validate_plan(checked, context)
     generated = m._program_bytes(checked, prior.capsule(), m._public_sources())
+    adapter = (lambda program_raw, permit, capsule: prior.invoke(contract=permit, context=capsule)) if seam is None else seam
+    adapter.tpr_synthetic_adapter = True  # every test adapter declares itself synthetic
     return m.execute_prepared_read(checked, capsule, directory, program_raw=kwargs.pop("program_raw", generated),
-        native_read=(lambda program_raw, permit, capsule: prior.invoke(contract=permit, context=capsule)) if seam is None else seam,
+        native_read=adapter,
         repository_guard=kwargs.pop("repository_guard", repository_guard),
         utc_now=kwargs.pop("utc_now", lambda: prior.NOW),
         monotonic_clock=kwargs.pop("monotonic_clock", lambda: 10), **kwargs)
@@ -397,3 +399,67 @@ def test_meaningful_controller_mutants_are_killed_and_real_definition_restored(t
     assert m.execute_prepared_read is original
     with monkeypatch.context() as patch:
         check(restored, patch)
+
+
+# TPR-CR30 regressions: synthetic-only is enforced, the lane boundary is decided by
+# identity, and every escape path still leaves a durable receipt.
+
+
+def test_unmarked_native_adapter_is_refused_before_any_claim(tmp_path):
+    checked = plan(tmp_path); capsule = prior.capsule()
+    generated = m._program_bytes(checked, capsule, m._public_sources())
+    with pytest.raises(m.ControllerRefusal):
+        m.execute_prepared_read(checked, capsule, tmp_path, program_raw=generated,
+            native_read=lambda *_: pytest.fail("unmarked adapter must never run"),
+            repository_guard=repository_guard, utc_now=lambda: prior.NOW, monotonic_clock=lambda: 10)
+    assert not list(tmp_path.iterdir()) and m.NATIVE_ADAPTER_PERMITTED is False
+
+
+@pytest.mark.parametrize("inside", ["artifacts/synthetic-never-created", "research/synthetic-never-created"])
+def test_receipt_directory_inside_the_lane_is_refused_by_identity(tmp_path, inside):
+    checked = plan(tmp_path); checked["receipt_directory"] = str(m.LANE / inside)
+    checked["program_sha256"] = hashlib.sha256(m._program_bytes(checked, prior.capsule(), m._public_sources())).hexdigest()
+    with pytest.raises(m.ControllerRefusal) as refused:
+        m.validate_plan(checked, prior.capsule())
+    assert not isinstance(refused.value, m.ControllerReceiptUnavailable)
+    alias = Path(str(m.LANE).upper())
+    if alias.exists() and os.stat(alias).st_ino == os.stat(m.LANE).st_ino:
+        assert m._lane_identity(alias / "synthetic-never-created", m.LANE) is True
+
+
+def test_base_exception_from_the_native_read_still_writes_a_receipt(tmp_path):
+    def exiting(*_):
+        raise SystemExit(3)
+    with pytest.raises(SystemExit):
+        invoke(tmp_path, seam=exiting)
+    receipt = json.loads(next(tmp_path.glob("*.result.json")).read_bytes())
+    assert receipt["status"] == "failed_or_uncertain" and receipt["scope_spent"] and receipt["native_read_invocations"] == 1
+    assert not (tmp_path / "controller.lock").exists()
+
+
+def test_cleanup_failure_after_cancellation_keeps_the_cancelled_status(tmp_path, monkeypatch):
+    def interrupted(*_):
+        raise KeyboardInterrupt(PRIVATE)
+    original = m.os.unlink
+    def unlink(name, **kwargs):
+        if name == "controller.lock": raise OSError(PRIVATE)
+        return original(name, **kwargs)
+    monkeypatch.setattr(m.os, "unlink", unlink)
+    with pytest.raises(m.ControllerCancelled) as cancelled:
+        invoke(tmp_path, seam=interrupted)
+    receipt = cancelled.value.receipt
+    assert receipt["status"] == "cancelled" and receipt["failure_stage"] == "cleanup"
+    assert PRIVATE not in json.dumps(receipt)
+
+
+def test_receipt_publish_failure_after_cancellation_still_propagates_the_cancellation(tmp_path, monkeypatch):
+    def interrupted(*_):
+        raise KeyboardInterrupt(PRIVATE)
+    original = m._publish
+    def publish(fd, name, raw):
+        if name.endswith(".result.json"): raise OSError(PRIVATE)
+        return original(fd, name, raw)
+    monkeypatch.setattr(m, "_publish", publish)
+    with pytest.raises(m.ControllerCancelled):
+        invoke(tmp_path, seam=interrupted)
+    assert not list(tmp_path.glob("*.result.json"))

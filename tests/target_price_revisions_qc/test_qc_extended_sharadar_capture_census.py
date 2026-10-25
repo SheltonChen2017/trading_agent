@@ -377,3 +377,37 @@ def test_production_rejects_injected_callbacks_before_directory(monkeypatch, rep
     elif replaced == 'monotonic': arguments[replaced] = lambda: 10
     with pytest.raises(ReachedDirectory if replaced is None else m.CensusRefusal):
         m.execute(selected, **arguments)
+
+
+# TPR-CR30 regressions: the lane boundary is decided by identity, and a cleanup
+# failure after a cancellation keeps the cancelled status.
+
+
+def test_case_alias_of_the_lane_is_refused_by_identity_not_text(leaves, monkeypatch):
+    import os
+    _source, output, _ = leaves
+    alias = Path(str(m.LANE).upper())
+    if not alias.exists() or os.stat(alias).st_ino != os.stat(m.LANE).st_ino:
+        pytest.skip('case-sensitive volume: no lane alias to test')
+    lane_real = os.path.realpath(m.LANE)
+    def guarded(path, **kwargs):
+        if os.path.realpath(path).startswith(lane_real): pytest.fail('alias reached the real lane')
+        return m._directory.__wrapped__(path, **kwargs) if hasattr(m._directory, '__wrapped__') else None
+    monkeypatch.setattr(m, '_directory', guarded)
+    with pytest.raises(m.CensusRefusal):
+        execute(plan(), alias / 'artifacts' / 'synthetic-never-created', output)
+    assert m._lane_identity(alias / 'artifacts', m.LANE) is True
+
+
+def test_cleanup_failure_after_cancellation_keeps_the_cancelled_status(leaves, monkeypatch):
+    source, output, _ = leaves
+    monkeypatch.setattr(m, '_read', lambda *_args, **_kwargs: (_ for _ in ()).throw(KeyboardInterrupt(PRIVATE)))
+    original = m.os.unlink
+    def unlink(name, **kwargs):
+        if name.endswith('.lock'): raise OSError(PRIVATE)
+        return original(name, **kwargs)
+    monkeypatch.setattr(m.os, 'unlink', unlink)
+    with pytest.raises(KeyboardInterrupt, match='preserve spent scope'):
+        execute(plan(), source, output)
+    raw = next(output.glob('*.result.json')).read_bytes(); result = json.loads(raw)
+    assert result['status'] == 'CANCELLED' and result['failure_stage'] == 'cleanup' and PRIVATE not in raw.decode()

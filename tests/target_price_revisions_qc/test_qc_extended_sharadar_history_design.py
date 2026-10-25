@@ -126,3 +126,33 @@ def test_pure_module_has_no_capture_controller_io_or_effect_import():
     assert imports <= {'__future__', 'datetime', 'hashlib', 'json'}
     assert not any(isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
         and node.func.id in {'open', 'exec', 'eval', 'main'} for node in ast.walk(tree))
+
+
+# TPR-CR30 regressions: the design carries the frozen capture's request bounds, and
+# the boundary dates' years must be observed.
+
+
+def test_design_carries_the_frozen_capture_request_bounds(inputs):
+    from research.target_price_revisions_qc import extended_source_capture as frozen
+    design = m.build_design(**inputs)
+    assert design['limits'] == m.LIMITS
+    for key in ('max_elapsed_seconds', 'request_seconds', 'redirects', 'retries'):
+        assert design['limits'][key] == frozen.LIMITS[key]
+    assert design['limits']['max_response_bytes'] == frozen.CSV_PAGE_BYTES and design['limits']['max_requests'] == m.MAX_PAGES
+
+
+@pytest.mark.parametrize("years,accepted", [
+    ({'2020': 1, '2021': 6}, True),
+    ({'2020': 0, '2021': 7}, False),
+    ({'2020': 7, '2021': 0}, False),
+])
+def test_boundary_date_years_must_be_observed(inputs, years, accepted):
+    counts = {year: 0 for year in m.YEARS}; counts.update(years)
+    census = {'page_rows': [7], 'terminated': True, 'earliest_date': '2020-09-01', 'latest_date': '2021-03-01',
+        'in_window_year_counts': counts, 'before_window_rows': 0, 'after_window_rows': 0,
+        'invalid_date_rows': 0, 'missing_date_rows': 0}
+    if accepted:
+        assert m.coverage_summary(**inputs, census=census)['retained_rows'] == 7
+    else:
+        with pytest.raises(m.HistoryDesignRefusal):
+            m.coverage_summary(**inputs, census=census)

@@ -750,6 +750,12 @@ This additive candidate is not wired into a production recovery or invoked
 against QC. A1–A6/R314/R316 remain spent; the old cause and extra general
 collaborator row remain unresolved. No A7 allowance or new review waiver is
 inferred. Monitor PAUSED; floor321/246/50/699 unchanged.
+Section319 supersedes that authority/integration stop only for the owner's
+explicit ONE additional A7 recovery and current scoped Claude-review waiver.
+The additive caller integrates318's unchanged response boundary and immediate
+whole-source readback after every successful write. All access/source gates
+remain; unknown collaborators refuse. A1–A6/R314/R316 remain spent. Preparation
+adds no look, and execution requires319's exact committed freeze. Monitor PAUSED.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1952,6 +1958,13 @@ explicitly waives that review. This is not an A7 allowance, run freeze or
 permission to reuse a spent caller. A future recovery must bind the new seam,
 reconcile current access/source state, retain actual exit/output evidence and
 obtain a separate explicit attempt decision before any new write or launch.
+The owner explicitly waives Claude review of section 319's specific A7 recovery
+and supplies ONE additional attempt:
+"Yes, skip Claude review for this recovery and allow one A7 attempt. Integrate
+the fix and proceed until the backtest is running. Document the progress and
+push once when done." Section 319 owns its additive integration, exact run
+decision and actual-result handoff. This is not independent acceptance, A8,
+old-control renewal, a collaborator-pin waiver or another family-cell launch.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -3902,6 +3915,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-24 | Owner-directed read-only file-effect diagnosis | `ff9d00bf` -> section316 preparation handoff | No incoming Claude review; new observer review/waiver and exact run freeze required before use | Current UI target shows#, documentation-only Mia cannot retrieve old response; false payload-field claim rejected against official docs; separate one-file observer implemented but UNINVOKED | Root541distinct focused passes11.74s, four new files compiled in memory,83selected pins matched; no full suite or old operational replay | A1–A6/R314 remain spent, ARV2E315-001 OPEN;321/246/50/699 unchanged; UI consultation changed session representation, not accepted write authority | No upload/lock/compile/launch/A7; next review/waiver and exact one-shot freeze for bounded current-byte evidence only |
 | 2026-10-24 | Scoped owner-waived one-shot R298 read-only reconciliation | `91daf58f` -> `1d751b23` -> section317 final result/handoff | No incoming Claude review; explicit read-only waiver exhausted | D1/D2 each once exit0; current target exactly1byte#; three application reads, no remote mutation or new attempt | Prior541focused passes apply to unchanged code;83pins and clean native-denied preflight passed;86record checks1.07s plus final repeat below | A1–A6/R314/R316 remain spent; original update reason/history unresolved;321/246/50/699 unchanged | No upload/lock/compile/capacity/launch/A7 or unchanged retry; separate recovery authority/protocol needed; one final push |
 | 2026-10-24 UTC | Owner-directed offline R298 response-evidence fix | `a9165774` -> section318 round | No incoming Claude review; implementation and same-round advice are not independent acceptance | Additive pure redaction and one-use response boundary; unchanged shared parser retains strict success semantics; no operational integration or invocation | Focused synthetic validation and limitations in318; no complete suite or spent replay | ARV2E315-001 remains OPEN; no new attempt/look/cell;321/246/50/699 unchanged | One final matching-lane push; separate review/waiver, A7 allowance and committed operational contract before contact |
+| 2026-10-24 PDT /25 UTC | Owner-authorized one additional A7 exact-source recovery | `b477c236` -> section319 freeze/result round | Explicit current review waiver, not independent acceptance; no new Claude range | Additive response evidence and immediate full-inventory write readbacks, unchanged exact access/projection/economics; sole use conditional on committed freeze | Focused native-denied checks and exact outcome in319; no complete suite or old operational replay | Preparation floor321/246/50/699; no prospective attempt/result booking | Exactly one final matching-lane push at running/terminal/concrete barrier; no A8 or next family cell; monitor PAUSED |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -55299,3 +55313,225 @@ not treat this library or a successful synthetic return as permission to
 perform the target update, reconstruct A6, accept the extra collaborator row,
 or launch a backtest. Stop at this concrete operational-authority/integration
 barrier; no further roadmap work or automatic monitoring is started.
+
+## 319. Owner-authorized A7 response-observed exact-source recovery — 2026-10-24 PDT /25 UTC
+
+### 319.1 Scope, synchronization and current access qualification
+
+The owner explicitly approved: "Yes, skip Claude review for this recovery and
+allow one A7 attempt. Integrate the fix and proceed until the backtest is
+running. Document the progress and push once when done." This supplies exactly
+ONE additional R298 recovery and waives current Claude review of this specific
+integration, not technical admission/access checks or independent acceptance.
+A1–A6, R314 and R316 remain spent. No A8, replacement project, changed strategy
+economics, other family cell, provider-data request, paid rights, paper/live,
+funded account, broker or real-order action is authorized. Monitor stays PAUSED.
+
+The synchronized clean starting HEAD/tracking/live matching remote was
+`b477c23622114e295805c37f68891c9b42fa8a81`. Section318's completed round was
+exactly c761c3e3 then b477c236 after a9165774, with one final push. No new Claude
+range exists. All work uses only the designated Code worktree and matching
+branch. The live remote remained b477c236 at the pre-freeze read. This round's
+new helper/caller/tests are agent-owned; no unrelated dirty work was present.
+
+Safari was inspected read-only at the authenticated QC terminal dashboard.
+R298's shared-project icon does not identify its extra general-view row or
+prove a write conflict. No editor was opened, source changed, Mia consultation
+started, collaborator removed, lock requested, compile or launch selected in
+this inspection. Section316's Mia-held-lock/editor observation supersedes the
+older exclusive-handoff assumption; do not repeat315's claim of no subsequent
+editor changes. The owner's present A7 direction supplies current sequencing
+authority, not proof that Mia is absent. Fresh exact API owner/idle/history/
+collaborator checks and the supported lock must still pass before any write.
+
+The historical313 manual sample Make Public observation remains dated, scoped
+no-sharing evidence under QC's documented private-default contract, not a
+fresh universal privacy claim. No sharing operation was selected subsequently.
+R317's general count2/list hash cannot identify or admit the extra row. The
+unchanged write policy accepts only the exact pinned owner and optional exact
+A5 environment row; Mia, a new representation or any pin drift refuses. No
+automatic pin refresh, generic uid-null exception or owner-count substitute.
+
+Current floor321shared/246Analyst development/50infrastructure/699cells.
+Preparation adds nothing. An actual fresh A7 claim is conservatively booked
+once as322/247/50/699 even if later refused; that is not proof of a launch or
+accepted comparison cell. The existing owner-authorized append-only Analyst
+R298 accounting exception permits only that actual shared-ledger delta;
+historical entries and other lanes remain unchanged.
+
+### 319.2 Additive protocol and unchanged strategy/source gates
+
+New scripts/arv2_r298_response_recovery_remote.py and
+scripts/run_arv2_r298_response_recovery.py supply schema
+arv2-r298-response-recovery-v1. Fixed fresh control:
+artifacts/analyst_revisions_v2/newrule_response_recovery/R319-20261024-A.
+It is not inspected or allocated during preparation. Exclusive claim/fsync
+precedes credentials/contact; partial claim/ambiguous exit remains spent.
+Selected source pins and a clean exact host/HEAD precede use. Fresh family and
+D15 admission is authenticated in native-network-denied workers; no old
+operational entrypoint or spent control is read or invoked. R315/R316 controls
+are explicitly added to the old-control worker denial list.
+
+Project38364439, original family/package/D15 pins, candidate
+arv2-newrule-6-ar0-2026-v1 and all11 source bytes/projection
+f67148cd717e207be9d44f088749c0443bb696d9c4f38f512eb6cbf483fd9662
+remain unchanged. New backtest name:
+ARV2 R298 NEWRULE SIX OFF 2021 OCT2026 A7 f67148cd.
+The exact environment label Codex ARV2 R298 A5 20261024 is deliberately reused
+as an editing-environment identity, not a renewed A5 attempt. Owner/access/
+idle/history checks use the frozen policy. Only the original manual sample
+may precede our launch; unexpected runs refuse rather than being filtered.
+
+At most9 missing/permitted-placeholder restorations. The two retained core/
+forced-exit modules must already match. Current inventory, not historical
+four-file evidence, determines the actual split. A fresh whole inventory
+immediately precedes the first write. EVERY successful write is immediately
+followed by whole-inventory readback equal to the exact evolving expected
+inventory. That readback is the next prewrite snapshot, with no intervening
+QC request; the last requires all11 exact files. Each target is consumed
+before dispatch, with no second write after refusal or ambiguity. Sequential
+snapshots are not continuous exclusion/atomicity. No arbitrary source can be
+overwritten, no file deleted and no lock forced/reacquired.
+
+Only the exact input-runtime files/update is wrapped in318's unchanged
+OneResponseBoundary on the same real shared client and unchanged bounded
+transport. Target is23055bytes SHA256
+c34e42d894dc88e74ce37899622a7f728bafdac9320ce2775736ba06b7ad463e.
+The serialized caller restores the original transport in finally. An immutable
+finite/redacted observation is recorded before shared parsing, with exact
+source/profile/request-marker/dispatch binding and reconstructed journal pin.
+Both success and failure envelopes retain it. If journal publication fails,
+finite in-memory evidence may remain with a null publication pin; it cannot
+be positive success. If the target is already exact, no target update occurs
+and absent response evidence is honest, not zero contact. Raw response text,
+credentials, headers, source and licensed rows never enter the output.
+
+The original strict shared success contract is unchanged. Non-2xx upstream
+refusals remain unknown at this seam; finite labels/hashes do not establish
+cause or remote write effect. Even success=True is not readback acceptance.
+Provider-request count remains null/unknown; application dispatches are not
+measured network/provider contacts. Old modules, tests, readers, source pins,
+economics, formal/PIT/paper/readiness flags and historical failures stay frozen.
+
+### 319.3 Prospective bounds and exact external result handling
+
+Only designated Darwin/POSIX Python3.13 at
+/Users/sheltonchen/.venvs/trading_agent-py313/bin/python may run the new caller
+in the designated Code root/branch. The final clean commit containing319's
+source/test pins and run decision is --expected-head; the final caller digest
+is --caller-sha256. These source arguments are not authorization booleans.
+The owner's319.1 decision supplies this sole A7 allowance and scoped waiver.
+
+Parent600seconds/max64application dispatches, one supported lock, one
+compile/create, at most20compile/read polls10seconds apart, fresh admission
+before launch and90seconds prelaunch reserve. Final source/history/idle and
+capacity checks precede exactly one backtests/create. Occupied capacity means
+capacity_wait, not cancellation/reassignment of another lane or permission
+to relaunch. One own-status read after60seconds only for queued/running create;
+immediate Completed. is retained without that poll; immediate Runtime Error
+retains the ID and fails. Queued is not running. No statistics, log, chart,
+order or aggregate-result retrieval; no next family cell. This is the original
+order-based candidate, not a non-order performance diagnostic.
+
+The new outer success/failure ceiling is prospectively96KiB to carry318's
+bounded64KiB evidence; child channels remain24KiB. This is a new contract,
+not a modification of A6's spent24KiB envelope. External capture is bounded
+615seconds/128KiB per channel; only its own child may be killed/reaped. These
+limits cannot guarantee interruption of uninterruptible I/O or host suspension.
+Capture actual process exit, UTC dispatch/completion brackets, channel sizes/
+hashes and any bound; never mistake brackets for exact QC event timestamps.
+
+Before contact, a credential-free native-network/production-artifact/Keychain-
+denied preflight checks exact clean host/HEAD/source/profile/tests and in-memory
+compilation, with dispatch_fence absent. The external launcher passes only
+existing QC_USER_ID/QC_API_TOKEN in memory and minimal permitted environment;
+no Keychain/tokenfile lookup or value printing. All support paths stay inside
+the designated root's .pytest_cache. The parent claims before credential use;
+only own new control writes and fresh admitted inputs are in operational scope.
+
+Once only, a separate credential-free native-network/production-artifact/
+Keychain-denied15second validator consumes the captured finite envelope in
+memory through this exact caller's pure validate_output and externally observed
+actual exit. Require empty stderr, canonical double-LF framing and reconstructed
+report/response-journal pins. No output-leaf reread. Exit0 plus validated output
+is necessary for a positive operation; exit2 remains authenticated FAILURE,
+including any launch/status receipt. Invalid/truncated/unknown output is finite
+hash/length evidence only, not raw exceptions. No report-only success, unchanged
+retry, repaired marker, renewed claim or alternate callback. Record the actual
+outcome and exact accounting before the one final nonforce matching-lane push.
+
+### 319.4 Final pins, validation, findings and one-shot freeze
+
+| File | Bytes | SHA256 |
+| --- | ---: | --- |
+| scripts/arv2_r298_response_recovery_remote.py |9861|fc52c562db6cf5f187cfb336ac091f89dcd59dfac87f30a2812fd5c3ecdb0dd9|
+| scripts/run_arv2_r298_response_recovery.py |44597|1b3b988bb2a2af2ba6c94203717e8f199139f18cf28227d9b055bab71b27f881|
+| tests/analyst_revisions_v2/test_r298_response_recovery_remote.py |22741|c84c56331d78b661d79cfef1ddcf981c31d298498085db0ea3c554f473583b25|
+| tests/analyst_revisions_v2/test_r298_response_recovery.py |76347|80c9bf79c7a71e30fd336d2b1ee40e9a80bfef6c6e449cadc20d5d6c0413997a|
+
+Canonical arv2-r298-response-recovery-v1 profile SHA256
+`ab94574001eebfa202cf330d43b14975f3009017dc1d5ad5eb81ba61ebbedb32`.
+Root verified all84 selected source pins, compiled all4 new files in memory,
+checked unique top-level definitions/single final LF, and asserted
+dispatch_fence absent on Python3.13.15. All318 boundary/evidence, A6/access,
+original projection/transport and other frozen pins remain unchanged. Selected
+pins are not whole-interpreter integrity or a same-user-memory sandbox.
+
+Root combined focused selection passed **760 tests in16.30s**, no failures,
+skips or warnings:182pure evidence+56boundary+161A7helper+274A7caller+86record/
+active-document+1research transitive closure. A test-only404 fixture was
+strengthened around collection, so that run alone does not attest which form
+was collected. Root then ran the exact final274caller tests: **274passed in
+12.12s**, and verified the final hashes above. The resulting distinct union
+is760, not1034. Earlier root486passes5.95s are wholly overlapping. No complete
+lane/repository suite ran. Native sandbox denied network, production artifacts,
+Keychain and security-tool execution; writes only in-root .pytest_cache or
+/dev/null, minimal environment, disabled plugin autoload, --noconftest, -B,
+no cache provider and in-root support paths. Denial is not measured contacts.
+
+Helper author161passes3.41s; earlier158passes3.31s overlap. An intermediate
+160pass/1failure3.50s used a stale expected code after strict JSON validation
+correctly refused bytes earlier; only that expectation changed. Memory-only
+immediate-readback omission caught1expectedfailure/160deselected0.12s (nine
+writes instead of stopping after one), restoredfinally with unchanged hashes.
+The full synthetic nine-write/20compile-poll/one-status path has60application
+dispatches, below64; this is not evidence QC accepts those operations.
+
+Caller author initial252passes/10setup errors10.83s used the patched synthetic
+root to locate a public source fixture. Correcting that fixture path reached
+260passes/10failures10.65s, all due to a synthetic credential class imported
+from a module that does not export it. The fixture now uses the real shared
+class with explicitly synthetic values; no credentials/private inputs were
+read. Targeted17passes3.76s,271passes10.65s and274passes11.38s overlap root.
+Six repinned impossible-envelope regressions were red before the correction
+(6failed/262deselected3.45s). Final memory-only2xx/journal-pin omissions caught
+3expectedfailures/271deselected0.30s; restoredfinally,3passed0.05s and disk
+hashes unchanged. The404fixture now also uses outer404, preventing a later
+status-equality guard from masking the intended2xx check. Root's early
+compile/newline assertion failed on extra EOF blank lines in in-progress
+caller/tests; they were removed before the exact final hash/compile check.
+
+| Finding | Priority / disposition | Evidence, correction and boundary |
+| --- | --- | --- |
+| ARV2I319-001 | P2 / corrected before invocation | Individually valid response/outer envelopes could encode impossible request counts, markers or non2xx observations. Final validation binds target complete-write-02,2xx, response count<=outer count and same-dispatch failure endpoint/marker/status; no later dispatch may follow rejected or unpublished evidence. Repinned regressions/mutations catch omissions. A later pending intent before count increment remains a legitimate fail-closed case, not a fabricated extra dispatch. |
+| ARV2I318-001 | P2 / integrated, real effect still unproved before use | New caller persists the frozen redacted snapshot before shared parsing and retains it on failure. The actual API reason, remote source effect and running result remain contingent on the sole operational observation. |
+| ARV2E315-001 | P2 / OPEN before execution | Historical refusal cause is not recovered. Fresh access/source checks must determine admissibility; current extra row remains unidentified, with no pin refresh. |
+
+Same-round advisory and root code examination found no remaining material
+blocker within the scoped serialized contract; this is not Claude independent
+acceptance or actual QC compatibility evidence. Broker/live/execution-authority
+systems and unrelated project-wide behavior were out of scope and unmodified.
+
+Under319.1's explicit approval, the clean commit containing this final319.4
+freezes exactly ONE `recover` invocation of the new caller, with expected-head
+equal to that commit and caller-sha256 equal to
+1b3b988bb2a2af2ba6c94203717e8f199139f18cf28227d9b055bab71b27f881.
+Sections319.1–319.3, all84pins, the profile/tests above, actual-exit requirements
+and once-only external15second validation are binding. A credential-free
+post-commit native-denied genuine preflight must pass before the sole parent.
+The control has not been inspected/allocated. No parent/worker, credential,
+private-source, upload/lock/compile/capacity/launch request has occurred in this
+preparation. Do not invoke any earlier dirty version or spent caller. Stop on
+an unexpected concurrent Git/UI/project state or any technical refusal; never
+spend A8 or mutate access/source economics to force a pass. No intermediate
+push; the final actual outcome and exact committed handoff precede one push.

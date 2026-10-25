@@ -833,9 +833,11 @@ still refused(323.27). The separately frozen exact-representation A18 consumer
 then passed fresh gates and ran. Its retained failure identified1held stock
 missing a required RAW close among48 identities; its probe returned4earlier
 bars and no exact-reference bar(323.30). A18/I are SPENT, no result cell.
-A19's dated-witness job then ran to Runtime Error, but fresh access_idle
-blocked its error read before contact; no identity/join was retained(323.33).
-Next a bounded read-only reconciliation of that exact job, not a relaunch,
+A19's dated-witness job ran to Runtime Error, but fresh access_idle blocked
+its detail read(323.33). K's read-only reconciliation likewise stopped after
+three exact busy observations(323.36). Both are spent; no identity was retained.
+R298's lingering code environment was then stopped alone, other lane retained.
+Next fresh post-remediation read-only exact-job authentication, not a relaunch,
 then privately identify/verify the holding before the six/eight comparison.
 No guessed stale-price/holding bypass.
 One final push; no funded or paper/live deployment authority is inferred.
@@ -2135,6 +2137,10 @@ Section323.31–32 froze A19; its actual job reached Runtime Error but access_id
 blocked the detail read before dispatch(323.33). J/A19 are spent; a new bounded
 read-only postterminal reconciliation may recover the exact job's witness,
 never relaunch it or bypass the current idleness/access/source gates.
+That K reconciliation subsequently exhausted its exact busy schedule(323.36),
+then only R298's owned Code Environment was visibly stopped. L's separately
+frozen post-stop read-only consumer(323.37) must establish real fresh idleness
+and unchanged source/job before any detail read. K and J remain spent.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
 V3 is spent after its
@@ -59522,3 +59528,104 @@ are not provider routing or permission. Actual0 after the supplied-output
 validator means only a valid ERROR OBSERVATION with postchecks, never a valid
 strategy run. No provider/archive-price request, new look/cell, backtest or
 other-lane action is booked. One final matching-lane push remains pending.
+
+### 323.36 Actual K busy refusal and scoped R298 code-environment stop
+
+At clean960a3ceaeb4f1b7af235f2f971a40185f86d841a, sole K parent ran
+2026-10-25T23:25:32.381079Z..23:27:46.827513Z, actualexit2/stderr0/no bound.
+Stdout717bytes SHAc87498622660407cd3dac9a734d57baf7d410fda2852250bec807d073ab5b173.
+Native supplied-output validator23:27:46.827748Z..23:27:50.579467Z exited0/
+stderr0, authenticated failure, outer2. Exact access_idle, stageidle,
+6application intents/6returned responses, lastcollaboration/read receivedtrue;
+error/observationnull. This exhausts the three project/dedicated observations
+with real>=60second gaps, each permitted only literal codeRunning=true with
+all non-idle predicates checked. No cloud source/history/compile/error body
+read, private join/facts, capacity/compile/job/mutation followed those reads.
+No report success pin was returned. K and all entrypoints/control are now
+SPENT; no control reread/repair/renamed unchanged retry. No new look/cell:
+334/259/50/699 remains the floor. Final record86passes1.11s and1.07s are repeats
+of the276focused selection, not additive; no tests ran during actual use.
+
+To investigate the actual persistent busy barrier without changing another
+lane, root created ONE separate Safari window UUID
+A549AD85-5FB3-46E3-9833-1907A2D06870 using New Window and navigated only to QC
+terminal. The previously observed other-lane editor was left intact. Authenticated
+terminal visibly listed BOTH other-lane and exact ARV2 R298 NEWRULE SIX OFF
+2021 OCT2026 Code Environments. Root clicked ONLY R298's stop control, not its
+project link, another lane's stop, a backtest or live resource. Fresh screenshot
+and full accessibility state confirmed R298's Code Environment and open-session
+sidebar link gone while the other lane's Code Environment/link remained.
+R298 remains in Recent Projects. No R298 editor was opened, no Build/Backtest/
+Mia/permission/lock/member/source-edit action or saving-files notice occurred.
+The UI observations have no instrumented exact action timestamp; do not reuse
+the API/observer timing brackets as UI action times.
+
+This is a concrete owned-session remediation, not proof of historical cause,
+actual API idleness, exclusive lease, privacy or source stability. A19/K refusal
+is preserved. Do not weaken codeRunning, cancel another lane or assert success
+from the terminal screen. Source/runtime/helper/profile bytes stay frozen.
+New one-use post-stop read-only consumer L may reauthenticate exact current
+idle/access/history/source/compile and observe the still-unread exact A19 error
+under a separately committed freeze. New name alone would NOT justify another
+read attempt; the observed R298-only stop is the new substantive state. No
+source update, new compile/job, provider/corpus read or extra look is authorized
+by that observation. Continue verified private diagnosis only if fresh gates
+actually pass; no routine Claude/permission wait under current owner direction.
+
+### 323.37 L post-session-stop read-only consumer and exact run freeze
+
+New observed owned-session stop in323.36 supplies substantive changed state,
+NOT an access permit. Select ONE new arv2-r298-a19-error-after-session-stop-v1
+consumer, control artifacts/analyst_revisions_v2/newrule_reference_error/R323-20261025-L,
+uninspected/unallocated before use. K/J stay spent and native-denied. No old
+operational parent/reader is called; unchanged pure K receiver is composed
+under L's new source/HEAD/claim/binding. The current cloud source, fixed A19
+compile/job, exact history, all access gates, bounded wait/read and native
+join/facts/postcheck/actual-exit rules are unchanged from323.34–35. No launch,
+source/control/lock/member/permission mutation, capacity request, new strategy
+look or performance cell. Floor334/259/50/699 unchanged.
+
+Authorize ONE observe of scripts/run_arv2_r298_a19_error_after_session_stop.py,
+--expected-head the clean commit containing323.36–37,
+--caller-sha256 c2ec1a0551a95ee4f7f82f97e212106c0766962b00b499408771129c81dc360a.
+Designated Darwin/POSIX Python3.13/root/branch only, clean source/HEAD,132pins
+including frozen K caller5ec52e. L schema is deliberately NOT substituted into
+the unchanged pure K receipt schema. All nonidentity protocol functions/methods
+are AST-identical to K, with only the observer support-prefix/new fixed remote
+schema-binding distinction; new profile/native-deny path and identity constants
+are explicit. This is not a source/economic/input update or renamed job retry.
+
+L caller SHA c2ec1a0551a95ee4f7f82f97e212106c0766962b00b499408771129c81dc360a;
+test_r298_a19_error_after_session_stop_caller.py
+SHA c20ff8d78608a2341c292c3e0d94931fcd84817387e23a0f685325d8bc11da25.
+Canonical-plus-LF profile20,022bytes
+SHAab3b9d4480ec6005722b7e1d7f5abf21b63bf7cc0f429a67797f3c62ff2075b6.
+Profile binds K's actual2/717-byte/c874stdout/times/6metadataresponses/null
+error and the scoped UI stop DOCUMENTARILY ONLY. The23:32:59clock was read
+AFTER UI verification, not an instrumented stop timestamp. No source metadata
+pin automatically refreshes; fresh real18cf must pass before/after the read.
+Continuing owner waiver is not independent review, security continuity or live
+authority. One final matching-lane push remains pending.
+
+Root final178distinct focused passes5.43s(91Lcaller+86record/document+1research
+closure), no failures/skips/warnings; all132pins/exact profile matched, two
+new files compiled in memory. Same native remote-network/production-artifact/
+Keychain/security denial, inroot support paths, no plugin/conftest/cache/-B
+and absent dispatch_fence. No private/QC/provider operation in tests or full
+suite. Author91passes6.45s overlap178. The91L cases rebind88previous K protocol
+cases plus3identity/denial/AST cases; do not add prior89K cases as new evidence.
+Unchanged ddc2/142b pure modules retain323.35's focused checks, not rerun as
+an inflated full suite. All old entrypoints/operational leaves stay frozen.
+
+Public-source financial audit considered but DID NOT IMPLEMENT an exit-only
+reference exemption. Exact targetweight0 mathematically gives desired shares0
+without a divisor; current quote handles fills/fees/cash. However, full-held
+prior-RAW coverage is the frozen admission contract, and missing-reference
+valuation provenance in prior engine NAV is not solved by that algebra.
+A19's actual holding targetweight is UNKNOWN. Do not drop the holding, assume
+an exit/delisting, relabel a reduced census as complete or use this reasoning
+to clear a source stop. Any future justified general exit-only research policy
+would require a new common family/profile and transparent changed semantics,
+preserve full holdings/subscriptions/split/quote/accounting and positive-target
+RAW checks, and still cannot admit performance using unauthenticated NAV.
+No strategy economics/data-admission rule changed in this round's L consumer.

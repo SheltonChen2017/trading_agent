@@ -812,15 +812,18 @@ prior readiness-only boundary has concluded. The new launch/result
 contract and six-cell public specification preceded A12. A12 actually launched
 and failed the fresh-price guard on2021-02-22; it is now SPENT, with no accepted
 performance cell. A13 then stopped during access metadata before any mutation,
-compile or job; it too is SPENT. Current floor329/254/50/699. Section323.6–10
+compile or job; it too is SPENT. Current floor330/255/50/699. Section323.6–10
 owns retained failure evidence and the completed read-only Mia consultation.
 The separately frozen current-access observation in323.12 passed the unchanged
 owner-only policy; its use is now SPENT. No permission change or historical
 A13 cause is inferred. A14 then completed its diagnostic use with an authenticated
 fresh QuoteBar/missing current TradeBar/stale generic-cache refusal(323.15).
 The coherent quote-aware successor and common six-cell economic pins are now
-frozen in323.16–19. Next is its sole A15 source/compile/run/result use, then
-verified fixes and the consistent six/eight comparison without a review wait.
+frozen in323.16–19. A15 stopped at access_idle before any mutation/job(323.20).
+R298's lingering code environment was stopped specifically, leaving the other
+lane's environment unchanged in the UI. Next is a separately frozen fresh A16
+use after that physical remediation, not replay of A15, then the consistent
+six/eight comparison without a review wait.
 One final push; no funded or paper/live deployment authority is inferred.
 
 Branch: `codex/strategy-analyst-revisions-v2`
@@ -2102,8 +2105,9 @@ failed at the per-security fresh-price check; A13 stopped during access reads
 before any source edit or new job. The read-only reconciliation in323.10–12
 subsequently passed the unchanged owner-only/current-idle policy. The immediate
 next step after the authenticated A14 diagnostic failure in323.15 is a separately
-versioned quote-aware A15 use frozen in323.16–19, then the consistent six-cell
-projection preserving current-data/side-price/cash/fee checks. Do not replay A12/A13/A14/C
+versioned quote-aware A16 use after A15's access-idle refusal and specific
+R298 code-environment remediation(323.20), then the consistent six-cell
+projection preserving current-data/side-price/cash/fee checks. Do not replay A12/A13/A14/A15/C
 or remove the freshness guard to obtain a terminal success.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
@@ -58439,3 +58443,101 @@ may be retained in session memory and summarized for the lane result record;
 no old artifact reread, raw logs/order/holding export or opaque private value
 is needed. Accumulate locally and make one final matching-lane push only after
 the concluded substantive round, not this pre-run freeze.
+
+### 323.20 Actual A15 pre-mutation idleness refusal and scoped UI remediation
+
+At clean5817aa42fdae6815d36c45e7723bdd1a1b764e53, sole A15 parent
+2026-10-25T21:02:19.955187Z..21:02:32.195106Z exited2/stderr0/no bound.
+Stdout729bytes SHA690b239757c3665c388088719c2d212f1c1ffa9dc158194972b421c433a02cab.
+Native supplied-output validator21:02:32.195323Z..21:02:35.593728Z exited0/
+stderr0 and authenticated FAILURE; outer2. No success/report pin returned,
+and no control reread. A15/caller/validator/E control are SPENT/frozen.
+
+Retained exact finite codeaccess_idle, stageprepare,2application dispatch
+intents and2returned responses; last endpointprojects/collaboration/read,
+last_response_received=true; compile/launch/terminalnull. The strict verifier
+requires project.codeRunning is False; refusal alone does not distinguish
+true, missing or another nonfalse value. No lock, file readback/update,
+compile, capacity, job or result followed. The quote-aware runtime has NOT
+been exercised in QC. Cloud source remains the A14 diagnostic bytes, and
+history remains exactly manual+A12+A14, with no invented A15 job.
+
+Safari initially showed a DIFFERENT lane's project. No action was taken in
+that editor or its Mia chat. A separate new Safari window was opened directly
+to the normal QC terminal/project-list page. Its Code Environments section
+showed both R298's exact project name and that other lane. The R298-specific
+stop icon alone was clicked. Subsequent screenshot visibly removed the R298
+code environment while the other lane's environment remained listed. No
+source editor was opened, no permission/collaborator changed, no build/run
+button clicked and no job cancellation requested. Incidental other-lane UI
+content from the initial accessibility snapshot is not Analyst evidence and
+was not interpreted or copied into research results. This is a scoped code-
+session remediation, not proof of the earlier raw API field value, historical
+cause, release of an edit lease or future API idleness. New current checks
+must still pass; the strict access policy stays unchanged.
+
+Book the genuinely claimed A15 once:+1shared/+1Analystdevelopment329/254 ->
+330/255, infrastructure50/cells699 unchanged. No strategy job or result cell.
+ARV2E323-002(P2 operational) records the non-idle project barrier; its UI
+condition was remediated, while API clearance remains prospective. Do not
+weaken the verifier or rerun E. The next distinct forward use is A16 after
+this concrete environment change, with a new immutable claim/protocol and
+fresh exact source/history/access. Same economic candidate/bytes, no strategy
+tuning; an unchanged environment/name-only replay would not be justified.
+The continuing owner scope permits this remediation and fresh bounded use
+without another routine question or Claude wait. Final record86passes1.19s
+overlap the322 selection, not additive. No tests ran during actual A15.
+
+### 323.21 A16 exact fresh-use freeze after scoped environment stop
+
+Authorize ONE observe invocation of scripts/run_arv2_r298_quote_execution_a16.py
+at the clean commit containing this freeze, bound to --expected-head that exact
+HEAD and --caller-sha256 d614744f07021c40e5ce0de6385232c96dc8aaabcd2f51671ad9c8daf4d6e6b4.
+New uninspected/unallocated control:
+artifacts/analyst_revisions_v2/newrule_quote_execution/R323-20261025-F.
+Schemaarv2-r298-quote-execution-a16-v1, attempt16, backtest name
+ARV2 R298 QUOTE EXECUTION R323 A16. Same quote-aware3735a776 projection,
+cf6e4063 internal profile, b4ed1a5f manifest and all six323.18 economic pins;
+no strategy source or fee-rule change from A15. The concrete intervening
+change is323.20's R298-only code-environment stop. Its UI observation/A15
+failure are bound as documentary context only, not historical cause or an
+access-authorization boolean. Fresh unchanged strict idleness/access is
+mandatory before any lock/update, and every later323.17 gate remains.
+
+Whole helper AST is identical to frozen A15 after masking only schema,
+attempt, backtest name and docstring. Parent operational lifecycle is identical
+after masking attempt/temp identity. Existing cloud is still A14, not A15;
+history remains manual+A12+A14 and after own job adds only A16. No A15 job is
+invented. Two exact runtime/main writes, one compile, one job and one mutually
+exclusive failure-detail/completed aggregate read at most. Parent/deadline/
+dispatch/output/native fresh-admission and actual-exit binding remain323.17.
+Fresh worker additionally denies spent E reads. A15 parent/helper/tests and
+all old controls remain immutable/spent; no unchanged replay/cleanup/repair.
+
+| A16 source/test | SHA256 |
+|---|---|
+| arv2_r298_quote_execution_a16_remote.py | e538b19725d0e61f0a5da9b2bc1e80de56e34f99645ac789adcc7872288d13a4 |
+| test_r298_quote_execution_a16_remote.py | c55ed0f094306a9b249ee3f7311ace15ecf0f0f25593247457ed09a58fc39e87 |
+| run_arv2_r298_quote_execution_a16.py | d614744f07021c40e5ce0de6385232c96dc8aaabcd2f51671ad9c8daf4d6e6b4 |
+| test_r298_quote_execution_a16_caller.py | 45c53ab1dea4da3b63f6e794c46ea786d6c6dea94eb802fb011492e84b3b92e5 |
+
+Remote profile1,981bytes SHAc142ba35b0f4d4411a59ca9a0fb83fcbbed8370c8c7519f8a332d4744023d442;
+caller profile17,963bytes SHA5e42837d910aca8ab97b712939ce0c72015b3c48259f2c826b0e62354ae7507a.
+Root279distinct focused passes13.84s(109caller+19remote+64projector+
+86record/document+1research closure), no failures/skips/warnings. All113public
+selected pins and exact profiles matched; four new files compiled in memory.
+Native remote-network/production-artifact/Keychain/security denial, explicit
+--ignore=artifacts, --noconftest, disabled autoload/cacheprovider, -B, inroot
+support paths and dispatch_fence absence remained. Author109passes8.22s and
+19passes5.93s overlap279; prior A15 mutations cover the AST-identical retained
+guards, not new independent observations. No full suite/private/QC operation
+in tests, no F allocation and no interim push. Same-round advice is not Claude
+review; the continuing owner waiver applies. Record the actual result honestly.
+
+Book a genuinely claimed A16 once from330/255/50/699 to331/256/50/699; add one
+cell only on actual0+authenticated complete matching aggregate/final admission.
+Current Code Environments UI is not capacity/launch authority; other lanes'
+environments/jobs must stay untouched. Unknown/concurrent source/history or
+identity changes must refuse. Preserve all historical failures and all false
+formal/PIT/master/paper/live flags. Continue with justified verified fixes,
+then the comparable family, not another routine authorization wait.

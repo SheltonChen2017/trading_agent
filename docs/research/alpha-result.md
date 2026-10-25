@@ -7120,3 +7120,22 @@ repeat claim or old operational reader. The separate current-access metadata
 observation adds no strategy look. Analyst323.15 owns exact evidence and the
 prospective quote-aware correction boundary. All history/other lanes and all
 formal/PIT/paper/live false flags remain unchanged.
+
+### R-298 A15 pre-mutation idleness refusal — 2026-10-25 UTC
+
+At clean `5817aa42fdae6815d36c45e7723bdd1a1b764e53`, sole quote-aware A15 parent
+21:02:19.955187Z..21:02:32.195106Z exited2/stderr0/no bound. Stdout729bytes
+SHA256 `690b239757c3665c388088719c2d212f1c1ffa9dc158194972b421c433a02cab`.
+Native supplied-output validator exited0 and authenticated FAILURE; outer2.
+Exactaccess_idle, stageprepare,2application intents/2responses; compile/launch/
+terminalnull. No lock, file readback/update, compile, capacity or job occurred.
+This is NOT a runtime failure or evidence against the unexercised quote-aware
+candidate. A later scoped UI action stopped only R298's lingering code
+environment; new API clearance remains prospective. No other lane was changed.
+
+Book A15 claim once: **329 ->330 shared /254 ->255 Analyst development /
+50 infrastructure unchanged /699 cells unchanged**. No accepted result cell.
+Analyst323.20 owns exact evidence, UI qualification and fresh-use boundary.
+A15 remains spent; all historical entries and false formal/PIT/paper/live
+flags are preserved. Continuing owner direction authorizes verified recovery,
+not an unchanged automatic retry or fabricated idle state.

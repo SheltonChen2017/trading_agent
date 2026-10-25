@@ -31859,3 +31859,181 @@ mistaking a SHA-matching body or metadata contract for original-parent/PIT
 admission. Acquisition, if later necessary under the standing source-build
 direction, requires its OWN bounded fresh scope/production claims/journal and
 never retries a completed/claimed/ambiguous request. QC stays untouched.
+
+## 225. Actual pilot SEC coverage/reuse observation and new owner direction (2026-10-25)
+
+The registered read-only operation completed successfully on already-existing
+clean implementation`b33cf144153fd118add3acdc6a9caad22b8b4077` in
+**219.802882s**, exit0/stderr0. Its1,281,147 context and1,008,318 pilot SUBMISSION
+rows were genuinely streamed, not inferred from fixtures. The trusted parent
+independently validated the full worker control and continuously held/rehashed
+the exact three private output leaves. Source inventorySHA256
+`8589073147842e4d14fbe466cf0f0b302194df2925cb7923b1f5529849519c77`.
+No later commit is represented as existing during execution. No source/body
+write, credential/provider request, source financial numeric projection, QC,
+outcome look or backtest occurred.
+
+| Current observed control | Bytes | SHA256 |
+|---|---:|---|
+| reservation | 13,328 | `c804118503b580c1985ecf4849fb0a990c160ca5ce4681a9234b4d753c3537cc` |
+| terminal | 423 | `1cefa3150c7dcab598391105a8fcc899bac6e21d4277d5417dafe4b405149bd4` |
+| complete | 73,723,173 | `f9ae8d1b96437f7107bfa431739132d49a0880f28de581e6dfe913673e2cc558` |
+
+The subsequent initial-native network/fork/all-write/security-exec-denied
+readback rehashed all three, strictly revalidated report crosslinks and printed
+only bounded aggregate metadata. The complete private report lives at
+`artifacts/insider_buying/pilot_sec_parent_audit_v1/ib-pilot-sec-parent-coverage-reuse-20261025-once/complete.json`.
+Exposure inventorySHA`86fb2f3ca08bdb907ada4f1da1b01c5c3da5925fa770cda3cae86ce44e5a5e46`;
+current opaque-body inventorySHA
+`404ac028ee5fe1b3e73ff2d2ba4bb2ff4bd7866bf8fff0e2d24172b7111c2b66`;
+parent auditSHA`ce6a0a0eb678e0f90e9821efc1a0460808c5536202c1bb5407d9ec89b044f056`;
+full inert fresh-request JSONL streamSHA
+`0c5edb9dfe02b236a47be0123472df100d60d7bd4ada41a9ad47d79f82f72a54`.
+The stream was exhaustively consumed/digest-bound, not published or executed
+as a million-request acquisition queue. No provider authority arises from it.
+
+| Actual partition | 25-quarter context | 20-quarter pilot |
+|---|---:|---:|
+| all six-form source filings | 1,281,147 | 1,008,318 |
+| Form4/4-A targets | 1,163,648 | 921,570 |
+| context-only Forms3,3/A,5,5/A | 117,499 | 86,748 |
+| prior consumed targets | 19,852 | 19,852 |
+| matching current-hash-verified original-body CANDIDATES | 19,852 | 19,852 |
+| consumed targets without a matching hash-verified candidate | 0 | 0 |
+| no prior dispatch observed | 1,143,796 | 901,718 |
+| fresh locatable inert candidates | 1,143,784 | 901,707 |
+| locator-quarantined targets | 12 | 11 |
+| preserved ambiguous original starts | 1 | 1 |
+| cross-quarter source repeats/identity conflicts/body conflicts | 0 | 0 |
+
+All retained pilot candidates are in2022Q4 (15,122) and2023Q1 (4,730); there
+are21,437 retained physical/control candidate-evidence entries globally,
+including repeats/out-of-pilot records. Pilot locator quarantines are2022Q2:2,
+2025Q1:3,2025Q2:2,2025Q3:4; context adds2026Q1:1. No path was fabricated from
+issuer CIK and no quarantined row was dropped. This audit does NOT establish
+why a locator is nonmatching or admit a body. The **19,852 opaque candidates
+must not replace the older19,846 source-bound two-quarter classification**;
+the difference needs actual structural/admission evidence, not a guessed
+six-record explanation. Source-bound completeness, all topical P2 closures,
+official/PIT/rights/canonical readiness and backtesting readiness remain false.
+
+### 225.1 Latest explicit workflow/resource authorization
+
+While this round continued, owner explicitly waived Claude review until further
+notice, directed continuous build until an honestly successful backtesting
+outcome or a concrete blocker, and delegated routine lane decisions/actions.
+Do not restore a Claude checkpoint or ask another routine milestone approval.
+The same instruction authorizes QC/Safari availability **after Short Interest's
+NEXT remote push**, not immediately and not from a merely local commit. The
+independently observed baseline is matching origin
+`refs/heads/codex/strategy-short-interest` =
+`d50c9fe981b391a2f9634491b4b9512ccf3216d7`. Read-only `git ls-remote` was run
+from the designated Insider checkout; no other branch was fetched/checked out
+or edited and QC/Safari remain untouched until the release event.
+
+The existing paused heartbeat`insider-buying-claude-push` was repurposed through
+the app's automation tool (no duplicate automation) to **Short Interest push
+releases Insider QC**, ACTIVE every five minutes in this same chat. It stays
+quiet while unchanged; a genuine changed remote tip pauses that heartbeat,
+records exact old/new tips and release provenance, and allows QC/Safari at the
+next safe current-build checkpoint without a concurrent writer. The obsolete
+source-completion heartbeat stays paused. Existing single-final-push, exact
+worktree/branch, source custody and shared-file boundaries remain binding.
+
+Owner additionally permits consulting Mia whenever a QC/Safari issue arises,
+including BEFORE three failures. The per-distinct-genuine-candidate maximum
+of three unsuccessful QC launches and mandatory Mia recovery afterward remain
+binding; a renamed identical candidate cannot reset that count. Compare every
+Mia/cloud source change with the exact local candidate and port only verified
+lane-owned fixes. Browser release and broad preauthorization do not fabricate
+data, vendor rights, PIT identity, protocol/look roots or empirical edge. Freeze
+criteria/looks before outcomes and report adverse evidence honestly; repeated
+outcome-driven tuning until a desired “good” result is not a completion method.
+Order-based evaluations, strategy economics and reserved holdout remain fixed;
+no brokerage, funded/paper/live deployment, capital or real trading is granted.
+
+## 226. Next offline retained-original structural corroboration registration (2026-10-25)
+
+Continue immediately with NEW operation
+`ib-pilot-sec-parent-structure-20261025-once`, rather than stopping on the QC
+hold. It binds all three225 control pins and reopens/rechecks every original
+operational root plus current opaque body inventory. All19,852 pilot candidate
+accessions must be accounted against the prior per-quarter roster. Every
+physical candidate copy is hash-checked; only unanimous URL/body/target
+comparison identities may share one structural parse, while raw targets and
+all control/request/body lineage remain preserved. No first alias, ticker
+guess, silently padded raw source or selected financial transaction is used.
+
+A new pure assessor uses exact unchanged
+`sec_complete_submission.py` from historical`aa0d635d`, preserving raw targets
+and explicitly padded parser-comparison CIK separately. Verify complete SGML
+envelope, original/header/XML/accession/form/date/issuer/owner consistency and
+all child-parent hashes. XML financial text may be structurally decoded but
+NO financial numeric field is converted/projected, and no canonical IB1C,
+official acceptance/PIT/rights or source-authenticity claim follows. Integrity
+failures stop; genuine frozen-parser grammar/identity refusals are explicit
+fixed-code quarantines, not dropped records or authority to fetch again. The
+one historical ambiguous start stays unresolved even if its separate body
+parses successfully. Original full-study/window/quarantines remain intact.
+
+Qualify and commit new source/tests plus this registration before actual body
+parsing, require clean exact HEAD, freeze all writers for execution, and use
+one initially native network/fork/all-write/security-exec-denied worker with a
+trusted guarded control-only parent and fresh exclusive three-leaf namespace
+`artifacts/insider_buying/pilot_sec_parent_structure_v1`. All225 inputs remain
+held/rehashed, recent new controls keep their explicitly documented ctime-only
+policy and original roots keep strict custody. Publish full bounded structural
+metadata/conservation and source hashes, not raw XML/SGML or secret text.
+Nothing invokes QC/Safari, transport, outcomes, SDK drafts or consumed scopes.
+The next action after a successful structural observation is determined by
+its actual evidence and remaining factual gates under standing continuous
+build authority, not a manufactured review/approval checkpoint.
+
+### 226.1 Structural image qualification before actual body parsing
+
+NEW pure source`research/insider_buying_pilot_sec_parent_structure.py`
+(9,373B/SHA`f95f7da3396124b1f2b31ce5698a67f3394a7f6ab3aebc67ce66975886224155`),
+test`tests/test_insider_buying_pilot_sec_parent_structure.py`
+(10,868B/SHA`fdacf33dee6988eab03671b574bb57353e2da1cfa03a1624dd5da03b4eeb3588`);
+NEW protected source
+`research/insider_buying_pilot_sec_parent_structure_runner.py`
+(27,477B/SHA`8a3cacf60b1d54d462ecea3a71a22c39367f26c2888c532223dd1dd6b8c62775`),
+test`tests/test_insider_buying_pilot_sec_parent_structure_runner.py`
+(38,325B/SHA`527d46f866ee23dcfdff0a4fe4132b4dcaa22d6df00da03fabb4b2119e2eeafa`).
+Exact registrationSHA
+`c6e64d641b88de1a549c2d30b3abe55adc7df6b31247d8a35dfd89ab137da1b9`.
+The128MiB bounded IPC/publication budget remains fail-closed; an invented
+one-copy wrapper was4,387B, whose19,852-row arithmetic87,090,724B is a sizing
+fixture, NOT measured actual output size or a guarantee. The4GiB remaining
+disk floor and exclusive per-operation publication still bind.
+
+The additional protected, all-write-denied225-report-only metadata check
+revalidated its exact completeSHA and found19,852 pilot accessions, ZERO
+explicit retained-master disagreements, ZERO raw-CIK variants across physical
+copies, and ZERO target/URL/body disagreements. No actual body was parsed by
+that check. New code still preserves raw targets and comparison padding
+separately, so equal identifiers do not require silently rewritten source.
+
+Draft integrity findings corrected before activation: a tuple/list registration
+round-trip mismatch was removed using JSON-stable named pins; all matching
+evidence must bind selected control/request, raw target, URL and original body;
+all successful children must bind the same full parent; serialized accession
+order and typed quarter counters are enforced in addition to count equality.
+These P3 engineering findings are CLOSED within the prospective scope by
+meaningful recomputed-stream negatives, not claims of independently reviewed
+empirical readiness. No frozen current/historical source was changed.
+
+Main integrated relevant selection: **643 passed in8.99s**, covering both new
+structural pairs, all five prior pilot SEC pairs, unchanged complete-submission
+and master-index contracts, import/active-document/record checks and EXACT
+package guard, with initial native network/Keychain-exec/repository-write
+denial and isolated minimal no-cache test environment. No complete lane or
+repository suite was run. Pure structural qualification separately measured
+132 checks including93 unchanged parser cases and EXACT guard; nine distinct
+in-memory guard reversals were caught (ten executions including a strengthened
+coherent-fake recheck). Runner/pure/EXACT157 checks passed; six additional
+runner reversals were caught and restored. Separate initial-native network/
+fork/ALL-write/direct-security-exec-denied source-only import and in-memory
+compilation passed all FOUR new images. These are actual synthetic/code
+observations, not actual retained-parent parsing. Actual body parsing follows
+only after this new committed image and registration exist at a clean HEAD.

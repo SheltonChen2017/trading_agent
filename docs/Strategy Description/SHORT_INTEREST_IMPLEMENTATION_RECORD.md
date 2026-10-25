@@ -5,7 +5,8 @@ COUNT-SCOPE ARITHMETIC ERRATUM (SECTION 124). OWNER-DIRECTED BOUNDED RECOVERY
 AND SECRET-SAFE DIAGNOSTICS ARE IMPLEMENTED. ACTUAL V2 AND V3 INITIALIZATION
 REFUSED WITH ZERO NEW START/HTTP/BYTES; BOTH CLAIMS ARE SPENT. V3 IDENTIFIES
 A FILE-CUSTODY GUARD; THE PRECISE CAUSE IS STILL UNKNOWN. A LOCAL NONCLAIM
-PROBE PASSED WITHOUT REPRODUCING IT. FURTHER CLAIMS ARE HELD. RETAINED MONTHLY
+V1 PROBE PASSED WITHOUT REPRODUCING IT; V2 STOPPED BEFORE OUTPUT PREPARATION.
+FURTHER CLAIMS ARE HELD. RETAINED MONTHLY
 INPUTS HAVE CLOSED OFFLINE SOURCE-ONLY NORMALIZATION (SECTION124.9), WITHOUT
 SOURCE FITNESS, INPUT ADMISSION OR BACKTEST READINESS.
 OWNER NOW DIRECTS CONTINUATION UNTIL LOCAL BACKTEST READINESS, WITHOUT QC.
@@ -22227,3 +22228,124 @@ No purchase, QC access, actual strategy evaluation or interim push occurred.
 
 Post-record Main diagnostic/record/active-document selection:128passed in0.91s,
 no skips or warnings. Staged new-source/test and record whitespace checks pass.
+
+### 124.11 Actual diagnostic pre-output failure and verified adapter defect
+
+The one registered NONCLAIM v2 diagnostic at clean
+`f287c955a87a8f536cc7fc237f0ecea8a02508bd` / actual matching originB648
+terminated exec54916 with exit2. Its external safe wrapper reported
+`unknown_local_error`, no projected held-field observation, provider/socket
+attempts0, credential attempts0 and capture attempts0. Main subsequently
+verified the designated roots/branch/HEAD/clean status, tracking/actual origin,
+and read-only protected namespace state: the fixed v2 diagnostic output
+directory DOES NOT EXIST and none of its16 fixed parent metadata files exist.
+No new probe was published. There is no original run.refused/completed/closed
+receipt to authenticate, and no original receipt is invented afterward.
+Actual process termination and the tool observation establish a failed local
+invocation, not successful diagnostic closure or source qualification.
+Preserve that invocation/observation and do not call its namespace again.
+This NONCLAIM operation consumed no source START, HTTP, credential or new
+capture claim; all old source claims, raw files and spent budgets are unchanged.
+
+**SI-BUILD-20261024-032 (P2, verified adapter/fixture incompatibility):** the
+diagnostic's exact `_v3_zero` comparison expects `failure_detail`, while the
+actual count producer at exact2D11 publishes `fixed_diagnostic`. Main verified
+the historical Git blob AND independently read only the protected original v3
+negative, matched its pinned SHA594f53, and confirmed fixed_diagnostic present
+and failure_detail absent. Thus this comparison necessarily rejects genuine
+v3 evidence if reached, before output preparation. The fabricated fixture
+copied the consumer's incorrect field name and missed the producer/consumer
+incompatibility. Correct the diagnostic to the original strict schema, not
+the original producer/receipts; retain missing/extra/wrong-field refusal and
+add producer-backed fabricated composition tests. This is a verified local
+blocker, but the precise stage/exception thrown by54916 was not persisted and
+remains UNKNOWN. Do not substitute this inference for an original trace.
+
+**SI-BUILD-20261024-033 (P2, verified diagnostic visibility gap):** the new
+diagnostic's own exact CustodyDiagnosticRefusal is not among the old count
+classifier's controlled types and therefore falls through to unknown_local_error.
+The successor needs its own exact-type, fixed-literal contract allowlist and
+fixed pre-output phase projection, with hostile argument/property/formatting
+tests. No arbitrary exception message, path, type name, source row or credential
+may escape. Do not broaden the original capture's transport retry classification
+or relax its source/custody enforcement to improve diagnostic visibility.
+
+**SI-DEC-20261024-16**, under the continuing SI-AUTH-20261024-05, permits the
+verified lane-specific diagnostic adapter/fixture/observability correction and
+a separately frozen future NONCLAIM v3 diagnostic, NOT a restart/reset of
+exec54916 or permission for a provider claim. New fixed namespace will be
+`local-custody-probe-20261025-v3`, its own16 metadata names and versioned
+protocol; retain all16/1024byte/128frame/1800second bounds and every original
+source/code/closure safeguard. Main must review complete composition, causal
+tests, exact code/protocol registration and clean committed runtime before
+any future invocation. No successor has been invoked at this entry. Historical
+count custody022 remains UNKNOWN and further count/daily claims remain held.
+Independent source-only count-epoch ledger and other offline factual gates
+remain next; local readiness, source admission, backtest/outcome/QC activity
+and interim publication are NOT claimed. Actual looks0/0 and0, alpha0,
+permanent look IDsnone, QC attempts0.
+
+### 124.12 Strict producer-backed correction and prospective NONCLAIM v3
+
+Disposition032: corrected in this diagnostic checkpoint. The consumer now
+requires the original `fixed_diagnostic` field, with unchanged raw pins and
+whole-object equality; wrong legacy spelling, missing detail or an extra field
+still refuses. The new fabricated fixture executes the actual count producer's
+nested negative publication code object with fabricated closure cells, never
+the outer capture/key/HTTP function. A full public run_registered composition
+retains real56-file HeldFiles composition, the real v3 loader, original output
+custody and terminal finalizer while replacing only source/Git/lane fixtures.
+Main's memory-only reversal to the wrong field produced **2failures with54
+deselected in0.31s**, including that full public composition. The original
+producer and every actual source/claim/control byte remain untouched.
+
+Disposition033: corrected prospectively. The diagnostic has an exact-own-type,
+fixed-literal contract catalogue and sealed fixed-phase wrapper.
+`failure_summary(error)` emits only stage/category/allowlisted errno/controlled
+contract code and genuine original-entry-check field NAMES. It never formats
+the original exception or emits private paths, dynamic type names or supplied
+text. Hostile argument/property/string subclasses and uninitialized wrapper
+objects have refusal tests. Fixed stages identify the last entered phase;
+callbacks or cleanup can raise within that phase, so they are not a forensic
+backfill of the old missing trace. The exact54916 exception and original count
+custody022 cause remain UNKNOWN. The source capture's retry classifier and
+custody requirements are not changed.
+
+Under SI-DEC-20261024-16, prospective diagnostic v3 uses only new
+`local-custody-probe-20261025-v3` output/item names. It cannot restart the failed
+v2 namespace even though v2 prepared no files. All16 probes, fixed186/730/746/800
+byte shapes,1024byte per-member ceiling,128-frame traceback and1800second
+whole-operation bound remain. Every original negative/spent claim/budget,
+source/code hold, precise failed-instance attribution, original output/parent
+FD identity, original control/metadata byte+stamp audit, after-context closure,
+post-final-code audit, deadline and negative-dominance safeguard is preserved.
+No new provider/credential/capture/claim path or source authority is introduced.
+
+New prospective protocol SHA256
+`f610f9561576a6e1bb3e1f0fc1abb541a359871cbf9ee37c8e2b9f40543ab361`;
+unchanged56-path list SHA256
+`62f0a81ae1eaec550093cc91998ad6821138e7ddfd3f6b05b4a2f2437675fdf7`;
+current relative-path/byte mapping SHA256
+`62b0a25f31cdccb7a1ca7b7e439f1e26754edb2d30c478b179a7391e0d353c1f`.
+The clean committed runtime HEAD is separately bound after commit. No new
+operational invocation has occurred at this registration entry. Success would
+still mean only local observations closed with cause UNREPRODUCED, not a count
+repair, provider-claim release, source fitness or backtest readiness.
+
+Main reviewed the complete production/test diff. Its same seven-file focused
+custody/diagnostics/import-boundary/record/active-document selection passed
+**249tests in4.27s**, no skips or warnings, empty inherited environment and
+network denied. Exact static closure matches all56 paths; source/test compile,
+every own contract/stage literal is covered by its frozen catalogue, and diff
+whitespace checks pass. Delegated evidence, not Main reruns: author56passed
+in2.09s; peer53passed in2.06s. No production change followed that peer execution;
+three later parameterized tests add errno/text cases and explain the count
+difference. Full public fabricated success, strict pre-output wrong-key refusal,
+and source-context-exit dominating negative are tested. No actual private
+source, request, credential, capture claim, QC or outcome was used in these
+tests. No full lane/repository suite ran. Software8/10 and records/authority9/10
+remain provisional. Claude has not reviewed the accumulating final snapshot;
+one final push remains pending, with no interim push.
+
+Post-record Main diagnostic/record/active-document selection:145passed in2.48s,
+no skips or warnings; complete diff whitespace check remains clean.

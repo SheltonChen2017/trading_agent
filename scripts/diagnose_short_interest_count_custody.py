@@ -24,11 +24,11 @@ from scripts.qualify_finra_short_interest import _prepare_capture_directory, _re
 from scripts.qualify_sharadar_companion import _utc_now
 
 DRIVER = "scripts/diagnose_short_interest_count_custody.py"
-NAMESPACE = "local-custody-probe-20261025-v2"
+NAMESPACE = "local-custody-probe-20261025-v3"
 OUTPUT = count.old.OUTPUT.parent / NAMESPACE
 PROBE_SPECS = tuple((size, index >= 8) for index, size in enumerate((186, 730, 746, 800) * 4))
 MAXIMUM_PROBES, MAXIMUM_PROBE_BYTES, MAXIMUM_SECONDS = 16, 1024, 1800
-PROTOCOL_SHA256 = "fac98f2a0f831805ede846be7bb591bfcc98bde39db788656e5a346a028bca49"
+PROTOCOL_SHA256 = "f610f9561576a6e1bb3e1f0fc1abb541a359871cbf9ee37c8e2b9f40543ab361"
 V3_HEAD = "2d11d1f5b73a04e0701c65bdeb81152766535f89"
 V3_REMOTE = "b648f60112af141efc2a12fbaef03b38846d219d"
 V3_CLAIM_SHA256 = "b32d9e9757a29e0edae07b87159361a83185f84513826280bef4560aef96e353"
@@ -44,6 +44,80 @@ class CustodyDiagnosticRefusal(ValueError):
     pass
 
 
+_OWN_CONTRACT_CODES = frozenset("""
+bounded_diagnostic_registration_required bounded_diagnostic_report_required bounded_nonclaim_metadata_required
+designated_diagnostic_driver_required diagnostic_clock_backdated diagnostic_code_custody_changed
+diagnostic_committed_code_manifest_changed diagnostic_output_membership_changed diagnostic_output_must_be_ignored
+diagnostic_preflight_window_exhausted diagnostic_protocol_pending_or_changed diagnostic_report_changed
+diagnostic_report_factory_required diagnostic_result_missing earlier_nonclaim_probe_changed
+earlier_nonclaim_probe_changed_during_final_audit earlier_nonclaim_probe_stamp_changed
+exact_complete_56_code_manifest_required exact_diagnostic_code_custody_required exact_diagnostic_original_member_required
+exact_fixed_nonclaim_metadata_size_required exact_local_probe_bindings final_diagnostic_code_identity_changed
+final_diagnostic_code_stamp_changed final_diagnostic_committed_code_bytes_changed final_earlier_diagnostic_code_changed
+final_exact_diagnostic_registration_required finite_diagnostic_context_closure_window_exhausted
+finite_diagnostic_window_exhausted fixed_nonclaim_metadata_already_exists fixed_nonclaim_metadata_size_too_small
+fixed_probe_ordinal_required fixed_probe_parent_changed fixed_probe_parent_protection fixed_probe_parent_required
+immutable_v3_zero_controls_changed nonclaim_probe_original_bytes_changed original_diagnostic_closure_material_required
+post_context_clock_backdated post_context_earlier_original_member_changed post_context_final_clock_backdated
+post_context_original_member_bytes_changed post_context_original_member_stamp_changed post_context_owned_report_required
+registered_diagnostic_code_path_required v3_code_not_lane_ancestor v3_exact_historical_code_changed
+v3_historical_registration_changed v3_spent_claim_semantics_changed v3_zero_exact_negative_membership_changed
+v3_zero_namespace_changed v3_zero_negative_or_budget_changed v3_zero_original_clocks_changed
+v3_zero_original_control_bytes_changed v3_zero_proof_changed
+""".split())
+_INITIALIZATION_STAGES = frozenset("""
+protocol_registration platform_capability designated_driver lane_guard_initialization lane_remote_initialization
+complete_code_manifest_shape saved_cache_loading current_extra_code_loading diagnostic_code_loading
+current_code_manifest_verification refused_prefix_loading query_plan_binding v2_zero_loading v3_zero_loading
+runtime_registration output_ignore_preflight metadata_absence_preflight finite_preflight output_directory_creation
+output_custody_open local_probe_sequence source_code_context_exit terminal_context_finalization output_custody_close
+""".split())
+_FAILURE_SEAL = object()
+
+
+class _DiagnosticStageFailure(ValueError):
+    __slots__ = ("_anchor", "_identity")
+
+    def __init__(self, stage, error, *, seal):
+        if seal is not _FAILURE_SEAL or type(stage) is not str or stage not in _INITIALIZATION_STAGES:
+            raise CustodyDiagnosticRefusal("REFUSED: diagnostic_result_missing")
+        self._anchor = self._identity = (stage, error)
+        super().__init__("diagnostic_initialization_refused")
+
+
+def fixed_local_failure(error):
+    """Exact own type/literal catalogue, otherwise the existing safe classifier."""
+    if type(error) is CustodyDiagnosticRefusal:
+        args = BaseException.args.__get__(error, BaseException)
+        code = None
+        if (type(args) is tuple and len(args) == 1 and type(args[0]) is str
+            and len(args[0]) <= 256 and args[0].startswith("REFUSED: ")):
+            candidate = args[0][len("REFUSED: "):]
+            if candidate in _OWN_CONTRACT_CODES:
+                code = candidate
+        return {"category": "local_contract_refusal", "errno_name": None, "contract_code": code}
+    return count.diagnostics.fixed_local_failure(error)
+
+
+def failure_summary(error):
+    """Wrapper-facing metadata only, including failures before output exists."""
+    stage, original = "unclassified_diagnostic_failure", error
+    if type(error) is _DiagnosticStageFailure:
+        try:
+            anchor = object.__getattribute__(error, "_anchor")
+            identity = object.__getattribute__(error, "_identity")
+        except AttributeError:
+            return {"stage": stage, **fixed_local_failure(error), "held_field_observation": None}
+        args = BaseException.args.__get__(error, BaseException)
+        if (anchor is identity and type(anchor) is tuple and len(anchor) == 2
+            and type(anchor[0]) is str and anchor[0] in _INITIALIZATION_STAGES
+            and type(args) is tuple and len(args) == 1 and type(args[0]) is str
+            and args[0] == "diagnostic_initialization_refused"):
+            stage, original = anchor
+    return {"stage": stage, **fixed_local_failure(original),
+        "held_field_observation": project_held_file_mismatch(original)}
+
+
 def require(value, code):
     if not value:
         raise CustodyDiagnosticRefusal("REFUSED: " + code)
@@ -57,7 +131,7 @@ def authority():
 
 
 def protocol():
-    return {"schema": "si-count-local-custody-diagnostic-protocol-v2", "driver": DRIVER,
+    return {"schema": "si-count-local-custody-diagnostic-protocol-v3", "driver": DRIVER,
         "output": str(OUTPUT), "metadata_namespace": NAMESPACE,
         "maximum_probes": MAXIMUM_PROBES, "maximum_probe_bytes": MAXIMUM_PROBE_BYTES,
         "maximum_seconds": MAXIMUM_SECONDS, "maximum_trace_frames": MAXIMUM_TRACE_FRAMES,
@@ -71,6 +145,11 @@ def protocol():
         "predecessor_manifest_sha256": count.PREDECESSOR_MANIFEST_SHA256,
         "v2_claim_sha256": snapshot.ZERO_CLAIM_SHA256, "v2_refusal_sha256": snapshot.ZERO_REFUSAL_SHA256,
         "v3_claim_sha256": V3_CLAIM_SHA256, "v3_refusal_sha256": V3_REFUSAL_SHA256,
+        "predecessor_diagnostic": "local-custody-probe-20261025-v2_closed_preoutput_no_metadata;never_restart",
+        "historical_54916_exception": "UNKNOWN_not_persisted",
+        "adapter_correction": "strict_original_v3_fixed_diagnostic_field_not_failure_detail",
+        "preoutput_diagnostics": "exact_own_type_literal_codes_and_sealed_fixed_stage_no_exception_formatting",
+        "own_contract_codes": sorted(_OWN_CONTRACT_CODES), "initialization_stages": sorted(_INITIALIZATION_STAGES),
         "restart_or_retry_allowed": False, "new_source_claims": 0, "authority": authority()}
 
 
@@ -94,7 +173,7 @@ def probe_name(ordinal):
 def probe_bytes(ordinal, size):
     require(type(size) is int and 0 < size <= MAXIMUM_PROBE_BYTES
         and type(ordinal) is int and 1 <= ordinal <= MAXIMUM_PROBES, "bounded_nonclaim_metadata_required")
-    value = {"schema": "si-custody-nonclaim-v2", "is_capture_claim": False, "provider_HTTP": 0,
+    value = {"schema": "si-custody-nonclaim-v3", "is_capture_claim": False, "provider_HTTP": 0,
         "credential_reads": 0, "source_START_debits": 0, "ordinal": ordinal, "padding": ""}
     empty = canonical_json(value).encode()
     require(len(empty) <= size, "fixed_nonclaim_metadata_size_too_small")
@@ -265,7 +344,7 @@ def _v3_zero(root, guard, queries):
             "unreceipted_attempts": [], "receipt_not_persisted_attempts": [], "unpublished_observed_diagnostics": [],
             "charged_bytes": 0, "cumulative_STARTs": 13992, "cumulative_charged_bytes": 23452681,
             "resolved_descriptors": 0, "new_claim_sha256": V3_CLAIM_SHA256, "authority": count.authority(),
-            "failure_detail": {"stage": "claim_custody_open", "category": "local_contract_refusal",
+            "fixed_diagnostic": {"stage": "claim_custody_open", "category": "local_contract_refusal",
                 "errno_name": None, "contract_code": "held_custody_file_changed"}}),
             "v3_zero_negative_or_budget_changed")
         require(count.old.parallel.clock(claim["started_at"]) <= count.old.parallel.clock(refused["refused_at"]),
@@ -385,7 +464,7 @@ def run_probe_sequence(*, owned, normal_check, refusal_check, source_full_check,
         normal()
     except Exception as error:
         failure = {"stage": phase, "ordinal": ordinal,
-            **count.diagnostics.fixed_local_failure(error),
+            **fixed_local_failure(error),
             "held_field_observation": projected(error, phase)}
     try:
         ended = at()
@@ -393,8 +472,8 @@ def run_probe_sequence(*, owned, normal_check, refusal_check, source_full_check,
         ended = None
         if failure is None:
             failure = {"stage": "terminal_clock", "ordinal": None,
-                **count.diagnostics.fixed_local_failure(error), "held_field_observation": None}
-    value = {"schema": "si-count-local-custody-diagnostic-v2",
+                **fixed_local_failure(error), "held_field_observation": None}
+    value = {"schema": "si-count-local-custody-diagnostic-v3",
         "status": "local_observations_passed_cause_unreproduced" if failure is None else "local_diagnostic_refused",
         "protocol_sha256": PROTOCOL_SHA256, "started_at": started, "completed_at": ended,
         "probes_published": len(published), "probes_opened": opened, "probes_read": read_count,
@@ -416,7 +495,7 @@ def run_probe_sequence(*, owned, normal_check, refusal_check, source_full_check,
             normal(); source_full_check(); normal()
         except Exception as error:
             value.update(status="local_diagnostic_refused", failure={"stage": "postpublication_source_audit",
-                "ordinal": None, **count.diagnostics.fixed_local_failure(error),
+                "ordinal": None, **fixed_local_failure(error),
                 "held_field_observation": projected(error, "postpublication_source_audit")})
             report = _seal(value)
             report_sink(report)
@@ -539,7 +618,7 @@ def _after_contexts(owned, result, *, context_error, final_check, began_tick, cl
         failure_stage = "source_or_code_context_exit"
     value.update(status="local_diagnostic_refused", context_closure="terminal_negative",
         failure={"stage": failure_stage, "ordinal": None,
-            **count.diagnostics.fixed_local_failure(context_error),
+            **fixed_local_failure(context_error),
             "held_field_observation": project_held_file_mismatch(context_error, components=components)})
     refused = _seal(value)
     # Never consult now-closed or failed old source custody to preserve a negative.
@@ -548,34 +627,61 @@ def _after_contexts(owned, result, *, context_error, final_check, began_tick, cl
 
 
 def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest):
+    """One prospective invocation; failure_summary safely projects any error."""
+    phase = "protocol_registration"
+    def mark(value):
+        nonlocal phase
+        phase = value
+    try:
+        return _run_registered(root, runtime_head=runtime_head, actual_remote=actual_remote,
+            complete_code_manifest=complete_code_manifest, mark=mark)
+    except Exception as error:
+        if type(error) is _DiagnosticStageFailure:
+            raise
+        raise _DiagnosticStageFailure(phase, error, seal=_FAILURE_SEAL) from None
+
+
+def _run_registered(root, *, runtime_head, actual_remote, complete_code_manifest, mark):
     """Authenticate exact code and old evidence, then local NONCLAIM probes."""
-    registered(); _require_capture_platform()
+    registered(); mark("platform_capability"); _require_capture_platform()
+    mark("designated_driver")
     require(root == lane.ROOT and Path(__file__).absolute() == root / DRIVER, "designated_diagnostic_driver_required")
     began = time.monotonic()
-    guard = lane.LaneGuard(root, expected_head=runtime_head, expected_remote=actual_remote); guard.refresh()
+    mark("lane_guard_initialization")
+    guard = lane.LaneGuard(root, expected_head=runtime_head, expected_remote=actual_remote)
+    mark("lane_remote_initialization"); guard.refresh()
     names = code_paths()
+    mark("complete_code_manifest_shape")
     require(len(names) == 56 and type(complete_code_manifest) is dict and set(complete_code_manifest) == set(names),
         "exact_complete_56_code_manifest_required")
     owned, result, context_error, registration, components, reports, materials = None, None, None, None, (), [], []
     try:
         try:
             with ExitStack() as stack:
+                mark("saved_cache_loading")
                 saved = stack.enter_context(count.old.cache.load_registered_cache(root, runtime_head=runtime_head,
                     actual_remote=actual_remote, for_counts=True))
                 extras = tuple(name for name in count.code_paths() if name not in count.old.cache.COUNT_CODE_FILES)
+                mark("current_extra_code_loading")
                 current = stack.enter_context(count.old.cache.HeldFiles(tuple(root / name for name in extras),
                     protected=False, boundary=guard.check))
                 composed = count._ComposedCodeCustody(root, saved._anchor[2], current)
+                mark("diagnostic_code_loading")
                 extra = stack.enter_context(count.old.cache.HeldFiles((root / DRIVER,), protected=False, boundary=guard.check))
                 code = _CodeCustody(root, composed, extra)
+                mark("current_code_manifest_verification")
                 entries, code_sha = count.old.cache._code_manifest(root, runtime_head, names, code, guard)
                 require({entry["path"]: entry["sha256"] for entry in entries} == complete_code_manifest,
                     "diagnostic_committed_code_manifest_changed")
+                mark("refused_prefix_loading")
                 prior = stack.enter_context(snapshot.load_refused_child(root, saved.plan, guard,
                     expected_manifest_sha256=count.PREDECESSOR_MANIFEST_SHA256))
-                queries = count.freeze_queries(saved.plan)
+                mark("query_plan_binding"); queries = count.freeze_queries(saved.plan)
+                mark("v2_zero_loading")
                 zero = stack.enter_context(snapshot.load_zero_start_predecessor(root, guard, queries))
+                mark("v3_zero_loading")
                 v3_held, v3 = stack.enter_context(_v3_zero(root, guard, queries))
+                mark("runtime_registration")
                 v2_registration = count.old._parse(zero._anchor[3])["registration"]
                 v3_registration = count.old._parse(v3._anchor[4])["registration"]
                 registration = {"head": runtime_head, "remote": actual_remote, "branch": lane.BRANCH,
@@ -591,14 +697,16 @@ def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest)
                         "v3_zero": {**v3_registration, "claim_sha256": V3_CLAIM_SHA256,
                             "refusal_sha256": V3_REFUSAL_SHA256}}}
                 target = root / OUTPUT
+                mark("output_ignore_preflight")
                 require(count.old.cache._git(root, ["check-ignore", str(target)], guard).strip() == str(target).encode(),
                     "diagnostic_output_must_be_ignored")
-                _preflight_absent_metadata(target.parent, guard.check)
+                mark("metadata_absence_preflight"); _preflight_absent_metadata(target.parent, guard.check)
+                mark("finite_preflight")
                 require(time.monotonic() - began < MAXIMUM_SECONDS, "diagnostic_preflight_window_exhausted")
-                directory = _prepare_capture_directory(target)
+                mark("output_directory_creation"); directory = _prepare_capture_directory(target)
                 # Owned output deliberately outlives the source/code stack so a
                 # failed source-context exit can preserve a dominating negative.
-                owned = _OwnedOutput(directory, guard.check)
+                mark("output_custody_open"); owned = _OwnedOutput(directory, guard.check)
                 def normal():
                     guard.check(); code.check(); saved.source_custody(); saved.code_custody(); prior.check(); zero.check(); v3.check()
                 def full():
@@ -609,9 +717,11 @@ def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest)
                 components = ((saved._anchor[2], "base_code"), (current, "extra_code"), (extra, "probe_code"),
                     *tuple(zip(saved._anchor[1], ("cache_source", "master_source", "matrix_source"))),
                     (zero._anchor[1], "v2_zero"), (v3_held, "v3_zero"))
+                mark("local_probe_sequence")
                 result = run_probe_sequence(owned=owned, normal_check=normal, refusal_check=refusal,
                     source_full_check=full, components=components, registration=registration,
                     began_tick=began, report_sink=reports.append, closure_sink=materials.append)
+                mark("source_code_context_exit")
         except Exception as error:
             context_error = error
         if result is None and reports:
@@ -621,9 +731,13 @@ def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest)
             if context_error is not None:
                 raise context_error
             raise CustodyDiagnosticRefusal("REFUSED: diagnostic_result_missing")
+        mark("terminal_context_finalization")
         return _after_contexts(owned, result, context_error=context_error,
             final_check=lambda: _current_code_after_contexts(root, guard, registration),
             began_tick=began, components=components, closure_material=materials[-1] if materials else None)
     finally:
         if owned is not None:
-            owned.close()
+            try:
+                owned.close()
+            except Exception as error:
+                raise _DiagnosticStageFailure("output_custody_close", error, seal=_FAILURE_SEAL) from None

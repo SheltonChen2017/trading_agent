@@ -1,10 +1,12 @@
 """Fabricated custody metadata only; every provider/key/capture seam forbidden."""
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
+import errno
 import json
 import os
 from pathlib import Path
 import socket
+from types import CodeType, FunctionType, SimpleNamespace
 
 import pytest
 
@@ -426,6 +428,36 @@ def test_existing_negative_sibling_blocks_and_is_never_overwritten(monkeypatch, 
     finally: h.owned.close()
 
 
+def _producer_negative(started, claim_sha):
+    """Run the real nested producer publication function with fake cells only.
+
+    The outer capture/registration/key/HTTP functions are never invoked.  This
+    avoids making the consumer's expected fieldset the fixture's source.
+    """
+    candidates = tuple(value for value in diagnostic.count._capture_chunk.__code__.co_consts
+        if type(value) is CodeType and value.co_name == "negative")
+    assert len(candidates) == 1
+    code = candidates[0]
+    publications = []
+    def local(*, negative): assert negative is True
+    def publish(name, payload, *, negative):
+        assert name == "run.refused.json" and negative is True
+        publications.append(json.loads(canonical_json(payload)))
+    values = {"attempts": [], "receipts": [], "charges": 0, "chosen": {},
+        "persisted_receipts": set(), "started": started, "claim_sha": claim_sha,
+        "clock": lambda: stamp(1), "local": local, "publish": publish}
+    assert set(code.co_freevars) == set(values)
+    def cell(value): return (lambda: value).__closure__[0]
+    negative = FunctionType(code, diagnostic.count.__dict__,
+        closure=tuple(cell(values[name]) for name in code.co_freevars))
+    assert negative.__code__ is code
+    detail = {"stage": "claim_custody_open", **diagnostic.count.diagnostics.fixed_local_failure(
+        diagnostic.count.old.cache.contract.AnchorCacheRefusal("held_custody_file_changed"))}
+    negative("initialization_refused_after_spent_claim", detail=detail)
+    assert len(publications) == 1
+    return publications[0]
+
+
 def _v3_fixture(monkeypatch, tmp_path):
     monkeypatch.setattr(diagnostic.count, "OUTPUT", Path("v3"))
     directory = tmp_path / "v3"; directory.mkdir(mode=0o700)
@@ -445,14 +477,8 @@ def _v3_fixture(monkeypatch, tmp_path):
         "prior_charged_bytes": 23452681, "maximum_cumulative_bytes": 4 * 1024 ** 3, "restart_allowed": False}
     claim_raw = canonical_json(claim).encode()
     monkeypatch.setattr(diagnostic, "V3_CLAIM_SHA256", hash_bytes(claim_raw))
-    refused = {"schema": "si-bounded-count-refused-v3", "code": "initialization_refused_after_spent_claim",
-        "protocol_sha256": diagnostic.count.PROTOCOL_SHA256, "started_at": stamp(), "refused_at": stamp(1),
-        "START_debits": 0, "known_HTTP_invocations": 0, "HTTP_count_exact": True, "unreceipted_attempts": [],
-        "receipt_not_persisted_attempts": [], "unpublished_observed_diagnostics": [], "charged_bytes": 0,
-        "cumulative_STARTs": 13992, "cumulative_charged_bytes": 23452681, "resolved_descriptors": 0,
-        "new_claim_sha256": diagnostic.V3_CLAIM_SHA256, "authority": diagnostic.count.authority(),
-        "failure_detail": {"stage": "claim_custody_open", "category": "local_contract_refusal",
-            "errno_name": None, "contract_code": "held_custody_file_changed"}}
+    refused = _producer_negative(stamp(), diagnostic.V3_CLAIM_SHA256)
+    assert "fixed_diagnostic" in refused and "failure_detail" not in refused
     refused_raw = canonical_json(refused).encode()
     monkeypatch.setattr(diagnostic, "V3_REFUSAL_SHA256", hash_bytes(refused_raw))
     write(tmp_path / diagnostic.count.CLAIM, claim_raw)
@@ -489,6 +515,209 @@ def test_full_v3_composition_rejects_changed_historical_code(monkeypatch, tmp_pa
     monkeypatch.setattr(diagnostic.count.old.cache, "_git", git)
     with pytest.raises(diagnostic.CustodyDiagnosticRefusal, match="exact_historical_code"):
         with diagnostic._v3_zero(tmp_path, guard, queries): pytest.fail("changed original code yielded")
+
+
+@pytest.mark.parametrize("mutation", ["legacy_wrong_key", "missing", "extra"])
+def test_actual_producer_negative_schema_is_exact_not_a_permissive_adapter(monkeypatch, tmp_path, mutation):
+    guard, queries, directory = _v3_fixture(monkeypatch, tmp_path)
+    path = directory / "run.refused.json"
+    value = json.loads(path.read_bytes())
+    if mutation == "legacy_wrong_key": value["failure_detail"] = value.pop("fixed_diagnostic")
+    elif mutation == "missing": del value["fixed_diagnostic"]
+    else: value["unknown_extra_field"] = False
+    raw = canonical_json(value).encode()
+    write(path, raw)
+    monkeypatch.setattr(diagnostic, "V3_REFUSAL_SHA256", hash_bytes(raw))
+    with pytest.raises(diagnostic.CustodyDiagnosticRefusal, match="v3_zero_negative_or_budget_changed"):
+        with diagnostic._v3_zero(tmp_path, guard, queries): pytest.fail("nonoriginal producer schema yielded")
+
+
+@pytest.mark.parametrize("message,expected", [
+    ("REFUSED: v3_zero_negative_or_budget_changed", "v3_zero_negative_or_budget_changed"),
+    ("v3_zero_negative_or_budget_changed", None), ("REFUSED: private_SECRET_path", None),
+    ("REFUSED: " + "x" * 1000, None)])
+def test_own_fixed_refusal_catalogue_never_projects_arbitrary_text(message, expected):
+    value = diagnostic.fixed_local_failure(diagnostic.CustodyDiagnosticRefusal(message))
+    assert value == {"category": "local_contract_refusal", "errno_name": None, "contract_code": expected}
+    assert "SECRET" not in canonical_json(value)
+
+
+def test_safe_preoutput_summary_uses_only_sealed_fixed_stage_and_original_fields(tmp_path):
+    path = tmp_path / "SECRET-private-name"; write(path, b"original")
+    with diagnostic.count.old.cache.HeldFiles((path,), protected=True, boundary=lambda: None) as held:
+        path.write_bytes(b"changed fabricated private length")
+        try: held.check()
+        except diagnostic.count.old.cache.contract.AnchorCacheRefusal as original:
+            error = diagnostic._DiagnosticStageFailure("v3_zero_loading", original, seal=diagnostic._FAILURE_SEAL)
+            value = diagnostic.failure_summary(error)
+    assert value["stage"] == "v3_zero_loading" and value["contract_code"] == "held_custody_file_changed"
+    assert value["held_field_observation"]["component"] == "unidentified"
+    assert "size" in value["held_field_observation"]["mismatch_fields"]
+    assert "SECRET" not in canonical_json(value) and str(error) == "diagnostic_initialization_refused"
+
+
+def test_hostile_or_uninitialized_wrapped_failures_do_not_leak_or_touch_properties():
+    class Hostile:
+        def __eq__(self, value): pytest.fail("hostile equality")
+        def __str__(self): pytest.fail("hostile formatting")
+    class Error(Exception):
+        def __getattribute__(self, name): pytest.fail("hostile property access")
+    class Text(str):
+        def startswith(self, *args): pytest.fail("hostile str method")
+        def __eq__(self, value): pytest.fail("hostile str equality")
+    for error in (Error(), diagnostic.CustodyDiagnosticRefusal(Hostile()),
+                  diagnostic.CustodyDiagnosticRefusal(Text("REFUSED: private_SECRET"))):
+        value = diagnostic.failure_summary(error)
+        assert value["contract_code"] is None and value["held_field_observation"] is None
+        assert "SECRET" not in canonical_json(value)
+    value = diagnostic.failure_summary(diagnostic._DiagnosticStageFailure.__new__(diagnostic._DiagnosticStageFailure))
+    assert value["stage"] == "unclassified_diagnostic_failure"
+    with pytest.raises(diagnostic.CustodyDiagnosticRefusal):
+        diagnostic._DiagnosticStageFailure("private_SECRET", Error(), seal=diagnostic._FAILURE_SEAL)
+
+
+def test_preoutput_registered_protocol_failure_has_fixed_stage_without_any_output(monkeypatch, tmp_path):
+    monkeypatch.setattr(diagnostic, "PROTOCOL_SHA256", "PENDING")
+    with pytest.raises(diagnostic._DiagnosticStageFailure) as caught:
+        diagnostic.run_registered(tmp_path, runtime_head="a" * 40, actual_remote="b" * 40, complete_code_manifest={})
+    assert diagnostic.failure_summary(caught.value) == {"stage": "protocol_registration",
+        "category": "local_contract_refusal", "errno_name": None,
+        "contract_code": "diagnostic_protocol_pending_or_changed", "held_field_observation": None}
+    assert not tuple(tmp_path.iterdir())
+
+
+@pytest.mark.parametrize("error,expected", [(OSError(errno.ENOSPC, "SECRET path"), "ENOSPC"),
+    (OSError(987654, "SECRET path"), None), (TypeError("SECRET request"), None)])
+def test_preoutput_wrapper_keeps_only_allowlisted_errno_not_original_text(error, expected):
+    wrapped = diagnostic._DiagnosticStageFailure("saved_cache_loading", error, seal=diagnostic._FAILURE_SEAL)
+    value = diagnostic.failure_summary(wrapped)
+    assert value["stage"] == "saved_cache_loading" and value["errno_name"] == expected
+    assert value["contract_code"] is None and "SECRET" not in canonical_json(value)
+
+
+def test_new_namespace_is_not_a_restart_of_failed_preoutput_diagnostic(monkeypatch, tmp_path):
+    h = Harness(monkeypatch, tmp_path)
+    old = tmp_path / "local-custody-probe-20261025-v2-item-01.private.json"
+    write(old, b"retained fabricated old diagnostic metadata")
+    before = old.read_bytes()
+    report = h.run()
+    assert diagnostic.NAMESPACE == "local-custody-probe-20261025-v3"
+    assert report.to_payload()["schema"] == "si-count-local-custody-diagnostic-v3"
+    assert old.read_bytes() == before
+    assert all("-v3-" in diagnostic.probe_name(index) for index in range(1, 17))
+
+
+def _registered_fixture(monkeypatch, tmp_path, *, wrong_key=False, fail_context_exit=False):
+    """Entire public adapter, real bounded code/proof/output custody, fake source.
+
+    No operational root, original private source, claim, key or HTTP is used.
+    Only the expensive source reconstruction and actual Git/lane runner are
+    replaced.  Producer-derived v3 controls pass through the unchanged loader.
+    """
+    unused_guard, queries, v3_directory = _v3_fixture(monkeypatch, tmp_path)
+    if wrong_key:
+        path = v3_directory / "run.refused.json"
+        negative = json.loads(path.read_bytes())
+        negative["failure_detail"] = negative.pop("fixed_diagnostic")
+        raw = canonical_json(negative).encode(); write(path, raw)
+        monkeypatch.setattr(diagnostic, "V3_REFUSAL_SHA256", hash_bytes(raw))
+    monkeypatch.setattr(diagnostic.lane, "ROOT", tmp_path)
+    monkeypatch.setattr(diagnostic, "__file__", str(tmp_path / diagnostic.DRIVER))
+    monkeypatch.setattr(diagnostic, "OUTPUT", Path(diagnostic.NAMESPACE))
+    events = []
+    class Guard:
+        def check(self): events.append("lane_check")
+        def refresh(self): self.check(); events.append("matching_remote")
+        def binding(self): return tmp_path, "c" * 40, "b" * 40
+    guard = Guard()
+    monkeypatch.setattr(diagnostic.lane, "LaneGuard", lambda *args, **kwargs: guard)
+    for name in diagnostic.code_paths():
+        path = tmp_path / name
+        path.parent.mkdir(mode=0o755, parents=True, exist_ok=True)
+        write(path, name.encode())
+    def git(root, arguments, checked):
+        assert root == tmp_path and checked is guard
+        if arguments[0] == "merge-base": return b""
+        if arguments[0] == "check-ignore": return arguments[1].encode() + b"\n"
+        assert arguments[0] == "show"
+        return arguments[1].partition(":")[2].encode()
+    monkeypatch.setattr(diagnostic.count.old.cache, "_git", git)
+    @contextmanager
+    def saved_cache(root, **kwargs):
+        assert root == tmp_path and kwargs["for_counts"] is True
+        with diagnostic.count.old.cache.HeldFiles(tuple(root / name for name in
+                diagnostic.count.old.cache.COUNT_CODE_FILES), protected=False, boundary=guard.check) as held:
+            saved = SimpleNamespace(plan=object(), _anchor=(None, (), held),
+                source_custody=lambda: events.append("source_custody"), code_custody=held.check)
+            yield saved
+            events.append("source_context_exited")
+            if fail_context_exit:
+                raise diagnostic.CustodyDiagnosticRefusal("REFUSED: v3_zero_original_control_bytes_changed")
+    monkeypatch.setattr(diagnostic.count.old.cache, "load_registered_cache", saved_cache)
+    @contextmanager
+    def refused_source(root, source, checked, expected_manifest_sha256):
+        assert root == tmp_path and checked is guard
+        assert expected_manifest_sha256 == diagnostic.count.PREDECESSOR_MANIFEST_SHA256
+        yield SimpleNamespace(check=lambda: None, full_check=lambda: events.append("prior_full_check"))
+    monkeypatch.setattr(diagnostic.snapshot, "load_refused_child", refused_source)
+    monkeypatch.setattr(diagnostic.count, "freeze_queries", lambda plan: queries)
+    zero_claim = canonical_json({"registration": {"head": diagnostic.snapshot.ZERO_HEAD,
+        "remote": diagnostic.snapshot.ZERO_REMOTE, "code_identity_sha256": "d" * 64}}).encode()
+    @contextmanager
+    def zero_start(root, checked, supplied):
+        assert root == tmp_path and checked is guard and supplied is queries
+        yield SimpleNamespace(_anchor=(None, object(), None, zero_claim), check=lambda: None,
+            full_check=lambda: events.append("zero_full_check"))
+    monkeypatch.setattr(diagnostic.snapshot, "load_zero_start_predecessor", zero_start)
+    real_publish = diagnostic._OwnedOutput.publish
+    def publish(owned, name, raw, **kwargs):
+        if name == "run.closed.json": assert "source_context_exited" in events
+        return real_publish(owned, name, raw, **kwargs)
+    monkeypatch.setattr(diagnostic._OwnedOutput, "publish", publish)
+    monkeypatch.setattr(diagnostic, "PROTOCOL_SHA256", hash_payload(diagnostic.protocol()))
+    manifest = {name: hash_bytes(name.encode()) for name in diagnostic.code_paths()}
+    return events, manifest
+
+
+def test_full_public_registered_composition_accepts_actual_producer_negative_then_closes(monkeypatch, tmp_path):
+    events, manifest = _registered_fixture(monkeypatch, tmp_path)
+    result = diagnostic.run_registered(tmp_path, runtime_head="c" * 40, actual_remote="b" * 40,
+        complete_code_manifest=manifest)
+    value = result.to_payload()
+    assert value["status"] == "local_observations_closed_cause_unreproduced"
+    assert value["context_closure"] == "all_source_and_code_contexts_closed"
+    assert value["registration"]["code_manifest_sha256"] == hash_payload(manifest)
+    assert value["registration"]["code_file_count"] == len(value["registration"]["code_files"]) == 56
+    assert value["registration"]["historical_sources"]["v3_zero"]["claim_sha256"] == diagnostic.V3_CLAIM_SHA256
+    assert value["probes_published"] == value["probes_opened"] == value["probes_read"] == 16
+    output = tmp_path / diagnostic.OUTPUT
+    assert {path.name for path in output.iterdir()} == {"run.completed.json", "run.closed.json"}
+    assert "source_context_exited" in events and value["authority"]["source_admitted"] is False
+    assert not any(".spent." in path.name for path in output.iterdir())
+
+
+def test_full_public_registered_wrong_source_key_has_safe_preoutput_stage(monkeypatch, tmp_path):
+    unused, manifest = _registered_fixture(monkeypatch, tmp_path, wrong_key=True)
+    with pytest.raises(diagnostic._DiagnosticStageFailure) as caught:
+        diagnostic.run_registered(tmp_path, runtime_head="c" * 40, actual_remote="b" * 40,
+            complete_code_manifest=manifest)
+    assert diagnostic.failure_summary(caught.value) == {"stage": "v3_zero_loading",
+        "category": "local_contract_refusal", "errno_name": None,
+        "contract_code": "v3_zero_negative_or_budget_changed", "held_field_observation": None}
+    assert not (tmp_path / diagnostic.OUTPUT).exists()
+    assert not any((tmp_path / diagnostic.probe_name(index)).exists() for index in range(1, 17))
+
+
+def test_full_public_registered_context_failure_is_a_safe_dominating_negative(monkeypatch, tmp_path):
+    unused, manifest = _registered_fixture(monkeypatch, tmp_path, fail_context_exit=True)
+    result = diagnostic.run_registered(tmp_path, runtime_head="c" * 40, actual_remote="b" * 40,
+        complete_code_manifest=manifest)
+    value = result.to_payload()
+    assert value["status"] == "local_diagnostic_refused"
+    assert value["failure"]["stage"] == "source_or_code_context_exit"
+    assert value["failure"]["contract_code"] == "v3_zero_original_control_bytes_changed"
+    output = tmp_path / diagnostic.OUTPUT
+    assert {path.name for path in output.iterdir()} == {"run.completed.json", "run.refused.json"}
 
 
 @pytest.mark.parametrize("changed", ["working", "committed", "earlier_during_later_read"])

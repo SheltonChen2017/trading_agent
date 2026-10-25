@@ -6996,3 +6996,33 @@ look is not a successful launch or result cell. A1–A9 remain spent; no A10 is
 authorized. Analyst320.10–320.11 retain the current access-observation barrier,
 qualifications and exact handoff. All earlier entries and other lanes remain
 unchanged under the owner's append-only Analyst accounting exception.
+
+### R-298 A10 actual source-policy upload refusal — 2026-10-25 UTC
+
+Under the owner's current AFK/readiness delegation and review waiver, one
+source-completion/compile-only recovery ran at clean freeze
+`8a621141ce67a0c213f3ddff0ede362a7851374e`. Caller SHA256
+`1cb13d0155a4e5bf43e7c3416034a93b2c1d5312ee1120e3b7d2a854431339ab`;
+profile `c38a9de346e6cf147f088e9db2dd9870188fc6d3fa9e642a62a8242ef6315711`.
+Parent brackets04:38:19.505771Z..04:38:32.512070Z, actualexit2, stderr0,
+no external bound. Observed stdout9404bytes SHA256
+`4d38b6589255fec1e27904a9a090438e8afa76138030e3035e9241f589250738`.
+The separate native-denied supplied-output validator exited0 and validated
+FAILURE evidence; outer observer retained exit2. No control/output reread.
+
+Ten application dispatches reached the exact input-runtime files/update after
+initial and post-lock strict access gates passed. QC returned HTTP200 with
+success=false and retained redacted source-policy language. Current general
+access was owner plus exact A5 and dedicated access owner-only; this is not a
+retroactive identification of A9's discarded row. Provider count and write
+effect remain unknown; no readback followed the refusal. No later module/main
+completion, explicit compile, capacity, launch, status/result call or accepted
+comparison cell occurred. Public source audit finds plain Python/data-only gzip;
+the exact policy trigger needs QC/Mia clarification, not a guessed workaround.
+
+Book A10 exactly once: **324 ->325 shared /249 ->250 Analyst development /
+50 infrastructure unchanged /699 booked cells unchanged**. The separate
+two-read R321 D1 observation adds no look. All A1–A10, old controls and earlier
+manual sample accounting remain preserved; no unchanged A11 or outcome is
+implied. Analyst321.9–321.10 retain evidence and the locked-Safari/QC-policy
+barrier. This append changes no prior entry or other lane.

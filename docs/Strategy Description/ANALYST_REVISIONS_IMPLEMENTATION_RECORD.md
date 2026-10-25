@@ -792,9 +792,14 @@ launch is part of the current readiness checkpoint.
 Section321.5 now records the once-only current observation: both views contain
 only the pinned owner and codeRunning=false; the earlier extra row is absent,
 without a proven historical cause. The strict access policy stays unchanged.
-Section321.6 prepares a separately bounded source-completion/compile-only A10;
-R321's read-only control is spent and no A10 has yet run. No capacity reservation,
-runtime success, six/eight result or formal-readiness clearance is inferred.
+Section321.9 records A10 now SPENT: current access passed, but the input-runtime
+update returned HTTP200/success=false with retained redacted source-policy
+refusal. No later module uploads, compile, capacity or launch followed. The
+public source is already plain Python; gzip parses authenticated JSON data,
+not executable code. Exact policy trigger/false-positive status needs QC/Mia
+clarification, not a guessed code rewrite. Safari is inaccessible because the
+Mac is locked. Section321.10 owns this concrete external barrier; no A11,
+automatic retry or review-authorization wait. Floor325/250/50/699, NOT ready.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -2047,6 +2052,13 @@ Implement and freeze the321.6 READY-only successor, preserving strict access
 checks and collecting per-stage finite evidence before any refusal. The current
 checkpoint is exact R298 source plus compilation and input admission, not all
 six/eight cloud candidates, runtime validation or a launched backtest.
+That successor has now run once and stopped at a retained source-policy refusal;
+321.9–321.10 supersede the prospective wording immediately above. Access passed,
+but no verified source-policy fix exists. Continue only after a controllable
+existing Safari/Mia session or an authoritative QC explanation resolves that
+specific refusal; no bypass aliases, blind formatting/split retries, new paid
+rights or historical-control replay. The owner's readiness waiver remains in
+scope, so no repeat review-authorization question is needed.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -3999,6 +4011,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-24 UTC | Owner-directed offline R298 response-evidence fix | `a9165774` -> section318 round | No incoming Claude review; implementation and same-round advice are not independent acceptance | Additive pure redaction and one-use response boundary; unchanged shared parser retains strict success semantics; no operational integration or invocation | Focused synthetic validation and limitations in318; no complete suite or spent replay | ARV2E315-001 remains OPEN; no new attempt/look/cell;321/246/50/699 unchanged | One final matching-lane push; separate review/waiver, A7 allowance and committed operational contract before contact |
 | 2026-10-24 PDT /25 UTC | Owner-authorized one additional A7 exact-source recovery | `b477c236` -> `50e59113` and final section319 result/handoff commit | Explicit current review waiver now consumed, not independent acceptance; no new Claude range | Access passed; sole first files/update returned HTTP200/success=false with one unclassified477byte error; redacted evidence authenticated, no later upload/compile/launch |760distinct focused checks, exact-final274repeat12.12s, four memory compiles/84pins; exact actual-exit evidence in319; no full suite or spent replay | A1–A7/R314/R316 spent; QC-refusal barrier OPEN, floor322/247/50/699, no accepted cell | Exactly one final matching-lane push at concrete refusal barrier; no A8 or next family cell; monitor PAUSED |
 | 2026-10-24 PDT /25 UTC | Owner-authorized A8 diagnostic and one additional A9 credential-handoff recovery | `35081915` -> `8df52a03`, `158f2fd0` and this final section320 result/handoff commit | No incoming Claude review; exact owner waivers consumed, not independent acceptance | A8 stopped locally at credentials with zero application dispatches; corrected A9 handoff reached two metadata calls, then current extra-row shape refused before upload/compile/launch | Root717 focused passes before A8 and608 before A9, overlapping selections not additive; final record repeat in320.11; no full suite or spent replay | A1–A9 spent; current access metadata and original QC upload error remain OPEN; floor324/249/50/699, no accepted cell or running candidate | Exactly one final nonforce matching-lane push; separately bounded read-only current-row observation needs review or scoped waiver; no A10, pin refresh or next cell; monitor PAUSED |
+| 2026-10-24 PDT /25 UTC | Owner AFK readiness delegation: current-access diagnosis and bounded A10 | `924a88ec` -> `5b613ca1`, `8a621141` and this final section321 handoff commit | No incoming Claude range; current readiness waiver, not independent acceptance | D1 two reads show owner-only; A10 access passes but first exact input-runtime update refuses with retained source-policy language; public audit finds plain Python/data-only gzip; Safari/Mia blocked by locked Mac | Root293 D1 and464 A10 focused passes, overlapping document checks not additive; public AST/transport/source checks and final record validation in321; no full suite or spent replay | ARV2I321-001..005 corrected before use; ARV2E321-001 OPEN, no verified policy remedy; A1–A10 spent; floor325/250/50/699, NOT ready/running | One final matching-lane push at concrete QC-policy/unlock barrier; no blind A11 or paid/other-lane expansion; no repeated review-authorization wait; monitor PAUSED |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -56596,3 +56609,148 @@ history/other lanes. Pre-claim checks alone do not add a look. At READY stop at
 exact-source/compile readiness: no capacity observation, backtest creation,
 status/result read or performance claim; remaining family cells and runtime
 validation stay outstanding. Preserve every formal/PIT/paper/live false flag.
+
+### 321.9 D2 actual A10 result — access passed, source-policy refusal retained
+
+Clean freeze8a621141ce67a0c213f3ddff0ede362a7851374e binds the final321.7
+sources and D2 decision. Record checks repeated86passes0.90s before freeze
+(not additive). Both genuine credential-free public-source preflights passed
+under native network/artifact/Keychain denial. The external observer was then
+invoked exactly once in the normal credential-bearing context. Parent brackets:
+2026-10-25T04:38:19.505771Z..04:38:32.512070Z, actualexit2, stderr0,
+no capture bound. Observed stdout9404bytes SHA256
+4d38b6589255fec1e27904a9a090438e8afa76138030e3035e9241f589250738.
+Sole native-denied supplied-output validator brackets:
+04:38:32.630479Z..04:38:35.506375Z, actualexit0, stderr0, no bound;
+stdout9446bytes SHA256
+1220b80db7fdd2c173ea3e68d4f1d1ae2990b32d60df88f7342f3e8ea49cf8ef.
+Outer observer correctly exited2 with output_validated=true. These brackets
+are process dispatch/completion observations, not exact provider-event times.
+The result is validated FAILURE evidence, not a READY report. A10 and its
+new control/external validator are SPENT; none was reread or reinvoked.
+
+Ten application dispatches reached files/update, complete-write-02, exact
+accepted_risk_order_level_input_runtime.py (23055bytes,SHA256
+c34e42d894dc88e74ce37899622a7f728bafdac9320ce2775736ba06b7ad463e).
+Current initial and post-lock access/history gates passed. Last retained
+complete-access observation at dispatch7 contains the pinned owner plus the
+exact pinned A5 row in the general view, and only the pinned owner in the
+dedicated view; every A5 typed predicate passes, dedicated write/liveControl
+are true and codeRunning=false. The observation projector's fixed false
+collaborator_policy_accepted field is not an execution verdict; actual workflow
+progress to the upload establishes that the separate unchanged policy passed.
+Access journal6128bytes SHA256
+2855b99300a9208b55905d7b76bb4f4afb442dc293595f3119a7f015c79a25f3.
+Do not use this later exact A5 row to identify A9's discarded failing row.
+
+QC returned HTTP200 with success=false, one477byte error and508byte body.
+Response body SHA256e23514ef4b4552e853a41bf2c2fe3f28f8e6c92cd5f3349f6d5a533fdd547b30
+and error SHA256bdd055d302cd830352764fc9143aa54d6468ea0707e076cc29d8187ab7164c34
+match A7's retained size/hash evidence. This new observation safely retained
+allowlisted language about encoding/otherwise obscured source being against
+service rules, plain-source saving and splitting files if a length limit is
+reached. The raw response was not printed, stored or retrospectively recovered.
+Response journal2819bytes SHA256
+5256283492b6089ad51113e3e1dbc7b97ae7ad7f7b98d43462e2282ce61b3760.
+Finite failure is remote_refused/request_ambiguous, http_failure,
+response_boundary_code=shared_request_refused. Provider-request count remains
+null/unknown. The matched hashes corroborate matching refusal evidence; neither
+the wording nor hashes authenticate the underlying classifier's actual cause.
+
+ARV2E321-001(P2,OPEN): QC's source-policy refusal blocks exact-source completion.
+No readback followed the refusal, so this attempted file's effect stays unknown.
+No subsequent seven creates/main replacement, explicit compile, capacity,
+backtest creation/status/result or accepted comparison cell occurred. R298 is
+NOT backtest-ready or running. Conservatively book A10 once:325shared /
+250Analyst development /50infrastructure /699cells. The shared ledger append
+uses the existing Analyst-only accounting exception; D1 adds zero looks and no
+prior attempt/manual sample is rebooked. No unchanged A11 is admitted.
+
+### 321.10 Public source diagnosis, compliance barrier and exact next action
+
+Root and same-round advisory public-source audits found no encoded executable
+payload in the eleven projected files. The rejected target's original source
+is24637bytes/609lines, its normalized upload23055bytes/432lines; AST equality
+holds. No exec/eval/builtin compile/dynamic import, base64/zlib/marshal/pickle
+loader or embedded encoded-code blob was found in the uploaded source inventory.
+The target's gzip.GzipFile at the original line266 reads bounded authenticated
+Object Store JSONL DATA, which reaches strict json.loads, never code execution.
+The host-only projection's compile(...,'exec') validates source syntax and is
+not uploaded executable code. The exact upload helper sends raw.decode('ascii')
+unchanged; shared transport JSON-serializes once, and a native-denied public
+round-trip check preserved the exact target bytes. Root verified all eleven
+files, target AST equality and JSON transport equality without private reads or
+provider contact. No encoded-source defect or file-length cause is established.
+The initial conversational description of a format problem is therefore limited
+to QC's refusal category, not an assertion that our source is obfuscated.
+
+Current official [Security and IP](https://www.quantconnect.com/docs/v2/cloud-platform/security-and-ip)
+guidance prohibits obfuscated executable source and bypassing compliance flags.
+The [Object Store documentation](https://www.quantconnect.com/docs/v2/writing-algorithms/object-store)
+describes in-cloud byte/JSON loading, but does not establish why this particular
+plain-source file was rejected. A false positive is possible, not proven.
+Do not rename imports, disguise gzip, use dynamic execution, reroute the upload,
+remove integrity checks or republish data merely to pass an unknown detector.
+Original formatting or a clean package/PIT-module split would require a new
+explicit source representation and AST/consumer-equivalence bridge; neither is
+currently a verified remedy. Original projection/source/admission pins remain
+frozen. No new representation, source upload, data publication or A11 was made.
+
+The owner already permits consulting Mia. Selecting Safari through the supported
+computer-use interface failed because the Mac is locked and automatic unlock
+could not unlock it. No tab/screen/private content was read, no Mia message was
+sent, and no browser/editor change occurred. Manual unlock is a concrete human-
+only prerequisite, not a request for more review or attempt authorization. Do
+not bypass the OS lock or extract browser cookies/sessions through another route.
+Public alternatives were checked: the official agent task/deployment API creates
+new mapped tasks/projects and is not a documented continuation of the existing
+R298 read-only Mia conversation; no safe existing agent identity/capability was
+authenticated. Support-ticket creation consumes a support-seat quota, and
+project attachment grants staff access to its libraries. No new agent resource,
+support purchase, ticket, staff source grant or public forum disclosure was made.
+See [agent tasks](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/agent-management/tasks/create-task)
+and [support tickets](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/support/create-support-ticket).
+
+Prepared next Mia question, to send only through the authenticated controllable
+existing R298 session after unlock: explain why files/update rejects the exact
+23055byte plain-Python input-runtime file with the source-policy message. It
+contains bounded gzip decoding of authenticated JSONL data, no decoded-code
+execution, and is below the documented file bound. Identify the precise policy
+trigger and supported compliant remedy; do not edit files, change permissions,
+compile, launch, export data or disclose credentials. Supply only this non-secret
+diagnostic context and the explicitly named user-owned file if needed. Compare
+any proposed correction locally and preserve data/source/economic gates before
+a separately frozen, justified continuation under the owner's readiness scope.
+No additional Claude-review authorization is needed for that in-scope work.
+
+This is a concrete external barrier, not completion, a token limit or an
+authorization pause. Keep the monitor PAUSED as directed. Finish this continuous
+round with durable evidence/accounting and one matching-lane push; do not imply
+background work or a scheduled wakeup was started. The next admissible action
+requires restored Safari/Mia access or a concrete authoritative QC explanation.
+
+### 321.11 Continuous-round handoff and commit dispositions
+
+Exact base924a88ec677fe1f65e51f7e5e56b90f5f9aa1f85 to this final snapshot
+contains exactly THREE Codex commits:5b613ca17ebe454f5eec00c2a4d2b0f9b76762bb
+(D1 source/freeze),8a621141ce67a0c213f3ddff0ede362a7851374e(D1 result plus A10
+source/freeze), and this final result/accounting/handoff commit. No incoming
+Claude range was present. Per-commit disposition is implemented under current
+owner waiver, not independently accepted; actual D1 observation passed, actual
+A10 recovery failed and both controls remain spent. Final correction of EOF
+whitespace was pre-use and explicitly re-pinned, not a historical-pin refresh.
+All pre-use ARV2I321-001..005 corrections remain; ARV2E321-001 and the qualified
+historical failures/source gates remain open. Same-round advice is not review.
+
+Final record/active-document selection repeated86passes0.99s after actual
+results and the append-only accounting entry; these checks overlap the earlier
+root selections. Diff/status and
+exact-source checks are required before the final commit and one nonforce push.
+Only the lane record and the previously authorized Analyst-only shared ledger
+append changed after A10; no operational/source file was modified after use.
+No complete suite, result evaluation, new provider contact, evidence cleanup,
+support/agent deployment, automatic monitor or paid-rights change occurred.
+After the one successful final matching-lane push, verify local/tracking/live
+remote agreement and clean status. Do not treat this push as a Claude trigger.
+The next action remains321.10's QC-policy clarification through unlocked Safari;
+the user need not repeat an in-scope review waiver. Do not report ready/running.

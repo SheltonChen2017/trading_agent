@@ -4,12 +4,13 @@ Status: **NEW OWNER-DIRECTED OFFLINE CUSTODY-FIRST CONTINUATION (SECTION125),
 PROSPECTIVE 84005 CUMULATIVE COUNT STARTS / UNCHANGED4GiB. REVIEW SKIPPED BY
 EXPLICIT OWNER EXCEPTION, NOT INDEPENDENT ACCEPTANCE. NO NEW RETRIEVAL UNTIL
 CUSTODY IS VERIFIED; NO PURCHASE. QC/SAFARI ARE CONDITIONALLY AUTHORIZED ONLY
-AFTER THE NEXT TARGET PRICE REVISION LANE PUSH (SECTION125.3); THAT GATE IS
-STILL CLOSED.
+AFTER THE NEXT TARGET PRICE REVISION LANE PUSH (SECTION125.3); THAT RESOURCE
+GATE IS NOW OPEN AT12be489416af00e266c3a47286f2cabafbf74e27 (SECTION125.10).
 LOCAL BACKTEST READINESS REMAINS FALSE.
 ACTUAL FIRST KERNEL PROOF REFUSED BEFORE FLAG SETTING BECAUSE THE NEW FILE
-ALREADY HAD UF_TRACKED. THE FAILED NAMESPACE IS PRESERVED; A PROSPECTIVE
-PRESERVE-TRACKED ADAPTER CORRECTION IS IN DEVELOPMENT (SECTION125.8).
+ALREADY HAD UF_TRACKED. THE PRESERVE-TRACKED SOFTWARE CORRECTION IS COMMITTED,
+BUT THE ACTUAL V2 PROOF REFUSED A FLAG MISMATCH; REQUIRED IMMUTABLE CUSTODY
+REMAINS UNESTABLISHED. BOTH FAILED NAMESPACES ARE PRESERVED (SECTION125.10).
 PRIOR ROUND: CODEX COUNTER-REVIEW OF CLAUDE `b648f60` ACCEPTED AFTER ONE APPENDED
 COUNT-SCOPE ARITHMETIC ERRATUM (SECTION 124). OWNER-DIRECTED BOUNDED RECOVERY
 AND SECRET-SAFE DIAGNOSTICS ARE IMPLEMENTED. ACTUAL V2 AND V3 INITIALIZATION
@@ -23393,3 +23394,98 @@ denied. An initial invocation named a nonexistent active-document test FILE
 and collected no tests (exit4); the corrected consistency-file selection is
 the196-pass result, not a repaired production failure. Exact60-path AST closure,
 fixed own-contract catalogue, in-memory compilation and whitespace passed.
+
+### 125.10 Actual V2 custody blocker and Target Price resource release
+
+The ONE V2 proof at clean
+`b838dd634e05f7e6bc40e02a1228429fdbc1466a` / matching tracking/actual
+originD50 started exec92433 and terminated **exit2**. Its terminal original
+safe stdout reports local_contract_refusal / `immutable_flags_changed`, errno
+null,638 permitted lane-Git calls and ALL eight denied-seam counters0.
+There is NO genuine closed summary, source replay, key read, provider HTTP,
+new claim, source START or charged byte. This is not an operational capture,
+successful primitive qualification, empirical test or QuantConnect attempt.
+No missing persistent controls are invented; this proof uses terminal stdout.
+
+Main's guarded terminal read-only inspection authenticated EXACTLY ONE safe
+186-byte0600/owner/singlelink member at kernel-immutable-metadata-20261025-v2,
+RAW SHA256 `12ae326d30644e70437533d333360dc75e1fb9d72f8e6c6edaa93917ff7b7404`.
+The current flags are64 ONLY: UF_TRACKED present, UF_IMMUTABLE absent, no
+unknown flag bits. Read-only FD/name nine-field observations matched during
+this read; their observation hash is
+`53dd9ce70ca2239bbddc7143b9ee34eab1a0db1fc25c139167f24afa0bcf9fac`.
+This is a NEW terminal observation, NOT a replacement seal, proof of former
+stability or actor attribution. Nothing was cleared, changed, deleted,
+adopted or retried; the V1 and V2 invocations/namespaces stay preserved.
+
+**SI-BUILD-20261025-015 (P2, OPEN factual custody gate):** the actual corrected
+primitive did not satisfy its exact post-set flag checks, and the terminal
+file lacks the required immutable bit. Successful fake-kernel tests cannot
+override that negative result. The exact actor/timing/cause is not established;
+do not claim the filesystem, a watcher, cloud sync, Keychain, provider or
+another agent caused it. This also does not identify historical001/006/022.
+No fresh namespace, repeated setter, longer quiet window, weaker stamp check,
+old-file adoption or source claim is authorized to guess around the refusal.
+
+Read-only disk inspection at this terminal check reports71,643,964KiB free
+(about68GiB); disk exhaustion is not the observed refusal. The installed macOS
+chflags(2) manual confirms fchflags(int,u_int), immutable bit semantics and
+0/-1 return contract; this documents the ABI, not an explanation of this run.
+
+In the same guarded matching-ref check, actual origin
+refs/heads/codex/strategy-target-price-revisions advanced from armed baseline
+`b07fafdc17590185809d7a5a7059302496997605` to
+`12be489416af00e266c3a47286f2cabafbf74e27`. This is the owner's requested
+QC/Safari RESOURCE-RELEASE signal only. The one-shot Target Price monitor
+(retained internal ID analyst-push-releases-short-interest-qc) was deleted
+after the signal; every other automation remains unchanged. Analyst pushes
+were never substituted. No other-lane source/artifacts or work was accessed.
+Mia is now conditionally available for issues during authorized QC/Safari
+work per125.4; no QC/Safari/Mia interaction has occurred in this round.
+
+**SI-DEC-20261025-08:** stop this round at the concrete custody blocker rather
+than launch source recovery or backtests with unproved custody/inputs. The
+owner's completion definition explicitly permits a concrete blocking gate.
+A source-body/receipt factory still needs real maximum-size offline custody
+closure and authenticated one-use durability proofs BEFORE any dispatch or
+reservation reduction; the current1024-byte NONCLAIM helper cannot admit
+2MiB bodies by inference. The pure prospective budget plan remains software
+only, not a capture permit. No old spent START/byte/claim is refunded or reset.
+
+Preserved cumulative count accounting remains13,992START/13,991recordedHTTP/
+23,452,681chargedbytes, with13,990 retained transport positions and67,885
+missing original descriptors. Owner ceiling84,005 cumulative STARTs and4GiB
+remains prospective and unchanged; canonical looks0/0, exploratory0,alpha0,
+permanent look IDsnone and QC backtest attempts0. Source/native identity,
+daily-chain, eligibility/corporate-action/terminal-cash and actual-input gates
+remain unresolved; no backtest readiness or good empirical result is claimed.
+
+Current round commits pending the ONE final publication are
+`358b0d79d6e8840197f0eef9743c2b7ea59ce41b` (prospective primitive/budget/owner
+instructions) and `b838dd634e05f7e6bc40e02a1228429fdbc1466a` (verified initial
+UF_TRACKED software correction and registered V2 proof), plus this terminal
+lane-record-only closure. Claude review is not required under current owner
+steering. Historical review/disposition rows are retained, not rewritten.
+Next authorized action after final record checks: one matching-lane nonforce
+publication, then request a separately scoped reliable custody/storage remedy
+before any further source claim. No backtest or repeated namespace guess is
+the next action, even though the QC/Safari resource gate has opened.
+
+A separate read-only native-call audit found no verified software/ABI defect:
+the local SDK declaration is int fchflags(int,uint32_t), and the helper uses
+the fixed libSystem symbol/c_int,c_uint→c_int with original readonly same-inode
+FD and target66. No code requests a later clear. Terminal evidence does NOT
+distinguish never-observed66 from transient66 or identify an actor; no
+per-call return/immediate-FD-versus-name trace was retained. Accordingly no
+speculative ABI change, sleep/fsync, setter retry or namespace is justified.
+This audit is separately attributed development evidence, not Claude review.
+
+Main's terminal lane-record plus three selected active-document checks passed
+23tests/.31s, no skips/warnings, OS network denied. Whitespace and the complete
+committed historical-body byte comparison passed. Both actual proof handles
+44895 and92433 have known terminal exit2; no pinned operation remains. Only
+the lane record changes after the B838 checkpoint. Final publication must
+recheck exact roots/branch/HEAD/status and matching actual/tracking remote,
+disable follow-tags/submodule pushes, then verify clean local/tracking/actual
+matching-lane equality. No source rows, private usability conclusion, secrets,
+implementation changes after validation, purchases or external messages occur.

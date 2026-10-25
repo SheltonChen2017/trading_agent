@@ -13,9 +13,13 @@ ONE FILE BUT REFUSED ITS LATER POSTSEAL STAMP CHANGE (SECTION124.15); NO LOCAL
 POLICY CLOSURE OR HISTORICAL REPAIR IS CLAIMED. FURTHER CLAIMS ARE HELD. RETAINED MONTHLY
 INPUTS HAVE CLOSED OFFLINE SOURCE-ONLY NORMALIZATION (SECTION124.9), WITHOUT
 SOURCE FITNESS, INPUT ADMISSION OR BACKTEST READINESS.
-A SOURCE-ONLY SPENT-EPOCH LEDGER IS IMPLEMENTED (SECTION124.16). THE FIRST
-ACTUAL OFFLINE REPLAY REFUSED AN OVERBROAD MAIN HARNESS CONSTRUCTOR DENIAL;
-ITS NARROW CORRECTION IS DOCUMENTED IN124.17, WITHOUT SOURCE CLOSURE.
+A SOURCE-ONLY SPENT-EPOCH LEDGER HAS NOW CLOSED ITS ACTUAL OFFLINE REPLAY
+(SECTION124.18), AFTER THE NARROW HARNESS CORRECTION IN124.17. THIS IS
+ACCOUNTING/LINEAGE CLOSURE ONLY, NOT COUNT-SOURCE OR INPUT ADMISSION.
+THE FROZEN FULL-STUDY RECOVERY IS SHORT AT LEAST ONE PROSPECTIVELY AUTHORIZED
+START BEFORE FUTURE RETRIES, AND THE NEW-METADATA CUSTODY GATE REMAINS OPEN.
+SECTION124.19 CLOSES THIS ROUND AT THOSE OWNER/EXTERNAL GATES FOR ONE FINAL
+MATCHING-LANE PUBLICATION AND CLAUDE'S INDEPENDENT REVIEW.
 OWNER NOW DIRECTS CONTINUATION UNTIL LOCAL BACKTEST READINESS, WITHOUT QC.
 ALL OLD CLAIMS,
 NEGATIVES AND CHARGES REMAIN SPENT/IMMUTABLE. NO BACKTEST READINESS IS CLAIMED.
@@ -252,6 +256,8 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-24 | Codex owner-directed publication handoff | Starting actual remote `b211db7f81103df9cc3d736a05a4cc82d8efe4b0`; unpublished `acf04aff1b2e78bba5d642b350c4f983ac53caf8`, `71c2e7a849aaed577a8a0e62b6d822e07b6b5f77`, `99417837467f98b0ed02a3272b0980f4efa2d243`, followed by this record-only closing commit | Existing-subscription access/recovery code for Claude review, not local backtest readiness | New count capture terminated refused at13,944 STARTs; original/new spent claims and unknown transport cause retained. Offline daily audit verified593 complete/576 complementary days; no new daily capture. Later owner stop/wait/push authority in122.10 supersedes continued building for this handoff only. | Earlier Main286-pass and117-pass executions remain attributed in122.7–122.8; closing record/diff checks in122.11. No full suite, real outcome or QC access. | Retain001–011 and all earlier ledgers; SI-BUILD-20261024-012 is unresolved actual transport/coverage refusal, not a proved timeout or subscription denial. | One final matching-lane non-force push after terminal documentation; Claude reviews the exact resulting pushed range. No implementation, source retry or next milestone; remove only the narrow wait monitor after publication. |
 | 2026-10-25 | Claude review (macOS session) | `cc1e44f` -> `ae28f4a` reviewed from the published head after Codex's own push; **no code or test correction**; this record commit is the only Claude commit | Independent review of Codex's counter-review of section 120, the six-route provider access audit and the count and daily recovery | Confirmed all three `SI-CCR-20261024` findings against my section 120. Verified both request rounds were frozen and committed before running, matched the count recovery's claim, closure, diagnostic and receipt and the daily scope files to their digests, and confirmed the access receipts hold no email-shaped data. Two in-memory probes: B2 red; B1 unreachable by construction. | Pushed tree `ae28f4a`, clean, network-denied, empty environment: 16 affected test files **645 passed** (no skips or warnings); mutation baseline 40 passed; compileall exit 0; record-regression and active-document checks pass after this record; `git diff --check` clean. **No complete lane suite, by owner direction.** **Authorized looks 0, consumed looks 0**. | `SI-CR23-001` (P3, open: no retry or chunking rule for status-less transport failures). `SI-CR23-002` (P3, open: status-paragraph test pins tie the status to past rounds). `SI-CR23-003` (P3, closed by erratum: `ae28f4a` row should be 2026-10-25 UTC). `SI-CCR-20261024-001..003` confirmed against Claude. `SI-BUILD-20261024-012`, source P2s and others open. | Codex counter-reviews this record commit. Freeze a retry or chunking rule before any further recovery. QuantConnect stays paused until the owner releases it. |
 | 2026-10-25 | Codex counter-review + bounded recovery | Exact Claude range `ae28f4a040706e7941553fdd6dd8072948b069cb..b648f60112af141efc2a12fbaef03b38846d219d`; this bounded code/record series follows | Section124: accept review after count-scope erratum; distinct finite successor transport and offline refused-prefix replay | Old v1 source files/claims stay immutable; no implicit budget reset; new512-descriptor proof chunk has528 maximum new STARTs,16 extra attempts, maximum3 tries, fixed2/10s backoff and one-hour START window. Not full source qualification or backtest readiness. | Main56-test counter-review and142-test new focused executions, causal clock/claim regressions and attributed delegate evidence in124; no complete suite or QC | SI-CR23-002 corrected; SI-CR23-001 design implemented, actual closure pending; old source P2s and012 stay open | Freeze measured predecessor manifest and exact committed code before any fresh claim/key/HTTP. Accumulate local commits, one final matching-lane push after this bounded round, then independent Claude review. |
+
+| 2026-10-25 | Codex final bounded-round handoff at owner/external gates | Starting matching origin `b648f60112af141efc2a12fbaef03b38846d219d`; ten local commits through `2da6aed30532d41f3a9ee1b45f9ae4e83771f2d9`, plus this final record-only commit | Sections124.18–124.19: actual source-only spent-epoch accounting closure; honest full-study cap/custody stop | Retained monthly normalization and count-epoch accounting closed OFFLINE, but no source/input/backtest admission. Zero new provider requests in this continuation; every spent claim, negative, body/unknown full-page debit stays immutable. At least1 additional finite START allowance is needed before future retries; metadata custody006 remains open. | Main focused/causal checks and actual73043 exit0 are attributed in124; final record/diff/status checks follow. No complete Codex suite, QC or outcomes. | Original source/coverage/custody P2s stay open. Pre-release software007/008 and operational-harness009 corrections do not repair historical refusals. | ONE final nonforce push to matching lane ONLY, after concurrency guards and no pinned process; actual publication/full hash/equality reported in chat. Claude independently reviews exact pushed snapshot. Owner must separately settle finite recovery allowance and safe custody policy before new retrieval; no monitor rearm. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -22804,3 +22810,176 @@ NOT Claude review. All code reversals were memory-only; the original helper
 was never replaced or weakened. Production source/loader/model/old diagnostic
 bytes are unchanged. Only this record and the loader test are staged for the
 new local checkpoint; no new actual invocation or interim push occurred.
+
+### 124.18 Actual OFFLINE spent-epoch accounting context closed
+
+Technical: the ONE separately frozen corrected harness invocation73043 at
+clean `2da6aed30532d41f3a9ee1b45f9ae4e83771f2d9` / matching actual and
+tracking originB648 terminated **exit0**. This is observed process termination,
+not an absent-handle inference. Original source/cache, complete FINAL parent/
+refused-child membership, external spent claims, every original attempt/body/
+unknown full-page debit, genuine zero-START negatives and historical code
+passed their held checks and context exits. A fresh58-file committed-Git/
+current-byte/stamp audit and terminal clocks completed before the genuine
+original factory-issued closed witness. All wrapper counters are0: provider/
+socket, credential, capture, publication and Python write-open. No new source
+claim, request, START, charged byte, artifact, probe or report file was created.
+
+Plain language: preserved accounting and lineage have now been replayed and
+closed against actual local evidence. This validates the bounded accounting
+software, NOT the meaning, fitness, coverage, licensing, original availability,
+denominator, corporate-action/cash or actual-input readiness of those sources.
+The old refused captures remain refused and spent. There is still NO positive
+closed bounded count chunk or qualified count-source union. No count/cell
+iterator or compiler-input capability was added. The first failed harness
+invocation49475 stays failed;73043 is not its resume or an old claim restart.
+Actual source-custody failure022 and new-metadata failures001/006 are not
+explained, repaired or overridden by this unrelated read-only context closure.
+
+Original started_at is `2026-10-25T08:41:31.939631Z`; closed_at is
+`2026-10-25T08:45:27.618153Z`. Closed status is
+`closed_offline_source_only_slice`, schema
+`si-count-epoch-ledger-context-closed-v1`. The original provisional source-held
+ledger SHA256 is
+`601ffc89671fafb52a17abe6ef0ac7222b66105ca656ee742e841d585b176b95`;
+pure model ledger SHA256 is
+`b3a8ac9057f8461bd4c450ffc911a5adac8c129ced762e33c5e56660215861e3`;
+genuinely issued closed-summary canonical SHA256 is
+`49e063bc331f78b94ad5a6d4cba68bf729024da66e9ea4cdb44d7abbf2857627`.
+Runtime code identity is
+`04e7a42c9fc091cf3d1a8547fff10004fd7612a0e204b1aa0f4d32ef7a58ed83`.
+The exact loader protocol5eae…,58-path list8ad8…, current-byte mappinga826…
+and corrected harness policy32cba… are the full pins in124.16–124.17,
+unchanged during the invocation. Main independently parsed the terminal
+aggregate stdout and recomputed its canonical hash, runtime58-code identity/
+mapping, exact authority, counters and accounting after exit, without replaying
+the source or inventing output receipt files. A released context is a finite
+observation, not a promise that source files remain immutable forever afterward.
+
+| Authenticated spent epoch | START debits | Recorded HTTP invocations | Retained transport positions | Charged bytes | Sealed inventory SHA256 |
+|---|---:|---:|---:|---:|---|
+| Original prefix | 48 | 47 | 47 | 2159332 | `9710382dc90cd7a47c941bd83809c51f2f717eebcefef672573d92dcc2b92dc5` |
+| Refused recovery | 13944 | 13944 | 13943 | 21293349 | `5e197b76253cfcca15c2224fddd9da3d80e306bd8a2c6c359e06e5c9d5a469c0` |
+| V2 zero-START spent refusal | 0 | 0 | 0 | 0 | `b5cddfbd149a1bf3908d1fcebafa20b8f90dbc58920a209e75d04871c03cf4c6` |
+| V3 zero-START spent refusal | 0 | 0 | 0 | 0 | `2ea4c70105a2c0a508e229d7b5fdd3f48891ac72bd96c27213bea0f31afad998` |
+
+Actual union accounting is13992START/13991 recorded HTTP,13990 distinct
+retained transport positions,13991 distinct started positions and1 repeated
+position START. Retained raw bytes19258377 plus two unknown/no-body full-page
+debits4194304 equal chargedbytes23452681. One START is recorded not invoked;
+the conservative START-based HTTP upper bound13992 is NOT an observation of
+extra HTTP or a claim that the recorded False flag is uncertain. Actual wire
+HTTP count is explicitly not established. The retained-position union hash is
+`25dd4a2c07eec748e4944d26a10024aea44e014f051bc67ce9f1b85a15a4e6f2`.
+
+Of81875 frozen original descriptors,67885 lack a retained transport observation.
+The unchanged81876 cumulative START ceiling minus13992 spent leaves67884.
+Even the optimistic one-new-START-per-missing-position/no-retry case therefore
+requires **at least1 additional prospectively authorized START**. This is a
+lower bound, NOT a sufficient retry budget or new authorization. The unchanged
+4GiB ceiling leaves4271514615bytes. Neither zeros nor retained partial success
+refund spent claims, remove the two full-page debits, shrink the roster or admit
+unknown data. All original_source_complete/any_count_source_qualified/source/
+denominator/PIT/actual-input/ready_for_backtest/trading flags remain false;
+positive closed chunks0, new provider/key/claim/START/bytes0, outcomes/QC0.
+
+### 124.19 Terminal gate, exact accumulated commits and final handoff
+
+**SI-DEC-20261025-04**, under SI-AUTH-20261024-05 and the owner's one-final-push
+boundary, closes this round at factual owner/external gates, NOT readiness.
+The frozen full-study recovery cannot complete under its present START cap.
+Increasing that finite allowance, allocating future retry STARTs or changing
+the frozen candidate scope cannot be inferred from broad preauthorization.
+The prospective metadata creation policy also never achieved actual closure:
+006's postseal stamp refusal still dominates its provisional control. No more
+probe namespace, longer window, weaker/postseal rebaseline, old-claim restart,
+new provider retrieval or automatic recovery is permitted to guess around it.
+No local accounting code can create a missing request allowance or turn a
+failed custody seal into valid evidence. These are irreducible within the
+present round's fixed scope; they are not a claim that all alternative future
+research scopes are impossible.
+
+The completed bounded software work is safe retry/diagnostic support,
+retained-monthly source-only normalization and actual spent-epoch accounting.
+It does NOT complete source qualification or the independently gated canonical
+PIT/latest-revised descriptive candidate. After the owner supplies a new
+finite recovery/custody decision and Claude's exact-snapshot review has been
+counter-reviewed, later work can address authenticated positive closed-chunk
+reloading/union, whole fresh missing-day chains/union, exact native/class/CIK/
+USD composition, issuer-size/eligibility, corporate-action/terminal-cash and
+actual-input gates. No invented dividend-pay clock/cash proxy or latest-revised
+to historical-PIT relabeling is accepted. No new source or empirical milestone
+is started by this handoff.
+
+Complete Claude range
+`ae28f4a040706e7941553fdd6dd8072948b069cb..b648f60112af141efc2a12fbaef03b38846d219d`
+remains **accepted after the appended P3 scope-arithmetic correction** in124.1.
+The following exact local commits accumulate AFTER that accepted review.
+Their disposition is **implemented and Main-validated within stated limits;
+independent Claude review PENDING**, not independently accepted:
+
+| Commit | Scoped result and retained limit |
+|---|---|
+| `5edab10d697e59595204e167539f6da1a68b2c5a` | Bounded count successor/retry and secret-safe diagnostics; historical spent budgets/refusals retained. |
+| `e9771c52824edc3fb123d586230ffca36bcfdd8f` | Measured successor registration; later V2 zero-START refusal preserved, not qualified closure. |
+| `2d11d1f5b73a04e0701c65bdeb81152766535f89` | Preserve V2 negative and fixed initialization-stage diagnostics; later V3 zero-START refusal remains open. |
+| `c2f96272057174f5051284b4e5843272e4857511` | Retained monthly OFFLINE normalization adapter; initial actual publisher-byte mismatch retained. |
+| `10e4eaaab9bcb547bf288a20c8a10a46c19a446f` | Match original canonical JSON plus one LF; actual monthly V2 source-only closure, not fitness/input admission. |
+| `f287c955a87a8f536cc7fc237f0ecea8a02508bd` | Finite NONCLAIM custody diagnostic; its actual pre-output failure remains unknown and has no invented receipts. |
+| `287b58d76d2c857740b913b11afb70366e0898c6` | Genuine original refusal schema and safe setup classification; later first-probe ctime refusal retained. |
+| `c492abad9a2b75592c48490daed49a569802e5ba` | Bounded creator-only unique metadata seal; actual later postseal refusal006 still open. |
+| `6ab546713cf242d3eb7134eadd9b38bb4658481e` | Fixed four-spent-epoch source-only ledger/held-context reader; no positive chunk/input route. |
+| `2da6aed30532d41f3a9ee1b45f9ae4e83771f2d9` | Correct Main harness constructor-versus-publication boundary, add original-helper regression and preserve first failed read; actual73043 accounting closure occurred at this snapshot. |
+
+This final record-only commit follows those ten. The review range is matching
+originB648 through the final published HEAD, including this handoff; the final
+full publication hash and post-push equality are reported in chat rather than
+self-referenced in its own commit. No push has yet occurred at this entry.
+All historical rows and complete Claude123 remain unchanged; this new ledger
+row and append explicitly supersede earlier provisional/current-state limits
+without rewriting those records. All prior factual source P2s, transport012,
+custody022/001/006 and inherited held/shared findings remain open. Software
+007/008 and wrapper009 corrections do not close those empirical gates.
+
+All pinned invocations have known terminal results; no source operation is
+active. Only this record changes after73043. Main uses relevant record/selected
+active-doc/diff/status checks here, NOT a full suite or a new actual replay.
+Earlier234/19.83s,100/16.60s,66/15.87s and23/.62s are prior executions on their
+recorded snapshots, not fresh code validation at this closing entry. Delegate
+or peer evidence stays separately attributed; neither is Claude review.
+Historical286/50.51s,117/11.43s and Claude645/1190.40s also remain prior.
+
+Next authorized action is the ONE final nonforce publication from this exact
+worktree to `HEAD:refs/heads/codex/strategy-short-interest`, follow-tags and
+submodule pushes disabled, after immediate physical/Git roots/branch/exact
+HEAD/status/actual matching-remote concurrency checks. Stop on advancement
+and never overwrite Claude. Verify clean local/tracking/actual-remote equality,
+then delete ONLY `short-interest-local-readiness`; all other automations stay
+unchanged, both older deleted monitors stay deleted and no review/build monitor
+is armed. Claude independently reviews the exact pushed snapshot; no message
+to Claude or another chat is sent automatically. Owner action is a separately
+finite recovery allowance/custody decision, not QC or purchase authorization.
+
+No QuantConnect access of ANY kind, purchase/renewal/new terms/new credential,
+email, other lane, broker/operator database, deployment, paper/live or real
+order occurred. No actual outcome join/S1/rank/order/strategy evaluation or
+backtest was run. Canonical actual looks0/0, exploratory0, alpha0, permanent
+look IDsnone, QC attempts0; protected dates/budgets remain intact. No private/
+licensed/reconstructible rows, usability conclusions, contacts/accounts or
+secrets enter Git/chat. Local disk previously had about69GiB free, no cleanup
+was performed and disk space is not the present blocker. Readiness remains
+FALSE; this is a truthful completed-round handoff at concrete gates.
+
+Final Main record/three selected active-document checks: **23passed in0.58s**,
+no skips or warnings, OS network denied. Main separately verified all earlier
+record rows/body bytes against2DA after excluding ONLY the single new final
+ledger row, and exact complete Claude123 bytes; no historical rewrite exists.
+The only changed path is this lane record. Independent development peer read
+the complete final diff and checked all ten full commit hashes/order and the
+optimistic shortfall arithmetic; no actionable issue was found. The peer did
+NOT independently reopen actual sources/private stdout, inspect actual origin
+or review the automation roster; those are Main-attested operational facts,
+not extra Claude review or delegated source qualification. All agents are now
+finished/frozen. The single matching origin read/push route was verified
+without emitting its URL; final root/branch/HEAD/status/ref checks still apply
+immediately before commit and publication.

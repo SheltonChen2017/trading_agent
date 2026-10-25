@@ -46,8 +46,8 @@ PRIOR_BYTES = 23_452_681
 MAXIMUM_CUMULATIVE_BYTES = 4 * 1024 ** 3
 # Frozen after the original-byte, read-only manifest measurement, before any
 # successor claim/key/HTTP. PENDING is deliberately a hard operational gate.
-PREDECESSOR_MANIFEST_SHA256 = "PENDING"
-PROTOCOL_SHA256 = "PENDING"
+PREDECESSOR_MANIFEST_SHA256 = "9be5d93cbc48527c1de98afa7e5b3599abfca63bdb9bdc5eef0f05d727aac4d7"
+PROTOCOL_SHA256 = "b0eb4dc35db8787ef02e0ef9f6e514f81fd0eaa8855838bde2efdb47f822a2c5"
 
 
 class BoundedRecoveryRefusal(ValueError):

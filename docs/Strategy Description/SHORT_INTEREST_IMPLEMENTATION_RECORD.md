@@ -3,7 +3,8 @@
 Status: **CODEX COUNTER-REVIEW OF CLAUDE `b648f60` ACCEPTED AFTER ONE APPENDED
 COUNT-SCOPE ARITHMETIC ERRATUM (SECTION 124). OWNER-DIRECTED BOUNDED RECOVERY
 AND SECRET-SAFE DIAGNOSTICS ARE IMPLEMENTED; ACTUAL REPLAY AND FIRST-CHUNK
-REGISTRATION REMAIN PENDING AT THIS PRE-DISPATCH CHECKPOINT. ALL OLD CLAIMS,
+DISPATCH REMAIN PENDING; ITS OFFLINE-MEASURED MANIFEST/PROTOCOL ARE NOW FROZEN
+IN SECTION124.4. ALL OLD CLAIMS,
 NEGATIVES AND CHARGES REMAIN SPENT/IMMUTABLE. NO BACKTEST READINESS IS CLAIMED.
 SIX PRIOR P2s AND ACTUAL TRANSPORT/COVERAGE FINDING `SI-BUILD-20261024-012`
 REMAIN UNRESOLVED. TWO HISTORICAL QC METADATA REQUESTS REMAIN RECORDED.
@@ -21757,3 +21758,40 @@ must record their real terminal result and any factual blocker, without
 inventing successful source qualification. Only one final non-force push to
 the matching lane is permitted for this accumulated round. No intermediate
 push, full suite, QC, purchase, outcome join or claimed backtest result.
+
+### 124.4 Actual offline manifest and prospective first-chunk registration
+
+The first local code/record checkpoint is
+`5edab10d697e59595204e167539f6da1a68b2c5a`; no push occurred. Main's final
+pre-checkpoint eight-file selection passed **281tests in4.79s**, no skips or
+warnings. This includes the complete-source-audit refusal and composed-code
+FD regressions added after the earlier276-test execution. Shared files and
+all old implementation/capture protocols remain unchanged.
+
+**SI-DEC-20261024-09:** with clean exact5EDA and actual matching originB648,
+Main ran only `measure_manifest` under macOS network denial and an empty
+inherited environment. It completed with exit0: **41835 members**, canonical
+manifest bytes**5214129**, raw manifest SHA256
+`9be5d93cbc48527c1de98afa7e5b3599abfca63bdb9bdc5eef0f05d727aac4d7`.
+Provider HTTP0, credential reads0, source admissionfalse, looks0 and QC0.
+The reader authenticated the fixed external spent-claim digest and all
+original member hashes/stamps, including full-pass custody; it did not parse
+market rows, replay the full child inventory, qualify a denominator, or spend
+a new claim. No old file was changed. The earlier PENDING entry is retained
+as the truthful pre-registration checkpoint, not the current dispatch gate.
+
+The successor manifest pin is now literal in the controller, with prospective
+protocol SHA256
+`b0eb4dc35db8787ef02e0ef9f6e514f81fd0eaa8855838bde2efdb47f822a2c5`.
+Exact committed current code must still be supplied as the complete54-file
+manifest under its externally bound clean runtime HEAD; no future/self HEAD
+literal or uncommitted code is accepted. Before the new output/claim/key,
+the wrapper must additionally replay both actual refused prefixes and their
+original code/controls/clocks into the halted typed inventory, enforce free
+descriptor headroom, and observe only the actual matching origin ref.
+No child dispatch or backtest readiness is claimed by this registration.
+
+Main's post-pin focused chunk/record/active-document check passed125tests
+in1.11s; the54 relative-path/current-byte mapping SHA256 is
+`7d304cc9fa66d8dbb2a3f22bdc26846f46537becff43b9fbb21ee1f69c367fb0`.
+This registration commit remains local until the round's single final push.

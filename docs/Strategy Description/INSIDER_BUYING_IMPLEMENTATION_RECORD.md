@@ -33252,3 +33252,243 @@ in0.595952042s; exact245 source/test hashes and frozen previous helper hashes
 passed. Final record/active-document and diff checks follow this append;
 commit then freeze ALL writers before245's one corrected observation. No
 actual profile/controls were read by this validation. No interim push.
+
+## 247. Corrected native observation succeeds; actual64-row shape (2026-10-25)
+
+245's separately registered v2 observation executed ONCE on ALREADY-EXISTING
+CLEAN`eb2482a27c2ed325cf0b7a735d1030fb4b49a724`, all writers frozen. Final
+record checks before that commit were72 passed1.37s. Observed guarded parent
+span5.992448833s, exit0/stderr0. Initially native network/fork/ALL-write/
+security-exec-denied child replayed exact9-leaf Q2 namespace/pins/links/source
+and held metadata; trusted parent revalidated bounded witness and all original
+106 source bytes against6011ae9d, then stripped raw witness. Current108-source
+inventory was separately Git-rooted/rechecked. No new request, credentials,
+QC/data access, look, backtest, original write or profile widening.
+
+| Observed v2 evidence | SHA256 |
+|---|---|
+|public result|`7fb8e2265b31095f0df758de7e8ddeda7ca745c831a2c24b8d714a1f519cd9fe`|
+|108-source current inventory|`c409a57216ce2f0691a6d4a1fecb62376e1b4ffafaf102eb8106ca753f060a27`|
+|profile observation|`fa8e4c7851a5da5741b23939b8b10bb7a0e20c8c9373fb0b25f3ac7390736333`|
+|v2 registration|`ee6ac631a7f29ca42293c811c2bee52526c53d9ef57abbc70c5113ef9667fb5d`|
+|original124,738B worker stdout|`d8203de828635249aae05a9b406023e076cd759439461f17db90f12de144ce0f`|
+
+Exact fixed8,695B response remains fa08fe5f…; original complete1590c272…
+and producer FAILED/opaque disposition remain unchanged. Foreign JSON parsed;
+one top directory object, exactly name/parent-dir/item fields, no unknown
+fields;64 items each exactly href/last-modified/name/size/type, all strings,
+type=file and safe Q2 archive filenames. Size strings carry explicit`KB`
+labels, not the old numeric-only profile. Directory display paths were outside
+the narrow observation allowlist and emitted NULL; their raw strings/hrefs
+were NOT exposed or guessed. The unchanged old parser still refused
+`directory_profile_refused`; item href/KB differences would also require a
+separate new contract, not an edit to executed producer bytes.
+
+Displayed ordinal56 advertises`20210618.nc.tar.gz` /`291592 KB`; this is only
+an observed name/lexeme, NOT qualified href, actual compressed byte count,
+kilobyte-base/rounding proof, download authorization or chosen request yet.
+All64 ordered advertisements remain in the result hash; no item was silently
+dropped. No archive/member/filing identity, full parent/XML admission, source
+authenticity, availability/PIT, rights or readiness is established here.
+
+`IBFEED-PROFILE-OBS01` **CLOSED within its actual reader-front scope**: the
+verified correction passed the original validator and actual child/parent
+custody path. The preceding20e5dbfc observer stays FAILED; no original result
+was rewritten. Six carried topical/shared P2s remain OPEN. Under delegated
+continuous-build authority, next qualify a NEW read-only retained-format
+adapter: request-bound fixed directory, exact observed fields, explicit same-
+origin/Q2 href validation, lexical KB advertisements with unknown actual byte
+semantics and complete ordered refusal accounting. No repeated directory GET
+or archive sample before that factual link/format qualification.
+
+## 248. Register one cloud control-only cell, not a data query (2026-10-25)
+
+Alongside retained SEC qualification, register
+`ib-qc-cloud-control-20261025-once`, NEW local namespace
+`artifacts/insider_buying/qc_cloud_control_v1`, NEW own notebook
+`ib_qc_cloud_control_20261025.ipynb` in project37465795, exactly one selected
+cell. Preserve research.ipynb/main.py/old JSON preview, private SDK images and
+claimed namespaces; never Run All, activate an old draft or use a backtest
+as a data-lookup workaround. Qualify/commit new source/test pair before any
+local intent publication, source upload or cell execution.
+
+Purpose is only observed Research execution and an own-control Object Store
+write acknowledgement, NOT dataset/identity/listing/history/fundamentals/prices
+or outcome access. One fresh project-prefixed256-bit unpredictable key, fixed
+own control text, one exact-own-key presence precheck then at most one save;
+no list/read/readback/download/delete, subscription/history/data lookup,
+project build/compile, agent deployment, job, strategy launch or backtest.
+QuantBook construction may initialize platform framework/reference services;
+zero EXPLICIT dataset/history calls is not a claim of zero internal I/O.
+
+Before upload/execute, exclusive durable local intent must bind clean exact
+Git/source identity, registration/core hash, full final cell bytes/hash,
+project/notebook/selected-cell target and key. No self-referential source hash:
+hash generic core separately, then registration, then full generated cell
+externally. Effective initial native network/fork/ALL-write/security-exec
+source/control preflight precedes publication; parent Git remains outside
+the denied child. One-shot local intent/within-kernel marker refuse repeat;
+timeouts/unknowns stay consumed, never reset or rename-retry.
+
+Existing-key precheck must refuse before save. This is NOT atomic CAS or a
+guaranteed immutable Object Store API: a cross-session race remains possible.
+Use exclusive own project/cell and fresh unpredictable key; document residual
+negligible-collision risk rather than manufacture an overwrite guarantee.
+Save=true is only an API acknowledgement, not independent persistence or
+data entitlement/readiness proof. Outside output is limited to own source/
+registration/key/write-completion status; no Object Store content/digest,
+private exception text or dataset-derived values. Cloud payload stays cloud.
+No routine owner approval requested; this is a new explicitly documented
+bounded diagnostic under existing build/QC authority, not a spent backtest
+candidate attempt. No actual cell preparation/execution at this registration.
+
+## 249. Register fixed64 original-parent/XML structural assessment (2026-10-25)
+
+Register `ib-pilot-sec-first64-original-parent-assessment-20261025-once`,
+read-only offline assessment of231's exact capture report
+`a407d79f06e8257a9a7344a8a64398547e0e51209eae169e4acaa58b92839749`:
+64 original complete bodies/650,349B, every ordered request/claim/start/result/
+header binding and original source identity. No new source request, mutation,
+financial computation, QC query, outcome look or backtest. This reuses retained
+originals, not the full pilot population or an acquisition replay.
+
+Qualify/commit an additive source/test pair before activation. Native child
+must effectively deny network/fork/ALL-write/security-exec before first actual
+input and recheck held namespace/ancestry/locks/body bytes and current/frozen
+sources. Trusted parent separately roots original capture inventory to its
+ALREADY-EXISTING1bb03b8e execution and current consumer identity to the future
+clean assessment commit; do not pass a later identity as if it existed during
+original capture. Bounded source/control witnesses may cross trusted IPC for
+parent validation, but no raw financial body or financial numeric fields are
+requested in public output.
+
+Use unchanged frozen `project_sec_complete_submission` and exact target
+facts from the source request, including decoded MASTER hash (not ZIP hash),
+form/date/accession and expected bulk issuer CIK. Do not guess issuer from
+archive-directory CIK/accession prefix or derive expected issuer from the
+same header to make it self-agree. Preserve reporter/issuer distinction and
+quarantine disagreement. Require complete envelope/document accounting,
+exactly one complete primary ownership XML, verbatim child spans/hash/length,
+header/XML issuer and reporting-owner agreement. Raw acceptance14-digit text
+remains **uninterpreted** in this structural step; do not reuse frozen2022Q4–
+2023Q1-only timezone helper for2021, fabricate official UTC corroboration or
+call a computed clock independent source evidence.
+
+All64 must receive projected/quarantined ordered dispositions with sanitized
+grammar/security/identity refusal accounting and total650,349B conservation.
+No amendment family is guessed; later Decimal-safe financial parsing and4/A
+lineage are separate work, not this assessment. Preserve921,570 pilot targets,
+full warm-up/context population and every unknown/readiness gate. Tests prove
+structure only. No actual assessment has occurred at this registration; one
+final combined push at completed/blocked round end remains controlling.
+
+## 250. Retained-format and cloud-control images qualified, not executed (2026-10-25)
+
+| New image | Bytes | SHA256 |
+|---|---:|---|
+|`research/insider_buying_sec_feed_retained_inventory.py`|14,148|`8e341b890ebfac3fc8355fab09dbe5efeb481b30bc776309daa63eec75a383a8`|
+|its tests|19,731|`d5093cdf59548b1f7e0b78f7dc17912bc6264743e05d88e79d7b48ddf4ce07b5`|
+|`research/insider_buying_qc_cloud_control_cell.py`|20,304|`28cd30598c6d0bd6475c3c105271638f43079cc143abc48c89d2ee711ee30dae`|
+|its tests|29,057|`de4ac3b94265f3bda1865d2b085bf38840bf16e1b262b17ad2434b36a16bf95f`|
+
+Register the retained-format observation
+`ib-sec-feed-directory-2021q2-retained-format-20261025-once` before actual
+use. It retains247's complete64 advertisements or refuses the whole inventory;
+source identity is the independently pinned HTTP request/control/body, not
+opaque directory display names. Each exact five-string row must have a real
+Q2 date/name, unique finite same-directory href, file type and positive decimal
+KB lexeme. No external/protocol-relative/credential/query/fragment/percent-
+escaped/traversal/different-quarter link or filename fallback is admitted.
+Canonical row hashes are not raw JSON substring hashes; KB magnitudes remain
+text, with no claimed byte base, rounding or actual payload length. Old
+executed parser stays unqualified. Native input hold/initial denial and full
+independent parent witness/Git rederivation remain as247; all SIX new/observer/
+producer source/test images explicitly enter current identity.
+
+248's cloud-control generator is local-only. Generic core SHA
+`5cf607974855212f952129a3d4b17138b7a77f43a654878070694ecd0d21e57b`;
+source and full final generated cell are separately hash-bound before upload.
+Its explicit own-key precheck, at-most-one save, permanent local intent and
+kernel marker do not claim CAS, independent storage persistence or data
+readiness. Only Python stdout/stderr are discarded during framework/SDK
+operations; managed/native runtime output is not falsely certified suppressed.
+No QuantConnect import occurs in local source import/generation/preflight.
+
+| Confirmed preactivation finding | Disposition and meaningful proof |
+|---|---|
+|`IBFEED-RETAINED-PRE01` P3: default new CLI parser echoed unknown credential-looking arguments.|CLOSED before activation. One invented-secret regression red; new source parser emits fixed refusal without echo. Executed observer unchanged.|
+|`IBFEED-RETAINED-PRE02` P3: public result aliased module registration, so caller mutation changed future canonical expectations.|CLOSED before activation. Genuine mutation red; independent canonical registration copy. No actual child/parent operation was compromised by this prospective finding.|
+|`IBQCCONTROL-PRE01` P2: Python dict equality admitted coherent bool/integer substitutions in exact scope.|CLOSED before activation. Six generated-core reds reached invented QuantBook tripwire; canonical typed comparison rejects before framework construction.|
+|`IBQCCONTROL-PRE02` P2: new source path allowlist omitted genuine inherited data/ml/backtest source roots.|CLOSED before activation. Real-shaped REAL `_identity`/validator/current-path regression produced source_identity_refused; canonical safe relative Python paths now retain full closure across roots, not a reduced or bypassed validator.|
+
+Main OBSERVED **773 passed7.42s**, explicit twelve-target selection: both
+new pairs, auth-only/profile/v2/v1/stopped-control regressions, unchanged QC
+client, lane import boundary, record/active documents and EXACT Insider
+package guard. Initial native process-tree network/security-exec/repository-
+write denial, SECRET-FREE isolated tests, invented external temporary roots,
+no plugin/cache/bytecode writes. No full lane/repository suite. Main source-only
+strong native network/fork/ALL-write/security-exec proof rehashed/compiled TEN
+retained/helper images in0.561887333s and TWO cloud-control images plus invented
+generated cell in0.567502375s. No actual artifact, credential or cloud action.
+
+Attributed author results: retained398 focused5.33s; nine memory reversals
+produced29 expected reds across href/count/duplicate/KB/typed-codec/current/
+producer-test/alias/CLI boundaries, restored82 new tests. Cloud-control427
+integrated5.59s/119 new checks; six scope reds, one real-shaped-front red,
+four further reversals7 reds then restored119. Both authors passed strong
+native source-only denial/compilation; read-only Codex peer/main inspected
+the exact new sources, not independent Claude review. Six carried P2s remain
+OPEN; no source/data/identity/price/rights/canonical/readiness gate closes.
+
+New structural249 pair is being qualified separately. No actual250 retained
+format observation or248 local preparation/upload/cell has run. Commit clean
+qualified images/records, freeze ALL writers, then execute only those explicit
+registered scopes. No checkpoint push or monitor rearm.
+
+## 251. Fixed64 structural reader qualified before real-parent activation (2026-10-25)
+
+| New image | Bytes | SHA256 |
+|---|---:|---|
+|`research/insider_buying_pilot_sec_parent_projection.py`|34,329|`e896a34575b84b8e39263e8d9d0d54138e7d9909536e8c4da24ca3b76caf738c`|
+|its tests|29,904|`017b08e03261c312439dc07425be7ae395035b821efdcc0285713cdd5d9ed939`|
+
+249's new runner preserves separate original/current identities. Fixed original
+report hash and literal capture source/test pins bind original controls before
+raw-body structural parsing. Initially native-denied child holds/rechecks all
+original controls/claims/starts/results/body/header identity, no financial
+values or timezone interpretation. Trusted parent independently Git-proves
+EVERY original inventory entry against1bb03b8e AFTER bounded control witness
+return but BEFORE any public acceptance; current executed full closure is
+separately clean/committed/rechecked before/after. Unused historical dependency
+bytes are not incorrectly required to remain current forever. No whole raw
+parent/XML enters IPC/model-visible output.
+
+| Verified preactivation finding | Disposition/red-green |
+|---|---|
+|`IBPARENT64-PRE01` P2: inherited1MiB own-control decoder could not carry the full64 control witness.|CLOSED before actual use. Genuine full64 specimen failed`control_byte_bound`; new own canonical8MiB IPC codec with duplicate/numeric/resource/type bounds passes. Foreign and executed codecs remain unchanged.|
+|`IBPARENT64-PRE02` P3: worker result shared canonical registration by reference.|CLOSED before actual use. Genuine mutation red, detached canonical copy; old helpers unchanged.|
+|`IBPARENT64-PRE03` P2: an extra unique-child-span check aborted all rows if a frozen-parser-valid secondary TXT attachment repeated the primary XML bytes.|CLOSED before actual use. Genuine two-row fixture red; dedicated row-local span refusal quarantines only that row and conserves the other. Custody/hash/descriptor corruption still aborts the operation; no blanket exception swallowing.|
+
+Main OBSERVED **1,125 passed19.69s**, sixteen explicit focused targets:
+250's twelve plus new projection, unchanged first64 capture, frozen complete-
+submission and raw-parent tests. Same effective process-tree network/security-
+exec/lane-write denial and SECRET-FREE isolated invented-fixture controls;
+no full lane/repository suite. Main separate source-only strong native network/
+fork/ALL-write/security-exec proof compiled/rehashed EIGHT projection/capture/
+frozen-parser source/test images in0.558180541s. Exact new and all reused
+image hashes passed. No actual retained source/provider/QC action in checks.
+
+Attributed author:404 focused passed17.26s; eight final memory guard reversals
+each gave its meaningful red then restored; source-only strong-native eight-
+image proof0.526859292s. Read-only Codex peer/main found no further material
+defect; no independent Claude review is claimed. Six carried topical/shared
+P2s remain OPEN; preactivation corrections close only their exact software
+scope, not source/identity/PIT/rights/canonical/complete-corpus/readiness gates.
+
+All three pairs now frozen. Final record/active-document/diff checks precede
+clean commit; then freeze ALL writers and execute only250's retained-format
+observation,249's fixed64 structural assessment and248's local source/intent
+preparation. Only AFTER successful preparation/source comparison/kernel check
+may one selected new control-only cell run in the existing project. No archive
+download, native dataset query, strategy job, registered outcome look or
+backtest is activated by this qualification. Continue building; no interim push.

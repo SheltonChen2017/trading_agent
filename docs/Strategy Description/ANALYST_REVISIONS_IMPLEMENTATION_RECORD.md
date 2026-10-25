@@ -768,6 +768,14 @@ A7 remains spent. The new purpose is to retain an actionable redacted QC error,
 not to assume a verified upload fix. Refusal must stop; only acceptance plus
 exact readback may continue the unchanged candidate. Preparation is not use,
 and320's separately committed exact freeze precedes contact. Monitor PAUSED.
+That A8 is now SPENT: actual exit2 at credentials, zero application dispatches,
+no response/upload/compile/launch. The external failure envelope validated.
+The observer runtime lacked QC credential variables while the normal execution
+runtime had them; this is a local handoff defect, not the original QC refusal.
+Floor323/248/50/699, no accepted cell. The owner subsequently approved ONE A9
+and scoped review waiver for this handoff fix; original A8 remains failed.
+Section320.6 onward owns the evidence and additive preclaim-guard continuation;
+no A9 invocation or future acceptance is inferred from that approval alone.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1993,6 +2001,12 @@ Section320 owns this new diagnostic purpose, source/protocol freeze and actual
 result. It does not renew A7, authorize A9, remove technical gates or treat an
 observability correction as a proven QC upload fix. No independent acceptance
 is claimed. The current round still ends with exactly one final lane push.
+A8 has now failed before any application dispatch and remains spent. The owner
+said to continue, then explicitly approved ONE A9 and waived review of this
+specific credential-handoff fix. Section 320 requires a separate exact A9
+freeze and preclaim credential-presence guard in the credential-bearing
+execution context. Original QC error remains unknown; no A9 contact may occur
+before that new freeze, and a refused diagnostic must still stop without retry.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -55741,9 +55755,9 @@ launches or accepted results and do not consume an extra strategy look.
 
 ### 320.3 Prospective implementation boundary
 
-Additive A8 preparation is in progress. No A8 parent/worker, claim allocation,
-credential/private-artifact read, upload or launch has occurred. The booked
-floor remains322shared/247Analyst development/50infrastructure/699cells.
+At the prospective preparation checkpoint, no A8 parent/worker, claim allocation,
+credential/private-artifact read, upload or launch had occurred. The booked
+floor was322shared/247Analyst development/50infrastructure/699cells.
 Only an actual new A8 claim will be booked once as323/248/50/699; preparation,
 Mia's metadata consultation and successful automatic editor builds do not
 rebook prior attempts or create result cells. Final source/protocol/test pins,
@@ -55876,3 +55890,211 @@ effects/limitations and the one accountable A8 look if consumed, append only the
 authorized Analyst shared-ledger delta, validate documentation/diff/status,
 commit final handoff and make exactly ONE nonforce matching-lane push. No new
 milestone or extra attempt is inferred. Monitor remains PAUSED throughout.
+
+### 320.6 Actual A8 local credential-handoff failure — SPENT
+
+The exact clean freeze was8df52a036f33c95d41a9be5d178488c3be9133a8.
+Credential-free native-denied host/HEAD/caller/profile/85source/fourtest preflight
+passed without artifacts or control inspection. The sole parent was dispatched
+2026-10-25T03:28:36.487Z; its captured child-close time was03:28:46.335Z,
+actual exit2, no signal/external bound/spawn error and stderr0bytes. These are
+external process brackets, not provider-event timestamps. Finite stdout1007bytes
+SHA2563b5b5c598093e40768dd9f6c2642bdd43ecb24df5e51758db96744c7129faf53.
+The asynchronous cached completion variable initially stayed unset; explicitly
+draining the already-existing promise recovered the original captured exit and
+bytes, without restarting anything. Intermediate unset-variable observations
+were not proof that the process was still running. A narrow process-name check
+found no remaining A8 process; no process outside this candidate was changed.
+
+Exactly one native-network/artifact/Keychain/security-denied external validator
+ran03:30:51.425Z–03:30:54.349Z, actual exit0, stderr0, no bound. Its finite
+output1040bytes SHA25635092f63a58c756d574060c5bc4b1c7108bcbd0495e099e0ee08c88b34f527a5
+validated the original caller/freeze/profile and actual exit2 FAILURE envelope.
+It did not reread any output/control or reconstruct a missing QC response.
+
+Actual failure was unknown_exception, last_stage=credentials,
+application_dispatch_count=0, helper_code=unknown, category=unknown. Endpoint,
+intent marker/event, HTTPstatus, code_running, response boundary code,
+response observation, launch and status receipts were all null; provider-request
+count remains null/unknown. Operation_completed and all formal/PIT/paper/strategy
+acceptance flags are false. The state was reached after fresh initial admission
+and claim, before constructing a usable QC client. No application QC request,
+upload/readback, lock, explicit compile, capacity, launch or status was reached
+by this caller. This is code-path/application-dispatch evidence, not independent
+measurement of every host/provider event or historical continuity.
+
+Codex diagnosed its own orchestration defect without another QC call or private
+artifact read: a native-denied presence/nonempty-only check in the observer's
+node runtime returned both QC_USER_ID/QC_API_TOKEN absent; the same safe check
+in the normal exec_command context returned both present and nonempty. No values,
+lengths, tokens, account IDs, Keychain access or secret-file reads were emitted.
+The observer had used its own credential-empty inherited environment; shell
+expansion supplied empty variables to the operational child. The unchanged
+shared from_env constructor refuses empty credentials. This verifies a local
+handoff defect and strongly explains the retained credentials-stage refusal;
+the exact original exception was not retained and must not be fabricated.
+Presence is not credential validity, entitlement or authenticated access.
+No conclusion about A7's477byte QC error, quota, subscription or source effect
+follows. The existing QC credentials are not being replaced or requested anew.
+
+Book A8 exactly once: **322 ->323shared /247 ->248Analyst development /
+50infrastructure /699cells unchanged**. This conservative consumed claim is not
+a measured launch or accepted result. A1–A8/R314/R316 and the once-only A8
+validator stay spent; do not repair, reread, delete or reuse their controls.
+No original QC refusal explanation was recovered, and the backtest is NOT running.
+
+### 320.7 Later owner-approved A9 continuation — preparation only
+
+After the failure was disclosed, the owner said "continue until a8 is successful.
+do not stop yet". Codex clarified that original A8 must remain failed/spent and
+asked for ONE additional A9 for the verified local credential-handoff fix,
+carrying forward the review waiver and stopping without retry if QC refuses.
+The owner explicitly answered: **"Yes—one A9 attempt; skip review for this
+handoff fix"**. This is a new bounded allowance, not a retroactive A8 success,
+unlimited retry, A10, review acceptance or a technical gate waiver. All original
+source/access/admission and diagnostic conditional-continuation rules remain.
+
+The correction will use the credential-bearing execution context, with explicit
+nonempty credential-shape checks before spawning/claiming, and a committed
+bounded external observer rather than relying on a different runtime's inherited
+environment or an asynchronously cached completion variable. Shape checks do
+not authenticate credentials. Additive A9 caller/helper/observer and tests may
+be prepared under this scope; A8 source/controls remain frozen. A new exact
+clean-head/source/profile/actual-exit run decision must be committed before
+use. No A9 allocation, credential authentication, QC contact or look is booked
+by this preparation. The entire current round still has zero pushes and ends
+with exactly ONE final matching-lane push and durable handoff; monitor PAUSED.
+
+### 320.8 A9 handoff correction and pre-use validation
+
+The new handoff helper/caller are additive successors, not edits to A8. A9 uses
+newrule_handoff_recovery/R320-20261024-B and the exact name
+ARV2 R298 NEWRULE SIX OFF 2021 OCT2026 A9 f67148cd. Its sole substantive caller
+change beyond new identity/denied-old-control bindings is a recover-only,
+nonblank QC_USER_ID/QC_API_TOKEN shape guard before Store construction, claim
+or private admission. Workers remain credential-free. Generic operational
+failure still conservatively means consumed/ambiguous; the finite guard label
+alone must not imply an unspent control. The frozen A8 error projector/boundary,
+source projection, transport, access, inventory/readback, compile, capacity,
+one-launch/status, admission and actual-exit gates remain unchanged.
+
+The committed external observer reads inherited existing QC values only into
+memory and verifies nonblank shape before any child subprocess. It uses the
+normal credential-bearing execution context and passes a strict UTF-8/allowed-
+environment dictionary directly to the single operational child, never token
+arguments or a different runtime's inherited environment. Missing variables
+before dispatch produce a tracked no_child_dispatched outcome; once the parent
+is dispatched all ambiguous failures remain conservatively consumed. It binds
+exact host/root/branch/clean HEAD and current/committed observer/caller bytes,
+retains only bounded channels in memory, synchronously waits/reaps, and passes
+the OBSERVED exit/stdout to one separate native-denied validator. No output
+leaf or old control is read. Presence is not authentication. Only validated
+finite/redacted output or safe channel-size/hash/error metadata may print.
+
+The new observer is a narrow protocol fix, not permission for an arbitrary
+callback or command. CLI source hashes are bindings, not authority;320.7's
+specific owner decision supplies the one additional allowance and waiver.
+No arbitrary same-user/interpreter integrity, continuous cloud lease, precise
+provider-contact count, universal secret detection or uninterruptible-I/O/
+host-suspension wall-clock guarantee is claimed. The original A7 QC refusal
+remains unexplained; the first diagnostic refusal must stop A9 without retry.
+
+Caller/helper author checks passed469 in10.28s (167helper+302caller) and all85
+selected pins matched. Memory-only preclaim-guard omission caught1expected
+failure0.26s; restored in finally, disk hashes unchanged. These are preliminary
+overlapping checks pending the root final observer-integrated selection below,
+not complete suite or independent-review acceptance. No actual A9 execution
+has occurred at this preparation point.
+
+Root final A9 selection passed **608 distinct tests in13.48s**:167helper +
+302caller +52observer +86record/document +1research import closure, no failures,
+skips or warnings. Native network/artifact/Keychain/security-tool denial, in-root
+support paths, no conftest/autoload/cache/bytecode and dispatch_fence absence
+were retained. No full suite. Author469passes10.28s and52passes0.43s overlap;
+observer's initial41pass subset also overlaps. This final A9 selection is not
+added to the earlier717 A8 selection as though shared document/import checks
+were distinct. Six new files compiled in memory and all85 selected dependency
+pins matched. Frozen A8 and all earlier source/tests remain unchanged.
+
+Before use, the observer's concrete Path-class mismatch was corrected; a real
+PosixPath fixture now covers it. Advisory/root review also found a post-parent
+source-binding freshness gap: the observer now repeats public clean-HEAD/source
+checks before dispatching its validator, and that native-denied validator calls
+the credential-free source-only preflight with12second internal budget within
+its15second capture. A memory-only omission of the post-parent check caught
+1expectedfailure0.08s, restored in finally. Real synthetic children exercised
+stdin, simultaneous channels, bounds, deadline and kill/reap, and a nested
+native validator used only a synthetic in-memory module, not operational source
+or private artifacts. No these-tests-prove-QC-success assertion is made.
+The final prefreeze document repeat passed86 in1.00s under the same denial;
+it overlaps the608 and is not additive.
+
+| A9 source/test | Bytes | SHA256 |
+| --- | ---: | --- |
+| scripts/arv2_r298_handoff_recovery_remote.py | 9859 | 4bd4be3c0fed06735dbeba67dce1e25ac3122ffaca6aeebec1588cf785db497c |
+| tests/analyst_revisions_v2/test_r298_handoff_recovery_remote.py | 22746 | c38b1b6ee952bca6b9dcf916bc17bf10fcd87ef35809fe17744dc454df0087a6 |
+| scripts/run_arv2_r298_handoff_recovery.py | 47670 | 48dd4e68d08f900fb9648ee20fc5cdd558d9b9974f753c70188a7b2efb56cf74 |
+| tests/analyst_revisions_v2/test_r298_handoff_recovery.py | 84377 | f9c24d5d211da8437cb194272e5303e438a2520a1588acf7498ba3e10ac7cb9c |
+| scripts/observe_arv2_r298_handoff_recovery.py | 19097 | cfba31c04d5ff10f33779f1c497cefa3885d63b737f7c260bd9b41a27db6f55f |
+| tests/analyst_revisions_v2/test_r298_handoff_recovery_observer.py | 18732 | 97b4cf24703d0eebae4e3ac295ce953f094ebb0ef5c72e9906591acbaedda2c1 |
+
+Canonical+LF caller profile SHA
+d53fdd14ed7e0609bd2807dd5f9b4a6c7f7449e2ea14ff65631eda4359ea4467;
+observer profile SHA
+f6af17b6cb0bf165e15ae75cf752aa33e2c2659da81fee06120dc37ff3e3e41b.
+A8's pure-text/boundary profiles and selected dependency pins stay fixed.
+
+### 320.9 Exact ONE A9 run decision — prospective freeze
+
+The owner explicitly waives Claude review of this handoff fix and authorizes
+ONE additional A9 under320.7. This second local commit's clean HEAD is the sole
+A9 expected-head. Verify exact root/branch/HEAD/status and all source/test/profile
+pins before use; the matching live remote must still be35081915. A credential-
+free native-denied public preflight of both new caller and observer may run
+after commit, with no operational entrypoint, control allocation or artifact
+read. No source edits may occur between freeze and completed bounded use.
+
+From the designated worktree and normal credential-bearing exec_command
+context ONLY, invoke the fixed Python3.13 executable with -B and
+scripts/observe_arv2_r298_handoff_recovery.py exactly ONCE. Pass --expected-head
+with this freeze SHA, --caller-sha25648dd4e68d08f900fb9648ee20fc5cdd558d9b9974f753c70188a7b2efb56cf74
+and --observer-sha256cfba31c04d5ff10f33779f1c497cefa3885d63b737f7c260bd9b41a27db6f55f
+(ordinary separate option/value arguments). Do not dispatch from node_repl,
+read Keychain/token files, print credentials or pass their values as arguments.
+Observer absent-credential/source refusal before a child is dispatched is
+tracked as no_child_dispatched, not proof of authenticated access or permission
+to rerun after a child dispatch. Parent has its own preclaim shape guard.
+
+The sole child targets newrule_handoff_recovery/R320-20261024-B, which remains
+uninspected/unallocated before use. Preserve the600second/64application-dispatch
+parent, fresh initial/prelaunch/final admission, strict access/idleness/manual-
+history and whole-source authentication. At most one write per permitted target;
+an already-exact target is not rewritten. If no input-runtime write is needed,
+the response boundary may remain unused and no old error is thereby recovered.
+Refused/ambiguous diagnostic stops without another write or retry. Accepted
+write plus exact full-inventory readback permits only the remaining frozen
+files/main.py, then the unchanged one compile-create/max20polls10seconds,
+90second reserve, one capacity access and at most one A9 launch/status sequence.
+No public/share/permission mutation, other project, replacement, economics
+change, result read, next family cell or A10 is authorized. Queued is not
+running; exact Completed. is not result/source/formal acceptance by itself.
+
+External capture is615seconds/128KiB per channel for the parent; this excludes
+bounded public-Git preflight/recheck,15second validator and5second reap overhead.
+It is not a whole-observer615second deadline or an uninterruptible-I/O/host-
+suspension guarantee. Only its exact child is killed/reaped. Dispatch-attempt
+and observed-spawn flags are separate; unsuccessful Popen does not fabricate
+a child exit. Capture hashes cover observed bytes, not an unread tail after a
+bound. Raw channels remain in memory. Empty parent stderr and observed exit0/2
+are required before the sole source-reauthenticated native validator receives
+the captured stdout through stdin. It imports no credentials, reads no output
+leaf/control, authenticates exact canonical envelopes and reconstructed pins,
+and cannot turn parent exit2 into success. No repeated external validator.
+
+Only actual A9 claim consumption adds one shared/development look to323/248,
+yielding324/249/50/699. Do not book preparation or rebook A8/manual history.
+Record actual result, safe error interpretation and remaining limitations,
+append only the authorized actual Analyst ledger delta, then final focused
+document/diff/status checks and one combined matching-lane push. Monitor stays
+PAUSED. The user goal is not complete unless this exact candidate is actually
+running or a concrete remaining barrier is reported honestly.

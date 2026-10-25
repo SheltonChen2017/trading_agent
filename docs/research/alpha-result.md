@@ -6936,3 +6936,33 @@ attempts/manual sample and diagnostics are not rebooked. A1–A7/R314/R316 stay
 spent; no A8. Analyst319.5–319.6 retain exact evidence, unknown-cause limits and
 the QC-side non-secret error-explanation barrier. All historical entries and
 other lanes remain unchanged under the owner's append-only accounting scope.
+
+### R-298 A8 actual pre-request credential-handoff failure — 2026-10-25 UTC
+
+The owner explicitly approved ONE A8 diagnostic upload with a scoped review
+waiver, conditional exact-source recovery only if accepted. Sole clean freeze:
+`8df52a036f33c95d41a9be5d178488c3be9133a8`; caller SHA256
+`74bdad51798a1cd16ddbecb857236129d29412c8482f719ec2405d5214a22a92`,
+profile `7fd70efb6a1decc8b273196c3685b33069d025159a2eea3e7be5dda851f5f7cb`.
+External dispatch03:28:36.487Z, captured child-close03:28:46.335Z, actual exit2,
+stderr0bytes, no external bound or signal. Finite stdout1007bytes SHA256
+`3b5b5c598093e40768dd9f6c2642bdd43ecb24df5e51758db96744c7129faf53`.
+The once-only native-denied external validator exited0 and validated FAILURE
+evidence only; no output/control was reread and no original QC error was recovered.
+
+The claim/initial admission preceded a credentials-stage unknown_exception.
+Application dispatch count was0; response, endpoint, HTTPstatus and launch/status
+receipts were null. Provider-contact count remains unknown, not measured zero.
+No QC application request/upload, compile, capacity or backtest launch occurred
+in this caller. A nonsecret native-denied environment-shape comparison found the
+observer runtime lacked both QC variables while the normal execution context
+had them, identifying a local handoff defect without changing credentials.
+That does not explain A7's server refusal or establish authentication/entitlement.
+
+Book A8 exactly once: **322 ->323 shared /247 ->248 Analyst development /
+50 infrastructure unchanged /699 booked cells unchanged**. This is a conservative
+consumed local recovery look, not a successful launch or result cell. A1–A8 and
+their controls remain spent. The later owner-approved ONE A9 handoff correction
+adds no look until an actual accountable claim. Analyst320.6–320.7 retain the
+exact failure, limits and new bounded preparation; all prior history and other
+lanes remain unchanged under the owner's append-only accounting exception.

@@ -5,8 +5,9 @@ COUNT-SCOPE ARITHMETIC ERRATUM (SECTION 124). OWNER-DIRECTED BOUNDED RECOVERY
 AND SECRET-SAFE DIAGNOSTICS ARE IMPLEMENTED. ACTUAL V2 AND V3 INITIALIZATION
 REFUSED WITH ZERO NEW START/HTTP/BYTES; BOTH CLAIMS ARE SPENT. V3 IDENTIFIES
 A FILE-CUSTODY GUARD; THE PRECISE CAUSE IS STILL UNKNOWN. A LOCAL NONCLAIM
-PROBE PASSED WITHOUT REPRODUCING IT. FURTHER CLAIMS ARE HELD; OFFLINE
-QUALIFICATION OF RETAINED MONTHLY INPUTS IS IN PROGRESS (SECTION124.6).
+PROBE PASSED WITHOUT REPRODUCING IT. FURTHER CLAIMS ARE HELD. RETAINED MONTHLY
+INPUTS HAVE CLOSED OFFLINE SOURCE-ONLY NORMALIZATION (SECTION124.9), WITHOUT
+SOURCE FITNESS, INPUT ADMISSION OR BACKTEST READINESS.
 OWNER NOW DIRECTS CONTINUATION UNTIL LOCAL BACKTEST READINESS, WITHOUT QC.
 ALL OLD CLAIMS,
 NEGATIVES AND CHARGES REMAIN SPENT/IMMUTABLE. NO BACKTEST READINESS IS CLAIMED.
@@ -22092,3 +22093,137 @@ operational/import-boundary execution passed51tests in17.89s; it is not a Main
 rerun. No full suite, actual strategy evaluation, source-usability conclusion,
 QC or push is claimed. Software8/10 and records/authority9/10 remain provisional
 pending actual closed offline normalization and the remaining readiness gates.
+
+### 124.9 Actual retained monthly source-only closure
+
+The separately registered v2 offline invocation ran once at clean
+`10e4eaaab9bcb547bf288a20c8a10a46c19a446f`, with tracking/actual matching
+origin `b648f60112af141efc2a12fbaef03b38846d219d`. Exec11009 terminated
+with exit0. Main then independently reread the protected original result
+controls, verified their hashes, bindings and exact three-member namespace,
+and found no negative sibling. The retained private evidence root is
+`artifacts/short_interest/private/source_qualification/monthly-f61a40bf-v2`:
+
+| Original control | SHA256 |
+|---|---|
+| `qualification.private.json` | `68ee4ca0bb964e1a193fbbdb451fb57deae8f2c3f35cba157d40fb2e71835c1b` |
+| `completed.provisional.json` | `ae8f02b88a3958135a6f564506993af4413a7292241e9162829db6b909504baa` |
+| `round.closed.json` | `9a9d1c1643e9124a7115628d31c579b842870ce5a896804fb4b074616fc0dfdd` |
+
+The result binds the original F61 creator, source protocol b95ecf, complete
+original member manifest ac6c1d, external spent budget raw hash3d0ace,
+section124.8's corrected54-file mapping/policy and exact runtime code identity
+`0ba94f69ce67d3a33019974125f5308164b837821e7af750ab018d79e745bcd8`.
+All112 original panels and their enclosing112 attempts were authenticated and
+normalized before closure; source/code custody also passed at context exit.
+Provider sockets were denied, with no credential path invoked: new provider
+HTTP0, key reads0, new capture claims0. Original source files, the v1 negative
+and all historical spent claims remain unchanged. Main's pre-invocation
+record/active-document check passed89tests in0.83s; earlier252/20.59s and
+delegated51/17.89s are the separately attributed executions in124.8, not
+new runs here. No full lane/repository suite or strategy evaluation ran.
+
+This closes only the registered OFFLINE source-byte replay and financial
+normalization check. It does not admit source fitness, native/date/class/CIK/
+USD identity, full population coverage, license, historical availability,
+corporate-action/terminal cash, actual inputs or backtesting. Private rows
+and source-usability conclusions remain outside Git/chat. Count custody
+finding022 is still unreproduced and open; no count repair or new provider
+claim is inferred from this unrelated successful adapter replay.
+
+Next: isolate count custody through finite NONCLAIM/provider-free diagnostic
+software before any further claim, and continue the independently implementable
+source/identity/cash/input gates under SI-AUTH-20261024-05. Claude has not
+independently reviewed the five accumulated local commits, including C2F and
+10E4; his next authorized review remains the one final pushed snapshot.
+No interim push occurred. Actual looks0/0 and0, alpha0, permanent look IDsnone,
+QC attempts0; QC access and purchases remain prohibited. Software8/10 and
+records/authority9/10 remain provisional, not empirical readiness scores.
+
+### 124.10 Finite local NONCLAIM custody diagnostic registration
+
+**SI-DEC-20261024-15**, under SI-AUTH-20261024-05, registers exactly ONE
+provider/key-free diagnostic invocation after this checkpoint is committed.
+It is not a capture, spent claim, retry or source-budget expansion. Fixed new
+run namespace: `local-custody-probe-20261025-v2`; exactly16 separately named
+parent metadata files use its fixed `-item-01..16.private.json` names. All names
+must be absent before execution, then exclusively created0600 by the actual
+original OwnedOutput publisher. Safe fixed JSON of186/730/746/800bytes exercises
+both immediate and extra-normal-check publication/open timing. It never copies
+private claim bodies, overwrites existing files, reads a credential or calls a
+capture/provider seam. Every local file and negative is retained permanently.
+Maximum16 probes,1024bytes each,128 traceback frames and1800seconds for the
+whole initialization/closure; no restart, reset, retry or additional claim.
+
+Technical: the exact original source/cache,41835-member refused prefix, v2 and
+v3 zero-START claims/negatives and their historical code identities authenticate
+before any new metadata. Current-code custody has56 files, not duplicate base
+FDs. Original HeldFiles enforcement remains unchanged. A pure traceback
+projector recognizes only the genuine original entry-check code frame and
+exact bare AnchorCacheRefusal contract. It emits fixed component labels and
+mismatching field NAMES, never values, private paths or exception formatting.
+New-probe attribution additionally binds the actual failed instance/entry,
+protected flag, exact active path and normal-boundary identity; an unknown
+original component remains unidentified. This is diagnostic observation, not
+an exception to custody or evidence of the historical cause.
+
+Plain language: safe local metadata can exercise the same file publication and
+open boundary without spending another source claim. `run.completed.json` is
+explicitly provisional while source/code contexts remain open. Success requires
+actual process exit0, authentic original provisional AND `run.closed.json`,
+complete runtime/source lineage and original metadata accounting, with no
+`run.refused.json`. The retained original output/parent inode anchors outlive
+source-context exit. Closure independently verifies all current committed Git
+bytes and rereads/sweeps the original provisional control and every published
+metadata byte/stamp, including AFTER the final code audit. Context exit,
+postpublication mutation, negative siblings or deadline failure cannot become
+success. A negative dominates any earlier provisional/closed marker. Sixteen
+passes would still mean cause UNREPRODUCED, not a repair, count qualification,
+permission for another provider claim or backtest readiness.
+
+Frozen prospective protocol SHA256
+`fac98f2a0f831805ede846be7bb591bfcc98bde39db788656e5a346a028bca49`;
+complete56-path list SHA256
+`62f0a81ae1eaec550093cc91998ad6821138e7ddfd3f6b05b4a2f2437675fdf7`;
+complete relative-path/current-byte mapping SHA256
+`a0f206723c5c8819df4b5445803c089cb57d90387408c6a11cc545da446a7438`.
+The exact clean runtime HEAD is separately bound at invocation rather than
+self-referenced in its own bytes. Tracking/actual matching origin must remain
+B648. Actual diagnostic execution has NOT occurred at this checkpoint.
+
+Pre-release findings, all corrected before this checkpoint, not explanations
+of historical count finding022:
+
+| ID | Priority / disposition | Evidence and correction |
+|---|---|---|
+| SI-BUILD-20261024-028 | P2, corrected before commit | Reusing the v2 proof constructor for v3 immediately called a v2-literal full_check against v3-held paths. A separate exact v3 wrapper now authenticates its own paths, namespace, raw controls and historical55-file code. Delegated memory-only reversal failed the constructor regression with held_read_exact_bound_file. |
+| SI-BUILD-20261024-029 | P2, corrected before commit | Original AnchorCacheRefusal uses the bare held_custody_file_changed code. Incorrect REFUSED-prefixed recognition suppressed real-frame projection. Main's memory-only reversal produced3failures/36deselected in0.10s; exact original recognition is restored. Hostile comparison/formatting and forged-frame regressions remain refused. |
+| SI-BUILD-20261024-030 | P2, corrected before commit | Phase-only fallback mislabeled an unmapped original HeldFiles callback failure as new_probe. Peer reproduced this with fabricated retained metadata; precise failed-instance/binding attribution now preserves unidentified for the original callback. Both genuine new-probe and unknown-original regressions are retained. |
+| SI-BUILD-20261024-031 | P2, corrected before commit | Code-only post-context closure could miss a changed original metadata/provisional file, including mutation during its final code audit, or exceed the deadline during that audit. Original byte/stamp/membership audits now follow the terminal code pass, with final clock/window checks and dominating negative publication. Fabricated mutation, context-exit, inode-replacement, negative-sibling and late-close regressions prove the boundary. |
+
+Main reviewed the complete new production path and tests. Its seven-file
+focused custody/diagnostics/import-boundary/record/active-document selection
+passed **232tests in3.26s**, no skips or warnings, with inherited environment
+empty and network denied. Static import closure exactly matches all56 paths
+(including package initializers); sources and the new test file compile in
+memory. Diff whitespace checks pass. The initial closure-check utility omitted
+the local ml package from its index and correctly refused; adding that package
+to the checker, not changing production paths, established exact closure.
+Delegated evidence, not Main reruns: author39passed/.56s; independent peer
+39passed/.84s. Delegated memory-only wrong-prefix, wrong-v2-constructor and
+missing-closure-audit reversals all failed before restoration. These fabricated
+checks used no actual private source, credential, provider, claim, QC or outcome.
+No full lane/repository suite ran; peer development audit is NOT independent
+Claude review of the accumulated snapshot.
+
+Further count/daily provider claims remain held. The separate source-only count
+epoch ledger/reloader is the next software gap: the old registry requires one
+complete fixed child and cannot absorb retry chunks. Preserve disjoint coverage
+origins, every failed attempt/unknown debit, all zero-START spent epochs and the
+prospective one-START cap shortfall; never cast partial history into complete
+denominator/input admission. Source identity/cash/input factual gates remain
+open. Actual looks0/0 and0, alpha0, permanent look IDsnone, QC attempts0.
+No purchase, QC access, actual strategy evaluation or interim push occurred.
+
+Post-record Main diagnostic/record/active-document selection:128passed in0.91s,
+no skips or warnings. Staged new-source/test and record whitespace checks pass.

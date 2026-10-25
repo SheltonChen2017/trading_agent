@@ -69,6 +69,18 @@ class InputContractTests(unittest.TestCase):
         with self.assertRaises(InputError):
             keys({"a": 1, "extra": True}, {"a"})
 
+
+    def test_only_canonical_extended_iso_clock_and_date_forms_are_accepted(self):
+        # GDR-CR49-001: datetime/date.fromisoformat accept other forms on Python
+        # 3.11+, so only the explicit patterns keep inputs canonical.
+        self.assertEqual(utc("2025-01-02T14:30:00Z").isoformat(), "2025-01-02T14:30:00+00:00")
+        for value in ("2025-01-02 14:30:00Z", "2025-01-02T14:30Z", "20250102T143000Z"):
+            with self.subTest(clock=value), self.assertRaises(InputError):
+                utc(value)
+        for value in ("20250102", "2025-W01-4"):
+            with self.subTest(date=value), self.assertRaises(InputError):
+                day(value)
+
     def test_primitives_have_no_side_effect_seams(self):
         with patch("builtins.open", side_effect=AssertionError("file forbidden")), \
              patch("os.getenv", side_effect=AssertionError("environment forbidden")), \

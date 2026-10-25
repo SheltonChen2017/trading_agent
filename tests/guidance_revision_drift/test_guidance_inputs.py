@@ -369,6 +369,53 @@ class GuidanceInputTests(unittest.TestCase):
                 self.assertFalse(compare_revision(changed.document, old.document).passes_arithmetic)
                 self.assertIn("changed_" + field, compare_revision(changed.document, old.document).refusal_reasons)
 
+
+    def test_document_rules_each_refuse_alone(self):
+        # GDR-CR49-003: each case breaks exactly one document rule.
+        cases = {
+            "unknown range kind": dict(period_values={"eps": {"lower": "1", "upper": "2", "kind": "interval"}}),
+            "integer bounds": dict(period_values={"eps": {"lower": 1, "upper": 1, "kind": "point"}}),
+            "fiscal year label differs from end year": dict(period_values={"fiscal_year": 2026}),
+            "unknown event kind": dict(kind="restatement", supersedes="fixture-d0"),
+            "disclosure that supersedes": dict(supersedes="fixture-d0"),
+            "unknown positioning": dict(positioning="tertiary"),
+            "unknown release type": dict(release_type="rumor"),
+            "disclosure without periods": dict(periods=[]),
+            "withdrawal with periods": dict(kind="withdrawal", supersedes="fixture-d0"),
+            "duplicate fiscal year": dict(periods=[period(), period()]),
+        }
+        for label, changes in cases.items():
+            with self.subTest(case=label), self.assertRaises(InputError):
+                receipt(**changes)
+
+    def test_comparison_gates_each_refuse_alone(self):
+        # GDR-CR49-003: changed security, a later "predecessor", secondary
+        # positioning and a non-baseline basis each block the comparison.
+        old = receipt()
+        cases = {
+            "changed_security_id": (raised(security_id="other-security"), old),
+            "predecessor_not_earlier_disclosure": (raised(), receipt("fixture-d0", "2025-03-01")),
+            "not_primary_guidance": (raised(positioning="secondary"), old),
+            "unsupported_accounting_basis": (raised(period_values={"revenue_basis": "non_gaap"}),
+                                             receipt(period_values={"revenue_basis": "non_gaap"})),
+        }
+        for reason, (new, predecessor) in cases.items():
+            with self.subTest(reason=reason):
+                compared = compare_revision(new.document, predecessor.document)
+                self.assertIn(reason, compared.refusal_reasons)
+                self.assertFalse(compared.passes_arithmetic)
+
+    def test_expired_fiscal_year_is_never_the_nearest_comparison_year(self):
+        # GDR-CR49-003: a fiscal year that ended before publication is expired,
+        # even when it is the earliest listed year.
+        expired = period(fiscal_year=2024, fiscal_start="2024-01-01", fiscal_end="2024-12-31")
+        old = receipt(periods=[expired, period()])
+        new = raised(periods=[expired, period(revenue={"lower": "102", "upper": "102", "kind": "point"},
+                                              eps={"lower": "1.05", "upper": "1.05", "kind": "point"})])
+        compared = compare_revision(new.document, old.document)
+        self.assertEqual(compared.fiscal_year, 2025)
+        self.assertTrue(compared.passes_arithmetic)
+
     def test_no_network_files_environment_or_provider_seams(self):
         with patch("socket.socket.connect", side_effect=AssertionError("network")), \
              patch("builtins.open", side_effect=AssertionError("files")), \

@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 from decimal import Decimal, localcontext
 import unittest
 
-from research.guidance_revision_drift.historical_market import HistoricalMarketBatch, instant_ns
+from research.guidance_revision_drift.historical_market import HistoricalMarketBatch, HistoricalQuote, instant_ns
 from research.guidance_revision_drift.input_contracts import InputError, canonical_bytes
 
 
@@ -211,6 +211,52 @@ class HistoricalMarketTests(unittest.TestCase):
         body["quotes"][0]["sip_timestamp"] = instant_ns(DECISION - timedelta(hours=1))
         with self.assertRaisesRegex(InputError, "outside"):
             batch(body)
+
+
+    def test_envelope_and_regular_session_rules_each_refuse_alone(self):
+        # GDR-CR49-002: each case keeps every other rule satisfied.
+        day_ns, day_ms = 86_400 * 10**9, 86_400 * 10**3
+        weekend = market_body()
+        for row in weekend["quotes"]:
+            row["sip_timestamp"] += day_ns
+            row["participant_timestamp"] += day_ns
+        for row in weekend["minutes"]:
+            row["t"] += day_ms
+        weekend.update(session_date="2025-04-05", session_open_utc="2025-04-05T13:30:00Z",
+                       session_close_utc="2025-04-05T20:00:00Z")
+        cases = {"other provider": dict(market_body(), provider="other-vendor"),
+                 "unknown role": dict(market_body(), role="index"),
+                 "weekend session": weekend,
+                 "nonstandard open": dict(market_body(), session_open_utc="2025-04-04T13:00:00Z"),
+                 "nonstandard close": dict(market_body(), session_close_utc="2025-04-04T19:00:00Z"),
+                 "bounds on another day": dict(market_body(), session_date="2025-04-03")}
+        for label, body in cases.items():
+            with self.subTest(case=label), self.assertRaises(InputError):
+                batch(body)
+
+    def test_execution_rejects_late_decision_quote_and_quote_at_submission_instant(self):
+        # GDR-CR49-002: a caller-supplied decision quote stamped after submission,
+        # and an execution quote stamped exactly at submission, are each refused
+        # while every other slicing rule holds.
+        body = market_body()
+        body["quotes"].append(quote(CALLBACK - timedelta(milliseconds=500), sequence=3))
+        value = batch(body)
+        stamp = instant_ns(CALLBACK - timedelta(seconds=1))  # the fixture's sequence-2 quote
+        late = HistoricalQuote(value.security_id, value.symbol, value.sha256, stamp, stamp, 2,
+                               Decimal("9.99"), Decimal("10.01"), 100, 100, ())
+        self.assertGreater(late.sip_timestamp_ns, instant_ns(DECISION))
+        with self.assertRaisesRegex(InputError, "before submission"):
+            value.subsequent_minute(submitted_at=DECISION, callback_at=CALLBACK, decision_quote=late)
+        body = market_body()
+        later = DECISION + timedelta(minutes=1)
+        body["quotes"].append(quote(later, sequence=3))
+        body["minutes"].append({"o": "10", "h": "11", "l": "9", "c": "10.5", "v": 10000,
+                                "t": instant_ns(later) // 1_000_000})
+        value = batch(body)
+        decision = value.decision_quote(DECISION)
+        with self.assertRaisesRegex(InputError, "reuse decision or pre-submission"):
+            value.subsequent_minute(submitted_at=later, callback_at=later + timedelta(minutes=1),
+                                    decision_quote=decision)
 
     def test_bounded_rows_and_unknown_row_fields_refuse(self):
         for field in ("quotes", "minutes"):

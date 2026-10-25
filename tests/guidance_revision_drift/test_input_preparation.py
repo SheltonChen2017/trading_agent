@@ -14,7 +14,7 @@ from data.hashing import hash_bytes
 from research.guidance_revision_drift.contracts import load_candidate
 from research.guidance_revision_drift.input_contracts import InputError, canonical_bytes, utc
 from research.guidance_revision_drift.input_preparation import prepare_inputs, inspect_local_inputs, main
-from research.guidance_revision_drift.guidance_inputs import GuidanceLedger
+from research.guidance_revision_drift.guidance_inputs import GuidanceDocument, GuidanceLedger
 from tests.guidance_revision_drift.test_guidance_inputs import receipt, raised
 from tests.guidance_revision_drift.test_historical_market import market_body
 
@@ -212,6 +212,64 @@ class InputPreparationTests(unittest.TestCase):
         with self.assertRaises(InputError):
             prepare_inputs(self.candidate, canonical_bytes(self.manifest), self.files,
                            expected_manifest_sha256="0" * 64)
+
+
+    def test_manifest_rules_each_refuse_alone(self):
+        # GDR-CR49-004: each case breaks exactly one manifest rule.
+        def traversal(manifest, files):
+            files["../stock.json"] = files.pop("stock.json")
+            manifest["files"]["../stock.json"] = manifest["files"].pop("stock.json")
+            manifest["stock_market_file"] = "../stock.json"
+        def candidate(manifest, files):
+            manifest["candidate_sha256"] = "0" * 64
+        def data_class(manifest, files):
+            manifest.update(data_class="live_capture", owner_scope_reference="1" * 64,
+                            source_rights_reference="2" * 64)
+        def unused_file(manifest, files):
+            files["extra.json"] = b"{}"
+            manifest["files"]["extra.json"] = hash_bytes(b"{}")
+        for label, change in (("parent-directory path", traversal), ("other candidate", candidate),
+                              ("unknown data class", data_class), ("unused inventory file", unused_file)):
+            self.manifest, self.files = fixture_set(self.candidate)
+            change(self.manifest, self.files)
+            with self.subTest(case=label), self.assertRaises(InputError):
+                self.run_preparation()
+
+    def test_one_raw_payload_cannot_back_two_guidance_documents(self):
+        # GDR-CR49-004: roles must be disjoint even when a second document
+        # deliberately names the first document's raw payload hash.
+        old = receipt()
+        values = raised().document.to_dict()
+        values["source_payload_sha256"] = hash_bytes(old.raw_bytes)
+        shared = GuidanceDocument.from_dict(values)
+        self.files.pop("new-raw.json")
+        self.manifest["files"].pop("new-raw.json")
+        self.files["new-doc.json"] = shared.canonical_bytes
+        self.manifest["files"]["new-doc.json"] = hash_bytes(shared.canonical_bytes)
+        self.manifest["guidance_receipts"][1]["raw_file"] = "old-raw.json"
+        with self.assertRaisesRegex(InputError, "disjoint"):
+            self.run_preparation()
+
+    def test_quarantined_guidance_blocks_preparation_and_the_cli_exit(self):
+        # GDR-CR49-004: a quarantined or refused guidance observation keeps the
+        # status blocked, and the CLI exits 2 for any blocked report.
+        conflict = receipt(period_values={"eps": {"lower": "2", "upper": "2", "kind": "point"}}, raw_tag="conflict",
+                           received_at="2025-02-03T12:01:00Z", validated_at="2025-02-03T12:02:00Z")
+        for name, raw in (("conflict-raw.json", conflict.raw_bytes),
+                          ("conflict-doc.json", conflict.document.canonical_bytes)):
+            self.files[name] = raw
+            self.manifest["files"][name] = hash_bytes(raw)
+        self.manifest["guidance_receipts"].append({"raw_file": "conflict-raw.json",
+            "document_file": "conflict-doc.json", "received_at": conflict.received_at,
+            "validated_at": conflict.validated_at})
+        result = self.run_preparation()
+        self.assertEqual(result["status"], "structurally_blocked")
+        self.assertTrue(all(row["status"] == "structurally_prepared" for row in result["market"]))
+        self.assertIn("quarantined", [row["status"] for row in result["guidance"]["refusals"]])
+        output = io.StringIO()
+        with patch("research.guidance_revision_drift.input_preparation.inspect_local_inputs",
+                   return_value=result), contextlib.redirect_stdout(output):
+            self.assertEqual(main(["--manifest", "unused.json", "--sha256", "0" * 64]), 2)
 
     def test_projections_are_detached_and_preparation_is_pure(self):
         expected = canonical_bytes(self.run_preparation())

@@ -783,6 +783,12 @@ frozen A5 shape. codeRunning=false. No lock/upload/compile/capacity/launch or
 QC upload-error observation occurred. Floor324/249/50/699, no accepted cell.
 Section320.10–320.11 own the final evidence, limitations and exact barrier;
 no A10, current-row pin refresh, repeated removal or spent-reader replay.
+Later owner direction in section 321 explicitly waives Claude review for the
+new read-only mismatch diagnostic and then for verified Analyst fixes toward
+backtesting readiness while the owner is AFK. This supersedes the prior
+review-wait only; A1–A9 remain spent. Begin with bounded current metadata
+evidence, not a guessed identity or unchanged recovery replay. No backtest
+launch is part of the current readiness checkpoint.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -2021,6 +2027,14 @@ bounded read-only observation, with review or a specific owner waiver, before
 designing any verified correction. No upload/lock/launch or A10 follows from
 current evidence. Section 320.10–320.11 retain the source-bound result and final
 handoff; Claude reviews section 320 unless the owner changes the workflow.
+The owner has now changed that sequencing: section 321 records the explicit
+read-only diagnostic waiver and subsequent AFK direction to continue verified
+fixes until backtesting-ready without routine review waits. Determine the
+current extra-row mismatch first; freeze any necessary successor before use,
+preserve all spent attempts and unchanged strategy/source/privacy gates, and
+stop at readiness before launch. The monitor remains PAUSED.
+The owner explicitly waives Claude review of section 321's diagnostic and
+verified readiness fixes; this is not independent acceptance.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -56216,3 +56230,141 @@ accounting, unchanged historical entries and consistent failure limitations;
 it is not independent review or new operational verification. No source/test
 changed after the158f2fd0 freeze. Final diff/status checks and remote baseline
 verification remain required immediately before the one push.
+
+## 321. Current collaborator-mismatch diagnosis and owner-directed readiness recovery — 2026-10-24 PDT
+
+### 321.1 Authority, scope and synchronized baseline
+
+The owner answered: "Yes, skip Claude review for the read-only diagnostic.
+Find what's causing the collaborator mismatch—no upload, permission changes,
+or launch yet." During preparation, the owner then stated that they would be
+AFK and directed continued work toward backtesting readiness, with no Claude
+review needed and preauthorization for necessary fixes before backtesting.
+This changes review sequencing for verified, in-scope Analyst recovery; it is
+not independent acceptance, unlimited unchanged retries, shared/other-lane
+authority, paid rights, security disabling or permission to assume unknown
+collaborators are safe. The current checkpoint is readiness, not a backtest
+launch. No funded, broker, real-order, paper or live operation is authorized.
+
+The owner reinforced this direction: continue until the issue is found and the
+lane is fully ready for backtesting, do not stop for additional authorization
+requests while they are away for at least12hours. Necessary verified Analyst
+recovery steps therefore proceed under that delegated readiness scope with
+prospective bounded decisions and durable accounting, not repetitive approval
+questions. Exhausted controls are never reused; a genuinely new recovery must
+state its changed purpose/fix and bounds before use. An unresolvable login,
+conflicting ownership or external service barrier is reported honestly rather
+than bypassed. No scheduling/monitor change or blanket source/privacy acceptance
+is implied by the owner's availability or token-budget statement.
+
+Starting clean local/tracking/live matching-lane snapshot is
+924a88ec677fe1f65e51f7e5e56b90f5f9aa1f85. Matching-branch-only fetch did not
+advance it. Every repository operation stays in the designated Code worktree
+on codex/strategy-analyst-revisions-v2. No new Claude range is present.
+Preserve A1–A9 and all old diagnostics/validators/controls as spent; none is
+reinvoked or reread. Monitor remains PAUSED. Accumulate the continuous round
+locally and make one final matching-lane push at the completed/blocked checkpoint.
+
+The first bounded step is one new read-only observation of project38364439:
+projects/read followed by projects/collaboration/read, no other endpoint or
+browser/editor interaction. Fresh prospective control is
+artifacts/analyst_revisions_v2/newrule_access_mismatch/R321-20261024-A; it has
+not been inspected or allocated during preparation. Compare current redacted
+field types/hashes and exact predicates against the frozen A5/owner/Mia facts.
+Current evidence cannot reconstruct A9's discarded responses or A7's old error.
+No source uploads, lock/collaborator changes, compile, capacity, backtest/result
+call or A10 is included in this diagnostic. It adds zero strategy looks;
+booked floor remains324shared /249Analyst development /50infrastructure /699cells.
+
+### 321.2 Diagnostic design and qualifications — preparation
+
+Reuse only frozen pure projector/validator and bounded transport primitives,
+never an old operational entrypoint, Store or control. The additive caller owns
+its new one-use claim, source/host/clean-HEAD binding and60second deadline.
+Credential-shape refusal precedes claim allocation; credentials stay in memory
+in the credential-bearing execution context, not Node's empty environment.
+One75second external parent capture and one15second native-network/private-
+artifact/Keychain-denied output validator retain actual exits and finite output
+only. No raw channels, exception strings, IDs, unknown keys or response bodies
+are printed. Selected pins are not whole-interpreter integrity. Bounded Git,
+validation and reap overhead are separate; host suspension/uninterruptible I/O
+cannot be absolutely time bounded.
+
+The new observation must reject nonempty errors and contradictory scope echoes,
+retain absent/null/type distinctions and reconstruct exact A5 predicate
+comparisons from redacted evidence. Whole-row equality is not continuous
+identity or proof of a synthetic collaborator. No current hash is automatically
+promoted to an access pin, and a successful diagnostic is not write acceptance.
+Source/test/profile pins, focused validation and the exact prospective run
+decision will be committed below before any new metadata contact.
+
+### 321.3 Final diagnostic implementation and focused validation
+
+The new caller is scripts/observe_arv2_r298_access_mismatch.py,18538bytes,
+SHA2560266745324e915b779bd9c50188fca28be880534bb7e5f4b322fb98d7acf3d78;
+tests/analyst_revisions_v2/test_r298_access_mismatch.py is26722bytes,
+SHA2561d8f3e374fb24478a9be96e725a9f699e3270842611d42459fcc12e26715036b.
+Canonical arv2-r298-access-mismatch-v1 profile SHA256 is
+01b8c8cc9fd854b2ae6e4b53473c821f4f19dc432784baf14246369e0b74be8c.
+The external runner scripts/run_arv2_r298_access_mismatch_observation.py is
+9218bytes,SHA2568c9076a118aebc2ee8a39c076da52767c6d89eac7a2d06f336612c93a44308b0;
+tests/analyst_revisions_v2/test_r298_access_mismatch_observation.py is15658bytes,
+SHA2563fa7587e06c26c316b0d2ba4c60da7d239c4a4b3dc0f15611225a70cd67bfc25.
+Canonical arv2-r298-access-mismatch-observation-v1 profile SHA256 is
+9c069ec16a6a35724f84a493446b5815221b952aa38dfa2e85470aa412372ba1.
+All11 selected dependency pins remain unchanged, including the old pure
+projector and access policy. They are not whole-interpreter integrity.
+
+ARV2I321-001(P2,corrected before use): finite output validation could otherwise
+accept a forged known owner/A5 row hash paired with contradictory field facts
+and regenerated comparison/report hashes. Known A5 hashes now require an
+object with all seven exact typed predicates; known owner hashes require the
+established owner/positive-owner-UID/write/liveControl facts. Unknown hashes
+remain observable diagnostic evidence, never refreshed admission pins.
+The22 new negative regressions first failed as expected in0.11s, then passed.
+The final author selection was158passes0.24s; prior135/133 subsets overlap.
+The runner's direct-script import bootstrap and caller-test path were also
+corrected before use; its48passes0.28s include a real minimal-environment CLI
+entry check. Post-parent freshness omission was caught by one expected failure
+in0.07s and restored in memory. Its first mutation harness omitted
+--ignore=artifacts and had one native-denied collection error0.03s; the harness
+was corrected without weakening denial. Caller credential-preclaim omission
+was caught by one expected failure0.11s, restored without disk/source changes.
+
+Root final focused selection: **293distinct passes in3.73s**:158caller,
+48external-runner,86record/active-document and1licensed-research transitive
+import-boundary check; no failures/skips/warnings. Native remote-network,
+production-artifact and Keychain/security-tool denial; all support paths in
+the designated root, no plugin autoload/conftest/cache provider/bytecode, and
+assistant.dispatch_fence asserted absent. The earlier270passes3.54s overlap;
+the preceding269passes/1record-test failure3.73s was the strict owner-waiver
+wording check, corrected only in the record. Four changed sources compiled in
+memory; source/profile pins and diff checks passed. These are synthetic focused
+checks, not operational metadata evidence, a full suite or independent review.
+
+### 321.4 D1 exact one-shot read-only diagnostic freeze
+
+Under321.1's explicit current review waiver, commit the four source/test files
+and this record as a clean freeze on the designated branch. Bind that actual
+commit SHA to --expected-head; bind the exact caller and runner hashes above
+to --caller-sha256 and --runner-sha256. First run only their credential-free
+public-source preflights under native network/private-artifact/Keychain denial.
+That preflight neither claims the leaf nor reads credentials. If it passes,
+invoke the committed external runner exactly ONCE through the normal
+credential-bearing exec context, not Node. Do not print or inspect credentials.
+The sole child may exclusively claim the new321.1 leaf, perform the exact two
+project-scoped metadata reads, publish its bounded finite report and return.
+The external runner may then validate that supplied output exactly once under
+native network/private-artifact/Keychain denial, without rereading controls.
+
+Retain actual parent/validator exits, finite transport metadata and validated
+redacted output from this invocation for the result record. A zero diagnostic
+exit means only successful observation, not collaborator acceptance, permission
+change or write readiness. A nonzero/unknown/bounded/missing/stale output remains
+failure or ambiguity; never replay the caller/validator or reuse/rename its
+control. Pre-dispatch refusal and claim ambiguity must be distinguished using
+only actual finite evidence. No uploads, lock changes, compile/capacity calls,
+launch, result reads, old control/source census or other-lane action is admitted.
+This diagnostic is zero new strategy looks. Use current facts for a separately
+committed, bounded verified readiness fix under the owner's broader direction;
+do not silently convert observed unknown metadata into an allowlist.

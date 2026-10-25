@@ -55275,3 +55275,27 @@ write policy. No automatic pin refresh, fallback, new project, unknown-row
 acceptance or unchanged retry is introduced. The backtest is not running.
 Normal independent review and a separately explicit A7 decision plus exact
 run freeze remain prerequisites for a future operational recovery.
+
+Implementation commit `c761c3e3bbe74cb01badff6a50b5bef53bddee03` contains
+the four new files and section318's scope, contract, pins, validation and
+findings. This final record-only handoff is the second commit of the continuous
+round after `a91657744fdef8c987470473498d3abe46684764`; no intermediate push
+occurred. No incoming Claude commit was reviewed, and these Codex commits
+must not be represented as independent acceptance. All four final code/test
+hashes match318.4. Only the lane record changes after the324-pass final code
+selection; final document/diff checks precede the one nonforce matching-lane
+push. Verify exact root/branch/HEAD/status and unchanged live remote before
+that push, then local/tracking/live equality and clean status afterward.
+Final handoff document selection passed86 in0.98s under the same native
+denial; it overlaps the earlier86 and is not additive to324.
+
+Handoff: Claude must review this exact pushed offline candidate, or the owner
+must explicitly waive that review for a specific future recovery. Separately,
+an A7 allowance is needed before another recovery attempt. Its prospective
+caller still must reconcile current access/source state, bind the observed
+response seam to the unchanged real transport, freeze claim/deadline/terminal
+and actual-output handling, and preserve original strategy/source pins. Do
+not treat this library or a successful synthetic return as permission to
+perform the target update, reconstruct A6, accept the extra collaborator row,
+or launch a backtest. Stop at this concrete operational-authority/integration
+barrier; no further roadmap work or automatic monitoring is started.

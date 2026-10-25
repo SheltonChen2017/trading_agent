@@ -7139,3 +7139,25 @@ Analyst323.20 owns exact evidence, UI qualification and fresh-use boundary.
 A15 remains spent; all historical entries and false formal/PIT/paper/live
 flags are preserved. Continuing owner direction authorizes verified recovery,
 not an unchanged automatic retry or fabricated idle state.
+
+### R-298 A16 RAW-reference runtime failure and detail-bound refusal — 2026-10-25 UTC
+
+At clean `af789ea0284b4c18b3fa4bd629a53014363d569e`, A16 passed fresh source/
+access/input checks, updated the exact two files and launched quote-aware
+job `65a1d6698d182b11f2f4b60b7e31267b` in project38364439. Parent21:12:50.203259Z..
+21:16:22.909650Z, actualexit2/stderr0; stdout3,275bytes SHA256
+`f1611fb828bc0904a1551c056a80e48eba3d6a51f342c412bc01badf3092349d`.
+Native supplied-output validator exited0 and authenticated FAILURE; outer2.
+Runtime Error retained after35application dispatches. The one detail read
+refused the complete decoded body's canonical1MiB limit, not a measured wire
+size; no aggregate/result cell/report success pin was returned. Later exact
+Safari error UI identified2022-10-24 09:20 incomplete required RAW-close census.
+Missing security and cause remain unknown. Static Mia advice supplied no proven
+fix and changed no source; incidental failed performance is not accepted.
+
+Book A16 claim once: **330 ->331 shared /255 ->256 Analyst development /
+50 infrastructure unchanged /699 cells unchanged**. No extra look for static
+Mia/UI or native output validation. A16/F remain spent; no old read/retry is
+revived. Analyst323.22 owns exact evidence and the prospective failure-only
+diagnostic boundary. Historical/other-lane entries and all false formal/PIT/
+paper/live flags are preserved.

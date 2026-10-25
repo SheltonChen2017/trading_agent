@@ -1,24 +1,21 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTIONS 219 ONWARD RECORD CODEX'S COUNTER-REVIEW AND THE OWNER'S
-NEW, SEPARATELY VERSIONED 2021–2025 EXPLORATORY PILOT WITH REQUIRED WARM-UP.
-NO QC ACCESS: THE EXPLICIT HOLD REMAINS. THE ORIGINAL 82-QUARTER STUDY AND
-ITS GATES ARE NOT REWRITTEN. PILOT READINESS IS NOT YET ESTABLISHED; CURRENT
-WORK QUALIFIES REAL RETAINED COVERAGE BEFORE OUTCOMES. ONE FINAL PUSH ONLY.
-SECTION 218 RECORDS CLAUDE'S REVIEW OF THE 13 CODEX COMMITS IN
-`8f6ee687..c43fb081` (SECTIONS 202-217). ALL 13 ARE ACCEPTED, THREE AFTER
-CORRECTION. THE RANGE'S NINE PROVIDER REQUESTS (SEVEN SHARADAR STATUS, ONE
-SHARADAR DATES-ONLY, ONE EODHD DATE) AND EIGHT KEYCHAIN READS MATCH THEIR
-RECEIPTS; EVERY NEW PRIVATE OUTPUT WAS CHECKED BY HASH. CORRECTIONS: THE LANE
-FIXTURE FENCE NOW COMPARES FILESYSTEM IDENTITY, NOT ONLY THE PATH SPELLING
-(`6605db25`), THE PRICE CAPTURE PARSES ITS HASHED PLAN BYTES (`6605db25`), AND
-THREE PARSER GRAMMAR GUARDS ARE PINNED (`fc7f0349`). NO REAL KEYCHAIN,
-PROVIDER, SEC OR QC ACCESS BY THE REVIEW. SIX P2 FINDINGS REMAIN OPEN AND FAIL
-CLOSED. THE OWNER'S QC HOLD STAYS IN FORCE. NOT BACKTEST-READY: THE INPUTS IN
-216.3 ARE STILL MISSING. FROZEN V1/FOUR V3 SOURCES, POPULATION/ECONOMICS,
-STRICT D23 AND BOTH FINAL ACCESS CLASSIFICATIONS REMAIN BINDING. CODEX
-COUNTER-REVIEWS SECTION 218. LOOKS/JOBS/BACKTESTS 0/0/0. NO FUNDED/PAPER/
-LIVE/CAPITAL/REAL-ORDER/TRADING AUTHORITY.**
+Status: **SECTIONS 219–222 ACCEPT CLAUDE'S THREE COMMITS AND RECORD THE
+OWNER-AUTHORIZED, SEPARATE 2021–2025 EXPLORATORY PILOT. REAL RETAINED AUDIT:
+ALL60 PILOT EARNINGS MONTH RECEIPTS,67 BUFFERED MONTHS,25 CONTEXT/20 PILOT
+SEC QUARTERS;374 INPUT LEAVES RECHECKED. CALENDAR-DERIVED REQUIRED OPEN
+HISTORY START2020-01-02, LAST60-SESSION EXIT2026-03-30. ONE NEW MASSIVE
+HISTORICAL-REFERENCE CONTROL RETURNED HTTP200 USING ONE KEYCHAIN READ;
+IT DOES NOT ESTABLISH A COMPLETE HISTORICAL MASTER. NO NEW SUBSCRIPTION
+RECOMMENDED. BACKTEST READINESS REMAINS FALSE: REQUIRED NATIVE-SID/PIT/ENGINE
+EVIDENCE CANNOT BE QUALIFIED WHILE THE OWNER'S EXPLICIT QC HOLD REMAINS;
+FULL PARENT/PRICE/CAUSAL-REFERENCE/FACTOR ASSEMBLY ALSO REMAINS WORK, NOT
+CLAIMED COMPLETE. OLD2006/2018 EARNINGS GAPS DO NOT AUTOMATICALLY BLOCK THIS
+NEW PILOT. ORIGINAL82-QUARTER STUDY, FROZEN V1/FOUR V3 FILES, SIX OPEN P2S
+AND FINAL ACCESS CLASSIFICATIONS ARE PRESERVED.806 FOCUSED PASSES/1 KNOWN
+TOPOLOGY SKIP; NO COMPLETE SUITE. NO QC ACCESS, OUTCOME LOOK, JOB OR BACKTEST.
+NEW PILOT CODE IS NOT INDEPENDENTLY REVIEWED. ONE FINAL MATCHING-LANE PUSH;
+MONITOR PAUSED. NO FUNDED/PAPER/LIVE/CAPITAL/REAL-ORDER/TRADING AUTHORITY.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -67,6 +64,10 @@ population/economics remain binding; the confirmed5-Year subscription and
 missing supplier exports cannot be changed by an internal approval entry.
 Section 218 is Claude's later review of sections 202-217; it changes no
 gate and does not release the QC hold.
+The owner's latest explicit2021–2025 pilot direction authorizes the new
+additive epoch in220–222; it does not retroactively narrow the original study
+or require original2006/2018 supplier exports for the pilot. No new outcome
+or QC authority follows from the observed metadata qualifications.
 
 ## 1. Canonical V1 contract
 
@@ -302,6 +303,8 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-22 | Claude review (macOS session) and corrections | `272132e4` -> `9013b407`, `11b4cf0d` -> this review record | Independent review of sections 195-200 (`bbf34ab6..272132e4`, 7 commits, 0 merges: two new selector modules, one correction commit, four records) | All seven accepted, two after test corrections. Retained selector receipts, 90 source hashes and bindings checked on metadata. Sharadar nested-echo screen fixed; thirteen surviving-mutant guards pinned; record ctime claim corrected. | Final tree: 367 and 187/2 skipped focused passes, 2 topology passes, guards 107 with the 2 known SEP-2 failures; network and Keychain exec denied. No complete suite. Looks 0/0/0. | IBSHAR-CR02, IBSELECT-V3-TEST01, IBSELECT-V2-TEST01 closed; IBREC-CR20101 corrected; IBSELECT-V3-OBS01-05, IBSELECT-V2-OBS01, IBEOD-OBS02 recorded; IBREC-CCR19401 accepted against Claude; six P2 open | Codex counter-reviews section 201; QC hold stays |
 | 2026-10-23 | Codex counter-review ONLY | Fetched clean local/origin `8f6ee687a69427f2ee2ea96ab08fb6269db33a57`; incoming `272132e4..8f6ee687`, three commits, zero merges | Accept Sharadar correction and thirteen test guards; qualify documentation without a new milestone | All three incoming commits have separate dispositions in202.1. Successful status-body retention and intentionally ignored ctime are precisely distinguished; original operations are not repeated or reclassified. | Main677 passed/2 intentional topology skips24.16s before the added record guard; Sharadar112 passed1.25s; new guard cases11 passed3.55s; four echo and thirteen selector reversals caught; metadata-only twelve-leaf/source audit passed. Final validation follows below. No full suite; looks/jobs/backtests0/0/0. | Two P3 record findings corrected in202.2; six carried P2s OPEN and all earlier findings retained at exact scopes | NO next milestone this round; QC hold remains in force. Separate durable handoff after exact review hash exists, then one final matching-lane push; monitor PAUSED. |
 | 2026-10-24 | Claude review (macOS session) and corrections | `c43fb081` -> `6605db25`, `fc7f0349` -> this review record | Independent review of sections 202-217 (`8f6ee687..c43fb081`, 13 commits, 0 merges: Sharadar status repair, three qualification modules, original-64 parser and EODHD date probe) | All 13 accepted, three after correction. Nine provider requests and eight Keychain reads match their receipts; every new private output checked by hash. Fixture fence now compares filesystem identity; price capture parses hashed plan bytes; three parser guards pinned. | Final tree: 705/1 skipped and 93 focused passes, 1 topology pass, 717 on the corrected files, guards 107 with the 2 known SEP-2 failures; network and Keychain exec denied. No complete suite. Looks 0/0/0. | IBSHAR-CR03, IBPRICE-CR01, IBORIG-TEST01 closed; IBREC-CCR20101/20102 accepted against Claude; eight P3 observation groups recorded; six P2 open | Codex counter-reviews section 218; QC hold stays |
+| 2026-10-25 UTC | Codex counter-review and separately authorized2021–2025 pilot qualification | Verified remote`336b8477`; counter-review/prereg`59901aab`; implementation`7ad63d08`; this separate final handoff | Accept all three Claude commits; inert exploratory pilot freeze, real retained source-window audit and one owned historical-reference control | Native-denied374-leaf/67-month/25-quarter audit passed4.271452s; all60 pilot-month receipts present; one Massive GET/Keychain read,HTTP200/375-byte metadata body. Original population, consumed requests and false readiness preserved. | Main806 passed/1 intentional nested-topology skip16.19s; source-only compile, five review reversals, attributed pilot/probe/audit sensitivities; actual offline replay and calendar metadata; no full suite or look/job/backtest. | Six carried P2s remainOPEN; draft cutoff/deadline/schema/readback findings corrected before activation | Not backtest-ready. QC hold prevents required native historical SID/context/engine qualification; original-parent/price/factor/reference assembly is also incomplete, not an exhausted-code claim. No new purchase recommended; next gated action and exact inputs in221.4/222. One final lane push; monitorPAUSED. |
+
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -31432,3 +31435,273 @@ images, reverify clean designated root/branch/HEAD, then run the fixed actual
 read-only audit and exactly one default Massive probe. Freeze ALL tracked
 sources/record/HEAD until both finish. Record observed execution hashes,
 counts and dispositions afterward. No checkpoint push or QC access.
+
+## 221. Observed pilot qualifications and exact readiness boundary (2026-10-25 UTC)
+
+### 221.1 Committed execution lineage and calendar-derived pilot plan
+
+All actual operations below used the already-existing clean implementation
+`7ad63d083568ed78de7a1b94143153b7ad1a068f` on the designated lane, after
+counter-review/preregistration`59901aab7aa0739d597725693f5f909f5181b6ce`.
+No later handoff commit is represented as existing during execution. All
+tracked images/HEAD stayed frozen; only the authorized new private Massive
+namespace was created. No original source or receipt was overwritten.
+Invoking/reporting parent glue was supplied through stdin in this chat,
+not an additional committed module or a claim of a reconstructed full
+interpreter environment. Reported49/91-source inventories are the internal
+module closures; the actual audit worker bootstrap is literal code in the
+committed audit module. Ad-hoc caller glue is not silently included in those
+inventory counts.
+
+Main exercised the new pure pilot factory using the installed NYSE calendar
+candidate `pandas_market_calendars5.4.0` under native network/fork/all-write/
+Keychain-exec denial. This is a reproducible calendar engineering diagnostic,
+NOT exchange authentication, price/listing/factor evidence or a full runtime
+snapshot. Calendar package-init source SHA256
+`b03b9fb6f9e134514bf37515c3ad8e7166c47a92c3ec385bb982d20fc4d82849`;
+NYSE definition source
+`175045c15d8ad58755977f6a450fcb498508ca8dff34b15dbea41ae4e3c53ad5`.
+Bound calendar159412 bytes/SHA256
+`cf89f63750992981001461030434ee95776b1f4b387f95084514fb42e5958aae`;
+inert plan383551 bytes/SHA256
+`f74310ade5bb09047b0b2edc3a25b3f40608289857bc9575e8b7310b9e349037`.
+No financial values or strategy outcomes were read.
+
+The padded envelope contains1695 regular-session labels,1255 within the
+entry window. First entry2021-01-04 requires its253 prior opens starting
+**2020-01-02**; last entry2025-12-31 has its60-session exit on
+**2026-03-30**. Calendar2020 has253 sessions in this candidate. Actual
+instrument observations/listing evidence remain necessary; a calendar does
+not establish them. Earnings diagnostic close boundaries are
+2020-12-23T21:00:00Z through2026-01-08T21:00:00Z;67 audited months are a
+conservative superset, not an expansion of the entry population.
+
+| Fixed pilot phase | Declared entry sessions | Predeclared purge/embargo exclusions | Included schedule labels |
+|---|---:|---:|---:|
+|2021–2023 development|753|60|693|
+|2024 validation|252|120|132|
+|2025 sealed pilot test|250|60|190|
+
+These are calendar schedule labels, NOT signals, eligible stocks, independent
+clusters, statistical power, orders or observed returns. Source rows for all
+excluded labels remain accounted for. The pilot is exploratory with zero new
+confirmatory alpha; any future outcome join must be permanently registered
+and disclosed as exposure of the overlapping original confirmation period.
+
+### 221.2 Actual retained-window audit: protected success and preserved refusals
+
+The first caller incorrectly placed the trusted parent inside an outer
+Seatbelt profile; its attempt exited1 with`isolated_audit_worker_refused`.
+A separate no-input nested-sandbox control exited71 with
+`sandbox-exec: sandbox_apply: Operation not permitted`. This corroborates
+the known macOS nested-profile limitation; it is not retrospectively a
+successful audit, nor does the original sanitized failure expose its child
+stderr or prove which input was reached. No success/counts are taken from it.
+A following parent audit-hook harness refused `/usr/bin/git` during initial
+identity preflight (`git_identity_unavailable`); no child was launched by that
+preflight. These are caller harness failures, not a weakened data guard or a
+new provider attempt. No producer receipt/namespace was changed or resumed.
+
+Corrected caller used a minimal trusted parent with a socket-denying audit
+hook and an explicit allowlist of read-only Git plus the exact sandboxed
+worker command. The actual metadata reader launched in its INITIAL native
+network/fork/all-write/Keychain-exec-denied profile, proving each effective
+denial, including direct harmless`security help` exec refusal, BEFORE input
+reads. The child's profile was not relaxed to accommodate Git: parent alone
+did clean Git/source checks before/after; child rehashed current source bytes.
+Actual read-only audit **exit0 in4.271452s**,91 internal source images,
+inventory`7115fcb1cc0e0b589cad8d9d76c5c373044b00ca24742d810fc07362ea811f24`.
+Result SHA256
+`a04f3b7a3bde3a49fe04e9de7b1cd44a467db8043104aff18523086832a69b93`;
+374 held input leaves with inventory SHA256
+`8c79f1fc321132010f2a09b210846c629b32e1ec07bf728ad1d0579f4d42708e`.
+The raw-free diagnostic was reported through stdout, not a fabricated
+persisted producer completion/seal; exact input anchors remain in committed
+code and the retained original namespaces. No financial source JSON/metadata
+rows were decoded: response/row-metadata files were stream-hashed, and
+operational receipts/census summaries were validated and summed.
+
+All67 buffered earnings months2020-10..2026-04 match their retained body,
+metadata, child-completion, started/scope and77-month campaign control chain.
+All60 evaluation months2021-01..2025-12 have sealed HTTP200 receipts.
+Their **producer-receipt** counts are706559 source/reported rows,
+473599 metadata-accepted and232960 quarantined. Timing unknown232735;
+unknown status0, duplicate-fiscal-period0, metadata-conflicting-period0.
+These are not newly rederived row semantics, verified per-issuer coverage,
+original publication clocks or a complete earnings confounder panel.
+January2006/August2018 are outside this pilot, so their old missing bodies
+are not its archive-month blocker. No consumed earnings request was repeated.
+
+The accepted selector success chain is section200's NEW semantic completion
+`da3780102a1b57157d4df4021630ded31cb78730d1765826111b960485a95b42`
+and trusted-publisher final
+`c1b2cd8c1833ef11763ceefee15b83c5ac7af47d26ad7a1296ed5af8e04e2441`,
+including actual exit0 terminal evidence. Equal selection SHA
+`d1dd4e093d5505fac6373562bb24198c7ad6fc61ef7745912a40bff84528aaef`
+does NOT promote the failed193 root. Audit covers25 context quarters and
+all20 pilot quarters: **1008318** submissions =74363 Form3 +2621 Form3/A
++905671 Form4 +15899 Form4/A +9520 Form5 +244 Form5/A. Relevant Form4/4-A
+count **921570**, NOT eligible events or admitted original parents.
+Pilot short-CIK rows131, relevant118, across2021Q1..2022Q4; no pilot
+accession-year mismatches. The v2 integration/full-original requirements
+remain; no row was silently normalized/admitted here. No raw quarter ZIP
+or submission/financial row was reparsed by this audit.
+
+### 221.3 Actual owned Massive reference access and independent offline replay
+
+Exactly ONE new default transport invocation and ONE configured Massive
+Keychain read completed220.3's fixed A/2020-01-02 control. ObservedHTTP200,
+375-byte reference-only response; overall23.257234s including repeated
+source/Git/custody checks, HTTP open/read still15-second wall bound.
+Completion2026-10-25T05:13:42.850266Z. No retry/pagination/redirect/proxy/
+fallback, price/quote/fundamental endpoint, old earnings request or QC access.
+
+| Private retained evidence | Bytes / SHA256 |
+|---|---|
+|complete.json|9423 / `97e89a4a42bde845ee36e5be10e43d46c938785381ffe1841553a139179b4349`|
+|01-reference-response.json|375 / `0819bf05f30263dd27747a00afb8e699f624a5bd0e0dd2c47816e2747b68cb4a`|
+|01-reference-metadata.json|1229 / `9dc1dd6438d053175a1b01fc046cd342b3f5796f457c262312ac10e1aefe550b`|
+|parent scope reservation|`e2ae34a3eab312272e4da2e95f184830e5f74e59ae41017d3609c091dfbe7398`|
+
+Namespace is exactly220.3's `pilot_massive_reference_v1/ib-pilot-massive-reference-20200102-20261024-once`.
+49 executed internal sources, inventory
+`4d7431305714f9e0397464ff503904bfa6457a0d6647ad1f343c3f9c611a2e5e`.
+Independent initial-native network/fork/all-write/Keychain-exec-denied
+readback passed0.002165s: all EIGHT output leaves plus parent scope,
+mode0600/single-link/owner/strict before-after versions, exact names/hashes,
+and a pure reprojection of the375 retained reference bytes reproduce the
+private metadata. It used an explicitly INVENTED offline screening token,
+not a configured token read, authentication assertion or provider request.
+Output inventory SHA256
+`fccadde792114b791d798043c5bb9ece773020e721f5041d19e442792a71b1f7`.
+All body/row data stays private ignored; no live secret or auth header is
+in Git, stdout, source, exceptions or the journal.
+
+This proves one owned historical reference access path, not all symbols,
+dead/reused-ticker coverage, historical first-public knowledge, native QC SID
+or an admitted full pilot universe. It does not renew or test Benzinga
+Earnings: that separate product's earlier403 remains preserved. No new
+subscription, SF1 repurchase or Sharadar upgrade is recommended from this
+control. Existing EODHD/Sharadar/SF1/Massive remain the selected candidates.
+
+### 221.4 Concrete gated boundary, remaining work and delegated disposition
+
+**NOT BACKTEST-READY.** The actual factual dependency at the present
+engine/reference boundary is a complete historical issuer/share-class/
+native-QC-SID/listing/availability match and native data/engine parity.
+The current Sharadar reference is a current snapshot; the new Massive
+single dated control has `qc_sid_bound=false`/`historical_identity_verified=false`;
+neither supplies that complete native mapping. Earlier narrow QC diagnostics
+and ignored SDK drafts are not a pilot-wide native reference archive or
+authorization to export cloud datasets. The required native qualification
+cannot be performed under the owner's explicit NO-QC hold, which remains
+binding. No substitute ticker/name join, generated SID assertion, exporter
+or partial green strategy is used to manufacture the missing fact.
+
+**This is not a claim that all offline coding/acquisition is exhausted, or
+that QC release alone makes the lane ready.** Remaining work includes:
+
+1. Full pilot/context original-parent/v2 admission and causal source/lot
+   accounting against real inputs. Measured921570 relevant pilot filing
+   rows are a census, not parent coverage. Original2022Q4–2023Q1 remains
+  19846 source-bound/99394 with79548 originally unattempted; no number was
+   increased by calendar planning or a metadata audit.
+2. Complete qualified per-instrument raw-open/liquidity/corporate-action/
+   delisting/terminal treatment through actual2020 warm-up and2026 maturity;
+   historical issuer/class/listing/industry/AR-fundamental availability and
+   an actual complete pre-entry/control cohort. Existing full-history SF1
+   was already supplied, and EODHD historical-date capability plus Massive
+   dated reference now have observed controls. These support scoped owned
+   acquisition/integration, not an automatic purchase or completeness claim.
+3. Actual causally available six-factor/RF252-open-interval construction,
+   matching features, both issuer-bound earnings diagnostics, permanent
+   full-population protocol/look roots and exact permitted processing
+   representation before outcome interpretation/launch. Missing ready-made
+   factors or a spread loader are engineering/data-qualification work, NOT
+   automatically an irreducible missing vendor or new subscription.
+4. After explicit QC release and the real evidence gates, order-based native
+   candidate compilation/completion/parity. At most three unsuccessful
+   launches per distinct candidate, followed by the documented Mia rule.
+   Current launch attempts/looks/jobs/backtests remain0/0/0/0.
+
+Delegated decision `IBPILOT-221-01`: finish this observed qualification round
+at the explicit native-reference/engine-access hold rather than call the
+pilot ready, infer an account release or start a large price/outcome/corpus
+campaign with an unfixed native cohort. This decision creates NO new routine
+approval gate and does not withdraw the standing source-build authorization.
+Next concrete external action is for the owner to state when QC is free;
+then preregister a bounded in-cloud native historical identity/context
+qualification with no raw cloud export, and continue the source assembly
+above. If a separately supplied qualified native reference archive exists,
+it is an alternative input—not a request for an API secret or a new purchase.
+No new historical earnings supplier/month export is required solely because
+the old full-study gap existed outside this new pilot.
+
+No new P0/P1; six carried P2s remain OPEN at their original scopes, all earlier
+resolved findings and218.5 observations retained. New draft P3 findings in
+220.4 are closed only at those prospective software scopes. Frozen IB1C v1,
+all four v3 bytes and exact`aa0d635d` validator, stopped1846/1847 v3 root,
+separate7373-byte diagnostic/report and strictD23 seven-nonexact/no82-quarter
+promotion state remain unchanged. Both distinct final historical access
+classifications remain binding without retroactive approval. No strategy
+economics, shared/main behavior, other lane, Action Plan or SESSION_HANDOFF
+was changed. No provider acquisition beyond the one new Massive reference
+control; no SEC/fresh earnings/price/quote/fundamental request, outcome look,
+QC access, SDK/job/backtest, scheduler/operator/broker, deployment, funded/
+paper/live/capital/order/trading action. Pilot metadata implementation is
+self-directed Codex work, NOT a new independent Claude review.
+
+## 222. Separate durable pilot-round handoff and one-push boundary (2026-10-25 UTC)
+
+Incoming complete three-commit range
+`c43fb081350d45640a4b3faf45fbd55c3187a0f8..336b8477df902a496df3d6fe836973288796dde0`
+is accepted per219, including its documentation-only handoff. Claude's prior
+full13-commit acceptance remains218's attributed independent evidence;
+Codex's new independent observations are precisely distinguished above.
+Counter-reviewed corrections quality8/10 within the focused scope, not a
+rating of empirical readiness or proof of the unrun full lane suite.
+
+The outgoing round starts exclusively at verified remote
+`336b8477df902a496df3d6fe836973288796dde0` and contains:
+
+1. `59901aab7aa0739d597725693f5f909f5181b6ce`: complete per-commit
+   counter-review/dispositions and separate pilot pre-outcome scope.
+2. `7ad63d083568ed78de7a1b94143153b7ad1a068f`: three new source/test pairs,
+   exact source-image/validation/activation record, followed by the actual
+   protected observations in221. This commit already existed during them.
+3. This separate documentation-only final handoff, after both exact hashes
+   above exist. No interim push has occurred. No actual report is relabeled
+   a later-commit run; private inputs/outputs stay local and are not Git data.
+
+Review next: exact outgoing range, all six source/test images and this
+documentation commit, while preserving the QC hold and the separate
+exploratory/confirmation-overlap semantics. Do not automatically rearm the
+monitor, message another chat, activate SDK drafts or repeat a consumed
+request. The next build requires the actual native reference/access input
+described221.4, not another ordinary engineering approval. Readiness and
+source/rights/look/engine promotion remain false. Required owner action is
+only availability/release of the held QC route (or a genuine substitute
+archive); no new dataset purchase is currently justified by this round.
+
+Before committing this final handoff, rerun record/active-document/import
+and EXACT package checks, diff/status/frozen-byte checks and a narrow
+secret-shape check; record final results below. Reverify exact designated
+root/branch/HEAD and expected record-only dirt, fetch only matching origin
+and require it still equal`336b8477`. Then commit this record separately and
+make exactly ONE final successful push to its matching lane. Independently
+verify the exact remote tip and clean status afterward; no force/side branch/
+overwriting concurrent work or checkpoint substitution. Monitor staysPAUSED.
+
+### 222.1 Final publication checks
+
+Main final handoff selection: **124 passed3.99s** on the record, active
+documents, import boundary and EXACT package guard, under native network/
+Keychain-exec/repository-write denial and the minimal no-bytecode test
+environment. Earlier integrated806/1 skip remains the measured source-test
+result, not a full suite. All four frozen sources still have an empty diff
+against exact historical`aa0d635d`; narrow secret-shape scan of all SIX new
+images and this record found no matching live-secret shape. `git diff
+--check` clean; designated root/branch/HEAD correct, only expected record
+dirt, and matching origin still exactly`336b8477`. No source edit followed
+the real operations. Publication verification occurs after the single push;
+this prepublication record does not invent its future success.

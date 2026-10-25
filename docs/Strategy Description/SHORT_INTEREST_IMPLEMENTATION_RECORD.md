@@ -2,9 +2,11 @@
 
 Status: **CODEX COUNTER-REVIEW OF CLAUDE `b648f60` ACCEPTED AFTER ONE APPENDED
 COUNT-SCOPE ARITHMETIC ERRATUM (SECTION 124). OWNER-DIRECTED BOUNDED RECOVERY
-AND SECRET-SAFE DIAGNOSTICS ARE IMPLEMENTED. ACTUAL V2 INITIALIZATION REFUSED
-WITH ZERO NEW START/HTTP/BYTES; ITS CLAIM IS SPENT AND THE CAUSE IS UNKNOWN.
-FRESH V3 BOUNDED SUCCESSOR IS REGISTERED IN SECTION124.5; DISPATCH PENDING.
+AND SECRET-SAFE DIAGNOSTICS ARE IMPLEMENTED. ACTUAL V2 AND V3 INITIALIZATION
+REFUSED WITH ZERO NEW START/HTTP/BYTES; BOTH CLAIMS ARE SPENT. V3 IDENTIFIES
+A FILE-CUSTODY GUARD; THE PRECISE CAUSE IS STILL UNKNOWN. A LOCAL NONCLAIM
+PROBE PASSED WITHOUT REPRODUCING IT. FURTHER CLAIMS ARE HELD; OFFLINE
+QUALIFICATION OF RETAINED MONTHLY INPUTS IS IN PROGRESS (SECTION124.6).
 OWNER NOW DIRECTS CONTINUATION UNTIL LOCAL BACKTEST READINESS, WITHOUT QC.
 ALL OLD CLAIMS,
 NEGATIVES AND CHARGES REMAIN SPENT/IMMUTABLE. NO BACKTEST READINESS IS CLAIMED.
@@ -21894,3 +21896,149 @@ qualification toward readiness; never substitute fixtures or a transport close
 for empirical qualification. Canonical/exploratory actual looks0/0 and0,
 alpha0, permanent look IDsnone, QC launch attempts0. Independent Claude review
 of this accumulated final snapshot remains pending.
+
+### 124.6 V3 terminal refusal and independent offline progress
+
+The exact55-file registered v3 invocation at clean
+`2d11d1f5b73a04e0701c65bdeb81152766535f89` and actual originB648 terminated
+exec85177 with exit2. The fixed diagnostic is initialization stage
+`claim_custody_open`, category `local_contract_refusal`, contract code
+`held_custody_file_changed`; no errno. Its exact run membership is only
+`run.refused.json`, with no protocol/start control or positive marker. Thus
+the key reader was not reached. Actual UTC clocks:
+2026-10-25T05:12:38.332777Z through 2026-10-25T05:12:39.096808Z.
+START0/knownHTTP0/chargedbytes0/resolved0; cumulative13992START and23452681bytes
+remain spent and unchanged. New v3 claim SHA256
+`b32d9e9757a29e0edae07b87159361a83185f84513826280bef4560aef96e353`;
+negative SHA256
+`594f53f5b275fabc5a2784e660533d98f0f0069d30dec85855ea9251bec213dc`.
+Main authenticated protected original controls after observing actual process
+termination. The v3 invocation and all earlier claims must never be restarted.
+
+**SI-BUILD-20261024-022 (P2, unresolved):** the diagnostic proves a file-level
+custody mismatch in one held-file check, not which member or predicate failed.
+That stage includes the constructor's normal-boundary callbacks as well as
+its own file check, so even the new claim itself cannot yet be blamed.
+Parent-directory mtime is deliberately excluded by that held-file reader.
+No Keychain, provider, timeout, descriptor-limit, filesystem or external-agent
+cause is asserted. Do not repeatedly spend claims to obtain more clues.
+
+**SI-DEC-20261024-11:** one separate credential/provider-free local probe
+(exec67210, exit0) replayed the actual source/cache/refused-prefix and v2
+zero-START custody, then exclusively published186bytes of fixed NONCLAIM
+metadata and opened/read it through the same held-file/normal-boundary
+composition. It made zero provider HTTP, credential reads and new claims.
+It preserved enforcement and wrapped the entry check only in memory to emit
+fixed role labels and mismatching field NAMES, never values, raw data,
+private paths or exception text. The probe passed; mismatch observations were
+empty. Evidence is retained under the separate
+`local-custody-probe-20261025-v1` path and parent metadata file. No original
+capture/claim was changed or removed. This failed to reproduce the v3 cause;
+it is not proof of a repair, source admission or readiness. Further capture
+claims are held while the cause is isolated; other independent offline gates
+remain implementable under the owner's continuation instruction.
+
+**SI-DEC-20261024-12:** Main measured the retained monthly source manifest
+read-only (exec31030, exit0), with provider network denied, no credential reads
+or source writes. Exact452 run members and separately protected spent budget,
+original inventory/completion pins, enclosing creator and historical8-file
+Git-blob code identity were authenticated. The protocol claim policy ID
+f72fb is NOT the budget file's raw SHA. Canonical complete member manifest:
+57266bytes, SHA256
+`ac6c1d19af27aefbc38d3bdf0aa52ec5460054edd06779fbc81be58029621afa`;
+budget raw SHA256
+`3d0ace1414f0ebc0e09a3841e9f94418595fdfcbd84ad0576e0486a68b675371`;
+started raw SHA256
+`e9705854496b39f2d36da1d5b7f6183fe73e59f97ebbe31f5e6a33842cb5fe9e`;
+protocol raw SHA256
+`d4d8b9d4d5e2c963e689ef45b659185c04e378100833df9de4d91354943fddd5`;
+historical code identity SHA256
+`700e12c52553920c8f7dad7d17a50d42110e24cbab92ea31d6d50be15f4e4ee4`.
+The original116.12 inventory/report/completion digests and source interval
+remain unchanged. This measurement hashed original pages without financial
+normalization, qualification, source admission or empirical usability claims.
+
+Next bounded offline work: a constant-descriptor protected monthly reloader
+and full-study (not ten-token pilot) exact page/panel qualification, retaining
+all original malformed and duplicate origins. A pure source-normalization
+report cannot supply native/date/class/USD identity, license, availability,
+coverage or actual-run authority. Those gates remain separate and private.
+No new HTTP, purchase, QC access, outcome join or strategy evaluation is
+authorized by this software/manifest entry. The one final push is still held
+until the round's true completion or a factual terminal owner-required gate.
+
+### 124.7 Prospective offline monthly qualification checkpoint
+
+**SI-DEC-20261024-13**, under the owner's continuing SI-AUTH-20261024-05,
+registers a finite offline replay/normalization of the retained116.12 monthly
+source. There is no capture, provider/key route, purchase, new budget claim,
+outcome join or QC path in the new orchestrator. Its54-file current static
+import closure (including package initializers and relative imports) is exact;
+path-list SHA256
+`e3140cf8de961412f519366280909140bc929fc312851529a100e48bd47202b0`;
+complete relative-path/current-byte mapping SHA256
+`dbc3c594ba393ff64762bb312f4f3898a2c6051745e06dfd272cc0d8ac5132f7`;
+prospective qualification policy SHA256
+`c8203f60eea2f43fd006d03cd2d4005c6218437a1debc5ad929e96bc54d22dd3`.
+The exact clean runtime HEAD and actual matching remote remain separately
+bound at invocation; no self/future HEAD is embedded in its own source bytes.
+Actual normalization has NOT yet run at this checkpoint.
+
+Technical: the fixed-path snapshot authenticates all452 original members,
+the external spent budget, original global controls and historical8-file code
+identity before yielding private bytes. It retains3FDs plus one transient,
+checks owner0700/0600/single-link/no-follow protection, original hashes and
+complete namespace/stamp sweeps. The orchestrator reconstructs every START,
+request, receipt, raw hash/length, whole-next-page budget, enclosing clock,
+original malformed/duplicate event and global total across all112 panels
+BEFORE its first report can escape. Subsequent use rebuilds one digest-bound
+panel at a time, not the entire normalized population in RAM. It keeps source
+and exact current-code custody through context exit. Negative/unknown members
+dominate success; `.refusals.private.json` is retained data-quality evidence,
+not confused with a terminal `.refused.json`.
+
+Plain language: retained source files can now be checked and normalized offline
+without a new request or a ten-token pilot substitution. RawOHLC and rawvolume
+use the recorded exact split-adjustment equations, including fractional volume
+without rounding; DAILY marketcap preserves issuer-USD-million source units,
+not class shares or proof of target USD currency. Every identifiable duplicate
+copy is quarantined, including malformed peers across pages. Original source
+origins and lastupdated revision metadata remain private. No returns, signals,
+rankings, outcomes, source fitness, native/class identity, coverage, license,
+historical availability or actual-input/backtest authority is manufactured.
+All such admissions remain false and require their own later evidence.
+
+Findings caught before this new checkpoint was released:
+
+| ID | Priority / disposition | Evidence and correction |
+|---|---|---|
+| SI-BUILD-20261024-023 | P3, corrected before commit | Main's first combined selection had208passes/1failure in2.45s: the new pure module used a package-root `from` import prohibited by the standing import-boundary AST test. Changed it to the exact absolute child-module import; the boundary test was NOT weakened. The corrected six-file selection passed210tests in2.19s. |
+| SI-BUILD-20261024-024 | P2, corrected before commit | Mutable per-panel checkpoint dictionaries could be altered without changing their outer tuple identity. A causal fabricated regression failed, then checkpoints became immutable canonical JSON strings; reflected checkpoint replacement remains rejected by the sealed object. No actual-input authority was exposed. |
+| SI-BUILD-20261024-025 | P2, corrected before commit | Mutating the capture protocol to an empty panel list after full replay could silently empty later iteration. A second causal regression failed. Policy identity now hashes the actual capture protocol AND the full pure qualification policy before any context/iterator use. Both regressions were red together (2failed/22passed in11.92s), then corrected. |
+| SI-BUILD-20261024-026 | P3, corrected before commit | Incremental report resource accounting must count UTF8 bytes, not Unicode characters. Current code counts encoded bytes. Main's new fabricated300k-four-byte-character case, with a3MiB bound and forbidden final serializer, fails when reversed to character counting (1failed/49deselected in0.09s) and passes normally. Private source text is never printed. |
+
+Main's final seven-file focused/new-software/import-boundary/active-document
+selection passed **243tests in20.01s**, no skips or warnings, under empty
+inherited environment and macOS network denial. All54 current source files
+and the three new test files compile in memory; diff whitespace check passes.
+No full lane/repository suite ran. Delegated focused evidence, not Main reruns:
+pure49passed/1.22s; snapshot plus original-capture62passed/.44s; operational
+plus import-boundary42passed/19.53s. All used fabricated controls, no actual
+private source, credentials, network, QC or outcomes. Pure arithmetic, bool,
+duplicate, date, clock and false-exhaustion reversals all failed as intended;
+snapshot full-stamp and historical-code reversals failed; removing operational
+page-refusal authentication failed. All mutations were restored. Delegates did
+not commit or push and are not a substitute for independent Claude review.
+
+Software8/10, records/authority9/10 remain provisional: actual closed retained
+monthly normalization is the next operational check, not a claimed result.
+The count custody cause022, complete count/daily unions, exact dated native/
+class/CIK/USD joins, issuer-size/market eligibility, corporate-action cash and
+actual-input/registration gates remain open. Private source/usability conclusions
+stay out of this record and chat. Preserve the source budgets and all spent
+claims; further count-capture claims remain held. QC0, actual looks0/0 and0,
+alpha0, permanent look IDsnone, no outcome join. No interim push has occurred.
+
+Post-record Main record/active-document check:89passed in0.72s, no skips or
+warnings; diff whitespace clean. This is validation of the updated handoff,
+not a source or backtest result.

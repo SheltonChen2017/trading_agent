@@ -762,6 +762,12 @@ one unclassified477byte error string, retained only by length/hash. Actual
 parent exit2; validator accepted FAILURE evidence. No write readback, later
 uploads, compile or launch followed. Floor322/247/50/699; no accepted cell.
 Section319.5–319.6 own the actual evidence and concrete QC-refusal stop; no A8.
+Section320 supersedes that last authority stop only for the owner's new,
+explicit ONE A8 diagnostic-upload/recovery decision and scoped review waiver.
+A7 remains spent. The new purpose is to retain an actionable redacted QC error,
+not to assume a verified upload fix. Refusal must stop; only acceptance plus
+exact readback may continue the unchanged candidate. Preparation is not use,
+and320's separately committed exact freeze precedes contact. Monitor PAUSED.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1979,6 +1985,14 @@ infer a root cause from its error hash. Any further operational recovery needs
 a separate coherent protocol and explicit attempt allowance; normal Claude
 review applies unless separately waived. Section 319 records the one final
 push and concrete blocker, not an automatic A8 or next family cell.
+The owner explicitly waives Claude review of section 320's specific A8
+diagnostic-upload/recovery contract, not independent acceptance or technical
+gates. The owner subsequently authorized one A8 with a scoped review waiver, then
+explicitly clarified: "Yes—use A8 to diagnose, then continue only if accepted".
+Section320 owns this new diagnostic purpose, source/protocol freeze and actual
+result. It does not renew A7, authorize A9, remove technical gates or treat an
+observability correction as a proven QC upload fix. No independent acceptance
+is claimed. The current round still ends with exactly one final lane push.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -55652,3 +55666,213 @@ and the user goal remains blocked rather than reported complete.
 Final result/handoff record checks passed86 in1.04s under the same native
 denial; this repeats the existing86 and adds no distinct tests. Final new-
 round diff checks passed; no source/test change followed the exact274 repeat.
+
+## 320. Owner-authorized A8 diagnostic upload and conditional exact recovery — 2026-10-24 PDT /25 UTC
+
+### 320.1 Scope, baseline and diagnosis
+
+The owner directed: "Find the actual QC upload error and fix it. You can use
+Safari or ask Mia for help. Keep going until the backtest is running, document
+the progress, and push once when done." The owner then approved "Yes—skip
+review and allow one A8 attempt" in response to a question contingent on a
+verified fix. Investigation did not establish an upload fix. Codex therefore
+asked explicitly whether A8 could instead make one diagnostic upload with safe
+error capture, stopping if refused and continuing exact-file recovery/launch
+only if accepted. The owner answered: **"Yes—use A8 to diagnose, then continue
+only if accepted"**. This later precise decision controls. It supplies ONE A8
+and a current scoped review waiver, not A9, unchanged retry, independent
+acceptance or a technical gate waiver. A1–A7/R314/R316 stay spent; their callers,
+readers, controls and evidence are not reopened. Monitor remains PAUSED.
+
+All work stays in the designated Code root and lane branch. Clean starting
+local HEAD and live matching remote were
+35081915130886ff435d6a2a58b88b87785fe66a. The completed prior round was exactly
+50e59113bc062a176ade308dd886c93d56820fdc then35081915 afterb477c236.
+No new Claude range exists. No new push has occurred in this preparation.
+Only new agent-owned additive files and this lane record are being edited;
+shared/root behavior, old modules, strategy economics and other lanes stay frozen.
+
+Static inspection and the official QC Update File, Lock Project and
+authentication references did not establish a request-schema/transport defect.
+The documented content-update model includes projectId/name/content/codeSourceId;
+the same environment identity served the successful A7 lock. Do not remove
+codeSourceId or change transport/source on speculation. Sources:
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/file-management/update-file
+and https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/collaboration/lock-project.
+The477byte unknown-error hash cannot reconstruct its original text. A7's
+observability limitation is verified, but is not the external refusal's cause.
+
+### 320.2 Safari/Mia observations and qualifications
+
+Safari began on the authenticated QC terminal dashboard. Opening only R298
+showed input_runtime as a visible# and four editor files. This is UI evidence,
+not byte-authenticated current inventory or proof of A7's write effect. The
+editor automatically reported a successful cloud build at displayed3:12:33,
+IDbe1b38-4795fc, engine2.5.0.0.18203. Codex did not select Build/Backtest. The
+UI displayed times are retained as UI labels, not asserted UTC API timestamps.
+
+The owner-authorized Mia consultation explicitly prohibited edits, locks,
+compile, launch, sharing, source/credential/data reads and other-project work.
+Mia reports one read_open_project inventory read with four unchanged filenames
+and no source reads. It states that its tools cannot retrieve past API bodies
+or per-request server diagnostics, and retracts the old incorrect claim that
+codeSourceId is undocumented for Update File. It offers a fresh diagnostic
+write or support as possible routes; no support ticket was submitted. Its
+HTTP200-as-authentication assertion is not accepted as proof, unchanged names
+do not establish unchanged content, and earlier larger-file acceptance does
+not exclude a current quota/policy condition. Error length and lock/size
+hypotheses are not a diagnosis. Same-round advice is not independent review.
+
+Mia consultation again exposed a Mia collaborator/session row and a read-only
+editor. Leaving the editor and stopping only the R298 coding environment
+removed that environment from the dashboard. Selecting its remaining shared
+indicator reopened R298; the editor auto-built again at displayed3:18:16,
+ID4f155c-4795fc. Under the owner's previously explicit removal-of-only-Mia
+direction, one Remove User action targeted the named Mia row after its task
+was Completed. It refused with the UI message "Collaboration not found"
+(reference-code suffix omitted here). No repeated removal, owner/A5 change,
+permission weakening or edit-control request followed. That UI refusal is
+not A7's upload error. The session was left for the terminal and its own
+environment-stop control selected again. A fresh terminal AX observation
+confirmed no Code Environments heading or editor remained. Fresh exact API
+access checks still govern any operational use; do not infer access clearance
+from these observations. The automatic successful builds are not candidate
+launches or accepted results and do not consume an extra strategy look.
+
+### 320.3 Prospective implementation boundary
+
+Additive A8 preparation is in progress. No A8 parent/worker, claim allocation,
+credential/private-artifact read, upload or launch has occurred. The booked
+floor remains322shared/247Analyst development/50infrastructure/699cells.
+Only an actual new A8 claim will be booked once as323/248/50/699; preparation,
+Mia's metadata consultation and successful automatic editor builds do not
+rebook prior attempts or create result cells. Final source/protocol/test pins,
+focused validation, exact run authority and actual result follow below before
+the one final matching-lane push.
+
+### 320.4 Additive implementation, pins and focused validation
+
+Four new sources and their four tests form the prospective A8 contract. The
+pure error-text projector accepts only the frozen strict response parser's
+success=false/single-string-errors shape. It removes supplied actual credential,
+Authorization/timestamp derivatives, common encodings and source echoes before
+a closed English vocabulary; unknown identifiers/numbers, quoted/code spans,
+URLs and email addresses are suppressed. The retained wording is deliberately
+lossy and partial, not the original error, authenticated cause, write-effect
+proof or universal secret detection. Unsafe/oversized/unsupported shapes keep
+finite metadata without text. Vocabulary was fixed BEFORE real observation;
+it must not be tuned around an observed response in this attempt.
+
+The new one-use boundary binds the exact shared client and unchanged bounded
+transport to project38364439, files/update, input_runtime23055bytes/SHA
+c34e42d894dc88e74ce37899622a7f728bafdac9320ce2775736ba06b7ad463e
+and the same A5 codeSourceId. It writes paired structural/text projections
+before shared success parsing, returning the original status/body unchanged.
+Both projections bind identical status/body/error size/hash and fallback shape;
+the caller further binds source/profile/marker/count/publication and failure
+context. Actual known sensitive values exist only in memory and are cleared on
+terminal paths. A denied nested invocation must not clear the outer invocation's
+still-needed sanitization context. The upstream transport still refuses non-2xx
+or oversized bodies before this seam; their details may remain unknown.
+
+The additive completion helper retains A7's exact owner/A5 access, idle/manual
+history and supported-lock requirements. It reads the complete inventory before
+the first write and immediately after every successful write. Only permitted
+missing/placeholder files may change; retained core/forced-exit must already be
+exact. Each target is consumed before dispatch and never written twice, even on
+refusal. Every successful readback is the next prewrite snapshot, no intervening
+request; this is not an atomic cloud lease. All eleven files must match before
+compile. A8 names/receipts cannot be satisfied by A6/A7 or the manual SPY sample.
+No current access policy, shared client, transport or frozen economics changed.
+
+| New source/test | Bytes | SHA256 |
+| --- | ---: | --- |
+| scripts/arv2_r298_qc_error_text.py | 18136 | a0942586f49c7055d178e4ffc1d94ce8d7433e68812ef6527c54f21430d92ddb |
+| tests/analyst_revisions_v2/test_r298_qc_error_text.py | 12529 | 94826be10f295712eb085e3d13c19681f9b83c110ff145877375465c9d9db693 |
+| scripts/arv2_r298_qc_diagnostic_boundary.py | 13038 | 483a1616c71e48c2b9a06e83ea49d225b1bfe838ea6b3ac032a716b751af4acc |
+| tests/analyst_revisions_v2/test_r298_qc_diagnostic_boundary.py | 20840 | 3b55a267cb911083c7e0cb15ccee378cb5fc07d6903f679654d5debb022a903c |
+| scripts/arv2_r298_diagnostic_recovery_remote.py | 9865 | 005b6937fcfbac2d59239421650de00def44c469a502024bc0703e7678f07d9d |
+| tests/analyst_revisions_v2/test_r298_diagnostic_recovery_remote.py | 22746 | 0fa6fcd943d481b2fcc4434823f1a7e090ae7fdba7ea1a3382ebaffcabf3ef9a |
+| scripts/run_arv2_r298_diagnostic_recovery.py | 46737 | 74bdad51798a1cd16ddbecb857236129d29412c8482f719ec2405d5214a22a92 |
+| tests/analyst_revisions_v2/test_r298_diagnostic_recovery.py | 79676 | 4a787587f433c48c141259e17a06b5f255a248cb7f62aee071514c354195f81a |
+
+Canonical caller profile (+LF) SHA
+7fd70efb6a1decc8b273196c3685b33069d025159a2eea3e7be5dda851f5f7cb;
+boundary profile (+LF)85d5b57060fe9dfcc3655d1dd32fd7c9256604819c8aff1d51f48d67e99ee44f;
+pure text profile (noLF)3981bdf3a396ce8c071b924547bf714668f515e8972d500f34cd9a32ec8cfa9c.
+All85 selected dependency pins passed. These cover selected imports, not whole-
+interpreter integrity. Eight new files compiled in memory without bytecode.
+
+Root final focused selection: **717 distinct passes in12.19s** =115puretext +
+64boundary +164helper +287caller +86record/document +1research transitive
+import closure; no failures/skips/warnings. Native network, production-artifact,
+Keychain and security-tool denial applied, with in-root support paths,
+--noconftest, disabled plugin autoload, -B/no bytecode and no cache provider;
+dispatch_fence absence asserted. No complete lane/repository suite ran.
+Author115passes0.11s and515passes10.13s overlap these tests. Preserve earlier
+109pass subset, 347passes/1nested-entry failure/2draft-pin deselections and
+4pass correction repeat as overlapping development evidence, not additional
+green tests. Memory-only omission of known-context suppression caught3expected
+failures/1pass/111deselected0.07s; omission of caller error-view binding caught
+1expectedfailure0.22s. Both restored in finally, source hashes unchanged.
+The nested-entry cleanup defect and initial marker-rematching/output-coherence
+issues were corrected before use. Same-round audits are advisory, not independent
+acceptance; the owner's precise waiver supplies sequencing authority only.
+Final prefreeze record/document repeat passed86 in0.88s under the same native
+denial; it is included in the717 distinct tests, not additive.
+
+### 320.5 Exact ONE A8 run decision — prospective freeze
+
+Under320.1's explicit diagnostic-use decision, Codex freezes this commit's clean
+HEAD as the only A8 expected-head. Before execution verify exact root/branch,
+HEAD/status, caller/test/source/profile pins and the unchanged remote baseline.
+Compatible host remains designated Darwin/POSIX Python3.13 executable
+/Users/sheltonchen/.venvs/trading_agent-py313/bin/python. Use only the finite
+allowed environment, UTF-8 locale, in-root support paths and existing QC
+credential variables in memory; no Keychain/token-file reader or credential
+output. Credential-free native-denied source/host preflight may run first and
+must not inspect or allocate any control/artifact. Source-binding CLI options
+are not authorization booleans.
+
+Invoke scripts/run_arv2_r298_diagnostic_recovery.py recover exactly ONCE with
+that expected-head and the caller SHA above. Fixed new leaf:
+artifacts/analyst_revisions_v2/newrule_diagnostic_recovery/R320-20261024-A.
+It has not been inspected/allocated during preparation. Exclusive claim/fsync
+precedes credentials/contact. A1–A7 controls remain denied and never replayed.
+Fresh native-network-denied family/D15 admission occurs initially, before launch
+and finally; no spent operational entrypoint is revived. Parent bounds remain
+600seconds,64 application dispatches,24KiB worker/96KiB outer/80KiB paired
+response envelopes. Only its own children may be killed/reaped. Host suspension
+or uninterruptible I/O can defeat wall-clock bounds; ambiguous/nonzero terminal
+state spends the claim, never grants a retry or proves no remote effect.
+
+The diagnostic purpose is one exact input-runtime upload with safely retained
+QC refusal, NOT a claimed repair of an unknown API defect. If refused, STOP
+immediately: no readback, next upload, compile, launch, new name or A9. If accepted,
+only exact inventory readback permits remaining allowed files and main.py,
+then existing one compile-create/max20polls10seconds, fresh admission and
+90second prelaunch reserve, one capacity read and at most one backtests/create.
+No node means bounded capacity-wait, not another launch or other-lane change.
+Own A8 name is ARV2 R298 NEWRULE SIX OFF 2021 OCT2026 A8 f67148cd. Retain an
+immediate terminal receipt; otherwise one own metadata status after60seconds.
+Queued is not running; Runtime Error retains identity and refuses. No result
+statistics/logs/charts/orders, other family cell, project replacement or strategy
+economics modification is authorized by this run decision.
+
+External observer is separately bounded615seconds/128KiB per channel, retaining
+stdout/stderr in memory only and actual exit plus external dispatch/completion
+brackets. Do not print raw output before validation. Exactly one external pure
+validator gets the captured stdout on stdin and the OBSERVED exit (never a
+fabricated0), with15second bound and native network/artifact/Keychain/security
+denial. Require empty stderr, exact canonical double-LF envelope, correct
+freeze/caller/profile and reconstructed report/response journal pins. It reads
+no output leaf, source corpus or old control. Malformed/oversized/timed-out
+output prints only safe size/hash/bound/exit metadata. Exit2 with valid evidence
+is validated FAILURE, not acceptance; even a positive retained report requires
+actual exit0. The finite redacted explanation is not authenticated root cause.
+
+This first freeze commit is local only. Following actual result, record all
+effects/limitations and the one accountable A8 look if consumed, append only the
+authorized Analyst shared-ledger delta, validate documentation/diff/status,
+commit final handoff and make exactly ONE nonforce matching-lane push. No new
+milestone or extra attempt is inferred. Monitor remains PAUSED throughout.

@@ -32037,3 +32037,133 @@ fork/ALL-write/direct-security-exec-denied source-only import and in-memory
 compilation passed all FOUR new images. These are actual synthetic/code
 observations, not actual retained-parent parsing. Actual body parsing follows
 only after this new committed image and registration exist at a clean HEAD.
+
+## 227. Observed retained-pilot original structure and next fresh selection (2026-10-25)
+
+NEW registered operation`ib-pilot-sec-parent-structure-20261025-once` completed
+on already-existing clean`3dc014feecff0900261b9b86f000e1eb9e65b692` in
+**63.930185s**, exit0/stderr0. Every one of19,852 pilot accession candidates
+passed the UNCHANGED frozen full original/header/XML structural and identity
+checks:2022Q4=15,122;2023Q1=4,730; ZERO structural quarantines. All physical
+copies were first hash-checked and unanimous identity/body comparisons bound
+the selected identical image. The one original ambiguous start remains
+preserved/unresolved. No later implementation commit existed during this run.
+Source inventorySHA`a22cc964c8de9e2c26cc31aa1c85557dc112fad82594899b4f7f550884b97fef`.
+
+| Observed new control | Bytes | SHA256 |
+|---|---:|---|
+| reservation |13,737|`2dd57d242e9f7d194def5e07b93b29502abcec203879291e0e7d2ce74529f287`|
+| terminal |410|`e8478d69ab8547493bd1c99de482f08a84323a3c6ccac2a59770a40958eee07b`|
+| complete |94,109,559|`dd2e2f845b212e9dd69fc1887a63a8e85f45462dace2a2d2adc3ab606e3ac2f0`|
+
+A separate initial-native network/fork/all-write/security-exec-denied control
+readback rehashed all three and strictly revalidated report identity, every
+structural/control/request/child-parent linkage, full accession order and
+count/stream conservation. It did not parse raw bodies again. The first shell
+invocation of that control-only diagnostic had a Python string-quoting
+SyntaxError before any source/control read; the corrected invocation is the
+reported readback, not a repeat of the actual structural operation.
+
+This is observed original STRUCTURE, not official SEC authenticity, historical
+availability/PIT, use rights, canonical IB1C admission, population completion
+or backtesting readiness. No financial numeric field was converted/projected,
+no SEC/provider/credential/QC/outcome access occurred. In particular do not
+rewrite the older19,846 source-bound receipt or invent why six more candidates
+exist. All topical evidence findings and frozen custody boundaries persist.
+The20-quarter pilot still has901,707 inert fresh locator candidates and11
+locator-quarantined targets; it is not a ready full original-parent corpus.
+
+### 227.1 New bounded offline prefix-selection registration
+
+Continue without another Claude/owner engineering checkpoint under225.1.
+Register NEW offline operation`ib-pilot-sec-first64-selection-20261025-once`
+and exclusive three-leaf output root
+`artifacts/insider_buying/pilot_sec_fresh_selection_v1` before execution. A NEW
+genuine pure factory must consume the full25-quarter source/disposition/fresh
+request streams through the completed roster/audit, bind every global and
+per-quarter stream/count to225's exact prior control, suppress all prior
+consumption and later repeats, and select the FIRST64 SOURCE-ORDER fresh
+locatable2021Q1 requests. Neither the old2006 collector/factory nor225's
+context2020 preview may be repurposed. Selection is inert, not dispatch
+authority. Preserve raw CIK/date/source ordinal and exact master alias/URL;
+do not synthesize an issuer-folder URL or replace quarantines with a guess.
+
+Persist ALL12 context locator-quarantine disposition metadata rows (11pilot)
+for concrete diagnosis alongside the64 inert request metadata, rather than
+pretending the prior hash-only full ledger persisted those rows. The protected
+runner must reopen/recheck accepted source selection, all84 intake leaves,
+25 real quarterly masters, all prior operational controls and opaque candidate
+hashes and reproduce225's complete roster/audit EXACTLY. New controls bind
+source inventory, prior controls, selection and quarantine hashes. One worker
+starts with effective native network/fork/ALL-write/security-exec denial;
+guarded unsandboxed parent publishes only fresh controls with continuous
+settled-ctime/full-hash custody. Qualify and commit exact new images, freeze
+all writers and require clean current HEAD before this actual source read.
+No request is sent by this step. A subsequent source capture, if qualified,
+needs its own committed bounded production claims/journal/contact/privacy/
+refusal controls and observed selection pins; draft capture activation stays
+disabled. QC/Safari remain held until the independently observed NEXT Short
+Interest remote push; Mia may then be consulted at any issue per225.1.
+
+### 227.2 Exact new engineering images and prospective corrections
+
+| New image | Bytes | SHA256 |
+|---|---:|---|
+|`research/insider_buying_pilot_sec_fresh_selection.py`|27,397|`789a39116e392e5fdd68bdaef485f827e5dec6751b4139d71b7de204cbfacfc3`|
+|`tests/test_insider_buying_pilot_sec_fresh_selection.py`|18,196|`0f8271c688f1c3de709647ab1318518a7677853fdb8da652b4523101cff52248`|
+|`research/insider_buying_pilot_sec_fresh_selection_runner.py`|21,209|`4c556a6a44ceefddaf66afca1b783745b59e4592a491d4d4d1577c6a8d1db45b`|
+|`tests/test_insider_buying_pilot_sec_fresh_selection_runner.py`|27,314|`7b3ee8bb63e877aa2db40c66d15ddfa981481e119d36beb12a38bba96746239d`|
+|`research/insider_buying_pilot_sec_parent_capture.py` DISABLED draft|57,070|`46311b4386723fc9ab76dacbf46a2136bb0eb3a9843c33e7e6f35cd7af71d3ff`|
+|`tests/test_insider_buying_pilot_sec_parent_capture.py`|30,728|`89d41d1f86d1933b26fbb7b9423b0753fbdf995ecb7cd0c42ac7d67049571332`|
+
+Only the offline selection operation227.1 is activated in this image. The
+capture draft has EMPTY observed selection pins and no selection execution
+HEAD/hash, so its production front refuses BEFORE any contact, root claim or
+dispatch. It does not reconfigure the old2006 factory/collector, old scopes or
+any frozen source. A serialized metadata validator never creates a genuine
+factory seal. The new pure factory requires genuine completed roster/audit
+seals and full stream equality, while the trusted parent separately validates
+detached IPC against225's externally pinned actual control. Quarantine raw
+source, master aliases, reasons, prior-consumption/ambiguity flags, count and
+ordered stream lineage remain explicit and fail closed.
+
+Preactivation review/correction observations (Codex engineering, not an
+independent Claude review):
+
+| Finding | Severity/disposition | Actual proof scope |
+|---|---|---|
+|`IBPILOT-CAP-CR01` Raw header privacy screening after JSON escaping could miss an encoded identifying-contact echo.|P2 CLOSED before activation.|A native-denied synthetic response genuinely reached retained-body success in the red test; checking EACH RAW header name/value before serialization/hash now refuses, preserves the consumed start and leaves no body/contact measurement. No real identifying contact or provider was used in the red/green.|
+|`IBPILOT-CAP-CR02` A coherently rehashed reservation could disagree with the worker's execution image.|P3 CLOSED before activation.|Genuine positive/negative protected three-control fixtures include fractional elapsed time and full wrapper/worker identity. Exact reservation↔worker↔external HEAD/registration links now reject the recomputed negative.|
+|Draft wiring/qualification gaps: old top-level execution identity, undefined selector name in production guard, float-terminal incompatibility, and absent current intake/master holds.|P3 CLOSED before activation.|Correct wrapper/current imports/finite canonical elapsed handling and all84 held intake leaves plus independently reparsed2021Q1 master aliases. Production-only read-only preflight will still be required after real pins exist; fixture success is not actual input execution.|
+|Quarantine IPC could carry inconsistent typed booleans or rewritten prior evidence despite a recomputed quarantine stream hash.|P3 CLOSED within227's captured-audit scope.|Recomputed-stream negatives bind exact source/alias/reason, zero repeated/consumed quarantine scope and typed false authority. No original quarantine is silently cleared.|
+
+Six carried topical/shared P2s remain OPEN as219.2 records; the prospective
+closed collector findings do not close actual source/PIT/rights/readiness
+gates. Main observed **546 passed in12.58s** on the two fresh selector pairs,
+prior roster/audit/readback, unchanged complete-submission/master contracts,
+record/active documents/import boundary and EXACT package guard. Initial
+native process-tree network/Keychain-exec/repository-write denial, isolated
+minimal no-cache environment; no full lane/repository suite. Additional main
+62 checks passed4.53s; separate source-only in-memory compilation/native
+network/fork/ALL-write/direct-security-exec proof and actual no-data guarded
+single-child stdin/native-launch proof both passed, without actual artifacts.
+Agent-observed pure+runner+EXACT136 passed5.73s; five pure reversals killed;
+eight runner reversals killed. A ninth generic evidence-consistency reversal
+survived because the independent exact captured-scope guard rejects those
+same rewrites: recorded as redundant protection, not universal mutation
+coverage. The disabled collector's author observed84 focused/EXACT checks
+passing4.22s. These are attributed Codex subagent observations, not newly
+observed main runs or independent Claude acceptance. Final integrated image
+qualification follows before the clean committed actual selection execution.
+
+Final main integrated selection including all THREE new source/test pairs and
+the relevant unchanged contracts/boundaries/documents/EXACT guard:
+**629 passed in15.13s** under the same initial native denial. All SIX new
+images compiled in memory under stronger initial network/fork/ALL-write/
+direct-security-exec denial; the unset production capture pins independently
+reached the exact preactivation refusal. No complete suite, actual SEC request,
+contact, credential, QC or outcome access. Separate read-only subagent API
+inspection found no new material production wiring defect; it did not run
+actual inputs. The next executable action is ONLY227.1 on the newly committed
+clean source, with every lane writer frozen and the matching origin still
+unchanged at`41d729aff80752cdc1ad6ef73690d9c59711d712`. No final push yet.

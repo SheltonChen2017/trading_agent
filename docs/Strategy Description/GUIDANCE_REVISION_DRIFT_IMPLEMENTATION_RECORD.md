@@ -3,16 +3,19 @@
 Status: **Independent Claude review of `c6834173..b40aae1f` (sections 44
 to 46: counter-review of section 43, the four-provider coverage audit and the
 GDR-COV1 offline coverage preflight) recorded in section 47, 2026-10-24;
-Codex counter-review of section 47 pending.
+Codex counter-review of section 47 skipped at the owner's direction;
+section 48 records the subsequent offline input-engineering checkpoint.
+This waiver is not counter-review acceptance. No QC access occurs in section 48.
 Claude's `c6834173` is accepted after documentation correction (section 44).
 The published `c6834173` review is consumed once.
 Claude's `863a0dcd` is accepted after documentation correction (section 42).
 The section-46 coverage-source epoch is accepted in section 47
 after `62d4afb8` registered its module in the review bundle and pinned six
-inventory rules. The owner directed this round's one push, which publishes
-Codex's three local commits together with this review.
+inventory rules. That section-47 round published Codex's three local commits
+together with Claude's corrections/review as `a5cd640c`. Section 48 is local
+only; no new publication or monitor rearm is directed.
 Accepted RP33 remains at exact producing `c589b3dd`; its runtime, draft and
-fixture files are unchanged, and no carrier is regenerated.
+fixture files are unchanged, and no recovery carrier is regenerated.
 Monitor remains PAUSED.
 GDR-RP33 is accepted in section 34
 as offline software only: it retains every record digest in a 489-line paired
@@ -42,7 +45,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 47. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 48. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -6328,3 +6331,197 @@ Acceptance here is a software and documentation review only. It establishes
 neither native execution nor empirical readiness.
 `docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` were not edited
 and stay frozen for both agents.
+
+## 48. Owner-waived counter-review; offline input engineering, 2026-10-24
+
+### 48.1 Direction, ownership and exact base
+
+The owner said: "skip the review. continue building until the lane is
+backtesting ready. consider i preauthorize your every move. Do not access QC
+yet." This explicitly skips the pending Codex counter-review of section 47
+and permits further offline engineering; it is not a counter-review acceptance,
+an independent review of this new source, a legal-rights attestation or a
+completed original research freeze. Section 47 and its findings remain intact.
+No additional review is requested as a prerequisite to this offline checkpoint.
+Its waived workflow step is not silently marked completed or consumed as an
+ordinary accepted counter-review.
+
+Start root and branch were the mandatory section-1 worktree and
+`codex/strategy-guidance-revision-drift`. Clean local and live matching remote
+were both `a5cd640cecd8cad44f994ed3bfe385fae7971147`; origin remained
+`https://github.com/SheltonChen2017/trading_agent.git`. The previously local
+`91043b17`, `b4414f68`, `b40aae1f` and Claude's `62d4afb8`/`a5cd640c`
+have therefore already been published in the section-47 round. That completed
+publication is not a new trigger or an instruction to republish it.
+
+All commands, edits and checks for this checkpoint use that one worktree.
+There is no branch creation/switch, stash/reset, cross-lane/shared behavior
+change, credential read, provider/API/data/outcome access, purchase or
+installation. There is no browser attachment, QC page/documentation/API/quota,
+Mia, compile or cloud run access in this section. The monitor remains PAUSED;
+no watch is rearmed. The latest request does not separately direct publication:
+this engineering checkpoint is retained locally, not pushed.
+
+### 48.2 Substantive local input layer
+
+Four new lane-owned modules provide a real parsing/preparation seam rather
+than another subscription metadata verdict. They consume explicitly supplied
+local bytes only; every exercised row is invented. None dispatches a strategy,
+queries a provider, verifies a subscription or imports the synthetic runtime.
+
+- `input_contracts.py`: bounded strict JSON, duplicate/type/nonfinite refusal,
+  exact decimal tokens (no binary floats), explicit UTC clocks, dates, identifiers
+  and retained SHA256 anchors. It is separate from frozen SYN-only validators.
+- `guidance_inputs.py`: a canonical normalized issuer-guidance interchange
+  contract and immutable append-only receipt ledger. It binds retained raw
+  bytes to normalized documents; retains version, fiscal period, currency,
+  accounting/share/adjustment/scope semantics, publication/availability/receipt/
+  validation clocks, corrections and withdrawals; and replays as of validation
+  cutoff. Unknown availability stays unknown. Conflicts, late/incomplete chains,
+  changed bases and withdrawn immediate predecessors refuse or quarantine.
+  Immediate supplied same-FY comparison uses the existing exact range formulas,
+  never vendor `previous_*` or a convenient older disclosure. Later known cuts
+  and loss of comparability invalidate earlier descriptive positive observations.
+  This is not a provider-specific raw guidance decoder, authentic version
+  history, complete disclosure archive, PIT proof or trade signal.
+- `historical_market.py`: strict bounded Massive-shaped historical quote/minute
+  projections, exact SIP/participant nanoseconds and raw prices/volumes. It
+  keeps an invalid latest quote to refuse, not select an older convenient quote;
+  checks 10:00 New York decisions, freshness, sizes, crossed/nonpositive prices
+  and proposed entry spread; deduplicates identical rows without doubling
+  volume, and refuses conflicting identities. Execution-input slicing requires
+  a wholly post-submission completed minute and a subsequent quote. The volume
+  cap is explicitly a completed-minute participation proxy, not an actual fill.
+  Nonempty quote conditions refuse pending an audited condition mapping.
+  Supplied regular-session bounds/completeness are claims, not a verified
+  exchange calendar, mapping, historical availability or NBBO entitlement.
+- `input_preparation.py`: a hash-bound exact named-file manifest and read-only
+  CLI joining one issuer/provider epoch to distinct stock and SPY identities
+  with identical session bounds. It verifies every file hash before parsing,
+  retains both market legs/refusals and emits only hashes, counts, timestamps
+  and fixed reasons, not raw payloads, guidance ranges or quote rows. Basenames
+  only; no directory discovery, URL, traversal or symlink/nonregular leaf read.
+  The containing directory must be owner controlled. Historical reconstructions
+  require explicit scope/rights references. Both input classes refuse protected
+  callback/session dates: an `invented_fixture` label is not proof of invention
+  and cannot bypass that screen. References are not validated permissions;
+  `data_class_verified` remains false. The caller's file dictionary is snapshotted
+  before anchoring and parsing so later replacements cannot alter inspected bytes.
+
+Example local invocation (paths/hashes supplied by the owner, no acquisition):
+`python -B -m research.guidance_revision_drift.input_preparation --manifest
+<explicit-local-manifest> --sha256 <retained-manifest-hash>`.
+Exit 0 means structurally prepared inputs only, including a valid zero-signal
+session; it does not mean a strategy is ready. Exit 2 is a structural refusal.
+All backtest, order, QC, outcome, PIT, rights, calendar/mapping, completeness
+and common-history verification flags remain false. Opaque references do not
+create approvals. The CLI has no launch, authentication or fetching option.
+
+All four modules are explicitly registered in `bundle._MODULES`, and the fresh
+import boundary covers them. The existing inventory guard and actual bundle,
+release and preparation consumers are checked; GDR-CR47-001 is not repeated.
+The explicit native closure/NATIVE_MODULES is not extended. No recovery carrier
+is regenerated; no candidate/project is saved, uploaded, selected for launch or
+rebound. The focused ordinary-project metadata consumer reconstructs native
+source in memory only, without recovery preparation or external access.
+
+### 48.3 Author QA and focused verification
+
+Codex and advisory implementation agents performed author QA, not an independent
+Claude review. Resolved author-QA findings:
+
+| ID | Priority / disposition | Evidence and correction |
+|---|---|---|
+| GDR-IN48-001 | P3 / corrected before checkpoint | Converting a direct >4,300-digit integer to text raised Python's generic `ValueError` instead of bounded `InputError`. Check integer bit length before conversion; an oversized-integer regression passes. |
+| GDR-IN48-002 | P2 / corrected before checkpoint | Exact `type(path) is Path` rejected ordinary `PosixPath` and broke the new CLI. Use `isinstance(path, Path)`; named regular-file/CLI and symlink-refusal tests pass. Initial preparation run had one error; it is not a native attempt. |
+| GDR-IN48-003 | P2 / corrected before checkpoint | The caller-owned file dictionary could be replaced after hashing, making parsed bytes differ from reported anchors. Copy the exact dictionary before inventory/hash checks and parse only that immutable-byte snapshot; a test swaps caller entries after hashing and proves the original bytes are retained. |
+| GDR-IN48-004 | P2 / corrected before checkpoint | A late-received older correction could overwrite newer effective values, creating a false positive raise. Track latest applied mutation publication clock per original, including withdrawals; equal/older corrections or withdrawals quarantine the issuer, invalidate active observations and remain retained but unapplied. Four new focused methods cover the false positive, equal/older mutations, non-resurrection and valid increasing/as-of chains. |
+| GDR-IN48-005 | P3 / hardened before checkpoint | A caller's fixture classification is not authenticated. Apply protected-date callback/session screens to both classes, preserve an explicit false classification-verification flag and pin each screen independently. No future-dated fixture is needed here. |
+
+Earlier guidance author QA also caught and corrected retained positive
+observations after a later cut/loss of comparability and incomplete unknown
+correction chains; their explicit regression tests remain. Direct supplied
+clocks, source completeness and calendar references are never promoted to
+verified evidence. Baseline-only/zero-signal inputs may be structurally valid
+without a qualifying comparison; this is pinned separately from readiness.
+
+Focused input selection: 65 methods passed in 0.330 s; focused existing
+boundary/import/active-doc, actual deterministic bundle, release round-trip
+and two preparation-CLI consumers: 11 methods passed in 157.200 s. Both use
+bundled Python 3.12.14, sanitized environment, `-B`, and network denial;
+the fresh import child also receives the denial fence. Zero failures/errors/
+skips. The two local named-file/CLI tests write only invented files in their
+temporary directories; no real file manifest or licensed payload is opened.
+Six root-run isolated in-memory mutations are caught: removal of the file-map
+snapshot, callback and market-date fences, paired-session equality, issuer/
+provider epoch equality, and retained manifest hash. Source is restored after
+each trial. Author agents separately reported six market-selection mutations
+and three guidance mutations caught, including restoration of the old
+original-only correction-clock guard. These are author QA, not review acceptance.
+All 98 lane source/test files compile in memory without executing native code
+or writing bytecode. An initial native-byte comparison harness misinterpreted
+the fully qualified module names as basenames; the corrected comparison verifies
+all 15 native modules byte-exact to `a5cd640c` (no production failure or change).
+
+Full new offline source-manifest SHA256 is
+`330fc9d523208f59591b9925f15630fdc52034a8987992b7828e6fbad382210e`
+(53 source members). The deterministic full review bundle reconstructs and
+verifies in memory: SHA256
+`5053affd46adf6d4fccc6029d46ae9d4ef195192c0dfa661f339f6463791b332`,
+761,926 bytes, 55 archive members, canonical manifest 14,525 bytes. The
+64-member/64-KiB-manifest limits are not changed. This is the full offline
+review source epoch, not a new native carrier or accepted recovery source.
+Final exact-source selection: all 76 focused methods passed in 144.663 s,
+zero failures/errors/skips, with network denial in parent/fresh child and
+repository-file-write denial in the parent. The full source identity above is
+identical before and after. Final diff/status, frozen-document and retained-
+history checks are repeated before local commit; its exact ref stays in private
+thread/automation custody without self-referential commit text here.
+No full lane/repository suite,
+empirical simulation or native execution is run. Tests use invented bytes and
+temporary local files only; focused consumer reconstruction is local synthetic
+source/preparation verification, not a QC job or new attempt.
+
+### 48.4 Remaining readiness gates and custody
+
+These modules remove missing offline parsing/journaling/paired-preparation
+engineering, not the evidence gaps. There is still no account-verified licensed
+versioned issuer-guidance archive or historical stock **and SPY** NBBO, no six
+usable common years, no verified processing/retention/cloud rights, and no
+verified dated universe/calendar/mapping/corporate-action/terminal-proceeds
+inputs. Normalized source semantics still need exact provider raw-field/version
+mapping and authentic historical/PIT evidence. A real-equity order/native
+adapter with matched SPY, actions and settlement parity is not implemented or
+validated by this seam. The synthetic-only engine is deliberately not relaxed
+to accept real symbols/dates or used as empirical proof. A reproducible
+research/evaluation scope and the original economic/family/look/window decisions
+remain unresolved; all immutable draft null/false fields stay unchanged. Broad
+engineering preauthorization does not manufacture these facts or choices.
+
+Use existing subscriptions first to resolve the guidance/quote/history/rights
+contract before choosing a purchase. This checkpoint selects no renewal,
+alternative economics, daily-bar fallback, shortened history or empirical look.
+Further data- or native-specific work needs that concrete contract and scope;
+QC remains forbidden until the owner explicitly lifts the prohibition. No
+additional datasource is represented as bought, entitled or verified here.
+
+Accepted producing source remains
+`c589b3dddab3f1dd136d10ae7ce1851d64818906`, with retained full-source
+`061ff30fe4053ebfabfa27c38d2e3ccd37d950c2fe3eae4375a933463125ee9f`,
+recovery-project
+`c6b9443aa64f005c48e21f493bfea14918ecf6a730ac4f995bd3a70ee4c269a9`,
+prepared runtime
+`5d1dc6560ad2778fd6a8c514c16641b6e78cf82d514a0088f0a344c31783437d`,
+invented 372-frame fixture
+`8f35d56a335d3f7d9dad016e1e2236de7fcd2635e5c463c30081f97b7b944458`
+and semantic draft
+`b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c`.
+New offline source hashes do not inherit that accepted candidate's review or
+bind a new recovery attempt. Original `GDR-base372-approved-20261008` stays
+CLOSED FAILED3/3, zero manual attempts; project 37647834 is untouched.
+Separate `GDR-Mia-base372-recovery-authorized-20261011` stays zero unsuccessful
+attempts, zero pending intents, no journal/project/launch, maximum three.
+No original GDR-0..6 completion, alpha, market edge or backtest readiness is
+claimed. Sections 1–47 remain byte-exact below the active header; root Session
+Handoff, Action Plan, Feature Milestone Record, shared/process docs and the
+original plan/PDF stay frozen.

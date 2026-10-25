@@ -77,6 +77,10 @@ import research.guidance_revision_drift.contracts
 import research.guidance_revision_drift.formulas
 import research.guidance_revision_drift.readiness
 import research.guidance_revision_drift.coverage_preflight
+import research.guidance_revision_drift.input_contracts
+import research.guidance_revision_drift.guidance_inputs
+import research.guidance_revision_drift.historical_market
+import research.guidance_revision_drift.input_preparation
 import research.guidance_revision_drift.__main__
 import research.guidance_revision_drift.archive
 import research.guidance_revision_drift.artifacts
@@ -181,7 +185,7 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         # Review-state phrase: rotate it in the same commit as each new review
         # or counter-review section so the status block cannot go stale.
         header = record.split("## 1.", 1)[0]
-        self.assertIn("Codex counter-review of section 47 pending", header)
+        self.assertIn("Codex counter-review of section 47 skipped at the owner's direction", header)
         self.assertIn("Claude's `c6834173` is accepted after documentation correction", header)
         self.assertIn("The published `c6834173` review is consumed once", header)
         self.assertIn("Claude's `863a0dcd` is accepted after documentation correction", header)
@@ -197,6 +201,7 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         self.assertGreater(record.index("\n## 45."), record.index("\n## 44."))
         self.assertGreater(record.index("\n## 46."), record.index("\n## 45."))
         self.assertGreater(record.index("\n## 47."), record.index("\n## 46."))
+        self.assertGreater(record.index("\n## 48."), record.index("\n## 47."))
         self.assertIn("research/__init__.py`, remains unobserved", header)
         self.assertIn("paused pending platform preflight", header)
         self.assertIn("GDR-RP33 is accepted in section 34", header)

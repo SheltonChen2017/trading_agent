@@ -32710,3 +32710,198 @@ every original inventory entry against2e3224 Git bytes. Original HTTP count
 and transfer bytes remain nullable/unmeasured; diagnosis cannot fabricate a
 terminal result or reopen its consumed URL. Commit this qualified source and
 record, then freeze all writers for234's single offline operation.
+
+## 235. Actual stopped-control diagnosis completed; original operation stays failed (2026-10-25)
+
+Registered234 operation ran ONCE on ALREADY-EXISTING CLEAN reader commit
+`13eea4f65a74d56059a8b20fd7b1846c190bad85`, all writers frozen. Guarded
+parent span7.024947917s, exit0, stderr0. Trusted parent independently matched
+ALL104 original source entries to FAILED_HEAD2e3224 and checked current clean
+Git/source before/after; initially native network/fork/ALL-write/security-exec-
+denied child held/rechecked the exact five leaves/ancestry/lock and verified
+all typed scope/reservation/contact-presence/claim/start crosslinks. No
+contact value, raw remote response, provider/credential/QC/outcome access or
+namespace mutation occurred. Witnesses were independently validated and
+stripped before public return.
+
+| Actual held control | Bytes | SHA256 |
+|---|---:|---|
+|scope.lock|48|`a7ee19234791996c35fd1f8527e82449a987f8250a173f181337d472dc83abef`|
+|canonical URL claim|316|`8e00e78c124efb19366c84024c156d85a0e97417d3bededc7120117bb10ad41f`|
+|reservation.json|14,281|`38c1d0eaed25923c93621442d592318ff56b272afe459532093bbc5ed4d6d572`|
+|contact-validated.json|210|`2e222f9bad6205cebc9dcfae2494358f971b5d2cfb5ba1fed87722681cac5e4a`|
+|request-start.json|322|`b3ee63d1eadc502b1a776c16be11dcd07c3b861fb80d8e57e965a806bd6ba377`|
+
+Original source inventorySHA
+`e62ad269ba396fca3a43dd37cb32bddd057b87c4f0ad0e235e750b01d1aee026`;
+reader inventorySHA
+`8fbabd4fe9df366540b5b7b46c96d4b6f764900ada20b094b27d88af66460335`;
+registrationSHA
+`0b406e02870686d0ea649a272b4854473045ca3f6fb6739b0b3176c2342cd524`;
+diagnosticSHA
+`f17a0f4faa0f0ab2fc2debe11d83c3801d5bfc82cf454cf5d6a26bbf32a6176d`;
+validated public resultSHA
+`6638044deecba3dd894be93cf4cd57b4df500016571f388eea2cf275e3d46bee`.
+Original worker stdout47,565B before strippingSHA
+`aca51973ab1b7cbda9daa5240fa321ab3678a8401058af2fc817acf39e43edaa`.
+
+The EXACT retained104-source reservation reproducibly triggers the unchanged
+decoder's`json_resource_bound_refused`; in the authenticated original source
+that decode precedes raw transport. This confirms the local control-decoder
+failure mechanism. It is CODE-DERIVED unreachability evidence, not original
+HTTP instrumentation: measured historical requests/transferred bytes stay
+NULL, not asserted zero. Original Q1 scope remains FAILED/consumed, with no
+result/body and no retry. The authority map's inert zero dispatch field is
+not an actual historical count. `IBFEED-OBS-01` remains OPEN pending a validated
+separately versioned producer correction; diagnosis does not retroactively
+make its original operation successful. Six carried P2s remain unchanged.
+
+## 236. Continue free archive qualification, not a purchase checkpoint (2026-10-25)
+
+The owner's continuous-build direction remains active; no new routine
+approval/Claude checkpoint is needed. The original decoder defect does NOT
+justify repeating the consumed Q1 URL. It also does not bar every genuinely
+different quarter's content. Under delegated judgment, register NEW operation
+`ib-sec-feed-directory-2021q2-20261025-once`, exact URL
+`https://www.sec.gov/Archives/edgar/Feed/2021/QTR2/index.json`, NEW private root
+`artifacts/insider_buying/sec_feed_directory_inventory_v2`. This inventories
+different Q2 content for the pilot's free-archive route; it is not a renamed
+Q1 retry, mutation of v1 or automatic fallback in the stopped scope.
+
+Qualify/commit the additive v2 producer/tests BEFORE contact or activation.
+Use separate bounded own-control and foreign-response decoders. Roundtrip
+the COMPLETE genuine source identity, reservation, claim and start before
+creating a root/claim or consuming contact. Test104+ source maps and large
+complete-receipt/readback shapes, typed/canonical links, front substitution,
+strict original/current source custody and no transport on preflight failure.
+Exactly one GET,512KiB complete-body bound,30-second raw-transport deadline,
+permanent URL claim/start, contact AFTER reservation, no retry/proxy/redirect/
+fallback/archive follow; non200 bodies unread. Screen contact before hashing
+and preserve safe complete200 bytes before candidate-profile parsing. A
+foreign-format refusal may lead only to later offline qualification of those
+retained bytes. Independently read back under initial native network/fork/
+ALL-write/security-exec denial with trusted parent Git checks outside child.
+Register that readback as`ib-sec-feed-directory-2021q2-readback-20261025-once`.
+No Q2 request/body or archive acquisition has occurred at this entry.
+
+The present source deficit is real accession-complete ownership XML plus
+acceptance evidence, not proof another subscription is needed. Official
+[SEC archive documentation](https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data)
+identifies free daily Feed/Oldloads with submission/header content. A later
+bulk payload needs its own exact size/storage/streaming/coverage and consumed-
+member overlap disposition; directory metadata is not accession coverage.
+Current public [Massive Form4](https://massive.com/docs/rest/stocks/filings/form-4)
+and[EDGAR index](https://massive.com/docs/rest/stocks/filings/index) endpoints
+advertise free beta access across Stocks plans and SEC links; their parsed
+rows/date-only fields are not themselves the original evidence pair. Account
+coverage was not probed here. Associated FMP SEC endpoints document acceptedDate
+and filing links, so no claim that FMP lacks all acceptance metadata is made;
+its applicable download rights, Form4 breadth/timezone and original XML
+remain unqualified under the prior skip disposition. No purchase/account/key
+access is justified by these public descriptions alone.
+
+## 237. QC evidence stays in cloud; Mia authority and supported interfaces (2026-10-25)
+
+The owner now explicitly permits consulting Mia for ANY QC/Safari issue,
+including before three failures. That does not remove the three-unsuccessful-
+launch maximum per genuine candidate, permit cosmetic candidate renaming,
+change strategy economics or grant funded/paper/live authority. Advice is
+not an executed result, and Mia changes require exact source comparison and
+verified lane-specific disposition. No new QC lookup/job/look ran here.
+
+Current public[QC terms](https://www.quantconnect.com/terms/), version1.5
+dated2026-10-08, include reference data in Platform Data and prohibit its
+off-platform extraction, including reconstructible derivatives and Object
+Store contents. Own source and normal strategy summary results are distinct
+permitted exports; no universal DDA gate is invented for a normal backtest
+summary. Use official supported API/CLI/MCP interfaces within their limits,
+not UI scraping or unapproved extraction. These observations change the
+engineering design, not vendor rights by assertion.
+
+Per current[Data Use guidance](https://www.quantconnect.com/docs/v2/cloud-platform/security-and-ip),
+paid organizations may cache/reuse data IN CLOUD Object Store; project files
+and notebooks must remain code, not dataset-value storage. Future CIK/SID,
+identity, native price/fundamental and derived evidence stays in cloud.
+Conservatively keep mapping digests there too; do not assume a public-metadata
+or verification-purpose exemption. Named own source may be compared through
+an allowed interface; do not download notebooks carrying dataset outputs or
+retrieve internal platform sources. Prior unactivated SDK drafts are NOT
+silently resumed. No platform data was exported by this documentation check.
+
+For a future separately registered51-CIK candidate-only diagnostic, use fresh
+project-prefixed Object Store start/per-row/final keys, one fixed lookup per
+row, bounded private receipts and no overwrite/retry. Claim locally, save and
+read back cloud start BEFORE first lookup, and consume retained cloud receipts
+later without repeating calls. Outside output is limited to preexisting own
+source/registration/key names and own execution/write/completion acknowledgments,
+not native mapping values/counts. [Object Store docs](https://www.quantconnect.com/docs/v2/research-environment/object-store)
+require create permission and distinguish caching; same-node readback alone
+does not prove fresh-node persistence. Store is organization-shared and
+contains_key/save is not documented as atomic compare-and-swap. No such
+candidate is activated here; real source scope, supported interface, paid
+storage permission and exact source controls must precede it.
+
+Existing local`research/quantconnect.py` documents configuration NAMES
+`QC_USER_ID` and`QC_API_TOKEN`, without automatic dotenv/Keychain loading.
+It has no notebook-execution method. Official QC MCP documents cell-level
+execution subject to agent-node entitlement; an unavailable connector is not
+permission to bypass platform restrictions or launch a strategy just to
+perform a lookup. Configuration/entitlement evidence must be factual, while
+routine implementation decisions remain delegated. The SI release monitor
+remains PAUSED; no new automation or inter-chat message is created.
+
+Configuration-only OBSERVATION: both named QC environment entries were
+present/nonempty in the current tool process; checked lane dotenv variants
+were absent. No secret value was printed, authenticated or sent; no dotenv,
+client credential constructor or Keychain lookup ran. Available tool metadata
+contained no enabled official QC MCP connector. This is not evidence of
+invalid credentials, an entitlement refusal or an absent official REST route.
+The REST route remains a prospective supported option, not a platform access
+observation. Earlier SDK/namespace scopes remain untouched.
+
+## 238. Q2-only producer correction qualified before activation (2026-10-25)
+
+New source`research/insider_buying_sec_feed_directory_inventory_v2.py`34,949B
+SHA256`c04c226f77e7dde3a94d31b83c23abea25e736997bf624caf49801da166e66a4`;
+new tests23,597B SHA256
+`8bfa62da7376162a823cdb03e99b135b84c9ef57bcf92ee7c5849643cbb976b2`.
+The separate producer preserves executed v1 and reader bytes, uses the old
+foreign codec ONLY for directory responses, and the qualified bounded own-
+control codec ONLY for canonical controls. Its complete-control constructor
+is shared by publication/readback and unpublished precontact capacity
+templates; templates are never claims or observations of a request/result.
+Identity/reservation/claim/start/contact/result/complete shapes roundtrip
+BEFORE creating the namespace or reading contact. Full104/256/1024-source
+regressions exercise that distinction and prevent another fixture-only pass.
+
+Main OBSERVED **329 passed in5.95s** across v2, unchanged v1, stopped reader,
+lane import boundary, record/active documents and EXACT package guard, under
+initial native process-tree network/security-exec/repository-write denial,
+minimal isolated environment and no bytecode/cache/plugin autoload. Invented
+fixtures may write only outside lane. Separate main strong-native source-only
+proof compiled/rehashed all SIX images and proved network/fork/ALL-write/
+security-exec denial in0.648654167s; both old pairs remained exact232.1/234.1.
+No full lane/repository suite or actual source/account access in those checks.
+Author-attributed257 focused checks passed4.16s; four memory reversals caused
+14 expected reds (codec routing5, precontact capacity3, typed complete4,
+independent metadata projection2) and restored257 greens. Read-only peer and
+main source inspections accepted the final exact images; neither is an
+independent Claude review.
+
+Both producer and independent readback expose only rederived bounded
+candidate directory metadata, or NULL for opaque/non200. Each listed entry
+binds source ordinal, exact URL, advertised size lexeme/representation and
+canonical item-metadata SHA. This is explicitly NOT a raw JSON substring
+hash, measured archive size, proven filing coverage or public-availability
+clock. Original complete response and ordered-entry SHA remain separately
+binding. Future archive selection must use that actual listed evidence,
+never guess dates/URLs. No archive body is authorized by these interfaces.
+
+`IBFEED-OBS-01` has its exact actual failure mechanism established235 and a
+tested additive producer correction here; retain OPEN until its production
+control-path qualification is observed. This cannot turn failed Q1 into a
+success, create missing HTTP measurements or authorize its retry. Six carried
+P2s remain unchanged. Commit the qualified new pair/registration clean, then
+freeze ALL writers for236's one Q2 GET and separately registered strong-native
+readback. All original/frozen roots, claims and SDK drafts stay untouched.
+No strategy job, outcome look, backtest or final push has occurred here.

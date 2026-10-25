@@ -812,7 +812,7 @@ prior readiness-only boundary has concluded. The new launch/result
 contract and six-cell public specification preceded A12. A12 actually launched
 and failed the fresh-price guard on2021-02-22; it is now SPENT, with no accepted
 performance cell. A13 then stopped during access metadata before any mutation,
-compile or job; it too is SPENT. Current floor333/258/50/699. Section323.6–10
+compile or job; it too is SPENT. Current floor334/259/50/699. Section323.6–10
 owns retained failure evidence and the completed read-only Mia consultation.
 The separately frozen current-access observation in323.12 passed the unchanged
 owner-only policy; its use is now SPENT. No permission change or historical
@@ -833,9 +833,11 @@ still refused(323.27). The separately frozen exact-representation A18 consumer
 then passed fresh gates and ran. Its retained failure identified1held stock
 missing a required RAW close among48 identities; its probe returned4earlier
 bars and no exact-reference bar(323.30). A18/I are SPENT, no result cell.
-Next privately identify the missing holding from a bounded failure witness
-and authenticated input join, then fix verified source/identity defects before
-the consistent six/eight comparison. No guessed stale-price/holding bypass.
+A19's dated-witness job then ran to Runtime Error, but fresh access_idle
+blocked its error read before contact; no identity/join was retained(323.33).
+Next a bounded read-only reconciliation of that exact job, not a relaunch,
+then privately identify/verify the holding before the six/eight comparison.
+No guessed stale-price/holding bypass.
 One final push; no funded or paper/live deployment authority is inferred.
 
 Branch: `codex/strategy-analyst-revisions-v2`
@@ -2129,8 +2131,10 @@ passed fresh access/source/compile and ran; actual RAW absence is retained in
 323.30. Preserve all spent controls and old helpers. Next a bounded private
 identity witness/join, not a generic label waiver, old probe replay or guessed
 price substitution; then verified correction and consistent six/eight runs.
-Section323.31–32 now freezes that prospective A19 witness/native join; it is
-uninvoked until the exact clean source/HEAD freeze and every fresh gate pass.
+Section323.31–32 froze A19; its actual job reached Runtime Error but access_idle
+blocked the detail read before dispatch(323.33). J/A19 are spent; a new bounded
+read-only postterminal reconciliation may recover the exact job's witness,
+never relaunch it or bypass the current idleness/access/source gates.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
 V3 is spent after its
@@ -59315,3 +59319,206 @@ No J inspection/allocation, credential/provider/QC capacity/source update/
 compile/job/error read or new look occurred before this freeze. Accumulate
 locally; one final matching-lane push remains pending. After actual result,
 preserve exact failures and continue only coherent admissible recovery.
+
+### 323.33 Actual A19 Runtime Error; postterminal idleness blocked the detail read
+
+At clean01def20b111b45e4d752257d87383ea99669d609, sole A19 parent ran
+2026-10-25T23:00:32.870978Z..23:04:03.368437Z, actualexit2/stderr0/no bound.
+Stdout3,359bytes SHAcd5c9cefc38841096e3c5aef0fd35a8c372d020b414ea4b0d29c66340d8b0236.
+Native supplied-output validator23:04:03.368963Z..23:04:06.893368Z exited0/
+stderr0, output_authenticated=true; outer2. Root finalrecord86passes1.03s
+overlap457, not additive. No tests/private-source census during actual use.
+J/A19/parent/reader now SPENT, no reread/repair/retry. No report success pin
+was returned; immutable finite failure evidence is the externally captured
+source-bound envelope, not a fabricated report or accepted result.
+
+Fresh input/source/access passed before own lock, both exact source updates,
+compile and capacity. New compile95f2715b63dde55edbac79da7e88d3aa-f8d3daabe131b918cd28aeaab059b9b9;
+job b850c8193949015bc59c41d0e1434229, exact nameARV2 R298 REFERENCE IDENTITY DIAGNOSTIC R323 A19.
+QC list reported Runtime Error. Before the sole detail read, _fresh's current
+project/dedicated access verifier refused exact access_idle. Statefailure_detail,
+31application intents/31returned responses; lastprojects/collaboration/read,
+received=true. Original selected error detail was NEVER dispatched; no witness,
+private join or complete-response/error body was read. The earlier list-based
+terminal has no known code/context/Python category, allnull. Do not infer
+the same A18 failure, transient worker cleanup, lingering editor or another
+lane's action from this finite category. Source stayed the new8325/7a85 set;
+the actual write/readback was authenticated before launch, but no later
+continuous-integrity/source readback claim is made. History adds A19 once.
+
+Book A19 once333/258/50/699 ->334/259/50/699; no result cell. E323-001 remains
+OPEN at required RAW-reference completeness, not a strategy result. No new
+provider, upload/storage, project create, cancel, permission/control change,
+other-lane mutation or subsequent job. Do not re-invoke A19 or renew its
+consumed read budget. Its unconditional access gate behaved as specified.
+
+Next justified recovery is a NEW READ-ONLY exact-A19-job reconciliation,
+not a second launch or renamed acquisition: a finite postterminal idleness
+observation schedule (at most3, >=60seconds apart) followed only when all
+unchanged access checks pass by exact current eleven-source/history/compile
+authentication and one selected error read. Unknown/non-idle access failures
+refuse immediately; never waive idleness, modify another environment or wait
+until pass indefinitely. No original J control/reader is inspected or replayed.
+If complete dated witnesses are obtained, a new scoped native worker may freshly
+join the genuine catalog. New exact source/protocol/host/claim/deadline/output
+freeze must precede this contact. Read-only reconciliation adds no new strategy
+look/cell and cannot turn Runtime Error into performance acceptance. Owner's
+continuing review waiver and in-scope verified recovery authority apply; no
+new blanket security/financial/source admission is inferred.
+
+A subsequent Safari getApp observation returned a DIFFERENT lane's active
+project/editor, not the owned Analyst terminal window. No click, navigation,
+Mia message, editor/kernel/run/resource/permission operation followed; that
+window and its environment were left untouched. This incidental UI state is
+not evidence of R298 idleness, cause or available capacity and is not copied
+into the Analyst source/identity evidence. Continue the scoped read-only K
+path without using another lane's Safari surface.
+
+Public-source check of QC's [Read Project API documentation](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/read-project)
+confirms codeRunning is a required boolean describing running status. This
+does not identify A19's running component, explain its postterminal true state
+or prove a transient cleanup/editor cause. No new API request or metadata pin
+is inferred from that documentation; the actual fresh response still governs.
+
+### 323.34 Prospective read-only A19 error reconciliation, not another launch
+
+Select one new arv2-r298-a19-error-reconciliation-v1 consumer at fixed private
+control artifacts/analyst_revisions_v2/newrule_reference_error/R323-20261025-K,
+uninspected/unallocated before invocation. The source-bound actual A19 envelope
+in323.33 establishes exact own compile/job/terminal and that its error read was
+not dispatched. J's parent/read budget remain spent. This is a separately
+bounded read-only observation of that existing job, not renewed A19 authority,
+unchanged upload/launch retry or new strategy attempt. Current continuing owner
+fix direction/review waiver applies; no independent acceptance is asserted.
+
+New remote has NO lock/update/create/capacity endpoint or executable mutation
+method. Scope only projects/read, projects/collaboration/read, backtests/list,
+files/read, compile/read and ONE backtests/read for exact A19. Source-bound
+name/id/compile,8325projection/86f1profile/7a85manifest and all eleven bytes,
+manual+A12+A14+A16+A18+A19 history and BuildSuccess must agree. Unknown new jobs,
+source drift, other collaborators/permissions or any scope contradiction
+refuse. Before that read, at most3 current project/dedicated observations,
+>=60seconds apart, may wait ONLY on literal codeRunning=true after the other
+access predicates are validated. Missing/null/nonboolean codeRunning is not
+a waiting signal. All non-idle failures refuse, and third busy observation
+terminates. The real unchanged18cf verifier still must pass with an actually
+idle response before any error body is read. No rewriting idleness, changing
+permissions, stopping another environment or indefinite wait-until-pass.
+
+The exact9703 selected-error boundary runs immediately after the existing
+bounded client returns, before journal/canonicalization. No logs, licensed
+rows, ignored outcomes or raw error text are retained. Finite selected error
+receipt is retained immediately; later postcheck failure cannot erase it or
+become actual0. Exact source/history/compile/access are checked again after
+the read. No strategy result/cell is admissible from a Runtime Error.
+
+New caller checks the inherited credential handoff/shape before claiming (no
+Keychain lookup), then claims/fsyncs K before API contact/private input reads.
+It binds compatible exact host/HEAD/source/profile,900second joint parent deadline/24application calls,
+and allows no automatic retry. Credential-free native initial/final admission
+workers reauthenticate the same genuine October/D2/A11 inputs and rebuild the
+same public8325 diagnostic specification without uploading it. A complete own
+v2 witness alone permits one separately retained held-FD native join intent;
+same source-bound genuine join/fresh snapshots as323.31, no old J read. One
+additional pure catalog-facts computation may classify reference/decision
+sessions as before/inside/after the already-admitted clipped candidate interval,
+with hashes/counts only. Clipped coverage is NOT actual listing/delisting,
+terminal payoff or evidence that a daily close exists. No original provider
+archive/price query, raw ticker route, source repair or financial use occurs.
+
+Read-only observation actual0 requires matching authenticated finite error
+receipt, postchecks and final fresh input admission; native join unavailable
+may remain a separate finite diagnostic. Joined itself still needs native
+actual0 plus strict matching receipt. Any postcheck/publication/transport/exit
+ambiguity gives actual2/unknown, preserving available error evidence; no report
+alone substitutes for actual exit. Only own children may be killed/reaped.
+Native isolation is not arbitrary same-user/whole-interpreter integrity, nor
+host-suspension/uninterruptible-I/O timing proof. Supplied-output authentication
+does not reread the control or authenticate the full HTTP response.
+
+This observation/native join is not a new strategy look: floor334shared/
+259development/50infrastructure/699cells stays unchanged. No QC capacity/node
+request, compile, job, cancellation, source/lock/member/control mutation,
+provider request, funded/broker/paper/live or other-lane action is authorized.
+Exact new source/protocol/run freeze and focused verification follow before
+contact. If bounded busy state persists, report it honestly and seek a safe
+scoped reconciliation, not another relaunch or a generic access relaxation.
+
+### 323.35 K exact source/profile/run freeze and pre-use corrections
+
+Authorize ONE observe of scripts/run_arv2_r298_a19_error_reconciliation.py,
+--expected-head the clean commit containing323.33–35,
+--caller-sha256 5ec52ee38a10a50e991d6136f376392966df65645834ca3467df17c2e6c0c9e3.
+Only designated Darwin/POSIX Python3.13/root/branch, clean HEAD, current source
+blob and all131 selected pins. Fixed K was not inspected/allocated, no API or
+private worker invoked before this freeze. No source/runtime/strategy change
+or job is made by K; new code is a bounded read-only receiver plus native
+join/facts. Continuing owner waiver is recorded, not independent review.
+
+| New K source/test | SHA256 |
+|---|---|
+| arv2_r298_a19_error_reconciliation.py | ddc2f9fafc1773cf3e0f94bef84791654fde73cc842946e29a858e666ca1ef8d |
+| test_r298_a19_error_reconciliation.py | b5cdd350abffb37270a56e6fa6d68bca60151bad424b6b799aa4d45c926c89d6 |
+| arv2_r298_reference_catalog_facts.py | 142b7f2854f5c0c90eb12a90c769161fdf694096bbaae01e31e5ebab5c78f3c1 |
+| test_r298_reference_catalog_facts.py | 4b4a18dea9b563f2fb92f0ea75b48f33c9c97762a15c45cb9422704ca998e346 |
+| run_arv2_r298_a19_error_reconciliation.py | 5ec52ee38a10a50e991d6136f376392966df65645834ca3467df17c2e6c0c9e3 |
+| test_r298_a19_error_reconciliation_caller.py | a532e162c6da2d13eb6699b3ffcc09acdd6d65d71011dd6798aa6ca50ac3b80d |
+
+Canonical-plus-LF remote profile1,178bytes
+SHA63ac0e367558c2dd254404f7cbf4e4f47086897185e999fbadbc8f07bf471b4c;
+catalog-facts profile1,311bytes
+SHA00ef65a8dfaefc2988c48da41a43cd59ee08490fd71fe44dd049a4e64435cf71;
+caller18,659bytes SHA648eb0de98acdea8bffcccd89b74ef8c49dd15680eae9ada30cd4f9ccadd6e8f.
+All frozen A19 projector/selector/join/access/legacy/source/profiles stay exactly
+323.32; J control/old parents/readers are native-denied, never replayed.
+
+Root final276distinct focused passes14.53s(55remote+45facts+89caller+
+86record/document+1research closure), no failures/skips/warnings. All131pins
+and three exact profiles matched; six new files compiled in memory. Native
+remote-network/production-artifact/Keychain/security denial, --ignore=artifacts,
+--noconftest/-B/no plugin/cache, inroot support paths and absent dispatch_fence
+remained. No complete suite or private/QC/provider operation in tests. Root
+source/advisory audits found no remaining concrete issue on held final bytes;
+same-round advice and tests are not independent acceptance or actual evidence.
+
+Pre-use P2 finding ARV2I323-013 confirmed: draft _fixed checked history/source/
+compile but omitted fresh access on both sides of the read; draft read method
+also consumed only after prechecks, leaving a failed precheck re-callable.
+Corrected before any use: strict dedicated non-idle precheck plus real18cf
+access before ANDafter; read method consumed BEFORE preflight; exact private
+detail permit/dispatch marker disallows a second read under another marker.
+Added before-refusal consumption/no-additional-calls and postbusy/extraowner/
+source/compile refusal tests retaining primary terminal. Generalized existing
+source-bound old lifecycle retains its earlier behavior; frozen used modules
+were NOT edited. Nonnegative finite monotonic clock guard added prospectively.
+
+Memory-only skip of ONLY _access(after) caught1expected failure3.05s in the
+postbusy regression (required refusal absent), with before/source/history/
+compile guards intact. Delaying read_spent until AFTER before_fixed caught
+1expected failure3.08s: second invocation refused marker rather than the
+required immediate read_once. The independent used-marker guard still blocked
+duplicate provider dispatch; this red proves method-consumption semantics,
+NOT a successful duplicate read. Methods restored finally and both held
+source/test hashes unchanged. No private/operational operation in mutations.
+Draft finding-number collision012 was caught by root's scan and corrected to
+013 here, preserving the older distinct P3 probe-observation finding012.
+
+Author55passes9.14s/45passes6.48s/89passes8.16s overlap276, not additive.
+Facts initial36passes/9fixture failures6.03s used witness no-LF hashing when
+repinning synthetic FIGI rows; corrected TEST ONLY to the binding contract's
+WITH-LF convention. Production/helper/output sources did not change for that
+fixture fix. Initial caller78passes/1pin-test deselected6.68s and85passes/
+1deselected7.58s overlap89; literal pin test ran in final. Pure facts memory-only
+join-equality omission caught1expected failure0.27s, inclusive first-boundary
+omission caught1expected failure0.16s; restored finally, disk hashes unchanged.
+Synthetic registered capabilities/admission seams are not real source proof.
+
+K's normal worst-case schedule is17application intents(6bounded idle metadata+
+5before checks+1detail+5after checks), under independent broker24limit. Both
+broker and remote reject any mutation/capacity endpoint or wrong project/job/
+compile/source payload BEFOREdispatch. Native join and facts require complete
+exact-own dated witnesses and actual0/closed matching receipts; their hashes
+are not provider routing or permission. Actual0 after the supplied-output
+validator means only a valid ERROR OBSERVATION with postchecks, never a valid
+strategy run. No provider/archive-price request, new look/cell, backtest or
+other-lane action is booked. One final matching-lane push remains pending.

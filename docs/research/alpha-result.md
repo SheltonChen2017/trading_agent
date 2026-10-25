@@ -7204,3 +7204,22 @@ native validation or H's metadata observation. A18/I remain spent/frozen.
 Analyst323.30 owns exact evidence, limitations and private-identity diagnostic
 next action. Historical/other-lane entries and all false formal/PIT/paper/live
 flags remain unchanged; no new job, provider price query or fallback followed.
+
+### R-298 A19 Runtime Error; postterminal access refusal — 2026-10-25 UTC
+
+At clean `01def20b111b45e4d752257d87383ea99669d609`, sole A19 parent
+23:00:32.870978Z..23:04:03.368437Z exited2/stderr0/no bound. Stdout3,359bytes
+SHA256 `cd5c9cefc38841096e3c5aef0fd35a8c372d020b414ea4b0d29c66340d8b0236`.
+Native supplied-output validator exited0 and authenticated FAILURE; outer2.
+Fresh source/input/access/compile/capacity passed; one job
+`b850c8193949015bc59c41d0e1434229`/ARV2 R298 REFERENCE IDENTITY DIAGNOSTIC R323 A19
+ran in project38364439. QC list reported Runtime Error. Current access_idle
+then blocked the selected detail read BEFORE backtests/read;31application
+intents/31responses, lastprojects/collaboration/read. No witness/catalog join,
+known cause, accepted report/performance cell or new source-price fact.
+
+Book A19 once: **333 ->334 shared /258 ->259 Analyst development /
+50 infrastructure unchanged /699 cells unchanged**. No extra look for native
+validation or a later bounded read-only exact-job reconciliation. A19/J remain
+spent/frozen, never renewed. Analyst323.33 owns evidence and limitations.
+Historical/other-lane entries and all false formal/PIT/paper/live flags remain.

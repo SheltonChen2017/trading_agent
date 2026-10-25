@@ -31315,3 +31315,120 @@ and order-based engine parity after the QC hold is explicitly released.
 No pure contract, boolean attestation, subscription inventory or green test
 can meet those evidence requirements. Further observed facts, blockers and
 the final handoff follow after implementation hashes exist.
+
+### 220.3 Additional owned Massive historical-reference control, before contact
+
+The public historical ticker-list route is a potentially useful owned-source
+alternative, not a demonstrated absence or a new supplier requirement.
+Under the owner's latest existing-subscription/continuous-build direction,
+authorize exactly ONE new metadata-only GET for warm-up discovery control
+`A` on2020-01-02 at `https://api.massive.com/v3/reference/tickers`, ordered
+parameters `ticker=A`, `market=stocks`, `active=true`, `date=2020-01-02`,
+`sort=ticker`, `order=asc`, `limit=1`. This is NOT the old consumed earnings
+request or a retry of any prior scope. Bearer credential is read once from
+the configured Massive Keychain item and never enters URL/query, Git,
+stdout, exceptions or the journal. No purchase/subscription change.
+
+New fixed probe `research/insider_buying_pilot_massive_reference_probe.py`,
+namespace `artifacts/insider_buying/pilot_massive_reference_v1/ib-pilot-massive-reference-20200102-20261024-once`:
+exclusive durable reservation, credential-read intent and request-start
+before their actions; clean committed exact lane/source identity required;
+ONE transport/ONE credential-read maximum;15-second HTTP wall bound and
+256-KiB body cap. No proxy, redirect, retry, paging, SDK, alternate endpoint,
+symbol/date fallback or QC. Error bodies are not read, retained or hashed.
+Successful metadata receives bounded strict schema/count/identity checks and
+credential-echo screening before private raw retention/hashing. Numerical
+financial data is neither requested nor interpreted; unexpected fields fail
+closed. Publication and input/source custody remain nofollow/single-link,
+private/exclusive and rechecked, with a sanitized permanent refusal on
+failure. Fixture callback paths must be outside every lane identity alias;
+tests enforce native process-tree network and Keychain-exec denial.
+
+Accept only narrow access/schema/dated-reference observations. A dated CIK,
+FIGI, type or exchange control is not an authenticated full historical
+issuer/share-class/native-SID/PIT knowledge master, source admission or
+backtest-ready universe. In particular, the supplier's dated Ticker Overview
+financial fields use reporting-period selection rather than filing-publication
+availability; they are not used here for pre-entry fundamentals. No real
+outcome or strategy join, official first-public availability, permanent look,
+stock signal or source/rights/readiness authority follows from this request.
+Exact source hashes, focused validation and activation HEAD must be recorded
+before the default production path runs. No success is asserted prospectively.
+
+### 220.4 Qualified source images, draft findings and activation boundary
+
+Main final integrated focus: **806 passed,1 intentional nested-sandbox
+topology skip in16.19s** on the three new pairs, four reviewed source-test
+paths, Keychain, record, active-document, lane-boundary and EXACT package
+guard. Native process-tree network/Keychain-exec/repository-write denial,
+minimal environment, no plugin/cache autoload or bytecode writes; Python3.13.15.
+No complete suite. Separately, the audit's invented worker proof ran under
+an INITIAL all-write/network/fork/direct-Keychain-exec-denied profile; it did
+not use a skipped nested topology case as proof of the real-worker boundary.
+Main memory-compiled all SIX new source/test images with network, fork,
+all-write and Keychain-exec denial. Diff check clean. Four frozen v3 files
+remain byte-equal to exact historical`aa0d635d00b64825bf8003289e0a60279bd52e73`.
+
+| New image | SHA-256 before activation |
+|---|---|
+| Pilot contract | `7deea2425974b641f812befea0b879e86f2e6214c1da5bb2df790ab4bfef9a98` |
+| Pilot tests | `e5c42157db6ead53f07d48bc3f9a9f57419dad00a5f3187d7452358fccd34da1` |
+| Retained coverage audit | `c184bf315c21ef0b3c99ab2c0bc4cb366d83bc58ba91703fd0ad664750fcaee4` |
+| Audit tests | `289fe29d89f9f57c77d153af894c3b832463f5cf7466aa6bc17167e1d8e35d90` |
+| Massive metadata probe | `323be54c5e58b750376add39052e939a0b089a8a06a36fcafe9107e48bcc644f` |
+| Probe tests | `ad31025743af88ee03d8573d8ee9fb634842b43053d40f37b27ee80d5ab53688` |
+
+Verified draft corrections, all before actual activation:
+
+- `IBPILOT-MOO-22001` (P3,CLOSED): merely-before-open prerequisite metadata
+  could pass inside the fixed two-minute MOO cutoff. Peer genuine red
+  **3 failed/3 positive passed1.46s**, then cutoff<=open-minus-two-minutes
+  corrected listing/context/interval checks. The 253/252 metadata conditions,
+ 31 inclusive signal labels (age0..30),60 prior context sessions and60-session
+  tail remain explicit; supplied metadata never proves actual bars.
+- `IBPILOT-HTTP-22001` (P3,CLOSED): deadline expiry in the last pre-opener
+  context check escaped the new probe's typed transport result. Peer genuine
+  red **1 failed0.54s**, and main's intervening draft combined run independently
+  showed **1 failed/251 passed6.30s** at that exact check. Outer typed deadline
+  handling now returns HTTP`null`/`transport-timeout` with no claimed remote
+  dispatch; main corrected selection **252 passed5.67s**. An invocation is
+  not proof of a remotely received GET.
+- `IBPILOT-AUDIT-22001` (P3,CLOSED): read-only peer inspection caught a
+  missing import and two genuine v5 producer-schema mismatches: aggregate
+  refused-window count is integer0, and its aggregate does not contain the
+  per-window financial-value flag. Independent historical producer-shape
+  fixtures pin the actual contract rather than editing old receipts.
+- `IBPILOT-AUDIT-22002` (P3,CLOSED): parent readback needed strict exact
+  result schema, typed-zero/all-false authorities and crosslinks from reported
+  root/month hashes to its complete held374-leaf inventory. Synthetic
+  laundering regressions now reject altered counts/authority/hash copies.
+  The fixed success chain requires section200's genuine completion/exit0
+  observer, not the equal selection bytes from failed193. No actual source
+  input or readiness was accepted by the draft.
+
+The collaborating Codex agents' narrow validation is attributed, not Claude
+review: pilot72 checks and10 guard reversals; probe73 checks and5 reversals;
+audit77 checks/1 topology skip and7 reversals, plus independent13-case peer
+readback selection. Main's integrated806 are independently observed here.
+No real source/outcome join or provider/credential/QC operation has occurred
+during these tests. Output/source numeric JSON inputs are rejected or kept
+opaque as appropriate; operational integer controls are not financial values.
+
+Public primary documentation independently checked by main:
+[Massive All Tickers](https://massive.com/docs/rest/stocks/tickers/all-tickers)
+documents the dated reference/active filter and plan-dependent history;
+[Ticker Overview](https://massive.com/docs/rest/stocks/tickers/ticker-overview)
+warns that its SEC financial fields use report-period dates, not filing-publication
+dates. Only All Tickers is in the new probe.
+[Sharadar fundamentals](https://sharadar.com/docs/fundamentals) documents
+AR/MR dimensions and daily delivery; already-retained full-history SF1 is
+not erased by the current5-Year account tier. No duplicate SF1 purchase or
+universal need for a precomputed factor vendor is inferred. A predeclared
+causal factor construction or labeled spread estimator is future engineering,
+not an absent-vendor fact or a reason to manufacture readiness.
+
+Activation next: commit this preregistration and the SIX exact qualified
+images, reverify clean designated root/branch/HEAD, then run the fixed actual
+read-only audit and exactly one default Massive probe. Freeze ALL tracked
+sources/record/HEAD until both finish. Record observed execution hashes,
+counts and dispositions afterward. No checkpoint push or QC access.

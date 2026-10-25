@@ -6903,3 +6903,36 @@ rebooked. No A7 allowance exists. Analyst315.5–315.7 retain the exact evidence
 prospective collaborator correction, open API-refusal/effect barrier and next
 bounded diagnostic decision. All historical entries and other lanes remain
 unchanged under the owner's append-only Analyst accounting exception.
+
+### R-298 A7 actual response-observed file-update refusal — 2026-10-25 UTC
+
+The owner explicitly waived review for this specific integration and allowed
+ONE additional A7. Sole clean run freeze:
+`50e59113bc062a176ade308dd886c93d56820fdc`; caller SHA256
+`1b3b988bb2a2af2ba6c94203717e8f199139f18cf28227d9b055bab71b27f881`,
+profile `ab94574001eebfa202cf330d43b14975f3009017dc1d5ad5eb81ba61ebbedb32`.
+External dispatch02:21:51.070164Z, completion observed02:22:05.907594Z;
+actual exit2, stderr0bytes, no external bound. Process brackets are not provider
+event times. Finite stdout2551bytes SHA256
+`a6ed2098abaeb2df05a6787b35b18aee205712b21f247761d9b4189fc8a41eab`.
+Once-only native-denied external validator exit0 authenticated matching FAILURE
+evidence. No old/new control reread or unchanged retry followed.
+
+Current initial and completion-stage access/history checks passed. Ten
+application dispatches reached complete-write-02, the exact input-runtime
+files/update in project38364439. QC returned HTTP200 with success explicitly
+false and one unclassified477byte error string, retained only by length/hash.
+Response-journal pin1761bytes SHA256
+`a2121ea6da5832f443e5f656a7b872d966a3d4c3e78b9bb5bd2bb19036801568`.
+Provider-contact count remains unknown. Refusal preceded readback, so remote
+write effect is unknown; the old placeholder cannot be asserted unchanged.
+No later module creates/main.py replacement, explicit compile, capacity or
+backtest launch/status call was reached. No candidate is running or accepted.
+
+Book A7 exactly once: **321 ->322 shared /246 ->247 Analyst development /
+50 infrastructure unchanged /699 booked cells unchanged**. This is a
+conservative consumed recovery look, not a measured successful launch. Prior
+attempts/manual sample and diagnostics are not rebooked. A1–A7/R314/R316 stay
+spent; no A8. Analyst319.5–319.6 retain exact evidence, unknown-cause limits and
+the QC-side non-secret error-explanation barrier. All historical entries and
+other lanes remain unchanged under the owner's append-only accounting scope.

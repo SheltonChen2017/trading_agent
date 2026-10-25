@@ -32905,3 +32905,192 @@ P2s remain unchanged. Commit the qualified new pair/registration clean, then
 freeze ALL writers for236's one Q2 GET and separately registered strong-native
 readback. All original/frozen roots, claims and SDK drafts stay untouched.
 No strategy job, outcome look, backtest or final push has occurred here.
+
+## 239. Actual Q2 response retained; candidate format unqualified (2026-10-25)
+
+Registered236 Q2 operation executed ONCE on ALREADY-EXISTING CLEAN
+`6011ae9d561fb7308249c55677055e4fa62c1150`, all writers frozen. Genuine
+106-source identity/reservation/control capacity preflight preceded namespace
+creation/contact. Reservation14,719B was observed before private echo-disabled
+stdin contact was supplied. No contact value was printed, hashed or persisted.
+One raw transport invocation returned HTTP200; safe complete8,695B body was
+retained BEFORE candidate parsing. The candidate profile refused it, so CLI
+exit2 means`opaque_response_retained_inventory_unqualified`, NOT a successful
+directory inventory. No archive/accession GET, redirect/retry/fallback or
+financial numeric interpretation followed. No full CLI wall duration was
+measured; individual polling waits are not mislabeled total runtime.
+
+| Actual Q2 evidence | SHA256 |
+|---|---|
+|complete report|`1590c2723a1f0745247791116dddada391708819cd50c713bb3a68fe2a441361`|
+|untouched8,695B response|`fa08fe5fefb4f4514a71e2c0192614dd649b05285e9050d1986e134fa602775c`|
+|execution106-source inventory|`eaa86f0d7384a3103cac3c0c2e7203e9d351f074b10bc40091b8988213cebb54`|
+
+Registered Q2 independent readback ran ONCE on that same clean head. Guarded
+parent span5.316864167s, exit0/stderr0; initial native network/fork/ALL-write/
+security-exec-denied child independently replayed scope/reservation/contact-
+presence/claim/start/result/headers/full original body/complete, reproduced
+the opaque disposition and rechecked current/frozen/helper bytes. Trusted
+parent current Git/source checks and exact result/report/body/type/zero-access
+crosslinks passed. Public resultSHA
+`e1b7b24189877a57519d0fd56b2067af46a282f67636c965eddfe04af4558eab`;
+original worker stdout1,244B SHA
+`890e19202dcba7f6ce754078a17a22f8d8b82e1aa5f7c32cef46b7bf08945556`.
+This established retained-response custody, NOT directory/archive/filing
+coverage, acceptance/PIT identity, rights, canonical admission or readiness.
+The inert authority map's zero sec_dispatches is not the observed raw
+transport count. Q1 original HTTP measurements remain separately NULL.
+
+One orchestration-only result-store attempt used an undefined still-running
+exit code and was refused AFTER private contact input was already supplied.
+No contact/HTTP action was repeated; later polling retrieved the original
+single operation. This tool-result bookkeeping refusal was not a second
+provider attempt, a source failure or a secret disclosure.
+
+`IBFEED-OBS-01` **CLOSED for the producer control-decoder defect only**:
+235 proved the exact original104-entry failure;238 supplied meaningful
+red/green correction; this real106-source run traversed the corrected control
+path and published complete result/readback without that refusal. Original
+Q1 remains FAILED/consumed with unknown measured HTTP count/bytes and no
+terminal result; closure does not repair/retry/rewrite it. Unknown Q2 foreign
+format is an expected candidate refusal, not evidence of corpus absence or a
+new software defect. Six carried topical/shared P2s remain OPEN unchanged.
+
+## 240. Registered offline Q2 profile observation; no repeated GET (2026-10-25)
+
+Continue under current delegated continuous-build authority. Register
+`ib-sec-feed-directory-2021q2-profile-observation-20261025-once`, bounded
+read-only observation of239's exact original Q2 controls and8,695B response.
+Qualify/commit a NEW observer/test pair first; preserve executed v1/v2 and
+stopped-reader bytes. No claim that the unknown shape was already observed
+or accepted at this registration. No new source request or archive download.
+
+An initially native network/fork/ALL-write/security-exec-denied worker will
+hold/recheck the complete exact namespace/metadata, externally pinned complete
+and response, scope/start/result/source/head links, and current/frozen helpers.
+Trusted parent owns clean Git/current source and original6011ae9d source
+verification outside that child. Bounded metadata/control witnesses, including
+a lossless witness of the fixed8,695B directory response, may cross TRUSTED
+IPC for independent parent hash/shape checks. Strip those witnesses before
+public return; no model-visible raw response/snippet is requested.
+Report JSON key/type/directory-path/item-shape/size-lexeme and safe archive-name
+observations, not arbitrary HTML/text/error snippets or financial fields.
+Preserve numeric lexemes/types rather than interpreting foreign financial
+numbers. Unknown/unexpected content remains unqualified; no invented
+inventory, date/URL fallback or producer-profile relaxation. Later actual
+format qualification must use these retained bytes, never redispatch Q2.
+
+## 241. Register minimal official QC authentication control, not data access (2026-10-25)
+
+In parallel with240's offline source qualification, prepare
+`ib-qc-authentication-20261025-once` at NEW private namespace
+`artifacts/insider_buying/qc_authentication_probe_v1`. Current owner completion
+authority, SI release228.1 and explicit Mia permission apply; no renewed
+routine approval or old QC hold is inferred. This control verifies ONLY the
+configured official API authentication route. It does not create a project,
+compile, notebook/cell, Object Store object, agent deployment, job, strategy,
+outcome look or backtest; no Platform Data is requested.
+
+Qualify/commit a lane-owned source/test pair first. [Official authentication
+documentation](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/authentication)
+defines POST`https://www.quantconnect.com/api/v2/authenticate`, empty JSON
+payload, time-stamped SHA256 authentication and a200 boolean-success response.
+Use exactly ONE such direct HTTPS invocation,15-second absolute deadline,
+16KiB complete-body cap and no proxy/redirect/retry/fallback. Reject/unread
+non200 bodies; do not log exceptions, account/user identifier, token, auth
+headers or derived credential hashes. One read of the existing two environment
+configuration entries only AFTER exclusive durable reservation and credential-
+read intent; no Keychain, dotenv search, secret CLI argument or persistent
+credential fingerprint. Fsync request-start BEFORE transport. Permanent scope
+claims prevent silent repeat. A401 is a fact, not automatic token recovery.
+
+Preflight genuine production-size source/control roundtrips BEFORE namespace
+or credentials. Screen credentials/user identifier/auth-header echoes BEFORE
+any successful response hash/retention, accept only bounded exact auth-status
+schema and empty error/warning collections when present; unknown contents
+remain unqualified and cannot become account/market data export. Retain only
+safe original auth-status bytes privately, then independently rederive their
+receipt under initial native network/fork/ALL-write/security-exec denial.
+Trusted parent owns Git/source checks outside child. Register readback
+`ib-qc-authentication-readback-20261025-once`. Tests use invented credentials
+and native denial, never actual environment secrets or authentication.
+
+An authenticated status would prove this narrowly configured route only,
+NOT paid storage/agent/data entitlement, source identity/PIT, notebook access,
+candidate readiness or a completed backtest. No actual credential read or
+QC request has occurred at this registration. Shared client behavior, frozen
+custody files and ignored SDK drafts remain unchanged. One final push only
+at completed/blocked round end remains controlling.
+
+## 242. Offline profile reader and auth-only control qualified before activation (2026-10-25)
+
+| New image | Bytes | SHA256 |
+|---|---:|---|
+|`research/insider_buying_sec_feed_directory_profile_observer.py`|22,839|`807512fc7f9f13883acb26238b62e45a9ff9ec25e3afde8fb9f07e1958cb15c8`|
+|its tests|17,378|`4d5f0fdc86e78003800cec14e363f031a30c0f863d443c6dd3a160d8c731b580`|
+|`research/insider_buying_qc_authentication_probe.py`|31,020|`7cd4d4e08de7472381d7a8d9a7d2c4cf0f6d00e72f6635b9eeaecf3845219131`|
+|its tests|26,048|`11f83e8a525ef6aef932480ed18deac949147b08ee730eb957593a91cbcd04da`|
+
+On PRECEDING images main OBSERVED **566 passed in7.06s**, explicit ten-target selection: both new
+pairs, v2/v1 directory and stopped-reader regressions, unchanged QC client,
+lane import boundary, record/active documents and EXACT package guard.
+Initial native process-tree network/security-exec/repository-write denial,
+isolated minimal SECRET-FREE test environment, no bytecode/cache/plugin
+autoload; invented fixtures may write outside lane only. No full lane or
+repository suite. Main also observed259 directory-focused checks2.98s.
+
+Separate main initial-native network/fork/ALL-write/security-exec proofs
+compiled/rehashed EIGHT preceding profile/previous-helper images in0.603093416s and
+FOUR preceding auth/unchanged-client images in0.636804458s. Effective denial probes
+passed before any actual input; all executed helpers retained exact hashes.
+Unchanged shared QC client19,126B SHA
+`7a12fdb68194ee10f6e8c3d7c0fc49c08b34166d056bd5ea2a72937dd03be373`;
+its tests15,782B SHA
+`582771c63f6d8fff1cd0be66156973685964ae2cf90a4b78a55079dd6bd09742`.
+These are source/fixture proofs, not account/authentication/data observations.
+
+| Confirmed preactivation finding | Disposition/evidence |
+|---|---|
+|`IBFEED-PROFILE-PRE01` P3: malformed/unsupported JSON inherited a placeholder null root label.|CLOSED before actual use. Six genuinely failing regressions; new observer labels refusal`unparsed`, while actual JSON null stays`null`. No existing producer/profile is changed.|
+|`IBFEED-PROFILE-PRE02` P3: a global no-numeric-interpretation label obscured replay of the old candidate parser's advertised-size conversion/sum on compatible fixtures.|CLOSED before actual use. A genuine red wrapped and observed the unchanged old parser converting/summing invented size metadata. Precise separate labels now distinguish lexical structural observation, no financial-number conversion and the legacy candidate's possible size conversion. No actual Q2 format/cause is inferred from that fixture.|
+|`IBQCAUTH-PRE01` P3: default argparse could echo a mistakenly supplied token argument.|CLOSED before actual use. One genuine red; fixed sanitized parser refuses without echoing private/unknown arguments. This is not a claim a real token was exposed.|
+|`IBQCAUTH-PRE02` P2: a standalone native readback caller could omit dependencies from its asserted source inventory.|CLOSED before actual use. A genuine source-omission regression reached the artifact tripwire; complete static/loaded current closure is now required BEFORE input access. Actual launcher still independently supplies Git-rooted full identity; no old run is relabeled compromised by this prospective finding.|
+
+Prospective nonce-timing hardening generates the transient QC timestamp/signature
+AFTER source/custody checks and durable request-start, immediately before the
+opener under the absolute deadline; credentials are not reread. A deliberate
+slow-check fixture and stale-signature reversal produced one genuine red.
+No actual authentication failure or vendor staleness threshold is claimed.
+
+Attributed author evidence: final profile312 focused passed5.37s; five earlier
+memory reversals13 expected reds/restored311 before the additional wording
+regression. Final auth308 integrated passed3.93s, including105 auth checks;
+four earlier memory reversals17 expected reds/restored104 before the timing
+hardening, then one stale-signature reversal red. Authors separately passed
+strong-native source-only compilation/denial. Read-only Codex peer/main source
+inspection found no further material defect. No actual input/provider/
+credential/QC action was performed by those authors or tests, and none of
+this is independent Claude review. Six carried topical/shared P2s remain OPEN.
+
+FINAL main OBSERVED **568 passed in7.49s** on the exact four images above,
+same explicit ten-target selection/native test controls. Separate source-only
+native network/fork/ALL-write/security-exec denial proofs rehashed/compiled
+the final EIGHT profile/helper images in0.626975000s and FOUR auth/client
+images in0.542013041s; effective denial probes passed. No actual retained
+response, configured credentials or provider/QC input was used by these
+compilation/tests. `git diff --check` passed; final active-document/record
+checks follow this evidence append before commit. No full suite.
+
+Auth production inherits existing configuration without copying secrets into
+command arguments or an application-level supervisor BEFORE reservation.
+Use fixed-cache`-I -S -B` and initial native direct-security-exec denial;
+only the registered producer's one from_env call follows durable intent.
+The documented transient signature must exist in memory for transport but
+is never persisted/fingerprinted. Its readback uses a clean env-i child with
+strong network/fork/ALL-write/security-exec denial and NO credentials.
+
+Commit these four images/registrations clean, then freeze ALL writers for
+240's one offline profile observation and241's one auth POST/readback.
+No new directory request, archive download, native dataset query, QC project/
+notebook/job, strategy launch, outcome look or backtest is activated here.
+No final push yet; continuous work remains authorized after these checks.

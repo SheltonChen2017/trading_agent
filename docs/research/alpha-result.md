@@ -7026,3 +7026,33 @@ two-read R321 D1 observation adds no look. All A1–A10, old controls and earlie
 manual sample accounting remain preserved; no unchanged A11 or outcome is
 implied. Analyst321.9–321.10 retain evidence and the locked-Safari/QC-policy
 barrier. This append changes no prior entry or other lane.
+
+### R-298 A11 actual plain-data source/compile readiness — 2026-10-25 UTC
+
+Under the owner's current AFK/readiness delegation and review waiver, one
+functional plain-JSONL source/compile-only recovery ran at clean freeze
+`9d4725e78ce4baaa39fc080de54aba25ce69b56f`. Caller SHA256
+`ec7f08b6483dcac360f1cffdaa54c956f9b734543ab6f7a7579c84b7253d94e3`;
+profile `d48d5eb61709d4d9551c529d6c878b3a01da201010009a3990c874581123dbef`.
+Parent brackets05:51:11.929573Z..05:52:00.199415Z, actualexit0/stderr0/no
+bound; stdout10,886bytes SHA256
+`1ef0aecda7b781eae445f22b457b3235d29d6fb8af0b4c5517dba452550299e1`.
+The single native-denied supplied-output validator exited0 and authenticated
+success, without rereading artifacts; outer observer exit0. Report10,684bytes
+SHA256 `a0ac64a13299e9fa2a37816a15394448bbec8236c9b6636bc379b00dece375e7`.
+
+Thirty-eight application dispatches completed exact source read-back and one
+successful compile in existing project38364439, with final strict owner/known-A5
+access and fresh native input/storage admission. Compile ID
+`5bd25474163eb6cf13a005139d1c4998-2a348312a9ff411534083f2012d355b5`;
+source manifest `8dfc3d3e16c0f6b555c565d9cac5d4e86a2fe35d037f95538e2a7dfe70a7bfa9`.
+This is technical READY of R298's six-universe AR-off candidate, not a strategy
+run or result. No capacity call/backtest launch/status/result/provider-data
+request occurred. Historical refusal causes remain qualified; A1–A11 stay spent.
+
+Book A11 exactly once: **325 ->326 shared /250 ->251 Analyst development /
+50 infrastructure unchanged /699 booked cells unchanged**. Earlier separate
+plain-data preparation/publication and native workers/output validation add no
+separate look. No accepted comparison cell is added. Analyst322.13–322.14 own
+the exact evidence, limitations and handoff. This owner-authorized append changes
+no historical entry or other lane; immutable/PIT/master/paper/live flags stay false.

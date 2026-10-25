@@ -799,9 +799,13 @@ public source is already plain Python; gzip parses authenticated JSON data,
 not executable code. Exact policy trigger/false-positive status needs QC/Mia
 clarification, not a guessed code rewrite. Section322 supersedes the locked-Mac
 barrier: Mia was consulted through unlocked Safari and could not identify the
-exact classifier trigger. A genuinely plain-JSONL transport successor is being
-prepared, preserving economics and historical refusals; acceptance is not
-proven. No A11 or automatic retry occurred. Floor325/250/50/699, NOT ready.
+exact classifier trigger. The genuinely plain-JSONL successor has now passed
+its separate preparation, six-object publication and A11 source/compile
+readiness checks once (322.6/322.10/322.13). QC accepted the exact new loader;
+all eleven intended R298 files were read back and the exact compile succeeded.
+This is prospective technical readiness for R298 only, not historical cause,
+formal acceptance, runtime success or a completed six/eight comparison.
+D1/D2/A11 are SPENT. Floor326/251/50/699; R298 READY, no backtest launched.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -2063,10 +2067,18 @@ rights or historical-control replay. The owner's readiness waiver remains in
 scope, so no repeat review-authorization question is needed.
 The owner explicitly waives Claude review of section 322's verified readiness
 fixes and directs continued work after unlocking the Mac. Mia could not identify
-the classifier cause; proceed with the genuinely plain-data successor and its
-once-only offline preparation under322.5, not another upload of rejected bytes.
-Storage publication and source/compile readiness need their own exact freezes;
-the current offline result does not admit QC contact or clear readiness.
+the classifier cause. The separately frozen plain-data preparation/publication
+and A11 exact-source/compile readiness have now passed once;322.13 supersedes
+the earlier prospective wording. Preserve all spent controls and unchanged
+economics. The current readiness checkpoint is achieved for R298 only: record
+the actual result and make the single final matching-lane push. No launch,
+capacity call or another six/eight cell follows from this READY-only contract.
+The next substantive step is a separately committed exact R298 launch/result
+protocol bound to the new admitted package, source manifest and compile, with
+fresh access/idleness/capacity checks only when that protocol permits. This
+round does not implement or invoke it, and does not claim all six/eight cloud
+candidates are ready. The monitor stays PAUSED; no routine review-authorization
+question is needed within the owner's existing scope.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -4020,6 +4032,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-24 PDT /25 UTC | Owner-authorized one additional A7 exact-source recovery | `b477c236` -> `50e59113` and final section319 result/handoff commit | Explicit current review waiver now consumed, not independent acceptance; no new Claude range | Access passed; sole first files/update returned HTTP200/success=false with one unclassified477byte error; redacted evidence authenticated, no later upload/compile/launch |760distinct focused checks, exact-final274repeat12.12s, four memory compiles/84pins; exact actual-exit evidence in319; no full suite or spent replay | A1–A7/R314/R316 spent; QC-refusal barrier OPEN, floor322/247/50/699, no accepted cell | Exactly one final matching-lane push at concrete refusal barrier; no A8 or next family cell; monitor PAUSED |
 | 2026-10-24 PDT /25 UTC | Owner-authorized A8 diagnostic and one additional A9 credential-handoff recovery | `35081915` -> `8df52a03`, `158f2fd0` and this final section320 result/handoff commit | No incoming Claude review; exact owner waivers consumed, not independent acceptance | A8 stopped locally at credentials with zero application dispatches; corrected A9 handoff reached two metadata calls, then current extra-row shape refused before upload/compile/launch | Root717 focused passes before A8 and608 before A9, overlapping selections not additive; final record repeat in320.11; no full suite or spent replay | A1–A9 spent; current access metadata and original QC upload error remain OPEN; floor324/249/50/699, no accepted cell or running candidate | Exactly one final nonforce matching-lane push; separately bounded read-only current-row observation needs review or scoped waiver; no A10, pin refresh or next cell; monitor PAUSED |
 | 2026-10-24 PDT /25 UTC | Owner AFK readiness delegation: current-access diagnosis and bounded A10 | `924a88ec` -> `5b613ca1`, `8a621141` and this final section321 handoff commit | No incoming Claude range; current readiness waiver, not independent acceptance | D1 two reads show owner-only; A10 access passes but first exact input-runtime update refuses with retained source-policy language; public audit finds plain Python/data-only gzip; Safari/Mia blocked by locked Mac | Root293 D1 and464 A10 focused passes, overlapping document checks not additive; public AST/transport/source checks and final record validation in321; no full suite or spent replay | ARV2I321-001..005 corrected before use; ARV2E321-001 OPEN, no verified policy remedy; A1–A10 spent; floor325/250/50/699, NOT ready/running | One final matching-lane push at concrete QC-policy/unlock barrier; no blind A11 or paid/other-lane expansion; no repeated review-authorization wait; monitor PAUSED |
+| 2026-10-24 PDT /25 UTC | Owner-delegated plain-data recovery to R298 technical readiness | `2292bdab` -> `d95198e0`, `8feb75db`, `9d4725e7` and this section322 final handoff commit | No incoming Claude range; current readiness waiver, not independent acceptance | Mia cause remains qualified; new exact plain-data preparation/publication passed; A11 accepted loader, authenticated eleven source files, compiled once and reached READY with38 application dispatches | Root408 D1,664 D2 and548 A11 focused selections overlap; exact failures/mutations and final record repeat retained below; no full suite or spent replay | R298 READY only, no strategy run/result; D1/D2/A1–A11 spent; floor326/251/50/699; formal/PIT/paper false | Exactly one final nonforce matching-lane push; next separately frozen launch/result protocol for new bindings, no launch/next cell this round; monitor PAUSED |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -57325,3 +57338,104 @@ entry and other lane. If exact READY is established, document it and conclude
 this round with exactly one matching-lane final push; do not launch a backtest
 as part of this readiness contract. Any new refusal stays retained and requires
 a coherent evidence-led recovery, never an unchanged replay or weakened gate.
+
+### 322.13 Actual A11 — exact R298 source compiled, READY and spent
+
+At clean freeze9d4725e78ce4baaa39fc080de54aba25ce69b56f, the sole external
+observer dispatched its parent2026-10-25T05:51:11.929573Z and observed completion
+05:52:00.199415Z. Actual parent exit0, stderr0, no deadline/channel bound.
+Parent stdout10,886bytes SHA256
+1ef0aecda7b781eae445f22b457b3235d29d6fb8af0b4c5517dba452550299e1.
+The single native-denied supplied-output validator ran05:52:00.380881Z through
+05:52:03.387391Z, actualexit0/stderr0/no bound, stdout10,928bytes SHA256
+63e037bf213ef81216e7378d45ecdd656da5388e5dcf6f08fa57d4f92ae9944c.
+The outer observer also exited0 with output_validated=true. These are external
+process dispatch/completion observations, not exact QC server timestamps or
+measured per-request durations. No artifact output reread followed.
+
+The authenticated result is terminal=ready_for_backtest with38 application
+dispatches and provider_request_count=null/unknown. At dispatch10 the exact
+16,093byte plain input-runtime update returned HTTP200/success=true. Its
+16byte response hash is c955e57777ec0d73639dca6748560d00aa5eb8e12f13ebb2ed9656add3908f97;
+the error-text projector's response_shape fallback merely means this successful
+response has no supported error-string shape, not an upload refusal. The
+response observation alone does not prove the remote effect; subsequent exact
+file read-backs and final complete source-manifest equality establish the
+observed source state. All eleven intended files, including the missing modules,
+input-runtime replacement and non-default main, matched the new projection.
+Do not infer an exact write/create/poll breakdown from38 alone.
+
+One explicit compile was created and authenticated as BuildSuccess, then
+checked again with fresh access/source state. Compile ID:
+5bd25474163eb6cf13a005139d1c4998-2a348312a9ff411534083f2012d355b5.
+The READY receipt is attempt11/project38364439/state=compiled_exact_source_ready,
+projection9dde39783bcb401d1f36aeb5beb1b1983882250b0472c2afd22dca1408c2a5f5,
+source manifest8dfc3d3e16c0f6b555c565d9cac5d4e86a2fe35d037f95538e2a7dfe70a7bfa9.
+Initial/final native admission of the new D2 package/control passed. The retained
+report at newrule_plain_readiness/R322-20261025-C/report.json is10,684bytes,
+SHA256 a0ac64a13299e9fa2a37816a15394448bbec8236c9b6636bc379b00dece375e7.
+The output validator reconstructed this exact report pin from the supplied
+envelope and actual exit; it did not reopen the report or private source.
+
+Final access observation at dispatch36 was dedicated owner-only; general
+project owner plus the exact known A5 row; codeRunning explicitlyfalse. Strict
+access gates passed without accepting Mia/arbitrary rows, changing permissions
+or treating absent public metadata as true privacy. The passive observation's
+privacy_verified/collaborator_policy_accepted/atomic_snapshot_proven flags remain
+false: its role is evidence projection, not an independent policy grant.
+Ready-access journal6,207bytes SHA256
+e010604b9f9285368d3ea5220797556526f8993aa6004dd77a82edfc4d586f87;
+input-response journal2,213bytes SHA256
+90253f7e96b79962aa72d6ce44ccdc4b5ee7324b6ba7efc0bb95ca41ab4bcb09.
+No new collaborator removal was attempted after the322.2 UI refusal.
+
+ARV2E321-001 is resolved PROSPECTIVELY for this new loader/source/compile
+checkpoint. A10's exact classifier trigger and earlier discarded errors remain
+unknown; success does not prove gzip was the historical cause or retroactively
+accept old attempts. All A1–A11 and D1/D2/observer uses are spent/frozen. No
+cleanup, repair, retry, old reader invocation, data-provider request, capacity
+check, backtest launch/status/result or other-lane modification followed.
+No strategy result/cell was accepted. Book A11 exactly once under the existing
+Analyst-only append authority:325->326shared/250->251development/
+50infrastructure unchanged/699cells unchanged. The shared ledger append
+preserves all prior entries; D1/D2/native workers/validator add no separate look.
+
+This is technical backtesting readiness of R298's six-universe AR-off candidate
+under the accepted-risk current-vintage inputs, not runtime success, market
+efficacy, all six/eight candidates, immutable/PIT/master admission or paper/live
+readiness. All formal/source/paper/launch false flags remain false. A later
+launch protocol must authenticate the exact new admitted bindings and fresh
+project/capacity state; no old compressed-profile continuation may be relabeled.
+
+### 322.14 Final handoff and single-push boundary
+
+This implementation-only round starts at pushed2292bdab11f835be32568b90229410c2a6510b16.
+There is no new Claude range or independent acceptance. The exact local series
+is d95198e014926ba1a578db61a5c21c4887293a26 (D1 freeze),
+8feb75dbda9d174e95dc5f49d3c8d29c12ff459c (D1 result/D2 freeze),
+9d4725e78ce4baaa39fc080de54aba25ce69b56f (D2 result/A11 freeze), and this
+final result/handoff commit. The owner-authorized readiness milestone is
+achieved for the exact R298 candidate; no next-cell implementation or launch
+is included. Same-round advisory checks do not replace independent review.
+
+Before A11, final document repeat86passes0.96s overlapped the548 root selection.
+After A11, local HEAD/branch remained exact, worktree was clean and live matching
+remote still equaled2292bdab. No source/test edits occurred after the actual
+freeze. Final validation is limited to changed active documents, in-memory
+compilation, public source-pin/diff/status checks; no repeated operational
+consumer or full suite. Final counts are not additive across overlapping runs.
+Final changed-record selection:86passes0.99s, overlapping the548; all98 selected
+public source pins, exact caller/observer hashes and in-memory compilation
+passed. A same-round read-only handoff audit found no material overclaim/count/
+scope issue and confirmed zero scripts/research/tests diff from9d4725e7; only
+the two authorized records changed. This is advisory, not independent review.
+The round makes exactly ONE nonforce matching-lane final push after final
+validation and remote/concurrency checks; no intermediate push occurred.
+Verify local/tracking/live agreement after that push. Monitor remains PAUSED.
+
+Plain-language checkpoint: QC now holds the intended R298 program instead of
+the stub/default template, its input package is authenticated, and it compiles.
+The plain-data transport removed the immediate upload blocker without changing
+the strategy rules. We have not yet run the strategy or produced performance
+results. The next bounded job is launch/result handling for this exact candidate,
+not another upload attempt or an assumed green light for all six/eight tests.

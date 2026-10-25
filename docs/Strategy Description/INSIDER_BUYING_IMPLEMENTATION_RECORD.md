@@ -32167,3 +32167,147 @@ inspection found no new material production wiring defect; it did not run
 actual inputs. The next executable action is ONLY227.1 on the newly committed
 clean source, with every lane writer frozen and the matching origin still
 unchanged at`41d729aff80752cdc1ad6ef73690d9c59711d712`. No final push yet.
+
+## 228. Observed full-stream fresh selection and QC resource release (2026-10-25)
+
+Operation`ib-pilot-sec-first64-selection-20261025-once` actually completed
+on already-existing CLEAN`b3aea4f10b7512eee2e1629a8417df0784cd4dbc` in
+**249.149212s**, exit0/stderr0. It genuinely rederived the complete25-quarter
+roster and all source/disposition/request streams, reproduced225's roster and
+audit exactly, and selected64 fresh2021Q1 requests from source ordinals1..71
+(context-only rows account for the gaps). SelectionSHA
+`6b9db2ccaf59c19a202759cf2f5334cc0862ca8bb01eeba9121aa385b9828f56`.
+Source inventorySHA`161f8fb6cc1de3da69dd9aac1ae5685499711bcbfad7b19d60552c52f913754f`.
+This was no transport, body-structure rerun, contact, credential, QC or outcome
+look. No later capture activation existed during this execution.
+
+| Observed new control | Bytes | SHA256 |
+|---|---:|---|
+|reservation|13,866|`1f07c7b2a7c0b6f633ca8a901be1a0d44010a4392c2e89d2e4078649b94fe8c7`|
+|terminal|403|`260c3330c96de06a41f243cd5541d1ab58d58aa9a42321dac9290a0804c7d287`|
+|complete|385,209|`3dc2a3b85fa2c56ea9ddbe02263bcf7f4fa0945b316e0383c9c15d675ebd22b1`|
+
+The separate initial-native network/fork/ALL-write/security-exec-denied
+readback rehashed all three, verified complete↔terminal↔reservation/stdout
+bindings and strict worker selection/quarantine/actual-prior report checks.
+All12 context quarantine rows are NOW retained as actual metadata, not inferred
+from a hash. Eleven lack ANY Form4/4-A master alias. One2025Q3 row at source
+ordinal6968 is dated2025-09-23, while its exact accession
+`0001193125-25-212764` has two retained master aliases (folders1030894 and
+2082884), BOTH dated2025-07-01. This establishes a source/master disagreement,
+not which source is correct. No path/date is guessed, no second-quarter
+substitution or quarantine is cleared. Ten of the missing-locator cases are
+pilot rows; context2026Q1 adds the eleventh. The pilot therefore retains11
+quarantines total. Further diagnosis must examine already retained ALL-FORM
+master metadata in a separately registered offline operation, not assume
+“not in the Form4 parser” means absent from the complete master or SEC.
+
+### 228.1 Independently observed Short Interest release; monitor paused
+
+At the safe read-only observation, Short Interest matching remote was
+`730c59cfec31b33a83fa09e065208eb3c26d345b`, genuinely changed from225.1's
+`d50c9fe981b391a2f9634491b4b9512ccf3216d7`. `git ls-remote --heads` was run
+from the designated Insider worktree; no Short Interest fetch, checkout,
+edit or cross-chat message occurred. The same heartbeat was PAUSED through
+the app tool and confirmed PAUSED at **2026-10-25 20:05:15 UTC**, before any
+QC/Safari action. The running native source selector was allowed to finish
+without a concurrent writer; no QC/Safari was accessed during it.
+
+The owner's explicit release condition is met: QC/Safari are NOW available,
+not held pending another routine approval or Claude review. This is resource
+authority, NOT data/rights/protocol/candidate readiness or a strategy look.
+Native in-cloud historical identity/pre-entry evidence may be qualified under
+a fresh specifically registered scope; no stale SDK source image/claimed
+namespace is activated by inference. Preserve raw source, both prescribed
+earnings diagnostics, price/terminal/reference/PIT/protocol gates and three
+unsuccessful launches per genuine candidate. Consult Mia whenever an issue
+arises, compare every cloud change and port only verified lane-owned fixes.
+The monitor remains paused and is not automatically rearmed.
+
+## 229. Fresh pilot parent first64 activation and precontact controls (2026-10-25)
+
+Under the existing owner source-build/delegated-decisions authority, bind228's
+OBSERVED exact three controls, selection hash and actual selection HEAD in the
+new pilot collector. Register NEW capture
+`ib-sec-pilot-2021q1-first64-20261025-once` at
+`artifacts/insider_buying/pilot_sec_parent_capture_v1`, with exclusive locked
+`claims` and `runs` namespaces. This is not a restart, renamed retry, reused
+2006/v3/v4 operation or an assertion that64 completes the921,570-target pilot.
+No already consumed accession may be dispatched, including the historical
+ambiguous start. The fixed64 requests preserve source/raw target/master aliases
+and exact hash; no caller can provide an alternate production path/selection.
+
+Before a contact prompt or claim, qualify the new activation image/tests and
+commit clean. Then execute ONE separately registered native-only read-only
+preflight`ib-pilot-sec-first64-input-preflight-20261025-once`: trusted launcher
+establishes exact Git/clean source identity outside native fork denial; a
+fresh initially native network/fork/ALL-write/security-exec-denied child loads
+228's exact fixed controls, checks genuine production payload lineage, holds
+all84 intake leaves with complete initial/final opaque hashes and strict
+per-dispatch identities, independently decompresses/reparses the current
+2021Q1 master and joins every selected exact alias. Reopen/recheck ALL prior
+operational roots and ensure NONE of the64 accessions is already consumed.
+No new output namespace, contact/credential, source request, QC or outcome is
+consumed by that preflight. Main rechecks the same committed Git identity
+afterward; child does not claim Git execution under fork denial.
+
+If that actual preflight succeeds, freeze all writers and run exactly this new
+production capture on the same already-existing clean activation commit.
+The owner's connected Gmail profile email is identifying SEC contact only,
+provided privately through echo-disabled stdin/getpass AFTER durable new
+reservation. Never persist/hash it, put it in argv/environment/chat/Git or
+exception text. Bind current committed source and held input/control roots
+before/around every JIT permanent ACCESSION claim, fsync start and the sole
+fixed HTTPS GET; claimed/started/ambiguous/refused requests stay consumed.
+Planned-only suffix stays unclaimed/unattempted. No proxy, redirect, retry,
+non200 body read, master refetch or broadened source window. Bound each raw
+body8MiB,64 total attempts, remaining worst-case bodies plus8GiB disk floor,
+REAL30-second transport wall deadline in addition to socket limits, and at
+least500ms AFTER prior completion. Raw header fields and body are screened
+for contact echo BEFORE hashing/retaining. New output-only settled-ctime
+policy continuously checks complete hashes/identity; old roots remain strict.
+
+Stop at any refusal, ambiguous/framing/privacy/header/custody surprise. Retain
+safe complete body separately from header qualification and full XML/canonical
+admission. Never change a guard to promote a failed capture. Register one
+postcapture native-only exact report/control/claim/start/body/header readback
+`ib-pilot-sec-first64-capture-readback-20261025-once`, with current/frozen
+source bytes checked before/after and trusted launcher Git identity rechecked
+outside child. No full XML or financial numeric projection in that readback.
+Further captures MUST first explicitly include this NEW permanent claim root
+in a separately versioned exposure inventory, including the new header/schema
+request SHA fields. The old observer currently omits this root/field set and
+cannot be silently reused to redispatch64 just-captured requests.
+
+No strategy job/SDK invocation, outcome look, funded/paper/live/broker/order
+action is included in this source scope. Other available readiness work may
+continue at its next safe checkpoint, without a manufactured Claude/owner
+engineering gate. Missing actual source/reference/rights inputs, not green
+tests or broad preauthorization, determine honest backtesting readiness.
+
+### 229.1 Activated source image qualification before actual preflight/contact
+
+Activated source`research/insider_buying_pilot_sec_parent_capture.py`
+60,713B/SHA`9943d1702ab40155674a1b59be69cda94d3ba330abaa7272901baef438d8e9fe`;
+test38,526B/SHA`56ec1607d55e57418e6fbdc2f527c0828782f0b4542e73e01d049b49895cf229`.
+All228 control pins, selection hash and already-existing selection execution
+HEAD are hardbound exactly. The capture's own later actual execution HEAD is
+separate. Added native-only`preflight_actual_capture_inputs` enforces initial
+native isolation before control/input reads and produces metadata only. It
+does not create a capture namespace, request access, contact validation or
+dispatch. The actual preflight has NOT yet occurred at this qualification.
+
+Main integrated **647 passed in15.12s**, same relevant selection as227.2 with
+the activated101-case capture test file, initial native process-tree network/
+Keychain-exec/repository-write denial and isolated no-cache environment.
+No full suite. Agent source-only in-memory compilation/import passed under
+native network/fork/ALL-write/direct-security-exec denial; main's earlier
+strong source-only proof remains227.2, not a false claim of executing real
+inputs. Agent-observed final153 focused/boundary/EXACT checks passed5.24s;
+four additional memory reversals (native front, prior consumption, held
+control hash, current/frozen source) produced seven expected failures and
+restored green. The first temporary test sandbox expression was overbroad
+and stopped pytest initialization; no source/provider input was reached;
+the corrected native policy produced the reported runs. Test fixtures never
+gain real selection authority. Every new actual operation follows ONLY after
+this clean committed activated image and all lane writers are frozen.

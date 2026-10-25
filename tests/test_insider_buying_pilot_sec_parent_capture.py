@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from io import BytesIO
 import json
 import os
 from pathlib import Path
@@ -196,7 +197,7 @@ def test_fixture_root_cannot_alias_actual_roots_or_their_ancestors(tmp_path,root
     with pytest.raises(ValueError):_run(selected,transport=lambda *args:pytest.fail("must not dispatch"))
 
 
-def test_disabled_production_pins_refuse_before_any_identity_contact_or_source_loader(monkeypatch):
+def test_explicitly_unset_production_pins_refuse_before_any_identity_contact_or_source_loader(monkeypatch):
     def tripwire(*args,**kwargs):pytest.fail("production preactivation must not reach external helper")
     monkeypatch.setattr(m,"_identity",tripwire);monkeypatch.setattr(m,"_load_actual_selection",tripwire)
     monkeypatch.setattr(m.old,"_stdin_contact",tripwire);monkeypatch.setattr(m.old,"_getpass_contact",tripwire)
@@ -484,6 +485,33 @@ def _invented_activation(monkeypatch):
     monkeypatch.setattr(m,"ACTUAL_SELECTION_HEAD","a"*40)
 
 
+def test_committed_observed_activation_configuration_is_typed_without_loading_actual_inputs():
+    # The default configuration may be activated after its separate selector
+    # completes. This checks only committed constants, never private controls.
+    m._activation_ready()
+    assert set(m.ACTUAL_SELECTION_PINS)=={"reservation.json","terminal.json","complete.json"}
+    assert all(type(size) is int and 0<size<=m.MAX_CONTROL_BYTES
+        for digest,size in m.ACTUAL_SELECTION_PINS.values())
+
+
+@pytest.mark.parametrize("fault",("missing","extra","bool_size","bad_digest","list_pin","selection_sha","head"))
+def test_activation_rejects_malformed_observed_pins_before_any_actual_loader(monkeypatch,fault):
+    _invented_activation(monkeypatch)
+    pins=dict(m.ACTUAL_SELECTION_PINS)
+    if fault=="missing":pins.pop("terminal.json")
+    elif fault=="extra":pins["extra.json"]=("a"*64,1)
+    elif fault=="bool_size":pins["complete.json"]=("a"*64,True)
+    elif fault=="bad_digest":pins["complete.json"]=("not-a-sha",1)
+    elif fault=="list_pin":pins["complete.json"]=["a"*64,1]
+    elif fault=="selection_sha":monkeypatch.setattr(m,"ACTUAL_SELECTION_SHA256","invalid")
+    else:monkeypatch.setattr(m,"ACTUAL_SELECTION_HEAD","invalid")
+    monkeypatch.setattr(m,"ACTUAL_SELECTION_PINS",pins)
+    monkeypatch.setattr(m,"_identity",lambda *a:pytest.fail("invalid activation must precede identity"))
+    monkeypatch.setattr(m,"_load_actual_selection",lambda:pytest.fail("invalid activation must precede actual controls"))
+    with pytest.raises(m.PilotParentCaptureError,match="not_activated"):
+        m.run_actual_capture(expected_head="a"*40)
+
+
 def test_actual_verifier_missing_isolation_flags_stops_before_any_replay(monkeypatch):
     _invented_activation(monkeypatch)
     def tripwire(*args,**kwargs):pytest.fail("missing native front must not inspect source or inputs")
@@ -510,3 +538,102 @@ def test_actual_verifier_changed_source_refuses_before_input_replay_with_fixture
     with pytest.raises(ValueError,match="current_or_frozen_source_changed"):
         m.verify_actual_capture(expected_report_sha256="c"*64,execution_identity=identity)
     assert calls==[tuple(sources)]
+
+
+def test_actual_input_preflight_missing_isolation_refuses_before_source_or_selection(monkeypatch):
+    _invented_activation(monkeypatch)
+    def tripwire(*args,**kwargs):pytest.fail("missing native preflight must precede every source/input read")
+    monkeypatch.setattr(m,"_load_actual_selection",tripwire)
+    monkeypatch.setattr(m,"_CaptureInputs",tripwire)
+    monkeypatch.setattr(m.source_runner,"_prove_isolation",tripwire)
+    monkeypatch.setattr(m.exposure.bootstrap.custody,"_source_bytes",tripwire)
+    monkeypatch.setattr(m,"sys",SimpleNamespace(flags=SimpleNamespace(isolated=1,no_site=0,dont_write_bytecode=1),
+        pycache_prefix=m.source_runner.EMPTY_CACHE_PREFIX))
+    with pytest.raises(ValueError,match="isolated_capture_preflight_required"):
+        m.preflight_actual_capture_inputs(execution_identity={})
+
+
+def _preflight_cutpoints(monkeypatch,*,fault=None):
+    """Invented metadata only; all actual source/input/contact cutpoints sealed."""
+    payload,_=_invented_observer_selection();selection=m._seal(payload,observed=True)
+    controls={name:BytesIO(("invented-"+name).encode())
+        for name in ("reservation.json","terminal.json","complete.json")}
+    monkeypatch.setattr(m,"ACTUAL_SELECTION_PINS",{name:(m._sha(stream.getvalue()),len(stream.getvalue()))
+        for name,stream in controls.items()})
+    monkeypatch.setattr(m,"ACTUAL_SELECTION_SHA256",selection.sha256)
+    monkeypatch.setattr(m,"ACTUAL_SELECTION_HEAD","a"*40)
+    monkeypatch.setattr(m,"sys",SimpleNamespace(flags=SimpleNamespace(isolated=1,no_site=1,dont_write_bytecode=1),
+        pycache_prefix=m.source_runner.EMPTY_CACHE_PREFIX,exc_info=sys.exc_info))
+    events=[];source_reads=[]
+    sources={m.SELF_PATH:"a"*64,m.TEST_PATH:"b"*64}
+    identity={"root":str(m.LANE_ROOT),"branch":m.source_runner.LANE_BRANCH,"head":"b"*40,"clean":True,
+        "source_sha256":sources,"source_inventory_sha256":m._sha(m._raw(sources))}
+    def source_bytes(root,names):
+        source_reads.append(tuple(names));events.append("source")
+        current=tuple(names)==tuple(sources)
+        phase="early" if len(source_reads)<=2 else "late"
+        if fault==phase+("_current" if current else "_frozen"):return {}
+        return sources if current else m.source_runner.FROZEN
+    class Hold:
+        handles=[(name,stream,None,len(stream.getvalue())) for name,stream in controls.items()]
+        def check(self):events.append("control_check")
+        def close(self):
+            events.append("control_close")
+            if fault=="cleanup":raise OSError("PRIVATE CONTROL CLOSE")
+    class Inputs:
+        intake=SimpleNamespace(context={"leaf_count":84})
+        exposed_accessions={_request(1)["accession_number"]} if fault=="consumed" else set()
+        def __init__(self,value):
+            assert value==payload;events.append("inputs")
+        def recheck(self):
+            events.append("input_check")
+            if fault in {"input_change","cleanup"}:raise ValueError("invented_input_changed")
+            if fault=="control_change":
+                stream=controls["terminal.json"];stream.seek(0);stream.write(b"changed-")
+        def final_recheck(self):events.append("input_final")
+        def close(self):
+            events.append("input_close")
+            if fault=="cleanup":raise OSError("PRIVATE INPUT CLOSE")
+    def load():events.append("selection");return selection,Hold()
+    monkeypatch.setattr(m.source_runner,"_prove_isolation",lambda:events.append("native"))
+    monkeypatch.setattr(m.exposure.bootstrap.custody,"_source_bytes",source_bytes)
+    monkeypatch.setattr(m,"_load_actual_selection",load)
+    monkeypatch.setattr(m,"_CaptureInputs",Inputs)
+    def tripwire(*args,**kwargs):pytest.fail("preflight cannot create a namespace, read a contact, or dispatch")
+    monkeypatch.setattr(m,"_NewDirectory",tripwire)
+    monkeypatch.setattr(m,"_RAW_TRANSPORT",tripwire)
+    monkeypatch.setattr(m.old,"_stdin_contact",tripwire);monkeypatch.setattr(m.old,"_getpass_contact",tripwire)
+    return identity,events,source_reads
+
+
+def test_actual_preflight_synthetic_holds_rechecks_source_controls_and_all84_without_namespace(monkeypatch):
+    identity,events,source_reads=_preflight_cutpoints(monkeypatch)
+    result=m.preflight_actual_capture_inputs(execution_identity=identity)
+    assert result["schema"]==m.SCHEMA+"/input-preflight"
+    assert result["selection_sha256"]==m.ACTUAL_SELECTION_SHA256
+    assert result["selection_execution_head"]=="a"*40 and result["capture_execution_head"]=="b"*40
+    assert result["source_inventory_sha256"]==identity["source_inventory_sha256"]
+    assert result["selection_control_pins"]=={name:{"sha256":sha,"bytes":size}
+        for name,(sha,size) in m.ACTUAL_SELECTION_PINS.items()}
+    assert result["selected_count"]==64 and result["selected_prior_consumed_count"]==0
+    assert result["held_intake_leaves"]==84 and result["current_master_period"]=="2021Q1"
+    assert result["native_network_fork_allwrite_securityexec_denial"] is True
+    assert result["output_namespace_created"] is False
+    assert all(type(result[key]) is int and result[key]==0 for key in
+        ("contact_reads","new_provider_requests","credential_reads","qc_accesses","outcome_looks","backtests"))
+    assert result["authority"]==m.audit._AUTHORITY
+    assert events[0]=="native" and events[-2:]==["control_close","input_close"]
+    assert events.count("input_final")==1 and len(source_reads)==8
+
+
+@pytest.mark.parametrize("fault",("early_current","early_frozen","late_current","late_frozen","consumed",
+    "control_change","input_change","cleanup"))
+def test_actual_preflight_changes_or_consumption_refuse_and_drain_invented_holds(monkeypatch,fault):
+    identity,events,_=_preflight_cutpoints(monkeypatch,fault=fault)
+    with pytest.raises(ValueError):m.preflight_actual_capture_inputs(execution_identity=identity)
+    assert events[0]=="native"
+    if fault.startswith("early_"):
+        assert "selection" not in events and "inputs" not in events
+    else:
+        assert "control_close" in events
+        if "inputs" in events:assert events[-2:]==["control_close","input_close"]

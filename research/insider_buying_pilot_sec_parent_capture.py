@@ -1,7 +1,7 @@
 """Fresh pilot-only JIT parent custody; no old scope is resumed or rewritten.
 
-Production is disabled until exact observed protected-selection control pins
-are committed here. Fixtures cannot invoke the default transport, contact
+Production requires exact observed protected-selection control pins committed
+here plus clean-source and current-input rechecks. Fixtures cannot invoke the default transport, contact
 reader, actual roots or production loader. Acquisition is not XML/canonical
 admission. A claim/start remains consumed on every failure, including a local
 publication error. Only fresh output leaves use settled-ctime/full-hash checks.
@@ -52,9 +52,13 @@ SELECTION_PARTS = ("artifacts", "insider_buying", "pilot_sec_fresh_selection_v1"
 SELECTION_AUDIT_ID = "ib-pilot-sec-first64-selection-20261025-once"
 # Observed controls, byte sizes and serialized-selection location are filled
 # only after the separately registered selector has actually completed.
-ACTUAL_SELECTION_PINS = {}
-ACTUAL_SELECTION_SHA256 = None
-ACTUAL_SELECTION_HEAD = None
+ACTUAL_SELECTION_PINS = {
+    "reservation.json": ("1f07c7b2a7c0b6f633ca8a901be1a0d44010a4392c2e89d2e4078649b94fe8c7", 13866),
+    "terminal.json": ("260c3330c96de06a41f243cd5541d1ab58d58aa9a42321dac9290a0804c7d287", 403),
+    "complete.json": ("3dc2a3b85fa2c56ea9ddbe02263bcf7f4fa0945b316e0383c9c15d675ebd22b1", 385209),
+}
+ACTUAL_SELECTION_SHA256 = "6b9db2ccaf59c19a202759cf2f5334cc0862ca8bb01eeba9121aa385b9828f56"
+ACTUAL_SELECTION_HEAD = "b3aea4f10b7512eee2e1629a8417df0784cd4dbc"
 _TOKEN = object()
 _REGISTRY = weakref.WeakKeyDictionary()
 _DISPATCHES = weakref.WeakKeyDictionary()
@@ -811,6 +815,55 @@ def _verify_capture(*, root, expected_report_sha256, fixture_only, execution_ide
 def verify_invented_capture(root, expected_report_sha256):
     _fixture_root(root);_native_fixture_denial()
     return _verify_capture(root=root, expected_report_sha256=expected_report_sha256, fixture_only=True)
+
+
+def preflight_actual_capture_inputs(*, execution_identity):
+    """Native-denied real input qualification; no scope, contact or dispatch.
+
+    The trusted launcher independently establishes and rechecks clean Git
+    identity. This child verifies only the supplied current/frozen source
+    image and the fixed observed selection, intake and operational custody.
+    """
+    _activation_ready()
+    _need(sys.flags.isolated == sys.flags.no_site == sys.flags.dont_write_bytecode == 1
+          and sys.pycache_prefix == source_runner.EMPTY_CACHE_PREFIX, "isolated_capture_preflight_required")
+    source_runner._prove_isolation()
+    identity = _source_identity(execution_identity, required_paths=(SELF_PATH, TEST_PATH))
+    def current():
+        _need(exposure.bootstrap.custody._source_bytes(LANE_ROOT, tuple(identity["source_sha256"])) == identity["source_sha256"]
+              and exposure.bootstrap.custody._source_bytes(LANE_ROOT, tuple(source_runner.FROZEN)) == source_runner.FROZEN,
+              "capture_preflight_current_or_frozen_source_changed")
+    current();hold = inputs = None
+    try:
+        selection, hold = _load_actual_selection()
+        def controls():
+            hold.check()
+            for name, stream, _, cap in hold.handles:
+                _need(selector.held_io._hash_stream(stream, cap) == ACTUAL_SELECTION_PINS[name], "preflight_selection_control_changed")
+            hold.check()
+        controls();current()
+        payload = selection.to_payload()
+        _need(type(selection) is _PinnedActualSelection and selection.sha256 == ACTUAL_SELECTION_SHA256
+              and payload["fixture_only"] is False and len(payload["requests"]) == MAX_REQUESTS,
+              "preflight_observed_selection_required")
+        inputs = _CaptureInputs(payload)
+        inputs.recheck();current();controls()
+        consumed = sum(item["request"]["accession_number"] in inputs.exposed_accessions for item in payload["requests"])
+        _need(consumed == 0, "preflight_selected_accession_already_consumed")
+        inputs.final_recheck();controls();current()
+        return {"schema": SCHEMA + "/input-preflight", "selection_sha256": selection.sha256,
+            "selection_execution_head": ACTUAL_SELECTION_HEAD, "capture_execution_head": identity["head"],
+            "source_inventory_sha256": identity["source_inventory_sha256"],
+            "selection_control_pins": {name: {"sha256": digest, "bytes": size} for name, (digest, size) in ACTUAL_SELECTION_PINS.items()},
+            "selected_count": len(payload["requests"]), "selected_prior_consumed_count": consumed,
+            "held_intake_leaves": inputs.intake.context["leaf_count"], "current_master_period": "2021Q1",
+            "native_network_fork_allwrite_securityexec_denial": True,
+            "source_identity_semantics": "trusted_launcher_git_identity_independent_child_current_and_frozen_bytes",
+            "output_namespace_created": False, "contact_reads": 0, "new_provider_requests": 0,
+            "credential_reads": 0, "qc_accesses": 0, "outcome_looks": 0, "backtests": 0,
+            "authority": dict(audit._AUTHORITY)}
+    finally:
+        _close_all([hold] if hold is not None else [], inputs, None, False)
 
 
 def verify_actual_capture(*, expected_report_sha256, execution_identity):

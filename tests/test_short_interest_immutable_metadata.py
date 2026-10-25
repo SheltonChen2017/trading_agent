@@ -35,11 +35,11 @@ def h(tmp_path):
 def kernel(monkeypatch):
     flags, calls = {}, []
     def read_flags(info): return flags.get((info.st_dev, info.st_ino), 0)
-    def set_immutable(fd):
+    def set_immutable(fd, initial_flags=0):
         info = os.fstat(fd)
         assert fcntl.fcntl(fd, fcntl.F_GETFL) & os.O_ACCMODE == os.O_RDONLY
-        assert read_flags(info) == 0
-        calls.append(fd); flags[info.st_dev, info.st_ino] = immutable.IMMUTABLE_FLAG
+        assert immutable._flags(info) == initial_flags and initial_flags in (0, 64)
+        calls.append(fd); flags[info.st_dev, info.st_ino] = initial_flags | immutable.IMMUTABLE_FLAG
         # Fake only: represent the kernel's PRESEAL metadata transition with
         # an ordinary chmod of this fabricated inode. Never set real flags.
         os.fchmod(fd, 0o600)
@@ -88,7 +88,7 @@ def test_original_flags_are_not_adopted_or_cleared(h, kernel):
     def boundary():
         if h.path.exists():
             info = h.path.stat(); flags[info.st_dev, info.st_ino] = 4
-    with pytest.raises(immutable.ImmutableMetadataRefusal, match="initial_flags_not_zero"):
+    with pytest.raises(immutable.ImmutableMetadataRefusal, match="initial_flags_refused"):
         with prepare(h, boundary=boundary): pytest.fail("old flags adopted")
     assert not calls and h.path.read_bytes() == h.raw
 
@@ -188,7 +188,7 @@ def test_duplicate_cleanup_survives_unrestored_reflection(h, kernel, monkeypatch
 
 
 def test_reported_kernel_success_without_the_flag_is_not_a_seal(h, kernel, monkeypatch):
-    monkeypatch.setattr(immutable, "_native_set", lambda fd: None)
+    monkeypatch.setattr(immutable, "_native_set", lambda fd, initial_flags=0: None)
     with pytest.raises(immutable.ImmutableMetadataRefusal, match="flags_changed"):
         with prepare(h): pytest.fail("kernel no-op accepted")
     assert h.path.read_bytes() == h.raw
@@ -208,7 +208,7 @@ def test_duplicate_close_error_never_issues_a_closed_witness(h, kernel, monkeypa
 
 def test_kernel_phase_does_not_reset_the_original_eight_second_creation_window(h, kernel, monkeypatch):
     setter = immutable._native_set
-    def delayed(fd): setter(fd); h.clock.now = 9.0
+    def delayed(fd, initial_flags=0): setter(fd, initial_flags=initial_flags); h.clock.now = 9.0
     monkeypatch.setattr(immutable, "_native_set", delayed)
     with pytest.raises(immutable.creator.NewMetadataRefusal, match="window_exhausted"):
         with prepare(h): pytest.fail("late flagging reset the original window")
@@ -263,14 +263,15 @@ def test_missing_kernel_symbol_and_hostile_diagnostics_are_fixed(monkeypatch):
     assert "SECRET" not in canonical_json(immutable.failure_summary(error))
 
 
-def test_fixed_native_success_calls_only_the_immutable_flag_not_an_unlock(monkeypatch):
+@pytest.mark.parametrize("initial,expected", [(0, 2), (64, 66)])
+def test_fixed_native_success_preserves_observed_tracked_and_never_unlocks(monkeypatch, initial, expected):
     calls = []
     class Operation:
         def __call__(self, fd, flags): calls.append((fd, flags)); return 0
     class Library: fchflags = Operation()
     monkeypatch.setattr(immutable.ctypes, "CDLL", lambda *args, **kwargs: Library())
-    REAL_NATIVE_SET(88)
-    assert calls == [(88, 2)]
+    REAL_NATIVE_SET(88, initial_flags=initial)
+    assert calls == [(88, expected)]
 
 
 def test_factory_forgery_policy_changes_and_subclasses_refuse(h, kernel, monkeypatch):
@@ -322,3 +323,67 @@ def test_mutable_failed_flag_cannot_reset_the_independent_refusal_latch(h, kerne
             state["failed"] = False
             with pytest.raises(immutable.ImmutableMetadataRefusal): value.read()
     with pytest.raises(immutable.ImmutableMetadataRefusal): value.closed_summary()
+
+
+def test_fresh_tracked_inode_preserves_exact_66_through_original_seal_and_closure(h, kernel, monkeypatch):
+    flags, calls = kernel
+    monkeypatch.setattr(immutable, "_flags", lambda info: flags.get((info.st_dev, info.st_ino), 64))
+    with prepare(h) as value:
+        assert value.observation()["initial_flags"] == 64
+        assert value.observation()["expected_flags"] == 66
+        value.seal_once(); value.check(); assert value.read() == h.raw
+        chosen = value._anchor[0]._state_identity["seal_stamp"]
+        expected = hash_payload([*chosen, 66])
+        assert value.observation()["seal_stamp_sha256"] == expected
+    summary = value.closed_summary()
+    assert summary["expected_flags"] == 66 and summary["initial_flags"] == 64
+    assert summary["seal_stamp_sha256"] == expected
+    assert flags[h.path.stat().st_dev, h.path.stat().st_ino] == 66 and len(calls) == 1
+    assert immutable.policy()["schema"] == "si-new-kernel-immutable-metadata-policy-v2"
+    assert immutable.policy()["initial_flags_allowed"] == [0, 64]
+
+
+@pytest.mark.parametrize("initial,changed", [(0, 66), (64, 2)])
+def test_tracked_addition_or_removal_after_seal_is_not_adopted_or_restored(h, kernel, monkeypatch, initial, changed):
+    flags, unused = kernel
+    monkeypatch.setattr(immutable, "_flags", lambda info: flags.get((info.st_dev, info.st_ino), initial))
+    with pytest.raises(immutable.ImmutableMetadataRefusal):
+        with prepare(h) as value:
+            value.seal_once(); info = h.path.stat(); key = info.st_dev, info.st_ino
+            flags[key] = changed
+            with pytest.raises(immutable.ImmutableMetadataRefusal, match="flags_changed"): value.check()
+            flags[key] = initial | 2
+            with pytest.raises(immutable.ImmutableMetadataRefusal, match="latched_failure"): value.check()
+    with pytest.raises(immutable.ImmutableMetadataRefusal): value.closed_summary()
+
+
+@pytest.mark.parametrize("initial", [2, 66, 4, 128, 192, 0x10000])
+def test_every_other_initial_flag_value_refuses_before_any_setter(h, kernel, monkeypatch, initial):
+    flags, calls = kernel
+    monkeypatch.setattr(immutable, "_flags", lambda unused: initial)
+    with pytest.raises(immutable.ImmutableMetadataRefusal, match="initial_flags_refused"):
+        with prepare(h): pytest.fail("unknown/already-immutable flag adopted")
+    assert calls == [] and h.path.read_bytes() == h.raw
+
+
+def test_named_and_fd_initial_flags_must_match_even_when_each_value_is_allowed(h, kernel, monkeypatch):
+    observed = iter((0, 64))
+    monkeypatch.setattr(immutable, "_flags", lambda unused: next(observed))
+    with pytest.raises(immutable.ImmutableMetadataRefusal, match="initial_flags_refused"):
+        with prepare(h): pytest.fail("different initial name/FD flags adopted")
+    assert kernel[1] == []
+
+
+@pytest.mark.parametrize("initial", [False, True, -1, 2, 66, 128, "64"])
+def test_native_shim_never_accepts_arbitrary_flags_or_boolean_coercion(monkeypatch, initial):
+    def denied(*args, **kwargs): pytest.fail("invalid flags reached the native library")
+    monkeypatch.setattr(immutable.ctypes, "CDLL", denied)
+    with pytest.raises(immutable.ImmutableMetadataRefusal, match="initial_flags_refused"):
+        REAL_NATIVE_SET(77, initial_flags=initial)
+
+
+def test_platform_tracked_flag_must_match_the_explicit_64_policy(h, monkeypatch):
+    monkeypatch.setattr(immutable.stat, "UF_TRACKED", 32)
+    with pytest.raises(immutable.ImmutableMetadataRefusal, match="platform_refused"):
+        with prepare(h): pytest.fail("wrong platform flag definition accepted")
+    assert not h.path.exists()

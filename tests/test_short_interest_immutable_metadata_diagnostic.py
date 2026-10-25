@@ -31,6 +31,7 @@ def deny_external(monkeypatch):
 class Harness:
     def __init__(self, monkeypatch, root):
         self.root, self.tick, self.metadata, self.events = root, 100.0, None, []
+        self.boundary_hook = lambda: None
         self.mapping = {}
         for name in proof.code_paths():
             path = root / name
@@ -41,7 +42,7 @@ class Harness:
         class Guard:
             def __init__(unused, *args, **kwargs): pass
             def refresh(unused): self.events.append("refresh")
-            def check(unused): pass
+            def check(unused): self.boundary_hook()
             def binding(unused): return root, "c" * 40, "b" * 40
         monkeypatch.setattr(proof.previous.lane, "LaneGuard", Guard)
         monkeypatch.setattr(proof.previous.lane, "ROOT", root)
@@ -85,6 +86,21 @@ def test_registered_composition_closes_original_code_and_metadata_without_source
     assert result["authority"] == proof.authority()
     assert result["authority"]["historical_repair_established"] is False
     assert len(kernel[1]) == 1 and h.tick >= 106
+
+
+def test_genuine_registered_composition_preserves_initial_document_tracking(monkeypatch, tmp_path, kernel):
+    h = Harness(monkeypatch, tmp_path)
+    def inherit_tracked():
+        if h.path.exists():
+            info = h.path.stat()
+            kernel[0].setdefault((info.st_dev, info.st_ino), 64)
+    h.boundary_hook = inherit_tracked
+    result = h.run()
+    assert result["status"] == "closed_offline_new_inode_only"
+    observed = h.metadata.closed_summary()
+    assert observed["initial_flags"] == 64 and observed["expected_flags"] == 66
+    assert result["seal_stamp_sha256"] == observed["seal_stamp_sha256"]
+    assert len(kernel[1]) == 1
 
 
 @pytest.mark.parametrize("when", ["code_exit", "fresh_code", "after_metadata_close", "output_close", "output_close_code"])
@@ -158,7 +174,7 @@ def test_code_change_before_final_exit_cannot_emit_closed_result(monkeypatch, tm
 
 def test_kernel_noop_cannot_be_published_as_a_pass(monkeypatch, tmp_path, kernel):
     h = Harness(monkeypatch, tmp_path)
-    monkeypatch.setattr(immutable, "_native_set", lambda unused: None)
+    monkeypatch.setattr(immutable, "_native_set", lambda unused, **kwargs: None)
     with pytest.raises(immutable.ImmutableMetadataRefusal, match="flags_changed"): h.run()
 
 

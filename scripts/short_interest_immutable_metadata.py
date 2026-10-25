@@ -17,6 +17,7 @@ from scripts import short_interest_new_metadata_custody as creator
 
 LIBRARY = "/usr/lib/libSystem.B.dylib"
 IMMUTABLE_FLAG = 2
+TRACKED_FLAG = 64
 _MINTED = {}  # One finite operational object; retain original identities until process exit.
 _SEALED = {}
 _ISSUED = {}  # Populated only by successful terminal factory exit, never caller state.
@@ -27,6 +28,7 @@ _ERRNOS = {getattr(errno, name): name for name in (
 _CODES = frozenset("""immutable_platform_refused immutable_kernel_unavailable
 immutable_kernel_set_refused immutable_kernel_result_changed immutable_flags_changed
 immutable_initial_flags_not_zero immutable_factory_required immutable_binding_changed
+immutable_initial_flags_refused
 immutable_latched_failure immutable_not_live immutable_not_sealed immutable_stamp_changed
 immutable_seal_changed immutable_original_bytes_changed immutable_not_closed
 immutable_read_bound_refused""".split())
@@ -56,18 +58,20 @@ def failure_summary(error):
 
 def _platform():
     require(sys.platform == "darwin" and getattr(stat, "UF_IMMUTABLE", None) == IMMUTABLE_FLAG
+        and getattr(stat, "UF_TRACKED", None) == TRACKED_FLAG and TRACKED_FLAG == 64
         and IMMUTABLE_FLAG == 2 and LIBRARY == "/usr/lib/libSystem.B.dylib", "immutable_platform_refused")
 
 
-def _native_set(fd):
+def _native_set(fd, initial_flags=0):
     """Darwin's fixed int fchflags(int, unsigned int); never path-based chflags."""
     _platform()
+    require(type(initial_flags) is int and initial_flags in (0, TRACKED_FLAG), "immutable_initial_flags_refused")
     try:
         library = ctypes.CDLL(LIBRARY, use_errno=True)
         operation = library.fchflags
         operation.argtypes, operation.restype = (ctypes.c_int, ctypes.c_uint), ctypes.c_int
         ctypes.set_errno(0)
-        result = operation(fd, IMMUTABLE_FLAG)
+        result = operation(fd, initial_flags | IMMUTABLE_FLAG)
         number = ctypes.get_errno()
     except (OSError, AttributeError):
         raise ImmutableMetadataRefusal("immutable_kernel_unavailable") from None
@@ -126,8 +130,10 @@ class ImmutableMetadataCustody:
             require(type(issued) is tuple and len(issued) == 5 and issued[0] is self and issued[1] is anchor
                 and state["closed_raw"] is issued[2] and type(issued[2]) is bytes
                 and state["seal"] is issued[3] and issued[4] == anchor[5], "immutable_binding_changed")
-        cap, original, original_state, unused_fd, unused_boundary, policy_sha = anchor
+        cap, original, original_state, unused_fd, unused_boundary, policy_sha, initial, target = anchor
         require(policy_sha == hash_payload(policy()), "immutable_binding_changed")
+        require(type(initial) is int and initial in (0, TRACKED_FLAG)
+            and type(target) is int and target == (initial | IMMUTABLE_FLAG), "immutable_binding_changed")
         require(type(cap) is creator.NewMetadataCustody and cap._anchor is cap._identity is original
             and cap._state is cap._state_identity is original_state, "immutable_binding_changed")
         cap._guard()
@@ -139,7 +145,7 @@ class ImmutableMetadataCustody:
 
     def _audit(self):
         anchor, state = self._binding()
-        cap, original, unused_state, fd, boundary, unused_policy = anchor
+        cap, original, unused_state, fd, boundary, unused_policy, unused_initial, target = anchor
         cap._owned(); boundary()
         require(fcntl.fcntl(fd, fcntl.F_GETFL) & os.O_ACCMODE == os.O_RDONLY,
             "immutable_binding_changed")
@@ -148,7 +154,7 @@ class ImmutableMetadataCustody:
             for info in observations:
                 creator._protected(info, original[8])
                 require(creator._stamp(info)[5:7] == original[8][5:7], "immutable_stamp_changed")
-                require(_flags(info) == IMMUTABLE_FLAG, "immutable_flags_changed")
+                require(_flags(info) == target, "immutable_flags_changed")
                 if state["seal"] is not None:
                     require(_stamp(info) == state["seal"], "immutable_stamp_changed")
             return observations
@@ -161,7 +167,7 @@ class ImmutableMetadataCustody:
             self._audit(); cap = anchor[0]; cap.seal_once()
             chosen = cap._state_identity["seal_stamp"]
             require(type(chosen) is tuple and len(chosen) == 8, "immutable_seal_changed")
-            state["seal"], state["held"] = (*chosen, IMMUTABLE_FLAG), cap._held_identity
+            state["seal"], state["held"] = (*chosen, anchor[7]), cap._held_identity
             _SEALED[id(self)] = self, anchor, state["seal"], state["held"]
             self.check(); return self
         except BaseException: self._latch(); raise
@@ -188,6 +194,7 @@ class ImmutableMetadataCustody:
                 "phase": "REFUSED" if state["failed"] else "CLOSED" if state["closed"] else "SEALED" if state["seal"] else "UNSEALED",
                 "expected_raw_sha256": hash_bytes(anchor[1][3]), "bytes": len(anchor[1][3]),
                 "immutable_flag": IMMUTABLE_FLAG,
+                "initial_flags": anchor[6], "expected_flags": anchor[7],
                 "seal_stamp_sha256": None if state["seal"] is None else hash_payload(list(state["seal"])),
                 "policy_sha256": anchor[5], "original_creator_observation": anchor[0].observation(),
                 "authority": authority()}
@@ -207,27 +214,32 @@ def prepare_owned_immutable_metadata(owned, name, raw, *, parent=True, boundary,
                                      monotonic=time.monotonic, sleep=time.sleep):
     """One fresh creator invocation; no old-file or caller-capability input."""
     _platform()
-    fd, value, flagged, original = None, None, False, None
+    fd, value, flagged, original, target = None, None, False, None, None
     state = {"failed": False, "closed": False, "seal": None, "held": None, "closed_raw": None}
     try:
         def guarded_boundary():
             boundary()
             if flagged:
                 for info in (os.fstat(fd), os.stat(original[2], dir_fd=original[6], follow_symlinks=False)):
-                    require(_flags(info) == IMMUTABLE_FLAG, "immutable_flags_changed")
+                    require(_flags(info) == target, "immutable_flags_changed")
         with creator.prepare_owned_metadata(owned, name, raw, parent=parent, boundary=guarded_boundary,
                 monotonic=monotonic, sleep=sleep) as cap:
             original, original_state = cap._anchor, cap._state_identity
             require(original_state["phase"] == "UNSEALED" and not original_state["attempted"], "immutable_binding_changed")
             fd = os.dup(original[7])
             require(fcntl.fcntl(fd, fcntl.F_GETFL) & os.O_ACCMODE == os.O_RDONLY, "immutable_binding_changed")
-            for info in (os.fstat(fd), os.stat(original[2], dir_fd=original[6], follow_symlinks=False)):
+            observed = os.fstat(fd), os.stat(original[2], dir_fd=original[6], follow_symlinks=False)
+            for info in observed:
                 creator._protected(info, original[8])
-                require(_flags(info) == 0, "immutable_initial_flags_not_zero")
-            _native_set(fd)
+            initial_flags = tuple(_flags(info) for info in observed)
+            require(type(initial_flags[0]) is int and type(initial_flags[1]) is int
+                and initial_flags[0] == initial_flags[1] and initial_flags[0] in (0, TRACKED_FLAG),
+                "immutable_initial_flags_refused")
+            initial, target = initial_flags[0], initial_flags[0] | IMMUTABLE_FLAG
+            _native_set(fd, initial_flags=initial)
             flagged = True
             value = object.__new__(ImmutableMetadataCustody)
-            anchor = cap, original, original_state, fd, guarded_boundary, hash_payload(policy())
+            anchor = cap, original, original_state, fd, guarded_boundary, hash_payload(policy()), initial, target
             value._anchor = value._identity = anchor
             _MINTED[id(value)] = value, anchor, state
             value._audit()
@@ -258,9 +270,10 @@ def prepare_owned_immutable_metadata(owned, name, raw, *, parent=True, boundary,
 
 
 def policy():
-    return {"schema": "si-new-kernel-immutable-metadata-policy-v1", "library": LIBRARY,
+    return {"schema": "si-new-kernel-immutable-metadata-policy-v2", "library": LIBRARY,
         "symbol": "fchflags", "ABI": "int(int,unsigned_int)", "flag": IMMUTABLE_FLAG,
-        "maximum_bytes": 1024, "initial_flags": 0,
+        "maximum_bytes": 1024, "initial_flags_allowed": [0, TRACKED_FLAG],
+        "tracked_flag": TRACKED_FLAG, "target_flags": "observed_initial_flags_OR_UF_IMMUTABLE",
         "scope": "THIS_invocation_original_creator_O_EXCL_inode_only",
         "seal": "UF_IMMUTABLE_before_one_original_eight_field_seal_plus_strict_flags_nine_field_seal",
         "closure": "original_context_exit_then_original_retained_readonly_dup_bytes_and_same_nine_field_stamp",

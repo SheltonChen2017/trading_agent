@@ -17,11 +17,11 @@ from scripts import short_interest_immutable_metadata as immutable
 
 DRIVER = "scripts/diagnose_short_interest_immutable_metadata.py"
 HELPER = "scripts/short_interest_immutable_metadata.py"
-NAMESPACE = "kernel-immutable-metadata-20261025-v1"
+NAMESPACE = "kernel-immutable-metadata-20261025-v2"
 OUTPUT = previous.OUTPUT.parent / NAMESPACE
 NAME = "one-safe-nonclaim.private.json"
 MAXIMUM_SECONDS, HOLD_SECONDS = 120, 5
-PROTOCOL_SHA256 = "92a899007f297c9297e7310b78be1936dc5e8c1595fd385e7d55f1b04bd38476"
+PROTOCOL_SHA256 = "131d639a9feb274e095c7d4970df00efd5841837b7c2506980954f30ea718e80"
 _CODES = frozenset("""
 immutable_proof_registration_changed immutable_proof_driver_changed
 immutable_proof_manifest_changed immutable_proof_code_changed immutable_proof_deadline
@@ -63,13 +63,15 @@ def code_paths():
 
 
 def protocol():
-    return {"schema": "si-kernel-immutable-metadata-proof-policy-v1",
-        "decision": "SI-DEC-20261025-05", "authority_id": "SI-AUTH-20261025-01",
+    return {"schema": "si-kernel-immutable-metadata-proof-policy-v2",
+        "decision": "SI-DEC-20261025-07", "authority_id": "SI-AUTH-20261025-01",
         "driver": DRIVER, "helper": HELPER, "output": str(OUTPUT), "name": NAME,
         "immutable_helper_policy_sha256": hash_payload(immutable.policy()),
         "raw_sha256": hash_bytes(previous.metadata_bytes()), "bytes": 186,
         "maximum_seconds": MAXIMUM_SECONDS, "minimum_hold_seconds": HOLD_SECONDS,
-        "new_inodes": 1, "retries": 0, "flag": "FD_UF_IMMUTABLE_before_first_seal_never_clear",
+        "new_inodes": 1, "retries": 0,
+        "flag": "FD_preserve_original_UF_TRACKED_add_UF_IMMUTABLE_before_first_seal_never_clear",
+        "initial_flags_allowed": [0, 64], "original_failed_v1_reopened": False,
         "challenge": ["write_open", "same_mode_fchmod", "fixed_fsetxattr"],
         "required_errno": "EPERM", "old_evidence_reopened": False,
         "closure": "all_original_code_and_metadata_context_exits_then_fresh_committed_code_and_original_nine_field_byte_audit",
@@ -89,7 +91,8 @@ def _original(fd, owned, expected, raw):
     owned.check()
     for info in (os.fstat(fd), os.stat(NAME, dir_fd=owned._anchor[2], follow_symlinks=False)):
         require(stat.S_ISREG(info.st_mode) and hash_payload(list(_stamp(info))) == expected
-            and immutable._flags(info) == stat.UF_IMMUTABLE, "immutable_proof_original_stamp_changed")
+            and immutable._flags(info) in (stat.UF_IMMUTABLE, stat.UF_IMMUTABLE | stat.UF_TRACKED),
+            "immutable_proof_original_stamp_changed")
     os.lseek(fd, 0, os.SEEK_SET)
     require(os.read(fd, 1025) == raw, "immutable_proof_original_bytes_changed")
     require(hash_payload(list(_stamp(os.fstat(fd)))) == expected,
@@ -226,7 +229,7 @@ def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest)
                     capability.check(); guard.refresh(); window()
                 closed = capability.closed_summary()
                 _original(fd, owned, expected, raw); guard.refresh(); window()
-                result = {"schema": "si-kernel-immutable-metadata-proof-closed-v1",
+                result = {"schema": "si-kernel-immutable-metadata-proof-closed-v2",
                     "status": "closed_offline_new_inode_only", "runtime_head": runtime_head,
                     "actual_remote": actual_remote, "code_identity_sha256": identity,
                     "code_manifest_sha256": hash_payload(complete_code_manifest),

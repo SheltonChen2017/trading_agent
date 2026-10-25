@@ -7,6 +7,9 @@ CUSTODY IS VERIFIED; NO PURCHASE. QC/SAFARI ARE CONDITIONALLY AUTHORIZED ONLY
 AFTER THE NEXT TARGET PRICE REVISION LANE PUSH (SECTION125.3); THAT GATE IS
 STILL CLOSED.
 LOCAL BACKTEST READINESS REMAINS FALSE.
+ACTUAL FIRST KERNEL PROOF REFUSED BEFORE FLAG SETTING BECAUSE THE NEW FILE
+ALREADY HAD UF_TRACKED. THE FAILED NAMESPACE IS PRESERVED; A PROSPECTIVE
+PRESERVE-TRACKED ADAPTER CORRECTION IS IN DEVELOPMENT (SECTION125.8).
 PRIOR ROUND: CODEX COUNTER-REVIEW OF CLAUDE `b648f60` ACCEPTED AFTER ONE APPENDED
 COUNT-SCOPE ARITHMETIC ERRATUM (SECTION 124). OWNER-DIRECTED BOUNDED RECOVERY
 AND SECRET-SAFE DIAGNOSTICS ARE IMPLEMENTED. ACTUAL V2 AND V3 INITIALIZATION
@@ -23293,3 +23296,100 @@ the same focused/three-active-doc selection **176passed in5.93s**, no skips or
 warnings, network denied. The earlier176/6.95s remains separately attributed.
 All development agents are completed/frozen; no actual operation or test
 session is active. Only the seven declared new-round paths may be staged.
+
+### 125.8 Actual first kernel proof refused; exact new-file flag identified
+
+The ONE registered proof at clean
+`358b0d79d6e8840197f0eef9743c2b7ea59ce41b` / matching tracking/actual
+originD50 terminated exec44895 **exit2**. Started stdout was observed, followed
+by fixed category local_contract_refusal / contract
+`immutable_initial_flags_not_zero`, errno null. All eight denial-seam counters
+were0, source replay0, provider/key/capture/claim/START/chargedbytes0;
+590 permitted lane-Git metadata calls. It failed BEFORE the native immutable
+setter, original seal or any issued closed result. This is not kernel flag
+support proof or source/input readiness, and no missing persistent negative
+or closed control is invented: this operation returns terminal safe stdout.
+Preserve this invocation and namespace permanently; it will not run again.
+
+Main's guarded read-only terminal inspection found EXACTLY ONE new safe
+`one-safe-nonclaim.private.json` in `kernel-immutable-metadata-20261025-v1`,
+0600/owner/singlelink/exact186 registered bytes, RAW SHA256
+`12ae326d30644e70437533d333360dc75e1fb9d72f8e6c6edaa93917ff7b7404`.
+The only set file flag is UF_TRACKED64, with no unknown bits. The complete
+9-field stamp and flags stayed unchanged during that read. It was not
+immutable-flagged, resealed, deleted, overwritten or adopted afterward.
+
+**SI-BUILD-20261025-014 (P2, verified prospective adapter incompatibility):**
+the zero-initial-flags requirement necessarily rejects this genuine fresh
+inode's UF_TRACKED. [Apple's FileFlags source](https://github.com/apple/swift-system/blob/main/Sources/System/FileSystem/FileFlags.swift)
+and [Darwin stat definitions](https://github.com/apple/darwin-xnu/blob/main/bsd/sys/stat.h)
+identify it as document-ID tracking, value0x40 and owner-settable. This
+establishes the precise new initial-flags refusal, NOT who set that flag,
+the actor behind old ctime changes or historical count022's cause.
+
+**SI-DEC-20261025-07** prospectively corrects ONLY this lane helper/driver and
+their tests: allow initial0 or UF_TRACKED64 on THIS-factory fresh inode,
+require matching FD/name flags, preserve the observed tracked bit and add
+UF_IMMUTABLE via FD as initial|2. Unknown/protection/synthetic flags refuse;
+no bit is deliberately cleared, no old file is adopted and all resulting
+2-or66 flags plus original8 fields/bytes stay exact after the one seal.
+Independent original-seal, terminal-issued witness and failure latch remain.
+The old zero-only code/protocol is retained at358B and its failed file stays
+untouched. This is a causally verified adapter correction, not guessing with
+larger windows, weaker postseal checks or repeated source claims.
+
+Only after fabricated native-ABI66/preserve-tracked/unknown-flag/postseal-drift/
+closure regressions, complete diff/compile/import checks and a NEW clean
+checkpoint may ONE separately frozen prospective V2 NONCLAIM proof use new
+`kernel-immutable-metadata-20261025-v2`. All one-inode/186byte/120second/5second
+hold/no-retry/zero-source/provider/key/claim bounds and original final audits
+remain. No V2 invocation yet; historical actors001/006/022 stay UNKNOWN,
+source recovery remains held, Target Price QC/Safari gate remains closed.
+
+### 125.9 Corrected V2 checkpoint and finite prospective proof registration
+
+Finding014 is corrected prospectively in software; its actual V1 failure and
+all older evidence remain unchanged. The V2 helper requires identical initial
+FD/name integer flags0 or64, adds immutable2 without clearing tracked64, and
+binds the exact target2 or66 through the original8-field seal and strict ninth
+field, permanent failure latch and terminal-issued closure. The driver uses
+decision07 and the new V2 namespace only. No old file is opened or adopted.
+
+Main's six-file focused helper/driver/budget/original-creator/import/record
+selection passed193tests/6.07s at PENDING registration; only the protocol
+literal was frozen afterward. Main's memory-only wrong-initial0 call in the
+actual public registered composition produced1expected causal failure/.13s;
+on-disk bytes were not reversed. Delegated author56helper plus50original
+tests106/.62s; initial-zero and native-OR causal reversals each produced
+1expected failure/.08s and/.09s, restored. A separate development peer tested
+the frozen four helper/driver/test files:79passed/5.10s, matching pre/post
+hashes. This is not Claude review, source qualification or actual kernel proof.
+
+Frozen V2 proof protocol SHA256
+`131d639a9feb274e095c7d4970df00efd5841837b7c2506980954f30ea718e80`;
+helper policy SHA256
+`ccfc2afbed0ba2f3732de044a14402bcaa7c7d5c49cfa922c25ee717fd14596e`;
+unchanged exact60-path list SHA256
+`fe25a1e2f121012d77b2d23dc2689388aec35adc2d702b3c27b304ca378ad788`;
+current60-byte mapping SHA256
+`3ea6ec7dbcae48326eb471c3b771ea185e4e227f008f6d4204d55f775068116d`.
+The new wrapper policy schema si-offline-kernel-metadata-proof-harness-v2 has
+SHA256 `9d3ee1ab0e918eeeb6635b2707b6d1db8c73a2f495d5a4aae66edcdefbcac7ac`.
+It binds decision07, observed initial[0,64] preservation, exact V2 mapping/
+protocol/namespace, one186-byte inode,120seconds/5second hold/no retry and
+the unchanged zero-source/provider/key/claim/START/chargedbyte restrictions.
+All eight denied-seam counters must stay0; real kernel challenges stay real.
+Only a known exit0 and original genuine post-context closed summary qualify
+this finite primitive. No actual V2 operation has run at this entry.
+
+Next: Main final restored focused/static/active-doc/diff/historical-preservation
+checks, a clean committed checkpoint with exact runtime identity, then ONE
+registered offline V2 proof. All agents freeze during it. No source recovery,
+QC/Safari/Mia access, interim push or outcome look is authorized by this proof.
+
+Main's final fresh-process restored six-file selection plus the three named
+active-document checks passed196tests/6.08s, no skips/warnings, OS network
+denied. An initial invocation named a nonexistent active-document test FILE
+and collected no tests (exit4); the corrected consistency-file selection is
+the196-pass result, not a repaired production failure. Exact60-path AST closure,
+fixed own-contract catalogue, in-memory compilation and whitespace passed.

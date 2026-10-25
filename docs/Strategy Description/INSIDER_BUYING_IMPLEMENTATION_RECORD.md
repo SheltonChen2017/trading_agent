@@ -31705,3 +31705,78 @@ images and this record found no matching live-secret shape. `git diff
 dirt, and matching origin still exactly`336b8477`. No source edit followed
 the real operations. Publication verification occurs after the single push;
 this prepublication record does not invent its future success.
+
+## 223. Owner-directed pilot SEC coverage/reuse audit preregistration (2026-10-25)
+
+Owner now directs: proceed with the2021–2025 SEC parent coverage/reuse audit,
+continue until honest backtesting readiness or a concrete blocker, keep QC
+untouched, document everything and push once. This is an implementation round
+starting at exact local/matching remote
+`41d729aff80752cdc1ad6ef73690d9c59711d712`, clean on initial verification; no
+new incoming independent-review range exists. Standing continuous-build and
+delegated routine engineering judgment apply. New work is not independently
+reviewed merely because its implementation tests pass. The monitor remains
+PAUSED. No intermediate push, side branch or alternate checkout is permitted.
+
+**Correction to222:** availability of QC is a later native identity/parity
+dependency, NOT the next prerequisite for accession-level offline SEC work.
+The retained25-quarter source and master-index archives are available. The
+earlier wording that the next build requires native QC access overstates that
+dependency; this additive correction supersedes that sequencing statement,
+without changing any historical operation or pretending native evidence exists.
+
+Bounded audit definition: interpret only SUBMISSION metadata in2020Q1–2026Q1
+(25context quarters,20pilot quarters2021Q1–2025Q4), preserving all six forms,
+source ordinals, raw CIK/date/symbol fields, short-CIK comparisons, archive/
+member/profile hashes and exhaustive ordered row/count digests. Cross-check
+the genuine successful selector-v2 terminal/control lineage, not the failed
+predecessor's equal selection bytes. Parse the25 retained quarterly master
+indexes from their request-bound gzip/decoded receipt pins; use their exact
+archive paths, never derive a filing URL from issuer CIK. Unique aliases and
+single issuer-matching aliases are explicitly distinguished from unresolved
+locator conflicts. Native SID is not an input to this custody join.
+
+Inventory every explicit retained operational root, including earlier failed
+complete-submission/XML scopes, master/selected-parent campaigns, both original
+and stopped-v3 campaigns, both separately journaled diagnostics, current v4
+global claims and the separate2006 original-parent claims. Planned requests
+alone are not dispatch evidence. Claims, reservations, starts, refusals and
+unmatched starts conservatively suppress redispatch across request profiles.
+Original-body current SHA/size verification is a SEPARATE axis from dispatch
+history and is not complete-parent admission. The separate accepted diagnostic
+body cannot erase the original v3 unmatched start. XML/header/master evidence
+must not be counted as a full original-parent body. Unknown/conflicting source
+evidence cannot be relabeled unattempted. No old consumed scope is retried.
+
+Prospective operation
+`ib-pilot-sec-parent-coverage-reuse-20261025-once` uses NEW source/test images
+and a fresh ignored private namespace under
+`artifacts/insider_buying/pilot_sec_parent_audit_v1`. Qualify and commit those
+images before actual intake, require clean exact source HEAD, and freeze all
+tracked writers during execution. One trusted OS-unsandboxed control parent
+(Python audit guard is defense in depth, not native isolation) verifies Git
+and publishes exclusive bounded reservation/terminal/complete controls. One
+initial native sandboxed worker must demonstrate process-tree network, fork,
+all-write and direct Keychain-exec denial before source intake; no nested
+Seatbelt workaround, test-only transport substitution, live credentials or
+provider route is part of this operation. Fresh output controls are not raw
+financial data or a rewritten old receipt. Full per-filing accounting is
+consumed and digest-bound; the first operation does not publish a million-row
+executable request queue or confer dispatch authority.
+
+The observed audit, not this preregistration, will establish new counts. Prior
+metadata totals remain1,008,318 pilot submissions/921,570 relevant Form4/4-A
+and1,281,147 context submissions/1,163,648 relevant; these must be independently
+rederived, not asserted as new observations. The old two-quarter custody total
+19,846 source-bound is distinct from consumed-accession count and is not a
+pilot-wide corpus. This round leaves the original82-quarter study, separate
+exploratory pilot economics/splits/overlap disclosures, strictD23, frozen IB1C
+v1/scale/pilot, four current-byte-bound v3 files and stopped1846/1847 state
+untouched. Both distinct final historical authorization/incident dispositions
+remain binding, without retroactive approval. Six carried OPEN P2s and all
+resolved findings remain at their exact scopes. No outcome look, QC access,
+SDK/job/backtest, other lane/shared behavior, purchase or trading authority is
+created. Continue genuine available offline work after the audit; if required
+source evidence or external input truly blocks that work, record the precise
+fact and next action rather than manufacturing readiness or stopping merely
+at another routine engineering checkpoint.

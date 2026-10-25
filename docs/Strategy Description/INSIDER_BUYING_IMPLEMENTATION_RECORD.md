@@ -33492,3 +33492,230 @@ preparation. Only AFTER successful preparation/source comparison/kernel check
 may one selected new control-only cell run in the existing project. No archive
 download, native dataset query, strategy job, registered outcome look or
 backtest is activated by this qualification. Continue building; no interim push.
+
+## 252. Observed retained Q2 directory qualification (2026-10-25)
+
+250's registered read-only retained-format operation executed ONCE on clean
+ALREADY-EXISTING `7458c598b97f61a21d1c2023ef8451bf1afa6740`, all source writers
+frozen. Main observed5.975792125s guarded parent span, exit0/stderr0. Initially
+native-denied worker held/rechecked the original nine custody leaves; trusted
+parent independently rooted the original106-source witness to6011ae9d before
+accepting/stripping it. No new HTTP, contact/credential, QC, raw-parent, outcome
+or backtest action; original failed/opaque producer disposition is unchanged.
+
+| Observed identity | SHA256 |
+|---|---|
+|current110-source inventory|`323d42fa5b3ac8d0676b17167aa4a7abdd7f8e11ffe2250fddc846a89d549199`|
+|public result|`310b51b9a59a6283dbf7cbefd1e74e282073ebd55c0c9d649b79a570b330e751`|
+|qualification|`8eb544b34d40ef2ae58402e109edda5777246d8cc159f5dd523914c0ff432cb5`|
+|registration|`801d3942a0af58beb104909f5c5537010a821acfa7d571bccc05c96a50d8e0f2`|
+|ordered64-entry inventory|`2d2aaeeb8b6bb75ed5d3e65395a2e1c5b54a7ab5d39f37543ac2d0eb3ed3d288`|
+|164,383B worker stdout|`c3282068f3faba5d68e685a10f7b39cf77c5522da6d9fc8c68476f29f1ec0ac6`|
+
+All64 exact five-string advertisements qualified; actual href form is relative
+filename in every row. The original8,695B body `fa08fe5fefb4f4514a71e2c0192614dd649b05285e9050d1986e134fa602775c`
+and complete `1590c2723a1f0745247791116dddada391708819cd50c713bb3a68fe2a441361`
+remain unchanged. Fixed request URL, not opaque directory name/parent display
+strings, binds2021Q2. Positive KB lexemes are advertisements with unknown byte
+base/rounding, NOT measured archive lengths or corpus volume.
+
+Deterministic minimum same-unit advertised magnitude is ordinal56,
+`20210618.nc.tar.gz`, `291592 KB`, href exactly that filename, qualified URL
+`https://www.sec.gov/Archives/edgar/Feed/2021/QTR2/20210618.nc.tar.gz`.
+Canonical row SHA `7f645dbfdb5d852f05d4508627ec3a9e1c1c8346adae8f4f3700788fff46b5f1`.
+This is a format-sample candidate, not a representative/economic selection or
+an acquired archive. Both spent directory URLs remain permanently consumed.
+
+## 253. Observed fixed64 original-parent structural assessment (2026-10-25)
+
+249's registered assessment executed ONCE on clean existing7458c598, writers
+frozen: main observed8.194711459s, exit0/stderr0, **64 projected/0 quarantined,
+650,349B conserved**. Unchanged frozen complete-submission parser verified full
+envelope/document accounting, exact primary ownership XML and header/XML
+issuer/reporting-owner agreement. No financial fields were parsed; raw14-digit
+acceptance text remains uninterpreted, not independent timezone/PIT evidence.
+
+| Observed identity | SHA256 |
+|---|---|
+|original103-source capture inventory,1bb03b8e|`908600f5c405dcc4fe21c7a77c7c1bb58e9c3d98be8dd8fd02d3b3beefaa284a`|
+|current107-source inventory,7458c598|`709fa92cb2f30ddc485de553cf0b17cb8ab2e904ffb09902c80f78f435f8c910`|
+|assessment|`f0a2cac2773c6b79b2d82c4e82264009ec8ce52189c77d0dbd7d0e56cf2d842f`|
+|ordered64 rows|`91f7b1d5703cc5168c63d28f2260ad44199d953879b4018744bb05aadb604e11`|
+|public result|`2a022bdd68e4c375c4f614d184a541ab37371ddbd7fac6b318222bc3ee5ce36b`|
+|registration|`c39bf6538df150c5498f9d273995239cdcf16cea0314b6b7a2db2dcd9ce32eaf`|
+|1,144,231B worker stdout|`530fe5152704274123364a0202ca28784ff18036c1be451568e4361bfe5bd335`|
+
+The real full64 control witness exceeded the old1MiB codec, validating251's
+specific capacity correction; no old decoder was changed. Initially denied
+child rechecked exact originals; parent Git-proved EVERY original source
+after witness return/before public acceptance, then omitted witness. No new
+provider/credential/QC/look/backtest action or original custody mutation.
+Only these64 are structurally assessed, not921,570 pilot targets or the full
+study. Legacy19,846/99,394 receipt and unresolved differences remain unchanged.
+
+The expected bulk issuer set, independently cross-checked against original
+header/XML rather than guessed from reporter/path, contains51 sorted CIKs:
+
+```text
+0000006281 0000019612 0000070318 0000072573 0000100885 0000716634
+0000737468 0000844856 0000861838 0000874866 0000877890 0000908255
+0000946673 0001015328 0001018840 0001058090 0001082923 0001084554
+0001124610 0001133818 0001136893 0001141391 0001171759 0001177394
+0001178253 0001287865 0001305323 0001309108 0001314152 0001320695
+0001379785 0001423689 0001438423 0001506293 0001533998 0001555280
+0001593034 0001640147 0001640455 0001671933 0001676479 0001682265
+0001709768 0001710072 0001740547 0001741231 0001773751 0001792580
+0001805284 0001831270 0001831617
+```
+
+This array is a main-observed SEC structural output, not native security
+mapping, historical share-class/listing evidence or entry admission.
+
+## 254. Local control intent and observed one-shot QC acknowledgement (2026-10-25)
+
+248's first LOCAL preparation invocation mistakenly wrapped the already
+native-sandboxing helper in another sandbox-exec. It refused source preflight
+BEFORE namespace/nonce/intent/QC. Source-only diagnostic
+`ib-qc-cloud-control-source-only-launch-observation-20261025-once` on clean7458
+observed child exit71/stdout0/stderr53B and finite classification of
+`sandbox-exec: sandbox_apply: Operation not permitted`; source inventory
+`91ee4dfbe89118a9907d9dd0e4fc2bc0950372f6f571d356d946637d4c07c80b`.
+This was main's wrapper error, not an acquisition or cloud failure. A separate
+diagnostic expected-source-proof comparison was false and is NOT used as
+causal proof. No claimed namespace existed and unchanged helper source was
+then invoked correctly with trusted parent OUTSIDE the native-denied child.
+
+Correct preparation on clean7458 succeeded once,37.282899667s observed parent
+span, publishing the permanent local intent before returning source. No
+credential/QC action by preparer. Exact identities:
+
+| Own control | SHA256 |
+|---|---|
+|full5,922B generated cell|`80239d696d363da2c8cfe09888fb0f8afa4e151920ead013e39d03725f3f82a1`|
+|generic core|`5cf607974855212f952129a3d4b17138b7a77f43a654878070694ecd0d21e57b`|
+|registration|`1e00712e81e04ae81162cfe221e7e68fde22b464b7acd0093054abe713840e38`|
+|permanent local intent|`86d7f4ea2c3745d3a8e7fc4ed9a2d582b25a78ea3505efaa3872b6d7daa98176`|
+|ready control|`51d680c8854820572d5b77c5744335437a1f7f0fd758ca99b1e12b255c5c2566`|
+
+Exact project-prefixed own key:
+`37465795/ib-qc-cloud-control-20261025-once/040f4274a501a787ecaee89e7ba32d4c09eb9ea812e82dbe77036659cf7d369e/control.json`.
+Local scope/intent remain permanently consumed, never prepare/reset/reclaim
+or rename-retry. No old SDK namespace or original notebook was activated.
+
+Using signed-in native Safari, main created ONLY the new
+`ib_qc_cloud_control_20261025.ipynb` in existing project37465795. Transient
+filename warning cleared into the one genuine new file; no duplicate created.
+Removed only that new notebook's autogenerated logo Markdown cell (recoverable
+Undo), leaving exact cell0. Initial paste still had autogenerated QuantBook
+comment; replaced the entire new cell BEFORE execution and saved. Fully read
+saved source through contiguous bounded native selections, compared all5,922B
+and SHA against local intent, and proved EOF; truncated AX source alone was
+NOT treated as full comparison. One accidental Command-Home navigated Safari
+to Apple before execution; normal Back restored the saved project. No repeated
+source action, request or cell execution resulted.
+
+Selected Research Server Collection/Foundation-Py-Default. Main clicked only
+the selected new cell's Execute ONCE, observed connection followed by **[1],
+0.3s and save_acknowledged_true**. No Run All/build/backtest/SDK draft clicked.
+Full836B own acknowledgement was read in three bounded contiguous selections
+through Accessible View, ending at its closing brace; initial offscreen click
+and a selected-text extraction attempt failed without execution or writes.
+Main regenerated only own registration in a SECRET-FREE initially native
+network/fork/ALL-write/security-exec denied process and validated its exact
+schema/counters in0.669454375s, exit0:
+ack SHA `32b0555702bcadf63c548f95927dd7b05c62b6e8578bf839297a0cae80f0ba16`.
+Observed one own-key precheck, one save, return=true; dataset/history0,
+jobs/backtests0, fixture=false, all persistence/immutability/readiness flags
+false. Notebook saved; terminal visibly confirmed All files saved.
+
+Save=true is an SDK acknowledgement ONLY, not Object Store byte readback,
+independent persistence, atomic create-only/CAS, paid data rights or mapping
+readiness. Managed/native output suppression is not certified; no unexpected
+data output observed. Framework initialization may use internal reference
+services, so no explicit data call is not a claim of zero internal I/O.
+UI's automatic build notices (fb4ed9-a195e1,b0c9e0-a195e1,9d11a4-a195e1,
+LEAN2.5.0.0.18203) and12 editor Problems are NOT user-launched strategy runs,
+candidate compile failures or spent backtest attempts. Zero backtests launched.
+
+## 255. Register bounded native CIK candidate diagnostic (2026-10-25)
+
+Owner explicitly permits Mia on any QC/Safari issue; maintain Ask Before Edits
+and independently verify advice/changes. Claude wait remains waived. Under
+delegated build judgment, register
+`ib-qc-first64-cik-candidates-20261025-once`: a NEW separately versioned cell
+`ib_qc_cik_candidates_20261025.ipynb`, cell0/project37465795, using253's exact51
+CIKs in fixed order and date2021-03-31. This tests native candidate discovery,
+not history, financial outcomes or a strategy. No mapping query has run here.
+
+Qualify/commit new source/test pair BEFORE fresh exclusive local intent, source
+upload/comparison or execution. Bind exact clean source closure, full/core/
+registration hashes, observed assessment/ordered-row provenance and fixed CIK
+array. Fresh256-bit project-prefixed namespace; kernel marker plus permanent
+local intent; unknowns consume scope, never relookup/retry. Cloud-only start,
+per-CIK started/result and final receipts: exact own-key precheck, save and
+readback before proceeding; no listing/deletion/foreign key access. Precheck
+is NOT CAS or a guaranteed race-free create-only API. A later receipt consumer
+may consume only these exact keys without repeating any lookup.
+
+At most one `qb.cik(intCIK,trading_date=2021-03-31)` per registered CIK, at most
+16 native Symbols per CIK/512 total; complete ordered dispositions, duplicates,
+cross-CIK many-to-one and bounded refusal/underfill accounting remain CLOUD.
+Empty/fallback/nonunique results are candidates, never contemporaneous ticker,
+PIT/CIK interval/share-class/listing or canonical admission proof. No AddSecurity,
+History, fundamentals, ticker reconstruction, agent/job/backtest or ObjectStore
+data export. Candidate values/counts/bitmaps/digests stay cloud; outside only
+own source/registration/key and finite lookup/control-completion acknowledgements.
+Any known data-derived output leakage refuses the candidate. This authorizes
+only the new bounded diagnostic, not reuse of254's consumed cell or auth probe.
+
+## 256. Register one SEC daily-archive format/custody sample (2026-10-25)
+
+Delegated engineering decision: qualify free original SEC daily-archive route
+before buying another source or issuing hundreds of thousands of individual
+requests. Register ONE new sample
+`ib-sec-feed-archive-20210618-format-20261025-once`, fixed252's qualified URL,
+ordinal56/row hash/all64 inventory/original directory lineage and source images.
+Deterministic minimum same-KB advertisement is format-only, not representative
+selection, actual compressed length or a signal/outcome filter. No archive
+request has occurred at registration; spent Q1/Q2 directory URLs never repeat.
+
+Before contact/GET: qualified committed additive source/test pair, actual
+capacity check, source-only isolation proof, exact production-sized control
+roundtrips, immutable directory validation, global permanent URL claim check,
+existing accession-exposure inventory PLUS231's new64 capture/control lineage.
+Explicit bulk-overlap disposition: one archive may incidentally contain already
+consumed filings/other forms; count/quarantine them, never individually
+redispatch, extract, promote or pretend this is an accession retry. Retaining
+privacy-qualified whole compressed archive inherently retains such incidental
+bytes. No full campaign, source-window change or denominator reduction.
+
+One fixed-host HTTPS GET, identity encoding,512MiB compressed cap,600s absolute
+transport deadline, no proxy/redirect/retry/fallback; non200 body unread.
+Private contact only after reservation, permanent URL claim/fsynced start
+before transport latch. Existing8MiB parent transport/publication globals stay
+frozen; new fixed-archive wrapper required. Raw response remains bounded volatile
+memory until complete HTTP/gzip integrity and finite privacy guard approve
+hashing/private retention. Strong-native denied streaming guard checks CRC/EOF,
+trailing data,8GiB decoded/128x expansion bounds, compressed AND decoded contact
+echo with explicit supported encodings/token/depth limits. Unsupported privacy
+encoding/integrity/cap failures consume request but do NOT retain/hash body.
+Do not materialize8GiB plaintext or claim a short chunk overlap implements the
+old whole-string decoder; actual machine RAM16GiB, local available capacity
+72,188,456KiB at planning check, not a measured full-campaign storage estimate.
+
+Strict bounded TAR metadata only: checksum/alignment/path/name/type/extension/
+duplicate/quota/terminal accounting, no filesystem extraction or XML/financial
+parse. Unknown alignment means prefix-known/remainder-unknown, not complete
+enumeration. A complete privacy/integrity-qualified gzip body may remain opaque
+if TAR/PDS format is unsupported; never guess256/266-byte PDS offset, wrap an
+nc member as an original TXT, or infer acceptance/PIT from filenames. Separate
+initially native-denied readback must rehash original bytes, custody/source/
+directory/exposure lineage; no decoded filing bodies in IPC/model output.
+Only then can a later additive actual-format admission design be considered.
+No actual archive acquisition/native CIK query/backtest at this registration.
+
+Main observed72 record/active-document checks passed1.39s under SECRET-FREE
+native process-tree network/security-exec/lane-write denial, plugin/cache off
+and invented external temporary roots; diff whitespace check clean. No full
+suite. This is a local durable progress/registration commit, NOT final handoff,
+independent Claude review, an interim push or a claim of backtesting readiness.

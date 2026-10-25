@@ -2,6 +2,7 @@
 import ast
 from copy import deepcopy
 from pathlib import Path
+import json
 
 import pytest
 
@@ -133,12 +134,15 @@ def test_pure_module_has_no_capture_controller_io_or_effect_import():
 
 
 def test_design_carries_the_frozen_capture_request_bounds(inputs):
-    from research.target_price_revisions_qc import extended_source_capture as frozen
+    frozen = json.loads(inputs['repair_freeze_raw'])
+    global_limits, actions = frozen['limits'], frozen['sharadar']['datasets']['actions']
     design = m.build_design(**inputs)
     assert design['limits'] == m.LIMITS
     for key in ('max_elapsed_seconds', 'request_seconds', 'redirects', 'retries'):
-        assert design['limits'][key] == frozen.LIMITS[key]
-    assert design['limits']['max_response_bytes'] == frozen.CSV_PAGE_BYTES and design['limits']['max_requests'] == m.MAX_PAGES
+        assert design['limits'][key] == global_limits[key]
+    assert design['limits']['max_response_bytes'] == min(global_limits['max_response_bytes'], actions['max_bytes'])
+    assert design['limits']['page_bytes'] == global_limits['page_bytes']
+    assert design['limits']['max_requests'] == actions['max_pages'] == m.MAX_PAGES
 
 
 @pytest.mark.parametrize("years,accepted", [
@@ -156,3 +160,14 @@ def test_boundary_date_years_must_be_observed(inputs, years, accepted):
     else:
         with pytest.raises(m.HistoryDesignRefusal):
             m.coverage_summary(**inputs, census=census)
+
+
+@pytest.mark.parametrize('outside', ('before', 'after'))
+def test_all_outside_window_dates_remain_diagnostic_not_raw_keyerror(inputs, outside):
+    supplied = census(page_rows=[7], earliest_date='2019-01-01' if outside == 'before' else '2027-01-01',
+        latest_date='2019-12-31' if outside == 'before' else '2027-12-31',
+        in_window_year_counts={year: 0 for year in m.YEARS},
+        before_window_rows=7 if outside == 'before' else 0, after_window_rows=7 if outside == 'after' else 0)
+    result = m.coverage_summary(**inputs, census=supplied)
+    assert result['missing_requested_years'] == list(m.YEARS)
+    assert result['retained_rows'] == 7 and result['complete_requested_history_proven'] is False

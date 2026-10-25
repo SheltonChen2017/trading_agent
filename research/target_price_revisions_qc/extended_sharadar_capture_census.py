@@ -64,8 +64,20 @@ class CensusRefusal(ValueError):
     """Fixed body-free error; never retain source rows or exception text."""
 
 
+class CensusAborted(BaseException):
+    """Body-free fatal stop; deliberately not an ordinary processing error."""
+
+
 def _fail():
-    raise CensusRefusal('bounded local Sharadar census refused; no automatic retry')
+    raise CensusRefusal('bounded local Sharadar census refused; no automatic retry') from None
+
+
+def _propagate_escape(error):
+    # SystemExit's code is printed by the interpreter, so never propagate a
+    # callback-supplied payload even after its body-free receipt is durable.
+    if isinstance(error, SystemExit):
+        raise SystemExit('local census interrupted; preserve spent scope') from None
+    raise CensusAborted('local census interrupted; preserve spent scope') from None
 
 
 def _sha(raw): return hashlib.sha256(raw).hexdigest()
@@ -431,7 +443,19 @@ def _lane_identity(path, lane):
     try:
         lane_info = os.stat(lane)
     except OSError:
-        return False
+        _fail()  # Unobservable protected identity is not evidence of exclusion.
+    try:
+        candidate_info = os.stat(candidate)
+    except OSError:
+        candidate_info = None
+    if candidate_info is not None:
+        for ancestor in lane.parents:
+            try:
+                info = os.stat(ancestor)
+            except OSError:
+                _fail()
+            if (candidate_info.st_dev, candidate_info.st_ino) == (info.st_dev, info.st_ino):
+                return True
     current = candidate
     while True:
         try:
@@ -481,7 +505,7 @@ def execute(plan, *, input_root=INPUT_ROOT, output_root=OUTPUT_ROOT,
         'failure_stage': 'lock', 'lock_cleanup_complete': False, 'qc_access': False,
         'provider_access': False, 'outcome_reads': 0, 'new_looks': 0, 'quantconnect_attempts': 0,
         'inputs_changed': False, **_FALSE_FLAGS}
-    nonce, cancelled = uuid.uuid4().hex, False
+    nonce, cancelled, escaped = uuid.uuid4().hex, False, None
     def read(fd, name, maximum, *, size=None, sha256=None):
         check(); receipt['input_read_attempts'] += 1
         receipt['reserved_input_bytes'] += size if size is not None else maximum
@@ -519,12 +543,18 @@ def execute(plan, *, input_root=INPUT_ROOT, output_root=OUTPUT_ROOT,
             cancelled = True; receipt['status'] = 'CANCELLED'
         except Exception:
             receipt['status'] = 'FAILED_OR_UNCERTAIN'
+        except BaseException as error:
+            escaped = error
+            receipt['status'] = 'FAILED_OR_UNCERTAIN'
         finally:
             if source is not None:
                 try: os.close(source)
                 except KeyboardInterrupt:
                     cancelled = True; receipt['status'] = 'CANCELLED'; receipt['failure_stage'] = 'cleanup'
                 except Exception:
+                    receipt['status'] = 'CANCELLED' if cancelled else 'FAILED_OR_UNCERTAIN'; receipt['failure_stage'] = 'cleanup'
+                except BaseException as error:
+                    if escaped is None: escaped = error
                     receipt['status'] = 'CANCELLED' if cancelled else 'FAILED_OR_UNCERTAIN'; receipt['failure_stage'] = 'cleanup'
             if lock is not None:
                 try:
@@ -536,16 +566,39 @@ def execute(plan, *, input_root=INPUT_ROOT, output_root=OUTPUT_ROOT,
                     cancelled = True; receipt['status'] = 'CANCELLED'; receipt['failure_stage'] = 'cleanup'
                 except Exception:
                     receipt['status'] = 'CANCELLED' if cancelled else 'FAILED_OR_UNCERTAIN'; receipt['failure_stage'] = 'cleanup'
+                except BaseException as error:
+                    if escaped is None: escaped = error
+                    receipt['status'] = 'CANCELLED' if cancelled else 'FAILED_OR_UNCERTAIN'; receipt['failure_stage'] = 'cleanup'
                 finally:
                     try: os.close(lock)
                     except KeyboardInterrupt:
                         cancelled = True; receipt['status'] = 'CANCELLED'; receipt['failure_stage'] = 'cleanup'
                     except Exception:
                         receipt['status'] = 'CANCELLED' if cancelled else 'FAILED_OR_UNCERTAIN'; receipt['failure_stage'] = 'cleanup'
-        _publish(out, operation + '.attempt-' + nonce + '.result.json', _canonical(receipt))
+                    except BaseException as error:
+                        if escaped is None: escaped = error
+                        receipt['status'] = 'CANCELLED' if cancelled else 'FAILED_OR_UNCERTAIN'; receipt['failure_stage'] = 'cleanup'
+        try:
+            _publish(out, operation + '.attempt-' + nonce + '.result.json', _canonical(receipt))
+        except BaseException as error:
+            # Keep a newly raised publication stop in state before the outer
+            # directory close; a later close error must not demote that stop.
+            if isinstance(error, KeyboardInterrupt): cancelled = True
+            elif not isinstance(error, Exception) and escaped is None: escaped = error
+            if cancelled: raise KeyboardInterrupt('local census cancelled; preserve spent scope') from None
+            if escaped is not None: _propagate_escape(escaped)
+            _fail()  # Do not claim a durable receipt or expose publication errors.
         if cancelled: raise KeyboardInterrupt('local census cancelled; preserve spent scope')
+        if escaped is not None: _propagate_escape(escaped)
         return receipt
-    finally: os.close(out)
+    finally:
+        try: os.close(out)
+        except BaseException as error:
+            if isinstance(error, KeyboardInterrupt): cancelled = True
+            elif not isinstance(error, Exception) and escaped is None: escaped = error
+            if cancelled: raise KeyboardInterrupt('local census cancelled; preserve spent scope') from None
+            if escaped is not None: _propagate_escape(escaped)
+            _fail()
 
 
 def main(argv=None):

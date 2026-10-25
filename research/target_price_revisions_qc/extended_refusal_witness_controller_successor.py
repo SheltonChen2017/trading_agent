@@ -2,7 +2,8 @@
 
 No CLI, current permit, native adapter, credential, client or notebook is
 created. Exact inert program bytes are rebuilt for comparison, never executed.
-Current callers/tests must inject SYNTHETIC seams only. A future real
+The shipped public dispatch policy refuses every adapter. Tests temporarily
+override that fixed policy for SYNTHETIC seams only, then restore it. A future real
 read needs fresh owner-released QC scope, genuine ephemeral Mia capability and
 reviewed adapter/clock/repository bindings; passing dictionaries is not proof
 of those facts. Native reads cannot be preempted or bounded before allocation.
@@ -57,15 +58,50 @@ class ControllerReceiptUnavailable(ControllerRefusal):
     """No durable receipt was possible; no success/receipt claim is returned."""
 
 
-class ControllerCancelled(KeyboardInterrupt):
-    """Cancellation propagates only after its closed receipt is durable."""
-    def __init__(self, receipt):
-        super().__init__("prepared witness controller cancelled; no continued reads")
+class _StopReceipt:
+    """A closed accounting candidate is distinct from confirmed publication."""
+    def _store_receipt(self, receipt, published):
+        if type(published) is not bool:
+            _fail()
         self._receipt = validate_receipt(receipt)
+        self._receipt_published = published
 
     @property
     def receipt(self):
         return validate_receipt(self._receipt)
+
+    @property
+    def receipt_published(self):
+        return self._receipt_published
+
+
+class ControllerCancelled(_StopReceipt, KeyboardInterrupt):
+    """Body-free cancellation with explicit durable/unavailable accounting."""
+    def __init__(self, receipt, *, receipt_published=True):
+        self._store_receipt(receipt, receipt_published)
+        super().__init__("prepared witness controller cancelled; no continued reads; "
+            + ("receipt published" if receipt_published else "receipt unavailable"))
+
+
+class ControllerSystemExit(_StopReceipt, SystemExit):
+    """Preserve process-stop semantics without the source exception payload."""
+    def __init__(self, receipt, *, receipt_published):
+        self._store_receipt(receipt, receipt_published)
+        super().__init__("prepared witness controller stopped; no automatic retry; "
+            + ("receipt published" if receipt_published else "receipt unavailable"))
+
+
+class ControllerEscaped(_StopReceipt, BaseException):
+    """Other fatal escapes stay outside Exception and remain body-free."""
+    def __init__(self, receipt, *, receipt_published):
+        self._store_receipt(receipt, receipt_published)
+        super().__init__("prepared witness controller stopped; no automatic retry; "
+            + ("receipt published" if receipt_published else "receipt unavailable"))
+
+
+def _body_free_escape(error, receipt, *, receipt_published):
+    wrapper = ControllerSystemExit if isinstance(error, SystemExit) else ControllerEscaped
+    return wrapper(receipt, receipt_published=receipt_published)
 
 
 def _fail():
@@ -140,7 +176,19 @@ def _lane_identity(path, lane):
     try:
         lane_info = os.stat(lane)
     except OSError:
-        return False
+        return True  # Unknown directory custody is not permission to proceed.
+    try:
+        candidate_info = os.stat(candidate)
+    except OSError:
+        candidate_info = None
+    if candidate_info is not None:
+        for ancestor in lane.parents:
+            try:
+                info = os.stat(ancestor)
+            except OSError:
+                return True
+            if (candidate_info.st_dev, candidate_info.st_ino) == (info.st_dev, info.st_ino):
+                return True
     current = candidate
     while True:
         try:
@@ -307,9 +355,11 @@ def execute_prepared_read(plan, capsule, directory, *, program_raw, native_read,
             or str(Path(directory)) != checked["receipt_directory"]
             or not all(callable(item) for item in (native_read, repository_guard, utc_now, monotonic_clock))):
         _fail()
-    # Synthetic-only is enforced, not labelled: an adapter must declare itself
-    # synthetic until a reviewed change permits a genuine native adapter.
-    if not NATIVE_ADAPTER_PERMITTED and getattr(native_read, "tpr_synthetic_adapter", None) is not True:
+    # A callable's self-declared attribute cannot authenticate absence of IO.
+    # The shipped entrypoint is closed. Tests explicitly and temporarily opt
+    # this fixed policy flag in, with finally-safe restoration; no real adapter
+    # or current dispatch permission is supplied by this module.
+    if NATIVE_ADAPTER_PERMITTED is not True:
         _fail()
     frozen_plan, frozen_capsule = _canonical(checked), runtime.validate_capsule(capsule, operation_id=checked["operation_id"])
     receipt = {"schema": "tpr-ext26-witness-controller-receipt-v1", "operation_id": checked["operation_id"],
@@ -325,6 +375,8 @@ def execute_prepared_read(plan, capsule, directory, *, program_raw, native_read,
     lock = None
     cancelled = False
     escaped = None
+    final = None
+    publication_confirmed = False
     start = previous_tick = None
     previous_now = None
     issued = runtime._clock_text(checked["permit"]["issued_utc"])
@@ -410,7 +462,8 @@ def execute_prepared_read(plan, capsule, directory, *, program_raw, native_read,
         except Exception:
             receipt["status"] = "failed_or_uncertain"
         except BaseException as error:
-            # SystemExit and friends still get a durable receipt before escaping.
+            # Attempt a body-free receipt before propagating a fatal stop;
+            # publication may remain unavailable or unconfirmed.
             receipt["status"] = "failed_or_uncertain"
             escaped = error
         finally:
@@ -428,6 +481,10 @@ def execute_prepared_read(plan, capsule, directory, *, program_raw, native_read,
                     receipt["status"], receipt["failure_stage"] = "cancelled", "cleanup"
                 except Exception:
                     receipt["status"], receipt["failure_stage"] = ("cancelled" if cancelled else "failed_or_uncertain"), "cleanup"
+                except BaseException as error:
+                    if escaped is None:
+                        escaped = error
+                    receipt["status"], receipt["failure_stage"] = ("cancelled" if cancelled else "failed_or_uncertain"), "cleanup"
                 finally:
                     try:
                         os.close(lock)
@@ -436,21 +493,64 @@ def execute_prepared_read(plan, capsule, directory, *, program_raw, native_read,
                         receipt["status"], receipt["failure_stage"] = "cancelled", "cleanup"
                     except Exception:
                         receipt["status"], receipt["failure_stage"] = ("cancelled" if cancelled else "failed_or_uncertain"), "cleanup"
+                    except BaseException as error:
+                        if escaped is None:
+                            escaped = error
+                        receipt["status"], receipt["failure_stage"] = ("cancelled" if cancelled else "failed_or_uncertain"), "cleanup"
         try:
             final = validate_receipt(receipt)
         except Exception:
             raise ControllerReceiptUnavailable("prepared witness receipt unavailable; no automatic retry") from None
         try:
             _publish(fd, checked["operation_id"] + ".attempt-" + receipt["invocation_id"] + ".result.json", _canonical(final))
+            publication_confirmed = True
         except Exception:
             if cancelled:
                 # A cancellation stays a cancellation even when its receipt cannot be written.
-                raise ControllerCancelled(final) from None
+                raise ControllerCancelled(final, receipt_published=False) from None
+            if escaped is not None:
+                raise _body_free_escape(escaped, final, receipt_published=False) from None
             raise ControllerReceiptUnavailable("prepared witness receipt unavailable; no automatic retry") from None
-        if escaped is not None:
-            raise escaped
+        except KeyboardInterrupt:
+            # Retain stop state BEFORE propagating: the final directory close
+            # must not demote a newly raised publication cancellation.
+            cancelled = True
+            final = validate_receipt({**final, "status": "cancelled", "failure_stage": "post_read"})
+            raise ControllerCancelled(final, receipt_published=False) from None
+        except BaseException as error:
+            if escaped is None:
+                escaped = error
+            if cancelled:
+                final = validate_receipt({**final, "status": "cancelled", "failure_stage": "post_read"})
+                raise ControllerCancelled(final, receipt_published=False) from None
+            final = validate_receipt({**final, "status": "failed_or_uncertain", "failure_stage": "post_read"})
+            raise _body_free_escape(escaped, final, receipt_published=False) from None
         if cancelled:
             raise ControllerCancelled(final) from None
+        if escaped is not None:
+            raise _body_free_escape(escaped, final, receipt_published=True) from None
         return final
     finally:
-        os.close(fd)
+        try:
+            os.close(fd)
+        except BaseException as error:
+            # The last descriptor close cannot replace a cancellation or
+            # disclose a native/OS payload after a closed receipt was saved.
+            # Never retry an uncertain close or invent a publication result.
+            if final is not None:
+                if cancelled or isinstance(error, KeyboardInterrupt):
+                    raise ControllerCancelled(final, receipt_published=publication_confirmed) from None
+                if escaped is not None:
+                    raise _body_free_escape(escaped, final, receipt_published=publication_confirmed) from None
+                if isinstance(error, Exception):
+                    raise ControllerRefusal("prepared witness directory cleanup refused; no automatic retry") from None
+                raise _body_free_escape(error, final, receipt_published=publication_confirmed) from None
+            message = "prepared witness stopped; receipt unavailable; no automatic retry"
+            if cancelled or isinstance(error, KeyboardInterrupt):
+                raise KeyboardInterrupt(message) from None
+            fatal = escaped if escaped is not None else error
+            if isinstance(fatal, SystemExit):
+                raise SystemExit(message) from None
+            if isinstance(fatal, Exception):
+                raise ControllerReceiptUnavailable(message) from None
+            raise BaseException(message) from None

@@ -389,10 +389,11 @@ def test_case_alias_of_the_lane_is_refused_by_identity_not_text(leaves, monkeypa
     alias = Path(str(m.LANE).upper())
     if not alias.exists() or os.stat(alias).st_ino != os.stat(m.LANE).st_ino:
         pytest.skip('case-sensitive volume: no lane alias to test')
-    lane_real = os.path.realpath(m.LANE)
+    safe_directory = m._directory
     def guarded(path, **kwargs):
-        if os.path.realpath(path).startswith(lane_real): pytest.fail('alias reached the real lane')
-        return m._directory.__wrapped__(path, **kwargs) if hasattr(m._directory, '__wrapped__') else None
+        if str(path).casefold().startswith(str(m.LANE).casefold()):
+            pytest.fail('alias reached the real lane')
+        return safe_directory(path, **kwargs)
     monkeypatch.setattr(m, '_directory', guarded)
     with pytest.raises(m.CensusRefusal):
         execute(plan(), alias / 'artifacts' / 'synthetic-never-created', output)
@@ -411,3 +412,251 @@ def test_cleanup_failure_after_cancellation_keeps_the_cancelled_status(leaves, m
         execute(plan(), source, output)
     raw = next(output.glob('*.result.json')).read_bytes(); result = json.loads(raw)
     assert result['status'] == 'CANCELLED' and result['failure_stage'] == 'cleanup' and PRIVATE not in raw.decode()
+
+
+def test_unobservable_lane_identity_refuses_before_directory(leaves, monkeypatch):
+    source, output, _ = leaves
+    original = m.os.stat
+    def stat(path, *args, **kwargs):
+        if os.fspath(path) == os.fspath(m.LANE): raise OSError('synthetic lane unavailable')
+        return original(path, *args, **kwargs)
+    monkeypatch.setattr(m.os, 'stat', stat)
+    monkeypatch.setattr(m, '_directory', lambda *_args, **_kwargs: pytest.fail('unproved lane boundary reached a directory'))
+    with pytest.raises(m.CensusRefusal): execute(plan(), source, output)
+
+
+@pytest.mark.parametrize('stage', ('read', 'cleanup'))
+def test_baseexception_escape_retains_a_bodyfree_spent_receipt(leaves, monkeypatch, stage):
+    source, output, _ = leaves
+    if stage == 'read':
+        monkeypatch.setattr(m, '_read', lambda *_args, **_kwargs: (_ for _ in ()).throw(SystemExit(PRIVATE)))
+    else:
+        original = m.os.unlink
+        def unlink(name, **kwargs):
+            if name.endswith('.lock'): raise SystemExit(PRIVATE)
+            return original(name, **kwargs)
+        monkeypatch.setattr(m.os, 'unlink', unlink)
+    with pytest.raises(SystemExit) as caught: execute(plan(), source, output)
+    assert PRIVATE not in str(caught.value)
+    assert caught.value.code == 'local census interrupted; preserve spent scope'
+    paths = list(output.glob('*.result.json'))
+    assert len(paths) == 1, 'spent BaseException escape left no receipt'
+    raw = paths[0].read_bytes(); result = json.loads(raw)
+    assert result['scope_spent'] and result['status'] == 'FAILED_OR_UNCERTAIN'
+    assert result['input_read_attempts'] == 1 and result['completed_input_reads'] == (stage == 'cleanup')
+    assert PRIVATE not in raw.decode()
+
+
+def test_cancelled_scope_preserves_cancellation_when_final_publish_fails(leaves, monkeypatch):
+    source, output, _ = leaves
+    monkeypatch.setattr(m, '_read', lambda *_args, **_kwargs: (_ for _ in ()).throw(KeyboardInterrupt(PRIVATE)))
+    original = m._publish
+    def publish(fd, name, raw):
+        if name.endswith('.result.json'): raise OSError(PRIVATE)
+        return original(fd, name, raw)
+    monkeypatch.setattr(m, '_publish', publish)
+    with pytest.raises(KeyboardInterrupt, match='preserve spent scope'): execute(plan(), source, output)
+    assert (output / (INDEX_OP + '.claim.spent.json')).exists()
+    assert not list(output.glob('*.result.json'))
+
+
+class SyntheticAbort(BaseException):
+    """Synthetic stop whose payload must not escape the processing boundary."""
+
+
+@pytest.mark.parametrize('stage,publish_failure', (('read', False), ('cleanup', False), ('read', True)))
+def test_generic_stop_redacts_payload_and_preserves_spent_scope(leaves, monkeypatch, stage, publish_failure):
+    source, output, _ = leaves
+    if stage == 'read':
+        monkeypatch.setattr(m, '_read', lambda *_args, **_kwargs: (_ for _ in ()).throw(SyntheticAbort(PRIVATE)))
+    else:
+        original_unlink = m.os.unlink
+        def unlink(name, **kwargs):
+            if name.endswith('.lock'): raise SyntheticAbort(PRIVATE)
+            return original_unlink(name, **kwargs)
+        monkeypatch.setattr(m.os, 'unlink', unlink)
+    if publish_failure:
+        original_publish = m._publish
+        def publish(fd, name, raw):
+            if name.endswith('.result.json'): raise OSError(PRIVATE)
+            return original_publish(fd, name, raw)
+        monkeypatch.setattr(m, '_publish', publish)
+    with pytest.raises(BaseException) as caught: execute(plan(), source, output)
+    assert not isinstance(caught.value, Exception)
+    assert caught.value.args == ('local census interrupted; preserve spent scope',)
+    assert caught.value.__suppress_context__ is True
+    assert PRIVATE not in str(caught.value)
+    assert (output / (INDEX_OP + '.claim.spent.json')).exists()
+    results = list(output.glob('*.result.json'))
+    assert len(results) == (not publish_failure)
+    if results:
+        raw = results[0].read_bytes(); result = json.loads(raw)
+        assert result['scope_spent'] and result['status'] == 'FAILED_OR_UNCERTAIN'
+        assert PRIVATE not in raw.decode()
+
+
+@pytest.mark.parametrize('stop', (SyntheticAbort, SystemExit))
+def test_final_receipt_stop_stays_bodyfree_without_claiming_publication(leaves, monkeypatch, stop):
+    source, output, _ = leaves
+    original_publish = m._publish
+    def publish(fd, name, raw):
+        if name.endswith('.result.json'): raise stop(PRIVATE)
+        return original_publish(fd, name, raw)
+    monkeypatch.setattr(m, '_publish', publish)
+    with pytest.raises(BaseException) as caught: execute(plan(), source, output)
+    assert not isinstance(caught.value, Exception)
+    if stop is SystemExit: assert isinstance(caught.value, SystemExit)
+    assert caught.value.args == ('local census interrupted; preserve spent scope',)
+    assert caught.value.__suppress_context__ is True
+    assert (output / (INDEX_OP + '.claim.spent.json')).exists()
+    assert not list(output.glob('*.result.json'))
+
+
+@pytest.mark.parametrize('prior,close_error', (('normal', OSError), ('normal', SystemExit),
+    ('normal', SyntheticAbort), ('cancelled', SystemExit), ('aborted', OSError)))
+def test_output_directory_close_redacts_without_replacing_prior_stop(leaves, monkeypatch, prior, close_error):
+    source, output, _ = leaves
+    original_directory, original_close = m._directory, m.os.close
+    output_fd, injected = [], []
+    def directory(path, **kwargs):
+        fd = original_directory(path, **kwargs)
+        if Path(path) == output: output_fd.append(fd)
+        return fd
+    def close(fd):
+        if output_fd and fd == output_fd[0] and not injected:
+            injected.append(True)
+            original_close(fd)
+            raise close_error(PRIVATE)
+        return original_close(fd)
+    monkeypatch.setattr(m, '_directory', directory)
+    monkeypatch.setattr(m.os, 'close', close)
+    if prior != 'normal':
+        stop = KeyboardInterrupt if prior == 'cancelled' else SyntheticAbort
+        monkeypatch.setattr(m, '_read', lambda *_args, **_kwargs: (_ for _ in ()).throw(stop(PRIVATE)))
+    with pytest.raises(BaseException) as caught: execute(plan(), source, output)
+    expected = (KeyboardInterrupt if prior == 'cancelled' else BaseException if prior == 'aborted'
+        else m.CensusRefusal if close_error is OSError else SystemExit if close_error is SystemExit else BaseException)
+    assert isinstance(caught.value, expected)
+    if prior == 'aborted' or close_error is SyntheticAbort: assert not isinstance(caught.value, Exception)
+    assert PRIVATE not in str(caught.value)
+    assert caught.value.__suppress_context__ is True
+    assert injected == [True]
+    results = list(output.glob('*.result.json'))
+    assert len(results) == 1
+    result = json.loads(results[0].read_bytes())
+    assert result['status'] == ('COMPLETED_DIAGNOSTIC_ONLY' if prior == 'normal'
+        else 'CANCELLED' if prior == 'cancelled' else 'FAILED_OR_UNCERTAIN')
+
+
+@pytest.mark.parametrize('prior_cancel,publish_stop', ((False, KeyboardInterrupt),
+    (False, SystemExit), (False, SyntheticAbort), (True, SystemExit)))
+def test_final_publication_stop_survives_later_directory_close_error(leaves, monkeypatch, prior_cancel, publish_stop):
+    source, output, _ = leaves
+    original_directory, original_close, original_publish = m._directory, m.os.close, m._publish
+    output_fd, closed = [], []
+    def directory(path, **kwargs):
+        fd = original_directory(path, **kwargs)
+        if Path(path) == output: output_fd.append(fd)
+        return fd
+    def close(fd):
+        if output_fd and fd == output_fd[0] and not closed:
+            closed.append(True)
+            original_close(fd)
+            raise OSError(PRIVATE)
+        return original_close(fd)
+    def publish(fd, name, raw):
+        if name.endswith('.result.json'): raise publish_stop(PRIVATE)
+        return original_publish(fd, name, raw)
+    monkeypatch.setattr(m, '_directory', directory)
+    monkeypatch.setattr(m.os, 'close', close)
+    monkeypatch.setattr(m, '_publish', publish)
+    if prior_cancel:
+        monkeypatch.setattr(m, '_read', lambda *_args, **_kwargs: (_ for _ in ()).throw(KeyboardInterrupt(PRIVATE)))
+    with pytest.raises(BaseException) as caught: execute(plan(), source, output)
+    if prior_cancel or publish_stop is KeyboardInterrupt:
+        assert isinstance(caught.value, KeyboardInterrupt)
+        assert caught.value.args == ('local census cancelled; preserve spent scope',)
+    elif publish_stop is SystemExit:
+        assert isinstance(caught.value, SystemExit)
+        assert caught.value.code == 'local census interrupted; preserve spent scope'
+    else:
+        assert not isinstance(caught.value, Exception)
+        assert caught.value.args == ('local census interrupted; preserve spent scope',)
+    assert PRIVATE not in str(caught.value) and caught.value.__suppress_context__ is True
+    assert closed == [True]
+    assert (output / (INDEX_OP + '.claim.spent.json')).exists()
+    assert not list(output.glob('*.result.json'))
+
+
+def test_lane_parent_alias_is_refused_by_directory_identity(monkeypatch):
+    lane = Path('/synthetic/protected/lane')
+    alias = Path('/synthetic/firmlink-parent')
+    class Info:
+        def __init__(self, inode): self.st_dev, self.st_ino = 1, inode
+    identities = {str(lane): 10, str(lane.parent): 20, str(alias): 20,
+        '/synthetic': 30, '/': 40}
+    monkeypatch.setattr(m.os.path, 'realpath', lambda path: str(path))
+    def stat(path, *args, **kwargs):
+        if str(path) not in identities: raise FileNotFoundError('synthetic identity')
+        return Info(identities[str(path)])
+    monkeypatch.setattr(m.os, 'stat', stat)
+    assert m._lane_identity(alias, lane) is True
+
+
+@pytest.mark.parametrize('interrupt_stage', ('publish', 'close'))
+def test_new_cancellation_outranks_prior_fatal_stop(leaves, monkeypatch, interrupt_stage):
+    source, output, _ = leaves
+    original_directory, original_close, original_publish = m._directory, m.os.close, m._publish
+    output_fd, closed = [], []
+    def directory(path, **kwargs):
+        fd = original_directory(path, **kwargs)
+        if Path(path) == output: output_fd.append(fd)
+        return fd
+    def close(fd):
+        if interrupt_stage == 'close' and output_fd and fd == output_fd[0] and not closed:
+            closed.append(True)
+            original_close(fd)
+            raise KeyboardInterrupt(PRIVATE)
+        return original_close(fd)
+    def publish(fd, name, raw):
+        if interrupt_stage == 'publish' and name.endswith('.result.json'): raise KeyboardInterrupt(PRIVATE)
+        return original_publish(fd, name, raw)
+    monkeypatch.setattr(m, '_read', lambda *_args, **_kwargs: (_ for _ in ()).throw(SystemExit(PRIVATE)))
+    monkeypatch.setattr(m, '_directory', directory)
+    monkeypatch.setattr(m.os, 'close', close)
+    monkeypatch.setattr(m, '_publish', publish)
+    with pytest.raises(BaseException) as caught: execute(plan(), source, output)
+    assert isinstance(caught.value, KeyboardInterrupt)
+    assert caught.value.args == ('local census cancelled; preserve spent scope',)
+    assert caught.value.__suppress_context__ is True and PRIVATE not in str(caught.value)
+    assert (output / (INDEX_OP + '.claim.spent.json')).exists()
+    results = list(output.glob('*.result.json'))
+    assert len(results) == (interrupt_stage == 'close')
+    if results:
+        result = json.loads(results[0].read_bytes())
+        # This immutable receipt preceded the final close, so it truthfully
+        # records the earlier fatal, not an unobserved future cancellation.
+        assert result['status'] == 'FAILED_OR_UNCERTAIN'
+
+
+@pytest.mark.parametrize('explosive', (False, True))
+def test_first_fatal_is_retained_without_calling_its_truthiness(leaves, monkeypatch, explosive):
+    source, output, _ = leaves
+    class FirstStop(BaseException):
+        def __bool__(self):
+            if explosive: raise AssertionError(PRIVATE)
+            return False
+    monkeypatch.setattr(m, '_read', lambda *_args, **_kwargs: (_ for _ in ()).throw(FirstStop(PRIVATE)))
+    original_unlink = m.os.unlink
+    def unlink(name, **kwargs):
+        if name.endswith('.lock'): raise SystemExit(PRIVATE)
+        return original_unlink(name, **kwargs)
+    monkeypatch.setattr(m.os, 'unlink', unlink)
+    with pytest.raises(BaseException) as caught: execute(plan(), source, output)
+    assert not isinstance(caught.value, (Exception, SystemExit))
+    assert caught.value.args == ('local census interrupted; preserve spent scope',)
+    assert caught.value.__suppress_context__ is True
+    results = list(output.glob('*.result.json'))
+    assert len(results) == 1
+    raw = results[0].read_bytes()
+    assert json.loads(raw)['status'] == 'FAILED_OR_UNCERTAIN' and PRIVATE not in raw.decode()

@@ -52,12 +52,20 @@ def invoke(directory, *, contract=None, context=None, seam=None, **kwargs):
         m.validate_plan(checked, context)
     generated = m._program_bytes(checked, prior.capsule(), m._public_sources())
     adapter = (lambda program_raw, permit, capsule: prior.invoke(contract=permit, context=capsule)) if seam is None else seam
-    adapter.tpr_synthetic_adapter = True  # every test adapter declares itself synthetic
-    return m.execute_prepared_read(checked, capsule, directory, program_raw=kwargs.pop("program_raw", generated),
-        native_read=adapter,
-        repository_guard=kwargs.pop("repository_guard", repository_guard),
-        utc_now=kwargs.pop("utc_now", lambda: prior.NOW),
-        monotonic_clock=kwargs.pop("monotonic_clock", lambda: 10), **kwargs)
+    # Explicit test-only policy override, not a callable's no-IO assertion.
+    # The same finally-safe override applies to an in-memory mutant namespace.
+    function = m.execute_prepared_read
+    namespace = function.__globals__
+    previous_policy = namespace["NATIVE_ADAPTER_PERMITTED"]
+    namespace["NATIVE_ADAPTER_PERMITTED"] = True
+    try:
+        return function(checked, capsule, directory, program_raw=kwargs.pop("program_raw", generated),
+            native_read=adapter,
+            repository_guard=kwargs.pop("repository_guard", repository_guard),
+            utc_now=kwargs.pop("utc_now", lambda: prior.NOW),
+            monotonic_clock=kwargs.pop("monotonic_clock", lambda: 10), **kwargs)
+    finally:
+        namespace["NATIVE_ADAPTER_PERMITTED"] = previous_policy
 
 
 def assert_saved(directory, result):
@@ -394,7 +402,7 @@ def test_meaningful_controller_mutants_are_killed_and_real_definition_restored(t
         patched.setattr(m, "execute_prepared_read", namespace["execute_prepared_read"])
         # Direct globals (publisher/clock/source seams) use the same synthetic controls.
         namespace["_publish"] = lambda *args, **kwargs: m._publish(*args, **kwargs)
-        with pytest.raises((AssertionError, ValueError, pytest.fail.Exception)):
+        with pytest.raises((AssertionError, ValueError, pytest.fail.Exception, namespace["ControllerEscaped"])):
             check(mutant, patched)
     assert m.execute_prepared_read is original
     with monkeypatch.context() as patch:
@@ -463,3 +471,281 @@ def test_receipt_publish_failure_after_cancellation_still_propagates_the_cancell
     with pytest.raises(m.ControllerCancelled):
         invoke(tmp_path, seam=interrupted)
     assert not list(tmp_path.glob("*.result.json"))
+
+
+def test_self_declared_synthetic_marker_cannot_enable_the_public_dispatch_entrypoint(tmp_path):
+    checked, capsule = plan(tmp_path), prior.capsule()
+    generated = m._program_bytes(checked, capsule, m._public_sources())
+    calls = []
+    def declared_adapter(program_raw, permit, context):
+        calls.append("safe sentinel reached; no actual IO")
+        return prior.invoke(contract=permit, context=context)
+    declared_adapter.tpr_synthetic_adapter = True
+    with pytest.raises(m.ControllerRefusal):
+        m.execute_prepared_read(checked, capsule, tmp_path, program_raw=generated,
+            native_read=declared_adapter, repository_guard=repository_guard,
+            utc_now=lambda: prior.NOW, monotonic_clock=lambda: 10)
+    assert calls == [] and not list(tmp_path.iterdir())
+
+
+def test_lane_parent_alias_is_refused_by_directory_identity_not_only_realpath_text(monkeypatch):
+    lane, alias = Path("/synthetic/lane-parent/lane"), Path("/synthetic/parent-alias")
+    identities = {lane: SimpleNamespace(st_dev=10, st_ino=100),
+        lane.parent: SimpleNamespace(st_dev=10, st_ino=99),
+        alias: SimpleNamespace(st_dev=10, st_ino=99)}
+    def fake_stat(path, *args, **kwargs):
+        if Path(path) in identities:
+            return identities[Path(path)]
+        raise FileNotFoundError("synthetic missing path")
+    with monkeypatch.context() as patch:
+        patch.setattr(m.os, "stat", fake_stat)
+        assert m._lane_identity(alias, lane) is True
+
+
+def test_system_exit_during_owned_lock_cleanup_has_a_closed_failure_receipt(tmp_path, monkeypatch):
+    original = m.os.stat
+    def exiting_stat(path, *args, **kwargs):
+        if path == "controller.lock":
+            raise SystemExit(PRIVATE)
+        return original(path, *args, **kwargs)
+    monkeypatch.setattr(m.os, "stat", exiting_stat)
+    with pytest.raises(SystemExit):
+        invoke(tmp_path)
+    receipts = list(tmp_path.glob("*.result.json"))
+    assert len(receipts) == 1
+    result = json.loads(receipts[0].read_bytes())
+    assert result["status"] == "failed_or_uncertain" and result["failure_stage"] == "cleanup"
+    assert result["contains_calls"] == result["read_calls"] == 2
+    assert PRIVATE not in receipts[0].read_text()
+
+
+def test_unavailable_cancelled_receipt_is_explicitly_not_reported_as_durable(tmp_path, monkeypatch):
+    original = m._publish
+    def publish(fd, name, raw):
+        if name.endswith(".result.json"):
+            raise OSError(PRIVATE)
+        return original(fd, name, raw)
+    def interrupted(*_):
+        raise KeyboardInterrupt(PRIVATE)
+    monkeypatch.setattr(m, "_publish", publish)
+    with pytest.raises(m.ControllerCancelled) as caught:
+        invoke(tmp_path, seam=interrupted)
+    assert caught.value.receipt_published is False
+    assert not list(tmp_path.glob("*.result.json"))
+
+
+def test_unavailable_lane_identity_is_a_closed_boundary(monkeypatch):
+    def unavailable(*_args, **_kwargs):
+        raise PermissionError("synthetic stat unavailable")
+    with monkeypatch.context() as patch:
+        patch.setattr(m.os, "stat", unavailable)
+        assert m._lane_identity(Path("/synthetic/unknown-alias"), Path("/synthetic/lane")) is True
+
+
+@pytest.mark.parametrize("generic", [False, True])
+def test_fatal_native_payload_is_replaced_with_body_free_stop_and_saved_counts(tmp_path, generic):
+    class SyntheticStop(BaseException):
+        pass
+    def stopped(*_):
+        raise (SyntheticStop(PRIVATE) if generic else SystemExit(PRIVATE))
+    with pytest.raises(BaseException) as caught:
+        invoke(tmp_path, seam=stopped)
+    assert not isinstance(caught.value, Exception)
+    if not generic:
+        assert isinstance(caught.value, SystemExit)
+    assert PRIVATE not in str(caught.value)
+    assert caught.value.receipt_published is True
+    result = caught.value.receipt
+    assert result["native_read_invocations"] == 1 and result["contains_calls"] is None
+    assert result["read_calls"] is None
+    assert_saved(tmp_path, result)
+
+
+def test_fatal_receipt_publication_failure_is_body_free_and_not_durable(tmp_path, monkeypatch):
+    original = m._publish
+    def publish(fd, name, raw):
+        if name.endswith(".result.json"):
+            raise SystemExit(PRIVATE)
+        return original(fd, name, raw)
+    monkeypatch.setattr(m, "_publish", publish)
+    with pytest.raises(SystemExit) as caught:
+        invoke(tmp_path)
+    assert PRIVATE not in str(caught.value)
+    assert caught.value.receipt_published is False
+    assert caught.value.receipt["contains_calls"] == 2
+    assert not list(tmp_path.glob("*.result.json"))
+
+
+@pytest.mark.parametrize("cancel", [False, True])
+def test_directory_close_fatal_escape_is_body_free_and_cannot_replace_cancellation(tmp_path, monkeypatch, cancel):
+    original_open, original_close = m._open_directory, m.os.close
+    state = {"directory_fd": None, "raised": False}
+    def opened(path):
+        fd = original_open(path)
+        state["directory_fd"] = fd
+        return fd
+    def close(fd):
+        original_close(fd)
+        if fd == state["directory_fd"] and not state["raised"]:
+            state["raised"] = True
+            raise SystemExit(PRIVATE)
+    def interrupted(*_):
+        raise KeyboardInterrupt(PRIVATE)
+    monkeypatch.setattr(m, "_open_directory", opened)
+    monkeypatch.setattr(m.os, "close", close)
+    with pytest.raises(BaseException) as caught:
+        invoke(tmp_path, seam=interrupted if cancel else None)
+    assert state["raised"] and PRIVATE not in str(caught.value)
+    assert isinstance(caught.value, m.ControllerCancelled if cancel else SystemExit)
+    assert caught.value.receipt_published is True
+    assert_saved(tmp_path, caught.value.receipt)
+
+
+@pytest.mark.parametrize("generic", [False, True])
+def test_ordinary_directory_close_error_cannot_demote_a_fatal_native_stop(tmp_path, monkeypatch, generic):
+    class SyntheticStop(BaseException):
+        pass
+    original_open, original_close = m._open_directory, m.os.close
+    state = {"directory_fd": None, "raised": False}
+    def opened(path):
+        fd = original_open(path)
+        state["directory_fd"] = fd
+        return fd
+    def close(fd):
+        original_close(fd)
+        if fd == state["directory_fd"] and not state["raised"]:
+            state["raised"] = True
+            raise OSError(PRIVATE)
+    def stopped(*_):
+        raise SyntheticStop(PRIVATE) if generic else SystemExit(PRIVATE)
+    monkeypatch.setattr(m, "_open_directory", opened)
+    monkeypatch.setattr(m.os, "close", close)
+    with pytest.raises(BaseException) as caught:
+        invoke(tmp_path, seam=stopped)
+    assert state["raised"] and not isinstance(caught.value, Exception)
+    if not generic:
+        assert isinstance(caught.value, SystemExit)
+    assert PRIVATE not in str(caught.value) and caught.value.receipt_published is True
+    assert_saved(tmp_path, caught.value.receipt)
+
+
+@pytest.mark.parametrize("native_cancel,publish_error,close_error", [
+    (True, SystemExit, False), (False, KeyboardInterrupt, True), (False, SystemExit, True)])
+def test_publication_stop_state_survives_fatal_publish_and_ordinary_final_close(
+        tmp_path, monkeypatch, native_cancel, publish_error, close_error):
+    original_open, original_close, original_publish = m._open_directory, m.os.close, m._publish
+    state = {"directory_fd": None, "close_error_raised": False, "publish_error_raised": False}
+    def opened(path):
+        fd = original_open(path)
+        state["directory_fd"] = fd
+        return fd
+    def close(fd):
+        original_close(fd)
+        if close_error and fd == state["directory_fd"] and not state["close_error_raised"]:
+            state["close_error_raised"] = True
+            raise OSError(PRIVATE)
+    def publish(fd, name, raw):
+        if name.endswith(".result.json"):
+            state["publish_error_raised"] = True
+            raise publish_error(PRIVATE)
+        return original_publish(fd, name, raw)
+    def interrupted(*_):
+        raise KeyboardInterrupt(PRIVATE)
+    monkeypatch.setattr(m, "_open_directory", opened)
+    monkeypatch.setattr(m.os, "close", close)
+    monkeypatch.setattr(m, "_publish", publish)
+    with pytest.raises(BaseException) as caught:
+        invoke(tmp_path, seam=interrupted if native_cancel else None)
+    assert state["publish_error_raised"] and state["close_error_raised"] is close_error
+    cancellation_expected = native_cancel or publish_error is KeyboardInterrupt
+    assert isinstance(caught.value, m.ControllerCancelled if cancellation_expected else SystemExit)
+    assert not isinstance(caught.value, Exception) and PRIVATE not in str(caught.value)
+    assert caught.value.receipt_published is False
+    receipt = caught.value.receipt
+    assert receipt["status"] == ("cancelled" if cancellation_expected else "failed_or_uncertain")
+    assert receipt["native_read_invocations"] == 1
+    assert receipt["contains_calls"] == (None if native_cancel else 2)
+    assert receipt["read_calls"] == (None if native_cancel else 2)
+    assert not list(tmp_path.glob("*.result.json"))
+
+
+@pytest.mark.parametrize("boundary", ["lock_cleanup", "publication"])
+@pytest.mark.parametrize("first_system_exit", [False, True])
+def test_first_fatal_stop_is_retained_over_a_later_fatal_stop(tmp_path, monkeypatch, boundary, first_system_exit):
+    class SyntheticFatal(BaseException):
+        pass
+    first = SystemExit if first_system_exit else SyntheticFatal
+    second = SyntheticFatal if first_system_exit else SystemExit
+    original_stat, original_publish = m.os.stat, m._publish
+    def stopped(*_):
+        raise first(PRIVATE)
+    def stat(path, *args, **kwargs):
+        if boundary == "lock_cleanup" and path == "controller.lock":
+            raise second(PRIVATE)
+        return original_stat(path, *args, **kwargs)
+    def publish(fd, name, raw):
+        if boundary == "publication" and name.endswith(".result.json"):
+            raise second(PRIVATE)
+        return original_publish(fd, name, raw)
+    monkeypatch.setattr(m.os, "stat", stat)
+    monkeypatch.setattr(m, "_publish", publish)
+    with pytest.raises(BaseException) as caught:
+        invoke(tmp_path, seam=stopped)
+    assert not isinstance(caught.value, Exception)
+    assert isinstance(caught.value, SystemExit) is first_system_exit
+    assert PRIVATE not in str(caught.value)
+    assert caught.value.receipt_published is (boundary == "lock_cleanup")
+    assert caught.value.receipt["native_read_invocations"] == 1
+    assert caught.value.receipt["contains_calls"] is None
+
+
+@pytest.mark.parametrize("mutation", ["marker_gate", "identity_unavailable", "parent_alias",
+    "cleanup_escape", "cancelled_durability", "fatal_payload"])
+def test_counterreview_controller_mutants_are_killed_with_restored_controls(tmp_path, monkeypatch, mutation):
+    raw = Path(m.__file__).read_text()
+    target = "execute_prepared_read"
+    if mutation == "marker_gate":
+        before, after = 'if NATIVE_ADAPTER_PERMITTED is not True:', 'if False:'
+        check = lambda path, patch: test_self_declared_synthetic_marker_cannot_enable_the_public_dispatch_entrypoint(path)
+    elif mutation == "identity_unavailable":
+        target = "_lane_identity"
+        before = 'return True  # Unknown directory custody is not permission to proceed.'
+        after = 'return False  # synthetic mutation: fail open'
+        check = lambda path, patch: test_unavailable_lane_identity_is_a_closed_boundary(patch)
+    elif mutation == "parent_alias":
+        target = "_lane_identity"
+        before, after = 'for ancestor in lane.parents:', 'for ancestor in ():'
+        check = lambda path, patch: test_lane_parent_alias_is_refused_by_directory_identity_not_only_realpath_text(patch)
+    elif mutation == "cleanup_escape":
+        before = '                except BaseException as error:\n                    if escaped is None:'
+        after = '                except RuntimeError as error:\n                    if escaped is None:'
+        check = lambda path, patch: test_system_exit_during_owned_lock_cleanup_has_a_closed_failure_receipt(path, patch)
+    elif mutation == "cancelled_durability":
+        before = 'raise ControllerCancelled(final, receipt_published=False) from None'
+        after = 'raise ControllerCancelled(final, receipt_published=True) from None'
+        check = lambda path, patch: test_unavailable_cancelled_receipt_is_explicitly_not_reported_as_durable(path, patch)
+    else:
+        before = 'raise _body_free_escape(escaped, final, receipt_published=True) from None'
+        after = 'raise escaped'
+        check = lambda path, patch: test_fatal_native_payload_is_replaced_with_body_free_stop_and_saved_counts(path, False)
+    assert raw.count(before) == (3 if mutation == "cancelled_durability" else 1)
+    namespace = {"__name__": m.__name__, "__file__": m.__file__}
+    exec(compile(raw.replace(before, after, 1), "<synthetic-counterreview-mutant>", "exec"), namespace)
+    # Dynamic compilation creates another exception class identity. Keep the
+    # regression's catch boundary identical; the mutated guard is unchanged.
+    namespace["ControllerCancelled"] = m.ControllerCancelled
+    original = getattr(m, target)
+    control, mutant, restored = (tmp_path / name for name in ("control", "mutant", "restored"))
+    for path in (control, mutant, restored):
+        path.mkdir(mode=0o700)
+    with monkeypatch.context() as patch:
+        check(control, patch)
+    with monkeypatch.context() as patch:
+        patch.setattr(m, target, namespace[target])
+        namespace["_publish"] = lambda *args, **kwargs: m._publish(*args, **kwargs)
+        with pytest.raises((AssertionError, AttributeError, ValueError, pytest.fail.Exception, namespace["ControllerEscaped"])):
+            check(mutant, patch)
+    assert getattr(m, target) is original
+    with monkeypatch.context() as patch:
+        check(restored, patch)
+    assert m.NATIVE_ADAPTER_PERMITTED is False

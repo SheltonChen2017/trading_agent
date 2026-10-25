@@ -17,8 +17,10 @@ PINS = {'repair': '0d0f67a6d02915ff7357018ef51108fdeb3e334cbcccc7e2fa65bbeb1f1d6
     'calendar': '3eccdf3cf9a2542ffd249983241d5747c2ecd4e21bc4a71f7f826c77ec1fe53d'}
 START, END = '2020-09-01', '2026-10-09'
 MAX_PAGES, PAGE_ROWS = 128, 10000
-# The frozen capture's request bounds; a fresh capture may not run looser.
-LIMITS = {'max_elapsed_seconds': 5400, 'max_requests': MAX_PAGES, 'max_response_bytes': 4 * 1024 ** 2,
+# Distinguish the frozen per-response page ceiling from cumulative ACTIONS
+# bytes: min(global 768 MiB, dataset 512 MiB). No actual request is made here.
+LIMITS = {'max_elapsed_seconds': 5400, 'max_requests': MAX_PAGES,
+    'page_bytes': 4 * 1024 ** 2, 'max_response_bytes': 512 * 1024 ** 2,
     'request_seconds': 30, 'redirects': 0, 'retries': 0}
 YEARS = tuple(str(year) for year in range(2020, 2027))
 _CENSUS_KEYS = frozenset(('page_rows terminated earliest_date latest_date in_window_year_counts '
@@ -137,8 +139,8 @@ def coverage_summary(*, repair_freeze_raw, study_freeze_raw, calendar_raw, censu
         for year in YEARS:
             if years[year] and not first[:4] <= year <= last[:4]: _fail()
         # The years of the retained boundary dates must themselves be observed.
-        if first >= START and not years[first[:4]]: _fail()
-        if last <= END and not years[last[:4]]: _fail()
+        if START <= first <= END and not years[first[:4]]: _fail()
+        if START <= last <= END and not years[last[:4]]: _fail()
     observed = [year for year in YEARS if years[year]]
     return {'schema': 'tpr-ext26-sharadar-coverage-observation-v1', 'study_id': STUDY,
         'requested_from': START, 'requested_to': END, 'page_count': len(pages), 'retained_rows': total,

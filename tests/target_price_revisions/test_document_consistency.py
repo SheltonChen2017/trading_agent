@@ -666,7 +666,7 @@ SECTION93_CURRENT_FACTS = (
     "No new job was observed after the source-only restoration",
     "Fresh Mac lock blocked the empty-notebook request; no new notebook, cell execution or native witness is claimed",
     "All native-read/create UI scopes are closed with no automatic retry",
-    "Monitor remains PAUSED; the review skip is this round ONLY",
+    "Analyst-push monitor remains ACTIVE; future Claude checkpoints are waived until further notice",
 )
 SECTION86_COMMITS = (
     "b28d07f6139dc0460e927b152fb4a87f6f2915e9",
@@ -752,6 +752,7 @@ SECTION8_NEXT_ACTION_STATEMENT = (
     r"Owner next unlocks the Mac and reopens authenticated built-in Mia for OFF37650980|"
     r"The next bounded (?:work|action) is|"
     r"Offline implementation continues under the owner's one-round review waiver; QC access remains forbidden|"
+    r"Codex continues bounded QC recovery after the Analyst Revisions release; further Claude checkpoints are waived|"
     r"Codex continues without Claude review stops)\b"
 )
 SECTION46_CLAUDE_BASE = "9958a459f5cd56c29cb9a0de13d38737e2c3412d"
@@ -1220,7 +1221,7 @@ def _current_integration_state(section: str) -> str:
 def _assert_section93_current_facts(text: str) -> None:
     """Positive, bounded current facts; never scan old sections for stale dates."""
     normalized = " ".join(text.split()).lower()
-    for required in (*SECTION93_CURRENT_FACTS, SECTION99_NEXT_ROLE,
+    for required in (*SECTION93_CURRENT_FACTS, SECTION100_NEXT_ROLE,
                      "last completed counter-review", "skip 1, proceed to 2 and 3 directly"):
         assert required.lower() in normalized, required
     assert SECTION92_NEXT_ROLE.lower() not in normalized, "section92-only routing is superseded for this round"
@@ -1229,6 +1230,7 @@ def _assert_section93_current_facts(text: str) -> None:
     assert SECTION95_NEXT_ROLE.lower() not in normalized, "section95 routing is reviewed, not current"
     assert SECTION97_NEXT_ROLE.lower() not in normalized, "owner waived the current counter-review checkpoint"
     assert SECTION98_NEXT_ROLE.lower() not in normalized, "section98 waiver round is reviewed, not current"
+    assert SECTION99_NEXT_ROLE.lower() not in normalized, "section99 has been counter-reviewed, not current"
 
 
 @pytest.mark.parametrize("missing", ["opening", "closing"])
@@ -1281,11 +1283,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [SECTION99_RANGE]
+    ) == [SECTION100_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Claude has independently reviewed the exact range"
+        "Codex has counter-reviewed the exact range"
         in normalized_current
     )
     assert (
@@ -1299,7 +1301,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "TPR-1 remains blocked" in normalized_current
     assert "reviewed-spec registry remains empty" in normalized_current
     assert "Claude next reviews this Codex round independently" not in normalized_current
-    assert SECTION99_NEXT_ROLE in normalized_current
+    assert SECTION100_NEXT_ROLE in normalized_current
+    assert SECTION99_NEXT_ROLE not in normalized_current
     assert SECTION98_NEXT_ROLE not in normalized_current
     assert SECTION97_NEXT_ROLE not in normalized_current
     assert SECTION95_NEXT_ROLE not in normalized_current
@@ -1387,7 +1390,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [SECTION99_SHORT_RANGE]
+        ) == [SECTION100_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
         _assert_section93_current_facts(summary_pointer)
         assert SECTION91_NEXT_ROLE.lower() not in normalized_summary_lower
@@ -4627,6 +4630,7 @@ SECTION81_STALE_NEXT_ACTIONS = {
     "counterreviewed": "Claude next reviews this section-95 counter-review and its complete Codex round",
     "pending": "Codex next counter-reviews section 97 and this round's Claude commits",
     "waiver": "Offline implementation continues under the owner's one-round review waiver; QC access remains forbidden",
+    "latest": "Codex next counter-reviews section 99 and this round's Claude commits",
 }
 
 
@@ -4643,16 +4647,17 @@ SECTION81_STALE_NEXT_ACTIONS = {
     "current_counterreviewed_role", "preamble_counterreviewed_role",
     "current_pending_role", "preamble_pending_role",
     "current_waiver_role", "preamble_waiver_role",
+    "current_latest_role", "preamble_latest_role",
 ))
-def test_section_99_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
+def test_section_100_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
     """Retain old routing mutants; reject routing only to the skipped checkpoint."""
     test_exact_next_step_names_the_current_artifacts()
-    current_next = SECTION99_NEXT_ROLE
+    current_next = SECTION100_NEXT_ROLE
     stale_next = SECTION81_STALE_NEXT_ACTIONS.get(fault.rsplit("_", 2)[-2], "")
     if fault.startswith("current_"):
         original_section = _record_section
         section = original_section("## 8. Exact next step")
-        old, new = (SECTION99_RANGE, SECTION97_RANGE) if fault.endswith("range") else (
+        old, new = (SECTION100_RANGE, SECTION99_RANGE) if fault.endswith("range") else (
             current_next, stale_next)
         pattern = r"\s+".join(re.escape(word) for word in old.split())
         assert re.search(pattern, section) is not None
@@ -4661,7 +4666,7 @@ def test_section_99_current_routing_refuses_stale_range_or_role(monkeypatch, fau
             lambda heading: mutated if heading.startswith("## 8.") else original_section(heading))
     else:
         preamble = _record_preamble()
-        old, new = (SECTION99_SHORT_RANGE, SECTION97_SHORT_RANGE) if fault.endswith("range") else (
+        old, new = (SECTION100_SHORT_RANGE, SECTION99_SHORT_RANGE) if fault.endswith("range") else (
             current_next, stale_next)
         pattern = r"\s+".join(re.escape(word) for word in old.split())
         assert re.search(pattern, preamble, flags=re.I) is not None
@@ -4688,7 +4693,7 @@ def test_section_99_current_routing_refuses_stale_range_or_role(monkeypatch, fau
     ("No new job was observed after the source-only restoration", "Source-only restoration launched and accepted a new job"),
     ("Fresh Mac lock blocked the empty-notebook request; no new notebook, cell execution or native witness is claimed", "The new notebook ran and retrieved a valid native witness"),
     ("All native-read/create UI scopes are closed with no automatic retry", "A live native task keeps retrying automatically"),
-    ("Monitor remains PAUSED; the review skip is this round ONLY", "Monitor remains ACTIVE; future review is permanently removed"),
+    ("Analyst-push monitor remains ACTIVE; future Claude checkpoints are waived until further notice", "Analyst-push monitor remains PAUSED; another Claude checkpoint is mandatory"),
 ))
 def test_section93_current_fact_mutants_do_not_invent_native_success_or_reset(monkeypatch, surface, before, after):
     """Mutate only bounded live pointers, not attributed historical snapshots."""
@@ -5642,6 +5647,14 @@ SECTION99_DISPOSITIONS = (
     "accepted",
 )
 SECTION99_NEXT_ROLE = "Codex next counter-reviews section 99 and this round's Claude commits"
+SECTION100_RANGE = "6bdd0c1cfb0ee9a45845bdca48a53c6c95409469..b07fafdc17590185809d7a5a7059302496997605"
+SECTION100_SHORT_RANGE = "6bdd0c1c..b07fafdc"
+SECTION100_COMMITS = (
+    "d44925a7b14e45047b3705ad2755f6e4edfa8481",
+    "b07fafdc17590185809d7a5a7059302496997605",
+)
+SECTION100_DISPOSITIONS = ("accepted after correction", "accepted after correction")
+SECTION100_NEXT_ROLE = "Codex continues bounded QC recovery after the Analyst Revisions release; further Claude checkpoints are waived"
 SECTION95_SCOPE = (
     ("Counter-review", "Two incoming Claude commits and cumulative tree"),
     ("Correction inputs", "Public committed code, synthetic fixtures and Git objects only"),
@@ -5851,3 +5864,64 @@ def test_section_99_guard_refuses_contradictory_authority(monkeypatch, added_gra
         lambda heading: mutated if heading.startswith("## 99.") else original_section(heading))
     with pytest.raises(AssertionError, match="contradictory section 99 authority"):
         test_section_99_review_records_every_commit_and_grants_nothing()
+
+
+SECTION100_SCOPE = (
+    ("Counter-review", "Both incoming Claude commits separately and the cumulative tree"),
+    ("Inputs during this counter-review", "Public committed code, Git objects and synthetic fixtures only"),
+    ("QC and Safari release", "Only after Analyst Revisions advances from 3c905d4235617d3d2a56b636c8e0be77ee790686"),
+    ("Future Claude checkpoints", "Waived by owner until further notice; current counter-review is completed"),
+    ("Attempt ceiling", "Former three-attempt ceiling superseded prospectively; every historical attempt and look retained"),
+    ("Continuation", "Auditable frozen-strategy backtesting or a concrete factual, external or safety blocker"),
+    ("Mia", "May be consulted as needed after resource release; source and economics still verified"),
+    ("Unchanged exclusions", "No purchases, upgrades, credential exposure, sibling overwrite, broker, paper or live actions"),
+    ("Monitor", "Analyst push heartbeat ACTIVE until one qualifying release is consumed, then PAUSED"),
+)
+
+
+def _assert_section100_scope(section):
+    block = _bounded(section, "<!-- TPR-CCR30-SCOPE:START -->", "<!-- TPR-CCR30-SCOPE:END -->", "section100 scope")
+    rows = tuple(tuple(part.strip() for part in line.strip('|').split('|'))
+        for line in block.splitlines() if line.startswith('| '))[1:]
+    assert rows == SECTION100_SCOPE, 'section100 scope changed'
+    assert "No positive-return guarantee or outcome-driven tuning is authorized" in section
+    assert "Historical attempt counts are not reset" in section
+    assert "No QC access occurred during this counter-review" in section
+
+
+def test_section100_pins_every_incoming_commit_scope_and_actual_old_attribution():
+    section = _record_section("## 100. Codex counter-review and conditional QC continuation")
+    assert SECTION100_RANGE in section
+    rows = _bounded(section, "### 100.2 Per-commit dispositions", "### 100.3 Findings", "section100 dispositions")
+    actual = tuple((match.group(1), match.group(2).lower()) for line in rows.splitlines()
+        if (match := re.match(r'\| `([0-9a-f]{40})` \| \*\*([A-Za-z ]+)\*\* \|', line)))
+    assert actual == tuple(zip(SECTION100_COMMITS, SECTION100_DISPOSITIONS))
+    assert tuple(_git_lines('rev-list', '--reverse', SECTION100_RANGE)) == SECTION100_COMMITS
+    _assert_section100_scope(section)
+    attribution = _bounded(section, "<!-- TPR-CCR30-ATTRIBUTION:START -->", "<!-- TPR-CCR30-ATTRIBUTION:END -->", "section100 attribution")
+    for commit, paths, sources, tests in (
+        (SECTION99_COMMITS[0], 9, 3, 3),
+        (SECTION99_COMMITS[1], 4, 1, 1),
+    ):
+        assert f'| `{commit}` | {paths} | {sources} | {tests} |' in attribution
+        changed = _git_lines('diff-tree', '--no-commit-id', '--name-only', '-r', commit)
+        added = _git_lines('diff-tree', '--no-commit-id', '--name-only', '--diff-filter=A', '-r', commit)
+        assert len(changed) == paths
+        assert sum(path.startswith('research/') for path in added) == sources
+        assert sum(path.startswith('tests/') for path in added) == tests
+
+
+@pytest.mark.parametrize('before,after', (
+    (SECTION100_SCOPE[2][1], 'QC access is immediate without the Analyst push'),
+    (SECTION100_SCOPE[3][1], 'Another Claude checkpoint is mandatory before every step'),
+    (SECTION100_SCOPE[4][1], 'Attempts and observed looks are reset to zero'),
+    (SECTION100_SCOPE[7][1], 'All account purchases and live orders are permitted'),
+    (SECTION100_SCOPE[8][1], 'Monitor is paused without consuming the release'),
+    ('No positive-return guarantee or outcome-driven tuning is authorized', 'Keep tuning until a profitable result appears'),
+))
+def test_section100_scope_rejects_clean_first_gate_history_and_tuning_drift(before, after):
+    text = _record_section("## 100. Codex counter-review and conditional QC continuation")
+    _assert_section100_scope(text)
+    assert before in text
+    with pytest.raises(AssertionError):
+        _assert_section100_scope(text.replace(before, after, 1))

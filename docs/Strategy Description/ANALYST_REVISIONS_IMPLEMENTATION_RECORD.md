@@ -789,6 +789,12 @@ backtesting readiness while the owner is AFK. This supersedes the prior
 review-wait only; A1–A9 remain spent. Begin with bounded current metadata
 evidence, not a guessed identity or unchanged recovery replay. No backtest
 launch is part of the current readiness checkpoint.
+Section321.5 now records the once-only current observation: both views contain
+only the pinned owner and codeRunning=false; the earlier extra row is absent,
+without a proven historical cause. The strict access policy stays unchanged.
+Section321.6 prepares a separately bounded source-completion/compile-only A10;
+R321's read-only control is spent and no A10 has yet run. No capacity reservation,
+runtime success, six/eight result or formal-readiness clearance is inferred.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -2035,6 +2041,12 @@ preserve all spent attempts and unchanged strategy/source/privacy gates, and
 stop at readiness before launch. The monitor remains PAUSED.
 The owner explicitly waives Claude review of section 321's diagnostic and
 verified readiness fixes; this is not independent acceptance.
+The321.5 diagnostic has now completed once with matching sole-owner rows and
+codeRunning=false. Preserve its spent control and A9's historical unknown cause.
+Implement and freeze the321.6 READY-only successor, preserving strict access
+checks and collecting per-stage finite evidence before any refusal. The current
+checkpoint is exact R298 source plus compilation and input admission, not all
+six/eight cloud candidates, runtime validation or a launched backtest.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -56368,3 +56380,219 @@ launch, result reads, old control/source census or other-lane action is admitted
 This diagnostic is zero new strategy looks. Use current facts for a separately
 committed, bounded verified readiness fix under the owner's broader direction;
 do not silently convert observed unknown metadata into an allowlist.
+
+### 321.5 D1 actual result — current views agree on owner only
+
+Clean freeze5b613ca17ebe454f5eec00c2a4d2b0f9b76762bb committed the exact
+diagnostic and D1 decision. Pre-freeze record checks repeated86passes0.95s
+(not additive). Genuine credential-free public-source preflights then passed
+under native network/private-artifact/Keychain denial, with no claim allocation.
+The external runner was dispatched exactly once in the normal execution context.
+Its child ran2026-10-25T04:22:41.659831Z..04:22:45.509419Z with actualexit0,
+no stderr or capture bound. These are child dispatch/completion brackets, not
+provider timestamps. Observed stdout4763bytes SHA256
+189cd7fb15eee6dc53e4a524f42f538c9d63ee21c3b0c06b4b7dba4df3570170.
+The sole output validator ran04:22:45.627535Z..04:22:45.860164Z,actualexit0,
+no stderr/bound; stdout4806bytes SHA256
+8d8dfeb41137347a072314d05038a39b8f032ef289375f70954b060adeb8da03.
+The outer runner also exited0 with output_validated=true. Its authenticated
+finite report pin is4658bytes SHA256
+f15efea20c0a1a3f014fc1d33239e67a7fdcee0db9fc20395cdd446226f3fa84.
+R321-20261024-A and its operational caller/output validator are now SPENT.
+No output/control reread followed this result.
+
+Exactly two application dispatches were observed. Both project and dedicated
+collaborator views contain exactly ONE row, equal to the unchanged pinned owner
+SHA256707a30618e122e49fe6fa75364451b5b7c50e1019a68a89ffc0cd3ae3c8e0b78.
+Both have owner=true, positive UID equal to project owner, permission=write and
+liveControl=true. General codeRunning is explicitly false; public is absent,
+not an independently verified privacy flag. No A5 extra or historical Mia row
+is present. Provider request count remains null/unknown; sequential views are
+not an atomic snapshot or continuous lease.
+
+ARV2E320-004 is no longer reproduced in these current views. The historical A9
+failure remains valid and its discarded extra-row identity/failed field/cause
+remain unknown. Do not claim expiry, Mia removal, lock release or a causal fix
+from disappearance alone. The existing strict access policy already admits
+the observed owner-only shape; no policy relaxation or pin refresh is needed.
+ARV2E319-002, the original upload refusal, remains unexplained. No upload,
+permission/lock change, compile, capacity, backtest or outcome call occurred;
+booked floor remains324/249/50/699.
+
+### 321.6 Next bounded readiness recovery — implementation, not invocation
+
+Proceed under321.1's current owner direction with a separately versioned A10
+READY-only recovery contract, not an unchanged A9 relaunch. The current owner-
+only observation, credential-preclaim/handoff corrections and new per-stage
+finite access evidence provide its prospective justification. Keep the frozen
+owner/A5 access policy unchanged and require it afresh at every existing gate.
+Preserve all eleven exact strategy sources and economics, complete only missing
+files or permitted placeholders, retain immediate full readback after each
+at-most-once target write, and compile once with bounded polling. Capture the
+safe actual update error if the target still requires writing and QC refuses;
+never rewrite an already-exact target to recover a historical cause.
+
+The new helper and real client must both forbid nodes/capacity, backtest creation
+and result/status execution. After BuildSuccess require a final fresh ownership
+check, exact full inventory matching the compiled source manifest and fresh
+family/D15 admission; stop at source-complete/compiled readiness. Preserve
+runtime-validated, backtest-started, outcome, formal-PIT and paper/live flags as
+false. Capture bounded redacted access facts before strict policy verification
+so a new mismatch is explainable rather than discarded. New control, selected
+pins, exact one-shot decision, accounting and actual-exit handling must be
+committed before any A10 operational action. No new control has yet been
+inspected or allocated and no A10 has been consumed at this preparation point.
+
+Readiness scope remains precise: R298 is the first six-universe/AR-off candidate,
+not completion of the six/eight comparison. The frozen family is six ordered
+cells (six/eight universes crossed with AR-off/100/200), with1451closes and
+302decisions spanning2021-01-04..2026-10-13. The remaining candidates, runtime
+execution, bounded result reads and matched comparison are not made ready or
+accepted by compiling this one existing project. No new data subscription is
+implicated by the current upload/access barrier.
+
+Privacy basis is the dated/scoped313.4 manual-result Make Public observation
+carried forward in315.2 and qualified in319.1, together with the service's
+documented private-default assumption and current strict owner/dedicated access
+checks. No fresh Safari sharing view or general privacy proof was obtained in
+this round. Do not carry forward the obsolete no-editor-change assumption:
+section320's Mia/UI auto-build/session events remain disclosed. The new contract
+does not add sharing or collaborator-permission operations.
+
+Public-only reconstruction under native network/artifact/Keychain denial found
+the unchanged eleven projected files total278066bytes; each compiled in memory.
+Exact sorted inventory SHA256 is
+1d2b2d763045256ac0613b07bb8097b92feb7915ea5c4da8ba6d24fbe7b9a453,
+bound to projection f67148cd717e207be9d44f088749c0443bb696d9c4f38f512eb6cbf483fd9662.
+This is source verification, not a private package read or QC compile result.
+Static payload/transport inspection found no verified structural upload defect;
+the current official [Update File contract](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/file-management/update-file)
+still lists projectId,name,content and codeSourceId. No parameter is removed
+or guessed from the lost historical error. The existing diagnostic boundary's
+upstream non2xx limitation and success=true/nonempty-errors parser qualification
+remain; exact readback, not the request response alone, establishes file effect.
+
+### 321.7 A10 final implementation, corrections and focused validation
+
+Additive helper scripts/arv2_r298_readiness_recovery_remote.py is11109bytes,
+SHA256bdf8dba1c4df5394e8acdfe760b92767450390b2c33b017472f73c4d80f7a1cd;
+its tests/analyst_revisions_v2/test_r298_readiness_recovery_remote.py is19513bytes,
+SHA256acea10079dce7f9ba1ab2b73bb5e886ecbb827a8695c3564b1e081687e54030a.
+Real caller scripts/run_arv2_r298_readiness_recovery.py is49556bytes,
+SHA2561cb13d0155a4e5bf43e7c3416034a93b2c1d5312ee1120e3b7d2a854431339ab;
+its tests/analyst_revisions_v2/test_r298_readiness_recovery.py is62975bytes,
+SHA2568f654b1c53346465880d17be447598e6fe048c51d135b14a93ad2ce4ad22e861.
+Canonical arv2-r298-readiness-recovery-v1 profile SHA256 is
+c38a9de346e6cf147f088e9db2dd9870188fc6d3fa9e642a62a8242ef6315711.
+External observer scripts/observe_arv2_r298_readiness_recovery.py is9540bytes,
+SHA2566bbdf752fbf09969ed0f8e250e8337f67c4d0480b7a29ce235a87db8e271853d;
+its tests/analyst_revisions_v2/test_r298_readiness_recovery_observer.py is16270bytes,
+SHA25696f227c5bc767a1f431e915a443c0ca02437a069bc7070a8543d5ce8dbda21c7.
+Canonical arv2-r298-readiness-observer-v1 profile SHA256 is
+7f36a77517d7048844ca1f5ebccd6fff1212ef6962346d206f05c011443dca6a.
+All89 selected dependency pins are unchanged and verified; this does not bind
+the whole interpreter. All six new sources/tests compiled in memory.
+
+The new orchestration owns its claim, Store, preflight, workers, workflow and
+external entrypoint; it does not alias or invoke spent orchestration or patch
+old globals. Low-level frozen I/O, pure projection/admission, strict access and
+transport primitives remain reused with their original qualifications. Both
+helper and actual client exclude nodes/capacity, backtest creation, status and
+results. Only the exact manual-history guard can call backtests/list. Each
+needed target is written at most once, immediately fully read back, and the
+whole eleven-file inventory must equal the exact321.6 manifest. One compile
+create, at most20 ten-second polls, a fresh matching BuildSuccess, fresh access/
+history/inventory and final fresh family/D15 admission precede READY output.
+No change to frozen strategy economics or access policy is made.
+
+The600second parent deadline and64application-dispatch ceiling cover its
+bounded workflow. External capture permits615seconds plus separate bounded
+Git,15second validator and reap overhead; host suspension/uninterruptible I/O
+remain qualifications. Only its own children may be killed/reaped. The parent
+holds credentials in inherited memory; initial/final admission workers receive
+none and are native network/Keychain/security-tool denied. Their writes are
+limited to the new control and in-root support paths. Fresh family/D15 reads
+are admission, not spent operational-reader replay. Parent output is at most
+120KiB, workers24KiB, external channels128KiB. Finite safe response/access
+evidence is retained before policy/parser refusal; unknown rows never become
+new admission pins. No raw exceptions, credentials or licensed rows print.
+
+ARV2I321-002(P2,corrected before use): draft READY receipt validation accepted
+an arbitrary well-formed manifest digest; now requires the exact321.6 inventory.
+ARV2I321-003(P2,corrected before use): draft failure-output context could discard
+the last valid access observation when the next intent failed before dispatch;
+the bounded intent exception now preserves it without inventing another call.
+ARV2I321-004(P2,corrected before use): a re-pinned synthetic READY packet could
+carry access facts contradicting success. Final owner-only/owner-plus-exact-A5,
+dedicated-owner/write/liveControl, idle and absent-or-false public facts must
+cohere; seven hostile success regressions cover these cases. Failure packets
+still retain contrary/unknown facts for diagnosis, not acceptance.
+ARV2I321-005(P3,corrected before use): copied external result keys could contradict
+the actual dispatch/consumption state; readiness-specific keys now agree.
+The combined worst retained response plus access evidence has an explicit
+120KiB envelope bound/regression rather than the inadequate draft96KiB bound.
+Worker write/Keychain isolation was also tightened before use. None of these
+offline corrections establishes the historical QC upload or A9 mismatch cause.
+
+Root final focused validation: **464distinct passes in13.25s**:101helper,
+228caller,48observer,86record/active-document and1licensed-research transitive
+import-boundary check; no failures/skips/warnings. Native network/production-
+artifact/Keychain/security-tool denial, in-root support paths, no plugin
+autoload/conftest/cache provider/bytecode, dispatch_fence absent. No full suite.
+Author helper101passes2.84s and caller/observer276passes10.68s overlap this set.
+Preserve development evidence: initial212passes/4failures/28fixture errors
+(placeholder pins and synthetic projection/org fixtures),244passes9.13s,
+275passes10.43s, and275passes/1maximum-envelope fixture failure10.69s before
+fixture rebinding; all overlap. The intermediate81passes/1fixture assertion
+failure4.53s was corrected to the existing request_ambiguous classification.
+No incomplete tool-output fragment is counted as a completed selection.
+Memory-only omissions caught one access-gate failure0.09s, one success-access
+coherence failure0.26s and one final-admission failure0.11s, restored in finally
+with disk hashes unchanged. Same-round author/advisory checks are not independent
+Claude review. This is synthetic validation, not operational source readiness.
+
+The staged diff check caught trailing blank lines in four new files (the
+unstaged check had not covered untracked sources). Before any commit/use,
+remove only those EOF blank lines and bind the resulting final hashes above;
+profiles/dependency pins and executable semantics are unchanged. Do not count
+this as an operational failure or claim the earlier staged check passed.
+
+### 321.8 D2 exact A10 readiness-only one-shot freeze
+
+Under321.1's current owner delegation/review waiver, freeze these six files and
+the record as a separate clean commit. The actual clean commit binds
+--expected-head; exact321.7 caller/observer hashes bind --caller-sha256 and
+--observer-sha256. First perform only genuine credential-free public-source
+preflights under native network/artifact/Keychain denial. They neither inspect
+nor allocate the prospective control. Then invoke the committed external
+observer exactly ONCE using the normal credential-bearing execution context,
+not Node, without printing/inspecting credentials.
+
+Fixed new control is
+artifacts/analyst_revisions_v2/newrule_readiness_recovery/R321-20261024-B.
+It has not been inspected or allocated at this freeze. The parent exclusively
+claims/fsyncs it after public preflight and credential-shape checks, then may
+perform exactly the bounded321.7 recovery on project38364439, retaining the
+unchanged owner/A5 policy and all exact candidate pins. The fresh two admission
+workers and one external supplied-output validator may run only as part of this
+invocation. No old control, validator, reader, caller or operational claim is
+renewed. No orchestration cleanup, unchanged retry, alternate project, source
+substitution, fallback role or permission change is authorized.
+
+Actual parentexit0 AND separately validated matching finite READY output are
+mandatory. Report text alone, compile success alone, exitunknown/nonzero,
+trailing/malformed/bounded channels or source/concurrent drift are not readiness.
+Capture actual parent/validator exits and bounded metadata from the single
+invocation; do not reread its control afterward. A valid failure remains useful
+failure evidence, not success; a claim/dispatch ambiguity stays consumed or
+ambiguous. Use only newly retained facts for a separately justified correction
+under the owner's delegation; no routine authorization wait and no blind retry.
+
+On actual A10 claim/consumption conservatively add ONE shared and ONE Analyst
+development look: floor324/249/50/699 becomes325/250/50/699. This is attempt
+accounting, not a strategy result, QC launch or new evaluation cell. Append only
+the authorized Analyst accounting to the shared run ledger, without changing
+history/other lanes. Pre-claim checks alone do not add a look. At READY stop at
+exact-source/compile readiness: no capacity observation, backtest creation,
+status/result read or performance claim; remaining family cells and runtime
+validation stay outstanding. Preserve every formal/PIT/paper/live false flag.

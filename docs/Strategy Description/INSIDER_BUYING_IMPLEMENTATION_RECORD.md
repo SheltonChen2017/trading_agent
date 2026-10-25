@@ -1,6 +1,11 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 218 RECORDS CLAUDE'S REVIEW OF THE 13 CODEX COMMITS IN
+Status: **SECTIONS 219 ONWARD RECORD CODEX'S COUNTER-REVIEW AND THE OWNER'S
+NEW, SEPARATELY VERSIONED 2021–2025 EXPLORATORY PILOT WITH REQUIRED WARM-UP.
+NO QC ACCESS: THE EXPLICIT HOLD REMAINS. THE ORIGINAL 82-QUARTER STUDY AND
+ITS GATES ARE NOT REWRITTEN. PILOT READINESS IS NOT YET ESTABLISHED; CURRENT
+WORK QUALIFIES REAL RETAINED COVERAGE BEFORE OUTCOMES. ONE FINAL PUSH ONLY.
+SECTION 218 RECORDS CLAUDE'S REVIEW OF THE 13 CODEX COMMITS IN
 `8f6ee687..c43fb081` (SECTIONS 202-217). ALL 13 ARE ACCEPTED, THREE AFTER
 CORRECTION. THE RANGE'S NINE PROVIDER REQUESTS (SEVEN SHARADAR STATUS, ONE
 SHARADAR DATES-ONLY, ONE EODHD DATE) AND EIGHT KEYCHAIN READS MATCH THEIR
@@ -31205,3 +31210,108 @@ remain, namely:
 
 No looks, jobs or backtests (0/0/0), and no capital, order or trading
 authority.
+
+## 219. Codex counter-review of Claude's exact three-commit push (2026-10-24)
+
+### 219.1 Captured review snapshot and every disposition
+
+The owner now directs a separate 2021–2025 pilot, required warm-up, use of
+existing subscriptions, continued build until readiness or a concrete
+blocker, documentation and ONE final push. The NO-QC restriction persists.
+This supersedes older review-only/next-checkpoint limits for this round,
+not factual input gates, source custody, frozen strategy economics or the
+one-worktree rule. Initial exact local and fetched matching origin are
+`336b8477df902a496df3d6fe836973288796dde0`, clean in
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying`
+on `codex/strategy-insider-buying`. No fast-forward was needed. Origin
+descends from the last verified Codex push
+`c43fb081350d45640a4b3faf45fbd55c3187a0f8`. The pushed section218 and complete
+diffs, rather than the shared Git author, identify the independent review.
+Monitor remains PAUSED; no rearm or cross-chat message is requested.
+
+| Incoming commit | Codex disposition | Independently examined evidence |
+|---|---|---|
+| `6605db259d7c4735483ffc4d105f8b5c05bd178a` | **Accepted; no new issue found.** | Complete five-file diff and production consumers read. Device/inode comparisons cover a lane firmlink, its descendants and ancestor roots; unrelated invented roots remain allowed. Price plan/completion JSON now comes from the bytes whose exact pinned hashes are checked, not merely an equal-version reread. Both consumed epochs remain consumed. |
+| `fc7f034948622bf3eb35b102935204dee2182fe4` | **Accepted; no new issue found.** | Complete test-only diff and parser branches read. Genuine distinct-document control reaches success; duplicate sequence, immediate unknown role-prefix line and xsl-prefixed ownership filename each reach their exact grammar refusal. No frozen custody source changes. |
+| `336b8477df902a496df3d6fe836973288796dde0` | **Accepted with this append-only scope qualification; no code correction required.** | Complete record diff, all per-commit dispositions and retained ledger examined. Its supplier/receipt checks and mutation/full-count reports remain attributed Claude observations, not newly observed Codex operations. Section218.8's old January2006/August2018 blockers apply to the original long study, not automatically to the new owner-authorized pilot. No original receipt or historical finding is rewritten. |
+
+### 219.2 Observed validation, retained findings and limits
+
+Main observed **530 passed in7.92s**, no skips, on the four corrected source
+test files, lane record, active documents, lane import boundary and EXACT
+`tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports`.
+Python3.13.15; native process-tree network denial, Keychain executable denial,
+repository write denial, minimal environment, disabled plugin/cache loading
+and bytecode writes. This focused run is NOT a complete lane/repository suite.
+Parent forks remain permitted for fixture bootstrap tests; that does not
+relax the actual retained-input worker isolation requirement.
+
+Five separately labeled in-memory reversals independently failed at the
+intended new tests: old path-string fence **3 failed1.36s**; removal of the
+parsed-plan/completion hash check **1 failed0.15s**; duplicate-sequence guard
+**1 failed0.08s**; role-topology first-marker guard **1 failed0.03s**; XML xsl
+filename guard **1 failed0.03s**. Original on-disk sources were not changed;
+these are sensitivity experiments, not newly discovered on-disk defects or
+new pre-fix executions of Claude's historical runs. The green530 includes
+every corresponding regression. No provider, credential, original-parent
+semantic rerun, earnings body decode, outcome, QC or strategy look occurred.
+
+All earlier resolved findings retain their exact scopes. `IBSHAR-CR03`,
+`IBPRICE-CR01` and `IBORIG-TEST01` remain closed as218 records. The eight
+P3 observation groups in218.5 remain recorded, not silently claimed fixed.
+No new P0/P1 is open. Six carried P2s remain OPEN:
+`IB1C-REAL-CR01`, `IB1BCAMP-CR01`, `IBSRC-CR01`, `IBSRC-CCR01`, and shared
+`IBSH-CR02`/`IBQC-SHARED-META01`. Shared behavior is not changed. Passing
+focused tests does not close a real source/identity/factor/rights gate.
+
+## 220. New 2021–2025 pilot: delegated decisions and pre-outcome coverage scope (2026-10-24)
+
+### 220.1 Owner authorization and separate research identity
+
+The owner's exact direction is: "Proceed with the 2021–2025 pilot and the
+required warm-up history using my existing subscriptions. Build until it’s
+backtesting-ready or you hit a concrete blocker. No QC access yet. Document
+everything and push once." This is a new additive pilot, not permission to
+claim completion of2006Q1–2026Q2, thaw v1/v3, discard delisted instruments,
+rewrite earlier failures or consume a completed acquisition again.
+
+Decisions made under this direction and the standing best-judgment delegation:
+
+| Decision | Frozen pilot treatment and reason |
+|---|---|
+| IBPILOT-220-01 | Separate exploratory protocol/evidence epoch for entries2021-01-01 through2025-12-31. Preserve all original82-quarter contracts. The old analysis places2021–2027-08-31 in confirmation; this pilot must disclose that overlap and cannot later call pilot-used outcomes untouched canonical confirmation. The reserved2027-09-01–2029-08-31 final holdout remains untouched. No extra confirmatory allocation or transferred alpha; no actual look is registered/spent by metadata planning. |
+| IBPILOT-220-02 | Fixed chronological pilot phases2021–2023 development,2024 validation,2025 sealed pilot test, before outcome access. Purge cross-phase maximum60-session labels and embargo the first60 sessions of later phases. These conservative design exclusions are counted separately, never selected using performance. No result-based date or cost selection. |
+| IBPILOT-220-03 | Preserve causal first-open/first50k-crossing/issuer-entry merge, ordinary-share/PIT checks, all-six-form source/refusal accounting,253 prior regular listing sessions and252 actual preceding instrument-open calibration intervals,30-session signal and60-session context. No synthetic prelisting bars or weekday approximations. Preserve20-session primary/5-and60-session descriptive horizons,10bps/side primary and both actual-earnings +/-2/+/-5 diagnostics. |
+| IBPILOT-220-04 | Conservative calendar/intake envelope2019-10-01 through2026-06-30; derive the actual253-session lower bound and60-session maturity tail from an externally bound regular-session calendar. Calendar rows and listing-age declarations are necessary metadata, not authenticated price/factor observations. Early2021 is not dropped to fit Sharadar's observed2021-10-25 floor. Prefer owned EODHD qualification over buying an upgrade. |
+| IBPILOT-220-05 | First qualify retained pilot-window source metadata, not reacquire old paid requests. January2006/August2018 earnings exports are outside this pilot; do not demand them for pilot readiness. Audit all20 pilot SEC quarters and relevant warm-up/earnings/tail windows. Distinguish retained actual-release metadata from first-public timing/PIT identity, and calendar/date capability from price/terminal-return completeness. |
+| IBPILOT-220-06 | NO QC account/UI/API/SDK/upload/job/launch, including a supposedly harmless diagnostic. No new subscription or purchase, and no credential read/provider transport in this metadata phase. Metadata planning/auditing grants no outcome access, production readiness, registered look or runtime authority. Continue safe local work without routine approval or a new Claude checkpoint. Stop at a real absent source/identity input or explicit hold, not a fixture milestone dressed as completion. |
+
+### 220.2 Bounded implementation and real-input audit preregistration
+
+New lane-owned pure contract `research/insider_buying_pilot_2021_2025.py`
+will bind caller-supplied calendar metadata and produce an inert, separately
+versioned pilot plan plus strict pre-entry-history metadata checks. It will
+not read files, credentials, provider/QC interfaces, prices or returns, or
+change old analysis policy. Calendar hashes are content anchors, not source
+authentication or a permanent production look registration.
+
+New `research/insider_buying_pilot_coverage_audit.py` will qualify ONLY the
+already retained EODHD monthly campaign/window metadata and existing SEC
+selector metadata, with fixed external input hashes, bounded reads and
+before/after custody checks. Actual raw financial response bodies will not
+be decoded, and no source-event/outcome join will occur. Any raw-body
+verification is streaming hashing only. Its actual read-only diagnostic
+must run under native network, fork, Keychain-exec and file-write denial
+after the committed source image exists; results and exact hashes are
+recorded append-only. No resumed namespace, rewritten old receipt or new
+semantic original-parent run. Fixture tests use invented outside-lane roots.
+
+These are real retained-source coverage qualifications and executable
+pre-outcome boundaries, not a claim to have acquired/qualified full pilot
+prices, historical identities, original parents or open-to-open factors.
+Definitions of done for actual backtest readiness remain complete real
+source/identity/availability/rights/canonical/reference/protocol evidence
+and order-based engine parity after the QC hold is explicitly released.
+No pure contract, boolean attestation, subscription inventory or green test
+can meet those evidence requirements. Further observed facts, blockers and
+the final handoff follow after implementation hashes exist.

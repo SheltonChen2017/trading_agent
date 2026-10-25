@@ -797,9 +797,11 @@ update returned HTTP200/success=false with retained redacted source-policy
 refusal. No later module uploads, compile, capacity or launch followed. The
 public source is already plain Python; gzip parses authenticated JSON data,
 not executable code. Exact policy trigger/false-positive status needs QC/Mia
-clarification, not a guessed code rewrite. Safari is inaccessible because the
-Mac is locked. Section321.10 owns this concrete external barrier; no A11,
-automatic retry or review-authorization wait. Floor325/250/50/699, NOT ready.
+clarification, not a guessed code rewrite. Section322 supersedes the locked-Mac
+barrier: Mia was consulted through unlocked Safari and could not identify the
+exact classifier trigger. A genuinely plain-JSONL transport successor is being
+prepared, preserving economics and historical refusals; acceptance is not
+proven. No A11 or automatic retry occurred. Floor325/250/50/699, NOT ready.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -2059,6 +2061,12 @@ existing Safari/Mia session or an authoritative QC explanation resolves that
 specific refusal; no bypass aliases, blind formatting/split retries, new paid
 rights or historical-control replay. The owner's readiness waiver remains in
 scope, so no repeat review-authorization question is needed.
+The owner explicitly waives Claude review of section 322's verified readiness
+fixes and directs continued work after unlocking the Mac. Mia could not identify
+the classifier cause; proceed with the genuinely plain-data successor and its
+once-only offline preparation under322.5, not another upload of rejected bytes.
+Storage publication and source/compile readiness need their own exact freezes;
+the current offline result does not admit QC contact or clear readiness.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -56754,3 +56762,190 @@ After the one successful final matching-lane push, verify local/tracking/live
 remote agreement and clean status. Do not treat this push as a Claude trigger.
 The next action remains321.10's QC-policy clarification through unlocked Safari;
 the user need not repeat an in-scope review waiver. Do not report ready/running.
+
+## 322. Mia consultation and plain-data compatibility successor — 2026-10-24 PDT
+
+### 322.1 Owner scope and synchronized starting state
+
+The owner reports the Mac unlocked and directs: ask Mia why QC rejected the
+file, fix it, continue until the lane is ready for backtesting, document progress
+and push once when done. The owner then reinforces continued work without routine
+authorization stops and preauthorizes necessary in-scope moves. Section321.1's
+review waiver/delegated readiness scope continues. This is not independent
+acceptance, permission to evade a QC compliance restriction, new paid rights,
+other-lane authority, renewal of A1–A10, or funded/broker/paper/live authority.
+The current checkpoint remains readiness, not a backtest launch. The monitor
+remains PAUSED. Exactly one final matching-lane push concludes this new round.
+
+Starting local/tracking/live matching snapshot is
+2292bdab11f835be32568b90229410c2a6510b16. Root/branch/status were checked in
+the designated Code worktree; matching-branch-only fetch found no new commit
+and status was clean. No incoming Claude review is present. Preserve all frozen
+operational sources, controls, failures and old package/admission pins.
+
+### 322.2 Actual Safari/Mia consultation and UI qualifications
+
+Safari is now accessible and authenticated. The exact existing R298 project
+38364439 was opened; its input-runtime editor displays the `#` stub. This is
+a UI observation, not a new byte-level inventory authentication. Opening the
+editor triggered a platform automatic build at displayed04:50:21, LEAN
+2.5.0.0.18203, short build id d2d297-4795fc. No Build button was clicked and
+this build of incomplete existing source is not candidate readiness or a run.
+The terminal also reported missing-import suggestions on the three helper files.
+
+Two bounded consultation messages were sent in the existing Mia conversation.
+Both explicitly prohibited edits, uploads, permission/lock changes, compile,
+backtests/live jobs, Object Store exports and support-ticket creation. The
+messages contained non-secret refusal metadata and a small user-owned plain
+source excerpt of the bounded data parser; no credentials, licensed rows or
+private artifact were sent. Mia reported documentation searches only and no
+operational query or write. The UI nevertheless added its Mia collaboration
+session and showed Request Edit Control; this platform session effect is not
+hidden by the read-only instruction.
+
+Mia confirmed the plain-source policy category but has no classifier internals,
+per-request diagnostic route or exact triggering pattern. Its proposed gzip
+false-positive explanation is a HYPOTHESIS, not an authenticated cause. Root
+challenged its claim that this was the only fitting hypothesis; Mia explicitly
+qualified that claim. It identified plain JSONL in Object Store as a supported
+functional data design and acknowledged that public documentation is silent
+about a specific post-refusal appeal/remediation procedure. Its advice does not
+establish platform acceptance, waive compliance or prove any proposed upload
+will pass. Compression of data is not execution of compressed source.
+
+After Mia completed, root attempted only the previously owner-authorized
+removal of the displayed Mia session. QC refused: Collaboration not found,
+REF #f54a1e0acj. No repeated removal or other-user/owner change followed. Closing
+the project reported that its final cloud save was skipped because this editor
+did not hold the write lock (displayed holder Mia). Safari then returned to
+the project list. These UI facts do not authenticate the present dedicated
+collaborator list or clear a future access gate. No explicit source write,
+storage publication, capacity call, backtest launch or result read occurred.
+
+### 322.3 Bounded implementation decision — no operational authority yet
+
+Proceed with a genuinely different plain-data transport, not import renaming,
+string-built calls, detector probing or repeated uploads of the flagged bytes.
+The four authenticated role streams will be represented as exact canonical
+plain JSONL, with new immutable keys, transport identity and activation manifest.
+The cloud reader will parse these plain bytes directly, retaining duplicate-key,
+canonical-byte/hash, role/order/count, prefix, aggregate-budget and false-claim
+checks. No decompression is then needed in that new reader. Original compressed
+objects, D15 admission, source files, A10 controls and failures remain untouched.
+
+This is a compatibility candidate under the owner's delegated judgment, not a
+verified historical root-cause correction. Before contact it needs synthetic
+validation, original-to-new canonical-stream equivalence, explicit parent
+lineage, new source/profile/projection bindings, a separately committed exact
+one-shot decision and new storage admission. The original D15 admission proves
+only the original six objects; it must never admit successor keys by relabeling.
+The unchanged strategy runtime can use the new package/profile identity while
+all economic/clock/universe/score/execution values remain exactly equal. Nine
+of eleven cloud files can stay byte-identical; the input reader and main's
+package/profile/activation bindings are the only intended source deltas.
+
+Keep existing32MiB object,44MiB aggregate,16MiB raw-role-shard and96object
+bounds for this candidate. The original2,776,584byte compressed inventory does
+not establish the uncompressed aggregate fits44MiB. No private measurement,
+new object allocation or provider contact has been made at this decision.
+Overbudget must refuse, not truncate, silently raise limits or split to evade
+an aggregate cap. Same-round advisory agents are not independent reviewers.
+
+Current official references remain the [Security and IP policy](https://www.quantconnect.com/docs/v2/cloud-platform/security-and-ip),
+[Object Store](https://www.quantconnect.com/docs/v2/writing-algorithms/object-store),
+and [support contract](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/support/create-support-ticket).
+No support seat, ticket, project/library access grant, purchase, public forum
+post or email has been made. No claim of exact classifier cause or unrestricted
+post-refusal clearance is inferred from Mia's documentation-based advice.
+
+### 322.4 Offline implementation and pre-use corrections
+
+Three new research modules implement the plain-data converter, cloud loader and
+R298 projection bridge. The host converter requires the genuine old package,
+external package/lineage pins and checked iterator exhaustion before minting a
+process-local immutable successor. The bridge authenticates the old projection,
+new transport and externally selected new sources; it reconstructs the exact
+old main before changing only four bound literals. Nine other cloud files are
+byte-identical. The economic profile is unchanged except package and source
+identities. Old pins remain predecessor dependencies, not the actual new loader.
+
+The separate offline preparation caller claims a fresh private leaf before
+reading the fixed old package/lineage. It retains metadata claim/report, not
+licensed rows or duplicate payloads. Later publication must freshly authenticate
+its input against externally pinned preparation; this is neither D15 reuse nor
+storage admission. Actual exit0 plus exact finite output is required. A complete
+report left by late failure does not count as success. No old control is read.
+
+Pre-use corrections: ARV2I322-001(P2), converter zlib.error now maps to finite
+source-row refusal without raw text. ARV2I322-002(P2), equal-content bytearray
+or string subclasses could satisfy capability fingerprints; exact types and
+regressions now refuse them. ARV2I322-003(P2), canonical JSON changed dict order
+used by the frozen main template; unchanged profile construction restores order
+and exact old-main equality is required. ARV2I322-004(P3), failure classification
+could import a module after its pin failed; it now checks only already-loaded
+exact modules/classes. None is a proven historical QC-refusal cause.
+
+Root selection: **408distinct passes in6.28s** (100converter,145loader,
+60projection,103preparation). Native network/production-artifact/Keychain/security
+denial, in-root support paths, no plugin autoload/conftest/bytecode/cacheprovider;
+dispatch_fence absent. No full suite. Author selections/earlier subsets overlap.
+Initial converter69pass/27fail covered invalid float fixture and zlib wrapping;
+initial projection36pass/21fail exposed main-order reconstruction. A projection
+collection attempt was denied at artifact metadata with zero tests; explicit
+--ignore=artifacts fixed the harness without weakening denial. Memory-only
+omissions caught sourcehash, final source authentication, cloud content pin,
+projection source pin and actual-exit omissions, restored finally. The first
+copied-globals mutation failed for the wrong fixture reason and is excluded.
+Same-round advice is not independent review.
+
+Selected source SHA256 pins:
+
+| Source | SHA256 |
+|---|---|
+| newrule_plain_transport.py | 4cf351095015fddb7a463692f6d789917d229966772e04a60de0c804ed965f5a |
+| newrule_plain_input_runtime.py | bc07c0bebc141ecad38c774a52ea3bddaad4664a7dd85ccf47581572ef9beb8f |
+| newrule_plain_projection.py | a0152d0d4109584312ee1e5a2f91cc03bf97cbab6b0e2525dd4f968fa9bd9927 |
+| scripts/prepare_arv2_newrule_plain_transport.py | 858d631f3aecd4107581ee768fbb606eb5f48addacbf0c1c43ecabf5b615158a |
+
+Other selected pins are inherited literally from the frozen comparison caller;
+evidence helper additionally pins dc41adea9285671d2c39a1ee0afbfa517a3641d9fdaa49a2ea77cc44c4d759d3.
+This is not whole-interpreter integrity. A storage helper draft is included but
+UNVALIDATED/UNINVOKED and outside preparation's import closure; no publication
+authority exists yet. Native private authentication must remain separate from
+the network-capable publisher. An inherited-FD broker is planned, not invoked.
+
+### 322.5 D1 prospective once-only offline preparation freeze
+
+Under the current owner waiver, freeze ONE invocation of unchanged322.4
+preparation at the clean commit containing this decision. Pass that exact HEAD
+and caller SHA858d631f3aecd4107581ee768fbb606eb5f48addacbf0c1c43ecabf5b615158a
+through --expected-head and --caller-sha256. These bind source, not authority.
+Host is only the designated Mac root/branch and Python3.13 at
+/Users/sheltonchen/.venvs/trading_agent-py313/bin/python. Deadline180seconds,
+finite stdout4096bytes, claim/report each128KiB; host suspension/uninterruptible
+I/O remain qualifications. Offline preparation is not an A11 QC attempt.
+
+Fresh exclusive leaf artifacts/analyst_revisions_v2/newrule_plain_transport/R322-20261025-A
+has not been inspected or allocated. Claim/partial claim is spent on failure;
+no reset/repair/renamed unchanged retry. Private input reads only the fixed
+R297-20261013-D5/package/arv2-preliminary-qc-package-411c2734da61c7d4172c4cb3
+and arv2-october-lineage-e4518e06a68a18a3151fe36e5926699624fc68b97c31a8e06917d44103831fd9/lineage.json
+within that same package parent. Pins remain
+package411c2734da61c7d4172c4cb3d33c4ffdde650f40336a5e807d26e50cc7de0bad
+and lineagee4518e06a68a18a3151fe36e5926699624fc68b97c31a8e06917d44103831fd9.
+Fresh consumer authentication is not replay of old acquisitions/readers.
+
+Invoke through /usr/bin/sandbox-exec with native network/Keychain/security-tool
+denial. Deny artifact reads except the exact input subtrees/new control and
+literal ancestors for safe directory traversal. Writes only new control parent/
+leaf and an in-root .pytest_cache support directory, plus /dev/null. Use env-i,
+GIT_OPTIONAL_LOCKS=0, -B, no user site/bytecode, in-root cache/temp paths. No UI,
+provider, QC or credential operation. Do not lower any source/object/aggregate
+bound on refusal. Retain actual exit and finite double-LF stdout. One separate
+native-network/artifact/Keychain/security-denied validate_output call may consume
+only supplied stdout, actual observed exit and exact binding; it never reopens
+private files. Raw exceptions/opaque values/licensed rows must never print.
+Failure stops this exact claim; further work must address verified evidence.
+The first root record check found84passes/2failures because the exact-next-step
+navigation still named321; that live navigation was corrected before D1. This
+is documentary pre-use evidence, not an operational failure or discarded test.

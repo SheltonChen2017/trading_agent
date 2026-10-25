@@ -1,26 +1,17 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE (MACOS SESSION) HAS REVIEWED THE FIVE CODEX COMMITS IN
-`cc1e44f..ae28f4a` (SECTION 123) AND ACCEPTS THEM WITH NO CORRECTION. THE
-CODEX COUNTER-REVIEW OF `cc1e44f` COMPLETE IN SECTION 121 WAS ACCEPTED AFTER
-DOCUMENTATION CORRECTION, AND ALL THREE OF ITS FINDINGS AGAINST CLAUDE ARE
-CONFIRMED. THE OWNER-DIRECTED LOCAL SOURCE QUALIFICATION RAN A SIX-ROUTE ACCESS
-AUDIT (SHARADAR, EODHD, MASSIVE, FMP; ALL HTTP 200) AND A 13,944-REQUEST COUNT
-RECOVERY THAT CLOSED REFUSED ON A STATUS-LESS TRANSPORT FAILURE, ITS CLAIM SPENT
-WITH 67,884 POSITIONS UNSTARTED; THE DAILY RECOVERY MADE NO REQUEST. THEIR
-EVIDENCE FILES MATCH THE PUBLISHED DIGESTS. `SI-CR23-001` (P3, OPEN): FREEZE A
-RETRY OR CHUNKING RULE FOR STATUS-LESS TRANSPORT FAILURES BEFORE THE NEXT
-RECOVERY. `SI-CR23-002` (P3, OPEN): THE RECORD TEST PINS PAST ROUNDS' PHRASES
-IN THIS STATUS. `SI-CR23-003` (P3) CORRECTS ONE LEDGER ROW'S UTC DATE BY
-ERRATUM. TWO HISTORICAL QC METADATA REQUESTS AND FIVE NYSE CALENDAR GETS REMAIN
-RECORDED; QUANTCONNECT PAUSED BY OWNER, INCLUDING CAPACITY/METADATA ACCESS,
-UNTIL RELEASE, AND NO QC REQUEST OCCURRED. NETWORK-DENIED ON `ae28f4a` THE 16
-AFFECTED TEST FILES PASS 645. NO COMPLETE LANE SUITE, BY OWNER
-DIRECTION. SIX P2s REMAIN OPEN, WITH `SI-BUILD-20261024-012`. LOOKBACKS
-20/60/120/252 UNSELECTED; CANONICAL ACTUAL LOOKS 0/0, EXPLORATORY ACTUAL LOOKS 0,
-ALPHA 0, PERMANENT LOOK IDS NONE, QC LAUNCH ATTEMPTS0. NO HOLDOUT, ETF,
-PURCHASE, BROKER, OPERATOR DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL, ORDER OR
-TRADING ACTION.**
+Status: **CODEX COUNTER-REVIEW OF CLAUDE `b648f60` ACCEPTED AFTER ONE APPENDED
+COUNT-SCOPE ARITHMETIC ERRATUM (SECTION 124). OWNER-DIRECTED BOUNDED RECOVERY
+AND SECRET-SAFE DIAGNOSTICS ARE IMPLEMENTED; ACTUAL REPLAY AND FIRST-CHUNK
+REGISTRATION REMAIN PENDING AT THIS PRE-DISPATCH CHECKPOINT. ALL OLD CLAIMS,
+NEGATIVES AND CHARGES REMAIN SPENT/IMMUTABLE. NO BACKTEST READINESS IS CLAIMED.
+SIX PRIOR P2s AND ACTUAL TRANSPORT/COVERAGE FINDING `SI-BUILD-20261024-012`
+REMAIN UNRESOLVED. TWO HISTORICAL QC METADATA REQUESTS REMAIN RECORDED.
+QUANTCONNECT PAUSED BY OWNER, INCLUDING CAPACITY/METADATA. NO QC OR PURCHASE.
+LOOKBACKS 20/60/120/252 UNSELECTED; CANONICAL ACTUAL LOOKS 0/0,
+EXPLORATORY ACTUAL LOOKS 0, ALPHA 0, PERMANENT LOOK IDS NONE,
+QC LAUNCH ATTEMPTS0. NO OUTCOME JOIN, HOLDOUT, ETF, BROKER, OPERATOR DATABASE,
+DEPLOYMENT, PAPER/LIVE, CAPITAL, ORDER OR TRADING ACTION.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -246,6 +237,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-24 | Codex counter-review only | Exact complete Claude range `66fb823bfb1fd1427b9d26673b778b5b839ee579..cc1e44fc3e937efe9aa19b38ca7b72cbb5399f5b`; one linear record-only commit; this correction commit follows | Section 121: verify Claude's exact-checkpoint review, cache/G1 claims and durable record | `cc1e44f` accepted after three appended P3 documentation corrections; a ledger-count ambiguity rejected as a false alarm; no production change | Focused offline checks and attributed independent in-memory red/green probes recorded in 121.4; no complete lane/repository suite; no private/provider/QC access; looks unchanged | SI-CCR-20261024-001..003 corrected; -004 false alarm; existing partial/unresolved, held, source/shared/process rows retained | No next milestone. QC paused including capacity/metadata. One final same-lane non-force push under section 81; Claude reviews the exact resulting checkpoint. |
 | 2026-10-24 | Codex owner-directed publication handoff | Starting actual remote `b211db7f81103df9cc3d736a05a4cc82d8efe4b0`; unpublished `acf04aff1b2e78bba5d642b350c4f983ac53caf8`, `71c2e7a849aaed577a8a0e62b6d822e07b6b5f77`, `99417837467f98b0ed02a3272b0980f4efa2d243`, followed by this record-only closing commit | Existing-subscription access/recovery code for Claude review, not local backtest readiness | New count capture terminated refused at13,944 STARTs; original/new spent claims and unknown transport cause retained. Offline daily audit verified593 complete/576 complementary days; no new daily capture. Later owner stop/wait/push authority in122.10 supersedes continued building for this handoff only. | Earlier Main286-pass and117-pass executions remain attributed in122.7–122.8; closing record/diff checks in122.11. No full suite, real outcome or QC access. | Retain001–011 and all earlier ledgers; SI-BUILD-20261024-012 is unresolved actual transport/coverage refusal, not a proved timeout or subscription denial. | One final matching-lane non-force push after terminal documentation; Claude reviews the exact resulting pushed range. No implementation, source retry or next milestone; remove only the narrow wait monitor after publication. |
 | 2026-10-25 | Claude review (macOS session) | `cc1e44f` -> `ae28f4a` reviewed from the published head after Codex's own push; **no code or test correction**; this record commit is the only Claude commit | Independent review of Codex's counter-review of section 120, the six-route provider access audit and the count and daily recovery | Confirmed all three `SI-CCR-20261024` findings against my section 120. Verified both request rounds were frozen and committed before running, matched the count recovery's claim, closure, diagnostic and receipt and the daily scope files to their digests, and confirmed the access receipts hold no email-shaped data. Two in-memory probes: B2 red; B1 unreachable by construction. | Pushed tree `ae28f4a`, clean, network-denied, empty environment: 16 affected test files **645 passed** (no skips or warnings); mutation baseline 40 passed; compileall exit 0; record-regression and active-document checks pass after this record; `git diff --check` clean. **No complete lane suite, by owner direction.** **Authorized looks 0, consumed looks 0**. | `SI-CR23-001` (P3, open: no retry or chunking rule for status-less transport failures). `SI-CR23-002` (P3, open: status-paragraph test pins tie the status to past rounds). `SI-CR23-003` (P3, closed by erratum: `ae28f4a` row should be 2026-10-25 UTC). `SI-CCR-20261024-001..003` confirmed against Claude. `SI-BUILD-20261024-012`, source P2s and others open. | Codex counter-reviews this record commit. Freeze a retry or chunking rule before any further recovery. QuantConnect stays paused until the owner releases it. |
+| 2026-10-25 | Codex counter-review + bounded recovery | Exact Claude range `ae28f4a040706e7941553fdd6dd8072948b069cb..b648f60112af141efc2a12fbaef03b38846d219d`; this bounded code/record series follows | Section124: accept review after count-scope erratum; distinct finite successor transport and offline refused-prefix replay | Old v1 source files/claims stay immutable; no implicit budget reset; new512-descriptor proof chunk has528 maximum new STARTs,16 extra attempts, maximum3 tries, fixed2/10s backoff and one-hour START window. Not full source qualification or backtest readiness. | Main56-test counter-review and142-test new focused executions, causal clock/claim regressions and attributed delegate evidence in124; no complete suite or QC | SI-CR23-002 corrected; SI-CR23-001 design implemented, actual closure pending; old source P2s and012 stay open | Freeze measured predecessor manifest and exact committed code before any fresh claim/key/HTTP. Accumulate local commits, one final matching-lane push after this bounded round, then independent Claude review. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -21601,3 +21593,167 @@ environment:
    production ranking and seeds, ETF work, any QuantConnect access, purchases,
    broker, operator database, deployment, paper/live, capital, orders and
    trading.
+
+## 124. Codex counter-review and owner-directed bounded recovery — 2026-10-24 PDT
+
+### 124.1 Authority, exact review range and dispositions
+
+**SI-AUTH-20261024-04** records the owner's later direction: “After Claude's
+review, counter-review it and add safe bounded recovery with clearer error
+diagnostics. Preserve existing data and spent budgets, then continue toward
+backtest-ready. No QC or purchases; push once when done.” This reopens bounded
+lane implementation after the earlier publication-only stop, not an old build
+monitor. Both old automations remain deleted; none is armed by this entry.
+No QC access includes capacity, account/metadata/history, projects, uploads,
+compilation, jobs and backtests. No purchase, renewal, new terms, credential
+issuance, email, other lane, broker/operator database, deployment, paper/live
+or real order is authorized. Current raw/license protections remain in force.
+
+The complete pending Claude range is
+`ae28f4a040706e7941553fdd6dd8072948b069cb..b648f60112af141efc2a12fbaef03b38846d219d`:
+one linear record-only commit, **+178/-18**, on the designated physical/Git
+root and matching branch, clean local/tracking/actual matching originB648.
+Main read its complete message/diff and section123; exact pushed-checkpoint
+review/completion and all five preceding Codex dispositions are explicit,
+not inferred from author identity. No Claude production or test correction
+exists to port. No implementation/source call occurred during counter-review.
+
+| Commit | Disposition | Counter-review evidence |
+|---|---|---|
+| `b648f60112af141efc2a12fbaef03b38846d219d` | **Accepted after appended documentation correction** | One P3 scope arithmetic error below; all three new Claude P3 observations otherwise confirmed, UTC erratum valid, prior numstat and evidence-attribution corrections retained. Claude's645-test/private-file observations remain attributed to Claude, not newly executed by Main. |
+
+| Finding | Priority/status | Evidence, correction and retained limits |
+|---|---|---|
+| SI-CCR-20261024-005 | P3 confirmed, corrected by this erratum | Section123.5 SI-CR23-001 calls67,884 the count positions still needed. That is only the **unstarted** child suffix. The failed child13944 maps to original13991 and also lacks an observation. Original47 successful bodies plus child13943 cover13990 distinct original positions, leaving **67885** of81875 unresolved. Spent cumulative13992 STARTs leave67884 under the historical81876 ceiling; a full successor therefore needs at least one additional prospectively authorized START even without retries. Historical rows are preserved, not rewritten. |
+| SI-CR23-001 | P3 design advisory, implemented here; real successor result pending | Fail-closed is retained. New chunk uses distinct per-attempt receipts and fully charged, finite retries below; no hidden retry is inserted into old transport or daily page gates. Old failure012 remains unresolved actual coverage, not a proved timeout or subscription denial. |
+| SI-CR23-002 | P3 confirmed/corrected | Round-specific phrases moved from current-header assertions into bounded historical sections119/121. The changed-header regression preserves the historical body byte-for-byte while allowing a genuine new current state. Durable QC/metadata/look gates remain tested. |
+| SI-CR23-003 | P3 confirmed/closed by Claude's preserved erratum | Section5 explicitly usesUTC. AE28's2026-10-24T20:18:09-07:00 is2026-10-25T03:18:09Z. This does not change the local owner-session date or old record row. |
+| B1 seventh-request-guard sensitivity concern | Not a new defect; retained qualification | Fixed operational route tuple/protocol permits only six requests. No seventh route is reachable without changing separately pinned policy; a green single-guard mutation is not proof of a dangerous seventh invocation. B2 claim-before-key remains load-bearing. |
+
+All six earlier unresolved P2s, SI-BUILD-20261024-012 and earlier partial,
+shared, held and false-alarm dispositions remain in their historical ledgers.
+New retry code does not retrospectively complete a refused source. Canonical
+original-vintage PIT requirements remain separate from the latest-reported
+descriptive candidate; report-period selection alone is not a new blanket
+blocker to the latter, but class/unit/split-basis/source coverage still matters.
+
+### 124.2 Bounded successor design, before dispatch
+
+**SI-DEC-20261024-08:** implement one bounded first chunk for original
+positions**13991..14502**, exactly512 descriptors, including the failed prior
+observation. There is no automatic later-chunk loop and no spent-claim resume.
+The bounded milestone ends at its actual closed result and independent Claude
+review before a later tranche; this is progress toward local readiness, not
+an assertion that512 observations complete the study. It does not consume the
+old claim's unused slots by inference. The later owner instruction supplies
+the new finite source-only authority.
+
+The distinct output is
+`artifacts/short_interest/native_reported_counts/count-bounded-20261024-v2-chunk001`,
+with stable exclusive parent claim
+`count-bounded-20261024-v2-chunk001.spent.json`. Maximum new STARTs**528**,
+extra-attempt pool**16**, at most**3** observations per descriptor, fixed**2s/10s**
+backoffs, at most**8** in flight and at least1s between new batches. One-hour
+new-START window; started work drains, and a late closure is refused. This
+dispatch is no faster than the prior eight-inflight protocol and claims no
+paid quota or rate-limit entitlement. Any403/429 or other HTTP failure stops
+new work; HTTP statuses, TLS/certificate, permanent DNS, resource exhaustion,
+unknown/local/guard/clock/echo/media/publication failures are never retried.
+Only explicitly classified status-less transient GET transport failures may
+spend a new attempt, after their own persisted negative and backoff.
+
+Prior totals are carried unchanged: **13992 STARTs,13991 recorded HTTP
+invocations,23452681 charged bytes**, across both refused claims. This chunk's
+maximum cumulative STARTs is**14520**, within the earlier numeric81876 ceiling;
+it does not grant the larger allowance a full future recovery would require.
+The cumulative response ceiling remains**4GiB**. Every attempt reserves a full
+2MiB before START and charges an unobserved body in full, including status404
+under this new conservative policy. Successful bodies charge actual bytes;
+every retry is a new immutable START/receipt with a predecessor attempt link.
+No unreceipted, unpublished or uninvoked START is refunded or omitted.
+
+New `short_interest_recovery_transport.py` makes one30s-timeout invocation,
+never a hidden retry. Fixed phase/class/status/allowlisted-errno diagnostics
+never stringify an exception or retain a URL, headers, error body, credentials,
+account/contact facts or dynamic exception type name. Known response status
+survives a read failure and disables retry. Nested typed URLError reasons are
+bounded/cycle-safe. Existing protected no-proxy/no-redirect opener validation
+and named in-memory Massive authentication remain unchanged.
+
+New `short_interest_refused_count_snapshot.py` authenticates the original
+146-file prefix and separate spent claim, historical994 complete51-file code
+identity, the first child's exact41835 members, frozen protocol, spent claim,
+negative closure/failed receipt/diagnostic and every raw/control byte hash.
+It reconstructs an actual **halted** ParallelCountInventory with original
+clocks,13944 STARTs/HTTP invocations and21293349 charged bytes. Retained
+directory/claim FDs and one transient member FD avoid all-member FD growth;
+full membership/stamp passes close replay before yield/exit, including
+in-place edits. Legitimate new sibling claims do not mutate the old run.
+The actual manifest digest and current protocol stay **PENDING** until a
+read-only measurement is frozen in committed code; no claim/key/HTTP can run
+at this checkpoint. That measurement is not source admission.
+
+The new controller pins exact committed current code and source custody,
+checks only the matching actual remote in at-most-eight batches, retains the
+new external claim under held-FD custody, and audits exact output membership
+and original hashes before/after provisional and final transport markers.
+Any dominant negative defeats a positive/provisional marker. It returns no
+full-source registry or actual-input runner; future union must qualify all
+81875 descriptors and every cumulative debit before yielding admitted input.
+Daily576-complement scope and593 old complete days remain unchanged; no new
+daily child is dispatched here and no partial page chain is stitched.
+
+### 124.3 Validation and pre-dispatch corrections
+
+Main's clean B648 counter-review selection (provider access, old count recovery
+and record): **56 passed in1.33s**. New chunk/transport/snapshot/record selection
+after correction: **142 passed in2.12s**, network-denied with empty inherited
+environment; no skip or warning. These are focused files, not a complete lane
+or repository suite. Main's first new chunk selection had test-only thread
+ordering assumptions (which worker invoked first); corrected tests now locate
+the persisted failed attempt rather than changing any production ordering.
+
+| Finding | Priority/status | Causal evidence and correction |
+|---|---|---|
+| SI-BUILD-20261024-013 | P2 corrected before dispatch | A closing clock could be after global start but before the final real receipt. Main's regression was red1failed/.36s; completion now must enclose every real START/receipt, with no rewritten clocks. Deadline checked through final audit; all already-started work drains. |
+| SI-BUILD-20261024-014 | P1 corrected before dispatch | New external claim was initially excluded from final output audit. Two tamper regressions were red2failed/.41s; retained protected claim FD/stamp/original-byte digest now gates every normal boundary and closure. Claim drift permits only a new negative, never rewriting the spent claim. |
+| SI-BUILD-20261024-015 | P2 corrected before integration | Directory timestamps do not detect an earlier in-place file edit. Snapshot full-stamp/membership replay before yield/exit adds this proof without O(N) work per request. Delegate reversed full_check to check:2expected failures/.14s, then restored. Parent sibling namespace must remain writable for separately claimed chunks; old run namespace and individual spent claim remain exact. |
+| SI-BUILD-20261024-016 | P2 corrected before integration | A misleading timeout/connection exception subclass carrying ENOSPC/EMFILE/ENFILE/ENOMEM must not be retried. Delegate's causal cases red6 then green; allowlisted numeric resource errno overrides transient-looking subclass. Nested HTTPError preserves known status and closes unread handle; hostile code accessor cannot leak text. |
+| SI-BUILD-20261024-017 | P2 corrected before dispatch | Changing an earlier body while the final audit read a later member could escape that pass. Published original inode/size/mtime/ctime stamps and a final all-member metadata sweep now close each byte pass. Main's late-prior-body regression and per-START deadline regression were red2failed/.51s before correction. |
+| SI-BUILD-20261024-018 | P2 corrected before dispatch | A batch could cross the deadline while constructing its STARTs. Deadline now gates each debit and each worker HTTP invocation, not only batches/final closure. Already-debited pre-wire work is still fully charged; no late invocation is authorized. |
+| SI-BUILD-20261024-019 | P3 prevented during static composition audit, no actual FD failure | Holding54 current-code files plus the saved cache's50 duplicate code FDs would likely fail the retained96-free preclaim gate under soft256. The new adapter reuses those exact50 held FDs and holds only4 extras, while re-verifying all54 against committed blobs and the external manifest. Neither host limits nor old headroom helper changes. |
+| SI-BUILD-20261024-020 | P2 corrected before dispatch | Final old-source full audit must occur inside the new controller's guarded positive/negative closure, not only on context exit after a positive marker. Explicit full audits precede/follow final publications. Source drift allows only fixed negative publication under unchanged lane/code/output custody. |
+
+Delegate-attributed evidence, not Main executions: header replacement red2/.56s
+then18passed/.38s; final transport/import79passed/1.03s (70new transport cases);
+snapshot/old-count/registry77passed/3.19s (26new snapshot cases), constantFD
+fixture peak4 and zero leaked; historical-code-proof reverse mutation red1/.09s.
+No delegated test touched actual captures, credentials or provider/QC network.
+Main's historical286passed/50.51s and117passed/11.43s and Claude's645-test
+review remain **prior executions**, not rerun claims in this round.
+
+Main subsequently ran the eight affected/focused/import-boundary/active-document
+files: **276passed in5.15s**, no skip/warning, before the final source-audit/FD
+composition regressions were added. Seven changed Python files compile in
+memory; the new operational static import closure has exactly**54** registered
+paths, no missing or extra path. A misplaced draft append was caught by the
+existing section120 history hash; it was moved after123, not accepted or
+committed in the wrong location. Main verified every historical body byte
+from Current publication rule through123 against B648 after subtracting only
+the one new push-ledger row. Existing source files and v1 protocols are unchanged.
+Read-only drive check showed73,856,524KiB available (about70.4GiB), well above
+this chunk's finite maximum1,107,296,256 response bytes plus control metadata;
+no file was removed. These are software/operational checks, not empirical results.
+
+Pre-dispatch quality: software**8/10**, records/authority**9/10**. Focused
+dangerous-direction checks cover the bounded path, but actual closed replay
+and retrieval have not yet been demonstrated on this new code. Independent
+Claude review of the final pushed snapshot is still required; delegate code
+audit is not a substitute for that review.
+
+Actual closed predecessor replay and the bounded first capture are the next
+in-scope steps after exact code/manifest registration. The next durable entry
+must record their real terminal result and any factual blocker, without
+inventing successful source qualification. Only one final non-force push to
+the matching lane is permitted for this accumulated round. No intermediate
+push, full suite, QC, purchase, outcome join or claimed backtest result.

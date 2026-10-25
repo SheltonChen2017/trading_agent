@@ -2,6 +2,8 @@
 from pathlib import Path
 import hashlib
 
+import pytest
+
 
 RECORD = Path(__file__).resolve().parents[1] / "docs/Strategy Description/SHORT_INTEREST_IMPLEMENTATION_RECORD.md"
 
@@ -10,12 +12,40 @@ def _text():
     return RECORD.read_text(encoding="utf-8")
 
 
-def test_current_status_retains_metadata_and_later_owner_source_scope():
+def test_current_status_retains_metadata_accounting_and_durable_gates():
     header = " ".join(_text().split("Current publication rule", 1)[0].split())
     assert "TWO HISTORICAL QC METADATA REQUESTS" in header
-    assert "LOCAL SOURCE QUALIFICATION" in header
     assert "QUANTCONNECT PAUSED BY OWNER" in header
+    assert "CAPACITY/METADATA" in header
+    assert "CANONICAL ACTUAL LOOKS 0/0" in header
+    assert "EXPLORATORY ACTUAL LOOKS 0" in header
+    assert "ALPHA 0" in header
+    assert "PERMANENT LOOK IDS NONE" in header
     assert "QC LAUNCH ATTEMPTS0" in header
+
+
+@pytest.mark.parametrize("check_name", (
+    "test_current_status_retains_metadata_accounting_and_durable_gates",
+    "test_section_121_counter_review_retains_its_historical_disposition_and_gates",
+))
+def test_current_status_can_advance_without_repeating_past_rounds(monkeypatch, check_name):
+    original = _text()
+    _, separator, history = original.partition("Current publication rule")
+    assert separator
+    replacement = """# Short Interest ETF Strategy — implementation and session record
+
+Status: **OWNER-DIRECTED BOUNDED RECOVERY IN PROGRESS.
+TWO HISTORICAL QC METADATA REQUESTS REMAIN ACCOUNTED FOR.
+QUANTCONNECT PAUSED BY OWNER INCLUDING CAPACITY/METADATA.
+CANONICAL ACTUAL LOOKS 0/0, EXPLORATORY ACTUAL LOOKS 0, ALPHA 0,
+PERMANENT LOOK IDS NONE, QC LAUNCH ATTEMPTS0.**
+
+"""
+    revised = replacement + separator + history
+    monkeypatch.setitem(globals(), "_text", lambda: revised)
+    # A new current state must not require restating past review conclusions.
+    globals()[check_name]()
+    assert _text().partition(separator)[2] == history
 
 
 def test_counter_review_distinguishes_historical_metadata_requests_from_launches():
@@ -71,7 +101,9 @@ def test_resumed_source_round_preserves_the_entire_previous_counter_review():
 
 
 def test_source_round_preserves_spent_claims_and_records_owner_qc_pause():
-    current = _text().split("## 119. Owner-resumed local source qualification", 1)[1]
+    title = "## 119. Owner-resumed local source qualification"
+    current = title + _text().split(title, 1)[1].split("## 120.", 1)[0]
+    assert "LOCAL SOURCE QUALIFICATION" in current.upper()
     for value in ("SI-AUTH-20261021-01", "SI-AUTH-20261021-02", "48 START", "47 HTTP",
                   "3,586 START", "3,585 HTTP", "593", "1,169", "not backtest readiness"):
         assert value in current
@@ -88,7 +120,7 @@ def test_resumed_round_has_its_own_pre_push_row():
 
 
 def _latest_counter_review():
-    return _text().split("## 121. Codex counter-review only", 1)[1]
+    return _text().split("## 121. Codex counter-review only", 1)[1].split("## 122.", 1)[0]
 
 
 def test_latest_counter_review_preserves_claude_section_120_exactly():
@@ -124,11 +156,11 @@ def test_latest_counter_review_publication_has_its_own_scoped_ledger_row():
     assert "121" in rows[0] and "No next milestone" in rows[0]
 
 
-def test_latest_counter_review_status_does_not_open_source_or_qc_gates():
-    header = " ".join(_text().split("Current publication rule", 1)[0].split())
-    assert "CODEX COUNTER-REVIEW OF `cc1e44f` COMPLETE" in header
-    assert "ACCEPTED AFTER DOCUMENTATION CORRECTION" in header
+def test_section_121_counter_review_retains_its_historical_disposition_and_gates():
     current = _latest_counter_review()
+    assert "| `cc1e44fc3e937efe9aa19b38ca7b72cbb5399f5b` |" in current
+    assert "**accepted after correction**" in current
+    assert "three P3 record inaccuracies qualified below" in current
     assert "No next milestone" in current
     assert "including capacity/metadata" in current
     assert "No provider, credential, private capture or QC access" in current
@@ -150,3 +182,19 @@ def test_existing_subscription_build_has_exact_new_authority_and_finite_prefligh
         assert value in current
     assert "old count/daily claims remain spent" in current
     assert "No signal/outcome join" in current
+
+
+def test_bounded_recovery_preserves_complete_claude_section_123():
+    text = _text()
+    section = text.split("## 123. Claude independent review", 1)[1].split("## 124.", 1)[0]
+    original = "## 123. Claude independent review" + section.rstrip() + "\n"
+    assert hashlib.sha256(original.encode()).hexdigest() == "159fd8fc53e10c7875a5d7b794f73419822b5a78713d38b6fd359b5f07fe7b00"
+
+
+def test_bounded_successor_retains_old_debits_and_has_no_readiness_promotion():
+    current = _text().split("## 124.", 1)[1]
+    for value in ("b648f60112af141efc2a12fbaef03b38846d219d", "SI-CCR-20261024-005",
+                  "67885", "13992 STARTs", "23452681 charged bytes", "SI-AUTH-20261024-04",
+                  "SI-DEC-20261024-08", "528", "No QC access", "No purchase",
+                  "not source admission", "one final", "No intermediate"):
+        assert value in current

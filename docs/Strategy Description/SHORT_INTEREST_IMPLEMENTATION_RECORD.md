@@ -1,14 +1,14 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **OWNER-RESUMED EXISTING-SUBSCRIPTION BUILD ACTIVE (SECTION 122),
-TOWARD LOCAL BACKTEST READINESS OR A CONCRETE FACTUAL BLOCKER; NO PURCHASES
-AND NO QC ACCESS. FOUR EXACT NAMED KEYCHAIN PREFLIGHT READS SUCCEEDED;
-THE SEPARATE FROZEN SIX-REQUEST ACCESS AUDIT CLOSED WITH SIX HTTP200
-RESPONSES, 15,660 CHARGED BYTES AND NO SOURCE ADMISSION. LOCAL SOURCE
-QUALIFICATION REMAINS INCOMPLETE: ORIGINAL
-COUNT 48 START DEBITS /47 HTTP; DAILY 3,586 START DEBITS /3,585 HTTP,
-593 OF 1,169 CHAINS COMPLETE. BOTH ORIGINAL CLAIMS REMAIN SPENT. NO REFUSED
-SUBSET OR METADATA RESPONSE IS BACKTEST INPUT. CODEX COUNTER-REVIEW OF `cc1e44f` COMPLETE;
+Status: **OWNER-DIRECTED PUBLICATION-FOR-CLAUDE-REVIEW HANDOFF (122.9–122.11);
+CONTINUOUS BUILD STOPPED. THE LOCAL COUNT RECOVERY EXITED REFUSED AFTER
+13,944 START DEBITS /13,944 RECORDED TRANSPORT INVOCATIONS; REQUEST13,944
+FAILED AT TRANSPORT WITH NO OBSERVED HTTP STATUS/BODY. ITS NEW CLAIM AND
+BOTH ORIGINAL CLAIMS REMAIN SPENT. NO RESTART OR RETRY. THE SEPARATE OFFLINE
+DAILY AUDIT CLOSED SUCCESSFULLY: EXACT593 COMPLETE /576 COMPLEMENTARY DAYS;
+NO NEW DAILY CAPTURE. LOCAL SOURCE QUALIFICATION REMAINS INCOMPLETE;
+NOT BACKTEST-READY. THE SIX-ROUTE ACCESS AUDIT'S SIX HTTP200 RESPONSES AND
+15,660 CHARGED BYTES REMAIN SOURCE-ONLY. CODEX COUNTER-REVIEW OF `cc1e44f` COMPLETE;
 ACCEPTED AFTER DOCUMENTATION CORRECTION (121); ITS HISTORICAL FACTS AND LEDGER
 ARE PRESERVED. TWO HISTORICAL QC METADATA REQUESTS AND FIVE NYSE CALENDAR
 GETS REMAIN ACCOUNTED FOR. QUANTCONNECT PAUSED BY OWNER INCLUDING
@@ -16,7 +16,8 @@ CAPACITY/METADATA; NO NEW QC REQUEST. LOOKBACKS 20/60/120/252 UNSELECTED;
 CANONICAL ACTUAL LOOKS 0/0, EXPLORATORY ACTUAL LOOKS 0, ALPHA 0, PERMANENT
 LOOK IDS NONE, QC LAUNCH ATTEMPTS0. NO OUTCOME JOIN, HOLDOUT, ETF,
 BROKER, OPERATOR DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL, REAL ORDER OR
-TRADING ACTION. ONE FINAL PUSH ONLY AT ROUND END.**
+TRADING ACTION. ONE OWNER-REQUESTED SAME-LANE PUBLICATION AFTER TERMINAL
+DOCUMENTATION/VALIDATION; THEN CLAUDE INDEPENDENT REVIEW, NO NEXT MILESTONE.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -240,6 +241,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-22 | Claude review (macOS session) | `3faa7fd` -> `66fb823` reviewed from the published head; **no code or test correction**; this record commit is the only Claude commit | Independent review of Codex's counter-review of section 117, the cache-custody fix and the owner-resumed count and daily rounds | Confirmed all four `SI-CCR23` findings against my section 117. Verified the fresh-directory-stream fix and turned its regression red with an in-memory mutant. Matched the count and daily rounds' claim, inventory and closure files to their published digests and confirmed 0600/0700 protection; no QC request this round. | Pushed tree `66fb823`, clean, network-denied, empty environment: affected test files **162 passed**; G1 and cache-stream probes as expected; compileall exit 0; record-regression and active-document checks pass after this record; `git diff --check` clean. **No complete lane suite, by owner direction.** **Authorized looks 0, consumed looks 0**. | No new finding against Codex. `SI-CCR23-001..004` confirmed against Claude and closed. `SI-BUILD-20261021-001` accepted; `-002` open. `SI-CR19-003`, source P2s, `SI-CR-WIN-*`, shared P2 and `SI-CR15-001` open. | Codex counter-reviews this record commit. Any recovery needs a newly frozen protocol carrying the spent claims, after checking plan rate limits. QuantConnect stays paused until the owner releases it. |
 
 | 2026-10-24 | Codex counter-review only | Exact complete Claude range `66fb823bfb1fd1427b9d26673b778b5b839ee579..cc1e44fc3e937efe9aa19b38ca7b72cbb5399f5b`; one linear record-only commit; this correction commit follows | Section 121: verify Claude's exact-checkpoint review, cache/G1 claims and durable record | `cc1e44f` accepted after three appended P3 documentation corrections; a ledger-count ambiguity rejected as a false alarm; no production change | Focused offline checks and attributed independent in-memory red/green probes recorded in 121.4; no complete lane/repository suite; no private/provider/QC access; looks unchanged | SI-CCR-20261024-001..003 corrected; -004 false alarm; existing partial/unresolved, held, source/shared/process rows retained | No next milestone. QC paused including capacity/metadata. One final same-lane non-force push under section 81; Claude reviews the exact resulting checkpoint. |
+| 2026-10-24 | Codex owner-directed publication handoff | Starting actual remote `b211db7f81103df9cc3d736a05a4cc82d8efe4b0`; unpublished `acf04aff1b2e78bba5d642b350c4f983ac53caf8`, `71c2e7a849aaed577a8a0e62b6d822e07b6b5f77`, `99417837467f98b0ed02a3272b0980f4efa2d243`, followed by this record-only closing commit | Existing-subscription access/recovery code for Claude review, not local backtest readiness | New count capture terminated refused at13,944 STARTs; original/new spent claims and unknown transport cause retained. Offline daily audit verified593 complete/576 complementary days; no new daily capture. Later owner stop/wait/push authority in122.10 supersedes continued building for this handoff only. | Earlier Main286-pass and117-pass executions remain attributed in122.7–122.8; closing record/diff checks in122.11. No full suite, real outcome or QC access. | Retain001–011 and all earlier ledgers; SI-BUILD-20261024-012 is unresolved actual transport/coverage refusal, not a proved timeout or subscription denial. | One final matching-lane non-force push after terminal documentation; Claude reviews the exact resulting pushed range. No implementation, source retry or next milestone; remove only the narrow wait monitor after publication. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -21266,3 +21268,176 @@ its51-path f8ae… manifest are unchanged. Source facts, all spent debits and
 actual look/QC counters remain unchanged. A separately named offline v2
 diagnostic under corrected committed code may now measure/authenticate the
 same original bytes; this is not a silent provider-budget restart.
+
+### 122.9 Actual recovery closure and completed offline audit
+
+Main committed **71c2e7a849aaed577a8a0e62b6d822e07b6b5f77** and the
+directory-count correction **99417837467f98b0ed02a3272b0980f4efa2d243**
+locally, with actual matching origin stillB211. At clean994, the registered
+count runtime was invoked **once**, without transport/guard/key seams. Its
+exclusive `manual-count-recovery-47-and-49-81875-v1.claim.json` was spent
+before its named key read or HTTP. The51-file relative-byte manifest and
+protocol remained122.5'sf8ae… and5876… pins. The separately serialized runtime
+code identity in the actual claim is
+`254b457da17190cba7986a21e9fff98dc415f329cee15e5fe64ace016dde022e`;
+it is not the differently shaped relative-path manifest hash.
+
+The process started **2026-10-24T22:12:00.255625Z** and retained a negative
+closure at **2026-10-25T03:07:11.091433Z** (both on2026-10-24 PDT).
+The existing process subsequently exited **2**, fixed stage
+`count_recovery_closed_refused`, rather than returning a completed inventory.
+Main did not terminate/restart it or change tracked code/HEAD/actual remote
+while it ran. The actual retained result is:
+
+| Control | Authenticated observation |
+|---|---|
+| Child START /received controls | 13,944 /13,944 |
+| Recorded child transport invocations | 13,944; refusal's invocation-count-exact flag is true |
+| Retained child raw bodies /diagnostics | 13,943 /1; this file count is not source qualification |
+| Child charged response bytes | 21,293,349, including the whole-page debit for the failed request |
+| Cumulative old+child STARTs /recorded transport invocations | 13,992 /13,991 |
+| Cumulative charged response bytes | 23,452,681, including the unchanged original2,159,332 |
+| First failed child ordinal | 13,944; transport attempted, no observed HTTP status or body |
+| New unreceipted diagnostics | Empty; every new START has its retained received control |
+| Protected closed membership | Exactly41,835 files: two controls per START,13,943 raw bodies, one diagnostic and three global controls |
+| Completion evidence | `run.refused.json` present; child inventory/completed/qualified markers absent |
+
+**SI-BUILD-20261024-012, P2 actual transport/coverage refusal, unresolved:**
+the negative code is `child_started_prefix_drained_or_unreceipted_no_restart`.
+The failed request's fixed diagnostic says `failure_stage=transport`,
+`http_attempted=true`, `http_status=null`; its receipt clock is
+2026-10-25T03:07:07.197464Z. This does **not** establish a timeout,429,
+subscription denial, server response, credential failure or storage cause.
+The source response was not observed. No exception text, provider error body,
+credential, account fact or licensed row is published. No correction or retry
+is made in this publication-only handoff. The child claim is spent even though
+67,884 planned positions were not started; their unused slots do not permit
+resumption. The old47 negative and both original refused claims are unchanged.
+No count union or actual-input/source admission is produced.
+
+After actual process termination Main authenticated the fixed controls through
+owned0600 files/0700 directories and retained no-follow FDs, bounded reads,
+before/after inode checks, duplicate-key/nonfinite-refusing JSON, claim/code/
+protocol bindings and exact directory membership. No raw market body was read
+by this closing diagnostic. Raw-byte SHA256s are:
+
+- new spent claim: `cdc0d80751c01189afe75a8ed59ca90bb66c76a3c5ed3871ef7d0f433d8bc398`;
+- negative closure: `b688011e116271dcfb6e3d905103b04785e752794210c69338b12c7771243ddc`;
+- failed diagnostic: `91d7d010dd9adef9607cd589dcdf77d6a02937d9ad37a7e9b20fbbd571509851`;
+- failed receipt: `afed64453cc56f55b7a13a1ce6f91a68057bf3fd62ae8a5789b621a039f9fcec`.
+
+The separate offline v2 daily audit had already exited **0** after measuring
+all12,553 original run members, authenticating original code/claim/controls/
+bytes and replaying all593 claimed complete chains. It derived the exact
+576-day complement, not a presumed prefix. The original daily source remains
+refused/spent. Its protected `daily-parent-20261024-v2` receipts bind:
+
+- `parent.manifest.private.json` raw SHA256
+  `3eca572b1cbe4a341dd14a55abb23cfd2344d8cf0fd1ed8cd96f965410fa3de9`;
+- derived scope payload SHA256
+  `7b33fa3879b56a6ba047194f30146e8fff19050fb71a4a0cffd80c0ec8ef7d03`;
+- derived prospective protocol SHA256
+  `34593c9f88750c598845e655b6206ad567f16bb4e3e413c73f5d725d5158e11f`;
+- `derived.scope.private.json` raw SHA256
+  `c2a3e62160cc33580ff3a3951e383d68f87004ab3b4e47aaa732e6a56d5b1483`.
+
+Main's closing held-file check independently verified these digests, the exact
+disjoint593/576 partition of all1,169 day ordinals and the576 per-day residual
+page caps summing to **36,837** possible new STARTs. Residual ceilings are
+**3,327,988,047 bytes /71,468,572 rows**. This check did not rerun the long
+audit, use credentials or make HTTP. Neither scope derivation nor this record
+spends `daily-recovery-20261024-v1.spent.json`: **no daily child claim/request
+was made**, and its next dispatch is outside the later handoff-only scope.
+
+### 122.10 Later owner stop/wait/publication instruction and review range
+
+**SI-DEC-20261024-06** records the temporary same-chat continuous-build
+automation created while both original operations were active; its protected
+decision receipt was kept under `private/recovery_registration`. The owner
+later said **“stop the monitor”**. Codex deleted
+`continue-short-interest-recovery-build`, leaving the processes untouched.
+It stays deleted; this section does not reactivate the earlier build loop.
+
+**SI-AUTH-20261024-03** records the later owner instructions to have Claude
+review the commits and **“please push first”**. Before pushing Main verified
+the count runtime's exact actual-remote guard: an early push would deliberately
+halt its spent capture. The owner chose **“ok. let's wait until the python is
+done”**. This later direction supersedes122.1's wait-for-local-readiness
+publication boundary for this handoff only: finish the existing process,
+document its actual terminal result and publish the existing code once for
+Claude, without silently continuing implementation or spending another claim.
+No readiness or provider fact is waived.
+
+**SI-DEC-20261024-07** exercises only that wait/publication choice. Codex
+created the separate five-minute completion-only
+`wait-for-short-interest-capture-before-push`; it made no duplicate capture
+and authorized no next milestone. The old build automation was verified
+absent and this narrow wait active before closing documentation. It must be
+deleted after the one publication or a terminal safe-publication blocker;
+every other automation remains unchanged. No new review/build monitor is
+armed by inference. Codex explicitly advised deferring the full suite and
+corrective Claude writes until capture termination; no completed Claude
+review is claimed. Any earlier read-only local pass is advisory, not the
+independent review of a pushed snapshot.
+
+The complete pending Codex range starts after exact actual matching origin
+**b211db7f81103df9cc3d736a05a4cc82d8efe4b0** and ends at the record-only
+commit containing this closing section:
+
+| Ordered commit | Behavior | Independent-review status |
+|---|---|---|
+| `acf04aff1b2e78bba5d642b350c4f983ac53caf8` | Freeze bounded six-route existing-provider access and privacy controls | Pending Claude review; no self-assigned acceptance |
+| `71c2e7a849aaed577a8a0e62b6d822e07b6b5f77` | Bounded count/daily recovery lineage and typed union/consumer code | Pending Claude review; actual child capture refused, not input-ready |
+| `99417837467f98b0ed02a3272b0980f4efa2d243` | Correct inside-directory count versus external spent claim | Pending Claude review; offline audit then completed |
+| This closing record-only commit | Actual terminal receipts, later owner scope, retained gates and review handoff | Pending Claude review; final object is verified/reported after the sole push |
+
+### 122.11 Closing validation, exclusions and next authorized action
+
+Only this lane record changes after capture termination. All earlier ledger
+rows and section122.1–122.8 are retained; the header is refreshed and the new
+push row is appended without rewriting historical evidence. Shared/project
+documents and SESSION_HANDOFF stay frozen. A Codex child's read-only
+publication audit checked the complete15-path committed range, individual
+commit stats, diff and added-line privacy shapes without reading private
+captures or running tests. It found only synthetic privacy-test/decorator
+matches, not actual contacts. This is not Claude independent review.
+
+Main's earlier **286 passed in50.51s** and post-directory-fix **117 passed
+in11.43s** remain the actual code validation in122.7–122.8, not fresh closing
+runs. No production/code/test file changes here. Main's closing public-record
+and active-document selection passes **85 tests in0.87s**, zero skips/warnings,
+with empty inherited environment, CPython3.13.15/pytest9.1.1, macOS network-
+denying sandbox and explicit socket denial. This is documentation validation,
+not new capture/union/backtest coverage or a complete lane/repository suite.
+The focused selector is repeated after this closing validation note; no
+Python compilation/import-boundary rerun is needed for a Markdown-only delta.
+Main verified every historical byte from Current publication rule through
+122.8 after removing only the single new push-ledger row; the rest is an
+exact unchanged prefix before the appended122.9–122.11. Narrow added-line
+credential/contact-shape and diff checks pass. Only this lane record is dirty;
+all15 cumulative paths are lane-owned, with no artifact/shared-document
+publication. Root/branch/HEAD/status and exact actual matching remote are
+rechecked before the handoff commit and sole final push; clean local/tracking/
+actual-remote equality is required afterward. No successful push preceded
+this closing record. This commit contains no claim of its own future hash;
+the exact final object and record link are reported after actual publication.
+
+The source deficit is concrete: the count child is incomplete/refused, the
+576 whole daily chains were not captured, operational count reloading remains
+unimplemented, and full-study class/count/price-volume, dividend/terminal and
+prospective actual-input/evaluation registrations remain unqualified. Retained
+full-study monthly files are not silently replaced by the ten-token pilot or
+recaptured. Original-vintage PIT and latest-revised descriptive requirements
+remain distinct; no new purchase or exhausted-provider-alternative conclusion
+follows from this transport failure. All001–011 and earlier confirmed,
+partial, false-alarm, shared, Windows, source and prospective rows survive.
+
+**Next action is Claude independent review of every commit in the exact
+resulting pushed range**, including this record commit, on the same lane
+branch. Codex stops after this handoff: no new daily/count claim, adapter,
+source qualification or next milestone. Actual-input refusal remains enforced;
+canonical actual looks0/0, exploratory actual looks0, alpha0, permanent look
+IDs none and QC attempts0. No QC access of any kind, new provider request,
+credential access, purchase/terms action, outcome join/S1/rank/order/backtest,
+holdout, ETF/seed change, other-lane access, broker/operator/deployment or
+paper/live/real-order action occurred in the closing publication work.

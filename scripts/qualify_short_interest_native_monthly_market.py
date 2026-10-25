@@ -109,6 +109,7 @@ def policy():
         "source_code_identity_sha256": source.CODE_IDENTITY_SHA256,
         "all_original_panels_required_before_first_yield": EXPECTED_PANELS,
         "all_original_attempts_required": EXPECTED_ATTEMPTS,
+        "controls_serialization": "original_canonical_JSON_plus_exactly_one_LF",
         "original_refusal_events": "exact_page_events_and_panel_groups_including_all_cross_page_origins",
         "budget": "replay_original_whole_next_8MiB_and_10000_rows_before_every_START",
         "memory": "one_bounded_panel_at_a_time_then_retained_digest_and_chronology_only",
@@ -129,7 +130,7 @@ def _clock(value):
 
 def _parsed(raw):
     value = source.parsed(raw)
-    require(canonical_json(value).encode() == raw, "original_canonical_control_required")
+    require((canonical_json(value) + "\n").encode() == raw, "original_canonical_control_required")
     return value
 
 

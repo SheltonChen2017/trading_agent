@@ -13,6 +13,7 @@ import pytest
 
 from data.hashing import canonical_json, hash_bytes, hash_payload
 from scripts import capture_short_interest_native_market_inputs as capture
+from scripts import qualify_finra_short_interest as captureio
 from scripts import qualify_short_interest_native_monthly_market as operational
 
 
@@ -62,7 +63,7 @@ class FakeSnapshot:
         return json.loads(self.files[name])
 
     def save(self, name, value):
-        self.files[name] = canonical_json(value).encode()
+        self.files[name] = (canonical_json(value) + "\n").encode()
 
     def reseal_inventory(self):
         report = self.payload("inventory.private.json")
@@ -89,9 +90,6 @@ def fabricated(monkeypatch, *, issue=False, cross_page=False):
         clock_count[0] += 1
         return (datetime(2026, 10, 14, 0, 42, 32, tzinfo=timezone.utc)
             + timedelta(seconds=clock_count[0])).isoformat().replace("+00:00", "Z")
-    def save(owner, name, value):
-        assert name not in files
-        files[name] = canonical_json(value).encode()
     def raw_save(owner, name, value):
         assert name not in files and type(value) is bytes
         files[name] = value
@@ -107,7 +105,10 @@ def fabricated(monkeypatch, *, issue=False, cross_page=False):
         return canonical_json({"count": len(values), "data": values}).encode(), "application/json", 200
     with monkeypatch.context() as nested:
         nested.setattr(capture, "_guard", lambda *unused: None)
-        nested.setattr(capture, "_publish_json", save)
+        # Keep the ORIGINAL serializer. Its global raw sink is the only seam;
+        # replacing _publish_json would hide source-control byte conventions.
+        assert capture._publish_json is captureio._publish_json
+        nested.setattr(captureio, "_publish", raw_save)
         nested.setattr(capture, "_publish", raw_save)
         nested.setattr(capture, "_utc_now", clock)
         nested.setattr(capture, "_http", http)
@@ -115,22 +116,39 @@ def fabricated(monkeypatch, *, issue=False, cross_page=False):
             capture.KeychainSecret("fabricated-only-key"), head=operational.source.SOURCE_HEAD,
             remote=operational.source.SOURCE_REMOTE, started_at=START)
     protocol = capture.protocol()
-    files["protocol.json"] = canonical_json(protocol).encode()
-    files["started.json"] = canonical_json({"schema": "si-native-market-input-start-v1",
+    files["protocol.json"] = (canonical_json(protocol) + "\n").encode()
+    files["started.json"] = (canonical_json({"schema": "si-native-market-input-start-v1",
         "code_head": operational.source.SOURCE_HEAD, "remote_head": operational.source.SOURCE_REMOTE,
         "protocol_sha256": operational.SOURCE_PROTOCOL_SHA256,
         "code_identity_sha256": operational.source.CODE_IDENTITY_SHA256, "started_at": START,
-        "maximum_requests": protocol["maximum_requests"], "outcome_looks": 0, "qc_attempts": 0}).encode()
-    claim = canonical_json({"schema": "si-native-market-input-budget-v1", "claim_sha256": operational.source.CLAIM_ID,
+        "maximum_requests": protocol["maximum_requests"], "outcome_looks": 0, "qc_attempts": 0}) + "\n").encode()
+    claim = (canonical_json({"schema": "si-native-market-input-budget-v1", "claim_sha256": operational.source.CLAIM_ID,
         "code_head": operational.source.SOURCE_HEAD, "remote_head": operational.source.SOURCE_REMOTE,
         "run_id": operational.source.DIRECTORY.name, "protocol_sha256": operational.SOURCE_PROTOCOL_SHA256,
-        "maximum_requests": protocol["maximum_requests"], "started_at": START, "restart_or_resume": False}).encode()
+        "maximum_requests": protocol["maximum_requests"], "started_at": START, "restart_or_resume": False}) + "\n").encode()
     assert len(files) == (456 if cross_page else 452)
     return FakeSnapshot(files, claim)
 
 
 def qualify(snapshot, check=lambda: None):
     return operational._qualify_snapshot(snapshot, check=check, registration=copy.deepcopy(REGISTRATION))
+
+
+def test_exact_original_json_publisher_one_LF_is_required(monkeypatch):
+    saved = {}
+    value = {"schema": "fabricated-control", "count": 1}
+    monkeypatch.setattr(captureio, "_publish", lambda owner, name, raw: saved.setdefault(name, raw))
+    captureio._publish_json(Path("/fabricated"), "control.json", value)
+    assert saved["control.json"] == (canonical_json(value) + "\n").encode()
+    assert operational._parsed(saved["control.json"]) == value
+
+
+@pytest.mark.parametrize("prefix,suffix", [(b"", b""), (b"", b"\n\n"), (b"", b"\n\t"),
+    (b"", b"\n "), (b"", b" \n"), (b"", b"\t\n"), (b" ", b"\n"), (b"\t", b"\n")])
+def test_non_original_control_whitespace_is_not_normalized(prefix, suffix):
+    raw = prefix + canonical_json({"schema": "fabricated-control", "count": 1}).encode() + suffix
+    with pytest.raises(operational.MonthlyMarketOperationalRefusal, match="original_canonical_control_required"):
+        operational._parsed(raw)
 
 
 def test_all112_panels_before_first_yield_and_bounded_replay(monkeypatch):
@@ -254,7 +272,7 @@ def test_original_global_proofs_and_clocks_cannot_be_substituted(monkeypatch, ki
         snap.save("started.json", value)
     elif kind == "claim":
         value = json.loads(snap.claim_raw); value["restart_or_resume"] = True
-        snap.claim_raw = canonical_json(value).encode()
+        snap.claim_raw = (canonical_json(value) + "\n").encode()
     elif kind == "completed":
         value = snap.payload("completed.json"); value["completed_at"] = START
         snap.save("completed.json", value)

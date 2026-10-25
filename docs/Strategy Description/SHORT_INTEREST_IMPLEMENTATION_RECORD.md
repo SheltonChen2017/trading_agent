@@ -22042,3 +22042,53 @@ alpha0, permanent look IDsnone, no outcome join. No interim push has occurred.
 Post-record Main record/active-document check:89passed in0.72s, no skips or
 warnings; diff whitespace clean. This is validation of the updated handoff,
 not a source or backtest result.
+
+### 124.8 Actual offline adapter refusal and exact publisher correction
+
+Checkpoint `c2f96272057174f5051284b4e5843272e4857511` invoked the offline
+qualifier once (exec52733, exit2). The original protected snapshot authenticated,
+then the new adapter refused with fixed code
+`original_canonical_control_required` before panel financial normalization.
+The separate private evidence root
+`artifacts/short_interest/private/source_qualification/monthly-f61a40bf-v1`
+contains only `run.refused.json`, SHA256
+`60f271a6d605eafd488da157151b108ca4e6a54cb0b9157f63ae189b854d6062`.
+No positive result, new provider HTTP, key read, budget claim, source write,
+source/input admission, outcome look or QC action occurred. Preserve that
+negative and its original files; it is not erased or relabelled as successful.
+
+**SI-BUILD-20261024-027 (P2, corrected by verified lane-specific adapter
+change):** `_parsed` incorrectly demanded canonical JSON WITHOUT a trailing
+newline, while the historical original publisher writes canonical JSON PLUS
+EXACTLY ONE LF. Main verified the writer in the actual F61 Git blob, not just
+current code. The fabricated capture fixture had replaced `_publish_json`
+with a substitute sink that omitted LF and therefore masked the mismatch.
+New regressions using the original publisher reproduced2failures/7passes
+in0.34s: genuine published bytes were rejected and missing-LF input accepted.
+The adapter now requires precisely the original one-LF serialization; it does
+not trim whitespace or accept both conventions. Missing/double LF, spaces and
+tabs remain refused. Fixtures retain the actual `_publish_json` function and
+inject only its raw sink, preserving original source-control serialization.
+All original member/budget/global/code pins and every semantic/custody guard
+remain unchanged. This verified adapter cause says NOTHING about the separate
+unreproduced count custody finding022.
+
+**SI-DEC-20261024-14:** after the corrected code and record are committed,
+repeat only this finite credential/provider-free OFFLINE verification under
+the new clean exact HEAD, keeping v1 negative evidence and writing any new
+private result to separate `monthly-f61a40bf-v2`. This is not a provider
+capture retry, source-budget reset, spent-claim reuse or old-file rewrite.
+The54-path list remains unchanged. New exact current-byte mapping SHA256
+`e2f0f0f15354dbbc9565d37390421f4f12452915bb111763daab6d2178c69b33`;
+new prospective policy SHA256
+`051523f21feecc42d446d5d67866c12abd84f2ebe17da500f7908899ea6d73df`.
+The policy explicitly records original canonical JSON plus exactly one LF.
+
+Main reviewed the complete production/test correction diff. Its same seven-file
+focused/import-boundary/active-document selection passed **252tests in20.59s**,
+no skips or warnings, with network denied and environment empty. All54 sources
+compile in memory and diff whitespace checks pass. Delegate's separate focused
+operational/import-boundary execution passed51tests in17.89s; it is not a Main
+rerun. No full suite, actual strategy evaluation, source-usability conclusion,
+QC or push is claimed. Software8/10 and records/authority9/10 remain provisional
+pending actual closed offline normalization and the remaining readiness gates.

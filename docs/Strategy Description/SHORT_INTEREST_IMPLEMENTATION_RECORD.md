@@ -13,8 +13,9 @@ ONE FILE BUT REFUSED ITS LATER POSTSEAL STAMP CHANGE (SECTION124.15); NO LOCAL
 POLICY CLOSURE OR HISTORICAL REPAIR IS CLAIMED. FURTHER CLAIMS ARE HELD. RETAINED MONTHLY
 INPUTS HAVE CLOSED OFFLINE SOURCE-ONLY NORMALIZATION (SECTION124.9), WITHOUT
 SOURCE FITNESS, INPUT ADMISSION OR BACKTEST READINESS.
-A SOURCE-ONLY SPENT-EPOCH LEDGER IS IMPLEMENTED (SECTION124.16); ITS FRESH
-ACTUAL OFFLINE CONTEXT REPLAY IS STILL PENDING.
+A SOURCE-ONLY SPENT-EPOCH LEDGER IS IMPLEMENTED (SECTION124.16). THE FIRST
+ACTUAL OFFLINE REPLAY REFUSED AN OVERBROAD MAIN HARNESS CONSTRUCTOR DENIAL;
+ITS NARROW CORRECTION IS DOCUMENTED IN124.17, WITHOUT SOURCE CLOSURE.
 OWNER NOW DIRECTS CONTINUATION UNTIL LOCAL BACKTEST READINESS, WITHOUT QC.
 ALL OLD CLAIMS,
 NEGATIVES AND CHARGES REMAIN SPENT/IMMUTABLE. NO BACKTEST READINESS IS CLAIMED.
@@ -22727,3 +22728,79 @@ bytes are unchanged. Staged five-file whitespace and explicit status checks
 are required before the local checkpoint commit. All development agents are
 finished/frozen before Main's prospective pinned OFFLINE replay; no actual
 source result or readiness is substituted for these fabricated validations.
+
+### 124.17 First actual ledger invocation: overbroad harness denial
+
+At clean `6ab546713cf242d3eb7134eadd9b38bb4658481e` / matching tracking and
+actual originB648, Main invoked ONE fresh OFFLINE context read, exec49475.
+It terminated exit2 without yielding a provisional ledger or issued closed
+summary. Its fixed reported stage is `saved_cache_loading`, category
+`unknown_local_error`, errno/contract/held-field observation null. The
+wrapper's counter named output_creation_attempts is1; provider/socket,
+credential and capture counters are0, and Python write-open attempts0. No
+source claim, START, charged byte, output/probe namespace or new file was
+created. No successful source/accounting closure is inferred from this result.
+
+**SI-BUILD-20261025-009 (P3, verified operational-harness error):** Main had
+blanket-denied `_OwnedOutput.__init__` as though its name meant publication.
+The unchanged original constructor actually validates and opens EXISTING
+directory/parent inode FDs O_RDONLY; it does not create a directory or file.
+The actual cache loader itself first constructs that original class around
+the EXISTING cache directory in `load_registered_cache`, before yielding any
+source result. The `stream_short_interest_native_identity_continuation`
+read-only adapter also uses it for two retained source directory anchors.
+Actual byte publication is its separate `publish`
+method, whose open uses O_WRONLY/O_CREAT/O_EXCL. The wrapper's intercepted
+constructor raises unconditionally and its exact counter establishes this
+wrapper denial; the misleading counter label is NOT evidence of output
+creation. This verified wrapper mistake says nothing about historical
+count022, original source usability or the actual postseal refusal006.
+Preserve49475 as a failed invocation; do not relabel it successful or resume it.
+
+**SI-DEC-20261025-03**, within continuing SI-AUTH-20261024-05, permits only a
+causally verified OFFLINE harness correction: leave the unchanged original
+read-only directory constructor/checks in place, deny the actual original
+`publish` seam and every Python write-open, and retain every provider/socket/
+key/capture/old-diagnostic denial. A fabricated original-helper regression
+and independent development peer must first establish that existing protected
+directory reads work while byte publication/new filenames remain impossible.
+Only the loader test and this record may change; production loader/model and
+all old custody/source/capture/diagnostic bytes remain frozen. After those
+checks and a new clean record/test checkpoint, ONE separately registered fresh
+read-only context invocation may use the same frozen loader protocol/code.
+It creates no output namespace or claim and is not an old invocation restart,
+provider retry, metadata probe or authority/budget enlargement. No such fresh
+invocation has begun at this entry. Any actual negative/unknown termination
+still vetoes closure; no claimed readiness or source admission follows.
+
+The prospective corrected read-only harness is
+`si-offline-count-epoch-readonly-harness-v2`, policy SHA256
+`32cba0d52f1b5f1ab7e6af160d01465b2c6c625f5eece5cd8a5ede70717bffac`.
+It retains the exact section124.16 loader protocol/58-file mapping and1800s
+whole context window, with zero retries/new claims/artifacts/HTTP/START/bytes.
+The actual harness leaves `os.open`, its dir_fd capability set and the original
+directory constructor untouched. Its existing Python audit hook rejects
+WRONLY/RDWR/CREAT/TRUNC/APPEND and write/append/exclusive/update modes; only
+the denied `_OwnedOutput` method changes from constructor to `publish`.
+The counter is now honestly named publication_attempts, expected0.
+
+The new fabricated test uses the unchanged original constructor/check AND
+the real protected source reader. It shows the old blanket constructor denial
+blocks that legitimate path, then exact existing bytes/stamp/membership remain
+unchanged under publish-only and write-open denials. Calling original publish
+independently reaches a denied O_WRONLY/O_CREAT/O_EXCL open before any new
+filename exists. Its test-only forwarding os.open wrapper advertises its real
+unchanged dir_fd forwarding capability; no production capability check is
+removed or changed. This tests the actual helper rather than a replacement
+serializer or counterfeit custody class, but is not actual-domain closure.
+
+Main reviewed the complete new regression and original cache/helper/read
+call paths. Main loader/import/record/three selected active-doc checks passed
+**66tests in15.87s**, no skips or warnings, empty inherited environment and OS
+network denied. Delegated author targeted1/1.01s, expected blanket-denial
+test-wiring reversal1fail/.05s and restored1/.32s; independent development peer
+new regression plus genuine toy lifecycle2/.92s, separately attributed and
+NOT Claude review. All code reversals were memory-only; the original helper
+was never replaced or weakened. Production source/loader/model/old diagnostic
+bytes are unchanged. Only this record and the loader test are staged for the
+new local checkpoint; no new actual invocation or interim push occurred.

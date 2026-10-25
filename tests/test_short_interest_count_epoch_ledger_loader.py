@@ -451,3 +451,57 @@ def test_model_contract_failure_has_fixed_specific_projection(monkeypatch):
     value = loader.failure_summary(wrapped)
     assert value["contract_code"] == "exact_registered_epoch_roster_required" and value["stage"] == "epoch_sealing"
     assert loader.failure_summary(loader.model.CountEpochLedgerRefusal("REFUSED: SECRET"))["contract_code"] is None
+
+
+def test_original_owned_directory_reader_survives_publish_only_and_write_open_denials(monkeypatch, tmp_path):
+    """A read-only harness must deny publication, not original source anchors."""
+    owned_type = loader.prior._OwnedOutput
+    original_constructor, original_publish, original_open = owned_type.__init__, owned_type.publish, os.open
+    directory = tmp_path / "fabricated-retained-source"; directory.mkdir(mode=0o700)
+    retained = directory / "retained.private.json"; previous.write(retained, b'{"fabricated":true}')
+    before = retained.read_bytes(), loader.snapshot._file_stamp(retained.stat()), set(directory.iterdir())
+    read_opens, write_opens, publish_denials, constructor_denials = [], [], [], []
+    def denied_write_open(path, flags, *args, **kwargs):
+        if flags & os.O_ACCMODE != os.O_RDONLY or flags & (os.O_CREAT | os.O_TRUNC | os.O_APPEND):
+            write_opens.append((path, flags))
+            raise PermissionError(errno.EACCES, "fabricated_write_open_denied")
+        read_opens.append(flags)
+        return original_open(path, flags, *args, **kwargs)
+    monkeypatch.setattr(os, "open", denied_write_open)
+    # This forwarding wrapper genuinely retains the original dir_fd support;
+    # advertise it without changing the original constructor's capability gate.
+    monkeypatch.setattr(os, "supports_dir_fd", {*os.supports_dir_fd, denied_write_open})
+    def read_existing_source(factory):
+        with factory(directory, lambda: None) as held:
+            held.check()
+            raw = loader.count.old.cache.adapter.protected.read_owned_source(held, retained.name, 1024)
+            return tuple(os.listdir(held._anchor[2])), raw
+    def blanket_factory_denial(*args, **kwargs):
+        constructor_denials.append(1)
+        raise AssertionError("fabricated_blanket_constructor_denial")
+    # Reproduce the bad harness boundary without stubbing the original class.
+    with pytest.raises(AssertionError, match="blanket_constructor_denial"):
+        read_existing_source(blanket_factory_denial)
+    assert constructor_denials == [1] and not read_opens and not write_opens
+    def denied_publish(owned, name, raw, *, parent=False):
+        publish_denials.append((name, parent))
+        raise AssertionError("fabricated_publish_denied")
+    monkeypatch.setattr(owned_type, "publish", denied_publish)
+    assert owned_type.__init__ is original_constructor
+    assert read_existing_source(owned_type) == ((retained.name,), b'{"fabricated":true}')
+    with owned_type(directory, lambda: None) as held:
+        held.check()
+        with pytest.raises(AssertionError, match="publish_denied"):
+            held.publish("blocked-by-publish.private.json", b"fixed fabricated NONCLAIM")
+        assert publish_denials == [("blocked-by-publish.private.json", False)] and not write_opens
+        # Independently exercise unchanged original publish: its real write
+        # open is denied before any new inode, bytes, fsync or source mutation.
+        with pytest.raises(PermissionError, match="write_open_denied"):
+            original_publish(held, "blocked-by-open.private.json", b"fixed fabricated NONCLAIM")
+        held.check()
+    assert len(write_opens) == 1 and write_opens[0][0] == "blocked-by-open.private.json"
+    flags = write_opens[0][1]
+    assert flags & os.O_ACCMODE == os.O_WRONLY and flags & os.O_CREAT and flags & os.O_EXCL
+    assert len(read_opens) == 5 and sum(bool(flags & os.O_DIRECTORY) for flags in read_opens) == 4
+    assert all(flags & os.O_ACCMODE == os.O_RDONLY and flags & os.O_NOFOLLOW for flags in read_opens)
+    assert (retained.read_bytes(), loader.snapshot._file_stamp(retained.stat()), set(directory.iterdir())) == before

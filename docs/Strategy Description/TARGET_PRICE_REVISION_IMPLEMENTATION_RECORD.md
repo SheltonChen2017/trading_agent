@@ -1,5 +1,11 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
+**Current owner continuation, 2026-10-24 (section 98):** "skip the review" applies
+to this offline development round. No formal Codex counter-review of section
+97 is claimed. Offline implementation continues under the owner's one-round
+review waiver; QC access remains forbidden. Broad preauthorization does not
+override the explicit no-QC boundary, frozen economics or retained attempts.
+
 **Section 97 (2026-10-24) is the Claude review of the section-95 counter-review and the
 owner-directed offline continuation of section 96.** Sharadar's older-history
 gap is explained by the owner-confirmed **5 Years** subscription; the offline
@@ -39,7 +45,7 @@ locked. No new notebook/cell or native witness is claimed. Genuine original
 compiled source, missing source/unit
 provenance and full-window native orders/accounting cannot be inferred from
 saved source or a Completed. status. No protected dates, frozen economics,
-selection rules or attempts are reset. Codex next counter-reviews section 97 and this round's Claude commits.
+selection rules or attempts are reset. Offline implementation continues under the owner's one-round review waiver; QC access remains forbidden.
 Old standalone native-read programs and scope holders are retired from operational use;
 no expired scope is renewed. Percent units remain a hypothesis, not a verified diagnosis.
 The non-authorizing TPR-TR0-I implementation candidate is checkpointed but
@@ -560,7 +566,7 @@ authorized by that audit.
 The trust rollback pin, protected parent custody, reviewer identity and
 adversarial matrix remain unresolved and parked. **Exact next role action:**
 Section 97 reviewed the section-95 counter-review and the section-96 offline round.
-Codex next counter-reviews section 97 and this round's Claude commits.
+Offline implementation continues under the owner's one-round review waiver; QC access remains forbidden.
 The owner bypassed the immediate section92 checkpoint for this round ONLY;
 this does not remove subsequent independent review. A newly observed Mac
 lock prevented even the empty-notebook request; its scope is closed without
@@ -24648,3 +24654,210 @@ launch, because the frozen ones were captured under the same 5-year limit.
 Second, when you release QuantConnect again, the next native step is the
 corrected witness read through a reviewed controller built on the runtime
 successor; `TPR-CR23-002` (Object Store retention) is still waiting.
+
+## 98. Owner-waived offline controller and program preparation - 2026-10-24
+
+### 98.1 Current instruction, baseline and scope
+
+Owner: "skip the review. continue building until the lane is backtesting ready.
+consider i preauthorize your every move. Do not access QC yet."
+The review checkpoint is waived for this continuation, not permanently.
+No formal counter-review is claimed. Broad preauthorization is applied to
+routine lane-owned offline implementation and necessary freshly bounded local
+coverage processing; it does not override the specific no-QC instruction,
+frozen study/holdouts, attempt caps, native proof requirements or credential/
+broker/live boundaries. No purchase, provider request or subscription change
+is necessary or performed in this round.
+
+Actual starting HEAD and actual matching remote both were
+`7a6fd7e22568bf4fa820a729d7058fca2d49c30b`, clean on
+`codex/strategy-target-price-revisions` at the pinned physical/Git root
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__target_price_revisions`.
+This is a descendant of the previous Codex publication `a5979bf6`.
+Claude's `4db9b62ace51d45e7469f33196c9fc51de4cdd2c` and
+`7a6fd7e22568bf4fa820a729d7058fca2d49c30b` are preserved as published.
+They were read as current source/handoff context, not given fabricated
+Codex accepted/accepted-after-correction dispositions. Section 97's review
+observations remain attributed to Claude; this owner-waived build is not a
+complete independent reproduction of its review or historical private reads.
+
+<!-- TPR-OFFLINE98-SCOPE:START -->
+| Boundary | Scope |
+|---|---|
+| Review checkpoint | Skipped by owner for this round; no formal counter-review disposition |
+| External access | Zero QC, provider, credential or operator-state access |
+| Local capture census | Fresh scopes for one pinned repair index and eight exact projections only; no D0 or raw wire |
+| Implementation | Prospective exact-program controller and standalone builder; synthetic execution only |
+| Active native permission or adapter | None; no current native permit, dispatch, notebook or job |
+| Executed inputs and economics | Unchanged; no recapture, unit conversion or candidate reset |
+| Native baseline verified | False; OFF three attempts spent; ON zero; 33 looks retained |
+| Purchase and subscription changes | None |
+<!-- TPR-OFFLINE98-SCOPE:END -->
+
+### 98.2 Offline controller/program assembly
+
+New named modules preserve all executed candidates, expired scopes and retired
+predecessor programs:
+
+- `extended_refusal_witness_program_successor.py` is a pure text builder.
+  It checks original runtime/reader/helper digests, extracts only the exact
+  pure witness projection dependency set, and excludes the old unsafe read/
+  scope/build functions. Original source copies AND exact transformed payloads
+  are checked before compilation. Generated code uses builtins-qualified
+  namespace/compile/exec/print operations, actual UTC and monotonic functions
+  and actual native reference-equality, never ambient supplied no-op callbacks.
+  It requires an already available genuine ephemeral context and `qb`; it
+  constructs no QuantBook, notebook, project, source file, compile or job.
+  Missing/expired context is refused before native getters or System import.
+- `extended_refusal_witness_controller_successor.py` prepares bounded local
+  custody. It verifies five public source identities, re-builds the exact
+  expected program and matches its whole-program hash before and after the
+  single injected invocation. The exact receipt directory is in the closed
+  prospective plan. Lock acquisition precedes the once-only claim; an
+  uncertain claim publication remains spent. Unique immutable receipts do
+  not overwrite earlier results or another process's lock. Access/lock/read/
+  cleanup failures are body-free; cancellation persists known accounting and
+  propagates. An unreturned native result leaves counts null, not zero.
+
+Only synthetic stores, clocks, native modules, contexts and local temporary
+directories are used in validation, including the composed controller ->
+generated text -> runtime success/cancellation cases. Generated cancellation
+has a different in-memory class identity; the synthetic adapter translates
+its closed snapshot. A future real adapter must either establish that same
+transport binding or truthfully retain unknown counts. There is no default
+native/QC adapter, current native permit, dispatch, project construction or
+native authentication proof. Shape-valid dictionaries and source hashes do
+not authenticate the genuine tool/clock/project context. SDK preemption and
+pre-allocation bounds remain unproved. No QC access occurred.
+
+### 98.3 Historical input provenance: qualification and bounded alternative
+
+Section 97's `TPR-CR29-004` correctly keeps ON input coverage unresolved, but
+its historical-entitlement/row-absence inference is not reproduced evidence.
+Current entitlement does not prove historical entitlement.
+TICKERS is a current-vintage snapshot, queried without a historical date
+filter; it is not a historical TICKERS series whose pre-2021 rows were
+necessarily removed. Section 75.12 dates the completed repair to October 11
+UTC, rather than proving its execution on October 10 from its operation name.
+It records 21,007 TICKERS and 49,716 ACTIONS rows but does not publish the
+ACTIONS minimum date or the account's then-effective tier. Today's owner
+answer and October 24 API samples cannot alone establish either fact.
+These are source/record qualifications, not an invented proof of complete
+historical identity, intact corporate-action coverage or a closed P1.
+Section 97 itself is retained unchanged.
+
+Before recommending an input rebuild or another purchase, a fresh two-stage
+LOCAL census is prepared. Stage A may read only the exact previously pinned
+7,871-byte repair source index, SHA
+`73010167499c30eb2b12a2c1f5b8f76c8f37c94bd001bcebd017a5e9fe0d72e8`,
+under `artifacts/target_price_extended/TPR-CAP-TILT-EXT26-20261010-v1/sharadar_repair/`.
+That authenticated metadata freezes the eight exact projection descriptors
+BEFORE stage B can read any licensed row: request.0001 through 0003 TICKERS,
+0004 through 0008 ACTIONS. No glob, fallback search, wire/Massive/D0 read,
+provider access, signal rebuild or outcome join is permitted. Each stage
+requires its own new manifest, source/HEAD binding, once-only claim, budget
+and body-free result custody; neither spent repair scope is renewed.
+The census producer must be committed before invocation. Actual results,
+if obtained, are recorded below, not assumed from fixture validation.
+
+The local census can establish only what the retained authenticated packet
+contains. Early action rows would contradict a blanket missing-early-actions
+claim; zero early rows would establish packet absence, not historical
+entitlement, provider absence or full completeness. Current master metadata
+does not become a historical identity series. No original payload/hash is
+replaced and no ON admission follows automatically. The current five-year
+subscription still cannot retrieve the full frozen warm-up today; ten-year
+access is sufficient if a separate fresh capture is actually needed, but no
+upgrade or new provider is purchased by this implementation.
+
+### 98.4 Findings, delegated decisions and remaining gates
+
+| ID | Priority/status within this build | Evidence, correction and limitation |
+|---|---|---|
+| `TPR-OFF98-001` | P2, corrected before any native effect | Draft generated text could trust shadowed ambient globals/exec/compile/print. Builtins-qualified operations and fresh embedded namespaces remove that dependency; matching synthetic ambient-substitution mutants are killed. This is not an observed native escape. |
+| `TPR-OFF98-002` | P2, corrected before any native effect | Original-source checks alone do not bind separately transformed executable payloads. Independent exact transformed-payload hashes now precede compile; the outer controller re-builds and pins the complete generated bytes. |
+| `TPR-OFF98-003` | P2, corrected in fixtures | A link may publish a claim before fsync raises. Mark reservation spent/uncertain before publication, preserve null native counts if no return, and retain unique failure receipts. No retry or allowance reset follows an uncertain publication. |
+| `TPR-OFF98-004` | P2, corrected in fixtures | Lock-cleanup interruption can occur after a read. Preserve cancellation/counts and durable result, clean only the owned inode, and propagate cancellation. Failure to write a receipt raises a fixed receipt-unavailable refusal, not a success claim. |
+| `TPR-OFF98-005` | P2, corrected before any native effect | Draft controller did not bind actual program bytes or its receipt directory. Both are now closed-plan fields; exact builder regeneration, public closure and path binding are checked. External repository/tool authentication is still unproved. |
+| `TPR-OFF98-006` | P2, provenance qualification; ON coverage OPEN | The inherited historical-entitlement/current-master inference is not established by the cited observations. Distinguish current tier, current snapshot, actual packet contents and historical availability; no capture is rebuilt merely by assumption. |
+| `TPR-OFF98-007` | P3, local validation routing corrected | A named v2 isolated test invoker uses system-temporary state, not the provider-custody root (`CR29-005`). Old invoker bytes and attributed directory observations remain history; no unexamined local directory is deleted. |
+| `TPR-OFF98-008` | P2, corrected before actual processing | The new census entrypoint initially allowed injected fixture guard/source/clock callbacks in production mode. Production now requires its exact intrinsic callbacks before any directory or input effect; only isolated-fixture mode permits injection. The normal CLI had used defaults, but the public entrypoint needed the same boundary. Focused red/green evidence follows below. |
+| `TPR-OFF98-009` | P3, corrected before actual processing | The original producer adds cross-page ticker lexical descents to intra-page counts. The new reducer now does the same; a 349 intra-page + 2 cross-page fixture pins the retained total 351. This count is an audit diagnostic, not a sorting/ranking gate or PIT proof. |
+
+| Decision ID | Provenance/choice | Rationale, alternative, scope/limits | Review state |
+|---|---|---|---|
+| `TPR-OFF98-D001` | Latest owner instruction: waive current review, continue offline | Preserve incoming corrections and record no formal counter-review; do not silently label it accepted or make the waiver permanent. | Explicit owner direction, scoped to this round. |
+| `TPR-OFF98-D002` | Remaining controller/runtime gap: build integrated prospective assembly | Complete local source/program/receipt/claim boundaries before later genuine tool access. Alternative old expired holder/program replay remains prohibited. | Agent implementation and focused verification, not independent Claude acceptance. |
+| `TPR-OFF98-D003` | Evidence discipline: qualify then census retained packet | Current five-year access is not retrospective entitlement proof. Prefer a small hash-bound local census over buying/rebuilding on an unproved assertion. | Agent-delegated processing design under current offline authority; no source completeness/PIT admission. |
+| `TPR-OFF98-D004` | No-QC priority: retain native readiness as unproved | Synthetic success establishes local composition, not native source/unit/mark/order/fee/cash/NAV/clock proof. No paid upgrade, attempt reset or source substitution is used to evade that boundary. | Agent-delegated routine implementation choice. |
+
+Native backtesting readiness remains unproved. `TPR-CCR28-003` has a prepared
+offline controller/program successor, but genuine adapter/tool custody,
+transport behavior and native verification are not independently proved.
+F017/F018/F019/CR23-001 and retained-input historical/PIT limitations stay
+OPEN at their respective scopes. Section 97's source-view/notebook receipt
+corrections are preserved; no formal Codex disposition is claimed here.
+The historical `extended_paired_results.py` consumer still pins old dated
+operations and a 22-look bound. Do not relax it or reset history; a named
+recovery-aware result consumer will be needed once actual recovery identities
+and usable native evidence can be bound. No old consumer is declared ready.
+
+No fourth Codex OFF attempt is permitted. OFF remains at three spent attempts,
+ON at zero, with 33 observed looks retained. No new backtest look is added.
+The six stock sleeves, dates/warm-up, AR-disabled weight-only TPR rules,
+capital, execution/cost assumptions, packet/input identities and protected
+holdouts stay frozen. No percent scaling, clipped membership, missing-as-zero,
+stale-mark bypass, inferred sleeve P&L or automatic canonical acceptance.
+TPR-1, TPR-0B and parked TR0-I remain distinct from safe development.
+
+### 98.5 Validation, local census and publication custody
+
+Tests use the identified system-temp isolated in-process runner v2 before
+dispatch/config/pytest imports, with sockets denied. No actual operator
+stop/database or native service is inspected. No complete lane/repository
+suite is run. macOS fixtures prove no native-Windows signer/ACL/protected-
+parent custody. Source/host-Git distinctions, missing-frozen-Git refusal/
+restoration and the fourteen frozen-Windows preregistration limits remain.
+
+The updated current-role guard first fails on the stale counter-review next
+step (**1 failed in 0.86s**), and the new section-98 scope guard first fails
+on its absent record (**1 failed in 0.33s**). Root's controller/program/runtime/
+predecessor/import focused control is **374 passed, 1 existing platform skip
+in 7.75s**. The first combined document run retained **7 failed, 544 passed
+in 11.87s**: all seven failures originated at the unchanged generic next-action
+grammar, which did not recognize the exact new offline waiver role. Its
+closed grammar now recognizes that exact statement, and an added duplicate-
+waiver negative preserves the one-next-action rule. The corrected document/
+census intermediate control was **606 passed in 13.23s**.
+
+The production-callback census regression was exercised before correction:
+**4 failed, 1 clean control passed, 57 deselected in 0.48s**. Replacing each
+production guard/source/UTC/monotonic callback reached the synthetic forbidden-
+directory sentinel. Exact intrinsic binding closes that path; the census
+module then passed **62 tests in 3.45s** (agent-run, synthetic only).
+Root's final ten-module focused union of controller, program, runtime,
+predecessor reader/notebook, import firewall, census, document, active-document
+and offline-handoff guards is **988 passed, 1 existing platform skip in
+21.36s**. No whole QC package or complete lane/repository suite was run.
+All eight changed/new Python source/test files and the isolated runner compile
+in memory; `git diff --check` is clean.
+
+| Prepared source | Bytes | SHA-256 |
+|---|---:|---|
+| `extended_refusal_witness_controller_successor.py` | 19,793 | `1e907cc0efdeadeccf284c7b2954e95c06901d9368ca43e795d98f91d63f745e` |
+| `extended_refusal_witness_program_successor.py` | 12,801 | `4d4ec88689d0c22742f981d13e1288122684b4e300e26286ddb468cbdad47110` |
+| `extended_sharadar_capture_census.py` | 32,331 | `5f92da2c7de122373a9264ef5595ad46e34e3bf2c6920bc4e302924f778b95a2` |
+
+The named local runner `artifacts/target_price_provider_coverage/offline_runner_20261024_v2.py`
+is 1,867 bytes, SHA `40d20baab905c205e47a9b598997395a24325c1276dc85888da9089825850d01`.
+It uses system-temporary fixture state; it is an ignored local validation
+artifact, not a new production runtime or a tracked custody record.
+Actual census manifests/results and producer/publication commit identities
+follow only after the producer is committed and new scopes are registered.
+
+No current QC scope is created or renewed, no monitor is rearmed and no
+automatic access follows publication. The round accumulates in this same
+worktree and makes exactly one final matching-lane non-force push at a stable
+completed or genuinely blocked checkpoint. Before every commit/push verify
+physical/Git roots, branch, HEAD, status/staged diff and actual matching remote;
+unexpected remote movement stops the round, not a silent merge/overwrite.

@@ -50,3 +50,54 @@ def test_offline_scope_guard_detects_clean_first_drift(old, new):
     assert old in section
     with pytest.raises(AssertionError):
         _assert_scope(section.replace(old, new, 1))
+
+
+OFFLINE98_SCOPE = (
+    ('Review checkpoint', 'Skipped by owner for this round; no formal counter-review disposition'),
+    ('External access', 'Zero QC, provider, credential or operator-state access'),
+    ('Local capture census', 'Fresh scopes for one pinned repair index and eight exact projections only; no D0 or raw wire'),
+    ('Implementation', 'Prospective exact-program controller and standalone builder; synthetic execution only'),
+    ('Active native permission or adapter', 'None; no current native permit, dispatch, notebook or job'),
+    ('Executed inputs and economics', 'Unchanged; no recapture, unit conversion or candidate reset'),
+    ('Native baseline verified', 'False; OFF three attempts spent; ON zero; 33 looks retained'),
+    ('Purchase and subscription changes', 'None'),
+)
+
+
+def _section98():
+    text = RECORD.read_text(encoding='utf-8')
+    start = text.index('## 98. Owner-waived offline controller and program preparation')
+    end = text.find('\n## ', start + 4)
+    return text[start:] if end == -1 else text[start:end]
+
+
+def _assert98(text):
+    start = text.index('<!-- TPR-OFFLINE98-SCOPE:START -->')
+    end = text.index('<!-- TPR-OFFLINE98-SCOPE:END -->', start)
+    rows = tuple(tuple(p.strip() for p in line.strip('|').split('|'))
+        for line in text[start:end].splitlines() if line.startswith('| '))[1:]
+    assert rows == OFFLINE98_SCOPE, 'offline98 scope changed'
+    for required in ('No formal counter-review is claimed',
+        'No QC access occurred', 'Native backtesting readiness remains unproved',
+        'Current entitlement does not prove historical entitlement',
+        'TICKERS is a current-vintage snapshot', 'No fourth Codex OFF attempt'):
+        assert required in text, required
+
+
+def test_offline98_preserves_waiver_no_access_and_unproved_native_readiness():
+    _assert98(_section98())
+
+
+@pytest.mark.parametrize('before,after', (
+    (OFFLINE98_SCOPE[0][1], 'Independently accepted by Codex counter-review'),
+    (OFFLINE98_SCOPE[1][1], 'QC access is allowed'),
+    (OFFLINE98_SCOPE[2][1], 'All old captures may be reopened'),
+    (OFFLINE98_SCOPE[4][1], 'Current native permit is active'),
+    (OFFLINE98_SCOPE[6][1], 'True; attempts reset'),
+    ('Current entitlement does not prove historical entitlement', 'Past entitlement is independently proved'),
+))
+def test_offline98_guards_reject_clean_first_authority_and_provenance_drift(before, after):
+    text = _section98(); _assert98(text)
+    assert before in text
+    with pytest.raises(AssertionError):
+        _assert98(text.replace(before, after, 1))

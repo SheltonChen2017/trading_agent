@@ -751,6 +751,7 @@ SECTION8_NEXT_ACTION_STATEMENT = (
     r"Codex next verifies the owner-reported Mia repair under fresh bounded scopes|"
     r"Owner next unlocks the Mac and reopens authenticated built-in Mia for OFF37650980|"
     r"The next bounded (?:work|action) is|"
+    r"Offline implementation continues under the owner's one-round review waiver; QC access remains forbidden|"
     r"Codex continues without Claude review stops)\b"
 )
 SECTION46_CLAUDE_BASE = "9958a459f5cd56c29cb9a0de13d38737e2c3412d"
@@ -1219,13 +1220,14 @@ def _current_integration_state(section: str) -> str:
 def _assert_section93_current_facts(text: str) -> None:
     """Positive, bounded current facts; never scan old sections for stale dates."""
     normalized = " ".join(text.split()).lower()
-    for required in (*SECTION93_CURRENT_FACTS, SECTION97_NEXT_ROLE,
+    for required in (*SECTION93_CURRENT_FACTS, SECTION98_NEXT_ROLE,
                      "last completed counter-review", "skip 1, proceed to 2 and 3 directly"):
         assert required.lower() in normalized, required
     assert SECTION92_NEXT_ROLE.lower() not in normalized, "section92-only routing is superseded for this round"
     assert SECTION93_NEXT_ROLE.lower() not in normalized, "section93 routing is reviewed, not current"
     assert SECTION94_NEXT_ROLE.lower() not in normalized, "section94 routing is counter-reviewed, not current"
     assert SECTION95_NEXT_ROLE.lower() not in normalized, "section95 routing is reviewed, not current"
+    assert SECTION97_NEXT_ROLE.lower() not in normalized, "owner waived the current counter-review checkpoint"
 
 
 @pytest.mark.parametrize("missing", ["opening", "closing"])
@@ -1296,7 +1298,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "TPR-1 remains blocked" in normalized_current
     assert "reviewed-spec registry remains empty" in normalized_current
     assert "Claude next reviews this Codex round independently" not in normalized_current
-    assert SECTION97_NEXT_ROLE in normalized_current
+    assert SECTION98_NEXT_ROLE in normalized_current
+    assert SECTION97_NEXT_ROLE not in normalized_current
     assert SECTION95_NEXT_ROLE not in normalized_current
     assert SECTION94_NEXT_ROLE not in normalized_current
     assert SECTION93_NEXT_ROLE not in normalized_current
@@ -2384,7 +2387,7 @@ def test_section_8_carries_one_current_role_and_no_stale_commit() -> None:
     The recognized role grammar is Claude/Codex, optional has/independently,
     and reviewed/counter-reviewed; next actions use next reviews/counter-reviews,
     the fixed Mia preparation/submission/owner-unlock actions, or the exact owner-directed
-    continuous no-review role.
+    continuous no-review role or exact offline one-round waiver role.
     This is an explicit grammar, not an arbitrary-prose classifier. Exactly
     one recognized role and next-action statement must occur in the current
     block. Lowercase 7-12 or 40-hex commit identities, quoted or unquoted,
@@ -2441,6 +2444,10 @@ def test_section_8_carries_one_current_role_and_no_stale_commit() -> None:
         ),
         (
             "The next bounded work is fresh all-file source baseline capture and diagnosis-only Mia registration.",
+            "one next action",
+        ),
+        (
+            "Offline implementation continues under the owner's one-round review waiver; QC access remains forbidden.",
             "one next action",
         ),
     ],
@@ -4616,6 +4623,7 @@ SECTION81_STALE_NEXT_ACTIONS = {
     "skipped": SECTION93_NEXT_ROLE,
     "reviewed": SECTION94_NEXT_ROLE,
     "counterreviewed": "Claude next reviews this section-95 counter-review and its complete Codex round",
+    "pending": "Codex next counter-reviews section 97 and this round's Claude commits",
 }
 
 
@@ -4630,11 +4638,12 @@ SECTION81_STALE_NEXT_ACTIONS = {
     "current_skipped_role", "preamble_skipped_role",
     "current_reviewed_role", "preamble_reviewed_role",
     "current_counterreviewed_role", "preamble_counterreviewed_role",
+    "current_pending_role", "preamble_pending_role",
 ))
 def test_section_97_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
     """Retain old routing mutants; reject routing only to the skipped checkpoint."""
     test_exact_next_step_names_the_current_artifacts()
-    current_next = SECTION97_NEXT_ROLE
+    current_next = SECTION98_NEXT_ROLE
     stale_next = SECTION81_STALE_NEXT_ACTIONS.get(fault.rsplit("_", 2)[-2], "")
     if fault.startswith("current_"):
         original_section = _record_section
@@ -5615,6 +5624,7 @@ SECTION97_DISPOSITIONS = (
     "accepted",
 )
 SECTION97_NEXT_ROLE = "Codex next counter-reviews section 97 and this round's Claude commits"
+SECTION98_NEXT_ROLE = "Offline implementation continues under the owner's one-round review waiver; QC access remains forbidden"
 SECTION95_SCOPE = (
     ("Counter-review", "Two incoming Claude commits and cumulative tree"),
     ("Correction inputs", "Public committed code, synthetic fixtures and Git objects only"),

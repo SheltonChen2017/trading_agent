@@ -6,7 +6,9 @@ AND SECRET-SAFE DIAGNOSTICS ARE IMPLEMENTED. ACTUAL V2 AND V3 INITIALIZATION
 REFUSED WITH ZERO NEW START/HTTP/BYTES; BOTH CLAIMS ARE SPENT. V3 IDENTIFIES
 A FILE-CUSTODY GUARD; THE PRECISE CAUSE IS STILL UNKNOWN. A LOCAL NONCLAIM
 V1 PROBE PASSED WITHOUT REPRODUCING IT; V2 STOPPED BEFORE OUTPUT PREPARATION.
-FURTHER CLAIMS ARE HELD. RETAINED MONTHLY
+THE NEW NONCLAIM V3 PROBE HAS NOW REPRODUCED A CTIME-ONLY REFUSAL ON ITS FIRST
+NEW METADATA FILE. THE ACTOR AND HISTORICAL COUNT FAILURE REMAIN UNKNOWN;
+SECTION124.13 PRESERVES THAT NEGATIVE. FURTHER CLAIMS ARE HELD. RETAINED MONTHLY
 INPUTS HAVE CLOSED OFFLINE SOURCE-ONLY NORMALIZATION (SECTION124.9), WITHOUT
 SOURCE FITNESS, INPUT ADMISSION OR BACKTEST READINESS.
 OWNER NOW DIRECTS CONTINUATION UNTIL LOCAL BACKTEST READINESS, WITHOUT QC.
@@ -22349,3 +22351,192 @@ one final push remains pending, with no interim push.
 
 Post-record Main diagnostic/record/active-document selection:145passed in2.48s,
 no skips or warnings; complete diff whitespace check remains clean.
+
+### 124.13 Actual NONCLAIM v3 ctime-only refusal; prospective creation phase
+
+The ONE registered local NONCLAIM v3 invocation at exact clean
+`287b58d76d2c857740b913b11afb70366e0898c6` / matching tracking and actual
+origin `b648f60112af141efc2a12fbaef03b38846d219d` terminated exec79871 with
+exit2. It authenticated the old source/cache,41835-member refused prefix,
+zero-START v2/v3 controls and historical code before publishing one safe186-byte
+metadata file. The genuine original HeldFiles failed-stat projection names
+component `new_probe`, ordinal1, and ONLY the field `ctime_ns`. Fixed stage is
+`held_custody_open`, category `local_contract_refusal`, contract
+`held_custody_file_changed`, errno null; published1/opened0/read0. This is a
+reproduced local creation/custody boundary failure, NOT provider transport
+failure, original count-source qualification or backtest readiness. It used
+no provider/socket, credential, capture, new claim, source START or charged byte.
+
+Main's separate guarded read-only receipt authentication exec26711 terminated
+exit0. The protected original run namespace contains EXACTLY
+`run.refused.json`, RAW SHA256
+`0868da636804930cdc54cf3d8e11db0ccedb0266b720bc2e25c2a1d79bfcbe34`;
+no provisional/completed/closed sibling exists. The first original parent
+metadata is0600/singlelink, exactly186 frozen safe bytes, RAW SHA256
+`d7e12dc67e4cd9a07ad0a7cd481f033dfbe1f133973468ac7921fc42d481b282`;
+items02..16 do not exist. It is currently stably readable, which does NOT
+undo its earlier refusal. Actual diagnostic runtime code identity is
+`de9d89aea19aae2d850a235c3bb96253deff72a253b2cb43ed4b09af2e2174d9`;
+the exact section124.12 protocol,56-path list/current-byte mapping and original
+source lineage were independently matched. Every original file, negative and
+old invocation remains immutable; none is restarted, overwritten or removed.
+
+**SI-BUILD-20261025-001 (P2, reproduced boundary; actor still UNKNOWN):** the
+exact fresh metadata instance changed ctime between initial custody stamping
+and its first original entry check. Static code audit found no explicit write
+after the original publisher's write/fchmod/fsync/close sequence and before
+that check. This does not establish who or what changed the timestamp: no
+filesystem/cloud/watcher/provider/Keychain/other-agent cause is asserted.
+Historical count finding SI-BUILD-20261024-022 still has no exact failed-member
+or predicate trace, and its cause is not retroactively filled from this probe.
+
+**SI-DEC-20261025-01**, under continuing SI-AUTH-20261024-05, selects a new,
+bounded, creator-only metadata handshake for prospective implementation and
+fabricated validation. It is NOT permission to rebaseline an existing HeldFiles
+failure. Only a THIS-invocation O_EXCL creation can enter an explicit UNSEALED
+phase; a retained original read-only inode FD, immutable creation observation,
+exact expected safe bytes and strict dev/ino/owner/mode0600/singlelink/size/mtime
+invariants must survive the last writer close. No existing path/hash factory,
+resume, old source, old claim or failed-probe adoption is allowed. Before the
+FIRST formal immutable seal ONLY ctime may change within fixed finite bounds:
+at most16 samples,250ms spacing, at least1second exact full-stamp quiet and
+at most8seconds including guard work. A unique seal constructs the original,
+unchanged HeldFiles exactlyONCE and verifies its stamp equals the chosen seal.
+Any nonctime creation drift or ANY postseal drift permanently refuses; no
+resampling, reconstruction, retry or removal follows failure. Creation and
+seal observations remain separate, never rewritten as if unchanged creation.
+
+Technical: new helper and a separately versioned driver are lane-specific
+additions; existing HeldFiles, OwnedOutput, capture and prior diagnostic bytes
+remain unchanged. The new driver is intended to publish ONE fixed186-byte safe
+NONCLAIM metadata file, at most1024bytes, within1800seconds, authenticating the
+same original source/code/zero-START lineage first. Original output/parent FD
+anchors and the new retained creation capability outlive source/code context
+exit; original control and metadata byte+stamp audits must follow the final
+code audit, then terminal deadline/clocks. A negative dominates provisional or
+positive markers. Main and independent development peer must review causal
+fabricated composition and exact code/protocol registration before any new
+actual invocation. No new diagnostic has been invoked at this entry.
+
+Plain language: newly created local metadata may have a bounded preparation
+phase before it becomes immutable evidence. Existing evidence never receives
+that exception. A future successful new diagnostic would show only that this
+prospective creation procedure closed under its frozen policy; it would not
+identify the historical actor, repair an old failed invocation, release a
+provider claim, enlarge a spent budget or admit count/denominator/backtest
+inputs. Source-only epoch ledger/union and factual identity/cash/input gates
+still remain. Source START13992/HTTP13991/chargedbytes23452681, the old81876
+START/4GiB ceiling and prospective at-least-one-START shortfall are unchanged.
+Count/daily provider claims stay held; actual looks0/0 and0, alpha0, permanent
+look IDsnone, QC attempts0. No QC, purchase, actual strategy evaluation or
+interim publication occurred. Claude has not reviewed the seven local commits.
+
+### 124.14 Frozen creator-only handshake and separately registered local probe
+
+Technical: SI-DEC-20261025-01 now has a new creator-only helper and a separately
+versioned operational driver. The helper can prove custody of bounded NEW
+bytes, not their semantic source authority; only this driver's fixed safe
+NONCLAIM JSON/name may be used in the registered operation. The factory's
+original readonly inode FD is opened before the last writer closes, retained
+independently of mutable capability fields and never used to adopt an old file.
+The complete8second creator window begins BEFORE the first guard/O_EXCL and
+includes writes/fsyncs/last-writer close, caller delay, sampling, original
+constructor and first strict read. At most16 samples/.25s spacing/>=1s quiet
+precede ONE original HeldFiles construction; the chosen seal must match its
+exact original stamp/owner/mode. Every postseal predicate remains strict.
+The quiet observation is finite evidence, not a guarantee of future stability.
+
+Plain language: this is a prospective preparation phase for one new local
+metadata file. It cannot repair/restart an old invocation, modify source
+custody, refund a spent claim or qualify data. If the actual source guards
+consume the8second creation window, the correct result is a retained bounded
+refusal, not fewer checks, a reset, a larger window or another namespace to
+guess again. Original count finding022 and the observed ctime actor stay UNKNOWN.
+
+Pre-release development findings, corrected BEFORE registration/commit; these
+do not explain or retroactively repair either historical failure:
+
+| ID | Priority / disposition | Evidence and correction |
+|---|---|---|
+| SI-BUILD-20261025-002 | P2, corrected before commit | A public operation's binding guard could fail outside the failure latch, allowing restored fields to appear usable again. Reflection damage could also bypass original FD cleanup. Exact-original failure state now latches permanently, original HeldFiles cleanup has a separate identity, and factory-local readonly-FD lifetime closes independently. Main's memory-only latch removal produced2failures/48deselected in0.06s; restored code passed. |
+| SI-BUILD-20261025-003 | P2, corrected before commit | The draft driver replaced a genuine pre-output setup error with missing-result and could call a pre-yield partial creation zero publication. The sealed fixed-stage wrapper now preserves the actual controlled cause; an attempted creation without an accepted capability is explicitly unknown_partial_creation_possible with probes_published null, never inferred absent/successful. Fabricated producer-backed setup and postwrite/deadline cases retain original files and reject adoption/retry. |
+| SI-BUILD-20261025-004 | P2, corrected before commit | Peer found that successful metadata-context close could consume the deadline or mutate original metadata/controls after the last pre-close audit. A post-close ORIGINAL seal-stamp/protection and control membership/byte/stamp sweep now follows, with final UTC/monotonic/deadline checks; no metadata reopening or resealing. Main's memory-only removal produced3failures/2passed/46deselected in1.71s, then was restored. Close/context failures dominate positives; if output close itself cannot preserve a negative, nonzero actual termination remains a mandatory success veto. |
+| SI-BUILD-20261025-005 | P3, corrected before commit | Path.exists followed a fixed-name symlink and treated a dangling one as absent. An anchored parent FD/no-follow ANY-entry absence preflight now refuses regular files, directories and dangling links before output creation; no outside-target stat, overwrite or cleanup is authorized. |
+
+The separately registered NONCLAIM operation is
+`new-metadata-custody-20261025-v1`, with ONE fixed186-byte
+`new-metadata-custody-20261025-v1.original.private.json`, max1024bytes and a
+whole initialization/closure deadline of1800seconds. It authenticates the
+original source/cache,41835-member refused prefix, v2/v3 zero-START controls
+and historical code first. The old NONCLAIM negative/probe pins are explicitly
+Main-previously-authenticated antecedents, NOT falsely claimed as currently
+reopened source evidence. Python provider sockets, exact credential readers
+and source-capture entry points must be denied in memory; Git may inspect only
+matching origin lane metadata. HTTP/key/capture/newclaims/sourceSTART/bytes
+and outcomes/QC remain0. It is NOT a provider claim.
+
+Success requires actual process exit0, authentic original
+`run.completed.provisional.json` AND `run.closed.json`, original metadata
+bytes/creation/seal observations, exact runtime/code/source lineage and NO
+`run.refused.json`. The closed control binds original provisional RAW SHA256,
+closed_at and all_source_and_code_contexts_closed. One stable callback changes
+to terminal routing ONLY after EVERY source/code context exits successfully.
+Original output/parent inode FDs and creator capability survive both fresh
+58-file committed-code audits and following original metadata/control audits.
+The post-successful-metadata-close original-stamp/clock sweep is additional,
+not a new custody construction. A negative or nonzero/unknown termination
+vetoes every provisional/positive control. Even success would establish ONLY
+prospective local creation-policy closure, not historical repair, provider
+claim release, source/denominator/input admission or backtest readiness.
+
+Frozen prospective protocol SHA256
+`08f3354d445e51ebf73b704cddfe0f93bf271642b640d633a4d27d1b37279526`;
+complete58-path list SHA256
+`756a52a106f90d70f2340b691a72e56014fe741dca7306f490ec368b8be6638e`;
+complete relative-path/current-byte mapping SHA256
+`f6ce9fef4c10ef31f6aa2738b33556c9615a80533292e9a259f1bebb6bd52deb`.
+The clean committed runtime HEAD is bound separately after commit, never
+self-referenced in code; actual/tracking matching origin must remainB648.
+No actual new probe has been invoked at this registration entry.
+
+Main reviewed both complete new production/test pairs and the retained
+original producer/consumer boundaries. Its focused creator/driver/old
+diagnostic/bounded-source/diagnostics/import-boundary/record plus three
+active-document checks passed **272tests in14.63s**, no skips or warnings,
+empty inherited environment and OS network denied. Main's separate helper
+selection passed50/.39s; preserved counter-review record20/.34s and selected
+active-document3/.65s also passed. Exact AST closure is all58 source paths,
+including package initializers; every own contract/stage literal is covered
+by its fixed catalogue, all58 sources and both new tests compile in memory,
+and whitespace checks pass. Only new helper/driver/tests plus this lane
+record change; original source/capture/custody bytes remain unchanged.
+
+Delegated development evidence, NOT Main reruns or independent Claude review:
+helper author50/.36s; driver author51/11.85s; independent peer combined101/10.80s.
+Author memory-only reversals separately established preseal-ctime allowance,
+permanent latch, original setup-cause preservation, failed-context phase and
+late-close safeguards; peer independently reversed latch and post-close audit.
+All were restored before final validation. After peer freeze Main changed
+only the prospective PENDING protocol literal to its computed exact hash;
+Main's272-test selection ran afterward. No actual private source, provider,
+credential, claim, QC or outcome was used by these tests; no full lane or
+repository suite ran. Claude has not reviewed this accumulating snapshot.
+
+After terminal probe authentication, the next bounded software slice is a
+sealed source-only count-epoch ledger, not a compiler input or old-registry
+cast. Authenticate complete FINAL membership including post-transport-manifest
+inventory/provisional/closed/negative controls and separately held spent claims;
+claim maxima are not actual debits. Replay every START/retry/unknown full-page
+charge, preserve all negative/zero-START epochs and disjoint original-position
+origins. Retained transport positions are NOT qualified counts. No actual
+positive closed bounded chunk exists; no complete denominator/input flag or
+provider authority may be fabricated. The immutable old cap still has an
+at-least-one START shortfall before future retries. All factual source/cash/
+actual-input gates remain open, source claims held, looks0/0 and0, alpha0,
+permanent look IDsnone, QC attempts0. One final combined push remains pending;
+no intermediate publication, new milestone or readiness is claimed.
+
+Post-record Main creator/driver/record/selected active-document selection:
+**124passed in11.38s**, no skips or warnings. Staged exact five-file source/
+test/record whitespace check passes. No production change followed the
+272-test Main run; only this appended validation attribution was added.

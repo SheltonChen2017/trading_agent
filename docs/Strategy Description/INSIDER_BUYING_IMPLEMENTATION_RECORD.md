@@ -33719,3 +33719,143 @@ native process-tree network/security-exec/lane-write denial, plugin/cache off
 and invented external temporary roots; diff whitespace check clean. No full
 suite. This is a local durable progress/registration commit, NOT final handoff,
 independent Claude review, an interim push or a claim of backtesting readiness.
+
+## 257. Native CIK candidate cell qualified before activation (2026-10-25)
+
+255's new source is28,041B SHA
+`4a192fef3feff0adbfe036c70fcb7b494bb29de2ad87d25bdc69c2010b00ca42`;
+tests20,754B SHA `6856a4e4bdec12cee31c692035792615d3f23f4c9a0e1725083c44eff4b614f1`.
+Generic core SHA `32027295c6b367ce19e558ea9548e77a0830e5ac5c7b3f5111682f70a11d0171`;
+exact51-CIK array SHA `d33f711c10b24c8a8dd9be9f3fb137b21c03b0f2506165477c9dab4e2854a1c1`.
+Provenance explicitly says trusted main-observed253 assessment, not a new
+artifact read by this preparer. No actual preparation/upload/query has run.
+
+Capture prechecks105 fresh own keys:104 normal start/51 started+result/final
+keys plus one distinct error key. Normal path has104 saves/readbacks; error
+receipt, if all absence checks passed, is one best-effort separate write/read,
+never a retry of the original call/receipt. Own finite stop_stage and attempted/
+fully validated row counts may leave; returned mappings/counts/digests remain
+cloud. `resolver_calls_completed` means fully iterated/shape-validated rows,
+NOT a measured backend HTTP-request or HTTP-completion count. Unknowns consume
+scope; partial row/receipt failures stay explicit, no automatic suffix resume.
+
+NEW cloud receipt bounds are512KiB EACH/2MiB aggregate reads. At most512 edges,
+16/CIK,512 printable-ASCII SID characters/128 label characters. JSON escaping
+can double those string lengths; at most256 shared-SID groups and256 duplicate-
+SID entries leave substantial finite fixed-metadata headroom. Genuine maximum
+escaped legal-shape test has final>256KiB, fits512KiB and all receipts<2MiB.
+No old codec/resource/custody guard changed. Independent persistence is still
+NOT established by immediate same-session save/read (SDK cache may intervene).
+
+| Verified preactivation finding | Exact disposition/red-green |
+|---|---|
+|`IBQCCIK-PRE01` P3: validator accepted impossible acknowledged error receipts in construct/precheck/consume states.|CLOSED before activation: three genuine generated-refusal-ack mutations red; require capture/all105 prechecks/save+read evidence and a possible post-precheck stage.|
+|`IBQCCIK-PRE02` P3: final serialization/cap refusal reported preceding row's stage.|CLOSED before activation: one genuine full51-row oversized-final red; set finite phase before serialization/size check. Unsupported>512KiB final still refuses without replay, preserving row receipts.|
+|`IBQCCIK-PRE03` P2: preceding64KiB receipt limit in the unexecuted new core could not carry legal worst-case512-edge final.|CLOSED before activation: genuine maximally escaped legal-shape red then green under separately declared finite512KiB/2MiB bounds. No cap relaxed in executed/frozen helpers or candidate count constraints.|
+
+Attributed author:58 new/integrated485 focused passed5.74s; six in-memory guard
+reversals killed eight meaningful reds then restored58. Native source-only
+network/fork/ALL-write/security-exec denied import/compile of pair and both
+invented capture/consumer cells passed0.587s. Main read full source and final
+capacity changes; independently rehashed/compiled FOUR source/test images plus
+both invented cell modes under strong initial native denial in0.565202875s,
+exit0; fixture cell15,235B. Read-only Codex peer accepted corrected source and
+finite capacity arithmetic; no independent Claude review or peer actual run.
+
+The receipt-consumer branch is inert and UNACTIVATED. Actual public preparer
+creates only one capture-cell intent; a future production consume requires a
+separately registered fresh selected source/intent, never an inferred second
+execution of this capture. Official [QuantBook Python reference](https://www.lean.io/docs/v2/lean-engine/class-reference/py/QuantConnect/Research/QuantBook/)
+documents the int CIK/date overload; current public [LEAN resolver source](https://github.com/QuantConnect/Lean/blob/master/Common/Securities/SecurityDefinitionSymbolResolver.cs)
+uses security definitions/map files and can fall back to a last ticker or an
+empty list after load failure. This current-public-source check is NOT exact
+cloud-v18203 source attestation. Candidates never prove historical absence,
+listing/share-class/CIK interval/PIT identity or canonical admission.
+
+## 258. Daily archive sample qualified before activation (2026-10-25)
+
+Final new source63,482B SHA
+`cdd8f3a0c0bafca83750d18a80c3b81c499f615d0299a6f0cd48b7570c745bf9`;
+tests25,391B SHA `68f84f3da0829aea0f37262885f0920e39d67a291b4632e292f0031c8fef5a36`.
+This qualifies256's one fixed archive sample only. No archive GET, actual
+preflight/input read, contact read or namespace publication occurred in tests.
+All four historical custody bytes and stopped namespaces remain frozen.
+
+The additive fixed HTTPS transport/framing/publication supports512MiB rather
+than changing old8MiB constants. Non200 body stays unread; absolute raw
+transport deadline600s (15s socket idle timeout), native guard timeout900s.
+Volatile binary stdin, never JSON/base64 body, carries compressed response
+and ephemeral contact to an initially native-denied streaming guard. Complete
+gzip CRC/EOF/no trailing/expansion and finite privacy checks precede body OR
+retained header crypto hashes/publication. Concatenated gzip is unsupported;
+failed privacy/integrity/caps consumes URL without body retention/hash.
+
+Finite streaming views are Latin1, incremental UTF8 replacement and conservative
+ASCII-NUL-stripped text, nine stages enforcing eight allowed escape layers,
+bounded64-character pending tokens and literal UTF16/32 contact forms. All
+bounded decoded CONTACT-needle variants are checked too; no claim of universal
+encoding decoding. Arbitrary binary/PDF positive fixtures pass; no requirement
+that the whole opaque TAR be valid UTF8. No8GiB plaintext materialization or
+temporary decoded files. Decoded total8GiB, expansion128x,100,000 physical
+members/256MiB member profile/32MiB metadata. Unknown alignment/quota means
+known prefix, unknown remainder, not complete enumeration. Unsupported TAR
+may remain opaque only after complete outer gzip/privacy qualification.
+
+Prior accession tokens in member names AND opaque payloads trigger count/
+quarantine, not parsed filing identity or canonical deduplication. Exact
+directory and old/new64 claim/control snapshots are checked before dispatch,
+retention and readback; these are repeated observations, NOT atomic global
+exclusion. Incidental consumed bytes remain compressed under256's explicit
+bulk policy; never individual redispatch/extraction/admission or PDS guessing.
+Native readback holds SH|NB lock against producer EX, rehashes bytes/header/
+inspection/result and rederives gzip/TAR metadata and input snapshot lineage.
+It explicitly does NOT replay contact screening without retaining contact.
+Trusted parent independently Git-proves original identities before acceptance.
+
+| Verified preactivation finding | Exact disposition/red-green |
+|---|---|
+|`IBARCHIVE-PRE01` P2: inherited2048-list codec could not carry real-shaped prior-accession/TAR metadata.|CLOSED before activation: new own bounded64MiB canonical control codec,100,001 list/3M nodes/depth32; >2048 prior keys and full source closures roundtrip. Foreign/executed codecs unchanged.|
+|`IBARCHIVE-PRE02` P2: readback omitted a held shared lock against producer EX.|CLOSED before activation: genuine EX-held readback red; SH|NB plus private owner/mode/nlink/inode/version checks and finally cleanup. Unlocked readback green; locks do not replace byte/source proof.|
+|`IBARCHIVE-PRE03` P2: new scanner omitted decoded variants of a valid percent-containing contact.|CLOSED before activation: main source-only native observation0.5017355s verified new-pass/old-refusal for invented valid contact. Author nine genuine gzip/TAR prehash reds across UTF8/16/32/chunks, fixed bounded needle convergence; twelve NUL-view escaped-multibyte controls green. An earlier invalid invented contact did not reach scanner and is NOT finding proof.|
+|`IBARCHIVE-PRE04` P2: new CLI protected contact only upon reader entry, leaving early queued PTY input exposed during preflight.|CLOSED before activation: three genuine protect-before-run/finally-restore refusal/argument-error reds; entry protection/restoration now wraps entire CLI. Direct API caller's echo responsibility documented; no actual contact was exposed.|
+
+Attributed author FINAL524 focused passed6.51s,126 new; source-only20-image
+strong-native proof0.060346625s internal/0.568s wall. Eleven memory reversals
+on preceding identical guard image killed31 reds (needle9,NUL-view12, EOF,
+ratio,HTTP cap,lock,result bool,header hash,producer test,real-list capacity2,
+same-inode content hash), restored123. Subsequent CLI-only correction adds
+three tests. Final readonly Codex peer inspected source/tests and qualifications;
+no actual input/action or independent Claude review is attributed to peers.
+
+Main OBSERVED **1,309 passed22.07s**, EIGHTEEN explicit focused targets:
+257+258 new pairs, original64 projection/capture, unchanged complete-submission/
+raw-parent parsers, cloud control, retained-format, auth/profile/directory-v2/
+directory-v1/stopped-control regressions, QC client, lane import boundary,
+record/active documents and EXACT Insider package guard. Effective native
+process-tree network/security-exec/lane-write denial, SECRET-FREE isolated
+fixtures, plugin/cache/bytecode writes off, external invented temporary roots.
+No full lane/repository suite. Preceding archive image
+`46f6a80e58cc3ce1cdffc852ee80ca727bcd29155f6c328251d9f3304008d052`
+with tests `3752927248ee2902c7b5705ecd6aac2d59d00c6e1e33710ad11415b436528386`
+passed main1,306 in22.09s; those results are NOT relabeled as final-image runs.
+
+Main FINAL separate source-only strong-native network/fork/ALL-write/security-
+exec proof compiled/rehashed20 images in0.61960625s, inventory
+`2071c4e6a915a21939f83eb22ac0bc1c42f49393117e2bdb1f5b94eacfba115c`.
+Preceding20-image proof0.596365167s/inventory
+`78d9625eceb53ac8bf29dfc9675f20db6e3843fa29df2a0a204397df6bf9365b`
+remains preceding evidence. Initial main source-only command used wrong cache
+prefix and refused isolated flags before image reading; corrected invocation
+passed. This was invocation error, not helper/input/HTTP failure or permission
+to weaken isolation. No actual namespace/request was involved.
+
+Commit qualified images/257–258, reverify exact root/branch/HEAD/status and
+matching remote, then freeze ALL source writers. Only then activate256's ONE
+archive sample and255's fresh local intent/source transfer/comparison/selected
+cell. Continuous build remains authorized, not a checkpoint/Claude pause.
+Six carried P2s remain OPEN; software corrections do not close source/corpus/
+identity/clock/rights/canonical/price/readiness gates. No backtest/outcome look
+has run, no final handoff or push yet; exactly one final combined push persists.
+
+Post-append main record/active-document checks72 passed1.57s under the same
+SECRET-FREE native denial/isolated-fixture controls; final diff check clean.

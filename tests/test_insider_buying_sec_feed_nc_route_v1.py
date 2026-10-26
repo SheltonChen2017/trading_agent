@@ -221,3 +221,16 @@ def test_cycle_and_batch_witness_inconsistent_partition_refuse_finitely():
     with pytest.raises(m.NCRouteError):m.validate_nc_route_batch_witness(w,fixture_only=True)
     w=_batch((_payload(),)).public_witness();w["member_dispositions"]=["prior_consumed_route_quarantined"]
     with pytest.raises(m.NCRouteError):m.validate_nc_route_batch_witness(w,fixture_only=True)
+
+
+# Claude review section 330 (IBNCROUTE-CR33001): the value parser strips
+# leading spaces/tabs, so the shadow hint must too, or a whitespace-led copy
+# of a route hides from duplicate quarantine. Claims keep the canonical form.
+@pytest.mark.parametrize("pad",[b"\t",b" ",b" \t "])
+def test_whitespace_led_shadow_copy_still_quarantines_every_copy(pad):
+    shadow=_payload(accession=pad+ACC)
+    assert _assess(shadow).claim is None
+    batch=_batch((_payload(),shadow))
+    assert not batch.eligible_claims()
+    assert batch.public_witness()["disposition_counts"]=={"duplicate_route_all_copies_quarantined":2}
+    assert _batch((_payload(accession=pad+ACC),),frozenset({ACC.decode()})).public_witness()["member_dispositions"]==["prior_consumed_route_quarantined"]

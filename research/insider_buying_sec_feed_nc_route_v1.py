@@ -40,6 +40,10 @@ _ACC = re.compile(r"[0-9]{10}-[0-9]{2}-[0-9]{6}\Z")
 # malformed closing markup or suffixes cannot hide a second copy of a route.
 # These hints can ONLY quarantine, never create/complete a claim.
 _HINT = re.compile(rb"<ACCESSION-NUMBER>([0-9]{10}-[0-9]{2}-[0-9]{6})")
+# Section 330 (Claude review): _token strips leading spaces/tabs, so a copy
+# written "<ACCESSION-NUMBER>\t..." must still count as a shadow. Claims keep
+# the canonical _HINT; this broader form only quarantines.
+_SHADOW_HINT = re.compile(rb"<ACCESSION-NUMBER>[ \t]*([0-9]{10}-[0-9]{2}-[0-9]{6})")
 _FORMS = frozenset({"3","3/A","4","4/A","5","5/A"})
 _FRONT = ("ACCESSION-NUMBER","TYPE","PUBLIC-DOCUMENT-COUNT","REFERENCE-462B","REFERENCES-429",
     "PERIOD","ITEMS","FILING-DATE","DATE-OF-FILING-DATE-CHANGE","EFFECTIVENESS-DATE",
@@ -398,6 +402,7 @@ def _assessment(raw,fixture,screened,limits):
     preamble=b"\n".join(lines[:boundary])
     _need(len(preamble)<=limits.preamble_bytes,"capacity","preamble_byte_bound")
     hints=tuple(match.group(1).decode("ascii") for match in _HINT.finditer(preamble))
+    shadows=tuple(match.group(1).decode("ascii") for match in _SHADOW_HINT.finditer(preamble))
     claim=None;count=0;disposition="unsupported_or_ambiguous_structure"
     try:
         _syntax(len(hints)==1 and not any(b"\r" in line for line in lines))
@@ -410,8 +415,8 @@ def _assessment(raw,fixture,screened,limits):
         disposition="unqualified_documented_status" if error.status else disposition
     witness=validate_nc_route_witness(_witness(raw,fixture,screened,disposition,hints,count),fixture_only=fixture)
     encoded=_raw(witness);_need(len(encoded)<=limits.metadata_bytes,"capacity","metadata_byte_bound")
-    value=NCRouteAssessment(raw,claim,hints,encoded,_TOKEN)
-    return _register(_ASSESSMENTS,value,(raw,claim,hints,encoded))
+    value=NCRouteAssessment(raw,claim,shadows,encoded,_TOKEN)
+    return _register(_ASSESSMENTS,value,(raw,claim,shadows,encoded))
 
 
 def assess_nc_route(payload,*,privacy_contact,fixture_only=False,limits=None):

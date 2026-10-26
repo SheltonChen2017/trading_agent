@@ -839,8 +839,10 @@ three exact busy observations(323.36). Both are spent; no identity was retained.
 R298's lingering code environment was then stopped alone, other lane retained.
 L's post-stop read passed all fresh checks and privately matched the exact
 2022-10-21/24 missing-stock witness to one of6151bindings(323.38); L is spent.
-Next a separately frozen offline original-TICKERS-row authentication, not a
-provider/price query or relaunch, before any verified source remedy/comparison.
+M's original-row authentication passed once(323.41): source price dates span
+the reference/decision and captured active metadata is N; M is now spent.
+Next a separately frozen no-order exact-SID Daily/Minute feed-presence
+diagnostic, not a price substitution, before a verified remedy/comparison.
 No guessed stale-price/holding bypass.
 One final push; no funded or paper/live deployment authority is inferred.
 
@@ -2145,7 +2147,9 @@ frozen post-stop read-only consumer(323.37) must establish real fresh idleness
 and unchanged source/job before any detail read. K and J remain spent.
 L subsequently passed this scope once(323.38), recovered the dated witness
 and matched the genuine catalog; no source/price repair or performance cell.
-Next the bounded original-TICKERS evidence contract, not another QC launch.
+M then authenticated the exact original TICKERS row once(323.41); no actual
+daily bar or price was admitted. Next a bounded no-order exact-SID Daily/Minute
+presence diagnostic, not another strategy attempt or guessed-price fallback.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
 V3 is spent after its
@@ -59850,3 +59854,308 @@ under synthetic drift); actual-zero omission caught1expected failure0.05s
 (DID NOT RAISE). All originals restored in finally, disk hashes unchanged.
 No production metadata/bytes/security setting was changed. One final
 matching-lane push remains pending after meaningful result/recovery handoff.
+
+### 323.41 Actual M original-row authentication; dated coverage remains unproved
+
+At clean446d061cc27b7df5fb4d7c93995284efad029b1f, sole native M parent ran
+2026-10-26T00:07:28.730690Z..00:07:46.165374Z, actualexit0/stderr0/no bound.
+Stdout4,838bytes SHA8785e415e666522981ac31a6e61f3916f4bbb1f2485b53b03b11757477e39132.
+Native supplied-output validator00:07:46.165733Z..00:07:49.730775Z exited0/
+stderr0/no bound, same4,838byte/stdout pin, output_authenticated=true/outer0.
+Report4,709bytes SHAfadb2929b5b38c9e0f4dc578c4015d640f5b6921872a4fce296d54aa7cc397ae.
+M/source consumer/output reader are now SPENT; no control reread/repair/retry.
+Final record86passes1.15s repeat the265selection, not additive; no tests or
+edits during actual use. Native source ACL/xattr/full-held/named postchecks,
+complete original archive/member/header and74,150CSVrow census passed.
+Exact unique row reproduces original composer identity and the genuine L
+catalog/context/join pins, with fresh final private input admission passed.
+
+Authenticated redacted result: RAW first price date BEFORE both reference and
+decision, RAW last price date AFTER both; current-vintage isdelisted=N/false,
+one CUSIP candidate, clipped reference/decision interval relations INSIDE.
+Raw-date hashes are7e787dd7b3c47e175f54ba11033b10ffa0f052b1a31b59a759963c8af7d6bd24
+(first) and9b5e07753bd5ffffe0073fcaec8095bbb5635d9e0897814992799359678ee7b3(last).
+No raw dates, security/ticker/FIGI/CUSIP/price/row or opaque route were printed
+or persisted by this consumer. Route discarded in memory. Zero new QC jobs,
+provider/credential/QC/capacity calls, strategy look/cell or source mutations;
+floor334/259/50/699 unchanged. All actual output formal/PIT/permanent identity/
+provider-route/sizing/strategy acceptance/paper/live flags remain false.
+
+This narrows the diagnosis: neither a clipped interval exclusion nor an
+original metadata-declared last-price cutoff explains the required reference
+absence. It does NOT prove every intervening daily bar exists, a historical
+exchange ticker, actual2022active/delisted state, immutable source continuity,
+current-source availability as-of2022 or a price/NAV remedy. Practical
+ARV2E323-001 remains OPEN. Preserve actual A18/A19 failures and all old metadata
+refusals. No holding omitted, zero target/payoff assumed, prior/stale/quote
+close substituted or missing-price guard relaxed.
+
+Next inspect public/runtime timestamp extraction and exact historical-series
+routing before choosing another bounded diagnostic. Primary vendor docs
+https://sharadar.com/docs/tickers document perma+table filtering for current
+metadata, not as-of history; from/to filter lastpricedate. Stocks endpoint
+https://sharadar.com/docs/stocks documents ticker/date filters and closeunadj,
+not a permaticker/FIGI price filter. https://sharadar.com/docs/faqs describes
+rewiring historical series under updated tickers and distinct share-class
+permatickers. Thus an authenticated STOCKS-table perma/FIGI match could justify
+a VENDOR historical-series locator, not a claim that its present label was
+the2022exchange ticker or formal permanent master. Do not use SF1 functional
+reporting currency as price-currency proof, invent an unsupported filter or
+execute a current-label fallback. Any new contact needs separately frozen
+exact identity/endpoint/date/rights/attempt/failure/secret-safe contract first.
+
+### 323.42 Prospective N no-order exact-identity feed-presence diagnostic
+
+Static public/runtime audit found no verified local filter/prune/timestamp
+defect explaining A19's missing reference. Frozen legacy _reference_prices
+requests typed Daily TradeBar RAW/no-fill-forward/no-extended over the exact
+reference00:00..next00:00; wrong date, unknown/duplicate SID or payload SID/date
+would raise distinct errors rather than silently reduce48 to47. New runtime
+unions held IDs before pruning, and held subscriptions cannot be removed.
+A18's widened Oct16..Oct23 request includes both ordinary market-close and
+legacy next-midnight Daily EndTime conventions; its four earlier bars do not
+by themselves identify provider/feed/map/halt cause. Current public LEAN
+master code is not authentication of the exact cloud engine revision.
+M's successful source metadata only narrows the possibilities, not a fix.
+
+Choose N BEFORE any new provider contact: one independently source-bound,
+NO-ORDER QC history-presence diagnostic in existing owned R298 project38364439.
+It is a distinct diagnostic purpose, not a renamed retry of the failed
+strategy or authority to alter its economics. It does not replay A18's wider
+probe, old controls or old result readers. Frozen original inputs/genuine
+admission and exact current preimage/history/access remain mandatory. No new
+project, other-lane action, source/metadata pin refresh, permission/member/lock
+change, ObjectStore upload or paid entitlement. Keep other nine source modules
+unchanged; only new exact diagnostic main.py and newrule_comparison_qc_runtime.py
+may replace the authenticated A19 preimage. Their full source-manifest census
+is a pinned binding, NOT another QC file to upload. Exact final pins/run freeze must
+be committed before any QC contact.
+
+Order-based strategy evaluation stays the default. This exception is justified
+BEFORE execution: the question is whether two resolutions return bars for
+one exact already-failing identity/session, not whether a strategy performs.
+Placing orders would add irrelevant exposure, selection and execution state
+and cannot authenticate missing data. No target selection/portfolio evolution,
+price-field access, order, return, Sharpe, drawdown or native strategy-result
+acceptance is part of N. An observed/Completed diagnostic adds ZERO performance
+cells and cannot clear RAW price/NAV or formal/PIT/master/paper/live gates.
+
+The fixed source resolves the unchanged full genuine input/FIGI inventory,
+selects the unique exact witness9daff625 for actual A19 reference2022-10-21/
+decision2022-10-24 and rechecks its source/binding identity. It subscribes only
+that exact native Symbol at Minute/RAW/no-fill-forward/noextended, retains SID
+and config checks and never guesses a current ticker. A one-day Oct24 no-order
+algorithm can perform the two fully-past History requests during Initialize;
+record the actual initialized clock separately rather than fabricate09:20 or
+depend on a sparse subscription advancing a scheduled callback on time.
+Conceptual A19 decision09:20 remains source context, not N's observed clock.
+
+At most ONE typed RAW Daily request for Oct21midnight..Oct22midnight and ONE
+typed RAW Minute request for Oct21regular09:30..16:00. Do not silently change
+endpoints, dates, normalization, fill-forward, extended hours or repeat a
+refused request. Cap Daily<=1bar and Minute<=390bars; retain only validated
+closed counts, exact SID equality/hash, distinct Time/EndTime day/session
+buckets, period/duplicate/fill-forward and source/config evidence. Completeness
+must be derived from exact regular minute indices, not rowcount alone; no
+bar.close/open/high/low/volume/price field may be read or serialized. Zero bars
+is valid absence evidence, not a valid price or proof of an actual halt.
+Successful emission and exact terminal handling mean diagnostic observation
+only. Unknown packet fields, changed source/subscription config or wrong
+selected identity/observation clock refuse. Returned-row SID/date/period/
+fill-forward anomalies may be retained as CLOSED invalid-metadata counts,
+never counted as valid exact-grid coverage or accepted as a strategy price.
+Enumeration completion is separate from row validity and completeness.
+
+One exclusive new control newrule_reference_feed/R323-20261025-N; old M and
+all operational leaves remain spent/native-denied. Under current continuing
+owner waiver, make one exact new diagnostic launch only after source/access,
+compile and fresh admissible capacity gates. This is NOT automatic launch
+authority from implementation or a generic new-attempt reset. No cancelled/
+interrupted other-lane node; wait if occupied. Actual new job, if reached,
+books ONE shared and ONE infrastructure look334/259/50/699 ->335/259/51/699;
+no development/performance cell and no counting preparation as a launch.
+Exact source/job/profile, bounded result/ambiguity/no-retry and actual-exit
+handling will follow in the run freeze. Preserve all prior failures.
+
+Optional Mia was not used during this step: fresh Safari state showed another
+lane's active project37465795 notebook even in the previously created window.
+Root took NO input/UI action on that state, did not open R298, change its
+source, start a Code Environment, submit a Mia task or message another lane.
+Continue offline implementation without commandeering the other lane's UI.
+This is not evidence that its backtest node is occupied or that QC is free;
+fresh permitted API capacity/access gates still decide N's eventual dispatch.
+
+### 323.43 N pre-use corrections and bounded observation semantics
+
+All findings below concern uninvoked draft N code, not retrospective causes
+of A18/A19, a Claude counter-review or an actual native data result.
+
+ARV2I323-014 P2 CONFIRMED/CORRECTED before use: the first draft emitted via
+set_runtime_statistic while its receiver selected backtest.statistics. Those
+are different QC channels; a Completed job could otherwise lose the sole
+diagnostic aggregate at collection. Frozen working strategy code uses
+set_summary_statistic for that receiver channel. N now uses only the summary
+channel; it does not fall back between fields or retain ordinary return
+statistics. Regression checks observe the invoked summary method, reject
+runtimeStatistics-only input and detect a memory-only emission omission.
+Primary API reference:
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/backtest-management/read-backtest/backtest-statistics
+and runtime channel:
+https://www.quantconnect.com/docs/v2/writing-algorithms/statistics/runtime-statistics.
+
+ARV2I323-015 P2 CONFIRMED/CORRECTED before use: the first draft's unique
+60second intervals could count off-grid or wrong-identity rows as valid
+regular-minute evidence, and endpoint flags preceded all validity checks.
+Exact integer minute indices0..389, clock alignment, matching dictionary AND
+payload SID, no fill-forward and valid metadata now control valid count and
+endpoint flags. The strict receiver also refuses impossible positive presence
+with zero counts, failed/uninvoked calls carrying rows, incompatible valid/
+bad counts, items exceeding batches, bool/int aliases and contradictory
+date/session/period witnesses. Enumeration complete is not independent
+coverage proof; full390valid indices only describes this exact native query,
+not independent historical coverage, RAW price correctness or NAV admission.
+
+ARV2I323-016 P2 CONFIRMED/CORRECTED before use: a valid bounded metadata
+response could be discarded if fresh POST-read access later refused, leaving
+only Completed and inviting an unnecessary new recovery read. Immediately
+after strict exact-own metadata parsing, N now retains an immutable closed
+result_observation with post_checks_complete=false/acceptance=false. It can
+cross the failure boundary ONLY with actualexit2, exact compile/job/source/
+profile/selection pins and all false readiness flags. It is not an accepted
+result receipt or postcheck bypass. One shared read budget is consumed before
+read prechecks; neither a failed postcheck nor retained observation permits
+another request. Successful acceptance still requires all postchecks, final
+fresh native input admission, matching report and actual parent0. Memory-only
+retention omission caused1expected failure0.15s(None after synthetic post-read
+idle refusal), restored finally with disk source unchanged.
+
+Public SecurityExchange/Hours/TimeZone and Security subscription/normalization
+APIs were checked against primary current LEAN source, not invented properties.
+Exact native algorithm ANDexchange NewYork observations precede assigning that
+zone to returned naive timestamps. Current master is not the exact cloud build;
+native API/type/config failure must remain a finite diagnostic refusal. Only
+one exact stock subscription is explicitly created by N. Benchmark Symbol is
+constructed without AddEquity/seed history. The unchanged other nine modules
+may contain strategy/order definitions but are never instantiated as a strategy
+by N; no claim that the whole QC engine never reads a price internally is made.
+
+N's prospective budgets are now purpose-specific, not the inherited multi-year
+strategy schedule: joint1200second parent, native workers<=120seconds each,
+compile60observations at>=1second, capacity3at>=60seconds, status20at>=30seconds
+with immediate first observation(max570second status spacing). Whole normal
+worst-poll path136application dispatches is bounded by160:21prepare+60compile+
+18capacity+5fresh-after-capacity/immediately-before-create+1create+20status+
+11read/postchecks. Source/access/history/BuildSuccess are rechecked after
+capacity and immediately before create. I/O latency still consumes the joint
+deadline; uninterruptible I/O/host suspension are not guaranteed bounded.
+No lock/member/permission/cancel/other-node or strategy-price action is added.
+Author subsets/mutations are qualifications, not additive independent results;
+exact final tree checks and source/run pins follow before actual invocation.
+
+### 323.44 N exact one-use source/run freeze
+
+Authorize ONE observe of scripts/run_arv2_r298_reference_feed.py using the
+normal credential-bearing exec context, --expected-head the clean commit
+containing323.41–44, --caller-sha256
+884bbd08d8e20b192e6fd694cf9a0b458e09b60ef400accb8664cfcae7cd0987.
+Only existing QC_USER_ID/QC_API_TOKEN cross the bounded parent handoff in
+memory; never print/inspect values or use a Keychain/token-file/provider
+fallback. Designated Darwin/POSIX Python3.13/root/branch only, clean exact
+committed HEAD/caller and131selected source pins. No zero placeholders or
+automatic source/profile refresh. N's fixed control remains uninspected and
+unallocated before this sole use; native workers/output validator deny old
+controls and all provider/credential contact and write only own allowed scope.
+The QC broker is intentionally network-capable for its exact allowlisted
+requests; native-denied workers do not claim to sandbox arbitrary same-user
+modification or authenticate the entire interpreter.
+
+Schema arv2-r298-reference-feed-n-v1, literal attempt N, exact backtest name
+ARV2 R298 RAW FEED PRESENCE R323 N, existing project38364439. No invented A20
+strategy candidate, new project or performance-run authority. Two exact edits
+newrule_comparison_qc_runtime.py and main.py only, preserving current A19's
+other nine exact files including legacy62a731eded8710f34c968f2ab61bc80052ad6486a2e41fa893e3ed8a9487ce84.
+Current A19 preimage 8325/7a85/c7 and exact six-row manual+A12+A14+A16+A18+A19
+history must authenticate before the first write; the full expected hybrid
+source and all access predicates reauthenticate before the second. No edit
+lock acquire/release or special unknown collaborator acceptance. Exact18cf
+owner/A5/7108 representation and all current source/access/idleness gates
+remain binding before mutations, after source publication, after compile,
+after available capacity/immediately before create and around the one read.
+
+New projector scripts/arv2_r298_reference_feed_projection.py35,843bytes
+SHAbb6750ad44ef1602ab96fa83df8b2df70d1d6cb9b90b616b93706ad75d4915bb;
+test18,956bytes0986f3d4eae7b79481d49d959fbda6312225c898640304570dbac06082d2a65b.
+Projection4,885bytes/noLF SHA5b7dfc6659944f7871d053a09b01deb8c46b7bb51b29cc03ddfdcdb9b2a4ef47;
+internal profile57b0a00db8de00985ed4bfb4bc3089135ce5b83d0544fd879d01ef6aa64afdf0;
+raw profile4,572bytes/noLF SHAb3272505b1215c339683bb74b1b5e16c0b73e0d152d951a9458748fc09db9d94.
+Sorted11-source manifest1,667bytes/withLF
+SHAa3b0d898c36ccdd53fca9a91459806a82a726b7830b002daa88e04ceb76e1802.
+Cloud runtime13,208bytes/e34d9c55ccc739fa708cb4dc837647ea9bbc75cfaad3649107da15882fab0018;
+main5,799bytes/9c057359cf7412eea704564fffb0e5afef30ccc7ca0b891eea3177263b7dddda.
+All derived from public source-only canonical recipe, no uncommitted/private
+preparation or original M/source/old operational reader replay.
+
+New pure remote scripts/arv2_r298_reference_feed_remote.py36,668bytes
+SHAc6f2a1aaa9873ffaa63efc0a756d615bbb0227b46d87daa58aeb511e64285502;
+test16,201bytes22c869f02c3df822fd512cd125267c7bb1658a202f8437aad31fc9cdc099cae2.
+Caller38,774bytes/884bbd08d8e20b192e6fd694cf9a0b458e09b60ef400accb8664cfcae7cd0987;
+test9,329bytes86edf0ba53495fa9d3dab84201d5bd7f2dd216022478ae33a59434146b8169e1.
+Canonical-plus-LF remote profile6,044bytes
+SHAb629a1c3cb034952d63d46b4b0d53b9a18d91f59455bf00c452b6da950f0d4cc;
+caller profile17,606bytes
+SHAd480b259286bada4ecb16464e3927433c0620ff9eea4dc537f9c3022a14c37aa.
+
+Sole parent joint1200second deadline and own-worker/actual-exit protocol in
+323.43 apply. One compile-create, at most60bounded build observations, three
+capacity observations with real>=60second gaps and at most20status observations
+with real>=30second gaps; no busy polling, silent retry, alternate output or
+unchanged fallback. At most160application dispatches; normal worst poll path136.
+One existing-subscription capacity check does not allow interrupting or
+repurposing another lane. Actual create dispatch, if reached even ambiguously,
+is conservatively booked once335shared/259development/51infrastructure/699cells;
+no look before it and no performance cell. Unknown create/result cannot be
+called safely unspent or used to lower the floor. No replay after claim.
+
+Only the exact one summary statistic ARV2_REFERENCE_FEED_META is selected
+BEFORE selected canonical hashing, under unchanged bounded HTTP wire reading;
+no ordinary performance statistics, charts, trade logs, raw errors or prices
+are retained in the selected result. Known Runtime Error/BuildError projects
+finite failure only, cause_authenticated=false. N parent2 is authenticated
+failure, never acceptance. Capacity-wait parent0 is only a no-job wait state,
+not a completed diagnostic. Completed parent0 with exact authenticated output
+can mean a bounded observation whose inner History status reports failure or
+missing bars; do not convert that into valid data coverage. A late metadata
+postcheck failure remains actual2 with only the explicit nonadmissible016
+observation. Successful exact report/exit0 and all fresh postchecks are required
+for an admissible diagnostic receipt; all strategy/PIT/master/paper/live
+readiness remains false regardless. No contact/strategy launch follows merely
+from this freeze unless every current gate actually passes.
+
+Root final204distinct focused passes11.86s(49projector+68remote/caller+
+86record/document+1research transitive import closure), no failures/skips/
+warnings. All131dependency/six new file pins, public projection/profile/
+full11-source manifest and two protocol profiles matched. Six new files AND
+all11generated cloud source files compiled in memory(17), without bytecode.
+Native remote-network/production-artifact/Keychain/security denial, inroot
+temp/cache/log/plugin paths, disabled plugin autoload/--noconftest/-B/no cache
+provider, dispatch_fence absent; synthetic/public only. No complete Codex lane
+or repository suite, private/QC/provider operation or independent acceptance.
+
+Author49projector passes7.14s and68remote/caller8.48s overlap204, not additive;
+prior29/43/46projector and53/59/65remote/caller subsets overlap. Memory-only
+summary-channel omission caught1expected failure2.55s, exact-grid omission
+1expected failure0.18s(off-grid wrongly counted389), SID-validity omission
+1expected failure0.18s(wrongSID wrongly fullgrid); originals restored in finally,
+disk hashes unchanged. 016retention omission is323.43's1expected failure0.15s,
+not an additional green test or real postterminal incident. Same-round advice
+is not Claude independent review; continuing owner waiver is sequencing
+authority only. One final matching-lane push remains pending.
+
+Precommit cached diff check caught one extra EOF blank line in each of the
+two new remote/caller test files; ordinary diff had not inspected untracked
+files. Both removed before commit, final test pins above supersede the author
+27bd68/bcf861 draft-test pins. No production source/profile/generated cloud
+byte changed. Preserve the failed cached check, not a false clean-first claim.
+The preceding204passes11.18s and record86passes1.07s overlap the final204,
+not additive; final six source/test pins and both generated/protocol profiles
+were rechecked after these formatting corrections.

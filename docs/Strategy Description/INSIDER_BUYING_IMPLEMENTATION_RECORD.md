@@ -35777,3 +35777,313 @@ frozen through operation/readback. Bound consumed roster is NOT observed member
 overlap: UNDETERMINED, never zero. No XML/financial/acceptance/issuer/SID parsing,
 source admission, QC/Safari/SDK/job/outcomes/backtest, study completion or final
 push. QC hold283/289 remains; continue only available offline work afterward.
+
+## 292. Consumed October archive privacy refusal and independent failed-scope readback (2026-10-25)
+
+291's actual operation ran on already-existing CLEAN
+`366385e4b97e867ae7ca004b30c588cc1f5beb9a`, not uncommitted/later source. Its
+126-source inventory was
+`9a1e36548cd249a351888ab989341b2e6c113a4021305ca3ddd93ad341159049`.
+Scope `ib-sec-feed-archive-20201007-format-v3-20261025-once` consumed exactly
+the registered October7 URL. The operation FAILED exit2; observed total
+505,053,318,875ns includes repeated clean/native/input precheck and private-
+contact wait, not pure transport/engine CPU time. HTTP200 and ONE raw transport
+invocation were observed; backend HTTP request count was NOT measured.
+
+Frozen engine refused phase `privacy`, code `finite_screen_refused`;
+disposition `privacy_integrity_or_descriptor_refused_no_retention_no_retry`.
+NO archive body, body SHA/byte count, response-header SHA, descriptor or member/
+physical-format observations were retained. Whether compressed or decoded
+screening refused, the exact private trigger and its cause remain UNKNOWN.
+Transport refusal was null; individual-parent requests0. Do not attribute this
+to a particular encoding, chunk boundary, document, contact echo or old June
+failure. Claim/start remain consumed; no retry, alias, resumed namespace or
+rewritten result. Source/test pair291 is EXECUTED/FROZEN.
+
+Exact pins: complete
+`df070bbb0d774cfd9b1cca5a6b8bbcf39044d7fb27c4a3735c8da9db4d9a6626`;
+reservation `35435114aae7be35bdd8caefa6a7aac2d9702b0018eaa318533bffb4474fbf53`;
+claim `7e0dc085a86da5dd7b4e66161d53febbb6aa45323616d557ff19eb33ecae60f7`;
+start `646e019dab5ee9ecd1ce9a40fb4ef4b15c97cff4f724cb30b23a80353ab3bfcf`.
+Independent failed-scope custody verification on the SAME clean HEAD/inventory
+returned exit0,142,341,553,375ns including its repeated precheck/contact wait.
+It rechecked exact externally pinned controls, source/initial/pre-first-read
+ctime/FD/ancestry and held-lock invariants. This validates custody of the FAILED
+operation, NOT successful acquisition. No retained body existed to replay:
+current-contact rescreen/engine replay, original-contact screen replay and
+original/current contact equality attestation are all FALSE. New requests0;
+original operation remains exit2.
+
+Each separately identified invoking glue protected TTY echo, proved read-only
+clean/source/native/input/original-Git/disk/freshness health BEFORE one private
+own Gmail profile read and anonymous contact feed. Authoritative fronts repeated
+guards before queued private input. Two total profile reads/feeds across actual
+and independent readback; no value/hash in chat/Git/logs/argv/env/Keychain.
+Glue is not silently part of committed source inventory. Actual native children
+enforced network/fork/ALL-write/Keychain-exec denial and291 resource policy;
+trusted invoking parent did not install an incompatible outer nested sandbox.
+Progress metadata-only stat was not response acceptance or measured transfer.
+
+Separate invented-text native probes show the frozen finite screen conservatively
+refuses some long incomplete percent/entity tokens at a chunk boundary although
+the same whole invented text passes; literal invalid Unicode escape also
+refuses. These are profile-availability limitations, NOT this actual archive's
+diagnosed trigger or evidence of privacy leakage. No actual bytes/contact were
+used in those probes. Nine carried OPEN P2s unchanged: a correct fail-closed
+privacy refusal does not itself establish a software defect. No source admission,
+XML/financial/clock parsing, corpus completion, QC/Safari/SDK/job/outcome look,
+backtest or push occurred. Owner's latest reply again confirms another lane is
+using QC/Safari; leave it untouched.
+
+## 293. Prospective compact retained-member boundary, not a carrier retry (2026-10-25)
+
+Delegated engineering decision under the owner's continuous-build/source-work
+authorization: qualify a NEW additive pure compact-member contract before any
+new acquisition. Whole daily carriers include irrelevant documents; retaining
+only complete, privacy-qualified roster-routed candidate members avoids making
+unneeded carrier retention a prerequisite. This is a DIFFERENT declared
+custody boundary, not a relaxed scanner, edit to frozen291/286 sources, claimed
+repair of292, or replay of a consumed URL. No actual namespace/request is
+registered by this entry.
+
+Required contract: immutable compressed input; full bounded HTTP/gzip CRC32/
+ISIZE/exact-EOF and continuous TAR physical-integrity completion BEFORE any
+candidate publication/hash. No full-carrier hash, full-carrier finite-privacy
+claim or whole-carrier replay/reclassification promise. Discard nonselected
+carrier/member bytes unhashed/unretained. Reuse only the frozen engine's
+explicit no-hash structural phase without monkeypatching or fixture-mode
+misrepresentation. A second pass over the SAME immutable input must reproduce
+geometry; retain bounded complete selected physical spans (header, unchanged
+payload, padding) in RAM and run the UNCHANGED finite privacy checker on EVERY
+retained byte. Only after integrity and per-object privacy succeed may hashes
+or selected-object controls be published. No unknown opaque/truncated physical
+tail may silently become complete selected coverage. Resource exhaustion must
+fail the operation, not retain a convenient prefix. Unsupported extensions,
+unsafe paths, duplicates/conflicts, oversized/private-refused members and
+prior-consumed routing overlaps need explicit conservative accounting.
+
+Finite anchored member-name profiles may route to an existing all-six-form
+quarter roster; names are routing hints ONLY, never accession/issuer/form
+identity or admission. Raw candidates stay identity-unvalidated/quarantined
+until an ADDITIVE typed factory reparses the unchanged complete NC member,
+genuine source/control identity, full primary ownership XML and actual
+acceptance-time evidence. Never strip an assumed256-byte prefix, fabricate a
+SEC-DOCUMENT wrapper/accession URL, or forge existing projection seals.
+Duplicates must not select first/latest. Prior consumed/ambiguous originals
+must never be individually redispatched; routing overlap is not verified source
+identity. Unknown June/October archive membership stays unknown, not zero.
+
+Initial compact qualification caps: inherit only-narrow512MiB compressed/
+8GiB streamed-decoded/128 ratio/100k physical and gzip members/32MiB internal
+geometry metadata; selected payload at most8MiB, at most4,096 candidates and
+24MiB TOTAL selected physical bytes. Prove native memory and inherited64MiB
+IPC limits with separately bounded metadata and chunked byte transport before
+any actual wrapper activation. Retained objects use CAS, never filesystem
+extraction based on source paths; no raw payload/name/contact in public logs.
+Main/independent focused/red-green/source/boundary verification precedes source
+freeze and any separately exact one-shot registration on an UNUSED day. A
+directory's advertised size is not actual bytes. No fallback/retry of October7
+or either June archive. No acquisition, XML/financial admission, QC access,
+outcomes/backtest, readiness claim or final push is authorized by mere passing
+of this prospective pure contract. Nine carried OPEN P2s remain unchanged.
+
+## 294. Compact routing scope and unpublished IPC capacity check (2026-10-25)
+
+Prospective refinement of293, not an actual source read or acquisition: bind
+the all-six-form source census but select only normative4/4A parent candidates;
+the other four forms get separate context-routing accounting. Filenames remain
+unvalidated routing hints. Existing `insider_buying_pilot_sec_roster._quarter`
+checks exact source rows/form/date/CIK/ordinal/ZIP/member/header/schema pins and
+refuses within-quarter duplicate accessions. A later wrapper must also preserve
+cross-quarter repeat/identity-conflict quarantine, including later occurrences,
+not silently choose the first/last row. Source-only inspection establishes the
+parser contract, NOT actual absence of conflicts in this quarter.
+
+Prefer a full25-context-quarter roster rederivation in initially native-denied
+workers, retaining only quarter-specific source metadata in RAM; bind the
+ordered full census and selected-quarter receipt. Do not rerun a consumed
+one-shot planner/observer or hash old original-parent bodies to obtain this
+metadata. The full17-field source row/its hash is the underlying source binding;
+a compact manifest may reference ordinal/hash/anchors rather than republish
+raw symbol/issuer fields. Any later parsed member identity must independently
+agree with genuine source evidence. Input-plan IPC need not carry every source
+row; a subsequent inspection worker can independently rederive/recheck the
+same continuously held, hash-bound source inputs. This is prospective design,
+not yet implemented/qualified or authorized actual namespace.
+
+MAIN initially native network/fork/ALL-write/Keychain-exec-denied capacity-only
+probe installed the frozen291 memory policy and roundtripped the EXACT inherited
+64MiB/3M-node codec:24MiB invented binary layout as384 chunks of65,536 bytes /
+131,072 hex characters, plus8,384,868B manifest layout, total58,717,762B IPC.
+Exit0/0.952502583s process;266,834,584ns inner observed serialization/roundtrip.
+4,096 metadata row layouts and padding are UNPUBLISHED artificial capacity
+envelopes, NOT real candidate/schema/member/source evidence. No retained data,
+contact/provider/QC access or artifact publication; no stress test or hard RSS
+claim. Real component/front schemas, canonical whole-control checks, aggregate
+quotas, source assembly and native input rederivation still need their own
+qualification before activation.124 focused record/active-document/import-
+boundary/EXACT-package checks passed4.77s under initial native network and
+Keychain-exec denial. No full suite, new actual source operation or final push.
+
+## 295. Main compact-contract prospective review findings (2026-10-25)
+
+MAIN read the new443-line pure compact draft completely before activation.
+Initially native network/fork/ALL-write/Keychain-exec-denied invented probes
+established two new, prospective P2 defects, not actual input/custody failures:
+
+- **IBCOMPACT-PRE01 /P2, PENDING**: limits={} reaches limits.validate before
+  exact-type validation and leaks a foreign AttributeError instead of the
+  contract's finite own refusal. Unchanged main probe exit1/0.649798459s,
+  inner2,541ns on the preceding uncommitted draft (not separately hash-pinned
+  by that probe). Both public compact/replay entry points need faithful red
+  tests and exact-type refusal before invoking an arbitrary supplied object.
+- **IBCOMPACT-PRE02 /P2, PENDING**: valid invented candidate plus expected
+  manifest backtesting_ready=True was ACCEPTED by retained-subset verifier.
+  Main probe exit1/0.635516500s, inner209,000ns, exact draft source
+  `535a5d57a32f9a3e3183bb250685f337f5036938bf480503544e049b8035bdcd`.
+  The verifier itself still returns readiness=False; this does NOT show actual
+  admission or tampering of an externally pinned completed capture. It is an
+  internally contradictory expected-control validation defect. Require exact
+  declared manifest schema/static flags and consistent bounded conservation/
+  object descriptors. Original carrier observations remain original evidence,
+  not freshly replayed from the discarded subset.
+
+Author was asked to preserve faithful failing tests BEFORE correction; main
+stored unchanged probe code for independent green reruns. Additional bounded
+descriptor decoding and monotonically ordered/nonoverlapping declared-origin
+checks are under review, not yet independently established defects. No actual
+retained input/provider/contact/QC operation or new namespace. Nine carried
+OPEN P2s remain unchanged; these two new pre-activation findings must be closed
+within the new compact scope before any actual front activation. No final push.
+
+Further MAIN review of the first correction (`5611b3bf`) found PRE02 still
+accepted a candidate-pool byte surplus with ZERO privacy-refused candidates:
+unchanged invented probe exit1/0.721857500s,522,792ns. Peer separately established
+impossible declared ordinal/population and span/decoded-size crosslinks. These
+are the SAME pending conservation finding, not fresh observation of discarded
+carrier positions. The correction now enforces exact integer/boolean and
+canonical-control typing, positive disposition conservation, bounded/aligned
+pool and refused-member byte accounting, ordinal/range geometry and original
+declared-population crosslinks. MAIN original wrong-type/readiness probes
+returned green on5611b3bf; unchanged pool probe returned green331,709ns /
+exit0/0.599370250s on preceding final candidate3d81c578.
+
+**IBCOMPACT-PRE03 /P2, PENDING**: peer's coherent invented descriptor/manifest
+for one physical member PLUS an extra512-byte zero block was accepted by the
+retained-object verifier on049c4964. Genuine1red1.67s; the frozen low-level TAR
+parser retained zeros=1, not an extra completed member. NEW helper now requires
+no residual zero block and exact member-padding-end==object length. The actual
+two-pass capture path's full TAR framing guard was not bypassed by this test.
+Peer24 controls passed0.72s after this correction. No old parser source edited.
+
+**IBCOMPACT-PRE04 /P2, PENDING**: integration review found the eligible subset
+also excludes repeated4/4A source rows, but the core reported every known-roster
+ineligible route as `known_other_context_form_route_not_eligible`. That is not
+necessarily another form; the pure API does not verify source form. Main's
+invented generic-policy exclusion probe exit1/0.573145709s on3d81c578 proves the
+over-specific reason. Use `known_roster_route_not_eligible`; the actual front's
+source receipt must separately account other forms versus repeated/conflicting
+4/4A. This is a concrete pre-activation QA correction to a newly prospective
+component, NOT a thaw of an executed/frozen custody source or changed selection
+economics. No actual member/census rows were accessed by any of these probes.
+
+The preceding3d81c578 image passed MAIN339 focused checks6.56s, including record/
+active-document/import-boundary/EXACT guard. Its strong native no-fork/ALL-write
+denied REAL component capacity fixture captured/replayed4,096 unchanged invented
+members of6,144 physical bytes each, exactly24MiB, through both CRC/integrity
+passes, finite privacy and inherited codec: manifest3,770,594B, IPC58,117,643B,
+inner3,096,520,167ns, exit0. Template unpublished; no actual data/contact/provider/
+QC input, clean-Git or whole-carrier replay attestation. This is a PRECEDING
+image proof, superseded for final qualification when PRE04's label changes.
+Repeat final focused/native-capacity proof and close all four exact-scope
+findings before activation; none has granted source or backtest readiness.
+
+## 296. Pure compact retained-member engineering qualified (2026-10-25)
+
+Final new prospective component, frozen for subsequent front qualification:
+
+- `research/insider_buying_sec_feed_compact_members_v1.py`,29,190B,
+  `777006cc74567613a5d82e9c5844c1fd0f91567727d47fcb073a02ea4e161e41`;
+- `tests/test_insider_buying_sec_feed_compact_members_v1.py`,21,501B,
+  `8f1619084ada77eb12165f6875643f6814902ca2ec2efc29e4213a9c06b3a1ea`;
+- independent QA tests `tests/test_insider_buying_sec_feed_compact_members_v1_review.py`,
+  9,804B,`c9ef1c02577da1efaf50f765249b0898d329634ff706a4b126ee1c1e7ed13951`.
+
+Technical result: two complete no-hash continuous-TAR/gzip integrity passes,
+unchanged selected header/payload/padding spans, full-copy duplicate quarantine,
+separate all-six/eligible/consumed routing, finite privacy on EVERY retained
+physical byte before its hashes, fatal extension/opaque/capacity refusals and
+complete physical-disposition conservation. Only selected bytes survive;
+neither a carrier hash nor whole-carrier privacy/replay claim is made. Source
+names route only; every candidate remains identity-unvalidated/quarantined,
+without XML/PDS/financial/acceptance/PIT/rights/admission/readiness authority.
+Retained-subset verifier checks exact canonical schemas/types/counts/geometry/
+hashes and fresh current-contact screening, explicitly NOT original contact,
+discarded bytes/duplicates, carrier positions or original capture provenance.
+
+Plain language: the pure reader can preserve only relevant, complete raw filing
+candidates rather than an entire daily archive, while keeping every exclusion
+visible. It has NOT downloaded, identified or admitted any real filing. The
+download front and real-input proof remain separate unfinished work.
+
+All four prospective findings295 are CLOSED in this exact NEW scope:
+PRE01 exact limits type precedes arbitrary method access; PRE02 exact canonical
+manifest/descriptor typing and bounded conservation/origin crosslinks reject
+the genuine red cases; PRE03 exact physical-span end/no residual zero rejects
+the extra512B block; PRE04 now uses generic known-roster ineligibility, while
+real source-form/repeat categories remain the future front's responsibility.
+No frozen/executed source or strategy economics changed. Author first recorded
+13 genuine type/schema reds1.09s, then5 additional pool/origin reds1.04s;
+peer2 origin crosslink reds2.36s/extra-zero1red1.67s; reason rename1red0.92s.
+Main unchanged generic-reason probe green exit0/0.685335500s on777006cc.
+Earlier main type/readiness/pool red-green observations stay separately295.
+
+Observed MAIN final340 focused checks passed6.09s, including both new core test
+files, frozen format, record/active-document, import boundary and EXACT package
+guard. No complete lane/repository suite. Initial native process-tree network/
+Keychain-exec denial; that run denied lane writes and used explicit fixture
+temp roots, NOT a claim that every other filesystem write was denied.
+Boundary child-import tests keep fork permitted with inherited network denial;
+strong source/capacity probes additionally deny fork and ALL writes.
+
+Additional MAIN restrictive harness returned337passed/3skipped6.43s: native
+ALL writes denied except the registered fresh temp root, but Git's read-only
+rev-parse needs /dev/null O_RDWR and was denied, causing existing mainline-
+availability tests to SKIP. Separate exact native diagnostic confirmed Git
+exit128 at that sink; not missing refs, document success or a compact defect.
+Final exact340 selection passed5.99s with ONLY fresh registered temp root PLUS
+literal /dev/null sink writable, initial network/Keychain-exec denial inherited
+by children. No repository/artifact writes allowed. This exception is confined
+to the Git-using TEST harness; actual source/custody/capacity workers retain
+their stronger no-fork/ALL-write policy and no /dev/null exemption.
+
+MAIN final REAL-core capacity fixture under initial strong denial plus291
+memory guard captured/replayed4,096 invented6,144B physical members, EXACT24MiB.
+Both CRC/physical passes and per-member privacy/replay executed; unchanged
+bytes checked. Manifest3,770,594B, own test IPC-layout58,117,643B roundtripped the
+inherited64MiB codec; inner2,917,662,166ns, exit0, source777006cc. Four loaded
+source images rechecked before/after, VM-growth/RSS monitor alive through
+serialization/final check. This fixture envelope is NOT the future front's
+full source-binding wire schema; that needs a separate real-schema capacity
+proof. No actual input/source authenticity, clean-Git, hard-RSS or discarded-
+carrier replay claim. All templates unpublished; no private contact/provider/
+QC/financial/outcome access.
+
+Attributed final author268 focused4.64s; independent peer's preceding exact-
+span image215 pure2.72s +52 boundary/package4.45s remains preceding evidence,
+with final narrow generic-label delta independently accepted. Author's final
+106-image initial-denial memory-compile/hash/pin/invented split-gzip replay
+proof has directly measured child712,490,833ns <= enclosing parent768,876,250ns;
+inventory `80758a0aa0c14c79638ae70fa534433847b353b13fcf1e9ba430bf60a6d87317`,
+proof-code `d2b2dce281db02ae43e52cc488bc7e0978acd8d75eaf086a4a7766e87cfeac50`.
+An earlier tool-wall/child interval pair was inconsistent and is NOT used as
+an enclosing timing claim. Meaningful guard reversals: author CRC1/privacy2/
+duplicate2 genuine reds/restored5 green; peer duplicate2/extra-zero1/manifest-
+typing4 genuine reds/restored7 green. Peer's initial ALL-write pytest startup
+tempdir refusal and one intentional boundary-subprocess fork refusal are
+harness incompatibilities, NOT core failures or passing qualification; final
+test scopes used the correct registered-temp/inherited-denial policies.
+
+Nine carried OPEN P2s unchanged. No real compact namespace/source operation,
+acquisition, QC/Safari, SDK, financial admission, backtest, final handoff or
+push. Continue front qualification while the owner's QC/Safari hold remains.

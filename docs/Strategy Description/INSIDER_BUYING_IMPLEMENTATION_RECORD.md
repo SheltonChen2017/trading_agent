@@ -34645,3 +34645,139 @@ Accumulate a local qualification commit for267–273 and these two finalized
 pairs while separately owned campaign drafts continue; do not stage those
 unfinished drafts. Actual271 activation still waits for ALL writers to finish
 and the final designated tree to be committed/clean. No push or final handoff.
+
+## 274. Qualified additive SEC parent batch controller (2026-10-25)
+
+Under the owner's continuing-build/delegated engineering direction, add ONLY
+new campaign/collector pairs; no frozen first64, archive, v3 or source-window
+change. All25 context quarters and original source ordinals are rederived once
+per bounded batch, with complete all-six-form accounting. Prior consumed
+accessions AND the separately completed64 are excluded. The first NEW batch is
+exactly64; later batches at most1024 require the externally pinned successful
+first64/predecessor chain. JIT fsynced claims/start records precede each single
+transport invocation. First transport/HTTP/framing/privacy/header refusal stops
+the batch; started/ambiguous claims remain consumed and the suffix unattempted.
+No retry/resume, archive alias, outcomes or economic selection is introduced.
+
+New sources/tests, in that order: campaign41,233B SHA
+`055559a67c11f5260dfa2d5e7415e55b04b5d9869766065276e6a74e8c560f96`,
+tests18,046B `99c134570d2d85f812322a4f9cd3642764ac6a22fc385542c1e108be9930f248`;
+collector50,265B `d2fb297c83f7ee15b38889c6c8e3d349edb1719ed391dd5ae678da2c2c2e3d0b`,
+tests28,898B `a6b4755458a866cc799ce553f6b3573f5119308c0acdb6eb9482c4318b86c52e`.
+These were frozen before main's final checks. This is Codex self-directed build
+and peer QA, not an independently accepted Claude snapshot.
+
+The fixed SEC HTTPS host/path, no redirects, unread non200 body,8MiB parent,
+30s wall/15s idle,500ms finish-to-next-start (including a new batch's first
+request) and8GiB free reserve plus remaining worst-case bytes are enforced.
+Private contact uses protected anonymous stdin, never argv/env/hash/log/control
+leaves. Headers and body receive finite contact-echo checks BEFORE hashing or
+retention; the already-qualified fast v2 recognizer is reused without changing
+its bytes. Per-response inspection runs under initial native process-tree
+network/fork/ALL-write/Keychain-exec denial. Bodies stay opaque whole parents
+with header identity; no financial transaction admission is claimed.
+
+Source/plan/intake/old custody holds remain open through capture, with initial
+ctime/version-before-first-read and boundary rechecks. Externally observed plan
+and complete hashes plus producer HEAD/Git bytes are required, not merely
+internally consistent self-hashes. A cooperative EX lane-controller lock spans
+planning/capture and checks exact batch inventories; it is NOT machinewide or
+cross-machine SEC rate enforcement. Cheap exact root/branch/HEAD/clean Git
+metadata is checked immediately before each actual opener, independently of
+held source bytes. This cannot make the check/network transition atomic or
+control other machines. Raw transport invocations are not a measured backend
+HTTP request count.
+
+Prospective findings CLOSED before activation (actual earlier roots untouched):
+
+- `IBPARENT-BATCH-PRE01` P2: coherent unanchored planner controls were accepted
+  by the draft reader. Genuine red; added external plan/complete/producer pins
+  and trusted-parent Git proof. Held plan now stays open through capture.
+- `IBPARENT-BATCH-PRE02` P2: a constructed private-token context could register
+  itself and reach a dummy opener without genuine planning/journals. Peer
+  reproduced one genuine red under native network denial. Constructors now
+  confer NO authority. Sole registration follows real source/Git/native
+  rederivation/held-input checks; exact selected request, ordinal and attempt
+  registry plus durable claim/start are required before the opener.
+- `IBPARENT-BATCH-PRE03` P2: separately consistent generations could discard
+  earlier claims. Six genuine predecessor negatives; require exact adjacent
+  consumed-index equality and complete/plan/index/source/finish/first64 links.
+- `IBPARENT-BATCH-PRE04` P2: same-byte Git advancement could evade source-only
+  holds until the final check. Exact cheap Git boundary added; faithful HEAD
+  change stops BEFORE dummy opener/attempt latch. No per-request full Git-show
+  source inventory is substituted for this metadata boundary.
+- `IBPARENT-BATCH-PRE05` P2: unretained terminal stage/code membership alone
+  admitted inconsistent success/HTTP pairs. Three genuine reds, then exact
+  status-dependent pairs; canonical-byte comparisons also reject bool/int
+  aliases in reconstructed controls.
+
+Disk-reserve-before-contact and immutable selected-request regressions also
+proved red/green. Large consumed-plan rehash was removed from per-request auth
+checks in favor of pinned request bytes plus full boundary rechecks; version-
+only held-input checks do not replace final byte checks. Existing output
+publication checks still reread cumulative pinned output;1024 bounds peak
+cost but no linear-time/throughput guarantee is claimed. The20-pilot921,570
+Form4/4A rows imply an ideal2rps floor128h; ALL25 context1,163,648 imply161.6h,
+before reuse, network, verification and parsing. Neither is a measured remaining
+request count, actual schedule or evidence of completed custody.
+
+Attributed final author611 focused passed40.71s across nine explicit new/old
+targets. Peer78 collector passed24.66s; eight memory reversals yielded eight
+genuine reds, restored78+51 boundary+EXACT=130 passed25.76s. One ctime-guard
+deletion survived a later strict check and is NOT counted as a red. The peer's
+proofs preceded only the final narrow terminal-reader/canonical correction.
+Author final strong-native source-only118 compiled/112 closure images proof
+1.737523125s, fixed original/frozen pins unchanged. No actual inputs, requests,
+credentials or QC access in those tests.
+Final author's three affected memory reversals yielded10 genuine reds
+(external plan pin1, cross-generation proof/index6, terminal stage3), then10
+restored green; all four on-disk final images remained unchanged.
+
+Main OBSERVED596 passed33.77s across nine explicit campaign/collector/old
+capture/fresh-selection/fast-privacy/record/active-document/boundary/EXACT
+targets. Native process-tree network/Keychain-exec/lane-write denial, isolated
+invented roots, no plugin/cache/bytecode writes; NOT a complete lane suite.
+Separate initial strong-native network/fork/ALL-write/Keychain-exec denied
+source-only proof1.804788625s compiled121 images, inventory
+`a49dfb2a0c17e7caa0dc3ebd7693fe27e9e37cd216b2887b31e6e63563cc0960`;
+all four hashes above matched and frozen first64/v3 checks passed. Synthesized
+uncommitted candidate/bootstrap identity is NOT actual clean-Git preflight.
+
+## 275. Registered first new64 source-only capture boundary (2026-10-25)
+
+After final checks, matching-only fetch and a clean, already-existing local
+commit containing274's images, freeze ALL writers. Prepare batch1 ONCE with
+`prepare_actual_batch` in `pilot_sec_parent_campaign_v2/batches/batch-000001`;
+observe exact complete/plan hashes and producer HEAD before capture. This is
+native-denied local full25-source selection, zero provider requests, not parent
+completion. No actual plan/request namespace has been created at this entry.
+
+Only that exact64 plan may activate the new collector's separate fresh
+`pilot_sec_parent_batch_capture_v2/batches/batch-000001` namespace. Existing
+first64 and all known completed/ambiguous accessions stay excluded. June16/18
+archive URLs remain consumed; their unretained membership exposure is UNKNOWN,
+not zero and not a fabricated accession list. Individual complete-parent URLs
+are separately identified targets, not permission to repeat either archive.
+Capture once with private contact stdin; record finite refusal honestly and
+never redispatch a claimed accession. Independently verify externally observed
+complete/plan/index hashes with native-denied strict custody/header/body replay.
+No later batch is implicitly executed by this registration; after a qualified
+successful first64, continuing authorized lane work still needs its precise
+recorded next batch scope and actual preceding pins.
+
+Continue271's separately registered reference cell1 in the existing consumer
+notebook only. On reopening QC, main observed the project dashboard and then
+reopened ONLY own project37465795: old notebook/cell[1] visible, UI currently
+offers Select Kernel. That UI change is not proof of a retained namespace or
+its loss, nor author attribution. Do not restart/reexecute old cell0, recover
+old receipts or make a broader query by inference. Only the prepared successor's
+finite context checks can permit its four registered selector calls; a missing
+context must refuse with zero queries. Mia remains advisory/Ask Before Edits;
+the owner's latest explicit permission allows consulting Mia for issues, not
+automatic acceptance of code/economics changes or another source acquisition.
+
+Six topical/shared P2s plus both archive-observation P2s remain OPEN. No
+original ambiguity, full corpus, canonical/PIT/rights, reference, price/warmup,
+both earnings diagnostics, protocol/look or order parity gate is promoted by
+these contracts. No strategy launch/outcome look has occurred. Accumulate this
+round locally and keep building; NO checkpoint push or final handoff yet.

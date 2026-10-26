@@ -846,8 +846,10 @@ both Daily and Minute returned zero bars. N is SPENT, and its fresh native
 symbol does not establish cross-job native-SID continuity. O then authenticated
 one identity-bound current-vintage Sharadar stock-series row for the reference
 date(323.49); O is SPENT, with no strategy price/NAV admission. Next the separate
-native identity/adjacent-series/within-job-phase P diagnostic(323.51 onward),
-not a current SF1-ticker guess or stale-price/holding bypass.
+native identity/adjacent-series/within-job-phase P diagnostic(323.51 onward).
+P then stopped before source mutation/compile/job on a changed exact general
+collaborator-row pin(323.54) and is SPENT. Next Q's bounded read-only current
+access representation observation, not a pin refresh or stale-price bypass.
 One final push; no funded or paper/live deployment authority is inferred.
 
 Branch: `codex/strategy-analyst-revisions-v2`
@@ -2157,9 +2159,11 @@ Minute enumerations with zero rows(323.45); it and all readers are spent.
 O then passed that identity-bound current-vintage stock-series existence scope
 once(323.49) and is SPENT. Its one positive exact-date vendor close is not a
 strategy reference/NAV package or source admission. P's new native-identity,
-adjacent-series and within-job phase protocol(323.51 onward) is the next bounded
-question, not another strategy attempt or guessed-price fallback. No cross-job
-native-SID continuity or market-wide absence is inferred.
+adjacent-series and within-job phase protocol(323.51 onward) then refused the
+current general collaborator-row pin before mutation/job(323.54) and is SPENT.
+Q's separately frozen read-only access observation(323.55 onward) is next; no
+blind pin refresh or strategy attempt is authorized by that observation. No
+cross-job native-SID continuity or market-wide absence is inferred.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
 V3 is spent after its
@@ -60799,3 +60803,146 @@ unchanged worker/validator policy both exited0/stdout0/stderr0. No relaxation
 or actual private/credential/QC call occurred; record tests then ran separately
 under the original strict audit denial. These are policy-load checks, not
 operational worker acceptance.
+
+### 323.54 Actual P refused current access before mutation or job; SPENT
+
+At clean d2abfec65f0b45fa783fd65abf5080ba734098dd, the sole parent dispatched
+2026-10-26T02:37:39.512472Z and completion was observed02:37:51.709112Z, actual2/
+stderr0/no bound. Parent stdout791bytes SHA
+a0bc0cd0822bd906302ef46c4d7bbcf0632a73cacaf19e3a39e8f50b0fb3ccef.
+Sole native supplied-output validator02:37:51.709805Z..02:37:55.239585Z actual0/
+stderr0/no bound, identical stdout pin, output_authenticated=true. This is
+authenticated FAILURE, not diagnostic completion or a data observation. P's
+claim/initial admission/parent/validator are SPENT; no old-control reread,
+unchanged invocation, repair or cleanup follows.
+
+Retained finite failure is access_general_row_pin at stageprepare. Exactly
+two application dispatches/two responses, projects/read then dedicated
+projects/collaboration/read, precede the refusal. No file/source inventory,
+source update, compile, capacity, backtest create/status/result, History or
+price request occurred in this P path. compiled/launch/terminal/observation/
+partial_observation are all null; no report/success pin was returned. Initial
+fresh native input admission had returned before the prepare-stage access
+check; it grants neither current access acceptance nor historical continuity.
+Physical provider request count remains null/unknown, not measured zero.
+
+The exact general row no longer matches the frozen owner/A5/Mia full-row set.
+This code alone does NOT identify which row/field changed, authenticate a new
+actor, establish privacy/idleness or prove an unsafe collaborator. A preceding
+Mia task/editor close is temporal context, not causal evidence. Dedicated
+owner-only success cannot be assumed because the earlier general-pin check
+refused first. The safety check was not weakened. Last authenticated cloud
+source remains N; this caller made no cloud mutation and provides no fresh
+all-source or continuous stability proof. E323-001 remains OPEN; no strategy
+cell/fix/readiness claim. No actual create dispatch, so the look floor stays
+335shared/259development/51infrastructure/699cells; do NOT book P's prospective
+336/52 event or double-count N. Other five family projects remain uncreated.
+
+Record/active-document repeats86passes1.19s and1.09s overlap the235focused
+selection and are not additive. The freeze cached/ordinary diff checks were
+clean and all seven exact files committed before the clean actual use. No
+test/edit took place during the parent/validator lifetime.
+
+### 323.55 Prospective Q read-only current access representation recovery
+
+Next recover the current representation, not spend another unchanged P launch.
+Q is a NEW bounded current-state observation prompted by the actual P refusal,
+not replay of H or P and not acquisition of strategy outcomes. Read only
+projects/read and projects/collaboration/read for38364439 once each. Bind exact
+project/name/org/owner scope and retain only finite field types, booleans,
+closed permission labels and hashes, plus the unchanged old/H and P verifier
+dispositions separately. No raw name/UID/publicId/email/codeSourceId/response,
+credentials or licensed/private source rows may escape. Source/protocol pins,
+new exclusive claim/deadline/actual-exit/native-output validation must freeze
+before contact. The prospective new leaf newrule_post_phase_access/
+R323-20261025-Q is NOT inspected or allocated here.
+
+No private corpus/input admission, old control reads, files/source inventory,
+Object Store, capacity, compile, upload, lock/member/permission/engine change,
+job/result or provider-data contact is included. Two canonical response pins
+are parsed-response authentication, not raw-wire provenance or lease proof.
+The observed new row is evidence for an exact prospective correction only if
+its semantics and source bindings genuinely permit one; the observation never
+accepts policy, renews P or automatically refreshes pins. Current owner waiver
+permits this additive lane recovery; all technical/source/security gates stay
+binding and all formal/PIT/paper/live/strategy flags false. The one final push
+remains reserved; no intermediate acknowledgement push.
+
+### 323.56 Q implementation and bounded prospective decision
+
+The new observe_arv2_r298_post_phase_access.py owns its new claim/store/run/
+observer/validator; it does NOT invoke H/P's spent main/run/observe operations,
+patch their module globals or read their controls. It reuses only frozen pure
+redaction/transport/capture/environment functions under selected source pins.
+H's old owner/A5-only policy result remains under legacy_access_failure_code;
+the unchanged18cf P policy has separate current_policy_check/current_failure_code.
+The actual P's791byte/stdout hash/stage/code/counts are documentary bindings,
+not retrospective new access evidence. No current policy is changed by Q.
+
+New row_details supplements the old pure redaction with per-field canonical
+hashes for all eight known fields, plus a complete bounded key/type/value-hash
+inventory for each supplied row. At most32keys per row, ASCII identifiers of
+length1..64 only, bounded8rows per view. No value, raw UID/email/publicId/ticker/
+response/error/credential is retained. Original H unreported field values and
+email hash are unavailable, not guessed or reconstructed; known critical
+shape/publicId comparisons remain explicit. Full-row hashing authenticates the
+parsed canonical snapshot, not raw-wire provenance or a continuously stable
+actor. Inventory hashes cannot reconstruct a row and do not by themselves prove
+its cause, identity, privacy or lease. New current-pass metadata must satisfy
+necessary original owner/dedicated/idleness/privacy-contradiction/unique fixed
+row-set/Mia-identity constraints; a forged pass on an unknown row must refuse.
+Finite refusals and observed success confer zero upload/retry/launch authority.
+
+Only projects/read and projects/collaboration/read with exact projectId38364439
+are included, once each; source-read/update, Object Store, capacity, compile,
+job/result, provider/private corpus, lock/member/permission or settings calls
+are excluded. Parent120s/outer150s/native supplied-output validator20s; normal
+request timeout30s is unchanged. No retry or response-body retention. Initial
+existing QC environment credential-shape handoff precedes claim as in the
+frozen observer pattern; new exclusive claim precedes the actual client and
+contact. Only own child kill/reap, no cleanup. Native validator denies network,
+production artifacts, Keychain/security; all support paths stay inroot.
+Uninterruptible-I/O/host-suspension and selected-pins-not-whole-interpreter
+qualifications remain. Actual parent0 plus validator0 plus exact source-bound
+output is needed for accepted observation, not accepted access. Partial claim/
+nonzero/unknown/malformed result consumes or ambiguously spends this use.
+
+After final focused tests and exact pins below are committed, D1 permits one
+Q parent and its one supplied-output validator at that next clean designated
+Mac/Python3.13/root/branch HEAD, explicitly bound by --expected-head and caller
+SHA. Current d2abfec65f0b45fa783fd65abf5080ba734098dd is the pre-Q HEAD, not its
+run freeze. No dirty/concurrent HEAD, silently refreshed pin or old control read
+is permitted. Q's leaf remains uninspected/unallocated before the freeze. No
+look/cell is booked, because Q cannot dispatch any job. Afterwards record exact
+times/actual exits/output pins/counts/refusals and current metadata truth. Only
+then decide whether evidence supports a separate exact prospective correction;
+an unknown actor or unexplained security-field drift remains a real barrier.
+
+Final Q caller31696bytes SHA940aa5652806f78529baf8a44ac8ca0a3c8002d6fc0b1a1dc667226ade0977ce;
+tests12392bytes SHAe4fc889a3142a62e8cf938262ae5197feafcbc317f11c2fb78b2b4b599dcc176.
+Canonical+LF arv2-r298-post-phase-access-q-v1 profile17861bytes SHA
+847c4e00383d184005520e3df60ac1fdecd27154a637177134dabf253a833939;
+125 selected source pins match. Output bound is128KiB including the full bounded
+field inventory, not the earlier draft64KiB. Native supplied-output validator
+still has no production artifact access; no report reader/corpus read is added.
+
+| Finding | Priority/status | Prospective disposition |
+| --- | --- | --- |
+| ARV2I323-024 | P2, corrected before Q use | Draft reused the old owner/A5-only refusal as if it were P's current policy. Final reports each unchanged verifier separately; new regression covers the same third-row yielding distinct old/current codes. |
+| ARV2I323-025 | P2, corrected before Q use | Draft current-pass metadata could be declared independently of unknown row hashes. Necessary exact owner/dedicated/row-set/idleness/privacy/Mia predicates now cross-check a claimed pass; observation still grants no capability. |
+
+Root final157distinct passes2.96s(70Q+86record/document+1research transitive
+closure), no failures/skips/warnings; caller/test memory compilation, both
+exact file pins/profile/all125dependencies matched. Strict native network/
+production-artifact/Keychain/security denial, inroot support paths, disabled
+plugin autoload/--noconftest/-B/no cacheprovider and dispatch_fence absent.
+Root memory-only known-field/inventory cross-hash omission caught1expected
+failure0.21s; originals restored finally/disk unchanged. Author's current-pass
+constraint omission caught1/0.20s. Author70/3.69s and70/3.99s overlap root157,
+not additive. Initial47passes/23fixture-dependent failures3.79s correctly
+refused the reused H fixture's hyphenated hidden-private-field key under Q's
+new safe-key rule. Changed only the synthetic fixture key/recomputed synthetic
+A5 pin; no production relaxation. Preserve that red baseline. No complete
+Codex lane/repository suite or independent acceptance. Main read all new
+caller/test code and old pure helpers before the run freeze. No actual Q
+control/credential/API observation occurred before this entry.

@@ -30,13 +30,16 @@ def serial_control():
     # Causal control removes only the new typed-parallel bridge. All original
     # serial formula bytes and canonical module types remain identical.
     path = HERE.parent / "research" / "short_interest_etf" / "compact_native_source.py"
-    raw = path.read_text()
-    before = "and type(registry) in (anchors.NativeReportedCountRegistry, parallel.ParallelReportedCountRegistry)"
+    raw = path.read_text(encoding="utf-8")
+    # The registry tuple gained recovery.CountRecoveryRegistry at 71c2e7a; the
+    # control drops only the typed-parallel member and only its lineage block.
+    before = ("and type(registry) in (anchors.NativeReportedCountRegistry, parallel.ParallelReportedCountRegistry,\n"
+              "                                   recovery.CountRecoveryRegistry)")
     assert raw.count(before) == 1
-    raw = raw.replace(before, "and type(registry) is anchors.NativeReportedCountRegistry")
+    raw = raw.replace(before, "and type(registry) in (anchors.NativeReportedCountRegistry, recovery.CountRecoveryRegistry)")
     start = raw.index("    if type(registry) is parallel.ParallelReportedCountRegistry:\n")
-    end = raw.index("    raw, packed = canonical_json(header).encode(), bytes(cells)", start)
-    raw = raw[:start] + raw[end:]
+    end = raw.index("    elif type(registry) is recovery.CountRecoveryRegistry:\n", start)
+    raw = raw[:start] + "    if False:\n        pass\n" + raw[end:]
     value = types.ModuleType("serial_compiler_parallel_control")
     sys.modules[value.__name__] = value
     exec(compile(raw, str(path), "exec"), value.__dict__)

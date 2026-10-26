@@ -1,13 +1,23 @@
 """Fabricated metadata and fake Darwin kernel only; never real flag setting."""
 import ctypes
 import errno
-import fcntl
 import os
 import socket
 
 import pytest
+# fcntl is POSIX-only and this module uses it directly, so it cannot be collected on
+# the supported Windows host; see the lane record SI-CR18-001.
+fcntl = pytest.importorskip(
+    "fcntl",
+    reason=(
+        "the protected-capture runtime and this test use the POSIX-only module "
+        "fcntl at import time; it cannot execute on this host, see the "
+        "lane record SI-CR18-001"
+    ),
+)
 
 from data.hashing import canonical_json, hash_bytes, hash_payload
+
 from scripts import short_interest_immutable_metadata as immutable
 import test_short_interest_new_metadata_custody as original
 

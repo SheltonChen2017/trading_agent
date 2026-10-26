@@ -9,6 +9,19 @@ import subprocess
 import pytest
 
 from research.short_interest_etf.native_reported_anchor_cache import AnchorCacheRefusal
+
+# The runtime under test imports POSIX-only stdlib modules at import time, so
+# this module cannot even be collected on the supported Windows host; see the
+# lane record SI-CR18-001. Portable contract logic stays covered on POSIX.
+pytest.importorskip(
+    "resource",
+    reason=(
+        "the protected-capture runtime imports the POSIX-only module "
+        "resource at import time; it cannot execute on this host, see the "
+        "lane record SI-CR18-001"
+    ),
+)
+
 from scripts.capture_short_interest_count_recovery import RecoveryRefusal
 from scripts.qualify_finra_short_interest import CapturePlatformRefusal, CaptureRefusal
 from scripts.qualify_sharadar_companion import SharadarCaptureRefusal

@@ -37555,3 +37555,122 @@ Final proof glue SHA-256
 `c012f8a2673ac8b49df4a5cdb27b70bd5bef02d3bf1290f51ce4150ffaf59e18`
 is separate orchestration, not a committed source image.
 All original/frozen executed bytes, nine OPEN P2s and readiness gates unchanged.
+
+## 325. Read-only NC/source17 front qualified, not activated (2026-10-25)
+
+Implemented323's distinct observation as an ADDITIVE front; all previously
+executed source and input roots remain unchanged. Main fully read source and
+both test files; two separate peer source reviews accepted its exact scope.
+This is Codex engineering/peer QA, not independent Claude review.
+
+| Final image | Bytes | SHA-256 |
+| --- | ---: | --- |
+| research/insider_buying_sec_feed_nc_source_binding_observe_v1.py | 43,732 | 53e0db0899096c613af97855e15bf4123f254bd5b4ea2a89efa151b2f41aa327 |
+| tests/test_insider_buying_sec_feed_nc_source_binding_observe_v1.py | 19,645 | c0b8dd5ffc4af2312e15aacda6d7f41d85989c1af70f666c73e05f3d4ad3d842 |
+| tests/test_insider_buying_sec_feed_nc_source_binding_observe_v1_review.py | 10,177 | 0a8d6fb51a80f452df5c29d41165e7c8bd058766aa87dba90aa6a1d07c2bff09 |
+
+Metadata preflight opens/stats the84-leaf intake with strict SH/NOFOLLOW/FD/
+ctime/inventory holds but reads/hashes ZERO ZIP or prefix body bytes. Manifest
+and auxiliary controls are separately pinned/read. Full body qualification is
+explicitly deferred. Analysis proves initial native denial and current source
+compilation before private input, rescreens the immutable original raw prefix
+and ALL decoded bytes with the current contact before collection/interpretation,
+then invokes unchanged genuine82-ZIP hashing/25-SUBMISSION derivation and the
+typed322 binder. Full result must match the retained genuine source roster;
+same consumed20,044 set, old producer Git/current-byte/input/version proofs,
+all physical/route/quarantine counts and closed nested IPC schemas rechecked.
+Known paper/status cases, partial payloads and unsupported physical semantics
+remain named nonadmission outcomes. No output file, journal, namespace, claim,
+provider/QC/SDK/store call, financial projection or outcome is created.
+
+Prospective findings corrected BEFORE actual input activation:
+
+| Finding | Genuine evidence and disposition |
+| --- | --- |
+| IBNCFRONT-PRE01 | Three peer REDs: otherwise-valid nested roster, accepted-selector and consumed-planner controls accepted an unregistered private field. Exact closed schemas/typed conservation/producer-path checks added. The peer upgraded its original minimal fixture to a faithful exact-schema positive; enriched baseline then3 REDs1.89s became GREEN, not an unrelated earlier failure. CLOSED. |
+| IBNCFRONT-PRE02 | Two peer REDs1.86s: actual collector geometry could be altered to zero decoded bytes despite complete header, or more collected members than physical headers. Enforced classified-row candidate conservation, header/member bounds and decoded physical lower bound. Both unchanged negatives GREEN. CLOSED. |
+
+Author separately corrected historical-identity validation to require each
+historical producer's own paths rather than impose a later front's paths;
+no historical source bytes changed. Malformed mutable error phases and unknown
+binder error text now map to finite static refusals. Those are prospective
+hardening, not newly claimed observed actual-source defects. Peer's final EOF
+check removed exactly one trailing LF from its preceding10,178B image
+`a8903973b2873cc262879b618ecf9b936124ebf58f4914f6c77f388a6883bd22`;
+no assertion changed. Initial EOF proof stopped before any product/input call.
+
+Attributed author324 focused16.00s/51 boundary3.45s, seven meaningful worker-
+guard reversals7 REDs/restored8 GREEN1.605446459s. Attributed peer62 final
+GREEN6.53s plus six separate meaningful schema/geometry/stat-read reversals,
+restored62 GREEN5.89s on preceding newline-only image. Its final8-image strong
+compile/hash/collector/native-four-denial/live291 proof0.850807042s outer /
+176,805,708ns inner used the FINAL peer bytes. Other independent peer62
+GREEN6.16s used the preceding peer-format image. Author's139-image strong
+invented full25 proof1.379974541s outer/834,419,084ns work is separately
+attributed, not actual-source lineage or a main-observed run.
+
+Main OBSERVED568 relevant focused GREEN22.62s before that final LF removal,
+then568 GREEN22.68s on the FINAL three hashes: new front, pure binder/route,
+old NC structure/front, roster/audit, record/active-document/import boundaries
+and EXACT Insider package guard. Native initial process-tree network and
+security-exec denial; fresh-privateTMP and/dev/null writes only; fork solely
+for boundary children. No complete lane/repository suite. Separate main strong
+initial network/fork/ALL-write/security-exec-denied -I-S-B proof compiled and
+rechecked149 manual loaded/explicit images, inventory
+`b57b38206cb6314f448b9d54f672afa5e911ec99ecfabe1771ad2ae3af5de76b`.
+Base d4467ce7 plus explicit uncommitted NEW front/test images, not a clean
+actual execution assembly. Real invented64KiB gzip prefix/65,521 decodedB,
+5 physical headers,3 collected NCs,2 genuine full25 source17 candidates,
+1 paper/status quarantine and2 unexamined directory/partial members;150
+source rows,3,807B binding witness. Exit0/1,360,346,791ns;291 live through
+stdout/final sample. Orchestration glue SHA-256
+`1057036ddaf589ba8df66ab6945ea4818a09fa72da895a35587e03d9c7d64e5c`.
+
+In plain terms, the new diagnostic is qualified to ask a narrow real-input
+matching question safely, but has NOT asked it yet. It cannot admit filings or
+prove original acceptance, publication, issuer identity or backtesting readiness.
+A later clean-assembly preflight and distinct registration are still required.
+No strategy launch attempt or round push; nine carried OPEN P2s unchanged here.
+
+## 326. Acceptance-clock model is not historical public-known-by proof (2026-10-25)
+
+Primary factual clarification, before any strategy outcome access: SEC's
+[Webmaster FAQ](https://www.sec.gov/files/about/webmaster-faq.htm), Developers
+sections on dissemination lag and timestamp interpretation, distinguishes
+acceptance from sec.gov availability. It gives no guaranteed lag bound and
+no first-publication timestamp. Do NOT turn a typical lag into a fixed proven
+upper bound. Acceptance remains a genuine modeled clock when independently
+corroborated; it is not itself evidence of public knowability at09:28.
+
+The canonical contract and IBDEC-141-04/09 deliberately chose an acceptance-
+clock model. Preserve it; this is NOT a new regression in that algorithm, nor
+authority to alter frozen economics, insert a delay, drop inconvenient events
+or rewrite any frozen caller. However,141-03/09/11 also require already-public
+facts before entry and actual known-by09:28 prerequisites/full-population09:30
+corroboration. Code/metadata phrases treating accepted_at_utc as verified public
+availability do not establish that factual requirement. Add precise lane-owned
+P2 **IBPUBLIC-KNOWNBY-01 OPEN**: unqualified acceptance/publication equality and
+missing historical public-known-by/version evidence. This is an unactivated
+evidence/claim gap, not an observed backtest loss or a newly imposed exact-
+first-publication-seconds requirement. Ten OPEN P2s now comprise the preceding
+nine exact scopes PLUS this distinct issue; no prior finding is silently closed.
+
+Sufficient evidence may be an authenticated historical known-by UPPER bound,
+not necessarily the unknowable exact first-public instant, for each required
+filing/version and the complete population at the existing cutoffs. Candidate
+sources include originally timestamped SEC/PDS/RSS polling captures or qualified
+provider first-seen/release audit logs with exact accession/body/version scope
+and trustworthy clocks. None is established merely by current credentials,
+retrospective filing dates, a present-day Feed/Oldloads/.txt download or a PDS
+acceptance control. Current Sharadar/EODHD/Massive/FMP/retained QC evidence has
+not qualified such a historical filing-publication/known-by archive. This is
+not a claim that no supplier could provide it or that a purchase is mandatory.
+
+Delegated disposition: keep real PIT/tradeability/readiness claims FALSE and
+do not launch a fixture, zero-event strategy or acceptance-only model labelled
+as an honest fully sourced backtest. Document the factual evidence gap rather
+than manufacture a clock on the owner's behalf. The already selected325
+read-only observation can finish; successful source17 matches or fresh original
+SEC captures would still not, by themselves, resolve this separate gap.
+Structural engineering alternatives remain possible; no further subscription
+or broader source acquisition is justified solely by a green contract test.

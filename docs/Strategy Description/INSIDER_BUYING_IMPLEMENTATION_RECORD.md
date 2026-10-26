@@ -34267,3 +34267,381 @@ Post-append main record/active-document/boundary/EXACT checks124 passed4.33s
 under the same native denial/isolated-fixture controls. Main returned existing
 project edit control from Mia; Safari visibly confirmed You have edit permission.
 No extra account/security permission, file edit, cell execution or job followed.
+
+## 267. Observed cloud-only CIK receipt consumer completed (2026-10-25)
+
+Scope `ib-qc-first64-cik-receipt-consumer-20261025-once` was prepared ONCE on
+already-existing clean `5553afed958734aa61a532d40f88c51e3688fcd9` and executed
+ONCE in ONLY new `ib_qc_cik_consumer_20261025.ipynb`, cell0, project37465795.
+The permanent local intent is consumed, not resettable. Actual preparation
+parent span40.854903500s;27,944B cell SHA
+`d7f69f3f80be17fd6a8b3be75a58bfb915d0509b62d92a96e3a5cc00292d42ab`;
+core `66b555b70dc13435d2a6d063b2a65a74e296be83de853564e7ed7a3cf5de7421`;
+registration `2f24b8542efd6bbf6378b2c5e7f090c040e54427c16ef287733edb7945bc4eae`;
+intent `4b7a8d17b2df66b149e0853e2357cd6f7be4e996a168bde8da18448717ddf9ea`;
+ready `36856495e222fb63f569782afa7d18e36b639523d54bac6a2503c32a5b86920f`.
+Source inventory `8fd87b48a94d0d06f8e4cb546adb17ea4ca205a81aac97fa313331307bfbb149`.
+
+Main verified the complete own prepared source through native TextEdit AX,
+then the complete saved QC cell through native copy into a new unsaved plain
+TextEdit view: exact27,944B equality and SHA above. The earlier partial
+overlapping Monaco-window check was abandoned, NOT claimed complete. The first
+GoTo paste did not replace its old default path; main corrected the native
+field, verified the Insider path and opened ONLY the intended source. No other
+lane file was opened. Only the new notebook's introductory Markdown/default
+code was replaced; old notebooks/SDK drafts were not changed or run. Closing
+the unsaved verification view offered an irreversible Delete; main cancelled,
+preserving the own-code-only unsaved copy. A temporary AX document URL is not
+proof of a saved file or measured upload. No platform mapping value or secret
+was copied into that view.
+
+Observed selected execution [1],1.3s:
+`existing_cloud_receipts_consistent_no_lookup`,104 own receipt reads,
+0 resolver calls and0 cloud saves/deletes; full receipt-chain consistency true.
+Main reconstructed ONLY the own acknowledgement through97 overlapping actual
+native Accessible View windows with a closing EOF and strict canonical parse:
+1,077B SHA `2ab7ad36d56d66353d2c95c4f00a34289457055c60c7dc02671294c20ca78df5`.
+One initial offscreen click was refused before action; main relocated the
+own output before reading. Independent native network/fork/write/security-exec
+denied acknowledgement validation passed exit0: external0.559138334s;
+validation/proof internal0.003561417s excludes preceding imports. The ACK binds
+259's exact producer cell/core/registration/ACK and this new consumer identity;
+all platform values, cardinalities and digests remain in cloud. Saved UI
+reported All files saved12:04:12. Automatic own-source build019281-a195e1,
+LEAN2.5.0.0.18203, is NOT a strategy launch/backtest attempt.
+
+These may be immediate SDK-cached reads: no independent persistence,
+immutability or atomic-create proof. No CIK lookup, historical fundamental,
+price/History, financial/outcome query, subscription, job or backtest occurred.
+Existing retained candidate globals and consumer markers can be prerequisites
+for a separately registered successor; missing kernel context must refuse,
+never trigger another104-read scope or recapture. This completed receipt
+consumer is NOT historical issuer/listing/PIT/admission or backtest readiness.
+
+## 268. Distinct June16 archive FAILED; failure custody read back (2026-10-25)
+
+261/265's exact `ib-sec-feed-archive-20210616-format-v2-20261025-once` ran ONCE
+on already-existing clean5553afed with ALL writers frozen. Its only URL was
+`https://www.sec.gov/Archives/edgar/Feed/2021/QTR2/20210616.nc.tar.gz`.
+Observed parent span464.877617500s, exit2, HTTP200, one raw-transport invocation
+(NOT a measured remote request count):
+`HTTP_gzip_or_finite_privacy_refused_no_retention_no_retry`.
+Response retained=false; compressed bytes/hash, response-header hash,
+inspection hash and format summary are NULL. The exact cause is UNKNOWN.
+Different timing and prospective scanner performance do not diagnose either
+actual archive failure. Open lane-owned P2 `IBARCHIVE-OBS-02` records this
+separate observation; `IBARCHIVE-OBS-01` remains independently OPEN.
+
+Complete `8d12cf9a297899450b987c293acdcb479306a6f4512f859662ee34b8dd9e7693`;
+reservation `366f66c9f029e1c24a25d4b09ef7524c8edddf4d02ac474bc094b59b08c54b9a`;
+claim `dbd47aa64fe1b321acc370bbe5b31a8260240cf14c333478b4422b21a392661f`;
+start `dd8f595ffa91ca344e65d3afde2c70206f7f5c5903bee5a5e2b8420ea67d6780`.
+Qualified failed-root readback passed exit0 in28.181269833s: held SH lock,
+strict old-input/source/Git versions, exact5553afed lineage and complete pin,
+control crosslinks and no-body inventory. This accepts FAILED custody only;
+body/gzip/tar metadata was not rederived, finite contact screening cannot be
+replayed without retaining the contact, and no authenticity/format/byte-count
+or accession-membership conclusion follows.
+
+Contact accounting is TWO own Gmail profile reads, not one: the first private
+parser could not extract that response shape and stopped BEFORE supplying
+stdin; the second privately extracted the unique address and supplied protected
+stdin ONCE. No contact value was retained, printed, hashed or put in argv,
+environment, Git or evidence; protected PTY echo was disabled from CLI entry.
+The final process-list inspection matched only its own shell/awk processes;
+there is NO valid v2 worker CPU/line-cause observation from that inspection.
+
+Both June18 and June16 requests/failed roots are permanently consumed and
+preserved. No repeated URL/alias, renamed retry, resumed namespace, changed
+guard or third blind archive request. The underlying member exposure is
+unknown, not zero; do not fabricate accession claims for unretained members.
+Original-parent requests must separately bind their exact distinct request
+targets and the authenticated global consumed accession inventory. These two
+failed bulk samples alone do not establish that free original parents are
+unavailable, nor justify a new paid subscription. The successful64 individual
+parent route remains the evidence-backed route to extend under fresh disjoint,
+permanently journaled scopes. No provider result or this failure closes the
+six carried topical/shared P2s or grants any outcome/readiness authority.
+
+## 269. Next bounded work and delegated decisions (2026-10-25)
+
+After267/268 and completed readbacks, main RELEASED the source-writer freeze.
+Under the owner's continuous-build/delegated-judgment direction, choose:
+(a) an additive sequential original-parent campaign from the genuine25-quarter
+roster and authenticated old+new64 consumed inventory, fixed first next64 then
+at most1,024 per separately immutable batch after capacity/control proof;
+(b) a separately prepared cloud-only historical-reference corroboration from
+already-retained candidate globals; (c) the pilot-specific causal/event bridge.
+These are engineering/qualification scopes, NOT actual acquisition/query
+activation, whole-population admission, outcome protocol or readiness yet.
+500ms completion-to-next-start spacing,8MiB parent cap,30s transport bound,
+JIT durable accession claim/start, privacy-before-hash, source/input custody,
+disk reserve and first-refusal stop remain binding. No old root is resumed.
+All25-context Form4/4-A population is1,163,648; the20-pilot subset is921,570.
+Planning throughput/storage estimates are NOT observed counts or durations.
+
+The historical-reference successor will bind267's observed consumer as well as
+259's capture, use only existing cloud globals, reconstruct exact retained SID
+and value pairs, preserve all CIK/candidate edges, and make at most four fixed
+selector-only calls for2021-03-31: CompanyReference.CIK,
+SecurityReference.SecurityType, SecurityReference.ShareClassStatus and
+SecurityReference.IsPrimaryShare. Missing context refuses with zero queries;
+no old receipt replay, CIK lookup or price/outcome fallback. Returned values,
+timestamps, platform cardinalities/digests and match results stay cloud. A new
+nonce/intent/own journals are required before activation. No whole Fundamental
+object, price, subscription, job or backtest is authorized by this scope.
+
+Main checked current public QuantBook.cs: GetFundamental(PyObject,selector,
+start,end) constructs SID-STRING DataFrame columns, not ticker/native-Symbol
+columns; its date iterator is end-inclusive. Thus start=end2021-03-31 is the
+single-date layout, with actual returned index preserved, not rewritten into
+publication/09:28 availability. The official Morningstar dataset page documents
+Python get_fundamental and also the September23,2026 whole-history feed
+migration; current public source/docs do NOT attest the exact cloud18203
+implementation or immutable historical publication/PIT. Unsupported shape or
+selector must refuse, not retry with a broader/current-value API.
+Primary references:
+https://raw.githubusercontent.com/QuantConnect/Lean/master/Research/QuantBook.cs
+and https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/morningstar/us-fundamental-data .
+
+Latest owner permission permits consulting Mia for QC issues. Advice is not
+evidence/authority and no unverified cloud strategy/economics change is accepted.
+The per-candidate three-unsuccessful-launch limit/Mia recovery rule stays.
+No actual outcome/look/order-based backtest has started; final admitted source,
+identity, availability, rights, full-population protocol and engine parity must
+be demonstrated first. Continue without routine review/checkpoint interruption;
+one final combined push only after this authorized round completes or a real
+factual blocker is exhausted and documented. No final handoff/push yet.
+
+## 270. Historical-reference cell qualified and kernel-location corrected (2026-10-25)
+
+Additive source `research/insider_buying_qc_historical_reference_cell.py`,
+34,059B SHA `f5bb85aec3f6dc600f406b13ad796cac5913fff3223e5e272b431d34f8a44a7a`;
+tests24,814B SHA `232be5733329a75596e2071efee863d656b7a3de10568447f4d33b0456878000`.
+Production core `54cda8175ceafc5bec6c3f6f90c31c43bcd0daad991262a42d13415736760fd2`.
+No actual preparation, intent, SDK/query, credential or business-artifact read
+was performed during qualification. All earlier executed sources stay frozen.
+
+The strict core binds267's exact observed consumer and259's producer images,
+original Git identities and observed own-control roots. It validates the full
+51-row in-memory chain, all ordinals/raw CIKs/start hashes/candidate shapes,
+both completed consumer markers and the retained source object. Duplicate and
+cross-CIK edges are preserved; identical SIDs are deduplicated ONLY for query
+scheduling; conflicting saved values refuse instead of selecting a ticker.
+Exact SecurityIdentifier.parse plus Symbol(id,saved_value) roundtrip and Equity
+type precede any own cloud key/query. There is no CIK call, old receipt read,
+whole Fundamental object, price/History call, current-ticker join or fallback.
+Ordinary mutable globals cannot attest independent origin or rule out coherent
+earlier mutation/ABA; these limitations remain explicit, not hidden by hashes.
+
+Exactly four preregistered selector batches, at most512 Symbols/512 edges,
+start=end2021-03-31. Own11-key absence checks are NOT atomic create. Own start
+and each durable query-start must save/read back before its single call;
+normal completion has10 own save/read receipts, each<=2MiB, aggregate<=8MiB.
+All returned SID/reference values, platform counts, hashes and match data stay
+cloud. Empty/missing/default values, missing columns and native False remain
+explicit; no missing record becomes absence or listing proof. Shape/transport/
+context failures stop with a fresh own error control when possible and retain
+the unattempted selector suffix in cloud; no retry/reset/reconstruction.
+
+`IBQCREF-TIME-PRE01` P2 CLOSED before activation. Main's public-source check
+found the draft rejected the documented T+1 EndTime; faithful April1-midnight
+fixture gave1 genuine red before correction. Main then found nanoseconds were
+omitted from midnight checking;1 further genuine red before correction.
+Fixed allowlist is March31 date-label or April1 current-public-source T+1,
+midnight through nanoseconds, exact ISO/tz retained. Neither is rewritten into
+publication/pre-entry availability, nor is current source an exact-runtime
+attestation. A second date, other day/column/type or wider selector refuses.
+
+`IBQCREF-CTX-PRE02` P2 CLOSED before activation. Early mutation of retained
+rows, old consume marker or outer consumer marker produced3 genuine reds:
+the draft continued all4 calls. Boundary hash/object/both-marker checks now
+run before each call, after its return/readback and at final, stopping after
+one affected call. The receipt says boundary checks match, NOT continuous
+immutability. No platform-derived values were exported by these invented tests.
+
+Main consulted Mia ADVISORY ONLY about an additional preactivation issue:
+choosing the same Research SERVER is not documented to attach a new notebook
+to the same Python namespace. Mia described per-notebook kernels and advised
+an additional cell in the existing notebook; no file read/edit, cell, store,
+data or job was requested/executed by Mia. Main independently checked the
+official Research Engine/getting-started documentation; it does not guarantee
+cross-notebook sharing. Mia also corrected its earlier current-only getter
+and SID/index advice; primary source checks, not advice, remain authoritative.
+
+`IBQCREF-KERNEL-PRE03` P2 CLOSED before activation: under delegated routine
+engineering judgment, change ONLY the NEW, unexecuted successor's location to
+`ib_qc_cik_consumer_20261025.ipynb`, fresh cell1, project37465795. Preserve old
+cell0/source/output; do NOT execute it again, select another kernel/restart,
+create a speculative new notebook or replay old receipts. Genuine correct-
+cell1 and coherent wrong-cell0 tests produced2 reds before the location fix.
+The old consumer source and its already-executed registration stay unchanged.
+This location correction does not grant a second execution of any old scope.
+
+Attributed final author611 integrated passed9.71s INCLUDING67 own checks;
+eight narrow memory reversals10 reds/restored67 green2.25s; initial strong-
+native source-only2-image/cell/capacity proof0.559637s. Pre-location608 passed
+9.29s/64 own and127ee29e source/d9409d93 tests/core0db674b3/proof0.579682s
+belong ONLY to the preceding new-notebook draft, not final source. Main's
+preceding503 passed8.55s and112-image proof1.778012583s likewise belong to
+that draft. Earlier main invocation used a nonexistent cloud-control test
+filename:0 collected/invocation error, not a product failure.
+
+Main final OBSERVED **506 passed9.31s**, nine explicit new/old QC, QC-client,
+record/active-document/boundary and EXACT package-guard targets. Native
+process-tree network/security-exec/lane-write denial, secret-free isolated
+invented roots, plugin/cache/bytecode writes off; no full suite. Separate final
+strong-native network/fork/ALL-write/security-exec denied source-only proof
+1.905627750s:112 loaded/explicit images, inventory
+`2eb0b0a6e9fabc4848ed67761072d42dee8a1c7f70cbabdc28a18836c2225176`;
+all final hashes above matched; unexecuted production-shaped25,576B cell
+compiled/capacity checked. Synthesized uncommitted candidate/bootstrap identity
+is explicitly NOT actual clean-Git preflight. These are Codex observations,
+not independent Claude review. Main returned existing edit control from Mia;
+UI again showed You have edit permission, no broader security grant.
+
+## 271. Registered next historical-reference activation boundary (2026-10-25)
+
+After all outstanding source writers finish, main verifies the designated
+root/branch/HEAD/status, focused controls, exact hashes and matching origin;
+commits the qualified work and freezes ALL writers. Only on that clean,
+already-existing commit may the inert preparer create the fresh permanent
+scope `ib-qc-first64-historical-reference-20261025-once` in
+`artifacts/insider_buying/qc_historical_reference_v1`, with fresh nonce,
+source inventory, cell, registration, intent and ready hashes observed before
+activation. No actual nonce/source/intent is prepared yet in this entry.
+
+The authorized selected execution is ONLY newly appended cell1 in the
+EXISTING consumer notebook, never Run All/above/below, original cell0, a new
+notebook/kernel, SDK drafts or main.py. Verify full own prepared/saved cell
+bytes via native UI, preserve old cell0 source/output, then execute new cell
+ONCE. If the existing kernel context is missing or differs, permanent finite
+refusal with zero queries; no implicit receipt-read/capture recovery. The four
+identity-only selectors/date/caps/privacy/journals of269–270 are the ENTIRE
+data scope. Actual returned fields and derived data stay in cloud; export and
+independently validate only the bounded own acknowledgement. Source/identity/
+listing/publication/PIT/rights/full-population/order/readiness remain separate
+facts, not made true by successful receipts. No strategy/outcome/backtest or
+additional acquisition follows automatically. Continue other qualified lane
+work under the owner's direction; one final push only, no checkpoint push.
+
+## 272. Pilot causal events and whole-window timing corroboration (2026-10-25)
+
+New `research/insider_buying_pilot_event_composition.py`,25,669B SHA
+`b80aeac614036cb525fe712fa6cb23461b8ca771f39f68c49207238f5b9043d5`;
+tests22,794B SHA `89eb941efeda992239773d1c82f113b0dd6948371e28269ab66efef7bf63fd77`.
+Pure OUTER orchestrator: no actual artifacts/data, transport, credentials, QC,
+outcomes or order actions. All existing full-study/frozen source bytes remain.
+This implements causal source-assessment behavior, not production readiness.
+
+The genuine two-minute boundary is NOT rewritten: one genuine entry-source
+composition contains facts known by09:28; a SECOND genuinely parsed source is
+cut at the exact09:30 first open. Both bind the identical original population,
+full-quarter receipts/all-six-form accounting and exact as-of parent/transaction
+prefixes. Second-source metadata cannot be relabeled as09:28 evidence. No old
+82-quarter registration/SourceEventStudyManifest seal is created or reminted.
+The second cutoff is necessary source-only canonical corroboration, not a price
+or outcome look. Actual complete originals are still a separate missing input.
+
+Replay preserves exact Decimal first50k crossing, immutable first-open lot,
+pre-open additions, owner/security/transaction-date keys, no late reset/retrade,
+known amendments, ordinary-share/reference validators and issuer-entry merge
+with frozen log scores. Facts exactly at the open are processed AFTER entry
+finalization, never rewriting that entry. A genuine below-threshold/known-
+amendment zero is distinct from missing originals or assumed eligibility.
+The full active/reference cohort uses unchanged v3 listing/stock-context
+checks,253 prior listing-session seasoning, declared complete controls and
+latest prerequisite knowledge. Those are supplied-evidence validations, not
+authentication or actual252-open factor/price proof.
+
+Any changed lot/member/entry/amendment result after09:28, or required reference
+known after that cutoff, yields `REFUSED_TEMPORAL_INCOMPATIBILITY` for the
+WHOLE target window. Full canonical event/lot lineage remains; compatible
+events accessor refuses rather than dropping/delaying/reselecting affected
+events. Pilot's predeclared embargo/purge metadata exclusions remain separate.
+An empty diagnostic window cannot be used to manufacture an accepted complete
+study. A future full-pilot candidate must reject ANY incompatible window, not
+silently omit it. That is preservation of IBDEC-141-09/11, not a new latency-
+based strategy/economic exclusion.
+
+`IBPILOT-EVENT-PRE01` P3 CLOSED prospectively: the draft's wording claimed
+later facts were not used as MOO features although BOTH diagnostic replays use
+the same first-open canonical reference. Main identified that overstatement;
+one faithful new-label regression was genuinely red before the summary fix.
+It now explicitly records
+`provisional_uses_same_canonical_reference_for_diagnostic_comparison=true` and
+`later_facts_admitted_as_tradeable_moo_features=false`; late prerequisite
+still refuses the whole window and compatible accessor. No economic logic
+changed and the diagnostic provisional result is not a tradeable09:28 signal.
+
+Attributed author final344 focused passed15.80s; eight memory-only guard/
+economics reversals12 genuine reds; restored own/boundary/EXACT78 passed6.55s.
+Final2-image initial strong-native network/fork/ALL-write/security-exec denied
+source-only import/compile0.552658791s. Initial21 fixture-stage failures were
+corrected invented cross-quarter stamps/issuer-exclusion construction, without
+relaxing any old guard. Preceding341 passed16.15s belongs only to the earlier
+draft, not the final additional amendment/timing/label assertions.
+
+Main full-source/test review and OBSERVED **416 passed17.13s**, nine explicit
+event/bridge/old-causal/source/clock/record/active-document/boundary/EXACT
+targets. Native process-tree network/security-exec/lane-write denial, isolated
+invented roots, plugin/cache/bytecode writes off; no full suite. Separate
+combined source-only strong-native network/fork/ALL-write/security-exec denied
+proof2.245688375s compiled/rehash final event and then-current270 reference
+images:124 loaded/explicit images, inventory
+`36ffc90e9f977498eb823dccf341e4f2e7e6eb529b09b3493e3dab3b5f269391`.
+Synthesized uncommitted candidate/bootstrap identity is NOT actual clean-Git
+preflight. No actual input, output namespace, query or outcome in either run.
+
+Final parent/event protocol and permanent registered look, real source/
+identity/availability/rights, original admission/full-corpus coverage, actual
+252 open intervals/six-factor data, both earnings diagnostics and order-engine
+parity remain false/separate. No fixture promotes those facts. Six carried
+topical/shared P2s and both actual archive-observation P2s remain OPEN. This is
+Codex self-directed build/peer QA, not independent Claude review. Continue
+the qualified SEC batch and historical-reference work, no final push yet.
+
+## 273. Final finite-ACK correction before any reference activation (2026-10-25)
+
+Independent Codex peer read the complete270 final reference pair and observed
+67 focused green2.87s under native process-tree network/security-exec/lane-
+write denial, with no actual data/SDK. The only additional finding was a safe-
+REJECTION classification issue: canonical generated REFUSAL acknowledgements
+with stop_stage=[] or{} raised raw TypeError at set membership instead of the
+fixed HistoricalReferenceError. Neither case was accepted, performed another
+query or granted authority. Main authorized the narrow prospective correction.
+
+`IBQCREF-ACK-PRE04` P3 CLOSED: faithful generated refusal cases gave2 genuine
+reds/67 deselected0.92s, then an exact-string guard before membership. Author
+restored69 own+51 boundary+EXACT=121 green5.66s. Exact memory reversal of that
+single guard reproduces270's preceding f5bb85ae source hash; no embedded query,
+date, cell location, journal, schema or authority change. Current source
+34,096B SHA `3f2ad607b75e5f8e1d774898e96a1c79141b08666990d1421b1204d01e52350f`;
+tests25,556B SHA `08d02b62a4b480ae0f2cecf9e2473ee38c716389ed4d4f8d68a9782730846d54`.
+Production core stays
+`54cda8175ceafc5bec6c3f6f90c31c43bcd0daad991262a42d13415736760fd2`;
+source-only production-shaped cell capacity remains25,576B. Attributed final
+native network/fork/ALL-write/security-exec denied compile/capacity proof
+0.587438250s:101 loaded/explicit images, inventory
+`a1236f9e961b9e63c311a403f26b212ef005b023f145387977797661118ba127`.
+This is synthesized uncommitted candidate/bootstrap evidence, NOT actual
+clean-Git preflight. Whitespace clean.270–272 proofs remain attributed to
+their exact preceding images, not silently relabeled to this correction.
+
+271's activation boundary remains binding with these CURRENT outer source/
+test hashes. No actual nonce/intent/source was prepared or executed by this
+correction. All composed-event pairs remain byte-frozen at272. Continue the
+same authorized round without a routine checkpoint or an interim push.
+
+Main final narrow-reference/record/active-document/boundary/EXACT observation:
+193 passed7.20s, same native/isolated invented-input controls as270. Final
+combined source-only strong-native proof1.995742417s:124 loaded/explicit images,
+inventory `39989456a78c31ffe440431851a3f40e64a47ff0233cf3ad414d88a51d05cbc4`;
+all273 reference and272 event hashes matched, core unchanged,25,576B
+production-shaped unexecuted cell capacity passed. This still uses synthesized
+uncommitted candidate/bootstrap identity, not actual clean-Git acceptance.
+Main matching-only fetch kept origin41d729aff80752cdc1ad6ef73690d9c59711d712.
+Accumulate a local qualification commit for267–273 and these two finalized
+pairs while separately owned campaign drafts continue; do not stage those
+unfinished drafts. Actual271 activation still waits for ALL writers to finish
+and the final designated tree to be committed/clean. No push or final handoff.

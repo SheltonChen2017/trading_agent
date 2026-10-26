@@ -2171,9 +2171,11 @@ once(323.60), completing the P scientific experiment: adjacent Daily sessions
 were present but October21 was absent, including Minute queries before and
 after a genuine market-clock bar. The within-job native identity matched; no
 price, strategy result or physical cause was admitted. R is SPENT and the
-booked floor is336shared/259development/52infrastructure/699cells. S(323.61)
-is a new local-only source-eligibility preparation, not QC price transfer or
-a strategy continuation. Q does not identify P's historical changed field;
+booked floor is336shared/259development/52infrastructure/699cells. S's local
+eligibility use then refused a probe metadata identity predicate after two
+HTTP200 metadata responses(323.63); S is SPENT, with no status/price request.
+T(323.64) prepares a narrower predicate-only diagnosis, not a replay, QC price
+transfer or strategy continuation. Q does not identify P's historical changed field;
 no cross-job native-SID continuity or market-wide absence is inferred.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
@@ -61363,3 +61365,162 @@ paid upgrade, privacy/permission/settings change, cleanup or unrelated roadmap
 step follows. S cannot book a look/cell;336/259/52/699 remains binding. Its
 result determines the next admissible source-contract step, not readiness.
 One successful final matching-lane push is still reserved; monitor PAUSED.
+
+### 323.63 Actual S metadata-predicate refusal, no price request; SPENT
+
+At cleana0e46adac59f09bf69edd334a819c0229a59dfbc, sole S parent ran
+2026-10-26T03:55:54.084974Z..03:55:59.808563Z, actual2/stderr0/no bound.
+Stdout1618bytes SHA71019e299709e0841ab0a5efcd76e894f2bc222c722c98d000d786441d8db75c.
+Sole supplied-output native validator03:55:59.808866Z..03:56:03.427212Z
+exited0/stderr0/no bound, identical stdout pin, output_authenticated=true.
+This is authenticated FAILURE, not a cancelled/successful source package.
+S claim/parent/validator/control are SPENT; no reread/retry/repair/cleanup.
+
+Retained stage=provider, failure_code=provider_metadata_identity,
+claim_consumed=true. Exactly two application intents/statuses were retained:
+stocks_metadata200 and funds_metadata200. Current source maps this finite
+code to the strict used-probe route-quality predicate after both bounded CSV
+responses. It does not identify which of nine probes or which field failed,
+nor subscription expiry, a malformed genuine6151 identity, or a native QC
+failure cause. Raw earlier successful bodies were read/parsed but not returned
+by the opaque bundle and therefore not published, as323.62 qualified. No
+capture/receipt/report success pin exists, and retrospective recovery cannot
+reconstruct those discarded field values. Do not call this no-byte access.
+
+Neither status=True nor early2020-12-31 price request was dispatched by the
+application protocol. Physical wire/contact count remains unmeasured. No
+credential/source row/private route/price value/raw exception was printed.
+There was no QC/capacity/job, original private input/control read, source
+mutation, new paid right or strategy/NAV/price admission. No new look/cell;
+336/259/52/699 and cloud P's exact11files remain unchanged. No test/edit
+occurred during the clean S parent/validator. The preceding86record check
+1.21s overlaps root272, not additive. One final push remains reserved.
+
+### 323.64 Prospective T public-probe predicate diagnosis, not S retry
+
+Under the continuing explicit owner recovery/research/Claude waiver and255.2,
+select a narrower NEW metadata-only observation. S's real predicate failure
+supplies its coherent purpose: identify exact failed predicate(s) safely,
+not repeat the full catalog/status/price request or bypass its identity guard.
+S's four later uninvoked roles are not automatically revived. All S sources/
+controls and older operations remain frozen/spent.
+
+T permits only two GETs: tickers table=stocks/ticker=QCOM and table=funds/
+ticker=the fixed eight own ETFs; same exact12fields/CSV/limit100/skip0/
+sort=ticker.asc, no date filter. Each response<=64KiB and below100rows. No
+bulk/status/price endpoint, original private input, real6151 join or QC action.
+These nine PUBLIC request labels are the diagnostic inventory, not historical
+identity or strategy eligibility. No new subscription/paid right is acquired.
+
+Structural body/field/header/bound/URL/TLS/secret/journal failures still refuse.
+For each fixed probe index retain candidate count, and only for exactly one
+row a closed predicate matrix: permanent-ID/FIGI/CUSIP/exchange/category/USD/
+delisting/date shapes and reference-interval coverage. Field byte counts/SHA
+digests may supplement those predicates; no raw arbitrary field names, values,
+tokens, routes, rows, prices or exceptions. Duplicates/cross-route collisions
+stay explicit observations. A FALSE predicate is a valid diagnostic observation,
+NEVER accepted identity or permission to loosen S. Missing/ambiguous rows are
+not silently dropped. Closed output must recompute/cross-bind the original
+bounded private bytes, including a failed quality matrix, before return.
+
+New T parent300s/outer330s/once-only supplied-output native validator20s/
+128KiB public channel/max12controlfiles, two private0600 CSVs, exclusive
+claim/fsync before one fixed existing Sharadar Keychain lookup(max20s) and
+contact. Four persistent intent/status markers, zero retries/redirects/fallbacks/
+cleanup/old control reads; raw and decoded credential-echo guards remain.
+Original held descriptors/full metadata/native ACL/xattrs remain binding through
+publication and return. Current source/clean exact host/branch/HEAD pins and
+actual-exit0 plus validator0 are mandatory. Partial/nonzero/ambiguous use spends
+the new leaf; only own child kill/reap, usual I/O/host-suspension qualifications.
+
+Fixed prospective leaf newrule_sharadar_probe_metadata/R323-20261025-T remains
+uninspected/unallocated. New source/tests, root audit and separately committed
+exact run freeze are required before contact. No T invocation, permission/
+membership/source/settings change or price acquisition is reported here.
+Every strategy/master/PIT/paid-tier/paper/live/price/NAV flag stays false;
+336/259/52/699 unchanged. A future correction must be supported by actual
+retained predicate evidence, not an invented explanation or routine waiver.
+
+### 323.65 T exact source/run freeze and validation
+
+Main read the whole new helper/tests and the complete caller/test diff from
+the already audited S lifecycle. Only T identity/control/source bindings,
+two-request/two-file bounds, shorter deadline, matrix schema and synthetic
+interoperability cases change. Frozen S/O operations/globals are not invoked/
+modified. Native supplied-output policy construction and pure security/byte
+helpers are reused without reading their controls or genuine private inputs.
+
+| File | Bytes | SHA256 |
+| --- | --- | --- |
+| scripts/arv2_r298_sharadar_probe_metadata.py | 23825 | 3122b8f2be402d1d74de7b0f0259835d5c317d6d30b00274a069607024b881ae |
+| scripts/run_arv2_r298_sharadar_probe_metadata.py | 23991 | 4120779c745e4b6c38f4702d665a8e113018ddccad603efec68adeb5b4b62439 |
+| tests/analyst_revisions_v2/test_r298_sharadar_probe_metadata.py | 12318 | 2df14328126993f61a7639042cd18564c32216642c079e2a611f62451f1c75c5 |
+| tests/analyst_revisions_v2/test_r298_sharadar_probe_metadata_caller.py | 25122 | fc8c3b3adbf9360d6f9065f6964e7b510620c4c0f40d05c1dd8f85cd98c26c35 |
+
+Actual caller canonical+ONE LF profile20251bytes SHA
+aece7ce5153556c259bb4f0fc0879ba850b3e016947e7368e8e2dd24bcdfc364;
+helper withoutLF3283bytes SHA5d9d7c5b197c6af2d49c70d2047ec60219f1b9ebbd62674dc1eb60c52a32e860,
+withONE LF3284bytes SHAa7cc0d57ad032192cd9c38898e3b24372f813620f8f3d1ac42f4ec539485e2d1
+(the latter is the caller provider-profile binding). All150selected source
+pins match, including the unchanged S caller/helper; no silent refresh or
+whole-interpreter integrity claim. Four new files compile in memory.
+
+Each fixed probe has a candidate census and, only when unique, twelve field
+type/UTF8-byte-count/canonical-string-SHA summaries plus21 closed predicates.
+Missing/ambiguous candidates retain unknown matrix fields. Predicate counts,
+known enum hashes/lengths, exact probe ticker/index, empty-field/hash relations,
+format/date shapes and nullable collisions/intervals must be consistent.
+Collisions refer ONLY to the two filtered returned subsets, not an entire
+current catalog or historical master. No global no-collision inference follows.
+All-false/all-unknown quality can be an authenticated diagnostic observation;
+none can become identity admission. The source bytes still recompute/bind the
+full receipt before and after private publication. T does not authenticate
+S's historical failure cause, since S's original bodies were discarded.
+
+ARV2I323-032(P2, corrected pre-use) is the generalized receiver-consistency
+gap: draft matrix packets could contradict their field hashes/lengths or
+nullable prerequisites and mislabel the fixed probe. Necessary closed cross-
+checks plus forged-packet regressions now refuse; pure byte-backed producer
+validation was already strict. No operational false diagnosis occurred.
+Author memory-only known-predicate/hash omission caught1expected failure0.15s,
+restored finally/sourcehash unchanged. Root separately omitted actual-exit
+binding in memory:1expected DID NOT RAISE failure0.20s, restored finally with
+disk bytes unchanged. This is test sensitivity, not an actual T failure.
+
+Root final267distinct passes3.28s(67helper+113caller+86record/document+1research
+transitive closure), no failures/skips/warnings; all150pins/four compiles/diff
+checks pass. Authors67/3.87s and113/4.37s overlap; earlier49/3.84s and106/112
+caller selections overlap, the latter deselecting only the pending helper-pin
+test. No ordinary author fixture failure. Every pytest/mutation used native
+network/production-artifact/Keychain/security-exec denial, inroot support
+paths, disabled plugin autoload/--noconftest/-B/no cacheprovider and no imported
+dispatch_fence. No complete Codex suite or independent acceptance is claimed.
+
+ARV2I323-033(P3, corrected pre-use): the first staged diff check refused one
+extra blank EOF line in each T caller/test. Earlier untracked-file git diff
+checks did not cover those bytes. Removed ONLY those two final LF bytes and
+revalidated267/3.28s on the exact resulting tree; the earlier267/3.59s overlaps.
+No commit or actual T invocation occurred at that refusal. Above caller/test
+pins explicitly supersede draftd8f17d05/bdd27067; helper/profile/dependencies
+and every protocol function remain unchanged. The86record repeat1.20s also
+overlaps267, not additive. The final staged check must cover all new files.
+
+D1 under the continuing owner research/recovery authority, Claude waiver and
+255.2 selects ONE T observe invocation, its one real parent and once-only
+supplied-output native validator AFTER these exact bytes/record are committed
+cleanly in the designated lane. Explicitly bind the next clean designated
+Darwin/POSIX Python3.13/root/branch HEAD and caller SHA above; current pre-T
+a0e46adac59f09bf69edd334a819c0229a59dfbc is not that run freeze. Two exact
+metadata GETs only, one existing login-Keychain Sharadar lookup after exclusive
+claim/fsync,300s parent/330s outer/20s native validator/128KiB channel. T's leaf
+is still uninspected/unallocated; no T contact/private/credential operation
+occurred before this entry. No dirty/concurrent source state may run.
+
+Require actual parent0 AND native validator0 AND exact bound closed output/
+capture/report pins/postchecks for accepted observation. A report cannot
+override nonzero/unknown/ambiguous actual exit; partial/duplicate claims remain
+spent. No retries/cleanup/old source/control reads, S status/price continuation,
+QC/capacity/job, new entitlement or strategy/price/NAV admission follows. All
+false flags,336/259/52/699, cloud P source and one final matching-lane push
+reservation remain unchanged; monitor stays PAUSED. Record actual evidence
+before deciding a real correction or concrete source barrier.

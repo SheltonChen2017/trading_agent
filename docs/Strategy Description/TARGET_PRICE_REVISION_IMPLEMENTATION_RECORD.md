@@ -25529,6 +25529,9 @@ provider, credential, private packet/receipt, operator-state or actual sibling
 resource-release check is performed. Existing monitor configuration is not
 inspected, changed, consumed or rearmed. Recorded historical monitor/source/
 Mac observations are not converted into fresh facts by reading the record.
+A peer initially resolved a local tracking-ref object during its read-only
+audit; that is not a fresh origin observation and was discarded as release
+evidence. No sibling fetch, checkout, source or worktree inspection followed.
 
 ### 102.2 Every incoming commit and cumulative disposition
 
@@ -25720,11 +25723,52 @@ current scope prospectively; a synthetic test does not authorize dispatch.
 ### 102.7 Durable same-lane handoff
 
 Last processed Claude range is exactly the range in 102.1. This round's
-correction and final record-only commit identities, exact bounded validation
-selection and public artifact hashes are recorded after the corrections are
-validated. Before staging or pushing, recheck physical/Git root, branch, HEAD,
-status and the actual matching remote; preserve any concurrent unknown work.
+correction foundation is
+`6605d4410cbb40f41303942b98b3231c9bfde410`, whose parent is the incoming
+Claude head `69ecaf91bd123d24138b915bcb5a37798d676b96`. It changes exactly
+the controller, new portable controller-stop test, document guard and lane
+record. The final record-only handoff is its sole direct child produced by
+this round; its resulting exact head is reported with the push rather than
+embedded self-referentially in its own content. Anyone later reviewing the
+round must include both commits, not only the foundation or the tip:
+
+```text
+git rev-list --reverse 69ecaf91bd123d24138b915bcb5a37798d676b96..HEAD
+```
+
+Committed public blobs at that foundation, not Windows working-copy hashes:
+
+| Artifact | Bytes | SHA-256 |
+|---|---:|---|
+| `research/target_price_revisions_qc/extended_refusal_witness_controller_successor.py` | 28763 | `d96f57179568a841d872ac8eb243cdf1c8a2834cb2b68a33912cdebbf376194b` |
+| `tests/target_price_revisions/test_document_consistency.py` | 294234 | `91a64bcf0f0eadbf42b92510ff2793ef89403cf53647c7c30a2018695029b37a` |
+| `tests/target_price_revisions_qc/test_qc_extended_refusal_witness_controller_stop_accounting.py` | 18274 | `65ecdbb6b1ece71b755a426a286f0a1c33779d1f344ff9c9e9ac6ea05bd874ca` |
+
+Public historical sections99/100/101, excluding their trailing newlines,
+are byte-identical between incoming head and foundation: respectively
+11798/24321/10033 bytes, SHA-256
+`6bd4b062a5944c255c0b071cd5dd8aef7eaf20ca5700cd53086e764cc7bf233b`,
+`8e5442cb56ea4f3092bc5f0aa93c02ed7137e5629360ec3610c1bf9b775224ed`,
+`37d15def57ac3c2722c700cc3161144ba7cdd3889efd03a7be5f67e2a821819e`.
+The original four Claude regressions, every other tracked path and all
+frozen inputs/executed candidate files remain unchanged by this round.
+
+The exact selected union in 102.5 actually produced 787 passes and nine
+explicit deselections in 104.82s; its final committed-tree reprise must
+retain those counts before the single push. The separate baseline nine
+failures are neither erased nor converted into passes. Parsing/compilation
+of the three changed Python files is in-memory only; no actual controller,
+native input, provider or operator state is executed/read by compilation.
+The full suite and native Mac custody were not rerun. All new admission/
+readiness/outcome/trading flags remain false and the shipped dispatch policy
+remains closed.
+
+Before staging or pushing, recheck physical/Git root, branch, HEAD, status
+and the actual matching remote; preserve any concurrent unknown work.
 Accumulate local commits and make only one non-force matching-lane push at
-the stable counter-review endpoint under the standing lane workflow. Stop on
-unseen remote changes. No history rewrite, separate branch or automatic
-native/monitor continuation follows that push.
+the stable counter-review endpoint under the standing lane workflow. Stop
+on unseen remote changes. Verify actual local/remote head equality and clean
+status afterward. No history rewrite, separate branch or automatic native/
+monitor continuation follows that push. The recorded future-checkpoint
+waiver remains in force at its scope; this handoff does not add a new
+mandatory Claude checkpoint or treat it as genuine resource release.

@@ -245,7 +245,10 @@ def test_preflight_failure_precedes_namespace_or_credentials(tmp_path, monkeypat
 def test_internal_actual_fixture_callback_root_separation(tmp_path, monkeypatch, fixture):
     root = m.LANE_ROOT if fixture else tmp_path
     monkeypatch.setattr(m.publication, "_NewDirectory", lambda *a, **k: pytest.fail("no namespace"))
-    with pytest.raises(ValueError):
+    # Claude review section 330: name the refusal, so an earlier unrelated
+    # ValueError cannot satisfy the test.
+    code = "^invented_outside_lane_root_required$" if fixture else "^production_auth_front_required$"
+    with pytest.raises(ValueError, match=code):
         m._run(root=root, identity={}, guard=lambda: None, credential_reader=credentials,
             transport=lambda *a: pytest.fail("no live transport"), fixture=fixture, clock=lambda: 1)
 
@@ -254,7 +257,7 @@ def test_internal_actual_fixture_callback_root_separation(tmp_path, monkeypatch,
 def test_fixture_cannot_consume_production_reader_or_transport(tmp_path, which):
     reader = m._read_credentials if which == "reader" else credentials
     wire = m._production_transport if which == "transport" else m._https_authenticate if which == "raw" else lambda *a: response()
-    with pytest.raises(ValueError):
+    with pytest.raises(m.AuthenticationProbeError, match="^invented_auth_callbacks_required$"):
         m._run_invented_probe(root=tmp_path, credential_reader=reader, transport=wire)
     assert not folder(tmp_path).exists()
 

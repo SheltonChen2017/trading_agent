@@ -1,11 +1,12 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Section 101 (2026-10-25) is the Claude review of the section-100 counter-review,**
-requested by the owner in the Claude chat. Codex's counter-review of section 99
-is accepted after one correction: its controller relabelled every unpublished
-stop receipt as `post_read` (`TPR-CR31-001`, P3, fixed). Its corrections to
-the controller, census and history design stand. The owner direction Codex
-recorded also stands: QC/Safari access is released only after the matching
+**Section 102 (2026-10-26) is the requested Codex counter-review of section 101.**
+Both incoming Claude commits are accepted after three P3 corrections:
+unpublished final-close accounting, publisher stop priority, and contradictory
+document-scope sensitivity. This round is counter-review only, not the next
+implementation milestone or native recovery. Section 101's useful corrections
+and public Git/hash qualifications stand. The owner direction recorded in
+section 100 is retained: QC/Safari access is released only after the matching
 Analyst Revisions ref advances from `3c905d4235617d3d2a56b636c8e0be77ee790686`;
 the former three-attempt ceiling is superseded prospectively without erasing
 any historical attempt or look; Mia may be consulted as needed; no current QC
@@ -15,13 +16,14 @@ access, new job, purchase or live authority is claimed. The lane is
 **Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly" applied
 to the section-93 round ONLY; section 94 is the Claude review that follows it.
 
-Status: **CLAUDE HAS INDEPENDENTLY REVIEWED THE CODEX COUNTER-REVIEW COMMIT
-`b07fafdc..12be4894` IN SECTION 101: SECTION 100'S DISPOSITIONS, CORRECTIONS
-AND QUALIFICATIONS OF SECTION 99 ARE VERIFIED AND ACCEPTED AFTER ONE P3
-CORRECTION TO THE CONTROLLER'S UNPUBLISHED STOP RECEIPTS. NO EXECUTED CLOUD
+Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN
+`12be4894..69ecaf91` IN SECTION 102. ACCEPTED AFTER THREE P3 CORRECTIONS;
+PORTABLE SYNTHETIC SOFTWARE CHECKS DO NOT PROVE MAC CUSTODY. NINE INHERITED
+WINDOWS WORKING-BYTE ANCHOR FAILURES ARE RETAINED, NOT CALLED GREEN.
+NO EXECUTED CLOUD
 CANDIDATE OR PRIVATE RECEIPT CHANGED; NO QC ACCESS. NOT BACKTESTING-READY,
 PERFORMANCE OR CANONICAL ACCEPTANCE.**
-The last completed counter-review is section 100.
+The last completed counter-review is section 102.
 Section 94 reviewed the owner-skipped continuation of section 93.
 33 observed looks now (31cloud+2historical local).
 OFF has consumed all three Codex attempts under the former ceiling; the owner
@@ -40,6 +42,8 @@ All native-read/create UI scopes are closed with no automatic retry.
 Analyst-push monitor remains ACTIVE; future Claude checkpoints are waived until further notice.
 The old Claude-review heartbeat remains PAUSED. The native-source/Mac observations
 above are retained historical observations, not newly inspected operator state.
+The monitor-status statements above are also retained handoff observations,
+not a fresh automation inspection or proof that resource release has occurred.
 
 The ephemeral native-read task reported STOP with zero tool/data effects;
 the separately staged empty-notebook request was NOT sent because the Mac
@@ -47,7 +51,7 @@ locked. No new notebook/cell or native witness is claimed. Genuine original
 compiled source, missing source/unit
 provenance and full-window native orders/accounting cannot be inferred from
 saved source or a Completed. status. No protected dates, frozen economics,
-selection rules or attempts are reset. Codex next counter-reviews section 101 and this round's Claude commits; bounded QC recovery after the Analyst Revisions release continues without a mandatory Claude checkpoint.
+selection rules or attempts are reset. The next bounded action is resource-release verification before any separately scoped QC recovery; this requested round implements no next milestone.
 Old standalone native-read programs and scope holders are retired from operational use;
 no expired scope is renewed. Percent units remain a hypothesis, not a verified diagnosis.
 The non-authorizing TPR-TR0-I implementation candidate is checkpointed but
@@ -408,11 +412,14 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, 2026-10-25:** Claude has independently reviewed the exact range
-`b07fafdc17590185809d7a5a7059302496997605..12be489416af00e266c3a47286f2cabafbf74e27`:
-the one Codex commit carrying section 100, the counter-review of section 99
-and of this lane's section-99 Claude commits. The last completed
-counter-review is section 100. Section 94
+**Current qualification, 2026-10-26:** Codex has counter-reviewed the exact range
+`12be489416af00e266c3a47286f2cabafbf74e27..69ecaf91bd123d24138b915bcb5a37798d676b96`:
+the two Claude commits carrying section 101's controller/test correction and
+its record/guard handoff. Both are accepted after the three P3 corrections
+in section 102; no executed input/cloud source or receipt changed. Portable
+synthetic checks are not native custody proof, and the nine inherited Windows
+working-byte anchor failures remain explicit. The last completed
+counter-review is section 102. Section 94
 reviewed the owner-skipped continuation of section 93. The owner's direction
 "skip 1, proceed to 2 and 3 directly" applied to that round ONLY. Section 101
 accepts the counter-review after one correction: the controller relabelled
@@ -448,7 +455,7 @@ No new job was observed after the source-only restoration.
 Fresh Mac lock blocked the empty-notebook request; no new notebook, cell execution or native witness is claimed.
 All native-read/create UI scopes are closed with no automatic retry.
 Analyst-push monitor remains ACTIVE; future Claude checkpoints are waived until further notice.
-The old Claude-review heartbeat remains PAUSED. Retained source/Mac observations
+The old Claude-review heartbeat remains PAUSED. Retained monitor/source/Mac observations
 are historical, not fresh operator-state assertions or an unconditional unlock demand.
 For historical outcomes, the owner-reported Mia fix requires independent result/source verification;
 saved source restoration is not historical compiled-source or accounting
@@ -578,8 +585,8 @@ outcome-free source audit; no real-row D1, outcomes or QuantConnect access is
 authorized by that audit.
 The trust rollback pin, protected parent custody, reviewer identity and
 adversarial matrix remain unresolved and parked. **Exact next role action:**
-Section 101 reviewed the section-100 counter-review and its controller, census and design corrections.
-Codex next counter-reviews section 101 and this round's Claude commits; bounded QC recovery after the Analyst Revisions release continues without a mandatory Claude checkpoint.
+Section 102 completes the requested counter-review of both section-101 Claude commits.
+The next bounded action is resource-release verification before any separately scoped QC recovery; this requested round implements no next milestone.
 QC access remains forbidden until the owner's conditional release. The old section92
 skip was one-round only; the section-100 instruction waives Codex's progress
 stops for Claude checkpoints until further notice, and Claude reviews when the
@@ -974,6 +981,7 @@ known.
 | 2026-10-24 | Claude review | `e1e074aaeb0c616a0e9ecba7d5b78db22bc77863..a5979bf63173e879786fcd84e778122523a09d23` reviewed; correction commit `4db9b62a` and this record/guard commit on this same lane branch | Independent review of section 95 (counter-review, inert catalog) and section 96 (Sharadar history diagnosis, offline runtime successor); no feature milestone | Dispositioned all four Codex commits. Fixed, not only documented: the oversized-receipt defect in the two hash-pinned source views with the three-link pin chain rotated, the notebook capture successor's missing echo-credential check and oversized-receipt fallback, and three unexercised intrinsic guards of the witness runtime successor; eleven mutation trials on the two new modules, eight killed by the received tests, three now killed by regressions. Verified the forty-five cumulative provider request claims and the two redacted summary and plan hashes by key. Accepted all eight CCR28 items, including the digest-boundary closure of my CR28-008. No executed candidate, receipt, shared document or shared test changed. | Whole QC test package plus the two new development and offline test files on the final tree, designated worktree, network-denied (figures in 97.5); no full lane suite and no complete suite, per the owner. Provider requests **0**; QC requests **0**; raw licensed rows read **0**; private receipts read locally for recomputation only; looks **0** by Claude. | No P0. `TPR-CR29-001`, `TPR-CR29-002` (P2) closed by correction; `TPR-CR29-003` (P3) closed by correction; `TPR-CR29-004` (P2) documented, feeding the ON input question; `TPR-CR29-005` (P3) documented. `TPR-CCR28-003`, `TPR-CR26-003`, `TPR-CR25-003`, `TPR-CR23-001`, `TPR-CR23-002`, `TPR-CR22-001`, `TPR-MATCHED-002`, `TPR-MATCHED-006`, the six canonical findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. No canonical, QuantConnect, broker, paper, live, capital or trading authority is added. | Make this round's one push. Codex counter-reviews section 97; the owner decides on the Sharadar history upgrade before any fresh capture (97.7). |
 | 2026-10-25 | Claude review | `7a6fd7e22568bf4fa820a729d7058fca2d49c30b..6bdd0c1cfb0ee9a45845bdca48a53c6c95409469` reviewed; correction commit `d44925a7` and this record/guard commit on this same lane branch | Independent review of section 98 (owner-waived offline controller and program preparation, local Sharadar census, history design); no feature milestone | Dispositioned both Codex commits. Reproduced the census from the private repair projections: 21,007 TICKERS rows, 49,716 ACTIONS rows spanning 2025-10-13 to 2026-10-09, none before late 2021 and none in the warm-up, and the frozen query's missing lower bound. Fixed, not only documented: the controller's unenforced synthetic-only mode, its text-only lane boundary and three receipt-durability gaps; the census's text-only lane boundary and cleanup status; the history design's missing request bounds and weak boundary-year check. Nine mutants killed. No executed candidate, receipt, shared document or shared test changed; no provider or QC access. | Whole QC test package plus the development and offline test files on the final code tree, designated worktree, network-denied (figures in 99.5); no full lane suite and no complete suite, per the owner. Provider requests **0**; QC requests **0**; raw licensed rows read **0** by Claude beyond counts and dates recomputed locally from the private projections; looks **0** by Claude. | No P0. `TPR-CR30-001`, `TPR-CR30-002`, `TPR-CR30-003` (P2) closed by correction; `TPR-CR30-004` (P3) closed by correction; `TPR-CR30-005` (P2) documented (controller design limits for the future adapter); `TPR-CR30-006` (P3) documented; `TPR-OFF98-010` (P1, Codex) reproduced and open; `TPR-CR29-004` qualified. `TPR-CCR28-003`, `TPR-CR26-003`, `TPR-CR25-003`, `TPR-CR23-001`, `TPR-CR23-002`, `TPR-CR22-001`, `TPR-MATCHED-002`, `TPR-MATCHED-006`, the six canonical findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. No canonical, QuantConnect, broker, paper, live, capital or trading authority is added; QC access stays forbidden. | Make this round's one push. Codex counter-reviews section 99; the owner decides on the explicit-range Sharadar re-capture (99.7). |
 | 2026-10-25 | Claude review | `b07fafdc17590185809d7a5a7059302496997605..12be489416af00e266c3a47286f2cabafbf74e27` reviewed; correction commit `40e7901d` and this record/guard commit on this same lane branch | Independent review of section 100 (Codex counter-review of section 99 with controller, census and history-design corrections); no feature milestone | Dispositioned the one Codex commit: accepted after correction. Verified every section-100 claim against Git, file hashes, the section-99 digest, the frozen capture bounds and the Analyst ref. Fixed, not only documented: the controller relabelled every unpublished stop receipt as post_read, and an ordinary final-close error after a failed publication hid that no receipt exists. Three regressions red on the received module. No executed candidate, receipt, shared document or shared test changed; no provider or QC access. | Controller, program and runtime modules, the three changed QC modules, the whole QC test package excluding Codex's untracked in-progress test, the document guards, compileall and `git diff --check` on the final tree, designated worktree, network-denied (figures in 101.5); no full lane suite and no complete suite, per the owner. Provider requests **0**; QC requests **0**; private rows read **0**; looks **0** by Claude. | No P0. `TPR-CR31-001`, `TPR-CR31-002` (P3) closed by correction; `TPR-CR31-003`, `TPR-CR31-004` (P3) documented. `TPR-OFF98-010` (P1) open; `TPR-CR30-005`, `TPR-CCR28-003`, `TPR-CR26-003`, `TPR-CR25-003`, `TPR-CR23-001`, `TPR-CR23-002`, `TPR-CR22-001`, `TPR-MATCHED-002`, `TPR-MATCHED-006`, the six canonical findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. No canonical, QuantConnect, broker, paper, live, capital or trading authority is added; QC access stays forbidden until the owner's conditional release. | Make this round's one push. Codex counter-reviews section 101 when it next commits and continues its bounded QC recovery after the Analyst release; no Claude checkpoint blocks it. |
+| 2026-10-26 | Codex counter-review | Reviewed `12be489416af00e266c3a47286f2cabafbf74e27..69ecaf91bd123d24138b915bcb5a37798d676b96`; exact outgoing correction/handoff identities follow in section 102 | Counter-review only; no next milestone | Accepted both Claude commits after three P3 corrections: unpublished close-stop accounting, publisher cancellation/fatal priority and appended contradictory scope guards. Native custody, shipped closed policy, frozen source/inputs and shared documents remain unchanged. | Separate red/green, 703 independent direct model cases and exact final selected counts/limitations in section 102. Nine inherited Windows byte-anchor failures remain visible; no full-suite or Mac-native green claim. | CCR31-001/002/003 closed by scoped corrections. CR31-003 public figures confirmed; CR31-004 historical untracked work not absorbed. Runtime/input/canonical findings stay open. | None; zero QC/provider/private/operator access, attempts, jobs and looks. No monitor or sibling change. | No implementation milestone started. Later resource-release verification and fresh scope remain distinct from this counter-review; retained future-checkpoint waiver is not rescinded. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 | 2026-10-05 | Codex counter-review and TPR-D0 implementation | Reviewed `9958a459f5cd56c29cb9a0de13d38737e2c3412d..c0bfb21393180d44c16c10be1e667ea741098531`; corrections/decisions `cf11788f39a2148d7bc3b801e88807bd2caca5ea`; D0 implementation `8dcfb71851ff22db6f0727395e18292c19f080ef`; this record-only handoff follows | Four-commit Claude counter-review, five bounded owner selections, strict D0 plan and one retained structural audit | Accepted the cumulative Claude range after three record/encoding corrections; selected explicit native/host test variants without changing production trust policy. Implemented the separate standard-library D0 package and immutable aggregate artifacts; retained-source inventory/hashes and all canonical freezes match. Sections 46/47 contain exact dispositions, scope, evidence and remaining limitations. | Cumulative focused suite 491 passed, 5 symlink-permission skips; final routing/artifact guards 107 passed. Standard suite blocked by 110 Analyst `fcntl` collection errors, with zero tests executed. Optional continuation diagnostics capped and incomplete, not reported as totals. Compileall exit 0; diff hygiene clean; Python 3.13.14 / pytest 9.1.1. | CCR16-001/002/003 closed; no new in-lane P0/P1/P2. Six canonical findings remain open and parked. TPR-OOL-017 opened for Windows Analyst collection, documented only. | Exact local retained-structure scope only, expiring 2026-10-12; 587,046 retained rows audited. Provider/outcome/QC/development-look/trading counts zero. No vendor-rights attestation or canonical admission. | One matching-branch non-force push of this Codex round, then independent Claude review of every commit after `c0bfb213` through the exact pushed tip. No automatic D1; later action/source scope must be selected after review and counter-review. |
 
@@ -25487,3 +25495,236 @@ agent's work possible, so a second worktree for one of us would remove that
 risk. Second, the ON-arm input question from section 99 is unchanged: a
 10-year Sharadar history with `from=2020-09-01` is still the smallest
 re-capture that covers the frozen window, and `TPR-OFF98-010` stays open.
+
+## 102. Codex counter-review of Claude section 101 - 2026-10-26
+
+### 102.1 Exact snapshot, serialization and requested scope
+
+Incoming published range:
+`12be489416af00e266c3a47286f2cabafbf74e27..69ecaf91bd123d24138b915bcb5a37798d676b96`.
+Only the matching Target-Price remote branch was fetched. The clean local
+checkout safely fast-forwarded from `e1e074aa` to the fetched review head;
+the intermediate committed record shows sections 95, 100 and earlier
+counter-reviews were already processed on another machine. They are context,
+not thirteen new Claude commits. Roles are established by the review content
+and recorded exact ranges, not Git author names alone.
+
+| Incoming ordered identity | Full commit |
+|---|---|
+| Claude commit 1, correction and regressions | `40e7901d60d96fccc1addaf9088e2caed5f71d74` |
+| Claude commit 2, record and guard; review head | `69ecaf91bd123d24138b915bcb5a37798d676b96` |
+
+Physical/Git root is
+`C:\git\customizedAgent\trading_agent_TargetPriceRevision`, branch
+`codex/strategy-target-price-revisions`. No branch/worktree, alternate clone,
+merge with main/siblings, stash, reset, checkout repair or unowned change was
+created or absorbed. Initial local status was clean; section 101's five
+untracked files on another host are not present here and were not adopted.
+All edits in this round are the root/explicitly delegated Codex team's work.
+
+The user's current request is sync, absorb context and counter-review Claude.
+No next implementation milestone or native continuation is started. Inputs are
+public source/Git objects and synthetic fixtures only. No QC/Safari/Mia,
+provider, credential, private packet/receipt, operator-state or actual sibling
+resource-release check is performed. Existing monitor configuration is not
+inspected, changed, consumed or rearmed. Recorded historical monitor/source/
+Mac observations are not converted into fresh facts by reading the record.
+
+### 102.2 Every incoming commit and cumulative disposition
+
+| Claude commit | Disposition | Independently checked basis and limitation |
+|---|---|---|
+| `40e7901d60d96fccc1addaf9088e2caed5f71d74` | **Accepted after correction** | Both direct fixes are useful: publication stops preserve the reached stage and ordinary final close after unconfirmed publication signals receipt-unavailable. Four incoming regressions reach their intended cases in an explicit synthetic OS/program model; reverting the received fixes gives three expected reds and one passing control. Generalized unpublished final-close status and low-level publisher stop priority still needed CCR31-001/003 below. |
+| `69ecaf91bd123d24138b915bcb5a37798d676b96` | **Accepted after correction** | Read the entire record/guard diff and cumulative contracts. Exact range/order/disposition/ledger and publicly reproducible counts, seven hash pins, section-99 body and freeze bounds agree with Git. The new authority scan omitted recommendations/access grants; current pointers and section-100 guard also admitted contradictory appended release/checkpoint/monitor claims. CCR31-002 adds clean-first negative controls without rewriting section 101's historical findings. Native runs, moving refs and untracked-host observations remain attributed. |
+
+**Cumulative disposition: accepted after correction.** This is acceptance of
+the corrected offline review software/tests/record only. No P0, P1 or P2
+production defect was newly established in this incoming range. Review quality
+is **7/10**: exact scope and useful regressions, but incomplete generalized
+stop accounting and contradictory-prose sensitivity required correction.
+No feature or native/backtesting milestone is declared complete.
+
+### 102.3 Retained P0-P3 findings and classifications
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| `TPR-CCR31-001` | P3 | **Closed by correction** | `40e7901d` cumulative inherited close path | controller final directory-close handler | After a completed read, failed receipt publication and final-close cancellation/fatal, the exception correctly stopped but its unpublished receipt still said completed/complete. A later cancellation after a publication fatal could likewise keep a failed rather than cancelled candidate. Shipped native dispatch remains closed. | Independent 160-case source control-flow sweep found 26 inconsistent unpublished candidates, 118 correct and 16 explicit receipt-unavailable outcomes. | The caller's only unavailable accounting candidate must not contradict its stop; no durable receipt is claimed. | Update status and `_stop_stage` only when publication is unconfirmed; published receipts remain byte-equivalent immutable observations. | Clean-first red/green model controls, preserved published snapshots and independent final sweep below. |
+| `TPR-CCR31-002` | P3 | **Closed by correction** | `69ecaf91` | lane document guard, section101/current pointers/section100 | A recommendation or nested heading could add a launch grant outside the scan; premature QC access was absent from the vocabulary. Appended mandatory-checkpoint or paused-without-release statements coexisted with required contrary facts. This is guard sensitivity, not an actual grant or monitor effect. | New 15-case regression selection: 14 failed DID NOT RAISE, one existing launch control passed, 498 deselected. | Required denials and exact tables alone must not hide contradictory additions. | Scan the entire remaining section101 authority/recommendation tail and share a bounded release-scope contradiction check across current pointers and section100/102. Retain former routing controls. | Corrected selected guards and finally-restored reverse mutations; final inventory below. |
+| `TPR-CCR31-003` | P3 | **Closed by correction** | `40e7901d` cumulative inherited publisher | controller `_publish` | A body write/link/fsync cancellation or fatal could be replaced by an ordinary temporary cleanup/close error; outer execution could then return an ordinary failed receipt instead of propagating the stop. The helper remains behind a shipped closed dispatch policy. | Both auditors reproduced the actual helper with in-memory OS descriptors: write KI/SystemExit/generic fatal followed by close OSError exits as ordinary OSError; no native call or filesystem write. | Cleanup must not demote cancellation/first-fatal semantics or invite continued work. | Retain cancellation first, otherwise first fatal over ordinary cleanup, without exception truthiness; always attempt one close, preserve no-replace link and owned-temp inode checks; never retry. | Publisher body/cleanup matrix, immutable-destination/foreign-inode controls and source mutations below. |
+
+Priority reflects current impact: the controller's shipped dispatch flag stays
+false, no genuine adapter or permit exists, and no execution authority is
+granted. These minor offline accounting/test defects are not relabelled P1
+trading incidents. Their source-level corrections are required before a
+future genuine adapter can rely on these contracts.
+
+| Inherited Claude item | Counter-review classification / retained disposition |
+|---|---|
+| `TPR-CR31-001` | Confirmed P3 and its direct stage correction accepted. CCR31-001 covers the separate generalized outer-close candidate gap; the original four regressions are retained unchanged. |
+| `TPR-CR31-002` | Confirmed P3; the direct receipt-unavailable exception correction is valid. No unavailable result is represented as durable. |
+| `TPR-CR31-003` | Public Git/hash/freeze claims confirmed. Seven pinned files match the historical 12be4894 blobs; the absent local runner, Mac execution/custody, historical moving Analyst ref and private observations remain attributed, not revalidated here. |
+| `TPR-CR31-004` | Retained historical shared-worktree concern. Initial Windows checkout was clean, with none of the five other-host untracked files. No pin in unowned work was rotated and no second worktree was created from a review recommendation. |
+
+Generalized search covered reached stages, publication success/unavailability,
+earlier/later ordinary/fatal/cancellation combinations, exception truthiness,
+owned/foreign temporary identities and all current document surfaces. It does
+not prove every native OS interruption path. Existing public-source preflight
+read/close and directory-admission failure semantics are not claimed globally
+repaired; genuine adapter, source/tool identity, hard wall/byte limits and
+native custody remain the open future-adapter scope of CR30-005. Out-of-lane
+findings are not fixed. Existing CR25-003 host limitations are not duplicated
+as a new issue or silently closed.
+
+### 102.4 Red/green, mutation and independent cross-audit evidence
+
+- The new portable controller regression selection before production changes
+  was **81 failed, 92 passed in 0.97s**. An earlier final-close subset was
+  9 failed, 31 passed in 0.73s. These are actual red reproductions, not an
+  unsupported claim that all old native Mac tests ran on Windows.
+- Corrected portable controller model: **181 passed, 0 skipped in 1.01s**,
+  zero failures/errors/warnings. Six in-memory source mutants are detected:
+  unpublished status update, published immutability, reached stage, publisher
+  stop priority, cleanup-close masking and suppressed publisher failure.
+  Controls run before/after; monkeypatch state is restored in finally, and
+  the real shipped policy remains false. Seven actual-effect sentinels and
+  success/no-replace/foreign-temp controls are included.
+- Independent read-only cross-audit: **703 direct model cases passed**, not a
+  pytest-suite count: 160 unpublished combinations (144 consistent candidates,
+  16 explicit receipt-unavailable outcomes), 140 published snapshots/stop-
+  priority combinations, 400 publisher combinations and three success/
+  no-replace/foreign-inode controls. No native OS or private store is used.
+- The incoming four Claude regression functions pass under explicit synthetic
+  OS/builder seams; reverting the two incoming fixes yields three expected
+  failures plus the existing green control. No working bytes are normalized
+  or source pins weakened in the new permanent test harness. An early auditor
+  probe first refused on Windows CRLF source pins and used LF source text for
+  a later throwaway model; that is not exact-working-byte custody evidence.
+- Document negative controls before correction: **14 failed, 1 passed,
+  498 deselected in 7.31s**. The full corrected lane document-module run was
+  **504 passed, 9 failed in 105.07s**, zero skips: eight failures share the
+  inherited public recovery-JSON working-byte pin and one the inherited raw
+  historical-record digest. They are preserved below, not reported green.
+- The exact original `69ecaf91` guard was independently loaded from its Git
+  blob against the same unchanged public checkout bytes: all nine anchor
+  cases failed there too. The Git JSON is 6980 bytes with the preserved hash;
+  the Windows copy is 7167 bytes with 187 CRLF expansions. The Git historical
+  slice matches the frozen 1074035-byte pin; the Windows slice adds CRLF bytes.
+  This verifies inheritance without changing either strict working-byte test.
+- Authority reverse controls: clean 15 passed, no-op shared check 15 failed,
+  finally-restored 15 passed. Restoring the old section101 tail boundary:
+  clean six passed, mutant four failed/two passed, restored six passed. An
+  initial throwaway tail harness rebound separate globals; those results
+  were discarded and the corrected same-globals proof is the evidence above.
+
+The portable test module clones real controller/helper control flow, replaces
+OS/directory/public-source/program collaborators with named synthetic seams,
+and uses real closed receipt/runtime-result validators. Its capsule/permit
+seams are explicitly model inputs, not genuine project, source, identity,
+deadline or admission evidence. No program is executed as native source.
+Native Mac tests and their strict working-byte assertions remain unchanged.
+
+### 102.5 Validation contract, exact limits and current evidence
+
+Windows Python 3.13.14, pytest 9.1.1. Tests run in this physical lane via an
+in-process runner with `-I -B`, plugin autoload disabled, network connections
+denied before imports, `--noconftest`, no cacheprovider and only named public/
+synthetic modules. This avoids the root hooks' operator/runtime observations.
+The historical Mac runner is absent here; no hash or behavior is invented for
+a replacement artifact. No private packet, capture or operator stop is read.
+
+Nine unchanged Windows working-byte anchor checks are an explicit platform
+limitation: one owner-recovery JSON inventory control plus its seven negative
+controls, and the section95 historical raw-record digest. The JSON working
+hash is `401d8f9257a567b4c154fe9ec5922070d5f012e273aa9f68556ee041641b2b17`,
+not the preserved `0d42011a1a7e2c94fe9a5df948d5fa21b9a0546e7f69b8036f2532ac7073d8ef`
+pin; the record span is 1087815 rather than 1074035 raw bytes on this CRLF
+checkout. Neither artifact nor its pin, native assertion, attributes or
+checkout bytes is repaired/normalized. A portable selection may deselect
+these exact nine cases but must report them and never call the whole module,
+lane, QC package, repository or native custody green. They remain within the
+previously open Windows host/byte-anchor limitation, not new failed economic
+evidence.
+
+Root cumulative selected validation after all substantive corrections and
+section102 routing: **787 passed, 9 deselected in 104.82s**, zero failed,
+errors, skips or warnings. Selected modules are the entire lane document
+guard, the new portable controller-stop model, shared active-document
+consistency and offline coverage handoff. The exact `-k` exclusion is:
+
+```text
+not test_retrospective_owner_recovery_inventory_preserves_all_failures_and_limits and not test_retrospective_owner_inventory_refuses_invented_acceptance_or_selection and not test_section95_historical_digest_boundary_is_explicit_and_reproducible
+```
+
+That names exactly the nine separately reproduced failures; it is not a
+package-wide native skip or evidence that those cases passed. The four
+selected module paths are respectively:
+
+```text
+tests/target_price_revisions/test_document_consistency.py
+tests/target_price_revisions_qc/test_qc_extended_refusal_witness_controller_stop_accounting.py
+tests/test_active_document_consistency.py
+tests/target_price_revisions/test_offline_coverage_handoff.py
+```
+
+The runner asserts the physical lane path, prepends it to `sys.path`, sets
+`PYTEST_DISABLE_PLUGIN_AUTOLOAD=1`, denies socket create_connection/connect/
+connect_ex before importing pytest, and calls `pytest.main` with `-q`,
+`--noconftest`, `-p no:cacheprovider`, those four modules, the exact `-k`
+expression and `--tb=short`. Python itself uses `-I -B -` for the inline
+runner. This is explicit local test support, not a native-provider adapter.
+All three changed Python files AST-parse and compile in memory, with no
+producer import/execution or bytecode output. `git diff --check` is clean.
+The exact committed final-tree reprise is reported with the handoff; no
+native Mac, complete module, QC-package or repository green claim follows.
+
+Complete lane/repository suites are not rerun under the retained focused
+Codex contract and latest recorded no-full-suite scope. No completed roadmap
+milestone or native acceptance is claimed. Compilation parses source in
+memory without importing/executing producers or writing a bytecode tree;
+Git diff checks and final path inventory are independently checked.
+
+### 102.6 Scope and next action
+
+<!-- TPR-CCR31-SCOPE:START -->
+| Boundary | Scope |
+|---|---|
+| Counter-review | Both incoming Claude commits in exact order and cumulative tree |
+| Inputs | Public source, Git objects and synthetic fixtures only |
+| Native/controller admission | Shipped dispatch remains closed; no genuine adapter, active permit or native custody proof |
+| External and private effects | Zero QC, Safari, Mia, provider, credential, private packet/receipt or operator-state access |
+| Attempts, jobs and looks | Zero new; OFF three historical Codex failures, ON zero and 33 observed looks retained |
+| Resource release | Not checked or consumed in this counter-review; future QC scope still needs fresh verified owner release |
+| Recorded scheduling | Section100 future-checkpoint waiver and prospective cap supersession retained; no historical reset |
+| Monitors and siblings | No monitor change, new trigger, sibling source/worktree inspection or sibling edit |
+| Implementation milestone | None started; this requested round is counter-review only |
+| Other authority | No purchases, upgrades, provider substitution, frozen-economics change, broker, paper or live actions |
+<!-- TPR-CCR31-SCOPE:END -->
+
+Canonical admission is not authorized; no real-row canonical D1 is authorized.
+This review grants no QuantConnect launch, Mia launch, ON launch, notebook,
+upload, broker, funded, paper, live, capital or trading authority. Historical
+source restoration is not full-window OFF accounting. F017/F018/F019,
+CR23-001, OFF98-010, CR30-005, source-rights/retention, historical identity/
+action provenance and all six canonical/TR0-I/TPR-1/TPR-0B gates remain open
+at their actual scopes. This round adds no new paperwork gate and treats no
+rights waiver as provider or historical-availability attestation.
+
+The next bounded action is resource-release verification before any separately scoped QC recovery; this requested round implements no next milestone.
+This records future sequencing, not a release assertion or effect. The owner
+may ask for further independent review, but the retained future-checkpoint
+waiver is not replaced by a mandatory new Claude stop. No old scope, private
+receipt, historical attempt, expired operation or fixed producer pin is rebound
+to the new code. Later native work must bind its actual source closure and
+current scope prospectively; a synthetic test does not authorize dispatch.
+
+### 102.7 Durable same-lane handoff
+
+Last processed Claude range is exactly the range in 102.1. This round's
+correction and final record-only commit identities, exact bounded validation
+selection and public artifact hashes are recorded after the corrections are
+validated. Before staging or pushing, recheck physical/Git root, branch, HEAD,
+status and the actual matching remote; preserve any concurrent unknown work.
+Accumulate local commits and make only one non-force matching-lane push at
+the stable counter-review endpoint under the standing lane workflow. Stop on
+unseen remote changes. No history rewrite, separate branch or automatic
+native/monitor continuation follows that push.

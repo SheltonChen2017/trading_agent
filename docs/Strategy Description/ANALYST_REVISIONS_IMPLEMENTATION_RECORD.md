@@ -2179,7 +2179,11 @@ only QQQ/REMX CUSIP-vocabulary predicate failures in its nine public probes.
 T is SPENT. U's offline exact-byte syntax inspection passed once(323.69):
 QQQ/REMX actually use three/four space-separated tokens; U is SPENT.
 The new current-route pipeline and V eligibility freeze(323.70) integrate
-the verified parser without changing old evidence. Insider's completed next
+the verified parser without changing old evidence. Actual V(323.71) cleared
+all9 used routes on full returned catalogs but then refused stocks status JSON
+after HTTP200; V is SPENT and early prices were not requested. W(323.72) is a
+new bounded status-shape diagnostic, not a V retry or coverage admission.
+Insider's completed next
 push/resource handoff is now recorded there and the one-shot monitor deleted;
 fresh QC gates and complete reference/NAV coverage still precede strategy
 continuation. Q does not identify P's historical changed field;
@@ -61886,3 +61890,162 @@ credential/licensed row/price/exception disclosure. All strategy/PIT/master/
 cloud-rights/paid-tier/paper/live flags false,336/259/52/699 unchanged. After
 actual observation choose the next justified coverage/identity/valuation step;
 do not call V a complete price package or launch a strategy on these9probes.
+
+### 323.71 Actual V cleared routing then refused status shape; V SPENT
+
+At cleanc265166d0d617444ddca19b920797b2afbae7420, sole V parent ran
+2026-10-26T07:07:06.697309Z..07:07:13.196425Z actual2/stderr0/no bound.
+Sole supplied-output native validator07:07:13.196664Z..07:07:16.404493Z
+actual0/stderr0/no bound, identical7951byte stdout SHA
+19dfbf561cb8026432341660baa636f565427fe20d58a23e4dceade736f83157,
+output_authenticated=true. External dispatch/poll brackets, not exact provider
+timings. V claim/parent/validator/control are SPENT; no reread/retry/repair.
+The prefreeze86record passes0.99s overlap394, not additive. No tests/edits
+occurred during the clean actual parent/validator. One final push remains.
+
+This is authenticated FAILURE: provider_status_json, stage=provider,
+claim_consumed=true, receipt=null/captures={}. Exactly3 application intents
+and validated HTTP200 statuses: stocks_metadata, funds_metadata, stocks_status.
+No funds_status/early-price request dispatched. Physical request count unknown.
+No accepted raw capture/report/manifest/price pin exists. The new catalog
+callback succeeded before route validation; its closed state is retained in
+output and metadata-catalog.json according to the fixed writer, not an
+independent final source-admission artifact. No V private control was reread.
+
+Returned stocks catalog21020 rows:20979 parsed vocabularies/41missing/0malformed/
+32326complete tokens. Funds10032 rows:10002parsed/30missing/0malformed/
+11923complete tokens. Thus71unknown missing vocabularies are explicit, never
+global no-collision. Two unrelated FIGI collision groups; perma/ticker/full-
+token collision groups0, malformed-overlap groups0 across these returned
+catalogs. These are observed subsets below fixed limits, not independent
+universe completeness. Canonical metadata rows SHA stocks
+e339c6a68271e42b2e7584d2237d00ed26a33974859ca57a76313fa3290b360a,
+funds35e8a24e673edd99040c35b3a06ec154bc71f86820645038b53072963598250e.
+
+All9 fixed required probes are unique/parsed/shape-true, with complete counts
+1/1/3/1/1/4/1/1/1 and zero perma/FIGI/ticker/same-table/cross-table/malformed-
+token overlaps for each selected route. The pinned actual flow reached the
+third HTTP dispatch only after require_probe_routes returned, including its
+fixed prior-date interval checks. This resolves I323-034 for this prospective
+current-routing scope; it does not authenticate S's discarded bodies, all6151
+identities, a permanent historical master or any price/NAV package.
+
+The stock status response was200 and bounded, but _decoded_secret_guard or
+_status mapped a JSON/schema/field/date refusal to status_json. Numeric200 does
+not prove application success. No retained body permits attribution to an
+exact field, error envelope, subscription expiry or a provider-format defect.
+Root read current [stocks documentation](https://sharadar.com/docs/stocks): its
+status=True example has exactly the same five expected fields and an aware
+ISO modified timestamp. Therefore the public example does NOT verify a fix
+to the failed predicate. Do not relax validation or assert an actual schema
+based only on documentation. ARV2E323-002 status-shape compatibility is OPEN;
+the original native price gap ARV2E323-001 remains OPEN. Current privacy/
+metadata source checks are not price coverage or historical availability.
+No provider failed-status body, credentials, raw rows/routes/prices or raw
+exceptions disclosed; no QC/Safari/capacity/job/look/cell;336/259/52/699 remains.
+
+### 323.72 Prospective W status-shape observation, not replacement acquisition
+
+Under current owner recovery/review waiver, investigate the actual finite
+status predicate before changing it. New W's coherent purpose is a first
+retained, safe structural diagnosis of exactly the documented stocks status
+response, not another V eligibility invocation, source acquisition, spent
+reader replay or resumption of V's unused price roles. No more full catalogs
+or licensed prices are required to learn the shape. Old V and every earlier
+source/control/attempt remain frozen/spent.
+
+Prospective ONE GET to the same fixed stocks endpoint with status=True,
+bounded8192bytes and fixed TLS/session/prepared/response identity, no redirects/
+retry/fallback/failed-status body. Claim/fsync before one existing Sharadar
+Keychain lookup and contact. The pure status helper will retain only known
+key-presence/type/equality/format classes, bounded counts/hashes, validated
+numeric sizes when applicable, and finite lexical error-category indications
+explicitly NOT authenticated causes. No freeform values, unknown raw keys,
+response body, credentials or licensed rows in durable/public output. Strict
+decoded JSON secret checks precede any body hash/receipt; malformed/non-UTF8
+body may produce only a closed nonJSON observation with no body hash or
+authenticated credential-absence assertion. Unsafe duplicate/nonfinite/depth/
+node shapes refuse rather than being normalized into success. No raw body is
+persisted. This is a response-format diagnostic; expected/error-envelope/nonJSON
+observations are not accepted bulk metadata or tier/price-source admission.
+Implementation/tests/source pins and separate committed exact one-shot host/
+HEAD/caller/profile/deadline/output decision remain required BEFORE contact.
+Prospective W control stays uninspected/unallocated; no W lookup/request/use
+occurred at this entry. No automatic provider or strategy retry follows.
+
+### 323.73 W implementation, bounded structural evidence and exact run freeze
+
+New helper scripts/arv2_r298_sharadar_status_shape.py20497bytes SHA
+5ed5da0208aae8b18580b2a1569b5fab9df5fd49c3dee3ccf2bda208c1b5f5cb;
+tests11712bytes SHAdb09e42878084905eee0fa29f5c25599faa2ed9f0299f4882dc1dfe0b8d6e04f.
+Helper canonicalNO-LF1547bytes SHA
+c2b268c23616834a742fc6f5ab6d9af2f2689e7b0cbf4c4a309a8bfbb2fc911b.
+New caller scripts/run_arv2_r298_sharadar_status_shape.py25735bytes SHA
+58a543c578466a8c9f90a2729c9b85bda24a59d2258a29e3fc3b4fa20d120092;
+tests12087bytes SHAce20ec7cbfeabe4a6279ee609cb32a0745909db2a71b8fd48660c57b488fd5fa.
+Exact canonical+LF caller profile20967bytes SHA
+01981a186bf5ebd48e106f726a7bc41b5e26a684446bc74d4f7a7071936105e1.
+All155 selected pins matched, including spent V caller/source and all inherited
+sources; no old operation/global mutation/source refresh. New W only calls
+its own fixed HTTP implementation and supplied-byte shape helper.
+
+Raw body remains RAM-only. Valid UTF8 strict JSON receives a body hash ONLY
+after raw-encoding and every decoded JSON string/key secret checks; maximum
+depth12/nodes512/objectkeys64, duplicates/nonfinite/unsafe bounds refuse.
+Malformed encoding/JSON produces finite format/bytecount without body hash,
+field evidence or authenticated credential-absence claim. Expected five keys
+and fixed error/message/detail/status/code/success inventory get types/hashes,
+not raw values or unknown keys. Numeric size and modified ISO/RFC/naive/type
+classes are observations only. Known error-word flags are untrusted lexical
+inferences, not expiration/authentication/entitlement causes. Pure legacy S
+_status is compared only on supplied safe bytes, not its CLI/HTTP operation.
+A current reproduction cannot authenticate V's discarded historical body.
+
+Root read complete helper/caller/tests and source differences. Final focused
+native-denied211distinct passes2.68s =90helper+34caller+86record/document+
+1research closure, no failures/skips/warnings. All4newfiles compiled in memory
+without bytecode, EOF/diff checks clean, dispatch_fence absent. Earlier211/
+2.52s overlap. Root first33caller selection had32passes/1fixturefailure3.40s:
+fake validator emitted noncanonical {} without requiredLF; fixed mock framing,
+not the real strict parser. Next211 selection had210passes/1fixturefailure
+2.59s: AST test read a live predecessor main already replaced by autouse
+operational denial. Corrected test to parse pinned source AST, retaining that
+denial. Intermediate33passes3.42s overlaps final. Storage primitives/preflight/
+main/native-validator construction match frozen V, with explicit new90s/8file
+bounds and no permitted private capture names/capture-reader method.
+
+Root memory-only actual-exit omission caught1expected failure0.14s; failed-
+HTTP-body guard omission1/0.14s, explicitly observed forbidden body-read count1.
+Restoredfinally/disk source unchanged. Author helper90passes3.25s overlaps;
+decoded-secret-scan omission1expected failure0.12s restoredfinally. Initial84
+passes3.36s subset and89passes/1overbroad static fixture failure3.05s (dict.get
+misclassified as network) remain qualified; AST named-operation inventory
+corrected only the test. No full suite or independent acceptance. No private
+response/Keychain/provider/QC operation occurred during preparation/tests.
+
+D-W: after THIS record/all4newfiles are committed in the exact designated
+root/branch with clean HEAD, invoke W observe ONCE with that HEAD and exact
+caller58a543c5 pin. Prospective private leaf
+newrule_sharadar_status_shape/R323-20261025-W remains uninspected/unallocated
+before invocation. Only designated Darwin/POSIX Python3.13 interpreter; one
+claim/fsync before exactlyone existing Sharadar Keychain lookup(timeout20s,
+no fallback), ONE stocks status=True GET, at most8192bytes, no raw body file.
+Parent90s/outer120s/native supplied-output validator20s/64KiB/max8controlfiles.
+Claim/intent/status/report or finite failure only; original own control FDs
+and ten held/named metadata/native ACL/xattrs retained through return checks.
+No filesystem-security claim for the RAM body and no continuous security or
+whole-interpreter pin claim. Network-enabled parent is not native-sandboxed;
+validator denies network/all production artifacts/Keychains/security CLI.
+TLS/prepared/response identities/no compression/redirect/retry/failed-body
+read remain strict. Malformed/nonlegacy shape may be an accepted DIAGNOSTIC
+observation with every source/price/tier/strategy flag false, never accepted
+bulk metadata. Actual parent0 AND validator0/empty stderr/no bound/matching
+closed output/report are mandatory; nonzero/unknown/late report is terminal
+spent/ambiguous, never accepted by report alone. Only own child kill/reap;
+no cleanup/repair/retry or old control/source read. Host suspension and
+uninterruptible I/O remain bound qualifications. Current owner review waiver
+covers this recovery; all adjacent source/rights/financial gates remain.
+No price request, QC/Safari/capacity/job/look/cell or new paid right;
+336/259/52/699 unchanged. Choose a verified correction or genuinely different
+admissible acquisition step after actual evidence; do not replay V/W or use
+lexical flags as an account-state verdict. One final matching-lane push remains.

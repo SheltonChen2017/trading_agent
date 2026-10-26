@@ -849,7 +849,10 @@ date(323.49); O is SPENT, with no strategy price/NAV admission. Next the separat
 native identity/adjacent-series/within-job-phase P diagnostic(323.51 onward).
 P then stopped before source mutation/compile/job on a changed exact general
 collaborator-row pin(323.54) and is SPENT. Next Q's bounded read-only current
-access representation observation, not a pin refresh or stale-price bypass.
+access representation observation. Q then passed both unchanged policies with
+only the original owner in both views(323.57), and is SPENT. Next R's separately
+claimed second attempt of the same P experiment, with STRICT original owner/A5
+admission and fresh gates, not a pin refresh or stale-price bypass.
 One final push; no funded or paper/live deployment authority is inferred.
 
 Branch: `codex/strategy-analyst-revisions-v2`
@@ -2161,9 +2164,12 @@ once(323.49) and is SPENT. Its one positive exact-date vendor close is not a
 strategy reference/NAV package or source admission. P's new native-identity,
 adjacent-series and within-job phase protocol(323.51 onward) then refused the
 current general collaborator-row pin before mutation/job(323.54) and is SPENT.
-Q's separately frozen read-only access observation(323.55 onward) is next; no
-blind pin refresh or strategy attempt is authorized by that observation. No
-cross-job native-SID continuity or market-wide absence is inferred.
+Q's separately frozen read-only access observation(323.55 onward) then passed
+both unchanged policies with original owner only in both views(323.57) and is
+SPENT. R's new strict owner/A5-only recovery(323.58 onward) may attempt the same
+P scientific experiment only after its separate source/run freeze and fresh
+gates. Q does not grant a capability or identify P's historical changed field.
+No cross-job native-SID continuity or market-wide absence is inferred.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
 V3 is spent after its
@@ -60946,3 +60952,164 @@ A5 pin; no production relaxation. Preserve that red baseline. No complete
 Codex lane/repository suite or independent acceptance. Main read all new
 caller/test code and old pure helpers before the run freeze. No actual Q
 control/credential/API observation occurred before this entry.
+
+### 323.57 Actual Q current access observation passed; Q SPENT
+
+At clean7b0308689671f13b860f637669ee56843d3a9241, sole Q parent dispatched
+2026-10-26T02:54:11.016015Z and completion observed02:54:15.399574Z, actual0/
+stderr0/no bound. Stdout7618bytes SHA
+f091b04ee1d43d7a82b0b6ac2b60721e6ff9315053bd636b9dfa5bf2a3c19eb6.
+Sole native supplied-output validator02:54:15.399743Z..02:54:18.943317Z actual0/
+stderr0/no bound, identical stdout pin, output_authenticated=true. Report7489
+bytes SHAfcb51efa2efbf6482ca9bc2a216442ba12704eca73de06fa7e6c2bd3560f0933.
+Q claim/parent/validator/control are now SPENT; no reread/retry/repair/cleanup.
+
+Exactly two authenticated application metadata observations: general and
+dedicated each contain EXACTLY ONE original pinned owner row707a30618e122e49
+fe6fa75364451b5b7c50e1019a68a89ffc0cd3ae3c8e0b78. Positive owner UID matches
+the project in both views, write/liveControl permissions remain exact. The
+general list contains neither the old A5 nor any Mia/unknown row. Original
+57333 and current18cf policies BOTH pass, without modification, extraction,
+new full-row/publicId pin or semantic waiver. Project/org/name/language/owner
+scope matches; codeRunningfalse/publicfieldabsent. General response SHA
+955ee12096182b06b002aa64052c50b8628eef370537f956a7203caada40e618;
+dedicated924558b9d04888f46f4705e24260a62e4c482f647e081d18ba5b09be115d9127.
+Full owner field inventory has nine safe keys with types/value hashes only;
+no raw owner UID/email/publicId/biography/avatar URL is exported in this record.
+
+Q does NOT recover which earlier P row/field changed or prove why the entries
+disappeared; temporal relation to editor close/Mia completion is not causality.
+There was no new row to admit or reason to relax the old policy. Equal owner/
+dedicated endpoint hashes are not continuous stability/atomic-view/lease/privacy
+proof. All observation authority/readiness flags stay false. No private source,
+provider-data, file, capacity, source mutation, lock/member/permission, compile,
+job or result request occurred. No look/cell is booked; floor335/259/51/699
+unchanged. Last authenticated cloud source remains N, not refreshed by Q.
+The final86record repeat1.12s overlaps157, not additive; no test/edit during
+Q's clean parent/validator use.
+
+### 323.58 Prospective R strict-access recovery of the same P experiment
+
+The actual condition changed: Q freshly observed the original owner only and
+both unchanged access contracts pass. Under the continuing owner research/
+recovery delegation and Claude waiver, root selects a separate R recovery,
+not a new scientific candidate or permission to reinvoke P. This is attempt2
+of the SAME three-History P experiment: attempt1 refused pre-job, so its source
+has NEVER executed in QC. Preserve that unsuccessful attempt and the generic
+three-attempt ceiling; a fourth is not silently inferred. Existing root has
+already consulted Mia for this source/data barrier. No strategy result cell
+is requested here.
+
+Material recovery is narrower current access plus new claim/worker/output
+bindings: R permits only the original57333 pinned owner, optionally its exact
+known A5 automation row, with all original dedicated-owner/idleness/privacy-
+contradiction/permission checks. NO Mia extra is extracted/admitted, no new
+actor, row pin, ownership, permission or lease is inferred. Every fresh check
+still binds actual current responses, so Q's receipt is documentary evidence,
+not a reusable capability. If access changes again, refuse. Do not reopen the
+editor or create another Mia task during this recovery.
+
+A small pure remote subclass may reuse P's source/hash/history/compile/job/
+result lifecycle, overriding ONLY _access to the original strict verifier.
+Do not alter P globals/source or invoke its spent CLI/main/run/observe/worker/
+control. New R parent owns its own exact source/claim/native worker intents/
+exclusive starts, source/input reauthentication, deadlines and output checks.
+P's public scientific projection/profile/generated sources/metadata schema and
+first-ever P job name remain identical; R outer schema/control identifies the
+operational recovery and source-bound stricter access, not a claim that the
+scientific design was changed. Preserve literal N source11files/seven prior
+jobs as the preimage and all P timing/result/no-order restrictions.
+
+Prospective leaf newrule_reference_series_recovery/R323-20261025-R is NOT
+inspected or allocated. Q/P/H/O and all other old controls stay SPENT/unread.
+One new actual job create, if reached after the separate exact run freeze,
+books335/259/51/699 ->336/259/52/699 exactly once. Before create book nothing.
+No alternate source/price/cache/selector, performance cell, paid entitlement,
+funded account, broker, deployment or paper/live action. If the native data
+question still has no admissible fix, retain the concrete source/coverage
+boundary rather than fabricate strategy readiness. One final push reserved.
+
+### 323.59 Exact R source/run freeze and validation
+
+Main read the complete new pure wrapper/tests and compared the whole new caller
+to the already audited P source: only new R identity/claim/support paths,
+strict57333 access import, wrapper/source pins and documentary recovery profile
+change. The AST comparison proves all nonidentity parent protocol methods are
+the frozen P methods after masking only R claim/temp-name identities. The
+wrapper overrides only _access; no frozen module globals or old operational
+entry points are modified/invoked. P's source/scientific profile/result/job
+binding stays exact, while the outer R claim/output/profile identifies the
+second operational attempt. This is not independent review or a newly green
+strategy candidate.
+
+| File | SHA256 |
+| --- | --- |
+| scripts/arv2_r298_reference_series_recovery_remote.py | 97720be665116c2a8cc66639890ae59f0a3214b3284bf3b555338d3a962a60f3 |
+| scripts/run_arv2_r298_reference_series_recovery.py | 4690e87fe23d9cdb6112670b24461ed36060773ae12a13c7e45edf4df983ab3a |
+| tests/analyst_revisions_v2/test_r298_reference_series_recovery_remote.py | 4554b3c18421a65fbea05df9f7743eea8682b97b87e31da55f7fadfcc3815048 |
+| tests/analyst_revisions_v2/test_r298_reference_series_recovery_caller.py | 58b314bc2310f4a1da4ab507355d5a6a63163b0a52e1cf18af3341541509f85a |
+
+Canonical+LF outer arv2-r298-reference-series-recovery-r-v1 profile27863bytes
+SHA11941b453e1f39dfad11add9a683ffd139af1771468b29956db829808d22bfc1;
+pure wrapper profile8017bytes SHAe57919e804bdba62271e70d7421ff4d6831972c0d52bf2adffd93aca1155a24c.
+All138selected dependencies match, not whole-interpreter integrity. Scientific
+P projection73b8c8f2cd54a227798d83f65846ca90ff80cd7a7d016563a47abaa8c2a0bf9e,
+profile66c49c90e0b45cfb892dbfdedb6ca7e7d110508de353a0fc8250bfdf91be32ff,
+manifest+LFb5ebe76c779ede0065552da2bb8377860766acc949d7e75ea853e781af55aea7
+and generated main/runtime pins323.53 remain binding. No new data-source,
+current-census constant, price/NAV/scalar or economic change is introduced.
+
+Under the continuing explicit owner recovery/research/review waiver, D1
+selects ONE R parent and its once-only supplied-output native validator from
+the next clean designated Mac/Python3.13/root/branch commit containing these
+exact bytes/record, bound by actual --expected-head and caller SHA. Current
+pre-R HEAD7b0308689671f13b860f637669ee56843d3a9241 is not the run HEAD. All
+fresh original owner/A5-only/access/idleness/source/history/compile/capacity/
+input gates remain mandatory; Q/H/P outputs are documentary, never capabilities.
+No new Mia chat/editor opening or actor/lease/pin relaxation is included.
+Actual codeRunning/owner/source drift refuses; only own children may be killed.
+
+All323.53 operational bounds/exclusions apply unchanged: parent1200s/outer
+1230s/two120s native input workers/20s supplied-output validator; persistent
+exclusive R claim/intents/start markers before private admission/API contact;
+initial existing QC environment shape handoff is qualified as before. Max160
+application dispatches, two exact source updates, one compile/create, bounded
+60x>=1s build/3x>=60s capacity/20x>=30s status(first immediate), one own selected
+aggregate/error read, no cleanup/alternateoutput/unchanged retry. Normal990s
+scheduled waits/workers leave overhead, not a worst-latency completion promise.
+No P/Q/other old control read; worker/validator native policies explicitly deny
+them, and the output validator denies all production artifacts/Keychain/network.
+Only a genuine actual job-create dispatch adds336/259/52/699; no performance
+cell. R's public scientific job name remains ARV2 R298 REFERENCE SERIES PHASE
+R323 P because P's code has never been launched; its receipt is scientific P,
+outer output/claim is operational R. Never count a duplicate P job/look.
+
+Actual parent0 plus native validator0, exact complete selected metadata and
+all original postchecks/final fresh admission are mandatory. Pending Init/
+RuntimeError/unknown/late/nonzero outputs stay nonadmissible, even if a report
+looks completed. On failure preserve bounded finite observations, classify
+the actual cause only to retained evidence, and continue only with a coherent
+verified correction under the real attempt rules. No strategy return, paper/
+live flag, funded action or efficacy claim follows from a diagnostic.
+
+Root final139distinct passes7.69s(7remote+45caller+86record/document+1closure),
+no failures/skips/warnings; all138pins/four new file pins/two profiles/four
+in-memory compilations pass. Earlier139/7.91s and author's52/10.41s,52/9.32s,
+51/9.32s overlap, not additive. Strict native network/production-artifact/
+Keychain/security denial, all inroot support paths, disabled plugin autoload/
+--noconftest/-B/no cacheprovider and dispatch_fence absent. No complete Codex
+suite. Root's first narrow-access omission hit1fixture KeyError busy0.19s,
+NOT sensitivity evidence. Root corrected only the test seam to the real former
+broader18cf verifier; corrected memory omission caught1DID NOT RAISE expected
+failure0.18s, restoring finally with production disk hashes unchanged. Test pin
+above supersedes author ebe9ab7b; production/profiles remain unchanged.
+
+Retain authors' initial44passes/2failures/5fixture errors9.38s from reused
+synthetic fixtures expecting previous/failure_evidence seams. Added a pure
+finite-error projector export and a test-only previous alias, no operational
+fallback. Strengthened test's51passes/1fixture failure9.51s still had a fake
+old-verifier seam; corrected before final52green. ARV2I323-026(P3) is this
+mutation-fixture sensitivity gap, corrected prospectively by the root test
+seam and true red/green proof above, not erased or called an operational
+failure. Same-round authors/audit are not independent acceptance. No actual R
+leaf/private/credential/API call has occurred before this entry.

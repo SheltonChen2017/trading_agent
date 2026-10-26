@@ -34995,3 +34995,72 @@ actuals finish; then resume278's unqualified query-free engineering.
 No backtest/outcome/strategy launch, readiness, full coverage, identity/PIT or
 rights is created by this correction. Same single final push, no checkpoint
 push or routine approval pause; no final handoff yet.
+
+## 280. Failed plan CLI, independently qualified retained candidate plan (2026-10-25)
+
+276–279 and the corrected campaign were committed on already-existing clean
+`d177c941159ff22f2932d1a4c72f4fa361cb7354`; post-record124 focused checks passed
+4.85s, origin41d729af unchanged. ALL writers/tests held. Main ran registered
+launch2 LOCAL plan once using the direct trusted parent. It exited2 after
+296.985888875s with generic `campaign_plan_refused`. At one read-only process
+metadata observation the linked child had4m28s elapsed/4m09s CPU,98.7% CPU and
+886,448KiB RSS; this was activity evidence, NOT progress/completion. No
+contact/collector/transport/provider request or outcome occurred.
+
+All THREE candidate controls were published. `IBPARENT-PLAN-OBS01` P2 OPEN:
+the operation remains FAILED; complete-file existence does not prove its
+publish returned, final controller.check or cleanup passed. Source narrows the
+failure to the final complete publication/check/cleanup region, not an exact
+guard/cause. New-lock strict ctime settling is only a prospective hypothesis.
+No actual exception/traceback/stderr was retained, and a later passing readback
+does NOT establish the historical cause or retroactively succeed the CLI. This
+is distinct from both archive observations and the earlier selector/title
+observations. No guard, receipt or namespace was weakened/revised/resumed.
+
+Main separately observed strict native-denied SH-lock/held own-metadata
+readback, initial/pre-first-read/post/final ctime/inventory/ancestry/byte checks,
+then the existing HeldBatchPlan schema/crosslink/current/frozen-source checks:
+exit0,0.711350500s after imports. Externally observed candidate control pins:
+
+- reservation17,280B SHA
+  `e5d228ffa66191fb822006d8b40cfdea2f0e1c2b218ae4a2d46ab0675edde153`;
+- plan776,704B SHA
+  `3e54de6b0c5e9355ed83610f447fa86ad461f990ac36d41ed35ab5ee9640a555`;
+- complete16,289B SHA
+  `c2ca4549c6ce73a7ef1bc89340bb03de8d73a2d972f45186118acdb4fedbbe68`.
+
+Exactly64 selected, logical batch1; producer d177c941, source inventory
+`dcacf980baf1a32da88d8900431059ff801bbceb079fe04fda67fad7362fb235`.
+Separate trusted-parent held/control-EX readback proved ALL120 original
+producer Git images and exact current controller inventory/lock: exit0,
+1.596649834s. These checks read own metadata, NOT another full source execution,
+provider data acquisition or parent capture. Native reader enforced initial
+network/fork/ALL-write/Keychain-exec denial; parent Git proof needs fork and is
+not represented as a fork-denied child. Original CLI remains failed in BOTH
+results. The old launch1 failed reservation also remains untouched.
+
+Main's delegated engineering disposition: accept only this RETAINED CANDIDATE
+PLAN'S source/control contract for the previously registered first64 capture,
+NOT the failed operation as successful and NOT any parent as acquired. Review
+of the actual capture contract confirms it requires exact external plan/
+complete/producer pins, original Git proof, then a new full25-source native
+rederivation and EXACT-plan equality BEFORE contact, capture output or dispatch.
+It does not add a separate planner-CLI-exit0 gate. Use that unchanged guarded
+path; no preparer rerun, new planner alias, filled namespace, rewritten receipt
+or weakened custody check. This is an explicit prospective acceptance after
+independent control qualification under the owner's delegated judgment, not
+manufactured evidence or retroactive authorization of an external request.
+
+After this record is committed cleanly with all writers held, activate ONLY
+the existing never-created collector batch1 with plan3e54de6b/completec2ca4549/
+producerd177c941. Current capture HEAD must be the new already-existing clean
+commit. Native current-source rederivation must still pass. A precontact
+controller/source/input refusal means STOP with zero new requests; any started
+transport remains one-shot/consumed even on ambiguous failure. Preserve every
+root; no automatic retry. Independently verify completed capture against its
+externally observed complete/plan/index pins before any continuation. This
+registration creates no later batch or strategy/outcome/backtest authority.
+
+Six carried topical/shared P2s, both archive-observation P2s and the NEW
+IBPARENT-PLAN-OBS01 remain OPEN within their exact scopes. No readiness claim,
+purchase requirement, interim push or final handoff is substituted for work.

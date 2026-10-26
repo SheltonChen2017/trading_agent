@@ -35203,3 +35203,240 @@ source contract still requires complete primary XML plus exact acceptance per
 accession, not TSV plus metadata alone. No repeat of consumed archives or blind
 third full GET; no source-policy weakening, economic change or new purchase.
 No final handoff/push yet; continue until honest readiness or concrete blocker.
+
+## 283. Composition prepared, NOT cloud-executed; owner reconfirms UI occupied (2026-10-25)
+
+281–282/new pair committed as already-existing clean
+`0ebcafed5de1c3d51a6492a8d1e7e1a914072e6f`; post-record124 focused checks
+passed3.94s, matching origin41d729af unchanged. All writers held. An initial
+local `python -I -S -m research...` invocation exited1 before module import:
+isolated Python omits this checkout from sys.path. No preparer, root, nonce,
+intent or QC action occurred in that invocation. Main then used the explicit
+fixed-root `sys.path.insert` direct-parent bootstrap, built-in native child,
+unchanged source/scope and already-existing clean0ebcafed. Preparation exited0
+after52.181535084s. This is a pre-import launch correction, not a retried or
+reset consumed intent, cloud query or backtest candidate.
+
+Protected five-leaf intent prepared ONCE; nonce
+`21d4cbbf011dea1b3c74a12ff9a0362d001fbd7a0ed9623a44beb6ba43363451`:
+
+- cell31,537B SHA
+  `054949654b09a7343ab02745ce351650936c6119133733c94e8e2b45208b842b`;
+- registration `ac58c0e9bc1d44d8e03687182b5ebd37685eeb567e0a93eb45c7dd9a9a75d6dd`;
+- intent `ce22466c4c5e762df4e6ff1adfcd026650188ab9d8cd613b3eafab76ce5702d0`;
+- ready `9f8e540a53ab351862956f992cd7471ad727221efb0abf1f1b7b3d83c57d7bbf`.
+
+Actual113-source inventory
+`0e2874d302779ad306a4d1367ec74171ffd554b19feaf47caf5eef03532abdb2`.
+Main independently observed own-control readback exit0/0.609484834s after
+imports, initially native network/fork/ALL-write/Keychain-exec denied:
+exact inventory, protected held leaves, external hashes, initial/final ctimes,
+current/frozen/loaded source and exact registration/cell regeneration. This
+read no financial data/credentials/SDK/store and did not activate the cell.
+
+Before transfer, native Safari read-only state showed ANOTHER lane's Analyst
+Revisions project38364439, not Insider37465795. Main did not navigate, edit,
+launch, query or consult that project's Mia. The owner explicitly confirmed
+another lane is still using QC/Safari. Hold all QC/Safari interaction until
+released. The prepared root remains permanently claimed/unexecuted; preserve
+it, do not reprepare/reset/rename, and do not infer live predecessor context
+from saved notebook output. When UI is released, perform282's full own-source
+transfer/verification and new cell2 ONCE only if its original context is usable;
+otherwise record refusal without repeating consumed predecessor operations.
+This temporary UI contention does not stop safe offline engineering and is
+not a dataset-purchase requirement. No strategy launch attempts or outcomes.
+
+## 284. Required original-parent quarter union and efficient transport decision (2026-10-25)
+
+Main independently reproduced221's exact supplied-calendar159,412B/cf89f637
+and pilot-plan383,551B/f74310ad in memory under initial native network/fork/
+ALL-write/Keychain-exec denial, -I-S-B/exact cache prefix, explicit installed
+calendar-package path: exit0/1.806116833s. No retained artifacts, prices,
+financial data, provider/QC or credentials. This proves byte reproduction of
+the declared calendar candidate, NOT exchange authenticity or runtime pricing.
+For EACH entry, the actual production composition derives lower=dates[index-30]
+and includes each quarter intersecting [lower,entry]. Across ALL1,255 declared
+AND1,015 included schedule labels the exact union is21 contiguous quarters
+2020Q4–2025Q4. First2021-01-04 lower2020-11-18; last2025-12-31 lower2025-11-17.
+The independent peer's same-pin reproduction remains separately attributed.
+
+Delegated prospective decision: focus NEW original-parent acquisition on that
+genuine required signal-window union, while preserving the full25-quarter,
+all-six-form census, original/refusal inventories and all context records.
+2020Q1–Q3/2026Q1 remain accounted context; they need not receive complete
+originals solely to satisfy these entry windows. This does NOT remove listing/
+price warm-up, earnings boundaries, amendments, missing/refused rows or causal
+cutoffs. New2020Q1 first64 custody remains real and preserved, not an ordinary
+2021–2025 entry input. Do not mutate executed campaign-v2 policy/root into a
+different selector; use an additive prospective source selection/transport.
+
+The normative source contract requires one exact acceptance artifact and one
+complete primary ownership XML per relevant bulk4/4-A accession; it does not
+mandate one complete-parent HTTPS GET per accession. Daily Feed/Oldloads are a
+candidate equivalent TRANSPORT, not relaxed evidence. ALL4 TSV +timestamps or
+retrieving originals only for observed mismatches would change that contract
+and is NOT adopted. Actual NC member framing, complete XML, issuer/owner/
+accession/form joins, correction/deletion lineage and historical availability
+must still be evidenced. No assumption that a filename proves a256-byte PDS
+prefix, or that a later/current ticker/name is historical identity.
+
+Continue additive pure bounded multi-member-gzip/physical-TAR/framing
+qualification with finite phase refusals, then separately qualify ONE new
+2020Q4 directory metadata response before any light-day archive registration.
+No archive/member request is authorized by this design note; June16/18 remain
+consumed/unretained with exact causes unknown, never repeat/alias them. Decide
+retention explicitly before any compact-only original-member storage; no silent
+discard or forged frozen parent projection. No new purchase blocker established.
+Nine OPEN P2s unchanged; no backtest/readiness, final handoff or push yet.
+
+## 285. New required-window Q4 listing collector qualified and preregistered (2026-10-25)
+
+Additive source `research/insider_buying_sec_feed_directory_q4_v2.py`45,064B
+SHA `eb26edea5e854834bcfa25b61b312dd7aaee2c91635d00b21d943041c6807c5b`,
+tests32,901B SHA
+`13d344dcdfab2f95aa3500aa03f3a7d4a8f6d88aa3ef7dbc2d0deb72f9fb13f5`.
+Earlier executed Q1/Q2 directory sources/roots stay frozen/consumed. The new
+profile uses the independently qualified retained Q2 FIVE-string JSON item
+shape (href/name/type/size/last-modified), prospectively for Q4; it is not the
+earlier unqualified four-field/integer-size candidate and is not HTML. Exact
+same-item relative/dot-relative/path/HTTPS hrefs only, real2020Q4 dates, unique
+nc.tar.gz names, original order/lexemes. Opaque directory display strings are
+NOT lookup identity. Positive lexical KB advertisements do not establish base,
+rounding or actual archive bytes; no archive is chosen/followed. Safe complete
+HTTP200 is privacy-screened and retained BEFORE profile parsing; a later parse
+refusal permits offline qualification, never a repeat request for this URL.
+
+Only the trusted actual front grants a registered transport activation after
+clean committed Git/current/frozen/loaded closure proof and initially strong
+native-denied source/control-capacity preflight BEFORE namespace/contact.
+Private constructor/invented identity/noop guard do not self-register real
+transport authority. Fixed request/header snapshots, durable EX-locked
+claim/start and full guards precede one raw opener; absolute30s alarm,
+512KiB response ceiling, no proxy/redirect/retry/alias/HEAD/Range/archive follow.
+Protected anonymous-stdin contact only, echo protection BEFORE argument parsing,
+no value/hash/argv/env/control/log retention. Finite framing/privacy precede
+response/header hashes. Independent readback SH-locks scope, binds initial and
+pre-first-read/full-boundary ctimes, exact inventory/ancestry/FD/bytes and all
+canonical crosslinks. Own allowlisted phase/code diagnostics distinguish
+source/native/no-output from namespace/transport/publication/final/cleanup;
+foreign exception messages are never emitted. No old failure is rediagnosed.
+
+`IBFEED-Q4-PRE01` P2 CLOSED prospectively: main observed hash-pinned preceding
+59d4698b code reuse an existing EMPTY final root and invoke dummy opener1;
+expected-refusal assertion genuinely failed, exit1/0.6276785s. This was an
+invented temporary fixture under native network/Keychain/lane-write denial,
+NOT an actual provider incident. Corrected NEW source exclusively creates the
+final component using a held no-follow ancestry chain BEFORE all outputs,
+contact/claim/dispatch; preserves/rechecks it through cleanup. Main's matching
+green covers both empty base and empty base/claims/runs, zero contact/opener
+calls and unchanged inventories, exit0/0.524842625s. Author/peer independently
+reproduced the gap; exclusive-last reversal produces two genuine reds.
+`IBFEED-Q4-PRE02` P3 CLOSED: peer found initial readback-inventory-stat failure
+leaked its newly opened directory FD; narrow new-constructor cleanup preserves
+the primary exception and regression/reversal prove closure. Draft literal-dot
+regex escaping was also corrected before activation; valid decimal-KB/plain
+filename success tests retain the actual observed profile, not a weakened one.
+
+Main read full final source/tests and independently observed385 relevant
+directory/retained-profile/control-codec/record/active-document/boundary/EXACT
+checks passed6.78s under native process-tree network/Keychain/lane-write denial,
+isolated Python/cache/plugins. Initially strong native network/fork/ALL-write/
+Keychain-exec-denied source-only compile/worker/control-capacity proof:
+109 images,1.011604458s, inventory
+`712d34006b566991545ef2b77695910b58845c3015109684363705fd403c72d2`;
+reservation15,249B/complete15,519B. Synthesized uncommitted identity is NOT a
+clean-Git actual preflight or real input execution. Author-attributed175
+focused3.90s, nine guard reversals14 genuine reds across preceding/final
+images,108-image source proof1.395s; peer independently observed final175
+focused5.24s. These are distinct runs, not main evidence or Claude review.
+
+Register ONE prospective metadata acquisition under the owner's active source/
+continuous-build delegation: audit
+`ib-sec-feed-directory-2020q4-20261025-once`, fixed ONLY
+`https://www.sec.gov/Archives/edgar/Feed/2020/QTR4/index.json`, new root
+`artifacts/insider_buying/sec_feed_directory_q4_v2`. This unused required-window
+listing is not either consumed June archive, an alias/retry or an outcome look.
+After final source/record commit on this lane, matching-origin verification,
+all-writer freeze and clean already-existing HEAD, activate direct trusted
+parent ONCE (NO outer Seatbelt wrapper). Supply private SEC contact once only
+after protected stdin is active; native source health/capacity precedes its
+read. Stop/preserve on any refusal; never reset/reclaim this namespace. Observe
+exact report/body/inventory/producer/source pins, then run strict native-denied
+readback anchored by observed report and trusted original Git identity before
+any selection decision. No archive/member request, accession acquisition, new
+API-key read, QC/Safari/SDK, strategy job, registered/outcome look or backtest
+is authorized by this registration. A directory is not a complete population,
+acceptance/publication/PIT/rights evidence or corpus/readiness. Nine carried
+OPEN P2s remain unchanged; the two new prospective findings above are CLOSED
+only within their stated scopes. Continue offline; no final handoff/push yet.
+
+## 286. Pure additive bulk-container format engineering completed (2026-10-25)
+
+New `research/insider_buying_sec_feed_format_v3.py`22,250B SHA
+`acfd242f083809a67510d96ab8129dc8da02bdbe17f930f475f7da40c58cd675`,
+tests18,170B SHA
+`4057b4764abdaae73bbe822aa5ec992d1db2922b4fce294b308f57743bfebb45`.
+Pure supplied-immutable-bytes API only: no file/data/transport/credential/SDK
+access or extraction, no actual input acquired/inspected. Reuses the exact
+frozen v2 finite privacy scanner as a dependency, not its actual acquisition
+front; pin text is explicitly NOT runtime attestation. A later actual wrapper
+must prove initial native isolation and exact current/loaded dependency bytes.
+Production-shaped input needs explicit validated contact; missing contact only
+allowed for explicitly unscreened invented fixtures, never false privacy proof.
+
+Two bounded streaming passes over the SAME immutable compressed bytes: complete
+finite compressed/decoded privacy and CRC/integrity FIRST, source/member SHA
+descriptors ONLY afterward, with identical non-hash structure. RFC1952 member
+boundaries can split one continuous TAR header/payload; each gzip header/optional
+field/FHCRC/CRC32/modulo-ISIZE and every compressed/decoded byte range is bound.
+Global/per-member expansion, input/decoded/header/metadata/member-count/size
+limits only narrow fixed finite maxima. No extra stream/junk silently skipped.
+Finite V7/ustar physical framing profiles, checksum/size/offset/padding/end
+accounting are NOT full POSIX/GNU support. PAX/GNU/link/unsafe/duplicate paths,
+oversized or noncanonical members remain explicitly refused/opaque; raw name
+identity is preserved without extraction/normalization. Physical framing and
+supported member profiles are separate flags; retention/extraction/admission
+authority is permanently false. Second TAR after terminator refuses. Partial
+payload/padding/header, nonterminal/pending zero blocks and trailing bytes keep
+their exact observed extents/identities instead of inventing missing bytes.
+
+Only opening/terminal-token SHAPES at exact offsets0/256 are observed. A256-byte
+prefix stays opaque; no blind strip, PDS-field validation, primary ownership XML,
+acceptance, issuer/owner/form/transaction/PIT interpretation or forged frozen
+CompleteSubmissionProjection. No new native helper claims it has reconstructed
+the actual NC profile, either June failure, official authenticity, complete
+filing population, processing rights or backtesting readiness. The old v1/v2
+executed sources/bodies/refusals are unchanged and cannot be retried via v3.
+
+Main fully read final source/tests and independently observed366 relevant new/
+frozen-v2/record/active-document/boundary/EXACT checks passed6.97s under native
+process-tree network/Keychain/lane-write denial, isolated Python/cache/plugins.
+Strong native network/fork/ALL-write/Keychain-exec-denied source-only113-image
+compile/frozen-privacy proof plus invented two-gzip-member continuous-TAR control
+passed0.942098083s, inventory
+`a0eb4ce41c3990d4b6067b464ee1843887735b862632717f8917d08891bc442e`.
+An initial MAIN ad-hoc control assembled a six-byte magic into an eight-byte
+slice and shortened its invented header; its expected-good assertion failed.
+Corrected ONLY that command's fixture to exact eight-byte magic, unchanged
+production source/guards, then passed. No actual input/intent was involved.
+
+Author-attributed294 focused6.03s,12 memory guard reversals with genuine reds,
+restored83green0.97s and strong native103-image proof0.42492s are distinct.
+Final-image invented8MiB random payload/8,391,330B gzip two-pass control passed
+7.88716s; an earlier author command had its own malformed-magic fixture. Neither
+synthetic timing diagnoses actual June throughput/cause or promises bulk speed.
+Independent peer observed135 focused4.37s plus one genuine CRC-guard reversal
+and restored eight controls. This is engineering QA, not Claude review.
+
+Prospective findings CLOSED in this NEW pair only: P2 truncated-member/
+trailing byte-accounting and finite limits-type defects found by faithful tests;
+P3 repeated trailing-separator misclassification independently prompted by main
+(one genuine red), and peer's pending-zero-plus-partial-header lost extent (two
+genuine reds). Author corrected exact accounting/refusal, not guards/admission
+policy; restored tests and independent peer acceptance confirm the scopes.
+These are not actual acquisition incidents or closure of the nine carried OPEN
+P2s. No archive GET/HEAD/Range or retained-body inspection is registered by this
+pure milestone. Commit285–286 together only after final checks; then all writers
+hold through285's ONE new directory operation and independent readback. Select
+or acquire no archive before its directory evidence and separate bounded
+format/custody registration. QC/Safari remain occupied as283; no final push yet.

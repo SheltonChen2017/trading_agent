@@ -29,19 +29,26 @@ from research import insider_buying_pilot_sec_parent_capture as first
 from research import insider_buying_sec_feed_archive_sample as archive
 
 base,audit,roster,fresh=source.base,source.base.compiler,source.base.roster,source.selection
-SCHEMA="insider-pilot-sec-parent-campaign-v2"
+SCHEMA="insider-pilot-sec-parent-campaign-v2-launch2"
 SELF_PATH="research/insider_buying_pilot_sec_parent_campaign_v2.py"
 TEST_PATH="tests/test_insider_buying_pilot_sec_parent_campaign_v2.py"
 CAPTURE_SOURCE_PATH="research/insider_buying_pilot_sec_parent_batch_capture_v2.py"
 CAPTURE_TEST_PATH="tests/test_insider_buying_pilot_sec_parent_batch_capture_v2.py"
 LANE_ROOT,LANE_BRANCH=base.LANE_ROOT,base.LANE_BRANCH
-ARTIFACT_PARTS=("artifacts","insider_buying","pilot_sec_parent_campaign_v2")
+ARTIFACT_PARTS=("artifacts","insider_buying","pilot_sec_parent_campaign_v2_launch2")
 CAPTURE_PARTS=("artifacts","insider_buying","pilot_sec_parent_batch_capture_v2")
+FAILED_PARTS=("artifacts","insider_buying","pilot_sec_parent_campaign_v2")
+FAILED_SCHEMA="insider-pilot-sec-parent-campaign-v2"
+FAILED_HEAD="586d3ef38700f4a963488d70b29736e03f0b4a85"
+FAILED_RESERVATION_SHA256="272ad69aacf9e4f3468138f0bceb32f1215102fe7df4b04d794f973367f1a6ac"
+FAILED_RESERVATION_BYTES=16698
+FAILED_INVENTORY_SHA256="cf67bf8fc534085003d8e2b89447ba4520c78e2e8561844960b3f252865dd438"
 FIRST_LIMIT,MAX_LIMIT,MAX_BATCHES=64,1024,20000
 MAX_CONTROL=128*1024*1024
 MAX_CONSUMED=1500000
 EMPTY_CACHE_PREFIX=base.EMPTY_CACHE_PREFIX
-LOCK_BYTES=b"INSETF-pilot-parent-campaign-v2-one-controller\n"
+LOCK_BYTES=b"INSETF-pilot-parent-campaign-v2-launch2-one-controller\n"
+FAILED_LOCK_BYTES=b"INSETF-pilot-parent-campaign-v2-one-controller\n"
 _raw,_sha=audit._raw,audit._sha
 _TOKEN=object();_SEALS=weakref.WeakKeyDictionary()
 ARCHIVE_EXPOSURES=(
@@ -67,7 +74,7 @@ class NativeWorkerRefused(CampaignError):
         self.phase,self.code=phase,code;super().__init__("campaign_native_worker_refused")
 
 
-PHASES={"initial_isolation","source_identity","prior_custody","source_rederivation","final_input_recheck"}
+PHASES={"launcher_health","stopped_launch_custody","initial_isolation","source_identity","prior_custody","source_rederivation","final_input_recheck"}
 FAILURE_CODES={"native_or_control_refused","prior_consumption_changed","source_population_changed","late_repeat_reconciliation_required"}
 
 
@@ -305,6 +312,112 @@ def _isolated():
     base._prove_isolation()
 
 
+def _failed_reservation(raw,*,fixture=False,pin=None):
+    expected=pin if fixture else {"sha256":FAILED_RESERVATION_SHA256,"bytes":FAILED_RESERVATION_BYTES,
+        "head":FAILED_HEAD,"source_inventory_sha256":FAILED_INVENTORY_SHA256}
+    _need(type(expected) is dict and set(expected)=={"sha256","bytes","head","source_inventory_sha256"}
+        and type(expected["bytes"]) is int and len(raw)==expected["bytes"] and _sha(raw)==_digest(expected["sha256"]),"campaign_failed_reservation_pin")
+    value=_decode(raw);identity=value.get("execution_identity")
+    if fixture:
+        _need(type(identity) is dict and type(identity.get("root")) is str,"campaign_failed_fixture_identity")
+        first._fixture_root(Path(identity["root"]))
+    first._source_identity({**identity,"root":str(LANE_ROOT)} if fixture else identity,
+        required_paths=(SELF_PATH,TEST_PATH,CAPTURE_SOURCE_PATH,CAPTURE_TEST_PATH))
+    _need(identity["head"]==expected["head"] and identity["source_inventory_sha256"]==expected["source_inventory_sha256"]
+        and _raw(value)==_raw({"schema":FAILED_SCHEMA+"/reservation","batch_number":1,"execution_identity":identity,
+            "policy":POLICY,"authority":AUTHORITY,"predecessor_pins":None}),"campaign_failed_reservation_crosslinks")
+    return {"schema":SCHEMA+"/stopped-launch-lineage","failed_root_parts":list(FAILED_PARTS),"failed_execution_head":identity["head"],
+        "reservation_sha256":_sha(raw),"reservation_bytes":len(raw),"source_inventory_sha256":identity["source_inventory_sha256"],
+        "batch_inventory":["reservation.json"],"completed_predecessor":False,"historical_dispatch_count_measured":False},identity
+
+
+def _launch_lineage():
+    return {"schema":SCHEMA+"/stopped-launch-lineage","failed_root_parts":list(FAILED_PARTS),"failed_execution_head":FAILED_HEAD,
+        "reservation_sha256":FAILED_RESERVATION_SHA256,"reservation_bytes":FAILED_RESERVATION_BYTES,"source_inventory_sha256":FAILED_INVENTORY_SHA256,
+        "batch_inventory":["reservation.json"],"completed_predecessor":False,"historical_dispatch_count_measured":False}
+
+
+class _FailedLaunchHold:
+    """Strict old metadata only; never complete or resume the consumed launch."""
+    def __init__(self,root,*,fixture=False,pin=None):
+        if fixture:first._fixture_root(root);first._native_fixture_denial()
+        else:_need(root==LANE_ROOT and pin is None,"campaign_failed_fixed_root")
+        self.folders=[];self.lock=None;self.versions={};self.raws={}
+        try:
+            top=archive._Output(root.joinpath(*FAILED_PARTS));self.folders.append(top)
+            batches=archive._Output(top.path/"batches");self.folders.append(batches)
+            run=archive._Output(batches.path/_batch(1));self.folders.append(run)
+            self.top,self.batches,self.run=top,batches,run
+            self.directory_versions=[base.custody._version(os.fstat(folder.fd)) for folder in self.folders]
+            _need(set(os.listdir(top.fd))=={"controller.lock","batches"} and set(os.listdir(batches.fd))=={_batch(1)}
+                and set(os.listdir(run.fd))=={"reservation.json"},"campaign_failed_stopped_inventory")
+            self.lock=os.open("controller.lock",os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK,dir_fd=top.fd)
+            fcntl.flock(self.lock,fcntl.LOCK_SH|fcntl.LOCK_NB)
+            self.lock_version=base.custody._version(os.fstat(self.lock))
+            for folder,name,cap in ((top,"controller.lock",4096),(run,"reservation.json",MAX_CONTROL)):
+                key=(folder.path,name);before=base.custody._version(os.stat(name,dir_fd=folder.fd,follow_symlinks=False))
+                raw=folder.read(name,cap)
+                _need(base.custody._version(os.stat(name,dir_fd=folder.fd,follow_symlinks=False))==before,"campaign_failed_old_control_changed")
+                self.versions[key]=before;self.raws[key]=raw
+            _need(self.raws[(top.path,"controller.lock")]==FAILED_LOCK_BYTES,"campaign_failed_lock_bytes")
+            self.reservation_raw=self.raws[(run.path,"reservation.json")]
+            self.summary,self.identity=_failed_reservation(self.reservation_raw,fixture=fixture,pin=pin)
+            self.recheck()
+        except BaseException:self.close();raise
+    def recheck(self):
+        _need(self.lock is not None,"campaign_failed_hold_closed")
+        _need(set(os.listdir(self.top.fd))=={"controller.lock","batches"} and set(os.listdir(self.batches.fd))=={_batch(1)}
+            and set(os.listdir(self.run.fd))=={"reservation.json"},"campaign_failed_stopped_inventory")
+        _need(base.custody._version(os.fstat(self.lock))==self.lock_version
+            ==base.custody._version(os.stat("controller.lock",dir_fd=self.top.fd,follow_symlinks=False)),"campaign_failed_lock_changed")
+        for folder,version in zip(self.folders,self.directory_versions):
+            folder.check();_need(base.custody._version(os.fstat(folder.fd))==version,"campaign_failed_directory_changed")
+            for (path,name),before in self.versions.items():
+                if path==folder.path:
+                    _need(base.custody._version(os.stat(name,dir_fd=folder.fd,follow_symlinks=False))==before
+                        and folder.read(name,MAX_CONTROL)==self.raws[(path,name)]
+                        and base.custody._version(os.stat(name,dir_fd=folder.fd,follow_symlinks=False))==before,"campaign_failed_old_control_changed")
+    def close(self):
+        base.selector._close_all((archive.SimpleCloseFD(self.lock),*reversed(self.folders)),phase="campaign_failed_hold_cleanup")
+        self.lock=None;self.folders=[]
+
+
+def _launcher_health_worker(identity):
+    _isolated();_current(identity)
+    return {"schema":SCHEMA+"/launcher-health","execution_identity":identity,
+        "native_network_fork_allwrite_securityexec_denial":True,"artifact_reads":0,"provider_requests":0,"credential_reads":0,"qc_accesses":0}
+
+
+def _launcher_health(identity):
+    """Exact worker launcher, source only, before claiming any new namespace."""
+    try:
+        result=_run_child(_command(identity,1,role="health"),timeout=30)
+        expected={"schema":SCHEMA+"/launcher-health","execution_identity":identity,
+            "native_network_fork_allwrite_securityexec_denial":True,"artifact_reads":0,"provider_requests":0,"credential_reads":0,"qc_accesses":0}
+        _need(_raw(result)==_raw(expected),"campaign_launcher_health_witness")
+    except Exception:raise NativeWorkerRefused("launcher_health","native_or_control_refused") from None
+
+
+def _failed_launch_worker(identity):
+    _isolated();_current(identity);held=None
+    try:
+        held=_FailedLaunchHold(LANE_ROOT);held.recheck();_current(identity)
+        return {"schema":SCHEMA+"/stopped-launch-worker","execution_identity":identity,"lineage":held.summary,
+            "reservation_witness":held.reservation_raw.decode(),"native_network_fork_allwrite_securityexec_denial":True}
+    finally:base.selector._close_all((held,),phase="campaign_stopped_launch_cleanup")
+
+
+def _stopped_launch_lineage(identity):
+    result=_run_child(_command(identity,1,role="stopped"),timeout=60)
+    _need(type(result) is dict and set(result)=={"schema","execution_identity","lineage","reservation_witness","native_network_fork_allwrite_securityexec_denial"}
+        and result["schema"]==SCHEMA+"/stopped-launch-worker" and _raw(result["execution_identity"])==_raw(identity)
+        and type(result["reservation_witness"]) is str and result["native_network_fork_allwrite_securityexec_denial"] is True,"campaign_stopped_launch_witness")
+    summary,old_identity=_failed_reservation(result["reservation_witness"].encode())
+    _need(_raw(summary)==_raw(result["lineage"]),"campaign_stopped_launch_crosslinks")
+    verify_plan_producer({"execution_identity":old_identity})
+    return summary
+
+
 def _previous_pins(number,pins):
     _batch(number)
     if number==1:_need(pins is None,"campaign_first_batch_no_predecessor");return None
@@ -323,9 +436,10 @@ def _next_consumption(number,pins,identity):
 
 
 def _plan_worker(identity,number,predecessor_pins=None):
-    prior_hold=accepted=intake=None;holds=[];phase="initial_isolation"
+    prior_hold=accepted=intake=failed=None;holds=[];phase="initial_isolation"
     try:
-        _isolated();phase="source_identity";_current(identity);_previous_pins(number,predecessor_pins);phase="prior_custody"
+        _isolated();phase="source_identity";_current(identity);_previous_pins(number,predecessor_pins);phase="stopped_launch_custody"
+        failed=_FailedLaunchHold(LANE_ROOT);phase="prior_custody"
         prior_hold=source.retained._PriorHold();prior=prior_hold.report()
         accepted=base.prior._Held(LANE_ROOT);base.prior._selector(accepted,base.prior.ACTUAL_ANCHORS)
         selected=accepted.leaf(base.prior.SELECTOR_PARTS,"selection.json",base.prior.MAX_CONTROL,base.prior.ACTUAL_ANCHORS.selection)
@@ -354,19 +468,21 @@ def _plan_worker(identity,number,predecessor_pins=None):
         _need(derived.to_payload()==prior["source_roster"] and compiled.to_payload()==prior["parent_audit"],"campaign_original_full_audit_changed")
         batch=builder.finish(source_roster=derived,parent_audit=compiled,base_consumption=proof)
         phase="final_input_recheck"
-        intake.recheck();accepted.recheck();prior_hold.recheck()
+        intake.recheck();accepted.recheck();prior_hold.recheck();failed.recheck()
         for held in holds:held.recheck()
         _current(identity)
-        return {"schema":SCHEMA+"/worker","execution_identity":identity,"plan":batch.to_payload(),"plan_sha256":batch.sha256,
+        return {"schema":SCHEMA+"/worker","execution_identity":identity,"plan":batch.to_payload(),"plan_sha256":batch.sha256,"stopped_launch_lineage":failed.summary,
             "native_network_fork_allwrite_securityexec_denial":True,"new_provider_requests":0,"credential_reads":0,"qc_accesses":0,"outcome_looks":0}
     except Exception as error:
         error._campaign_phase=phase;raise
-    finally:base.selector._close_all((intake,accepted,prior_hold,*reversed(holds)),phase="campaign_planner_cleanup")
+    finally:base.selector._close_all((intake,accepted,prior_hold,failed,*reversed(holds)),phase="campaign_planner_cleanup")
 
 
-def _command(identity,number,predecessor_pins=None):
+def _command(identity,number,predecessor_pins=None,*,role="plan"):
     _previous_pins(number,predecessor_pins)
-    code="import sys,json;sys.path.insert(0,"+repr(str(LANE_ROOT))+");from research import insider_buying_pilot_sec_parent_campaign_v2 as m;identity=json.loads("+repr(_raw(identity).decode())+");\ntry:r=m._plan_worker(identity,"+repr(number)+","+repr(predecessor_pins)+")\nexcept Exception as e:print(m._raw(m._safe_failure(e)).decode());sys.exit(2)\nprint(m._raw(r).decode())"
+    _need(role in {"plan","health","stopped"},"campaign_fixed_worker_role")
+    call={"plan":"m._plan_worker(identity,"+repr(number)+","+repr(predecessor_pins)+")","health":"m._launcher_health_worker(identity)","stopped":"m._failed_launch_worker(identity)"}[role]
+    code="import sys,json;sys.path.insert(0,"+repr(str(LANE_ROOT))+");from research import insider_buying_pilot_sec_parent_campaign_v2 as m;identity=json.loads("+repr(_raw(identity).decode())+");\ntry:r="+call+"\nexcept Exception as e:print(m._raw(m._safe_failure(e)).decode());sys.exit(2)\nprint(m._raw(r).decode())"
     policy='(version 1)(allow default)(deny network*)(deny process-fork)(deny file-write*)(deny process-exec (literal "/usr/bin/security"))'
     return ("/usr/bin/env","-i","PATH=/usr/bin:/bin:/usr/sbin:/sbin","/usr/bin/sandbox-exec","-p",policy,
         sys.executable,"-I","-S","-B","-X","pycache_prefix="+EMPTY_CACHE_PREFIX,"-c",code)
@@ -446,9 +562,10 @@ class Controller:
 
 
 def _validate_worker(result,identity,number):
-    _need(type(result) is dict and set(result)=={"schema","execution_identity","plan","plan_sha256","native_network_fork_allwrite_securityexec_denial",
+    _need(type(result) is dict and set(result)=={"schema","execution_identity","plan","plan_sha256","stopped_launch_lineage","native_network_fork_allwrite_securityexec_denial",
         "new_provider_requests","credential_reads","qc_accesses","outcome_looks"} and result["schema"]==SCHEMA+"/worker"
         and result["execution_identity"]==identity and result["native_network_fork_allwrite_securityexec_denial"] is True
+        and _raw(result["stopped_launch_lineage"])==_raw(_launch_lineage())
         and all(type(result[k]) is int and result[k]==0 for k in ("new_provider_requests","credential_reads","qc_accesses","outcome_looks")),"campaign_worker_witness")
     plan=validate_batch_plan(result["plan"])
     _need(plan["fixture_only"] is False and plan["batch_number"]==number and result["plan_sha256"]==_sha(_raw(plan)),"campaign_worker_plan_crosslink")
@@ -457,7 +574,10 @@ def _validate_worker(result,identity,number):
 
 def prepare_actual_batch(expected_head,*,batch_number=1,predecessor_pins=None):
     identity=_identity(expected_head);_previous_pins(batch_number,predecessor_pins);controller=None
-    reservation={"schema":SCHEMA+"/reservation","batch_number":batch_number,"execution_identity":identity,"policy":_copy(POLICY),"authority":dict(AUTHORITY),"predecessor_pins":_copy(predecessor_pins)}
+    _launcher_health(identity)
+    lineage=_stopped_launch_lineage(identity)
+    _need(_raw(lineage)==_raw(_launch_lineage()) and _identity(expected_head)==identity,"campaign_stopped_launch_lineage_changed")
+    reservation={"schema":SCHEMA+"/reservation","batch_number":batch_number,"execution_identity":identity,"policy":_copy(POLICY),"authority":dict(AUTHORITY),"predecessor_pins":_copy(predecessor_pins),"stopped_launch_lineage":lineage}
     _need(_decode(_raw(reservation))==reservation,"campaign_production_reservation_roundtrip")
     try:
         controller=Controller(LANE_ROOT,create=True);run=controller.fresh(batch_number)
@@ -466,7 +586,7 @@ def prepare_actual_batch(expected_head,*,batch_number=1,predecessor_pins=None):
         plan=_validate_worker(result,identity,batch_number);_need(_identity(expected_head)==identity,"campaign_parent_source_changed")
         psha=run.publish("plan.json",_raw(plan),cap=MAX_CONTROL)
         complete={"schema":SCHEMA+"/complete","batch_number":batch_number,"execution_identity":identity,"reservation_sha256":rsha,
-            "plan_sha256":psha,"native_network_fork_allwrite_securityexec_denial":True,"authority":dict(AUTHORITY)}
+            "plan_sha256":psha,"stopped_launch_lineage":lineage,"native_network_fork_allwrite_securityexec_denial":True,"authority":dict(AUTHORITY)}
         csha=run.publish("complete.json",_raw(complete),cap=MAX_CONTROL);controller.check()
         return {"schema":SCHEMA+"/public","batch_number":batch_number,"plan_sha256":psha,"complete_sha256":csha,
             "selected_count":plan["selected_count"],"next_action":"capture_exact_qualified_batch_not_backtest","authority":dict(AUTHORITY)}
@@ -484,9 +604,9 @@ def _validate_plan_controls(raws,number,*,expected_plan_sha256,expected_complete
     pins=reservation.get("predecessor_pins");_previous_pins(number,pins)
     _need(_raw(complete)==_raw({"schema":SCHEMA+"/complete","batch_number":number,"execution_identity":reservation["execution_identity"],
         "reservation_sha256":_sha(raws["reservation.json"]),"plan_sha256":_sha(raws["plan.json"]),
-        "native_network_fork_allwrite_securityexec_denial":True,"authority":dict(AUTHORITY)}) and plan["batch_number"]==number
+        "stopped_launch_lineage":_launch_lineage(),"native_network_fork_allwrite_securityexec_denial":True,"authority":dict(AUTHORITY)}) and plan["batch_number"]==number
         and plan["fixture_only"] is fixture and _raw(reservation)==_raw({"schema":SCHEMA+"/reservation","batch_number":number,
-            "execution_identity":complete["execution_identity"],"policy":POLICY,"authority":dict(AUTHORITY),"predecessor_pins":pins}),"campaign_plan_receipt_crosslinks")
+            "execution_identity":complete["execution_identity"],"policy":POLICY,"authority":dict(AUTHORITY),"predecessor_pins":pins,"stopped_launch_lineage":_launch_lineage()}),"campaign_plan_receipt_crosslinks")
     if number>1:_need(all(plan["predecessor"].get(k)==v for k,v in pins.items()),"campaign_external_predecessor_crosslink")
     identity=complete["execution_identity"]
     _need(type(expected_producer_head) is str and re.fullmatch(r"[0-9a-f]{40}",expected_producer_head)

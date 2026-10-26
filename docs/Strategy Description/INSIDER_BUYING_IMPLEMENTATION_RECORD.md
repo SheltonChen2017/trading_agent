@@ -34781,3 +34781,217 @@ original ambiguity, full corpus, canonical/PIT/rights, reference, price/warmup,
 both earnings diagnostics, protocol/look or order parity gate is promoted by
 these contracts. No strategy launch/outcome look has occurred. Accumulate this
 round locally and keep building; NO checkpoint push or final handoff yet.
+
+## 276. Observed preparation refusals and completed reference receipts (2026-10-25)
+
+274–275 were committed as already-existing clean
+`586d3ef38700f4a963488d70b29736e03f0b4a85`; matching origin stayed41d729af.
+Post-record focused record/document/boundary/EXACT checks124 passed4.47s. ALL
+source writers were frozen before the actual local preparations. Main launched
+both trusted parents under an additional deny-network/Keychain-exec Seatbelt
+wrapper, following a peer command recommendation. Reference preparation
+refused/exit2 after5.901497250s, with NO reference output directory. SEC local
+plan preparation refused/exit2 after3.290820833s, leaving ONLY batch1's
+reservation, no plan/complete. No collector namespace/contact/transport was
+activated and no provider request or strategy launch occurred.
+
+Both peers subsequently reproduced, with constant-output SOURCE-ONLY children,
+the identical inner strong profile exiting71/stdout0 with
+`sandbox-exec: sandbox_apply: Operation not permitted` beneath that outer
+wrapper; direct inner profile exited0. Main direct source-identity-only
+diagnostic succeeded111 images/2.799160208s. The actual sanitized preparations
+did NOT retain their child stderr, so this deterministic wrapper mechanism is
+consistent with their observed failure, NOT retained proof of each precise
+historical phase/cause. Do not infer any corpus/SEC refusal from a local wrapper
+error. `IBLAUNCH-PRE01` P2: incompatible outer launch composition identified;
+277 registers the bounded corrective path, not a provider retry or weaker child.
+
+Native-denied strict own-metadata readback of stopped SEC batch1 observed a
+16,698B reservation SHA
+`272ad69aacf9e4f3468138f0bceb32f1215102fe7df4b04d794f973367f1a6ac`,
+source inventory `cf67bf8fc534085003d8e2b89447ba4520c78e2e8561844960b3f252865dd438`,
+head586d3ef3 and exact inventory[`reservation.json`]. No plan/complete or
+completed predecessor is fabricated. Preserve that namespace and its exact
+executed source image forever; no removal, resume or in-place completion.
+
+Because reference preparation had created NO namespace/nonce/intent, main used
+the SAME registered271 scope with the corrected direct trusted-parent launch.
+Its built-in child still enforced initial network/fork/ALL-write/Keychain-exec
+denial; no isolation was disabled in the child. Preparation succeeded once on
+clean586d3ef3 in40.995118584s. Scope
+`ib-qc-first64-historical-reference-20261025-once`, nonce
+`80d684adcb9788f78af2622f4097c383eba2718ddb80066b41f750e9bec22769`:
+cell25,576B `0a55a8c95927849da9353a821de14e834fbc750fb1110b94a82b82410ff9a2cb`,
+registration `36f256d2afc9403ddba3a49d1b204add18fbccdece7b9bde7c5a1f531708bba1`,
+intent `cd286d5c237aa849854b49b82cdee49037f35c36b6a98cde3cd1674cbacd0517`,
+ready `76d5d2bd7ef3d69badcb25597c8b48edf89a9f85528f66d2bfb618fee47e450e`;
+source inventory `8e635a57ef61e45f73036f7482476be1b2c6f13cf09d3eb01ae5e7396d82898e`.
+Core remains54cda8175ceafc5bec6c3f6f90c31c43bcd0daad991262a42d13415736760fd2.
+
+Mia was consulted ADVISORY ONLY about the reopened notebook's kernel state;
+its unsupported guarantees were not treated as fact/authority. Main opened
+Select Kernel's Research Server Collection; the UI detected the SAME R-44ca...
+server. Main cancelled the specification picker without choosing another spec,
+restart or old-cell execution. The label subsequently showed that same server;
+the label alone was NOT accepted as context proof. Only the new core's context
+validation could permit a query. No fallback old-receipt reads were performed.
+
+Main opened exact own prepared cell.py in native TextEdit; FULL25,576B source
+hash matched. Appended fresh cell1 ONLY to EXISTING consumer notebook in own
+project37465795, leaving old cell0/source/output untouched; saved. Complete
+saved QC code was independently copied through native UI into a new unsaved
+own-code-only TextEdit view: exact byte equality/hash matched. These unsaved
+verification views are preserved, not irreversibly deleted. Main clicked only
+cell1 Execute ONCE and observed pending→own success acknowledgement. No Run
+All/above/below, kernel restart, source edit, SDK draft or main.py activation.
+Automatic saved-source Cloud Builds are not strategy launch attempts.
+
+The own acknowledgement is782B SHA
+`633d9096557f492eaba7d5e3c12125960d5d45f501ba68d6fa40f97b3dcf2168`:
+`historical_reference_receipts_completed`, final acknowledgedtrue, errorfalse,
+stop_stagenull. Two native Accessible View500-character windows overlapped218
+characters with observed beginning/EOF and canonical JSON framing. No platform
+values, counts or derived digests left cloud. Main independently validated the
+entire observed ACK against externally hash-bound prepared registration/intent/
+cell/ready and current source using strict held own-metadata readers under
+initial network/fork/ALL-write/Keychain-exec denial: exit0,0.610534334s after
+imports. Four fixed selector receipt completion is observed; actual returned
+coverage/matching/identity/PIT/rights are NOT thereby established. Immediate
+cached save/read acknowledgement is not independent persistence, CAS or origin
+attestation. No price/History, outcome, strategy job or backtest attempt.
+
+## 277. Delegated local planning launch correction, not acquisition retry (2026-10-25)
+
+The owner delegated routine engineering choices and asked for uninterrupted
+build until readiness or a concrete blocker. Main explicitly chooses a bounded
+LOCAL-ONLY planning correction: new immutable planner launch2 namespace, logical
+batch1 and the same unattempted selection procedure, with the failed276
+reservation/hash/head/exact inventory retained and bound as failure lineage.
+It is NOT a successful predecessor. The never-created collector namespace and
+all known consumed accession exclusions remain unchanged. No provider request
+was made by either failed planner or reference local preparation; this decision
+does not authorize repeating any completed/ambiguous transport or archive URL.
+
+Before the new controller/root/reservation/contact is created, require a tiny
+fixed-role SOURCE-ONLY launcher health child using the exact actual interpreter,
+environment, cwd, initial flags, source identity and strong native-denial profile.
+Genuine nested-wrapper refusal and direct strong-native success must be proved
+with invented/source-only tests; trusted parent runs directly, not inside a
+second Seatbelt profile. This is correction of launch composition, not removal
+of process-tree denial from tests/readers/inspection. Preserve the executed
+586d3ef3 image and failed controls, register final new images/pins/validation
+before activating the separately named LOCAL plan. Do not resume or fill the
+old batch1, reset controller state or claim a successful64 predecessor.
+
+No additional paid source, scope-window/economics change, outcome/QC launch or
+new owner decision is needed for this engineering correction. Reference276 is
+complete and all actual local processes have finished; source writers may now
+work only on this bounded correction. No checkpoint push; all readiness and
+carried topical/actual-archive findings remain as before.
+
+## 278. Next bounded query-free cloud reference composition definition (2026-10-25)
+
+Under the same delegated continuing-build direction, implement a NEW inert
+preparer/cell pair for the missing reference join, not another data acquisition.
+It will rederive the exact276 retained start/four-result/final context together
+with259/267's original51 CIK rows and every candidate edge, zero and duplicate;
+bind all original source/core/registration/intent/ready/ACK provenance. Preserve
+each raw selector state and returned March31/April1 index label. Classify each
+returned CIK against its expected original SEC issuer CIK as exact/mismatch/
+missing/malformed, without a today's-ticker join, selecting only primary shares
+or treating a missing field as negative proof. All graphs, platform values,
+cardinalities, classifications and hashes remain INSIDE QC.
+
+The engineering scope permits ZERO SDK/resolver/fundamental/History/price/data
+queries, ZERO old-store receipt reads, and no outcome/strategy action. Use only
+the existing retained kernel globals with before/after source/context/marker
+validation and a fresh permanent own claim/intent; missing/mutated context must
+refuse without reconstruction. Any new own-control publication must be separately
+bounded and preregistered before its one activation; only an own-control ACK may
+leave cloud. No actual nonce, cell, namespace or cloud activation exists yet for
+this new scope. Existing producer/consumer/reference images and cells0/1 stay
+frozen, never reexecuted. Main registers final exact images/validation and the
+actual activation boundary only after source writers finish and clean commit.
+
+This is substantive join/assessment engineering, NOT historical identity
+admission. Genuine first-listing/predecessor and publication/knowledge clocks,
+SEC security-title/share-class/SID intervals, original-parent admission/full
+coverage, price/liquidity/delisting/252-open calibration, issuer-bound earnings,
+final full population/look and order-engine parity are distinct missing inputs
+or unfinished integrations. Four reference selectors cannot supply these facts.
+Existing subscriptions remain qualification routes; this scope establishes no
+new purchase requirement or routine owner-approval gate. Continue the same
+round and one final push only; no independent Claude acceptance is claimed.
+
+Sequencing note: before main's writer HOLD arrived, the author materialized one
+untracked inert draft, no test pair/intent/actual activation. To keep the next
+SEC actual's entire Git tree clean without bundling unfinished engineering,
+main recoverably moved ONLY that known-own draft with apply_patch to ignored
+`artifacts/insider_buying/qc_historical_reference_composition_draft.py`.
+Before/after bytes33,435 and SHA
+`123c110fa614a4892daf4b4532b694f3a064f30457e9eebf95eb4045d1260e25`
+are IDENTICAL. No evidence, user/concurrent file or source was deleted or
+overwritten. Private draft is unqualified/unactivated and not part of any
+actual/source guard; its fixed-source path is not this scratch location.
+Restore prospective work via ordinary apply_patch only AFTER actual SEC
+planning/capture/readback finishes; all source writers remain held meanwhile.
+
+## 279. Qualified source-only launch correction and new local plan registration (2026-10-25)
+
+277's minimal correction is frozen: campaign50,358B SHA
+`0a2f6b40b1b021a58f173e77e316658a2f5c8a74e74c3a134173f4de95505918`,
+tests25,121B `4981a118e67cf240be8b0c0a3451c98cff00ef948cd4d8a2c0b1e5a67ea9ca9f`.
+Collector source/test remain EXACT274 d2fb297c/a6b47554 images. New planner
+root/schema/lock are explicitly `pilot_sec_parent_campaign_v2_launch2` /
+`insider-pilot-sec-parent-campaign-v2-launch2`; collector root unchanged.
+The old586d3ef3 image and stopped16,698B reservation remain preserved in place
+and Git, never resumed/reinterpreted as success.
+
+Fixed-role source-only health uses the EXACT actual worker interpreter/env/
+cwd/initial flags/strong Seatbelt profile and current source identity BEFORE
+any new controller, root or reservation. Separate native-denied stopped-control
+reader requires exact old root/batch inventory, external reservation bytes/hash/
+HEAD/source-inventory pins, first-read ctime/version, held SH lock and repeated
+bytes/ancestry checks. Trusted parent proves original Git bytes. Full planning
+worker keeps/rechecks this failure lineage through source rederivation; each
+new reservation/complete binds it. No failed control is an actual completed
+parent or a successful first64 predecessor.
+
+`IBLAUNCH-PRE01` P2 CLOSED prospectively for launcher composition: two genuine
+pre-fix namespace/health-order reds; genuine nested-profile refusal before any
+old/new artifacts; direct strong-native source-only health passed. Three
+affected guard reversals each produced one red, restored12 green. Historical
+actual failure cause remains qualified as276, not converted into retained
+stderr/precise-phase proof. No request or namespace was repeated by testing.
+
+Attributed author final208 focused passed27.93s (campaign+collector+boundary+
+EXACT); source-only native health/memory compilation116 images3.065706500s,
+inventory `ed6e3f5651792e464380caaa2d9c195801269e1562f8dc3ee7b9ad8e5795801c`.
+An earlier nonexistent-boundary-filename invocation collected0/invocation error,
+not a product failure. Main reviewed the complete correction and OBSERVED280
+passed28.37s, adding record and active-document targets under native process-
+tree network/Keychain-exec/lane-write denial, isolated invented roots and no
+plugins/cache/bytecode writes. No complete lane/repository suite. Main separate
+strong-native network/fork/ALL-write/Keychain-exec denied source-only121-image
+compile/current/frozen proof1.818671250s, inventory
+`e02ab61334f4060749b0e8021bc470f8c4c6a2726ea3913049bc5cf510ffbc9f`;
+all four current hashes matched. These are synthesized uncommitted candidate/
+bootstrap proofs, not actual clean-Git preflight or independent Claude review.
+
+Register NEW LOCAL-ONLY plan launch
+`pilot_sec_parent_campaign_v2_launch2/batches/batch-000001`, logical batch1,
+once after a clean already-existing commit and all-writer freeze. Run trusted
+parent DIRECTLY, no outer Seatbelt wrapper; built-in native health, stopped-
+metadata and full25-source children remain strictly denied. Observe exact plan/
+complete hashes and producer HEAD before any capture. This is source planning,
+not a renamed provider retry; old failed planning reservation stays consumed.
+Only an accepted exact64 plan can activate275's still-never-created collector
+batch1, once, protected contact stdin and fatal-stop/no-redispatch policy.
+Perform strict native-denied externally pinned capture readback. Do not act on
+an incomplete plan or invent success after refusal. No later batch is executed
+by this registration. Other source writers/drafts remain held until these
+actuals finish; then resume278's unqualified query-free engineering.
+
+No backtest/outcome/strategy launch, readiness, full coverage, identity/PIT or
+rights is created by this correction. Same single final push, no checkpoint
+push or routine approval pause; no final handoff yet.

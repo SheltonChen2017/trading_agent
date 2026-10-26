@@ -141,10 +141,10 @@ def _controls(plan,root):
         "source_sha256":{m.SELF_PATH:"b"*64,m.TEST_PATH:"c"*64}}
     identity["source_inventory_sha256"]=m._sha(m._raw(identity["source_sha256"]))
     reservation={"schema":m.SCHEMA+"/reservation","batch_number":plan["batch_number"],"execution_identity":identity,
-        "policy":m.POLICY,"authority":m.AUTHORITY,"predecessor_pins":None}
+        "policy":m.POLICY,"authority":m.AUTHORITY,"predecessor_pins":None,"stopped_launch_lineage":m._launch_lineage()}
     raw=m._raw(reservation);plan_raw=m._raw(plan)
     complete={"schema":m.SCHEMA+"/complete","batch_number":plan["batch_number"],"execution_identity":identity,
-        "reservation_sha256":m._sha(raw),"plan_sha256":m._sha(plan_raw),"native_network_fork_allwrite_securityexec_denial":True,"authority":m.AUTHORITY}
+        "reservation_sha256":m._sha(raw),"plan_sha256":m._sha(plan_raw),"stopped_launch_lineage":m._launch_lineage(),"native_network_fork_allwrite_securityexec_denial":True,"authority":m.AUTHORITY}
     return {"reservation.json":raw,"plan.json":plan_raw,"complete.json":m._raw(complete)}
 
 
@@ -297,3 +297,118 @@ def test_private_CLI_never_echoes_unknown_secret_argv(monkeypatch,capsys):
     monkeypatch.setattr(m,"prepare_actual_batch",lambda *a,**k:pytest.fail("no plan on invalid argv"))
     assert m.main(["--expected-head","a"*40,"--api-token","PRIVATE"])==2
     captured=capsys.readouterr();assert captured.err=="" and captured.out=='{"disposition":"campaign_plan_refused"}\n'
+
+
+def test_local_launch2_has_distinct_namespace_but_never_changes_capture_namespace():
+    assert m.ARTIFACT_PARTS==("artifacts","insider_buying","pilot_sec_parent_campaign_v2_launch2")
+    assert m.CAPTURE_PARTS==("artifacts","insider_buying","pilot_sec_parent_batch_capture_v2")
+
+
+def test_source_only_launcher_health_refusal_precedes_any_new_namespace(monkeypatch):
+    identity={"invented_source_identity":True}
+    monkeypatch.setattr(m,"_identity",lambda _:identity)
+    def refuse(value):
+        assert value is identity
+        raise m.NativeWorkerRefused("launcher_health","native_or_control_refused")
+    monkeypatch.setattr(m,"_launcher_health",refuse,raising=False)
+    monkeypatch.setattr(m,"_stopped_launch_lineage",lambda *a:pytest.fail("old input reached before health"))
+    monkeypatch.setattr(m,"Controller",lambda *a,**k:pytest.fail("namespace reached before health"))
+    with pytest.raises(m.NativeWorkerRefused,match="native_worker_refused"):
+        m.prepare_actual_batch("a"*40)
+
+
+def _failed_launch(root):
+    sources={name:"b"*64 for name in (m.SELF_PATH,m.TEST_PATH,m.CAPTURE_SOURCE_PATH,m.CAPTURE_TEST_PATH)}
+    sources.update({f"research/invented_{n:03d}.py":"c"*64 for n in range(112)})
+    identity={"root":str(root.resolve()),"branch":m.LANE_BRANCH,"head":"d"*40,"clean":True,"source_sha256":sources,
+        "source_inventory_sha256":m._sha(m._raw(sources))}
+    raw=m._raw({"schema":m.FAILED_SCHEMA+"/reservation","batch_number":1,"execution_identity":identity,
+        "policy":m.POLICY,"authority":m.AUTHORITY,"predecessor_pins":None})
+    path=root.joinpath(*m.FAILED_PARTS,"batches","batch-000001");path.mkdir(parents=True,mode=0o700)
+    for parent in (root/"artifacts",root/"artifacts"/"insider_buying",path.parent.parent,path.parent,path):os.chmod(parent,0o700)
+    lock=path.parent.parent/"controller.lock";lock.write_bytes(m.FAILED_LOCK_BYTES);os.chmod(lock,0o600)
+    reservation=path/"reservation.json";reservation.write_bytes(raw);os.chmod(reservation,0o600)
+    pin={"sha256":m._sha(raw),"bytes":len(raw),"head":identity["head"],"source_inventory_sha256":identity["source_inventory_sha256"]}
+    return reservation,pin,raw
+
+
+def test_native_old_failed_reservation_is_only_failure_lineage_not_completed_predecessor(tmp_path):
+    path,pin,raw=_failed_launch(tmp_path.resolve())
+    held=m._FailedLaunchHold(tmp_path.resolve(),fixture=True,pin=pin)
+    try:
+        assert held.reservation_raw==raw and len(held.identity["source_sha256"])==116
+        assert held.summary["batch_inventory"]==["reservation.json"]
+        assert held.summary["completed_predecessor"] is held.summary["historical_dispatch_count_measured"] is False
+        held.recheck()
+    finally:held.close()
+    assert path.read_bytes()==raw
+
+
+def test_failed_reservation_first_read_ctime_mutation_refuses(tmp_path,monkeypatch):
+    path,pin,_raw=_failed_launch(tmp_path.resolve());before=path.stat();original=m.os.read;changed=[]
+    def read(fd,count):
+        result=original(fd,count)
+        if not changed and m.os.fstat(fd).st_ino==before.st_ino:
+            changed.append(True);os.chmod(path,0o640);os.chmod(path,0o600)
+        return result
+    monkeypatch.setattr(m.os,"read",read)
+    with pytest.raises(ValueError,match="failed_old_control_changed"):
+        m._FailedLaunchHold(tmp_path.resolve(),fixture=True,pin=pin)
+    assert changed and path.stat().st_mtime_ns==before.st_mtime_ns
+
+
+@pytest.mark.parametrize("fault",("pin","complete","head","inventory","old_lock"))
+def test_failed_launch_exact_old_inventory_pin_and_shared_lock(tmp_path,fault):
+    path,pin,raw=_failed_launch(tmp_path.resolve());lock=None
+    if fault=="pin":pin["sha256"]="e"*64
+    elif fault=="complete":extra=path.parent/"complete.json";extra.write_bytes(b"{}");os.chmod(extra,0o600)
+    elif fault=="head":pin["head"]="f"*40
+    elif fault=="inventory":pin["source_inventory_sha256"]="0"*64
+    else:
+        lock=os.open(path.parent.parent.parent/"controller.lock",os.O_RDONLY)
+        m.fcntl.flock(lock,m.fcntl.LOCK_EX|m.fcntl.LOCK_NB)
+    try:
+        with pytest.raises((ValueError,BlockingIOError)):m._FailedLaunchHold(tmp_path.resolve(),fixture=True,pin=pin)
+    finally:
+        if lock is not None:os.close(lock)
+
+
+def test_source_health_worker_proves_initial_denial_before_any_source_or_input(monkeypatch):
+    monkeypatch.setattr(m,"_isolated",lambda:(_ for _ in ()).throw(ValueError("initial denial")))
+    monkeypatch.setattr(m,"_current",lambda _:pytest.fail("source before denial"))
+    monkeypatch.setattr(m,"_FailedLaunchHold",lambda *a,**k:pytest.fail("health must never read old artifacts"))
+    with pytest.raises(ValueError,match="initial denial"):m._launcher_health_worker({})
+
+
+@pytest.mark.parametrize("fault",("stderr","bool_counter","identity","extra"))
+def test_launcher_health_exact_tiny_witness_refuses_before_namespace(monkeypatch,fault):
+    identity={"invented_source_identity":True}
+    value={"schema":m.SCHEMA+"/launcher-health","execution_identity":identity,"native_network_fork_allwrite_securityexec_denial":True,
+        "artifact_reads":0,"provider_requests":0,"credential_reads":0,"qc_accesses":0}
+    if fault=="bool_counter":value["artifact_reads"]=False
+    elif fault=="identity":value["execution_identity"]={}
+    elif fault=="extra":value["unsafe_extra"]="invented-private"
+    def child(*a,**k):
+        if fault=="stderr":raise ValueError("invented-private stderr never emitted")
+        return value
+    monkeypatch.setattr(m,"_run_child",child)
+    with pytest.raises(m.NativeWorkerRefused) as error:m._launcher_health(identity)
+    assert (error.value.phase,error.value.code)==("launcher_health","native_or_control_refused")
+
+
+def test_exact_fixed_health_command_matches_worker_launch_prefix_and_never_inputs():
+    identity={"source_metadata_only":True};normal=m._command(identity,1);health=m._command(identity,1,role="health")
+    assert normal[:-1]==health[:-1] and "_launcher_health_worker(identity)" in health[-1]
+    assert "_plan_worker(identity," not in health[-1] and "_failed_launch_worker(identity)" not in health[-1]
+    with pytest.raises(ValueError,match="fixed_worker_role"):m._command(identity,1,role="arbitrary_source_code")
+
+
+@pytest.mark.skipif(m.sys.platform!="darwin",reason="faithful macOS nested Seatbelt launch refusal")
+def test_genuine_nested_native_launcher_refuses_before_old_or_new_artifacts(monkeypatch):
+    # This test already runs inside initial native network/security denial.
+    # The exact fixed health command cannot sandbox_apply a second profile.
+    monkeypatch.setattr(m,"_identity",lambda _:{"invented_source_metadata":True})
+    monkeypatch.setattr(m,"_stopped_launch_lineage",lambda *a:pytest.fail("no old input before healthy launcher"))
+    monkeypatch.setattr(m,"Controller",lambda *a,**k:pytest.fail("no new root before healthy launcher"))
+    with pytest.raises(m.NativeWorkerRefused) as error:m.prepare_actual_batch("a"*40)
+    assert error.value.phase=="launcher_health"

@@ -136,12 +136,22 @@ def _audit_event(event: str, args: tuple[object, ...]) -> None:
 
 
 def _worker_policy(python: str | None = None) -> str:
-    executable = str(Path(python or sys.executable).resolve())
-    if not Path(executable).is_absolute() or '"' in executable or "\\" in executable:
-        _refuse("worker interpreter path is unsafe")
+    executable = Path(python or sys.executable).resolve()
+    targets = [executable]
+    # Section 130 (Claude review): a macOS framework interpreter's bin stub
+    # re-executes Resources/Python.app/Contents/MacOS/Python in place. With a
+    # literal allow for the stub alone that exec is refused and the worker
+    # never starts, so the replay could not run on the lane's venv interpreter.
+    if len(executable.parents) > 1:
+        relaunch = executable.parents[1] / "Resources/Python.app/Contents/MacOS/Python"
+        if relaunch.is_file():
+            targets.append(relaunch.resolve())
+    for target in targets:
+        if not target.is_absolute() or '"' in str(target) or "\\" in str(target):
+            _refuse("worker interpreter path is unsafe")
     return ("(version 1)(allow default)(deny network*)(deny file-write*)"
             "(deny process-fork)(deny process-exec)"
-            f'(allow process-exec (literal "{executable}"))')
+            + "".join(f'(allow process-exec (literal "{target}"))' for target in targets))
 
 
 def _module_name(path: str) -> tuple[str, bool]:

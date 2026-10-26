@@ -1,7 +1,6 @@
 """Offline invented-source tests for a read-only, stopped-v3 binding."""
 from __future__ import annotations
 
-import fcntl
 import json
 import os
 from dataclasses import replace
@@ -9,6 +8,12 @@ from pathlib import Path
 
 import pytest
 
+pytest.importorskip(
+    "fcntl",
+    reason="IBWIN-CR01: Insider custody/acquisition/replay requires POSIX fcntl; Windows custody port deferred",
+)
+
+import fcntl
 from data.hashing import canonical_json, hash_bytes, hash_payload
 from research.insider_buying_sec_complete_acquisition import SecHttpResult
 import research.insider_buying_sec_all_form4_parent_recovery_executor as executor

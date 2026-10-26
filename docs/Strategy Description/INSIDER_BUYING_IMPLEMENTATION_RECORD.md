@@ -35440,3 +35440,340 @@ pure milestone. Commit285–286 together only after final checks; then all write
 hold through285's ONE new directory operation and independent readback. Select
 or acquire no archive before its directory evidence and separate bounded
 format/custody registration. QC/Safari remain occupied as283; no final push yet.
+
+## 287. Actual Q4 directory and independent retained readback completed (2026-10-25)
+
+283–286/new pairs committed as already-existing clean
+`a3b84a1dfb7a4fbe958ac162fae88a74f882e706`; post-record124 focused checks
+passed4.66s. Matching-only origin fetch remained41d729af. All writers/tests
+held through acquisition AND readback. Main invoked285's fixed actual front
+once from direct isolated trusted parent, no outer Seatbelt wrapper, explicitly
+protected stdin echo before preflight/contact. Caller glue supplied/printed
+only sanitized public result metadata and observed timing; it is not silently
+part of the committed module/runtime source count. One own Gmail-profile read
+yielded a unique private contact, fed once through protected anonymous stdin;
+no value/hash/argv/env/chat/Git/control-log retention or Keychain/API-key read.
+
+Actual operation exit0/40.843211625s INCLUDING preflight/contact wait. HTTP200,
+one raw transport invocation (not a measured backend HTTP-request count),
+8,274 safe retained bytes,61 qualified archive advertisements. ZERO archive/
+accession requests; this was exactly the unused fixed index.json URL. Pins:
+
+- complete/report
+  `6081e7b6d92e7a7916e38735f7020a4c417e93f309dd1fe2225f8bf0bd54952f`;
+- retained response
+  `d53ecb1d60e139ff2a132bebffcce7d97bf3130964175c6a550ac86d80ef17d9`;
+- inventory
+  `a670a31dadf0521abbb458e3e057042abde5cc3b35c13cef871ff6cd2452a37f`.
+
+Producer108-source inventory
+`df5d0dabd4c6f3732fccdc59a0ce46b1492ddc8eda304ed0f34c72e2098420e4`.
+Safe complete200 bytes were retained BEFORE the new Q4 profile parsed. A
+qualified listing is NOT a complete filing population, even if61 dates appear.
+Advertisement KB base/rounding/actual payload bytes remain unqualified.
+
+First independent read-only native child exited0 with empty stderr after full
+SH/strict initial/pre-first-read/ctime/inventory/ancestry/FD/hash/control/source
+readback, but main's ad-hoc PRESENTATION decoder refused its floating elapsed
+field: the qualified canonical own-control codec intentionally forbids floats.
+No source/codec/control was loosened, actual operation rerun or supplier request
+repeated. Main corrected ONLY the read-only diagnostic timing to integer
+nanoseconds and repeated the existing read-only verification. Final native child
+exit0/87,426,334ns after imports; trusted parent total4.374167959s, exact original
+Git/current identity rechecked before/after. Report/body/inventory pins and61
+rows matched. Native process-tree network/fork/ALL-write/Keychain-exec denial was
+effective before retained inputs. This verifier did NOT replay original private
+contact screening; original production privacy and this custody proof are
+distinct. Original root/controls/receipts remained unchanged. Both diagnostics
+had zero new SEC requests, contact reads, credentials, SDK/QC or outcomes.
+
+Only after final accepted readback did the denied child rank the five smallest
+positive advertised KB LEXEMES as planning metadata, not actual byte sizes or
+filing/outcome selection. Smallest is original source ordinal5,
+`20201007.nc.tar.gz`,2020-10-07,`390877 KB`. Others in ascending nominal order:
+20201203/493450KB,20201008/523023KB,20201231/545232KB,20201014/569788KB.
+No archive was followed/selected by that read-only diagnostic. Final root/
+branch/HEAD/status and matching-only origin check remained clean a3b84a1d/
+41d729af. No incidental archive contents, Form4 identity, dates of actual
+availability, XML, rights, source completeness or readiness is inferred.
+Nine carried OPEN P2s unchanged; no final handoff/push yet. QC/Safari still held.
+
+## 288. Prospective unused-day bulk qualification decision, not activation (2026-10-25)
+
+Under the owner's delegated continuous-build/source-acquisition authority,
+choose the smallest NOMINAL advertisement solely to bound first-format work:
+exact Q4 ordinal5/20201007/390877KB and fixed
+`https://www.sec.gov/Archives/edgar/Feed/2020/QTR4/20201007.nc.tar.gz`.
+The advertisement does not certify compressed/uncompressed size, base or
+rounding. Runtime byte/time/disk ceilings must therefore independently refuse
+overflow; no presumption it fits. This is one unused day within the genuine
+required original-parent quarter union, NOT a representative sample, completed
+quarter/study, improved outcome or a retry/alias of either June URL. Every other
+advertisement and full25-quarter census/refusal accounting remain intact.
+
+Implement an ADDITIVE one-shot archive-format/custody wrapper around the exact
+frozen pure format engine and exact retained Q4 evidence. Do not edit executed
+Q4, old directory/archive/campaign, first64 or four v3 custody sources. Strong
+initial native source/control-capacity health and exact held inputs/original
+producer Git proof BEFORE fresh output/contact; exclusive claimed namespace,
+front-only activation, durable claim/start, exact request/header rechecks,
+one transport invocation, no proxy/redirect/retry/HEAD/Range/fallback/alias.
+Prospective limits:512MiB compressed response,15s idle,600s total transport,
+1,800s native inspection/readback, existing finite engine decoded/member/
+metadata limits,8GiB reserve PLUS worst-case response/control storage BEFORE
+private contact. These are engineering ceilings, not measured actual sizes,
+durations or throughput guarantees. All selected/remote refusal states remain
+fatal/consumed with finite own phase/code, never raw foreign exception text.
+
+For THIS first qualification retain the ENTIRE privacy-qualified raw archive,
+not selectively discarded/translated members, plus exact descriptors and
+custody receipts. No compact-retention policy is adopted. Initially strong
+network/fork/ALL-write/Keychain-exec-denied inspector receives bounded private
+anonymous IPC; full finite compressed/decoded privacy and gzip integrity must
+precede any body/header SHA/retention. Retention requires a NORMAL COMPLETE
+frozen-engine return after full finite privacy/gzip integrity/all-compressed-byte
+accounting, NOT physical-framing-complete or supported-member-profile acceptance.
+Such a return may honestly retain opaque/refused TAR evidence; it grants no
+extraction/admission. Any engine exception means no invented retention permission. Keep source
+changes/claims, body bounds/bytes and cleanup disposition independently exact.
+
+Use the externally pinned cumulative20,044 consumed-accession index from281
+(complete6233fc9b/indexd501e30d/plan3e54de6b), strict SH-held metadata plus
+original capture/plan Git proofs; never substitute original64 alone. For this
+FORMAT-ONLY scope, binding a no-redispatch roster does NOT observe archive
+membership. Prefer explicitly UNDETERMINED archive-vs-known-accession overlap,
+not0/no-overlap, with ALL members unextracted/unadmitted/quarantined. Any later
+observed incidental exact known accession TOKENS are only candidates, not
+canonical member identities. A later typed XML adapter must measure actual
+membership/overlap before admission/reuse. Unretained June memberships remain
+UNKNOWN, not zero. Do not redispatch any completed/ambiguous parent or resolve/
+rewrite stoppedv3. No third decoded-token pass is required merely to turn a
+bound roster into a misleading overlap count. If later specifically qualified,
+such a pass is local work on the same held bytes, not a supplier request or
+financial/PDS/XML projection. Frozen
+helpers with different cache prefixes require compatible fixed-role denied
+children; never patch their globals or call actual bodies invented fixtures.
+
+Independent retained readback may separately reload the CURRENT private SEC
+contact via one additional own Gmail-profile/anonymous-stdin feed, re-screen
+and replay the same frozen engine in ACTUAL mode after strict externally pinned
+custody. Do not store the contact or a hash, claim equality to an erased original
+contact, or mislabel current-contact re-screening as attested original-contact
+replay. This is separate read-only verification, not a second SEC GET. Original
+production screening remains distinct evidence. Exact preregistration/source
+hashes and final QA/clean commit are still required BEFORE activation.
+
+This note defines engineering/retention choices, NOT an activated archive
+scope. Main must record final wrapper source/test/validation and exact one-shot
+root before any new request. No XML/ownership/acceptance/issuer/SID/financial
+parsing, canonical admission, QC/Safari/SDK/job, prices/outcome or backtest yet.
+No new purchase requirement established. Continue offline; QC hold283 persists,
+nine carried OPEN P2s unchanged, no final handoff/push yet.
+
+## 289. Offline pilot gate map while QC remains occupied (2026-10-25)
+
+Owner explicitly confirms another lane is STILL using QC/Safari. Keep283's
+prepared composition cell2 and all earlier claimed contexts unchanged; no
+navigation, transfer, execution, query restoration, SDK or Mia interaction with
+that other project. This is an external UI resource hold, not permission to
+read another lane's outputs or a reason to manufacture pilot readiness. Continue
+available offline work. No strategy launch attempt has been spent in this round.
+
+Read-only source/record scout independently identifies this sequence, not new
+observed business-data evidence. First qualify actual NC member framing, then
+add a genuine typed archive/member provenance, identity/complete-XML/acceptance
+adapter preserving the old per-accession factories. A 256-byte token offset,
+invented SEC-DOCUMENT envelope or expected per-accession URL must not forge an
+old projection seal. Preserve PAC/deletion/private-release/paper-stub/version
+lineage; conflicting same-accession versions and uncertain clock semantics stay
+quarantined. The archival PDS document's EST label is not proof of the unseen
+2020 NC profile's timezone/DST interpretation. Reconcile the ordered real
+source/refusal/member ledger against284's required21 original quarters while
+retaining the complete25-quarter/all-six-form census. The new2020Q1 first64
+are valid context custody, not a reduction of required2020Q4–2025Q4 coverage.
+
+The next bridges have real unimplemented/evidence boundaries:
+`pilot_production_composition.py` ends BEFORE causal event/lot/reference and
+actual price-context composition. `backtest_source_stream.py` requires complete
+4/4-A originals for every inclusive31-label decision window. The existing
+`event_study_manifest.py` and `event_clock.py` supply causal first-$50k/first-open
+and issuer/entry merge policies, not actual PIT listing,60 prior raw close/volume
+observations or admitted events. The latest prerequisite must be available by
+open-minus2min. `registered_analysis.py` requires252 ACTUAL preceding
+open-to-open six-factor/RF intervals,60-session tail and genuine matched control
+features; its production outcome refusal is not to be bypassed by a fixture or
+an engineering registration. A future additive pilot-specific production bridge
+and permanent full-population protocol/look root are still needed.
+
+Retained EODHD67 buffered months/60 pilot months and their473,599 metadata-
+accepted rows do not prove issuer-complete historical actual-release/timing
+coverage. Qualify issuer and timing against genuine reference evidence for BOTH
+prescribed earnings diagnostics;232,735 unknown-timing rows remain unknown.
+The old2006/2018 missing bodies are outside this pilot, not a new purchase gate.
+Already supplied SF1 and retained TICKERS/ACTIONS/date-only diagnostics can
+support separately registered local qualification; they do not turn Sharadar's
+five-year price floor into early2021 raw opens, establish historical QC SID/
+share-class/listing/PIT identity or supply delisting terminal returns. Cloud
+ACK metadata cannot reconstruct the earlier reference values offline. Do not
+buy SF1 again or infer a new purchase requirement from these boundaries.
+
+Main accepts this as an engineering priority map under delegated judgment,
+not new source/PIT/rights/canonical/look/QC/backtest/execution authority or an
+independent review of implementation. Scout ran no tests, actual retained-data
+reader, provider, credential or QC operation; each future actual qualification
+still needs exact source/input/namespace registration and observed validation.
+Next available work remains288's bounded archive qualification, not outcome
+access. Nine carried OPEN P2s unchanged; no final handoff or push yet.
+
+## 290. Archive wrapper pre-activation findings and memory-policy correction (2026-10-25)
+
+Everything here precedes any archive activation, contact read or new namespace.
+Main read the full new wrapper/tests. Its563 focused format/input/record/active-
+document/boundary/EXACT-package checks passed39.47s on pre-memory sourcead42db92/
+tests ead73e1c; earlier560 passed39.20s before the header correction. These are
+superseded intermediate validations, not final memory-corrected qualification.
+No complete lane/repository suite. Tests used initial native network and
+Keychain-exec denial; source/metadata probes additionally denied fork/ALL writes.
+Invented fixtures had only registered temporary writable roots.
+
+Prospective **IBARCHIVEV3-PRE01 /P2**: main's invented capture/readback added a
+canonical extra field to response-headers.json WITHOUT changing the external
+complete pin. The wrapper accepted it: assertion exit1/0.897285459s, probe
+23,932,208ns, sourcebdb4814b. Its NEW Q4-input replay had the analogous omission;
+the executed Q4 collector's original verifier ALREADY requires exact schema.
+Author added faithful red tests and exact single-key/canonical whole-header
+guards in BOTH new paths, no frozen source edit. Main's unchanged original
+probe now rejects it: exit0/0.811075916s,19,552,875ns onad42db92. Peer reversed
+both guards:2genuine reds/restored2green. CLOSED only for these new paths, not
+evidence of actual retained-control tampering or a cause of old consumed runs.
+
+Peer's strong-native unpublished capacity layouts used2,048 long-path source
+entries,20,044 invented accessions,300 metadata pins: descriptor33,280,130B,
+IPC33,281,641B, input-preflight4,565,864B, reservation1,020,065B; the EXACT64MiB/
+3M-node inherited codec roundtripped them1.064s. Body/private-header envelope
+537,332,028B fits603,979,776B input cap. These are capacity-only layouts, not
+engine-observed members/business evidence; templates stay unpublished. Peer212
+focused passed15.86s. Author13mutation families/15genuine red checks/restored68
+controls exclude a surviving redundant single-check reversal: NOT counted red.
+An ad-hoc author py_compile lacked native wrapping and wrote only ignored
+bytecode: NOT qualification evidence; no actual input/network ran.
+
+Main's strong-native preflight then FAILED BEFORE inputs at the new draft's
+resource.setrlimit(RLIMIT_AS,(4GiB,4GiB)): exit1/0.658582542s, ValueError.
+Own getrlimit showed soft/hard2^63-1, AS=RSS=5,DATA2, not an inherited4GiB cap.
+Scout independently reproduced it. Apple's [resource definitions](https://github.com/apple-oss-distributions/xnu/blob/main/bsd/sys/resource.h)
+alias RSS to AS; its [kernel source](https://github.com/apple-oss-distributions/xnu/blob/main/bsd/kern/kern_resource.c)
+passes AS changes to map-size validation, which can refuse below-current-map
+limits. These current public sources support semantics, NOT exact installed-
+kernel attestation. Main independently observed SELF-PID virtual445,715,251,200B
+versus resident22,609,920B with the96-byte libproc task-info API: mapped address
+space is NOT consumed physical RAM. Baseline+1MiB soft cap read back
+445,716,299,776B, original hard ceiling preserved; unwritten64KiB mmap succeeded,
+unwritten2MiB refused ENOMEM12. Probe85,084ns; no memory stress/actual data.
+Scout separately observed the same control pattern. This proves a VM-GROWTH
+fuse, not an absolute4GiB RSS ceiling or old-run cause.
+
+Delegated prospective engineering decision: new macOS/POSIX wrapper uses native
+SELF libproc virtual baseline+4GiB growth soft fuse, respects already stricter
+limits/never raises hard ceiling, installs/readbacks fail-closed BEFORE private
+stdin/inputs. Add<=100ms sampled SELF peak-RSS4GiB abort plus final peak check.
+Explicit possible between-sample/GIL overshoot: NOT instantaneous/hard physical-
+memory cap. Keep finite512MiB compressed/8GiB streamed-decoded/32MiB metadata/
+member/IPC/disk/time controls and native network/fork/ALL-write/Keychain denial.
+Static policy can enter deterministic plans; volatile VM/RSS readings must not
+break equality-replayed controls. No silent exception-and-continue. Fresh main/
+peer native guard/capacity proof and clean committed source precede activation.
+
+Prospective **IBARCHIVEV3-PRE02 /P2** tracks the unusable absolute-AS draft and
+is PENDING corrected native proof, not waived by mocked tests. No frozen thaw,
+June retry, XML/financial/source admission, QC/Safari/SDK/job/outcome/backtest or
+final push. Nine carried OPEN P2s unchanged; this prospective finding remains
+separately pending and must be dispositioned before activation.
+
+## 291. Final archive-front qualification and exact one-shot registration (2026-10-25)
+
+New additive pair, now frozen for activation:
+
+- `research/insider_buying_sec_feed_archive_format_v3.py`,57,522B,
+  `b53808d458e270db465586b9863e2acc3efa56f9c42e7524cc6424a0aa2261e0`;
+- `tests/test_insider_buying_sec_feed_archive_format_v3.py`,39,501B,
+  `abe696390af1316d70654bbdb146880d480ddc2e199aa248f1fb409647d6ee18`.
+
+Main's previous full native retained-metadata preflight on the preceding
+memory-corrected pair passed memory installation but FAILED the unchanged
+campaign source-identity guard: generic loaded/static import closure omitted
+two string-named inherited test paths. This was a NEW front assembly defect,
+**IBARCHIVEV3-PRE03 /P2**, before any namespace/contact/request, not a bad actual
+input or grounds to weaken the legacy guard. Author's faithful regression
+observed1red2.93s. The new front now starts with the complete qualified
+batch.campaign._identity(head), THEN adds/verifies its own current/frozen
+pairs. Ambient-test-module independence is explicitly tested. Peer independently
+reversed only that builder in live globals:2 genuine failures at the REAL legacy
+source-identity guard4.32s/restored2green4.87s. An earlier copied-globals reversal
+failed at the wrong isolation stage and is NOT counted as guard evidence.
+
+Final observed MAIN strong-native `_worker('preflight', identity)` compiled127
+images and executed the corrected VM-growth/RSS guard BEFORE source/retained
+inputs, actual strict held Q4 listing and batch metadata/predecessor proof,
+20,044-entry consumed roster, near-quota codec capacity and final source/guard
+checks: exit0/7,010,390,250ns. Inventory
+`a9211ed16525828c46da03946a6166ecc77d111f399090418de45024828b91a1`.
+This manually SAME complete assembly used basea3b84a1d plus explicit uncommitted
+new source/test hashes: NOT clean-Git attestation or a later commit already
+existing during execution. No private contact/new namespace/provider request;
+zero old original-parent body bytes read. Q4 report6081e7b6 and cumulative20,044
+matched. Actual preflight control sizes: reservation19,328B,input573,060B,
+claim237B,start235B. Unpublished capacity-only layout:17,610 member and17,610
+gzip rows, descriptor33,280,130B/IPC33,281,641B; not observed archive membership.
+Actual clean production identity/original producer Git must still independently
+pass the front BEFORE contact at activation.
+
+Final MAIN588 focused checks passed47.96s: new wrapper, frozen pure engine,
+Q4 input, campaign/batch helpers, record/active-document, lane import boundary
+and EXACT `tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports`.
+Author102 passed16.17s; peer237 passed23.69s. All required native network/
+Keychain-exec denial and isolation held; no full lane/repository suite. Author's
+separate source-only native guard/capacity proof used107 images and an unwritten
+5GiB map refusal, with nine genuine memory reversals/restored23 controls. Those
+preceding-image proofs are attributed, not MAIN actual-input observations.
+
+IBARCHIVEV3-PRE01/PRE02/PRE03 are CLOSED only within these corrected prospective
+new-front scopes after the final native/input/integration proof. No frozen
+Q4/archive/campaign/first64/four-v3 source changed; nine carried OPEN P2s stay
+OPEN. Supported native resource policy is baseline-relative kernel VM growth
+plus requested50ms sampled peak-RSS abort, NOT hard/instant RSS. Production
+publish=True keeps the sampler alive through JSON serialization, stdout write/
+flush/final sample; direct publish=False caller serialization is explicitly
+outside sampling, still subject to kernel VM/IPC bounds. Volatile measurements
+are not deterministic source/input-plan fields.
+
+Register exactly ONE unused GET, under288's delegated acquisition/format-only
+decision: `ib-sec-feed-archive-20201007-format-v3-20261025-once`, root
+`artifacts/insider_buying/sec_feed_archive_format_v3`, fixed Q4 ordinal5 URL
+`https://www.sec.gov/Archives/edgar/Feed/2020/QTR4/20201007.nc.tar.gz`.
+Original advertisement390877KB is only the priority cue, not measured bytes.
+Protected anonymous stdin, initially isolated flags/cache prefix, original
+Q4/capture/planner Git/current-source/native/input/control-capacity proof,
+8GiB reserve PLUS512MiB response/four64MiB controls before contact, exclusive
+fresh final directory/durable claim/start, one direct transport invocation,
+15s idle/600s absolute transport/1,800s native worker. No proxy/redirect/retry/
+HEAD/Range/fallback/alias/individual-parent redispatch. Entire raw retention
+requires normal frozen-engine complete finite privacy/integrity return; opaque/
+unsupported TAR may remain honestly retained, never extracted/admitted. On
+refusal preserve consumed controls, no raw hashes/bytes invented, no retry.
+
+Main's separately identified invoking glue will protect TTY echo and repeat
+read-only clean-source/native/input/original-Git/disk/freshness health BEFORE
+requesting a private own Gmail profile contact; then the authoritative actual
+front independently repeats all gates before consuming queued stdin. Glue is
+not silently part of the committed module inventory. Keep value/hash out of
+chat/Git/logs/argv/env/Keychain. A separately registered independent readback
+may reload CURRENT private contact once, rescreen/replay same retained bytes in
+ACTUAL mode, no new GET, no original-contact equality/attestation claim.
+
+Commit this source/registration before dispatch; record that already-existing
+exact producer HEAD and actual result separately. All writer activity must stay
+frozen through operation/readback. Bound consumed roster is NOT observed member
+overlap: UNDETERMINED, never zero. No XML/financial/acceptance/issuer/SID parsing,
+source admission, QC/Safari/SDK/job/outcomes/backtest, study completion or final
+push. QC hold283/289 remains; continue only available offline work afterward.

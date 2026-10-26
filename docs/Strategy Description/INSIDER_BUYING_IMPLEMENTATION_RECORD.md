@@ -37151,3 +37151,67 @@ or old namespace mutation is necessary. QC/Safari remain held by another lane,
 zero launches; no interim push or final handoff at this engineering checkpoint.
 After313–316 main124 record/active-document/boundary/EXACT-package checks
 passed3.89s; final five new source/test hashes matched the stated pins.
+
+## 317. Clean NC metadata qualification passed (2026-10-25)
+
+316 executed on already-existing CLEAN
+`7d996f5a7938135d97cddbec83dd5c2312189ca2`, exit0,total29,194,249,458ns.
+REAL149-source inventory
+`3fe784489c7f473cd5a7c950ca8c2996002a80dc0fec0bb33aac9156b2ba2d25`,
+not manual142 or author141. Held-input digest remains
+`a8f2ebce8b2368bc2b8ab8aa1903a886d9df8c35ba648ee73cb2c86490dece45`;
+head-specific135,404-byte plan
+`73fe8104847a1efa552c83d4fa6abf0b8b104f571e1bba2c38ca5c539931fdfd`;
+registration `86b2afb3a2197029bdbf1b85b408a0b3f5d8c7c0f8fed16e6adbd3a85210ccc4`.
+Initially strong native source compilation/current rechecks before held old
+metadata, live291 memory guard through stdout/final sample; old control/
+producer/current/Git/SH/FD proofs passed. Raw prefix/body/contact/profile/
+namespace/requests0. Source/test/record writers frozen; tree remained clean.
+No NC structure was actually interpreted by this metadata qualification.
+
+## 318. One read-only NC-prefix observation registered (2026-10-25)
+
+Under delegated completion judgment AFTER317, commit317–318 and verify the NEW
+already-existing CLEAN designated producer HEAD before activating ONE scope
+`ib-sec-feed-prefix-nc-structure-offline-v1-20261025-once`. Freeze ALL source/
+test/record writers through completion. Execute only315's read-only front on
+the SAME307 externally pinned65,536-byte prefix. No new namespace/claim/output
+artifact, provider/SEC request, source-row ingestion or old-root mutation.
+This observation is not an acquisition/transaction, filing admission, outcome
+look or backtest; its exact safe stdout metadata and execution/source bindings
+will be documented here. No semantic retry after failure or repeated scope by
+renaming; separately justified new work requires its own registration.
+
+Trusted invoking glue
+`9844842405941e8ed5f6502faaa2cdd0ab651db0bffd113cb41722c2504ac2e9`
+is separately identified orchestration, NOT part of the149-source image. It
+protects TTY echo and repeats full source/Git/original-producer/strict old
+metadata/native health before requesting ONE own-profile contact. Protected
+ready marker must bind149/3fe78448, inputa8f2ebce and registration86b2afb3.
+No value/hash in chat/Git/logs/argv/env/Keychain; feed anonymous stdin once.
+Authoritative read-only observation repeats preflight BEFORE consuming queued
+input. Native source compilation/current checks precede held/private bytes;
+network/fork/ALL-write/security-exec denied from startup,291 memory guard through
+JSON stdout/final sample,180s native wall/1MiB IPC. Complete raw/ALL-produced-
+decoded finite privacy precedes any local source hash. Strict SH/FD/version/
+control/current-source holds and parent final exact Git check remain binding.
+
+Only314's complete-small-physical-span NC/tag/XML syntax is observed, with all
+partial/oversize/unknown/unsupported/capacity dispositions explicit. No convenient
+subset publication. Return sanitized full observation plus exact witness/
+source/input bindings; a witness hash covers own safe aggregate metadata, NOT
+a new raw/member/accession/value hash. Source/code and old known prefix custody
+hashes are explicitly distinguished. No original-contact equality/screen or
+whole-carrier/source-authenticity/GNU-logical/PDS/PIT/rights/admission/readiness
+claim. No new output exists for a separate file readback; do not relabel a
+metadata contract recheck as independent raw-source/semantic replay. The old
+prefix is independently verified already, and this operation rescreens it
+through its frozen verifier before the new witness.
+
+Record exact observed status, producer/runtime lineage, safe per-member
+dispositions, source/witness pins, validation, exclusions and next factual
+action afterward. Nine carried OPEN P2s/20,044 individual dispatches unchanged.
+No source window/economics change, frozen bytes thaw or stopped-v3 resume.
+QC/Safari remain in another lane's use, zero SDK/jobs/outcomes/backtests/Mia.
+No interim push/final handoff; continue available work after this observation.
+Main124 record/active-document/boundary/EXACT-package checks passed4.28s.

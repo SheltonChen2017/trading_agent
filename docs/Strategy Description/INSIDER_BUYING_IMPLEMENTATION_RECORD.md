@@ -37701,3 +37701,180 @@ Any refusal remains a failed preflight, never success by a later control.
 All writers frozen until it terminates;900s bounded worker/2MiB IPC and291 live
 through stdout/final sample. Recheck root/branch/exactHEAD/clean status and
 origin41d729af before commit; no interim push. Ten OPEN P2s/readiness FALSE.
+
+## 328. Actual clean metadata qualification succeeded; no source-body activation (2026-10-25)
+
+Executed327 exactly once on already-existing CLEAN
+`e4ae7e1f9fb5ecb4f9fd313f48d2157f52c583b2`, designated root/branch, all writers
+frozen until exit. OBSERVED exit0 in40,423,241,542ns total parent qualification
+time, not worker-only timing. Actual implementation remains325's three exact
+hashes. Current157-source inventory
+`d2c775a021e9568af45ed393d4bb37b623f69419197a13b2a196236b9245ae80`;
+registration `28c564d5be5a0ae5de4be8e2273fa11d3ce706c1b6c751cde234970c81352fb6`.
+Plan207,868B SHA-256
+`6990f2afbac50000c5550aace5571c2d4a4ffa7f7392afbed432faf30461b3d8`.
+Original-prefix metadata digest remains
+`a8f2ebce8b2368bc2b8ab8aa1903a886d9df8c35ba648ee73cb2c86490dece45`;
+source-control metadata digest
+`3a1b0f84b6e4687fd56c6ecfa2c66fd117d645a0a6f1452adeb4294a48ce0b21`.
+Separate invocation glue SHA-256
+`bc37bd08b6772903e9fd142f37042a821a2db3e7113cd7edb7d893c9d2e88c75`.
+These are own code/control metadata, not exported NC route/value digests.
+
+Trusted parent proved current clean Git and original producer bytes. Native
+worker proved initial process-tree network/fork/ALL-write/security-exec denial,
+compiled/rechecked current source, strict old SH/NOFOLLOW/FD/stat/ctime controls
+and continuous291 guard through stdout/final sample. Stat-only intake/held
+prefix preflight read ZERO actual prefix/ZIP/original-parent body bytes and
+ZERO contact/profile; no namespace, acquisition, SDK/store/QC/outcome/backtest.
+Body proofs remain DEFERRED. No NC/source17 matching operation was activated:
+there are still no actual matching results from325. Do not relabel its genuine
+invented2-candidate proof as actual evidence. Only319's older structure witness
+and321's distinct cloud zero-query composition have their separately recorded
+actual semantic results. No new semantic registration, retry or claimed root.
+
+## 329. Final continuous-round handoff: factual readiness blocker, one publication (2026-10-26)
+
+### 329.1 Owner direction, disposition and concrete missing input
+
+The latest owner releases QC/Safari and says start backtesting IF ready, then
+push when done. Continue-build/delegated ordinary decisions/no-Claude-wait/
+single-final-push directions persist; they cannot establish missing historical
+facts. This round stops on326's concrete source-evidence blocker, NOT for a
+routine milestone checkpoint or to wait for Claude. Acceptance-clock MODEL
+engineering is preserved, not silently redefined or reported as verified public
+availability. To satisfy the already binding09:28/09:30 knowability rules, the
+lane still needs historical evidence that each required filing/version and
+complete population was publicly known no later than those existing cutoffs.
+An authenticated known-by upper bound is sufficient; exact first seconds are
+not an invented additional requirement. Current retained/provider credentials
+and present-day acceptance/custody records do not establish this input.
+
+No new source-body/HTTP/QC operation is justified solely to pretend it resolves
+that missing historical evidence.325's real-input matching remains unactivated
+after its successful metadata qualification, not failed or completed. Full
+required21-quarter original coverage/all-six-form corroboration, issuer/share-
+class/listing/PIT identity, causal source/price/volume/factor contexts, both
+earnings diagnostics and permanent full-population protocol/look bindings also
+remain unfinished/unqualified. Safe structural adapters/fresh pilot21 selection
+could be built later, but would not themselves supply the missing public-known-
+by archive. Existing all25 campaign selects early2020Q1; do not activate it as
+if it were a required21-window acquisition. Current64GiB free/2.2GiB Insider
+artifacts is a read-only capacity snapshot, NOT a proved full-corpus requirement
+or independent capacity refusal. No additional purchase is established now.
+
+Concrete next input: qualify an available historical first-seen/public-known-by
+archive or original timestamped SEC/PDS/RSS/public snapshots, with reliable
+clocks, exact accession/body/version lineage, required2020Q4–2025Q4 warmup/pilot
+coverage and complete refusal/underfill accounting. Ask any candidate supplier
+for a sample and these fields/coverage/rights BEFORE buying. An ordinary price
+bundle or another date-only earnings calendar is not that evidence. A present-
+day Oldloads download may recover acceptance/control bytes, but cannot alone
+prove historical09:28 observation. No claim every future supplier is impossible
+or a purchase mandatory. Without actual evidence, do not manufacture readiness,
+silently delay/drop events, weaken a custody guard or launch a fixture/zero-
+event proxy strategy as the promised sourced backtest.
+
+### 329.2 Exact outgoing implementation lineage, no invented review
+
+Starting independently verified origin is
+`41d729aff80752cdc1ad6ef73690d9c59711d712`. No incoming review or other remote
+advance arrived in this captured continuous round. The36 local commits in the
+ordered range41d729af..e4ae7e1f below are this authorized engineering/record
+series; NOT independent Claude acceptance. Their focused tests, prospective
+findings/corrections, exact actual scopes, failures and exclusions remain in
+their associated entries. Failed actual operations are NOT accepted as
+successful by their later controls. This separate handoff commit follows all
+implementation hashes; its own exact tip will be independently verified after
+the single matching-lane push, not circularly embedded in its own bytes.
+
+| Exact commit | Per-commit scope/disposition |
+| --- | --- |
+| 39b1e6a61dff09ebce86e00a809a1733a3eac8c1 | Pilot source/reuse audit registration; preserved. |
+| b33cf144153fd118add3acdc6a9caad22b8b4077 | Source coverage/reuse engineering; evidence gates retained. |
+| 3dc014feecff0900261b9b86f000e1eb9e65b692 | Retained-parent structural corroboration, not corpus promotion. |
+| b3aea4f10b7512eee2e1629a8417df0784cd4dbc | Fresh selection/capture engineering; separately bounded activation. |
+| 1bb03b8ee44088cad82872c12a6cd7f38e9ef961 | First64 exact scope/QC-release record; actual evidence as recorded. |
+| 2e3224d6d69e4eb9ce2c877505b9ea2473b0ceb3 | Locator/Feed inventory engineering; no inferred retry. |
+| 13eea4f65a74d56059a8b20fd7b1846c190bad85 | Failed directory-control diagnosis; original failure preserved. |
+| 6011ae9d561fb7308249c55677055e4fa62c1150 | Distinct Q2 census/control qualification. |
+| 20e5dbfc7c3b640b9f3054273767a330ea61883f | Retained-profile/auth-only QC engineering; not strategy launch. |
+| eb2482a27c2ed325cf0b7a735d1030fb4b49a724 | Exact producer-test source binding before observation. |
+| 7458c598b97f61a21d1c2023ef8451bf1afa6740 | Retained links/protected parent/cloud-control qualification. |
+| b4ffa2760553c54b5cd3566e65334ea95534ef04 | Observed structures/control ACK recorded at exact scopes. |
+| c4311eab0b7a0540ac03e83b4eba22c96a1ac436 | CIK/archive candidate engineering; later failure remains failure. |
+| bc2c9dc6caa5129153ea85a3a3f0c9729f0e8d8d | Failed archive custody and distinct CIK-receipt replay engineering. |
+| 5553afed958734aa61a532d40f88c51e3688fcd9 | Distinct collector/pilot-source composition, not actual admission. |
+| 0291be356f1ac41fa31a49b3a499bfd72b9baa94 | Historical reference/causal-event contracts; gates retained. |
+| 586d3ef38700f4a963488d70b29736e03f0b4a85 | Additive campaign engineering; stopped initial scope preserved. |
+| d177c941159ff22f2932d1a4c72f4fa361cb7354 | Isolated launcher correction/reference record; later CLI failure retained. |
+| de12364738b662bb163798346c6623122ff4b814 | Failed planner journal and exact candidate-plan qualification. |
+| 0ebcafed5de1c3d51a6492a8d1e7e1a914072e6f | Query-free composition engineering; later actual run321 distinct. |
+| a3b84a1dfb7a4fbe958ac162fae88a74f882e706 | Required-window listing/bulk-format engineering. |
+| 366385e4b97e867ae7ca004b30c588cc1f5beb9a | Bounded archive/native resource controls; failed Oct7 preserved. |
+| 099078478a1dd21f5d5a928485ded1b7351d4b98 | Compact-member pure custody qualification. |
+| 77353c5b6e78742bb55cdb8710304beb21782ad3 | Compact-controller qualification, not actual carrier success. |
+| 71c37d23af4cf037ac3c1f9cc9e80dea30ce7b8e | Compact preflight/one-shot registration; later Dec3 failure preserved. |
+| 5e2738310b6b40c2ed93db46ea7468130c428fb5 | Failed compact record/new prefix-format engineering. |
+| 00954cafb100bb552b3b316ddc60c3fa999e8fc8 | Strict one-shot prefix custody front qualification. |
+| 941a6f78608b6ffb3f76c986176495cb7fae43bf | Clean preflight/unused-day Range registration, later307 exact result. |
+| e9b27628a57f75a40b076ffc719ab260a6879f9e | Sequential prefix-shape pure qualification. |
+| de71afa8e3ba316e1e0b6100395c8c5dc1883ca8 | Offline shape custody-runner qualification. |
+| 85f0857325b612d8941ced620c4e8c9dbdad49e7 | Exact offline shape registration, later313 result distinct. |
+| 7d996f5a7938135d97cddbec83dd5c2312189ca2 | Bounded read-only NC structure engineering. |
+| 1e706972c5bdee31375ecc169fd562c5f83a72b6 | Exact NC structure registration, later319 result distinct. |
+| d4467ce70913a65663ddfe96e795dedbdbf292b2 |322–324 pure lexical routing/full25 binding qualification; invented proofs only. |
+| e5e83bcaac20fe54dbc69e70e298585653819be4 |325 front qualified;326 factual publication limitation/OPEN issue documented. |
+| e4ae7e1f9fb5ecb4f9fd313f48d2157f52c583b2 |327 metadata-only qualification registration; actual328 succeeded, no body activation. |
+
+### 329.3 Validation, durable state and publication exclusions
+
+Latest main focused568 GREEN22.68s on exact final front/pure/test images;
+124 record/active-document/boundary/EXACT checks then GREEN4.60s and4.27s
+after325–327. Earlier focused/strong/actual runs retain their own exact source,
+hash, timing and attribution; there was NO complete lane/repository suite.
+Main native initial four-denial/291-live final scope check on e4ae7e1f found
+exactly98 changed lane-owned files, compiled all97 Python images in memory,
+verified all four frozen v3 bytes unchanged and no shared document except the
+lane record. Scope manifest at THAT preceding doc image:
+`66f8f1043a645428f30283d88e2e0a56add742ebc33f22a6072ab0f2abe2f34a`.
+Later record-only handoff edits do not relabel that preceding manifest hash.
+
+Cumulative diff checking identified two non-blocking trailing-blank-line EOF
+notices in already executed/byte-bound Q4 directory source/test (lines711/584).
+Preserve those exact custody images rather than rewrite them for whitespace.
+The rest of the cumulative diff is whitespace-clean with those TWO explicit
+paths excluded. Latest staged handoff checking must separately be clean; do
+not report an unconditional clean cumulative diff. No code/test deletion,
+frozen-file thaw, shared behavior/Action Plan/SESSION_HANDOFF edit, reset,
+branch switch/side-worktree/force push or concurrent work overwrite occurred.
+
+Live QC own37465795 composition321 completed exactly once, zero new SDK/store
+calls/data export; its graph remains volatile kernel state, not a new durable
+platform-data capture. Old cells/scopes were not reexecuted by that operation.
+NO strategy backtest was launched: ZERO candidate launch attempts, outcomes,
+registered looks or empirical performance claims. No capital/broker/paper/live/
+real-order authority or action. Do not promise a good empirical result.
+
+Keep nine carried OPEN P2s plus IBPUBLIC-KNOWNBY-01 OPEN; no new OPEN P0/P1.
+All resolved findings remain resolved only within their scopes. Frozen v1/
+scale/pilot/four custody files, stopped v3 1,846/1,847, separate7,373B diagnostic,
+legacy19,846/99,394 custody and79,548 unattempted, strictD23 seven nonexact/no
+82-quarter promotion, both final nonretroactive access classifications,
+consumed/failed/ambiguous URLs/roots and private SDK draft namespace unchanged.
+20,044 individual dispatches are not complete pilot admission. Original82-
+quarter population is not rewritten by this separately authorized pilot.
+
+End on the concrete factual blocker without pretending unfinished engineering
+is complete. Reverify designated root/branch/exactHEAD/expected record-only
+status, fetch ONLY matching origin and stop on advancement. Commit THIS final
+handoff separately, then exactly ONE successful push of the accumulated round
+to origin/codex/strategy-insider-buying; independently verify exact remote tip
+and clean status. Monitor remains PAUSED; no auto-rearm, other automation or
+message to another chat. No interim push has occurred.
+
+Final handoff-only124 record/active-document/boundary/EXACT checks passed4.47s;
+latest unstaged handoff diff checking was clean. Matching-only fetch still
+41d729af, exact local parent e4ae7e1f, record-only status. Calendar rolled to
+2026-10-26 before publication (observed07:02:02UTC); earlier20261025 scope IDs
+and execution/source images are preserved, not renamed or backdated.

@@ -2166,10 +2166,15 @@ adjacent-series and within-job phase protocol(323.51 onward) then refused the
 current general collaborator-row pin before mutation/job(323.54) and is SPENT.
 Q's separately frozen read-only access observation(323.55 onward) then passed
 both unchanged policies with original owner only in both views(323.57) and is
-SPENT. R's new strict owner/A5-only recovery(323.58 onward) may attempt the same
-P scientific experiment only after its separate source/run freeze and fresh
-gates. Q does not grant a capability or identify P's historical changed field.
-No cross-job native-SID continuity or market-wide absence is inferred.
+SPENT. R's separately frozen strict owner/A5-only recovery subsequently passed
+once(323.60), completing the P scientific experiment: adjacent Daily sessions
+were present but October21 was absent, including Minute queries before and
+after a genuine market-clock bar. The within-job native identity matched; no
+price, strategy result or physical cause was admitted. R is SPENT and the
+booked floor is336shared/259development/52infrastructure/699cells. S(323.61)
+is a new local-only source-eligibility preparation, not QC price transfer or
+a strategy continuation. Q does not identify P's historical changed field;
+no cross-job native-SID continuity or market-wide absence is inferred.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
 V3 is spent after its
@@ -61113,3 +61118,248 @@ mutation-fixture sensitivity gap, corrected prospectively by the root test
 seam and true red/green proof above, not erased or called an operational
 failure. Same-round authors/audit are not independent acceptance. No actual R
 leaf/private/credential/API call has occurred before this entry.
+
+### 323.60 Actual R completed the P experiment; exact-date gap retained
+
+At cleanf701a602885384130d4607756e17eaf8ef2be175, sole R parent ran
+2026-10-26T03:12:55.944302Z..03:14:10.871893Z, actual0/stderr0/no bound.
+Stdout15239bytes SHAc31aaf6b7783b96278530a2a2bab7f64edcacaa470585bd33a4601592ba292a4.
+Sole native supplied-output validator03:14:10.872488Z..03:14:14.507394Z,
+actual0/stderr0/no bound, identical stdout pin/output_authenticated=true.
+Report15109bytes SHA54c6c1c5d872864e86e3d3ce8855f64b95e15e91d478ae82de66f7f6da5ee14c.
+These are external parent/validator brackets, not precise provider timings.
+R claim/parent/workers/validator/control are now SPENT; no reread/retry/repair.
+
+One jobfe0603a704d33cfce3d072947bcc56e0 in project38364439, named
+ARV2 R298 REFERENCE SERIES PHASE R323 P, compile
+d527e950e2a673b9c56c96b45a91ac91-f769ff859a5e3b6108b95e45bff62bf0,
+reached exact Completed. with47application API dispatches. Physical request
+count is unmeasured. This is attempt2 of the same scientific P experiment,
+not a second P job or new strategy candidate. All original fresh owner/A5-only
+access/source/history/compile/capacity/input gates and final source/access/
+private admission equality passed. Fresh genuine6151 binding resolution gave
+5121resolved/1030named refusals, measured in this job rather than copied from N.
+Both selected and SPY securities had exactly two RAW Minute configs, one
+TradeBar/one QuoteBar, no fill-forward/extended hours and verified NY zones.
+
+The [October17,October25)2022 Daily census returned5batches/5items: exact valid
+precise09:30-to16:00 sessions October17,18,19,20,24. October21 has zero rows
+in batch/Time/EndTime/valid-session buckets. All invalid/duplicate/SID-mismatch/
+fill-forward/unknown/other buckets were zero; no legacy midnight shape occurred.
+The exact October21 regular Minute query returned0batches/0items during
+Initialize at October25midnight AND after a genuine non-fill-forward SPY
+09:30-to09:31 OnData bar on October25. Three explicit History calls/two summary
+updates completed. diagnostic_complete=true means that this enumeration and
+market-clock protocol completed, NOT that data completeness passed.
+
+Native SID/display/SID.Date fingerprints matched before/after probes and at
+all three dated resolutions2020-11-01/2022-10-21/2022-10-24; each roundtrip
+matched and SID.Date related before_reference. SID SHA
+1473d9635c3db103e3ff7b0ccfa1a05a53df98727a202d491b853724dd5dea94;
+display9c3e954a5ee8ee9bb6e03de9d3f5533d03513a7ebb1212bd58bba3fb03ce9f7f;
+SID.Date7d9f65cb16b9d879072061e8ee4d77288f68d0336cde16b1c70176397a0cea26.
+Initial metadata SHA0e89d3718f6c13679a98b2addef1743151a0d4f8fa9659774528e1f0c31d66de.
+These are current-database within-job consistency observations, not original
+historical resolution/listing proof. N/A19 did not retain cross-job native
+fingerprints; never infer cross-job SID continuity from this result.
+
+The retained observations make initialization timing, received-row timestamp
+classification and the October24 exclusive endpoint poor explanations of THIS
+gap. They do not establish a physical vendor cause, genuine halt/absence,
+permanent master/PIT admission or a fix. O's independent positive vendor mark
+remains existence evidence only. No OHLCV/price/volume/cache field, order,
+strategy return or ordinary outcome was read/selected. All source/master/PIT/
+paper/live/family-comparability/strategy-readiness flags remain false and
+result_cell=0. The held-stock price stop ARV2E323-001 remains OPEN.
+
+Last authenticated cloud source is now P's exact11-file scientific projection
+73b8c8f2cd54a227798d83f65846ca90ff80cd7a7d016563a47abaa8c2a0bf9e,
+profile66c49c90e0b45cfb892dbfdedb6ca7e7d110508de353a0fc8250bfdf91be32ff,
+manifest+LF1667bytes SHAb5ebe76c779ede0065552da2bb8377860766acc949d7e75ea853e781af55aea7;
+runtime25276bytes SHA14b1c86ba3d9e4e115fe9fee28437c10ce92b68dc2c508b2e0241bff8756d8cc;
+main6992bytes SHAc7ab14468100372650a238a783225760a0e6d9c5fe91915e4899bf7c8eca340f.
+The other nine files remain exactA19. No strategy source was restored afterward.
+
+Book R's one actual job-create event ONCE335/259/51/699 ->
+336shared/259development/52infrastructure/699cells. P/Q had no job/look; do not
+double-count the P scientific name and R operational claim. This entry's
+R298-only append to alpha-result preserves all historical/other-lane entries.
+Other five comparison projects remain uncreated/unlaunched. No tests/edits
+occurred during R's clean one-use parent/validator. One final push remains due.
+
+### 323.61 New local-only source-eligibility stage, not one-stock fallback
+
+Under255.2/current owner continuation and Claude waiver, choose an additive
+local-only Sharadar eligibility stage S BEFORE any common price acquisition
+or successor strategy run. R/O do not justify a scalar price/cache patch,
+dropping the held stock, changing its selection or filling the date with a
+previous session. All six/eight by AR-off/100%/200% cells must use one common
+source/unit/valuation policy. Replacing only the09:20 reference would leave
+current engine-NAV sizing/returns dependent on independently stale marks.
+A coherent successor would need actual QC cash plus every actual held whole
+share times the same-session admitted unadjusted USD close, with prior-session
+NAV sizing, same-day split bridge and unchanged09:31 quote/fill/cash/fee guards.
+Vendor marks must not seed Security.Price/cache/executable quotes. Credited QC
+dividends/cash-in-lieu/forced exits must not be credited a second time.
+This is design analysis, not implemented/admitted strategy behavior.
+
+Main read current primary [stock](https://sharadar.com/docs/stocks) and
+[fund](https://sharadar.com/docs/funds) schemas: closeunadj is the relevant
+unadjusted per-share field; close/closeadj have different adjustment semantics.
+Their after-close publication schedule does not establish original historical
+availability. [Current plan documentation](https://sharadar.com/subscribe)
+separates products/history tiers; today's five-year plan cannot by itself cover
+early2021. O's October2022 success proves neither full-window nor fund access.
+Do not buy/upgrade anything or assume a subscription tier from endpoint200.
+
+Existing262.4/286.1 and current owner direction support local research under
+existing rights without another routine acknowledgment or retired vendor-email
+wait. The narrower existing private-QC permissions in297.14 do NOT authenticate
+a new raw-price package's cloud-use scope. [Personal terms](https://sharadar.com/terms)
+permit individual research and restrict data/reconstructive sharing; those
+public terms do not expressly settle this new private-QC processing boundary.
+This is not a finding that private QC is forbidden. Before a new QC transfer,
+bind the exact permitted representation/access/retention model rather than
+inventing vendor attestation or a blanket waiver. S remains LOCAL ONLY.
+
+S's purpose is current stock/fund routing/size and early-period table-access
+observation, NOT replacement acquisition, a strategy price/NAV package, full
+historical coverage or paid-entitlement proof. It gets at most six application
+GETs: two complete bounded tickers CSV subsets(table=stocks/funds, exactly the
+12 O metadata fields, limit100000/skip0/sort=ticker.asc); two stocks/funds
+status=True metadata observations; one exact2020-12-31 stocks/QCOM probe and
+one same-date funds/all-eight frozen own-ETF probe. These PUBLIC probe symbols
+test table/window access, not the genuine6151 routing census. No private old
+input/control/artifact is read. A later genuine common-universe bridge still
+must authenticate/collision-check every applicable identity without using
+availability as an eligibility filter.
+
+Prospective budgets: each metadata CSV16MiB/at most99999rows, field2048bytes;
+each status8KiB; each early-price CSV64KiB/limit100 with exact fields
+ticker,date,closeunadj,lastupdated and no pagination. No limit-hit acceptance,
+redirect, retry, fallback, failed-body read or body in external output. One
+owned zero-retry/default-TLS/trust_env=false session, exact prepared/response
+URL/query/header bindings, credential-echo refusal and persistent intent/status
+journal. Current duplicate/ambiguous routes or wrong currency/type refuse;
+zero early rows are observed absence, not silently successful price coverage.
+All positive observed prices must be finite/unadjusted/exact-date and stay
+private. Native current output security/full held/named metadata/ACL/xattrs
+must remain binding through validation and return, not a hash-only substitute.
+
+New S parent600s/outer630s and once-only20s supplied-output native validator
+are proposed, with designated Mac/Python3.13/root/branch/cleanHEAD/source pins,
+one exclusive claim before a single existing Sharadar login-Keychain lookup
+or contact. Partial/duplicate/nonzero/ambiguous claim/use is spent. Only own
+child kill/reap, no cleanup/marker repair. Public output<=128KiB, closed counts/
+hashes/statuses only, no token/routes/rows/price. Fixed prospective leaf
+newrule_sharadar_eligibility/R323-20261025-S is NOT inspected or allocated.
+Implementation/tests, root audit and a separately committed exact run decision
+are still required before any invocation. No QC/provider operation occurred
+for S at this entry; it books no job/look/cell, preserves336/259/52/699 and all
+false flags. Same-round advice is not independent acceptance; monitor PAUSED.
+
+### 323.62 S final implementation, assurance and exact one-use decision
+
+Main read all four new S files and their unchanged O transport/Store pattern
+before selecting this use. No frozen O operation, capture/worker/main or global
+is invoked/modified. S has its own parent/claim/Store/observer/validator identity;
+only pure canonicalization, preflight-support, security/transport primitives
+and fixed dependency inventories are reused. There is no old private source,
+genuine6151 join or QC capability. No arbitrary callback, authorization boolean,
+silent pin refresh, retry or source-stop bypass is added.
+
+| File | Bytes | SHA256 |
+| --- | --- | --- |
+| scripts/arv2_r298_sharadar_eligibility_observation.py | 26664 | c2c669b7e58bbb9ce118328225ddc8b8e7d96df1c1d7727309e42544279a197e |
+| scripts/run_arv2_r298_sharadar_eligibility.py | 24217 | b24c1538b13dfc44aa4890695043fb1d270023319b2e07039211b88c4c1b0ad6 |
+| tests/analyst_revisions_v2/test_r298_sharadar_eligibility_observation.py | 14220 | a9d76e7d0b90072ed738221c1857d6dfde11f647e732257ea1fc76736b5d00f4 |
+| tests/analyst_revisions_v2/test_r298_sharadar_eligibility_caller.py | 23469 | beaabf12fcd57f6a1874cdda89b8f60cd5a5ba48eef3bbe7957e043e96103d66 |
+
+Actual caller canonical profile already includes ONE LF:20125bytes SHA
+d5617de4616b929a6a819c2dfcb0bae1d66a8d9a389942625cf59bb304277657.
+Observation profile withoutLF3530bytes SHA
+6236db7401e5b0f64792cfbace096b4ed67d1889b27064dfeb40b58959482b65;
+withONE LF3531bytes SHA2d005844150870b8afb06cf95e681abdef88a2eb776f041fd4febc099ce4014e.
+The latter is the caller's provider-profile binding. All148selected source
+pins match, including both new direct imports(identity parser and frozen
+eight-symbol target inventory). Not whole-interpreter integrity. Root's first
+metadata print mistakenly added another LF to the caller canonicalizer,
+reporting20126/3532byte double-LF hashes; those are NOT contract pins. The
+separate exact-byte check above corrects that measurement only; no source,
+profile binding or dependency was refreshed.
+
+Public probe inventory is exactly QCOM plus SPY,QQQ,SOXX,XLV,REMX,XLE,XLI,XLF.
+Current table routes require unique perma/ticker/FIGI/CUSIP, USD and the stated
+stock/ETF category/interval BEFORE status/early-price continuation. A missing/
+unsupported route therefore refuses before those later requests; it is not
+reported as early-price absence or subscription expiry. Unrelated missing/
+unsupported catalog fields are counted, not used to drop strategy candidates
+or invented into a master. A bounded below-limit API enumeration is not an
+independent complete census. Status size describes advertised compressed bulk
+bytes, not in-memory CSV size/history coverage/download rights. Used-route
+collision checks conservatively retain valid CUSIP tokens even in malformed
+unrelated vocabularies. Current first/last-price dates remain non-PIT metadata.
+
+S persists twelve exclusive intent/status markers, six private0600 responses,
+claim and report in its own0700 directory(max24files). Both metadata CSVs have
+exact12fields/16MiB/99999row maximum; status8KiB and earlyprice64KiB limits
+remain323.61. No bulk archive or price-history acquisition occurs. Every file's
+original descriptor/full ten metadata fields plus native empty-ACL/stable
+ordinary provenance-xattr security is held/rechecked through byte validation,
+publication and return. New own response bytes are read for validation; the
+flag is original_private_input_read=false, not a false no-byte-read claim.
+Native supplied-output validation has no production artifact/network/Keychain/
+security-exec access. Own support paths stay inroot. Uninterruptible I/O/host
+suspension, higher-ancestor/kernel trust and no continuous all-tree integrity
+qualifications remain. Parent's fresh source/HEAD/status postflight is required.
+
+The opaque six-buffer bundle returns only on full normal completion. A later
+request/parse failure can discard earlier successful transient response bytes;
+finite persistent intent/status evidence survives. Do not claim all partial
+responses are retained. No failed response body is read. Output reports closed
+numeric statuses/counters/hashes and finite schema/header/row/field refusal
+categories, never tokens/routes/rows/prices/raw exceptions. Producer return or
+report presence alone is not success. A late report failure can leave files,
+but actual nonzero/unknown/ambiguous exit remains inadmissible and spent.
+
+| Finding | Priority/status | Verified disposition |
+| --- | --- | --- |
+| ARV2I323-027 | P2, corrected pre-use | New fetch omitted urlencode import and would refuse every first200response. Static source audit caught it before tests/contact; import plus real-new-fetch synthetic path now covers it. No observed provider failure is attributed to this draft defect. |
+| ARV2I323-028 | P1, corrected pre-use | Broader unrelated CSV/status fields could encode a credential echo through doubled quotes or JSON Unicode escapes, evading raw-only checks. Decoded-cell/string guards now refuse before PrivateCapture/persistence; two expected-red omission tests prove sensitivity. No actual credential exposure occurred. |
+| ARV2I323-029 | P3, corrected pre-use | Standalone receipt could claim nine used routes with zero catalog rows or impossible duplicate counts. Necessary cross-census/count constraints plus negative tests now refuse; byte-backed validation still recomputes the complete receipt. |
+| ARV2I323-030 | P2, corrected pre-use | Strict malformed-CUSIP parsing could hide an overlapping valid collision token. Conservative token census now refuses used-route ambiguity; regression covers the malformed unrelated field. |
+| ARV2I323-031 | P3, false alarm | Root suspected composer CUSIP parsing could raise on unrelated missing fields. Full source inspection showed it returns empty vocabulary; no production change was made for that hypothesis. |
+
+Root final272distinct passes3.24s(78observer+107caller+86record/document+
+1research transitive closure), no failures/skips/warnings; all148pins/four
+new-source memory compilations/diff checks pass. Strict native network/
+production-artifact/Keychain/security-exec denial; inroot support paths,
+disabled plugin autoload/--noconftest/-B/no cacheprovider, dispatch_fence absent.
+Root memory-only actual-exit omission caught1expected DID NOT RAISE failure
+0.18s, restored finally/sourcehash unchanged. Author decoded-secret omission
+caught2expected failures0.15s; retained-FD postread verification omission caught
+1/0.17s, both restored finally. Authors'78/3.91s,74/4.24s and107/4.05s overlap
+root272. Earlier caller54/65/106 selections deliberately deselected only the
+pending helper-pin test; no ordinary author fixture failure. No complete Codex
+lane/repository suite or independent final review/acceptance.
+
+D1 under the continuing explicit owner research/recovery direction, Claude
+waiver and255.2 delegation selects ONE S observe operation, its one actual
+parent and once-only supplied-output native validator AFTER this exact source/
+record is committed cleanly in the designated lane. Bind the next clean
+Mac/POSIX Python3.13 HEAD and caller SHA above explicitly on the CLI; current
+f701a602885384130d4607756e17eaf8ef2be175 is pre-S, NOT that freeze. No dirty/
+concurrent scope is permitted. Claim/fsync precedes one fixed existing login
+Keychain Sharadar lookup(max20s), then only the six exact GET roles323.61.
+Parent600s/outer630s/validator20s and128KiB parent output remain binding.
+The prospective S leaf has NOT been inspected/allocated; no S credential,
+provider/private read or operation occurred before this entry.
+
+Acceptance requires actual parent0, validator0, source-bound matching closed
+output/report/capture pins and all postchecks. On failure record exact finite
+stage/status/actual exits honestly, spend the claim and do not replay unchanged.
+No automatic price-history capture/QC transfer/capacity/job/strategy launch,
+paid upgrade, privacy/permission/settings change, cleanup or unrelated roadmap
+step follows. S cannot book a look/cell;336/259/52/699 remains binding. Its
+result determines the next admissible source-contract step, not readiness.
+One successful final matching-lane push is still reserved; monitor PAUSED.

@@ -36467,3 +36467,94 @@ permits a server to ignore Range; the proposed front must refuse an HTTP200
 before reading its body, never fall back to a full download. No continuation/
 same-URL later request is implied. QC/Safari hold and all nine carried OPEN P2s,
 actual source/readiness gates and one-final-push rule remain unchanged.
+
+## 303. Narrow Range front reviewed/corrected prospectively, no GET (2026-10-25)
+
+Add NEW `research/insider_buying_sec_feed_prefix_capture_v1.py`,53,875 bytes/SHA
+`153f1b35fa9aaa9d6274a43eb6c077cc5d26ac7bb83a45ac674edb4151e3e6e8`;
+own tests13,735 bytes/SHA
+`00f1eae23b522cc806729912210c41199bfbd6ada925e8d749a8dc2ff9de08f6`,
+peer tests8,523 bytes/SHA
+`075799f50570e79b832585e944e57d07cbc06df56b4a3793b5e9ebc1b0792727`.
+All code remains an unexecuted acquisition candidate, distinct from301's frozen
+executed compact image. No old source, stopped root or failed controls changed.
+The following new-front findings were CLOSED before any actual activation:
+
+- IBPREFIX-PRE01: draft passed unsupported `root=` to the reused publication
+  identity checker;18 integration reds/30green1.69s caught this. Replaced by an
+  exact own root-aware identity validator, without changing the old helper.
+- IBPREFIX-PRE02: final readback parent checked current bytes but not final Git
+  identity. Peer genuine1red1.40s; final `_identity(expected_head)==identity`
+  now rejects HEAD/branch/status movement. Native source checks also explicitly
+  preserve all four frozen custody pins; source images compile before inputs.
+- IBPREFIX-PRE03: descriptor boundary allowed undeclared keys, Boolean counter
+  aliases, false privacy provenance and static-scope assertions. Seven peer
+  genuine reds1.92s; exact field/nested-marker/TAR schemas, static privacy pins,
+  exact Boolean/zero/counter types and quantitative bounds now reject them.
+- IBPREFIX-PRE04: precontact forms accepted inconsistent preflight schemas,
+  identity, nonzero/Boolean new-request counts and extra fields. Seven genuine
+  peer reds; exact preflight shape/identity/zero actions required. Together with
+  PRE05's one repr case,8red1.40s, then corrected tests GREEN.
+- IBPREFIX-PRE05: unqualified transport-container repr displayed invented raw
+  body/header private text. One genuine peer red; all its fields are now repr-
+  suppressed. This was an invented preactivation exposure, not an actual leak.
+- IBPREFIX-PRE06: LOCK_UN failure skipped closing that held FD. Author faithful
+  1red0.70s; unlock and close now drain independently, preserving primary error.
+
+Main observed378 focused checks GREEN6.10s: all four new prefix test files,
+frozen format-v3 regression, record/active-document, import boundary and EXACT
+`tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports`.
+Initial native process-tree network/Keychain-exec denial; writes only fresh
+registered task TMP plus literal `/dev/null`; fork allowed for boundary children
+with inherited network denial. No complete suite. Attributed author223focused
+GREEN4.37s; attributed peer171prefix2.37s +52boundary/package3.45s, five genuine
+memory-only guard reversals (non206 before-body, descriptor, preflight, final
+Git, activation), then44restoredgreen0.42s. Peer four-image strong-native
+source-only/invented-inspection proof0.584593334s remains attributed, not main
+observed actual-source evidence. Source/test writers now frozen.
+
+Main separately ran an initially native network/fork/ALL-write/security-exec-
+denied actual RETAINED-METADATA-only qualification on base5e273831 plus the
+explicit uncommitted153f1b35 candidate, NOT a clean actual acquisition image.
+Compiled/rechecked131 source images/inventory
+`dac4bcd2840573bf115aa17e8011994d1cdace6193e5126994e78552c4c4169b`;
+held/SH-locked genuine Q4 listing plus all four exact failed-carrier controls,
+their claim/start/result/reservation/input links and producer identities;
+selected genuine ordinal6/Oct8 advertisement. Inputs SHA
+`0005f463f5afbcf6373a41303f2e5528882302f5fe1ec01bf3d1ac2978a3a404`;
+exit0,total1,033,549,375ns including source compilation/held metadata/final
+checks. Original parent/carrier body bytes read0; source-row tables decoded0;
+profile reads0/new requests0/new namespace0. Listing body is metadata, not a
+filing carrier. This narrow proof is NOT302's pure118-image assembly,299's full
+roster preflight, or a future actual-front inventory. Old failed memberships
+stay unknown; no all25-row rederivation is claimed for a format-only prefix.
+
+In plain language, the wrapper now limits any future diagnostic to a65,536-byte
+Range response with custody records and refuses full responses unread. It can
+report finite privacy, gzip-prefix and native-boundary refusals separately.
+It has NOT fetched a prefix, resolved a past failure or made the lane ready.
+Proceed to304's clean READ-ONLY qualification before any private delivery or
+GET activation; no extra owner purchase or routine checkpoint is required.
+All nine carried OPEN P2s and source/readiness gates unchanged. QC/Safari held.
+
+## 304. Clean prefix-front read-only health check registered, no request authority (2026-10-25)
+
+After committing303–304, qualify the already-existing new CLEAN producer HEAD
+from the designated worktree/branch. Trusted parent may run only exact source/
+committed-Git identity, initial strongly denied worker preflight, original-
+producer Git proofs for the retained directory/four failed controls, canonical
+precontact controls, disk reserve and new-namespace ABSENCE checks. Native
+worker memory-compiles/rechecks the REAL assembled source image before held
+metadata, with native network/fork/ALL-write/Keychain-exec denial and291 memory
+policy active through stdout serialization/final sample. No inherited outer
+Seatbelt on the trusted parent: nesting failure remains a known separate guard.
+
+Require unchanged actual metadata-input hash0005f463f5afbcf6; report measured
+source inventory/count and plan hash, and exact producer HEAD independently of
+303's manual uncommitted131-image assembly. No contact/profile/Keychain read,
+provider GET/HEAD/Range/alias, namespace/claim/start/publication, original-parent
+body, source-row decode, QC/Safari/SDK/job or outcome/backtest action is allowed
+by this check. A refusal stops activation for diagnosis; do not weaken custody
+or dispatch. Only AFTER successful observed qualification may a separately
+recorded ONE unused-day Range scope be activated under delegated authorization.
+No final handoff or push; source/test writers remain frozen through the check.

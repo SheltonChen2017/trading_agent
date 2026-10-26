@@ -36341,3 +36341,129 @@ access, QC/Safari/SDK/job/strategy launch/backtest, full-study completion or
 readiness. QC/Safari hold remains; nine carried OPEN P2s unchanged. It is not a
 final checkpoint push: continue available lane work afterward, exactly one final
 push only at the authorized round's terminal condition.
+
+## 301. Compact Dec3 actual operation FAILED; independent failed-scope custody verified (2026-10-25)
+
+300's one-shot actual scope ran on already-existing CLEAN
+`71c37d23af4cf037ac3c1f9cc9e80dea30ce7b8e`, production133-source inventory
+`769a465ca243bf8c08b0faa56ca965d71e08d72e3b368e7de56c655b6e72ebc1`.
+Executed compact wrapper63,175 bytes/SHA
+`fd0fe5cc2e77b42d2845efa34a884dc4cf864bf7492bb865e970fe7ec5d1cf56`;
+own tests25,988 bytes/SHA
+`5a057a496eda592495e4f25ee89adfa4de40becc4c326668ab97b0d92527cc36`,
+peer tests4,492 bytes/SHA
+`d35f0f20a8fc0e72c12d7f286cf85d856f7fe4868447052ec9cc5a99ead63f32`.
+The operation exited2 after301,099,714,125ns TOTAL, including precheck, private
+input wait and repeated authoritative preflight; this is not transport/CPU time.
+HTTP200 and ONE raw transport invocation were observed; backend request count
+was NOT measured. Result `compact_privacy_integrity_or_resource_refused_no_retry`,
+inspection phase/code `inspection` / `finite_compact_inspection_refused`,
+transport refusal null. Exact native cause remains UNKNOWN: do not select a
+privacy, gzip, TAR, source, resource or process cause from this generic refusal.
+
+No qualified retained objects were published. Selected-object count/physical
+bytes, response-header hash and inspection hash are NULL, not measured zero.
+Carrier was neither hashed nor persisted; no carrier byte count/hash, format/
+member observations, XML/acceptance/PIT identity or original-parent admission is
+established. The Dec3 URL and namespace are permanently consumed, with no retry,
+renamed whole-carrier scope, continuation, alias or receipt rewrite. Source-
+bound coverage and known individual-dispatch count20,044 did not increase.
+The following exact control pins are preserved:
+
+- complete `c4bc18e34bb3bc0d0dd388709936bb103c208d7b33a5e1f41125d26280d9810d`;
+- reservation `97ded4c97c85fe7ddeb79b020f7c4740191e02bab4a735a704fd925f96937ac5`;
+- URL claim `e5c237877e56b101f894c109b93b56d40b849527dc1e9404f28e5572f01dbb54`;
+- start `f8a866e50aee35e1d1a36093e4cc980953f4265d161acaaad0aa7e5ca1c272cc`.
+
+Main independently verified this failed scope READ-ONLY on the same unchanged
+clean producer image, exit0,373,417,217,958ns total including precheck/contact
+wait/repeated verification. Strong initial native network/fork/ALL-write/
+Keychain-exec denial and291's memory controls preceded source/input/control
+reads. Externally pinned controls, held directory/lock/inventory, original
+producer Git/source and complete actual source/predecessor bindings matched.
+Original actual operation remains exit2. Retained-subset replay is NULL;
+discarded carrier replay, original contact-screen replay and original/current
+contact equality attestation are FALSE; new provider requests0. Actual and
+readback each used one own-profile read and one anonymous stdin feed only AFTER
+their ready prechecks, with protected TTY echo. Neither private value nor hash
+was stored or emitted. All source/record writers stayed frozen until readback
+finished. Stat-only progress was not transfer or qualification evidence.
+
+Engineering decision under delegated continuous-build judgment: stop blind
+full-carrier trials. Qualify a separately versioned, tiny prefix-format
+diagnostic on a genuinely unused within-window day before any further archive
+parser/acquisition proposal. A new prefix cannot establish Dec3's missing cause
+or whole-carrier CRC/EOF/population; no new actual scope is activated by301.
+Nine carried OPEN P2s remain unchanged: a fail-closed observation alone is not a
+proved new software defect. QC/Safari remain held by another lane per the
+owner's latest reply; no UI/SDK/job/outcome/backtest access. No readiness claim,
+final handoff or push; continue available bounded lane engineering.
+
+## 302. Pure prefix-format engineering qualified, no actual prefix request (2026-10-25)
+
+Technical milestone under delegated judgment: add the independent prospective
+`research/insider_buying_sec_feed_prefix_format_v1.py`,9,625 bytes/SHA
+`6778363fb6fb9b8fa71e091c749b74179d2495c49975452a92883e615e5b8c88`;
+own tests10,058 bytes/SHA
+`371c8163f3ddfdec650ecafc7455948bbdfd68ac60d63b468f4c0bb031c54fe0`,
+peer tests5,246 bytes/SHA
+`bffac22873a10f2a41cbda4e827dded44bf3c7b2f29ad22d3fc80fc96af38050`.
+This is a pure supplied-byte unit, not a transport or source-attestation seal.
+It caps compressed input64KiB, all produced decoded bytes8MiB/128ratio and1,024
+gzip members. The unchanged finite private-contact screen finishes over ALL
+supplied compressed bytes and ALL produced decoded bytes before the sole raw-
+prefix hash. Malformed observed gzip/trailer, privacy or capacity refusal
+produces no prefix hash/retention. Only the first64KiB decoded bytes are held
+transiently for fixed observations; decoded bytes/names/issuer/time/XML values
+are not separately hashed, returned or persisted. No old executed source changed.
+
+A truncated final gzip member is a legitimate incomplete PREFIX observation,
+not whole-carrier integrity. Fully observed members may have zlib-validated
+trailers, yet complete-carrier CRC/ISIZE/EOF/privacy, TAR member population,
+duplicate/coverage, SEC authenticity, PDS identity, admission and readiness
+remain FALSE. Observe only the first checksummed TAR block, finite type/profile
+enums and opening-marker locations0/256/266; no assumed PDS strip or fabricated
+complete-submission wrapper. The whole later daily body remains unavailable.
+[SEC Feed documentation](https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data)
+describes daily tar/gzip files, but does not establish the member-layout profile
+for this day. [RFC1952](https://www.rfc-editor.org/info/rfc1952/), section2.2,
+allows consecutive gzip members; that alone does not establish TAR layout.
+
+Main observed61 own checks GREEN1.47s and283 focused combined checks GREEN6.13s:
+new own+peer prefix tests, frozen format-v3 regression, implementation-record,
+active-document, import-boundary and EXACT Insider package guard. Initial
+native process-tree network/Keychain-exec denial; test writes only a fresh task
+temporary directory plus literal `/dev/null` for Git; fork allowed solely for
+boundary-check children with network denial inherited. No complete suite.
+The first pytest launcher failed BEFORE collection because two flat write-rule
+filters combined as OR and disallowed its fresh temp directory; the invoking
+policy was corrected to `require-all`. This was not a product-test failure.
+
+Independent main strong-native proof denied network/fork/ALL-write/security-
+exec from process start, proved denial, memory-compiled/rechecked118 current
+source images, and exercised the REAL64KiB compressed /8MiB decoded boundary
+twice plus an8MiB+1-byte refusal BEFORE hashing. Descriptor1,797 bytes;
+observations64KiB; memory fuse active through JSON serialization/stdout/final
+sample; total1,632,963,750ns. Inventory
+`3a832106d6715f45aff366e8772fa8926f3ed44f8c607f67077aebbd2d601521`
+is a MANUAL current-uncommitted pure-candidate assembly, not a clean actual-front
+inventory or future producer commit. All data were invented in RAM. Main's
+memory-only decoded-screen-bypass reversal caused a genuine late-private-byte
+prehash test failure, restored afterward. Decoded-tail fixtures were strengthened
+to prove the compressed/raw screen cannot mask a missing decoded screen.
+
+Attributed peer evidence remains separate:15 independent checks GREEN; decoded-
+screen bypass1red0.97s and false-whole-carrier flag7red0.04s, then15green0.07s;
+four-image native compile/hash/partial-fixture proof0.629404125s. An earlier
+peer proof-script key typo caused KeyError and was corrected only in the probe,
+not product source. No verified new core defect or new ledger closure.
+
+In plain language: the diagnostic can inspect a tiny safely screened slice and
+tell an incomplete slice from observed corruption without calling it a complete
+filing archive. It has NOT obtained that slice yet. Next engineer/qualify a
+separate one-shot Range front, then register its exact new unused URL and clean
+producer BEFORE any request. [RFC9110 section14.2](https://www.rfc-editor.org/rfc/rfc9110.html#section-14.2)
+permits a server to ignore Range; the proposed front must refuse an HTTP200
+before reading its body, never fall back to a full download. No continuation/
+same-URL later request is implied. QC/Safari hold and all nine carried OPEN P2s,
+actual source/readiness gates and one-final-push rule remain unchanged.

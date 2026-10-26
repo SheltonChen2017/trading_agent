@@ -36558,3 +36558,107 @@ by this check. A refusal stops activation for diagnosis; do not weaken custody
 or dispatch. Only AFTER successful observed qualification may a separately
 recorded ONE unused-day Range scope be activated under delegated authorization.
 No final handoff or push; source/test writers remain frozen through the check.
+
+## 305. Clean prefix-front actual-metadata preflight completed (2026-10-25)
+
+304's health check ran on already-existing CLEAN
+`00954cafb100bb552b3b316ddc60c3fa999e8fc8`, exit0,total20,240,622,667ns.
+This total includes trusted-parent Git/current checks, native full assembly
+compilation, retained metadata/crosslinks, original-producer Git proofs, disk/
+freshness and final identity checks; it is not an isolated native CPU interval.
+REAL actual assembly138-source inventory
+`efb11ed9b5c728e65da22a87c2ecb3cc79c65b60b248cb7d812c788628dc7b32`;
+all sources memory-compiled/rechecked under initial native network/fork/ALL-
+write/Keychain-exec denial, with291 memory controls through stdout final sample.
+Inputs remained `0005f463f5afbcf6373a41303f2e5528882302f5fe1ec01bf3d1ac2978a3a404`;
+whole head-specific preflight plan
+`3f1aa444dc84d7b2ef8d08e3ad18a51c49f526c9ea1dc7a56921e2c89e485b55`.
+This138-image actual assembly is distinct from303's131-image uncommitted manual
+probe and302's118-image pure proof. The separately supplied invoking glue is
+not silently included in the committed module/source image.
+
+Four failed-carrier witnesses and genuine Q4 ordinal6 listing matched. Original
+parent/carrier body bytes read0; source-row tables decoded0; profile/private
+contact reads0; new requests0; output namespace/claim/start/publication0. This
+does not replay failed bodies, rederive all25 source tables, establish unknown
+archive membership, or admit a filing. Same HEAD/tree remained clean afterward.
+Nine carried OPEN P2s/readiness gates unchanged; no QC/Safari or push. Proceed
+only to306's separately named one-prefix activation.
+
+## 306. One unused-day64KiB Range diagnostic registered (2026-10-25)
+
+Under the owner's delegated source-work/continuous-build authorization, after
+committing305–306 and verifying its new CLEAN designated producer HEAD, activate
+ONE scope `ib-sec-feed-prefix-20201008-v1-20261025-once`, fresh root
+`artifacts/insider_buying/sec_feed_prefix_capture_v1`, ONLY
+`https://www.sec.gov/Archives/edgar/Feed/2020/QTR4/20201008.nc.tar.gz`, GET with
+`Range: bytes=0-65535` and identity HTTP encoding. This is a genuinely UNUSED
+Q4 day, advertisement ordinal6/523023KB, not a retry/alias of either June day,
+Oct7 or Dec3. Advertisement KB base/rounding and full-carrier actual bytes are
+not qualified. ONE transport invocation maximum; remote/backend request count
+not measured. URL-wide permanent claim/start BEFORE GET consumes this URL even
+if Range is refused. No proxy, redirect, HEAD, retry, fallback, continuation,
+renamed diagnostic/full GET or another byte range of this same URL is granted.
+
+Require exact singlepart206, one Content-Length65536, exact Content-Range
+`bytes 0-65535/N` with finite numeric declaredN>65536, no transfer encoding and
+absent/identity content encoding BEFORE any body read. Non206 (including200),
+malformed/multipart/duplicate framing or refusal closes body UNREAD. A body is
+accepted only when the single bounded read returns exactly65,536 bytes. Server-
+declaredN is NOT measured carrier transfer/completeness.45s absolute transport,
+15s idle and180s native-worker wall; no release of full-carrier readiness from
+an observed Range response. Only four required response-header families may
+be retained after finite privacy; all other headers are discarded/unhashed,
+not claimed to have passed a complete-header privacy screen.
+
+Trusted invoking glue protects TTY echo first, verifies exact clean/committed/
+current source, native actual-input/producer-Git/disk/freshness health BEFORE
+requesting ONE own Gmail-profile contact. Require actual138-source inventory
+efb11ed9b5c728e6 and input digest0005f463f5afbcf6 at a ready marker. Wait for
+anonymous stdin readiness without reading/hashing/printing the private value;
+actual run independently repeats authoritative preflight/source/held-input
+checks before consuming queued stdin. No contact value/hash in chat/Git/logs/
+argv/env/Keychain. Parent is the documented trusted direct launcher, not an
+outer Seatbelt that would prevent the required native worker from installing.
+
+Fresh EX-locked namespace, held old metadata/SH locks and8GiB free reserve plus
+prefix/four64MiB controls; no overwrite or resume. Native workers deny network,
+fork, ALL file writes and security-exec from process start, compile/recheck
+the actual source assembly before retained/private inputs, and retain291's
+baseline-relative4GiB VM-growth fuse/requested50ms sampled4GiB peak-RSS abort
+through JSON serialization/stdout/final sample. This is not hard/instant RSS
+or a global trusted-parent memory guarantee. Core caps64KiB compressed/8MiB
+decoded/128ratio/1,024 gzip members, no resource-limited partial publication.
+
+All retained prefix bytes and ALL produced decoded bytes must finish the
+unchanged finite private-contact screen before hashing/retention. Malformed
+observed gzip/trailer, privacy/quota or native failure retains only exact safe
+phase/code controls; no refused-prefix hash/bytes invented. Successful prefix
+retention permits fixed structural enums/marker observations only, not names,
+raw snippets, issuer/time/XML/financial fields or a complete parent. Prefix-
+only privacy and observed complete gzip-member trailers are NOT full-carrier
+CRC/ISIZE/EOF/privacy, TAR-population/duplicate integrity or filing coverage.
+Neither success nor refusal diagnoses the discarded Dec3/Oct7/June bodies.
+
+Afterward, one separately identified independent READ-ONLY verification may
+reload CURRENT own contact once, only after the same protected ready precheck,
+verify externally pinned controls/lock/inventory/source/producer Git and
+rescreen/rederive any retained prefix under initial strong native controls.
+Original contact screen/equality and discarded whole carrier are NOT replayed.
+Failed-operation custody verification cannot change the actual exit status.
+After successful verification ONLY, a separate strongly denied metadata-only
+reader may expose the exact hash-pinned, strict-schema inspection descriptor
+enums/counts/offsets, with current source/control checks. It reads no additional
+raw body, profile, provider or namespace and cannot turn observations into
+PDS, source, PIT or admission claims. All source/record writers freeze through
+the actual operation and independent verification; record producer/head/runs,
+pins, observed/attributed evidence and precise disposition afterward.
+
+Known individual-dispatch count20,044 is unchanged; no individual parent is
+requested, no completed/ambiguous accessions redispatched or original source
+window/economics changed. Nine carried OPEN P2s stay open within exact scopes;
+all source/rights/PIT/canonical/mapping/look/QC/backtest/execution gates remain
+FALSE. QC/Safari are explicitly still occupied by another lane; no UI, SDK,
+job, outcome or strategy launch. This is not a final checkpoint/push. Continue
+available work after the named diagnostic; exactly ONE final push only at the
+authorized round's honest terminal condition.

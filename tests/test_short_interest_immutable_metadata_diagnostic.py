@@ -11,7 +11,9 @@ import pytest
 from data.hashing import hash_bytes, hash_payload
 from scripts import diagnose_short_interest_immutable_metadata as proof
 from scripts import short_interest_immutable_metadata as immutable
-from test_short_interest_immutable_metadata import kernel
+from test_short_interest_immutable_metadata import kernel, REAL_NATIVE_SET
+
+REAL_CHALLENGE = proof._challenge
 
 
 @pytest.fixture(autouse=True)
@@ -32,6 +34,21 @@ class Harness:
     def __init__(self, monkeypatch, root):
         self.root, self.tick, self.metadata, self.events = root, 100.0, None, []
         self.boundary_hook = lambda: None
+        self.native_noop = False
+        fake_set = immutable._native_set
+        class Operation:
+            def __call__(unused, fd, flags):
+                assert flags in (2, 66)
+                if not self.native_noop:
+                    fake_set(fd, initial_flags=flags & ~2)
+                ctypes.set_errno(0)
+                return 0
+        class Library:
+            fchflags = Operation()
+        # Exercise the exact original Python/ctypes call body; only the
+        # fabricated native boundary is replaced, never a real file flag.
+        monkeypatch.setattr(immutable, "_native_set", REAL_NATIVE_SET)
+        monkeypatch.setattr(immutable.ctypes, "CDLL", lambda *args, **kwargs: Library())
         self.mapping = {}
         for name in proof.code_paths():
             path = root / name
@@ -174,8 +191,23 @@ def test_code_change_before_final_exit_cannot_emit_closed_result(monkeypatch, tm
 
 def test_kernel_noop_cannot_be_published_as_a_pass(monkeypatch, tmp_path, kernel):
     h = Harness(monkeypatch, tmp_path)
-    monkeypatch.setattr(immutable, "_native_set", lambda unused, **kwargs: None)
+    h.native_noop = True
     with pytest.raises(immutable.ImmutableMetadataRefusal, match="flags_changed"): h.run()
+    report = proof.failure_summary(immutable.ImmutableMetadataRefusal("immutable_flags_changed"))
+    observed = report["native_transition"]["diagnostic"]
+    assert observed["observer_complete"] is True and observed["native_result"] == 0
+    assert observed["immediate_after_native"]["fd_flags"] == 0
+    assert observed["classification"] == "required_flags_absent_at_immediate_observation"
+
+
+def test_direct_proof_refusal_names_its_own_frame_not_the_parent_registered_runner(monkeypatch, tmp_path, kernel):
+    h = Harness(monkeypatch, tmp_path)
+    monkeypatch.setattr(proof, "_challenge", REAL_CHALLENGE)
+    with pytest.raises(proof.ImmutableProofRefusal, match="challenge_not_denied") as failed:
+        h.run()
+    report = proof.failure_summary(failed.value)["native_transition"]["diagnostic"]
+    assert report["first_controlled_refusal"]["phase"] == "proof__challenge"
+    assert report["first_controlled_refusal"]["contract_code"] == "immutable_proof_challenge_not_denied"
 
 
 @pytest.mark.parametrize("ticks", [(100.0, float("nan"), 100.0), (100.0, 106.0, 105.0)])
@@ -193,7 +225,7 @@ def test_every_hold_sample_is_validated_and_cannot_hide_a_skipped_or_backdated_h
 
 def test_protocol_has_no_old_evidence_or_provider_authority():
     value = proof.protocol()
-    assert len(value["code_paths"]) == len(set(value["code_paths"])) == 60
+    assert len(value["code_paths"]) == len(set(value["code_paths"])) == 61
     assert value["new_inodes"] == 1 and value["retries"] == 0
     assert value["old_evidence_reopened"] is False
     assert value["required_errno"] == "EPERM"
@@ -207,7 +239,7 @@ def test_original_and_terminal_code_context_close_failure_cannot_return_a_pass(m
     original = proof.previous.count.old.cache.HeldFiles.__exit__
     count = []
     def close(value, *args):
-        is_code = len(value._anchor[1]) == 60
+        is_code = len(value._anchor[1]) == 61
         result = original(value, *args)
         if is_code:
             count.append(1)

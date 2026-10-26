@@ -14,14 +14,17 @@ import time
 from data.hashing import hash_bytes, hash_payload
 from scripts import diagnose_short_interest_new_metadata_custody as previous
 from scripts import short_interest_immutable_metadata as immutable
+from scripts import short_interest_immutable_transition_diagnostics as transition
 
 DRIVER = "scripts/diagnose_short_interest_immutable_metadata.py"
 HELPER = "scripts/short_interest_immutable_metadata.py"
-NAMESPACE = "kernel-immutable-metadata-20261025-v2"
+TRACE = "scripts/short_interest_immutable_transition_diagnostics.py"
+NAMESPACE = "kernel-immutable-metadata-20261025-v3"
 OUTPUT = previous.OUTPUT.parent / NAMESPACE
 NAME = "one-safe-nonclaim.private.json"
 MAXIMUM_SECONDS, HOLD_SECONDS = 120, 5
-PROTOCOL_SHA256 = "131d639a9feb274e095c7d4970df00efd5841837b7c2506980954f30ea718e80"
+PROTOCOL_SHA256 = "97ea03b85815e20ec9c06b6d24a8f063ebea5bd8c2361baa11448fd963c6497b"
+_LAST_TRANSITION = None
 _CODES = frozenset("""
 immutable_proof_registration_changed immutable_proof_driver_changed
 immutable_proof_manifest_changed immutable_proof_code_changed immutable_proof_deadline
@@ -42,11 +45,23 @@ def require(value, code):
 
 
 def failure_summary(error):
+    value = _failure_summary(error)
+    if _LAST_TRANSITION is not None:
+        try:
+            value["native_transition"] = _LAST_TRANSITION.report()
+        except transition.TransitionDiagnosticRefusal:
+            value["native_transition"] = {"status": "no_closed_observer_report"}
+    return value
+
+
+def _failure_summary(error):
     if type(error) is ImmutableProofRefusal:
         args = BaseException.args.__get__(error, BaseException)
         code = next((name for name in _CODES if type(args) is tuple and len(args) == 1
             and type(args[0]) is str and args[0] == "REFUSED: " + name), None)
         return {"category": "local_contract_refusal", "errno_name": None, "contract_code": code}
+    if type(error) is transition.TransitionDiagnosticRefusal:
+        return transition.failure_summary(error)
     return immutable.failure_summary(error)
 
 
@@ -59,19 +74,21 @@ def authority():
 
 
 def code_paths():
-    return tuple(sorted((*previous.code_paths(), HELPER, DRIVER)))
+    return tuple(sorted((*previous.code_paths(), HELPER, DRIVER, TRACE)))
 
 
 def protocol():
-    return {"schema": "si-kernel-immutable-metadata-proof-policy-v2",
-        "decision": "SI-DEC-20261025-07", "authority_id": "SI-AUTH-20261025-01",
+    return {"schema": "si-kernel-immutable-metadata-proof-policy-v3",
+        "decision": "SI-DEC-20261025-09", "authority_id": "SI-AUTH-20261025-05",
         "driver": DRIVER, "helper": HELPER, "output": str(OUTPUT), "name": NAME,
         "immutable_helper_policy_sha256": hash_payload(immutable.policy()),
+        "transition_diagnostic_policy_sha256": hash_payload(transition.policy()),
         "raw_sha256": hash_bytes(previous.metadata_bytes()), "bytes": 186,
         "maximum_seconds": MAXIMUM_SECONDS, "minimum_hold_seconds": HOLD_SECONDS,
         "new_inodes": 1, "retries": 0,
         "flag": "FD_preserve_original_UF_TRACKED_add_UF_IMMUTABLE_before_first_seal_never_clear",
         "initial_flags_allowed": [0, 64], "original_failed_v1_reopened": False,
+        "original_failed_v2_reopened": False,
         "challenge": ["write_open", "same_mode_fchmod", "fixed_fsetxattr"],
         "required_errno": "EPERM", "old_evidence_reopened": False,
         "closure": "all_original_code_and_metadata_context_exits_then_fresh_committed_code_and_original_nine_field_byte_audit",
@@ -79,7 +96,7 @@ def protocol():
 
 
 def _registered():
-    require(hash_payload(protocol()) == PROTOCOL_SHA256 and len(code_paths()) == 60
+    require(hash_payload(protocol()) == PROTOCOL_SHA256 and len(code_paths()) == 61
         and (MAXIMUM_SECONDS, HOLD_SECONDS) == (120, 5), "immutable_proof_registration_changed")
 
 
@@ -181,6 +198,8 @@ def _code(root, guard, mapping, held):
 
 
 def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest):
+    global _LAST_TRANSITION
+    _LAST_TRANSITION = None
     began, last_tick = time.monotonic(), [None]
     started = previous.prior._utc_now()
     started_clock = previous.count.old.parallel.clock(started)
@@ -212,30 +231,37 @@ def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest)
                 guard.check(); window()
                 if held_live[0]: held.check()
             try:
-                with immutable.prepare_owned_immutable_metadata(owned, NAME, raw, parent=False,
-                        boundary=boundary) as capability:
-                    capability.seal_once(); capability.check()
-                    observation = capability.observation()
-                    expected = observation["seal_stamp_sha256"]
-                    fd = os.open(NAME, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=owned._anchor[2])
-                    _original(fd, owned, expected, raw)
-                    challenges = _challenge(fd, owned)
-                    until = window() + HOLD_SECONDS
-                    while window() < until:
-                        time.sleep(.25); capability.check(); _original(fd, owned, expected, raw); window()
-                    _code(root, guard, complete_code_manifest, held); window()
-                    code_stack.close()  # Success before switching the stable callback.
-                    held_live[0] = False
-                    capability.check(); guard.refresh(); window()
-                closed = capability.closed_summary()
-                _original(fd, owned, expected, raw); guard.refresh(); window()
-                result = {"schema": "si-kernel-immutable-metadata-proof-closed-v2",
+                with transition.observe_original_transition(directory_fd=owned._anchor[2], name=NAME,
+                        proof_binding=(require, ImmutableProofRefusal, _CODES)) as diagnostic:
+                    _LAST_TRANSITION = diagnostic
+                    with immutable.prepare_owned_immutable_metadata(owned, NAME, raw, parent=False,
+                            boundary=boundary) as capability:
+                        capability.seal_once(); capability.check()
+                        observation = capability.observation()
+                        expected = observation["seal_stamp_sha256"]
+                        fd = os.open(NAME, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=owned._anchor[2])
+                        _original(fd, owned, expected, raw)
+                        challenges = _challenge(fd, owned)
+                        until = window() + HOLD_SECONDS
+                        while window() < until:
+                            time.sleep(.25); capability.check(); _original(fd, owned, expected, raw); window()
+                        _code(root, guard, complete_code_manifest, held); window()
+                        code_stack.close()  # Success before switching the stable callback.
+                        held_live[0] = False
+                        capability.check(); guard.refresh(); window()
+                    closed = capability.closed_summary()
+                    _original(fd, owned, expected, raw); guard.refresh(); window()
+                trace_report = diagnostic.report()
+                require(trace_report["diagnostic"]["observer_complete"] is True,
+                    "immutable_proof_result_missing")
+                result = {"schema": "si-kernel-immutable-metadata-proof-closed-v3",
                     "status": "closed_offline_new_inode_only", "runtime_head": runtime_head,
                     "actual_remote": actual_remote, "code_identity_sha256": identity,
                     "code_manifest_sha256": hash_payload(complete_code_manifest),
                     "protocol_sha256": PROTOCOL_SHA256, "started_at": started,
                     "metadata_raw_sha256": hash_bytes(raw),
                     "seal_stamp_sha256": expected, "helper_closed_summary_sha256": hash_payload(closed),
+                    "native_transition": trace_report,
                     "challenges": challenges, "original_code_and_metadata_contexts_closed": True,
                     "authority": authority()}
             finally:

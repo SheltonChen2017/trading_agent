@@ -1,46 +1,18 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **NEW OWNER-DIRECTED OFFLINE CUSTODY-FIRST CONTINUATION (SECTION125),
-PROSPECTIVE 84005 CUMULATIVE COUNT STARTS / UNCHANGED4GiB. REVIEW SKIPPED BY
-EXPLICIT OWNER EXCEPTION, NOT INDEPENDENT ACCEPTANCE. NO NEW RETRIEVAL UNTIL
-CUSTODY IS VERIFIED; NO PURCHASE. QC/SAFARI ARE CONDITIONALLY AUTHORIZED ONLY
-AFTER THE NEXT TARGET PRICE REVISION LANE PUSH (SECTION125.3); THAT RESOURCE
-GATE IS NOW OPEN AT12be489416af00e266c3a47286f2cabafbf74e27 (SECTION125.10).
-LOCAL BACKTEST READINESS REMAINS FALSE.
-ACTUAL FIRST KERNEL PROOF REFUSED BEFORE FLAG SETTING BECAUSE THE NEW FILE
-ALREADY HAD UF_TRACKED. THE PRESERVE-TRACKED SOFTWARE CORRECTION IS COMMITTED,
-BUT THE ACTUAL V2 PROOF REFUSED A FLAG MISMATCH; REQUIRED IMMUTABLE CUSTODY
-REMAINS UNESTABLISHED. BOTH FAILED NAMESPACES ARE PRESERVED (SECTION125.10).
-PRIOR ROUND: CODEX COUNTER-REVIEW OF CLAUDE `b648f60` ACCEPTED AFTER ONE APPENDED
-COUNT-SCOPE ARITHMETIC ERRATUM (SECTION 124). OWNER-DIRECTED BOUNDED RECOVERY
-AND SECRET-SAFE DIAGNOSTICS ARE IMPLEMENTED. ACTUAL V2 AND V3 INITIALIZATION
-REFUSED WITH ZERO NEW START/HTTP/BYTES; BOTH CLAIMS ARE SPENT. V3 IDENTIFIES
-A FILE-CUSTODY GUARD; THE PRECISE CAUSE IS STILL UNKNOWN. A LOCAL NONCLAIM
-V1 PROBE PASSED WITHOUT REPRODUCING IT; V2 STOPPED BEFORE OUTPUT PREPARATION.
-THE NEW NONCLAIM V3 PROBE HAS NOW REPRODUCED A CTIME-ONLY REFUSAL ON ITS FIRST
-NEW METADATA FILE. THE ACTOR AND HISTORICAL COUNT FAILURE REMAIN UNKNOWN;
-SECTION124.13 PRESERVES THAT NEGATIVE. THE CREATOR-ONLY PROBE THEN SEALED/READ
-ONE FILE BUT REFUSED ITS LATER POSTSEAL STAMP CHANGE (SECTION124.15); NO LOCAL
-POLICY CLOSURE OR HISTORICAL REPAIR IS CLAIMED. FURTHER CLAIMS ARE HELD. RETAINED MONTHLY
-INPUTS HAVE CLOSED OFFLINE SOURCE-ONLY NORMALIZATION (SECTION124.9), WITHOUT
-SOURCE FITNESS, INPUT ADMISSION OR BACKTEST READINESS.
-A SOURCE-ONLY SPENT-EPOCH LEDGER HAS NOW CLOSED ITS ACTUAL OFFLINE REPLAY
-(SECTION124.18), AFTER THE NARROW HARNESS CORRECTION IN124.17. THIS IS
-ACCOUNTING/LINEAGE CLOSURE ONLY, NOT COUNT-SOURCE OR INPUT ADMISSION.
-THE FROZEN FULL-STUDY RECOVERY IS SHORT AT LEAST ONE PROSPECTIVELY AUTHORIZED
-START BEFORE FUTURE RETRIES, AND THE NEW-METADATA CUSTODY GATE REMAINS OPEN.
-SECTION124.19 CLOSES THIS ROUND AT THOSE OWNER/EXTERNAL GATES FOR ONE FINAL
-MATCHING-LANE PUBLICATION AND CLAUDE'S INDEPENDENT REVIEW.
-OWNER NOW DIRECTS CONTINUATION UNTIL LOCAL BACKTEST READINESS, WITHOUT QC.
-ALL OLD CLAIMS,
-NEGATIVES AND CHARGES REMAIN SPENT/IMMUTABLE. NO BACKTEST READINESS IS CLAIMED.
-SIX PRIOR P2s AND ACTUAL TRANSPORT/COVERAGE FINDING `SI-BUILD-20261024-012`
-REMAIN UNRESOLVED. TWO HISTORICAL QC METADATA REQUESTS REMAIN RECORDED.
-QUANTCONNECT PAUSED BY OWNER, INCLUDING CAPACITY/METADATA. NO QC OR PURCHASE.
-LOOKBACKS 20/60/120/252 UNSELECTED; CANONICAL ACTUAL LOOKS 0/0,
-EXPLORATORY ACTUAL LOOKS 0, ALPHA 0, PERMANENT LOOK IDS NONE,
-QC LAUNCH ATTEMPTS0. NO OUTCOME JOIN, HOLDOUT, ETF, BROKER, OPERATOR DATABASE,
-DEPLOYMENT, PAPER/LIVE, CAPITAL, ORDER OR TRADING ACTION.**
+Status: **OWNER-RESUMED OFFLINE CUSTODY REPAIR AND PRE-QC BUILD (SECTION126).
+84005 CUMULATIVE COUNT STARTS / UNCHANGED4GiB; ALL OLD CLAIMS, NEGATIVES,
+RECEIPTS AND CHARGES REMAIN SPENT/IMMUTABLE. NO CHECK IS WEAKENED OR OLD
+FILE ADOPTED. ACTUAL KERNEL PROOFS125.8/125.10 REMAIN REFUSED; NEW RETRIEVAL
+IS HELD UNTIL GENUINE OFFLINE CUSTODY CLOSURE. LOCAL BACKTEST READINESS FALSE.
+REVIEW SKIPPED BY OWNER EXCEPTION, NOT INDEPENDENT ACCEPTANCE.
+OWNER NOW REPORTS QC/SAFARI OCCUPIED: QUANTCONNECT PAUSED BY OWNER INCLUDING
+CAPACITY/METADATA; NO SAFARI, MIA, QC SETUP, UPLOAD, COMPILE OR JOB.
+TWO HISTORICAL QC METADATA REQUESTS REMAIN ACCOUNTED FOR.
+NO PURCHASE OR NEW TERMS/CREDENTIAL, BROKER/OPERATOR DATABASE, DEPLOYMENT,
+PAPER/LIVE, CAPITAL, ORDER OR TRADING ACTION. NO OUTCOME JOIN OR BACKTEST.
+CANONICAL ACTUAL LOOKS 0/0, EXPLORATORY ACTUAL LOOKS 0, ALPHA 0,
+PERMANENT LOOK IDS NONE, QC LAUNCH ATTEMPTS0.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -23489,3 +23461,126 @@ recheck exact roots/branch/HEAD/status and matching actual/tracking remote,
 disable follow-tags/submodule pushes, then verify clean local/tracking/actual
 matching-lane equality. No source rows, private usability conclusion, secrets,
 implementation changes after validation, purchases or external messages occur.
+
+## 126. Owner-resumed offline custody repair and last-pre-QC build
+
+### 126.1 Authority, exact starting state and preserved evidence
+
+**SI-AUTH-20261025-05** records the owner's latest direct instruction:
+“fix the custody blocker offline without weakening checks or losing data,
+then keep going through backtesting. stay within 84,005 cumulative STARTs
+and 4 GiB. qc/safari is currently occupied. so build until the last step
+before qc setup. push when done”. The last sentence limits this round to
+the final LOCAL pre-QC gate; no QC/Safari/Mia interaction or setup is allowed,
+even though the historical Target Price resource signal occurred in125.10.
+That deleted one-shot monitor stays deleted; no replacement is requested.
+No other automation changes. Claude review remains unnecessary under the
+owner's still-current exception, not self-declared independent acceptance.
+
+The exact clean local/tracking/actual matching origin baseline is
+`730c59cfec31b33a83fa09e065208eb3c26d345b`, verified from the designated
+Short Interest worktree/branch before implementation. All repository commands,
+validations, commits and the ONE final nonforce matching-lane push remain in
+that worktree; shared documents and all other lanes stay frozen. No historical
+record body is rewritten. The prior final push is not reused as this round's
+publication. No full lane/repository suite is authorized or run.
+
+Owner ceiling84,005 cumulative count STARTs and4GiB is unchanged. The recorded
+baseline is13,992START/13,991recordedHTTP/23,452,681chargedbytes with13,990
+retained original transport positions and67,885 missing descriptors. Existing
+negative/zero-START claims stay spent; both unknown full-page debits remain.
+No claim is restarted, reset, refunded, retried or adopted. Daily budgets are
+separate and not enlarged. Every eventual new count START requires its own
+prospective durable debit, a full2MiB unknown/inflight reservation and exact
+retry/133chunk limits; no reservation is reduced on an unauthenticated caller
+assertion. All actual source/custody/input gates precede any dispatch.
+
+### 126.2 First finite causal step: original-transition diagnostics
+
+**SI-DEC-20261025-09** addresses a verified EVIDENCE GAP, not an established
+native-kernel defect: the prior V2 terminal contract/stamp did not retain the
+native return/immediate original FD-versus-name observation or first controlled
+refusal before cleanup. The unchanged creator closes HeldFiles on failures;
+a cleanup refusal can mask an earlier controlled failure. Neither638 Git
+calls nor the later flags64 identify the first failed instruction or actor.
+
+Add only bounded diagnostic observation around the EXACT original native-set
+code and exact own controlled refusal frames, without replacing the setter,
+native library, old creator, custody predicates, seal or terminal-issued
+witness. Observe the fixed native return/allowlisted errno and immediate
+same-original FD/name flags/protection/inode booleans BEFORE callbacks, then
+retain the first fixed own-contract refusal and bounded deduplicated cleanup
+observations. Expose no arbitrary exception text/type/path/attribute values,
+private source rows or caller payload. A lost/error/overflow observer refuses
+any positive result, and diagnostics never grant source/input authority.
+
+Only AFTER fabricated first-failure/cleanup/missing-observer/native-noop/
+redaction regressions, exact61-file code closure, focused checks and a clean
+checkpoint may ONE prospective V3 NONCLAIM operation use
+kernel-immutable-metadata-20261025-v3. It keeps the original120second deadline,
+5second checked hold, one new safe186byte inode and ONE setter/no retry.
+V1/V2 and all other old files are never reopened by this operation. It closes
+a specific missing observation gap; it is not a loop of guessed source claims
+or relaxed protection. Real write-open/fchmod/fsetxattr challenge results and
+all8/9field postseal checks remain required. No actual new operation at this
+entry; source/key/HTTP/claims/START/bytes/QC/outcome looks remain0 this round.
+
+### 126.3 Pre-release findings, causal regressions and frozen V3 registration
+
+New diagnostic code is observation-only. Original metadata creator, HeldFiles,
+kernel setter, all8/9field checks and their policy bytes remain unchanged.
+The observer binds the exact unwrapped original factory/native frames, fixed
+owned directory/name and186-byte original capability; it never substitutes a
+setter, flags reader or successful kernel challenge in an actual run.
+
+Pre-release own findings, all corrected BEFORE actual operation:
+
+| ID | Priority/status | Verified issue | Correction and evidence |
+|---|---|---|---|
+| SI-BUILD-20261025-016 | P2, corrected | A decorated contextmanager's code is a shared contextlib helper, not its original generator; observing it misses the exact guarded callback. | Unwrap the exact original generators and bind nested code. Main memory-only callback-map removal produced1expected failure/.14s; on-disk checks were never reversed. |
+| SI-BUILD-20261025-017 | P2, corrected | Counting every ordinary helper/require call and return exhausted32,768 events in valid full composition. Main's loaded development pair produced11fail/31pass/7.86s, all11 overflow. | Count only native call/return, guarded callback observations and distinct controlled refusals; ordinary frames remain exception-traced. Same32,768 relevant-event cap,16 bounded reports and all original deadlines/checks retained. This is not a longer window or actual-run retry. |
+| SI-BUILD-20261025-018 | P2, corrected | Mutable diagnostic failure/report state could reset a caught observer fault or invent a closed report. | Main added two fabricated counterexamples: both failed/.66s before correction. Independent permanent failure and terminal-issued canonical report records now veto resets and caller-made closure. |
+| SI-BUILD-20261025-019 | P3, corrected | Direct proof raises could be attributed to their known parent frame rather than the raising frame. | Only a require-wrapper uses its caller's phase. Main direct native-challenge counterexample failed1/23deselected/.87s before correction. Phases identify observed code context, not an external actor. |
+
+Delegated author initially ran19fabricated tests/.87s before Main's integration
+corrections. A development peer identified the mutable-state counterexample
+from code; Main independently reproduced it and supplied the correction.
+Both delegated turns later ended at model capacity, not a code/kernel failure;
+neither performed actual flag/source/provider/QC work. These are not Claude
+review or final Main validation. Main's corrected trace/driver pair then
+passed44tests/11.80s; the full seven-file focus plus three selected active-doc
+checks passed217/12.93s BEFORE the later direct-phase correction. A final
+fresh-process run follows below; no full lane/repository suite is implied.
+
+Frozen V3 proof protocol SHA256
+`97ea03b85815e20ec9c06b6d24a8f063ebea5bd8c2361baa11448fd963c6497b`;
+new diagnostic policy SHA256
+`28f02709031d9330cd301b7b0250bade95845e69266c32547881a90d505674f0`;
+exact61-path AST closure SHA256
+`8532de63f5883ce2e141ef5a9f67c641232993c6802e0a2803072aa6bd9843f6`;
+current61-byte mapping SHA256
+`dfafa52c80d17e58728f2f9e01f49c96ae60aea4e012096f36a8732ae06cb451`.
+Wrapper schema si-offline-kernel-transition-harness-v3 SHA256
+`b36903aaa99a43b5574bded0ba2a8af043b6dacf7794100c1858016aa3120dfc`
+binds exact code/protocol/authority/decision, ONE new V3 safe inode and ONE
+original setter call. All provider/socket/DNS/exact source-key/capture/source-
+replay/publication seams are denied/countable. Subprocesses are restricted to
+exact designated-root lane Git metadata and61 committed source blobs. The
+real fixed Darwin setter/write-open/fchmod/fsetxattr challenges are neither
+replaced nor blanket-denied. A missing/error/overflow/changed observer vetoes
+any positive result. Native diagnostics remain false-authority on success too.
+
+No actual V3 operation has run at this entry. All development agents are
+stopped/frozen. Runtime exact clean HEAD is bound only after checkpoint; the
+actual/tracking origin must remain730C until this round's ONE final push.
+No source claim, data admission, historical repair, purchase or QC/Safari
+availability is inferred from this diagnostic registration.
+
+Main read the complete final new production/test pair and the complete driver
+integration. Fresh-process final selection after the direct-phase correction:
+**218passed/14.02s**, no skips/warnings, empty inherited environment and OS
+network denied. Exact61-path transitive AST closure, all own literal-contract
+catalogues, source/test in-memory compile and whitespace passed. Complete
+published historical body from Current publication rule through125 remains
+byte-for-byte unchanged; only current status and appended126 change. No
+actual operation or test session remains active before this checkpoint.

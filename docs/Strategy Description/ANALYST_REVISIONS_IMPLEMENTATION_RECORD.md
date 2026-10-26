@@ -2176,8 +2176,12 @@ eligibility use then refused a probe metadata identity predicate after two
 HTTP200 metadata responses(323.63); S is SPENT, with no status/price request.
 T's narrower predicate-only diagnosis then passed once(323.66), observing
 only QQQ/REMX CUSIP-vocabulary predicate failures in its nine public probes.
-T is SPENT. U(323.67) prepares an offline syntax inspection of its exact two
-retained DATA leaves, not a T/S replay, QC price transfer or strategy
+T is SPENT. U's offline exact-byte syntax inspection passed once(323.69):
+QQQ/REMX actually use three/four space-separated tokens; U is SPENT.
+The new current-route pipeline and V eligibility freeze(323.70) integrate
+the verified parser without changing old evidence. Insider's completed next
+push/resource handoff is now recorded there and the one-shot monitor deleted;
+fresh QC gates and complete reference/NAV coverage still precede strategy
 continuation. Q does not identify P's historical changed field;
 no cross-job native-SID continuity or market-wide absence is inferred.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
@@ -61720,3 +61724,165 @@ is inadmissible even if a report exists; claim consumed or ambiguous, no retry,
 repair or cleanup. Retain only finite counts/hashes/separator ordinals, never
 tokens/rows/keys/raw exceptions. No provider/QC contact, strategy look or cell.
 Root/advisors are same-round engineering checks, not independent review.
+
+### 323.69 Actual U passed; documented space grammar confirmed, U SPENT
+
+At clean06be279222cf8a722b43133e5c5e46386d1447de, sole U native parent ran
+2026-10-26T06:25:45.198681Z..06:25:49.766126Z actual0/stderr0/no bound.
+Native supplied-output validator06:25:49.766527Z..06:25:53.850261Z actual0/
+stderr0/no bound, identical6551byte stdout SHA
+7b186c328d931a520a3ba9e6bbb26fb5506859495a05dddc86f76caee56bf8d8,
+output_authenticated=true. Report6422bytes SHA
+63b416d1122cb332b22adb7ec84bb66b2a5b1d40c6df4ed775516ae6c92972a1.
+External brackets, not exact internal read timings. U claim/producer/source
+stage/validator/control are now SPENT; no reread/retry/repair. The precommit
+86record passes1.24s overlap251, not additive. No tests/edits during clean use.
+
+All9 fields passed the new complete-vocabulary parser. QQQ(index2) actually
+has three9-character tokens with two ordinal32 ASCII-space separators;
+REMX(index5) four tokens with three ordinal32 separators. Legacy counts0 for
+both; new counts3/4, duplicates0. Other7 fields are single9-character tokens,
+legacy/new1. No lowercase or additional separator was present. Exact canonical
+field hashes match323.66 and both retained DATA pins matched through current
+full metadata/security/final normal guard exit. This confirms the documented
+syntax mismatch on these retained fields, not S's discarded historical bodies
+or active/historical/permanent identity/global collision absence. No token,
+licensed row or raw price was disclosed. All identity/PIT/price/NAV/source/
+strategy/paid-tier/paper/live admission flags remain false, no provider/QC
+dispatch/credential lookup/job/look/cell;336/259/52/699 unchanged.
+
+The prospective parser itself is corrected; integration remains: BOTH quality
+assessment and route selection in a separately versioned current-metadata
+pipeline must use it and check EVERY token against ALL returned stock/fund
+rows. Merely fixing a predicate or selecting the first token is insufficient.
+Malformed unrelated vocabulary may only poison/refuse a route, never establish
+no collision. Original composer/seedarchive/M/O/S/T/U remain frozen. A new
+coherently justified current eligibility contract may then use that verified
+code change; S's spent claim/status/price roles are not automatically revived.
+No QC contact until Insider's completed next push/resource handoff and fresh
+gates. Full consistent reference/NAV coverage remains open; one Oct21 vendor
+mark or successful syntax does not close it or permit a six/eight run.
+
+### 323.70 Completed Insider handoff; new current-routing V one-use freeze
+
+Read-only live Insider branch changed from armed41d729aff80752cdc1ad6ef73690d9c59711d712
+to96d4d8aae3f7caec5134fb46fd3170be6fe9dcce. Compact wait revision3/cursor
+e399b411-f3be-441d-87a7-e6563d7ded7a:3 reports its turn completed at
+2026-10-26T07:03:28Z, thread idle, final handoff explicitly pushed96d4d8aa/
+remote verified/tree clean. This is the requested NEW completed push, not its
+older baseline/local work. No other-lane private input, repository checkout,
+branch fetch, message, test, job or session was touched. One-shot automation
+analyst-claude-review-forward-pair was DELETED after its fulfilled handoff,
+as product heartbeat completion instructions require, rather than leaving a
+stale monitor active/paused. Its monitoring purpose is complete, not Analyst
+backtesting readiness. Owner permits continuation, but no QC/Safari/capacity
+request has yet followed; fresh availability/access/source/run gates still
+apply. This supersedes323.68's prospective pause-on-trigger wording.
+
+I323-034 is corrected prospectively in NEW
+scripts/arv2_r298_sharadar_current_routes.py: the same held complete parser
+feeds BOTH route-quality census and selected-route vocabulary. Physical-row
+ownership indexes every token across both full returned tables, with perma/
+FIGI/ticker duplicates and second/later-token collisions refused. Unrelated
+missing/malformed fields remain explicit unknowns; bounded shape-token scans
+may only poison/refuse, never admit a vocabulary or claim global absence.
+Current metadata and all these predicates are not an active-CUSIP/permanent/
+historical master. Frozen composer/seed-archive/M/O/S/T/U remain unchanged.
+
+New V is not renamed unchanged S: its verified full-vocabulary integration
+removes the documented compatibility defect and I323-036 P2 corrects S's
+blind later-route diagnostic. Before route admission, a required callback
+retains ONLY the closed whole-catalog counts/hashes/nine-probe collision
+predicates. Caller persists metadata-catalog.json after exactly4 HTTP events
+(the two metadata200 responses), before allowing role3. A duplicate/missing
+callback refuses. Later failures retain this finite evidence; it is not an
+HTTP dispatch, a successful capture, a raw row or source admission. On normal
+return its value must match the independently recomputed six-capture receipt.
+Earlier raw successful buffers can still remain unreturned/unpublished after
+later refusal; the new callback does not pretend otherwise. V's own claim,
+schema/events/sourcepins/control are separately versioned and no S operation
+or consumed roles are invoked/revived. New live metadata is not pinned to T's
+old bytes; source code/grammar and fresh returned capture pins bind instead.
+
+The fixed LOCAL purpose remains current stock/fund routing and advertised
+bulk size plus exact2020-12-31 access observation before planning a full
+common price/NAV package, never replacement acquisition or outcome selection.
+At most six GET attempts, in order: stocks/funds TICKERS all rows bounded
+16MiB each/limit100000/skip0, exactly12 frozen fields; stocks/funds status=True
+8KiB each; QCOM stocks and all8 frozen ETF funds for exact2020-12-31 with
+ticker/date/closeunadj/lastupdated, limit100/64KiB each. Current selected
+intervals must cover that date before any status/price continuation. At a
+metadata limit-hit or overflow/schema/required-route ambiguity, REFUSE, no
+pagination/growing bound/alternate route/fallback/retry. Query transport,
+credential-echo decoding checks, TLS/stream/no redirects/no compression/
+trust_envFalse/retries0 and failed-body exclusion remain fixed. Six possible
+application dispatches are not measured physical provider counts. Empty early
+prices mean observed absence, never proof of subscription expiry or full
+coverage; positive nine probes also cannot prove all6151/all-date coverage.
+
+Selected new source/test pins:
+
+| File | Bytes | SHA256 |
+| --- | --- | --- |
+| scripts/arv2_r298_sharadar_current_routes.py | 20075 | 514e1f895c7e088de25e80b958ca4f2f9190e69bdadb18343f7dde40172e7955 |
+| tests/analyst_revisions_v2/test_r298_sharadar_current_routes.py | 11658 | 453f52a44fb48170cc4ac2f17dbbcc42bc469d3d18bee2cef28132089dd80308 |
+| scripts/arv2_r298_sharadar_eligibility_v2_observation.py | 26072 | a5dd7356316351af6ede75eb07db79464a546b661a9fba74a9c92786072c3b13 |
+| tests/analyst_revisions_v2/test_r298_sharadar_eligibility_v2_observation.py | 24379 | 46f11f47182b79cadfc57744a4d2d38f655c1453d2ec87c7140da9d0eabd6ed9 |
+| scripts/run_arv2_r298_sharadar_eligibility_v2.py | 26948 | c8fdf22b783e784a4ee4cefeffe346f5d6c4db1158b3e9e5133f9e36095e926b |
+| tests/analyst_revisions_v2/test_r298_sharadar_eligibility_v2_caller.py | 30371 | 72d4157b5c5666d37469c8b742043f7db640de1d03f5ebab261d39e1fbb671a2 |
+
+Exact caller canonical+LF20869bytes SHA
+f343ea1102d357a2cd77c15bc5bf86f7242a39f0c9ebf6a8f26091300e1cbc94;
+observerNO-LF4059bytes SHA
+54ac98e7d2bdf7ad4f962f8682adf727870b1b8bc59ac9ba0a58f2e9881d0c13;
+routerNO-LF2094bytes SHA
+5ef8fdbba0f9358d00c4460bc4230eee46566081cea28e04ae80b8587ce520eb.
+All153 source pins matched, including frozen S caller/helper and U/T pins;
+none silently refreshed. Root read complete new sources/tests and old/new
+diffs. Root native-denied final394distinct passes3.21s =60routing+122observer+
+125caller+86record/document+1research closure, no failures/skips/warnings;
+compile all6files in memory/no bytecode, EOF checks clean, dispatch_fence absent.
+Earlier393passes3.48s and147passes2.42s overlap. Root first final extension
+had393passes/1fixturefailure3.24s: its wrapper hit the synthetic provider's
+own catalog-equality assertion before the new caller guard. Corrected only
+the fixture to exercise a genuinely mismatched yet well-formed earlier catalog.
+Production guard retained; final394 passes above. Interim123callerpasses/
+1pending-pin deselection3.97s is not complete final validation.
+
+Root memory-only first-token index omission caught3expected failures0.13s;
+actual-exit omission1/0.19s; catalog-binding omission1/0.17s. Restoredfinally,
+disk hashes unchanged. Author routing initial59passes/1fixturefailure3.75s
+expected shape refusal but accidentally created an earlier real token collision;
+changed to disjoint synthetic tokens, preserving production refusal. Observer
+author122passes3.43s overlap final. Its initial first-token mutant passed1test
+0.15s because overlap was already the counterpart's sorted first token; NOT
+sensitivity evidence. Strengthened new fixture placed overlap later on both
+sides, catching1expected failure0.14s; callback omission1/0.13s, restoredfinally.
+Earlier78/114/122 subsets overlap. No complete suite or independent review;
+same-round advice is not independent acceptance. Owner's current Claude waiver
+covers this recovery; technical/source/rights/financial gates stay binding.
+
+D-V: after THIS record and all6new files are committed in exact designated
+root/branch with clean HEAD, use that HEAD and caller c8fdf22b pin to invoke
+V observe ONCE. New fixed private control
+newrule_sharadar_eligibility/R323-20261025-V remains uninspected/unallocated
+before invocation. Compatible host ONLY designated Darwin/POSIX Python3.13
+at /Users/sheltonchen/.venvs/trading_agent-py313/bin/python. Exclusive claim/
+fsync before exactlyone Sharadar login-Keychain lookup(timeout20s,no fallback)
+and all contact; parent600s/outer630s/native validator20s/128KiB/max24files.
+Only own child kill/reap. Parent uses existing permitted direct local Sharadar
+research access, not a new paid right or QC transfer. Keep all support paths
+inroot. Native supplied-output validator denies network/all artifacts/Keychains/
+security CLI. Selected pins are not whole-interpreter integrity; no native
+sandbox claim for the network-enabled provider parent. Current full-ten held/
+named response/control metadata and native ACL/xattr policy retain original
+FDs through publication/return checks; no continuous-security claim. Limits
+do not bound uninterruptible I/O/host suspension. Actual parent0 plus native
+validator0/empty stderr/no bound/matching closed output/report/capture/catalog
+pins mandatory; nonzero/unknown/late report is failure/ambiguous spent, never
+report-only acceptance. No retry/cleanup/repair; retain finite refusal evidence.
+No old private input/control/source reader, QC operation/job/look/cell or raw
+credential/licensed row/price/exception disclosure. All strategy/PIT/master/
+cloud-rights/paid-tier/paper/live flags false,336/259/52/699 unchanged. After
+actual observation choose the next justified coverage/identity/valuation step;
+do not call V a complete price package or launch a strategy on these9probes.

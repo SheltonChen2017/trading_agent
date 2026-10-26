@@ -36950,3 +36950,204 @@ Actual invoking glue SHA256
 `5f93d0346299fea80984aa600a4dd660e3e508ac2ac9b671884522f902cbfc94`
 is external trusted orchestration, not silently part of the144-source image.
 Main124 record/active-document/boundary/EXACT-package checks passed4.19s.
+
+## 313. Offline shape observed and independently replayed; route/envelope gates identified (2026-10-25)
+
+312 ran on already-existing CLEAN
+`85f0857325b612d8941ced620c4e8c9dbdad49e7`, executed runnerf959d2c6/
+pure98f13147/frozen front153f1b35/core6778363f,144-source inventory
+`72f9ea8ac9bc0d8a5ab2bff455f63cbb08f4971d59da5475225f9dc3d8f29552`.
+Actual exit0,total164,933,620,041ns INCLUDING protected precheck/contact wait/
+repeated authoritative run, not native CPU or transport time. One OFFLINE
+interpretation, report retained, no refusal/new SEC requests. Exact pins:
+
+- complete `2da2613b400b1ade1e6eba1fda7fabdf3be11a94fd2804070a76d4d807921000`;
+- reservation `2e0b169c7e40c0d60223071d8b1d3de09ae807351841862d06691da15fbc85fa`;
+- analysis-start `f1480f27c8b00d3fca57fa2d1e30b8fd596bc48c57dc5fc19d68512f0974c378`;
+- shape report `8ed84500edb27f6f43b9f358ca3db4263d2e47364eff8ce51b55f4fdff12a015`.
+
+Independent READ-ONLY replay exit0,total73,650,042,833ns including protected
+precheck/contact wait/repeated verification; exact original/new producer,
+controls/source/current/original Git/SH/FD versions and derived shape matched.
+Current-contact prefix rescreen TRUE; original-contact screen/equality and
+whole-carrier verification FALSE. Actual and independent verifier each obtained
+one own-profile contact after protected ready marker, fed anonymous stdin once,
+no value/hash retained or echoed. New/old source/record writers stayed frozen.
+Independent invoking glue SHA256
+`4e01f70e4f6716133e0aff749c815173b8594f5577a17374e668be7c4c0f4e03`,
+separate from committed144-source execution image. Stat-only600-mode leaf
+progress (report27,130B/complete19,798B) was not acceptance/custody evidence.
+
+Only afterward312's separate metadata reader, initially native network/fork/
+ALL-write/security-exec denied with144-source memory compilation/recheck,
+strict old/new SH/FD versions and exact externally pinned complete/report/all
+control schemas, succeeded. Native reader1,639,303,083ns; trusted parent pre/
+post source checks included total16,935,864,209ns. Live291 guard through stdout/
+final sample. Raw prefix/original body/profile/new requests0 in this reader.
+Reader glue `bfb5d32701a47770a4acf61aaa4a2a43892a2fa74aa1b87934eb45bf43dd1d6a`,
+trusted outer orchestration
+`13e2119724750ed4fc4f62d1e2c0a1b6166dfda09da9bfb10ab66ae93a8b117a`,
+neither silently part of the committed source image.
+
+Hash-bound observations over1,532,222 decoded bytes: five sequential checksum-
+matching headers, all magic enum `old_gnu_ustar_spaces_NUL`; one directory plus
+four regular NC-suffix fixed-name fields. Directory payload0 and three regular
+payloads843/9,042/6,699 have complete PHYSICAL spans inside this decoded prefix;
+the last regular declares6,858,613 bytes but only1,512,254 payload bytes observed.
+Status `prefix_ended_with_partial_payload`, structural frontier1,532,222.
+All four regular opening markers are `SUBMISSION` at offset0, none observed at
+256/266. All four fixed-name-field accession-NC ROUTING-PATTERN clues are FALSE.
+No names/routes/source values or their hashes were exposed. These are fixed-
+field/physical observations, NOT GNU logical-name or complete-member/container
+validation. No whole gzip trailer/CRC/ISIZE/EOF or population integrity gained.
+No original filing/PDS control/acceptance/XML was parsed or admitted.
+
+This actual evidence changes the next engineering order: a simple old-GNU
+profile addition to the filename-routed compact collector is insufficient.
+Do not assume accession-bearing filenames, prepend a256/266-byte PDS control,
+wrap `<SUBMISSION>` in fabricated `<SEC-DOCUMENT>` or infer acceptance from TAR
+time/archive day/source17 filing date. The dated PDS specification is not proof
+of this NC envelope. Next delegated bounded step is a NEW pure OFFLINE NC
+structure/name-pattern witness on the SAME retained prefix, with privacy first,
+complete-observed-span boundaries and finite tag/cardinality/presence enums;
+no source values/identity/admission. Qualify source/tests and separately register
+any actual interpretation before using real bytes. No new archive GET until
+the routing/envelope facts support a separately versioned capture design.
+
+Different-day observations still do NOT establish earlier discarded June/
+Oct7/Dec3 failure causes. Existing failures, stoppedv3 and all frozen custody
+bytes remain preserved. Nine carried OPEN P2s,20,044 individual dispatches,
+source/PIT/rights/canonical/look/QC/backtest gates unchanged. QC/Safari are still
+occupied by another lane; no UI/SDK/job/outcome/backtest/Mia use or push. All
+named observations/verifications finished; source writers may resume solely
+for new additive offline engineering. No final handoff or interim push.
+Main124 record/active-document/boundary/EXACT-package checks passed4.28s after313.
+
+## 314. Pure NC structure diagnostic qualified; no source admission (2026-10-25)
+
+Delegated engineering choice from313: qualify NC routing/envelope observations
+OFFLINE before spending another full-carrier request. NEW pure
+`research/insider_buying_sec_feed_prefix_nc_structure_v1.py`,37,159B/
+`bb2511c136029e318a703e52da019828268622642fbe6f14269db5b4a1c229f6`;
+own13,795B/`7ff5392a078d970172a96eebf4ddb4a6cd10d822e14ead672e1aadf075c9142f`;
+peer11,326B/`0d0e2218c020cd94327f769bc1c702930dfe3ba434807acf7957b44185f03954`.
+All raw/produced decoded bytes finish unchanged finite privacy first. Frozen
+shape geometry then drives another bounded decode, comparing byte/gzip states;
+no guessed payload-header scan. Collect at most64 complete small NC candidates,
+1MiB each/4MiB aggregate,256 headers/8MiB decoded/256KiB final witness. Capacity
+refuses the WHOLE witness, not a convenient subset. Partial/oversize/unknown/
+extended members explicitly unexamined, never absent. Conservative GNU tail
+gate distinguishes unsupported sparse/multivolume/link/extension semantics;
+nonzero lexical atime/ctime can be archive metadata, NEVER acceptance. Collected
+candidate counts/bytes are distinct from examined counts after this gate.
+
+Only finite filename-pattern clues and bounded SGML/document/XML syntax are
+returned; no actual names/accessions/times/CIKs/financial values, member/routes/
+raw-prefix hashes or source-value hashes. Source/dependency CODE pins are not
+source-data hashes. Whitelisted pre-DOCUMENT/TEXT header fields retain exact
+occurrence counts; unknown markup/nesting/duplicate headers yield ambiguity,
+not a fabricated absence. Acceptance14digit lexical shape is NOT calendar,
+timezone, original availability or PIT validation. SOURCE is count-only, not
+a source17 interpretation/join. SUBMISSION@0 means no pre-opener bytes IN THAT
+member, not universal PDS absence. Complete observed DOCUMENT/TEXT/XML bounds
+plus bounded strict-UTF8/DTD/entity/resource-denied Expat parsing permit only
+syntactic ownership-root CANDIDATES. Text/financial values ignored; XML schema,
+source authenticity/identity/primary selection/PDS/PAC/paper/private-release/
+deletion/version semantics and all admission/readiness remain unqualified.
+Malformed XML/unsupported encoding stay explicit; node/depth limits are fatal
+whole-witness capacity refusals. Closed public validator returns detached safe
+metadata only; all error codes are finite own enums.
+
+New prospective findings corrected before actual input:
+
+| Finding | Evidence/correction |
+| --- | --- |
+| IBNC-PRE01 | Main's unknown/inline markup scope concern produced two own genuine reds; unrecognized or markup-bearing values cannot prove singleton/absence. Recognized ignored leaves remain count-only, accurately named other-preamble labels. |
+| IBNC-PRE02 | Five GNU regular-header extension variants genuinely red before new conservative semantic gate; unsupported tail semantics unexamined. No old source/global mutation. |
+| IBNC-PRE03 | Peer duplicate sequential HEADER scopes incorrectly joined accession/acceptance singletons; genuine red1.20s. Multiple same-kind headers now ambiguous, preserving counts. |
+
+Author-attributed269 focused5.04s; source-only six-image initial native all-four
+denial/hash/compile/live291 guard proof exit0,outer0.550182625s/inner22,620,917ns,
+invented witness4,282B. Two memory reversals generated11 genuine reds (GNU5,
+validator6), restored5/6 green0.03s each. Peer-attributed own+peer70 green1.99s;
+six distinct reversals genuinely red, restored18 green1.36s; strong six-image
+proof0.484204917s. Two peer sandbox syntax mistakes stopped BEFORE Python and
+were excluded. An aggregate fixture's gzip exceeded64KiB before product call,
+and a baseline SOURCE fixture adjustment were fixture corrections, NOT product
+reds. Genuine capacity negatives assert exact phase/code after proving upstream
+compressed/expansion limits. No actual prefix/private input/provider/QC used.
+
+## 315. Minimal read-only NC observation front qualified (2026-10-25)
+
+NEW `research/insider_buying_sec_feed_prefix_nc_observe_v1.py`,16,758B/
+`cb66d434f0cefeb38bc85659feab8fce2f2b7431b03aef9a7d72550940d6d3df`;
+own19,992B/`7fb1bd8ea5626595defdb2ad7ec94dd14d5008b98cafef7ce156a560028da107`.
+Delegated choice: this is a READ-ONLY diagnostic, not another acquisition or
+publisher. NO new namespace/claim/analysis journal/output file; durable observed
+metadata and exact execution/source lineage belong in this lane record. A new
+named observation may run only after separate registration. It cannot resume
+any carrier/prefix namespace or consume a URL. Old307 prefix/control SH/FD/
+strict versions/external pins and941a6f78/138/efb11ed9 producer proofs remain
+binding.313's85f08573/144/72f9 history is distinctly STATIC prior provenance,
+not new execution or a re-read of the consumed313 observation output root.
+
+Exact clean/current/committed source and Git parent proofs before/after,
+initially native network/fork/ALL-write/security-exec-denied full-source memory
+compile BEFORE held/private input,291 live guard through stdout/final sample.
+Metadata preflight stats old prefix only, no raw read/hash. Anonymous current
+contact analysis replays frozen prefix custody/privacy, interprets the SAME
+immutable held bytes with314, and validates closed outer/nested IPC before
+returning safe metadata. Existing prefix SHA is an explicit old custody binding,
+not a new member/value hash. Original contact equality/screen replay FALSE.
+Typed finite pure refusals survive the boundary; foreign messages suppressed.
+No acquired output exists to replay or promote; no apparent corpus completion.
+
+**IBNCFRONT-PRE01:** genuine1red1.41s: nested pure prefix_bytes mutated65536→1
+still satisfied its legitimate general≤64KiB API but the fixed-input wrapper
+accepted it. New wrapper binds exact old statted65,536 extent. Not a pure API
+defect. Closed nested original metadata/control/plan/pin/producer crosslinks
+also reviewed. An own contact.test orchestration fixture initially hit the
+production observed-contact validator; corrected ONLY the mocked fixture
+boundary. One /tmp-alias launcher refusal before collection was corrected to
+registered/private/tmp; no privacy/isolation weakening.
+
+Author-attributed178 focused10.20s (new front56 +pure70 +boundary51 +EXACT1);
+four memory guard reversals generated6 genuine reds, restored6 green0.29s.
+Source-only141-image native-denied compile/hash/dependency/live-memory/invented
+65,536-byte observation proof1,112,607,833ns, NOT clean actual assembly. Peer
+independently read exact front/tests and ran56 green7.39s, no further material
+finding. No actual retained input/contact/acquisition/QC/Git actions by agents.
+
+Main OBSERVED742 focused green33.26s: all five new files plus related frozen
+prefix/shape/format/archive regression, active-document/record, import-boundary
+and EXACT Insider package guard; native process-tree network/security-exec
+denied, writes only fresh registered TMP plus/dev/null; fork only for boundary
+children. No complete lane/repository suite. Main independent strong initial
+network/fork/ALL-write/security-exec proof compiled/rechecked142 current manual
+images, inventory
+`1e6e636787e4d6dbd555b672945d3d55b05af898a93a542a9251e9579ab79d95`;
+base85f08573 plus explicit UNCOMMITTED new source/test images, not clean actual
+assembly. Reused fixed hash-checked invented peer builders only, no actual data.
+Real64 NCs: compressed840/decoded66,560/payload15,744/witness201,965 bytes.
+Real4MiB payload aggregate: compressed50,913/decoded4,197,376/witness13,383B.
+Member65 and over4MiB each refused exact respective capacity before choosing a
+subset. Exit0,1,332,977,750ns with live291 guard through stdout/final sample.
+All final file hashes rechecked; nine OPEN P2s/readiness gates unchanged.
+
+## 316. Clean NC-front metadata health check registered (2026-10-25)
+
+After committing313–316, freeze ALL source/test/record writers. On its NEW
+already-existing CLEAN designated producer HEAD run only `preflight_actual`:
+measure REAL source assembly/count/inventory and metadata plan/input digest,
+current/committed/full Git/old producer/control/strict SH/FD closure, initially
+strong native source compilation before metadata. No raw prefix/body read/hash,
+private contact/profile/Keychain, namespace/output file, provider/request/QC/
+Safari/SDK/job/outcome/backtest or repeat of an old scope. Report exact measured
+HEAD/source/input/plan/elapsed; never relabel manual142/agent141 images as the
+actual assembly. A refusal stops activation for diagnosis, not weak guards.
+Only after observed success may a separately named/committed ONE read-only NC
+observation be registered with protected own-profile readiness. No new download
+or old namespace mutation is necessary. QC/Safari remain held by another lane,
+zero launches; no interim push or final handoff at this engineering checkpoint.
+After313–316 main124 record/active-document/boundary/EXACT-package checks
+passed3.89s; final five new source/test hashes matched the stated pins.

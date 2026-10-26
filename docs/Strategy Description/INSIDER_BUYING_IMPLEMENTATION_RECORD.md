@@ -36884,3 +36884,69 @@ analysis-start/publication or acquisition by this health check. A refusal
 stops activation for diagnosis without weak guards or a retry. Only after
 observed success may a separate named OFFLINE retained-prefix interpretation
 be registered/committed; no new download is necessary or authorized here.
+
+## 311. Clean offline runner metadata health check passed (2026-10-25)
+
+310 executed on already-existing CLEAN
+`de71afa8e3ba316e1e0b6100395c8c5dc1883ca8`, exit0,total25,793,001,041ns.
+REAL144-source assembly inventory
+`72f9ea8ac9bc0d8a5ab2bff455f63cbb08f4971d59da5475225f9dc3d8f29552`,
+not309's manual137-image proof. Held-input digest
+`a8f2ebce8b2368bc2b8ab8aa1903a886d9df8c35ba648ee73cb2c86490dece45`;
+head-specific plan134,333B/
+`cfa1a701ff6b9270f8fda30be11500204e2fbccbed241b555994a9d2c2c84692`.
+Old prefix producer941a6f78/138-source efb11ed9 matched independently. All
+actual-image sources memory-compiled/rechecked before held input under initial
+native network/fork/ALL-write/security-exec denial,291 guard through stdout/
+final sample. Parent current/committed/Git/producer/disk/freshness passed.
+Raw prefix/original body/private contact/namespace/requests0. No shape was
+interpreted, no readiness claim, no QC/Safari or push. Tree stayed clean.
+
+## 312. One offline retained-prefix shape interpretation registered (2026-10-25)
+
+Under delegated continuous-build judgment AFTER311's successful qualification,
+commit311–312, verify its NEW already-existing CLEAN designated producer HEAD,
+freeze ALL source/test/record writers, then run ONE scope
+`ib-sec-feed-prefix-shape-offline-v1-20261025-once`, fresh root
+`artifacts/insider_buying/sec_feed_prefix_shape_observation_v1`. Only reuse the
+already-held65,536-byte Oct8 prefix and its exact307 external controls/pins.
+No new SEC/provider request, alias/range/full GET/continuation, original-parent
+dispatch or source-window expansion. Old capture root is READ ONLY. This is
+shape observation, not GNU/PDS/member extraction, XML/admission or a backtest.
+
+Trusted separately hashed invocation protects TTY echo, performs full current/
+committed/Git/old producer/native source/input/disk/lexical-freshness precheck
+before ONE own-profile contact. Require actual144/72f9ea8a source assembly and
+held-input a8f2ebce at protected ready marker. No contact value/hash in chat,
+Git/logs/argv/env/Keychain. Anonymous stdin is fed once; authoritative runner
+repeats preflight BEFORE consuming queued private input. Direct trusted parent,
+not a nested outer Seatbelt; analysis starts already under strong native
+denials, full source compilation/holds and291 memory controls through stdout.
+Fresh EX namespace/reservation/analysis-start; no resume or renamed retry.
+Max64KiB source prefix,8MiB decoded,256 headers/256KiB shape,1MiB control/IPC,
+180s native wall,64MiB+eight controls free reserve. Finite privacy screens raw
+and ALL produced decoded bytes before hash/retention. Publication failure is
+terminal, never reclassified as coherent analysis nonretention.
+
+Afterward ONE separately identified independent READ-ONLY verifier may reload
+CURRENT own contact once after protected ready preflight and replay externally
+pinned new complete/report plus old-prefix/source/producer/FD/SH custody and
+the shape report. No original-contact screen/equality or discarded whole-
+carrier verification is claimed. Original exit status remains original.
+Only after successful independent verification, a separate initially native
+network/fork/ALL-write/security-exec-denied metadata-only reader may compile/
+recheck current sources, hold exact external new complete/report/control pins
+and old-prefix metadata/strict SH versions, validate full sanitized schemas,
+and return enum/count/range/marker summaries (no names/routes/source values or
+their hashes). That reader reads raw prefix/original carrier bytes0, profile0,
+new requests0. Both new and old roots stay unchanged throughout verification.
+
+Record observed producer/execution lineage, exact pins, outcomes and limits
+afterward; attributed tests are not actual evidence. Nine carried OPEN P2s,
+individual dispatch20,044 and all source/PIT/rights/canonical/look/QC/backtest
+gates unchanged. QC/Safari still held; zero launches. Continue available lane
+work after this named offline assessment, no interim push/final handoff now.
+Actual invoking glue SHA256
+`5f93d0346299fea80984aa600a4dd660e3e508ac2ac9b671884522f902cbfc94`
+is external trusted orchestration, not silently part of the144-source image.
+Main124 record/active-document/boundary/EXACT-package checks passed4.19s.

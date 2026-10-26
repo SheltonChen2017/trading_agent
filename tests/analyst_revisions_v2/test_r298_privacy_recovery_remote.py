@@ -611,4 +611,3 @@ def test_equal_owner_views_still_must_match_positive_project_owner_identity(clou
     with pytest.raises(m.RecoveryError, match='dedicated_owner'):
         cloud.runner.inspect()
     assert [endpoint for endpoint, _ in cloud.calls] == ['projects/read', m.COLLABORATION_ENDPOINT]
-

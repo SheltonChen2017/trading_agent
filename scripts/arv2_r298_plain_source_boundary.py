@@ -254,4 +254,3 @@ class OneResponseBoundary:
             client = payload = copied = result = None
             raise BoundaryError(failure)
         return result
-

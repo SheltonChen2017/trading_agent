@@ -36662,3 +36662,132 @@ FALSE. QC/Safari are explicitly still occupied by another lane; no UI, SDK,
 job, outcome or strategy launch. This is not a final checkpoint/push. Continue
 available work after the named diagnostic; exactly ONE final push only at the
 authorized round's honest terminal condition.
+
+## 307. One64KiB prefix acquired/independently verified; unsupported first-directory profile observed (2026-10-25)
+
+306's actual operation ran on already-existing CLEAN
+`941a6f78608b6ffb3f76c986176495cb7fae43bf`, actual138-source inventory
+`efb11ed9b5c728e65da22a87c2ecb3cc79c65b60b248cb7d812c788628dc7b32`;
+executed wrapper153f1b35/core6778363f byte images as303/302. Exit0,total
+168,635,308,958ns INCLUDING protected precheck, private-input wait and repeated
+authoritative execution; not transport/CPU time. ONE raw transport invocation,
+HTTP206, exact65,536-byte prefix retained after finite raw/decoded screening;
+no refusal. Server declared total535,576,467 bytes, NOT measured whole-carrier
+transfer or proof of size/KB rounding. No full GET/fallback/continuation. The
+Oct8 URL is now permanently consumed, not available for a later full GET or
+another range. Exact pins:
+
+- complete `f89f5c9333383cc7a9a62b4f07ffef340451f0fca75fa91f1cd7ee55e580f2ce`;
+- reservation `c3a35a798eb5e8d39e5bd1d79099fc85e0a4910eb470466d631fd8b588443807`;
+- claim `ee8464baf15998099c94f3a2432378017cc481788cdf4a04d32b68e083918b05`;
+- start `b1bc5191ce30172b28eab22a0f041a6ee360ad761d59caccf906a5ecae66bcd9`;
+- result `f12420338cfcb7bad3d25773d38987af16a5b382f04262b651ad76dc33ee5924`;
+- prefix `4646b2a211ee8cc367528571ae6c212519cd4a7ff9b95820f9411c50d5763362`;
+- required-headers `82cf6d58f31e3222d41a19a9e35d5c1104b1a6db4ee4c90bcfb7ee66f2797921`;
+- inspection `a403b1d30f901299662f43249b8fa05ef445387e07af2e9ae564c0cf731280ff`.
+
+Main independently verified the exact complete/control/prefix/descriptor/
+current-contact privacy/source/current/original-producer-Git custody, exit0,
+82,046,282,083ns total including precheck/contact wait/repeated verification.
+Current-contact prefix rescreen TRUE; original-contact screen/equality and
+whole-carrier replay/verification FALSE; new requests0. Actual and independent
+verification each fetched one own-profile contact only after protected ready
+precheck and fed anonymous stdin once; no private value/hash persisted or
+echoed. All source/record writers remained frozen. Stat-only600-mode leaf
+progress was not used as acquisition acceptance or measured transfer evidence.
+
+After successful verification,306's separate initially native network/fork/
+ALL-write/security-exec-denied metadata-only reader verified exact externally
+pinned controls, SH lock/inventory, strict descriptor schemas and current138
+compiled source bytes; exit0,total1,695,141,667ns. It read raw prefix/original
+carrier bytes0, profile0, new requests0. The hash-bound derived observations:
+decoded prefix1,532,222 bytes; transient observation buffer65,536; completed gzip
+members0/final member incomplete TRUE. First TAR block512 bytes, checksum
+matches TRUE, type DIRECTORY, declared payload0, nonzero first block, NC suffix
+FALSE; profile `unsupported_magic_or_extension`, no payload/opening markers.
+The first zero-payload physical span fits the observed prefix; whole-member
+integrity remains FALSE. This does not identify the exact unsupported magic,
+later logical names, a PDS profile or any filing. Do not call it GNU yet.
+
+All full-carrier CRC/ISIZE/EOF/privacy/hash/retention, namespace population/
+duplicates/coverage, source/PDS/PIT/rights/canonical/backtest gates remain FALSE.
+No original parent was requested or admitted; individual-dispatch count20,044
+and nine carried OPEN P2s unchanged. Different-day prefix observations cannot
+establish why discarded Dec3/Oct7/June bodies failed. Original failures remain
+failed/unresolved. QC/Safari untouched and still held; no job/outcome/backtest.
+
+Next delegated engineering decision: reuse this already retained prefix for a
+separately versioned READ-ONLY shape qualification. Observe exact magic enums
+and sequential checksum/size-bounded physical header geometry over the produced
+decoded prefix before choosing any successor parser. Do not mutate frozen
+format/compact/front globals, scan guessed headers inside payload, invent PDS
+offset semantics, request this URL again or claim whole-container acceptance.
+Engineering/tests may proceed now; no actual shape interpretation is activated
+by307 alone. No final handoff/push; continue within the same authorized round.
+
+## 308. Sequential prefix-shape engineering qualified, not actual interpretation (2026-10-25)
+
+Delegated decision: add a NEW pure observer rather than thaw the executed
+prefix/format/compact sources or infer the earlier failures from a different
+day. `research/insider_buying_sec_feed_prefix_shape_v1.py` is13,980 bytes,
+SHA256 `98f13147c86ecd58932d70f51bb7ccbf2a683a01908450371d1ed2038b27fc31`;
+own tests12,513 bytes/`67b7b2923a487cd9de557038c7da4032ece254c3d8262a3518546af901fca6d4`;
+peer tests7,929 bytes/`e89588779f44038aa09eb8fa5dd957b612adfb038fdace388057de2999c5d498`.
+First the unchanged prefix core screens ALL raw/produced decoded bytes before
+its prefix hash. A second decode of the SAME immutable bytes observes sequential
+checksum/octal-size physical geometry over ALL produced bytes; byte/member-end
+counts must match. It never scans guessed headers inside payload, rewrites a
+header, strips an assumed PDS prefix, extracts a member or returns source names,
+routes, decoded values or their hashes. Payload-opening marker offsets are
+observations only. Exact POSIX, V7 and old-GNU magic patterns are enums, NOT
+logical-name/container admission. In particular old-GNU fields345 onward are
+not treated as POSIX's prefix: the [GNU format specification](https://www.gnu.org/software/tar/manual/html_node/Standard.html)
+distinguishes these layouts. Unknown magic/extensions/links/invalid framing
+stop interpretation; the bounded decode still finishes. Observed truncation is
+not silently reclassified as invalid bytes or whole-carrier integrity.
+
+New prospective finding **IBPREFIXSHAPE-PRE01**, corrected before actual use:
+the first draft's real256-empty-directory fixture exceeded the final256KiB
+metadata cap. Author observed a genuine `final_metadata_bound` red; removed
+two duplicated per-header declarations while retaining exact root-wide FALSE
+declarations. No cap increase/physical behavior change. Corrected256-header
+report passes;257 refuses the WHOLE shape report. An upstream privacy-cleared
+raw-prefix hash may already exist before shape-cap refusal; do not claim all
+capacity failures occur before that hash. Privacy-before-source-hash remains
+binding. No unresolved material pure-observer finding; no carried P2 is closed.
+
+Main OBSERVED449 focused passes7.17s: pure shape own/peer, prefix front own/peer,
+frozen prefix-format own/peer, format-v3 regression, active-document/record,
+import-boundary and EXACT Insider package guard. Initial native process-tree
+network/security-exec denial, writes only fresh test scratch plus/dev/null;
+fork allowed only for boundary children, inherited network denial. No full
+suite. Separately initial native network/fork/ALL-write/security-exec denied
+capacity proof compiled/rechecked134 current manual images, inventory
+`1b35ba436137a36f9a31c8319916e4cc3cb1c76577e2775817a0813c8729ab7b`,
+base941a6f78 plus explicit UNCOMMITTED pure source/tests, NOT clean actual
+assembly. Invented256 sequential empty-directory headers: compressed2,619,
+decoded131,072, report240,203 bytes;257 refused with `header_count_bound`.
+Exit0,total1,422,619,375ns,291 memory controls through stdout/final sample.
+Actual inputs/contact/provider requests0. Source image hashes rechecked.
+After307–308 documentation, main observed195 focused shape/record/document/
+boundary/exact-package passes5.42s. A first sandbox-policy invoking string had
+an extra closing parenthesis and was rejected BEFORE Python/test collection;
+corrected the launcher only, not source or isolation policy.
+
+Author-attributed evidence, not relabeled observed:50 own passes1.48s, final199
+focused4.08s; three genuine memory-reversal reds/restored greens for checksum,
+sequential skipping and header cap. Peer-attributed147 focused2.10s plus52
+boundary/package3.63s; five genuine reversal reds/restored21 greens0.08s; strong
+six-image native compilation/invented256-header proof0.737696625s with240,224-
+byte report (a different invented fixture, not a contradictory actual result).
+An earlier peer proof script used a nonexistent helper and was corrected in
+the SCRIPT before invented-input execution, not a product correction.
+
+This completes pure prefix-shape ENGINEERING only. No actual retained-prefix
+shape was interpreted, no carrier grammar/PDS/source/identity/PIT/rights gate
+promoted, no original filing admitted. Nine carried OPEN P2s and all readiness
+gates remain unchanged. QC/Safari remain held by another lane, zero SDK/jobs/
+outcomes/backtests. Next: separately versioned committed OFFLINE custody runner,
+focused review and clean actual-metadata preflight, then separately registered
+retained-prefix interpretation if those gates pass. No new GET or Oct8 retry;
+no interim/final push yet. Single final round push remains unspent.

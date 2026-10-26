@@ -1,21 +1,19 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTIONS 219–222 ACCEPT CLAUDE'S THREE COMMITS AND RECORD THE
-OWNER-AUTHORIZED, SEPARATE 2021–2025 EXPLORATORY PILOT. REAL RETAINED AUDIT:
-ALL60 PILOT EARNINGS MONTH RECEIPTS,67 BUFFERED MONTHS,25 CONTEXT/20 PILOT
-SEC QUARTERS;374 INPUT LEAVES RECHECKED. CALENDAR-DERIVED REQUIRED OPEN
-HISTORY START2020-01-02, LAST60-SESSION EXIT2026-03-30. ONE NEW MASSIVE
-HISTORICAL-REFERENCE CONTROL RETURNED HTTP200 USING ONE KEYCHAIN READ;
-IT DOES NOT ESTABLISH A COMPLETE HISTORICAL MASTER. NO NEW SUBSCRIPTION
-RECOMMENDED. BACKTEST READINESS REMAINS FALSE: REQUIRED NATIVE-SID/PIT/ENGINE
-EVIDENCE CANNOT BE QUALIFIED WHILE THE OWNER'S EXPLICIT QC HOLD REMAINS;
-FULL PARENT/PRICE/CAUSAL-REFERENCE/FACTOR ASSEMBLY ALSO REMAINS WORK, NOT
-CLAIMED COMPLETE. OLD2006/2018 EARNINGS GAPS DO NOT AUTOMATICALLY BLOCK THIS
-NEW PILOT. ORIGINAL82-QUARTER STUDY, FROZEN V1/FOUR V3 FILES, SIX OPEN P2S
-AND FINAL ACCESS CLASSIFICATIONS ARE PRESERVED.806 FOCUSED PASSES/1 KNOWN
-TOPOLOGY SKIP; NO COMPLETE SUITE. NO QC ACCESS, OUTCOME LOOK, JOB OR BACKTEST.
-NEW PILOT CODE IS NOT INDEPENDENTLY REVIEWED. ONE FINAL MATCHING-LANE PUSH;
-MONITOR PAUSED. NO FUNDED/PAPER/LIVE/CAPITAL/REAL-ORDER/TRADING AUTHORITY.**
+Status: **SECTION 330 RECORDS CLAUDE'S REVIEW OF THE 40 CODEX COMMITS IN
+`336b8477..96d4d8aa` (SECTIONS 219-329: THE 2021-2025 PILOT, ITS SEC PARENT,
+FEED AND NC WORK, AND SIX QC CELLS). ALL 40 ARE ACCEPTED, THREE AFTER
+CORRECTION. THE ROUND'S 136 SEC DISPATCHES, ONE MASSIVE REQUEST AND ONE QC
+AUTHENTICATION CALL MATCH THEIR JOURNALS; NO CONTROL FILE HOLDS AN EMAIL
+ADDRESS; QC RESULTS STAYED IN THE CLOUD. CORRECTIONS: A WHITESPACE-LED NC
+DUPLICATE NOW QUARANTINES EVERY COPY (`223b4644`); THE LIVE SEC BATCH READBACK
+REFUSES AN UNEXPLAINED EARLY STOP AND THREE BATCH GUARDS ARE PINNED
+(`5c50bd3b`); TWO QC FIXTURE TESTS NAME THEIR REFUSALS (`5917fbcf`). NEW OPEN
+P2S: SELF-ASSERTED QC ACKNOWLEDGEMENTS AND TWO PILOT COMPOSITION ISSUES.
+THIRTEEN P2 FINDINGS ARE OPEN; NONE IS P0/P1. NOT BACKTEST-READY:
+IBPUBLIC-KNOWNBY-01 (329.1). NO STRATEGY BACKTEST HAS RUN. CODEX
+COUNTER-REVIEWS SECTION 330. NO FUNDED/PAPER/LIVE/CAPITAL/REAL-ORDER/TRADING
+AUTHORITY.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -68,6 +66,8 @@ The owner's latest explicit2021–2025 pilot direction authorizes the new
 additive epoch in220–222; it does not retroactively narrow the original study
 or require original2006/2018 supplier exports for the pilot. No new outcome
 or QC authority follows from the observed metadata qualifications.
+Section 330 is Claude's later review of sections 219-329; it changes no
+gate.
 
 ## 1. Canonical V1 contract
 
@@ -304,6 +304,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-23 | Codex counter-review ONLY | Fetched clean local/origin `8f6ee687a69427f2ee2ea96ab08fb6269db33a57`; incoming `272132e4..8f6ee687`, three commits, zero merges | Accept Sharadar correction and thirteen test guards; qualify documentation without a new milestone | All three incoming commits have separate dispositions in202.1. Successful status-body retention and intentionally ignored ctime are precisely distinguished; original operations are not repeated or reclassified. | Main677 passed/2 intentional topology skips24.16s before the added record guard; Sharadar112 passed1.25s; new guard cases11 passed3.55s; four echo and thirteen selector reversals caught; metadata-only twelve-leaf/source audit passed. Final validation follows below. No full suite; looks/jobs/backtests0/0/0. | Two P3 record findings corrected in202.2; six carried P2s OPEN and all earlier findings retained at exact scopes | NO next milestone this round; QC hold remains in force. Separate durable handoff after exact review hash exists, then one final matching-lane push; monitor PAUSED. |
 | 2026-10-24 | Claude review (macOS session) and corrections | `c43fb081` -> `6605db25`, `fc7f0349` -> this review record | Independent review of sections 202-217 (`8f6ee687..c43fb081`, 13 commits, 0 merges: Sharadar status repair, three qualification modules, original-64 parser and EODHD date probe) | All 13 accepted, three after correction. Nine provider requests and eight Keychain reads match their receipts; every new private output checked by hash. Fixture fence now compares filesystem identity; price capture parses hashed plan bytes; three parser guards pinned. | Final tree: 705/1 skipped and 93 focused passes, 1 topology pass, 717 on the corrected files, guards 107 with the 2 known SEP-2 failures; network and Keychain exec denied. No complete suite. Looks 0/0/0. | IBSHAR-CR03, IBPRICE-CR01, IBORIG-TEST01 closed; IBREC-CCR20101/20102 accepted against Claude; eight P3 observation groups recorded; six P2 open | Codex counter-reviews section 218; QC hold stays |
 | 2026-10-25 UTC | Codex counter-review and separately authorized2021–2025 pilot qualification | Verified remote`336b8477`; counter-review/prereg`59901aab`; implementation`7ad63d08`; this separate final handoff | Accept all three Claude commits; inert exploratory pilot freeze, real retained source-window audit and one owned historical-reference control | Native-denied374-leaf/67-month/25-quarter audit passed4.271452s; all60 pilot-month receipts present; one Massive GET/Keychain read,HTTP200/375-byte metadata body. Original population, consumed requests and false readiness preserved. | Main806 passed/1 intentional nested-topology skip16.19s; source-only compile, five review reversals, attributed pilot/probe/audit sensitivities; actual offline replay and calendar metadata; no full suite or look/job/backtest. | Six carried P2s remainOPEN; draft cutoff/deadline/schema/readback findings corrected before activation | Not backtest-ready. QC hold prevents required native historical SID/context/engine qualification; original-parent/price/factor/reference assembly is also incomplete, not an exhausted-code claim. No new purchase recommended; next gated action and exact inputs in221.4/222. One final lane push; monitorPAUSED. |
+| 2026-10-26 | Claude review (macOS session) and corrections | `96d4d8aa` -> `5c50bd3b`, `223b4644`, `5917fbcf` -> this review record | Independent review of sections 219-329 (`336b8477..96d4d8aa`, 40 commits, 0 merges: pilot, SEC parent/Feed/NC, six QC cells) | All 40 accepted, three after correction. 136 SEC dispatches, one Massive request and one QC authentication call checked against journals; no email-like string in control files; QC results stayed in the cloud. NC whitespace duplicate fixed; batch readback early stop refused; batch and QC guards pinned. | Final tree: 3,429/1 skipped and 71 focused passes, 1 topology pass, guards 107 with the 2 known SEP-2 failures; network and Keychain exec denied. No complete suite. No backtest. | IBNCROUTE-CR33001, IBBATCH-CR33001, IBBATCH-TEST33001, IBQCAUTH-TEST33001 closed; IBQC-ACK-33001 and IBPILOT-COMP-33001/33002 open P2; P3 groups recorded; thirteen P2 open | Codex counter-reviews section 330; repeat NC metadata qualification before activation |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -37878,3 +37879,261 @@ latest unstaged handoff diff checking was clean. Matching-only fetch still
 41d729af, exact local parent e4ae7e1f, record-only status. Calendar rolled to
 2026-10-26 before publication (observed07:02:02UTC); earlier20261025 scope IDs
 and execution/source images are preserved, not renamed or backdated.
+
+## 330. Claude review - sections 219-329 and corrections (2026-10-26 UTC)
+
+### 330.1 Scope and method
+
+Range `336b8477..96d4d8aa`: 40 Codex commits, no merges. It adds 51 research
+modules and 52 test files (about 48,000 lines) for the 2021-2025 pilot, the
+pilot SEC parent pipeline, SEC Feed directory, archive, prefix and NC work,
+and six QuantConnect cells or probes.
+
+The owner directions quoted in 220.1, 225.1 (QC and Safari released after
+the Short Interest lane's next remote push; Mia at any QC issue) and 329.1
+are Codex-attributed. This review did not witness them and takes them as the
+record states. Codex observed the release condition in 228.1 before any QC
+access.
+
+Method:
+- Read sections 219-222, 225, 228-231 and 329 in full, and the operation
+  sections by heading.
+- Five read-only agents (no code execution) read the module groups:
+  - the QC cells;
+  - the SEC Feed directory and archive modules;
+  - the SEC Feed prefix and NC modules;
+  - the pilot SEC parent pipeline;
+  - the pilot contracts and the Massive probe.
+
+  Every finding below was checked against the code before it was accepted.
+- In-memory mutants on the live and first-64 SEC captures and the QC
+  authentication probe (330.4, 330.6).
+- Metadata-only checks of every new private output (330.3).
+- No Keychain read, and no SEC, provider, QC or browser access by the
+  review. Every test and mutant ran with network and `/usr/bin/security` exec
+  denied; mutants also had writes under `artifacts/` denied.
+
+### 330.2 Commit dispositions
+
+| Commit | Change | Claude disposition |
+|---|---|---|
+| `59901aab` | Section 219 counter-review; pilot preregistration | **Accepted.** Its qualification that 218.8's old earnings blockers apply to the long study, not automatically to the pilot, is accepted. |
+| `7ad63d08` | Pilot contracts, coverage audit, Massive probe | **Accepted**, with `IBPILOT-COMP-33001` and `-33002` recorded (330.5). |
+| `41d729af` | Sections 221-222 | **Accepted.** |
+| `39b1e6a6`, `b33cf144`, `3dc014fe` | Pilot SEC coverage, reuse audit and structural corroboration | **Accepted.** |
+| `b3aea4f1`, `1bb03b8e` | Fresh selection, first-64 capture, QC release record | **Accepted.** First-64 survivors and `IBFIRST64-OBS33001` recorded; the capture is consumed. |
+| `2e3224d6`, `13eea4f6`, `6011ae9d` | Locator and Feed directory inventory, stopped controls, Q2 census | **Accepted.** |
+| `20e5dbfc`, `eb2482a2` | Retained profile observation, QC authentication probe | **Accepted after test corrections** in `5917fbcf` (`IBQCAUTH-TEST33001`). |
+| `7458c598`, `b4ffa276` | Retained links, protected parent, cloud control cell | **Accepted**, with `IBQC-ACK-33001` recorded. |
+| `c4311eab`, `bc2c9dc6` | Native CIK candidate cell, archive sample, CIK receipt replay | **Accepted**, with `IBQC-EGRESS-33001` and `IBFEED-OBS33002` recorded. |
+| `5553afed`, `0291be35` | Archive v2 collector, pilot source bridge, historical reference cell | **Accepted**, with the 330.5 composition findings. |
+| `586d3ef3`, `d177c941`, `de123647` | Additive batch campaign, planner launch | **Accepted after correction** in `5c50bd3b` (`IBBATCH-CR33001`, `IBBATCH-TEST33001`). |
+| `0ebcafed`, `a3b84a1d`, `366385e4` | Query-free composition, required-window listing, archive framing | **Accepted.** |
+| `09907847`, `77353c5b`, `71c37d23`, `5e273831` | Compact members and controller, Dec3 failure record, prefix format | **Accepted**, with `IBFEED-OBS33001` recorded. |
+| `00954caf`, `941a6f78`, `e9b27628`, `de71afa8`, `85f08573` | Prefix custody front, Range registration, prefix shape | **Accepted.** |
+| `7d996f5a`, `1e706972` | NC structure diagnostic and its registration | **Accepted**, with `IBNC-OBS33001` recorded. |
+| `d4467ce7` | NC lexical routes and full-context source binding | **Accepted after correction** in `223b4644` (`IBNCROUTE-CR33001`). |
+| `e5e83bca`, `e4ae7e1f` | NC source-binding observation front | **Accepted**, with `IBNC-OBS33002` and `-33003` recorded. The front's bytes changed in `223b4644`, so section 328's metadata qualification must be repeated before any activation. |
+| `96d4d8aa` | Section 329 handoff | **Accepted.** `IBPUBLIC-KNOWNBY-01` is the correct factual blocker. |
+
+### 330.3 Independent check of the round's real operations
+
+Metadata only, under native network, fork, Documents-write and Keychain-exec
+denial.
+
+**Request and credential counts, from the private journals:**
+- **SEC:** 136 dispatch starts:
+  - two 64-filing parent captures, all 128 returning HTTP 200;
+  - four single-archive operations, each returning HTTP 200 but recorded as
+    failed afterward (260, 268, 292, 301);
+  - three directory listings, one of which (`sec_feed_directory_inventory_v1`)
+    has a start but no result;
+  - one 64 KiB Range request returning 206.
+- **Massive:** one reference request with one credential read (HTTP 200,
+  completed).
+- **QC:** one authentication call (HTTP 200).
+
+**The SEC contact address:**
+- No control JSON in any new namespace contains an email-like string.
+- The capture code reads the contact from protected standard input after the
+  reservation.
+- It screens headers and bodies for echoes of the contact before hashing.
+- Requests are at least 500 ms apart, under SEC's 10-per-second limit.
+
+**Custody:**
+- Every completion, terminal and final receipt in the new namespaces matches a
+  hash the record pins.
+- Every file created this round is 0600 and single-link.
+- The four 0755 directories predate the round (`IBPRIV-OBS01`).
+
+**QC:** the QC namespaces keep only preparation files locally: the cell
+source, intent, ready and registration records. No cloud result values are
+stored, which fits QC's keep-data-in-cloud rule.
+
+**Fixed images:** the four v3 custody files still equal `aa0d635d`. The
+three QC SDK images and the QC study are unchanged, and no shared file
+changed.
+
+### 330.4 Corrections
+
+- **`IBNCROUTE-CR33001` (P2, closed in `223b4644`).**
+  - The NC route parser strips leading spaces and tabs from values, but the
+    duplicate-copy hint required a digit right after `<ACCESSION-NUMBER>`.
+  - A copy written `<ACCESSION-NUMBER>\tX` was therefore never counted, and
+    the valid copy of X stayed eligible. That broke the rule that every copy
+    is quarantined.
+  - Fix: a separate shadow hint tolerates the whitespace, while claims still
+    require the canonical form. A whitespace-led payload is still never a
+    claim, and the public witness count is unchanged.
+  - The binder's `CODE_PINS` and the observer's `FROZEN` follow the new bytes.
+  - Three test cases failed before the fix. The source binding has never run
+    on real input.
+- **`IBBATCH-CR33001` (P3, closed in `5c50bd3b`).**
+  - The live batch readback accepted a `complete.json` whose results were cut
+    back to a header-bound prefix, with the later leaves removed and the index
+    re-pinned. The first-64 verifier refuses that case.
+  - The batch readback now refuses it too.
+  - The test failed before the fix, and its mutant is caught.
+- **`IBBATCH-TEST33001` (P3, closed in `5c50bd3b`, tests).** Three batch
+  guards survived mutants and are now pinned, each test failing against its
+  mutant:
+  - a non-200 response that carries body bytes;
+  - an inspection whose hashes do not match the body it retains;
+  - an empty plan reaching the private contact read.
+- **`IBQCAUTH-TEST33001` (P3, closed in `5917fbcf`, tests).** Two
+  authentication fixture tests accepted any `ValueError`. They now match the
+  exact refusal, and three guard mutants are caught.
+
+### 330.5 Findings recorded, not fixed
+
+- **`IBQC-ACK-33001` (P2, OPEN).** Each cloud cell's acknowledgement copies
+  `core_sha256` and the registration hash from the prepared registration
+  instead of hashing the code that ran.
+  - A passing ACK therefore proves the registration is consistent, not that
+    this exact cell executed.
+  - Two record statements overstate it: section 267 says the consumer ACK
+    "binds" the producer chain, and section 276 says the ACK was validated
+    "against hash-bound prepared registration/intent/cell". Read both as
+    operator-transcribed and unauthenticated.
+  - A successor cell should execute an exact source string and print a hash
+    computed in the cloud.
+- **`IBQC-EGRESS-33001` (P3).** On a refusal, the CIK cell's ACK prints how many
+  resolver calls were attempted and completed, and where it stopped. That is
+  derived from platform data. The actual runs completed with constant values.
+- **`IBPILOT-COMP-33001` (P2, OPEN).** The composition replays every fact in
+  the loaded quarters. It refuses the whole window when any eligible row's
+  trade date precedes the first loaded quarter, and it does so before
+  checking target relevance.
+  - A Form 4 accepted on 3 January for a 30 December trade therefore refuses
+    the window.
+  - It fails closed, but it would block most real windows.
+  - The fix is a declared earlier source start for every target. That choice
+    belongs to the pipeline design.
+- **`IBPILOT-COMP-33002` (P2, OPEN).** The single per-window entry context is
+  per security, and its seasoning reason sets the whole window's disposition.
+  - Event-level seasoning is already enforced through the reference cohort.
+  - So the caller's choice of context can steer which windows are included.
+  - Use only the plan's purge and embargo reasons for the window.
+- **`IBFEED-OBS33001` (P3).** The compact capture front maps every refusal to
+  one generic code, losing the engine's fixed phase/code pair that v3 kept.
+  That is why section 301 records the cause as unknown. The front is consumed;
+  a successor must keep the pair.
+- **`IBFEED-OBS33002`, `-33003`, `-33004`, `IBFEED-TEST33001` (P3).**
+  - The v1 and v2 archive readbacks re-read old run files with the
+    ctime-ignoring version.
+  - `archive_format_v3._Inputs` in fixture mode has no fence. It is
+    read-only and refuses later.
+  - Compact publication is quadratic, with no deadline.
+  - The `samebyte_ctime` test also changes mtime, so it does not isolate
+    ctime.
+- **`IBNC-OBS33001` to `-33004` (P3).**
+  - A member flagged for non-zero padding is still routed.
+  - `all_input_NC_members_accounted` is always true; the real accounting is
+    enforced elsewhere.
+  - The source-binding fixture mode does not fence the real intake, and
+    relies on monkeypatching.
+  - A copy whose accession line comes after a stray `<DOCUMENT>` line falls
+    outside the preamble and is not hinted.
+- **`IBBATCH-OBS33001` (P3).** The batch readback never compares the planner
+  receipt's plan and completion hashes with the planner namespace. The capture
+  itself binds them.
+- **`IBFIRST64-OBS33001` and `IBMASSIVE-OBS33001` (P3).**
+  - The frozen first-64 capture records pre-dispatch refusals as transport
+    ambiguity.
+  - The Massive probe records a body-read timeout as `partial-read`.
+  - Both fail closed.
+- **Unpinned surviving mutants:**
+  - First-64 capture, consumed: C2 (the after-sleep spacing check) and C8
+    (the whole-header screen) are defense in depth; C4 (a non-200 body must be
+    empty) and C9 (the per-row consumption check) are untested.
+  - Batch: B01 is redundant, because the plan validator refuses consumed and
+    duplicate accessions. B05's batch-gap check is untested, B08 is redundant
+    by content hash, and B10 is production-only.
+- **Test environment.** The Massive and EODHD fixture guards run `security -h`
+  and require the native EPERM. Under a Python Keychain probe they fail;
+  native Keychain-exec denial is the correct harness.
+
+### 330.6 Validation
+
+- **Pushed `96d4d8aa`**, default pytest temp, network and Keychain exec
+  denied:
+  - All 52 changed test files under the Keychain probe:
+    **3,464 passed, 29 failed, 1 skipped**. All 29 failures are the Massive
+    probe's native-denial guard reacting to the probe. That file passes
+    **71 of 71** with native Keychain-exec denial only.
+  - The skipped coverage-audit topology test, from an unsandboxed parent with
+    a socket-refusing audit hook: **1 passed**. It uses invented code and
+    `tmp_path` roots only.
+  - Guards and record tests: **179 passed, 2 failed**. The failures are the
+    two SEP-2 guards that `IBSH-CR02` records; the undeclared roots are
+    unchanged.
+- **Final tree:**
+  - Probe run without Massive: **3,429 passed, 1 skipped**, no Keychain exec.
+  - Massive: **71 passed**.
+  - Topology: **1 passed**.
+  - Guards: **107 passed, 2 failed** (the same two).
+  - NC files: **347 passed**.
+  - Batch file: **82 passed**.
+- **Mutation:**
+  - First-64 capture: 6 of 10 killed.
+  - Batch capture: 3 of 10 killed, then 3 more plus the new early-stop check
+    after `5c50bd3b`.
+  - QC authentication: 3 of 3 after `5917fbcf`.
+- **Compile and diff.** The seven changed files compile in memory, and the
+  diff check is clean. The two documented end-of-file blank lines in the Q4
+  directory files are kept, because those executed bytes are pinned. No
+  bytecode was written.
+- **Record checks** (record, active documents, lane boundary, EXACT package
+  guard) after this section: **124 passed**, network denied.
+- **Complete suite:** not run, by the owner's standing instruction.
+
+### 330.7 Retained P0-P3 finding ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IBNCROUTE-CR33001 | P2 | **CLOSED in `223b4644`** | `d4467ce7` | NC route | A whitespace-led copy hid from duplicate quarantine. | 330.4. | Every copy must be quarantined before activation. | Separate shadow hint; pin round. | 3 red before; 347 NC tests pass. |
+| IBBATCH-CR33001 | P3 | **CLOSED in `5c50bd3b`** | `586d3ef3` | Batch readback | A truncated capture passed readback. | 330.4. | Live controller; parity with first-64. | Early-stop refusal. | Red before; mutant caught. |
+| IBBATCH-TEST33001, IBQCAUTH-TEST33001 | P3 | **CLOSED in `5c50bd3b`, `5917fbcf`** (tests) | `586d3ef3`, `20e5dbfc` | Batch capture; QC auth tests | Guards removable with tests green. | Mutants B03, B06, B07, Q1-Q3. | Live controller; exact refusal codes. | Tests. | All six mutants caught. |
+| IBQC-ACK-33001 | P2 | **OPEN** | `7458c598` and later | QC cells | ACKs do not bind executed source. | 330.5. | Successor design. | Record qualification only. | Code read. |
+| IBPILOT-COMP-33001, IBPILOT-COMP-33002 | P2 | **OPEN** | `7ad63d08`, `0291be35` | Pilot composition | Whole-window refusal at quarter starts; context-driven window disposition. | 330.5. | Pipeline design choices. | None here. | Code read. |
+| IBQC-EGRESS-33001, IBFEED-OBS33001 to 33004, IBFEED-TEST33001, IBNC-OBS33001 to 33004, IBBATCH-OBS33001, IBFIRST64-OBS33001, IBMASSIVE-OBS33001 | P3 | **Recorded** | range | various | 330.5. | Agents and mutants, checked. | Consumed one-shots, diagnostics, test gaps. | None; carry into successors. | None. |
+| Codex's findings of 219-329 (including IBFEED-OBS-01, IBARCHIVE-OBS-01/02, IBPARENT-PLAN-OBS01, IBPUBLIC-KNOWNBY-01) | as recorded | **Accepted at Codex's stated scopes** | range | range | Unchanged. | Sections 219-329. | Checked against the code where reviewed. | Codex's. | Tests pass. |
+| IB1C-REAL-CR01, IB1BCAMP-CR01, IBSRC-CR01, IBSRC-CCR01 | P2 | **OPEN, retained** | earlier | Long study | Unchanged. | 152.1, 154.6, 216.3. | All fail closed. | None. | None new. |
+| IBSH-CR02, IBQC-SHARED-META01 | P2, shared/out of lane | **OPEN, retained** | earlier | Shared manifest; shared QC client | Unchanged. | 190.3, 194.5. | Out of lane. | None here. | Two guards fail on 3.13. |
+| Every earlier entry | as recorded | **Retained as recorded** | earlier | earlier | Unchanged. | Sections 1-329. | Unchanged. | None. | None new. |
+
+There is no open P0 or P1 finding. Thirteen P2 findings remain open: Codex's
+nine carried ones and `IBPUBLIC-KNOWNBY-01`, plus `IBQC-ACK-33001` and the
+two composition findings. All fail closed, or only affect evidence quality.
+
+### 330.8 Next action
+
+Codex counter-reviews this section and `5c50bd3b`, `223b4644` and
+`5917fbcf`. Two things are needed before any real NC source-binding
+activation: the repeated metadata qualification at the new bytes, and a
+decision on `IBNC-OBS33004`. The composition findings need a source-start and
+context decision before the pilot composition runs on real data.
+
+The lane is not backtest-ready. `IBPUBLIC-KNOWNBY-01` is the factual
+blocker, as section 329.1 states. No strategy backtest has run, and there is
+no capital, order or trading authority.

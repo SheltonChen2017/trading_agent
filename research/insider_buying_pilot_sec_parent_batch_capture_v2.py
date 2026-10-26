@@ -514,6 +514,9 @@ def _verify(root,number,*,expected_complete_sha256,expected_plan_sha256,expected
                     _need(observed_bound is terminal["header_bound"],"batch_readback_header_identity")
                 retained+=1;bound+=int(terminal["header_bound"])
             _need(terminal["header_bound"] or ordinal==len(results)-1,"batch_continued_after_fatal_refusal");last=terminal
+        # Claude review section 330: as the first64 verifier does, a short result
+        # list must end in its stopping refusal, not a header-bound prefix.
+        _need(len(results)==len(plan["requests"]) or not last["header_bound"],"batch_readback_unexplained_early_stop")
         expected_index={"schema":campaign.SCHEMA+"/consumed-index","generation":number,"accessions":sorted(consumed),"plan_sha256":expected_plan_sha256,
             "predecessor_index_sha256":plan["predecessor"]["index_sha256"] if plan["predecessor"] else None,"base_consumption":plan["base_consumption"],
             "archive_exposures":list(campaign.ARCHIVE_EXPOSURES),"archive_membership_known":False,"authority":AUTHORITY}

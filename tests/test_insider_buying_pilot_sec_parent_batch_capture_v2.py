@@ -483,3 +483,46 @@ def test_HEAD_change_after_held_source_proof_stops_before_dummy_opener_and_attem
     with pytest.raises(ValueError,match="exact_clean_lane_before_dispatch"):m._production_transport(context)
     assert events==["source_and_inputs_checked","durable_start_checked"]
     assert context.invoked is False and context.authorization.attempted==set()
+
+
+# Claude review section 330: guards that in-memory mutants survived, and the
+# readback's missing early-stop check. Each test fails if its guard is removed.
+
+def test_readback_refuses_a_coherently_truncated_capture_without_a_final_refusal(tmp_path,plan):
+    result=_run(tmp_path,plan);run=_run_path(tmp_path)
+    complete=_json(run/"complete.json");keep=3
+    for entry in complete["results"][keep:]:
+        terminal=_json(run/entry["result_name"])
+        for leaf in (run/"claims"/entry["claim_name"],run/entry["start_name"],run/entry["result_name"],
+                     run/entry["result_name"].replace("-result.json","-headers.json"),run/"objects"/(terminal["body_sha256"]+".bin")):
+            leaf.unlink()
+    complete["results"]=complete["results"][:keep]
+    index=_json(run/"consumed-index.json")
+    index["accessions"]=sorted(set(plan["consumed_accessions"])|{entry["accession_number"] for entry in complete["results"]})
+    result["index_sha256"]=complete["index_sha256"]=_replace_json(run/"consumed-index.json",index)
+    complete.update(started_requests=keep,retained_bodies=keep,header_bound_bodies=keep,
+        planned_unclaimed_unattempted=len(plan["requests"])-keep,capture_completed_without_refusal=False)
+    with pytest.raises(m.BatchCaptureError,match="^batch_readback_unexplained_early_stop$"):
+        _verify(tmp_path,_repin_complete(tmp_path,result,complete))
+
+
+def test_non200_with_body_bytes_refuses_instead_of_recording_a_normal_stop(tmp_path,plan):
+    with pytest.raises(m.BatchCaptureError,match="^batch_non200_body_unread$"):
+        _run(tmp_path,plan,response=_response(b"unexpected",status=404))
+    assert list((_run_path(tmp_path)/"objects").iterdir())==[]
+
+
+def test_parent_binds_the_inspection_to_the_exact_body_it_retains(tmp_path,plan,monkeypatch):
+    real=m._inspect_response
+    monkeypatch.setattr(m,"_inspect_response",lambda *args:{**real(*args),"body_sha256":"f"*64})
+    result=_run(tmp_path,plan);terminal=_json(_run_path(tmp_path)/"request-0000-result.json")
+    assert terminal["failure_code"]=="native_inspection_refused" and terminal["body_retained"] is False
+    assert list((_run_path(tmp_path)/"objects").iterdir())==[]
+    assert result["started_requests"]==1 and result["retained_bodies"]==0
+
+
+def test_empty_plan_refuses_before_namespace_or_private_contact(tmp_path,plan):
+    empty=deepcopy(plan);empty["requests"]=[];empty["selected_count"]=0
+    with pytest.raises(m.BatchCaptureError,match="^batch_empty_plan_no_contact$"):
+        _run(tmp_path,empty,contact=lambda:pytest.fail("private contact read"))
+    assert not _base(tmp_path).exists()

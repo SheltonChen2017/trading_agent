@@ -2181,8 +2181,10 @@ QQQ/REMX actually use three/four space-separated tokens; U is SPENT.
 The new current-route pipeline and V eligibility freeze(323.70) integrate
 the verified parser without changing old evidence. Actual V(323.71) cleared
 all9 used routes on full returned catalogs but then refused stocks status JSON
-after HTTP200; V is SPENT and early prices were not requested. W(323.72) is a
-new bounded status-shape diagnostic, not a V retry or coverage admission.
+after HTTP200; V is SPENT and early prices were not requested. W's bounded
+status-shape diagnostic passed once(323.74) and is SPENT. Its current response
+has two top-level keys, including the correct table, but not the four expected
+flat file fields. This is not accepted bulk metadata or price coverage.
 Insider's completed next
 push/resource handoff is now recorded there and the one-shot monitor deleted;
 fresh QC gates and complete reference/NAV coverage still precede strategy
@@ -62049,3 +62051,154 @@ No price request, QC/Safari/capacity/job/look/cell or new paid right;
 336/259/52/699 unchanged. Choose a verified correction or genuinely different
 admissible acquisition step after actual evidence; do not replay V/W or use
 lexical flags as an account-state verdict. One final matching-lane push remains.
+
+### 323.74 Actual W structural observation passed; W SPENT
+
+At clean5b3a3c1a4d888842035ce85bb5e7133aec703d61, sole W parent ran
+2026-10-26T07:29:39.944654Z..07:29:43.958598Z actual0/stderr0/no bound.
+Sole supplied-output native validator07:29:43.959134Z..07:29:47.471245Z
+actual0/stderr0/no bound, identical3311byte stdout SHA
+17a5f28b0a673acbcde29185ed31d99d5c819898a99cb4714cab48c73b831732,
+output_authenticated=true. Report3182bytes SHA
+2591b68438ec199db540a1dc6e7e7efd6d1b7fc0414ebdfece0d48bd3d816e27.
+These are external execution brackets, not provider timestamps. W claim/
+parent/validator/control are SPENT; no reread, retry, cleanup or repair. No
+tests/edits occurred during its actual use. Prefreeze86record passes1.09s
+overlap211, not additive. One final matching-lane push remains.
+
+Exactlyone application intent and validatedHTTP200 stock-status observation;
+physical requests unknown. Bounded645byte RAM-only body, valid strictJSON,
+SHA bb251171112b3e46045a4607b54c994584abe380cf3880e64dc53aedd06ff183.
+Decoded/raw credential scans passed for their registered representations;
+not a universal absence proof. Top-level object has exactlytwo keys: table
+present and equal stocks; name/size/sizeLabel/modified absent. One unknown key
+was counted, not disclosed or identified. It must not be retrospectively
+called files without a separately admissible observation. Table canonicalSHA
+b20ec5a5e0f9faf797674b14e6bcb81bd89d4894041383d7b6367f9a3337334d.
+Every known error/message/detail/status/code/success field absent. All fixed
+error-word flags false, not proof of entitlement, valid subscription or no
+expiry. Legacy-contract acceptance false: keys_exact and all name/size/label/
+modified predicates fail; validJSON/top-object/table predicates pass.
+
+This is accepted DIAGNOSTIC evidence only. It prospectively localizes an
+incompatible flat status assumption, not V's discarded historical body or
+an authenticated vendor cause. No raw response was persisted and none can be
+recovered by rereading controls. ARV2E323-002 stays OPEN pending a supported
+additive parser and actual compatible observation. ARV2E323-001 native price
+gap stays OPEN. No full price capture, native continuity, NAV/reference
+coverage, paid-tier/cloud rights, historical/PIT/master or strategy admission.
+No price request, QC/Safari/capacity/job/look/cell;336/259/52/699 unchanged.
+All false readiness flags and old frozen sources/attempts remain unchanged.
+
+### 323.75 Additive bulk-file inventory compatibility and retained evidence
+
+Primary public [stocks](https://sharadar.com/docs/stocks) and
+[funds](https://sharadar.com/docs/funds) still show the legacy flat status
+example. [Actions](https://sharadar.com/docs/actions) explicitly documents
+table plus files, with history/historyLabel/name/size/sizeLabel/modified/
+available per entry. Root and same-round advisory audit also read the
+[current public frontend](https://sharadar.com/_next/static/chunks/pages/docs/%5BpageKey%5D-f219048c7886d7c1.js):
+BulkDownloads fetches /v1.0/bulk and uses items/canDownload/key, not a
+data/table status normalizer. Thus it does NOT prove stocks' unknown W key.
+Supporting the documented multi-history shape for stock/fund status is an
+explicit compatibility inference pending a fresh exact observation, not a
+retrospective assertion. Five-year history cannot silently satisfy early2021.
+
+Under current owner recovery/review waiver, new X has a distinct prospective
+purpose: first strictly validated two-table file inventory using an additive
+versioned parser, plus retained safe bounded status evidence before semantic
+schema gates. It is not another W structural observation, V eligibility
+invocation, replacement price capture or automatic resumption of unused old
+roles. Frozen W/V/S and every old attempt/control remain unchanged/spent.
+The pure parser recognizes only exact flat or exact table/files variants,
+every bounded entry and unique supported history, with no first-entry/latest/
+available fallback. Flat availability remains unknown. No inventory field is
+entitlement, immutable history, price completeness, PIT/master, QC-transfer
+rights or reference/NAV admission.
+
+Prospective X has exactlytwo ordered status=True GETs, stocks then funds,
+8192bytes each, no prices/redirect/downloads. Own exclusive claim/fsync before
+one existing Sharadar Keychain lookup. Strict JSON bounds and raw/decoded
+credential guards precede private0600 body retention; schema checks follow
+retention. This deliberately corrects the earlier blind-discard diagnostic
+limitation without changing old evidence. Retained bodies are NEW X-only
+metadata blobs, never stdout/public rows or arbitrary later replay authority;
+public output contains exact pins and closed validated inventory only. A
+semantic refusal stops immediately without next role/retry, retaining its
+bounded pin for a separately justified offline exact-byte interpretation.
+Unsafe/nonJSON/failedHTTP bodies are NOT retained or normalized into success.
+New implementation/tests/pins and a separate clean committed exact run freeze
+remain required before contact. No X control was inspected/allocated, no new
+credential/provider/QC operation at this entry;336/259/52/699 unchanged.
+
+### 323.76 X implementation, focused validation and exact one-shot freeze
+
+New helper scripts/arv2_r298_sharadar_bulk_status.py11542bytes SHA
+c58567e66c9f1002612adfcc120f1aef9415fc5a3af7d7520c1cdf613c8daee9;
+tests12544bytes SHA6ee8935f8012c6320c26c66298fc9ea1ba1959dd43752fdc69a87cd101e934d7.
+Helper canonicalNO-LF1790bytes SHA
+e7f31aa659c752da9332b1c991979fa74e0c94888a1c1719dd051bbbfb6342d9.
+New caller scripts/run_arv2_r298_sharadar_bulk_inventory.py28313bytes SHA
+c02d3551d3768cacf7c61c59c89d78641046308a916be36039de9c831c0fa96a;
+tests13221bytes SHAed857a6218f4fdccfdba727d416a7e11a562d62bcd6efed61d8cfe2f87fe9c0d.
+Exact caller canonical+LF21371bytes SHA
+08848d5598582796fe3441b0e25b7d5e993b075355f949ad02187715fd5d66ab.
+All157 selected dependency pins matched; no old source/global mutation or old
+operational invocation. Raw body and all decoded strings/keys scanned before
+private retention or hash. Closed file metadata includes supported history/
+basename/availability/integer size and label/time hashes; no arbitrary strings.
+Every entry validated, unique histories sorted by fixed enum, not selected.
+Legacy flat availability remains null/unknown; unavailable is literal false.
+Strict ISO offset lexical bounds prevent fromisoformat's +01:99 normalization.
+
+Root read complete new helper/caller/tests and differences. Final focused
+native-denied247distinct passes2.55s =113helper+47caller+86record/document+
+1research import closure, no failures/skips/warnings; all4sources compiled
+in memory without bytecode, EOF/diff checks clean, dispatch_fence absent.
+Author113passes2.89s and earlier105/3.28s overlap, not additive. Root corrected
+new capture-map validation before tests to use exact prefix key sets plus
+fixed role indexing: canonical JSON sorts dictionary keys, so insertion-order
+assumptions cannot authenticate the roundtrip. The source-state gate also
+requires the first validated receipt before any second-role event.
+
+Root memory-only omission mutations: actual-exit guard1expected failure0.12s;
+capture/receipt body-pin binding1/0.05s; pre-retention safe_body guard3expected
+failures/1overlapping pass0.06s (nonJSON, invalidUTF8, Unicode-escaped secret
+would otherwise be privately retained). Restoredfinally/disk hashes unchanged.
+Author decoded registered-encoding guard, all-file validation and ISO lexical
+offset guard omissions each1expected failure0.16s, restoredfinally/disk unchanged.
+These are sensitivity evidence, not failed actual operations or extra distinct
+passes. Same-round advisory implementation/audit is not independent review.
+No full suite, production artifact/source read, credential/provider/QC call
+occurred in validation. Owner's present recovery waiver remains scoped here.
+
+D-X: after THIS record/all4newfiles are committed in the exact designated
+root/branch with clean HEAD, invoke new X observe ONCE with that exact HEAD
+and callerc02d3551 pin. Prospective private control
+newrule_sharadar_bulk_inventory/R323-20261026-X stays uninspected/unallocated
+before invocation. ONLY designated Darwin/POSIX Python3.13 interpreter and
+existing direct-local Sharadar access. Exclusive claim/fsync before one login-
+Keychain lookup(timeout20s,no fallback), then exactlytwo ordered GETs stocks/
+funds status=True,8192bytes each. Parent120s/outer150s/native supplied-output
+validator20s/64KiB/max12files; only own child kill/reap. No prices, redirect,
+download, retry, alternate endpoint/history or automatic strategy continuation.
+TLS/prepared/response identity, no compression/failed-body read, ten held/named
+metadata fields/native ACL/xattr checks retain original own FDs through return.
+Unsafe/nonJSON/credential echoes refuse BEFORE body persistence; safe semantic
+schema refusal stops before next role and retains only its bounded private
+body plus closed pin. No outside/old artifact or controls read/repair/cleanup.
+
+Actual parent0 AND native validator0/empty stderr/no bound/exact matching
+closed report/body-pin/receipt/event bindings are mandatory. Late/nonzero/
+unknown/ambiguous exit is failure/spent, never report-only acceptance. Validator
+uses supplied redacted output only and denies network/all production artifacts/
+Keychains/security CLI; its body pins are bound to the actual parent's checked
+held-byte publication, not a second private-body read or continuous integrity.
+Network-enabled provider parent is not native-sandboxed; selected pins are not
+whole-interpreter integrity, and deadlines do not bound host suspension or
+uninterruptible I/O. New body pins are not implicit replay/source-admission
+authority. If accepted choose the next justified local full-coverage step;
+if refused interpret finite evidence without blind unchanged retry. Every
+source/coverage/tier/cloud/PIT/master/strategy/paper/live flag stays false.
+No QC/Safari/capacity/job/look/cell,336/259/52/699 unchanged. No new paid right.
+One final matching-lane push remains; no intermediate acknowledgement push.

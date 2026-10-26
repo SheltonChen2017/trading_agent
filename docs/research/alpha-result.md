@@ -7223,3 +7223,28 @@ Book A19 once: **333 ->334 shared /258 ->259 Analyst development /
 validation or a later bounded read-only exact-job reconciliation. A19/J remain
 spent/frozen, never renewed. Analyst323.33 owns evidence and limitations.
 Historical/other-lane entries and all false formal/PIT/paper/live flags remain.
+
+### R-298 N no-order exact-identity feed-presence diagnostic — 2026-10-26 UTC
+
+At clean `86ba71fc5345a075534fa24676404dcabc649bc8`, sole N parent
+00:50:53.309564Z..00:52:07.725940Z exited0/stderr0/no bound. Stdout10,574bytes
+SHA256 `0e124b1712206dbc35a16d95769b21eb8971bab65039a65337307f4fc2a3ff2f`.
+Native supplied-output validator exited0/accepted bounded diagnostic only;
+report10,444bytes SHA256
+`7ae988dac8ac89195d2a7dc636df817e89374e54cd3574859bc571144650d1ac`.
+One no-order job `80f506bd3526e4d31a47b7eef5e1b3dc`, ARV2 R298 RAW FEED
+PRESENCE R323 N, compilee519bbfb97bd35211f963ea0bd2b5eb3-61ba015c3a74d972878ec774971a4144,
+project38364439, reached exact Completed.;47application dispatches and all
+source/access/input/postchecks passed. Both exact Oct21 typed RAW Daily and
+regular Minute queries returned0batches/0items for N's freshly resolved exact
+logical identity. No price/volume/cache field, order or strategy return was
+used/selected. Actual0 is diagnostic observation, NOT a performance cell.
+
+Book N ONCE: **334 ->335 shared /259 Analyst development unchanged /
+50 ->51 infrastructure /699 cells unchanged**. No extra look for M's offline
+original-row authentication, native workers/validator or public source audit.
+N is spent/frozen; other five comparison projects uncreated/unlaunched.
+Analyst323.45 records native-SID continuity/metadata/coverage qualifications;
+zero returned rows do not prove market absence, halt or historical cause.
+Owner R298-only append preserves all historical/other-lane entries and false
+formal/PIT/master/paper/live flags; no strategy-price fallback or efficacy claim.

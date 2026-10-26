@@ -843,9 +843,11 @@ M's original-row authentication passed once(323.41): source price dates span
 the reference/decision and captured active metadata is N; M is now spent.
 N's separately frozen no-order feed-presence diagnostic completed once(323.45):
 both Daily and Minute returned zero bars. N is SPENT, and its fresh native
-symbol does not establish cross-job native-SID continuity. Next an explicitly
-identity-bound Sharadar stock-series existence observation, not a current
-SF1-ticker guess, strategy-price substitution or stale-price/holding bypass.
+symbol does not establish cross-job native-SID continuity. O then authenticated
+one identity-bound current-vintage Sharadar stock-series row for the reference
+date(323.49); O is SPENT, with no strategy price/NAV admission. Next the separate
+native identity/adjacent-series/within-job-phase P diagnostic(323.51 onward),
+not a current SF1-ticker guess or stale-price/holding bypass.
 One final push; no funded or paper/live deployment authority is inferred.
 
 Branch: `codex/strategy-analyst-revisions-v2`
@@ -2152,10 +2154,12 @@ and matched the genuine catalog; no source/price repair or performance cell.
 M then authenticated the exact original TICKERS row once(323.41); no actual
 daily bar or price was admitted. N subsequently completed both no-order Daily/
 Minute enumerations with zero rows(323.45); it and all readers are spent.
-Next a separately frozen identity-bound current-vintage Sharadar stock-series
-existence check for that exact session, not another strategy attempt, current
-SF1-ticker guess or guessed-price fallback. No cross-job native-SID continuity
-or market-wide absence is inferred.
+O then passed that identity-bound current-vintage stock-series existence scope
+once(323.49) and is SPENT. Its one positive exact-date vendor close is not a
+strategy reference/NAV package or source admission. P's new native-identity,
+adjacent-series and within-job phase protocol(323.51 onward) is the next bounded
+question, not another strategy attempt or guessed-price fallback. No cross-job
+native-SID continuity or market-wide absence is inferred.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
 V3 is spent after its
@@ -60447,3 +60451,351 @@ single test-only byte before commit; final test pin above supersedes4bfe8f70.
 No production/helper/profile byte changed. Preserve the failed cached check.
 The271passes3.38s repeat overlaps271/3.37s; final post-format validation follows
 on the exact final source/test pins, not additive green evidence.
+
+### 323.49 Actual O vendor-series observation passed; native QC discrepancy open
+
+At clean66bcec00589bad2618ff1a1e984c335aee12ac9a, sole O parent ran
+2026-10-26T01:41:01.499766Z..01:41:50.629659Z, actual0/stderr0/no bound.
+Stdout5913bytes SHAd8e538121912ab34db3f1414efaf5085f3a67b3697d456d8153d2dbb26b527cf.
+Sole native supplied-output validator01:41:50.629984Z..01:41:54.203144Z actual0/
+stderr0/no bound, identical stdout byte/hash pin, output_authenticated=true.
+Report5784bytes SHAd6fddbabebf3fb61402a9b93e615e8a8bb6364cb8af8aa4dd8595ae8f68c327e.
+O claim/private phases/parent/output validator/provider observation are now
+SPENT. No unchanged retry, old reader/control reread, cleanup or repair follows.
+No test/edit occurred during the exact clean operational use.
+
+Initial and final genuine input/catalog/original-row/current-source native
+security/full10metadata authentication matched. Source endpoint fingerprint
+6f2e6eaec89f958cf70fb403cb8418ec5b257b73c11e6b5e33427b9ae7ccfdaf;
+fresh input snapshotc4a85ef350b1065384616d76c7639ce2934cb2209a02b3a9870000eed7d37ec1;
+fresh admissioneee97f49de91f09cab988dcc6a3a2b911c74df9a63a19682c01adbc156919a8a.
+Exactly two application intents/status observations, metadata200/price200;
+physical provider request count remains unknown, not measured2. Matching price-
+table metadata selected exactly one vendor-series row with one positive finite
+unadjusted USD close on2022-10-21. Strict final privateCSV/authentication passed:
+metadata225bytes SHAcc61535bcb5c8a01e1d4d83a87036b52c07c2ba5c2e2c209a4732e57aa46e55c;
+price66bytes SHA9729664e2485dbf31bf34de63832be1b92e0cd9cd72feaa1608ce3ab5c3cf621.
+No credential/raw route/ticker/FIGI/CUSIP/price/licensed row is disclosed here.
+
+This independently matched vendor row conflicts with N's empty QC Daily/Minute
+observation for the same logical input/date. It does NOT identify a wrong QC
+mapping, prove identical historical native SIDs/database revisions, a halt's
+absence, a physical feed cause or permanent historical security-master truth.
+It confirms usable access only to these exact current-vintage endpoints/rows,
+not every subscription or immutable/PIT data. No strategy price/NAV was admitted
+or used. All formal/master/PIT/paper/live/strategy flags remain false; E323-001
+stays OPEN. No QC call/source edit/job/capacity action, new look or result cell;
+335shared/259development/51infrastructure/699cells unchanged. Other five family
+projects remain uncreated/unlaunched. Last authenticated cloud source is N;
+O performed no cloud mutation or new cloud-state observation.
+
+Post-format root final271distinct passes3.31s, all145/six final file pins/three
+profiles and six in-memory compiles passed before this use; this overlaps the
+earlier271/3.37s and3.38s, not additional distinct evidence. Cached diff was
+clean after the disclosed single test-only EOF correction.
+
+Next distinguish the native QC identity/data mismatch or design a genuinely
+versioned qualified reference-and-valuation admission contract, not insert O's
+single scalar into frozen _reference_prices or set Security.Price/cache.
+Current native RAW census covers targets UNION holdings; it cannot be relaxed
+because a holding's target weight happens to be zero. Any alternative package
+must cover sizing AND all held daily-close NAV marks, session/share-unit/split/
+currency/identity/source-priority/absence/conflict rules consistently across
+all six/eight cells, with immutable captures and exact result lineage before
+new outcomes. O is existence evidence only, not that package or admission.
+Current09:31 genuine side-quote/cash/fill/fee checks remain independently
+required; a vendor prior close cannot replace executable quotes. No new paid
+rights, paper deployment or funded-account authority follows.
+
+### 323.50 Source-only Mia consultation and qualifications after O
+
+Safari was freshly available in R298 at project38364439, window71DD1ABE-
+A664-4EC1-B649-219FA47257A8. No other-lane window/job was used or changed.
+Created the new verify composite figi identity n order gate conversation in
+Ask Before Edits, explicitly source-only: no file edits, private Object Store/
+source/capture/credential reads, data/capacity/provider request, compile/job,
+orders, deployment, permission or lock change. Both the source-reading task
+and a <=400word no-tools textual continuation completed. No change was
+requested/accepted. Mia reported main5799bytes/runtime13208bytes/FIGI-header
+inspection; observed tools were source reads/searches and a documentation link,
+not operational data queries. This is advisory evidence, not independent review
+or an authenticated all-tools/no-effects census. UI showed the existing Mia
+service avatar automatically; no manual membership/ownership change was made.
+
+Mia found no verified code defect that explains N's zero delivered batches/items.
+It correctly separated empty enumeration from postdelivery validity predicates,
+and recommended native-SID/display fingerprints, adjacency counts and a
+within-job phase contrast. All readiness remains false. Root qualifications:
+
+- 'Genuine provider emptiness' means this QC API enumeration was empty, not a
+  measured physical upstream-provider absence or proved cause. No library/
+  engine/identity path was thereby proven correct universally.
+- Mia's recalled sibling QCOM/QC-support case, 'family-proven' windows and
+  claim that identity is the ONLY code-side explanation are not authenticated
+  evidence for this new held security/date. No old job/data read was replayed.
+- The native-SID first-date-after-reference suggestion cannot be assigned to
+  A19, whose retained witness says on_or_before_reference. N retained no SID
+  fingerprint; fresh current metadata can investigate, not rewrite that history.
+- Mia's 'no dated FIGI API' assertion is false as an API claim: current official
+  QCAlgorithm.CompositeFIGI(string, DateTime? tradingDate) supports the dated
+  argument. Its correct limitation is that this resolves the CURRENT database's
+  dated display map/stored SID, with last-entry fallback, not an immutable
+  historical snapshot/PIT/master proof. Equal hashes in one new job do not
+  establish historical database continuity. Primary source is QCAlgorithm.cs
+  and SecurityDefinitionSymbolResolver.cs cited323.45, not a cloud-revision pin.
+- Daily precise-end/group-time shape remains unmeasured when no rows arrive.
+  A later diagnostic must count received Time/EndTime/batch/session metadata
+  BEFORE validity classification, including unknown shapes; no blanket claim
+  that zero valid bars means zero delivered bars. Nor does five-of-six rows
+  automatically prove a hole or an exclusive-end boundary cause.
+- History during Initialize is documented/supported by official examples.
+  A19 already failed at its POST-initialize09:20 decision. A later paired phase
+  difference cannot alone explain/fix A19, even if it qualifies N's observation.
+
+Fresh Safari state incidentally showed N's default zero-order result dashboard
+and an editor log saying build be9372-61ba01 at1:22:24. Those are UI observations,
+not a new accepted result/cell, attributed launch/compile or current source
+authentication. No dashboard statistics influence construction or conclusions.
+No Build/Backtest/Live button, result download, Object Store or permission was
+clicked. A later consumer must freshly authenticate actual source/access/
+idleness/history/compile; UI familiarity or Mia completion is not a gate waiver.
+
+### 323.51 Prospective P native identity/series/phase diagnostic
+
+O's exact vendor row is not a scalar fallback. The smaller next native question
+is whether the freshly resolved QC SID's nearby Daily series brackets Oct21
+and whether its exact Oct21 Minute enumeration differs across TWO observed
+phases in one job. This is a new source/identity/adjacency/phase contract, not
+reinvocation of N, a renamed strategy retry, future feature selection or another
+performance cell. Root selects at mostTHREE typed RAW History calls, rather
+than a broad month/multi-day-minute scan. No private O/M control is reread.
+Current owner waiver/delegation covers additive implementation; exact pins/run
+freeze and every technical gate still precede any actual P use.
+
+New public projection changes only N main/runtime; other nine current A19
+source files remain exact. Expected preimage is N projection5b7dfc66/profile
+57b0a00d/manifest a3b0d898, runtimee34d9c55/main9c057359. Same genuine6151inputs/
+activation/catalog/witness/source bindings, fresh full resolver census, no
+old5121/1030 counts substituted for current evidence. A single selected native
+Symbol is retained for every History call; no current ticker guess, alternate
+dated SID, mapping policy, subscription security or price/cache substitution.
+
+Actual observation date2022-10-25 is distinct from original referenceOct21 and
+decisionOct24. In Initialize00:00NY: retain selected native SID/display hashes,
+native-first-date hash/relation. The unchanged full resolver enforces US-equity/
+USA-market/exact reverse FIGI for the selected identity; those predicates are
+not separate retained flags, nor is a canonical-status observation added.
+Observe dated CompositeFIGI at frozen strategy warmup
+start2020-11-01, referenceOct21 and decisionOct24 using the current database,
+hashing labels separately and never using an alternate SID for History. All
+requested map dates are <=actual Time.Date; no historical availability claim.
+
+History1 is one metadata-only Daily census [Oct17 00:00,Oct25 00:00) across
+six exact NYSE dates17/18/19/20/21/24, cap6batches/6items. Retain per-session
+delivered Time/EndTime/batch metadata and unknown buckets before classification;
+no OHLCV/positive-close claim. Oct24 is post-original-decision infrastructure
+coverage evidence only, not a feature/input/price for the strategy decision.
+History2 is exact Oct21 regular Minute[09:30,16:00), cap390 at Initialize.
+History3 repeats ONLY that Minute request on the SAME native SID after an
+actual nonFFSPY09:30->09:31TradeBar in OnData onOct25, with exact NY algorithm/
+slice/bar clocks. This is a paired prospective phase experiment, not an old
+control replay. Official docs support Initialize history; no cause is presumed.
+
+New explicit SPY Minute RAW/noFF/noextended clock subscription plus the selected
+security means TWO subscriptions and a NEW profile, not alteration of N's
+one-subscription claim. Authenticate actual subscription configs and data/
+exchange time zones, not only requested booleans. No warmup/price seeding,
+order/fill/quote/volume/price/cache use or strategy continuation. If the exact
+09:31 clock is missed, refuse without catch-up. At most two writes to the SAME
+single summary-statistic key: immutable Init snapshot with postphasepending,
+then exact postphase or terminal missingclock. Pending/refused phases never
+become accepted success. Preserve only bounded finite Init observations on
+RuntimeError/late refusal, explicitly nonadmissible on parent2; no raw errors,
+ordinary return statistics, charts, logs, orders or private rows are selected.
+
+Prospective fixed leaf newrule_reference_series_phase/R323-20261025-P has not
+been inspected/allocated. A new parent claim precedes private admission/API
+contact. The outer observer necessarily reads the existing QC environment
+credential shape for its sanitized parent handoff beforehand; this is not a
+claim-before-all-secret-memory-access guarantee or a new Keychain lookup.
+native input workers bind exact own claims/intents and exclusive start markers,
+fresh input/source/access/current idleness/history/compile gates apply. Only
+R298 owned editor environment may later be closed after Mia completes; never
+another lane's environment, project, job or control. If the one new job create
+is reached, book exactly one shared/infrastructure look335/259/51/699 ->
+336/259/52/699, not a performance cell. At most one compile/create, bounded
+build/capacity/status schedules; no silent retry, busy polling, alternate
+output, membership relaxation or unchanged-source relaunch. All old controls
+and strategy economics stay frozen. No actual P call is authorized until its
+separate exact source/validation/run freeze below.
+
+### 323.52 P implementation, source audit and focused validation
+
+P's projector/runtime uses only the three frozen typed RAW observations, one
+selected Symbol, two explicit subscriptions and one summary key with at most
+two updates. Current resolver counts are measured anew; no original count is
+asserted as current truth. Dated resolutions retain separate SID/display/date
+hashes and finite roundtrip/equality observations, never alternate subscription
+or History input. The untouched full FIGI resolver enforces US-equity/USA/exact
+reverse identity for the selected current symbol; no separate canonical-status
+flag or immutable historical database claim is emitted. Native identity fields
+are hashes/relation only, not licensed rows or raw ticker/SID/FIGI strings.
+
+Main personally inspected the generated runtime, new remote/caller, surrounding
+FIGI resolver and tests. Primary public source was also read: LEAN's current
+[history wrapper](https://github.com/QuantConnect/Lean/blob/master/Engine/HistoricalData/SubscriptionDataReaderHistoryProvider.cs#L127-L132)
+and [strict daily assignment](https://github.com/QuantConnect/Lean/blob/master/Common/Util/LeanData.cs#L1471-L1490)
+support the exchange-session09:30->16:00 shape; legacy midnight->nextmidnight
+is counted separately. Midnight->16:00 is received metadata/other, not silently
+promoted. The [synchronizer](https://github.com/QuantConnect/Lean/blob/master/Engine/HistoricalData/SynchronizingHistoryProvider.cs#L52-L103)
+groups an emission frontier, not bar opening time. Batch/Time/EndTime buckets
+are observed independently before validity. This current public source is not
+a pinned deployed-cloud revision or proof of the cause of N/A19.
+
+Official [Security.subscriptions](https://www.lean.io/docs/v2/lean-engine/class-reference/py/QuantConnect/Securities/Security/)
+and [SubscriptionDataConfig](https://www.lean.io/docs/v2/lean-engine/class-reference/py/QuantConnect/Data/SubscriptionDataConfig/)
+expose the actual configs used here. fill_data_forward is the property, not
+the fill_forward constructor argument. A pre-use draft compared config.type
+to an injected Python class; Python.NET equality was not established. Final
+P instead checks the documented CLR System.Type.FullName against only the
+closed TradeBar/QuoteBar names, retaining typed payload checks. No reflection
+import, broader data type or price accessor was added.
+
+Safari reappeared in a stale second R298 window during observation; root sent
+no action there. The owner then confirmed the focus change was accidental and
+directed continuation. Fresh getApp bound the original71DD window; after Mia
+was Completed/Stop disabled, root clicked only R298's Close. The UI logged a
+skipped final cloud save because this session did not hold Mia's write lock,
+then visibly navigated to terminal/projects with ONLY the other lane's code
+environment still listed. No other environment/job/permission was changed.
+This is not source/lease/idle proof; actual P must pass its fresh API gates.
+An incidental public announcement concerns Morningstar fundamental migration,
+not evidence that this caused the missing native price series; no engine branch
+or dataset settings were changed.
+
+| Finding | Priority/status | Prospective disposition |
+| --- | --- | --- |
+| ARV2I323-021 | P2, corrected before use | Actual config type/RAW/noFF/noextended/timezones must be checked, not merely request kwargs or unverified Python-class equality. Closed CLR type-name validation and adversaries cover it. |
+| ARV2I323-022 | P2, corrected before use | A terminal summary or pending Init must not imply successful postphase. Remote and caller require diagnostic_complete, actual parent0 and authenticated matching output; RuntimeError/late-failure metadata stays explicitly nonadmissible. |
+| ARV2I323-023 | P3, corrected before use | Root added a genuine completed-result actual-exit regression; earlier caller tests covered failed/capacity reports but not genuine completed metadata. Root also made Init-digest tampering preserve the6151 total, isolating the digest guard instead of an earlier census refusal. |
+
+Root combined first234distinct passes15.11s(54projection+50remote+43caller+
+86record/document+1research transitive import closure), no failures/skips/
+warnings. All135 selected dependency pins/six new source/test pins/two protocol
+profiles and public projection/profile/manifest matched; six files compiled
+in memory without bytecode. The final extra caller regression makes235 after
+the final-tree repeat below, not an additive new suite. Root's two strengthened
+regressions passed2/9.32s; memory-only actual0 guard omission caught1expected
+failure2.99s, Init-digest omission1/2.87s. Originals restored finally, disk
+production hashes unchanged. These deliberate red tests are not real failures
+or exposures. Native remote-network/production-artifact/Keychain/security
+denial, all inroot temp/cache/log/plugin paths, disabled autoload/--noconftest/
+-B/no cacheprovider and dispatch_fence absent applied. No complete Codex suite.
+
+Authors' final54projection/8.26s and93remote+caller/11.35s overlap the root
+selection. Earlier52/7.68s,88/89 subsets overlap; no initial baseline failure.
+Projector author's memory omissions each caught1expected failure: summary
+channel2.41s, genuine-clock nonFF2.34s, same-SID3rd History2.36s. Remote author's
+hard-complete gate omission caught1/0.16s. Restored finally/no disk changes;
+same-round advice and root audit are not independent Claude acceptance.
+
+### 323.53 Exact prospective one-shot P decision before contact
+
+Under the owner's continuing research/recovery delegation and explicit current
+Claude-review waiver, D1 selects ONE P use from the next clean commit containing
+this exact source and freeze, bound by actual --expected-head and caller hash.
+The previous clean HEAD is66bcec00589bad2618ff1a1e984c335aee12ac9a; it is not
+the P run HEAD. No dirty/concurrent/unexplained HEAD/source change is permitted.
+Only designated Mac root/branch and the frozen Darwin/POSIX Python3.13 interpreter
+/Users/sheltonchen/.venvs/trading_agent-py313/bin/python are compatible. Selected
+135 dependency pins are mandatory, not whole-interpreter integrity. All older
+claims/control readers/jobs/probes remain SPENT and unchanged; O's price bytes
+are not read by P. No automatic pin refresh, unchanged retry or source-stop
+bypass. P leaf has NOT been inspected/allocated at this freeze.
+
+Exact source/test SHA256s:
+
+| File | SHA256 |
+| --- | --- |
+| scripts/arv2_r298_reference_series_phase_projection.py | fa8aadb86b7129cdada420e48dd8b8a670be91b13325e2c73e76840db5216fb4 |
+| scripts/arv2_r298_reference_series_phase_remote.py | 660d8f5f2ac8d0bf7f1382d2667db9a229c44ee47d47d96cd1408a927da182fd |
+| scripts/run_arv2_r298_reference_series_phase.py | 22b9886c23ad4a912d30672fdc8f0a105d486e56856f297bbf861f872ff8f113 |
+| tests/analyst_revisions_v2/test_r298_reference_series_phase_projection.py | d475a88043db5e2ce7c394657ffae9a3d21bc9795c9705940a3805f0ab31aa7e |
+| tests/analyst_revisions_v2/test_r298_reference_series_phase_remote.py | 3b04b3586d7c483351e5773e76682ac5666f231f2bd77f929b1ab8ce0b047c94 |
+| tests/analyst_revisions_v2/test_r298_reference_series_phase_caller.py | c09c37b9d2f9278d2ee194217daf7bf4bd6971e6417396dc12cd87cbd64a5a8c |
+
+Public projection73b8c8f2cd54a227798d83f65846ca90ff80cd7a7d016563a47abaa8c2a0bf9e;
+internal profile66c49c90e0b45cfb892dbfdedb6ca7e7d110508de353a0fc8250bfdf91be32ff;
+manifest+LF1667bytes SHAb5ebe76c779ede0065552da2bb8377860766acc949d7e75ea853e781af55aea7.
+Generated runtime25276bytes SHA14b1c86ba3d9e4e115fe9fee28437c10ce92b68dc2c508b2e0241bff8756d8cc;
+main6992bytes SHAc7ab14468100372650a238a783225760a0e6d9c5fe91915e4899bf7c8eca340f.
+Other nine N files remain byte-exact. Canonical+LF caller profile18330bytes
+SHA02faeafa60a99f3dcf4dcc5a55fa78002db760b0134a9d05943af65a929239dc;
+remote6960bytes SHA1b5a449a05c3351e30198066c7e172f6ff1545fce28d4c11ec30d7da41f8c1a8.
+
+Parent deadline1200s covers claimed lifecycle; outer capture1230s, each native
+admission child120s and supplied-output validator20s. Uninterruptible I/O/host
+suspension qualifications remain. Exclusive persistent claim and typed worker
+intents/start markers precede private admission/contact; partial claim consumes
+or ambiguously spends use even without launch. Only own children may be killed/
+reaped. No orchestration cleanup. Max160 application dispatches, one compile,
+up to60build reads separated>=1s, three cooperative capacity observations
+separated>=60s, one backtest create,20status polls separated>=30s(first immediate),
+one own selected aggregate/error read. Exact N source11files/seven prior jobs,
+access/owner/privacy/idleness and compile gates authenticate before mutation/
+launch/read and after observation. No unknown collaborator/lease relaxation.
+Maximum scheduled waits/workers total990s before RPC/control overhead; the
+joint1200s deadline refuses slow/ambiguous requests, rather than promising that
+every combination of maximum transport latency can finish.
+
+Only main/runtime exact updates are allowed. Job name is ARV2 R298 REFERENCE
+SERIES PHASE R323 P in existing project38364439. This no-order diagnostic is
+justified because it measures historical delivery/identity/time semantics, not
+performance or fill behavior. No order-based strategy result is inferred. On
+actual create dispatch book exactly one shared and infrastructure look:
+335shared/259development/51infrastructure/699cells ->336/259/52/699. Before that
+event do not book it. No other five family project, capacity cancellation,
+funded account, broker, paper/live deployment, new paid rights, credential or
+licensed-row disclosure is authorized.
+
+D2 runs only the caller's once-only native supplied-output validator against
+the actual captured parent bytes/observed exit, not a new control/corpus read.
+Its artifact/Keychain/network denial remains binding. Selection before hashing
+retains only the <=16KiB exact metadata statistic/closed finite error, bounded
+selected response32768B and parent128KiB; underlying HTTP wire bound16MiB is
+unchanged. Ignored ordinary outcomes/charts/rawerrors do not enter projection
+or its hash; this is not whole-response authentication or measured-zero network
+contact. Actual parent0 AND native validator0 AND matching output AND complete
+exact-clock/three-enumeration evidence AND all postchecks are required. Report
+alone, pending Init, unknown/nonzero/late failure or terminal Completed. alone
+is insufficient. A failed output may preserve finite nonadmissible metadata;
+do not reinterpret it as an accepted strategy result or retry unchanged.
+
+After use record exact parent/validator exit/times/byte pins, launch/compile/
+terminal IDs, application counts, source/input/admission checks, bounded
+observations/refusals and accountable look event. No raw prices/IDs/rows,
+credentials, rawerrors or old control reads. All formal/PIT/master/price/NAV/
+paper/live readiness remains false. If P shows a genuine fix, version and
+validate the economic family consistently before a new strategy attempt; if
+not, retain the actual unresolved data/identity boundary rather than fabricate
+continuity or insert O's scalar. One final matching-lane push remains reserved.
+
+Final root exact P tree235distinct passes17.86s(54projection+50remote+44caller+
+86record/document+1closure), no failures/skips/warnings. All135 dependencies,
+six exact source/test pins, generated projection/profile/manifest/two protocol
+profiles and six memory compilations matched. This supersedes, overlaps and is
+not additive to234/15.11s. Ordinary diff check clean; stage/cached check follows
+before the freeze commit. Matching-branch-only fetch and live ls-remote still
+equal the round baseline3c905d4235617d3d2a56b636c8e0be77ee790686; no concurrent
+push/HEAD change was observed. No actual P private/credential/API/control call
+has yet occurred at this entry.
+
+Retain a validation-harness qualification: the first separate inert policy
+wrapper asserted before record tests because it nested sandbox-exec inside an
+already native-denied process. Finite follow-up identified each child exit71,
+stdout0/stderr53 and exact sandbox_apply Operation not permitted, not a P
+operational failure. Corrected DIRECT inert /usr/bin/true checks under each
+unchanged worker/validator policy both exited0/stdout0/stderr0. No relaxation
+or actual private/credential/QC call occurred; record tests then ran separately
+under the original strict audit denial. These are policy-load checks, not
+operational worker acceptance.

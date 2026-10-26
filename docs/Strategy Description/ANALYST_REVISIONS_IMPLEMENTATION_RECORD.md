@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–299 retain the milestone, review, preregistration, QC
+strategy. Sections 1–322 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -512,7 +512,13 @@ invented messages. No failed capture was retried or privately re-read.
 Section 290 adds a committed observation-only one-call seam, with no adapter
 default, credential loader, provider dispatcher or CLI. It separates finite
 failure evidence from an opaque producer return and keeps request counts
-unknown; it is not an operational recovery or production capture entry point.**
+unknown; it is not an operational recovery or production capture entry point.
+Section 323 is the Windows-host Claude session's independent review of
+`ef654b1d..3c905d42` (0 P0, 0 P1, 1 P2, 5 P3): every commit accepted, the
+forty-one owner-waived commits of sections 306–322 reviewed after the fact,
+the R-298 ledger chain reproduced to 326 / 251 / 50 / 699, and seven
+R323-named launches found at QuantConnect after the pushed tip that the next
+push must book.**
 
 Current continuation, 2026-10-13: section 292 accepts Claude's two-commit
 section-291 review after documentary qualifications and reproduces both new
@@ -2079,6 +2085,14 @@ fresh access/idleness/capacity checks only when that protocol permits. This
 round does not implement or invoke it, and does not claim all six/eight cloud
 candidates are ready. The monitor stays PAUSED; no routine review-authorization
 question is needed within the owner's existing scope.
+Section 323 is the Windows-host Claude session's independent review of the
+exact pushed range `ef654b1d..3c905d42` (sections 289–322), including the
+forty-one owner-waived commits of sections 306–322 reviewed after the fact.
+The immediate next step is that Codex must counter-review section 323 and
+its record commit, book in the next pushed round the seven R323-named
+launches observed at QuantConnect on 2026-10-25/26 with the waivers that
+covered them, and answer `ARV2R323-001` and `-002`; the pushed floor
+**326 / 251 / 50 / 699** stands until that push.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -2230,7 +2244,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–268
+findings, outcomes, and per-run accounting remain in numbered sections 1–322
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -4033,6 +4047,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-24 PDT /25 UTC | Owner-authorized A8 diagnostic and one additional A9 credential-handoff recovery | `35081915` -> `8df52a03`, `158f2fd0` and this final section320 result/handoff commit | No incoming Claude review; exact owner waivers consumed, not independent acceptance | A8 stopped locally at credentials with zero application dispatches; corrected A9 handoff reached two metadata calls, then current extra-row shape refused before upload/compile/launch | Root717 focused passes before A8 and608 before A9, overlapping selections not additive; final record repeat in320.11; no full suite or spent replay | A1–A9 spent; current access metadata and original QC upload error remain OPEN; floor324/249/50/699, no accepted cell or running candidate | Exactly one final nonforce matching-lane push; separately bounded read-only current-row observation needs review or scoped waiver; no A10, pin refresh or next cell; monitor PAUSED |
 | 2026-10-24 PDT /25 UTC | Owner AFK readiness delegation: current-access diagnosis and bounded A10 | `924a88ec` -> `5b613ca1`, `8a621141` and this final section321 handoff commit | No incoming Claude range; current readiness waiver, not independent acceptance | D1 two reads show owner-only; A10 access passes but first exact input-runtime update refuses with retained source-policy language; public audit finds plain Python/data-only gzip; Safari/Mia blocked by locked Mac | Root293 D1 and464 A10 focused passes, overlapping document checks not additive; public AST/transport/source checks and final record validation in321; no full suite or spent replay | ARV2I321-001..005 corrected before use; ARV2E321-001 OPEN, no verified policy remedy; A1–A10 spent; floor325/250/50/699, NOT ready/running | One final matching-lane push at concrete QC-policy/unlock barrier; no blind A11 or paid/other-lane expansion; no repeated review-authorization wait; monitor PAUSED |
 | 2026-10-24 PDT /25 UTC | Owner-delegated plain-data recovery to R298 technical readiness | `2292bdab` -> `d95198e0`, `8feb75db`, `9d4725e7` and this section322 final handoff commit | No incoming Claude range; current readiness waiver, not independent acceptance | Mia cause remains qualified; new exact plain-data preparation/publication passed; A11 accepted loader, authenticated eleven source files, compiled once and reached READY with38 application dispatches | Root408 D1,664 D2 and548 A11 focused selections overlap; exact failures/mutations and final record repeat retained below; no full suite or spent replay | R298 READY only, no strategy run/result; D1/D2/A1–A11 spent; floor326/251/50/699; formal/PIT/paper false | Exactly one final nonforce matching-lane push; next separately frozen launch/result protocol for new bindings, no launch/next cell this round; monitor PAUSED |
+| 2026-10-26 | Claude (Windows host) independent review of `ef654b1d..3c905d42`: sections 289–305 confirmed, the forty-one owner-waived commits of sections 306–322 reviewed after the fact, fifth QC census | `3c905d42` -> this record commit | Review of the eighty-three commits pushed since `ef654b1d`: three Claude review sections and their Codex counter-reviews confirmed by this host's gates; the forty-one tail commits (the V5 hardening, the R298 recovery helpers, observers and readers of A2–A11, the plain-data preparation and publication, the READY result) reviewed individually (section 323) | Synced the lane clone by fast-forward from a clean tree. Immutability of V16–V19, the cap-90 bridge runtime and the three trust roots re-verified from committed blobs. The ledger's R-298 chain reproduces (A1–A11 and the owner sample, one shared and one development look each) to 326/251/50/699. Endpoint census of every new script: only three helpers can create a backtest, each exactly once after compile, ownership, file read-back and capacity checks; no live, order or account endpoint. QC administrative reads (zero looks) confirm the owner's sample and find seven R323-named launches after the pushed tip that the next push must book; the project's files were modified after A11, so its source manifest cannot be re-verified from the cloud. No production, test or ledger line changed. | Real tree at `3c905d42`: record and active-document gates **86 passed**; final record bytes **86 passed**; `compileall` exit 0; `git diff --check` clean on the tree and red on the range (five EOF blank lines, four in SHA-pinned files). Complete lane suite at `b295ce02` (owed from section 288): 1579 failed, 7488 passed, 1357 skipped, 1241 errors in 2:56:53, host classes; at `3c905d42`: **in progress at push time**: started 10:56 local on 2026-10-26 and at 5% of the 23,466 collected tests when this record was committed, following the owner's standing direction not to hold a push for this host's run; its counts are to be recorded in the next round. | 0 P0, 0 P1. `ARV2R323-001` (P2, open for the next push): seven un-pushed launches in project 38364439. `ARV2R323-002` (P3): five whitespace defects in pinned files. `ARV2R323-003` (P3): compile results not durable at QC. `ARV2R323-004` (P3, corrected): stale banner and section-4 ranges. `ARV2R323-005`/`-006` (P3, documented): host class and owed suite counts; other-lane launches in the census. `ARV2R248-002`/`-003`/`-004` and `ARV2D287-001` stay open. | Codex counter-reviews section 323; the next pushed round books the seven launches with their waivers; the floor 326/251/50/699 stands; no further attempt, replacement project, six/eight cell, paper/live deployment, broker, funded-account, real-order or trading action is authorised by this review. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -57439,3 +57454,154 @@ The plain-data transport removed the immediate upload blocker without changing
 the strategy rules. We have not yet run the strategy or produced performance
 results. The next bounded job is launch/result handling for this exact candidate,
 not another upload attempt or an assumed green light for all six/eight tests.
+
+## 323. Independent Claude review of `ef654b1d..3c905d42` on the Windows host: sections 289–305 confirmed, the forty-one owner-waived commits of sections 306–322 reviewed after the fact, and a fifth QC census, 2026-10-26
+
+### 323.1 Range, method and disposition summary
+
+**Range:** the eighty-three commits pushed after this session's section-288
+commit `ef654b1d`, from `95f56997` (section 289) to `3c905d42` (section
+322), taken by fast-forward into the lane clone from a clean tree. Forty-two
+of them, through `4421da78`, carry an independent Claude review by the
+other lane session (sections 291, 301 and 305, each with per-commit
+dispositions and a Codex counter-review in sections 292, 302 and 306); its
+own section-305 commit `de0911a0` was counter-reviewed by Codex in section
+306. The remaining forty-one commits, `b707ab98` through `3c905d42`
+(sections 306–322), had no Claude review: every one ran under an owner
+waiver quoted verbatim in its section ("qc is free. skip the reveiw and
+proceed" in 307.1, the per-recovery "Yes—skip review" answers of sections
+309–320, and the AFK readiness delegation of 321.1). The waivers changed the
+pre-use sequencing only, so this section is the after-the-fact independent
+review of those forty-one commits (323.2).
+
+**Owner-authorized QC access, zero looks.** `projects/read` and
+`backtests/list` for every project the census rule selects (203 projects,
+324 backtests, reduced in process to id, name, status, completed flag and
+creation time); one `files/read` for project `38364439` reduced to names,
+byte counts, in-process digests and modified times; three status-only
+`backtests/read` projections (name, status, progress, error, creation time,
+engine window, node); and one `compile/read` for the A11 compile id. No
+`backtests/create`, no statistic, chart, order, log, price, provider row,
+return or Object Store payload was read; credentials were never printed.
+
+**What this host reviewed and what it did not.** The tail adds 20,529 lines
+across thirty-nine new scripts and about 35,000 lines of tests and record.
+This review reads the endpoint census of every new script, the launch path
+of the three helpers that can create a backtest, the V5 family's attempt
+and batch-claim rules, the A11 caller and observer against their recorded
+pins, the ledger's R-298 chain and the record's internal consistency, and
+checks what an administrative QC read can confirm. It is not a line-by-line
+review of the R298 recovery tooling, whose runs, controls and evidence exist
+only on the designated Mac root and whose tests are Darwin-gated (323.6).
+
+**Verdict.** All eighty-three commits are accepted; the forty-one tail
+commits are accepted individually in 323.2. **0 P0, 0 P1, 1 P2, 5 P3** new.
+No production line, test or ledger entry changes in this round: this session
+adds this record section with its live-state and push-ledger updates. The
+P2 findings carried from sections 248 and 287 stay open as last recorded.
+
+### 323.2 Per-commit dispositions
+
+| Commits | What they are | Disposition | Basis |
+|---|---|---|---|
+| `95f56997` .. `4421da78` (42) | sections 289–305: Codex's source-complete failure classifier and observation seam, the Massive and Keychain diagnostics, the rating-only October source and six/eight family, the QC storage recovery, the V5 launch-readiness successor, with the other session's reviews 291, 301 and 305 and the test-only commits `d3fa1aec`, `7d4b6a71` and `4421da78` | accepted | Each Codex commit is disposed in a Claude review section and each Claude commit is counter-reviewed by Codex; the record, active-document and whole-tree compilation gates are green at `3c905d42` on this host; the five runtime blobs and the three trust roots are unchanged (323.6). `ARV2R288-001` and `-003` were answered in sections 289–290 and accepted in 291. |
+| `de0911a0` | the other session's section 305 | not re-reviewed (a Claude record commit) | Counter-reviewed by Codex in section 306. |
+| `b707ab98`, `bde2df5a` | section 306: V5 list-parsing hardening and control-file room; counter-review and QC hold | accepted | `_backtest_rows` requires an absent or exact `projectId`; the record-only commit holds QC until the owner released it. |
+| `9cddf9de`, `5f6dcf99` | section 307: the owner-waived corrected V5 six-cell execution freeze; the capacity success and the ambiguous R298 begin (record only) | accepted | A1's begin exited 2 without a backtest; the ledger books it once (323.4). |
+| `e061d441` | section 308: Safari/Mia authority and the QC sign-in blocker (record only) | accepted | Record-only diff. |
+| `0b054ddf`, `dfa3490a`, `f9fd0932` | sections 309–310: the A2 recovery helper, evidence reader and caller; the owner-waived A2 freeze and its refusal | accepted | `arv2_r298_recovery_remote.launch_once` creates at most one backtest after `BuildSuccess`, an owner check, a complete file read-back and a capacity read (323.5). |
+| `e3d53276`, `0a2400d7`, `7c462a01` | sections 310–311: the A2 stage reader, the final-recovery helper and caller; the A3 idleness refusal | accepted | `arv2_r298_final_recovery_remote.launch_once` has the same single-create shape; A3 stopped at `owned_idle` after one `projects/read`. |
+| `45a96f61`, `7331b4db`, `7a6ea94f`, `90fdd5d2`, `5002abb5`, `efdd7582`, `8877caba` | section 312: the post-Mia recovery and idleness observer, the collaborator-shape and collaborator-record observers, the owner-recovery helper, the first R-298 ledger reconciliation and the A4 refusal | accepted | The ledger's R-298 entry books A1–A3 and the owner's manual sample once each; A4 booked once (323.4). |
+| `4fe89ff9`, `13cc0ae7`, `7a2c756e`, `388594b6`, `ff9d00bf` | sections 313–315: the privacy-contract fix and A5, the lock-access observer, the access-representation fix and A6 | accepted | Each attempt is one claim and one booked look; the record quotes the owner's per-attempt waivers. |
+| `91daf58f`, `1d751b23`, `a9165774` | sections 316–317: the read-only file-effect observer and its owner-waived one-shot read | accepted | Read-only; no look. |
+| `c761c3e3`, `b477c236` | section 318: the offline QC response-evidence correction | accepted | Future-use evidence retention after the A6 reason loss; no run. |
+| `50e59113`, `35081915` | section 319: A7 response-observed recovery and its update refusal | accepted | Booked once. |
+| `8df52a03`, `158f2fd0`, `924a88ec` | section 320: A8 diagnostic upload, A9 handoff recovery and their refusals | accepted | Booked once each. |
+| `5b613ca1`, `8a621141`, `2292bdab` | section 321: the collaborator-mismatch observer, A10 readiness recovery and its source-policy refusal | accepted | Booked once. |
+| `d95198e0`, `8feb75db`, `9d4725e7`, `3c905d42` | section 322: plain-data preparation (D1), native-worker storage publication (D2), the A11 caller and observer, and the READY result | accepted | The A11 caller and observer at `3c905d42` hash to the recorded `ec7f08b6…` and `9a90b60f…` (15,119 bytes). READY is source read-back plus one compile; the record says no launch was in that contract. |
+
+### 323.3 What QuantConnect confirms and what it no longer can
+
+| Check | Result |
+|---|---|
+| Owner's manual sample `bbd2202c…` (`Casual Yellow Kangaroo`) | `Completed.`, progress 1, no error, created 2026-10-24 20:00:03 UTC, engine window 2020-01-01 to 2021-01-01, as the R-298 ledger entry says |
+| Project `38364439` files | eleven files, the names of 322.13's projection; every file now carries a modified time of 2026-10-26 02:32:28 UTC, and `main.py` and `newrule_comparison_qc_runtime.py` 03:13 UTC, later than the A11 READY of 2026-10-25 05:52 UTC, so the recorded source manifest `8dfc3d3e…` cannot be re-verified from the cloud today |
+| A11 compile id `5bd25474…-2a348312…` | `compile/read` now answers `state: InQueue` with no log lines: QuantConnect does not retain a compile result past its window, so this neither confirms nor contradicts the recorded `BuildSuccess` (`ARV2R323-003`) |
+| Launches in project `38364439` after the pushed tip | **seven**, none in the pushed record or ledger (`ARV2R323-001`): `e5c35860…` (`… R323 A12 9dde3978`, `Runtime Error`, 2026-10-25 19:04:48 UTC), `45ffd36c…` (`QUOTE DIAGNOSTIC R323 A14`, `Runtime Error`, 20:38:52), `65a1d669…` (`QUOTE EXECUTION R323 A16`, `Runtime Error`, 21:13:16), `78ba7a23…` (`RAW REFERENCE DIAGNOSTIC R323 A18`, `Runtime Error`, 22:26:10), `b850c819…` (`REFERENCE IDENTITY DIAGNOSTIC R323 A19`, `Runtime Error`, 23:00:58), `80f506bd…` (`RAW FEED PRESENCE R323 N`, `Completed.`, 2026-10-26 00:51:22, engine window 2022-10-24 only) and `fe0603a7…` (`REFERENCE SERIES PHASE R323 P`, `Completed.`, 03:13:25, engine window 2022-10-25 only) |
+
+The seven launches are named for a section 323 that the pushed branch does
+not contain, so they belong to a round still in flight on the Mac. They
+are not booked here, to avoid counting them twice when that round is
+pushed; the next pushed ledger must book each of them (at least seven
+shared and seven development looks over the current 326 / 251 / 50 / 699),
+state which owner waiver covered attempts beyond A11, and explain the
+missing A13, A15 and A17 numbers and the `N` and `P` names outside the
+attempt convention.
+
+### 323.4 The R-298 ledger chain
+
+Every booking in the ledger's R-298 entry and its eight attempt addenda
+moves the floor by exactly one shared and one development look: A1 314 →
+315, A2 → 316, A3 → 317, the owner's manual sample → 318, A4 → 319, A5 →
+320, A6 → 321, A7 → 322, A8 → 323, A9 → 324, A10 → 325 and A11 → 326, with
+infrastructure 50 and cells 699 unchanged throughout. The chain reproduces,
+and it matches the convention of 248.4 that every launch or consumed
+attempt is one shared look. Closing pushed floor: **326 / 251 / 50 / 699**.
+Of the eleven attempts, none created a backtest: A1 exited before the
+launch call, A2–A10 refused at access, privacy, lock, file-update or
+source-policy gates, and A11 is a compile-only readiness run.
+
+### 323.5 Code read on this host
+
+- **Endpoint census.** Every new script was grepped for the QuantConnect
+  endpoints it names. Only three helpers can reach `backtests/create`:
+  `arv2_newrule_recovery_continuation_v5.py`, `arv2_r298_recovery_remote.py`
+  and `arv2_r298_final_recovery_remote.py`; the storage recovery and
+  diagnostic scripts reach only `object/list`, `object/properties` and
+  `object/set`. No new script names a `live/`, order or account endpoint.
+- **Single launch.** Each `launch_once` requires `BuildSuccess` for the
+  exact compile id, re-checks ownership, re-reads the complete file set,
+  reads `projects/nodes/read` and returns `wait` when no node is available,
+  and otherwise issues exactly one `backtests/create` whose response must
+  carry the project id, the fixed name and a pending status. The V5 family
+  admits attempt 1 only and writes a batch claim before each operation.
+- **Pins.** `scripts/run_arv2_r298_plain_readiness.py` and
+  `scripts/observe_arv2_r298_plain_readiness.py` at `3c905d42` hash to the
+  values section 322 pins.
+
+### 323.6 Validation on this host
+
+| Check | Scope | Result |
+|---|---|---|
+| Record and active-document gates | real lane tree at `3c905d42`, then again on the final record bytes | **86 passed**; final record bytes **86 passed** |
+| `python -m compileall -q` | the standard package list plus `research/analyst_revisions_v2` and `research/analyst_revisions_v2_qc`, real tree | exit 0 |
+| `git diff --check` | the working tree and this round's commit | clean |
+| `git diff --check` | the range `ef654b1d..3c905d42` | **red**: `new blank line at EOF` in `scripts/arv2_r298_plain_source_boundary.py`, `scripts/observe_arv2_r298_collaborator_records.py`, `scripts/run_arv2_r298_plain_readiness.py`, `tests/analyst_revisions_v2/test_r298_plain_source_boundary.py` and `tests/analyst_revisions_v2/test_r298_privacy_recovery_remote.py` (`ARV2R323-002`) |
+| Immutability | `git show HEAD:…` SHA-256 | V16 `998cb19b…`, V17 `8049d90e…`, V18 `40d38321…`, V19 `f79ea5c7…`, cap-90 bridge runtime `60b0e300…` unchanged; trust roots `3152aca0…`, `23f23d19…`, `e8c1a2a7…` as in 231.3 |
+| Complete Analyst lane suite, previous tip | guarded LF scratch worktree at `b295ce02`, the run section 288 could not wait for (2026-10-12) | **1579 failed, 7488 passed, 1357 skipped, 1241 errors in 2:56:53**; the host classes of `ARV2R165-001` |
+| Complete Analyst lane suite, this tip | guarded LF scratch worktree at `3c905d42`: 23,466 tests collected, the same four files uncollectable (`os.getuid`, `fcntl`) | **in progress at push time**: started 10:56 local on 2026-10-26 and at 5% of the 23,466 collected tests when this record was committed, following the owner's standing direction not to hold a push for this host's run; its counts are to be recorded in the next round |
+| QC access | administrative census, one file inventory, three status-only reads, one compile-status read | zero looks; no result, statistic, chart, order, log, price, provider row, return or Object Store payload read |
+
+### 323.7 Findings ledger
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| `ARV2R323-001` | P2 | Seven backtests were launched in project `38364439` on 2026-10-25/26 after the pushed tip, named for a section 323 the branch does not contain; the pushed record ends at A11 READY with no launch in its contract, and the pushed ledger stops at 326 / 251 / 50 / 699. | Documented, not booked here. The next pushed round must book all seven, name the waiver that covered attempts beyond A11, and explain the A13/A15/A17 gaps and the `N`/`P` names; this session re-checks the census against that push. |
+| `ARV2R323-002` | P3 | Five files of the tail end with a blank line and fail `git diff --check` on the range; four are pinned by SHA-256 in sections 313–322, so the bytes cannot be corrected without breaking recorded pins. | Documented; Codex corrects them in the next versioned file of each, never in place. |
+| `ARV2R323-003` | P3 | QuantConnect does not retain a compile result: `compile/read` for the A11 compile id now answers `InQueue` with no logs, so `BuildSuccess` can be shown only from the retained ready-access journal, not from the cloud. | Documented; future freezes should pin the hash of the `compile/read` response that showed `BuildSuccess`, as 322.13 appears to do through its journals. |
+| `ARV2R323-004` | P3 | The banner read "Sections 1–299 retain" and section 4's closing sentence "numbered sections 1–268" with sections running to 322. | Corrected in this record commit. |
+| `ARV2R323-005` | P3 | Host class: the tail's tooling is Darwin-only; four test files stay uncollectable here, and the suite counts owed from section 288's push are recorded in 323.6 while this tip's run was still in progress at this push. | `ARV2R165-001`; unchanged. |
+| `ARV2R323-006` | P3 | The census rule sweeps other lanes' projects: thirteen more launches since 2026-10-12, all in the target-price lane's extension project, and thirty-four since 2026-10-05. | Documented for the owner; outside this lane's ledger and gates. |
+
+Carried open: `ARV2R248-002`, `-003`, `-004` (P2, section 248),
+`ARV2D287-001` (P2, section 287) and the other P2 items last listed in
+section 305; `ARV2CR28-008` (out of lane).
+
+### 323.8 Next gate
+
+Codex counter-reviews section 323 and its record commit, and the next
+pushed round books the seven launches of 323.3 with their waivers. The
+pushed floor **326 / 251 / 50 / 699** stands until then. No R298 attempt
+beyond what the owner has already waived, replacement project, six/eight
+cell, stress successor, levered target, paper/live deployment, broker,
+funded-account, real-order or trading action is authorised by this review.

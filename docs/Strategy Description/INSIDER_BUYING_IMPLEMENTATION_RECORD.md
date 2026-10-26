@@ -36243,3 +36243,101 @@ successful real-input qualification may a separately recorded activation of
 the candidate unused Dec3 GET be considered. No routine approval checkpoint;
 continue within delegated source-work scope, never retry October/June URLs.
 Nine carried OPEN P2s unchanged; no final handoff or push.
+
+## 299. Clean real-input compact preflight completed, no acquisition (2026-10-25)
+
+298's read-only qualification ran on already-existing CLEAN
+`77353c5b6e78742bb55cdb8710304beb21782ad3`, exit0. Trusted parent verified
+committed/current designated identity and memory-compiled133 assembled images;
+native worker enforced initial network/fork/ALL-write/Keychain-exec denial and
+291 memory policy before retained source inputs. Actual production assembly
+inventory `769a465ca243bf8c08b0faa56ca965d71e08d72e3b368e7de56c655b6e72ebc1`
+is DISTINCT from298's134-image manual uncommitted compilation qualification.
+Full metadata/predecessor/held-input/source/producer-Git/final-current checks
+passed; old original-parent body bytes0, private contact/profile reads0, new
+requests0, output namespace/claim/start creation0. Total54,187,372,042ns includes
+trusted-parent Git/compilation, actual native input rederivation and final checks,
+not a transport or isolated native CPU interval. Separately identified invoking
+glue SHA `4dd5304ed9babfd1143bf128c61fe44267c6868d8ef26287d8f1d0194b846806`
+is NOT silently part of the committed module inventory.
+
+Actual full25 metadata rederivation again matched1,281,147 all-six rows,
+1,163,6484/4A context rows;20 pilot quarters1,008,318 all-six/921,5704/4A.
+2020Q4:43,607 all-six =38,5024/4A +5,105 other context forms. All38,502 are
+eligible after observed source-repeat quarantine; cross-quarter repeat and
+conflict occurrences0 across the entire25-source-quarter stream; Q4 repeat/
+conflict accessions0. This is actual retained SUBMISSION metadata accounting,
+NOT completed original parents or a claim about all82 quarters. Known consumed
+individual-dispatch index remains20,044; its routing intersection with Q4 is0.
+UNKNOWN membership of either failed June carrier and the failed October carrier
+does NOT become zero incidental archive overlap from this fact.
+
+Source receipt `f3f9a8b8e93f1e21ee14ce8a62689ba553ee09d97672b0a9e0da575a89802b9c`;
+whole input plan `683cc8d75507824949ebffac41797663ee4a4bed3e5ef474e53bbbb8b2baf194`.
+Sorted-newline routing bindings: all-six43,607
+`ec559b56b08318fc0a58291a6f197a5ae799593b6b551fd5553f54adb7eb41e7`;
+eligible38,502 `0c47f617596d1551ab2f1ff97b299da8faf8c761aee65892b0c74946759956df`;
+consumed20,044 `66cfe8ab6095f478c14062282bfe0f615689d446da9def2f19eb3857b9e05690`.
+No raw source-row values were emitted. Same HEAD/tree remained clean afterward.
+Nine carried OPEN P2s, source/PIT/rights/canonical/look/QC/backtest gates unchanged.
+No actual carrier acquisition, QC/Safari or push; proceed to300's named scope.
+
+## 300. One unused-day compact carrier activation registered (2026-10-25)
+
+Under the owner's delegated continuous-build/source-work authorization and293's
+different retained-subset boundary, activate exactly ONE fixed unused GET after
+committing299–300 and verifying the new CLEAN producer identity:
+`ib-sec-feed-archive-20201203-compact-v1-20261025-once`, root
+`artifacts/insider_buying/sec_feed_compact_capture_v1`, ONLY
+`https://www.sec.gov/Archives/edgar/Feed/2020/QTR4/20201203.nc.tar.gz`.
+Q4 advertisement ordinal43/493450KB is priority metadata, NOT measured bytes or
+qualified KB base/rounding. This is a distinct day, not a retry/alias of October7
+or either June URL. Known original/ambiguous individual requests are not
+redispatched; incidental unknown prior archive membership remains unknown.
+
+Trusted invoking glue protects TTY echo BEFORE any profile/private input, and
+does read-only exact-clean-source/native/full-input/original-producer-Git/disk/
+fresh-namespace health BEFORE requesting ONE own Gmail-profile contact. Require
+unchanged source receipt f3f9a8b8 and measured production source inventory769a465c,
+133 images, before private delivery. Wait for anonymous stdin readiness without
+reading/printing/hashing the contact; actual front independently repeats its
+authoritative preflight/source/input gates before consuming queued private
+stdin. No value/hash in chat/Git/logs/argv/env/Keychain. Invoking glue and its
+lineage remain separate from committed module/source inventory.
+
+Exclusive fresh final root (even pre-existing empty root refuses), continuously
+held old/accepted-source inputs,8GiB disk reserve PLUS24MiB selected/four64MiB
+controls, durable URL claim/start BEFORE a single direct transport invocation.
+No proxy, redirect, HEAD, Range, retry, fallback or alias;15s idle/1,200s absolute
+transport and3,600s native-worker wall. Native kernel baseline-relative4GiB
+VM-growth fuse plus requested50ms sampled peak-RSS4GiB abort through stdout
+serialization/final sample; NOT hard/instant RSS or a global parent-memory claim.
+512MiB compressed/8GiB streamed-decoded/128ratio finite profile,100k physical/
+gzip members,4,096 candidates/8MiB payload/24MiB TOTAL physical spans/8MiB exact
+nonhex metadata/64MiB IPC, never capacity-limited prefix publication.
+
+Whole carrier stays transient RAM: NO carrier SHA/file/full-carrier privacy or
+future full-carrier replay claim. Complete HTTP/gzip/physical integrity and
+unchanged finite privacy for retained whole-member bytes precede selected CAS
+and sanitized control publication. Even normal return may yield ZERO selected
+objects; report that honestly, not source progress. Every candidate remains
+identity-unvalidated/quarantined until a later actual NC/source/time/XML factory;
+no guessed256-byte strip, wrapper or old projection seal. On any refusal preserve
+consumed controls, no raw hash/byte count invented, no retry or changed policy.
+
+A separately identified independent READ-ONLY post-operation verification may
+reload CURRENT own contact once after the same initial source/input health,
+check exact externally pinned output/control/CAS custody and rerun retained-
+object privacy/physical/hash/source bindings under initial strong denial. It
+must explicitly report discarded carrier integrity/member-population/duplicates
+NOT replayed, original contact NOT replayed/equality NOT attested. Failed-scope
+readback success cannot turn a failed acquisition into success. Freeze all
+writer activity through actual operation and independent verification; record
+already-existing producer HEAD, measured assembly, transport/result/pins and
+observed versus attributed validation separately afterward.
+
+This grants no XML/financial/acceptance/PIT/canonical admission, price/outcome
+access, QC/Safari/SDK/job/strategy launch/backtest, full-study completion or
+readiness. QC/Safari hold remains; nine carried OPEN P2s unchanged. It is not a
+final checkpoint push: continue available lane work afterward, exactly one final
+push only at the authorized round's terminal condition.

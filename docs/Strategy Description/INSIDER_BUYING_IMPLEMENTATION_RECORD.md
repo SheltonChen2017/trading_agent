@@ -37674,3 +37674,30 @@ read-only observation can finish; successful source17 matches or fresh original
 SEC captures would still not, by themselves, resolve this separate gap.
 Structural engineering alternatives remain possible; no further subscription
 or broader source acquisition is justified solely by a green contract test.
+
+## 327. Clean read-only NC/source17 metadata health check registered (2026-10-25)
+
+Implementation already exists as
+`e5e83bcaac20fe54dbc69e70e298585653819be4`; final325 source/test bytes are
+frozen for this check. Exact registration SHA-256
+`28c564d5be5a0ae5de4be8e2273fa11d3ce706c1b6c751cde234970c81352fb6`
+was separately obtained under initial native network/fork/ALL-write/security-
+exec denial and291 live guard, without opening actual inputs or reading a
+profile/contact. Register ONE metadata-only health check on the clean commit
+containing this entry, exact head read from Git immediately before invocation.
+
+Invoke ONLY325 `preflight_actual(expected_head=that_existing_clean_head)`.
+Parent inventories current committed sources and proves original producer Git;
+native child independently proves initial four denials, compiles/rechecks all
+current images, holds original307 controls/prefix FD without body read and the
+stat-only84-leaf source intake plus accepted-selector/consumed controls. Read/
+hash ZERO actual prefix/ZIP/original-parent bodies, contact/profile0, requests0,
+namespaces0, file writes0, SDK/store/QC/outcomes/backtests0. Preserve old307/313/
+319 witnesses separately; this health check does not repeat their semantics.
+No interpretation is authorized by this entry. Export only closed safe own
+identity/control hashes/counts; hold all source/body qualifications DEFERRED.
+Any refusal remains a failed preflight, never success by a later control.
+
+All writers frozen until it terminates;900s bounded worker/2MiB IPC and291 live
+through stdout/final sample. Recheck root/branch/exactHEAD/clean status and
+origin41d729af before commit; no interim push. Ten OPEN P2s/readiness FALSE.

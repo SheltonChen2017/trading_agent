@@ -36791,3 +36791,96 @@ outcomes/backtests. Next: separately versioned committed OFFLINE custody runner,
 focused review and clean actual-metadata preflight, then separately registered
 retained-prefix interpretation if those gates pass. No new GET or Oct8 retry;
 no interim/final push yet. Single final round push remains unspent.
+
+## 309. Retained-prefix offline custody runner qualified (2026-10-25)
+
+Additive `research/insider_buying_sec_feed_prefix_shape_runner_v1.py`,47,235B/
+`f959d2c6375353e510b0183032cab39bccaf15546cc3433937d6898960e8cee6`;
+own tests17,470B/`db1591265cc04351e8bc966f3eab29f24cb18c004321989f8665d9f87ea7f609`;
+peer tests11,235B/`6b496f5edaf28803aecb879f28a121be938863d897f8451f2db1c4b88437e82f`.
+No HTTP implementation, URL dispatch, SDK or source-row rederivation. Exact
+externally pinned307 controls, original941a6f78/138/efb11ed9 lineage and frozen
+front/core/pure source/test pins are independent of the NEW producer identity.
+Metadata preflight holds strict old SH-lock/FD/versions/control bytes and stats
+the prefix only, no raw prefix read/hash. Before private input, trusted parent
+proves clean/current/committed source/Git history, original lineage, disk and
+lexical fresh namespace. Native worker compiles/rechecks the complete actual
+assembly before held/private input, with initial network/fork/ALL-write/
+security-exec denial and291 memory policy through serialized stdout/final sample.
+
+After anonymous current contact, frozen prefix verifier replays custody and
+privacy; the same held immutable prefix is interpreted by308's pure observer.
+Bounded repeated disk/decode reads are deliberate, NOT new GETs. Strict nested
+report contracts enforce static false readiness/authority, exact schemas/types/
+source pins, physical ranges/counts and descriptor crosslinks before report
+hash/publication. No names/routes/source values or their hashes leave observer.
+Fresh EX-locked observation namespace, analysis-start (NOT an HTTP claim), exact
+registration/preflight/contact-present/result/report/complete,64MiB reserve plus
+eight1MiB controls. Same-run readback rechecks every published leaf under the
+producer EX lock; independent later SH verifier rederives the semantic report.
+It is not a second SH worker while EX is held. All OLD input/later SH versions
+stay strict; ONLY new producer lock uses the existing output settled-ctime
+policy plus full content/inventory/other identity checks. No frozen source edit.
+
+Prospective NEW-runner findings, all corrected before actual input:
+
+| Finding | Genuine preactivation red and correction |
+| --- | --- |
+| IBPSRUN-PRE01 | Peer actual-root read tripwire: fixture pin assembly preceded original-root/native boundary. Check BOTH fixture roots/native denial before any pin read. No actual file was read. |
+| IBPSRUN-PRE02 | Five dirty report variants were accepted for hashing/publication. Add strict report/nested shape/authority/privacy/source/type contracts. Later alias/source-pin negatives also pass. |
+| IBPSRUN-PRE03 | Own IPC phase-list caused TypeError. Exact finite wire schema/string types before lookup; four wire cases green. |
+| IBPSRUN-PRE04 | Two peer crosslink reds: frontier drift and contradictory first checksum. Validate physical extent/frontier and inherited first-header crosslinks. |
+| IBPSRUN-PRE05 | New producer lock wrongly rejected benign ctime-only settling. Match existing NEW-output-only policy, retaining strict old-input negative. Not an established historical failure cause. |
+| IBPSRUN-PRE06 | Four faithful unsupported-header positives falsely required payload-marker interpretation after an intentional header-only stop. Compare markers only for interpreted first rows. Initial fixture magic-length typo corrected in test before genuine reds. |
+| IBPSRUN-PRE07 | Publication guard error after report leaf was swallowed as nonretention, yielding an inconsistent complete. Move publication OUTSIDE analysis-refusal catch: terminal custody/publication failure cannot mint a false nonretention receipt. |
+
+Peer's first6 reds1.81s, next3 reds1.56s, final publication red1.46s are attributed
+evidence. Final peer five memory guard reversals each genuinely red; restored18
+green0.99s. One isolated frontier-comparison deletion survived another crosslink
+and is NOT counted as a detected mutant. Author final264 focused9.19s; final
+strong six-image compile/hash/frozen-pin/invented64KiB report proof exit0,
+outer0.518089292s/inner20,405,166ns/report6,324B. Earlier263/ff3502fc proof is a
+PRECEDING image only, not final evidence. One author launcher syntax error
+stopped before Python/collection; correction only to launcher. No actual inputs.
+
+Main OBSERVED616 focused passes26.36s: new runner own/peer, pure shape own/peer,
+prefix front/core own/peer, directly used archive/format-v3 regressions, active
+documents/record, import boundary and EXACT Insider package guard. Native
+process-tree network/security-exec denied; writes only registered fresh TMP
+plus/dev/null, fork for boundary children only. No complete lane/repo suite.
+Main strong native network/fork/ALL-write/security-exec denied137-image compile/
+hash/recheck proof, inventory
+`4188143c60f236150c437a860fae7a65ce541e226bcea3dc9eb96a933380d662`,
+basee9b27628 plus explicit UNCOMMITTED runner images, NOT clean actual assembly.
+Invented exact65,536 compressed bytes/195,004 decoded,256 headers: shape240,230B,
+report258,245B/IPC258,265B within1MiB;1,208,132,625ns with live291 guard through
+stdout/final sample. First proof SCRIPT guessed zlib level0 overhead and failed
+its fixture-length assertion before qualification; replaced fixture framing
+with an exact bounded stored-deflate member, no product/isolation change.
+Actual input/private contact/namespace/provider requests0. Final hashes checked.
+After309–310, main124 record/active-document/boundary/EXACT-package checks
+passed3.87s. Final peer extra six-image native ALL-denied compilation/hash/
+live-memory proof passed0.522378334s, metadata/body input0 (attributed).
+
+No actual interpretation activated yet; all nine carried OPEN P2s/readiness
+gates unchanged. QC/Safari untouched and still held by another lane; zero
+launches. This is delegated offline engineering, not new independent Claude
+acceptance, NC/PDS/GNU logical admission or corpus completion. No push.
+
+## 310. Clean runner actual-metadata health check registered (2026-10-25)
+
+After committing309–310, freeze ALL source/test/record writers. From the NEW
+already-existing CLEAN designated producer HEAD, run only runner `_preflight`:
+exact source/current/committed/Git closure, initially strong denied native
+full-assembly memory compile/recheck, externally pinned307 old-prefix metadata/
+strict SH versions, original941a6f78/138-source Git proofs, disk and fresh
+`sec_feed_prefix_shape_observation_v1` namespace check. Report measured source
+count/inventory, held-input digest, head-specific plan hash and elapsed time.
+Do not reuse309's manual137-image inventory as the actual assembly.
+
+No raw prefix/original parent/carrier body read/hash, profile/private contact,
+Keychain, provider/credential/SDK/QC/Safari/outcome/backtest action, namespace/
+analysis-start/publication or acquisition by this health check. A refusal
+stops activation for diagnosis without weak guards or a retry. Only after
+observed success may a separate named OFFLINE retained-prefix interpretation
+be registered/committed; no new download is necessary or authorized here.

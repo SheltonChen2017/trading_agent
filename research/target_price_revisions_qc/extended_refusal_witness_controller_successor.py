@@ -104,6 +104,13 @@ def _body_free_escape(error, receipt, *, receipt_published):
     return wrapper(receipt, receipt_published=receipt_published)
 
 
+def _stop_stage(receipt):
+    """A publication stop keeps the stage the receipt had actually reached;
+    only a completed read is relabelled post_read, because "complete" stops
+    being true once its receipt could not be published."""
+    return "post_read" if receipt["failure_stage"] == "complete" else receipt["failure_stage"]
+
+
 def _fail():
     raise ControllerRefusal("prepared witness controller refused")
 
@@ -515,15 +522,15 @@ def execute_prepared_read(plan, capsule, directory, *, program_raw, native_read,
             # Retain stop state BEFORE propagating: the final directory close
             # must not demote a newly raised publication cancellation.
             cancelled = True
-            final = validate_receipt({**final, "status": "cancelled", "failure_stage": "post_read"})
+            final = validate_receipt({**final, "status": "cancelled", "failure_stage": _stop_stage(final)})
             raise ControllerCancelled(final, receipt_published=False) from None
         except BaseException as error:
             if escaped is None:
                 escaped = error
             if cancelled:
-                final = validate_receipt({**final, "status": "cancelled", "failure_stage": "post_read"})
+                final = validate_receipt({**final, "status": "cancelled", "failure_stage": _stop_stage(final)})
                 raise ControllerCancelled(final, receipt_published=False) from None
-            final = validate_receipt({**final, "status": "failed_or_uncertain", "failure_stage": "post_read"})
+            final = validate_receipt({**final, "status": "failed_or_uncertain", "failure_stage": _stop_stage(final)})
             raise _body_free_escape(escaped, final, receipt_published=False) from None
         if cancelled:
             raise ControllerCancelled(final) from None
@@ -543,6 +550,8 @@ def execute_prepared_read(plan, capsule, directory, *, program_raw, native_read,
                 if escaped is not None:
                     raise _body_free_escape(escaped, final, receipt_published=publication_confirmed) from None
                 if isinstance(error, Exception):
+                    if not publication_confirmed:
+                        raise ControllerReceiptUnavailable("prepared witness receipt unavailable; no automatic retry") from None
                     raise ControllerRefusal("prepared witness directory cleanup refused; no automatic retry") from None
                 raise _body_free_escape(error, final, receipt_published=publication_confirmed) from None
             message = "prepared witness stopped; receipt unavailable; no automatic retry"

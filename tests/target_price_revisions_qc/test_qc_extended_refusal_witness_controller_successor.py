@@ -749,3 +749,66 @@ def test_counterreview_controller_mutants_are_killed_with_restored_controls(tmp_
     with monkeypatch.context() as patch:
         check(restored, patch)
     assert m.NATIVE_ADAPTER_PERMITTED is False
+
+
+@pytest.mark.parametrize("earlier_stop,publish_error,expected_status,expected_stage", [
+    ("lock", KeyboardInterrupt, "cancelled", "lock"),
+    ("lock", SystemExit, "failed_or_uncertain", "lock"),
+    (None, KeyboardInterrupt, "cancelled", "post_read"),
+])
+def test_publication_stop_keeps_the_stage_the_receipt_had_actually_reached(
+        tmp_path, monkeypatch, earlier_stop, publish_error, expected_status, expected_stage):
+    """TPR-CR31-001: an unpublished accounting candidate must not relabel an
+    earlier lock/claim/cleanup stop as post_read; only a completed read is."""
+    original_fsync, original_publish = m.os.fsync, m._publish
+    state = {"fsync_failures": 0}
+    def fsync(fd):
+        if earlier_stop == "lock" and state["fsync_failures"] == 0:
+            state["fsync_failures"] += 1
+            raise OSError(PRIVATE)
+        return original_fsync(fd)
+    def publish(fd, name, raw):
+        if name.endswith(".result.json"):
+            raise publish_error(PRIVATE)
+        return original_publish(fd, name, raw)
+    monkeypatch.setattr(m.os, "fsync", fsync)
+    monkeypatch.setattr(m, "_publish", publish)
+    with pytest.raises(BaseException) as caught:
+        invoke(tmp_path)
+    assert not isinstance(caught.value, Exception) and PRIVATE not in str(caught.value)
+    assert isinstance(caught.value, m.ControllerCancelled if expected_status == "cancelled" else SystemExit)
+    assert caught.value.receipt_published is False
+    receipt = caught.value.receipt
+    assert receipt["status"] == expected_status and receipt["failure_stage"] == expected_stage
+    assert receipt["lock_acquired"] is True
+    assert receipt["claim_attempted"] is (earlier_stop is None)
+    assert receipt["native_read_invocations"] == (0 if earlier_stop else 1)
+    assert receipt["lock_cleanup_complete"] is True
+    assert not list(tmp_path.glob("*.result.json"))
+
+
+def test_ordinary_final_close_error_after_failed_publication_reports_the_receipt_unavailable(tmp_path, monkeypatch):
+    """TPR-CR31-002: when the receipt was never published, an ordinary error on the
+    final directory close must still say receipt-unavailable, not generic cleanup."""
+    original_open, original_close, original_publish = m._open_directory, m.os.close, m._publish
+    state = {"directory_fd": None, "raised": False}
+    def opened(path):
+        fd = original_open(path)
+        state["directory_fd"] = fd
+        return fd
+    def close(fd):
+        original_close(fd)
+        if fd == state["directory_fd"] and not state["raised"]:
+            state["raised"] = True
+            raise OSError(PRIVATE)
+    def publish(fd, name, raw):
+        if name.endswith(".result.json"):
+            raise OSError(PRIVATE)
+        return original_publish(fd, name, raw)
+    monkeypatch.setattr(m, "_open_directory", opened)
+    monkeypatch.setattr(m.os, "close", close)
+    monkeypatch.setattr(m, "_publish", publish)
+    with pytest.raises(m.ControllerReceiptUnavailable) as caught:
+        invoke(tmp_path)
+    assert state["raised"] and PRIVATE not in str(caught.value)
+    assert not list(tmp_path.glob("*.result.json"))

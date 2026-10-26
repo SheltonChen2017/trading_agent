@@ -36087,3 +36087,159 @@ test scopes used the correct registered-temp/inherited-denial policies.
 Nine carried OPEN P2s unchanged. No real compact namespace/source operation,
 acquisition, QC/Safari, SDK, financial admission, backtest, final handoff or
 push. Continue front qualification while the owner's QC/Safari hold remains.
+
+## 297. Compact capture-front prospective review findings (2026-10-25)
+
+Core296/records292–296 are locally committed in
+`099078478a1dd21f5d5a928485ded1b7351d4b98`; no push. NEW capture-front pair
+remains uncommitted, unactivated and under qualification. Main read the initial
+785-line front and its successive source/plan/geometry/readback deltas; peer
+independently reviewed it. No real source-row reader, contact, namespace or GET
+was run by these front tests. Invented HTTP callbacks and actual native-denial
+controls are not acquisition authority.
+
+Prospective lane-owned P2 findings, all PENDING final main qualification:
+
+- **IBCOMPACTCAP-PRE01**: new input assembly assumed nonexistent old._Inputs.raw.
+  Frozen old class exposes held folders, not that attribute. Faithful real-
+  shape fixture1red1.50s; NEW front now reads the exact existing held directory
+  run's response.bin, preserving its original Oct7 proof separately from the
+  new Dec3 selected row. No old source edit or actual input failure.
+- **IBCOMPACTCAP-PRE02**: NEW worker used frozen memory guard as a context
+  manager although it has no enter/exit methods. Genuine initially denied
+  real-guard/invented-role probe failed TypeError (~0.5868s); same probe passed
+  after NEW worker explicit try/finally close (~0.7468s). Monitor must remain
+  active through stdout serialization/flush/final sample; never waive guard.
+- **IBCOMPACTCAP-PRE03**: NEW CLI referenced nonexistent nonunderscored echo
+  helper/restore closure. Unknown-argument regression1red+53green2.14s before
+  correction to the existing protect/restore pair. Also require failed actual
+  capture exit2 versus successful failed-scope custody verification exit0;
+  completion of controls is not successful source retention. Final tests must
+  prove both statuses, not merely argument sanitization.
+- **IBCOMPACTCAP-PRE04**: new wire validator accepted six invented descriptor/
+  static-policy violations (identity/admission, extra descriptor field, bool
+  ordinal, negative payload, changed name policy):6genuine reds2.00s. Added
+  exact canonical constants/types/keys/ranges/hash-part and disposition
+  conservation plus source-plan/scope/anchor checks; not yet final acceptance.
+- **IBCOMPACTCAP-PRE05**: real4,096-member/24MiB fixture exceeded declared8MiB
+  metadata:10,177,168B, though full60,517,008B wire fits64MiB. Removing duplicate
+  descriptors from selected[].member (reference the single canonical compact
+  descriptor by its physical SHA instead) preserves every candidate and guard
+  limit. Read-only peer's corrected full real-schema wire57,059,656B; actual
+  wrapped/newline57,059,677B. Exact nonhex metadata INCLUDING partial-chunk
+  quotes/commas6,728,008B, not empty-list skeleton6,719,816B.4,096 actual partial
+  chunks,172,122 codec nodes,depth6,maxdict39/maxlist4096/maxstring12288.
+  Earlier original red2,794,761,250ns; corrected proof5,313,812,375ns on draft
+  `fd0fe5cc2e77b42d2845efa34a884dc4cf864bf7492bb865e970fe7ec5d1cf56`.
+  Lower actual metadata quota by ONE byte: refusal; disable ONLY that live
+  quota guard: violating envelope accepted/genuine assertion red; restore:
+  refusal; original8MiB: accepted. Bound:2*24MiB+8MiB+21B outer wrapper/newline
+  <64MiB. Capacity templates stay unpublished, not observed membership.
+- **IBCOMPACTCAP-PRE06**: native readback/parent verification could return after
+  invented source drift without final current/identity check. Independent
+  faithful2reds1.51s onabd5f9c0; unchanged2green1.76s on025b379c after final
+  worker/readback _current and parent exact _identity checks. They remain
+  necessary even when old held inputs and object hashes match.
+
+All corrections are confined to new prospective files. Main's requirement
+keeps full25-quarter all-six source rederivation/native row interpretation,
+late repeat/conflict quarantine,20,044 pinned consumed metadata with ZERO old
+original-body reads, original producer Git checks outside fork-denied workers,
+fixed-root/branch/clean-current capability, exclusive fresh scope and durable
+claim/start BEFORE one transport. Whole carrier stays RAM-only/unhashed;
+selected CAS objects remain identity-unvalidated. Current-contact retained-
+object verification must NOT claim discarded-carrier replay. Peer source-only
+identity assembly tests exercise the REAL inherited campaign builder/guards
+with generic Git/initial identity emulated from bytes, including string-named
+legacy tests; not actual Git-clean/source/input attestation. Real input and
+full actual front assembly qualification remain unfinished. Nine carried OPEN
+P2s unchanged. No QC/Safari, actual source operation, outcome/backtest or push.
+
+## 298. Compact front engineering accepted; read-only real-input qualification registered (2026-10-25)
+
+New front frozen for the next READ-ONLY qualification, not GET activation:
+
+- `research/insider_buying_sec_feed_compact_capture_v1.py`,63,175B,
+  `fd0fe5cc2e77b42d2845efa34a884dc4cf864bf7492bb865e970fe7ec5d1cf56`;
+- `tests/test_insider_buying_sec_feed_compact_capture_v1.py`,25,988B,
+  `5a057a496eda592495e4f25ee89adfa4de40becc4c326668ab97b0d92527cc36`;
+- independent QA `tests/test_insider_buying_sec_feed_compact_capture_v1_review.py`,
+  4,492B,`d35f0f20a8fc0e72c12d7f286cf85d856f7fe4868447052ec9cc5a99ead63f32`.
+
+Technical: the new controller binds held old Q4 listing/consumed20,044 metadata,
+full25-quarter all-six native roster rederivation and cross-quarter repeat/
+conflict counts. It preserves old source17 rows and source ordinal/hash/anchors,
+routes only nonrepeated4/4A candidates, and distinguishes routing from member
+identity. Source/Git/current/native gates precede private contact and fresh
+one-shot claim/start. Whole carrier is RAM-only/unhashed; the actual native
+worker must complete both physical passes and per-object privacy before CAS
+publication. Strict object/control/readback/source-final checks and truthful
+CLI statuses preserve failed acquisitions independently from successful custody
+verification. Existing executed modules and old namespaces are untouched.
+
+Plain language: the download controller is engineered and tested, but has not
+downloaded anything. First it must prove it can safely read and reproduce the
+existing real SEC source metadata. Those counts and a green fixture would not
+themselves make any raw filing, signal or backtest ready.
+
+All six prospective findings297 are CLOSED within this corrected NEW front
+after main and peer validation: old held-input API, real memory-guard lifetime,
+TTY/CLI outcome truth, exact wire declarations/source-plan binding, actual
+maximum metadata capacity without duplicate descriptors, and final source-
+drift rechecks. Main final412 focused checks passed10.55s: four compact test
+files, frozen format, record/active documents, import boundaries and EXACT
+package guard. Initial native network/Keychain-exec denial; ALL writes denied
+except the fresh registered test temp root and literal /dev/null sink for
+read-only Git checks; inherited denial for boundary children. No full suite.
+
+MAIN independently executed the REAL front wire with4,096 genuine INVENTED
+members,24MiB unchanged selected bytes, both integrity/privacy passes and4,096
+per-object replays under initial network/fork/ALL-write/Keychain-exec denial
+and real291 memory guard through serialization:57,059,656B own wire,
+6,728,008B exact nonhex metadata,57,059,677B actual wrapped/newline envelope;
+inherited codec exact roundtrip. Inner3,882,250,375ns, exit0; core777006cc/front
+fd0fe5cc source images before/after unchanged. No template publication, actual
+source/contact/provider/QC access or carrier replay/authenticity claim.
+
+MAIN strong native source-only proof additionally memory-compiled and hash-
+rechecked134 current images, including inherited string-named test paths,
+both new peer files and frozen pins:1,072,020,584ns, exit0; inventory
+`17fd3c4125e2540e913bed2d62a8aa4f7ce0c5fd259b45dbab75bd1b63a7d7fd`.
+Base09907847 plus explicit uncommitted front hashes; NOT clean committed/Git
+or actual-input attestation. Future clean production assembly count/pins must
+be measured independently, not relabel this qualification inventory.
+
+Attributed author257 focused8.79s; peer288 focused7.20s under fork-denied
+registered-temp native policy,52 boundary/EXACT4.34s with fork permitted and
+inherited network denial. Read-only capacity review's exact real-schema live
+guard reversal and statistics remain297; proof-code
+`9fd0a5aa7a4e7a8022e03a2cac9853df4c1f179546497b5673ccfc32849c25b7`.
+Author seven meaningful safety reds (one-attempt2, identity1, late-repeat3,
+header-privacy1) restored green; exclusive-root reversal's two diagnostic-
+difference reds did NOT prove an unsafe opener was exposed and are not counted
+as that proof. Peer post-worker-source1/parent-final-identity1/inherited-real-
+builder1 genuine reds restored3green3.12s. Source-only native125-current/
+15-compile author proof and6-image peer proof are attributed, not MAIN134 or
+actual-input observations. All are self-directed engineering QA, not Claude
+review or independent review of a pushed snapshot.
+
+Register the next bounded READ-ONLY real-input qualification after committing
+these exact files/record: trusted parent verifies exact designated root/branch/
+clean HEAD/current+committed full source assembly; initial strong-native
+`_worker('preflight', identity)` independently holds/rechecks old Q4 listing,
+cumulative complete/plan/index/claims/headers (ZERO old original-body bytes),
+accepted selector and full84-leaf retained intake, rederives only SUBMISSION
+metadata for all25 context quarters and compares old genuine source/cross-
+quarter receipts. Compile/recheck all assembled source images, verify exact
+original directory/capture/planner producer Git in the trusted parent outside
+fork-denied worker, and recheck current identity afterward. Emit ONLY bounded
+public counts/pins/health summary; no raw source-row values or private input.
+This registration permits NO contact/profile read, namespace/claim/start,
+provider/SEC request, new daily-carrier or old original-parent body reading,
+XML/financial interpretation,
+QC/Safari/SDK/job, outcome/look or backtest. Record observed clean producer HEAD,
+real assembly inventory, results and any precise refusal separately. Only after
+successful real-input qualification may a separately recorded activation of
+the candidate unused Dec3 GET be considered. No routine approval checkpoint;
+continue within delegated source-work scope, never retry October/June URLs.
+Nine carried OPEN P2s unchanged; no final handoff or push.

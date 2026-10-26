@@ -35064,3 +35064,142 @@ registration creates no later batch or strategy/outcome/backtest authority.
 Six carried topical/shared P2s, both archive-observation P2s and the NEW
 IBPARENT-PLAN-OBS01 remain OPEN within their exact scopes. No readiness claim,
 purchase requirement, interim push or final handoff is substituted for work.
+
+## 281. First new64 capture and independent custody readback completed (2026-10-25)
+
+280 was committed as already-existing clean
+`de12364738b662bb163798346c6623122ff4b814`; post-record124 focused checks passed
+4.61s, matching origin41d729af unchanged. ALL source writers/tests remained
+held through actual capture AND readback. Main activated only registered
+collector batch1, exact candidate plan3e54de6b/completec2ca4549/producerd177c941,
+using the direct trusted parent and existing guarded entry. Its full25-source
+initially native-denied rederivation and exact-plan comparison passed BEFORE
+capture output/contact/dispatch. No original planner namespace was resumed or
+rewritten; that operation stays failed as280.
+
+One own Gmail-profile read supplied the unique private SEC contact through
+already-protected anonymous stdin. No value/hash/argv/env/chat/Git/control-log
+retention. The native inspection worker received only private anonymous stdin;
+its fixed source, network/fork/ALL-write/Keychain-exec denial and finite contact
+screen preceded body/header hashing/retention. No new credential/provider-key
+read. Actual capture exited0 after589.197346875s INCLUDING preflight.64 planned,
+64 starts/results,64 retained bodies,64 header-bound,0 unclaimed suffix; no
+fatal refusal. A mid-run metadata-only48 start/48 result names observation was
+explicitly NOT custody acceptance or a body/HTTP count.
+
+Externally observed actual output pins:
+
+- complete `6233fc9b49c6a10c59904179199514b7d1e7df979df1c26d5d0ee2853bc04339`;
+- consumed index `d501e30d5ce1e9b90cd8738251036fa5f0dbf0a16bba65d6c5d66fa83af4f664`;
+- plan `3e54de6b0c5e9355ed83610f447fa86ad461f990ac36d41ed35ab5ee9640a555`.
+
+Main separately ran existing strict readback on the same clean de123647:
+exit0/10.670387625s, full actual retained body rehash/header replay, exact
+inventory/claim/start/result/index/rate/source and original Git proofs under
+initial native process-tree network/fork/ALL-write/Keychain-exec denial in the
+reader. Parent Git proofs remain correctly outside the fork-denied child.
+Private contact screen was NOT replayed without the contact, as the readback
+explicitly reports; original production screening is distinct evidence.
+
+Additional native-denied strict externally anchored journal-metadata summary
+exit0/0.721471791s after imports:64 HTTP200 result records,64 raw transport
+invocations (NOT a measured backend HTTP request count),1,059,074 retained body
+bytes; ALL64 are2020Q1 context originals. Complete/index/plan pins matched;
+consumed accession index19,980→20,044, conserving all prior claims. This index
+is a no-redispatch ledger, NOT a count of canonical/admitted/source-authenticated
+filings or a completed corpus. This extra metadata diagnostic did NOT rehash
+bodies; the preceding10.670s readback did. Capture source inventory remains
+`dcacf980baf1a32da88d8900431059ff801bbceb079fe04fda67fad7362fb235`.
+
+No strategy, price/History/outcome look, QC launch/backtest or economic change.
+These are64 additional opaque complete originals with request/header custody,
+not parsed financial transactions, publication/PIT/rights or ready signals.
+Original first64/2021Q1 and its51-CIK QC reference context remain separately
+identified; new2020Q1 parents are not silently substituted into that graph.
+Legacy2022Q4–2023Q1 figures remain19,846/99,394 (79,548 originally unattempted),
+and strictD23/frozen v3 ambiguity remain unchanged. Generic authority-template
+zero/false fields are permission/readiness restrictions, NOT a claim that this
+observed64-request acquisition had zero activity.
+
+This meets the controller's factual successful-first64 prerequisite for a
+separately registered later bounded batch; it does NOT automatically launch
+one. Continue278's query-free join engineering now, with the private draft
+restored via apply_patch while its original ignored snapshot is preserved.
+In parallel audit whether official already-owned quarterly data plus genuine
+SEC acceptance metadata can meet the SAME admission contract more efficiently
+than whole-parent acquisition; this is a read-only design/primary-doc audit,
+not permission to weaken clocks, titles, amendment/lot lineage, source-window
+or scientific gates. No further acquisition scope is defined by that audit.
+Nine carried topical/shared/actual-observation P2s remain OPEN as280; no final
+push or final handoff yet. No concrete external owner blocker was identified
+by this successfully completed bounded capture.
+
+## 282. Query-free retained-reference composition qualified and registered (2026-10-25)
+
+Under the owner's continuous-build/delegated-judgment direction, qualify an
+additive zero-query successor; do not reexecute any predecessor cell or claim
+the new2020Q1 parents are the original2021Q1 graph. New source
+`research/insider_buying_qc_historical_reference_composition_cell.py`33,641B
+SHA `1cd97ae0228d56deb741b590cef0a5d8eb2cf1d227c923367b62c84116dc7caf`,
+tests17,236B SHA
+`88006e3051053221a35fea61e5c15fe86dbb7ec8decd090acfc09232bd20e518`;
+production core
+`7be7c9fb2fa60f0d22c9ecdf560108d1f9c752cc24266775912d243ec2096c1a`,
+production-shaped source-only cell31,537B. The original ignored unqualified
+draft123c110f remains preserved; it is not an activated source image.
+
+The new cell reconstructs276's exact registration36f256d2 and all original
+CIK/result/four-query/final chains from existing in-memory contexts. It retains
+all51 rows, zeros, duplicate/cross-CIK edges, every raw reference state, four
+fields and returned date/index labels. Positive exact integers or1–10 ASCII
+digit text compare via ten-digit CIK, without ticker/primary-share selection,
+float/whitespace repair or dropping mismatches. Missing/malformed/zero/different
+remain distinct. March31/April1 midnight labels are not original availability.
+Context identity/hash/marker checks precede/follow composition/publication;
+ordinary globals are coherently mutable before execution, not authenticated
+origin or continuous immutability. The composed graph stays explicitly
+VOLATILE in the existing kernel, not durable/independently persisted. No SDK,
+resolver/fundamental/History/price/outcome/ObjectStore read/save/delete calls.
+Only bounded own execution controls may leave QC; no values/counts/comparisons
+or derived platform-data digests are exported. All admission/readiness false.
+
+Main fully read new source/tests and independently observed361 focused,
+record/active-document/import-boundary/EXACT package checks passed12.39s under
+native process-tree network denial, lane-write/Keychain-exec denial, isolated
+Python/cache/plugins. Strong initially native network/fork/ALL-write/
+Keychain-exec-denied -I-S-B source-only compilation/worker/capacity proof:
+114 images,1.935119333s, inventory
+`69f9a563bda032eb531d9d556d13662a118e2a44ce8bbd75c50a78d385404a7d`.
+This synthesized uncommitted-source identity is NOT actual clean Git proof or
+business-data replay. Author-attributed289 focused11.19s, nine memory reversals
+18 genuine reds, restored1037.55s and102-image source proof0.530982208s are
+separate evidence, not main-observed runs. Initial author fixture sorted-SID
+assertion was corrected without weakening production guards. Whitespace clean.
+
+Register ONE actual query-free scope
+`ib-qc-first64-historical-reference-composition-20261025-once`, local root
+`artifacts/insider_buying/qc_historical_reference_composition_v1`, project37465795,
+fresh cell2 of EXISTING `ib_qc_cik_consumer_20261025.ipynb`. After this source/
+registration record is committed cleanly and all writers held, run direct
+trusted local parent (NO outer Seatbelt wrapper), built-in strong native source
+preflight, protected five-leaf permanent intent and fresh nonce. Verify full
+prepared AND saved own cell bytes; execute ONLY new cell2 ONCE in existing
+context, no Run All/restart/preceding-cell replay. Refusal consumes the intent;
+no reset/retry. Export only own ACK and independently validate it against
+externally pinned own registration/current source under strong native denial.
+No query, store activity, strategy launch/attempt or backtest is registered.
+
+In plain terms, this joins already retained candidate identifiers and fields;
+even matching CIKs do not establish historical title/class/SID/listing/PIT,
+processing rights, actual transaction admission or backtesting readiness.
+Nine OPEN P2s remain as280; no topical evidence gate is closed by these tests.
+The next acquisition design remains separately qualified, not activated here.
+Official [SEC access documentation](https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data)
+describes daily Feed tar/gzip and complete-header Oldloads transports;
+[RFC1952 section2.2](https://www.rfc-editor.org/rfc/rfc1952#section-2.2)
+allows successive gzip members. This supports prospective bulk compatibility
+engineering, NOT a diagnosis of either unretained June failure. The current
+source contract still requires complete primary XML plus exact acceptance per
+accession, not TSV plus metadata alone. No repeat of consumed archives or blind
+third full GET; no source-policy weakening, economic change or new purchase.
+No final handoff/push yet; continue until honest readiness or concrete blocker.

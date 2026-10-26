@@ -37215,3 +37215,343 @@ No source window/economics change, frozen bytes thaw or stopped-v3 resume.
 QC/Safari remain in another lane's use, zero SDK/jobs/outcomes/backtests/Mia.
 No interim push/final handoff; continue available work after this observation.
 Main124 record/active-document/boundary/EXACT-package checks passed4.28s.
+
+## 319. Actual read-only NC witness completed; no routed originals (2026-10-25)
+
+318 executed ONCE on already-existing CLEAN
+`1e706972c5bdee31375ecc169fd562c5f83a72b6`, exit0,
+151,354,875,208ns TOTAL including protected precheck/contact wait and repeated
+authoritative observation, NOT transport or worker-only time. Source assembly
+149/`3fe784489c7f473cd5a7c950ca8c2996002a80dc0fec0bb33aac9156b2ba2d25`,
+held-input `a8f2ebce8b2368bc2b8ab8aa1903a886d9df8c35ba648ee73cb2c86490dece45`;
+safe aggregate stdout witness
+`4c3ef48ec6e9e5217218a70eb511e8e8ad41d26dd4982a62e7b8fc4f5c6c7a2d`.
+Invoking glue remains318's98448424, separately identified rather than a
+committed source image. Exactly one own-profile read/anonymous stdin feed,
+protected ready marker verified before feed; no contact value/hash/echo was
+retained or emitted. ALL source/test/record writers remained frozen until exit.
+
+Native initial network/fork/ALL-write/security-exec denial,149-source memory
+compile/current/Git/original-producer/strict SH/FD checks, frozen prefix custody
+and current-contact raw/ALL-produced-decoded rescreen preceded the new pure
+witness. Live291 guard continued through stdout/final sample; parent final
+source/Git checks passed. Original-contact screen/equality remain FALSE.
+The same independently retained65,536-byte prefix decoded1,532,222 bytes;
+three-pass counts compared, completed gzip members0/final member incomplete.
+No new artifact/namespace/claim exists; this was a read-only stdout observation,
+not an acquired-output transaction. No independent file readback or repeated
+raw/semantic observation is claimed. Requests/files-written/SDK/outcome looks0.
+
+| Physical ordinal | Actual safe disposition |
+| --- | --- |
+| 1 | Directory, not examined as NC; no absence claims. |
+| 2 | Complete843-byte NC physical payload; one complete DOCUMENT sequence, other document type/no XML candidate; literal PAPER label count1, NOT validated paper/status semantics. |
+| 3 | Complete9,042-byte NC physical payload; one TYPE4 DOCUMENT with safe filename shape, XML wrapper and well-formed ownership-root XML syntax candidate,110 nodes/depth6. |
+| 4 | Complete6,699-byte NC physical payload; one TYPE4 DOCUMENT with safe filename shape, XML wrapper and well-formed ownership-root XML syntax candidate,92 nodes/depth6. |
+| 5 | Partial physical payload, not examined as NC; no absence claims. |
+
+Three complete candidates/16,584 bytes collected AND examined; two physical
+members unexamined. All three begin exactly SUBMISSION@0 and have terminal
+SUBMISSION closes. All three preambles are AMBIGUOUS/UNSUPPORTED under314's
+conservative grammar: no HEADER/SEC-HEADER openings; one top lexical occurrence
+each ACCESSION-NUMBER/TYPE/FILING-DATE/DATE-OF-FILING-DATE-CHANGE/
+PUBLIC-DOCUMENT-COUNT; PERIOD0/1/1; ACCEPTANCE-DATETIME0 and SOURCE0 observed.
+Because preamble scope is unqualified these zero counts are NOT authenticated
+absence, singleton route/acceptance/document-count proof, source17 matches or
+admission. Other preamble label counts14/28/25 include both ignored known leaves
+and unsupported grammar; actual unseen label identities were not exposed or
+guessed. No legacy colon-header lines observed. No acceptance/calendar/timezone/
+original-availability/PIT evidence established.
+
+All four regular fixed basenames have23-byte dashed-accession SHAPE with NC
+suffix and one directory component. The prior313 routing-pattern FALSE and
+current filename/internal-accession comparison FALSE do NOT prove actual name
+or accession disagreement: the frozen collector's filename rule and314's
+unqualified preamble prevent those respective positive proofs. No value/name/
+route/accession/member/raw-prefix hash was exported by the pure witness;
+explicit old prefix/code custody pins in the outer report are distinguished.
+DTD/entities/external XML resources were not resolved; XML schema/financial
+fields/source identity/authenticity/GNU logical/PDS/PAC/private-release/deletion/
+version semantics/whole-carrier integrity/privacy/population remain unqualified.
+Two XML SYNTAX candidates are NOT two admitted original parents.
+
+Delegated next engineering choice: research the primary documented direct
+SUBMISSION NC grammar, then qualify a NEW bounded private typed routing/source
+binding only if its exact scope is supportable. Do not change the frozen314
+witness to reinterpret this run; do not invent256/266-byte control, SEC-DOCUMENT
+wrapper, .txt URL, acceptance clock, source17 match or old failure cause. A new
+observer would need a genuinely distinct question/registration; no renamed
+semantic repetition of318. Existing consumed URLs/failed roots/frozen source
+bytes/stoppedv3 remain preserved. Nine carried OPEN P2s,20,044 individual
+dispatches and all source/PIT/rights/canonical/look/QC/backtest gates unchanged.
+Owner confirms another lane STILL controls QC/Safari; none accessed, zero
+launches spent. Writers may now resume additive offline work. No push/final
+handoff or claim of backtesting readiness.
+
+## 320. Direct-NC routing and source binding scope selected (2026-10-25)
+
+Primary format research after319: the dated2014 SEC PDS specification§§2,
+3.2–3.4 describes direct SUBMISSION front matter, nested registrants and
+documents; HEADER/SEC-HEADER wrappers are not required there. Its SGML scalar
+end tags can be omitted. Acceptance belongs to a separate control block;
+correction timestamps have different meaning. This explains why a distinct
+direct-preamble parser is appropriate, NOT that319's NCs have been validated
+against a2020 specification. No distinct official2020 NC profile was found.
+The currently served PDS PDF and mutable archive link cannot be relabelled
+immutable2020 bytes. Sources:
+[dated PDS specification](https://www.sec.gov/info/edgar/specifications/pds-dissemination-spec030314.pdf),
+[current PDS specification](https://www.sec.gov/files/info/edgar/specifications/pds_dissemination_spec.pdf),
+[SEC Feed description](https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data).
+No new filing/data request was made for this public-document research.
+
+Delegated implementation choice under the owner's continuous-build direction:
+qualify TWO additive pure components, without changing any executed source.
+First, a bounded conservative documented ownership-subset direct NC parser
+with exact private immutable route claims and safe detached public witness.
+It must parse scopes itself, not trust a caller's complete-header Boolean;
+unknown/misnested/inline/duplicate/late identity and unsupported status semantics
+quarantine claims. Full supplied payload finite privacy precedes any hash or
+claim; no invented filename routing/control/wrapper/acceptance. Batch duplicate
+and prior-consumed shadows quarantine ALL copies, never first/latest. This is
+a custody-only route candidate, not full SGML/XML/identity/admission validation.
+
+Second, bind eligible typed claims to source metadata by invoking the unchanged
+full25-quarter roster derivation on explicit supplied inputs. Validate each
+exact normalized17-field row and ordered archive/member/header/profile/ordinal/
+canonical-row binding; resolve all source occurrences/repeats/conflicts before
+joining internal accession/form/date. Preserve raw CIK/date/symbol; no use of
+accession-leading filer CIK as issuer CIK. The normalized17-field source row is
+NOT an NC SOURCE tag or the value17. Consumed sets supplied to a pure API are
+caller-bound controls, not proof of named-file consumption custody. Missing
+acceptance, primary XML/issuer/owner corroboration and source/PDS authenticity
+stay unqualified; no fake frozen complete-submission projection or Feed URL
+masquerading as accession-specific .txt provenance.
+
+Both components require private factory integrity, bounded inputs and closed
+value-free public contracts; no actual retained bodies/source archives,
+contact/profile, filesystem IO, SEC/provider/QC/Safari/SDK/outcome/backtest or
+new namespace in their engineering tests. Initial native process-tree network
+denial and relevant focused/adversarial/compilation/boundary/EXACT-package
+checks remain required. This entry selects engineering scope, NOT completed
+implementation or real-input qualification. Actual use needs a later distinct
+registered source-binding operation, not a renamed replay of318. Nine OPEN
+P2s/readiness false/zero QC launches and zero round pushes remain unchanged.
+
+## 321. Owner releases Safari; retained-reference composition completed (2026-10-25)
+
+Later owner direction explicitly releases Safari and says start backtesting
+IF ready, then reiterates push when done. Readiness is still FALSE, so no
+strategy launch/backtest/outcome occurred. Main opened ONLY own37465795
+Adaptable Light Brown Pony. The previous lane's cached workbench was left
+untouched. Own editor initially reported WebSocket1006 and requested reload;
+main used its Reload control, not a notebook/kernel restart. The kernel picker
+then visibly listed an EXISTING Jupyter SESSION for
+`ib_qc_cik_consumer_20261025.ipynb` on the existing R-44ca0f46228fc8f11cd73ff1b1041cec
+server. Main attached that existing session, not a fresh kernel specification.
+Server/session labels alone were not treated as retained-context proof.
+
+283's previously prepared, permanently claimed scope was NOT re-prepared or
+renamed. A strong initially native network/fork/ALL-write/security-exec-denied
+own-control reader rechecked all five leaves, strict initial/final named/FD
+ctime versions, SH lock, exact external283 pins, old113 current source bytes
+and in-memory compilation, then regenerated exact old registration/core/cell.
+Exit0/1,249,149,959ns after imports; glue
+`0408e57109949edfb1c81c84c35b4decbc259f9e912978c643910bf3f9c15c17`.
+This proves old prepared113-image/0ebcafed lineage, NOT a new clean preparation
+on1e706972 or a hash claim about the new uncommitted NC files. No actual
+business/credential/SDK/store data was read by this local control verification.
+
+Native TextEdit opened ONLY the exact283 prepared cell.py without executing or
+editing it. Main observed ALL31,537 ASCII source bytes through the native
+accessibility text and matched
+`054949654b09a7343ab02745ce351650936c6119133733c94e8e2b45208b842b`.
+Appended fresh cell2 AFTER the two existing cells in the existing notebook;
+old cells0/1 were not edited or reexecuted. Full pasted source was saved,
+copied back through ordinary native editor UI into a new owned scratch buffer,
+and again matched every byte and the exact prepared hash. No filesystem/
+clipboard backdoor, SDK draft, new notebook, Run All/above/below or kernel
+restart. Save triggered the editor's ordinary own-project successful cloud
+build; that is NOT an order-based strategy test or a backtest launch.
+
+Exactly ONE Execute Cell click on the selected new composition cell; pending
+then terminal execution count[3] with displayed0.0s, NOT a separately measured
+total elapsed/runtime. The cell returned `retained_reference_composition_completed`
+and own_composition_published=true. Its existing-context/chain/field/boundary
+checks passed, but ordinary coherent globals remain unauthenticated/volatile.
+Only its bounded OWN acknowledgement was copied using QC's output text editor
+and native UI. No candidate SID/CIK/reference value, cardinality, comparison or
+platform-data digest was exported or interpreted as readiness.
+
+Observed ACK810B, no trailing LF in the measured copy, SHA
+`eef489b6fb6c80f021fbdfefdb293c4fce10e329ee0614d83b0d75a6f0a8a2ac`;
+registration remainsac58c0e9, core7be7c9fb and nonce21d4cbbf from283.
+Main independently validated the COMPLETE observed ACK against exact held
+registration/external pins with the unchanged validator under the same strong
+four native denials: exit0, control readback1,099,996,917ns after imports;
+glue `53e0ab4f75e56861ceee9d37ef203b7c5292f456c33b3b00d792c3e003866472`.
+No platform payload was acquired for that validator. Notebook output was saved;
+the private composed graph remains VOLATILE in its existing kernel, not newly
+persisted or independently authenticated. The immutable local283 intent still
+records its PRE-execution prepared state and is preserved, not rewritten.
+
+Observed SDK/store/resolver/fundamental/History/price/outcome calls0 in this
+composition. Zero strategy launch attempts/backtests/orders; no Mia message,
+permission change, purchase or economic change. Existing four reference queries
+and earlier resolver/receipt operations remain distinct earlier evidence, not
+repeated by this successor. Technical composition acceptance does not establish
+historical identity/title/class/listing/availability/PIT/rights or full SEC
+coverage. Continue actual-source qualification under delegated judgment; one
+final matching-lane push when genuinely done/blockered, not an interim push.
+
+## 322. Private direct-NC route and full25-source17 binding qualified (2026-10-25)
+
+320's two pure engineering components are now implemented, with no actual
+retained-source use. Exact NEW files:
+
+| File | Bytes | SHA-256 |
+| --- | ---: | --- |
+| research/insider_buying_sec_feed_nc_route_v1.py | 25,921 | 5d9d24641802c2e826eb8df6f236496a1ba598f29bf2ed8c52852101295a1a59 |
+| tests/test_insider_buying_sec_feed_nc_route_v1.py | 12,746 | 0da90d325eeb08b8fb65a86128a66173f5c4ea17c706d466b88bd422b74557b1 |
+| tests/test_insider_buying_sec_feed_nc_route_v1_review.py | 9,734 | 6b2503362ea5eb26f5f8ced93cb636e088cf5e437f2512f65c4d268b3dd7025d |
+| research/insider_buying_sec_feed_nc_source_binding_v1.py | 14,896 | 02bc643697f6205eb45139923cca0c2d58f535ba4836e4b2f12fadac113b19e5 |
+| tests/test_insider_buying_sec_feed_nc_source_binding_v1.py | 14,149 | bb4cfd817d9d03dd3879895c037f089b9f4899f91a1ddb2b160d28cb7e246e98 |
+
+Direct profile independently corroborates320 with SEC's
+[July2014 PDS DTD](https://www.sec.gov/info/edgar/specifications/pds-dissemination-spec070114.pdf)
+§3.4. It supports a CONSERVATIVE documented ownership subset, not full DTD or
+an authenticated2020 NC schema. Exact bounded immutable whole payload contact
+privacy precedes parsing/claims; no source-data hashing is needed by the route
+factory. Scoped/order/cardinality/calendar/document-envelope checks reject
+unknown/inline/misnested/late/shadow/status/unsupported fields. TEXT is opaque,
+never a route source or financial/XML projection.8MiB/member,24MiB/batch,
+4,096 members,256KiB preamble,100,000 lines/65,536B line,32 documents/256 groups;
+only exact narrower limits. No convenient subset on capacity/privacy failure.
+Canonical accession shadows in rejected preambles conservatively quarantine
+ALL duplicate copies; consumed sets remain excluded. Explicit weak-registry
+factory/typed immutable snapshots prevent forged/copied/resurrected claims.
+Private exact original payload/accession/form/date/count never becomes a frozen
+complete-submission projection, .txt URL or acceptance/PDS/issuer seal. Public
+contracts are closed, detached, value/name/route/hash-free finite witnesses.
+
+The new binder invokes unchanged genuine roster derivation on supplied exact
+full25-quarter inputs itself, validates every audit._source17 row, callbacks/
+ordered ordinals/counts/forms/full framing digest against genuine factory finish
+BEFORE returning. Bounded compact all-occurrence maps preserve late repeat/
+identity conflicts; only routed rows retain full immutable raw17 metadata.
+Candidate source union2020Q4–2025Q4 includes warmup, distinct20 entry quarters
+2021Q1–2025Q4 and25 context quarters2020Q1–2026Q1. Same exact caller consumed set
+and genuine routebatch/mode/children rechecked postscan. All unmatched/mismatch/
+repeat/conflict/outside-window/non4/consumed dispositions conserved; no first/
+latest/issuer shortcut. Raw17/accession/date/CIK/symbol/ordinal and quarterZIP/
+SUBMISSION/header/profile/row-hash lineage stay private/unchanged. Source-body
+privacy, named custody/actual provenance/physical spans and original acceptance/
+primary XML/issuer/owner/authenticity/rights/canonical/readiness remain FALSE.
+
+Prospective corrections before actual activation:
+
+| Finding | Evidence and final disposition |
+| --- | --- |
+| IBNCROUTE-PRE01 | Peer genuine malformed inline accession-shadow red1failed/38green3.89s: rejected copy did not quarantine valid same-accession copy. Broadened SHADOW-only recognition; strict positive routing unchanged. Six distinct peer memory guard reversals genuinely red; restored123green1.65s. CLOSED. |
+| IBNCBIND-PRE01 | Copied code-pin literal had65hex rather than64. Faithful own negative red; exact current dependency pin corrected. CLOSED. |
+| IBNCBIND-PRE02 | Peer genuine index1→True snapshot-alias red513,501,459ns; exact typed record guard then unchanged probe green387,736,500ns. CLOSED. |
+| IBNCBIND-PRE03 | Peer genuine foreign source iterator RuntimeError escape red308,895,458ns. New binder-only finite unexpected-derivation boundary, unchanged probe green308,829,750ns; known fixed dependency/own refusals preserved. CLOSED. |
+
+Route author attributed123 own/peer2.03s plus52 boundary/EXACT4.81s and strong
+four-image live291 genuine4,096-route proof1.507043083s outer/620,109,333ns
+inner; peer independent source read,1232.56s and separate1.65s restoration,
+strong4-image proof1.120933375s outer. An initial wrong interpreter had no
+pytest and stopped BEFORE collection, not a product red. Public-validator
+finite arbitrary-object/cycle/nonfinite guards were added prospectively;
+there was no separate peer acceptance defect observed for those cases.
+Binder author attributed257 focused10.76s,51 boundary4.55s, five memory
+reversals killing6tests/restored6green and strong112-image proof1.2416s
+outer/424,571,834ns work. Independent peer full read accepted final binder,
+156 focused3.51s/52 boundary4.83s and three genuine memory reversals/restored.
+
+Main independently read final sources/tests and OBSERVED422 relevant focused
+green20.02s, then FINAL combined506green23.57s: both new pairs/peer, frozen NC
+structure/front, pilot roster/audit, active-document/record/import-boundary and
+EXACT `tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports`.
+Initial native process-tree network/security-exec denied, fresh privateTMP and
+/dev/null writes only, fork solely for boundary children; no complete suite.
+Main strong initial network/fork/ALL-write/security-exec-denied -I-S-B proof
+compiled/rechecked148 MANUAL loaded/explicit source images, inventory
+`b6594a3f054412b436ab7c9a6b496af6b24b9da0389e22594dc65628e3edfe8f`.
+Base1e706972 plus explicit uncommitted five NEW source/test images, NOT clean
+actual execution assembly. Hash-checked fixed invented fixture builders only:
+REAL4,096 distinct private routes/1,228,800 payloadB and genuine full25/150
+source rows;1 source17 candidate/4,095 unmatched conserved, public147,081B.
+Exit0/2,065,014,708ns,291 live guard through stdout/final sample. Glue
+`bdb9298e7fb0ea59b7fa63ece353c82b27587cc3b876c022f10713f8b1c622e3`
+is separate orchestration, not a committed image. Exact five hashes rechecked;
+no actual source/contact/profile/request/output namespace in these proofs.
+
+In plain terms, the lane can now safely distinguish direct NC route candidates
+and compare their original source rows without pretending to possess missing
+clocks or complete originals. These are qualified engineering contracts, not
+real NC/source matches or admitted filings. Nine carried OPEN P2s,20,044
+individual dispatches/all readiness gates unchanged. Codex self-directed build
+and peer QA, NOT independent Claude review. All previously executed/frozen
+source and custody roots remain byte-preserved. No round push yet.
+
+## 323. Next distinct read-only source-binding front selected (2026-10-25)
+
+Continue under delegated completion direction; no routine review/approval stop.
+Qualify a NEW read-only front for the distinct factual question: do direct NC
+candidates from the same already-held307 prefix match genuinely rederived
+full25 source17 rows after all duplicate/consumed/window exclusions? This is
+not a renamed repeat of318's structure witness. No new namespace/output file/
+journal/claim/HTTP/SDK/store/outcome or frozen-source edit. Preflight MUST read/
+hash0 raw prefix/ZIP bodies: static pinned control metadata and strict FD/stat
+holds only, with body qualification explicitly DEFERRED. The unchanged genuine
+intake constructor hashes all82 ZIP bodies, so it belongs ONLY in native
+analysis AFTER full raw/ALL-decoded prefix privacy, not in metadata preflight.
+Do not weaken that constructor or mislabel opaque hashing as zero reads.
+
+Require full current clean committed source/Git proof before held/private input,
+initial native network/fork/ALL-write/security-exec denial, strict old307
+external pins/original producer/current-source/input/SH/FD/version holds,
+291 live guard through stdout/final sample, bounded900s/2MiB IPC. Frozen shape
+ranges drive complete-small NC collection with partial/unexamined accounting,
+64/4MiB limits; source binding uses322's typed batch/full25 factory, all values
+remain private. Preserve static319 history versus NEW execution lineage. A
+later actual run needs separate registration on an observed clean assembly;
+this entry is engineering scope only, not activation/source matching. QC321
+completed its own zero-query scope; no backtest is yet ready or launched. One
+final push remains deferred until real completion or a concrete blocker.
+After319–323, main124 record/active-document/boundary/EXACT-package checks
+passed5.07s. Matching-only fetch kept origin41d729af unchanged. Commit ONLY
+these completed pure pairs and record; separately authored new323 front drafts
+remain unactivated/uncommitted until qualification. No final handoff or push.
+
+## 324. Final pure-pair format correction and distinct validation lineage (2026-10-25)
+
+Before the intended local commit, staged diff checking stopped on one trailing
+blank line in the route peer test. NO commit or push occurred. Removed exactly
+one final LF (no assertion change), then updated ONLY its child code-pin in the
+binder and the matching expected literal in the binder test. No parser, route,
+source-join, privacy, authority or custody guard changed. Section322 remains
+the preceding-image validation, not relabelled as these later bytes.
+
+| Final image | Bytes | SHA-256 |
+| --- | ---: | --- |
+| tests/test_insider_buying_sec_feed_nc_route_v1_review.py | 9,733 | b76815992a26b3f5c4816213a70c8ee21590ad09296692e7d3fc137402e070c0 |
+| research/insider_buying_sec_feed_nc_source_binding_v1.py | 14,896 | 90af57a48c5a3aaac3f77edf94bd92be795e1d957c5c4b1116afe8e97ae9698a |
+| tests/test_insider_buying_sec_feed_nc_source_binding_v1.py | 14,149 | a3f724d471ccc10a7c6718a860a1bc86a73e84e1debe94ee1340e95f13ddb457 |
+
+Main OBSERVED the same506 focused checks green18.15s on these final images,
+with native initial process-tree network/security-exec denial and restricted
+fresh-privateTMP writes. Separately reran the strong invented full25/max4,096
+route proof under initial network/fork/ALL-write/security-exec denial, -I-S-B,
+148 compiled/rechecked manual images; inventory
+`5d7492f2544d9e82c3d20c46306b73c6948445c4b5af12355a48c8f5251166c8`.
+Exit0/2,037,034,417ns;1,228,800 invented payloadB,150 source rows,1 candidate,
+4,095 unmatched and147,081B public witness,291 live through stdout/final sample.
+This is base1e706972 plus explicit five uncommitted pure/test images, NOT a
+clean actual-source assembly or source observation. No actual source/contact,
+namespace, provider/QC call, output acquisition or backtest. The unfinished323
+front is excluded from this proof and the completed pure-pair local commit.
+Final proof glue SHA-256
+`c012f8a2673ac8b49df4a5cdb27b70bd5bef02d3bf1290f51ce4150ffaf59e18`
+is separate orchestration, not a committed source image.
+All original/frozen executed bytes, nine OPEN P2s and readiness gates unchanged.

@@ -1,0 +1,113 @@
+{
+  "schema": "tpr-ext26-mia-recovery-outcome-v1",
+  "study_id": "TPR-CAP-TILT-EXT26-20261010-v1",
+  "candidate_id": "TPR-CAP-TILT-EXT26-OFF-BASE-v1",
+  "arm": "tpr_off",
+  "project_id": 37650980,
+  "backtest_id": "e3324aef9bd2af2caf16a32468eeb101",
+  "actor": "quantconnect-built-in-mia",
+  "operation_id": "TPR-EXT26-MIA-RECOVERY-20261012-001",
+  "observed_look": 20,
+  "observed_looks_total": 20,
+  "cloud_looks": 18,
+  "historical_local_looks": 2,
+  "codex_off_attempts_consumed": 3,
+  "codex_on_attempts_consumed": 0,
+  "genuine_mia_recovery_jobs": 1,
+  "period": {
+    "start": "2021-01-04",
+    "end": "2026-10-09",
+    "warmup": "2020-09-01",
+    "expected_valuations": 1449,
+    "expected_decisions": 301
+  },
+  "terminal": {
+    "status": "Runtime Error",
+    "completed_flag": true,
+    "reported_failure_clock": "2024-07-12 00:00:00",
+    "reported_error": "membership weight outside bounds",
+    "error_bytes": 454,
+    "error_sha256": "7e7df7da3fcb321a0d6114d88683eeaea52b8c241018ded24cb1baee770adb49",
+    "offending_etf": null,
+    "offending_member": null,
+    "raw_weight": null,
+    "weight_type": null,
+    "source_asof": null,
+    "root_cause_proven": false
+  },
+  "terminal_receipt": {
+    "operation_id": "TPR-EXT26-MIA-RESULT-STATUS-20261012-003",
+    "envelope_bytes": 1299746,
+    "envelope_sha256": "aace232f310ae1cb4c109ae504b5d27ca77faea3a7978934642818d91e4df7d5"
+  },
+  "post_terminal_source": {
+    "operation_id": "TPR-EXT26-MIA-SOURCE-POST-20261012-004",
+    "status": "COMPLETED",
+    "stable_inventory": true,
+    "source_archive_bytes": 232051,
+    "source_archive_sha256": "acd4e7afd4b17ea0b5e7212acf07714bdb76b51614a8e7e0b9cc10787a14c79b",
+    "diff_bytes": 132576,
+    "diff_sha256": "83d07cded083c6dd0d40f2b77447fd4b924e0d9631e82b8a72bed5eb82db1b47",
+    "all_12_hashes_equal_to_prerun": true,
+    "helper_sha256": "bce4182d09dc9d31132cb54d404712471ddff5e2b706c2988fbe9fcc48c93aea",
+    "main_sha256": "8f21e51f7db525795601a4364d627a19e9b5479e479f5f47647e113be0082477",
+    "gui_build_label": "ef4179-5f7e58",
+    "full_native_compile_id": null,
+    "compiled_source_proven": false
+  },
+  "native_collection": {
+    "operation_id": "TPR-EXT26-MIA-RESULT-NATIVE-20261012-001",
+    "status": "FAILED_OR_UNCERTAIN",
+    "summary_count": 1,
+    "summary_validated": false,
+    "index_count": null,
+    "nav_observations": null,
+    "order_count": null,
+    "order_pages": 0,
+    "fees_observed": null,
+    "full_private_replay_verified": false
+  },
+  "summary_format_diagnosis": {
+    "operation_id": "TPR-EXT26-MIA-SUMMARY-DIAG-20261012-003",
+    "envelope_bytes": 9331,
+    "envelope_sha256": "a2acd54bfe08d45d9d964d1d01ff08da5f198f9a5e20d9e28cba9850a80e84ed",
+    "envelope_identity_verified": true,
+    "log_line_bytes": 8192,
+    "json_bytes": 8158,
+    "json_sha256": "bfc8630f3b3feb243fddb90a4a0a37cc43124815a20ee7a3faffac4aa8723eda",
+    "json_error_category": "Unterminated string starting at",
+    "json_error_position": 8145,
+    "ends_closing_brace": false,
+    "truncation_layer_proven": false
+  },
+  "per_sleeve_accepted_outcomes": {
+    "SPY": null,
+    "QQQ": null,
+    "SOXX": null,
+    "XLV": null,
+    "REMX": null,
+    "XLE": null
+  },
+  "matched_study_complete": false,
+  "accepted_metrics": null,
+  "strategy_accepted": false,
+  "canonical_admission": false,
+  "on_launched": false,
+  "local_candidate_ported": false,
+  "additional_source_changes_authorized": false,
+  "additional_jobs_authorized": false,
+  "open_findings": [
+    "TPR-EXT26-F012",
+    "TPR-EXT26-F017",
+    "TPR-EXT26-F018",
+    "TPR-EXT26-F019",
+    "TPR-EXT26-F020"
+  ],
+  "next_action": "Owner may ask genuine Mia for read-only diagnosis of exact failed OFF job and propose correction; no edit/drop/clip/renormalization/rerun. Reconcile every source change and prospective authorization before another effect.",
+  "limitations": [
+    "Runtime Error is not a completed full-window comparison.",
+    "Partial dashboard metrics and order totals are not accepted returns, usable fills/fees or independent sleeve P&L.",
+    "All executed source/inputs/bundles and prior failure receipts remain immutable.",
+    "No fourth Codex OFF attempt, implicit cap reset, ON launch, parameter/date changes or canonical readiness."
+  ]
+}

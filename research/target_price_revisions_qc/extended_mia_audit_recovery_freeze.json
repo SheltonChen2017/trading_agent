@@ -1,0 +1,135 @@
+{
+  "schema": "tpr-ext26-mia-audit-key-recovery-freeze-v1",
+  "operation_id": "TPR-EXT26-MIA-RECOVERY-20261012-001",
+  "actor": "quantconnect-built-in-mia",
+  "owner_instruction_sha256": "00501bc212073a9876149458a1be60d9326c6838f43d55af72ebeb40827b4984",
+  "registered_parent_head": "fcf5b792cc7daf30aec58681159eec84fe7cb852",
+  "created_utc": "2026-10-12T06:47:00Z",
+  "expires_utc": "2026-10-12T07:47:00Z",
+  "project_id": 37650980,
+  "candidate_id": "TPR-CAP-TILT-EXT26-OFF-BASE-v1",
+  "study_id": "TPR-CAP-TILT-EXT26-20261010-v1",
+  "genuine_mia_only": true,
+  "new_codex_attempts": 0,
+  "codex_attempts_consumed": 3,
+  "legacy_binding_attempt": 3,
+  "observed_looks_before": 19,
+  "prospective_mia_look_ordinal": 20,
+  "new_look_count_on_actual_new_job": 1,
+  "no_attempt_allowance_reset": true,
+  "no_automatic_retry": true,
+  "no_source_or_economics_edit": true,
+  "compile_limit": 1,
+  "backtest_limit": 1,
+  "source_read_limit_files": 12,
+  "source_read_max_each": 1048576,
+  "source_read_max_total": 8388608,
+  "mia_tool_calls_max": 24,
+  "result_read_calls_max": 10,
+  "result_read_max_each": 2097152,
+  "result_read_max_total": 16777216,
+  "existing_included_resources_only": true,
+  "no_purchases_or_upgrades": true,
+  "cloud_files": {
+    "cap_observer.py": {
+      "bytes": 8712,
+      "sha256": "cad8a3306f6b459bc8bf187c8fd8b8bb980c7b1dc0d85465fba11dd318b70c4d"
+    },
+    "cap_tilt.py": {
+      "bytes": 14373,
+      "sha256": "262f568b7c0fe0b08af8a26896431465c17746bcd32e9addc568f58631e11a5c"
+    },
+    "extended_completion_successor.py": {
+      "bytes": 6084,
+      "sha256": "336e67bff64f484b57e49e92209e22bf9471118c0ee8b8d13c3ff7b8b2511fb6"
+    },
+    "extended_compressed_store.py": {
+      "bytes": 13987,
+      "sha256": "d661b5752c35b9dd04f783f5d78850f453d5f5f299874e5cf19700599df2356e"
+    },
+    "extended_config.py": {
+      "bytes": 428,
+      "sha256": "5790ca63661f0f54a7734565342d141cbaba7797eb8c7b1e488c7ad573b01bd0"
+    },
+    "extended_construction.py": {
+      "bytes": 10567,
+      "sha256": "e61bd56ad3ff5147eedf3220b40ef77743f8e13bff9919f80bc3f684a3fe27c0"
+    },
+    "extended_core.py": {
+      "bytes": 37572,
+      "sha256": "706ed5efdcb3999400c5349dc8b5200be1d48c4bb01cbfc7fb080608a679d5da"
+    },
+    "extended_loader.py": {
+      "bytes": 51383,
+      "sha256": "f5cc9d9cb56ebbae2a22f02d6b6b7041468eadbc77d87ed2e161c9ce119a3820"
+    },
+    "extended_runtime_successor.py": {
+      "bytes": 6712,
+      "sha256": "2e6bb5c82f356ee7ece4811c9d634ce57d48533d408d4b57b8aee41de062517b"
+    },
+    "main.py": {
+      "bytes": 59961,
+      "sha256": "8f21e51f7db525795601a4364d627a19e9b5479e479f5f47647e113be0082477"
+    },
+    "research.ipynb": {
+      "bytes": 1029,
+      "sha256": "af27200522531d426185f4daa25d23610c164134e3ab7fdf38919616d0d5b344"
+    },
+    "audit_key_recovery.py": {
+      "bytes": 7490,
+      "sha256": "bce4182d09dc9d31132cb54d404712471ddff5e2b706c2988fbe9fcc48c93aea"
+    }
+  },
+  "frozen_inputs_and_economics": {
+    "study_freeze_path": "research/target_price_revisions_qc/extended_study_freeze.json",
+    "study_freeze_sha256": "90bdec5520b29bd932a3ec730f7c4c40c544ea7582731ad6680ef34ea8cf4067",
+    "calendar_path": "research/target_price_revisions_qc/extended_calendar.json",
+    "calendar_sha256": "3eccdf3cf9a2542ffd249983241d5747c2ecd4e21bc4a71f7f826c77ec1fe53d",
+    "immutable_completion_bundle_sha256": "daaf0c33fd837b9896c99d1759e67454a9f3027d478879c5e60015af1f099934",
+    "config_sha256": "5790ca63661f0f54a7734565342d141cbaba7797eb8c7b1e488c7ad573b01bd0",
+    "original_writer_sha256": "d661b5752c35b9dd04f783f5d78850f453d5f5f299874e5cf19700599df2356e",
+    "start": "2021-01-04",
+    "end": "2026-10-09",
+    "warmup": "2020-09-01",
+    "valuations": 1449,
+    "decisions": 301,
+    "off_signal_packet_reads": 0,
+    "remaining_on_uploads_not_authorized_by_this_scope": true,
+    "ar_disabled": true,
+    "all_membership_identity_rules_and_economic_parameters_unchanged": true,
+    "no_outcome_tuning": true,
+    "no_gap_fill_or_partial_window_relabel": true,
+    "source_input_clock_pit_survivorship_overlap_limits_unchanged": true
+  },
+  "baseline_reference": {
+    "operation_id": "TPR-EXT26-MIA-SOURCE-BASELINE-20261012-003",
+    "receipt_bytes": 5865,
+    "receipt_sha256": "1d2f7cb390bcced2547a8f6b1e22b2b1a2800149e741535bf6e65e3624223f86",
+    "sources_bytes": 224315,
+    "sources_sha256": "c24f20eb9733bc9f4d3dea79b86223857d4c2e99d232955066fe9939baed1af3"
+  },
+  "post_reference": {
+    "operation_id": "TPR-EXT26-MIA-SOURCE-POST-20261012-003",
+    "receipt_bytes": 7152,
+    "receipt_sha256": "271d7dcf7ba074396124b1ef187b03b6f6ae634453e27da6365712e1e0462253",
+    "sources_bytes": 232051,
+    "sources_sha256": "24baf5029130b927f88e8e760d7828656ac25c751ecd29db6b333b9e6ed75505",
+    "diff_bytes": 132576,
+    "diff_sha256": "83d07cded083c6dd0d40f2b77447fd4b924e0d9631e82b8a72bed5eb82db1b47"
+  },
+  "source_inspection_operation": "TPR-EXT26-MIA-RESULT-SOURCE-INSPECT-20261012-003",
+  "source_inspection_plan_sha256": "0532e7463fc575fb565bedbaa096326ac6940aec76411f07d4363d206cdd9467",
+  "acceptance": {
+    "compiled_source_proven": false,
+    "full_window_native_accounting_proven": false,
+    "accepted_metrics": null,
+    "genuine_completed_status_alone_is_insufficient": true,
+    "retain_all_audit_rows_chunks_index_sidecar_hash_gzip_readback_and_collisions": true,
+    "native_nav_dates_and_frozen_1601_ny_clock_required": true,
+    "native_orders_fills_fees_and_coverage_census_required": true,
+    "f017_open": true,
+    "f018_open": true,
+    "canonical_admission": false,
+    "trading": false
+  }
+}

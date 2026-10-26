@@ -2174,8 +2174,11 @@ price, strategy result or physical cause was admitted. R is SPENT and the
 booked floor is336shared/259development/52infrastructure/699cells. S's local
 eligibility use then refused a probe metadata identity predicate after two
 HTTP200 metadata responses(323.63); S is SPENT, with no status/price request.
-T(323.64) prepares a narrower predicate-only diagnosis, not a replay, QC price
-transfer or strategy continuation. Q does not identify P's historical changed field;
+T's narrower predicate-only diagnosis then passed once(323.66), observing
+only QQQ/REMX CUSIP-vocabulary predicate failures in its nine public probes.
+T is SPENT. U(323.67) prepares an offline syntax inspection of its exact two
+retained DATA leaves, not a T/S replay, QC price transfer or strategy
+continuation. Q does not identify P's historical changed field;
 no cross-job native-SID continuity or market-wide absence is inferred.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
@@ -61524,3 +61527,196 @@ QC/capacity/job, new entitlement or strategy/price/NAV admission follows. All
 false flags,336/259/52/699, cloud P source and one final matching-lane push
 reservation remain unchanged; monitor stays PAUSED. Record actual evidence
 before deciding a real correction or concrete source barrier.
+
+### 323.66 Actual T observed two CUSIP-parser predicate failures; SPENT
+
+At clean1147e69919d6bbe15b46c369a8c6bf8937481ab0, sole T parent ran
+2026-10-26T04:18:36.434983Z..04:18:41.516991Z, actual0/stderr0/no bound.
+Stdout27598bytes SHA78ae1ef05dc3d0e88614f89c66e20e4106dcc46e6df1072972a071e70bb209e2.
+Sole supplied-output native validator04:18:41.517259Z..04:18:45.630466Z,
+actual0/stderr0/no bound, identical stdout pin/output_authenticated=true.
+Report27468bytes SHA96a716cd9e3cae52522739df8efc876cde867ea6b51a6396ca09a57b4dc6127a.
+Accepted observation ONLY; all source/master/PIT/paid-tier/price/NAV/strategy/
+paper/live admission flags remain false. T parent/validator/claim/control are
+SPENT, never rerun/repaired. No test/edit during this clean actual use.
+
+Two application metadata intents/responses, both200; physical request count
+unmeasured. Exactly one stock row/eight fund rows, no unexpected ticker row,
+one candidate at each of nine fixed probe indices. Current QCOM plus six fund
+probes passed every tested noncollision predicate; the remaining two public
+fund probes are index2=QQQ and index5=REMX. Their ONLY failed identity predicate
+is cusip_vocabulary_valid. CUSIP fields are NONEMPTY with29 and39UTF8bytes,
+respectively, canonical-field SHAs
+96a3c0eecde75e0960124e5fbad8a3a95a7b6e816c2efcff3d6e3e006c22c181 and
+47842f36e1fbabb8b92b9c402d04295b2d125515485239570e1ad906245b5967.
+All their other tested format/category/exchange/USD/delisting/date/interval
+predicates passed. Their same/cross-table CUSIP collisions are UNKNOWN because
+the strict parser returned no vocabulary; all other observed collision flags
+are false within THESE returned subsets. No global absence is established.
+
+This identifies a current vocabulary/parser compatibility boundary, not an
+authentication refusal or missing CUSIP field. Lengths alone do NOT identify
+the separator or prove that every token is valid/unique. Do not guess a format,
+choose the first token, waive collision/identity checks or declare the original
+S failure cause authenticated: its full-query bodies were not retained. T's
+current filtered observations may inform a prospective verified correction.
+No subscription expiry or early2021 access is established; no price/status
+request, QC/capacity/job, original6151/private control read or source mutation.
+
+Retained successful private DATA buffers, byte-backed and full-current-
+metadata/security validated through T return:
+
+| Leaf under newrule_sharadar_probe_metadata/R323-20261025-T | Bytes | SHA256 |
+| --- | --- | --- |
+| stocks-probe.csv | 225 | 0f0578e8f3067bfc40b3e32bcec8ad05d42087b3a4f1428a4d993cc9db7eb9bf |
+| funds-probe.csv | 899 | 5e37400fd38313f4980f4947ef1e9aeafc52e4cf3566b64ee686bc91c9b9fdaa |
+
+These retained source bytes are not a capability, master or historical-
+preservation receipt. A separately frozen, exact-byte scoped fresh consumer
+may analyze ONLY these two DATA leaves under new current-security checks;
+T claim/report/markers/operations remain excluded. No broad control inspection
+or request replay follows. No look/cell;336/259/52/699 and cloud P remain.
+
+### 323.67 Prospective U offline CUSIP syntax diagnosis and strict parser
+
+The owner's status question asks QC versus subscription versus unknown cause.
+Root reports the separate issues honestly: initial upload/session/collaborator
+barriers passed later gates; native QC's exact-date stock-price absence remains
+the immediate strategy stop; the alternative vendor path now has a measured
+CUSIP-parser compatibility boundary rather than a demonstrated expired product.
+Keep those findings separate. No valid current six/eight comparison exists.
+
+Under the continuing research/recovery/Claude waiver and255.2 delegation,
+choose U: an OFFLINE, native-network-denied, newly claimed fresh consumer of
+exactly the two T source DATA files/pins323.66. No more HTTP is needed to
+inspect their retained syntax. This is not a T/S parent/reader replay or a
+read of their control-state/claim/report/markers. Source bytes are authenticated
+against the externally retained T pins, with owner0600/regular/nlink1/no-follow,
+current full ten held/named metadata and native empty-ACL/stable ordinary
+provenance-xattr checks held through analysis/publication/return. T did not
+export historical full metadata: U is PROSPECTIVE FRESH USE/current security,
+not fabricated continuous/historical preservation or an old ctime/device
+waiver. Old v4 and every spent historical assessment stay frozen.
+
+The new pure syntax helper must consume the complete field, never find valid
+tokens and discard the rest. A prospective strict vocabulary may support only
+nine-character ASCII identifiers with explicitly bounded comma/ASCII-space
+separators, complete parsing and uniqueness; missing/empty/duplicate/partial/
+unsupported forms refuse, and every token is retained rather than first-token
+selection. Actual source separator character ordinals/token counts/legacy
+versus proposed parser counts and canonical hashes may be emitted, never raw
+CUSIPs/security rows or field values. Existing T predicate receipt is recomputed
+from byte-backed inputs; a syntax result is not historical active-CUSIP/share-
+class/effective-interval or strategy-price admission. No frozen composer/S/T
+parser is edited. Validating a new grammar does not restore S's spent claim.
+
+New U parent90s/outer120s/once-only supplied-output validator20s/128KiB/max8
+controlfiles; exclusive claim/fsync before source DATA access. Native producer
+denies ALL network/Keychains/security CLI and artifact read-data except the
+two literal T source leaves plus own U control; artifact writes only its own
+U control and exact setup-parent directory creation, support writes inroot.
+Metadata traversal needed for no-follow chain authentication is broader than
+read-data access and must be explicitly qualified, never a no-metadata-probe
+claim. Validator denies all production artifacts. Source/helper/current clean
+host/branch/HEAD bindings and actual0 plus matching validator0 remain mandatory.
+Only own child kill/reap, no cleanup/retry/permission/attribute/source change.
+
+Prospective leaf newrule_sharadar_cusip_syntax/R323-20261025-U remains
+uninspected/unallocated. New implementation/tests/root audit and separate exact
+committed run decision are still required before source access. No U private
+read, Keychain/provider/QC operation occurred at this entry. Every formal/
+price/NAV/strategy/paper/live/paid-rights flag stays false,336/259/52/699
+unchanged, monitor PAUSED and one final matching-lane push reserved.
+
+### 323.68 Owner recovery scope, Insider resource monitor and exact U freeze
+
+Owner October25: "skip claude review for now.fix the parser and resolve the
+price coverage gap. in the meantime, set up a monitor on Insider Buying who's
+currently using safari/qc. when that lane pushes, continue with the bactesting".
+This supplies current lane parser/price recovery and research continuation
+authority, not independent acceptance, spent-attempt renewal or funded/paper/
+live authority. Continue locally; NO Safari or QC contact until the resource
+handoff. Data/source/processing rights and technical/run/attempt gates remain.
+
+The OpenAI Docs skill was used for product scheduling; official documentation
+supports a recurring follow-up in this existing chat. Reused, rather than
+duplicated, automation analyst-claude-review-forward-pair, now ACTIVE as
+"Analyst: resume after Insider push", every10minutes. Its old Claude-review-
+only prompt is superseded. Insider thread01a07a8e-13b5-7b51-b8eb-2f8acae5ce13
+(Feature - insider Buying) is active; latest visible handoff is still using
+QC. Read-only live origin refs/heads/codex/strategy-insider-buying baseline
+41d729aff80752cdc1ad6ef73690d9c59711d712 is excluded. A NEW matching push plus
+completed pushed handoff triggers Analyst continuation, not other-lane review
+or editing. No other checkout/branch fetch, message, interruption or private
+artifact access occurred. The monitor stays quiet until actionable change,
+pauses on its one handoff trigger, then uses fresh applicable idle/capacity/
+source/input gates: a push is not a continuous exclusive resource lease.
+
+Root personally read the public Sharadar prices-page-declared JavaScript
+1906-370e4d69c2fd7f15.js; its TICKERS CUSIPs description explicitly says
+"Space delimited in the event of multiple identifiers."
+[Vendor metadata description](https://sharadar.com/prices).
+This establishes documented vocabulary syntax, not the retained fields' actual
+separator/validity, historical active identifiers or global collision absence.
+I323-034 P2 CONFIRMED: frozen comma-only composer cannot consume this documented
+multiple-identifier form. Correct PROSPECTIVELY using new complete-vocabulary
+parser; never change historical composer/seed-archive/M/O/S/T bindings.
+
+New U helper scripts/arv2_r298_sharadar_cusip_syntax.py14700bytes SHA
+cab79cb04bbc0788b37138b74526fdd518b7d0e90ee7ceeca546227f91a7b72b;
+tests10292bytes SHA166d1a761ff7f41e57298ede6a45f3202248902b1f07948cae412e93424262ca.
+Helper profile NO-LF2695bytes SHA
+3e3ad2dab1b8953722eb64325b1c8807f8a46c94b944faeeaa082c378fc51e90,
+plusLF2696bytes SHA55a8b08f54d79adcf60613fdd3b6527ebcabcf10b5f52ae52da4e9bf83d1b4af.
+New caller scripts/inspect_arv2_r298_sharadar_cusip_syntax.py26639bytes SHA
+2a4cde341f943bd653ff2476381aab63c5facfa7a0d163044ece5217b703bcf7;
+tests23002bytes SHAb1e8e97bd3ee0802ee680617c61272c76d1d3f4e56a41a8e2cb5f46ae1b36678.
+Exact caller canonical+LF profile20869bytes SHA
+3d83fdd4dbae3abdeb2615faa4e69b68ea06813a69f311bb668651275f5fc0c5.
+All152 selected pins matched, including final T caller4120779c; selected pins
+are not whole-interpreter integrity. T closed receipt canonicalNO-LF25650bytes
+SHA84449eda55a1aad5b7139c1c2561457cf84c439c60204896ef912d798ae8c637
+was computed from retained external redacted output under native denial,
+not by rereading T controls. U binds this receipt and both323.66 DATA pins.
+
+Root read all new sources/tests. Native-denied final focused validation:
+251distinct passes3.40s =74helper+90caller+86record/document+1research closure.
+New sources/tests compiled in memory without bytecode; dispatch_fence absent.
+Root memory-only actual-exit omission caught1expected failure0.15s; restored
+finally and disk source unchanged. Author final74passes3.49s and90passes3.57s
+overlap root, not additive. Author duplicate omission caught2expected failures
+0.16s; partial-token fullmatch-to-search omission1/0.05s; SourceGuard normal-
+exit verification omission1/0.14s, restoredfinally. Initial mutation harness
+collectionerror0.09s omitted --ignore=artifacts and hit native artifact denial;
+not mutation sensitivity evidence and isolation was not weakened. Earlier
+71/78/90pass subsets overlap, one interim pending-pin deselection is retained.
+No complete Codex suite or independent review ran.
+
+I323-035 P2 pre-use native directory-descriptor incompatibility was reproduced:
+O_RDONLY and O_EVTONLY directory opens require denied read-data. New U-only
+O_SEARCH/no-follow traversal fixes source AND Store ancestors; full-ten held/
+named metadata/security applies to source directory/leaves, while ancestor
+chains retain dev/ino metadata checks, not full-ten continuous security.
+Direct separate synthetic native child passed full Store create/claim/report/
+fsync/security and full SourceGuard under actual policy; inert /usr/bin/true
+parsed exact SBPL. Denials tested other source/control data, directory listing,
+network connect, Keychain metadata and outside writes. Both user/system
+Keychains/security CLI are denied; no actual Keychain was read. Exact setup-
+parent exception denies data/unlink/xattr/mode/owner/flags/times, leaving create;
+operational code only mkdirs it. One synthetic probe template error and initial
+descriptor-policy failures remain engineering evidence, not private-source
+attempts. Host suspension/uninterruptible I/O remain deadline qualifications.
+
+D-U: after THIS freeze is committed with all four new files and clean exact
+root/branch/HEAD, invoke U observe ONCE with that clean HEAD and exact caller
+SHA above. The new U control remains uninspected/unallocated before invocation;
+native producer may freshly read ONLY the two fixed T DATA leaves under323.67,
+not T claim/report/markers or any old operation. Preserve original FDs/current
+full metadata/security through final normal guard return. One source stage,
+claim/fsync first, parent90/outer120/validator20; actual parent0 AND native
+supplied-output validator0/empty stderr/unbounded=false plus exact closed
+source/receipt/report pins required. Nonzero/unknown/late publication failure
+is inadmissible even if a report exists; claim consumed or ambiguous, no retry,
+repair or cleanup. Retain only finite counts/hashes/separator ordinals, never
+tokens/rows/keys/raw exceptions. No provider/QC contact, strategy look or cell.
+Root/advisors are same-round engineering checks, not independent review.

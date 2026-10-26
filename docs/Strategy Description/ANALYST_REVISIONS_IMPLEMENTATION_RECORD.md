@@ -837,8 +837,10 @@ A19's dated-witness job ran to Runtime Error, but fresh access_idle blocked
 its detail read(323.33). K's read-only reconciliation likewise stopped after
 three exact busy observations(323.36). Both are spent; no identity was retained.
 R298's lingering code environment was then stopped alone, other lane retained.
-Next fresh post-remediation read-only exact-job authentication, not a relaunch,
-then privately identify/verify the holding before the six/eight comparison.
+L's post-stop read passed all fresh checks and privately matched the exact
+2022-10-21/24 missing-stock witness to one of6151bindings(323.38); L is spent.
+Next a separately frozen offline original-TICKERS-row authentication, not a
+provider/price query or relaunch, before any verified source remedy/comparison.
 No guessed stale-price/holding bypass.
 One final push; no funded or paper/live deployment authority is inferred.
 
@@ -2141,6 +2143,9 @@ That K reconciliation subsequently exhausted its exact busy schedule(323.36),
 then only R298's owned Code Environment was visibly stopped. L's separately
 frozen post-stop read-only consumer(323.37) must establish real fresh idleness
 and unchanged source/job before any detail read. K and J remain spent.
+L subsequently passed this scope once(323.38), recovered the dated witness
+and matched the genuine catalog; no source/price repair or performance cell.
+Next the bounded original-TICKERS evidence contract, not another QC launch.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
 V3 is spent after its
@@ -59629,3 +59634,219 @@ would require a new common family/profile and transparent changed semantics,
 preserve full holdings/subscriptions/split/quote/accounting and positive-target
 RAW checks, and still cannot admit performance using unauthenticated NAV.
 No strategy economics/data-admission rule changed in this round's L consumer.
+
+### 323.38 Actual L error observation and unique private catalog match
+
+At clean001cbcb4f9bded1bc3e85e5519410a8699fc2eac, sole L parent ran
+2026-10-25T23:39:31.417369Z..23:40:14.522484Z, actualexit0/stderr0/no bound.
+Stdout9,475bytes SHA19b56bf8a3ea26fdfb481c5b76f26cf37898650842588731499d963e5f0d4e7e.
+Native supplied-output validator23:40:14.522685Z..23:40:18.038541Z exited0/
+stderr0, output_authenticated=true, outer0. Report9,346bytes
+SHA471ccccc268b223576f8aa5cd4518bf4ac6a720a71f5653a565150c9c63231fe.
+L/parent/reader/join use are now SPENT; no leaf reread/repair/retry. Finalrecord
+86passes1.07s overlap178, not additive. No tests during actual use.
+
+Actual0 is successful READ-ONLY ERROR OBSERVATION, NOT a completed strategy.
+Thirteen application intents, idle observationindex0, exact source/history/
+compile/access checks before ANDafter, final fresh input admission passed.
+No lock/source/member/permission/control edit, capacity, compile or job request
+was made. This establishes current post-stop idleness and the receiver's
+operation for this scope, not the historical cause of A19/K's busy state,
+causal proof that the UI stop was the sole remedy or continuous source/access
+security. Booked floor334/259/50/699 unchanged; result_cell0/strategy acceptance
+false and every formal/PIT/master/paper/live flag remains false.
+
+The exact A19 job b850c8193949015bc59c41d0e1434229, compile
+95f2715b63dde55edbac79da7e88d3aa-f8d3daabe131b918cd28aeaab059b9b9,
+still has Runtime Error. Selected failure known raw_reference_census_incomplete,
+Pythoncategorynull/raw_error_retained=false/cause_authenticated=false. Actual
+v2 context: reference2022-10-21, decision2022-10-24 at09:20, calendar valid,
+requested48/returned47/missing1heldstock, technicalSIDDateon_or_before_reference1.
+No extra History call or repeated A18 probe. Complete sole dated identity
+witness9daff6253d858c3762ecb0f5fbe9d62cef6cb896afcb027693b5e3ea59dceb75;
+context canonical-ASCII/no-LF SHAe9f74508de4027874305296ddbf8ef325e6dbf7e2c7f0e2b55fb76fade9bd8b0.
+These dates are now actual A19 observations, not retroactively invented A18
+timestamps or proof of historical absence/cause beyond the returned census.
+
+The separate credential-free/native-network-denied worker uniquely matched
+that witness against ALL6151 genuine authenticated runtime bindings and passed
+fresh reconstruction/admission afterward. Join receipt canonical/no-LF
+SHA5ee8bf62329f85a24a91ed7bd3828313c386ea38c59a2e678dad57af7c86886e;
+catalog SHA73ba4ac73c0485b2d274c31b5ec740a97a64de27a4f6dfbfb9cb63bc8e7cd15f.
+Matched binding row SHA580f7c4fe58c41f4fd4922dfb2373724d639b414bf14abe9522dcf7f55c6ccc8;
+whole binding row1975b7c6f03af2f2dc22a8986144686c31cb468cf41db5849ba75e710e08e8b8;
+original source-row SHA5d9097a2c0dfe4dc736eb28d38b8adbc9e2f6e1b6c2adfd1c67d00505adb0ef9;
+identity-evidence SHA369a4a1cc783f543f5b668642b35b396949b3c75c8f1b119bd698bc09b6d62f6.
+Source/master/package/calendar/D2/A11/profile bindings all match the separately
+pinned input path. No raw identity/FIGI/ticker/cap/price/catalog row was printed.
+
+Same held genuine construct's catalog facts report reference ANDdecision INSIDE
+the clipped candidate interval, and current source snapshot AFTER decision.
+This rules out only an out-of-declared-clipped-interval explanation for this
+matched row. It does NOT prove an actual listing, a delisting/merger/halt,
+permanent historical ticker, daily bar coverage, immutable historical
+availability, price remedy, targetweight0 or terminal payoff. No strategy price
+was substituted and no holding was dropped. Practical E323-001 remains OPEN
+at missing required RAW-close authentication; a hash match alone is no remedy.
+
+Next original-source qualification is OFFLINE ONLY: authenticate the one
+fixed original TICKERS manifest/sidecar/ZIP/member and exact full CSVrow bound
+by the above source-row/identity evidence, retaining no raw output. Reuse
+source-native empty ACL, pinned vintage xattr fingerprints and all ten full
+held/named metadata fields under a NEW fresh-use contract; never replay old
+v4 assessment/device projection or refresh historical ctime/device pins.
+Source bytes must remain unchanged through the consumer return. Do not traverse
+actions/fundamentals, infer permaticker by stripping issuer_id, invent a provider
+route from a current display ticker, contact a provider or accept a price yet.
+Current-vintage row/range evidence remains qualified research, not formal/PIT/
+permanent master admission. Freeze exact source/protocol/run before private use.
+
+### 323.39 M prospective offline original-row authentication and fresh-use policy
+
+L's authenticated dated witness and unique full-catalog join permit a narrow
+next question: does the exact original SF1 TICKERS row reproduce that candidate,
+and how do its RAW first/last price-date declarations relate to the actual
+2022-10-21 reference/2022-10-24 decision? This is original metadata qualification,
+NOT a provider price request, historical-ticker admission, replacement acquisition,
+reconstruction of a lost failure, source-stop waiver or changed strategy rule.
+The current owner direction waives Claude review for this ongoing lane recovery;
+Codex/same-round advice is not independent review. No funded/paper/live scope
+is supplied by the broad eventual small-cash goal. All formal flags stay false.
+
+Select one credential-free/native-network-denied consumer M, fixed private
+control artifacts/analyst_revisions_v2/newrule_reference_ticker/R323-20261025-M,
+uninspected/unallocated before use. It exclusively claims/fsyncs BEFORE any
+private-source read. Exact designated Darwin/POSIX Python3.13/root/branch,
+clean committed HEAD/caller/profile and selected dependency pins must match.
+One joint300s alarm/deadline covers private admission, source consumption and
+publication, with host suspension/uninterruptible-I/O qualification; a separate
+supplied-output validator must bind the actual parent exit. Claim is spent even
+if no source read occurs; partial/unknown/nonzero is never safely unspent.
+No retry, old control reread, cleanup, metadata repair, credential/QC/provider
+access, new backtest/compile/capacity request or new research look/cell.
+Floor334shared/259development/50infrastructure/699cells unchanged.
+
+New full source guard holds the no-follow absolute directory chain and exactly
+three original capture leaves through consumer return. Current ten-field
+dev/ino/mode/uid/gid/nlink/size/mtime_ns/ctime_ns/flags held/named equality is
+required, not a five-field-only check. Above designated ROOT, authenticate
+directory identity, not a newly invented private-directory mode/ACL policy.
+ROOT755, private descendants700, leaves600/current owner/nlink1 and original
+UF_TRACKED/UF_HIDDEN-only flag allowance remain binding. Native empty ACL and
+ordinary provenance-only xattr policy apply from ROOT down. The exact original
+capture directory instead requires all FOUR historical public xattr name,
+size and value-SHA pins unchanged from frozen v4: no decoded values, removal,
+attribute/settings changes, new device projection or learned-value refresh.
+All security/metadata snapshots are fresh bounded endpoint observations,
+NOT historical preservation, continuous integrity or hidden-xattr proof.
+Old v4 snapshot/preflight/assessment/device/twelve-ctime map remain frozen and
+spent; only its unchanged names-only helper/public four-value constants are
+reused. This NEW current-use contract neither retroactively accepts old
+refusals nor changes their metadata/security policies.
+
+Additional original capture scope is ONLY the exact original TICKERS manifest,
+marker and01-tickers-years-full.zip at
+sharadar_capture/arv2-sharadar-source-20260914T003329843989Z. Manifest
+94251ffdf0529b118ff331b98c4a144d97bc734380d7e7333f94045e4aa6f09b,
+exact65byte hash-plus-LF marker, archive4,937,076bytes
+a7b129f159631ee50f1eefd2be8d4215c1c7818880570c0ad0a79c76c25e51bf,
+sole member24,939,614bytes
+562577ea331805c4d50229b783e37216c9422c09d921b17dc950cf267ecf7697
+and291byte/28field header
+c9186ed191f4e51d5142287016dc99e3f80ecebed49aa63c3fa1ecf09e5d26f7
+must authenticate BEFORE CSV field interpretation. Unchanged manifest parser
+validates all declared archive metadata but opens neither ACTIONS nor SF1
+archive; native rules explicitly deny those two paths. Complete CSV census
+is bounded<=250000rows; exact selected full-row SHA5d9097a2 is unique. Original
+full-row/identity composer hashing is UTF8 ensure_ascii=false WITH LF, while
+genuine join/whole-binding/witness hashes retain their existing encodings.
+No issuer-id stripping or current display-ticker guess supplies a route.
+
+Fresh genuine input reconstruction/admission and ALL6151-binding join must
+reproduce L's exact context e9f74508 and join5ee8bf62, selected whole-binding
+1975b7c6 and source-row5d9097a2 before original metadata is interpreted. This
+separate existing input-package admission DOES read authenticated private input
+payloads; the three-leaf limit describes only the additional ORIGINAL capture,
+not all private bytes read globally. Repeat fresh reconstruction/admission
+and all source security/metadata postchecks before guard RETURN. Only after
+successful RETURN publish a closed redacted receipt/report; late guard/close
+failure cannot publish success. Opaque source locators exist only in memory,
+have redacted representation/no serialization and are discarded; no ticker,
+FIGI, CUSIP, exact raw source date, price or licensed row is emitted. No original
+source/evidence is deleted or changed. This consumer parses authenticated ZIP
+bytes in memory; in-root runtime support is not a claim that every interpreter
+or transient byte has whole-system integrity.
+
+The receipt can establish exact original-composer identity equality, hashes,
+raw first/last date relations, current-vintage Y/N/unknown delisting metadata
+and clipped-candidate interval relations. It cannot establish an actual2022
+delisting, merger/halt, exact daily bar existence, historical provider route,
+terminal payoff, targetweight0, independent permanent master, PIT or strategy
+performance. Missing RAW-close E323-001 remains OPEN regardless of a metadata
+match. A provider route/price consumer, if useful afterward, requires its own
+bounded justified identity/date/rights/protocol before contact; M grants none.
+Exact final source/profile/validation/run freeze follows before actual use.
+
+### 323.40 M exact one-use freeze and focused validation
+
+Authorize ONE observe of scripts/observe_arv2_r298_reference_ticker.py,
+--expected-head the clean commit containing323.38–40,
+--caller-sha25681ba47db277a5c20979490f9c0e901d4b5199a378fbb53b1be68a930463d6efc.
+Schema arv2-r298-reference-ticker-authentication-v1;139selected dependency
+pins are mandatory, no silent refresh. Canonical-plus-LF profile19,485bytes
+SHAa00e807bce90738b5b8324d6d34c615dd089733e895849beeeda60395c44370a.
+Claim/report publication and bounded parent stdout128KiB are new M only;
+actual0 AND exact native supplied-output validator acceptance mandatory.
+Late failure, nonzero/unknown/ambiguous actual exit or malformed receipt
+cannot be accepted from report text alone. No old operational entrypoint is
+invoked. This is not a new backtest attempt, corpus census or provider request.
+Original source remains bound through successful guard RETURN before report
+publication. A callback exception closes descriptors but is NOT described as
+having passed successful postchecks. Same-user arbitrary modification and
+whole-interpreter integrity are not claimed.
+
+New source guard scripts/arv2_r298_reference_ticker_source_guard.py12,452bytes
+SHA9dd41136a8daca1ac01de823d8f9bb9fb1a5b0c27cfd85a02a725dac5274201f;
+test13,076bytes9afc0ce4ea6384ad84a2ddaed292e6b3a729befff27cc2bc5bf0e5765273d5de.
+Guard canonical-plus-LF profile1,731bytes
+SHA72ce14b852020a5792ffd388da3752421c6ae156f95a4ae2ab745011babbb2a3.
+Pure evidence scripts/arv2_r298_reference_ticker_evidence.py16,220bytes
+SHA7153d0d44db66d93ea4a0fb9921c58276e56ad8a46274841c99aa3abaf67712f;
+test12,645bytesafe53df212aef4e0f95b7fb55b34aa56cc734a5a3ebf1e21f04a4e8b3f915646.
+Evidence canonical-plus-LF profile1,720bytes
+SHAd03896b9d52b318d7ffa95ec77ffd471d4e502cce5faa7ddb976f4b3bda67e7b
+(withoutLF1,719bytes337c2238da90bb5b867c32662d39e36cc488f7faeec910a9465ef906ec7ecc19).
+Caller test SHA9f93a7b26bcd73204b561d5e2f04b05698a26d06f7b953e1889da6004afc0a76.
+
+Root final265distinct focused passes3.08s(52guard+57evidence+69caller+
+86record/document+1research import closure), no failures/skips/warnings.
+All139dependency pins, six new source/test hashes and three exact profiles
+matched; all six compiled in memory without bytecode. Native remote-network/
+production-artifact/Keychain/security denial, inroot temp/cache/log/plugin
+support paths, plugin autoload disabled/--noconftest/-B/no cacheprovider and
+dispatch_fence absent. Synthetic only; no actual private/source/provider/QC
+operation or complete lane/repository suite. Same-round read-only advisory
+found no verified material caller defect; this is NOT independent review.
+
+Author52guard passes0.21s,57evidence3.56s and69caller3.71s overlap265,
+not additive; prior guard46/48subsets overlap. Preserve initial guard7pass/
+39fixture setup errors0.31s(missing inroot basetemp parent, fixturemkdir fixed),
+evidence15pass/34fixture failures3.79s(missing28thlastquarter synthetic field),
+then48pass/1expected-refusal-class test error3.27s(FIGI mismatch correctly
+refused earlier as binding, test fixed). Caller66pass/1safe-field substring
+fixture failure4.27s and68pass/1nested-native-sandbox reapplication failure
+4.08s remain qualified. Corrected inert-child fixture inherits the outer
+denial; independently ONE inert native M-profile child exited0/stderr0 from
+a public-source-only harness, no M CLI/private/claim call. Neither is an
+actual operational/source test or measured zero contact.
+
+Memory-only guard full-metadata omission caught1expected failure0.07s and
+vintage-value-pin omission1expected failure0.07s; initial two mutation
+collections failed under artifact denial because --ignore=artifacts was absent,
+then corrected harness only. Evidence source-pin omission caught1expected
+failure0.20s and identity/listing omission1expected failure0.08s. Root caller
+final-admission omission caught1expected failure0.38s(report wrongly published
+under synthetic drift); actual-zero omission caught1expected failure0.05s
+(DID NOT RAISE). All originals restored in finally, disk hashes unchanged.
+No production metadata/bytes/security setting was changed. One final
+matching-lane push remains pending after meaningful result/recovery handoff.

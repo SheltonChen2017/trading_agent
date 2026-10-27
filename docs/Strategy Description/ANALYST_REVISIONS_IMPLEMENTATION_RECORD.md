@@ -63332,3 +63332,256 @@ check still58396a33 locally and live634509bf; only authored listed newfiles
 and this record are dirty. No actual Z use yet. Commit this freeze after
 exact root/branch/status/diff/record checks, then one observer/parent/worker/
 validator use only; no tests or edits during that actual use.
+
+
+### 326.6 Actual Z stopped at a local original-catalog predicate; no price/QC run
+
+At clean81e8eda882c37342555c4c0a5af80808db3f0600, ONE Z parent dispatched
+2026-10-27T07:10:28.772604Z, completion observed07:10:40.206685Z,
+actualexit2/stderr0/no bound. Sole native supplied-output validator
+07:10:40.206914Z..07:10:43.332965Z actual0/stderr0/no bound, identical8042byte
+stdout SHAf4ab845d4acd8433ae6952e89cda524ccf0a42b381bcaaa3e4e8597c44f22094,
+output_authenticated=true. These external process brackets are not provider
+timestamps or measured HTTP durations. Parent/worker/observer/validator claim
+and control are now SPENT; no reread/retry/repair or renewed provider request.
+Prefreeze86recordpasses1.05s overlap543. No edits/tests during actual use.
+No push yet this round.
+
+ExactlyFOUR application intent/status pairs were retained, each HTTP200,
+in frozen stocks_metadata/funds_metadata/stocks_status/funds_status order.
+Physical provider request count remains unknown. Selected164-source
+preflight passed prospectively with the new exact EOF projection; no old
+ec7f/A11 source admission was called or retroactively accepted.
+Retained data identities carried in the authenticated finite failure envelope:
+
+| Fixed Z data leaf | Bytes | SHA256 |
+| --- | ---: | --- |
+| stocks-metadata.csv | 2340169 | 354f578dd11ab0cebe1ff5b6f9ddb596b2d776f4e3161b34b8d4e1723ffe60e6 |
+| funds-metadata.csv | 904679 | a85d60f8699ae4b606ee11b7a70fd48e683fd8de223f14f5b4e2599434bdefac |
+| stocks-status.json | 645 | 34673733fab3c07d2cc2a252e809f65c633336b96d79754a6b60602c859964be |
+| funds-status.json | 638 | 4a125caa20d2a4da6168d1356c08137b284c96794e7a9a3415794080da8b8e47 |
+
+Both status responses ACTUALLY passed v2 as history_files_keyed with all3
+histories, exact advertised basenames, six bounded opaque hash-only keys and
+available=true. This establishes the optional-key correction prospectively
+for these exact fresh bytes, NOT entitlement/full EOD-history/PIT/price
+admission or a retroactive X/Y acceptance. The pure receipt's provider_contact
+false means the PURE parser itself performs no contact; the containing
+operation ACTUALLY made4application dispatches. No key/URL/row/price disclosed.
+
+Parent stage=worker, failure_code=worker_failed; selected finite inner code
+worker_original_catalog. Worker07:10:33.962684Z..07:10:40.103889Z actual2,
+stderr0/no bound, stdout334bytes SHA
+9843f5e5be05ebb3022573c92a98ca63b2c3c5fc86b8ff4e29299c01890a6806.
+No successful source-guard/join summary/private-route pin returned. The
+envelope authenticates scoped failure evidence, not complete named on-disk
+post-close output integrity or an accepted original/current join. No named
+failure-file pin was returned; do not invent one or infer whole-tree retention.
+
+Public-code audit of this finite path finds a guessed EXACT28-field name set
+in all_routes and worker, although the original decoder already binds exact
+manifest columns, header291bytes/c9186ed1, archive/member pins, all74150rows,
+full source-row hashes and duplicate counts. The guessed name inventory
+serializes as unquotedLF289bytes. That arithmetic ALONE is not conclusive
+proof of different actual names (CSV quoting/CRLF/BOM can affect header
+length), and the old coarse original_catalog code does not distinguish its
+type/count/column/digest predicates. No actual unknown column name or unique
+root cause is fabricated, and no private header/control has been reread.
+
+I326-001 (P2): the redundant guessed full-column inventory is a confirmed
+overstrict compatibility design; exact authenticated original schema should
+govern unrelated fields while all identity-evidence-required fields remain
+mandatory and ALL28 values/hash semantics remain unchanged. I326-002 (P3):
+coarse local original_catalog failure prevents identifying which predicate
+failed; prospective v2 will retain exact finite type/count/columns/digest
+predicates plus closed schema hash/count/presence evidence. No source bytes,
+field values or hashes are normalized/dropped/refreshed to make a gate pass.
+
+The next substantive recovery is NEW OFFLINE current-route compatibility,
+not a renamed/repeated Z provider request: consume ONLY the two pinned NEW Z
+CSV DATA leaves under fresh full-ten-field/native-security held/named guard,
+plus separately frozen same exact genuine October package/lineage/original
+three source leaves. Z claim/report/status/journals, old operational entries
+and all other controls remain unread. New schema handling, finite predicates,
+source/protocol pins, private-channel/output semantics and exact one-use
+authority must be committed before this bounded read. Owner326.1 covers this
+verified in-scope implementation/recovery without routine acknowledgment.
+No actual successor yet; no source-stop bypass, cache/scalar/quote fallback,
+price acquisition/QC capacity/job/strategy run/result/cell/look occurred.
+ARV2E323-001 price coverage remains OPEN; floor336/259/52/699 unchanged.
+
+
+### 326.7 Prospective schema recovery and corrected price-coverage reasoning
+
+NEW all_routes_v2 is an explicit successor, never an edit to spent d3:
+source6fe5ec74c4e241fc554183d8ecbdc663c0e63e3f476deb180e37304b7c033ab1,
+testd9a18bd8415be67f79dd25ee430fd2e725f67b87c5bc694bd37c220877fc196e.
+It accepts exactly28 unique bounded ASCII column names containing the12
+fields actually read by original metadata/identity reconstruction, while
+requiring every source row share the authenticated schema. ALL28 original
+names/values remain in the exact old full-row hashes and identity evidence.
+The exact header291/c9186ed1 and manifest column order continue to be
+authenticated by the unchanged decoder BEFORE this predicate; the helper
+does not independently admit an arbitrary caller's schema. Remaining
+collision/interval/evidence/graph limits are preserved. No actual unknown
+column name, altered input, dropped field or historical source re-pin.
+
+NEW all_route_worker_v2 source
+d236e3f0113046ca638296823d880ac8a93e8d31e65047b57c26fcba5dc35da1,
+test69006d85a674410fa7585466049e503f1294c4af8dd76e37568b9110427da92c.
+CanonicalNO-LF profile6721bytes SHA
+bb52ab8ca4ebb05428294a833bf03aef12cbe48e66ec7a24913e7be008243b22.
+It reuses only frozen pure current loaders/catalog/fingerprint functions,
+not old prepare/admit/operations. New original_catalog_type/count/columns/
+digest predicates distinguish failures. Success records closed count/hash/
+required-field and legacy-name-set-equality observations, never raw names.
+New summary schema and shape-policy hash are required FIRST; an explicit
+metadata-only projection changes only schema tags/removes new observation
+fields to apply the old closed metadata validator, then restores the new
+tags. No source/body/evidence hash, gate boolean, predecessor global or
+accepted input is rewritten by that validation adapter.
+
+Author38v2route passes3.02s and43worker passes0.22s/whole3.74s; old selections
+overlap through reused code and are not summed as distinct round proof.
+New unused-column regressions prove full-field hashing is preserved and
+missing actual identity fields still refuse. Reinstating the guessed-name
+check caught1expectedfailure/1pass0.14s; omitting complete original copy digest
+caught1expectedfailure0.04s, memory-only/finally restored. All source bytes
+unchanged after mutations; no actual private read/provider/QC use in author
+checks. Length289vs291 remains a qualified static clue, not proof of actual
+unknown names or unique cause. Exact successor freeze/actual result follows.
+
+A further public-code coverage finding changes NEXT price-plan reasoning,
+not strategy economics or an executed input: original binding
+candidate_last_session is NOT the authoritative target/holding horizon.
+accepted_risk_october_order_package._extend_stale_inventory extends terminal
+predecessor EVALUATOR memberships to Oct13 while retaining the original
+runtime-binding stream unchanged (lines222/425/463/495). Evaluator active
+membership uses its actual first/exclusive-last indices. Runtime _books
+intersects those active memberships with QC callbacks, then reference
+pricing unions targets with ACTUAL nonzero holdings. The holdings census
+does not discard a position when membership/candidate dates expire.
+
+Therefore current routing's original_candidate_interval/outside_window is
+ONLY a retained geometry observation, never proof that a security will not
+be targeted/held or a price-based eligibility/drop rule. Do NOT clip future
+price requests or declare a never-used stock from candidate_last alone.
+Future common-price planning must reconcile genuine evaluator memberships,
+prior-session boundaries and possible carried holdings/terminal payoff;
+full-window acquisition for each required identity is the conservative
+default. Explicit zero-initial-stock/zero-holding and final exit evidence
+must precede any narrower required-mark assertion. Existing route current
+interval checks are not complete reference/NAV coverage. This strengthens
+326.4–326.5's explicit later-consumer gate and supersedes any interpretation
+that binding geometry alone could reduce the planned stock request count.
+All original6151 bindings and8 ETFs stay retained, no dropping/filter fallback.
+
+The owner still authorizes verified offline recovery then admissible research
+backtests. Darwin's observed nested sandbox_apply refusal is handled in the
+NEW offline AA DESIGN BEFORE freeze: one no-data observer launches ONE
+native network/Keychain/security-denied producer, which owns its claim and
+both source guards and directly calls worker_v2.prepare in the SAME PID.
+That preserves genuine plain capability. Original and retained-metadata
+guards must return normally BEFORE memory-only private publication. Native
+producer may write only its OWN new AA outputs/root-cache/null; no arbitrary
+write authority or claimed inner cache-only sandbox. No private IPC or data
+crosses producer stdout/observer. Separate non-nested native output validator
+denies all artifacts/network/Keychains/security. This is a new precise
+contract, not a claim that the prohibited nested sandbox worked. No actual
+AA control/read/worker/result use yet; source/protocol pins and root checks
+must be committed first. No new provider/QC request or look.
+
+
+
+### 326.8 Exact offline AA implementation, validation and one-use freeze
+
+NEW scripts/prepare_arv2_r298_all_routes_offline_v2.py34156bytes
+SHAc884334a8df36d12718bf39098a396f079efa68c33e320d7bf83a7f4c51dbe35;
+tests26018bytes SHA804c014c3fe050ceb476a25c38935add6e2eee5ef500ad56e8bd8d7054afa288.
+CanonicalLF profile29724bytes
+SHA6fd875eaee903c2aa44451b830e0ddf489d754f473672db81268edaf11f41794.
+Selected167 pins = exact existing164 + frozen Zcaller0b46e504 + explicit
+new route6fe5ec74/worker d236e3f0, all ACTUAL public bytes matched. No old
+map/global/profile modification, silent re-pin or generic callback authority.
+
+Owner326.1 supplies current one-use local research authority/review waiver
+for this verified compatibility recovery, not an additional provider/QC run.
+ONLY exact designated Mac root/branch/Python3.13; clean committed HEAD via
+--expected-head and exact callerSHA via --caller-sha256. Freeze THIS commit
+before source open. Fixed NEW control:
+artifacts/analyst_revisions_v2/newrule_all_routes_offline/R326-20261027-AA,
+not inspected/allocated. Claim/fsync and source-start precede any new source
+open; join-start precedes ONE direct prepare. Claim consumes even without
+data read; partial/unknown/ambiguous is spent. No retries/alternate leaf,
+repair/cleanup, changed attributes or source-pin refresh.
+
+Read ONLY Z's stocks-metadata.csv2340169bytes/354f578d and
+funds-metadata.csv904679bytes/a85d60f8, with FULL pins in326.6/newcaller.
+This is first compatibility-correct full join of those retained DATA bytes,
+not another Z operation or interpretation of its report. Native producer
+holds complete no-follow path chain and BOTH original descriptors with exact
+bytes and fresh full-ten-field/nativeemptyACL/ordinaryxattr snapshots, named/
+held checks through direct prepare, then NORMAL outer guard RETURN. No Z
+claim/report/status/journal read. Prior actual credential-scan provenance is
+bound through fixed data pins, not rerun/upgraded into a new credential check.
+
+Inside that SAME native PID, worker_v2 mints genuine October input authority
+for unchanged exact411c2734/e4518e06 package/lineage and decodes ONLY original
+manifest/marker/TICKERS ZIP under unchanged fresh three-leaf guard. Full
+header/member/archive/74150row/hash/duplicate evidence remains mandatory.
+Original guard normal return AND retained-metadata guard normal return
+precede memory-only publication of routes-private.json. No private bytes
+cross producer stdout or no-data observer; public128KiB envelope only.
+Own Store holds original output FDs, full metadata/native security and exact
+readback bytes through its postchecks; private graph<=128MiB, output bound129MiB,
+two metadata leaves<=16MiB each (exact smaller external byte pins mandatory).
+At most12own control files; normal claim/source-start/join-start/private/report,
+bounded failure alternative. Late failures may leave files; never inferexit0.
+
+ExactlyONE native producer run, thenONE separate native stdin-output validator
+from the no-data observer. Producer600s, directprepare450s withinremaining,
+observer630s, validator20s; ownchild kill/reap only, host-suspension/
+uninterruptibleI/O qualification retained. No nested sandbox/inner child.
+Producer policySHAff83b8d9d994205083010c10ade90e9b92074b5788d600c3c73e602b38d1d97c;
+validator79d7e961f0ab250fd95784609a254c2628244cbd0143b0aa3ea1d2f514858a4c.
+All network/Keychains/securityCLI denied. Producer artifact reads only exact
+two Z CSVs/package subtree/lineage/original3leaves/ownexpectedoutputs plus
+necessary ancestor directory-data scope; writes only OWN AA/rootcache/null.
+Validator denies ALL artifact reads. These are not global read allowlists,
+whole-interpreter integrity or arbitrary-same-user protection. Logging route
+guard rechecked before source/prepare, after prepare, publication and postflight.
+Only actual producer0 + separate validator0/exact finite envelope/report pin
+accept diagnostic output, never report alone or a fabricated success code.
+Validator consumes supplied stdout; no new output-leaf reader is authorized.
+
+Root241distinctpasses2.96s (38v2routes+43v2worker+73AAcaller+86record/doc+
+1researchimportclosure), no failures/skips/warnings. Outer harness compiled
+ACTUAL AA producer native policy with stronger total artifact denial, all
+temp/cache/log/plugin in designatedroot/.pytest_cache; disabledautoload,
+--noconftest --ignore=artifacts -B nocacheprovider; dispatch_fence absent.
+Six changed source/testfiles compile in memory, exactEOF passed. Public AST
+proof: old/new route definitions/classes identical EXCEPT explicit _originals/
+profile changes and added valid_original_columns; new schema/constants/policy
+declared. This proves no silent identity/collision/execution change, not
+production-source acceptance. Earlier543 and author subsets overlap; not
+summed as unique round count. No complete lane/repository suite.
+
+Author AA73passes3.29s actual-policyharness,3.15s earlier overlap. Source-guard
+final verify/retained-byte digest/actualexit/committedblob/postpreparelogging
+omissions each caught1expectedfailure0.13/.05/.05/.05/.12s, memory-only/finally
+restored; a mutation-harness needle assertion after four checks was corrected
+for the fifth separately, not a production defect. Initial fake validator
+wrongly accepted producer2 successenvelope; fixed fixture to mirror actual
+validator refusal, no gate weakened. Author EOF-only draft correction before
+this freeze; no consumed module changed. No actual source/control read,
+provider/credential/QC request, capacity, job or look in implementation/tests.
+
+If any original/current route is refused or outside_window, retain it;
+this is a diagnostic, not price/universe coverage or permission to omit it.
+Next price plan must use actual extended evaluator memberships and carried
+holdings, not stale binding last dates (326.7). No price acquisition, QC upload/
+source change/capacity/compile/job/result read authorized by this AA freeze.
+All booked336/259/52/699 floors and formal/PIT/master/readiness/paper/live
+false flags remain. Agents/files held; verify root/branch/HEAD/status, commit
+this exact freeze, then sole producer/validator use with no edits/tests during
+that actual operation. No push yet this round.

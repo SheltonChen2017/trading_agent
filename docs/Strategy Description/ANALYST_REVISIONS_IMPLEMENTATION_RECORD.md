@@ -2252,9 +2252,13 @@ refusal, correct the genuine session-record bridge, verify the minimal macOS
 resolver-socket correction and complete AP's full RAW capture/authentication
 once:1256HTTP200 bodies,5541040valid price rows/2654048explicit absent cells,
 179185028byte corpus. All used protocols stay spent; no source-price or
-strategy admission follows from this technical capture. Concrete monthly
-sidecar/current identity/common reference AND actual-held NAV/runtime/transfer/
-source/run/attempt gates still precede the six-cell strategy runs.
+strategy admission follows from this technical capture. Sections326.41–326.47
+correct the uninvoked rename/ETF-tuple/seeding boundaries, preserve failedAQ,
+and record successful AR production/native validation of71monthly grids
+(146284817bytes). AS is separately frozen to recover the tool-truncated PUBLIC
+metadata from one pinned DATA manifest; no AR operation/control replay.
+Current identity/common reference AND actual-held NAV/private transfer/source/
+run/attempt gates still precede the six-cell strategy jobs; none has launched.
 Old modules/profiles/pins and spent uses stay frozen;
 no automatic re-pin/retry or source/financial gate clearance. This is the
 current live continuation, superseding325's no-next-milestone endpoint.
@@ -66589,3 +66593,133 @@ No QC look/cell/capacity/source install/compile/strategy job:337/259/53/699.
 After authenticated AR0 continue a separately frozen private QC transfer/
 project/source/compile/run/result contract for all six preregistered cells;
 do not infer strategy readiness or perform an intermediate push.
+
+### 326.46 Actual AR monthly-sidecar production and native validation PASSED
+
+At clean e7f81cddcffd5de82b88095ccdc5493d2a892f7e, sole AR producer
+2026-10-27T14:38:45.289848+00:00..14:41:25.592502+00:00 exited0.
+Sole independently applied native validator
+14:41:25.634429+00:00..14:41:29.681402+00:00 exited0. Each original stdout
+28655bytes SHA5c0a070c1d2f03e4a78adb9400db8a94c4d11b334e1a777a7f0fb65a281bc52b,
+stderr0/boundnull. Outer exited0, accepted_sidecar=true and
+external_output_authenticated=true observed in its complete retained prefix.
+Final86record1.16s repeats222, not additional coverage.
+AR producer/validator/claim are SPENT. No rerun/control/report/corpus read,
+repair, cleanup, rename or renewed attempt. I326-021/022 corrections worked
+PROSPECTIVELY in this exact fresh scope, not proof of every cause of AQ's
+os_error or of historical/continuous security/source admission.
+
+Original report28524bytes SHA
+9b33a3a4fc52858a0feeca90b42061c9e682d851f9f03aee228a1c0a867fc71f.
+DATA manifest-private.json22373bytes SHA
+cf9a27d0c6ccd8ad65b676c6335de35ac6738579e49784cb532d790cf83e7189;
+catalog-private.json2224206bytes SHA
+f55e44f85f39846f0b4946860318760eab68d10d95c79d2cf87da44ad9568cb1.
+Under R326-20261027-AR:71final monthly DATA files total146284817bytes;
+all8195088vendor grid cells retained,5541040positive/2654048explicit absent.
+Provisional71spools104108387bytes remain preserved; their pin-stream SHA
+bceeb4e775c514a4b212561def5097e79ce293243579eb362d5d7d0bd2388d51.
+All final original descriptors held through validation, consumed-spool scope
+ended after authenticated consumption. No native QC price exported.
+
+Full retained source-guard receipt confirms4whole hashes,1256contiguous
+ranges/exact179185028corpus extent; profile
+2de5c7bfa85bde32fa7b06cdc21d6ca379365d05bb016791647804a3a5c0d0c2,
+fresh endpoint SHA
+e543d5422c75e4bd18494d1ab81456637ec977cc5678614bb242189ad0871ca3.
+Original genuine all6151bindings/3466axis and normal source RETURN before
+publication/postchecks passed. This is technical source representation,
+not proof required target/held-position prices are all available. Actual
+common-price demand must stop on any requested absent cell. No row drop,
+expiry close or alternate date/quote/source fallback is authorized.
+
+P3 I326-023: root's final tool poll requested max_output_tokens1400 although
+the public outer JSON duplicated the28655byte metadata payload. Tool returned
+14582original tokens truncated to5703characters; whole JSON parse failed in
+orchestration, AFTER successful producer/validator completion. Complete
+producer/validator/report/codec-summary/source-guard objects and spool
+metrics survived in prefix/tail and were strictly extracted as closed JSON
+objects. Original full payload is NOT retained in orchestration yet. This
+is metadata-carrier loss, not an operational failure or license-row exposure.
+Do not fabricate missing fields or replay AR. Full recovery must independently
+join original report/stdout pins before QC transfer preparation.
+
+New inert scripts/arv2_r298_ar_retained_binding.py4817bytes SHA
+152213d23bc2188b8dabe6ce2ca8192eabcbecf5f61f87c012738944b0ac1a62;
+canonical fact3906bytes SHA
+1c1b2c6729826bd821dafa6d0af70bb406400eb17fc285d05393cb3f37ee19a5;
+NO-LFprofile323bytesbb6203a690dcff2ed9d375469100e5d256f78af4a54a9c7d68bd4a0747c23169.
+It retains actual0/0 and the explicit truncated-carrier qualification,
+complete_original_payload_retained=false, no new read/transfer/price/rights
+grant. Tests3005bytes152ea6a45fb45ce61d8d97d4fd283c95738e37271e175864f50ab8da81d35ed2;
+4native-deniedpasses0.06s for original actual joins, exact DATA/grid facts,
+truncation/false-grant/copy/hash and fresh inert import with I/O prohibited.
+
+No provider/QC/capacity/source install/compile/strategy backtest was invoked
+by AR.337/259/53/699 unchanged. OldAQ/ARreport/control/source operations stay
+spent. The safe recovery below reads ONE exact new DATA manifest under a
+new committed one-use metadata purpose, not old controls or source prices.
+
+### 326.47 AS one-manifest metadata-reconstruction freeze
+
+Current owner source/coverage/research delegation and Claude sequencing
+waiver authorize ONE separately claimed AS metadata reader at the next exact
+clean commit containing this freeze. Source-only recovery of I326-023 uses
+ONLY AR DATA manifest-private.json22373/cf9a27d0; no report/control/catalog/
+monthly/source-corpus/original-package/credential/provider/QC read. No
+original AR producer or validator CLI replay. New own claim/output scope
+artifacts/analyst_revisions_v2/newrule_common_price_sidecar/R326-20261027-AS
+has not been inspected/allocated/invoked before this freeze. Claim/fsync
+before DATA read; duplicate/partial/ambiguous/nonzero stays spent, no repair/
+retry/rename. Two own small files:claim.json,result-metadata.json.
+
+Reader scripts/read_arv2_r298_common_price_manifest_metadata.py15951bytes SHA
+1cb61514eb650cd3f360dfb0f5e58c486d443cf5ec104ccda46aa8d740e7c783;
+tests15315bytes42854b04ec384bfd6c3666ac77b3f0ef08a598134d72d693451e597ed5d65cb2.
+Canonical NO-LFprofile26665bytes SHA
+43de9cdb9e973afdc30850c60c7bd0da57e7116bf0cd7ed2e2f2cf343f110a7c,
+200literal dependencies plus self/committed blob/current HEAD/profile CLI
+pins. Same designated Mac/Python3.13/root/branch/clean in-root environment.
+Exact native policy1682bytes SHA
+a99f86665725865b124c146ff0d90fcdf9982acfd186aeccb3dfae1e26285d6c:
+ALL network/Keychains/security CLI denied, artifact read only exact manifest
+and necessary literal ancestors, own AS output/parent-literal writes and
+in-root support only. No original package/other old-control subtree allowance.
+
+Unchanged generic FixedDataGuard authenticates source size/SHA before JSON,
+original no-follow held/named full ten-field/native ACL+xattr snapshots and
+normal RETURN. Pure strict manifest parser rejects any additional/private
+row/assignment field. Reconstruction uses full71descriptors plus already
+retained exact source/codec/output/input metadata and only schema-forced
+true/false constants. Both independently frozen original REPORT28524/9b33
+AND STDOUT28655/5c0a byte pins MUST match; no count-based guessed acceptance.
+The original AR pure closed validators recheck the reconstruction without
+executing their old CLI/claims/reads. Emit only after source guard normal
+return, own-output validation/closure and clean postflight. This is new
+DATA-only metadata authentication, not renewed old operation authority.
+
+Reader alarm30s/outer35s, uninterruptible-I/O/host-suspension qualification.
+External metadata-only capture4102bytes SHA
+dd4e152948fbd1b63c2683c80d5c5b690c59ff9213d23531ce28098b61901961
+independently applies AS's native policy from ordinary orchestration. It
+requires observed actualASexit0/no stderr/bounds and exact original stdout
+size/SHA against BOTH observed AR actual0 frames, plus strict closed metadata
+validation. Success emits ONE original AR payload (no duplicate). Capture
+tool budget15000tokens, store the full structured result BEFORE printing a
+small summary. A matching pin or finite failure alone never fabricates0.
+Unknown/nonzero/malformed remains inadmissible; no new source/price/QC/
+paper/live flags become true from this metadata-only recovery.
+
+Author47focusedpasses4.39s; initial44pass/1fixturefail4.42s corrected dependency
+count201-to-200 only (generic guard already inherited). Two memory-only
+independent report/stdout-join omissions each caused1expectedfailure0.22s,
+restored finally. Actual one-file generic-guard success/drift and six reader
+failure boundaries are synthetic/artifact-denied; no private DATA/claims/
+operations in tests. Root137distinctpasses5.75s=47AS+4retained-anchor+
+86record/document; no failures/skips/warnings/full suite. Subsets overlap.
+Root public code audit, in-memory compile, literal pin/profile/policy and
+diff/status checks precede actual dispatch. All agents HOLD edits/tests/
+temp creation through AS. No provider/QC/strategy look/cell,337/259/53/699.
+After actual0 + exact full metadata recovery, freeze the actual one-private-
+project/73object transfer/18source/six-cell compilation/run/result contracts
+before contact. No intermediate push or false backtest-running claim.

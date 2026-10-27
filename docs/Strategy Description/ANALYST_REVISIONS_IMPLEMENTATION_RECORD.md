@@ -2277,8 +2277,14 @@ spent. Sections326.63–326.64 record BB full genuine/original/current identity
 crosswalk actual0/native validator0:6151original proofs passed, all8ETFmatched,
 but2426potential stocks remain unresolved. Source-pin/parser progress is
 verified; historical-price and strategy-run admission remain blocked. A new
-offline field-format diagnosis is frozen in326.65 but not yet invoked; no
-price request follows an unresolved identity. The RAW-history parser is held technical
+offline field-format diagnosis passed once in326.66 (actual0/native validator0)
+and is spent. It confirms at least15potential stocks have no original FIGI in
+the full mapping inventory; a parser cannot supply that missing identity.
+I326-032 and early-history I326-024 remain concrete external-data barriers.
+326.67 concludes this round for the single final push; no six/eight strategy
+cell is launched. The existing Sharadar history-tier answer is pending, not
+assumed or a new purchase/access permission gate. No price request follows an
+unresolved identity. The RAW-history parser remains held technical
 preparation, no price caller.
 No strategy historical-price acquisition or QC run follows without its gates.
 No AU/AW/AY replay or QC source transfer/project/compile/strategy job followed
@@ -4248,6 +4254,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-26 | Owner-directed corrections to every section-323 finding: seven R323-named launches booked, five whitespace defects corrected | `dfc04152` -> `ad14e379` -> `5751a487` -> this record commit | The owner directed that every finding of section 323 be fixed; 323.9 records the three fixable ones | Status-only QC reads classified the seven un-pushed launches in project 38364439 (five full-window runtime refusals, two one-day probes) and the shared ledger books them conservatively: 326/251/50/699 -> **333/256/52/699**, no cell, identities named in full for the in-flight round to reconcile. The five files ending with a blank line now end with one newline; their pre-correction pins stay true of the spent runs and the corrected digests are recorded. No production logic, test logic or strategy economics changed. | Five files compile; `git diff --check` clean on the tree and on `ef654b1d..HEAD`; record and active-document gates **86 passed** on the final bytes; the lane suite at `3c905d42` remains in progress on this host. QC access: status-only reads, zero looks. | `ARV2R323-001` (P2) and `ARV2R323-002`/`-004` (P3) corrected; `-003`, `-005`, `-006` (P3) have no artifact to change and stay documented; `ARV2R248-002`/`-003`/`-004` and `ARV2D287-001` stay open. | Codex counter-reviews section 323 including 323.9, reconciles its in-flight entries for the seven booked identities by identity, and pins the corrected digests before any future use of the five files; no further attempt, replacement project, six/eight cell, paper/live deployment, broker, funded-account, real-order or trading action is authorised by this correction. |
 | 2026-10-26 | Codex counter-review of all four section-323 Claude commits | `3c905d42` -> `dfc04152` -> `ad14e379` -> `5751a487` -> `6076ef20` -> this record commit | Accepted after documentary correction; one P2 review-coverage defect and four P3 qualifications corrected; no confirmed production bypass or new milestone | Corrected the nine-definition launch census, 42+1+40 commit attribution, script inventory, compile/timestamp inferences, and spent source-pin closure warning; verified the seven bookings without adding them again | Section 324.5 separates public-byte/lane checks, focused Windows failures and isolation-denied Git checks. No full suite, operational entry, private receipt or QC read. Only this lane record changes | Floor 333/256/52/699 unchanged; original seven-run source/authority/numbering and carried P2s remain unresolved. Existing out-of-lane CRLF/public-source and host findings documented, not fixed | One final same-lane push; Claude must review section 324 and exact snapshot. No retry, new source freeze or operational authority; monitor remains paused |
 | 2026-10-26 | Mac recovery handoff plus owner-requested sync/counter-review and explicitly approved normal merge | Common3c905d42;25local recovery commits e3afe7ef..503168ac;5incoming dfc04152..e57d785f; d403c972 counter-review; preserving merge and final handoff | All5incoming commits disposed in325; accepted after qualifications/identity reconciliation;25local implementation commits remain without independent review | Retain Mac323 and namespaced remoteR323/324; retain both ledger histories and reconcile7overlapping jobs with3pre-job claims, floor336/259/52/699 unchanged; retain5EOFchanges without pin refresh; X actual failure recorded, Y drafts preserved uncommitted/uninvoked | 389focused native-denied passes4.13s on merged tree, overlapping premerge389/4.53s and86record repeats; public Git-byte/AST/pin/accounting assertions; no full suite/private or operational replay | ARV2CR325-001/003/004 resolved by preserving merge/append; -002 OPEN with exactly2of157Xsource-pin mismatches; price/status gaps and carried formal/PIT/master gates remain; no strategy result or live readiness | Exactly ONE final nonforce matching-lane push, verify both parents and local/tracking/live agreement; no next milestone/provider/QC action this review round; Insider monitor already fulfilled/deleted |
+| 2026-10-27 | Codex owner-waived source-pin/parser/price recovery; one concluded round | `634509bf0fb361a8471c9ed6b62106d0cdcfc245` -> this final handoff commit (34 recorded predecessors through `4e51fdf8`, 35 total) | Prospective exact EOF-byte closure, all-token/original-schema recovery, full-window source work and authenticated identity-gap endpoint | Retains all failures/spent uses; one native-QC source diagnostic, accepted Sharadar RAW capture/sidecar, older EOD pilot and complete111page/110346row EOD catalogue; BB/BC native0/0 validate original6151+8 and expose2426potential identity refusals, including15 without original FIGI; no six/eight strategy cells launched | Latest200distinct focused passes14.17s; pure actual-BC anchor/output/hash/shape agreement and final document/diff/status gates; no full suite. Earlier overlapping selections/failures/Root collector and test-window qualifications retained. AJ one shared+infrastructure look already booked:337/259/53/699, no new cells | ARV2CR325-002 resolved only prospectively for approved exact bytes; all original proofs pass technically. I326-024 early-price coverage and I326-032 source identities OPEN; inherited formal/PIT/master/readiness gates remain false; no independent acceptance | Exactly one nonforce matching-lane final push after baseline/HEAD/status check; confirm existing Sharadar history tier and obtain authenticated missing identity/lineage evidence before separately frozen source/price/run work. No new paid rights, source-stop bypass, retry, paper/live/broker or real-order action |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -68409,3 +68416,212 @@ not cleared by tests. No provider/QC/Safari/capacity/project/transfer/compile/
 backtest in this decision;337/259/53/699 unchanged. Record actual BC once, then
 continue only justified verified recovery or a concrete external barrier.
 All agents HOLD writes/tests/temp before actual; one final push still pending.
+
+### 326.66 Actual BC format diagnosis and irreducible retained-data barrier
+
+At clean4e51fdf8dc8eaf14b00c22ae949de714ced6c006, credential-free native-denied
+public preflight passed without DATA/claim. Sole native BC producer dispatched
+2026-10-27T18:38:53.366004Z; completion18:39:03.949785Z actual0, boundnull,
+stderr0, complete stdout40708bytes SHA
+d97dcd8e2cc4739ea42d5e39c1445c93f2ee17e67b9a4228025ab801d31686bc.
+Independent ALL-network/ALL-artifact/Keychain/security-denied native output
+validator18:39:03.950375..18:39:07.792492Z actual0/same exact stdout/no stderr
+or bounds. Outer0/validated; external process brackets, not source event times.
+Report40577bytes SHA
+cd8481ac8054d2c8d78664a89715032d1cbe428d8cb2cb952f4abed1c337b423.
+All six DATA guards returned normally, full6151+8 bindings/results/roles
+retained and old V2 outcomes reproduced.10914 related-row references and9871
+all-mapping derived-ID references; overlapping rows, not independent evidence.
+No package, old controls, provider, credential, QC, browser or strategy call.
+BC producer/output validator/control are now SPENT; preserve everything,
+no replay/repair/cleanup/renamed retry.
+
+Global110346-row mapping field diagnosis:
+CUSIP37206valid/73059null/5empty/60checksum-invalid/10format-invalid/
+2length8/4other-length; FIGI73265valid/37081null, no other malformed class;
+ISIN61308valid/49027null/8checksum-invalid/3format-invalid. All symbols valid
+in the fixed.US representation. These exact null/type/missing/empty counts
+also match the earlier BA authenticated field inventory in a later pure
+public-metadata cross-check; no source bytes reread for that comparison.
+
+Among1927 potential prior-Sharadar mapping_identifier_invalid refusals,
+469 have at least one exact FIGI+source-fullCUSIP9 pair, but related rows
+also contain invalid/missing/conflicting identifiers:4178 row references
+include2265nullFIGI and1104nullCUSIP. The US/CA standards-based diagnostic
+observes629US and18CA per-group ORIGINAL-token/source observations with raw
+CUSIP absent and exact FIGI; those counts may overlap and are NOT647 newly
+admitted routes. Other predicates/global ownership must still pass. Five
+leading-zero-loss observations are not a permitted identifier repair;
+no exact8-character-base observation supports a CUSIP8 fix. Another115
+potential conflicting-FIGI sources include38 with an exact positive pair,
+illustrating why selecting only the favourable row would hide disagreement.
+
+The15 potential no_identifier_match sources have ZERO related raw original-
+FIGI/CUSIP rows and ZERO exact pair. Their17 US/CA original-CUSIP-derived
+row relations ALL carry a different valid FIGI (sameFIGI0/nullFIGI0).
+Thus no substring/checksum/case/format correction can supply the absent
+original composite FIGI or prove a historical hierarchy/continuity link.
+All four pending-native identity refusals have one valid FIGI and ISIN each
+but NULLCUSIP, no US/CA-encoded ORIGINAL-token observation. This does not
+identify their country, exact root cause or a safe replacement identity.
+All8ETFmatches remain; no stock is dropped or silently deemed unused.
+
+I326-032 therefore remains OPEN at2426potential/2844all-stock refusals;
+new format observations do not retrospectively accept V2 or clear a subset.
+A prospective V3 could represent a verified missing-CUSIP subset while
+preserving all other predicates, but it CANNOT clear all5641 from these exact
+bytes. No actual V3/full-price capture is started merely to produce another
+known-incomplete result. Same-round read-only source/standards audit agrees:
+new authenticated vendor identity/hierarchy evidence is needed for at least
+the15, with interval/corporate-action evidence if the identity changed; no
+offline parser can manufacture that. Advice is not independent acceptance.
+
+I326-024 also remains OPEN: the retained Sharadar capture lacks every vendor
+mark beforeOctober2021, including always-needed own-fund references. Correct
+query syntax/public tier documentation does not prove the current account's
+purchased history. Owner was asked only the NONSECRET existing Prices/Bundle
+history tier (5/10/full) to choose the next admissible data recovery, not for
+routine access permission. No answer/tier/upgrade is inferred. No new paid
+rights/purchase/provider entitlement probe, fallback/shortened period, blind
+alias, source-stop selector, quote/cache injection or QC retry is authorized.
+This is a concrete external-data endpoint, not a source-pin/test/QC-storage
+readiness assertion. Historical lineage, permanent master, immutable/PIT,
+terminal payoff and every carried formal/readiness/paper/live gate remain.
+
+Public inert scripts/arv2_r298_bc_source_binding.py47088bytes SHA
+7fc3f11792c13d1fff8acf6e3831ec17c5f53c6c005d0be0d7e636cb1dcb5343
+durably retains actual0/0 and exact full closed metadata, no licensed row
+values. Fact6436c5a70b7e0e7e02ac60b0030828115a9fa6e46c8d670a59d0a2ea27f77a8a;
+result6931a33e41448d968b8945933e227a6508e140159af6beb168efa5cd6bf7b5cc;
+diagnosisfdc4dd652fd7b333c915fdbc38e51af6a8b4cfdf79105b2136374bcda77162ca.
+Native ALL-network/artifact/Keychain/security-denied pure public check
+reconstructed original BC output/report and actual-exit/hash joins, compiled
+anchor in memory and checked BA/BC shape-count agreement. It calls no old
+operational reader or DATA path. Anchor grants no read, route or operation.
+
+326.65 final pre-freeze86recordpasses1.25s overlaps the200pass selection,
+not additive. New actual metadata requires only relevant pure-binding/
+record/diff/status checks; no full suite or operational rerun. Booked floor
+337shared/259development/53infrastructure/699cells unchanged here; six matched
+six/eight×ARoff/100/200 strategy cells are unlaunched. All used source modules,
+profiles, spent controls and production evidence remain frozen. No workflow
+monitor is rearmed; fulfilled Insider monitor remains deleted.
+
+### 326.67 Whole-round handoff, exact commit accounting and single final push
+
+This round began at634509bf0fb361a8471c9ed6b62106d0cdcfc245 and contains the
+following34 accumulated local commits through4e51fdf8dc8eaf14b00c22ae949de714ced6c006,
+followed by THIS final actual-result/anchor/handoff commit (35total). No
+incoming Claude push was substituted for implementation, no branch/worktree
+created/switched and no commit rewritten. Every source/actual freeze and
+per-stage focused validation/failure/omission qualification is retained in
+326.1–326.66; this table records each commit's disposition without claiming
+independent acceptance. The earlier authorized preserving merge and all
+25local/5remote historical contributions remain ancestors, not replayed work.
+
+| Exact commit | Purpose / current disposition | Review status |
+|---|---|---|
+| `58396a339df8aebe0b22c23961f9d5edc9569de7` | Prospective exact two-EOF source-byte closure; spent predecessors remain refused. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `81e8eda882c37342555c4c0a5af80808db3f0600` | Keyed/all-token CUSIP parsing and full-route preparation; later schema refusal retained. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `4d0ad82e4193ceb65ef9620d82047ec0d8a8c0dd` | Full original28-column compatibility recovery; no guessed unused headers. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `845fdce655907c44db6c362e41f5a932b4720d76` | Route-component and potential/membership demand evidence; refusals retained. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `d25ab8eaaa4a3abea39c41b7e3d6470b429c4e16` | Reporting-currency semantics corrected; qualified current price lineage retained. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `874b349d8b681b1fbca908502c40994869229b92` | Bounded public FIGI corroboration freeze; no formal identity admission. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `d49e54152f4d2bba50161850c82d692af1c7fc3c` | Exact five-original-source native QC specification preparation. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `9c0822360aad2f759a2ba26a28a21b0c6b0e7aeb` | Read-only QC rights/source packaging; no strategy authorization. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `1f38ff32f9d767b35fc7a0a5d4b96244e2a54a09` | QC transport refusal preserved; separate private project decision. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `79886541d94b5c7a661d5d14508f91116219cb7d` | Private source project binding and exact eight-file installation freeze. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `4e098e2a533cdf96f778f1338bf29729bdad28f6` | Dependency uploads and bounded code-only readback. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `4fd0d422e98983aafc45f75ef819a1d0758089c3` | Complete cloud source authentication and one native source-job freeze. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `b3173fd4131e8a418a775bd6d919c24096ed02e1` | Completed native source diagnostic booked once; no strategy result cell. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `f6a57893ac8e8245343e77d825e1fc041159cf99` | Native metadata authentication and RAW acquisition preparation. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `c2278d3de8720d4c2b0d20e1e17a6ceaf84e4a72` | Canonical session-record bridge corrected before its new provider use. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `6d78975f28c0dff9c163f054080727f3333dc039` | Source-plan/transport refusal retained; credential-free transport diagnosis. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `bccc394a3478aa260bb0948c8dc67d4f3051c366` | Scoped macOS resolver IPC correction; no broader network or security waiver. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `6b86972a78d09d1d6aabd087edfe3b2248c7b291` | Verified transport fix and bounded RAW capture/privacy freeze. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `a7c546e4051a3e458c288b4cb5b6a0527714b5eb` | Actual full1256-body Sharadar RAW capture/authentication recorded. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `95a2d5a186566831ad020f7503a74a4c01147869` | Offline monthly sidecar and rename-safe common valuation; held runtime helpers. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `e7f81cddcffd5de82b88095ccdc5493d2a892f7e` | Failed AQ publication preserved; corrected AR native-publication boundary. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `fdc8611e883f410df74b32c55b0226bb226636be` | AR sidecar accepted technically; AS metadata-only reconstruction freeze. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `4302c6519d8118de265af1535f029c001202c4d6` | Early-history barrier retained; existing-EODHD diagnostic freeze. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `3fc471d50cf45f937e49d2189d55a7c55bc98f8a` | AU metadata refusal retained; separate AV shape diagnosis. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `b4a190080330f80fa09c6dd877bedac11f17c94d` | Verified Unicode display correction and exact retained-pair freeze. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `d6dae40dbc4b949bb229583d8ece6d7b1375c598` | AX retained pair accepted; complete EODHD catalogue candidate frozen. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `741e966cd426946877cac175dac9c569c72952af` | AW partial-catalog refusal retained; AY framed-pagination diagnosis. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `a8d5bf5b161911933f8c6a569870bfb9b847e406` | Root collector failure retained; fixed bounded capture and AZ metadata freeze. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `3f7e524423e708ed5041d21293d1f79bccfbf4b5` | Exact outer environment corrected before first native AZ dispatch. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `0b6c42d1c66dbe3fdb704443ee803693a2c7df50` | AZ metadata result, V2 representation/crosswalk and BA forward continuation freeze. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `278ea72688e65b9f35d24260026a70b3d7291775` | BA complete catalogue0/native0 with fixed external provenance. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `cdc902b3b1dd3715b6f4033016b68620e02a1403` | BB fresh-genuine/full-catalog crosswalk freeze; strict RAW parser held. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `95fe949ea1c073b8795e959509e1bcc489b395d7` | BB technical0/native0 retained with2426potential identity refusals. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+| `4e51fdf8dc8eaf14b00c22ae949de714ced6c006` | BC metadata diagnosis and checksum-valid US/CA representation freeze. | Recorded implementation/evidence; owner-waived sequencing, independent acceptance not claimed. |
+
+The final commit adds only the inert actual-BC metadata anchor and this lane
+record/live navigation/push-ledger handoff; it invokes no next operation.
+Source-pin mismatch resolution is PROSPECTIVE for the exact approved EOF
+deltas, not a blanket refresh or oldX/W/U acceptance. All-token CUSIP/original
+schema/reporting-currency/display/axis/resolver/publication/parser corrections
+have focused or actual bounded evidence as individually recorded. New RAW
+history parser remains supplied-data technical representation. Latest root
+focused selection is200distinctpasses14.17s, with earlier named selections
+and native metadata operations retained separately, never added into a false
+full-suite total. Initial fixtures, expected mutation reds, AQ/AU/AW/AY/
+transport/source refusals, Root collector/environment mistakes and native
+test-window overlap remain disclosed. Full lane/repository suite not run.
+No source/rights/permanent-master/PIT/readiness/trading flag becomes true.
+
+Exactly ONE actual native-QC infrastructure look in this round was booked at
+b3173fd4 (AJ technical source observation), already included337/259/53/699;
+all other current captures/authentication/format diagnostics add no QC looks
+or cells. OldR298 failures/owner sample and source-job identity remain counted
+once; no strategy completion/return or six-cell acceptance is claimed. Shared
+alpha-result changes are only the preauthorized bounded append-only own
+look accounting. Other shared/root/project-wide files and other lanes untouched.
+No order economics or source-stop behavior is relaxed, no evidence cleanup.
+
+Concluded endpoint is the verified data barrier above. Next substantive work:
+resolve existing Sharadar historical coverage to include2020-12-31..2026-10-13
+stocks AND funds, obtain authenticated identifier/hierarchy evidence for
+unresolved original stocks, then separately freeze a coherent whole-window
+source/price policy and only execute when complete coverage/input/valuation/
+source/privacy/project/access/idle/capacity/run/attempt gates pass. If a later
+source changes, use a separate reviewed-or-owner-waived version with actual
+byte/run pins, never transplant EOD prices into the frozen Sharadar/native
+format, date-fallback, execution quotes or caches. QC platform availability
+does not cure this source barrier. Existing account rights only; no purchase/
+funded/broker/real-order/paper/live action or efficacy claim.
+
+Before this sole final nonforce push: verify exact designatedroot/branch,
+clean committed state, full baseline ancestry, source/byte/diff checks and
+live matching remote STILL634509bf0fb361a8471c9ed6b62106d0cdcfc245. Stop on any
+concurrent change, do not broaden/reset/rebase/overwrite. Push HEAD only to
+origin refs/heads/codex/strategy-analyst-revisions-v2; verify local/tracking/live
+agreement and status afterwards. Section5 contiguous row covers all35commits.
+No intermediate successful push occurred; the successful final SHA/outcome
+will be reported from actual Git observations, never assumed in this record.
+All agents remain HOLD; no background source/QC/Safari operation.
+
+Final whole-round whitespace qualification P3 I326-033: unmodified baseline-
+to-4e51fdf8 git diff --check exits2 for exactlythree new-blank-at-EOF warnings:
+scripts/arv2_r298_ba_source_binding.py:39 (usedfdc6cd8e),
+scripts/arv2_r298_bb_source_binding.py:33 (used8aa1f5c9), and
+scripts/read_arv2_r298_eodhd_retained_pair.py:254 (used58aa5e2b).
+Working-diff check is clean. Earlier working-tree checks did not inspect all
+committed additions, so no false whole-range-green claim is made. These exact
+bytes are now dependencies of spent/pinned consumers; preserve them and their
+historical pins rather than perform a cosmetic mutation/automatic refresh.
+This has no executable effect or source-admission significance; retained as
+documented frozen-file formatting qualification for a future coherent version.
+The NEW uninvoked BC public anchor's extra EOF blank was removed BEFORE its
+final commit/use, changing its source length47089->47088 and source SHA only;
+its fact/result/diagnosis digests are unchanged. No frozen source was repaired,
+no whitespace setting/attribute changed or red evidence hidden. Current215
+literal dependency pins continue matching. The final handoff/push row must be
+read with this qualification, not as an all-checks-green or full-suite claim.
+Final handoff's first record selection85pass/1fail1.39s caught a blank
+separator before the newly appended section5row; removed that separator to
+restore the mandatory contiguous GFM ledger. No production source changed;
+the original failure and corrected final record validation are retained.
+Corrected final86record/documentpasses1.36s;215current literal pins, frozen
+BC source/profile, actual-output reconstruction and new anchor single-EOF/
+compile/hash checks passed under native denials. This repeat is not additive.

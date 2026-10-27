@@ -46,7 +46,8 @@ def test_original_readonly_OwnedOutput_inventory_ABI_survives_real_hook(tmp_path
     assert sorted(path.name for path in directory.iterdir()) == ["synthetic.private.json"]
 
 
-@pytest.mark.parametrize("kind", ["publish", "write", "socket", "credentials", "source", "native", "mutation", "subprocess"])
+@pytest.mark.parametrize("kind", ["publish", "write", "socket", "credentials", "source", "native", "mutation", "subprocess",
+    "future_credentials", "future_source"])
 def test_actual_cold_handler_refuses_external_seams_before_the_operation(tmp_path, kind):
     result = child(f'''
         import ctypes, os, socket, subprocess
@@ -62,6 +63,8 @@ def test_actual_cold_handler_refuses_external_seams_before_the_operation(tmp_pat
             elif kind == "socket": socket.socket()
             elif kind == "credentials": d.loader.count.read_named_keychain("massive")
             elif kind == "source": d.loader.count.run_registered(None)
+            elif kind == "future_credentials": d.future_transport.read_named_keychain("massive")
+            elif kind == "future_source": d.future_transport.CountCaptureOperation.dispatch(None, None, None, None)
             elif kind == "native": ctypes.CDLL("/usr/lib/libSystem.B.dylib")
             elif kind == "mutation": os.mkdir(directory / "new", 0o700)
             else: subprocess.run(["/bin/true"], cwd=directory, check=True)
@@ -81,6 +84,7 @@ def test_actual_cold_handler_refuses_external_seams_before_the_operation(tmp_pat
     ["git", "cat-file", "--batch-all-objects", "--batch"],
     ["git", "status", "--ignored", "--untracked-files=all"],
     ["git", "ls-remote", "--exit-code", "origin", "refs/heads/other"],
+    ["git", "ls-remote", "origin", "refs/heads/other"],
     ["git", "push", "origin", "HEAD"],
 ])
 def test_nonmatching_or_mutating_Git_arguments_are_rejected_without_running(argv):
@@ -108,6 +112,79 @@ def test_exact_original_Git_metadata_shapes_remain_permitted_without_execution(a
     seams = timing.OfflineSeams("c" * 40)
     seams.audit("subprocess.Popen", ("git", argv, str(timing.ROOT), {}))
     assert seams.git == 1 and not any(seams.denied.values())
+
+
+def test_original_saved_cache_remote_producer_survives_fixed_readonly_hook(monkeypatch):
+    from scripts import qualify_sharadar_companion as producer
+    seams = timing.OfflineSeams("c" * 40)
+    called = []
+    def fake_git(argv, **kwargs):
+        seams.audit("subprocess.Popen", ("git", argv, kwargs["cwd"], None))
+        called.append(tuple(argv))
+        return subprocess.CompletedProcess(argv, 0, "b" * 40 + "\t" + timing.loader.lane.REF + "\n", "")
+    monkeypatch.setattr(subprocess, "run", fake_git)
+    producer._guard_remote(timing.ROOT, "b" * 40)
+    assert called == [("git", "ls-remote", "origin", timing.loader.lane.REF)]
+    assert seams.git == 1 and not any(seams.denied.values())
+
+
+def test_negative_snapshot_preserves_original_denial_role_without_command_values(monkeypatch):
+    seams = timing.OfflineSeams("c" * 40)
+    monkeypatch.setattr(timing, "_DIAGNOSTIC_SEAM", seams)
+    monkeypatch.setattr(timing, "_DIAGNOSTIC_ORIGIN", (seams, timing._SEAMS[seams], object()))
+    with pytest.raises(timing.CountGuardTimingRefusal):
+        seams.audit("subprocess.Popen", ("git", ["git", "show", "--output=SECRET"], str(timing.ROOT), None))
+    seams.audit("subprocess.Popen", ("git", ["git", "rev-parse", "HEAD"], str(timing.ROOT), None))
+    summary = timing.negative_seam_summary()
+    assert summary["state"] == "original_counter_snapshot" and summary["denied"]["subprocess"] == 1
+    assert summary["first_denial_kind"] == "subprocess"
+    assert summary["first_denial_command_role"] == "other_subprocess"
+    assert summary["last_command_role"] == "local_head" and "SECRET" not in canonical_json(summary)
+    seams.denied["subprocess"] = 0
+    failed = timing.negative_seam_summary()
+    assert failed["state"] == "integrity_refused" and failed["denied"] is None
+
+
+def test_negative_snapshot_does_not_adopt_a_copied_origin(monkeypatch):
+    seams = timing.OfflineSeams("c" * 40)
+    monkeypatch.setattr(timing, "_DIAGNOSTIC_SEAM", seams)
+    monkeypatch.setattr(timing, "_DIAGNOSTIC_ORIGIN", (seams, tuple([*timing._SEAMS[seams]]), object()))
+    assert timing.negative_seam_summary()["state"] == "integrity_refused"
+
+
+def test_no_callable_counter_rebase_can_clear_a_denial():
+    seams = timing.OfflineSeams("c" * 40)
+    with pytest.raises(timing.CountGuardTimingRefusal): seams.deny("write")
+    seams.denied["write"] = 0
+    seams.first_denial_kind = "none"; seams.first_denial_command_role = None
+    rebase = getattr(seams, "_record", None)
+    if callable(rebase): rebase()
+    with pytest.raises(timing.CountGuardTimingRefusal, match="counter_changed"): seams.check()
+
+
+def test_foreign_counter_key_never_executes_equality_during_projection(monkeypatch):
+    calls = []
+    class Foreign:
+        __hash__ = object.__hash__
+        def __eq__(self, unused): calls.append("eq"); return False
+    seams = timing.OfflineSeams("c" * 40)
+    monkeypatch.setattr(timing, "_DIAGNOSTIC_SEAM", seams)
+    monkeypatch.setattr(timing, "_DIAGNOSTIC_ORIGIN", (seams, timing._SEAMS[seams], object()))
+    keys = tuple(seams.denied); seams.denied.clear()
+    seams.denied.update({Foreign(): 0, **{key: 0 for key in keys[1:]}})
+    assert timing.negative_seam_summary()["state"] == "integrity_refused"
+    assert calls == []
+
+
+@pytest.mark.parametrize("slot", ["__hash__", "__eq__"])
+def test_projection_refuses_changed_registry_identity_methods_before_lookup(monkeypatch, slot):
+    calls = []
+    seams = timing.OfflineSeams("c" * 40)
+    monkeypatch.setattr(timing, "_DIAGNOSTIC_SEAM", seams)
+    monkeypatch.setattr(timing, "_DIAGNOSTIC_ORIGIN", (seams, timing._SEAMS[seams], object()))
+    def foreign(*unused): calls.append("called"); raise AssertionError("foreign identity method")
+    monkeypatch.setattr(timing.OfflineSeams, slot, foreign)
+    assert timing.negative_seam_summary()["state"] == "integrity_refused" and calls == []
 
 
 @pytest.mark.parametrize("kind", ["counter_reset", "counter_bool", "counter_map_replaced", "head_replaced"])

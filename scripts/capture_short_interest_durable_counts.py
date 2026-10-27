@@ -28,6 +28,8 @@ from scripts import short_interest_count_control_custody as controls
 from scripts import short_interest_count_response_custody as responses
 from scripts import short_interest_count_response_volume as storage
 from scripts import short_interest_closed_count_chunk as reader
+from scripts import short_interest_count_negative_custody as negative
+from scripts import short_interest_count_transport_union as transport_union
 from scripts import diagnose_short_interest_body_receipt_custody as antecedent
 
 ROOT, BRANCH = transport.ROOT, lane.BRANCH
@@ -41,6 +43,13 @@ _ARCHIVES, _ARCHIVE_PLANS, _ARCHIVE_FAILED = {}, {}, set()
 _LEASES, _LEASE_FAILED, _LEASE_TERMINALS, _LEASE_PHASES, _LEASE_CLOCKS = {}, set(), {}, {}, {}
 _RUNS, _RUN_ORIGINS, _TERMINALS, _TERMINAL_ORIGINS, _TERMINAL_FAILED = {}, {}, {}, {}, set()
 _DIRECTORIES, _PRESERVATION_HOLD = {}, {}
+_PRESERVATION_LEASES, _NEGATIVE_STATUS, _NEGATIVE_ATTEMPTED = {}, {}, set()
+_PRESERVATION_PROFILES = {}
+_NEGATIVE_ORIGINS = {}
+_NEGATIVE_FINAL_ATTEMPTED = set()
+_BLOCKED_OPERATIONS, _RETENTION_ANNOUNCED = set(), set()
+_SOURCE_BATCHES, _SOURCE_BATCH_FAILED = {}, set()
+_SETTLED_CONTRIBUTIONS, _CONTRIBUTION_ORIGINS = {}, {}
 _RLOCK_TYPE = type(_thread.RLock())
 _CODES = frozenset("""durable_capture_registration_pending durable_capture_exact_root_required
 durable_capture_archive_factory_required durable_capture_archive_not_closed
@@ -51,7 +60,9 @@ durable_capture_clock_refused durable_capture_window_exhausted durable_capture_c
 durable_capture_terminal_required durable_capture_terminal_changed durable_capture_terminal_reused
 durable_capture_candidate_changed durable_capture_member_changed durable_capture_directory_changed
 durable_capture_fd_close_failed durable_capture_negative_preservation_pending
-durable_capture_unqualified_result durable_capture_retry_exhausted""".split())
+durable_capture_unqualified_result durable_capture_retry_exhausted durable_capture_preservation_changed
+durable_capture_retention_required durable_capture_START_evidence_required
+durable_capture_START_evidence_changed durable_capture_contribution_changed""".split())
 
 
 class DurableCountCaptureRefusal(ValueError): pass
@@ -73,6 +84,8 @@ def code_paths():
         "scripts/short_interest_count_durable_budget.py", "scripts/short_interest_count_durable_transport.py",
         "scripts/short_interest_count_control_custody.py", "scripts/short_interest_count_response_custody.py",
         "scripts/short_interest_count_response_volume.py", "scripts/short_interest_closed_count_chunk.py",
+        "scripts/short_interest_count_negative_custody.py",
+        "scripts/short_interest_count_transport_union.py",
         "research/short_interest_etf/native_count_recovery_budget.py"))))
 
 
@@ -88,6 +101,12 @@ def protocol():
         "directory_width": 6, "payload": "capture", "external_claim": "claim/claim.spent.json",
         "manifest": "all_capture_files_except_self_pinned_separately_original_typed_controls",
         "closed_control": "terminal_intent_only_until_original_outer_finish",
+        "negative_preservation": "LIVE_independent_lease_before_claim_or_key_failed_already_received_only_inside_volume_drain",
+        "negative_blocker": "fixed_no_network_process_retention_no_new_HTTP_claim_START_retry_or_settlement",
+        "negative_final": "once_issued_preservation_manifest_after_wire_drain_all_reserved_debits_unknowns_not_process_closure",
+        "remote_START_evidence": "fresh_exact_origin_ref_original_SourceLease_at_most8_exact_ticket_roster_before_START_creator",
+        "contribution": "original_reader_snapshot_immediately_after_chunkclosure_before_irreversible_settle_then_original_account7_only",
+        "transport_union": "all_original_ordered_contributions_and_pure_original_settlement_journal_no_expired_reader_clock",
         "same_original_mounted_epoch_only": True, "reattach_or_resume": False,
         "bound_antecedent_not_runtime_imported": [antecedent.previous.WRAPPER, antecedent.WRAPPER],
         "code_paths": list(code_paths()), "authority": authority()}
@@ -101,7 +120,8 @@ def failure_summary(error):
         return {"category": "local_contract_refusal", "contract_code": code, "errno_name": None}
     for module, name in ((transport, "CountTransportRefusal"), (controls, "CountControlRefusal"),
         (responses, "CountResponseRefusal"), (storage, "CountResponseVolumeRefusal"),
-        (reader, "ClosedCountChunkRefusal"), (accounting, "DurableCountBudgetRefusal")):
+        (reader, "ClosedCountChunkRefusal"), (accounting, "DurableCountBudgetRefusal"),
+        (negative, "NegativePreservationRefusal"), (transport_union, "CountTransportUnionRefusal")):
         if type(error) is getattr(module, name, None): return module.failure_summary(error)
     return transport.failure_summary(error)
 
@@ -310,6 +330,57 @@ def _source_boundary(lease):
     record = _lease_record(lease)
     if record[4][0] == "LIVE": return source_lease_live_binding(lease)
     return source_lease_terminal_binding(lease)
+
+
+class SourceStartBatchEvidence:
+    __slots__ = ("_anchor", "_identity")
+    def __init__(self): raise DurableCountCaptureRefusal("REFUSED: durable_capture_START_evidence_required")
+    def __repr__(self): return "<SourceStartBatchEvidence exact opaque roster; redacted>"
+
+
+def source_lease_authorize_start_batch(lease, operation, tickets):
+    """Fresh actual-ref evidence before the unchanged START creation window."""
+    source = source_lease_live_binding(lease); op = transport.active_operation_binding(operation)
+    require(op[12] is lease and type(tickets) is tuple and 1 <= len(tickets) <= 8
+        and len({id(ticket) for ticket in tickets}) == len(tickets)
+        and len(_SOURCE_BATCHES) < 70013, "durable_capture_START_evidence_required")
+    with source[12]:
+        for ticket in tickets:
+            bound = accounting.active_ticket_binding(ticket)
+            require(bound[1] is source[5] and bound[2] is source[4] and bound[3] == op[4],
+                "durable_capture_START_evidence_required")
+        record = _lease_record(lease)
+        evidence = record[3].refresh()
+        source_lease_live_binding(lease)
+        require(type(evidence) is lane.LaneEvidence, "durable_capture_START_evidence_changed")
+        payload = evidence.payload()
+        require(type(payload) is dict and payload.get("schema") == "si-bounded-batch-lane-evidence-v1"
+            and payload.get("HEAD") == source[2] and payload.get("branch") == BRANCH
+            and payload.get("actual_remote") == source[3] and payload.get("actual_ref") == lane.REF
+            and payload.get("status") == "clean" and type(payload.get("maximum_HTTP_slots")) is int
+            and payload["maximum_HTTP_slots"] == 8, "durable_capture_START_evidence_changed")
+        value = object.__new__(SourceStartBatchEvidence)
+        anchor = value, operation, source, op, tickets, evidence, hash_payload(payload), object()
+        value._anchor = value._identity = anchor; _SOURCE_BATCHES[value] = anchor
+        return value
+
+
+def source_start_batch_binding(value):
+    try:
+        original = _SOURCE_BATCHES.get(value) if type(value) is SourceStartBatchEvidence else None
+        require(type(original) is tuple and len(original) == 8 and original[0] is value
+            and value._anchor is value._identity is original and value not in _SOURCE_BATCH_FAILED
+            and source_lease_binding(original[2][0]) is original[2]
+            and transport.operation_binding(original[1]) is original[3]
+            and hash_payload(original[5].payload()) == original[6], "durable_capture_START_evidence_changed")
+        for ticket in original[4]:
+            bound = accounting.ticket_binding(ticket)
+            require(bound[1] is original[3][1] and bound[2] is original[3][2] and bound[3] == original[3][4],
+                "durable_capture_START_evidence_changed")
+        return original
+    except BaseException:
+        if type(value) is SourceStartBatchEvidence: _SOURCE_BATCH_FAILED.add(value)
+        raise
 
 
 def _expected_output(root, plan, chunk):
@@ -601,6 +672,242 @@ def _publish_attempt(operation, ticket, claim):
     return observed
 
 
+def _failed_original_state(operation):
+    """Negative-only original RAM state; never invoke a failed source guard."""
+    record = transport._OPERATIONS.get(operation)
+    prepared = _PRESERVATION_LEASES.get(operation)
+    expected = prepared[1] if prepared is not None else (record[0] if type(record) is tuple and record else None)
+    require(type(operation) is transport.CountCaptureOperation and type(expected) is tuple and len(expected) == 14
+        and expected[0] is operation and operation._anchor is operation._identity is expected
+        and type(record) is tuple and len(record) == 2 and record[0] is expected
+        and operation in transport._FAILED, "durable_capture_preservation_changed")
+    with expected[11]:
+        state = transport._OPERATIONS[operation][1]
+        require(type(state) is tuple and len(state) == 6 and all(type(state[index]) is tuple for index in (1, 2, 3))
+            and len(state[1]) <= 528 and len(state[2]) <= 8 and len(state[3]) <= 528,
+            "durable_capture_preservation_changed")
+        return expected, state
+
+
+def _checked_negative_report(operation, lease):
+    registered_lease = _PRESERVATION_LEASES.get(operation)
+    require(type(registered_lease) is tuple and len(registered_lease) == 4 and registered_lease[0] is lease
+        and type(lease) is negative.OriginalPreservationLease,
+        "durable_capture_preservation_changed")
+    report = negative.preservation_binding(lease)
+    count_names = ("retained_opaque_observations", "originally_closed_negative_attempts",
+        "verified_durable_negative_attempts", "pending_already_started_attempts")
+    require(type(report) is dict and report.get("schema") == "si-negative-preservation-observation-v1"
+        and type(report.get("requires_process_hold")) is bool and type(report.get("original_mount_FD_retained")) is bool
+        and type(report.get("final_negative_manifest_issued")) is bool
+        and type(report.get("status")) is str and report["status"] in {"blocked_private_bytes_and_FDs_must_remain_alive",
+            "negative_quarantine_incomplete_process_must_remain_alive", "negative_quarantine_only",
+            "preservation_manifest_sealed_only"}
+        and report.get("budget_changes_performed") is False
+        and all(type(report.get(name)) is int and 0 <= report[name] <= 528 for name in count_names)
+        and type(report.get("authority")) is dict and all(type(name) is str for name in report["authority"]),
+        "durable_capture_preservation_changed")
+    profile = _PRESERVATION_PROFILES.get(operation)
+    require(type(profile) is tuple and bool(profile), "durable_capture_preservation_changed")
+    wanted = dict(profile)
+    require(set(report["authority"]) == set(wanted) and all(type(report["authority"][name]) is type(value)
+        and report["authority"][name] == value for name, value in wanted.items())
+        and report["verified_durable_negative_attempts"] <= report["originally_closed_negative_attempts"],
+        "durable_capture_preservation_changed")
+    blocked = (report["requires_process_hold"] or report["pending_already_started_attempts"] != 0
+        or not report["final_negative_manifest_issued"] or not report["original_mount_FD_retained"]
+        or operation in _BLOCKED_OPERATIONS)
+    if report["status"] == "blocked_private_bytes_and_FDs_must_remain_alive" or not report["original_mount_FD_retained"]:
+        _BLOCKED_OPERATIONS.add(operation)
+    permanent = operation in _BLOCKED_OPERATIONS
+    summary = {"schema": "si-count-negative-capture-state-v1",
+        "status": "preservation_blocked" if permanent else "preservation_incomplete" if blocked else "negative_preservation_complete",
+        "requires_process_hold": blocked, "original_mount_FD_retained": report["original_mount_FD_retained"],
+        "final_negative_manifest_issued": report["final_negative_manifest_issued"],
+        "source_or_process_closure_claimed": False,
+        **{name: report[name] for name in count_names}, "budget_changes_performed": False,
+        "additional_HTTP_from_preservation": 0, "authority": authority()}
+    raw = canonical_json(summary).encode()
+    _NEGATIVE_STATUS[operation] = registered_lease, raw, hash_bytes(raw)
+    _NEGATIVE_ORIGINS[operation] = _NEGATIVE_STATUS[operation]
+    return summary
+
+
+def _blocked_negative_summary(operation):
+    _BLOCKED_OPERATIONS.add(operation)
+    summary = {"schema": "si-count-negative-capture-state-v1", "status": "preservation_blocked",
+        "requires_process_hold": True, "original_mount_FD_retained": False,
+        "final_negative_manifest_issued": False, "source_or_process_closure_claimed": False,
+        "retained_opaque_observations": 0, "originally_closed_negative_attempts": 0,
+        "verified_durable_negative_attempts": 0, "pending_already_started_attempts": 0,
+        "budget_changes_performed": False, "additional_HTTP_from_preservation": 0, "authority": authority()}
+    raw = canonical_json(summary).encode()
+    _NEGATIVE_STATUS[operation] = _PRESERVATION_LEASES.get(operation), raw, hash_bytes(raw)
+    _NEGATIVE_ORIGINS[operation] = _NEGATIVE_STATUS[operation]
+    return summary
+
+
+def _preserve_failed_chunk(operation, volume, error):
+    """Drain accepted work and quarantine only opaque already-received data.
+
+    Called inside original volume/source contexts for every body failure.
+    Late context-exit failures use the same independently retained original
+    mount capability; no qualified source/root guard is bypassed or cleared.
+    """
+    transport._latch(operation)
+    prepared = _PRESERVATION_LEASES.get(operation)
+    previous = _PRESERVATION_HOLD.get(operation)
+    original_error = previous[4] if type(previous) is tuple and len(previous) == 6 else error
+    _PRESERVATION_HOLD[operation] = volume, prepared, None, (), original_error, object()
+    try:
+        anchor, state = _failed_original_state(operation)
+        if prepared is None:
+            # Mint failure precedes claim/key. Any accepted attempt here is an
+            # unexpected preservation gap and must hold the process alive.
+            if state[1] or state[2] or state[3]: return _blocked_negative_summary(operation)
+            return None
+        lease = prepared[0]
+        while True:
+            anchor, state = _failed_original_state(operation); retained = []
+            _PRESERVATION_HOLD[operation] = volume, prepared, state, (), original_error, anchor
+            for observation in state[3]:
+                try:
+                    if type(observation) is transport.HttpObservation:
+                        observation = transport.downgrade_http_observation_for_preservation(observation)
+                    require(type(observation) is transport.UnqualifiedHttpObservation,
+                        "durable_capture_preservation_changed")
+                    transport.drained_http_observation_binding(observation); retained.append(observation)
+                    _PRESERVATION_HOLD[operation] = volume, prepared, state, tuple(retained), original_error, anchor
+                    key = operation, observation
+                    if key not in _NEGATIVE_ATTEMPTED:
+                        _NEGATIVE_ATTEMPTED.add(key)  # Never retry a failed quarantine publication.
+                        negative.preserve_failed_observation(lease, observation)
+                except BaseException:
+                    _BLOCKED_OPERATIONS.add(operation)
+                    if not any(item is observation for item in retained): retained.append(observation)
+                    _PRESERVATION_HOLD[operation] = volume, prepared, state, tuple(retained), original_error, anchor
+            try:
+                report = _checked_negative_report(operation, lease)
+                unused, drained = _failed_original_state(operation)
+                if (not drained[2] and report["pending_already_started_attempts"] == 0
+                        and not report["final_negative_manifest_issued"] and operation not in _BLOCKED_OPERATIONS
+                        and operation not in _NEGATIVE_FINAL_ATTEMPTED):
+                    _NEGATIVE_FINAL_ATTEMPTED.add(operation)
+                    negative.finalize_failed_chunk(lease)
+                    report = _checked_negative_report(operation, lease)
+            except BaseException: report = _blocked_negative_summary(operation)
+            unused, current = _failed_original_state(operation)
+            if operation in _BLOCKED_OPERATIONS: return report
+            if not current[2] and report["pending_already_started_attempts"] == 0: return report
+            # Existing protected wire calls drain into opaque originals. No
+            # lock is held while waiting, including the original short gap
+            # after inflight-pop but before observation issuance. Never
+            # reserve/retry/read a key/start a GET or reset qualification.
+            time.sleep(0.05)
+    except BaseException:
+        return _blocked_negative_summary(operation)
+
+
+def _negative_summaries():
+    summaries = []
+    for operation, record in tuple(_NEGATIVE_STATUS.items()):
+        try:
+            require(type(record) is tuple and len(record) == 3 and _NEGATIVE_ORIGINS.get(operation) is record
+                and type(record[1]) is bytes and hash_bytes(record[1]) == record[2], "durable_capture_preservation_changed")
+            summary = json.loads(record[1])
+            require(type(summary) is dict and type(summary.get("requires_process_hold")) is bool,
+                "durable_capture_preservation_changed")
+            summaries.append(summary)
+        except BaseException: _BLOCKED_OPERATIONS.add(operation)
+    return summaries
+
+
+def _retention_summary():
+    summaries = _negative_summaries()
+    return {"schema": "si-count-private-retention-hold-v1", "status": "preservation_blocked",
+        "requires_process_hold": True, "blocked_operations": len(_BLOCKED_OPERATIONS) or len(summaries),
+        "known_private_observations_retained": sum(item["retained_opaque_observations"] for item in summaries),
+        "additional_HTTP_from_hold": 0, "new_claims_from_hold": 0, "new_STARTs_from_hold": 0,
+        "new_credentials_from_hold": 0, "authority": authority()}
+
+
+def _requires_process_hold():
+    summaries = _negative_summaries()
+    return bool(_BLOCKED_OPERATIONS) or any(summary["requires_process_hold"] for summary in summaries)
+
+
+def _retain_failed_process():
+    """Keep independent ROFDs/private bytes alive; no network or cleanup API."""
+    require(_requires_process_hold(), "durable_capture_retention_required")
+    if "announced" not in _RETENTION_ANNOUNCED:
+        print(canonical_json(_retention_summary()), flush=True)
+        _RETENTION_ANNOUNCED.add("announced")
+    while True: time.sleep(30)
+
+
+def _fill_live_chunk(operation, volume, lease, budget):
+    base = source_lease_binding(lease)[11]
+    for path in (base, base / "starts", base / "received", base / "responses"):
+        _new_directory(operation, path)
+    with _owned(operation, transport._control_directory(operation, "claim")) as owned:
+        with controls.prepare_owned_count_claim(owned, operation,
+                boundary=lambda: _source_boundary(lease)) as claim: pass
+    # Serial scheduling is within <=8 in-flight. Every retry gets its own
+    # original ticket and START; dispatch also enforces the position chain.
+    chunk = budget.public_summary()["current_chunk"]
+    for position in budget.plan.chunk_positions(chunk):
+        epoch_attempts = 0
+        while True:
+            ticket = budget.reserve_start_slot(position)
+            operation.authorize_start_batch((ticket,))  # Serial first policy: one exact slot per fresh ref.
+            observed = _publish_attempt(operation, ticket, claim)
+            epoch_attempts += 1
+            bound = transport.http_observation_binding(observed)
+            if bound[9] == 200 and type(bound[10]) is bytes and bound[10]: break
+            detail = dict(bound[13] or ())
+            require(detail.get("retryable") is True and bound[9] is None, "durable_capture_retry_exhausted")
+            time.sleep(2 if epoch_attempts == 1 else 10)
+    candidate = operation.freeze_provisional_root()
+    for role in transport.FINAL_ROLES:
+        with _owned(operation, transport._control_directory(operation, role)) as owned:
+            with controls.prepare_owned_count_final_control(owned, operation, candidate, role=role,
+                    boundary=lambda: _source_boundary(lease)) as final: pass
+        operation.accept_final_control(final)
+    _RUNS[operation] = transport.operation_binding(operation), candidate, volume, claim, object()
+    _RUN_ORIGINS[operation] = _RUNS[operation]
+    _audit_membership(operation, candidate); volume.check()
+    return candidate
+
+
+def _retain_settled_contribution(budget, contribution):
+    """Only an irreversible original account7 append admits the snapshot."""
+    require(type(contribution) is transport_union.ClosedCountTransportContribution,
+        "durable_capture_contribution_changed")
+    original = transport_union.contribution_binding(contribution)
+    journal = accounting.settled_chunk_accounting(budget)
+    existing = _SETTLED_CONTRIBUTIONS.get(budget, ())
+    require(type(existing) is tuple and (not existing or _CONTRIBUTION_ORIGINS.get(budget) is existing)
+        and type(journal) is tuple and len(journal) == 4 and journal[0] is budget
+        and type(journal[3]) is tuple and len(journal[3]) == len(existing) + 1
+        and original[3] is budget and original[4] is journal[1] and original[2] is journal[2]
+        and original[5] is journal[3][-1] and original[5][2] == len(existing) + 1,
+        "durable_capture_contribution_changed")
+    retained = (*existing, contribution)
+    _SETTLED_CONTRIBUTIONS[budget] = _CONTRIBUTION_ORIGINS[budget] = retained
+
+
+def _original_settled_contributions(budget):
+    retained = _SETTLED_CONTRIBUTIONS.get(budget)
+    journal = accounting.settled_chunk_accounting(budget)
+    require(type(retained) is tuple and _CONTRIBUTION_ORIGINS.get(budget) is retained
+        and len(retained) == len(journal[3]), "durable_capture_contribution_changed")
+    for contribution, account in zip(retained, journal[3]):
+        original = transport_union.contribution_binding(contribution)
+        require(original[3] is budget and original[4] is journal[1] and original[2] is journal[2]
+            and original[5] is account, "durable_capture_contribution_changed")
+    return retained
+
+
 def _capture_chunk(token, budget, *, root, runtime_head, actual_remote, complete_code_manifest):
     registered(); operation = volume = None
     try:
@@ -609,58 +916,36 @@ def _capture_chunk(token, budget, *, root, runtime_head, actual_remote, complete
             operation = transport.bind_registered_operation(lease, budget)
             with storage.prepare_registered_volume(root, operation=operation,
                     boundary=lambda: _source_boundary(lease)) as volume:
-                operation.bind_volume(volume); base = source_lease_binding(lease)[11]
-                for path in (base, base / "starts", base / "received", base / "responses"):
-                    _new_directory(operation, path)
-                with _owned(operation, transport._control_directory(operation, "claim")) as owned:
-                    with controls.prepare_owned_count_claim(owned, operation,
-                            boundary=lambda: _source_boundary(lease)) as claim: pass
-                # Serial scheduling is within <=8 in-flight. Every retry gets
-                # its own original budget ticket and durable START; dispatch
-                # independently enforces the original position retry chain.
-                chunk = budget.public_summary()["current_chunk"]
-                for position in budget.plan.chunk_positions(chunk):
-                    epoch_attempts = 0
-                    while True:
-                        ticket = budget.reserve_start_slot(position)
-                        observed = _publish_attempt(operation, ticket, claim)
-                        epoch_attempts += 1
-                        bound = transport.http_observation_binding(observed)
-                        if bound[9] == 200 and type(bound[10]) is bytes and bound[10]: break
-                        detail = dict(bound[13] or ())
-                        require(detail.get("retryable") is True and bound[9] is None,
-                            "durable_capture_retry_exhausted")
-                        time.sleep(2 if epoch_attempts == 1 else 10)
-                candidate = operation.freeze_provisional_root()
-                for role in transport.FINAL_ROLES:
-                    with _owned(operation, transport._control_directory(operation, role)) as owned:
-                        with controls.prepare_owned_count_final_control(owned, operation, candidate, role=role,
-                                boundary=lambda: _source_boundary(lease)) as final: pass
-                    operation.accept_final_control(final)
-                _RUNS[operation] = transport.operation_binding(operation), candidate, volume, claim, object()
-                _RUN_ORIGINS[operation] = _RUNS[operation]
-                _audit_membership(operation, candidate); volume.check()
+                operation.bind_volume(volume)
+                preservation = negative.prepare_original_preservation_lease(operation, volume)
+                require(type(preservation) is negative.OriginalPreservationLease,
+                    "durable_capture_preservation_changed")
+                _PRESERVATION_LEASES[operation] = preservation, transport.operation_binding(operation), volume, object()
+                profile = negative.authority()
+                require(type(profile) is dict and all(type(name) is str and type(value) in (bool, int)
+                    for name, value in profile.items()) and profile.get("source_admitted") is False
+                    and profile.get("budget_release_authority") is False and profile.get("HTTP_authority") is False
+                    and profile.get("retry_authority") is False and profile.get("ready_for_backtest") is False,
+                    "durable_capture_preservation_changed")
+                _PRESERVATION_PROFILES[operation] = tuple(profile.items())
+                try:
+                    candidate = _fill_live_chunk(operation, volume, lease, budget)
+                except BaseException as error:
+                    report = _preserve_failed_chunk(operation, volume, error)
+                    if report is not None and report["requires_process_hold"]: _retain_failed_process()
+                    raise
             # Volume's original contexts/FDs have closed, source/code still held.
             volume.check_after_close(); source_lease_live_binding(lease)
         # Now source/code contexts and their fresh committed-code audits closed.
         result = _finish_original_chunk(operation, candidate)
+        contribution = transport_union.freeze_closed_count_transport_contribution(result)
         budget.settle_closed_chunk(result)
+        _retain_settled_contribution(budget, contribution)
         return result
-    except BaseException:
+    except BaseException as error:
         if operation is not None:
-            transport._latch(operation)
-            retained = []
-            state = transport._OPERATIONS.get(operation)
-            _PRESERVATION_HOLD[operation] = volume, (), state
-            if state is not None:
-                for observation in state[1][3]:
-                    if type(observation) is transport.HttpObservation:
-                        try: retained.append(transport.downgrade_http_observation_for_preservation(observation))
-                        except BaseException: retained.append(observation)
-                    else: retained.append(observation)
-            # RAM is explicitly unqualified and not durable. Strongly retain
-            # original capabilities and bytes rather than calling them closed.
-            _PRESERVATION_HOLD[operation] = volume, tuple(retained), state
+            report = _preserve_failed_chunk(operation, volume, error)
+            if report is not None and report["requires_process_hold"]: _retain_failed_process()
         raise
 
 
@@ -673,8 +958,15 @@ def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest,
     for unused in range(1, len(plan._parts[3]) + 1):
         closed.append(_capture_chunk(token, budget, root=root, runtime_head=runtime_head,
             actual_remote=actual_remote, complete_code_manifest=complete_code_manifest))
-    return {"schema": "si-durable-count-transport-round-v1", "status": "transport_chunks_closed_only",
-        "closed_chunks": len(closed), "budget": budget.public_summary(), "authority": authority()}
+    union = transport_union.seal_count_transport_union(sourcelease_model(token), plan,
+        _original_settled_contributions(budget), budget)
+    return {"schema": "si-durable-count-transport-round-v1", "status": "transport_union_only_source_unqualified",
+        "closed_chunks": len(closed), "transport_union": union.public_summary(), "authority": authority()}
+
+
+def _run_cli(arguments):
+    registered()  # CLI cannot bypass missing source/negative-preservation registration.
+    raise DurableCountCaptureRefusal("REFUSED: durable_capture_registration_pending")
 
 
 def main(argv=None):
@@ -683,10 +975,12 @@ def main(argv=None):
     parser.add_argument("--runtime-head", required=True); parser.add_argument("--actual-remote", required=True)
     arguments = parser.parse_args(argv)
     try:
-        registered()  # CLI cannot bypass missing source/negative-preservation registration.
-        raise DurableCountCaptureRefusal("REFUSED: durable_capture_registration_pending")
+        result = _run_cli(arguments)
+        print(canonical_json(result)); return 0
     except BaseException as error:
-        print(canonical_json({"status": "refused", "fixed_diagnostic": failure_summary(error), "authority": authority()}))
+        if _requires_process_hold(): _retain_failed_process()
+        print(canonical_json({"status": "refused", "fixed_diagnostic": failure_summary(error),
+            "negative_preservation": _negative_summaries(), "authority": authority()}))
         return 2
 
 

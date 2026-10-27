@@ -10,6 +10,7 @@ import socket
 from concurrent.futures import ThreadPoolExecutor
 import threading
 import http.client
+from io import BytesIO
 
 import pytest
 
@@ -19,12 +20,20 @@ from scripts import short_interest_count_durable_budget as budget_module
 from test_short_interest_count_durable_budget import genuine_plan, isolated_registries_and_no_network
 
 
+def genuine_headers(*pairs):
+    headers = http.client.HTTPMessage()
+    for name, value in pairs: headers[name] = value
+    return headers
+
+
 @pytest.fixture
-def operation(monkeypatch, tmp_path):
+def operation(monkeypatch, tmp_path, request):
     for name, value in (("_OPERATIONS", {}), ("_FAILED", set()), ("_OBSERVATIONS", {}),
         ("_TERMINALS", {}), ("_CANDIDATES", {}), ("_RESPONSE_CAPS", {}), ("_RECEIVED_CAPS", {}),
         ("_FINAL_CAPS", {}), ("_WINDOWS", {}), ("_VOLUMES", {}), ("_DRAINED", {}),
-        ("_DOWNGRADES", {}), ("_DRAIN_ORIGINS", {}), ("_OBS_COMPLETED", {}), ("_WIRE_RESULTS", {})):
+        ("_DOWNGRADES", {}), ("_DRAIN_ORIGINS", {}), ("_OBS_COMPLETED", {}), ("_WIRE_RESULTS", {}),
+        ("_WIRE_ERROR_HOLD", {}), ("_OBS_WIRE", {}), ("_REMOTE_BATCHES", {}),
+        ("_START_PERMISSIONS", {}), ("_START_CONSUMED", set())):
         monkeypatch.setattr(transport, name, value)
     plan = genuine_plan(monkeypatch)
     budget = budget_module.open_durable_count_budget(plan)
@@ -37,6 +46,7 @@ def operation(monkeypatch, tmp_path):
     monkeypatch.setattr(transport.time, "monotonic", lambda: h.tick)
     # Explicit fabricated registration: no actual source or Git route is run.
     monkeypatch.setattr(transport, "_registered", lambda *args: None)
+    monkeypatch.setattr(transport, "_capacity_before_dispatch", lambda operation, ticket: None)  # Explicit fake physical-volume seam.
     class Lease: pass
     h.lease = Lease()
     source = (h.lease, tmp_path, "c" * 40, "b" * 40, plan, budget,
@@ -54,6 +64,23 @@ def operation(monkeypatch, tmp_path):
     h.coordinator = SimpleNamespace(CountSourceLease=Lease, source_lease_binding=lambda lease: source,
         source_lease_live_binding=live, source_lease_terminal_binding=lambda lease: source,
         terminal_chunk_binding=terminal, final_member_rows=lambda op, candidate: h.member_rows)
+    class SourceBatch: pass
+    h.source_batches, h.refresh_calls, h.remote_ref = {}, [], source[3]
+    def refresh(lease, op, tickets):
+        assert lease is h.lease and op is h.op
+        h.refresh_calls.append(tickets)
+        if h.remote_ref != source[3]:
+            raise transport.CountTransportRefusal("REFUSED: count_operator_START_permission_changed")
+        value = SourceBatch()
+        original = value, op, source, transport.operation_binding(op), tickets, object(), "a" * 64, object()
+        value._anchor = value._identity = original; h.source_batches[value] = original; return value
+    def source_batch(value):
+        original = h.source_batches.get(value)
+        assert type(value) is SourceBatch and original is value._anchor is value._identity
+        return original
+    h.coordinator.SourceStartBatchEvidence = SourceBatch
+    h.coordinator.source_lease_authorize_start_batch = refresh
+    h.coordinator.source_start_batch_binding = source_batch
     monkeypatch.setattr(transport, "_coordinator", lambda: h.coordinator)
     h.op = transport.bind_registered_operation(h.lease, budget)
     class Claim: pass
@@ -81,9 +108,12 @@ def operation(monkeypatch, tmp_path):
     monkeypatch.setattr(transport, "read_named_keychain", key)
     monkeypatch.setattr(transport, "_clock", lambda: "2026-10-27T00:00:01Z")
     class WireResponse:
-        def __init__(self, raw): self.raw, self.offset, self.status, self.headers = raw, 0, h.status, {
-            "Content-Type": "application/json", "Content-Length": str(len(raw))}
+        def __init__(self, raw):
+            self.raw, self.offset, self.status = raw, 0, h.status
+            self.headers = genuine_headers(("Content-Type", "application/json"), ("Content-Length", str(len(raw))))
+            self.read_calls = []
         def read(self, maximum):
+            self.read_calls.append(maximum)
             piece = self.raw[self.offset:self.offset + maximum]; self.offset += len(piece); return piece
         def close(self): pass
     def open_wire(request, *, timeout):
@@ -115,6 +145,7 @@ def operation(monkeypatch, tmp_path):
         h.starts[ticket] = value
         return ticket
     h.retry_ticket = retry_ticket
+    if getattr(request, "param", True): h.op.authorize_start_batch(h.tickets)
     return h
 
 
@@ -266,11 +297,14 @@ def test_retry_after_nonretryable_prior_result_never_reads_another_key_or_GET(op
     assert len(h.key_calls) == len(h.wire_calls) == 1
 
 
+@pytest.mark.parametrize("operation", [False], indirect=True)
 def test_OPEN_retry_requires_original_completion_backoff_and_new_START(operation):
     h = operation; first = h.tickets[0]
+    h.op.authorize_start_batch((first,))
     h.failure = transport.wire.RecoveryTransportFailure("network_failure", phase="open", failure_class="timeout", retryable=True)
     original = h.op.dispatch(first, h.claim, h.starts[first]); ticket = h.retry_ticket(first.public_summary()["source_position"])
     h.tick += 2; h.failure = None
+    h.op.authorize_start_batch((ticket,))
     retried = h.op.dispatch(ticket, h.claim, h.starts[ticket])
     assert transport.http_observation_binding(original)[9] is None
     assert transport.http_observation_binding(retried)[9] == 200
@@ -309,7 +343,7 @@ def test_different_tickets_for_one_position_cannot_dispatch_concurrently(operati
 def test_read_or_close_failure_preserves_every_observed_prefix_only_unqualified(operation, monkeypatch, kind):
     h = operation; returned, partial = b'{"partial":', b'"SYNTHETIC"}'
     class FailedResponse:
-        status, headers = 200, {"Content-Type": "application/json"}
+        status, headers = 200, genuine_headers(("Content-Type", "application/json"))
         def __init__(self): self.reads, self.closed = 0, False
         def read(self, maximum):
             assert 0 < maximum <= 65536; self.reads += 1
@@ -336,8 +370,10 @@ def test_read_or_close_failure_preserves_every_observed_prefix_only_unqualified(
 def test_maximum_body_never_reads_MAX_plus_one_and_requires_authoritative_length(operation, monkeypatch, declared):
     h = operation; raw = b"x" * transport.MAXIMUM_RESPONSE_BYTES
     response = h.response(raw); requested = []; original_read = response.read
-    if declared == "absent": response.headers.pop("Content-Length")
-    if declared == "ambiguous": response.headers["Content-Length"] = "2097152, 2097152"
+    if declared == "absent": del response.headers["Content-Length"]
+    if declared == "ambiguous":
+        del response.headers["Content-Length"]
+        response.headers["Content-Length"] = "2097152, 2097152"
     if declared == "transfer-encoded": response.headers["Transfer-Encoding"] = "chunked"
     def read(maximum): requested.append(maximum); return original_read(maximum)
     response.read = read
@@ -356,9 +392,266 @@ def test_maximum_body_never_reads_MAX_plus_one_and_requires_authoritative_length
 
 
 def test_truncated_declared_body_is_preserved_and_never_source_retry_evidence(operation, monkeypatch):
-    h = operation; response = h.response(b"short"); response.headers["Content-Length"] = "20"
+    h = operation; response = h.response(b"short"); del response.headers["Content-Length"]
+    response.headers["Content-Length"] = "20"
     monkeypatch.setattr(h.opener, "open", lambda *a, **k: response)
     obs = h.op.dispatch(h.tickets[0], h.claim, h.starts[h.tickets[0]])
     assert transport.drained_http_observation_binding(obs)[10] == b"short"
     assert type(obs) is transport.UnqualifiedHttpObservation
     assert dict(transport.drained_http_observation_binding(obs)[13])["retryable"] is False
+
+
+@pytest.mark.parametrize("kind", ["CL_conflict", "CL_equal", "CT_duplicate", "TE_duplicate", "CL_and_TE", "CE_gzip", "CE_duplicate"])
+def test_duplicate_or_unsupported_original_HTTPMessage_framing_is_rejected_before_body(operation, monkeypatch, kind):
+    h = operation; response = h.response(h.raw)
+    if kind == "CL_conflict": response.headers["Content-Length"] = "999"
+    elif kind == "CL_equal": response.headers["Content-Length"] = str(len(h.raw))
+    elif kind == "CT_duplicate": response.headers["Content-Type"] = "text/plain"
+    elif kind == "TE_duplicate":
+        del response.headers["Content-Length"]
+        response.headers["Transfer-Encoding"] = "chunked"; response.headers["Transfer-Encoding"] = "chunked"
+    elif kind == "CL_and_TE": response.headers["Transfer-Encoding"] = "chunked"
+    elif kind == "CE_gzip": response.headers["Content-Encoding"] = "gzip"
+    elif kind == "CE_duplicate":
+        response.headers["Content-Encoding"] = "identity"; response.headers["Content-Encoding"] = "identity"
+    monkeypatch.setattr(h.opener, "open", lambda *a, **k: response)
+    bound = transport.http_observation_binding(h.op.dispatch(h.tickets[0], h.claim, h.starts[h.tickets[0]]))
+    assert bound[10] is None and response.read_calls == []
+    assert dict(bound[13])["retryable"] is False
+
+
+def genuine_chunked_response(body, *, transfer="chunked", trailer=b"0\r\n\r\n"):
+    raw = (b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nTransfer-Encoding: "
+        + transfer.encode("ascii") + b"\r\n\r\n" + f"{len(body):x}".encode() + b"\r\n" + body + b"\r\n" + trailer)
+    class FakeSocket:
+        def makefile(self, mode): assert mode == "rb"; return BytesIO(raw)
+    response = http.client.HTTPResponse(FakeSocket(), method="GET"); response.begin(); return response
+
+
+@pytest.mark.parametrize("transfer", ["chunked", "ChUnKeD"])
+def test_single_chunked_uses_genuine_original_HTTPResponse_decoder_and_bounded_eof(operation, monkeypatch, transfer):
+    h = operation; response = genuine_chunked_response(h.raw, transfer=transfer)
+    monkeypatch.setattr(h.opener, "open", lambda *a, **k: response)
+    obs = h.op.dispatch(h.tickets[0], h.claim, h.starts[h.tickets[0]])
+    assert transport.http_observation_binding(obs)[10] == h.raw and response.fp is None
+
+
+@pytest.mark.parametrize("kind", ["fake_flag", "subclass", "read_override", "read_code", "other_TE"])
+def test_chunked_flag_or_substituted_decoder_cannot_admit_body(operation, monkeypatch, kind):
+    h = operation
+    if kind == "fake_flag":
+        response = h.response(h.raw); del response.headers["Content-Length"]
+        response.headers["Transfer-Encoding"] = "chunked"; response.chunked = True; response.length = None
+    else:
+        response = genuine_chunked_response(h.raw)
+        if kind == "subclass":
+            class Derived(http.client.HTTPResponse): pass
+            response.__class__ = Derived
+        elif kind == "read_override": response.read = lambda maximum: pytest.fail("substituted read executed")
+        elif kind == "read_code":
+            def replacement(self, maximum=None): raise AssertionError("substituted original function code executed")
+            monkeypatch.setattr(http.client.HTTPResponse.read, "__code__", replacement.__code__)
+        elif kind == "other_TE":
+            del response.headers["Transfer-Encoding"]
+            response.headers["Transfer-Encoding"] = "gzip"
+    monkeypatch.setattr(h.opener, "open", lambda *a, **k: response)
+    bound = transport.http_observation_binding(h.op.dispatch(h.tickets[0], h.claim, h.starts[h.tickets[0]]))
+    assert bound[10] is None and dict(bound[13])["retryable"] is False
+
+
+def test_original_HTTPMessage_function_code_cannot_be_replaced_in_place(operation, monkeypatch):
+    h = operation; response = h.response(h.raw)
+    def replacement(self, name, failobj=None): raise AssertionError("substituted header parser executed")
+    monkeypatch.setattr(http.client.HTTPMessage.get_all, "__code__", replacement.__code__)
+    monkeypatch.setattr(h.opener, "open", lambda *a, **k: response)
+    bound = transport.http_observation_binding(h.op.dispatch(h.tickets[0], h.claim, h.starts[h.tickets[0]]))
+    assert bound[10] is None and response.read_calls == []
+
+
+def test_chunked_exact_MAX_stays_unqualified_without_an_extra_decoded_read(operation, monkeypatch):
+    h = operation; raw = b"x" * transport.MAXIMUM_RESPONSE_BYTES
+    response = genuine_chunked_response(raw)
+    monkeypatch.setattr(h.opener, "open", lambda *a, **k: response)
+    obs = h.op.dispatch(h.tickets[0], h.claim, h.starts[h.tickets[0]])
+    assert transport.drained_http_observation_binding(obs)[10] == raw
+    assert type(obs) is transport.UnqualifiedHttpObservation
+
+
+def test_original_HTTPConnection_request_path_inserts_single_identity_encoding_without_socket(operation):
+    h = operation; query = transport._query_for_ticket(h.tickets[0])
+    request = transport.legacy._wire_request(query, transport.KeychainSecret("FAKE_HEADER_TEST_SECRET"))
+    assert request.get_header("Accept-encoding") is None  # Original builder unchanged.
+    class SinkSocket:
+        def __init__(self): self.parts = []
+        def sendall(self, raw): self.parts.append(raw)
+        def close(self): pass
+    connection = http.client.HTTPConnection("synthetic.invalid")
+    sink = SinkSocket(); connection.sock = sink; connection.auto_open = 0
+    connection.request("GET", "/fixed-synthetic", headers=dict(request.header_items()))
+    sent = b"".join(sink.parts); connection.close()
+    assert sent.count(b"Accept-Encoding: identity\r\n") == 1
+
+
+@pytest.mark.parametrize("case,framed,expected", [
+    ("first_chunk", b"5\r\nabc", b"abc"),
+    ("completed_then_partial", b"3\r\none\r\n5\r\ntwo", b"onetwo"),
+    ("malformed_next_size", b"3\r\none\r\nZZ\r\n", b"one"),
+    ("truncated_delimiter", b"3\r\none\r", b"one")])
+def test_genuine_native_chunked_IncompleteRead_keeps_body_pieces_once_and_excludes_framing(operation, monkeypatch, case, framed, expected):
+    h = operation
+    class FakeSocket:
+        def makefile(self, mode):
+            return BytesIO(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nTransfer-Encoding: chunked\r\n\r\n" + framed)
+    response = http.client.HTTPResponse(FakeSocket(), method="GET"); response.begin()
+    monkeypatch.setattr(h.opener, "open", lambda *a, **k: response)
+    obs = h.op.dispatch(h.tickets[0], h.claim, h.starts[h.tickets[0]])
+    bound = transport.drained_http_observation_binding(obs)
+    assert bound[10] == expected and type(obs) is transport.UnqualifiedHttpObservation
+    assert dict(bound[13])["retryable"] is False and transport.unqualified_preservation_blocker(obs) is None
+
+
+def test_genuine_Content_Length_truncation_keeps_every_returned_body_byte(operation, monkeypatch):
+    h = operation
+    class FakeSocket:
+        def makefile(self, mode):
+            return BytesIO(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: 5\r\n\r\nabc")
+    response = http.client.HTTPResponse(FakeSocket(), method="GET"); response.begin()
+    monkeypatch.setattr(h.opener, "open", lambda *a, **k: response)
+    obs = h.op.dispatch(h.tickets[0], h.claim, h.starts[h.tickets[0]])
+    assert transport.drained_http_observation_binding(obs)[10] == b"abc"
+    assert transport.unqualified_preservation_blocker(obs) is None
+
+
+@pytest.mark.parametrize("kind", ["same_valued_cause", "cycle", "deep"])
+def test_unproved_IncompleteRead_chain_keeps_original_error_and_prefix_without_duplicate_adoption(operation, monkeypatch, kind):
+    h = operation; outer = http.client.IncompleteRead(b"prefix", 1)
+    if kind == "cycle": outer.__cause__ = outer
+    else:
+        current = outer
+        for unused in range(8 if kind == "deep" else 1):
+            following = http.client.IncompleteRead(b"prefix", 1); current.__cause__ = following; current = following
+    response = h.response(b"unused")
+    def read(maximum): raise outer
+    response.read = read
+    monkeypatch.setattr(h.opener, "open", lambda *a, **k: response)
+    obs = h.op.dispatch(h.tickets[0], h.claim, h.starts[h.tickets[0]])
+    assert transport.drained_http_observation_binding(obs)[10] == b"prefix"
+    assert transport.unqualified_preservation_blocker(obs) == "native_partial_chain_unproven"
+    assert any(held[1] is outer for held in transport._WIRE_ERROR_HOLD.values())
+    assert dict(transport.drained_http_observation_binding(obs)[13])["preservation_blocker"] == "native_partial_chain_unproven"
+
+
+@pytest.mark.parametrize("at", ["before_key", "before_GET"])
+def test_fresh_physical_capacity_refusal_retains_full_reservation_and_prevents_GET(operation, monkeypatch, at):
+    h = operation; checks = []
+    def capacity(op, ticket):
+        assert op is h.op and ticket is h.tickets[0]; checks.append(True)
+        if len(checks) == (1 if at == "before_key" else 2):
+            raise transport.CountTransportRefusal("REFUSED: count_operator_storage_not_registered")
+    monkeypatch.setattr(transport, "_capacity_before_dispatch", capacity)
+    obs = h.op.dispatch(h.tickets[0], h.claim, h.starts[h.tickets[0]])
+    assert type(obs) is transport.UnqualifiedHttpObservation
+    assert transport.drained_http_observation_binding(obs)[8] is False and h.wire_calls == []
+    assert len(h.key_calls) == (0 if at == "before_key" else 1)
+    with pytest.raises(budget_module.DurableCountBudgetRefusal): h.budget.public_summary()
+    assert budget_module.settled_chunk_accounting(h.budget)[3] == () and len(h.budget._state[2]) == 2
+
+
+@pytest.mark.parametrize("operation", [False], indirect=True)
+def test_unissued_remote_START_slot_refuses_before_key_or_GET(operation):
+    h = operation
+    with pytest.raises(transport.CountTransportRefusal, match="START_permission_required"):
+        h.op.dispatch(h.tickets[0], h.claim, h.starts[h.tickets[0]])
+    assert h.key_calls == h.wire_calls == h.refresh_calls == []
+
+
+@pytest.mark.parametrize("operation", [False], indirect=True)
+def test_one_fresh_remote_evidence_binds_exact_original_roster_once(operation):
+    h = operation; h.op.authorize_start_batch(h.tickets)
+    originals = tuple(transport.start_permission_binding(h.op, ticket) for ticket in h.tickets)
+    assert len(h.refresh_calls) == 1 and h.refresh_calls[0] is h.tickets
+    assert all(original[4][4] is h.tickets for original in originals)
+    for ticket in h.tickets:
+        h.op.dispatch(ticket, h.claim, h.starts[ticket])
+    assert len(h.refresh_calls) == 1 and len(h.wire_calls) == 2
+    assert all(ticket in transport._START_CONSUMED for ticket in h.tickets)
+    with pytest.raises(transport.CountTransportRefusal, match="remote_batch_refused"):
+        h.op.authorize_start_batch(h.tickets)
+    assert len(h.refresh_calls) == 1
+
+
+@pytest.mark.parametrize("operation", [False], indirect=True)
+@pytest.mark.parametrize("kind", ["list", "empty", "over8", "same_ticket", "same_position", "forged"])
+def test_remote_batch_does_not_admit_foreign_or_unbounded_slots(operation, kind):
+    h = operation
+    roster = (list(h.tickets) if kind == "list" else () if kind == "empty" else h.tickets * 5
+        if kind == "over8" else (h.tickets[0], h.tickets[0]) if kind == "same_ticket" else
+        (h.tickets[0], h.retry_ticket(h.tickets[0].public_summary()["source_position"])) if kind == "same_position"
+        else (object.__new__(budget_module.CountAttemptTicket),))
+    with pytest.raises((transport.CountTransportRefusal, budget_module.DurableCountBudgetRefusal)):
+        h.op.authorize_start_batch(roster)
+    assert h.refresh_calls == h.key_calls == h.wire_calls == []
+    assert h.op in transport._FAILED and transport._START_PERMISSIONS == {}
+
+
+@pytest.mark.parametrize("operation", [False], indirect=True)
+def test_actual_ref_change_vetoes_new_START_permission_without_key_or_GET(operation):
+    h = operation; h.remote_ref = "f" * 40
+    with pytest.raises(transport.CountTransportRefusal, match="START_permission_changed"):
+        h.op.authorize_start_batch((h.tickets[0],))
+    assert len(h.refresh_calls) == 1 and transport._START_PERMISSIONS == {}
+    assert h.key_calls == h.wire_calls == [] and h.op in transport._FAILED
+
+
+def test_exact_ticket_permission_cannot_be_replayed_as_a_second_dispatch(operation):
+    h = operation; ticket = h.tickets[0]
+    original = transport.start_permission_binding(h.op, ticket)
+    h.op.dispatch(ticket, h.claim, h.starts[ticket])
+    assert original is transport.start_permission_binding(h.op, ticket)
+    with pytest.raises(transport.CountTransportRefusal, match="dispatch_reused"):
+        h.op.dispatch(ticket, h.claim, h.starts[ticket])
+    assert len(h.wire_calls) == 1
+
+
+@pytest.mark.parametrize("operation", [False], indirect=True)
+def test_remote_evidence_cannot_be_queued_for_unstarted_future_batches(operation):
+    h = operation; h.op.authorize_start_batch((h.tickets[0],))
+    with pytest.raises(transport.CountTransportRefusal, match="remote_batch_refused"):
+        h.op.authorize_start_batch((h.tickets[1],))
+    assert len(h.refresh_calls) == 1 and h.key_calls == h.wire_calls == []
+
+
+def test_operator_failure_permanently_stops_original_budget_reserve_and_keeps_debits(operation):
+    h = operation; before = h.budget._state
+    transport._latch(h.op)
+    with pytest.raises(budget_module.DurableCountBudgetRefusal, match="permanently_stopped"):
+        h.budget.reserve_start_slot(h.plan.chunk_positions(1)[0])
+    assert h.budget._state is before and budget_module.settled_chunk_accounting(h.budget)[3] == ()
+    assert h.op in transport._FAILED and h.budget in budget_module._FAILED
+
+
+def test_failure_latch_serializes_with_original_outbound_acceptance_lock(operation, monkeypatch):
+    h = operation; lock = transport.operation_binding(h.op)[11]
+    reached, worker_box = threading.Event(), []
+    class ObservedRegistry(dict):
+        def get(self, key, default=None):
+            result = super().get(key, default)
+            if worker_box and threading.current_thread() is worker_box[0]: reached.set()
+            return result
+    monkeypatch.setattr(transport, "_OPERATIONS", ObservedRegistry(transport._OPERATIONS))
+    worker = threading.Thread(target=transport._latch, args=(h.op,)); worker_box.append(worker)
+    with lock:
+        worker.start(); assert reached.wait(timeout=5)
+        assert h.op not in transport._FAILED  # Atomic latch waits for original A, never races an accepted slot.
+    worker.join(timeout=5)
+    assert not worker.is_alive() and h.op in transport._FAILED and h.budget in budget_module._FAILED
+
+
+def test_named_existing_key_read_is_inside_same_original_failure_acceptance_lock(operation, monkeypatch):
+    h = operation; original = transport.read_named_keychain
+    def read(name):
+        assert h.op._anchor[11]._is_owned()
+        return original(name)
+    monkeypatch.setattr(transport, "read_named_keychain", read)
+    observed = h.op.dispatch(h.tickets[0], h.claim, h.starts[h.tickets[0]])
+    assert transport.http_observation_binding(observed)[9] == 200 and len(h.key_calls) == 1

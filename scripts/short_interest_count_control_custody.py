@@ -283,6 +283,7 @@ def _prepare_control(owned, operation, role, *, ticket=None, claim=None, candida
                 "count_control_binding_changed")
             ticket, claim = observed[2:4]
         require(role not in ("start", "received") or type(ticket) is budget.CountAttemptTicket, "count_control_binding_changed")
+        if role == "start": transport.start_permission_binding(operation, ticket)
         key = (operation, role, ticket) if role in ("start", "received") else (operation, role)
         require(key not in _USED, "count_control_role_spent"); _USED.add(key)
         started = kernel._utc_now(); kernel._clock(started)
@@ -410,6 +411,7 @@ def prepare_owned_count_claim(owned, operation, *, boundary, monotonic=time.mono
 
 
 def prepare_owned_count_start(owned, operation, ticket, claim, *, boundary, monotonic=time.monotonic, sleep=time.sleep):
+    _transport().start_permission_binding(operation, ticket)  # Before entering the unchanged creator timer/inode path.
     return _prepare_control(owned, operation, "start", ticket=ticket, claim=claim, boundary=boundary, monotonic=monotonic, sleep=sleep)
 
 

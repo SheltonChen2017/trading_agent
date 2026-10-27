@@ -9,6 +9,7 @@ import _thread
 import importlib
 import json
 import http.client
+import dis
 from pathlib import Path
 import re
 import time
@@ -32,7 +33,32 @@ _VOLUMES, _RECEIVED_CAPS = {}, {}
 _DRAINED = {}
 _DOWNGRADES, _DRAIN_ORIGINS = {}, {}
 _OBS_COMPLETED = {}
-_WIRE_RESULTS = {}
+_WIRE_RESULTS, _WIRE_ERROR_HOLD, _OBS_WIRE = {}, {}, {}
+_REMOTE_BATCHES, _START_PERMISSIONS, _START_CONSUMED = {}, {}, set()
+_HTTP_RESPONSE_TYPE, _HTTP_MESSAGE_TYPE = http.client.HTTPResponse, http.client.HTTPMessage
+_HEADER_GET_ALL = http.client.HTTPMessage.get_all
+_HEADER_CODE = _HEADER_GET_ALL.__code__
+_DECODER_METHODS = tuple((name, getattr(http.client.HTTPResponse, name)) for name in (
+    "read", "_read_chunked", "_get_chunk_left", "_safe_read", "_read_next_chunk_size",
+    "_read_and_discard_trailer", "_close_conn", "close"))
+_DECODER_CODES = tuple((function, function.__code__) for unused, function in _DECODER_METHODS)
+_CHUNK_CODE = http.client.HTTPResponse._read_chunked.__code__
+_SAFE_READ_CODE = http.client.HTTPResponse._safe_read.__code__
+
+
+def _native_call_offsets(attribute):
+    instructions = tuple(dis.get_instructions(_CHUNK_CODE)); result = []
+    for index, instruction in enumerate(instructions):
+        if instruction.opname == "LOAD_ATTR" and instruction.argval == attribute:
+            following = next((item for item in instructions[index + 1:] if item.opname == "CALL"), None)
+            if following is not None: result.append(following.offset)
+    return frozenset(result)
+
+
+_BODY_CALL_OFFSETS = _native_call_offsets("_safe_read")
+_FRAMING_CALL_OFFSETS = _native_call_offsets("_get_chunk_left")
+_WRAP_OFFSETS = frozenset(item.offset for item in dis.get_instructions(_CHUNK_CODE)
+    if item.opname == "RAISE_VARARGS" and item.arg == 2)
 _CODES = frozenset("""count_operator_factory_required count_operator_registration_pending
 count_operator_source_not_registered count_operator_storage_not_registered
 count_operator_binding_changed count_operator_latched_failure count_operator_not_live
@@ -43,6 +69,8 @@ count_operator_observation_required count_operator_observation_changed count_ope
 count_operator_final_role count_operator_not_closed count_operator_terminal_changed
 count_operator_candidate_required count_operator_candidate_changed count_operator_retry_chain_refused
 count_operator_retry_backoff_refused count_operator_wire_origin_refused""".split())
+_CODES = _CODES | frozenset(("count_operator_START_permission_required", "count_operator_START_permission_changed",
+    "count_operator_START_permission_spent", "count_operator_remote_batch_refused"))
 
 
 class CountTransportRefusal(ValueError): pass
@@ -65,6 +93,12 @@ def policy():
         "source_request": "original_native_query_descriptor_SHA_excludes_Authorization_and_secret",
         "HTTP": "fixed_protected_GET_at_most_reserved_bytes_prefix_preserved_200_JSON_only_404_negative",
         "body_limit": "no_MAX_plus_one_MAX_requires_strict_original_Content_Length_and_successful_close",
+        "framing": "genuine_HTTPMessage_exact_single_JSON_type_zero_or_one_CL_or_TE_no_duplicates_no_mixed_framing",
+        "transfer_encoding": "single_chunked_only_exact_original_HTTPResponse_decoder_no_overrides_bounded_EOF_below_MAX",
+        "content_encoding": "absent_or_exact_case_insensitive_single_identity_only",
+        "incomplete_prefix": "exact_native_IncompleteRead_body_wrapping_frames_offsets_only_depth4_cycles_veto_private_error_hold",
+        "physical_headroom": "original_active_volume_native_FDs_current_host9GiB_mount4GiB_before_key_and_GET",
+        "remote_START_batch": "one_outstanding_batch_fresh_original_SourceLease_actual_ref_exact_1_to_8_ticket_roster_before_START_creator",
         "retry": "classification_only_allowlisted_statusless_open_transients_each_new_ticket_and_START",
         "retry_chain": "original_same_query_previous_completed_OPEN_transient_only_no_parallel_position_2_10_seconds",
         "final_roles": list(FINAL_ROLES), "closure": "original_outer_context_exit_and_postclose_witness_only",
@@ -116,6 +150,12 @@ def _source_closed(lease):
     return _coordinator().source_lease_terminal_binding(lease)
 
 
+def _capacity_before_dispatch(operation, ticket):
+    volume = volume_for_operation(operation)
+    require(type(volume) is _volume_module().CountResponseVolume, "count_operator_storage_not_registered")
+    volume.check_capacity_before_dispatch(ticket)
+
+
 def _closed_storage(operation, bundle):
     # Only a registered storage implementation may supply the complete FINAL
     # recursive member/capability set and original closed-volume witness.
@@ -123,7 +163,33 @@ def _closed_storage(operation, bundle):
 
 
 def _latch(operation):
-    if type(operation) is CountCaptureOperation: _FAILED.add(operation)
+    if type(operation) is not CountCaptureOperation: return
+    try:
+        record = _OPERATIONS.get(operation)
+        if type(record) is not tuple or len(record) != 2:
+            _FAILED.add(operation); return
+        anchor = record[0]
+        if (type(anchor) is not tuple or len(anchor) != 14 or anchor[0] is not operation
+                or type(anchor[11]) is not accounting._RLOCK_TYPE):
+            _FAILED.add(operation); return
+        with anchor[11]:  # Original shared op lock A, then original budget lock B.
+            _FAILED.add(operation)  # Always first, even if the budget is corrupt.
+            budget = anchor[1]
+            original = accounting._BUDGETS.get(budget) if type(budget) is accounting.DurableCountBudget else None
+            lock = accounting._LOCKS.get(budget) if type(budget) is accounting.DurableCountBudget else None
+            if (type(original) is not tuple or len(original) != 3 or original[0] is not budget
+                    or type(original[1]) is not tuple or len(original[1]) != 5
+                    or original[1][0] is not anchor[2] or original[1][3] is not anchor[3]
+                    or type(lock) is not tuple or len(lock) != 2 or lock[0] is not budget
+                    or lock[1] is not original[1][4] or type(lock[1]) is not accounting._RLOCK_TYPE): return
+            with lock[1]:
+                current = accounting._BUDGETS.get(budget)
+                if type(current) is tuple and len(current) == 3 and current[0] is budget and current[1] is original[1]:
+                    accounting._FAILED.add(budget)
+    except BaseException:
+        # Latching must never mask the original failure or discard returned
+        # wire bytes. Normal corrupt-budget access still refuses on its own.
+        _FAILED.add(operation); return
 
 
 def _permanent(function):
@@ -231,6 +297,94 @@ def _wire_result_binding(value, opener, request):
     return original
 
 
+def _framing_failure():
+    return wire.RecoveryTransportFailure("response_contract_refused", phase="response",
+        failure_class="response_contract", status=200)
+
+
+def _chunk_decoder(response, *, initial=False, eof=False):
+    """Exact original stdlib decoder origin, not a caller chunked flag."""
+    if (http.client.HTTPResponse is not _HTTP_RESPONSE_TYPE or type(response) is not _HTTP_RESPONSE_TYPE
+            or any(getattr(_HTTP_RESPONSE_TYPE, name) is not original for name, original in _DECODER_METHODS)
+            or any(function.__code__ is not original for function, original in _DECODER_CODES)):
+        raise _framing_failure()
+    fields = object.__getattribute__(response, "__dict__")
+    if (any(name in fields for name, unused in _DECODER_METHODS)
+            or response.chunked is not True or response.length is not None
+            or type(response._method) is not str or response._method != "GET"
+            or (response.chunk_left is not None and (type(response.chunk_left) is not int or response.chunk_left < 0))
+            or (initial and response.chunk_left is not None)
+            or (eof and (response.chunk_left is not None or response.fp is not None))):
+        raise _framing_failure()
+
+
+def _response_framing(response, maximum):
+    headers = response.headers
+    if (http.client.HTTPMessage is not _HTTP_MESSAGE_TYPE or type(headers) is not _HTTP_MESSAGE_TYPE
+            or _HTTP_MESSAGE_TYPE.get_all is not _HEADER_GET_ALL or _HEADER_GET_ALL.__code__ is not _HEADER_CODE):
+        raise _framing_failure()
+    values = tuple(_HEADER_GET_ALL(headers, name, []) for name in (
+        "Content-Type", "Content-Length", "Transfer-Encoding", "Content-Encoding"))
+    if (any(type(items) is not list or any(type(value) is not str for value in items) for items in values)
+            or len(values[0]) != 1 or any(len(items) > 1 for items in values[1:])):
+        raise _framing_failure()
+    media = values[0][0]
+    if len(media) > 256 or wire._JSON_MEDIA.fullmatch(media) is None:
+        raise wire.RecoveryTransportFailure("content_type", phase="response", failure_class="content_type", status=200)
+    declared = values[1][0] if values[1] else None
+    transfer = values[2][0] if values[2] else None
+    encoding = values[3][0] if values[3] else None
+    if encoding is not None and encoding.lower() != "identity": raise _framing_failure()
+    if declared is not None:
+        if (re.fullmatch(r"0|[1-9][0-9]{0,9}", declared) is None or int(declared) > maximum or transfer is not None):
+            raise _framing_failure()
+        declared = int(declared)
+    if transfer is not None:
+        if transfer.lower() != "chunked": raise _framing_failure()
+        _chunk_decoder(response, initial=True)
+    return media, declared, transfer is not None
+
+
+def _native_trace(error, response):
+    trace = BaseException.__traceback__.__get__(error, BaseException); rows = []
+    for unused in range(128):
+        if trace is None: return tuple(rows)
+        frame = trace.tb_frame
+        rows.append((frame.f_code, trace.tb_lasti, frame.f_locals.get("self") is response))
+        trace = trace.tb_next
+    return None
+
+
+def _incomplete_prefix(error, response):
+    """Original native wrapping proves disjoint body pieces, never value dedup."""
+    pieces, seen, current = [], set(), error
+    for unused in range(4):
+        if type(current) is not http.client.IncompleteRead or id(current) in seen: return tuple(pieces), True
+        seen.add(id(current))
+        partial = object.__getattribute__(current, "__dict__").get("partial")
+        if type(partial) is not bytes: return tuple(pieces), True
+        pieces.append(partial)
+        cause = BaseException.__cause__.__get__(current, BaseException)
+        if cause is None: return tuple(pieces), False
+        trace = _native_trace(current, response)
+        if (trace is None or not any(code is _CHUNK_CODE and offset in _WRAP_OFFSETS and own
+                for code, offset, own in trace) or type(cause) is not http.client.IncompleteRead):
+            return tuple(pieces), True
+        child = _native_trace(cause, response)
+        if child is None: return tuple(pieces), True
+        original_body = any(code is _CHUNK_CODE and offset in _BODY_CALL_OFFSETS and own
+            for code, offset, own in child)
+        original_framing = any(code is _CHUNK_CODE and offset in _FRAMING_CALL_OFFSETS and own
+            for code, offset, own in child)
+        if original_framing and not original_body:
+            # A partial chunk delimiter/size is framing, never response body.
+            return tuple(pieces), False
+        if not original_body or child[-1][0] is not _SAFE_READ_CODE or not child[-1][2]:
+            return tuple(pieces), True
+        current = cause
+    return tuple(pieces), True
+
+
 def _bounded_get(opener, request, maximum):
     """One GET; never request a byte outside the original page reservation.
 
@@ -241,30 +395,23 @@ def _bounded_get(opener, request, maximum):
     wire._require_capture_platform()
     require(type(maximum) is int and 1 <= maximum <= MAXIMUM_RESPONSE_BYTES,
         "count_operator_response_refused")
-    response, status, media, failure = None, None, None, None
+    response, status, media, failure, error_hold, prefix_blocked = None, None, None, None, None, False
     phase, parts, length, positive, preserve = "open", [], 0, False, False
     try:
         response = opener.open(request, timeout=30); phase = "response"
         status = wire._status(response.status)
         if status != 200:
             raise wire.RecoveryTransportFailure("http_not_200", phase=phase, failure_class="http_status", status=status)
-        media = response.headers.get("Content-Type", "")
-        if type(media) is not str or len(media) > 256 or wire._JSON_MEDIA.fullmatch(media) is None:
-            raise wire.RecoveryTransportFailure("content_type", phase=phase, failure_class="content_type", status=status)
-        declared = response.headers.get("Content-Length")
-        transfer = response.headers.get("Transfer-Encoding")
-        if declared is not None:
-            if (type(declared) is not str or re.fullmatch(r"0|[1-9][0-9]{0,9}", declared) is None
-                    or int(declared) > maximum or transfer is not None):
-                raise wire.RecoveryTransportFailure("response_size_limit", phase=phase, failure_class="response_size", status=status)
-            declared = int(declared)
+        media, declared, chunked = _response_framing(response, maximum)
         phase = "read"; eof = False
         while length < maximum and (declared is None or length < declared):
             requested = min(65536, maximum - length, maximum if declared is None else declared - length)
+            if chunked: _chunk_decoder(response)
             piece = response.read(requested)
             if type(piece) is not bytes:
                 preserve = True
                 raise wire.RecoveryTransportFailure("response_contract_refused", phase=phase, failure_class="response_contract", status=status)
+            if chunked: _chunk_decoder(response, eof=piece == b"")
             # A conforming original HTTPResponse never returns more than the
             # requested bound. Preserve a violating return, and refuse it.
             if piece: parts.append(piece); length += len(piece)
@@ -284,9 +431,9 @@ def _bounded_get(opener, request, maximum):
         if phase == "read": preserve = True
     except BaseException as error:
         if type(error) is http.client.IncompleteRead:
-            partial = object.__getattribute__(error, "__dict__").get("partial")
-            if type(partial) is bytes:
-                parts.append(partial); length += len(partial)
+            partials, prefix_blocked = _incomplete_prefix(error, response)
+            parts.extend(partials); length += sum(len(partial) for partial in partials)
+            if prefix_blocked: error_hold = error
         if isinstance(error, wire.urllib.error.HTTPError):
             if response is None: response, status = error, wire._http_error_status(error)
             failure = wire.RecoveryTransportFailure("http_not_200", phase=phase, failure_class="http_status", status=status)
@@ -303,6 +450,7 @@ def _bounded_get(opener, request, maximum):
     value = object.__new__(_WireResult)
     anchor = value, opener, request, raw, media, status, None if failure is None else tuple(failure.diagnostic().items()), positive, preserve, object()
     value._anchor = value._identity = anchor; _WIRE_RESULTS[value] = anchor
+    if prefix_blocked: _WIRE_ERROR_HOLD[value] = anchor, error_hold, "native_partial_chain_unproven"
     return value
 
 
@@ -328,6 +476,28 @@ def _check_position_chain(operation, ticket, state):
     completed = _OBS_COMPLETED.get(obs); now = _WINDOWS[operation][1]
     require(type(completed) in (int, float) and completed <= now
         and now - completed >= (2 if len(previous) == 1 else 10), "count_operator_retry_backoff_refused")
+
+
+def start_permission_binding(operation, ticket):
+    """Original remote-ref roster slot; historical authentication, no grant flag."""
+    try:
+        anchor = operation_binding(operation)
+        with anchor[11]:
+            original = _START_PERMISSIONS.get(ticket)
+            require(type(original) is tuple and len(original) == 7 and original[0] is operation
+                and original[1] is ticket and original[2] is anchor,
+                "count_operator_START_permission_required")
+            batch = _coordinator().source_start_batch_binding(original[3])
+            require(type(batch) is tuple and len(batch) == 8 and batch is original[4]
+                and batch[1] is operation and batch[3] is anchor
+                and type(original[5]) is int and 0 <= original[5] < len(batch[4]) <= 8
+                and batch[4][original[5]] is ticket and any(saved is batch for saved in _REMOTE_BATCHES[operation]),
+                "count_operator_START_permission_changed")
+            bound = accounting.ticket_binding(ticket)
+            require(bound[1] is anchor[1] and bound[2] is anchor[2] and bound[3] == anchor[4],
+                "count_operator_START_permission_changed")
+            return original
+    except BaseException: _latch(operation); raise
 
 
 class HttpObservation:
@@ -360,6 +530,24 @@ def drained_http_observation_binding(observation):
             and all(left is right for left, right in zip(original[1:15], source_tuple[1:15])),
             "count_operator_observation_changed")
     return original
+
+
+def unqualified_preservation_blocker(observation):
+    """Fixed negative-only signal; original unresolved exception stays private."""
+    bound = drained_http_observation_binding(observation)
+    source = _DRAIN_ORIGINS[observation][0] if observation in _DRAIN_ORIGINS else observation
+    saved = _OBS_WIRE.get(source)
+    if saved is None: return None
+    result, original = saved
+    require(_WIRE_RESULTS.get(result) is original and result._anchor is result._identity is original
+        and bound[10] is original[3], "count_operator_wire_origin_refused")
+    held = _WIRE_ERROR_HOLD.get(result)
+    if held is None: return None
+    require(type(held) is tuple and len(held) == 3 and held[0] is original
+        and type(held[1]) is http.client.IncompleteRead and type(held[2]) is str
+        and held[2] == "native_partial_chain_unproven",
+        "count_operator_wire_origin_refused")
+    return held[2]
 
 
 def downgrade_http_observation_for_preservation(observation):
@@ -419,6 +607,42 @@ class CountCaptureOperation:
     def __repr__(self): return "<CountCaptureOperation redacted>"
 
     @_permanent
+    def authorize_start_batch(self, tickets):
+        """One fresh actual-ref observation for <=8 exact reserved tickets."""
+        anchor = active_operation_binding(self)
+        with anchor[11]:
+            require(type(tickets) is tuple and 1 <= len(tickets) <= 8
+                and len({id(ticket) for ticket in tickets}) == len(tickets), "count_operator_remote_batch_refused")
+            current = anchor[1].current_tickets()  # The original coordinator thread authorizes before workers.
+            state = _OPERATIONS[self][1]; positions = []
+            previous = _REMOTE_BATCHES.get(self, ())
+            if previous:
+                prior_tickets = previous[-1][4]
+                require(all(ticket in _START_CONSUMED for ticket in prior_tickets)
+                    and not any(any(item is ticket for ticket in prior_tickets) for item in state[2]),
+                    "count_operator_remote_batch_refused")
+            _window(self)
+            for ticket in tickets:
+                original = accounting.active_ticket_binding(ticket)
+                require(original[1] is anchor[1] and original[2] is anchor[2] and original[3] == anchor[4]
+                    and any(ticket is entry for entry in current) and ticket not in _START_PERMISSIONS,
+                    "count_operator_remote_batch_refused")
+                _check_position_chain(self, ticket, state); positions.append(original[5])
+            require(len(positions) == len(set(positions)), "count_operator_remote_batch_refused")
+            coordinator = _coordinator()
+            evidence = coordinator.source_lease_authorize_start_batch(anchor[12], self, tickets)
+            require(type(evidence) is coordinator.SourceStartBatchEvidence, "count_operator_START_permission_changed")
+            batch = coordinator.source_start_batch_binding(evidence)
+            require(type(batch) is tuple and len(batch) == 8 and batch[0] is evidence and batch[1] is self
+                and batch[3] is anchor and batch[4] is tickets,
+                "count_operator_START_permission_changed")
+            _REMOTE_BATCHES[self] = (*_REMOTE_BATCHES.get(self, ()), batch)
+            for index, ticket in enumerate(tickets):
+                _START_PERMISSIONS[ticket] = self, ticket, anchor, evidence, batch, index, object()
+            for ticket in tickets: start_permission_binding(self, ticket)
+            return None
+
+    @_permanent
     def bind_volume(self, volume):
         anchor = active_operation_binding(self)
         with anchor[11]:
@@ -451,23 +675,32 @@ class CountCaptureOperation:
             require(not any(ticket is previous for previous in state[1]), "count_operator_dispatch_reused")
             require(len(state[2]) < MAXIMUM_INFLIGHT, "count_operator_inflight_cap")
             _check_position_chain(self, ticket, state)
+            start_permission_binding(self, ticket)
+            require(ticket not in _START_CONSUMED, "count_operator_START_permission_spent")
+            _START_CONSUMED.add(ticket)
             _update(self, (state[0], (*state[1], ticket), (*state[2], ticket), state[3], state[4], state[5]))
-        raw = media = status = None; invoked = False; detail = None
+        raw = media = status = None; invoked = False; detail = None; result = None
         try:
             with anchor[11]:
                 require(self not in _FAILED, "count_operator_latched_failure")
                 _source_check(anchor[12])
-            secret = read_named_keychain("massive")
-            require(type(secret) is KeychainSecret, "count_operator_response_refused")
+                _capacity_before_dispatch(self, ticket)
+            with anchor[11]:
+                require(self not in _FAILED, "count_operator_latched_failure")
+                secret = read_named_keychain("massive")
+                require(type(secret) is KeychainSecret, "count_operator_response_refused")
             query = _query_for_ticket(ticket)
             request = legacy._wire_request(query, secret)
             opener = legacy.transport.build_protected_opener(); legacy.transport._opener(opener)
             with anchor[11]:
                 require(self not in _FAILED, "count_operator_latched_failure")
                 _window(self); _source_check(anchor[12]); controls.start_binding(start); controls.claim_binding(claim)
+                _capacity_before_dispatch(self, ticket)
                 invoked = True  # Original outbound-attempt acceptance precedes unlocking.
             result = _wire_result_binding(_bounded_get(opener, request, MAXIMUM_RESPONSE_BYTES), opener, request)
             raw, media, status, detail = result[3:7]
+            if result[0] in _WIRE_ERROR_HOLD:
+                detail = (*detail, ("preservation_blocker", "native_partial_chain_unproven"))
             if result[8]: _latch(self)
             if result[7]:
                 require(type(raw) is bytes and len(raw) <= MAXIMUM_RESPONSE_BYTES and type(media) is str
@@ -503,6 +736,7 @@ class CountCaptureOperation:
             parts = (value, self, ticket, claim, start, original[8], started[4], anchor[5], invoked,
                 status, raw, media, received, detail, hash_payload(descriptor), object())
             value._anchor = value._identity = parts
+            if result is not None: _OBS_WIRE[value] = result[0], result
             if qualified:
                 _OBSERVATIONS[value] = parts
                 _OBS_COMPLETED[value] = _WINDOWS[self][1]

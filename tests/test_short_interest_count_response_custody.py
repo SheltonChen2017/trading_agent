@@ -5,6 +5,7 @@ source/storage qualification. No real provider, keychain, image or flag calls.
 """
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
+from http.client import HTTPMessage
 import ast
 import inspect
 import json
@@ -50,7 +51,9 @@ def h(operation_fixture, kernel, monkeypatch):
     class Response:
         def __init__(self):
             self.status = h.status; self.offset = 0
-            self.headers = {"Content-Type": "application/json", "Content-Length": str(len(h.raw))}
+            self.headers = HTTPMessage()
+            self.headers["Content-Type"] = "application/json"
+            self.headers["Content-Length"] = str(len(h.raw))
         def read(self, maximum):
             assert type(maximum) is int and 0 < maximum <= 65536
             part = h.raw[self.offset:self.offset + maximum]; self.offset += len(part)

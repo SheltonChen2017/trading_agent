@@ -20,7 +20,8 @@ spec.loader.exec_module(support)
 
 @pytest.fixture(autouse=True)
 def isolated_registries_and_no_network(monkeypatch):
-    for name, value in (("_BUDGETS", {}), ("_TICKETS", {}), ("_LOCKS", {}), ("_FAILED", set()), ("_CONSUMED", set())):
+    for name, value in (("_BUDGETS", {}), ("_TICKETS", {}), ("_LOCKS", {}), ("_FAILED", set()), ("_CONSUMED", set()),
+            ("_SETTLEMENT_MINTS", {}), ("_SETTLED_VIEWS", {}), ("_APPEND_ORIGINS", {})):
         monkeypatch.setattr(budget, name, value)
     def denied(*args, **kwargs): raise AssertionError("pure fabricated accounting forbids network")
     monkeypatch.setattr(socket.socket, "connect", denied)
@@ -441,3 +442,115 @@ def test_workers_cannot_observe_torn_chunk_settlement(plan, fabricated_reader, m
     value.settle_closed_chunk(witness); thread.join(2)
     assert not thread.is_alive() and done.is_set() and not errors and len(results) == 1
     assert results[0][0] is ticket and value.public_summary()["closed_chunks"] == 1
+
+
+def test_settled_journal_returns_exact_original_account_without_old_reader_or_clock(plan, fabricated_reader, monkeypatch):
+    value = budget.open_durable_count_budget(plan)
+    empty = budget.settled_chunk_accounting(value)
+    assert empty == (value, value.budget_identity, plan, ()) and budget.settled_chunk_accounting(value) is empty
+    value.reserve_start_slot(5); value.reserve_start_slot(6)
+    closed = fabricated_reader.mint(value); original_account = fabricated_reader.minted[closed]
+    value.settle_closed_chunk(closed)
+    journal = budget.settled_chunk_accounting(value)
+    assert type(journal) is tuple and len(journal) == 4 and journal[0] is value and journal[1] is value.budget_identity
+    assert journal[2] is plan and journal[3][0] is original_account
+    record = value._state[3][0]
+    assert len(record) == 5 and record[:4] == (closed, original_account[6], original_account[3], original_account[4])
+    assert record[4] is original_account
+    def expired(unused): raise AssertionError("historical accounting reopened an expired reader/source/clock")
+    monkeypatch.setattr(fabricated_reader.module, "closed_count_chunk_accounting", expired)
+    assert budget.settled_chunk_accounting(value) is journal
+    assert journal[3][0] is original_account
+
+
+def test_historical_accounting_survives_later_normal_failure_but_new_reserve_stops(plan, fabricated_reader):
+    value = budget.open_durable_count_budget(plan); value.reserve_start_slot(5); value.reserve_start_slot(6)
+    value.settle_closed_chunk(fabricated_reader.mint(value)); history = budget.settled_chunk_accounting(value)
+    value.reserve_start_slot(7)
+    with pytest.raises(budget.DurableCountBudgetRefusal): value.reserve_start_slot(5)
+    assert value in budget._FAILED and budget.settled_chunk_accounting(value) is history
+    with pytest.raises(budget.DurableCountBudgetRefusal, match="permanently_stopped"): value.reserve_start_slot(8)
+    assert len(history[3]) == 1 and len(value._state[2]) == 1
+
+
+@pytest.mark.parametrize("change", ["record_copy", "account_copy", "view_copy", "reorder", "issuance_copy", "nonce"])
+def test_copied_or_reordered_settled_records_cannot_reconstruct_issuance(plan, fabricated_reader, change):
+    value = budget.open_durable_count_budget(plan)
+    for positions in ((5, 6), (7, 8)):
+        for position in positions: value.reserve_start_slot(position)
+        value.settle_closed_chunk(fabricated_reader.mint(value))
+    current = value._state
+    if change == "view_copy":
+        budget._SETTLED_VIEWS[value] = tuple(list(budget._SETTLED_VIEWS[value]))
+    elif change in ("issuance_copy", "nonce"):
+        bank = budget._SETTLEMENT_MINTS[value]; minted = list(bank[2])
+        minted[0] = tuple(list(minted[0])) if change == "issuance_copy" else (*minted[0][:4], object())
+        budget._SETTLEMENT_MINTS[value] = (*bank[:2], tuple(minted), bank[3])
+    else:
+        records = list(current[3])
+        if change == "record_copy": records[0] = tuple(list(records[0]))
+        elif change == "account_copy": records[0] = (*records[0][:4], tuple(list(records[0][4])))
+        else: records.reverse()
+        updated = (*current[:3], tuple(records), current[4])
+        object.__setattr__(value, "_state", updated)
+        budget._BUDGETS[value] = value, value._anchor, updated  # Even this copied public binding cannot mint history.
+    with pytest.raises(budget.DurableCountBudgetRefusal, match="settled_accounting_changed"):
+        budget.settled_chunk_accounting(value)
+
+
+def test_historical_journal_is_worker_readonly_after_latch_and_no_caller_factory(plan, fabricated_reader):
+    value = budget.open_durable_count_budget(plan); value.reserve_start_slot(5); value.reserve_start_slot(6)
+    value.settle_closed_chunk(fabricated_reader.mint(value)); history = budget.settled_chunk_accounting(value)
+    budget._FAILED.add(value); returned = []
+    worker = threading.Thread(target=lambda: returned.append(budget.settled_chunk_accounting(value)))
+    worker.start(); worker.join()
+    assert returned == [history] and returned[0] is history and value in budget._FAILED
+    for supplied in (True, history, object.__new__(budget.DurableCountBudget)):
+        with pytest.raises(budget.DurableCountBudgetRefusal): budget.settled_chunk_accounting(supplied)
+
+
+@pytest.mark.parametrize("kind", ["budget", "ticket"])
+@pytest.mark.parametrize("method", ["__hash__", "__eq__"])
+def test_changed_exact_class_hash_or_equality_never_executes_in_registry_lookup(plan, monkeypatch, kind, method):
+    value = budget.open_durable_count_budget(plan); ticket = value.reserve_start_slot(5)
+    calls = []
+    def hostile(self, unused=None):
+        calls.append(True)
+        raise AssertionError("registry lookup invoked caller hash/equality")
+    class LookupProbe(dict):
+        def get(self, *args, **kwargs):
+            calls.append("registry lookup before identity check")
+            return super().get(*args, **kwargs)
+    registry = "_LOCKS" if kind == "budget" else "_TICKETS"
+    monkeypatch.setattr(budget, registry, LookupProbe(getattr(budget, registry)))
+    cls = budget.DurableCountBudget if kind == "budget" else budget.CountAttemptTicket
+    monkeypatch.setattr(cls, method, hostile)
+    actions = (lambda: budget._lock(value), lambda: budget.settled_chunk_accounting(value),
+        lambda: value._guard()) if kind == "budget" else (
+        lambda: budget.ticket_binding(ticket), lambda: budget.active_ticket_binding(ticket),
+        lambda: budget.settled_chunk_accounting(value), lambda: value.reserve_start_slot(6))
+    for action in actions:
+        with pytest.raises(budget.DurableCountBudgetRefusal): action()
+    assert calls == []
+
+
+def test_original_current_reader_issuance_is_retained_after_reader_expiry(monkeypatch, tmp_path, request):
+    # Function-local genuine fixture builders avoid a reverse module-level
+    # import cycle. Their external source/file/wire closures remain fake.
+    import importlib
+    operators = importlib.import_module("test_short_interest_count_durable_transport")
+    readers = importlib.import_module("test_short_interest_closed_count_chunk")
+    h = operators.operation.__wrapped__(monkeypatch, tmp_path, request)
+    h = readers.chunk.__wrapped__(h, monkeypatch)
+    from scripts import short_interest_closed_count_chunk as actual_reader
+    closed = h.issue()
+    original_account = actual_reader.closed_count_chunk_accounting(closed)
+    h.budget.settle_closed_chunk(closed)
+    original = budget.settled_chunk_accounting(h.budget)
+    assert type(closed) is actual_reader.ClosedCountChunk and original[3][0] is original_account
+    def expired(*unused): raise AssertionError("old operational reader/source lease expired")
+    monkeypatch.setattr(h.coordinator, "terminal_chunk_binding", expired)
+    h.tick += 7200
+    with pytest.raises(AssertionError, match="expired"): actual_reader.closed_count_chunk_accounting(closed)
+    assert budget.settled_chunk_accounting(h.budget) is original
+    assert original[3][0] is original_account and original[3][0][4] == tuple(len(h.raw) for unused in h.tickets)

@@ -3,6 +3,8 @@ import ast
 from concurrent.futures import ThreadPoolExecutor
 import inspect
 import json
+import os
+import fcntl
 from pathlib import Path
 import subprocess
 import textwrap
@@ -22,6 +24,8 @@ def h(tmp_path, monkeypatch):
     for name in ("_MINTED", "_ISSUED", "_FROZEN", "_CLOCKS", "_COMMANDS", "_ORIGIN_ISSUED",
             "_STATE_ORIGINS", "_ASSOCIATION_ISSUED", "_ROOT_ENFORCEMENTS", "_OPERATIONS", "_VOLUME_BINDINGS"):
         monkeypatch.setattr(volume, name, {})
+    monkeypatch.setattr(volume, "_PRESERVATION_ORIGINS", {}, raising=False)
+    monkeypatch.setattr(volume, "_PRESERVATION_PINS", {}, raising=False)
     monkeypatch.setattr(volume, "_FAILED", set()); monkeypatch.setattr(volume, "_ATTEMPTED", set())
     monkeypatch.setattr(volume, "_PLAN", None); monkeypatch.setattr(volume, "_LAST_ASSOCIATION", None)
     namespace = volume.NAMESPACE_PREFIX + "-" + "a" * 64 + "-chunk001"
@@ -176,3 +180,91 @@ def test_new_volume_policy_separates_source_cap_and_virtual_container():
     assert value["virtual_image_bytes_are_source_budget"] is False
     assert value["authority"]["source_admitted"] is value["authority"]["ready_for_backtest"] is False
     assert prior.MAXIMUM_SECONDS == 300
+
+
+def active_capacity_ticket(h, monkeypatch):
+    """Named typed-ticket issuer seam; no real reservation/source authority."""
+    budget = transport.accounting
+    ticket = object.__new__(budget.CountAttemptTicket)
+    original = (ticket, h.origin[1], h.origin[2], h.origin[4], 1, 5, 5, 1,
+        "1" * 64, "2" * 64, "3" * 64, 2097152, h.origin[3], b"fabricated")
+    def issued(value):
+        budget.require(value is ticket, "attempt_ticket_binding_changed")
+        return original
+    monkeypatch.setattr(budget, "active_ticket_binding", issued)
+    return ticket
+
+
+def test_preservation_origin_is_live_original_once_and_retained_fd_is_readonly(h):
+    with h.prepare() as cap:
+        original = volume.preservation_volume_origin(cap, h.operation)
+        assert len(original) == 10 and original[:3] == (cap, h.operation, h.mount)
+        assert original[4][:3] == original[5][:3]
+        assert original[4][-1] == 0o700 and len(original[6]) == 9 and len(original[7]) == 6
+        assert original[8] is cap._anchor
+        assert fcntl.fcntl(original[3], fcntl.F_GETFL) & os.O_ACCMODE == os.O_RDONLY
+        assert volume.preservation_volume_origin(cap, h.operation) is original
+        copied = list(original); copied[2] = Path("/fabricated/not-original")
+        assert volume.preservation_volume_origin(cap, h.operation) is original
+        duplicate = os.dup(original[3])
+    try:
+        # This independent live duplicate is the prospective negative lease's
+        # own resource. The old accessor does not reopen or adopt any inode.
+        assert os.fstat(duplicate).st_ino == original[4][1]
+        with pytest.raises(volume.CountResponseVolumeRefusal):
+            volume.preservation_volume_origin(cap, h.operation)
+    finally: os.close(duplicate)
+
+
+def test_preservation_origin_never_mints_from_failed_or_cross_operation_volume(h):
+    with pytest.raises(volume.CountResponseVolumeRefusal):
+        with h.prepare() as cap:
+            with pytest.raises(volume.CountResponseVolumeRefusal):
+                volume.preservation_volume_origin(cap, object())
+            volume.preservation_volume_origin(cap, h.operation)
+    assert cap not in volume._PRESERVATION_ORIGINS
+
+
+def test_preservation_origin_registry_replacement_cannot_issue_a_new_nonce(h):
+    with pytest.raises(volume.CountResponseVolumeRefusal):
+        with h.prepare() as cap:
+            original = volume.preservation_volume_origin(cap, h.operation)
+            volume._PRESERVATION_ORIGINS[cap] = (*original[:-1], object())
+            volume.preservation_volume_origin(cap, h.operation)
+    assert id(cap) not in volume._ISSUED
+
+
+def test_capacity_gate_rechecks_original_host_and_mounted_native_before_dispatch(h, monkeypatch):
+    ticket = active_capacity_ticket(h, monkeypatch)
+    with h.prepare() as cap:
+        before, commands = len(h.native_reads), len(h.calls)
+        assert cap.check_capacity_before_dispatch(ticket) is None
+        assert len(h.native_reads) > before and len(h.calls) == commands
+
+
+@pytest.mark.parametrize("kind", ["host_free", "mount_free", "host_fsid", "mount_fsid", "wrong_ticket", "not_live_op"])
+def test_capacity_failure_is_before_dispatch_and_cannot_be_rebased(h, monkeypatch, kind):
+    ticket = active_capacity_ticket(h, monkeypatch)
+    with pytest.raises((volume.CountResponseVolumeRefusal, transport.accounting.DurableCountBudgetRefusal,
+            transport.CountTransportRefusal)):
+        with h.prepare() as cap:
+            if kind == "host_free": h.host_change = lambda row: {**row, "bavail": 0}
+            elif kind == "mount_free": h.native_change = lambda row: {**row, "bavail": 0}
+            elif kind == "host_fsid": h.host_change = lambda row: {**row, "fsid": (0, 0)}
+            elif kind == "mount_fsid": h.native_change = lambda row: {**row, "fsid": (0, 0)}
+            elif kind == "wrong_ticket": ticket = object()
+            else:
+                def inactive(unused): raise transport.CountTransportRefusal("REFUSED: count_operator_not_live")
+                monkeypatch.setattr(transport, "active_operation_binding", inactive)
+            cap.check_capacity_before_dispatch(ticket)
+    assert id(cap) not in volume._ISSUED
+    h.host_change = h.native_change = lambda row: row
+    with pytest.raises(volume.CountResponseVolumeRefusal): cap.closed_summary()
+
+
+def test_fresh_capacity_thresholds_match_initial_fixed_thresholds_exactly(h, monkeypatch):
+    ticket = active_capacity_ticket(h, monkeypatch)
+    with h.prepare() as cap:
+        h.host_change = lambda row: {**row, "bsize": 4096, "bavail": (9 * 1024 ** 3) // 4096}
+        h.native_change = lambda row: {**row, "bsize": 4096, "bavail": (4 * 1024 ** 3) // 4096}
+        cap.check_capacity_before_dispatch(ticket)

@@ -10,6 +10,7 @@ No remount, reattach, old image adoption or budget-release authority is issued.
 from contextlib import contextmanager
 import ctypes
 import errno
+import fcntl
 import json
 import math
 import os
@@ -43,6 +44,7 @@ _ATTEMPTED = set()
 _PLAN = None
 _OPERATIONS = {}
 _VOLUME_BINDINGS = {}
+_PRESERVATION_ORIGINS, _PRESERVATION_PINS = {}, {}
 _RLOCK_TYPE = type(threading.RLock())
 _CODES = frozenset("""count_volume_platform_refused count_volume_native_unavailable count_volume_native_result_refused
 count_volume_native_string_refused count_volume_root_changed count_volume_policy_changed count_volume_deadline
@@ -58,7 +60,9 @@ count_volume_mount_not_local count_volume_mount_browse_refused count_volume_moun
 count_volume_mount_readonly count_volume_mount_name_changed count_volume_mount_device_changed
 count_volume_mount_native_identity_changed count_volume_origin_refused count_volume_descriptor_refused
 count_volume_device_node_refused count_volume_device_node_changed count_volume_new_root_mode_refused
-count_volume_new_root_identity_changed count_volume_new_root_enforcement_repeated""".split())
+count_volume_new_root_identity_changed count_volume_new_root_enforcement_repeated
+count_volume_preservation_binding_changed count_volume_readonly_required count_volume_ticket_changed
+count_volume_host_native_identity_changed""".split())
 _ERRNOS = {getattr(errno, name): name for name in (
     "EACCES", "EPERM", "EEXIST", "ENOENT", "ENOSPC", "EIO", "EBADF", "EINVAL", "ENOTSUP")
     if hasattr(errno, name)}
@@ -117,6 +121,8 @@ def policy():
         "shared_guard": "entire_original_volume_checks_and_callbacks_under_original_operation_RLock",
         "terminal_order": "provisional_only_while_LIVE_all_original_contexts_and_postclose_pins_before_ClosedCountChunk",
         "reload": "same_original_still_mounted_epoch_pins_only_no_reattach_or_new_device_mapping",
+        "preservation_origin": "LIVE_original_once_readonly_mount_FD_root4_GID4_native9_blocknode6_no_failure_accessor",
+        "predispatch_capacity": "genuine_active_ticket_original_FDs_native_identity_host9GiB_mount4GiB_before_every_GET",
         "spotlight_index_creation": False,
         "volume_name": "SI_COUNT_RESPONSE_CUSTODY_V1", "failed_v1_namespace_retired_even_if_absent": True,
         "failed_v2_image_and_mount_never_modified_or_adopted": True,
@@ -257,6 +263,7 @@ def _fixed_state(state):
         "operator_protocol_sha256": state["operator_protocol_sha256"],
         "directories": [(str(path), fd, pin) for path, fd, pin in state["directories"]],
         "namespace_fd": state["namespace_fd"], "host_device": state["host_device"],
+        "host_native": state["host_native"],
         "backing_fd": state["backing_fd"], "backing_pin": state["backing_pin"],
         "under_mount_fd": state["under_mount_fd"], "under_mount_pin": state["under_mount_pin"],
         "device": state["device"], "attach_entities": state["attach_entities"],
@@ -628,6 +635,33 @@ class CountResponseVolume:
             _check_parents(state); _check_mount(state, state["mount_fd"])
         return self._guarded(check)
 
+    def check_capacity_before_dispatch(self, ticket):
+        """Fresh physical headroom on the original live epoch, never allocation."""
+        def check(state):
+            from scripts import short_interest_count_durable_budget as budget
+            require(state["phase"] == "LIVE", "count_volume_not_live")
+            op = _operation_origin(state["operation_origin"][0], active=True)
+            original = budget.active_ticket_binding(ticket)
+            require(op is state["operation_origin"] and type(original) is tuple and len(original) == 14
+                and original[0] is ticket and original[1] is op[1] and original[2] is op[2]
+                and type(original[3]) is int and original[3] == op[4], "count_volume_ticket_changed")
+            # These are the same ORIGINAL FD/name/native predicates used by
+            # the factory. A capacity failure never installs a new baseline.
+            self.check()
+            host = _native_statfs(state["directories"][0][1])
+            require(_mount_identity(host) == state["host_native"], "count_volume_host_native_identity_changed")
+            require(type(host["bsize"]) is int and host["bsize"] > 0
+                and type(host["bavail"]) is int and host["bavail"] >= 0
+                and host["bavail"] * host["bsize"] >= VIRTUAL_BYTES + 1024 ** 3,
+                "count_volume_host_capacity_refused")
+            mounted = _native_statfs(state["mount_fd"]); _native_contract(state, mounted)
+            require(type(mounted["bsize"]) is int and mounted["bsize"] > 0
+                and type(mounted["bavail"]) is int and mounted["bavail"] >= 0
+                and mounted["bavail"] * mounted["bsize"] >= 4 * 1024 ** 3,
+                "count_volume_mount_capacity_refused")
+            self.check()
+        return self._guarded(check)
+
     def observation(self):
         def report(state):
             require(state["phase"] == "LIVE", "count_volume_not_live"); self.check()
@@ -668,6 +702,40 @@ def volume_binding(volume, *, live=False):
             volume.check()
         return original
     return volume._guarded(authenticate)
+
+
+def preservation_volume_origin(volume, operation):
+    """LIVE original10 for a separately typed negative-only retained lease.
+
+    This accessor never works around a failed volume/operation and never
+    duplicates/reopens an FD. The lease must duplicate the genuine readonly
+    FD while LIVE and keep its own exact original pins through any failure.
+    """
+    require(type(volume) is CountResponseVolume, "count_volume_preservation_binding_changed")
+    def issue(state):
+        require(state["phase"] == "LIVE" and operation is state["operation_origin"][0]
+            and _operation_origin(operation, active=True) is state["operation_origin"],
+            "count_volume_preservation_binding_changed")
+        volume.check()
+        require(fcntl.fcntl(state["mount_fd"], fcntl.F_GETFL) & os.O_ACCMODE == os.O_RDONLY,
+            "count_volume_readonly_required")
+        original = _PRESERVATION_ORIGINS.get(volume)
+        if original is None:
+            original = (volume, operation, state["mount"], state["mount_fd"], state["mount_pin"],
+                state["root_creation_pin"][:4], state["mount_native"], state["device_node_pin"],
+                volume._anchor, object())
+            _PRESERVATION_ORIGINS[volume] = original
+            _PRESERVATION_PINS[volume] = original, volume._anchor, state["operation_origin"]
+        issued = _PRESERVATION_PINS.get(volume)
+        require(type(original) is tuple and len(original) == 10 and type(issued) is tuple
+            and len(issued) == 3 and issued[0] is original and issued[1] is volume._anchor
+            and issued[2] is state["operation_origin"] and original[0] is volume and original[1] is operation
+            and original[2] is state["mount"] and type(original[3]) is int and original[3] == state["mount_fd"]
+            and original[4] is state["mount_pin"] and original[5] == state["root_creation_pin"][:4]
+            and original[6] is state["mount_native"] and original[7] is state["device_node_pin"]
+            and original[8] is volume._anchor, "count_volume_preservation_binding_changed")
+        return original
+    return volume._guarded(issue)
 
 def _summary(state, status):
     _original_state(state)
@@ -750,7 +818,7 @@ def prepare_registered_volume(root, *, operation, boundary, monotonic=time.monot
         namespace_pin = _directory(os.fstat(namespace_fd))
         require(_directory(namespace.lstat()) == namespace_pin and not os.listdir(namespace_fd),
             "count_volume_namespace_changed")
-        state.update(namespace_fd=namespace_fd, host_device=parent_pin[0],
+        state.update(namespace_fd=namespace_fd, host_device=parent_pin[0], host_native=_mount_identity(host),
             directories=[(parent, parent_fd, parent_pin), (namespace, namespace_fd, namespace_pin)])
         _selected_image(state, absent=True)
         _run(state, "create")

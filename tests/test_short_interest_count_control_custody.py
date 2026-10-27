@@ -56,6 +56,7 @@ def h(monkeypatch, tmp_path):
     operations[op] = parts
     active, final_payload, callbacks = [True], [{"members": []}], []
     volume, volume_good = object(), [True]
+    permissions_good, permission_checks = [True], []
     def operation_binding(value):
         result = operations.get(value) if type(value) is CountCaptureOperation else None
         control.require(result is not None, "count_control_operation_changed")
@@ -94,6 +95,17 @@ def h(monkeypatch, tmp_path):
             "operator_protocol_sha256": parts[5], "registration_sha256": parts[6], "candidate_sha256": "e" * 64,
             "payload": final_payload[0], "source_admitted": False, "budget_release_authority": False}).encode()
     module.operation_binding, module.active_operation_binding = operation_binding, active_operation_binding
+    def permission_binding(value, ticket):
+        # Explicit fake fixed issuer for these storage-only tests; no actual
+        # source-ref witness or provider authority is supplied by this fixture.
+        with lock:
+            operation_binding(value)
+            original = control.budget.active_ticket_binding(ticket)
+            control.require(permissions_good[0] is True and original[1] is coordinator,
+                "count_control_operation_changed")
+            permission_checks.append(ticket)
+            return value, ticket, parts, object()
+    module.start_permission_binding = permission_binding
     module.volume_for_operation = lambda value: (operation_binding(value), volume)[1]
     module._control_volume_binding = volume_binding
     module.http_observation_binding, module.HttpObservation = observation_binding, HttpObservation
@@ -117,7 +129,8 @@ def h(monkeypatch, tmp_path):
         return control.prepare_owned_count_claim(output, op, boundary=boundary, monotonic=clock, sleep=clock.sleep)
     return SimpleNamespace(op=op, parts=parts, plan=plan, budget=coordinator, base=base, module=module,
         active=active, candidate=candidate, final_payload=final_payload, clock=clock, boundary=boundary,
-        owned=owned, claim=claim, callbacks=callbacks, observe=observe, volume_good=volume_good, volume=volume)
+        owned=owned, claim=claim, callbacks=callbacks, observe=observe, volume_good=volume_good, volume=volume,
+        permissions_good=permissions_good, permission_checks=permission_checks)
 
 
 def closed_claim(h):
@@ -310,6 +323,29 @@ def test_historical_controls_reauthenticate_after_operation_closes_but_new_role_
         with pytest.raises(control.CountControlRefusal):
             with control.prepare_owned_count_final_control(owned, h.op, h.candidate, role="inventory",
                     boundary=h.boundary, monotonic=h.clock, sleep=h.clock.sleep): pass
+
+
+def test_missing_original_remote_START_permission_refuses_before_timer_or_inode(h, kernel):
+    claim = closed_claim(h); ticket = h.budget.reserve_start_slot(5)
+    h.permissions_good[0] = False; before_time, before_native = h.clock.now, len(kernel.calls)
+    with h.owned("start", ticket) as owned:
+        with pytest.raises(control.CountControlRefusal):
+            control.prepare_owned_count_start(owned, h.op, ticket, claim,
+                boundary=h.boundary, monotonic=h.clock, sleep=h.clock.sleep)
+        assert not tuple(owned._anchor[0].iterdir())
+    assert h.clock.now == before_time and len(kernel.calls) == before_native
+
+
+def test_permission_is_rechecked_at_original_context_entry_before_first_inode(h, kernel):
+    claim = closed_claim(h); ticket = h.budget.reserve_start_slot(5)
+    with h.owned("start", ticket) as owned:
+        prepared = control.prepare_owned_count_start(owned, h.op, ticket, claim,
+            boundary=h.boundary, monotonic=h.clock, sleep=h.clock.sleep)
+        h.permissions_good[0] = False
+        before_native = len(kernel.calls)
+        with pytest.raises(control.CountControlRefusal):
+            with prepared: pass
+        assert not tuple(owned._anchor[0].iterdir()) and len(kernel.calls) == before_native
 
 
 @pytest.mark.parametrize("status,raw", [(200, b'{"synthetic":true}'), (404, None), (None, None)])

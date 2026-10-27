@@ -25559,3 +25559,336 @@ checkpoint. Existing monthly112 panels and all old negative/spent evidence
 remain retained. Local readiness is false; negative durability, actual-scale
 custody, source qualification/rights/cash/actual-input gates and the remaining
 pre-QC tasks in128.29 are still pending. One final push is still pending.
+
+### 128.32 Actual read-only timing invocation refused before sampling
+
+At clean `ac1b0a7c2acae5db770cec70e21858014bb0de1f`, tracking and actual
+origin `d6af672b3c8198712228bbd7b5eef35777283b1a`, the ONE128.31 invocation
+ran as exec53939. Main observed started_readonly_guard_timing with protocol
+`9fdb15e412f2caa161ddef2078dc601a0984c365992084a018a6331eb724deb4`,
+then actual process termination **EXIT2**. The original loader's fixed
+projection reports stage `saved_cache_loading`, category `unknown_local_error`,
+contract/errno/held-field observation null. There is NO closed summary,
+timing sample, original closed archive token, new plan/budget/ticket or source
+readiness proof from this invocation.
+
+This invocation had no source-lease/capture/claim/START/GET, image or new-file
+route. All old evidence and spent budgets remain unchanged. The failure
+wrapper did not serialize the live audit seam counters/original thrown cause;
+the terminated runtime cannot now supply them. The exact cause is UNKNOWN.
+Do not invent a denied argv, custody predicate, source/provider/Keychain/FS
+actor or historical022 repair. Perform causal readonly public-code/fixture
+analysis first; no automatic repeat or new provider claim is authorized by
+this failure. Improve fixed negative reporting before a separately frozen
+prospective invocation if an exact adapter defect is proved. All other source
+registration/negative-preservation/capacity/readiness gates remain held.
+
+### 128.33 Causal corrections after the failed read-only run; source still held
+
+**SI-BUILD-20261027-029 (P2, verified prospective harness ABI correction):**
+the original saved-cache loader calls original matrix_reader.load_matrix,
+which calls original companion._guard_remote and its unchanged imported
+_git. That producer uses EXACT `git ls-remote origin` plus the matching lane
+REF, without LaneGuard's extra --exit-code. V1 admitted only the latter form.
+The original producer with a fake subprocess forwarded to the ORIGINAL
+audit handler necessarily refused: peer independently reproduced it, then
+Main obtained **1causal failure/37deselected/.70s**, without executing Git.
+The new harness admits only BOTH exact forms for the SAME matching origin
+ref; other refs/options/verbs remain denied. WRITER46 and COUNT50 historical
+paths are already fully contained in63; no missing writer path was found.
+This proves an adapter incompatibility IF reached, not the unpersisted
+actual53939 traceback/cause. That historical result remains UNKNOWN.
+
+The prospective timingV2 hook records original integrity-checked primitive
+counter copies, fixed last command ROLE and first denial kind/command ROLE
+on negative termination. It emits nulls plus integrity_refused if original
+pins fail. No argv/path/value/private row or arbitrary exception string is
+projected. Source loader stage and harness role remain separate; a broad
+stage is not precise forensic attribution. No new diagnostic is invoked here.
+
+**SI-BUILD-20261027-030 (P2, corrected prospective wire framing):** genuine
+HTTPMessage fixtures proved one `.get` ignored duplicate/conflicting
+Content-Length and Content-Type, and ignored unsupported TE-only framing.
+The NEW wire now demands exact original HTTPMessage getter, one Content-Type,
+0/1Content-Length/Transfer-Encoding/Content-Encoding and rejects ambiguous
+combinations before a body read. Only identity content encoding is accepted;
+a CPU-only original HTTPConnection proves the unchanged request builder's
+automatic single Accept-Encoding:identity header. TE-only accepts exactly
+single chunked with original exact HTTPResponse type, native decoder method/
+state identity and genuine decoded EOF, not a caller flag or duck type.
+Unknown/other transfer framing refuses. Actual provider behavior is not
+inferred. The old request builder/wire remain unchanged.
+
+**SI-BUILD-20261027-031 (P2, corrected native incomplete-chunk retention):**
+an exact native HTTPResponse over BytesIO proved the native chunk decoder can
+raise outer IncompleteRead(partial empty) FROM an inner IncompleteRead holding
+current-chunk bytes. The NEW wire now recovers disjoint original completed/
+current prefixes through exact native frame/code/call-offset/same-response
+provenance, <=4exact-IncompleteRead causes with cycle veto; it never dedups by
+byte value or inspects arbitrary exception text. Unknown/forged/cyclic chains
+retain the original exception/bytes strongly and return a fixed preservation
+blocker. Every such response stays unqualified/full2MiB/no retry. BytesIO
+fixtures cover first truncated chunk, completed+truncated next, malformed
+size/delimiter, ordinary length truncation and exactMAX ambiguity. No actual
+provider body or budget was used by this proof.
+
+Delegated final outer/operator/reader selection after030/031 and capacity
+integration: **95passed/4.72s**, OS network denied. Memory-only causal old
+single-get reversal yielded6fail/1pass46deselected/.35s; outer.partial-only
+reversal2fail/2pass49deselected/.25s, restored by child exit. These are fixture
+causal failures, not failed actual backtests or source jobs. Main has not
+represented this delegated selection as a Main rerun or Claude review.
+
+**SI-BUILD-20261027-032 (P2, corrected timing counter integrity):** the
+callable private `_record` could rebase a mutated denial map back to clean.
+Foreign counter-map keys could also execute equality before exactstr checks.
+Independent peer verified both with no external operation. Main's two new
+regressions failed **2/41deselected/.69s** before correction. The rebase
+helper is deleted: only original checked constructor/deny/audit transitions
+assign shadow tuples. Exact key/registry identity-method types are checked
+before equality/hash lookup; projection refuses changed identity methods
+without invoking them. Main timing selection then passed **45tests/6.12s**,
+OS network denied. No actual53939 cause/actor is inferred from these findings.
+
+The new source volume now issues an original LIVE-only once-bound immutable
+ten-field preservation origin before claims, for an independently duplicated
+original RO mount FD; there is NO failed-source accessor or guard reset in
+the positive volume. Fresh before-dispatch capacity authenticates exact
+original active ticket/op, host/mount FD/name/native identities and the SAME
+initial9GiB host/4GiB mounted thresholds, before key and final outbound GET.
+Virtual allocation does not prove physical headroom. Volume/response fixture
+author selection passed49/14.69s; no native/image/HTTP was invoked. Response
+production remains unchanged; only its TEST headers fixture now supplies
+genuine HTTPMessage under the stronger wire contract.
+
+Durable negative publication, inside-volume drainage/retention hold, final
+composition and actual-scale timing/custody remain SOFTWARE/qualification
+work. All source/operator/negative capture authority is still PENDING; no
+new claim, START, HTTP, credential, charge, QC/Safari action or push occurred.
+Continue the available local work and independently establish factual gates;
+do not call mere incomplete implementation or an old open label irreducible.
+
+### 128.34 Finite closure snapshots and exact remote START permissions
+
+**SI-DEC-20261027-10**, continuing SI-AUTH-20261026-02, extends only the
+current bounded SOFTWARE work. No new source invocation is authorized here.
+Independent inspection found that operational ClosedCountChunk access
+necessarily rechecks the original one-hour source/volume deadline. Reopening
+such an accessor after expiry must still refuse; changing the deadline would
+not be a valid full-study union. Normal budget settlement already preserved
+pure facts, but its old four-field record omitted the original account7.
+
+The NEW durable-budget journal now retains the original authenticated account7
+as its fifth record field, with independent append-issued record/view identity
+and nonce. The fixed readonly settled_chunk_accounting API returns original4
+(budget,original budget identity,exact plan,tuple of original account7). It
+keeps coherent original state/plan/profile/provenance checks, without any old
+reader/source/clock or normal FAILED/owner-thread veto of prior facts. Later
+failure still stops every normal reserve/settle action. Copied/reordered
+records/accounts/views and changed identity callbacks refuse before lookup.
+The old ConservativeCountBudget remains unchanged.
+
+A NEW process-retained ClosedCountTransportContribution is privately minted
+only from a genuine just-closed reader twice authenticated within its original
+window. Original claim/START/received/final/body/receipt proof references and
+immutable raw bytes stay PRIVATE. Public binding is aggregate-only; no count/
+cell/raw iterator, denominator/input admission or perpetual-FS claim exists.
+Pure guards never reopen the old terminal/lease/volume or failed budget.
+The full transport union accepts only the old four-epoch baseline, original
+plan and133 original disjoint contributions matched by identity to genuine
+irreversible account7 journal entries, preserving every retry/full-page debit
+under84005/4GiB. A contribution alone cannot settle or join before settlement.
+This is finite observed lineage in one original process, not restart/reload,
+image adoption or an extension of8second/one-hour checks. A later process
+would need its OWN separately qualified original-root requalification.
+
+Delegated budget final own68/1.75s and joint204/5.43s passed, OS network
+denied. Genuine current reader issuer components use explicit fake source/
+file/volume/remote/wire seams; after original settlement, poisoning the old
+reader and advancing7200seconds does not erase pure journal facts. Later
+budget FAILED refuses reserve while history remains. Original-identity/nonce/
+view/FAILED-veto/hash-guard causal reversals failed as intended and were
+restored. No fixture-import cycle remains. These are not actual-domain source
+closure, Main reruns, independent Claude review or completed backtests.
+
+Delegated contribution/union+reader+budget selection passed106/3.42s,
+including25 new union cases with complete two-chunk genuine toy plan/reader/
+budget and explicit fabricated Main/storage/control/terminal seams. It tests
+deadline veto BEFORE mint, full-page transient debt, pure expiry/later-failure
+survival, settlement identity/order/replay/copy, private retention and caps.
+Main's inspection prompted a verified reader-class prelookup edge:3causal
+failures22deselected/.76s, corrected by original module/class/default object
+identity guards BEFORE any closed-key lookup. No old reader was weakened.
+
+**SI-BUILD-20261027-033 (P2, corrected prospective remote evidence):**
+inspection confirmed the first new SourceLease checked local root/HEAD/code
+and clocks between source calls, but actual matching origin was refreshed
+only opening/final audits. The NEW exact-ticket gate refreshes the real
+matching ref under the original lock BEFORE the unchanged START creator
+timer. It issues private original evidence/nonce for1..8 exact current active
+unique-position reserved tickets. No future batch may queue before the prior
+batch is consumed and wire-drained. START requires its original permission
+before inode creation and again on entry; dispatch consumes that SAME slot
+once before key/GET. No timed cache, len(dispatched)%8 or caller bool is
+authority. Initial outer scheduling stays serial batch1, within the cap8.
+
+Delegated remote/outer/control core passed156/6.26s before later negative
+manifest integration. Memory-only omission of the START permission checks
+caused2fail38deselected/.25s; replacing actual ref refresh by synthetic old
+evidence caused2fail35deselected/.33s, restored by child exit. Original root/
+code/source/timer checks and failure drains remain. Final composition still
+needs Main verification and a clean checkpoint; source authority is PENDING.
+
+**SI-BUILD-20261027-034 (P2, held before activation):** op failure already
+stopped qualified START/dispatch/retry and the outer scheduler, but standalone
+accounting reserve could still be called. The bounded correction also latches
+the ORIGINAL genuine budget FAILED under its pinned lock; it never refunds,
+reanchors or adjusts a debit. Pure historical journal and negative original
+registry access remain available; normal summaries/reserve/settle still
+refuse. This correction is being validated before source activation.
+
+All work in this subsection is local software/fabricated validation. Source
+claims/STARTs/HTTP/charged bytes/outcomes/QC/Safari/purchases remain unchanged.
+Backtest readiness is false. The remaining new negative marker and actual-scale
+qualification work must finish honestly before any finite source registration.
+
+### 128.35 Dominating negative manifest and final software composition
+
+**SI-BUILD-20261027-035 (P2, corrected before source activation):** the first
+new negative path had per-observation quarantine and strong RAM/FD retention
+but no authenticated global negative/accounting marker. A claim/partial-START
+failure with zero observations could therefore describe its result only in
+stdout/RAM. The new independent preservation lease now MUST issue one fixed
+quarantine/closure body+receipt manifest before safe exit2, including zero
+observations. It records all current ORIGINAL reserved tickets at full2MiB
+unknown debt, prior irreversible account7 roots and exact source-created
+capture/external-claim membership. A pure fixed catalogue is scanned BEFORE
+reading any source bytes; foreign extras/symlinks refuse without payload
+reads. Only original registered closed seals may be byte-audited. Absent,
+partial/unsealed/unregistered fixed-role files stay explicitly UNKNOWN; no
+adoption, reseal, repair, refund or zero inference occurs. OS/APFS metadata
+outside capture/claim is excluded as in the positive FINAL policy.
+
+The marker is negative-only preservation_manifest_sealed_only, explicitly
+source_contexts_closed/process_closed false; it dominates positive intent
+but cannot issue source/denominator/input/budget-release authority. Its unique
+issued nonce and original postpublication source/quarantine/marker audits are
+mandatory. A failure retains original opaque bytes, exception and independent
+RO mount FD, and the CLI cannot exit/drop them while hold is required.
+No new source/key/GET/START, namespace retry or guard reset is allowed from
+retention. Before-lease failure remains provably before claim/key by original
+outer order and cannot fabricate this marker. The positive path takes genuine
+contribution snapshots immediately after closed-reader issuance, then admits
+them into the union only after irreversible settlement.
+
+**SI-BUILD-20261027-036 (P2, corrected metadata bound):** Main found that
+serializing every prior reservation SHA/charge/position would exceed2MiB late
+in the133-chunk run. The marker now stores compact original settlement
+counts/sums plus ordered roster/charge/covered-position digests and original
+closure roots; full original account7 objects remain privately retained.
+Current528 ticket details and exact source catalogue remain explicit. The
+maximum132-prior-chunk formatting fixture stays<1MiB. The old full-array
+memory reversal produced6,236,789bytes and failed as intended;2MiB cap was
+never raised. No caller JSON becomes settlement or count truth.
+
+**SI-BUILD-20261027-037 (P2, corrected finite drain progress):** peer found
+a gap after dispatch removes inflight but before it appends the observation.
+The first outer drain could enter permanent hold despite the result arriving
+moments later. Main-author causal fixture failed1/.80s, then the drain was
+corrected to keep polling pending accepted attempts without holding the lock,
+starting another request or retrying a publication. It waits for all original
+opaque observations before the once-only final marker. Permanent integrity/
+native/storage blockers still require the no-network retention hold.
+
+The035 marker/capacity path, startup dup cleanup, original namespace FD/pins,
+maximum body audit, full-page preservation, original account journal, issued
+nonce, blocked output authority and full class-dictionary/default-identity
+checks have fabricated causal regressions. No fallback arbitrary exception
+formatting, foreign hash/equality callback or mutable authority output is
+accepted. Independent local review found no additional verified data-loss,
+debt-reset/adoption or authority issue in the frozen tree; this is not an
+actual provider result or independent Claude review.
+
+The034 latch correction is now validated: original op FAILED is set first
+INSIDE its genuine native A lock, then the original budget FAILED under B.
+Corrupt-anchor fallback always latches the op. Named existing key acceptance
+and final GET acceptance use the same A gate. Barrier fixtures reject a new
+key/GET/reservation after atomic latch while earlier accepted wire work
+drains. Prior irreversible contribution/journal facts survive; summaries,
+reserve/settle/source checks do not become permissive. The original A->B lock
+order,8second file checks, one-hour chunk bounds and84005/4GiB caps stay.
+
+Main final SEVENTEEN focused files passed **644tests/54.67s**, OS network
+denied: all ten new custody/operator/accounting/reader/outer/timing/negative/
+union tests, old conservative budget, original archive loader, original body
+pair, lane import boundary, two review records and active documents. This is
+not a full lane/repository suite. Main also ran final timing-only47/6.66s.
+Delegated final four-file outer/operator/control checks168/6.95s, negative+
+budget+control162/7.03s, union/reader/budget106/3.42s and earlier journal204/
+5.43s remain separately attributed, not Main reruns/actual source proof.
+The partial toy outer union fixture correctly refuses incomplete coverage;
+only the author's complete two-chunk fixture asserts full union acceptance.
+
+Independent Main AST audits prove held82 =runtime80+TWO bound historical
+wrappers, no missing/extra runtime dependency; the read-only diagnostic holds
+exact63. Complete source union+ten focused tests compile in memory. The
+outer still unconditionally refuses source activation with controlled
+durable_capture_registration_pending BEFORE source access. All source and
+negative capture authority literals remain PENDING at this software snapshot.
+
+| New/current production member | SHA256 |
+| --- | --- |
+| outer coordinator | b0d6b97753ad2a6ece31a81e19bd662ce340a22dd8900c6cf988fb32420b05ee |
+| operator/wire | 8177095d316b60c96031c74f9d7472ef5c0f646773df412c1c8a2ed47fe3c6d5 |
+| semantic controls | 308add2c72a88d01c31971634986bcff520c27e57544bd36c86237282f8120cc |
+| durable budget/journal | b0d91c87dc1142998d633bb63fab4a899734260b8b46eee3674082a8414e12b6 |
+| source-only volume | d0acb92d06cc539826f1fd734d9c0b298b183f541ffbd962ac02de2978dc81e9 |
+| negative custody/finalizer | 022ff0d93c19b4eb13c620aefef8073d573a0078463189f9ca323c049612d59d |
+| transport contribution/union | 13f660f27d0f81cc242ffe8f6f43ae1af9b33c54228f3fe4af513cbc5ab1b70c |
+
+Held82 list SHA256
+`cca258db51a2d2cdef247a86ecab1a62401a995c19b1f966e231e0b9fa7013a5`,
+complete mapping
+`9b02346a2bead40a2084cb7e5ce78acf41863214ea355dc17d4938422cbec1bd`.
+All old source/capture/claim/primitive files stay unchanged. Existing negatives,
+spent claims, every received/raw/unknown debit and original monthly panels
+remain retained. No actual new count/daily retrieval, claim/START/charge,
+look, QC/Safari, purchase or push occurred in this software work.
+
+### 128.36 Frozen corrected read-only timingV2, ONE prospective invocation
+
+**SI-DEC-20261027-11**, continuing SI-AUTH-20261026-02, permits ONE corrected
+OFFLINE invocation after the new clean checkpoint. This is not53939 restart,
+not provider recovery or an old claim reset. Only the verified029 exact
+matching-ref producer ABI is added; other branches/verbs/options remain
+denied. Original old58 source loader, every byte/stamp/full-manifest/code
+check,1800second whole deadline, three pure EMPTY-budget samples and zero
+ticket/claim/source/native/key/write authority remain. No SourceLease/source
+entrypoint is entered to obtain timings. The in-memory deny set also covers
+the newly bound future operator dispatch/credential aliases; two cold-child
+tests prove denial before those operations. Fixed negative counters/roles
+and no callable reset improve future diagnosis without claiming53939 cause.
+
+New schema si-count-guard-readonly-timing-v2 and protocol
+`06d9a7ffb43203aa8f3fac7b12095a4be548a33aca3ae318d6010f917d823b39`;
+driver rawSHA `d04f159df38734a152c811dd868673d6f0be606e63ab4142d93ab5b1ba65fd68`;
+test rawSHA `f25e5386a0a2f0926e484ae5efe3c5761018b6ac6b86ae5b8cfa57b09c17e0dd`.
+Exact63 list stays
+`21b25d2464cc07329f05d93f9d09d8e53f8fe19267588a63301f30d66954f09b`;
+current63-byte mapping
+`20f188c25724f4a29cf6588e25aa2d467cf1ea52e1a4624a9e689d49efcfac0e`.
+Expected runtime is the resulting clean lane checkpoint; matching tracking/
+actual origin remains `d6af672b3c8198712228bbd7b5eef35777283b1a`. Stop on
+unexpected root/branch/HEAD/dirt/actual remote. Freeze all agents until its
+actual known-handle termination. No edits/tests/commits/push while running.
+An absent session/started stdout/provisional result is not successful closure.
+
+Success needs actual exit0 and original closed_readonly_guard_timing_only
+result after all original source/code exits, fresh checks and zero denied
+seams; report only aggregate timings. On failure retain true original counters/
+controlled roles and precise unknowns; prove a cause before any new action,
+never repeatedly invoke to guess. Sampling itself never relaxes checks or
+admits source/denominator/input/backtest readiness. Continue from the actual
+result; local readiness and the ONE final matching-lane push remain pending.
+
+Main post-record active-document/review-record validation:95passed/.95s.

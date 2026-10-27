@@ -527,8 +527,10 @@ bypass was found. This Windows counter-review does not reproduce the Mac
 operational receipts or the full lane suite; its focused results and limits
 are recorded separately. Its **333 / 256 / 52 / 699** floor is historical to
 that snapshot. Mac section323 owns the separate recovery evidence; section325
-records the owner-approved merge and identity reconciliation at current floor
-**336 / 259 / 52 / 699**, without duplicate looks or operational pin refresh.**
+records the owner-approved merge and identity reconciliation at its floor
+**336 / 259 / 52 / 699**, without duplicate looks or operational pin refresh.
+Current section326.27 then books the one newly created native-source job:
+**337 / 259 / 53 / 699**, with no strategy result cell.**
 
 Current continuation, 2026-10-13: section 292 accepts Claude's two-commit
 section-291 review after documentary qualifications and reproduces both new
@@ -2233,11 +2235,16 @@ All Y/Z/AA/AB/AC uses and controls are SPENT. AD's one public-FIGI diagnostic
 then failed at transport with no retained HTTP status; no corroboration or
 unchanged retry. AE's exact offline five-binding metadata specification passed
 once; AD/AE are SPENT. Sections326.11–326.18 own those facts and the remaining
-4FIGI disagreements/1collision. The next proposed route is a separately gated
-QC-native source diagnostic for those five, preserving the vendor stops;
-current paid/private-org/access/storage/source/project/run proof is pending.
-Complete reference AND held-stock NAV coverage,
-source identity/common sidecar/runtime/run/attempt gates still precede QC.
+4FIGI disagreements/1collision. AF's local source authentication passed before
+its first authentication request refused at transport; AF is SPENT. Authorized
+Safari established current same-org Researcher/sole-Manager context; new own
+project38522505 was created, exact eight source files installed and AI code
+readback passed. AJ's one no-order source job d366867e9ca3a657baea9beb9b660b41
+then completed in the UI; selected full metadata remains unvalidated and all
+source stops persist. Sections326.19–326.27 own the actual context, readback,
+one new337/259/53/699 floor and bounded metadata recovery. No unchanged replay.
+Complete reference AND held-stock NAV coverage, source identity/common
+sidecar/runtime/run/attempt gates still precede the six-cell strategy runs.
 Old modules/profiles/pins and spent uses stay frozen;
 no automatic re-pin/retry or source/financial gate clearance. This is the
 current live continuation, superseding325's no-next-milestone endpoint.
@@ -65103,3 +65110,107 @@ frozen before use and remain native ALL-network/artifact-denied for parsing;
 no unrelated result/raw data is included. All five source blockers persist
 until their actual independent proof; strategy acquisition/runtime/coverage/
 quote/holdings/payoff gates still precede the six-cell strategy evaluation.
+
+### 326.27 Actual AJ/A1 source job completed; full selected metadata pending
+
+At clean4fd0d422e98983aafc45f75ef819a1d0758089c3, fresh same-org Resources
+UI again showed both B2-8 nodes with Project/InUseBy empty and84.54MB/2GB
+storage. The capacity-only tab was closed, preserving both the other lane's
+original editor and this own source project. New project38522505 was reobserved
+with exact name, sole Owner/no library, main.py selected/no visible dirty
+marker, and masterv18207. All eight exact source downloads had already passed
+AI; no intervening source edit/upload occurred. There was no explicit Saved
+text exposed, so no such UI label is fabricated. The upload completion and
+full byte readback are the actual saved-source evidence.
+
+After external clock11:11:49UTC, Backtest Project was clicked ONCE. Its first
+immediate AX state was unchanged; it was NOT clicked again. After15seconds,
+normal product progress showed the actual new build and run. Displayed IDE
+events:11:11:55 build LEAN2.5.0.0.18207 short IDb0a1d7-58fd1d;
+11:11:57 received backtest;11:12:04 initialization;11:12:08 launch/completion.
+Actual jobd366867e9ca3a657baea9beb9b660b41, automatically named
+Retrospective Fluorescent Pink kitten, in38522505. Engine algorithm window
+2026-10-14 only. These are observed IDE strings, not a REST compile ID or
+exact provider timestamps. The controlled UI combined compile+launch protocol
+was used; the old default-template build was not substituted. AJ gesture/run
+is SPENT, one actual source job and no second launch/reader/retry occurred.
+
+The own Cloud Terminal automatically displayed generic History-start-date
+warnings, completed engine messages,0.11s reported algorithm time and2736
+processed points. Those warnings do not prove a particular missing-price cause,
+whether any date was adjusted, or coverage. The default result Overview also
+automatically displayed flat1m/zero-order/zero-return source-diagnostic metrics
+and the custom metadata prefix. This incidental UI outcome display is
+qualified; no Logs/Orders/Trades/Charts/Report/Download Results action or full
+run/outcome export was selected, and no metric is accepted as strategy evidence.
+The selected prefix reports technical cache publication and a candidate book
+pin, but its full object is TRUNCATED in AX and not yet authenticated. Do not
+admit a book/identity/price or clear any source stop from that prefix or the
+engine completion. Native data/book remain inside QC.
+
+Book the exact job ONCE under existing bounded Analyst R298 actual-run
+accounting:336->337shared /259development unchanged /52->53infrastructure /
+699cells unchanged. Source prep/IDE builds, AI checks, five potential History
+calls and custom-field parsing add no separate look. Append-only alpha ledger
+entry records only this actual ID; no other-lane/historical entry changes.
+All agents held through actual launch/completion. Final86record1.19s overlaps
+prior focused selections, not additional distinct suite coverage. No full
+suite, Claude acceptance, alpha, formal/PIT/master/paper/live gate clearance.
+
+### 326.28 Bounded AK selected-field acquisition/validation decision
+
+Current owner authority permits one bounded acquisition of ONLY this own
+terminal job's ARV2_NATIVE_SOURCE_META field, not a rerun or book/data download.
+Use UI selection/copy of the exact JSON value, verify visible first/last JSON
+boundaries, and transfer via native UI to a plain UTF8 file inside
+artifacts/analyst_revisions_v2/newrule_native_source_metadata/R326-20261027-AK.
+New leaf UNINSPECTED/unallocated; allocate exclusive claim BEFORE saving data.
+No whole-page selection, full-result download, raw prices/book, credentials,
+other run or other clipboard content may be saved. If UI selection contains
+non-metadata leading/trailing content, correct the selection visibly before
+the one saved input; do not silently trim a later malformed input into success.
+No global app/security/download setting changes; no provider/QC job or
+Object Store contact is authorized by this metadata transfer. Preserve any
+ambiguous/partial file and consume the new leaf, no parser-until-pass retry.
+
+After UI transfer, ONE native ALL-network/Keychain/security-denied parser may
+open ONLY that fixed own selected-metadata input, <=16KiB, original no-follow/
+owner/regular/single-link/full10 FD metadata held before/after bytes. Parse
+strict ASCII JSON with duplicate/nonfinite/trailing rejection; no stripping,
+rewriting, inferred zeros or missing fields. Bind jobd366867e…/project38522505/
+actual UI terminal and exact65cebf60 source/profile3e985a9d/spec9da6813b/
+namespace13e90215. Require the exact Main result key set and false flags;
+native.validate_summary and publication.validate_receipt/validate_attempt_record
+must join to the exact frozen spec/scope. Keep source observation/refusal and
+every missing/invalid/failure-unknown cell separate from technical publication.
+Only actual parser0 plus a matching closed redacted report authenticates this
+field; it never supplies formal identity/PIT/price/strategy admission by itself.
+Write only claim, original selected input and bounded report/endpoint evidence
+inside AK, all runtime/cache/log paths inroot. No old control/report/result
+reader or data corpus read. Native read policy denies all other artifacts.
+Source/protocol self/HEAD/root/branch binds remain; all other source bytes
+stay frozen and all five vendor stops remain pending this actual result.
+
+AK acquisition refinement BEFORE allocation/save/semantic parsing: the selected
+field's native UI triple-click exposes its COMPLETE text, unlike the earlier
+editor/concatenated-statistics snapshots. It is6053ASCII characters with one
+observed trailing display-separator SPACE; first/last JSON boundaries are
+visible, no ellipsis. Shift-selection did not remove that separator, and the
+static text does not support a settable text range. No file/claim/parser had
+run. A pure ASCII SHA256 checksum at UI acquisition(empty-vector self-check)
+returned ec3627673a9c54b497ea42376abd2eb3d2ea4e6b0158ecba3e599a07ecaf90f5.
+Trusted-tool transfer reproduced that exact6053byte checksum under native
+ALL-network/artifact denial, without JSON semantic parsing or any file write.
+No clipboard/TextEdit/Terminal app or global setting is necessary.
+
+The one AK capture/parser may now save ONLY these exact6053 original UI bytes
+via trusted-tool transfer after its exclusive claim. This is an explicit
+one-SPACE UI framing contract fixed BEFORE use: preserve the raw input/hash;
+require exactly canonical Main JSON bytes6052 followed by that one SPACE.
+No generic whitespace stripping, malformed repair, alternate input, missing
+field substitution or different framing is accepted. Strict duplicate/
+nonfinite/trailing-content rejection and all semantic bindings above remain;
+canonical body and original transport hashes are reported separately. This
+replaces only the proposed UI-to-file mechanism, not a spent reader or source
+rule. Native parser no-follow/full10 FD checks, single-use, closed output and
+all false price/formal flags remain. No raw QC data/book is transferred.

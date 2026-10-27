@@ -7343,3 +7343,29 @@ contains original per-run freezes/finite result evidence/waiver context;
 this merge neither rereads private receipts nor infers authority from names.
 No new QC/provider/result access, accepted cell, efficacy or formal/PIT/master/
 paper/live clearance follows. Analyst325 owns the counter-review and merge.
+
+## R-298 / Analyst326 AJ native-five source availability — 2026-10-27 (INFRASTRUCTURE ONLY)
+
+Owner-authorized parser/price recovery under the current review waiver used
+new owned project38522505, ARV2 R326 FIVE SOURCE RAW 20261027, to check the
+five predeclared original identity/RAW source assignments and retain their
+book inside QC. The no-order exception was frozen before execution. At
+4fd0d422, one normal Safari Backtest Project gesture produced short IDE build
+b0a1d7-58fd1d and actual backtestd366867e9ca3a657baea9beb9b660b41,
+Retrospective Fluorescent Pink kitten. UI engine2.5.0.0.18207 reported
+completion on the2026-10-14one-day algorithm window. The requested native
+source window is2020-12-31..2026-10-13, not a strategy evaluation period.
+All eight cloud code files177315bytes matched the frozen65cebf60 projection
+through controlled code-only downloads/one native readback before launch.
+
+Full selected custom metadata is still pending bounded authentication;
+completion/cache-prefix/flat engine metrics are not identity or price coverage,
+formal admission, a comparison result cell or an efficacy claim. No raw QC
+prices/book, order/return artifact or full result export was requested. One
+actual new source job is booked ONCE: **336->337 shared /259 Analyst development
+unchanged /52->53 infrastructure /699 cells unchanged**. Preparations, IDE
+automatic builds and result authentication are not additional looks. No
+historical/other-lane entry is changed or rebooked; no funded/broker/real-order/
+paper/live authority or formal/PIT/master readiness follows. Analyst326.26–28
+own the exact one-use protocol, current UI/source/rights qualifications and
+remaining source/coverage gates.

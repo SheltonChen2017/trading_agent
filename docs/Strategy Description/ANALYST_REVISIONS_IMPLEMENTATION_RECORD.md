@@ -2229,9 +2229,14 @@ Z then refused the guessed original schema; AA's separately frozen exact-schema
 recovery passed, and AB authenticated genuine potential membership demand.
 AC passed once at d25ab8ea:74 of79 route refusals corrected,5636potential-stock
 routes/5closed identity refusals/510conditional-never/all8funds retained.
-All Y/Z/AA/AB/AC uses and controls are SPENT. Sections326.11–326.13 own those
-actual facts, remaining4FIGI disagreements/1collision, and the next separately
-frozen public-FIGI diagnostic. Complete reference AND held-stock NAV coverage,
+All Y/Z/AA/AB/AC uses and controls are SPENT. AD's one public-FIGI diagnostic
+then failed at transport with no retained HTTP status; no corroboration or
+unchanged retry. AE's exact offline five-binding metadata specification passed
+once; AD/AE are SPENT. Sections326.11–326.18 own those facts and the remaining
+4FIGI disagreements/1collision. The next proposed route is a separately gated
+QC-native source diagnostic for those five, preserving the vendor stops;
+current paid/private-org/access/storage/source/project/run proof is pending.
+Complete reference AND held-stock NAV coverage,
 source identity/common sidecar/runtime/run/attempt gates still precede QC.
 Old modules/profiles/pins and spent uses stay frozen;
 no automatic re-pin/retry or source/financial gate clearance. This is the
@@ -64444,3 +64449,251 @@ book publication so data are retained without an unchanged History replay.
 No raw QC data may leave QC. Complete RAW reference AND actual held-stock NAV/
 terminal-payoff/quote-aware common six-cell gates remain.336/259/52/699 unchanged.
 No push yet this round.
+
+### 326.18 Actual AE metadata specification passed once
+
+At clean freeze d49e54152f4d2bba50161850c82d692af1c7fc3c, sole native AE
+producer2026-10-27T10:01:13.648410Z..10:01:16.942247Z exited0; separate
+native validator10:01:16.942418Z..10:01:20.093562Z exited0. Both stderr0/no
+bound, identical4926byte stdout SHA
+c3b5c94b504527a330ff5351621e59860b9236d7b73eea45d88ddc4bc989e886.
+Report4797bytes SHAdc9d728d3dcb61f6393d82b22c7c9a05b06b1995ea0922fa965eb151fe59b010.
+Metadata native-price-specification.json1791bytes SHA
+9da6813b4807d7ebf0ea32fddd38ab0740ff6c6edbc3bd05cdc5889775eb1f66.
+Process brackets are not provider timestamps. AE producer/data guard/direct
+preparation/observer/validator/control are SPENT; no rerun/reader/control
+inspection or automatic new authority. No edits/tests during actual use.
+The final86record1.09s overlaps245. No provider/credential/QC/capacity/project/
+compile/job/look/cell or push occurred.
+
+All5 selected ORIGINAL full bindings/class/evidence/semantic row hashes were
+verified. Original non-USD functional-currency count0 for THESE five; this does
+not erase the earlier five corrected currency-role cases. Original native
+SIDs remain unavailable; prior AD producer2/validator0 remain explicit and
+mapping_accepted=False. Vendor blockers still5. Every full-binding hash is in
+the prepared metadata spec; the future native source job must independently
+reload/resolve the complete6151 input and all eight ETF collision census.
+The proposal covers BOTH reference and NAV, entire frozen window/all six
+cells; no per-missing-date fallback, price eligibility filter or alias update.
+
+The AD26503byte source pin matched fresh guard metadata endpoint SHA
+02a35007731cccba3e52f3f75d08305fb4a144683e7e8e40f8ce72d6fa076912,
+current security2b84f04ed075c50bcafe7c9ebecee4bb98d84615a2e677f701b3b06bb7b47612;
+one-file guard profileba8382f9b85d9f121ab4e2832e250b83e93d95aef1625574263242b1dc81b1fd.
+Held/named/native checks and normal return passed; not historical/continuous
+custody or price/master admission. No original source/package census or old
+failure/report read occurred.
+
+Root generated public-only arv2_r298_ae_source_binding.py5230bytes SHA
+d67e13dfb73885a335345648a4149f1968b3ba2aebc26405ea409681a1be6bb1
+from retained authenticated stdout. Fact SHA
+7bb8c0ce079c85a2c41f20913a28cc9db4db1420402867cb57641b80db0436a4;
+spec SHA9da6813b4807d7ebf0ea32fddd38ab0740ff6c6edbc3bd05cdc5889775eb1f66;
+selection-evidence SHAda5435a43b8f5d4a57487d67eb7066afbb3c368c31fcbbc8809464f20d208b70.
+This metadata provides no paid rights, native identity, source price, project
+or run grant. No artifact reread. Future source projection and QC-local book
+publication must preserve exact input/source/spec/project/context/run binds.
+
+Before new QC contact, prepare a NEW bounded pre-creation rights observation:
+fresh native-denied genuine local _load_plain/_catalog/_catalog_unchanged of
+the fixed original October input, no old admit/TICKERS/controls; require its
+actual0/closed authentication BEFORE existing QC credential handoff. Then
+read only the exact owned reference's current org/owner and that org's bounded
+metadata through a lane-owned fixed endpoint. No project creation/upload/
+compile/capacity/job or account/history/project-list census in that phase.
+Recognized current paid context and actual Storage Create are required before
+cache publication;2GB/pastD15/ownership alone are insufficient. SDK fields
+data.current/signedTime have unspecified semantics and are observations, not
+an invented cache-agreement or billing gate. If API permission semantics are
+absent, use authorized same-org read-only Safari inspection after source gates;
+no subscription/permission change or routine access acknowledgement.
+
+QC-local publication is being implemented prospectively. ObjectStore is
+organization-wide; Save overwrites existing keys, so source namespace must
+derive from the exact NEW own project, scope and content. Known-present even
+identical rejects; no cleanup/overwrite/retry/GetFilePath/enumeration/Clear.
+Immediate same-key readback may use the algorithm cache, not independent
+remote-durability proof; each future QC-only consumer must authenticate exact
+bytes/hash fresh. No raw QC data exported to host/results/log/project source.
+Current paid/private-org/project/source/access/idle/capacity/attempt and exact
+run gates remain; all formal/PIT/master/paper/live flags false,336/259/52/699.
+
+### 326.19 QC-local book publication and exact-source projection candidates
+
+The owner's current parser/price recovery and research-review waiver continues;
+it grants no paid, security, financial or source-gate exception. Public-only
+AE anchor tests8200bytes SHAc83ac51ed97ddf4a687096a82094693f63899a0d704c7b9098abd45b61a5de72
+passed4 under native ALL-network/artifact/Keychain/security denial3.35s. They
+join the exact1791byte specification and five whole-binding hashes, preserve
+AE actual0/validator0 alongside AD actual2/validator0, reject invented mapping
+success, and check defensive copies/literal-only no-I/O accessors. This is
+source metadata validation, not fresh data, rights or native-price evidence.
+
+New research/analyst_revisions_v2_qc/newrule_native_price_book_publication.py
+25817bytes SHA03d100e962b98cd8b174d947a33636e421692445422c0dcce2282b46015435e2;
+tests19040bytes SHAa76e0c3db9cf4e442cf751d741843dde20c7aa5483fa117673dc42df139d6044.
+Canonical NO-LF1976byte protocol SHA
+3e8c98f4ff76e73b7c33b9d1988e7f6088aa6b32ecbc7ae82b2acb92a6e4b820.
+It accepts ONLY the exact opaque native-book class plus matching closed
+specification/summary, hashes bounded bytes before JSON, and rechecks the
+full6151 forward census, exact five selected bindings, calendar, cells and
+false flags. Live=False/zero holdings/no orders/project/spec/book bindings
+are checked before and after publication. The key is derived from the NEW
+own project, frozen scope and whole-book hash. One-use is consumed before
+contains_key; any existing key refuses even if identical. Then save_bytes
+must returnTrue and bounded read_bytes must equal the original bytes. Exact
+Python bytes and exact System.Byte[] are supported; the CLR test is a stand-in,
+not actual cloud proof. There is no GetFilePath/list/Clear/Delete, cleanup,
+overwrite or retry. Probe-plus-save is NOT atomic exclusive creation;
+exclusive current project/run authority is external. Same-job readback may
+be the algorithm cache, not independent remote durability. Each later QC-only
+consumer must authenticate bytes/hash fresh. Partial objects remain after
+late/nonzero/unknown failure. Raw QC data stay inside QC, never host/results/
+logs/source files.65 distinct focused author passes; earlier31/62/64 overlap.
+Two restored omissions caught one expected failure each: existing-key refusal
+0.13s and negative-price validation0.13s. Root source audit found no additional
+material defect; same-round advice is not independent acceptance.
+
+New scripts/arv2_r298_native_price_source_projection.py23758bytes SHA
+a34385be7b5dbf95c30a669fc251689edbe3e8e0429386b188d2ac103907da3e;
+tests19785bytes SHA7fe5fd37180290e18fb4fe5eb5368e09b5ea4d15534b8c68901255e936185063.
+Canonical NO-LF3098byte policy SHA
+6b20e516f856cc0d3fb110a9e3a7b0b35a5faa059ae8697f94057782a5264564.
+Pure generation requires a concrete NEW positive project ID different from
+38364439, exact source bytes/generator hash, AE specification, fixed existing
+plain activation and project/scope binding. It derives exactly eight cloud
+files. The plain loader is aliased to the accepted input-runtime module;
+the only legacy strategy copies are exact AST error/Decimal primitives.
+An annotations future import is removed ONLY after proving no annotations;
+all other AST is preserved. Imports/no-I/O/order calls are statically bounded.
+All files compile with QC's implicit AlgorithmImports prefix. Synthetic
+concrete-project output177323bytes, largest53466, below64k/file320KiB total.
+An isolated import-closure regression proves the publisher and diagnostic
+share the projected opaque-book type and plain loader, without host fallback.
+
+Generated Main binds the exact actual project, NY/USD, strict Daily end times,
+no price seeding, all eight RAW/no-fill-forward/no-extended ETFs and SPY
+benchmark, with a one-day2026-10-14 no-order source diagnostic. It prepares
+ONCE and publishes the opaque book in the SAME job, avoiding an unchanged
+History replay merely to retain data. Only bounded ARV2_NATIVE_SOURCE_META
+is emitted. The technical terminal source_observation_QC_cache_written does
+NOT mean identity, History enumeration, price coverage or strategy admission
+passed; refusals/missing cells remain explicit. Runtime failure is nonzero,
+finite and never retried. Root P3 correction before use preserves a fresh
+validated source summary alongside partial-publication metadata if the writer
+fails; malformed/drifted summaries are omitted.46 final distinct author passes
+0.64s; earlier40/41/43 overlap. Five restored omissions caught one expected
+failure each: project binding0.33s, publish0.34s, safe failure-summary retention
+0.31s, raw source pin0.33s, no-annotation prerequisite0.40s. Initial3 regex
+audit fixture errors0.17s and3 canonical-order fixture errors0.30s were fixed
+before use. No actual source DATA, credential, QC/provider/capacity/project/
+compile/job/cache write or new control allocation occurred in these checks.
+Actual paid/private-org/access/Storage Create and separately committed exact
+project/source/namespace/compile/run/attempt freezes remain mandatory. No
+strategy result, cell, financial gate clearance or push yet;336/259/52/699.
+
+### 326.20 Exact one-use AF local-source and read-only QC organization freeze
+
+Under the current owner waiver/delegation, the clean commit containing THIS
+freeze permits ONE new AF run and ONE separate native validator after observing
+its real parent exit. New scripts/observe_arv2_r298_native_qc_rights.py59678bytes
+SHAb3a9d74363018e0a2064ae3dd5ab1bbfb4914d0f772363d07eb3be86221e8443;
+tests28704bytes SHA142a2cd1fe72d7b497a62c6cc0d25e6530076f716e4c4696bad918421bb22fbc.
+Canonical WITH-LF25638byte profile SHA
+9ed594bdc905c11cb3bf7254fcf5c29a041a27487a992f1a740b55328af7b55b.
+All183 current literal public source pins match: AE181 plus exact AE caller
+501371b3 and public AE binding d67e13df. No silent refresh/old-map mutation.
+Compatible host remains the exact designated Mac root/branch, Darwin/POSIX
+Python3.13 at /Users/sheltonchen/.venvs/trading_agent-py313/bin/python, exact
+actual clean committed HEAD/caller SHA; claim/each role intent fsynced before
+dispatch. Fixed NEW control, UNINSPECTED/unallocated:
+artifacts/analyst_revisions_v2/newrule_native_qc_rights/R326-20261027-AF.
+Any partial/unknown claim is consumed/ambiguous spent, no unchanged retry.
+
+This phase observes current context before ANY new project creation or QC-data
+cache use. Parent claims first, then one native ALL-network-denied fresh
+genuine _load_plain/_catalog/_catalog_unchanged process consumes ONLY the fixed
+October input package411c2734/lineagee4518e06. It authenticates all five transport
+role byte inventories, manifest/axis/all6151 binding semantics, same-process
+capability/unchanged checks and the exact five AE whole-binding hashes. The
+catalog helper does not parse membership/contribution row semantics; no such
+claim is made. No original TICKERS/source controls/old admit/prepare are read.
+Only actual source-child0 plus matching closed metadata permits the EXISTING
+QC two-environment-value credential handoff inside the parent. No credential
+precheck/copy helper, new Keychain access or secret output precedes it.
+
+Then exactly THREE separately native HTTP children, one request each, in order:
+POST authenticate; POST projects/read for existing own reference38364439;
+POST organizations/read for ONLY the returned fixed same-org ID. Exact org
+SHAa2d88859373df0f1fd59ede52b9b3945f847091b5fca3286841241536c38e880
+and exact owner full-row707a30618e122e49fe6fa75364451b5b7c50e1019a68a89ffc0cd3ae3c8e0b78
+are binding. No dedicated old A5-row allowance is imported. Raw org ID remains
+only in bounded internal metadata IPC, authenticated before external redaction.
+Parent/worker inherit original directory/claim/intent FDs, verify named/full
+metadata/native security and each input pin. HTTP children cannot write any
+artifact or read source DATA. TLS verified, fixed API host/path/body/header,
+zero retries, owned Session suppresses redirect preparation, non200 validated
+numeric status retained before later checks and failed body never read.
+Complete bounded200 body pins precede parsing; only recognized tier values,
+finite shapes/counts/hashes/own-row observations enter the closed report.
+Names/emails/product IDs/raw identifiers/cards/credentials/raw responses do not.
+Unknown type/permission stays unknown. SDK data.current/signedTime do not prove
+billing, cache agreement, Storage Create, or organization privacy. Those flags
+remain false/unknown even when this read-only observation completes.
+
+No projects/create, files/history/source read/upload, ObjectStore write,
+node/capacity/compile/backtest/member-permission/subscription/account-billing
+operation exists. Three dispatch intents are NOT physical contact accounting;
+provider_request_count remainsNone. Existing reference may be observed without
+mutating its lock/job/source. Latest compact Insider snapshot was idle/completed,
+with923b962a pushed and QC reported untouched; this is not a continuous exclusive
+lease or later capacity proof. New project/cache/run authority remains a
+separate committed protocol after current rights evidence genuinely permits.
+
+Parent600s/source180s/each HTTP90s (send<=30s)/validator20s; own children only.
+Uninterruptible IO/host suspension remain qualifications. Native source SBPL
+SHA4689d509e38e9e8e8859b22074467c3e678da4e712455ef8da2555e5de1348e4;
+HTTPadae76243e9e45e806ae91fc130ccb0ed021df57cb011300d608911c9e6c1d2b;
+validatoraf3e1d446297735b0394607b83e8ce5fe825b528628a2ca606adeb2b88ec12a0.
+HTTP outbound443/DNS53 restrictions are not a domain fence. Source permits
+only genuine package/lineage plus own claim/intents; validator denies all
+artifacts. All temp/cache/log/plugin paths stay inside designated root.
+No whole-interpreter/same-user/continuous-integrity claim is added.
+
+Trusted-tool external orchestration1956bytes SHA
+20bd851b09e5d467096494a8fad6724f3ffa102173224f6efe8b54c1cbb94b88
+is frozen for bounded actual-exit/result recording: inherit the current broker
+context without separately inspecting/copying credentials, invoke only this
+exact run once<=620s/128KiB, retain actual exit/bounds/times/stdout+stderr pins;
+only observed0/2, no bounds and empty stderr permits the credential-free native
+validator, fed EXACT stdout and actual exit once<=20s. Its actual0 plus
+byte-identical output and strict matching closed schema authenticates output;
+producer2 stays FAILURE even if orchestration/validator exit0. Unknown/nonzero/
+partial/malformed/trailing/mismatched evidence never becomes successful work.
+Only this bounded redacted output/process evidence may be recorded afterward;
+no extra control/report reader, private census, retry or raw exception output.
+An unexecuted draft initialized its record from an undefined local; corrected
+before use. Four native-denied synthetic handling cases(0,2,unknown-bound,
+negative exit) pass; no operational entrypoint executed in these checks.
+
+Prospective P2 I326-011: matching replacement credentials+changed same-org owner
+could bypass the intended fixed-owner pin. Corrected before use by exact
+707a full-row extraction AND closed output checks; omission red1/0.17s.
+P3 I326-012: a cookie/session refusal could discard available HTTP status;
+corrected before use, red1/3.07s then green1/2.99s, body unread. P3 I326-013:
+four-stream wording corrected to actual five byte inventories/three selected
+semantic streams. Product-loop type-variable shadowing also corrected before
+use. Remaining omissions caught exact-five membership0.26s, final unchanged
+check0.26s, owned redirects0.13s (body read count1). Initial redirect mutation
+missed a case-sensitive fake header; corrected CaseInsensitiveDict produced
+the meaningful red. Initial two fixture assertions corrected; no actual error.
+Author87distinct passes7.82s; earlier51/87 overlap. Three SBPL profiles compiled.
+RootFINAL289distinct passes8.15s =65publisher+46projection+4AEanchor+87AF+
+86record/doc+1research transitive closure; no failures/skips/warnings. Eight
+new sources/tests compile in memory/exact EOF, all183 pins/source binding match,
+dispatch_fence absent; native ALL-network/artifact/Keychain/security denial,
+inroot paths/noautoload/--noconftest/--ignore=artifacts/-B/nocacheprovider.
+Four external-handling checks are additional synthetic cases, not pytest suite
+passes or operational evidence. No full suite/independent acceptance/new DATA/
+credential/QC/control allocation occurred in validation. No push yet; floor
+336shared/259development/52infrastructure/699cells unchanged.

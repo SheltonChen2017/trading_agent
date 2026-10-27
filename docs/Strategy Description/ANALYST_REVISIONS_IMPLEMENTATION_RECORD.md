@@ -65910,3 +65910,169 @@ support only a separately versioned source-authenticated acquisition with the
 verified minimal policy under its own exact run freeze. A failure retains its
 specific stage and stops that protocol; no blind relaunch or blanket security
 exception. All original scientific/source/licensing/financial stops remain.
+
+### 326.38 Actual AO complete; resolver prerequisite corrected prospectively
+
+At cleanbccc394a3478aa260bb0948c8dc67d4f3051c366, sole AO parent
+2026-10-27T12:48:12.355193Z..12:48:20.819302Z exited0,
+2776bytes SHAff790b98087a57c321841a08550d3cd4f50343260d512446d39dd16ec8ff6789,
+stderr0/boundnull. Sole native validator12:48:20.819546Z..12:48:24.604211Z
+exited0 and returned identical2776bytes/hash, stderr0/boundnull.
+Child0,12:48:15.996830Z..12:48:20.588981Z,1191bytes SHA
+665a0c7b63768be8abec681117bf66901e52c18dc533997a8d9a05778aea7aad.
+Report2360bytes SHAa769ed73c93ea4a18d1882aef19dad7af0fd0d901df22be88725a252ca410e75;
+journal1265bytes SHAfd89d3d877740c546ee3d1a3012f96f9cc02a9035a797320b5c9547438ec14e4.
+Actual child/packet/journal/report/external exits match; this completes the
+particular credential-free diagnostic, not any price acquisition. AO and its
+control/observer/output validator are now SPENT, no reread/retry/repair.
+Final86record1.13s overlaps154, not additional coverage.
+
+All four application stage intents completed. DNS returned4ordered addresses,
+2IPv4/2IPv6, selected first ordinal0/IPv6 with no fallback; inventory SHA
+c9f706a32784e5f18ae0f1776f2ba30f3d3d68e16f68899f8320d60faef4d632.
+No address itself was exposed. TCP connected, pinned-CA hostname-verified
+TLSv1.3 completed, peerDER SHAbd034affabd578a8bdc65e445e28976e25bad12ef95205ff13330e042de23114.
+One public-root HEAD returned first status404/status-line24bytes. No headers/
+body application read, source data endpoint/key/authentication/corpus/QC call.
+404 at PUBLIC ROOT is not a stock/fund endpoint refusal or subscription test.
+
+The sole resolver-socket exclusion now has actual prospective DNS/TCP/verified-
+TLS/HEAD evidence; com.apple.netsrc remained denied and was unnecessary for
+this observed path. I326-015 is narrowed prospectively: the bounded transport
+works with the specific macOS DNS prerequisite restored. Historical AM/AD/AF
+causal chains were not recovered, continuous network reliability is unproven,
+and no security/identity/PIT/price or entitlement gate is retroactively cleared.
+The original AN/AM refusals and old policies remain intact. No new QC look or
+strategy cell;337/259/53/699 unchanged.
+
+New inert PUBLIC scripts/arv2_r298_ao_source_binding.py3355bytes SHA
+908d4b8143d2d981f638df93fb6f1f3956a6d0902ab104388b2dd6b5dfc0de2c,
+fact canonical SHAf0c5db3f65451a93a82384b16603fb8f349980433566146af1b338d7b533dca8,
+was constructed ONLY from authenticated stored tool metadata, no artifact/
+control/response reread. It retains exact actual/source/profile/report/journal/
+DNS/TLS/status facts and all false admission/new-operation/historical-cause
+flags; it is not an access grant. Four tests5776bytes SHA
+3817a62790793b0d25d1792af11f3d7e0d9ca5ed96e31c199df89bc368c9922c,
+4passes3.64s under native ALL-network/artifact/Keychain/security denial, fresh
+inert-import/I/O denial, copy/privacy and all3actual-zero joins. No data or
+operational call occurred in those tests; author compile/style checks pass.
+
+Next AP is a separately versioned source-authenticated RAW acquisition using
+ONLY this verified minimal provider-egress correction, original full3466axis/
+6151whole bindings/5636vendor+5native+510conditional+8fund plan and original
+prices/fields/windows. It must freshly pass original-source/AC guards, normal
+return, source0 and the exact public AO evidence/CA pins BEFORE one Keychain
+handoff/contact. New source/profile/self/head/claim/actual-exit/output freeze
+and meaningful regression checks precede use; no spent AM control or data is
+read or renewed. No raw price, strategy NAV/coverage or sidecar is accepted yet.
+The owner continuing review waiver/delegation covers this verified recovery;
+no new routine review/permission acknowledgment is needed.
+
+### 326.39 Exact AP source-authenticated RAW acquisition recovery freeze
+
+New scripts/run_arv2_r298_raw_price_acquisition_v3.py64256bytes SHA
+c6c68118713844979e1865ed7b6cc919640dc38516179e9513eb457f36cbc4e4;
+tests46463bytes SHAf5fc6f55fc278d618cf4962816b8e48a9ed7012d7b4bad9bcc10a3cbc186a5b8.
+NO-LF profile32182bytes SHA
+cf230b9d4db6dd2574da4cdaf3762538341fdc9b7974d14b870040f626d53175,
+191explicit selected pins, including old AL4a3/AM88a1/ANccaf/AOcd7 and inert
+AO public anchor908d. New schemaarv2-r298-raw-price-acquisition-ap-v3;
+fixed private control
+artifacts/analyst_revisions_v2/newrule_raw_price_acquisition/R326-20261027-AP
+UNINSPECTED/unallocated. Only the designated Mac/root/branch/POSIX3.13/Python
+path and exact clean committed HEAD/self/profile are compatible.
+
+Purpose: verified local resolver dependency correction before the first
+ACCEPTED full-window common RAW corpus. AM had one application intent and
+unknown physical count, so this is not called the first-ever provider use.
+The new private-source run is separately justified by actual AN DNS failure,
+primary dependency evidence and actual AO DNS/TCP/TLS/HEAD0 under the sole
+mDNS predicate. It is not renewal/relabeling of unchanged AM or authority to
+rerun any old parent/worker/validator/control. Every original refusal remains.
+
+Root full diff/AST checks preserve AM's genuine original source/AC guards,
+strict parsed3466axis bridge, all6151whole original bindings, exact5636vendor/
+5native/510conditional/8fund assignments,1452sessions/8195088vendor cells,
+1256requests/funds-first ordinals1254/1255 then0..1253, windows/fields/row bounds,
+source0 BEFORE one Keychain handoff, durable intents, HTTP/no-retry/no-redirect/
+failed-body rules, held append-only corpus/range journals, separate credential-
+free native-denied CSV authentication, exact child/actual/failure packet joins,
+persistent stage markers, deadline/disk/FD/byte bounds and closed external
+result validation. Full326.31/33 operational protocol applies unchanged except
+the explicit corrections below. No membership/metadata date shortens a holding
+or price query; no source/row/price fallback or eligibility exclusion.
+
+Added pure transport_binding requires the exact public AO fact digestf0c5db3f,
+old source/profile/report and all producer/validator/child actual0, stdout/
+stderr/UTC/order/known-bound/policy joins. It never calls AO's CLI/protocol or
+reads its control. Pinned AO's bounded public _ca_bytes function reauthenticates
+the SAME240216/9cc2a774 CA BEFORE private input/credentials; default Requests
+verify=True/no-client-cert/trust_env=False remain. Selected source/CA checks
+are endpoint authentication, not whole-interpreter or continuous-host proof.
+Provider native outbound deny adds ONLY the verified mDNSResponder literal;
+all other ports/Unix/control sockets/inbound/bind/Keychain/artifact/privacy
+fences stay as before. Source/auth/validator remain native ALL-network-denied.
+The past public HEAD404 is explicitly not current entitlement or historical
+AM cause proof. New run preflight and actual data response must decide.
+
+P2 I326-017 verified/fixed BEFORE AP use: the inherited printable-ASCII key
+grammar permits quotes. A standard CSV field doubles those quotes, so the
+old raw/URL/JSON byte variants missed that form. A native-denied synthetic
+fake fetch returned76bytes containing the synthetic escaped key; no actual
+key/contact/file/corpus was involved. New AP-only bounded encoder retains
+all original variants and adds CSV double-quoting of EACH variant, including
+JSON-inside-CSV, without parsing CSV in the network role. The full-provider
+regression now refuses this demonstrated echo after durable intent/HTTP200
+but BEFORE corpus/range retention. Frozen AL/AM/transport bytes stay unchanged;
+their historical tests did not cover this case and are not retroactively green.
+New closed flag recognized_credential_encodings_retained=false and profile
+explicitly limit the assertion to finite recognized raw/URL/JSON/CSV forms,
+not unknown transformations/steganography. Input credentials are never protocol
+outputs; no credential/row/raw exception is sent to the assistant. This makes
+the evidence claim precise and strengthens the demonstrated scan; no secret/
+licensing gate is relaxed. Existing no-keychain-in-worker/no-raw-stdout rules hold.
+
+Author107distinctpasses5.17s, native ALL-network/artifact/both Keychains/
+security CLI denial, no failures/full suite; earlier101/4.87 and106/4.89
+overlap. Five omission categories caught expected red: actual0 0.27s,
+CA-before-source0.27s, sole mDNS predicate0.26s, fixed fact binding0.23s
+(both redundant digest checks removed), CSV encoding0.23s. Removing only the
+first fact check passed1/0.19s because the separate anchor-profile digest still
+refused; that is NOT counted as red. All mutations memory-only/restored.
+Root247distinctpasses11.54s(107AP+4AOanchor+50frozenpureplanner+86record/doc),
+no failures/skips/warnings/full suite. In-memory compile/no bytecode,
+191source pins/publicCA/profile/dispatch_fence absence pass. Native denial,
+inroot temp/cache/log/plugin paths, --noconftest/no autoload/no cacheprovider.
+Selections and ported AM mechanisms overlap prior evidence, not independent
+admission. Same-round advisory found no additional confirmed P0-P2; no Claude
+independent acceptance is claimed under this owner waiver.
+
+Current owner continuing review-waived source/parser/price/research authority
+permits ONE AP parent at the clean commit containing THIS freeze, exact self
+c6c68118/profilecf230b9d and new private leaf. Source/transport/rights/preflight
+must genuinely pass before contact. Exact outer4733bytes SHA
+eb1c74829f2f6c029bc21a412868e095054aaa25934a6230454abdec6e583b9e
+is the tested bounded AM outer with only AP module import/runtime/metadata
+prefix changes; compiled/exact-transform checked, no invented extra test pass.
+It binds future clean HEAD/self argv, holds original parent stdout<=2MiB inRAM,
+coalesces finite progress>=15s, preserves actual exit/brackets/count/hash/
+stderr/bound and invokes native validate ONCE on those exact bytes/actual exit.
+No source/control/corpus result reader is added. Parent0 plus matching native
+validator0/closed source/provider/auth/report/corpus pins is mandatory. Nonzero/
+unknown/malformed is spent even with a retained success-looking report; do not
+retry/truncate/repair/clean/fallback or fabricate0. All326.31 native-IO/host-
+suspension/deadline/count/privacy and physical-contact qualifications apply.
+
+AP policies SHA(source/provider/authenticate/validate):
+0af1af4caa384838f7902afeb12b63bf36ef527dfdccce61ea4bd68a66e9cef4;
+8582ffadc4485e06e51cd7f38506787cf396fb6b84565b2e21ac5051ac1903b4;
+129ab72683c9c6ca25b6df1f09bb1e181ed5414b45d5cd525447ee7f2112ff19;
+3c7a552da2b064cba8ff0dcc0120af09737cd7dcdc0b85c5fe881aecc8caf2d6.
+All agents HOLD edits/tests through actual acquisition. Existing Sharadar
+personal private-processing scope only, no new paid rights/entitlement
+acknowledgment, QC/Safari/capacity/job, licensed-row disclosure or source-price/
+NAV/formal/PIT/master/paper/live admission.337/259/53/699 stays. No AP control/
+private-source read/key/provider/QC contact occurred before this freeze.
+After actual result, only an independently bound data-only sidecar/current
+privacy/source/price-runtime/whole-held-NAV/quoted-execution/run/attempt protocol
+may lead to the six/eight strategy jobs; no current success is inferred.

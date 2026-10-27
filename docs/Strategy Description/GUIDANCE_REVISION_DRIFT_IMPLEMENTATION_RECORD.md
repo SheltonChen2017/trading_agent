@@ -1,12 +1,14 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Independent Claude review of `a5cd640c..ddaa5e54` (section 48,
-the GDR-RP48 offline input layer) recorded in section 49, 2026-10-25;
-Codex counter-review of section 49 pending.
+Status: **Codex counter-review of section 49 completed in section 50,
+2026-10-26. Claude's `23d06504` test hardening is accepted.
+Claude's `d6036b7d` review is accepted after documentation clarification.
+The published `d6036b7d` review is consumed once.
 The section-48 input-layer epoch is accepted in section 49
 after `23d06504` pinned thirty input-layer guards; no production source changed
-in this review. The owner directed this round's one push, which publishes
-Codex's local `ddaa5e54` together with this review.
+in that review or this counter-review. The section-49 round was published as
+`d6036b7d`, including `ddaa5e54` and `23d06504`; it is not a pending push.
+This counter-review remains local-only; no push is requested.
 Codex counter-review of section 47 skipped at the owner's direction (48.1);
 that waiver is not counter-review acceptance.
 Claude's `c6834173` is accepted after documentation correction (section 44).
@@ -37,15 +39,16 @@ and policy level, without a QC clearance. Native loading of the recovery
 carrier is unverified. Only `data/__init__.py` was observed as one LF at
 runtime;
 `research/__init__.py`, remains unobserved. The input layer parses supplied
-local files only; existing subscriptions still show no versioned
-issuer-guidance source, no historical stock or SPY NBBO and no six-usable-year
-common history, and no purchase is recommended yet (45, 46, 48.4).
+local files only. Retained account observations are dated October 24, not a
+current entitlement check. A licensed/versioned issuer-guidance source,
+historical stock and SPY NBBO, six usable common years and processing rights
+remain unverified; no purchase is recommended yet (45, 46, 48.4, 50.4).
 No successful native integration or empirical backtest readiness is
 established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 49. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 50. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -6650,3 +6653,151 @@ Acceptance here is a software review only. It establishes neither native
 execution nor empirical readiness.
 `docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` were not edited
 and stay frozen for both agents.
+
+## 50. Codex counter-review of section 49, 2026-10-26
+
+### 50.1 Synced snapshot, ownership and commit dispositions
+
+The owner requested: "sync the lane, and counter review claude's changes".
+The designated worktree was clean and already matched the live matching
+remote at `d6036b7dc4de0164fb3cdf6c79a73bef35fdf948`. A narrow, non-force
+fetch of only `refs/heads/codex/strategy-guidance-revision-drift` confirmed that
+exact remote object; no pull, merge, reset, stash, branch switch or alternate
+worktree was necessary. All repository commands, checks, edits and local
+commits use `/Users/sheltonchen/.codex/worktrees/guidance-revision-drift/trading_agent`,
+branch `codex/strategy-guidance-revision-drift`, origin
+`https://github.com/SheltonChen2017/trading_agent.git`.
+
+Base is the preceding Codex checkpoint
+`ddaa5e542490cf5a0090fb6c58f41fb9d959a9ab`. Complete ordered review range:
+`ddaa5e542490cf5a0090fb6c58f41fb9d959a9ab..d6036b7dc4de0164fb3cdf6c79a73bef35fdf948`.
+Both commit messages and complete diffs, production contracts, new tests,
+review dispositions, mutation explanations and cumulative tree were examined.
+Two read-only advisory agents assisted; they are not an independent Claude
+review of this Codex closure. No implementation or QC work ran concurrently.
+
+| Claude commit | Disposition | Reason and evidence |
+|---|---|---|
+| `23d06504b3148556b1287c833351a3631988ac2c` | Accepted; no defect found | Nine behavioral test methods pin the thirty missing isolated failure directions without weakening existing guards. No production code changed. All nine methods pass and all thirty corresponding guard-removal mutants are caught. |
+| `d6036b7dc4de0164fb3cdf6c79a73bef35fdf948` | Accepted after documentation clarification | Section 49's software acceptance, test-only corrections, source identities and remaining gates are sound. Clarify hypothetical mutant consequences versus actual production behavior, and refresh the now-completed publication/current counter-review state (50.2). |
+
+Assessment: **9/10 for the test-hardening/review round**. No P0/P1/P2 issue or
+new production defect was established. This accepts the offline input-layer
+software review, not data provenance, economics, native execution or empirical
+readiness. The published `d6036b7d` review is consumed exactly once. Earlier
+`c6834173`, `863a0dcd`, `2baf5a48` and older reviews remain consumed history;
+the section-47 counter-review remains explicitly waived, not retroactively
+performed or accepted. The section-49 publication already includes
+`ddaa5e54`, `23d06504` and `d6036b7d`; none is still local-only.
+
+### 50.2 Findings, corrections and limitations
+
+P0 0, P1 0, P2 0; two P3 documentary findings, clarified/corrected here.
+Section 49's four corrected P3 test-sensitivity findings remain historical
+review results, not four new production defects or additional findings here.
+
+| ID | Priority/status | Evidence, adjudication, correction and verification |
+|---|---|---|
+| GDR-CCR50-001 | P3 / clarified | Section 49.4's GDR-CR49-004 wording can read as if original production permitted traversal or reported quarantined/refused guidance as prepared. That interpretation is false: at `ddaa5e54`, `_name` already rejects non-basename paths and `prepared = not refused and ...` already blocks those guidance observations. They are the consequences of IP01/IP22 **mutants removing existing guards**, not defects observed in the actual source. Preserve section 49 verbatim and retain this explicit clarification. `23d06504` changes tests only; current tests and the reconstructed mutants verify the distinction. |
+| GDR-CCR50-002 | P3 / corrected | The active header still described the section-49 push as publishing local `ddaa5e54`. It has completed at live matching `d6036b7d`. Refresh the header to completed publication, both accepted Claude commits, the consumed review, current local-only/no-push counter-review and dated account evidence; rotate/pin the corresponding active-document guards. Section 49.6's pre-push wording remains historical. The stronger guard fails on the old header before correction, then passes after it. |
+
+The thirty new pins are behavioral: deliberately remove an existing guard,
+then its own invalid-input case becomes accepted or its status/exit assertion
+fails. The reproduced campaign yields thirty caught mutants and thirty-five
+intended assertion failures from multi-case pins, with zero unexpected
+exceptions. This is not a new production regression, a real input, or a native
+launch attempt. Every mutant is restored in memory; files are not rewritten.
+
+The other seventeen mutation dispositions in 49.5 were assessed against the
+neighboring guards and explicit call paths. Their redundancy explanations do
+not remove the production guards or waive future regression coverage. The
+complete historical 118-mutant campaign is Claude-reported; this counter-review
+reproduces the thirty targeted behaviors, not all 118 trials. Its accounting
+does reconcile: 71 previously caught + 30 newly pinned + 17 other = 118.
+The nine added methods turn 65 input methods into 74. The reported 187 baseline
+method count also reconciles to the files at `ddaa5e54`: 65 input + 21 bundle +
+6 release + 6 preparation CLI + 13 coverage + 7 boundary + 69 shared active-doc.
+That arithmetic is not a rerun or independent certification of its timings.
+
+Section 49's focused-only validation is retained as the reported owner-scoped
+review selection, not a standing waiver of Claude's future full-lane review
+obligation. Codex does not run a complete lane/repository suite without an
+explicit owner request. "Frozen draft" in 49.2 refers to pinned proposed bytes,
+not an owner-approved economic/research freeze. The guidance-receipt/date
+distinction is sound: the plan separates raw input collection from protected
+outcomes; this local parser still verifies neither collection authority nor
+rights and dispatches no outcome evaluation.
+
+### 50.3 Focused verification and unchanged source epoch
+
+Baseline: 82 focused methods passed in 0.474 s on bundled Python 3.12.14,
+zero failures/errors/skips. Selection is the four input files (74 methods),
+the seven lane boundary/import/document checks and one actual deterministic
+bundle reconstruction/verification method. Sanitized environment, `-B`,
+network denial in parent and fresh import child, repository-file-write denial
+in parent; named-file tests use only invented temporary files. Advisory test QA
+separately ran the nine new methods: 9 passed in 0.013 s, then reconstructed
+the thirty mutants above and restored a green baseline. No full lane/repository
+suite, provider/account access, browser, data API/download, credentials, QC
+page/documentation/quota/Mia/build/run, broker/operator database, installation
+or purchase is accessed by this counter-review.
+
+All 98 lane source/test files compile in memory without native execution or
+bytecode. All 53 production/draft/neutral source-manifest members are byte-exact
+to `ddaa5e54`; the review changed tests/docs only. Reproduced full source SHA256:
+`330fc9d523208f59591b9925f15630fdc52034a8987992b7828e6fbad382210e`.
+The full review bundle reconstructs and verifies in memory: SHA256
+`5053affd46adf6d4fccc6029d46ae9d4ef195192c0dfa661f339f6463791b332`,
+761,926 bytes, 55 archive members. The explicit fifteen-module native closure
+is unchanged; no recovery project/carrier is regenerated, saved or rebound.
+
+Only the active header, this appendix and the lane's active-document test pins
+change. Sections 1–49 remain byte-exact below the header. Root Session Handoff,
+Action Plan, Feature Milestone Record, process/shared docs, original plan/PDF,
+draft and fixtures remain frozen. Final exact-tree focused, compilation,
+history/frozen-path, diff/status and matching-remote checks are repeated before
+local commit. Final focused rerun: all 82 methods passed in 0.431 s, zero
+failures/errors/skips, identical full source before/after. The strengthened
+active-document guard first failed on the old header (one expected assertion
+failure in 0.001 s) and passed after correction (0.008 s). Seven isolated
+read-only document mutants each produce exactly one assertion failure, no
+unexpected errors: pending review, unaccepted test commit, unaccepted review
+commit, unconsumed review, automatic publication, rearmed monitor and a
+misclassified section-47 waiver. Actual files remain unchanged by those
+probes. Final local ref is retained in thread/private memory rather than
+self-referential commit text here.
+
+### 50.4 Authority, unresolved data work and next action
+
+The October 25 owner instruction to proceed with Massive Corporate Guidance
+and Stocks Advanced coverage/licensing checks using existing access remains a
+separate, unfinished scope. Its interrupted start performed repository checks,
+not an authenticated account or license verification. Prior public-document
+advice is not current account entitlement or a vendor answer. This sync/
+counter-review neither completes that audit nor contacts a provider. No purchase
+or current six-year/common-coverage/retention/cloud-rights finding is invented.
+The next data step remains the specifically authorized bounded coverage/rights
+assessment, not automatically acquiring rows, changing subscriptions or
+evaluating outcomes. The latest no-QC instruction remains controlling.
+
+Original `GDR-base372-approved-20261008` stays immutable CLOSED FAILED3/3,
+zero manual attempts, project 37647834 untouched. Separate
+`GDR-Mia-base372-recovery-authorized-20261011` stays zero unsuccessful attempts,
+zero pending intents, no journal/project/launch, maximum three. Accepted
+producing `c589b3dddab3f1dd136d10ae7ce1851d64818906` and its retained full
+source `061ff30fe4053ebfabfa27c38d2e3ccd37d950c2fe3eae4375a933463125ee9f`,
+recovery project `c6b9443aa64f005c48e21f493bfea14918ecf6a730ac4f995bd3a70ee4c269a9`,
+prepared runtime `5d1dc6560ad2778fd6a8c514c16641b6e78cf82d514a0088f0a344c31783437d`,
+invented fixture `8f35d56a335d3f7d9dad016e1e2236de7fcd2635e5c463c30081f97b7b944458`
+and semantic draft `b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c`
+remain distinct from the newer offline input-layer epoch. No review/name/hash/
+project or new source epoch resets attempts, outcomes, economics or authority.
+
+No GDR-0..6 milestone, authentic PIT data, native completion or empirical
+readiness is established. No automatic next engineering milestone, provider
+acquisition, scheduling or recovery is started. Monitor remains PAUSED; this
+counter-review changes no automation configuration. The latest request is
+sync/counter-review, not publication: retain the new closure locally, no push,
+PR/main merge or cross-lane mutation. Recheck exact mandatory root/branch/
+HEAD/status and the live matching remote before committing; do not publish
+the already-completed section-49 round again or rearm a review watch.

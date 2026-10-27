@@ -63346,7 +63346,6 @@ timestamps or measured HTTP durations. Parent/worker/observer/validator claim
 and control are now SPENT; no reread/retry/repair or renewed provider request.
 Prefreeze86recordpasses1.05s overlap543. No edits/tests during actual use.
 No push yet this round.
-
 ExactlyFOUR application intent/status pairs were retained, each HTTP200,
 in frozen stocks_metadata/funds_metadata/stocks_status/funds_status order.
 Physical provider request count remains unknown. Selected164-source
@@ -63585,3 +63584,228 @@ All booked336/259/52/699 floors and formal/PIT/master/readiness/paper/live
 false flags remain. Agents/files held; verify root/branch/HEAD/status, commit
 this exact freeze, then sole producer/validator use with no edits/tests during
 that actual operation. No push yet this round.
+
+
+### 326.9 Actual AA passed once; all bindings retained and route refusals exposed
+
+At clean4d0ad82e4193ceb65ef9620d82047ec0d8a8c0dd, sole native AA producer
+2026-10-27T07:31:38.514900Z..07:31:49.922625Z actual0/stderr0/no bound.
+Sole separate native output validator07:31:49.922836Z..07:31:53.443867Z
+actual0/stderr0/no bound, identical8694byte stdout SHA
+aeca9dfda9d66fc10228bed0babd485392fb72e2fdf481df719f9ce94779b324,
+output_authenticated=true. Externally observed process brackets, not provider
+times. Report8565bytes SHA
+9272dbf57c33c4f3da3acd2974f9f3b2a0386fbb992dda6e9a59a10816dd2fbb.
+Private DATA file routes-private.json19895631bytes SHA
+3776f03b4941d8e6d014dee19f5ee8a05080f214ab7f502d10738f00a689f561.
+Actual0+validator0 and returned pin, not report content alone. AA claim/
+producer/source pass/directprepare/observer/validator/control are now SPENT.
+No edits/tests during actual use; prefreeze86record0.97s overlaps241.
+No new provider, credential, QC/capacity request/job/look/cell; no push yet.
+
+Both exact retained Z CSVs matched freshly: stocks metadata endpointSHA
+fcfb52237ca2cb6435d25b3a41293c3114ee19103314e3b9a5f88ec3e7a23d96,
+funds7ceed7b6c609f0de876892d485cbd0d83fd26d0e4a571c7ab1c650d58c70f5ab;
+ordinary native-securitySHA for each
+cc8d8156a5b063bbb107d529c51c37eabcc0ed66bfe7fc1bba0b60962fcef766.
+Original three-leaf guard normal return/full ten-field endpoints passed;
+source endpointSHA24f3d1ce1917755c79fd88c1ea7ca816065f87006627d88bb258326794c70629.
+These are fresh scoped endpoints, not historic/continuous metadata proof.
+No Z controls/status data or old original-source operational entry was read.
+
+The unchanged original byte pins decoded ALL74150 unique original28-field
+rows (0duplicates): active23718/delisted37178/unknown13254. Ordered source-row
+digest-arraySHAe22569077935c73678c1d389535f98d9bb9d07fd3c6765d2a9161f86d591d54b.
+Actual authenticated schema observation is count28/requiredfieldsTrue/
+legacy_known_name_set_equal=False, orderednameSHA
+1162197271c19a530482df5e6accf7e1fe22b14e14b668c29b978b4daae5d824.
+This NOW establishes the old guessed-set mismatch against the authenticated
+exact original schema, rather than inferring it from header length. No raw
+unknown name was printed or any original cell altered. I326-001 corrected
+prospectively for this exact v2 scope; I326-002 finite subpredicates corrected
+prospectively, old coarse failure retained. Not historical source admission.
+
+Genuine same-process October source still411c2734/e4518e06; plain1ab48d0b,
+axis3466sessions2013-01-02..2026-10-13. Ordered session-valueSHA4ac84a2d,
+session JSONL3e976a6e, evaluator manifest214dfc9b. ALL6151 binding rows
+retained, stream73ba4ac7/inventory2dedd92e/master5d0075cf; no native-QC
+5121-resolution shortcut. Current catalog21022stock/10020fund rows,67unknown
+vocabulary rows,2FIGI collision groups, other reported token/perma/ticker/
+malformed-overlap groups0. Unknown rows and unrelated collisions are not
+blanket no-collision/source/master proof.
+
+| Original-stock disposition | Count |
+| --- | ---: |
+| Routed under the scoped original/current predicates | 5564 |
+| Refused, retained with exact named reason | 79 |
+| Outside ORIGINAL binding-window geometry only, retained | 508 |
+| Total original bindings | 6151 |
+
+All8funds routed. The79stock reasons are current_identity_changed47,
+current_identity_missing4,current_shape10,current_interval12,
+current_collision1,original_identity5. These are predicate categories, not
+authenticated economic causes. No row was dropped, repaired or treated as
+a price-based exclusion. The508 are NOT declared never-targeted/never-held;
+extended evaluator membership and actual carried holding obligations still
+govern future demand. No source-required mark coverage or strategy result
+is accepted merely because the local diagnostic completed.
+
+Next useful offline work: newly authenticate only this20MiB DATA leaf against
+the returned external pin, validate its complete original binding inventory,
+retain finite reason-component evidence and reconcile the genuine full
+evaluator memberships/axis in the SAME fixed October package. This can
+distinguish overstrict current-route compatibility predicates from required
+unresolved identities, without repeating provider requests, original CSV
+census or old reports. Never infer ETF inclusion, actual selection or zero
+holdings from absent QC callbacks/caps/prices; use conservative potential
+membership demand and separately documented empty-initial-stock code only.
+Any relaxed future routing policy must be justified/versioned/frozen BEFORE
+use, not automatically accept all79 or omit508.
+
+Root created metadata-only arv2_r298_aa_source_binding.py9299bytes SHA
+e881c694b516ad7d773ab6c3a8ef996873616862dc55ffda4e371733f6c6bd11
+DIRECTLY from retained validated stdout, no artifact reread. It records exact
+observed0producer/validator facts, head/caller/profile/report/private pins
+and CLOSED worker summary (6511canonicalNO-LF bytes, SHA
+f32c7e2b5f951114312af0c2ec75253eb6bd323a9d2353e0e67b5134e43c1d5e).
+Actual process exits are external FACTS, not authorization booleans, fresh
+source truth or readiness scaffolding. No raw route/row/credential/name in
+this metadata module; it has no read/provider capability and every public
+accessor returns a copy. New consumer still needs its exact clean committed
+source/protocol/one-use scope, fresh data-byte/security check and actual exit
+plus external output validation. No actual AB successor read yet.
+ARV2E323-001 price/NAV coverage remains OPEN;336/259/52/699 unchanged.
+
+
+
+### 326.10 Exact prospective AB: finite route causes and genuine membership demand
+
+NEW disposition helper scripts/arv2_r298_route_disposition_evidence.py
+SHA0c6604ba8cbbf5c42c4b4d1879ad5738a5843d70af776d171c2c947daa7a6a1b;
+tests d439ce05eb902a8eec948186313fa145703496ba572cd446b612af048020147e;
+canonical profile ac0e34603f1a22ac3a441eaea6b3ce8f0c021c82c9026ecab735c8c6b7ff01ed.
+It authenticates externally pinned AA bytes BEFORE JSON, validates/recounts
+all ordered6151bindings/8funds/source hashes/dispositions/reasons, and derives
+finite original identity/currency/date and current ticker/MIC/shape/date/
+candidate-intersection components. Public output is fixed enum/count/hash
+only; private facts retain binding identity for exact membership joins.
+Candidate subsets cannot reconstruct complete collision indexes; missing
+cause remains explicitly unknown. No source correction/admission/price filter.
+
+NEW membership helper scripts/arv2_r298_membership_price_demand.py21363bytes
+SHA08a9aa94b8c771eb69ed5876a82f900f0716cff9c47e082d55490c211a2c9b40;
+tests15846bytes SHA9dc7fbe72d2df34ea6b0bf98a4cd7811e35bc09c70d174332a602466b9084461.
+CanonicalNO-LF profile2351bytes SHA
+37de702b89be411feafd89a85dc64d8bfe233fea2aa1d219abb4f5af0d01be8d.
+Same genuine package/PID authority supplies manifest/session_axis/MEMBERSHIPS/
+runtime_symbol_bindings with strict full descriptor order/inventory/hash,
+manifest membership count/stream hash, evaluator inclusive-first/exclusive-last
+semantics, exact catalog binding and final capability/stream recheck.
+Decision axis is EXACT unchanged runtime.weekly_axis, first actual NYSE
+session of each ISOweek, clipped by its frozen2021-01-04..2026-10-12 rule.
+
+Membership is only a NECESSARY potential-stock condition. There are no actual
+QC ETF constituent callbacks, caps, scores, prices or selected portfolios in
+this scope; sector names cannot invent ETF inclusion. Potential stock demand
+is conservatively IDENTICAL for six/eight and all0/100/200arms, while fund
+counts remain6/8. A stock potentially active at ANY frozen decision requires
+its immediately prior close through END2026-10-13, never clipped at binding/
+membership last date. Never-potential labels require complete authenticated
+membership absence at ALL decisions AND the unchanged runtime's empty-initial-
+holding requirement (newrule_comparison_qc_runtime.initialize:437,
+source674415b3; targets30ed05cb). Root read this actual check; it is a frozen
+simulation precondition, NOT observed QC holdings or terminal payoff proof.
+Unknown corporate/holding outcomes still stop on actual missing demand.
+Every source binding/refusal/geometry disposition remains retained.
+
+Author53evidencepasses3.05s (51overlap),37membershippasses0.14s/whole3.37s
+(36overlap), real synthetic evidence->private validation->membership
+composition passed. Membership last-exclusive changedinclusive caught1
+expectedfailure0.13s; priceend clippedlasteligible caught1failure0.05s;
+membership-hash omission first missed because fixture saved the original
+REAL_AUTHENTICATED function, corrected memory test alias then caught1failure
+0.11s. Finallyrestored modules/testalias/disk bytes. The initial missed
+mutation is a harness qualification, not green sensitivity proof.
+No actual private/package/credential/provider/QC reads in these checks.
+
+NEW caller scripts/inspect_arv2_r298_route_dispositions.py40477bytes
+SHA7d6d152d7cf8ca302658f40ce0909fd947ee2b525db02d719bbb4844c31a94e6;
+tests32452bytes SHAb8ce8063516dfeb70814f5b1a4b259dbe6625e43c4a816a328b5d7938409095f.
+CanonicalLF profile29202bytes
+SHA3849711d7f4330e9a095edaf308c0f41dd9236c2dfed431c0761e18738df6cc2.
+171literal current source pins match = exact167prior pins + AAc884, public
+AA source bindinge881, evidence0c6604ba, demand08a9aa94. No replacements/
+automatic refresh. Sourcebinding FACT storedJSON SHA81502441 and separately
+decoded/canonicalNO-LF1297byte SHA77449577 are both bound; summary f32c7e2b
+unchanged. Initial35pass/1failure exposed stored-vs-canonical key-order
+assumption, fixed prospectively in NEW caller with explicit dual pins;
+anchor/AA/data unchanged. Actual0 facts do not grant authority.
+
+Owner326.1 authorizes this verified local diagnostic recovery with current
+Claude waiver. At the clean commit containing THIS exact freeze, ONLY the
+designated Mac root/branch/DarwinPOSIX3.13/Python path and literal new caller
+SHA/actual clean HEAD arguments apply. Fixed NEW control:
+artifacts/analyst_revisions_v2/newrule_route_dispositions/R326-20261027-AB,
+not inspected/allocated. One claim/fsync/source-start BEFORE any source open,
+analysis-start BEFORE one direct helper chain. Failed/partial/unknown claim
+consumed/ambiguous spent even with no read. No renamed retry or old operation.
+
+ONLY AA routes-private.json19895631bytes/3776f03b (FULL326.9pin) is a data
+source, freshly held with entire no-follow chain/full ten-field/native
+empty-ACL/ordinary-xattr/byte pins through both helper calls and NORMAL guard
+RETURN. Genuine same-process package411c2734/lineagee4518e06 is the ONLY
+additional private input. NO AA claim/report/control, original TICKERS
+manifest/marker/ZIP, Z CSV/control, old reader/assessment/capture or provider
+entry is read/replayed. No new Keychain/credential/contact/QC capability.
+
+One native producer750s, direct combined analysis600s withinremaining,
+observer780s, separate native output validator20s. Actual policy producer
+SHA55bf23ec9f51e3bc01952dbcc3f6953e68527bd874ad2501dfb703fef3e9428d;
+validator79d7e961f0ab250fd95784609a254c2628244cbd0143b0aa3ea1d2f514858a4c.
+All remote/loopback network, Keychains and securityCLI denied. Producer
+artifact reads exact AA DATA leaf/package/lineage plus own expectedoutputs
+and necessary ancestor DIRECTORY data opens; own AB/root-cache/null writes
+only. Separate validator denies ALL artifacts. Not global read allowlist/
+whole-interpreter/arbitrary same-user protection. No nested sandbox or
+inner child; no private IPC escapes producer. Only owned child kill/reap,
+uninterruptible-I/O/host-suspension qualification retained.
+
+After normal source return, publish EXACT two independently bound private
+products evidence-private.json and membership-demand-private.json, each
+full byte/hash identity matched to its helper's closed summary, combined
+<=32MiB. Single source<=32MiB exactsmallerpin; public<=128KiB,
+at most12ownfiles. Held outputFDs/full metadata/native security through
+readback/postchecks; no raw rows/tickers/CUSIPs/keys/exceptions onstdout.
+Partial publication may remain on nonzero; retain bounded failure state/
+partialpins, never fabricate0 or report acceptance. Logging guard before
+source/evidence/demand, after imports/helpers, publication/postflight.
+Only ACTUAL producer0 + independent-process native stdin-validator0 and
+matching closed envelope/report pin authenticate the diagnostic; the
+validator does not reread outputs after close. No further reader authorized.
+
+Author100callerpasses3.09s actual-policy+strongerallartifactdenial,
+prior95/92/91 overlap. Seven memory omissions finalguardverify/sourcebytehash/
+routinganchor/combinedprivatebound/decodedAAfact/actualexit/postdemandlogging
+each caught1expectedfailure0.13/.05/.05/.05/.08/.05/.05s, finallyrestored,
+diskunchanged. RootFINAL281distinctpasses2.94s =
+53evidence+37membership+100caller+4publicsourcebinding+86record/doc+
+1researchclosure, no failures/skips/warnings. Earlier anchor5passes2.98s
+overlap; one tautological digest-mirror test removed before final4.
+Eight changed source/test files compile in memory/exactEOF, all171pins
+match, source-bound AA summary validates; dispatch_fence absent.
+Actual AB producer native policy compiled as outer harness plus total artifact
+denial for synthetic tests, alltmp/cache/log/plugins inroot, disabledautoload,
+--noconftest --ignore=artifacts -B nocacheprovider. No full suite/independent
+Claude acceptance, actual private read/allocation or contact in author/root
+validation. Agents/files held before real use.
+
+Next: exact root/branch/HEAD/status/diff/record check, commit this new scope,
+then ONE producer/validator with no concurrent edits/tests. Derive truthful
+dispositions from returned evidence; never auto-accept79/drop508, preselect
+from prices/native-resolution/capcallback absence, change frozen economics,
+or claim covered/running from preparation. A further current-route correction/
+price acquisition/common reference+NAV sidecar/quote-aware six-cell source/
+run/attempt/result freeze must genuinely pass before QC. No provider,
+capacity, job, source upload or strategy run is authorized by AB.
+Booked336/259/52/699, all formal/PIT/master/readiness/paper/live flags false.
+No push yet this round.

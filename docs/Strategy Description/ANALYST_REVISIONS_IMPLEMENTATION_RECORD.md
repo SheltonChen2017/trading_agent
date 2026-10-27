@@ -66170,3 +66170,243 @@ Old44MBinput/quote economics stay frozen; current required prices/actual-held
 NAV, private QC processing/transfer/source/run/capacity/attempt/terminal gates
 still precede the six-cell order-based evaluation. The owner current waiver/
 delegation continues without a routine acknowledgment wait.
+
+### 326.41 Prospective common-price integration and rename-safe identity
+
+Owner direction remains current: resolve source pins/parser/coverage and
+continue the matched six/eight x AR0/100/200 research cells, with current Claude
+sequencing waived, document progress and one concluded-round push. APactual0
+is not a strategy result or additional rights; no acknowledgment wait is added.
+The existing public source-pin closure, all-token CUSIP parser and complete
+vendor acquisition remain retained. No old contract/control/read is revived.
+
+Root confirmed P2 I326-018 in two UNINVOKED price readers: a full native fact
+included display ticker in cross-date identity equality. Source book2026 and
+strategy initialization2020 can legitimately differ in Symbol.Value despite
+the same SID; LEAN UpdateMappedSymbol also returns a new Symbol with the same
+ID and changed Value. Primary sources:
+https://github.com/QuantConnect/Lean/blob/master/Common/Symbol.cs and
+https://www.quantconnect.com/docs/v2/writing-algorithms/key-concepts/security-identifiers.
+Three native-denied memory-only synthetic reproductions refused: past-book/
+fresh display(selected_identity), later mapped native Security.Symbol(currency),
+and later mapped vendor Security.Symbol(source). The second harness initially
+expected selected_identity; actual currency was correctly retained before the
+harness expectation was corrected. No actual book/data/QC/credential read.
+
+Prospective correction compares exact validated sid/kind/market/sid_date;
+display remains well-formed, retained observational metadata. Whole original
+bindings/FIGIs/SID digests/full census/collisions/calendar/currency/RAW/current
+project/time and same-current-point Base-to-Native resolution SHA remain
+binding. Initial AddSecurity can also return a mapped label: new reader-local
+configure retains Daily/noFF/noextended/RAW/USD1/NYSE-calendar checks and
+returns the full current fact to unchanged diagnostic postchecks. No generic
+ticker lookup, original remapping or old-policy waiver. Used diagnostic57450eac,
+publisher03d100e9 and QC bookb149c9c6 stay unchanged and spent.
+
+New native reader33871bytes SHA
+76b2a193fe1b8de9c9f8c598464edc2d0058b61aa690e13cc6216051f862a3f6;
+NO-LFprofile2801bytes SHA
+5adaa4002d75f2b6125aa6cc07b681ba881cf7c490d0848899b301e2f5cb5f56.
+Vendor reader15376bytes SHA
+c97c9d0d4874b85bd50676e3e87c54840be9f3eab952302deb42a301f67fc430;
+NO-LFprofile949bytes SHA
+25617b9d732502a2f8be0641ffc625ffdbd782a4e6c35af3ad37d997bc86ea50.
+Native tests16365bytes SHA
+a76adfc26944d2bde1fdb21372719a637ca2d381767db87c225ae8631c74c4c5;
+vendor tests14104bytes SHA
+856ebd41a48f92f6ec198dff551f4fb7c99b8be551b7ff21f560f669e621b1f8.
+Author focused95distinctpasses4.16s =45native+26codec+24vendor,
+native ALL-network/artifact/Keychains/security denied, in-root support paths,
+no full suite. Memory-only stable-SID omission caused2expectedfailures0.17s,
+restored finally. This same-round advice/author coverage is not independent
+review. None of these new readers has been operationally invoked.
+
+New strict monthly format/codecs preserve all6151stock originals/all8funds,
+fixed5636vendor/5native/510conditional source choices and all1452price sessions.
+Each monthly grid contains every vendor slot/session, with explicit null for
+observed absence; it cannot drop a source row or substitute a quote/stale mark.
+Private catalog carries routing identities; private data-only canonical JSONL
+carries source-slot/session/Decimal text-or-null. Public stdout is limited to
+closed descriptors/counts/pins. Seventy-one bounded months, at most two cached
+QC months, exact byte pins before semantic parsing, no host QC data export.
+Native5 remains QC-only. Absence does not authorize filtering or expiry close.
+
+Root also identified P2 I326-019 before use in the new comparison integration:
+Base stores an ordered ETF mapping while the concrete Vendor constructor
+requires a tuple of eight Symbols. A permissive fake had not enforced that
+boundary. Pass the exact ordered Symbol tuple only to Vendor; Native/Base
+mapping and all construction/order/economics remain unchanged. Final correction,
+regression and hashes are recorded with the next freeze. No strategy job or
+additional look/cell has occurred:337/259/53/699 remains.
+
+### 326.42 AQ offline monthly-sidecar one-use run freeze
+
+Under current owner implementation/research delegation and Claude sequencing
+waiver, authorize ONE new offline producer at the next exact clean committed
+HEAD containing this freeze, then ONE separate native stdin-only output
+validator. This is a new deterministic representation of accepted AP DATA,
+not an AP replay/acquisition, provider request, historical repair or price/
+strategy/source-rights admission. Prospective AQ output:
+artifacts/analyst_revisions_v2/newrule_common_price_sidecar/R326-20261027-AQ.
+It has not been inspected/allocated/invoked before this freeze. Claim/fsync
+precedes private reads; existing/partial/ambiguous allocation is spent, no
+cleanup/repair/rename/retry. Actual nonzero/unknown remains inadmissible even
+if a manifest exists.
+
+Exact producer scripts/prepare_arv2_r298_common_price_sidecar.py36236bytes SHA
+a454259816eb5ad97aa3d4143d65abc8c96f7c77331071c864f696f396c8c056;
+canonical NO-LFprofile28639bytes SHA
+136dd2c838b06eaa22ae61f362ffb1b7a3aeb9bc1f21953d97408550d85291bc.
+Its196literal selected dependency pins are checked in the exact clean tree,
+plus self source/committed blob/CLI expected-HEAD and profile hash. New fixed
+streaming guard12708bytes SHA
+ba0460f5d3d1e42f8a59b9c2bc7e2c7babc2502544f2c80d4905e180d8971f9c;
+guard tests7460bytes SHA
+493ca3439b68747e4835a3794704c0dab4c9fdf7c69523221a4c85a636504cec.
+Producer tests20434bytes SHA
+4d21f93a887384d02815695814233f4a82e2e1d8c525edb45dd5ec71b7ed5cfd.
+Pure codec12015bytes SHA
+bd1c92c0512d320c13108c23a7d50529a8bde777116604b62d7ee3b61e0865d3;
+NO-LFprofile684bytes9a24d85a8a82a65130b3bbb83ab174558ee44d81b7dd91e9b00ccac50904bcbc.
+Shared inert format13744bytes SHA
+d254b3e3a6a52445e4422f03885ec58a3d2b30e8ce902cb80ed8f841c374f873;
+NO-LFprofile762bytes7db17f26d9da887b7583a7086f6fa72b678da2eff318118c3aa7381b8b465360.
+Frozen RAW229b3be9 parser and all used source/capture modules remain unchanged.
+
+Compatible host only designated Mac/root/branch/Darwin POSIX Python3.13 at
+/Users/sheltonchen/.venvs/trading_agent-py313/bin/python. Credential-free
+closed in-root runtime environment. Exact native produce policy3249bytes SHA
+c769684b3ff901d42cd8299d8d8525bc13be99d5926ed32d11f2a8f57e6beca3;
+validate policy494bytes79d7e961f0ab250fd95784609a254c2628244cbd0143b0aa3ea1d2f514858a4c.
+ALL network/Keychains/security CLI denied. Produce permits only exact AP4DATA,
+genuine original package/lineage, own AQ outputs and in-root support paths.
+Validator denies ALL artifacts and reads only original bounded stdout from
+RAM/stdin. No AP report/claim/control, historical QC data/book, credentials,
+provider, Safari or QC endpoint/job is permitted by AQ. No native prices leave
+QC. Selectedpins/endpoint security are not whole-interpreter/continuous or
+historical integrity.
+
+Producer reauthenticates genuine original6151whole bindings/3466axis and
+exact AP fact/source/auth0 pins; full4DATA byte hashes before parsing, then
+original held/no-follow ten-field/native ACL+xattr checks and exact1256
+contiguous bounded corpus ranges, canonical request/journal/range joins and
+unchanged original-input check. The32MiB legacy guard is not enlarged.
+Only provisional private monthly spools are written inside source scope.
+The source guard must RETURN normally before final catalog/month/manifest
+publication; preserve original spool FDs/hash/security through consumption.
+Each final file stays held through output-only validation; only its already
+consumed spool FD closes, without deleting/reopening the retained spool.
+Manifest is last. Per-append checks cover exact target FD/named/security and
+fixed directory inventory; full all-output checks occur at creation, source
+return, every final/readback phase and manifest. This avoids roughly2.1million
+unnecessary full-inventory snapshots without removing final acceptance checks.
+
+Fixed71months, monthly32MiB, provisional512MiB AND final512MiB caps, catalog4MiB,
+manifest1MiB, minimum1.5GiB available before claim. Initial FD window128 with
+at most16baseline and112new budget, softlimit>=128 without RLIMIT change,
+<=72simultaneous spool/final FDs plus explicit source/directory/claim/catalog/
+report/stdio reserve. Overflow refuses without clipping rows/changing bounds.
+One month is materialized at a time; a serialized32MiB cap is not a claim of
+32MiB total Python RAM. Parent1800s alarm, outer1810s; native validator30s/
+outer35s, uninterruptible-I/O/host-suspension caveat. Only own children may be
+killed/reaped.
+
+External capture program3981bytes SHA
+1c64b71a1e0f1a797393014263bfbaec57e24c50b00d9cc3235e409239a7c08e
+is frozen separately before dispatch. It launches exact producer under native
+produce policy, captures bounded128KiB stdout/8KiB stderr without raw-error
+output, observes actual exit, then passes the SAME original bytes ONCE to the
+native validator with exact HEAD/self/profile and externally observed exit.
+Require producer0 AND validator0, no stderr/bounds, identical original stdout.
+Validator0 on authenticated failure is not success. Closed public descriptors/
+counts/pins only; never private catalog/assignments/routes/price rows/opaque
+objects. Failure preserves finite stage/code/consumption/bytes/manifest-may-
+exist, never silently retries. External process/timestamp brackets are dispatch/
+observation, not provider timing or continuity proof.
+
+Author62distinct passes6.34s(26guard+36producer) under native ALL-network/
+artifact/Keychains/security denial, root same62passes4.65s; overlapping, not124.
+Four omission reds: normal-return0.13s isolated, before-whole-hash0.21s,
+output readback0.21s, actual parent exit0.37s. Initial parallel normal-return
+mutation hit unrelated shared-ancestor metadata drift; isolated DIDNOTRAISE
+reproduction retained, not counted twice. Compile/whitespace/import-boundary
+checks passed. No full suite, private DATA/control read or operational use in
+these synthetic tests. Root's final focused joint check is recorded before
+actual dispatch.
+
+After actual authenticated AQ0 only a separately exact private QC transfer/
+project/access/source/compile/capacity/run/attempt/result freeze can use these
+DATA. New pure transfer-plan helper derives exactly73objects catalogfirst,
+71months and manifestlast from supplied authenticated AQ metadata/actual0
+join and a future actual projectID; it performs NO I/O/contact/rights grant.
+Object properties are bounded metadata, not remote SHA/durability proof;
+future QC-internal read_bytes must authenticate byte pins before semantics.
+No strategy look/cell or QC call is booked now:337/259/53/699 unchanged.
+
+### 326.43 Final prospective integration correction and focused freeze checks
+
+I326-019 corrected: only Vendor receives the exact eight-Symbol tuple ordered
+by frozen universe; Native and Base retain the original mapping. Regression
+uses the ACTUAL projected Vendor constructor with source authentication/read
+methods blocked; old driver caused actual catalog refusal(1expectedfailure,
+6.00s). I326-020 confirmed: frozen Main sets seed_initial_prices=True while
+both concrete readers require False. The NEW Main projection now explicitly
+sets False through one anchored AST delta; reversing only the declared new
+deltas restores whole frozen Main AST. Frozen Main/Base are unchanged.
+No automatic seeded cache is needed for explicit source references/NAV and
+fresh signed execution quotes. This may refuse where no actual valid quote
+arrives; it grants no seeded/scalar/quote substitute for a missing reference.
+Common profile/policy now bind seeding=False. Memory-only omitted seed delta
+caused1expectedfailure2.78s, restored finally.
+
+Counter review also binds reported Vendor completed lookups to actual300000
+hard budget; regression rejects300001. Five-native bound dominates native
+budget. Construction max10stocks+1fund per sleeve implies nominal<=88positive
+targets/close, <=176target-union-prior-holding references, so
+176*302+88*1451=180840<300000; no bounds are expanded to force a result.
+Terminal requires302reference batches,302unchanged split History calls,
+zero reference History calls,1451unique closes, source attempts/completions,
+all old plan/execution/preopen/account/safety/no-open-order/order-fill/fee/
+forced-delisting/monthly/account-aggregate predicates. Hashes/flags are code-
+reported aggregates; they do not independently reconstruct licensed price,
+holdings or signed quote rows.
+
+Final new driver39193bytes SHA
+a608b90cad9be75ec06bd2ae42e040e25eb1c98fa8fb568ba1a648e662c25bcb;
+NO-LFpolicy1268bytes576c18098e77aacee26589e358afe6ff18ca58ba8ad8637bc820b4fec3b47941.
+Pure public projection15904bytes SHA
+b3f21b8e05d77a71e97327b43406203797bc749b558dba7d4c05de00bca1454b.
+Runtime tests14646bytes SHA
+da30a74dc046ae11377195d1cc18a56f99e0c5c2748bb53d47f7e716167782ab;
+projection tests19067bytes SHA
+1b07a84408250f1bec4a74de85d3461862c8858ef3c094b44dc6aede32561a3a.
+Author65passes10.74s supersedes/overlaps earlier62; root379joint15.55s:
+45native+26codec+24vendor+41monetary+65driver/projection+26streamingguard+
+36AQproducer+26transferplan+4APanchor+86record/document. No failures/skips/
+warnings or full suite. Root strict single-EOF style check initially refused
+two NEW uninvoked source files with double terminalLF; staged diff then
+identified the same issue in their two NEW tests before any commit. Root
+removed one LF from each with complete AST equality, without changing any
+frozen source/test/profile; no operational attempt was consumed. Hashes above supersede provisional cc6e4b33/bf846e06. Corrected
+65subset passed10.86s, overlapping379. All nine selected new/changed modules
+compiled in memory with exact single terminalLF,196AQ sourcepins/current
+profile/native-policy hashes verified. No private/operational read in checks.
+
+Pure transfer-plan helper9378bytes SHA
+4631b6fbdc891fcefc3dd4b8eca7fa47d59ee5d1df21078e5300e4ee8eecf3a3;
+tests7727bytes2afc05d0ff2d994bc00af95827b63dc1b64bc9586fa33940b3a4fdf1162ba10f;
+NO-LFprofile1129bytesbdb1a5476e810ed84a9b5d562c9fc057ce24f8db8e515ed2878ee69ebb320721.
+Its26authorpasses4.45s overlap root379. Supplied closed AQ output is revalidated
+with exact actual0/equal stdout/hash/no stderr/bounds and ordered UTC brackets.
+Future actual projectID/same-org metadata are inputs, never discovered or
+invented. It derives exactly73DATA objects (catalog,71months,manifestlast),
+fixed source-relative paths and content-addressed runtime keys, fixed byte
+caps and false flags. No I/O/get/upload/launch or access/rights grant.
+
+This clean commit freezes AQ only, as326.42. The common driver/projection/
+transfer plan remain UNINVOKED, no QC strategy source install/compile/launch
+or result-read scope is inferred. All agents now HOLD edits/tests/temp creation
+through AQ producer+validator, preventing duplicate operations/concurrent pin
+changes. Shared files/ledger and337/259/53/699 unchanged. After AQ actual result,
+continue the separate private-processing/transfer/project/source/run work
+under current owner delegation; do not push an intermediate acknowledgment.

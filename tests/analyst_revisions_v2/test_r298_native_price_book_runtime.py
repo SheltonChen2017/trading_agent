@@ -109,6 +109,54 @@ def test_missing_native_cell_stops_without_other_source_date_fallback_or_new_His
     refused('session',lambda:reader.price(dict(case.selected[0]),'2021-01-05'))
 
 
+def test_source_and_fresh_current_mapped_labels_may_differ_with_same_full_identity(case):
+    row=case.selected[1];symbol=case.source.symbols[row['composite_figi']]
+    before=m.native._native(symbol);symbol.value='SYNTHETICHIST'
+    assert m.stable_native_identity(before)==m.stable_native_identity(m.native._native(symbol))
+    reader=case.reader();receipt=reader.authenticate_once()
+    assert reader.price(dict(row),case.source.grid[0]['session'])==Decimal('123.45')
+    assert receipt['fresh_input_binding_count']==7 and case.source.history.calls==[]
+
+
+def test_initial_add_security_may_return_current_mapped_Symbol_with_same_SID(case):
+    row=case.selected[1];target=case.source.symbols[row['composite_figi']]
+    original_add=case.source.algorithm.add_security
+    def add(symbol,*args):
+        security=original_add(symbol,*args)
+        if symbol is target:
+            mapped=fixture.Symbol('SYNTHETICMAPPED',str(symbol.id))
+            security.symbol=mapped
+            for config in security.subscriptions:config.symbol=mapped
+            # The synthetic dict lacks LEAN SecurityManager's SID-based lookup.
+            case.source.securities[mapped]=security
+        return security
+    case.source.algorithm.add_security=add
+    reader=case.reader();reader.authenticate_once()
+    assert reader.price(dict(row),case.source.grid[0]['session'])==Decimal('123.45')
+    assert case.source.history.calls==[] and len(case.source.adds)==5
+
+
+def test_later_same_SID_mapped_security_label_is_observational(case):
+    row=case.selected[1];symbol=case.source.symbols[row['composite_figi']]
+    reader=case.reader();reader.authenticate_once()
+    case.source.securities[symbol].symbol=fixture.Symbol('SYNTHETICMAPPED',str(symbol.id))
+    assert reader.price(dict(row),case.source.grid[0]['session'])==Decimal('123.45')
+
+
+@pytest.mark.parametrize('field',['sid','kind','market','sid_date','malformed_display'])
+def test_same_display_does_not_waive_any_stable_identity_field(case,field):
+    row=case.selected[1];symbol=case.source.symbols[row['composite_figi']]
+    reader=case.reader();reader.authenticate_once()
+    changed=fixture.Symbol(symbol.value,str(symbol.id))
+    if field=='sid':changed.id.text='CHANGED 123'
+    elif field=='kind':changed.security_type='Option'
+    elif field=='market':changed.id.market='canada'
+    elif field=='sid_date':changed.id.date=datetime(2011,1,1)
+    else:changed.value='malformed value'
+    case.source.securities[symbol].symbol=changed
+    with pytest.raises(m.Refused):reader.price(dict(row),case.source.grid[0]['session'])
+
+
 def test_future_close_guard_is_independent_of_calendar_accessor(case):
     reader=case.reader();reader.authenticate_once()
     session=case.source.grid[-1]['session']

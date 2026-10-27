@@ -130,6 +130,8 @@ def profile_record():
         'construction': 'inert_then_one_consumed_authentication_before_any_strategy_orders_or_holdings',
         'future_runtime_project_binding': 'exact_positive_integer_frozen_by_new_strategy_caller',
         'current_identity': 'fresh_genuine_full_original_binding_stream_forward_reverse_census_all8_ETFs_and_selected5',
+        'native_identity_projection': ['sid', 'kind', 'market', 'sid_date'],
+        'display_ticker': 'validated_observational_not_a_permanent_identity_key',
         'original_SIDs': 'absent_never_inferred_from_prior_totals_or_reused_without_current_resolution',
         'initial_subscriptions': 'selected5_RAW_Daily_only_before_strategy_quote_subscriptions',
         'later_guard': 'requested_current_native_identity_USD_rate1_RAW_and_NY_clock_not_permanent_no_orders',
@@ -145,6 +147,20 @@ def profile_record():
         'source_read_cache': 'same_QC_ObjectStore_API_read_not_independent_remote_durability',
         'rights': 'separate_current_paid_private_org_actual_source_job_and_qualified_source_policy_required',
         'no_serializer_or_host_transport': True, **FALSE_FLAGS}
+
+
+def stable_native_identity(value):
+    """Validate full observations; ticker Value is metadata, never an ID key."""
+    require(type(value) is dict and set(value) == {'sid', 'display', 'kind', 'market', 'sid_date'}
+        and type(value['sid']) is str and native.figi._SID.fullmatch(value['sid']) is not None
+        and type(value['display']) is str and native.figi._TICKER.fullmatch(value['display']) is not None
+        and value['kind'] in ('equity', 'securitytype.equity') and value['market'] == 'usa'
+        and type(value['sid_date']) is str, 'selected_identity')
+    try:
+        require(datetime.strptime(value['sid_date'], '%Y-%m-%d').date().isoformat() == value['sid_date'], 'selected_identity')
+    except ValueError:
+        raise Refused('selected_identity') from None
+    return {key: value[key] for key in ('sid', 'kind', 'market', 'sid_date')}
 
 
 def _parse_supplied_book(raw, context):
@@ -239,6 +255,44 @@ class SpecificNativePriceBook:
         except Exception:
             raise Refused('settings') from None
 
+    def _configure(self, symbol, schedule):
+        """Reader-local initial subscription; stable identity, mapped labels.
+
+        The already-used diagnostic remains unchanged. No History is invoked.
+        All Daily/noFF/RAW/USD and independent-calendar checks are retained.
+        """
+        try:
+            before = native._native(symbol)
+            security = self._algorithm.add_security(symbol, self._identity.daily, False, 1, False)
+            security.set_data_normalization_mode(self._raw_normalization)
+            current = native._native(security.symbol)
+            require(stable_native_identity(current) == stable_native_identity(before)
+                and security.quote_currency.symbol == 'USD'
+                and native.money._decimal(security.quote_currency.conversion_rate, 'native USD rate') == 1, 'currency')
+            require(str(security.exchange.hours.time_zone) == 'America/New_York'
+                and security.data_normalization_mode == self._raw_normalization, 'subscription')
+            trade, quote = 0, 0
+            for index, config in enumerate(security.subscriptions):
+                require(index < 2 and stable_native_identity(native._native(config.symbol)) == stable_native_identity(before)
+                    and config.resolution == self._identity.daily and config.fill_data_forward is False
+                    and config.extended_market_hours is False and config.data_normalization_mode == self._raw_normalization
+                    and str(config.data_time_zone) == str(config.exchange_time_zone) == 'America/New_York', 'subscription')
+                name = config.type.FullName
+                require(name in ('QuantConnect.Data.Market.TradeBar', 'QuantConnect.Data.Market.QuoteBar'), 'subscription')
+                trade += int(name == 'QuantConnect.Data.Market.TradeBar')
+                quote += int(name == 'QuantConnect.Data.Market.QuoteBar')
+            require(trade == 1 and quote <= 1, 'subscription')
+            for item in schedule:
+                self._remaining()
+                midnight = datetime.strptime(item['session'], '%Y-%m-%d')
+                opening = native._qc_ny(security.exchange.hours.get_next_market_open(midnight, False))
+                closing = native._qc_ny(security.exchange.hours.get_next_market_close(opening.replace(tzinfo=None), False))
+                require(opening.astimezone(timezone.utc).isoformat() == item['open_utc']
+                    and closing.astimezone(timezone.utc).isoformat() == item['close_utc'], 'calendar')
+            return security.symbol, current
+        except Refused: raise
+        except Exception: raise Refused('subscription') from None
+
     def authenticate_once(self):
         require(not self._started, 'once')
         self._started = True
@@ -267,9 +321,9 @@ class SpecificNativePriceBook:
                 self._remaining()
                 symbol = resolution.symbol_for_security(originals[pin]['security_id'])
                 require(symbol is not None, 'selected_identity')
-                fact = self._identity._configure(symbol, schedule)
+                current_symbol, fact = self._configure(symbol, schedule)
                 require(digest({'sid': fact['sid']}) == public['native_sid_sha256'], 'selected_identity')
-                symbols[pin], current[pin] = symbol, fact
+                symbols[pin], current[pin] = current_symbol, fact
             self._remaining(); self._base_guard()
             try:
                 payload = self._algorithm.object_store.read_bytes(context['publication']['object_key'])
@@ -281,7 +335,8 @@ class SpecificNativePriceBook:
             require(record['session_schedule'] == schedule, 'calendar')
             chosen = _join_original_catalog(record, rows, context)
             for entry, pin in zip(record['selected'], wanted, strict=True):
-                require(entry['native'] == current[pin] and entry['status'] == 'complete', 'selected_identity')
+                require(stable_native_identity(entry['native']) == stable_native_identity(current[pin])
+                    and entry['status'] == 'complete', 'selected_identity')
                 self._bindings[pin] = canonical(chosen[pin])
                 self._symbols[pin], self._natives[pin] = symbols[pin], canonical(current[pin])
                 self._cells[pin] = {index: text for index, text in entry['raw_USD_closes']}
@@ -323,9 +378,9 @@ class SpecificNativePriceBook:
             require(pin in self._bindings and canonical(row) == self._bindings[pin], 'binding')
             symbol = self._symbols[pin]
             current = native._native(symbol)
-            require(canonical(current) == self._natives[pin], 'selected_identity')
+            require(stable_native_identity(current) == stable_native_identity(json.loads(self._natives[pin])), 'selected_identity')
             security = self._algorithm.securities[symbol]
-            require(native._native(security.symbol) == current
+            require(stable_native_identity(native._native(security.symbol)) == stable_native_identity(current)
                 and security.quote_currency.symbol == 'USD'
                 and native.money._decimal(security.quote_currency.conversion_rate, 'native USD rate') == 1,
                 'currency')

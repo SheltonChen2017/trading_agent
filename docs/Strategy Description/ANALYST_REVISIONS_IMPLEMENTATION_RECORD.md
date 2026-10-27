@@ -65796,3 +65796,117 @@ profile bytes match the exact root151-pass snapshot ccaf46bf/384a6dff before
 freeze. No operational call overlapped those edits, and no continuous file-
 stability claim is made for authoring/testing. All final hashes are rechecked
 before commit/use; the used frozen source must never be changed or repaired.
+
+### 326.36 Actual AN isolates DNS-stage refusal; scoped resolver recovery
+
+At clean6d78975f28c0dff9c163f054080727f3333dc039, sole credential-free AN
+parent2026-10-27T12:38:57.043492Z..12:39:04.723127Z exited2,
+2669bytes SHA6832c5c0092c609301d51485b0274624a7c26d6e76d0a16d052fae1c207b542b,
+stderr0/boundnull. Sole native validator12:39:04.723337Z..12:39:08.502364Z
+exited0 and returned the identical2669bytes/hash, stderr0/boundnull.
+Report2253bytes SHA4631e9ee7901a5a1dc5fba3a819390973c3c0722ec499f69b45c31e7fd095ff6.
+Child2,12:39:00.705929Z..12:39:04.496618Z,1085bytes SHA
+0e30cc64e757d848e88d8cf97df0c6c82d844c32073a0db3e2680ebc6a873161.
+Exact child/actual/report/journal joins authenticated; journal316bytes SHA
+03b34f2076df37b64e820f98a6416a3cb77605116614283e67415f762d7a036c.
+This is authenticated failed diagnostic evidence, not completed transport.
+
+Only DNS application intent exists. Actual socket.gaierror numeric errno8
+was retained without text; DNS inventory null, TCP false, TLS/status null,
+HEAD_send_attempts0. No TCP/TLS/HEAD/data-endpoint dispatch, credentials,
+licensed rows, QC contact or new look. Underlying DNS/OS packet count remains
+unknown; native denial is not measured zero network effects. This establishes
+the observed current DNS-stage refusal, not authoritative NXDOMAIN, expired
+subscription, server downtime or the lost causal chain of historical AM/AD/AF.
+AN/claim/parser/output validator and authority are SPENT; do not reread control,
+repair marker, rerun or call the same diagnostic unchanged. Final86record1.12s
+before commit overlaps151 and is not additional coverage.
+
+Static primary Apple/Chromium dependency evidence from326.34 plus this observed
+DNS failure supports a narrowly scoped prospective resolver correction.
+Next AO preserves the entire AN protocol and adds ONLY
+(require-not (literal "/private/var/run/mDNSResponder")) to the current
+outbound deny's require-all, making the already intended DNS facility usable
+through macOS's local resolver socket. No all-Unix permission, extra remote
+port, inbound/bind, Keychain, artifact or data-source access is added. The
+separate com.apple.netsrc control socket stays denied unless later actual
+stage evidence separately justifies it. Native ALL-network source/auth/
+validator policies remain unchanged. This is a required local IPC dependency
+inside the bounded intended transport, not removing/disabling security fences.
+
+A separately versioned caller/control/source/profile/new exact one-use freeze
+and focused protocol/policy-delta tests precede AO. Its purpose is to validate
+that specific platform dependency correction, not renew AN or acquire prices.
+If that observation succeeds, a distinct source-authenticated price acquisition
+may later adopt only the verified minimal correction under its own exact
+contract; no current code/field grants that contact. If it fails, preserve the
+new finite stage and act only on a coherent verified recovery, no blind retry.
+No historical failure is retroactively accepted. All formal/PIT/master/price/
+paper/live flags and337/259/53/699 remain; no six/eight strategy run yet.
+
+### 326.37 Exact AO resolver-socket-only correction and one-use validation freeze
+
+New scripts/diagnose_arv2_r298_public_transport_v2.py37925bytes SHA
+cd7fe6608ba4b56a748efe8fc1f738d94d6dbfd02da6f724b57644118db4d57d;
+main tests24683bytes SHAe147fa36e2808408a2ed3f5d6d736713ec9f4fa90a2241cc91bb35e2370559ff;
+review tests9156bytes SHA4dbbf77211e366e57ea9e34795f56315e3c13f3f895fa098ac9784c8336d1ea1.
+WITH-LF profile25810bytes SHA
+e60af01eb261bb1195000957315f420577d6558d52341fee9c24465ff2e1a041,
+189selected pins including frozen ANccaf46bf and AM88a1c9df. New schema
+arv2-r298-public-transport-phase-ao-v2, fixed own control
+artifacts/analyst_revisions_v2/newrule_public_transport/R326-20261027-AO,
+UNINSPECTED/unallocated. Old AN/AM source/policies/controls stay frozen/spent.
+
+Root full diff and exact module-AST/protocol tests confirm the only permission
+delta is the explicit mDNSResponder socket exclusion inside the existing
+outbound deny. Version/source/control/pin/profile evidence bindings change;
+all operational function bodies, one-use claim/FD/journal/actual-packet gates,
+public CA9cc2a774/cadata/TLS verification, bounded DNS-first-address-TCP-HEAD,
+status-only/credential-free environment and all other326.35 limits/protections
+are unchanged. Source/auth/validator ALL-network policies remain unchanged.
+com.apple.netsrc and other Unix/control sockets are NOT excepted; neither are
+additional remote ports, inbound/bind, Keychain or artifact reads. This precise
+platform resolver dependency correction is justified by observed AN DNS
+refusal plus primary implementation evidence, not an inferred general waiver.
+Success and any historical failure cause remain UNPROVEN before actual AO.
+
+Author54distinct mainpasses7.69s, plus separate14broker regressions3.57s;
+those are ports of prior AN mechanisms, not additive independent capability.
+Removing ONLY the IPC predicate caught1expectedfailure0.15s, memory-only/
+finally-restored; original AN sourceccaf remained unchanged. Root final
+154distinctpasses5.57s(54AO+14broker+86record/document), no failures/skips/
+warnings/full suite; earlier selections overlap. All three files in-memory
+compile/no bytecode,189pins/publicCA/profile/dispatch_fence absence pass,
+native ALL-network/artifact/Keychain/security denial, inroot support paths,
+--noconftest/plugin-autoload-off/no cacheprovider. Exact child policy SHA
+b7e48e4fb1c0268e11d4102050b04a6ad7d96247c2852f8ec3b87ebf1920b5b6;
+validator unchanged79d7e961f0ab250fd95784609a254c2628244cbd0143b0aa3ea1d2f514858a4c.
+
+Current continuing review-waived source/price recovery authority permits ONE
+AO observation at the clean commit containing this exact freeze, self hash
+cd7fe660/profilee60af01e. It tests the verified local-IPC correction, not a
+price acquisition, API authentication or repeat of unchanged AN. One original
+parent stdout/actual exit passes once through native closed validator; same
+actual0+matching authentication is required for completed diagnostic. Parent2
+with validator0 is only authenticated failure. Public HEAD contact is bounded
+and credential-free; no data endpoint/body or licensed rows are consumed.
+No history/prior cause, price input, strategy result or formal gate is cleared.
+
+Exact outer1768bytes SHA
+940f601ba7db0a4335bce8f1e83639da951b886d0abb95a9c6414303e95b689b
+differs from the tested AN outer only by module import/runtime prefix/metadata
+label; unchanged control logic is compiled/static-transform checked, with no
+new claimed runtime tests or additive synthetic passes. It supplies exact
+committed HEAD/self hash argv and the same literal C/inroot locale-compatible
+environment, bounded65s parent/35s validator captures, own-child reap, no key
+or raw stderr/exception output. No artifact/report/corpus reread is authorized.
+All agents HOLD edits/tests through the actual attempt. Invocation consumes
+the new claim even on local/ambiguous failure; never retry/repair/rename it.
+
+No actual AO allocation/DNS/TCP/TLS/HEAD/credential/provider-data/QC contact
+occurred before this freeze.337/259/53/699 remains; no sourceprice or strategy
+look is added by this public transport validation. A completed diagnostic may
+support only a separately versioned source-authenticated acquisition with the
+verified minimal policy under its own exact run freeze. A failure retains its
+specific stage and stops that protocol; no blind relaunch or blanket security
+exception. All original scientific/source/licensing/financial stops remain.

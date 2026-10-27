@@ -2257,8 +2257,10 @@ correct the uninvoked rename/ETF-tuple/seeding boundaries, preserve failedAQ,
 and record successful AR production/native validation of71monthly grids
 (146284817bytes). Sections326.48–326.49 record AS actual0/full metadata
 recovery and I326-024: ALL vendor slots lack pre-October2021 marks, blocking
-the Jan2021 start. AU is a separately frozen existing-EODHD own-fund history/
-identity diagnostic, not a source fallback or strategy capture. No QC source
+the Jan2021 start. Section326.50 records AU spent: six older EODHD RAW prices
+returned but metadata shape refused; authenticated failure, no source admission.
+AV is the separately frozen offline exact-DATA metadata shape diagnosis,
+not an AU retry or provider/strategy capture. No QC source
 transfer/project/compile/strategy job follows this known source stop. Current
 identity/reference/actual-held NAV/full-window/source/run gates remain;
 337/259/53/699 unchanged.
@@ -66957,3 +66959,139 @@ admission or a license for a mixed/scalar/date fallback. No source-stop
 selector, shorter study or paid upgrade by inference.337/259/53/699 remains
 until an actual accountable QC event; no strategy cell/attempt consumed now.
 Accumulate locally and keep exactly one final matching-lane push at endpoint.
+
+### 326.50 Actual AU: older RAW prices available, identity shape refusal retained
+
+At exact clean4302c6519d8118de265af1535f029c001202c4d6, the separately
+frozen AU parent was invoked ONCE and is now SPENT. Actual parent
+2026-10-27T15:45:06.175301+00:00..15:45:18.544649+00:00 exit2;
+stdout5769bytes SHA256
+5f3862c2e836e5ee858040bc2306b426af5352beb124b0c9bc7f6aa18a63a343,
+stderr0/boundnull. Sole independent native validator
+15:45:18.545292..15:45:22.404646+00:00 exit0, same exact5769/hash,
+stderr0/boundnull. Outer0 authenticates FAILURE, not accepted diagnostic:
+accepted_diagnostic=false, stage=authenticate, diagnostic_incomplete.
+Never rerun AU parent/worker/validator/control/report or provider requests.
+
+Credential handoff completed. Provider actual0,855bytes SHA
+b2238574d2a1df828a86d7e279e2fdfd872817eb83add477c18bfbc3708cf3ca,
+stderr0/boundnull: exactly2 application dispatch intents,2 completed HTTP200
+bodies, current ordinal1/last HTTP200. Physical provider_request_count remains
+null/unknown. Auth actual2,1610bytes SHA
+4f9cb5a3b4114967860a6d8f2c507d1f76674a5b576da2531783ded9e802f849,
+stderr0/boundnull. Its finite independent history results:
+history_schema_valid=true,6rows/6positive RAW closes,
+expected_date_coverage=true, exact date-window/observed-dates hash
+d91a987013c5998e463ca273ba3842674de46fd04b92a1abdb5223fc1fdc63a1,
+RAW-close-series hash
+c99487abd91a0891de6def829f6b0631cbf44661616a6bbd1f146342485bdbaa.
+These establish six old SPY RAW observations were returned, not identity
+acceptance, full-window/all-stock completeness, or usable strategy input.
+
+Metadata_schema_valid=false, row count/hash null, identity unresolved/false.
+Static used analyse() makes null or mismatched Isin a VALID shape with
+unresolved identity; therefore no claim that the observed refusal was simply
+a null/mismatched ISIN. JSON/top-level/exact field inventory/string predicates
+remain possible; the170byte length does not identify the cause. No raw
+metadata, price, exception, account or credential was displayed.
+
+Retained AU DATA-only pins, NOT a generic read/replay grant:
+metadata-private.json170bytes
+27fe1cfd219c064793151e03c98ce70eb43889b568056d5810f8db3dc2b1355a;
+history-private.json729bytes
+c55a32ca410d5b34ba7601715013b3b93b302d43d2eb7a87fde383d80d40c02d;
+requests.jsonl196bytes
+3ffbc3f0d5468eaeee7dcd5aa3d57ba6976f51cc8f0e475f2da7808a4ad8b845.
+All are under newrule_eodhd_history_diagnostic/R326-20261027-AU.
+Used AU8f837fee source/profile/policies and original control remain frozen.
+
+Next admissible recovery is a NEW separately committed offline DATA-only
+metadata shape selector over exactly the170byte pinned leaf, native ALL-
+network/Keychain/security denial, full held/named/security/hash checks before
+JSON and normal guard return before redacted finite output. It may emit only
+known public field names, value types/hash/expected-constant comparison flags;
+unknown field names only hashed. No history/journal/report/claim/control read,
+provider retry, raw values or source/identity/price acceptance. Then a verified
+prospective parser correction can authenticate retained DATA under its own
+exact freeze; do not refresh used AU or assume documented metadata shape.
+A public documentation review also found Sharadar history-depth subscription
+tiers; actual owner tier/cause remains uninspected/unproved. EODHD current
+symbol mapping and old RAW availability alone cannot establish historical
+rename intervals or all5636stocks/8funds. Preserve I326-024 missing early
+history and all false readiness flags; no shortened study or implicit fallback.
+No QC capacity/project/upload/compile/launch/result/strategy attempt followed:
+booked337shared/259development/53infrastructure/699cells unchanged.
+Current owner review waiver applies; same-round advice is not independent
+acceptance. Continue safe recovery, accumulate locally, one final lane push.
+
+### 326.51 AV prospective exact offline metadata-shape freeze
+
+Owner's current parser/coverage/research direction and Claude waiver continue.
+This is ONE new offline diagnosis of AU's retained DATA, not a repeated AU
+capture/authentication/control read or an identity/source/price admission.
+Fixed new AV control
+artifacts/analyst_revisions_v2/newrule_eodhd_history_diagnostic/R326-20261027-AV
+has NOT been inspected/allocated before this committed freeze.
+
+Source scripts/read_arv2_r298_eodhd_metadata_shape.py19223bytes SHA256
+6e75b8dba85ab45d88f0382da0e4aa978d344c8ebdc02e03e8a158afc05672d6;
+tests14118bytes aecf8362da28f865d77452c8a18744640119cd9fb6348fa8f508f1893f1ecfce.
+Canonical no-LF profile28001bytes
+c8cf6c4353d575e8c5622f2f182be118802731dd1f06bc04cb913607d9cf49c1,
+203 selected unchanged dependency pins. All202 AU-selected sources matched
+actual bytes in Root's fresh native artifact/network-denied check; new batch,
+payload and held-project profiles regenerated without private reads.
+Used AU self8f837fee is separately pinned; no old frozen pin refresh.
+
+Compatible host ONLY exact designated Mac root/branch, Darwin/POSIX Python3.13
+at /Users/sheltonchen/.venvs/trading_agent-py313/bin/python. CLI requires
+exact clean committed run HEAD, caller/profile SHA; source bindings, not
+authorization booleans or independent acceptance. Preflight selected-source/
+committed-blob equality and safe credential-free environment BEFORE exclusive
+fsynced AV claim. 30s parent alarm and outer35s, uninterruptible-I/O/host-
+suspension qualification; own children only. Exact native profile1706bytes
+345ccd53008ff8d8d903f038153f5125b367ceb3d4248375b1f81570db83ce85
+denies ALL network, both Keychains/security CLI, artifact reads except
+ONE exact AU metadata DATA170bytes/27fe1cfd and own AV outputs/necessary
+literal ancestors. All write paths only inroot runtime/own AV/parent literal.
+AU history/journal/report/claim/control, AR/AP/genuine package and QC are
+denied; no credential or provider contact. New claim consumes this use even
+without source bytes; partial/nonzero/unknown remains spent/ambiguous, no retry.
+
+FixedDataGuard authenticates exact byte pin before JSON, original no-follow
+descriptors/full10 metadata/native security/held-and-named checks through
+computation and NORMAL RETURN before output. Retained843byte AU failure fact
+SHA345f1962bf162cb8dd09302585db52f0c75274ee0678b7c52d42fe24adbe76db
+preserves original parent2/nativevalidator0, never relabels AU accepted.
+Duplicate JSON keys, excess depth/fields/arrays or invalid encoding refuse.
+Output: bounded top-level/row/field counts, known PUBLIC whitelisted field
+names, type/typed-value hash/ASCII predicates and equality booleans against
+public SPY/ETF/USD/US78462F1030 constants. Unknown field names hash-only.
+No actual values, instrument Name, raw row, price, token or exception.
+Original AU's grouped shape predicates are exposed to discriminate its refusal;
+no guessed schema, silent case normalization or metadata acceptance.
+All identity/price/provider/QC/PIT/master/readiness flags false.
+
+Root read public implementation/preflight/policy/Store/shape/closed validator;
+no confirmed P0–P2 in that scope. Author52passes3.80s, initial44pass3.86s
+overlap. Memory-only unknown-name whitelist omission detected1expectedfailure
+0.13s, restored finally. Root138distinctfocusedpasses4.79s=52AV+86record/
+document; no failures/skips/warnings/full suite, dispatch_fence absent.
+In-memory compile,203pin/profile/native-policy checks passed. Synthetic tests
+native ALL-network+production-artifact+Keychain/security denied, all support
+paths inroot. Same-round advice is not independent review.
+
+Exact external metadata-only capture program4955bytes SHA
+14c3cfc11e11e5324faff471104d4a912033e6b2699ac17e2ccc860d7940840b:
+ordinary outer launches sole AV CLI under its own native fence, then a
+SEPARATE artifact/network-denied pure validate_output worker over original
+bounded stdout and ACTUAL observed parent exit. Independent35s caps/stdout
+64KiB/stderr8KiB; exact stdout equality/no stderr/no bound/nativevalidator0 AND
+actualparent0 required for accepted shape observation. Validator0 on2 only
+authenticates failure. This outer reads no private data; neither child has
+credential/contact authority. Full structured output stored before trimmed
+tool summary. If successful, record actual schema predicates then change only
+an uninvoked prospective parser/contract. Used AV/AU remain frozen/spent.
+No new EODHD catalog/source/price acquisition or QC action is authorized by
+this AV freeze; each needs its own exact justified contract/current pins.
+Preserve known full-window source stop and337/259/53/699 accounting.

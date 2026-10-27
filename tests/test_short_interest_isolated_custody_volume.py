@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import plistlib
 import socket
+import stat
 import subprocess
 from types import SimpleNamespace
 
@@ -17,6 +18,7 @@ from scripts import short_interest_isolated_custody_volume as volume
 
 REAL_RUN, REAL_NATIVE = volume._run, volume._native_statfs
 REAL_STAT, REAL_FSTAT = os.stat, os.fstat
+REAL_FCHMOD = os.fchmod if hasattr(os, "fchmod") else None
 _POSIX_CAPTURE_ONLY = pytest.mark.skipif(not hasattr(os, "getuid"),
     reason="protected fixture requires POSIX ownership, mode and dir_fd; SI-CR-WIN-20261012-002")
 
@@ -37,6 +39,9 @@ def deny_real_external_operations(monkeypatch):
     monkeypatch.setattr(volume, "_ISSUED", {})
     monkeypatch.setattr(volume, "_FAILED", set())
     monkeypatch.setattr(volume, "_USED", False)
+    for name in ("_ORIGIN_ISSUED", "_STATE_ORIGINS", "_ASSOCIATION_ISSUED", "_ROOT_ENFORCEMENTS"):
+        monkeypatch.setattr(volume, name, {})
+    monkeypatch.setattr(volume, "_LAST_ASSOCIATION", None)
 
 
 class Harness:
@@ -48,6 +53,10 @@ class Harness:
         self.mount = self.namespace / volume.MOUNT_NAME
         self.clock, self.calls, self.boundaries = Clock(), [], 0
         self.attached, self.mount_inode, self.info_change = False, None, None
+        self.attach_entities, self.created_root_mode = None, 0o700
+        self.root_chmod_calls, self.node_reads, self.native_reads = [], [], []
+        self.node_change = lambda value: value
+        self.root_change = lambda value: value
         self.hook = lambda: None
         self.command_hook = lambda verb: None
         self.host_device = REAL_STAT(self.parent).st_dev
@@ -60,11 +69,17 @@ class Harness:
         monkeypatch.setattr(volume, "sys", SimpleNamespace(platform="darwin"))
         monkeypatch.setattr(subprocess, "run", self.runner)
         monkeypatch.setattr(volume, "_native_statfs", self.native)
+        monkeypatch.setattr(volume, "_device_node_stat", self.node_stat, raising=False)
+        def fchmod(fd, mode):
+            if self.mount_inode is not None and REAL_FSTAT(fd).st_ino == self.mount_inode:
+                self.root_chmod_calls.append((mode, len(self.native_reads), len(self.node_reads)))
+            return REAL_FCHMOD(fd, mode)
+        monkeypatch.setattr(os, "fchmod", fchmod)
         def changed(info):
             if self.mount_inode is not None and info.st_ino == self.mount_inode:
                 values = {name: getattr(info, name) for name in dir(info) if name.startswith("st_")}
                 values["st_dev"] = self.host_device + 101
-                return SimpleNamespace(**values)
+                return SimpleNamespace(**self.root_change(values))
             return info
         monkeypatch.setattr(os, "stat", lambda *args, **kwargs: changed(REAL_STAT(*args, **kwargs)))
         monkeypatch.setattr(os, "fstat", lambda fd: changed(REAL_FSTAT(fd)))
@@ -72,6 +87,7 @@ class Harness:
     def boundary(self): self.boundaries += 1; self.hook()
 
     def native(self, fd):
+        self.native_reads.append(fd)
         info = REAL_FSTAT(fd)
         base = {"bsize": 4096, "blocks": volume.VIRTUAL_BYTES // 4096,
             "bavail": 7 * 1024 ** 3 // 4096, "fsid": (111, 222), "owner": os.getuid(),
@@ -84,6 +100,13 @@ class Harness:
             mounted_on="/FAKE-HOST", mounted_from="/dev/diskFAKE")
         return self.host_change(base)
 
+    def node_stat(self, device):
+        assert device == "/dev/disk999s1"
+        self.node_reads.append(device)
+        return SimpleNamespace(**self.node_change({"st_dev": 77, "st_ino": 888,
+            "st_rdev": self.host_device + 101, "st_mode": stat.S_IFBLK | 0o660,
+            "st_uid": 0, "st_gid": 5}))
+
     def runner(self, arguments, **kwargs):
         assert arguments[0] == "/usr/bin/hdiutil" and arguments[1] in ("create", "attach", "info")
         assert kwargs["stdin"] is subprocess.DEVNULL and kwargs["stderr"] is subprocess.DEVNULL
@@ -94,7 +117,7 @@ class Harness:
         if verb == "create":
             assert arguments == ["/usr/bin/hdiutil", "create", "-type", "SPARSE", "-size", "8g",
                 "-fs", "APFS", "-uid", str(os.getuid()), "-gid", str(os.getgid()), "-mode", "0700",
-                "-volname", "SI_OFFLINE_CUSTODY_V2", "-nospotlight", "-plist", str(self.image)]
+                "-volname", "SI_OFFLINE_CUSTODY_V3", "-nospotlight", "-plist", str(self.image)]
             with self.image.open("xb") as stream: stream.write(b"FABRICATED SPARSE IMAGE, NO REAL FILESYSTEM")
             self.image.chmod(0o644)
             payload = [str(self.image)]
@@ -105,9 +128,10 @@ class Harness:
             # Fake a mounted root without a mount syscall. Retain the original
             # underlying directory separately so its held FD remains authentic.
             self.mount.rename(self.root / "retained-underlying-mount")
-            self.mount.mkdir(mode=0o700); self.mount_inode = REAL_STAT(self.mount).st_ino
+            self.mount.mkdir(mode=self.created_root_mode); self.mount.chmod(self.created_root_mode)
+            self.mount_inode = REAL_STAT(self.mount).st_ino
             self.attached = True
-            payload = {"system-entities": deepcopy(self.current_entities)}
+            payload = {"system-entities": deepcopy(self.current_entities if self.attach_entities is None else self.attach_entities)}
         else:
             assert arguments == ["/usr/bin/hdiutil", "info", "-plist"]
             images = [{"image-path": str(self.root / "UNRELATED-PRIVATE-NAME"),
@@ -154,6 +178,194 @@ def test_full_original_factory_close_is_redacted_and_preserves_all_artifacts(h):
     assert cap.closed_summary()["authority"]["source_admitted"] is False
     for fd in descriptors:
         with pytest.raises(OSError): REAL_FSTAT(fd)
+
+
+@pytest.mark.parametrize("attach_hint,info_hint", [("Apple_APFS", "41504653-0000-11AA-AA11-00306543ECAC"),
+    ("41504653-0000-11aa-aa11-00306543ecac", "Apple_APFS_Volume")])
+def test_distinct_original_descriptor_origins_require_same_stronger_native_identity(h, attach_hint, info_hint):
+    h.attach_entities = deepcopy(h.current_entities)
+    h.attach_entities[-1]["content-hint"] = attach_hint
+    h.current_entities[-1] = {"dev-entry": "/dev/disk999s1", "content-hint": info_hint,
+        "mount-point": str(h.mount)}
+    with h.prepare() as cap:
+        assert cap.observation()["authority"]["source_admitted"] is False
+        report = volume.association_diagnostic()
+        assert report["vendor_text_equal"] is False and report["mounted_devices_equal"] is True
+        assert report["mount_points_equal"] is report["attach_devices_subset"] is True
+        assert report["mismatching_field_names"] == ["content-hint", "volume-kind"]
+        assert report["attach_raw_sha256"] != report["info_raw_sha256"]
+        assert report["attach_parsed_sha256"] != report["info_parsed_sha256"]
+        assert cap.observation()["device_node_original_identity_sha256"]
+        assert str(h.root) not in canonical_json(report) and "/dev/" not in canonical_json(report)
+        report["authority"]["source_admitted"] = True
+        assert volume.association_diagnostic()["authority"]["source_admitted"] is False
+    assert cap.closed_summary()["authority"]["source_admitted"] is False
+
+
+def test_fresh0755_root_is_enforced0700_once_after_identity_and_before_yield(h):
+    h.created_root_mode = 0o755
+    with h.prepare() as cap:
+        assert stat.S_IMODE(REAL_STAT(h.mount).st_mode) == 0o700
+        assert len(h.root_chmod_calls) == 1
+        mode, native_before, node_before = h.root_chmod_calls[0]
+        assert mode == 0o700 and native_before >= 2 and node_before >= 1
+    assert cap.closed_summary()["authority"]["ready_for_backtest"] is False
+
+
+@pytest.mark.parametrize("hint,kind", [("UNKNOWN_PRIVATE", None), ("Apple_HFS", None),
+    ("41504653-0000-11AA-AA11-00306543ECAX", "apfs"), (None, "hfs"), ("apple_apfs", "apfs")])
+def test_unknown_or_contradictory_mounted_descriptors_refuse_before_root_mode_write(h, hint, kind):
+    h.created_root_mode = 0o755
+    # Missing plist keys map to None in the strict parser; plistlib has no
+    # None/null value, so do not fabricate an impossible producer response.
+    row = {"dev-entry": "/dev/disk999s1", "mount-point": str(h.mount)}
+    if hint is not None: row["content-hint"] = hint
+    if kind is not None: row["volume-kind"] = kind
+    h.current_entities[-1] = row
+    with pytest.raises(volume.IsolatedVolumeRefusal, match="isolated_descriptor_refused"):
+        with h.prepare(): pytest.fail("unknown vendor descriptor admitted")
+    assert h.root_chmod_calls == [] and stat.S_IMODE(REAL_STAT(h.mount).st_mode) == 0o755
+    report = volume.association_diagnostic()
+    assert report["original_shapes_valid"] is True and "UNKNOWN_PRIVATE" not in canonical_json(report)
+    assert report["authority"]["source_admitted"] is False
+
+
+@pytest.mark.parametrize("change", ["rdev", "symlink", "inode", "uid", "gid", "mode"])
+def test_original_block_node_identity_drift_refuses_and_permanently_latches(h, change):
+    with pytest.raises(volume.IsolatedVolumeRefusal):
+        with h.prepare() as cap:
+            def changed(value):
+                if change == "rdev": value["st_rdev"] += 1
+                elif change == "symlink": value["st_mode"] = stat.S_IFLNK | 0o777
+                elif change == "inode": value["st_ino"] += 1
+                elif change == "uid": value["st_uid"] += 1
+                elif change == "gid": value["st_gid"] += 1
+                else: value["st_mode"] = stat.S_IFBLK | 0o600
+                return value
+            h.node_change = changed
+            with pytest.raises(volume.IsolatedVolumeRefusal): cap.check()
+            h.node_change = lambda value: value
+            with pytest.raises(volume.IsolatedVolumeRefusal, match="isolated_failure_latched"): cap.check()
+    assert len(h.root_chmod_calls) == 1
+
+
+@pytest.mark.parametrize("change", ["rdev", "symlink"])
+def test_no_block_node_binding_means_no_fresh_root_chmod(h, change):
+    h.created_root_mode = 0o755
+    h.node_change = lambda value: dict(value, **({"st_rdev": value["st_rdev"] + 1}
+        if change == "rdev" else {"st_mode": stat.S_IFLNK | 0o777}))
+    with pytest.raises(volume.IsolatedVolumeRefusal, match="isolated_device_node_refused"):
+        with h.prepare(): pytest.fail("missing block-node witness admitted")
+    assert h.root_chmod_calls == [] and stat.S_IMODE(REAL_STAT(h.mount).st_mode) == 0o755
+
+
+def test_fresh_root_mode_transition_cannot_be_repeated_or_reset(h):
+    with h.prepare() as cap:
+        state = volume._MINTED[id(cap)][2]
+        for unused in range(2):
+            with pytest.raises(volume.IsolatedVolumeRefusal, match="isolated_new_root_enforcement_repeated"):
+                volume._enforce_new_root(state, state["mount_fd"])
+        assert len(h.root_chmod_calls) == 1
+    assert cap.closed_summary()["root_mode_enforced_before_probe"] is True
+
+
+def test_later_info_descriptor_text_still_matches_its_own_original_without_rebaseline(h):
+    h.current_entities[-1]["content-hint"] = "Apple_APFS"
+    with pytest.raises(volume.IsolatedVolumeRefusal, match="isolated_image_association_refused"):
+        with h.prepare() as cap:
+            h.current_entities[-1]["content-hint"] = "41504653-0000-11AA-AA11-00306543ECAC"
+    assert len(h.root_chmod_calls) == 1
+
+
+@pytest.mark.parametrize("change", ["owner", "remote", "browse", "noowners", "readonly", "device", "root_uid"])
+def test_every_native_or_UID_precondition_refuses_before_any_new_root_mode_operation(h, change):
+    h.created_root_mode = 0o755
+    if change == "root_uid":
+        h.root_change = lambda value: dict(value, st_uid=os.getuid() + 1)
+    else:
+        def changed(value):
+            if change == "owner": value["owner"] += 1
+            elif change == "remote": value["flags"] &= ~volume.MNT_LOCAL
+            elif change == "browse": value["flags"] &= ~volume.MNT_DONTBROWSE
+            elif change == "noowners": value["flags"] |= volume.MNT_IGNORE_OWNERSHIP
+            elif change == "readonly": value["flags"] |= volume.MNT_RDONLY
+            else: value["mounted_from"] = "/dev/disk998s1"
+            return value
+        h.native_change = changed
+    with pytest.raises(volume.IsolatedVolumeRefusal):
+        with h.prepare(): pytest.fail("unqualified native root identity admitted")
+    assert h.root_chmod_calls == [] and stat.S_IMODE(REAL_STAT(h.mount).st_mode) == 0o755
+
+
+def test_selected_info_unknown_field_drift_refuses_original_canonical_identity(h):
+    with pytest.raises(volume.IsolatedVolumeRefusal, match="isolated_image_association_refused"):
+        with h.prepare() as cap:
+            def changed(payload):
+                payload["images"][-1]["unexpected-vendor-metadata"] = "PRIVATE_NOT_A_NEW_BASELINE"
+                return payload
+            h.info_change = changed
+    assert len(h.root_chmod_calls) == 1
+
+
+def test_terminal_node_drift_cannot_use_new_snapshot_as_original(h):
+    with h.prepare() as cap: pass
+    h.node_change = lambda value: dict(value, st_ino=value["st_ino"] + 1)
+    with pytest.raises(volume.IsolatedVolumeRefusal, match="isolated_device_node_changed"):
+        cap.check_after_close()
+    h.node_change = lambda value: value
+    with pytest.raises(volume.IsolatedVolumeRefusal, match="isolated_failure_latched"): cap.closed_summary()
+
+
+def test_original_root_GID_cannot_drift_after700_seal_or_reset_failure(h):
+    with pytest.raises(volume.IsolatedVolumeRefusal):
+        with h.prepare() as cap:
+            h.root_change = lambda value: dict(value, st_gid=value["st_gid"] + 1)
+            with pytest.raises(volume.IsolatedVolumeRefusal, match="isolated_new_root_identity_changed"):
+                cap.check()
+            h.root_change = lambda value: value
+            with pytest.raises(volume.IsolatedVolumeRefusal, match="isolated_failure_latched"): cap.check()
+    assert len(h.root_chmod_calls) == 1
+
+
+def test_no_original_command_means_no_association_diagnostic_or_authority():
+    value = volume.association_diagnostic()
+    assert value["status"] == "not_observed" and value["authority"]["source_admitted"] is False
+    value["authority"]["source_admitted"] = True
+    assert volume.association_diagnostic()["authority"]["source_admitted"] is False
+
+
+def test_device_node_witness_uses_nofollow_metadata_never_a_raw_device_open(monkeypatch):
+    sentinel, opened = object(), []
+    def forbidden(*args, **kwargs):
+        opened.append(True)
+        raise AssertionError("raw device open is forbidden")
+    with monkeypatch.context() as patch:
+        patch.setattr(os, "open", forbidden)
+        patch.setattr(Path, "lstat", lambda unused: sentinel)
+        observed = volume._device_node_stat("/dev/disk999s1")
+    assert observed is sentinel and opened == []
+
+
+def test_association_mismatch_snapshot_survives_refusal_without_private_values(h):
+    h.attach_entities = deepcopy(h.current_entities)
+    h.attach_entities[-1]["mount-point"] = "/FABRICATED_WRONG_MOUNT_PRIVATE"
+    with pytest.raises(volume.IsolatedVolumeRefusal, match="isolated_attach_association_refused"):
+        with h.prepare(): pytest.fail("wrong original attach mount admitted")
+    report = volume.association_diagnostic()
+    assert report["attach_raw_sha256"] and report["info_raw_sha256"] is None
+    assert report["authority"]["ready_for_backtest"] is False
+    assert "PRIVATE" not in canonical_json(report) and "/dev/" not in canonical_json(report)
+
+
+def test_original_info_device_or_mount_mismatch_is_projected_before_abort(h):
+    h.attach_entities = deepcopy(h.current_entities)
+    h.current_entities[-1]["dev-entry"] = "/dev/disk998s1"
+    with pytest.raises(volume.IsolatedVolumeRefusal, match="isolated_image_association_refused"):
+        with h.prepare(): pytest.fail("different mounted device admitted")
+    report = volume.association_diagnostic()
+    assert report["mismatching_field_names"] == ["dev-entry"]
+    assert report["mounted_devices_equal"] is False and report["mount_points_equal"] is True
+    assert not h.root_chmod_calls
 
 
 def test_live_object_phase_mutation_cannot_forge_terminal_issued_closure(h):

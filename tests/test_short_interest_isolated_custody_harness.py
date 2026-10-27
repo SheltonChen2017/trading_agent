@@ -45,7 +45,7 @@ def result(manifest):
         "first_controlled_refusal": None, "controlled_refusals": [],
         "policy_sha256": hash_payload(harness.proof.base.transition.policy()),
         "authority": harness.proof.base.transition.authority()}
-    return {"schema": "si-isolated-kernel-immutable-proof-closed-v2",
+    return {"schema": "si-isolated-kernel-immutable-proof-closed-v3",
         "status": "closed_offline_isolated_new_inode_only", "runtime_head": HEAD, "actual_remote": REMOTE,
         "code_identity_sha256": "e" * 64, "code_manifest_sha256": hash_payload(manifest),
         "protocol_sha256": harness.proof.PROTOCOL_SHA256,
@@ -279,6 +279,14 @@ def test_main_invalid_argument_and_unknown_exception_never_echo_values(monkeypat
     assert harness.main([HEAD, REMOTE]) == 2
     output = capsys.readouterr().out
     assert "PRIVATE" not in output and "SECRET" not in output and '"status":"refused"' in output
+
+
+def test_own_harness_refusal_retains_original_safe_storage_projection(monkeypatch):
+    observation = {"status": "original_association_observed", "mismatching_fields": ["volume-kind"]}
+    monkeypatch.setattr(harness.proof.storage, "association_diagnostic", lambda: dict(observation), raising=False)
+    result_value = harness._failure(harness.OfflineHarnessRefusal("REFUSED: harness_native_denied"))
+    assert result_value["storage_association"] == observation
+    assert result_value["contract_code"] == "harness_native_denied"
 
 
 def test_registered_policy_disclaims_audit_mode_dirfd_and_persistent_storage():

@@ -18,7 +18,7 @@ WRAPPER = "scripts/run_short_interest_isolated_custody_offline.py"
 NAME = base.NAME
 INNER_DIRECTORY = "proof"
 MAXIMUM_SECONDS, HOLD_SECONDS = 420, 5
-PROTOCOL_SHA256 = "23f05c9065c97c8d8e7659cb783f30769b7c8fef7d34ab518e88000722e42a31"
+PROTOCOL_SHA256 = "0e334f0018fad61e35a1b8b211a1c0a72834e566eb822ad41325c1b13756d03a"
 _LAST_TRANSITION = None
 _CODES = frozenset("""isolated_proof_registration_changed isolated_proof_driver_changed
 isolated_proof_manifest_changed isolated_proof_code_changed isolated_proof_deadline
@@ -44,8 +44,8 @@ def code_paths():
 
 
 def protocol():
-    return {"schema": "si-isolated-kernel-immutable-proof-policy-v2",
-        "decision": "SI-DEC-20261027-01", "authority_id": "SI-AUTH-20261026-02",
+    return {"schema": "si-isolated-kernel-immutable-proof-policy-v3",
+        "decision": "SI-DEC-20261027-02", "authority_id": "SI-AUTH-20261026-02",
         "driver": DRIVER, "offline_harness": WRAPPER, "storage_policy_sha256": hash_payload(storage.policy()),
         "original_immutable_policy_sha256": hash_payload(base.immutable.policy()),
         "original_observer_policy_sha256": hash_payload(base.transition.policy()),
@@ -56,6 +56,7 @@ def protocol():
         "challenge": ["write_open", "same_mode_fchmod", "fixed_fsetxattr"],
         "required_errno": "EPERM", "old_evidence_reopened": False,
         "original_seal_checks_unchanged": True,
+        "storage_refusal_projection": "original_attach_and_selected_info_hashes_exact_device_mount_join_and_field_names_only",
         "closure": "original_metadata_output_code_exits_then_volume_exit_fresh_final_committed_code_original_seal_and_original_volume_audits",
         "code_paths": list(code_paths()), "authority": authority()}
 
@@ -70,6 +71,7 @@ def failure_summary(error):
         result = storage.failure_summary(error)
     else:
         result = base._failure_summary(error)
+    result["storage_association"] = storage.association_diagnostic()
     if _LAST_TRANSITION is not None:
         try: result["native_transition"] = _LAST_TRANSITION.report()
         except base.transition.TransitionDiagnosticRefusal:
@@ -148,7 +150,7 @@ def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest)
                     trace_report = diagnostic.report()
                     require(trace_report["diagnostic"]["observer_complete"] is True,
                         "isolated_proof_result_missing")
-                    result = {"schema": "si-isolated-kernel-immutable-proof-closed-v2",
+                    result = {"schema": "si-isolated-kernel-immutable-proof-closed-v3",
                         "status": "closed_offline_isolated_new_inode_only", "runtime_head": runtime_head,
                         "actual_remote": actual_remote, "code_identity_sha256": identity,
                         "code_manifest_sha256": hash_payload(complete_code_manifest),
@@ -182,4 +184,5 @@ def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest)
     require(base.previous.count.old.parallel.clock(closed_at) >= started_clock, "isolated_proof_deadline")
     result["closed_at"] = closed_at
     result["isolated_storage_closed_summary_sha256"] = hash_payload(storage_summary)
+    window()
     return result

@@ -10,7 +10,8 @@ LOCAL BACKTEST READINESS FALSE. ACTUAL V3 OBSERVATION ESTABLISHED THE
 IMMUTABLE FLAG THEN OBSERVED ITS LOSS; ACTOR AND HISTORICAL CAUSE UNKNOWN.
 NEW SOURCE RECOVERY REMAINS HELD.
 ISOLATED V1 REFUSED INITIALIZATION WITHOUT CREATING ITS NAMESPACE;
-THE CAUSALLY CORRECTED, SEPARATELY FROZEN V2 IS NOT YET RUN.
+V2 CREATED/ATTACHED ITS EMPTY SYNTHETIC IMAGE BUT REFUSED ASSOCIATION BEFORE
+ANY PROBE FILE; ITS IMAGE/MOUNT ARE PRESERVED. STORAGE CLOSURE IS UNPROVED.
 CLAUDE REVIEW COVERS b648f60..730c59c, NOT THE LATER LOCAL3B0 DIAGNOSTIC COMMIT.
 LATEST OWNER REPORTS QC/SAFARI OCCUPIED: QUANTCONNECT PAUSED BY OWNER
 INCLUDING CAPACITY/METADATA; NO SAFARI, MIA, QC SETUP, UPLOAD, COMPILE OR JOB.
@@ -24280,3 +24281,164 @@ The original V1 and new V2 namespaces remain absent before checkpoint.
 All agents/tests are completed/frozen, all original source/custody checks
 unchanged. Final record/whitespace and concurrency guards precede the new
 checkpoint and ONE V2 dispatch. The actual result must be appended afterward.
+
+### 128.8 Actual V2 association refusal; original image/mount retained
+
+The separately registered V2 execution59944 at exact clean
+`9b3668a69366952d9275f01401a6a6ccc04db40a`, actual/tracking originD6AF,
+terminated **exit2**. Original safe refusal: local_contract_refusal /
+isolated_image_association_refused / errno null; last permitted hdiutil
+verb info. Genuine projected counters: Git609, create1, attach1, info3,
+null_stream5, probe_create0/probe_write_challenge0; all nine denied counters0,
+failure_latched=false. This proves the audit-recursion correction progressed
+through original code custody and local creation/attachment; it is NOT a
+metadata/flag proof or source admission. No new source/key/provider/START/
+claim/charge/outcome/QC action occurred. No synthetic proof inode was written.
+
+Main's subsequent guarded READONLY diagnostic selected exactly one matching
+image, verified the namespace has exactly backing.sparseimage and mount,
+and found no probe. It projected only selected field NAMES and fixed
+identity/protection booleans, never device/path/UID values or source rows.
+There are no shadow-path/shadow-file keys. The selected info response has
+five dev-entry/content-hint entities; the final one also has mount-point
+and matches the fixed mount and native mounted_from. NONE has volume-kind.
+Readonly fstatfs64 confirms APFS/local/nobrowse/owners-honored, not readonly,
+current mount owner/root UID, exact mounted_on and separate hosting device.
+However the mounted root's mode0700 predicate is FALSE. Do not silently
+accept that root or claim create's -mode argument proved its permission.
+
+Original V2 attach tuples were NOT persisted or projected at the failed
+comparison. This later stable info observation does NOT identify the exact
+original mismatching field, change the V2 refusal, qualify the existing
+image or authorize another blind namespace attempt. Keep V2 image/mount
+and all failed evidence untouched: no reattach, chmod, detach, write,
+adoption, reseal, reset or cleanup. No native immutable setter was called.
+
+Next bounded work is causal interface/creation-policy analysis: distinguish
+optional descriptive attach/info schema fields from original device/mount
+identity, and ENFORCE rather than infer0700 on a future exclusively created
+owned root BEFORE any evidence inode. Any correction must retain/strengthen
+native APFS/owner/local/FSID/device/backing provenance and every original
+file/flag/8second/terminal gate; no missing property may be caller-defaulted.
+Freeze and causally test any successor prospectively. No further actual
+operation is authorized merely by this failed result or later observation.
+
+### 128.9 Prospective V3 association and fresh-root correction
+
+**SI-DEC-20261027-02**, continuing SI-AUTH-20261026-02, freezes a separately
+registered NONCLAIM V3 ONLY after the following causal software corrections,
+complete focused checks and a new clean committed64-file mapping. New fixed
+namespace isolated-custody-20261027-v3 / SI_OFFLINE_CUSTODY_V3 is exclusive to
+that future invocation. V1 and V2 remain retired; the existing V2 image and
+mounted root are NEVER changed, adopted, remounted, detached or retried.
+No V3 operation is run at this entry.
+
+**SI-BUILD-20261027-003 (P2, interface binding):** old fixtures reused one
+identical attach/info dictionary, hiding their distinct producer schemas.
+The old full mounted-tuple comparison necessarily refused valid optional
+APFS presentation variants in fabricated distinct-producer cases. Local
+hdiutil documentation describes content hints as GUIDs or human-readable
+mappings; Apple's driver identifies41504653-0000-11AA-AA11-00306543ECAC and
+the APFS reference identifies7C3457EF-0000-11AA-AA11-00306543ECAC. These
+public descriptors alone are NOT filesystem/device proof. Preserve BOTH
+complete original raw outputs and parsed tuples, join EXACT unique original
+device/mount identities, require the attach-device subset and one mounted
+root, and reject unknown or contradictory mounted APFS descriptors. Require
+independent native APFS/local/owner/FSID/name/RW/ownership checks PLUS a
+nofollow BLOCK-node witness whose rdev equals the mounted original root's
+device. Pin that node's original dev/ino/rdev/mode/UID/GID and recheck through
+terminal closure; NEVER open/read a raw device. Later selected-image identity
+and complete raw descriptor tuples must stay EXACT to their initial origin,
+without normalization/rebaseline on rechecks. Whole global info-output hashes
+remain original provenance; unrelated images are not this volume's identity.
+This establishes a sound prospective binding, not the unpersisted exact V2
+mismatching field or any historical custody actor/cause.
+
+**SI-BUILD-20261027-004 (P2, fresh creation protection):** V2's actual mounted
+root was0755 despite create's -mode0700 argument. For ONLY a future newly
+created root, require exact original FD/name/native/block-node/UID identity
+and every association check FIRST, then enforce0700 ONCE on that original
+fresh FD before any evidence inode. Verify unchanged identity/native bindings
+afterward and freeze the resulting original0700 pin. Unknown modes, ownership,
+devices, contradictory descriptors or later drift refuse; no old failed root
+receives this preparation. Author's separate-producer variants and fresh0755
+case were RED **3failed/47deselected/.51s** before003/004; this is fabricated
+causal evidence, not actual V2 trace recovery or actual V3 qualification.
+
+Original-association refusal diagnostics now retain issued canonical safe
+hashes/counts/exact-join booleans and mismatching FIELD NAMES only, before
+the original comparison can abort. Never emit raw device/path/UID values,
+dynamic exception types or formatted exception strings. Main's driver and
+own-harness projection tests were RED **2failed/.60s** before the correction,
+then green with the terminal-clock regression **3passed/1.24s**. Original
+native setter, observer catalogue, seal/flags/bytes,8second creator window,
+5second checked hold,300/420second storage/proof windows and source denials
+remain unchanged. This new diagnostic is not an admission capability.
+
+**SI-BUILD-20261027-005 (P2, terminal deadline):** internal read-only peer
+identified that the last proof deadline check preceded final UTC sampling.
+Main's fabricated late final-clock case was RED **1failed/1.25s**: a421second
+delay could return a positive result. Add the original monotonic window check
+after final UTC validation/summary hashing and immediately before return.
+No deadline is enlarged. All delegated work here is internal development,
+not Claude independent review. Final pins, validation and actual disposition
+must follow; current local pre-QC readiness remains FALSE and every source
+request/claim/START/charge/outcome/QC counter in this round remains0.
+
+**SI-BUILD-20261027-006 (P2, corrected before release):** Main found that the
+new root's creation observation recorded GID but later checks compared only
+the older dev/ino/UID/mode tuple. Author's late-GID case was RED1/.34s, then
+corrected by comparing BOTH original FD/name dev/ino/UID/GID against the
+original creation pin alongside the unchanged0700 check. Final author-only
+isolated-helper selection passed **79/.52s**, OS network denied. Intermediate
+expanded fabricated cases initially failed3/74passed/.62s because the fake
+plist producer encoded Python None instead of ABSENT optional keys; correct
+the producer, preserve the strict consumer/assertions. No real operation was
+performed and neither result proves actual V3 closure.
+
+Primary interface references: installed macOS hdiutil manual;
+[Apple filesystem driver content hint](https://raw.githubusercontent.com/apple-oss-distributions/AppleFileSystemDriver/main/Info.plist),
+[Apple File System Reference](https://developer.apple.com/support/downloads/Apple-File-System-Reference.pdf)
+and installed SDK sys/mount.h. No provider/market data or QC/Safari was used.
+
+### 128.10 Frozen V3 registration and pre-release validation
+
+Proof protocol SHA256
+`0e334f0018fad61e35a1b8b211a1c0a72834e566eb822ad41325c1b13756d03a`;
+isolated-storage policy
+`da6375c0fa5297427409c3a9f52e62bb77e9854a0335edc2a8e015b430051fa4`;
+offline harness policy
+`3cd41ae6bcbcedb6cedd78d9f410fcd3c7706ff85191ffd68b134fc23d814fe5`.
+Exact64-path transitive AST list stays
+`0be79b48af5c30bbe96cc52fee3ca3f1561a7f03b7de658cb5b953272f6e0922`;
+complete64-current-byte mapping is
+`f228a4c5b4f48a3fada283c24c958a46f1c8080b46dc66816f43db928d402b66`.
+Schemas advance to storage/proof/harness v3; safe association diagnostic has
+its own v1 schema. All original capture/source/creator/immutable/transition
+modules remain byte-unchanged. Main read the complete helper/driver/wrapper
+and their tests. Independent read-only development peer found no remaining
+actionable issue after005/006; it ran no tests/operations or edits. Only
+prospective hash literals changed after that review; no Claude review is
+claimed or required by the owner's current waiver.
+
+Main fresh-process focused selection (eleven files plus three named active
+document checks): **363passed/19.58s**, no skips/warnings, empty inherited
+environment and OS network denied. Exact transitive64-source AST closure,
+source/three-test in-memory compile, all new literal contract catalogues,
+wrapper's absence of audited id() calls and diff whitespace passed. Both
+historical126 block hashes passed their pinned regressions. No full lane or
+repository suite was run. This is software validation, not empirical source
+or storage qualification.
+
+No actual V3 invocation has occurred at this entry. After record-only checks,
+verify exact physical/Git roots, branch, HEAD/status and matching actual/
+tracking originD6AF immediately before a new local checkpoint. Require the
+new fixed V3 namespace wholly absent, all agents/tests frozen, then dispatch
+the registered CLI ONCE with that checkpoint's full hash and originD6AF.
+No edits/tests/commits/pushes while pinned. Preserve every original artifact
+and mount on either outcome. Actual exit0 AND genuine complete original
+closed proof/counters are required; any refusal/nonzero/unknown termination
+vetoes positives. Authenticate and append actual disposition before another
+bounded step. No interim push or source request/claim follows by inference.
+The84,005 cumulative START/4GiB ceilings and13,992START/23,452,681byte baseline
+remain unchanged; current pre-QC readiness is FALSE.

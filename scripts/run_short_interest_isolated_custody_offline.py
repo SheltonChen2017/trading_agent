@@ -17,7 +17,7 @@ from data.hashing import canonical_json, hash_bytes, hash_payload
 from scripts import diagnose_short_interest_isolated_immutable_metadata as proof
 
 DRIVER = "scripts/run_short_interest_isolated_custody_offline.py"
-HARNESS_SHA256 = "48536fb87e405e6a1c43edd07b6e37dee336559122b1e31e1ca73c94cc0b6fae"
+HARNESS_SHA256 = "3cd41ae6bcbcedb6cedd78d9f410fcd3c7706ff85191ffd68b134fc23d814fe5"
 MAXIMUM_GIT_COMMANDS, MAXIMUM_INFO_COMMANDS = 20000, 12
 _INVOKED = False
 _ORIGINAL, _COUNTS, _ACTIVE, _FAILED = {}, {}, {}, {}
@@ -41,7 +41,7 @@ def require(value, code):
 def policy():
     require((MAXIMUM_GIT_COMMANDS, MAXIMUM_INFO_COMMANDS) == (20000, 12),
         "harness_registration_changed")
-    return {"schema": "si-isolated-custody-offline-harness-v2", "driver": DRIVER,
+    return {"schema": "si-isolated-custody-offline-harness-v3", "driver": DRIVER,
         "root": str(proof.base.previous.lane.ROOT), "branch": "codex/strategy-short-interest",
         "ref": "refs/heads/codex/strategy-short-interest", "code_paths": list(proof.code_paths()),
         "proof_protocol_sha256": proof.PROTOCOL_SHA256,
@@ -58,7 +58,7 @@ def policy():
         "metadata_audit_limit": "stat_and_directory_metadata_not_independently_sandboxed_original_authenticated_code_and_FD_checks_remain",
         "audit_state": "original_identity_counter_tuples_and_permanent_failure_latch_no_public_reset_or_active_toggle",
         "registry_keys": "original_objects_retained_with_default_object_identity_hash_no_audited_builtin_id",
-        "refusal_projection": "after_failed_driver_contexts_unwind_deactivate_hook_only_preserve_all_denials_then_fixed_projection",
+        "refusal_projection": "after_failed_driver_contexts_unwind_deactivate_hook_only_preserve_all_denials_then_fixed_projection_including_original_safe_storage_association",
         "destructive_operations": "denied_no_cleanup_detach_unlock_or_adoption",
         "denied_counter_names": list(DENIED), "authority": proof.authority()}
 
@@ -313,7 +313,7 @@ def _validate_result(result, seams, head, remote, manifest):
         "original_code_and_metadata_contexts_closed", "authority", "closed_at",
         "isolated_storage_closed_summary_sha256"}
     require(type(result) is dict and set(result) == fields
-        and result.get("schema") == "si-isolated-kernel-immutable-proof-closed-v2"
+        and result.get("schema") == "si-isolated-kernel-immutable-proof-closed-v3"
         and result.get("status") == "closed_offline_isolated_new_inode_only"
         and result.get("runtime_head") == head and result.get("actual_remote") == remote
         and result.get("code_manifest_sha256") == hash_payload(manifest)
@@ -372,7 +372,8 @@ def _failure(error):
     if type(error) is OfflineHarnessRefusal:
         args = BaseException.args.__get__(error, BaseException)
         code = next((value for value in _CODES if args == ("REFUSED: " + value,)), None)
-        return {"category": "offline_harness_refusal", "contract_code": code, "errno_name": None}
+        return {"category": "offline_harness_refusal", "contract_code": code, "errno_name": None,
+            "storage_association": proof.storage.association_diagnostic()}
     return proof.failure_summary(error)
 
 
@@ -408,7 +409,7 @@ def main(argv=None):
     if type(values) not in (list, tuple) or len(values) != 2:
         print(canonical_json({"status": "refused", "failure": {"contract_code": "harness_arguments_refused"}}), flush=True)
         return 2
-    print(canonical_json({"status": "starting", "schema": "si-isolated-custody-offline-harness-v2"}), flush=True)
+    print(canonical_json({"status": "starting", "schema": "si-isolated-custody-offline-harness-v3"}), flush=True)
     try: result = run_once(values[0], values[1])
     except BaseException as error:
         result = {"status": "refused", "failure": _failure(error)}

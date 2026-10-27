@@ -19,11 +19,11 @@ import subprocess
 import sys
 import time
 
-from data.hashing import canonical_json, hash_payload
+from data.hashing import canonical_json, hash_bytes, hash_payload
 
 ROOT = Path("/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__short_interest")
 PARENT = Path("artifacts/short_interest/native_reported_counts")
-NAMESPACE = "isolated-custody-20261027-v2"
+NAMESPACE = "isolated-custody-20261027-v3"
 IMAGE_NAME, MOUNT_NAME = "backing.sparseimage", "mount"
 HDIUTIL, LIBRARY = "/usr/bin/hdiutil", "/usr/lib/libSystem.B.dylib"
 VIRTUAL_BYTES = 8 * 1024 ** 3
@@ -33,6 +33,9 @@ MNT_RDONLY, MNT_LOCAL = 0x00000001, 0x00001000
 MNT_DONTBROWSE, MNT_IGNORE_OWNERSHIP = 0x00100000, 0x00200000
 _MINTED, _ISSUED, _FAILED = {}, {}, set()
 _FROZEN, _CLOCKS, _COMMANDS = {}, {}, {}
+_ORIGIN_ISSUED, _STATE_ORIGINS, _ASSOCIATION_ISSUED = {}, {}, {}
+_ROOT_ENFORCEMENTS = {}
+_LAST_ASSOCIATION = None
 _USED = False
 _CODES = frozenset("""isolated_platform_refused isolated_native_unavailable isolated_native_result_refused
 isolated_native_string_refused isolated_root_changed isolated_policy_changed isolated_deadline
@@ -46,7 +49,9 @@ isolated_not_live isolated_not_closed isolated_already_used isolated_close_faile
 isolated_mount_not_apfs isolated_mount_owner_refused
 isolated_mount_not_local isolated_mount_browse_refused isolated_mount_ownership_ignored
 isolated_mount_readonly isolated_mount_name_changed isolated_mount_device_changed
-isolated_mount_native_identity_changed""".split())
+isolated_mount_native_identity_changed isolated_origin_refused isolated_descriptor_refused
+isolated_device_node_refused isolated_device_node_changed isolated_new_root_mode_refused
+isolated_new_root_identity_changed isolated_new_root_enforcement_repeated""".split())
 _ERRNOS = {getattr(errno, name): name for name in (
     "EACCES", "EPERM", "EEXIST", "ENOENT", "ENOSPC", "EIO", "EBADF", "EINVAL", "ENOTSUP")
     if hasattr(errno, name)}
@@ -89,16 +94,17 @@ def policy():
         and MAXIMUM_PLIST_BYTES == 4 * 1024 ** 2 and MAXIMUM_IMAGES == 256 and MAXIMUM_ENTITIES == 64
         and HDIUTIL == "/usr/bin/hdiutil" and LIBRARY == "/usr/lib/libSystem.B.dylib"
         and PARENT == Path("artifacts/short_interest/native_reported_counts")
-        and NAMESPACE == "isolated-custody-20261027-v2" and IMAGE_NAME == "backing.sparseimage"
+        and NAMESPACE == "isolated-custody-20261027-v3" and IMAGE_NAME == "backing.sparseimage"
         and MOUNT_NAME == "mount"
         and (MNT_RDONLY, MNT_LOCAL, MNT_DONTBROWSE, MNT_IGNORE_OWNERSHIP)
             == (0x00000001, 0x00001000, 0x00100000, 0x00200000), "isolated_policy_changed")
-    return {"schema": "si-isolated-custody-volume-policy-v2", "root": str(ROOT),
+    return {"schema": "si-isolated-custody-volume-policy-v3", "root": str(ROOT),
         "parent": str(PARENT), "namespace": NAMESPACE, "image": IMAGE_NAME, "mount": MOUNT_NAME,
         "virtual_bytes": VIRTUAL_BYTES, "filesystem": "APFS", "image_type": "SPARSE",
         "purpose": "finite_synthetic_intermediate_only_not_durable_production_storage",
         "spotlight_index_creation": False,
-        "volume_name": "SI_OFFLINE_CUSTODY_V2", "failed_v1_namespace_retired_even_if_absent": True,
+        "volume_name": "SI_OFFLINE_CUSTODY_V3", "failed_v1_namespace_retired_even_if_absent": True,
+        "failed_v2_image_and_mount_never_modified_or_adopted": True,
         "maximum_seconds": MAXIMUM_SECONDS, "subprocess_seconds": SUBPROCESS_SECONDS,
         "maximum_plist_bytes": MAXIMUM_PLIST_BYTES, "maximum_images": MAXIMUM_IMAGES,
         "plist_limit_kind": "post_capture_acceptance_not_hard_capture_memory_bound",
@@ -107,8 +113,16 @@ def policy():
         "mount_masks": {"readonly": MNT_RDONLY, "local": MNT_LOCAL,
             "dontbrowse": MNT_DONTBROWSE, "ignore_ownership": MNT_IGNORE_OWNERSHIP},
         "native": "SDK_statfs64_size2168_fixed_libSystem_fstatfs64_int_int_pointer",
-        "ownership": "create_root_current_uid_gid_0700_attach_owners_on_native_no_ignore_ownership",
+        "ownership": "fresh_root_UID_native_identity_and_blocknode_before_one_original_FD_fchmod0700_then_original_pin",
         "mount": "fixed_nobrowse_noautoopen_local_APFS_original_device_fsid_and_root_identity",
+        "device_node": "nofollow_block_device_original_dev_ino_rdev_mode_uid_gid_rdev_equals_mount_dev_never_open_device",
+        "cross_origin_association": "exact_unique_device_mount_join_with_native_APFS_blocknode_witness_not_optional_vendor_text_equality",
+        "mounted_content_hints": [None, "Apple_APFS", "Apple_APFS_Volume",
+            "41504653-0000-11AA-AA11-00306543ECAC", "7C3457EF-0000-11AA-AA11-00306543ECAC"],
+        "hint_GUID_case": "ASCII_hex_case_only", "mounted_volume_kinds": [None, "apfs"],
+        "origin_custody": "both_original_full_raw_outputs_and_parsed_tuples_retained_later_selected_info_raw_identity_exact",
+        "association_projection": "original_issued_canonical_bytes_hashes_counts_booleans_fixed_field_names_only_false_authority",
+        "fresh_root_initial_modes": [0o700, 0o755], "fresh_root_mode_enforcements": 1,
         "backing": "current_uid_0600_singlelink_original_inode_mutable_container_size_times_not_evidence_seal",
         "inner_evidence": "all_original_checks_unchanged_no_adoption_reseal_or_flag_clearing",
         "creation": "new_namespace_and_backing_only_no_overwrite_retry_shadow_copy_or_cleanup",
@@ -191,7 +205,13 @@ def _fixed_state(state):
         "under_mount_fd": state["under_mount_fd"], "under_mount_pin": state["under_mount_pin"],
         "device": state["device"], "attach_entities": state["attach_entities"],
         "mount_fd": state["mount_fd"], "mount_pin": state["mount_pin"],
-        "mount_native": state["mount_native"], "info_entities": state["info_entities"]}
+        "mount_native": state["mount_native"], "info_entities": state["info_entities"],
+        "device_node_pin": state["device_node_pin"], "root_creation_pin": state["root_creation_pin"],
+        "root_mode_enforced": state["root_mode_enforced"],
+        "root_enforcement_record": _root_enforcement_record(state),
+        "attach_origin": _origin_pin(state, state["attach_origin"], "attach"),
+        "info_origin": _origin_pin(state, state["info_origin"], "info"),
+        "selected_info_identity": state["selected_info_identity"]}
 
 
 def _original_state(state):
@@ -224,7 +244,7 @@ def _arguments(state, verb):
     if verb == "create":
         return [HDIUTIL, "create", "-type", "SPARSE", "-size", "8g", "-fs", "APFS",
             "-uid", str(os.getuid()), "-gid", str(os.getgid()), "-mode", "0700",
-            "-volname", "SI_OFFLINE_CUSTODY_V2", "-nospotlight", "-plist", image]
+            "-volname", "SI_OFFLINE_CUSTODY_V3", "-nospotlight", "-plist", image]
     if verb == "attach":
         return [HDIUTIL, "attach", "-mountpoint", mount, "-mount", "required", "-nobrowse",
             "-owners", "on", "-noautoopen", "-noautoopenro", "-noautoopenrw", "-plist", image]
@@ -256,7 +276,85 @@ def _run(state, verb):
         and tuple(state["commands"]) == original[1], "isolated_capability_changed")
     state["commands"].append(verb)
     _COMMANDS[id(state)] = state, (*original[1], verb)
+    token = object()
+    _ORIGIN_ISSUED[token] = state, verb, result.stdout, hash_payload(_arguments(state, verb))
+    existing = _STATE_ORIGINS.get(id(state), (state, ()))
+    require(existing[0] is state, "isolated_origin_refused")
+    _STATE_ORIGINS[id(state)] = state, (*existing[1], token)
+    state["last_origin"] = token
     return payload
+
+
+def _origin_data(state, token, verb):
+    row, original = _ORIGIN_ISSUED.get(token), _STATE_ORIGINS.get(id(state))
+    require(type(row) is tuple and len(row) == 4 and row[0] is state and row[1] == verb
+        and type(row[2]) is bytes and 0 < len(row[2]) <= MAXIMUM_PLIST_BYTES
+        and type(original) is tuple and original[0] is state and token in original[1], "isolated_origin_refused")
+    return row
+
+
+def _origin_pin(state, token, verb):
+    row = _origin_data(state, token, verb)
+    return row[1], hash_bytes(row[2]), row[3]
+
+
+def association_diagnostic():
+    """Copy of an ORIGINAL privately issued observation, never caller payload."""
+    if _LAST_ASSOCIATION is None:
+        return {"schema": "si-isolated-association-diagnostic-v1", "status": "not_observed",
+            "authority": authority()}
+    row = _ASSOCIATION_ISSUED.get(_LAST_ASSOCIATION)
+    require(type(row) is tuple and len(row) == 2 and row[0] is _LAST_ASSOCIATION
+        and type(row[1]) is bytes, "isolated_origin_refused")
+    return json.loads(row[1])
+
+
+def _issue_association(state, info_origin=None):
+    """Project the actual original two command outputs BEFORE any join refusal."""
+    global _LAST_ASSOCIATION
+    attach_raw = _origin_data(state, state["attach_origin"], "attach")[2]
+    attach_payload = plistlib.loads(attach_raw)
+    info_raw = None if info_origin is None else _origin_data(state, info_origin, "info")[2]
+    info_payload = None if info_raw is None else plistlib.loads(info_raw)
+    mismatch, attach, selected, matching = set(), None, None, []
+    try: attach = _entities(attach_payload)
+    except IsolatedVolumeRefusal: mismatch.add("system-entities")
+    valid_images = (type(info_payload) is dict and type(info_payload.get("images")) is list
+        and len(info_payload["images"]) <= MAXIMUM_IMAGES)
+    if valid_images:
+        matching = [item for item in info_payload["images"] if type(item) is dict
+            and item.get("image-path") == str(state["image"])]
+        if len(matching) == 1:
+            try: selected = _entities(matching[0])
+            except IsolatedVolumeRefusal: mismatch.add("system-entities")
+            if any(key in matching[0] for key in ("shadow-path", "shadow-file")): mismatch.add("shadow")
+        else: mismatch.add("image-path")
+    elif info_origin is not None: mismatch.add("images")
+    attached_mounts = () if attach is None else tuple(row for row in attach if row[3] is not None)
+    info_mounts = () if selected is None else tuple(row for row in selected if row[3] is not None)
+    one_each = len(attached_mounts) == len(info_mounts) == 1
+    if one_each:
+        for index, name in enumerate(("dev-entry", "content-hint", "volume-kind", "mount-point")):
+            if attached_mounts[0][index] != info_mounts[0][index]: mismatch.add(name)
+    report = {"schema": "si-isolated-association-diagnostic-v1", "status": "original_origins_observed",
+        "attach_raw_sha256": hash_bytes(attach_raw),
+        "info_raw_sha256": None if info_raw is None else hash_bytes(info_raw),
+        "attach_parsed_sha256": None if attach is None else hash_payload(attach),
+        "info_parsed_sha256": None if selected is None else hash_payload(selected),
+        "attach_entity_count": None if attach is None else len(attach),
+        "info_entity_count": None if selected is None else len(selected),
+        "matching_image_count": len(matching) if valid_images else None,
+        "original_shapes_valid": attach is not None and selected is not None,
+        "attach_devices_subset": attach is not None and selected is not None
+            and {row[0] for row in attach} <= {row[0] for row in selected},
+        "unique_mounted_origins": one_each,
+        "mounted_devices_equal": one_each and attached_mounts[0][0] == info_mounts[0][0],
+        "mount_points_equal": one_each and attached_mounts[0][3] == info_mounts[0][3],
+        "fixed_mount_matches": one_each and attached_mounts[0][3] == info_mounts[0][3] == str(state["mount"]),
+        "vendor_text_equal": one_each and attached_mounts[0][1:3] == info_mounts[0][1:3],
+        "mismatching_field_names": sorted(mismatch), "authority": authority()}
+    token = object(); _ASSOCIATION_ISSUED[token] = token, canonical_json(report).encode()
+    _LAST_ASSOCIATION = token
 
 
 def _entities(value):
@@ -277,6 +375,8 @@ def _entities(value):
 
 def _selected_image(state, *, absent=False):
     payload = _run(state, "info")
+    if "attach_origin" in state and "info_origin" not in state:
+        _issue_association(state, state["last_origin"])
     require(type(payload) is dict and type(payload.get("images")) is list
         and len(payload["images"]) <= MAXIMUM_IMAGES, "isolated_image_association_refused")
     matching = []
@@ -290,7 +390,89 @@ def _selected_image(state, *, absent=False):
     image = matching[0]
     # Any alternate writable overlay would invalidate backing-image attribution.
     require(not any(key in image for key in ("shadow-path", "shadow-file")), "isolated_image_association_refused")
+    identity = hash_bytes(plistlib.dumps(image, fmt=plistlib.FMT_BINARY, sort_keys=True))
+    if "selected_info_identity" in state:
+        require(identity == state["selected_info_identity"], "isolated_image_association_refused")
+    state["last_selected_info_identity"] = identity
     return _entities(image)
+
+
+def _mounted_descriptor(row):
+    hint, kind = row[1:3]
+    known = hint is None or hint in {"Apple_APFS", "Apple_APFS_Volume"}
+    if type(hint) is str and re.fullmatch(r"[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}", hint):
+        known = hint.upper() in {"41504653-0000-11AA-AA11-00306543ECAC", "7C3457EF-0000-11AA-AA11-00306543ECAC"}
+    require(known and kind in (None, "apfs"), "isolated_descriptor_refused")
+
+
+def _device_node_stat(device):
+    """Metadata only. NEVER open or read a block device."""
+    require(type(device) is str and re.fullmatch(r"/dev/disk[0-9]+(?:s[0-9]+)*", device),
+        "isolated_device_node_refused")
+    return Path(device).lstat()
+
+
+def _node_pin(device, mount_device):
+    info = _device_node_stat(device)
+    values = info.st_dev, info.st_ino, info.st_rdev, info.st_mode, info.st_uid, info.st_gid
+    require(stat.S_ISBLK(info.st_mode) and all(type(value) is int and value >= 0 for value in values)
+        and info.st_rdev == mount_device, "isolated_device_node_refused")
+    return values
+
+
+def _native_contract(state, native):
+    require(native["fstype"] == "apfs", "isolated_mount_not_apfs")
+    require(native["owner"] == os.getuid(), "isolated_mount_owner_refused")
+    require(native["flags"] & MNT_LOCAL, "isolated_mount_not_local")
+    require(native["flags"] & MNT_DONTBROWSE, "isolated_mount_browse_refused")
+    require(not native["flags"] & MNT_IGNORE_OWNERSHIP, "isolated_mount_ownership_ignored")
+    require(not native["flags"] & MNT_RDONLY, "isolated_mount_readonly")
+    require(native["mounted_on"] == str(state["mount"]), "isolated_mount_name_changed")
+    require(native["mounted_from"] == state["device"], "isolated_mount_device_changed")
+    require(_mount_identity(native) == state["mount_native"], "isolated_mount_native_identity_changed")
+
+
+def _fresh_root_identity(info):
+    require(stat.S_ISDIR(info.st_mode) and info.st_uid == os.getuid()
+        and stat.S_IMODE(info.st_mode) in (0o700, 0o755), "isolated_new_root_mode_refused")
+    return info.st_dev, info.st_ino, info.st_uid, info.st_gid
+
+
+def _root_enforcement_record(state):
+    row = _ROOT_ENFORCEMENTS.get(id(state))
+    require(type(row) is tuple and len(row) == 3 and row[0] is state
+        and row[1] == state["mount_fd"] and row[2] == state["root_creation_pin"][:4],
+        "isolated_new_root_identity_changed")
+    return row[1], row[2]
+
+
+def _enforce_new_root(state, fd):
+    # This is construction of THIS invocation's fresh mounted root, never a
+    # permission correction of an old image, failed proof, source or claim.
+    require(id(state) not in _ROOT_ENFORCEMENTS, "isolated_new_root_enforcement_repeated")
+    before, named = os.fstat(fd), state["mount"].lstat()
+    original = _fresh_root_identity(before)
+    require(_fresh_root_identity(named) == original and before.st_dev != state["host_device"]
+        and state["mount"].resolve() == state["mount"], "isolated_new_root_identity_changed")
+    native = _native_statfs(fd); _native_contract(state, native)
+    node = _node_pin(state["device"], before.st_dev)
+    _check_parents(state)
+    require(_selected_image(state) == state["info_entities"], "isolated_image_association_refused")
+    require(_fresh_root_identity(os.fstat(fd)) == _fresh_root_identity(state["mount"].lstat()) == original,
+        "isolated_new_root_identity_changed")
+    _native_contract(state, _native_statfs(fd))
+    require(_node_pin(state["device"], before.st_dev) == node, "isolated_device_node_changed")
+    # Exactly ONE real original-FD mode operation, before the caller receives
+    # a capability or can create even the synthetic probe on the mounted FS.
+    _ROOT_ENFORCEMENTS[id(state)] = state, fd, original
+    os.fchmod(fd, 0o700); os.fsync(fd)
+    require(_directory(os.fstat(fd)) == _directory(state["mount"].lstat())
+        and _fresh_root_identity(os.fstat(fd)) == original, "isolated_new_root_identity_changed")
+    require(_mount_identity(_native_statfs(fd)) == _mount_identity(native),
+        "isolated_mount_native_identity_changed")
+    require(_node_pin(state["device"], before.st_dev) == node, "isolated_device_node_changed")
+    state.update(device_node_pin=node, root_creation_pin=(*original, stat.S_IMODE(before.st_mode)),
+        root_mode_enforced=True, mount_pin=_directory(os.fstat(fd)))
 
 
 def _check_parents(state):
@@ -314,15 +496,10 @@ def _check_mount(state, fd, *, info=False):
     require(state["mount"].resolve() == state["mount"] and _directory(named)
         == _directory(os.fstat(fd)) == state["mount_pin"]
         and named.st_dev != state["host_device"], "isolated_mount_association_refused")
-    require(native["fstype"] == "apfs", "isolated_mount_not_apfs")
-    require(native["owner"] == os.getuid(), "isolated_mount_owner_refused")
-    require(native["flags"] & MNT_LOCAL, "isolated_mount_not_local")
-    require(native["flags"] & MNT_DONTBROWSE, "isolated_mount_browse_refused")
-    require(not native["flags"] & MNT_IGNORE_OWNERSHIP, "isolated_mount_ownership_ignored")
-    require(not native["flags"] & MNT_RDONLY, "isolated_mount_readonly")
-    require(native["mounted_on"] == str(state["mount"]), "isolated_mount_name_changed")
-    require(native["mounted_from"] == state["device"], "isolated_mount_device_changed")
-    require(_mount_identity(native) == state["mount_native"], "isolated_mount_native_identity_changed")
+    require(_fresh_root_identity(os.fstat(fd)) == _fresh_root_identity(named)
+        == state["root_creation_pin"][:4], "isolated_new_root_identity_changed")
+    _native_contract(state, native)
+    require(_node_pin(state["device"], named.st_dev) == state["device_node_pin"], "isolated_device_node_changed")
     if info:
         require(_selected_image(state) == state["info_entities"], "isolated_image_association_refused")
     _boundary(state)
@@ -413,7 +590,7 @@ def _summary(state, status):
     original = _COMMANDS.get(id(state))
     require(type(original) is tuple and len(original) == 2 and original[0] is state
         and tuple(state["commands"]) == original[1], "isolated_capability_changed")
-    return {"schema": "si-isolated-custody-volume-observation-v2", "status": status,
+    return {"schema": "si-isolated-custody-volume-observation-v3", "status": status,
         "policy_sha256": state["policy"], "virtual_bytes": VIRTUAL_BYTES,
         "filesystem_APFS": True, "owners_honored": True, "local_filesystem": True,
         "nobrowse": True, "separate_host_device": True, "root_protection_verified": True,
@@ -421,6 +598,13 @@ def _summary(state, status):
         "mount_identity_sha256": hash_payload(state["mount_pin"]),
         "filesystem_identity_sha256": hash_payload(state["mount_native"]),
         "attach_entities_sha256": hash_payload(state["attach_entities"]),
+        "info_entities_sha256": hash_payload(state["info_entities"]),
+        "attach_original_raw_sha256": _origin_pin(state, state["attach_origin"], "attach")[1],
+        "info_original_raw_sha256": _origin_pin(state, state["info_origin"], "info")[1],
+        "selected_info_original_identity_sha256": state["selected_info_identity"],
+        "device_node_original_identity_sha256": hash_payload(state["device_node_pin"]),
+        "root_creation_identity_sha256": hash_payload(state["root_creation_pin"]),
+        "root_mode_enforced_before_probe": state["root_mode_enforced"],
         "commands": list(state["commands"]), "container_is_immutable_evidence": False,
         "authority": authority()}
 
@@ -432,11 +616,12 @@ def prepare_registered_volume(root, *, boundary, monotonic=time.monotonic):
     The caller nests all code and inner-file contexts inside this context.
     Neither context exit nor any failure detaches, clears flags or removes data.
     """
-    global _USED
+    global _USED, _LAST_ASSOCIATION
     _platform(); require(type(root) is type(ROOT) and root == ROOT and root.is_absolute()
         and root.resolve() == root and Path.cwd().resolve() == root, "isolated_root_changed")
     require(callable(boundary) and callable(monotonic), "isolated_capability_changed")
     require(not _USED, "isolated_already_used"); _USED = True
+    _LAST_ASSOCIATION = None
     begin = monotonic()
     require(type(begin) in (int, float) and not isinstance(begin, bool) and math.isfinite(begin),
         "isolated_clock_refused")
@@ -489,15 +674,24 @@ def prepare_registered_volume(root, *, boundary, monotonic=time.monotonic):
         state.update(under_mount_fd=under_fd, under_mount_pin=_directory(os.fstat(under_fd)))
         require(not os.listdir(under_fd), "isolated_mount_preexists")
         _check_parents(state); _selected_image(state, absent=True)
-        attached = _entities(_run(state, "attach"))
+        attached_payload = _run(state, "attach")
+        state["attach_origin"] = state["last_origin"]
+        _issue_association(state)
+        attached = _entities(attached_payload)
         mounted = tuple(row for row in attached if row[3] is not None)
         require(len(mounted) == 1 and mounted[0][3] == str(state["mount"]),
             "isolated_attach_association_refused")
         state.update(device=mounted[0][0], attach_entities=attached)
         info_entities = _selected_image(state)
+        state.update(info_origin=state["last_origin"], selected_info_identity=state["last_selected_info_identity"])
+        info_mounted = tuple(row for row in info_entities if row[3] is not None)
         require({row[0] for row in attached} <= {row[0] for row in info_entities}
-            and tuple(row for row in info_entities if row[3] is not None) == mounted,
+            and len(info_mounted) == 1 and info_mounted[0][0] == mounted[0][0]
+            and info_mounted[0][3] == mounted[0][3],
             "isolated_image_association_refused")
+        _mounted_descriptor(mounted[0]); _mounted_descriptor(info_mounted[0])
+        require(_entities(plistlib.loads(_origin_data(state, state["attach_origin"], "attach")[2])) == attached,
+            "isolated_origin_refused")
         mount_fd = os.open(MOUNT_NAME, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=namespace_fd)
         descriptors.append(mount_fd)
         native = _native_statfs(mount_fd)
@@ -505,8 +699,8 @@ def prepare_registered_volume(root, *, boundary, monotonic=time.monotonic):
             and 4 * 1024 ** 3 <= native["blocks"] * native["bsize"] <= VIRTUAL_BYTES
             and type(native["bavail"]) is int and native["bavail"] * native["bsize"] >= 4 * 1024 ** 3,
             "isolated_mount_capacity_refused")
-        state.update(mount_fd=mount_fd, mount_pin=_directory(os.fstat(mount_fd)),
-            mount_native=_mount_identity(native), info_entities=info_entities)
+        state.update(mount_fd=mount_fd, mount_native=_mount_identity(native), info_entities=info_entities)
+        _enforce_new_root(state, mount_fd)
         _check_parents(state); _check_mount(state, mount_fd)
         _FROZEN[id(state)] = state, hash_payload(_fixed_state(state))
         capability = object.__new__(IsolatedCustodyVolume); anchor = (object(),)

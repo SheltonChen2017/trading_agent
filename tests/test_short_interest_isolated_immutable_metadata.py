@@ -154,3 +154,22 @@ def test_policy_stays_synthetic_only_with_no_retry_or_old_evidence():
     assert value["retries"] == 0 and value["old_evidence_reopened"] is False
     assert value["original_seal_checks_unchanged"] is True
     assert value["minimum_hold_seconds"] == 5 and value["required_errno"] == "EPERM"
+
+
+def test_fixed_storage_association_survives_failure_without_exception_text(monkeypatch):
+    observation = {"status": "original_association_observed", "mismatching_fields": ["content-hint"]}
+    monkeypatch.setattr(proof.storage, "association_diagnostic", lambda: dict(observation), raising=False)
+    monkeypatch.setattr(proof, "_LAST_TRANSITION", None)
+    result = proof.failure_summary(RuntimeError("PRIVATE DEVICE PATH SECRET"))
+    assert result["storage_association"] == observation
+    assert "PRIVATE" not in str(result) and "SECRET" not in str(result)
+
+
+def test_final_UTC_sampling_delay_cannot_escape_whole_closure_deadline(h, monkeypatch):
+    original = proof.base.previous.prior._utc_now
+    def late_clock():
+        value = original()
+        if h.volume is not None and h.volume.phase == "CLOSED": h.tick += 421
+        return value
+    monkeypatch.setattr(proof.base.previous.prior, "_utc_now", late_clock)
+    with pytest.raises(proof.IsolatedProofRefusal, match="deadline"): h.run()

@@ -1,4 +1,4 @@
-"""Synthetic pure crosswalk policy; no actual source DATA, provider or QC."""
+"""Synthetic V2 original+current vocabulary policy; no actual DATA or operations."""
 import copy
 import hashlib
 import json
@@ -56,7 +56,9 @@ def case():
         f, c = figi(index + 1), cusip(index + 100)
         binding = {'security_id': 'synthetic-security-' + str(index), 'composite_figi': f,
             'row_sha256': hashlib.sha256(('semantic-' + str(index)).encode()).hexdigest(),
-            'candidate_first_session': '2020-12-31', 'candidate_last_session': '2026-10-13'}
+            'candidate_first_session': '2020-12-31', 'candidate_last_session': '2026-10-13',
+            'source_row_sha256': hashlib.sha256(('original-' + str(index)).encode()).hexdigest(),
+            'identity_evidence_sha256': hashlib.sha256(('evidence-' + str(index)).encode()).hexdigest()}
         route = None if index == 2 else {'table': 'stocks',
             'current_metadata_row': {'ticker': 'SHARADAR-' + str(index), 'figi': f},
             'current_cusip_tokens': [c]}
@@ -68,10 +70,11 @@ def case():
     for index, ticker in enumerate(('SPY', 'QQQ')):
         f, c = figi(index + 100), cusip(index + 1000)
         route = {'table': 'funds', 'current_metadata_row': {'ticker': ticker, 'figi': f},
-            'current_cusip_tokens': [c]}
+            'current_cusip_tokens': [c], 'current_exchange_mic': 'ARCX'}
         funds.append({'fund_ordinal': index, 'ticker': ticker, 'disposition': 'routed', 'route': route})
         active.append(catalog(ticker, 'ETF')); mappings.append(mapping(ticker, f, c))
-    return {'frame': {'stocks': stocks, 'funds': funds,
+    originals = {row['binding']['source_row_sha256']: [cusip(index + 100)] for index, row in enumerate(stocks)}
+    return {'originals': originals, 'frame': {'stocks': stocks, 'funds': funds,
                 'binding_contract': {'binding_stream_sha256': m.prices.native.BINDING_STREAM_SHA256}},
         'active': active, 'delisted': [], 'mapping': mappings}
 
@@ -95,14 +98,33 @@ def plan_for(frame):
         'full_axis_sha256': m.prices.FULL_AXIS_SHA256, 'price_sessions': [], 'assignments': assignments, 'requests': []}
 
 
+def aa_for(case):
+    frame = case['frame']
+    stocks = []
+    for row in frame['stocks']:
+        binding = row['binding']
+        tokens = case['originals'][binding['source_row_sha256']]
+        stocks.append({'binding_ordinal': row['binding_ordinal'], 'binding': copy.deepcopy(binding),
+            'original_cusip_tokens': None,  # V2 must derive validated original_row, not trust this field.
+            'original_row': {'currency': 'USD', 'figi': binding['composite_figi'], 'cusips': ','.join(tokens)}})
+    return {'stocks': stocks, 'funds': copy.deepcopy(frame['funds']),
+        'binding_contract': copy.deepcopy(frame.get('binding_contract', {}))}
+
+
+def synthetic_original(item):
+    row = item['original_row']
+    return {'figi': row['figi'], 'tokens': tuple(row['cusips'].split(','))}
+
+
 def run(case, monkeypatch, *, deadline=None):
     frame = case['frame']
     monkeypatch.setattr(m, 'EXPECTED_STOCKS', len(frame['stocks']))
     monkeypatch.setattr(m, 'EXPECTED_FUNDS', len(frame['funds']))
-    source = {'AC': m.AC_PIN, 'AP_plan': m.AP_PIN,
+    monkeypatch.setattr(m.prices.ac, '_original', synthetic_original)
+    source = {'AA': m.AA_PIN, 'AC': m.AC_PIN, 'AP_plan': m.AP_PIN,
         'genuine_binding_stream_sha256': m.prices.native.BINDING_STREAM_SHA256,
         'AW': inventory(case['active'], case['delisted'], case['mapping'])}
-    return m._prepare_bound(frame, plan_for(frame), case['active'], case['delisted'], case['mapping'], source, deadline)
+    return m._prepare_bound(aa_for(case), frame, plan_for(frame), case['active'], case['delisted'], case['mapping'], source, deadline)
 
 
 def refused(code, operation):
@@ -119,11 +141,13 @@ def test_strict_identity_conjunction_retains_every_stock_fund_native_and_conditi
         'pending_native_original_identity_source': 1, 'conditional_never_potential_empty_initial_holdings_required': 1}
     assert [row['binding'] for row in record['stocks']] == [row['binding'] for row in case['frame']['stocks']]
     assert record['stocks'][0]['route']['symbol'] == 'EOD-0.US'  # Not its Sharadar ticker.
-    assert record['stocks'][2]['status'] == 'unresolved' and record['stocks'][2]['route'] is None
-    assert record['stocks'][2]['reason'] == 'source_locator_unavailable'
-    assert record['stocks'][2]['figi_only_observed'] is True
+    assert record['stocks'][2]['status'] == 'matched_current_crosswalk'
+    assert record['stocks'][2]['route'] is not None
+    assert record['stocks'][2]['validated_original_cusip_tokens'] == case['originals'][record['stocks'][2]['binding']['source_row_sha256']]
+    assert record['stocks'][2]['qualified_current_cusip_tokens'] is None
     assert record['stocks'][3]['potential'] is False and record['stocks'][3]['route'] is not None
-    assert summary['exact_FIGI_only_unresolved_count'] == 1
+    assert summary['exact_FIGI_only_unresolved_count'] == 0
+    assert summary['original_proof_counts'] == {'pass': 4, 'refused': 0, 'unavailable': 0}
     assert summary['all_original_rows_retained'] is summary['all_supplied_provider_rows_indexed'] is True
     assert all(summary[key] is False for key in m.FALSE_FLAGS)
     assert all(row['route']['query_window'] == [m.prices.FIRST, m.prices.LAST]
@@ -177,8 +201,11 @@ def test_source_vocabulary_is_not_silently_trimmed_or_sanitized(case, monkeypatc
     if change == 'bad_checksum': tokens.append('037833101')
     elif change == 'duplicate': tokens.append(tokens[0])
     else: tokens.append('０37833100')
-    _, private = run(case, monkeypatch)
-    assert private.private_record()['stocks'][0]['reason'] == 'source_vocabulary_invalid'
+    if change == 'duplicate':
+        refused('original_source', lambda: run(case, monkeypatch))
+    else:
+        _, private = run(case, monkeypatch)
+        assert private.private_record()['stocks'][0]['reason'] == 'source_vocabulary_invalid'
 
 
 def test_same_security_and_composite_repeated_intervals_are_one_owner_but_all_bindings_retained(case, monkeypatch):
@@ -197,7 +224,9 @@ def test_distinct_security_owners_cannot_be_merged_by_figi_CUSIP_or_shared_class
     a, b = case['frame']['stocks'][:2]
     if change == 'different_ID_same_figi': b['binding']['composite_figi'] = a['binding']['composite_figi']
     elif change == 'same_ID_different_figi': b['binding']['security_id'] = a['binding']['security_id']
-    elif change == 'CUSIP_owner': b['route']['current_cusip_tokens'] = list(a['route']['current_cusip_tokens'])
+    elif change == 'CUSIP_owner':
+        b['route']['current_cusip_tokens'] = list(a['route']['current_cusip_tokens'])
+        case['originals'][b['binding']['source_row_sha256']] = list(a['route']['current_cusip_tokens'])
     else:
         case['frame']['funds'][0]['route']['current_cusip_tokens'] = list(a['route']['current_cusip_tokens'])
     _, private = run(case, monkeypatch)
@@ -274,14 +303,26 @@ def test_prepare_compares_supplied_full_bindings_and_plan_hashes_without_adding_
     # unchanged frozen AC validator remains mandatory in production prepare().
     monkeypatch.setattr(m.prices, '_source_ac', lambda supplied, summary: copy.deepcopy(frame))
     rows = [row['binding'] for row in frame['stocks']]
-    kwargs = {'expected_ac_summary': {}, 'expected_aw_inventory': inventory(case['active'], case['delisted'], case['mapping'])}
-    summary, _ = m.prepare(rows, ac_raw, ap_raw, raw(case['active']), raw(case['delisted']), case['mapping'], **kwargs)
+    aa = aa_for(case); aa_raw = raw(aa); monkeypatch.setattr(m, 'AA_PIN', m.pin(aa_raw))
+    frame['source_pins'] = {'aa_frame': m.AA_PIN}
+    ac_raw = raw(frame); monkeypatch.setattr(m, 'AC_PIN', m.pin(ac_raw)); plan['ac_frame_pin'] = m.AC_PIN
+    ap_raw = raw(plan); monkeypatch.setattr(m, 'AP_PIN', m.pin(ap_raw))
+    monkeypatch.setattr(m.evidence, 'inspect', lambda *args, **kwargs: ({}, None))
+    monkeypatch.setattr(m.evidence, '_decode', lambda supplied, deadline: copy.deepcopy(aa))
+    monkeypatch.setattr(m.prices.ac, '_original', synthetic_original)
+    kwargs = {'expected_aa_routing_summary': {}, 'expected_ac_summary': {},
+        'expected_aw_inventory': inventory(case['active'], case['delisted'], case['mapping'])}
+    supplied = [rows, aa_raw, ac_raw, ap_raw, raw(case['active']), raw(case['delisted']), case['mapping']]
+    for index in (1, 2, 3):
+        changed_raw = list(supplied); changed_raw[index] += b'\n'
+        refused('source_pin', lambda changed_raw=changed_raw: m.prepare(*changed_raw, **kwargs))
+    summary, _ = m.prepare(*supplied, **kwargs)
     assert summary['stock_count'] == 4 and summary['crosswalk_admitted'] is False
     changed = copy.deepcopy(rows); changed[0]['candidate_last_session'] = '2021-01-01'
-    refused('genuine_binding', lambda: m.prepare(changed, ac_raw, ap_raw, raw(case['active']), raw(case['delisted']), case['mapping'], **kwargs))
+    refused('genuine_binding', lambda: m.prepare(changed, aa_raw, ac_raw, ap_raw, raw(case['active']), raw(case['delisted']), case['mapping'], **kwargs))
     broken_plan = copy.deepcopy(plan); broken_plan['assignments'][0]['whole_binding_sha256'] = 'a' * 64
     broken_raw = raw(broken_plan); monkeypatch.setattr(m, 'AP_PIN', m.pin(broken_raw))
-    refused('plan', lambda: m.prepare(rows, ac_raw, broken_raw, raw(case['active']), raw(case['delisted']), case['mapping'], **kwargs))
+    refused('plan', lambda: m.prepare(rows, aa_raw, ac_raw, broken_raw, raw(case['active']), raw(case['delisted']), case['mapping'], **kwargs))
 
 
 def test_expired_deadline_stops_before_any_match_and_summary_is_closed(case, monkeypatch):
@@ -309,6 +350,7 @@ def test_private_crosswalk_repr_pickle_and_mutability_do_not_disclose_or_grant(c
 
 def test_production_scope_still_requires_all_originals_and_all_funds():
     assert m.EXPECTED_STOCKS == 6151 and m.EXPECTED_FUNDS == 8
+    assert m.AA_PIN['byte_count'] == 19895631
     assert m.AC_PIN['byte_count'] == 16344399 and m.AP_PIN['byte_count'] == 2927971
     assert all(value is False for key, value in m.profile_record().items() if key in m.FALSE_FLAGS)
 
@@ -323,7 +365,9 @@ def test_full6151_and_eight_fund_partition_is_retained_with_native5_and_conditio
         f, c, code = figi(index + 10000), cusip(index + 10000), 'S' + str(index)
         binding = {'security_id': 'full-synthetic-' + str(index), 'composite_figi': f,
             'row_sha256': hashlib.sha256(str(index).encode()).hexdigest(),
-            'candidate_first_session': '2020-12-31', 'candidate_last_session': '2026-10-13'}
+            'candidate_first_session': '2020-12-31', 'candidate_last_session': '2026-10-13',
+            'source_row_sha256': hashlib.sha256(('full-original-' + str(index)).encode()).hexdigest(),
+            'identity_evidence_sha256': hashlib.sha256(('full-evidence-' + str(index)).encode()).hexdigest()}
         route = None if native else {'table': 'stocks', 'current_metadata_row': {'ticker': code, 'figi': f},
             'current_cusip_tokens': [c]}
         stocks.append({'binding_ordinal': index, 'binding': binding, 'potential': not conditional,
@@ -333,18 +377,216 @@ def test_full6151_and_eight_fund_partition_is_retained_with_native5_and_conditio
     for index, ticker in enumerate(('SPY','QQQ','SOXX','XLV','REMX','XLE','XLI','XLF')):
         f, c = figi(index + 50000), cusip(index + 50000)
         route = {'table': 'funds', 'current_metadata_row': {'ticker': ticker, 'figi': f},
-            'current_cusip_tokens': [c]}
+            'current_cusip_tokens': [c], 'current_exchange_mic': 'ARCX'}
         funds.append({'fund_ordinal': index, 'ticker': ticker, 'disposition': 'routed', 'route': route})
         active.append(catalog(ticker, 'ETF')); mappings.append(mapping(ticker, f, c))
-    full = {'frame': {'stocks': stocks, 'funds': funds}, 'active': active, 'delisted': [], 'mapping': mappings}
+    originals = {row['binding']['source_row_sha256']: [cusip(index + 10000)] for index, row in enumerate(stocks)}
+    full = {'originals': originals, 'frame': {'stocks': stocks, 'funds': funds}, 'active': active, 'delisted': [], 'mapping': mappings}
     summary, private = run(full, monkeypatch)
     record = private.private_record()
     assert summary['stock_count'] == len(record['stocks']) == 6151
     assert summary['fund_count'] == len(record['funds']) == 8
     assert summary['AP_stock_role_counts'] == {'Sharadar_RAW_full_window': 5636,
         'pending_native_original_identity_source': 5, 'conditional_never_potential_empty_initial_holdings_required': 510}
-    assert summary['reason_counts']['stocks'] == {'source_locator_unavailable': 5}
-    assert summary['exact_FIGI_only_unresolved_count'] == 5
+    assert summary['reason_counts']['stocks'] == {}
+    assert summary['exact_FIGI_only_unresolved_count'] == 0
+    assert summary['original_proof_counts'] == {'pass': 6151, 'refused': 0, 'unavailable': 0}
+    assert summary['disposition_counts']['stocks'] == {'matched_current_crosswalk': 6151}
     assert sum(not row['potential'] for row in record['stocks']) == 510
     assert record['stocks'][-1]['binding'] == stocks[-1]['binding']
     assert record['funds'][-1]['ticker'] == 'XLF' and record['funds'][-1]['route'] is not None
+
+def genuine_native_case(*, currency='USD'):
+    original = m.evidence.routes.original
+    composer = original.composer
+    source = {'table': 'SF1', 'ticker': 'SYNTHETIC', 'permaticker': '1001',
+        'figi': figi(5001), 'exchange': 'NYSE', 'category': 'Domestic Common Stock',
+        'cusips': '037833100,594918104', 'currency': currency, 'sector': 'synthetic-sector',
+        'industry': 'synthetic-industry', 'firstpricedate': '2020-01-02', 'lastpricedate': '2026-10-13',
+        **{'unused_' + str(index): 'retained-' + str(index) for index in range(16)}}
+    source_pin = original.source_row_digest(source)
+    table, ticker, perma, f, exchange, mic, tokens, first, last = original._metadata(source)
+    constructor_evidence = {'permaticker': perma, 'composite_figi': f, 'source_table': table,
+        'ticker': ticker, 'cusips': list(tokens), 'exchange': exchange, 'exchange_mic': mic,
+        'firstpricedate': first, 'lastpricedate': last, 'source_row_sha256': source_pin,
+        'availability_semantics': composer.TICKERS_AVAILABILITY}
+    evidence_pin = hashlib.sha256(composer.canonical_json_bytes(constructor_evidence)).hexdigest()
+    binding = m.prices.native.figi.build_preliminary_qc_figi_binding(
+        security_id=composer._safe_component('sharadar-composite-figi', f),
+        issuer_id=composer._safe_component('sharadar-permaticker', perma), composite_figi=f,
+        listing_id='sharadar-listing-' + evidence_pin[:24], diagnostic_current_ticker=ticker,
+        diagnostic_exchange_mic=mic, candidate_first_session='2020-12-31',
+        candidate_last_session='2026-10-13', source_snapshot_available_at='2026-10-13T23:00:00.000000Z',
+        source_row_sha256=source_pin, identity_evidence_sha256=evidence_pin,
+        security_master_admission_sha256=m.prices.native.ADMISSION_SHA256,
+        admitted_mapping_inventory_sha256='f' * 64, admitted_mapping_count=1)
+    row = {'binding_ordinal': 0, 'binding': binding, 'potential': True, 'disposition': 'refused',
+        'route': None, 'role': 'pending_native_original_identity_source'}
+    frame = {'stocks': [row], 'funds': [],
+        'binding_contract': {'binding_stream_sha256': m.prices.native.BINDING_STREAM_SHA256}}
+    aa = {'stocks': [{'binding_ordinal': 0, 'binding': copy.deepcopy(binding),
+        'original_cusip_tokens': None, 'original_row': source}], 'funds': [],
+        'binding_contract': copy.deepcopy(frame['binding_contract'])}
+    return aa, frame, plan_for(frame)
+
+
+@pytest.mark.parametrize('currency', ['USD', 'EUR'])
+def test_genuine_original_constructor_derives_all_tokens_when_AA_token_field_is_none(currency, monkeypatch):
+    aa, frame, plan = genuine_native_case(currency=currency)
+    monkeypatch.setattr(m, 'EXPECTED_STOCKS', 1)
+    monkeypatch.setattr(m, 'EXPECTED_FUNDS', 0)
+    sources = m._sources(aa, frame, plan)
+    stock = sources[0]
+    assert stock['original_tokens'] == ['037833100', '594918104']
+    assert stock['tokens'] == ['037833100', '594918104']
+    assert stock['current_tokens'] is None
+    assert stock['original_reporting_currency_not_usd'] is (currency != 'USD')
+    assert stock['original_source_row_sha256'] == aa['stocks'][0]['binding']['source_row_sha256']
+    assert stock['original_identity_evidence_sha256'] == aa['stocks'][0]['binding']['identity_evidence_sha256']
+
+
+@pytest.mark.parametrize('field,value', [
+    ('unused_15', 'changed-unused-column'), ('cusips', '037833100'),
+    ('figi', figi(5002)), ('firstpricedate', '2020-02-02')])
+def test_genuine_full_28_field_original_hash_is_checked_before_matching(field, value, monkeypatch):
+    aa, frame, plan = genuine_native_case()
+    monkeypatch.setattr(m, 'EXPECTED_STOCKS', 1)
+    monkeypatch.setattr(m, 'EXPECTED_FUNDS', 0)
+    aa['stocks'][0]['original_row'][field] = value
+    assert_original_proof_refused(aa, frame, plan)
+
+
+@pytest.mark.parametrize('field,value', [
+    ('identity_evidence_sha256', 'a' * 64), ('listing_id', 'sharadar-listing-' + 'b' * 24),
+    ('issuer_id', 'different-original-issuer'), ('composite_figi', figi(5002)),
+    ('diagnostic_exchange_mic', 'XNAS'), ('candidate_last_session', '2026-10-14')])
+def test_genuine_original_evidence_and_constructor_predicates_are_not_replaced_by_a_hash_claim(field, value, monkeypatch):
+    aa, frame, plan = genuine_native_case()
+    monkeypatch.setattr(m, 'EXPECTED_STOCKS', 1)
+    monkeypatch.setattr(m, 'EXPECTED_FUNDS', 0)
+    frame['stocks'][0]['binding'][field] = value
+    aa['stocks'][0]['binding'][field] = value
+    plan = plan_for(frame)
+    assert_original_proof_refused(aa, frame, plan)
+
+
+def test_union_is_uniform_deterministic_and_retains_separate_original_and_current_provenance(case, monkeypatch):
+    extra = cusip(700001)
+    case['frame']['stocks'][0]['route']['current_cusip_tokens'].insert(0, extra)
+    case['mapping'].append(mapping('EOD-0', figi(1), extra))
+    summary, private = run(case, monkeypatch)
+    stocks = private.private_record()['stocks']
+    assert stocks[0]['validated_original_cusip_tokens'] == [cusip(100)]
+    assert stocks[0]['qualified_current_cusip_tokens'] == [extra, cusip(100)]
+    assert stocks[0]['available_source_cusip_union'] == sorted([cusip(100), extra])
+    assert stocks[2]['validated_original_cusip_tokens'] == [cusip(102)]
+    assert stocks[2]['qualified_current_cusip_tokens'] is None
+    assert stocks[2]['status'] == 'matched_current_crosswalk'
+    assert summary['original_proof_counts'] == {'pass': 4, 'refused': 0, 'unavailable': 0}
+
+
+def test_current_qualified_vocabulary_cannot_discard_an_authenticated_original_token(case, monkeypatch):
+    case['frame']['stocks'][0]['route']['current_cusip_tokens'] = [cusip(800001)]
+    refused('original_source', lambda: run(case, monkeypatch))
+
+
+def test_AA_and_AC_fund_identifier_objects_must_match_exactly(case, monkeypatch):
+    monkeypatch.setattr(m, 'EXPECTED_STOCKS', 4)
+    monkeypatch.setattr(m, 'EXPECTED_FUNDS', 2)
+    monkeypatch.setattr(m.prices.ac, '_original', synthetic_original)
+    aa, frame = aa_for(case), case['frame']
+    aa['funds'][-1]['route']['current_exchange_mic'] = 'XNAS'
+    refused('original_source', lambda: m._sources(aa, frame, plan_for(frame)))
+
+
+def test_v2_profile_adds_exact_AA_pin_without_an_operational_capability():
+    profile = m.profile_record()
+    assert profile['schema'].endswith('-v2') and profile['AA_pin'] == m.AA_PIN
+    assert profile['original_token_provenance'].startswith('AA_original_row_revalidated')
+    assert profile['fund_proof'].startswith('AA_AC_full')
+    assert all(profile[key] is False for key in m.FALSE_FLAGS)
+
+@pytest.mark.parametrize('field,value', [
+    ('category', 'ETF'), ('table', 'SEP'), ('firstpricedate', '2026-10-14'),
+    ('cusips', 'invalid-original-vocabulary')])
+def test_repinning_a_synthetic_original_row_does_not_bypass_frozen_constructor_semantics(field, value, monkeypatch):
+    aa, frame, plan = genuine_native_case()
+    monkeypatch.setattr(m, 'EXPECTED_STOCKS', 1)
+    monkeypatch.setattr(m, 'EXPECTED_FUNDS', 0)
+    source = aa['stocks'][0]['original_row']
+    source[field] = value
+    new_pin = m.evidence.routes.original.source_row_digest(source)
+    frame['stocks'][0]['binding']['source_row_sha256'] = new_pin
+    aa['stocks'][0]['binding']['source_row_sha256'] = new_pin
+    plan = plan_for(frame)
+    assert_original_proof_refused(aa, frame, plan)
+
+@pytest.mark.parametrize('kind', ['different_Code', 'different_class', 'different_currency'])
+def test_all_catalog_ISIN_owners_are_checked_without_prefiltering_to_the_selected_symbol(case, monkeypatch, kind):
+    valid_isin = 'US0378331005'
+    case['mapping'][0]['isin'] = valid_isin
+    case['active'][0]['Isin'] = valid_isin
+    other = catalog('OTHER', isin=valid_isin)
+    if kind == 'different_class': other.update(Code=case['active'][0]['Code'], Type='ETF')
+    if kind == 'different_currency': other.update(Code=case['active'][0]['Code'], Currency='GBP')
+    case['delisted'].append(other)
+    _, private = run(case, monkeypatch)
+    row = private.private_record()['stocks'][0]
+    assert row['status'] == 'unresolved' and row['route'] is None
+    assert row['reason'] in ('isin_conflict', 'catalog_identity_ambiguous')
+
+
+def test_agreeing_global_ISIN_catalog_duplicates_are_preserved_without_inventing_new_owners(case, monkeypatch):
+    valid_isin = 'US0378331005'
+    case['mapping'][0]['isin'] = valid_isin
+    case['active'][0]['Isin'] = valid_isin
+    case['delisted'].append(copy.deepcopy(case['active'][0]))
+    summary, private = run(case, monkeypatch)
+    row = private.private_record()['stocks'][0]
+    assert row['status'] == 'matched_current_crosswalk'
+    assert len(row['catalog_references']) == 2
+    assert summary['provider_row_counts']['delisted'] == 1
+
+
+def test_nullable_or_opaque_catalog_display_never_becomes_identity_or_a_sanitized_alias(case, monkeypatch):
+    case['active'][0].update(Name='line\n\x00\ud800', Country=None)
+    _, private = run(case, monkeypatch)
+    assert private.private_record()['stocks'][0]['status'] == 'matched_current_crosswalk'
+    for key in ('Name', 'Country', 'Exchange'):
+        assert key not in private.private_record()['stocks'][0]['route']
+    public = m.canonical(run(case, monkeypatch)[0])
+    assert b'line' not in public and b'\\ud800' not in public
+
+def assert_original_proof_refused(aa, frame, plan):
+    sources = m._sources(aa, frame, plan)
+    assert len(sources) == 1 and sources[0]['original_proof'] == 'refused'
+    assert sources[0]['original_tokens'] is None
+    indexes = m._indexes([], [], [], sources, None)
+    result = m._match(sources[0], indexes, None)
+    assert result['status'] == 'unresolved' and result['route'] is None
+    assert result['reason'] == 'original_source_refused'
+
+
+def test_missing_original_row_remains_a_named_unresolved_binding_not_a_current_token_fallback(case, monkeypatch):
+    frame = case['frame']
+    monkeypatch.setattr(m, 'EXPECTED_STOCKS', 4)
+    monkeypatch.setattr(m, 'EXPECTED_FUNDS', 2)
+    monkeypatch.setattr(m.prices.ac, '_original', synthetic_original)
+    aa = aa_for(case)
+    aa['stocks'][0]['original_row'] = None
+    source = {'AA': m.AA_PIN, 'AC': m.AC_PIN, 'AP_plan': m.AP_PIN,
+        'genuine_binding_stream_sha256': m.prices.native.BINDING_STREAM_SHA256,
+        'AW': inventory(case['active'], case['delisted'], case['mapping'])}
+    summary, private = m._prepare_bound(aa, frame, plan_for(frame), case['active'], case['delisted'],
+        case['mapping'], source, None)
+    rows = private.private_record()['stocks']
+    assert len(rows) == 4 and rows[0]['binding'] == frame['stocks'][0]['binding']
+    assert rows[0]['reason'] == 'original_source_unavailable' and rows[0]['route'] is None
+    assert rows[0]['validated_original_cusip_tokens'] is None
+    assert rows[0]['qualified_current_cusip_tokens'] == frame['stocks'][0]['route']['current_cusip_tokens']
+    assert summary['original_proof_counts'] == {'pass': 3, 'refused': 0, 'unavailable': 1}
+    assert summary['disposition_counts']['stocks']['matched_current_crosswalk'] == 3
+    for mutation in (True, -1, 4):
+        changed = copy.deepcopy(summary)
+        changed['original_proof_counts']['pass'] = mutation
+        refused('summary', lambda: m.validate_summary(changed))

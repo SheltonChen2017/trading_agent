@@ -2266,7 +2266,12 @@ total refused; no complete catalog/identity/coverage admission. Section326.56
 freezes the separate offline fixed-frame AY diagnosis. Section326.57 records
 its unaccepted actual-9 after Root's external-collector naming error; no
 whole-file/source acceptance. Section326.58 freezes corrected bounded result
-capture and AZ metadata-only reconciliation, not yet invoked.
+capture and AZ metadata-only reconciliation. Section326.60 records AZ actual0
+metadata-only acceptance: reported total110346 and display refusals; original
+AY source claims remain unaccepted. A NEW BA forward-catalog continuation
+and source-complete crosswalk V2 are implemented. Section326.61 freezes BA's
+fresh-source/110-unrequested-page continuation, not yet invoked; no strategy
+price acquisition, actual crosswalk or QC run follows without further gates.
 No AU retry, provider/strategy capture or QC source
 transfer/project/compile/strategy job follows this known source stop. Current
 identity/reference/actual-held NAV/full-window/source/run gates remain;
@@ -67713,3 +67718,213 @@ no bound/no stderr/exact output equality. Metadata-only observation never
 accepts original AY or its reported whole-file/source claim.
 Preflight-only refusal does not justify any other retry or spent claim.
 337/259/53/699 unchanged; one final matching-lane push remains pending.
+
+### 326.60 Actual AZ metadata observation and next substantive source recovery
+
+FIRST native AZ at clean3f7e524423e708ed5041d21293d1f79bccfbf4b5:
+producer2026-10-27T17:00:40.942929+00:00..17:00:44.829405+00:00 exit0;
+separate native validator17:00:44.829591..17:00:48.536345+00:00 exit0.
+Both stdout6823bytes SHA256
+9cbd25bdc01da9a996e845a559817ccb14c677757023ed0f545f7f5867353fde,
+stderr0/boundnull/exact equality; all helper stream-complete flags true,
+external phase validated/no outer failure. AZ now SPENT: no repeat metadata
+read, claim, source/reader/validator replay. This accepts METADATA ONLY.
+Original AYactual-9/no validator/whole-file claim remains UNADMITTED.
+
+Exact observed metadata file4526bytes/d9dfeaab matched BEFORE JSON under
+fresh source guard/normal return. Its REPORTED pagination: exact integer
+total110346, limit1000, offset0, data1000objects; no coercion was needed.
+Top/meta field inventories exactly documented; next is a string, hash only,
+never URL. This supports the design hypothesis that AW's100000 bound was
+too small; a future source role must independently confirm those same raw
+bytes/count BEFORE contact, not promote failed AY's source claims.
+Reported candidate whole-file16140080bytes SHA
+02d64c177446409f43f6f443cda77afa4c6e9503ebb17844a9910a52b1093005
+is UNADMITTED; it may only be an extra expected comparison alongside ALL
+three externally pinned frame/hash/extent checks, never sole source truth.
+
+Both REPORTED symbol-list checks failed only finite display predicate; no
+specific bad row/field/value/category is known, so do not invent the cause.
+The one-fund AX success remains valid. The full lists require a separately
+versioned representation policy: Name/Country opaque bounded JSON string/null
+preserved byte-semantically, NEVER identity/routing/log output; nullable
+bounded ASCII availability labels/identifiers retained as observations.
+Actual positive crosswalk predicates stay strict full FIGI/checksum-CUSIP,
+ISIN consistency/global ownership, USD/class and exact source bindings.
+No normalized alias, row drop or ignored identity collision is allowed.
+Used8ece V1 and all old callers/readers stay frozen.
+
+Next coherent BA is a NEW forward COMPLETE-catalog contract, NOT an AW retry:
+fresh source role authenticates original AW's exact three frames against
+all known external body pins, headers, extent and current security, waits for
+normal return, then copies those exact bytes to own held seed FD. Actual
+source0 before credentials, parent0/independent native validator0 eventually.
+Only NEW never-requested offsets1000..110000 (110requests, final346rows)
+may follow, with total110346/limit/offset/count checked on EVERY page.
+No active/delisted/map0/old protocol replay or silent bound increase. Seed+
+new pages are authenticated together before a full inventory receipt exists.
+Current decision authorizes IMPLEMENTATION ONLY; exact new source/profile/
+host/read-plan/claim/deadline/actual-output freeze precedes any BA operation.
+No strategy price acquisition, cloud transfer or QC authority yet.
+
+Public-only AA evidence audit (326.58) means native-five current-route absence
+is not an external source barrier: a NEW uninvoked crosswalk V2 can consume
+guarded AA original28field/evidence/CUSIP provenance plus qualified AC current
+vocabulary and genuine all6151 equality, uniform union rule for every stock,
+not a five-symbol fallback. Eight fund joins/global collisions remain binding.
+No actual AA/genuine/crosswalk read occurred in this metadata round.
+
+No provider/QC/strategy event in AZ;337shared/259development/53infrastructure/
+699cells unchanged. I326-024 full-window coverage remains open; no six-cell
+launch or strategy result. Continue admissible source recovery under owner
+review waiver, all local commits preserved, exactly one final push pending.
+
+### 326.61 Representation/crosswalk V2 and exact BA forward-catalog freeze
+
+Current owner source-pin/parser/full-window research direction and review
+waiver continue; same-round advice is not independent acceptance.
+NEW representation V2 scripts/arv2_r298_eodhd_catalog_schema_v2.py6616bytes
+ad0c34e95c29c909bcb35f479fbfbb6b4580cbad36d81ab1b1bbdbba9c0b194c;
+tests6994bytes4524160434271f56dc3c6034bfc45ef9335f3801a1d6e964ad3c2a9eb5aa9454;
+canonical noLF profile1517bytes
+9d45ae1dd354c84c46ce69154551e759a2f9e6dde410314c74a9d05b8ed8124b.
+This separates REPRESENTATION from identifier eligibility: Name/Country
+private opaque bounded string/null, controls/surrogate JSON values preserved
+under ASCII canonical serialization, never identity/routing/log payload.
+Code remains bounded nonempty printableASCII; nullable labels/Isin and
+malformed ASCII placeholders remain observations, not valid IDs. Exact7keys/
+duplicates/byte/row/value bounds; no row dropping, normalization/class filters.
+Positive crosswalk still requires all exact valid ID/USD/class/collision rules.
+Used V18ece untouched.99nativepasses.10s; display-presence mutation2reds/
+18overlappingpasses.08s, restored. No actual source read.
+
+UNINVOKED crosswalk V2 replaces ONLY the prior UNUSED candidate (762d retained
+in741e966 and326.56); no used source pin refresh. New source36751bytes
+39464645b7acb8187eac2209e7e994d74ddd3c077911cb32d1a9c1820ffd6843;
+tests35565bytes5c98b8035b1f2c8b95deb2540beb03d3e6ad5898ce86942e3852026dab0e695d;
+canonical profile3028bytes
+9ece75189b6f16625388a8beb9b360f23371e6f332508dc6963fd48de0feca4e.
+Adds exact AA19,895,631/3776f03b DATA pin, full genuine AA=AC/AP6151
+object joins, all28 original-row/evidence predicates via unchanged proof
+except already justified functional SF1 currency, uniform original/current
+vocabulary UNION for EVERY stock. Separate token provenance/proof statuses:
+pass/refused/unavailable sum6151; missing/refused NEVER routes, all retained.
+AA interval-disjoint branch actually retains original_row; broader missing/
+ambiguous original evidence may be unavailable, no private count asserted.
+Eight fund metadata/token/MIC joins and global catalogue ISIN ownership/
+FIGI/CUSIP/symbol collisions strict; agreeing duplicates retained/classified.
+57nativepasses3.91s, earlier57/4.20 overlap; original-proof/global-ISIN omissions
+1red.15s each restored. Private field renamed available_source_cusip_union
+to avoid claiming unavailable original vocabulary complete. No actual genuine/
+AA/AC/AP/EOD crosswalk consumed, no source/price/interval/PIT admission.
+
+NEW BA scripts/run_arv2_r298_eodhd_catalog_continuation.py58214bytes
+8eb6b92db6c8833998cd2fef4388091f8e65c6dbc8e0a77a79f86d9b2d4dc6e7;
+tests22474bytes047c55cf5479f68926a67d6306a87d641102bd2970f99f7afe747f0f6546df64;
+canonical noLF profile30700bytes
+c2db43c6f1b664de393418755f7917d2b9fad327e7e447c6d06b803a8084aac3.
+209 literal dependencies incl frozen AZ6402/capturehelperfebe/new V2ad0c;
+Root verified ALL209 actual bytes. This is a FIRST complete current catalog
+using retained seed plus UNREQUESTED mapping pages, not retry/renewal of AW/
+AY/AZ. Fixed NEW control
+artifacts/analyst_revisions_v2/newrule_eodhd_catalog/R326-20261027-BA
+NOT inspected/allocated before this freeze. Run only at exact clean committed
+HEAD containing this decision, exact caller/profile above, designated Mac/
+root/branch/Python3.13 and explicit safe environment.
+
+Claim/source/blob/HEAD/profile/CA proofs precede fresh native SOURCE role.
+ONE original AW DATA leaf16140080bytes: extra candidate whole02d64c1774 is
+UNADMITTED as prior evidence; fresh generic guard additionally requires ALL
+three separately external body pins/BE64headers/exact extent from326.55
+BEFORE ANY JSON. Candidate whole hash alone cannot pass. Source rechecks
+exact meta.total110346/limit1000/offset0/count1000 and V2 representations.
+Original source guard NORMAL RETURN before copying own seed/private source
+metadata. Source actual0/packet hash/held original FDs+metadata and PARENT
+cryptographic rehash of own seed required BEFORE ONE existing EODHD
+Keychain lookup (service trading-agent-eodhd/account eodhd). Old AY-9 remains
+unaccepted; this is a new source consumer proof, no old operation/control read.
+No account/env/config/service/rights expansion or paid purchase.
+
+ONLY provider requests, each ONCE, HTTPS eodhd.com/api/id-mapping:
+fmt=json,filter[ex]=US,page[limit]=1000,page[offset]=1000,2000,...,110000.
+EXACT110 previously unrequested offsets, final346rows. Never request active/
+delisted/offset0, follow returned URLs, refresh counts, retry or fallback.
+Every response total exactinteger110346/limit1000/current offset/expected
+row-count. Raw successful bodies<=1MiB secret-scanned/fsynced BEFORE JSON;
+new framed corpus<=32MiB, bounded64KiB journal/index; own16MiBseed+newcapture
+below64MiB. Non200 body unread. Physical request countnull, application
+intent/completed-body/HTTPstatus retained; recognized encoding checks not
+universal secrecy proof. Five own DATA files/original descriptors held:
+seed, new map corpus, journal, index, source-metadata. Native credential-free
+AUTH hashes all113 bodies/contiguous frames/index/LF journal/whole pins first,
+then joins2lists+111pages/all110346 rows. Public output only counts/types/
+hashes; no licensed values/URLs/names/credentials. Complete PROTOCOL current
+inventory is not identity/price/history/PIT/master/strategy admission.
+
+Parent1800/source120/provider1500/auth180/validator30s; eachrequest<=25s
+within remaining budget, external parent1810/validator35s. Only own children
+killed/reaped; uninterruptible-I/O/host-suspension caveat. Persistent per-role
+intent/start claims and exact inherited FDs, no repeated worker dispatch.
+Native source1670bytes
+9301d5f1aae0ad067e5a19962adcab4ab454ca5b9af5f39ad3efda2255a39725;
+provider1564bytes65b35d5704c8750176d7b78b0c6cf0f773c18d1cd14a5c056412c96996aa48d6;
+auth1341bytesfac2551ce844fd1de5cc4517ba4502e51346ed63b93a5f273d371b0dab59bdff;
+validator494bytes79d7e961f0ab250fd95784609a254c2628244cbd0143b0aa3ea1d2f514858a4c.
+Source alone can read exact old AW DATA; others own control only; all deny
+Keychains/security. Only provider permits HTTPS443/DNS53/exact macOS resolver
+socket; not a native domain fence. Pinned CA/owned SSLContext/exact prepared
+host/path/query/header/no proxy/cookie/redirect/retry/default trust enforce
+application scope. Source/auth/validator ALL-network denied; output validator
+ALL-artifact denied. No QC/source package/other lane access or cleanup.
+
+Pre-use Root P2 I326-030: source child hash was verified, but parent boundary
+checked only seed SIZE after its owned-output metadata refresh; same-length
+drift could consume contact before final auth refusal. Added parent seed
+cryptographic read/verify before credentials and postflight. Regression/
+memory omission1red.16s proves pre-Keychain refusal. P3 I326-031: Popen
+outside try discarded constructed no-child observation on spawn failure;
+new BA preserves finite capture_failure+spawnfalse metadata, no raw error,
+regression/omission1red.14s. Old AW sources unchanged.
+Independent external frame omission1red.15s and real-LF/full-join omission
+1red.26s restored finally; candidate whole refresh in SYNTHETIC negative
+case alone never proves an authenticated frame.
+
+51authornativepasses18.44s; earlier50/18.25 and2/3.63 overlap. Initial47pass/
+3fixturefail11.75 retained: real tiny children exited0 but fixture spaced
+json.dumps correctly failed canonical packet parsing; changed fixture to
+canonical JSON. Real five-DATA original-FD children/all3persistent role
+markers and owned distinct CREDpipe (secret absent argv/env/packet) passed;
+no operational provider/source behavior exercised. Full110newpage/111page/
+110346record synthetic join, all3framepins beforeJSON, source-return-before-
+seed and same-size drift refusal tested. Representative parent envelope
+63394bytes<128KiB; no raw values. Same-round transport/source advisory plus
+Root parent/source/join review no additional confirmed P0–P2.
+
+Root294distinctfocusedpasses18.47s=99representation+57crosswalk+51BA+
+86record/document+1research transitive closure; nofail/skip/warning/fullsuite.
+Six source-test memory compiles/profile/native-policy/pin checks passed;
+all synthetic tests native ALL-network/production-artifact/Keychain/security
+denied, inroot temp/cache/log/plugin paths, no plugins/conftest/bytecode/
+cacheprovider, dispatch_fence absent. Overlapping subsets/doc repeats notadditive.
+
+EXACT manually authored external metadata program3222bytes SHA
+9934660598384291b2ec557985d8205d1652e84abffe4be8e66e4e4ef02d40e8.
+Root exact outer env: PATH=/usr/bin:/bin:/usr/sbin:/sbin,
+LANG/LC_ALL=en_US.UTF-8, inroot TMPDIR/TMP/TEMP/XDG_CACHE_HOME and
+PYTHONPYCACHEPREFIX=support/pycache, PYTHONDONTWRITEBYTECODE=1; no extra
+Python/test variables, absolute Python -B -s. Preflight before first spawn;
+fixed helperfebe,131072/8192 limits resolved first. Ordinary parent launches
+separate native role children, no incompatible outer nested sandbox.
+Independent native output validator sees original bounded stdout/ACTUAL
+parent exit; parent0+ALL3role0+validator0/complete streams/no stderr/bounds/
+exact stdout equality mandatory. Validator0 on2 authenticates failure only.
+Full nested tool capture100000tokens/store before count-only output prevents
+metadata truncation. Finite phase-marked failures retained, never reportalone.
+No role/source/claim retry; unknown/partial/nonzero spends this new use.
+
+After actual catalog, record exact result and only then freeze a new genuine/
+AA/AC/AP/fullcatalog crosswalk consumer; no strategy price acquisition, source
+policy, new project/transfer/compile/backtest by this BA decision. All formal
+flags and I326-024 remain open/false.337/259/53/699 unchanged until actual
+accountable QC event. All agents HOLD before dispatch; accumulate locally,
+exactly one final matching-lane push remains pending, none this round yet.

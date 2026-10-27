@@ -12,18 +12,23 @@ import re
 import time
 
 from scripts import arv2_r298_raw_price_acquisition as prices
-from scripts import arv2_r298_eodhd_catalog_schema as catalogs
+from scripts import arv2_r298_eodhd_catalog_schema_v2 as catalogs
+from scripts import arv2_r298_route_disposition_evidence as evidence
 
-SCHEMA = 'arv2-r298-EODHD-current-crosswalk-v1'
+SCHEMA = 'arv2-r298-EODHD-current-crosswalk-v2'
 PRIVATE_SCHEMA, INVENTORY_SCHEMA = SCHEMA + '-private', SCHEMA + '-captured-inventories'
 EXPECTED_STOCKS, EXPECTED_FUNDS = 6151, 8
+AA_PIN = {'byte_count': 19895631, 'sha256': '3776f03b4941d8e6d014dee19f5ee8a05080f214ab7f502d10738f00a689f561'}
+CATALOG_SCHEMA_PIN = {'byte_count': 6616, 'sha256': 'ad0c34e95c29c909bcb35f479fbfbb6b4580cbad36d81ab1b1bbdbba9c0b194c'}
+CATALOG_SCHEMA_PROFILE_SHA256 = '9d45ae1dd354c84c46ce69154551e759a2f9e6dde410314c74a9d05b8ed8124b'
 AC_PIN = {'byte_count': 16344399, 'sha256': '4366e1e8a218fb21afc6ef3d88dfed9c2ab8b784a7718a405616850e1a4d6ddc'}
 AP_PIN = {'byte_count': 2927971, 'sha256': '7703c8e29d7bef5928b0a776628759ff97715b003045c2c00df2b01e7b03f51e'}
 MAX_ROWS, MAX_RECORD_BYTES, MAX_PRIVATE_BYTES = 200000, 64 * 1024 * 1024, 64 * 1024 * 1024
 MAPPING_FIELDS = frozenset(('symbol', 'isin', 'figi', 'lei', 'cusip', 'cik'))
 AP_ROLES = frozenset(('Sharadar_RAW_full_window', 'pending_native_original_identity_source',
     'conditional_never_potential_empty_initial_holdings_required'))
-REASONS = frozenset(('source_locator_unavailable', 'source_figi_invalid', 'source_vocabulary_invalid',
+REASONS = frozenset(('original_source_unavailable', 'original_source_refused',
+    'source_locator_unavailable', 'source_figi_invalid', 'source_vocabulary_invalid',
     'source_owner_collision', 'no_identifier_match', 'figi_only_no_cusip_link',
     'mapping_fields_unknown', 'mapping_identifier_invalid', 'mapping_identifier_conflict',
     'mapping_symbol_ambiguous', 'catalog_symbol_missing', 'catalog_identity_ambiguous',
@@ -35,7 +40,7 @@ FALSE_FLAGS = {'crosswalk_admitted': False, 'price_source_policy_admitted': Fals
     'point_in_time_proven': False, 'formal_identity_admitted': False,
     'formal_forward_ready': False, 'paper_or_live_ready': False}
 FINITE = frozenset(('deadline', 'source_pin', 'source_json', 'source_frame', 'genuine_binding',
-    'plan', 'inventory', 'catalog', 'mapping', 'bound', 'summary', 'private_record', 'unknown'))
+    'plan', 'original_source', 'inventory', 'catalog', 'mapping', 'bound', 'summary', 'private_record', 'unknown'))
 
 
 class Refused(ValueError): pass
@@ -175,13 +180,23 @@ def _inventories(active_raw, delisted_raw, mapping_rows, expected, deadline):
     return list(active), list(delisted), json.loads(canonical(list(mapping_rows)))
 
 
-def _source(binding_rows, ac_raw, plan_raw, expected_ac_summary, deadline):
+def _source(binding_rows, aa_raw, ac_raw, plan_raw, expected_aa_routing_summary, expected_ac_summary, deadline):
     _budget(deadline)
-    require(type(ac_raw) is bytes and pin(ac_raw) == AC_PIN, 'source_pin')
-    try: frame = prices._source_ac(ac_raw, expected_ac_summary)
-    except Exception: raise Refused('source_frame') from None
+    for raw, expected in ((aa_raw, AA_PIN), (ac_raw, AC_PIN), (plan_raw, AP_PIN)):
+        require(type(raw) is bytes and pin(raw) == expected, 'source_pin')
+    try:
+        evidence.inspect(aa_raw, expected_summary=expected_aa_routing_summary, deadline=deadline)
+        aa = evidence._decode(aa_raw, deadline)
+        frame = prices._source_ac(ac_raw, expected_ac_summary)
+    except evidence.Refused as error:
+        raise Refused('deadline' if evidence.finite(error) == 'deadline' else 'source_frame') from None
+    except Exception:
+        raise Refused('source_frame') from None
     require(type(binding_rows) in (tuple, list) and len(binding_rows) == EXPECTED_STOCKS
-        and [item['binding'] for item in frame['stocks']] == list(binding_rows), 'genuine_binding')
+        and [item['binding'] for item in aa['stocks']] == list(binding_rows)
+        and [item['binding'] for item in frame['stocks']] == list(binding_rows)
+        and aa['binding_contract'] == frame['binding_contract']
+        and frame['source_pins']['aa_frame'] == AA_PIN, 'genuine_binding')
     plan = _loads(plan_raw, AP_PIN)
     require(type(plan) is dict and set(plan) == {'schema', 'ac_summary_sha256', 'ac_frame_pin',
         'native_specification_sha256', 'full_axis_sha256', 'price_sessions', 'assignments', 'requests'}
@@ -190,15 +205,34 @@ def _source(binding_rows, ac_raw, plan_raw, expected_ac_summary, deadline):
         and plan['native_specification_sha256'] == prices.NATIVE_SPECIFICATION_SHA256
         and plan['full_axis_sha256'] == prices.FULL_AXIS_SHA256
         and type(plan['assignments']) is list and len(plan['assignments']) == EXPECTED_STOCKS + EXPECTED_FUNDS, 'plan')
-    return frame, plan
+    return aa, frame, plan
 
-
-def _sources(frame, plan):
+def _sources(aa, frame, plan, deadline=None):
+    _budget(deadline)
+    require(type(aa) is dict and type(aa['stocks']) is list and len(aa['stocks']) == EXPECTED_STOCKS
+        and type(aa['funds']) is list and len(aa['funds']) == EXPECTED_FUNDS, 'original_source')
     require(type(frame) is dict and type(frame['stocks']) is list and len(frame['stocks']) == EXPECTED_STOCKS
         and type(frame['funds']) is list and len(frame['funds']) == EXPECTED_FUNDS, 'source_frame')
     result = []
     for index, row in enumerate(frame['stocks']):
-        binding, assignment = row['binding'], plan['assignments'][index]
+        _budget(deadline)
+        binding, assignment, original_row = row['binding'], plan['assignments'][index], aa['stocks'][index]
+        require(type(original_row) is dict and original_row['binding_ordinal'] == index
+            and original_row['binding'] == binding, 'original_source')
+        original_tokens, original_proof = None, 'unavailable'
+        if original_row['original_row'] is not None:
+            original_proof = 'refused'
+            try:
+                original = prices.ac._original(original_row)
+                require(original['figi'] == binding['composite_figi'] and original['tokens']
+                    and type(original['tokens']) in (tuple, list), 'original_source')
+                checked_tokens = list(original['tokens'])
+                require(all(type(token) is str for token in checked_tokens)
+                    and len(checked_tokens) == len(set(checked_tokens)), 'original_source')
+            except Exception:
+                pass
+            else:
+                original_tokens, original_proof = checked_tokens, 'pass'
         require(row['binding_ordinal'] == index and assignment['binding_ordinal'] == index
             and assignment['security_id'] == binding['security_id']
             and assignment['whole_binding_sha256'] == digest(binding)
@@ -213,13 +247,29 @@ def _sources(frame, plan):
                 and assignment['table'] == 'stocks', 'plan')
         elif role == 'pending_native_original_identity_source':
             require(row['potential'] is True and row['disposition'] == 'refused' and route is None, 'plan')
-        tokens = None if route is None else list(route['current_cusip_tokens'])
+        current_tokens = None if route is None else list(route['current_cusip_tokens'])
+        if current_tokens is not None:
+            require(all(type(token) is str for token in current_tokens)
+                and len(current_tokens) == len(set(current_tokens))
+                and (original_tokens is None or set(original_tokens) <= set(current_tokens)), 'original_source')
+        tokens = sorted(set(original_tokens or ()) | set(current_tokens or ()))
         result.append({'kind': 'stock', 'ordinal': index, 'binding': dict(binding), 'AP_role': role,
             'potential': row['potential'], 'figi': binding['composite_figi'], 'tokens': tokens,
+            'original_tokens': original_tokens, 'current_tokens': current_tokens, 'original_proof': original_proof,
+            'original_source_row_sha256': binding['source_row_sha256'],
+            'original_identity_evidence_sha256': binding['identity_evidence_sha256'],
+            'original_reporting_currency_not_usd': original_proof == 'pass' and original_row['original_row']['currency'] != 'USD',
             'owner': ('stock', binding['security_id'], binding['composite_figi'])})
     for index, row in enumerate(frame['funds']):
+        _budget(deadline)
         assignment = plan['assignments'][EXPECTED_STOCKS + index]
+        old = aa['funds'][index]
         route = row['route']
+        require(type(old) is dict and old['fund_ordinal'] == index and old['ticker'] == row['ticker']
+            and type(old['route']) is dict and type(route) is dict
+            and old['route']['current_metadata_row'] == route['current_metadata_row']
+            and old['route']['current_cusip_tokens'] == route['current_cusip_tokens']
+            and old['route']['current_exchange_mic'] == route['current_exchange_mic'], 'original_source')
         require(row['fund_ordinal'] == index and assignment['fund_ordinal'] == index
             and assignment['own_ETF'] == row['ticker'] and assignment['role'] == 'Sharadar_RAW_full_window'
             and row['disposition'] == 'routed' and type(route) is dict
@@ -228,15 +278,19 @@ def _sources(frame, plan):
         figi = route['current_metadata_row']['figi']
         result.append({'kind': 'fund', 'ordinal': index, 'ticker': row['ticker'], 'AP_role': assignment['role'],
             'potential': True, 'figi': figi, 'tokens': list(route['current_cusip_tokens']),
+            'original_tokens': None, 'current_tokens': list(route['current_cusip_tokens']),
             'owner': ('fund', row['ticker'], figi)})
     return result
 
 
 def _indexes(active, delisted, mapping_rows, sources, deadline):
-    by_symbol, map_figi, map_cusip, map_symbol = defaultdict(list), defaultdict(set), defaultdict(set), defaultdict(set)
+    by_symbol, catalog_isin = defaultdict(list), defaultdict(set)
+    map_figi, map_cusip, map_symbol = defaultdict(set), defaultdict(set), defaultdict(set)
     for table, rows in (('active', active), ('delisted', delisted)):
         for index, row in enumerate(rows):
             _budget(deadline); by_symbol[row['Code'] + '.US'].append((table, index, row))
+            if _isin(row['Isin']):
+                catalog_isin[row['Isin']].add((row['Code'], row['Type'], row['Currency']))
     records = []
     for index, row in enumerate(mapping_rows):
         _budget(deadline)
@@ -254,7 +308,7 @@ def _indexes(active, delisted, mapping_rows, sources, deadline):
         if item['kind'] == 'stock': source_ids[item['binding']['security_id']].add(item['figi'])
         for token in item['tokens'] or ():
             if _cusip(token): source_cusip[token].add(item['owner'])
-    return {'catalog': by_symbol, 'map_figi': map_figi, 'map_cusip': map_cusip,
+    return {'catalog': by_symbol, 'catalog_isin': catalog_isin, 'map_figi': map_figi, 'map_cusip': map_cusip,
         'map_symbol': map_symbol, 'records': records, 'source_figi': source_figi,
         'source_cusip': source_cusip, 'source_ids': source_ids}
 
@@ -269,6 +323,8 @@ def _match(source, indexes, deadline):
         'mapping_indices': sorted(matches), 'catalog_references': [], 'route': None}
     def refused(reason):
         result['reason'] = reason; return result
+    if source['kind'] == 'stock' and source['original_proof'] != 'pass':
+        return refused('original_source_' + source['original_proof'])
     if not _figi(figi): return refused('source_figi_invalid')
     if not tokens:
         result['figi_only_observed'] = figi_only
@@ -312,6 +368,10 @@ def _match(source, indexes, deadline):
     if currency != 'USD' or instrument != ('Common Stock' if source['kind'] == 'stock' else 'ETF'):
         return refused('catalog_instrument_or_currency')
     if isin not in (None, '') and (not _isin(isin) or isins and isin not in isins): return refused('isin_conflict')
+    relevant_isins = isins | ({isin} if isin not in (None, '') else set())
+    expected_owner = (code, instrument, currency)
+    if any(indexes['catalog_isin'].get(value) and indexes['catalog_isin'][value] != {expected_owner}
+            for value in relevant_isins): return refused('isin_conflict')
     result.update(status='matched_current_crosswalk', reason=None, route={
         'source_policy': 'EODHD_fixed_whole_window_candidate_not_admission',
         'symbol': symbol, 'original_composite_figi': figi, 'matched_cusip_tokens': sorted(matched_tokens),
@@ -321,8 +381,8 @@ def _match(source, indexes, deadline):
     return result
 
 
-def _prepare_bound(frame, plan, active, delisted, mapping_rows, source_meta, deadline):
-    sources = _sources(frame, plan); indexes = _indexes(active, delisted, mapping_rows, sources, deadline)
+def _prepare_bound(aa, frame, plan, active, delisted, mapping_rows, source_meta, deadline):
+    sources = _sources(aa, frame, plan, deadline); indexes = _indexes(active, delisted, mapping_rows, sources, deadline)
     results, symbol_owners = [], defaultdict(set)
     for source in sources:
         _budget(deadline); result = _match(source, indexes, deadline); results.append(result)
@@ -336,9 +396,14 @@ def _prepare_bound(frame, plan, active, delisted, mapping_rows, source_meta, dea
         _budget(deadline)
         table = 'stocks' if source['kind'] == 'stock' else 'funds'
         item = {'AP_role': source['AP_role'], 'potential': source['potential'],
-            'source_composite_figi': source['figi'], 'complete_source_cusip_tokens': source['tokens'], **result}
+            'source_composite_figi': source['figi'], 'available_source_cusip_union': source['tokens'],
+            'validated_original_cusip_tokens': source['original_tokens'],
+            'qualified_current_cusip_tokens': source['current_tokens'], **result}
         if source['kind'] == 'stock':
             item['binding_ordinal'], item['binding'] = source['ordinal'], source['binding']
+            item['original_proof'] = source['original_proof']
+            item['original_source_row_sha256'] = source['original_source_row_sha256']
+            item['original_identity_evidence_sha256'] = source['original_identity_evidence_sha256']
             prior_roles[source['AP_role']] += 1
         else:
             item['fund_ordinal'], item['ticker'] = source['ordinal'], source['ticker']
@@ -353,6 +418,12 @@ def _prepare_bound(frame, plan, active, delisted, mapping_rows, source_meta, dea
     summary = {'schema': SCHEMA, 'scope': 'all_supplied_current_identifier_evidence_not_route_or_history_admission',
         'source_fingerprint': digest(source_meta), 'source_pins': source_meta,
         'stock_count': len(stocks), 'fund_count': len(funds),
+        'original_proof_counts': {state: sum(item.get('original_proof') == state for item in sources)
+            for state in ('pass', 'refused', 'unavailable')},
+        'original_reporting_currency_not_usd_count': sum(item.get('original_reporting_currency_not_usd', False) for item in sources),
+        'original_token_count': sum(len(item['original_tokens'] or ()) for item in sources),
+        'qualified_current_token_count': sum(len(item['current_tokens'] or ()) for item in sources),
+        'union_token_count': sum(len(item['tokens'] or ()) for item in sources),
         'distinct_source_owner_count': len({item['owner'] for item in sources}),
         'repeated_source_owner_binding_count': len(sources) - len({item['owner'] for item in sources}),
         'disposition_counts': {key: dict(sorted(value.items())) for key, value in counts.items()},
@@ -383,6 +454,8 @@ class PrivateCrosswalk:
 
 def validate_summary(value):
     keys = {'schema', 'scope', 'source_fingerprint', 'source_pins', 'stock_count', 'fund_count',
+        'original_proof_counts', 'original_reporting_currency_not_usd_count',
+        'original_token_count', 'qualified_current_token_count', 'union_token_count',
         'distinct_source_owner_count', 'repeated_source_owner_binding_count', 'disposition_counts',
         'reason_counts', 'AP_stock_role_counts', 'exact_FIGI_only_unresolved_count', 'provider_row_counts',
         'provider_duplicate_row_counts', 'private_payload_pin', 'all_original_rows_retained',
@@ -395,13 +468,24 @@ def validate_summary(value):
         and all(value[key] is False for key in FALSE_FLAGS) and _hash(value['source_fingerprint'])
         and type(value['source_pins']) is dict, 'summary')
     source_meta = value['source_pins']
-    require(set(source_meta) == {'AC', 'AP_plan', 'genuine_binding_stream_sha256', 'AW'}
-        and source_meta['AC'] == AC_PIN and source_meta['AP_plan'] == AP_PIN
+    require(set(source_meta) == {'AA', 'AC', 'AP_plan', 'genuine_binding_stream_sha256', 'AW'}
+        and source_meta['AA'] == AA_PIN and source_meta['AC'] == AC_PIN and source_meta['AP_plan'] == AP_PIN
         and source_meta['genuine_binding_stream_sha256'] == prices.native.BINDING_STREAM_SHA256, 'summary')
     _inventory_metadata(source_meta['AW'])
     require(digest(source_meta) == value['source_fingerprint'], 'summary')
     for name in ('disposition_counts', 'reason_counts'):
         require(type(value[name]) is dict and set(value[name]) == {'stocks', 'funds'}, 'summary')
+    proof_counts = value['original_proof_counts']
+    require(type(proof_counts) is dict and set(proof_counts) == {'pass', 'refused', 'unavailable'}
+        and all(type(count) is int and 0 <= count <= EXPECTED_STOCKS for count in proof_counts.values())
+        and sum(proof_counts.values()) == EXPECTED_STOCKS
+        and type(value['original_reporting_currency_not_usd_count']) is int
+        and 0 <= value['original_reporting_currency_not_usd_count'] <= proof_counts['pass'], 'summary')
+    for name in ('original_token_count', 'qualified_current_token_count', 'union_token_count'):
+        require(type(value[name]) is int and 0 <= value[name] <= MAX_PRIVATE_BYTES, 'summary')
+    require(value['original_token_count'] >= proof_counts['pass']
+        and max(value['original_token_count'], value['qualified_current_token_count']) <= value['union_token_count']
+        <= value['original_token_count'] + value['qualified_current_token_count'], 'summary')
     total = EXPECTED_STOCKS + EXPECTED_FUNDS
     for key in ('distinct_source_owner_count', 'repeated_source_owner_binding_count', 'exact_FIGI_only_unresolved_count'):
         require(type(value[key]) is int and 0 <= value[key] <= total, 'summary')
@@ -416,6 +500,9 @@ def validate_summary(value):
             and type(reasons) is dict and set(reasons) <= REASONS
             and all(type(count) is int and count > 0 for count in reasons.values())
             and sum(reasons.values()) == counts.get('unresolved', 0), 'summary')
+    require(value['disposition_counts']['stocks'].get('matched_current_crosswalk', 0) <= proof_counts['pass']
+        and value['reason_counts']['stocks'].get('original_source_refused', 0) == proof_counts['refused']
+        and value['reason_counts']['stocks'].get('original_source_unavailable', 0) == proof_counts['unavailable'], 'summary')
     require(value['exact_FIGI_only_unresolved_count'] <= sum(
         value['disposition_counts'][table].get('unresolved', 0) for table in ('stocks', 'funds')), 'summary')
     require(value['provider_row_counts'] == {name: source_meta['AW'][name]['row_count']
@@ -432,28 +519,38 @@ def validate_summary(value):
     return json.loads(canonical(value))
 
 
-def prepare(binding_rows, ac_raw, ap_plan_raw, active_raw, delisted_raw, mapping_rows, *,
-            expected_ac_summary, expected_aw_inventory, deadline=None):
+def prepare(binding_rows, aa_raw, ac_raw, ap_plan_raw, active_raw, delisted_raw, mapping_rows, *,
+            expected_aa_routing_summary, expected_ac_summary, expected_aw_inventory, deadline=None):
     _budget(deadline)
-    frame, plan = _source(binding_rows, ac_raw, ap_plan_raw, expected_ac_summary, deadline)
+    aa, frame, plan = _source(binding_rows, aa_raw, ac_raw, ap_plan_raw, expected_aa_routing_summary, expected_ac_summary, deadline)
     active, delisted, mappings = _inventories(active_raw, delisted_raw, mapping_rows, expected_aw_inventory, deadline)
-    source_meta = {'AC': dict(AC_PIN), 'AP_plan': dict(AP_PIN),
+    source_meta = {'AA': dict(AA_PIN), 'AC': dict(AC_PIN), 'AP_plan': dict(AP_PIN),
         'genuine_binding_stream_sha256': frame['binding_contract']['binding_stream_sha256'],
         'AW': json.loads(canonical(expected_aw_inventory))}
-    return _prepare_bound(frame, plan, active, delisted, mappings, source_meta, deadline)
+    return _prepare_bound(aa, frame, plan, active, delisted, mappings, source_meta, deadline)
 
 
 def profile_record():
-    return {'schema': SCHEMA, 'AC_pin': dict(AC_PIN), 'AP_plan_pin': dict(AP_PIN),
+    return {'schema': SCHEMA, 'AA_pin': dict(AA_PIN), 'AC_pin': dict(AC_PIN), 'AP_plan_pin': dict(AP_PIN),
+        'catalog_schema_module': 'scripts/arv2_r298_eodhd_catalog_schema_v2.py',
+        'catalog_schema_source_pin': dict(CATALOG_SCHEMA_PIN),
+        'catalog_schema_profile_sha256': CATALOG_SCHEMA_PROFILE_SHA256,
         'stock_count': EXPECTED_STOCKS, 'fund_count': EXPECTED_FUNDS,
         'inventory_commitment': 'full_canonical_ASCII_sorted_JSON_row_plus_real_LF_preserve_order_duplicates_unknowns',
         'matching': 'unique_EOD_symbol_identity_exact_valid_compositeFIGI_and_at_least_one_exact_checksum_CUSIP9_link',
-        'all_tokens': 'all_source_tokens_and_all_global_mapping_relationships_checked_no_first_token_or_row',
+        'all_tokens': 'uniform_available_original_proof_UNION_qualified_current_tokens_for_ALL_originals_no_adaptive_native_five_fallback',
+        'private_union_field': 'available_source_cusip_union_not_a_claim_of_unavailable_original_completeness',
+        'original_missing_or_refused': 'retained_per_binding_unresolved_no_route_not_an_entire_diagnostic_abort_pass_refused_unavailable_counts_sum6151',
+        'original_identity': 'all28field_source_hash_original_constructor_evidence_hashes_and_dates_except_previously_qualified_SF1_functional_reporting_currency',
+        'original_token_provenance': 'AA_original_row_revalidated_with_frozen_AC_original_proof_not_AA_original_cusip_tokens_alone',
+        'fund_proof': 'AA_AC_full_current_metadata_tokens_and_MIC_equal_then_AP_route_hash',
+        'all_relationships': 'all_source_tokens_and_all_global_mapping_relationships_checked_no_first_token_or_row',
         'source_owner': 'same_validated_original_security_id_AND_compositeFIGI_repeated_intervals_share_owner_other_IDs_never_merge',
         'duplicate_provider_rows': 'preserved_classified_same_complete_identity_ownership_can_agree_no_arbitrary_first_row',
         'display': 'ticker_name_country_exchange_CIK_LEI_never_identity_or_alias_proof',
         'FIGI_only': 'diagnostic_unresolved_not_a_route',
-        'current_catalog': 'USD_and_exact_Common_Stock_or_ETF_type_optional_ISIN_consistency_no_historical_interval_inference',
+        'current_catalog': 'display_neutral_V2_schema_USD_exact_Common_Stock_or_ETF_type_optional_ISIN_consistency_no_historical_interval_inference',
+        'global_ISIN': 'all_active_and_delisted_rows_checked_for_different_Code_type_currency_owners_of_any_used_valid_ISIN_agreeing_duplicates_preserved',
         'policy': 'prospective_fixed_EOD_whole_window_same_six_cells_not_implicit_Sharadar_native_fallback',
         'scope': 'all6151_original_bindings_plus8funds_including_native5_andconditional510_never_dropped',
         **FALSE_FLAGS}

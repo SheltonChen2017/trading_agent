@@ -1,9 +1,8 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **LANE SYNCED WITH CLAUDE'S TWO COMMITS; CODEX COUNTER-REVIEW
-ACCEPTED AFTER APPENDED FACTUAL ERRATA (SECTION127); BOTH126 HISTORIES PRESERVED.
-OWNER-RESUMED OFFLINE CUSTODY REPAIR / LAST-PRE-QC BUILD IS PAUSED FOR THIS
-COUNTER-REVIEW. 84005 CUMULATIVE COUNT STARTS / UNCHANGED4GiB; THE CURRENT
+Status: **OWNER-RESUMED OFFLINE CUSTODY REPAIR / LAST-PRE-QC BUILD (SECTION128).
+CLAUDE COUNTER-REVIEW ACCEPTED AFTER APPENDED FACTUAL ERRATA (SECTION127);
+BOTH126 HISTORIES PRESERVED. 84005 CUMULATIVE COUNT STARTS / UNCHANGED4GiB; THE CURRENT
 PERMANENT FULL-PAGE RESERVATION MODEL ADMITS ONLY2036 NEW SLOTS UNTIL AN
 AUTHENTICATED DURABILITY ADAPTER EXISTS. ALL OLD CLAIMS, NEGATIVES,
 RECEIPTS AND CHARGES REMAIN SPENT/IMMUTABLE; NO OLD FILE IS ADOPTED.
@@ -23986,3 +23985,182 @@ held until real custody and maximum-size body/receipt closure. Do not access
 QC/Safari/Mia or start setup, upload, compile or backtest. Local readiness
 remains false; canonical looks0/0, exploratory0, alpha0, permanent IDsnone,
 QC launch attempts0. No review, fixture or merge changes those gates.
+
+## 128. Owner-resumed offline custody repair — 2026-10-26 Pacific session
+
+### 128.1 Authority, immutable baseline and smallest prospective step
+
+**SI-AUTH-20261026-02** records the owner's direct instruction: "continue
+fixing custody offline without weakening checks or losing data. stay within
+84,005 cumulative STARTs and 4 GiB. build to the last step before QC setup,
+no QC/Safari or purchases, and push once when done." Work remains in the
+designated Short Interest root and codex/strategy-short-interest branch.
+Exact clean local/tracking/actual origin baseline is
+`d6af672b3c8198712228bbd7b5eef35777283b1a`. This is a NEW bounded round; the
+previous single push is not reused as this round's publication. No monitor
+or other automation is requested or changed. Shared documents stay frozen.
+
+Retain all negative namespaces, claims and data in place. Count baseline
+13,992START/13,991recordedHTTP/23,452,681chargedbytes remains spent; no debit
+or unknown full page is refunded. Cumulative count ceiling84,005/4GiB is
+unchanged. Missing67,885 positions and133chunks(132*512+301), at most16
+extra attempts/chunk and3total historical+new tries/position remain frozen.
+The existing conservative permanent-full-page model still admits only2,036
+new reservations before a separately proved durable-body/receipt adapter;
+84,005 is not proof of affordability. Daily budgets are separate. No new
+provider count or daily START is authorized before actual offline custody,
+maximum-size body/receipt closure and a newly frozen finite source policy.
+
+**SI-DEC-20261026-01** selects one finite isolated-local-storage hypothesis
+based on127.3's genuine66-to64 transition, NOT an actor diagnosis. Restore
+only the three owned draft CODE files from127.1 by apply_patch, keeping the
+original private copies byte-exact. Complete and validate them before any
+image is created. A fresh private0700 namespace
+`artifacts/short_interest/native_reported_counts/isolated-custody-20261026-v1`
+may contain ONE new8GiB-virtual APFS SPARSE intermediate image and a fixed
+private mountpoint; at most ONE fresh186-byte synthetic proof inode under
+mount/proof. No existing source or failed file is moved, copied, mounted,
+adopted, reopened, reset, resealed or unlocked. The8GiB virtual container
+limit is NOT a provider-response allowance or8GiB of acquired data; new
+source charges remain0 and the4GiB cumulative source cap is unchanged.
+
+### 128.2 Prospective isolated-storage and unchanged evidence predicates
+
+Use only fixed local hdiutil create/attach/info argument arrays; fresh
+namespace/absent image and association checks, no overwrite/shadow/copy,
+resize, retry, elevation, authentication workaround, cleanup or detach.
+Bound each subprocess to120seconds and whole volume initialization/closure
+to300seconds; the registered composition including setup is420seconds.
+These do NOT enlarge the ORIGINAL metadata creator's8second window or
+5second checked postseal hold. Any window exhaustion remains a refusal.
+
+Bind original parent/namespace/backing/mount FDs and native statfs64 APFS,
+local-mount, owners-honored and exact returned-device/FSID identity. Creation
+root0700/current UID and backing0600/single-link/current UID are required;
+the mounted device must differ from its hosting parent. Reject already
+attached images, unknown/duplicate/changed associations, overlays and native
+ownership-ignore/readonly flags. Check real hosting and mounted capacity.
+The backing image is a mutable CONTAINER with fixed inode/protection, not
+an immutable evidence file; that distinction grants NO exception to the
+inner file's exact original eight-field seal plus ninth flags field, hash,
+FD/name checks, permanent failure latch and all terminal context exits.
+
+Call the ORIGINAL fixed native setter ONCE; preserve initial UF_TRACKED and
+require UF_IMMUTABLE thereafter, with genuine EPERM write-open/fchmod/
+fsetxattr challenges. No second setter, flags tolerance, fabricated denial,
+rebaseline or adopted capability. Keep the original bounded native observer
+and its exact accepted original proof catalogue. After ALL original code,
+metadata/output AND volume exits, require a fresh committed64-file code
+audit followed by the original evidence seal/bytes and original-volume pin
+audits, terminal clocks and genuine factory-issued closure witnesses.
+Any negative/nonzero/unknown termination vetoes provisional reports.
+
+Create with indexing disabled and attach nobrowse/noautoopen/owners-on;
+those options are NOT a sandbox, actor attribution or future stability
+guarantee. SPARSE is an intermediate synthetic target: even a pass does
+not qualify persistent production storage,2MiB bodies/receipts, source
+coverage, licensing, denominator/actual-input admission or backtest readiness.
+No further namespace guesses are permitted after an unexplained actual
+failure; first establish a specific causal issue or factual external gate.
+
+### 128.3 Pre-release findings and validation (no actual operation yet)
+
+| ID | Priority/status | Verified issue and correction |
+|---|---|---|
+| SI-BUILD-20261026-001 | P2, corrected before release | Four authoritative mount masks were absent from the policy trust root. Changing a mask could defeat ownership/local/readonly checks without changing policy identity. Internal peer identified it; Main's four new cases failed4/43deselected/.37s before correction. Pin all four exact SDK literals AND fields in policy before any native/command seam. |
+| SI-BUILD-20261026-002 | P3, corrected before release | The parked partial driver used nonexistent storage API names and supplied a new catalogue to an observer that intentionally accepts only the original proof's exact catalogue. Bind the actual prepare_registered_volume/mountpoint API and original base proof catalogue; no original observer/check is generalized. Main's complete fabricated composition now exercises those genuine boundaries. |
+| SI-BUILD-20261026-003 | P2, corrected before release | A code change during volume-context shutdown occurred after the earlier terminal code audit and escaped the draft's final result when the fabricated lane guard itself was neutral. Main's new late-close case failed1, with60passing/6.70s before correction. Add a fresh complete committed64-file audit AFTER volume-context exit, then final ORIGINAL evidence/volume audits. |
+| SI-BUILD-20261026-004 | P3, corrected before release | New protected filesystem/native tests needed selective POSIX capability scoping, and the new composition imported its POSIX subject before inherited test guards. Keep pure policy/error cases active, skip only the protected fixture/native case on unsupported hosts, and importorskip before the first protected script import. This is not Windows execution or ACL parity. |
+| SI-BUILD-20261026-005 | P2, corrected before release | The draft wrapper's public failed/counter/active fields could be reset after a caught denial or to authorize a second create. Main's direct-handler counterexamples independently confirmed all three false-clean/reset/disable cases, with0 actual operations. Author then supplied five red tests (including006)5failed/34deselected/.52s. Independent retained original bindings/dict identities/counter tuples, permanent failure and active-state pins now veto mutation; summaries use ORIGINAL counts even after tampering. Trusted terminal deactivation never erases failure or admits reuse. |
+| SI-BUILD-20261026-006 | P2, corrected before release | The first wrapper allowed64 code file paths but refused the ORIGINAL HeldFiles read-open shapes: exact code parent directories and relative code basenames. That would necessarily stop real initialization without testing storage. Main verified the original constructor and requested causal regressions. Include only those exact readonly parents/basenames, not arbitrary subtrees; unchanged original HeldFiles/creator still bind dir_fd/mode/inode and committed bytes. Two author red cases are included in005's five-case run. |
+
+Main's first restored isolated helper baseline passed43/.44s on fabricated
+subprocess/native seams. After mask/closure/API corrections and before the
+later selective-host markers/harness addition, the ten-file focused selection
+passed282/18.62s, no skips/warnings, empty inherited environment and OS network
+denied. This is prior software evidence, not actual volume proof or final
+validation of later changes. No actual image, mount, flag, source, key, HTTP,
+claim, START, charge, outcome look or QC operation has run in this round.
+
+An internal read-only peer checked the installed SDK statfs64 layout, exact
+mount flag constants, local hdiutil options, fresh-association/anchor/closure
+rules and final driver. It performed NO edits, tests or actual operations;
+these are development observations, not Claude review. Main read the complete
+restored helper/test and new driver/composition tests. hdiutil's4MiB plist
+limit is expressly a post-capture acceptance bound, NOT a hard capture-memory
+bound; only the fixed local tool's output is accepted, stderr discarded and
+no arbitrary exception/path/attribute value or private source bytes emitted.
+The dedicated committed wrapper must deny every source/key/socket and other
+write surface while permitting the genuine local kernel challenges.
+
+Author's first wrapper selection passed34/.37s before Main's counterexamples;
+the corrected wrapper passed41/.46s after the five red cases. One intermediate
+development selection was1failed/38passed/1.01s because an old NEW-test regex
+expected a later read-open denial after an already latched failure. Preserve
+the stronger immediate permanent veto and add a separate fresh-instance
+read-open test; no original production/test protection is relaxed. All are
+author-attributed fabricated executions, not Main reruns or actual operations.
+Main's fresh three-new-file selection then passed102/6.13s, network denied,
+before the final hash literals below. Main read the complete final wrapper,
+all new tests and every correction; no agent is authoring during operation.
+
+### 128.4 Frozen ONE-invocation registration, not source authority
+
+Dedicated wrapper scripts/run_short_interest_isolated_custody_offline.py
+installs counted permanent Python source/key/socket denials. It preserves
+original os.open AND supports_dir_fd, original OwnedOutput constructor,
+creator, setter, flag reader and native challenge implementations. Exact
+readonly64-code files/parents/basenames and the fixed NEW namespace are
+permitted; file-open audit mode/dir_fd limitations are explicit and enforced
+by original authenticated custody code, not a replacement syscall. Stat and
+directory metadata are NOT independently sandboxed; this is not a claim of
+a general hostile-code sandbox. No source bytes are read. Exact /dev/null
+RDWR is allowed only as a non-evidence subprocess stream. Real write-open,
+same-mode fchmod and fixed fsetxattr MUST still return genuine EPERM.
+
+Subprocesses permit only exact matching-lane Git metadata/64 committed blobs
+(maximum20,000 commands) and the frozen new local image's hdiutil arrays:
+create1, attach1, info at most12. No fetch, other ref, shell, security/key
+tool, source command, device detach or unknown subprocess. No Python
+destructive operation, arbitrary native library/symbol or other write-open.
+Every denial or counter/active-state mutation latches permanently. Terminal
+success validates the complete17-field driver result, original14-field
+observer report/hash, exact one native call and stable flags/samples,
+all three EPERM challenges, genuine source/code/volume closures and0 denied
+seams. Nonzero/unknown process termination still vetoes that result.
+
+Proof protocol SHA256
+`c7ed187de9291aaaf8961611a217da10692c3257a649ac4e09c258ccad3381e1`;
+isolated storage policy
+`fa475de30aa3e51174c119e26b166e188453ee3dc1473d7fda5392d38768e062`;
+offline harness policy
+`28aae5bac9075b8b22f7c25834ecd3d3089b162b09756a72526033302ea3a040`.
+Exact64-path transitive AST list SHA256
+`0be79b48af5c30bbe96cc52fee3ca3f1561a7f03b7de658cb5b953272f6e0922`;
+complete64-current-byte mapping SHA256
+`7fcb9d31ed9eb27266f36e960d6c002f6411f817f4eef7c1af8a7f29999926d5`.
+Exact AST closure, all new literal-contract catalogues and source/three-test
+in-memory compilation passed, no bytecode written. Read-only symbol lookup
+confirmed the three fixed libSystem symbols exist; NO native function was
+invoked by that lookup, which is not filesystem/custody proof.
+
+Actual invocation is still NOT run at this entry. It may run ONCE only after
+final focused checks, clean checkpoint, exact physical/Git roots/branch/HEAD/
+status and actual/tracking originD6AF rechecks. Runtime HEAD is the resulting
+checkpoint hash, supplied explicitly to the CLI; the immutable64-file source
+mapping and protocol above must match committed Git before any new image.
+No editing/testing/commit/push or agent authoring while that operation is
+active. Keep all output/image/mount/evidence on either outcome; no retry,
+reset, extra probe namespace, old-file adoption or weakened predicate.
+After genuine terminal closure, authenticate/document the actual result
+before deciding the next bounded offline step. The single final matching
+push remains deferred until true local pre-QC readiness or an irreducible
+factual blocker, never an interim publication.
+
+Main final fresh-process eleven-file custody/harness/import/budget/record
+selection plus three named active-document checks: **326passed/18.55s**,
+no skips/warnings, empty inherited environment and OS network denied.
+Both complete126 histories remain byte-exact under their pinned regressions.
+All production/test files were read by Main; original capture/source/custody
+modules are unchanged. No full suite is run. All development agents and test
+sessions are completed/frozen before checkpoint and actual invocation.

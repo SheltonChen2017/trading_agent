@@ -65603,3 +65603,196 @@ AM policy SHA(source/provider/authenticate/validate):
 b3768e7326a11215b253ca92d78b17f38d9578e4f7e846afc2bd02728aea1dc9;
 0ccbf55cde4c1595dcc7253efafa0e77c3b282ee55dd1d361c783ab48256d887;
 c1049796494e2d2a0f2c090d4dae3e82db76890cb3f79e2a20d3388753dc8aaf.
+
+### 326.34 Actual AM source/axis proof passed; first transport intent refused
+
+At cleanc2278d3de8720d4c2b0d20e1e17a6ceaf84e4a72, sole AM parent
+2026-10-27T12:13:28.779547+00:00..12:13:43.788454+00:00 exited2,
+9691stdoutbytes SHA49893a0f53ad1b559d3e06185c32d282425a4bd84261ca447a5ced745a7a2ab0,
+stderr0/boundnull. Sole native closed-output validator
+12:13:43.788824+00:00..12:13:47.662316+00:00 exited0, same9691bytes/hash,
+stderr0/boundnull. This is authenticated failure evidence, not parent0 or
+accepted acquisition. AM parent/source/provider/validator/claim are SPENT;
+no control/corpus/plan reread, repair, unchanged retry or output-reader replay.
+The final86record1.29s repeats prior218, not additive coverage.
+
+Actual source child0,3750bytes SHA
+4dcfef69115327da96b0ab7f56a0c8d51aa6a384fd2569d91188a0cd6f64a254,
+stderr0/boundnull. Genuine6151whole original bindings, full3466strict parsed
+dates/hash4ac84a2d, held AC4366e1e8 and normal source guards passed BEFORE
+plan publication and Keychain handoff. I326-014 resolves prospectively for
+this source use; AL's historical refusal remains. New private plan2927971bytes
+SHA7703c8e29d7bef5928b0a776628759ff97715b003045c2c00df2b01e7b03f51e;
+assignment inventory36f3bf15edae5c13873f43dcc1eef179a6aee2f0c7a2d1395cf7e5afe2dd9bb6;
+request inventory70313bc404094f0e458424f79a0ec7f52c4fc71447c554d97aff4d8d8de558d7.
+It preserves6151originals/5636vendor/5native/510conditional/8funds,
+1452price sessions/8195088vendor grid cells and1256requests. This authenticates
+the fresh plan, not any acquired price or subscription capability.
+
+Only after source0, one existing Sharadar Keychain handoff completed. Provider
+actual2,592bytes SHAc2d6394786e3734001b6b2b8136a36d3c5aa7df416df9dff1bd5ef095a3dd996,
+stderr0/boundnull, finite transport_connection. Exactly1APPLICATION intent
+was retained, first dispatch plan ordinal1254(funds);0complete HTTP200 bodies/
+0retained corpus bytes. HTTP status not observed/OS errno null; physical
+request count remains null/unknown, auth worker never dispatched. All source/
+provider failure packets and actual stdout joins passed. There is no accepted
+corpus, price/sidecar/receipt or strategy run and no basis to infer expired
+subscription, rate limit, server rejection or cause from this category.
+
+P2 I326-015 OPEN: existing transport taxonomy loses information when Requests
+wraps urllib3 errors inside exception args and MaxRetryError.reason; gaierror
+EAI codes also fall outside AM's positive OS errno allowlist. Static installed
+library inspection, not old output rereading, confirms those representation
+paths. The child environment is a literal credential-free/proxy-free allowlist,
+and Requests trust_env=False/proxies={} remain binding; a proxy explanation
+is not supported for this admissible run. Z's earlier metadata HTTP200 calls
+ran in its ordinary claimed parent, while native network denial applied only
+to its parser/validator; they do NOT validate AM's new provider egress policy.
+
+Root primary-source research found a concrete testable hypothesis: Apple's
+mDNSResponder dnssd_clientstub opens/connects a local daemon socket for DNS,
+and Chromium's actual mac network sandbox explicitly allows network-outbound
+literal /private/var/run/mDNSResponder and control-name com.apple.netsrc.
+AM's egress rule admits only remoteTCP443/TCP53/UDP53 and denies other outbound
+socket kinds. This may block platform DNS IPC; it is not yet an observed
+root cause. References:
+https://github.com/apple-oss-distributions/mDNSResponder/blob/main/mDNSShared/dnssd_clientstub.c
+and
+https://chromium.googlesource.com/chromium/src/+/cfbe56f17a3d7a3397a09d091252db6e3470223d/sandbox/policy/mac/network.sb.
+No system logs/private network configuration or content was read, settings or
+daemon changed/restarted, or security disabled. Qualification: advisory work
+did inspect public OS METADATA outside the root, with designated repository
+cwd: stat of /var/run,/private/var/run,/private/var/run/mDNSResponder reported
+Directory/Directory/Socket; /usr/bin/readlink /var returned private/var. An
+initial /bin/readlink attempt failed because that executable was absent.
+No socket was opened/connected or file content/log read in those operations.
+This limited system dependency observation is not historical source/private
+runtime authentication or permission to inspect other out-of-root evidence.
+
+Next is a separately frozen CREDENTIAL-FREE public-root transport phase
+diagnostic for api.sharadar.com: same native egress, one DNS/first-address
+TCP/verified TLS/HEAD status-line only, finite stage/error/numeric errno
+including DNS codes, no data endpoint/key/proxy/response body/redirect/retry.
+Purpose is cause discrimination, not another acquisition or entitlement test.
+Any later minimal platform-resolver policy correction needs actual evidence,
+exact scoped delta/new source/run freeze; frozen AM/AF policies stay unchanged.
+No broker/source privacy or network-denial gate may be removed. No QC/capacity/
+sourcebook export/new look occurred;337/259/53/699 remains. Concrete common
+vendor corpus/sidecar/runtime/full required coverage still precede six/eight
+strategy jobs. Current owner continuing authority covers this diagnostic
+implementation without another routine permission or Claude checkpoint.
+
+### 326.35 Exact AN credential-free transport phase diagnostic freeze
+
+Owner's continuing parser/price/research recovery direction and review waiver
+permit ONE new credential-free public transport diagnostic at the clean commit
+containing this freeze, not another price acquisition or entitlement test.
+New scripts/diagnose_arv2_r298_public_transport.py37001bytes SHA
+ccaf46bfabcd7a4f0598bd04cd5d27126467ab5aea18cea5a6c2c919e989194c;
+main tests19604bytes SHA03d05500c5729265b1d01eee00cdc22535bc9c6425076ce20f074aa3152745e7;
+review tests9153bytes SHAca039791e725f644bec5959754429792b49dd31e2c00637bf5abe4ce946e3000.
+Canonical WITH-LF profile25054bytes SHA
+384a6dff5449b73afae3603023795540f6dfed81f2313d38f65d8ff93d0dc12e,
+188selected dependencies including AM88a1c9df. Fixed own leaf
+artifacts/analyst_revisions_v2/newrule_public_transport/R326-20261027-AN
+UNINSPECTED/unallocated. Designated root/branch/Mac/POSIX Python3.13 and exact
+/Users/sheltonchen/.venvs/trading_agent-py313/bin/python/clean HEAD/self hash
+binds remain; no automatic pin refresh, arbitrary callback or permission flag.
+
+Parent exclusively claims/fsyncs before any DNS/network action; one inherited
+own control/claim/intent/journal FD set binds one child. Held/named metadata,
+owner/single-link/regular/0700directory/0600file/native security checks and
+fsynced stage-prefix journal preserve the exact application intents. Partial/
+duplicate/unknown/nonzero consumes authority, no cleanup or replay. Public CA
+dependency is fixed certifi/cacert.pem at the designated venv path,240216bytes
+SHA9cc2a774b5198dcff14d9be1e66091f538975d867ce029a96bce15a55dfd730f.
+No-follow/regular/exact-fstat bounded bytes/hash/endpoints are checked before
+DNS; those SAME captured public PEM bytes are loaded as TLS cadata. No default
+trust roots, client certificate, Keychain, environment proxy or secret input.
+Selected library/CA pins are not whole-interpreter integrity.
+
+Native child retains EXACT AM outbound DNS53/HTTPS443 clause and bind/inbound
+denial, with no newly allowed local resolver/control socket. This deliberately
+tests the existing constraint before any correction. Native policy is not a
+domain firewall; the program fixes host api.sharadar.com/port443/path/.
+ALL other artifacts/Keychain/security CLI are denied; writes only own journal/
+inroot temp/cache/log paths. Validator uses native ALL-network/ALL-artifact
+denial and only RAM stdin. No old source/control/report/corpus/book/data read.
+
+Exactly one application getaddrinfo(AF_UNSPEC,SOCK_STREAM,IPPROTO_TCP) retains
+only ordered-inventory hash/count/families, not addresses. Select first returned
+supported address, never retry/re-resolve/fallback/Happy-Eyeballs. Direct one
+TCP connect; one PROTOCOL_TLS_CLIENT verified handshake with CERT_REQUIRED,
+hostname check/server_hostname exact, minTLS1.2 and http/1.1 ALPN; retain only
+finite TLSversion and peerDER SHA. Then ONE fixed credential-free HEAD /,
+Host/Connectionclose/Accept-Encodingidentity, status line recv(1) only <=512
+bytes. Retain validated first numeric100..599 status and byte count; no headers,
+body, cookies, redirects, API key or stocks/funds data endpoint. Public-root
+HEAD IS provider contact; provider_data_endpoint_called=false does not claim
+zero contact. Application does not read/parse/retain response-body bytes;
+TLS/OS buffering may receive additional bytes internally. Any numeric status
+only corroborates this transport observation, never API entitlement/source/
+subscription health, historical AM cause or price/strategy readiness.
+
+One30s child/per-stage5s, parent60s/outer65s, validator30s/outer35s; native
+uninterruptible IO/host suspension may exceed these bounds. Only own child
+kill/reap.32KiB output/8KiB journal/64DNS rows/512B status bounds. Finite exact
+exception classes and numeric OS/DNS EAI/certificate verify codes are captured
+without str/repr/args strings/URLs/addresses/raw exception. Closed9field actual
+metadata validates finite bound/null-or-integer exit/UTCISO order/counts/hashes
+even with no accepted child; child packet/journal/report pins and actual exits
+must join. Root found and corrected that initially incomplete actual-record
+validation BEFORE use (I326-016 P3 corrected prospectively). Late close/report
+failure is parent2 despite retained earlier success; never accept report alone.
+
+Real native-denied ENV-only smoke checks(no source preflight/claim/probe/DNS/
+private data/contact) found Darwin Python's PEP538 adds LC_CTYPE=C.UTF-8 to
+the literal LANG=C environment. Original draft would reject its own host.
+Fix accepts ONLY absent/C.UTF-8 plus already permitted automatic CF bookkeeping;
+all credential/proxy/other names remain refused. Main tests now launch a REAL
+plain child under inherited native denial with this literal environment and
+call only environment(), rather than mocking that boundary. This is a locale
+compatibility correction, not an environment/security blanket waiver.
+
+Exact bounded outer code1765bytes SHA
+7d53e3dd8aa0b387267b23982cac3c8c581f2b4036cec595b5bd93aa8e60865e
+takes exact committed HEAD/self hash argv and constructs only the literal
+credential-free C/inroot environment. It holds bounded original stdout/stderr
+in RAM/actual-exit metadata, invokes native validate ONCE on that same original
+stdout/actual exit, and emits only authenticated closed redacted result.
+Four synthetic external-exit cases passed(0+validator0,2+validator0,negative
+exit without validator,validator failure); no operation occurred. Actual
+parent0 plus matching native validator0 and closed complete state is necessary
+for completed observation. Validator0 may authenticate parent2 failure; no
+physical-packet count or historical failure cause is inferred. No control/
+result reader or acquisition is replayed; this one use is consumed on invocation.
+
+Root focused151distinctpasses5.54s(51main+14broker-review+86record/document),
+no failures/skips/warnings/full suite. Source/test in-memory compilation,
+188pins, CA hash, exact AM egress/profile and dispatch_fence absence passed.
+Native ALL-network/artifact/Keychain/security denial, inroot support paths,
+--noconftest/no plugin autoload/no cacheprovider held. Earlier author45/51 and
+review14 selections overlap, not additive. Broker journal-to-child omission
+caught1expectedfailure0.13s, memory-only/restored; author omissions separately
+recorded below. Same-round source audit found no additional confirmed P0-P2;
+neither advisory work nor root tests is Claude independent acceptance.
+Child policy SHA833bfe6f65f69da2a83018fc70d992508b11a5424495736801211dba9aa0dd92;
+validator79d7e961f0ab250fd95784609a254c2628244cbd0143b0aa3ea1d2f514858a4c.
+
+All agents HOLD edits/tests through actual AN. No QC/Safari/capacity/job,
+licensed rows, credential lookup/new paid rights, source-price admission,
+strategy backtest or financial/formal gate clearance. Booked floor stays
+337/259/53/699; public transport intents add no QC look or strategy cell.
+If it refuses at a platform stage, preserve the actual finite evidence and
+prepare only a separately justified minimal scoped recovery with fresh exact
+freeze; never silently change a used policy or retry it unchanged. No actual
+AN control allocation/credential/DNS/socket/HEAD contact occurred before freeze.
+
+Author source51passes8.21s(process8.76s), prior45overlap. Memory-only/
+finally-restored omissions each caught1expectedfailure: TLS configuration
+predicate0.16s, closed failed-child actual metadata0.19s. During preparation,
+two brief unheld predicate/policy source lines were restored; final source/
+profile bytes match the exact root151-pass snapshot ccaf46bf/384a6dff before
+freeze. No operational call overlapped those edits, and no continuous file-
+stability claim is made for authoring/testing. All final hashes are rechecked
+before commit/use; the used frozen source must never be changed or repaired.

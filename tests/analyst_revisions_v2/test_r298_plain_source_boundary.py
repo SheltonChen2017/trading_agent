@@ -485,4 +485,3 @@ def test_new_profile_has_no_source_acceptance_or_attempt_authority():
     assert profile['a11_authorized'] is False and profile['source_policy_acceptance_proven'] is False
     assert profile['provider_request_count'] is None
     assert 'a8_authorized' not in profile
-

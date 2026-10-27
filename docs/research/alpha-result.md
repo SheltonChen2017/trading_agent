@@ -7277,3 +7277,69 @@ other five comparison projects remain uncreated/unlaunched. Analyst323.60
 owns exact evidence/qualifications; new S source eligibility is local-only
 and has not run. Owner-authorized R298 append preserves all historical/
 other-lane entries and false formal/PIT/master/paper/live flags.
+
+## R-298 R323-named launches — seven unbooked backtests after the pushed tip (RETROACTIVELY RECONCILED FROM A QC CENSUS AT THE OWNER'S DIRECTION; NOT ADMISSIBLE) — 2026-10-26
+
+Written by the Claude review of section 323 on the Windows host, at the
+owner's direction to fix every finding of that review. A 2026-10-26
+administrative census (zero looks: `backtests/list` and status-only
+`backtests/read` projections of name, status, progress, error text, creation
+time and engine window; no statistic, chart, order, log or return) of private
+project `ARV2 R298 NEWRULE SIX OFF 2021 OCT2026` (`38364439`) finds eight
+backtests. One is the owner's manual sample already booked above. The other
+seven were created on 2026-10-25 and 2026-10-26, after the pushed tip
+`3c905d42`, and are named for a section 323 that the pushed branch does not
+contain; they are in neither the pushed lane record nor this ledger:
+
+| Backtest | Name | QC status | Created (UTC) | Engine window | Conservative class |
+|---|---|---|---|---|---|
+| `e5c358608fa75d62b3a26a1be26d301f` | `ARV2 R298 NEWRULE SIX OFF 2021 OCT2026 R323 A12 9dde3978` | `Runtime Error` at 2021-02-22 09:31 (`execution_price_not_current_minute`) | 2026-10-25 19:04:48 | 2020-11-01 to 2026-10-13 | development |
+| `45ffd36c48e59adfbb212cfd3324dfeb` | `ARV2 R298 QUOTE DIAGNOSTIC R323 A14` | `Runtime Error` at 2021-02-22 09:31 (`execution_price_end_not_current`) | 2026-10-25 20:38:52 | 2020-11-01 to 2026-10-13 | development |
+| `65a1d6698d182b11f2f4b60b7e31267b` | `ARV2 R298 QUOTE EXECUTION R323 A16` | `Runtime Error` at 2022-10-24 09:20 (six-universe RAW reference price census incomplete) | 2026-10-25 21:13:16 | 2020-11-01 to 2026-10-13 | development |
+| `78ba7a236450cdeffea5efe07d087637` | `ARV2 R298 RAW REFERENCE DIAGNOSTIC R323 A18` | `Runtime Error` at 2022-10-24 09:20 (same census refusal) | 2026-10-25 22:26:10 | 2020-11-01 to 2026-10-13 | development |
+| `b850c8193949015bc59c41d0e1434229` | `ARV2 R298 REFERENCE IDENTITY DIAGNOSTIC R323 A19` | `Runtime Error` at 2022-10-24 09:20 (same census refusal) | 2026-10-25 23:00:58 | 2020-11-01 to 2026-10-13 | development |
+| `80f506bd3526e4d31a47b7eef5e1b3dc` | `ARV2 R298 RAW FEED PRESENCE R323 N` | `Completed.` | 2026-10-26 00:51:22 | 2022-10-24 only | infrastructure |
+| `fe0603a704d33cfce3d072947bcc56e0` | `ARV2 R298 REFERENCE SERIES PHASE R323 P` | `Completed.` | 2026-10-26 03:13:25 | 2022-10-25 only | infrastructure |
+
+The five full-window runs executed the R298 candidate period and refused at
+runtime; by this ledger's convention for order-shaped runs they are counted
+as development evaluations. The two one-day runs are input-presence probes
+and are counted as infrastructure looks. Every launch is one shared look.
+The lane read none of their results on this host, the two completed probes'
+results are not admitted as cells, and the attempt numbering past A11
+(A12, A14, A16, A18, A19, with A13, A15 and A17 absent from QC, and `N` and
+`P` outside the attempt convention), the waivers that covered them and their
+exact sources are for the in-flight round to record. Conservative booking:
+**326 -> 333 shared looks / 251 -> 256 Analyst development evaluations /
+50 -> 52 infrastructure looks / 699 authenticated cells unchanged**. If
+that round's own entries book any of these seven identities again, the
+later push must reconcile against this entry by identity rather than add
+them a second time. No formal alpha, efficacy, paper/live, broker, funded or
+real-order claim follows.
+
+### R-298 same-lane merge reconciliation — 2026-10-26 (NO NEW LOOK)
+
+The owner explicitly approved a normal non-rewriting merge of the Mac recovery
+history and e57d785f review history. The preceding retrospective seven-job entry
+is retained as a historical census/accounting view, NOT seven additional looks.
+Its exact job identities are already each booked in A12/A14/A16/A18/A19/N/R
+above. Identity-set intersection is seven; union is seven, not fourteen. No
+historical entry or other lane is removed, rewritten or rebooked.
+
+The three additional Mac consumed claims A13(access-stage refusal), A15(idleness
+refusal) and A17(general-collaborator refusal) preceded write/compile/job. They
+are not missing launches or compile failures and remain counted once under the
+existing consumed-attempt convention. The combined ten consumed looks are eight
+development claims A12–A19 plus two infrastructure jobs N and R/P. Therefore
+**336 shared /259 Analyst development /52 infrastructure /699 cells unchanged**
+is the merged floor. Remote333/256/52/699 is its seven-launched-job subset,
+not a rollback of the three pre-job claims and not an additive new balance.
+
+Append-only wording qualification for the retained retrospective paragraph:
+its five development jobs were CONFIGURED for the2020-11-01..2026-10-13window,
+but stopped early in2021or2022. They did not complete that candidate period.
+The two completed one-day probes are not strategy performance cells. Mac323
+contains original per-run freezes/finite result evidence/waiver context;
+this merge neither rereads private receipts nor infers authority from names.
+No new QC/provider/result access, accepted cell, efficacy or formal/PIT/master/
+paper/live clearance follows. Analyst325 owns the counter-review and merge.

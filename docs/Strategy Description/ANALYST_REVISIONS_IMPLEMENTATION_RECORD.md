@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–299 retain the milestone, review, preregistration, QC
+strategy. Sections 1–325 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -512,7 +512,23 @@ invented messages. No failed capture was retried or privately re-read.
 Section 290 adds a committed observation-only one-call seam, with no adapter
 default, credential loader, provider dispatcher or CLI. It separates finite
 failure evidence from an opaque producer return and keeps request counts
-unknown; it is not an operational recovery or production capture entry point.**
+unknown; it is not an operational recovery or production capture entry point.
+Review snapshot R323 is the Windows-host Claude session's independent review of
+`ef654b1d..3c905d42` (0 P0, 0 P1, 1 P2, 5 P3): every commit accepted, the
+forty tail commits of sections 306–322 reviewed after the fact,
+the R-298 ledger chain reproduced to 326 / 251 / 50 / 699, and seven
+R323-named launches found at QuantConnect after the pushed tip, booked at the
+owner's direction to **333 / 256 / 52 / 699** (R323.9) pending original-run
+source/authority reconciliation; five whitespace defects corrected in place.
+The retained Windows section 324 counter-reviews all four Claude commits through `6076ef20`,
+corrects the launch-helper census and evidence/provenance qualifications,
+and accepts the review after documentary correction. No confirmed production
+bypass was found. This Windows counter-review does not reproduce the Mac
+operational receipts or the full lane suite; its focused results and limits
+are recorded separately. Its **333 / 256 / 52 / 699** floor is historical to
+that snapshot. Mac section323 owns the separate recovery evidence; section325
+records the owner-approved merge and identity reconciliation at current floor
+**336 / 259 / 52 / 699**, without duplicate looks or operational pin refresh.**
 
 Current continuation, 2026-10-13: section 292 accepts Claude's two-commit
 section-291 review after documentary qualifications and reproduces both new
@@ -2190,13 +2206,17 @@ push/resource handoff is now recorded there and the one-shot monitor deleted;
 fresh QC gates and complete reference/NAV coverage still precede strategy
 continuation. Q does not identify P's historical changed field;
 no cross-job native-SID continuity or market-wide absence is inferred.
+Actual X then retained its bounded stock-status body before a file-field
+schema refusal(323.77); X is SPENT, funds/prices were not requested. Its
+prospective offline Y drafts are preserved uncommitted and UNINVOKED.
 Current owner request is now synchronization and counter-review, not another
 provider/QC recovery use. Codex counter-reviews the five exact fetched commits
 in section 325. The remote e57d785f and Mac503168ac diverge after3c905d42;
 normal fast-forward is impossible. Preserve both histories and the two
-uncommitted Y draft files; no merge/rebase/reset/force-push, silent source-pin
-refresh, duplicate run booking or further operation while synchronization is
-unresolved. Section325 owns the dispositions and required reconciliation.
+uncommitted Y draft files. The owner subsequently explicitly approved a normal
+non-rewriting merge. Section325 owns that reconciliation, per-commit dispositions
+and single final push. No reset/rebase/force-push, silent source-pin refresh,
+duplicate booking or operational replay; inherited byte-pin gates remain closed.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
 V3 is spent after its
@@ -2350,7 +2370,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–268
+findings, outcomes, and per-run accounting remain in numbered sections 1–322
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -4153,6 +4173,10 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-24 PDT /25 UTC | Owner-authorized A8 diagnostic and one additional A9 credential-handoff recovery | `35081915` -> `8df52a03`, `158f2fd0` and this final section320 result/handoff commit | No incoming Claude review; exact owner waivers consumed, not independent acceptance | A8 stopped locally at credentials with zero application dispatches; corrected A9 handoff reached two metadata calls, then current extra-row shape refused before upload/compile/launch | Root717 focused passes before A8 and608 before A9, overlapping selections not additive; final record repeat in320.11; no full suite or spent replay | A1–A9 spent; current access metadata and original QC upload error remain OPEN; floor324/249/50/699, no accepted cell or running candidate | Exactly one final nonforce matching-lane push; separately bounded read-only current-row observation needs review or scoped waiver; no A10, pin refresh or next cell; monitor PAUSED |
 | 2026-10-24 PDT /25 UTC | Owner AFK readiness delegation: current-access diagnosis and bounded A10 | `924a88ec` -> `5b613ca1`, `8a621141` and this final section321 handoff commit | No incoming Claude range; current readiness waiver, not independent acceptance | D1 two reads show owner-only; A10 access passes but first exact input-runtime update refuses with retained source-policy language; public audit finds plain Python/data-only gzip; Safari/Mia blocked by locked Mac | Root293 D1 and464 A10 focused passes, overlapping document checks not additive; public AST/transport/source checks and final record validation in321; no full suite or spent replay | ARV2I321-001..005 corrected before use; ARV2E321-001 OPEN, no verified policy remedy; A1–A10 spent; floor325/250/50/699, NOT ready/running | One final matching-lane push at concrete QC-policy/unlock barrier; no blind A11 or paid/other-lane expansion; no repeated review-authorization wait; monitor PAUSED |
 | 2026-10-24 PDT /25 UTC | Owner-delegated plain-data recovery to R298 technical readiness | `2292bdab` -> `d95198e0`, `8feb75db`, `9d4725e7` and this section322 final handoff commit | No incoming Claude range; current readiness waiver, not independent acceptance | Mia cause remains qualified; new exact plain-data preparation/publication passed; A11 accepted loader, authenticated eleven source files, compiled once and reached READY with38 application dispatches | Root408 D1,664 D2 and548 A11 focused selections overlap; exact failures/mutations and final record repeat retained below; no full suite or spent replay | R298 READY only, no strategy run/result; D1/D2/A1–A11 spent; floor326/251/50/699; formal/PIT/paper false | Exactly one final nonforce matching-lane push; next separately frozen launch/result protocol for new bindings, no launch/next cell this round; monitor PAUSED |
+| 2026-10-26 | Claude (Windows host) independent review of `ef654b1d..3c905d42`: sections 289–305 confirmed, the forty-one owner-waived commits of sections 306–322 reviewed after the fact, fifth QC census | `3c905d42` -> this record commit | Review of the eighty-three commits pushed since `ef654b1d`: three Claude review sections and their Codex counter-reviews confirmed by this host's gates; the forty-one tail commits (the V5 hardening, the R298 recovery helpers, observers and readers of A2–A11, the plain-data preparation and publication, the READY result) reviewed individually (section 323) | Synced the lane clone by fast-forward from a clean tree. Immutability of V16–V19, the cap-90 bridge runtime and the three trust roots re-verified from committed blobs. The ledger's R-298 chain reproduces (A1–A11 and the owner sample, one shared and one development look each) to 326/251/50/699. Endpoint census of every new script: only three helpers can create a backtest, each exactly once after compile, ownership, file read-back and capacity checks; no live, order or account endpoint. QC administrative reads (zero looks) confirm the owner's sample and find seven R323-named launches after the pushed tip that the next push must book; the project's files were modified after A11, so its source manifest cannot be re-verified from the cloud. No production, test or ledger line changed. | Real tree at `3c905d42`: record and active-document gates **86 passed**; final record bytes **86 passed**; `compileall` exit 0; `git diff --check` clean on the tree and red on the range (five EOF blank lines, four in SHA-pinned files). Complete lane suite at `b295ce02` (owed from section 288): 1579 failed, 7488 passed, 1357 skipped, 1241 errors in 2:56:53, host classes; at `3c905d42`: **in progress at push time**: started 10:56 local on 2026-10-26 and at 5% of the 23,466 collected tests when this record was committed, following the owner's standing direction not to hold a push for this host's run; its counts are to be recorded in the next round. | 0 P0, 0 P1. `ARV2R323-001` (P2, open for the next push): seven un-pushed launches in project 38364439. `ARV2R323-002` (P3): five whitespace defects in pinned files. `ARV2R323-003` (P3): compile results not durable at QC. `ARV2R323-004` (P3, corrected): stale banner and section-4 ranges. `ARV2R323-005`/`-006` (P3, documented): host class and owed suite counts; other-lane launches in the census. `ARV2R248-002`/`-003`/`-004` and `ARV2D287-001` stay open. | Codex counter-reviews section 323; the next pushed round books the seven launches with their waivers; the floor 326/251/50/699 stands; no further attempt, replacement project, six/eight cell, paper/live deployment, broker, funded-account, real-order or trading action is authorised by this review. |
+| 2026-10-26 | Owner-directed corrections to every section-323 finding: seven R323-named launches booked, five whitespace defects corrected | `dfc04152` -> `ad14e379` -> `5751a487` -> this record commit | The owner directed that every finding of section 323 be fixed; 323.9 records the three fixable ones | Status-only QC reads classified the seven un-pushed launches in project 38364439 (five full-window runtime refusals, two one-day probes) and the shared ledger books them conservatively: 326/251/50/699 -> **333/256/52/699**, no cell, identities named in full for the in-flight round to reconcile. The five files ending with a blank line now end with one newline; their pre-correction pins stay true of the spent runs and the corrected digests are recorded. No production logic, test logic or strategy economics changed. | Five files compile; `git diff --check` clean on the tree and on `ef654b1d..HEAD`; record and active-document gates **86 passed** on the final bytes; the lane suite at `3c905d42` remains in progress on this host. QC access: status-only reads, zero looks. | `ARV2R323-001` (P2) and `ARV2R323-002`/`-004` (P3) corrected; `-003`, `-005`, `-006` (P3) have no artifact to change and stay documented; `ARV2R248-002`/`-003`/`-004` and `ARV2D287-001` stay open. | Codex counter-reviews section 323 including 323.9, reconciles its in-flight entries for the seven booked identities by identity, and pins the corrected digests before any future use of the five files; no further attempt, replacement project, six/eight cell, paper/live deployment, broker, funded-account, real-order or trading action is authorised by this correction. |
+| 2026-10-26 | Codex counter-review of all four section-323 Claude commits | `3c905d42` -> `dfc04152` -> `ad14e379` -> `5751a487` -> `6076ef20` -> this record commit | Accepted after documentary correction; one P2 review-coverage defect and four P3 qualifications corrected; no confirmed production bypass or new milestone | Corrected the nine-definition launch census, 42+1+40 commit attribution, script inventory, compile/timestamp inferences, and spent source-pin closure warning; verified the seven bookings without adding them again | Section 324.5 separates public-byte/lane checks, focused Windows failures and isolation-denied Git checks. No full suite, operational entry, private receipt or QC read. Only this lane record changes | Floor 333/256/52/699 unchanged; original seven-run source/authority/numbering and carried P2s remain unresolved. Existing out-of-lane CRLF/public-source and host findings documented, not fixed | One final same-lane push; Claude must review section 324 and exact snapshot. No retry, new source freeze or operational authority; monitor remains paused |
+| 2026-10-26 | Mac recovery handoff plus owner-requested sync/counter-review and explicitly approved normal merge | Common3c905d42;25local recovery commits e3afe7ef..503168ac;5incoming dfc04152..e57d785f; d403c972 counter-review; preserving merge and final handoff | All5incoming commits disposed in325; accepted after qualifications/identity reconciliation;25local implementation commits remain without independent review | Retain Mac323 and namespaced remoteR323/324; retain both ledger histories and reconcile7overlapping jobs with3pre-job claims, floor336/259/52/699 unchanged; retain5EOFchanges without pin refresh; X actual failure recorded, Y drafts preserved uncommitted/uninvoked | 389focused native-denied passes4.13s on merged tree, overlapping premerge389/4.53s and86record repeats; public Git-byte/AST/pin/accounting assertions; no full suite/private or operational replay | ARV2CR325-001/003/004 resolved by preserving merge/append; -002 OPEN with exactly2of157Xsource-pin mismatches; price/status gaps and carried formal/PIT/master gates remain; no strategy result or live readiness | Exactly ONE final nonforce matching-lane push, verify both parents and local/tracking/live agreement; no next milestone/provider/QC action this review round; Insider monitor already fulfilled/deleted |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -62243,9 +62267,389 @@ by this paragraph. No private X data read occurred in the new review turn.
 ARV2E323-001 native price gap and ARV2E323-002 status compatibility remain
 OPEN;336/259/52/699 unchanged and every formal/PIT/master/paper/live flag false.
 
+## R323. Independent Claude review of `ef654b1d..3c905d42` on the Windows host: sections 289–305 confirmed, the forty tail commits of sections 306–322 reviewed after the fact, and a fifth QC census, 2026-10-26
+
+Namespace note added only for the owner-authorized merge: this is the retained
+Windows review originally numbered323 at e57d785f, now labelled R323 to avoid
+collision with Mac's independently accumulated recovery section323. Its inline
+323.N references are labelled R323.N here; source commit blobs retain every
+original byte. Section324 below is the retained Windows Codex counter-review.
+Historical floors/monitor/source-availability statements in these snapshots are
+not current Mac state; section325 controls reconciliation and the live handoff.
+
+Section 324 records Codex's counter-review and the corrections to this section.
+QC observations and full-suite results below remain Claude-reported evidence,
+not new Codex observations. Historical push-ledger rows retain their original
+wording; R323.9 and 324 control the current accounting and qualifications.
+
+### R323.1 Range, method and disposition summary
+
+**Range:** the eighty-three commits pushed after this session's section-288
+commit `ef654b1d`, from `95f56997` (section 289) to `3c905d42` (section
+322), taken by fast-forward into the lane clone from a clean tree. The first
+forty-two, through `4421da78`, contain thirty-seven Codex commits independently
+reviewed by Claude in sections 291/301/305 and five Claude commits
+counter-reviewed by Codex in sections 292/302/306. The next commit,
+Claude's section-305 record `de0911a0`, was also counter-reviewed in section
+306. The remaining forty commits, `b707ab98` through `3c905d42`
+(sections 306–322), had no Claude review before this section. The two
+section-306 commits explicitly held QC pending review; the operational owner
+waiver begins in section 307, not section 306 ("qc is free. skip the reveiw and
+proceed" in 307.1, the per-recovery "Yes—skip review" answers of sections
+309–320, and the AFK readiness delegation of 321.1). The waivers changed the
+pre-use sequencing only, so this section is the after-the-fact independent
+review of those forty commits (R323.2). The first forty-three commits comprise
+thirty-seven Codex commits independently reviewed by Claude and six Claude
+commits counter-reviewed by Codex; the forty-two-prefix grouping includes
+five of those Claude commits, not forty-two Claude-reviewed Codex commits.
+
+**Owner-authorized QC access, zero looks.** `projects/read` and
+`backtests/list` for every project the census rule selects (203 projects,
+324 backtests, reduced in process to id, name, status, completed flag and
+creation time); one `files/read` for project `38364439` reduced to names,
+byte counts, in-process digests and modified times; three status-only
+`backtests/read` projections (name, status, progress, error, creation time,
+engine window, node); and one `compile/read` for the A11 compile id. No
+`backtests/create`, no statistic, chart, order, log, price, provider row,
+return or Object Store payload was read; credentials were never printed.
+
+**What this host reviewed and what it did not.** The forty-commit tail changes
+forty-six scripts, adds forty-four script files, and has 19,586 added/nine
+deleted script lines. The full range changes eighty-one scripts and adds
+eighty. Codex's counter-review corrects the original three-helper census to
+nine actual create-dispatch definitions (324.2); the original review's
+completeness claim was overstated. The original review examined the V5 family's attempt
+and batch-claim rules, the A11 caller and observer against their recorded
+pins, the ledger's R-298 chain and the record's internal consistency, and
+checks what an administrative QC read can confirm. It is not a line-by-line
+review of the R298 recovery tooling, whose runs, controls and evidence exist
+only on the designated Mac root and whose tests are Darwin-gated (R323.6).
+
+**Verdict.** All eighty-three commits are accepted; the forty tail
+commits are accepted individually in R323.2. **0 P0, 0 P1, 1 P2, 5 P3** new.
+No production line, test or ledger entry changes in this round: this session
+adds this record section with its live-state and push-ledger updates. The
+P2 findings carried from sections 248 and 287 stay open as last recorded.
+
+### R323.2 Per-commit dispositions
+
+| Commits | What they are | Disposition | Basis |
+|---|---|---|---|
+| `95f56997` .. `4421da78` (42) | sections 289–305: Codex's source-complete failure classifier and observation seam, the Massive and Keychain diagnostics, the rating-only October source and six/eight family, the QC storage recovery, the V5 launch-readiness successor, with the other session's reviews 291, 301 and 305 and the test-only commits `d3fa1aec`, `7d4b6a71` and `4421da78` | accepted | Each Codex commit is disposed in a Claude review section and each Claude commit is counter-reviewed by Codex; the record, active-document and whole-tree compilation gates are green at `3c905d42` on this host; the five runtime blobs and the three trust roots are unchanged (R323.6). `ARV2R288-001` and `-003` were answered in sections 289–290 and accepted in 291. |
+| `de0911a0` | the other session's section 305 | not re-reviewed (a Claude record commit) | Counter-reviewed by Codex in section 306. |
+| `b707ab98`, `bde2df5a` | section 306: V5 list-parsing hardening and control-file room; counter-review and QC hold | accepted | `_backtest_rows` requires an absent or exact `projectId`; the record-only commit holds QC until the owner released it. |
+| `9cddf9de`, `5f6dcf99` | section 307: the owner-waived corrected V5 six-cell execution freeze; the capacity success and the ambiguous R298 begin (record only) | accepted | A1's begin exited 2 without a backtest; the ledger books it once (R323.4). |
+| `e061d441` | section 308: Safari/Mia authority and the QC sign-in blocker (record only) | accepted | Record-only diff. |
+| `0b054ddf`, `dfa3490a`, `f9fd0932` | sections 309–310: the A2 recovery helper, evidence reader and caller; the owner-waived A2 freeze and its refusal | accepted | `arv2_r298_recovery_remote.launch_once` creates at most one backtest after `BuildSuccess`, an owner check, a complete file read-back and a capacity read (R323.5). |
+| `e3d53276`, `0a2400d7`, `7c462a01` | sections 310–311: the A2 stage reader, the final-recovery helper and caller; the A3 idleness refusal | accepted | `arv2_r298_final_recovery_remote.launch_once` has the same single-create shape; A3 stopped at `owned_idle` after one `projects/read`. |
+| `45a96f61`, `7331b4db`, `7a6ea94f`, `90fdd5d2`, `5002abb5`, `efdd7582`, `8877caba` | section 312: the post-Mia recovery and idleness observer, the collaborator-shape and collaborator-record observers, the owner-recovery helper, the first R-298 ledger reconciliation and the A4 refusal | accepted | The ledger's R-298 entry books A1–A3 and the owner's manual sample once each; A4 booked once (R323.4). |
+| `4fe89ff9`, `13cc0ae7`, `7a2c756e`, `388594b6`, `ff9d00bf` | sections 313–315: the privacy-contract fix and A5, the lock-access observer, the access-representation fix and A6 | accepted | Each attempt is one claim and one booked look; the record quotes the owner's per-attempt waivers. |
+| `91daf58f`, `1d751b23`, `a9165774` | sections 316–317: the read-only file-effect observer and its owner-waived one-shot read | accepted | Read-only; no look. |
+| `c761c3e3`, `b477c236` | section 318: the offline QC response-evidence correction | accepted | Future-use evidence retention after the A6 reason loss; no run. |
+| `50e59113`, `35081915` | section 319: A7 response-observed recovery and its update refusal | accepted | Booked once. |
+| `8df52a03`, `158f2fd0`, `924a88ec` | section 320: A8 diagnostic upload, A9 handoff recovery and their refusals | accepted | Booked once each. |
+| `5b613ca1`, `8a621141`, `2292bdab` | section 321: the collaborator-mismatch observer, A10 readiness recovery and its source-policy refusal | accepted | Booked once. |
+| `d95198e0`, `8feb75db`, `9d4725e7`, `3c905d42` | section 322: plain-data preparation (D1), native-worker storage publication (D2), the A11 caller and observer, and the READY result | accepted | The A11 caller and observer at `3c905d42` hash to the recorded `ec7f08b6…` and `9a90b60f…` (15,119 bytes). READY is source read-back plus one compile; the record says no launch was in that contract. |
+
+### R323.3 What QuantConnect confirms and what it no longer can
+
+| Check | Result |
+|---|---|
+| Owner's manual sample `bbd2202c…` (`Casual Yellow Kangaroo`) | `Completed.`, progress 1, no error, created 2026-10-24 20:00:03 UTC, engine window 2020-01-01 to 2021-01-01, as the R-298 ledger entry says |
+| Project `38364439` files | Claude reported eleven matching file names and later modification times, including 2026-10-26 02:32:28 UTC and 03:13 UTC. Timestamps are excluded from the source-manifest recipe and alone prove neither a digest mismatch nor launch source identity. No current complete digest comparison is retained here, so the historical A11 manifest `8dfc3d3e…` is not independently re-established by this record. |
+| A11 compile id `5bd25474…-2a348312…` | Claude reported `compile/read` returning `state: InQueue` with no log lines. That observation does not independently reproduce the historical `BuildSuccess`; the cause and any retention policy are unestablished (`ARV2R323-003`, qualified in 324.4). |
+| Launches in project `38364439` after the pushed tip | **seven**, none in the pushed record or ledger (`ARV2R323-001`): `e5c35860…` (`… R323 A12 9dde3978`, `Runtime Error`, 2026-10-25 19:04:48 UTC), `45ffd36c…` (`QUOTE DIAGNOSTIC R323 A14`, `Runtime Error`, 20:38:52), `65a1d669…` (`QUOTE EXECUTION R323 A16`, `Runtime Error`, 21:13:16), `78ba7a23…` (`RAW REFERENCE DIAGNOSTIC R323 A18`, `Runtime Error`, 22:26:10), `b850c819…` (`REFERENCE IDENTITY DIAGNOSTIC R323 A19`, `Runtime Error`, 23:00:58), `80f506bd…` (`RAW FEED PRESENCE R323 N`, `Completed.`, 2026-10-26 00:51:22, engine window 2022-10-24 only) and `fe0603a7…` (`REFERENCE SERIES PHASE R323 P`, `Completed.`, 03:13:25, engine window 2022-10-25 only) |
+
+The seven launches use R323 names absent from the then-pushed record. Their
+names establish neither the actor, host, authority nor an in-flight round. The
+first push of this section left them unbooked to avoid counting them twice;
+the owner then directed that every finding be fixed, and R323.9 books them
+conservatively (five development, two infrastructure, seven shared looks) with
+every identity named in full so that any related unpublished work reconciles
+by identity. The original-run evidence must still state which owner waiver covered attempts
+beyond A11 and explain the missing A13, A15 and A17 numbers and the `N` and
+`P` names outside the attempt convention.
+
+### R323.4 The R-298 ledger chain
+
+Every booking in the ledger's R-298 entry and its eight attempt addenda
+moves the floor by exactly one shared and one development look: A1 314 →
+315, A2 → 316, A3 → 317, the owner's manual sample → 318, A4 → 319, A5 →
+320, A6 → 321, A7 → 322, A8 → 323, A9 → 324, A10 → 325 and A11 → 326, with
+infrastructure 50 and cells 699 unchanged throughout. The chain reproduces,
+and it matches the convention of 248.4 that every launch or consumed
+attempt is one shared look. Closing pushed floor: **326 / 251 / 50 / 699**.
+Of the eleven attempts, none created a backtest: A1 exited before the
+launch call, A2–A10 refused at access, privacy, lock, file-update or
+source-policy gates, and A11 is a compile-only readiness run.
+
+### R323.5 Code read on this host
+
+- **Endpoint census, corrected by 324.2.** Nine actual create-dispatch
+  definitions occur in the changed scripts, including six omitted from the
+  original three-helper claim. The complete inventory and static gate audit
+  are in 324.2; a textual grep is not a dynamic reachability proof.
+- **Single launch.** Each `launch_once` requires `BuildSuccess` for the
+  exact compile id, re-checks ownership, re-reads the complete file set,
+  reads `projects/nodes/read` and returns `wait` when no node is available,
+  and otherwise issues one `backtests/create`. V5/Remote/Final/PostMia require
+  a pending response; Access/Privacy/Response/Diagnostic/Handoff also retain
+  immediate `Completed.` or `Runtime Error` receipts. A terminal receipt is
+  not evidence of valid execution. The V5 family
+  admits attempt 1 only and writes a batch claim before each operation.
+- **Pins.** `scripts/run_arv2_r298_plain_readiness.py` and
+  `scripts/observe_arv2_r298_plain_readiness.py` at `3c905d42` hash to the
+  values section 322 pins.
+
+### R323.6 Validation on this host
+
+| Check | Scope | Result |
+|---|---|---|
+| Record and active-document gates | real lane tree at `3c905d42`, then again on the final record bytes | **86 passed**; final record bytes **86 passed** |
+| `python -m compileall -q` | the standard package list plus `research/analyst_revisions_v2` and `research/analyst_revisions_v2_qc`, real tree | exit 0 |
+| `git diff --check` | the working tree and this round's commit | clean |
+| `git diff --check` | the range `ef654b1d..3c905d42`, before the correction of R323.9 | **red**: `new blank line at EOF` in `scripts/arv2_r298_plain_source_boundary.py`, `scripts/observe_arv2_r298_collaborator_records.py`, `scripts/run_arv2_r298_plain_readiness.py`, `tests/analyst_revisions_v2/test_r298_plain_source_boundary.py` and `tests/analyst_revisions_v2/test_r298_privacy_recovery_remote.py` (`ARV2R323-002`) |
+| Immutability | `git show HEAD:…` SHA-256 | V16 `998cb19b…`, V17 `8049d90e…`, V18 `40d38321…`, V19 `f79ea5c7…`, cap-90 bridge runtime `60b0e300…` unchanged; trust roots `3152aca0…`, `23f23d19…`, `e8c1a2a7…` as in 231.3 |
+| Complete Analyst lane suite, previous tip | guarded LF scratch worktree at `b295ce02`, the run section 288 could not wait for (2026-10-12) | **1579 failed, 7488 passed, 1357 skipped, 1241 errors in 2:56:53**; the host classes of `ARV2R165-001` |
+| Complete Analyst lane suite, this tip | guarded LF scratch worktree at `3c905d42`: 23,466 tests collected, the same four files uncollectable (`os.getuid`, `fcntl`) | **in progress at push time**: started 10:56 local on 2026-10-26 and at 5% of the 23,466 collected tests when this record was committed, following the owner's standing direction not to hold a push for this host's run; its counts are to be recorded in the next round |
+| QC access | administrative census, one file inventory, three status-only reads, one compile-status read | zero looks; no result, statistic, chart, order, log, price, provider row, return or Object Store payload read |
+
+### R323.7 Findings ledger
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| `ARV2R323-001` | P2 | Seven backtests were launched in project `38364439` on 2026-10-25/26 after the pushed tip, named for a review snapshot R323 the branch does not contain; the pushed record ends at A11 READY with no launch in its contract, and the pushed ledger stops at 326 / 251 / 50 / 699. | Booked at the owner's direction in R323.9 (326 / 251 / 50 / 699 → 333 / 256 / 52 / 699); original source/authority/numbering evidence remains unresolved and must reconcile by identity without a second booking. |
+| `ARV2R323-002` | P3 | Five files of the tail end with a blank line and fail `git diff --check` on the range; four are pinned by SHA-256 in sections 313–322, so the bytes cannot be corrected without breaking recorded pins. | Corrected in place at the owner's direction (R323.9); the pre-correction pins stay true of the spent runs and the corrected digests are recorded. |
+| `ARV2R323-003` | P3 | Claude reported a later `compile/read` response of `InQueue` with no logs; its original explanation as compile expiry was unsupported. | Qualified in 324.4: retain the reported observation, leave cause unknown, and distinguish the original-host historical READY evidence from a current verification. No fresh compile/status read or future authority follows. |
+| `ARV2R323-004` | P3 | The banner read "Sections 1–299 retain" and section 4's closing sentence "numbered sections 1–268" with sections running to 322. | Corrected in this record commit. |
+| `ARV2R323-005` | P3 | Host class: the tail's tooling is Darwin-only; four test files stay uncollectable here, and the suite counts owed from section 288's push are recorded in R323.6 while this tip's run was still in progress at this push. | `ARV2R165-001`; unchanged. |
+| `ARV2R323-006` | P3 | The census rule sweeps other lanes' projects: thirteen more launches since 2026-10-12, all in the target-price lane's extension project, and thirty-four since 2026-10-05. | Documented for the owner; outside this lane's ledger and gates. |
+
+Carried open: `ARV2R248-002`, `-003`, `-004` (P2, section 248),
+`ARV2D287-001` (P2, section 287) and the other P2 items last listed in
+section 305; `ARV2CR28-008` (out of lane).
+
+### R323.8 Original first-push gate, superseded by R323.9 and 324
+
+Codex counter-reviews review snapshot R323 and its record commit, and the next
+pushed round books the seven launches of R323.3 with their waivers. This was
+the first-push handoff: R323.9 subsequently booked the identities, but not their
+provenance, and 324 completes the counter-review. Current floor is
+**333 / 256 / 52 / 699**. No R298 attempt
+beyond what the owner has already waived, replacement project, six/eight
+cell, stress successor, levered target, paper/live deployment, broker,
+funded-account, real-order or trading action is authorised by this review.
+
+### R323.9 Owner-directed corrections after the first push
+
+After the section-323 push at `dfc04152`, the owner directed that every
+finding of this review be fixed. Three were fixable and are fixed in the
+commits below; the other three (`-003`, `-005`, `-006`) have no artifact to
+change and stay documented.
+
+**`ARV2R323-001`, booked.** Status-only reads of all eight backtests in
+project `38364439` (name, status, progress, error text, creation time and
+engine window; no statistic) classify the seven un-pushed launches: five were
+configured for 2020-11-01 to 2026-10-13 but stopped early with runtime refusals
+(A12 and A14 at 2021-02-22 09:31 with `execution_price_not_current_minute`
+and `execution_price_end_not_current`; A16, A18 and A19 at 2022-10-24 09:20
+with the six-universe RAW reference price census incomplete), and two
+one-day input-presence probes completed (`N` on 2022-10-24, `P` on
+2022-10-25). The shared ledger's new R-298 entry books them conservatively
+as five development and two infrastructure looks, seven shared looks in all:
+**326 / 251 / 50 / 699 → 333 / 256 / 52 / 699**, no cell. The entry names
+every identity in full so that any related unpublished work reconciles by
+identity instead of adding them again. Attempt numbering, covering waivers
+and exact sources still require original-run evidence.
+
+**`ARV2R323-002`, corrected in place.** Each of the five files now ends
+with exactly one newline; nothing else changed, and the range
+`ef654b1d..HEAD` passes `git diff --check`. Because four of them are pinned
+by SHA-256 as the bytes that ran, the pins in sections 313, 315 and 322
+remain true of the runs and refer to the pre-correction bytes:
+
+| File | Pinned (pre-correction) SHA-256 | Corrected SHA-256 |
+|---|---|---|
+| `scripts/run_arv2_r298_plain_readiness.py` (A11 caller, 322.11) | `ec7f08b6483dcac360f1cffdaa54c956f9b734543ab6f7a7579c84b7253d94e3` | `b15ba88e8f233c81e779d0cf80301903ebec0912a0105fe35ba168775b26fb5f` |
+| `scripts/arv2_r298_plain_source_boundary.py` (322) | `3f0274b2ef618a1c…` | `587a81d3600c90e21869c9972374ecabe0792d5e37af9ee4e2693b89d1aa7f08` |
+| `scripts/observe_arv2_r298_collaborator_records.py` (312) | `0a4532af010699a6…` | `5421fdda7c2b5b27b9752e9ef412dbdcc98c643d80c8f36208840cb6e9849159` |
+| `tests/analyst_revisions_v2/test_r298_privacy_recovery_remote.py` (313) | `dce2765a698c8fa4…` | `93890115080ad8f8c8a52678040b3f537e4847ac4a392f75796fead60376ed86` |
+| `tests/analyst_revisions_v2/test_r298_plain_source_boundary.py` (unpinned) | `ca3e873959fb9e3a…` | `9637834d50c575a060c97abd92db9bcbfae940ec0a154dbe410568c452299d7a` |
+
+Corrected CLI digests alone do not make a future invocation admissible: the
+caller/observer dependency closure still pins old bytes, as detailed in 324.3.
+Any future authorized use requires a coherent prospective closure/freeze;
+the spent runs are not replayed and these pins are not silently rewritten.
+
+**`ARV2R323-004`** was already corrected in the first commit. The five files
+compile, the tree and the whole range pass `git diff --check`, and the
+record and active-document gates pass on the final bytes (**86 passed**).
+This round therefore makes a second single push: the whitespace commit
+`ad14e379`, the ledger commit `5751a487` and this record commit.
+
+## 324. Codex counter-review of Claude's four section-323 commits, 2026-10-26
+
+### 324.1 Exact scope, synchronization and per-commit dispositions
+
+The owner requested synchronization, context absorption and counter-review.
+The fetched matching-lane remote and clean local HEAD were both
+`6076ef2093e74695dd24f1395af62de484539899`; no checkout, merge, branch creation
+or fast-forward was necessary. This round reviews every complete diff after
+`3c905d4235617d3d2a56b636c8e0be77ee790686`, then the cumulative tree, under
+the binding P0-P3 process. AGENTS, CLAUDE, sequencing/three-strategy exception,
+review-process documents, the current R298 contracts and lane history govern.
+The root Action Plan/Session Handoff, other lanes and shared code stay frozen.
+Same-round assistants performed read-only pin, ledger and launch audits;
+they are assistance to this review, not a separate independent final review.
+
+| Commit | Disposition | Evidence |
+|---|---|---|
+| `dfc041524051de35cd8f187655deed572f222337` | Accepted after documentary correction | The review's three-helper census omitted six real create definitions; its commit/script counts, blanket waiver attribution and compile/timestamp/actor inferences are corrected below and in 323. No new production bypass was confirmed. |
+| `ad14e37973863c79393dca264483e5e1b9f2d829` | Accepted with the spent-closure qualification in 324.3 | Exactly five files lose only trailing LF bytes (1/1/3/1/1), ending in one LF. All five reported corrected SHA-256 values reproduce and ASTs are identical to the reconstructed pre-correction bytes. Historical pins remain historical, not automatically usable. |
+| `5751a487d03e10aed61cd6237703743d8192e052` | Accepted for accounting | Each of seven exact backtest identities occurs once in the final shared ledger and zero times before this commit. Five development plus two infrastructure entries yield 326/251/50/699 -> 333/256/52/699. No cell or result is admitted. |
+| `6076ef2093e74695dd24f1395af62de484539899` | Accepted after documentary correction | Section R323.9 matches the five byte changes and seven bookings. Its "ran the full candidate window" wording is corrected to configured windows with early failures; booking does not resolve source/authority provenance, and a new CLI hash alone cannot repair the spent closure. |
+
+Overall: **accepted after correction; 0 P0, 0 P1, 1 P2 and 4 P3 lane-review/record
+findings**, with no executable, test, ledger, source-pin or strategy change.
+Implementation-quality rating: **7/10** for this reviewed snapshot. Static
+launch gates remain intact, but native Mac validation, the spent dependency
+closure and seven-run provenance limit operational conclusions; this is not
+a strategy-efficacy or live-readiness rating.
+The original forty-three-prefix history is 42 through `4421da78`, then
+`de0911a0`; the tail from `b707ab98` is forty, not forty-one. The prefix
+contains thirty-seven independently reviewed Codex commits and six
+counter-reviewed Claude commits. Section 306's two outgoing commits held QC;
+the operational waiver begins in 307. This correction does not invent or
+withdraw owner authority for the historical attempts.
+
+### 324.2 Corrected launch surface and cumulative static gate audit
+
+An AST census of literal `backtests/create` calls in changed scripts yields
+nine real dispatch definitions in both the full 83-commit range and its
+forty-commit tail. A tenth literal call in `read_arv2_r298_a2_stage.py:411`
+calls a local supplied-document validator, not the API. The full range changes
+81 scripts and adds 80; the tail changes 46/adds 44 with 19,586 added/nine deleted
+script lines. This falsifies the original three-helper/39-new-script claim;
+it is not a proof about every dynamically constructed endpoint.
+
+All paths below are relative to this lane's `scripts/` directory; lines refer
+to reviewed HEAD `6076ef20`.
+
+| File and method | Create call line |
+|---|---|
+| `arv2_newrule_recovery_continuation_v5.py`, `_launch` | 362 |
+| `arv2_r298_recovery_remote.py`, `RemoteRecovery.launch_once` | 235 |
+| `arv2_r298_final_recovery_remote.py`, `FinalRecovery.launch_once` | 135 |
+| `run_arv2_r298_post_mia_recovery.py`, `PostMiaRecovery.launch_once` | 229 |
+| `arv2_r298_privacy_recovery_remote.py`, `PrivacyRecovery.launch_once` | 221 |
+| `arv2_r298_access_recovery_remote.py`, `AccessRecovery.launch_once` | 191 |
+| `arv2_r298_response_recovery_remote.py`, `ResponseRecovery.launch_once` | 137 |
+| `arv2_r298_diagnostic_recovery_remote.py`, `DiagnosticRecovery.launch_once` | 137 |
+| `arv2_r298_handoff_recovery_remote.py`, `HandoffRecovery.launch_once` | 137 |
+
+The inspected paths retain BuildSuccess, ownership, complete eleven-file
+source comparison and node-capacity checks before one create call. V5 enforces
+BuildSuccess in `_preconditions` before public dispatch; the others poll it
+in their launch method. Remote/Privacy/Access consume the dispatch marker
+before journaling and the injected request; ambiguous dispatch stays consumed.
+Inheritance carries those semantics into the later response/diagnostic/handoff
+versions. Durable cross-process protection remains the caller/journal contract,
+not the in-memory marker alone. OwnerRecovery inherits PostMia's launch;
+ReadinessRecovery explicitly refuses launch/status and exposes no create/node
+endpoint. No production correction is justified by the omitted inventory.
+
+V5/Remote/Final/PostMia require a pending create receipt; the five later
+Access/Privacy-derived variants also retain immediate Completed./Runtime Error
+receipts. Retaining a terminal error does not accept execution. Existing tests
+for busy nodes, failed compilation, exact-source rereads, ambiguous dispatch and
+duplicates were inspected; that inspection is not an executed Mac test result.
+
+### 324.3 Whitespace, immutable history and the remaining dependency closure
+
+All five old/new digests in R323.9 reproduce from current public bytes plus the
+removed LF suffixes; their ASTs and compilation are unchanged. However,
+`run_arv2_r298_plain_readiness.NEW_PINS` still requires boundary hash
+`3f0274b2…`, while the corrected boundary is `587a81d3…`. The unchanged
+observer's CALLER_SHA256 still requires `ec7f08b6…`, while the caller is now
+`b15ba88e…`. Its checks require both the supplied pin and actual bytes to
+match; neither supplying the old pin nor simply updating the CLI pin can pass
+that closure. The caller's selected-source inventory test at
+`test_r298_plain_readiness_caller.py:442` is also stale for that dependency.
+
+This is expected fail-closed behavior for spent A11 tooling, not retry
+authority or a reason to rewrite the historical source pins. A justified
+prospective use would need a coherent versioned closure/profile and freeze,
+with its own current prerequisites. No such implementation is requested here.
+The five whitespace changes do not alter the historical A11 receipt.
+
+### 324.4 Findings, evidence limits and carried dispositions
+
+| ID | Severity | Finding and disposition |
+|---|---|---|
+| `ARV2CR324-001` | P2 | Review snapshot R323's claimed complete critical launch census listed three helpers but omitted six actual dispatch definitions. Corrected in 323/324.2; all nine static gate paths inspected, no confirmed production bypass found. Review-completeness defect, not a new runtime failure. |
+| `ARV2CR324-002` | P3 | Commit/script inventory and blanket owner-waiver attribution did not reproduce. Corrected with 42+1+40, reviewer/implementer separation, exact tail numstat and the section-306 hold. Historical push rows remain as originally reported, with this section controlling their qualifications. |
+| `ARV2CR324-003` | P3 | A future corrected CLI digest was described without the still-old caller/observer dependency closure. Corrected in R323.9/324.3; spent source pins remain unchanged and fail closed. No operational re-pin or claim that the affected native pin tests are green. |
+| `ARV2CR324-004` | P3 | Later timestamps and one InQueue response were treated as proof of source non-verifiability/compile expiry; run names inferred a Mac actor/in-flight round. Corrected in R323.3/R323.7. Timestamps are excluded from the manifest recipe; no complete current digest comparison, retention-policy evidence, actor or authority chain is established here. |
+| `ARV2CR324-005` | P3 | Accounting correction was liable to be read as complete provenance resolution, and early failures as full-window execution. Corrected in R323.9 and this handoff: the seven identities are booked once, but their exact sources, waivers and numbering remain unresolved; five configured full windows stopped early, two one-day probes completed. |
+
+For `ARV2R323-003`, the public [QC compilation-result reference](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/compiling-code/read-compilation-result)
+lists compile states but establishes no expiry/retention window. The cause of
+Claude's later InQueue observation remains unknown. This public documentation
+read used no QC account, credential, project API or private receipt.
+
+`ARV2R323-001` is corrected only as an accounting omission; provenance remains
+open. `-002`/`-004` are accepted as corrected with the closure qualification.
+`-005` remains a reported host/full-suite limitation, not proof that every
+full-suite failure is environmental. `-006` stays out of lane, documented and
+unfixed. `ARV2R248-002/-003/-004`, `ARV2D287-001`, the other carried section-305
+P2s and out-of-lane `ARV2CR28-008` remain open as recorded. The original Mac
+private receipts and unpublished seven-run provenance are not available here;
+none were sought or re-read in this counter-review.
+
+Out-of-lane observation `ARV2CR324-OOL01` (P3): the existing Windows checkout
+of shared `research/quantconnect.py` has CRLF bytes while the lane pins its LF
+blob, as measured in 324.5. Documented only; no shared-file, Git configuration
+or working-copy normalization was performed. It is separate from the five
+new lane-review/record findings above.
+
+### 324.5 Validation and final handoff
+
+Validation uses Windows Python3.13.14, cleared environment, plugin autoload
+disabled, no repository conftest and ignored lane-local synthetic scratch.
+A Python audit hook denies socket operations, child/native dispatch, credential
+locations and production-artifact opens before tested imports; refusal probes
+pass and `assistant.dispatch_fence` stays absent. Trusted Windows console and
+timezone dependencies initialize before the hook. This is Python-level test
+isolation, not the Mac native sandbox or an OS-wide no-network guarantee.
+No native platform capability was stubbed into production modules.
+
+| Stage/check | Observed result and limitation |
+|---|---|
+| Reviewed-head public-byte and lane-record checks | **25 passed**: eight ephemeral public hash/AST/ledger assertions plus seventeen committed lane-record tests. No private input or operational caller import. |
+| Reviewed-head active-document checks | **66 passed, 3 failed** because the unchanged tests invoke Git subprocesses denied by the audit hook. These three are not claimed green or fixed. |
+| Privacy-recovery selection | **1 collection error**, Windows lacks `fcntl` in an unchanged transitive dependency. No test execution claimed. |
+| Plain-boundary selection | **7 passed, 1 failed, 63 setup errors**. Only the test fixture's public root was rebound from the Mac path to the actual Windows lane; no production root/pin was changed. Setup errors arise from missing `fcntl`. The single failure is an existing shared `research/quantconnect.py` checkout-byte mismatch: 424 CRLFs, actual SHA256 `8e9c645e…`, LF-normalized `7a12fdb6…` equals its frozen pin. This out-of-lane checkout issue is documented, not fixed or normalized on disk. |
+| Five whitespace files | Public byte/AST equality and compilation pass; exact new hashes match R323.9. No production execution or new mutation claim. |
+| Final record/public-byte/document checks | **91 passed, 3 failed in 4.48s**: eight public-byte assertions, seventeen lane-record tests and sixty-six active-document tests pass; the same three Git subprocess checks are denied by unchanged isolation. After the documentary qualifications, the public-byte/lane-record repeat is **25 passed in 2.50s**; this result sentence alone was then updated. No full suite or Mac operational validation. |
+
+The compile source, eleven-file READY receipt, seven-run QC census and earlier
+complete-suite counts remain original-host/reviewer reports, not new native
+reproductions. No failed/spent assessment, capture, observer, result reader or
+attempt was invoked; no credential, provider/licensed row, outcome, QC API,
+Object Store, broker, deployment or trading access occurred. Zero additional
+looks, evaluations or cells; **333 / 256 / 52 / 699** remains the booked floor.
+
+Only this lane record changes. After final HEAD/status/diff checks, make one
+nonforce push on the existing branch and verify the live remote tip. Claude
+must review section 324 and that exact snapshot. The monitor remains paused;
+no automatic next round, new milestone, private read, source re-freeze or QC
+launch follows from this counter-review. Original seven-run source/authority
+evidence remains the concrete reconciliation input, without reopening an
+already answered vendor question or silently renewing spent protocols.
+
 ## 325. Mac counter-review of the divergent pushed review range, 2026-10-26
 
-### 325.1 Exact scope and synchronization stop
+### 325.1 Exact scope and initial synchronization stop
 
 Owner: "sync the lane, and counter review claude's changes". This replaces
 active Y implementation/price recovery for the current turn. Read CLAUDE in
@@ -62356,7 +62760,8 @@ flags stay OPEN/false. Uncommitted Y drafts remain preserved and uninvoked.
 The one-shot Insider handoff monitor was fulfilled/deleted earlier, not paused
 or rearmed by this request. Latest remote was rechecked unchanged ate57d785f.
 
-Next: owner choice on normal non-rewriting synchronization; if permitted,
+Initial handoff, superseded by the owner's subsequent approval in325.5:
+next was owner choice on normal non-rewriting synchronization; if permitted,
 resolve only lane record/approved append-only R298 accounting, retain both
 histories, verify changed byte closures remain fail-closed, run final focused
 document/diff/status checks and make only the single authorized final matching
@@ -62365,3 +62770,61 @@ new freeze/provider call or QC action follows from this counter-review itself.
 Until integration/push is verified, cross-machine synchronization is NOT
 complete. This note will be committed locally only; no remote acceptance or
 completed single-push claim is made.
+
+### 325.5 Owner-approved non-rewriting merge and identity reconciliation
+
+The owner answered the exact divergence question: "Yes—reconcile with a normal
+merge". This separately supplies the missing merge authority, with preservation
+of both records, counting each run once and keeping changed source-pin chains
+blocked. It supersedes325.1/325.4's initial synchronization stop/choice, not
+their historical observations. No blanket operational or source-refresh waiver.
+
+Normal no-ff/no-commit merge prepared with parents
+d403c972a2d135475f93450925c382101e97be58(Mac counter-review note after its25
+recovery commits) and e57d785fd813dfe8a17d11233ba47534ae42616a(remote5commits).
+Exactlytwo expected content conflicts: lane record and approved shared R298
+run ledger. Both histories' content retained; no checkout-ours/theirs overwrite,
+reset/rebase/cherry-pick/force-push or other-worktree operation. The five
+remote EOF-only changes are retained unchanged; no source pin is rewritten.
+Uncommitted Y drafts remain outside the merge and are not independently accepted.
+
+The conflicting Mac scientific/recovery section323 is preserved as323 with
+every original subentry, freeze/result pin and waiver context. The Windows
+review originally numbered323 is retained as R323; only its heading/inline
+crossreference namespace is disambiguated. Its original bytes remain in the
+fetched commits. Windows324 is retained as324; Mac325 follows both. The three
+remote push-ledger rows remain historical, unmodified. No duplicate numbered
+323heading or silent replacement of native evidence by the older remote view.
+Current navigation distinguishes historical333/paused state from current336
+and the already fulfilled/deleted Insider monitor.
+
+Both shared-ledger branches' append-only entries are retained. A bounded
+R298-only reconciliation append states that the remote seven jobs are the
+same identities as local A12/A14/A16/A18/A19/N/R, not seven new looks; three
+additional pre-job claims A13/A15/A17 remain counted once. Thus8development+
+2infrastructure consumed looks preserve336/259/52/699, with zero new cells.
+The append also qualifies the historical "executed candidate period" wording:
+configured full windows stopped early, and two Completed probes are not
+strategy returns. No other lane or historical entry changed or removed.
+
+ARV2CR325-001 is resolved by this explicitly authorized preserving merge,
+subject to final commit/push verification. -003 identity reconciliation and
+-004 ledger wording are corrected prospectively by the bounded append,
+retaining the historical evidence. -002 remains OPEN: current inherited
+byte-pin gates must refuse after the approved EOF changes. No operational
+caller/control/source was invoked to demonstrate it, no pins automatically
+refreshed, and no future freeze/source-admission flag or old attempt renewed.
+The counter-review is accepted after the above reconciliation/qualifications,
+not acceptance of the25Mac implementation commits or a completed backtest.
+
+Merged-tree focused selection389passes4.13s, no failures/skips/warnings;
+same389as the premerge4.53s, NOT778distinct passes. Native-denied preservation
+probe verifies Mac323 byte-for-byte as a section, all original local ledger
+content as prefix, the remote ledger append verbatim, one each of323/R323/
+324/325headings, seven overlapping identities as historical duplicate mentions
+not new looks, and all5remoteEOFbytes/ASTs/compilation. Current X's157selected
+sources have EXACTLYtwo hash mismatches: boundary3f0274b2->587a81d3 and
+readinessec7f08b6->b15ba88e. This is a public-byte comparison, not an actual
+preflight invocation or private artifact access. The preclaim source gate
+remains fail-closed; no changed pin was accepted or overwritten. All validation
+was under the same native network/artifact/Keychain/securityCLI denials.

@@ -2240,9 +2240,13 @@ its first authentication request refused at transport; AF is SPENT. Authorized
 Safari established current same-org Researcher/sole-Manager context; new own
 project38522505 was created, exact eight source files installed and AI code
 readback passed. AJ's one no-order source job d366867e9ca3a657baea9beb9b660b41
-then completed in the UI; selected full metadata remains unvalidated and all
-source stops persist. Sections326.19–326.27 own the actual context, readback,
-one new337/259/53/699 floor and bounded metadata recovery. No unchanged replay.
+then completed in the UI; AK's sole native parser subsequently exited0 and
+authenticated the complete selected metadata. All five selected current
+identities and five enumerations passed:2711valid/4549explicitly absent RAW
+cells, with0invalid/0failure-unknown. The pinned1313871byte book remains only
+inside QC; this is technical source observation/publication, not price-input
+admission or complete required coverage. Sections326.19–326.29 own the actual
+context, readback,337/259/53/699 floor and bounded metadata recovery. No replay.
 Complete reference AND held-stock NAV coverage, source identity/common
 sidecar/runtime/run/attempt gates still precede the six-cell strategy runs.
 Old modules/profiles/pins and spent uses stay frozen;
@@ -65214,3 +65218,271 @@ canonical body and original transport hashes are reported separately. This
 replaces only the proposed UI-to-file mechanism, not a spent reader or source
 rule. Native parser no-follow/full10 FD checks, single-use, closed output and
 all false price/formal flags remain. No raw QC data/book is transferred.
+
+### 326.29 Actual AK metadata authentication and specific future consumer
+
+At cleanb3173fd4131e8a418a775bd6d919c24096ed02e1, sole native AK
+capture/parser2026-10-27T11:30:41.799934+00:00..11:30:41.883464+00:00
+exited0. Exclusive claim preceded saving the exact6053 original UI bytes
+SHAec3627673a9c54b497ea42376abd2eb3d2ea4e6b0158ecba3e599a07ecaf90f5.
+The explicit6052canonical-JSON-plus-one-SPACE framing, strict closed key set,
+duplicate/nonfinite rejection, project38522505/jobd366867e…/source65cebf60/
+profile3e985a9d/spec9da6813b/scope13e90215 joins all passed. Original input FD
+and named full10 metadata stayed equal through the single read/report checks.
+Native ALL-network/Keychain/security denial and unrelated-artifact denial
+applied; all three exclusive files(claim,original metadata,report) remain.
+Report6848bytes SHA60b8829ffd5c5b072d83d5d56eeab58c8f1996460610b97c62ef1315e377f66b.
+AK is SPENT: no recapture, parser rerun, control reread/repair or extra QC job.
+
+The authenticated summary records6151forward observations:5121known US equity,
+1030unavailable,0known-incompatible/unreadable;0duplicate SID and0own-ETF
+collisions. All five selected original whole bindings resolved, all five
+fixed typed RAW History calls were invoked and enumerated completely over
+1452sessions each:7260required cells,2711valid and4549explicitly absent,
+0invalid/duplicate and0failure-unknown. Per selected valid/absent counts in
+spec order are366/1086,374/1078,257/1195,375/1077,1339/113. These are observed
+availability states, not a root-cause diagnosis, permanent historical identity,
+an eligibility filter, terminal-payoff proof or complete required coverage.
+Unknown1030catalog rows are retained; no source row is dropped from a strategy.
+
+Summary canonical SHA88bac1c6d26fa32b92bae1f770f273d8858aae7588b3c1e1a83c8957327aeb7e;
+current resolution SHAca6d1de45df7ada9c8c86df7fd0682fb31ef4a7573a92b0ced88c6cd5724825b;
+forward-census SHAca7aad8cfcb43e36e08df7071f07408bedc0e92fb61cc35f9d869c89fb476a79.
+The exact QC-only book is1313871bytes SHA
+b149c9c659ef53084782e25ee18ffc4133bebb063180958651cafc69725c7299,
+key38522505/arv2/r326-native/13e90215fc380c2e286c541abf6d34fda6c77e3c01d999a352ea875110a358cc/b149c9c659ef53084782e25ee18ffc4133bebb063180958651cafc69725c7299.
+Publication phasecomplete/known-absent/save-True/readback-equal/API checks
+passed for this one same-job namespace. Receipt canonical SHA
+e5f645f8225519bded97892a0e843fc332738129b1fd0003e751925a416e1a4e.
+Physical write success is now observed for this scope; independent remote
+durability, atomic create, whole-organization integrity and all source-price/
+NAV/formal/PIT/permanent-master/strategy/paper/live admissions remain false.
+Native RAW prices/book were never exported to this host or the assistant.
+No additional look: the same AJ job is already booked337/259/53/699.
+
+New scripts/arv2_r298_ak_source_binding.py is a PUBLIC literal metadata anchor
+derived from the authenticated stored tool output, not a fresh artifact read:
+8782bytes SHA2eab16f58809f2af9eb10b1507a04796c3630c555cb0689acf61b2cdea4737ce.
+Fact canonical SHA13a190bd378c9b24a818c691cd5c5dcc091ddd007c8655bdb0716a67c7d39a1e.
+It grants no fresh operation/read/admission. A separately frozen strategy
+consumer must freshly authenticate all original bindings/8ETF collision
+census/current selected SID/USD identity and the exact QC book bytes BEFORE
+JSON or orders; it cannot call the spent source preparation/History/publication
+again. Missing requested cells must stop, never select another source or clip
+holding lifetime. Event-time guard must reject same-session EOD prices before
+the actual NYSE close; morning decisions use the prior completed close with
+the unchanged split bridge. Intraday fill/account observations are distinct
+from authoritative session-close NAV, avoiding future-close lookahead.
+
+Next is a separately bounded full-window Sharadar RAW observation contract,
+then common source/reference/actual-held-position NAV integration and exact
+six-cell strategy freezes. No strategy backtest was launched by AK. Source
+input pins, current licensed private-processing scope, quoted execution,
+missing-data stops, attempt/privacy/capacity and all financial gates remain.
+
+### 326.30 Additive native consumer and common monetary component; rights scope
+
+New research/analyst_revisions_v2_qc/newrule_native_price_book_runtime.py,
+29991bytes SHA3126b9b1bf0882b61797bcc9dcfa6df71f0fbf12cebb1a8c5234972f624faf46,
+is an inert specific QC-local book consumer, not another source diagnostic.
+Its one authentication must precede strategy orders/holdings: fresh genuine
+full6151 package/whole-binding/axis/forward-reverse census and all8ETF collision
+observations, all5selected native SID/USD/RAW identity comparisons, independent
+NYSE schedule, then ONE exact-key read of the AK-pinned book. Exact byte count
+and SHA precede closed JSON/full-cell/book validation. The old source prepare,
+History and publication are never called. Future lookups require whole original
+binding/current SID/USD/RAW/context/runtime project and actual session-close
+availability;09:20 or15:59 cannot consume that day's16:00 close. Missing/invalid/
+unknown cells stop; source choice and holding lifetime never change. No raw
+getter/serializer/host export is exposed. Current cross-job SID comparison is
+scoped current corroboration, not permanent historical identity continuity.
+NO-LF profile2665bytes SHA
+dda49418b0bb884ebb165f20bc4fa55485f8e0e6c9353901cd004cbf6a1988b6.
+Tests13792bytes SHAe87a302de6a35593e1f5fd8c2a9868ae426706a284a82d2ddfc4b330acd6337d;
+four AK-anchor tests5169bytes SHA73ecff780e7e6dc6e246fa0bf3a10102c079fc5ada40c87a4411e12e06e1cb00.
+
+Final author selection41distinctpasses0.42s(37reader+4anchor), native ALL-
+network/artifact/Keychain/security denial, no failures/warnings. Earlier37/41
+selections overlap. Four memory-only/finally-restored omissions caught one
+expected failure each: pre-JSON byte pin0.15s, global collision0.16s,
+intraday-close gate0.16s, pre-order authentication0.16s. Initial mutation
+harness copied globals and interfered with synthetic pin patches; corrected
+live-globals harness supplied those meaningful red results. No actual book,
+private source, History, publication, credential, provider or QC call occurred.
+
+New research/analyst_revisions_v2_qc/newrule_common_price_qc_runtime.py,
+19327bytes SHAe9c79d20429b9041874e615a1e6ee06824c640c635ebe75c3868b53018350c89,
+provides SpecificCommonPriceBook and CommonPriceLedger pure components only.
+Concrete native/vendor classes and immutable original contracts fix source
+choice; there are no supplied price callbacks or fallbacks. The vendor class
+is deliberately still unavailable, causing finite provider_unavailable until
+its separately frozen implementation/transfer exists. References are exact
+prior-NYSE RAW for targets UNION ALL actual positive whole holdings at09:20;
+the unchanged split bridge remains the future driver's separate duty. Actual
+session-close NAV is Decimal96 QC cash plus actual positive whole quantity
+times same-session RAW USD; gross uses that identical marked basis. QC cash
+already contains actual fees/dividends/actions. Complete holdings, current
+runtime identity, nonnegative cash, positive NAV, exact close availability
+and repeated-event consistency are required. No membership/metadata expiry
+liquidates a positive position; real signed fill plus engine-zero payoff
+proof remains required. Engine NAV is diagnostic only. Honest source lookup/
+reference/close counters replace no actual History counter and fabricate no302.
+NO-LF profile2146bytes SHA7598965c05c2dc372b88d63016f4fd580d8d880d9f2cf560e996fca6a0ae6796;
+tests16871bytes SHAf7afb29bcd5860aa4383163549c4fa4a2d4e730dc4f3c6e9dafacc06e3f0ee78.
+Author41distinctpasses0.22s, no failures/skips/warnings, same native denial;
+earlier40overlap. Future-close and engine-NAV-substitution omissions each
+caught1expectedfailure0.13/0.12s, memory-only/restored finally. No subclass,
+actual QC snapshot, source transfer/admission or strategy operation is provided.
+
+Root call-chain review: current NewruleComparisonDriver sizes from the prior
+_account_observations, except first cash-only decision; _portfolio_equity in
+the decision binding is explicitly an engine diagnostic. The new actual-close
+ledger can therefore supply authoritative sizing NAV without a generic
+intraday portfolio override. Any exact future quoted-driver projection must
+wire references/actual close/result counters, preserve signed-side quote fills,
+ask-cash/fees/whole shares/1e-7 tolerance and split rules, and retain distinct
+intraday/fill diagnostics. No future EOD value may enter morning sizing.
+
+Primary Sharadar personal terms https://sharadar.com/terms were inspected;
+they restrict personal/nonprofessional use and reconstructive sharing, discuss
+non-source-displaying backtest/research outputs and copies/caches on systems
+the individual owns or operates. They do not expressly name QuantConnect or
+cloud processors. Under the owner's existing personal subscriptions and
+explicit private deterministic QC research direction, a sole-owner private
+QC computation with no access sharing, raw rows to AI, reconstructive export
+or commercial use is a QUALIFIED personal-processing interpretation. It is
+not explicit vendor-approved processor status, a corporate/Nasdaq license
+extension, redistribution right or formal source admission. No new paid right,
+routine vendor-letter/access acknowledgment gate or vendor message is inferred.
+Actual account-specific terms, privacy/no-sharing and the frozen source/data
+scope still bind each future transfer. The canonical research-source authority
+and security-master registries remain zero/empty and all formal/PIT/master/
+paper/live flags false. Local RAW acquisition below grants no automatic QC
+upload; that exact private data transfer/run decision must be separately fixed.
+
+### 326.31 Exact one-use AL full-window RAW source observation freeze
+
+Owner's current source/parser/price/research direction and review waiver permit
+ONE new AL acquisition at the clean commit containing this freeze, not a replay
+of any old capture/status/receipt. Purpose is the first fixed full-window common
+RAW vendor corpus observation for5636potential stocks+all8funds over
+2020-12-31..2026-10-13. Preserve all6151originals:5native whole bindings stay
+on their separately observed source and510conditional-never remain explicit
+stops if unexpectedly requested. Metadata/membership dates never clip prices
+or close a holding. Acquisition alone admits no source/price/NAV/strategy.
+
+New scripts/run_arv2_r298_raw_price_acquisition.py58224bytes SHA
+4a3f51135a4ecfe9cf5b7242a95bc4bf89ca332ba3d88bd73b07e93c9a790169;
+tests32429bytes SHA72e67709329f4c391b4ac0cdef7bc23bddedc00d169b2b03639c95487b784cb1.
+Canonical NO-LF profile29818bytes SHA
+8bc4892249a4d94032045cce0cca7edc3fe955c3d68bbc519ab8e626c388fb95,
+186explicit selected dependency pins, caller hash and future exact clean HEAD.
+No silent pin refresh: the original source/adapter/policies and pure229b3be9
+planner remain unchanged. Fixed new private leaf
+artifacts/analyst_revisions_v2/newrule_raw_price_acquisition/R326-20261027-AL
+UNINSPECTED/unallocated. Only designated Mac/root/branch/Darwin POSIX3.13
+/Users/sheltonchen/.venvs/trading_agent-py313/bin/python is compatible.
+
+Broker claims/fsyncs exclusively before private input/credential/contact;
+partial/duplicate claim and nonzero/unknown are spent. A credential-free,
+native ALL-network-denied source worker uses genuine plain _load_plain/
+_catalog/_catalog_unchanged plus held AC DATA16344399/4366e1e8 and exact
+public AC/AE/AK anchors. All6151full original bindings and full3466axis must
+equal, plan summaries/digests must join, and both source guards must RETURN
+normally before the private request plan is written. Actual source0 is
+mandatory before exactly ONE existing Sharadar login-Keychain handoff
+(trading-agent-sharadar/accountsharadar,20s). No opaque source value or key
+is printed/serialized; credential passes only inherited pipe to own provider.
+
+The immutable plan has1256requests: dispatch funds ordinals1254,1255 FIRST,
+then stock0..1253. This is an explicit fixed plan-ordinal/dispatch-ordinal
+distinction, not adaptive scope. Stock209groups of<=27ticker×6disjoint windows,
+fund8tickers×2windows, query limit10000/skip0/date.asc and exact four fields
+ticker,date,closeunadj,lastupdated. Endpoints only
+https://api.sharadar.com/v1.0/data/stocks and /funds. No redirect, HTTP/
+transport retry, role fallback, alternate key/output or failed response-body
+read. Validated numeric HTTP status, finite transport category/OS errno,
+dispatch intent and completed-body accounting survive failures; physical
+provider_request_count remains null/unknown. Courtesy1/s is NOT a vendor quota
+or performance guarantee. Each intent is fsynced before possible dispatch.
+
+Provider does NO CSV semantics. It secret-scans complete bounded HTTP200
+bytes before append/fsync into ONE held corpus.bin; fsynced dispatch.jsonl/
+captures.jsonl contain exact request/range/hash joins. No1256FD pressure or
+RLIMIT change. A later independent process with native ALL-network denial,
+no credential, authenticates plan/provider pins, contiguous/nonoverlapping
+ranges and whole corpus extent/hash, then frozen229b CSV schemas/tickers/
+NYSE dates/positive exact Decimal/duplicate/row-limit semantics. An interrupted
+uncommitted corpus tail is inadmissible; preserve it, never truncate/repair.
+Source authentication guards bytes at endpoints, not whole-host continuity.
+Provider native policy allows only outbound443/DNS, not a domain sandbox;
+requests are mechanically fixed to the two literal TLS endpoints. All workers
+deny Keychain/security CLI and unrelated artifact reads; source gets only
+the original package/lineage and exact AC DATA, not old operational controls.
+
+Parent deadline7200s covers source<=600/provider/auth<=900/postflight; per
+request<=30remaining. Native uninterruptible IO/host suspension remains a
+qualification. Only own child may be killed/reaped.4MiB/body,2GiBcorpus,
+2MiB journals/parent output,128KiB frames,>=2GiB+256MiB headroom and>=128
+descriptor soft limit are checked without changing settings. All temporary/
+cache/log/support paths stay inroot. Claim, four DATA files, intent/start/
+observed metadata and one terminal report/failure remain; no orchestration
+cleanup. Persistent stage markers prevent unchanged worker redispatch.
+Safe progress is finite counts only, no rows/tickers/URLs/secrets. Actual
+source/provider/auth exits and exact success OR failure packets/stdout pins
+must join; noisy/partial/deadline capture is distinct finite hash-only evidence.
+
+Root will use ONE bounded outer process capture: retain original parent stdout
+in RAM<=2MiB/stderr<=128KiB, exact actual exit/UTC dispatch-completion brackets/
+count/hash/bound and only coalesced validated finite progress while active.
+Then invoke the new caller's native ALL-network/Keychain/artifact-denied
+validate role ONCE on that same RAM stdout and actual exit, <=30s; no corpus/
+control reread. Validator0+identical stdout authenticates the declared result,
+not automatic parent0. Parent0 plus authenticated matching closed result/
+report/source/corpus pins is mandatory for accepted observation; no report-
+alone or fabricated0. External malformed/negative/unknown actual exit remains
+unaccepted/spent. Exact outer code/hash and synthetic protocol checks are
+recorded before invocation; caller requires --expected-head/--caller-sha256,
+which bind source and are not permission booleans. Any invocation consumes this
+one-use decision even if a preflight/credential failure prevents provider contact.
+
+Author70distinct native-denied focusedpasses4.29s; no failures/full suite.
+Seven memory-only/restored omissions each caught1expectedfailure: full binding
+equality0.36s, secret scan0.32s, complete-tail extent0.35s, failed-packet byte
+pin0.36s, persistent start marker0.33s, child actual exit0.34s, failed numeric
+HTTP status0.36s. Early synthetic environment-fixture issue and LF-vs-no-LF
+parser mismatch were corrected before use; no private data/contact was used.
+Root identified the missing failed-provider-packet join in the initial draft;
+the final closed child-packet state now authenticates source/provider/auth
+failure/preflight packets and progress prefixes against actual stdout/count/
+hash, while retaining broker capture failure as a different finite category.
+Same-round advisory inspection found no additional confirmed P0-P2 issue;
+neither that advice nor root tests is Claude independent acceptance.
+
+All agents HOLD edits/tests through actual AL. No QC/Safari/project/capacity/
+backtest call, new paid right, raw rows to AI or formal/PIT/master/paper/live
+gate clearance is granted. Existing sole-owner private personal-processing
+interpretation and original subscriptions/terms apply; no new entitlement.
+After actual result, resume only separately bound sidecar/price-runtime/fresh
+private project/capacity/source/run/attempt gates. No strategy run is inferred
+from source acquisition or from the source-only AJ Completed observation.
+
+Root final focused selection289distinctpasses12.71s:70ALcaller+37native
+reader+4AKanchor+41commonmonetary+50frozenpureplanner+86record/doc+1research
+transitiveimport closure. No failures/skips/warnings, no full suite; author
+subsets/mutations/repeats are not additive. All eight new source/test files
+compiled in memory without bytecode;186pins/profile/source hashes matched,
+dispatch_fence absent. Native ALL-network/artifact/Keychain/security denial,
+inroot support paths, --noconftest/plugin-autoload-off/no cacheprovider held.
+Policies SHA(source/provider/authenticate/validate), respectively:
+88329fc1c9d4347286198140f72e0f24033c83c832a76618c2fc1e257c53d782;
+19d0301153c9234652c65573d0148d36c71155250c165a5a1626cd2b269d7da9;
+4f0a0a58b0e8f6595b9f4bcdfd95f079c97753876c0095af73b791f5ad215a3a;
+2caea97b6dd6c72e944332095dc89b7d58ba8782ccbdc153f4aa8b55b35ec574.
+Exact outer code4730bytes SHAcdfd270ba6f6fe1256dc89ca76747f0ae6956014043e15ec1113a1eb2e8e0a95
+passed four tiny synthetic native-denied capture cases(actual0,actual2,
+stderr accounting, own-child timeout kill/reap); no operational code ran in
+those cases. The outer program takes the exact committed HEAD/caller hash
+as argv rather than discovering/rebinding source automatically. Current live
+remote remains634509bf; all agents HOLD. This commit freezes AL once; no
+actual AL allocation, credential or provider operation occurred before it.

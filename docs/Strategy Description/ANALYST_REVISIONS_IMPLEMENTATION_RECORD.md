@@ -65486,3 +65486,120 @@ those cases. The outer program takes the exact committed HEAD/caller hash
 as argv rather than discovering/rebinding source automatically. Current live
 remote remains634509bf; all agents HOLD. This commit freezes AL once; no
 actual AL allocation, credential or provider operation occurred before it.
+
+### 326.32 Actual AL refused locally; verified session representation defect
+
+At cleanf6a57893ac8e8245343e77d825e1fc041159cf99, the sole AL parent
+2026-10-27T12:05:29.591536+00:00..12:05:40.211525+00:00 exited2,
+bounded stdout1775bytes SHAa2b1bfd02984d5c0d73a70c554d694158718f1142b97278dce270a3d852f8a7a,
+stderr0/boundnull. Sole native output validator
+12:05:40.211722+00:00..12:05:44.115876+00:00 exited0 and returned exactly the
+same1775bytes/hash, stderr0/boundnull. This authenticates FAILURE, not parent
+success. Source child actual2,355bytes SHA
+4ff0c4e7c3bc97b09ff850b1d937d4c35f0714335aa0fcede15aec7661fd6b60,
+finite price_axis, stderr0/boundnull. Closed source failure packet and actual
+stdout/hash joins passed. Accepted source/plan remain null, credential handoff
+false, provider/auth workers never dispatched; provider_request_count remains
+null, not a logged physical zero. Source worker was native ALL-network-denied.
+No key was handed off, price body acquired, QC contact or new look occurred.
+
+AL's claim/partial files and operational authority are SPENT. Do not inspect/
+repair/reuse that control leaf, rerun source/parent/validator or rename an
+unchanged request. Its caller4a3f5113 and test72e67709 stay frozen. The final
+86record1.17s before the freeze overlaps289, not additional distinct coverage.
+
+Root STATIC trace identifies a verified interface defect, not a dataset/
+subscription/QC error: frozen all-route _catalog parses session records with
+identity.evaluator._parse_sessions internally but RETURNS selected role values
+as raw canonical session RECORD dictionaries. AL line335 forwarded those
+dictionaries directly to pure prepare_plan, whose _axis explicitly requires
+3466DATE STRINGS and fixed hash4ac84a2d. It therefore raises price_axis.
+The70caller fixtures mocked this boundary without exercising the genuine
+session-record parser; their green result did not prove actual source planning.
+
+A separately versioned AM contract will retain the exact AL transport,
+credentials/source-order/claim/deadline/retention/authentication/bounds and
+request inventory but explicitly bridge the already authenticated raw records
+through the unchanged evaluator._parse_sessions. Full3466count/order/hash and
+the1452price-session projection must still pass. No date/row/source pin is
+changed or refreshed, no absent row discarded, and no old source control is
+read. The additive AM caller pins the frozen AL source and receives a NEW
+exact clean run freeze after meaningful real-record-shape regressions. This
+is a verified local representation correction before any first provider use,
+not an unexplained unchanged replay or renewal of AL. Owner's continuing
+review-waived source/price recovery authority covers implementation; no new
+routine owner acknowledgment is required. Native-denied author tests and
+root counter-check precede one prospective use. All formal/source/financial
+flags and337/259/53/699 floor remain unchanged; no strategy run yet.
+
+### 326.33 Exact AM parsed-session repair, validation and one-use freeze
+
+P2 I326-014 is confirmed and corrected prospectively: canonical session record
+dictionaries require the existing strict evaluator parser before the planner's
+date-string axis gate. Old AL source/claim/result are unchanged and spent.
+New scripts/run_arv2_r298_raw_price_acquisition_v2.py58554bytes SHA
+88a1c9df85f29655d8069826ad3b22453023776299306f6ed192bbf64c427334;
+tests38631bytes SHA5881ffd3fd40e086aa9cec5a83f398383984452a2b18efddabcbfedf2c1d48d8.
+NO-LF profile30045bytes SHA
+5f4888c221ba431458e3b9ae1186b6ef26583a39ab722f62c4e23e207a6f4d19,
+187explicit selected pins including frozen AL4a3f5113. SOURCE/new schema
+arv2-r298-raw-price-acquisition-am-v2/control
+artifacts/analyst_revisions_v2/newrule_raw_price_acquisition/R326-20261027-AM
+are separately bound; leaf UNINSPECTED/unallocated.
+
+Exact source difference test permits only new source/schema/control/profile/
+old-AL-pin/runtime-path bindings and the explicit unchanged
+worker.previous.identity.evaluator._parse_sessions(tuple(selected['session_axis']))
+bridge. Every other acquisition protocol line remains byte-identical to AL:
+genuine full original source authentication/held AC/normal guards BEFORE plan,
+actual source0 BEFORE exactly one existing Keychain handoff, fixed funds-first
+1256requests and original windows/fields, no retry/redirect/failed body read,
+fsynced intent then secret-scanned HTTP200 corpus/range retention, separate
+native-denied offline CSV authentication, actual success/failure packet joins,
+persistent markers, deadline/byte/disk/FD bounds and false flags from326.31.
+This resolves representation only; no source pin/date/row is refreshed or
+discarded and no old control is read. No provider worker ran in AL, so this is
+the verified corrected source plan BEFORE a first provider invocation, not
+renewal of a spent provider capture or unexplained renamed retry.
+
+Author82distinctpasses5.11s:70ported AL protocol cases against AM plus12new
+representation cases using the GENUINE frozen evaluator parser and full public
+October axis. Planner receives3466parsed dates and unchanged1452price-session
+grid; malformed schema/index/order/count/hash are rejected. Earlier82/4.50s
+overlaps. Removing only the parser bridge caught1expectedfailure0.24s,
+memory-only/finally-restored. Old70mock-boundary limitation remains historical.
+
+Under current continuing review-waived source/parser/price/research authority,
+the clean commit containing this freeze permits ONE AM parent at that exact
+HEAD/caller/profile. All326.31 runtime/rights/isolation/finite recording and
+actual-exit gates apply unchanged. Use the separately bound outer4733byte
+code SHA1a43b2862c2e15d3d38ef33f2f5c60a1f50de2fb191bb9385c5be6dfb1e1baea:
+only import changes to the AM caller and metadata/runtime prefixes change.
+Four native-denied tiny synthetic capture cases again passed(0/2/stderr/
+own-child deadline), not provider evidence or additive pytest passes. Original
+parent stdout remains RAM-only/bounded, coalesced finite progress only, then
+ONE native validate role on the same bytes/actual exit. No artifact/corpus
+reader is added or replayed. Validator0 authenticates an observed parent2
+failure without turning it into success. Unknown/nonzero/malformed is spent;
+no retry/cleanup/fallback. Only matching actual0 plus authenticated closed source/
+corpus/output pins admits this observation, not strategy/source-price readiness.
+
+All agents HOLD edits/tests for actual AM. No QC/Safari/job/capacity/other-lane
+action or new look;337/259/53/699 stays. After result, independently freeze the
+actual data-only sidecar, qualified private QC processing, concrete vendor/
+native/common runtime, unchanged quoted execution and six-cell source/run/
+attempt/terminal protocol before any strategy launch. Source-price/formal/PIT/
+permanent-master/paper/live flags remain false. No actual AM allocation,
+credential handoff, provider/QC contact occurred before this committed freeze.
+
+Root focused218distinctpasses11.14s(82AM+50pureplanner+86record/document),
+no failures/skips/warnings/full suite. They overlap prior helper/document
+selections and the70ported mechanisms; do not sum them as independent coverage.
+Both new files compile in memory/no bytecode,187pins/profile/caller match,
+dispatch_fence absent. Native ALL-network/artifact/Keychain/security denial,
+inroot support/plugin paths, --noconftest/no autoload/no cacheprovider held.
+AM policy SHA(source/provider/authenticate/validate):
+1c288b7144a823ab621ecff58b44ace51fa294d04220f05079ce4c11ffaf8667;
+b3768e7326a11215b253ca92d78b17f38d9578e4f7e846afc2bd02728aea1dc9;
+0ccbf55cde4c1595dcc7253efafa0e77c3b282ee55dd1d361c783ab48256d887;
+c1049796494e2d2a0f2c090d4dae3e82db76890cb3f79e2a20d3388753dc8aaf.

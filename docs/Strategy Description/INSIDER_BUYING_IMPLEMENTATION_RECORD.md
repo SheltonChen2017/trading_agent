@@ -1,20 +1,21 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 332 COMPLETES NATIVE MACOS COUNTER-REVIEW OF CLAUDE'S
-FOUR COMMITS `96d4d8aa..0c536a91` AND ACCEPTS THE LATER WINDOWS RECORD
-`c0ee6957` AT ITS STATED SCOPES. THE THREE CLAUDE CORRECTIONS ARE ACCEPTED;
-THE REVIEW RECORD RETAINS331'S APPEND-ONLY QUALIFICATIONS. THE REMAINING
-STRAY-DOCUMENT DUPLICATE P2 `IBNC-OBS33004` IS CORRECTED IN `b5f1ca47` UNDER
-A BOUNDED PRE-TEXT SHADOW POLICY, WITH NATIVE RED/GREEN AND854 FOCUSED
-PASSES. AMBIGUOUS BARRIERS REFUSE THE WHOLE BATCH; GENUINE OPAQUE TEXT
-REMAINS OPAQUE. THIS IS NOT UNIVERSAL MALFORMED-BODY OR ACTUAL NC ADMISSION
-ACCEPTANCE; FRESH METADATA/BODY QUALIFICATION IS STILL REQUIRED BEFORE
-ACTIVATION. THIRTEEN P2 FINDINGS REMAIN OPEN; NONE IS P0/P1. HISTORICAL
-PUBLIC-KNOWN-BY, COMPLETE SOURCE/IDENTITY CONTEXTS AND OTHER329.1 GATES
-REMAIN MISSING. NO NEXT MILESTONE, SOURCE REQUEST, CREDENTIAL READ, QC
-CALL, STRATEGY BACKTEST OR LOOK IN THIS COUNTER-REVIEW. ORIGINAL82-QUARTER
-STUDY AND SEPARATE2021-2025 PILOT ARE NOT COMPLETE. LOOKS/JOBS/BACKTESTS
-0/0/0; NO FUNDED/PAPER/LIVE/CAPITAL/REAL-ORDER/TRADING AUTHORITY.**
+Status: **SECTION 333 CONTINUES THE OWNER-DIRECTED PRE-QC BUILD WITHOUT
+WAITING FOR CLAUDE. WINDOW SCHEDULING NOW USES THE GENUINE PILOT PLAN,
+NOT ONE SECURITY'S SEASONING; ACTUAL PER-SECURITY SEASONING STAYS ENFORCED.
+PILOT-ONLY RELEVANCE ACCOUNTING PREVENTS TARGET-IRRELEVANT OLD LOT FACTS
+FROM REFUSING A WINDOW. TARGET-AFFECTING OLD LOTS STILL REQUIRE GENUINE
+HISTORICAL CONTEXT AND REFUSE WITHOUT IT. IBPILOT-COMP-33002 IS CLOSED;
+IBPILOT-COMP-33001 REMAINS PARTLY OPEN. TWELVE P2 FINDINGS REMAIN OPEN,
+NONE P0/P1. MAIN472 FOCUSED AND124 BOUNDARY/DOCUMENT CHECKS PASS, WITH
+MEANINGFUL NATIVE RED/GREEN. THIS IS NOT THE LAST READY-TO-LAUNCH QC STEP:
+HISTORICAL PUBLIC-KNOWN-BY, COMPLETE ORIGINAL ADMISSION/PIT CONTEXTS AND
+THE FINAL PILOT POPULATION/REGISTRATION BRIDGE REMAIN UNFINISHED. SECTION
+332'S SCOPED REVIEW ACCEPTANCE AND NC CORRECTION ARE PRESERVED; NC ACTUAL
+ACTIVATION STILL NEEDS FRESH QUALIFICATION. NO QC/SAFARI/SDK/JOB, SOURCE
+REQUEST, CREDENTIAL READ, OUTCOME LOOK OR BACKTEST IN THIS ROUND. ORIGINAL
+82-QUARTER STUDY AND SEPARATE2021-2025 PILOT ARE NOT COMPLETE OR BACKTEST-
+READY. LOOKS/JOBS/BACKTESTS0/0/0; MONITOR PAUSED.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -308,6 +309,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-26 | Claude review (macOS session) and corrections | `96d4d8aa` -> `5c50bd3b`, `223b4644`, `5917fbcf` -> this review record | Independent review of sections 219-329 (`336b8477..96d4d8aa`, 40 commits, 0 merges: pilot, SEC parent/Feed/NC, six QC cells) | All 40 accepted, three after correction. 136 SEC dispatches, one Massive request and one QC authentication call checked against journals; no email-like string in control files; QC results stayed in the cloud. NC whitespace duplicate fixed; batch readback early stop refused; batch and QC guards pinned. | Final tree: 3,429/1 skipped and 71 focused passes, 1 topology pass, guards 107 with the 2 known SEP-2 failures; network and Keychain exec denied. No complete suite. No backtest. | IBNCROUTE-CR33001, IBBATCH-CR33001, IBBATCH-TEST33001, IBQCAUTH-TEST33001 closed; IBQC-ACK-33001 and IBPILOT-COMP-33001/33002 open P2; P3 groups recorded; thirteen P2 open | Codex counter-reviews section 330; repeat NC metadata qualification before activation |
 | 2026-10-26 | Codex counter-review only | Exact incoming `96d4d8aae3f7caec5134fb46fd3170be6fe9dcce..0c536a912bbd0fa5f9cfd782c32a864ccae2f9d6`; this record follows | Four Claude commits; no next milestone or source activation | Scoped code corrections accepted; record counts, grouped dispositions and evidence attribution qualified in331. NC stray-DOCUMENT duplicate reproduced and existing observation elevated toP2. |157 boundary/package/document checks pass149.18s;376-file compileall passes; exact selected affected collection blocked by7 fcntl errors and2 existing module skips; pure/sliced probes separately attributed, never a native custody suite. Shared pair2 failed23.23s, rootsIPython/QuantConnect/clr; looks0/0/0. Final record checks follow331. | IBDOC-CCR33001 P3 corrected by qualification; IBNC-OBS33004 OPENP2,14 total. Other findings retained; no shared fix, fake-lock acceptance or historical journal replay. | Complete one counter-review publication after final checks. Supported-host regression/native qualification and bounded shadow/source policy remain required before activation; actual historical known-by and other pilot facts remain missing. Monitor PAUSED; no automatic rearm. |
 | 2026-10-26 | Codex native-macOS counter-review completion | Captured origin`c0ee6957`; Claude four-commit range`96d4d8aa..0c536a91`; corrective`b5f1ca47`; this separate handoff | Sync plus per-commit review/native validation only, NO next milestone | Claude corrections accepted;331's attributed Windows limits retained, not rewritten. Bounded malformed-front correction closesIBNC-OBS33004 only at332's scope; actual NC activation remains withheld. | Main854 focused passes50.35s;105 auth passes1.59s,3 meaningful auth reversals/5 restored;147-image four-denial/live291 strong invented proof. Attributed82 batch/144 route plus independent144 route. Shared SEP-2 pair2 failed3.68s, unchanged. No full suite or actual-input/QC look. |13 OPENP2s; no P0/P1. Other findings and historical failed/consumed roots retained. | One final matching-lane push after handoff checks. Fresh actual qualification and real historical known-by/source/reference facts still missing; monitorPAUSED, no automatic next step. |
+| 2026-10-26 | Codex owner-directed pre-QC continuation | Clean matching base`969e29d7`; this scoped implementation and separate final handoff | Two pilot composition corrections, no Claude wait or QC access | Genuine-plan window scheduling closes33002; exact target-relevance/count/ordered digest narrowly corrects33001 while target-affecting missing history still refuses. Acceptance MODEL explicitly distinguished from historical-publication evidence. | Main472 focused17.44s;124 boundary/document4.39s;4 whole-function reversals caught13 intended REDs,15 restored3.39s;112-image strong compile/pin proof; attributed final peer46GREEN5.41s. No full suite, actual input/QC/look. |12 OPENP2s; noneP0/P1. 33001 partlyOPEN; known-by, originals/PIT contexts and final population registration remain concrete blockers. | Separate exact-hash handoff, one final lane push. No ready-to-QC claim, source activation or automated next step; monitorPAUSED. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -38580,3 +38582,203 @@ read by that scope check. Main exact Git accounting independently confirms
 40/0/104 and47+56+1, not just the peer's report. Repeat the narrow completed-
 record checks after this receipt; then verify record-only expected status,
 commit the separate handoff and perform the one final authorized push.
+
+## 333. Owner-directed pre-QC continuation — prospective scope
+
+The owner's later explicit instruction is "continue building to the last step
+before qc. skip claude review for now". This supersedes the completed332
+review-only stop for this new round. Base and matching origin are exact
+`969e29d74f7b419570f54613798faa1ba91ab3f9`, clean at entry; the matching-lane
+fetch contains no incoming commits. Work stays in the designated Insider
+worktree/branch, with one final push and a separate durable handoff. No new
+independent Claude review is claimed or awaited. Shared records remain frozen.
+No QC/Safari/API/SDK/job/backtest access is authorized for this round.
+
+### 333.1 Decisions registered before implementation
+
+Use delegated engineering judgment for two verified lane-owned defects:
+
+- **IBPILOT-COMP-33002:** take whole-window purge/embargo disposition from
+  the SAME genuine, registered pilot plan's target-session schedule, not one
+  security's mixed metadata assessment. Retain that assessment and the actual
+  v3 security-level listing-seasoning/reference checks. An immature security
+  may be excluded; it cannot exclude every other security's target window.
+- **IBPILOT-COMP-33001, bounded relevance correction:** preserve the exact
+ 31-label/full-quarter source bridge. A source-preceding transaction can only
+  affect a target first-open crossing through a member accepted in the exact
+  interval from the preceding regular open (inclusive) to target open
+  (exclusive). Outside that interval, retain named source accounting without
+  admitting the old row into target lot arithmetic. Inside it, retain a whole-
+  window missing-historical-lot refusal. Do not silently reset/retrade lots,
+  accept invented carry-in, broaden the source window, omit amendments or
+  claim complete historical replay. Peer scrutiny and factory-path controls
+  must support this policy before acceptance. The finding remains partly
+  OPEN if genuine target-affecting history is unavailable.
+
+This is **IBDEC-333-01, pilot-only target-relevance projection**, exercised
+under the owner's delegated judgment: a lot is keyed by transaction date, so
+an old-date lot cannot merge with a replayed on/after-source-start lot. Any
+member that could make the target's first crossing falls inside that exact
+interval and still refuses regardless of its apparent value or consumption.
+This supplies no historical carry-in and does not relax IBDEC-141-06 for
+potentially target-affecting lots. The original full-study source/event
+factory retains its existing pre-source refusal unchanged. All loaded4/A
+handling, original-population/cutoff/reference validation and missing
+historical-publication/amendment scopes remain separate and unchanged.
+
+These are pure pre-QC engineering corrections, not activation of a retained
+source body, producer, consumed namespace, new capture, metadata observation
+or cloud cell. Invented complete-census/original/reference factory fixtures
+must exercise positive behavior, paired refusals and meaningful red/green
+under native process-tree network/security-exec denial and freshTMP-only
+writes. Focused checks only; no complete lane/repository suite.
+
+Actual historical public-known-by upper bounds, complete original-parent
+coverage, historical identity/reference/prices, processing rights and final
+permanent population/look evidence remain factual requirements. Acceptance
+time is not retroactive public-availability evidence. Existing source claims,
+subscription access and passing contracts cannot establish these facts or
+honest backtesting readiness. After the corrections, audit the existing
+downstream contracts against these real inputs; do not remint the older
+full-study seal or invent a differently scoped executor to manufacture a
+last-step-before-QC claim. Record any remaining concrete boundary precisely.
+
+### 333.2 Completed engineering behavior
+
+The pure pilot event composer now takes purge/embargo exclusions exclusively
+from the SAME genuine registered plan's target-session schedule. It keeps the
+complete selected-security metadata assessment, genuine full-cohort reference
+and actual v3 seasoning rules. The pilot-only old-lot projection implements
+IBDEC-333-01 using the exact preceding-open-inclusive/target-open-exclusive
+acceptance interval. Outside it, a named count and constant-space ordered
+SHA-256 bind `{event_id, transaction_sha256, accepted_at_utc, transaction_date}`
+to retained source rows without initializing old lots. Inside it, the whole
+window still refuses for missing history, even for tiny visible amounts,
+apparent crossings, later same-lot members or post-MOO canonical facts. All
+loaded4/A handling, all-six-form/original inventories, exact31-label bridge,
+first50k/first-open/consumed-lot economics and immutable seals stay unchanged.
+The summary explicitly labels `SEC_ACCEPTANCE_MODEL` and leaves historical
+public-known-by verification FALSE. No old full-study factory/pilot metadata
+factory, schema/registration epoch, custody pin or strategy economics changes.
+
+In plain language, one young security no longer cancels everybody else's
+scheduled window. A transaction that cannot affect that window is retained
+and accounted without pretending its old lot history is known. A transaction
+that could matter still stops the window when that history is missing. These
+software corrections preserve the need for real data; they do not make the
+pilot ready to run in QC. Internal engineering peer checks supplement author
+validation and are not an independent Claude review or new owner approval.
+
+### 333.3 Native validation and exact images
+
+Final source SHA-256
+`486c8188c9f4c3415120da0a6f3faaeac32f34b56ae4b78fc06fa0a9f93a0f51`;
+final test SHA-256
+`bcad505dab4f02f39eab602250863dd9984893d9bd4e7ebe1369b77a2183cb8b`.
+Execution base is969e29d7 plus these explicit uncommitted images, NOT a later
+commit already existing during validation. No actual input body, profile,
+credential, source namespace, SDK or QC object was read or activated.
+
+Main OBSERVED **472 focused GREEN17.44s**, no skips/warnings: pilot event,
+production and metadata composition; source stream, unchanged full-study
+event manifest and clock; canonical QC-candidate contracts; EXACT
+`tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports`.
+This is eight specifically selected files/nodes, NOT the complete lane or
+repository suite. QC-candidate tests are invented, local pure contracts; no
+QC access/launch is implied. Main separately observed **124 active-document,
+record, import-boundary and exact-package GREEN4.39s**. The exact guard is
+included in both selections; these counts are not asserted as596 unique tests.
+
+Four MAIN whole-function in-memory reversals independently fail at the
+intended assertions: old mixed scheduling6failed/1passed2.14s; previous-open
+exclusive1failed/1passed1.20s; target-open inclusive1failed1.15s; deleted
+missing-history interval guard5failed1.52s. These are full genuine-factory
+test functions, not predicate slices or a fabricated seal. All15 selected
+cases restored GREEN3.39s; no production byte was changed by the reversals.
+
+Attributed internal author evidence, before the final explicit clock labels:
+schedule11 new factory cases give10RED/1GREEN2.74s on preceding code, then
+149GREEN6.83s across its three relevant files; history9 new cases give
+3RED/6GREEN2.06s before correction, then48GREEN6.03s including the unchanged
+full-study pre-source-history refusal and exact-window bridge refusal. A
+separate read-only peer on the FINAL two hashes observes46GREEN5.41s, no
+skips/warnings, and finds no verified defect in the full composer/diff/tests.
+In that same process, loopback/TEST-NET connects, fork and security exec
+return native EPERM/EACCES before pytest. Reversed source timestamps prove
+ordered relevance digests follow acceptance order rather than source ordinal.
+
+Every test/mutant process begins with native OS process-tree network and
+security-exec denial, env-i, explicit Python3.13.15, disabled plugin/cache/
+bytecode and fresh privateTMP-only writes. Pure tests/mutants additionally
+deny fork; only the separate import/document checks permit boundary children.
+No mocked transport is treated as acquisition safety. A main source-only
+compile/pin proof under all-write/network/fork/security-exec denial and the
+real291 memory guard compiles112 MANUAL loaded/explicit code images; inventory
+`d0e6857f9b55eb9ea611a755a26e2003fc0dbd810869e47f329be33177c4848a`,
+305,454,625ns, guard live through stdout/final sample. All current FROZEN pins
+and four historical v3 byte identities match. This is not actual-source
+assembly qualification, a retained-root replay or an actual body observation.
+One orchestration serialization attempt stopped before a command launched;
+it supplies no test result. Shared SEP-2 debt remains as independently
+observed in332; no shared behavior changed or repeated shared test claimed.
+The appended draft session-ledger row initially had a preceding blank line:
+the document repeat caught1failure/123passes4.37s. Removing that blank line
+restores the required contiguous table; this formatting correction does not
+weaken the test or alter historical ledger entries.
+The corrected complete124-node boundary/document/package selection is GREEN
+in4.91s, with no skips/warnings.
+
+### 333.4 Concrete boundary before actual pilot assembly or QC
+
+| Required input/stage | Current exact boundary | Next admissible evidence/action |
+| --- | --- | --- |
+| Historical public-known-by | Acceptance model and present-day custody do not prove historical09:28/09:30 availability. No qualified archive was supplied;326/329's blocker persists. | Timestamped historical first-seen/public snapshots or an authenticated upper bound, reliable clocks, exact accession/body/version lineage, full required population and refusal accounting. Exact first seconds are not required. |
+| Complete source/admission | Full required21-quarter originals/all-six-form corroboration are unfinished;25-context census and20,044 individual dispatches are different quantities. Old consumed/failed roots remain preserved. | Genuine original-parent admission and exact source inventories for required2020Q4–2025Q4; do not activate the all25 earliest2020Q1 campaign as a required21 successor by relabelling it. |
+| Older target-affecting lots | The bounded relevance fix does not replay old lot state. | Separately genuine source-bound historical lot/consumption and applicable mapping/amendment evidence for any target-relevant pre-source lot. Do not guess a zero/carry-in or broaden source scope silently. |
+| Historical identity/reference | Historical issuer/share-class/CIK/QC-SID/listing/PIT maps, full active cohort and actual price/volume/factor contexts remain unassembled/unqualified. | Genuine references, all preceding60-bar contexts,253 listing sessions and252 actual factor intervals with the frozen knowledge clocks/control policy. |
+| Earnings and rights | Retained calendar claims/subscription presence are not both evaluated diagnostics or processing-rights evidence. | Bind/qualify both±2/±5 diagnostics, complete coverage/ambiguity/refusal semantics and applicable provider-to-processing rights. No new purchase is established by this round. |
+| Final pilot population/engine handoff | Existing older QC-plan factory accepts the original manifest/registration epoch, not genuine pilot event objects. The current pilot registration is prerequisite-only. | Once real inputs exist, build a specifically pilot-compatible complete schedule/event collection and permanent full-population/look/engine-parity binding; do not remint an old seal or enable its production gate. |
+
+This round reaches a **concrete factual-input blocker before actual
+population assembly**, not a routine checkpoint or a wait for Claude. A new
+collector or known-by parser alone would not supply those missing facts and
+is not substituted for completion. Existing subscriptions and retained
+counts are not a newly measured denial or proof that a new purchase is
+necessary. Qualification of a source sample/coverage/terms comes before any
+purchase recommendation. Current final source/readiness flags stay FALSE;
+no fixture/zero-event proxy, arbitrary publication lag, delayed event,
+favorable population drop or strategy backtest is presented as the promised
+sourced evaluation. Latest NO-QC direction remains binding throughout.
+
+### 333.5 Finding dispositions and preserved authority
+
+| ID | Priority | Status | Original location | Correction/evidence | Remaining scope |
+| --- | --- | --- | --- | --- | --- |
+| IBPILOT-COMP-33002 | P2 | CLOSED at333.2 scheduling scope | Pilot event `_compose` used one security's mixed assessment for the whole window. | Genuine registered plan schedule; actual young-SID exclusion retained;11 author controls, main472 selection and6RED old-schedule reversal/15 restored. | No source/reference authenticity or overall readiness claim. |
+| IBPILOT-COMP-33001 | P2 | PARTLY CORRECTED, OPEN | Pilot event `_replay` refused every pre-source-date candidate before target relevance. | Exact interval projection/count/ordered digest,9 author controls, boundary/missing-history reversals and unchanged original full-study refusal. | Target-affecting pre-source economic lots still lack genuine historical replay/carry-in. Cannot claim the whole finding closed. |
+| IBPUBLIC-KNOWNBY-01 | P2 | OPEN |326/329 historical public availability. | Explicit acceptance MODEL/false known-by annotation prevents an engineering output from being presented as publication proof. | Actual authenticated historical known-by upper bounds remain missing. |
+| IBQC-ACK-33001 | P2 | OPEN | Consumed cloud ACK copied a prepared hash. | No cloud cell/API/SDK access or retroactive upgrade. | Executed-source authentication remains unproved. |
+| IB1C-REAL-CR01, IB1BCAMP-CR01, IBSRC-CR01, IBSRC-CCR01 | P2 | OPEN | Original long-study scopes. | No old source, custody pin or study epoch changed. | Actual long-study evidence and strictD23 remain unfinished. |
+| IBARCHIVE-OBS-01, IBARCHIVE-OBS-02, IBPARENT-PLAN-OBS01 | P2 | OPEN | Preserved actual failures. | No semantic rerun, retry, receipt rewrite or namespace reuse. | Original exact failed dispositions remain. |
+| IBSH-CR02, IBQC-SHARED-META01 | P2 shared | OPEN | Shared manifest/client debt. | Coordination record only; shared files stay frozen. | No shared behavior changes authorized by these pilot fixes. |
+
+**Twelve OPENP2s = thirteen at332 minus the closed schedule finding.**
+No new/openP0/P1. The NC correction and all earlier resolved findings remain
+resolved only at their exact recorded scopes; all other observations and
+attributions are preserved. Frozen v1/scale/pilot/four custody files, stopped
+v3 at1,846/1,847, separate7,373B diagnostic, legacy19,846/99,394 custody and
+79,548 originally unattempted, strictD23 seven nonexact/no82-quarter promotion,
+both earnings diagnostics and frozen strategy economics remain unchanged.
+The372-request final classification remains "historical authorization
+provenance not established"; the distinct reviewer incident remains
+"reviewer-reported probable unintended SEC access; exact request count and
+transferred bytes not established". Neither is retroactively approved.
+
+Source/identity/publication/PIT/rights/canonical/registration/look/QC/backtest
+readiness remains FALSE. No actual source/body/profile/provider/credential,
+purchase, Safari/QC/API/SDK/job/upload, outcome access or backtest took place.
+No funded/paper/live/broker/operator-DB/scheduler/deployment/capital/order/
+trading authority is created. Accumulate this implementation and a separate
+exact-hash handoff, verify matching origin has not advanced, then make ONE
+final successful matching-lane push. Monitor stays PAUSED; no automatic
+rearm, new automation or message to another chat.

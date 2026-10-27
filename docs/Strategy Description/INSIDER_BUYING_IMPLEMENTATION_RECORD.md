@@ -1,6 +1,7 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 333 CONTINUES THE OWNER-DIRECTED PRE-QC BUILD WITHOUT
+Status: **SECTIONS 333–334 COMPLETE THE OWNER-DIRECTED PRE-QC CORRECTION
+ROUND IN `060624c3`, WITH A SEPARATE EXACT-HASH HANDOFF, WITHOUT
 WAITING FOR CLAUDE. WINDOW SCHEDULING NOW USES THE GENUINE PILOT PLAN,
 NOT ONE SECURITY'S SEASONING; ACTUAL PER-SECURITY SEASONING STAYS ENFORCED.
 PILOT-ONLY RELEVANCE ACCOUNTING PREVENTS TARGET-IRRELEVANT OLD LOT FACTS
@@ -38782,3 +38783,76 @@ trading authority is created. Accumulate this implementation and a separate
 exact-hash handoff, verify matching origin has not advanced, then make ONE
 final successful matching-lane push. Monitor stays PAUSED; no automatic
 rearm, new automation or message to another chat.
+
+## 334. Separate pre-QC build handoff — exact correction and factual stop
+
+### 334.1 Exact lineage and completed scope
+
+Verified starting local/origin snapshot:
+`969e29d74f7b419570f54613798faa1ba91ab3f9`. Matching-lane incoming range is
+EMPTY. The owner's latest explicit pre-QC/no-Claude-wait direction starts this
+new implementation round; no unreviewed incoming commit is silently accepted
+or attributed to Claude. Implementation/decision/validation record333 and the
+two changed Python files are committed together in
+**`060624c309b58638470d9309fb2d153d4340b130`**. This separate handoff names
+that already-existing exact correction commit. Main/peer test runs described
+in333 used the earlier969e29d7 base plus the explicit uncommitted image hashes;
+they are not relabelled as executions on a then-existing060624c3 commit.
+
+Outgoing implementation scope is exactly three lane paths: the pure pilot
+event composer, its meaningful genuine-factory tests and this lane record.
+No original full-study factory, pure pilot metadata factory, custody producer,
+frozen byte pin, shared document/behavior or QC source changes. The two final
+code hashes remain333.3's exact values. IBPILOT-COMP-33002 is CLOSED by the
+genuine-plan schedule correction in060624c3. IBPILOT-COMP-33001 is narrowly
+corrected and PARTLY OPEN: target-relevant old lots still require genuine
+historical lot state. All twelve remaining P2s, prior closures, access
+classifications and historical operation dispositions remain333.5's ledger.
+No P0/P1 is open. Internal engineering QA is not a new Claude review.
+
+### 334.2 Validation, boundary and next action
+
+Main472 focused17.44s, four whole-function reversals with13 expected RED
+assertions and15 restored3.39s, final124 boundary/document/package4.91s and
+the112-image strong compile/pin proof are observed evidence at333's exact
+scope. The final read-only peer's46GREEN5.41s and pre-correction author
+red/green are separately attributed. The draft ledger blank-line failure
+and its correction remain recorded rather than being silently recast as a
+first-pass success. No full suite or actual source/root replay was run.
+
+The concrete stop remains **before genuine pilot population assembly**, not
+at a ready QC-launch boundary. Existing historical acceptance timestamps do
+not supply authenticated public-known-by upper bounds at09:28/09:30. Complete
+required21-quarter original admission, historical identity/reference/price/
+factor/earnings inputs and permanent population/look/engine-parity bindings
+remain unfinished. No new contract/collector is substituted for these facts;
+the old full-study seal cannot consume the pilot by relabelling it. The
+specific required source sample/clock/body/version/coverage/rights evidence
+and remaining engineering interfaces are333.4's current gap map. No routine
+approval or further Claude checkpoint is requested. Current delegated
+judgment continues to cover engineering decisions; it cannot supply an
+absent historical archive or alter frozen economics by calling a proxy PIT.
+
+No QC/Safari/API/SDK/job/upload or account access; no provider/SEC request,
+private input/profile/credential read, purchase, actual body activation,
+registered/outcome look, strategy backtest, broker/paper/live/deployment/
+capital/order/trading action occurred. Looks/jobs/backtests0/0/0. Do not
+resume/rewrite stoppedv3, duplicate consumed/ambiguous requests, reclaim a
+namespace or infer a new source/actual-QC activation from this handoff.
+Monitor remains PAUSED; no automation or other-chat message is created.
+
+Before this handoff commit and final publication, reverify the designated
+absolute root, branch, exact HEAD060624c3, record-only expected status and
+matching origin969e29d7; fetch only the matching lane and stop if it advanced.
+Accumulate the implementation and this separate handoff in ONE successful
+push only to origin/codex/strategy-insider-buying. Independently verify the
+exact remote tip and final clean status afterward. No intermediate push or
+unrelated local commit is bundled.
+
+Final handoff receipt: main124 boundary/document/exact-package checks are
+GREEN4.52s after334, no skips/warnings. Independent Git-blob reconstruction
+matches both final code hashes exactly to committed060624c3 and current bytes;
+the cumulative implementation diff is exactly the three declared paths and
+only this handoff record is dirty. Diff whitespace check is clean. No later
+test run, actual-source qualification, data access or readiness is invented
+by the publication bookkeeping below.

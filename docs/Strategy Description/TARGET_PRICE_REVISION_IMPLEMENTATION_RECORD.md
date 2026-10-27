@@ -25978,10 +25978,48 @@ PYTHONDONTWRITEBYTECODE=1 /Users/sheltonchen/.venvs/trading_agent-py313/bin/pyth
 Run only after the standing physical/Git-root, branch, HEAD and status checks
 from the designated worktree. It rereads exactly 18 fixed public paths, renders
 the attempt-four source template in memory and prints only an inert manifest
-and hashes. It allocates no reservation, operation or look. The actual clean-
-foundation smoke observation is appended after the first local commit and
-before the one final push. No native or backtest completion is inferred from
-these fixture controls.
+and hashes. It allocates no reservation, operation or look. No native or
+backtest completion is inferred from these fixture controls.
+
+Actual clean-tree CLI smoke at foundation
+`ee5c0b4b95466c8ef1154e97f5320ffcedd6483e` returned **exit 0**, zero stderr,
+10196 stdout bytes at observed wall clock **2026-10-27 06:45:41 UTC**. That
+actual observation time is retained separately from the owner's October-26
+round date. Status was clean before and after; all 18 public paths were
+validated, and **10** candidate source files were rendered only in memory.
+The attempt-four template retained four enumerated identity AST changes,
+no reservation hash and NULL accepted metrics. Every native-pending field
+was null; all permission/authentication/dispatch/diagnosis/acceptance flags
+were false; actual new jobs/attempts/looks were zero. Manifest identities:
+
+| Clean-foundation CLI observation | SHA-256 |
+|---|---|
+| Exact stdout including its trailing newline | `484e9576fe33a6f247c8aea16c52fc86f2ec689a77fc52a3c981fa265c54b6cc` |
+| Top-level preparation (before its own digest field) | `26391e56dccf6c64268b82e6c82150794711d25f524fef6ad080e91214fb84f2` |
+| Fixed public-source closure | `1f7095e4b96def2a01eb937d0e5fe76d1c0b91eda9c0d1355481d07c8731a008` |
+| Nested witness preparation | `0216dca125dd6e5afed7a5f8a308fb0b3d713de852fb86a1628e4260540c5a51` |
+
+The ten prospective attempt-four source hashes, not uploaded or compiled:
+
+| Candidate file | SHA-256 |
+|---|---|
+| `cap_observer.py` | `cad8a3306f6b459bc8bf187c8fd8b8bb980c7b1dc0d85465fba11dd318b70c4d` |
+| `cap_tilt.py` | `262f568b7c0fe0b08af8a26896431465c17746bcd32e9addc568f58631e11a5c` |
+| `extended_completion_successor.py` | `336e67bff64f484b57e49e92209e22bf9471118c0ee8b8d13c3ff7b8b2511fb6` |
+| `extended_compressed_store.py` | `e8f442906d216504b1edad42438fb71a395f19b4d3fcd43efd484825d59467fc` |
+| `extended_config.py` | `5790ca63661f0f54a7734565342d141cbaba7797eb8c7b1e488c7ad573b01bd0` |
+| `extended_construction.py` | `e61bd56ad3ff5147eedf3220b40ef77743f8e13bff9919f80bc3f684a3fe27c0` |
+| `extended_core.py` | `c14f5568dbc03339cdcf11ed5fdcc3c6383c8761fd2867ef1302eabbd43fe46b` |
+| `extended_loader.py` | `f5cc9d9cb56ebbae2a22f02d6b6b7041468eadbc77d87ed2e161c9ce119a3820` |
+| `extended_runtime_successor.py` | `b93ce0b08c971f6c11d60b841e08026b0fb74ab38beb33dfd724bcfb58db61af` |
+| `main.py` | `26583c94b8648b588de90aa34e5758559a4ca4a3d161dab2dda49db77b833932` |
+
+After the first validation ledger was written, the four selected document/
+handoff modules again produced **625 passed in 11.96s**. This final local
+follow-up commit changes only this lane record to retain the real clean-
+foundation observation. It does not repeat the implementation or publish a
+second push. A final clean-HEAD CLI observation has its own HEAD-dependent
+manifest identity; it must not be relabelled as the foundation observation.
 
 ### 103.5 Exact next step and publication
 

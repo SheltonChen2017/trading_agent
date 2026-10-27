@@ -2255,10 +2255,13 @@ once:1256HTTP200 bodies,5541040valid price rows/2654048explicit absent cells,
 strategy admission follows from this technical capture. Sections326.41–326.47
 correct the uninvoked rename/ETF-tuple/seeding boundaries, preserve failedAQ,
 and record successful AR production/native validation of71monthly grids
-(146284817bytes). AS is separately frozen to recover the tool-truncated PUBLIC
-metadata from one pinned DATA manifest; no AR operation/control replay.
-Current identity/common reference AND actual-held NAV/private transfer/source/
-run/attempt gates still precede the six-cell strategy jobs; none has launched.
+(146284817bytes). Sections326.48–326.49 record AS actual0/full metadata
+recovery and I326-024: ALL vendor slots lack pre-October2021 marks, blocking
+the Jan2021 start. AU is a separately frozen existing-EODHD own-fund history/
+identity diagnostic, not a source fallback or strategy capture. No QC source
+transfer/project/compile/strategy job follows this known source stop. Current
+identity/reference/actual-held NAV/full-window/source/run gates remain;
+337/259/53/699 unchanged.
 Old modules/profiles/pins and spent uses stay frozen;
 no automatic re-pin/retry or source/financial gate clearance. This is the
 current live continuation, superseding325's no-next-milestone endpoint.
@@ -66723,3 +66726,234 @@ temp creation through AS. No provider/QC/strategy look/cell,337/259/53/699.
 After actual0 + exact full metadata recovery, freeze the actual one-private-
 project/73object transfer/18source/six-cell compilation/run/result contracts
 before contact. No intermediate push or false backtest-running claim.
+
+### 326.48 AS metadata recovered; early-history barrier and held helpers
+
+At cleanfdc8611e883f410df74b32c55b0226bb226636be, sole AS native reader
+2026-10-27T15:02:19.163325+00:00..15:02:23.083968+00:00 exited0,
+stderr0/boundnull. Exact28655byte original AR stdout SHA
+5c0a070c1d2f03e4a78adb9400db8a94c4d11b334e1a777a7f0fb65a281bc52b
+was reconstructed from ONLY the pinned DATA manifest and retained public
+facts, with original report28524/9b33 and both original0/0 stdout pins joined.
+External capture exited0, accepted_metadata=true. Full structured payload
+stored before small tool summary; no carrier truncation. AS is SPENT; no
+rerun/read/control repair. No AR/AQ producer/validator/report/control/catalog/
+shard/original-package/provider/QC read occurred. I326-023 resolved
+prospectively for complete metadata recovery, not historical source admission.
+Final86record1.21s overlaps137, not additional coverage.
+
+New inert complete anchor scripts/arv2_r298_ar_source_binding.py35394bytes SHA
+52ae31ddb440e1ecaf693d54fb6cf6d48ee377813d8614e7ce3cee5a02d68d76
+stores original AR0/native0, AS0 and exact recovered metadata,73DATA plan,
+false operational/price/master/PIT/paper/live grants. No prices/assignments/
+credential or new operation hidden in this anchor. Tests3214bytes SHA
+01f915ef1451e553fc90e3696f607ccce922d55fae12c08a60a29f29a84e8411.
+All73DATA total148531396bytes:71months146284817 plus catalog2224206 and
+manifest22373. An external exact new consumer/run contract still precedes
+any actual DATA use/transfer. No new look/cell:337/259/53/699.
+
+OPEN I326-024: public recovered monthly counts show ZERO valid vendor cells
+in every month2020-12 through2021-09. All5644vendor slots include all8funds;
+189NYSE sessions/1066716cells in that interval are explicitly absent.
+October2021 has13909valid/104615absent cells, November98177/20347,
+December103394/20774. Thus the frozen Jan4,2021 first reference cannot be
+cleared from this vendor dataset; complete capture/authentication is not
+complete usable strategy history. Bulk identified and Root reproduced this
+using ONLY already recovered metadata, no price/corpus census. No launch/
+compile/upload/project creation is allowed merely to rediscover the known
+hard stop, no shorter-period/row-dropping/expiry/source/date fallback.
+
+Primary-source research: https://sharadar.com/subscribe distinguishes5-year,
+10-year and Full History tiers, with purchased history controlling access.
+https://sharadar.com/docs/stocks and /docs/funds document from/to and RAW
+closeunadj. Returned cutoff is consistent with a rolling5-year restriction;
+the actual owner's tier/underlying cause is NOT authenticated by these
+counts or generic pricing. No account/billing settings or new paid rights
+are changed. https://eodhd.com/ and its historical EOD documentation advertise
+longer history in the existing All World product; coverage/entitlement and
+identity still need actual bounded diagnosis. Existing access is not
+permission for undocumented endpoints, immutable history or source admission.
+
+The following bounded helpers are implemented/tested but UNINVOKED and grant
+no contact/run/readiness. They remain held while I326-024 blocks operational
+QC work; their source success is not a way around the source stop.
+
+Pure six-cell batch scripts/arv2_r298_common_price_batch.py15693bytes SHA
+8b14809c2143680f1fb348e45058ed24d9a97399d265beaf75ce3b9ec23ffd34;
+tests10476bytesdf9dbf2255c8d06d4eeed24b727bf1ef01fd69ababe746e47c0ec68db5a1df79;
+NO-LFprofile3918bytes099292aea13c83130f6e15c5e036a1105af3c8d890d2135c226179e6735ab652.
+17literal public sources regenerate plain→frozen quote3735/cf6e/d740/c7b829/
+161cb without old artifact/control/admission reads. Same7addons/commonpatcher
+b3f21/ARcontexts; exact6off,6AR100,6AR200,8off,8AR100,8AR200 geometry, identical
+17nonMain modules and source policy,6unique Main/profile/projection pins.
+32authorpasses12.86s; earlier31/13.06 overlap. Corrected per-cell-geometry
+omission caught1expectedfailure3.50s. First omission accidentally targeted
+aggregate uniqueness,1testpassed3.49s and harness expected-red failed; that
+is retained NOT counted as red evidence. No actual source batch or files built.
+
+Streaming payload helper scripts/arv2_r298_common_price_payload.py22991bytes SHA
+aff0a446a44c8c76cf83fd084c69d8a82877a4f451bf55c2c53045b511bf51e9;
+tests13044bytesaad14d983a8bff6e1bd46ba9a81bcefe812974ccdc0b2e4c4cbf1137942ca775;
+NO-LFprofile19175bytes3b734b400f45bab28d0b059991dcd3d98fd766cc19d11c75261cdc57f04ab90f.
+Fixed73original source descriptors, full whole-file hash pass before ordered
+copy,64KiB chunks, normal source-return before READY, independently verified
+framed archive. Metadata-only header11650bytes SHA
+2cda5157e4b305592568d71239ba613f8e452a43ac1507c8ee33b7ead2bd65fe;
+exact archive148543046bytes, no all-month RAM copy. FDcap96/soft>=128,
+max16initial in first128; free disk810614822 before future actual prep, no
+RLIMIT change/resource reservation claim. Caller still owes own claim/fresh
+genuine inputs/original archive named guard/native exact archive FD/path
+permission; inherited FD alone bypasses no Seatbelt rule.46authorpasses28.67s;
+initial45pass/1dict-orderfixturefail28.74 corrected expected set+explicit role
+ordering, not production source. Whole-first-hash omission1red1.13s and range-
+hash omission1red1.66s restored finally. No archive/source DATA operation.
+
+New project-creation candidate scripts/create_arv2_r298_common_price_project.py
+45557bytes SHAd06a9edf240bb8b2a60f93ce27e2bb63bdbcc5d14c8214ecb2900eb52d48b2db;
+tests20065bytes343fc643776978a6eb528c5c62ab8e16eb64baff2fc53bcf1097f4bd030b2255;
+NO-LFprofile26772bytes1d52cc35e3cc7e87d5d6d417748ba5c1e0069774e60d25150447f729ac202dce,
+200selectedpins. Its AT control is UNALLOCATED, no actual invocation authority
+is supplied by this record while price history is blocked. Fixed one private-
+default Python project, six exact metadata/create requests, trusted env2keys
+only after ownclaim/sourceproof, bounded native child with fixed CA/TLS/
+mDNS; durable returnedID before all later checks, no replacement/unknown retry.
+Only documented name/language/organizationId creation fields. API missing
+public flag is UNKNOWN/documented-default inference/private_verified=false,
+never fabricated private proof or transfer grant. Fresh actual Private proof
+still precedes any licensed transfer; no upload/compile/nodes/backtest/Mia/
+permission changes.37authorpasses8.45s. Initial28pass/1handoff-classfixturefail
+4.30s and later33pass/3nested-policyfixturefail4.82s retained; real tiny child
+tests inherit native pytest denial instead of attempting different nested
+profiles. Independent exact worker policy compiled with harmless public child,
+not AT operation. CreatedID/redirect/source-before-CRED omissions caught reds
+0.15/0.14/0.15s; first redirect omission had passed with case-sensitive fake
+headers and is not red evidence; CaseInsensitiveDict regression corrected it.
+
+QC trusted credential bridge remains exactly QC_USER_ID/QC_API_TOKEN from
+the actual orchestration context, not shape proof, env-i magic or the four-
+provider Keychain helper (which has NO QC service). No credentials/environment
+values were inspected. No old caller/control, fixed6-object limit, obsolete
+collaborator row-count guard or failed-body-reading transport is invoked.
+All code-only/advisory work is same-round assistance, not independent Claude
+review. Next bounded action is AU below; full-window source/identity/price
+coverage still precedes the frozen six-cell research evaluation.
+
+### 326.49 AU one-shot existing-EODHD history/identity diagnostic freeze
+
+Under current owner existing-data/research delegation and Claude sequencing
+waiver, authorize ONE new bounded AU two-request diagnostic then ONE separate
+native stdin-only output validator at the next exact clean commit containing
+this freeze. Purpose: determine whether existing EODHD access can provide a
+known own fund's pre-2021 RAW history and current identity metadata, to inform
+safe recovery of I326-024. NOT a replacement strategy capture, source fallback,
+metadata master admission, full-window coverage proof, Sharadar retry or QC
+action. No new purchase/subscription/right, account setting or formal/PIT/
+live gate is changed. AT/private transfer/source batch remain UNINVOKED.
+
+New scripts/run_arv2_r298_eodhd_history_diagnostic.py45645bytes SHA
+8f837fee5421cac1981894ffc40c0a2ea3b1f93c298304607f184eb98bc80f29;
+tests22414bytes3e79cd8d23c0dece1786908bcb36d55a0b6a6c53334ae0910108394344f220dc.
+Canonical NO-LFprofile27309bytes SHA
+78364da928fa308bedc73fff4d73c92c69d35c4900a861aea1e4e9352b4222a9;
+202literal dependencies plus exact current clean HEAD/self/committed blob/
+profile CLI binds. Only designated Mac/Python3.13/root/branch/environment.
+Fixed prospective control:
+artifacts/analyst_revisions_v2/newrule_eodhd_history_diagnostic/R326-20261027-AU
+NOT inspected/allocated/invoked before this freeze. Exclusive fsynced claim
+and exact complete AR/AS/code/CA proofs precede exactly ONE existing EODHD
+Keychain lookup (service trading-agent-eodhd/account eodhd). No QC env/other
+key/service/token/config inspection. A claim is consumed even without a
+request; unknown/partial/nonzero/transport ambiguity is terminal, never an
+unchanged retry/renamed attempt or fallback role/endpoint.
+
+Exactly two fixed GET intents, in order, to https://eodhd.com:
+(1) /api/exchange-symbol-list/US with fmt=json,symbols=SPY,delisted=0,type=etf;
+(2) /api/eod/SPY.US with fmt=json,from=2020-12-31,to=2021-01-08,period=d,order=a.
+Only api_token is added from the owned credential pipe. No fundamental,
+intraday, realtime, other symbol, licensed-row disclosure, subscription or QC
+endpoint. Existing plan is owner-confirmed; actual capability is diagnosed,
+not asserted from a credential shape or pricing page. Application intents/
+HTTP statuses/body pins retained; physical request count remains null.
+
+Parent120s/provider60s/auth30s, each request<=25s within deadline, external
+validator30s/outer35s; uninterruptible-I/O/host-suspension caveat. Only own
+children may be killed/reaped. Parent retains original control/data/result
+descriptors/full metadata/native security and immutable role intent/start
+markers; once-only worker claims before network. Separate provider and
+credential-free native authentication roles. Parent may use Keychain after
+source preflight; provider and auth cannot access Keychains/security CLI.
+Native provider1608bytes SHA
+37a75e5f146578aff87fafb1a63001293581649fa1ad53b6ad7a9b3b3c73e557;
+auth1385bytesf3d055ec1173fc044ede0ff5a2438cd205ac86029331b373068819dd2c5bbfaf;
+validator494bytes79d7e961f0ab250fd95784609a254c2628244cbd0143b0aa3ea1d2f514858a4c.
+Provider permits only existing HTTPS443/DNS53 plus exact macOS resolver
+socket, owns pinned-CA SSLContext on both Requests pool-key and cert_verify
+paths. Pinned certifi CA240216bytes/9cc2a774 remains unchanged. No environment
+proxy/auth/cookie/hooks/redirect/retry/debug/default trust/client cert.
+Native egress is not a domain fence; exact prepared host/path/query/headers,
+TLS verification and no redirect enforce application scope.
+
+Each successful raw body<=64KiB, two own private DATA files plus bounded
+requests journal. No body JSON parsing in provider; numeric status retained
+before checks and non200 body unread. Empty/oversize/unrecognized response
+refuses. Bounded raw/URL/JSON/CSV-doubled-quote credential encodings scanned
+before retention; this is not universal secrecy/encoding proof. Native ALL-
+network-denied auth follows actual provider0, authenticates original body/
+journal pins/descriptors before semantic parsing. No opaque/raw exception,
+token, price, raw row or response body enters output.
+
+Native semantics: one exact SPY/ETF/USD/current Isin=US78462F1030 metadata
+row; venue is observed metadata, not forced equal to containerUS. Issuer
+primary https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-sp-500-etf-trust-spy
+confirms USD/NYSEARCA/CUSIP78462F103/ISINUS78462F1030; this is current fund
+identification, not a permanent historical interval master. Require exact
+six ordered NYSE dates Dec31,2020 and Jan4–8,2021, positive finite bounded
+Decimal RAW close only (never adjusted_close). Independent finite metadata
+and date/RAW-schema/count/hash evidence survives partial semantic refusal;
+actual accepted0 requires BOTH current identity match and complete six dates.
+Null ISIN/unknown/mismatch never becomes an inferred identity or strategy
+price input. Full-stock/full-window coverage, rights/master/PIT/ready flags
+remain false even if this diagnostic passes.
+
+Same-round advisory source audits covered TLS/credential/native FD privacy
+and independent RAW/identity/auth/result paths; Root reviewed parent/source/
+claim/actual-exit/output orchestration. No confirmed P0–P2 in those assigned
+paths. Confirmed P3 I326-025 before use: failure provider-state validator
+accepted impossible ordinal/count combinations. Corrected minimal invariants:
+ordinalNone requires zero intents/bodies; ordinal0 at most one; ordinal1
+requires1or2intents and at least first body completed, bodies<=intents.
+Nine negative/seven reachable-partial regressions; success predicates remain
+strict. Its omission caused1expectedfailure0.16s, restored finally. This is
+prospective failed-evidence correction; no actual contact had occurred.
+
+90authorfocusedpasses5.05s. Earlier69pass/regex SyntaxWarning corrected,
+71pass4.28s,74pass4.88s overlap. Earlier material omission reds: redirect/
+hidden failed-body read0.17s, exact preflight-before-Keychain0.18s, adjusted-
+close substitution0.14s; memory-only/restored. Real Requests301/302 tests use
+case-insensitive headers under native remote denial. No actual token/env/
+private/API/QC reads in tests. Same-round advice is not independent review.
+Root295distinctfocusedpasses51.34s=90AU+4complete-anchor+37heldAT+46payload+
+32batch+86record/document; no failures/skips/warnings/full suite. Old subsets/
+doc repeats overlap and are not additive. Source/profile/policy/compile/
+diff/status checks and all-agent HOLD precede actual dispatch.
+
+External actual-capture program4283bytes SHA
+900d1199ca13372614e32da5a418ee33072d07f512a801fa8130f29deed8dbde:
+ordinary metadata-only outer launches committed parent once, then independent
+native validator over EXACT original bounded stdout with observed exit;
+no different nested sandbox. Parent/outer120/130s, validator30/35s,
+stdout64KiB/stderr8KiB. Require actualparent0 AND nativevalidator0/no stderr/
+bounds/exact original equality for accepted diagnostic. Nativevalidator0 on
+actual2 means authenticated FAILURE only. Retain finite closed observation if
+validator fails; do not fabricate actual0/report acceptance. Clear duplicate
+reported payload once native validation succeeds; tool budget15000tokens,
+store full structured output before emitting small summary. No old reader/
+source/control/probe/capture/metadata recovery/QC action is renewed.
+
+After actual result, record exact statuses/limits/counts/pins and choose only
+an admissible full-window recovery. One fund's successful old history is
+existence/capability evidence, not all5636stock/8fund completeness, strategy
+admission or a license for a mixed/scalar/date fallback. No source-stop
+selector, shorter study or paid upgrade by inference.337/259/53/699 remains
+until an actual accountable QC event; no strategy cell/attempt consumed now.
+Accumulate locally and keep exactly one final matching-lane push at endpoint.

@@ -2224,7 +2224,9 @@ current source-pin/parser/price recovery and six/eight research-backtest work:
 then continue the 6 and 8 universe backtests. Skip Claude review for now,
 document the progress, and push once when done." Section326 owns the new
 prospective closure and one exact offline X-data consumer before any new
-provider or QC action. Old modules/profiles/pins and spent uses stay frozen;
+provider or QC action. Y is now spent/passed in326.3;326.4–326.5 own the
+additive full-catalog/current-route Z preparation and exact new one-use scope.
+Old modules/profiles/pins and spent uses stay frozen;
 no automatic re-pin/retry or source/financial gate clearance. This is the
 current live continuation, superseding325's no-next-milestone endpoint.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
@@ -63043,3 +63045,290 @@ credentials. A passing Y proves this bounded current-field observation, not
 schema/price coverage, native vendor cause, subscription or strategy readiness.
 No new look/cell,336/259/52/699 unchanged. Continue only a genuinely verified
 additive parser/source/valuation step afterward; no automatic provider/QC retry.
+
+### 326.3 Actual Y passed once; exact extra-field mismatch established
+
+At clean58396a339df8aebe0b22c23961f9d5edc9569de7, sole native Y parent ran
+2026-10-27T06:33:04.822602Z..06:33:08.281771Z actual0/stderr0/no bound.
+Sole native supplied-output validator06:33:08.282019Z..06:33:11.427448Z
+actual0/stderr0/no bound, identical8242byte stdout SHA
+3f61457e51280facfadabdc677e5c15ec53f93044fb25183160579e30fbe1c6f,
+output_authenticated=true. Report8113bytes SHA
+0ffcdfd8bc36fe10088c168491c7c0ef351e44573bb29a6c81ddd2a8c4f4d39e.
+External process brackets, not provider times. Prefreeze86record passes0.97s
+overlap335; no edits/tests during actual use. Y claim/parent/source-stage/
+validator/control are now SPENT; no reread/retry/repair. No push yet this round.
+
+The exact645byte X data SHA bb251171112b3e46045a4607b54c994584abe380cf3880e64dc53aedd06ff183
+matched under fresh full-ten-field/native-security held/named checks through
+normal guard return. Current metadata SHA
+330107f4f8734ebc6f9750a8effc3e6502191558036f636747ea2844be2e1172;
+security SHAcc8d8156a5b063bbb107d529c51c37eabcc0ed66bfe7fc1bba0b60962fcef766.
+These are fresh-use facts, not historical preservation/continuous metadata
+or a new credential scan. Only this pinned data leaf was consumed; X control
+and every other spent artifact remain unread.
+
+Observed top-level keys are EXACTLY table/files, table=stocks,3objectentries,
+no unknown keys. EACH entry has EXACTLYeight known keys: the seven documented
+fields history/historyLabel/name/size/sizeLabel/modified/available PLUS key.
+The source8-key-set SHA is
+d691f4c671c62e433837d95bde297a6e074cc0a8e449fbc3869e6955f13d0163.
+Thus X's provider_file refusal is its exact seven-key assumption, not an
+inferred expiry or malformed HTTP response. Histories5y/10y/full, their labels
+and exact stocks basenames all match; availability is literaltrue in each.
+Sizes177352024/337450597/952098749, modified strings24bytes classifiedISOaware.
+Opaque key strings have31/32/28UTF8bytes; only hashes observed, never their
+values, URL/path meaning or any relation to basenames. All other14-key
+inventory fields absent. Do not fabricate the private key contents or treat
+availability as entitlement/download authority. No failed V body is recovered.
+
+ARV2E323-002 now has a verified additive correction target: accept a separately
+versioned exact eight-field variant with bounded ignored-for-authority opaque
+key, preserving strict rest-of-schema and credential guards. Old v1/X/Y stay
+frozen/spent. A new pure v2 parser is being implemented; no fresh provider
+request or successful production parser result yet. This diagnostic does not
+admit prices, full history, the common6151+8join, immutable/PIT/master proof,
+source-processing rights or strategy readiness. ARV2E323-001 native price gap
+stays OPEN. No Keychain/provider/QC/Safari/capacity/job/look/cell;
+336/259/52/699 unchanged and all formal/paper/live flags remain false.
+
+
+### 326.4 Additive parser correction and complete original/current routing implementation
+
+The verified extra key is handled by NEW arv2_r298_sharadar_bulk_status_v2.py,
+not a change to frozen c585 v1/V/X/Y. Source0394c5d1dd1a9d11077dacb5ae3f480ce6152ab2bab4dc1cc61f3401f488f691;
+testc17b734499151cf5914bb927a448a8b08d07169c275a770d6ad0243d586f9978.
+Pure profile canonicalNO-LF2135bytes SHA
+6cc0f81d4beb271bffc198d27e08e76024f719cb1dfe78c9ebe34f79d1d24d4c.
+It accepts uniform legacy-flat/seven-field/eight-field-keyed envelopes,
+checks EVERY entry, and refuses mixed keyed/unkeyed histories, duplicate
+histories/names/keys, unpaired Unicode and invalid secret-aware JSON.
+Optional key is1..256visibleASCIIbytes, hash/length/presence ONLY; even
+URI/path-shaped text stays opaque, never evaluated/followed or related to
+basename by invention. False availability remains false; flat availability
+unknown. This compatibility fix grants no download/entitlement/price admission.
+
+New original-TICKERS decoder authenticates fixed original manifest/marker/
+archive/member/header BEFORE CSV interpretation, then preserves ALL74150
+original28-field rows in original order, including duplicate occurrences.
+Sourcee88d6197445880a832c55fa60a3bcce98213aa3baef02fae11a7a33c131d9d29;
+test4d4612230fdaaa75dc6d7e70a73fd0a3cf9aceb1f872a07f0a4832bca3f0175e.
+LF-profile2476bytes SHA
+ea0003358e327f574db0b4130bc16b57b9ef6745be2d2e330570863d2f7dd2af.
+Every canonical source hash uses ORIGINAL UTF8 ensure_asciiFalse WITHLF.
+Digest index retains all occurrences, direct ambiguous lookup refuses;
+unique+duplicate counts equal74150. No first witness filter, row overwrite,
+global duplicate-based eligibility rule or historical acceptance. Exact
+source guard is caller-owned; decoder itself reads supplied bytes only.
+
+New all_routes source d3a7ab5fd486d548ec90d27532741cd8e0194863bd548baa53c0fd8c765bdd83;
+test2fbe63f7d3eb7188d9205e71ca8178c4a2c224b1726f416da00d100f63934e24.
+CanonicalNO-LF profile2244bytes SHA
+7ad259ad2b19caeaa96ab50de418ab37b0842be8a9aff4240c46d659a0bb11f1.
+All original binding fields/order/count/inventory/source-row and identity
+evidence hashes are validated. ORIGINAL comma-parser semantics reconstruct
+historical evidence bytes; cab79 complete CUSIP vocabulary separately governs
+new current routing. Current perma/FIGI/ticker/MIC/USD/category/interval and
+cross-table/all-token collision checks retain every binding as routed, named
+refusal or explicit original-geometry outside_window. Current metadata must
+COVER original candidate interval intersect2020-12-31..2026-10-13, never shrink
+it to fit data/price availability. Same-issuer original rows are retained;
+no invented unique-permaticker original gate. Eight own ETFs are checked
+separately; local own-etf route keys are NOT QC SID proof and require exact
+own-ETF runtime identity binding later.
+
+Graph amplification is bounded before copies/appends:4096candidate rows/item,
+100000aggregate candidates,128MiB candidate bytes, incremental complete-item
+128MiB budget minus4KiB envelope reserve, and final128MiB private serialization.
+Excess refuses structurally; never truncates/drops rows to fit. Unknown
+unrelated vocabulary is retained unknown, not global no-collision proof.
+A route summary/private payload is not source/rights/PIT/master/price authority.
+Prior-session boundary extension and no-initial-stock semantics remain an
+explicit later price-plan gate; this helper alone does not authorize them.
+
+New all_route_worker source
+52a9ad6abf2f7385adbf844743ea2e5c06aaf707a872a4e2c17bf6a0bb6d0a81;
+test700250eb1b74008ce64303f3620059ce8bbc09500584c06dde9a0cb1ed6aa35e.
+After the new route-bound finite inventory, canonicalNO-LF profile5045bytes
+SHA94219a62b052b518c4d350f9bd4fcbf2b185efaf7822f45ca8081a7bcd52c559.
+Public code audit found old launch_admission.admit() rechecks OLD ec7f
+readiness bytes internally: updating an outer map cannot make it admissible.
+The new LOCAL input purpose instead uses October loader -> original pure
+_input predicate -> genuine PID-bound plain transport -> authenticated
+selected streams/manifest/every6151binding/exact frozen session axis.
+It does NOT call old A11/D2 admissions, operations, source builder or witness
+join, read their controls, reconstruct the old cloud projection or bypass an
+actual cloud admission gate. New package/lineage pins remain411c2734/e4518e06;
+this local preparation grants no old storage/compile/readiness acceptance.
+
+The fresh three-leaf original SourceGuard remains held through full decoder,
+join, complete plain fingerprint/record/selected-stream recheck and full
+ten-field/security endpoint equality; only NORMAL guard RETURN permits output.
+The private mapping copy's entire original ordered digest is rechecked.
+Closed summary includes current body pins, exact package/catalog/axis pins,
+native-security/endpoint qualifications and private-frame identity. Only that
+separate licensed private frame may traverse the captured private worker pipe;
+never logs/public stdout/exception strings. Trusted finite child predicate
+labels survive; arbitrary exception text is never rendered.
+
+Author-focused evidence, not additive to final root validation:
+v2 113passes0.15s afterpreimport/whole3.68s, prior107/113 overlap;
+five memory omissions caught1/1/1/1/2expected failures0.11/.05/.04/.04/.05s.
+Decoder70passes2.92s; prior64/draft duplicate-wide refusal evidence superseded;
+four final omissions member/census/delisting/ambiguous lookup each caught1
+expected failure0.11/.05/.09/.05s. Worker100passes0.26s/whole3.61s, prior81/99
+overlap; missing final plain check caught1expected failure0.17s, omitting
+all metadata caught10expected failures0.12s. All_routes62passes3.31s,
+prior57/58 overlap; interval/evidence omissions each caught1expected failure
+0.13/.12s before added memory bounds. All mutations memory-only/finally
+restored, no disk/source or actual-data mutation. Initial decoder fixture
+patched nonexistent capture.main; worker initial57pass/2test false positives
+matched original_row_count and fingerprint by substring, corrected with exact
+keys/AST. Full original/production bytes were NOT exercised by synthetic seams.
+
+Root-owned new preparation caller retains all four bounded secret-checked
+metadata/status responses before SEMANTIC interpretation, then one separately
+network-denied native full-catalog worker. Every body is already private if a
+later schema gate refuses. Unsafe/overbound/credential-echo or non-200 bodies
+are not retained/read; this does not promise retention of every transient byte.
+Sole native worker has inherited private claim/start/directory descriptors
+and exact named/held/content checks before AND after preparation; persistent
+start precedes its one dispatch. Only own child is killed/reaped. Own output
+descriptors/full metadata/native security stay held through final validation;
+late failure can leave files but nonzero/unknown/ambiguous actual exit is
+inadmissible. No orchestration cleanup, retries, fallback roles or pin refresh.
+
+Same-round caller advisory regressions corrected: all4body retention before
+semantic gates; boolFalse is not exit0; success/failure summary/body and status
+receipt/body pins must match; impossible zero private-channel stdout refuses;
+per-item/aggregate candidate amplification refuses before unbounded graph.
+Caller tests47passes3.31s after44overlap. Initial38fixture setup errors patched
+nonexistent admitted.admit, then19/5,37/1,43/1 fixture failures while fixing
+state/actual/current-metadata and LF/noLF fixture semantics; no production
+gate weakened. Helper initial tooling's /dev/null log refusal was fixed with
+in-root explicit log-file. Synthetic evidence retained in ignored
+.pytest_cache; empty .agent-test-tmp has no files. No full suite, independent
+acceptance, original/credential/provider/QC access or source/control replay
+occurred during this implementation. Exact root final checks and one-use
+run decision follow before any new contact.
+
+### 326.5 Exact prospective Z decision: full-catalog preparation only
+
+Owner326.1 delegation supplies this new local research sequencing authority,
+with current Claude waiver. It does NOT renew V/X/Y, permit a bare adapter,
+admit a price, bypass a stop or clear a QC/PIT/security/financial gate.
+At the clean commit containing THIS freeze, use ONLY the designated Mac root/
+branch and /Users/sheltonchen/.venvs/trading_agent-py313/bin/python,
+Darwin/POSIX3.13. Bind actual clean HEAD via --expected-head and exact new
+caller via --caller-sha256. Source bindings are not authorization booleans.
+
+NEW caller scripts/prepare_arv2_r298_all_routes.py37364bytes
+SHA0b46e5048c86e764494106efd22b419c1c800401be207691274db5f8cae476d3;
+caller tests20936bytes SHAc84f76700f3f2858813b9609023680356d4883eace37606a71ec240a472dbea0.
+CanonicalLF profile51016bytes
+SHA11d6c30bdf1759fae988e8df655bf2afeef54b14be280196166f8f9548ff10e0.
+All164 selected actual source bytes matched: historical159 projection plus
+explicit manifest/v2-status/all_routes/original-decoder/worker pins. The two
+approved source deltas are exact prospective facts; no internal old
+admission/source check is monkeypatched or silently made green. All predecessor
+bytes/maps/profiles remain frozen. The new caller's own final4EOF blank LFs
+were caught by root static check and removed BEFORE this first freeze;
+earlier draftb91a6f70 was never pinned/invoked.
+
+Fixed NEW control is artifacts/analyst_revisions_v2/newrule_all_routes/R326-20261026-Z.
+It has NOT been inspected or allocated. Sole exclusive claim/fsync precedes
+one Sharadar Keychain lookup and any request. Purpose is FIRST full original
+6151-binding/eight-ETF current route preparation, with retained success-body
+evidence and corrected optional-key status validation, not a renamed witness
+retry or replacement of a lost prior response. Local personal research scope
+and existing Sharadar rights only; no bulk redirect/download or new plan.
+MaximumFOUR application dispatches in exact order stocks_metadata,
+funds_metadata, stocks_status, funds_status, with the old fixed GET
+/v1.0/data/tickers (exact12fields/table/csv/limit100000/skip0/ticker.asc)
+then /v1.0/data/stocks and /funds status=True. TLS verify, trust_envFalse,
+identity encoding, no redirect, zero transport retries, failed bodies unread.
+Bodies bounded16MiB/16MiB/8192/8192. Numeric status and intent persist privately;
+application count is not measured physical/server contact count.
+
+After all bounded secret-checked responses persist, semantic checks and v2
+status checks must pass before the sole native all-catalog worker dispatch.
+Parent900s covers preflight/acquisition/worker/publication; observer930s,
+worker450s, output validator20s. Uninterruptible I/O/host suspension and bounded
+reap remain qualifications, not a wall-clock guarantee. Only own children may
+be killed/reaped; claim consumes even with no request, partial claim ambiguous/
+spent. No retries, alternative controls, roles, source-pin refresh or cleanup.
+
+Worker may freshly load ONLY the exact411c2734 October package subtree and
+e4518e06 lineage leaf (source package/lineage authentication mints genuine
+same-process authority), plus fixed original capture manifest/marker/TICKERS
+ZIP under full fresh SourceGuard. Original archive bytes4937076 pin a7b129f1,
+member24939614 pin562577ea, header291 pin c9186ed1, manifest94251ffd remain
+unchanged. Native read exceptions include necessary ancestor DIRECTORY
+data-open scope and OWN inherited claim/start, not other operational leaf
+contents/A11/D2/actions/fundamentals. Original rows and private routes stay
+inside separately bounded IPC/private output. Worker input base64twoCSVs
+<=46MiB, private output<=129MiB, complete private graph<=128MiB, public128KiB.
+Root/source/current metadata checks are scoped endpoints, not continuous/
+historical integrity, whole-interpreter or whole-filesystem read isolation.
+
+Only actualparent0 AND separate native supplied-output validator0 with matching
+finite envelope/report pin permit accepted diagnostic evidence. Validator reads
+stdin and public sources, denies ALL artifacts/network/Keychains/securityCLI;
+it does NOT reread output after parent closes. Parent holds original output
+descriptors/full metadata/native security through its checks. Own normal
+outputs are claim,8intent/status markers,4response bodies,join-start,
+join-observed,private routes and report, with bounded failure alternative.
+Late publication/close ambiguity can leave files; report alone never supplies
+exit0. No source/performance/price readiness follows from an all-routes receipt.
+
+Root533 distinct focused passes3.39s (54manifest+113v2status+70originaldecoder+
+62all_routes+100worker+47caller+86record/doc+1research importclosure), no
+failures/skips/warnings; author runs overlap and are not added. Root memory
+omissions of success metadata binding and actual-exit binding each caught1
+expected failure0.15/.14s, finally restored/no disk mutation. Their separate
+processes briefly overlapped after exec yielded; stdout captures separately
+retained, shared synthetic log not claimed independent durable evidence.
+No actual operation occurred during checks.
+
+NEW native-channel tests10683bytes SHA
+6402269087291560cfa248289f83fe7f44469fabe5cc04a6e208d434157e1ebc:
+author10passes26.35s. Initial nested sandbox-exec test failed before child
+Python with sandbox_apply Operation not permitted. Corrected TEST HARNESS
+compiles actual worker policy OUTSIDE pytest, adds total artifact denial and
+retains native-denied inherited children; no product policy weakened.
+Required test-only policySHA
+54b4cad437872b641726a784237f51f6c458563fb013b00d7c02172f30e8cd6c.
+Real tiny children test inherited FD/fullmetadata/nonces, native TEST-NET
+denial, six changed control/FD refusals, bounded noisy stdout/stderr and
+deadline SIGKILL/reap. No production private paths probed. Root final combined
+selection follows. Same-round read-only audit found no further defect; it is
+not independent acceptance. All agents/files are held before actual use.
+
+If Z passes with any named identity/interval/collision refusal, retain every
+original binding and diagnose; do not price-filter or launch. If all original/
+current routes pass, next separately justified acquisition plan must extend
+required prior-session boundaries and bind common RAW reference AND NAV
+coverage, preserve quote-aware execution and all costs/actions/whole shares.
+Primary docs [stocks](https://sharadar.com/docs/stocks),
+[funds](https://sharadar.com/docs/funds),
+[getting started](https://sharadar.com/docs/getting-started) document default
+limit10000, not a higher guaranteed maximum. Candidate design (NOT invocation
+authority here): fixed27ticker x <=366calendar-day stock windows, unique-key
+ceiling9882<10000, six windows throughOct13; eight funds in two fixed windows.
+Worstcase1370price GETs, exact4fields ticker/date/closeunadj/lastupdated,
+single-flight/no retries, retained private bounded successes, explicit every
+required NYSE-session reconciliation. Short response alone is never coverage.
+No raw price QC transfer, quote substitution, cloud source update, capacity,
+compile, job, result read or look/cell authorized by this Z freeze.
+Floor336/259/52/699 and all formal/paper/live false flags remain binding.
+
+Root final combined543distinctpasses26.79s, no failures/skips/warnings:
+the533selection above PLUS10real native-channel cases in the actual-worker-
+policy outer harness with stronger total artifact denial. Earlier533 and
+author subsets overlap, not additive. All11newsource/testfiles compile in
+memory, exactEOF checks passed after the disclosed caller-only correction,
+all164selectedpins match and dispatch_fence is absent. Final public Git
+check still58396a33 locally and live634509bf; only authored listed newfiles
+and this record are dirty. No actual Z use yet. Commit this freeze after
+exact root/branch/status/diff/record checks, then one observer/parent/worker/
+validator use only; no tests or edits during that actual use.

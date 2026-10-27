@@ -64837,3 +64837,107 @@ native ALL-network/artifact/Keychain/security denial and inroot paths, no
 full suite or actual data/credential/provider/QC operation. The source-only
 helper is not an operational acquisition caller. All agents held before
 the separately frozen create-only UI action; no competing edits/launches.
+
+### 326.23 Actual one-project creation and observed IDE side effects
+
+At clean1f38ff32f9d767b35fc7a0a5d4b96244e2a54a09, the sole create-only UI
+action used Code From Template then Use Default Template in the separate
+Analyst tab. Contrary to the prospective expectation of a name form, QC
+immediately created project38522505, automatically named Muscular Apricot
+Butterfly, and opened its coding environment. Creation is consumed; the ID
+is observed and not ambiguous. No replacement project/renamed creation is
+permitted. The new Project panel shows exactly one collaborator, the current
+account labelled Owner, no added collaborator or library, default main.py,
+Foundation Default and Always use Master Branch selected at masterv18207.
+No Mia conversation, code edit/upload, parameter, sharing, permission, plan,
+node or other-lane change occurred. No research notebook/backtest was opened.
+
+QC also automatically built that default template at10:47:02 displayed IDE
+time, LEAN2.5.0.0.18207, short build ID776eb9-6b0744. This unexpected IDE
+side effect is retained, not described as zero compile activity or accepted
+candidate compilation. It did NOT use the frozen eight-file source, has no
+strategy/source diagnostic run, and consumes no candidate backtest attempt,
+look or result cell. No Backtest Project/Optimize/Live button was pressed.
+The326.22 prohibition was the intended explicit action scope; it was not a
+mechanical guarantee that the new IDE would suppress automatic template build.
+No later freeze can retroactively turn this template build into our compile.
+
+The current official [Projects guide](https://www.quantconnect.com/docs/v2/cloud-platform/projects/getting-started)
+documents renaming this SAME project via its Project-panel pencil/name field.
+Under the owner's current lane authority, proceed with that bounded name-only
+correction to ARV2 R326 FIVE SOURCE RAW 20261027; no second creation, deletion,
+clone or migration. Existing default-private project behavior is documented
+in [Security and IP](https://www.quantconnect.com/docs/v2/cloud-platform/security-and-ip).
+It is a controlled new creation with owner-only UI/no sharing action, not a
+historical privacy/whole-org proof or an API owner-row observation. Record
+any contradictory sharing state and stop before source upload. Concrete
+project38522505 must now bind the separate generated source/cache/run freeze.
+No raw QC data/code downloaded or native History/cache write/job occurred.
+All five vendor blockers and all false readiness flags persist;336/259/52/699,
+no push yet this round. Other agents were held throughout actual creation.
+
+### 326.24 Concrete-project AH source derivation and installation freeze
+
+Pure native ALL-network/artifact-denied derivation for actual38522505 uses
+unchanged generatora34385be, eight raw public input pins, AE9da6813b, fixed
+plain activationffdc80e1/5901 and cache scope tag R326-20261027-AH. Projection
+record1988bytes SHA65cebf606f2867b58ae203b186f3ce7ec0701fc2f3c5f576f13adef46ca5624a;
+profile4899bytes declared seed SHA
+3e985a9d6951adf53aa058fb4116f26b4c90bd7a881e9c32c9945306363279f1,
+whole profile bytes SHAda084b9f504614f973b79205a997cd3559be49de43a409211a34dad2541e2de9.
+Namespace scope13e90215fc380c2e286c541abf6d34fda6c77e3c01d999a352ea875110a358cc
+binds38522505/AE spec/static publication3e8c98f4/tag; final data key also binds
+the actual whole-book hash generated INSIDE QC. No QC rows/source DATA,
+credential, artifact/control write, network or QC action occurred in derivation.
+Pure flags describe derivation's lack of operational grants, not a denial
+that the newly created project exists. Exact eight Python files total177315:
+
+| File | Bytes | SHA256 |
+|---|---:|---|
+| accepted_risk_order_level_input_runtime.py |16093|b3f48e1b1c6fc6cc665d9f8b475292260074feec5571eab6e8f0d1c1a091fd35|
+| accepted_risk_preliminary_qc_figi.py |25920|5958786ddd787a45a90d636a36d07136841ee79cf1ce904c8d749d47045ff81d|
+| accepted_risk_preliminary_rating_evaluator.py |53466|d706a19324f59ac36e910b715c3ee17312a7126444287d9eba18c8fc8d06c21a|
+| accepted_risk_preliminary_rating_policy.py |4649|be082935781e8d406e5c6126fe33bb08866bc765b1d1ac162a96df4c0c988fd7|
+| main.py |12760|b447d662b7ca7fb7954ffecc87c48c135b28af0016351df9101b1a3c303dc98c|
+| newrule_legacy_primitives.py |950|2e8c22a26182a4fb46d3dc759b28e0da537c98e3a8c0c306aecd62f5bada8999|
+| newrule_native_price_book_publication.py |24694|f625466fbeda3f59170ef49b76ebd31900a391dc8025589e621c31cc91326085|
+| newrule_native_price_source_diagnostic.py |38783|1e1c43c106ebef50973f26b9202b6393e4ab47e4b62e26433da32ffc662d085c|
+
+Under the current owner delegation/waiver, the clean commit containing THIS
+freeze permits one new AH PUBLIC-CODE-ONLY stage at
+artifacts/analyst_revisions_v2/newrule_native_source_projection/R326-20261027-AH,
+not inspected/allocated, with exclusive claim before writes. Recheck exact
+root/branch/clean committed HEAD/generator and all raw public source pins;
+derive only this exact project/scope, match all record/profile/file hashes,
+then exclusively write/fsync/close only claim, projection/profile JSON and
+these8py files. Recheck unchanged source bytes and all staged byte counts/
+hashes; retain partial outputs on failure, no cleanup/overwrite/retry. Native
+ALL-network/Keychain/security denial, reads only public code/own stage,
+writes only this stage/ancestor creation and own inroot temp. No credential,
+licensed row, raw QC price/book or old source/control read is permitted. This
+stage is a bounded source-code transport artifact, not price admission.
+
+The SAME new project38522505 may be renamed to the frozen target name and
+receive ONLY these exact public Python source bytes through the normal
+authorized Safari editor/upload interface. Install dependencies first, main.py
+last; replace only the new project's default main, do not modify R298 or any
+other project/library. Keep any uninvoked default notebook/IDE metadata outside
+the executable eight-Python-file bundle; never run it, delete it or import it
+as a fallback. No new collaborator, sharing/permission, paid plan, broker/live
+action or node interruption. Require Saved and independently reauthenticate
+all eight cloud bytes against this exact manifest before any launch. If the
+UI cannot expose complete source bytes, do not equate visible snippets, a
+filename, saved icon or successful build with byte equality. Use an authorized
+bounded code-only read/download path or report the limitation; no QC-data
+download or outside-root support path. Any unexpected Python file/import,
+owner/privacy/project change, unknown install outcome or drift stops launch.
+
+Normal IDE automatic builds while installing/default initialization must be
+recorded as such, not accepted as compilation of the complete candidate.
+No explicit Build/Backtest/Optimize/Live action, strategy test, native History,
+Object Store book write or outcome read is authorized by this SOURCE-INSTALL
+freeze. A separate final source/access/current capacity/compile/run/attempt/
+metadata-only result decision follows verified complete installation; no API
+compile/status evidence may be fabricated from UI labels. Source project
+creation/install adds no research look or cell. All five source stops and
+formal/PIT/master/paper/live false flags remain;336/259/52/699, no push yet.

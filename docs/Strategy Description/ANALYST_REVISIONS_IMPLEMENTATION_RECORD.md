@@ -2268,12 +2268,15 @@ its unaccepted actual-9 after Root's external-collector naming error; no
 whole-file/source acceptance. Section326.58 freezes corrected bounded result
 capture and AZ metadata-only reconciliation. Section326.60 records AZ actual0
 metadata-only acceptance: reported total110346 and display refusals; original
-AY source claims remain unaccepted. A NEW BA forward-catalog continuation
-and source-complete crosswalk V2 are implemented. Section326.61 freezes BA's
-fresh-source/110-unrequested-page continuation, not yet invoked; no strategy
-price acquisition, actual crosswalk or QC run follows without further gates.
-No AU retry, provider/strategy capture or QC source
-transfer/project/compile/strategy job follows this known source stop. Current
+AY source claims remain unaccepted. Sections326.61–326.62 record NEW BA's
+fresh-source/110-unrequested-page continuation and actual parent0/native
+validator0: complete current catalog110346mapping rows/111pages plus both
+symbol lists. Original AW frame bytes were freshly authenticated against all
+three external body pins before BA source0; AY remains unaccepted. BA is now
+spent. The separate full genuine/original/current identity crosswalk is next;
+no strategy historical-price acquisition or QC run follows without its gates.
+No AU/AW/AY replay or QC source transfer/project/compile/strategy job followed
+the catalogue result. Current
 identity/reference/actual-held NAV/full-window/source/run gates remain;
 337/259/53/699 unchanged.
 Old modules/profiles/pins and spent uses stay frozen;
@@ -67928,3 +67931,81 @@ policy, new project/transfer/compile/backtest by this BA decision. All formal
 flags and I326-024 remain open/false.337/259/53/699 unchanged until actual
 accountable QC event. All agents HOLD before dispatch; accumulate locally,
 exactly one final matching-lane push remains pending, none this round yet.
+
+### 326.62 BA actual complete current catalogue — accepted technical observation, now spent
+
+At clean committed freeze0b6c42d1c66dbe3fdb704443ee803693a2c7df50, sole BA
+parent dispatched2026-10-27T17:39:57.535515Z and completion observed
+17:53:40.641468Z: actual0, boundnull, stderr0, complete stdout63696bytes
+SHAd62df29ed4c00602a40399cbd3bd22717d13b491a9e63d40a4357a8a93617285.
+Independent native ALL-network/ALL-artifact/Keychain/security-denied output
+validator dispatched17:53:40.641876Z, completion17:53:44.434525Z: actual0,
+same exact complete stdout, stderr0/boundnull. External times are own
+dispatch/completion brackets, not provider timestamps or measured latency.
+Outer actual0/stagevalidated; no truncation, unknown exit or report-alone
+acceptance. Source/provider/auth children each actual0/no stderr/no bounds.
+Source stdout4140/b4f7d2a76dd06b366aea12d04f166e51a2b06f941378516600927f32d834d9e4;
+provider11772/c72b429527ccad07a554b37b395be6fb1979e0a18621894f4c4d2f0d7f7bfdd5;
+auth15107/57c071187718914599b559a2f75669bac02ae9e551f9b7d6c6121776653c3791.
+Report63565/cfb7d3f19f6578d5ed997f16b896e2b96447574f7728363e496b881a75f0d43e.
+
+Fresh source guard independently verified exact AW binary extent16140080,
+all three BE64 headers and the three original externally pinned body hashes,
+before JSON; it returned normally before own seed publication and credentials.
+Current whole seed SHA02d64c177446409f43f6f443cda77afa4c6e9503ebb17844a9910a52b1093005
+is accepted ONLY under this new actual0 source scope. This does not accept AY's
+actual-9 result, prove historical/continuous metadata stability or revive AW.
+Source metadata3658/c0d738188e352a490a789ecb3522c900591af1d8f971828846c1295c4eb27038.
+
+Exactly110 NEW application dispatch intents and110 completed HTTP200 bodies
+at fixed offsets1000..110000; no first-three request replay, retries, returned
+link following or alternate endpoint. Physical provider request count remains
+null/unknown. Joined catalogue:50668 active and59979 delisted symbol rows,
+111mapping pages/110346mapping rows (first1000 retained +109346 new), final346.
+Mapping ordered-records SHA9b49e14223906b5c0cd0e194265df23b5363146fa786e025f965dc2ac3c03ded;
+active152378bb7661fef22953e4fcb29659cf67077aa586f561e5f2720c258ef47ba8;
+delisted6f37a217d2111420d34c6db2640c700d72a2b1059707f622a37326d87caf8f84.
+Exact V2 representation retained all rows including null descriptive fields;
+no unknown field names. Complete bounded protocol inventory is not complete
+identifiers: mapping CUSIP has73059null/5empty, FIGI37081null, ISIN49027null.
+These remain explicit identity-crosswalk constraints, never ticker fallback.
+
+Five retained own DATA leaves under
+artifacts/analyst_revisions_v2/newrule_eodhd_catalog/R326-20261027-BA:
+seed-bodies.bin16140080/02d64c177446409f43f6f443cda77afa4c6e9503ebb17844a9910a52b1093005;
+mapping-bodies.bin11322284/1b601920ea0bf26c2f7354b99276cdd88d0e9f979b4337fa8badcb5a85fe8596;
+requests.jsonl10890/8f76f8af4e47ceef0e6b03cc51df6ac72ec2c1c1386e9a7b58609f68c0ccf128;
+catalog-index.json15152/ca250b3555a554e9a805cc5befaf4bf095d16760075489493983ec73033aad29;
+source-metadata.json3658/c0d738188e352a490a789ecb3522c900591af1d8f971828846c1295c4eb27038.
+All113body frames/whole pins/journal/index/source-metadata authenticated by
+separate credential-free native worker before metadata-only accepted result.
+No licensed values, names, identifiers, URLs, prices or credentials disclosed.
+
+BA parent/workers/output validator/control are now SPENT. Preserve all DATA
+and controls; no replay, repair, cleanup, retry, pin refresh or source-census.
+The inert public scripts/arv2_r298_ba_source_binding.py records externally
+observed actual0 facts and full metadata-only summaries plus five DATA pins;
+it grants no reads/operation/admission by itself. A new exact BB offline
+contract must authenticate fresh genuine input plus all original/current
+identity evidence and the full catalogue before any stock/ETF price request.
+I326-024/fullwindow price coverage remains OPEN. No new historical-price
+acquisition, QC capacity/project/transfer/compile/backtest or strategy result.
+337shared/259development/53infrastructure/699cells unchanged. All formal/PIT/
+permanent-master/readiness/paper/live flags remain false. Current owner
+research sequencing waiver remains; no independent acceptance represented.
+Root resumed only public source/doc work after actual completion; exactly
+one final matching-lane push still pending, none this round.
+
+Public BA anchor37073bytes SHAfdc6cd8eb38a017961f67b351ae525e280e3e8bd6c141a1af7710c7bf27dc0d4;
+fact11efb22aaf20aeb65445868fc86d5a2d049bdd4a43615fd1278c8d6ac256ed3d,
+sourcec0d738188e352a490a789ecb3522c900591af1d8f971828846c1295c4eb27038,
+provider972e564b42ec5845bd359575964e06e3e5e5e753fb653493a38b4f7963330ae0,
+authbfa32f26ad55fc9a0446e7d8cdc89886a9bc77239cd8125689f25285948c1e23.
+Native ALL-network/artifact/Keychain/security-denied pure public-source check
+validated all actual exactinteger0 facts, source/provider/auth schemas,
+full output equality, five exact DATA pins/27492064total bytes and in-memory
+compile. This invokes no old operational reader or private DATA traversal.
+86record/documentpasses1.21s; repeated document selection is not additive to
+326.61. Same-round public-source edge-case advisory found no material defect:
+related missing FIGI/CUSIP remains unresolved, unrelated missing identifiers
+stay retained, null ISIN is absent corroboration. No independent acceptance.

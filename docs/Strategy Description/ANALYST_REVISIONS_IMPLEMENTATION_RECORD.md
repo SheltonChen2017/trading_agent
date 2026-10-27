@@ -2247,8 +2247,14 @@ cells, with0invalid/0failure-unknown. The pinned1313871byte book remains only
 inside QC; this is technical source observation/publication, not price-input
 admission or complete required coverage. Sections326.19–326.29 own the actual
 context, readback,337/259/53/699 floor and bounded metadata recovery. No replay.
-Complete reference AND held-stock NAV coverage, source identity/common
-sidecar/runtime/run/attempt gates still precede the six-cell strategy runs.
+Sections326.31–326.40 then preserve AL's local axis refusal and AM's transport
+refusal, correct the genuine session-record bridge, verify the minimal macOS
+resolver-socket correction and complete AP's full RAW capture/authentication
+once:1256HTTP200 bodies,5541040valid price rows/2654048explicit absent cells,
+179185028byte corpus. All used protocols stay spent; no source-price or
+strategy admission follows from this technical capture. Concrete monthly
+sidecar/current identity/common reference AND actual-held NAV/runtime/transfer/
+source/run/attempt gates still precede the six-cell strategy runs.
 Old modules/profiles/pins and spent uses stay frozen;
 no automatic re-pin/retry or source/financial gate clearance. This is the
 current live continuation, superseding325's no-next-milestone endpoint.
@@ -66076,3 +66082,91 @@ private-source read/key/provider/QC contact occurred before this freeze.
 After actual result, only an independently bound data-only sidecar/current
 privacy/source/price-runtime/whole-held-NAV/quoted-execution/run/attempt protocol
 may lead to the six/eight strategy jobs; no current success is inferred.
+
+### 326.40 Actual AP full RAW corpus and offline authentication PASSED
+
+At clean6b86972a78d09d1d6aabd087edfe3b2248c7b291, sole AP parent
+2026-10-27T13:07:21.260471+00:00..13:29:23.681913+00:00 exited0.
+Original bounded stdout250498bytes SHA
+82005db3095c93390318e9541452e541dcb77f520d6847780162bb1b404f493b,
+stderr0/boundnull. Sole native output validator
+13:29:23.682398+00:00..13:29:27.553621+00:00 exited0, same250498bytes/hash,
+stderr0/boundnull. Exact source/provider/auth frames, coalesced/retained complete
+progress-prefix joins and report pin validated. Report12204bytes SHA
+c84e22c65eff54d6677e2372fe51af3be6f20fd0318619d076184b3d1a300a4a.
+AP parent/workers/output validator/claim are now SPENT, no rerun/repair/
+unchanged retry/control/report reread. Final86record1.29s before freeze
+overlaps247 and is not additional coverage.
+
+Source actual0,3750bytes SHA81ad26dc14c13dd5658a4a75f5c638cc35b5dd122e7e0ef689fc5769edf0956d;
+provider actual0,239065bytes SHA2c805691f04ee078f16adb7a43f627fd699119e78fa0790ce66e36ce719da968;
+authentication actual0,926bytes SHA3a8c380d96c7ea7f7843cc14a6ca9545d16abb0ea16c1602c4c012e30362ca6f.
+Each stderr0/boundnull. Fresh genuine all6151whole bindings/3466axis and held
+AC source/normal guards passed before plan and exactly one Keychain handoff.
+All1256fixed application intents completed HTTP200 bodies, funds first and
+then all stock batches; no retry/redirect/fallback/failed body or other endpoint.
+Underlying physical provider_request_count remains null, not measured1256.
+No raw price, key, licensed row or exception entered tool output.
+
+The separate credential-free native ALL-network-denied worker authenticated
+the complete contiguous retained corpus/range journals and all1256CSV schemas.
+Observed5541040positive exact price rows +2654048explicitly absent expected
+cells =8195088vendor grid cells, all5636vendor stock routes/all8funds over
+1452sessions. Response-summary stream SHA
+52dd5c21b0ab238c361c0cd1782b3f577858ef615329e023a7dbe23eb74ed31b.
+Absence is observed missingness, not pre-IPO/delist cause or a filter; no source
+row is removed, no holding lifetime clipped and no scalar/stale/quote fallback.
+Only actual strategy target/positive-holding lookup can decide required-cell
+coverage, with mandatory stop on a requested absent cell. Five native source
+assignments remain separate; their QC-only book was not read/exported by AP.
+
+Exact retained DATA pins for a separately frozen downstream purpose ONLY:
+
+| DATA role | Bytes | SHA256 |
+| --- | ---: | --- |
+| plan-private.json |2927971|7703c8e29d7bef5928b0a776628759ff97715b003045c2c00df2b01e7b03f51e|
+| corpus.bin |179185028|024eeab3ee849e946b429f7c5d52586c58f017012e8593f81c832fa34cad7113|
+| dispatch.jsonl |161060|6f875945c0fbb6b36b14f85d393016d3e2240071e0c9662f156a5dc7abdd3f25|
+| captures.jsonl |343437|1c29fdbb57a7e64fe2191a279ea9e2e9bfc8a61aad8dae98d2e55340500f5ea5|
+
+These four DATA leaves are under
+artifacts/analyst_revisions_v2/newrule_raw_price_acquisition/R326-20261027-AP.
+A new exact consumer must authenticate original held/named metadata/native
+security and byte pins before semantics; this is not permission to read AP
+claim/report/other controls or replay its auth process. No data census followed.
+
+New public scripts/arv2_r298_ap_source_binding.py8941bytes SHA
+fc14178438cb5d891da0f71321e3a4e04c804e8adcc6eadd86d24b4ab1554652
+was derived solely from authenticated stored tool metadata. Fact canonical
+SHA4768862323d73344c48e239568c0dbce849e7441ac1ce7a609115932abe8c825;
+source summary6979b747ed1cf2bccce7144d8cbb1b4a8397373a586d2e736e0b3f8105350da1;
+authentication summary93a82e5cbdd9c79b95de8e9289ebe7d2047b44a50dc1488816756c23fd509f51.
+It exposes no prices/credentials/rows/I/O/new grant. Four focused native-denied
+public-anchor tests passed0.08s: actual-zero/channel/report joins, exact4DATA
+pins/grid counts, literal hash/false-gate/copy isolation and inert fresh import
+with filesystem/socket/process operations forbidden. No private artifact,
+credential, provider or QC access in tests; no full suite.
+
+This is the first accepted full-window vendor RAW corpus in this recovery,
+and the source/parser/verified resolver correction now works prospectively.
+It is current-vintage qualified research, not immutable PIT/history, permanent
+security master, continuous integrity or strategy price/NAV/performance
+admission. No strategy job/capacity/compile/result was invoked, no additional
+look/cell:337shared/259development/53infrastructure/699cells unchanged.
+
+During acquisition all agents held edits/tests and supplied only public-code
+read-only designs; worktree/source pins stayed exact through postflight0.
+No source/control/private-data probe or competing operation ran. Following
+actual0, implementation resumes for the concrete two-pass streaming corpus
+guard, data-only monthly sidecar, vendor/native common price driver/new result
+reader and exact source projection. Frozen generic FixedDataGuard caps leaves
+at32MiB/total64MiB and materializes bytes; it CANNOT safely authenticate this
+179MBcorpus by changing its globals. A separately pinned bounded streaming
+guard is required. There are71months(Dec2020,60months2021–25,10months2026),
+cap72, no native price export. Explicit spool/final/global/file/FD/RAM budgets
+and normal source-guard RETURN before manifest-last admitted publication must
+be frozen before AQ. No new producer/consumer/control is invoked by this result.
+Old44MBinput/quote economics stay frozen; current required prices/actual-held
+NAV, private QC processing/transfer/source/run/capacity/attempt/terminal gates
+still precede the six-cell order-based evaluation. The owner current waiver/
+delegation continues without a routine acknowledgment wait.

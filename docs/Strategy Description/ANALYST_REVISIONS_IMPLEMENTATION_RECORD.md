@@ -2263,7 +2263,10 @@ Sections326.52–326.54 record AV actual0 identifying the display-name ASCII
 refusal and AX actual0 accepting the unchanged pair under corrected Unicode
 policy. Section326.55 records AW spent after3HTTP200 bodies: first mapping
 total refused; no complete catalog/identity/coverage admission. Section326.56
-freezes the separate offline fixed-frame AY diagnosis, not yet invoked.
+freezes the separate offline fixed-frame AY diagnosis. Section326.57 records
+its unaccepted actual-9 after Root's external-collector naming error; no
+whole-file/source acceptance. Section326.58 freezes corrected bounded result
+capture and AZ metadata-only reconciliation, not yet invoked.
 No AU retry, provider/strategy capture or QC source
 transfer/project/compile/strategy job follows this known source stop. Current
 identity/reference/actual-held NAV/full-window/source/run gates remain;
@@ -67527,3 +67530,142 @@ artifact/Keychains/security denied, inroot support paths, no plugin/conftest/
 bytecode/cacheprovider. Subsets and record repeats not additive.
 All agents HOLD writes/tests/temp before actual AY. Preserve I326-024 and
 337/259/53/699; continue only admissible evidence recovery, one final lane push.
+
+### 326.57 AY unaccepted: Root external-collector defect, no replay
+
+Actual sole AY native parent at clean741e966cd426946877cac175dac9c569c72952af
+2026-10-27T16:35:32.974173+00:00..16:35:37.101820+00:00:
+actual exit-9, bound=outer_capture, stdout4526bytes
+d9dfeaab7818d8e9aac495f525e27a3fb40a640f23bbb7f79aef3b6014bccdf8,
+stderr0. Validator NOT invoked, external outer2, accepted=false.
+AY now SPENT/UNACCEPTED; no unchanged reader/source/data/claim retry.
+
+Confirmed P2 I326-029, OWN ROOT error: generating the external capture
+program by global AX->AY replacement also changed MAX_OUTPUT to MAY_OUTPUT.
+The program compiled, but that missing module attribute is evaluated after
+the first stdout chunk. Its generic exception handler set outer_capture and
+finally killed/reaped its OWN still-running child. This static defect explains
+the collector's failure path; emitted bytes do NOT establish the reader's
+successful terminal exit or accepted guard/source result. No invented0,
+successful-reader claim or whole-file pin follows from those bytes.
+The earlier170 focused passes covered committed sources, not this external
+program's runtime attribute lookup; compile-only checking missed it.
+All earlier passes/failures and AW's independent original mapping refusal
+remain retained; neither dataset entitlement nor QC failure is inferred.
+
+Fix prospectively: NEW committed technical bounded capture helper with
+integer limits validated BEFORE process dispatch, one nonblocking stdin/
+stdout/stderr selector, own-child kill/reap, partial-byte/hash preservation,
+strict finite actual metadata and explicit safe env/ROOT. Test REAL tiny
+synthetic children under native denial; do not regenerate operation IDs by
+unrestricted string replacement. Helper grants no protocol/source authority.
+No used AY/AW/AX/AV source/profile/policy changed.
+
+New separately frozen AZ may read ONLY candidate AY/result-metadata.json
+at exact expected4526byte/d9dfeaab pin (not inspected/existence asserted).
+This is NEW METADATA-ONLY failure reconciliation, not raw AW corpus, old
+AY operation/control replay or source admission. Validate known original
+binding/shape/receipt FORMAT while explicitly retaining actual-9,
+outer_capture and no independent validator. NEVER call AY.validate_output
+with fabricated0. Every copied observation/whole-pin remains
+reported_UNADMITTED; native AZ0 would authenticate metadata only.
+A future substantive forward-catalog consumer still requires its OWN
+successful fresh source-byte/frame proof and exact separate run freeze
+before any remaining-page contact. Do not silently increase bounds or repeat
+AW's first3 requests. All financial/source/PIT/readiness flags remain false.
+
+No new provider/QC contact occurred in AY; no accepted full catalog/crosswalk/
+prices/strategy result.337/259/53/699 unchanged. Continue verified recovery
+under owner waiver, preserve all claims/evidence, one final matching push.
+
+### 326.58 Bounded measurement repair and exact AZ metadata-only freeze
+
+NEW technical scripts/arv2_r298_bounded_actual_capture.py12105bytes SHA
+febe87c53010227eeca399b8a5087c42d2363c7d3a9ee583d18dfd06b3a68356;
+tests10301bytes386a9fce7e32870bbfb8058d4d546d33fe597b1e1033ae32001fcda61c455138.
+Canonical profile1026bytes
+a4786dae98004b466ce6831384c70f2ac3793105345a8914da52cbc139f10ed6.
+All integer output/input/argv/env/ROOT/seconds limits resolved BEFORE Popen;
+explicit env/cwd/closefds/no shell/no callback. One nonblocking selector handles
+stdin/stdout/stderr, including pipe backpressure; only own child kill/reap.
+Raw stdout stays internal, raw stderr/argv/env/exception never returned.
+Retained-prefix count/hash distinguished from one extra cap-detection byte
+and incomplete streams; deadline/uninterruptible-I/O/host-suspension caveat.
+Metadata always grants ZERO protocol/operation acceptance.
+
+44authorpasses1.03s, initial43/.95 overlap. REAL synthetic children prove
+zero/nonzero/timeout/partial output/limits/early closed stdin/large output
+before input, explicit environment, injected IO failure and no-spawn invalid
+arguments. Pre-spawn limit-type omission1red.08s, restored.
+I326-029 corrected PROSPECTIVELY by tested helper plus manually authored
+external program; old AY-9 remains unaccepted. No global operation-ID text
+replacement; literal module attribute checks/compile passed before use.
+
+NEW scripts/read_arv2_r298_eodhd_failed_bounds_metadata.py17556bytes SHA
+6402bc090df29f7a1fde6f2a2dcca7301d412f557f2caea8f931f1ad5b0fea9c;
+tests11369bytes e0ad096ae832b0c392ca8b2923af8932ebd4c0046a97fd396bfe009708d509d2.
+Canonical noLF profile29921bytes
+02a919b038aa342081682e8ac7cada37777b7d28498f5f7a148c33e857b2d598,
+207 actual-matching literal pins, including used AY5863 and capture helperfebe.
+ONLY exact candidate AY/result-metadata.json4526bytes/d9dfeaab is read
+under NEW AZ claim/full GenericFixedDataGuard, whole pin BEFORE JSON,
+no-follow/originalFD/full10/native-security/held-named/normal-return/postflight.
+New control newrule_eodhd_catalog/R326-20261027-AZ has NOT been inspected/
+allocated. Same designated clean Mac/root/branch/Python3.13; exact committed
+run HEAD plus caller/profile above mandatory. Once only; unknown/partial/
+nonzero spends use, no replay/repair/renaming of AY or source extraction.
+
+Native1639bytes
+fbb27358b61870cff03f7ccc958e120004ccafc0eb342fa348e763128ff84c25:
+ALL-network/Keychains/security denied, artifacts except ONE metadata leaf/
+literal ancestors/own AZ denied, writes inroot runtime/own outputs only.
+No original AW DATA/control/report/index/journal/source/genuine/QC read.
+30s parent/35s outer and30s validator/35s outer; own children only,
+uninterruptible-I/O/host-suspension caveat.
+
+Closed result says metadata FORMAT authenticated only; original AYactual-9,
+outer_capture/no validator always preserved. AY pure shape/receipt checks
+never receive a fabricated actual0. Copied guard-return claims/whole pin/
+pagination observations explicitly REPORTED_UNADMITTED, not fresh source
+evidence. No pagination/identity/source/price/PIT/readiness gate cleared.
+Future substantive source consumer needs OWN actual0 and independent fresh
+byte/frame/security proof before any remaining-page contact. No first3 AW
+requests, old reader/claim/output-validator or source operation is renewed.
+
+26authorpasses3.52s, earlier26/3.72 overlap. Restored omission reds:
+metadata byte pin1/.12s, original-9 enforcement1/.12s, candidate join1/.12s.
+First byte-pin omission check misleadingly passed1/.09s because pytest.fail
+inside a parse spy was swallowed by finite parse handling; replaced the spy
+with observable calls, then genuine red proved the boundary. No production
+weakening. Root reviewed source/format-vs-actual distinction and guards.
+Root157distinctfocusedpasses3.98s=44measurement+26AZ+86record/document+
+1research transitive closure; no failures/skips/warnings/full suite.
+Pre-test host inspection initially stopped on an absent helper canonical()
+attribute BEFORE pytest/dispatch; corrected inspection to existing protocol
+canonical helper.207source pins/four source-test compiles/profile checks
+passed. All tests native network/artifact/Keychain/security denied, inroot
+support paths/no plugins/conftest/bytecode/cacheprovider; dispatch_fence absent.
+Subsets and record repeats are not additive.
+
+EXACT manual external metadata program4063bytes SHA
+258b85555c7b904acbe87cc46251a2fb9debf306c33b31af289fcdcd54d6d0cd:
+checks literal helper hash/ROOT and fixed65536/8192byte limits BEFORE first
+spawn; uses committed measured.capture, b'' input and strict stream-complete/
+actual/bound metadata. Ordinary outer launches native AZ once, then SEPARATE
+native ALL-network/artifact/Keychain/security-denied validator on original
+bounded stdout/actual0or2. Accept metadata observation only if actualparent0
+AND validator0, all streams complete/no stderr/bounds and exact stdout equality.
+Never accept AY source/wholepin. Whole structured result stored before
+count-only summary; finite external preflight/postprocess failure retained.
+
+Public AA audit also found original vocabulary exists upstream of AC's native
+five current-route refusals: exact DATA routes-private.json19895631bytes/
+3776f03b4941d8e6d014dee19f5ee8a05080f214ab7f502d10738f00a689f561.
+No actual read or new grant. Future V2 crosswalk may use fresh genuine+AA+
+AC/AP guards, validate all28 original fields via unchanged original evidence,
+ignore ONLY the already justified SF1 functional-reporting-currency predicate,
+and apply ONE exhaustive original/current-token union rule to ALL6151.
+No ticker/FIGI-only fallback, five-name exception or external barrier inferred
+from AC route=None before that evidence is exhausted. V2 is in memory only;
+old762d candidate remains uninvoked, complete EOD inventory still absent.
+All agents HOLD before AZ;337/259/53/699 unchanged. One final lane push.

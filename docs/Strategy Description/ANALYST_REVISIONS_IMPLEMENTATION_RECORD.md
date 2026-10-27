@@ -64941,3 +64941,75 @@ metadata-only result decision follows verified complete installation; no API
 compile/status evidence may be fabricated from UI labels. Source project
 creation/install adds no research look or cell. All five source stops and
 formal/PIT/master/paper/live false flags remain;336/259/52/699, no push yet.
+
+### 326.25 Actual AH staging/name/dependency installation; bounded AI readback
+
+At clean79886541d94b5c7a661d5d14508f91116219cb7d, AH public-code stage ran
+once2026-10-27T10:53:34.841850+00:00..10:53:35.122587+00:00, actual0.
+It exclusively allocated its new leaf/claim, derived the concrete38522505
+projection under native ALL-network/Keychain/security denial, held original
+public source FDs/metadata through generation, exclusively wrote/fsynced all
+11expected files, checked own staged bytes/hashes/metadata and unchanged
+source/git state.8code files177315bytes/projection65cebf60/profile3e985a9d
+matched326.24. No DATA/credential/provider/QC contact occurred. The builder is
+SPENT, no rerun/cleanup/overwrite/extra output. These public code files remain
+available solely as the frozen source-install transport; no historical or
+continuous filesystem/native-security proof is claimed.
+
+In the same project38522505, the normal pencil/name form saved exactly
+ARV2 R326 FIVE SOURCE RAW 20261027. No second project was created. Explorer's
+Upload action selected ONLY the seven frozen dependency.py files from AH,
+excluding claim/profile/projection JSON and main.py. The file picker initially
+retained another remembered directory; its visible names were incidental UI
+observations, no other file bytes were opened/uploaded. The exact AH path was
+then set and verified BEFORE selecting all seven expected files. Upload
+completed and all seven dependency filenames appeared beside the existing
+default main.py and uninvoked research.ipynb. Names/prefixes/progress completion
+are not byte authentication. main.py remains the default pending final install;
+no explicit Build/Backtest/Optimize/Live or Mia action was performed. Sole
+Owner/no library/default engine context persisted. No result or cell added.
+
+Full Editor Select All is READ-ONLY but its accessibility representation
+truncates long source selections. Therefore it cannot establish full bytes.
+The ordinary Explorer Download action on ONLY the newly uploaded
+accepted_risk_order_level_input_runtime.py completed a code-only readback.
+Safari delivered that16093byte-expected code artifact to its existing native
+Downloads location, not an in-root Save As form. This unanticipated browser
+delivery-path qualification is retained; no global download setting, filesystem
+attribute or security control was changed. Its source-project selection and
+file identity were observed in Safari, and Show in Finder identified the
+exact literal /Users/sheltonchen/Downloads/accepted_risk_order_level_input_runtime.py.
+Other displayed filenames were not opened/read/used. No QC native price/book,
+Object Store/data file, old control or licensed row was downloaded.
+
+Under the owner's current source-install authority, finish ONLY the frozen
+main.py upload to this SAME project (replace its default main only), then use
+normal code-file Download for each remaining seven exact Python filenames.
+The browser's existing delivery location is a source-artifact input, not an
+execution/temp/cache/log/plugin/support directory; all processing/output stays
+in the designated root. This narrow continuation addresses the actual UI
+behavior, not a blanket outside-root source/security waiver. Do not inspect
+Downloads as a filesystem census, open unrelated files, change Safari's
+settings, overwrite or delete original downloads. If a duplicate/suffixed
+filename appears, observe and bind its exact UI-reported path before reading;
+never search/fall back to a same-named artifact. No JSON control/notebook/data
+file or folder/whole-project archive is included.
+
+One new native ALL-network/Keychain/security-denied AI code-only reader may
+claim/fsync exclusively at
+artifacts/analyst_revisions_v2/newrule_native_source_readback/R326-20261027-AI
+(uninspected/unallocated), AFTER all eight exact download paths are observed.
+It may open only those eight specific own Python downloads and AH public-code
+source manifest, with no-follow/owner/regular/single-link/size checks before
+bytes, original FDs/full10 metadata held through matching all326.24 hashes and
+normal checks. No execution of downloaded bytes. It may exclusively copy only
+matching code bytes plus claim/report into AI; failures preserve originals/
+partial output and consume the claim, no retry/repair. Native policy must deny
+all other Downloads file reads and all unrelated artifacts; no native DATA,
+provider/credential/network/QC or old-control read. Exact current clean HEAD/
+root/branch, bounded256KiB total/max64KiB per file/deadline60s/inroot runtime
+required. Only actual0 plus matching closed eight-file report authenticates
+this particular cloud code readback. It is not a continuous cloud snapshot or
+compile/job acceptance; verify current project/Saved/access/source before a
+separate run freeze. Unknown/changed/missing source still blocks launch.
+No raw QC data may leave QC;336/259/52/699 and all five source stops unchanged.

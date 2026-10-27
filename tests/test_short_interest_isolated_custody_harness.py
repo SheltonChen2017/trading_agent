@@ -3,6 +3,8 @@ from copy import deepcopy
 import json
 import os
 from pathlib import Path
+import subprocess
+import sys
 from types import SimpleNamespace
 
 import pytest
@@ -43,7 +45,7 @@ def result(manifest):
         "first_controlled_refusal": None, "controlled_refusals": [],
         "policy_sha256": hash_payload(harness.proof.base.transition.policy()),
         "authority": harness.proof.base.transition.authority()}
-    return {"schema": "si-isolated-kernel-immutable-proof-closed-v1",
+    return {"schema": "si-isolated-kernel-immutable-proof-closed-v2",
         "status": "closed_offline_isolated_new_inode_only", "runtime_head": HEAD, "actual_remote": REMOTE,
         "code_identity_sha256": "e" * 64, "code_manifest_sha256": hash_payload(manifest),
         "protocol_sha256": harness.proof.PROTOCOL_SHA256,
@@ -242,6 +244,25 @@ def test_run_once_uses_explicit_fake_hook_and_driver_seams_without_real_operatio
     with pytest.raises(harness.OfflineHarnessRefusal, match="already_invoked"): harness.run_once(HEAD, REMOTE, manifest)
 
 
+def test_failure_projection_only_after_unwound_hook_deactivation_preserves_original_denial(monkeypatch):
+    handlers = []
+    monkeypatch.setattr(harness.sys, "addaudithook", handlers.append)
+    monkeypatch.setattr(harness, "_registered_arguments", lambda *args: None)
+    manifest = {name: "f" * 64 for name in harness.proof.code_paths()}
+    def refused(*args, **kwargs): handlers[0].__self__.deny("source")
+    def safe_projection(error):
+        seams = handlers[0].__self__
+        assert seams.active is False
+        assert harness._ACTIVE[seams] == (seams, False)
+        return {"category": "fixed_test_projection", "contract_code": "harness_source_denied", "errno_name": None}
+    monkeypatch.setattr(harness.proof, "run_registered", refused)
+    monkeypatch.setattr(harness, "_failure", safe_projection)
+    result_value = harness.run_once(HEAD, REMOTE, manifest)
+    assert result_value["status"] == "refused"
+    assert result_value["seams"]["denied"]["source"] == 1
+    assert result_value["seams"]["failure_latched"] is True
+
+
 def test_memory_denials_restore_original_entries_and_never_read_a_key(seams):
     count = harness.proof.base.previous.count
     original = count.read_named_keychain
@@ -267,3 +288,45 @@ def test_registered_policy_disclaims_audit_mode_dirfd_and_persistent_storage():
     assert value["maximum_hdiutil_info"] == 12
     assert value["authority"]["source_STARTs"] == value["authority"]["source_bytes"] == 0
     assert value["authority"]["persistent_storage_qualified"] is False
+
+
+def test_real_bounded_child_audit_hook_handles_one_NOOP_without_nested_id_events():
+    # This exercises only the ORIGINAL audit handler on one benign event, not
+    # run_once, Git, an image, native calls, source replay or a credential seam.
+    # The outer observer's depth cap makes the historical reentrancy finite.
+    code = r'''
+import json
+import sys
+from scripts import run_short_interest_isolated_custody_offline as harness
+seams = harness.AuditSeams("a" * 40)
+assert type(seams).__hash__ is object.__hash__
+assert type(seams).__eq__ is object.__eq__
+enabled, depth, maximum, nested_ids = True, 0, 0, 0
+def observe(event, args):
+    global depth, maximum, nested_ids
+    if not enabled:
+        return
+    depth += 1
+    maximum = max(maximum, depth)
+    if event == "builtins.id":
+        nested_ids += 1
+    try:
+        if depth > 8:
+            raise RuntimeError("fixed_bounded_observer_depth")
+        seams.handle(event, args)
+    finally:
+        depth -= 1
+sys.addaudithook(observe)
+raised = False
+try:
+    sys.audit("offline.synthetic_no_operation")
+except BaseException:
+    raised = True
+enabled = False
+print(json.dumps({"raised": raised, "nested_id_events": nested_ids, "maximum_depth": maximum}))
+'''
+    completed = subprocess.run([sys.executable, "-B", "-c", code], cwd=Path(__file__).resolve().parents[1],
+        env={"PATH": "/usr/bin:/bin", "PYTHONPATH": ".:tests", "PYTHONDONTWRITEBYTECODE": "1"},
+        stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=10, check=False)
+    assert completed.returncode == 0
+    assert json.loads(completed.stdout) == {"raised": False, "nested_id_events": 0, "maximum_depth": 1}

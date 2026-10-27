@@ -8,8 +8,10 @@ AUTHENTICATED DURABILITY ADAPTER EXISTS. ALL OLD CLAIMS, NEGATIVES,
 RECEIPTS AND CHARGES REMAIN SPENT/IMMUTABLE; NO OLD FILE IS ADOPTED.
 LOCAL BACKTEST READINESS FALSE. ACTUAL V3 OBSERVATION ESTABLISHED THE
 IMMUTABLE FLAG THEN OBSERVED ITS LOSS; ACTOR AND HISTORICAL CAUSE UNKNOWN.
-NEW SOURCE RECOVERY REMAINS HELD. CLAUDE REVIEW COVERS b648f60..730c59c,
-NOT THE LATER LOCAL3B0 DIAGNOSTIC COMMIT.
+NEW SOURCE RECOVERY REMAINS HELD.
+ISOLATED V1 REFUSED INITIALIZATION WITHOUT CREATING ITS NAMESPACE;
+THE CAUSALLY CORRECTED, SEPARATELY FROZEN V2 IS NOT YET RUN.
+CLAUDE REVIEW COVERS b648f60..730c59c, NOT THE LATER LOCAL3B0 DIAGNOSTIC COMMIT.
 LATEST OWNER REPORTS QC/SAFARI OCCUPIED: QUANTCONNECT PAUSED BY OWNER
 INCLUDING CAPACITY/METADATA; NO SAFARI, MIA, QC SETUP, UPLOAD, COMPILE OR JOB.
 TWO HISTORICAL QC METADATA REQUESTS REMAIN ACCOUNTED FOR.
@@ -24164,3 +24166,117 @@ Both complete126 histories remain byte-exact under their pinned regressions.
 All production/test files were read by Main; original capture/source/custody
 modules are unchanged. No full suite is run. All development agents and test
 sessions are completed/frozen before checkpoint and actual invocation.
+
+### 128.5 Actual V1 initialization refusal and verified audit reentrancy
+
+Checkpoint `c715a6c1fa74b7c06c3ce7fe081a116238093bbd` was clean at matching
+tracking/actual originD6AF. The registered V1 CLI was invoked ONCE with those
+exact two hashes and terminated **exit2**. Its original safe output was a
+starting JSON followed by status refused / category unknown_local_error /
+contract_code null / errno_name null. It did NOT return a seam summary,
+closed/provisional result or stored control receipt; do not invent them.
+Main then guarded and independently confirmed the exact original
+isolated-custody-20261026-v1 namespace ABSENT (including no symlink), hence
+no image, mount or proof member there. The failed invocation remains retired
+even though that namespace is absent. It is NONCLAIM, not a source claim;
+all old source data/claims/budgets remain unchanged. No source/key/provider
+operation was invoked. Do not call the absence a successful closure.
+
+Original preflight and AuditSeams construction/check each passed as separate
+read-only NOHOOK diagnostics. A separate original read-only lane-check-under-
+hook diagnostic terminated exit1 with NO projected output; it invoked no
+proof/image/source operation and supplies no successful receipt. Main did
+not repeat the registered V1 proof or create another probe file.
+
+**SI-BUILD-20261027-001 (P2, verified local harness defect):** Python's
+builtins.id emits an audit event. The hook's own _check called id(self),
+recursively invoking the same hook before it could handle even a benign
+event. Main's bounded observer delegated the ORIGINAL handler exactly once
+for offline.synthetic_no_operation and caught a nested builtins.id event:
+benign_event_admitted=false / nested_audit_event=true, with0 proof, image,
+native, source or provider calls. This demonstrates a deterministic wrapper
+bug; the actual V1 exception stack was NOT persisted, so do not fabricate its
+exact thrown type or blame storage/provider/Keychain or historical022.
+
+Correct only the wrapper registry keying: use retained ORIGINAL live objects
+and their default identity hash instead of audited id() inside the hook.
+Keep exact type/nonce/binding/counter/active pins and permanent failure. No
+counter reset, skipped event, weakened predicate, new setter or source claim.
+Require a real bounded-child audit-hook NOOP regression to be red before the
+fix and green afterward; fake direct-event tests alone missed this composition.
+All former observations/negative namespaces and source debits stay retained.
+
+### 128.6 Causally corrected prospective V2 (not a V1 restart)
+
+**SI-DEC-20261027-01**, under continuing SI-AUTH-20261026-02, permits one
+separately frozen successor ONLY after001's causal correction/regression,
+focused checks and a new clean committed64-file mapping. New fixed namespace
+is isolated-custody-20261027-v2 with SI_OFFLINE_CUSTODY_V2 volume name;
+the failed/absent V1 name is never reused. Storage/proof/harness schemas
+advance to v2. Original186-byte content, eight/nine-field checks, single
+native setter,8second creator window,5second hold,300/420second successful-
+closure windows, command limits and all source/START/4GiB gates are unchanged.
+No additional authority, retry of a spent claim, preflight success or source
+readiness is inferred. V2 is NOT invoked at this entry. Preserve the exact
+V1 code/record in C715 and append measured validation/pins before any new
+operation; one final matching push for the entire round remains pending.
+
+Author's bounded real-child original-handler NOOP regression was red
+**1failed/.80s** before001's object-key correction:8 nested builtins.id
+events, maximum depth9, raised=true. Afterward the full wrapper selection
+passed **42/.81s**; that child reported0 nested IDs, depth1, raised=false.
+A separate author read-only NOOP plus explicit ordinary builtins.id event
+diagnostic exited0/.26s, depth1, all external counters0. These are not actual
+proof/Git/image/native/source invocations. Main read every changed wrapper
+line and the real-child regression; no original inode/custody check changed.
+
+**SI-BUILD-20261027-002 (P3, refusal-reporting hardening):** deactivate the
+hook ONLY after a failed driver/all context unwinding and BEFORE pure fixed
+failure projection, so a permanently latched callback cannot interrupt error
+inspection and lose the original counters. Main's explicit projection-order
+regression was red1/42deselected/.34s, then green after this failure-only
+cleanup. Permanent failure/counters and _INVOKED remain; success validation
+still requires an ACTIVE, clean hook and genuine original closure. This is
+not a claim about V1's unpersisted exception stack. A read-only peer confirmed
+the ordering and unchanged success/custody/authority gates; no peer test or
+actual operation was performed. Main's fresh three-file selection after both
+corrections passed **104/7.21s**, no skips/warnings, OS network denied.
+
+### 128.7 Frozen corrected V2 registration (prospective)
+
+Proof protocol SHA256
+`23f05c9065c97c8d8e7659cb783f30769b7c8fef7d34ab518e88000722e42a31`;
+storage policy
+`96f0eefd6672ede3e52287f0c7ccc89409d510ce4e8004735733dc7959bbe77d`;
+harness policy
+`48536fb87e405e6a1c43edd07b6e37dee336559122b1e31e1ca73c94cc0b6fae`.
+The exact64-path list remains
+`0be79b48af5c30bbe96cc52fee3ca3f1561a7f03b7de658cb5b953272f6e0922`;
+corrected complete64-byte mapping is
+`6ca2f282ff28103f0da54a9460f6cb820ff1f9c0f1f1acce1b1c0b542c059d66`.
+Main's exact transitive AST closure, frozen policy identities, all new literal
+catalogues, absence of any audited id() call inside the wrapper, and all
+source/three-test in-memory compilation passed. The actual V1 namespace
+remains absent and retired. New V2 namespace must also be absent/nonsymlink
+at the separately guarded clean checkpoint and ONE CLI invocation.
+
+No actual V2 operation is run at this entry. Final focused validation and
+new exact committed HEAD follow before dispatch; matching actual/tracking
+origin staysD6AF and no interim push occurs. Continue to preserve every
+START/receipt/raw/full-page debit and all source/custody negatives. Source
+recovery, maximum-body durability and every actual-input/backtest/QC gate
+remain closed until their own genuine evidence; all source/new claim/key/
+provider/looks/QC counters in this round remain0 by the non-source path.
+
+Main final fresh-process V2 focused selection (eleven files plus three named
+active-document checks) passed **328/18.32s**, no skips/warnings, empty
+inherited environment and OS network denied. Both prior126 block pins passed.
+Main then exercised ONLY original readonly subprocess boundaries under the
+corrected real hook: exact Git root check1 and local hdiutil info1, both
+valid,0 denied operations and failure_latched=false; no proof, create,
+attach, mount, flag or source/key/provider invocation. This pre-release
+diagnostic inspects no private rows and does not supply storage qualification.
+The original V1 and new V2 namespaces remain absent before checkpoint.
+All agents/tests are completed/frozen, all original source/custody checks
+unchanged. Final record/whitespace and concurrency guards precede the new
+checkpoint and ONE V2 dispatch. The actual result must be appended afterward.

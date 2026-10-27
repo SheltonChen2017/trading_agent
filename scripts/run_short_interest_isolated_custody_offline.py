@@ -17,7 +17,7 @@ from data.hashing import canonical_json, hash_bytes, hash_payload
 from scripts import diagnose_short_interest_isolated_immutable_metadata as proof
 
 DRIVER = "scripts/run_short_interest_isolated_custody_offline.py"
-HARNESS_SHA256 = "28aae5bac9075b8b22f7c25834ecd3d3089b162b09756a72526033302ea3a040"
+HARNESS_SHA256 = "48536fb87e405e6a1c43edd07b6e37dee336559122b1e31e1ca73c94cc0b6fae"
 MAXIMUM_GIT_COMMANDS, MAXIMUM_INFO_COMMANDS = 20000, 12
 _INVOKED = False
 _ORIGINAL, _COUNTS, _ACTIVE, _FAILED = {}, {}, {}, {}
@@ -41,7 +41,7 @@ def require(value, code):
 def policy():
     require((MAXIMUM_GIT_COMMANDS, MAXIMUM_INFO_COMMANDS) == (20000, 12),
         "harness_registration_changed")
-    return {"schema": "si-isolated-custody-offline-harness-v1", "driver": DRIVER,
+    return {"schema": "si-isolated-custody-offline-harness-v2", "driver": DRIVER,
         "root": str(proof.base.previous.lane.ROOT), "branch": "codex/strategy-short-interest",
         "ref": "refs/heads/codex/strategy-short-interest", "code_paths": list(proof.code_paths()),
         "proof_protocol_sha256": proof.PROTOCOL_SHA256,
@@ -57,6 +57,8 @@ def policy():
         "artifact_file_opens": "new_fixed_namespace_exact_parent_directory_exact64code_files_basenames_and_their_readonly_parent_directories",
         "metadata_audit_limit": "stat_and_directory_metadata_not_independently_sandboxed_original_authenticated_code_and_FD_checks_remain",
         "audit_state": "original_identity_counter_tuples_and_permanent_failure_latch_no_public_reset_or_active_toggle",
+        "registry_keys": "original_objects_retained_with_default_object_identity_hash_no_audited_builtin_id",
+        "refusal_projection": "after_failed_driver_contexts_unwind_deactivate_hook_only_preserve_all_denials_then_fixed_projection",
         "destructive_operations": "denied_no_cleanup_detach_unlock_or_adoption",
         "denied_counter_names": list(DENIED), "authority": proof.authority()}
 
@@ -67,6 +69,8 @@ class AuditSeams:
         "code_parents", "code_basenames", "denied", "permitted", "failed", "active",
         "last_hdiutil", "_identity")
     def __init__(self, runtime_head):
+        require(type(self) is AuditSeams and AuditSeams.__hash__ is object.__hash__
+            and AuditSeams.__eq__ is object.__eq__, "harness_counter_failed")
         self.root = proof.base.previous.lane.ROOT
         self.head = runtime_head
         self.namespace = self.root / proof.storage.PARENT / proof.storage.NAMESPACE
@@ -85,13 +89,15 @@ class AuditSeams:
         bindings = tuple(getattr(self, name) for name in (
             "root", "head", "namespace", "parent", "mount", "target", "probe", "code",
             "code_parents", "code_basenames"))
-        _ORIGINAL[id(self)] = (self, self._identity, (bindings, hash_payload(policy())),
+        _ORIGINAL[self] = (self, self._identity, (bindings, hash_payload(policy())),
             self.denied, self.permitted, tuple(self.denied), tuple(self.permitted))
-        _COUNTS[id(self)] = self, tuple(self.denied.values()), tuple(self.permitted.values()), "none"
-        _ACTIVE[id(self)] = self, True
+        _COUNTS[self] = self, tuple(self.denied.values()), tuple(self.permitted.values()), "none"
+        _ACTIVE[self] = self, True
 
     def _check(self, *, allow_failed=False):
-        entry, counts, active = _ORIGINAL.get(id(self)), _COUNTS.get(id(self)), _ACTIVE.get(id(self))
+        require(type(self) is AuditSeams and AuditSeams.__hash__ is object.__hash__
+            and AuditSeams.__eq__ is object.__eq__, "harness_counter_failed")
+        entry, counts, active = _ORIGINAL.get(self), _COUNTS.get(self), _ACTIVE.get(self)
         bindings = tuple(getattr(self, name) for name in (
             "root", "head", "namespace", "parent", "mount", "target", "probe", "code",
             "code_parents", "code_basenames"))
@@ -105,11 +111,11 @@ class AuditSeams:
             and self.last_hdiutil == counts[3]
             and type(active) is tuple and active[0] is self and type(self.active) is bool
             and self.active is active[1] and type(self.failed) is bool
-            and self.failed is (_FAILED.get(id(self)) is self))
+            and self.failed is (_FAILED.get(self) is self))
         if not good:
-            _FAILED[id(self)] = self; self.failed = True
+            _FAILED[self] = self; self.failed = True
             raise OfflineHarnessRefusal("REFUSED: harness_counter_failed")
-        require(allow_failed or _FAILED.get(id(self)) is not self, "harness_counter_failed")
+        require(allow_failed or _FAILED.get(self) is not self, "harness_counter_failed")
         return entry, counts
 
     def _allow(self, name, *, verb=None):
@@ -117,14 +123,14 @@ class AuditSeams:
         values = list(counts[2]); index = entry[6].index(name); values[index] += 1
         self.permitted[name] = values[index]
         if verb is not None: self.last_hdiutil = verb
-        _COUNTS[id(self)] = self, counts[1], tuple(values), self.last_hdiutil
+        _COUNTS[self] = self, counts[1], tuple(values), self.last_hdiutil
 
     def deny(self, category):
         entry, counts = self._check(allow_failed=True)
         if category not in entry[5]: category = "other"
         values = list(counts[1]); index = entry[5].index(category); values[index] += 1
-        self.denied[category] = values[index]; self.failed = True; _FAILED[id(self)] = self
-        _COUNTS[id(self)] = self, tuple(values), counts[2], counts[3]
+        self.denied[category] = values[index]; self.failed = True; _FAILED[self] = self
+        _COUNTS[self] = self, tuple(values), counts[2], counts[3]
         raise OfflineHarnessRefusal("REFUSED: harness_" + category + "_denied")
 
     @staticmethod
@@ -209,7 +215,7 @@ class AuditSeams:
         self.deny("mutation")
 
     def handle(self, event, args):
-        active = _ACTIVE.get(id(self))
+        active = _ACTIVE.get(self)
         if type(active) is tuple and active[0] is self and active[1] is False:
             if self.active is False: return  # Only trusted run_once finally sets this original record.
         self._check()
@@ -238,16 +244,16 @@ class AuditSeams:
     def summary(self):
         try: self._check(allow_failed=True)
         except OfflineHarnessRefusal: pass  # Project ORIGINAL retained counts even after public tampering.
-        entry, counts = _ORIGINAL[id(self)], _COUNTS[id(self)]
+        entry, counts = _ORIGINAL[self], _COUNTS[self]
         return {"denied": dict(zip(entry[5], counts[1])), "permitted": dict(zip(entry[6], counts[2])),
-            "failure_latched": _FAILED.get(id(self)) is self, "last_permitted_hdiutil_verb": counts[3]}
+            "failure_latched": _FAILED.get(self) is self, "last_permitted_hdiutil_verb": counts[3]}
 
 
 def _deactivate(seams):
     """Trusted terminal cleanup only; never clear a denial or reset its counters."""
     try: seams._check(allow_failed=True)
     except OfflineHarnessRefusal: pass
-    _ACTIVE[id(seams)] = seams, False
+    _ACTIVE[seams] = seams, False
     seams.active = False
 
 
@@ -307,7 +313,7 @@ def _validate_result(result, seams, head, remote, manifest):
         "original_code_and_metadata_contexts_closed", "authority", "closed_at",
         "isolated_storage_closed_summary_sha256"}
     require(type(result) is dict and set(result) == fields
-        and result.get("schema") == "si-isolated-kernel-immutable-proof-closed-v1"
+        and result.get("schema") == "si-isolated-kernel-immutable-proof-closed-v2"
         and result.get("status") == "closed_offline_isolated_new_inode_only"
         and result.get("runtime_head") == head and result.get("actual_remote") == remote
         and result.get("code_manifest_sha256") == hash_payload(manifest)
@@ -388,6 +394,10 @@ def run_once(runtime_head, actual_remote, complete_code_manifest=None):
             return {"status": "completed", "proof": result, "proof_sha256": hash_payload(result),
                 "harness_policy_sha256": HARNESS_SHA256, "seams": seams.summary()}
     except BaseException as error:
+        # All original driver/context exits have unwound as a refusal. Stop
+        # the failed audit callback before pure traceback/error projection;
+        # never clear its permanent failure/counters or admit another run.
+        _deactivate(seams)
         return {"status": "refused", "failure": _failure(error),
             "harness_policy_sha256": HARNESS_SHA256, "seams": seams.summary()}
     finally: _deactivate(seams)
@@ -398,7 +408,7 @@ def main(argv=None):
     if type(values) not in (list, tuple) or len(values) != 2:
         print(canonical_json({"status": "refused", "failure": {"contract_code": "harness_arguments_refused"}}), flush=True)
         return 2
-    print(canonical_json({"status": "starting", "schema": "si-isolated-custody-offline-harness-v1"}), flush=True)
+    print(canonical_json({"status": "starting", "schema": "si-isolated-custody-offline-harness-v2"}), flush=True)
     try: result = run_once(values[0], values[1])
     except BaseException as error:
         result = {"status": "refused", "failure": _failure(error)}

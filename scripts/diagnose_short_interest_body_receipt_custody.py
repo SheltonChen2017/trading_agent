@@ -28,7 +28,7 @@ MAXIMUM_SECONDS, HOLD_SECONDS = 420, 5
 MAXIMUM_BODY_BYTES, MAXIMUM_RECEIPT_BYTES = 2 * 1024 ** 2, 1024
 EXPECTED_CODE_PATHS = 70
 BODY_SHA256 = "03359e9fa404fac2200a0e3e9fa0dcd8eb973358a76e24b805de7e7566a2fd4a"
-PROTOCOL_SHA256 = "df8990fee21d8192cdbf76c4d934007101c189bd24b86a66f719d73d180564f9"
+PROTOCOL_SHA256 = "642d34f9d988a05369cffa5ebef0444203fe531e8df8682046de7d48bd175307"
 _LAST_TRANSITION = None
 _LAST_STAGE = "not_entered"
 _RUN_USED, _CLOSED_FAILED = False, False
@@ -79,10 +79,16 @@ def code_paths():
 
 
 def protocol():
-    return {"schema": "si-body-receipt-custody-proof-policy-v1",
-        "decision": "SI-DEC-20261027-06", "authority_id": "SI-AUTH-20261026-02",
+    return {"schema": "si-body-receipt-custody-proof-policy-v2",
+        "decision": "SI-DEC-20261027-07", "authority_id": "SI-AUTH-20261026-02",
         "driver": DRIVER, "helper": HELPER, "offline_harness": WRAPPER,
         "bound_antecedent_not_runtime_imported": [previous.WRAPPER],
+        "refused_predecessor": {"runtime_head": "20a2153d1de2a5214487cbf02c6c221056c38f59",
+            "namespace": "body-receipt-custody-20261027-v1", "actual_exit": 2,
+            "known_denied_read_open_count": 1, "known_body_and_receipt_create_counts": [0, 0],
+            "historical_denied_path_persisted": False,
+            "verified_adapter_error": "original_inventory_readonly_directory_stream_disallowed",
+            "evidence_scope": "Main_known_terminal_and_separate_original_readonly_causal_reproduction_not_claim_or_source_admission"},
         "storage_policy_sha256": hash_payload(storage.policy()),
         "custody_policy_sha256": hash_payload(custody.policy()),
         "monitor_policy_sha256": hash_payload(monitor.policy()),
@@ -315,7 +321,7 @@ def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest)
                     trace_report = diagnostic.report()
                     require(trace_report["diagnostic"]["observer_complete"] is True,
                         "body_receipt_proof_result_missing")
-                    result = {"schema": "si-body-receipt-custody-proof-closed-v1",
+                    result = {"schema": "si-body-receipt-custody-proof-closed-v2",
                         "status": "closed_offline_synthetic_maximum_body_receipt_only", "runtime_head": runtime_head,
                         "actual_remote": actual_remote, "code_identity_sha256": identity,
                         "code_manifest_sha256": hash_payload(complete_code_manifest), "protocol_sha256": PROTOCOL_SHA256,

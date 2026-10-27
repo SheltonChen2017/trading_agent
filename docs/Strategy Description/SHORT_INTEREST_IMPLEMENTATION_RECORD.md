@@ -17,6 +17,8 @@ CREATOR WINDOW BEFORE WRITE CHALLENGE. V6 CLOSED THE ORIGINAL186-BYTE
 SYNTHETIC CUSTODY PROOF WITH REAL EPERM CHALLENGES AND ORIGINAL POST-CLOSE
 SEAL VERIFICATION. MAXIMUM-BODY/RECEIPT CUSTODY, DURABLE BUDGET SETTLEMENT,
 PRODUCTION STORAGE, SOURCE AND ACTUAL-INPUT ADMISSION REMAIN UNPROVED.
+BODY/RECEIPT V1 TERMINATED EXIT2 BEFORE EITHER FILE CREATE: READ-OPEN
+HARNESS DENIAL. IMAGE/MOUNT PRESERVED; NO SOURCE DEBIT OR CUSTODY ADMISSION.
 CLAUDE REVIEW COVERS b648f60..730c59c, NOT THE LATER LOCAL3B0 DIAGNOSTIC COMMIT.
 LATEST OWNER REPORTS QC/SAFARI OCCUPIED: QUANTCONNECT PAUSED BY OWNER
 INCLUDING CAPACITY/METADATA; NO SAFARI, MIA, QC SETUP, UPLOAD, COMPILE OR JOB.
@@ -25122,3 +25124,137 @@ later durability-adapter/source work progress. All old charges/claims/data,
 
 Main post-record named record/privacy/coordination selection: **29passed/.47s**,
 OS network denied; final diff whitespace clean. No code changed after336.
+
+
+### 128.25 Actual maximum-body V1 refusal; causal readonly adapter diagnosis
+
+Checkpoint `20a2153d1de2a5214487cbf02c6c221056c38f59` was clean, matching
+tracking/actual originD6AF, and the fixed new V1 namespace was wholly absent.
+ONE registered actual invocation13145 printed its original starting marker,
+then terminated **exit2**. Original wrapper status refused, entered stage
+body_receipt_context_open, fixed contract harness_counter_failed/errnoNULL.
+Original counters: read_open denied1, failure latchTRUE; all other eight
+denied categories0. Permitted Git696/create1/attach1/info4/null_stream6;
+body_create/receipt_create/body_write_challenge/receipt_write_challenge0.
+No original pair, seal, native EPERM challenge, closed output or positive
+custody result was issued. Source/provider/key/newclaims/START/bytes0;
+count baseline and every old charge remain unchanged.
+
+Original attach/info shapes and structural5/5 join passed; the displayed
+volume-kind difference remained the allowed descriptor distinction, not a
+new association failure. Original attach raw/parsed hashes
+`f5b41ddaa92170cc8cf5ac8a79bc22ac877bd040fc54e64b689e461531fa90ba` /
+`daa2045a34244ecec97ce4b91ce077934e9a82c3e300db1e284cf711ecfb0c1f`;
+info raw/parsed
+`84a53ff5dbed4ec6d4a2c3ea5981ebbf99a7e9093684a5012662da567c5a5c10` /
+`370e8c63dd4c0df324f6d08e42fc8f9c03ab2db24d21d3824fe58846b1b45c27`.
+V1's exact protocol/harness/current-byte pins are128.24. No closed proof or
+post-hoc negative control file is invented. The diagnostic namespace is
+retired; it is not a source claim and is never restarted or adopted.
+
+Main's guarded readonly observation AFTER known exit2 confirmed the original
+V1 namespace has exactly backing.sparseimage and mount, protected currentUID/
+0700 directories, singlelink currentUID0600 image and an EMPTY proof directory.
+Body, receipt and positive controls are absent. These are current original
+namespace observations, not issued custody seals or storage closure. Keep
+image/mount/directories intact, no cleanup/detach/unlock/reset/adoption.
+
+**SI-BUILD-20261027-023 (P2, verified new-harness interface defect):** the
+unchanged ORIGINAL cache._inventory_names authenticates its protected retained
+directory FD and opens literal dot with EXACT RDONLY|DIRECTORY|NOFOLLOW to
+obtain an independent directory stream (dup would share a cursor). The new
+harness omitted this legitimate metadata read. Main ran ONE separate
+network-denied READONLY causal composition against the existing original
+empty V1 proof-directory FD: actual original inventory function plus actual
+frozen audit handler produced read_open1, all other/permitted counters0,
+no new artifacts/native/source action. A fixed-label observation confirmed
+exact dot/flags; no arbitrary path or exception text was emitted.
+
+The historical13145 denied path/frame itself was NOT persisted. This proves
+the required original adapter call is necessarily rejected when reached and
+is consistent with the actual pre-create denial; it is not a fabricated
+persisted traceback or attribution of historical022/flag-loss actors. No
+provider, Keychain, filesystem or other-agent cause is inferred.
+
+### 128.26 Prospective V2 fixes only the verified directory-stream admission
+
+**SI-DEC-20261027-07**, continuing SI-AUTH-20261026-02, permits a separately
+frozen V2 after023 causal correction, not another blind probe or V1 retry.
+Keep the original inventory function/FD/owner/0700/stamp checks unchanged.
+The wrapper may admit ONLY literal-dot, audit modeNone and EXACT
+RDONLY|DIRECTORY|NOFOLLOW after stripping Python's implicit CLOEXEC flag.
+Every other flag, alias, file, write, source/credential/network read remains
+denied; mode/dir_fd limits of the audit API remain explicit and the original
+committed producer enforces those bindings. A separately pinned finite
+4096 directory_stream counter supplies accounting; no old bound or custody
+predicate is increased or removed. The original per-file8second/16sample/
+.25second/1second quiet, full5second hold, native/flags/full-byte/nine-field/
+context/final-member checks remain unchanged.
+
+Use ONLY new body-receipt-custody-20261027-v2 / SI_BODY_RECEIPT_CUSTODY_V2
+and new v2 registration/closed schemas, with explicit preservation of V1's
+empty image/mount. Helper and monitor stay byte-identical to20A. The protocol
+honestly binds the refused predecessor and the scope of its Main-known
+terminal/read-only evidence. All source/claim/dispatch/budget-release/input/
+backtest authority stays FALSE. Frozen code/causal tests/cold-child real-hook
+composition, final Main checks and committed identity are required BEFORE
+any ONE prospective V2 actual invocation. No such invocation occurs here.
+
+
+### 128.27 Frozen V2 causal evidence, validation and single prospective proof
+
+Author's two direct exact-dot cases were RED before the fix. An initial
+third cold-child failure occurred BEFORE hook construction because Mac
+/var temporary paths were not physically resolved; it is NOT causal evidence
+of the adapter rejection. Resolve only that fabricated fixture path before
+using the original OwnedOutput. The corrected fresh child executes genuine
+OwnedOutput and original inventory under the REAL audit hook: exact stream1,
+empty inventory, then unrelated-file read denial1/latchTRUE, other denials0,
+body/receipt creates0. A separate fresh-process memory-only old-dot-denial
+reversal against this physically corrected child reproduces inventory
+read_open1/no result, other counters0. No new image/probe/source operation.
+Main's original128.25 readonly causal reproduction remains independently
+attributed. No unavailable historical denied-path traceback is invented.
+
+Author exact stream/flag/quota/identity/cold-child selection **20/.97s** and
+final wrapper selection **105/1.47s** passed OS network denied. Main volume
+version/retirement/strict AST selection **81/.78s** passed. Independent peer
+read the complete delta and regressions, then independently recomputed the
+full frozen protocol/harness hashes, accepted the bounded synthetic scope;
+no peer test or actual operation. Main read the final six-path diff and the
+new cold-child tests. Helper/monitor/old creators remain byte-identical to20A.
+
+Main final fresh-process same bounded selection: **357passed/7.64s**, no
+skips/warnings, empty inherited environment and OS network denied. Runtime
+AST69 plus exactly one bound V6-harness antecedent still equals registered70;
+all70-source/five-test in-memory compile, literal refusal catalogues,
+identity-key/static checks, unchanged helper/monitor/old-creator bytes,
+historical record-body prefix and whitespace passed. No full lane/repository
+suite. No actual V2 invocation, provider/key/source/claim/START/byte action.
+
+Frozen V2 proof protocol
+`642d34f9d988a05369cffa5ebef0444203fe531e8df8682046de7d48bd175307`;
+harness policy
+`69349d5ec8aa6ddab7c0dfb04462773acb71826b4bb535e242aaa04f3627c372`;
+volume policy
+`5f769c93d6e696c6557b7ad9146b025a3250607fdd8467a26c8d5184a403abc2`.
+Helper0e09c46e.../monitor9f5c1509... remain the exact128.24 full hashes.
+Registered70 path SHA remains
+`e4d7a3ca73cb945c05b62f9bf80b05f6cae63d889e936bc956f30852c6d1a940`;
+complete current-byte mapping is now
+`f2174eb7e0059ee17d4d1912ae21f1b2bab7eb5ca8ab0b736deea8c53f5adbe2`.
+
+After record-only checks and immediate designated root/branch/HEAD/status/
+matching actual/tracking origin guards, commit this correction checkpoint.
+Then verify clean exact committed identity and wholly absent V2 namespace,
+and invoke ONCE only that frozen V2 policy. All agents/tests stay frozen;
+no edit/test/commit/push while active. Require actual exit0, original unique
+terminal validation after all contexts, original paired seals/bytes and six
+real EPERM challenges; any negative/nonzero/unknown closure vetoes success.
+Independently compare original seals after termination. Do not reset/retry/
+reuse V1 or silently fix another unverified failure by new namespaces.
+Source recovery/durability settlement/readiness remain gated;84005START/
+4GiB and13992START/23452681chargedbytes remain unchanged. No interim push.
+
+Main post-V2-record selection: **29passed/.41s**, network denied; whitespace
+clean. No code changed after357; all agents/tests frozen before invocation.

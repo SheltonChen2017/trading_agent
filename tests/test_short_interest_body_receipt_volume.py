@@ -22,10 +22,10 @@ def test_new_volume_is_exact_versioned_v6_ast_except_fixed_policy_literals():
     directory = Path(__file__).resolve().parents[1] / "scripts"
     original = ast.parse((directory / "short_interest_isolated_custody_volume.py").read_text())
     candidate = ast.parse((directory / "short_interest_body_receipt_volume.py").read_text())
-    replacements = {"body-receipt-custody-20261027-v1": "isolated-custody-20261027-v6",
-        "SI_BODY_RECEIPT_CUSTODY_V1": "SI_OFFLINE_CUSTODY_V6",
-        "si-body-receipt-custody-volume-policy-v1": "si-isolated-custody-volume-policy-v6",
-        "si-body-receipt-custody-volume-observation-v1": "si-isolated-custody-volume-observation-v6"}
+    replacements = {"body-receipt-custody-20261027-v2": "isolated-custody-20261027-v6",
+        "SI_BODY_RECEIPT_CUSTODY_V2": "SI_OFFLINE_CUSTODY_V6",
+        "si-body-receipt-custody-volume-policy-v2": "si-isolated-custody-volume-policy-v6",
+        "si-body-receipt-custody-volume-observation-v2": "si-isolated-custody-volume-observation-v6"}
     class FixedVersionOnly(ast.NodeTransformer):
         def visit_Constant(self, node):
             if type(node.value) is str and node.value in replacements:
@@ -34,11 +34,12 @@ def test_new_volume_is_exact_versioned_v6_ast_except_fixed_policy_literals():
         def visit_Dict(self, node):
             pairs = [(key, value) for key, value in zip(node.keys, node.values)
                 if not (isinstance(key, ast.Constant)
-                    and key.value == "successful_tiny_v6_flagged_inode_image_mount_never_modified_or_adopted")]
+                    and key.value in {"successful_tiny_v6_flagged_inode_image_mount_never_modified_or_adopted",
+                        "failed_body_receipt_v1_empty_image_mount_never_modified_or_adopted"})]
             node.keys, node.values = [key for key, unused in pairs], [value for unused, value in pairs]
             return self.generic_visit(node)
     assert ast.dump(FixedVersionOnly().visit(candidate), include_attributes=False) == ast.dump(original, include_attributes=False)
-    assert volume.NAMESPACE == "body-receipt-custody-20261027-v1"
+    assert volume.NAMESPACE == "body-receipt-custody-20261027-v2"
     assert volume.policy()["successful_tiny_v6_flagged_inode_image_mount_never_modified_or_adopted"] is True
 
 REAL_RUN, REAL_NATIVE = volume._run, volume._native_statfs
@@ -142,7 +143,7 @@ class Harness:
         if verb == "create":
             assert arguments == ["/usr/bin/hdiutil", "create", "-type", "SPARSE", "-size", "8g",
                 "-fs", "APFS", "-uid", str(os.getuid()), "-gid", str(os.getgid()), "-mode", "0700",
-                "-volname", "SI_BODY_RECEIPT_CUSTODY_V1", "-nospotlight", "-plist", str(self.image)]
+                "-volname", "SI_BODY_RECEIPT_CUSTODY_V2", "-nospotlight", "-plist", str(self.image)]
             with self.image.open("xb") as stream: stream.write(b"FABRICATED SPARSE IMAGE, NO REAL FILESYSTEM")
             self.image.chmod(0o644)
             payload = [str(self.image)]
@@ -582,3 +583,7 @@ def test_authoritative_mount_masks_are_frozen_before_any_native_or_command_seam(
     monkeypatch.setattr(volume, name, 0)
     with pytest.raises(volume.IsolatedVolumeRefusal, match="isolated_policy_changed"):
         volume.policy()
+
+
+def test_refused_body_receipt_v1_stays_retired_and_unadopted():
+    assert volume.policy()["failed_body_receipt_v1_empty_image_mount_never_modified_or_adopted"] is True

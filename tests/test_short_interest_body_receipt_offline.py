@@ -59,7 +59,7 @@ def result(manifest):
             "native_call_count": 1, "native_result": 0, "native_errno_name": None,
             "before_native": dict(sample, fd_flags=64, name_flags=64), "immediate_after_native": dict(sample),
             "after_callbacks": [dict(sample)], "classification": "required_flags_observed_without_recorded_loss"} for row in files]}
-    return {"schema": "si-body-receipt-custody-proof-closed-v1", "status": "closed_offline_synthetic_maximum_body_receipt_only",
+    return {"schema": "si-body-receipt-custody-proof-closed-v2", "status": "closed_offline_synthetic_maximum_body_receipt_only",
         "runtime_head": HEAD, "actual_remote": REMOTE, "code_identity_sha256": "e" * 64,
         "code_manifest_sha256": hash_payload(manifest), "protocol_sha256": harness.proof.PROTOCOL_SHA256,
         "started_at": "2026-10-27T07:00:00Z", "closed_at": "2026-10-27T07:00:10Z", "binding_sha256": "a" * 64,
@@ -77,6 +77,7 @@ def completed_seams(seams):
     for name in (harness.proof.custody.BODY_NAME, harness.proof.custody.RECEIPT_NAME):
         seams.handle("open", (name, None, os.O_RDWR | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW))
         seams.handle("open", (name, None, os.O_WRONLY | os.O_NOFOLLOW))
+    seams.handle("open", (".", None, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW))
 
 
 def test_fixed_creator_RDWR_and_real_WRONLY_challenge_with_implicit_cloexec(seams):
@@ -89,6 +90,108 @@ def test_fixed_creator_RDWR_and_real_WRONLY_challenge_with_implicit_cloexec(seam
     assert seams.permitted["body_create"] == seams.permitted["body_write_challenge"] == 1
     assert seams.permitted["null_stream"] == 1 and not seams.failed
     assert os.open is original_open and os.supports_dir_fd == capabilities
+
+
+@pytest.mark.parametrize("extra", [0, getattr(os, "O_CLOEXEC", 0)])
+def test_exact_original_directory_stream_flags_are_counted_without_read_authority(seams, extra):
+    seams.handle("open", (".", None, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | extra))
+    assert seams.summary()["permitted"]["directory_stream"] == 1
+    assert all(value == 0 for value in seams.denied.values())
+
+
+@pytest.mark.parametrize("path,mode,flags", [
+    (".", None, os.O_RDONLY), (".", None, os.O_RDONLY | os.O_DIRECTORY),
+    (".", None, os.O_RDONLY | os.O_NOFOLLOW),
+    (".", None, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_NONBLOCK),
+    (".", None, os.O_RDWR | os.O_DIRECTORY | os.O_NOFOLLOW),
+    (".", None, os.O_WRONLY | os.O_DIRECTORY | os.O_NOFOLLOW),
+    (".", None, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_TRUNC),
+    (".", "r", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW),
+    ("./", None, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW),
+    ("..", None, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW),
+    ("./old-source.raw", None, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW),
+    ("old-source.raw", None, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW),
+    (Path("."), None, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)])
+def test_dot_stream_exception_does_not_admit_alias_flags_files_or_writers(seams, path, mode, flags):
+    with pytest.raises(harness.OfflineHarnessRefusal): seams.handle("open", (path, mode, flags))
+    assert seams.summary()["failure_latched"] is True
+
+
+def test_directory_stream_counter_has_a_finite_nonresettable_quota(seams):
+    flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+    for unused in range(harness.MAXIMUM_DIRECTORY_STREAMS): seams.handle("open", (".", None, flags))
+    assert seams.summary()["permitted"]["directory_stream"] == 4096
+    with pytest.raises(harness.OfflineHarnessRefusal, match="read_open_denied"):
+        seams.handle("open", (".", None, flags))
+    assert seams.summary()["permitted"]["directory_stream"] == 4096
+    assert seams.summary()["denied"]["read_open"] == 1 and seams.summary()["failure_latched"] is True
+
+
+@pytest.mark.parametrize("change", ["counter", "dictionary"])
+def test_directory_stream_counter_reset_or_dictionary_copy_cannot_authorize_an_open(seams, change):
+    flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+    seams.handle("open", (".", None, flags))
+    if change == "counter": seams.permitted["directory_stream"] = 0
+    else: seams.permitted = dict(seams.permitted)
+    with pytest.raises(harness.OfflineHarnessRefusal, match="counter_failed"):
+        seams.handle("open", (".", None, flags))
+    assert seams.summary()["permitted"]["directory_stream"] == 1
+    assert seams.summary()["failure_latched"] is True
+
+
+def test_directory_stream_policy_declares_exact_original_flags_and_finite_counter():
+    value = harness.policy()
+    assert value["maximum_directory_streams"] == 4096
+    assert value["inventory_directory_stream"] == (
+        "literal_dot_mode_None_exact_RDONLY_DIRECTORY_NOFOLLOW_only_implicit_CLOEXEC_removed_original_FD_owner_mode_stamp_checks_unchanged")
+
+
+def test_fresh_child_original_inventory_uses_real_hook_then_denies_unrelated_read():
+    # Only a new empty temporary OwnedOutput is prepared before the hook.
+    # This child never invokes a capture, image, setter, proof or credential.
+    code = r'''
+import json
+import os
+from pathlib import Path
+import sys
+import tempfile
+from scripts import run_short_interest_body_receipt_offline as harness
+cache = harness.proof.base.previous.count.old.cache
+OwnedOutput = harness.proof.base.previous.prior._OwnedOutput
+with tempfile.TemporaryDirectory(prefix="si-inventory-hook-unit-") as parent:
+    target = Path(parent).resolve() / "owned"
+    target.mkdir(mode=0o700)
+    owned = OwnedOutput(target, lambda: None)
+    harness.HARNESS_SHA256 = harness.hash_payload(harness.policy())
+    seams = harness.AuditSeams("a" * 40)
+    sys.addaudithook(seams.handle)
+    try:
+        names = cache._inventory_names(owned._anchor[2], boundary=owned.check)
+        assert names == ()
+        denied = False
+        try:
+            fd = os.open("old-source.raw", os.O_RDONLY)
+        except harness.OfflineHarnessRefusal:
+            denied = True
+        else:
+            os.close(fd)
+        summary = seams.summary()
+    finally:
+        harness._deactivate(seams)
+        owned.close()
+    print(json.dumps({"empty_original_inventory": names == (), "unrelated_read_denied": denied,
+        "directory_stream": summary["permitted"]["directory_stream"],
+        "denied_read_open": summary["denied"]["read_open"], "failure_latched": summary["failure_latched"],
+        "other_denials": sum(value for name, value in summary["denied"].items() if name != "read_open"),
+        "body_create": summary["permitted"]["body_create"], "receipt_create": summary["permitted"]["receipt_create"]}))
+'''
+    completed = subprocess.run([sys.executable, "-B", "-c", code], cwd=Path(__file__).resolve().parents[1],
+        env={"PATH": "/usr/bin:/bin", "PYTHONPATH": ".:tests", "PYTHONDONTWRITEBYTECODE": "1"},
+        stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=15, check=False)
+    assert completed.returncode == 0
+    assert json.loads(completed.stdout) == {"empty_original_inventory": True, "unrelated_read_denied": True,
+        "directory_stream": 1, "denied_read_open": 1, "failure_latched": True, "other_denials": 0,
+        "body_create": 0, "receipt_create": 0}
 
 
 @pytest.mark.parametrize("name,flags", [("old.spent.json", os.O_RDWR | os.O_CREAT | os.O_EXCL),

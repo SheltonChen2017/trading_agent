@@ -17,8 +17,9 @@ from data.hashing import canonical_json, hash_bytes, hash_payload
 from scripts import diagnose_short_interest_body_receipt_custody as proof
 
 DRIVER = "scripts/run_short_interest_body_receipt_offline.py"
-HARNESS_SHA256 = "7c4533599348ce02c08abfaedeab74ffb1a26f62204a4ae25291fbfa0864e999"
+HARNESS_SHA256 = "69349d5ec8aa6ddab7c0dfb04462773acb71826b4bb535e242aaa04f3627c372"
 MAXIMUM_GIT_COMMANDS, MAXIMUM_INFO_COMMANDS = 20000, 16
+MAXIMUM_DIRECTORY_STREAMS = 4096
 _INVOKED = False
 _ORIGINAL, _COUNTS, _ACTIVE, _FAILED = {}, {}, {}, {}
 _POLICY_ISSUED = {}  # Original immutable witness; an equal replacement is not issued.
@@ -40,9 +41,9 @@ def require(value, code):
 
 
 def policy():
-    require((MAXIMUM_GIT_COMMANDS, MAXIMUM_INFO_COMMANDS) == (20000, 16),
+    require((MAXIMUM_GIT_COMMANDS, MAXIMUM_INFO_COMMANDS, MAXIMUM_DIRECTORY_STREAMS) == (20000, 16, 4096),
         "harness_registration_changed")
-    return {"schema": "si-body-receipt-offline-harness-v1", "driver": DRIVER,
+    return {"schema": "si-body-receipt-offline-harness-v2", "driver": DRIVER,
         "root": str(proof.base.previous.lane.ROOT), "branch": "codex/strategy-short-interest",
         "ref": "refs/heads/codex/strategy-short-interest", "code_paths": list(proof.code_paths()),
         "proof_protocol_sha256": proof.PROTOCOL_SHA256,
@@ -51,6 +52,8 @@ def policy():
         "maximum_hdiutil_create": 1, "maximum_hdiutil_attach": 1,
         "Python_write_open": "two_role_pinned_original_O_EXCL0600_body_receipt_inodes_and_their_real_WRONLY_challenges",
         "relative_open_audit_limitation": "mode_and_dir_fd_enforced_by_unchanged_original_authenticated_creator",
+        "inventory_directory_stream": "literal_dot_mode_None_exact_RDONLY_DIRECTORY_NOFOLLOW_only_implicit_CLOEXEC_removed_original_FD_owner_mode_stamp_checks_unchanged",
+        "maximum_directory_streams": MAXIMUM_DIRECTORY_STREAMS,
         "null_stream": "exact_dev_null_RDWR_for_hdiutil_stdin_stderr_only_not_evidence",
         "native_library": proof.base.immutable.LIBRARY,
         "native_symbols": ["fstatfs64", "fchflags", "fsetxattr"],
@@ -123,7 +126,8 @@ class AuditSeams:
         self.code_basenames = frozenset(Path(name).name for name in proof.code_paths())
         self.denied = {name: 0 for name in DENIED}
         self.permitted = {"Git": 0, "create": 0, "attach": 0, "info": 0,
-            "body_create": 0, "body_write_challenge": 0, "receipt_create": 0, "receipt_write_challenge": 0, "null_stream": 0}
+            "body_create": 0, "body_write_challenge": 0, "receipt_create": 0, "receipt_write_challenge": 0,
+            "null_stream": 0, "directory_stream": 0}
         self.failed, self.active, self.last_hdiutil = False, True, "none"
         self._identity = object()
         bindings = tuple(getattr(self, name) for name in (
@@ -221,6 +225,14 @@ class AuditSeams:
         path, unused_mode, flags = args
         if type(flags) is not int: self.deny("other")
         flags &= ~getattr(os, "O_CLOEXEC", 0)  # CPython's implicit PEP446 flag only.
+        if type(path) is str and path == ".":
+            # The original inventory function opens a new directory stream
+            # relative to its retained, checked directory FD. This audit event
+            # cannot see dir_fd; the original code/FD/inode checks still do.
+            if (unused_mode is None and flags == (os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+                    and self.permitted["directory_stream"] < MAXIMUM_DIRECTORY_STREAMS):
+                self._allow("directory_stream"); return
+            self.deny("read_open")
         if type(path) is int:
             if flags & os.O_ACCMODE != os.O_RDONLY: self.deny("write_open")
             return  # Original subprocess PIPE readers; no artifact FD is supplied by a caller.
@@ -387,7 +399,7 @@ def _validate_result(result, seams, head, remote, manifest):
         "original_code_and_pair_contexts_closed", "authority", "closed_at",
         "isolated_storage_closed_summary_sha256"}
     require(type(result) is dict and set(result) == fields
-        and result["schema"] == "si-body-receipt-custody-proof-closed-v1"
+        and result["schema"] == "si-body-receipt-custody-proof-closed-v2"
         and result["status"] == "closed_offline_synthetic_maximum_body_receipt_only"
         and result["runtime_head"] == head and result["actual_remote"] == remote
         and result["code_manifest_sha256"] == hash_payload(manifest)
@@ -462,6 +474,9 @@ def _validate_result(result, seams, head, remote, manifest):
     require(seams.permitted["create"] == seams.permitted["attach"] == 1
         and all(seams.permitted[key] == 1 for key in ("body_create", "body_write_challenge", "receipt_create", "receipt_write_challenge")),
         "harness_result_refused")
+    require(type(seams.permitted["directory_stream"]) is int
+        and 0 < seams.permitted["directory_stream"] <= MAXIMUM_DIRECTORY_STREAMS,
+        "harness_result_refused")
     # Recheck exact original issued closure after pure validation; a caught late
     # storage/file/code/clock refusal can never be turned into a clean result.
     require(proof.validate_closed_result(result) is True, "harness_result_refused")
@@ -510,7 +525,7 @@ def main(argv=None):
     if type(values) not in (list, tuple) or len(values) != 2:
         print(canonical_json({"status": "refused", "failure": {"contract_code": "harness_arguments_refused"}}), flush=True)
         return 2
-    print(canonical_json({"status": "starting", "schema": "si-body-receipt-offline-harness-v1"}), flush=True)
+    print(canonical_json({"status": "starting", "schema": "si-body-receipt-offline-harness-v2"}), flush=True)
     try: result = run_once(values[0], values[1])
     except BaseException as error:
         result = {"status": "refused", "failure": _failure(error)}

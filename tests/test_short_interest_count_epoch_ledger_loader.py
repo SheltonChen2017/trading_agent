@@ -17,6 +17,19 @@ from types import SimpleNamespace
 import pytest
 
 from data.hashing import canonical_json, hash_bytes, hash_payload
+
+# The runtime under test imports POSIX-only stdlib modules at import time, so
+# this module cannot even be collected on the supported Windows host; see the
+# lane record SI-CR18-001. Portable contract logic stays covered on POSIX.
+pytest.importorskip(
+    "resource",
+    reason=(
+        "the protected-capture runtime imports the POSIX-only module "
+        "resource at import time; it cannot execute on this host, see the "
+        "lane record SI-CR18-001"
+    ),
+)
+
 from scripts import load_short_interest_count_epoch_ledger as loader
 import test_short_interest_refused_count_snapshot as snapshots
 import test_short_interest_count_custody_diagnostic as previous

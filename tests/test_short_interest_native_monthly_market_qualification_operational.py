@@ -15,6 +15,18 @@ from data.hashing import canonical_json, hash_bytes, hash_payload
 from scripts import capture_short_interest_native_market_inputs as capture
 from scripts import qualify_finra_short_interest as captureio
 from scripts import qualify_short_interest_native_monthly_market as operational
+import os
+
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
 
 
 REGISTRATION = {"head": "a" * 40, "remote": "b" * 40, "code_identity_sha256": "c" * 64}
@@ -151,6 +163,7 @@ def test_non_original_control_whitespace_is_not_normalized(prefix, suffix):
         operational._parsed(raw)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_all112_panels_before_first_yield_and_bounded_replay(monkeypatch):
     snap = fabricated(monkeypatch)
     with qualify(snap) as report:
@@ -176,6 +189,7 @@ def test_all112_panels_before_first_yield_and_bounded_replay(monkeypatch):
         report.to_payload()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_original_malformed_and_duplicate_events_are_retained_not_terminal(monkeypatch):
     snap = fabricated(monkeypatch, issue=True)
     with qualify(snap) as report:
@@ -184,6 +198,7 @@ def test_original_malformed_and_duplicate_events_are_retained_not_terminal(monke
         assert all("all_identifiable_duplicate_peers_quarantined" in item["refusal_reasons"] for item in rows)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_cross_page_duplicate_peer_origins_replayed_from_real_original_events(monkeypatch):
     snap = fabricated(monkeypatch, cross_page=True)
     monkeypatch.setattr(operational, "EXPECTED_ATTEMPTS", 113)
@@ -200,6 +215,7 @@ def test_cross_page_duplicate_peer_origins_replayed_from_real_original_events(mo
 
 
 @pytest.mark.parametrize("kind", ["missing", "extra_negative", "START", "request", "raw_hash", "clock", "totals", "panel_order", "receipt_extra", "malformed_event", "duplicate_group"])
+@_POSIX_CAPTURE_ONLY
 def test_corrupt_last_or_original_evidence_prevents_any_yield(monkeypatch, kind):
     snap = fabricated(monkeypatch, issue=True)
     if kind == "missing":
@@ -229,6 +245,7 @@ def test_corrupt_last_or_original_evidence_prevents_any_yield(monkeypatch, kind)
             pytest.fail("unverified complete source escaped")
 
 
+@_POSIX_CAPTURE_ONLY
 def test_page_refusal_event_origin_loss_refuses_even_when_top_report_is_unchanged(monkeypatch):
     snap = fabricated(monkeypatch, issue=True)
     value = snap.payload("attempt-00001.refusals.private.json")
@@ -240,6 +257,7 @@ def test_page_refusal_event_origin_loss_refuses_even_when_top_report_is_unchange
 
 
 @pytest.mark.parametrize("kind", ["rows", "bytes", "attempts"])
+@_POSIX_CAPTURE_ONLY
 def test_whole_next_page_budget_is_checked_before_reading_a_new_attempt(monkeypatch, kind):
     snap = fabricated(monkeypatch)
     panel = capture.protocol()["panels"][0]
@@ -254,6 +272,7 @@ def test_whole_next_page_budget_is_checked_before_reading_a_new_attempt(monkeypa
     assert snap.reads == []
 
 
+@_POSIX_CAPTURE_ONLY
 def test_prefix_consumer_cannot_skip_late_panel_verification(monkeypatch):
     snap = fabricated(monkeypatch)
     last = snap.payload("attempt-00112.refusals.private.json")
@@ -265,6 +284,7 @@ def test_prefix_consumer_cannot_skip_late_panel_verification(monkeypatch):
 
 
 @pytest.mark.parametrize("kind", ["start_code", "claim", "digest", "retrieved", "completed", "authority"])
+@_POSIX_CAPTURE_ONLY
 def test_original_global_proofs_and_clocks_cannot_be_substituted(monkeypatch, kind):
     snap = fabricated(monkeypatch)
     if kind == "start_code":
@@ -288,6 +308,7 @@ def test_original_global_proofs_and_clocks_cannot_be_substituted(monkeypatch, ki
             pytest.fail("unproven global source controls escaped")
 
 
+@_POSIX_CAPTURE_ONLY
 def test_late_final_source_custody_failure_cannot_escape_first_yield(monkeypatch):
     snap = fabricated(monkeypatch)
     original = snap.full_check
@@ -302,6 +323,7 @@ def test_late_final_source_custody_failure_cannot_escape_first_yield(monkeypatch
 
 
 @pytest.mark.parametrize("kind", ["source", "current_code", "controls"])
+@_POSIX_CAPTURE_ONLY
 def test_custody_remains_live_through_prefix_consumption_and_exit(monkeypatch, kind):
     snap, changed = fabricated(monkeypatch), [False]
     def check():
@@ -316,6 +338,7 @@ def test_custody_remains_live_through_prefix_consumption_and_exit(monkeypatch, k
             report.public_summary()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_mid_context_capture_protocol_change_cannot_silently_make_iteration_empty(monkeypatch):
     snap = fabricated(monkeypatch)
     with qualify(snap) as report:
@@ -326,6 +349,7 @@ def test_mid_context_capture_protocol_change_cannot_silently_make_iteration_empt
                 list(report.iter_panels())
 
 
+@_POSIX_CAPTURE_ONLY
 def test_mid_context_pure_policy_change_cannot_relabel_cached_qualification(monkeypatch):
     snap = fabricated(monkeypatch)
     with qualify(snap) as report:
@@ -345,6 +369,7 @@ def test_unregistered_current_code_refuses_before_snapshot_or_Git(monkeypatch):
             pytest.fail("PENDING current code gate passed")
 
 
+@_POSIX_CAPTURE_ONLY
 def test_current_committed_manifest_mismatch_refuses_before_source(monkeypatch):
     class FakeGuard:
         def __init__(self, *args, **kwargs): pass

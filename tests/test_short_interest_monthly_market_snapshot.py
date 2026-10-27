@@ -9,6 +9,17 @@ import pytest
 from data.hashing import canonical_json, hash_bytes, hash_payload
 from scripts import short_interest_monthly_market_snapshot as monthly
 
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
+
 
 def stamp(second):
     return (datetime(2026, 10, 14, 0, 42, 32, tzinfo=timezone.utc)
@@ -110,6 +121,7 @@ def fixture(monkeypatch, tmp_path):
     return guard, directory, files, manifest
 
 
+@_POSIX_CAPTURE_ONLY
 def test_fixed_snapshot_closes_all_bytes_without_input_admission(monkeypatch, tmp_path):
     guard, directory, files, manifest = fixture(monkeypatch, tmp_path)
     before = {path: path.read_bytes() for path in (*directory.iterdir(),
@@ -135,6 +147,7 @@ def test_strict_control_JSON_refuses_duplicate_nonfinite_or_invalid_bytes(raw):
 
 
 @pytest.mark.parametrize("mutation", ["raw", "claim", "control", "historical", "membership", "mode", "hardlink", "symlink"])
+@_POSIX_CAPTURE_ONLY
 def test_original_bytes_protection_and_exact_membership_are_not_caller_flags(monkeypatch, tmp_path, mutation):
     guard, directory, files, unused = fixture(monkeypatch, tmp_path)
     path = directory / "attempt-00001.raw"
@@ -160,6 +173,7 @@ def test_original_bytes_protection_and_exact_membership_are_not_caller_flags(mon
 
 
 @pytest.mark.parametrize("control", ["budget", "started.json", "inventory.private.json", "completed.json"])
+@_POSIX_CAPTURE_ONLY
 def test_rehashed_controls_cannot_change_original_global_contract(monkeypatch, tmp_path, control):
     guard, directory, files, unused = fixture(monkeypatch, tmp_path)
     if control == "budget":
@@ -185,6 +199,7 @@ def test_rehashed_controls_cannot_change_original_global_contract(monkeypatch, t
 
 
 @pytest.mark.parametrize("name", ["attempt-00001.raw", "attempt-00001.started.json"])
+@_POSIX_CAPTURE_ONLY
 def test_inplace_change_to_earlier_read_during_later_read_prevents_yield(monkeypatch, tmp_path, name):
     guard, directory, files, unused = fixture(monkeypatch, tmp_path)
     original = monthly._MonthlySnapshot.read
@@ -201,6 +216,7 @@ def test_inplace_change_to_earlier_read_during_later_read_prevents_yield(monkeyp
             pytest.fail("earlier in-place changes must be caught before outward yield")
 
 
+@_POSIX_CAPTURE_ONLY
 def test_context_exit_and_explicit_full_check_detect_late_inplace_change(monkeypatch, tmp_path):
     guard, directory, files, unused = fixture(monkeypatch, tmp_path)
     with pytest.raises(monthly.MonthlySnapshotRefusal, match="monthly_earlier_file_changed"):
@@ -209,6 +225,7 @@ def test_context_exit_and_explicit_full_check_detect_late_inplace_change(monkeyp
             (directory / "attempt-00001.raw").write_bytes(files["attempt-00001.raw"] + b" ")
 
 
+@_POSIX_CAPTURE_ONLY
 def test_parent_siblings_allowed_but_snapshot_bindings_cannot_be_replaced(monkeypatch, tmp_path):
     guard, directory, files, unused = fixture(monkeypatch, tmp_path)
     with pytest.raises(monthly.MonthlySnapshotRefusal, match="monthly_snapshot_seal_changed"):
@@ -220,6 +237,7 @@ def test_parent_siblings_allowed_but_snapshot_bindings_cannot_be_replaced(monkey
             held.check()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_three_retained_descriptors_and_one_transient_regardless_of_members(monkeypatch, tmp_path):
     guard, directory, files, unused = fixture(monkeypatch, tmp_path)
     original_open, original_close = os.open, os.close

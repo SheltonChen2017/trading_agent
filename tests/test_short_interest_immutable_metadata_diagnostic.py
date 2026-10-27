@@ -9,6 +9,19 @@ import socket
 import pytest
 
 from data.hashing import hash_bytes, hash_payload
+
+# The runtime under test imports POSIX-only stdlib modules at import time, so
+# this module cannot even be collected on the supported Windows host; see the
+# lane record SI-CR18-001. Portable contract logic stays covered on POSIX.
+pytest.importorskip(
+    "fcntl",
+    reason=(
+        "the protected-capture runtime imports the POSIX-only module "
+        "fcntl at import time; it cannot execute on this host, see the "
+        "lane record SI-CR18-001"
+    ),
+)
+
 from scripts import diagnose_short_interest_immutable_metadata as proof
 from scripts import short_interest_immutable_metadata as immutable
 from test_short_interest_immutable_metadata import kernel, REAL_NATIVE_SET

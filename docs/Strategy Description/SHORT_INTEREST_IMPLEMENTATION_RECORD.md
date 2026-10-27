@@ -1,13 +1,18 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **OWNER-RESUMED OFFLINE CUSTODY REPAIR AND PRE-QC BUILD (SECTION126).
-84005 CUMULATIVE COUNT STARTS / UNCHANGED4GiB; ALL OLD CLAIMS, NEGATIVES,
-RECEIPTS AND CHARGES REMAIN SPENT/IMMUTABLE. NO CHECK IS WEAKENED OR OLD
-FILE ADOPTED. ACTUAL KERNEL PROOFS125.8/125.10 REMAIN REFUSED; NEW RETRIEVAL
-IS HELD UNTIL GENUINE OFFLINE CUSTODY CLOSURE. LOCAL BACKTEST READINESS FALSE.
-REVIEW SKIPPED BY OWNER EXCEPTION, NOT INDEPENDENT ACCEPTANCE.
-OWNER NOW REPORTS QC/SAFARI OCCUPIED: QUANTCONNECT PAUSED BY OWNER INCLUDING
-CAPACITY/METADATA; NO SAFARI, MIA, QC SETUP, UPLOAD, COMPILE OR JOB.
+Status: **LANE SYNCED WITH CLAUDE'S TWO COMMITS; CODEX COUNTER-REVIEW
+ACCEPTED AFTER APPENDED FACTUAL ERRATA (SECTION127); BOTH126 HISTORIES PRESERVED.
+OWNER-RESUMED OFFLINE CUSTODY REPAIR / LAST-PRE-QC BUILD IS PAUSED FOR THIS
+COUNTER-REVIEW. 84005 CUMULATIVE COUNT STARTS / UNCHANGED4GiB; THE CURRENT
+PERMANENT FULL-PAGE RESERVATION MODEL ADMITS ONLY2036 NEW SLOTS UNTIL AN
+AUTHENTICATED DURABILITY ADAPTER EXISTS. ALL OLD CLAIMS, NEGATIVES,
+RECEIPTS AND CHARGES REMAIN SPENT/IMMUTABLE; NO OLD FILE IS ADOPTED.
+LOCAL BACKTEST READINESS FALSE. ACTUAL V3 OBSERVATION ESTABLISHED THE
+IMMUTABLE FLAG THEN OBSERVED ITS LOSS; ACTOR AND HISTORICAL CAUSE UNKNOWN.
+NEW SOURCE RECOVERY REMAINS HELD. CLAUDE REVIEW COVERS b648f60..730c59c,
+NOT THE LATER LOCAL3B0 DIAGNOSTIC COMMIT.
+LATEST OWNER REPORTS QC/SAFARI OCCUPIED: QUANTCONNECT PAUSED BY OWNER
+INCLUDING CAPACITY/METADATA; NO SAFARI, MIA, QC SETUP, UPLOAD, COMPILE OR JOB.
 TWO HISTORICAL QC METADATA REQUESTS REMAIN ACCOUNTED FOR.
 NO PURCHASE OR NEW TERMS/CREDENTIAL, BROKER/OPERATOR DATABASE, DEPLOYMENT,
 PAPER/LIVE, CAPITAL, ORDER OR TRADING ACTION. NO OUTCOME JOIN OR BACKTEST.
@@ -241,6 +246,9 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-25 | Codex counter-review + bounded recovery | Exact Claude range `ae28f4a040706e7941553fdd6dd8072948b069cb..b648f60112af141efc2a12fbaef03b38846d219d`; this bounded code/record series follows | Section124: accept review after count-scope erratum; distinct finite successor transport and offline refused-prefix replay | Old v1 source files/claims stay immutable; no implicit budget reset; new512-descriptor proof chunk has528 maximum new STARTs,16 extra attempts, maximum3 tries, fixed2/10s backoff and one-hour START window. Not full source qualification or backtest readiness. | Main56-test counter-review and142-test new focused executions, causal clock/claim regressions and attributed delegate evidence in124; no complete suite or QC | SI-CR23-002 corrected; SI-CR23-001 design implemented, actual closure pending; old source P2s and012 stay open | Freeze measured predecessor manifest and exact committed code before any fresh claim/key/HTTP. Accumulate local commits, one final matching-lane push after this bounded round, then independent Claude review. |
 
 | 2026-10-25 | Codex final bounded-round handoff at owner/external gates | Starting matching origin `b648f60112af141efc2a12fbaef03b38846d219d`; ten local commits through `2da6aed30532d41f3a9ee1b45f9ae4e83771f2d9`, plus this final record-only commit | Sections124.18–124.19: actual source-only spent-epoch accounting closure; honest full-study cap/custody stop | Retained monthly normalization and count-epoch accounting closed OFFLINE, but no source/input/backtest admission. Zero new provider requests in this continuation; every spent claim, negative, body/unknown full-page debit stays immutable. At least1 additional finite START allowance is needed before future retries; metadata custody006 remains open. | Main focused/causal checks and actual73043 exit0 are attributed in124; final record/diff/status checks follow. No complete Codex suite, QC or outcomes. | Original source/coverage/custody P2s stay open. Pre-release software007/008 and operational-harness009 corrections do not repair historical refusals. | ONE final nonforce push to matching lane ONLY, after concurrency guards and no pinned process; actual publication/full hash/equality reported in chat. Claude independently reviews exact pushed snapshot. Owner must separately settle finite recovery allowance and safe custody policy before new retrieval; no monitor rearm. |
+| 2026-10-26 | Claude review (Windows session) | `b648f60` -> `730c59c` reviewed from the published head after a fast-forward from `cc1e44f`; **test-only correction at `e92e8ab`**; this record commit follows, so the round has two Claude commits | Independent review of sections 124-125: bounded count recovery and secret-safe diagnostics, retained monthly source-only normalization, NONCLAIM custody diagnostics, creator-only and kernel-immutable metadata primitives, the spent-epoch ledger and the prospective recovery budget | Reviewed all fourteen commits individually. Read every new production module and all twelve new or changed scripts in full. Recomputed the 84,005 cumulative-START ceiling, the 133 chunks (132 x 512 + 301), the 317-slot final chunk, the 4,271,514,615 remaining bytes and the one-START shortfall; checked the ledger's position accounting (13,990 retained, 13,991 started, one repeated START) against the parent/child receipts. Six file-based guard removals: four red, two redundant by construction. Secrets, data-file and ignore-rule sweep clean. The first complete Windows collection since 2026-10-12 found ten uncollectable test modules and one module broken on every host; both corrected in tests only. | 131-file lane on `e92e8ab` stopped by owner direction before completion: 4,477 of 4,870 tests executed (91.9%) in 11,212 s: 3,855 passed, 395 skipped, 217 failed, 10 errors; 393 tests in eleven files not executed; no complete lane figure exists for this tree; every executed failure is outside the reviewed range and classified under `SI-CR18-005`; collection **4,870 tests, 0 errors** (from 11 errors); the thirteen touched files **25 passed, 60 skipped**; the registry test **11 passed** (from a collection error); mutations MA **1 failed**, MB survivor, MC **1 failed**, MD **2 failed**, ME **1 failed**, MF survivor; compileall exit 0; `git diff --check` clean; active-document **69 passed** before and **69 passed in 4.09s** after this record. No protected artifact, credential, provider, mailbox or macOS invocation was reproduced; none exists on this host. **Canonical actual looks 0/0, exploratory 0, alpha 0, QC attempts 0.** | No P0/P1. `SI-CR18-001` (P2, closed by test-only correction; production lazy-import advisory for Codex), `SI-CR18-002` (P2, closed by test-only correction; the registry test was uncollectable on all hosts since `71c2e7a`), `SI-CR18-003` (P3, two redundant guards), `SI-CR18-004` (P3, the permanent full-page reservation admits at most 2,036 of the 70,013 allowed STARTs under the byte cap, consistent with 125.6 but unquantified there), `SI-CR18-005` (P2, open owner decision: the complete Windows lane is red outside the reviewed range for classified platform, physical-root-pin, path-rendering and host-limit reasons, none a logic defect), `SI-CR18-006` (P3 advisory: two production call sites raise `AttributeError` before the fixed platform refusal). Custody gate `SI-BUILD-20261025-015`, source P2s, `SI-CR15-001`, `SI-CR19-003`, `SI-CR-WIN-20261012-001/-002` and shared `SI-CR5-005` unchanged. | Codex counter-reviews `e92e8ab` and this record commit; the owner decides the custody remedy and Windows parity; every source, outcome, QC-run, purchase and trading gate remains closed. Push once at the end of this round per the standing rule. |
+
+| 2026-10-27 | Codex synchronization + counter-review (2026-10-26 Pacific session) | Local3b0e854472a0db5592e4e350695da5798c9ccbfa plus exact Claude e92e8ab7876e17c039950be26a033309b6ac727f and20c49ac0fad5eddba251478406dd7af5a04093f0; ordinary merge preserves both parents | Section127: accept test-only corrections; qualify cache-guard attribution, host conclusions and latest owner resource pause | Both concurrent126 blocks preserved byte-exactly; three unfinished drafts retained privately, not admitted; actual local V3 negative supplemented, no custody repair claimed | Main571focused/65.12s and29post-record/.46s; causal in-memory guard removal3expected failures/.07s, restored process; final validation below. No full suite, Windows execution, provider, source replay or QC | SI-CCR-20261026-001..003 appended; prior custody/source/platform gates remain open; all START/byte debits and84005/4GiB caps unchanged | ONE final matching-lane nonforce push for this bounded counter-review; then offline custody work only, stopping before QC setup while resources remain occupied |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -23584,3 +23592,397 @@ catalogues, source/test in-memory compile and whitespace passed. Complete
 published historical body from Current publication rule through125 remains
 byte-for-byte unchanged; only current status and appended126 change. No
 actual operation or test session remains active before this checkpoint.
+
+## 126. Claude independent review — 2026-10-26 UTC (Windows session: sections 124-125, bounded recovery, custody diagnostics, spent-epoch ledger, prospective budget)
+
+Reviewer: Claude, the Windows session, in the designated lane worktree
+`C:\git\customizedAgent\trading_agent_short_interest` on
+`codex/strategy-short-interest`, CPython 3.13.14 / pytest 9.1.1. This host
+holds no protected artifact, provider row, credential or Darwin kernel;
+nothing under `artifacts/` exists here and nothing under it is tracked. After a
+lane-only fetch the local branch was fast-forwarded from `cc1e44f` to the
+remote `730c59c` with a clean tree; `git worktree list` reports exactly this
+worktree. The macOS session's reviews through section 123 were read, not
+redone. Git Bash failed to launch for part of this round; the affected
+commands were re-issued through PowerShell and their results are unchanged.
+Governing documents: `CLAUDE.md`,
+`docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`, the parallel-workflow
+contract, the owner blueprint, the lane-owned owner-decision record, the
+standing round-end push rule (section 81.1), and the owner's instruction for
+this round: "sync the lane, and review all unreviewed commits. apply
+corrections where ncessary. push once when done."
+
+**Disposition: all fourteen commits accepted after one test-only correction.**
+No P0 or P1. The production code added this round does what sections 124 and
+125 say it does, its arithmetic recomputes exactly, and four of six pure
+guards turn their tests red under mutation. Two P2 findings are both about the
+lane's own test suite rather than the software under test: the range broke
+the Windows-portability convention the lane adopted in section 114, and one
+test module had been uncollectable on every host for two days without anyone
+noticing because, by owner direction, no complete lane run followed the commit
+that broke it. Both are corrected in `e92e8ab`. The complete Windows lane, run for the
+first time since 2026-10-12, is red outside the reviewed range; every failure
+is classified in `SI-CR18-005` and none is a logic defect or corrected here,
+because the remedy is the owner's open Windows-parity decision. Nothing here
+admits a source, opens a look, touches a provider, repairs a custody failure
+or claims a backtest.
+
+### 126.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Lane branch | `codex/strategy-short-interest` |
+| Previous Claude review record | `b648f60112af141efc2a12fbaef03b38846d219d` (section 123, macOS session) |
+| Reviewed remote head | `730c59cfec31b33a83fa09e065208eb3c26d345b` |
+| Ordered reviewed range | `b648f60..730c59c` (14 commits, linear, no merge) |
+| Code added | `native_count_epoch_ledger.py`, `native_count_recovery_budget.py`, `native_monthly_market_qualification.py`; twelve new scripts; sixteen new or changed test files; 11,052 lines added, 8 removed outside the record |
+| Claude commits this round | `e92e8ab` (thirteen test files, +177/-7, no production change) and this record commit |
+| Owner authorities exercised by the range | `SI-AUTH-20261024-04`, `-05`, `SI-AUTH-20261025-01` through `-04`, each quoted verbatim in sections 124-125 |
+
+### 126.2 Commit dispositions
+
+| # | Commit | Scope | Disposition |
+|---|---|---|---|
+| 1 | `5edab10` | Bounded count successor, recovery transport, refused-count snapshot, diagnostics (124.1-124.3) | **accepted**; its tests are among those guarded by `SI-CR18-001` |
+| 2 | `e9771c5` | Measured successor registration (124.4) | **accepted** |
+| 3 | `2d11d1f` | Preserve V2 zero-START negative, fixed initialization stages, recovery diagnostics (124.5) | **accepted**; `SI-CR18-001` |
+| 4 | `c2f9627` | Retained monthly offline normalization: pure module, operational qualifier, snapshot (124.6-124.7) | **accepted**; `SI-CR18-001` (markers) |
+| 5 | `10e4eaa` | Original canonical JSON plus one LF (124.8) | **accepted** |
+| 6 | `f287c95` | Finite NONCLAIM custody diagnostic (124.9-124.10) | **accepted**; `SI-CR18-001` |
+| 7 | `287b58d` | Strict producer schema and safe setup diagnostics (124.11-124.12) | **accepted** |
+| 8 | `c492aba` | Creator-only metadata sealing helper and driver (124.13-124.14) | **accepted**; `SI-CR18-001` |
+| 9 | `6ab5467` | Spent-epoch ledger model and loader (124.15-124.16) | **accepted**; `SI-CR18-001` |
+| 10 | `2da6aed` | Loader harness boundary correction (124.17) | **accepted** |
+| 11 | `d50c9fe` | Section 124.18-124.19 closure and handoff | **accepted** |
+| 12 | `358b0d7` | Kernel-immutable primitive, prospective count budget, owner instructions (125.1-125.7) | **accepted**; `SI-CR18-001` |
+| 13 | `b838dd6` | Preserve UF_TRACKED in the V2 primitive (125.8-125.9) | **accepted** |
+| 14 | `730c59c` | Section 125.10 terminal custody blocker and resource release | **accepted** |
+
+### 126.3 What was executed here
+
+- **Arithmetic.** 13,992 + 67,885 + 133 x 16 = 84,005. 67,885 = 132 x 512 +
+  301, so 133 chunks and a 317-slot final chunk. 4,294,967,296 - 23,452,681 =
+  4,271,514,615 remaining bytes. 81,876 - 13,992 = 67,884 available historical
+  STARTs against 67,885 missing positions, a one-START shortfall. The ledger's
+  position accounting reconciles from the receipts: parent 48 STARTs with
+  position 47 recorded-not-invoked and positions 1-46 and 48 retained; child
+  13,944 STARTs over positions 47 and 49-13,991 with 13,943 retained; union
+  13,990 retained, 13,991 started, one repeated START, two full-page unknown
+  debits, 19,258,377 + 4,194,304 = 23,452,681 charged bytes.
+- **Pure-module tests on Windows.** Ledger **35 passed**, budget **35
+  passed**, monthly qualification **50 passed**, recovery transport **70
+  passed**, registry **11 passed** after `SI-CR18-002`; their frozen-protocol
+  tests recompute the pinned policy digests.
+- **Guard removals, byte-exact restore verified by blob id.** MA
+  `overlapping_retained_epoch_contribution` **1 failed**; MB
+  `cumulative_START_allowance_exhausted` **35 passed** (survivor); MC
+  `total_try_allowance_exhausted` **1 failed**; MD page exhaustion **2
+  failed**; ME duplicate quarantine **1 failed**; MF transport retryable
+  constructor contract **70 passed** (survivor). The two survivors are
+  `SI-CR18-003`.
+- **Secrets and data.** No key-like literal, no non-Python/Markdown file, no
+  ignore-rule change; `artifacts/` ignored and untracked; the only URLs added
+  to code are `.invalid` fixtures; the three new research modules import no
+  network, subprocess or filesystem module.
+- **Collection.** Before the correction the 131 lane files collected 4,859
+  tests with 11 errors on this host; after it, **4,870 tests, 0 errors**.
+- **Lane run.** 4,477 of 4,870 tests executed (91.9%) in 11,212 s: 3,855 passed, 395 skipped, 217 failed, 10 errors; 393 tests in eleven files not executed on `e92e8ab`, stopped by owner direction before
+  completion. The twenty files that had failed by the 81% point were rerun in
+  isolation (**217 failed, 323 passed,
+  26 skipped, 10 errors in 49.44s**, identical outcomes) and every failure was
+  classified from its exception. No file beyond those twenty failed or errored between the 81% point and the stop at 91.9%. The classification is in 126.5 and
+  the finding is `SI-CR18-005`.
+- **Structural record claims.** Each of the fourteen commits touches only the
+  lane record and lane-owned code or tests; sections 124-125 quote the owner's
+  six authorities (`SI-AUTH-20261024-04` through `SI-AUTH-20261025-04`) and
+  the stop decision `SI-DEC-20261025-08` verbatim; section numbering is monotonic; the pushed range
+  equals section 124.19's and 125.10's commit lists.
+
+Not reproduced, and recorded as Codex's reported observations: every actual
+invocation in sections 124-125 (the zero-START V2 and V3 claims, the NONCLAIM
+probes, the monthly replay, the ledger closure, the two kernel-flag proofs and
+their exec identifiers), the Darwin `fchflags`/`UF_TRACKED` behaviour, the
+`com.apple.provenance` observation, the vendor mailbox state and the Target
+Price resource-release read. None of these can exist on this host.
+
+### 126.4 P0-P3 issue ledger
+
+No P0 or P1 in the lane. Resolved and advisory items are retained.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or closure | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI-CR18-001 | P2 | **Closed by test-only correction; production advisory open for Codex** | `5edab10`, `2d11d1f`, `c2f9627`, `f287c95`, `c492aba`, `6ab5467`, `358b0d7`; generalized instance in `71c2e7a` | `scripts/capture_short_interest_count_recovery.py:17` (`import resource`), `scripts/short_interest_immutable_metadata.py:9` and `scripts/short_interest_new_metadata_custody.py:10` (`import fcntl`); ten test modules; `test_short_interest_monthly_market_snapshot.py`, `test_short_interest_native_monthly_market_qualification_operational.py` | Section 114 made the protected-capture runtime refuse cleanly on non-POSIX hosts and gave the lane a convention: protected-I/O tests carry `_POSIX_CAPTURE_ONLY`, portable contract tests use the capability seam. This range imported POSIX-only stdlib modules at module level in three scripts and directly in two tests, so ten test modules raise `ModuleNotFoundError` at collection and abort the whole Windows session; the two monthly files add fifty protected-filesystem failures (`protected_capture_platform_unavailable`, one symlink privilege) with no marker. The Windows lane was unrunnable again. | Collection sweep: 11 errors, 8 `resource`, 2 `fcntl`; the monthly files alone: 18 failed/4 passed and 32 failed/10 passed; the seven older capture files under the convention: **219 passed, 258 skipped, 0 failed**. | `CLAUDE.md` names Windows the supported environment; a suite that cannot be collected there is not a safety control, and the convention already existed. | `pytest.importorskip` with the stated reason before the first `scripts` import in the ten modules (replacing the two direct `fcntl` imports), and `_POSIX_CAPTURE_ONLY` on the seven and thirteen protected-filesystem tests of the two monthly files, leaving their fourteen portable tests active. Test-only. **Advisory for Codex:** move the three POSIX-only imports inside the functions that use them (`require_fd_headroom`, the `F_GETFL` checks) so the portable contract tests in those ten modules run on Windows again instead of skipping wholesale. | Collection **4,870 tests, 0 errors**; the thirteen touched files **25 passed, 60 skipped**, reasons attached; full lane in 126.5. |
+| SI-CR18-002 | P2 | **Closed by test-only correction** | `71c2e7a` (section 123 range) | `tests/test_short_interest_compact_parallel_registry.py::serial_control` | The test builds a "serial control" by pattern-replacing source text of `compact_native_source.py`. `71c2e7a` added `recovery.CountRecoveryRegistry` to the registry tuple that pattern matches and a recovery-lineage block after the parallel block it cuts, so the module-level `assert raw.count(before) == 1` fails and the module has been uncollectable on every host since 2026-10-24. Sections 123-125 ran focused selections by owner direction, so no complete lane run existed to notice it. A silently uncollectable module removes eleven regressions from the suite without a red result. | Collection error `assert 0 == 1` here; the single-line pattern is absent from the blob regardless of host; `git log` shows the production change at `71c2e7a` and the test last changed at `19a02b5`. | A test that cannot be collected proves nothing; the control's intent (drop only the typed-parallel bridge) is preserved by re-anchoring, not weakened. | Re-anchored `before` to the three-member tuple, replaced it with the two non-parallel members, and cut only from the parallel `if` to the recovery `elif`, leaving an empty branch so the recovery lineage block survives. Test-only. | **11 passed**; collection clean. |
+| SI-CR18-003 | P3 | Open advisory, no change | `358b0d7`, `5edab10` | `native_count_recovery_budget.py` `reserve_start_slot`; `short_interest_recovery_transport.py` `RecoveryTransportFailure.__init__` | Two guards survive removal without a red test. The cumulative-START check is implied by the per-chunk checks because the sum of per-chunk maxima equals the allowance exactly, and the byte cap binds long before it. The transport constructor's retryable contract restates what `_network_failure` computes; no production caller constructs a retryable failure any other way. | MB **35 passed**, MF **70 passed** under removal. | Defence in depth, not fail-open; pinning them would test construction order rather than behaviour. | None. | N/A. |
+| SI-CR18-004 | P3 | Open observation, record precision | `358b0d7` | section 125.6; `native_count_recovery_budget.py` byte check | The coordinator reserves a full 2 MiB per slot permanently and admits a slot only while prior bytes plus reservations fit under 4 GiB. 4,271,514,615 / 2,097,152 = 2,036.8, so at most 2,036 of the 70,013 STARTs the 84,005 ceiling allows can ever be reserved by this object. Section 125.6 states the limitation qualitatively and defers it to a durability adapter; the number is not stated anywhere and a reader could take 84,005 as the operative bound. | Arithmetic on the module's constants. | Record precision; the software is correct as specified. | None to code. Codex should state the 2,036-slot bound next to the 84,005 ceiling wherever the prospective plan is summarized. | This section. |
+| SI-CR18-005 | P2 | **Open, owner decision; deliberately not corrected** | sections 113-123 ranges (files last changed 2026-10-13 to 2026-10-24); none in `b648f60..730c59c` | twenty lane test files, listed in 126.5 | The complete Windows lane is red outside the reviewed range: the twenty-file rerun gives 227 failing cases. No file beyond those twenty failed or errored between the 81% point and the stop at 91.9%. Four causes, all host properties rather than logic: (a) protected-filesystem tests without the section-114 marker reach the POSIX-only runtime and receive the fixed refusal, or a refusal the test did not expect first (137 cases); (b) the lane pins its physical root to the owner's macOS worktree in eleven scripts and one research module and embeds `str(Path)` renderings inside hashed protocols, manifests and rebuilt reports, so on any other host the protocol digest, the current-code manifest, the designated-root check and a sibling import by pinned path all refuse (67 cases: 36 `prospective_capture_protocol_pending_or_changed`, 15 `exact_current_code_manifest_required`, 9 `designated_physical_root_required`, 4 `FileNotFoundError` on the pinned path, 2 `completed_report_rebuild`, 1 digest mismatch); (c) host privilege or limits: symlink creation privilege (3), a 65,537-byte fabricated body passed through an environment variable above the Windows 32,767-character limit (2), and `monkeypatch.setattr(os, "getuid", ...)` raising where the attribute is absent (4); (d) path-separator expectations in fabricated inventories (2); plus the twelve `AttributeError` cases of `SI-CR18-006`. Four of the twenty files use the portable seam; the seam asserts that no `skipif` marker is present, so the section-114 marker cannot be applied to those tests without changing the seam. | 126.3, 126.5; `failing20.log` on the reviewing host. | Correcting this means choosing between Windows parity (configurable root, path-neutral digests, seam extension) and a declared macOS-only operational runtime with a Windows lane that validates pure modules and seam contracts only; both are the owner's open `SI-CR17-002` decision, and every affected file lies outside the reviewed range. A reviewer must not pre-empt that decision with two hundred unilateral skips. | None. Recommended menu for the owner and Codex: (1) decide `SI-CR17-002`; (2) if macOS-only, apply the section-114 marker to the non-seam protected tests and give the seam a host-rendering-neutral path binding; (3) if parity, make the physical root a verified parameter and hash protocol paths as POSIX strings; (4) in every case keep collection on Windows clean (`SI-CR18-001`). | The figure is reproducible with the command in 126.5; the twenty-file rerun is deterministic across two runs. |
+| SI-CR18-006 | P3 | Open advisory for Codex | sections 113-120 files, outside the reviewed range | `scripts/capture_short_interest_native_anchor_cache.py:104` (`os.getuid()` inside the custody constructor before `_require_capture_platform`), `scripts/capture_short_interest_native_daily_operational.py:128` (`os.O_DIRECTORY` in a module that never calls the fixed platform refusal) | On a host without POSIX ownership semantics these two call sites raise `AttributeError` instead of the lane's fixed `protected_capture_platform_unavailable` refusal; six cases each. On the designated macOS host the attribute exists and the behaviour is unchanged, so this is a refusal-shape defect, not a safety defect. | twelve `AttributeError` entries in the twenty-file rerun. | The lane's contract (section 114) is that non-POSIX hosts receive one fixed refusal before any protected I/O; an `AttributeError` is a Python traceback, not a refusal. | None (outside the reviewed range). Codex should call `_require_capture_platform()` at the top of both paths. | N/A. |
+| SI-BUILD-20261025-015 | P2 | Open factual custody gate, owner remedy requested by Codex | `b838dd6`, `730c59c` | macOS protected storage | Unchanged. The kernel-immutable primitive did not observe its flag after a successful `fchflags` return, and the earlier creation probe saw a ctime change after sealing. I cannot reproduce or diagnose either from this host. One observation for the owner, offered as a hypothesis and not a finding: both files carried macOS document-ID tracking (`UF_TRACKED`) and a `com.apple.provenance` attribute, both set by macOS subsystems outside the lane's code; running the same primitive on a plain non-home, non-synced volume would separate a location effect from a code effect without spending a claim. | Sections 124.13, 124.15, 125.8, 125.10. | Owner decision; no lane code change can supply it. | None. | N/A. |
+| SI-CR17-002 / SI-CR-WIN-20261012-002 | P2 | Open owner decision | prior rounds | protected-capture runtime platform scope | Unchanged; the macOS session registered my section-112 findings under `SI-CR-WIN-20261012-001/-002` in section 114. | Sections 112, 114, 123. | Owner decision. | None. | N/A. |
+| SI-SRC-20260928-001, -002, -003; SI-BUILD-20261024-012; SI-CR15-001; SI-CR19-003; SI-CR5-005 / SI-CCR16-007 | P2-P3 | Open, unchanged | N/A | as recorded | Nothing in this range closes a source, transport, commitment, look or shared-history gate. | Sections 124.19, 125.10. | Retained. | None. | N/A. |
+
+### 126.5 Validation
+
+All runs are on this Windows lane worktree with CPython 3.13.14 / pytest
+9.1.1. No file was edited while a run was collecting it; the six mutation runs
+restored their module byte-exactly before the test edits began, and the lane
+run started only after the correction was complete.
+
+- 131-file Short Interest lane on the corrected tree `e92e8ab`,
+  launched as a detached process with the machine held awake, with the command
+  `python -m pytest -q -p no:cacheprovider -rs <the 131 tests/test_short_interest_*.py files>`,
+  and **stopped by owner direction before completion** ("nvm, push now
+  directly", 2026-10-26, after three hours and seven minutes): **4,477 of 4,870 tests executed (91.9%) in 11,212 s: 3,855 passed, 395 skipped, 217 failed, 10 errors; 393 tests in eleven files not executed**. No
+  complete lane figure exists for this tree; the unexecuted tail is listed
+  below and is owed by the next Windows round. The skipped cases are the
+  POSIX-only modules and markers of `SI-CR18-001` and the section-114
+  convention. Every executed failure and error is in `SI-CR18-005`; none is in
+  a file touched by `b648f60..730c59c` or by `e92e8ab`. No file beyond those twenty failed or errored between the 81% point and the stop at 91.9%.
+
+  Not executed (393 tests in eleven files, in lane order): the last 14 of
+  `test_short_interest_stock_normalization.py`, then `stock_percentile` (55),
+  `stock_population_binding` (29), `stock_score_order` (45),
+  `terminal_actions_offline` (16), `terminal_consideration` (48),
+  `terminal_disclosure_capture` (18), `terminal_disclosure_evidence` (87),
+  `terminal_original_evidence` (20), `terminal_original_offline` (18) and
+  `terminal_originals` (43). None of these files changed in the reviewed
+  range or in `e92e8ab`; their last complete Windows run is the
+  2026-10-12 lane of section 112.
+
+  Classification of the twenty-file rerun (217 failed, 10 errors; 227 cases):
+
+  | Cases | Cause observed on this host | Representative site |
+  |---|---|---|
+  | 135 | fixed refusal `protected_capture_platform_unavailable` reached by tests without the section-114 marker or the seam | `qualify_finra_short_interest.py:66` via nine capture and round test files |
+  | 2 | the fixed platform refusal pre-empts the refusal the test expects | `test_short_interest_class_reference.py:336` |
+  | 36 | `prospective_capture_protocol_pending_or_changed`: the protocol dictionary embeds `str(PRIOR_REFUSAL)`, a `Path` rendered with the host separator, so its digest is host-dependent | `capture_short_interest_native_population.py:134`, `:219` |
+  | 15 | `exact_current_code_manifest_required`: required code paths are built from the pinned macOS root | `capture_short_interest_native_daily_operational.py:66`, `:97` |
+  | 9 | `designated_physical_root_required`: `Path.cwd().resolve() == ROOT` with `ROOT` the pinned macOS worktree | `short_interest_qc_source_free_bundle.py:129` |
+  | 4 | `FileNotFoundError` importing a sibling test module by the pinned root rendered as `C:\Users\...` | `test_short_interest_native_identity_*`, `..._population_continuation`, `..._nominal_calendar_capture` |
+  | 2 | `completed_report_rebuild`: the rebuilt report serializes a rendered path | `continue_short_interest_native_population.py:511` |
+  | 1 | digest mismatch over host-rendered content | `test_short_interest_nominal_calendar_capture.py:176` |
+  | 6 | `AttributeError: os.getuid` before the fixed refusal (`SI-CR18-006`) | `capture_short_interest_native_anchor_cache.py:104` |
+  | 6 | `AttributeError: os.O_DIRECTORY` without the fixed refusal (`SI-CR18-006`) | `capture_short_interest_native_daily_operational.py:128` |
+  | 4 | `monkeypatch.setattr(keys.os, "getuid", ...)` raises where the attribute is absent | `test_short_interest_keychain.py:82`, `:92` |
+  | 3 | `OSError: WinError 1314`, symlink creation privilege | `pathlib` symlink in three protected tests |
+  | 2 | `ValueError`: a 65,537-byte fabricated body exceeds the Windows environment-variable limit (one case, setup and teardown) | `test_short_interest_provider_access.py:180` |
+  | 2 | fabricated inventory keys expect `/fabricated/...` where the host renders `\fabricated\...` | `test_short_interest_native_identity_capture.py:84` |
+
+  The pinned root `/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__short_interest`
+  appears in `scripts/audit_short_interest_provider_access.py`,
+  `capture_short_interest_native_daily_operational.py`,
+  `continue_short_interest_native_identity.py`,
+  `load_short_interest_native_identity_continuation.py`,
+  `read_short_interest_qc_engine_metadata.py`, `short_interest_lane_batch_guard.py`
+  (imported as `lane.ROOT` by fourteen scripts), `short_interest_qc_source_free_bundle.py`,
+  `research/short_interest_etf/native_daily_recovery.py` and
+  `tests/test_short_interest_native_daily_runtime_seams.py`; the owner's keychain
+  and credential paths are pinned in `short_interest_keychain.py` and
+  `capture_short_interest_native_market_inputs.py`. These are recorded lane
+  design choices (the designated worktree of the macOS sessions), not new
+  findings; their Windows consequence is.
+- Collection of the same 131 files: **4,870 tests, 0 errors** (11 errors
+  before the correction).
+- The thirteen touched files: **25 passed, 60 skipped, 0 failed**; the
+  registry test alone **11 passed**.
+- Guard-removal mutations: MA **1 failed**, MB **35 passed**, MC **1 failed**,
+  MD **2 failed**, ME **1 failed**, MF **70 passed**, each restored.
+- Lane-scoped compileall over `research/short_interest_etf`, `scripts` and
+  `tests`: exit **0**. `git diff --check`: clean before and after this record.
+- Active-document consistency: **69 passed** before this record and
+  **69 passed in 4.09s** after it.
+- No complete-repository suite was run, per the dedicated-lane direction.
+
+This review accessed only tracked files. No credential, network, provider,
+mailbox, protected artifact, licensed row, price, outcome, holdout,
+QuantConnect, broker, operator database, scheduler, deployment, paper/live,
+order or trading surface was touched. **Canonical actual looks 0/0.
+Exploratory actual looks 0. Allocated alpha 0. QC attempts 0.**
+
+### 126.6 Quality, scope and limits
+
+**Codex's software this round: 8/10.** The ledger, budget, transport,
+diagnostics and custody primitives are exact, closed and defensively typed,
+and every arithmetic claim recomputes. Points withheld for breaking the
+lane's own Windows convention in eight of fourteen commits and for a
+production change that silently disabled a test module in the preceding
+range. **Sections 124-125 records: 8.5/10.** Precise, verbatim on authority,
+honest about every negative; withheld for the unquantified reservation bound
+(`SI-CR18-004`) and for carrying two days of pushes with a module nobody
+could collect. **This round's own quality: 8/10.** The full Windows lane was
+restored, run to 91% before the owner stopped it, and fully classified, and the two suite defects
+in the range were found and fixed, but the actual Darwin invocations that
+dominate these sections could only be read, and the lane remains red on this
+host pending the owner's decision.
+
+Limits: everything reviewed is documentation and software behaviour on
+fabricated fixtures and says nothing about source fitness, coverage or the
+strategy's merit. The custody failures are real, unexplained and only
+observable on the macOS host; this review neither explains nor narrows them.
+
+### 126.7 Remaining gates and next authorized step
+
+1. Codex counter-reviews `e92e8ab` and this record commit, and considers
+   the lazy-import advisory in `SI-CR18-001`.
+2. **Owner decisions:** the protected-storage custody remedy Codex requested
+   in 125.10 (`SI-BUILD-20261025-015`), and whether protected-capture
+   runtimes need Windows parity (`SI-CR17-002` / `SI-CR-WIN-20261012-002`),
+   which `SI-CR18-005` shows now also covers the physical-root pin and
+   determines what the Windows lane can validate at all.
+3. No source is admitted; `SI-SRC-20260928-001..003`, `SI-BUILD-20261024-012`
+   and all spent claims and charges stand. The 84,005-START / 4 GiB
+   allowance is prospective and, under permanent full-page reservation,
+   admits at most 2,036 slots (`SI-CR18-004`).
+4. QC/Safari access is resource-released per 125.10 but remains behind the
+   custody, input and licensing gates; no backtest is authorized by this
+   review. Holdout, production rankings and seeds, ETF, purchases, broker,
+   operator database, deployment, paper/live, capital and real orders remain
+   closed.
+5. The complete 131-file lane figure on `e92e8ab` is owed: the owner
+   stopped this round's run at 91% to push. The next Windows round runs it
+   first, before any new review work.
+6. Per the standing rule in section 81.1 and the owner's "push now directly",
+   this round ends with one push of `e92e8ab` and this record commit.
+
+## 127. Codex lane synchronization and counter-review — 2026-10-26
+
+### 127.1 Exact scope, preserved concurrent histories and drafts
+
+The owner now directs: "sync the lane, and counter review claude's changes".
+Pause the unfinished isolated-storage implementation for this bounded review;
+do not run a new image, mount, custody probe, provider claim or source request.
+The preceding direct instruction to stop at the last LOCAL step before QC
+setup remains binding: QC/Safari are occupied, including metadata/capacity,
+and Mia is not accessed. The historical resource release quoted in Claude's
+126.7 does NOT supersede that later owner pause. No automation is created,
+rearmed or changed. The review-required exception remains in place; this
+requested counter-review does not claim that Claude reviewed later local work.
+
+Verified designated-root/branch starting HEAD is
+`3b0e854472a0db5592e4e350695da5798c9ccbfa`, one local committed diagnostic
+after published `730c59cfec31b33a83fa09e065208eb3c26d345b`. Matching actual
+origin is now `20c49ac0fad5eddba251478406dd7af5a04093f0`. Fetch only that
+matching lane ref, then integrate by a normal merge preserving BOTH histories;
+no alternate checkout, branch, rebase, reset, history rewrite or force push.
+One initial read-only check after a tool-state refresh lacked its saved guard
+and used the chat's default checkout. No mutation occurred there, none of
+that output is review evidence, and the check was immediately repeated with
+literal absolute root/branch/HEAD guards in the designated lane. Subsequent
+repository operations use those explicit guards rather than a saved default.
+
+Both sides independently appended section126. Preserve both complete blocks
+byte-for-byte rather than renumbering or rewriting their historical evidence:
+**Codex126** means "Owner-resumed offline custody repair and last-pre-QC build"
+from3B0; **Claude126** means "Claude independent review — 2026-10-26 UTC" from
+20C. This section127 is the current reconciliation and handoff. Exact block
+recipe is UTF-8 from each full heading through the next section126/127 heading,
+strip trailing whitespace and append one LF. Local block SHA256
+`c50de43584f63787ddaaf40ebb2086ac6e2485a0c9b6e7863cf890db39091b80`;
+Claude block SHA256
+`ca65d99691e8bf621558c2b3bb77dc1f19520efce99c636b15e49cbbae95425f`.
+Earlier ledger rows and both agents' historical validation attributions remain.
+
+Three unfinished, unvalidated local code drafts were moved recoverably to
+the ignored private directory
+`artifacts/short_interest/private/local_drafts/offline-custody-before-claude-sync-20261026-v1`.
+No draft is admitted to production or Git. Each exact original byte hash was
+verified before/after the move; directory0700/files0600, no deletion:
+
+| Draft basename | SHA256 |
+|---|---|
+| diagnose_short_interest_isolated_immutable_metadata.py | 4bd3b1d72f2af32243801010f43558f0a5ff2ae68ec525b08980ae849a160b9d |
+| short_interest_isolated_custody_volume.py | 39536d37c739a22ec72e9c61efc427e87389e2f0671f3529e3b7cab6945fa890 |
+| test_short_interest_isolated_custody_volume.py | b656068151c36dc08e68746d1968eb5972c8be8950f84320d299369a1f8012c0 |
+
+They remain available for later offline development, not an instruction to
+execute their partial policy. No disk image or mount was created.
+
+### 127.2 Exact Claude commit dispositions and append-only errata
+
+| Exact commit | Exact parent | Codex disposition |
+|---|---|---|
+| e92e8ab7876e17c039950be26a033309b6ac727f | 730c59cfec31b33a83fa09e065208eb3c26d345b | **Accepted.** Read all thirteen test-file diffs and their production contexts. POSIX import guards run before protected imports, and do not skip on this Mac. Monthly per-function markers preserve the portable parser/early-refusal cases. The serial control removes only the typed-parallel registry and lineage and retains recovery registry/type/lineage; no production custody check changes. |
+| 20c49ac0fad5eddba251478406dd7af5a04093f0 | e92e8ab7876e17c039950be26a033309b6ac727f | **Accepted after appended factual correction/qualification below.** Read the complete record diff and Claude126. Execution counts/mutations are Claude-attributed Windows evidence, not Main reruns or macOS operational proof. Windows run remains owner-cancelled at91.9%, not a complete green lane. |
+
+| ID | Priority/status | Evidence and disposition |
+|---|---|---|
+| SI-CCR-20261026-001 | P3, factual correction appended | Claude126's SI-CR18-006 incorrectly says the cache HeldFiles constructor reaches os.getuid before the platform preflight. Exact reviewed730C and merged source already call _require_capture_platform as the FIRST constructor operation. Its fabricated fixture in test_short_interest_native_anchor_cache_capture.py replaces that guard with lambda:None; bypassing the guard does not establish its absence in production. New fabricated missing-UID/missing-no-follow/non-POSIX regressions use the ORIGINAL guard and require the fixed refusal before any boundary or path/open call. The separate daily HeldPinnedFile path really lacks this preflight; retain that narrower advisory, without asserting that the cache needs a duplicate call or attributing all Windows errors without the original logs. |
+| SI-CCR-20261026-002 | P3, qualification appended | The blanket "none is a logic defect" in Claude126 is too broad: even its own SI-CR18-006 describes a real daily refusal-shape defect. Accept the reviewed test corrections and host-limited observations, not proof that every unexecuted or classified case is free of software defects. The 393 unexecuted tests remain unexecuted; no complete-lane result is fabricated here. |
+| SI-CCR-20261026-003 | P3, authority qualification appended | As already stated in113.2, routine fail-closed lane design is delegated; Windows parity is an unresolved factual/platform scope issue, not a generic new permission gate blocking designated-Mac offline repair. Do not weaken the physical-root/protocol/custody pins to make a Windows suite green. The later owner custody-repair instruction already authorizes bounded offline work; it supplies neither reliable storage nor Windows ACL parity. Latest QC/Safari pause overrides Claude126's historical resource-release wording. |
+| SI-CR18-001 / SI-CR18-002 | P2 corrections accepted | Test-only collection/marker and stale registry-control corrections retained; no assertion, source gate or protection is removed. Lazy imports remain a separate advisory; this review does not expand platform scope or change production runtime bytes. |
+| SI-CR18-003 / SI-CR18-004 | P3 observations accepted | Keep all redundant defence-in-depth guards. Recomputed:13,992+67,885+133*16=84,005;133chunks=132*512+301;4GiB-23,452,681=4,271,514,615bytes; floor(residual/2MiB)=2,036 slots under permanent full-page reservation. Thus84,005 is an upper START allowance, not proof that the existing coordinator can retrieve all missing positions. A separately authenticated body/receipt durability adapter is still required. |
+| SI-CR18-005 / remaining SI-CR18-006 daily advisory | Open, narrowed as above | No Windows execution or full-suite rerun here. Preserve host/root-rendering/custody limitations, genuine daily refusal-shape advisory and all earlier source/custody P2s. No new safety P0/P1/P2 is verified in Claude's test-only diff. |
+
+An internal development peer independently inspected e92's complete test-only
+change and found no verified defect. That read-only assessment ran no tests
+and is not Claude review or Main validation. Main independently inspected the
+changed files, original guard, fixture bypass and both current source paths.
+
+### 127.3 Actual local V3 diagnostic supplement; no historical repair
+
+The already completed local V3 execution1227 at exact3B0 is terminal exit2,
+not active and never reinvoked. The safe original-transition observer recorded
+ONE native call returning0, no errno, initial FD/name flags64/64, immediate
+66/66, then guarded samples66/66 and64/64 on the SAME original inode.
+Ownership,0600 mode, single link,186byte size and mtime predicates remained
+true; the retained FD remained readonly. First controlled refusal is
+immutable_guard_callback / immutable_flags_changed. Observer complete=true,
+no observer error; diagnostic SHA256
+`72601b2b7f5e384e12da01921e7b138112147b6c359570a94f78528229ba8cee`.
+All eight denied external seams remained0;647 permitted lane-Git metadata
+calls are not provider requests. No successful custody closure exists.
+
+This narrows the NEW invocation's temporal evidence: the native operation did
+establish the bit and it was later lost. It does NOT identify an actor or the
+cause of any earlier refusal. No filesystem/cloud/watcher/provider/Keychain
+attribution, second setter, rebaseline or adoption is authorized by that
+observation. Existing data, spent claims, negative markers and all START/byte
+debits remain unchanged. The proposed isolated-volume mitigation remains an
+unexecuted hypothesis; tiny synthetic success would not itself qualify2MiB
+bodies, receipts, durable source recovery or actual inputs.
+
+### 127.4 Validation, exclusions and next authorized action
+
+Main's merged-tree focused selection: all thirteen Claude-touched files,
+local transition diagnostics, pure recovery budget, import boundary, current
+record and three named active-document checks: **571passed/65.12s**, no
+skips/warnings, empty inherited environment and OS network denied. This is
+NOT the complete lane/repository suite or a Windows run. No actual source
+replay, probe, provider/key/HTTP/claim, purchase, outcome or QC action occurs
+in this synchronization. New counter-review regressions and final checks
+follow below before the merge is committed and published.
+
+The new record/early-refusal regression plus the existing record and three
+selected active-document checks passed **29/.46s**, no skips/warnings.
+Main's memory-only removal of the original cache constructor guard produced
+**3 expected failures/.07s**, each reaching the fabricated forbidden path
+seam instead of the required fixed refusal. The process exited; production
+source bytes were never edited. A fresh restored-process check follows.
+The read-only development peer independently verified the exact730C guard,
+fixture bypass, narrow daily advisory and new regression seams; it ran no
+tests and supplied no implementation change. Neither Windows parity nor a
+missing production cache guard is inferred from the old fixture failures.
+
+Fresh restored-process final selection: **29passed/1.41s**, no skips/warnings,
+network denied. In-memory compilation/AST parsing of all thirteen incoming
+test files, the new counter-review regression, and the three relevant local
+transition/driver files passed17files; no bytecode written. Staged/working
+whitespace passed. Both complete126-block digest regressions passed, and
+production scripts/research/data/ml have no uncommitted difference from3B0.
+Only the review record and new regression are authored after merge; Claude's
+thirteen test changes and the previously committed local diagnostic are
+preserved. Main UTC publication-ledger date is2026-10-27, corresponding to
+the owner's2026-10-26 Pacific session. No validation or actual process remains
+running before the final commit.
+
+Finish this bounded synchronization/counter-review with one matching-lane
+nonforce push, preserving3B0 and both Claude commits. Immediately before
+commit and push, verify exact roots, branch, HEAD/status and actual matching
+origin20C; stop on advancement. No pinned actual operation remains. Verify
+clean local/tracking/actual equality afterward. No shared document or other
+lane changes. Next build action is offline custody repair from retained
+drafts after validating/fixing their partial policy; source recovery remains
+held until real custody and maximum-size body/receipt closure. Do not access
+QC/Safari/Mia or start setup, upload, compile or backtest. Local readiness
+remains false; canonical looks0/0, exploratory0, alpha0, permanent IDsnone,
+QC launch attempts0. No review, fixture or merge changes those gates.

@@ -63809,3 +63809,175 @@ run/attempt/result freeze must genuinely pass before QC. No provider,
 capacity, job, source upload or strategy run is authorized by AB.
 Booked336/259/52/699, all formal/PIT/master/readiness/paper/live flags false.
 No push yet this round.
+
+### 326.11 Actual AB passed once: all 79 refusals matter to the frozen study
+
+At clean freeze845fdce655907c44db6c362e41f5a932b4720d76, the sole AB producer
+dispatched2026-10-27T07:59:49.683480Z and completion was observed07:59:58.591543Z,
+actual exit0. Separate native validator dispatched07:59:58.591771Z and
+completed08:00:01.845652Z, actual exit0. Both had no bound condition, stderr0,
+and identical10216byte stdout SHA
+3973bb3f3dca6d6e65822baa541ac22b88786816fdc7055d8ed55388e220fb03.
+Report10086bytes SHA43e5bacc260537a04ec70a764663e9b66fe90d8e8c69c5eceaa623ee61d1ad21.
+These are external process dispatch/completion brackets, not provider times.
+Private evidence17512446bytes SHA
+122a70ab313b539bc7e3e160c8f344aabf5e812bfa7d08121fea3f122dda88bc;
+private membership demand4760647bytes SHA
+1196778dd1d217c707f5ae0ff3dcd72bcba9b23919e9ffab242ac3226a705201.
+Producer, direct helpers, source guard, observer, validator and AB control
+are SPENT. No report/control reread, edits/tests during actual use, provider,
+credential, QC/capacity call, job, look or result cell. No push yet.
+
+ALL6151 original bindings and8 funds remain represented. Genuine membership
+stream6151rows SHA6da39a900784aea5f0be81a9a329b28a1399d8dc5d95ec60b3951f55e31f40cd
+and302 exact weekly decisions2021-01-04..2026-10-12 were authenticated in the
+fixed October package. Decision-array SHA
+57dc85dd30969ccf16023520657b077c2f5dc2a485cb69f3195f0ebc255ff05b.
+Both six/eight cohorts and all AR arms have the SAME conservative5641
+potential stock identities;510 are never-potential only conditional on the
+frozen empty-initial-holdings requirement. That requirement is not actual QC
+initial/terminal holdings evidence. All79 refused rows are potential; all508
+outside-original-window rows and2 previously routed rows are never-potential.
+No refusal may be omitted using absent prices, callbacks, caps or ETF guesses.
+Potential prior-price starts range2020-12-31..2025-12-26; holding-price end is
+2026-10-13 for every potential identity, never membership/binding expiry.
+
+Finite components establish the following observed predicate failures;
+counts overlap and are not independent economic causes:
+
+| Prior refusal | Count | Observed component |
+| --- | ---: | --- |
+| original_identity | 5 | Only original reporting-currency USD test failed |
+| current_identity_changed | 47 | 26 ticker changes,22 MIC changes,one overlap |
+| current_shape | 10 | 9 unsupported current venue/MIC,1 category |
+| current_interval | 12 | Current last-price metadata precedes old required geometry |
+| current_identity_missing | 4 | Same permaticker but no original/current FIGI intersection |
+| current_collision | 1 | Local candidate collision; complete global index cause not inferred |
+
+Across all categories there are2 unsupported categories,31 MIC changes,
+9 unsupported exchanges,13 short current metadata intervals,4 same-perma-only
+rows,1 same-ticker-only row,1 local collision and1 unknown global collision
+cause. No particular corporate action or acceptable FIGI replacement follows
+from these observations. All original identities/evidence stay unchanged.
+
+Primary documentation checked for the new policy:
+https://sharadar.com/prices distinguishes SF1 functional reporting currency
+from stocks/funds EOD price currency. It defines closeunadj as unadjusted
+USD/share close; adjusted OHLC is not a substitute for RAW marks.
+https://sharadar.com/docs/faqs describes stable security/share-class
+permatickers, current-ticker history rewiring, and distinct share classes.
+Current ticker, venue, category and first/last-price metadata do not rewrite
+historical QC identities, original common-stock eligibility or holding life.
+Thus the5 original non-USD reporting currencies expose a confirmed P2
+I326-003 role-confusion bug; USD EOD prices remain mandatory. Other display/
+date predicate differences may be corrected ONLY under unchanged permanent
+identity, composite FIGI, complete original CUSIP vocabulary and full-catalog
+collision proof. The4 FIGI disagreements and1 collision remain hard stops.
+
+New metadata-only arv2_r298_ab_source_binding.py10736bytes SHA
+817ea451899e61da3f3ee911cd5f8a11bb3dc6463dc1dfacebb5f71bd7ede1dd
+was generated from retained validated stdout, never an artifact reread.
+Canonical NO-LF observed-fact SHA7a8380f17b2ba65682061ebaf599a966cbb22326a1f5fda4c5949b8cec71dfb3,
+evidence-summary SHAca0d661b11597bbc9a41383eb3fc0f5cf501d888866a0f8efe8776d55c04c1c0,
+demand-summary SHA71043f8d0d0a71e307507e1479675d55ce1bbf25199e650ad8279099854171f0.
+Actual exits are recorded facts, not new authority, source truth or readiness.
+All master/PIT/formal/paper/live flags false;336/259/52/699 unchanged.
+
+### 326.12 Prospective AC: corrected price-field roles, unchanged identities
+
+New PURE scripts/arv2_r298_price_lineage_routes.py SHA
+5a7a289a9f09cc30dc2155a00d23726cb8238d75993cb6d7c40049862e977d5a;
+tests85af60b4ea8453b1c32880acb470a167818bca1a5c26c326fc6c04524a5a0977;
+canonical policy a820043ee7ec3a42196f012ac20f44af35e54136733f0a93e0a23167bf08dcec.
+It retains every original constructor/evidence/raw-date predicate except the
+misapplied SF1 reporting-currency USD test. Original strategy eligibility,
+QC security IDs and historical venue assertions are not edited. EOD table
+and USD currency remain mandatory. Current unique permaticker AND identical
+composite FIGI, all original CUSIPs, both-table full catalog collision and
+poison-token checks remain mandatory. Display/category/venue/metadata dates
+are observations, never eligibility changes, holding bounds or price proof.
+Queries for every potential identity cover the FULL frozen2020-12-31..
+2026-10-13 window. All6151 rows remain; never-potential rows are conditional,
+and unknown actual holdings must still stop a future runtime. FIGI disagreement
+or global collision refuses. No inferred aliases, row drop or price fallback.
+
+New technical scripts/arv2_r298_fixed_data_guard.py12253bytes SHA
+00de1fbde9ae1925d1231dc863cd4a5bb00974bb596f6368187059452cfae145;
+tests15672bytes SHAd78ba6f1eaed0db320d1004a69cb8c8e902510c50337cbf3ba1edb21126ca427.
+It holds every no-follow directory/leaf descriptor, full ten-field held/named
+metadata and ordinary native ACL/xattrs, authenticates fixed bytes before
+parsing, and requires normal return before consumer publication. This generic
+technical helper grants no protocol/attempt/source authority. A mutable-plan
+defect in unused draft19b7b5c5 was reproduced:1expected failure0.06s. The
+initial canonical plan fingerprint is now checked before every budgeted stage,
+chunk, verify and receipt. The brief first-fix1pass0.06s and prior72passes
+overlap final75passes0.26s/nativeprocess0.51s. Real native ABI baseline passed;
+additional ACL/xattr refusals use scoped synthetic doubles. Same-round advice
+is not independent Claude acceptance. P2 I326-004 corrected before any use.
+
+New scripts/prepare_arv2_r298_price_lineage.py32067bytes SHA
+2b6de35e7115010573ba40221a85a29174db8004ff35faea5932799b963618d3;
+tests25284bytes SHAdfed804b3ff0af64448d7c316b3f48e04f1322303b26d60c40a87b9eca471ce7.
+Canonical LF profile30509bytes SHA
+50a927fc2ce78c79728594a28837c6b8de5d2b152366427e9fba269326a5562b.
+175 literal source pins =171 AB pins plus AB caller7d6d, public binding817e,
+price helper5a7a and technical guard00de. No replacement or auto-refresh.
+Exact four-file guard profile SHA
+d034027c8771a55693af64d5d7a84ea7a284d67cb702a0e0d255f12b8cf94902.
+
+Owner326.1 and latest direct instruction authorize this prospective recovery
+without Claude review. At the clean commit containing THIS freeze, the sole
+permitted host is designated Mac root/branch, Darwin/POSIX3.13 and
+/Users/sheltonchen/.venvs/trading_agent-py313/bin/python, with exact clean
+run HEAD and caller SHA arguments. Fixed NEW control, not inspected/allocated:
+artifacts/analyst_revisions_v2/newrule_price_lineage/R326-20261027-AC.
+Claim/fsync and persistent source-start precede ALL private source reads;
+analysis-start precedes ONE direct preparation. Partial/unknown/failed claim
+is consumed or ambiguous/spent even without a read. No renamed retry.
+
+Only these four fixed DATA leaves may be freshly read once under this scope:
+AA routes-private.json19895631bytes/3776f03b, AB membership-demand-private.json
+4760647bytes/1196778d, and retained Z stocks-metadata.csv2340169bytes/354f578d
+and funds-metadata.csv904679bytes/a85d60f8. Full pins are in326.8/326.9/326.11
+and literal caller FILE_PLAN. No AA/AB/Z claim/report/control/status or old
+reader, original TICKERS, package/lineage census, provider or credential read.
+All four descriptors remain held through preparation, private validation,
+receipt equality and NORMAL guard return before publication of only the
+bound price-lineage-private.json. Public observations remain finite metadata.
+
+One native producer600s/direct450s/observer630s/separate stdin-validator20s;
+no nested sandbox or private IPC/inner child. Producer policy SHA
+71bb8f7d832171e84291d384f60a0d6e2ae143fc81b2c91376f87c7f810534dc,
+validator79d7e961f0ab250fd95784609a254c2628244cbd0143b0aa3ea1d2f514858a4c.
+All network/Keychains/securityCLI denied. Artifact reads restricted to exact
+four DATA leaves, necessary ancestor directory opens and own AC outputs;
+writes only new AC/cache/null. Validator denies all artifacts. Not whole
+interpreter/global read allowlist or arbitrary same-user protection. Deadlines
+retain host-suspension/uninterruptible-I/O qualification; kill/reap own child
+only. Source aggregate<=32MiB, private<=32MiB, public<=128KiB, <=12 ownfiles.
+Actual producer0 PLUS separate native validator0 and matching closed envelope/
+report pin are required. Partial publication may survive a failed exit;
+report alone never establishes success. No extra operational reader.
+
+Author47price-helperpasses3.35s (earlier47/3.50 overlap),75guardpasses and
+69callerpasses17.21s. Earlier67/68caller runs overlap. Six finally-restored
+caller omissions each caught1expected failure: all-four-source-pins0.48s,
+early private hash0.31s, canonical prior-AB fact0.14s, actualexit0.50s,
+committed blob0.05s, postprepare logging0.41s. No source/private read or
+operational allocation in validation.
+Root same-round audit confirmed P3 I326-005: the known local alarm Deadline
+exception was safely spent/exit2 but incorrectly labeled unknown_exception.
+Regression reproduced1expected failure2.98s against unused caller1a034826;
+exact-type mapping now preserves deadline while foreign subclasses remain
+unknown. No operational use occurred before correction. RootFINAL283
+distinct passes17.65s =47pricehelper+75guard+70caller+4publicABbinding+
+86record/doc+1researchclosure; no failures/skips/warnings. Earlier282passes
+17.87s overlap. Eight changed sources/tests compiled in memory with exact EOF,
+all175 literalpins matched, dispatch_fence absent. ABbindingtests SHA
+b0642d0ec79ebc44dd05ebbf9cb3aec56b8e3e76d135b03151b550c6dd6f2f47.
+Root initially added an extra LF when independently hashing the already-LF
+canonical profile; that unused calculation was corrected to the exact30509
+byte profile above, not used as a source/protocol pin. No actual source read.
+Next is only this offline diagnosis; no price acquisition, QC capacity/job,
+upload, strategy launch, original identity rewrite or acceptance from success.
+ARV2E323-001 complete reference/NAV coverage remains OPEN. No push yet.

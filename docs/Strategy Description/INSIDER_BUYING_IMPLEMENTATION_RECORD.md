@@ -38856,3 +38856,177 @@ the cumulative implementation diff is exactly the three declared paths and
 only this handoff record is dirty. Diff whitespace check is clean. No later
 test run, actual-source qualification, data access or readiness is invented
 by the publication bookkeeping below.
+
+## 335. Existing-subscription evidence resolution — preregistration (2026-10-27)
+
+The owner explicitly directs: resolve missing historical availability and SEC
+parent/PIT evidence using existing subscriptions, NO QC access, document and
+push once when done. This authorizes the bounded actual qualifications below;
+334's no-data-access description remains true for its completed earlier round,
+not a prohibition on this new task. Starting clean local/origin is
+`06870130764c17239ef1d786b3c30b67092408c9`; matching-only fetch has no incoming
+commits. No Claude wait is reinstated, no source window/economics is changed,
+and no repeated consumed or ambiguous request is authorized. No new purchase,
+QC/Safari/API/SDK/job, outcome, backtest, broker/deployment/trading action.
+
+### 335.1 Public documentation and decisions before actual access
+
+Use official provider documentation to qualify the existing sources, keeping
+access, sample coverage and historical authenticity distinct:
+
+- [Sharadar Insiders/SF2](https://sharadar.com/docs/insiders) provides
+  daily refreshed filing-date records, with published product history from
+  January2008. Its documented dates and normalized/restated rows do not
+  provide exact historical accession/body-version first-seen evidence. The
+  account's known five-year horizon is not promoted to full product history.
+- [Massive EDGAR Index](https://massive.com/docs/rest/stocks/filings/index)
+  and [Form4](https://massive.com/docs/rest/stocks/filings/form-4) currently
+  document daily beta access on Stocks plans. They offer filing dates,
+  accessions/CIKs and SEC links/structured corroboration, not original full
+  submission bytes or historical public-first-seen/version timestamps. These
+  are distinct from the possibly expired Benzinga Earnings expansion.
+- [Massive dated reference](https://massive.com/docs/rest/stocks/tickers/all-tickers)
+  is a useful identity candidate. Prefer reference-only All Tickers to
+  [Overview](https://massive.com/docs/rest/stocks/tickers/ticker-overview):
+  Overview explicitly dates some SEC-derived attributes by reporting period,
+  potentially including filings published later. A date query therefore
+  cannot establish historical financial knowledge or filing availability.
+- [EODHD Form4](https://eodhd.com/financial-apis/insider-transactions-api)
+  documents a newer accession-based interface, but its filed-at date is not
+  an intraday first-seen timestamp. [EOD pricing](https://eodhd.com/financial-apis/api-for-historical-data-and-volumes)
+  distinguishes raw OHLC, adjusted close and split-adjusted volume: raw
+  price times supplied volume is not automatically actual-dollar liquidity
+  across splits. [Rename history](https://eodhd.com/financial-apis/us-stock-symbol-rename-history-api)
+  starts2022-07-22 and has a separately documented plan requirement, so it
+  cannot alone reconstruct the2020–2021 identity chain.
+- [FMP insider documentation](https://site.financialmodelingprep.com/developer/docs/stable/search-insider-trades)
+  does not document the required Form4 first-seen/body-version archive.
+  Financial-statement ingestion dates cannot be borrowed as insider
+  timestamps. [FMP terms](https://site.financialmodelingprep.com/terms-of-service)
+  also make local copying/retention account/order-form dependent; another
+  lane's use is not contractual rights evidence. No FMP licensed-row request
+  or retention is justified by inventing that missing permission.
+- [Benzinga News](https://massive.com/docs/rest/partners/benzinga/news)
+  timestamps articles rather than every underlying filing/version. Current
+  edited articles and sparse coverage cannot establish complete filing
+  knowability. Do not fetch broad historical news/outcome text as a substitute.
+
+**IBDEC-335-01:** qualify the fresh reference and filing-discovery interfaces
+with one fixed issuer/warmup-quarter sample each before any broader acquisition. No
+arbitrary publication lag, article-clock substitution or first-seen claim is
+adopted. **IBDEC-335-02:** activate the still-pending retained NC/source17
+question under the corrected current assembly, without another SEC request.
+Existing Sharadar/EODHD retained evidence remains reusable; no SF1 repurchase,
+old probe repeat, broad provider inventory or inert collector is substituted
+for a real evidence qualification.
+
+### 335.2 Exact actual scope A — retained NC/source17 observation
+
+Use the unchanged
+`insider_buying_sec_feed_nc_source_binding_observe_v1.preflight_actual`,
+then `observe_actual`, on a clean, committed exact source assembly. Its audit
+ID remains the previously UNUSED
+`ib-sec-feed-prefix-nc-source17-offline-v1-20261025-once`; this is activation
+of the distinct325 lexical/source question, not a retry of completed318
+structure or any HTTP request. One standalone metadata health check precedes
+one actual observation; the actual method also rechecks its own preflight.
+
+The source is the already retained307 65,536-byte prefix, original producer
+and immutable receipts, full25 source17 rederivation/82 opaque ZIP hashes and
+exact20,044 consumed controls. Current route/binder/observer pins must match;
+328's older assembly is not reused as proof of current bytes. The native
+worker denies network, fork, all file writes and security exec BEFORE bodies;
+900s/2MiB IPC/64payload/1MiB each/4MiB collected caps and the real baseline-
+relative VM/sampled-RSS policy remain unchanged. This is not hard RSS.
+
+Permit at most one own connected Gmail-profile read solely to obtain the
+already approved private SEC screening contact. Deliver only through protected
+anonymous stdin; no contact argument, environment, file, receipt, fingerprint
+or printed profile. No guessed local contact file is read. The trusted parent
+may atomically claim a fresh ignored0700 metadata-receipt directory
+`artifacts/insider_buying/evidence_resolution_20261027_v1` and publish0600
+bounded metadata health/terminal/witness receipts there. This separate parent
+bookkeeping is NOT an observer file write; no raw NC/source rows/body or
+private values/value hashes may be exported. Claim before activation and
+preserve failure/partial state without rerunning or overwriting it.
+
+Expected output is finite lexical join counts/refusals, not admitted originals,
+acceptance, XML/issuer/owner identity, complete-carrier verification, public
+availability or canonical readiness. Do not manufacture a SEC-DOCUMENT wrapper
+around an NC claim to pass the frozen complete-submission parser. No consumed
+root is rewritten or relabelled as success.
+
+### 335.3 Exact actual scope B — fresh Massive capability samples
+
+The additive `insider_buying_pilot_massive_evidence_probe_v2` has a fresh
+private claimed namespace and exact fixed profiles, in this order:
+
+1. All Tickers: AAPL, stocks/active, date2021-01-04, ticker ascending, limit1.
+2. EDGAR Index: CIK0000320193, form4, filing_date2020-10-01 through2020-12-31, limit1,
+   filing_date ascending.
+3. Structured Form4: issuer_cik0000320193, same form/date-window/limit/sort.
+
+**IBDEC-335-03, before any actual request:** use the full already-required
+2020Q4 warmup quarter, earliest returned row/limit1, rather than an arbitrary
+single day not yet known to contain an Apple filing. This avoids presenting
+an empty arbitrary day as a history-entitlement result. It does not expand
+the frozen study window or infer that index/transaction-row ordering yields
+the same accession. Preserve actual returned dates and any underfill.
+
+One configured Massive Keychain read, maximum three requests, each attempted
+at most once;15s per-request deadline and256KiB body/control caps. Durable
+reservation/key/start records precede access. No redirect, retry, pagination,
+SEC-link following, alias or fallback. Stop after the first refusal, invalid
+schema or underfill and record every unattempted profile. A valid cursor is
+recorded as an unfollowed page, never completeness. This does not repeat the
+consumed A/2020-01-02 reference or a Benzinga/SEC request.
+
+Strict finite schema and literal/encoded credential screening precede success
+body hashing/retention; unknown/outcome fields refuse. Error or unqualified
+bodies are neither retained nor hashed. Form4 numeric lexemes stay opaque;
+project only identity/date/field-presence metadata, not financial values or
+outcome statistics. Validated licensed raw responses, if any, stay private
+and ignored. Every source/PIT/public-known-by/body-version/full-population/
+rights/QC/look/backtest flag remains FALSE. HTTP success is not blanket plan
+entitlement or historical-data authenticity.
+
+### 335.4 Validation and publication boundary
+
+Qualify new code and the current observer under effective native process-tree
+network/security-exec denial and freshTMP-only writes before actual access.
+Use focused tests, meaningful guard reversals, compilation, active-document/
+record/import-boundary and EXACT Insider package guard, not a complete suite.
+Commit a clean preregistered source assembly before either actual operation;
+record its exact already-existing execution hash and observed/attributed
+results afterward. Preserve all twelve openP2s and earlier resolved scopes
+until their actual evidence is sufficient. Accumulate all commits and a
+separate exact-hash final handoff for ONE successful final lane push. No
+intermediate push, other worktree/branch, shared-record change, monitor rearm
+or other-chat message.
+
+Preactivation qualification for335 (actual operations still UNEXECUTED):
+main405 focused GREEN8.07s on final quarter-sample source
+`018c47631bcecabd9eebe33da6a256be7d1e408808f8da876a0c4e3a61924d90`
+and test
+`0c36658c1aa6bdd069691f62772e178f7ece657d08ab421683d2a7d920323912`.
+Independent read-only peer94 GREEN0.63s on the same two hashes. Earlier
+fixed-day candidate397 GREEN7.91s, agent157 GREEN0.80s and peer86 GREEN0.57s
+are not relabelled as final quarter-sample validations. Four main whole-
+function guard reversals catch privacy12RED, journal3RED, stop8RED/4GREEN
+and non200-read5RED; restored full preceding86 GREEN1.22s. The initial
+privacy reversal copied globals and proved failure only; a faithful live-
+module-globals repeat catches all12 at the intended pre-hash tripwire0.41s.
+No physical product source is changed by these in-memory reversals.
+
+Main142-image all-write/network/fork/security-exec-denied compile/current-pin
+proof with real291 memory guard precedes the quarter refinement: inventory
+`67eaa94bd6e470432392a33ee739d5e0eadc05d098ff1265cdf9b04f543a3b45`,
+378,955,209ns; not actual-source qualification. Final two images compile
+under the same four native denials. Separately attributed current observer
+240 focused GREEN7.45s; all34 current pins match inventory
+`0e9bcd61ad6f8ccfef6453a6a7fde10322542e75a9d24103d1bc3a8cb67273d1`,
+24binder/25route finite-code controls pass, registration
+`28c564d5be5a0ae5de4be8e2273fa11d3ce706c1b6c751cde234970c81352fb6`.
+All tests deny process-tree network/security exec and restrict writes to a
+fresh privateTMP; pure tests also deny fork. No actual body/profile/key,
+provider, SEC, QC or outcome input has been accessed at this preregistration.

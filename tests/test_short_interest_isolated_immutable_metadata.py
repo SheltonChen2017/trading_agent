@@ -10,6 +10,7 @@ pytest.importorskip("fcntl", reason="original immutable runtime imports POSIX fc
 from scripts import diagnose_short_interest_isolated_immutable_metadata as proof
 from test_short_interest_immutable_metadata import kernel
 from test_short_interest_immutable_metadata_diagnostic import Harness, deny_external
+ORIGINAL_PREPARE = proof.base.immutable.prepare_owned_immutable_metadata
 
 
 class Volume:
@@ -42,10 +43,17 @@ class Volume:
 @pytest.fixture
 def h(monkeypatch, tmp_path, kernel):
     value = Harness(monkeypatch, tmp_path)
+    # The inherited legacy fixture wrapped this factory to inject its clock.
+    # Keep the exact ORIGINAL function/code and change only explicit fabricated
+    # keyword defaults, so the stronger production code-identity check runs.
+    monkeypatch.setattr(proof.base.immutable, "prepare_owned_immutable_metadata", ORIGINAL_PREPARE)
+    monkeypatch.setattr(ORIGINAL_PREPARE.__wrapped__, "__kwdefaults__", {
+        **ORIGINAL_PREPARE.__wrapped__.__kwdefaults__, "monotonic": lambda: value.tick,
+        "sleep": value.sleep})
     value.volume, value.volume_entries, value.volume_close_hook = None, [], lambda: None
     value.volume_close_error = False
     monkeypatch.setattr(proof, "__file__", str(tmp_path / proof.DRIVER))
-    for name in (proof.DRIVER, proof.STORAGE, proof.WRAPPER):
+    for name in (proof.DRIVER, proof.STORAGE, proof.WRAPPER, proof.MONITOR):
         path = tmp_path / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(name.encode())
@@ -63,8 +71,17 @@ def h(monkeypatch, tmp_path, kernel):
         value.volume.phase = "CLOSED"
     monkeypatch.setattr(proof.storage, "prepare_registered_volume", prepared)
     monkeypatch.setattr(proof, "PROTOCOL_SHA256", hash_payload(proof.protocol()))
-    value.run = lambda: proof.run_registered(value.root, runtime_head="c" * 40,
-        actual_remote="b" * 40, complete_code_manifest=value.mapping)
+    def run():
+        try:
+            return proof.run_registered(value.root, runtime_head="c" * 40,
+                actual_remote="b" * 40, complete_code_manifest=value.mapping)
+        finally:
+            minted = [record[0] for record in proof.base.immutable._MINTED.values()
+                if record[1][1][12] == value.path]
+            if minted:
+                assert len(minted) == 1
+                value.metadata = minted[0]
+    value.run = run
     return value
 
 
@@ -155,7 +172,7 @@ def test_native_challenge_is_not_substituted_with_synthetic_success(h, monkeypat
 
 def test_policy_stays_synthetic_only_with_no_retry_or_old_evidence():
     value = proof.protocol()
-    assert len(proof.code_paths()) == len(set(proof.code_paths())) == 64
+    assert len(proof.code_paths()) == len(set(proof.code_paths())) == 65
     assert value["new_probe_inodes"] == value["native_set_calls"] == 1
     assert value["retries"] == 0 and value["old_evidence_reopened"] is False
     assert value["original_seal_checks_unchanged"] is True
@@ -182,17 +199,18 @@ def test_final_UTC_sampling_delay_cannot_escape_whole_closure_deadline(h, monkey
 
 
 def test_each_metadata_boundary_uses_complete_original_volume_bracket_without_duplicate(h, monkeypatch):
-    original = proof.base.immutable.prepare_owned_immutable_metadata
-    from contextlib import contextmanager
+    original = proof.base._challenge
     inspecting, calls = [], []
     h.boundary_hook = lambda: calls.append("fresh_lane_check") if inspecting else None
-    @contextmanager
-    def prepared(*args, boundary, **kwargs):
+    def challenge(*args):
+        minted = [record[0] for record in proof.base.immutable._MINTED.values()
+            if record[1][1][12] == h.path]
+        assert len(minted) == 1
         inspecting.append(True)
-        try: boundary()
+        try: minted[0]._anchor[4]()  # Original live immutable guarded callback.
         finally: inspecting.clear()
-        with original(*args, boundary=boundary, **kwargs) as cap: yield cap
-    monkeypatch.setattr(proof.base.immutable, "prepare_owned_immutable_metadata", prepared)
+        return original(*args)
+    monkeypatch.setattr(proof.base, "_challenge", challenge)
     assert h.run()["status"] == "closed_offline_isolated_new_inode_only"
     assert calls == ["fresh_lane_check", "fresh_lane_check"]
 

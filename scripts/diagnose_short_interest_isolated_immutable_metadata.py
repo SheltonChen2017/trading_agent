@@ -11,14 +11,16 @@ import time
 from data.hashing import hash_bytes, hash_payload
 from scripts import diagnose_short_interest_immutable_metadata as base
 from scripts import short_interest_isolated_custody_volume as storage
+from scripts import short_interest_targeted_immutable_monitor as monitor
 
 DRIVER = "scripts/diagnose_short_interest_isolated_immutable_metadata.py"
 STORAGE = "scripts/short_interest_isolated_custody_volume.py"
 WRAPPER = "scripts/run_short_interest_isolated_custody_offline.py"
+MONITOR = "scripts/short_interest_targeted_immutable_monitor.py"
 NAME = base.NAME
 INNER_DIRECTORY = "proof"
 MAXIMUM_SECONDS, HOLD_SECONDS = 420, 5
-PROTOCOL_SHA256 = "9e625fded1f866ef6cb81096fc593d4ecd57246e24bc042dbc5fa1d595046871"
+PROTOCOL_SHA256 = "8c36cc1f3440aa6128b008fa311c9fbcc64cd8f5ddf0c5f41441a9a2ea220079"
 _LAST_TRANSITION = None
 _LAST_STAGE = "not_entered"
 _STAGES = frozenset("""not_entered registration code_context_open storage_context_open
@@ -45,15 +47,17 @@ def authority():
 
 
 def code_paths():
-    return tuple(sorted((*base.code_paths(), STORAGE, DRIVER, WRAPPER)))
+    return tuple(sorted((*base.code_paths(), STORAGE, DRIVER, WRAPPER, MONITOR)))
 
 
 def protocol():
-    return {"schema": "si-isolated-kernel-immutable-proof-policy-v5",
-        "decision": "SI-DEC-20261027-04", "authority_id": "SI-AUTH-20261026-02",
+    return {"schema": "si-isolated-kernel-immutable-proof-policy-v6",
+        "decision": "SI-DEC-20261027-05", "authority_id": "SI-AUTH-20261026-02",
         "driver": DRIVER, "offline_harness": WRAPPER, "storage_policy_sha256": hash_payload(storage.policy()),
         "original_immutable_policy_sha256": hash_payload(base.immutable.policy()),
         "original_observer_policy_sha256": hash_payload(base.transition.policy()),
+        "targeted_monitor_policy_sha256": hash_payload(monitor.policy()),
+        "diagnostic_scope": "original_meaningful_native_flag_callback_controlled_refusal_events_with_selected_event_and_terminal_bindings",
         "inner_directory": INNER_DIRECTORY, "name": NAME,
         "raw_sha256": hash_bytes(base.previous.metadata_bytes()), "bytes": 186,
         "maximum_seconds": MAXIMUM_SECONDS, "minimum_hold_seconds": HOLD_SECONDS,
@@ -76,13 +80,15 @@ def failure_summary(error):
         result = {"category": "local_contract_refusal", "contract_code": code, "errno_name": None}
     elif type(error) is storage.IsolatedVolumeRefusal:
         result = storage.failure_summary(error)
+    elif type(error) is monitor.TargetedMonitorRefusal:
+        result = monitor.failure_summary(error)
     else:
         result = base._failure_summary(error)
     result["storage_association"] = storage.association_diagnostic()
     result["entered_stage"] = entered_stage()
     if _LAST_TRANSITION is not None:
         try: result["native_transition"] = _LAST_TRANSITION.report()
-        except base.transition.TransitionDiagnosticRefusal:
+        except (base.transition.TransitionDiagnosticRefusal, monitor.TargetedMonitorRefusal):
             result["native_transition"] = {"status": "no_closed_observer_report"}
     return result
 
@@ -115,7 +121,7 @@ def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest)
             and now - began < MAXIMUM_SECONDS, "isolated_proof_deadline")
         last_tick[0] = now
         return now
-    require(hash_payload(protocol()) == PROTOCOL_SHA256 and len(code_paths()) == 64
+    require(hash_payload(protocol()) == PROTOCOL_SHA256 and len(code_paths()) == 65
         and (MAXIMUM_SECONDS, HOLD_SECONDS) == (420, 5), "isolated_proof_registration_changed")
     require(root == base.previous.lane.ROOT and Path(__file__).absolute() == root / DRIVER,
         "isolated_proof_driver_changed")
@@ -146,7 +152,7 @@ def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest)
                     # check belongs before this already bracketed operation.
                     volume.check()
                 try:
-                    with base.transition.observe_original_transition(directory_fd=owned._anchor[2], name=NAME,
+                    with monitor.observe_original_transition(directory_fd=owned._anchor[2], name=NAME,
                             proof_binding=(base.require, base.ImmutableProofRefusal, base._CODES)) as diagnostic:
                         _LAST_TRANSITION = diagnostic
                         _LAST_STAGE = "immutable_context_open"
@@ -178,7 +184,7 @@ def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest)
                     trace_report = diagnostic.report()
                     require(trace_report["diagnostic"]["observer_complete"] is True,
                         "isolated_proof_result_missing")
-                    result = {"schema": "si-isolated-kernel-immutable-proof-closed-v5",
+                    result = {"schema": "si-isolated-kernel-immutable-proof-closed-v6",
                         "status": "closed_offline_isolated_new_inode_only", "runtime_head": runtime_head,
                         "actual_remote": actual_remote, "code_identity_sha256": identity,
                         "code_manifest_sha256": hash_payload(complete_code_manifest),

@@ -38,14 +38,22 @@ def event_command(seams, command, executable=None, cwd=None):
 def result(manifest):
     sample = {"fd_flags": 66, "name_flags": 66, "same_original_inode": True,
         "protections_match": True, "size_and_mtime_unchanged": True, "retained_fd_readonly": True}
-    diagnostic = {"schema": "si-immutable-transition-diagnostic-v1", "observer_complete": True,
+    diagnostic = {"schema": "si-targeted-immutable-monitoring-diagnostic-v1", "observer_complete": True,
         "observer_failure": None, "native_call_count": 1, "native_result": 0, "native_errno_name": None,
         "before_native": dict(sample, fd_flags=64, name_flags=64), "immediate_after_native": dict(sample),
         "after_callbacks": [dict(sample)], "classification": "required_flags_observed_without_recorded_loss",
         "first_controlled_refusal": None, "controlled_refusals": [],
-        "policy_sha256": hash_payload(harness.proof.base.transition.policy()),
-        "authority": harness.proof.base.transition.authority()}
-    return {"schema": "si-isolated-kernel-immutable-proof-closed-v5",
+        "policy_sha256": hash_payload(harness.proof.monitor.policy()),
+        "authority": harness.proof.monitor.authority(),
+        "backend": "sys.monitoring_local_original_code_events", "monitoring_context_closed": True,
+        "resource_restoration": {"tool_id": 4,
+            "scope": "global_exact_target_local_known_callback_slots_and_tool4_ownership_only",
+            "prior_tool_unused": True, "original_global_mask_zero": True,
+            "original_target_local_masks_zero": True, "original_known_callbacks_absent": True,
+            "owned_tool_released": True, "global_mask_restored": True,
+            "target_local_masks_restored": True, "known_callback_slots_restored": True,
+            "foreign_ownership_preserved": False}}
+    return {"schema": "si-isolated-kernel-immutable-proof-closed-v6",
         "status": "closed_offline_isolated_new_inode_only", "runtime_head": HEAD, "actual_remote": REMOTE,
         "code_identity_sha256": "e" * 64, "code_manifest_sha256": hash_payload(manifest),
         "protocol_sha256": harness.proof.PROTOCOL_SHA256,
@@ -209,7 +217,7 @@ def test_chmod_only_exact_new_named_inode_and_mode(seams, monkeypatch):
         seams.handle("os.chmod", (99, 0o644, -1))
 
 
-@pytest.mark.parametrize("kind", ["extra", "authority", "observer", "native_count", "flags", "refusal", "challenge", "counter"])
+@pytest.mark.parametrize("kind", ["extra", "authority", "observer", "native_count", "flags", "refusal", "challenge", "counter", "resource", "backend"])
 def test_completed_shape_or_summary_never_bypasses_real_closure_contract(seams, kind):
     manifest = {name: "f" * 64 for name in harness.proof.code_paths()}
     value = result(manifest); completed_seams(seams)
@@ -221,6 +229,8 @@ def test_completed_shape_or_summary_never_bypasses_real_closure_contract(seams, 
     elif kind == "flags": diagnostic["after_callbacks"][0]["fd_flags"] = 64
     elif kind == "refusal": diagnostic["controlled_refusals"] = [{"PRIVATE": "SECRET"}]
     elif kind == "challenge": value["challenges"][0]["errno_name"] = "EACCES"
+    elif kind == "resource": diagnostic["resource_restoration"]["owned_tool_released"] = False
+    elif kind == "backend": diagnostic["schema"] = "si-immutable-transition-diagnostic-v1"
     else: seams.denied["source"] = 1
     value["native_transition"]["diagnostic_sha256"] = hash_payload(diagnostic)
     with pytest.raises(harness.OfflineHarnessRefusal): harness._validate_result(value, seams, HEAD, REMOTE, manifest)

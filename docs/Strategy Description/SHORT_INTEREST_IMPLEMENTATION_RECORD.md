@@ -11,7 +11,7 @@ IMMUTABLE FLAG THEN OBSERVED ITS LOSS; ACTOR AND HISTORICAL CAUSE UNKNOWN.
 NEW SOURCE RECOVERY REMAINS HELD.
 ISOLATED V1 REFUSED INITIALIZATION WITHOUT CREATING ITS NAMESPACE;
 V2 CREATED/ATTACHED ITS EMPTY SYNTHETIC IMAGE BUT REFUSED ASSOCIATION BEFORE
-ANY PROBE FILE; ITS IMAGE/MOUNT ARE PRESERVED. ISOLATED V3/V4 REACHED ORIGINAL
+ANY PROBE FILE; ITS IMAGE/MOUNT ARE PRESERVED. ISOLATED V3/V4/V5 REACHED ORIGINAL
 NATIVE FLAGS0->2 WITHOUT RECORDED LOSS, THEN REFUSED THE UNCHANGED8SECOND
 CREATOR WINDOW BEFORE WRITE CHALLENGE. NO STORAGE CLOSURE IS PROVED.
 CLAUDE REVIEW COVERS b648f60..730c59c, NOT THE LATER LOCAL3B0 DIAGNOSTIC COMMIT.
@@ -24739,3 +24739,170 @@ vetoes positive markers. Record the actual result before next bounded work.
 No partial push, source request/claim/START/charge/QC action is authorized by
 software checks alone. Final publication remains ONE matching-lane push at
 true pre-QC readiness or a concrete irreducible blocker.
+
+### 128.17 Actual V5 still refused; causal global-tracing comparison
+
+ONE execution20711 at exact clean
+`f27c8c3e4bdd711da89023493e2e1a5a927b2976`, matching actual/tracking originD6AF,
+terminated **exit2**, metadata_sealing / creator__tick /
+new_metadata_window_exhausted. Observer complete, native1/result0, flags0->2
+and callback2, no recorded loss; diagnostic SHA remains
+`78d89283e9bca93b620708489df110ccbfbcbdb6321c630d65fff9775acf57f7`.
+Original exact5/5 association passed, only volume-kind differed. Attach/info
+raw SHAs
+`f2edee66dcebeab414f49055446eb2fd9c78706cbe2982375405fd98f4d2ee3f` /
+`0047b618ecc7653aa965f331e66dd2060cfed0e1d7a14f0e04467926fa3d962c`.
+Genuine counters Git804/create1/attach1/info4/null_stream6/probe_create1,
+write_challenge0, all denied0/failure_latched=false. No source/key/provider/
+new claim/START/charged-byte action. No seal, challenge or storage closure
+was admitted. V5 is retired, never repeated or adopted;8seconds unchanged.
+
+Main independently read the original V5 synthetic member after known exit:
+186bytes/SHA12ae326d...7404 match, current flags2, original FD/name current
+stamps agree before/after, regular currentUID0600/singlelink, fixed members
+and mounted root0700 TRUE. Current nine-field SHA
+`02441ddcdfd866550f0282932fe07201b1506fde76e9c61d898ee5ac56e961bc`
+is an observation, NOT an issued seal. Keep original flagged inode/image/
+mount intact. Actual custody and local pre-QC readiness remain FALSE.
+
+Main then ran ONE bounded READONLY full-composition comparison18929, exit0.
+It authenticated the exact64 committed source files and matching lane under
+the actual frozen audit hook. Three identical fresh lane+full64-FD checks
+took70.768ms without global observation and320.960ms inside the ORIGINAL
+global observer. That observer correctly refused missing native observation
+(none was attempted) and restored tracing None; its negative report was
+explicitly incomplete. Whole window7565.722ms, Git597/all image/probe/native/
+source/key calls0, all audit denials0. This causally demonstrates about4.5x
+diagnostic overhead on those identical checks. It does not reconstruct the
+unpersisted exact expired call or authorize another blind probe namespace.
+
+### 128.18 Prospective targeted diagnostic backend; custody unchanged
+
+**SI-DEC-20261027-05**, continuing SI-AUTH-20261026-02, permits bounded
+SOFTWARE/CPU-only development of a separate exact-code diagnostic backend
+before any future actual proof. Existing global observer, original creator,
+immutable helper, native setter, all source/FD/byte/eight-nine-field checks,
+8second/16sample/.25second/1second quiet,5second hold and every other original
+budget/closure predicate remain unchanged. Use a newly frozen V6 namespace
+only after causal parity tests, final focused checks and committed code
+identity; no V6 invocation is run or inferred here.
+
+The new backend uses CPython3.13 monitoring to observe the exact ORIGINAL
+phase code objects and native/callback entries/exits, while retaining every
+meaningful native/flag/controlled-refusal observation and original code,
+caller/factory/cap/readonly-FD/thread checks. Fixed tool4 only, cold unused
+ownership, global/target masks and original callbacks must be authenticated;
+no other IDs, restart_events or unknown-code mutation. Global exception/
+unwind/throw events preserve incoming and propagated first-controlled errors;
+native/callback exceptional exits preserve the old final-return samples.
+Terminal code/native/event/ownership checks and restoration must precede
+original issued canonical report. Failure, lost ownership, partial setup or
+incomplete observations cannot yield a completed diagnostic or custody proof.
+
+The [official Python3.13 monitoring reference](https://docs.python.org/3.13/library/sys.monitoring.html)
+defines code-local start/resume/return/yield events, separate throw/unwind
+events and callback return of a displaced registration. Releasing an ID
+leaves its masks/callbacks, so cleanup must explicitly restore the journaled
+original settings. No API enumerates every unknown code's local mask: leave
+unknown code untouched and scope closure honestly to our global mask, exact
+target masks, known callback slots and tool4 ownership. Foreign ownership
+loss refuses without overwriting foreign resources or claiming restoration.
+
+Author's bounded CPU-only API prototype exited0, all16 originating frames
+matched their supplied code objects across start/resume/return/yield/raise/
+reraise/unwind events, and tool4 was restored. No image/probe/metadata/native/
+source operation occurred. This establishes API semantics only. New module/
+tests, exact report/resource schema, all causal parity results, fixed policy
+and65-source integration must be reviewed and frozen before any actual proof.
+The new backend supplies diagnostic observations only; no source admission,
+provider authority, charged-byte release, outcome or QC action is enabled.
+
+### 128.19 Targeted backend parity and integration findings
+
+New scripts/short_interest_targeted_immutable_monitor.py supplies a separate
+original-object/nonce-issued diagnostic with17 fixed report fields and11
+scoped restoration fields. Every selected event validates original state,
+immutable phase map, count/thread/resource bindings and actual originating
+frame/code. Entry/terminal code/native audits and scoped resource cleanup
+precede original canonical issuance. It intentionally stops observing normal
+UNMATCHED Python calls; it preserves meaningful native/flag/callback/refusal
+observations and every unchanged custody/source check. No claim of whole
+global-call-tracing equivalence is made. No actual V6 proof has run.
+
+Author final focused tests **42/1.74s**, OS network denied; compile/whitespace/
+AST passed, with0 restart_events/settrace/native-set calls in the new backend.
+Fabricated unchanged original producer runs compare old/new meaningful
+failed-native-1/EPERM and exceptional-callback reports exactly. Memory-only
+removal of PY_UNWIND return observations caused2expected failures/.16s;
+delaying successful callback journal registration caused1/.14s; omitting the
+PY_THROW mask caused the explicit callback-count/order case1/.17s. The first
+controlled error alone still arrived through other propagation events, so
+that earlier path is not falsely claimed as sole evidence for PY_THROW.
+All reversals were isolated/restored; none is a production failure or proof.
+
+**SI-BUILD-20261027-013 (P2, corrected before release):** Main/peer identified
+three concrete new-backend edges. Unknown callback code must be exact CodeType
+before hashing/filtering, every cleanup mutation rechecks observed ownership
+and stops on loss, and an unexpected callback must be restored as the SAME
+observed object while refusing closure/retaining the failed lease. Author's
+causal group was RED3/.78s before corrections. Independent owner-thread/count
+pins prevent public state reset; busy/orphan/partial-init/foreign-takeover,
+residual cleanup, fixed projection, real frames, cloned code and forged report
+cases passed. Unknown-code local masks remain untouched. Peer read the final
+511-line backend and517-line test, no remaining actionable finding, no peer
+test/actual operation or Claude review. Main read all final code/tests.
+
+**SI-BUILD-20261027-014 (P3, fixture composition):** Main's first four-file
+integration had13failed/202passed/2.98s, all13 correctly refused an altered
+factory code. Inherited legacy fixture wrapped the immutable factory to
+inject its fake clock, which the stronger original-factory code pin rejects.
+Restore the actual original function/code in that fixture and change only
+its explicitly fabricated clock/sleep keyword defaults. Assertions recover
+the genuine original-minted cap by unique fixture path; the boundary case
+executes that cap's actual live guarded callback during the fake challenge.
+No production pin is relaxed. Isolated composition then passed **20/7.73s**.
+New protected tests guard POSIX runtime/monitoring availability before subject
+import; no Windows execution or capability parity is claimed. Final complete
+focused selection, exact65-source AST/byte mapping and frozen registrations
+follow before any actual operation. Original creator, immutable helper,
+global observer and all source files remain unchanged fromF27.
+
+### 128.20 Frozen V6 software validation; readonly check before proof
+
+Main final fresh-process focused selection (twelve files plus three named
+active-document checks): **460passed/25.17s**, no skips/warnings, empty
+inherited environment and OS network denied. Exact transitive AST closure65,
+65-source/five-test in-memory compile, four new-module literal catalogues,
+no numeric-id calls in wrapper/targeted backend, both historical126 hashes
+and whitespace passed. No complete lane/repository suite was run. All agents
+and test sessions are frozen. Main read all final production/test code;
+independent read-only peer accepted the exact backend parity/provenance/
+resource changes after013 corrections. No Claude review is claimed.
+
+Proof protocol SHA256
+`8c36cc1f3440aa6128b008fa311c9fbcc64cd8f5ddf0c5f41441a9a2ea220079`;
+storage policy
+`3a351fe3fb24b9f51d52da11fb0609c8800e62ddc04cba82fd6504084585030f`;
+targeted-monitor policy
+`ccc3e4efaa51d715f0c20c077e4e260230a80fa9449a2be9d9974d7f0a8057f7`;
+harness policy
+`34c988060317d6571f5a5d1ccb00b15d9f3407735082c800c2915991490284c9`.
+Exact65-path AST list
+`ff25846448d06d9a97217bb9c66839fbf187d3579869aa81daefa1181a953422`;
+complete65-current-byte mapping
+`e6c3ffca2073895441680bec9bbeac549c28a6b19b6d77d08bd663b2188f0a83`.
+
+Actual V6 has NOT run. After record-only checks, exact physical/Git root,
+branch, HEAD/status and matching actual/tracking originD6AF rechecks, commit
+this software checkpoint. A bounded READONLY current-committed65-code and
+actual-hook targeted-monitor composition may then measure identical lane/
+FD checks. Native absence must be an explicit negative diagnostic, no issued
+custody/positive report; no artifact/image/probe/source action. Only after
+that closure, guard the clean checkpoint and wholly absent new
+isolated-custody-20261027-v6 namespace, then ONE registered proof at that HEAD.
+No edits/tests/commits/pushes while pinned; any negative/nonzero/unknown
+closure overrides positives. All V1..V5 evidence stays untouched.8seconds,
+5second hold, original creator/immutable/native/source checks,84,005START/
+4GiB caps and13,992START/23,452,681byte baseline remain unchanged. Require
+actual full terminal proof before any maximum-body/source work or readiness.
+ONE final matching-lane push remains pending; no interim publication.

@@ -117,7 +117,7 @@ class Harness:
         if verb == "create":
             assert arguments == ["/usr/bin/hdiutil", "create", "-type", "SPARSE", "-size", "8g",
                 "-fs", "APFS", "-uid", str(os.getuid()), "-gid", str(os.getgid()), "-mode", "0700",
-                "-volname", "SI_OFFLINE_CUSTODY_V5", "-nospotlight", "-plist", str(self.image)]
+                "-volname", "SI_OFFLINE_CUSTODY_V6", "-nospotlight", "-plist", str(self.image)]
             with self.image.open("xb") as stream: stream.write(b"FABRICATED SPARSE IMAGE, NO REAL FILESYSTEM")
             self.image.chmod(0o644)
             payload = [str(self.image)]

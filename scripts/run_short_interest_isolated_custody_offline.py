@@ -1,7 +1,7 @@
 """ONE offline synthetic custody invocation with fixed, counted external seams.
 
 The audit event cannot independently see open's mode or dir_fd. Exact original
-creator/OwnedOutput checks and the committed 64-file composition bind those;
+creator/OwnedOutput checks and the committed 65-file composition bind those;
 this harness does not replace os.open, its capability set, or a native call.
 """
 from contextlib import contextmanager
@@ -17,7 +17,7 @@ from data.hashing import canonical_json, hash_bytes, hash_payload
 from scripts import diagnose_short_interest_isolated_immutable_metadata as proof
 
 DRIVER = "scripts/run_short_interest_isolated_custody_offline.py"
-HARNESS_SHA256 = "1f66c5ffe341a9316f81f83499c4d66cc2a896e7054649a046aaeb3b773d47aa"
+HARNESS_SHA256 = "34c988060317d6571f5a5d1ccb00b15d9f3407735082c800c2915991490284c9"
 MAXIMUM_GIT_COMMANDS, MAXIMUM_INFO_COMMANDS = 20000, 12
 _INVOKED = False
 _ORIGINAL, _COUNTS, _ACTIVE, _FAILED = {}, {}, {}, {}
@@ -42,7 +42,7 @@ def require(value, code):
 def policy():
     require((MAXIMUM_GIT_COMMANDS, MAXIMUM_INFO_COMMANDS) == (20000, 12),
         "harness_registration_changed")
-    return {"schema": "si-isolated-custody-offline-harness-v5", "driver": DRIVER,
+    return {"schema": "si-isolated-custody-offline-harness-v6", "driver": DRIVER,
         "root": str(proof.base.previous.lane.ROOT), "branch": "codex/strategy-short-interest",
         "ref": "refs/heads/codex/strategy-short-interest", "code_paths": list(proof.code_paths()),
         "proof_protocol_sha256": proof.PROTOCOL_SHA256,
@@ -55,7 +55,7 @@ def policy():
         "native_library": proof.base.immutable.LIBRARY,
         "native_symbols": ["fstatfs64", "fchflags", "fsetxattr"],
         "source_replay_credentials_network_publication": "denied_counted_permanent_failure",
-        "artifact_file_opens": "new_fixed_namespace_exact_parent_directory_exact64code_files_basenames_and_their_readonly_parent_directories",
+        "artifact_file_opens": "new_fixed_namespace_exact_parent_directory_exact65code_files_basenames_and_their_readonly_parent_directories",
         "metadata_audit_limit": "stat_and_directory_metadata_not_independently_sandboxed_original_authenticated_code_and_FD_checks_remain",
         "audit_state": "original_identity_counter_tuples_and_permanent_failure_latch_no_public_reset_or_active_toggle",
         "policy_predicate": "rebuild_complete_current_policy_every_event_strict_typed_original_witness_same_value_canonical_hash_before_hook_and_positive_terminal",
@@ -361,7 +361,7 @@ def _registered_arguments(runtime_head, actual_remote, manifest):
         and root.resolve() == root and Path.cwd().resolve() == root, "harness_root_changed")
     require(all(type(value) is str and re.fullmatch(r"[0-9a-f]{40}", value)
         for value in (runtime_head, actual_remote)), "harness_arguments_refused")
-    require(len(proof.code_paths()) == len(set(proof.code_paths())) == 64 and DRIVER in proof.code_paths(),
+    require(len(proof.code_paths()) == len(set(proof.code_paths())) == 65 and DRIVER in proof.code_paths(),
         "harness_registration_changed")
     if manifest is not None:
         require(type(manifest) is dict and set(manifest) == set(proof.code_paths())
@@ -380,7 +380,7 @@ def _validate_result(result, seams, head, remote, manifest):
         "original_code_and_metadata_contexts_closed", "authority", "closed_at",
         "isolated_storage_closed_summary_sha256"}
     require(type(result) is dict and set(result) == fields
-        and result.get("schema") == "si-isolated-kernel-immutable-proof-closed-v5"
+        and result.get("schema") == "si-isolated-kernel-immutable-proof-closed-v6"
         and result.get("status") == "closed_offline_isolated_new_inode_only"
         and result.get("runtime_head") == head and result.get("actual_remote") == remote
         and result.get("code_manifest_sha256") == hash_payload(manifest)
@@ -406,19 +406,32 @@ def _validate_result(result, seams, head, remote, manifest):
     require(set(diagnostic) == {"schema", "observer_complete", "observer_failure", "native_call_count",
         "native_result", "native_errno_name", "before_native", "immediate_after_native",
         "after_callbacks", "classification", "first_controlled_refusal", "controlled_refusals",
-        "policy_sha256", "authority"}
-        and diagnostic["schema"] == "si-immutable-transition-diagnostic-v1"
+        "policy_sha256", "authority", "backend", "monitoring_context_closed", "resource_restoration"}
+        and diagnostic["schema"] == "si-targeted-immutable-monitoring-diagnostic-v1"
         and diagnostic["observer_failure"] is diagnostic["native_errno_name"]
             is diagnostic["first_controlled_refusal"] is None
         and diagnostic["controlled_refusals"] == []
-        and diagnostic["policy_sha256"] == hash_payload(proof.base.transition.policy())
-        and diagnostic["authority"] == proof.base.transition.authority()
+        and diagnostic["policy_sha256"] == hash_payload(proof.monitor.policy())
+        and diagnostic["authority"] == proof.monitor.authority()
         and diagnostic["classification"] == "required_flags_observed_without_recorded_loss",
+        "harness_result_refused")
+    restored = diagnostic["resource_restoration"]
+    resource_fields = {"tool_id", "scope", "prior_tool_unused", "original_global_mask_zero",
+        "original_target_local_masks_zero", "original_known_callbacks_absent", "owned_tool_released",
+        "global_mask_restored", "target_local_masks_restored", "known_callback_slots_restored",
+        "foreign_ownership_preserved"}
+    require(diagnostic["backend"] == "sys.monitoring_local_original_code_events"
+        and diagnostic["monitoring_context_closed"] is True
+        and type(restored) is dict and set(restored) == resource_fields
+        and type(restored["tool_id"]) is int and restored["tool_id"] == 4
+        and restored["scope"] == "global_exact_target_local_known_callback_slots_and_tool4_ownership_only"
+        and restored["foreign_ownership_preserved"] is False
+        and all(restored[name] is True for name in resource_fields - {"tool_id", "scope", "foreign_ownership_preserved"}),
         "harness_result_refused")
     before, immediate, after = (diagnostic[name] for name in
         ("before_native", "immediate_after_native", "after_callbacks"))
     require(type(before) is dict and type(immediate) is dict and type(after) is list
-        and 1 <= len(after) <= proof.base.transition.MAXIMUM_REFUSALS, "harness_result_refused")
+        and 1 <= len(after) <= proof.monitor.MAXIMUM_REFUSALS, "harness_result_refused")
     sample_fields = {"fd_flags", "name_flags", "same_original_inode", "protections_match",
         "size_and_mtime_unchanged", "retained_fd_readonly"}
     for sample in (before, immediate, *after):
@@ -480,7 +493,7 @@ def main(argv=None):
     if type(values) not in (list, tuple) or len(values) != 2:
         print(canonical_json({"status": "refused", "failure": {"contract_code": "harness_arguments_refused"}}), flush=True)
         return 2
-    print(canonical_json({"status": "starting", "schema": "si-isolated-custody-offline-harness-v5"}), flush=True)
+    print(canonical_json({"status": "starting", "schema": "si-isolated-custody-offline-harness-v6"}), flush=True)
     try: result = run_once(values[0], values[1])
     except BaseException as error:
         result = {"status": "refused", "failure": _failure(error)}

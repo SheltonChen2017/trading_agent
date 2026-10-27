@@ -2261,7 +2261,9 @@ the Jan2021 start. Section326.50 records AU spent: six older EODHD RAW prices
 returned but metadata shape refused; authenticated failure, no source admission.
 Sections326.52–326.54 record AV actual0 identifying the display-name ASCII
 refusal and AX actual0 accepting the unchanged pair under corrected Unicode
-policy. AW whole-US current catalog is separately run-frozen, NOT yet invoked.
+policy. Section326.55 records AW spent after3HTTP200 bodies: first mapping
+total refused; no complete catalog/identity/coverage admission. Section326.56
+freezes the separate offline fixed-frame AY diagnosis, not yet invoked.
 No AU retry, provider/strategy capture or QC source
 transfer/project/compile/strategy job follows this known source stop. Current
 identity/reference/actual-held NAV/full-window/source/run gates remain;
@@ -67373,3 +67375,155 @@ QC operation is renewed. Record actual result, then only admissible exhaustive
 identity/whole-window recovery; no shortened study/source-stop selector.
 337shared/259development/53infrastructure/699cells unchanged until real QC
 event. Exactly one final matching-lane push for concluded round; none yet.
+
+### 326.55 AW actual authenticated failure: first mapping total refused
+
+At cleand6dae40dbc4b949bb229583d8ece6d7b1375c598, sole AW parent
+2026-10-27T16:18:06.391656+00:00..16:18:24.709209+00:00 exit2;
+sole separate native validator16:18:24.709690..16:18:28.514266+00:00 exit0.
+Both stdout2854bytes SHA82a9572938b8f79b364020fe659a457a96c84bbd63b76e024c9220286077ef45,
+stderr0/boundnull/exact equality. Authenticated FAILURE only; AW now SPENT.
+No repeat of its parent/worker/output validator/claims or first3 requests.
+
+Stage provider, parent worker_failed; provider finite mapping_bound.
+Provider actual2/stdout966bytes
+0d7fcd076c8a46d19f6e309225f707f96d5c29d03b0ec06709237654b4d11f07,
+stderr0/boundnull; credential handoff complete,3application dispatch intents,
+3completed HTTP200 bodies, current ordinal2/HTTP200, physical countnull.
+Authentication worker never dispatched; mapping_total/pages and whole
+capture/index/journal pins remain NULL. Never fabricate those missing pins.
+
+Provider reported each complete fsynced raw body BEFORE first mapping parse:
+active7549657bytes SHA041219222278efc8a53e79a3d1ce2357613e7e88cb39dd542021dc3af420cc63;
+delisted8487744bytes SHAd50b5f1cee071640694bd00aa41de849427d525f39b5978770065aed1b646933;
+mappingpage0 102655bytes SHAec33da7c0fd6b33dc24c303ddae2de794e5e80e4a6dc1bb7e6980ce2c5db747e.
+These expected frame commitments do not yet authenticate today's retained
+file; no complete US mapping/collision/crosswalk/source/price admission.
+No raw body/identifier/Name/credential displayed; no numeric total observed.
+
+Static mapping_bound has exact alternatives: meta.total not exactint,
+negative or greater100000. pages<=100 cannot independently fail under frozen
+PAGE_SIZE1000 and total<=100000. Thus neither actual over-limit count,
+type/coercion defect, filter behavior nor subscription cause is established.
+HTTP200 is not accepted semantic evidence;79/4initial and83final tests remain
+synthetic and do not erase this actual failure.
+
+Next NEW offline AY may authenticate only AW/catalog-bodies.bin DATA:
+three deterministic BE64 length headers plus the externally recorded body
+SHA/lengths cover EXACT16140080bytes, with no gaps/trailing/overlap. A new
+held/no-follow/full10/native-security framed guard can hash all three bodies
+and compare every header/extent BEFORE ANY JSON. Only after full frame
+authentication may it observe the FIRST whole-file SHA, explicitly a new AY
+observation, not a recovered AW capture_pin or automatic refresh.
+Normal source-guard return before any emitted result remains mandatory.
+Then emit only finite pagination field names/types/counts/hash observations
+and independent list-schema counts; no rows/names/URL or private identifiers.
+No old AW analyse (requires absent successful state/index/journal), source/
+control/output replay, credentials or new provider request.
+Same-round advisory validated this byte-covering proof and its limitations:
+endpoint equality does not prove historical/continuous integrity/absence of
+older transient writes. New reader/profile/claim/current clean freeze required
+before actual DATA access. AW remains failed/spent regardless of AY outcome.
+
+No QC/capacity/source transfer/compile/strategy launch or look/cell followed.
+337/259/53/699 unchanged, I326-024 full early coverage remains OPEN.
+Parser I326-026 was corrected prospectively via AX; this new refusal does not
+undo AX or clear broader price/identity gates. Continue admissible recovery
+under current owner review waiver; accumulate locally, exactly one final push.
+
+### 326.56 Exact AY fixed-frame offline freeze; crosswalk remains uninvoked
+
+NEW scripts/read_arv2_r298_eodhd_catalog_bounds.py28673bytes SHA256
+58634dde609beee9b5272cb5bb570fefa272387533909646e3642963cfb9776f;
+tests13345bytes1a146eac09f7e7727f590a65f79d0c90800999e69e800d571461dfdad7e9ab10.
+Canonical noLF profile28345bytes
+45d8b08b1fb5f3f26e4154898ee9aaf53be10516996cd16c7ef103b62bcec256,
+205 selected actual-matching unchanged dependencies including used AWe5a6.
+Current owner parser/coverage waiver applies, not independent acceptance.
+Run only at exact clean committed HEAD containing this freeze, caller/profile
+above, same designated Mac/root/branch/Python3.13. Exclusive fsynced claim in
+NEW newrule_eodhd_catalog/R326-20261027-AY BEFORE source read; leaf/control
+NOT inspected/allocated before this freeze. Once only; unknown/partial/
+nonzero spends use, never AW replay or marker repair.
+
+ONE exact DATA: AW/catalog-bodies.bin, fixed extent16140080bytes, exact three
+BE64 length headers plus326.55's three external body SHA/length commitments.
+Reader-local FramedSourceGuard reuses ONLY frozen technical nofollow/
+held-named/full10/native ACL/xattr/normal-exit mechanics; no inherited
+whole-SHA reader/receipt or invented initial whole hash. Plan digest checked
+each stage; every header/body/range/extent and endpoint/security predicate
+passes BEFORE ANY JSON. Newly observed whole SHA only after all pass; it is
+a first AY observation of that fully covered sequence, never AW's missing
+capture_pin or historical/continuous proof. New guard profile
+d7a7c7a0057d28c9278a06e505a567ae08566fdd2636317f2fbd18ff2e0bdffa.
+Same-round independent advisory confirmed this byte-covering reasoning and
+partial/trailing/mutation limitations; it is not independent final review.
+
+Native policy1637bytes
+a1647e60cc4670217f6d00c597482852ababfd36dd25551a76465d208fa86488
+ALL-network/Keychains/security denied, all artifacts denied except exact
+DATA/literal ancestors/own AY output. No old AW control/report/index/journal,
+other source, credentials, provider or QC access. Parent120s/outer125s,
+validator30s/outer35s; uninterruptible-I/O/host-suspension caveat. Original
+source FD/security/metadata held through guarded computation; normal source
+return BEFORE output, exact source/HEAD/profile postflight.
+
+Output only known pagination field names/types, bounded integer0..100million
+counts, original value hashes, data count/type and next-link type/hash NEVER
+URL/identifier values. A canonical ASCII decimal STRING receives an explicitly
+tagged diagnostic integer interpretation ONLY for known meta.total/limit/
+offset; original wire_type is retained and pagination acceptance remains false.
+No bool/float/leadingzero/Unicode-digit/whitespace/fraction coercion.
+Two list schema/count/ordered-hash checks are independent finite observations,
+so a bad list cannot erase mapping diagnosis; every source byte authenticates
+before any of them. Partial mapping page never means complete inventory.
+AW original actual2/missing pins/spent status preserved in public binding.
+
+52authorpasses3.69s, initial49pass/2fixturefail3.85s retained: comment wording
+and a plan-mutation test swallowed the expected refusal then wrongly expected
+normal exit. Fixtures corrected, no isolation weakening. Restored memory
+omissions detected frame-byte hash1red0.14s, whole-pin/output join1red0.13s,
+decimal grammar4reds/11overlappingpasses0.14s, real-LF stream1red0.13s.
+Root reviewed reader-local guard, inherited exit, observations, actual-exit/
+receipt join and no operational callback, no additional confirmed P0–P2.
+
+EXACT external metadata program4958bytes SHA
+f4cbd599ffbb9209906eb6206cad61c287d5cb59822facf5424326504b9fcc66:
+ordinary outer launches ONE native AY, then SEPARATE native artifact/network/
+Keychain/security-denied validator on original bounded stdout/actual exit.
+64KiBstdout/8KiBstderr; actual0 AND validator0/no stderr/bounds/exact stdout
+equality mandatory. Validator0 on2 authenticates failure only. Full tool result
+stored before small count-only summary. No provider/old-reader renewal.
+
+NEW PURE crosswalk candidate, UNINVOKED:
+scripts/arv2_r298_eodhd_crosswalk.py28576bytes
+762d1048b7636dbfd1f99911557a1564ac5c3aceaf0a7d6653a1577aaf78a6f3;
+tests21241bytes f6c8c8c270748cc192475ee63276b019db69100d5f663c7fc2f8ba3cc275f3d0;
+canonical profile1714bytes
+6be1dc3b1beebceee6fd44f197a15f2a5ecf33a6f87b7febf1dffd00bb03fb9f.
+Requires fixed AC/AP byte pins BEFORE JSON, fresh genuine all6151 object
+equality, exact AP whole/semantic/role/eight-fund joins, externally authenticated
+COMPLETE current inventory pins/counts/real-LF hashes. Strict unique current
+symbol/currency/class, exact valid FIGI+checksum-CUSIP linkage, global ownership
+and all-token/collision checks; ticker/name/CIK or FIGI-only never routes.
+All6151+8 retained, native5/missing vocabulary unresolved, conditional510
+preserved. Same original securityID+FIGI repeated intervals may share an owner;
+other IDs not merged. Same agreeing duplicate provider rows retained/classified,
+conflicting ownership refuses. No price/source/interval/permanent/PIT authority.
+
+31authorpasses4.15s; full6151+8 synthetic fixture, not actual corpus/coverage.
+Two memory-only/restored omissions caught1red0.10s each: global source CUSIP
+owner collision and exact EOD FIGI equality. Frozen AC validator replaced ONLY
+in source-wrapper synthetic fixture, production still uses unchanged validator.
+Root read candidate matching/joins/private result/summary; no additional
+confirmed P0–P2 in this uninvoked diagnostic scope. Partial AW provides NO
+accepted complete inventory, so no actual crosswalk or price request follows.
+
+Root170distinctfocusedpasses3.38s=52AY+31crosswalk+86record/document+
+1research transitive closure; no failures/skips/warnings/full suite.
+205pins/four-source-test in-memory compile/profile/native checks pass,
+dispatch_fence absent. All synthetic tests native ALL-network/production-
+artifact/Keychains/security denied, inroot support paths, no plugin/conftest/
+bytecode/cacheprovider. Subsets and record repeats not additive.
+All agents HOLD writes/tests/temp before actual AY. Preserve I326-024 and
+337/259/53/699; continue only admissible evidence recovery, one final lane push.

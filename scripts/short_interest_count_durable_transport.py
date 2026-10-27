@@ -26,7 +26,7 @@ from scripts import short_interest_recovery_diagnostics as diagnostics
 from scripts.short_interest_keychain import KeychainSecret, read_named_keychain
 
 ROOT = Path("/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__short_interest")
-PROTOCOL_SHA256, SOURCE_AUTHORITY_SHA256 = "PENDING", "PENDING"
+PROTOCOL_SHA256, SOURCE_AUTHORITY_SHA256 = "660af15547c1d518df352f563adde4da1ebc4e4b88bbf5a75b06b271343906d9", "9d67d93ad79657031befd8849659bc20fc5834173d76a569bccb9307347e3a6c"
 MAXIMUM_INFLIGHT, MAXIMUM_SECONDS, MAXIMUM_RESPONSE_BYTES = 8, 3600, 2 * 1024 ** 2
 FINAL_ROLES = ("inventory", "provisional", "closed", "manifest")
 _OPERATIONS, _FAILED, _OBSERVATIONS, _TERMINALS = {}, set(), {}, {}

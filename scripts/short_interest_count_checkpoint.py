@@ -21,9 +21,14 @@ from scripts import short_interest_body_receipt_custody as primitive
 from scripts import short_interest_count_response_volume as storage
 from scripts import short_interest_count_durable_transport as transport
 
-CHECKPOINT_POLICY_SHA256 = "PENDING"
+CHECKPOINT_POLICY_SHA256 = "965fa077fc16141468822ff083756d7f236f52b99b3ecc322844e2278cf2dd67"
 MAXIMUM_CHUNKS, MAXIMUM_BYTES, MAXIMUM_RECEIPT_BYTES = 133, 2097152, 1024
-MAXIMUM_AUDIT_SECONDS, MAXIMUM_TRANSIENT_FDS = 1800, 16
+MAXIMUM_AUDIT_SECONDS, MAXIMUM_TRANSIENT_FDS = 1800, 100
+# Keep the serial 16-FD allowance and add seven concurrent workers at twelve
+# FDs each: OwnedOutput2 + two (reader1 + HeldFiles2) + pair duplicates2 +
+# explicit inventory FD1 + CPython listdir(fd)'s internal duplicate1.
+# This is conservative constructor-based preclaim headroom, not a claim about
+# all descriptors any process/library/system might ever allocate.
 # Per chunk: independent mount + checkpoint dir + child dir + two file FDs.
 # The single round index shares the last mount/checkpoint dir, adding three.
 MAXIMUM_OWNED_FDS = 5 * MAXIMUM_CHUNKS + 3
@@ -61,12 +66,15 @@ def authority(): return dict(_AUTHORITY)
 def policy():
     constants = (MAXIMUM_CHUNKS, MAXIMUM_BYTES, MAXIMUM_RECEIPT_BYTES,
         MAXIMUM_AUDIT_SECONDS, MAXIMUM_TRANSIENT_FDS, MAXIMUM_OWNED_FDS)
-    require(all(type(a) is int and a == b for a, b in zip(constants, (133, 2097152, 1024, 1800, 16, 668)))
+    require(all(type(a) is int and a == b for a, b in zip(constants, (133, 2097152, 1024, 1800, 100, 668)))
         and (ROOT_NAME, CHUNK_NAME, ROUND_NAME) == ("checkpoint", "chunk", "round"),
         "checkpoint_registration_pending")
     return {"schema": "si-count-success-checkpoint-policy-v1", "maximum_chunks": MAXIMUM_CHUNKS,
         "maximum_descriptor_bytes": MAXIMUM_BYTES, "maximum_receipt_bytes": MAXIMUM_RECEIPT_BYTES,
         "maximum_owned_FDs": MAXIMUM_OWNED_FDS, "maximum_transient_FDs": MAXIMUM_TRANSIENT_FDS,
+        "transient_FD_derivation": {"serial_allowance": 16, "additional_workers": 7,
+            "per_additional_worker_constructor_peak": 12, "includes_internal_listdir_duplicate": True,
+            "scope": "conservative_constructor_based_preclaim_margin_not_universal_process_FD_maximum"},
         "independent_metadata_audit_seconds": MAXIMUM_AUDIT_SECONDS,
         "paths": [ROOT_NAME + "/" + CHUNK_NAME, ROOT_NAME + "/" + ROUND_NAME],
         "files": [primitive.BODY_NAME, primitive.RECEIPT_NAME],
@@ -78,6 +86,7 @@ def policy():
         "provider_response_charge_bytes": 0,
         "metadata_classification": "checkpoint_storage_overhead_not_provider_response_or_budget_release",
         "postcontext": "own_original_readonly_FDs_native_epoch_directory_file9_and_bytes_not_expired_SourceLease",
+        "terminal_clock": "same_original_pinned_monotonic_after_final_metadata_pass_no_source_callback",
         "terminal_authentication": "known_actual_process_EXIT0_and_Main_independent_original_root_pin_match_required",
         "authority": authority()}
 
@@ -374,9 +383,10 @@ def _audit_one(value, boundary):
 
 def audit_original_checkpoint_roots():
     """Own finite readonly metadata audit; no old source deadline is extended."""
-    _registered(); began = time.monotonic(); previous = [began]
+    _registered(); original_clock = time.monotonic
+    began = original_clock(); previous = [began]
     def boundary():
-        now = time.monotonic()
+        now = original_clock()
         require(type(now) in (int, float) and math.isfinite(now) and 0 <= began <= previous[0] <= now,
             "checkpoint_clock_refused")
         require(now - began < MAXIMUM_AUDIT_SECONDS, "checkpoint_audit_deadline"); previous[0] = now
@@ -394,7 +404,21 @@ def audit_original_checkpoint_roots():
             own = next(item for item in root[7] if item[0] is sys.modules[__name__] and item[1] == "_check_code")
             require(own[2].__code__ is own[3], "checkpoint_code_changed")
             own[2](root[7]); _audit_pins(value); own[2](root[7])
+            clock_pin = next(item for item in root[7] if item[0] is time and item[1] == "monotonic")
+            require(clock_pin[2] is original_clock is time.monotonic, "checkpoint_code_changed")
         except BaseException: _fail(value); raise
+    try:
+        # This exact clock was bound by every original root above. Read only
+        # elapsed time after the complete metadata pass: no source/lane guard
+        # or caller callback is reintroduced beyond those final observations.
+        ended = original_clock()
+        require(type(ended) in (int, float) and math.isfinite(ended)
+            and 0 <= began <= previous[0] <= ended, "checkpoint_clock_refused")
+        require(ended - began < MAXIMUM_AUDIT_SECONDS, "checkpoint_audit_deadline")
+        require(time.monotonic is original_clock, "checkpoint_code_changed")
+    except BaseException:
+        for value in originals: _fail(value)
+        raise
     return {"schema": "si-count-checkpoint-metadata-audit-v1", "original_roots_checked": len(_ISSUED),
         "audit_context_closed": True, "authority": authority()}
 

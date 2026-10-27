@@ -112,11 +112,13 @@ def h(monkeypatch, tmp_path):
             except OSError: pass
 
 
-def test_policy_and_registration_remain_false_and_pending_by_default():
+def test_frozen_policy_has_false_authority_and_rejects_missing_registration(monkeypatch):
     value = negative.policy()
     assert value["maximum_attempts"] == 528 and value["maximum_body_bytes"] == 2097152
     assert value["maximum_metadata_bytes"] == 1024 and value["maximum_leases"] == 133
-    assert negative.PRESERVATION_POLICY_SHA256 == "PENDING"
+    assert negative.PRESERVATION_POLICY_SHA256 == hash_payload(value)
+    negative._registered()
+    monkeypatch.setattr(negative, "PRESERVATION_POLICY_SHA256", "PENDING")
     with pytest.raises(negative.NegativePreservationRefusal, match="registration_pending"): negative._registered()
     for name in ("HTTP_authority", "retry_authority", "budget_release_authority", "source_admitted", "ready_for_backtest"):
         assert value["authority"][name] is False

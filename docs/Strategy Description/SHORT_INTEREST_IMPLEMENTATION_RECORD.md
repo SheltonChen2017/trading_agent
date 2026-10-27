@@ -26117,3 +26117,197 @@ Continue local work; accumulate commits and make only the ONE final matching
 lane push at genuine pre-QC readiness or a concrete irreducible blocker.
 
 Main post-record active-document/two-review-record checks:95passed/.81s.
+
+### 128.40 Bounded scheduling, complete readonly audits and final-clock corrections
+
+The preceding checkpoint is exact local commit
+f07f230dfa05f885b9644b13fade88bfba815d42, still unpublished on the same lane.
+Under128.39/SI-DEC-20261027-13, Main now reserves at most8 original distinct
+tickets, obtains ONE original fresh matching-ref roster and creates only
+START/received directories. Workers perform START/GET/received with private
+original readonly directory FDs; Main joins every accepted task before
+conditionally creating response directories for actual nonempty bodies.
+The second worker stage seals those bodies/receipts and also fully joins.
+Only Main schedules eligible original OPEN retries after their2/10second
+minimum delays, reserves another slot or settles. No empty no-body response
+directory is ignored. Failure latches before new work and retains executor,
+futures, original outcomes and bytes through complete drain and the original
+negative marker before any volume/source teardown. Incomplete shutdown enters
+the existing no-network process hold, not an unsafe exit.
+
+The045 readonly work amplification is corrected: one exact descriptor unit
+has full repository snapshots before/after, while every original local clock,
+file9/FD/name/byte/native/catalogue check remains. Each actual Git command
+still has its original guard. Original2MiB reads now use4 rather than68 Git
+commands under the fabricated original-producer experiment. Original producer
+code/profile is verified initially and terminally through a private issued
+witness; chunk-specific registration SHA is independently recomputed with
+the exact original formula. The133-times/three-sweeps two-code-file fixture
+uses20 actual fake-runner Git commands, not399 full producer audits. All
+three original source sweeps and terminal metadata checks remain; no source
+or HTTP guard was reduced and no timed cache/caller complete flag was added.
+
+**SI-BUILD-20261027-046 (P2, corrected final deadline coverage):** peer's
+ephemeral fabricated clock advanced1800seconds only during the checkpoint's
+last metadata sweep; the old audit returned success. Persistent deadline and
+backward-clock cases both failed before correction. Producer and reader now
+call the ORIGINAL pinned monotonic clock directly after their final original
+metadata pass, validate pointer/order/elapsed bounds, and permanently refuse
+on failure. No source/caller callback is introduced after the final metadata
+audit, no old source deadline is extended, and the1800second independent
+audit bound stays.
+
+**SI-BUILD-20261027-047 (P2, stronger preclaim FD admission):** eight workers
+require a stronger finite transient margin than the serial prototype. Keep
+668 checkpoint-owned FDs and reserve100 transient, derived as existing
+serial16 plus7 additional workers times12 conservative constructor FDs. This
+includes the internal duplicate used by CPython3.13 os.listdir(fd) before
+fdopendir, independently checked in its primary posixmodule.c source.
+This is a constructor-based admission margin, not a universal process FD
+guarantee. A low-limit fixture went red before the change; the exact sufficient
+boundary passes with no setrlimit call. OS limits remain unchanged.
+
+**SI-BUILD-20261027-048 (P2, corrected prospective CLI identity):** direct
+module execution formerly defined a separate __main__.CountSourceLease while
+transport imported the canonical module. Its distinct type/registries would
+necessarily refuse a genuine lease if reached. Entry now delegates to the
+canonical imported main before creating any capability. A source-free runpy
+test proves that exact canonical main is called; no old unknown refusal is
+attributed to this prospective adapter defect.
+
+Delegated validations remain separate: batching/transport/control181/11.14s,
+reader92/1.22s and reader+checkpoint152/3.23s, checkpoint final62/2.60s.
+Reversal proofs detected serial execution, omitted snapshot exits, wrong
+chunk registration, redundant Git callbacks, omitted terminal clock and low
+FD margin, then restored the real code. These are software/fabricated-native
+results, not an actual eight-source/one-hour custody proof. Both peer reviews
+accepted the frozen changes with no actionable finding; they are not Claude
+review and no actual source operation ran.
+
+### 128.41 Finite registered count recovery: ONE prospective invocation
+
+**SI-DEC-20261027-14**, continuing the owner's SI-AUTH-20261026-02 and latest
+explicit84005/4GiB direction, freezes the following finite count-only source
+registration. Pure SourceAUTH binds the genuineB3 baseline, old refused-prefix
+manifest and Main-authenticated d423 body-custody proof. Its own file digest,
+future runtime HEAD and downstream protocol digests are excluded to avoid
+self cycles. Current committed code identity and matching origin are bound
+separately by the original SourceLease. The source is only the existing
+named Massive native dated-class count GET reader; no caller URL/date/manifest,
+new credential, purchase or term is accepted.
+
+| Registered semantic control | SHA256 |
+| --- | --- |
+| SourceAUTH | 9d67d93ad79657031befd8849659bc20fc5834173d76a569bccb9307347e3a6c |
+| checkpoint policy | 965fa077fc16141468822ff083756d7f236f52b99b3ecc322844e2278cf2dd67 |
+| operator protocol | 660af15547c1d518df352f563adde4da1ebc4e4b88bbf5a75b06b271343906d9 |
+| negative policy | 11cc180fc0ae9e2faddf1e632cc431e1cd7ad1dd0ab02fb1a819644ae7b8ecf3 |
+| outer run protocol | 0364f7bca6bc7eaf7c41af850df8c6e1558f23354c179e5ce27126b118b60cd7 |
+
+All five registrations and cross-module equalities are independently checked
+BEFORE old-source replay, new image/claim, key or HTTP. The fixed canonical
+CLI verifies exact root/branch/HEAD/clean status/actual matching origin, then
+derives only the fixed complete working-equals-committed code catalogue and
+its original58-file archive subset. Runtime HEAD/full mapping are supplied
+externally from the resulting clean commit, never embedded into their own
+source. An initial fixed started message and per-closed-chunk aggregate
+reservation/byte progress contain no licensed rows; optional progress OSError
+cannot discard settled data. Checkpoint and SourceAUTH refusals use controlled
+allowlisted diagnostics; the existing private-byte/process-hold rule remains.
+
+Immutable prior accounting is13992START/13991recordedHTTP/23452681charged
+bytes,13990 retained original transport positions,67885 missing. Only the
+new finite policy adds up to2128 extra attempts across133 chunks (512+16,
+last chunk shorter); total cumulative STARTs never exceed84005. Lifetime
+maximum3 includes historical tries; every retry has its own START/debit/receipt,
+only genuine statusless OPEN transients and at least2/10seconds backoff.
+At most8 are in flight. Every outstanding/unknown attempt keeps its FULL
+2097152byte reservation until genuine original closed-chunk settlement.
+The unchanged4GiB ceiling can stop the run before the START ceiling; it is
+never inferred away or enlarged. Original file8seconds and chunk/source
+3600seconds remain, with no hidden retries, restart/reset/adoption, remount,
+old claim reuse, cleanup or flag clearing.
+
+ONE prospective run_registered invocation may start only at the resulting
+clean committed snapshot, with expected tracking/actual origin
+d6af672b3c8198712228bbd7b5eef35777283b1a and the complete committed manifest.
+Use the fixed count-response-20261027-v1 PLAN/chunk001..133 namespaces;
+each external claim is spent on first creation and never restarted. Freeze
+all authors/tests before launch; no edits/tests/commits/push while active.
+Poll only its known handle after physical/Git roots, branch, exact HEAD and
+status guards. Quiet original source replay is expected; absent handle or
+provisional controls are not trustworthy closure. Never signal, duplicate,
+retry or reset it. A negative/unknown termination vetoes positive claims.
+
+Actual success needs known process EXIT0 after all original code/source/
+volume/control contexts and final checks, genuine complete133-chunk union,
+all original checkpoint/index roots and no negative sibling. Main must then
+independently authenticate the original full9/bytes/native/membership roots
+before a separately protected known-EXIT0 receipt and offline requalifier
+registration. That registration stays PENDING now. Even full transport
+closure is not source/count/denominator/actual-input or backtest admission.
+If preservation reports a hold, retain the original process/private bytes/FDs
+without network and report the exact blocker; never manufacture exit2.
+
+Main six-file registration check passed385tests/18.02s. Main final TWENTY
+focused files passed880tests/63.42s with OS network denied, no warnings or
+skips reported. No full lane/repository suite ran. Independent exact AST
+checks: outer held84=82runtime+TWO explicit antecedent wrappers, listSHA
+590904dc5a48401a4bea9704198143de77ffbfa37c73ca8e6fa59a94b327b621,
+current mappingb8646862f1005da26ad8a224333fdec45b4bee20cfb253e5df57b4980768d4a5;
+readonly loader held85=83runtime+the same wrappers, listSHA
+4bcda69af6dc2c71733a31584b5ebb0d6b1154448323d57508683446dd2c9fd5,
+current mappinge9a751479537de7e92c7572c39f7d40fc89b49359aa41c06715dbfb3c1f72d91.
+All current source compiles in memory; no runtime dependency was omitted.
+
+No actual new source/key/image/claim/START/charge, outcome look, QC/Safari,
+purchase or push occurred while implementing this registration. All old
+source artifacts, failed images/probes, negatives and spent claims remain.
+After true closure document the actual result, then continue source/input
+qualification toward the last local step before QC setup. Canonical looks0/0,
+exploratory0, alpha0, permanent look IDs none, QC attempts0. Claude review is
+waived by the owner; do not message another chat, rearm a monitor or make an
+interim push. The ONE final matching lane publication still awaits genuine
+pre-QC readiness or a concrete irreducible owner/external blocker.
+
+### 128.42 Final preactivation hold correction and validation erratum
+
+**SI-BUILD-20261027-049 (P2, corrected before actual invocation):** peer's
+source-free CPU probe showed a BrokenPipeError from the optional retention
+announcement escaping BEFORE the mandatory private-byte/FD hold loop.
+No source operation occurred in the probe. Summary construction, canonical
+encoding and print are now best-effort inside the announcement only; even a
+notification failure marks the one announcement attempt and enters the
+unchanged mandatory hold loop. No error text/source action/cleanup was added.
+Five regressions cover BrokenPipeError/OSError/ValueError/RuntimeError and
+summary failure. Main's memory-only old-function reversal yielded exactly
+FIVE expected failures, restored; source operations0. Main outer72/4.65s
+passed after the fix, and peer accepted its small final diff. A second peer
+CPU probe of ordinary failure-output did not establish private exception-
+context leakage; no such claim or expanded correction is made here.
+
+The880/63.42s validation and code mappings in128.41 are preserved as their
+actual PRIOR execution before049. Main's FINAL TWENTY relevant focused files
+passed **885tests/63.80s**, OS network denied, with no warnings/skips reported.
+No full lane/repository suite ran. The five semantic policy hashes in128.41
+remain EXACTLY unchanged and independently match. Exact runtime/held path
+counts and list hashes stay84=82+2 and85=83+2. Final outer source rawSHA:
+ff15e55095a04a52a1fe6d736ac12fd302be57e597095aa7db1c178351d31f5e.
+FINAL outer84-byte mapping:
+662615638960744fe8c67e9e5cc47093370bfaf201181f8098d7d672660c21d6.
+FINAL readonly85-byte mapping:
+2cce1e31f3b134e3d910f8321e89c14c49f956b241de869a20ef42c4d9388f17.
+All source/changed tests compile in memory; all historical record bytes remain
+an unchanged prefix. Current generated-artifact namespace is covered by the
+existing artifacts/ ignore rule; no gitignore/shared-document change is made.
+
+This is the final software clearance for the ONE prospective128.41 count
+invocation after clean commit and immediate exact root/branch/HEAD/status/
+actual matching-origin revalidation. No invocation/claim/HTTP/charge has yet
+occurred at this record update. Freeze every author/test before launching;
+do not mistake policy registration, passing fixtures or started stdout for
+actual closure or pre-QC readiness. Continue from its true terminal result,
+preserving every debit/negative and the original process on any hold.
+
+Main post-record checks:95passed/1.06s;90 source/changed-test files compiled
+in memory; append-only history and whitespace checks passed.

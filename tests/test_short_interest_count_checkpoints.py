@@ -17,7 +17,8 @@ from test_short_interest_count_durable_budget import genuine_plan, isolated_regi
 
 @pytest.fixture(autouse=True)
 def fresh(monkeypatch):
-    for name, value in (("_ISSUED", {}), ("_FAILED", set()), ("_CLOSED", {}), ("_PRIVATE", {})):
+    for name, value in (("_ISSUED", {}), ("_FAILED", set()), ("_CLOSED", {}), ("_PRIVATE", {}),
+            ("_DEADLINES", {}), ("_DEADLINE_LAST", {}), ("_PRODUCERS", {}), ("_PRODUCER_PINS", {})):
         monkeypatch.setattr(reader, name, value)
 
 
@@ -291,9 +292,10 @@ def terminal_metadata_fixture(monkeypatch, tmp_path):
     monkeypatch.setattr(reader, "EXPECTED_ROUND_MOUNT", str(mount))
     monkeypatch.setattr(reader, "_native", lambda volume, plan, chunk, boundary: mount)  # Named fake native epoch.
     monkeypatch.setattr(reader, "_read_original", lambda *a, **k: pytest.fail("terminal metadata reread body bytes"))
-    return SimpleNamespace(mount=mount, claim=claim, main=main,
+    ticks = [0.0]; deadline = reader._new_deadline(lambda: ticks[0])
+    return SimpleNamespace(mount=mount, claim=claim, main=main, ticks=ticks, deadline=deadline,
         audit=lambda: reader._terminal_metadata(index, [source], directories("round"),
-            *pairs["round"], (main, "b" * 64, main9)))
+            *pairs["round"], (main, "b" * 64, main9), deadline))
 
 
 def test_terminal_original_metadata_pass_uses_no_body_reread(terminal_metadata_fixture):
@@ -466,3 +468,166 @@ def test_Git_allowlist_accepts_original_producer_show_and_both_exact_ref_ABIs(mo
     ["git", "merge-base", "--is-ancestor", "f" * 40, "a" * 40]])
 def test_Git_allowlist_rejects_unrelated_ref_paths_heads_or_broad_metadata(command):
     assert not reader._git_allowed("git", command, reader.ROOT, "a" * 40)
+
+
+@pytest.fixture
+def repository_unit_fixture(monkeypatch, tmp_path):
+    """ORIGINAL LaneGuard/_git; only the physical/Git producer is fabricated."""
+    root = tmp_path.resolve(); head, remote = "a" * 40, "b" * 40
+    calls, status, committed = [], ["clean"], {}
+    monkeypatch.setattr(reader, "ROOT", root); monkeypatch.setattr(reader.lane, "ROOT", root)
+    def runner(where, command):
+        assert where == root; calls.append(tuple(command))
+        if command == ["git", "rev-parse", "--show-toplevel"]: return (str(root) + "\n").encode()
+        if command[:2] == ["git", "status"]:
+            oid = "c" * 40 if status[0] == "advanced" else head
+            raw = ("# branch.oid " + oid + "\n# branch.head " + reader.lane.BRANCH + "\n").encode()
+            return raw + (b"? changed.py\n" if status[0] == "dirty" else b"")
+        assert command[:2] == ["git", "show"]
+        return committed[command[2]]
+    def physical(where): assert where == root and where.resolve() == root
+    guard = reader.lane.LaneGuard(root, expected_head=head, expected_remote=remote,
+        runner=runner, physical=physical)
+    def subprocess_run(command, *, cwd, **unused):
+        return SimpleNamespace(returncode=0, stdout=runner(cwd, command), stderr=b"")
+    monkeypatch.setattr(reader.old_archive.count.old.cache.subprocess, "run", subprocess_run)
+    ticks = [100.0]; deadline = reader._new_deadline(lambda: ticks[0])
+    return SimpleNamespace(root=root, guard=guard, calls=calls, status=status, committed=committed,
+        ticks=ticks, deadline=deadline, head=head, remote=remote)
+
+
+@pytest.mark.parametrize("length,original_commands", [(1, 6), (65536, 6), (65537, 8), (2097152, 68)])
+def test_descriptor_bracket_bounds_Git_calls_without_skipping_original_byte_reads(
+        repository_unit_fixture, monkeypatch, length, original_commands):
+    h = repository_unit_fixture; raw = b"F" * length
+    path = h.root / "fabricated-body.raw"; path.write_bytes(raw); path.chmod(0o600)
+    original_stamp = reader._stamp
+    monkeypatch.setattr(reader, "_stamp", lambda info: (*original_stamp(info)[:8], 2))
+    pin = list(reader._stamp(path.lstat()))
+    # The old per-read callback performed a complete two-Git snapshot for
+    # every 64KiB. The original file reader and original guards are unchanged.
+    assert reader._read_original(path, hash_bytes(raw), pin, h.guard.check)[0] == raw
+    assert len(h.calls) == original_commands; h.calls.clear()
+    with reader._repository_unit(h.guard, h.deadline):
+        found, seal = reader._read_original(path, hash_bytes(raw), pin, lambda: reader._tick(h.deadline))
+    assert found == raw and seal == tuple(pin)
+    assert len(h.calls) == 4  # Entry+exit snapshots, independent of body size.
+
+
+@pytest.mark.parametrize("changed", ["dirty", "advanced"])
+def test_descriptor_exit_snapshot_rejects_changed_repository(repository_unit_fixture, changed):
+    h = repository_unit_fixture
+    with pytest.raises(reader.lane.LaneBatchRefusal):
+        with reader._repository_unit(h.guard, h.deadline): h.status[0] = changed
+    assert len(h.calls) == 4
+
+
+def test_pure_inner_clock_keeps_original_seal_mutation_veto(repository_unit_fixture, monkeypatch):
+    h = repository_unit_fixture; path = h.root / "fabricated-body.raw"
+    path.write_bytes(b"{}"); path.chmod(0o600); original_stamp = reader._stamp
+    monkeypatch.setattr(reader, "_stamp", lambda info: (*original_stamp(info)[:8], 2))
+    pin = list(reader._stamp(path.lstat())); calls = []
+    def boundary():
+        reader._tick(h.deadline); calls.append(1)
+        if len(calls) == 3: path.write_bytes(b"[]")
+    with pytest.raises(reader.CountCheckpointLoaderRefusal, match="seal_changed"):
+        with reader._repository_unit(h.guard, h.deadline):
+            reader._read_original(path, hash_bytes(b"{}"), pin, boundary)
+    assert len(h.calls) == 4
+
+
+@pytest.fixture
+def invariant_producer(repository_unit_fixture, monkeypatch):
+    h = repository_unit_fixture
+    bodies = {"scripts/fabricated_a.py": b"FIXED_A", "scripts/fabricated_b.py": b"FIXED_B"}
+    manifest = tuple((name, hash_bytes(raw)) for name, raw in sorted(bodies.items()))
+    monkeypatch.setattr(reader, "EXPECTED_PRODUCER_HEAD", h.head)
+    monkeypatch.setattr(reader, "EXPECTED_PRODUCER_PROTOCOL", "c" * 64)
+    monkeypatch.setattr(reader, "EXPECTED_PRODUCER_CODE_MANIFEST", manifest)
+    monkeypatch.setattr(reader, "code_paths", lambda: tuple(bodies))  # Explicit synthetic code profile.
+    h.committed.update({h.head + ":" + name: raw for name, raw in bodies.items()})
+    profile = {"head": h.head, "remote": h.remote, "code_manifest": [list(row) for row in manifest],
+        "code_identity_sha256": hash_payload({"git_commit": h.head, "files": [
+            {"path": name, "sha256": digest} for name, digest in manifest]}),
+        "source_authority_sha256": "d" * 64, "operator_protocol_sha256": "e" * 64,
+        "run_protocol_sha256": "c" * 64, "negative_policy_sha256": "f" * 64,
+        "registration_sha256": "0" * 64}
+    def for_chunk(chunk):
+        value = deepcopy(profile)
+        value["registration_sha256"] = hash_payload({"plan_sha256": "1" * 64, "chunk": chunk,
+            "protocol_sha256": value["operator_protocol_sha256"], "head": value["head"], "remote": value["remote"],
+            "code_identity_sha256": value["code_identity_sha256"],
+            "code_manifest_sha256": hash_payload(dict(manifest))})
+        return value
+    h.manifest, h.for_chunk = manifest, for_chunk
+    return h
+
+
+def test_producer_initial_terminal_original_Git_audits_are_constant_across_133_chunks(invariant_producer):
+    h = invariant_producer
+    witness = reader._new_producer_witness(h.for_chunk(1), h.guard, h.deadline)
+    assert len(h.calls) == 5 * len(h.manifest)
+    for unused_sweep in range(3):
+        for chunk in range(1, 134): reader._match_producer(h.for_chunk(chunk), witness, "1" * 64, chunk)
+    assert len(h.calls) == 5 * len(h.manifest)  # No per-descriptor Git verification.
+    reader._audit_producer_code(witness, h.guard, h.deadline)
+    assert len(h.calls) == 10 * len(h.manifest)
+    assert len(h.calls) < 5 * len(h.manifest) * 133 * 3
+
+
+@pytest.mark.parametrize("field", ["registration_sha256", "source_authority_sha256", "operator_protocol_sha256"])
+def test_producer_invariant_and_each_original_chunk_registration_are_recomputed(invariant_producer, field):
+    h = invariant_producer; witness = reader._new_producer_witness(h.for_chunk(1), h.guard, h.deadline)
+    value = h.for_chunk(2); value[field] = "9" * 64
+    with pytest.raises(reader.CountCheckpointLoaderRefusal, match="producer_changed"):
+        reader._match_producer(value, witness, "1" * 64, 2)
+    with pytest.raises(reader.CountCheckpointLoaderRefusal, match="producer_changed"):
+        reader._match_producer(h.for_chunk(1), witness, "1" * 64, 2)
+
+
+def test_wrong_initial_committed_code_never_mints_producer_witness(invariant_producer):
+    h = invariant_producer; h.committed[h.head + ":" + h.manifest[-1][0]] = b"CHANGED"
+    with pytest.raises(reader.CountCheckpointLoaderRefusal, match="producer_changed"):
+        reader._new_producer_witness(h.for_chunk(1), h.guard, h.deadline)
+    assert reader._PRODUCERS == reader._PRODUCER_PINS == {}
+
+
+def test_original_producer_terminal_code_and_private_witness_cannot_be_substituted(invariant_producer):
+    h = invariant_producer; witness = reader._new_producer_witness(h.for_chunk(1), h.guard, h.deadline)
+    forged = object.__new__(reader._ProducerCodeWitness)
+    forged._anchor = forged._identity = witness._anchor
+    with pytest.raises(reader.CountCheckpointLoaderRefusal, match="producer_changed"): reader._producer_origin(forged)
+    h.committed[h.head + ":" + h.manifest[-1][0]] = b"CHANGED"
+    with pytest.raises(reader.CountCheckpointLoaderRefusal, match="producer_changed"):
+        reader._audit_producer_code(witness, h.guard, h.deadline)
+
+
+@pytest.mark.parametrize("changed", [True, float("nan"), -1.0, 1800.0])
+def test_original_pinned_clock_rejects_invalid_backward_and_final_deadline(changed):
+    ticks = [0.0]; deadline = reader._new_deadline(lambda: ticks[0]); ticks[0] = changed
+    with pytest.raises(reader.CountCheckpointLoaderRefusal): reader._tick(deadline)
+
+
+def test_pinned_clock_never_looks_up_rebound_module_clock(monkeypatch):
+    ticks = [0.0]; deadline = reader._new_deadline(lambda: ticks[0])
+    monkeypatch.setattr(reader.time, "monotonic", lambda: pytest.fail("untrusted rebound clock called"))
+    ticks[0] = 1.0; reader._tick(deadline)
+
+
+def test_original_test_clock_code_cannot_be_replaced_after_mint():
+    def clock(): return 0.0
+    deadline = reader._new_deadline(clock)
+    original = clock.__code__
+    try:
+        clock.__code__ = (lambda: 0.0).__code__
+        with pytest.raises(reader.CountCheckpointLoaderRefusal, match="clock_changed"): reader._tick(deadline)
+    finally: clock.__code__ = original
+
+
+def test_final_metadata_deadline_includes_last_original_Main_receipt_audit(terminal_metadata_fixture, monkeypatch):
+    h = terminal_metadata_fixture; original = reader._file_metadata
+    def audit(path, seal9):
+        original(path, seal9)
+        if path == h.main: h.ticks[0] = 1800.0
+    monkeypatch.setattr(reader, "_file_metadata", audit)
+    with pytest.raises(reader.CountCheckpointLoaderRefusal, match="window_exhausted"): h.audit()

@@ -102,14 +102,19 @@ def h(source_h, kernel, monkeypatch):
     return original
 
 
-def test_registration_false_authority_and_independent_finite_bounds():
+def test_registration_false_authority_and_independent_finite_bounds(monkeypatch):
     value = checkpoint.policy()
-    assert checkpoint.CHECKPOINT_POLICY_SHA256 == "PENDING"
+    assert checkpoint.CHECKPOINT_POLICY_SHA256 == hash_payload(value)
     assert value["maximum_descriptor_bytes"] == 2 * 1024 ** 2
     assert value["maximum_receipt_bytes"] == 1024 and value["maximum_chunks"] == 133
-    assert value["maximum_owned_FDs"] == 668 and value["maximum_transient_FDs"] == 16
+    assert value["maximum_owned_FDs"] == 668 and value["maximum_transient_FDs"] == 100
+    margin = value["transient_FD_derivation"]
+    assert margin["serial_allowance"] + margin["additional_workers"] * margin["per_additional_worker_constructor_peak"] == 100
+    assert margin["includes_internal_listdir_duplicate"] is True
     assert value["independent_metadata_audit_seconds"] == 1800
     assert all(item is False or type(item) is int and item == 0 for item in value["authority"].values())
+    checkpoint._registered()
+    monkeypatch.setattr(checkpoint, "CHECKPOINT_POLICY_SHA256", "PENDING")
     with pytest.raises(checkpoint.CountCheckpointRefusal, match="registration_pending"): checkpoint._registered()
 
 
@@ -424,3 +429,47 @@ def test_last_round_read_cannot_change_a_previously_audited_chunk_root(h, monkey
     with pytest.raises(checkpoint.CountCheckpointRefusal, match="membership_changed"):
         checkpoint.final_checkpoint_roots()
     assert first._anchor[11] in checkpoint._FAILED_NONCES
+
+
+@pytest.mark.parametrize("change", ["deadline", "backwards"])
+def test_final_no_callback_metadata_pass_is_inside_original_audit_window(h, monkeypatch, change):
+    native, active, calls = checkpoint.storage._native_statfs, [False], []
+    def native_then_advance(fd):
+        result = native(fd)
+        if active[0]:
+            calls.append(fd)
+            # First native check precedes reads; second follows the last
+            # receipt read; third is the final all-root metadata-only pass.
+            if len(calls) == 3:
+                h.clock.now += checkpoint.MAXIMUM_AUDIT_SECONDS if change == "deadline" else -1
+        return result
+    monkeypatch.setattr(checkpoint.storage, "_native_statfs", native_then_advance)
+    cap = h.publish(); active[0] = True
+    with pytest.raises(checkpoint.CountCheckpointRefusal,
+            match="audit_deadline" if change == "deadline" else "clock_refused"):
+        checkpoint.audit_original_checkpoint_roots()
+    assert len(calls) == 3
+    assert cap._anchor[11] in checkpoint._FAILED_NONCES and cap in checkpoint._FAILED
+    with pytest.raises(checkpoint.CountCheckpointRefusal): checkpoint.checkpoint_binding(cap)
+
+
+def test_eight_worker_headroom_refuses_one_fd_below_stronger_preclaim_boundary(h, monkeypatch):
+    real_listdir = os.listdir
+    monkeypatch.setattr(os, "listdir", lambda path: [str(item) for item in range(64)]
+        if path == "/dev/fd" else real_listdir(path))
+    soft = 64 + 668 + 100 - 1
+    monkeypatch.setattr(checkpoint.resource, "getrlimit", lambda limit: (soft, soft))
+    with pytest.raises(checkpoint.CountCheckpointRefusal, match="fd_headroom"):
+        checkpoint.preflight_checkpoint_resources(h.op, h.volume)
+    assert not (h.mount / "checkpoint").exists() and not h.kernel.calls
+
+
+def test_exact_prospective_worker_margin_preserves_owned_bound_and_changes_no_OS_limit(h, monkeypatch):
+    real_listdir = os.listdir
+    monkeypatch.setattr(os, "listdir", lambda path: [str(item) for item in range(64)]
+        if path == "/dev/fd" else real_listdir(path))
+    soft = 64 + 668 + 100
+    monkeypatch.setattr(checkpoint.resource, "getrlimit", lambda limit: (soft, soft))
+    monkeypatch.setattr(checkpoint.resource, "setrlimit", lambda *args: pytest.fail("OS limits must remain unchanged"))
+    assert checkpoint.preflight_checkpoint_resources(h.op, h.volume) is None
+    assert checkpoint.MAXIMUM_OWNED_FDS == 668 and not (h.mount / "checkpoint").exists() and not h.kernel.calls

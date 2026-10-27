@@ -5,7 +5,7 @@ START/page, or issues any qualified count capability. The original mount FD
 and opaque observations stay strongly alive on every blocker. The owner of
 the process MUST keep it alive while `requires_process_hold` is true; this
 module intentionally offers no release/retry/adoption or success-lane cast.
-Production registration is pending an explicit Main code/policy freeze.
+Production registration binds the explicit finite Main code/policy freeze.
 """
 import _thread
 import fcntl
@@ -26,7 +26,7 @@ from scripts import short_interest_count_control_custody as controls
 from scripts import short_interest_count_response_custody as responses
 
 immutable, creator = primitive.immutable, primitive.creator
-PRESERVATION_POLICY_SHA256 = "PENDING"
+PRESERVATION_POLICY_SHA256 = "11cc180fc0ae9e2faddf1e632cc431e1cd7ad1dd0ab02fb1a819644ae7b8ecf3"
 MAXIMUM_ATTEMPTS, MAXIMUM_LEASES = 528, 133
 MAXIMUM_BODY_BYTES, MAXIMUM_METADATA_BYTES = 2097152, 1024
 ROOT_NAME, PAIR_NAME, METADATA_NAME = "quarantine", "pair", "metadata"

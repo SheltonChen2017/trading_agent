@@ -15,6 +15,7 @@ import stat
 import sys
 import time
 from datetime import timedelta
+from types import FunctionType, BuiltinFunctionType
 
 from data.hashing import canonical_json, hash_bytes, hash_payload
 from scripts import load_short_interest_count_epoch_ledger as old_archive
@@ -43,6 +44,8 @@ HISTORICAL_HEADS = (
     "71f0a62de1ecfa07e1c1f91bd34ec94361eb207a", "99417837467f98b0ed02a3272b0980f4efa2d243",
     "e9771c52824edc3fb123d586230ffca36bcfdd8f", "2d11d1f5b73a04e0701c65bdeb81152766535f89")
 _ISSUED, _FAILED, _CLOSED, _PRIVATE = {}, set(), {}, {}
+_DEADLINES, _DEADLINE_LAST, _PRODUCERS, _PRODUCER_PINS = {}, {}, {}, {}
+_MONOTONIC = time.monotonic
 _CODES = frozenset("""checkpoint_loader_registration_pending checkpoint_loader_root_changed
 checkpoint_loader_json_changed checkpoint_loader_shape_changed checkpoint_loader_seal_changed
 checkpoint_loader_file_changed checkpoint_loader_directory_changed checkpoint_loader_native_changed
@@ -101,6 +104,9 @@ def protocol():
         "Git_historical_heads": list(HISTORICAL_HEADS),
         "Git_routes": "exact_current_producer_historical_show_paths_exact_ancestry_and_only_matching_origin_REF",
         "producer_files": "PROVISIONAL_STORAGE_FACTS_never_actual_process_closure",
+        "repository_brackets": "full_exact_snapshots_before_after_each_descriptor_inner_original_seals_bytes_native_and_pinned_clock",
+        "producer_code": "original_private_invariant_witness_initial_and_terminal_guarded_Git_audits_registration_recomputed_per_chunk",
+        "terminal_clock": "same_original_pinned_pure_monotonic_through_last_metadata_check_no_source_callback",
         "root_of_trust": "frozen_Main_independently_authenticated_KNOWN_actual_exit0_receipt_and_original_full9_pins",
         "closure": "all_source_sweeps_and_code_context_exits_then_fresh_committed_code_and_original_terminal_witness",
         "code_paths": list(code_paths()), "authority": authority()}
@@ -164,6 +170,50 @@ def _close(fds):
         try: os.close(fds.pop())
         except BaseException: failed = True
     require(not failed, "checkpoint_loader_close_failed")
+
+
+class _PinnedDeadline:
+    __slots__ = ("_anchor", "_identity")
+    def __init__(self): raise CountCheckpointLoaderRefusal("REFUSED: checkpoint_loader_factory_required")
+
+
+def _new_deadline(monotonic=_MONOTONIC):
+    """Production uses the ORIGINAL builtin; explicit Python clocks are tests."""
+    require(type(monotonic) in (FunctionType, BuiltinFunctionType)
+        and type(MAXIMUM_SECONDS) is int and MAXIMUM_SECONDS == 1800, "checkpoint_loader_clock_changed")
+    began = monotonic()
+    require(type(began) in (int, float) and math.isfinite(began) and 0 <= began <= 2 ** 53,
+        "checkpoint_loader_clock_changed")
+    value = object.__new__(_PinnedDeadline)
+    original = (value, monotonic, monotonic.__code__ if type(monotonic) is FunctionType else None,
+        monotonic.__defaults__ if type(monotonic) is FunctionType else None, began, MAXIMUM_SECONDS, object())
+    value._anchor = value._identity = original
+    _DEADLINES[id(value)] = original; _DEADLINE_LAST[id(value)] = original, began
+    return value
+
+
+def _tick(deadline):
+    original = _DEADLINES.get(id(deadline)) if type(deadline) is _PinnedDeadline else None
+    require(type(original) is tuple and len(original) == 7 and original[0] is deadline
+        and deadline._anchor is deadline._identity is original
+        and _DEADLINE_LAST.get(id(deadline), (None,))[0] is original,
+        "checkpoint_loader_clock_changed")
+    clock = original[1]
+    require((original[2] is None or (clock.__code__ is original[2] and clock.__defaults__ is original[3]))
+        and type(MAXIMUM_SECONDS) is int and MAXIMUM_SECONDS == original[5], "checkpoint_loader_clock_changed")
+    now = clock()
+    require(type(now) in (int, float) and math.isfinite(now)
+        and original[4] <= _DEADLINE_LAST[id(deadline)][1] <= now <= 2 ** 53, "checkpoint_loader_clock_changed")
+    require(now - original[4] < original[5], "checkpoint_loader_window_exhausted")
+    _DEADLINE_LAST[id(deadline)] = original, now
+
+
+@contextmanager
+def _repository_unit(guard, deadline):
+    """A fixed readonly unit, never timed evidence or a caller complete flag."""
+    _tick(deadline); guard.check(); _tick(deadline)
+    try: yield
+    finally: _tick(deadline); guard.check(); _tick(deadline)
 
 
 def _read_original(path, digest, seal9, boundary, *, seal_hash=None):
@@ -304,7 +354,7 @@ def _native(volume, plan_sha, chunk, boundary):
     boundary(); return mount
 
 
-def _producer(value, guard):
+def _producer_profile(value):
     _keys(value, ("head", "remote", "code_manifest", "code_identity_sha256", "source_authority_sha256",
         "operator_protocol_sha256", "run_protocol_sha256", "negative_policy_sha256", "registration_sha256"))
     require(value["head"] == EXPECTED_PRODUCER_HEAD and value["run_protocol_sha256"] == EXPECTED_PRODUCER_PROTOCOL
@@ -315,9 +365,62 @@ def _producer(value, guard):
     require(hash_payload({"git_commit": value["head"], "files": [
         {"path": name, "sha256": digest} for name, digest in EXPECTED_PRODUCER_CODE_MANIFEST]})
         == value["code_identity_sha256"], "checkpoint_loader_producer_changed")
-    for name, digest in EXPECTED_PRODUCER_CODE_MANIFEST:
-        committed = old_archive.count.old.cache._git(ROOT, ["show", EXPECTED_PRODUCER_HEAD + ":" + name], guard)
+    return canonical_json({key: item for key, item in value.items() if key != "registration_sha256"}).encode()
+
+
+class _ProducerCodeWitness:
+    __slots__ = ("_anchor", "_identity")
+    def __init__(self): raise CountCheckpointLoaderRefusal("REFUSED: checkpoint_loader_factory_required")
+
+
+def _producer_origin(witness):
+    original = _PRODUCERS.get(id(witness)) if type(witness) is _ProducerCodeWitness else None
+    require(type(original) is tuple and len(original) == 7 and original[0] is witness
+        and witness._anchor is witness._identity is original and original is _PRODUCER_PINS.get(id(witness))
+        and hash_bytes(original[1]) == original[2] and hash_payload(protocol()) == original[4],
+        "checkpoint_loader_producer_changed")
+    return original
+
+
+def _audit_producer_code(witness, guard, deadline):
+    original = _producer_origin(witness)
+    for name, digest in original[3]:
+        _tick(deadline)
+        # Every REAL Git invocation keeps its original complete guards.
+        committed = old_archive.count.old.cache._git(ROOT, ["show", original[5] + ":" + name], guard)
         require(hash_bytes(committed) == digest, "checkpoint_loader_producer_changed")
+        _tick(deadline)
+    require(_producer_origin(witness) is original, "checkpoint_loader_producer_changed")
+
+
+def _new_producer_witness(value, guard, deadline):
+    raw = _producer_profile(value); manifest, head, scope = EXPECTED_PRODUCER_CODE_MANIFEST, EXPECTED_PRODUCER_HEAD, hash_payload(protocol())
+    for name, digest in manifest:
+        _tick(deadline)
+        committed = old_archive.count.old.cache._git(ROOT, ["show", head + ":" + name], guard)
+        require(hash_bytes(committed) == digest, "checkpoint_loader_producer_changed"); _tick(deadline)
+    require(manifest is EXPECTED_PRODUCER_CODE_MANIFEST and head is EXPECTED_PRODUCER_HEAD
+        and scope == hash_payload(protocol()) and _producer_profile(value) == raw, "checkpoint_loader_producer_changed")
+    # Nothing can authenticate a provisional witness while code is still
+    # being read: mint only after the complete original guarded verification.
+    witness = object.__new__(_ProducerCodeWitness)
+    original = witness, raw, hash_bytes(raw), manifest, scope, head, object()
+    witness._anchor = witness._identity = original
+    _PRODUCERS[id(witness)] = _PRODUCER_PINS[id(witness)] = original
+    return witness
+
+
+def _match_producer(value, witness, plan_sha256, chunk):
+    original = _producer_origin(witness)
+    require(_producer_profile(value) == original[1] and _digest(plan_sha256)
+        and type(chunk) is int and 1 <= chunk <= MAXIMUM_CHUNKS, "checkpoint_loader_producer_changed")
+    # Registration binds the chunk, so unlike the invariant producer profile
+    # it MUST differ across chunks. This is the exact original operator hash.
+    expected = hash_payload({"plan_sha256": plan_sha256, "chunk": chunk,
+        "protocol_sha256": value["operator_protocol_sha256"], "head": value["head"], "remote": value["remote"],
+        "code_identity_sha256": value["code_identity_sha256"],
+        "code_manifest_sha256": hash_payload(dict(original[3]))})
+    require(value["registration_sha256"] == expected, "checkpoint_loader_producer_changed")
 
 
 def _root_membership(mount, system_entries, boundary):
@@ -400,14 +503,17 @@ def _checkpoint_metadata(mount, relative_root, body9, receipt9, directories, *, 
     for row in directories: _directory5(mount / row["path"], row["pin5"])
 
 
-def _terminal_metadata(index, descriptors, round_directories, round_body9, round_receipt9, receipt_pin):
+def _terminal_metadata(index, descriptors, round_directories, round_body9, round_receipt9, receipt_pin, deadline):
     """One finite no-callback original metadata pass after final code/clocks.
 
     No body reread, expired lease, new baseline, or perpetual/atomic stability
     assertion is made here. Each original native/name/FD pin is observed once.
     """
+    _tick(deadline)
     for number, (entry, descriptor) in enumerate(zip(index["chunks"], descriptors), 1):
+        _tick(deadline)
         mount = _native(descriptor["volume"], index["plan_sha256"], number, lambda: None)
+        _tick(deadline)
         files = descriptor["files"]; names = [row["path"] for row in files]
         expected_dirs = {"."}
         for name in names:
@@ -416,19 +522,25 @@ def _terminal_metadata(index, descriptors, round_directories, round_body9, round
                 expected_dirs.add(parent.as_posix()); parent = parent.parent
         observed = []
         for row in descriptor["directories"]:
+            _tick(deadline)
             name = row["path"]; _directory(mount / name, row["pin4"]); observed.append(name)
             if name != ".":
                 allowed = {Path(item).parts[len(Path(name).parts)] for item in names if item.startswith(name + "/")}
                 require(set(os.listdir(mount / name)) == allowed, "checkpoint_loader_catalogue_changed")
         require(observed == sorted(set(observed)) and set(observed) == expected_dirs,
             "checkpoint_loader_catalogue_changed")
-        for row in files: _file_metadata(mount / row["path"], row["seal9"])
+        for row in files:
+            _tick(deadline); _file_metadata(mount / row["path"], row["seal9"]); _tick(deadline)
         _checkpoint_metadata(mount, "checkpoint/chunk", entry["body_seal9"], entry["receipt_seal9"],
             entry["directory_pins"], final_mount=number == len(descriptors))
         _root_membership(mount, descriptor["volume"]["system_entries"], lambda: None)
+        _tick(deadline)
     _checkpoint_metadata(Path(EXPECTED_ROUND_MOUNT), "checkpoint/round", round_body9, round_receipt9,
         round_directories, final_mount=True)
     _file_metadata(receipt_pin[0], receipt_pin[2])
+    # Direct original pinned clock, not an arbitrary source/repository callback
+    # after the last original file/native/membership audit.
+    _tick(deadline)
 
 
 def _attempts(descriptor, private, plan, lifetime, *, ordinal_offset=0):
@@ -602,14 +714,11 @@ def load_registered_count_checkpoints(root, *, runtime_head, actual_remote,
         "checkpoint_loader_root_changed")
     require(type(complete_code_manifest) is dict and tuple(sorted(complete_code_manifest)) == code_paths()
         and all(_digest(item) for item in complete_code_manifest.values()), "checkpoint_loader_code_changed")
-    began, last, value = time.monotonic(), [None], None
+    deadline, value, producer_witness = _new_deadline(), None, None
     guard = lane.LaneGuard(root, expected_head=runtime_head, expected_remote=actual_remote)
+    def clock_boundary(): _tick(deadline)
     def boundary():
-        now = time.monotonic()
-        require(type(now) in (int, float) and math.isfinite(now) and now >= began
-            and (last[0] is None or now >= last[0]), "checkpoint_loader_clock_changed")
-        require(now - began < MAXIMUM_SECONDS, "checkpoint_loader_window_exhausted")
-        last[0] = now; guard.check()
+        _tick(deadline); guard.check(); _tick(deadline)
     def audit_code(held):
         guard.refresh()
         for name, digest in sorted(complete_code_manifest.items()):
@@ -628,16 +737,15 @@ def load_registered_count_checkpoints(root, *, runtime_head, actual_remote,
             plan = plans.freeze_count_recovery_plan(baseline)
             with old_archive.count.old.cache.HeldFiles(tuple(root / name for name in code_paths()),
                     protected=False, boundary=boundary) as code:
-                audit_code(code); main_receipt, receipt_pin = _receipt(boundary)
+                audit_code(code)
+                with _repository_unit(guard, deadline): main_receipt, receipt_pin = _receipt(clock_boundary)
                 round_directories = _round_directories()
                 def audit_round():
-                    return _pair(Path(EXPECTED_ROUND_MOUNT), "checkpoint/round", EXPECTED_ROUND_BODY_SHA256,
-                        EXPECTED_ROUND_BODY_SEAL9_SHA256, EXPECTED_ROUND_RECEIPT_SHA256,
-                        EXPECTED_ROUND_RECEIPT_SEAL9_SHA256, boundary, hashes=True, directory_pins=round_directories)
-                index_raw, round_body9, round_receipt9 = _pair(Path(EXPECTED_ROUND_MOUNT), "checkpoint/round",
-                    EXPECTED_ROUND_BODY_SHA256, EXPECTED_ROUND_BODY_SEAL9_SHA256,
-                    EXPECTED_ROUND_RECEIPT_SHA256, EXPECTED_ROUND_RECEIPT_SEAL9_SHA256, boundary, hashes=True,
-                    directory_pins=round_directories)
+                    with _repository_unit(guard, deadline):
+                        return _pair(Path(EXPECTED_ROUND_MOUNT), "checkpoint/round", EXPECTED_ROUND_BODY_SHA256,
+                            EXPECTED_ROUND_BODY_SEAL9_SHA256, EXPECTED_ROUND_RECEIPT_SHA256,
+                            EXPECTED_ROUND_RECEIPT_SEAL9_SHA256, clock_boundary, hashes=True, directory_pins=round_directories)
+                index_raw, round_body9, round_receipt9 = audit_round()
                 index = _parse(index_raw)
                 _keys(index, ("schema", "phase", "baseline_sha256", "plan_sha256", "chunks",
                     "expected_union_binding_sha256", "expected_accounting", "authority"))
@@ -648,12 +756,15 @@ def load_registered_count_checkpoints(root, *, runtime_head, actual_remote,
                     == main_receipt["expected_union_binding_sha256"], "checkpoint_loader_index_changed")
                 descriptors, accounts, lifetime = [], [], list(plan._parts[4][0])
                 def sweep(root_entry, number, *, account=True):
+                    with _repository_unit(guard, deadline): return sweep_files(root_entry, number, account=account)
+                def sweep_files(root_entry, number, *, account=True):
+                    nonlocal producer_witness
                     _keys(root_entry, ("chunk", "mount", "relative_root", "body_sha256", "body_seal9",
                         "receipt_sha256", "receipt_seal9", "descriptor_sha256", "directory_pins"))
                     require(type(root_entry["chunk"]) is int and root_entry["chunk"] == number
                         and root_entry["relative_root"] == "checkpoint/chunk", "checkpoint_loader_index_changed")
                     raw, unused3, unused4 = _pair(Path(root_entry["mount"]), "checkpoint/chunk", root_entry["body_sha256"],
-                        root_entry["body_seal9"], root_entry["receipt_sha256"], root_entry["receipt_seal9"], boundary,
+                        root_entry["body_seal9"], root_entry["receipt_sha256"], root_entry["receipt_seal9"], clock_boundary,
                         directory_pins=root_entry["directory_pins"], final_mount=number == len(plan._parts[3]))
                     require(hash_bytes(raw) == root_entry["descriptor_sha256"], "checkpoint_loader_index_changed")
                     descriptor = _parse(raw)
@@ -664,10 +775,13 @@ def load_registered_count_checkpoints(root, *, runtime_head, actual_remote,
                             "sha256": plan.sha256, "chunk": number, "positions": list(plan.chunk_positions(number)),
                             "total_chunks": len(plan._parts[3])} and descriptor["archive"]["baseline_sha256"] == baseline.sha256,
                         "checkpoint_loader_baseline_changed")
-                    _producer(descriptor["producer"], guard)
-                    mount = _native(descriptor["volume"], plan.sha256, number, boundary)
+                    if producer_witness is None:
+                        require(number == 1, "checkpoint_loader_producer_changed")
+                        producer_witness = _new_producer_witness(descriptor["producer"], guard, deadline)
+                    _match_producer(descriptor["producer"], producer_witness, plan.sha256, number)
+                    mount = _native(descriptor["volume"], plan.sha256, number, clock_boundary)
                     require(str(mount) == root_entry["mount"], "checkpoint_loader_native_changed")
-                    private = _catalogue(mount, descriptor["files"], descriptor["directories"], boundary,
+                    private = _catalogue(mount, descriptor["files"], descriptor["directories"], clock_boundary,
                         system_entries=descriptor["volume"]["system_entries"])
                     if account: accounts.append(_attempts(descriptor, private, plan, lifetime,
                         ordinal_offset=sum(len(item["charges"]) for item in accounts)))
@@ -703,19 +817,21 @@ def load_registered_count_checkpoints(root, *, runtime_head, actual_remote,
                 for number, root_entry in enumerate(index["chunks"], 1):
                     require(sweep(root_entry, number, account=False) == descriptors[number - 1], "checkpoint_loader_file_changed")
                 require(audit_round()[0] == index_raw, "checkpoint_loader_index_changed")
-                _read_original(*receipt_pin[:2], receipt_pin[2], boundary)
+                with _repository_unit(guard, deadline): _read_original(*receipt_pin[:2], receipt_pin[2], clock_boundary)
                 code.check(); audit_code(code)
             with old_archive.count.old.cache.HeldFiles(tuple(root / name for name in code_paths()),
                     protected=False, boundary=boundary) as final_code: audit_code(final_code)
+            _audit_producer_code(producer_witness, guard, deadline)
             # Last original source audit follows the terminal code context exit.
             for number, root_entry in enumerate(index["chunks"], 1):
                 require(sweep(root_entry, number, account=False) == descriptors[number - 1], "checkpoint_loader_file_changed")
             require(audit_round()[0] == index_raw, "checkpoint_loader_index_changed")
-            _read_original(*receipt_pin[:2], receipt_pin[2], boundary); boundary()
+            with _repository_unit(guard, deadline): _read_original(*receipt_pin[:2], receipt_pin[2], clock_boundary)
+            boundary()
             closed = dict(summary, status="closed_requalified_transport_custody_only")
-            raw = canonical_json(closed).encode(); boundary()
-            _terminal_metadata(index, descriptors, round_directories, round_body9, round_receipt9, receipt_pin)
-            _CLOSED[value] = original, raw, hash_bytes(raw)
+            raw = canonical_json(closed).encode(); digest = hash_bytes(raw); boundary()
+            _terminal_metadata(index, descriptors, round_directories, round_body9, round_receipt9, receipt_pin, deadline)
+            _CLOSED[value] = original, raw, digest
     except BaseException:
         if value is not None:
             _FAILED.add(id(value))

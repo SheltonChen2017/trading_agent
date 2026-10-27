@@ -1,4 +1,4 @@
-"""Finite source-only count coordinator; production registration is pending.
+"""Finite registered source-only count coordinator; no source admission.
 
 The old archive's finite context closes before any new chunk begins.  Its
 original closed model is lineage, not a perpetual assertion about old files.
@@ -7,6 +7,7 @@ source/code/output/storage context and all original-pin audits have closed.
 No caller callback, JSON receipt, complete flag or pair closure is authority.
 """
 from contextlib import contextmanager
+from concurrent.futures import ThreadPoolExecutor
 import _thread
 import argparse
 import json
@@ -30,14 +31,17 @@ from scripts import short_interest_count_response_volume as storage
 from scripts import short_interest_closed_count_chunk as reader
 from scripts import short_interest_count_negative_custody as negative
 from scripts import short_interest_count_transport_union as transport_union
+from scripts import short_interest_count_checkpoint as checkpoints
+from scripts import short_interest_count_source_authority as source_scope
 from scripts import diagnose_short_interest_body_receipt_custody as antecedent
 
 ROOT, BRANCH = transport.ROOT, lane.BRANCH
-SOURCE_AUTHORITY_SHA256 = "PENDING"
-RUN_PROTOCOL_SHA256 = "PENDING"
-NEGATIVE_PRESERVATION_POLICY_SHA256 = "PENDING"
+SOURCE_AUTHORITY_SHA256 = "9d67d93ad79657031befd8849659bc20fc5834173d76a569bccb9307347e3a6c"
+RUN_PROTOCOL_SHA256 = "0364f7bca6bc7eaf7c41af850df8c6e1558f23354c179e5ce27126b118b60cd7"
+NEGATIVE_PRESERVATION_POLICY_SHA256 = "11cc180fc0ae9e2faddf1e632cc431e1cd7ad1dd0ab02fb1a819644ae7b8ecf3"
 BASELINE_LEDGER_SHA256 = research_budget.BASELINE_LEDGER_SHA256
 MAXIMUM_CHUNK_SECONDS, MAXIMUM_ARCHIVES = 3600, 1
+MAXIMUM_WORKERS = 8
 DRIVER = "scripts/capture_short_interest_durable_counts.py"
 _ARCHIVES, _ARCHIVE_PLANS, _ARCHIVE_FAILED = {}, {}, set()
 _LEASES, _LEASE_FAILED, _LEASE_TERMINALS, _LEASE_PHASES, _LEASE_CLOCKS = {}, set(), {}, {}, {}
@@ -53,6 +57,9 @@ _SETTLED_CONTRIBUTIONS, _CONTRIBUTION_ORIGINS = {}, {}
 _CHECKPOINT_FACTS, _CHECKPOINT_FACTS_FAILED = {}, set()
 _CHECKPOINT_CAPS, _CHECKPOINT_ROUND = {}, {}
 _WRITTEN_CHECKPOINTS = {}
+_ATTEMPT_SLOTS, _ATTEMPT_BY_TICKET, _RESPONSE_SLOTS = {}, {}, {}
+_ATTEMPT_USED, _RESPONSE_USED, _ATTEMPT_RESULTS = set(), set(), {}
+_WORKER_RETAINED = {}
 _RLOCK_TYPE = type(_thread.RLock())
 _CODES = frozenset("""durable_capture_registration_pending durable_capture_exact_root_required
 durable_capture_archive_factory_required durable_capture_archive_not_closed
@@ -66,7 +73,9 @@ durable_capture_fd_close_failed durable_capture_negative_preservation_pending
 durable_capture_unqualified_result durable_capture_retry_exhausted durable_capture_preservation_changed
 durable_capture_retention_required durable_capture_START_evidence_required
 durable_capture_START_evidence_changed durable_capture_contribution_changed
-durable_capture_checkpoint_changed durable_capture_checkpoint_required""".split())
+durable_capture_checkpoint_changed durable_capture_checkpoint_required
+durable_capture_worker_slot_changed durable_capture_worker_stage_failed
+durable_capture_CLI_arguments_refused""".split())
 
 
 class DurableCountCaptureRefusal(ValueError): pass
@@ -91,6 +100,7 @@ def code_paths():
         "scripts/short_interest_count_negative_custody.py",
         "scripts/short_interest_count_transport_union.py",
         "scripts/short_interest_count_checkpoint.py",
+        "scripts/short_interest_count_source_authority.py",
         "research/short_interest_etf/native_count_recovery_budget.py"))))
 
 
@@ -98,9 +108,12 @@ def protocol():
     return {"schema": "si-durable-count-capture-v1", "source_authority_sha256": SOURCE_AUTHORITY_SHA256,
         "operator_protocol_sha256": transport.PROTOCOL_SHA256,
         "negative_preservation_policy_sha256": NEGATIVE_PRESERVATION_POLICY_SHA256,
+        "checkpoint_policy_sha256": checkpoints.CHECKPOINT_POLICY_SHA256,
         "archive_baseline_sha256": BASELINE_LEDGER_SHA256, "archive_context": "original_closed_before_new_chunk",
         "maximum_chunk_seconds": MAXIMUM_CHUNK_SECONDS, "maximum_archives": MAXIMUM_ARCHIVES,
         "maximum_inflight": 8, "positions_per_chunk": 512, "extra_STARTs_per_chunk": 16,
+        "worker_batch": MAXIMUM_WORKERS,
+        "worker_order": "Main_reserve_remote_roster_START_received_dirs_workers_START_GET_received_Main_conditional_response_dirs_workers_pair_join_before_retry",
         "maximum_cumulative_STARTs": 84005, "maximum_cumulative_bytes": 4 * 1024 ** 3,
         "per_file_creation_seconds": 8, "volume_whole_seconds": 3600,
         "directory_width": 6, "payload": "capture", "external_claim": "claim/claim.spent.json",
@@ -127,7 +140,8 @@ def failure_summary(error):
     for module, name in ((transport, "CountTransportRefusal"), (controls, "CountControlRefusal"),
         (responses, "CountResponseRefusal"), (storage, "CountResponseVolumeRefusal"),
         (reader, "ClosedCountChunkRefusal"), (accounting, "DurableCountBudgetRefusal"),
-        (negative, "NegativePreservationRefusal"), (transport_union, "CountTransportUnionRefusal")):
+        (negative, "NegativePreservationRefusal"), (transport_union, "CountTransportUnionRefusal"),
+        (checkpoints, "CountCheckpointRefusal"), (source_scope, "CountSourceAuthorityRefusal")):
         if type(error) is getattr(module, name, None): return module.failure_summary(error)
     return transport.failure_summary(error)
 
@@ -138,16 +152,22 @@ def _digest(value): return type(value) is str and re.fullmatch(r"[0-9a-f]{64}", 
 def registered():
     require(all(_digest(value) for value in (SOURCE_AUTHORITY_SHA256, RUN_PROTOCOL_SHA256,
         NEGATIVE_PRESERVATION_POLICY_SHA256, transport.PROTOCOL_SHA256))
-        and SOURCE_AUTHORITY_SHA256 == transport.SOURCE_AUTHORITY_SHA256
+        and SOURCE_AUTHORITY_SHA256 == transport.SOURCE_AUTHORITY_SHA256 == source_scope.registered_sha256()
+        and hash_payload(transport.policy()) == transport.PROTOCOL_SHA256
         and hash_payload(protocol()) == RUN_PROTOCOL_SHA256
+        and NEGATIVE_PRESERVATION_POLICY_SHA256 == negative.PRESERVATION_POLICY_SHA256
         and BASELINE_LEDGER_SHA256 == research_budget.BASELINE_LEDGER_SHA256
         and type(MAXIMUM_CHUNK_SECONDS) is int and MAXIMUM_CHUNK_SECONDS == 3600
-        and type(MAXIMUM_ARCHIVES) is int and MAXIMUM_ARCHIVES == 1,
+        and type(MAXIMUM_ARCHIVES) is int and MAXIMUM_ARCHIVES == 1
+        and type(MAXIMUM_WORKERS) is int and MAXIMUM_WORKERS == 8,
         "durable_capture_registration_pending")
-    # This is an honest extra deployment barrier.  RAM drain alone does not
-    # durably preserve an already received body after process death.  No new
-    # provider invocation is valid until a fixed negative publisher exists.
-    raise DurableCountCaptureRefusal("REFUSED: durable_capture_negative_preservation_pending")
+    # Check registrations before old replay, new images, claims, keys or HTTP.
+    negative._registered(); checkpoints._registered()
+
+
+def _require_lane_root(root):
+    require(type(root) is type(ROOT) and root == ROOT and root.resolve() == root
+        and Path.cwd().resolve() == root, "durable_capture_exact_root_required")
 
 
 class OriginalClosedArchiveToken:
@@ -853,23 +873,201 @@ def terminal_chunk_binding(operation, candidate):
 
 
 def _publish_attempt(operation, ticket, claim):
-    with _owned(operation, transport._control_directory(operation, "start", ticket)) as owned:
+    slot = _attempt_for_ticket(operation, ticket)
+    require(slot[2] is claim, "durable_capture_worker_slot_changed")
+    with _prepared_owned(slot, "start") as owned:
         with controls.prepare_owned_count_start(owned, operation, ticket, claim,
                 boundary=lambda: _source_boundary(transport.operation_binding(operation)[12])) as start: pass
     observed = operation.dispatch(ticket, claim, start)
     require(type(observed) is transport.HttpObservation, "durable_capture_unqualified_result")
-    with _owned(operation, transport._control_directory(operation, "received", ticket)) as owned:
+    with _prepared_owned(slot, "received") as owned:
         with controls.prepare_owned_count_received(owned, operation, observed,
                 boundary=lambda: _source_boundary(transport.operation_binding(operation)[12])) as received: pass
     operation.accept_received_control(received)
-    raw = transport.http_observation_binding(observed)[10]
-    if type(raw) is bytes and raw:
-        base = source_lease_binding(transport.operation_binding(operation)[12])[11]
-        with _owned(operation, base / "responses" / f"{accounting.ticket_binding(ticket)[4]:06d}") as owned:
-            with responses.prepare_owned_count_response(owned, ticket=ticket, observation=observed,
-                    boundary=lambda: _source_boundary(transport.operation_binding(operation)[12])) as pair: pass
-        operation.accept_closed_response(pair)
     return observed
+
+
+def _batch_width():
+    require(type(MAXIMUM_WORKERS) is int and 1 <= MAXIMUM_WORKERS <= 8, "durable_capture_worker_slot_changed")
+    return MAXIMUM_WORKERS
+
+
+def _prepare_attempt_slot(operation, ticket, claim):
+    """Main alone creates the exact fresh directories, before creator timers."""
+    op = transport.active_operation_binding(operation)
+    with op[11]:
+        require(any(ticket is value for value in op[1].current_tickets()), "durable_capture_worker_slot_changed")
+        permission = transport.start_permission_binding(operation, ticket)
+        require(id(ticket) not in _ATTEMPT_BY_TICKET, "durable_capture_worker_slot_changed")
+        paths = []
+        for role in ("start", "received"):
+            path = transport._control_directory(operation, role, ticket)
+            _new_directory(operation, path)
+            pin = dict(_DIRECTORIES[operation]).get(path)
+            require(type(pin) is tuple and len(pin) == 4, "durable_capture_worker_slot_changed")
+            paths.append((role, path, pin))
+        slot = (operation, ticket, claim, op, tuple(paths), permission, object())
+        _ATTEMPT_SLOTS[slot[6]] = slot; _ATTEMPT_BY_TICKET[id(ticket)] = slot
+        return slot
+
+
+def _attempt_slot(slot):
+    require(type(slot) is tuple and len(slot) == 7 and type(slot[6]) is object
+        and _ATTEMPT_SLOTS.get(slot[6]) is slot, "durable_capture_worker_slot_changed")
+    operation, ticket, unused_claim, op = slot[:4]
+    require(transport.active_operation_binding(operation) is op and _ATTEMPT_BY_TICKET.get(id(ticket)) is slot
+        and accounting.active_ticket_binding(ticket)[1] is op[1]
+        and transport.start_permission_binding(operation, ticket) is slot[5], "durable_capture_worker_slot_changed")
+    return slot
+
+
+def _attempt_for_ticket(operation, ticket):
+    accounting.active_ticket_binding(ticket)
+    slot = _ATTEMPT_BY_TICKET.get(id(ticket))
+    require(type(slot) is tuple and slot[0] is operation and slot[1] is ticket, "durable_capture_worker_slot_changed")
+    return _attempt_slot(slot)
+
+
+def _prepare_response_slot(operation, slot, observed):
+    op = transport.active_operation_binding(operation)
+    with op[11]:
+        _attempt_slot(slot); op[1].current_tickets()  # Original owner-thread guard.
+        result = _ATTEMPT_RESULTS.get(slot[6])
+        require(type(result) is tuple and len(result) == 2 and result[0] is slot and result[1] is observed,
+            "durable_capture_worker_slot_changed")
+        bound = transport.http_observation_binding(observed)
+        require(bound[1] is operation and bound[2] is slot[1] and type(bound[10]) is bytes and bound[10],
+            "durable_capture_worker_slot_changed")
+        path = source_lease_binding(op[12])[11] / "responses" / f"{accounting.ticket_binding(slot[1])[4]:06d}"
+        _new_directory(operation, path); pin = dict(_DIRECTORIES[operation]).get(path)
+        require(type(pin) is tuple and len(pin) == 4, "durable_capture_worker_slot_changed")
+        response = slot, observed, path, pin, object()
+        _RESPONSE_SLOTS[response[4]] = response; return response
+
+
+@contextmanager
+def _prepared_owned(slot, role, response=None):
+    slot = _attempt_slot(slot); operation, unused_ticket, unused_claim, op = slot[:4]
+    with op[11]:
+        if role == "response":
+            require(type(response) is tuple and len(response) == 5 and type(response[4]) is object
+                and _RESPONSE_SLOTS.get(response[4]) is response and response[0] is slot,
+                "durable_capture_worker_slot_changed")
+            path, pin = response[2:4]
+        else:
+            require(role in ("start", "received"), "durable_capture_worker_slot_changed")
+            unused, path, pin = next(value for value in slot[4] if value[0] == role)
+        require(dict(_DIRECTORIES.get(operation, ())).get(path) is pin
+            and _directory_stamp(path.lstat()) == pin, "durable_capture_directory_changed")
+    def boundary():
+        with op[11]:
+            _attempt_slot(slot); _source_boundary(op[12]); transport._control_volume_binding(operation, live=True)
+            require(_directory_stamp(path.lstat()) == pin, "durable_capture_directory_changed")
+    # The directory is this exact original Main-issued slot, not adoption of a
+    # caller-selected existing output. The original OwnedOutput still opens
+    # and checks every original FD/name/protection boundary itself.
+    with archive_loader.prior._OwnedOutput(path, boundary) as owned:
+        yield owned
+
+
+def _receive_worker(slot):
+    try:
+        slot = _attempt_slot(slot); operation, ticket, claim, op = slot[:4]
+        with op[11]:
+            require(slot[6] not in _ATTEMPT_USED, "durable_capture_worker_slot_changed")
+            _ATTEMPT_USED.add(slot[6])
+        observed = _publish_attempt(operation, ticket, claim)
+        with op[11]:
+            _attempt_slot(slot)
+            require(type(observed) is transport.HttpObservation, "durable_capture_unqualified_result")
+            _ATTEMPT_RESULTS[slot[6]] = slot, observed
+        return observed
+    except BaseException:
+        if type(slot) is tuple and len(slot) == 7: transport._latch(slot[0])
+        raise
+
+
+def _response_worker(response):
+    slot = response[0] if type(response) is tuple and len(response) == 5 else None
+    try:
+        slot = _attempt_slot(slot); operation, ticket, unused_claim, op = slot[:4]
+        with op[11]:
+            require(type(response[4]) is object and _RESPONSE_SLOTS.get(response[4]) is response and response[4] not in _RESPONSE_USED,
+                "durable_capture_worker_slot_changed")
+            _RESPONSE_USED.add(response[4]); observed = response[1]
+            result = _ATTEMPT_RESULTS.get(slot[6])
+            require(type(result) is tuple and len(result) == 2 and result[0] is slot and result[1] is observed,
+                "durable_capture_worker_slot_changed")
+        with _prepared_owned(slot, "response", response) as owned:
+            with responses.prepare_owned_count_response(owned, ticket=ticket, observation=observed,
+                    boundary=lambda: _source_boundary(op[12])) as pair: pass
+        operation.accept_closed_response(pair); return pair
+    except BaseException:
+        if type(slot) is tuple and len(slot) == 7: transport._latch(slot[0])
+        raise
+
+
+def _run_worker_stage(operation, slots, worker):
+    """Join EVERY accepted task; a failure never starts a new batch/stage."""
+    require(type(slots) is tuple and 1 <= len(slots) <= _batch_width()
+        and (worker is _receive_worker or worker is _response_worker), "durable_capture_worker_slot_changed")
+    futures, results, errors, executor = [], [], [], None
+    try:
+        executor = ThreadPoolExecutor(max_workers=len(slots), thread_name_prefix="si-count")
+        for slot in slots:
+            try: futures.append(executor.submit(worker, slot))
+            except BaseException as error:
+                transport._latch(operation); errors.append(error); break
+        for future in futures:
+            try: results.append(future.result())
+            except BaseException as error:
+                transport._latch(operation); errors.append(error)
+    except BaseException as error:
+        transport._latch(operation); errors.append(error)
+    finally:
+        if executor is not None:
+            try: executor.shutdown(wait=True, cancel_futures=False)
+            except BaseException as error:
+                transport._latch(operation); errors.append(error)
+        if errors:
+            _WORKER_RETAINED[operation] = executor, tuple(futures), tuple(results), tuple(errors)
+            if any(not future.done() for future in futures): _BLOCKED_OPERATIONS.add(operation)
+    if errors: raise errors[0]
+    require(len(results) == len(slots), "durable_capture_worker_stage_failed")
+    return tuple(results)
+
+
+def _schedule_chunk_attempts(operation, budget, claim):
+    """Main is the only reservation/retry/directory owner; workers do no such work."""
+    chunk = budget.public_summary()["current_chunk"]
+    fresh = list(budget.plan.chunk_positions(chunk)); retries, tries = {}, {}
+    while fresh or retries:
+        op = transport.active_operation_binding(operation); _source_boundary(op[12])
+        width = _batch_width(); now = time.monotonic()
+        positions = fresh[:width]; del fresh[:len(positions)]
+        ready = sorted(position for position, deadline in retries.items() if deadline <= now)
+        for position in ready[:width - len(positions)]: positions.append(position); del retries[position]
+        if not positions:
+            time.sleep(max(0, min(retries.values()) - time.monotonic())); continue
+        tickets = tuple(budget.reserve_start_slot(position) for position in positions)
+        operation.authorize_start_batch(tickets)
+        slots = tuple(_prepare_attempt_slot(operation, ticket, claim) for ticket in tickets)
+        observations = _run_worker_stage(operation, slots, _receive_worker)
+        response_slots = []
+        for slot, observed in zip(slots, observations):
+            bound = transport.http_observation_binding(observed)
+            if type(bound[10]) is bytes and bound[10]: response_slots.append(_prepare_response_slot(operation, slot, observed))
+        if response_slots: _run_worker_stage(operation, tuple(response_slots), _response_worker)
+        for position, observed in zip(positions, observations):
+            bound = transport.http_observation_binding(observed); tries[position] = tries.get(position, 0) + 1
+            if type(bound[9]) is int and bound[9] == 200 and type(bound[10]) is bytes and bound[10]: continue
+            detail = dict(bound[13] or ())
+            require(detail.get("retryable") is True and bound[9] is None, "durable_capture_retry_exhausted")
+            with op[11]:
+                completed = transport._OBS_COMPLETED.get(observed)
+                require(type(completed) in (int, float) and 0 <= completed <= time.monotonic(),
+                    "durable_capture_clock_refused")
+                retries[position] = completed + (2 if tries[position] == 1 else 10)
 
 
 def _failed_original_state(operation):
@@ -1040,7 +1238,10 @@ def _retain_failed_process():
     """Keep independent ROFDs/private bytes alive; no network or cleanup API."""
     require(_requires_process_hold(), "durable_capture_retention_required")
     if "announced" not in _RETENTION_ANNOUNCED:
-        print(canonical_json(_retention_summary()), flush=True)
+        try:
+            print(canonical_json(_retention_summary()), flush=True)
+        except BaseException:
+            pass  # No notification failure authorizes losing private RAM/FDs.
         _RETENTION_ANNOUNCED.add("announced")
     while True: time.sleep(30)
 
@@ -1052,21 +1253,8 @@ def _fill_live_chunk(operation, volume, lease, budget):
     with _owned(operation, transport._control_directory(operation, "claim")) as owned:
         with controls.prepare_owned_count_claim(owned, operation,
                 boundary=lambda: _source_boundary(lease)) as claim: pass
-    # Serial scheduling is within <=8 in-flight. Every retry gets its own
-    # original ticket and START; dispatch also enforces the position chain.
     chunk = budget.public_summary()["current_chunk"]
-    for position in budget.plan.chunk_positions(chunk):
-        epoch_attempts = 0
-        while True:
-            ticket = budget.reserve_start_slot(position)
-            operation.authorize_start_batch((ticket,))  # Serial first policy: one exact slot per fresh ref.
-            observed = _publish_attempt(operation, ticket, claim)
-            epoch_attempts += 1
-            bound = transport.http_observation_binding(observed)
-            if bound[9] == 200 and type(bound[10]) is bytes and bound[10]: break
-            detail = dict(bound[13] or ())
-            require(detail.get("retryable") is True and bound[9] is None, "durable_capture_retry_exhausted")
-            time.sleep(2 if epoch_attempts == 1 else 10)
+    _schedule_chunk_attempts(operation, budget, claim)
     candidate = operation.freeze_provisional_root()
     for role in transport.FINAL_ROLES:
         with _owned(operation, transport._control_directory(operation, role)) as owned:
@@ -1163,7 +1351,7 @@ def _capture_chunk(token, budget, *, root, runtime_head, actual_remote, complete
 
 
 def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest, archive_code_manifest):
-    registered()
+    registered(); _require_lane_root(root)
     token = load_registered_closed_archive(root, runtime_head=runtime_head, actual_remote=actual_remote,
         complete_code_manifest=archive_code_manifest)
     plan = freeze_recovery_from_archive(token); budget = accounting.open_durable_count_budget(plan)
@@ -1171,6 +1359,15 @@ def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest,
     for unused in range(1, len(plan._parts[3]) + 1):
         closed.append(_capture_chunk(token, budget, root=root, runtime_head=runtime_head,
             actual_remote=actual_remote, complete_code_manifest=complete_code_manifest))
+        progress = budget.public_summary()
+        try:
+            print(canonical_json({"schema": "si-count-registered-capture-progress-v1", "stage": "original_chunk_closed",
+                "closed_chunks": progress["closed_chunks"], "planned_chunks": len(plan._parts[3]),
+                "cumulative_START_reservations_upper_bound": progress["cumulative_START_debits_upper_bound"],
+                "cumulative_charged_plus_reserved_bytes": progress["cumulative_charged_plus_reserved_bytes"],
+                "source_qualified": False, "qc_attempts": 0}), flush=True)
+        except OSError:
+            pass  # Optional progress transport cannot discard settled data.
     union = transport_union.seal_count_transport_union(sourcelease_model(token), plan,
         _original_settled_contributions(budget), budget)
     from scripts import short_interest_count_checkpoint as checkpoints
@@ -1184,9 +1381,36 @@ def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest,
     return result
 
 
+def _committed_CLI_manifest(guard, head):
+    paths = code_paths(); manifest = {}
+    guard.refresh()
+    with archive_loader.count.old.cache.HeldFiles(tuple(ROOT / name for name in paths),
+            protected=False, boundary=guard.check) as code:
+        for name in paths:
+            raw = code.read(ROOT / name, 8 * 1024 ** 2)
+            committed = archive_loader.count.old.cache._git(ROOT, ["show", head + ":" + name], guard)
+            require(hash_bytes(raw) == hash_bytes(committed), "durable_capture_code_changed")
+            manifest[name] = hash_bytes(raw)
+        code.check()
+    guard.refresh(); _manifest_shape(manifest)
+    return manifest
+
+
 def _run_cli(arguments):
-    registered()  # CLI cannot bypass missing source/negative-preservation registration.
-    raise DurableCountCaptureRefusal("REFUSED: durable_capture_registration_pending")
+    registered(); _require_lane_root(ROOT)
+    require(type(arguments) is argparse.Namespace and arguments.command == "run_registered"
+        and all(type(value) is str and re.fullmatch(r"[0-9a-f]{40}", value)
+            for value in (arguments.runtime_head, arguments.actual_remote)), "durable_capture_CLI_arguments_refused")
+    guard = lane.LaneGuard(ROOT, expected_head=arguments.runtime_head, expected_remote=arguments.actual_remote)
+    manifest = _committed_CLI_manifest(guard, arguments.runtime_head)
+    archive_manifest = {name: manifest[name] for name in archive_loader.code_paths()}
+    guard.refresh()
+    print(canonical_json({"schema": "si-count-registered-capture-start-v1", "stage": "before_original_archive_replay",
+        "runtime_HEAD": arguments.runtime_head, "actual_remote": arguments.actual_remote,
+        "source_authority_sha256": SOURCE_AUTHORITY_SHA256, "run_protocol_sha256": RUN_PROTOCOL_SHA256,
+        "new_HTTP_started": False, "authority": authority()}), flush=True)
+    return run_registered(ROOT, runtime_head=arguments.runtime_head, actual_remote=arguments.actual_remote,
+        complete_code_manifest=manifest, archive_code_manifest=archive_manifest)
 
 
 def main(argv=None):
@@ -1204,4 +1428,8 @@ def main(argv=None):
         return 2
 
 
-if __name__ == "__main__": raise SystemExit(main())
+if __name__ == "__main__":
+    # Transport resolves this canonical module; never split its type/registry
+    # identity by minting a second __main__.CountSourceLease.
+    from scripts.capture_short_interest_durable_counts import main as canonical_main
+    raise SystemExit(canonical_main())

@@ -38,12 +38,16 @@ def fresh_outer_registries(monkeypatch):
     for name, value in (("_CHECKPOINT_FACTS", {}), ("_CHECKPOINT_FACTS_FAILED", set()),
         ("_CHECKPOINT_CAPS", {}), ("_CHECKPOINT_ROUND", {}), ("_WRITTEN_CHECKPOINTS", {})):
         monkeypatch.setattr(outer, name, value)
+    for name, value in (("_ATTEMPT_SLOTS", {}), ("_ATTEMPT_BY_TICKET", {}), ("_RESPONSE_SLOTS", {}),
+        ("_ATTEMPT_USED", set()), ("_RESPONSE_USED", set()), ("_ATTEMPT_RESULTS", {}), ("_WORKER_RETAINED", {})):
+        monkeypatch.setattr(outer, name, value)
     for name, value in (("_CONTRIBUTIONS", {}), ("_PRIVATE_PROOFS", {}), ("_CLOSED_ORIGINS", {}),
         ("_UNIONS", {}), ("_FAILED", set()), ("_UNION_FAILED", set())):
         monkeypatch.setattr(outer.transport_union, name, value)
 
 
 def test_default_registration_blocks_before_archive_key_claim_native_or_provider(monkeypatch, tmp_path):
+    monkeypatch.setattr(outer, "SOURCE_AUTHORITY_SHA256", "PENDING")
     calls = []
     for obj, name in ((outer.archive_loader, "load_registered_count_epoch_ledger"),
         (outer.storage, "prepare_registered_volume"), (outer.transport, "read_named_keychain"),
@@ -63,7 +67,9 @@ def test_operational_manifest_explicitly_binds_new_plan_and_historical_anteceden
         outer.antecedent.previous.WRAPPER, outer.antecedent.WRAPPER]
 
 
-def test_cli_is_fixed_refusal_and_never_formats_exception_payload(capsys):
+def test_cli_refusal_never_formats_exception_payload(monkeypatch, capsys):
+    def refused(arguments): raise RuntimeError("PRIVATE TOKEN URL BODY")
+    monkeypatch.setattr(outer, "_run_cli", refused)
     assert outer.main(["run_registered", "--runtime-head", "a" * 40, "--actual-remote", "b" * 40]) == 2
     value = __import__("json").loads(capsys.readouterr().out)
     assert value["status"] == "refused" and value["authority"]["ready_for_backtest"] is False
@@ -241,13 +247,13 @@ def test_original_ref_advance_during_START_authorization_has_no_permission(fabri
     assert transport._START_PERMISSIONS == {} and outer._SOURCE_BATCHES == {} and op in transport._FAILED
 
 
-def test_pending_negative_preservation_barrier_survives_other_registered_hashes(monkeypatch):
+def test_forged_chain_hashes_cannot_replace_the_frozen_semantic_authority(monkeypatch):
     monkeypatch.setattr(outer, "SOURCE_AUTHORITY_SHA256", "a" * 64)
     monkeypatch.setattr(outer.transport, "SOURCE_AUTHORITY_SHA256", "a" * 64)
     monkeypatch.setattr(outer.transport, "PROTOCOL_SHA256", "b" * 64)
     monkeypatch.setattr(outer, "NEGATIVE_PRESERVATION_POLICY_SHA256", "c" * 64)
     monkeypatch.setattr(outer, "RUN_PROTOCOL_SHA256", hash_payload(outer.protocol()))
-    with pytest.raises(outer.DurableCountCaptureRefusal, match="negative_preservation_pending"): outer.registered()
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="registration_pending"): outer.registered()
 
 
 @pytest.fixture
@@ -422,6 +428,16 @@ def fabricated_outer_run(operation, monkeypatch):
     It tests original terminal ordering/provenance, not physical admission.
     """
     h = operation; h.events = []; h.volume_closed, h.source_closed, h.drift = False, False, False
+    # This inherited ordering/negative fixture intentionally stays serial.
+    # Separate barrier tests below exercise the actual <=8 scheduling path.
+    monkeypatch.setattr(outer, "_batch_width", lambda: 1)
+    monkeypatch.setattr(outer, "_prepare_attempt_slot", lambda op, ticket, claim: (op, ticket, claim))
+    def receive_worker(slot):
+        try: return outer._publish_attempt(*slot)
+        except BaseException: transport._latch(slot[0]); raise
+    monkeypatch.setattr(outer, "_receive_worker", receive_worker)
+    monkeypatch.setattr(outer, "_prepare_response_slot", lambda op, slot, observed: (op, slot, observed))
+    monkeypatch.setattr(outer, "_response_worker", lambda response: None)  # Fake publish below already registers a fake pair.
     from scripts import short_interest_count_checkpoint as checkpoint
     # Explicit fabricated checkpoint storage seam; the original producer is
     # exercised by its own kernel/FD tests, not these ordering-only fixtures.
@@ -749,6 +765,93 @@ def test_failed_settlement_never_enters_outer_union_registry(fabricated_outer_ru
     assert outer.accounting.settled_chunk_accounting(h.budget)[3] == ()
 
 
+def test_all_frozen_registration_hashes_match_without_source_IO(monkeypatch):
+    calls = []
+    for obj, name in ((outer.archive_loader, "load_registered_count_epoch_ledger"),
+            (outer.storage, "prepare_registered_volume"), (outer.transport, "read_named_keychain")):
+        monkeypatch.setattr(obj, name, lambda *a, **k: calls.append("FORBIDDEN"))
+    assert outer.registered() is None and calls == []
+
+
+@pytest.mark.parametrize("module,field,error", [
+    (outer.negative, "PRESERVATION_POLICY_SHA256", outer.negative.NegativePreservationRefusal),
+    (outer.checkpoints, "CHECKPOINT_POLICY_SHA256", outer.checkpoints.CountCheckpointRefusal)])
+def test_forged_outer_hash_cannot_skip_independent_preservation_registration(monkeypatch, module, field, error):
+    monkeypatch.setattr(module, field, "0" * 64)
+    if module is outer.negative: monkeypatch.setattr(outer, "NEGATIVE_PRESERVATION_POLICY_SHA256", "0" * 64)
+    monkeypatch.setattr(outer, "RUN_PROTOCOL_SHA256", hash_payload(outer.protocol()))
+    with pytest.raises(error, match="registration_pending"): outer.registered()
+
+
+def test_registered_wrong_root_still_refuses_before_archive_or_claim(monkeypatch, tmp_path):
+    calls = []
+    monkeypatch.setattr(outer.archive_loader, "load_registered_count_epoch_ledger", lambda *a, **k: calls.append(1))
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="exact_root_required"):
+        outer.run_registered(tmp_path, runtime_head="a" * 40, actual_remote="b" * 40,
+            complete_code_manifest={}, archive_code_manifest={})
+    assert calls == []
+
+
+@pytest.mark.parametrize("head,remote", [("bad", "b" * 40), ("a" * 40, "bad"), (True, "b" * 40)])
+def test_CLI_hash_shape_refuses_before_repository_or_source_factory(monkeypatch, head, remote):
+    monkeypatch.setattr(outer, "_require_lane_root", lambda root: None)  # Explicit fake physical-root seam.
+    monkeypatch.setattr(outer.lane, "LaneGuard", lambda *a, **k: pytest.fail("repository reached"))
+    args = outer.argparse.Namespace(command="run_registered", runtime_head=head, actual_remote=remote)
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="CLI_arguments_refused"): outer._run_cli(args)
+
+
+def test_CLI_passes_only_fixed_committed_catalogues_to_canonical_factory(monkeypatch, capsys):
+    from types import SimpleNamespace
+    calls = []
+    manifest = {name: "d" * 64 for name in outer.code_paths()}
+    monkeypatch.setattr(outer, "_require_lane_root", lambda root: calls.append(("physical", root)))
+    monkeypatch.setattr(outer.lane, "LaneGuard", lambda root, **kw: SimpleNamespace(refresh=lambda: calls.append("fresh-ref")))
+    monkeypatch.setattr(outer, "_committed_CLI_manifest", lambda guard, head: manifest)
+    def run(root, **kwargs): calls.append(("canonical", root, kwargs)); return {"source_admitted": False}
+    monkeypatch.setattr(outer, "run_registered", run)
+    args = outer.argparse.Namespace(command="run_registered", runtime_head="a" * 40, actual_remote="b" * 40)
+    assert outer._run_cli(args) == {"source_admitted": False}
+    selected = calls[-1][2]
+    assert selected["complete_code_manifest"] is manifest
+    assert selected["archive_code_manifest"] == {name: manifest[name] for name in outer.archive_loader.code_paths()}
+    value = __import__("json").loads(capsys.readouterr().out)
+    assert value["stage"] == "before_original_archive_replay" and value["new_HTTP_started"] is False
+
+
+def test_module_entrypoint_delegates_to_canonical_registry_without_source(monkeypatch):
+    import runpy
+    calls = []
+    monkeypatch.setattr(outer, "main", lambda: calls.append(outer.CountSourceLease) or 17)
+    with pytest.raises(SystemExit) as result: runpy.run_path(outer.__file__, run_name="__main__")
+    assert result.value.code == 17 and calls == [outer.CountSourceLease]
+
+
+@pytest.mark.parametrize("failure", [BrokenPipeError, OSError, ValueError, RuntimeError])
+def test_announcement_failure_keeps_required_private_hold(monkeypatch, failure):
+    class StopFabricatedHold(BaseException): pass
+    calls = []
+    monkeypatch.setattr(outer, "_requires_process_hold", lambda: True)
+    monkeypatch.setattr(outer, "_retention_summary", lambda: {"status": "preservation_blocked"})
+    def failed_print(*args, **kwargs): raise failure("FABRICATED_PRIVATE_NOTIFICATION_ERROR")
+    monkeypatch.setattr(outer, "print", failed_print, raising=False)
+    def sleep(seconds): calls.append(seconds); raise StopFabricatedHold
+    monkeypatch.setattr(outer.time, "sleep", sleep)
+    with pytest.raises(StopFabricatedHold): outer._retain_failed_process()
+    assert calls == [30] and outer._RETENTION_ANNOUNCED == {"announced"}
+
+
+def test_summary_failure_keeps_required_private_hold(monkeypatch):
+    class StopFabricatedHold(BaseException): pass
+    calls = []
+    monkeypatch.setattr(outer, "_requires_process_hold", lambda: True)
+    def failed_summary(): raise RuntimeError("FABRICATED_PRIVATE_SUMMARY_ERROR")
+    monkeypatch.setattr(outer, "_retention_summary", failed_summary)
+    def sleep(seconds): calls.append(seconds); raise StopFabricatedHold
+    monkeypatch.setattr(outer.time, "sleep", sleep)
+    with pytest.raises(StopFabricatedHold): outer._retain_failed_process()
+    assert calls == [30] and outer._RETENTION_ANNOUNCED == {"announced"}
+
+
 def test_pure_contribution_history_never_reopens_expired_reader_and_partial_plan_cannot_form_union(fabricated_outer_run, monkeypatch):
     h = fabricated_outer_run; h.run(); h.tick += 4000
     def expired(*args): raise AssertionError("EXPIRED_SOURCE_READER_MUST_NOT_BE_CALLED")
@@ -837,3 +940,226 @@ def test_drain_revisits_original_result_after_inflight_pop_before_observation_mi
     assert type(returned) is transport.UnqualifiedHttpObservation
     assert report["pending_already_started_attempts"] == 0 and report["requires_process_hold"] is False
     assert h.preserved == [returned] and h.final_calls == [True] and h.preservation.fd_open
+
+
+@pytest.fixture
+def batched_filesystem_io(operation, monkeypatch):
+    """Real fresh dirs/OwnedOutput FDs and original operator/ticket factories.
+
+    Main/source/native/control sealing/wire are explicitly fabricated. No
+    provider, source artifact, image or native flag operation is exercised.
+    """
+    h = operation; h.owner = threading.get_ident(); h.events, h.created = [], []; h.refresh_calls.clear()
+    h.base = h.coordinator.source_lease_binding(h.lease)[11]
+    h.base.mkdir(parents=True, mode=0o700)
+    for name in ("starts", "received", "responses"): (h.base / name).mkdir(mode=0o700)
+    outer._DIRECTORIES[h.op] = tuple((path, outer._directory_stamp(path.lstat()))
+        for path in (h.base, h.base / "starts", h.base / "received", h.base / "responses"))
+    monkeypatch.setattr(outer, "source_lease_binding", h.coordinator.source_lease_binding)
+    monkeypatch.setattr(outer, "_source_boundary", lambda lease: h.coordinator.source_lease_live_binding(lease))
+    monkeypatch.setattr(transport, "_control_volume_binding", lambda *a, **k: None)  # Explicit fake live volume.
+    for ticket in h.tickets: transport._START_PERMISSIONS.pop(ticket, None)
+    transport._REMOTE_BATCHES[h.op] = ()
+    original_reserve = type(h.budget).reserve_start_slot
+    preissued = {outer.accounting.ticket_binding(ticket)[5]: ticket for ticket in h.tickets}
+    def reserve(self, position):
+        assert threading.get_ident() == h.owner
+        h.events.append(("reserve", position, threading.get_ident()))
+        if position in preissued: return preissued.pop(position)
+        return original_reserve(self, position)
+    monkeypatch.setattr(type(h.budget), "reserve_start_slot", reserve)
+    def new_directory(operation, path):
+        assert operation is h.op and threading.get_ident() == h.owner
+        h.events.append(("mkdir", path, threading.get_ident())); h.created.append(path)
+        path.mkdir(mode=0o700)
+        outer._DIRECTORIES[h.op] = (*outer._DIRECTORIES[h.op], (path, outer._directory_stamp(path.lstat())))
+        return path
+    monkeypatch.setattr(outer, "_new_directory", new_directory)
+    @contextmanager
+    def start(owned, operation, ticket, claim, *, boundary):
+        assert operation is h.op and claim is h.claim and threading.get_ident() != h.owner
+        boundary(); h.events.append(("START", ticket, threading.get_ident()))
+        if ticket not in h.starts:
+            bound = outer.accounting.ticket_binding(ticket); cap = type(next(iter(h.starts.values())))()
+            h.start_bindings[cap] = (cap, h.op, ticket, h.claim, hash_payload([bound[9], "START"]),
+                bound[8], transport.operation_binding(h.op)[5], h.claims[h.claim][6],
+                "2026-10-27T00:00:00Z", None, None, object())
+            h.starts[ticket] = cap
+        yield h.starts[ticket]
+    @contextmanager
+    def received(owned, operation, observed, *, boundary):
+        boundary(); bound = transport.http_observation_binding(observed)
+        h.events.append(("received", bound[2], threading.get_ident()))
+        cap = h.controls.CountReceived()
+        h.received[cap] = cap, h.op, bound[2], observed, h.claim, bound[4], hash_payload([bound[14], "received"]), None, None, bound[12], bound[7], object()
+        yield cap
+    @contextmanager
+    def response(owned, *, ticket, observation, boundary):
+        boundary(); observed = transport.http_observation_binding(observation)
+        h.events.append(("pair", ticket, threading.get_ident()))
+        cap = h.responses.CountResponseCustody()
+        h.response_bindings[cap] = (cap, h.op, ticket, observation, h.claim, observed[4],
+            hash_bytes(observed[10]), len(observed[10]), "9" * 64, None, None, object(), object())
+        yield cap
+    h.controls.prepare_owned_count_start = start; h.controls.prepare_owned_count_received = received
+    h.responses.prepare_owned_count_response = response
+    monkeypatch.setattr(outer, "controls", h.controls); monkeypatch.setattr(outer, "responses", h.responses)
+    h.schedule = lambda: outer._schedule_chunk_attempts(h.op, h.budget, h.claim)
+    return h
+
+
+def test_exact_remote_roster_precedes_original_worker_STARTs_and_Main_owns_budget_dirs(batched_filesystem_io, monkeypatch):
+    h = batched_filesystem_io; entered = threading.Barrier(len(h.tickets)); original_open = h.opener.open
+    def open_wire(*args, **kwargs):
+        h.events.append(("wire-enter", threading.get_ident())); entered.wait(timeout=5)
+        return original_open(*args, **kwargs)
+    monkeypatch.setattr(h.opener, "open", open_wire)
+    h.schedule()
+    assert h.refresh_calls == [h.tickets]
+    assert len(h.response_bindings) == len(h.received) == len(h.tickets)
+    assert all(row[-1] == h.owner for row in h.events if row[0] in ("reserve", "mkdir"))
+    assert all(row[-1] != h.owner for row in h.events if row[0] in ("START", "received", "pair"))
+    first_START = next(index for index, row in enumerate(h.events) if row[0] == "START")
+    assert sum(row[0] == "reserve" for row in h.events[:first_START]) == len(h.tickets)
+    assert sum(row[0] == "mkdir" for row in h.events[:first_START]) == 2 * len(h.tickets)
+    first_pair = next(index for index, row in enumerate(h.events) if row[0] == "pair")
+    assert sum(row[0] == "received" for row in h.events[:first_pair]) == len(h.tickets)
+    assert not outer._WORKER_RETAINED
+
+
+def test_concurrent_original_OwnedOutput_directories_have_private_worker_FDs(batched_filesystem_io, monkeypatch):
+    h = batched_filesystem_io; barrier = threading.Barrier(len(h.tickets)); live = []
+    original_start = h.controls.prepare_owned_count_start
+    @contextmanager
+    def start(owned, *args, **kwargs):
+        with original_start(owned, *args, **kwargs) as cap:
+            fd = owned._anchor[2]; info = os.fstat(fd)
+            live.append((fd, info.st_dev, info.st_ino)); barrier.wait(timeout=5)
+            yield cap
+    monkeypatch.setattr(h.controls, "prepare_owned_count_start", start)
+    h.schedule()
+    assert len(live) == len({row[0] for row in live}) == len({row[1:] for row in live}) == len(h.tickets)
+
+
+def test_missing_original_remote_permission_has_no_worker_inode_or_wire(batched_filesystem_io):
+    h = batched_filesystem_io
+    with pytest.raises(transport.CountTransportRefusal, match="START_permission_required"):
+        outer._prepare_attempt_slot(h.op, h.tickets[0], h.claim)
+    assert h.created == [] and h.key_calls == h.wire_calls == []
+
+
+def test_original_worker_slot_cannot_be_cloned_or_replayed(batched_filesystem_io):
+    h = batched_filesystem_io; h.op.authorize_start_batch((h.tickets[0],))
+    slot = outer._prepare_attempt_slot(h.op, h.tickets[0], h.claim)
+    with pytest.raises(outer.DurableCountCaptureRefusal): outer._attempt_slot(tuple(list(slot)))
+    observed, = outer._run_worker_stage(h.op, (slot,), outer._receive_worker)
+    assert type(observed) is transport.HttpObservation
+    with pytest.raises(outer.DurableCountCaptureRefusal): outer._receive_worker(slot)
+    assert len(h.wire_calls) == len(h.key_calls) == 1
+
+
+def test_worker_control_failure_joins_all_accepted_wire_and_retains_original_bytes(batched_filesystem_io, monkeypatch):
+    h = batched_filesystem_io; entered = threading.Barrier(len(h.tickets)); original_open = h.opener.open
+    def open_wire(*args, **kwargs): entered.wait(timeout=5); return original_open(*args, **kwargs)
+    monkeypatch.setattr(h.opener, "open", open_wire)
+    original_received = h.controls.prepare_owned_count_received
+    @contextmanager
+    def received(owned, operation, observed, **kwargs):
+        if transport.http_observation_binding(observed)[2] is h.tickets[0]:
+            raise RuntimeError("FABRICATED_RECEIPT_FAILURE")
+        with original_received(owned, operation, observed, **kwargs) as cap: yield cap
+    monkeypatch.setattr(h.controls, "prepare_owned_count_received", received)
+    with pytest.raises((RuntimeError, transport.CountTransportRefusal)): h.schedule()
+    assert h.op in transport._FAILED and len(transport._OPERATIONS[h.op][1][1]) == 2
+    for original in tuple(transport._OBSERVATIONS.values()):
+        if original[1] is h.op: transport.downgrade_http_observation_for_preservation(original[0])
+    rows = [transport.drained_http_observation_binding(cap) for cap in transport._DRAINED
+        if transport._DRAINED[cap][1] is h.op]
+    assert {id(row[2]) for row in rows} == {id(ticket) for ticket in h.tickets}
+    assert all(row[10] == h.raw for row in rows)
+    assert all(future.done() for future in outer._WORKER_RETAINED[h.op][1])
+    assert not any(path.parent == h.base / "responses" for path in h.created)
+    assert len(h.key_calls) == len(h.wire_calls) == 2 and not outer._TERMINALS
+
+
+def test_OPEN_retry_waits_original_backoff_and_never_creates_empty_response_dir(batched_filesystem_io, monkeypatch):
+    h = batched_filesystem_io; original_open = h.opener.open; lock = threading.Lock(); count = [0]; sleeps = []
+    def open_wire(*args, **kwargs):
+        with lock: count[0] += 1; number = count[0]
+        if number == 1:
+            raise transport.wire.RecoveryTransportFailure("network_failure", phase="open", failure_class="timeout", retryable=True)
+        return original_open(*args, **kwargs)
+    def wait(seconds): sleeps.append(seconds); h.tick += seconds
+    monkeypatch.setattr(h.opener, "open", open_wire); monkeypatch.setattr(outer.time, "sleep", wait)
+    h.schedule()
+    original = transport._OPERATIONS[h.op][1]
+    observed = [transport.http_observation_binding(obs) for obs in original[3]]
+    negative = next(row for row in observed if row[9] is None)
+    failed_ordinal = outer.accounting.ticket_binding(negative[2])[4]
+    assert h.base / "responses" / f"{failed_ordinal:06d}" not in h.created
+    assert len([path for path in h.created if path.parent == h.base / "responses"]) == len(h.tickets)
+    assert len(h.refresh_calls) == 2 and h.refresh_calls[0] == h.tickets and len(h.refresh_calls[1]) == 1
+    assert sleeps == [2] and len(original[1]) == len(observed) == 3
+    assert h.budget.public_summary()["new_START_reservations"] == 3
+
+
+def test_stage_runs_eight_independent_workers_and_rejects_ninth_before_submit(operation, monkeypatch):
+    h = operation; entered = threading.Barrier(8); finished = []
+    def worker(slot): entered.wait(timeout=5); finished.append(slot); return slot
+    monkeypatch.setattr(outer, "_receive_worker", worker)
+    assert outer._run_worker_stage(h.op, tuple(range(8)), worker) == tuple(range(8))
+    assert sorted(finished) == list(range(8))
+    with pytest.raises(outer.DurableCountCaptureRefusal): outer._run_worker_stage(h.op, tuple(range(9)), worker)
+    assert len(finished) == 8
+
+
+def test_stage_joins_other_accepted_worker_after_first_error_and_blocks_followup(operation, monkeypatch):
+    h = operation; entered, release = threading.Barrier(3), threading.Event(); exited = []
+    def worker(slot):
+        entered.wait(timeout=5)
+        if slot == 0:
+            transport._latch(h.op); release.set(); raise RuntimeError("FABRICATED_STAGE_FAILURE")
+        assert release.wait(timeout=5); exited.append(slot); return slot
+    monkeypatch.setattr(outer, "_receive_worker", worker)
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        future = pool.submit(outer._run_worker_stage, h.op, (0, 1), worker)
+        entered.wait(timeout=5)
+        with pytest.raises(RuntimeError, match="FABRICATED_STAGE_FAILURE"): future.result(timeout=5)
+    assert exited == [1] and h.op in transport._FAILED
+    assert all(item.done() for item in outer._WORKER_RETAINED[h.op][1])
+    with pytest.raises(outer.accounting.DurableCountBudgetRefusal): h.budget.reserve_start_slot(h.plan.chunk_positions(1)[0])
+
+
+def test_outer_batched_failure_drains_both_wire_outcomes_before_negative_marker_and_teardown(fabricated_outer_run, monkeypatch):
+    h = fabricated_outer_run; monkeypatch.setattr(outer, "_batch_width", lambda: 2)
+    entered, release = threading.Barrier(2), threading.Event(); local = threading.local()
+    original_open = h.opener.open
+    def opened(*args, **kwargs):
+        entered.wait(timeout=5)
+        if local.ticket is h.tickets[1]: assert release.wait(timeout=5)
+        return original_open(*args, **kwargs)
+    monkeypatch.setattr(h.opener, "open", opened)
+    def publish(operation, ticket, claim):
+        local.ticket = ticket
+        observed = operation.dispatch(ticket, claim, h.starts[ticket])
+        h.events.append("accepted-wire-outcome-" + str(h.tickets.index(ticket)))
+        if ticket is h.tickets[0]: raise RuntimeError("FABRICATED_BATCHED_LOCAL_FAILURE")
+        return observed  # Original dispatcher returns a distinct unqualified opaque result after the latch.
+    monkeypatch.setattr(outer, "_publish_attempt", publish)
+    def release_after_latch():
+        for unused in range(500):
+            if h.op in transport._FAILED: release.set(); return
+            release.wait(.01)
+        release.set()
+    releaser = threading.Thread(target=release_after_latch); releaser.start()
+    try:
+        with pytest.raises(RuntimeError, match="FABRICATED_BATCHED_LOCAL_FAILURE"): h.run()
+    finally: release.set(); releaser.join(timeout=5)
+    assert len(h.preserved) == len(h.wire_calls) == len(h.key_calls) == 2
+    assert all(transport.drained_http_observation_binding(value)[10] == h.raw for value in h.preserved)
+    marker = h.events.index("negative-final-preservation-marker-only")
+    assert all(h.events.index("accepted-wire-outcome-" + str(number)) < marker for number in range(2))
+    assert marker < h.events.index("original-volume-exits") < h.events.index("original-source-code-exits")
+    assert h.final_marker and h.preservation.fd_open and not outer._requires_process_hold()
+    assert h.failed_source_checks == 0 and outer._TERMINALS == {}
+    assert outer.accounting.settled_chunk_accounting(h.budget)[3] == ()

@@ -1,17 +1,18 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Section 102 (2026-10-26) is the requested Codex counter-review of section 101.**
-Both incoming Claude commits are accepted after three P3 corrections:
-unpublished final-close accounting, publisher stop priority, and contradictory
-document-scope sensitivity. This round is counter-review only, not the next
-implementation milestone or native recovery. Section 101's useful corrections
-and public Git/hash qualifications stand. The owner direction recorded in
-section 100 is retained: QC/Safari access is released only after the matching
-Analyst Revisions ref advances from `3c905d4235617d3d2a56b636c8e0be77ee790686`;
-the former three-attempt ceiling is superseded prospectively without erasing
-any historical attempt or look; Mia may be consulted as needed; no current QC
-access, new job, purchase or live authority is claimed. The lane is
-**not backtesting-ready**.
+**Current owner direction, 2026-10-26 (section 103):** continue the offline build
+to the last step before QC setup and skip Claude review for now. QC/Safari is
+unavailable because another lane is using it; no setup or access is performed.
+The owner stopped the Analyst-push monitor and it was deleted through the app.
+No polling, automatic rearm or consumed release is inferred. The earlier
+baseline remains historical provenance, not a moving trigger. The instruction
+to push once when done still governs this offline round.
+
+Section 102 remains the completed counter-review of both section-101 Claude
+commits, accepted after three P3 corrections. Its published corrections and
+all historical tests/failures are retained, not reviewed a second time here.
+The prospective attempt-cap supersession retains all attempts and looks.
+The lane is **not backtesting-ready**; offline preparation is not native proof.
 
 **Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly" applied
 to the section-93 round ONLY; section 94 is the Claude review that follows it.
@@ -39,11 +40,11 @@ F017/F018/F019 and CR23-001 remain OPEN; full-window OFF accounting remains unpr
 No new job was observed after the source-only restoration.
 Fresh Mac lock blocked the empty-notebook request; no new notebook, cell execution or native witness is claimed.
 All native-read/create UI scopes are closed with no automatic retry.
-Analyst-push monitor remains ACTIVE; future Claude checkpoints are waived until further notice.
+Analyst-push monitor was deleted at owner request; future Claude checkpoints are waived until further notice.
 The old Claude-review heartbeat remains PAUSED. The native-source/Mac observations
 above are retained historical observations, not newly inspected operator state.
-The monitor-status statements above are also retained handoff observations,
-not a fresh automation inspection or proof that resource release has occurred.
+The deletion above is the actual app result from the owner's stop request,
+not a fresh automation inspection or proof of resource release.
 
 The ephemeral native-read task reported STOP with zero tool/data effects;
 the separately staged empty-notebook request was NOT sent because the Mac
@@ -51,7 +52,7 @@ locked. No new notebook/cell or native witness is claimed. Genuine original
 compiled source, missing source/unit
 provenance and full-window native orders/accounting cannot be inferred from
 saved source or a Completed. status. No protected dates, frozen economics,
-selection rules or attempts are reset. The next bounded action is resource-release verification before any separately scoped QC recovery; this requested round implements no next milestone.
+selection rules or attempts are reset. Codex stops before QC setup; resume only after a fresh owner resource release, with no mandatory Claude checkpoint.
 Old standalone native-read programs and scope holders are retired from operational use;
 no expired scope is renewed. Percent units remain a hypothesis, not a verified diagnosis.
 The non-authorizing TPR-TR0-I implementation candidate is checkpointed but
@@ -430,9 +431,10 @@ rather than receipt-unavailable; both are fixed with regressions. Section
 belong to the second section-98 commit) and its evidence qualifications are
 verified against Git and accepted. The owner's later instruction, recorded by
 Codex, waives Codex's progress stops for Claude checkpoints until further
-notice and supersedes the three-attempt ceiling prospectively once the Analyst
-push releases QC/Safari; the owner separately requested this review in the
-Claude chat. Section 99's private census is attributed: the frozen packet's
+notice and supersedes the three-attempt ceiling prospectively. Section 103
+records the later monitor-stop and offline-only directions: another lane is
+using QC/Safari, and no automatic Analyst trigger or new review checkpoint
+is inferred. Section 99's private census is attributed: the frozen packet's
 49,716 corporate-action rows span 2025-10-13 to 2026-10-09; the missing `from`
 is verified in public code/freeze and supports the default-window explanation.
 The ON identity-input question remains open; no private packet is replayed.
@@ -454,7 +456,7 @@ F017/F018/F019 and CR23-001 remain OPEN; full-window OFF accounting remains unpr
 No new job was observed after the source-only restoration.
 Fresh Mac lock blocked the empty-notebook request; no new notebook, cell execution or native witness is claimed.
 All native-read/create UI scopes are closed with no automatic retry.
-Analyst-push monitor remains ACTIVE; future Claude checkpoints are waived until further notice.
+Analyst-push monitor was deleted at owner request; future Claude checkpoints are waived until further notice.
 The old Claude-review heartbeat remains PAUSED. Retained monitor/source/Mac observations
 are historical, not fresh operator-state assertions or an unconditional unlock demand.
 For historical outcomes, the owner-reported Mia fix requires independent result/source verification;
@@ -585,9 +587,10 @@ outcome-free source audit; no real-row D1, outcomes or QuantConnect access is
 authorized by that audit.
 The trust rollback pin, protected parent custody, reviewer identity and
 adversarial matrix remain unresolved and parked. **Exact next role action:**
-Section 102 completes the requested counter-review of both section-101 Claude commits.
-The next bounded action is resource-release verification before any separately scoped QC recovery; this requested round implements no next milestone.
-QC access remains forbidden until the owner's conditional release. The old section92
+Section 102 completes the requested counter-review of both section-101 Claude commits;
+section 103 is the later owner-requested offline implementation round.
+Codex stops before QC setup; resume only after a fresh owner resource release, with no mandatory Claude checkpoint.
+QC access remains forbidden until that fresh release. The old section92
 skip was one-round only; the section-100 instruction waives Codex's progress
 stops for Claude checkpoints until further notice, and Claude reviews when the
 owner asks. A historical Mac lock prevented
@@ -601,8 +604,8 @@ frozen rules, stop at that factual blocker, not an invented canonical gate.
 No duplicate uncertain dispatch or ON through an unresolved path. One final
 matching-lane push carries the stable endpoint. Launch/audit/data gates still
 apply; the earlier attempt ceiling is expressly superseded, not reset.
-The Analyst release heartbeat stays ACTIVE until its one qualifying trigger
-is consumed, then pauses before native work; the old Claude monitor stays paused.
+The Analyst release heartbeat was deleted at the owner's request, not triggered;
+no monitor is rearmed. The old Claude monitor stays paused.
 The owner's latest
 request is an order-based 2021-now extension of section72's cap-selected
 stock portfolio and weight-only TPR tilt, with Analyst Revisions disabled.
@@ -25772,3 +25775,236 @@ status afterward. No history rewrite, separate branch or automatic native/
 monitor continuation follows that push. The recorded future-checkpoint
 waiver remains in force at its scope; this handoff does not add a new
 mandatory Claude checkpoint or treat it as genuine resource release.
+
+## 103. Offline OFF recovery preparation before QC setup - 2026-10-26
+
+### 103.1 Latest owner direction, exact base and isolation
+
+The owner stopped the Analyst-push monitor, then said:
+
+> qc/safari is not available at this point.another lane is using it.
+> so, build whatever is needed until the last step before qc/safari setup. skip claude review
+> push once when done
+
+After the requested sync/counter-review verification, the owner continued:
+
+> continue building to the last step before qc. skip claude review for now
+
+Actual starting HEAD and matching Target-Price remote were both
+`990e53672533cf27e466235bfe4184cec0bd32bb`. The designated physical/Git root
+is `/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__target_price_revisions`,
+branch `codex/strategy-target-price-revisions`. Five untracked files from this
+chat's interrupted offline build were preserved through the safe fast-forward
+and are completed in this round. No other unknown tracked changes were present.
+The prior stall was actual overlapping controller edits, not an invented
+Claude-review requirement. Section 102's two Codex commits were already
+published; no consumed counter-review is repeated or attributed as a new one.
+
+The app confirmed deletion of `analyst-push-releases-target-price-qc` after
+the owner's stop request. This round performs no automation change, rearm,
+Analyst ref poll, sibling inspection, QC/Safari availability check or setup.
+The former baseline `3c905d4235617d3d2a56b636c8e0be77ee790686` stays provenance;
+it is not silently advanced or treated as current release authority.
+
+<!-- TPR-OFFLINE103-SCOPE:START -->
+| Boundary | Scope |
+|---|---|
+| Owner boundary | Offline build only; stop before QC/Safari setup or access |
+| Claude checkpoint | Skipped by the latest explicit owner direction |
+| Monitors | Analyst-push monitor deleted at owner request; no polling, rearm or consumed release |
+| Inputs | Public repository bytes and synthetic fixtures only |
+| Native admission | No active permit, genuine adapter, notebook, claim or QC job |
+| History | OFF three historical Codex failures; ON zero; 33 observed looks retained |
+| New effects | Zero private/provider/credential/operator reads; zero attempts, jobs and looks |
+| Publication | Exactly one non-force push to the matching Target-Price lane |
+<!-- TPR-OFFLINE103-SCOPE:END -->
+
+### 103.2 Implemented offline boundary
+
+`extended_off_recovery_preparation.py` stitches the existing five public
+controller/program/runtime/reader/context identities into one deterministic,
+hash-bound preparation manifest. The synced controller's independently
+verified source pin is rotated to its section-102 identity, not weakened.
+Its repository/owner metadata is explicitly not authenticated native custody.
+All live operation, permit, capsule, invocation, program and claim fields stay
+null. No current deadline, attempt, access scope or native program is minted.
+The strict future-return envelope binds operation/invocation/HEAD and plan,
+program, capsule and source-closure hashes. Duplicate/unknown JSON fields,
+nonfinite values, byte/depth excess and mismatched bindings refuse body-free.
+Unreturned transport counts stay null; known partial failures/cancellation
+retain their observations. A validated witness is not a sufficient source-unit diagnosis.
+
+`extended_off_recovery_cli.py` provides a real public-source-only preflight
+command, rather than a callable's self-asserted clean-tree metadata. It checks
+the pinned physical/Git root, branch, HEAD and clean status around exact
+bounded public-source reads. Its final output is an inert JSON manifest on
+stdout only; no receipt, active permit, private input, notebook or job is
+created. A dirty tree or changed source refuses. Genuine own-project tool/
+clock/custody/invocation evidence still cannot be fabricated offline.
+
+`extended_off_attempt_continuation.py` is a named prospective path, preserving
+the old three-attempt contracts rather than globally lifting their limits.
+It prepares closed, hash-chained draft reservations and observational closures
+and adapts only enumerated attempt-identity predicates/source literals in
+pinned public native sources. Actual attempt four or later is preserved, not
+remapped to three. Old effect controllers remain unchanged and still refuse attempt four.
+A draft reservation is not a durable claim or native permission. Fresh real
+reservation publication, ownership and source/tool binding remain prerequisites
+at native setup, before any future compile or launch.
+
+Compile failure spends an attempt but invents no observed job or outcome look.
+Reserved look identities remain separate from observations; unresolved
+delivery is not interpreted as zero actual effects or permission to retry.
+The combined pre-QC CLI also validates the continuation public-source closure
+and dry-builds an unreserved attempt-four source template in memory. It outputs
+only its hashes/report and all-false permission flags, not executable source,
+an allocated look or an active claim. The pure OFF native processing path reuses the existing exact NAV/orders/
+fee/currency/clock arithmetic and does not require ON historical input repair.
+Source/compiled-job authenticity and full independent accounting are separate
+from successful normalization or terminal Completed. The generated template
+does not guess a membership-unit fix, bypass stale marks, change economics or
+claim the July-2024 runtime defect repaired.
+
+### 103.3 Frozen study, findings and delegated choices
+
+Study `TPR-CAP-TILT-EXT26-20261010-v1` remains 2021-01-04 through 2026-10-09,
+warm-up 2020-09-01, 1449 valuations/301 decisions. Six cap-selected STOCK
+sleeves, top10/fixed60 slots, neutral OFF versus weight-only standalone TPR20%
+ON and AR entirely disabled remain frozen. Capital, cash/volume constraints,
+fees/slippage, corporate actions, timing, input/calendar/config hashes and
+protected holdouts are not changed. No accepted OFF full-window result or paired performance is claimed.
+Historical OFF failures, ON unlaunched and all 33 observed looks remain;
+new actual attempts/jobs/looks in this round are zero. All accepted metrics
+remain NULL. ON's incomplete historical identity/action/signal bridge and
+five-year history limitation are not invented blockers to OFF diagnosis.
+
+| Decision | Agent provenance and scope | Limit |
+|---|---|---|
+| OFF103-D001 | Root implements the owner's offline-only continuation and one-push scope | No native resource release or monitor restart inferred |
+| OFF103-D002 | Preparation agent finishes the preserved four factory/CLI/test files and the synced controller pin | Public bytes and synthetic fixtures, not native authentication |
+| OFF103-D003 | Continuation agent completes the preserved pure attempt/source/processing candidate and tests | No rewrite of historical effect controllers, attempts or receipts |
+| OFF103-D004 | Root updates only this sole lane handoff and lane-owned guards | No shared Action Plan, Session Handoff, workflow, main or sibling edits |
+| OFF103-D005 | Read-only Codex cross-auditor independently verifies the final new sources and tests; no verified residuals | Offline QA only, no added Claude checkpoint or native acceptance |
+
+The current source-bound adapter/custody and historical source-unit/accounting
+findings remain open at their actual scope. Canonical TR0-I/TPR-1/TPR-0B gates
+remain distinct and unclosed. No vendor rights/PIT claim, subscription purchase,
+new provider, broker, paper/live or deployment authority follows from this
+software build. No real operator stop or database is read.
+
+### 103.4 Validation and source identities
+
+Focused synthetic validation uses the existing isolated runtime-root runner
+BEFORE dispatch/config imports, network denied, no actual operator state,
+no bytecode tree and no complete lane/QC-package/repository suite. Root's two
+new current-handoff controls first reproduced the missing section and stale
+role: **2 failed in 0.52s** before this record/current-pointer correction.
+The next combined document selection was **8 failed, 617 passed in 12.18s**:
+the exact next-action grammar had not yet recognized the new owner-directed
+pre-QC stop sentence, so its seven clean-first negatives also failed their
+baseline. Adding that exact phrase (not an arbitrary-prose bypass) restored
+the four selected document/handoff modules to **625 passed in 11.29s**.
+Final root validation: **1745 passed, 1 existing Windows-junction skip in
+27.94s**, selecting exactly these 19 modules through
+`artifacts/target_price_provider_coverage/offline_runner_20261024_v2.py`
+(runner SHA-256 `40d20baab905c205e47a9b598997395a24325c1276dc85888da9089825850d01`):
+
+```text
+tests/target_price_revisions_qc/test_qc_extended_refusal_witness_controller_successor.py
+tests/target_price_revisions_qc/test_qc_extended_refusal_witness_controller_stop_accounting.py
+tests/target_price_revisions_qc/test_qc_extended_refusal_witness_program_successor.py
+tests/target_price_revisions_qc/test_qc_extended_refusal_witness_runtime_successor.py
+tests/target_price_revisions_qc/test_qc_extended_refusal_witness_read_design.py
+tests/target_price_revisions_qc/test_qc_extended_refusal_witness_notebook_read_design.py
+tests/target_price_revisions/test_import_firewall.py
+tests/target_price_revisions_qc/test_qc_extended_sharadar_capture_census.py
+tests/target_price_revisions_qc/test_qc_extended_sharadar_history_design.py
+tests/target_price_revisions/test_document_consistency.py
+tests/test_active_document_consistency.py
+tests/target_price_revisions/test_offline_coverage_handoff.py
+tests/target_price_revisions/test_offline103_handoff.py
+tests/target_price_revisions_qc/test_qc_extended_off_attempt_continuation.py
+tests/target_price_revisions_qc/test_qc_extended_off_recovery_cli.py
+tests/target_price_revisions_qc/test_qc_extended_off_recovery_preparation.py
+tests/target_price_revisions_qc/test_qc_extended_native.py
+tests/target_price_revisions_qc/test_qc_extended_metrics.py
+tests/target_price_revisions_qc/test_qc_extended_compressed_store.py
+```
+
+The preparation/CLI owner selection was **136 passed in 0.88s**, including
+six in-memory semantic mutations and descriptor-relative ancestor/leaf/root
+swap, post-read drift, bounded file and fatal/cancellation cleanup controls.
+Its intermediate 133-test selection had 132 passes and one test-harness
+traceback assertion failure; changing the fixture's literal to a variable
+removed a false secret-in-source-line match, with no production weakening.
+The continuation owner selection was **78 passed in 2.14s**, including
+three killed in-memory-only mutants (compile failure falsely adds a job,
+unresolved job count is falsely zero, frozen cloud configuration is unchecked).
+Early continuation controls exposed missing compile identity, invalid terminal
+shape, backwards reservation clocks, an unbound cloud-config hash and the
+pre-reservation source/hash cycle. Those verified issues were corrected.
+The later actual attempt-four journal/compressed-export composition exposed the
+fourth three-attempt gate in compressed store; its independently pinned exact
+OFF identity predicate is now adapted alongside main/core/runtime. Two new
+export assertions initially named the wrong metric/identity locations; only
+those fixture assertions were corrected. No failing cloud path was retried.
+
+Independent read-only Codex QA selected the three new modules: **206 passed
+in 2.51s** before the final argument-shape hardening; it then inspected that
+exact final delta and independently reran continuation: **78 passed in 2.46s**,
+with the final source/test hashes unchanged. It found no verified residuals
+within the offline scope. This is not a Claude review or native acceptance.
+All eight changed Python files parse/compile in memory; `git diff --check`
+is clean. Historical sections99/100/101/102 are byte-identical to starting
+HEAD, excluding trailing newlines. No frozen/executed source or input is edited.
+
+| Final Python artifact | Bytes | SHA-256 |
+|---|---:|---|
+| `research/target_price_revisions_qc/extended_off_attempt_continuation.py` | 26435 | `d36f802e3666ac9dc529a8d763de8d6842eefd0d37c8a40ccad8a2eb7f195624` |
+| `research/target_price_revisions_qc/extended_off_recovery_cli.py` | 11028 | `99ea5fb6ab14400132c91e8af75aa89c4d90c40533fab7f3111d6dd9e665970a` |
+| `research/target_price_revisions_qc/extended_off_recovery_preparation.py` | 12509 | `64931f8dac9e21c4c76e86f32b1d7294631503bc6d91df36f9cfeb29ed0b2fa2` |
+| `tests/target_price_revisions/test_document_consistency.py` | 294968 | `670dde7fa410ccd59fa3f283ab92bb3c0e43becfa202f8880e52d0db97cb409c` |
+| `tests/target_price_revisions/test_offline103_handoff.py` | 3497 | `f937cccde6bd51ff58fd98badf846ab6ba1582fab72a279486da80d0684d4f90` |
+| `tests/target_price_revisions_qc/test_qc_extended_off_attempt_continuation.py` | 22944 | `d0af147103490d2c19b3283b76e254cead3e6756e6bf76880494d4db804a4ec6` |
+| `tests/target_price_revisions_qc/test_qc_extended_off_recovery_cli.py` | 19168 | `8b8e528b654d62692f6d0ef2fa9e1492d794121c0aade868924cf895610e56cc` |
+| `tests/target_price_revisions_qc/test_qc_extended_off_recovery_preparation.py` | 18424 | `6f81e9268cf588f5af2be83e88136e26af4ed23a712a8002d4366986781b9ca2` |
+
+The real no-argument public-only CLI requires a clean committed tree:
+
+```sh
+PYTHONDONTWRITEBYTECODE=1 /Users/sheltonchen/.venvs/trading_agent-py313/bin/python3 -m research.target_price_revisions_qc.extended_off_recovery_cli
+```
+
+Run only after the standing physical/Git-root, branch, HEAD and status checks
+from the designated worktree. It rereads exactly 18 fixed public paths, renders
+the attempt-four source template in memory and prints only an inert manifest
+and hashes. It allocates no reservation, operation or look. The actual clean-
+foundation smoke observation is appended after the first local commit and
+before the one final push. No native or backtest completion is inferred from
+these fixture controls.
+
+### 103.5 Exact next step and publication
+
+Codex stops before QC setup; resume only after a fresh owner resource release, with no mandatory Claude checkpoint.
+Fresh source/tool metadata and custody must be verified at actual QC setup.
+Then freeze separate fresh bounded identities/claims before each applicable
+private read, native tool/Mia operation, upload, compile or job. First discover
+a genuine own-project native capability or separately scoped collision-free
+new notebook context; do not revive fixed October-22 scopes or relabel a fake
+tool as Mia. Read the exact retained first-refusal evidence and establish the
+actual sleeve/row/units/source date and mark context before any economic
+correction. Returned witness hashes alone may not resolve that diagnosis.
+
+Only after an evidence-bound repair and fresh source/attempt reservation may
+OFF run and be checked for complete orders/fills/fees/cash/exposure/NAV/clock
+accounting. ON follows only a usable OFF baseline and admitted historical
+inputs. This is the last offline setup handoff, not a claim that an unchanged
+known-failing algorithm can already be blindly launched or accepted.
+
+All round commits stay on this one lane. Recheck physical/Git root, branch,
+HEAD/status/staged diff and actual matching remote before every commit/final
+push; stop on unexpected advance. Make exactly one non-force final push to
+`HEAD:refs/heads/codex/strategy-target-price-revisions`, then verify actual
+local/remote equality and clean status. The final identity and CLI smoke
+observation are reported with the handoff; no self-referential commit hash or
+successful push is asserted before it happens.

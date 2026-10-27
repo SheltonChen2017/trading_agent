@@ -666,7 +666,7 @@ SECTION93_CURRENT_FACTS = (
     "No new job was observed after the source-only restoration",
     "Fresh Mac lock blocked the empty-notebook request; no new notebook, cell execution or native witness is claimed",
     "All native-read/create UI scopes are closed with no automatic retry",
-    "Analyst-push monitor remains ACTIVE; future Claude checkpoints are waived until further notice",
+    "Analyst-push monitor was deleted at owner request; future Claude checkpoints are waived until further notice",
 )
 SECTION86_COMMITS = (
     "b28d07f6139dc0460e927b152fb4a87f6f2915e9",
@@ -753,6 +753,7 @@ SECTION8_NEXT_ACTION_STATEMENT = (
     r"The next bounded (?:work|action) is|"
     r"Offline implementation continues under the owner's one-round review waiver; QC access remains forbidden|"
     r"Codex continues bounded QC recovery after the Analyst Revisions release; further Claude checkpoints are waived|"
+    r"Codex stops before QC setup; resume only after a fresh owner resource release, with no mandatory Claude checkpoint|"
     r"Codex continues without Claude review stops)\b"
 )
 SECTION46_CLAUDE_BASE = "9958a459f5cd56c29cb9a0de13d38737e2c3412d"
@@ -1222,7 +1223,7 @@ def _assert_section93_current_facts(text: str) -> None:
     """Positive, bounded current facts; never scan old sections for stale dates."""
     normalized = " ".join(text.split()).lower()
     _assert_retained_release_scope(text)
-    for required in (*SECTION93_CURRENT_FACTS, SECTION102_NEXT_ROLE,
+    for required in (*SECTION93_CURRENT_FACTS, SECTION103_NEXT_ROLE,
                      "last completed counter-review", "skip 1, proceed to 2 and 3 directly"):
         assert required.lower() in normalized, required
     assert SECTION92_NEXT_ROLE.lower() not in normalized, "section92-only routing is superseded for this round"
@@ -1234,6 +1235,7 @@ def _assert_section93_current_facts(text: str) -> None:
     assert SECTION99_NEXT_ROLE.lower() not in normalized, "section99 has been counter-reviewed, not current"
     assert SECTION100_NEXT_ROLE.lower() not in normalized, "section100 routing is reviewed, not current"
     assert SECTION101_NEXT_ROLE.lower() not in normalized, "section101 review is counter-reviewed, not pending"
+    assert SECTION102_NEXT_ROLE.lower() not in normalized, "section102 is historical counter-review, not the current offline build"
 
 
 @pytest.mark.parametrize("missing", ["opening", "closing"])
@@ -1304,7 +1306,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "TPR-1 remains blocked" in normalized_current
     assert "reviewed-spec registry remains empty" in normalized_current
     assert "Claude next reviews this Codex round independently" not in normalized_current
-    assert SECTION102_NEXT_ROLE in normalized_current
+    assert SECTION103_NEXT_ROLE in normalized_current
+    assert SECTION102_NEXT_ROLE not in normalized_current
     assert SECTION101_NEXT_ROLE not in normalized_current
     assert SECTION100_NEXT_ROLE not in normalized_current
     assert SECTION99_NEXT_ROLE not in normalized_current
@@ -4638,6 +4641,7 @@ SECTION81_STALE_NEXT_ACTIONS = {
     "latest": "Codex next counter-reviews section 99 and this round's Claude commits",
     "counterreviewed100": "Codex continues bounded QC recovery after the Analyst Revisions release; further Claude checkpoints are waived",
     "reviewed101": "Codex next counter-reviews section 101 and this round's Claude commits; bounded QC recovery after the Analyst Revisions release continues without a mandatory Claude checkpoint",
+    "counterreviewed102": "The next bounded action is resource-release verification before any separately scoped QC recovery; this requested round implements no next milestone",
 }
 
 
@@ -4657,11 +4661,12 @@ SECTION81_STALE_NEXT_ACTIONS = {
     "current_latest_role", "preamble_latest_role",
     "current_counterreviewed100_role", "preamble_counterreviewed100_role",
     "current_reviewed101_role", "preamble_reviewed101_role",
+    "current_counterreviewed102_role", "preamble_counterreviewed102_role",
 ))
-def test_section_102_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
+def test_section_103_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
     """Retain old routing mutants; reject routing only to the skipped checkpoint."""
     test_exact_next_step_names_the_current_artifacts()
-    current_next = SECTION102_NEXT_ROLE
+    current_next = SECTION103_NEXT_ROLE
     stale_next = SECTION81_STALE_NEXT_ACTIONS.get(fault.rsplit("_", 2)[-2], "")
     if fault.startswith("current_"):
         original_section = _record_section
@@ -4702,7 +4707,7 @@ def test_section_102_current_routing_refuses_stale_range_or_role(monkeypatch, fa
     ("No new job was observed after the source-only restoration", "Source-only restoration launched and accepted a new job"),
     ("Fresh Mac lock blocked the empty-notebook request; no new notebook, cell execution or native witness is claimed", "The new notebook ran and retrieved a valid native witness"),
     ("All native-read/create UI scopes are closed with no automatic retry", "A live native task keeps retrying automatically"),
-    ("Analyst-push monitor remains ACTIVE; future Claude checkpoints are waived until further notice", "Analyst-push monitor remains PAUSED; another Claude checkpoint is mandatory"),
+    ("Analyst-push monitor was deleted at owner request; future Claude checkpoints are waived until further notice", "Analyst-push monitor remains ACTIVE; another Claude checkpoint is mandatory"),
 ))
 def test_section93_current_fact_mutants_do_not_invent_native_success_or_reset(monkeypatch, surface, before, after):
     """Mutate only bounded live pointers, not attributed historical snapshots."""
@@ -5677,6 +5682,7 @@ SECTION102_RANGE = f"{SECTION102_BASE}..{SECTION102_HEAD}"
 SECTION102_SHORT_RANGE = "12be4894..69ecaf91"
 SECTION102_COMMITS = ("40e7901d60d96fccc1addaf9088e2caed5f71d74", SECTION102_HEAD)
 SECTION102_NEXT_ROLE = "The next bounded action is resource-release verification before any separately scoped QC recovery; this requested round implements no next milestone"
+SECTION103_NEXT_ROLE = "Codex stops before QC setup; resume only after a fresh owner resource release, with no mandatory Claude checkpoint"
 SECTION101_EFFECT_GRANT = (
     rf"(?:{SECTION81_GRANT})|"
     r"(?:^|[.!?|:;])\s*(?:QuantConnect|QC|Safari)\s+access\s+is\s+authorized\b"

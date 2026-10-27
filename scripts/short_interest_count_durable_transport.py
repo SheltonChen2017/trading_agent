@@ -13,7 +13,9 @@ import dis
 from pathlib import Path
 import re
 import time
+import sys
 from functools import wraps
+from types import MappingProxyType
 
 from data.hashing import canonical_json, hash_bytes, hash_payload
 from research.short_interest_etf import native_dated_class_reference as references
@@ -30,6 +32,7 @@ FINAL_ROLES = ("inventory", "provisional", "closed", "manifest")
 _OPERATIONS, _FAILED, _OBSERVATIONS, _TERMINALS = {}, set(), {}, {}
 _CANDIDATES, _RESPONSE_CAPS, _FINAL_CAPS, _WINDOWS = {}, {}, {}, {}
 _VOLUMES, _RECEIVED_CAPS = {}, {}
+_CAP_INDEXES, _CAP_INDEX_PINS, _CAP_INDEX_MINTS = {}, {}, {}
 _DRAINED = {}
 _DOWNGRADES, _DRAIN_ORIGINS = {}, {}
 _OBS_COMPLETED = {}
@@ -94,6 +97,7 @@ def policy():
         "HTTP": "fixed_protected_GET_at_most_reserved_bytes_prefix_preserved_200_JSON_only_404_negative",
         "body_limit": "no_MAX_plus_one_MAX_requires_strict_original_Content_Length_and_successful_close",
         "framing": "genuine_HTTPMessage_exact_single_JSON_type_zero_or_one_CL_or_TE_no_duplicates_no_mixed_framing",
+        "custody_lookup": "original_immutable_rosters_ticket_identity_index_nonce_only_one_full_cap_authentication_pass_at_freeze",
         "transfer_encoding": "single_chunked_only_exact_original_HTTPResponse_decoder_no_overrides_bounded_EOF_below_MAX",
         "content_encoding": "absent_or_exact_case_insensitive_single_identity_only",
         "incomplete_prefix": "exact_native_IncompleteRead_body_wrapping_frames_offsets_only_depth4_cycles_veto_private_error_hold",
@@ -230,6 +234,7 @@ def bind_registered_operation(source_lease, budget):
     value._anchor = value._identity = anchor
     _OPERATIONS[value] = anchor, ("LIVE", (), (), (), None, None)
     _RESPONSE_CAPS[value], _RECEIVED_CAPS[value], _FINAL_CAPS[value] = (), (), ()
+    _issue_cap_indexes(value, anchor, (), (), (), ())
     _WINDOWS[value] = source[14], source[14]
     return value
 
@@ -601,6 +606,48 @@ def received_custody_binding(capability):
     raise CountTransportRefusal("REFUSED: count_operator_observation_changed")
 
 
+def _issue_cap_indexes(operation, anchor, received, responses, received_entries, response_entries):
+    """Original immutable identity indexes; no physical-completion authority."""
+    require(sys._getframe(1).f_code in _INDEX_ISSUER_CODES, "count_operator_observation_changed")
+    left = MappingProxyType({id(entry[0]): entry for entry in received_entries})
+    right = MappingProxyType({id(entry[0]): entry for entry in response_entries})
+    original = anchor, received, responses, left, right, received_entries, response_entries, object()
+    previous = _CAP_INDEX_PINS.get(operation)
+    _CAP_INDEXES[operation] = _CAP_INDEX_PINS[operation] = original
+    _CAP_INDEX_MINTS[original[7]] = original
+    # Only the current append-issued index is authority. Retaining every
+    # superseded full map would itself grow quadratically across133 chunks.
+    if previous is not None: del _CAP_INDEX_MINTS[previous[7]]
+    return original
+
+
+def _cap_indexes(operation, anchor):
+    """Cheap ORIGINAL provenance only; freeze/terminal still audit every file."""
+    original = _CAP_INDEXES.get(operation)
+    require(type(original) is tuple and len(original) == 8 and original is _CAP_INDEX_PINS.get(operation)
+        and original[0] is anchor and type(original[7]) is object
+        and _CAP_INDEX_MINTS.get(original[7]) is original
+        and original[1] is _RECEIVED_CAPS[operation] and original[2] is _RESPONSE_CAPS[operation],
+        "count_operator_observation_changed")
+    for roster, index, entries in ((original[1], original[3], original[5]), (original[2], original[4], original[6])):
+        require(type(roster) is tuple and type(index) is MappingProxyType and type(entries) is tuple
+            and len(roster) == len(index) == len(entries) <= 528
+            and len({id(cap) for cap in roster}) == len(roster), "count_operator_observation_changed")
+        for cap, entry in zip(roster, entries):
+            require(type(entry) is tuple and len(entry) == 3 and entry[1] is cap
+                and type(entry[2]) is tuple and len(entry[2]) in (12, 13)
+                and entry[2][0] is cap and entry[2][1] is operation and entry[2][2] is entry[0]
+                and index.get(id(entry[0])) is entry, "count_operator_observation_changed")
+    return original
+
+
+def _same_cap_binding(current, original):
+    # CountReceived reconstructs its12tuple; each element still comes from
+    # the EXACT original cap/observation/seal/nonce, not a new cached flag.
+    return type(current) is tuple and len(current) == len(original) and all(
+        left is right for left, right in zip(current, original))
+
+
 class CountCaptureOperation:
     __slots__ = ("_anchor", "_identity")
     def __init__(self): raise CountTransportRefusal("REFUSED: count_operator_factory_required")
@@ -749,51 +796,81 @@ class CountCaptureOperation:
     def accept_closed_response(self, capability):
         anchor = active_operation_binding(self)
         with anchor[11]:
-            original = _responses().response_binding(capability)
-            require(type(original) is tuple and original[0] is capability and original[1] is self
+            indexes = _cap_indexes(self, anchor); module = _responses()
+            require(type(capability) is module.CountResponseCustody, "count_operator_observation_changed")
+            original = module.response_binding(capability)
+            require(type(original) is tuple and len(original) == 13 and original[0] is capability and original[1] is self
                 and any(original[3] is item for item in _OPERATIONS[self][1][3])
-                and not any(original[2] is received_custody_binding(item)[2]
-                    for item in _RESPONSE_CAPS[self]), "count_operator_observation_changed")
-            _RESPONSE_CAPS[self] = (*_RESPONSE_CAPS[self], capability)
+                and id(original[2]) not in indexes[4]
+                and all(capability is not cap for cap in indexes[2]), "count_operator_observation_changed")
+            require(_cap_indexes(self, anchor) is indexes, "count_operator_observation_changed")
+            roster = (*indexes[2], capability); entries = (*indexes[6], (original[2], capability, original))
+            _RESPONSE_CAPS[self] = roster
+            _issue_cap_indexes(self, anchor, indexes[1], roster, indexes[5], entries)
 
     @_permanent
     def accept_received_control(self, capability):
         anchor = active_operation_binding(self)
         with anchor[11]:
-            original = _controls().received_binding(capability)
+            indexes = _cap_indexes(self, anchor); module = _controls()
+            require(type(capability) is module.CountReceived, "count_operator_observation_changed")
+            original = module.received_binding(capability)
             require(type(original) is tuple and len(original) == 12 and original[0] is capability
                 and original[1] is self and any(original[3] is obs for obs in _OPERATIONS[self][1][3])
-                and not any(_controls().received_binding(cap)[2] is original[2] for cap in _RECEIVED_CAPS[self]),
+                and id(original[2]) not in indexes[3] and all(capability is not cap for cap in indexes[1]),
                 "count_operator_observation_changed")
-            _RECEIVED_CAPS[self] = (*_RECEIVED_CAPS[self], capability)
+            require(_cap_indexes(self, anchor) is indexes, "count_operator_observation_changed")
+            roster = (*indexes[1], capability); entries = (*indexes[5], (original[2], capability, original))
+            _RECEIVED_CAPS[self] = roster
+            _issue_cap_indexes(self, anchor, roster, indexes[2], entries, indexes[6])
 
     @_permanent
     def freeze_provisional_root(self):
         anchor = active_operation_binding(self)
         with anchor[11]:
             state = _OPERATIONS[self][1]; roster = anchor[1].current_tickets()
+            indexes = _cap_indexes(self, anchor)
             require(not state[2] and len(state[3]) == len(roster) == len(_RECEIVED_CAPS[self]) > 0,
                 "count_operator_final_incomplete")
-            observations = tuple(next((item for item in state[3] if http_observation_binding(item)[2] is ticket), None)
-                for ticket in roster)
-            require(all(item is not None for item in observations), "count_operator_final_incomplete")
-            caps = tuple((next((cap for cap in _RECEIVED_CAPS[self] if _controls().received_binding(cap)[2] is ticket), None),
-                next((cap for cap in _RESPONSE_CAPS[self] if _responses().response_binding(cap)[2] is ticket), None))
-                for ticket in roster)
-            for obs, pair in zip(observations, caps):
-                received = _controls().received_binding(pair[0]); observed = http_observation_binding(obs)
-                require(received[3] is obs and received[10] == anchor[5], "count_operator_observation_changed")
+            observed_by_ticket, received_by_ticket, response_by_ticket = {}, {}, {}
+            for obs in state[3]:
+                bound = http_observation_binding(obs); key = id(bound[2])
+                require(bound[1] is self and key not in observed_by_ticket, "count_operator_final_incomplete")
+                observed_by_ticket[key] = bound
+            # ONE full physical/source audit for EACH previously accepted cap.
+            # An old mutable seal cannot hide behind the identity index.
+            for entries, index, validator in ((indexes[5], received_by_ticket, _controls().received_binding),
+                    (indexes[6], response_by_ticket, _responses().response_binding)):
+                for ticket, cap, issued in entries:
+                    current = validator(cap)
+                    require(_same_cap_binding(current, issued) and id(ticket) not in index,
+                        "count_operator_observation_changed")
+                    index[id(ticket)] = current
+            require(_cap_indexes(self, anchor) is indexes and _OPERATIONS[self][1] is state,
+                "count_operator_observation_changed")
+            keys = {id(ticket) for ticket in roster}
+            require(len(keys) == len(roster) and set(observed_by_ticket) == set(received_by_ticket) == keys
+                and set(response_by_ticket) <= keys, "count_operator_final_incomplete")
+            observations, caps, covered, ticket_shas = [], [], set(), []
+            for ticket in roster:
+                key = id(ticket); observed, received = observed_by_ticket[key], received_by_ticket[key]
+                response = response_by_ticket.get(key); obs = observed[0]
+                reserved = accounting.ticket_binding(ticket)
+                require(observed[2] is received[2] is ticket and received[3] is obs
+                    and received[4] is observed[3] and received[5] is observed[4]
+                    and received[10] == anchor[5], "count_operator_observation_changed")
                 if type(observed[10]) is bytes and observed[10]:
-                    require(pair[1] is not None and _responses().response_binding(pair[1])[3] is obs,
+                    require(response is not None and response[2] is ticket and response[3] is obs,
                         "count_operator_final_incomplete")
-                else: require(pair[1] is None, "count_operator_observation_changed")
-            covered = tuple(sorted({accounting.ticket_binding(ticket)[5] for ticket, obs in zip(roster, observations)
-                if http_observation_binding(obs)[9] == 200 and type(http_observation_binding(obs)[10]) is bytes
-                and len(http_observation_binding(obs)[10]) > 0}))
+                else: require(response is None, "count_operator_observation_changed")
+                if observed[9] == 200 and type(observed[10]) is bytes and observed[10]: covered.add(reserved[5])
+                observations.append(obs); caps.append((received[0], None if response is None else response[0]))
+                ticket_shas.append(reserved[9])
+            observations, caps, covered = tuple(observations), tuple(caps), tuple(sorted(covered))
             require(covered == anchor[2].chunk_positions(anchor[4]), "count_operator_final_incomplete")
             metadata = {"registration_sha256": anchor[6], "plan_sha256": anchor[10], "chunk": anchor[4],
-                "ticket_sha256s": [accounting.ticket_binding(ticket)[9] for ticket in roster],
-                "observation_sha256s": [http_observation_binding(obs)[14] for obs in observations],
+                "ticket_sha256s": ticket_shas,
+                "observation_sha256s": [observed_by_ticket[id(ticket)][14] for ticket in roster],
                 "covered_positions": list(covered), "authority": authority()}
             raw = canonical_json(metadata).encode(); value = object.__new__(ProvisionalRootClosureCandidate)
             original = value, self, anchor, roster, observations, caps, covered, hash_bytes(raw), raw
@@ -898,3 +975,8 @@ def open_registered_operation(root, *, budget, runtime_head, actual_remote, comp
 def _terminal_binding(operation, candidate):
     provisional_candidate_binding(candidate)
     return _coordinator().terminal_chunk_binding(operation, candidate)
+
+
+_INDEX_ISSUER_CODES = frozenset((bind_registered_operation.__code__,
+    CountCaptureOperation.accept_received_control.__wrapped__.__code__,
+    CountCaptureOperation.accept_closed_response.__wrapped__.__code__))

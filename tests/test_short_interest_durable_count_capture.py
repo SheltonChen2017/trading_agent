@@ -35,6 +35,9 @@ def fresh_outer_registries(monkeypatch):
         monkeypatch.setattr(outer, name, value)
     monkeypatch.setattr(outer, "_SETTLED_CONTRIBUTIONS", {})
     monkeypatch.setattr(outer, "_CONTRIBUTION_ORIGINS", {})
+    for name, value in (("_CHECKPOINT_FACTS", {}), ("_CHECKPOINT_FACTS_FAILED", set()),
+        ("_CHECKPOINT_CAPS", {}), ("_CHECKPOINT_ROUND", {}), ("_WRITTEN_CHECKPOINTS", {})):
+        monkeypatch.setattr(outer, name, value)
     for name, value in (("_CONTRIBUTIONS", {}), ("_PRIVATE_PROOFS", {}), ("_CLOSED_ORIGINS", {}),
         ("_UNIONS", {}), ("_FAILED", set()), ("_UNION_FAILED", set())):
         monkeypatch.setattr(outer.transport_union, name, value)
@@ -255,14 +258,29 @@ def fabricated_member_caps(operation, monkeypatch):
     h.responses.BODY_NAME, h.responses.RECEIPT_NAME = "response.raw", "response.receipt.private.json"
     base = h.coordinator.source_lease_binding(h.lease)[11]
     def origin(path, name, raw): return (None, (path,), None, name, raw, hash_bytes(raw), None, None, None, None, None, None, None, None, None)
+    def stamp(raw, inode): return (1, inode, os.getuid(), 0o600, 1, len(raw), 7, 8, 2)
+    original_received = h.controls.received_binding
+    def received(cap):
+        saved = original_received(cap)
+        if saved[7] is None:
+            ordinal = outer.accounting.ticket_binding(saved[2])[4]
+            changed = list(saved); changed[7] = origin(base / "received" / f"{ordinal:06d}", "received.private.json", b"RECEIVED")
+            changed[6] = hash_bytes(b"RECEIVED"); changed[8] = stamp(b"RECEIVED", 30 + ordinal); h.received[cap] = tuple(changed)
+        return original_received(cap)
+    original_response = h.responses.response_binding
+    def response(cap):
+        saved = original_response(cap)
+        if saved[9] is None:
+            changed = list(saved); changed[9] = stamp(h.raw, 2); changed[10] = stamp(b"RECEIPT", 4)
+            h.response_bindings[cap] = tuple(changed)
+        return original_response(cap)
+    h.controls.received_binding = received; h.responses.response_binding = response
     for ticket in h.tickets:
-        got, pair = h.receive(h.op.dispatch(ticket, h.claim, h.starts[ticket])); ordinal = ticket.public_summary()["reservation_ordinal"]
+        ordinal = ticket.public_summary()["reservation_ordinal"]
         start = h.starts[ticket]; old = list(h.start_bindings[start]); old[9] = origin(base / "starts" / f"{ordinal:06d}", "START.spent.json", b"START")
+        old[4] = hash_bytes(b"START"); old[10] = stamp(b"START", 20 + ordinal)
         h.start_bindings[start] = tuple(old)
-        old = list(h.received[got]); old[7] = origin(base / "received" / f"{ordinal:06d}", "received.private.json", b"RECEIVED")
-        h.received[got] = tuple(old)
-        old = list(h.response_bindings[pair]); old[9] = (1, 2, 3, 0o600, 1, len(h.raw), 7, 8, 2)
-        old[10] = (1, 4, 3, 0o600, 1, 9, 7, 8, 2); h.response_bindings[pair] = tuple(old)
+        h.receive(h.op.dispatch(ticket, h.claim, start))
     h.candidate = h.op.freeze_provisional_root(); h.base = base
     return h
 
@@ -288,6 +306,68 @@ def test_terminal_helper_cannot_be_called_by_a_matching_payload_or_complete_flag
     with pytest.raises(outer.DurableCountCaptureRefusal, match="terminal_required"):
         outer._finish_original_chunk(h.op, h.candidate)
     assert outer._TERMINALS == {}
+
+
+def test_checkpoint_facts_constructor_and_raw_payload_helper_cannot_mint(fabricated_member_caps):
+    h = fabricated_member_caps
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="checkpoint_required"): outer.CountCheckpointFacts()
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="checkpoint_required"):
+        outer._issue_checkpoint_facts(h.op, h.candidate, {"complete": True}, (), ())
+    assert outer._CHECKPOINT_FACTS == {}
+
+
+def test_pure_original_checkpoint_facts_do_not_reenter_expired_source_callbacks(monkeypatch):
+    """Explicit fabricated original issuer record; tests only pure provenance."""
+    cap = object.__new__(outer.CountCheckpointFacts); raw = canonical_json({"phase": "PROVISIONAL_STORAGE_FACTS"}).encode()
+    original = (cap, object(), object(), (), (), raw, hash_bytes(raw), (), (), object())
+    cap._anchor = cap._identity = original; outer._CHECKPOINT_FACTS[cap] = original
+    monkeypatch.setattr(outer, "source_lease_binding", lambda *a: pytest.fail("expired source callback"))
+    assert outer.checkpoint_facts_binding(cap) is original
+    clone = object.__new__(outer.CountCheckpointFacts); clone._anchor = clone._identity = original
+    with pytest.raises(outer.DurableCountCaptureRefusal): outer.checkpoint_facts_binding(clone)
+
+
+def test_checkpoint_facts_all_full9_origins_are_persisted_not_current_stat_baselines(fabricated_member_caps, monkeypatch):
+    """Genuine toy tickets/operator; FAKE closed control/native/storage origins."""
+    import json
+    h = fabricated_member_caps; source = h.coordinator.source_lease_binding(h.lease)
+    monkeypatch.setattr(outer, "source_lease_live_binding", h.coordinator.source_lease_live_binding)
+    monkeypatch.setattr(outer, "_audit_membership", lambda *a: None)  # Named fabricated membership IO.
+    mount = h.base.parent
+    def stamp(raw, ordinal): return (1, ordinal, os.getuid(), 0o600, 1, len(raw), 7, 8, 2)
+    def origin(path, name, raw): return (None, (path,), None, name, raw, hash_bytes(raw), None, None, None, None, None, None, None, None, None)
+    claim = list(h.claims[h.claim]); claim[8] = origin(mount / "claim", "claim.spent.json", b"CLAIM")
+    claim[6], claim[9] = hash_bytes(b"CLAIM"), stamp(b"CLAIM", 10); h.claims[h.claim] = tuple(claim)
+    for role in transport.FINAL_ROLES:
+        cap = object(); raw = transport._final_control_payload(h.op, h.candidate, role)
+        name = {"inventory": "inventory.private.json", "provisional": "provisional.json", "closed": "closed.json", "manifest": "manifest.private.json"}[role]
+        h.finals[cap] = (cap, h.op, role, hash_bytes(raw), origin(h.base / ("final_" + role), name, raw), stamp(raw, 40 + len(h.finals)), h.candidate, object())
+        h.op.accept_final_control(cap)
+    pin = (1, 2, os.getuid(), 0o700)
+    state = {"mount_pin": pin, "root_creation_pin": (1, 2, os.getuid(), os.getgid(), 0o700),
+        "mount_native": ((1, 2), os.getuid(), 4096, 0, 1, 0, "apfs", str(mount), "/dev/fabricated"),
+        "device_node_pin": (1, 2, 3, 4, 5, 6), "backing_pin": (1, 2, os.getuid(), 0o600, 1),
+        "directories": ((mount.parent, None, pin),), "namespace": mount.parent, "device": "/dev/fabricated"}
+    h.volume = SimpleNamespace(_binding=lambda: state, check=lambda: None)
+    volume_original = (h.volume, h.op, mount, 1, h.plan.sha256, source[10], object(), transport.operation_binding(h.op), object())
+    monkeypatch.setattr(transport, "volume_for_operation", lambda op: h.volume)
+    monkeypatch.setattr(outer.storage, "volume_binding", lambda *a, **k: volume_original)
+    monkeypatch.setattr(outer.storage, "volume_system_entries", lambda *a: (), raising=False)
+    monkeypatch.setattr(outer, "_lease_record", lambda lease: (source, "fabricated-archive-token"))
+    monkeypatch.setattr(outer, "_archive_binding", lambda token: (None, None, None, None, None, "f" * 64))
+    outer._DIRECTORIES[h.op] = ((h.base, pin), (mount / "claim", pin))
+    facts = outer.checkpoint_facts(h.op, h.candidate); saved = outer.checkpoint_facts_binding(facts)
+    payload = json.loads(saved[5])
+    assert payload["phase"] == "PROVISIONAL_STORAGE_FACTS" and payload["authority"]["source_admitted"] is False
+    assert len(payload["files"]) == 13  # 2 START +2 received +4 response +4 FINAL + external claim.
+    assert all(len(row["seal9"]) == 9 for row in payload["files"])
+    assert payload["producer"]["code_manifest"] == [list(row) for row in source[7]]
+    assert payload["account"]["covered_positions"] == list(h.plan.chunk_positions(1))
+    assert outer.checkpoint_facts(h.op, h.candidate) is facts
+    # Revalidation reconstructs all original facts; no changed descriptor may
+    # inherit the cached cap or install a new seal.
+    state["device"] = "/dev/changed"
+    with pytest.raises(outer.DurableCountCaptureRefusal): outer.checkpoint_facts(h.op, h.candidate)
 
 
 def test_independent_FD_cleanup_drains_other_descriptor_even_when_first_close_fails(monkeypatch):
@@ -342,6 +422,18 @@ def fabricated_outer_run(operation, monkeypatch):
     It tests original terminal ordering/provenance, not physical admission.
     """
     h = operation; h.events = []; h.volume_closed, h.source_closed, h.drift = False, False, False
+    from scripts import short_interest_count_checkpoint as checkpoint
+    # Explicit fabricated checkpoint storage seam; the original producer is
+    # exercised by its own kernel/FD tests, not these ordering-only fixtures.
+    checkpoint_roots = {}
+    def checkpoint_publish(op, candidate):
+        value = object(); checkpoint_roots[value] = (value, op, candidate, "chunk", None, None,
+            "a" * 64, tuple(range(9)), "b" * 64, tuple(range(9)), "checkpoint/chunk", object())
+        h.events.append("provisional-checkpoint-publication"); return value
+    monkeypatch.setattr(checkpoint, "preflight_checkpoint_resources", lambda *args: h.events.append("checkpoint-preclaim-preflight"))
+    monkeypatch.setattr(checkpoint, "publish_provisional_chunk_checkpoint", checkpoint_publish)
+    monkeypatch.setattr(checkpoint, "checkpoint_binding", lambda value: checkpoint_roots[value])
+    monkeypatch.setattr(checkpoint, "audit_original_checkpoint_roots", lambda: h.events.append("original-checkpoint-postcontext-audit"))
     for ticket in h.tickets: transport._START_PERMISSIONS.pop(ticket, None)
     transport._REMOTE_BATCHES[h.op] = ()  # Explicit fake source fixture begins a fresh outer authorization epoch.
     h.failed_source_checks = 0
@@ -469,6 +561,8 @@ def test_original_outer_issues_then_settles_only_after_all_original_context_exit
     assert type(value) is outer.reader.ClosedCountChunk
     assert h.events.index("original-volume-exits") < h.events.index("original-source-code-exits")
     assert h.events.index("original-source-code-exits") < h.events.index("fresh-original-code-audit")
+    assert h.events.index("checkpoint-preclaim-preflight") < h.events.index("original-preservation-lease-before-claim-key")
+    assert h.events.index("provisional-checkpoint-publication") < h.events.index("original-volume-exits")
     bound = outer.reader.closed_count_chunk_accounting(value)
     assert bound[0] is h.budget.budget_identity and bound[1] is h.plan and bound[3] == h.tickets
     assert h.budget.public_summary()["current_chunk"] == 2

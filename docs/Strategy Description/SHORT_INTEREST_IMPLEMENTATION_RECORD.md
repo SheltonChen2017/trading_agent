@@ -25892,3 +25892,228 @@ admits source/denominator/input/backtest readiness. Continue from the actual
 result; local readiness and the ONE final matching-lane push remain pending.
 
 Main post-record active-document/review-record validation:95passed/.95s.
+
+### 128.37 Actual corrected read-only timingV2 CLOSED exit0
+
+At clean `6d4d0e32096d3527a2db14068560fa76399cc207`, tracking/actual origin
+`d6af672b3c8198712228bbd7b5eef35777283b1a`, the ONE128.36 invocation ran
+as exec59809. Main observed started_readonly_guard_timing, then the genuine
+closed_readonly_guard_timing_only result and actual process **EXIT0**.
+Schema si-count-guard-readonly-timing-closed-v2, protocol
+`06d9a7ffb43203aa8f3fac7b12095a4be548a33aca3ae318d6010f917d823b39`,
+exact63 current mapping
+`20f188c25724f4a29cf6588e25aa2d467cf1ea52e1a4624a9e689d49efcfac0e`
+matched. All original source/code contexts and final checks closed. Original
+archive closed-summary SHA256:
+`d42ec4037970b66e34e064ba3e919ed5642f8da71859c2519df5172e407d844d`.
+Permitted matching/source-code Git commands18350/20000. Every denied seam
+(credentials/mutation/native/network/source/subprocess/write) remained0;
+new ticket reservations0. No output/claim/START/GET/charged bytes were created.
+
+| Original pure guard | Sample1 seconds | Sample2 seconds | Sample3 seconds |
+| --- | --- | --- | --- |
+| model | .00034254199999850243 | .0003285409984528087 | .00034795800092979334 |
+| plan | .0003954580024583265 | .00036862500201095827 | .00035033300082432106 |
+| empty durable-budget summary | .0007743339992885012 | .000680042001476977 | .0007433749997289851 |
+
+These are actual full-domain ORIGINAL pure guard observations, not toy
+timings. They disprove a presumed multi-second cost of those sampled empty
+guards; they do not prove whole-file parallel source custody, source
+qualification, full transport closure or backtest readiness. The failed53939
+historical cause remains UNKNOWN; this successful separately corrected
+invocation does not rewrite its result or any old022/flag-loss attribution.
+
+The source grant/real CLI remain PENDING. Before activation, public producer
+inspection identified another implementable prerequisite: original9seals,
+post-context terminal/contribution/journal/union provenance are process-only,
+while existing disk closed controls are pre-exit INTENT. Printing a union
+summary and exiting cannot create a sound later offline requalification
+consumer. Freeze a finite original post-context durable checkpoint plus
+independent known-exit0 root and a strict original-root reader; never adopt
+caller JSON/expired contexts or claim perpetual filesystem/restart authority.
+All old files/spent budgets remain unchanged. Continue local work; no new
+source, QC/Safari, purchase, evaluation or push occurred here.
+
+### 128.38 Prospective durable checkpoint and strict offline requalification software
+
+**SI-DEC-20261027-12**, continuing SI-AUTH-20261026-02, covers this local
+software checkpoint only. It does not release a provider claim. The owner
+continues to waive Claude review, requires preservation of all old evidence
+and spent budgets, caps count recovery at84005 cumulative STARTs/4GiB, and
+excludes QC/Safari/purchases. Only this lane record is the handoff. The exact
+pre-checkpoint HEAD is6d4d0e32096d3527a2db14068560fa76399cc207; matching
+tracking/actual origin remains d6af672b3c8198712228bbd7b5eef35777283b1a.
+No push has occurred in this round.
+
+**SI-BUILD-20261027-038 (P2, corrected physical audit growth):** acceptance
+and candidate lookup repeatedly authenticated prior physical capabilities.
+The fabricated512-position causal comparison counted131328 binder calls per
+cap family; the new append path uses512, followed by the mandatory separate
+full original-cap freeze audit. Original immutable rosters, ticket identity
+indexes and independent nonces authorize lookup only. Incoming caps are
+authenticated before insertion; freeze/FINAL/reader/source/native/file9
+audits remain. Copied indexes, direct caller reissuance, changed nonces and
+late original seals refuse. This is a software call-count result, not actual
+512-file custody or a one-hour transport completion result.
+
+**SI-BUILD-20261027-039 (P2, durable success lineage gap addressed in
+prospective software):** the former terminal witnesses existed only in RAM.
+New fixed checkpoint/chunk descriptors persist the ORIGINAL file9 seals,
+bytes/hash catalogue, claim, all attempts/receipts, FINAL manifest and
+original directories/native/backing/block-node lineage while the original
+chunk is LIVE. These descriptors explicitly say PROVISIONAL_STORAGE_FACTS;
+they cannot attest future context exits, process EXIT0 or source admission.
+Original typed Main facts10 and writer roots12 are factory/registry-issued;
+caller JSON, flags, clones and equal tuples cannot substitute for them.
+Independent retained readonly FDs and original pins support a separate finite
+1800second metadata audit without reopening expired source leases. Finite FD
+headroom668+16 is checked before a new claim without changing OS limits.
+
+The last LIVE chunk writes a bounded round index of133 exact descriptor
+roots. Its deterministic expected accounting uses compact per-chunk roster,
+charge and coverage SHA roots/counts/sums; every full ticket/account remains
+in its chunk descriptor. This avoids a prospective2MiB round-index overflow
+without raising the cap. Prior chunks must match irreversible ORIGINAL
+account7 entries; the last account is explicitly provisional. No actual union
+SHA or closed_at is invented before terminal issuance. Final controlled
+output carries only small original root/protocol/code hashes and the genuine
+later union SHA. A separately protected Main receipt, outside ALL producer
+catalogues, requires known actual process EXIT0 and independent original-pin
+authentication before a reader registration can be frozen. That receipt and
+actual source execution do not exist yet.
+
+**SI-BUILD-20261027-040 (P2, corrected negative-membership gaps):** peer
+causals demonstrated foreign/negative siblings at the mount root, checkpoint
+parent and pair child escaping incomplete rosters. The prospective volume
+now captures a factory-issued original pre-source system-entry tuple, permits
+only optional .fseventsd with exact nofollow original directory/device/inode/
+UID/GID/mode predicates, and refuses unknown or absent-then-new entries.
+This policy is informed by a CURRENT metadata-only observation of the retained
+safe synthetic V2 mount; it is not a historical pre-source attestation.
+Source-created positive root roles remain capture/claim/checkpoint. The
+reader demands exact original root/parent/child memberships before bytes and
+after the final reads; negative evidence always vetoes positive controls.
+
+**SI-BUILD-20261027-041 (P2, corrected rejection provenance):** copied
+directory-pin tuples and public class-slot rejection could revive after
+restoration. Fixed original class identities and independent plain-object
+nonce latches now preserve rejection without hashing or comparing a rejected
+class. Genuine corpus getters validate class identity before registry access;
+no arbitrary exception text/path/value/type name is projected.
+
+**SI-BUILD-20261027-042 (P2, corrected cross-chunk accounting):** loader
+reconstruction must use cumulative ticket ordinals rather than restarting
+ordinals at1 for each chunk. It rederives every original query SHA, lifetime
+try, START/received/receipt/body link,2/10second retry chain, complete coverage
+and charge. Compact roots cannot replace those full facts. Requalified
+transport custody is a DISTINCT source-only corpus; no old budget/ticket/
+ClosedCountChunk/denominator/actual-input capability is recreated from JSON.
+
+**SI-BUILD-20261027-043 (P2, corrected complete code catalogue):** Main's
+AST audit found21 reachable producer/custody modules absent from the draft
+reader list. The final intended reader list binds84=82runtime+TWO explicitly
+bound historical wrappers; producer holds83=81runtime+the same wrappers.
+Both exact genuine matching-origin Git forms are admitted, alongside only
+fixed current/historical code/ancestry routes. Unrelated refs/options remain
+denied. This is a prospective ABI correction, not attribution of an old
+unknown operational failure.
+
+**SI-BUILD-20261027-044 (P2, corrected terminal metadata ordering):** peer
+and author causals inserted late negative children/parents during the last
+receipt read. Producer audits now repeat original native/FD/name/file9 and
+directory membership after reads, final boundary/code checks, then repeat all
+root metadata after the last clock so a later root cannot silently change an
+earlier root. This is finite observed closure, not perpetual filesystem
+stability or an atomic snapshot claim. No original8second creator/one-hour
+source window, old claim or source checker was relaxed.
+
+Main's initial NINETEEN focused files passed805tests/61.89s with OS network
+denied at the frozen reader e7468670 snapshot. The final same-category late
+mount-root terminal correction receives a separate affected-file Main check
+below;805 is retained as its actual prior execution, not relabelled a rerun.
+All fixtures/native/issuer substitutes remain explicit. No actual count/daily
+request, key read, new source claim/START/charge, research look, QC/Safari,
+purchase or publication occurred. Source registration and the real CLI still
+unconditionally refuse. Next work is bounded scheduling/actual guard-cost
+validation and a separately frozen finite source registration, not readiness
+from fixtures or another old spent-claim invocation.
+
+Main FINAL affected reader/outer/import-boundary/two-record/active-document
+selection passed225tests/5.58s, OS network denied. All89 current held source
+and changed test paths compile in memory; whitespace and append-only history
+checks passed. This is focused validation, not a full lane/repository suite.
+Delegated results remain separately attributed: transport/control/response/
+budget215/23.21s; volume+checkpoint97/2.55s; checkpoint final58/2.56s;
+outer+reader final121/6.84s. Main805 and225 are Main executions, not totals
+borrowed from those delegate runs or evidence of actual source admission.
+All causal reversals were restored before their respective final checks.
+
+| Final prospective production member | SHA256 |
+| --- | --- |
+| outer facts/coordinator | 5720420cb612e98b52bdecb9acc2a584fb4cf83364db70ffb32214512e4f656e |
+| indexed operator | 497bc7f84a3f4846cf4fd55b0838ece6e978e689408063156a3e65a58e55349c |
+| original system-entry volume | 87be750566b3a2b794dcd43dd348ade6d042a93d4b5a455a45f2e4c72bed2825 |
+| provisional checkpoint writer | 1e27b5f3fdf95c59bfdb18c6384d87aa6c4c186688e0ec6df52c0ae8e25f7169 |
+| strict readonly requalifier | 363b478a1a5a30458db636234455bce1d070de7a8fd75aace9a9bdfa6dd5713c |
+
+Main exact AST held83 listSHA
+44d9c07e98ad96f9c55bf15c52e092d0d2b462872bb62936de79966ee1902fd4;
+current mapping4c7af2f6f22b7070545783ea968df24074cc452eac0bb8e7f27d69c93bc843cb.
+Reader held84 listSHA
+a53247eb94509ed14afe8df96d14c1585a8c3092457dd26424dd673ff73995ee;
+final mappingcc9ccd921cd32504a64f64bf7fc39b7814a999334080535f2ff40417b590aa0e.
+No missing/extra runtime module was silently excluded. The two bound
+historical wrappers are explicit non-runtime antecedents, as before.
+
+### 128.39 Next bounded software work before finite recovery activation
+
+**SI-BUILD-20261027-045 (P2, verified work amplification; held before actual
+requalification):** an original-producer/fabricated-Git audit counted6/6/8/68
+Git commands for1B/64KiB/64KiB+1/2MiB file reads. Three full successful-data
+sweeps at67885 missing positions imply at least4887720 Git commands before
+FINAL/descriptor/code checks. Repeated immutable producer-code verification
+adds167580 for84files/133chunks/three sweeps. These are measured call counts
+and derived work bounds, not measured real Git latency or an actual timeout.
+By contrast original LIVE SourceLease checks perform exactly TWO Git commands
+for1/82/84 held code files, with1/82/84 original file-entry checks. Its
+HeldFiles.check does not recursively execute Git. Do not attribute the
+reader's amplification to that source guard or weaken the source guard.
+
+**SI-DEC-20261027-13** authorizes the next SOFTWARE-only bounded step under
+the same owner authority: fixed at-most8 ticket scheduling with Main-only
+reservation/retry/settlement, exact original fresh matching-ref evidence,
+complete drain before the next batch, and no new source window or retry
+class. Main-created directories must preserve exact FINAL membership,
+including failures without bodies; no empty precreated response directory
+may be silently ignored. All accepted private bytes retain the existing
+negative-preservation path.
+
+The distinct readonly requalifier may bracket one exact descriptor/catalogue
+unit with complete repository snapshots and retain every local read clock,
+ORIGINAL FD/name/file9/byte/native/membership check inside that unit. Every
+actual Git command keeps its own original root/branch/HEAD/status checks.
+Immutable producer code can be verified once initially and once terminally
+against an original private witness; each chunk's registration SHA must still
+be rederived independently because it binds the chunk. No time cache, caller
+complete flag, source/HTTP guard relaxation, expired-source adoption or
+additional authority is permitted. Whole initialization/closure clocks must
+still be checked through the final original metadata audit.
+
+After that software validation, freeze the independent semantic SourceAUTH,
+transport, negative, checkpoint and outer registration hashes without a
+self-hash/future-commit cycle; bind committed runtime HEAD and complete code
+mapping externally. The current unconditional activation barriers remain
+until that separate valid registration. A canonical-module CLI delegation
+must avoid creating a distinct __main__ lease class. The future Main-known
+EXIT0 receipt and actual requalification registration stay pending.
+
+Pre-QC readiness remains unproven: complete genuine count transport/source
+qualification, fresh whole missing daily chains, retained monthly-panel
+composition, exact native/date/class/CIK/USD/availability, eligibility,
+corporate-action/cash/rights and actual-input gates remain. No fictional
+pay-date or terminal cash proxy may close them. No actual outcome join,
+evaluation/backtest, QC/Safari or purchase is authorized by this checkpoint.
+Continue local work; accumulate commits and make only the ONE final matching
+lane push at genuine pre-QC readiness or a concrete irreducible blocker.
+
+Main post-record active-document/two-review-record checks:95passed/.81s.

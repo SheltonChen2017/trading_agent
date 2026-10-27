@@ -50,6 +50,9 @@ _NEGATIVE_FINAL_ATTEMPTED = set()
 _BLOCKED_OPERATIONS, _RETENTION_ANNOUNCED = set(), set()
 _SOURCE_BATCHES, _SOURCE_BATCH_FAILED = {}, set()
 _SETTLED_CONTRIBUTIONS, _CONTRIBUTION_ORIGINS = {}, {}
+_CHECKPOINT_FACTS, _CHECKPOINT_FACTS_FAILED = {}, set()
+_CHECKPOINT_CAPS, _CHECKPOINT_ROUND = {}, {}
+_WRITTEN_CHECKPOINTS = {}
 _RLOCK_TYPE = type(_thread.RLock())
 _CODES = frozenset("""durable_capture_registration_pending durable_capture_exact_root_required
 durable_capture_archive_factory_required durable_capture_archive_not_closed
@@ -62,7 +65,8 @@ durable_capture_candidate_changed durable_capture_member_changed durable_capture
 durable_capture_fd_close_failed durable_capture_negative_preservation_pending
 durable_capture_unqualified_result durable_capture_retry_exhausted durable_capture_preservation_changed
 durable_capture_retention_required durable_capture_START_evidence_required
-durable_capture_START_evidence_changed durable_capture_contribution_changed""".split())
+durable_capture_START_evidence_changed durable_capture_contribution_changed
+durable_capture_checkpoint_changed durable_capture_checkpoint_required""".split())
 
 
 class DurableCountCaptureRefusal(ValueError): pass
@@ -86,6 +90,7 @@ def code_paths():
         "scripts/short_interest_count_response_volume.py", "scripts/short_interest_closed_count_chunk.py",
         "scripts/short_interest_count_negative_custody.py",
         "scripts/short_interest_count_transport_union.py",
+        "scripts/short_interest_count_checkpoint.py",
         "research/short_interest_etf/native_count_recovery_budget.py"))))
 
 
@@ -107,6 +112,7 @@ def protocol():
         "remote_START_evidence": "fresh_exact_origin_ref_original_SourceLease_at_most8_exact_ticket_roster_before_START_creator",
         "contribution": "original_reader_snapshot_immediately_after_chunkclosure_before_irreversible_settle_then_original_account7_only",
         "transport_union": "all_original_ordered_contributions_and_pure_original_settlement_journal_no_expired_reader_clock",
+        "checkpoint": "provisional_full_original_file_seals_and_same_mounted_epoch_roots_Main_independent_known_EXIT0_required",
         "same_original_mounted_epoch_only": True, "reattach_or_resume": False,
         "bound_antecedent_not_runtime_imported": [antecedent.previous.WRAPPER, antecedent.WRAPPER],
         "code_paths": list(code_paths()), "authority": authority()}
@@ -449,6 +455,197 @@ def _capture_snapshot(operation, candidate):
     return op, original, claim, tuple(starts), finals
 
 
+class CountCheckpointFacts:
+    """Original provisional storage facts, never a terminal or source cap."""
+    __slots__ = ("_anchor", "_identity")
+    def __init__(self): raise DurableCountCaptureRefusal("REFUSED: durable_capture_checkpoint_required")
+    def __repr__(self): return "<CountCheckpointFacts provisional; redacted>"
+
+
+def checkpoint_facts_binding(value):
+    """Pure original10; does not resurrect an expired source or volume clock."""
+    try:
+        require(type(value) is CountCheckpointFacts and CountCheckpointFacts.__hash__ is object.__hash__
+            and CountCheckpointFacts.__eq__ is object.__eq__, "durable_capture_checkpoint_changed")
+        saved = _CHECKPOINT_FACTS.get(value) if type(value) is CountCheckpointFacts else None
+        require(type(saved) is tuple and len(saved) == 10 and saved[0] is value
+            and value._anchor is value._identity is saved and id(value) not in _CHECKPOINT_FACTS_FAILED
+            and type(saved[5]) is bytes and hash_bytes(saved[5]) == saved[6]
+            and type(saved[7]) is tuple and type(saved[8]) is tuple and type(saved[9]) is object,
+            "durable_capture_checkpoint_changed")
+        return saved
+    except BaseException:
+        if type(value) is CountCheckpointFacts: _CHECKPOINT_FACTS_FAILED.add(id(value))
+        raise
+
+
+def _issue_checkpoint_facts(operation, candidate, payload, directory_pins, volume_pins):
+    require(sys._getframe(1).f_code in (checkpoint_facts.__code__, checkpoint_round_facts.__code__),
+        "durable_capture_checkpoint_required")
+    require(CountCheckpointFacts.__hash__ is object.__hash__ and CountCheckpointFacts.__eq__ is object.__eq__,
+        "durable_capture_checkpoint_changed")
+    op = transport.operation_binding(operation); original = transport.provisional_candidate_binding(candidate)
+    raw = canonical_json(payload).encode()
+    require(0 < len(raw) <= 2 * 1024 ** 2, "durable_capture_checkpoint_changed")
+    cap = object.__new__(CountCheckpointFacts)
+    saved = (cap, operation, candidate, op, original, raw, hash_bytes(raw), directory_pins, volume_pins, object())
+    cap._anchor = cap._identity = saved; _CHECKPOINT_FACTS[cap] = saved
+    checkpoint_facts_binding(cap); return cap
+
+
+def checkpoint_facts(operation, candidate):
+    """Mint only from original LIVE fully published FINAL/control/file origins.
+
+    The descriptor describes observed storage, not the future context exits.
+    All original full9 stamps come from creator choices, never current stats.
+    """
+    op = transport.active_operation_binding(operation)
+    with op[11]:
+        source = source_lease_live_binding(op[12])
+        op, original, claim, starts, finals = _capture_snapshot(operation, candidate)
+        require(len(finals) == 4, "durable_capture_checkpoint_changed")
+        _audit_membership(operation, candidate)
+        volume = transport.volume_for_operation(operation)
+        volume_origin = storage.volume_binding(volume, live=True)
+        require(callable(getattr(storage, "volume_system_entries", None)), "durable_capture_checkpoint_required")
+        system_entries = storage.volume_system_entries(volume, operation)
+        require(type(system_entries) is tuple, "durable_capture_checkpoint_changed")
+        state = volume._binding(); mount = volume_origin[2]; base = source[11]
+        require(base == mount / "capture", "durable_capture_checkpoint_changed")
+        rows = []
+        def file_row(origin, seal, digest):
+            require(type(origin) is tuple and len(origin) == 15 and type(seal) is tuple and len(seal) == 9
+                and all(type(item) is int for item in seal) and seal[5] == len(origin[4])
+                and hash_bytes(origin[4]) == digest, "durable_capture_checkpoint_changed")
+            path = (origin[1][0] / origin[3]).relative_to(mount).as_posix()
+            rows.append({"path": path, "bytes": len(origin[4]), "sha256": digest, "seal9": list(seal)})
+            return path
+        claimed = controls.claim_binding(claim)
+        claim_path = file_row(claimed[8], claimed[9], claimed[6])
+        attempts, charges = [], []
+        for ticket, obs, evidence, start in zip(original[3], original[4], original[5], starts):
+            reserved = accounting.ticket_binding(ticket); observed = transport.http_observation_binding(obs)
+            started = controls.start_binding(start); received = controls.received_binding(evidence[0])
+            start_path = file_row(started[9], started[10], started[4])
+            received_path = file_row(received[7], received[8], received[6])
+            body_path = receipt_path = None
+            if evidence[1] is not None:
+                pair = responses.response_binding(evidence[1]); ordinal = reserved[4]
+                require(pair[1] is operation and pair[2] is ticket and pair[3] is obs,
+                    "durable_capture_checkpoint_changed")
+                body_path = f"capture/responses/{ordinal:06d}/{responses.BODY_NAME}"
+                receipt_path = f"capture/responses/{ordinal:06d}/{responses.RECEIPT_NAME}"
+                for name, seal, digest in ((body_path, pair[9], pair[6]), (receipt_path, pair[10], pair[8])):
+                    require(type(seal) is tuple and len(seal) == 9 and all(type(item) is int for item in seal),
+                        "durable_capture_checkpoint_changed")
+                    rows.append({"path": name, "bytes": seal[5], "sha256": digest, "seal9": list(seal)})
+                charge = pair[7]
+            else: charge = 2 * 1024 ** 2
+            charges.append(charge)
+            attempts.append({"reservation": json.loads(reserved[13]), "reservation_sha256": reserved[9],
+                "observation_sha256": observed[14], "http_invoked": observed[8], "http_status": observed[9],
+                "received_at": observed[12], "fixed_diagnostic": None if observed[13] is None else dict(observed[13]),
+                "START_path": start_path, "received_path": received_path, "body_path": body_path,
+                "receipt_path": receipt_path, "charged_bytes": charge})
+        for cap in finals:
+            final = controls.final_control_binding(cap); file_row(final[4], final[5], final[3])
+        require(len(rows) == len({row["path"] for row in rows}), "durable_capture_checkpoint_changed")
+        directory_pins = tuple(_DIRECTORIES.get(operation, ()))
+        directories = [{"path": ".", "pin4": list(state["mount_pin"])}]
+        directories.extend({"path": path.relative_to(mount).as_posix(), "pin4": list(pin)}
+            for path, pin in directory_pins)
+        archive = _archive_binding(_lease_record(op[12])[1])
+        volume_pins = (volume_origin, state["mount_pin"], state["root_creation_pin"], state["mount_native"],
+            state["device_node_pin"], state["backing_pin"], tuple(state["directories"]), system_entries)
+        descriptor = {"schema": "si-count-checkpoint-descriptor-v1", "phase": "PROVISIONAL_STORAGE_FACTS",
+            "producer": {"head": source[2], "remote": source[3], "code_manifest": [list(row) for row in source[7]],
+                "code_identity_sha256": source[8], "source_authority_sha256": source[9],
+                "operator_protocol_sha256": source[10], "run_protocol_sha256": RUN_PROTOCOL_SHA256,
+                "negative_policy_sha256": NEGATIVE_PRESERVATION_POLICY_SHA256, "registration_sha256": op[6]},
+            "archive": {"baseline_sha256": BASELINE_LEDGER_SHA256, "closed_summary_sha256": archive[5]},
+            "plan": {"sha256": op[10], "chunk": op[4], "positions": list(original[6]),
+                "total_chunks": len(op[2]._parts[3])}, "payload_base": "capture",
+            "files": sorted(rows, key=lambda row: row["path"]),
+            "directories": sorted(directories, key=lambda row: row["path"]),
+            "volume": {"mount": str(mount), "namespace": str(state["namespace"]),
+                "backing_pin": list(state["backing_pin"]), "root_pin": list(state["mount_pin"]),
+                "root_identity": list(state["root_creation_pin"][:4]),
+                "native_identity": state["mount_native"], "device": state["device"],
+                "block_node_pin": list(state["device_node_pin"]),
+                "system_entries": [{"name": name, "pin5": list(pin)} for name, pin in system_entries],
+                "parent_directories": [{"path": str(path), "pin4": list(pin)} for path, unused, pin in state["directories"]]},
+            "attempts": attempts, "external_claim_path": claim_path,
+            "final_manifest_sha256": controls.final_control_binding(finals[-1])[3],
+            "account": {"chunk": op[4], "reservation_sha256s": [accounting.ticket_binding(item)[9] for item in original[3]],
+                "charges": charges, "covered_positions": list(original[6]),
+                "manifest_sha256": controls.final_control_binding(finals[-1])[3]},
+            "authority": authority()}
+        if candidate in _CHECKPOINT_CAPS:
+            cap = _CHECKPOINT_CAPS[candidate]; saved = checkpoint_facts_binding(cap)
+            require(saved[1] is operation and saved[2] is candidate and saved[3] is op and saved[4] is original
+                and saved[5] == canonical_json(descriptor).encode() and saved[7] == directory_pins,
+                "durable_capture_checkpoint_changed")
+        else:
+            cap = _issue_checkpoint_facts(operation, candidate, descriptor, directory_pins, volume_pins)
+            _CHECKPOINT_CAPS[candidate] = cap
+        source_lease_live_binding(op[12]); volume.check(); return cap
+
+
+def checkpoint_round_facts(operation, candidate, original_checkpoint_caps):
+    """Original ordered stored roots; final current account is still provisional."""
+    from scripts import short_interest_count_checkpoint as checkpoints
+    op = transport.active_operation_binding(operation)
+    with op[11]:
+        source_lease_live_binding(op[12]); original = transport.provisional_candidate_binding(candidate)
+        require(op[4] == len(op[2]._parts[3])
+            and type(original_checkpoint_caps) is tuple and len(original_checkpoint_caps) == op[4],
+            "durable_capture_checkpoint_changed")
+        prior = accounting.settled_chunk_accounting(op[1])[3]
+        require(len(prior) == op[4] - 1, "durable_capture_checkpoint_changed")
+        roots, accounts, all_positions = [], [], []
+        for number, cap in enumerate(original_checkpoint_caps, 1):
+            bound = checkpoints.checkpoint_binding(cap); facts = checkpoint_facts_binding(bound[4][0])
+            descriptor = json.loads(facts[5]); account = descriptor["account"]
+            require(bound[3] == "chunk" and facts is bound[4] and facts[3][1] is op[1]
+                and facts[3][2] is op[2] and facts[3][4] == number
+                and descriptor["plan"]["chunk"] == number, "durable_capture_checkpoint_changed")
+            if number < op[4]:
+                settled = prior[number - 1]
+                require(account == {"chunk": number,
+                    "reservation_sha256s": [accounting.ticket_binding(ticket)[9] for ticket in settled[3]],
+                    "charges": list(settled[4]), "covered_positions": list(settled[5]), "manifest_sha256": settled[6]},
+                    "durable_capture_checkpoint_changed")
+            else: require(facts[2] is candidate and facts[4] is original, "durable_capture_checkpoint_changed")
+            roots.append({"chunk": number, "mount": descriptor["volume"]["mount"], "relative_root": bound[10],
+                "body_sha256": bound[6], "body_seal9": list(bound[7]),
+                "receipt_sha256": bound[8], "receipt_seal9": list(bound[9]), "descriptor_sha256": facts[6],
+                "directory_pins": [{"path": path.relative_to(Path(descriptor["volume"]["mount"])).as_posix(),
+                    "pin5": list(pin)} for path, pin in checkpoints.checkpoint_directory_pins(cap)]})
+            accounts.append(_checkpoint_account_root(account)); all_positions.extend(account["covered_positions"])
+        require(all_positions == sorted(set(all_positions)), "durable_capture_checkpoint_changed")
+        expected = {"baseline_sha256": BASELINE_LEDGER_SHA256, "plan_sha256": op[10], "accounts": accounts}
+        payload = {"schema": "si-count-checkpoint-round-v1", "phase": "PROVISIONAL_STORAGE_FACTS",
+            "baseline_sha256": BASELINE_LEDGER_SHA256, "plan_sha256": op[10],
+            "chunks": roots, "expected_union_binding_sha256": hash_payload(expected),
+            "expected_accounting": expected, "authority": authority()}
+        if operation in _CHECKPOINT_ROUND:
+            facts = _CHECKPOINT_ROUND[operation]; saved = checkpoint_facts_binding(facts)
+            require(saved[1] is operation and saved[2] is candidate and saved[3] is op and saved[4] is original
+                and saved[5] == canonical_json(payload).encode(), "durable_capture_checkpoint_changed")
+        else:
+            facts = _issue_checkpoint_facts(operation, candidate, payload, (), ())
+            _CHECKPOINT_ROUND[operation] = facts
+        return facts
+
+
+def _checkpoint_account_root(account):
+    """Compact root; every full per-ticket account remains in its descriptor."""
+    return {"chunk": account["chunk"], "STARTs": len(account["charges"]),
+        "charged_bytes": sum(account["charges"]), "reservation_roster_sha256": hash_payload(account["reservation_sha256s"]),
+        "charges_sha256": hash_payload(account["charges"]), "covered_positions": len(account["covered_positions"]),
+        "covered_positions_sha256": hash_payload(account["covered_positions"]), "manifest_sha256": account["manifest_sha256"]}
+
+
 def final_member_rows(operation, candidate):
     """Fixed typed-cap reconstruction; no caller member rows or raw bodies."""
     try:
@@ -596,6 +793,9 @@ def _original_postchecks(operation, candidate):
         "durable_capture_terminal_changed")
     _audit_code(op[7], _lease_record(op[12])[3], source_lease_binding(op[12])[7])
     _audit_membership(operation, candidate)
+    from scripts import short_interest_count_checkpoint as checkpoints
+    require(operation in _WRITTEN_CHECKPOINTS, "durable_capture_checkpoint_required")
+    checkpoints.audit_original_checkpoint_roots()
     volume.check_after_close(); source_lease_terminal_binding(op[12])
     previous = _TERMINALS.get(operation)
     if previous is not None:
@@ -876,6 +1076,17 @@ def _fill_live_chunk(operation, volume, lease, budget):
     _RUNS[operation] = transport.operation_binding(operation), candidate, volume, claim, object()
     _RUN_ORIGINS[operation] = _RUNS[operation]
     _audit_membership(operation, candidate); volume.check()
+    from scripts import short_interest_count_checkpoint as checkpoints
+    checkpoint = checkpoints.publish_provisional_chunk_checkpoint(operation, candidate)
+    bound = checkpoints.checkpoint_binding(checkpoint)
+    require(type(bound) is tuple and len(bound) == 12 and bound[1] is operation
+        and bound[2] is candidate and bound[3] == "chunk", "durable_capture_checkpoint_changed")
+    _WRITTEN_CHECKPOINTS[operation] = checkpoint, bound
+    if chunk == len(budget.plan._parts[3]):
+        round_cap = checkpoints.publish_provisional_round_checkpoint(operation, candidate)
+        round_bound = checkpoints.checkpoint_binding(round_cap)
+        require(round_bound[1] is operation and round_bound[2] is candidate and round_bound[3] == "round",
+            "durable_capture_checkpoint_changed")
     return candidate
 
 
@@ -917,6 +1128,8 @@ def _capture_chunk(token, budget, *, root, runtime_head, actual_remote, complete
             with storage.prepare_registered_volume(root, operation=operation,
                     boundary=lambda: _source_boundary(lease)) as volume:
                 operation.bind_volume(volume)
+                from scripts import short_interest_count_checkpoint as checkpoints
+                checkpoints.preflight_checkpoint_resources(operation, volume)
                 preservation = negative.prepare_original_preservation_lease(operation, volume)
                 require(type(preservation) is negative.OriginalPreservationLease,
                     "durable_capture_preservation_changed")
@@ -960,8 +1173,15 @@ def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest,
             actual_remote=actual_remote, complete_code_manifest=complete_code_manifest))
     union = transport_union.seal_count_transport_union(sourcelease_model(token), plan,
         _original_settled_contributions(budget), budget)
-    return {"schema": "si-durable-count-transport-round-v1", "status": "transport_union_only_source_unqualified",
-        "closed_chunks": len(closed), "transport_union": union.public_summary(), "authority": authority()}
+    from scripts import short_interest_count_checkpoint as checkpoints
+    roots = checkpoints.final_checkpoint_roots()
+    result = {"schema": "si-durable-count-transport-round-v1", "status": "transport_union_only_source_unqualified",
+        "closed_chunks": len(closed), "transport_union": union.public_summary(), "transport_union_sha256": union.sha256,
+        "checkpoint_roots": roots, "authority": authority()}
+    # No saved pre-exit file is relabelled process closure. Only a separately
+    # Main-observed actual exit0 plus independent roots can authorize rereading.
+    canonical_json(result); checkpoints.audit_original_checkpoint_roots()
+    return result
 
 
 def _run_cli(arguments):

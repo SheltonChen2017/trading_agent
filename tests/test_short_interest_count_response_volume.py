@@ -4,14 +4,16 @@ from concurrent.futures import ThreadPoolExecutor
 import inspect
 import json
 import os
-import fcntl
 from pathlib import Path
 import subprocess
 import textwrap
 import threading
+import stat
 from types import MethodType
 
 import pytest
+pytest.importorskip("resource")
+fcntl = pytest.importorskip("fcntl")
 
 from scripts import short_interest_count_response_volume as volume
 from scripts import short_interest_count_durable_transport as transport
@@ -26,6 +28,8 @@ def h(tmp_path, monkeypatch):
         monkeypatch.setattr(volume, name, {})
     monkeypatch.setattr(volume, "_PRESERVATION_ORIGINS", {}, raising=False)
     monkeypatch.setattr(volume, "_PRESERVATION_PINS", {}, raising=False)
+    monkeypatch.setattr(volume, "_SYSTEM_ORIGINS", {})
+    monkeypatch.setattr(volume, "_SYSTEM_PINS", {})
     monkeypatch.setattr(volume, "_FAILED", set()); monkeypatch.setattr(volume, "_ATTEMPTED", set())
     monkeypatch.setattr(volume, "_PLAN", None); monkeypatch.setattr(volume, "_LAST_ASSOCIATION", None)
     namespace = volume.NAMESPACE_PREFIX + "-" + "a" * 64 + "-chunk001"
@@ -78,6 +82,117 @@ def test_registered_plan_chunk_has_fresh_volume_and_original_live_then_closed_bi
     with pytest.raises(volume.CountResponseVolumeRefusal): volume.volume_binding(cap, live=True)
     assert h.image.exists() and h.mount.exists()
     assert all(args[1] in ("create", "attach", "info") for args, unused in h.calls)
+
+
+def fabricated_system_entry(h, monkeypatch, *, name=".fseventsd", make=True):
+    """Fake rootUID/native device metadata, never chown/native/mount calls."""
+    control = {"uid": 0, "gid": None, "mode": 0o700, "device": h.host_device + 101}
+    original_stat, original_hook = os.stat, h.command_hook
+    def names(verb):
+        original_hook(verb)
+        if make and verb == "info" and h.attached and not (h.mount / name).exists():
+            (h.mount / name).mkdir(mode=0o700)
+            if control["gid"] is None: control["gid"] = original_stat(h.mount).st_gid
+    h.command_hook = names
+    def changed(*args, **kwargs):
+        info = original_stat(*args, **kwargs); value = os.fspath(args[0])
+        component = Path(value).name
+        if component in (name, "capture", "claim", "checkpoint"):
+            fields = {key: getattr(info, key) for key in dir(info) if key.startswith("st_")}
+            fields["st_dev"] = control["device"]
+            if component == name:
+                fields.update(st_uid=control["uid"], st_gid=control["gid"],
+                    st_mode=stat.S_IFMT(info.st_mode) | control["mode"])
+            return SimpleNamespace(**fields)
+        return info
+    from types import SimpleNamespace
+    monkeypatch.setattr(os, "stat", changed)
+    return control
+
+
+def test_original_optional_system_tuple_is_captured_before_source_and_never_reads_contents(h, monkeypatch):
+    fabricated_system_entry(h, monkeypatch)
+    real_open, calls = os.open, []
+    def opened(name, *args, **kwargs):
+        calls.append(os.fspath(name))
+        assert Path(name).name != ".fseventsd", "root-owned system contents must not be opened"
+        return real_open(name, *args, **kwargs)
+    monkeypatch.setattr(os, "open", opened)
+    monkeypatch.setattr(os, "supports_dir_fd", os.supports_dir_fd | {opened})  # Truthful test-only forwarding declaration.
+    with h.prepare() as cap:
+        first = volume.volume_system_entries(cap, h.operation)
+        assert first is volume.volume_system_entries(cap, h.operation) and type(first) is tuple
+        assert first[0][0] == ".fseventsd" and first[0][1][2:] == (0, h.mount.stat().st_gid, stat.S_IFDIR | 0o700)
+        assert first[0][1][0] == h.host_device + 101 and not (h.mount / "claim").exists()
+        for name in ("capture", "claim", "checkpoint"): (h.mount / name).mkdir(mode=0o700)
+        cap.check()
+    assert cap.closed_summary()["status"] == "closed_count_chunk_storage_only"
+
+
+def test_absent_system_directory_cannot_appear_later_or_be_adopted(h):
+    with pytest.raises(volume.CountResponseVolumeRefusal, match="root_membership_changed"):
+        with h.prepare() as cap:
+            assert volume.volume_system_entries(cap, h.operation) == ()
+            (h.mount / ".fseventsd").mkdir(mode=0o700)
+            cap.check()
+    assert id(cap) in volume._FAILED and (h.mount / ".fseventsd").exists()
+
+
+@pytest.mark.parametrize("name", ["FOREIGN", ".Spotlight-V100", "claim", "checkpoint"])
+def test_unknown_or_source_name_before_baseline_refuses_before_capability(h, monkeypatch, name):
+    fabricated_system_entry(h, monkeypatch, name=name)
+    with pytest.raises(volume.CountResponseVolumeRefusal, match="root_membership_changed"):
+        with h.prepare(): pytest.fail("unexpected pre-source name was adopted")
+    assert not volume._MINTED and (h.mount / name).exists()
+
+
+@pytest.mark.parametrize("field,value", [("uid", 50101), ("gid", 50102), ("mode", 0o755), ("device", -1)])
+def test_fixed_known_name_requires_original_system_protection_before_source(h, monkeypatch, field, value):
+    control = fabricated_system_entry(h, monkeypatch); control[field] = value
+    with pytest.raises(volume.CountResponseVolumeRefusal, match="system_entry_refused"):
+        with h.prepare(): pytest.fail("unprotected known name admitted")
+    assert not volume._MINTED
+
+
+@pytest.mark.parametrize("change", ["inode", "uid", "gid", "mode", "missing", "foreign", "symlink"])
+def test_postbaseline_system_or_root_change_is_permanent_without_rebaseline(h, monkeypatch, change):
+    control = fabricated_system_entry(h, monkeypatch)
+    with pytest.raises(volume.CountResponseVolumeRefusal):
+        with h.prepare() as cap:
+            original = volume.volume_system_entries(cap, h.operation)
+            if change in ("uid", "gid", "mode"): control[change] += 1
+            elif change == "foreign": (h.mount / "unregistered.refused.json").write_bytes(b"SYNTHETIC")
+            else:
+                (h.mount / ".fseventsd").rename(h.root / "retained-original-system-directory")
+                if change == "inode": (h.mount / ".fseventsd").mkdir(mode=0o700)
+                if change == "symlink": (h.mount / ".fseventsd").symlink_to(h.root / "retained-original-system-directory")
+            cap.check()
+    assert id(cap) in volume._FAILED and original[0][0] == ".fseventsd"
+
+
+def test_copied_system_tuple_cannot_replace_the_factory_original(h, monkeypatch):
+    fabricated_system_entry(h, monkeypatch)
+    with pytest.raises(volume.CountResponseVolumeRefusal, match="system_entry_changed"):
+        with h.prepare() as cap:
+            state = volume._MINTED[id(cap)][2]
+            original = volume.volume_system_entries(cap, h.operation)
+            state["system_entries"] = tuple(list(original))
+            cap.check()
+    assert id(cap) in volume._FAILED
+
+
+def test_closed_original_volume_rejects_late_foreign_root_membership(h):
+    with h.prepare() as cap: pass
+    (h.mount / "unregistered.refused.json").write_bytes(b"SYNTHETIC")
+    with pytest.raises(volume.CountResponseVolumeRefusal, match="root_membership_changed"):
+        volume.volume_binding(cap)
+
+
+def test_system_names_policy_cannot_expand_into_a_new_adoption_catalogue(h, monkeypatch):
+    monkeypatch.setattr(volume, "SYSTEM_ENTRY_NAMES", frozenset((".fseventsd", "OTHER")))
+    with pytest.raises(volume.CountResponseVolumeRefusal, match="system_entry_refused"):
+        with h.prepare(): pytest.fail("expanded catalogue admitted")
+    assert not h.calls
 
 
 def test_same_original_plan_chunk_cannot_be_restarted_after_first_creation(h):

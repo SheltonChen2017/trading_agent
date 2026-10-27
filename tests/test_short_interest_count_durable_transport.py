@@ -11,6 +11,7 @@ from concurrent.futures import ThreadPoolExecutor
 import threading
 import http.client
 from io import BytesIO
+from datetime import date, timedelta
 
 import pytest
 
@@ -18,6 +19,7 @@ from data.hashing import hash_bytes, hash_payload
 from scripts import short_interest_count_durable_transport as transport
 from scripts import short_interest_count_durable_budget as budget_module
 from test_short_interest_count_durable_budget import genuine_plan, isolated_registries_and_no_network
+from test_short_interest_body_receipt_custody import kernel
 
 
 def genuine_headers(*pairs):
@@ -35,6 +37,8 @@ def operation(monkeypatch, tmp_path, request):
         ("_WIRE_ERROR_HOLD", {}), ("_OBS_WIRE", {}), ("_REMOTE_BATCHES", {}),
         ("_START_PERMISSIONS", {}), ("_START_CONSUMED", set())):
         monkeypatch.setattr(transport, name, value)
+    for name in ("_CAP_INDEXES", "_CAP_INDEX_PINS", "_CAP_INDEX_MINTS"):
+        monkeypatch.setattr(transport, name, {})
     plan = genuine_plan(monkeypatch)
     budget = budget_module.open_durable_count_budget(plan)
     tickets = tuple(budget.reserve_start_slot(position) for position in plan.chunk_positions(1))
@@ -158,6 +162,186 @@ def test_default_source_registration_refuses_before_key_wire_or_storage(monkeypa
     assert calls == []
 
 
+def _genuine_512_missing_plan(monkeypatch):
+    """Fabricated516-anchor domain; every plan/ledger/ticket uses its factory."""
+    import test_short_interest_count_durable_budget as support
+    epoch, research, historical = support.support.support, support.budget.research_budget, support.support.historical
+    parallel, references = epoch.parallel, epoch.references
+    ceiling = 515 * parallel.MAXIMUM_RESPONSE_BYTES
+    dates = tuple((date(2022, 1, 3) + timedelta(days=offset)).isoformat() for offset in range(516))
+    # Alternating FABRICATED class identity makes each daily cell a genuine
+    # new anchor instead of asking the source model to bypass quarterly reuse.
+    reports = tuple(epoch.fabricated.identity(at, class_id=(epoch.fabricated.CLASS
+        if index % 2 == 0 else epoch.fabricated.NEXT_CLASS)) for index, at in enumerate(dates))
+    source = epoch.fabricated.plan(dates, reports=reports)
+    assert len(source.query_plan.to_payload()["selected_query_ordinals"]) == 516
+    for name, value in {"ORIGINAL_COUNT": 516, "MAXIMUM_CUMULATIVE_STARTS": 517,
+            "MAXIMUM_CUMULATIVE_BYTES": ceiling, "PARENT_STARTED": 3, "PARENT_HTTP": 2,
+            "PARENT_RAW": 2, "RECOVERY_STARTED": 3, "RECOVERY_HTTP": 3, "RECOVERY_RAW": 2,
+            "FAILED_PARENT_POSITION": 2, "ANCHOR_PLAN_SHA256": source.sha256}.items():
+        monkeypatch.setattr(historical, name, value)
+    parent_plan = parallel.freeze_parallel_count_plan(source.query_plan, maximum_total_response_bytes=ceiling)
+    parent = epoch._inventory(parent_plan, 3, 2, offset=0, failed_http=False)
+    charged = parent.to_payload()["charged_response_bytes"]
+    monkeypatch.setattr(historical, "PARENT_CHARGED_BYTES", charged)
+    selected = source.query_plan.to_payload()["selected_query_ordinals"]
+    queries = references.freeze_native_class_query_plan(source._matrix, mode="explicit_anchors",
+        selected_query_ordinals=tuple(selected[position - 1] for position in (2, 4, *range(5, 517))))
+    child_plan = parallel.freeze_parallel_count_plan(queries, maximum_total_response_bytes=ceiling - charged)
+    child = epoch._inventory(child_plan, 3, 3, offset=20, failed_http=True)
+    monkeypatch.setattr(historical, "RECOVERY_CHARGED_BYTES", child.to_payload()["charged_response_bytes"])
+    pins = tuple(tuple((label, None if value is None else hash_payload((index, label))) for label, value in row)
+        for index, row in enumerate(historical._PROOF_PINS))
+    monkeypatch.setattr(historical, "_PROOF_PINS", pins)
+    proofs = tuple(tuple((label, value or "a" * 64) for label, value in row) for row in pins)
+    ledger = historical.seal_registered_count_epoch_ledger(source, epoch.epochs_from((source, parent, child, proofs)))
+    old = ledger.public_summary()
+    for name, value in {"BASELINE_LEDGER_SHA256": ledger.sha256, "PRIOR_STARTS": old["START_debits"],
+            "PRIOR_CHARGED_BYTES": old["charged_response_bytes"], "HISTORICAL_START_CEILING": 517,
+            "MAXIMUM_CUMULATIVE_STARTS": 534, "MAXIMUM_CUMULATIVE_BYTES": ceiling,
+            "MISSING_POSITIONS": 512, "POSITIONS_PER_CHUNK": 512, "MAXIMUM_CHUNKS": 1,
+            "EXTRA_ATTEMPTS_PER_CHUNK": 16, "_PLAN_MINTS": {}, "_BUDGET_MINTS": {}, "_PLAN_KEYS": set()}.items():
+        monkeypatch.setattr(research, name, value)
+    monkeypatch.setattr(budget_module, "_EXPECTED_SOURCE_PROFILE", budget_module._source_profile())
+    return research.freeze_count_recovery_plan(ledger)
+
+
+def test_512_original_ticket_caps_have_linear_binder_calls_at_accept_and_each_freeze(monkeypatch, tmp_path):
+    """Exact real cap CLASSES, explicit fabricated closed-issuer/binder IO.
+
+    This counts semantic validators, not512 physical files or an actual1h
+    deadline. Genuine physical custody/mutation is checked separately below.
+    No HTTP, key, native kernel, image or source operation is dispatched.
+    """
+    from scripts import short_interest_count_control_custody as controls
+    from scripts import short_interest_count_response_custody as responses
+    monkeypatch.setitem(globals(), "genuine_plan", _genuine_512_missing_plan)
+    h = operation.__wrapped__(monkeypatch, tmp_path, SimpleNamespace(param=False))
+    originals, counts = {}, {"received": 0, "response": 0}
+    observations, received_caps, response_caps = [], [], []
+    def authenticate(cap, role):
+        counts[role] += 1
+        original = originals.get(cap)
+        transport.require(type(original) is tuple and original[0] is cap
+            and cap._anchor is cap._identity is original, "count_operator_observation_changed")
+        return original
+    h.controls.CountReceived = controls.CountReceived
+    h.controls.received_binding = lambda cap: authenticate(cap, "received")
+    h.responses.CountResponseCustody = responses.CountResponseCustody
+    h.responses.response_binding = lambda cap: authenticate(cap, "response")
+    anchor = transport.operation_binding(h.op)
+    for ticket in h.tickets:
+        query = budget_module.ticket_binding(ticket); start = h.starts[ticket]
+        obs = object.__new__(transport.HttpObservation)
+        bound = (obs, h.op, ticket, h.claim, start, query[8], h.start_bindings[start][4], anchor[5],
+            True, 200, b"SYNTHETIC", "application/json", "2026-10-27T00:00:01Z", None,
+            hash_payload(("fabricated_observation", query[4])), object())
+        obs._anchor = obs._identity = bound; transport._OBSERVATIONS[obs] = bound; observations.append(obs)
+        got = object.__new__(controls.CountReceived)
+        receipt = got, h.op, ticket, obs, h.claim, start, hash_payload((query[4], "receipt")), object(), object(), bound[12], anchor[5], object()
+        got._anchor = got._identity = receipt; originals[got] = receipt; received_caps.append(got)
+        pair = object.__new__(responses.CountResponseCustody)
+        body = pair, h.op, ticket, obs, h.claim, start, hash_bytes(bound[10]), len(bound[10]), "9" * 64, object(), object(), object(), object()
+        pair._anchor = pair._identity = body; originals[pair] = body; response_caps.append(pair)
+    state = transport._OPERATIONS[h.op][1]
+    transport._OPERATIONS[h.op] = anchor, (state[0], h.tickets, (), tuple(observations), None, None)
+    for received, response in zip(received_caps, response_caps):
+        h.op.accept_received_control(received); h.op.accept_closed_response(response)
+    assert counts == {"received": 512, "response": 512}
+    assert len(transport._CAP_INDEX_MINTS) == 1  # No retained quadratic map history.
+    for unused in range(2):
+        before = dict(counts)
+        candidate = h.op.freeze_provisional_root()
+        assert counts == {name: value + 512 for name, value in before.items()}
+        # The separately requested candidate authenticator STILL performs its
+        # own mandatory complete pass; indexing never caches a complete flag.
+        bound = transport.provisional_candidate_binding(candidate)
+        assert len(bound[3]) == len(bound[4]) == len(bound[5]) == len(bound[6]) == 512
+        assert counts == {name: value + 1024 for name, value in before.items()}
+    assert h.wire_calls == h.key_calls == []
+
+
+@pytest.mark.parametrize("change", ["copy", "nonce", "mutable", "roster"])
+def test_forged_or_copied_custody_indexes_never_mint_provisional_root(operation, change):
+    h = operation
+    for ticket in h.tickets: h.receive(h.op.dispatch(ticket, h.claim, h.starts[ticket]))
+    original = transport._CAP_INDEXES[h.op]
+    if change == "copy": transport._CAP_INDEXES[h.op] = tuple(list(original))
+    elif change == "roster": transport._RECEIVED_CAPS[h.op] = tuple(list(original[1]))
+    else:
+        mutated = list(original)
+        if change == "nonce": mutated[7] = object()
+        else: mutated[3] = dict(original[3])
+        transport._CAP_INDEXES[h.op] = transport._CAP_INDEX_PINS[h.op] = tuple(mutated)
+    with pytest.raises(transport.CountTransportRefusal, match="observation_changed"):
+        h.op.freeze_provisional_root()
+    assert not transport._CANDIDATES and h.op in transport._FAILED
+
+
+@pytest.mark.parametrize("kind", ["received", "response"])
+@pytest.mark.parametrize("copy_cap", [False, True])
+def test_duplicate_ticket_cap_is_rejected_without_reauditing_prior_caps(operation, kind, copy_cap):
+    h = operation; obs = h.op.dispatch(h.tickets[0], h.claim, h.starts[h.tickets[0]])
+    got, pair = h.receive(obs)
+    cap = got if kind == "received" else pair
+    if copy_cap:
+        registry = h.received if kind == "received" else h.response_bindings
+        duplicate = type(cap)(); registry[duplicate] = (duplicate, *registry[cap][1:]); cap = duplicate
+    with pytest.raises(transport.CountTransportRefusal, match="observation_changed"):
+        (h.op.accept_received_control if kind == "received" else h.op.accept_closed_response)(cap)
+    assert h.op in transport._FAILED and not transport._CANDIDATES
+
+
+@pytest.mark.parametrize("kind", ["received", "response"])
+def test_foreign_cap_type_is_refused_before_any_custody_validator(operation, monkeypatch, kind):
+    h = operation; calls = []
+    owner, name = (h.controls, "received_binding") if kind == "received" else (h.responses, "response_binding")
+    monkeypatch.setattr(owner, name, lambda cap: calls.append(cap))
+    with pytest.raises(transport.CountTransportRefusal, match="observation_changed"):
+        (h.op.accept_received_control if kind == "received" else h.op.accept_closed_response)(object())
+    assert not calls and not transport._CANDIDATES
+
+
+def test_reentrant_index_replacement_during_full_authentication_cannot_mint_root(operation, monkeypatch):
+    h = operation
+    for ticket in h.tickets: h.receive(h.op.dispatch(ticket, h.claim, h.starts[ticket]))
+    original = h.controls.received_binding; changed = [False]
+    def validate(cap):
+        result = original(cap)
+        if not changed[0]:
+            changed[0] = True; transport._CAP_INDEXES[h.op] = tuple(list(transport._CAP_INDEXES[h.op]))
+        return result
+    monkeypatch.setattr(h.controls, "received_binding", validate)
+    with pytest.raises(transport.CountTransportRefusal, match="observation_changed"):
+        h.op.freeze_provisional_root()
+    assert changed[0] and not transport._CANDIDATES and h.op in transport._FAILED
+
+
+def test_direct_index_constructor_cannot_remint_a_copied_original_roster(operation):
+    h = operation
+    for ticket in h.tickets: h.receive(h.op.dispatch(ticket, h.claim, h.starts[ticket]))
+    original = transport._CAP_INDEXES[h.op]
+    with pytest.raises(transport.CountTransportRefusal, match="observation_changed"):
+        transport._issue_cap_indexes(h.op, original[0], tuple(list(original[1])), tuple(list(original[2])),
+            original[5], original[6])
+    assert transport._CAP_INDEXES[h.op] is original and len(transport._CAP_INDEX_MINTS) == 1
+
+
+def test_every_freeze_reauthenticates_late_original_physical_nine_field_seal(operation, kernel, monkeypatch):
+    import os
+    import test_short_interest_count_response_custody as physical
+    physical.response_registry.__wrapped__(monkeypatch)
+    h = physical.h.__wrapped__(operation, kernel, monkeypatch)
+    for ticket in h.tickets:
+        pair, unused = physical.close_response(h, ticket)
+        h.op.accept_closed_response(pair)
+    first = h.response_path(h.tickets[0]) / physical.custody.BODY_NAME
+    h.op.freeze_provisional_root()  # A prior provisional pass cannot cache completeness.
+    os.utime(first, None)
+    with pytest.raises(physical.custody.CountResponseRefusal): h.op.freeze_provisional_root()
+    assert h.op in transport._FAILED and h.budget in budget_module._FAILED
+
+
 def test_original_operation_and_HTTP_bindings_are_opaque_and_exact(operation):
     h = operation; op = transport.operation_binding(h.op)
     assert len(op) == 14 and op[1] is h.budget and op[2] is h.plan and op[12] is h.lease
@@ -266,7 +450,7 @@ def test_received_control_alone_cannot_become_body_coverage(operation):
     for ticket in h.tickets:
         observation = h.op.dispatch(ticket, h.claim, h.starts[ticket]); h.receive(observation)
     transport._RESPONSE_CAPS[h.op] = ()  # Explicit fabricated missing-custody fault.
-    with pytest.raises(transport.CountTransportRefusal, match="final_incomplete"): h.op.freeze_provisional_root()
+    with pytest.raises(transport.CountTransportRefusal, match="observation_changed"): h.op.freeze_provisional_root()
 
 
 def test_backward_or_expired_operator_clock_refuses_before_any_HTTP(operation):

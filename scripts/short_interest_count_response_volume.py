@@ -45,6 +45,9 @@ _PLAN = None
 _OPERATIONS = {}
 _VOLUME_BINDINGS = {}
 _PRESERVATION_ORIGINS, _PRESERVATION_PINS = {}, {}
+SYSTEM_ENTRY_NAMES = frozenset((".fseventsd",))
+_APPLICATION_ROOT_NAMES = frozenset(("capture", "claim", "checkpoint"))
+_SYSTEM_ORIGINS, _SYSTEM_PINS = {}, {}
 _RLOCK_TYPE = type(threading.RLock())
 _CODES = frozenset("""count_volume_platform_refused count_volume_native_unavailable count_volume_native_result_refused
 count_volume_native_string_refused count_volume_root_changed count_volume_policy_changed count_volume_deadline
@@ -62,7 +65,8 @@ count_volume_mount_native_identity_changed count_volume_origin_refused count_vol
 count_volume_device_node_refused count_volume_device_node_changed count_volume_new_root_mode_refused
 count_volume_new_root_identity_changed count_volume_new_root_enforcement_repeated
 count_volume_preservation_binding_changed count_volume_readonly_required count_volume_ticket_changed
-count_volume_host_native_identity_changed""".split())
+count_volume_host_native_identity_changed count_volume_system_entry_refused
+count_volume_system_entry_changed count_volume_root_membership_changed""".split())
 _ERRNOS = {getattr(errno, name): name for name in (
     "EACCES", "EPERM", "EEXIST", "ENOENT", "ENOSPC", "EIO", "EBADF", "EINVAL", "ENOTSUP")
     if hasattr(errno, name)}
@@ -102,6 +106,7 @@ def authority():
 
 
 def policy():
+    _system_names()
     require(VIRTUAL_BYTES == 8 * 1024 ** 3 and MAXIMUM_SECONDS == 3600 and SUBPROCESS_SECONDS == 120
         and MAXIMUM_PLIST_BYTES == 4 * 1024 ** 2 and MAXIMUM_IMAGES == 256 and MAXIMUM_ENTITIES == 64
         and HDIUTIL == "/usr/bin/hdiutil" and LIBRARY == "/usr/lib/libSystem.B.dylib"
@@ -122,6 +127,10 @@ def policy():
         "terminal_order": "provisional_only_while_LIVE_all_original_contexts_and_postclose_pins_before_ClosedCountChunk",
         "reload": "same_original_still_mounted_epoch_pins_only_no_reattach_or_new_device_mapping",
         "preservation_origin": "LIVE_original_once_readonly_mount_FD_root4_GID4_native9_blocknode6_no_failure_accessor",
+        "system_root_entries": {"possible_names": sorted(SYSTEM_ENTRY_NAMES),
+            "protection": "nofollow_directory_rootUID0_original_rootGID_0700_same_device",
+            "capture": "THIS_fresh_factory_once_before_any_source_inode_original_pin5_never_absent_to_present_adoption",
+            "positive_source_root_roles": sorted(_APPLICATION_ROOT_NAMES)},
         "predispatch_capacity": "genuine_active_ticket_original_FDs_native_identity_host9GiB_mount4GiB_before_every_GET",
         "spotlight_index_creation": False,
         "volume_name": "SI_COUNT_RESPONSE_CUSTODY_V1", "failed_v1_namespace_retired_even_if_absent": True,
@@ -274,7 +283,64 @@ def _fixed_state(state):
         "root_enforcement_record": _root_enforcement_record(state),
         "attach_origin": _origin_pin(state, state["attach_origin"], "attach"),
         "info_origin": _origin_pin(state, state["info_origin"], "info"),
-        "selected_info_identity": state["selected_info_identity"]}
+        "selected_info_identity": state["selected_info_identity"],
+        "original_system_entries": _system_record(state)[1]}
+
+
+def _system_names():
+    require(type(SYSTEM_ENTRY_NAMES) is frozenset and all(type(name) is str for name in SYSTEM_ENTRY_NAMES)
+        and SYSTEM_ENTRY_NAMES == frozenset((".fseventsd",))
+        and type(_APPLICATION_ROOT_NAMES) is frozenset and all(type(name) is str for name in _APPLICATION_ROOT_NAMES)
+        and _APPLICATION_ROOT_NAMES == frozenset(("capture", "claim", "checkpoint")),
+        "count_volume_system_entry_refused")
+
+
+def _system_pin(state, info):
+    require(stat.S_ISDIR(info.st_mode) and info.st_dev == state["mount_pin"][0]
+        and info.st_uid == 0 and info.st_gid == state["root_creation_pin"][3]
+        and stat.S_IMODE(info.st_mode) == 0o700, "count_volume_system_entry_refused")
+    return info.st_dev, info.st_ino, info.st_uid, info.st_gid, info.st_mode
+
+
+def _capture_system_entries(state, fd):
+    """Fresh original metadata only; never open/read root-owned contents."""
+    _system_names()
+    require(state["phase"] == "CREATING" and id(state) not in _SYSTEM_ORIGINS
+        and fd == state["mount_fd"] and fcntl.fcntl(fd, fcntl.F_GETFL) & os.O_ACCMODE == os.O_RDONLY,
+        "count_volume_system_entry_refused")
+    names = tuple(sorted(os.listdir(fd)))
+    require(set(names) <= SYSTEM_ENTRY_NAMES, "count_volume_root_membership_changed")
+    entries = tuple((name, _system_pin(state, os.stat(name, dir_fd=fd, follow_symlinks=False))) for name in names)
+    require(tuple(sorted(os.listdir(fd))) == names, "count_volume_root_membership_changed")
+    state["system_entries"] = entries
+    original = state, entries, object()
+    _SYSTEM_ORIGINS[id(state)] = _SYSTEM_PINS[id(state)] = original
+    _check_system_entries(state, fd)
+
+
+def _system_record(state):
+    original = _SYSTEM_ORIGINS.get(id(state))
+    require(type(original) is tuple and len(original) == 3 and original is _SYSTEM_PINS.get(id(state))
+        and original[0] is state and original[1] is state["system_entries"] and type(original[2]) is object,
+        "count_volume_system_entry_changed")
+    return original
+
+
+def _check_system_entries(state, fd):
+    _system_names(); original = _system_record(state); expected = dict(original[1])
+    require(fcntl.fcntl(fd, fcntl.F_GETFL) & os.O_ACCMODE == os.O_RDONLY
+        and _directory(os.fstat(fd)) == state["mount_pin"], "count_volume_system_entry_changed")
+    names = tuple(sorted(os.listdir(fd)))
+    require(set(names) - _APPLICATION_ROOT_NAMES == set(expected), "count_volume_root_membership_changed")
+    for name in names:
+        info = os.stat(name, dir_fd=fd, follow_symlinks=False)
+        if name in expected:
+            require(_system_pin(state, info) == expected[name], "count_volume_system_entry_changed")
+        else:
+            require(stat.S_ISDIR(info.st_mode) and info.st_dev == state["mount_pin"][0]
+                and info.st_uid == os.getuid() and info.st_gid == state["root_creation_pin"][3]
+                and stat.S_IMODE(info.st_mode) == 0o700, "count_volume_root_membership_changed")
+    require(tuple(sorted(os.listdir(fd))) == names, "count_volume_root_membership_changed")
 
 
 def _original_state(state):
@@ -588,6 +654,7 @@ def _readonly_original_check(state):
             follow_symlinks=False)) == state["backing_pin"], "count_volume_backing_changed")
         mount_fd = os.open(MOUNT_NAME, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=namespace_fd)
         descriptors.append(mount_fd); _check_mount(state, mount_fd, info=True)
+        _check_system_entries(state, mount_fd)
         for path, unused, pin in state["directories"]:
             require(_directory(path.lstat()) == pin, "count_volume_directory_changed")
         require(_backing(os.stat(IMAGE_NAME, dir_fd=namespace_fd, follow_symlinks=False))
@@ -620,7 +687,11 @@ class CountResponseVolume:
             require(type(entry) is tuple and len(entry) == 3 and entry[0] is self,
                 "count_volume_capability_changed")
             with _source_lock(entry[2]):
-                return action(self._binding())
+                state = self._binding()
+                if state["phase"] == "LIVE": _check_system_entries(state, state["mount_fd"])
+                result = action(state)
+                if state["phase"] == "LIVE": _check_system_entries(state, state["mount_fd"])
+                return result
         except BaseException:
             if _MINTED.get(id(self), (None,))[0] is self: _FAILED.add(id(self))
             raise
@@ -736,6 +807,17 @@ def preservation_volume_origin(volume, operation):
             and original[8] is volume._anchor, "count_volume_preservation_binding_changed")
         return original
     return volume._guarded(issue)
+
+
+def volume_system_entries(volume, operation):
+    """SAME original pre-source tuple; only a genuine LIVE volume may issue."""
+    require(type(volume) is CountResponseVolume, "count_volume_system_entry_changed")
+    def original(state):
+        require(state["phase"] == "LIVE" and state["operation_origin"][0] is operation,
+            "count_volume_system_entry_changed")
+        _check_system_entries(state, state["mount_fd"])
+        return _system_record(state)[1]
+    return volume._guarded(original)
 
 def _summary(state, status):
     _original_state(state)
@@ -867,6 +949,7 @@ def prepare_registered_volume(root, *, operation, boundary, monotonic=time.monot
         state.update(mount_fd=mount_fd, mount_native=_mount_identity(native), info_entities=info_entities)
         _enforce_new_root(state, mount_fd)
         _check_parents(state); _check_mount(state, mount_fd)
+        _capture_system_entries(state, mount_fd)  # Before capability/source/claim/START creation.
         _FROZEN[id(state)] = state, hash_payload(_fixed_state(state))
         capability = object.__new__(CountResponseVolume); anchor = (object(),)
         capability._anchor = capability._identity = anchor

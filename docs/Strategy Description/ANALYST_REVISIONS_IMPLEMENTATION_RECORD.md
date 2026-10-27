@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–325 retain the milestone, review, preregistration, QC
+strategy. Sections 1–326 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -2217,6 +2217,16 @@ uncommitted Y draft files. The owner subsequently explicitly approved a normal
 non-rewriting merge. Section325 owns that reconciliation, per-commit dispositions
 and single final push. No reset/rebase/force-push, silent source-pin refresh,
 duplicate booking or operational replay; inherited byte-pin gates remain closed.
+The new owner direction explicitly resumes implementation beyond that completed
+review checkpoint. The owner explicitly waives Claude review of section 326's
+current source-pin/parser/price recovery and six/eight research-backtest work:
+"Resolve the source-pin mismatches, finish the parser and price coverage fixes,
+then continue the 6 and 8 universe backtests. Skip Claude review for now,
+document the progress, and push once when done." Section326 owns the new
+prospective closure and one exact offline X-data consumer before any new
+provider or QC action. Old modules/profiles/pins and spent uses stay frozen;
+no automatic re-pin/retry or source/financial gate clearance. This is the
+current live continuation, superseding325's no-next-milestone endpoint.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
 V3 is spent after its
@@ -62873,3 +62883,163 @@ this sync/counter-review checkpoint; no provider/QC/Safari/price/body read,
 capacity check, freeze or backtest is started as a next milestone here.
 All existing review waivers retain their actual scope and are not independent
 acceptance or a trading permit. The fulfilled Insider monitor stays deleted.
+
+## 326. Prospective pin closure, parser/coverage recovery and six/eight continuation, 2026-10-26
+
+### 326.1 Owner scope, existing drafts and explicit new source-byte contract
+
+Owner: "Resolve the source-pin mismatches, finish the parser and price coverage
+fixes, then continue the 6 and 8 universe backtests. Skip Claude review for now,
+document the progress, and push once when done." This opens the next bounded
+research implementation/recovery round after325, not paper/live/funded/broker
+authority, new paid rights, a shared-file waiver or renewal of spent protocols.
+Review sequencing is waived for this work; same-round agents remain advisers,
+not independent acceptance. ExactlyONE successful matching-lane final push
+at the concluded documented endpoint, no intermediate acknowledgement push.
+
+Starting root/branch/HEAD verified: ONLY /Users/sheltonchen/Code/trading_agent__
+analyst_revisions_v2 on codex/strategy-analyst-revisions-v2,
+634509bf0fb361a8471c9ed6b62106d0cdcfc245. Tracking/live matching remote equals
+that head. Two untracked Y pure-helper/test drafts from323.77 were preserved,
+read and completed in scope; no other preexisting dirty work. No inherited
+operational entry/control, source data or credential was read while preparing.
+Read CLAUDE completely, current326/325/navigation,323.61 common reference/NAV
+design and relevant process/action-plan boundaries. Root/project-wide/other-
+lane files remain frozen except the existing bounded R298 ledger append.
+
+New pure post-merge source manifest pins the historical X157-entry map by its
+exact canonicalNO-LF digest, permits ONLY the two recorded old-to-new EOF
+source pairs, and adds two explicit imported X/U caller pins. It never reads
+current files or automatically refreshes a hash, mutates predecessor globals,
+calls old operations or grants a run. A new caller separately authenticates
+all159 actual selected bytes plus its own direct new imports before claim or
+contact. This resolves ARV2CR325-002 PROSPECTIVELY for a separately frozen
+new use, not a green old X/A11 closure or historical continuity/whole-interpreter
+integrity. Old source modules, maps, profiles and every spent attempt remain
+unchanged. Root/agent public-byte Git proofs establish both replacements
+remove exactlyone trailingLF with equal ASTs; no broader change accepted.
+
+New offline Y has a first interpretation purpose for X's newly retained data
+ONLY: stocks-status.body645bytes SHA
+bb251171112b3e46045a4607b54c994584abe380cf3880e64dc53aedd06ff183,
+captured at503168ac before semantic file refusal. It does not reread X claim/
+report/journals, invoke X/W/U, repeat a request, renew their status readers or
+infer what V's discarded historical body contained. New Y claim/fsync and
+source-stage marker precede one logical bounded source pass under fresh
+current native ACL/xattr and full ten-field held/named metadata authentication;
+original descriptors stay held through analysis/report/normal-return checks.
+The earlier registered credential-scan provenance is bound through the exact
+X byte pin, NOT rerun or upgraded into a new credential-absence claim. No
+Keychain/API/provider/QC capability is present in Y.
+
+Pure field inventory uses fixed known key names/type/hash/length, bounded
+unknown-key hashes, finite history/basename equalities, integer-size evidence
+and timestamp classes; no arbitrary/raw value, row, price or unknown key name
+is disclosed. Every file entry is inventoried, not first-entry selected or
+admitted. It refuses duplicate/nonfinite/overbound/invalid-UTF8/surrogate JSON
+before hashing. Opaque hash-only classifications are not independently
+recoverable by the output-only reader: the producer recomputes all receipt
+facts from authenticated supplied bytes and externally pins the body identity.
+All schema/entitlement/price/PIT/master/readiness flags remain false.
+
+After this diagnosis, choose only a verified additive parser correction and
+complete common reference/NAV source, never a scalar held-stock price/cache
+patch, price-based eligibility drop or stale fallback. Retain the actual
+quote-aware projection, RAW units, same-day splits and actual QC cash/actions/
+fees/whole shares; vendor EOD marks cannot become executable quotes. Exact
+comparison sessions remain2021-01-04..2026-10-13, decision cutoff2026-10-12,
+first prior close2020-12-31, not an automatic extension to today's date. Fresh
+identity/processing-rights/input/source/access/idleness/capacity/attempt gates
+precede any QC launch. Current floor336/259/52/699; no new look/cell in local
+source/diagnostic preparation. The fulfilled Insider monitor stays deleted;
+its old handoff is not a continuous QC resource lease.
+
+Y implementation/tests/pins and separate exact committed one-shot host/HEAD/
+profile/result decision follow before source read. No Y control has been
+inspected/allocated, no actual private source/credential/provider/QC action
+at this entry. Preserve all spent X/W/V/S/T/U and earlier refusals and leaves.
+
+### 326.2 Prospective Y implementation, validation and exact one-use decision
+
+Root read complete new manifest/helper/caller/tests, compared copied Y source/
+Store guards/preflight/alarm/main against frozen U primitives and retained
+normal source-guard exit AFTER report creation. New direct pin map adds the
+manifest/helper explicitly. No old operational entry/global/policy is invoked
+or changed. Fresh own-source actual161pins all match; old X157still has its
+historical two mismatches. ARV2CR325-002 is resolved PROSPECTIVELY by this new
+closed versioned map plus actual-byte validation, not a silent old-map repair.
+No standalone manifest is a run capability or source-admission grant.
+
+| New file | Bytes | SHA256 |
+|---|---|---|
+| scripts/arv2_r298_post_merge_source_pins.py | 7142 | 45212ec4ad2585a29c8105f2c66862ae2b625def159ac2706479974f3faa3f5b |
+| scripts/arv2_r298_sharadar_bulk_fields.py | 16984 | 22d8a35c971e30004de3b98feb4d5e1ec9809d32f6eb58daa44f491f3e244dbc |
+| scripts/inspect_arv2_r298_sharadar_bulk_fields.py | 27531 | e4fc51b607ae9a5f222adad8745956db9cd77371c24605ad5d42a1941be31ca0 |
+| tests/analyst_revisions_v2/test_r298_post_merge_source_pins.py | 10114 | e7850950358ec8b1343d2b70fdecc2156859fa16a5c18cc95998ca3eb0c506c0 |
+| tests/analyst_revisions_v2/test_sharadar_bulk_fields.py | 14902 | 76306bebe56b361bcb9fa8e937f16d45d9cd8fefe693133ca6b2b0382c89aabe |
+| tests/analyst_revisions_v2/test_r298_sharadar_bulk_fields_caller.py | 25077 | 9ae0f69f95c7beba4f1398de5ea60682efb7892c542f455a07130a1a1d75703a |
+
+Exact caller canonical+LF profile22133bytes SHA
+b95cafebb24316bff615b0c7e6f5595df2fa68f8ea45593f5e696c1f867b22fa.
+Helper canonicalNO-LF1888bytes SHA
+80153931387f94114a858de0d8aeb82f0db197f8711a3816e7b586e9d83ad11c;
+caller's+LF1889bytes SHA1a5413954dd2ce54dd67fdf0d08aeb9caa780557e1d765be46cde08fad882c45.
+Manifest canonicalNO-LF21262bytes SHA
+078b2186f8ce4810456c11048b7836a5b6fe59f12102b46bd04a2dd614a8dd47;
+caller's+LF21263bytes SHAbcd277c0a45d17cd3c19a33132f4b8ff9afc666dab92588a697b5475374aeda7.
+Historical157map canonicalNO-LF SHA
+d27eea9e5676ecc8b0cabaa3b8a12510d2d9b28248f799a41b73b8f51f682220.
+These framings are distinct; no doubled LF or silent profile refresh.
+
+Root final335distinct focused passes3.38s =54manifest+107fields+87caller+
+86record/document+1research transitiveclosure, no failures/skips/warnings.
+All6files compile in memory without bytecode, EOF/diff clean, all161pins
+match, dispatch_fence absent. Earlier87caller/3.65s is overlapping. Native
+synthetic-child probe separately passed the real O_SEARCH guard/full Store,
+literal one-leaf read, denied source listing/control report, denied unrelated
+write/network/Keychain and independent real-production-artifact denial. Parent
+only constructs synthetic paths; tested child has native denials, not a nested
+sandbox or an actual X-body read. All temp/cache/log/plugin paths inroot;
+plugin autoload/conftest/cacheprovider disabled,-B, no full suite.
+
+Root memory-only omissions caught: body-size/hash external binding2expected
+failures0.12s; actual-zero exit1/0.08s; normal source-guard exit verification
+1/0.06s, explicitly rejecting a report left before late drift. Restoredfinally,
+disk hashes unchanged. Manifest author54/0.33s(preimported) and54/3.42s overlap;
+baseline digest/addition-pin/exact-manifest omissions each1expected failure
+0.10/0.05/0.05s. Helper initial97/3.35s,106/3.06s and final107/0.14s after
+preimport(wholeprocess3.46s) overlap; red-before-fix6expected failures+1already
+caught pass/98deselected2.98s. Corrected known-string hash/length consistency,
+unknown-key/known-field disjointness and early64count bound. Five restored
+helper omissions each1expected failure0.12/0.05/0.09/0.05/0.05s for JSON safety,
+known length, key disjointness, every-file coverage and unknown digest. These
+are synthetic sensitivity results, not market evidence or extra green passes.
+Same-round implementation/audit is not independent acceptance.
+
+D-Y under the current owner research/recovery and review waiver: after THIS
+record/all6newfiles are committed at the next exact CLEAN designated root/
+branch HEAD, invoke new Y observe ONCE with that HEAD and caller e4fc51b6
+pin. Fixed prospective own control newrule_sharadar_bulk_fields/R326-20261026-Y
+is uninspected/unallocated before invocation. ONLY designated Darwin/POSIX
+Python3.13 interpreter. Claim/fsync plus source-start precede one logical
+bounded read of ONLY X's645byte stocks-status.body with its fixed hash in326.1.
+No source-directory data listing, old X control, other artifact, credential,
+provider/QC/Safari access. Native producer allows this literal data leaf and
+its own new control only; native output validator denies all artifacts,
+network, Keychains and securityCLI. All fresh ten-field held/named metadata
+and native emptyACL/stable ordinary provenance-xattr checks remain binding
+through source-guard NORMAL RETURN. Original FDs are not replaced/reopened
+as a fresh baseline. Byte hashes alone are not security or continuity proof.
+
+Parent90s/outer120s/validator20s,128KiB public output/max8owncontrolfiles,
+only own child kill/reap. Limits do not bound uninterruptible I/O or host
+suspension. Actual parent0 AND native supplied-output validator0/empty stderr/
+no bound/exact closed output/report/body-pin binding mandatory. Late/nonzero/
+unknown/ambiguous status is failure/spent; never accept report alone. Claims
+consume use even if no source bytes are read. No retry/cleanup/repair/attribute
+stripping, old-module invocation or blanket metadata waiver. Only finite
+closed field evidence may be externally recorded; no raw values/rows/body or
+credentials. A passing Y proves this bounded current-field observation, not
+schema/price coverage, native vendor cause, subscription or strategy readiness.
+No new look/cell,336/259/52/699 unchanged. Continue only a genuinely verified
+additive parser/source/valuation step afterward; no automatic provider/QC retry.

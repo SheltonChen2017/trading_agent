@@ -2223,9 +2223,16 @@ current source-pin/parser/price recovery and six/eight research-backtest work:
 "Resolve the source-pin mismatches, finish the parser and price coverage fixes,
 then continue the 6 and 8 universe backtests. Skip Claude review for now,
 document the progress, and push once when done." Section326 owns the new
-prospective closure and one exact offline X-data consumer before any new
-provider or QC action. Y is now spent/passed in326.3;326.4–326.5 own the
-additive full-catalog/current-route Z preparation and exact new one-use scope.
+explicit prospective source closure and recovery. Y's offline field inventory
+passed once; the corrected keyed parser passed both actual Z status responses.
+Z then refused the guessed original schema; AA's separately frozen exact-schema
+recovery passed, and AB authenticated genuine potential membership demand.
+AC passed once at d25ab8ea:74 of79 route refusals corrected,5636potential-stock
+routes/5closed identity refusals/510conditional-never/all8funds retained.
+All Y/Z/AA/AB/AC uses and controls are SPENT. Sections326.11–326.13 own those
+actual facts, remaining4FIGI disagreements/1collision, and the next separately
+frozen public-FIGI diagnostic. Complete reference AND held-stock NAV coverage,
+source identity/common sidecar/runtime/run/attempt gates still precede QC.
 Old modules/profiles/pins and spent uses stay frozen;
 no automatic re-pin/retry or source/financial gate clearance. This is the
 current live continuation, superseding325's no-next-milestone endpoint.
@@ -63981,3 +63988,282 @@ byte profile above, not used as a source/protocol pin. No actual source read.
 Next is only this offline diagnosis; no price acquisition, QC capacity/job,
 upload, strategy launch, original identity rewrite or acceptance from success.
 ARV2E323-001 complete reference/NAV coverage remains OPEN. No push yet.
+
+### 326.13 Actual AC passed once: 74 corrected routes, five identities unresolved
+
+At clean freeze d25ab8eaaa4a3abea39c41b7e3d6470b429c4e16, sole AC producer
+dispatched2026-10-27T08:34:17.171069Z and completed08:34:26.689193Z,
+actual exit0; separate native validator08:34:26.689346Z..
+08:34:30.148700Z, actual exit0. Both stderr0/no bound, identical6063byte
+stdout SHA1192425eea322cb520cdf7b6af34de384735e53a1e67a26ec1056680ff68b057.
+Report5934bytes SHA2eec05418cd5e61ba453c1ee8c900bb5776fd5c21d5e1c05348ca6a701ac4267.
+Private price-lineage-private.json16344399bytes SHA
+4366e1e8a218fb21afc6ef3d88dfed9c2ab8b784a7718a405616850e1a4d6ddc.
+These are process brackets, not provider timestamps. AC producer/guard/direct
+analysis/observer/validator/control are now SPENT. No tests/edits during actual
+use, no provider/credential/QC request/look/cell or push. The prefreeze86record
+passes0.97s overlap final283. No extra reader or retained-control reread.
+
+Four exact data-byte pins passed under the NEW current-security guard, with
+all held/named metadata and native security checks through normal return.
+Current endpoint metadata SHAs: AA d9db97b85a6343d1636472518081ebcf2a29b180c2b06dd52083ef5288d2a766;
+AB demand07f7cdc409b6ac695f957947c2d981ee32b843410854be56a1b74139b5c1ea9a;
+stocks bd2364e43e213d31b4ce59f5a537dc3820bf64b1641e2994f45f4ea4726822f8;
+funds7880bead721552161b76c2d475e5c0abb796039bb9718824fcaf2fead25532c2.
+All four current security receipts SHA
+2b84f04ed075c50bcafe7c9ebecee4bb98d84615a2e677f701b3b06bb7b47612.
+These use the new technical helper's canonical representation, not a claim
+of equality to differently encoded older receipt hashes or continuous/history
+integrity. Original byte pins, original strategy identities and source rows
+remain unchanged; no old v4 device/ctime policy was used or renewed.
+
+Actual corrected stock routing:5636routed,5refused,510conditional-never,
+total6151; all8funds routed. Exactly74 of79 earlier potential-stock refusals
+were old-predicate-only corrections. P2 I326-003 reporting-vs-price-currency
+correction has now passed its exact prospective data use. Remaining4
+identity_missing and1global_collision remain CLOSED refusals. No aliases,
+row omissions or fallback authority. Required potential stocks stay5641,
+full price window2020-12-31..2026-10-13. Observed metadata differences include
+5 non-USD functional reporting currencies,26 ticker changes,37 venue/MIC
+changes,9 unmapped venues,3 category changes,2 outside-old-vocabulary
+categories,1371 first-price dates after window start and2121 last-price dates
+before window end. These are observations, not price completeness, lifecycle
+payoff or permission to clip holdings/queries. Unknown vocabulary67 retained.
+
+Root created public-only arv2_r298_ac_source_binding.py5099bytes SHA
+112221b42d0c35065fec96ea55dc124c2e66101d8e6011bd91160d4a97576d0b
+from validated stdout; no data/control reread. Canonical observed-fact SHA
+1ca8c38addfd4dc98b86e425147a01633dac132bc3146902ac860754faabe775;
+closed price-summary SHA112daa665daefaaef723e3fd3379196f4d85a7d920f80edf0b9d0fdb063ee5ef.
+Prior process0 is a recorded fact, not future source/readiness authority.
+
+Next justified recovery: a NEW bounded current-public-FIGI corroboration
+diagnostic for these exact five disagreements, not a replacement acquisition,
+historical master/PIT admission or replay of R284. Only public FIGI identifiers
+may leave the host; no vendor CUSIPs, permanent IDs, licensed rows, names or
+credentials. No same-share-class-only inference may clear distinct claimed
+US composite identities or a global collision. No data/contact is authorized
+until its exact caller/source/protocol/claim/attempt/deadline/output freeze is
+committed and applicable technical gates pass. If independent current public
+evidence cannot resolve the identities, preserve the concrete source barrier.
+Complete RAW reference AND held-stock NAV coverage, common sidecar/runtime,
+quote-aware six-cell source/run/attempt/result gates remain before backtests.
+All price/PIT/master/formal/paper/live readiness false;336/259/52/699 unchanged.
+
+### 326.14 Prospective public-FIGI recovery design; no contact before exact freeze
+
+AD's distinct purpose is to observe the public identifier hierarchy for ALL
+five remaining potential-stock route refusals, not to acquire prices or
+replace the old R284 public identity run. Exact supplied FIGIs are globally
+identified, so initial jobs use only ID_BB_GLOBAL/idValue and
+includeUnlistedEquities=True. No market/exchange request filter can hide a
+foreign, non-equity or venue-level observation as a no-match. This is the
+INITIAL frozen design, not an adaptive fallback: no alternate idType, filter,
+row choice or unchanged retry. Local positive classification still requires
+actual Equity/US and a consistent composite/share-class hierarchy. No-match,
+missing metadata, null hierarchy, warnings/errors, multiple results or foreign
+scope remain finite unresolved observations. All returned rows are validated.
+
+Primary sources checked: https://www.openfigi.com/api/documentation and
+https://api.openfigi.com/schema define request order, unlisted opt-in, nullable
+response hierarchy and unauthenticated10jobs/request,25requests/IP/60seconds.
+https://www.openfigi.com/about/exchange-codes and
+https://www.openfigi.com/about/allocation-rules distinguish US composite from
+venue instruments and global share class. These pages provide no historical
+as-of/version/correction package. No shared-IP quota availability is assumed.
+Same share class alone cannot clear distinct claimed US composites, a source
+collision, issuer/security changes or historical validity intervals.
+
+Only two fixed DATA leaves may be consumed by the future exact AD freeze:
+AA routes-private.json19895631bytes/3776f03b and AC price-lineage-private.json
+16344399bytes/4366e1e8. Full external pins above must be authenticated before
+JSON; aggregate36240030bytes requires a NEW explicit64MiB source budget,
+not AC's32MiB. Every6151 binding/eight-fund inventory and same-row source
+identity must align before extracting the exact five refused rows and ALL
+their retained AA physical candidates (perma/FIGI/ticker union). This subset
+is NOT a full-catalog CUSIP/poison-owner or global-collision counterparty census;
+absent/unmapped rivals cannot clear the collision. No original TICKERS/Z CSV/package/old
+control/report reads. The frozen00de technical guard holds both original
+descriptors/full chains/native security/metadata until normal return.
+
+No vendor CUSIP, permanent identifier, ticker, name, licensed row or credential
+may leave the machine. The complete deduplicated public-FIGI inventory must
+strictly validate and fit<=30 before contact; missing/invalid physical-candidate
+identifiers must be counted, not silently omitted. Such a refusal completes
+the source guard normally and retains private five-case evidence with zero
+dispatch intents. A valid inventory permits at most3 exact POST batches of
+<=10jobs to https://api.openfigi.com/v3/mapping, unauthenticated owned session,
+trust_env=False/no proxies/auth/cookies, TLS verified, redirects/retries zero.
+Persistent dispatch intent precedes each send. Application dispatch count is
+not measured physical contact. Non200 retains only validated numeric status,
+never a response body; transport ambiguity spends the one-use claim.
+
+Bounded HTTP200 bytes must be retained privately BEFORE semantic parsing.
+These are provisional diagnostic evidence INSIDE the still-active source
+guard, never accepted corroboration. Only the final bound selected-case/
+provenance package may publish after NORMAL source return. Partial bodies or
+outputs on failure stay evidence, never acceptance or a retry opportunity.
+Actual producer0 plus separate native output-validator0 and matching closed
+pins are required; report alone is insufficient. Producer network capability
+must be explicitly distinguished from native-denied synthetic tests; exact
+application host/TLS/request checks are not an OS domain allowlist.
+
+Source-only prefreeze audits found two corrections: P2 I326-006, the unused
+pure prototype accepted regex-shaped FIGIs without checksum, now corrected
+for claims AND all hierarchy IDs; P2 I326-007, unused487b58f2 could label
+different returned US FIGIs with a contradictory shared third composite as
+positive. A targeted native-denied synthetic assertion reproduced1expected
+failure0.22s, no private data/provider read. A claimed US composite row must
+have figi==compositeFIGI before positive classification; inconsistent levels
+remain unresolved. All current proof statuses still grant no route acceptance,
+old-FIGI replacement, global-collision waiver, historical identity or readiness.
+Exact final sources/profiles, native policies, budgets and validation follow
+before any commit/use. No AD source read, allocation or provider contact yet.
+
+P2 I326-008 was then confirmed BEFORE use: installed requests.Session.send
+prepares redirects even with allow_redirects=False; its redirect iterator
+consumes a3xx body before max_redirects=0 raises, losing the numeric status.
+Native-denied real-Session/fake-adapter regression reproduced that unwanted
+read:1expected failure, process3.06s. Its initial harness stopped at the logging/
+environment guard and is not transport evidence. The owned anonymous Session
+now provides an empty redirect iterator; the SAME isolated regression passed,
+process3.12s, retaining302 with its body untouched. No global monkeypatch or
+spent adapter change. Earlier source-level statements that a caller did not
+explicitly read a non200 body do not prove transport-internal redirect bodies
+were unread when actual statuses were unknown. No old cause/status is inferred,
+no historical reader/capture is replayed and no historical evidence erased.
+
+The source-only alternative analysis also established that original runtime
+bindings contain qc_security_id=None/qc_sid_available=False, not original
+native SIDs (accepted_risk_preliminary_qc_figi.py195/262). The old5121/1030
+aggregate cannot prove these five resolve. A separately frozen research hybrid
+could assign these exact five to native QC for BOTH reference/NAV over the
+entire window and all six cells, without declaring their Sharadar locators
+correct. It needs fresh original-FIGI/native-SID round trips and full-inventory/
+benchmark/all8ETF collision checks before prices; no ticker construction,
+replacement FIGI, per-missing-date fallback or membership-end holding waiver.
+RAW availability and every actual demand/terminal payoff remain separate gates.
+Different source provenance may change marks/sizing; it is not economically
+identical to a one-vendor study. No hybrid is cleared from this analysis alone.
+
+Primary QC public documentation permits paid organizations to cache/reuse QC
+data INSIDE QC Object Store for their QC projects:
+https://www.quantconnect.com/docs/v2/cloud-platform/object-store and
+https://www.quantconnect.com/docs/v2/cloud-platform/security-and-ip.
+No raw QC dataset may be exported locally, placed in logs/project source or
+treated as licensed for another service. Current paid/private-organization,
+source/run/access/idle/capacity/attempt and bounded namespace gates still need
+fresh proof before contact/publication. No QC account/API/job was accessed.
+
+Root public-only native-denied calendar preparation from unchanged
+data/exchange_calendar.py SHA174a032efce4082b8661eabe84b0cf6094048e937722bdf1659c8cb6c7decb89
+reproduced all3466 original session values SHA4ac84a2d. Requested2020-12-31..
+2026-10-13 has1452 NYSE sessions with independent open/close times including
+half-days/DST. Canonical NO-LF151009byte schedule SHA
+d4bc21d601f7d32b2b4190fe1ce4307d2a63d56821d61d99464dbd710b7476ee.
+This is public calendar computation, not a private source read, coverage proof,
+new formal epoch or operational QC attempt. A future native diagnostic may
+match its in-engine hours against this exact independent commitment before
+History. No native source helper/project/launch or cache publication yet.
+
+### 326.15 Exact one-use AD freeze and final validation
+
+Final pure public-FIGI helper arv2_r298_public_figi_corroboration.py SHA
+1b7c3151266023286b4170b0b2412acc08c7bbb011d86a2ec012cfc3db4eb54e;
+tests b553a2638579e614f4ef467651d60a8d86fd0b6c565296e955e54b0220d844b7;
+canonical policy3542435deec3247c598c157224b779e11f8dedf80f636d849bd546f7d0b89207.
+Final67distinct passes0.10s, earlier58/64/66 overlap. I326-006 checksum and
+I326-007 hierarchy corrections are prospective, before any actual use.
+All supplied instrument/composite/share-class IDs require canonical FIGI
+alphabet/checkdigit/checksum. Returned US rows with figi!=compositeFIGI are
+unresolved_hierarchy_level; same-share-class/different-composite remains
+unresolved. Legitimate positive fixture is the same deduplicated exact claim,
+not contradictory A/B/shared-C. Every job/result is retained/validated; finite
+unknown causes remain explicit. No observation grants route replacement,
+vendor-collision clearance, historical/share-class master or price admission.
+One compile-only native profile had an extra parenthesis and exited65 before
+Python; corrected command passed. No operational data was involved.
+
+Final caller scripts/inspect_arv2_r298_public_figi_lineage.py55812bytes SHA
+0e1328c07fa82690625a49dbc043cc9facdf125516bfff8a411dd0eb5bfa2ab4;
+tests34924bytes SHA5bb4f13eb7d872e39a9f452fbe30ce1fca5d5098133ef55f67667ea3528a8f9f.
+Canonical LF profile29949bytes SHA
+d4f0a0fa48dc248d11660888d4a130c8b2f5a9bac64576fbdcf1e05fbf79e230.
+178 literal selected pins =175 prior plus AC caller2b6de35e, AC public
+binding112221b4 and pure FIGI helper1b7c3151; no replacements/auto-refresh.
+AC public binding tests6369bytes SHA
+caa4cf1e2a986270e586f2b8a7ba1cdd4a70ca7395decea3691629956a500442,
+4passes3.13s/native3.52s overlap final root selection. Accessors remain inert
+copy-returning metadata; actual prior exits are facts, not operational grants.
+
+Owner326.1/latest direct review waiver authorizes ONLY the fixed AD diagnosis
+described in326.14/this exact source, after a clean commit containing this
+freeze. Compatible host remains designated Mac root/branch, Darwin/POSIX3.13,
+/Users/sheltonchen/.venvs/trading_agent-py313/bin/python; literal caller SHA
+and actual clean run HEAD must bind CLI/committed blob. NEW fixed control,
+not inspected/allocated:
+artifacts/analyst_revisions_v2/newrule_public_figi_lineage/R326-20261027-AD.
+One observer dispatches ONE native producer and ONE separate native stdin
+output validator. Claim/fsync/source-start precede data reads/contact. Claim
+consumes this use even without source/API access; partial/unknown is ambiguous
+spent. No repeat, renamed replacement, old control/reader/capture replay or
+automatic protocol change. The no-order purpose is identifier diagnosis,
+not strategy performance; no QC backtest or result cell belongs to AD.
+
+Only two DATA leaves/full external pins in326.14/caller FILE_PLAN,64MiB
+aggregate, fresh full chain/native-security/full ten-field guard. Every6151
+stock/eight-fund row and every retained candidate in all five exact cases
+is checked before contact. Invalid/missing/over30 inventory refuses as a
+whole, retains source predicates/private case evidence after normal guard
+return, and creates no session/dispatch intent. No subset fallback. Valid
+inventory permits<=3 batches/10jobs each; fixed initial unfiltered exact-ID
+requests as326.14. Producer600s, observer630s, each request30s bounded by
+remaining parent, validator20s. Inner alarm restores the remaining parent
+timer. Only owned process kill/reap; host-suspension/uninterruptible-I/O caveat.
+
+Producer native policy SHA
+c0b3792e46b9379239cfe2bb84ed50d0ca803a86bdfcf498540e438c2ee262fb;
+validator79d7e961f0ab250fd95784609a254c2628244cbd0143b0aa3ea1d2f514858a4c.
+Producer denies inbound/bind and permits outbound HTTPS443/DNS53 ports, not
+an OS domain allowlist. Owned anonymous session enforces the exact endpoint,
+TLS/prepared request/headers/body; redirects/retries/credential/proxy/cookie
+reuse prohibited. The scoped network capability is necessary for this new
+public contact, not a global security change. Keychains/securityCLI remain
+denied. Artifact reads exact AA/AC DATA plus own expected AD outputs/ancestor
+directory opens; writes only new AD/cache/null. Validator denies ALL network
+and artifacts. Not whole-interpreter/arbitrary-same-user/global-read isolation.
+
+Each intent journal precedes send. Non200 numeric status retained, no failed
+body read; the owned no-redirect iterator prevents the confirmed Requests
+hidden3xx read. HTTP200 body<=2MiB, aggregate<=6MiB; bounded completed bodies
+are privately retained before semantics. response_bytes counts completed
+bodies, not all received/partial/transport bytes. No measured-contact claim.
+Raw responses are provisional evidence inside source hold; accepted final
+case/provenance package<=32MiB only after normal guard RETURN. Public<=128KiB,
+<=12 ownfiles. Failed/partial/unknown exit remains inadmissible even if files
+exist; preserve bounded failure/partial pins. Only ACTUAL producer0 plus
+separate validator0/exact matching closed output/report pins accept this
+technical diagnosis. Authenticated failure evidence is not diagnostic success,
+price acceptance or permission to retry. No later output reader authorized.
+
+Author final82distinct callerpasses6.54s, earlier66/79/81 overlap. Six restored
+memory omissions each caught1expected failure: pre-send marker0.21s,
+raw-before-semantics0.11s, canonical priorfact0.08s, actualexit0.11s,
+owned redirect override0.06s, parent timer restore0.14s. Early fake-send tests
+missed the real Requests library path; I326-008 red/green evidence in326.14
+and committed real Session/fake-adapter regression preserve that limitation.
+RootFINAL240distinct passes6.13s =67pureFIGI+82caller+4ACbinding+86record/doc+
+1researchclosure, no failures/skips/warnings. All178 current source pins match;
+six changed sources/tests compile in memory/exact EOF, dispatch_fence absent.
+Native actual producer policy compiled with stronger ALL-network/ALL-artifact
+denial for synthetic tests, inroot temp/cache/log/plugin paths, -B, noautoload,
+--noconftest --ignore=artifacts/no cacheprovider. No full suite, actual TLS,
+source read, output allocation, provider/QC operation or independent Claude
+acceptance in validation. Same-round audits are advisory only.
+
+Next: verify exact root/branch/HEAD/status, commit this scope, then ONE AD
+observer/producer/validator with all agents held and no edits/tests. Preserve
+all five original source stops regardless mapping status; assess the separately
+justified native-source alternative only under a new exact protocol. No price
+acquisition, source upload, QC capacity/project/compile/job or strategy run from
+AD success alone.336/259/52/699 and all readiness flags unchanged. No push yet.

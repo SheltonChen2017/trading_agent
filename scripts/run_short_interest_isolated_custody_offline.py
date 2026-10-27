@@ -17,7 +17,7 @@ from data.hashing import canonical_json, hash_bytes, hash_payload
 from scripts import diagnose_short_interest_isolated_immutable_metadata as proof
 
 DRIVER = "scripts/run_short_interest_isolated_custody_offline.py"
-HARNESS_SHA256 = "3cd41ae6bcbcedb6cedd78d9f410fcd3c7706ff85191ffd68b134fc23d814fe5"
+HARNESS_SHA256 = "e0a428915e9da6a41500ba78583d9ff28db02fada0125b864069cdcff840a9b0"
 MAXIMUM_GIT_COMMANDS, MAXIMUM_INFO_COMMANDS = 20000, 12
 _INVOKED = False
 _ORIGINAL, _COUNTS, _ACTIVE, _FAILED = {}, {}, {}, {}
@@ -41,7 +41,7 @@ def require(value, code):
 def policy():
     require((MAXIMUM_GIT_COMMANDS, MAXIMUM_INFO_COMMANDS) == (20000, 12),
         "harness_registration_changed")
-    return {"schema": "si-isolated-custody-offline-harness-v3", "driver": DRIVER,
+    return {"schema": "si-isolated-custody-offline-harness-v4", "driver": DRIVER,
         "root": str(proof.base.previous.lane.ROOT), "branch": "codex/strategy-short-interest",
         "ref": "refs/heads/codex/strategy-short-interest", "code_paths": list(proof.code_paths()),
         "proof_protocol_sha256": proof.PROTOCOL_SHA256,
@@ -313,7 +313,7 @@ def _validate_result(result, seams, head, remote, manifest):
         "original_code_and_metadata_contexts_closed", "authority", "closed_at",
         "isolated_storage_closed_summary_sha256"}
     require(type(result) is dict and set(result) == fields
-        and result.get("schema") == "si-isolated-kernel-immutable-proof-closed-v3"
+        and result.get("schema") == "si-isolated-kernel-immutable-proof-closed-v4"
         and result.get("status") == "closed_offline_isolated_new_inode_only"
         and result.get("runtime_head") == head and result.get("actual_remote") == remote
         and result.get("code_manifest_sha256") == hash_payload(manifest)
@@ -373,7 +373,8 @@ def _failure(error):
         args = BaseException.args.__get__(error, BaseException)
         code = next((value for value in _CODES if args == ("REFUSED: " + value,)), None)
         return {"category": "offline_harness_refusal", "contract_code": code, "errno_name": None,
-            "storage_association": proof.storage.association_diagnostic()}
+            "storage_association": proof.storage.association_diagnostic(),
+            "entered_stage": proof.entered_stage()}
     return proof.failure_summary(error)
 
 
@@ -409,7 +410,7 @@ def main(argv=None):
     if type(values) not in (list, tuple) or len(values) != 2:
         print(canonical_json({"status": "refused", "failure": {"contract_code": "harness_arguments_refused"}}), flush=True)
         return 2
-    print(canonical_json({"status": "starting", "schema": "si-isolated-custody-offline-harness-v3"}), flush=True)
+    print(canonical_json({"status": "starting", "schema": "si-isolated-custody-offline-harness-v4"}), flush=True)
     try: result = run_once(values[0], values[1])
     except BaseException as error:
         result = {"status": "refused", "failure": _failure(error)}

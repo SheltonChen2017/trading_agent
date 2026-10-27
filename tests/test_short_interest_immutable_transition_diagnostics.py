@@ -2,8 +2,11 @@
 import ctypes
 import errno
 import os
+from pathlib import Path
 import socket
+import subprocess
 import sys
+import textwrap
 
 import pytest
 
@@ -343,3 +346,176 @@ def test_caller_state_cannot_issue_a_report_before_original_context_exit(h):
     state["report_raw"] = canonical_json({"SECRET": "arbitrary caller text", "observer_complete": True})
     with pytest.raises(transition.TransitionDiagnosticRefusal, match="not_closed"):
         observed.report()
+
+
+def test_real_bounded_unmatched_observer_has_no_audited_numeric_identity_keys(tmp_path):
+    # Original factory and unmatched original trace calls only. The child never
+    # enters observation or invokes a creator/native/source/proof operation.
+    tmp_path.chmod(0o700)
+    code = textwrap.dedent("""
+        import json, os, sys
+        from scripts import short_interest_immutable_transition_diagnostics as transition
+        fd = os.open(sys.argv[1], os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            observed = transition.observe_original_transition(directory_fd=fd, name=transition.NAME)
+        finally:
+            os.close(fd)
+        counts = {"numeric_id": 0, "frame_code": 0, "network": 0}
+        def audit(event, args):
+            if event == "builtins.id": counts["numeric_id"] += 1
+            if event == "object.__getattr__" and len(args) == 2 and args[1] == "f_code":
+                counts["frame_code"] += 1
+            if event.startswith("socket."):
+                counts["network"] += 1
+                raise RuntimeError("fixed_network_denied")
+        frame = sys._getframe()
+        sys.addaudithook(audit)
+        for unused in range(1000):
+            assert observed._trace(frame, "call", None) is None
+        print(json.dumps(counts, sort_keys=True))
+    """)
+    completed = subprocess.run([sys.executable, "-B", "-c", code, str(tmp_path)],
+        cwd=Path(__file__).resolve().parents[1], stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=10, check=False,
+        text=True, env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"})
+    assert completed.returncode == 0
+    import json
+    assert json.loads(completed.stdout) == {"numeric_id": 0, "frame_code": 1000, "network": 0}
+
+
+@pytest.mark.parametrize("attribute", ["__hash__", "__eq__"])
+def test_original_object_key_requires_exact_default_hash_and_equality(h, monkeypatch, attribute):
+    observed = h.observer()
+    called = []
+    def hostile(*args):
+        called.append(True)
+        raise RuntimeError("SECRET hostile object method")
+    monkeypatch.setattr(transition.ImmutableTransitionDiagnostic, attribute, hostile)
+    with pytest.raises(transition.TransitionDiagnosticRefusal, match="binding_changed"):
+        observed._state()
+    assert called == []
+
+
+@pytest.mark.parametrize("attribute", ["__hash__", "__eq__"])
+def test_factory_refuses_changed_object_hash_or_equality_before_registration(h, monkeypatch, attribute):
+    before = len(transition._MINTED)
+    monkeypatch.setattr(transition.ImmutableTransitionDiagnostic, attribute, lambda *args: 0)
+    with pytest.raises(transition.TransitionDiagnosticRefusal, match="binding_changed"):
+        h.observer()
+    assert len(transition._MINTED) == before and not h.path.exists()
+
+
+@pytest.mark.parametrize("attribute", ["__hash__", "__eq__", "_identity"])
+def test_terminal_identity_tamper_never_hashes_hostile_object_and_restores_trace(h, monkeypatch, attribute):
+    observed = h.observer()
+    with pytest.raises(transition.TransitionDiagnosticRefusal, match="binding_changed"):
+        with observed:
+            with h.prepare() as cap:
+                cap.seal_once()
+            if attribute == "_identity":
+                observed._identity = object()
+            else:
+                def hostile(*args):
+                    raise AssertionError("hostile identity method was invoked")
+                monkeypatch.setattr(transition.ImmutableTransitionDiagnostic, attribute, hostile)
+    assert sys.gettrace() is None
+
+
+def test_caught_identity_fault_is_permanently_latched_after_public_identity_reset(h):
+    observed = h.observer()
+    identity = observed._identity
+    with pytest.raises(transition.TransitionDiagnosticRefusal, match="binding_changed"):
+        with observed:
+            with h.prepare() as cap:
+                cap.seal_once()
+            observed._identity = object()
+            try:
+                with pytest.raises(transition.TransitionDiagnosticRefusal, match="binding_changed"):
+                    observed._state()
+            finally:
+                observed._identity = identity
+            observed._state()["observer_failure"] = None
+    assert observed.report()["diagnostic"]["observer_complete"] is False
+    assert sys.gettrace() is None
+
+
+def test_complete_original_report_cannot_survive_caught_post_exit_identity_reset(h):
+    observed = h.observer()
+    with observed:
+        with h.prepare() as cap:
+            cap.seal_once()
+    identity = observed._identity
+    observed._identity = object()
+    with pytest.raises(transition.TransitionDiagnosticRefusal, match="binding_changed"):
+        observed.report()
+    observed._identity = identity
+    with pytest.raises(transition.TransitionDiagnosticRefusal, match="not_closed"):
+        observed.report()
+
+
+def test_unregistered_exact_or_unknown_type_cannot_adopt_an_observer_identity(h):
+    original = h.observer()
+    unregistered = object.__new__(transition.ImmutableTransitionDiagnostic)
+    unregistered._identity = original._identity
+    class Unknown:
+        _identity = original._identity
+        def __hash__(self):
+            raise AssertionError("unknown object was hashed")
+        def __eq__(self, other):
+            raise AssertionError("unknown object was compared")
+    for value in (unregistered, Unknown()):
+        with pytest.raises(transition.TransitionDiagnosticRefusal, match="binding_changed"):
+            transition.ImmutableTransitionDiagnostic._state(value)
+    assert original._state()["entered"] is False and sys.gettrace() is None
+
+
+@pytest.mark.parametrize("key", ["observer_failure", "tracer", "native_calls", "after_callbacks"])
+def test_original_state_key_deletion_restores_trace_and_never_issues_a_report(h, key):
+    observed = h.observer()
+    with pytest.raises(transition.TransitionDiagnosticRefusal, match="observer_error"):
+        with observed:
+            with h.prepare() as cap:
+                cap.seal_once()
+            del observed._state()[key]
+    assert sys.gettrace() is None
+    with pytest.raises(transition.TransitionDiagnosticRefusal, match="not_closed"):
+        observed.report()
+
+
+@pytest.mark.parametrize("failure", ["PRIVATE_SECRET_PATH", 17, False, ["PRIVATE_SECRET_PATH"]])
+def test_mutable_failure_value_is_fixed_before_latch_or_original_report(h, failure):
+    observed = h.observer()
+    with pytest.raises(transition.TransitionDiagnosticRefusal, match="observer_error"):
+        with observed:
+            with h.prepare() as cap:
+                cap.seal_once()
+            observed._state()["observer_failure"] = failure
+    value = observed.report()["diagnostic"]
+    assert value["observer_failure"] == "transition_observer_error"
+    assert value["observer_complete"] is False and "PRIVATE_SECRET_PATH" not in canonical_json(value)
+    assert sys.gettrace() is None
+
+
+def test_direct_failure_latch_rejects_uncontrolled_text_without_losing_prior_literal(h):
+    observed = h.observer()
+    with pytest.raises(transition.TransitionDiagnosticRefusal, match="observer_lost"):
+        with observed:
+            with h.prepare() as cap:
+                cap.seal_once()
+            observed._fail("transition_observer_lost")
+            observed._fail("PRIVATE_SECRET_PATH")
+    value = observed.report()["diagnostic"]
+    assert value["observer_failure"] == "transition_observer_lost"
+    assert "PRIVATE_SECRET_PATH" not in canonical_json(value) and sys.gettrace() is None
+
+
+def test_direct_invalid_failure_latch_issues_only_fixed_error(h):
+    observed = h.observer()
+    with pytest.raises(transition.TransitionDiagnosticRefusal, match="observer_error"):
+        with observed:
+            with h.prepare() as cap:
+                cap.seal_once()
+            observed._fail("PRIVATE_SECRET_PATH")
+    value = observed.report()["diagnostic"]
+    assert value["observer_failure"] == "transition_observer_error"
+    assert "PRIVATE_SECRET_PATH" not in canonical_json(value) and sys.gettrace() is None

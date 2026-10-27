@@ -18,8 +18,13 @@ WRAPPER = "scripts/run_short_interest_isolated_custody_offline.py"
 NAME = base.NAME
 INNER_DIRECTORY = "proof"
 MAXIMUM_SECONDS, HOLD_SECONDS = 420, 5
-PROTOCOL_SHA256 = "0e334f0018fad61e35a1b8b211a1c0a72834e566eb822ad41325c1b13756d03a"
+PROTOCOL_SHA256 = "9f2ede233644be5294b53a8031a3159a813d01609c1021bdc87f330cf1474752"
 _LAST_TRANSITION = None
+_LAST_STAGE = "not_entered"
+_STAGES = frozenset("""not_entered registration code_context_open storage_context_open
+output_context_open immutable_context_open metadata_sealing metadata_checking
+metadata_challenges metadata_hold original_code_context_exit metadata_context_exit
+volume_context_exit terminal_original_audits closed""".split())
 _CODES = frozenset("""isolated_proof_registration_changed isolated_proof_driver_changed
 isolated_proof_manifest_changed isolated_proof_code_changed isolated_proof_deadline
 isolated_proof_result_missing isolated_proof_output_not_ignored
@@ -44,8 +49,8 @@ def code_paths():
 
 
 def protocol():
-    return {"schema": "si-isolated-kernel-immutable-proof-policy-v3",
-        "decision": "SI-DEC-20261027-02", "authority_id": "SI-AUTH-20261026-02",
+    return {"schema": "si-isolated-kernel-immutable-proof-policy-v4",
+        "decision": "SI-DEC-20261027-03", "authority_id": "SI-AUTH-20261026-02",
         "driver": DRIVER, "offline_harness": WRAPPER, "storage_policy_sha256": hash_payload(storage.policy()),
         "original_immutable_policy_sha256": hash_payload(base.immutable.policy()),
         "original_observer_policy_sha256": hash_payload(base.transition.policy()),
@@ -57,6 +62,8 @@ def protocol():
         "required_errno": "EPERM", "old_evidence_reopened": False,
         "original_seal_checks_unchanged": True,
         "storage_refusal_projection": "original_attach_and_selected_info_hashes_exact_device_mount_join_and_field_names_only",
+        "metadata_boundary": "original_volume_check_with_its_two_fresh_pre_post_lane_and_full_code_callbacks_no_immediate_third_duplicate",
+        "failure_stage": "fixed_entered_stage_may_include_callback_or_cleanup_not_forensic_cause",
         "closure": "original_metadata_output_code_exits_then_volume_exit_fresh_final_committed_code_original_seal_and_original_volume_audits",
         "code_paths": list(code_paths()), "authority": authority()}
 
@@ -72,11 +79,16 @@ def failure_summary(error):
     else:
         result = base._failure_summary(error)
     result["storage_association"] = storage.association_diagnostic()
+    result["entered_stage"] = entered_stage()
     if _LAST_TRANSITION is not None:
         try: result["native_transition"] = _LAST_TRANSITION.report()
         except base.transition.TransitionDiagnosticRefusal:
             result["native_transition"] = {"status": "no_closed_observer_report"}
     return result
+
+
+def entered_stage():
+    return _LAST_STAGE if type(_LAST_STAGE) is str and _LAST_STAGE in _STAGES else "not_entered"
 
 
 def _code(root, guard, mapping, held):
@@ -89,8 +101,9 @@ def _code(root, guard, mapping, held):
 
 
 def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest):
-    global _LAST_TRANSITION
+    global _LAST_TRANSITION, _LAST_STAGE
     _LAST_TRANSITION = None
+    _LAST_STAGE = "registration"
     began, last_tick = time.monotonic(), [None]
     started = base.previous.prior._utc_now()
     started_clock = base.previous.count.old.parallel.clock(started)
@@ -110,47 +123,62 @@ def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest)
     guard.refresh(); window()
     raw, held_live, fd, result = base.previous.metadata_bytes(), [True], None, None
     with ExitStack() as code_stack:
+        _LAST_STAGE = "code_context_open"
         held = code_stack.enter_context(base.previous.count.old.cache.HeldFiles(
             tuple(root / name for name in code_paths()), protected=False, boundary=guard.check))
         identity = _code(root, guard, complete_code_manifest, held); window()
         def storage_boundary():
             guard.check(); window()
             if held_live[0]: held.check()
+        _LAST_STAGE = "storage_context_open"
         with storage.prepare_registered_volume(root, boundary=storage_boundary) as volume:
             target = volume.mountpoint / INNER_DIRECTORY
             require(base.previous.count.old.cache._git(root, ["check-ignore", str(target)], guard).strip()
                 == str(target).encode(), "isolated_proof_output_not_ignored")
+            _LAST_STAGE = "output_context_open"
             with base.previous.prior._OwnedOutput(
                     base.previous.prior._prepare_capture_directory(target), guard.check) as owned:
                 directory_stamp, parent_stamp = owned._anchor[4:6]
                 def boundary():
-                    storage_boundary(); volume.check()
+                    # The ORIGINAL volume check invokes storage_boundary
+                    # before parent checks and after mount checks. Preserve
+                    # both fresh lane/full-code sweeps; no extra duplicate
+                    # check belongs before this already bracketed operation.
+                    volume.check()
                 try:
                     with base.transition.observe_original_transition(directory_fd=owned._anchor[2], name=NAME,
                             proof_binding=(base.require, base.ImmutableProofRefusal, base._CODES)) as diagnostic:
                         _LAST_TRANSITION = diagnostic
+                        _LAST_STAGE = "immutable_context_open"
                         with base.immutable.prepare_owned_immutable_metadata(owned, NAME, raw,
                                 parent=False, boundary=boundary) as capability:
-                            capability.seal_once(); capability.check()
+                            _LAST_STAGE = "metadata_sealing"
+                            capability.seal_once()
+                            _LAST_STAGE = "metadata_checking"
+                            capability.check()
                             expected = capability.observation()["seal_stamp_sha256"]
                             fd = os.open(NAME, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK,
                                 dir_fd=owned._anchor[2])
                             base._original(fd, owned, expected, raw)
+                            _LAST_STAGE = "metadata_challenges"
                             challenges = base._challenge(fd, owned)
+                            _LAST_STAGE = "metadata_hold"
                             until = window() + HOLD_SECONDS
                             while window() < until:
                                 time.sleep(.25); capability.check()
                                 base._original(fd, owned, expected, raw); window()
                             _code(root, guard, complete_code_manifest, held); window()
+                            _LAST_STAGE = "original_code_context_exit"
                             code_stack.close()
                             held_live[0] = False
                             capability.check(); guard.refresh(); window()
+                            _LAST_STAGE = "metadata_context_exit"
                         closed = capability.closed_summary()
                         base._original(fd, owned, expected, raw); boundary()
                     trace_report = diagnostic.report()
                     require(trace_report["diagnostic"]["observer_complete"] is True,
                         "isolated_proof_result_missing")
-                    result = {"schema": "si-isolated-kernel-immutable-proof-closed-v3",
+                    result = {"schema": "si-isolated-kernel-immutable-proof-closed-v4",
                         "status": "closed_offline_isolated_new_inode_only", "runtime_head": runtime_head,
                         "actual_remote": actual_remote, "code_identity_sha256": identity,
                         "code_manifest_sha256": hash_payload(complete_code_manifest),
@@ -169,8 +197,10 @@ def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest)
             window()
             base._after_all_closes(target, directory_stamp, parent_stamp, expected, raw, guard)
             volume.check(); window()
+            _LAST_STAGE = "volume_context_exit"
         # Native storage/retained-FD context exit must itself succeed. Never
         # accept a provisional synthetic result or choose a new evidence seal.
+        _LAST_STAGE = "terminal_original_audits"
         volume.check_after_close()
         storage_summary = volume.closed_summary()
         with base.previous.count.old.cache.HeldFiles(tuple(root / name for name in code_paths()),
@@ -185,4 +215,5 @@ def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest)
     result["closed_at"] = closed_at
     result["isolated_storage_closed_summary_sha256"] = hash_payload(storage_summary)
     window()
+    _LAST_STAGE = "closed"
     return result

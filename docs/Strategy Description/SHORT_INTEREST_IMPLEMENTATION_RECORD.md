@@ -11,7 +11,9 @@ IMMUTABLE FLAG THEN OBSERVED ITS LOSS; ACTOR AND HISTORICAL CAUSE UNKNOWN.
 NEW SOURCE RECOVERY REMAINS HELD.
 ISOLATED V1 REFUSED INITIALIZATION WITHOUT CREATING ITS NAMESPACE;
 V2 CREATED/ATTACHED ITS EMPTY SYNTHETIC IMAGE BUT REFUSED ASSOCIATION BEFORE
-ANY PROBE FILE; ITS IMAGE/MOUNT ARE PRESERVED. STORAGE CLOSURE IS UNPROVED.
+ANY PROBE FILE; ITS IMAGE/MOUNT ARE PRESERVED. ISOLATED V3 REACHED ORIGINAL
+NATIVE FLAGS0->2 WITHOUT RECORDED LOSS, THEN REFUSED THE UNCHANGED8SECOND
+CREATOR WINDOW BEFORE WRITE CHALLENGE. NO STORAGE CLOSURE IS PROVED.
 CLAUDE REVIEW COVERS b648f60..730c59c, NOT THE LATER LOCAL3B0 DIAGNOSTIC COMMIT.
 LATEST OWNER REPORTS QC/SAFARI OCCUPIED: QUANTCONNECT PAUSED BY OWNER
 INCLUDING CAPACITY/METADATA; NO SAFARI, MIA, QC SETUP, UPLOAD, COMPILE OR JOB.
@@ -24442,3 +24444,165 @@ vetoes positives. Authenticate and append actual disposition before another
 bounded step. No interim push or source request/claim follows by inference.
 The84,005 cumulative START/4GiB ceilings and13,992START/23,452,681byte baseline
 remain unchanged; current pre-QC readiness is FALSE.
+
+### 128.11 Actual isolated V3 window refusal and readonly causal profiling
+
+Checkpoint `71b9261ac993e62690ea839790324655a2628a0f` was clean at matching
+actual/tracking originD6AF. ONE V3 execution5500 terminated **exit2** with
+new_metadata_window_exhausted, original creator role/creator__tick phase.
+Original trace was complete, native call1 returned0, original FD/name flags
+were0 before and2 immediately afterward and in the recorded callback sample;
+classification required_flags_observed_without_recorded_loss. That finite
+observation is NOT a seal, completed challenge, later stability guarantee or
+historical actor/cause attribution. Diagnostic SHA256
+`249721a86b4330bc509b92358ba3d817faec5fea1a2e5c96a2ffd144b2a15db7`.
+No genuine metadata/storage/proof closed result was returned.
+
+Original issued association now establishes5 attach/5 info entities, exact
+unique mounted device/mount, one matching image, device subset TRUE and
+fixed mount TRUE. Only volume-kind differs; raw/parsed response origins stay
+distinct. Attach raw SHA
+`ba3a98c2f07a1353561687f6c4fbcddb201b89c330a3ec359cc783c0b7a07a74`;
+info raw SHA
+`a45338271f37d0337b4ea1584b6d504fe60667b0f7ad333f63f341b909aabac1`.
+This verifies V3's semantic association correction, not the unpersisted
+specific V2 mismatch. Genuine harness counters: Git712, create1/attach1,
+info4/null_stream6, probe_create1/write_challenge0; all nine denied counters0,
+failure_latched=false. No source/key/provider/claim/START/charged-byte action.
+
+Main independently read ONLY the original V3 synthetic186-byte member after
+known termination: bytes match SHA
+`12ae326d30644e70437533d333360dc75e1fb9d72f8e6c6edaa93917ff7b7404`,
+FD/name before/after nine-field observations agree, current flags2,
+currentUID0600/singlelink and fixed membership TRUE; original mounted root
+is0700. Current observed stamp SHA
+`4d497e090b6fd172bb7a7812d30c26363552fbf78240abff14e74134ea20453e`
+is expressly NOT an original issued seal. Preserve this flagged inode/image/
+mount forever; never unlock/adopt/reseal/retry it or enlarge the8second limit.
+
+Bounded readonly code-boundary profile90184 exited0, no image/probe/native/
+source action. It authenticated all64 original committed code files under
+the ORIGINAL audit handler and denied source/key/network entry seams. Whole
+observed window7852.714ms; three original64-FD sweeps8.088ms, three fresh
+lane checks171.707ms, three combined storage boundaries93.297ms;100 benign
+events6.558ms. These separate measurements are observations, not identical
+workload timings or an exact reconstruction of the expired creator call.
+All denials0, Git597, all image/probe command counters0.
+
+A second finite CODE-ONLY profile exited0 without entering the observer or
+creating any inode/native/source call. Its ORIGINAL factory-issued unentered
+observer processed1,000 unrelated frame calls:1,000 audited builtins.id plus
+1,000 f_code accesses, both with and without the full original audit handler.
+Without that handler1.783ms; with it95.215ms. Every external counter0 and
+sys tracing stayed None; no observer closure was issued. This verifies an
+avoidable audit-work multiplier, NOT the precise actual8second failure cause.
+Internal peer also proved a consecutive orchestration duplicate: one new
+driver metadata boundary explicitly checked source/code, then original
+volume.check did the same fresh check before parent checks and again after
+mount checks. All old creator/immutable/volume predicates remain binding.
+
+### 128.12 Prospective V4 removes instrumentation overhead, never predicates
+
+**SI-DEC-20261027-03**, continuing SI-AUTH-20261026-02, registers a prospective
+NONCLAIM V4 only after verified causal corrections, focused validation and
+new clean committed64-file identity. It uses exclusively new namespace
+isolated-custody-20261027-v4 / SI_OFFLINE_CUSTODY_V4; all failed V1/V2/V3
+names/evidence remain retired and untouched. No V4 operation runs here.
+8second creator limit,16 samples/.25second/1second quiet,5second checked hold,
+300/420second successful-closure windows and every original file/flag/byte/
+native/challenge/code/volume/source/terminal check remain unchanged.
+
+**SI-BUILD-20261027-007 (P2, instrumentation composition):** prospectively
+replace observer numeric-id registry keys with retained ORIGINAL object keys
+and exact type/default object hash/equality guards, preserving every original
+trace/state/identity/failure/issuance/native/code predicate. Never filter out a
+trace event, cache a policy/admission result, sample checks or reset failure.
+Tampered hash/equality must not prevent guaranteed original tracing cleanup;
+terminal identity lookup and the original private nonce preserve refusal.
+The old observer bytes remain in71B9. Original creator/immutable helpers and
+source code are not changed. Author's real-child audit-ID and identity-method
+counterexamples were RED **5failed/21deselected/.69s** before the correction:
+the child observed1,000 builtins.id events with no native/source/image call.
+
+**SI-BUILD-20261027-008 (P3, equivalent orchestration):** new driver boundary
+now calls ORIGINAL volume.check directly. That exact helper still performs
+both fresh lane/full64-code sweeps before filesystem-parent checks and after
+mount checks, with no intervening side effect before its first callback.
+Only the immediately duplicated third sweep is removed; no old helper check
+or meaningful pre/post boundary is removed. Main's corrected composed test
+was RED **1failed/2.89s**, observing3 fresh callbacks instead of2; the fake
+volume now models BOTH original callbacks explicitly. Its first development
+assertion was placed before native entry and was masked by the expected
+missing-native observer refusal (1failed/.50s); move that assertion after
+the full fabricated composition, without relaxing production behavior.
+
+Fixed entered-stage diagnostics distinguish immutable-context opening,
+sealing, challenges, hold and terminal exits. They may include callbacks or
+cleanup and do NOT identify forensic cause. No arbitrary exception/path/type
+value is projected. New schemas/pins and validation must be appended before
+any prospective dispatch. No new source/claim/START/charge, readiness or QC
+authority follows from these optimizations; every budget remains intact.
+
+**SI-BUILD-20261027-009 (P2, terminal exception safety)** and
+**SI-BUILD-20261027-010 (P2, fixed failure projection):** peer found original
+mutable-state reads before the new terminal restoration finally, and an
+unvalidated public observer_failure value could enter issued diagnostics.
+Author's causal group was RED **9failed/1passed/.77s**. The outermost finally
+now covers original-record lookup and ALL terminal prechecks; report-building
+errors occur after trace restoration and permanently refuse without creating
+missing state or issuing a replacement report. Only exact own literal failure
+codes may enter the original nonce latch/report. Invalid text/types become
+transition_observer_error; the first genuine failure is never reset/refunded.
+Final author selection **42passed/1.19s**, OS network denied, compile/diff clean
+and AST numeric-id calls0. The bounded original-factory unmatched-frame child
+now reports numeric-ID0 / f_code1000 / network0; no observer entry, native,
+creator, image, source or positive closure. Earlier32/1.01s and32/.92s were
+pre-009/010 executions. Author's first system-Python pytest request could not
+start because pytest was unavailable there; no tests ran, then the designated
+venv was used. Main read all final observer code and tests; final complete
+focused validation follows. Main's prior two-file composition/observer run
+passed52/16.13s BEFORE009/010 and is not their final validation.
+
+### 128.13 Frozen V4 software and one prospective proof
+
+Main's final fresh-process focused selection (same eleven files plus three
+named active-document checks) passed **388/30.49s**, no skips/warnings, empty
+inherited environment and OS network denied. This includes the preserved
+full fabricated composition with both original volume callbacks, all native/
+flag/seal/late-code/terminal-context negatives, observer cleanup/identity/
+projection regressions and both byte-exact126 histories. Exact transitive AST
+closure64,64-source/four-test in-memory compile, all four new-module literal
+catalogues, no numeric-id calls in wrapper/observer and whitespace passed.
+No full lane/repository suite was run. Main read every changed production
+line/test. Independent read-only peer accepted007..010 and the driver
+deduplication/fixed stages after correction; no peer execution or Claude
+review is claimed. All development agents and test sessions are now frozen.
+
+Proof protocol SHA256
+`9f2ede233644be5294b53a8031a3159a813d01609c1021bdc87f330cf1474752`;
+storage policy
+`01324efff1707caa563654513aed455ed094109abd23e381168e686dfdbe4069`;
+observer policy
+`2e0a9a1310e545bcfd4b86c3aecd4ce51d706f32388cd53858e578920bf1c5a5`;
+harness policy
+`e0a428915e9da6a41500ba78583d9ff28db02fada0125b864069cdcff840a9b0`.
+Exact64-path list remains
+`0be79b48af5c30bbe96cc52fee3ca3f1561a7f03b7de658cb5b953272f6e0922`;
+complete64-current-byte mapping
+`15d7fd4e45341dbaf9b972d44e4b4c55265ddb73042af1dc7f2f80d5cb2bbf5a`.
+The observer changes its policy to v2 while retaining report schema v1;
+isolated storage/proof/harness schemas are v4. Original creator/immutable/
+source bytes remain unchanged; no new secret reader or source authority.
+
+No V4 actual operation has run at this entry. Record-only checks and exact
+physical/Git roots/branch/HEAD/status plus matching tracking/actual originD6AF
+precede a new local checkpoint. Then require wholly absent V4 namespace and
+ONE registered CLI dispatch at that exact new HEAD/remote. No authoring,
+tests, commit or push while active. Require genuine original complete proof
+AND process exit0; any negative/nonzero/unknown closure dominates. No old
+file/mount is retried/adopted, no limit is lengthened and no source budget is
+spent to diagnose storage. Preserve all actual outputs and append the true
+terminal result before any next bounded step. The ONE final matching push
+remains deferred to true local pre-QC readiness or a concrete irreducible
+blocker. All source/claim/START/charge/outcome/QC counters in this round0;
+count baseline13,992START/23,452,681chargedbytes and84,005/4GiB caps unchanged.

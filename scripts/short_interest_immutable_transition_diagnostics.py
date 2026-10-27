@@ -22,8 +22,8 @@ MAXIMUM_EVENTS = 32768
 _NATIVE = immutable._native_set
 _NATIVE_CODE = _NATIVE.__code__
 _MINTED = {}
-_FAILED = {}  # Independent first observer fault; mutable state cannot reset it.
-_ISSUED = {}  # Only the original context exit may issue canonical report bytes.
+_FAILED = {}  # Original plain-object nonce keys survive hostile observer hash changes.
+_ISSUED = {}  # Original nonce keys; only context exit may issue canonical bytes.
 _ERRNOS = {getattr(errno, name): name for name in (
     "EACCES", "EPERM", "EBADF", "EINVAL", "EIO", "ENOSYS", "ENOTSUP", "EOPNOTSUPP")
     if hasattr(errno, name)}
@@ -52,13 +52,17 @@ def authority():
 
 
 def policy():
-    return {"schema": "si-immutable-transition-diagnostic-policy-v1", "name": NAME,
+    return {"schema": "si-immutable-transition-diagnostic-policy-v2", "name": NAME,
         "maximum_native_calls": 1, "maximum_controlled_refusals": MAXIMUM_REFUSALS,
         "maximum_trace_events": MAXIMUM_EVENTS, "bytes": 186,
         "original_native_and_checks_replaced": False, "native_observation":
         "original_call_return_immediate_readonly_FD_and_fixed_name_before_callbacks",
         "trace_entry": "original_sys_gettrace_None", "trace_exit": "restore_original_None",
         "permanent_observer_failure_latch": True,
+        "registry_keys": "retained_original_observers_default_object_hash_equality_and_original_plain_object_nonces_no_numeric_id",
+        "terminal_identity_failure": "finite_retained_record_identity_scan_and_unconditional_trace_restore_no_hostile_hash_or_equality",
+        "corrupt_state": "all_terminal_reads_covered_by_trace_restoration_missing_state_fixed_refusal_no_report_reconstruction",
+        "failure_projection": "fixed_own_literal_codes_only_first_genuine_nonce_failure_preserved",
         "report_issuance": "original_context_exit_only_independent_canonical_bytes",
         "old_evidence_opened": False, "authority": authority()}
 
@@ -134,6 +138,25 @@ def _proof_binding(binding, phases, catalogues):
     catalogues.append((cls, codes, "proof"))
 
 
+def _identity_methods(value):
+    return (type(value) is ImmutableTransitionDiagnostic
+        and ImmutableTransitionDiagnostic.__hash__ is object.__hash__
+        and ImmutableTransitionDiagnostic.__eq__ is object.__eq__)
+
+
+def _retained_record(value):
+    # Error/terminal path only. Never hash or compare a possibly tampered
+    # observer, and never adopt a replacement public identity or registry key.
+    for record in _MINTED.values():
+        if type(record) is tuple and len(record) == 3 and record[0] is value:
+            return record
+    return None
+
+
+def _failure_code(value):
+    return value if type(value) is str and value in _CODES else "transition_observer_error"
+
+
 class ImmutableTransitionDiagnostic(AbstractContextManager):
     __slots__ = ("_identity",)
 
@@ -141,15 +164,26 @@ class ImmutableTransitionDiagnostic(AbstractContextManager):
         raise TransitionDiagnosticRefusal("REFUSED: transition_factory_required")
 
     def _state(self):
-        record = _MINTED.get(id(self))
-        require(type(self) is ImmutableTransitionDiagnostic and type(record) is tuple
-            and record[0] is self and record[1] is self._identity, "transition_binding_changed")
+        record = _MINTED.get(self) if _identity_methods(self) else None
+        try:
+            identity = object.__getattribute__(self, "_identity")
+        except AttributeError:
+            identity = None
+        if (type(record) is not tuple or len(record) != 3
+                or record[0] is not self or record[1] is not identity):
+            ImmutableTransitionDiagnostic._fail(self, "transition_binding_changed")
+            raise TransitionDiagnosticRefusal("REFUSED: transition_binding_changed")
         return record[2]
 
     def _fail(self, code):
-        record = _MINTED.get(id(self))
-        if type(record) is tuple and record[0] is self:
-            _FAILED.setdefault(id(self), (self, record[1], code))
+        record = _retained_record(self)
+        if record is not None:
+            previous = _FAILED.get(record[1])
+            if previous is None:
+                _FAILED[record[1]] = self, record[1], _failure_code(code)
+            elif not (type(previous) is tuple and len(previous) == 3 and previous[0] is self
+                    and previous[1] is record[1] and type(previous[2]) is str and previous[2] in _CODES):
+                _FAILED[record[1]] = self, record[1], "transition_observer_error"
 
     def __enter__(self):
         state = self._state()
@@ -246,70 +280,89 @@ class ImmutableTransitionDiagnostic(AbstractContextManager):
         require(state["events"] <= MAXIMUM_EVENTS, "transition_observer_overflow")
 
     def __exit__(self, kind, error, traceback):
-        # Restore tracing even if the caller replaced the public identity slot.
-        record = _MINTED.get(id(self))
-        if type(record) is not tuple or record[0] is not self:
-            sys.settrace(None)
-            raise TransitionDiagnosticRefusal("REFUSED: transition_binding_changed")
-        state = record[2]
-        latched = _FAILED.get(id(self))
-        failure = latched[2] if type(latched) is tuple and latched[0] is self and latched[1] is record[1] else state["observer_failure"]
+        # Restore tracing even if public identity/hash/equality were replaced.
         try:
-            identity = object.__getattribute__(self, "_identity")
-        except AttributeError:
-            identity = None
-        if identity is not record[1]:
-            failure = failure or "transition_binding_changed"
-        if sys.gettrace() is not state["tracer"]:
-            failure = failure or "transition_observer_lost"
-        if immutable._native_set is not _NATIVE or immutable._native_set.__code__ is not _NATIVE_CODE:
-            failure = failure or "transition_original_code_changed"
-        if threading.get_ident() != state["thread"]:
-            failure = failure or "transition_wrong_thread"
-        if state["native_calls"] != 1 or state["immediate_after_native"] is None:
-            failure = failure or "transition_missing_native_observation"
-        sys.settrace(None)
-        if failure is not None:
-            self._fail(failure)
-        state["observer_failure"] = failure
-        state["closed"] = True
-        immediate = state["immediate_after_native"]
-        classification = "no_complete_native_observation"
-        if immediate is not None:
-            target = 2 if state["before_native"]["fd_flags"] == 0 else 66
-            if immediate["fd_flags"] != immediate["name_flags"]:
-                classification = "immediate_original_fd_name_flags_disagree"
-            elif immediate["fd_flags"] != target:
-                classification = "required_flags_absent_at_immediate_observation"
-            elif any(row["fd_flags"] != target or row["name_flags"] != target for row in state["after_callbacks"]):
-                classification = "required_flags_observed_then_lost"
-            else:
-                classification = "required_flags_observed_without_recorded_loss"
-        report = {"schema": "si-immutable-transition-diagnostic-v1", "observer_complete": failure is None,
-            "observer_failure": failure, "native_call_count": state["native_calls"],
-            "native_result": state["native_result"], "native_errno_name": state["native_errno_name"],
-            "before_native": state["before_native"], "immediate_after_native": immediate,
-            "after_callbacks": state["after_callbacks"], "classification": classification,
-            "first_controlled_refusal": state["refusals"][0] if state["refusals"] else None,
-            "controlled_refusals": state["refusals"], "policy_sha256": hash_payload(policy()),
-            "authority": authority()}
-        state["report_raw"] = canonical_json(report)
-        _ISSUED[id(self)] = self, record[1], state["report_raw"]
+            record = _retained_record(self)
+            require(record is not None, "transition_binding_changed")
+            state = record[2]
+            latched = _FAILED.get(record[1])
+            require(latched is None or (type(latched) is tuple and len(latched) == 3
+                and latched[0] is self and latched[1] is record[1]), "transition_binding_changed")
+            raw_failure = latched[2] if latched is not None else state["observer_failure"]
+            failure = None if raw_failure is None else _failure_code(raw_failure)
+            try:
+                identity = object.__getattribute__(self, "_identity")
+            except AttributeError:
+                identity = None
+            if not _identity_methods(self) or identity is not record[1]:
+                failure = failure or "transition_binding_changed"
+            if sys.gettrace() is not state["tracer"]:
+                failure = failure or "transition_observer_lost"
+            if immutable._native_set is not _NATIVE or immutable._native_set.__code__ is not _NATIVE_CODE:
+                failure = failure or "transition_original_code_changed"
+            if threading.get_ident() != state["thread"]:
+                failure = failure or "transition_wrong_thread"
+            if state["native_calls"] != 1 or state["immediate_after_native"] is None:
+                failure = failure or "transition_missing_native_observation"
+        except BaseException as observed_error:
+            controlled = _controlled(observed_error, [(TransitionDiagnosticRefusal, _CODES, "observer")])
+            fixed = controlled[1] if controlled is not None else "transition_observer_error"
+            ImmutableTransitionDiagnostic._fail(self, fixed)
+            raise TransitionDiagnosticRefusal("REFUSED: " + fixed) from None
+        finally:
+            sys.settrace(None)
+        try:
+            if failure is not None:
+                ImmutableTransitionDiagnostic._fail(self, failure)
+            state["observer_failure"] = failure
+            state["closed"] = True
+            immediate = state["immediate_after_native"]
+            classification = "no_complete_native_observation"
+            if immediate is not None:
+                target = 2 if state["before_native"]["fd_flags"] == 0 else 66
+                if immediate["fd_flags"] != immediate["name_flags"]:
+                    classification = "immediate_original_fd_name_flags_disagree"
+                elif immediate["fd_flags"] != target:
+                    classification = "required_flags_absent_at_immediate_observation"
+                elif any(row["fd_flags"] != target or row["name_flags"] != target for row in state["after_callbacks"]):
+                    classification = "required_flags_observed_then_lost"
+                else:
+                    classification = "required_flags_observed_without_recorded_loss"
+            report = {"schema": "si-immutable-transition-diagnostic-v1", "observer_complete": failure is None,
+                "observer_failure": failure, "native_call_count": state["native_calls"],
+                "native_result": state["native_result"], "native_errno_name": state["native_errno_name"],
+                "before_native": state["before_native"], "immediate_after_native": immediate,
+                "after_callbacks": state["after_callbacks"], "classification": classification,
+                "first_controlled_refusal": state["refusals"][0] if state["refusals"] else None,
+                "controlled_refusals": state["refusals"], "policy_sha256": hash_payload(policy()),
+                "authority": authority()}
+            state["report_raw"] = canonical_json(report)
+            _ISSUED[record[1]] = self, record[1], state["report_raw"]
+        except BaseException:
+            ImmutableTransitionDiagnostic._fail(self, "transition_observer_error")
+            raise TransitionDiagnosticRefusal("REFUSED: transition_observer_error") from None
         if failure is not None:
             raise TransitionDiagnosticRefusal("REFUSED: " + failure) from None
         return False
 
     def report(self):
         state = self._state()
-        issued = _ISSUED.get(id(self))
+        record = _MINTED[self]
+        issued = _ISSUED.get(record[1])
         require(type(issued) is tuple and issued[0] is self and issued[1] is self._identity
             and state["closed"] is True and state["report_raw"] is issued[2]
             and type(issued[2]) is str, "transition_not_closed")
         report = json.loads(state["report_raw"])
+        latched = _FAILED.get(record[1])
+        require(latched is None or (type(latched) is tuple and latched[0] is self
+            and latched[1] is record[1] and report["observer_complete"] is False
+            and report["observer_failure"] == latched[2]), "transition_not_closed")
         return {"diagnostic": report, "diagnostic_sha256": hash_payload(report)}
 
 
 def observe_original_transition(*, directory_fd, name, proof_binding=None):
+    require(ImmutableTransitionDiagnostic.__hash__ is object.__hash__
+        and ImmutableTransitionDiagnostic.__eq__ is object.__eq__, "transition_binding_changed")
     require(type(directory_fd) is int and type(name) is str and name == NAME,
         "transition_arguments_refused")
     info = os.fstat(directory_fd)
@@ -333,5 +386,5 @@ def observe_original_transition(*, directory_fd, name, proof_binding=None):
         "immediate_after_native": None, "after_callbacks": [], "native_result": "unavailable_or_invalid",
         "native_errno_name": None, "refusals": [], "seen_errors": [],
         "observer_failure": None, "report_raw": None}
-    _MINTED[id(value)] = value, value._identity, state
+    _MINTED[value] = value, value._identity, state
     return value

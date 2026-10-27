@@ -13,8 +13,9 @@ from test_short_interest_immutable_metadata_diagnostic import Harness, deny_exte
 
 
 class Volume:
-    def __init__(self, h):
+    def __init__(self, h, source_boundary):
         self.h, self.phase, self.events = h, "LIVE", []
+        self.source_boundary = source_boundary
         self.mountpoint = h.root / "proof-parent" / "isolated-volume"
         self.mountpoint.mkdir(mode=0o700)
         self.after = lambda: None
@@ -22,6 +23,11 @@ class Volume:
     def check(self):
         self.events.append("check")
         assert self.phase == "LIVE"
+        # Explicitly fabricated ORIGINAL volume bracket: both callbacks stay
+        # present when the driver removes its immediately duplicated precheck.
+        self.source_boundary()
+        self.events.append("original_parent_and_mount_checks")
+        self.source_boundary()
 
     def check_after_close(self):
         self.events.append("after_close")
@@ -50,7 +56,7 @@ def h(monkeypatch, tmp_path, kernel):
     def prepared(root, *, boundary):
         assert root == value.root and value.volume is None
         value.volume_entries.append(1)
-        boundary(); value.volume = Volume(value)
+        boundary(); value.volume = Volume(value, boundary)
         yield value.volume
         value.volume.check(); value.volume_close_hook()
         if value.volume_close_error: raise RuntimeError("fabricated original volume close failure")
@@ -173,3 +179,29 @@ def test_final_UTC_sampling_delay_cannot_escape_whole_closure_deadline(h, monkey
         return value
     monkeypatch.setattr(proof.base.previous.prior, "_utc_now", late_clock)
     with pytest.raises(proof.IsolatedProofRefusal, match="deadline"): h.run()
+
+
+def test_each_metadata_boundary_uses_complete_original_volume_bracket_without_duplicate(h, monkeypatch):
+    original = proof.base.immutable.prepare_owned_immutable_metadata
+    from contextlib import contextmanager
+    inspecting, calls = [], []
+    h.boundary_hook = lambda: calls.append("fresh_lane_check") if inspecting else None
+    @contextmanager
+    def prepared(*args, boundary, **kwargs):
+        inspecting.append(True)
+        try: boundary()
+        finally: inspecting.clear()
+        with original(*args, boundary=boundary, **kwargs) as cap: yield cap
+    monkeypatch.setattr(proof.base.immutable, "prepare_owned_immutable_metadata", prepared)
+    assert h.run()["status"] == "closed_offline_isolated_new_inode_only"
+    assert calls == ["fresh_lane_check", "fresh_lane_check"]
+
+
+@pytest.mark.parametrize("value,expected", [("metadata_sealing", "metadata_sealing"),
+    ("PRIVATE_PATH_OR_EXCEPTION", "not_entered"), (None, "not_entered")])
+def test_entered_stage_is_fixed_allowlisted_context_not_exception_attribution(monkeypatch, value, expected):
+    monkeypatch.setattr(proof, "_LAST_STAGE", value)
+    monkeypatch.setattr(proof, "_LAST_TRANSITION", None)
+    result = proof.failure_summary(RuntimeError("PRIVATE_PATH_OR_EXCEPTION"))
+    assert result["entered_stage"] == expected
+    assert "PRIVATE" not in str(result)

@@ -45,7 +45,7 @@ def result(manifest):
         "first_controlled_refusal": None, "controlled_refusals": [],
         "policy_sha256": hash_payload(harness.proof.base.transition.policy()),
         "authority": harness.proof.base.transition.authority()}
-    return {"schema": "si-isolated-kernel-immutable-proof-closed-v3",
+    return {"schema": "si-isolated-kernel-immutable-proof-closed-v4",
         "status": "closed_offline_isolated_new_inode_only", "runtime_head": HEAD, "actual_remote": REMOTE,
         "code_identity_sha256": "e" * 64, "code_manifest_sha256": hash_payload(manifest),
         "protocol_sha256": harness.proof.PROTOCOL_SHA256,

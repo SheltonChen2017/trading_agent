@@ -2259,9 +2259,9 @@ and record successful AR production/native validation of71monthly grids
 recovery and I326-024: ALL vendor slots lack pre-October2021 marks, blocking
 the Jan2021 start. Section326.50 records AU spent: six older EODHD RAW prices
 returned but metadata shape refused; authenticated failure, no source admission.
-Sections326.52–326.53 record AV actual0 identifying the display-name ASCII
-refusal and the prospective Unicode correction/AX offline retained-pair freeze.
-AW whole-US current catalog is implemented but NOT yet run-frozen/invoked.
+Sections326.52–326.54 record AV actual0 identifying the display-name ASCII
+refusal and AX actual0 accepting the unchanged pair under corrected Unicode
+policy. AW whole-US current catalog is separately run-frozen, NOT yet invoked.
 No AU retry, provider/strategy capture or QC source
 transfer/project/compile/strategy job follows this known source stop. Current
 identity/reference/actual-held NAV/full-window/source/run gates remain;
@@ -67265,3 +67265,111 @@ Current Claude review waived, not independently accepted. All agents HOLD
 writes/tests/temp during sole AX operation. AW/price acquisition/crosswalk/
 source-policy/QC continuation remains uninvoked until separately admissible;
 337/259/53/699 unchanged. Continue to actual evidence; one final lane push.
+
+### 326.54 AX actual0 and exact one-use AW catalog acquisition freeze
+
+Sole AX at cleanb4a190080330f80fa09c6dd877bedac11f17c94d:
+native producer2026-10-27T16:15:15.438438+00:00..16:15:19.343662+00:00 exit0;
+separate native validator16:15:19.343801..16:15:23.079754+00:00 exit0.
+Both stdout3971bytes SHA256
+7bdb4b2b472291193b1e527f3c52e65c3d14a0581df528a93fb9e841dc9315ff,
+stderr0/boundnull/exact equality. AX now SPENT: no rerun/read/control repair.
+Corrected parser ACTUALLY accepted unchanged170/729byte DATA under full
+source guards/normal return: metadata schema/one-row/current identity true,
+metadata-row hashe859ab81bdc0273a35926fd73c3e6e7fe7d7b62ebde040bed7b8b7f66525219f;
+history schema/six positive RAW dates true, original date/RAW-series hashes
+d91a9870/c99487ab unchanged. Guard profile
+b547f9cf95e01cc11ca3450ecc4cde35a9bc5ada23fb13a4d2f4e38f9a8cc801;
+current history metadata hash5a6ae744d23474daaf8c9e1fa2328f7ae89396e0f9ace7d947597886494d87c2,
+metadata/security pins in326.52 remain equal. No response/price/name/token
+display. AU remains original failed2; AV/AX success is prospective scoped
+analysis, not historical rewriting, permanent identity or strategy admission.
+I326-026 corrected PROSPECTIVELY for this exact Unicode parser/retained pair.
+
+Owner's existing delegated parser/price recovery and explicit current review
+waiver justify a FIRST complete US identifier-catalog acquisition under EODHD
+existing All World rights. Purpose: establish ALL current vendor locators/
+missing/collisions before whole-window price acquisition; no renamed retry
+of AU's single-fund pilot, replacement history window, ticker-only matching,
+implicit Sharadar/native fallback or strategy source admission.
+AW candidate/source/test/profile exact hashes are326.53 and UNCHANGED.
+Run only at the new exact clean committed HEAD containing this decision.
+Same designated Mac/root/branch/Python3.13; CLI caller
+e5a6cf032b52da4fcffbfe17f92fbfbc617e16f4bf3e048a441b4a6844e27323,
+profile6d4696640e35a5d580be671fe3d984c2ac42d1c30b1c8278ad0ac409d70e51b6,
+204 literal actual-matching selected pins. No silent refresh.
+
+Fixed AW control
+artifacts/analyst_revisions_v2/newrule_eodhd_catalog/R326-20261027-AW
+has NOT been inspected/allocated. Exclusive fsynced claim, exact source/blob/
+profile/AR-AS public fact/CA proofs precede ONE existing Keychain lookup
+service trading-agent-eodhd/account eodhd. Secret only owned pipe; no other
+provider/QC env/config/account/service inspection. Claim consumes use without
+contact too; partial/nonzero/unknown/timeout ambiguous/spent, no unchanged retry.
+No spending/new entitlement/purchase, price/fundamental/rename endpoint or QC.
+
+Fixed HTTPS host eodhd.com:
+1 GET/api/exchange-symbol-list/US?fmt=json&delisted=0
+2 GET same path fmt=json&delisted=1
+3 GET/api/id-mapping?fmt=json&filter[ex]=US&page[limit]=1000&page[offset]=0
+then ONLY explicit offsets1000,2000,... computed from validated integer
+meta.total<=100000, at most100mappingpages/102total dispatches. First and
+every page's limit/offset/total/row-count must match exactly; unknown schema/
+drift refuses. Total0 uses ONE mapping page, not another poll. Returned links
+are inert private evidence NEVER followed/interpolated. No ticker/type filters,
+fallback exchange, arbitrary URL or silent retry. Current broad catalogs need
+no lane-private identifier sent to provider. Account capability/rate limits
+are observations, not assertions from docs or token presence.
+
+Lists<=16MiB each/maps<=1MiB each/total framed capture<=64MiB; exact8byte
+length frames, bounded journal/index32KiB each. Successful bodies secret-
+scanned and fsynced BEFORE JSON; provider parses only mapping envelope counts
+for deterministic pagination, no row selection. Numeric HTTP/status/app
+dispatch/completed-body counts retained; physical request_count remainsnull.
+Non200 body unread. Raw/URL/JSON/CSV-doubled-quote encodings scanned; finite
+recognized encoding check is not universal secrecy proof. No opaque/raw
+exception/value/row/token enters public output. Separate credential-free native
+auth verifies original three DATA descriptors/whole pins/index contiguous
+extent/per-body pins/exact LF journal before all list/mapping semantics.
+It preserves all catalog rows/private values, missing/null/empty/unknown IDs/
+duplicate names/types; public output only counts, types and ordered hashes.
+No current crosswalk, share-class/permanent historical identity or price
+admission follows. Source/genuine AC/AP/full6151/8fund joins are future scope.
+
+Parent900/provider720/auth120/validator30 seconds; request<=25 seconds within
+remaining deadline. Outer910/validator35, uninterruptible-I/O/host-suspension
+caveat; own children only. Native provider1564bytes SHA
+e3a3c1e216643fd153f064e774c6ed4302da56782c74ebad310e12d395f4cbd5;
+auth1341bytes87fdb467dcbcfe2390a47578a4d839976d27944ca85f457c7e034c61f3f492db;
+validator494bytes79d7e961f0ab250fd95784609a254c2628244cbd0143b0aa3ea1d2f514858a4c.
+Provider egress only existing HTTPS443/DNS53/exact macOS resolver socket;
+not a native domain fence. Exact prepared URL/host/path/query/header/TLS/
+pinned CA/no proxy/cookie/redirect/retry/defaultCA enforce application scope.
+Both worker roles deny Keychains/security CLI and all artifacts except OWN AW
+directory. Auth/validator ALL-network denied; validator ALL-artifact denied.
+Only own control/data/start/result descriptors; persistent started marker
+before role work prevents repeated dispatcher use, not malicious same-user
+sandbox proof. Original metadata/security held through output validation.
+No orchestration cleanup; preserve any partial output as spent evidence.
+
+Root reviewed entire789-line AW parent/transport/body/pagination/journal/
+authentication/inheritedFD/success/actual-exit orchestration before use; no
+additional verified P0–P2 beyond corrected I326-027. I326-026 parser uses new
+checked Unicode-display schema, no used source edits. Root278focused result
+and author/initial/omission qualifications in326.53 retained; no full suite.
+Record-only repeats are not additive. All agents HOLD edits/tests/temp while
+actual AW runs; clean HEAD/source checks recur before role/postflight.
+
+Exact external metadata capture program4299bytes SHA
+005c2cf7d1aae3f2677db1339e6a97a49800304aeefede43498c0228888dfc90:
+ordinary outer launches committed parent ONCE, then SEPARATE native output
+validator over exact original bounded stdout with observed actual exit.
+128KiB original channel,8KiB stderr, separate910/35s deadlines, exact stdout
+equality/no stderr/bounds/nativevalidator0 plus actualparent0 required.
+Validator0 on2 is authenticated failure only. Tool capture budget100000tokens
+and full structured store BEFORE small output avoid old metadata truncation.
+Never accept report alone or fabricate0. No old reader/capture/assessment/
+QC operation is renewed. Record actual result, then only admissible exhaustive
+identity/whole-window recovery; no shortened study/source-stop selector.
+337shared/259development/53infrastructure/699cells unchanged until real QC
+event. Exactly one final matching-lane push for concluded round; none yet.

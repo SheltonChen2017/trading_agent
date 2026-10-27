@@ -23,7 +23,7 @@ from data.hashing import canonical_json, hash_bytes, hash_payload
 
 ROOT = Path("/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__short_interest")
 PARENT = Path("artifacts/short_interest/native_reported_counts")
-NAMESPACE = "isolated-custody-20261027-v4"
+NAMESPACE = "isolated-custody-20261027-v5"
 IMAGE_NAME, MOUNT_NAME = "backing.sparseimage", "mount"
 HDIUTIL, LIBRARY = "/usr/bin/hdiutil", "/usr/lib/libSystem.B.dylib"
 VIRTUAL_BYTES = 8 * 1024 ** 3
@@ -94,18 +94,19 @@ def policy():
         and MAXIMUM_PLIST_BYTES == 4 * 1024 ** 2 and MAXIMUM_IMAGES == 256 and MAXIMUM_ENTITIES == 64
         and HDIUTIL == "/usr/bin/hdiutil" and LIBRARY == "/usr/lib/libSystem.B.dylib"
         and PARENT == Path("artifacts/short_interest/native_reported_counts")
-        and NAMESPACE == "isolated-custody-20261027-v4" and IMAGE_NAME == "backing.sparseimage"
+        and NAMESPACE == "isolated-custody-20261027-v5" and IMAGE_NAME == "backing.sparseimage"
         and MOUNT_NAME == "mount"
         and (MNT_RDONLY, MNT_LOCAL, MNT_DONTBROWSE, MNT_IGNORE_OWNERSHIP)
             == (0x00000001, 0x00001000, 0x00100000, 0x00200000), "isolated_policy_changed")
-    return {"schema": "si-isolated-custody-volume-policy-v4", "root": str(ROOT),
+    return {"schema": "si-isolated-custody-volume-policy-v5", "root": str(ROOT),
         "parent": str(PARENT), "namespace": NAMESPACE, "image": IMAGE_NAME, "mount": MOUNT_NAME,
         "virtual_bytes": VIRTUAL_BYTES, "filesystem": "APFS", "image_type": "SPARSE",
         "purpose": "finite_synthetic_intermediate_only_not_durable_production_storage",
         "spotlight_index_creation": False,
-        "volume_name": "SI_OFFLINE_CUSTODY_V4", "failed_v1_namespace_retired_even_if_absent": True,
+        "volume_name": "SI_OFFLINE_CUSTODY_V5", "failed_v1_namespace_retired_even_if_absent": True,
         "failed_v2_image_and_mount_never_modified_or_adopted": True,
         "failed_v3_flagged_inode_image_mount_never_modified_or_adopted": True,
+        "failed_v4_flagged_inode_image_mount_never_modified_or_adopted": True,
         "maximum_seconds": MAXIMUM_SECONDS, "subprocess_seconds": SUBPROCESS_SECONDS,
         "maximum_plist_bytes": MAXIMUM_PLIST_BYTES, "maximum_images": MAXIMUM_IMAGES,
         "plist_limit_kind": "post_capture_acceptance_not_hard_capture_memory_bound",
@@ -245,7 +246,7 @@ def _arguments(state, verb):
     if verb == "create":
         return [HDIUTIL, "create", "-type", "SPARSE", "-size", "8g", "-fs", "APFS",
             "-uid", str(os.getuid()), "-gid", str(os.getgid()), "-mode", "0700",
-            "-volname", "SI_OFFLINE_CUSTODY_V4", "-nospotlight", "-plist", image]
+            "-volname", "SI_OFFLINE_CUSTODY_V5", "-nospotlight", "-plist", image]
     if verb == "attach":
         return [HDIUTIL, "attach", "-mountpoint", mount, "-mount", "required", "-nobrowse",
             "-owners", "on", "-noautoopen", "-noautoopenro", "-noautoopenrw", "-plist", image]
@@ -591,7 +592,7 @@ def _summary(state, status):
     original = _COMMANDS.get(id(state))
     require(type(original) is tuple and len(original) == 2 and original[0] is state
         and tuple(state["commands"]) == original[1], "isolated_capability_changed")
-    return {"schema": "si-isolated-custody-volume-observation-v4", "status": status,
+    return {"schema": "si-isolated-custody-volume-observation-v5", "status": status,
         "policy_sha256": state["policy"], "virtual_bytes": VIRTUAL_BYTES,
         "filesystem_APFS": True, "owners_honored": True, "local_filesystem": True,
         "nobrowse": True, "separate_host_device": True, "root_protection_verified": True,

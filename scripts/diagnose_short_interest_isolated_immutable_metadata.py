@@ -18,7 +18,7 @@ WRAPPER = "scripts/run_short_interest_isolated_custody_offline.py"
 NAME = base.NAME
 INNER_DIRECTORY = "proof"
 MAXIMUM_SECONDS, HOLD_SECONDS = 420, 5
-PROTOCOL_SHA256 = "9f2ede233644be5294b53a8031a3159a813d01609c1021bdc87f330cf1474752"
+PROTOCOL_SHA256 = "9e625fded1f866ef6cb81096fc593d4ecd57246e24bc042dbc5fa1d595046871"
 _LAST_TRANSITION = None
 _LAST_STAGE = "not_entered"
 _STAGES = frozenset("""not_entered registration code_context_open storage_context_open
@@ -49,8 +49,8 @@ def code_paths():
 
 
 def protocol():
-    return {"schema": "si-isolated-kernel-immutable-proof-policy-v4",
-        "decision": "SI-DEC-20261027-03", "authority_id": "SI-AUTH-20261026-02",
+    return {"schema": "si-isolated-kernel-immutable-proof-policy-v5",
+        "decision": "SI-DEC-20261027-04", "authority_id": "SI-AUTH-20261026-02",
         "driver": DRIVER, "offline_harness": WRAPPER, "storage_policy_sha256": hash_payload(storage.policy()),
         "original_immutable_policy_sha256": hash_payload(base.immutable.policy()),
         "original_observer_policy_sha256": hash_payload(base.transition.policy()),
@@ -178,7 +178,7 @@ def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest)
                     trace_report = diagnostic.report()
                     require(trace_report["diagnostic"]["observer_complete"] is True,
                         "isolated_proof_result_missing")
-                    result = {"schema": "si-isolated-kernel-immutable-proof-closed-v4",
+                    result = {"schema": "si-isolated-kernel-immutable-proof-closed-v5",
                         "status": "closed_offline_isolated_new_inode_only", "runtime_head": runtime_head,
                         "actual_remote": actual_remote, "code_identity_sha256": identity,
                         "code_manifest_sha256": hash_payload(complete_code_manifest),

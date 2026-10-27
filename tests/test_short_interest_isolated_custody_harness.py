@@ -21,8 +21,8 @@ HEAD, REMOTE = "a" * 40, "b" * 40
 @pytest.fixture(autouse=True)
 def reset(monkeypatch):
     monkeypatch.setattr(harness, "_INVOKED", False)
-    for name in ("_ORIGINAL", "_COUNTS", "_ACTIVE", "_FAILED"):
-        monkeypatch.setattr(harness, name, {})
+    for name in ("_ORIGINAL", "_COUNTS", "_ACTIVE", "_FAILED", "_POLICY_ISSUED"):
+        monkeypatch.setattr(harness, name, {}, raising=False)
     monkeypatch.setattr(harness, "HARNESS_SHA256", hash_payload(harness.policy()))
 
 
@@ -45,7 +45,7 @@ def result(manifest):
         "first_controlled_refusal": None, "controlled_refusals": [],
         "policy_sha256": hash_payload(harness.proof.base.transition.policy()),
         "authority": harness.proof.base.transition.authority()}
-    return {"schema": "si-isolated-kernel-immutable-proof-closed-v4",
+    return {"schema": "si-isolated-kernel-immutable-proof-closed-v5",
         "status": "closed_offline_isolated_new_inode_only", "runtime_head": HEAD, "actual_remote": REMOTE,
         "code_identity_sha256": "e" * 64, "code_manifest_sha256": hash_payload(manifest),
         "protocol_sha256": harness.proof.PROTOCOL_SHA256,
@@ -306,6 +306,8 @@ def test_real_bounded_child_audit_hook_handles_one_NOOP_without_nested_id_events
 import json
 import sys
 from scripts import run_short_interest_isolated_custody_offline as harness
+# Explicit fabricated registration only; this child never enters run_once.
+harness.HARNESS_SHA256 = harness.hash_payload(harness.policy())
 seams = harness.AuditSeams("a" * 40)
 assert type(seams).__hash__ is object.__hash__
 assert type(seams).__eq__ is object.__eq__
@@ -338,3 +340,185 @@ print(json.dumps({"raised": raised, "nested_id_events": nested_ids, "maximum_dep
         stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=10, check=False)
     assert completed.returncode == 0
     assert json.loads(completed.stdout) == {"raised": False, "nested_id_events": 0, "maximum_depth": 1}
+
+
+def test_complete_current_policy_is_evaluated_every_check_without_hot_canonical_hash(seams, monkeypatch):
+    original_policy, original_hash = harness.policy, harness.hash_payload
+    evaluations, hashes = [], []
+    def current_policy():
+        evaluations.append(True)
+        return original_policy()
+    def counted_hash(value):
+        hashes.append(True)
+        return original_hash(value)
+    monkeypatch.setattr(harness, "policy", current_policy)
+    monkeypatch.setattr(harness, "hash_payload", counted_hash)
+    for unused in range(7): seams.handle("offline.synthetic_no_operation", ())
+    assert len(evaluations) == 7 and hashes == []
+
+
+def test_original_same_policy_value_is_canonically_registered_before_hook(monkeypatch):
+    monkeypatch.setattr(harness, "HARNESS_SHA256", "0" * 64)
+    with pytest.raises(harness.OfflineHarnessRefusal, match="registration_changed"):
+        harness.AuditSeams(HEAD)
+
+
+@pytest.mark.parametrize("kind", ["dict_subclass", "list_subclass", "str_subclass", "int_subclass", "key_subclass", "tuple", "bool_int"])
+def test_strict_current_policy_shapes_refuse_normalization_aliases(seams, monkeypatch, kind):
+    value = deepcopy(harness.policy())
+    if kind == "dict_subclass": value = type("OtherDict", (dict,), {})(value)
+    elif kind == "list_subclass": value["code_paths"] = type("OtherList", (list,), {})(value["code_paths"])
+    elif kind == "str_subclass": value["schema"] = type("OtherStr", (str,), {})(value["schema"])
+    elif kind == "int_subclass": value["maximum_hdiutil_create"] = type("OtherInt", (int,), {})(1)
+    elif kind == "key_subclass": value = {(type("OtherStr", (str,), {})(key) if key == "schema" else key): item
+        for key, item in value.items()}
+    elif kind == "tuple": value["code_paths"] = tuple(value["code_paths"])
+    else: value["maximum_hdiutil_create"] = True
+    monkeypatch.setattr(harness, "policy", lambda: value)
+    with pytest.raises(harness.OfflineHarnessRefusal, match="counter_failed"):
+        seams.handle("offline.synthetic_no_operation", ())
+    assert seams.summary()["failure_latched"] is True
+
+
+def test_equal_fresh_policy_and_dict_order_are_allowed_but_all_leaf_changes_refuse():
+    original = harness.policy()
+    frozen = harness._freeze_policy(original)
+    reordered = dict(reversed(list(deepcopy(original).items())))
+    assert harness._matches_policy(frozen, reordered)
+    def leaves(value, path=()):
+        if type(value) is dict:
+            for key, item in value.items(): yield from leaves(item, (*path, key))
+        elif type(value) is list:
+            for index, item in enumerate(value): yield from leaves(item, (*path, index))
+        else: yield path, value
+    original_hash = hash_payload(original)
+    for path, item in leaves(original):
+        value = deepcopy(original)
+        parent = value
+        for part in path[:-1]: parent = parent[part]
+        parent[path[-1]] = (not item if type(item) is bool else item + 1
+            if type(item) is int else item + " changed" if type(item) is str else "changed")
+        assert hash_payload(value) != original_hash
+        assert not harness._matches_policy(frozen, value)
+
+
+@pytest.mark.parametrize("kind", ["extra", "missing", "path_order", "authority", "cycle", "nan", "inf", "unknown"])
+def test_complete_current_policy_structural_changes_are_fixed_permanent_refusals(seams, monkeypatch, kind):
+    value = deepcopy(harness.policy())
+    if kind == "extra": value["unexpected"] = False
+    elif kind == "missing": del value["branch"]
+    elif kind == "path_order": value["code_paths"].reverse()
+    elif kind == "authority": value["authority"]["source_admitted"] = True
+    elif kind == "cycle": value["code_paths"][0] = value
+    elif kind == "nan": value["maximum_hdiutil_create"] = float("nan")
+    elif kind == "inf": value["maximum_hdiutil_create"] = float("inf")
+    else:
+        class Unknown:
+            def __str__(self): raise AssertionError("unknown value was formatted")
+            def __eq__(self, other): raise AssertionError("unknown value was compared")
+        value["schema"] = Unknown()
+    monkeypatch.setattr(harness, "policy", lambda: value)
+    with pytest.raises(harness.OfflineHarnessRefusal, match="counter_failed"):
+        seams.handle("offline.synthetic_no_operation", ())
+    assert seams.summary()["failure_latched"] is True
+
+
+@pytest.mark.parametrize("kind", ["equal_copy", "nonce", "tree", "hash"])
+def test_policy_witness_cannot_be_forged_or_replaced_by_equal_values(seams, kind):
+    original = harness._POLICY_ISSUED[seams]
+    replacement = list(original)
+    if kind == "nonce": replacement[2] = object()
+    elif kind == "tree": replacement[3] = harness._freeze_policy(harness.policy())
+    elif kind == "hash": replacement[4] = "0" * 64
+    harness._POLICY_ISSUED[seams] = tuple(replacement)
+    with pytest.raises(harness.OfflineHarnessRefusal, match="counter_failed"):
+        seams.handle("offline.synthetic_no_operation", ())
+    harness._POLICY_ISSUED[seams] = original
+    seams.failed = False
+    with pytest.raises(harness.OfflineHarnessRefusal, match="counter_failed"):
+        seams.handle("offline.synthetic_no_operation", ())
+    assert seams.summary()["failure_latched"] is True
+
+
+def test_positive_terminal_recomputes_original_policy_canonical_hash(seams, monkeypatch):
+    manifest = {name: "f" * 64 for name in harness.proof.code_paths()}
+    completed_seams(seams)
+    value = result(manifest)
+    original_hash = harness.hash_payload
+    schema = harness.policy()["schema"]
+    def changed_digest(payload):
+        if type(payload) is dict and payload.get("schema") == schema: return "0" * 64
+        return original_hash(payload)
+    monkeypatch.setattr(harness, "hash_payload", changed_digest)
+    seams.handle("offline.synthetic_no_operation", ())  # Full current values still match.
+    with pytest.raises(harness.OfflineHarnessRefusal, match="counter_failed"):
+        harness._validate_result(value, seams, HEAD, REMOTE, manifest)
+    assert seams.summary()["failure_latched"] is True
+
+
+def test_issued_tree_is_immutable_and_primitive_types_are_exact():
+    value = {"none": None, "bool": False, "int": 0, "str": "", "list": [1, True]}
+    frozen = harness._freeze_policy(value)
+    def immutable_only(item):
+        assert type(item) in (tuple, str, int, bool, type(None))
+        if type(item) is tuple:
+            for child in item: immutable_only(child)
+    immutable_only(frozen)
+    assert harness._matches_policy(frozen, deepcopy(value))
+    for key, replacement in (("none", False), ("bool", 0), ("int", False), ("str", [])):
+        changed = deepcopy(value); changed[key] = replacement
+        assert not harness._matches_policy(frozen, changed)
+
+
+def test_unknown_mint_value_or_cycle_refuses_without_formatting_or_equality():
+    class HostileMeta(type):
+        def __eq__(self, other): raise AssertionError("unknown metaclass was compared")
+    class Unknown(metaclass=HostileMeta):
+        def __str__(self): raise AssertionError("unknown value was formatted")
+        def __eq__(self, other): raise AssertionError("unknown value was compared")
+    cycle = []; cycle.append(cycle)
+    for value in (Unknown(), cycle, float("nan"), float("inf")):
+        with pytest.raises(harness.OfflineHarnessRefusal, match="registration_changed"):
+            harness._freeze_policy(value)
+
+
+def test_policy_construction_exception_permanently_latches_even_after_restoration(seams, monkeypatch):
+    original = harness.policy
+    def refused(): raise RuntimeError("PRIVATE_EXCEPTION_PATH")
+    monkeypatch.setattr(harness, "policy", refused)
+    with pytest.raises(harness.OfflineHarnessRefusal, match="counter_failed"):
+        seams.handle("offline.synthetic_no_operation", ())
+    monkeypatch.setattr(harness, "policy", original)
+    seams.failed = False
+    with pytest.raises(harness.OfflineHarnessRefusal, match="counter_failed"):
+        seams.handle("offline.synthetic_no_operation", ())
+    assert seams.summary()["failure_latched"] is True
+
+
+def test_original_mutable_construction_value_does_not_change_issued_tree(monkeypatch):
+    original = harness.policy()
+    mutable = deepcopy(original)
+    monkeypatch.setattr(harness, "policy", lambda: mutable)
+    seams = harness.AuditSeams(HEAD)
+    witness = harness._POLICY_ISSUED[seams]
+    mutable["code_paths"].reverse()
+    assert harness._matches_policy(witness[3], deepcopy(original))
+    with pytest.raises(harness.OfflineHarnessRefusal, match="counter_failed"):
+        seams.handle("offline.synthetic_no_operation", ())
+    assert seams.summary()["failure_latched"] is True
+
+
+def test_unissued_hostile_tree_is_rejected_before_any_tag_comparison(seams):
+    called = []
+    class HostileTag:
+        def __eq__(self, other):
+            called.append(True)
+            raise AssertionError("unissued policy tag was compared")
+    original = harness._POLICY_ISSUED[seams]
+    replacement = list(original)
+    replacement[3] = HostileTag(), None
+    harness._POLICY_ISSUED[seams] = tuple(replacement)
+    with pytest.raises(harness.OfflineHarnessRefusal, match="counter_failed"):
+        seams.handle("offline.synthetic_no_operation", ())
+    assert called == []
+    assert seams.summary()["failure_latched"] is True

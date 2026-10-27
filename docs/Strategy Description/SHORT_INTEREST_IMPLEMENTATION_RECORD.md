@@ -11,7 +11,7 @@ IMMUTABLE FLAG THEN OBSERVED ITS LOSS; ACTOR AND HISTORICAL CAUSE UNKNOWN.
 NEW SOURCE RECOVERY REMAINS HELD.
 ISOLATED V1 REFUSED INITIALIZATION WITHOUT CREATING ITS NAMESPACE;
 V2 CREATED/ATTACHED ITS EMPTY SYNTHETIC IMAGE BUT REFUSED ASSOCIATION BEFORE
-ANY PROBE FILE; ITS IMAGE/MOUNT ARE PRESERVED. ISOLATED V3 REACHED ORIGINAL
+ANY PROBE FILE; ITS IMAGE/MOUNT ARE PRESERVED. ISOLATED V3/V4 REACHED ORIGINAL
 NATIVE FLAGS0->2 WITHOUT RECORDED LOSS, THEN REFUSED THE UNCHANGED8SECOND
 CREATOR WINDOW BEFORE WRITE CHALLENGE. NO STORAGE CLOSURE IS PROVED.
 CLAUDE REVIEW COVERS b648f60..730c59c, NOT THE LATER LOCAL3B0 DIAGNOSTIC COMMIT.
@@ -24606,3 +24606,136 @@ terminal result before any next bounded step. The ONE final matching push
 remains deferred to true local pre-QC readiness or a concrete irreducible
 blocker. All source/claim/START/charge/outcome/QC counters in this round0;
 count baseline13,992START/23,452,681chargedbytes and84,005/4GiB caps unchanged.
+
+### 128.14 Actual V4 still refused; full policy revalidation optimization
+
+ONE execution96944 at exact clean
+`ed23c84a7f95e029eb482d5809e9f379fdc4dca8`, matching actual/tracking originD6AF,
+terminated **exit2**, entered_stage metadata_sealing / creator__tick /
+new_metadata_window_exhausted. Original observer was complete with native
+call1/result0, FD/name flags0->2 and callback2, no recorded flag loss; no
+seal/challenge/closed storage result was admitted. Diagnostic SHA256
+`78d89283e9bca93b620708489df110ccbfbcbdb6321c630d65fff9775acf57f7`.
+Original association passed5/5 entities and every exact join, only volume-kind
+differing. Attach/info raw SHAs
+`19a9b8fb33bab95481b0d183b2da3a45dbd4f2a702fde31ccbc5b3298f254360` /
+`7f81c5a633131f6a3a605d0ac64a420e81025dbbbfd8671c0e0ad4c95bd8b151`.
+Genuine counters Git748, create1/attach1/info4/null_stream6/probe_create1,
+write_challenge0, all nine denied counters0/failure_latched=false. No source/
+key/provider/newclaim/START/charged-byte action. Do NOT lengthen the8second
+window, claim these optimizations repaired custody or repeat V4.
+
+Main's guarded independent original-file readonly observation after known
+termination matched the synthetic186-byte SHA12ae326d...7404, original FD/name
+current stamps before/after agree, flags2, currentUID0600/singlelink and fixed
+membership TRUE, root0700 TRUE. Current observed nine-field SHA
+`0db938a5a5abefb5a4e145350ca64b95451ddec73ad9d32f0738b0889c196faa`
+is NOT an issued seal. Preserve original V4 flagged inode/image/mount unchanged;
+there is no source admission, old-claim release or readiness.
+
+Main then ran a bounded CPU-ONLY comparison, exit0, no hook/file/native/probe/
+source action:2,000 complete-current-policy canonical hashes85.490ms versus
+2,000 strict complete-current-value matches43.629ms. Every iteration rebuilt
+the same complete current policy; it did NOT reuse a policy/admission result.
+This measured comparison work, not the precise expired call stack or future
+8second success. Internal read-only peer accepted equivalence conditions:
+exact builtin dict/list/str/int/bool/None; exact keys/lengths/list order and
+scalar types/values; dictionary order nonsemantic; reject all floats, unknown
+types, subclasses, cycles and bool/int substitutions. No function-code/input
+cache, event filter, source-code sweep or native predicate may be removed.
+
+**SI-DEC-20261027-04**, under continuing SI-AUTH-20261026-02, freezes a
+prospective V5 ONLY after causal software regression/provenance checks and a
+new committed64-file mapping. The new harness must STILL reconstruct and
+validate the COMPLETE current policy on EVERY event. Compare against an
+original independently issued IMMUTABLE typed witness minted from the SAME
+policy value whose original canonical SHA was verified BEFORE hook install.
+Keep all existing original instance/nonce/counter/binding/failure/active
+checks. At positive terminal, hash a FRESH full current policy and compare
+the ORIGINAL prehook digest AND registered literal. A construction/comparison
+error must permanently refuse even if caught and restored. No public/copied
+snapshot may replace original provenance. This changes comparison mechanics,
+not the contents, frequency or safety predicates checked.
+
+V5 uses exclusively new isolated-custody-20261027-v5 / SI_OFFLINE_CUSTODY_V5,
+with all V1..V4 names retired/untouched. All original file/creator/immutable/
+native/code/terminal/window/hold/cap limits remain unchanged. No actual V5
+operation runs here. Only final frozen causal validations/pins and a clean
+checkpoint may precede one separately registered successor; no blind namespace
+or source claim. Current local pre-QC readiness remains FALSE, all source
+claims held, cumulative baseline13,992START/23,452,681bytes unchanged.
+
+### 128.15 Full-current-policy predicate, original provenance and validation
+
+**SI-BUILD-20261027-011 (P3, equivalent policy mechanics):** wrapper now
+reconstructs COMPLETE policy() on EVERY _check and compares every exact
+builtin type/key/value/length/list position against an independently issued
+original immutable tagged tree. All old instance/counter/nonce/active/
+permanent-failure checks remain. Its SAME original policy value is canonical-
+hashed to the registered literal BEFORE hook installation. Positive terminal
+validation again canonical-hashes a FRESH complete current value against BOTH
+original witness digest and registered literal. No policy result, readiness,
+source check or timing window is cached. Exact dict ordering is nonsemantic;
+list order/types are strict, floats/unknowns/subclasses/cycles refuse. Local
+comparison changes do not alter data.hashing or shared serialization behavior.
+
+Author's causal pre-production group was RED **17failed/5passed/.97s**:
+old hot hashing repeated7 times, normalization aliases were accepted, direct
+constructor registration was absent and malformed/cyclic current values could
+escape fixed refusal. Final author-only wrapper selection **69/.75s**, compile/
+diff clean. Its memory-only omission of positive-terminal canonical checking
+was RED **1failed/68deselected/.08s**, process restored afterward. Main then
+advanced only prospective V5 literals and added construction-exception latch
+and mutable original-construction-payload independence cases: **71/1.05s**.
+These are fabricated/software validations, not actual storage proof.
+
+**SI-BUILD-20261027-012 (P2, corrected before release):** peer found traversal
+preceded original-witness pointer verification. A replaced registry tuple
+could therefore execute a hostile kind-tag equality method before rejection.
+Main's causal hostile-tag test was RED **1failed/.35s**. Authenticate the
+ORIGINAL entry/nonce/witness identity FIRST, then traverse only that issued
+immutable tree. Unknown/unissued trees must not run caller methods; refusal
+and its original failure latch remain permanent. No new type is accepted.
+Final complete selection and frozen pins follow before any actual V5 dispatch.
+
+### 128.16 Frozen V5 validation and prospective dispatch
+
+Main final fresh-process focused selection (eleven files/three named active-
+document checks): **416passed/30.91s**, no skips/warnings, empty inherited
+environment and OS network denied. All64-source/four-test in-memory compile,
+exact transitive AST closure64, fixed literal catalogues, no audited numeric
+IDs in wrapper/observer, both126 historical pins and diff whitespace passed.
+No full suite. Independent read-only peer accepted the complete-current-
+policy equivalence and original-witness-before-traversal correction; Main
+read all final production/tests. Only registration literals changed after
+the final algorithm review. No Claude review is claimed or required.
+
+Main also performed one fresh bounded CPU-only ORIGINAL unentered observer/
+actual hook measurement, exit0:1,000 calls28.274ms, numeric-ID0/f_code1000,
+all denied/permitted external counters0, no observer entry/issued closure,
+sys tracing None, OS network denied and mandatory terminal canonical check
+passed. No image/native/probe/source/key action occurred. This corroborates
+reduced instrumentation work, not future8second storage closure.
+
+Proof protocol SHA256
+`9e625fded1f866ef6cb81096fc593d4ecd57246e24bc042dbc5fa1d595046871`;
+storage policy
+`c8496ccf9f0265fa639a9862cee72da58838411826206af50d9fac58d9654ae0`;
+harness policy
+`1f66c5ffe341a9316f81f83499c4d66cc2a896e7054649a046aaeb3b773d47aa`.
+Observer policy remains2e0a9a13...1c5a5; exact64-path list remains
+`0be79b48af5c30bbe96cc52fee3ca3f1561a7f03b7de658cb5b953272f6e0922`;
+complete64-current-byte mapping
+`81d3b82a1d52abd219a9e90cc4c2fd2a989d719a6bc6fec19c9364cc6e927c5b`.
+
+V5 remains NOT invoked at this entry. Final record-only checks, exact root/
+branch/HEAD/status, matching tracking/actual originD6AF and wholly absent V5
+namespace precede a new clean local checkpoint and ONE registered dispatch.
+All agents/tests must stay frozen while pinned. Original creator/immutable/
+source code,8second window,5second hold and every other bound/predicate are
+unchanged; no original evidence is adopted or rewritten. Require actual
+exit0 AND genuine closed original proof; any refusal/nonzero/unknown closure
+vetoes positive markers. Record the actual result before next bounded work.
+No partial push, source request/claim/START/charge/QC action is authorized by
+software checks alone. Final publication remains ONE matching-lane push at
+true pre-QC readiness or a concrete irreducible blocker.

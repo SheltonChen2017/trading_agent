@@ -17,10 +17,11 @@ from data.hashing import canonical_json, hash_bytes, hash_payload
 from scripts import diagnose_short_interest_isolated_immutable_metadata as proof
 
 DRIVER = "scripts/run_short_interest_isolated_custody_offline.py"
-HARNESS_SHA256 = "e0a428915e9da6a41500ba78583d9ff28db02fada0125b864069cdcff840a9b0"
+HARNESS_SHA256 = "1f66c5ffe341a9316f81f83499c4d66cc2a896e7054649a046aaeb3b773d47aa"
 MAXIMUM_GIT_COMMANDS, MAXIMUM_INFO_COMMANDS = 20000, 12
 _INVOKED = False
 _ORIGINAL, _COUNTS, _ACTIVE, _FAILED = {}, {}, {}, {}
+_POLICY_ISSUED = {}  # Original immutable witness; an equal replacement is not issued.
 _CODES = frozenset("""harness_registration_changed harness_arguments_refused harness_manifest_refused
 harness_already_invoked harness_network_denied harness_credentials_denied harness_source_denied
 harness_subprocess_denied harness_write_open_denied harness_read_open_denied harness_mutation_denied
@@ -41,7 +42,7 @@ def require(value, code):
 def policy():
     require((MAXIMUM_GIT_COMMANDS, MAXIMUM_INFO_COMMANDS) == (20000, 12),
         "harness_registration_changed")
-    return {"schema": "si-isolated-custody-offline-harness-v4", "driver": DRIVER,
+    return {"schema": "si-isolated-custody-offline-harness-v5", "driver": DRIVER,
         "root": str(proof.base.previous.lane.ROOT), "branch": "codex/strategy-short-interest",
         "ref": "refs/heads/codex/strategy-short-interest", "code_paths": list(proof.code_paths()),
         "proof_protocol_sha256": proof.PROTOCOL_SHA256,
@@ -57,10 +58,48 @@ def policy():
         "artifact_file_opens": "new_fixed_namespace_exact_parent_directory_exact64code_files_basenames_and_their_readonly_parent_directories",
         "metadata_audit_limit": "stat_and_directory_metadata_not_independently_sandboxed_original_authenticated_code_and_FD_checks_remain",
         "audit_state": "original_identity_counter_tuples_and_permanent_failure_latch_no_public_reset_or_active_toggle",
+        "policy_predicate": "rebuild_complete_current_policy_every_event_strict_typed_original_witness_same_value_canonical_hash_before_hook_and_positive_terminal",
         "registry_keys": "original_objects_retained_with_default_object_identity_hash_no_audited_builtin_id",
         "refusal_projection": "after_failed_driver_contexts_unwind_deactivate_hook_only_preserve_all_denials_then_fixed_projection_including_original_safe_storage_association",
         "destructive_operations": "denied_no_cleanup_detach_unlock_or_adoption",
         "denied_counter_names": list(DENIED), "authority": proof.authority()}
+
+
+def _freeze_policy(value, ancestors=()):
+    """Issue an immutable typed tree of this one ORIGINAL policy value."""
+    kind = type(value)
+    if value is None: return "none", None
+    if kind is bool: return "bool", value
+    if kind is int: return "int", value
+    if kind is str: return "str", value
+    require((kind is dict or kind is list) and not any(value is previous for previous in ancestors),
+        "harness_registration_changed")
+    ancestors = (*ancestors, value)
+    if kind is list:
+        return "list", tuple(_freeze_policy(item, ancestors) for item in value)
+    require(all(type(key) is str for key in value), "harness_registration_changed")
+    return "dict", tuple((key, _freeze_policy(value[key], ancestors)) for key in sorted(value))
+
+
+def _matches_policy(original, current):
+    """Inspect EVERY complete current value; never normalize or admit an alias.
+
+    Walk only the finite issued tree, so a current cycle cannot extend the
+    recursion. Exact builtin types prevent caller equality/string coercion.
+    """
+    kind, expected = original
+    if kind == "none": return current is None
+    if kind == "bool": return type(current) is bool and current is expected
+    if kind == "int": return type(current) is int and current == expected
+    if kind == "str": return type(current) is str and current == expected
+    if kind == "list":
+        return (type(current) is list and len(current) == len(expected)
+            and all(_matches_policy(item, current[index]) for index, item in enumerate(expected)))
+    if kind == "dict":
+        return (type(current) is dict and len(current) == len(expected)
+            and all(type(key) is str for key in current)
+            and all(key in current and _matches_policy(item, current[key]) for key, item in expected))
+    return False
 
 
 class AuditSeams:
@@ -89,20 +128,48 @@ class AuditSeams:
         bindings = tuple(getattr(self, name) for name in (
             "root", "head", "namespace", "parent", "mount", "target", "probe", "code",
             "code_parents", "code_basenames"))
-        _ORIGINAL[self] = (self, self._identity, (bindings, hash_payload(policy())),
+        try:
+            original_policy = policy()
+            original_tree = _freeze_policy(original_policy)
+            original_hash = hash_payload(original_policy)
+            require(original_hash == HARNESS_SHA256, "harness_registration_changed")
+        except BaseException:
+            raise OfflineHarnessRefusal("REFUSED: harness_registration_changed") from None
+        witness = self, self._identity, object(), original_tree, original_hash
+        _POLICY_ISSUED[self] = witness
+        _ORIGINAL[self] = (self, self._identity, (bindings, original_hash, witness),
             self.denied, self.permitted, tuple(self.denied), tuple(self.permitted))
         _COUNTS[self] = self, tuple(self.denied.values()), tuple(self.permitted.values()), "none"
         _ACTIVE[self] = self, True
 
-    def _check(self, *, allow_failed=False):
+    def _check(self, *, allow_failed=False, canonical=False):
         require(type(self) is AuditSeams and AuditSeams.__hash__ is object.__hash__
             and AuditSeams.__eq__ is object.__eq__, "harness_counter_failed")
         entry, counts, active = _ORIGINAL.get(self), _COUNTS.get(self), _ACTIVE.get(self)
         bindings = tuple(getattr(self, name) for name in (
             "root", "head", "namespace", "parent", "mount", "target", "probe", "code",
             "code_parents", "code_basenames"))
+        try:
+            current_policy = policy()  # Deliberately reconstruct the COMPLETE value on EVERY check.
+            witness = _POLICY_ISSUED.get(self)
+            # Authenticate ORIGINAL provenance before inspecting the tree. A
+            # replacement registry row must never execute caller tag methods.
+            policy_good = (type(entry) is tuple and len(entry) == 7
+                and entry[0] is self and entry[1] is self._identity
+                and type(entry[2]) is tuple and len(entry[2]) == 3
+                and entry[2][0] == bindings and entry[2][2] is witness
+                and type(witness) is tuple and len(witness) == 5 and witness[0] is self
+                and witness[1] is self._identity and type(witness[2]) is object
+                and type(witness[3]) is tuple and type(witness[4]) is str
+                and _matches_policy(witness[3], current_policy))
+            if canonical:
+                policy_good = policy_good and hash_payload(current_policy) == witness[4] == HARNESS_SHA256
+        except BaseException:
+            policy_good = False
         good = (type(self) is AuditSeams and type(entry) is tuple and len(entry) == 7
-            and entry[0] is self and entry[1] is self._identity and entry[2] == (bindings, hash_payload(policy()))
+            and entry[0] is self and entry[1] is self._identity and policy_good
+            and type(entry[2]) is tuple and len(entry[2]) == 3 and entry[2][0] == bindings
+            and entry[2][2] is witness and entry[2][1] == witness[4]
             and self.denied is entry[3] and self.permitted is entry[4]
             and type(counts) is tuple and len(counts) == 4 and counts[0] is self
             and set(self.denied) == set(entry[5]) and set(self.permitted) == set(entry[6])
@@ -313,7 +380,7 @@ def _validate_result(result, seams, head, remote, manifest):
         "original_code_and_metadata_contexts_closed", "authority", "closed_at",
         "isolated_storage_closed_summary_sha256"}
     require(type(result) is dict and set(result) == fields
-        and result.get("schema") == "si-isolated-kernel-immutable-proof-closed-v4"
+        and result.get("schema") == "si-isolated-kernel-immutable-proof-closed-v5"
         and result.get("status") == "closed_offline_isolated_new_inode_only"
         and result.get("runtime_head") == head and result.get("actual_remote") == remote
         and result.get("code_manifest_sha256") == hash_payload(manifest)
@@ -366,6 +433,9 @@ def _validate_result(result, seams, head, remote, manifest):
         for name in ("write_open", "same_mode_fchmod", "fixed_fsetxattr")], "harness_result_refused")
     require(seams.permitted["create"] == seams.permitted["attach"] == seams.permitted["probe_create"]
         == seams.permitted["probe_write_challenge"] == 1, "harness_result_refused")
+    # The driver has returned only after all original contexts closed. Preserve
+    # the original canonical hash gate as a mandatory positive-terminal check.
+    seams._check(canonical=True)
 
 
 def _failure(error):
@@ -410,7 +480,7 @@ def main(argv=None):
     if type(values) not in (list, tuple) or len(values) != 2:
         print(canonical_json({"status": "refused", "failure": {"contract_code": "harness_arguments_refused"}}), flush=True)
         return 2
-    print(canonical_json({"status": "starting", "schema": "si-isolated-custody-offline-harness-v4"}), flush=True)
+    print(canonical_json({"status": "starting", "schema": "si-isolated-custody-offline-harness-v5"}), flush=True)
     try: result = run_once(values[0], values[1])
     except BaseException as error:
         result = {"status": "refused", "failure": _failure(error)}

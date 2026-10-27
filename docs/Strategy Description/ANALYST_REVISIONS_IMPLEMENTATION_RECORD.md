@@ -2259,8 +2259,10 @@ and record successful AR production/native validation of71monthly grids
 recovery and I326-024: ALL vendor slots lack pre-October2021 marks, blocking
 the Jan2021 start. Section326.50 records AU spent: six older EODHD RAW prices
 returned but metadata shape refused; authenticated failure, no source admission.
-AV is the separately frozen offline exact-DATA metadata shape diagnosis,
-not an AU retry or provider/strategy capture. No QC source
+Sections326.52–326.53 record AV actual0 identifying the display-name ASCII
+refusal and the prospective Unicode correction/AX offline retained-pair freeze.
+AW whole-US current catalog is implemented but NOT yet run-frozen/invoked.
+No AU retry, provider/strategy capture or QC source
 transfer/project/compile/strategy job follows this known source stop. Current
 identity/reference/actual-held NAV/full-window/source/run gates remain;
 337/259/53/699 unchanged.
@@ -67095,3 +67097,171 @@ an uninvoked prospective parser/contract. Used AV/AU remain frozen/spent.
 No new EODHD catalog/source/price acquisition or QC action is authorized by
 this AV freeze; each needs its own exact justified contract/current pins.
 Preserve known full-window source stop and337/259/53/699 accounting.
+
+### 326.52 AV actual0: exact display-name ASCII refusal identified
+
+At clean3fc471d50cf45f937e49d2189d55a7c55bc98f8a, sole AV native producer
+2026-10-27T15:59:47.955097+00:00..15:59:51.899669+00:00 exit0;
+sole SEPARATE native validator15:59:51.899815..15:59:55.642827+00:00 exit0.
+Both stdout4953bytes SHA256
+78b1493a53951d363ded5d812489a5d3ee825c6acc7911a6b6645b13490b13c7,
+stderr0/boundnull/exact equality. Accepted SHAPE observation only; AV now SPENT.
+No AV/AU rerun, old control/report read or provider request. Root stored full
+structured tool result before emitting its already redacted fields/predicates.
+
+Exact source170bytes/27fe1cfd authenticated before JSON, fresh metadata hash
+bd806499345abbf2ad999fe47db91bc0c475c4ac4db401c0525e0a59b634435d,
+fresh security hash2b84f04ed075c50bcafe7c9ebecee4bb98d84615a2e677f701b3b06bb7b47612;
+guard profile343c00cadac2987bacd4fbb5b1db0a8ba4b6d334d8bd6619dd97ec0bc235fb32,
+normal return observed. Endpoint equality is not historical/continuous proof.
+
+Actual one-row array, exact seven documented field keys, valid Isin type.
+Code/Currency/Type/Isin public expected comparisons ALLtrue. Name is a string
+with ASCII_string=false and printable_ASCII_string=false; every other field
+passes the old bounded nonempty printable-ASCII predicate. Old overall
+would_pass_metadata_shape=false, solely its display Name predicate.
+Field-inventory hash902472709f7a681108b9e066db9b180763799017295d8cef5356d4b8c6e4b10e.
+No actual Name, country/venue value, ISIN value, row or price was displayed.
+
+Confirmed P2 I326-026: requiring ASCII for a non-identity vendor display name
+can reject an otherwise exact identified fund and valid old RAW history.
+The verified actual refusal is the non-ASCII Name; AV did NOT test its Unicode
+category/control/surrogate admissibility under a proposed replacement, so a
+new parser's ACTUAL acceptance cannot be asserted yet. Used AU remains a
+failed/spent diagnostic; its result is not retroactively accepted.
+Prospective correction: a NEW pure symbol-list schema keeps bounded exact
+Unicode display Name/Country, rejects category-C/control/surrogate text, keeps
+identifier/Code/Type/currency/venue ASCII rules and all exact identity predicates,
+no normalization/alias/class filtering/deduplication. A NEW frozen offline
+two-DATA consumer may verify this correction against retained source; never
+edit/reinvoke AU/AV or silently reinterpret their accepted status.
+
+Public official EODHD documentation offers current active/delisted lists and
+paged US CUSIP/ISIN/FIGI mapping under existing EOD All World. These may support
+a NEW full-window source, not implicit mixing into frozen Sharadar/native
+prices. Whole lists/complete pagination, all original bindings/collisions and
+missing IDs must be accounted before any price request. No historical
+permanent identity/PIT interval proof is supplied: the separate rename API
+begins2022-07-22 and is not documented in the owner's existing basic EOD tier.
+No extra paid endpoint is inferred. Relevant primary references:
+https://eodhd.com/financial-apis/exchanges-api-list-of-tickers-and-trading-hours
+https://eodhd.com/financial-apis/id-mapping-api-cusip-isin-figi-lei-cik-%E2%86%94-symbol
+https://eodhd.com/financial-apis/api-for-historical-data-and-volumes
+https://eodhd.com/financial-apis/us-stock-symbol-rename-history-api
+
+Public AP-plan audit found it contains reduced binding hashes/roles/tickers,
+NOT the full whole-binding/FIGI/CUSIP inventories. Future crosswalk cannot
+promote AP alone: exact AC DATA16,344,399bytes/
+4366e1e8a218fb21afc6ef3d88dfed9c2ab8b784a7718a405616850e1a4d6ddc
+retains those qualified current identifiers; identity/strategy consumer also
+requires fresh genuine _load_plain/catalog/unchanged proof and equality of
+ALL6151 original objects, with8fund joins. No census/private read was performed
+during this public audit. Account for native5/conditional510 too; never call
+5636vendor routes complete for all6151 originals.
+Current history stop remains open;337/259/53/699 unchanged, no new strategy
+look/cell/QC operation. Accumulate this round locally, exactly one final push.
+
+### 326.53 Unicode correction, held catalog candidate, exact AX offline run freeze
+
+NEW pure scripts/arv2_r298_eodhd_catalog_schema.py6469bytes SHA256
+8ece5d178d2c8a1054aebd498f0968387d34dd3dca7979ddc59276f255a660f0;
+tests7409bytes f316843fcf733f5e14627f616d02848de9e83da8994e07361a24188882b78c6c.
+Canonical profile1738bytes
+517fa79f55ecebfa3af280e6e70aa7e6f8df674fe388cccfded0a6cc110fc44e.
+Exact seven field keys/duplicate-key refusal/UTF8/list<=100000; no discarded
+rows, class filter, deduplication, case conversion, Unicode normalization or
+alias inference. Bounded Unicode Name/Country are DISPLAY ONLY; category-C,
+surrogate/control text refuses. Code/currency/type/venue remain bounded
+printable ASCII; unknown punctuation/classes remain observations, not a
+routing permit. Isin retains null/empty/bounded alphanumeric text; matching
+still requires exact public SPY/ETF/USD/US78462F1030. Frozen AU history
+predicates reused PURELY on supplied history bytes, never its operation.
+No authoritative binary-float price arithmetic; Decimal RAW-close checks
+stay unchanged.80authorpasses3.78s; old ASCII-display mutation1red0.12s,
+restored. All schema/privacy/PIT/master/QC/readiness flags remain false.
+
+NEW AX scripts/read_arv2_r298_eodhd_retained_pair.py15094bytes SHA
+58aa5e2bb44c06c724c7bef7ba35a3a789c02620321a5e2ece3da486d4627872;
+tests10771bytes cdfd465f417bb7281e02c0c653baf20d31b3b59c0a76eb5d91436fc7b6459a83;
+canonical noLF profile29128bytes
+66ce2b07347bfa67c0de6b70e8c36bad981b72d75c797daaf3ed9b6fe8197d38.
+205 unchanged selected dependencies, including used AU8f837/AV6e75 and new
+schema8ece. Public source-context945bytes
+4626df96b94f8b08194b8d37ac5e3e65b3e0acae425bdb2f514ede0feffc6952
+preserves AU actual2 and AV actual0, not retrospective acceptance.
+AX control R326-20261027-AX under newrule_eodhd_history_diagnostic NOT
+inspected/allocated before this freeze. Claim/fsync/source/clean committed
+HEAD/caller/profile proofs precede exactly TWO pinned DATA reads:
+AU metadata170bytes/27fe1cfd and history729bytes/c55a32ca ONLY.
+No AU/AV parent, worker, reader, claim, journal, report or control replay.
+
+Native AX policy1893bytes
+1791225a454f765a0a3b64ef306c2ade4c4a15f0ee9a86ac704ca54e13edd38a:
+ALL network/Keychains/security denied, exact2DATA+own outputs/literal ancestors,
+all writes inroot runtime/own AX only. Generic held/no-follow/full10/native
+security guards authenticate BOTH whole byte pins BEFORE any JSON; compute
+new pure pair observation, exact current SPY identity and six positive RAW
+dates, verify source guards, require NORMAL RETURN, then postflight/emit.
+30s alarm/35s external caps; uninterruptible I/O/host-suspension caveat.
+Same exact Mac/Python3.13/root/branch-only preflight as AV; current clean
+committed run HEAD plus exact source/profile arguments required. One claim,
+unknown/partial/nonzero spends use; no retry/repair/alternate leaf.
+No new credential/provider/QC contact or strategy source admission.
+
+28authorpasses3.48s. Initial13pass/3fixture-independent failures3.83s exposed
+a pre-use escaped-LF framing bug: literal backslash+n before raw[:-1] JSON
+decode. Corrected as generalized I326-027 family; actual AU/AV stay frozen.
+Real canonical-one-LF roundtrip and pair-pin/normal-exit/guard failure cases
+cover dangerous direction. Memory-only literal-LF omission1red0.12s and
+pair/source-pin join omission1red0.14s, restored finally.
+Root reviewed AX source/preflight/data guards/strict actual-exit output and
+pure schema, no additional confirmed P0–P2 in that assigned scope.
+
+EXACT AX external metadata-only program4945bytes SHA
+d44a81dfb379b9b8831d3dc0c14c7e22b88f313f496dcb33ad25b36275f02a3d:
+ordinary outer launches AX once under native fence, then separate native
+ALL-network/ALL-artifact/Keychain/security-denied validator over original
+bounded stdout and actual parent exit. Both35s/64KiBstdout/8KiBstderr, no
+different nested sandbox. Accept only actualparent0/nativevalidator0,
+no stderr/bounds and exact original stdout equality. Preserve finite failures;
+validator0 on2 authenticates failure only. Retain full tool structured result
+before emitting redacted summary. Qualified current one-fund history match
+does not establish all6151/8fund price coverage or strategy admission.
+
+AW WHOLE-US CATALOG CANDIDATE IS COMMITTED BUT NOT YET RUN-FROZEN/INVOKED:
+scripts/run_arv2_r298_eodhd_catalog.py51508bytes
+e5a6cf032b52da4fcffbfe17f92fbfbc617e16f4bf3e048a441b4a6844e27323;
+tests23311bytes322a25915c798f3db6e6a020130dd717b1b8a53f7aa284f600a38198f9adee11.
+Canonical noLF profile27968bytes
+6d4696640e35a5d580be671fe3d984c2ac42d1c30b1c8278ad0ac409d70e51b6,
+204 literal pins. This implements bounded complete active/delisted US lists
+and explicit-offset US identifier-map pagination, private append-only framed
+bodies/journal/index, independent native auth, no raw values in output,
+no price/source/identity/PIT/QC admission. Existing EOD rights only, no new
+subscription/rename/fundamentals/price endpoint. No control allocation,
+credential/HTTP inspection or call occurred. Separate exact committed
+run decision/current pins and external actual-result handling required later.
+
+Root pre-use P2 I326-027: journal writer used real LF, authentication expected
+literal backslash+n; deterministic valid capture would fail after contact.
+Corrected unused AW expected journal and ordered-record hash to real LF;
+same bug family found in new AX and corrected before use. No old protocols
+changed.83AWauthorpasses4.50s (83pass4.16 overlap); initial79pass/4fixture
+failures4.25s retained: trailing-byte finite-code expectation, two safe-env
+pytest fixtures, retain-before-parse spy held across later auth. Fixed fixtures,
+no production isolation weakening. Omission reds restored finally: LF1/0.17s,
+mapping-total drift1/0.15s, redirect failed-body2/0.22s, persistent-start2/0.17s.
+Maximum100page parent envelope50706bytes tested, fits new prospective128KiB
+cap; aggregate framed byte size bound also joined to body pins. No contact.
+
+Root278distinctfocusedpasses3.74s=80schema+83AW+28AX+86record/document+
+1research transitive closure; no failures/skips/warnings/full suite.
+205/204 selected closures all actual source hashes match; source/profile/
+native-policy in-memory compile checks passed. All synthetic tests native ALL-
+network+production-artifact+Keychains/security denied, inroot support paths,
+disabled plugins/noconftest/no bytecode/cacheprovider; dispatch_fence absent.
+Old subsets/repeated record checks overlap and are not additive.
+Current Claude review waived, not independently accepted. All agents HOLD
+writes/tests/temp during sole AX operation. AW/price acquisition/crosswalk/
+source-policy/QC continuation remains uninvoked until separately admissible;
+337/259/53/699 unchanged. Continue to actual evidence; one final lane push.

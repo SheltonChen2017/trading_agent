@@ -34,7 +34,7 @@ shape,nc,route=inherited.pure.shape,inherited.pure,binder.route
 _raw,_sha=inherited._raw,inherited._sha
 FROZEN={**inherited.FROZEN,inherited.SELF_PATH:"cb66d434f0cefeb38bc85659feab8fce2f2b7431b03aef9a7d72550940d6d3df",
     inherited.TEST_PATH:"7fb1bd8ea5626595defdb2ad7ec94dd14d5008b98cafef7ce156a560028da107",
-    binder.SELF_PATH:"833a9e4a0a192a4e1aa3405d189a7b89047749e644902251c80e069fdd788f60",
+    binder.SELF_PATH:"66b764e2208e1817b76cdcaa257121b36d2fca830c588cb37213f859db56307f",
     binder.TEST_PATH:"a3f724d471ccc10a7c6718a860a1bc86a73e84e1debe94ee1340e95f13ddb457",**binder.CODE_PINS}
 _PHASES=frozenset({"arguments","source","native_preflight","inputs","input","privacy","collection","routes","source17","final","cleanup"})
 _CODES=frozenset({"private_arguments_refused","private_contact_mode_refused","fixed_actual_front_required","source_changed",

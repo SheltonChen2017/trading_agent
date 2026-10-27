@@ -234,3 +234,99 @@ def test_whitespace_led_shadow_copy_still_quarantines_every_copy(pad):
     assert not batch.eligible_claims()
     assert batch.public_witness()["disposition_counts"]=={"duplicate_route_all_copies_quarantined":2}
     assert _batch((_payload(accession=pad+ACC),),frozenset({ACC.decode()})).public_witness()["member_dispositions"]==["prior_consumed_route_quarantined"]
+
+
+@pytest.mark.parametrize("before_submission",[False,True])
+def test_stray_DOCUMENT_does_not_hide_a_shadow_before_a_qualified_TEXT_barrier(before_submission):
+    valid=_payload()
+    malformed=(b"<DOCUMENT>\n"+valid if before_submission else
+        valid.replace(b"<SUBMISSION>\n",b"<SUBMISSION>\n<DOCUMENT>\n",1))
+    assessed=_assess(malformed)
+    assert assessed.claim is None and assessed.public_witness()["canonical_preamble_accession_occurrences"]==0
+    batch=_batch((valid,malformed))
+    assert batch.eligible_claims()==()
+    assert batch.public_witness()["member_dispositions"]==["duplicate_route_all_copies_quarantined"]*2
+
+
+@pytest.mark.parametrize("raw",[
+    b"<SUBMISSION>\n<TEXT>\n<ACCESSION-NUMBER>"+ACC+b"\n</TEXT>\n</SUBMISSION>\n",
+    b"<DOCUMENT>\n<TEXT>\n<ACCESSION-NUMBER>"+ACC+b"\n</TEXT>\n",
+    _payload().replace(b"<TEXT>\n",b"<TEXT>inline\n"),
+    b"<SUBMISSION>\n<ACCESSION-NUMBER>"+ACC+b"\n</SUBMISSION>\n",
+])
+def test_unqualified_or_missing_TEXT_barrier_refuses_entire_batch_not_other_claims(raw):
+    assert _assess(raw).claim is None
+    with pytest.raises(m.NCRouteError) as caught:_batch((_payload(accession=OTHER),raw))
+    assert (caught.value.phase,caught.value.code)==("structure","shadow_front_unqualified")
+
+
+def test_genuine_opaque_TEXT_accession_mentions_do_not_quarantine_distinct_routes():
+    second=_payload(accession=OTHER,docs=_doc(b"<ACCESSION-NUMBER>"+ACC+b"\n<ACCESSION-NUMBER>\t"+ACC))
+    batch=_batch((_payload(),second))
+    assert [index for index,_ in batch.eligible_claims()]==[0,1]
+    assert batch.public_witness()["disposition_counts"]=={"private_direct_front_route_claim":2}
+
+
+def test_description_document_header_is_a_supported_opaque_TEXT_barrier():
+    second=_payload(accession=OTHER,docs=_doc(b"<ACCESSION-NUMBER>"+ACC).replace(
+        b"<TEXT>\n",b"<DESCRIPTION>invented description\n<TEXT>\n",1))
+    assert [index for index,_ in _batch((_payload(),second)).eligible_claims()]==[0,1]
+
+
+@pytest.mark.parametrize("old,new",[
+    (b"<TYPE>4\n<SEQUENCE>",b"<TYPE>\n<SEQUENCE>"),
+    (b"<SEQUENCE>1",b"<SEQUENCE>01"),
+    (b"<FILENAME>invented-private.xml",b"<FILENAME>"),
+    (b"<TEXT>\n",b"<DESCRIPTION>bad<inline>\n<TEXT>\n"),
+])
+def test_malformed_document_header_cannot_establish_an_opaque_shadow_barrier(old,new):
+    raw=_payload().replace(old,new,1)
+    assert _assess(raw).claim is None
+    with pytest.raises(m.NCRouteError) as caught:_batch((_payload(accession=OTHER),raw))
+    assert (caught.value.phase,caught.value.code)==("structure","shadow_front_unqualified")
+
+
+def test_shadow_front_budget_includes_stray_DOCUMENT_prelude_and_qualified_header():
+    raw=_payload().replace(b"<SUBMISSION>\n",b"<SUBMISSION>\n"+b"<DOCUMENT>\n"*8,1)
+    with pytest.raises(m.NCRouteError) as caught:_assess(raw,limits=replace(m.NCRouteLimits(),preamble_bytes=80))
+    assert (caught.value.phase,caught.value.code)==("capacity","preamble_byte_bound")
+
+
+def test_exact_shadow_front_byte_boundary_includes_header_but_not_opaque_TEXT():
+    raw=_payload();front_bytes=raw.index(b"<TEXT>\n")+len(b"<TEXT>\n")
+    limits=replace(m.NCRouteLimits(),preamble_bytes=front_bytes)
+    assert _assess(raw,limits=limits).claim is not None
+    with pytest.raises(m.NCRouteError) as caught:_assess(raw,limits=replace(limits,preamble_bytes=front_bytes-1))
+    assert (caught.value.phase,caught.value.code)==("capacity","preamble_byte_bound")
+    larger=_payload(docs=_doc(b"opaque"*8192))
+    assert larger.index(b"<TEXT>\n")+len(b"<TEXT>\n")==front_bytes
+    assert _assess(larger,limits=limits).claim is not None
+
+
+def test_stray_DOCUMENT_front_budget_counts_cumulative_prelude_not_header_alone():
+    raw=b"<DOCUMENT>\n"+_payload()
+    front_bytes=raw.index(b"<TEXT>\n")+len(b"<TEXT>\n")
+    document_header_bytes=front_bytes-raw.rindex(b"<DOCUMENT>\n",0,front_bytes)
+    assert document_header_bytes<front_bytes-1
+    assert _assess(raw,limits=replace(m.NCRouteLimits(),preamble_bytes=front_bytes)).claim is None
+    with pytest.raises(m.NCRouteError) as caught:
+        _assess(raw,limits=replace(m.NCRouteLimits(),preamble_bytes=front_bytes-1))
+    assert (caught.value.phase,caught.value.code)==("capacity","preamble_byte_bound")
+
+
+@pytest.mark.parametrize("complete",[True,False])
+def test_shadow_completeness_is_exact_typed_factory_snapshot_not_caller_assertion(complete):
+    raw=_payload() if complete else b"<SUBMISSION>\n<TEXT>\n</SUBMISSION>\n"
+    value=_assess(raw)
+    assert value._shadow_complete is complete
+    try:
+        object.__setattr__(value,"_shadow_complete",1 if complete else True)
+        with pytest.raises(m.NCRouteError,match="genuine_unchanged_assessment_required"):value.public_witness()
+    finally:object.__setattr__(value,"_shadow_complete",complete)
+
+
+def test_contact_screen_precedes_even_an_ambiguous_shadow_barrier(monkeypatch):
+    raw=b"<SUBMISSION>\n<TEXT>\n"+CONTACT.encode()+b"\n</SUBMISSION>\n"
+    monkeypatch.setattr(m,"_shadow_front",lambda *a:pytest.fail("shadow interpretation preceded whole privacy"))
+    with pytest.raises(m.NCRouteError) as caught:_assess(raw)
+    assert (caught.value.phase,caught.value.code)==("privacy","finite_payload_screen_refused")

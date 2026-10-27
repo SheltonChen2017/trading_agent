@@ -31,8 +31,8 @@ MAX_ROUTE_CLAIMS=4096
 MAX_PUBLIC_BYTES=2*1024**2
 CODE_PINS={"research/insider_buying_pilot_sec_roster.py":"e14c0e23d22604ee583cbb4958ab371ec56b619741a5a2e5da7211db73c7eaf4",
     "research/insider_buying_pilot_sec_parent_audit.py":"eb88a3e9c10f7d4911c313a41b36abe98f476ad4831f657651bf1d19b11f8971",
-    route.SELF_PATH:"a641ee80087413a749e3a945e39b7c81bd244dffc110506b563271e820373e72",
-    route.TEST_PATH:"48ba88f7a39773f436f1babd3933b1fae9074c94d49e3d38ac88c3b642964346",
+    route.SELF_PATH:"c9b83041cf38311ea4b4a6b7f2c4fedc35a276c0d388d6a1baecdaac6a70c208",
+    route.TEST_PATH:"430453b568a9034aba08475a8eb8e05d7c87e1cc48ed79dafb38761c6ab212eb",
     route.REVIEW_TEST_PATH:"b76815992a26b3f5c4816213a70c8ee21590ad09296692e7d3fc137402e070c0",
     route.PRIVACY_PATH:route.PRIVACY_SHA256}
 DISPOSITIONS=frozenset({"source_accession_unmatched","source_cross_quarter_repeat_quarantined",

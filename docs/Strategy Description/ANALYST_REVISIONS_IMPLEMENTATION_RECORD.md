@@ -65013,3 +65013,93 @@ this particular cloud code readback. It is not a continuous cloud snapshot or
 compile/job acceptance; verify current project/Saved/access/source before a
 separate run freeze. Unknown/changed/missing source still blocks launch.
 No raw QC data may leave QC;336/259/52/699 and all five source stops unchanged.
+
+### 326.26 Exact eight-file readback passed and bounded AJ source-job freeze
+
+In project38522505, main.py was uploaded LAST from the frozen AH stage and
+Replace confirmed ONLY its new-project default main. All eight Python files
+and the untouched/uninvoked research.ipynb were visible. No explicit build,
+backtest, optimize, live, notebook or Mia action occurred. The seven remaining
+code files were each downloaded ONCE through their own Explorer Download
+action. Safari's completed-download list showed exactly all eight unsuffixed
+filenames. Show in Finder observed each exact literal
+/Users/sheltonchen/Downloads/<326.24 Python filename>; no filesystem search,
+other file content, folder archive, data or old operational control was read.
+
+At clean4e098e2a533cdf96f778f1338bf29729bdad28f6, sole native AI code-only
+reader2026-10-27T11:05:35.568623+00:00..11:05:35.702327+00:00 exited0.
+All eight actual downloaded files177315bytes matched every326.24 hash EXACTLY,
+including main b447d662. Original no-follow/owner/regular/single-link/size/
+non-world-writable FDs/full10 metadata remained stable through matching/copy/
+report checks. AH public projection1988bytes/65cebf60 also matched. AI holds
+10exclusive files(claim,8matchingpy,report), report1895bytes SHA
+175a47a12afe4cef7a10c0ea642b2a5024c353cc75abd3f78db1579d6a86ed8c;
+held10-field endpoint SHA40af9aef9a09e621dc0e93f60d3428f9e591eb96de3a95a6395e092759c29d3d.
+The one-use reader/claim/report are SPENT; do not replay/repair/clean them or
+alter original downloads. Native ALL-network/Keychain/security denial, exact
+eight Downloads literals only, all other Downloads/artifact bytes denied,
+inroot processing/temp/output. No downloaded code executed, QC row/price/book
+exported, provider/QC contact or other-agent edit/test during this operation.
+This authenticates the particular controlled current code downloads, not
+historical/continuous cloud source, whole-user integrity or candidate compile.
+
+Under current owner source/price/research authority and review waiver, the
+clean commit containing THIS freeze permits ONE actual AJ/A1 no-order native
+five-source diagnostic in38522505, ARV2 R326 FIVE SOURCE RAW 20261027, using
+ONLY this exact eight-file65cebf60 projection/profile3e985a9d/AE9da6813b/
+plain activationffdc80e1/5901/cache scope13e90215 with tagR326-20261027-AH.
+All source/window/identity/calendar/collision/bounds/false flags are as326.17–24.
+No-order exception is frozen BEFORE execution: this checks original identity,
+RAW availability and QC-only book retention, which cannot legitimately place
+orders before identity/price admission. It supplies no strategy returns,
+six/eight comparison result, alpha verdict, formal admission or live/paper permit.
+
+Use the normal Safari Backtest Project action ONCE from this SAME controlled
+owner-only new-project editor after fresh same-org/sole-owner/Saved/source/
+resource observations. Own controlled editor session is expected, not an API
+codeRunning=False fiction; no other collaborator/writer/job may be present.
+Keep default-private/no-sharing context; do not change permissions, libraries,
+plan, organization, node, engine settings or other projects. Reobserve current
+masterv18207 and privately bound project before the gesture; unexpected drift
+or occupied capacity blocks it. Current paid Researcher/sole-Manager default
+Storage-Create inference remains QUALIFIED, not an explicit ACL/current-write
+fact. First real publication must fail closed on any refusal. Raw native data
+remain only in QC's own project-prefixed content-addressed Object Store key,
+with no overwrite/cleanup/retry and no host download.
+
+The GUI action may combine compilation and launch; this is a new explicit
+one-click UI protocol, not a claim to select or reuse a REST compile ID.
+Record every actual displayed new build/version/short ID and actual returned
+backtest ID/name/status. The earlier default776eb9-6b0744 build is excluded.
+No REST compile ID/Completed. string, zero effects or successful launch may
+be fabricated from a UI label. A failed/unknown compile or ambiguous gesture
+consumes A1; do not press again. At most one backtest may result. This stricter
+one-gesture authority does not renew any historical R298/R/R284 attempt;
+generic max-three unsuccessful candidate attempts and Mia checkpoint remain
+binding for any separately justified continuation. No unchanged retry.
+
+Observe only this own run through normal product status updates, bounded30min
+and<=40 user-interface observations spaced with product progress; no busy
+polling, additional job/result census, cancellation or node interruption.
+If still nonterminal/unknown at the bound, retain ambiguity/spent attempt and
+do not relaunch. An actual created source job adds ONE shared+infrastructure
+look, prospectively337shared/259development/53infrastructure/699cells;
+creation/build/source install alone did not add it. Append only its exact
+accountable ID once to the permitted Analyst run ledger. No comparison cell
+or development evaluation is added by this source-only diagnostic.
+
+After actual terminal, read ONLY selected ARV2_NATIVE_SOURCE_META and bounded
+own compile/finite failure evidence; no History/price/book file, raw rows,
+Object Store content, full logs/charts/orders/outcome/other-run export. The
+strict source/projection/native-summary/receipt validators remain the semantic
+authority. A UI Completed label plus source_observation_QC_cache_written and
+matching closed metadata can establish only this technical observation/cache
+publication; identity refusals, missing/invalid/failure-unknown cells and
+price-input-admission false flags remain binding. Completed alone is never
+enough. If selected metadata is truncated/unavailable/unmatchable, preserve
+that concrete limitation and do not accept the book or run another job.
+Any future bounded metadata-only copy/paste-to-inroot-file reader must be
+frozen before use and remain native ALL-network/artifact-denied for parsing;
+no unrelated result/raw data is included. All five source blockers persist
+until their actual independent proof; strategy acquisition/runtime/coverage/
+quote/holdings/payoff gates still precede the six-cell strategy evaluation.

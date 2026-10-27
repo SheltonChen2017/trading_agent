@@ -15,10 +15,14 @@ ANY PROBE FILE; ITS IMAGE/MOUNT ARE PRESERVED. ISOLATED V3/V4/V5 REACHED ORIGINA
 NATIVE FLAGS0->2 WITHOUT RECORDED LOSS, THEN REFUSED THE UNCHANGED8SECOND
 CREATOR WINDOW BEFORE WRITE CHALLENGE. V6 CLOSED THE ORIGINAL186-BYTE
 SYNTHETIC CUSTODY PROOF WITH REAL EPERM CHALLENGES AND ORIGINAL POST-CLOSE
-SEAL VERIFICATION. MAXIMUM-BODY/RECEIPT CUSTODY, DURABLE BUDGET SETTLEMENT,
-PRODUCTION STORAGE, SOURCE AND ACTUAL-INPUT ADMISSION REMAIN UNPROVED.
+SEAL VERIFICATION. THE MAXIMUM-BODY/RECEIPT SYNTHETIC PROOF CLOSED IN128.28;
+ACTUAL DURABLE BUDGET SETTLEMENT, PRODUCTION STORAGE, SOURCE AND
+ACTUAL-INPUT ADMISSION REMAIN UNPROVED.
 BODY/RECEIPT V1 TERMINATED EXIT2 BEFORE EITHER FILE CREATE: READ-OPEN
 HARNESS DENIAL. IMAGE/MOUNT PRESERVED; NO SOURCE DEBIT OR CUSTODY ADMISSION.
+BODY/RECEIPT V2 CLOSED ITS ACTUAL2MiB/790BYTE SYNTHETIC PAIR WITH SIX
+REAL EPERM CHALLENGES AND INDEPENDENT ORIGINAL-SEAL VERIFICATION. THIS
+DOES NOT RELEASE SOURCE CAPACITY OR ADMIT PRODUCTION COUNT TRANSPORT.
 CLAUDE REVIEW COVERS b648f60..730c59c, NOT THE LATER LOCAL3B0 DIAGNOSTIC COMMIT.
 LATEST OWNER REPORTS QC/SAFARI OCCUPIED: QUANTCONNECT PAUSED BY OWNER
 INCLUDING CAPACITY/METADATA; NO SAFARI, MIA, QC SETUP, UPLOAD, COMPILE OR JOB.
@@ -25258,3 +25262,300 @@ Source recovery/durability settlement/readiness remain gated;84005START/
 
 Main post-V2-record selection: **29passed/.41s**, network denied; whitespace
 clean. No code changed after357; all agents/tests frozen before invocation.
+
+
+### 128.28 Actual V2 maximum-body pair closed and independently authenticated
+
+At clean `ff9d1cc4502f0e46c3bfca8b96ea9c04a57e52f3`, matching tracking and
+actual originD6AF, ONE registered V2 invocation10622 printed the original
+starting marker and terminated **exit0**, status completed. Started
+2026-10-27T10:11:14.759000Z, closed2026-10-27T10:12:14.253791Z. Original
+body/receipt/code/output/volume contexts, issued terminal validator and fresh
+post-context original code/file/storage/clock checks succeeded. Exactly two
+genuine original setter calls returned0, one per distinct body/receipt inode;
+each original flag0->2 and callback2, no observer/controlled refusal. All
+SIX real WRONLY-open/same-mode-fchmod/fixed-fsetxattr challenges refused EPERM.
+Original8second/16sample/.25second/1second-quiet limits and>=5second hold
+remained unchanged. Tool4 original scoped masks/callbacks were restored and
+own lease released, no foreign ownership overwritten. This is observed
+custody of this specific synthetic pair, not perpetual stability or a general
+production/source admission; authority fields intentionally remain FALSE.
+
+Original counter result: all nine denial categories0/failure latchFALSE.
+Permitted Git5341/create1/attach1/info13/null_stream15/directory_stream35,
+body_create1/receipt_create1/body_write_challenge1/receipt_write_challenge1.
+Source/provider/key/newclaims/START/charged bytes0. Original count debt
+13992START/13991recordedHTTP/23452681chargedbytes is unchanged;84005START/
+4GiB ceilings and every old claim/negative/raw/unknown debit remain intact.
+
+| Original proof item | Exact SHA256 / bytes |
+|---|---|
+| Body | 2097152bytes; raw `03359e9fa404fac2200a0e3e9fa0dcd8eb973358a76e24b805de7e7566a2fd4a` |
+| Original body nine-field seal | `5515ffb0e0322ade7202b3614c8e61921df81b27f08723e7468447342b26f9d6` |
+| Internal canonical receipt | 790bytes; raw `d5dd6358d464051a68024a502fe73bd4c91229eb37e00f90c357c4f745cd45f2` |
+| Original receipt nine-field seal | `90c2b569515ad340489466e12d6173a9c0f730013bcdd7f9a89d4b1a9b8c126e` |
+| Original binding | `73fe5cd8612d545d1efb27dc3a08c38a8a01d75aba8f6988ce47249f4fb17592` |
+| Helper-closed summary | `6d75f145ca38fdf9d4a774e65416fc10678decc9aa2bf86be2c14e1532eebe9f` |
+| Storage-closed summary | `6f8b354447e94eb21a87d297c49e29eecf0d05266687e1636b592bfd933fad3c` |
+| Runtime code identity | `5fba1ae9b1ff4566b4af635343ba16d491edbc5039eda0436294253e41c555e1` |
+| Diagnostic | `a96385b8d7e7be6f81812e23f1d7d04c1a84722307bb4cfb49061f092191fcac` |
+| Complete proof | `d423a349cc4ceb2b17a41bbf55fdf57fa725e9d65f7540afc7e53119c609e00e` |
+
+Main independently opened both ORIGINAL V2 members readonly/nofollow/
+nonblocking AFTER known exit0. Each complete current nine-field stamp matched
+its ORIGINAL issued seal hash, original FD/name stamps agreed before/after,
+full exact bytes/hash matched, flags2/currentUID0600/singlelink held and the
+two original inodes were distinct. Exact directory membership was only body
+and receipt. Receipt canonical bytes, exact body hash/length, original binding/
+protocol and nondecreasing construction clocks inside original proof clocks
+matched. No replacement seal or current-stat baseline was selected. No new
+native, claim, source, provider/key or budget operation. Preserve original
+V2 inode pair, sparse image and mount; V1/older evidence remains untouched.
+
+### 128.29 Next source-only durability software; no dispatch permission yet
+
+**SI-DEC-20261027-08**, continuing SI-AUTH-20261026-02, authorizes bounded
+lane-specific SOFTWARE only before any new count claim/key/HTTP. Keep old
+ConservativeCountBudget and all old source/claim/custody files unchanged.
+A NEW coordinator must retain original CountRecoveryPlan and baseline,
+permanent START/try/unknown full-page debt,2MiB per-attempt reservation,
+512positions+16extras/chunk,3lifetime tries,133chunk/84005START/4GiB bounds.
+Owner-only reserve/settle transitions require coherent original state/lock,
+no caller callback/I/O between capacity check and append. Worker read-only
+authentication must not observe torn multiwrite state, grant mutation or
+reactivate a settled ticket. Historical and active ticket evidence differ.
+
+A NEW source-response custody type may seal only genuine active-ticket and
+original qualified-HTTP observations under an exactly registered operator;
+no bare caller body/status/HTTP=True/complete/hash may become source truth.
+Each attempt owns a unique original ordinal directory0700 with EXACT body+
+receipt membership and unchanged per-file kernel/FD/byte/nine-field/window
+checks. Claim/START/control semantic roles require separately frozen exact
+original publishers; large FINAL controls cannot silently raise the old1024
+metadata cap. No old synthetic capability is cast into provider authority.
+Shared lane/code/claim guard cursor/clock access must be coherent across
+<=8workers; serialize those checks rather than omit them to fit8seconds.
+
+The operational FINAL reader must authenticate complete recursive directory/
+START/retry/received/raw/inventory/provisional/closed membership, independently
+spent external claim and exact source/operator/code lineage. FINAL manifest
+lists all OTHER final members; its own bytes/pair must be independently
+bound by the original terminal root, avoiding recursive selfhash fiction.
+An inner pair or provisional roster cannot settle. Only after ALL original
+workers/source/code/chunk/output/storage contexts CLOSE and original postclose
+pins/fresh-code/clocks pass may the original outer factory mint opaque
+ClosedCountChunk. Fixed seven-field accounting binds exact budget+plan+
+chunk+original tickets+per-ticket charges+independently terminal-covered
+positions+closure hash. Attempted positions alone are not resolved coverage.
+Source/count/denominator/input/backtest admission remains separate.
+
+Unknown/statusless/no-body charges remain full2MiB; no zero-length positive
+body, START refund, old-charge reduction or negative-marker deletion. A
+negative chunk cannot issue a positive closure; next chunk waits for genuine
+unique prior settlement. Fixed reader type/registry and once-only consumption
+must reject forgery, cross-plan/chunk replay, partial rosters and reentrant
+state changes. No provider path is enabled until the real HTTP/claim/START/
+operator/storage/reader contract is frozen, focused/causal/parallel tests pass
+and the exact source operation receives a finite committed registration.
+
+Prospective storage is finite fresh per-chunk same-mounted-epoch custody,
+with original image/mount/device/owner/native anchors through provisional
+validation and full context closure before witness/next chunk. No arbitrary
+namespace, old-source/proof/image adoption, detach, reattach/remount/reboot
+interpretation, retries or seal rebaseline is inferred.8GiB virtual image
+capacity is distinct from4GiB cumulative provider response charges; actual
+host/metadata headroom must be checked before any HTTP. Synthetic V2 alone
+neither qualifies persistent production storage nor authenticates512/528
+parallel attempt controls. Later exact finite operation/qualification must
+prove those boundaries; no source capture is started here.
+
+Pre-QC work still includes authenticated count union, whole fresh missing-day
+daily chains, qualification/reload of existing monthly panels (no recapture),
+exact native/date/class/CIK/USD and denominator/eligibility composition,
+corporate-action/payment/terminal cash, exact rights and actual-input gates.
+Missing canonical originals must not blanket-block an independently qualified
+latest-reported descriptive candidate, nor may it be called historical PIT.
+No private source-usability conclusion is inferred. QC/Safari, purchases,
+new terms/credentials, outcomes/evaluation/backtest and trading stay excluded.
+ONE final matching-lane push remains pending; no interim publication.
+
+### 128.30 Source-only software checkpoint and verified integration corrections
+
+This checkpoint implements the SOFTWARE scope in SI-DEC-20261027-08. It
+does not enable capture. The original old source/capture/custody files and
+ConservativeCountBudget remain unchanged. The new DurableCountBudget keeps
+one original coordinator, coherent native RLock, original plan/tickets,
+permanent START/lifetime-try/full-page reservations and the84005/4GiB ceiling.
+Only the fixed operational reader's original seven-field, post-context
+ClosedCountChunk may settle a CURRENT complete chunk once. No individual
+response, caller complete flag, byte hash or provisional root can release
+capacity. Historical tickets cannot authorize another response creation.
+
+New claim/START/received/FINAL semantic capabilities use distinct genuine
+publishers. The original1024-byte primitive is not enlarged: large FINAL
+controls have a separate2MiB cap and strict roles. Body and receipt live in
+one exact two-member ordinal directory. Original FD/kernel/nine-field seals,
+8seconds/16samples/.25spacing/1second quiet and permanent failure latches
+remain. New volume lifetime is a separately stated one-hour finite chunk
+window, not a change to any old synthetic window or per-file check. Virtual
+8GiB storage and physical headroom are separate from provider body charges.
+
+The new outer source context closes the finite original four-epoch archive
+BEFORE any prospective new chunk. An original closed archive model supplies
+lineage, not an assertion that old files are perpetually stable. The outer
+factory issues terminal accounting only after original output/storage/source/
+code exits, complete recursive FINAL membership, original pins, fresh
+committed-code audits and clocks succeed. Provisional/closed-intent files
+alone are not terminal closure. The new reader authenticates the external
+spent claim and every original ticket/START/received/pair/final-control,
+independently covered positions and the manifest's OTHER members; the
+manifest itself is independently pinned, avoiding a recursive selfhash.
+
+**SI-BUILD-20261027-024 (P2, corrected before release):** independent local
+peer found the new final recursive audit omitted original cache
+`_inventory_names`'s required keyword-only boundary. The new caller now
+supplies the original phase-aware source boundary under the original lock.
+A fabricated directory regression exercises the ORIGINAL inventory function,
+not an accepting substitute. No actual source invocation encountered this.
+
+**SI-BUILD-20261027-025 (P2, corrected new wire; preservation still held):**
+inspection confirmed the old wire returns only after response.close and
+does not expose a received prefix on read/close failure. The NEW capture-only
+wire retains all returned bytes and genuine IncompleteRead.partial in an
+opaque original result, reads at most the remaining2MiB reservation in64KiB
+pieces, never MAX+1, and preserves full bodies on close failure. Incomplete,
+read/close/ambiguous cap failures are unqualified/full-page/no-retry. Exactly
+MAX is positive only with strict original Content-Length==MAX and successful
+complete read/close. Malformed/ambiguous framing refuses.404 is a negative
+full-page observation, never a zero or covered position. No old wire byte
+or historical charge changed. Only an original statusless OPEN transient
+chain may retry, with a new durable START, same query, no same-position
+inflight operation,3lifetime tries and fixed current-epoch2/10second backoff.
+
+Already-qualified genuine observations can be downgraded once to a distinct
+false-authority preservation object after failure; original bytes/fields/
+anchor/nonce identity remain. New in-flight results drain as unqualified
+objects. These objects are strongly held in RAM and cannot pass the positive
+reader. RAM retention is NOT durable quarantine. A separate before-claim
+original preservation lease and already-received-only negative publisher,
+plus fresh original physical-capacity checks before each GET, remain to be
+implemented/qualified. The source entrypoint deliberately refuses BEFORE old
+archive replay, new volume/claim/key/HTTP until those contracts are frozen.
+Source/negative-preservation/operator authority literals remain PENDING.
+
+**SI-BUILD-20261027-026 (P3, corrected fixed diagnostics):** own-class
+exception projection in the new outer/operator/reader now requires exact
+BaseException.args tuple/length/builtinstr before comparing a controlled
+literal. Hostile equality/string methods cannot execute during projection.
+These are fabricated adversarial regressions, not attribution of any old
+failure/actor or an actual provider trace.
+
+Main's fifteen relevant files passed **467tests/44.87s**, OS network denied:
+the eight new accounting/control/response/volume/operator/reader/outer/timing
+files, old conservative budget and original archive loader, original pair
+custody, lane import boundary, two review-record files and active documents.
+This is a focused selection, not a full lane/repository suite. Delegated
+executions are separate: budget89/1.60s, control selection187/3.27s, response+
+volume38/14.91s, outer/operator/reader68/4.06s, timing36/5.77s. Main reviewed
+the production interfaces and peer evidence; these are not independent Claude
+review or actual-domain operational closure. The eight-worker response test
+uses genuine toy tickets/HTTP/control/pair instances and original locks, but
+explicit fake source/volume/kernel/clock/wire seams. Quiet sleeps prove the
+shared lock is not held; guard callbacks prove it is held. Toy performance
+does not establish actual8second viability.
+
+Frozen new production SHA256s at this checkpoint:
+
+| Member | SHA256 |
+| --- | --- |
+| durable budget | 98c9034e71e64ade29cfa962fa77d93e668f4e30bf399363df97014979aa19dc |
+| semantic controls | e624493317fc2ae2f145bd2e5ed989aac307c0c3835742ee2f4957493dc76bae |
+| response custody | a40b7d909cb8bb7bcf38e1580a74df10a159281d964c802785d1eeeefebb98aa |
+| response volume | 341630d22da24516053371e10bb1165e35175776f1d709b613c323fc32575c7d |
+| bounded operator/wire | ac1e76ec2135ad525e82ab290dbe1b3e677530b6dba70035ecdf524fe57accbd |
+| closed-chunk reader | 485a4ac9537feec376b99958ce24cb4fc789aae13b157d7d549c842e45c9f5d3 |
+| original outer coordinator | 88e85add13969d8bca3e4a062b721b19fca9c10036e8849850dab218178105aa |
+
+Outer held80-file catalogue SHA256
+`4ab96b3c9800329392ae86795c8bf79e94cfcd4d9052957f7ba89a19848345ad`;
+current-byte mapping
+`96348a3eb0ef642be66c3e46511eca89263955de67c2afc02e6dfc0166112d63`.
+Static runtime closure is78 including ancestor package initializers; the
+other TWO are explicit bound historical offline wrappers, not runtime imports.
+No claim of80 runtime imports or actual source-protocol registration is made.
+
+### 128.31 Frozen ONE read-only actual-domain guard timing registration
+
+**SI-DEC-20261027-09**, continuing SI-AUTH-20261026-02, permits ONE separately
+frozen OFFLINE diagnostic after this clean software checkpoint. It may replay
+the ORIGINAL four spent epochs through the existing58-file loader, require
+its genuine post-context closed summary and unchanged baseline, then create
+one pure plan/EMPTY durable accounting coordinator and take exactly3samples
+of original model guard/plan guard/empty-budget summary. NO reserve call,
+ticket, source lease, provider entrypoint, image/native call, new file/claim,
+START, key/HTTP or budget charge is authorized. Samples measure current guard
+cost; they never relax checks or prove whole-file/whole-source readiness.
+The1800second whole initialization/closure bound and original old source
+checks/negative overrides remain. An absent handle is not terminal closure.
+
+New driver `scripts/diagnose_short_interest_count_guard_timing.py` freezes
+protocol `9fdb15e412f2caa161ddef2078dc601a0984c365992084a018a6331eb724deb4`;
+exact63-file list SHA256
+`21b25d2464cc07329f05d93f9d09d8e53f8fe19267588a63301f30d66954f09b`;
+complete current-byte mapping
+`612fc24130bc9a2b2bc244ff22c36cc0bd2498371b23f4404a3ccd07ecce7e3a`.
+Driver rawSHA `d809604521bce2bb52c4034da0596bd7a0e5c480cd46e7bc7e4202e18e03a4e3`;
+test rawSHA `0fd6c9e2cd4b0e575af6bf6014cbced603542b42d0519e55ee53521080992de3`.
+The63 are old58+research recovery-budget+durable-budget+this driver+two
+dormant method-level settlement imports (closed reader and operator). They
+are held as conservative AST dependencies, not invoked by this diagnostic.
+No fresh source operator or volume is entered/bypassed to obtain timings.
+
+The real cold-child audit hook denies Python network/native/write/mutation,
+exact named credential and all source/publication seams. Original readonly
+OwnedOutput construction and original inventory streams remain available.
+Git is limited to fixed current/historical code-path show commands, fixed
+historical-to-runtime ancestry and exact matching-lane metadata arrays,
+with an original20000-command quota. It cannot accept show options, another
+remote ref, arbitrary cat-file payloads, resets/fetches or a shell. Original
+argument/catalogue/counter identities are checked; a denial cannot become a
+positive terminal result. All source/code contexts must exit and final code/
+lane/clock/counter checks pass before an aggregate-only closed result.
+
+**SI-BUILD-20261027-027 (P2, corrected before actual diagnostic):** peer
+identified too-broad Git verb matching (show could accept an output option)
+and an omitted genuine readonly merge-base ABI. The exact command shapes and
+controlled historical heads are now bound. Peer also demonstrated hostile
+argv equality before exactstr checking; Main moved the type checks first.
+Main additionally proved that replacing the global historical catalogue could
+otherwise reintroduce an output option: **1causal failure/36deselected/.39s**
+before original-global catalogue pins, then **37passed/5.90s** after correction,
+OS network denied. This direct audit-handler reversal ran NO Git command and
+wrote no output file. Genuine toy loader cold-child closure tests remain
+fabricated-domain evidence, not proof of actual baseline runtime performance.
+
+**SI-BUILD-20261027-028 (P3, corrected registration before invocation):**
+Main's independent recursive AST walk found that the first61-path draft
+omitted the durable-budget settlement method's reader/operator imports.
+Neither method is entered by this diagnostic, but its held catalogue now
+includes both, exact63 with no missing/extra AST dependency. The original
+58-file source replay remains unchanged. This was a failed STATIC assertion,
+not an actual source/custody failure. The prospective registration above was
+corrected before any commit/invocation; no61-file invocation occurred.
+
+Main's final exact63 timing selection passed **37tests/6.15s**, OS network
+denied, after028; the eight new focused test files and complete union of
+held80/63 source files compile in memory. Independent AST walks prove
+outer78+2bound antecedents and diagnostic63+0extras. New source registration
+still refuses with controlled `durable_capture_registration_pending` before
+any source access. Record/import/diff/status checks accompany the checkpoint.
+Main post-record active-document/review-record checks: **95passed/.74s**.
+
+Every development agent is frozen before the actual read-only invocation.
+Document its real terminal result before another action; do not repeat a
+failed operation merely to guess. No new provider count/daily request, source
+claim/START/debit, outcome, QC/Safari action or push occurred in this software
+checkpoint. Existing monthly112 panels and all old negative/spent evidence
+remain retained. Local readiness is false; negative durability, actual-scale
+custody, source qualification/rights/cash/actual-input gates and the remaining
+pre-QC tasks in128.29 are still pending. One final push is still pending.

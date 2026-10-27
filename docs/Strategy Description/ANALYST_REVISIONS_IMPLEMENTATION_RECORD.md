@@ -2273,8 +2273,10 @@ fresh-source/110-unrequested-page continuation and actual parent0/native
 validator0: complete current catalog110346mapping rows/111pages plus both
 symbol lists. Original AW frame bytes were freshly authenticated against all
 three external body pins before BA source0; AY remains unaccepted. BA is now
-spent. The separate full genuine/original/current identity crosswalk is next;
-no strategy historical-price acquisition or QC run follows without its gates.
+spent. Section326.63 freezes the separate full genuine/original/current BB
+identity crosswalk; it is uninvoked until the exact clean committed decision.
+The new RAW-history parser is held technical preparation, no price caller.
+No strategy historical-price acquisition or QC run follows without its gates.
 No AU/AW/AY replay or QC source transfer/project/compile/strategy job followed
 the catalogue result. Current
 identity/reference/actual-held NAV/full-window/source/run gates remain;
@@ -68009,3 +68011,157 @@ compile. This invokes no old operational reader or private DATA traversal.
 326.61. Same-round public-source edge-case advisory found no material defect:
 related missing FIGI/CUSIP remains unresolved, unrelated missing identifiers
 stay retained, null ISIN is absent corroboration. No independent acceptance.
+
+### 326.63 Exact BB offline full-crosswalk freeze; new RAW-history parser held
+
+Owner's current direction remains: resolve source pins/parser/price coverage,
+continue six/eight research backtests, skip Claude review for now, document
+and push once at the concluded endpoint. This supplies sequencing for the
+following ONE new offline BB attempt and independent native output validation;
+it is not independent acceptance, a new vendor entitlement, source-policy
+admission or a QC/trading permit. No routine authorization wait is required.
+
+NEW scripts/prepare_arv2_r298_eodhd_crosswalk.py32357bytes SHA
+daec25bbe62c5855e0b21420f695f9816a87093f41c2f19f83452393abe66ab6;
+tests/analyst_revisions_v2/test_eodhd_crosswalk_consumer.py19042bytes SHA
+c7b68d03a50f9d35c0871c1c8c7044f9c310fdbef151d98a69abd455c9fa7edf.
+Canonical no-LF arv2-r298-offline-full-EODHD-crosswalk-bb-v1 profile33251bytes
+SHA43f624ac4543403ac58ff2e287659382c12f3a7ef7c474c99eb3c10e733f76f7.
+Exactly212 fixed literal selected source pins (all checked matching); inherited
+used chains unchanged. Draft crosswalk literal transcription had a correct
+eight-character prefix/incorrect remainder; caught and replaced with the
+already committed exact39464645b7acb8187eac2209e7e994d74ddd3c077911cb32d1a9c1820ffd6843
+before tests/use, never a historical pin refresh. Selected closure is not
+whole-interpreter integrity. Clean freeze is the commit containing this exact
+decision; actual CLI binds its full HEAD/caller/profile, no refresh or boolean
+authorization surrogate.
+
+Fixed own control is
+artifacts/analyst_revisions_v2/newrule_eodhd_crosswalk/R326-20261027-BB.
+It has NOT been inspected/allocated/invoked before this freeze. Parent must
+exclusively claim/fsync before any DATA or fresh genuine-package read. Claim
+consumes this use even with no source read; partial/nonzero/unknown is spent
+or ambiguous. No cleanup, retry, repair, rename or source-census. Compatible
+host only designated Mac root/branch, Darwin/POSIX Python3.13 at
+/Users/sheltonchen/.venvs/trading_agent-py313/bin/python. No credentials,
+provider, QC, browser or old operational entrypoint.
+
+Two UNCHANGED FixedDataGuard groups: AA/AC/APplan39168001bytes and five BA
+DATA27492064bytes =66660065combined, explicit96MiB aggregate cap. Each retains
+the existing8file/32MiBleaf/64MiBgroup/900s technical bounds, all no-follow
+original descriptors, ten metadata fields, native ACL/xattr/held-named checks;
+no helper-limit mutation. Exact SOURCE_PLAN AA routes19895631/3776f03b,
+AC price-lineage16344399/4366e1e, APplan2927971/7703c8e2 and CATALOG_PLAN
+five exact section326.62 DATA pins are frozen in source/profile with full
+hashes. Only these eight DATA leaves and exact genuine package/lineage are
+readable under native producer policy. No old claims/reports/controls are read.
+
+Both groups open; all eight whole byte pins checked BEFORE any DATA JSON or
+fresh genuine loader. Inside both guards, unchanged worker loads/revalidates
+genuine full6151 bindings and3466 original session records/1452price axis;
+all full binding objects must equal AA/AC/AP by ordinal. Pure BA.analyse
+rehashes all113raw bodies, index/real-LF journal/source metadata and requires
+exact complete110346row/111page authentication equal to external BA facts.
+This is supplied-DATA computation, never BA parent/worker/reader replay.
+BA parent/source/provider/auth/external-validator exactinteger0 facts, packet
+hashes, full report/output reconstruction and closed false flags are verified
+from inert anchor BEFORE private reads. Complete constant-count pagination is
+not an atomic/versioned/PIT snapshot; current mutable vendor limitations remain.
+
+Pure crosswalk V2 validates original whole28field identity/evidence/CUSIP
+proof plus qualified current vocabulary, all original/global FIGI/CUSIP/
+symbol/ISIN ownership, USD and stock/ETF types. Retains all6151stocks/8funds
+and every supplied catalogue row; no ticker/name/FIGI-only alias, source-stop
+selector, row removal or silent interval acceptance. Original proof refusals/
+unavailable rows remain explicit. Result includes metadata-only disposition/
+reason counts grouped by prior AP role and potential: executable5641 stock
+bindings versus510conditional assignments; matching a current identity
+does not prove historical ticker ownership or admit any price source.
+Fresh genuine _catalog_unchanged and both guard verifies/receipts occur while
+both original contexts are still open. BOTH guards must RETURN NORMALLY
+before ANY private publication. Own immutable crosswalk<=64MiB and metadata
+report retain full rows privately; public output only hashes/counts/finite
+reasons. Minimum free disk192MiB. Own original output descriptors/security/
+readback held through final verification; endpoint equality is not continuous
+or historical integrity. Late failure can leave private/report files; actual
+nonzero/unknown remains inadmissible.
+
+Producer native policy5105bytes SHA
+83fe5a0f219246c22f34178c88266876abf4eee0056a4cecb473b19e13492614;
+independent output-validator policy494bytes SHA
+79d7e961f0ab250fd95784609a254c2628244cbd0143b0aa3ea1d2f514858a4c.
+Both deny ALL network and both Keychains/security CLI; output validator denies
+ALL artifact reads. Exact DATA/package scope only in producer, writes only
+own new control and inroot runtime. Parent300/validator30s; external310/35s,
+uninterruptible-I/O/host-suspension qualification. No nested native profiles:
+ordinary external controller launches the two separate native processes.
+External manually authored program3428bytes SHA
+2ed489ed3ac183f5ec552f9dbfafdeab2e5972304dce3e5a675a6c61f515c5ab,
+pinned fixed capture helperfebe87c53010227eeca399b8a5087c42d2363c7d3a9ee583d18dfd06b3a68356.
+Root exact credential-free short PATH, LANG/LC_ALL=en_US.UTF-8 and inroot
+TMPDIR/TMP/TEMP/XDG_CACHE_HOME/PYTHONPYCACHEPREFIX; no extra Python/test env,
+absolute interpreter -B -s. Preflight before first spawn. Limits128KiBstdout/
+8192stderr resolved before spawn; complete EOF/stdin flags, no stderr/bounds,
+actual exit and exact output equality. Parent0 AND native validator0 required
+for accepted technical crosswalk observation; validator0 on2 authenticates
+failure only. External finite stage/failure preserves all exits, no raw errors,
+opaque values, credentials or licensed rows. Full tool capture/store precedes
+counts-only display. Actual result and all private/output pins will be recorded
+once; no future source/acquisition operation is granted by a success.
+
+BB author56distinctnativepasses4.26s. Initial54pass/2fixturefail4.22 retained:
+synthetic private-pin dict alias tampered both sides; static forbidden
+requests-dot substring matched permitted requests.jsonl DATA name. Fixed
+fixtures with a copied pin and AST import check, no product correction.
+All-eight-whole-byte-pin omission1expectedred.15s and fresh _catalog_unchanged omission
+1expectedred.15s restored finally/hash unchanged. All212pins/in-memorycompile
+passed. Nine Root in-memory external-controller synthetic cases passed:
+success, actual2/authenticated-failure, validator2, output mismatch, stderr,
+partial EOF, boolean exit, malformed postprocessing and preflight/no-spawn.
+No actual protocol runtime/control/private/provider/QC used by those fixtures.
+Malformed postprocessing keeps outer2 and accepted=false; stagevalidated is
+set only after successful JSON decode. This directly exercises resolved output
+constants before dispatch and avoids the earlier Root MAX_OUTPUT naming error.
+
+NEW pure scripts/arv2_r298_eodhd_history_schema.py14925bytes SHA
+164588995b8f82b42e09ea2087621391c1b81be04db618c119f285f4536a05ce;
+tests/analyst_revisions_v2/test_eodhd_history_schema.py12500bytes SHA
+1abd66513184d07ae52a5ef797d6c1c75fba0f6a5e278c4d30bb37ef9b5a62aa;
+canonical no-LF profile1797bytes SHA
+60d34d2afcb92631d000cbfa77aa0811732975ff9e9c9c79a58a85ba35bd51e2.
+Inert technical parser only, no operational caller or source/acquisition grant.
+Exact supplied raw pin before bounded duplicate-free UTF8 seven-field JSON,
+Decimal numbers (128lexical/exponent bounds, no float), existing full3466
+digest/1452axis check. Positive RAW close uses unchanged price normalization;
+adjusted_close/OHLC never substitute. Unused auxiliary finite/nonnegative,
+zeros retained/counts; volume finite/nonnegative/integral. All supplied rows/
+original ordinals retained privately, strict ascending unique in-window dates;
+off-axis rows produce no cell and normalization_complete=false; missing axis
+dates explicitabsent, present invalidclose refuses rather than becomingabsence.
+No sorting/redating/FF/row dropping. Opaque immutable tuple/Decimal evidence,
+redacted repr/no pickle; all admission/readiness flags false.84authorpasses
+3.38s/no fail/skip/warning; RAW validation and off-axis-retention omissions
+each1expectedred.13s, memory-only/restored finally. HELD, no actual DATA use.
+
+Root final227distinctfocusedpasses3.41s=56BB+84history+86record/document+
+1research transitive import closure, nofail/skip/warning/fullsuite. All four
+new source/test memory compiles, all212literalpins, exact profiles/native
+policies passed. Native ALL-network/production-artifact/Keychain/security
+denial, all temp/cache/log/plugin paths inroot, no conftest/plugins/bytecode/
+cacheprovider; dispatch_fence absent. Author/subsets/document repeats overlap,
+not additive. Same-round public-source advisory and Root review are not
+independent Claude acceptance. No strategy economics/shared behavior changed.
+
+After BB result, continue only with verified safe recovery: all5641potential
+stocks/eight ETFs must have admissible current identity before a separately
+justified homogeneous whole-window EOD acquisition/source policy; old Sharadar/
+native format and exact provider types stay frozen and cannot receive an EOD
+pin swap. EOD closes may support reference/NAV, never QC execution quotes,
+cache injection, stale/scalar/date fallback or outcome tuning. Missing early
+Sharadar I326-024 remains open until actual required-price coverage passes.
+No QC capacity/project/source transfer/compile/backtest in this decision;
+337/259/53/699 unchanged. All agents HOLD writes/tests/temp before actual BB.
+Accumulate locally; exactly ONE final matching-lane push still pending.
+Final pre-freeze86record/documentpasses1.19s is an overlapping repeat,
+not additional distinct coverage. Exact root/branch/HEAD/status and live
+matching remote634509bf0fb361a8471c9ed6b62106d0cdcfc245 rechecked unchanged.

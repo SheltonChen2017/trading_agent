@@ -64697,3 +64697,143 @@ Four external-handling checks are additional synthetic cases, not pytest suite
 passes or operational evidence. No full suite/independent acceptance/new DATA/
 credential/QC/control allocation occurred in validation. No push yet; floor
 336shared/259development/52infrastructure/699cells unchanged.
+
+### 326.21 Actual AF input proof passed; authentication transport refused
+
+At clean freeze9c0822360aad2f759a2ba26a28a21b0c6b0e7aeb, sole AF parent
+2026-10-27T10:36:22.547822Z..10:36:34.341637Z exited2; separate native
+validator10:36:34.341905Z..10:36:37.571229Z exited0. Both stderr0/no bounds,
+identical5058byte stdout SHA
+984d1330a7b134d54b7d87d74eed68eac8ae97af7e83e19c175527a2daf8aae1.
+Trusted-tool orchestration0 means authenticated FAILURE, never parent0 or
+successful organization observation. Run/claim/worker/validator/control are
+SPENT. No rerun, old-control/report reader, cleanup, renamed retry or fabricated
+success. Final86record1.01s overlaps289; no edits/tests during actual use.
+
+Fresh genuine source child10:36:25.658753Z..10:36:30.906278Z exited0,
+2407byte stdout SHA436ff86dda1bedc5f638c94c86c193ae8e025d8c2da789a06bae706b5a66a986.
+All6151 full bindings, five exact selected whole-binding hashes, five transport
+byte inventories,3466-session axis, manifest, capability/unchanged predicates
+passed at the original411c2734/e4518e06 input; plain1ab48d0b, activationffdc80e1,
+binding stream73ba4ac7 and axis4ac84a2d matched. This is scoped local input
+authentication, not native/QC/permanent identity or price admission.
+
+The existing credential handoff occurred ONLY after that actual0. The sole
+authenticate child10:36:30.967518Z..10:36:34.251915Z exited2,735byte stdout
+SHAf9d61d8c11f0bc84a80bbc89e7184a70eac2aac18ffd65eaa01dc657215ed2d6.
+Finite failure transport_connection; one request intent, HTTP statusNone,
+complete body pinNone, physical contacts unknown. No project/org role was
+dispatched; no report/successful rights pin returned. No root cause, API
+entitlement, expiration, server outage or specific native-policy cause is
+established. Do not apply this category retrospectively to AD/R287/Massive.
+All original false flags remain, no QC-data acquisition/source upload/project/
+cache write/capacity/compile/job/cell from AF;336/259/52/699 unchanged.
+
+After the fresh local source gate passed, authorized Safari READ-ONLY
+inspection used a NEW tab, preserving the other lane's existing editor/tab.
+The session was unlocked/logged in. The homepage/lab/Organization/Members/
+Resources UI loaded successfully; this does not identify AF's failed
+transport cause. The observed organization ID was hashed locally under native
+ALL-network/artifact denial and equalled the frozena2d88859… org pin; raw ID,
+names, billing amounts and private node IDs are not copied into this record.
+Current Plan was Researcher, the current billing window included2026-10-27,
+and Members showed one member with Manager role. No invoice/payment completion
+claim follows from an estimated bill or current-plan label. Resources showed
+two B2-8 backtest nodes with Project/InUseBy empty, and84.54MB/2GB Object Store
+usage. These are point observations, not a continuous lease/current future
+job clearance. No node stop/settings/permission/subscription/lock/source change
+or Object Store file/content read/download occurred. Web navigation dispatches
+are not measured physical-request counts and add no research look/cell.
+
+Current primary QuantConnect documentation supports a qualified default-access
+inference for the sole Manager in this paid Researcher context: all members
+access their organization's resources, while extra per-member permission
+editing is described for Trading Firm/Institution managers. The absent Edit
+Permissions UI is not proof Storage Create is denied. This is NOT an observed
+Storage Create checkbox or successful current write; first actual publication
+must still refuse on any write denial. No permission flag is fabricated or
+weakened. See [Members](https://www.quantconnect.com/docs/v2/cloud-platform/organizations/members)
+and [Object Store](https://www.quantconnect.com/docs/v2/cloud-platform/object-store).
+Paid organizations may retain/reuse QC data for their QC Cloud projects, with
+data remaining inside QC; this account is not thereby authorized to download
+raw QC files to the host. Organization membership/context is observed, not
+whole-org integrity/privacy or a new paid entitlement. A separately bounded
+NEW private own project, fresh access/privacy/source/input/capacity/attempt
+and actual source/run freeze remain required before uploading/compiling/
+launching the exact eight-file source-only diagnostic. No strategy/backtest
+result or source gap is cleared; all five vendor blockers remain.
+
+### 326.22 Pure RAW acquisition plan and one new create-only UI checkpoint
+
+New scripts/arv2_r298_raw_price_acquisition.py28967bytes SHA
+229b3be993a111ac82ebfe4c68e67928b2eedd6cc2c9222de6ae2190a4dd71af;
+tests16497bytes SHA38f7ff7ca493394298f49dc266e542c5c1a7a8cfc7422aa4f72b2a3eaca2e560.
+Canonical NO-LF2669byte profile SHA
+379765aa50fbbb0fce6ecb448da37b6ef76ccd02facdd6b2ee3801c0e05eae02.
+This pure additive helper authenticates supplied AC frame/summary, exact AE
+five-refusal join and full3466-session axis before deriving one common full
+2020-12-31..2026-10-13 plan. All6151 original stocks plus8funds remain:
+5636 routed vendor,5 pending independent native source and510 conditionally
+never-potential with empty-initial/unexpected-holdings stops still required.
+No date is clipped to binding/membership/current metadata endpoints. Fixed
+209stock groups of<=27 tickers times6annual windows =1254 requests;8funds
+times2windows =2requests. Largest calendar-key bound9882 stays below10000;
+this is not a vendor unlimited quota/rate or completeness guarantee.
+
+Requests use exact stocks/funds endpoints, ordered ticker,date,closeunadj,
+lastupdated fields, format=csv,limit10000,skip0,sort=date.asc. The parser accepts
+only exact ordered four-column bounded UTF8/BOM CSV, direct positive finite
+Decimal text, exact requested tickers/NYSE dates, no duplicates or out-of-order
+dates and strictly below limit. It preserves observed lastupdated relation as
+current-vintage evidence, not original availability/PIT. Absent observations
+are explicit on the exact1452-session NYSE grid, not weekend/holiday cells or
+inferred halt/delisting/payoff causes. Non200 requires no body and keeps
+absence unknown. Opaque plan/request/response objects have no raw serializer,
+HTTP/file/credential/retry interface and grant no operational authority;
+constructors/types alone are not trusted source capabilities. A future exact
+caller must derive/bind the genuine plan/request hashes, authenticate source
+bytes/security, retain secret-scanned HTTP200 raw bodies BEFORE semantics,
+honestly bound acquisition/deadline/FD/disk/rate/attempt behavior, and separately
+admit prices for BOTH target reference and actual held-stock NAV/terminal
+payoff. It must not promote the five refusers, infer admission from fewer
+than10000 rows, drop rows, or substitute EOD marks for executable quotes.
+
+Author50distinct native ALL-network/artifact/Keychain/security-denied passes
+12.20s; earlier46/11.31s overlap. Five restored omissions: exactnative-five
+join1failure0.44s, equal-length source-pin mismatch1/0.50s, positiveprice1/0.45s,
+duplicate early classification1failure+1overlappingpass0.66s(later closed
+accounting still refused), ordering1/0.45s. Initial reserved pytest fixture
+name caused collection error4.74s, corrected before use. No actual source DATA,
+provider/QC/credential/control or operational acquisition was performed.
+
+Under the owner's existing source/price/research authority and review waiver,
+the clean commit containing THIS freeze permits ONE Safari CREATE-ONLY action
+for a NEW Python project named exactly ARV2 R326 FIVE SOURCE RAW 20261027,
+inside the freshly observed same frozena2d88859… Researcher/sole-Manager org.
+This is a five-original-identity/RAW availability infrastructure candidate,
+not a replacement R298 strategy attempt or a valid six/eight result. Use only
+the separate current Analyst browser tab; preserve every other tab/project/job.
+Record the actual returned project ID once and inspect its normal Sharing/
+owner-only/private state without adding collaborators or changing permissions.
+Unknown/ambiguous creation is spent; do not rename/create a replacement.
+No upload, default-code execution, compile, backtest, storage write, licensed
+row/data upload, node/plan/permission change or extra project is authorized
+by this CREATE-ONLY checkpoint. If a dialog requests purchase/new legal terms/
+unexpected sensitive access, stop before accepting. Source-only project
+creation adds no look/cell. Actual project identity/privacy must be observed
+before a separate committed concrete-project projection/cache-scope/eight-file
+manifest/source/input/compile/run/attempt/result freeze. Do not fabricate an
+API compile ID or Completed. status from a different UI label; if the normal
+UI combines compile+launch, prospectively define that actual one-click protocol
+and preserve its evidence limits before the click. Paid-cache context remains
+the qualified sole-Manager inference in326.21, not an explicit ACL checkbox
+or verified current physical write. No strategy backtest is ready from this
+step;336/259/52/699 unchanged. No push yet this round.
+
+Root final137distinct focused passes11.34s =50RAWhelper+86record/document+
+1research transitive closure; no failures/skips/warnings. Source/test compile
+in memory, exact EOF/profile/source pins matched, dispatch_fence absent under
+native ALL-network/artifact/Keychain/security denial and inroot paths, no
+full suite or actual data/credential/provider/QC operation. The source-only
+helper is not an operational acquisition caller. All agents held before
+the separately frozen create-only UI action; no competing edits/launches.

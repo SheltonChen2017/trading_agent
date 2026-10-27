@@ -62828,3 +62828,48 @@ readinessec7f08b6->b15ba88e. This is a public-byte comparison, not an actual
 preflight invocation or private artifact access. The preclaim source gate
 remains fail-closed; no changed pin was accepted or overwritten. All validation
 was under the same native network/artifact/Keychain/securityCLI denials.
+
+### 325.6 Exact merge checkpoint, single-push boundary and next handoff
+
+Normal merge committed630e1abc2c78b87b625c161f6ca196eb2e4e531e, exactparents
+d403c972a2d135475f93450925c382101e97be58 and
+e57d785fd813dfe8a17d11233ba47534ae42616a. Both original
+503168ac5caa1d2f0ee678f697c24dd552f0a818 and reviewedremotee57are verified
+ancestors. No original commit was rewritten. The exact25local implementation
+commits after3c905d4235617d3d2a56b636c8e0be77ee790686 end at503168ac;
+their ordered prefixes are e3afe7ef,433831fc,6eda8f40,9eec2276,cce39c6d,
+5817aa42,af789ea0,52eb8956,283ec2c3,ff7de3dd,01def20b,960a3cea,
+001cbcb4,446d061c,86ba71fc,66bcec00,d2abfec6,7b030868,f701a602,
+a0e46ada,1147e699,06be2792,c265166d,5b3a3c1a,503168ac. They remain
+implementation history requiring their own eventual independent review, not
+the scope of the5incoming dispositions above. This final record follows the
+separate d403counter-review and630emerge commits. No new code milestone.
+
+Merge-precommit86record passes1.00s and earlier86/1.13s overlap the389selection;
+they are not additive. Final record/diff/status checks follow this note. No
+production/source pins changed after the merged389/4.13s selection. The five
+EOFcorrectedfiles remain exactly the reviewed remote bytes and immutable
+pre-correction sources remain recoverable from their original commits.
+ARV2CR325-001/003/004 are resolved after the authorized preserving merge and
+append-only accounting qualification; -002 stays OPEN with the exacttwo
+hash mismatches recorded in325.5. No newbookedlook/cell, no acceptedstrategy
+result, no price fallback/cache injection or permission inferred from a merge.
+
+Before final push recheck designatedroot/branch/HEAD/status, no staged surprise
+and live matching remote stille57d785f; stop on change rather than overwrite.
+Make exactlyONE successful nonforce push to refs/heads/codex/strategy-analyst-
+revisions-v2, then verify local/tracking/live tip agreement and both ancestors.
+No intermediate push occurred. Tracked files will be committed; the two Y
+draft source/test files remain deliberately UNTRACKED/local-only, preserved
+but not part of remote synchronization, validation or invocation authority.
+Report that qualification, not a globally clean worktree or complete transfer
+of those drafts. The contiguous section5row covers this oneconcludedround.
+
+Next work is a separately coherent prospective closure for approved new bytes
+and a bounded offline interpretation of X's pinned status data, followed by
+complete common reference/NAV coverage and all genuine launch gates. It is
+NOT an unchanged X/W/V retry or renewed old consumer. Current request ends at
+this sync/counter-review checkpoint; no provider/QC/Safari/price/body read,
+capacity check, freeze or backtest is started as a next milestone here.
+All existing review waivers retain their actual scope and are not independent
+acceptance or a trading permit. The fulfilled Insider monitor stays deleted.

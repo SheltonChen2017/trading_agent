@@ -67669,3 +67669,47 @@ No ticker/FIGI-only fallback, five-name exception or external barrier inferred
 from AC route=None before that evidence is exhausted. V2 is in memory only;
 old762d candidate remains uninvoked, complete EOD inventory still absent.
 All agents HOLD before AZ;337/259/53/699 unchanged. One final lane push.
+
+### 326.59 AZ outer preclaim refusal: reader still uninvoked; corrected handoff
+
+Section326.58's external program exited2 with producer=null/validator=null,
+outer_failure=external_preflight_or_postprocess, no metadata acceptance.
+The native AZ CLI was NOT invoked: that exact program unconditionally calls
+protocol.preflight before measured.capture, while its explicit outer env has
+a venv-prefixed PATH and PYTHONNOUSERSITE/PYTEST_DISABLE_PLUGIN_AUTOLOAD
+outside the frozen allowed env. _require_environment MUST refuse before source
+Git/claim/read/dispatch. An ALL-network/artifact/Keychain/security-denied pure
+environment check reproduced this guaranteed early refusal; no source/control
+inspection was used to infer it. Thus this was an EXTERNAL PRECHECK only,
+not a spent AZ source-reader claim or a renewal of AY/AZ usage.
+Original AYactual-9 remains unaccepted; no other result is promoted.
+
+First attempted corrected host probe still refused environmental key policy
+because the locale was not fixed. Final exact existing _environment convention
+passed full clean-head/source/host/environment preflight under native denial:
+PATH=/usr/bin:/bin:/usr/sbin:/sbin; LANG=en_US.UTF-8;
+LC_ALL=en_US.UTF-8; inroot TMPDIR/TMP/TEMP/XDG_CACHE_HOME,
+PYTHONPYCACHEPREFIX=inroot support/pycache; PYTHONDONTWRITEBYTECODE=1.
+No extra Python/test env flags. Absolute pinned Python -B -s suppresses user
+site additions without forbidden environment keys. No native protocol,
+claim/private read/provider/QC operation in any host probe.
+
+Freeze the FIRST native AZ source-reader invocation now, with unchanged
+caller6402/profile02a9/helperfebe/207source pins and all326.58 source/guard/
+deadline/actual-exit semantics. Current clean committed HEAD containing this
+decision replaces the prior expected HEAD, not any byte pin/protocol/scope.
+All new controls remain unallocated by Codex code; no pre-use lstat/read.
+Exact outer COMMAND environment above is binding, not merely its child env.
+
+Manually authored external program WITH FINITE PHASE MARKERS:
+4291bytes SHA3a62712c6c0819bd8dc15a0c182c0427f850678a5bd740688fab81c016009bf1.
+Phases initial/external_preflight/producer_capture/validator_capture/validated
+distinguish future refusals. No global ID substitution or limits looked up
+after spawn; fixed helper hash, fixed65536/8192 limits and childcomplete flags.
+Literal module attributes/compile checked; source207 closures unchanged.
+Native reader35s outer, independent validator35s; original source30s alarms.
+No actual source success unless parent0 AND nativevalidator0/complete streams/
+no bound/no stderr/exact output equality. Metadata-only observation never
+accepts original AY or its reported whole-file/source claim.
+Preflight-only refusal does not justify any other retry or spent claim.
+337/259/53/699 unchanged; one final matching-lane push remains pending.

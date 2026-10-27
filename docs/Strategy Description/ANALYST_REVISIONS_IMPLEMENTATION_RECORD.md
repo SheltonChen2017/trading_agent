@@ -2277,8 +2277,8 @@ spent. Sections326.63–326.64 record BB full genuine/original/current identity
 crosswalk actual0/native validator0:6151original proofs passed, all8ETFmatched,
 but2426potential stocks remain unresolved. Source-pin/parser progress is
 verified; historical-price and strategy-run admission remain blocked. A new
-offline field-format diagnosis is being prepared; no price request follows
-an unresolved identity. The RAW-history parser remains held technical
+offline field-format diagnosis is frozen in326.65 but not yet invoked; no
+price request follows an unresolved identity. The RAW-history parser is held technical
 preparation, no price caller.
 No strategy historical-price acquisition or QC run follows without its gates.
 No AU/AW/AY replay or QC source transfer/project/compile/strategy job followed
@@ -68273,3 +68273,139 @@ Current work continues offline under owner waiver; exactly one final push
 remains pending, none this round yet.
 86record/documentpasses1.32s after this actual-result entry; overlapping
 selection, not additive. BB source/tests and all used old sources stay frozen.
+
+### 326.65 Exact BC offline identifier-format diagnosis and ISIN observation freeze
+
+ONE new BC metadata-only read is now prospectively authorized under the
+current owner parser/price-recovery research waiver. It diagnoses newly
+retained BB DATA, not an old operation replay, identity repair, source-policy
+admission or provider/QC call. Normal technical byte/host/claim/security/
+actual-exit gates remain. No independent Claude acceptance is represented.
+
+scripts/read_arv2_r298_eodhd_crosswalk_gaps.py42314bytes SHA
+a80a0d784cee31cf1778f135f411e5e859f44f36fd1d26dba7f3b6b2e8c753b8;
+tests/analyst_revisions_v2/test_eodhd_crosswalk_gaps.py22331bytes SHA
+892550f0cfcb86fe5553364f98d16a99812e1d1360deb607b72c8e6f1f1fba87.
+Canonical no-LF arv2-r298-offline-EODHD-identifier-gap-diagnosis-bc-v1 profile
+32827bytes SHA4859ccdecbce34b17f18f044484c7e9760da1d7b468652846c70572252e965e6.
+Exactly215 literal selected source pins match; inherit unchanged BB/BA/old
+chains, add exact BB caller/public anchor/new pure ISIN helper. No pin refresh,
+shared behavior change or whole-interpreter-integrity claim. Actual CLI binds
+the full clean HEAD of the commit containing this decision, caller and profile.
+
+Own fixed control
+artifacts/analyst_revisions_v2/newrule_eodhd_crosswalk/R326-20261027-BC
+has not been inspected/allocated/invoked before freeze. Exclusive fsynced claim
+precedes DATA reads. One unchanged six-leaf FixedDataGuard: exact BB private
+13445076/5006dc2f plus five BA leaves27492064 =40937140total bytes, full hashes/
+paths frozen in DATA_PLAN/profile (326.62/326.64). Existing8file/32MiBleaf/
+64MiBgroup/900s/ten metadata/native ACL/xattr/no-follow/held-named rules stay.
+ALL six whole hashes before any DATA JSON. Native producer reads ONLY these
+six DATA leaves and own output/cache; no original package, AA/AC/AP, prior
+claims/reports/control leaves, licensed corpus census or old entrypoint.
+
+Pure BA complete111page/110346mapping authentication is repeated on supplied
+buffers under this NEW guard, no BA operation. BB private schema/fingerprint/
+full6151 binding canonical stream, retained CUSIP vocabularies, original-proof/
+token/disposition/reason counts, all8funds and every old V2 match result are
+reproduced against the exact public actual0 BB result. This is retained-DATA
+consistency, NOT fresh genuine-package/original28field authentication. No
+source rights/admission/history proof is upgraded.
+
+Diagnostic indexes all supplied mapping rows. Fixed global/related FIGI,
+CUSIP, symbol and ISIN categories: missing/null/type/empty/length/format/
+checksum/valid. Counts grouped by original AP role/potential/BB status/reason;
+exact FIGI+checksum-valid full source CUSIP9 pair presence stays distinct from
+absence. CUSIP8 base and leading-zero-loss comparisons are observations ONLY;
+no padding, generated checkdigits, trimming/case changes, token mutation or
+route. Reference visits explicitly capped2000000/deadline checked.
+New helper's exact US/CA ISIN localCUSIP9 evidence is counted by ORIGINAL
+vocabulary versus current-union-only, prefix and raw-CUSIP state: absent/
+null/empty, nonempty-invalid, valid-different, agreeing. Same exact source
+FIGI is mandatory for these related-row counts. Derived valid IDs across
+ALL mapping rows also count same/other/null/invalid FIGI relationships, so
+otherwise-invalid rows are not hidden from future collision analysis.
+These are overlapping row/source observations, NOT independently corroborated
+evidence, admissible routes or a guarantee any refusal can be recovered.
+
+Guard checks and NORMAL RETURN precede own metadata-only report publication.
+All6151+8 preserved; no new private row export, identifiers, indices, URLs,
+names, prices or credentials in public output. Only own claim/report or finite
+failure files, original output FDs/native security/readback retained through
+final checks. Minimum free disk4MiB. Partial/unknown/nonzero consumes/ambiguates
+the new use; no retry, cleanup, repair, renamed replacement or old-reader replay.
+Source metadata endpoint equality is not continuous/historical integrity.
+
+Native producer2811bytes SHA
+a102f8dd0064d9af90afbd530bc253a69172adc6acdca252e81758fcb55542f6;
+native validator494bytes SHA
+79d7e961f0ab250fd95784609a254c2628244cbd0143b0aa3ea1d2f514858a4c.
+Both deny ALL network/both Keychains/security CLI; validator denies ALL artifact
+reads. Producer300/validator30seconds, external310/35; uninterruptible-I/O/
+host-suspension caveat. Compatible designated Mac root/branch/Python3.13 only,
+same exact credential-free short PATH/UTF8/inroot temp/cache environment as BB,
+absolute interpreter -B -s. Ordinary external parent launches separate native
+producer/validator, no nested conflicting profiles. Exact manually authored
+external program3426bytes SHA
+1b17460e89b46e57e6a895c9a787fdfd7fae85b2e725ce8976091b1642f6dd7c;
+capture helperfebe87c53010227eeca399b8a5087c42d2363c7d3a9ee583d18dfd06b3a68356,
+128KiBstdout/8192stderr bounds resolved pre-spawn, actual exits/complete streams/
+no stderr or bounds/exact output equality mandatory. Parent0+validator0 accepts
+only technical format observation; validator0 on2 is failure evidence. Complete
+metadata stored before counts-only display; no raw exception/opaque values.
+A report alone or fabricated0 never suffices. Nine synthetic external capture
+cases passed, including actual2, malformed postprocess, partial output and
+preflight-no-spawn; no protocol runtime/claim/source/contact in those fixtures.
+
+NEW pure scripts/arv2_r298_isin_cusip_evidence.py7271bytes SHA
+fb9fd313f7c88536e08ac163d299f46ab773442d8e7900ca7debcf131fb14c4e;
+tests/analyst_revisions_v2/test_isin_cusip_evidence.py6670bytes SHA
+a48ded78fdb5e8195d2888d4bbdf0ae5d5688b22546d739b0cd56b39b2f8910f.
+Canonical no-LF profile1280bytes SHA
+4e2a2b4b97fa80b568b79fb3a591b2495adb6166d916b2a2bd9bd4e03bf22221.
+Exact unchanged uppercase12-character validISIN Luhn, US/CA whitelist only,
+literal positions3–11 slice must independently satisfy the existing CUSIP9
+checksum. No generated digit or assumption about other countries; immutable/
+redacted/no pickle evidence, caller keeps vendor rawCUSIP disagreements.
+Exact string type before finite exception-membership avoids hostile equality/
+coercion. This is representation evidence, no new mapping or source contract.
+CGS and ANNA primary references in326.64 apply. ISIN and its local slice are
+ONE datum, not independent corroboration; historical intervals, current FIGI
+hierarchy and permanent identity remain unproven. Future V3 would still need
+exact ORIGINAL fullCUSIP9, original compositeFIGI, rawCUSIP genuinely absent
+(not a nonempty placeholder/conflict), listing/mappingISIN agreement and ALL
+global poison/ownership/type/USD gates, with a separate exact freeze. No V3
+predicate, source policy or price acquisition is authorized by this BC use.
+
+ISIN helper39distinctauthornativepasses3.61s, no initial failure/skip/warning;
+embedded-CUSIP-checksum omission1expectedred.12s, restoredfinally/hashunchanged.
+BC74distinctauthorpasses=73selection13.93s+1new independent envelope test4.48s;
+initial72selection13.42s overlaps/no failures. Three omissions each1expectedred:
+whole binding stream1.25s, sameFIGI1.25s, original/union scope1.26s; restored
+finally/no file changes. All215pins and memory compile passed under ALL-write
+denial. Valid synthetic full output18881bytes/4e3819f5797e9df80d8bbcc8037ea257fc3fb4b0a5a07a437f08c555153b3fce.
+Conservative fixed15-group size-only envelope with every diagnosisinteger
+widened to7digits48324bytes/3207ae370439e4b19e530de4232ab7496926fff48b440b014e5d0b58a3e1f0f1
+is below128KiB; the widened counts are NOT semantically admissible evidence.
+
+Root200distinctfocusedpasses14.17s=74BC+39ISIN+86record/document+1research
+transitive import closure, nofail/skip/warning/fullsuite; four source/test
+memory compiles,215pins, profiles/native policies and9synthetic external cases
+passed. Author/subsets/record repeats overlap, not additive. All pytest and
+fixtures native ALL-network/production-artifact/Keychain/security denied,
+all temp/cache/log/plugin paths inroot, no conftest/plugins/bytecode/cache;
+dispatch_fence absent. Root tooling qualification: the first test exec yielded
+a running session at10s, then Root prematurely started the synthetic collector
+fixture's separate native call before waiting that session. The windows
+overlapped (collector4.28s); both remained fully denied, no operational DATA/
+claim/contact was exercised and the first selection completed200green. No
+zero-effects/continuous-metadata claim or hidden rerun is made; all actual
+operation windows remain serialized with every agent HOLD.
+
+Root public code review found no additional confirmed material defect; same-round
+standards advice is not independent acceptance. Existing I326-024 early prices
+and I326-032 qualified identities remain OPEN until actual admissible evidence,
+not cleared by tests. No provider/QC/Safari/capacity/project/transfer/compile/
+backtest in this decision;337/259/53/699 unchanged. Record actual BC once, then
+continue only justified verified recovery or a concrete external barrier.
+All agents HOLD writes/tests/temp before actual; one final push still pending.

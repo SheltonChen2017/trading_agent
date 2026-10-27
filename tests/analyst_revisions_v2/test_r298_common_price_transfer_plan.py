@@ -1,4 +1,4 @@
-"""Supplied public-metadata transfer plans; no actual AQ data or QC access."""
+"""Supplied public-metadata AR plans; no actual old or new DATA/QC access."""
 import ast
 import builtins
 import copy
@@ -17,14 +17,20 @@ from tests.analyst_revisions_v2 import test_r298_common_price_sidecar_producer a
 @pytest.fixture
 def case():
     args = NS(expected_head='a' * 40, caller_sha256='b' * 64, profile_sha256='c' * 64)
-    result = fixture.result(); raw = fixture.envelope(result, args); output = m.aq.parse(raw[:-1])
+    # Port only this pre-existing SYNTHETIC public metadata fixture's schema;
+    # no prior producer/validator/data/control operation is called or replayed.
+    result = m.fmt.loads(m.canonical(fixture.result()).replace(
+        fixture.m.SCHEMA.encode('ascii'), m.AR_SCHEMA.encode('ascii')), m.sidecar.MAX_OUTPUT)
+    binding = m.sidecar.binding(args)
+    outcome = {'result': result, 'report': m.fmt.pin(m.canonical({**binding, 'result': result}))}
+    output = {'binding': binding, 'outcome': outcome}; raw = m.canonical(output) + b'\n'
     def actual(start, end):
         return {'actual_exit': 0, 'bound': None, 'spawn_observed': True,
             'dispatched_at': start, 'completion_observed_at': end, 'stdout_bytes': len(raw),
             'stdout_sha256': m.sha(raw), 'stderr_bytes': 0, 'stderr_sha256': m.sha(b'')}
     kwargs = {'producer_actual': actual('2026-10-27T14:00:00Z', '2026-10-27T14:01:00Z'),
         'validator_actual': actual('2026-10-27T14:01:01Z', '2026-10-27T14:01:02Z'),
-        'frozen_AQ_binding': m.aq.binding(args), 'project_id': 40000002,
+        'frozen_AR_binding': binding, 'project_id': 40000002,
         'organization_sha256': m.ORGANIZATION_SHA256}
     return NS(output=output, kwargs=kwargs, raw=raw)
 
@@ -34,13 +40,13 @@ def test_exact73_content_addressed_objects_and_manifest_last_match_QC_reader(cas
     assert len(rows) == plan['object_count'] == 73
     assert [row['ordinal'] for row in rows] == list(range(73))
     assert rows[0]['role'] == 'catalog' and rows[-1]['role'] == 'manifest'
-    assert rows[0]['relative_path'] == m.AQ_DIRECTORY + '/catalog-private.json'
+    assert rows[0]['relative_path'] == m.AR_DIRECTORY + '/catalog-private.json'
     assert rows[0]['object_store_key'] == plan['object_key_prefix'] + 'catalog.json'
-    assert rows[-1]['relative_path'] == m.AQ_DIRECTORY + '/manifest-private.json'
+    assert rows[-1]['relative_path'] == m.AR_DIRECTORY + '/manifest-private.json'
     assert rows[-1]['object_store_key'] == plan['object_key_prefix'] + 'manifest.json'
     for index, row in enumerate(rows[1:-1]):
         assert row['role'] == 'month' and row['month_ordinal'] == index
-        assert row['relative_path'] == m.AQ_DIRECTORY + '/month-' + format(index, '03d') + '.jsonl'
+        assert row['relative_path'] == m.AR_DIRECTORY + '/month-' + format(index, '03d') + '.jsonl'
         assert row['object_store_key'] == plan['object_key_prefix'] + 'month-' + format(index, '02d') + '-' + row['sha256'] + '.jsonl'
     assert plan['object_inventory_sha256'] == m.digest(rows)
     assert plan['total_byte_count'] == sum(row['byte_count'] for row in rows) <= m.MAX_TOTAL_BYTES
@@ -58,13 +64,13 @@ def test_nonzero_unknown_or_mismatched_actual_process_is_not_success(case, role,
     with pytest.raises(m.Refused): m.make_plan(case.output, **args)
 
 
-def test_actual_records_and_AQ_binding_are_exact_closed_types(case):
+def test_actual_records_and_AR_binding_are_exact_closed_types(case):
     for change in ('extra', 'timestamps', 'ordering', 'binding', 'float_project', 'other_org'):
         args = copy.deepcopy(case.kwargs)
         if change == 'extra': args['producer_actual']['extra'] = 'no'
         elif change == 'timestamps': args['producer_actual']['completion_observed_at'] = 'invalid'
         elif change == 'ordering': args['validator_actual']['dispatched_at'] = '2026-10-27T13:59:00Z'
-        elif change == 'binding': args['frozen_AQ_binding']['caller_sha256'] = 'd' * 64
+        elif change == 'binding': args['frozen_AR_binding']['caller_sha256'] = 'd' * 64
         elif change == 'float_project': args['project_id'] = 40000002.0
         else: args['organization_sha256'] = 'd' * 64
         with pytest.raises(m.Refused): m.make_plan(case.output, **args)
@@ -74,7 +80,7 @@ def test_actual_records_and_AQ_binding_are_exact_closed_types(case):
 def test_closed_source_normal_return_and_original_input_proofs_are_retained(case, field):
     output = copy.deepcopy(case.output); output['outcome']['result'][field] = False
     # Preserve actual-channel equality for the changed synthetic output so the
-    # decisive refusal must be AQ's semantic proof, not the outer hash alone.
+    # decisive refusal must be AR's semantic proof, not the outer hash alone.
     output['outcome']['report'] = m.fmt.pin(m.canonical({**output['binding'], 'result': output['outcome']['result']}))
     raw = m.canonical(output) + b'\n'; args = copy.deepcopy(case.kwargs)
     for role in ('producer_actual', 'validator_actual'):
@@ -105,7 +111,7 @@ def test_plan_is_metadata_only_deepcopy_and_all_boundaries_stay_false(case):
     assert plan['properties_initial_recheck_put_verify_maximum_dispatches'] == 292
     assert plan['no_retry_or_cleanup_or_delete_or_object_get'] is True
     plan['objects'][0]['sha256'] = 'f' * 64
-    plan['AQ_producer_actual']['actual_exit'] = 2
+    plan['AR_producer_actual']['actual_exit'] = 2
     assert case.output == before and case.kwargs['producer_actual']['actual_exit'] == 0
     assert m.make_plan(case.output, **case.kwargs)['objects'][0]['sha256'] != 'f' * 64
 
@@ -119,8 +125,21 @@ def test_fresh_import_and_full_plan_derivation_have_no_I_O_or_operation(case, mo
     with monkeypatch.context() as patch:
         for obj, name in ((builtins, 'open'), (os, 'open'), (Path, 'read_bytes'), (Path, 'read_text'),
                 (socket, 'socket'), (socket, 'getaddrinfo'), (subprocess, 'Popen'),
-                (m.aq, 'run'), (m.aq, 'construct'), (m.aq, 'preflight')):
+                (m.sidecar, 'run'), (m.sidecar, 'construct'), (m.sidecar, 'preflight')):
             patch.setattr(obj, name, denied)
         exec(compile(raw, '<public-transfer-plan>', 'exec'), namespace)
         plan = namespace['make_plan'](case.output, **case.kwargs)
         assert plan['object_count'] == 73 and plan['QC_contact'] is False
+
+
+def test_old_AQ_schema_and_control_namespace_cannot_be_admitted_as_new_AR(case):
+    args = copy.deepcopy(case.kwargs); output = copy.deepcopy(case.output)
+    args['frozen_AR_binding']['schema'] = fixture.m.SCHEMA
+    output['binding'] = copy.deepcopy(args['frozen_AR_binding'])
+    raw = m.canonical(output) + b'\n'
+    for role in ('producer_actual', 'validator_actual'):
+        args[role]['stdout_bytes'] = len(raw); args[role]['stdout_sha256'] = m.sha(raw)
+    with pytest.raises(m.Refused): m.make_plan(output, **args)
+    plan = m.make_plan(case.output, **case.kwargs)
+    assert all('/R326-20261027-AR/' in row['relative_path'] and '/R326-20261027-AQ/' not in row['relative_path']
+        for row in plan['objects'])

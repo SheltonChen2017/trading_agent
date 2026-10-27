@@ -1,4 +1,4 @@
-"""Pure fixed AQ-to-private-QC transfer plan; no operational capability.
+"""Pure fixed AR-to-private-QC transfer plan; no operational capability.
 
 Supplied validated descriptors and external process facts are data bindings,
 not upload permission. A new exact caller must prove current access/rights,
@@ -9,11 +9,12 @@ import json
 import re
 from types import SimpleNamespace
 
-from scripts import prepare_arv2_r298_common_price_sidecar as aq
+from scripts import prepare_arv2_r298_common_price_sidecar_v2 as sidecar
 from research.analyst_revisions_v2_qc import newrule_common_price_format as fmt
 
-SCHEMA = 'arv2-r326-common-price-transfer-plan-v1'
-AQ_DIRECTORY = 'artifacts/analyst_revisions_v2/newrule_common_price_sidecar/R326-20261027-AQ'
+SCHEMA = 'arv2-r326-common-price-transfer-plan-v2'
+AR_SCHEMA = 'arv2-r298-offline-common-price-sidecar-ar-v2'
+AR_DIRECTORY = 'artifacts/analyst_revisions_v2/newrule_common_price_sidecar/R326-20261027-AR'
 ORGANIZATION_SHA256 = 'a2d88859373df0f1fd59ede52b9b3945f847091b5fca3286841241536c38e880'
 OBJECT_COUNT, MAX_TOTAL_BYTES = 73, fmt.MAX_TOTAL_BYTES + fmt.MAX_CATALOG_BYTES + fmt.MAX_MANIFEST_BYTES
 FALSE_FLAGS = {'QC_contact': False, 'credential_access': False, 'private_DATA_read': False,
@@ -40,7 +41,7 @@ def finite(error):
 
 def _binding(value):
     require(type(value) is dict and set(value) == {'schema', 'expected_head', 'caller_sha256', 'profile_sha256'}
-        and value['schema'] == aq.SCHEMA and type(value['expected_head']) is str
+        and sidecar.SCHEMA == AR_SCHEMA and value['schema'] == AR_SCHEMA and type(value['expected_head']) is str
         and re.fullmatch('[0-9a-f]{40}', value['expected_head'])
         and all(fmt.hash_string(value[key]) and value[key] != '0' * 64 for key in ('caller_sha256', 'profile_sha256')),
         'binding')
@@ -66,28 +67,28 @@ def _actual(value, expected_raw):
     return first, last
 
 
-def make_plan(validated_AQ_output, *, producer_actual, validator_actual, frozen_AQ_binding,
+def make_plan(validated_AR_output, *, producer_actual, validator_actual, frozen_AR_binding,
               project_id, organization_sha256):
     """Derive exactly 73 data-only objects from supplied authenticated metadata.
 
     This revalidates all supplied shapes and joins; it performs no file read,
     claim, credential access, current account check or application dispatch.
     """
-    binding = _binding(frozen_AQ_binding)
+    binding = _binding(frozen_AR_binding)
     require(type(project_id) is int and 0 < project_id <= 2147483647, 'project')
     require(type(organization_sha256) is str and organization_sha256 == ORGANIZATION_SHA256, 'organization')
-    require(type(validated_AQ_output) is dict and set(validated_AQ_output) == {'binding', 'outcome'}
-        and validated_AQ_output['binding'] == binding, 'output')
-    raw = canonical(validated_AQ_output) + b'\n'
-    require(0 < len(raw) <= aq.MAX_OUTPUT, 'bound')
+    require(type(validated_AR_output) is dict and set(validated_AR_output) == {'binding', 'outcome'}
+        and validated_AR_output['binding'] == binding, 'output')
+    raw = canonical(validated_AR_output) + b'\n'
+    require(0 < len(raw) <= sidecar.MAX_OUTPUT, 'bound')
     _, produced = _actual(producer_actual, raw); validated, _ = _actual(validator_actual, raw)
     require(produced <= validated, 'actual')
     args = SimpleNamespace(expected_head=binding['expected_head'], caller_sha256=binding['caller_sha256'],
         profile_sha256=binding['profile_sha256'])
     try:
-        checked = aq.validate_output(raw, 0, args)
+        checked = sidecar.validate_output(raw, 0, args)
         result = checked['outcome']['result']
-        manifest = aq._descriptor_manifest(result['manifest_descriptor'])
+        manifest = sidecar._descriptor_manifest(result['manifest_descriptor'])
         fmt.validate_manifest(manifest)
     except Exception: raise Refused('source') from None
     manifest_pin = result['output_receipt']['manifest_pin']; catalog_pin = manifest['catalog_pin']
@@ -97,7 +98,7 @@ def make_plan(validated_AQ_output, *, producer_actual, validator_actual, frozen_
         try: fmt.validate_pin(payload_pin, maximum)
         except Exception: raise Refused('bound') from None
         rows.append({'ordinal': len(rows), 'role': role, 'month_ordinal': month,
-            'relative_path': AQ_DIRECTORY + '/' + source_name, 'object_store_key': prefix + remote_name,
+            'relative_path': AR_DIRECTORY + '/' + source_name, 'object_store_key': prefix + remote_name,
             'byte_count': payload_pin['byte_count'], 'sha256': payload_pin['sha256']})
     add('catalog', 'catalog-private.json', 'catalog.json', catalog_pin, fmt.MAX_CATALOG_BYTES)
     for index, row in enumerate(manifest['months']):
@@ -111,12 +112,12 @@ def make_plan(validated_AQ_output, *, producer_actual, validator_actual, frozen_
         and sum(row['byte_count'] for row in rows if row['role'] == 'month') == manifest['total_shard_bytes']
         and sum(row['byte_count'] for row in rows) <= MAX_TOTAL_BYTES, 'inventory')
     plan = {'schema': SCHEMA, 'project_id': project_id, 'organization_sha256': organization_sha256,
-        'AQ_binding': binding, 'AQ_producer_actual': producer_actual, 'AQ_validator_actual': validator_actual,
-        'AQ_report_pin': checked['outcome']['report'], 'AQ_result_sha256': digest(result),
+        'AR_binding': binding, 'AR_producer_actual': producer_actual, 'AR_validator_actual': validator_actual,
+        'AR_report_pin': checked['outcome']['report'], 'AR_result_sha256': digest(result),
         'AP_fact_sha256': fmt.AP_FACT_SHA256, 'AP_source_sha256': fmt.AP_SOURCE_SHA256,
         'AP_authentication_sha256': fmt.AP_AUTH_SHA256, 'original_binding_stream_sha256': fmt.BINDING_SHA256,
         'original_full_axis_sha256': fmt.FULL_AXIS_SHA256, 'source_guard_receipt_sha256': digest(result['source_guard_receipt']),
-        'format_profile_sha256': digest(fmt.profile_record()), 'codec_profile_sha256': digest(aq.codec.profile_record()),
+        'format_profile_sha256': digest(fmt.profile_record()), 'codec_profile_sha256': digest(sidecar.codec.profile_record()),
         'manifest_pin': manifest_pin, 'catalog_pin': catalog_pin, 'object_key_prefix': prefix,
         'objects': rows, 'object_inventory_sha256': digest(rows), 'object_count': OBJECT_COUNT,
         'total_byte_count': sum(row['byte_count'] for row in rows),
@@ -135,7 +136,7 @@ def make_plan(validated_AQ_output, *, producer_actual, validator_actual, frozen_
 
 
 def profile_record():
-    return {'schema': SCHEMA, 'AQ_schema': aq.SCHEMA, 'AQ_DATA_directory': AQ_DIRECTORY,
+    return {'schema': SCHEMA, 'AR_schema': AR_SCHEMA, 'AR_DATA_directory': AR_DIRECTORY,
         'organization_sha256': ORGANIZATION_SHA256, 'objects': OBJECT_COUNT,
         'monthly_bytes_maximum': fmt.MAX_MONTH_BYTES, 'shard_total_bytes_maximum': fmt.MAX_TOTAL_BYTES,
         'catalog_bytes_maximum': fmt.MAX_CATALOG_BYTES, 'manifest_bytes_maximum': fmt.MAX_MANIFEST_BYTES,

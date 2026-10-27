@@ -66410,3 +66410,182 @@ through AQ producer+validator, preventing duplicate operations/concurrent pin
 changes. Shared files/ledger and337/259/53/699 unchanged. After AQ actual result,
 continue the separate private-processing/transfer/project/source/run work
 under current owner delegation; do not push an intermediate acknowledgment.
+
+### 326.44 AQ actual refusal; two verified local native-policy defects
+
+At clean95a2d5a186566831ad020f7503a74a4c01147869, sole AQ producer dispatched
+2026-10-27T14:14:07.049662+00:00, completion14:14:10.805486+00:00,
+actualexit2/boundnull/stderr0, stdout327bytes SHA
+38e2561181b2cdd62e3327440748949fb4a64b1fcea18377d46948244de60892.
+Sole separate validator dispatched14:14:10.805670+00:00, completion
+14:14:10.814049+00:00, actualexit71/boundnull/stdout0, stderr53bytes SHA
+d34a4e4359a4dc36526cf5b363da32f7b7594a3a09eea17cbdfd6425b052d93e.
+External capture exited2, external_output_authenticated=false,
+accepted_sidecar=false. No report/manifest/success pin was admitted. AQ
+producer/validator/control are SPENT and preserved; no control/output/claim
+inspection, retry, cleanup or repair. Stage/allocation/private-read extent
+remain unknown, not proven absent. Final86record1.23s and1.13s overlap379.
+
+The metadata-only outer returned no parsed producer record because the
+validator did not start. Root recovered only the finite reported category
+without reading any artifact: enumerating the already closed public canonical
+failure envelopes with the exact frozen binding yielded ONE byte-count/SHA
+match, preflight_failure=os_error. That label encloses Store construction/
+exit too, so it does not prove an actual preflight-only stop or failing call.
+It is not native-reader acceptance. Exact53byte stderr/hash matches the
+known public OS message sandbox_apply/Operation not permitted. No unknown raw
+exception/credential/price row was printed or reconstructed.
+
+P2 I326-021 CONFIRMED prospectively: the native producer allowed writes under
+CONTROL but not the fresh CONTROL.parent output-family directory, while Store
+tries mkdir on that parent. A fresh synthetic in-root directory under the
+same rule refused PermissionError errno1; adding ONLY its exact parent
+literal allowed creation. No AP/AQ/control/private-data path was probed.
+This proves a setup defect and a narrow correction, not the complete cause
+of AQ's undifferentiated os_error. Do not silently waive broader writes or
+modify existing directories/settings/attributes.
+
+P2 I326-022 CONFIRMED: root placed the metadata-only orchestrator inside the
+produce policy before asking it to apply a different validator sandbox.
+Synthetic produce-outer/same-produce-inner exited0; produce-outer/validator-
+inner exited71 with the exact53byte actual stderr hash. Even a network-only
+outer refused both different nested profiles. Separately applied top-level
+produce and validate policies each exited0,26bytes SHA
+47f7e74341c57327b3ad0cd841c6121f1f2130599cac07303a7dbd326463f923,
+stderr0. Each synthetic child had native ALL-network denial; none invoked a
+producer/parser/old control or provider/QC. The plain orchestration only
+assembled literal commands/captured public process metadata. These are
+public OS-contract probes, not pytest coverage, price/strategy evidence or
+measured zero-contact accounting.
+
+Correction must use a separately versioned new AR consumer/claim with ONLY
+the fixed output-parent literal exception, and independently launch producer
+and validator under their OWN full native policies from the credential-free
+metadata-only orchestrator (the prior AP pattern). The orchestrator itself
+is not claimed to be natively sandboxed and may not parse private DATA,
+read credentials or contact a provider/QC. All private consumers/parsers/
+pytest remain natively ALL-network denied. Preserve the strong child
+policies, not weaken them to make nesting pass. Correct top-level outside-
+body finite failure evidence must retain allocation-unknown instead of
+mislabeling a Store failure as proven preflight-only/no-effects.
+
+New inert public scripts/arv2_r298_aq_failure_binding.py2447bytes SHA
+923b0e976dbf60168033a3b8ce1b2eb42e91c5fe9030137e74bef75c4b0caaf6,
+fact180cdc04c62564fbd0f85dad984731555c3d18d6aba5ce19199f0a9614532ce0;
+NO-LFprofile290bytesd87e6330bd80a8d06c3cf447f43d5a601cc2edbfb1a32c20a7edc1278d19efa2.
+Tests2648bytes47b7895cf79fd2a023f6431473521124372db0d7a42112e50ab9f3f227d60699;
+4native-deniedpasses0.07s for actual failure/unknown stage, exact finite
+reconstruction, copy/hash/false gates and inert fresh import with filesystem/
+socket/process forbidden. No private artifact/credential/operational read.
+The anchor grants no retry/source/price/new operation and does not fabricate
+validator0. Root diagnosis did not reopen AQ or AP DATA.
+
+AP accepted full corpus remains unchanged. No QC source/install/compile/
+backtest or additional look/cell:337/259/53/699 unchanged. Continue verified
+local correction under current owner delegation, with a separately exact
+source/profile/HEAD/native/exit/result freeze before any AR DATA read. This
+substantive policy/capture correction is not an unchanged renamed retry,
+does not revive AQ and is not independent Claude acceptance.
+
+### 326.45 AR corrected offline one-shot freeze; transfer/result helpers held
+
+Owner's current source/parser/coverage/backtesting delegation and Claude
+sequencing waiver authorize ONE corrected AR offline producer then ONE
+separately launched native output validator at the next exact clean commit
+containing this freeze. AQ remains spent/refused/uninspected. This new source/
+native/outer/failure-evidence contract corrects verified I326-021/022; it is
+not an unchanged renamed attempt, new acquisition, broader source admission
+or QC call. Same AP4DATA/original genuine package/lineage and fixed CSV/
+coverage/source-choice/economic boundaries remain. Native book stays QC-only.
+No AR output/control/claim has been inspected/allocated before this freeze.
+
+New scripts/prepare_arv2_r298_common_price_sidecar_v2.py39963bytes SHA
+25eec980ccc9dcf9b6e15c7618597bfe050954bd160be6b32f07452e7ed96edc;
+canonical NO-LFprofile29521bytes SHA
+ff9479819fddba92fcc8b14bf4299aa1c41d435433f624e01c8f7b215e4e611d,
+198literal dependencies (196AQ chain plus frozen AQ source and exact new
+public failure anchor). Self committed blob/current clean HEAD/self/profile
+CLI pins remain mandatory. Root's public diff audit confirms AP4 guard/
+codec/build body/limits/normal-return/manifest-last output logic unchanged.
+No automatic pin refresh, original-parent settings/attributes change or old
+control/read/cleanup/marker repair. Compatible host/Python/root/branch,
+in-root environment, claim/deadline/disk/FD/month/global caps and actual0
+requirements remain326.42.
+
+Fixed new control:
+artifacts/analyst_revisions_v2/newrule_common_price_sidecar/R326-20261027-AR.
+Sole file permission correction is exact literal CONTROL.parent for fresh
+directory creation/read, never its subtree; own CONTROL subtree remains
+permitted, other artifact reads stay denied except exact AP4/package/lineage.
+Produce policy3539bytes SHA
+b53cd88f3f4e10804e2ecf716e8ba76a38edb59de308d4e328e830da2b0386ff.
+Validate policy494bytes SHA
+79d7e961f0ab250fd95784609a254c2628244cbd0143b0aa3ea1d2f514858a4c
+is unchanged: ALL artifacts/network/Keychains/security CLI denied, stdin only.
+Both actual children must independently apply their native policies from
+the ordinary credential-free metadata-only outer; do not sandbox the outer
+then stack a different child profile. No child fence is weakened.
+Top-level failures now preserve closed outside_body_failure{operation,code,
+allocation_unknown:true}; this cannot claim no claim/no read/no effects.
+The validator accepts a producer's such envelope only as actual2 failure,
+not a valid sidecar. Known claimed-body failure protocol remains unchanged.
+
+Corrected external capture program4288bytes SHA
+7235609a63c564b706fa09f7bb0bce13b893d2f3d8c41a2f16c96dfac9325ae8.
+Same bounded producer1800s/outer1810s, stdout128KiB/stderr8KiB; validator30s/
+outer35s and uninterruptible-I/O/suspension caveat. Only own children killed/
+reaped. The exact original producer stdout is retained in RAM ONCE and sent
+to the independently native validator with exact HEAD/self/profile and
+externally observed actual exit. Closed public reported output may be kept
+as OBSERVATION ONLY even if native validation fails, avoiding loss of finite
+failure evidence. Acceptance still requires actualproducer0 AND actualnative
+validator0, no stderr/bounds and exact stdout equality. Report/manifest or
+plain-orchestrator parsing alone never supplies native acceptance. No private
+DATA parser, credential read, network request or QC call runs in the outer.
+These are selected code/OS role boundaries, not whole-interpreter integrity
+or a claim that the ordinary outer itself is OS-sandboxed.
+
+AR tests27114bytes SHAd1e3e6c3fd2907134ee649cb61951cebc4ea38f6efb91f232836deef83ff306d.
+Author54passes6.05s, prior53/4.56s overlap. Omission reds: exact parent-write
+exception0.23s, preserving validator71/no acceptance0.26s, unknown allocation
+0.25s; memory-only/restored finally. Pytest remains natively denied; it did
+not relax its fence to pretend different nested policies work. Actual OS
+top-level/parent/nesting proofs are the separate public synthetics in326.44.
+No actual old/new producer, private DATA/control/credential read in tests.
+
+Prospective transfer-plan update (UNINVOKED) now binds ARv2 ONLY, rejects old
+AQ schema/namespace. Source9497bytes SHA
+ee9c7595af9a1de390232c66899b4e3473451abddb0a9966012b40bfe8474ac8;
+tests8900bytes918d7a94456f941507304363e5bd824ccfd449fa39846b4c7ca43c021b9b6b9d;
+NO-LFprofile1129bytesa656951467a2f02effe88fd4637e507d6db414c0b384a8f6b5ac4573084013f9.
+27focusedpasses4.81s. First23pass/4fail4.80s exposed one missed aq.codec
+alias in the port; fixed to sidecar.codec before any use. Same73exactDATA
+objects/caps/pins/manifest-last/false gates. No transfer operation implemented
+or authority inferred from this pure derivation.
+
+New pure result helper scripts/arv2_r298_common_price_result.py11913bytes SHA
+5cc251fa1135510782eb6e420b080c34f334f032bccafa284eb8fc0c42abed85;
+tests11793bytes56a9e086d615960e8681a20db21b8c442c41a18b9a32ff36125a712205704159;
+NO-LFprofile1090bytese6880a64184e74041f147d58c1b13b4c1d6e43870da7021e45351960eabe555a.
+51focusedpasses5.42s, earlier50/5.68s overlap. Missing-compile launch-proof
+omission caught1expectedfailure3.38s, restored finally. Exact supplied
+seven-field project/job/name/compile/source-manifest/common-profile/scope
+binding, exact Completed., success/errors and ONLY two genuine new aggregate
+statistics. If compileId is absent, require closed supplied actual launch
+binding bytes and separately frozen external pin; no invented ID/auth bool.
+Ignored charts/orders/trades/other stats are not traversed, hashed or retained.
+Final selected-byte validation requires observed actual reader int0, exact
+external selected pin/binding and all new aggregate predicates. No I/O/CLI/
+contact/credential/old-control/run capability; pure flags stay false.
+It authenticates selected code-reported aggregates, not raw private rows,
+whole response, source/job independently, PIT/master/formal/live readiness.
+
+Root final focused222distinctpasses9.29s =54AR+27transfer+51result+4AQfailure+
+86record/document; no failures/skips/warnings/full suite. These overlap prior
+subsets/record checks and are NOT additive to older379. All source/compile/
+diff/status/native-policy/current dependency checks must pass before actual
+dispatch. All agents HOLD edits/tests/temp creation through producer/validator.
+No QC look/cell/capacity/source install/compile/strategy job:337/259/53/699.
+After authenticated AR0 continue a separately frozen private QC transfer/
+project/source/compile/run/result contract for all six preregistered cells;
+do not infer strategy readiness or perform an intermediate push.

@@ -13,7 +13,10 @@ ISOLATED V1 REFUSED INITIALIZATION WITHOUT CREATING ITS NAMESPACE;
 V2 CREATED/ATTACHED ITS EMPTY SYNTHETIC IMAGE BUT REFUSED ASSOCIATION BEFORE
 ANY PROBE FILE; ITS IMAGE/MOUNT ARE PRESERVED. ISOLATED V3/V4/V5 REACHED ORIGINAL
 NATIVE FLAGS0->2 WITHOUT RECORDED LOSS, THEN REFUSED THE UNCHANGED8SECOND
-CREATOR WINDOW BEFORE WRITE CHALLENGE. NO STORAGE CLOSURE IS PROVED.
+CREATOR WINDOW BEFORE WRITE CHALLENGE. V6 CLOSED THE ORIGINAL186-BYTE
+SYNTHETIC CUSTODY PROOF WITH REAL EPERM CHALLENGES AND ORIGINAL POST-CLOSE
+SEAL VERIFICATION. MAXIMUM-BODY/RECEIPT CUSTODY, DURABLE BUDGET SETTLEMENT,
+PRODUCTION STORAGE, SOURCE AND ACTUAL-INPUT ADMISSION REMAIN UNPROVED.
 CLAUDE REVIEW COVERS b648f60..730c59c, NOT THE LATER LOCAL3B0 DIAGNOSTIC COMMIT.
 LATEST OWNER REPORTS QC/SAFARI OCCUPIED: QUANTCONNECT PAUSED BY OWNER
 INCLUDING CAPACITY/METADATA; NO SAFARI, MIA, QC SETUP, UPLOAD, COMPILE OR JOB.
@@ -24906,3 +24909,216 @@ closure overrides positives. All V1..V5 evidence stays untouched.8seconds,
 4GiB caps and13,992START/23,452,681byte baseline remain unchanged. Require
 actual full terminal proof before any maximum-body/source work or readiness.
 ONE final matching-lane push remains pending; no interim publication.
+
+
+### 128.21 Actual readonly profile and original V6 closure
+
+At clean `a94d1b4bfd4c370fd0a280e7da2237e9c120387a`, matching tracking and
+actual origin `d6af672b3c8198712228bbd7b5eef35777283b1a`, the ONE bounded
+readonly comparison9201 terminated exit0. It authenticated all65 committed
+source files with the actual frozen audit hook. Three identical fresh lane/
+65-FD checks took70.453ms unobserved and70.843ms with targeted monitoring;
+whole7477.850ms, Git606, all image/native/probe/source/key/denied counters0.
+No native call was intended: targeted_missing_native_observation correctly
+made observer_complete FALSE. Its scoped monitoring context closed, tool4
+was freed, and tracing remained None. This was a negative diagnostic only,
+not a synthetic custody proof, source operation or admission.
+
+After fresh clean/root/branch/HEAD and matching-remote checks, ONE registered
+V6 execution70231 at that same A94 checkpoint terminated **exit0**. Started
+2026-10-27T09:08:59.916726Z, closed2026-10-27T09:09:48.514918Z. Original
+creator/immutable/native/code/output/volume contexts and final audits passed.
+Exactly one original native call returned0: original flags0->2, callback2,
+no controlled refusal or observer failure. Genuine kernel WRONLY-open,
+same-mode fchmod and fixed fsetxattr challenges each refused EPERM. The
+unchanged original8second creation/seal,16sample/.25second/1second quiet and
+>=5second hold remained enforced. Tool4 original global/exact-target-local
+masks and known callback slots were restored, its own lease released, no
+foreign ownership overwritten. All nine denied counters0/failure latchFALSE;
+permitted Git3603/create1/attach1/info9/null_stream11/probe_create1/
+probe_write_challenge1. Source/provider/key/claim/START/charged bytes0.
+
+Original issued nine-field seal SHA256
+`edb490dbb50393d9db8ae1d8a0d800e83f1fd866b70d41c58e91e38437bdea73`;
+fixed186-byte raw SHA256
+`12ae326d30644e70437533d333360dc75e1fb9d72f8e6c6edaa93917ff7b7404`;
+original helper-closed SHA256
+`87eff0daed198a25df0b0fc6afe4e62edc76bba5ece5246ba34ddf8b63856acb`;
+storage-closed SHA256
+`d757113e76c5218644b62d13007b528a31fb6f578c883b023cd66e6b84141f71`;
+runtime-code identity
+`fe53e93640d4872e5f3b64e5d8da7afa6230840327f47c2424367c375257addd`;
+targeted diagnostic SHA256
+`9eed92e9b9eec5cdbe9a5d673b64006a032f388bdb2ac3efbc541d4e7c4ea180`;
+complete proof SHA256
+`f1c572c8aecaa51fcf3f0aa957bb8d3cbcba101d2de75826a66b0416afe33c09`.
+
+Main independently reopened ONLY the original fixed synthetic V6 member
+readonly/nofollow/nonblocking AFTER known exit0. Original issued seal hash
+matched its current complete nine-field stamp, original FD/name stamps
+agreed before/after, exact186 bytes/raw hash matched, and regular currentUID/
+0600/singlelink/flags2/fixed inner membership/root0700 passed. No replacement
+seal or baseline was selected. Preserve the original V6 inode, sparse image
+and mount; no detach/unlock/adoption/reuse. This closes the tiny synthetic
+primitive only. Historical022/flag-loss actor/cause remain UNKNOWN; old
+failed claims/namespaces are not repaired or admitted. Maximum body/receipt,
+durable settlement, production storage, source/denominator/actual-input and
+pre-QC readiness remain FALSE.
+
+### 128.22 Prospective maximum-body and receipt primitive
+
+**SI-DEC-20261027-06**, continuing SI-AUTH-20261026-02, freezes SOFTWARE-only
+work on a separate creator-owned bounded pair before any source retrieval.
+Never raise the old1024-byte metadata maximum or change its source/claim
+callers. A NEW original O_EXCL0600/singlelink body of at most2MiB and a
+separate internally canonical operational receipt must each retain their
+original readonly FD, one native immutable transition and nine-field seal.
+Each keeps the unchanged whole8second creation deadline,16samples/.25second/
+1second quiet; no old file, failed inode or post-seal drift may be adopted,
+rebaseline, resealed, retried or reset. Receipt binds opaque request/attempt/
+reservation/protocol identity to exact body length/hash. Every original pair
+and outer code/output/storage context and original post-close seal must pass.
+A role-swapped/duplicate native call, negative or unknown closure refuses.
+
+The finite prospective actual proof uses internally generated maximum2MiB
+synthetic bytes only, one fresh fixed body-receipt-custody-20261027-v1 image,
+and the same genuine EPERM challenges and>=5second hold. Its software,
+protocol, complete AST/current-byte closure, source-denying exact harness,
+focused/causal tests and committed checkpoint must be frozen FIRST; no such
+actual proof is run in this subsection. No old V6 image is reused. No source
+request/key/claim/START/debit or QC/Safari/purchase is authorized by a paired
+synthetic proof. Even pair closure cannot release capacity: a later versioned
+settlement adapter needs original uniquely consumed final chunk/source/code/
+storage closure witnesses before the NEXT chunk. STARTs, old charges and
+unknown/no-body full-page debits never decrease. Baseline13992START/
+23452681chargedbytes and cumulative84005START/4GiB remain unchanged.
+
+
+### 128.23 New pair software: verified pre-release corrections and limits
+
+The NEW body/receipt helper, separate fixed volume clone, targeted two-role
+monitor and finite driver/harness do not alter any old creator/immutable/
+source/claim/budget implementation. The old metadata maximum remains1024.
+New per-file custody allows body1..2097152bytes and an internally canonical
+receipt<=1024. Receipt clocks mean construction start and receipt-built time,
+not later provider or terminal closure. Pair closed_at is issued only after
+both original file contexts, retained duplicates and original paired audits
+close. Caller output/code/storage closure remains an independent outer gate.
+Every source/dispatch/budget-release/readiness authority stays FALSE.
+
+| ID | Priority/disposition | Concrete evidence and prospective correction |
+|---|---|---|
+| SI-BUILD-20261027-015 | P2, corrected before release | Main found abort-on-first-close loops could leave another independently owned FD open. Driver and helper now drain every retained FD and refuse on any error. Driver memory-only old-loop reversal RED1/14deselected/.10s; helper close-drain reversal RED1/.09s. Both restored; these are fabricated causal failures, not actual custody failures. |
+| SI-BUILD-20261027-016 | P2, corrected before release | Main independently changed only authority() in memory: current policy hash changed but the draft guard accepted source_admitted=True, with0 file/native/source operations. New guard checks strict constant types and the complete fresh small policy; original-issued file state snapshots and pair-phase pins detect reset/rollback. Main repeated the original counterexample and confirmed fixed body_receipt_policy_changed, then restored the original function/hash. Author authority-guard reversal RED1/.07s, restored. No authority was exercised. |
+| SI-BUILD-20261027-017 | P2, corrected before release; no downstream custody admission demonstrated | Monitor first-sample baseline used current fstat instead of the genuine creation origin. Author's wrong-inode observations were mislabeled same_original_inode: RED1/16deselected/.65s. Pin the original creation tuple by identity; preseal comparisons retain original inode/protections/size/mtime while only ctime may settle. The creator would separately refuse drift; a false diagnostic identity still required correction. |
+| SI-BUILD-20261027-018 | P2, corrected before release | Peer identified that resetting the file clock to began could allow a known creation-clock regression to reach native entry before a later guard refused. Seed from the ORIGINAL latest creation tick, retain independent immutable clock/state shadows, and check immediately before the setter. Staged clock reversal requires zero native calls; author reversal RED1/.11s, restored. Eight seconds is unchanged. |
+| SI-BUILD-20261027-019 | P2, corrected before release | Exact two-name membership was checked only before reads; OwnedOutput directory identity intentionally omits directory mtime/ctime. A third negative sibling during the last receipt read could escape the helper's own witness. Repeat exact membership after original reads/stamps and after descriptor closure via original named paths; preserve all siblings and permanently refuse. Author membership reversal RED2/.14s, restored. Outer proof also independently repeats final membership. |
+| SI-BUILD-20261027-020 | P2, corrected before release | A pre-native read chose current stat as expected rather than ORIGINAL creation+initial flags. Bind to the original eight-field creation plus observed initial flags, ignoring ONLY preseal ctime, and compare original FD/name properties/flags again immediately before the unchanged setter. Staged mtime/TRACKED changes must refuse before any native call, not rewrite a newly observed flag. Author reversal RED2/.08s, restored. No atomic race guarantee is claimed. |
+| SI-BUILD-20261027-021 | Closed false alarm; NOT an errno-loss defect | Main initially inferred that the proof's old fallback lost builtin ENOSPC/EIO. Main's independent memory check and four author's sentinel cases actually preserved the errno and omitted text/paths BEFORE any routing edit. The existing fallback already reaches the fixed local projector. Withdraw the allegation and retain only the useful sentinel regressions. An intermediate explicit-dispatch spy failure proved routing only; that unnecessary route/test was reverted. It is not causal evidence of lost diagnostics. |
+
+New helper author final focused helper60+genuine helper/monitor18:
+**78passed/2.56s**, OS network denied. Its five requested causal reversals
+above were isolated in memory and restored immediately; no actual native
+flag or source operation. Volume author **80/.65s**, strict AST equivalence
+to V6 except fixed version labels and explicit V6-evidence preservation;
+Main independently **80/.81s**. Monitor author's initial **18/1.97s** uses
+genuine NEW producer code with fake C-library/kernel only, both initial0/64,
+maximum2MiB body/internal receipt, exact two disjoint roles, negatives and
+resource restoration. These counts precede the later full-driver integration.
+
+Driver/harness author's final fabricated pair/monitor/volume/Git composition
+**102/1.45s**, including the four unchanged safe errno/sentinel cases. Main's
+earlier independent **98/1.48s** preceded those four added tests. The
+intermediate103/1.47s explicit-router tree is superseded, not a final-tree
+result. No invented producer/native proof is inferred from mocked seams.
+Independent peer read the exact frozen helper, volume and monitor and
+accepted the verified corrections; no peer helper test or Claude review is
+claimed. Main read all new production code and relevant causal tests.
+
+All these are SOFTWARE/fabricated executions only. No actual maximum-body
+proof, new image, source claim, HTTP/key read, START or byte debit has run.
+Original V6 proof/evidence and all earlier refused claims remain untouched.
+One genuine full-driver/fake-kernel composition, final Main selection,
+complete AST/current-byte binding and frozen registrations precede any
+prospective actual proof. Cumulative84005START/4GiB and old baseline remain
+unchanged; no partial/interim publication.
+
+
+### 128.24 Frozen maximum-body proof registration and final Main validation
+
+The final native-entry monitor explicitly vetoes known initial flag, inode,
+protection, size/mtime or readonly drift BEFORE the unchanged setter body.
+Its causal drift case was RED1/.45s, restored; final author monitor
+**20passed/3.68s**. The added full-driver composition uses the genuine NEW
+pair, monitor, native/creator function codes and issued terminal validator,
+with explicitly fabricated volume/Git/challenge and C-library/kernel seams.
+It closes a2MiB body/internal receipt with original8second per-file bounds,
+exact20 .25second hold polls over the full5seconds, and28 sleeps total
+including8 for sealing. Fake clock100->107; no guard clock acceleration,
+event-cap increase or phase skip. This is a genuine software composition,
+NOT an actual image, native immutable flag or EPERM proof.
+
+**SI-BUILD-20261027-022 (P3, registration-description correction):** Main's
+static assertion correctly found69 runtime AST sources plus ONE extra bound
+old V6 harness in the inherited70-file manifest, not70 runtime imports.
+Retain ALL70 held/committed-byte checks. Explicit protocol field
+bound_antecedent_not_runtime_imported names ONLY
+scripts/run_short_interest_isolated_custody_offline.py. A permanent static
+regression proves the exact69/one disjoint sets and their70-file union;
+there is no missing runtime source or arbitrary extra. Independent peer
+accepted this conservative binding and honest description. The old harness
+is not executed or granted provider authority. No custody/code predicate
+was removed.
+
+Main final fresh-process selection of the five NEW focused files, count
+budget/import boundary, two lane record files and three named active-document
+checks: **336passed/6.75s**, no skips/warnings, empty inherited environment,
+OS network denied. Earlier335/6.91s was before the explicit antecedent
+metadata/static regression; it is not the final registration. Earlier73/1.51s
+was the separate unchanged budget/import/record/privacy selection. No full
+lane or repository suite ran. Exact runtime AST69 plus one named antecedent,
+all70-source/five-test in-memory compile, all five modules' literal refusal
+catalogues, no numeric-id audit/monitor calls, no monitor native/settrace/
+restart call, old history-body exact prefix preservation and whitespace
+passed. No old tracked code/test file changed. Main read all new production
+code and causal tests; peer accepted helper/volume/monitor. Claude review
+remains waived and is not claimed.
+
+Frozen proof protocol SHA256
+`df8990fee21d8192cdbf76c4d934007101c189bd24b86a66f719d73d180564f9`;
+new helper policy
+`0e09c46e92c8868a7037e0af771728a777a7189a441968b4d6aabf293b3ed5e0`;
+new volume policy
+`788bd3e20fbc681518e54d618443c6d7d5f7dc750017183f769d886f54cba15b`;
+new monitor policy
+`9f5c15095795c91d86cb2584b5bdc2a1d742612f63fbef1eb5c34c1d23407f97`;
+new harness policy
+`7c4533599348ce02c08abfaedeab74ffb1a26f62204a4ae25291fbfa0864e999`.
+Runtime69 AST list
+`b503fa970269e2d8a005d5652795f63fd94884e32ff83605f56298a780d128e4`;
+registered70 path list
+`e4d7a3ca73cb945c05b62f9bf80b05f6cae63d889e936bc956f30852c6d1a940`;
+complete registered70 current-byte mapping
+`bf0483a6c90cce72971f8af41c5932c42fdc355cde434d73880de68ffad81298`.
+Harness remains finite Git20000/info16/create1/attach1 and one exclusive
+create/one WRONLY challenge per fixed role. Info16 registers four extra
+terminal-witness volume audits beyond the prior12; it is not unbounded.
+Whole proof420seconds/storage300/per-file8,16samples/.25spacing/1second
+quiet and>=5second hold remain fixed. Network/key/source/claims/charges0.
+
+NO actual maximum-body invocation has run. After final record-only checks,
+root/branch/exact A94/status and matching tracking/actual originD6AF guards,
+commit this new software checkpoint. Then verify its clean exact HEAD,
+matching remote and wholly absent fixed body-receipt-custody-20261027-v1
+namespace before ONE registered actual proof. Freeze all agents/tests; no
+edits, tests, commit or push while pinned. Actual exit0 plus original issued
+pair/code/output/storage terminal validation, two distinct original native
+successes and six genuine EPERM challenges are required. Nonzero/unknown
+termination or any refusal overrides every provisional/positive observation.
+Independently authenticate both original seals/bytes after actual termination;
+never choose fresh seal baselines or reuse any old namespace. Only then may
+later durability-adapter/source work progress. All old charges/claims/data,
+84005START/4GiB caps and one-final-push rule remain unchanged.
+
+Main post-record named record/privacy/coordination selection: **29passed/.47s**,
+OS network denied; final diff whitespace clean. No code changed after336.

@@ -1,22 +1,19 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTIONS 333–334 COMPLETE THE OWNER-DIRECTED PRE-QC CORRECTION
-ROUND IN `060624c3`, WITH A SEPARATE EXACT-HASH HANDOFF, WITHOUT
-WAITING FOR CLAUDE. WINDOW SCHEDULING NOW USES THE GENUINE PILOT PLAN,
-NOT ONE SECURITY'S SEASONING; ACTUAL PER-SECURITY SEASONING STAYS ENFORCED.
-PILOT-ONLY RELEVANCE ACCOUNTING PREVENTS TARGET-IRRELEVANT OLD LOT FACTS
-FROM REFUSING A WINDOW. TARGET-AFFECTING OLD LOTS STILL REQUIRE GENUINE
-HISTORICAL CONTEXT AND REFUSE WITHOUT IT. IBPILOT-COMP-33002 IS CLOSED;
-IBPILOT-COMP-33001 REMAINS PARTLY OPEN. TWELVE P2 FINDINGS REMAIN OPEN,
-NONE P0/P1. MAIN472 FOCUSED AND124 BOUNDARY/DOCUMENT CHECKS PASS, WITH
-MEANINGFUL NATIVE RED/GREEN. THIS IS NOT THE LAST READY-TO-LAUNCH QC STEP:
-HISTORICAL PUBLIC-KNOWN-BY, COMPLETE ORIGINAL ADMISSION/PIT CONTEXTS AND
-THE FINAL PILOT POPULATION/REGISTRATION BRIDGE REMAIN UNFINISHED. SECTION
-332'S SCOPED REVIEW ACCEPTANCE AND NC CORRECTION ARE PRESERVED; NC ACTUAL
-ACTIVATION STILL NEEDS FRESH QUALIFICATION. NO QC/SAFARI/SDK/JOB, SOURCE
-REQUEST, CREDENTIAL READ, OUTCOME LOOK OR BACKTEST IN THIS ROUND. ORIGINAL
-82-QUARTER STUDY AND SEPARATE2021-2025 PILOT ARE NOT COMPLETE OR BACKTEST-
-READY. LOOKS/JOBS/BACKTESTS0/0/0; MONITOR PAUSED.**
+Status: **SECTIONS 335–337 QUALIFY EXISTING SOURCES ON CLEAN `78a048e3`:
+THE ACTUAL RETAINED NC/SOURCE17 OBSERVATION SUCCEEDS WITH TWO LEXICAL
+CANDIDATES, STILL NOT ADMITTED; ALL1,281,147 CONTEXT ROWS ARE ACCOUNTED.
+THREE FRESH MASSIVE REFERENCE/2020Q4 FILING SAMPLES RETURN HTTP200 WITH
+THE EXISTING KEY. CURSORS ARE NOT FOLLOWED; DIFFERENT SAMPLE ACCESSIONS
+ARE NOT CROSS-CORROBORATION OR PROOF OF MISSING HISTORY. THE OBSERVED
+FIELDS STILL DO NOT SUPPLY HISTORICAL PUBLIC-KNOWN-BY/BODY-VERSION
+EVIDENCE, COMPLETE ORIGINAL ADMISSION, PIT CONTEXTS OR FINAL PILOT
+POPULATION/REGISTRATION. SOURCE GAP RESOLUTION IS PARTIAL, NOT LANE
+COMPLETION OR BACKTEST READINESS. MAIN405 FOCUSED CHECKS PASS; ACTUAL
+RECEIPTS AND SOURCE IMAGES ARE INDEPENDENTLY READ BACK AT THEIR STATED
+SCOPES. TWELVE P2s REMAIN OPEN, NONE P0/P1; PRIOR SCOPED CORRECTIONS
+REMAIN CLOSED. NO QC/SAFARI/SDK/JOB, NEW SEC FILING/CARRIER REQUEST,
+OUTCOME LOOK OR BACKTEST. LOOKS/JOBS/BACKTESTS0/0/0; MONITOR PAUSED.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -311,6 +308,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-26 | Codex counter-review only | Exact incoming `96d4d8aae3f7caec5134fb46fd3170be6fe9dcce..0c536a912bbd0fa5f9cfd782c32a864ccae2f9d6`; this record follows | Four Claude commits; no next milestone or source activation | Scoped code corrections accepted; record counts, grouped dispositions and evidence attribution qualified in331. NC stray-DOCUMENT duplicate reproduced and existing observation elevated toP2. |157 boundary/package/document checks pass149.18s;376-file compileall passes; exact selected affected collection blocked by7 fcntl errors and2 existing module skips; pure/sliced probes separately attributed, never a native custody suite. Shared pair2 failed23.23s, rootsIPython/QuantConnect/clr; looks0/0/0. Final record checks follow331. | IBDOC-CCR33001 P3 corrected by qualification; IBNC-OBS33004 OPENP2,14 total. Other findings retained; no shared fix, fake-lock acceptance or historical journal replay. | Complete one counter-review publication after final checks. Supported-host regression/native qualification and bounded shadow/source policy remain required before activation; actual historical known-by and other pilot facts remain missing. Monitor PAUSED; no automatic rearm. |
 | 2026-10-26 | Codex native-macOS counter-review completion | Captured origin`c0ee6957`; Claude four-commit range`96d4d8aa..0c536a91`; corrective`b5f1ca47`; this separate handoff | Sync plus per-commit review/native validation only, NO next milestone | Claude corrections accepted;331's attributed Windows limits retained, not rewritten. Bounded malformed-front correction closesIBNC-OBS33004 only at332's scope; actual NC activation remains withheld. | Main854 focused passes50.35s;105 auth passes1.59s,3 meaningful auth reversals/5 restored;147-image four-denial/live291 strong invented proof. Attributed82 batch/144 route plus independent144 route. Shared SEP-2 pair2 failed3.68s, unchanged. No full suite or actual-input/QC look. |13 OPENP2s; no P0/P1. Other findings and historical failed/consumed roots retained. | One final matching-lane push after handoff checks. Fresh actual qualification and real historical known-by/source/reference facts still missing; monitorPAUSED, no automatic next step. |
 | 2026-10-26 | Codex owner-directed pre-QC continuation | Clean matching base`969e29d7`; this scoped implementation and separate final handoff | Two pilot composition corrections, no Claude wait or QC access | Genuine-plan window scheduling closes33002; exact target-relevance/count/ordered digest narrowly corrects33001 while target-affecting missing history still refuses. Acceptance MODEL explicitly distinguished from historical-publication evidence. | Main472 focused17.44s;124 boundary/document4.39s;4 whole-function reversals caught13 intended REDs,15 restored3.39s;112-image strong compile/pin proof; attributed final peer46GREEN5.41s. No full suite, actual input/QC/look. |12 OPENP2s; noneP0/P1. 33001 partlyOPEN; known-by, originals/PIT contexts and final population registration remain concrete blockers. | Separate exact-hash handoff, one final lane push. No ready-to-QC claim, source activation or automated next step; monitorPAUSED. |
+| 2026-10-27 | Codex existing-subscription evidence qualification | Starting origin`06870130`; implementation/preregistration and actual clean execution`78a048e3`; separate handoff337 | Retained NC/source17 actual activation and three new Massive metadata samples, NO QC | Native observation135.738256s accounts1,281,147rows and2lexical/nonadmitted candidates; fresh reference/index/Form4 samples3HTTP200. Known-by/bodyversion/wholepopulation/PIT rights not established. | Main405 focused8.07s; preactivation124 documents3.99s; peer94 finalprobe,240 observer; held metadata/raw-schema readbacks and exact158/50 Git source checks. No full suite/outcome. |12 OPENP2s retained. Wrong receipt helper stopped before observer launch, corrected before activation; P3 tooling-only disposition336.1. No failed actual source operation is rewritten. | Need genuine historical known-by archive and complete originals/PIT/context/registration evidence. One final accumulated push after final record checks; no purchase or QC launch inferred. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -39030,3 +39028,213 @@ under the same four native denials. Separately attributed current observer
 All tests deny process-tree network/security exec and restrict writes to a
 fresh privateTMP; pure tests also deny fork. No actual body/profile/key,
 provider, SEC, QC or outcome input has been accessed at this preregistration.
+
+## 336. Observed existing-source qualifications and concrete remaining gap
+
+### 336.1 Exact execution lineage and tooling disposition
+
+Both actual operations used already-existing clean committed implementation
+and preregistration **`78a048e3eaf3f93f1888f3d35c46b02e85c8eae2`** on the
+designated worktree/branch. No code or HEAD changed during either operation;
+their output directories are private and ignored.335's final probe source/test
+hashes are those actually executed/qualified. NC source identity contains158
+images/inventory
+`ca7ab155b164d887264924422332c6ea8e2554ab62e10229a27b3a4a06d4c83c`;
+Massive identity contains50/inventory
+`150a108bb20abb9360146bae09144dcc5619d127a4c3440a7d216be438330299`.
+They are different loaded/static source closures, not conflicting measurements
+of one universal assembly. The earlier142-image manual compile is neither.
+
+**IBBOOT-335-01, P3 tooling-only, CLOSED before actual activation:** the first
+trusted-parent wrapper used `_publish_raw` on the NC alias `publication`,
+which actually names the SEC-parent-capture module and has no such helper.
+It stopped11.65138s after source identity/empty-directory setup, BEFORE the
+reservation publication or ANY `preflight_actual`/observer invocation. The
+initial generic stdout label `NC_metadata_health_refused` is therefore a
+parent-bootstrap classification, not a failed semantic NC health/body run.
+Static helper identity and the preserved empty owned directory establish the
+phase; no contact, source-body analysis or HTTP occurred. The correction uses
+the existing Sharadar publication helper for separate parent metadata only.
+Nothing was deleted/reset or overwritten; the first actual claim and health
+followed that correction. The268B bootstrap receipt SHA-256 is
+`107faa18c5353effe9c40f24ce00b0b1e06a7a3f7dc0fed638f4fc026d8df326`.
+
+The successful standalone NC metadata health completes50.137754s, reads zero
+raw prefix/ZIP bodies or contacts, and publishes227,876B:
+`e4a307e52b72d923f800ad2e052810a7561b33b3acc06adace937a8eaaf06d34`.
+Parent reservation SHA-256
+`e4adfdf407eaffbc0d5bdd515f357de552aa264d858e7dcfc89d12f9b828792e`;
+299B observation-started receipt
+`a3749c0cda90ad7308dae2ad90f8f53d36faa8f296dfbd596502840846c476fe`.
+One own connected Gmail-profile read supplies only the approved private
+screening contact through an ephemeral encrypted in-memory relay and protected
+anonymous stdin. No contact argument/environment/file/raw log/fingerprint or
+private key is published. The actual trusted-parent observation glue hash is
+`ee196c084187eda75433f62725fe5a32dcb18a95ea232234342b27cd8e113d60`.
+Its bootstrap is explicit tooling, not silently included in the158-file code
+inventory. Current/original contact equality remains UNATTESTED as before.
+
+### 336.2 Actual retained NC/source17 result
+
+One actual observation exits0, stderr0, **135.738256s**, including its internal
+metadata preflight. It rescreens the retained65,536B compressed prefix and
+all1,532,222 decoded bytes, collects three complete NC payloads/16,584B,
+retains one documented-status exclusion and produces two private direct-front
+claims. Five physical headers are accounted: one nonregular/directory, three
+complete payloads and one partial payload. Completed observed gzip members0;
+last member incomplete TRUE. This is not whole-carrier validation.
+
+The genuine full25 source scan accounts **1,281,147 context SUBMISSION rows**,
+1,108,720,728 framed source-row bytes,1,163,648 context4/4-A rows and exact
+20,044 prior-consumed controls. Pilot20-quarter counts remain1,008,318 all-six-
+form rows/921,5704-or4-A. Cross-quarter repeated/conflicting accessions0 in
+this actual rederivation. Exactly two rows match the eligible direct routes;
+1,281,145 do not. Both dispositions are
+`private_lexical_source17_candidate_not_admitted`. No actual original is
+admitted or added to a completed-corpus count; no issuer/owner/XML/acceptance/
+public-availability/rights or financial evidence is promoted.
+
+Witness25,651B SHA-256
+`85145e8bb4ee3fe882d95ebe45330a1b9f63e1baae8b60a7cd0ada64399d9029`;
+input plan
+`a5693cbe8d6dec4ac509c369dcbd141b792e37bcba8fc830088b3f109b1e15bc`;
+terminal3,449B
+`ce1b66d40b33c11d739ec46fa1bc2f8c0b8c137fc9a1713244ac42a66d5f46c6`.
+All six parent metadata receipts live under335.2's exact directory. The
+observer itself writes zero files/makes zero requests; separate parent
+receipt publication is explicitly accounted. No new carrier/range/individual
+SEC request, consumed-request repeat, source rewrite or financial projection.
+
+### 336.3 Actual existing Massive account result
+
+The fixed fresh v2 probe completes with **one Keychain read journal and three
+HTTP200 requests**, zero unattempted profiles, no redirects/retries/cursor or
+SEC-link following. Historical reference request2021-01-04 and two2020Q4
+filing samples return one row each. This demonstrates those actual requested
+capabilities on the configured key, not blanket plan entitlement or an
+authenticated historical version of the reference fields. Whole-process
+elapsed time was NOT measured;15s is a per-request deadline, not an invented
+45s total-run duration.
+
+| Profile | Retained validated response bytes | SHA-256 | Unfollowed page |
+| --- | --- | --- | --- |
+| Reference |363| `4deddddec552893ee3d398f6af656bd2a578d9e5c3c78dc6a16b81db6011ebfd` | FALSE |
+| EDGAR index |472| `131d79fb0c493cf76a0fe552232641ce0947df9269570612afd98267d7d455cc` | TRUE |
+| Form4 |1,520| `9ae653e64ef3a43b670b847bcb2ab1d2f9df7618a26dc1cb078292039765e12c` | TRUE |
+
+These are2,355 retained success-body bytes, NOT measured wire-transfer bytes.
+Completion15,025B SHA-256
+`1a6d8e8ea61cd0cd2e9af752c0ba8ff405bf8c937a8f0554c3e8ce343e083b06`;
+16 child leaves plus the separate global scope reservation are preserved
+under335.3's fixed output path. Source financial numbers remain opaque and
+private; projected metadata contains no prices, quantities or outcome values.
+There is no new FMP/EODHD/Sharadar credential or licensed-row request in this
+round, and none of those accounts is newly authenticated by these results.
+
+Reference metadata provides CIK/share-class/composite identifiers and a dated
+request, with a version-update field; it provides no QC SID or independently
+authenticated pre-entry publication clock. Filing responses expose filing
+dates/accessions/CIKs/SEC links; the actual accepted schemas contain no
+historical first-seen/body-version timestamp. Index and Form4 sample accessions
+DIFFER. Limit1/date sorting/transaction-row representation do not guarantee
+the same filing, so this is neither a matched-parent corroboration nor proof
+of omitted history. Cursors prove the response is partial, not a complete
+source census. The possibly expired Benzinga Earnings product was not called;
+no new subscription is established as necessary by this successful route.
+
+### 336.4 Independent readback and limits
+
+Main independently reads all three validated private success bodies under
+native network/fork/all-write/security-exec denial and the real memory guard:
+reconstructs source schemas/metadata, complete control hashes and held source
+bytes, exact leaf inventories and FALSE authority flags. It makes no key read.
+Actual-key privacy screening remains execution evidence from the qualified
+producer; the readback does NOT pretend to rescreen against an unavailable
+key or use an invented token as equivalent proof.
+
+Separate read-only peers independently validate:
+
+- NC: all six canonical metadata receipts, unchanged nested plan/witness
+  validators, held descriptors/private modes/single links and crosslinks;
+  all158 current code hashes/frozen pins and exact78a048e3 Git blobs. No body
+  replay. Final reader0.620012125s. Two initial diagnostic reader mistakes
+  (comparing access-time-inclusive stat tuples; using the NC no-float codec
+  on the outer terminal's finite elapsed field) were corrected ONLY in the
+  reader. Receipts and unchanged NC validators were not weakened or rewritten.
+- Massive:14 permitted control files,16 child names, private permissions/
+  held versions, canonical reservations/starts/key/completion crosslinks and
+  all50 current/committed source hashes. The peer opens ZERO raw response
+  files: body-byte/hash statements there remain crosschecked receipt claims;
+  main's separate raw/schema validation is main evidence, not a peer replay.
+
+Execution/profile counts and run durations stay main-recorded operation
+evidence; readback is not a second observed acquisition. No complete suite,
+outcome look, QC/Safari/API/SDK/job/upload or backtest was used. Documentation
+browsing is separate from these registered source-acquisition counters.
+
+## 337. Separate final handoff — partial evidence resolution, factual stop
+
+Exact outgoing implementation is
+**`78a048e3eaf3f93f1888f3d35c46b02e85c8eae2`**, based on independently verified
+origin06870130764c17239ef1d786b3c30b67092408c9. Incoming range is EMPTY.
+This separate documentation commit follows the already-existing actual
+execution hash. No new independent Claude review is claimed or awaited.
+Main405 focused8.07s and final two-image compilation validate exact code;
+124 preactivation active-document/record/import/package checks pass3.99s.
+Final completed-record checks follow before publication. Guard-sensitivity,
+earlier candidate attribution, actual readbacks and the tooling-only setup
+error remain335–336's exact evidence, not generic all-green claims.
+
+The bounded source qualifications are COMPLETE at their stated scopes; the
+requested full availability/parent/PIT gap resolution is **PARTIAL/BLOCKED**.
+Current documented/observed fields from the existing subscriptions do not
+supply the required authenticated historical filing/body/version known-by
+bounds at09:28/09:30. This is not a claim a provider could never supply a
+separate archive/export under an existing account. The precise missing input
+is335/333's clock-bound archive with exact accession/body-version/amendment
+lineage, full required2020Q4–2025Q4 coverage and refusal/underfill accounting.
+A provider's additional archival evidence or original timestamped public
+snapshots must be qualified; a price bundle, filing date, acceptance clock
+or current edited news article is not a replacement. No additional purchase
+is justified merely by this gap, and no provider/support message was sent.
+
+Complete21-quarter original admission and historical issuer/share-class/
+listing/PIT/price/volume/factor contexts remain incomplete. Two NC lexical
+joins and three provider samples do not fill those populations. Next source
+engineering is a genuinely qualified NC original/header/XML successor and/or
+a separately defined required21 continuation that scans all25 for conflicts
+and excludes every consumed/ambiguous/reserved claim. Neither is silently
+activated here. The full-scale250,000-exposure/128MiB inventory cap also
+requires a scalable partitioned solution before a million-parent continuation.
+Final pilot collection/permanent population/look/engine-parity binding must
+use actual qualified inputs; an old full-study seal is not reminted to make
+the pilot pass. No QC step can start under the owner's current hold.
+
+All **twelve OPENP2s** retain333.5's exact scopes: four original-study,
+three preserved failed-operation, two shared, public-known-by, consumed-cloud-
+ACK and partly corrected old-lot-history findings. IBPILOT-COMP-33002 and
+prior scoped closures stay CLOSED. IBBOOT-335-01 is a corrected P3 wrapper
+issue, not a newly closed data gate. No P0/P1. Source/PIT/rights/canonical/
+look/QC/backtest readiness remains FALSE; looks/jobs/backtests0/0/0. Frozen
+v1/scale/pilot/four custody files, stoppedv3 at1,846/1,847, separate7,373B
+diagnostic, legacy19,846/99,394 custody/79,548 unattempted, strictD23 seven
+nonexact/no82-quarter promotion, original economics/population and both final
+nonretroactive access classifications remain unchanged. No claim that two
+lexical matches increase admitted/source-bound corpus counts.
+
+Publish this implementation and its durable record in exactly ONE final
+successful push from the designated worktree to the matching lane, after
+checking root/branch/exactHEAD/record-only expected status and fetching only
+origin's matching branch. Stop on unexpected advancement, never overwrite,
+reset, force, rebase, switch or create a side branch/worktree. Independently
+verify exact remote tip and final clean state. Shared docs/ActionPlan/root
+handoff stay frozen; private receipts stay ignored. No new automation,
+monitor rearm, other-chat message, broker/operator-DB/scheduler, funded/
+capital/paper/live/deployment/order/trading authority or action.
+
+Final completed-record receipt: main124 active-document/record/import-boundary/
+EXACT-package checks GREEN3.90s after336–337, no skips/warnings. Only the lane
+record is dirty after actual operations; cumulative changed paths are exactly
+the two new probe files and this record. Matching-only fetch still shows
+origin06870130. Diff whitespace checks pass; final code-pin/secret-shape and
+record checks precede the separate handoff commit and single publication.

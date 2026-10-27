@@ -2273,9 +2273,13 @@ fresh-source/110-unrequested-page continuation and actual parent0/native
 validator0: complete current catalog110346mapping rows/111pages plus both
 symbol lists. Original AW frame bytes were freshly authenticated against all
 three external body pins before BA source0; AY remains unaccepted. BA is now
-spent. Section326.63 freezes the separate full genuine/original/current BB
-identity crosswalk; it is uninvoked until the exact clean committed decision.
-The new RAW-history parser is held technical preparation, no price caller.
+spent. Sections326.63–326.64 record BB full genuine/original/current identity
+crosswalk actual0/native validator0:6151original proofs passed, all8ETFmatched,
+but2426potential stocks remain unresolved. Source-pin/parser progress is
+verified; historical-price and strategy-run admission remain blocked. A new
+offline field-format diagnosis is being prepared; no price request follows
+an unresolved identity. The RAW-history parser remains held technical
+preparation, no price caller.
 No strategy historical-price acquisition or QC run follows without its gates.
 No AU/AW/AY replay or QC source transfer/project/compile/strategy job followed
 the catalogue result. Current
@@ -68165,3 +68169,107 @@ Accumulate locally; exactly ONE final matching-lane push still pending.
 Final pre-freeze86record/documentpasses1.19s is an overlapping repeat,
 not additional distinct coverage. Exact root/branch/HEAD/status and live
 matching remote634509bf0fb361a8471c9ed6b62106d0cdcfc245 rechecked unchanged.
+
+### 326.64 BB actual authenticated; qualified current identity coverage OPEN
+
+At clean cdc902b3b1dd3715b6f4033016b68620e02a1403, credential-free public
+preflight passed under native ALL-network/artifact/Keychain/security denial;
+no DATA/claim read. Sole actual BB native producer dispatched2026-10-27
+18:16:04.875940Z, completion18:16:20.520670Z:actual0, boundnull/stderr0,
+complete stdout10823bytes SHA
+e8e982017acf665111a67f796bfd0976f3c4169559cf775b641165b757b3070b.
+Independent native output validator18:16:20.520930..18:16:24.504990Z actual0,
+same exact complete stdout/stderr0/no bounds. Outer0/stagevalidated; actual
+dispatch/completion brackets are not private-source event times. No source
+or reader replay, ignored unknown exit, truncation or report-alone acceptance.
+Report10692bytes SHA
+5ff592f1ddc25b23cbb124a472fbcf2d2e64cdcfbeff4519714af5e37627cbdd.
+Both guards returned normally, original eight DATA pins and fresh genuine
+input unchanged. Same-round public-source scope/admission audit found no
+additional confirmed P0–P2; it performed no tests/DATA/operations and is not
+independent acceptance.
+
+All6151 original28field identity/evidence/CUSIP proofs PASS;0refused/0unavailable.
+11402original/11468qualified-current/11473union CUSIP tokens; five original
+functional reporting currencies nonUSD remain explicitly distinguished from
+USD trading currency. All6159 distinct stock/fund owners retained, no repeated
+owner collapse. Catalogue110346mapping/50668active/59979delisted,0duplicate
+records; every row indexed/retained. All8own ETFs matched current crosswalk.
+Stocks3307matched/2844unresolved. Executable-potential5636priorSharadar slots:
+3214matched/2422unresolved; five prior-native slots:1matched/4unresolved.
+Thus5641potential bindings have3215matched/2426unresolved. Conditional510:
+92matched/418unresolved, retained with their conditional/empty-initial-holdings
+requirements, not silently removed or treated as unconditional exceptions.
+
+| Retained unresolved reason | All stocks | Potential stocks |
+|---|---:|---:|
+| mapping_identifier_invalid | 2323 | 1931 |
+| figi_only_no_cusip_link | 278 | 276 |
+| mapping_identifier_conflict | 137 | 115 |
+| isin_conflict | 76 | 76 |
+| no_identifier_match | 17 | 15 |
+| catalog_symbol_missing | 8 | 8 |
+| catalog_instrument_or_currency | 5 | 5 |
+
+OPEN P2 I326-032: qualified EOD current crosswalk is incomplete for2426
+potential bindings. This is an authenticated predicate census, NOT yet proof
+of a subscription, QC or specific field-format root cause. All-genuine/input
+pin validation and original parser proof passed; no source row was selected
+away. Actual output grants neither crosswalk admission nor full-window price
+source/strategy readiness. Do not acquire a known-incomplete replacement
+universe, shorten dates, use FIGI-only/ticker aliases or launch doomed cells.
+
+One new retained private DATA leaf
+artifacts/analyst_revisions_v2/newrule_eodhd_crosswalk/R326-20261027-BB/crosswalk-private.json
+13445076bytes SHA5006dc2f1313d02c18f521172e2e454ca190a0191e2f85799b54a9d7d963d753.
+BB parent/producer/output validator/control are now SPENT. Retain all outputs;
+no reread/replay/repair/cleanup/renamed retry. A new fixed-DATA diagnostic may
+consume only separately frozen DATA bytes after its own committed claim/scope.
+No new provider/QC/browser/capacity/project/transfer/compile/backtest followed.
+337/259/53/699 unchanged, six comparison cells remain unlaunched.
+
+Inert scripts/arv2_r298_bb_source_binding.py14206bytes SHA
+8aa1f5c9379f94275535c158c61c791ee482ba49fa01be299bbdd2b3ed921b5c
+records exact externally observed0/0 facts, full metadata-only result and
+private DATA pin, no licensed row values. Fact SHA
+7b5810185359ea96cd27e94afa627887c34ed29ce82841972e61545a41f48617;
+result04526fa38e528d262affefcd038274c44536d1b0f04ee49aaac72eff6d4d559e;
+crosswalksummary00850fc4938d09782af6dc9abfb4a7acb82f2ee5f019b0fca3920d94b2ceac10.
+Native-denied pure public check reconstructed exact BB output/report and
+actual0/complete hash joins, compiled anchor in memory; no old reader or DATA.
+Anchor supplies provenance, no source/read/operation/admission grant.
+
+Safe next recovery is a new BC offline six-DATA format diagnosis (BB private
+plus five BA DATA, no AA/AC/AP reread or fresh-genuine claim). Reauthenticate
+all whole pins before JSON and pure full BA inventory, then classify finite
+field null/empty/type/length/checksum categories and exact FIGI+valid source
+CUSIP9 pair presence, grouped by original AP role/potential/reason. No field
+coercion or new route. Optional CUSIP8/leading-zero observations remain only
+diagnostic, never a repair. This is substantive format diagnosis of a new
+retained crosswalk result, not replay of BB or a renamed price retry. Exact
+new source/profile/claim/native scope/output freeze precedes private use.
+
+Public primary research checked2026-10-27: Sharadar's documented from/to,
+ticker/fields/limit/skip/sort parameters match the frozen stocks/funds query
+construction. Its published5/10/full-history tiers make the observed early
+cutoff consistent with a5-year tier, but actual account tier/cause is NOT
+authenticated. No private account/entitlement/API or new paid access inspected.
+Sources: https://sharadar.com/docs/stocks ; https://sharadar.com/docs/funds ;
+https://sharadar.com/subscribe . No conclusion that query syntax caused the gap.
+
+CGS primary identifier specification explicitly places a CUSIP/CINS in
+positions3–11 of a CGS ISIN, with US/CA/KY examples; ANNA defines the nine
+local identifier characters and final ISIN check digit. Sources:
+https://www.cusip.com/identifiers.html?section=ISIN ;
+https://anna-web.org/identifiers/ . A potential separately versioned parser
+could recognize a valid fullCUSIP9 already encoded in a valid supported-prefix
+ISIN, preserve provenance and all FIGI/global ownership predicates. That is
+NOT an admitted route or justification to infer arbitrary countries, generate
+checkdigits, ignore conflicting nonempty fields or accept FIGI alone. BC may
+count exact US/CA encoded-source matches only to assess this safe alternative;
+any later predicate/whitelist/version/run decision must be explicit prospectively.
+Historical ownership, immutable/PIT/master and all readiness flags remainfalse.
+Current work continues offline under owner waiver; exactly one final push
+remains pending, none this round yet.
+86record/documentpasses1.32s after this actual-result entry; overlapping
+selection, not additive. BB source/tests and all used old sources stay frozen.

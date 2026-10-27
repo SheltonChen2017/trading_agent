@@ -1,7 +1,15 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Codex counter-review of section 49 completed in section 50,
-2026-10-26. Claude's `23d06504` test hardening is accepted.
+Status: **Offline input-to-intent engineering recorded in section 51,
+2026-10-26. Claude review of section 51 is deferred at the owner's direction;
+it is not independent acceptance. The new supplied-input decoder, dated
+reference checks, provisional buy-intent planner and reproducible local handoff
+are offline software only. The full multi-session real-equity execution adapter,
+dated settlement/action contracts, terminal-stock-to-SPY rule and verified
+licensed data remain outstanding. This is not the final step before QC.
+No QC access, actual provider rows, purchase or empirical evaluation occurs.
+Codex counter-review of section 49 completed in section 50.
+Claude's `23d06504` test hardening is accepted.
 Claude's `d6036b7d` review is accepted after documentation clarification.
 The published `d6036b7d` review is consumed once.
 The section-48 input-layer epoch is accepted in section 49
@@ -9,6 +17,7 @@ after `23d06504` pinned thirty input-layer guards; no production source changed
 in that review or this counter-review. The section-49 round was published as
 `d6036b7d`, including `ddaa5e54` and `23d06504`; it is not a pending push.
 This counter-review remains local-only; no push is requested.
+The section-51 implementation also remains local-only; no push is requested.
 Codex counter-review of section 47 skipped at the owner's direction (48.1);
 that waiver is not counter-review acceptance.
 Claude's `c6834173` is accepted after documentation correction (section 44).
@@ -48,7 +57,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 50. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 51. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -6801,3 +6810,231 @@ sync/counter-review, not publication: retain the new closure locally, no push,
 PR/main merge or cross-lane mutation. Recheck exact mandatory root/branch/
 HEAD/status and the live matching remote before committing; do not publish
 the already-completed section-49 round again or rearm a review watch.
+
+## 51. Offline raw-guidance-to-provisional-intent engineering; review deferred
+
+### 51.1 Scope, custody and owner direction
+
+Owner instruction, 2026-10-26: "continue building to the last step before qc.
+skip claude review for now". This authorizes continued offline engineering and
+temporarily defers the next independent Claude review. It does not accept this
+source or establish data rights, an economic/research freeze, empirical outcome
+authority or QC access. The earlier no-QC instruction remains controlling.
+The implementation reaches a supplied-input-to-provisional-intent seam, not
+the requested final pre-QC state; the concrete missing adapter/contracts below
+are recorded rather than invented. Review debt is explicit, not a reason to
+stop otherwise authorized offline work.
+
+All repository work stays in the mandatory absolute worktree
+`/Users/sheltonchen/.codex/worktrees/guidance-revision-drift/trading_agent`,
+branch `codex/strategy-guidance-revision-drift`, origin
+`https://github.com/SheltonChen2017/trading_agent.git`. Start is clean local
+`6b19e3428f72d590196a9d8dbdf16ca5cd3a1f55`, one local section-50 closure ahead
+of live matching remote `d6036b7dc4de0164fb3cdf6c79a73bef35fdf948`; the same
+remote was rechecked during this work. Section 50's per-commit acceptance and
+consumed `23d06504` / `d6036b7d` review dispositions stand. Section 47's waiver
+is still not counter-review acceptance. No old review is consumed again, and
+no Claude review runs concurrently. Subagent work here is author QA only.
+
+No provider/account/browser/UI/API, credentials/keychain, QC page/docs/quota/
+Mia/upload/build/run/log/source, broker/operator database, actual data capture,
+installation, purchase or subscription change occurs. Monitor remains PAUSED;
+no automation configuration changes. No new branch/worktree, switch, reset,
+stash, force push, PR or main/cross-lane mutation occurs. The user has not
+requested publication of this new build; retain it locally without a push.
+
+### 51.2 New supplied-input contracts and behavior
+
+Four explicitly inventoried modules and four focused test files are added:
+
+- `guidance_decoder.py`: `decode_guidance(raw, semantic_context_bytes,
+  expected_context_sha256=...)` checks the retained sidecar anchor before
+  parsing, binds the raw payload hash and normalized document, and decodes one
+  frozen Massive/Benzinga-shaped disclosure using exact JSON numeric lexemes.
+  New `gdr.guidance-semantic-context.v1` names time zone, units, point/range kind,
+  normalized document and separate receipt/validation clocks. It does not infer
+  provider first availability from `last_updated`, previous-value fields or a
+  sidecar. Known GAAP/adjusted/FFO methods remain visible even when incompatible
+  with the proposed baseline; unknown schemas/methods and raw/context mismatches
+  refuse. Finite zero/negative guidance remains a disclosure; the comparison
+  layer owns floor/comparability refusals. The frozen raw schema cannot verify
+  corrections, withdrawals, versions or provider-availability claims, so those
+  mappings refuse instead of inventing semantics. Existing normalized ledger
+  support for auditable corrections/withdrawals is unchanged.
+- `research_reference.py`: immutable `CalendarInput` and `ReferenceBook` use
+  `gdr.research-calendar.v1` and `gdr.research-reference.v1`. They consume explicit
+  dated sessions, stable security/issuer IDs, symbol/exchange/type/primary/sector/
+  listing status and dated raw close/volume rows. No exchange holiday calendar
+  is inferred. Eligibility slices availability before the previous session's
+  18:00 New York cutoff, checks the immediately previous close, exactly twenty
+  completed sessions for ADV20 and sixty supplied calendar sessions since
+  listing for stocks; supplied schedules do not prove exchange coverage.
+  Missing/ambiguous visible inputs refuse. A future reference version is not
+  eligible; an older still-valid visible reference can remain in its as-of
+  slice. Multiple visible overlapping references refuse. SPY requires its
+  explicit dated ETF identity and twenty prior bars, without applying stock
+  price/listing/ADV minimum thresholds. That supplied-history check is not
+  proof of later benchmark execution capacity or real calendar authenticity.
+- `order_planning.py`: immutable `gdr.offline-account-snapshot.v1` accepts dated
+  marked holdings, settled cash, unsettled receivables, pending buy notional/fee
+  reservations, attempted event hashes and explicit bool/null entry-control
+  assertions. Any active or unknown program-stop, exit/trim, unresolved-action
+  or valuation control blocks new intents. These assertions do not authenticate
+  an account or implement complete historical NAV/drawdown/action reconciliation.
+  `plan_session` prepares one supplied session's proposed 10:00 New York buy
+  intents only. It respects the cutoff cohort, decision-time risk invalidations,
+  D+3..E+2 eligibility, prior eligible/attempted opportunity refusals, permanent
+  identity, stock/SPY quote checks, exact rational revision ranking, one issuer,
+  settled cash, pending reservations, position/notional/ADV/gross/sector limits,
+  whole shares, proposed 10:05 remainder cancellation and session-index time exit.
+  Notional caps and fee-inclusive cash affordability are distinct. SPY is never
+  co-submitted now: its instruction is conditional on each actual stock fill at
+  the next equivalent execution opportunity. No fill, cancel, action, settlement,
+  performance or order dispatch is performed. Extreme quantities explicitly
+  refuse; receivables never silently become spendable cash.
+- `pre_qc.py`: `build_handoff()` reconstructs only a fixed invented recipe from
+  provider-shaped raw guidance through dated references to base/stress intents;
+  it builds/verifies the complete review-source ZIP in memory. It does not
+  instantiate a native algorithm or run a backtest. The recipe reuses existing
+  literal invented dates solely as a test calendar, not as verified NYSE history
+  or a rebind of the accepted 372-frame recovery candidate. New canonical
+  `gdr.pre-qc-handoff.v1` retains source/plan/input hashes, all eleven unresolved
+  draft decisions and explicit missing work. `verify_handoff` checks its retained
+  hash before exact current-source reconstruction; a self-rehashed approval flag
+  cannot certify itself. All readiness/authority/native-adapter flags stay false.
+
+The local CLI is `python -B -m research.guidance_revision_drift.pre_qc`.
+`--verify-file PATH --sha256 HASH` verifies named local canonical bytes.
+Optional `--output-dir EXISTING_DIRECTORY` uses the existing no-overwrite,
+content-addressed publication helper for the review-source ZIP only; it never
+creates a missing directory or writes a native carrier/project or market rows.
+Canonical handoff JSON goes to stdout without a trailing LF; a machine-specific
+publication location goes to stderr. Exit 0 means local preparation only, exit
+2 means refusal, and exit 3 reports ambiguous publication with
+`source_archive_may_exist=true`, not a false claim of artifact absence. No
+approval/launch route exists. Actual publication tests use invented temporary
+directories; no durable source archive or real input is published this turn.
+
+This code has no edge to provider SDKs, ML, broker or operator packages. The
+existing SYN-only simulation, comparator, market/action/timing contracts and
+fifteen-module native closure stay unchanged. No real symbol is renamed into
+a synthetic identifier, and no existing synthetic report becomes empirical.
+
+### 51.3 Author QA findings and resolved corrections
+
+| ID | Priority/status | Evidence and correction |
+|---|---|---|
+| GDR-AQA51-001 | P2 / corrected before commit | Initial sizing incorrectly put fees inside the notional/exposure budget, yielding 494 instead of 495 shares. Preserve notional caps separately and reserve fees from settled cash. Both base/stress invented plans now propose 495 shares at limit 10.10, reserved notional 4999.50 and fee 2.475, leaving 94998.025 declared cash. No fill or realized return is claimed. |
+| GDR-AQA51-002 | P2 / corrected before commit | A withdrawal visible after cutoff but before the decision initially left a stale positive intent. Retain the cutoff cohort and intersect its active observations with the decision-time ledger. Known invalidations refuse; later positive news cannot create the earlier cutoff cohort. |
+| GDR-AQA51-003 | P2 / corrected before commit | Ranking initially used theoretical D+3 even when receipt delayed first eligibility. Rank admitted events by their actual supplied-input eligible session, then exact rational revenue/EPS revision and security ID. In the constrained invented tie case, the larger revision receives 49 shares and the other event is visibly refused. |
+| GDR-AQA51-004 | P3 / corrected before commit | Adding the archive's machine path to canonical stdout broke retained-hash reconstruction. Send it to stderr, leave stdout exact/reconstructible and test actual temporary publication, identical retry and verify-file roundtrip. Ambiguous publication is separately reported rather than converted to definite absence. |
+| GDR-AQA51-005 | P2 / corrected before commit | The initial decoder rejected finite nonpositive amounts and recognized nonbaseline accounting methods too early. That can erase an immediate incompatible predecessor and permit fallback to an older comparable disclosure. Retain the exact known disclosure and let comparison refuse. A three-record chain regression verifies that removing the incompatible middle disclosure would create the forbidden apparent positive comparison. |
+
+Author QA also verifies exact bool/null risk controls and the whole-share bound.
+It establishes no independent acceptance. Twenty invalid entry-control type
+probes refuse; two targeted final additions pass, plus a pure ambiguous-publication
+probe with no archive built/written. The initial quantity-bound test failed
+because its own fee-limited cash fixture did not reach the guard; increasing
+only invented test cash exercises the intended refusal. No production behavior
+was changed to satisfy that mistaken test setup.
+
+### 51.4 Source identity and focused verification
+
+New full source SHA256:
+`937e337e5eb35aca7cc97fd3f90409106275d0bc7eeb3ea6998ae320ce7153db`,
+57 source/draft/neutral manifest members. Complete review bundle SHA256:
+`e9d79b4830d79d78d12334b8ead34c2734c79a046ee52e57b1179a54c62d59c5`,
+825,226 bytes, 59 archive members. Canonical invented handoff is 8,021 bytes,
+SHA256 `a39abb41b7b7a4b214f5e88a0c6c6b5cc68af3bb2cd17f208dc03e166802b4eb`;
+base plan `a314a98eea4f4a563f638b95e60bf33dcf2788ad5c69a58f149fe443feb4309d`,
+stress plan `2b6c67cca29364517b7095b195430ede7b5d047ca624af9db3d8dbd50add8079`.
+These are offline software/content identities, not review approval, backtest
+results, an authentic historical dataset or native binding evidence. The
+section-48/50 source `330fc9d5...` remains the prior distinct epoch.
+
+The four new test files contain 46 methods: all passed in 1.852 s on bundled
+Python 3.12.14. Tests use invented data only. Eight targeted in-memory root
+mutants each cause the intended assertion failure, zero unexpected errors:
+fee/notional mixing, missed decision-time invalidation, theoretical-date rank,
+ignored risk controls, spending receivables, immediate SPY order, false readiness
+and hash check after reconstruction. Every function is restored in `finally`;
+no source file is rewritten. Decoder author QA separately reports 55 related
+methods passed in 0.092 s and eleven caught targeted mutants across its two
+campaigns; reference author QA reports seven passed methods and three caught
+mutants. These are local QA, not deferred independent review.
+
+All 106 lane source/test files compile in memory, with no bytecode/native
+execution. The immutable draft file remains SHA256
+`1dd9b5969853924d7682b4b566734ea7e90f061340d6378912118fb93d132110`;
+its semantic SHA256 and eleven null decisions remain unchanged. Original plan
+and PDF are byte-exact to local base, retaining `26478c3b...` and `f8d7855b...`.
+The explicit review bundle inventory and fresh-process import checks include
+the four new modules. Final exact-tree selection: 128 methods passed in
+2.600 s, then three slower actual source-release/CLI bundle-roundtrip/ordinary
+project-metadata methods passed in 135.797 s. Total 131 distinct focused
+methods, zero failures/errors/skips. Both runs use a sanitized environment,
+`-B`, parent/fresh-child network denial and parent repository-file-write denial;
+source hashes are identical before/after. The metadata check is local software,
+not a cloud project, recovery carrier or native execution. No full lane/repository
+suite is run. Three additional read-only header mutants each cause one intended
+assertion failure, no unexpected error: missing section-51 state, false review
+acceptance and false final-pre-QC readiness. Final author documentation QA
+corrects "provider rows" to "actual provider rows" and "proved listing
+sessions" to "supplied calendar sessions since listing"; neither authentic
+provider data nor exchange-calendar coverage is established by invented inputs.
+
+Only these eight new files, the lane-owned bundle inventory, boundary tests and
+this lane record change. Sections 1–50 remain byte-exact below the refreshed
+header. Root Session Handoff, Action Plan, Feature Milestone Record, all shared/
+process docs, original plan/PDF, existing runtime modules, draft and accepted
+fixtures remain frozen. Final root/branch/HEAD/status/live-remote checks and
+staged diff checks precede the local commit. Its exact ref is retained in
+thread/private memory, not self-referential commit text here.
+
+### 51.5 Concrete remaining work; no final-pre-QC claim
+
+The supplied-input path is useful engineering but cannot complete the full
+pre-QC definition of done:
+
+1. Licensed/versioned guidance revision and withdrawal history, timestamp
+   semantics, historical stock/SPY NBBO, six usable common years, dated security/
+   sector/listing/corporate-action references and retention/processing/cloud
+   rights remain unverified. Prior dated subscription observations are not
+   current entitlements. The separately authorized Massive Corporate Guidance/
+   Stocks Advanced coverage/licensing assessment is still unfinished; this
+   offline build neither contacts a provider nor recommends a purchase.
+2. A pinned dated settlement/fee contract and the terminal-stock-payout-to-SPY
+   unwind rule remain unresolved. The current source explicitly blocks the
+   latter; inventing an immediate SPY unwind or copying an invented
+   `settlement_session` into historical data would change economic meaning.
+3. A full real-equity multi-session fill/cancel/exit/trim/action/settlement engine,
+   complete daily paired NAV and drawdown history, matched SPY per actual stock
+   partial fill and eventual native algorithm/binding adapter remain absent.
+   The existing synthetic engine cannot be relabeled to provide them. The new
+   account controls and one-session intent are not substitutes. These paths
+   need the concrete contracts in items 1–2 and focused validation before a
+   complete frozen-source pre-QC package can honestly be presented.
+4. Independent review of this new epoch is temporarily deferred, not satisfied
+   by author/subagent QA. Proposed economic parameters, family/look allocation,
+   dates and research scope are still not owner-frozen. Current permission to
+   build does not grant empirical evaluation or QC access.
+
+No GDR-0..6 milestone is marked complete. Next useful action is the existing
+bounded coverage/rights check using already owned access, together with a
+concrete settlement/terminal-SPY contract; then implement the missing full
+adapter against that exact contract. Do not manufacture historical availability
+or spend money to make the report appear ready. QC remains untouched until the
+owner changes that explicit restriction.
+
+Original `GDR-base372-approved-20261008` stays CLOSED FAILED3/3, zero manual
+attempts, exhausted project 37647834 untouched. Separate
+`GDR-Mia-base372-recovery-authorized-20261011` stays zero unsuccessful attempts,
+zero pending intents, no journal/project/launch, maximum three unsuccessful
+attempts. Accepted producing `c589b3dddab3f1dd136d10ae7ce1851d64818906`, old full
+source `061ff30fe4053ebfabfa27c38d2e3ccd37d950c2fe3eae4375a933463125ee9f`,
+recovery-project `c6b9443aa64f005c48e21f493bfea14918ecf6a730ac4f995bd3a70ee4c269a9`,
+prepared-runtime `5d1dc6560ad2778fd6a8c514c16641b6e78cf82d514a0088f0a344c31783437d`,
+fixture `8f35d56a335d3f7d9dad016e1e2236de7fcd2635e5c463c30081f97b7b944458` and
+semantic draft `b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c`
+retain their previous custody. No carrier is regenerated/rebound, no new
+attempt/look is created, no publication is repushed and no monitor is rearmed.

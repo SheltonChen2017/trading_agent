@@ -81,6 +81,10 @@ import research.guidance_revision_drift.input_contracts
 import research.guidance_revision_drift.guidance_inputs
 import research.guidance_revision_drift.historical_market
 import research.guidance_revision_drift.input_preparation
+import research.guidance_revision_drift.guidance_decoder
+import research.guidance_revision_drift.research_reference
+import research.guidance_revision_drift.order_planning
+import research.guidance_revision_drift.pre_qc
 import research.guidance_revision_drift.__main__
 import research.guidance_revision_drift.archive
 import research.guidance_revision_drift.artifacts
@@ -185,6 +189,9 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         # Review-state phrase: rotate it in the same commit as each new review
         # or counter-review section so the status block cannot go stale.
         header = record.split("## 1.", 1)[0]
+        self.assertIn("Offline input-to-intent engineering recorded in section 51", header)
+        self.assertIn("Claude review of section 51 is deferred at the owner's direction", header)
+        self.assertIn("This is not the final step before QC", header)
         self.assertIn("Codex counter-review of section 49 completed in section 50", header)
         self.assertIn("Claude's `23d06504` test hardening is accepted", header)
         self.assertIn("Claude's `d6036b7d` review is accepted", header)
@@ -209,6 +216,7 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         self.assertGreater(record.index("\n## 48."), record.index("\n## 47."))
         self.assertGreater(record.index("\n## 49."), record.index("\n## 48."))
         self.assertGreater(record.index("\n## 50."), record.index("\n## 49."))
+        self.assertGreater(record.index("\n## 51."), record.index("\n## 50."))
         self.assertIn("research/__init__.py`, remains unobserved", header)
         self.assertIn("paused pending platform preflight", header)
         self.assertIn("GDR-RP33 is accepted in section 34", header)

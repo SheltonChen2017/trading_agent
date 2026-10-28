@@ -37,8 +37,8 @@ from scripts import diagnose_short_interest_body_receipt_custody as antecedent
 
 ROOT, BRANCH = transport.ROOT, lane.BRANCH
 SOURCE_AUTHORITY_SHA256 = "9d67d93ad79657031befd8849659bc20fc5834173d76a569bccb9307347e3a6c"
-RUN_PROTOCOL_SHA256 = "0364f7bca6bc7eaf7c41af850df8c6e1558f23354c179e5ce27126b118b60cd7"
-NEGATIVE_PRESERVATION_POLICY_SHA256 = "11cc180fc0ae9e2faddf1e632cc431e1cd7ad1dd0ab02fb1a819644ae7b8ecf3"
+RUN_PROTOCOL_SHA256 = "0a12282d516613ac3d6f5e407aab331c385159fbf5244370bc05b88f5551f7e5"
+NEGATIVE_PRESERVATION_POLICY_SHA256 = "e0e8df728d96dfaae20b43497ad150557d9a767e5d853d020ec6b9acfcc0423c"
 BASELINE_LEDGER_SHA256 = research_budget.BASELINE_LEDGER_SHA256
 MAXIMUM_CHUNK_SECONDS, MAXIMUM_ARCHIVES = 3600, 1
 MAXIMUM_WORKERS = 8
@@ -52,6 +52,8 @@ _PRESERVATION_PROFILES = {}
 _NEGATIVE_ORIGINS = {}
 _NEGATIVE_FINAL_ATTEMPTED = set()
 _BLOCKED_OPERATIONS, _RETENTION_ANNOUNCED = set(), set()
+_PRESERVATION_FAILURES, _PRESERVATION_FAILURE_ORIGINS = {}, {}
+_HOLD_BASELINE = (13992, 23452681, 84005, 4 * 1024 ** 3, 2097152)
 _SOURCE_BATCHES, _SOURCE_BATCH_FAILED = {}, set()
 _SETTLED_CONTRIBUTIONS, _CONTRIBUTION_ORIGINS = {}, {}
 _CHECKPOINT_FACTS, _CHECKPOINT_FACTS_FAILED = {}, set()
@@ -76,6 +78,10 @@ durable_capture_START_evidence_changed durable_capture_contribution_changed
 durable_capture_checkpoint_changed durable_capture_checkpoint_required
 durable_capture_worker_slot_changed durable_capture_worker_stage_failed
 durable_capture_CLI_arguments_refused""".split())
+_HOLD_CONTRACT_CODES = frozenset((*_CODES, *transport.diagnostics.LOCAL_CONTRACT_CODES,
+    *(name for module in (transport, controls, responses, storage, reader, accounting, negative,
+        transport_union, checkpoints, source_scope, negative.primitive, negative.immutable,
+        negative.creator) for name in module._CODES)))
 
 
 class DurableCountCaptureRefusal(ValueError): pass
@@ -120,7 +126,7 @@ def protocol():
         "manifest": "all_capture_files_except_self_pinned_separately_original_typed_controls",
         "closed_control": "terminal_intent_only_until_original_outer_finish",
         "negative_preservation": "LIVE_independent_lease_before_claim_or_key_failed_already_received_only_inside_volume_drain",
-        "negative_blocker": "fixed_no_network_process_retention_no_new_HTTP_claim_START_retry_or_settlement",
+        "negative_blocker": "fixed_allowlisted_original_failure_and_authenticated_pure_journal_or_explicit_unknown_before_mandatory_no_network_process_retention",
         "negative_final": "once_issued_preservation_manifest_after_wire_drain_all_reserved_debits_unknowns_not_process_closure",
         "remote_START_evidence": "fresh_exact_origin_ref_original_SourceLease_at_most8_exact_ticket_roster_before_START_creator",
         "contribution": "original_reader_snapshot_immediately_after_chunkclosure_before_irreversible_settle_then_original_account7_only",
@@ -418,6 +424,7 @@ def _prepare_registered_source_lease(token, budget, *, root, runtime_head, actua
     registered()
     require(root == ROOT and root.resolve() == root and Path.cwd().resolve() == root,
         "durable_capture_exact_root_required")
+    source_scope.require_dispatch_allowed()
     archive = _archive_binding(token); plan = _ARCHIVE_PLANS.get(token)
     require(type(budget) is accounting.DurableCountBudget and type(plan) is research_budget.CountRecoveryPlan
         and budget.plan is plan and plan._parts[1] is archive[3], "durable_capture_plan_changed")
@@ -1180,7 +1187,8 @@ def _preserve_failed_chunk(operation, volume, error):
                     if key not in _NEGATIVE_ATTEMPTED:
                         _NEGATIVE_ATTEMPTED.add(key)  # Never retry a failed quarantine publication.
                         negative.preserve_failed_observation(lease, observation)
-                except BaseException:
+                except BaseException as preservation_error:
+                    _remember_preservation_failure(operation, preservation_error)
                     _BLOCKED_OPERATIONS.add(operation)
                     if not any(item is observation for item in retained): retained.append(observation)
                     _PRESERVATION_HOLD[operation] = volume, prepared, state, tuple(retained), original_error, anchor
@@ -1193,7 +1201,9 @@ def _preserve_failed_chunk(operation, volume, error):
                     _NEGATIVE_FINAL_ATTEMPTED.add(operation)
                     negative.finalize_failed_chunk(lease)
                     report = _checked_negative_report(operation, lease)
-            except BaseException: report = _blocked_negative_summary(operation)
+            except BaseException as preservation_error:
+                _remember_preservation_failure(operation, preservation_error)
+                report = _blocked_negative_summary(operation)
             unused, current = _failed_original_state(operation)
             if operation in _BLOCKED_OPERATIONS: return report
             if not current[2] and report["pending_already_started_attempts"] == 0: return report
@@ -1202,7 +1212,8 @@ def _preserve_failed_chunk(operation, volume, error):
             # after inflight-pop but before observation issuance. Never
             # reserve/retry/read a key/start a GET or reset qualification.
             time.sleep(0.05)
-    except BaseException:
+    except BaseException as preservation_error:
+        _remember_preservation_failure(operation, preservation_error)
         return _blocked_negative_summary(operation)
 
 
@@ -1220,11 +1231,139 @@ def _negative_summaries():
     return summaries
 
 
+def _fixed_hold_diagnostic(value):
+    """Recheck exact fixed fields; never serialize an exception or its text."""
+    categories = frozenset(("local_contract_refusal", "unknown_local_error", "local_os_error",
+        "lane_guard_refusal", "platform_refusal", "keychain_refusal", "local_type_error",
+        "local_name_error", "local_memory_error", "local_timeout"))
+    errnos = frozenset(("EACCES", "EPERM", "EMFILE", "ENFILE", "ENOSPC", "ENOMEM", "ENOENT",
+        "EIO", "ETIMEDOUT", "EEXIST", "EBADF", "EINVAL", "ENOTSUP"))
+    require(type(value) is dict and len(value) == 3 and all(type(key) is str for key in value)
+        and set(value) == {"category", "errno_name", "contract_code"}, "durable_capture_preservation_changed")
+    category, number, code = value["category"], value["errno_name"], value["contract_code"]
+    require(type(category) is str and category in categories
+        and (number is None or type(number) is str and number in errnos)
+        and (code is None or type(code) is str and len(code) <= 256 and code in _HOLD_CONTRACT_CODES),
+        "durable_capture_preservation_changed")
+    return {"category": category, "errno_name": number, "contract_code": code}
+
+
+def _remember_preservation_failure(operation, error):
+    """Best-effort bounded RAM-only observations; cannot release a hold."""
+    try:
+        detail = _fixed_hold_diagnostic(failure_summary(error))
+        previous = _PRESERVATION_FAILURES.get(operation, ())
+        require(type(previous) is tuple and (not previous
+            or _PRESERVATION_FAILURE_ORIGINS.get(operation) is previous), "durable_capture_preservation_changed")
+        item = tuple(detail.items())
+        if item not in previous and len(previous) < 16:
+            updated = (*previous, item)
+            _PRESERVATION_FAILURES[operation] = _PRESERVATION_FAILURE_ORIGINS[operation] = updated
+    except BaseException:
+        pass  # Diagnostic failure cannot alter mandatory private retention.
+
+
+def _hold_accounting(operation):
+    """Authenticate original pure journals after FAILED; never a public guard."""
+    names = ("closed_chunks", "new_START_reservations", "cumulative_START_reservations_upper_bound",
+        "closed_charged_bytes", "outstanding_full_page_bytes", "cumulative_charged_plus_reserved_bytes")
+    unknown = {"availability": "unavailable", **{name: None for name in names},
+        "actual_START_or_HTTP_observation": False}
+    try:
+        op, unused = _failed_original_state(operation); budget = op[1]
+        require(type(budget) is accounting.DurableCountBudget, "durable_capture_preservation_changed")
+        with accounting._lock(budget):
+            journal = accounting.settled_chunk_accounting(budget)
+            profile = tuple(getattr(research_budget, name) for name in ("PRIOR_STARTS", "PRIOR_CHARGED_BYTES",
+                "MAXIMUM_CUMULATIVE_STARTS", "MAXIMUM_CUMULATIVE_BYTES", "MAXIMUM_RESPONSE_BYTES"))
+            require(type(_HOLD_BASELINE) is tuple and len(_HOLD_BASELINE) == 5
+                and all(type(actual) is int and type(wanted) is int and actual == wanted
+                    for actual, wanted in zip(profile, _HOLD_BASELINE)), "durable_capture_preservation_changed")
+            prior, historical_bytes, maximum_starts, maximum_bytes, page_bytes = profile
+            original = accounting._BUDGETS.get(budget)
+            require(type(original) is tuple and len(original) == 3 and original[0] is budget
+                and original[1] is budget._anchor is budget._identity
+                and original[2] is budget._state and journal[0] is budget
+                and journal[1] is original[1][3] is op[3] and journal[2] is op[2],
+                "durable_capture_preservation_changed")
+            state = original[2]
+            require(type(state) is tuple and len(state) == 5 and type(state[1]) is tuple
+                and type(state[2]) is tuple and len(state[1]) <= maximum_starts - prior and len(state[2]) <= 528
+                and type(state[0]) is int and state[0] == op[4]
+                and type(state[4]) is int and 0 <= state[4] <= maximum_bytes,
+                "durable_capture_preservation_changed")
+            for ordinal, ticket in enumerate(state[1], 1):
+                part = accounting._TICKETS.get(ticket) if type(ticket) is accounting.CountAttemptTicket else None
+                require(type(part) is tuple and len(part) == 14 and part[0] is ticket
+                    and ticket._anchor is ticket._identity is part and part[1] is budget and part[2] is op[2]
+                    and part[12] is op[3] and type(part[4]) is int and part[4] == ordinal
+                    and type(part[11]) is int and part[11] == page_bytes,
+                    "durable_capture_preservation_changed")
+            require(all(accounting._TICKETS[ticket][3] == state[0] for ticket in state[2]),
+                "durable_capture_preservation_changed")
+            starts, outstanding = len(state[1]), len(state[2]) * page_bytes
+            total = historical_bytes + state[4] + outstanding
+            require(prior + starts <= maximum_starts and total <= maximum_bytes,
+                "durable_capture_preservation_changed")
+            return {"availability": "authenticated_original_pure_journal", "closed_chunks": len(journal[3]),
+                "new_START_reservations": starts, "cumulative_START_reservations_upper_bound": prior + starts,
+                "closed_charged_bytes": state[4], "outstanding_full_page_bytes": outstanding,
+                "cumulative_charged_plus_reserved_bytes": total, "actual_START_or_HTTP_observation": False}
+    except BaseException:
+        return unknown
+
+
+def _hold_diagnostics(operation):
+    result = {"original_failure": {"availability": "unavailable", "fixed_diagnostic": None},
+        "preservation_failures": {"availability": "unavailable", "fixed_diagnostics": None,
+            "maximum_reported": 16, "negative_registry_authenticated": False}, "accounting": _hold_accounting(operation)}
+    try:
+        op, unused = _failed_original_state(operation)
+        held = _PRESERVATION_HOLD.get(operation)
+        require(type(held) is tuple and len(held) == 6 and held[5] is op,
+            "durable_capture_preservation_changed")
+        result["original_failure"] = {"availability": "available",
+            "fixed_diagnostic": _fixed_hold_diagnostic(failure_summary(held[4]))}
+    except BaseException:
+        pass
+    try:
+        failures = _PRESERVATION_FAILURES.get(operation, ())
+        require(type(failures) is tuple and (not failures
+            or failures is _PRESERVATION_FAILURE_ORIGINS.get(operation)) and len(failures) <= 16,
+            "durable_capture_preservation_changed")
+        details = [_fixed_hold_diagnostic(dict(item)) for item in failures]
+        result["preservation_failures"] = {"availability": "available_partial", "fixed_diagnostics": details,
+            "maximum_reported": 16, "negative_registry_authenticated": False}
+        prepared = _PRESERVATION_LEASES.get(operation)
+        require(type(prepared) is tuple and len(prepared) == 4
+            and type(prepared[0]) is negative.OriginalPreservationLease,
+            "durable_capture_preservation_changed")
+        lease = prepared[0]; anchor = negative._original_anchor(lease)
+        require(lease._anchor is lease._identity is anchor and anchor[1] is operation
+            and anchor[2] is prepared[1] and anchor[3] is prepared[2], "durable_capture_preservation_changed")
+        with anchor[10]:
+            state = negative._STATES.get(lease)
+            require(type(state) is tuple and len(state) == 3 and state is negative._STATE_PINS.get(lease)
+                and type(state[2]) is tuple and len(state[2]) <= 528, "durable_capture_preservation_changed")
+            for value in state[2]:
+                detail = _fixed_hold_diagnostic(value)
+                if detail not in details and len(details) < 16: details.append(detail)
+        result["preservation_failures"] = {"availability": "available", "fixed_diagnostics": details,
+            "maximum_reported": 16, "negative_registry_authenticated": True}
+    except BaseException:
+        pass
+    return result
+
+
 def _retention_summary():
     summaries = _negative_summaries()
+    operations = tuple(_PRESERVATION_HOLD)
+    require(len(operations) <= 133, "durable_capture_preservation_changed")
     return {"schema": "si-count-private-retention-hold-v1", "status": "preservation_blocked",
         "requires_process_hold": True, "blocked_operations": len(_BLOCKED_OPERATIONS) or len(summaries),
         "known_private_observations_retained": sum(item["retained_opaque_observations"] for item in summaries),
+        "known_private_observations_are_complete": False,
+        "operation_diagnostics": [_hold_diagnostics(operation) for operation in operations],
         "additional_HTTP_from_hold": 0, "new_claims_from_hold": 0, "new_STARTs_from_hold": 0,
         "new_credentials_from_hold": 0, "authority": authority()}
 
@@ -1352,6 +1491,7 @@ def _capture_chunk(token, budget, *, root, runtime_head, actual_remote, complete
 
 def run_registered(root, *, runtime_head, actual_remote, complete_code_manifest, archive_code_manifest):
     registered(); _require_lane_root(root)
+    source_scope.require_dispatch_allowed()
     token = load_registered_closed_archive(root, runtime_head=runtime_head, actual_remote=actual_remote,
         complete_code_manifest=archive_code_manifest)
     plan = freeze_recovery_from_archive(token); budget = accounting.open_durable_count_budget(plan)
@@ -1401,6 +1541,7 @@ def _run_cli(arguments):
     require(type(arguments) is argparse.Namespace and arguments.command == "run_registered"
         and all(type(value) is str and re.fullmatch(r"[0-9a-f]{40}", value)
             for value in (arguments.runtime_head, arguments.actual_remote)), "durable_capture_CLI_arguments_refused")
+    source_scope.require_dispatch_allowed()
     guard = lane.LaneGuard(ROOT, expected_head=arguments.runtime_head, expected_remote=arguments.actual_remote)
     manifest = _committed_CLI_manifest(guard, arguments.runtime_head)
     archive_manifest = {name: manifest[name] for name in archive_loader.code_paths()}

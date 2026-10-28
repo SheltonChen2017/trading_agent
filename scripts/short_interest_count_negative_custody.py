@@ -26,7 +26,7 @@ from scripts import short_interest_count_control_custody as controls
 from scripts import short_interest_count_response_custody as responses
 
 immutable, creator = primitive.immutable, primitive.creator
-PRESERVATION_POLICY_SHA256 = "11cc180fc0ae9e2faddf1e632cc431e1cd7ad1dd0ab02fb1a819644ae7b8ecf3"
+PRESERVATION_POLICY_SHA256 = "e0e8df728d96dfaae20b43497ad150557d9a767e5d853d020ec6b9acfcc0423c"
 MAXIMUM_ATTEMPTS, MAXIMUM_LEASES = 528, 133
 MAXIMUM_BODY_BYTES, MAXIMUM_METADATA_BYTES = 2097152, 1024
 ROOT_NAME, PAIR_NAME, METADATA_NAME = "quarantine", "pair", "metadata"
@@ -90,6 +90,7 @@ def policy():
         "final_manifest": "one_quarantine_closure_pair_max2MiB_all_reserved_full_pages_original_settlements_no_source_or_process_closure",
         "prior_settlements": "original_account7_retained_privately_compact_counts_sums_ordered_digests_and_original_closureSHA_only",
         "source_catalogue": "fixed_capture_subtree_external_claim_only_metadata_first_unknown_partial_never_read_or_adopted",
+        "source_empty_containers": "fixed_capture_starts_received_responses_allowed_before_any_reservation_same_original_directory_checks",
         "source_budget": "all_STARTs_and_full_2MiB_negative_charges_unchanged_no_settlement",
         "issuance": "LIVE_original_op_volume_before_claim_key_independent_dup_RO_mount_FD",
         "failure_validation": "FAILED_original_registries_inmemory_code_native_FD_pins_only_no_source_guard_reset",
@@ -474,7 +475,10 @@ def _catalogue(parts):
             f"capture/received/{ordinal}/received.private.json",
             f"capture/responses/{ordinal}/response.raw",
             f"capture/responses/{ordinal}/response.receipt.private.json"))
-    directories = {"capture", "claim"}
+    # Main creates these three containers before the claim or any reservation.
+    # Their admissibility cannot depend on a per-ticket filename; all original
+    # directory pins, protection and exact-membership audits still apply.
+    directories = {"capture", "claim", "capture/starts", "capture/received", "capture/responses"}
     for name in files:
         parent = Path(name).parent
         while parent != Path("."):

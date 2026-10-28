@@ -398,6 +398,65 @@ def manifest(h):
     return json.loads((h.mount / "quarantine/closure" / negative.primitive.BODY_NAME).read_bytes())
 
 
+def original_empty_source_containers(h, monkeypatch):
+    """Actual coordinator mkdir/pins with explicit fabricated source guards."""
+    base = h.mount / "capture"
+    def volume_binding(operation, *, live):
+        assert operation is h.op and live is True
+    monkeypatch.setattr(negative.transport, "_control_volume_binding", volume_binding)
+    monkeypatch.setattr(coordinator, "source_lease_binding", lambda lease: (None,) * 11 + (base,))
+    for path in (base, base / "starts", base / "received", base / "responses", h.mount / "claim"):
+        coordinator._new_directory(h.op, path)
+
+
+def test_zero_tickets_with_original_preclaim_containers_closes_only_negative_manifest(h, kernel, monkeypatch):
+    original_empty_source_containers(h, monkeypatch)
+    pins = coordinator._DIRECTORIES[h.op]
+    assert {path.relative_to(h.mount).as_posix() for path, pin in pins} == {
+        "capture", "capture/starts", "capture/received", "capture/responses", "claim"}
+    assert h.budget.current_tickets() == ()
+    lease = h.lease(); before = h.budget._state; h.fail()
+    result = negative.finalize_failed_chunk(lease)
+    assert result["final_negative_manifest_issued"] and not result["requires_process_hold"]
+    assert result["status"] == "preservation_manifest_sealed_only"
+    assert h.budget._state is before and coordinator._DIRECTORIES[h.op] is pins
+    payload = manifest(h)
+    assert payload["all_current_reserved_tickets"] == [] and payload["current_full_page_reservations"] == 0
+    assert payload["source_contexts_closed"] is False and payload["process_closed"] is False
+    assert all(row["state"] == "ABSENT_NOT_A_START_REFUND" for row in payload["source_members"])
+    assert len(kernel.calls) == 2 and not payload["authority"]["budget_release_authority"]
+    assert negative.preservation_binding(lease)["final_negative_manifest_issued"]
+
+
+@pytest.mark.parametrize("extra", ["capture/foreign", "capture/starts/000001", "capture/received/000001", "capture/responses/000001"])
+def test_zero_tickets_fixed_containers_do_not_admit_unknown_children(h, kernel, monkeypatch, extra):
+    original_empty_source_containers(h, monkeypatch)
+    lease = h.lease(); path = h.mount / extra; path.mkdir(mode=0o700)
+    h.fail(); report = negative.finalize_failed_chunk(lease)
+    assert report["requires_process_hold"] and not report["final_negative_manifest_issued"]
+    assert report["blockers"][0]["contract_code"] == "negative_source_catalogue_changed"
+    assert not kernel.calls and not (h.mount / "quarantine").exists() and path.is_dir()
+    assert report["original_mount_FD_retained"] and h.budget._state[1:3] == ((), ())
+
+
+@pytest.mark.parametrize("change", ["mode", "inode", "symlink"])
+def test_zero_tickets_fixed_containers_retain_original_directory_checks(h, kernel, monkeypatch, change):
+    original_empty_source_containers(h, monkeypatch)
+    lease = h.lease(); path = h.mount / "capture/starts"
+    if change == "mode": path.chmod(0o755)
+    else:
+        original = h.mount / "original-starts-outside-capture"
+        path.rename(original)
+        if change == "inode": path.mkdir(mode=0o700)
+        else: path.symlink_to(original, target_is_directory=True)
+    h.fail(); report = negative.finalize_failed_chunk(lease)
+    assert report["requires_process_hold"] and not report["final_negative_manifest_issued"]
+    expected = "negative_source_member_changed" if change == "inode" else "negative_owned_directory_changed"
+    assert report["blockers"][0]["contract_code"] == expected
+    assert not kernel.calls and not (h.mount / "quarantine").exists()
+    assert report["original_mount_FD_retained"] and h.budget._state[1:3] == ((), ())
+
+
 def test_zero_observations_requires_original_global_negative_before_exit(h, kernel):
     lease = h.lease(); h.fail()
     missing = negative.preservation_binding(lease)

@@ -18,7 +18,8 @@ PRIOR_STARTS, PRIOR_CHARGED_BYTES = 13992, 23452681
 MAXIMUM_STARTS, MAXIMUM_BYTES = 84005, 4 * 1024 ** 3
 MISSING_POSITIONS, CHUNKS, POSITIONS_PER_CHUNK, EXTRA_PER_CHUNK = 67885, 133, 512, 16
 MAXIMUM_TRIES, MAXIMUM_INFLIGHT, PAGE_BYTES, CHUNK_SECONDS, FILE_SECONDS = 3, 8, 2097152, 3600, 8
-_CODES = frozenset(("count_source_authority_changed", "count_source_authority_unregistered"))
+_CODES = frozenset(("count_source_authority_changed", "count_source_authority_unregistered",
+    "count_source_prior_run_unresolved"))
 
 
 class CountSourceAuthorityRefusal(ValueError): pass
@@ -96,3 +97,22 @@ def registered_sha256():
     require(type(POLICY_SHA256) is str and re.fullmatch(r"[0-9a-f]{64}", POLICY_SHA256)
         and hash_payload(value) == POLICY_SHA256, "count_source_authority_unregistered")
     return POLICY_SHA256
+
+
+def require_dispatch_allowed():
+    """Keep software validation separate from permission to spend again.
+
+    The E756 run (exec13448, plan2aa15b2f) entered preservation hold. Its
+    original process/terminal witness and reservation journal are unavailable.
+    Empty START directories and an absent process cannot refund that run or
+    establish that its private data was completely preserved. There is no
+    caller flag, namespace choice, reset or retry that can release this gate.
+    A separately verified accounting/preservation resolution must replace
+    this operational policy before another source lease can be issued.
+
+    The registered owner scope above stays unchanged: 84,005 cumulative
+    STARTs and 4 GiB are ceilings, not an additional allocation after an
+    unresolved run.
+    """
+    registered_sha256()
+    raise CountSourceAuthorityRefusal("REFUSED: count_source_prior_run_unresolved")

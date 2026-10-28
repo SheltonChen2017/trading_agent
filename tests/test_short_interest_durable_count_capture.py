@@ -31,7 +31,7 @@ def fresh_outer_registries(monkeypatch):
     for name, value in (("_PRESERVATION_LEASES", {}), ("_NEGATIVE_STATUS", {}), ("_NEGATIVE_ORIGINS", {}),
         ("_NEGATIVE_ATTEMPTED", set()), ("_BLOCKED_OPERATIONS", set()), ("_RETENTION_ANNOUNCED", set()),
         ("_SOURCE_BATCHES", {}), ("_SOURCE_BATCH_FAILED", set()), ("_NEGATIVE_FINAL_ATTEMPTED", set()),
-        ("_PRESERVATION_PROFILES", {})):
+        ("_PRESERVATION_PROFILES", {}), ("_PRESERVATION_FAILURES", {}), ("_PRESERVATION_FAILURE_ORIGINS", {})):
         monkeypatch.setattr(outer, name, value)
     monkeypatch.setattr(outer, "_SETTLED_CONTRIBUTIONS", {})
     monkeypatch.setattr(outer, "_CONTRIBUTION_ORIGINS", {})
@@ -116,6 +116,7 @@ def fabricated_current_code_lease(monkeypatch, tmp_path):
     """Genuine plan/budget; explicit fake already-closed archive and code IO."""
     h = SimpleNamespace(plan=genuine_plan(monkeypatch), tick=100., events=[], fail_close=False)
     h.budget = outer.accounting.open_durable_count_budget(h.plan)
+    monkeypatch.setattr(outer.source_scope, "require_dispatch_allowed", lambda: None)  # Explicit SOFTWARE-ONLY fixture seam.
     h.token = object.__new__(outer.OriginalClosedArchiveToken)
     model = h.plan._parts[1]; h.archive = (h.token, object(), object(), model, b"{}", "d" * 64,
         model._parts[1].query_plan, object())
@@ -803,6 +804,7 @@ def test_CLI_hash_shape_refuses_before_repository_or_source_factory(monkeypatch,
 def test_CLI_passes_only_fixed_committed_catalogues_to_canonical_factory(monkeypatch, capsys):
     from types import SimpleNamespace
     calls = []
+    monkeypatch.setattr(outer.source_scope, "require_dispatch_allowed", lambda: None)  # Explicit SOFTWARE-ONLY fixture seam.
     manifest = {name: "d" * 64 for name in outer.code_paths()}
     monkeypatch.setattr(outer, "_require_lane_root", lambda root: calls.append(("physical", root)))
     monkeypatch.setattr(outer.lane, "LaneGuard", lambda root, **kw: SimpleNamespace(refresh=lambda: calls.append("fresh-ref")))
@@ -850,6 +852,139 @@ def test_summary_failure_keeps_required_private_hold(monkeypatch):
     monkeypatch.setattr(outer.time, "sleep", sleep)
     with pytest.raises(StopFabricatedHold): outer._retain_failed_process()
     assert calls == [30] and outer._RETENTION_ANNOUNCED == {"announced"}
+
+
+@pytest.mark.parametrize("route", ["CLI", "round", "lease"])
+def test_unresolved_prior_run_gate_precedes_every_source_dispatch_route(monkeypatch, tmp_path, route):
+    monkeypatch.setattr(outer, "registered", lambda: None)  # SOFTWARE-ONLY registration and physical-root seams.
+    monkeypatch.setattr(outer, "_require_lane_root", lambda root: None)
+    monkeypatch.setattr(outer, "ROOT", tmp_path); monkeypatch.chdir(tmp_path)
+    calls = []
+    for module, name in ((outer.lane, "LaneGuard"), (outer, "_archive_binding"),
+            (outer, "load_registered_closed_archive"), (outer.storage, "prepare_registered_volume"),
+            (outer.controls, "prepare_owned_count_claim"), (outer.transport, "read_named_keychain")):
+        monkeypatch.setattr(module, name, lambda *a, **k: calls.append("FORBIDDEN_SOURCE_OR_IO"))
+    with pytest.raises(outer.source_scope.CountSourceAuthorityRefusal, match="count_source_prior_run_unresolved"):
+        if route == "CLI":
+            outer._run_cli(outer.argparse.Namespace(command="run_registered", runtime_head="c" * 40,
+                actual_remote="b" * 40))
+        elif route == "round":
+            outer.run_registered(tmp_path, runtime_head="c" * 40, actual_remote="b" * 40,
+                complete_code_manifest={}, archive_code_manifest={})
+        else:
+            with outer._prepare_registered_source_lease(object(), object(), root=tmp_path,
+                    runtime_head="c" * 40, actual_remote="b" * 40, complete_code_manifest={}):
+                pytest.fail("unresolved prior operation yielded source lease")
+    assert calls == []
+
+
+def _fabricated_blocked_hold(h, monkeypatch):
+    h.block_negative = True
+    fail_after_first_genuine_observation(h, monkeypatch)
+    monkeypatch.setattr(outer, "_retain_failed_process", lambda: (_ for _ in ()).throw(HoldingTestSentinel()))
+    with pytest.raises(HoldingTestSentinel): h.run()
+    return outer._PRESERVATION_HOLD[h.op]
+
+
+def test_prehold_diagnostics_classify_original_without_private_text_or_failed_guard(fabricated_outer_run, monkeypatch):
+    h = fabricated_outer_run
+    held = _fabricated_blocked_hold(h, monkeypatch)
+    # A later cleanup error cannot replace the very first capture error.
+    outer._preserve_failed_chunk(h.op, h.volume, ValueError("LATER_PRIVATE_ERROR"))
+    detail = outer._hold_diagnostics(h.op)
+    assert outer._PRESERVATION_HOLD[h.op][4] is held[4]
+    assert detail["original_failure"] == {"availability": "available", "fixed_diagnostic": {
+        "category": "unknown_local_error", "errno_name": None, "contract_code": None}}
+    assert detail["accounting"]["availability"] == "unavailable"  # Toy policy is not the actual frozen baseline.
+    assert all(value is None for name, value in detail["accounting"].items()
+        if name not in {"availability", "actual_START_or_HTTP_observation"})
+    text = canonical_json(detail)
+    assert "PRIVATE_EXCEPTION_SENTINEL" not in text and "LATER_PRIVATE_ERROR" not in text
+    assert h.failed_source_checks == 0 and len(h.key_calls) == len(h.wire_calls) == 1
+    assert h.op in transport._FAILED and outer._requires_process_hold()
+
+
+def test_prehold_pure_accounting_authenticates_full_original_reservations(fabricated_outer_run, monkeypatch):
+    h = fabricated_outer_run; _fabricated_blocked_hold(h, monkeypatch)
+    # Explicit TOY-profile seam: genuine pure budget/journal/ticket identities remain required.
+    profile = tuple(getattr(outer.research_budget, name) for name in ("PRIOR_STARTS", "PRIOR_CHARGED_BYTES",
+        "MAXIMUM_CUMULATIVE_STARTS", "MAXIMUM_CUMULATIVE_BYTES", "MAXIMUM_RESPONSE_BYTES"))
+    monkeypatch.setattr(outer, "_HOLD_BASELINE", profile)
+    before = h.budget._state
+    detail = outer._hold_accounting(h.op)
+    assert detail["availability"] == "authenticated_original_pure_journal"
+    assert detail["new_START_reservations"] == len(before[1]) == 2
+    assert detail["cumulative_START_reservations_upper_bound"] == profile[0] + 2
+    assert detail["outstanding_full_page_bytes"] == 2 * profile[4]
+    assert detail["cumulative_charged_plus_reserved_bytes"] == profile[1] + 2 * profile[4]
+    assert detail["actual_START_or_HTTP_observation"] is False
+    assert h.budget._state is before and h.failed_source_checks == 0
+    assert outer.accounting.settled_chunk_accounting(h.budget)[3] == ()
+    assert outer._requires_process_hold() and outer._TERMINALS == {}
+    ticket = before[1][0]; original = outer.accounting._TICKETS[ticket]
+    outer.accounting._TICKETS[ticket] = tuple(list(original))
+    corrupted = outer._hold_accounting(h.op)
+    assert corrupted["availability"] == "unavailable" and corrupted["new_START_reservations"] is None
+    assert corrupted["outstanding_full_page_bytes"] is None
+
+
+def test_prehold_negative_codes_require_original_registry_identity_and_literal_catalogue(fabricated_outer_run, monkeypatch):
+    h = fabricated_outer_run; _fabricated_blocked_hold(h, monkeypatch)
+    from scripts import short_interest_count_negative_custody as real_negative
+    monkeypatch.setattr(outer, "negative", real_negative)
+    # Explicit fabricated private-registry issuer seam; no native/file/source callback is invoked.
+    lease = object.__new__(real_negative.OriginalPreservationLease)
+    op = transport._OPERATIONS[h.op][0]
+    anchor = (lease, h.op, op, h.volume, None, None, None, None, None, None, outer._thread.RLock())
+    lease._anchor = lease._identity = anchor
+    fixed = {"category": "local_contract_refusal", "contract_code": "negative_source_catalogue_changed", "errno_name": None}
+    state = (), (), (fixed,)
+    monkeypatch.setattr(real_negative, "_LEASES", {lease: anchor})
+    monkeypatch.setattr(real_negative, "_STATES", {lease: state})
+    monkeypatch.setattr(real_negative, "_STATE_PINS", {lease: state})
+    outer._PRESERVATION_LEASES[h.op] = lease, op, h.volume, object()
+    detail = outer._hold_diagnostics(h.op)["preservation_failures"]
+    assert detail["availability"] == "available" and detail["negative_registry_authenticated"] is True
+    assert detail["fixed_diagnostics"] == [fixed]
+    real_negative._STATES[lease] = tuple(list(state))
+    detail = outer._hold_diagnostics(h.op)["preservation_failures"]
+    assert detail["availability"] == "available_partial" and detail["negative_registry_authenticated"] is False
+    assert detail["fixed_diagnostics"] == []
+    real_negative._STATES[lease] = state
+    state[2][0]["contract_code"] = "PRIVATE_UNREGISTERED_PATH_TOKEN"
+    detail = outer._hold_diagnostics(h.op)
+    assert detail["preservation_failures"]["negative_registry_authenticated"] is False
+    assert "PRIVATE_UNREGISTERED_PATH_TOKEN" not in canonical_json(detail)
+
+
+@pytest.mark.parametrize("value", [
+    {"category": "PRIVATE", "errno_name": None, "contract_code": None},
+    {"category": "local_os_error", "errno_name": "PRIVATE", "contract_code": None},
+    {"category": "local_contract_refusal", "errno_name": None, "contract_code": "PRIVATE"},
+    {"category": "unknown_local_error", "errno_name": None, "contract_code": None, "private": "PRIVATE"},
+])
+def test_hold_projection_refuses_dynamic_fields_instead_of_serializing_them(value):
+    with pytest.raises(outer.DurableCountCaptureRefusal): outer._fixed_hold_diagnostic(value)
+
+
+def test_preservation_failure_diagnostics_are_bounded_and_original_failures_are_recorded(fabricated_outer_run, monkeypatch):
+    h = fabricated_outer_run
+    h.fail_final = True
+    original = h.negative.finalize_failed_chunk
+    def failed_final(lease):
+        original(lease)
+        raise outer.DurableCountCaptureRefusal("REFUSED: durable_capture_preservation_changed")
+    h.negative.finalize_failed_chunk = failed_final
+    fail_after_first_genuine_observation(h, monkeypatch)
+    monkeypatch.setattr(outer, "_retain_failed_process", lambda: (_ for _ in ()).throw(HoldingTestSentinel()))
+    with pytest.raises(HoldingTestSentinel): h.run()
+    observed = outer._PRESERVATION_FAILURES[h.op]
+    assert len(observed) == 1 and dict(observed[0])["contract_code"] == "durable_capture_preservation_changed"
+    for code in sorted(outer._CODES):
+        outer._remember_preservation_failure(h.op, outer.DurableCountCaptureRefusal("REFUSED: " + code))
+    assert len(outer._PRESERVATION_FAILURES[h.op]) == 16
+    assert outer._PRESERVATION_FAILURES[h.op] is outer._PRESERVATION_FAILURE_ORIGINS[h.op]
+    assert h.op in transport._FAILED and outer._requires_process_hold() and h.final_calls == [True]
 
 
 def test_pure_contribution_history_never_reopens_expired_reader_and_partial_plan_cannot_form_union(fabricated_outer_run, monkeypatch):

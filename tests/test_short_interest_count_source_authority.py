@@ -59,3 +59,26 @@ def test_fixed_projection_never_formats_private_or_hostile_text():
         def __eq__(self, other): pytest.fail("private comparison")
     assert authority.failure_summary(authority.CountSourceAuthorityRefusal(Hostile())) == {
         "category": "unknown_local_error", "contract_code": None, "errno_name": None}
+
+
+def test_registered_scope_does_not_release_unresolved_prior_spending():
+    assert authority.registered_sha256() == hash_payload(authority.policy())
+    for unused in range(2):
+        with pytest.raises(authority.CountSourceAuthorityRefusal) as caught:
+            authority.require_dispatch_allowed()
+        assert authority.failure_summary(caught.value) == {
+            "category": "local_contract_refusal", "contract_code": "count_source_prior_run_unresolved",
+            "errno_name": None}
+    assert authority.policy()["maximum_cumulative_STARTs"] == 84005
+    assert authority.policy()["maximum_cumulative_bytes"] == 4294967296
+
+
+def test_unresolved_gate_has_no_caller_release_or_IO_argument():
+    with pytest.raises(TypeError):
+        authority.require_dispatch_allowed(allow=True)
+
+
+def test_unregistered_policy_still_refuses_before_operational_gate(monkeypatch):
+    monkeypatch.setattr(authority, "POLICY_SHA256", "PENDING")
+    with pytest.raises(authority.CountSourceAuthorityRefusal, match="count_source_authority_unregistered"):
+        authority.require_dispatch_allowed()

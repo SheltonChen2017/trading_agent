@@ -1,15 +1,18 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE REVIEW OF THE 17 CODEX COMMITS 3b0e854..757e363 COMPLETE (SECTION129):
-ALL ACCEPTED; RECORD CORRECTIONS, ONE RECORD REGRESSION FILE AND ONE TEST-ONLY
-HOLD-REPORT REGRESSION (SI-CR24-006); NO PRODUCTION CODE CHANGE. ONE REGISTERED COUNT INVOCATION (EXEC13448, SECTION128.43) STARTED AT
+Status: **CLAUDE CORRECTIONS FOR SI-CR24-001 AND SI-CR24-002 COMMITTED (SECTION130,
+OWNER-DIRECTED): A DURABLE CONTENT-ADDRESSED HOLD REPORT IS NOW WRITTEN BEFORE
+STDOUT AND BEFORE ANY FUTURE PROCESS HOLD (RUN PROTOCOL RE-REGISTERED), AND A
+STAT-ONLY VERIFIER SHOWS EXEC13448'S START, RECEIVED AND RESPONSE CONTAINERS NEVER
+HELD AN ENTRY. SECTION129 REVIEWED THE 17 CODEX COMMITS 3b0e854..757e363: ALL
+ACCEPTED. ONE REGISTERED COUNT INVOCATION (EXEC13448, SECTION128.43) STARTED AT
 e756763, ENTERED PRESERVATION HOLD AND THEN VANISHED WITH NO OBSERVED EXIT:
 PRIOR COUNT RUN 13448 UNRESOLVED (SI-BUILD-20261028-052 OPEN). SOURCE DISPATCH
 BLOCKED IN CODE ON ALL THREE DURABLE-COUNT ENTRY ROUTES, WITH NO CALLER RELEASE.
-ITS NAMESPACE HOLDS NO PER-TICKET START DIRECTORY AND THE ONLY KEY/GET PATH NEEDS
-ONE, SO ITS MASSIVE GETS ARE BOUNDED TO ZERO UNLESS THE NAMESPACE WAS ALTERED
-AFTER THE RUN (SI-CR24-001); THE GATE STAYS UNTIL A FROZEN RESOLUTION POLICY
-REPLACES IT. 84005 CUMULATIVE COUNT STARTS / UNCHANGED4GiB CEILINGS; THE CURRENT
+KERNEL STAMPS BOUND ITS MASSIVE KEY READS AND GETS TO ZERO (SI-CR24-001; RESIDUAL:
+A CHANGED CLOCK OR AN EDIT BELOW THE FILESYSTEM), WITH AT MOST 8 UNSTARTED START
+RESERVATIONS; AN UNEXPLAINED MOUNT-ROOT ENTRY CHANGE IS OPEN (SI-CR24-007). THE
+GATE STAYS UNTIL A FROZEN RESOLUTION POLICY REPLACES IT. 84005 CUMULATIVE COUNT STARTS / UNCHANGED4GiB CEILINGS; THE CURRENT
 PERMANENT FULL-PAGE RESERVATION MODEL ADMITS ONLY2036 NEW SLOTS UNTIL AN
 AUTHENTICATED DURABILITY ADAPTER EXISTS. THE LAST AUTHENTICATED BASELINE
 13992START/23452681 CHARGED BYTES IS A PRIOR BASELINE, NOT A VERIFIED CURRENT
@@ -257,6 +260,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-27 | Codex synchronization + counter-review (2026-10-26 Pacific session) | Local3b0e854472a0db5592e4e350695da5798c9ccbfa plus exact Claude e92e8ab7876e17c039950be26a033309b6ac727f and20c49ac0fad5eddba251478406dd7af5a04093f0; ordinary merge preserves both parents | Section127: accept test-only corrections; qualify cache-guard attribution, host conclusions and latest owner resource pause | Both concurrent126 blocks preserved byte-exactly; three unfinished drafts retained privately, not admitted; actual local V3 negative supplemented, no custody repair claimed | Main571focused/65.12s and29post-record/.46s; causal in-memory guard removal3expected failures/.07s, restored process; final validation below. No full suite, Windows execution, provider, source replay or QC | SI-CCR-20261026-001..003 appended; prior custody/source/platform gates remain open; all START/byte debits and84005/4GiB caps unchanged | ONE final matching-lane nonforce push for this bounded counter-review; then offline custody work only, stopping before QC setup while resources remain occupied |
 | 2026-10-28 | Codex owner-directed blocked-snapshot publication (row added by Claude review, `SI-CR24-005`) | Starting matching origin `d6af672b3c8198712228bbd7b5eef35777283b1a`; fourteen local commits `c715a6c1fa74b7c06c3ce7fe081a116238093bbd` .. `162125d69f091cea1be4bcde601d3d25048bae9e` plus the record-only `757e3634511d2160f24ef2b274f101f0952c4f84`, published in one non-force push at 07:28 UTC | Sections 128.1-128.46: isolated and maximum-body synthetic custody proofs, durable count chain, ONE registered count invocation (exec13448) and its unconditional dispatch block | Owner's "push for now" supersedes 128.45's wait-for-pre-QC boundary for this snapshot only. exec13448 entered preservation hold and vanished with no observed exit; `SI-BUILD-20261028-050/051` corrected prospectively, `-052` open, and every durable-count entry route refuses. | Codex attributes Main's 907 focused tests / 62.97 s (128.45) and 95 post-record checks; no complete lane suite, QC or outcome look. | `SI-BUILD-20261028-052` (P2, open). No ledger row was written for this push; Claude added this one. | Claude reviews the pushed snapshot (section 129). No source dispatch until a frozen resolution policy replaces the gate. QC stays paused. |
 | 2026-10-28 | Claude review (macOS session) | `730c59c` -> `757e363` reviewed from the published head after the push watcher fired; the 17 Codex commits get dispositions, while the two Windows Claude commits stay with Codex's 127.2 counter-review; **record corrections, one record regression file and one test-only hold-report regression**; this round's commit is the only Claude commit | Independent review of Codex126, merge 127 and section 128 (custody proofs, durable count chain, exec13448 and its dispatch block) | All 17 Codex commits accepted. The 13448 namespace was checked read-only by stat and the mount table: no per-ticket START, received or response directory, and the claim matches 128.43. A code-order trace at `e756763` shows the Massive key read and GET need a START control in such a directory. The five 128.41 registration hashes match `e756763`'s constants. Eight in-memory mutants of the `06cdd11` gate and hold changes: seven caught by existing tests; one (hold report claiming complete retention) survived until the new regression. | Pushed tree `757e363`, network-denied, empty environment: 48 affected files **2338 passed** (no skips or warnings). After the corrections: 10 files **361 passed**. Mutation baseline 175 passed; of 8 mutants, 7 were caught by existing tests and 1 by the new regression. `git diff --check` clean. **No complete lane suite, by owner direction.** **Authorized looks 0, consumed looks 0**. | `SI-CR24-001` (P3, open: zero-dispatch evidence for 052). `SI-CR24-002` (P2, open: a RAM-only hold does not survive its launching session). `SI-CR24-003` (P3, closed by note: SI-CR18-001 reused). `SI-CR24-004` (P3, closed: stale status). `SI-CR24-005` (P3, closed: missing ledger row). `SI-CR24-006` (P3, closed by test: completeness flag untested). `SI-CR23-001` closed in software by 128.41. `SI-BUILD-20261028-052` open. | Codex counter-reviews section 129. Before replacing the 052 gate, freeze a resolution policy for exec13448 and answer `SI-CR24-002`. QC stays paused until the owner releases it. |
+| 2026-10-28 | Claude correction round (macOS session, owner-directed) | Starting matching origin `19339df500c60368eb5f452f40b4b69b00fba303`; code/test commit `2ffadd0d66f25d844f954662034933a36ec012ad` plus this record commit, published in one push | Owner's "proceed to fix all findings you identified": `SI-CR24-001` and `SI-CR24-002` (section 130) | Durable content-addressed hold report written before stdout and before any future process hold; run protocol re-registered `0a12282d...` -> `5d2cb993...`. A new stat-only verifier on the real exec13448 namespace: the three containers never held an entry and last changed before the claim, and the pins match. At most 8 unstarted reservations. The 052 gate and every other registration are unchanged. | Network-denied, empty environment: 10 affected code files **531 passed** on `2ffadd0`; 9 in-memory mutants all caught (baseline 97 passed); record readers in 130.4. **No complete lane suite, by owner direction.** **Authorized looks 0, consumed looks 0.** | `SI-CR24-001` (P3, closed by correction: evidence only). `SI-CR24-002` (P2, closed prospectively; residual supervisor-launch requirement). `SI-CR24-007` (P3, open: unexplained mount-root entry change). `SI-BUILD-20261028-052` open. | Codex counter-reviews sections 129-130 and freezes a 052 resolution policy before any source dispatch. QC stays paused. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -26585,3 +26589,132 @@ All runs used `sandbox-exec` with `(deny network*)`, an empty environment (`env 
 - Not run: the complete lane suite (owner direction), a Windows run, any actual proof, source or provider operation, and any QC or Safari access. I read no credential and no private artifact content.
 - The two regressions and this record are the only changes. No production code, shared document, `docs/SESSION_HANDOFF.md` or Action Plan changes.
 - Next: Codex counter-reviews section 129. `SI-BUILD-20261028-052` stays open. Before any source dispatch, Codex or the owner must freeze a resolution policy for exec13448 (it may use the `SI-CR24-001` evidence) and answer `SI-CR24-002`. QuantConnect stays paused until the owner releases it. The owner's 128.45/128.46 steering governs Codex's next publication.
+
+## 130. Claude corrections for SI-CR24-001 and SI-CR24-002 — 2026-10-28 UTC (macOS session, owner-directed)
+
+### 130.1 Direction and scope
+
+- **Owner direction in this session**, after the section-129 notes: "proceed to fix all findings you identified". My open findings were `SI-CR24-001` and `SI-CR24-002`; every other row of 129.6 was already closed or belongs to someone else. Claude126 `SI-CR18-005` (the owner's Windows-parity decision) and the daily `SI-CR18-006` advisory come from the Windows session's review and are unchanged here.
+- **Starting point:** `19339df500c60368eb5f452f40b4b69b00fba303`. After `git fetch`, local, tracking and actual origin were equal, the worktree was clean, and Codex had not pushed since.
+- **Commits:** `2ffadd0d66f25d844f954662034933a36ec012ad` (code and tests) and this record commit, published in one push.
+- **Unchanged:**
+  - `require_dispatch_allowed()` still refuses unconditionally, and `SI-BUILD-20261028-052` stays open.
+  - The SourceAUTH scope `9d67d93a...`, the negative policy `e0e8df72...`, the 84005 / 4 GiB ceilings and all spent accounting are untouched.
+  - I made no image, claim, key, provider, QuantConnect or Safari access. I observed the exec13448 namespace by `lstat` only.
+
+### 130.2 `SI-CR24-002`: durable hold report (closed prospectively by correction)
+
+Changes in `scripts/capture_short_interest_durable_counts.py`:
+
+- **The copy.** `_persist_hold_report` writes the fixed retention projection inside a `si-count-hold-report-v1` wrapper. The wrapper adds a UTC timestamp, the process ID, `private_bytes_retained_only_by_holding_process: true` and `release_or_settlement_authority: false`.
+- **Location.** The copy goes in `artifacts/short_interest/count_hold_reports/`, which Git ignores and which is outside every custody image and namespace.
+- **Protection.**
+  - The directory must be a real directory, owned by the user, with mode 0700.
+  - The file is created exclusively (`O_EXCL|O_NOFOLLOW`) with mode 0400 and written in full; both the file and its directory are fsynced.
+  - The file is named `hold-<SHA-256 of its bytes>.json`, so a truncated or edited copy fails its own name check. No existing file is ever replaced.
+- **Order.** `_retain_failed_process` writes the copy first. It then prints the projection, plus a `si-count-hold-report-persistence-v1` line saying whether the copy was written and giving its SHA-256. A failed summary, copy or print never releases the hold.
+- **Registration.** `protocol()` gains a `hold_report` entry, so `RUN_PROTOCOL_SHA256` is re-registered from `0a12282d516613ac3d6f5e407aab331c385159fbf5244370bc05b88f5551f7e5` to `5d2cb9935d26bbdbe92ac15d2bc98b775a8b7202870a5f119f3aa15dcb74f959`. One fixed refusal code, `durable_capture_hold_report_refused`, is added. No other registration changes.
+- **Tests write nowhere in the lane.** The existing autouse fixture redirects the directory to a temporary path.
+
+What this fixes, and what it cannot:
+
+- **Fixed for future runs:** the hold projection's accounting and diagnostics now survive the loss of stdout and of the holding process. That covers the fixed failure classification and the authenticated pure-journal reservations and charges, or an explicit "unavailable". Exec13448 would have left this file.
+- **Not fixable this way:** the unexported private bytes and FDs still live only in the holding process. Any run that a frozen 052 policy allows must still be launched under a supervisor whose lifetime does not depend on the agent session; this remains a runbook requirement.
+- **Not retroactive:** it does not resolve exec13448.
+
+The regressions are in `tests/test_short_interest_durable_count_capture.py`:
+
+- `test_hold_report_is_durable_content_addressed_and_written_before_stdout`
+- `test_unsafe_hold_report_directory_never_receives_the_report_or_releases_hold`, for a symlinked and a group-readable directory
+- `test_hold_report_name_is_never_replaced`
+
+### 130.3 `SI-CR24-001`: kernel-stamp evidence for exec13448 (closed by correction; evidence only)
+
+The new `scripts/diagnose_short_interest_count_run13448_stamps.py` calls only `lstat`. No runtime module imports it, and it imports only `os`, `pathlib`, `stat`, `sys` and `data.hashing`.
+
+**The rule.**
+- Creating or removing a directory entry sets that directory's mtime and ctime to the current time. `utimes()` can restore mtime, but it always sets ctime to now.
+- At `e756763`, Main creates `capture/starts/NNNNNN` only after the claim file exists.
+- Take a container whose mtime equals its birth time, whose link count shows no entry, and whose ctime predates the claim file's birth. That container never held a per-ticket directory.
+
+**Result on the real namespace** (2026-10-28, network-denied, `lstat` only, exit 0):
+- `containers_never_held_an_entry: true` and `containers_last_changed_before_claim: true`;
+- `per_ticket_START_directories_created: 0` and `provider_key_read_or_GET_possible: false`;
+- `pins_match_2026_10_28_observation: true` and `release_refund_or_dispatch_authority: false`.
+
+Observed stamps, all on 2026-10-27 UTC:
+
+| Path under the namespace | Inode | Birth | Last entry change (mtime) | Last metadata change (ctime) |
+| --- | --- | --- | --- | --- |
+| the namespace directory (host volume) | 46599617 | 15:37:29.418973 | 15:37:30.631578 | 15:37:30.631578 |
+| `mount/capture/starts` | 19 | 15:37:32.569302 | 15:37:32.569302 (= birth) | 15:37:32.569366 |
+| `mount/capture/received` | 20 | 15:37:32.905837 | 15:37:32.905837 (= birth) | 15:37:32.905944 |
+| `mount/capture/responses` | 21 | 15:37:33.257576 | 15:37:33.257576 (= birth) | 15:37:33.257656 |
+| `mount/claim/claim.spent.json` | 23 | 15:37:35.346106 | 15:37:35.606140 | 15:37:36.838351 |
+
+Each container last changed between 2.1 and 2.8 s before the claim file was created.
+
+What follows:
+
+- **Provider increment of exec13448:** 0 START controls, 0 key reads, 0 HTTP requests and 0 charged bytes. Section 129's caveat ("unless the namespace was altered after the run") narrows to two cases that stat cannot show:
+  - a changed system clock;
+  - an edit below the filesystem. The backing image is still attached and the kernel still writes it, so its mtime (2026-10-28 15:50:30 UTC) is not evidence either way.
+- **Internal reservations:** the bound is at most 8 START reservations, none started.
+  - `_schedule_chunk_attempts` is unchanged since `e756763`. In it, one batch of at most `_batch_width()` = 8 reservations precedes `authorize_start_batch` and that batch's directories.
+  - No later batch can begin until those directories exist.
+  - Debited at the full-page rate, 8 reservations would be at most 16,777,216 bytes.
+  - The 84005 ceiling is fully allocated (13992 + 67885 + 133 x 16). Whether and how to debit these reservations is therefore a policy choice for the owner or Codex.
+- **`SI-CR24-007` (P3, open observation):** the mount root's own mtime and ctime are 2026-10-27 19:08:48.157969 UTC, 3 h 31 min after the claim.
+  - So at that time an entry directly under `mount/` was created, removed or renamed. Today the root holds only `.fseventsd`, `capture` and `claim`.
+  - This is off the START path: `capture`'s own stamps have not changed since 15:37:33.258.
+  - I do not assign it a cause. A 052 policy should account for it.
+- **Pins:** the verifier pins the inode, mtime and ctime of the three containers and of the claim, so a re-run shows any later change.
+
+The regressions are in `tests/test_short_interest_count_run13448_stamps.py`, which runs on macOS only. Its nine tests cover:
+
+- the APFS link-count assumption;
+- an untouched layout, which proves zero per-ticket directories and grants no authority;
+- a START directory created and then removed;
+- a restored mtime that still leaves a late ctime;
+- a START directory left in place;
+- a same-device mount;
+- that observation opens and lists nothing;
+- a pin change;
+- the import allowlist.
+
+### 130.4 Validation
+
+All runs used `sandbox-exec` with `(deny network*)`, an empty environment (`env -i`), `-B` and `-p no:cacheprovider`. Before each run, an EPERM probe to 192.0.2.1:443 returned errno 1.
+
+- **Affected code selection on `2ffadd0`: 10 files, 531 passed in 29.12 s.** The files are the durable capture, stamp verifier, negative custody, source authority, durable transport, durable budget, checkpoint, checkpoint loader, kill-switch and ML import-boundary tests. The worktree was clean before and after, and no `count_hold_reports` directory appeared in the lane.
+- **Mutation probes, in memory only (no source file edited): baseline 97 passed** on the two test files with new regressions. Every mutant was caught:
+  - `NO_PERSIST` skips the copy: 1 failed.
+  - `PRINT_FIRST` prints before the copy: 3 failed.
+  - `NO_EXCL` replaces `O_EXCL` with `O_TRUNC`: 1 failed.
+  - `NO_MODE` drops the 0700 directory check: 1 failed.
+  - `NO_FSYNC` drops the file fsync: 1 failed.
+  - `NO_BIRTH`, `NO_CTIME`, `NO_LINKS` and `NO_DEVICE` each drop one verifier rule: 1 failed each.
+- **Record readers after this record: 7 files, 185 passed in 1585.07 s**, no skips or warnings. The files are the three Claude/counter-review record tests, `test_active_document_consistency.py` and the three other test files that read this record. After this result was written in, the three record test files were rerun on the final text before the commit. `git diff --check` is clean.
+- **Not run:** the complete lane suite (by owner direction), `compileall` and any Windows run.
+
+### 130.5 P0-P3 issue ledger
+
+| ID | Priority | Status | Summary |
+| --- | --- | --- | --- |
+| `SI-CR24-001` | P3 | Closed by correction (evidence only) | The stat-only verifier shows exec13448's three containers never held an entry and last changed before the claim. The provider increment is zero, short of a changed clock or an edit below the filesystem. At most 8 internal reservations. The 052 gate is unchanged. |
+| `SI-CR24-002` | P2 | Closed prospectively by correction | A durable, content-addressed hold report is written before stdout and before any future hold. Residual: private bytes remain process-only, so a supervisor launch is still a runbook requirement. |
+| `SI-CR24-007` | P3 | Open (observation for 052) | The exec13448 mount root had an entry change at 2026-10-27 19:08:48 UTC, off the START path, with no assigned cause. |
+| `SI-BUILD-20261028-052` | P2 | Open (Codex) | Unchanged. A resolution policy can now use 130.3: zero provider increment, at most 8 unstarted reservations, and `SI-CR24-007`. |
+| `SI-CR24-003` .. `SI-CR24-006`, `SI-CR23-001` | P3 | Unchanged | Closed in section 129. |
+| Claude126 `SI-CR18-005` / daily `SI-CR18-006` | P3 | Unchanged | As in 129.6. |
+
+### 130.6 Scope, limits and next step
+
+- **Changed:**
+  - one runtime module: the hold path and the re-registered run protocol;
+  - one new read-only diagnostic and its test file;
+  - one existing test file: a redirect fixture and three hold-report regressions;
+  - this record.
+- **Not changed:** the gate, the source scope, any other registration, shared documents, `docs/SESSION_HANDOFF.md` and the Action Plan.
+- **Live-assistant behavior:** none can change. The changed path runs only inside a registered count capture, and every such capture is refused today.
+- **Next:** Codex counter-reviews sections 129 and 130. Before any source dispatch, Codex or the owner freezes a 052 resolution policy, using 130.3 and `SI-CR24-007`, and replaces the gate in code. QuantConnect stays paused until the owner releases it.

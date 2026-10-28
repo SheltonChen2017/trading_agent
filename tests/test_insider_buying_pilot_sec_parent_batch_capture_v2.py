@@ -526,3 +526,27 @@ def test_empty_plan_refuses_before_namespace_or_private_contact(tmp_path,plan):
     with pytest.raises(m.BatchCaptureError,match="^batch_empty_plan_no_contact$"):
         _run(tmp_path,empty,contact=lambda:pytest.fail("private contact read"))
     assert not _base(tmp_path).exists()
+
+
+# Claude review section 342 (IBBATCH-CR34201): the readback copied the planner
+# receipt from complete.json without comparing it with the planner's own
+# namespace or the batch's external plan pin.
+def test_planner_receipt_is_bound_to_the_held_planner_namespace(corpus,tmp_path):
+    helper,values=corpus
+    held,pins=helper._held_plan(values,tmp_path);receipt=dict(held.receipt);held.close()
+    root=tmp_path.resolve()
+    assert m._bind_planner_receipt(receipt,1,pins["expected_plan_sha256"],root=root,fixture=True) is None
+    for changed,plan_pin in (({**receipt,"plan_sha256":"f"*64},"f"*64),({**receipt,"complete_sha256":"e"*64},pins["expected_plan_sha256"]),
+                             (receipt,"d"*64),({**receipt,"extra":True},pins["expected_plan_sha256"])):
+        with pytest.raises(ValueError):
+            m._bind_planner_receipt(changed,1,plan_pin,root=root,fixture=True)
+
+
+def test_actual_readback_binds_the_planner_receipt(monkeypatch):
+    seen=[]
+    monkeypatch.setattr(m.campaign,"_isolated",lambda:None)
+    monkeypatch.setattr(m.campaign,"_current",lambda identity:None)
+    monkeypatch.setattr(m,"_verify",lambda *a,**k:{"complete":{"planner_receipt":{"invented":True}}})
+    monkeypatch.setattr(m,"_bind_planner_receipt",lambda receipt,number,plan,**k:seen.append((receipt,number,plan)))
+    m._readback_actual({},number=1,expected_complete_sha256="a"*64,expected_plan_sha256="b"*64,expected_index_sha256="c"*64)
+    assert seen==[({"invented":True},1,"b"*64)]

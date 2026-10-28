@@ -2307,6 +2307,13 @@ to the last checkpoint BEFORE QC submission. No six/eight strategy job launched.
 Section327.10 records J's spent offline actual0/native0 query preparation:
 all5original cases retained;1exact EOD pair,3missing-CUSIP query-preparable,
 1global-ISIN-ownership conflict. No FMP contact, price or new source admission.
+Section327.11 records tested W5 runtime/source/result preparation for all six
+cells: September2021 callback warmup, November2021..October2026 performance,
+new empty USD1m epoch and unchanged source/quote/fee economics. Source generation
+and six-cell result parsing are local only; no actual project ID or cloud
+source/run binding exists. Native dated point coverage remains QC-deferred,
+not inferred from potential-demand totals. A separate local archive is
+prospective; no old controls are renewed and the QC/Safari hold remains.
 No AU/AW/AY replay or QC source transfer/project/compile/strategy job followed
 the catalogue result. Current
 identity/reference/actual-held NAV/full-window/source/run gates remain;
@@ -69399,3 +69406,112 @@ readiness. No QC/Safari/credential/provider operation occurred.337/259/53/699
 unchanged. Continue the separately versioned local W5 runtime/profile/Main/
 six-cell/result preparation and bounded source recovery under the owner hold;
 one final push only at the last honest local pre-QC checkpoint. No push yet.
+
+### 327.11 W5 runtime, source generation and six-cell result preparation
+
+The owner reiterated "when done, push". This remains ONE final matching-lane
+push after the local checkpoint, with NO QC/Safari access under327.8. New
+separately named W5 modules now implement the matched six/eight x AR0/100/200
+comparison for2021-11-01..2026-10-13:1242evaluation sessions,259decisions,
+60months, first prior close2021-10-29 and a new empty-holdings/open-orders
+USD1000000 capital epoch. The genuine full3466session axis is preserved;
+full-axis4ac84a2d01e18691a152812851857195ef56dac16b82ceb72bcf7dd068f86585,
+evaluationeff4b9f8552317b16b97fbc1734aca1b27baea25d718721ddf0831e2ae85ef7e,
+decision9f0bd75e1de17112bd3a571438311cd152ba3ee5ce7279e710b133553cbd1429
+remain exact. No old package, input axis, source assignment or result is
+relabelled/clipped. Original January2021 candidate remains unadmitted.
+
+Engine start2021-09-01 is explicitly distinct from evaluation startNov1.
+It preserves an analogous two-month callback-only warmup (old Main started
+2020-11-01 before its January2021 evaluation). Warmup calls return before
+decision orders/reference lookup or common close-NAV valuation. The prior
+close is explicitly supplied through the existing common source; no synthetic
+opening price or warmed holdings are introduced. Actual QC callback freshness
+at the first09:20 decision remains unverified. Only the custom November2021
+capital-epoch aggregates count; QC's broader engine-period metrics are not
+silently substituted into the six-cell comparison.
+
+Public construction authenticates the17original sources,7common addons and
+two new W5 sources, plus period/patcher pins. Exact declared old-host byte
+changes and reverse AST restoration reproduce the frozen quote base; all
+seven quote/cash/fee/fill methods remain identical. Generated19files retain
+the original11quote files including old c7b829 base as provenance, six
+unchanged monetary/codec/readers and two explicit W5 modules. Main binds the
+new common import/profile and September engine start; seeding remainsFalse,
+decision09:20/execution09:31 and owned-project checks remain unchanged.
+All18non-Main files are equal across six cells. The new generated W5 quote
+base is57031bytes/dd01d3ce6a9c8de067fc1dee9ad397fe98f347580a6976909682e084b544d403;
+the old c7b829 pin is provenance, NOT a claim that the new base has old bytes.
+Common-module references to the frozen base mean this pinned economic
+provenance; actual W5 bytes have their own source_files/source_pins bindings.
+
+| New file | Bytes | SHA256 |
+|---|---:|---|
+| research/analyst_revisions_v2_qc/newrule_available_history_comparison_runtime.py |56298|7b32ec439553089fbd9b3ffd5fabb708bc823fffca479c8f941dbfe185b33150|
+| research/analyst_revisions_v2_qc/newrule_available_history_common_price_runtime.py |41123|1478c1a5008409f44d52622002d6e4ea0999222a65580ad8bc9e5a7fa805fb3e|
+| scripts/arv2_r327_available_history_projection.py |33244|7eda0d27788cbf90e6d160a774de0fe2a184f0686f446e0594525ac6639cb1d2|
+| scripts/arv2_r327_available_history_result.py |22669|76170cabedb84b0d2c3c6a63c6fab35b7fd59412afe82c86a413b3da2efac0ef|
+| tests/analyst_revisions_v2/test_r327_available_history_runtime.py |24816|bf36ef77da0243b3418f120d54986d7b32721f24ec166f1c2ccbcdba486ec39d|
+| tests/analyst_revisions_v2/test_r327_available_history_projection.py |14983|573c0aed8a99ebe41624881f94cebc7cd2e91d0b1e3fc8f0d7843451482e0c38|
+| tests/analyst_revisions_v2/test_r327_available_history_result.py |15739|e38f3e4052f2c60cd2dbfa10d75a2753cc8452ca2ea9ea8cd7ec5602debe0617|
+
+New result parsing binds actual external reader0, exact selected-byte pin,
+project/job/name/compile or separately pinned launch, successTrue/errors[],
+exact Completed. and only the two new custom aggregate statistics. Family
+validation first authenticates full public batch bytes, then all six ordered
+unique jobs/compiles/scopes/source manifests, full profile/projection/19-source
+joins, shared economics/source contexts and matching identity proofs. Ignored
+charts/orders/trades are not traversed. It is a PURE selected-metadata parser:
+actual cloud source/readback/rights/attempt/protocol evidence remains external.
+No operational result reader or job has run; technical_selected_results_complete
+in a synthetic fixture is not a strategy acceptance or readiness flag.
+
+Pre-use issues corrected in NEW unused files only:
+- I327-011(P2): common profile originally allowed removal of an interior
+  nondecision close with recomputed digest. Root's Nov2 deletion regression
+  produced1expectedfailure4.06s; exact1242/259counts and both hashes now bind.
+- I327-012(P2): projection expected an old January4 Main start, but the real
+  public source uses November1,2020 warmup. First genuine-source fixture run
+  produced9passes/26setup errors9.67s, all main_anchor. Correct old anchor and
+  reverse restoration now bind; unchanged set_cash(STARTING_CASH) assertion
+  also uses the actual original expression, not a guessed float wrapper.
+- I327-013(P3): batch metadata indexed descriptor fields before proving dict
+  shape. Strict per-row keysets precede access;10malformed-entry regressions
+  preserve a finite refusal rather than raw TypeError.
+- I327-014(P2): initial prospective Main started exactly at evaluation and
+  dropped callback warmup. Explicit September engine start, November epoch
+  and warmup no-order/no-reference/no-NAV tests preserve the intended split.
+- I327-015(P2): result validator omitted the new expected_public_cell argument
+  at its second call. Combined run78passes/20failures24.73s exposed that
+  TypeError; the exact source join now reaches both boundaries, no weaker test.
+
+Final focused runtime42passes6.64s; final projection48+result52=100distinct
+passes22.36s. Four new modules' transitive harness/fence check1pass1.27s and
+114generated source units compiled in memory. Thus143distinct checks across
+these selections, not a complete lane/repository suite. Initial runtime
+40passes/1fixture failure5.60s concerned an over-broad old/new finish-method
+AST comparison; normalization now changes ONLY the two declared terminal
+schema literals. Root command construction also had one pytest usage exit4
+(no tests), then a closure-helper PosixPath/iterable invocation TypeError
+(no closure pass); corrected invocations supplied the actual helper contract.
+All earlier subsets/repeats/failures remain, not additive. Native all-network,
+production-artifact, Keychain/security-CLI denial, inroot support paths,
+noautoload/--noconftest/-B/no cacheprovider and no dispatch_fence were used.
+Static closure covers repository imports, not dynamic/external internals;
+generated imports retain AlgorithmImports/System and existing host research
+fallbacks. Compilation/synthetic imports are not a LEAN/cloud execution proof.
+
+Same-round advice found the Main/metadata issues and later no further confirmed
+result issue; it is not independent Claude review. No actual project ID has
+been created/bound, no actual batch/source-manifest run freeze is asserted,
+and synthetic project123 is ONLY a test fixture. Original Sharadar5636stocks+
+8funds/native5/conditional-never510 policy remains; all6151stock bindings are
+retained. J's optional EOD/FMP corroboration is not an invented mandatory
+admission gate or permission to replace sources. Dense potential-membership
+counts do not prove the actual target/held price path. Exact native dated
+coverage and engine callback checks await the owner's QC release; no private
+QC book was read. All immutable-PIT/master/source/readiness/paper/live flags
+remainFalse and337/259/53/699 remains unchanged. New local archive packaging
+is separately prospective; old AR/AS/payload controls are not renewed here.
+Updated live navigation/record passed86focused document checks2.12s; this
+repeats earlier document tests and is not additive to this round's prior86.

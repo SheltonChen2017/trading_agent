@@ -69240,3 +69240,114 @@ Updated live navigation/actual evidence/owner hold passed86record/document
 checks1.20s under native denials; these repeat earlier tests, not additive.
 No private I leaf, old control, provider or QC/Safari access was used to
 record this public result/anchor. New J/K work is not yet implemented/frozen.
+
+The owner then reiterated: "continue building until the last step before
+qc/safari testing" and "when you are at the last step before qc backtesting,
+push once". Continue authorized local fixes and source/package preparation;
+do not stop merely for Claude review or routine authorization, and do not
+contact QC/Safari. The final push is at the last honest local checkpoint,
+with any unproven source/price/cloud prerequisites stated explicitly. No
+successful push has yet occurred in this327 round. Same-round Codex agents
+are implementation/audit assistance, not independent Claude acceptance.
+
+### 327.9 Offline EODHD identifier query-plan preparation J freeze
+
+New J closes the implementation gap between the retained five-case I diagnosis
+and a possible future identifier-only FMP corroboration. It does NOT admit an
+EOD price route, waive the original FIGI/CUSIP gates or contact any provider.
+Every original five case remains, including blocked/already-linked/no-query
+cases. Existing Sharadar/native assignments remain unchanged. FMP may later
+corroborate a genuinely missing raw CUSIP using observed exact ISIN and a full
+checksum-valid original CUSIP9; it cannot override any nonempty invalid or
+conflicting raw CUSIP, derive a foreign CUSIP from an ISIN slice, change the
+original FIGI or use ticker/name/CIK identity. J only prepares exact observed
+ISIN search requests when every prerequisite is satisfied.
+
+J consumes exactly four retained DATA leaves under its OWN new fixed guard,
+all whole-byte pins before JSON parsing, total45891902bytes:
+- I identity-demand-private.json4984462/c85ae5ddf2e918d194f6aa2939ee1249229d0989f75c334ef92ea793b61b711d;
+- BB crosswalk-private.json13445076/5006dc2f1313d02c18f521172e2e454ca190a0191e2f85799b54a9d7d963d753;
+- BA seed-bodies.bin16140080/02d64c177446409f43f6f443cda77afa4c6e9503ebb17844a9910a52b1093005;
+- BA mapping-bodies.bin11322284/1b601920ea0bf26c2f7354b99276cdd88d0e9f979b4337fa8badcb5a85fe8596.
+The exact paths are literal DATA_PLAN in the pinned source. No old control,
+BA index/journal/source metadata, provider response rerequest, AP price corpus,
+AR monthly shard, genuine-package operation or QC-only native book is read.
+This reuses retained I/BB source proofs, not fresh genuine master admission.
+
+J authenticates the three seed frames and110captureframes/headers/lengths/
+hashes/exact extent, all111mapping pages110346rows and complete50668active/
+59979delisted inventory against closed BA evidence. It reconstructs all6151
+original stock and8fund BB match results and joins the complete five bindings
+to authenticated I cases. All related mapping/catalog rows and global exact
+ISIN owner conflicts are retained before classifying query availability.
+No first-favourable row, duplicate exemption, owner-collision waiver, dropped
+case or automatic source/pin refresh. The new immutable private query object
+and summary pin are checked inside the unchanged held-descriptor guard;
+normal guard RETURN precedes any private/report publication.
+
+| New file | Bytes | SHA256 |
+|---|---:|---|
+| scripts/arv2_r327_eodhd_fmp_query_plan.py |36552|ccbd09de62703115adb971025461eb861b3fe68f52cccbe935520cd72a559d59|
+| scripts/prepare_arv2_r327_eodhd_fmp_query_plan.py |19648|8ba4fa609a9d2b049f88e937a71473189888e6473c1b05b0ed3abd7a1d7059b7|
+| scripts/observe_arv2_r327_eodhd_fmp_query_plan.py |15025|d4f5d44e5e94dbeadd20aca9720d62948ceb179017ca7ef43b22fed08a9830cb|
+| tests/analyst_revisions_v2/test_r327_eodhd_fmp_query_plan.py |19661|3ba537347e6eb402b91fffc3b85ba3c35782a72cd49d2e3f4f1d45c7f130d7fe|
+| tests/analyst_revisions_v2/test_r327_eodhd_fmp_query_plan_caller.py |12625|8042b7073af62a71bed05f9250b828cf4df1138125cb8c8f67ae46738bb34228|
+| tests/analyst_revisions_v2/test_r327_eodhd_fmp_query_plan_observer.py |11217|98104af2ebe9169bd668e429ff3d8252a5ae6ce79095b58bc92076f604a69ad6|
+
+Caller canonical profile32312bytes SHA256fcab94fa177c653ffb37acc6faaf5c4364e39aafd6db172ec3efd0627718b82e;
+collector profile3341bytes SHA256ec52d5d7f327b5d8c7d7e4d2e1136b48804a88c1db81a5fa3da24619d2e98171;
+all226literal dependencies and all helper-selected source pins matched the
+actual final public tree. No frozen source bytes changed. Selected pins are
+not whole-interpreter integrity. In-memory compile and exact single-EOF checks
+passed. Root native focused helper/caller/collector131distinctpasses12.81s,
+no failures/skips/warnings. This is not a complete lane/repository suite.
+
+Issue I327-009 P3, false alarm: suspected double-escaped runtime filename
+regex is an ordinary non-raw Python string; it correctly produces one regex
+escape for the literal dot. Static inspection confirmed no correction needed.
+Issue I327-010 P2, corrected before use: J initially allowed known frozen
+validator refusal classes to escape its public source-context boundary, so
+the parent would lose the finite category. First joint run125passes/6failures
+12.94s caught exact False/True/2 actual exits for both producer/validator.
+The unchanged predicates still refused; NEW J now translates exact known
+validator/structural failures to its own source_context refusal, preserving
+own finite exceptions and never raw text. Tests were not weakened.
+A root in-memory actual-exit omission was caught by5expectedfailures0.13s,
+restored in finally, no source mutation. A redundant caller-byte-assert
+omission was NOT caught:4tests still passed0.10s because the frozen DATA guard
+refuses those corrupted files earlier. The harness correctly flagged that
+mutation as uncaught; no false sensitivity claim or production fix follows.
+These runs/subsets are not additive to131. No actual DATA/provider behavior
+was exercised by synthetic tests; all tests/mutations used native all-network,
+production-artifact, Keychain and security-CLI denial, inroot support paths,
+disabled plugins, --noconftest, -B and no cacheprovider. dispatch_fence absent.
+
+D-J exact one-shot decision: following this committed clean freeze, under the
+existing owner-waived local parser/price recovery scope, invoke ONLY the fixed
+new J collector once with the exact clean freeze HEAD and collector SHA above.
+Designated Mac Code root/branch/Python3.13 and env-i requirements unchanged.
+Collector400s outer, producer300s/330s observation, validator30s/35s observation;
+uninterruptible I/O/host suspension qualifications remain. Producer and
+independent top-level validator both native deny ALL network/Keychains/security
+CLI. Validator also denies all artifacts, consumes only the complete bounded
+public envelope and observed actual exit, and must return0 with byte-equal
+stdout. Collector actual0 plus authenticated producer actual0 is required;
+exit2 is authenticated failure only. Unknown/nonzero/noise/trailing/incomplete/
+timeout is spent or ambiguous, no retry or fabricated0. Ordinary credential-
+free collector itself is not asserted to be natively network-denied.
+
+Fixed prospective new control:
+artifacts/analyst_revisions_v2/newrule_eodhd_fmp_query_plan/R327-20261028-J.
+It has NOT been inspected or allocated before this freeze. Exclusive claim/
+fsync consumes use before any DATA read; partial claim ambiguous/spent.
+At most claim/private/report/failure four own files, no cleanup/repair/reuse.
+16MiB private and128KiB public output bounds; only closed counts/hashes/finite
+states leave stdout, never identifier/row/credential/raw exception. Actual
+output recording is bounded to already-collected public envelope, source/
+profile pins, process brackets and an inert public fact anchor; no subsequent
+private/control reader is authorized by that recording. J cannot launch FMP K,
+acquire prices, establish formal PIT/master/source/strategy admission or create
+a QC look/result cell. QC/Safari hold remains absolute;337/259/53/699 unchanged.
+Final J prefreeze record/document86passes1.28s, repeated/not additive.
+The precommit diff gate caught one new blank at document EOF before staging;
+removed that new unused document blank, leaving frozen files unchanged.

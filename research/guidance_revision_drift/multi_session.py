@@ -617,7 +617,11 @@ class MultiSessionReplay:
                 self._cancel(order, at)
             self._refuse("late_terminal_entitlement_requires_reconciliation", at, key)
             return
-        if kind in {"noncash_merger", "cvr", "terminal_unresolved"}:
+        # An unresolved split leaves the entitled share count unknown, so a
+        # cash payout cannot be counted on the pre-split holding.
+        split_pending = self._state["unresolved"].get(security) in (
+            "split_requires_reconciled_orders", "fractional_split_cash_in_lieu_unsupported")
+        if kind in {"noncash_merger", "cvr", "terminal_unresolved"} or (kind == "terminal_cash" and split_pending):
             self._state["terminal"].add(security)
             if held or (security == self.spy and any(row["quantity"] for row in tranches)):
                 self._state["unresolved"][security] = "unsupported_or_unresolved_terminal_economics"

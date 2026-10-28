@@ -586,6 +586,8 @@ class Simulation:
                     if due is not None:
                         if due["quantity"] <= quantity:
                             self._state["due"].pop(order.issuer)
+                            if due.get("later"):
+                                self._state["due"][order.issuer] = self._combine_due(due["later"])
                         else:
                             due["quantity"] -= quantity
                 # A tiny legitimate exit may have a fee above its proceeds.
@@ -613,10 +615,27 @@ class Simulation:
         if current is None:
             self._state["due"][issuer] = proposed
         else:
-            current["session"] = min(current["session"], day)
-            current["quantity"] = max(current["quantity"], quantity)
-            if EXIT_PRIORITY[reason] < EXIT_PRIORITY[current["reason"]]:
-                current["reason"] = reason
+            self._state["due"][issuer] = self._combine_due([proposed, current, *current.pop("later", ())])
+
+    def _combine_due(self, requests: list[dict]) -> dict:
+        # Merge only requests the next possible 10:00 exit reaches anyway. A
+        # later-dated request (an invalidation) keeps its own session, so its
+        # larger quantity is never liquidated before its cutoff.
+        requests = sorted(requests, key=lambda row: row["session"])
+        first_exit = next((day for day in self._days
+                           if datetime.combine(day, time(10), NY) >= self._state["clock"]), date.max)
+        horizon = max(requests[0]["session"], first_exit)
+        due, later = dict(requests[0]), []
+        for row in requests[1:]:
+            if row["session"] > horizon:
+                later.append(row)
+                continue
+            due["quantity"] = max(due["quantity"], row["quantity"])
+            if EXIT_PRIORITY[row["reason"]] < EXIT_PRIORITY[due["reason"]]:
+                due["reason"] = row["reason"]
+        if later:
+            due["later"] = later
+        return due
 
     @_atomic
     def schedule_invalidation(self, issuer: str, effective_session: date, at: datetime) -> None:
@@ -703,6 +722,9 @@ class Simulation:
             raise SimulationError("explicit per-issuer exit ADV dictionary required")
         for issuer, value in adv20_by_issuer.items():
             _id(issuer, "issuer"), _money(value, "adv20")
+        for issuer, due in tuple(self._state["due"].items()):
+            if "later" in due:
+                self._state["due"][issuer] = self._combine_due([due, *due.pop("later")])
         result = []
         for issuer, due in sorted(self._state["due"].items(), key=lambda item: (EXIT_PRIORITY[item[1]["reason"]], item[0])):
             if due["session"] > session.day:
@@ -813,10 +835,12 @@ class Simulation:
         # mix pre-split prices with the new share count or fabricate a mark.
         self._state["marks"][issuer] = None
         if issuer in self._state["due"]:
-            due_shares = mul(Decimal(self._state["due"][issuer]["quantity"]), ratio)
-            if due_shares != Decimal(_floor_ratio(due_shares, Decimal("1"))):
-                raise SimulationError("fractional scheduled split trim is unsupported")
-            self._state["due"][issuer]["quantity"] = int(due_shares)
+            due = self._state["due"][issuer]
+            for row in (due, *due.get("later", ())):
+                due_shares = mul(Decimal(row["quantity"]), ratio)
+                if due_shares != Decimal(_floor_ratio(due_shares, Decimal("1"))):
+                    raise SimulationError("fractional scheduled split trim is unsupported")
+                row["quantity"] = int(due_shares)
 
     @_atomic
     def credit_dividend(self, action_id: str, issuer: str, per_share: Decimal,

@@ -415,6 +415,86 @@ class SimulationTests(unittest.TestCase):
         self.sim.process_minute(self.minute(session=1))
         self.assertEqual(self.sim.snapshot()["scheduled_exits"], {})
 
+    # GDR-CR54-001 (GDR-CR53-007): a later-dated invalidation keeps its own session; it is
+    # never merged into an earlier trim and liquidated before its cutoff.
+    def test_later_invalidation_after_trim_waits_for_its_own_session(self):
+        self.held()
+        self.sim.close_session(self.sessions[0].day, {"SYN-A": D("200")})
+        self.sim.schedule_invalidation("SYN-A", self.sessions[3].day, self.at(0, 19))
+        due = self.sim.snapshot()["scheduled_exits"]["SYN-A"]
+        self.assertEqual((due["session"], due["reason"], due["quantity"]), (self.sessions[1].day.isoformat(), "trim", 23))
+        self.assertEqual(due["later"], [{"session": self.sessions[3].day.isoformat(),
+                                         "reason": "guidance_invalidation", "quantity": 49}])
+        trim = self.sim.execute_due_exits(self.at(1), {"SYN-A": ADV})[0]
+        self.assertEqual((trim.quantity, trim.exit_reason), (23, "trim"))
+        self.sim.process_minute(self.minute(session=1, bid="200", ask="200.1"))
+        self.assertEqual(self.sim.positions[0].quantity, 26)
+        self.assertEqual(self.sim.snapshot()["scheduled_exits"]["SYN-A"],
+                         {"session": self.sessions[3].day.isoformat(), "reason": "guidance_invalidation", "quantity": 49})
+        self.sim.close_session(self.sessions[1].day, {"SYN-A": D("200")})
+        self.assertEqual(self.sim.execute_due_exits(self.at(2), {"SYN-A": ADV}), ())
+        self.sim.close_session(self.sessions[2].day, {"SYN-A": D("200")})
+        sale =self.sim.execute_due_exits(self.at(3), {"SYN-A": ADV})[0]
+        self.assertEqual((sale.quantity, sale.exit_reason), (26, "guidance_invalidation"))
+
+    def test_trim_after_later_invalidation_does_not_pull_the_liquidation_forward(self):
+        self.held()
+        self.sim.schedule_invalidation("SYN-A", self.sessions[3].day, self.at(0, 10, 30))
+        self.sim.close_session(self.sessions[0].day, {"SYN-A": D("200")})
+        trim = self.sim.execute_due_exits(self.at(1), {"SYN-A": ADV})[0]
+        self.assertEqual((trim.quantity, trim.exit_reason), (23, "trim"))
+        # A partial trim is still pending when the invalidation comes due;
+        # the later request then joins the due exit and upgrades the order.
+        self.sim.process_minute(self.minute(session=1, bid="200", ask="200.1", volume=100))
+        self.sim.close_session(self.sessions[1].day, {"SYN-A": D("200")})
+        self.assertEqual(self.sim.execute_due_exits(self.at(2), {"SYN-A": ADV})[0].remaining, 22)
+        exit_ =self.sim.execute_due_exits(self.at(3), {"SYN-A": ADV})[0]
+        self.assertEqual((exit_.order_id, exit_.exit_reason, exit_.remaining), (trim.order_id, "guidance_invalidation", 48))
+        self.assertNotIn("later", self.sim.snapshot()["scheduled_exits"]["SYN-A"])
+
+    def test_close_before_the_invalidation_session_merges_it_into_the_due_exit(self):
+        self.held()
+        self.sim.schedule_invalidation("SYN-A", self.sessions[3].day, self.at(0, 10, 30))
+        self.sim.close_session(self.sessions[0].day, {"SYN-A": D("200")})
+        self.sim.execute_due_exits(self.at(1), {"SYN-A": ADV})
+        self.sim.process_minute(self.minute(session=1, bid="200", ask="200.1", volume=100))
+        self.sim.close_session(self.sessions[1].day, {"SYN-A": D("200")})
+        self.assertIn("later", self.sim.snapshot()["scheduled_exits"]["SYN-A"])
+        self.sim.close_session(self.sessions[2].day, {"SYN-A": D("200")})
+        self.assertEqual(self.sim.snapshot()["scheduled_exits"]["SYN-A"],
+                         {"session": self.sessions[1].day.isoformat(), "reason": "guidance_invalidation", "quantity": 49})
+
+    def test_invalidation_for_the_next_session_still_combines_with_a_due_trim(self):
+        self.held()
+        self.sim.close_session(self.sessions[0].day, {"SYN-A": D("200")})
+        self.sim.schedule_invalidation("SYN-A", self.sessions[1].day, self.at(0, 17))
+        self.assertEqual(self.sim.snapshot()["scheduled_exits"]["SYN-A"],
+                         {"session": self.sessions[1].day.isoformat(), "reason": "guidance_invalidation", "quantity": 49})
+        self.assertEqual(self.sim.execute_due_exits(self.at(1), {"SYN-A": ADV})[0].quantity, 49)
+
+    def test_past_due_trim_absorbs_a_next_session_stop_at_once(self):
+        self.held()
+        self.sim.close_session(self.sessions[0].day, {"SYN-A": D("200")})
+        self.sim.execute_due_exits(self.at(1), {"SYN-A": ADV})
+        self.sim.process_minute(self.minute(session=1, bid="200", ask="200.1", volume=100))
+        self.sim.close_session(self.sessions[1].day, {"SYN-A": D("80")})
+        self.assertEqual(self.sim.snapshot()["scheduled_exits"]["SYN-A"],
+                         {"session": self.sessions[1].day.isoformat(), "reason": "position_stop", "quantity": 48})
+
+    def test_split_scales_a_later_dated_exit_and_refuses_fractional_shares(self):
+        self.held()
+        self.sim.close_session(self.sessions[0].day, {"SYN-A": D("200")})
+        self.sim.schedule_invalidation("SYN-A", self.sessions[3].day, self.at(0, 19))
+        trim = self.sim.execute_due_exits(self.at(1), {"SYN-A": ADV})[0]
+        self.sim.process_minute(self.minute(session=1, bid="200", ask="200.1", volume=100))
+        self.sim.request_cancel(trim.order_id, self.at(1, 10, 2))
+        self.sim.acknowledge_cancel(trim.order_id, self.at(1, 10, 3))
+        # 48 held and 22 still due halve exactly; the later 49 would not.
+        self.assert_atomic(lambda: self.sim.apply_split("SYN-SPLIT-F", "SYN-A", D("0.5"), self.sessions[2].opens_at))
+        self.sim.apply_split("SYN-SPLIT", "SYN-A", D("2"), self.sessions[2].opens_at)
+        due = self.sim.snapshot()["scheduled_exits"]["SYN-A"]
+        self.assertEqual((self.sim.positions[0].quantity, due["quantity"], due["later"][0]["quantity"]), (96, 44, 98))
+
     def test_split_dividend_no_double_count_and_action_replay(self):
         order, fill = self.held()
         nav_before = self.sim.close_session(self.sessions[0].day, {"SYN-A": D("100")})["nav"]

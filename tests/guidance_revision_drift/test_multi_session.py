@@ -623,6 +623,20 @@ def sells(result, sleeve="strategy"):
     return [row for row in result[sleeve]["fills"] if row["side"] == "sell"]
 
 
+def postpone(data, security, days=1):
+    """Publish one cloned security's revision later, so it enters later."""
+    shift = lambda text: stamp(datetime.fromisoformat(text.replace("Z", "+00:00")) + timedelta(days=days))
+    receipts = []
+    for receipt in data["guidance"].receipts:
+        document = receipt.document.to_dict()
+        if document["security_id"] == security and document["disclosure_id"].startswith("INVENTED-RAISE"):
+            document["published_at"] = shift(document["published_at"])
+            receipt = GuidanceReceipt(receipt.raw_bytes, GuidanceDocument.from_dict(document),
+                                      shift(receipt.received_at), shift(receipt.validated_at))
+        receipts.append(receipt)
+    data["guidance"] = GuidanceLedger(tuple(sorted(receipts, key=lambda row: row.validated_at)))
+
+
 class ReviewPinTests(unittest.TestCase):
     def test_unmatched_spy_exposure_at_the_replay_boundary_blocks_parity(self):
         # GDR-CR53-002: a terminal unwind after the last session left SPY held
@@ -1056,6 +1070,146 @@ class ReviewPinTests(unittest.TestCase):
         carried = [row for row in sells(run_replay(**data), "comparator") if row["at"][:10] == next_date.isoformat()]
         self.assertTrue(carried)
         self.assertTrue(all(row["at"] > stamp(at(next_date, 10)) for row in carried))
+
+
+class EdgePinTests(unittest.TestCase):
+    """GDR-CR53-008 edges and the GDR-CR54-002 regression (section 54)."""
+
+    def test_cash_terminal_after_an_unresolved_split_stays_unresolved(self):
+        # GDR-CR54-002: a fractional split left the share count unknown, yet
+        # the payout counted 495 pre-split shares and the replay completed.
+        data = inputs(count=5)
+        reprice(data, "benchmark", "100")
+        day0, day1 = session(data, 0), session(data, 1)
+        split = {**known_action("split", "INVENTED-SEC", at(day1, 9, 30), at(day0, 17), key="INVENTED-SPLIT"), "ratio": "1.5"}
+        known = at(day1, 10, 30)
+        terminal = known_action("terminal_cash", "INVENTED-SEC", known, known, cash="7", pay=session(data, 2), key="INVENTED-TERMINAL")
+        result = run_replay(**data, actions=(split, terminal))
+        self.assertEqual(result["unresolved"], {"INVENTED-SEC": "unsupported_or_unresolved_terminal_economics"})
+        self.assertEqual([row["quantity"] for row in result["strategy"]["positions"]], [495])
+        self.assertEqual({row["strategy_receivables"] for row in result["daily_nav"]}, {"0"})
+        self.assertFalse(result["complete_software_replay"])
+        self.assertTrue(result["comparison_parity_blocked"])
+
+    def test_cash_terminal_clears_a_moot_exit_outside_the_window(self):
+        # MSAA13: the payout ends the holding, so its pending exit is moot.
+        data = inputs(count=1)
+        day0 = session(data, 0)
+        withdraw(data, at(day0, 10, 30))
+        self.assertEqual(run_replay(**data)["unresolved"], {"INVENTED-SEC": "invalidation_exit_outside_replay_window"})
+        known = at(day0, 11)
+        result = run_replay(**data, actions=(known_action("terminal_cash", "INVENTED-SEC", known, known, cash="10", pay=day0),))
+        self.assertEqual(result["unresolved"], {})
+        self.assertEqual(result["strategy"]["positions"], [])
+
+    def test_entry_account_counts_an_outstanding_strategy_receivable(self):
+        # MSE14: at a 9.9 mark the later entry sizes from NAV 99945.55, one
+        # share under the cap; the dividend receivable restores 495.
+        data = inputs(count=3)
+        held, later = securities(data, 2)
+        postpone(data, later)
+        day0, day1 = session(data, 0), session(data, 1)
+
+        def marked(batch, raw):
+            if raw["security_id"] == held and batch.session_date == day1:
+                for quote in raw["quotes"]:
+                    quote.update(bid_price="9.9", ask_price="9.9")
+        edit_batches(data, marked)
+        dividend = known_action("dividend", held, at(day1, 9, 30), at(day0, 17), cash="0.2", pay=session(data, 3))
+        for actions, quantity in (((), 494), ((dividend,), 495)):
+            fills = run_replay(**data, actions=actions)["strategy"]["fills"]
+            with self.subTest(dividend=bool(actions)):
+                self.assertEqual([(row["security_id"], row["quantity"]) for row in fills], [(held, 495), (later, quantity)])
+
+    def test_gross_cap_trims_the_eleventh_position_in_sorted_order(self):
+        # MSC9, MSC11: dividends make room for an eleventh entry; at a close
+        # of 11 the 50% gross cap leaves the last sorted holding 312 shares.
+        data = inputs(count=3)
+        ids = securities(data, 11)
+        postpone(data, ids[10])
+        day0, day1 = session(data, 0), session(data, 1)
+        dividends = tuple(known_action("dividend", security, at(day1, 9, 30), at(day0, 17), cash="2.1",
+                                       pay=session(data, 3), key="INVENTED-DIVIDEND-" + security) for security in ids[:10])
+        edit_bars(data, lambda row: row.update(raw_close="11") if row["security_id"] in ids and row["session_date"] == day1.isoformat() else None)
+        result = run_replay(**data, actions=dividends)
+        self.assertEqual(len([row for row in result["strategy"]["fills"] if row["side"] == "buy"]), 11)
+        self.assertEqual([(row["security_id"], row["quantity"], row["exit_reason"]) for row in sells(result)], [(ids[9], 183, "trim")])
+
+    def test_terminal_unwind_counts_a_pending_spy_sell_of_the_same_tranche(self):
+        # MSY1: seven trim-matched SPY shares are still pending at the unwind.
+        data = inputs(count=4)
+        day0, day1 = session(data, 0), session(data, 1)
+        edit_bars(data, lambda row: row.update(raw_close="12") if (row["security_id"], row["session_date"]) == ("INVENTED-SEC", day0.isoformat()) else None)
+
+        def slow(batch, raw):
+            if batch.role == "benchmark" and batch.session_date == day1:
+                for minute in raw["minutes"]:
+                    minute["v"] = 100
+        edit_batches(data, slow)
+        known = at(day1, 10, 30)
+        result = run_replay(**data, actions=(known_action("terminal_cash", "INVENTED-SEC", known, known, cash="12", pay=day1),))
+        self.assertEqual([(row["quantity"], row["exit_reason"]) for row in result["comparator"]["orders"] if row["side"] == "sell"],
+                         [(13, "trim"), (79, "terminal_entitlement")])
+        self.assertEqual([row["quantity"] for row in result["comparator"]["positions"]], [0])
+
+    def test_carried_spy_sell_stops_at_a_dated_spy_issuer_change(self):
+        # MSF5: the carried order keeps the issuer it was submitted under.
+        data = inputs()
+        exit_date, next_date = session(data, 20), session(data, 21)
+
+        def slow(batch, raw):
+            if batch.role == "benchmark" and batch.session_date == exit_date:
+                for minute in raw["minutes"]:
+                    minute["v"] = 1000
+        edit_batches(data, slow)
+        redate(data, "INVENTED-SPY", next_date, issuer_id="INVENTED-SPY-ISSUER-2")
+        result = run_replay(**data)
+        self.assertEqual([row for row in sells(result, "comparator") if row["at"][:10] == next_date.isoformat()], [])
+        self.assertIn("subsequent_quote_minute_or_settlement_refused", reasons(result["permanent_parity_blockers"]))
+
+    def test_exit_fee_above_a_sub_dollar_notional_is_paid_from_settled_cash(self):
+        # MSF26: 495 shares at 0.003998 raise 1.97901 against a 2.475 fee.
+        data = inputs(count=2)
+        day0, day1 = session(data, 0), session(data, 1)
+        edit_bars(data, lambda row: row.update(raw_close="9") if (row["security_id"], row["session_date"]) == ("INVENTED-SEC", day0.isoformat()) else None)
+
+        def tiny(batch, raw):
+            if batch.role == "stock" and batch.session_date == day1:
+                for quote in raw["quotes"]:
+                    quote.update(bid_price="0.004", ask_price="0.004")
+        edit_batches(data, tiny)
+        result = run_replay(**data)
+        sale = sells(result)[0]
+        shortfall = Decimal(sale["fee"]) - Decimal(sale["price"]) * sale["quantity"]
+        self.assertEqual(shortfall, Decimal("0.49599"))
+        self.assertEqual(Decimal(result["daily_nav"][1]["strategy_settled_cash"]), Decimal("95045.05") - shortfall)
+
+    def test_program_drawdown_includes_exactly_eighty_five_percent(self):
+        # MSC2: four 500-share holdings make the day-1 NAV exactly 85000.
+        data = inputs(count=3)
+        ids = securities(data, 4)
+
+        def entry(batch, raw):
+            if batch.role == "stock":
+                for quote in raw["quotes"]:
+                    quote.update(bid_price="9.89", ask_price="9.89")
+        edit_batches(data, entry)
+        closes = {session(data, 0).isoformat(): "9.89", session(data, 1).isoformat(): "2.399945"}
+        edit_bars(data, lambda row: row.update(raw_close=closes[row["session_date"]]) if row["security_id"] in ids and row["session_date"] in closes else None)
+        result = run_replay(**data)
+        self.assertEqual(Decimal(result["daily_nav"][1]["strategy_nav"]), Decimal("85000"))
+        self.assertTrue(result["program_stop_active"])
+        self.assertEqual([row["exit_reason"] for row in sells(result)], ["program_drawdown"] * 4)
+
+    def test_spy_entry_budget_admits_an_exactly_equal_cost(self):
+        # MSP5: 30 x 165.049958 + 1 equals the 509-share source cost 4952.49874.
+        data = inputs(count=1, volume=60000)
+        reprice(data, "stock", "9.72")
+        reprice(data, "benchmark", "163.4158")
+        result = run_replay(**data)
+        self.assertEqual([row["quantity"] for row in result["strategy"]["fills"]], [509])
+        self.assertEqual([row["quantity"] for row in result["comparator"]["fills"]], [30])
+        self.assertEqual(result["permanent_parity_blockers"], [])
 
 
 if __name__ == "__main__":

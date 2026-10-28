@@ -70329,3 +70329,44 @@ pins/counts. It is not an independent review or a second operational reader.
 Successful A permits a later separately recorded exact public-source install,
 not launch. Nonzero/unknown/ambiguous A is terminal/spent, no unchanged retry or
 renamed clone. No actual A allocation/invocation or job precedes this commit.
+
+### 329.6 D1 outer refusal and corrected first-target dispatch freeze
+
+D1 was committed at2e01ffecb00d016e62ea3f2e767c2ddf5412c109 with clean worktree.
+The1896byte outer specification SHA256
+ff6095e3e7a13e1c383118323870610c37cbc82d7b4809654904c35f68bb1944
+was dispatched2026-10-28T16:36:44Z (external whole-second dispatch bracket).
+Outer actual exit2 returned only finite outer_binding/attempt_reusable=false;
+no child envelope or accepted stage resulted. No exact completion/provider
+duration is inferred from the tool's coarse timing. This outer invocation is
+consumed and its failure remains; no output/control absence was inspected.
+
+ARV2E329-001 confirmed local orchestration defect: the exact env-i invocation
+omitted locale, and a separate native-all-artifact/network-denied same-env
+Python startup observed LC_CTYPE injected in addition to the six intended
+names and permitted __CF_USER_TEXT_ENCODING. Exact frozen outer source checks
+the environment before caller os.open and collect/Popen; LC_CTYPE is excluded,
+so these verified inputs necessarily refuse before target dispatch. Generic
+outer_binding alone does not locate the failure; this conclusion uses exact
+source and the reproducible startup observation. No A target/claim/control
+was invoked/read to diagnose it. No QC/provider/sourceDATA/credential call.
+
+Prospective correction is explicit LC_ALL=C, which BOTH existing outer/stage
+allow; do not admit arbitrary LC_CTYPE or change either used source. New focused
+test2147bytes/da7e270aae637f1906ae90ecf2721c46b9117f9cb8fd20998b0d95b2ff8922f7
+has2passes0.12s: otherwise-valid exact spec/host/env with LC_CTYPE refuses before
+source-open/child-dispatch sentinels, and a bounded real tiny synthetic Python
+startup with LC_ALL=C observes C and no LC_CTYPE. Initial2passes0.18s overlaps;
+its missing temp-path fixture could have refused for another reason and was
+corrected prospectively before acceptance. No original target was replayed.
+
+D1b separately freezes the FIRST target-A dispatch after this concrete local
+environment fix, retaining the consumed failed outer D1. Use the clean commit
+containing329.6 as expected-head, explicit env-i LC_ALL=C, and all unchanged
+329.5 caller/outer/profile/native-policy pins and source/output scope. Recompute
+only the outer specification hash for that exact new run HEAD; no source pin
+refresh. No new control name/date or replacement target is created. This is a
+corrected first target invocation, not a renewed spent A claim or unchanged
+outer retry. Once dispatched, any A failure/ambiguity remains spent under329.5.
+Record actualexit and perform only its previously frozen once-only in-memory
+output validation. Booked floor remains337/259/53/699; no cloud job yet.

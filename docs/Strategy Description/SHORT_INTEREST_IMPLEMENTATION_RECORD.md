@@ -26445,3 +26445,31 @@ exploratory0, alpha0, permanent look IDs none, QC attempts0.
 
 Main post-record checks:95passed/0.79s, append-only prefix and whitespace
 checks passed. This lane-record commit follows06cdd118; both stay local.
+
+### 128.46 Owner-directed publication of the blocked local snapshot
+
+**Later owner direction, 2026-10-28: "push for now".** This explicitly
+supersedes128.45's wait-for-pre-QC publication boundary for this snapshot
+ONLY. It grants no source restart, budget release, custody adoption, QC,
+Safari, purchase, outcome or trading authority. The lane remains NOT
+pre-QC/backtest ready;052 and its unknown original accounting/custody remain
+OPEN. The unconditional source-dispatch block and84005 cumulative START/
+4294967296-byte ceilings remain unchanged.
+
+Codex reverified the designated physical/Git roots, branch and clean exact
+HEAD162125d69f091cea1be4bcde601d3d25048bae9e, with tracking/actual matching
+origin d6af672b3c8198712228bbd7b5eef35777283b1a. The full OS Python-executable
+scan found no matching original recovery process; its actual terminal result
+was NOT inferred from absence. No process or original artifact was modified.
+The14 accumulated local commits and this minimal handoff commit are to be
+published together in exactly ONE successful non-force push of
+HEAD:refs/heads/codex/strategy-short-interest from this worktree, with
+follow-tags and submodule pushes disabled. Stop on concurrent advancement.
+
+The source tree is unchanged from the Main907tests/62.97s validation in128.45;
+that execution is retained as prior evidence, not a new full-suite run.
+Only this lane record changes. Recheck append-only history, relevant record
+consistency, whitespace, root/branch/HEAD/status and actual matching origin
+before commit/publication, then verify clean local/tracking/actual-remote
+equality. Publication is for review/continuity and does not resolve052 or
+certify source completeness, remaining spend or pre-QC readiness.

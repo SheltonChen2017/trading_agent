@@ -59,7 +59,7 @@ def native(sources,monkeypatch):
     module.PROBE_CONFIG=config;module.PROBE_CONFIG_JSON=reader._canonical(config).decode();module.PROBE_CONFIG_SHA256=hashlib.sha256(module.PROBE_CONFIG_JSON.encode()).hexdigest()
     algo=module.Main();algo.__dict__.update(original.algo.__dict__)
     original.algo=algo;original.module=module
-    api=sys.modules['AlgorithmImports'];api.TickType=NS(TRADE='trade');module.TickType=api.TickType
+    api=sys.modules['AlgorithmImports'];api.TickType=NS(TRADE='trade',QUOTE='quote');module.TickType=api.TickType
     class NativeSecurity:
         def __init__(self,symbol):self.symbol=symbol
     class NativeConfig:
@@ -222,3 +222,50 @@ def test_four_call_and_per_stream_row_bounds_are_hard_and_duplicate_callback_has
     assert out['history_calls']==4 and native.control.yielded==2004
     assert all(out[label]['row_bound_reached_result_may_be_incomplete'] for label in ('control_minute','control_daily','minute','daily'))
     before=list(native.control.events);native.algo._probe();assert native.control.events==before
+
+
+def test_known_exact_raw_quote_companion_allows_only_typed_trade_history_and_reports_safe_counts(native):
+    native.initialize()
+    target=old.Symbol(old.SID(native.body['security_id']),'PRIVATE.SID')
+    trade=native.NativeConfig(target);quote=native.NativeConfig(target)
+    quote.tick_type='quote';quote.type=NS(FullName='QuantConnect.Data.Market.QuoteBar')
+    native.control.configs=[trade,quote]
+    native.algo._probe();out=result(native);proof=out['native_exact_subscription']
+    assert proof['verified'] is True and proof['external_config_count']==2
+    assert proof['regular_nonfillforward_raw_minute_trade_configs']==1
+    assert proof['regular_nonfillforward_raw_minute_quote_configs']==1
+    assert proof['unrecognized_external_config_count']==0 and out['history_calls']==4
+    assert proof['native_config_kind_counts']=={'trade_bar':1,'quote_bar':1,'other_native':0,'untyped':0}
+    assert proof['config_rows_examined']==2
+    assert [label for label,_,_ in native.control.history]==['control_minute','control_daily','minute','daily']
+    assert out['minute_daily_close_price_parity'] is True and out['target_data_gap_proven'] is False
+
+
+@pytest.mark.parametrize('fault',['foreign_sid','adjusted','fillforward','extended','custom','zone',
+    'resolution','wrong_type','wrong_tick','duplicate_quote','duplicate_trade','no_trade','untyped'])
+def test_quote_companion_is_explicitly_validated_and_never_ignored_if_unsafe(native,fault):
+    native.initialize();target=old.Symbol(old.SID(native.body['security_id']),'PRIVATE.SID')
+    trade=native.NativeConfig(target);quote=native.NativeConfig(target)
+    quote.tick_type='quote';quote.type=NS(FullName='QuantConnect.Data.Market.QuoteBar')
+    configs=[trade,quote]
+    if fault=='foreign_sid':quote.symbol=old.Symbol(old.SID('FOREIGN X123ABC'),'PRIVATE.FOREIGN')
+    elif fault=='adjusted':quote.data_normalization_mode='adjusted'
+    elif fault=='fillforward':quote.fill_data_forward=True
+    elif fault=='extended':quote.extended_market_hours=True
+    elif fault=='custom':quote.is_custom_data=True
+    elif fault=='zone':quote.exchange_time_zone=NS(id='UTC')
+    elif fault=='resolution':quote.resolution='daily'
+    elif fault=='wrong_type':quote.type=NS(FullName='Unknown.PRIVATE.TYPE')
+    elif fault=='wrong_tick':quote.tick_type='trade'
+    elif fault=='duplicate_quote':configs.append(quote)
+    elif fault=='duplicate_trade':configs.append(trade)
+    elif fault=='no_trade':configs=[quote]
+    else:configs[1]=NS(**vars(quote))
+    native.control.configs=configs;native.algo._probe();out=result(native)
+    assert out['native_exact_subscription']['verified'] is False
+    kinds=out['native_exact_subscription']['native_config_kind_counts']
+    assert sum(kinds.values())==len(configs) and out['native_exact_subscription']['config_rows_examined']==len(configs)
+    assert out['history_calls']==2 and out['status']=='native_exact_subscription_config_unproved'
+    assert out['target_data_gap_proven'] is False
+    assert all(label.startswith('control_') for label,_,_ in native.control.history)
+    assert 'PRIVATE.FOREIGN' not in native.logs[-1] and 'Unknown.PRIVATE.TYPE' not in native.logs[-1]

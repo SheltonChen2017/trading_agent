@@ -128,20 +128,42 @@ HISTORY_AND_REGISTRATION = r'''    def _history(self,symbol,start,end,resolution
                 row=next(iterator,sentinel)
                 if row is sentinel:break
                 configs.append(row)
-            if not 0<len(configs)<=64 or any(not isinstance(row,SubscriptionDataConfig) for row in configs):
+            # Fixed class labels/counts only: no arbitrary type names or SIDs
+            # enter public metadata, including on malformed/oversized results.
+            kinds={'trade_bar':0,'quote_bar':0,'other_native':0,'untyped':0}
+            for row in configs:
+                if not isinstance(row,SubscriptionDataConfig):kind='untyped'
+                elif row.type.FullName=='QuantConnect.Data.Market.TradeBar':kind='trade_bar'
+                elif row.type.FullName=='QuantConnect.Data.Market.QuoteBar':kind='quote_bar'
+                else:kind='other_native'
+                kinds[kind]+=1
+            provenance.update(config_rows_examined=len(configs),native_config_kind_counts=kinds)
+            if not 0<len(configs)<=64 or kinds['untyped']:
                 raise ProbeRefusal('native_exact_subscription_config_unproved')
             external=[row for row in configs if row.is_internal_feed is False]
             provenance['external_config_count']=len(external)
             exact_ids=all(row.symbol.id==symbol.id for row in external)
             raw=all(row.data_normalization_mode==DataNormalizationMode.RAW for row in external)
-            matches=[row for row in external if row.symbol.id==symbol.id
+            # Native Equity MINUTE registration normally creates TradeBar AND
+            # QuoteBar configs: SubscriptionManager.DefaultDataTypes316-324,
+            # DataManager.LookupSubscriptionConfigDataTypes705-709 and
+            # LeanData.GetDataType460-465. Only the typed TRADE history below
+            # supplies marks; this known quote companion never supplies prices.
+            eligible=[row for row in external if row.symbol.id==symbol.id
                 and row.data_normalization_mode==DataNormalizationMode.RAW and row.resolution==Resolution.MINUTE
-                and row.tick_type==TickType.TRADE and row.type.FullName=='QuantConnect.Data.Market.TradeBar'
                 and row.fill_data_forward is False and row.extended_market_hours is False and row.is_custom_data is False
                 and row.exchange_time_zone.id=='America/New_York']
+            trades=[row for row in eligible if row.tick_type==TickType.TRADE
+                and row.type.FullName=='QuantConnect.Data.Market.TradeBar']
+            quotes=[row for row in eligible if row.tick_type==TickType.QUOTE
+                and row.type.FullName=='QuantConnect.Data.Market.QuoteBar']
+            unknown=len(external)-len(trades)-len(quotes)
             provenance.update(all_external_exact_sid=bool(exact_ids) if external else None,
-                all_external_raw=bool(raw) if external else None,regular_nonfillforward_raw_minute_trade_configs=len(matches))
-            if not external or not exact_ids or not raw or len(matches)!=len(external):
+                all_external_raw=bool(raw) if external else None,
+                regular_nonfillforward_raw_minute_trade_configs=len(trades),
+                regular_nonfillforward_raw_minute_quote_configs=len(quotes),
+                unrecognized_external_config_count=unknown)
+            if not external or not exact_ids or not raw or len(trades)!=1 or len(quotes)>1 or unknown:
                 raise ProbeRefusal('native_exact_subscription_config_unproved')
         self._effect('verify_exact_parent_subscription',inspect)
         # Verification is true only after the post-effect custody guard succeeds.
@@ -185,7 +207,7 @@ def build_mark_probe_control(*,base_probe_source,helper_source,producer_source,o
             "'native_identity_framing_unproved','native_identity_roundtrip_unproved','history_label_unproved',\n    'native_volume_representation','native_exact_subscription_type_or_identity','native_exact_subscription_config_unproved'))")
         native=_replace_once(native,"'schema':'tpr-cmp28-native-mark-probe-result-v1'","'schema':'tpr-cmp28-native-mark-probe-control-result-v1'")
         native=_replace_once(native,"'minute':None, 'daily':None, 'minute_daily_close_price_parity':None,",
-            "'minute':None, 'daily':None, 'minute_daily_close_price_parity':None,\n            'control_minute':None,'control_daily':None,'control_request_path_status':'request_path_unproved',\n            'target_data_gap_proven':False,'native_exact_subscription':{'add_security_calls':0,'config_reads':0,\n                'returned_native_security':None,'returned_exact_sid':None,'registered_exact_native_reference':None,\n                'external_config_count':None,'all_external_exact_sid':None,'all_external_raw':None,\n                'regular_nonfillforward_raw_minute_trade_configs':None,'verified':False},")
+            "'minute':None, 'daily':None, 'minute_daily_close_price_parity':None,\n            'control_minute':None,'control_daily':None,'control_request_path_status':'request_path_unproved',\n            'target_data_gap_proven':False,'native_exact_subscription':{'add_security_calls':0,'config_reads':0,\n                'returned_native_security':None,'returned_exact_sid':None,'registered_exact_native_reference':None,\n                'external_config_count':None,'all_external_exact_sid':None,'all_external_raw':None,\n                'config_rows_examined':None,'native_config_kind_counts':None,\n                'regular_nonfillforward_raw_minute_trade_configs':None,\n                'regular_nonfillforward_raw_minute_quote_configs':None,'unrecognized_external_config_count':None,'verified':False},")
         old="""            minute=self._history(symbol,start,end,Resolution.MINUTE,1000,parent_close,parent_algorithm.date())
             daily=self._history(symbol,start,end,Resolution.DAILY,2,parent_close,parent_algorithm.date())
             if len(minute)==len(daily)==1:
@@ -209,7 +231,7 @@ def build_mark_probe_control(*,base_probe_source,helper_source,producer_source,o
             config_sha256=config_hash,main_sha256=_sha(source),main_bytes=len(source),max_history_calls=4,
             max_minute_rows_per_symbol=1000,max_daily_rows_per_symbol=2,max_total_history_rows=2004,
             max_native_exact_symbol_registrations=1,max_registration_config_reads=1,max_configs=64,max_config_rows_examined=65,
-            source_edits=['Main._history_explicit_labels_four_call_bound_volume_counts','Main._register_parent_native_exact_symbol',
+            source_edits=['Main._history_explicit_labels_four_call_bound_volume_counts','Main._register_parent_native_exact_symbol_known_quote_companion',
                 'closed_safe_reason_codes','controlled_result_schema','control_and_registration_report_fields',
                 'SPY_controls_before_parent_registration_and_target_queries','closed_control_config_literals'],
             target_data_gap_proven=False)

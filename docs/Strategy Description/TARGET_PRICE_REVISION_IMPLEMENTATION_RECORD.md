@@ -27308,3 +27308,73 @@ readback does not prove backendcrash-durability. Positivecontrols plus0target
 rows supports only these exactboundedqueries returning0 underthissetup;
 not universalabsence, entitlement, rights/PIT or canonicalvaluation acceptance.
 Fresh separate NONECONOMIC reservation/access/source identities precede effect.
+
+Fresh bounded private phase TPR-CMP28-MARK-PROBE-CONTROL-PREPARE-20261028-001/ab26a9ee2c99fdfdf19a91524aeab5081d96dff737b9b1b4e9eec9f9ed047e99 at a5d4d02c78cd58c193adf200734ebeac2f800a9f BEFORE 1 exact private inputs/120s; Read only own source-only archive to preserve19 cloud files; render and durably reserve controlled probe002 before upload/compile/job; fsync claim and directory retained.
+
+Fresh bounded private phase TPR-CMP28-MARK-PROBE-CONTROL-PREPARE-20261028-002/4332c2cf2b72584817ca179ec42439eedd5b4240062d0fc26a03ef01d992436b at a5d4d02c78cd58c193adf200734ebeac2f800a9f BEFORE 1 exact private inputs/120s; Own source-only archive one exact read/render; preserve19files; reserve controlled probe002 beforeeffects; fsync claim and directory retained.
+
+Control preparation002 stopped before reservation/effects: root compared incomplete SHA-only inventory rather than API byte+SHA descriptors. Corrected preparation uses fresh scope003; prior failed source-read claim retained. No compile/job/observedlook was spent.
+
+Fresh bounded private phase TPR-CMP28-MARK-PROBE-CONTROL-PREPARE-20261028-003/48a8962207917fd59220931800dba1c523b57dc907d0d43f02ad932e18b28b68 at a5d4d02c78cd58c193adf200734ebeac2f800a9f BEFORE 1 exact private inputs/120s; Own source-only archive one exact read/render; API bytes+SHA inventory; preserve19files; reserve controlled probe002 beforeeffects; fsync claim and directory retained.
+
+NONECONOMIC controlled probe002 reservation 1cb43f84c2c11124b70c690305ad9bb5a3bcd98cf93005cc87264fba02879b1f retainedfsyncBEFOREeffects at a5d4d02c78cd58c193adf200734ebeac2f800a9f; sourcef51a0b9df4133ca2f3dd8388f945b184221450c9ce4ebed64a60182d54ed10b8; replaceONLYmain/preserve19; baseline151d7c27c6e4e5f655286f2e6cc348f4abc1f3f7ea2ec2ca925dc5d9012d6cc1 -> 0bd03b02f09b77b0c17fd52cc4347310c48b56dc459ae5bcb65842c69e75bbd9. Four bounded RAWHistory calls/SPYpositivecontrols/exactnativeSIDregistration perD013; zero orders or financialacceptance. Financialcountsunchanged OFF4failedjobs, other4arms0jobs; diagnosticR1unused/R2Completedretained.
+
+Fresh bounded private phase TPR-CMP28-MARK-PROBE-CONTROL-UPLOAD-SOURCE-20261028-001/15c0dc5235381be43d0a3dd7732755f4a012a928cd7131e342a8376b5bfb68d1 at a5d4d02c78cd58c193adf200734ebeac2f800a9f BEFORE 1 exact private inputs/180s; Read own exact source-only snapshot for main-only update;3bounded APIrequests180s/10MiB; reservation1cb43f84 retained; fsync claim and directory retained.
+
+Actual controlledprobe002 uploadplan 4c8f279d37c38d04329ca91043ee90ef955b06f3ab5b378a7ccfa358d024f86a BEFOREcredentials/effects, exactcurrent151d7c27...to0bd03b02...; mainONLY, preserve19.
+
+Fresh bounded native phase TPR-CMP28-API-MARK-PROBE-CONTROL-COMPILE-20261028-001/8df712fddce53f851a19a5844692655f698c8ef1f178741a1c717e203d70c7b8 at a5d4d02c78cd58c193adf200734ebeac2f800a9f before3 exact requests/120s/10485760B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-MARK-PROBE-CONTROL-COMPILE-READ-20261028-001/b7836a15052d70ac53078815e8a471e021164982e31c7171161ebbec5cdd16ac at a5d4d02c78cd58c193adf200734ebeac2f800a9f before1 exact requests/60s/131072B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-MARK-PROBE-CONTROL-LAUNCH-20261028-001/87888cc6299ee625c3fdb63f048b2d0015f6f9565a3c9bfbe66a71ba21bca98c at a5d4d02c78cd58c193adf200734ebeac2f800a9f before3 exact requests/120s/10485760B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-MARK-PROBE-CONTROL-RESULT-20261028-002/41f43720334fc3ba4f3b333865a262337df4ef7808bf19fb6745921ae516c4cb at a5d4d02c78cd58c193adf200734ebeac2f800a9f before2 exact requests/120s/4456448B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-MARK-PROBE-CONTROL-PROCESS-20261028-001/c6fdf64a26e48606fad69f1fa14900204fb3eb35ddc6c2d73d35b7c0fc3c3975 at a5d4d02c78cd58c193adf200734ebeac2f800a9f BEFORE 1 exact private inputs/120s; Read only expected safe controlledprobe log; no financial/body/SID/quote projection; fsync claim and directory retained.
+
+### 104.25 Actual controlled probe and verified subscription predicate correction
+
+Controlledprobe002 compile600b530ec54b2da84a41747f70b41f3b-345dbf03e5165f469fee35d6299c0aff
+BuildSuccess; nativejob78f2e9c2374d2b24c8153a5a566058ea terminalCompleted.
+Before/after upload/compile/launch20fileinventory0bd03b02f09b77b0c17fd52cc4347310c48b56dc459ae5bcb65842c69e75bbd9.
+Freshsafe-result2635B/db561a221009d262d4a0de4c00c48722a1618e0250339d10c0673246789f05e0:
+SPY390minute/1daily current-session positivevolume/nonFF/exactSID, both contain
+expectedclose. Parent hash/schema/actualchildcustody hold. NativeAddSecurity
+returns exactSID/nativeSecurity/ReferenceEqualstrue; externalconfigs2, bothRAW/
+exactSID, matchingregularnonFFTradeBarconfigs1. Probe refuses its overstrict
+all-external-must-be-TradeBar test BEFOREtargetHistory; actual2Historycalls,
+targetminute/daily null. Do not describe this as0targetbars or dataabsence.
+
+Primary verified correction CMP104-D014: currentLEAN default Equity ticktypes
+includeTrade ANDQuote. A genuine minuteQuoteBar companion is legitimate. The
+actualsecondconfig remains unobserved, not assumedQuote. Narrow nextprobe
+must require exactlyone fullyverifiedTradeBar, allowatmostone corresponding
+fullyverifiedQuoteBar withTickType.QUOTE and SAME exactSID/RAW/minute/noFF/
+regular/noncustom/NYfields; rejectunknown/duplicate/adjusted/extra configurations.
+No quote supplies portfolio price, no stale policy is relaxed. Preserve002
+source/results; new003 reservation/access/lookbeforeeffect. Delegated audit
+source: offline103_final_audit; primary SubscriptionManager.DefaultDataTypes,
+DataManager.Add, officialUS-equity minuteTradeBar/QuoteBar support:
+https://github.com/QuantConnect/Lean/blob/master/Common/Data/SubscriptionManager.cs
+https://github.com/QuantConnect/Lean/blob/master/Engine/DataFeeds/DataManager.cs .
+
+cr31_synced_source_audit independentlyfound no lane-owned removal/ticker
+reconstruction defect. AllownednativeSIDs retainedRAWminute subscriptions;
+heldsecurityremoval is separatelyprotected. LEAN skips fillforwardwhenupdating
+lastrealcache, so prior-dayrealcache can coexistwith currentFFdelivery; this
+explainspossibility, not actualmissingrealbar cause. No action/HasData/registered
+config substitutesfor currentclose. Exactsource-only agent evidence at a5d4d02,
+no private/nativeeffects; frozenwrong-dayguard remains intact.
+
+Signal-arm preread audit found another lane-owned custody defect BEFORElaunch:
+currentmultiinitialize reads/parses packet beforeengine assigns actualjob/locked.
+CMP104-D015 repairs this prospectively bylazy one-time read atfirstneededtarget
+preparation with actualproject/job/locked/evidence-prefix checks aroundeffects
+and processing. Durableexternalfreshmanifest remainsauthority; one bounded
+own-job metadata claim precedes packetread, spent-before-read/nooverwrite/retry.
+Same-node metadatareadback is NOTbackendcrashdurability. Financialtiming/
+selection/capital/economics muststayunchanged; no actualsignalarm waslaunched
+with the flawedinitread. finish_off_preparation owns source/focusedtestrepair.
+
+D014 correctedcontrolsource16441B/c7337090cc336472576abe4126c20317de47f31e5b9f59fb93eef36520b7662a; tests16823B/5cf844f69417612d8587ed55b6ebcf42fa26b00d4b79293c2929c4afb530218c. Author43passed1.72s; root43passed1.59s plus diff/source review. Root required exactoneTradeBar and duplicateTrade negative beforeacceptance. No shared or financialvaluationchange. Localcommit prepares immediatelyfresh003; no roundpush yet. Concurrentmulti source remainsunstaged/ownedbyfinishagent.

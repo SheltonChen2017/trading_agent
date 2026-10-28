@@ -2299,8 +2299,11 @@ Section327.5 now records H's actual technical success and spent protocol:
 one anonymous9-job HTTP200, all9 unique US composites, but4of5 original/current
 pairs still disagree. The fallback-format hypothesis does not cure those
 identities. No route/price or known native-gap admission follows; the new
-five-year period is still prospective pending fresh genuine-source/required-
-price evidence. No six/eight strategy job launched this round.
+five-year runtime remains prospective; section327.7 records I's spent actual
+0/native0 source/demand diagnosis and fresh genuine checks, with price coverage
+and identity gates still open. Section327.8 records the LATEST owner hold:
+NO QC or Safari access until further notice. Continue local/source fixes only
+to the last checkpoint BEFORE QC submission. No six/eight strategy job launched.
 No AU/AW/AY replay or QC source transfer/project/compile/strategy job followed
 the catalogue result. Current
 identity/reference/actual-held NAV/full-window/source/run gates remain;
@@ -69132,3 +69135,108 @@ compile/single-EOF and absent dispatch_fence passed in the same native all-
 network/artifact/Keychain-denied window. All earlier subsets/repeats overlap.
 No current test/operation session; every I DATA/control/producer/validator and
 collector remains uninvoked pending this committed clean freeze.
+
+### 327.7 Actual I completed and bounded required-demand findings
+
+At clean60f76c0a5ed24703753117f5e4517e0357186043, allowed native public-source/
+Git/environment preflight exited0 without private/control access. Fixed I
+collector then ran ONCE, actual tool exit0. Native producer dispatched
+2026-10-28T06:38:33.094415Z, completed06:38:41.034719Z, actual0; separate
+artifact/network/Keychain-denied validator dispatched06:38:41.271763Z,
+completed06:38:44.650659Z, actual0. Original streams complete, stderr0/bounds
+null, exact output equality. Process brackets are not provider timestamps.
+Collector stdout9006bytes
+SHA256d6bdba89b45a57337e7b5cdf87c75628d53c539540fe524a91c5b74537d488c3;
+producer/validator stdout19576bytes
+SHA25678bada5f8053cb59734b9ef6ee88a4356b9fc0007d3efa8926c39a03bac6c368;
+report19445bytes SHA2561ccd31e2385cebf5c0a434b72ae9a0d46721645eb36743fb2e3ca428b6d004bb.
+
+All four DATA whole pins authenticated, new guard returned normally and fresh
+genuine checks completed. Full3466-calendar/6151bindings/8funds and original
+assignment inventory retained. W5 demand: vendor5475potential/161never,
+native5potential, original conditional510never. This is necessary membership
+demand, not actual targets/holdings. Every native-five first required prior
+close is AFTER2022-10-21 under the new EMPTY start:
+
+| Case | First eligible W5 decision | First required prior close | Eligible decisions |
+|---|---|---|---|
+|0|2023-12-04|2023-12-01|150|
+|1|2025-02-18|2025-02-14|87|
+|2|2025-02-18|2025-02-14|87|
+|3|2025-01-27|2025-01-24|90|
+|4|2025-08-04|2025-08-01|63|
+
+All possible held-demand endpoints remain2026-10-13; none is shortened at
+membership or metadata end. These five dates conditionally exclude a2022
+mark for THESE securities in the new empty-start epoch. They do NOT identify
+the stock in old R's failed run, prove old holdings were empty, or close the
+overall price gap. Pre-November2021 old-period holdings could carry forward;
+other vendor stocks still need actual price coverage. The progress message
+was immediately clarified to this exact scope. Both old-gap attribution and
+known_native_gap_resolved remain FALSE.
+
+All five original/current permas and complete original CUSIP subsets agree
+with at least one retained candidate. Four current FIGIs still differ from
+original, as H observed; no alias or cause is inferred. Case0's two stock
+rows share the original FIGI but only one matches original perma/CUSIP/
+ticker/category and quality. Its other candidate differs in those fields.
+Across the complete retained current catalogs all6 related owners are already
+the6 candidate rows: no extra CUSIP-only or poison-token owner found for this
+selected scope. This is NOT full original-snapshot reassessment or a safe
+duplicate exemption. All5 source stops remain; two other current candidates
+have category/quality differences too. Do not infer ticker reuse, merger,
+delisting or vendor error from these equality patterns. Actions not supplied.
+
+Private I DATA identity-demand-private.json4984462bytes
+SHA256c85ae5ddf2e918d194f6aa2939ee1249229d0989f75c334ef92ea793b61b711d;
+source fingerprint021180d49b202b5e39466e549843631d56a3ed5aec5c0573501c3589aec997e4;
+period digest88113155d49f74e00a89ba743aaa314d718cfd0d29b017ac501058460fe5d11a.
+Original control/private/report leaves retained, no cleanup or post-closure
+inspection. I producer/validator/collector/control are NOW SPENT. No retry or
+old entrypoint/reader/source/job replay. Inert public
+scripts/arv2_r327_i_source_binding.py24968bytes
+SHA25644405001183804020d8b211d79846d8ea70019758059cc73878cca883bac6416
+has canonical fact digest8fd5f90a0990b82a08f18a5037a54ed772c9c8c033bd2430501bdfd88620874e.
+Root native artifact/network/Keychain-denied reconstruction of already
+collected PUBLIC stdout, exact inert-anchor equality/compile/single EOF and
+222unchanged source pins passed. This is result recording, not a second
+operational I read/validator or private-leaf access. No provider/QC/Safari
+contact, price/strategy admission or result cell;337/259/53/699 unchanged.
+
+Next in-scope source work may independently use existing EODHD/FMP identifier
+evidence to preserve BOTH original FIGI and original CUSIP requirements,
+rather than accept conflicting Sharadar FIGIs or waive missing CUSIPs.
+Official FMP search-isin then profile endpoints can expose ISIN/CUSIP
+identifier projections, but no FIGI/validity intervals; availability remains
+account-dependent/unknown. Public docs only inspected, no FMP request/key read.
+An exact ISIN plus original checksumCUSIP9 may corroborate genuinely absent
+raw CUSIP, never override a nonempty invalid/conflicting field or replace an
+original FIGI. Every case/related row must remain, no favorable subset or
+ticker/name equivalence. Future J is OFFLINE plan preparation only; provider
+contact requires a separate complete source/rights/credential/endpoint/
+claim/deadline/output/run freeze, not this handoff or a query-plan return.
+No new subscription, paid entitlement, source/PIT/master/readiness gate
+clearance or live/paper/broker authority.
+
+### 327.8 Owner hold at the last step before QC submission
+
+The owner subsequently directed: "until further notice, do not access
+qc/safari. continue fixing the issues found and build until the last step
+before qc submission." This later direction controls. NO QC API/website/
+capacity/project/ObjectStore/read/upload/compile/backtest/job/credential
+operation or Safari UI access is authorized until the owner explicitly
+releases the hold. No waiting heartbeat or former QC-free message overrides it.
+All agents were notified immediately. No QC/Safari operation was queued or
+running; current work is local source/implementation/validation plus separately
+admissible existing-vendor data work. Do not make the suggested QC-only native
+book coverage job under this hold; it is deferred design, not authority.
+Retained local public QC metadata/source may inform preparation, with no
+remote endpoint or private book read. Stop at the final LOCAL pre-submission
+checkpoint, not at a cloud upload/compile/launch. Existing source/identity/
+financial/licensing/privacy/attempt gates and false flags remain binding.
+One final matching-lane push at the concluded round, with documented actual
+progress and blockers, still applies; no successful push this round yet.
+Updated live navigation/actual evidence/owner hold passed86record/document
+checks1.20s under native denials; these repeat earlier tests, not additive.
+No private I leaf, old control, provider or QC/Safari access was used to
+record this public result/anchor. New J/K work is not yet implemented/frozen.

@@ -1,6 +1,6 @@
 """Pure pinned-public-source OFF bundle renderer, no read/upload/claim/job effect.
 
-The caller supplies the exact twelve public source/metadata byte strings.
+The caller supplies the exact eleven public source/metadata byte strings.
 Pre-render template closure and final cloud source identities are separate:
 embedding final source hashes in their own configuration would be circular.
 Historical initialization is never selected; main exposes one subclass only.
@@ -22,11 +22,10 @@ PINS = {
     "cap_observer.py": "cad8a3306f6b459bc8bf187c8fd8b8bb980c7b1dc0d85465fba11dd318b70c4d",
     "extended_construction.py": "4be72251040a0f133ee4a39245a3b0fe96285715a8510b4328b5d06c276596a6",
     "extended_loader.py": "24c752b0859a04d73306e3afddc10d45cc6d3c7b566e2ff17ef160fd90e6e10b",
-    "extended_compressed_store.py": "d661b5752c35b9dd04f783f5d78850f453d5f5f299874e5cf19700599df2356e",
     "extended_runtime_successor.py": "2e6bb5c82f356ee7ece4811c9d634ce57d48533d408d4b57b8aee41de062517b",
     "extended_algorithm_successor.py": "e0077b7992dc64515384f56687b350725d694c746a8d4523336d18aa144dd9a8",
     "comparison_20261028.py": "cb507762dded3340acb7dd69b8086045ae819e0398eea1943444acb496e0e161",
-    "comparison_20261028_algorithm.py": "c45a254b8999859796aec2c3fec904f292489838f32f87c0c76f11f7156cd3bc",
+    "comparison_20261028_algorithm.py": "22276770abd8eb267ca54b2b1dccc24bc2d9fba327f8d7f24fcb1738c432b149",
     "extended_calendar.json": "3eccdf3cf9a2542ffd249983241d5747c2ecd4e21bc4a71f7f826c77ec1fe53d",
     "comparison_20261028_policy.json": "df4c89601ba5a45a17c79d6386fff1ac202ef0689c4e592a8b1f9aba32ada80c"}
 SOURCE_PATHS = tuple(PREFIX + name for name in PINS)
@@ -98,6 +97,20 @@ def _flat_import(raw, *, alias):
     return _span_replace(text, node, "import cap_tilt" + (" as " + alias if alias else "")).encode("utf-8")
 
 
+def _drop_unused_predecessor_store_import(raw):
+    """Delete the exact unused historical import; old initialize/export not used."""
+    text = raw.decode("utf-8")
+    nodes = [node for node in ast.parse(text).body if isinstance(node, ast.ImportFrom)
+        and node.module == "extended_compressed_store"]
+    if len(nodes) != 1:
+        _fail()
+    node = nodes[0]
+    if node.level != 0 or [(name.name, name.asname) for name in node.names] != [
+            ("CompressedInputStore", None), ("CompressedAuditStore", None)]:
+        _fail()
+    return _span_replace(text, node, "").encode("utf-8")
+
+
 def _calendar(raw, policy_sha256):
     try:
         source = json.loads(raw)
@@ -151,6 +164,7 @@ def build_off_candidate(*, public_sources, operation_id, attempt, prior_attempts
     files["comparison_20261028.py"] = _flat_import(files["comparison_20261028.py"], alias="legacy")
     files["extended_loader.py"] = _assignment(files["extended_loader.py"], "CALENDAR_JSON",
         "__CALENDAR_JSON_LITERAL__", repr(sources["extended_calendar.json"].decode("utf-8")), identifier=True)
+    files["extended_algorithm_successor.py"] = _drop_unused_predecessor_store_import(files["extended_algorithm_successor.py"])
     files["extended_algorithm_successor.py"] = _assignment(files["extended_algorithm_successor.py"],
         "EXPECTED_CONFIG_SHA256", "__EXTENDED_CONFIG_SHA256__", repr(_sha(b"IMPORT_ONLY_PREDECESSOR_INITIALIZE_NOT_SELECTED")))
     files["extended_algorithm_successor.py"] = _assignment(files["extended_algorithm_successor.py"],
@@ -179,7 +193,8 @@ def build_off_candidate(*, public_sources, operation_id, attempt, prior_attempts
         "rendered_source_closure_sha256": _sha(_canonical(final_hashes)), "file_count": len(files),
         "ast_changes": ["extended_construction.cap_tilt_import", "comparison_20261028.cap_tilt_import",
             "extended_loader.calendar_literal", "predecessor.import_only_config_literal",
-            "predecessor.import_only_attempt_literal", "comparison_algorithm.config_literal"],
+            "predecessor.import_only_attempt_literal", "predecessor.unused_store_import_removed",
+            "comparison_algorithm.config_literal"],
         "predecessor_initialize_selected": False, "main_class": "Main(candidate.ComparisonOffAlgorithm)",
         "source_inputs_admitted": False, "native_permission": False, "qc_setup_complete": False,
         "reservation_sha256": None, "new_attempts": 0, "new_observed_looks": 0,

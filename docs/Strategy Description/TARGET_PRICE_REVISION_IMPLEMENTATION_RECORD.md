@@ -26474,3 +26474,62 @@ Tests: 12922 bytes / SHA-256
 `c10bbbb7a6d93408cc3ff46071b91bc89e54e6ee96f52253ff05ce11fbbf299a`.
 No production API effect was performed by those synthetic tests. Legacy
 controllers and their old three-attempt contracts were not bypassed or relabelled.
+
+Fresh native OFF upload claim TPR-CMP28-API-OFF-UPLOAD-20261028-001 / 9b295fdf48179fc288cff47819598d8f93383f09405e6eb4ff2182f3c7a1d76b at HEAD e322931228ccfb0b557ba6d789146d8f51f825e6 precedes credentials and all effects: 13 fixed requests, 600s, 10MiB aggregate; first/last whole-source hash gates, 11 exact writes, eight extras preserved. Candidate reservation 9b2396b6...; no compile/backtest is requested by this scope.
+
+OFF upload001 stopped on write07 after six acknowledged source mutations. All responses retained; no compile/job occurred. Fresh exact-error read claim TPR-CMP28-OFF-UPLOAD-ERROR-READ-20261028-001/fe6afc067a07ad43a6ad6da5b63b9a494c8025681f340bbacac08b31023956f4 precedes one494B response read; no retry or inferred rollback.
+
+Fresh SOURCEBASELINE004 claim 13ddaa21f1f6a9e2a0890d5c5f42e080a3882617714417850b590538282a9b02 at HEAD e322931228ccfb0b557ba6d789146d8f51f825e6 precedes two all-file OFF reads after the stopped partial upload. Fixed24-file/8MiB/120s bounds; no writes, compile, job or private market input read. The exact QC error rejects gzip import; recovery will use readable plain JSON data/journals, with no hidden import or encoded-source workaround.
+
+Fresh local plain-data conversion claim TPR-CMP28-PLAIN-PACKET-20261028-001/4621be95745f4033197f98ea2b13d61074ee387965bff5cfb715658013b36a37 precedes one exact40,637,425B derived-gzip read; bounded120s and exact280,105,389B plaintext hash6a8f4915... . The cloud successor will receive plain JSON only. This local data conversion grants no QC upload/native identity/economic acceptance.
+
+Fresh complete partial-cloud source diff claim TPR-CMP28-PARTIAL-SOURCE-DIFF-20261028-001/2ea68fc382a63149be793dac32e3dd36b63e1342188d597f8c77d2e548267600 precedes exact two current archives,653285B total/120s. No new API/input/outcome effect.
+Actual partial source diff retained 3a6b1d33161042f1bfacf4368a16c8edb1a4938ae3e2c0647f37e34aaa8ac1c0; exactly six changed/added source files,20total. Main and every notebook remain exact. Current whole-source inventory 1d3ee38ec1d05e95133d3a0a90ecad36a37b79a497968aa01e2d7c9afcf13163. No compile/job or economic acceptance.
+
+### 104.13 Actual upload refusal and readable-data recovery
+
+Actual source upload001 stopped after six acknowledged mutations. The seventh
+request returned HTTP200/success=false and explicitly rejected importing gzip
+in extended_compressed_store.py under QC's readable-source policy. Its exact
+494-byte error response SHA-256 is
+`3dff968e63ca2f1a982b4202fe1352d1ca196c6784a88955a1dc188b507cf866`.
+The full upload receipt is 9169 bytes/SHA-256
+`d4c4ff4c794d8ca8d0b829b7c0062729e8757102f50fb3d98920de241ad68160`.
+No compile, runtime or backtest was requested; a failed source upload does not
+invent a compile attempt, job or observed outcome look.
+
+Fresh SOURCE004 captured two stable complete20-file snapshots at16:50:32UTC.
+The complete before/after partial-source diff is retained privately:
+167321 bytes/SHA-256
+`3a6b1d33161042f1bfacf4368a16c8edb1a4938ae3e2c0647f37e34aaa8ac1c0`.
+Exactly six files changed/were added; main and all notebooks remain exact.
+Current whole-project source inventory SHA-256 is
+`1d3ee38ec1d05e95133d3a0a90ecad36a37b79a497968aa01e2d7c9afcf13163`.
+The stopped scope is spent. No unchanged request is retried or partial source
+silently treated as a complete candidate.
+
+Decision CMP104-D006: comply by using plain UTF-8 JSONL journal chunks and a
+plain JSON index. The new v2-plain schemas state their encoding and actual
+byte/hash domains. The new cloud bundle excludes the compressed-store module;
+a precise enumerated AST deletion removes its unused predecessor import.
+Predecessor initialization/export remain unselected. Every historical local
+module and every old source/artifact remains preserved. There is no hidden
+import, binary source embedding, encoded source or policy-evasion adapter.
+The strategy economics, calendar, selection and order rules are unchanged.
+
+Corrected driver31528B/SHA-256
+`22276770abd8eb267ca54b2b1dccc24bc2d9fba327f8d7f24fcb1738c432b149`;
+renderer11106B/SHA-256
+`bfbb0654389a28fe0dcc0974b339f50189187754c9701831778346ad5b20776a`.
+Root final focused driver+renderer114passed in3.51s. Eleven readable cloud
+source files and seven enumerated AST edits are checked; no compression or
+codec package is imported in that closure. Tests remain software evidence.
+
+Fresh local conversion produced the exact280105389-byte plain signal packet
+at16:51:15UTC, preserving SHA-256
+`6a8f4915df539f5aee731832138e038caf6dd579b591ebe745e37b5d283e4708`.
+Its receipt SHA-256 is
+`f47b165292bd0bdc2e40344a89cac373540c18cf37961c37eed846beecefe276`.
+The old gzip derivative is retained locally; cloud successors use plain JSON.
+Source version1's OFF reservation remains unobserved and will be superseded
+by a fresh source-version reservation before the next effects, never erased.

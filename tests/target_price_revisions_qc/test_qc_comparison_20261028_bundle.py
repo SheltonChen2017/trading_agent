@@ -32,11 +32,11 @@ def literal(raw, name):
     return ast.literal_eval(node.value)
 
 
-def test_pinned_closure_yields_twelve_compilable_flat_files_and_exact_final_hashes(sources):
+def test_pinned_closure_yields_eleven_compilable_flat_files_and_exact_final_hashes(sources):
     before = deepcopy(sources)
     files, raw = build(sources)
     report = json.loads(raw)
-    assert sources == before and len(files) == report["file_count"] == 12
+    assert sources == before and len(files) == report["file_count"] == 11
     expected = {name for name in b.PINS if name.endswith(".py")} | {"main.py", "comparison_20261028_config.py"}
     assert set(files) == expected
     for name, source in files.items():
@@ -48,7 +48,7 @@ def test_pinned_closure_yields_twelve_compilable_flat_files_and_exact_final_hash
     assert report["rendered_source_closure_sha256"] == hashlib.sha256(closure).hexdigest()
     assert report["template_source_hashes"] == {name: hashlib.sha256(value).hexdigest() for name, value in sources.items()}
     assert report["main_class"] == "Main(candidate.ComparisonOffAlgorithm)"
-    assert len(report["ast_changes"]) == 6
+    assert len(report["ast_changes"]) == 7
     assert all(report[key] is False for key in ("predecessor_initialize_selected", "source_inputs_admitted",
         "native_permission", "qc_setup_complete", "strategy_accepted", "canonical_admission"))
     assert report["reservation_sha256"] is report["accepted_performance"] is None
@@ -72,7 +72,7 @@ def test_config_calendar_policy_attempt_and_old_import_only_placeholders_are_bou
     assert literal(files["comparison_20261028_algorithm.py"], "EXPECTED_CONFIG_SHA256") == report["config_sha256"]
     assert literal(files["extended_loader.py"], "CALENDAR_JSON").encode() == sources[b.PREFIX + "extended_calendar.json"]
     assert "extended_config.py" not in files and not any(name.startswith(("signal_packet", "compressed_packet")) for name in files)
-    for name in ("extended_core.py", "cap_tilt.py", "cap_observer.py", "extended_compressed_store.py", "extended_runtime_successor.py"):
+    for name in ("extended_core.py", "cap_tilt.py", "cap_observer.py", "extended_runtime_successor.py"):
         assert files[name] == sources[b.PREFIX + name]
 
 
@@ -132,8 +132,9 @@ def test_distinct_attempt_operation_changes_rendered_config_not_template_closure
 
 def load_flat(files, monkeypatch):
     native_tests.driver.__wrapped__(monkeypatch)  # Public native-platform stubs only.
+    monkeypatch.delitem(sys.modules, "extended_compressed_store", raising=False)
     names = ["extended_loader", "cap_tilt", "cap_observer", "extended_construction", "extended_core",
-             "extended_compressed_store", "extended_runtime_successor", "extended_algorithm_successor",
+             "extended_runtime_successor", "extended_algorithm_successor",
              "comparison_20261028", "comparison_20261028_config", "comparison_20261028_algorithm", "main"]
     modules = {name: ModuleType(name) for name in names}
     for name, module in modules.items(): monkeypatch.setitem(sys.modules, name, module)
@@ -189,3 +190,25 @@ def test_renderer_has_only_stdlib_imports_and_no_file_or_native_effect_calls():
     assert imports <= {"__future__", "ast", "hashlib", "json", "re"}
     calls = {node.func.id for node in ast.walk(tree) if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)}
     assert not calls & {"open", "exec", "eval", "__import__"}
+
+
+def test_cloud_closure_is_plain_and_has_no_compression_imports_or_store_dependency(sources):
+    files, raw = build(sources)
+    assert "extended_compressed_store.py" not in files
+    assert b.PREFIX+"extended_compressed_store.py" not in b.SOURCE_PATHS
+    for name, source in files.items():
+        tree=ast.parse(source)
+        imports={node.module for node in ast.walk(tree) if isinstance(node,ast.ImportFrom)}
+        imports|={alias.name for node in ast.walk(tree) if isinstance(node,ast.Import) for alias in node.names}
+        assert not imports & {"gzip","zlib","codecs","extended_compressed_store"}
+    assert "predecessor.unused_store_import_removed" in json.loads(raw)["ast_changes"]
+    source=files["extended_algorithm_successor.py"].decode()
+    assert "from extended_compressed_store import" not in source
+    assert "CompressedInputStore(" in source  # Historical unselected initialize preserved.
+
+
+@pytest.mark.parametrize("source", [b"", b"from extended_compressed_store import CompressedInputStore\n",
+    b"from extended_compressed_store import CompressedInputStore as Different, CompressedAuditStore\n",
+    b"from extended_compressed_store import CompressedInputStore, CompressedAuditStore\n"*2])
+def test_unused_import_deletion_requires_exact_one_enumerated_ast_node(source):
+    with pytest.raises(b.BundleRefusal):b._drop_unused_predecessor_store_import(source)

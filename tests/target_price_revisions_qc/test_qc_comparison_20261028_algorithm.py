@@ -2,7 +2,6 @@
 from copy import deepcopy
 from datetime import date, datetime, time, timedelta, timezone
 from fractions import Fraction
-import gzip
 import hashlib
 import json
 from pathlib import Path
@@ -243,7 +242,7 @@ def test_inherited_exact_planner_does_not_recycle_sale_proceeds_and_caps_volume(
     assert result[0]["submitted"]==10 and result[0]["reason"]=="volume_cap"
 
 
-def test_journal_stays_private_job_bound_compressed_and_index_last(driver):
+def test_journal_stays_private_job_bound_plain_and_index_last(driver):
     body,_,digest=config(driver)
     state=NS(project=driver.PROJECT,job="",locked=False)
     journal=driver.ComparisonJournal(body,digest,lambda:(state.project,state.job,state.locked))
@@ -254,13 +253,20 @@ def test_journal_stays_private_job_bound_compressed_and_index_last(driver):
     state.job,state.locked="synthetic-job-4",True
     pointer=journal.export(store)
     saves=[key for method,key in store.calls if method=="save"]
-    assert saves[-1].endswith("/index.json.gz") and len(saves)==2
+    assert saves[-1].endswith("/index.json") and len(saves)==2
     assert all("/37650980/synthetic-job-4/" in key and "/attempt-4/" in key for key in saves)
-    raw=gzip.decompress(store.values[pointer["index_key"]]);index=json.loads(raw)
-    assert hashlib.sha256(raw).hexdigest()==pointer["index_plain_sha256"]
+    raw=store.values[pointer["index_key"]];index=json.loads(raw)
+    assert hashlib.sha256(raw).hexdigest()==pointer["index_sha256"]
     assert index["records"]==1 and index["config"]==body
     chunk=index["chunks"][0]
-    assert json.loads(gzip.decompress(store.values[chunk["key"]]))["kind"]=="NAV"
+    chunk_raw=store.values[chunk["key"]]
+    assert json.loads(chunk_raw)["kind"]=="NAV"
+    assert chunk["bytes"]==len(chunk_raw) and chunk["sha256"]==hashlib.sha256(chunk_raw).hexdigest()
+    assert set(chunk)=={"key","bytes","sha256"} and chunk["key"].endswith(".jsonl")
+    assert pointer["index_bytes"]==len(raw) and pointer["encoding"]==index["encoding"]=="utf-8-jsonl"
+    assert pointer["schema"]=="tpr-cmp28-private-journal-pointer-v2-plain"
+    assert index["schema"]=="tpr-cmp28-private-journal-index-v2-plain"
+    assert "gzip" not in raw.decode() and not any("gzip" in key for key in pointer)
     assert index["strategy_accepted"] is index["source_inputs_admitted"] is False
     with pytest.raises(ValueError):journal.export(store)
 
@@ -291,7 +297,7 @@ def test_uncertain_store_effect_closes_against_retry_and_cannot_publish_index(dr
     with pytest.raises(TimeoutError):journal.export(store)
     before=list(store.calls)
     with pytest.raises(ValueError):journal.export(store)
-    assert store.calls==before and not any(key.endswith("index.json.gz") and method=="uncertain" for method,key in before)
+    assert store.calls==before and not any(key.endswith("index.json") and method=="uncertain" for method,key in before)
 
 
 def test_daily_audit_clock_is_exact_and_reuses_existing_stale_future_mark_checks(driver):
@@ -572,3 +578,14 @@ def test_current_missing_cap_is_preserved_when_old_cells_are_narrowed(driver):
     assert row["unfilled_slots"]==10
     caps_record=next(payload for kind,payload in algo._records if kind=="CAPS")
     assert caps_record["caps"]["SID-KIE"]=={"state":"missing","value":None}
+
+
+@pytest.mark.parametrize("value", [b"plain", bytearray(b"plain"), memoryview(b"plain")])
+def test_native_bytes_preserves_plain_bounded_python_bytes(driver,value):
+    assert driver.native_bytes(value,5)==b"plain"
+    with pytest.raises(ValueError):driver.native_bytes(value,4)
+
+
+@pytest.mark.parametrize("value", [None,"plain",[112,108,97,105,110],b"",True])
+def test_native_bytes_rejects_arbitrary_coercions_and_empty_values(driver,value):
+    with pytest.raises(ValueError):driver.native_bytes(value,64)

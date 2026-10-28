@@ -23,7 +23,6 @@ import re
 
 import extended_core as core
 import extended_algorithm_successor as execution
-import extended_compressed_store as storage
 import cap_observer
 import comparison_20261028 as comparison
 
@@ -58,6 +57,30 @@ def _identity(value):
 
 def _wire(value):
     return core.exact_json(value).encode("utf-8")
+
+
+def native_bytes(value, maximum):
+    """Bounded raw Python/CLR bytes only; no codec or compressed representation."""
+    if type(maximum) is not int or maximum < 1:
+        _fail()
+    if type(value) is bytes:
+        result = value
+    elif type(value) in (bytearray, memoryview):
+        if (value.nbytes if type(value) is memoryview else len(value)) > maximum:
+            _fail()
+        result = bytes(value)
+    else:
+        # ObjectStore returns System.Byte[] in LEAN. Arbitrary iterables refuse.
+        try:
+            from System import Array, Byte
+            if type(value) is not Array[Byte] or not 0 < value.Length <= maximum:
+                _fail()
+            result = bytes(value)
+        except (ImportError, AttributeError, TypeError, OverflowError):
+            _fail()
+    if not 0 < len(result) <= maximum:
+        _fail()
+    return result
 
 
 def comparison_calendar():
@@ -117,7 +140,7 @@ def validate_config(raw, expected_hash):
 
 
 class ComparisonJournal:
-    """Private, bounded, immutable own-job gzip chunks with index published last.
+    """Private immutable plain UTF-8 JSONL chunks; plain JSON index published last.
 
     Native identity is observed before/after every store interaction. Any failed
     publication permanently closes this object against automatic retry. A
@@ -193,41 +216,41 @@ class ComparisonJournal:
                 chunks.append(bytes(current))
             if not 1 <= len(chunks) <= MAX_CHUNKS:
                 _fail()
-            encoded, metadata = [], []
+            publications, metadata = [], []
             for index, raw in enumerate(chunks):
-                packed = storage.encode_gzip(raw, maximum=MAX_RECORD)
-                key = prefix + f"chunk-{index:04d}.jsonl.gz"
-                encoded.append((key, packed))
-                metadata.append({"key": key, "plain_bytes": len(raw), "plain_sha256": hashlib.sha256(raw).hexdigest(),
-                    "gzip_bytes": len(packed), "gzip_sha256": hashlib.sha256(packed).hexdigest()})
-            index = {"schema": "tpr-cmp28-private-journal-index-v1", "study_id": STUDY,
+                key = prefix + f"chunk-{index:04d}.jsonl"
+                publications.append((key, raw))
+                metadata.append({"key": key, "bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest()})
+            index = {"schema": "tpr-cmp28-private-journal-index-v2-plain", "study_id": STUDY,
                 "candidate_id": CANDIDATE, "config_sha256": self._config_hash,
                 "project_id": self._project, "job_id": self._job, "config": json.loads(self._config_raw),
                 "records": len(self.records), "plain_bytes": self.bytes, "kind_counts": dict(self.counts),
-                "chunks": metadata, "encoding": "gzip", "gzip_mtime": 0,
+                "chunks": metadata, "encoding": "utf-8-jsonl",
                 "source_inputs_admitted": False, "strategy_accepted": False, "canonical_admission": False}
             index_raw = _wire(index)
-            index_packed = storage.encode_gzip(index_raw, maximum=2*1024*1024)
-            index_key = prefix + "index.json.gz"
-            encoded.append((index_key, index_packed))
-            for key, _ in encoded:
+            if not 0 < len(index_raw) <= 2 * 1024 * 1024:
+                _fail()
+            index_key = prefix + "index.json"
+            publications.append((index_key, index_raw))
+            for key, _ in publications:
                 if self.require_binding() != prefix:
                     _fail()
                 exists = store.contains_key(key)
                 self.require_binding()
                 if type(exists) is not bool or exists:
                     _fail()
-            for key, raw in encoded:
+            for key, raw in publications:
                 self.require_binding()
                 if store.save_bytes(key, raw) is not True:
                     _fail()
                 self.require_binding()
-                observed = storage._bytes(store.read_bytes(key), len(raw))
+                observed = native_bytes(store.read_bytes(key), len(raw))
                 self.require_binding()
                 if observed != raw:
                     _fail()
-            return {"schema": "tpr-cmp28-private-journal-pointer-v1", "index_key": index_key,
-                "index_plain_sha256": hashlib.sha256(index_raw).hexdigest(), "index_gzip_sha256": hashlib.sha256(index_packed).hexdigest(),
+            return {"schema": "tpr-cmp28-private-journal-pointer-v2-plain", "index_key": index_key,
+                "index_sha256": hashlib.sha256(index_raw).hexdigest(), "index_bytes": len(index_raw),
+                "encoding": "utf-8-jsonl",
                 "records": len(self.records), "plain_bytes": self.bytes, "chunks": len(chunks),
                 "project_id": self._project, "job_id": self._job, "strategy_accepted": False,
                 "source_inputs_admitted": False, "canonical_admission": False}

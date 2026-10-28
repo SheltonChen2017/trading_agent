@@ -190,6 +190,90 @@ def test_observed_in_progress_status_is_preserved_without_claiming_completion(tm
     assert result['economics_accepted'] is False
 
 
+def chart_payload():
+    return {'projectId':m.PROJECT,'backtestId':'synthetic-own-job','name':'EXT26 Account NAV',
+        'start':m.ops.CHART_START,'end':m.ops.CHART_END,'count':m.ops.CHART_COUNT}
+
+
+@pytest.mark.parametrize('fault',['foreign_project','foreign_chart','chart_case','arbitrary_window',
+    'end_past_freeze','short_count','oversized_count','bool_count','bad_job','missing_end','extra_key','live_endpoint'])
+def test_chart_read_is_closed_to_exact_own_nav_frozen_window(fault):
+    payload=chart_payload();endpoint='backtests/chart/read'
+    if fault=='foreign_project':payload['projectId']=m.PROJECT+1
+    elif fault=='foreign_chart':payload['name']='Strategy Equity'
+    elif fault=='chart_case':payload['name']='EXT26 account NAV'
+    elif fault=='arbitrary_window':payload['start']+=86400
+    elif fault=='end_past_freeze':payload['end']+=86400
+    elif fault=='short_count':payload['count']=1449
+    elif fault=='oversized_count':payload['count']=m.ops.CHART_COUNT+1
+    elif fault=='bool_count':payload['count']=True
+    elif fault=='bad_job':payload['backtestId']='../foreign-job'
+    elif fault=='missing_end':payload.pop('end')
+    elif fault=='extra_key':payload['resolution']='minute'
+    elif fault=='live_endpoint':endpoint='live/chart/read'
+    with pytest.raises(m.APIRefusal):plan([row(endpoint,payload)])
+
+
+def test_chart_read_claims_then_retains_only_private_raw_body_and_no_acceptance(tmp_path):
+    payload=chart_payload();p=plan([row('backtests/chart/read',payload)])
+    body={'success':True,'chart':{'name':'EXT26 Account NAV','projectId':m.PROJECT,
+        'backtestId':payload['backtestId'],'series':{'NAV':{'values':[[1609794060,123456.78]]}}}}
+    raw=m._canonical(body);calls=[];root=tmp_path/'synthetic-api'
+    def transport(endpoint,wire,seconds,maximum):
+        calls.append(endpoint)
+        assert endpoint=='backtests/chart/read' and json.loads(wire)==payload
+        assert (root/(OP+'.operation.spent.json')).exists()
+        assert (root/(OP+'.r001.request.spent.json')).exists()
+        assert seconds==10 and maximum==65536
+        return raw,200,'SYNTHETIC-TOKEN'
+    result=execute(tmp_path,p,transport);observed=result['requests'][0]
+    assert result['status']=='completed' and calls==['backtests/chart/read']
+    assert result['actual_new_backtests']==result['new_observed_looks']==result['compile_requests_attempted']==0
+    assert p['attempt_id'] is p['reserved_look_id'] is None
+    assert result['economics_accepted'] is result['automatic_retry'] is False
+    assert observed['backtest_completed'] is None and observed['backtest_status'] is None
+    artifact=root/observed['raw_response']['name']
+    assert artifact.read_bytes()==raw and observed['raw_response']['sha256']==m._sha(raw)
+    assert stat.S_IMODE(artifact.stat().st_mode)==0o600
+    assert '123456.78' not in json.dumps(result)
+
+
+@pytest.mark.parametrize('fault',['foreign_project','foreign_job','foreign_chart','missing_chart','unrecognized_loading'])
+def test_chart_read_retains_but_refuses_foreign_identity_or_unrecognized_body(tmp_path,fault):
+    payload=chart_payload();body={'success':True,'chart':{'name':'EXT26 Account NAV'}}
+    if fault=='foreign_project':body['chart']['projectId']=m.PROJECT+1
+    elif fault=='foreign_job':body['chart']['backtestId']='other-native-job'
+    elif fault=='foreign_chart':body['chart']['name']='Strategy Equity'
+    elif fault=='missing_chart':body.pop('chart')
+    else:body={'success':True,'status':'ready'}
+    result=execute(tmp_path,plan([row('backtests/chart/read',payload)]),lambda *_:response(body))
+    assert result['status']=='failed_or_uncertain' and len(result['requests'])==1
+    assert result['requests'][0]['raw_response']['sha256']==m._sha(m._canonical(body))
+    assert result['economics_accepted'] is False
+
+
+def test_loading_chart_is_retained_without_retry_or_claiming_nav_observations(tmp_path):
+    calls=[]
+    def transport(endpoint,*_):
+        calls.append(endpoint)
+        return response({'success':True,'status':'loading','progress':0})
+    result=execute(tmp_path,plan([row('backtests/chart/read',chart_payload())]),transport)
+    assert result['status']=='completed' and calls==['backtests/chart/read']
+    assert result['requests'][0]['raw_response'] is not None
+    assert result['requests'][0]['backtest_completed'] is None
+    assert result['economics_accepted'] is result['automatic_retry'] is False
+
+
+def test_chart_response_budget_is_enforced_before_retention_and_no_retry(tmp_path):
+    request=row('backtests/chart/read',chart_payload());request['max_response_bytes']=10
+    calls=[]
+    def transport(endpoint,*_):
+        calls.append(endpoint);return response({'success':True,'status':'loading','progress':0})
+    result=execute(tmp_path,plan([request]),transport)
+    assert result['status']=='failed_or_uncertain' and calls==['backtests/chart/read']
+    assert result['requests'][0]['raw_response'] is None
+
+
 @pytest.mark.parametrize('mode',['success','unknown','cancelled'])
 def test_launch_counts_only_actual_returned_job_and_uncertainty_stops(tmp_path,mode):
     p=plan([row('backtests/create',{'projectId':m.PROJECT,'compileId':'compile-4','backtestName':'candidate-attempt-4'})],

@@ -33,7 +33,8 @@ REQUIRED_SOURCES = frozenset((MODULE, 'research/target_price_revisions_qc/extend
 PRIVATE_ROOT = ops.PRIVATE_PARENT / 'TPR-SIX-UNIVERSE-FIVE-ARM-20261028-v1' / 'api'
 PROJECT = 37650980
 ENDPOINTS = frozenset(('files/read','files/create','files/update','compile/create','compile/read',
-    'backtests/create','backtests/read','backtests/list','backtests/read/log','backtests/orders/read'))
+    'backtests/create','backtests/read','backtests/list','backtests/read/log','backtests/orders/read',
+    'backtests/chart/read'))
 MUTATIONS = frozenset(('files/create','files/update','compile/create','backtests/create'))
 WRITE_FILES = frozenset(('main.py','extended_core.py','cap_tilt.py','cap_observer.py','extended_construction.py',
     'extended_loader.py','extended_compressed_store.py','extended_runtime_successor.py',
@@ -105,6 +106,17 @@ def _payload(endpoint, payload, allowed):
     elif endpoint in {'compile/read','backtests/create'}:
         keys.add('compileId'); _identity(payload.get('compileId'))
         if endpoint=='backtests/create': keys.add('backtestName'); _identity(payload.get('backtestName'))
+    elif endpoint=='backtests/chart/read':
+        # Official ReadBacktestChart: JSON POST, UTC Unix seconds and point
+        # count. This sole own-account chart/window is not a NAV census or
+        # financial acceptance; loading responses are never retried here.
+        # https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/backtest-management/read-backtest/charts
+        keys|={'backtestId','name','start','end','count'}
+        _identity(payload.get('backtestId'))
+        if (payload.get('name')!='EXT26 Account NAV'
+                or _integer(payload.get('start'),ops.CHART_START)!=ops.CHART_START
+                or _integer(payload.get('end'),ops.CHART_END)!=ops.CHART_END
+                or _integer(payload.get('count'),ops.CHART_COUNT)!=ops.CHART_COUNT): _fail()
     elif endpoint in {'backtests/read','backtests/read/log','backtests/orders/read'}:
         keys.add('backtestId'); _identity(payload.get('backtestId'))
         if endpoint!='backtests/read':
@@ -366,8 +378,13 @@ def _execute(plan,root,*,transport,guard,clock,monotonic):
                 report['observed_new_backtest_ids'].append(row['backtest_id'])
                 report['actual_new_backtests']=len(report['observed_new_backtest_ids'])
                 report['new_observed_looks']=len(report['observed_new_backtest_ids'])
-            if request['endpoint'] in {'backtests/read','backtests/read/log','backtests/orders/read'}:
+            if request['endpoint'] in {'backtests/read','backtests/read/log','backtests/orders/read','backtests/chart/read'}:
                 ops._returned_identity(body,PROJECT,payload['backtestId'])
+            if request['endpoint']=='backtests/chart/read':
+                chart=body.get('chart')
+                if chart is not None:
+                    if type(chart) is not dict or chart.get('name')!='EXT26 Account NAV':_fail()
+                elif body.get('status')!='loading':_fail()
             if request['endpoint']=='backtests/read':
                 job=body.get('backtest')
                 if (type(job) is not dict or job.get('backtestId')!=payload['backtestId']

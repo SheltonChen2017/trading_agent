@@ -27671,3 +27671,34 @@ or actualhangwasproved. LatestoperationalCPU143.6%/159.8%,RAM2113/2033of8192MB,
 uptime16:19/6:50/progress.053/.055 isNOTfinancialcoverageacceptance orhangproof.
 Nojobcancel/relaunch/parameterchange fromthishypothesis. rootcontinuesawaiting
 native100/200terminalstates; purecompileBuildSuccessalreadyretained,0jobs yet.
+
+Statusphase003 finalguard refused afterroot-owned documentation/probe commit90d02e29 overlapped its two readonlyAPIresponses. Bothrawresponsesretained, no source/cloudmutation/job/account effect or financialacceptance. This was an orchestrationerror: futureHEAD mutations are serialized afterallAPIcellsfinish; nextstatus usesfreshHEAD/scope, no spentoperation reused. ActualTargetremotea0wasverifiedbeforecommit; financial15-sourceclosure unchanged.
+
+Fresh bounded native phase TPR-CMP28-API-FIXED-ARM-STATUS-20261028-004/431bcda97d5f825f53178ed18482de56ae162e6c558d9ce0b9955ee03ba2fd57 at 90d02e29e7d0c38ccc007905d87918e7d94dd268 before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-NATIVE-OUTPUT-STATE-20261028-001/a8176dc6962cca5df4693a3cdeb66b1e1a38d2cf5678517683411d0ae26c72c7 at 90d02e29e7d0c38ccc007905d87918e7d94dd268 BEFORE 2 exact private inputs/120s; Own runtime CPU/RAM/uptime and existence/countofderived equitysamples plus feeactivityboolean; no price/return/position projection or financialacceptance; fsync claim and directory retained.
+
+Fresh bounded private phase TPR-CMP28-MARK-PROBE-POST-GAP-PREPARE-20261028-001/aa47f131a183afabb943aff74c9b146726059c92d081a391c2782c22f360674e at 90d02e29e7d0c38ccc007905d87918e7d94dd268 BEFORE 1 exact private inputs/120s; Own source-only archive1read/render; reserve post-gap diagnostic AFTERpurefinancialjob priority/naturalcapacity; no packet/witness/dataprocessing or nativeeffects; fsync claim and directory retained.
+
+Post-gap004 NONECONOMIC source/reservation prepared fc97fdb27732b03bdc2cac8186dc08f5f5dcb7d1a6d1a96875e113b72c4642c6 at 90d02e29e7d0c38ccc007905d87918e7d94dd268 BEFOREanyfutureeffect; source6ee3c0f98af82dd1bc356c9dd0934c99754eff8a232d8d6b7cfa1e6e985312ef; mainONLY24fileinventory1e8337a0f1845f10ef74a4e316ea1303afae22bc7c7e36ca12856deea20e8a97->ece70d78ba25c0284f67a6d9baecd76ca6fba027dfe829bd5e7ba974cad0c33d; 4History/4810rows/20guardedhourscalls. Purefinancialarmhaspriority; no nativeeffectnow and freshAPIphaseclaimsrequiredlater. ParentFeb10/childFeb12 separated/no pastmarkreplacement; allabsence/terminal/recoveryacceptancefalse. Prior3diagnostics/unusedR1retained.
+
+Fresh bounded private phase TPR-CMP28-QC-AVAILABILITY-UNSENT-DRAFT-20261028-001/f2ec6607b77ecfe4d7bb3d655cdf3f44f4d370389d586b0377511253efe10fbb at 90d02e29e7d0c38ccc007905d87918e7d94dd268 BEFORE 1 exact private inputs/120s; Own existing simulated-order identity to PRIVATE owner review draft only; rawSID stayslocal0600; do not send orpublish, no quotes/providercaptures; fsync claim and directory retained.
+
+PreparedPRIVATE UNSENTQCavailability draft f7c23caacffa1ea34360f22b96c78138b0b2386c747b1d2161307f1857779165 fromfreshboundedown3orderidentityread; rawSID/aliases staylocal0600, no quotes/credentials/providerdata/publicexport or supportcommunication. Nativeidentityhash1122... verified; aliasnotcurrentticker/PITproof. Postgapprobependingexplicit, no categoricalproviderabsenceclaim.
+
+### 104.30 Bounded own-account NAV chart read capability
+
+CurrentCMP28hadnofullNAVchart consumer, andlegacyresultreaders enforceoldstudy
+candidates/schemas/attemptceilings; no relabelledacceptance. While100/200native
+jobsrununchanged, source-only cr31 addedONE readendpoint backtests/chart/read
+restrictedproject37650980, nameEXT26 Account NAV, exactfrozenUTCstart1609718400/
+end1791590400/count2000. OfficialSDK/CloudAPI defines JSONPOSTUnixUTC+count;
+loadingresponsesretainedonce/no retry andnofinancialacceptance. Returnedforeign
+identities/chartnamesrefuse. No credential/transport/claim/source/mutationlimits
+changed. API26654B/574d1ab970776b6bf91abacf6212dcc9dd1fc215b0aeba5f1d344f68699e72c1;
+test22653B/260dfe302a51c996270cdecd682091ef395f417d97f09fd5fae5b4504a375353.
+Author75focusedpassed0.66s, root75passed0.62s plus source/diffreviewclean.
+RootpausedallAPIeffectswhilehelperuncommitted; no nativejobwaspaused/cancelled.
+Freshoperation/HEAD/sourceboundsrequiredaftercommit; compiledfinancialsources
+areunchanged. Rootnextreadwillchecknaturalcapacityforpurelaunch; notendturn.
+Officialcontract: https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/backtest-management/read-backtest/charts .

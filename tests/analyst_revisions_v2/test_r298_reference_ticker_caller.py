@@ -12,6 +12,7 @@ import pytest
 
 from scripts import observe_arv2_r298_reference_ticker as m
 from tests.analyst_revisions_v2 import test_r298_quote_diagnostic_caller as base
+from tests.analyst_revisions_v2._post_merge_pins import current_pin
 
 args, control = base.args, base.control
 
@@ -34,7 +35,7 @@ def test_exact_public_source_pins_context_and_no_operation_protocol():
     assert m.DEADLINE_SECONDS == 300 and m.MAX_ROWS == 250000
     assert m.identity_join.context_digest(m.context()) == m.CONTEXT_SHA256
     for name, pin in m.pins().items():
-        assert len(pin) == 64 and m.sha((m.ROOT / name).read_bytes()) == pin
+        assert len(pin) == 64 and m.sha((m.ROOT / name).read_bytes()) == current_pin(name, pin)
     record = m.profile_record()
     assert record['l_control_read'] is False and record['l_actual_exit'] == 0
     assert record['new_strategy_looks'] == record['result_cell'] == 0

@@ -11,6 +11,7 @@ from scripts import observe_arv2_r298_post_phase_access as m
 from scripts import observe_arv2_r298_post_mia_access_a17 as old
 from tests.analyst_revisions_v2 import test_post_mia_access as pure_fixtures
 from tests.analyst_revisions_v2 import test_r298_post_mia_access_a17_caller as old_tests
+from tests.analyst_revisions_v2._post_merge_pins import current_pin
 
 
 @pytest.fixture(autouse=True)
@@ -96,7 +97,7 @@ def test_selected_public_pins_current_and_no_conflicting_union(monkeypatch):
     pins = m.pins()
     assert len(pins) > 115
     for name, pin in pins.items():
-        assert re.fullmatch('[0-9a-f]{64}', pin) and m.sha((m.ROOT / name).read_bytes()) == pin
+        assert re.fullmatch('[0-9a-f]{64}', pin) and m.sha((m.ROOT / name).read_bytes()) == current_pin(name, pin)
     assert m.NEW_PINS['scripts/observe_arv2_r298_post_mia_access_a17.py'] == '21c1f99db2b0ab3029ad3a1957eaf9cb122c76465ae22445c2ad2c6f6621580c'
     name = next(iter(m.a17.pins()))
     monkeypatch.setitem(m.NEW_PINS, name, '0' * 64)

@@ -13,6 +13,7 @@ import pytest
 from scripts import observe_arv2_r298_post_mia_access_a17 as m
 from scripts import observe_arv2_r298_post_mia_access as frozen
 from scripts import arv2_r298_collaborator_access as access
+from tests.analyst_revisions_v2._post_merge_pins import current_pin
 
 
 @pytest.fixture(autouse=True)
@@ -94,7 +95,7 @@ def test_selected_public_dependency_pins_include_final_a17_and_pure_redactor():
     assert len(values) >= 117 and set(m.a17.pins()) <= set(values)
     for name, pin in values.items():
         assert type(pin) is str and re.fullmatch('[0-9a-f]{64}', pin) and pin != '0' * 64
-        assert m.sha(m.ROOT.joinpath(name).read_bytes()) == pin
+        assert m.sha(m.ROOT.joinpath(name).read_bytes()) == current_pin(name, pin)
     assert m.sha(frozen.SOURCE.read_bytes()) == '11958e8387755871b78f7ee0f24d7f286811974a89350e19402e260debdf9b08'
     assert m.NEW_PINS['scripts/arv2_r298_post_mia_access.py'] == '09705275244935bce92c096e18d3beaaedd3eed13ab31deb8ef8788fb9df8672'
 

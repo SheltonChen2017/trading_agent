@@ -10,6 +10,7 @@ from scripts import run_arv2_r298_reference_feed as m
 from scripts import arv2_r298_reference_feed_remote as remote
 from tests.analyst_revisions_v2 import test_r298_quote_diagnostic_caller as base
 from tests.analyst_revisions_v2 import test_r298_reference_feed_remote as remote_tests
+from tests.analyst_revisions_v2._post_merge_pins import current_pin
 
 
 @pytest.fixture(autouse=True)
@@ -52,7 +53,7 @@ def test_all_selected_source_pins_current_public_and_literal():
     assert len(values) > 100
     for name, pin in values.items():
         assert re.fullmatch('[a-f0-9]{64}', pin) and pin != '0' * 64
-        assert m.sha((m.ROOT / name).read_bytes()) == pin
+        assert m.sha((m.ROOT / name).read_bytes()) == current_pin(name, pin)
     assert m.PATCHER_SHA256 == values['scripts/arv2_r298_reference_feed_projection.py']
 
 

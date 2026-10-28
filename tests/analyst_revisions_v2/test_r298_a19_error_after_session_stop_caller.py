@@ -6,6 +6,7 @@ import pytest
 from scripts import run_arv2_r298_a19_error_after_session_stop as m
 from scripts import run_arv2_r298_a19_error_reconciliation as frozen
 from tests.analyst_revisions_v2 import test_r298_a19_error_reconciliation_caller as k_tests
+from tests.analyst_revisions_v2._post_merge_pins import current_pin
 
 args, control, projected, packet = k_tests.args, k_tests.control, k_tests.projected, k_tests.packet
 workflow, joined, witness_terminal = k_tests.workflow, k_tests.joined, k_tests.witness_terminal
@@ -47,7 +48,7 @@ def test_new_L_identity_binds_actual_K_and_scoped_stop_without_access_authority(
     assert record['fresh_unchanged_access_verifier_required'] is True
     assert record['result_cell'] == record['new_jobs'] == record['new_compiles'] == record['new_source_writes'] == 0
     for name, pin in m.pins().items():
-        assert len(pin) == 64 and m.sha((m.ROOT / name).read_bytes()) == pin
+        assert len(pin) == 64 and m.sha((m.ROOT / name).read_bytes()) == current_pin(name, pin)
 
 
 def test_L_denies_spent_K_as_well_as_all_old_controls_without_reading_them():

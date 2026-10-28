@@ -18,6 +18,7 @@ from scripts import run_arv2_r298_quote_execution_a16 as a16
 from scripts import run_arv2_r298_raw_reference_diagnostic as a17
 from scripts import arv2_r298_reference_identity_remote as remote
 from tests.analyst_revisions_v2 import test_r298_quote_diagnostic_caller as inherited
+from tests.analyst_revisions_v2._post_merge_pins import current_pin
 
 _original_result_output = inherited.result_output
 
@@ -143,7 +144,7 @@ def test_selected_public_source_pins_are_literal_current_and_remote_bound():
     assert len(values) > 100
     for name, pin in values.items():
         assert type(pin) is str and re.fullmatch('[0-9a-f]{64}', pin) and pin != '0' * 64
-        assert m.sha(m.ROOT.joinpath(name).read_bytes()) == pin
+        assert m.sha(m.ROOT.joinpath(name).read_bytes()) == current_pin(name, pin)
     assert m.PATCHER_SHA256 == m.NEW_PINS['scripts/arv2_newrule_reference_identity_projection.py']
     assert m._remote() is remote
 

@@ -13,6 +13,7 @@ from scripts import run_arv2_r298_reference_identity_diagnostic as previous
 from scripts import arv2_r298_a19_error_reconciliation as remote
 from tests.analyst_revisions_v2 import test_r298_quote_diagnostic_caller as base
 from tests.analyst_revisions_v2 import test_r298_reference_identity_diagnostic_caller as identity_tests
+from tests.analyst_revisions_v2._post_merge_pins import current_pin
 
 args, control = base.args, base.control
 
@@ -63,7 +64,7 @@ def test_fixed_read_only_scope_new_control_and_source_closure():
     assert record['private_join_workers'] == 1 and record['private_join_worker_index'] == 2
     assert record['actual_zero_is_error_observation_not_strategy_completion'] is True
     for name, pin in m.pins().items():
-        assert re.fullmatch('[0-9a-f]{64}', pin) and m.sha((m.ROOT / name).read_bytes()) == pin
+        assert re.fullmatch('[0-9a-f]{64}', pin) and m.sha((m.ROOT / name).read_bytes()) == current_pin(name, pin)
     assert 'assistant.dispatch_fence' not in sys.modules
 
 

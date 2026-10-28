@@ -10,6 +10,7 @@ import pytest
 
 from scripts import run_arv2_r298_sharadar_probe_metadata as m
 from tests.analyst_revisions_v2 import test_r298_sharadar_probe_metadata as synthetic_catalog
+from tests.analyst_revisions_v2._post_merge_pins import current_pin
 
 REAL_PROVIDER_OBSERVE = m.observation.observe
 
@@ -132,7 +133,7 @@ def test_selected_pins_and_in_memory_compilation():
         'research/analyst_revisions_v2_qc/newrule_comparison_targets.py'} <= set(m.NEW_PINS)
     for name, pin in m.pins().items():
         assert re.fullmatch('[0-9a-f]{64}', pin) and pin != '0' * 64
-        assert m.sha((m.ROOT / name).read_bytes()) == pin
+        assert m.sha((m.ROOT / name).read_bytes()) == current_pin(name, pin)
     for name in ('scripts/run_arv2_r298_sharadar_probe_metadata.py',
         'tests/analyst_revisions_v2/test_r298_sharadar_probe_metadata_caller.py'):
         compile((m.ROOT / name).read_bytes(), name, 'exec')

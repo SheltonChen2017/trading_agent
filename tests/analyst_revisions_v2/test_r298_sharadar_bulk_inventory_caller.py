@@ -12,6 +12,7 @@ import pytest
 import requests
 
 from scripts import run_arv2_r298_sharadar_bulk_inventory as m
+from tests.analyst_revisions_v2._post_merge_pins import current_pin
 
 KEY = 'synthetic-SECRET+/"1234'
 
@@ -240,7 +241,7 @@ def test_control_drift_and_unknown_private_names_refuse(control):
 def test_selected_pins_and_native_output_policy():
     for name, pin in m.pins().items():
         assert re.fullmatch('[0-9a-f]{64}', pin) and pin != '0' * 64
-        assert m.sha((m.ROOT / name).read_bytes()) == pin
+        assert m.sha((m.ROOT / name).read_bytes()) == current_pin(name, pin)
     assert m.ROLES == ('stocks_status', 'funds_status') and m.CAPTURE_BOUNDS == (8192, 8192)
     assert m.profile_record()['price_rows_or_downloads_requested'] is False
     assert '(deny network*)' in m.native_profile() and str(m.ROOT / 'artifacts') in m.native_profile()

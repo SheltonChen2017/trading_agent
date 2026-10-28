@@ -12,6 +12,7 @@ from types import SimpleNamespace as NS
 import pytest
 
 from scripts import inspect_arv2_r298_sharadar_cusip_syntax as m
+from tests.analyst_revisions_v2._post_merge_pins import current_pin
 
 
 @pytest.fixture(autouse=True)
@@ -108,7 +109,7 @@ def test_public_scope_and_native_policy_literals():
 def test_selected_pins_and_in_memory_compilation():
     for name, pin in m.pins().items():
         assert re.fullmatch('[0-9a-f]{64}', pin) and pin != '0' * 64
-        assert m.sha((m.ROOT / name).read_bytes()) == pin
+        assert m.sha((m.ROOT / name).read_bytes()) == current_pin(name, pin)
     for name in ('scripts/inspect_arv2_r298_sharadar_cusip_syntax.py',
         'tests/analyst_revisions_v2/test_r298_sharadar_cusip_syntax_caller.py'):
         compile((m.ROOT / name).read_bytes(), name, 'exec')

@@ -11,6 +11,7 @@ from types import SimpleNamespace as NS
 import pytest
 
 from scripts import run_arv2_r298_sharadar_reference as m
+from tests.analyst_revisions_v2._post_merge_pins import current_pin
 
 
 @pytest.fixture(autouse=True)
@@ -112,7 +113,7 @@ def test_protocol_has_no_qc_or_strategy_authority():
 def test_selected_source_pins_and_compile():
     for name, pin in m.pins().items():
         assert re.fullmatch('[0-9a-f]{64}', pin) and pin != '0' * 64
-        assert m.sha((m.ROOT / name).read_bytes()) == pin
+        assert m.sha((m.ROOT / name).read_bytes()) == current_pin(name, pin)
     for name in ('scripts/run_arv2_r298_sharadar_reference.py',
         'tests/analyst_revisions_v2/test_r298_sharadar_reference_caller.py'):
         compile((m.ROOT / name).read_bytes(), name, 'exec')

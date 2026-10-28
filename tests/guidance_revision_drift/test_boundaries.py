@@ -191,8 +191,13 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         # Review-state phrase: rotate it in the same commit as each new review
         # or counter-review section so the status block cannot go stale.
         header = record.split("## 1.", 1)[0]
+        self.assertIn("Claude follow-up corrections recorded in section 54", header)
+        self.assertIn("Codex counter-review of sections 53 and 54 pending", header)
+        self.assertNotIn("Codex counter-review of section 53 pending", header)
+        self.assertIn("The SYN native closure changes in `simulation.py` only (section 54);", header)
+        self.assertIn("the retained `c589b3dd` custody and its recovery authorization are unchanged", header)
+        self.assertIn("Section 53 was published as `37bce7f2`", header)
         self.assertIn("Independent Claude review of sections 50 through 52 recorded in", header)
-        self.assertIn("Codex counter-review of section 53 pending", header)
         self.assertIn("Sections 51 and 52 are accepted in section 53 as offline software after correction", header)
         self.assertIn("Sections 50 through 52 were published together as `2d739339`", header)
         self.assertNotIn("Claude review of section 51 is deferred at the owner's direction", header)
@@ -227,6 +232,7 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         self.assertGreater(record.index("\n## 51."), record.index("\n## 50."))
         self.assertGreater(record.index("\n## 52."), record.index("\n## 51."))
         self.assertGreater(record.index("\n## 53."), record.index("\n## 52."))
+        self.assertGreater(record.index("\n## 54."), record.index("\n## 53."))
         self.assertIn("research/__init__.py`, remains unobserved", header)
         self.assertIn("paused pending platform preflight", header)
         self.assertIn("GDR-RP33 is accepted in section 34", header)

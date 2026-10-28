@@ -1,7 +1,13 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Independent Claude review of sections 50 through 52 recorded in
-section 53, 2026-10-28. Codex counter-review of section 53 pending.
+Status: **Claude follow-up corrections recorded in section 54, 2026-10-28:
+GDR-CR53-007 and GDR-CR53-008 are corrected, with one new P2 (GDR-CR54-002).
+Codex counter-review of sections 53 and 54 pending.
+The SYN native closure changes in `simulation.py` only (section 54);
+the retained `c589b3dd` custody and its recovery authorization are unchanged.
+Section 53 was published as `37bce7f2`.
+Independent Claude review of sections 50 through 52 recorded in
+section 53, 2026-10-28.
 Settlement and multi-session engineering recorded in section 52.
 Offline input-to-intent engineering recorded in section 51.
 Sections 51 and 52 are accepted in section 53 as offline software after correction:
@@ -63,7 +69,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 53. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 54. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -7499,6 +7505,163 @@ still needs the concrete evidence in 52.3: a licensed, versioned guidance
 source with its removal, confirmation and time semantics; stock and SPY
 historical NBBO with six usable common years; and the processing rights. The
 displayed existing access ends between November 6 and 14, 2026.
+
+Acceptance here is a software review only. It establishes neither native
+execution nor empirical readiness. The proposed terminal-SPY rule and all
+eleven original decisions stay open.
+`docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` were not edited
+and stay frozen for both agents.
+
+## 54. Claude follow-up corrections of GDR-CR53-007 and GDR-CR53-008, 2026-10-28
+
+### 54.1 Scope and method
+
+After the section-53 push the owner instructed Claude to "proceed to fix all
+findings you identified". Section 53 left two findings documented rather than
+corrected: GDR-CR53-007 (the accepted SYN runtime's due-exit coalescing) and
+GDR-CR53-008 (nine reachable engine edges without a pin). This section
+corrects both. Pinning the edges exposed one new P2 defect, GDR-CR54-002,
+which is also corrected. At the start the remote, local branch and worktree
+all matched `37bce7f2`; Codex had pushed nothing new. Same branch and
+worktree; no other branch.
+
+Every run used the designated worktree, network-denied. No QC page, provider
+account, browser session or real data was contacted. Every exercised row is
+invented. `docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` were
+not edited.
+
+This round changes `simulation.py`, a native-closure module, for the first
+time since the retained `c589b3dd` custody. 54.2 states what that does and
+does not change.
+
+### 54.2 GDR-CR53-007: SYN due exits keep their own dates
+
+Section 53 understated the reachability. The native algorithm and every
+accepted fixture, scenario and release payload still never issue
+`schedule_invalidation`, but `recovery.RecoveryEngine` accepts it as an allowed
+public command, so an offline command journal reaches the premature
+liquidation. A trim due on session 1 and an invalidation effective on
+session 3 became one exit on session 1 for all 49 shares, in either order of
+arrival.
+
+Fix in `Simulation._schedule` and the new `_combine_due`: requests that the
+next possible 10:00 exit would reach anyway merge exactly as before (earliest
+session, largest quantity, highest-priority reason). A request dated after
+that horizon stays in the due record's `later` list, visible in
+`scheduled_exits`. It joins the due exit at the first `_schedule` or
+`execute_due_exits` whose horizon reaches it. A sale that exhausts the
+earlier request hands the record to the later rows. Splits scale them, and a
+full sale or cash terminal removes them with the record.
+
+Without a later-dated request the state, snapshots and orders are unchanged.
+At `37bce7f2` and after the fix, the fixture stream (`8f35d56a...`) and the
+base and stress `run_example` results are byte-identical. `run_fixture_report`
+differs only in code-derived identity fields (`code_sha256`, the epoch, input
+and chain hashes, and the two changed files' digests).
+
+Native identity: the offline native audit ZIP named in 33.4,
+`5d081569a901ec5ed3fa0a38b282050cb1dddc276482dee4dbd0e6a60aaa7230` (292,740
+bytes), reproduces at `37bce7f2`. After the fix it is
+`fa562a43d49f59e5e3305c3d99cb2d3537bf0045a494504c3f5e5711fd8ae3e6` (293,994
+bytes, 22 members); only `simulation.py` differs. The retained `c589b3dd`
+custody is untouched: recovery project `c6b9443a...`, prepared runtime
+`5d1dc656...`, audit ZIP `5d081569...` and fixture `8f35d56a...`. The
+`GDR-Mia-base372-recovery-authorized-20261011` authorization still names that
+custody. Its runtime contains the unreachable defect, which its carrier cannot
+reach. A native attempt from the current source would be a new candidate,
+needing independent review and owner direction first. No carrier, project or
+release was regenerated, saved or uploaded.
+
+### 54.3 GDR-CR54-002: cash terminal after an unresolved split
+
+Pinning MSAA13 showed that section 53 mislabelled it as a conservative mutant.
+After a fractional (1.5) split that the engine leaves unresolved, a $7 cash
+terminal paid 495 x 7 = 3,465, the same as with no split. It cleared the
+unresolved flag, and the replay reported `complete_software_replay` `True`
+with `comparison_parity_blocked` `False` and no blockers. The entitled share
+count after the split is unknown (742.5 shares before cash in lieu), so the
+payout and the clean result were both wrong. A split refused for open orders
+(`split_requires_reconciled_orders`) has the same shape.
+
+Fix in `MultiSessionReplay._apply_action`: a `terminal_cash` on a security
+whose unresolved state is either split reason takes the existing unresolved
+terminal path. The security is marked terminal and keeps its exposure as
+`unsupported_or_unresolved_terminal_economics`; no receivable is created; and
+the parity row `unsupported_terminal_comparison_schedule` is recorded. A
+resolved split is unaffected (a 2:1 split still pays 990 x 7). An exit made
+moot by the payout (`invalidation_exit_outside_replay_window`,
+`required_exit_outside_replay_window`) is still cleared; MSAA13 pins that.
+`test_cash_terminal_after_an_unresolved_split_stays_unresolved` fails without
+the fix, and both FIX54 mutants are caught.
+
+### 54.4 GDR-CR53-008: the nine engine edges are pinned
+
+New class `EdgePinTests` in `test_multi_session.py`, plus a `postpone` helper
+that publishes one cloned security's revision a day later so it enters on a
+later session:
+
+| Mutant | Pin | Construction |
+|---|---|---|
+| MSE14 | `test_entry_account_counts_an_outstanding_strategy_receivable` | A 9.9 mark leaves NAV 99,945.55 and a 494-share second entry; a $0.20 dividend receivable restores 495 |
+| MSC9, MSC11 | `test_gross_cap_trims_the_eleventh_position_in_sorted_order` | Ten dividends make room for an eleventh entry; at a close of 11 the 50% gross cap trims `INVENTED-SEC-9` by 183 |
+| MSY1 | `test_terminal_unwind_counts_a_pending_spy_sell_of_the_same_tranche` | Seven trim-matched SPY shares are pending at the unwind; sells are 13 + 79 = 92 |
+| MSF5 | `test_carried_spy_sell_stops_at_a_dated_spy_issuer_change` | The carried SPY sell does not fill under a new dated SPY issuer |
+| MSF26 | `test_exit_fee_above_a_sub_dollar_notional_is_paid_from_settled_cash` | 495 x 0.003998 = 1.97901 against a 2.475 fee; settled cash falls by 0.49599 |
+| MSAA13 | `test_cash_terminal_clears_a_moot_exit_outside_the_window` | The payout clears `invalidation_exit_outside_replay_window` |
+| MSC2 | `test_program_drawdown_includes_exactly_eighty_five_percent` | Four 500-share holdings at 9.89 and a close of 2.399945 give NAV exactly 85,000 |
+| MSP5 | `test_spy_entry_budget_admits_an_exactly_equal_cost` | 30 x 165.049958 + 1 equals the 509-share source cost 4,952.49874 |
+
+None of these changes the accepted 23-session replays; both blocker sets are
+unchanged.
+
+### 54.5 Findings ledger
+
+| ID | Priority / status | Location | Finding, disposition and verification |
+|---|---|---|---|
+| GDR-CR54-001 | P3 / corrected | `simulation.Simulation._schedule`, `_combine_due`, `execute_due_exits`, `process_minute`, `apply_split`; `test_simulation.py` | Closes GDR-CR53-007 and corrects its reachability statement (54.2). A later-dated invalidation and an earlier trim merged into one exit at the earliest session with the largest quantity, in either order of arrival, liquidating before the invalidation's own session. It is reachable offline through `RecoveryEngine`'s `schedule_invalidation` command; the accepted carrier still never issues it. Six methods added, from `test_later_invalidation_after_trim_waits_for_its_own_session` to `test_split_scales_a_later_dated_exit_and_refuses_fractional_shares`; four fail without the fix, including `test_close_before_the_invalidation_session_merges_it_into_the_due_exit`. The other two pin unchanged behavior and pass on the old code (`test_invalidation_for_the_next_session_still_combines_with_a_due_trim`, `test_past_due_trim_absorbs_a_next_session_stop_at_once`). All eleven SYN mutants are caught. Native closure change and retained custody: 54.2. |
+| GDR-CR54-002 | P2 / corrected | `multi_session.MultiSessionReplay._apply_action`; `test_multi_session.py` | A cash terminal after an unresolved split paid on the pre-split share count, cleared the unresolved state, and could report a complete, unblocked replay (54.3). It now takes the unresolved terminal path. `test_cash_terminal_after_an_unresolved_split_stays_unresolved` fails without the fix (FIX54MS and FIX54MSa caught). Section 53.5's description of MSAA13 as conservative is withdrawn. |
+| GDR-CR54-003 | P3 / corrected | `test_multi_session.py::EdgePinTests` | Closes GDR-CR53-008. All nine documented edges are pinned (54.4), each caught by its intended method. |
+
+Scripted count from this table: P0 0, P1 0, P2 1, P3 2; corrected 3, documented 0.
+
+### 54.6 Validation and mutation trials
+
+| Check | Scope | Result |
+|---|---|---|
+| Section-53 identities at `37bce7f2` | scratch export of HEAD, network-denied | All reproduced: source `c4f6d706...`, bundle `d5ab5b1f...`, handoff `155cec34...`, both replays, contract and plans; native audit ZIP `5d081569...` |
+| Regressions without the fixes | worktree, network-denied | SYN (new tests against the `37bce7f2` simulator in a scratch export): 4 failed, 54 passed. Engine (fix reverted in place): the GDR-CR54-002 regression fails and the other eight edge pins pass |
+| 22 in-memory mutants: the nine GDR-CR53-008 edges, two FIX54 reverts, eleven SYN branches | worktree, network-denied, HEAD and status unchanged | 21 caught at first; SYN8 (dropping earlier `later` rows on a new request) survived, was pinned by `test_close_before_the_invalidation_session_merges_it_into_the_due_exit`, and is now caught. 22 of 22 caught, each by its intended pin |
+| Simulator consumers (29 files that import the simulator or the native closure, including bundle, release, recovery, recovery-preparation, QC-project, native-bundle and boundary) | worktree, network-denied, HEAD unchanged | 421 passed, 695 subtests, no failures (771 s) |
+| Round-14 focused selection | worktree, network-denied, HEAD unchanged | 338 passed, 505 subtests, no failures; the nine `EdgePinTests` methods are the difference from 53.5 |
+| Accepted SYN runs | HEAD export against the corrected worktree | Fixture stream, base and stress examples byte-identical; fixture report differs only in code-derived identity fields |
+| Post-fix identities | worktree, network-denied | Full source `0f077b4aff666b4358f09ef624d39f82556957f68f42b7cfc092a0551202d370` (59 members); review bundle `d7b5310156b38306c6649252afd41b812287af4689688bfdc17b7b8cf3b60905` (898,841 bytes, 61 members); handoff `e422973618287411b72201c18e82ca97ec61d76d5398628cdda4981525b5408e` (83,641 bytes); base replay `dbbae722a0f281dbb588d716bee73dfa720e481bb8e60f582ef322de3846abeb`, stress replay `826d3fbb4a1121ec62499e4694f990dae9a1b91ba32ae0a2676cd0d5e1d639e9`; native audit ZIP `fa562a43d49f59e5e3305c3d99cb2d3537bf0045a494504c3f5e5711fd8ae3e6` (293,994 bytes, 22 members). Contract `219706fd...` and both plans unchanged; both blocker sets unchanged (only `comparator_budget_mismatch_beyond_rounding`) |
+| Full lane selection and repository suite | not run | Per the owner's standing preference; the simulator change is covered by its 29 consumer files instead |
+| `git diff --check` | worktree | passed |
+| Closing check on this record commit | worktree, network-denied | lane gate plus shared active-document check: 76 passed |
+
+### 54.7 Commits and next action
+
+The status block names this section. In `test_boundaries.py`, the pins are
+rotated to "Codex counter-review of sections 53 and 54 pending", the
+section-54 corrections and the `37bce7f2` publication. The stale "Codex
+counter-review of section 53 pending" phrase is guarded as absent, and a
+section-54 ordering guard is added.
+
+| Commit | Scope |
+|---|---|
+| `55ce7412` | GDR-CR54-001 and -002 fixes; GDR-CR54-001 to -003 pins |
+| This record commit | Section 54, status block, `test_boundaries.py` pin rotation |
+
+This round gets one push, guarded on the remote head still being `37bce7f2`;
+never force. It publishes both commits.
+
+Next, Codex counter-reviews sections 53 and 54 together. In particular,
+Codex should confirm or dispute the native-closure change in 54.2: the
+retained `c589b3dd` custody is unchanged, and any native attempt from the
+current source is a new candidate. QC stays untouched while the owner's
+instruction holds, and the Mia-led recovery stays paused. Real-data work
+still needs the evidence listed in 52.3, and the displayed existing access
+ends between November 6 and 14, 2026.
 
 Acceptance here is a software review only. It establishes neither native
 execution nor empirical readiness. The proposed terminal-SPY rule and all

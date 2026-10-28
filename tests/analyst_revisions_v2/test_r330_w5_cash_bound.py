@@ -72,9 +72,45 @@ def test_stale_engine_price_above_ask_sizes_on_engine_price(w5):
     assert orders == [('ID', 1)] and d._cash_underfill_count == 1
 
 
-@pytest.mark.parametrize('engine_price', [D(0), D(-1), None])
-def test_missing_or_nonpositive_engine_price_refuses_before_any_order(w5, engine_price):
+@pytest.mark.parametrize('engine_price', [D(0), D(-1), None, D('NaN'), D('Infinity'), D('-Infinity'), True, False])
+def test_invalid_engine_price_refuses_before_any_order(w5, engine_price):
     d, orders = buy(w5, engine_price)
     with pytest.raises(quote_fixtures.NewruleError, match='^quote_execution_engine_price$'):
         d.on_after_open()
     assert orders == [] and not d._executed
+
+
+def test_absent_engine_price_refuses_before_any_order(w5):
+    d, orders = buy(w5, D(120))
+    del d._ensure_security('ID')[1].price
+    with pytest.raises(quote_fixtures.NewruleError, match='^quote_execution_engine_price$'):
+        d.on_after_open()
+    assert orders == [] and not d._executed
+
+
+def test_sell_only_dispatch_does_not_enter_buy_engine_price_check(w5):
+    d, orders = buy(w5, None)
+    session = quote_fixtures.NOW.date().isoformat()
+    holdings = {'ID': 2}
+    d._plans[session].update(holdings=dict(holdings), quantities={'ID': 0})
+    d._current_holding_census = lambda: dict(holdings)
+    d._current_quantity = lambda identity: holdings.get(identity, 0)
+    d._ensure_security = lambda identity: pytest.fail('sell-only loop entered buy price check')
+
+    def sell(identity, quantity, _session):
+        orders.append((identity, quantity))
+        holdings[identity] += quantity
+    d._submit_market = sell
+    assert d.on_after_open() == 'a' * 64
+    assert orders == [('ID', -2)] and d._executed == {session}
+    assert d._cash_underfill_count == 0
+
+
+def test_source_profile_declares_cash_bound_change_and_preserved_inverse():
+    m = projection_fixtures.m
+    profile = m.profile_record()
+    assert profile['source_delta'] == ('explicit_W5_base_and_common_modules_Main_import_profile_start_date'
+        '_and_declared_buy_cash_bound')
+    assert profile['buy_cash_bound'] == m.CASH_BOUND_FIELD[1]
+    assert profile['W5_cloud_inverse'].endswith('_and_declared_cash_bound')
+    assert all(profile[key] is False for key in m.FALSE_FLAGS)

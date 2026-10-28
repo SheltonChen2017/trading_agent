@@ -1,8 +1,9 @@
 """Pure public-source W5 projection and six-cell local specification.
 
 The original quote-aware cloud base remains immutable provenance. A separately
-named W5 base has only declared period/capital-epoch/result changes. All source
-bytes are supplied; this module cannot read data, contact QC or grant a run.
+named W5 base has declared period/capital-epoch/result changes and the
+owner-directed buy cash bound. All source bytes are supplied; this module
+cannot read data, contact QC or grant a run.
 """
 import ast
 import copy
@@ -429,7 +430,7 @@ def profile_record():
         'public_source_pins':dict(previous.PUBLIC_SOURCE_PINS),'addon_source_pins':dict(previous.ADDON_SOURCE_PINS),
         'available_source_pins':dict(AVAILABLE_SOURCE_PINS),'period_source_pin':PERIOD_SOURCE_PIN,
         'frozen_quote_base_sha256':common.runtime.FROZEN_BASE_SHA256,'period_profile_sha256':period.digest(period.profile_record()),
-        'source_count_per_cell':19,'source_delta':'explicit_W5_base_and_common_modules_Main_import_profile_start_date_only',
+        'source_count_per_cell':19,'source_delta':'explicit_W5_base_and_common_modules_Main_import_profile_start_date_and_declared_buy_cash_bound',
         'old_host_to_W5_host_delta':'exact_declared_byte_replacements_no_other_change',
         'W5_cloud_inverse':'exact_frozen_quote_base_AST_after_restoring_period_nodes_and_declared_cash_bound',
         'buy_cash_bound':CASH_BOUND_FIELD[1],

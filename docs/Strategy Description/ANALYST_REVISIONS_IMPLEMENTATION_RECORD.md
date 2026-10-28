@@ -2337,18 +2337,23 @@ All are accepted; the W5 and R298 result parsers now accept a QC success
 envelope without an `errors` key (`ARV2R328-001`, corrected in
 `41295615`). Codex's section 329 counter-review accepts the correction and
 qualifies the recorded access authority, suspected buy-sizing engine risk and
-resolver causality. The immediate next step is section 329's bounded native
-dated-coverage work, followed by strategy preparation only if actual gates pass.
+resolver causality. Section 329's native dated-coverage code is installed, but
+fresh source authentication and its diagnostic launch remain pending. The owner
+has reimposed the QC resource hold in329.10; only offline completion is current.
 Under the standing scoped recovery direction, the owner explicitly waives
 Claude review of section 329 before this research continuation; independent
 acceptance is not claimed. Section 329 records the explicit hold release ("hold released.
 proceed"), counter-review of the exact two new Claude commits, and the
-prospective QC-only native dated-coverage continuation. The earlier hold is
-historical, not current. Review waiver for bounded research continues; no
+prospective QC-only native dated-coverage continuation. That release was later
+superseded by329.10's new hold. Review waiver for bounded research continues; no
 spent operation is renewed and no strategy/capacity/source gate is inferred.
 The current path preserves W5 quote economics, uses current sole-owner
 access rather than the old R298 Mia exception, and keeps native rows in QC.
-No new strategy result or research look exists at this starting checkpoint.
+No new strategy result or research look exists in this continuation. Safari's
+Ask for each download preference is specifically approved, but no change or
+browser interaction will occur while the other lane is using the resources.
+Finish the offline checkpoint and one final matching-lane push; resume QC
+source authentication only after a later owner release and fresh local gates.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -4310,6 +4315,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-27 | Codex owner-waived source-pin/parser/price recovery; one concluded round | `634509bf0fb361a8471c9ed6b62106d0cdcfc245` -> this final handoff commit (34 recorded predecessors through `4e51fdf8`, 35 total) | Prospective exact EOF-byte closure, all-token/original-schema recovery, full-window source work and authenticated identity-gap endpoint | Retains all failures/spent uses; one native-QC source diagnostic, accepted Sharadar RAW capture/sidecar, older EOD pilot and complete111page/110346row EOD catalogue; BB/BC native0/0 validate original6151+8 and expose2426potential identity refusals, including15 without original FIGI; no six/eight strategy cells launched | Latest200distinct focused passes14.17s; pure actual-BC anchor/output/hash/shape agreement and final document/diff/status gates; no full suite. Earlier overlapping selections/failures/Root collector and test-window qualifications retained. AJ one shared+infrastructure look already booked:337/259/53/699, no new cells | ARV2CR325-002 resolved only prospectively for approved exact bytes; all original proofs pass technically. I326-024 early-price coverage and I326-032 source identities OPEN; inherited formal/PIT/master/readiness gates remain false; no independent acceptance | Exactly one nonforce matching-lane final push after baseline/HEAD/status check; confirm existing Sharadar history tier and obtain authenticated missing identity/lineage evidence before separately frozen source/price/run work. No new paid rights, source-stop bypass, retry, paper/live/broker or real-order action |
 | 2026-10-28 | Codex owner-waived matched-history/local pre-QC recovery | `5b8d4f8a8603c60be182b6202e6d53b908f2bcff` -> this final handoff commit (nine recorded predecessors through `5735bb28`, TEN total) | Existing five-year period, exact identity/demand evidence, W5 six-cell runtime/source/result and verified project-independent archive | H/I/J/K actual0 plus separate native0 retained/spent; W5 uses Sep2021 callback warmup, Nov2021..Oct2026 USD1m epoch and unchanged source/economics; local archive148543046bytes/73ranges verified; no QC/Safari after owner hold and no strategy cell | New W5/archive227distinct focused passes plus repeated86document checks; earlier H/I/J/period counts/failures qualified in327; no full suite;337/259/53/699 unchanged | I327-001..016 dispositions in327; source/identity/actual-held-price/PIT limitations stay open; no independent review or formal admission claimed | ONE matching final push, then remain at local checkpoint under QC/Safari hold; next QC-only dated-coverage/source/project/transfer/run checks await release and all applicable gates |
 | 2026-10-28 | Claude independent review of the seventy-four Codex commits `3c905d42..0d38c59d` (sections 323 Mac, 324–327), excluding Claude's four R323 commits | `0d38c59d` -> `41295615` (correction) -> this record commit | All seventy-four accepted, `bfe79eef` after correction; section 328 | W5 and R298 result parsers accept an absent QC `errors` key; letter and special-character CUSIP/ISIN/FIGI checksum vectors added; DNS-profile, QC permission-action and buy-sizing risks documented | 152 range test files 9,095 passed / 20 failed (ARV2CR325-002 stale pin) / 10 harness errors; 349 affected passed; 5/5 mutations caught; 86 record gates; no full suite, no QC/Safari/provider access; 0 looks, 337/259/53/699 unchanged | 0 P0, 1 P1 corrected, 3 P2 documented, 10 P3 (one corrected) | Codex counter-reviews section 328; QC/Safari hold stays |
+| 2026-10-28 | Codex section328 counter-review, owner-released coverage preparation, then newly held offline checkpoint | `287952427b0e847d5f47261fc5d97c2057a04d17` -> this final handoff commit (five recorded predecessors through `02679fc7`, SIX total) | Accept incoming two-commit review after qualifications; prepare exact native dated coverage and bounded verification/result mechanisms | A first target passed once and is spent; four public QC code files installed before the new hold; two downloads retained with collision qualification; B/C/D remain uninvoked; no explicit compile/backtest | Root final250distinct focused passes7.96s plus four in-memory compilation checks/import absence; earlier counts and failures remain qualified in329; no full suite;337/259/53/699 unchanged | I329-001/002 P2 and I329-003 P3 corrected before use; existing price/actual-holdings/buy-sizing/source/PIT gates remain; no independent acceptance | ONE nonforce matching-lane push; then retain the new QC/Safari resource hold. Approved Ask-download preference awaits release. Fresh exact source verification, run/result freezes and genuine gates precede any coverage job or six/eight strategy submission |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -70458,3 +70464,253 @@ is QC's named single-file read endpoint (official Read File documentation),
 but no new API caller/credential/project-file request was implemented/invoked
 to bypass this pause. Offline preparation may continue while it is pending.
 No result job/look;337/259/53/699 remains unchanged.
+
+### 329.9 Prospective read-only alternative and exact UI result boundary
+
+While the narrowly requested Safari preference confirmation remains pending,
+leave that preference unchanged. A separately versioned D candidate is being
+prepared to authenticate only the eleven exact named public code files through
+QC's documented POST /files/read with projectId38522505 and name. This is a
+read-only source verification alternative to the incomplete browser download
+set, not an upload retry, old control reader, project census or data acquisition.
+The two current Downloads copies remain inert; B stays uninvoked. No inference
+of successful source authentication follows from the already completed install.
+The official Read File documentation supports optional name and content in the
+single-file response; its example authenticate/create/update/delete calls are
+not part of this contract. The public documentation fetch's502 is not evidence
+of a QC API failure. No credential value or operational API was inspected here.
+
+Normal network/runtime/source gates still precede D: exact current source and
+host pins, bounded credential-free preclaim QC DNS observation, pinned held CA,
+exclusive claim, bounded own child and inherited credential handoff, no proxy/
+redirect/retry or alternate file, and finite source/status/dispatch metadata.
+Eleven exact sequential source reads would not establish no extra cloud files,
+atomic consistency, current exclusivity or a capacity lease. A later exact
+clean run freeze is required; this paragraph alone invokes neither D nor C.
+
+The pending C result recorder addresses two concrete UI/API representation
+differences before any new job: Safari's literal Completed label must be kept
+alongside its explicit Completed. parser translation, and the displayed IDE
+build token must be identified as such, never called an observed RESTcompileId.
+Section326.28 observed exactly ONE TRAILING separator SPACE, not a leading
+space. The prospective recorder therefore distinguishes canonical bytes from
+the explicitly frozen one-trailing-SPACE mode, retains original and canonical
+pins, and never strips arbitrary whitespace or retries parsing until accepted.
+Actual UI source/build/job linkage and selected-text provenance remain external
+observations; the pure parser does not authenticate them. C requires its own
+bounded source/input/run freeze, exclusive output claim and actual exit/result
+checks. No earlier result reader, selected bytes or control is replayed.
+
+Same-round static advisory inspection found no verified material defect in
+coverage geometry/first-last gap partition, exact identity/calendar/book joins
+or false readiness flags. This is not independent review, runtime proof or
+launch clearance. Potential membership-prior gaps are not automatically actual
+target/holding gaps; membership expiry alone cannot retire a holding. All
+strategy price/payoff/order-path questions remain open. No job has been created
+in this continuation;337/259/53/699 remains the booked floor.
+
+### 329.10 New owner resource hold and offline checkpoint scope
+
+After approving ONLY Safari's File download location -> Ask for each download,
+the owner explicitly directed: "do not access qc yet another lane is using it".
+Observed by the root before2026-10-28T17:29:46Z; this is an observation bracket,
+not an exact user-message timestamp. The new hold supersedes this round's earlier
+release. Do not contact QC, launch either source-readback route, operate the
+owned project, or interact with Safari while the other lane uses it. Do not
+cancel/interrupt/message that lane or change its projects, jobs or sessions.
+The preference approval persists for the later release; no repeated approval
+is needed for that exact setting, and no preference has yet been changed.
+
+Continue only the public-source offline C/D implementation, focused validation
+and handoff documentation to the checkpoint before QC verification. Under the
+standing explicit one-push instruction, commit the concluded offline round
+locally and push once to the matching Analyst branch after concurrency checks.
+This is a held checkpoint, not full backtest readiness or strategy completion.
+No new monitor, automatic lease inference, operational run freeze or contact
+follows from this paragraph. B/C/D controls remain uninvoked/unallocated; A is
+spent/passed. The two incomplete browser downloads remain preserved and inert.
+No new diagnostic/backtest, source capture, result read, native-book replay or
+look was performed;337/259/53/699 remains unchanged. After a later explicit
+release, choose and freeze one source-verification route, authenticate its
+actual output, then separately freeze one admissible no-order coverage job and
+selected result recording before any six/eight strategy submission.
+
+### 329.11 Implemented D alternative; no operational authority under hold
+
+NEW scripts/verify_arv2_r329_qc_source_readback.py47923bytes SHA256
+24fc290152a776c9b5bc41f2120a657f2e8b472f07b6fd08e0a081a467cf6d33;
+tests/analyst_revisions_v2/test_r329_qc_source_readback.py26948bytes SHA256
+453307354d27b44a526c652cef5ed8f1de2004290d2a3abb80a2eb5a865978e7.
+Canonical D profile5862bytes/e28b9387e06195a677c7eaa2e6089b0b70aeb851c928e4c5d57010aff1c1931c;
+native policy1670bytes/908598b2e71165bf326a33ddafa6600e571526d3cd432f2b64bb9ce28ead50c8.
+Prospective fixed own control is newrule_available_history_native_coverage_source/
+R329-20261028-D under this lane's artifacts. It was not inspected or allocated.
+
+D launch uses the exact designated Python with -I -B and an ordinary isolated
+stdlib parent. It binds its own public source, copies only the two already
+configured QC environment values into a fresh in-root support environment,
+and execs its fixed run mode without putting secrets in command arguments.
+No invented QC Keychain item or alternate execution environment is used.
+The carried210second parent bounds the one own native worker; its operation
+window is at most180seconds for compatibility with the frozen source guards.
+Initial interpreter startup, uninterruptible I/O and host suspension are not
+bounded; own-child reap can add5seconds, and no process-tree guarantee is made.
+Credential shape is checked before dispatch; the worker receives only owned
+one-use intent/credential pipes, never credential environment variables.
+
+The worker reauthenticates selected source bytes/metadata and regenerates the
+unchanged eleven-file projection before one credential-free preclaim lookup
+of www.quantconnect.com. A current existing/partial D leaf refuses before DNS.
+Only the first validated global supported DNS address is selected, with no
+fallback or retry. DNS observation is not an HTTP request count. Exact held
+public certifi CA240216bytes/9cc2a774b5198dcff14d9be1e66091f538975d867ce029a96bce15a55dfd730f
+configures the actual TLS context with hostname verification and TLS>=1.2.
+The native HTTPS443/DNS53/mDNSResponder allowance is a port/IPC boundary, not
+a domain fence. Original CA ancestor full metadata is held/named; native
+ACL/xattr checks cover its leaf and immediate parent, not every ancestor.
+
+Exclusive claim, worker-start marker and fsynced per-name intent precede each
+of at most eleven application dispatches. POST /api/v2/files/read is the only
+endpoint; payload names/project are exact. No redirects, proxies, retry,
+alternate file, source write, compile/job/capacity query or source-byte export.
+Response bodies are bounded1MiB and compared in memory with exact generated
+source bytes; only names/sizes/hashes, finite status and dispatch evidence are
+retained. Missing errors is allowed; malformed/nonempty present errors refuse.
+Five normal control files plus an optional failure record are bounded outputs;
+no old control is read. A failed/unknown/late-nonzero operation remains spent or
+ambiguous even if a report exists. Actual parent0 AND child0 AND separately
+validated complete eleven-file/projection/report bindings are mandatory.
+The committed offline validate mode has a30second bound, reads only its bounded
+supplied envelope/public sources under native denial, and emits finite metadata.
+It does not read D's control, inspect credentials or contact QC.
+
+Before use, same-round static audit confirmed two P2 local blockers and a P3
+metadata gap, all corrected prospectively: I329-001 replaced the inappropriate
+ROOT-only guard for the exact external public CA path; I329-002 limits the
+worker operation to180seconds rather than passing210 to the frozen helper;
+I329-003 checks every stage bootstrap metadata row, not only the stage module.
+No used helper or old operational pin was changed. Advisory reinspection found
+no further material issue; this is not independent review or operational proof.
+
+Author final79distinct focused tests passed6.05s under native all-network,
+real-artifact, Keychain and security-CLI denial. Earlier61pass/1CA-fixturefail3.57s,
+63pass3.61s,63pass/3fakeCONTROL-fixturefail3.71s,66pass5.27s, and78pass/1nested-
+sandboxfail6.09s are overlapping evidence, not additive. The last failure was
+host sandbox_apply exit71/Operation not permitted under nested sandbox-exec;
+the narrow test now records that limitation. A separate harmless /usr/bin/true
+under the literal D policy PLUS all-network/all-production-artifact denial
+exited0, proving policy acceptance only. Future operational parent must launch
+its independent native worker; do not nest that parent under another sandbox.
+Two in-memory compilation checks and diff check passed. No actual D invocation,
+credential value, CA file, production control, QC endpoint or provider was read.
+
+### 329.12 Implemented C selected-result recorder; uninvoked
+
+NEW scripts/record_arv2_r329_native_coverage_result.py34780bytes SHA256
+9d2e053c2e45c1b17e25d419f151a3a4463244954a5baf021d5ae79e7ae06ecb;
+tests/analyst_revisions_v2/test_r329_native_coverage_recorder.py22224bytes SHA256
+da28e6d9427bc401da699c9f6f43790a905631860a100fcee5768fb59f3474e5.
+Native policy1450bytes/eef3641cd1ce9e22416147987667c41e9fcbf00374c6724f9b45da4bef45b16e.
+The fixed prospective own control is newrule_available_history_native_coverage_result/
+R329-20261028-C under this lane's artifacts; it remains uninspected/unallocated.
+Its complete profile depends on a real, separately frozen future run and selected
+input. No dummy job, build token, source-readback pin or actual-exit value is
+substituted to manufacture that profile now.
+
+C accepts only a closed external run binding for project38522505, the exact
+projection/source/coverage profiles, a successful source-readback report pin,
+explicit Safari_download11 or named_API_read11 method, actual IDE build token,
+engine2.5.0.0.18207, actual job/name/UI terminal, and original selected-byte pin.
+The UI token is explicitly not an observed RESTcompileId. Canonical bytes or
+exactly one trailing SPACE are distinct frozen modes; original bytes and pin
+are retained, the canonical body remains bounded8002bytes, and all pure result
+geometry/type/false-flag checks remain. No generic whitespace repair or trial
+framing. UI origin and source/build/job linkage remain externally observed,
+not independently authenticated by this recorder.
+
+An ordinary clean parent validates its bound source/arguments, bounds stdin
+acquisition30seconds and launches only its own native all-network-denied child.
+The parent's60second child collector covers bootstrap/import/preflight/publication;
+its internal operation alarm is30seconds, reap may add5seconds. Parent argument/
+source startup and uninterruptible I/O/host suspension remain qualified. Do not
+nest the producer parent under another sandbox on this host. Exclusive claim
+precedes saving the supplied raw bytes; original input/source descriptors/full
+metadata/native security stay held through bounded report publication. Four
+allowed own files are claim, selected.raw, report and optional failure. No old
+control/private DATA, browser, credential or service is read by C.
+
+The explicit offline --validate-output --actual-parent-exit mode is mutually
+exclusive with --worker. Under direct native all-network/artifact/Keychain
+denial it authenticates current public source/clean HEAD and the exact supplied
+parent/child envelope, actual exits and report pins without Store/produce/claim
+or control access. Its30second internal bound starts after bootstrap, so a
+future external startup bound remains required. A typed unbound startup failure
+can be envelope_validated while output_authenticated remains false; validator0
+alone is not recording success. Even an authenticated recording of a failed
+QC diagnostic is not accepted strategy evidence. Actual producer parent0 and
+child0 plus matching authenticated output are mandatory for record acceptance.
+
+Author final85distinct focused cases passed0.92s; prior62pass0.95s,75pass0.91s
+and84pass0.95s overlap. Intermediate67pass/8fixturefail0.99s correctly rejected
+pytest's injected environment variable; fixtures were changed to explicit
+synthetic allowed environments, not production relaxation. Restored memory-only
+actual-exit omission caught1expectedfailure0.21s and raw-pin omission caught
+1expectedfailure0.06s; source hashes remained unchanged. The final author85-run
+denied user Keychains, while the prior84-run also denied system Keychains;
+the root combined run below denied BOTH. No credential function was called.
+Same-round static reinspection found no further material issue and confirmed
+the validator cannot enter production. This is not independent review.
+
+### 329.13 Final held checkpoint, exact range and handoff
+
+Root final focused validation passed250distinct tests7.96s, exit0:85C recorder,
+79D readback and86 lane-record/active-document checks. All used native remote-
+network and production-artifact denial, both Keychain paths/security-CLI denial,
+explicit LC_ALL=C, disabled plugin autoload, --noconftest, --ignore=artifacts,
+-B/no cacheprovider and in-root support paths. assistant.dispatch_fence was
+asserted absent after collection/execution. Four changed source/test files
+compiled in memory without bytecode; public source/profile/policy hashes matched
+329.11–12. These checks exercised synthetic fixtures and public code only, not
+operational source reads, CA/credentials, QC or browser behavior. No full lane
+or repository suite ran. Earlier author/root subsets, mutations and repeated
+document counts are not added to these250; historical failures remain visible.
+Final document-only confirmation passed86tests1.12s, exit0, under the same
+native denial. It repeats the86 above and is not additive; this confirmation
+was used because the immediately preceding document-check output was not
+retained across context compaction, whose result is not claimed.
+
+Exact outgoing continuous range is
+287952427b0e847d5f47261fc5d97c2057a04d17..this final handoff commit,
+six Codex commits in order. This is author implementation/counter-review
+evidence, not independent acceptance:
+
+| Commit | Disposition and durable scope |
+|---|---|
+|e843202f10e86fa1535bff49e4936d66366965ef|Incoming41295615 correction accepted and28795242 review accepted after329.2 qualifications; runtime-limit tests and owner release recorded.|
+|2e01ffecb00d016e62ea3f2e767c2ddf5412c109|Prospective coverage/projection/A/B/result/outer implementation and D1 freeze; no cloud job.|
+|cb0f1da08fdbfc96bc276d10f8a45793b53bae9f|D1 pre-dispatch outer locale refusal retained; explicit LC_ALL fix and separately frozen FIRST A target dispatch.|
+|82aaec7dcc602df0b47bf07c17a8f32e07b3d8a1|Actual A0 plus sole output validation0 recorded; D2 exact public-source install frozen.|
+|02679fc752741052c7174996cbfd969203423d28|Actual install/two-download collision qualifications and prospective exact numeric Safari filename binding correction recorded.|
+|This final handoff commit|C/D offline candidates, prospective corrections/validation, renewed owner hold, persistent exact preference approval and contiguous final push ledger. No C/D run freeze or invocation.|
+
+The original source diagnostic remains spent, A is now spent/passed, and B/C/D
+remain uninvoked. Four public source-file installations and two downloads occurred
+before the new hold; no explicit Build/Backtest/Live/Mia action or new job/result
+occurred. No resource interaction followed the new hold. Preserve all old data,
+controls, failures and the incomplete Downloads copies. Booked floor stays
+337shared/259development/53infrastructure/699cells, with no shared-ledger change.
+There is no six/eight strategy run, new result cell, efficacy claim or formal/
+PIT/master/paper/live clearance from this checkpoint.
+
+Conclude with exactly ONE nonforce push to the matching Analyst branch after
+rechecking root/branch/HEAD/status and live remote baseline28795242. Confirm
+local/tracking/live agreement and clean status afterward; do not push an
+intermediate acknowledgment or another lane. While the hold remains, perform
+no QC/Safari action. After explicit release, the already approved Ask-download
+setting may be applied and one source-verification route chosen/frozen; D is a
+tested alternative, not an automatic fallback after a failed B or vice versa.
+Successful actual source authentication, fresh private sole-owner/idle/capacity/
+processing/source/attempt checks, separate exact run freeze, bounded new job and
+selected result capture precede any strategy continuation. Dense potential gaps
+remain distinct from actual target/held NAV demand; no price substitution,
+holding retirement by membership expiry, economics change or attempt renewal.

@@ -22,8 +22,7 @@ SCOPE = (
 def _section(text):
     assert text.count(START) == 1
     result = text.split(START, 1)[1]
-    assert '\n## 104.' not in result
-    return result
+    return result.split('\n## ', 1)[0]
 
 
 def _check(section):

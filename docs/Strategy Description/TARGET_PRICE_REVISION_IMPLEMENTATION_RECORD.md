@@ -1,22 +1,24 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Current owner direction, 2026-10-26 (section 103):** continue the offline build
-to the last step before QC setup and skip Claude review for now. QC/Safari is
-unavailable because another lane is using it; no setup or access is performed.
-The owner stopped the Analyst-push monitor and it was deleted through the app.
-No polling, automatic rearm or consumed release is inferred. The earlier
-baseline remains historical provenance, not a moving trigger. The instruction
-to push once when done still governs this offline round.
+**Current owner direction, 2026-10-28 (section 104):** QC/Safari is now
+available by direct owner release for OFF recovery and all five requested
+full-window comparisons. The owner waives Claude review and delegates remaining
+technical questions to Codex's best judgment with documented decisions. One
+push follows completion of the requested tests; no intermediate push occurs.
+The former Analyst-push monitor stays deleted. Each actual private/native/
+compile/job effect still needs a fresh bounded source/HEAD scope. No completed
+backtest or accepted performance is asserted by this new direction.
 
 Section 102 remains the completed counter-review of both section-101 Claude
 commits, accepted after three P3 corrections. Its published corrections and
 all historical tests/failures are retained, not reviewed a second time here.
 The prospective attempt-cap supersession retains all attempts and looks.
-The lane is **not backtesting-ready**; offline preparation is not native proof.
+The new study remains **not backtesting-ready** until its native inputs/source and execution are verified; offline preparation is not native proof.
 
 **Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly" applied
 to the section-93 round ONLY; section 94 is the Claude review that follows it.
 
+Historical section-102 status, retained verbatim as attributed facts:
 Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN
 `12be4894..69ecaf91` IN SECTION 102. ACCEPTED AFTER THREE P3 CORRECTIONS;
 PORTABLE SYNTHETIC SOFTWARE CHECKS DO NOT PROVE MAC CUSTODY. NINE INHERITED
@@ -52,7 +54,7 @@ locked. No new notebook/cell or native witness is claimed. Genuine original
 compiled source, missing source/unit
 provenance and full-window native orders/accounting cannot be inferred from
 saved source or a Completed. status. No protected dates, frozen economics,
-selection rules or attempts are reset. Codex stops before QC setup; resume only after a fresh owner resource release, with no mandatory Claude checkpoint.
+selection rules or attempts are reset. Codex proceeds with owner-released OFF recovery and the five-arm full-window comparison, without a Claude checkpoint.
 Old standalone native-read programs and scope holders are retired from operational use;
 no expired scope is renewed. Percent units remain a hypothesis, not a verified diagnosis.
 The non-authorizing TPR-TR0-I implementation candidate is checkpointed but
@@ -588,9 +590,9 @@ authorized by that audit.
 The trust rollback pin, protected parent custody, reviewer identity and
 adversarial matrix remain unresolved and parked. **Exact next role action:**
 Section 102 completes the requested counter-review of both section-101 Claude commits;
-section 103 is the later owner-requested offline implementation round.
-Codex stops before QC setup; resume only after a fresh owner resource release, with no mandatory Claude checkpoint.
-QC access remains forbidden until that fresh release. The old section92
+section 103 is the completed offline preparation and section104 is the later owner-released five-arm recovery round.
+Codex proceeds with owner-released OFF recovery and the five-arm full-window comparison, without a Claude checkpoint.
+The owner provided that fresh resource release; bounded per-effect claims remain required. The old section92
 skip was one-round only; the section-100 instruction waives Codex's progress
 stops for Claude checkpoints until further notice, and Claude reviews when the
 owner asks. A historical Mac lock prevented
@@ -26046,3 +26048,155 @@ push; stop on unexpected advance. Make exactly one non-force final push to
 local/remote equality and clean status. The final identity and CLI smoke
 observation are reported with the handoff; no self-referential commit hash or
 successful push is asserted before it happens.
+
+
+## 104. Owner resource release and expanded comparison - 2026-10-28
+
+The owner now explicitly releases QC/Safari, requests OFF recovery and a full-window
+backtest, and waives the Claude checkpoint. This supersedes section103's
+resource-wait instruction without erasing its offline-only historical evidence.
+The deleted monitor stays deleted; release is this direct owner message.
+Actual local and matching remote HEAD were both
+`a0a45fc32f5bb66b93ec6dcd3e0ffd677dff3420`, clean, before this record entry.
+
+The new requested comparison is a NEW evidence epoch: market-cap-selected OFF,
+market-cap-selected TPR tilts50/100/200%, and stock selection purely by TPR.
+The owner confirmed the existing tied-midrank tilt formula with those
+coefficients. Universe count is resolved by separate insurance and finance;
+Codex chooses historical IWM small-cap stock membership instead of Nasdaq100
+after the owner's overlap concern. Finance excludes insurance. These are
+stock universes, not six ETF holdings. Exact new freeze/input lineage must be
+prepared before comparison launches; the old six-sleeve/TPR20% freeze and
+historical OFF3/ON0/33 observed looks are preserved. Full window remains
+2021-01-04..2026-10-09, warmup2020-09-01 unless expressly amended.
+The200% coefficient must not introduce silent clipping, negative long-only
+weights or unapproved shorts. Old native findings remain open; valid negative
+results will be retained. No purchases, broker, paper/live or holdout change.
+
+### 104.1 Fresh bounded UI-discovery claim before access
+
+This durable record claim authorizes only actual UI capability discovery, not
+a private read/processing scope, compile reservation, native adapter admission
+or backtest acceptance. No expired October22 scope is reused. A different
+source/effect scope must be retained before any next native/private action.
+
+```json
+{"allowed":"Safari authenticated UI setup/capability metadata only; navigate own OFF project; inspect genuine Mia availability and tool metadata without sending a task","allowed_project_ids":[37650980],"branch":"codex/strategy-target-price-revisions","expires_utc":"2026-10-28T07:22:00.698513+00:00","forbidden":"No notebook/cell, private object/source/result read, history/provider request, credentials/account page, upload/edit/compile/job, cancellation, deployment or sibling changes","issued_utc":"2026-10-28T07:07:00.698513+00:00","maximum_ui_calls":20,"native_adapter_or_custody_accepted":false,"new_attempts":0,"new_jobs":0,"new_observed_looks":0,"operation_id":"TPR-EXT26-OFF-UI-DISCOVERY-20261028-001","owner_direction_sha256":"279fe344a548b4d531d30c6c2a387533971690014289b94da144a966495cdda6","physical_root":"/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__target_price_revisions","schema":"tpr-owner-released-ui-discovery-claim-v1","source_hashes":{"research/target_price_revisions_qc/extended_off_attempt_continuation.py":"d36f802e3666ac9dc529a8d763de8d6842eefd0d37c8a40ccad8a2eb7f195624","research/target_price_revisions_qc/extended_off_recovery_cli.py":"99ea5fb6ab14400132c91e8af75aa89c4d90c40533fab7f3111d6dd9e665970a","research/target_price_revisions_qc/extended_off_recovery_preparation.py":"64931f8dac9e21c4c76e86f32b1d7294631503bc6d91df36f9cfeb29ed0b2fa2","research/target_price_revisions_qc/extended_refusal_witness_controller_successor.py":"d96f57179568a841d872ac8eb243cdf1c8a2834cb2b68a33912cdebbf376194b"},"source_head":"a0a45fc32f5bb66b93ec6dcd3e0ffd677dff3420"}
+```
+
+Claim canonical SHA-256: `8152feed9bfbc783e435a9faf51aa55e0acf2133628d76f021be67b0b338a61d`.
+
+### 104.2 Decisions and fresh source/capability scopes
+
+The owner confirmed the200% arm remains LONG-ONLY: double rank-transfer
+demand, cap each donor's funded transfer by its actual remaining nonnegative
+weight, fund recipients only from those transfers and report unfulfilled
+demand. Never independently clip target weights or renormalize. The owner
+then delegated all remaining questions to Codex's best judgment with durable
+decisions, and instructed one push after all requested tests. No intermediate
+push is made. PureTPR selection uses each universe's highest valid signed
+score (including measured zero), permanent SID ties, fixed1/60 slots and
+cash underfill; unavailable is excluded, never treated as zero/cap fallback.
+All five arms retain prior timing/cost/cash/corporate-action rules.
+
+UI discovery001 reached authenticated ownproject37650980 in a separate new
+Safari tab; genuine built-in Mia controls are available, prior task Completed
+and Stop disabled. Six UI tool calls, one screenshot, no Mia Send, notebook
+or deliberate compile/backtest. Opening the project displayed a platform
+Cloud Terminal build at7:07:46, buildID b0029d-1fc7a1. Its clock/source and
+whether newly triggered by environment initialization are NOT yet reconciled.
+Retain this observed build separately; do not silently claim no new compile
+or invent a new job/outcome look from it. Source snippets in the IDE/prior
+chat were incidental UI, not source-capture or compiled-history acceptance.
+UI discovery001 is now closed; its identity is not reused for private effects.
+
+Before any Mia task, register fresh immutable whole-source capture
+`TPR-EXT26-MIA-SOURCE-BASELINE-20261028-001` using the committed identified
+`extended_mia_capture_notebook_successor.py`: ownproject only, exactly two
+files/read requests, max17files/1MiB each,4MiB/response8MiB total,120seconds,
+40seconds/request, full source archives retained privately and hashes only
+publicly. The producer retains fresh exclusive claim/access/request receipts
+BEFORE existing environment credential resolution and network. No old
+D0/capture/input scope is opened. Mismatch against the older template is
+retained honestly, not automatic strategy rejection or permission to overwrite.
+
+Fresh genuine Mia capability-only claim (no native read/compile/job scope):
+
+```json
+{"expires_utc":"2026-10-28T07:25:48.553740+00:00","genuine_interface_observed":"Safari QuantConnect project37650980 built-in Mia Full Auto Mode, prior task Completed, Stop disabled","issued_utc":"2026-10-28T07:15:48.553740+00:00","maximum_messages":1,"maximum_new_chats":1,"maximum_output_characters":2000,"maximum_ui_calls":16,"new_backtest_looks":0,"operation_id":"TPR-OFF-CAP-20261028-001","permitted_effect":"One built-in Mia metadata capability question only","private_native_reads_edits_jobs_authorized":false,"project_id":37650980,"prompt_sha256":"098a5bd3f82f6f2dc92dc2af05247850ec9d85ce5b1cb2b914b92fd9e89cc0d9","prompt_utf8_bytes":1070,"schema":"tpr-mia-capability-discovery-claim-v1","source_head":"a0a45fc32f5bb66b93ec6dcd3e0ffd677dff3420"}
+```
+
+Canonical claim SHA-256 `b13fc843784e2dd382afa0758a11c08692f66fd5418492e58f661cfc6f89f7ba`. Exact prompt:
+
+```text
+TPR-OFF-CAP-20261028-001. Metadata-only capability check for this private OFF project37650980. Do NOT continue an old task. No file reads/edits, compile, backtest, optimization, notebook creation/execution, ObjectStore, History/provider requests, cancellation, other projects, account changes or purchases. Do not expose credentials or private data. From the tools ACTUALLY exposed to your current genuine built-in Mia interface, state whether you can: (a) retrieve own project source inventory/full source; (b) create one NEW uniquely named empty research notebook; (c) execute one later hash-frozen cell using QuantBook and exactly two named object reads; (d) supply actual project/notebook/creation/invocation tool metadata. Describe capability/tool names only; do NOT invoke those effects now. Reply within2000characters with project_id, capabilities, relevant exact tool names/provenance, execution_invocation_binding_available and no_effects_requested=true. Report absent capabilities honestly, never manufacture an ephemeral tool or run an alternative diagnostic.
+```
+
+### 104.3 Actual source and Mia capability observations
+
+SourceBASELINE20261028-001 genuinely completed two stable all-file reads at
+2026-10-28 07:16:17UTC:16files,541366wirebytes. StatusBASELINE_MISMATCH is
+against the old10-file completion template, not an unexplained new source
+change. All16 current bytes were retained privately; main60658B/SHA
+`a098c087c14507c154a4740d0145f7af1c448ec24905f4c8b66e82869d917d86`
+is the previously restored identity. No source/strategy acceptance follows.
+Plan`a05e40c828f8eadb32a583e1562ff3ef266ae7975d8a53149d4c7d8587be45b3`;
+receipt8072B/`03d0f6ab75b9279e098402e4e733df75c2661c95a88ddbd15ef6233486516edb`.
+Read1archive268675B/`c0006f951b37c4792edfc2c633d1add587baf48795984a91d7f01cee53bfb16a`;
+read2archive268675B/`128dfdd58dc54d7ad2d7f29601ee13714e655a51a6e379a88cc770d27def7e30`.
+Producer's hardcoded historicalOFF3 remains historical, not a reset or proof
+that today's displayed platform build was absent. No backtest was requested.
+The scoped controller completed and released its own lock.
+
+Genuine built-in MiaCAP001 was deliberately sent once, in one new own chat.
+The initial AX input paste did not populate a draft; a fresh screenshot and
+coordinate focus populated the nonce beforeSend. No duplicateSend occurred.
+Its task header is projectsourceinventorycheck - Completed; Stopdisabled.
+Mia reports no tools invoked for this capability-only question. It exposes
+read_open_project/read_file and jupyter_read_notebook/read_cell;
+jupyter_create_cell appends to the default agent notebook and
+jupyter_execute_cell(index) executes one cell. Its jupyter_create_notebook
+REPLACES the default and has no path parameter; it cannot safely establish
+a fresh unique notebook path. It reports a prior research provisioning
+NotFound, which is historical until a fresh scoped invocation proves today.
+The reported projectID is expressly caller-provided, not newly verified by
+a native read; invocation binding is procedural, not cryptographic proof.
+No ObjectStore/native witness, notebook, source edit or job occurred by this
+metadata question. CAP001 is closed; no spent identity is reopened.
+
+TPR-CMP104-D005: use a unique NEW owned diagnostic cell via append-only
+creation if necessary, preserve every pre-existing notebook/cell byte, then
+independently capture its saved source and actual creation/index metadata
+BEFORE a separately scoped one-cell execution. Do not invoke the tool that
+replaces a default notebook. This is a new safe route under delegated owner
+judgment, not revival of an October22 notebook scope. Exact source-bound
+program, real qb.project_id, UTC/monotonic/store-reference guards and bounded
+safe classifications are prerequisites; no fake adapter flag is enabled.
+A diagnostic projection may expose safe refusal/classification predicates,
+not raw licensed rows or assumed unit/date evidence.
+
+### 104.4 Pure policy and native-cell software foundation
+
+Comparison policy/source/tests are new, candidate-only and preserve every old
+freeze/module. Root's focused selection of comparison and fresh-cell controls
+produced124passed in1.22s with isolated runtime roots, network denied, before
+any cell creation/execution. Comparison owner independently86passed0.67s;
+read-only Codex auditor86passed0.46s. Native builder owner140passed1.18s
+(new38 plus existingreader102), with parse/compile in memory. These prove
+software only, not native source/unit, history or performance acceptance.
+No full lane/repository suite, operator stop/database, paid upgrade or real
+trading effect. Current root routing is amended for this later owner release;
+section103's historic wait and scope table remain bounded to section103.
+
+Native append-cell builder SHA-256
+`1b0a4c6cd575a7316043f4107884e672d6ea53f545198faf690b6ff83af6aea9`,
+12308B; tests11858B/`ad2c622ce000c6ca82d73eea2fb3903fb1105e7c99a56de34d7b1f596a83f3b1`.
+Comparison source19770B/`cb507762dded3340acb7dd69b8086045ae819e0398eea1943444acb496e0e161`;
+policy4816B/`df4c89601ba5a45a17c79d6386fff1ac202ef0689c4e592a8b1f9aba32ada80c`;
+tests20700B/`3252371b4ada3d2442b3f3381621c5d61b173f0a1e2e4eff5831e318a5a13f0c`.
+The cell builder embeds the exact committed native-reader program, one actual
+QuantBook, intrinsic UTC/monotonic/qb.project_id/store-reference guards,
+tracked attempts and two exact witness keys. Full safe classifications are
+retained; raw market values/SIDs/clocks are withheld. Python-level output
+buffers do not prove a native SDK hard timeout or pre-allocation byte bound.
+All custody, economic and OFF acceptance flags stay false.

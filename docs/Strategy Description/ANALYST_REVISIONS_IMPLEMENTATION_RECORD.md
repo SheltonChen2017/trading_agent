@@ -2344,8 +2344,14 @@ source guard requires the resolver literal in every outbound profile
 withheld from the current text. The statement below that the current path
 preserves W5 quote economics is superseded for this one bound. Every W5
 profile hash changes, so the batch must be regenerated before any launch.
-The 329.10 resource hold still controls. The immediate next step is that
-Codex counter-reviews section 330 and its three commits.
+The 329.10 resource hold still controls. Section 331 counter-reviews the exact
+three-commit section330 push, corrects the redaction-test fingerprints and
+source-guard/documentation limitations, and retains the owner-approved W5
+cash bound. No QC/Safari action, source re-freeze or next milestone follows
+from this offline counter-review.
+Under the standing scoped research-recovery direction, the owner explicitly
+waives Claude review of section 331; this is not independent acceptance of
+the corrections and does not release the QC/Safari hold.
 
 Section 328 is Claude's independent review of `3c905d42..0d38c59d`, the
 seventy-four Codex commits of sections 323 (Mac recovery) and 324–327.
@@ -4334,6 +4340,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-28 | Claude independent review of the seventy-four Codex commits `3c905d42..0d38c59d` (sections 323 Mac, 324–327), excluding Claude's four R323 commits | `0d38c59d` -> `41295615` (correction) -> this record commit | All seventy-four accepted, `bfe79eef` after correction; section 328 | W5 and R298 result parsers accept an absent QC `errors` key; letter and special-character CUSIP/ISIN/FIGI checksum vectors added; DNS-profile, QC permission-action and buy-sizing risks documented | 152 range test files 9,095 passed / 20 failed (ARV2CR325-002 stale pin) / 10 harness errors; 349 affected passed; 5/5 mutations caught; 86 record gates; no full suite, no QC/Safari/provider access; 0 looks, 337/259/53/699 unchanged | 0 P0, 1 P1 corrected, 3 P2 documented, 10 P3 (one corrected) | Codex counter-reviews section 328; QC/Safari hold stays |
 | 2026-10-28 | Codex section328 counter-review, owner-released coverage preparation, then newly held offline checkpoint | `287952427b0e847d5f47261fc5d97c2057a04d17` -> this final handoff commit (five recorded predecessors through `02679fc7`, SIX total) | Accept incoming two-commit review after qualifications; prepare exact native dated coverage and bounded verification/result mechanisms | A first target passed once and is spent; four public QC code files installed before the new hold; two downloads retained with collision qualification; B/C/D remain uninvoked; no explicit compile/backtest | Root final250distinct focused passes7.96s plus four in-memory compilation checks/import absence; earlier counts and failures remain qualified in329; no full suite;337/259/53/699 unchanged | I329-001/002 P2 and I329-003 P3 corrected before use; existing price/actual-holdings/buy-sizing/source/PIT gates remain; no independent acceptance | ONE nonforce matching-lane push; then retain the new QC/Safari resource hold. Approved Ask-download preference awaits release. Fresh exact source verification, run/result freezes and genuine gates precede any coverage job or six/eight strategy submission |
 | 2026-10-28 | Claude owner-directed corrections of the section-328 findings | `f23ca94c` -> `8381e0cb` (W5 cash bound) -> `6c7c80a9` (pin closures, resolver guard) -> this record commit | Section 330; all fourteen findings dispositioned; `-003` erratum (the owner quote exists in 312.6) | W5 cash-limited buys sized on max(ask, engine price) by owner override of 329.2; twenty spent-caller pin closures restored through the post-merge manifest; resolver-literal guard; five reversible fingerprints and the owner's display name withheld | 29 focused files 1,986 passed; native channels 10 passed under their harness; 2 redaction tests; 2/2 mutations caught; 86 record gates; no full suite, no QC/Safari/provider access; 0 looks, 337/259/53/699 unchanged | `-004`, `-006`, `-007`, `-009` corrected; `-002` corrected forward; `-011` transport size and `-012` open; new P3 `ARV2R330-001` | Codex counter-reviews section 330; the 329.10 resource hold stays |
+| 2026-10-28 | Codex section330 counter-review under QC/Safari hold | `b065e98c664aecffe795f51bbe6a1045468be047` -> `619425b0591ce7ac37396acf9150bd88d43809e2` -> this final handoff commit; TWO total | All three incoming commits accepted after scoped corrections; all fourteen earlier findings and new330 observation dispositioned in331 | Removed residual low-entropy test fingerprints; corrected resolver guard and declared W5 source delta; retained owner-approved cash bound and all historical pins/spent controls | Focused final validation and exact overlaps/failures in331.4–5; four in-memory compilations and source/profile pins verified; no full suite or private/operational replay;337/259/53/699 unchanged | One P2 and three P3 corrected in current tree; source/price/transport/formal gates stay open; history privacy not retroactively repaired | ONE nonforce matching-lane final push; retain QC/Safari hold, no new milestone or launch. Resource release and separate source/run gates precede continuation |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -70753,8 +70760,10 @@ Claude asked before changing anything:
 records the owner's waiver of Claude review of section 329, and this round
 only corrects section-328 findings.
 
-**Scope.** Every change is in this lane's code, tests and record. No QC,
-Safari, provider, credential or artifact access occurred. The owner's
+**Scope.** Every change is in this lane's code, tests and record. Claude
+reported no QC, Safari, provider, credential or artifact-byte access. The
+artifact metadata census reported in330.7 is metadata access; section331
+corrects the earlier unqualified no-artifact-access statement. The owner's
 resource hold of 329.10 still controls.
 
 This round adds three commits:
@@ -70932,10 +70941,13 @@ Section 323.25 now names the owner by role.
 
 New `tests/analyst_revisions_v2/test_r330_record_redactions.py` (1617 B,
 `d706b786867129ca95409dbbbb360b8e88dad582d4646ce7626d98ca8d2f2803`) stores
-only SHA-256 digests of the withheld 64-hex strings, which cannot be
-reversed. Both of its tests failed against the pre-redaction record. Git
-history still holds the old text; no history is rewritten, and no force push
-is made.
+SHA-256 digests of the withheld 64-hex strings in the original330 snapshot.
+Section331 corrects the claim that these could not be recovered: a second
+unsalted hash does not add entropy to the underlying small candidate space.
+The current test instead checks redaction structure without any such digest
+inventory. Both original tests were reported to fail against the pre-redaction
+record. Git history still holds the old text and test; no history is rewritten,
+and no force push is made.
 
 **New observation `ARV2R330-001`** (P3, documented, unchanged). Section 4R
 names a reviewing session by its work e-mail address. This is deliberate
@@ -70967,6 +70979,9 @@ The owner directed that the complete lane suite not be run; it was not.
 Artifacts metadata census by `stat` only, sorted: 9,029 entries before
 and after the final runs, identical in name, inode, size, mtime, ctime, mode
 and link count.
+Section331 qualification: this is Claude-reported endpoint metadata evidence,
+not continuous integrity or no-access proof. Codex did not repeat the census,
+inspect those private paths or validate the reported equality independently.
 
 ### 330.8 Handoff
 
@@ -70980,3 +70995,155 @@ projection, because every W5 profile and cell hash changed (330.3).
 
 The immediate next step is that Codex counter-reviews section 330 and its
 three commits.
+
+## 331. Codex counter-review of section330; resource hold retained, 2026-10-28
+
+### 331.1 Scope, exact incoming range and per-commit dispositions
+
+Owner instruction: "counter review claude's changes". The latest resource
+direction remains "do not access qc yet another lane is using it". This is an
+offline counter-review and correction round only, not release of that hold,
+new source verification, next milestone or launch authority. The standing
+single final matching-lane push remains applicable. No browser, QC endpoint,
+provider, credential, private artifact/control or historical operational reader
+was accessed. No old attempt, claim or result was replayed.
+
+Designated root remains /Users/sheltonchen/Code/trading_agent__analyst_revisions_v2,
+branch codex/strategy-analyst-revisions-v2. Entry worktree was clean; local,
+tracking and live matching remote all equalled
+b065e98c664aecffe795f51bbe6a1045468be047. Matching-branch-only fetch confirmed
+that exact completed330 handoff. No merge, reset, rebase, checkout, other-lane
+inspection or worktree was needed. Exact incoming range is
+f23ca94cbccd7078fd181968ab11746598d87224..
+b065e98c664aecffe795f51bbe6a1045468be047, exactly THREE commits:
+
+| Commit | Disposition | Scope and reason |
+|---|---|---|
+|8381e0cb3e7d3cdef905893edade52e9f424c28d|Accepted after correction|The owner override recorded in330.1 is implemented by the exact reversible buy-cash-bound statement. CR331-003 corrects the stale source-delta declaration; no further economics change.|
+|6c7c80a9e0ed41a5d875311b3729ed6523f0abf5|Accepted after correction|All twenty closure assertions use the exact two approved path/old-pin replacements. CR331-002 corrects the new resolver test's lexical blind spots; production policies and historical pins stay unchanged.|
+|b065e98c664aecffe795f51bbe6a1045468be047|Accepted after correction|Every330 finding disposition reviewed; CR331-001 removes the test's remaining low-entropy fingerprint inventory, and CR331-004 qualifies the artifact-access/census record. Original redacted text stays redacted.|
+
+Same-round agents provided static review and focused checks, not independent
+final acceptance of Codex's corrections. The six section329 commits were
+explicitly excluded from Claude330's independent review; no acceptance of
+that snapshot is inferred. The resource hold blocks the next operational step.
+
+### 331.2 Findings and corrections retained
+
+No new P0 or P1. One P2 and three P3 findings were confirmed and corrected:
+
+| ID | Priority/status | Incoming commit/location | Evidence and reason | Correction and verification |
+|---|---|---|---|---|
+|CR331-001|P2 confirmed; corrected in current tree|b065e98c, test_r330_record_redactions.py and330.6|SHA256 of a SHA256 of a low-entropy value still permits dictionary comparison; the second unsalted hash does not add entropy. Calling it unrecoverable was false and the fingerprint inventory defeated the privacy purpose.|Remove all five second-order fingerprints and hashing imports. Check only the three public replacement passages; synthetic prepend/append/replace cases refuse with finite errors. A source guard rejects fingerprint literals/hashing imports. No actual withheld value was enumerated, recovered or printed. History is not rewritten; this is not a whole-record privacy guarantee.|
+|CR331-002|P3 confirmed; corrected|6c7c80a9, test_r330_resolver_profile_guard.py|Exact substring matching missed whitespace-equivalent clauses, rechecking f-string fragments caused false refusal, and a comment or separate clause could falsely supply the resolver text.|Tokenize bounded source templates, inspect each recognized require-all clause, preserve quoted tokens/comments as opaque, and inspect a f-string once. Synthetic regressions cover the distinct failures; six exact-byte historical exemptions remain. No dynamic Python assembly, full policy semantics or runtime DNS guarantee is claimed.|
+|CR331-003|P3 confirmed; corrected|8381e0cb, W5 projector docstring/profile_record.source_delta|The top description and source_delta still claimed only period/start changes after the explicit cash-bound addition, contradicting the declared source contract.|Describe the declared buy bound in both places and assert the profile declaration. Generated cash behavior remains Claude's exact statement. Add invalid/nonfinite/bool/absent-engine-price and sell-only regression coverage; no extra pricing or execution rule.|
+|CR331-004|P3 confirmed; documentary correction|b065e98c,330.1/330.7|The no-artifact-access assertion conflicts with the reported stat census of9029 entries; endpoint equality cannot prove continuous integrity or no effects.|Record Claude-reported metadata access and preserve its reported counts/fields. Codex did not repeat that census or independently verify the private observations. No private byte/corpus access is needed for this correction.|
+
+The broader search inspected the exact incoming test changes and public
+source dependencies. No operational remapping was introduced by the test-only
+post-merge helper. Its fixed pair lookup is not historical source success,
+permission to run a spent caller or automatic refresh from disk. No current
+R329 A/B/C/D dependency pin includes the changed W5 projector; the coverage
+projection and its selected sources are unaffected. All future W5 generated
+profiles/Main/cell/batch bindings must nevertheless be regenerated from the
+corrected projector before a separate operational freeze. No such freeze or
+actual project binding was created here.
+
+### 331.3 Finding-by-finding counter-review of330.2
+
+| Original finding | Codex disposition at this checkpoint |
+|---|---|
+|ARV2R328-001|Retain earlier absent-errors correction and P2 qualification; no old response reader replay.|
+|ARV2R328-002|Partially correct historical causal claim; resolver literal is a scoped source requirement, not proof of AD/AF causes. Accept forward guard after CR331-002.|
+|ARV2R328-003|Accept330's erratum and recorded owner confirmation; prior claim of no explicit Mia-removal authority was false. That historical exception does not replace current sole-owner checks or release the hold.|
+|ARV2R328-004|Accept recorded explicit owner override of329.2: max(ask, positive finite engine price) bounds cash-limited buys. Synthetic inequalities/AST checks are not cloud LEAN acceptance or proof of an earlier failure cause.|
+|ARV2R328-005|Retain checksum-vector correction; no new source identity admission.|
+|ARV2R328-006|Original text redaction accepted; its double-hash test inventory was still problematic and is removed by CR331-001.|
+|ARV2R328-007|Twenty exact current-tree closure mappings accepted; historical failure results and operational original pins remain. Claude's separate ten native-channel passes are reported evidence, not rerun or added to Codex totals.|
+|ARV2R328-008|Accept documentary supersession by later owner monitor direction; no automation read/write or new monitor this round.|
+|ARV2R328-009|Accept role-only replacement in the named passage and strengthened scoped regression; no claim that all repository history contains no identifying data.|
+|ARV2R328-010|Retain prior AP-binding correction and unreproducible old hash-only-outer limitation; no claim of retrospectively reconstructing those programs.|
+|ARV2R328-011|Retain8768-byte worst-case META vs8002-byte observed transport limitation and callback-cache tests. Offline tests cannot settle cloud transport sufficiency.|
+|ARV2R328-012|OPEN source/split-admission requirement. No EOD capture, split check or new price admission attempted.|
+|ARV2R328-013|Retain prior naming/accounting erratum; no new booking.|
+|ARV2R328-014|Retain scoped D TLS-context/source qualification and old frozen/spent limitations; no operation or security-policy relaxation.|
+|ARV2R330-001|Retain documented reviewer-email provenance issue outside this correction scope; no new identifiers or history rewrite.|
+
+### 331.4 Exact corrected public pins and validation
+
+The corrected W5 projector is35293bytes SHA256
+3030d0fbeabbf9b0c7f3310a19de8791d9e4c1b79991f088f5542681222bd969;
+its public profile is4833bytes/bd6327e38b1ce449e63d9dbc53d2e7430aa70c7bc16ff7ba37b1c3aafc952549.
+The synthetic project123 batch is31197bytes/f46c0148b8e05fa74ac5367a81f0ddac4ca63d72900df780d02e41dd70349c65,
+not an actual cloud input or run binding. Generated W5 base remains Claude's
+57307bytes/ab12bb5124cb78f567a47fc4da5646d119accae1100745f7d7172efe5ce3203e.
+Original330 pins remain historical; none is silently replaced operationally.
+
+| Corrected test | Bytes | SHA256 |
+|---|---:|---|
+|test_r330_w5_cash_bound.py|5010|389d0b391456fa3a21f1c93bc4261d78879302f8636c29e335fe3ca6f0591df0|
+|test_r330_resolver_profile_guard.py|7032|f13658adace3c02e8c9c159dee8e5ac853ad51cd856e52fdf29ba6d737d8fb7a|
+|test_r330_record_redactions.py|4374|16498b245292de16317f73952d0820a98a6e79ef023c1f023ad1659072d49cda|
+
+Focused author evidence: cash/projection/runtime-limit72passes23.43s (initial
+11passes7.92s overlap); one documentary omission mutation caught/restored;
+redaction16passes0.09s (earlier16passes0.08s overlap), original fingerprint
+inventory rejected by a finite-count expected-red source check; original
+twenty closure/helper/guard25passes9.20s, corrected guard/helper13passes8.62s
+overlap. Five resolver regression cases failed as expected0.07s; a later
+three-case red run0.08s contained two valid regressions and one malformed
+quoted fixture. The fixture was corrected and is only supporting coverage,
+not a third valid red proof. Four edited source/test memory compilations and
+diff checks passed across these checks. No full suite or operational path ran.
+
+All execution used native all-network/production-artifact/both-Keychain denial
+and denied /usr/bin/security, with in-root temp/cache paths, stripped synthetic
+environment, disabled plugin autoload, --noconftest, --ignore=artifacts, -B and
+no cacheprovider. No shared conftest or dispatch_fence support path is allowed.
+Network denial is not physical-request accounting. Final root validation is
+recorded in the final handoff below; overlapping results are not additive.
+
+### 331.5 Held handoff and single-push scope
+
+Root focused run:211passed/two document-navigation failures39.44s on
+Python3.13.15. All127 selected code checks passed:19cash-bound,48projection,
+5runtime-limit,11resolver-guard,2post-merge-helper,16redaction,20exact caller
+closure nodes,3R329 public projection/import/immutability nodes and3W5 family
+result-binding nodes. The other84passes were document checks. The two failed
+checks correctly required the latest numbered section and its explicit review
+status in live navigation; the record now names section331 and the existing
+scoped waiver without lifting the resource hold. No test was weakened.
+Four source/test files compiled in memory and the corrected source/profile
+pins above matched. The final document-only check below validates this
+documentary correction; its passing overlap is not added twice.
+Final document-only confirmation passed86tests1.15s, exit0. The union is
+213distinct passing focused checks (127unchanged-code checks plus86final
+document checks), not a second all213 run and not211+86. No failures/skips/
+warnings remain in those final relevant selections. The original two draft
+navigation failures remain recorded above. Root compilation/source-profile
+verification exited0 on all four edited files; no import of dispatch_fence.
+
+This round accepts the three incoming commits after the above corrections.
+Correction commit619425b0591ce7ac37396acf9150bd88d43809e2 contains only the
+four code/test files. The outgoing rangeb065e98c664aecffe795f51bbe6a1045468be047..
+this final handoff commit contains exactly TWO commits: that correction and
+this lane-record handoff. Both are accepted as bounded Codex corrections;
+independent acceptance is not claimed. Corrected implementation assessment:
+8/10 for this offline scope, with static-template/privacy-scope limitations
+explicit and cloud behavior still unverified.
+It does not certify the strategy as backtest-ready or establish market edge.
+QC/Safari remain held; approved Ask-for-each-download preference is still
+pending resource release. No capacity/project/file/result request, source
+install, compile, job or account action occurred. No source package, old
+control, native book or selected result was opened. Booked floor remains
+337shared/259development/53infrastructure/699cells; no shared-ledger change.
+
+Commit the corrections and lane handoff locally, then make exactly ONE
+nonforce matching-lane push after rechecking root/branch/HEAD/status and live
+remoteb065e98c. Recheck local/tracking/live equality and clean status after
+success. No side branch, next milestone or automatic resource retry follows.
+After an explicit release, the next operational step remains separately
+frozen source verification, then a bounded coverage diagnostic and actual
+result handling under all source/price/identity/rights/attempt gates. All
+historical refusals, spent attempts and false PIT/master/readiness/paper/live
+flags remain. No live, paper, broker, funded or real-order authority exists.

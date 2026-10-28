@@ -78,8 +78,13 @@ class MultiSessionTests(unittest.TestCase):
         self.assertTrue(all(row["quantity"] == 0 for row in spy["positions"]))
         self.assertEqual(stock["receivables"], [])
         self.assertEqual(spy["receivables"], [])
-        self.assertTrue(result["comparison_parity_blocked"])
-        self.assertIn("comparator_budget_mismatch_beyond_rounding", [row["reason"] for row in result["permanent_parity_blockers"]])
+        self.assertFalse(result["comparison_parity_blocked"])
+        self.assertEqual(result["permanent_parity_blockers"], [])
+        reconciliation = spy["positions"][0]["entry_budget_reconciliation"]
+        self.assertEqual(Decimal(reconciliation["admission_rounding_cash"]), Decimal("29.1900"))
+        self.assertEqual(Decimal(reconciliation["released_price_reserve"]), Decimal("46.3220"))
+        self.assertEqual(Decimal(reconciliation["actual_cash_residual"]), Decimal("75.5120"))
+        self.assertTrue(reconciliation["within_rounding"])
         for fill in stock["fills"] + spy["fills"]:
             self.assertGreater(fill["quote_sip_ns"], instant_ns(datetime.fromisoformat(
                 next(order["submitted_at"] for order in stock["orders"] + spy["orders"] if order["order_id"] == fill["order_id"]).replace("Z", "+00:00"))))
@@ -229,7 +234,7 @@ class MultiSessionTests(unittest.TestCase):
             context.prec = 2
             self.assertEqual(canonical_bytes(run_replay(**data)), expected)
 
-    def test_separate_positive_parity_fixture_does_not_erase_53_price_blocker(self):
+    def test_separate_positive_parity_fixture_keeps_its_original_execution(self):
         data = inputs()
         batches = []
         for batch in data["market_batches"]:
@@ -1309,6 +1314,202 @@ class EdgePinTests(unittest.TestCase):
         self.assertEqual([row["quantity"] for row in result["strategy"]["fills"]], [509])
         self.assertEqual([row["quantity"] for row in result["comparator"]["fills"]], [30])
         self.assertEqual(result["permanent_parity_blockers"], [])
+
+
+class BudgetReconciliationTests(unittest.TestCase):
+    def test_fixed_base_and_stress_keep_exact_orders_fills_cash_and_idle_reserves(self):
+        expected = {
+            "base": ("4954.9500", "53.0265", "99993.1240", "29.1900", "46.3220", "75.5120"),
+            "stress": ("4959.9000", "53.0795", "99981.3720", "33.1400", "41.4460", "74.5860"),
+        }
+        for mode, values in expected.items():
+            with self.subTest(mode=mode):
+                result = run_replay(**inputs(), mode=mode)
+                budget, price, cash, rounding, released, residual = map(Decimal, values)
+                comparator = result["comparator"]
+                self.assertTrue(result["complete_software_replay"])
+                self.assertFalse(result["comparison_parity_blocked"])
+                self.assertEqual(result["permanent_parity_blockers"], [])
+                self.assertEqual([row["quantity"] for row in comparator["orders"]], [92, 92])
+                self.assertEqual([row["quantity"] for row in comparator["fills"]], [92, 92])
+                self.assertEqual([row["side"] for row in comparator["fills"]], ["buy", "sell"])
+                self.assertEqual(Decimal(comparator["fills"][0]["price"]), price)
+                self.assertEqual(comparator["fills"][0]["at"], "2025-04-04T14:02:00Z")
+                self.assertEqual(comparator["fills"][1]["at"], "2025-05-05T14:02:00Z")
+                self.assertEqual(Decimal(comparator["settled_cash"]), cash)
+                tranche = comparator["positions"][0]
+                proof = tranche["entry_budget_reconciliation"]
+                self.assertEqual(Decimal(tranche["source_budget"]), budget)
+                self.assertEqual(proof["order_id"], comparator["orders"][0]["order_id"])
+                self.assertEqual(Decimal(proof["limit_price"]), Decimal("53.53"))
+                self.assertEqual(proof["filled_quantity"], 92)
+                self.assertEqual(Decimal(proof["admission_rounding_cash"]), rounding)
+                self.assertEqual(Decimal(proof["released_price_reserve"]), released)
+                self.assertEqual(Decimal(proof["actual_cash_residual"]), residual)
+                self.assertEqual(rounding + released, residual)
+                self.assertEqual(Decimal(proof["committed_limit_cost"]) + rounding, budget)
+                self.assertGreater(residual, price)
+                self.assertLess(rounding, Decimal(proof["next_share_limit_cost"]))
+                self.assertTrue(proof["within_rounding"])
+                for field in ("backtest_ready", "native_execution_verified", "empirical_evaluation_allowed",
+                              "qc_access_allowed", "real_orders_allowed"):
+                    self.assertIs(result[field], False)
+
+    @staticmethod
+    def undersized_order(original):
+        def submit(replay, sleeve, security, side, quantity, at, adv20, **kwargs):
+            # Resubmit a genuinely smaller whole-share order through the real
+            # reservation function; do not corrupt its cash or remaining fields.
+            if sleeve == "comparator" and side == "buy":
+                quantity -= 1
+            return original(replay, sleeve, security, side, quantity, at, adv20, **kwargs)
+        return submit
+
+    def test_one_share_underallocation_still_blocks_with_coherent_reservations(self):
+        original = MultiSessionReplay._order
+        with patch.object(MultiSessionReplay, "_order", self.undersized_order(original)):
+            result = run_replay(**inputs(count=1))
+        comparator = result["comparator"]
+        self.assertEqual(comparator["orders"][0]["quantity"], 91)
+        self.assertEqual(comparator["orders"][0]["filled_quantity"], 91)
+        self.assertEqual(Decimal(comparator["orders"][0]["reserved_notional"]), 0)
+        proof = comparator["positions"][0]["entry_budget_reconciliation"]
+        self.assertGreater(Decimal(proof["admission_rounding_cash"]), Decimal(proof["next_share_limit_cost"]))
+        self.assertFalse(proof["within_rounding"])
+        self.assertIn("comparator_budget_mismatch_beyond_rounding", reasons(result["permanent_parity_blockers"]))
+        self.assertTrue(result["comparison_parity_blocked"])
+
+    def test_limit_commitment_cannot_exceed_source_budget_despite_price_improvement(self):
+        original = MultiSessionReplay._order
+        def oversized(replay, sleeve, security, side, quantity, at, adv20, **kwargs):
+            if sleeve == "comparator" and side == "buy":
+                quantity += 1
+            return original(replay, sleeve, security, side, quantity, at, adv20, **kwargs)
+        with patch.object(MultiSessionReplay, "_order", oversized):
+            result = run_replay(**inputs(count=1))
+        tranche = result["comparator"]["positions"][0]
+        proof = tranche["entry_budget_reconciliation"]
+        self.assertEqual(proof["filled_quantity"], 93)
+        # The full cash sleeve funds it and the eventual fill costs less than
+        # the source budget, but the original limit commitment exceeded it.
+        self.assertGreater(Decimal(proof["actual_cash_residual"]), 0)
+        self.assertLess(Decimal(proof["admission_rounding_cash"]), 0)
+        self.assertFalse(proof["within_rounding"])
+        self.assertIn("comparator_budget_mismatch_beyond_rounding", reasons(result["permanent_parity_blockers"]))
+
+    def test_exact_next_share_cost_is_underallocation_not_rounding(self):
+        data = inputs(count=1, volume=60000)
+        reprice(data, "stock", "9.72")
+        reprice(data, "benchmark", "163.4158")
+        admitted = run_replay(**data)["comparator"]["positions"][0]["entry_budget_reconciliation"]
+        self.assertEqual(admitted["filled_quantity"], 30)
+        self.assertEqual(Decimal(admitted["admission_rounding_cash"]), 0)
+        self.assertTrue(admitted["within_rounding"])
+        original = MultiSessionReplay._order
+        with patch.object(MultiSessionReplay, "_order", self.undersized_order(original)):
+            result = run_replay(**data)
+        proof = result["comparator"]["positions"][0]["entry_budget_reconciliation"]
+        self.assertEqual(proof["filled_quantity"], 29)
+        self.assertEqual(Decimal(proof["admission_rounding_cash"]), Decimal(proof["next_share_limit_cost"]))
+        self.assertFalse(proof["within_rounding"])
+        self.assertIn("comparator_budget_mismatch_beyond_rounding", reasons(result["permanent_parity_blockers"]))
+
+    def test_next_share_cost_uses_the_commission_floor_crossover(self):
+        for mode, price, quantity, fee, increment in (
+                ("base", "24.6", 199, "1", "0"),
+                ("base", "24.5", 200, "1", "0.005"),
+                ("stress", "12.3", 399, "2", "0"),
+                ("stress", "12.25", 400, "2", "0.005")):
+            with self.subTest(mode=mode, quantity=quantity):
+                data = inputs(count=1)
+                reprice(data, "benchmark", price)
+                result = run_replay(**data, mode=mode)
+                proof = result["comparator"]["positions"][0]["entry_budget_reconciliation"]
+                self.assertEqual(proof["filled_quantity"], quantity)
+                self.assertEqual(Decimal(proof["cumulative_fee"]), Decimal(fee))
+                self.assertEqual(Decimal(proof["next_share_limit_cost"]) - Decimal(proof["limit_price"]), Decimal(increment))
+                self.assertTrue(proof["within_rounding"])
+                self.assertEqual(result["permanent_parity_blockers"], [])
+
+    def test_favorable_execution_releases_reserve_without_resizing_or_top_up(self):
+        data = inputs(count=1)
+        def cheaper(batch, raw):
+            if batch.role == "benchmark":
+                for quote in raw["quotes"][2:]:
+                    quote.update(bid_price="40", ask_price="40")
+        edit_batches(data, cheaper)
+        result = run_replay(**data)
+        comparator = result["comparator"]
+        proof = comparator["positions"][0]["entry_budget_reconciliation"]
+        self.assertEqual(len(comparator["orders"]), 1)
+        self.assertEqual(comparator["orders"][0]["quantity"], 92)
+        self.assertEqual([row["quantity"] for row in comparator["fills"]], [92])
+        self.assertEqual(Decimal(proof["admission_rounding_cash"]), Decimal("29.1900"))
+        self.assertEqual(Decimal(proof["released_price_reserve"]), Decimal("1242.9200"))
+        self.assertEqual(Decimal(proof["actual_cash_residual"]), Decimal("1272.1100"))
+        self.assertTrue(proof["within_rounding"])
+        self.assertEqual(result["permanent_parity_blockers"], [])
+
+    def test_above_limit_comparator_has_no_fill_or_completed_budget_proof(self):
+        data = inputs(count=1)
+        def more_expensive(batch, raw):
+            if batch.role == "benchmark":
+                for quote in raw["quotes"][2:]:
+                    quote.update(bid_price="55", ask_price="55")
+        edit_batches(data, more_expensive)
+        result = run_replay(**data)
+        self.assertEqual(result["comparator"]["fills"], [])
+        self.assertIsNone(result["comparator"]["positions"][0]["entry_budget_reconciliation"])
+        self.assertEqual(result["comparator"]["orders"][0]["status"], "cancelled")
+        self.assertIn("comparator_unfilled_remainder_at_close", reasons(result["permanent_parity_blockers"]))
+        self.assertTrue(result["comparison_parity_blocked"])
+
+    def test_partial_comparator_execution_keeps_one_fee_and_its_mismatch(self):
+        for mode, fee in (("base", "1"), ("stress", "2")):
+            with self.subTest(mode=mode):
+                data = inputs(count=1)
+                edit_batches(data, lambda batch, raw: [minute.update(v=3000) for minute in raw["minutes"]]
+                             if batch.role == "benchmark" else None)
+                result = run_replay(**data, mode=mode)
+                fills = result["comparator"]["fills"]
+                self.assertEqual([row["quantity"] for row in fills], [30, 30, 30, 2])
+                self.assertEqual(sum(Decimal(row["fee"]) for row in fills), Decimal(fee))
+                proof = result["comparator"]["positions"][0]["entry_budget_reconciliation"]
+                self.assertEqual(proof["filled_quantity"], 92)
+                self.assertEqual(Decimal(proof["cumulative_fee"]), Decimal(fee))
+                self.assertTrue(proof["within_rounding"])
+                self.assertIn("comparator_partial_or_unmatched_execution", reasons(result["permanent_parity_blockers"]))
+                self.assertTrue(result["comparison_parity_blocked"])
+
+    def test_funding_and_zero_share_refusals_are_not_certified_by_rounding(self):
+        replay = MultiSessionReplay(**inputs(count=1))
+        replay._state["cash"]["comparator"] = Decimal("2500")
+        result = replay.run()
+        self.assertIn("comparator_funding_mismatch", reasons(result["permanent_parity_blockers"]))
+        proof = result["comparator"]["positions"][0]["entry_budget_reconciliation"]
+        self.assertFalse(proof["within_rounding"])
+        self.assertIn("comparator_budget_mismatch_beyond_rounding", reasons(result["permanent_parity_blockers"]))
+        data = inputs(count=1)
+        reprice(data, "benchmark", "10000")
+        result = run_replay(**data)
+        self.assertEqual(result["comparator"]["orders"], [])
+        self.assertIsNone(result["comparator"]["positions"][0]["entry_budget_reconciliation"])
+        self.assertIn("comparator_rounded_to_zero", reasons(result["permanent_parity_blockers"]))
+        self.assertTrue(result["comparison_parity_blocked"])
+
+    def test_completed_admission_audit_stays_fixed_after_a_spy_split(self):
+        data = inputs(count=2)
+        replay = MultiSessionReplay(**data, actions=(action(data, "split", security="INVENTED-SPY", ratio="2"),))
+        replay.step_session(replay.days[0])
+        before = replay.snapshot()["comparator"]["positions"][0]
+        replay.step_session(replay.days[1])
+        after = replay.snapshot()["comparator"]["positions"][0]
+        self.assertEqual(before["quantity"], 92)
+        self.assertEqual(after["quantity"], 184)
+        self.assertEqual(before["entry_budget_reconciliation"], after["entry_budget_reconciliation"])
+        self.assertEqual(before["source_budget"], after["source_budget"])
+        self.assertEqual(before["entry_spent"], after["entry_spent"])
+        self.assertTrue(after["entry_budget_reconciliation"]["within_rounding"])
 
 
 if __name__ == "__main__":

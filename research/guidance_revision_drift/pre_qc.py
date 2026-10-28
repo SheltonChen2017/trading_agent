@@ -185,20 +185,19 @@ def build_handoff() -> dict:
     for mode, replay in replays.items():
         if (replay["complete_software_replay"] is not True or len(replay["daily_nav"]) != 23
                 or replay["native_execution_verified"] is not False
-                or replay["comparison_parity_blocked"] is not True
-                or {row["reason"] for row in replay["permanent_parity_blockers"]}
-                    != {"comparator_budget_mismatch_beyond_rounding"}
+                or replay["comparison_parity_blocked"] is not False
+                or replay["permanent_parity_blockers"]
                 or any(replay[sleeve]["receivables"] or
                     sum(row["quantity"] for row in replay[sleeve]["positions"])
                     for sleeve in ("strategy", "comparator"))):
-            raise InputError("invented multi-session cash or visible-parity rehearsal did not reproduce")
+            raise InputError("invented multi-session cash or budget-parity reconciliation did not reproduce")
     metadata = latest_observed_manifest()
     coverage = assess_coverage(candidate, metadata, expected_sha256=hash_bytes(metadata))
     raw_bundle = build_bundle()
     bundle = verify_bundle(raw_bundle, expected_sha256=hash_bytes(raw_bundle))
     if source_manifest_sha256() != before:
         raise InputError("source changed during offline handoff preparation")
-    report = {"schema": "gdr.pre-qc-handoff.v2", "status": "offline_replays_prepared_comparison_blocked",
+    report = {"schema": "gdr.pre-qc-handoff.v2", "status": "invented_replays_reconciled_external_gates_closed",
         "recipe": "INVENTED-RAW-GUIDANCE-TO-MULTI-SESSION-v2", "source_manifest_sha256": before,
         "candidate_sha256": candidate.sha256, "source_bundle_sha256": hash_bytes(raw_bundle),
         "source_bundle_bytes": len(raw_bundle), "source_bundle_members": len(bundle["manifest"]["members"]) + 1,
@@ -212,8 +211,8 @@ def build_handoff() -> dict:
         "remaining_before_QC": ["licensed_guidance_versions_and_withdrawals_and_time_semantics",
             "stock_and_SPY_NBBO_six_usable_common_years", "verified_dated_reference_calendar_and_actions",
             "dated_settlement_calendar_and_historical_fees_verified",
-            "proposed_terminal_SPY_policy_not_owner_frozen", "multi_session_comparator_parity_blocked",
-            "real_data_and_native_equity_adapter_validation", "exact_source_independent_review_deferred",
+            "proposed_terminal_SPY_policy_not_owner_frozen", "real_data_comparator_funding_timing_and_fill_parity_verified",
+            "real_data_and_native_equity_adapter_validation", "exact_source_independent_review_pending",
             "owner_research_scope_and_parameter_freeze", "explicit_QC_access_and_run_permission"],
         "orders_submitted": 0, "multi_session_software_implemented": True,
         "complete_comparison_verified": False, "native_adapter_implemented": False, "native_execution_verified": False,

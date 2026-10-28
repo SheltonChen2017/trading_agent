@@ -421,7 +421,7 @@ class MultiSessionReplay:
         key = fill["fill_id"]
         budget = add(mul(Decimal(fill["quantity"]), fill["price"]), fill["fee"])
         tranche = {"tranche_id": key, "source_security_id": fill["security_id"], "quantity": 0,
-                   "source_budget": budget, "entry_spent": ZERO}
+                   "source_budget": budget, "entry_spent": ZERO, "entry_budget_reconciliation": None}
         self._state["tranches"][key] = tranche
         try:
             if self.spy in self._state["terminal"] or self.spy in self._state["unresolved"]:
@@ -593,8 +593,23 @@ class MultiSessionReplay:
                     else:
                         self._source_exit(fill, held_before, at)
                 elif order["side"] == "buy" and not order["remaining"]:
+                    # Shares were fixed at submission against the limit and
+                    # cumulative fee, without a later price-improvement top-up.
+                    # Released execution protection is idle cash, distinct from
+                    # whole-share rounding at that original admission limit.
+                    committed = add(mul(Decimal(order["filled_quantity"]), order["limit"]), fee_total)
+                    rounding = sub(tranche["source_budget"], committed)
+                    released = sub(committed, tranche["entry_spent"])
                     residual = sub(tranche["source_budget"], tranche["entry_spent"])
-                    if residual >= add(price, sub(self.contract.commission(order["filled_quantity"] + 1, self.mode), fee_total)):
+                    next_share = add(order["limit"], sub(self.contract.commission(order["filled_quantity"] + 1, self.mode), fee_total))
+                    matched = ZERO <= rounding < next_share and released >= ZERO
+                    tranche["entry_budget_reconciliation"] = {
+                        "order_id": order["order_id"], "filled_quantity": order["filled_quantity"],
+                        "limit_price": order["limit"], "cumulative_fee": fee_total,
+                        "committed_limit_cost": committed, "admission_rounding_cash": rounding,
+                        "released_price_reserve": released, "actual_cash_residual": residual,
+                        "next_share_limit_cost": next_share, "within_rounding": matched}
+                    if not matched:
                         self._refuse("comparator_budget_mismatch_beyond_rounding", at, order["tranche_id"], parity=True)
 
     def _apply_action(self, value, at):

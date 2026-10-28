@@ -24,6 +24,7 @@ class PreQCHandoffTests(unittest.TestCase):
         self.assertEqual(canonical_bytes(build_handoff()), raw)
         self.assertEqual(report["source_bundle_members"], 61)
         self.assertEqual(report["schema"], "gdr.pre-qc-handoff.v2")
+        self.assertEqual(report["status"], "invented_replays_reconciled_external_gates_closed")
         self.assertEqual(set(report["plans"]), {"base", "stress"})
         for mode, plan in report["plans"].items():
             self.assertEqual(report["plan_sha256s"][mode], hash_bytes(canonical_bytes(plan)))
@@ -36,7 +37,9 @@ class PreQCHandoffTests(unittest.TestCase):
             self.assertIs(report[key], False)
         self.assertTrue(all(value is None for value in report["unresolved_original_decisions"].values()))
         self.assertIn("proposed_terminal_SPY_policy_not_owner_frozen", report["remaining_before_QC"])
-        self.assertIn("multi_session_comparator_parity_blocked", report["remaining_before_QC"])
+        self.assertNotIn("multi_session_comparator_parity_blocked", report["remaining_before_QC"])
+        self.assertIn("real_data_comparator_funding_timing_and_fill_parity_verified", report["remaining_before_QC"])
+        self.assertIn("exact_source_independent_review_pending", report["remaining_before_QC"])
         self.assertTrue(report["multi_session_software_implemented"])
         self.assertFalse(report["complete_comparison_verified"])
         self.assertEqual(report["coverage"]["as_of_date"], "2026-10-28")
@@ -44,9 +47,10 @@ class PreQCHandoffTests(unittest.TestCase):
             self.assertEqual(report["replay_sha256s"][mode], hash_bytes(canonical_bytes(replay)))
             self.assertTrue(replay["complete_software_replay"])
             self.assertEqual(len(replay["daily_nav"]), 23)
-            self.assertTrue(replay["comparison_parity_blocked"])
-            self.assertEqual({row["reason"] for row in replay["permanent_parity_blockers"]},
-                             {"comparator_budget_mismatch_beyond_rounding"})
+            self.assertFalse(replay["comparison_parity_blocked"])
+            self.assertEqual(replay["permanent_parity_blockers"], [])
+            self.assertEqual([row["quantity"] for row in replay["strategy"]["fills"]], [495, 495])
+            self.assertEqual([row["quantity"] for row in replay["comparator"]["fills"]], [92, 92])
             self.assertEqual(replay["lineage"]["producing_source_sha256"], report["source_manifest_sha256"])
             for sleeve in ("strategy", "comparator"):
                 self.assertFalse(replay[sleeve]["receivables"])

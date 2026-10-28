@@ -26533,3 +26533,71 @@ Its receipt SHA-256 is
 The old gzip derivative is retained locally; cloud successors use plain JSON.
 Source version1's OFF reservation remains unobserved and will be superseded
 by a fresh source-version reservation before the next effects, never erased.
+
+Fresh source-version2 preparation TPR-CMP28-OFF-PREPARE-20261028-002/6c3dfe067310665e0936942baaa7ffcf1f125a7c46659325d61e6a0714aa994e at 4a34f582904d6bfea0825db69077f3a30569d699 precedes exact SOURCE004read2 archive384459B/beea14bb... . No API effect under this processing claim.
+Fresh OFF source-version2 reservation 76ff446863020d7b692a1746134d8a5c162a252c56002d1b5b16bdd8d1f9d72d, prior census e075630a59277526aec115eb82e5476e9db48983ccc02f2a9e9623d7e6f0c32e; compile attempt remains1 reserved/0requested, old source-version1 look retained unobserved. Fresh upload002 plan 34327b1530f0cb53eabbfd9d469b9b1afb689dd933c5997fc87a5d692766b7fa precedes credentials/effects; 7 exact writes, existing extras preserved, final whole inventory 68cadc18ea73b9ef83a0a7037bb0c6c5d2148bd91850186482d9a72d591ab32d. Config 1331e443a1eee85ce4c831f6a56b9aed0ed44fec02bf385f9c95e51329e221e4; rendered closure 675aec63421cd8c4758f40b245749ee18df6ccb0c6e6ed62431335b793c4fb25.
+
+OFF upload002 completed:9 requests/711895 response bytes,20files, nine extras unchanged; receipt12838B/dc45665577584c8b078ae3bea517da81896e3b28a72cba580200a0056225c605. Exact source inventory68cadc18... verified. Fresh compile001 plan 9bec7f88a042a8c2a12cb9b8efb9829ac1a2739b0cda8fae29fe93b3f28aad0e at HEAD 4a34f582904d6bfea0825db69077f3a30569d699 precedes one compile/create bracketed by source reads,120s/10MiB. Reservation76ff4468...; this spends new-study compile attempt1 when sent, but does not create an observed backtest/look.
+
+Compile001 was genuinely requested once, actual compileID83044161b72750e09eac968d2f0c1019-30e10c0ed32e08063a6b9ea3307a1f99 initiallyInQueue; source remained exact before/after. Receipt7952B/fb237c1b984aaba815adeef98829b20f5caef975554076d08b3aeadfbbb0161e. Fresh one-read compile scope f1c1056131e59a60819c87888084d129dd1b656ac4bf3717ba12684f2c3797e6 precedes current-state retrieval,60s/1MiB, no new attempt/job/look.
+
+OFF compile001 actual state BuildSuccess, exact compileID83044161b72750e09eac968d2f0c1019-30e10c0ed32e08063a6b9ea3307a1f99; read receipt1501B/e6970c4f1d0207a622c8202e9c280d6c582afeec39e3bba49566c14959180137. Fresh full-window launch001 plan 87b6e719b037f468f1157d31cfa8378e87376126f8a2554763eca95d67e27e86 precedes one backtests/create bracketed by exact source reads,120s/10MiB. Reserved look001R2 becomes observed only upon a genuine returned job ID. No new parameters, date extension or economic change.
+
+OFF launch001 genuinely returned job074dd39863bfe50fa2ecdf2bb091ee47, with exact source reads before/after. Receipt7936B/12eb1b9c2a9e511c5c3daa92e5161a3e0f971f87c70ba917aacad53e44fb4912. New-study compile1/job1; reservation001R2 now has an actual observed run. Historical3 failures/33 prior looks remain distinct. Fresh one-job status/result-read claim 1348a5dbfd82d0d82aa0e21e40659859c23782426821057252647e3d01aebcf9 precedes first current result read,60s/4MiB; full private result retained, no new launch or parameter decision.
+
+Fresh first-status metadata processing claim TPR-CMP28-OFF-STATUS-PROCESS-20261028-001/68f50ff8d9b1f7027e8facffdc0beb6a1825affcad4d66200189c2a04273c59f before one exact1483B result read, no statistics/market projection or native effect.
+
+### 104.14 Four-arm runtime and private-input transport snapshot
+
+The actual OFF job is074dd39863bfe50fa2ecdf2bb091ee47, created17:01:57UTC.
+Its first result status is exactly In Progress..., completed=false,
+progress0.055. The API whitelist now recognizes that observed nonterminal
+status. It does not imply completion, data acceptance or profit. Root has not
+evaluated a final economic outcome. Current source/config/calendar and all
+cost/clock/cash/order rules remain fixed; no parameter selection is based on
+this progress observation.
+
+The plain native provider verifies the exact whole packet before parsing,
+indexes issued-date byte ranges, slices only the frozen eligible80-session
+window, and resolves event-date tickers through explicit native map rows and
+historical SID generation. Unknown/ambiguous native identities remain unknown.
+No current ticker/delisted snapshot filter, raw native map/factor export,
+compression import or generic genuine-adapter flag is used. Binding receipts
+stay in bounded private journal chunks. Source/ABI/rights/share-basis/PIT and
+canonical admission remain separately unproved, pending actual evidence.
+
+The four-arm driver cap-selects before50/100/200% tilts; pure TPR uses the
+whole current universe without a cap read/gate. Zero-weight200% donors remain
+in selection/evidence and are removed only from the order-planner target view;
+held zero-target names still exit. Fixed60slots, underfill cash and all prior
+RAW action/fees/slippage/clock accounting are preserved. The shared generated
+config module carries a distinct closed multi schema. Fifteen active readable
+files plus nine preserved legacy extras fit the24-file cloud bound.
+
+The exact plain packet uploader separately binds the actual own-project
+organization metadata, permits one exact-key properties check and one streamed
+multipart upload after explicit absence, and verifies resulting size/hash
+metadata without retaining previews. Its two local read passes are bounded to
+560210778bytes, its upload phase to120s, whole operation to300s. Unknown absence
+semantics stop before a packet read or write. No listing, download, delete,
+purchase, capacity change, provider request or broker action is permitted.
+
+| Current software source | Bytes | SHA-256 |
+|---|---:|---|
+| comparison_20261028_api.py |25421|a241d1045234aa90d90bbe5c2a11304bd1142881436b194ec698526fd3b86c45|
+| comparison_20261028_object_upload.py |20947|0582943ce667ddb3607c5682fe99dac99c21350c2e284915efb3482d26aa788f|
+| comparison_20261028_signal_native.py |22050|6fdab16bdfe070e138b92977279dec0d03d67e6a05b1be5f9af5e9136bd96935|
+| comparison_20261028_multi_algorithm.py |30551|55d090b97e53d18eaa4fa970309159e7f6c08115123ef3f3564da37f47f5e2f8|
+| comparison_20261028_multi_bundle.py |12187|5c066ab47c519e82fc5810b44792b523a96377bc262efa0cf5e0e80c93177d5a|
+
+Independent provider/multi/renderer159focused checks passed; three semantic
+native-provider mutants were detected. Root separately checked the object,
+provider and multi composition178passed5.67s before final API allowlist work.
+The final root union includes the API's exact three added source filenames,
+wrong-hash/missing-inventory refusal and running-status regression. Its exact
+count/time is retained in the associated command output. Five production
+sources compiled in memory. These are synthetic/software results only.
+No routine Claude checkpoint is required; the owner still directs all five
+actual full-window runs and one final push after completion.
+
+Final root union:214passed6.15s. Staged diff check then exposed one extra EOF blank line in the new multi driver (untracked-file checks had not covered it). Removed only that line, updated the independent renderer pin/current table, and reran the relevant multi tests. No native source/economic outcome changed by this whitespace correction.

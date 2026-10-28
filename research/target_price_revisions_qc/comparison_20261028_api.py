@@ -38,7 +38,8 @@ MUTATIONS = frozenset(('files/create','files/update','compile/create','backtests
 WRITE_FILES = frozenset(('main.py','extended_core.py','cap_tilt.py','cap_observer.py','extended_construction.py',
     'extended_loader.py','extended_compressed_store.py','extended_runtime_successor.py',
     'extended_algorithm_successor.py','comparison_20261028.py','comparison_20261028_algorithm.py',
-    'comparison_20261028_config.py','comparison_20261028_events.py'))
+    'comparison_20261028_config.py','comparison_20261028_events.py',
+    'comparison_20261028_multi_algorithm.py','comparison_20261028_signal_native.py','raw_revision.py'))
 MAX_REQUESTS, MAX_BODY, MAX_RESPONSE, MAX_TOTAL = 64, 1024*1024, 4*1024*1024, 32*1024*1024
 _HASH = re.compile(r'[a-f0-9]{64}')
 _ID = re.compile(r'[A-Za-z0-9_.-]{1,160}')
@@ -372,7 +373,7 @@ def _execute(plan,root,*,transport,guard,clock,monotonic):
                         or type(job.get('completed')) is not bool):_fail()
                 status_name=job.get('status')
                 known={'Completed','Completed.','Runtime Error','RuntimeError','Error','Stopped','Cancelled',
-                    'Running','In Queue','InQueue','Queued','Initializing','Loading'}
+                    'Running','In Queue','InQueue','Queued','Initializing','Loading','In Progress...'}
                 row['backtest_status']=status_name if type(status_name) is str and status_name in known else 'unrecognized_status'
                 row['backtest_completed']=job['completed'];row['backtest_id']=payload['backtestId']
             if request['endpoint']=='backtests/list':

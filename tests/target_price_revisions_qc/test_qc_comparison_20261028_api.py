@@ -92,6 +92,30 @@ def test_changed_before_inventory_stops_before_first_write(tmp_path):
     assert result['requests'][0]['raw_response'] is not None
 
 
+@pytest.mark.parametrize('name',['comparison_20261028_multi_algorithm.py','comparison_20261028_signal_native.py','raw_revision.py'])
+@pytest.mark.parametrize('fault',[None,'wrong_hash','missing_inventory_gate'])
+def test_exact_multi_packaging_names_keep_hash_and_inventory_admission(name,fault):
+    source='# synthetic exact packaging source\n'
+    before=row('files/read',{'projectId':m.PROJECT},'before',source_inventory_sha256=m._sha(m._canonical({})))
+    write=row('files/create',{'projectId':m.PROJECT,'name':name,'content':source},'write')
+    after=row('files/read',{'projectId':m.PROJECT},'after',
+        source_inventory_sha256=m._sha(m._canonical(inventory({name:source}))))
+    allowed={name:m._sha(source.encode())}
+    if fault=='wrong_hash':allowed[name]='f'*64
+    elif fault=='missing_inventory_gate':after.pop('source_inventory_sha256')
+    arguments=dict(allowed_source_hashes=allowed,attempt_id='fresh-multi-attempt',reserved_look_id='fresh-multi-look')
+    if fault is None:
+        prepared=plan([before,write,after],**arguments)
+        assert prepared['allowed_source_hashes']==allowed
+    else:
+        with pytest.raises(m.APIRefusal):plan([before,write,after],**arguments)
+
+
+def test_packaging_allowlist_does_not_admit_arbitrary_comparison_names():
+    name='comparison_20261028_unapproved.py'
+    with pytest.raises(m.APIRefusal):plan(allowed_source_hashes={name:m._sha(b'# not admitted')})
+
+
 def test_changed_after_extra_fails_without_rollback_or_further_effect(tmp_path):
     p,before,after=upload_plan();calls=[]
     def transport(endpoint,*_):
@@ -110,6 +134,21 @@ def test_compile_claim_spends_identity_but_adds_no_backtest_or_look(tmp_path):
     assert result['compile_requests_attempted']==1
     assert result['requests'][0]['compile_id']=='compile-4' and result['requests'][0]['compile_state']=='BuildQueued'
     assert result['actual_new_backtests']==result['new_observed_looks']==0
+
+
+def test_observed_in_progress_status_is_preserved_without_claiming_completion(tmp_path):
+    # Exact native status spelling observed by root under a fresh scope;
+    # original1483-byte envelope SHA00794a35d5e3586e51bdf49fd587d93003a1c9c1da27db2ad4fa17ca008a273b.
+    # This synthetic response does not reopen or authenticate that private body.
+    p=plan([row('backtests/read',{'projectId':m.PROJECT,'backtestId':'synthetic-running-off'})])
+    result=execute(tmp_path,p,lambda *_:response({'success':True,'backtest':{
+        'projectId':m.PROJECT,'backtestId':'synthetic-running-off','status':'In Progress...',
+        'completed':False,'progress':0.055}}))
+    observed=result['requests'][0]
+    assert result['status']=='completed'
+    assert observed['backtest_status']=='In Progress...' and observed['backtest_completed'] is False
+    assert result['actual_new_backtests']==result['new_observed_looks']==0
+    assert result['economics_accepted'] is False
 
 
 @pytest.mark.parametrize('mode',['success','unknown','cancelled'])

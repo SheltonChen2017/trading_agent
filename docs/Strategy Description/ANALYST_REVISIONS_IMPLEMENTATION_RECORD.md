@@ -2312,8 +2312,11 @@ cells: September2021 callback warmup, November2021..October2026 performance,
 new empty USD1m epoch and unchanged source/quote/fee economics. Source generation
 and six-cell result parsing are local only; no actual project ID or cloud
 source/run binding exists. Native dated point coverage remains QC-deferred,
-not inferred from potential-demand totals. A separate local archive is
-prospective; no old controls are renewed and the QC/Safari hold remains.
+not inferred from potential-demand totals. Section327.13 records new K's
+actual0/native0: the complete148543046byte local vendor archive is prepared
+and verified, with every73source range preserved; K is now spent. Section327.14
+is the final LOCAL checkpoint/single-push handoff. No old controls are renewed;
+the QC/Safari hold remains, and no strategy job is claimed running or complete.
 No AU/AW/AY replay or QC source transfer/project/compile/strategy job followed
 the catalogue result. Current
 identity/reference/actual-held NAV/full-window/source/run gates remain;
@@ -4282,6 +4285,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-26 | Codex counter-review of all four section-323 Claude commits | `3c905d42` -> `dfc04152` -> `ad14e379` -> `5751a487` -> `6076ef20` -> this record commit | Accepted after documentary correction; one P2 review-coverage defect and four P3 qualifications corrected; no confirmed production bypass or new milestone | Corrected the nine-definition launch census, 42+1+40 commit attribution, script inventory, compile/timestamp inferences, and spent source-pin closure warning; verified the seven bookings without adding them again | Section 324.5 separates public-byte/lane checks, focused Windows failures and isolation-denied Git checks. No full suite, operational entry, private receipt or QC read. Only this lane record changes | Floor 333/256/52/699 unchanged; original seven-run source/authority/numbering and carried P2s remain unresolved. Existing out-of-lane CRLF/public-source and host findings documented, not fixed | One final same-lane push; Claude must review section 324 and exact snapshot. No retry, new source freeze or operational authority; monitor remains paused |
 | 2026-10-26 | Mac recovery handoff plus owner-requested sync/counter-review and explicitly approved normal merge | Common3c905d42;25local recovery commits e3afe7ef..503168ac;5incoming dfc04152..e57d785f; d403c972 counter-review; preserving merge and final handoff | All5incoming commits disposed in325; accepted after qualifications/identity reconciliation;25local implementation commits remain without independent review | Retain Mac323 and namespaced remoteR323/324; retain both ledger histories and reconcile7overlapping jobs with3pre-job claims, floor336/259/52/699 unchanged; retain5EOFchanges without pin refresh; X actual failure recorded, Y drafts preserved uncommitted/uninvoked | 389focused native-denied passes4.13s on merged tree, overlapping premerge389/4.53s and86record repeats; public Git-byte/AST/pin/accounting assertions; no full suite/private or operational replay | ARV2CR325-001/003/004 resolved by preserving merge/append; -002 OPEN with exactly2of157Xsource-pin mismatches; price/status gaps and carried formal/PIT/master gates remain; no strategy result or live readiness | Exactly ONE final nonforce matching-lane push, verify both parents and local/tracking/live agreement; no next milestone/provider/QC action this review round; Insider monitor already fulfilled/deleted |
 | 2026-10-27 | Codex owner-waived source-pin/parser/price recovery; one concluded round | `634509bf0fb361a8471c9ed6b62106d0cdcfc245` -> this final handoff commit (34 recorded predecessors through `4e51fdf8`, 35 total) | Prospective exact EOF-byte closure, all-token/original-schema recovery, full-window source work and authenticated identity-gap endpoint | Retains all failures/spent uses; one native-QC source diagnostic, accepted Sharadar RAW capture/sidecar, older EOD pilot and complete111page/110346row EOD catalogue; BB/BC native0/0 validate original6151+8 and expose2426potential identity refusals, including15 without original FIGI; no six/eight strategy cells launched | Latest200distinct focused passes14.17s; pure actual-BC anchor/output/hash/shape agreement and final document/diff/status gates; no full suite. Earlier overlapping selections/failures/Root collector and test-window qualifications retained. AJ one shared+infrastructure look already booked:337/259/53/699, no new cells | ARV2CR325-002 resolved only prospectively for approved exact bytes; all original proofs pass technically. I326-024 early-price coverage and I326-032 source identities OPEN; inherited formal/PIT/master/readiness gates remain false; no independent acceptance | Exactly one nonforce matching-lane final push after baseline/HEAD/status check; confirm existing Sharadar history tier and obtain authenticated missing identity/lineage evidence before separately frozen source/price/run work. No new paid rights, source-stop bypass, retry, paper/live/broker or real-order action |
+| 2026-10-28 | Codex owner-waived matched-history/local pre-QC recovery | `5b8d4f8a8603c60be182b6202e6d53b908f2bcff` -> this final handoff commit (nine recorded predecessors through `5735bb28`, TEN total) | Existing five-year period, exact identity/demand evidence, W5 six-cell runtime/source/result and verified project-independent archive | H/I/J/K actual0 plus separate native0 retained/spent; W5 uses Sep2021 callback warmup, Nov2021..Oct2026 USD1m epoch and unchanged source/economics; local archive148543046bytes/73ranges verified; no QC/Safari after owner hold and no strategy cell | New W5/archive227distinct focused passes plus repeated86document checks; earlier H/I/J/period counts/failures qualified in327; no full suite;337/259/53/699 unchanged | I327-001..016 dispositions in327; source/identity/actual-held-price/PIT limitations stay open; no independent review or formal admission claimed | ONE matching final push, then remain at local checkpoint under QC/Safari hold; next QC-only dated-coverage/source/project/transfer/run checks await release and all applicable gates |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -69613,3 +69617,119 @@ launch/capacity/native-book operation is authorized. All QC/Safari holds and
 false formal/readiness flags remain;337/259/53/699 unchanged. One final push
 at the concluded local checkpoint, no intermediate push and no push yet.
 K freeze record/document86checks passed1.21s, repeated/not additive.
+
+### 327.13 Actual K archive prepared and independently verified
+
+At clean5735bb28ade555bc22e52ec9a10ec4bb7616af08, sole public-only native
+artifact/network/Keychain-denied preflight passed228exact dependencies,
+source/profile/Git/host checks without control inspection/allocation.
+The fixed collector then ran ONCE and the tool observed actual exit0.
+Producer2026-10-28T08:19:29.977482Z..08:19:40.110807Z actual0;
+separate native archive verifier08:19:40.329219Z..08:19:44.903116Z actual0.
+Both complete public stdout4560bytes SHA256
+a7ef7819f90c43f956c6968e714f073defc820a5e770cf204af11280c46f9154,
+byte-identical, zero stderr and no bounds. These are process dispatch/observed
+completion brackets, not provider timestamps. Collector public output5507
+bytes/3ab7d9a87e2c027ff4784ae8db544bb11a68fe95d1d9874115633014e8b5a433;
+report4430bytes/5f3fff83f20f5781ec3ce8647e78a218ce815aaef0c9522607a6e253884a99ca.
+
+New DATA is ONLY
+artifacts/analyst_revisions_v2/newrule_available_history_archive/R327-20261028-K/vendor-payload-private.bin,
+148543046bytes SHA2562a2815b543c41728b441b0b300a9d269f282778ef1915923fd68f61993f9ca1f.
+The original11650byte header pin2cda5157e4b305592568d71239ba613f8e452a43ac1507c8ee33b7ead2bd65fe
+and all73fixed source ranges/whole output hash passed independent verification.
+Producer source endpoint2039672cb22b5efe0d29116295898c01141cb24613758e3651da8f42f70e7530;
+archive metadatafd1ad3204abd1caf803c49f6537eb6329376c520f9a57cb58b956efc46e54cb0;
+native security2b84f04ed075c50bcafe7c9ebecee4bb98d84615a2e677f701b3b06bb7b47612;
+source contextf13aec9c079f16c542af48b2fa550accac6702c8e28dea95053b2af8fb60043f.
+Fresh genuine6151catalog/full-axis and postchecks passed. This proves bounded
+local byte packaging/verification, NOT price coverage, continuous integrity,
+processing rights, formal identity/PIT, source admission or strategy success.
+
+K producer/verifier/collector/control are now SPENT. Preserve all outputs and
+verification marker. No reinspection/rerun/repair/cleanup/alternate naming.
+Public result recording reconstructed ONLY the already-captured closed frame
+under native artifact/network/Keychain denial, not a second archive reader.
+New inert scripts/arv2_r327_k_source_binding.py7781bytes SHA256
+1814d6a71ee20a6cda6ec14a6af6cf938a7c95c8b02cfee38730f3caac9176b9;
+canonical observed factaa95d4ab093291cc5e201bbeba312f5cae12db028c30e9a65b634d5c5589bc72.
+Its one DATA role is a future consumer input, not reuse authority for K.
+No QC/Safari/provider/credential access or new look/cell occurred; booked
+337shared/259development/53infrastructure/699cells remains unchanged.
+
+### 327.14 Last local checkpoint and single-push handoff
+
+The owner-directed offline checkpoint is reached: the separately versioned
+matched-history runtime, deterministic19-file source generator, six-cell
+batch/result boundary and complete verified local vendor archive are prepared.
+This is the LAST LOCAL checkpoint before work requiring QC, not a claim that
+all cloud/source/price gates passed or that a backtest is running. The owner
+QC/Safari hold remains until explicitly released. No extra vendor purchase,
+FMP query or routine access acknowledgment is required by this checkpoint.
+
+On release, the next admissible work is bounded QC-side native dated-coverage/
+current source identity and processing-rights verification, followed only if
+all predicates pass by owned project/source/input binding and archive transfer.
+Actual project ID/organization/ObjectStore admission, fresh access/idle/capacity,
+exact generated source readback, separately committed run/attempt bindings,
+compile, launch and selected terminal validation remain UNPERFORMED. The
+synthetic project123 never becomes an operational ID. Frozen old AT/transfer/
+launch controls and spent candidates are not revived; a future continuation
+must bind actual W5 sources, archive/source pins and scope prospectively.
+No resource is reserved and no other lane is interrupted. Preserve attempt/
+Mia rules, missing-price stops, all original bindings and economic policies.
+
+The five native price cases remain on the ORIGINAL native source policy.
+I's potential membership envelope and public native valid totals cannot prove
+actual target/held demand or all dated prices. No private QC book was read
+under the hold. W5 removes pre-available-history evaluation dates through an
+explicit owner-approved new period/empty epoch; it does not repair/relabel the
+old October2022 gap or invent marks. J's one exact pair/three preparable
+queries/one unresolved ISIN-owner flag is retained optional corroboration,
+not a silently adopted price fallback or a mandatory new selector gate.
+I327-003 and historical source/identity/PIT limitations remain OPEN; no efficacy,
+paper/live readiness or formal source/master admission is claimed.
+
+Contiguous outgoing round starts at remote baseline
+5b8d4f8a8603c60be182b6202e6d53b908f2bcff. Nine accumulated predecessors plus
+this final actual-result/handoff commit form TEN commits, with no intermediate
+push. Per-commit dispositions are local technical retention under the owner
+waiver, not independent Claude acceptance:
+
+| Commit | Disposition / scope |
+|---|---|
+| ff8aba19284a81b3aa267068fbf8f31eaa1f1cb0 | Retain explicit five-year matched period/metadata; original January candidate stays unadmitted. |
+| b11eea5a0f8a213d84603db2ccd3dbc5a95041bb | Retain separate H source/collector/run freeze and bounded validation; no generic retry authority. |
+| 433ffd1cb08a020c699387498f72743e58595ef0 | Retain actual H0/0 and all four unresolved original/current composite disagreements; spent. |
+| 60f76c0a5ed24703753117f5e4517e0357186043 | Retain fresh offline I catalog/axis/ownership/demand freeze, with original sources unchanged. |
+| 082fc98c6c7ef025e9ef95cbe9979611e7d0a526 | Retain actual I0/0 qualified potential-demand evidence and controlling QC/Safari hold; spent. |
+| c9864f3bed213f0d4a8df8f68f8db2407b35abbe | Retain J complete inventory/identifier query-plan freeze and finite-error correction. |
+| 5d7e0f3f050c86c984e05de587bae194d4d4fee3 | Retain actual J0/0 and every blocked/query-preparable case; no FMP contact/source switch; spent. |
+| bfe79eef3c54c05913d8b06cf38b93afeac35859 | Retain explicit W5 runtime/projection/result implementation, geometry/warmup/source-join fixes and qualified focused checks; no cloud binding. |
+| 5735bb28ade555bc22e52ec9a10ec4bb7616af08 | Retain exact new K archive freeze, APFS own-create correction and84focused checks; no old control replay. |
+| This final actual-result/handoff commit | Retain actual K0/0, inert archive source anchor, exact outgoing ledger and owner hold; no later milestone or QC action. |
+
+Final new W5/archive focused selections total227distinct passes
+(42runtime+48projection+52result+84archive+1import closure), plus86document
+checks reused across this round. Earlier H/I/J/period subsets, expected red
+mutations, initial failures and repeated checks are separately recorded above;
+do not add repeated selections to inflate a complete-suite claim. No complete
+Codex lane/repository suite ran. All new production/test files compiled in
+memory, selected source pins matched, and original used source files remained
+frozen. No shared/root coordination or other-lane file changed this round.
+
+Exactly ONE normal final matching-lane push is authorized after final
+root/branch/HEAD/status/diff and unchanged-live-remote checks. The final commit
+SHA is mechanically resolved by Git because a commit cannot include its own
+hash. After successful push, verify local/tracking/live-remote equality and
+clean status, then report that exact SHA. No subsequent implementation,
+provider contact, source-control replay, QC/Safari use or next job follows
+this handoff without its applicable gates and the owner's hold release.
+Final ledger insertion initially had a blank before its new row: the
+contiguous-table regression correctly failed (85passes/1failure1.23s).
+Removed ONLY that new separator before commit; no historical row rewritten.
+Corrected final record86checks passed1.14s (repeat/not additive). Native-denied
+final inert-anchor compile/source pin/closed-fact/frame/DATA-plan equality
+passed using already-collected public bytes only, with no archive/control
+read. Final diff/status/scope inspection found only new Analyst-owned files
+and this lane record; no historical source mutation or shared-file change.

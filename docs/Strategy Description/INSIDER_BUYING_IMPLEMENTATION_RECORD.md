@@ -1,15 +1,14 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 343 COMPLETES CODEX COUNTER-REVIEW OF EVERY CLAUDE
-COMMIT IN `c0a44004..d1990c49` (TEN COMMITS, ZERO MERGES). ALL TEN ARE
-ACCEPTED AT THEIR RECORDED SCOPES; NO NEW PRODUCTION DEFECT IS VERIFIED.
-THE UNCHAINED REQUIRED-WINDOW CONSUMPTION STOP REMAINS BINDING. NC METADATA
-MUST BE REQUALIFIED AT THE CORRECTED BYTES BEFORE ACTIVATION. TWELVE P2
-FINDINGS REMAIN OPEN; NO OPEN P0/P1. HISTORICAL PUBLIC-KNOWN-BY AND FULL
-POPULATION/PIT INPUTS REMAIN MISSING, SO THE LANE IS NOT BACKTEST-READY.
-THIS IS COUNTER-REVIEW ONLY: NO NEXT MILESTONE, SOURCE ACQUISITION, SUPPLIER
-MESSAGE OR QC ACCESS. SECTION 344 IS THE SEPARATE DURABLE FINAL HANDOFF.
-NO FUNDED/PAPER/LIVE/CAPITAL/REAL-ORDER/TRADING AUTHORITY.**
+Status: **SECTION 345 RECORDS THE OWNER-AUTHORIZED EXISTING-SUBSCRIPTION
+ARCHIVE INQUIRIES: MASSIVE FIRST, THEN SHARADAR. BOTH MESSAGES ARE VERIFIED
+SENT; NO SUPPLIER REPLY OR SAMPLE HAS YET BEEN OBSERVED. THIS LATER EXPLICIT
+PERMISSION SUPERSEDES THE EARLIER NO-OUTREACH DECISION ONLY FOR THESE TWO
+SUPPORT INQUIRIES. NO PURCHASE, UPGRADE, TRIAL, PAID EXPORT OR QC ACCESS IS
+AUTHORIZED OR PERFORMED. ARCHIVE CAPABILITY REMAINS UNCONFIRMED; THE LANE IS
+NOT BACKTEST-READY. SECTION 343'S TEN-COMMIT COUNTER-REVIEW REMAINS ACCEPTED.
+TWELVE P2 FINDINGS REMAIN OPEN; NO OPEN P0/P1. SECTION 346 IS THE FINAL
+OUTREACH HANDOFF. NO FUNDED/PAPER/LIVE/CAPITAL/REAL-ORDER/TRADING AUTHORITY.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -314,6 +313,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-28 | Claude review (macOS session) and corrections | `c0a44004` -> `645264ea`, `62948782` -> this review record | Independent review of sections 331-340 (`0c536a91..c0a44004`, 9 commits, 0 merges: NC and composition fixes, Massive v2, required-window SEC capture) | All 9 accepted, two with corrections. Three Massive and eight SEC requests checked against journals; no email-like string in control files. Required-window readback early stop refused; two NC guards pinned. | Final tree: 514 and 94 focused passes, 114 required-window passes, guards 107 with the 2 known SEP-2 failures; network and Keychain exec denied. No complete suite. No backtest. | IBREQ21-CR34101, IBNC-TEST34101 closed; IBDOC-CCR33001 accepted against Claude; IBREQ21-OBS34101/34102 and IBMASSIVE2-OBS34101 recorded; twelve P2 open | Codex counter-reviews section 341; close IBREQ21-OBS34101 before further SEC capture |
 | 2026-10-28 | Claude corrections (macOS session) | `75ee0f52` -> `89e3a2d6`, `305a8d57`, `b3b0006f`, `b5e2a92a`, `726f4e20`, `8aaff950` -> this record | Correction of Claude's own open findings from sections 330 and 341; no Codex commit in range | Nine P3 findings closed with regression tests. Batch planning refuses while the required-window namespace is unchained; batch receipt bound; NC padding members excluded and accounting flag derived. | Final tree: 875 focused passes (19 files), Massive 167, guards 179 with the 2 known SEP-2 failures; 20 of 20 mutants caught; network and Keychain exec denied. No complete suite. No backtest. | IBREQ21-CR34202-34204, IBREQ21-TEST34201, IBMASSIVE2-CR34201, IBBATCH-CR34201, IBBATCH-TEST34201, IBNC-CR34201/34202 closed; IBMASSIVE-OBS33001 withdrawn; frozen and consumed findings retained | Codex counter-reviews section 342; chain the required-window index before any further SEC batch; requalify the NC front before activation |
 | 2026-10-28 | Codex counter-review only | Exact incoming `c0a44004..d1990c49`, ten Claude commits, zero merges; separate final handoff344 | Counter-review341/342 and every source/test/documentation commit; no next milestone | All ten accepted at precise scopes; no new production correction required. Consumption stop, registered-root binding, planner receipt, malformed-URL refusal and NC padding/accounting protections verified. | Native-denied focused selections and guard reversals343.4; main124 documents/imports/EXACT and15 changed Python images compiled. No full suite, private evidence replay, source request, credential read, QC or outcome. | Twelve OPENP2s unchanged; exact prior P3 closures/successor rules preserved. Historical availability and real cohort/PIT evidence remain factual blockers. | One final matching-lane push after completed-record checks; no automatic monitor, acquisition or next milestone. |
+| 2026-10-28 | Codex owner-authorized archive support outreach | Starting clean local/origin`0113863658cad27aabad7990a7f23f985a7578ad`; incoming EMPTY; separate final handoff346 | Contact Massive first, then Sharadar for an existing-subscription historical archive sample | Two explicit support messages verified SENT with exact body/recipient/subject readback. No supplier replies or samples observed. Earlier no-outreach decision superseded for these two inquiries only. | Message body hashes/UTC/PDT order345.2; focused document/record/boundary checks below. No production code change, private source replay, credential/provider-API access, licensed-row ingestion, SEC or QC action. | Archive capability still UNCONFIRMED; all twelve OPENP2s and historical closures preserved. No paid activation or new research readiness. | Review authentic replies/samples for exact version, historical available-by, coverage and existing rights. No purchase/upgrade/QC or duplicate inquiry inferred. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -40222,3 +40222,170 @@ from the verified fifteen-image compile. Cumulative incoming/current diff
 checking is clean, only the lane record is modified, and the matching-only
 refetch still resolves exactd1990c49. Final staged checks and the one
 publication follow; no new source action or next milestone is inferred.
+
+
+## 345. Owner-authorized Massive and Sharadar archive inquiries (2026-10-28)
+
+### 345.1 Latest authorization and bounded decisions
+
+The owner now explicitly directs: "Proceed with Massive first, then
+Sharadar. You may contact support for a historical archive sample under my
+existing subscriptions. No purchases or upgrades, and no QC access yet."
+
+**IBDEC-345-01:** this direct communication authorization supersedes
+IBDEC-338-04's no-outreach choice only for the named Massive and Sharadar
+historical-archive support inquiries. Historical338/340/344 remain accurate
+for their completed scopes. It authorizes neither EODHD/FMP/other-recipient
+messages nor marketing, account changes or a general correspondence campaign.
+The current NO-QC hold remains binding; no Safari/QC/API/SDK/job is opened.
+
+**IBDEC-345-02:** send the two scoped inquiries sequentially in the requested
+provider order, Massive first and Sharadar second. Do not interpret inquiry
+permission as proof of entitlement or as an order for a full paid archive.
+Sharadar's known5-Year Bundle horizon is stated explicitly, and requested
+2020Q4–2025Q4 coverage is a capability/coverage question, not a silent plan
+expansion. Each message forbids a purchase, upgrade, trial, paid export or
+other charge. A small sample is requested only under existing account rights
+and without additional charge. No credentials or account identifiers are
+included; authenticated Gmail supplies the normal sender identity.
+
+The existing338 inquiry is refined without adding a new evidence gate:
+original filing bytes **or verifiable exact hash/version linkage** can join
+a genuine archival sample to the retained SEC originals. Authenticated
+historical available-by upper bounds are sufficient; exact first-public
+seconds are not required. Ask about timestamp/timezone/clock meaning,
+corrections/deletions/backfills, all-six-form coverage/gaps, historical/dead/
+renamed/reused-ticker coverage, and permitted local research retention/use.
+No price/earnings/news/insider API probe or additional SEC fetch is substituted
+for that archival question.
+
+**IBDEC-345-03:** use the connected Gmail send tool, not browser/Safari,
+provider credentials or another lane's message thread. A bounded prior-mail
+search finds related Massive conversations about other datasets but no
+matching ownership-archive inquiry; Sharadar archive search has no matches.
+Those other threads are neither replied to nor treated as a refusal for this
+different source. This bounded search is not a complete-mailbox absence
+claim. Raw private mail search/header values are not copied into Git.
+
+### 345.2 Actual messages and independently read-back sent state
+
+Starting matching-only fetch confirms clean local/origin
+`0113863658cad27aabad7990a7f23f985a7578ad`, no incoming commits, in the exact
+Insider worktree on `codex/strategy-insider-buying`. No checkout/branch move,
+side worktree, reset or shared record change.
+
+Official recipients are verified from the providers' public contact sources:
+[Massive Contact](https://massive.com/contact) lists `support@massive.com`;
+[Sharadar About](https://sharadar.com/about) lists `connect@sharadar.com`.
+The web text renderer masks Sharadar's address and cannot resolve its email
+protection link; a bounded unauthenticated read of the same official public
+HTML decodes its published address. No guessed recipient, authenticated
+provider account/API or data-download route is used for this lookup.
+
+| Order and recipient | Exact subject | Sent time | Exact UTF-8 HTML identity |
+| --- | --- | --- | --- |
+| 1, `support@massive.com` | Historical SEC ownership availability archive sample — existing subscription only |2026-10-28 15:33:50 PDT /22:33:50 UTC |1,926 bytes; SHA-256`ed46c91127328f696e5c0bb55d6c01696b42b10b84626c5559da452499019c5e` |
+| 2, `connect@sharadar.com` | Historical SF2/Insiders delivery archive sample — existing 5-Year Bundle only |2026-10-28 15:34:45 PDT /22:34:45 UTC |2,254 bytes; SHA-256`07449565bda5fe99c582ea27c361dc505fa1213ef32d5e99f2e9a9d7d7639699` |
+
+Each send call returns a Gmail message/thread identity and SENT label. Each
+separate thread is then read back through Gmail: recipient, exact subject,
+exact HTML body and SENT label match the intended request. The55-second
+ordering is observed, not inferred from local draft timestamps. These are
+sent-message acceptance/readback facts, not proof a vendor received/read the
+mail or accepted a sample/coverage/rights request. Each thread contains only
+the one outgoing message at this check: **zero supplier replies, zero sample
+attachments or exports observed**. No send is repeated. Private sender,
+message IDs, transport headers and mailbox values stay out of this record;
+recipient+unique subject+date identify the two existing threads for later
+search without creating duplicate inquiries.
+
+The Massive inquiry asks for a genuine historical archive/delivery/snapshot/
+ingestion-change-log sample, version linkage, clock semantics, corrections,
+coverage and existing-subscription research rights. The Sharadar inquiry asks
+specifically for retained SF2/Insiders daily delivery files and exact original
+version provenance, distinguishing a contemporaneous delivery from a current
+regenerated CSV. Both cover2020-10-01 through2025-12-31, identify09:28/09:30
+US Eastern cutoffs, permit a sufficient available-by upper bound and prohibit
+paid activation. No original filing body, licensed row, private control,
+account number, token, API key or credential is attached or transmitted.
+
+### 345.3 Evidence status, validation and exclusions
+
+A read-only internal peer reviews the inquiry's evidence requirements before
+the sends; it does not send mail, edit code or independently qualify a source.
+Both sent bodies retain those requirements. Production/test Python bytes are
+unchanged from343's accepted tree; this round changes only the lane record.
+Focused record/document/import checks and whitespace validation follow below;
+no new software behavior justifies a complete lane/repository suite or a new
+source replay. No test result is used as data-authority proof.
+
+Support outreach is the only newly authorized external write: **two emails**.
+Public documentation/contact reads and scoped Gmail searches/sent readbacks
+are the corresponding read-only actions. No provider Keychain read, provider
+API call, SEC request, licensed-row/earnings/news/outcome access, purchase,
+upgrade, trial, paid export, QC/Safari access, source namespace activation,
+original-body/private-artifact replay, broker/operator-database/scheduler
+change, deployment or trading action occurs. No automation is created or
+rearmed, and no other chat is messaged.
+
+`IBPUBLIC-KNOWNBY-01` remains **OPEN**; supplier capability is **UNCONFIRMED**,
+not a denial or an entitlement. No response is manufactured and sending a
+request does not satisfy a historical evidence/rights contract. All twelve
+OPENP2s and every343.3 carried/closed P3 scope remain unchanged. The source/
+publication/PIT/rights/canonical/look/QC/backtest flags remain FALSE. The
+existing eight originals and20,052-accession consumption chain are preserved;
+legacy19,846/99,394 and79,548 unattempted, frozen IB1C/current four v3 hashes,
+stoppedv3 at1,846/1,847 unresolved, separate7,373-byte diagnostic, strictD23
+seven nonexact/no82-quarter digest, both earnings diagnostics, study/pilot
+populations/economics and the two distinct nonretroactive classifications
+remain exactly as344. No frozen file is edited.
+
+## 346. Separate final handoff — archive inquiries sent, replies pending
+
+Exact prior implementation/review/counter-review handoff is
+`0113863658cad27aabad7990a7f23f985a7578ad`. Incoming range is EMPTY.
+This separate record-only handoff documents the newly authorized actions,
+observed sent receipts and current factual waiting state; it is not a new
+implementation milestone or source-readiness acceptance. The old no-outreach
+boundary is superseded only at345.1's exact Massive/Sharadar inquiry scope.
+NO QC, purchase or upgrade is authorized or performed.
+
+Next action is to examine genuine supplier replies and any existing-account,
+no-additional-charge sample for exact accession/body/version linkage,
+authenticated historical available-by bounds, timezone/clock semantics,
+correction/backfill/gap accounting, actual coverage and permitted research
+use. Start validation against already-retained originals, without repeating
+consumed SEC requests. A generic sales answer, current refreshed table,
+acceptance date or present-day export clock alone does not close the gap.
+If a reply offers only a paid upgrade/export or unsupported dates, record
+that precise limitation; do not accept charges, broaden the pilot, change
+strategy economics, infer alternate rights or launch QC.
+
+Both support responses are pending at the observed readback. The archive
+question is therefore still a concrete external-evidence dependency, not a
+routine checkpoint or a demand for another general approval. No further
+question to the owner is needed to send the two already authorized inquiries.
+No automatic reply monitor or follow-up message campaign is created by
+inference. The two existing threads must be reused/read rather than blindly
+resending the inquiries. The lane remains NOT backtesting-ready.
+
+Finish focused record/document checks, reverify exact root/branch/HEAD and
+record-only expected status, fetch ONLY matching origin and stop if it
+advances. Under the standing one-final-push instruction, commit this durable
+outreach record and make exactly ONE successful matching-lane push, then
+independently verify the exact remote tip and clean/synced status. No shared
+Action Plan/SESSION_HANDOFF/other-lane edits, side branch/worktree, reset,
+force-push, interim checkpoint or monitor rearm.
+
+Final prepublication verification: current record/active-document/lane-import/
+EXACT package selection **124 passed7.19s**, no skips/warnings. Tests run on
+Python3.13.15 with cleared environment, `-I -B`, disabled plugin/cache and
+freshTMP-only writes under effective process-tree native network and
+security-exec denial; child import tests inherit those controls. No complete
+suite or new source replay is run; unchanged Python images do not need new
+compilation. A read-only peer checks the outreach requirements and record
+scope without independently reopening Gmail. Its minor request-versus-access
+wording clarification is applied. A final bounded readback still finds one
+outgoing message and zero incoming replies in each existing thread. Exact
+sent bodies/hashes are unchanged. Whitespace and staged secret-shape checks
+follow before the single matching-lane publication.

@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–326 retain the milestone, review, preregistration, QC
+strategy. Sections 1–327 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -2281,11 +2281,19 @@ offline field-format diagnosis passed once in326.66 (actual0/native validator0)
 and is spent. It confirms at least15potential stocks have no original FIGI in
 the full mapping inventory; a parser cannot supply that missing identity.
 I326-032 and early-history I326-024 remain concrete external-data barriers.
-326.67 concludes this round for the single final push; no six/eight strategy
-cell is launched. The existing Sharadar history-tier answer is pending, not
-assumed or a new purchase/access permission gate. No price request follows an
-unresolved identity. The RAW-history parser remains held technical
-preparation, no price caller.
+326.67 concluded that round with the single final push at
+5b8d4f8a8603c60be182b6202e6d53b908f2bcff; no six/eight strategy cell launched.
+The owner subsequently confirmed the five-year Sharadar tier and said
+"let's work with what we have for now". Under the standing scoped recovery
+direction the owner explicitly waives Claude review of section 327 before
+the bounded parser/price research work; independent acceptance is not claimed.
+Section 327 owns the new matched
+November2021–October2026 period proposal under those existing rights and the
+remaining identity/required-price recovery. The full January2021 candidate
+remains preserved and unadmitted. Changing the start does not resolve the
+October21,2022 native-price gap. No price request follows an unresolved
+identity. The RAW-history parser remains held technical preparation, no price
+caller.
 No strategy historical-price acquisition or QC run follows without its gates.
 No AU/AW/AY replay or QC source transfer/project/compile/strategy job followed
 the catalogue result. Current
@@ -68618,6 +68626,112 @@ its fact/result/diagnosis digests are unchanged. No frozen source was repaired,
 no whitespace setting/attribute changed or red evidence hidden. Current215
 literal dependency pins continue matching. The final handoff/push row must be
 read with this qualification, not as an all-checks-green or full-suite claim.
+
+## 327. Existing five-year history and matched-period recovery
+
+### 327.1 Owner scope, preserved baseline and prospective comparison period
+
+After326's final push the owner answered the Sharadar history-tier question
+"5 years", then directed "let's work with what we have for now". This is the
+new round from clean pushed5b8d4f8a8603c60be182b6202e6d53b908f2bcff; local,
+tracking and live matching remote agreed at its start. All commands, edits,
+focused validation and commits remain solely in the designated Code Analyst
+root on codex/strategy-analyst-revisions-v2. Earlier source/control/operation
+attempts remain spent, including AD's unknown transport failure, AP/AR's
+technical captures, BB/BC's identity refusals and the QC-only native book.
+No old reader, capture, control, provider call or source job is renewed.
+The prior authorized parser/price/research review waiver continues for this
+bounded recovery; implementation and same-round advice are not independent
+acceptance. Exactly one final matching-lane push at this round's concluded
+endpoint remains authorized; none has occurred this new round.
+
+The new prospective matched evaluation is2021-11-01..2026-10-13, using
+2021-10-29 as its first immediately prior NYSE reference close and weekly
+decisions through2026-10-12. This is a new research/capital epoch, chosen
+before outcomes from the existing five-year history constraint, not a
+date-renamed spent capture or hidden shortening of an accepted result.
+Both six/eight universes and all AR0/100/200 cells keep the same new period,
+$1m empty initial holdings/open orders, original bindings and economics.
+Full January2021–October2026 remains preserved and unadmitted. No performance
+result, symbol removal, favorable availability or strategy outcome selected
+the new start; comparisons with prior full-period returns require the changed
+start/capital-epoch qualification. The precise full-calendar-derived axes,
+months and counts remain metadata until a separately frozen source consumer
+freshly authenticates the genuine full3466-session package. A public-calendar
+focused fixture is not fresh private package authentication.
+
+The original5636 Sharadar stocks/5 native stocks/510 conditional-never stocks
+and8 funds remain the prospective common policy, retaining all6151 binding
+identities. EODHD's incomplete current crosswalk is diagnostic evidence, not
+a requirement to abandon valid existing Sharadar/native routes or a source-
+stop selector. Conditional-never requires genuine decision-membership absence
+plus empty initialization; it does not retire positive holdings at membership
+end. Missing target reference, actual-held NAV, identity or execution quotes
+still stops. The known October21,2022 native-price gap is INSIDE this new
+period, so dates alone cannot clear it. No new paid rights, purchase, QC
+capacity/strategy job, funded/broker/real-order/paper/live authority follows.
+Booked floor remains337shared/259development/53infrastructure/699cells.
+
+### 327.2 Public-only period implementation and identity-recovery design
+
+New scripts/arv2_r327_available_history_period.py is a pure supplied-calendar
+contract. It checks the unchanged full3466-session content hash BEFORE
+deriving evaluation/prior-close/weekly/monthly geometry; binds six NEW cell
+identifiers and a common R327 research epoch; changes first-cash/month/CAGR
+labels to the new period; and preserves the selected old economic source
+pins/native-five whole-binding identities. It neither mutates old runtime
+globals nor opens files, authenticates DATA, grants an operation, creates a
+runtime, admits prices or clears any source/readiness flag. Root's serialized
+native all-network/artifact/Keychain-denied focused selection completed
+30passes3.14s, no failures/skips/warnings; disabled plugin autoload,
+--noconftest --ignore=artifacts -B and no cacheprovider, inroot support paths.
+No full suite, private source read or operational contact occurred.
+The fixture calls retained public accepted_risk_october_order_package._sessions
+and its exchange-calendar helper, not a private package or live calendar API.
+It derives1242 evaluation sessions/1243 price sessions/259weekly decisions/
+60months, period digest88113155d49f74e00a89ba743aaa314d718cfd0d29b017ac501058460fe5d11a,
+evaluation-axis digesteff4b9f8552317b16b97fbc1734aca1b27baea25d718721ddf0831e2ae85ef7e,
+decision-axis digest9f0bd75e1de17112bd3a571438311cd152ba3ee5ce7279e710b133553cbd1429.
+These are public-content expectations, not fresh DATA authority. New source
+13429bytes SHA256722cffeae9fbebcd9bca656c8994273d2b1fb36f6d3e269a018c8fb18e5b7b18;
+tests9433bytes SHA256f3f117138b2a0595ab0230ab58fc8fe64f5d7e31d027bbcb7f2974c10ccb23f6.
+Both compile in memory without bytecode. Initial86 document selections were
+84passes/2failures1.14s and85passes/1failure1.01s: the new live reference first
+said Section327 without the separating space, then lacked the record gate's
+exact explicit-owner-review-waiver wording. Navigation is corrected
+prospectively; these overlapping initial reds are retained, not production
+defects or additive tests.
+Corrected document selection is86passes1.09s; it overlaps the earlier document
+runs. Distinct focused coverage at this point is30period+86document=116,
+not the sum of overlapping retries. No whole-lane suite ran.
+
+Public code inspection confirms the earlier reporting-currency correction is
+already present: SF1 reporting currency is separated from trade currency,
+and remaining source identity stops occur before USD price-route acceptance.
+Do not remove that correct currency check or claim it caused the remaining
+four FIGI disagreements/one collision. Sharadar's official TICKERS definition
+permits a non-composite US FIGI fallback and space-separated FIGIs. That makes
+a listing-to-composite hierarchy observation a justified NEW diagnostic
+question, not proof that these five cases are equivalent. A new bounded
+two-phase anonymous OpenFIGI contract is being implemented: authenticate only
+the exact retained AD selection DATA with a new guard; query its nine public
+FIGIs once; optionally query only newly referenced composite FIGIs once;
+require unambiguous same-share-class US-composite witness evidence. Any
+relation would remain current-vintage technical evidence, not an alias,
+permanent-master/PIT/price admission or vendor-global-collision clearance.
+The old AD transport cause/contact count remains unknown. The later verified
+macOS resolver-socket correction motivates the new exact transport boundary,
+not a retrospective root-cause claim or unchanged retry.
+
+Sources for this public design are https://sharadar.com/prices (expanded
+TICKERS Composite FIGI definition), https://sharadar.com/docs/tickers and
+https://www.openfigi.com/api/documentation. Implementation alone grants no
+contact. Exact new source/profile/host/endpoint/claim/deadline/attempt/output
+validation and clean committed run bindings must be frozen separately before
+any new DATA or provider access. Fixed prospective R327-H output is not yet
+inspected/allocated. All old source modules and their actual pin chains stay
+frozen; no generic equality relaxation, silent refresh, favorable first-row
+selection, source/price fallback or response-body/credential/row disclosure.
 Final handoff's first record selection85pass/1fail1.39s caught a blank
 separator before the newly appended section5row; removed that separator to
 restore the mandatory contiguous GFM ledger. No production source changed;

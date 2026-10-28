@@ -38,7 +38,7 @@ from scripts import diagnose_short_interest_body_receipt_custody as antecedent
 
 ROOT, BRANCH = transport.ROOT, lane.BRANCH
 SOURCE_AUTHORITY_SHA256 = "9d67d93ad79657031befd8849659bc20fc5834173d76a569bccb9307347e3a6c"
-RUN_PROTOCOL_SHA256 = "5d2cb9935d26bbdbe92ac15d2bc98b775a8b7202870a5f119f3aa15dcb74f959"
+RUN_PROTOCOL_SHA256 = "14818d707b17eef1a6b9ba26416c3c0a4dd82cdc33c8819130ffcd3cb8cc4b29"
 NEGATIVE_PRESERVATION_POLICY_SHA256 = "e0e8df728d96dfaae20b43497ad150557d9a767e5d853d020ec6b9acfcc0423c"
 BASELINE_LEDGER_SHA256 = research_budget.BASELINE_LEDGER_SHA256
 MAXIMUM_CHUNK_SECONDS, MAXIMUM_ARCHIVES = 3600, 1
@@ -129,7 +129,7 @@ def protocol():
         "closed_control": "terminal_intent_only_until_original_outer_finish",
         "negative_preservation": "LIVE_independent_lease_before_claim_or_key_failed_already_received_only_inside_volume_drain",
         "negative_blocker": "fixed_allowlisted_original_failure_and_authenticated_pure_journal_or_explicit_unknown_before_mandatory_no_network_process_retention",
-        "hold_report": "content_addressed_owner_only_exclusive_fsynced_copy_before_stdout_write_failure_never_releases_process_retention",
+        "hold_report": "max2MiB_content_addressed_owner_only_exclusive_original_parent_directory_and_file_anchors_positive_write_progress_file_directory_parent_fsync_original_inode_exact_readback_terminal_full_stamp_before_stdout_failure_never_releases_retention",
         "negative_final": "once_issued_preservation_manifest_after_wire_drain_all_reserved_debits_unknowns_not_process_closure",
         "remote_START_evidence": "fresh_exact_origin_ref_original_SourceLease_at_most8_exact_ticket_roster_before_START_creator",
         "contribution": "original_reader_snapshot_immediately_after_chunkclosure_before_irreversible_settle_then_original_account7_only",
@@ -1379,8 +1379,9 @@ def _requires_process_hold():
 def _persist_hold_report(raw):
     """Durable owner-only copy of the fixed hold projection; never a release.
 
-    Only this process retains unexported RAM bytes, and its launcher can still
-    reap it (exec13448). The copy lets the projection's accounting outlive
+    Only this process retains unexported RAM bytes. A launcher's lifetime is
+    a prospective risk; exec13448's disappearance cause is UNKNOWN. The copy
+    lets the projection's accounting outlive
     stdout and the process. Its name is the SHA-256 of its exact bytes, so a
     truncated or edited copy is self-evidently invalid; no file is replaced.
     """
@@ -1390,25 +1391,97 @@ def _persist_hold_report(raw):
         "process_id": os.getpid(), "retention_summary": json.loads(raw),
         "private_bytes_retained_only_by_holding_process": True, "release_or_settlement_authority": False}
     data = canonical_json(record).encode()
+    require(0 < len(data) <= 2 * 1024 ** 2, "durable_capture_hold_report_refused")
     digest = hash_bytes(data); directory = HOLD_REPORT_DIRECTORY
-    try: directory.mkdir(mode=0o700)
-    except FileExistsError: pass
-    named = directory.lstat()
-    require(stat.S_ISDIR(named.st_mode) and named.st_uid == os.getuid()
-        and stat.S_IMODE(named.st_mode) == 0o700, "durable_capture_hold_report_refused")
-    parent = os.open(directory, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    require(type(directory) is type(ROOT) and directory.is_absolute()
+        and directory.resolve() == directory, "durable_capture_hold_report_refused")
+    containing = directory.parent
+    def directory_pin(info, *, report=False):
+        mode = stat.S_IMODE(info.st_mode)
+        require(stat.S_ISDIR(info.st_mode) and info.st_uid == os.getuid()
+            and (mode == 0o700 if report else not mode & 0o022), "durable_capture_hold_report_refused")
+        return info.st_dev, info.st_ino, info.st_uid, info.st_gid, mode
+    def file_pin(info, size):
+        require(stat.S_ISREG(info.st_mode) and info.st_uid == os.getuid()
+            and stat.S_IMODE(info.st_mode) == 0o400 and info.st_nlink == 1 and info.st_size == size,
+            "durable_capture_hold_report_refused")
+        return info.st_dev, info.st_ino, info.st_uid, info.st_gid, stat.S_IMODE(info.st_mode), info.st_nlink
+    parent_pin = directory_pin(containing.lstat())
+    parent = os.open(containing, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    name = "hold-" + digest + ".json"
     try:
-        opened = os.fstat(parent)
-        require((opened.st_dev, opened.st_ino) == (named.st_dev, named.st_ino), "durable_capture_hold_report_refused")
-        fd = os.open("hold-" + digest + ".json", os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o400,
-            dir_fd=parent)
+        def check_parent():
+            require(containing.resolve() == containing
+                and directory_pin(os.fstat(parent)) == parent_pin
+                and directory_pin(containing.lstat()) == parent_pin, "durable_capture_hold_report_refused")
+        check_parent()
+        try: os.mkdir(directory.name, mode=0o700, dir_fd=parent)
+        except FileExistsError: pass
+        named = os.stat(directory.name, dir_fd=parent, follow_symlinks=False)
+        report_pin = directory_pin(named, report=True)
+        report = os.open(directory.name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=parent)
         try:
-            view = memoryview(data)
-            while view: view = view[os.write(fd, view):]
-            os.fsync(fd)
-        finally: os.close(fd)
-        os.fsync(parent)
+            def check_directory():
+                check_parent()
+                require(directory.resolve() == directory
+                    and directory_pin(os.fstat(report), report=True) == report_pin
+                    and directory_pin(os.stat(directory.name, dir_fd=parent, follow_symlinks=False), report=True) == report_pin
+                    and directory_pin(directory.lstat(), report=True) == report_pin,
+                    "durable_capture_hold_report_refused")
+            check_directory()
+            fd = os.open(name, os.O_RDWR | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o400, dir_fd=report)
+            try:
+                os.fchmod(fd, 0o400)  # Exact owner-only mode even under a restrictive umask; fresh inode only.
+                created = file_pin(os.fstat(fd), 0)
+                def check_file(size):
+                    check_directory()
+                    require(file_pin(os.fstat(fd), size) == created
+                        and file_pin(os.stat(name, dir_fd=report, follow_symlinks=False), size) == created,
+                        "durable_capture_hold_report_refused")
+                offset = 0
+                while offset < len(data):
+                    check_file(offset)
+                    amount = os.write(fd, memoryview(data)[offset:])
+                    require(type(amount) is int and 0 < amount <= len(data) - offset,
+                        "durable_capture_hold_report_refused")
+                    offset += amount
+                def full_file_stamp(info):
+                    return (*file_pin(info, len(data)), info.st_size, info.st_mtime_ns, info.st_ctime_ns,
+                        getattr(info, "st_flags", None))
+                sealed = full_file_stamp(os.fstat(fd))
+                def check_sealed():
+                    check_file(len(data))
+                    require(full_file_stamp(os.fstat(fd)) == sealed
+                        and full_file_stamp(os.stat(name, dir_fd=report, follow_symlinks=False)) == sealed,
+                        "durable_capture_hold_report_refused")
+                check_sealed(); os.fsync(fd); check_sealed()
+                os.fsync(report); check_sealed()
+                # This existing directory owns the newly created report-directory link.
+                os.fsync(parent); check_sealed()
+                # Read only this invocation's original O_EXCL inode. No named file is reopened or adopted.
+                os.lseek(fd, 0, os.SEEK_SET); remaining, blocks = len(data), []
+                while remaining:
+                    check_sealed(); amount = min(65536, remaining)
+                    block = os.read(fd, amount)
+                    require(type(block) is bytes and 0 < len(block) <= amount,
+                        "durable_capture_hold_report_refused")
+                    blocks.append(block); remaining -= len(block); check_sealed()
+                require(b"".join(blocks) == data, "durable_capture_hold_report_refused")
+                check_sealed()
+            finally: os.close(fd)
+            check_directory()
+            require(full_file_stamp(os.stat(name, dir_fd=report, follow_symlinks=False)) == sealed,
+                "durable_capture_hold_report_refused")
+        finally: os.close(report)
+        check_parent()
+        require(directory_pin(os.stat(directory.name, dir_fd=parent, follow_symlinks=False), report=True) == report_pin,
+            "durable_capture_hold_report_refused")
     finally: os.close(parent)
+    # Successful descriptor cleanup cannot hide a last named-entry change.
+    require(containing.resolve() == containing and directory.resolve() == directory
+        and directory_pin(containing.lstat()) == parent_pin
+        and directory_pin(directory.lstat(), report=True) == report_pin
+        and full_file_stamp((directory / name).lstat()) == sealed, "durable_capture_hold_report_refused")
     return digest
 
 

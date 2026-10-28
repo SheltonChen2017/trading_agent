@@ -708,8 +708,8 @@ def _reach_real_hold(h, monkeypatch):
 
 
 def test_hold_report_is_durable_content_addressed_and_written_before_stdout(fabricated_outer_run, monkeypatch, capsys):
-    # SI-CR24-002: exec13448's stdout projection died with its launching
-    # session; the accounting copy must already be on disk before stdout.
+    # SI-CR24-002: exec13448's stdout projection became unavailable after its
+    # process disappeared; the accounting copy must already be on disk before stdout.
     hold = _reach_real_hold(fabricated_outer_run, monkeypatch)
     directory, seen, synced = outer.HOLD_REPORT_DIRECTORY, [], []
     def recording_print(*args, **kwargs):
@@ -717,10 +717,16 @@ def test_hold_report_is_durable_content_addressed_and_written_before_stdout(fabr
         print(*args, **kwargs)
     monkeypatch.setattr(outer, "print", recording_print, raising=False)
     real_fsync = os.fsync
-    monkeypatch.setattr(outer.os, "fsync", lambda fd: (synced.append(fd), real_fsync(fd))[1])
+    def fsync(fd):
+        info = os.fstat(fd); synced.append((info.st_dev, info.st_ino))
+        return real_fsync(fd)
+    monkeypatch.setattr(outer.os, "fsync", fsync)
     with pytest.raises(HoldingTestSentinel): hold()
     files = sorted(directory.iterdir())
-    assert len(files) == 1 and seen and seen[0] == [files[0].name] and len(synced) == 2
+    assert len(files) == 1 and seen and seen[0] == [files[0].name]
+    # Distinct durable barriers: file bytes, report entry, and newly created directory's parent entry.
+    assert synced == [(info.st_dev, info.st_ino) for info in
+        (files[0].lstat(), directory.lstat(), directory.parent.lstat())]
     data = files[0].read_bytes()
     assert files[0].name == "hold-" + hash_bytes(data) + ".json"
     assert files[0].lstat().st_mode & 0o777 == 0o400 and directory.lstat().st_mode & 0o777 == 0o700
@@ -762,6 +768,161 @@ def test_hold_report_name_is_never_replaced(monkeypatch):
     path = outer.HOLD_REPORT_DIRECTORY / ("hold-" + digest + ".json"); original = path.read_bytes()
     with pytest.raises(FileExistsError): outer._persist_hold_report(raw)
     assert path.read_bytes() == original and len(list(outer.HOLD_REPORT_DIRECTORY.iterdir())) == 1
+
+
+def test_new_hold_report_directory_link_is_fsynced_before_durable_success(monkeypatch):
+    directory = outer.HOLD_REPORT_DIRECTORY
+    containing = directory.parent.lstat(); synced = []
+    real_fsync = os.fsync
+    def fsync(fd):
+        info = os.fstat(fd); synced.append((info.st_dev, info.st_ino))
+        return real_fsync(fd)
+    monkeypatch.setattr(outer.os, "fsync", fsync)
+    digest = outer._persist_hold_report(canonical_json({"status": "preservation_blocked"}))
+    report = (directory / ("hold-" + digest + ".json")).lstat()
+    created = directory.lstat()
+    assert (report.st_dev, report.st_ino) in synced
+    assert (created.st_dev, created.st_ino) in synced
+    assert (containing.st_dev, containing.st_ino) in synced  # Parent owns the newly created directory entry.
+
+
+def test_hold_report_zero_progress_refuses_without_retrying_or_hanging(monkeypatch):
+    real_write = os.write; calls = []
+    def write(fd, data):
+        calls.append(len(data))
+        return 0 if len(calls) == 1 else real_write(fd, data)
+    monkeypatch.setattr(outer.os, "write", write)
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="hold_report_refused"):
+        outer._persist_hold_report(canonical_json({"status": "preservation_blocked"}))
+    assert len(calls) == 1
+
+
+def test_named_hold_directory_replacement_cannot_announce_durable_success(fabricated_outer_run, monkeypatch, capsys):
+    hold = _reach_real_hold(fabricated_outer_run, monkeypatch)
+    directory = outer.HOLD_REPORT_DIRECTORY; directory.mkdir(mode=0o700)
+    original = directory.lstat(); moved = directory.with_name("original-moved")
+    real_open = os.open; changed = []
+    def open_with_replacement(*args, **kwargs):
+        fd = real_open(*args, **kwargs); info = os.fstat(fd)
+        if not changed and (info.st_dev, info.st_ino) == (original.st_dev, original.st_ino):
+            directory.rename(moved); directory.mkdir(mode=0o700); changed.append(True)
+        return fd
+    monkeypatch.setattr(outer.os, "open", open_with_replacement)
+    with pytest.raises(HoldingTestSentinel): hold()
+    assert changed == [True] and list(directory.iterdir()) == []
+    output = capsys.readouterr().out
+    assert '"durable_report_written":false' in output
+    assert '"durable_report_written":true' not in output
+    assert outer._requires_process_hold() and fabricated_outer_run.preservation.fd_open
+
+
+@pytest.mark.parametrize("mutation_barrier", [1, 3])
+def test_hold_report_same_size_original_inode_mutation_refuses_instead_of_wrong_digest(monkeypatch, mutation_barrier):
+    real_fsync = os.fsync; changed, barriers, original_writer = [], [], []
+    def fsync(fd):
+        real_fsync(fd); info = os.fstat(fd)
+        barriers.append(fd)
+        if outer.stat.S_ISREG(info.st_mode): original_writer.append(fd)
+        if len(barriers) == mutation_barrier:
+            assert os.pwrite(original_writer[0], b"X", 0) == 1
+            changed.append(True)
+    monkeypatch.setattr(outer.os, "fsync", fsync)
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="hold_report_refused"):
+        outer._persist_hold_report(canonical_json({"status": "preservation_blocked"}))
+    assert changed == [True]
+
+
+@pytest.mark.parametrize("amount", [False, -1, None, 3 * 1024 ** 2])
+def test_hold_report_invalid_write_progress_refuses_immediately(monkeypatch, amount):
+    calls = []
+    def write(fd, data): calls.append(len(data)); return amount
+    monkeypatch.setattr(outer.os, "write", write)
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="hold_report_refused"):
+        outer._persist_hold_report(canonical_json({"status": "preservation_blocked"}))
+    assert len(calls) == 1
+
+
+def test_hold_report_short_writes_preserve_exact_original_copy(monkeypatch):
+    real_write = os.write; calls = []
+    def write(fd, data):
+        calls.append(len(data)); return real_write(fd, data[:7])
+    monkeypatch.setattr(outer.os, "write", write)
+    digest = outer._persist_hold_report(canonical_json({"status": "preservation_blocked"}))
+    saved = (outer.HOLD_REPORT_DIRECTORY / ("hold-" + digest + ".json")).read_bytes()
+    assert hash_bytes(saved) == digest and len(calls) > 1
+
+
+def test_hold_report_exact_original_inode_readback_is_required(monkeypatch):
+    calls = []
+    def wrong_read(fd, size): calls.append(size); return b"X" * size
+    monkeypatch.setattr(outer.os, "read", wrong_read)
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="hold_report_refused"):
+        outer._persist_hold_report(canonical_json({"status": "preservation_blocked"}))
+    assert calls and all(0 < amount <= 65536 for amount in calls)
+
+
+@pytest.mark.parametrize("failed_barrier", [1, 2, 3])
+def test_hold_report_fsync_failure_keeps_original_private_hold(fabricated_outer_run, monkeypatch, capsys, failed_barrier):
+    hold = _reach_real_hold(fabricated_outer_run, monkeypatch)
+    real_fsync = os.fsync; calls = []
+    def fsync(fd):
+        calls.append(fd)
+        if len(calls) == failed_barrier: raise OSError("PRIVATE_FSYNC_DIAGNOSTIC_SENTINEL")
+        return real_fsync(fd)
+    monkeypatch.setattr(outer.os, "fsync", fsync)
+    with pytest.raises(HoldingTestSentinel): hold()
+    output = capsys.readouterr().out
+    assert len(calls) == failed_barrier and '"durable_report_written":false' in output
+    assert "PRIVATE_FSYNC_DIAGNOSTIC_SENTINEL" not in output
+    assert outer._requires_process_hold() and fabricated_outer_run.preservation.fd_open
+    assert list(outer.HOLD_REPORT_DIRECTORY.iterdir())  # Preserve original partial/unconfirmed evidence.
+
+
+def test_hold_report_refuses_symlinked_ancestor_before_creating_copy(monkeypatch, tmp_path):
+    target = tmp_path / "physical"; target.mkdir(mode=0o700)
+    alias = tmp_path / "alias"; alias.symlink_to(target, target_is_directory=True)
+    monkeypatch.setattr(outer, "HOLD_REPORT_DIRECTORY", alias / "count_hold_reports")
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="hold_report_refused"):
+        outer._persist_hold_report(canonical_json({"status": "preservation_blocked"}))
+    assert list(target.iterdir()) == []
+
+
+@pytest.mark.parametrize("hazard", ["directory_mode", "file_mode", "extra_file_link"])
+def test_hold_report_protection_drift_at_final_barrier_refuses(monkeypatch, hazard):
+    real_fsync = os.fsync; calls = []
+    def fsync(fd):
+        real_fsync(fd); calls.append(fd)
+        if len(calls) == 3:
+            directory = outer.HOLD_REPORT_DIRECTORY
+            saved = next(directory.iterdir())
+            if hazard == "directory_mode": directory.chmod(0o750)
+            elif hazard == "file_mode": saved.chmod(0o440)
+            else: os.link(saved, directory / "extra-link")
+    monkeypatch.setattr(outer.os, "fsync", fsync)
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="hold_report_refused"):
+        outer._persist_hold_report(canonical_json({"status": "preservation_blocked"}))
+    assert len(calls) == 3
+
+
+def test_hold_report_final_named_directory_audit_runs_after_all_descriptors_close(monkeypatch):
+    directory = outer.HOLD_REPORT_DIRECTORY
+    containing = directory.parent.lstat(); real_close = os.close; changed = []
+    def close(fd):
+        info = os.fstat(fd); real_close(fd)
+        if not changed and (info.st_dev, info.st_ino) == (containing.st_dev, containing.st_ino):
+            directory.rename(directory.with_name("original-after-close")); directory.mkdir(mode=0o700)
+            changed.append(True)
+    monkeypatch.setattr(outer.os, "close", close)
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="hold_report_refused"):
+        outer._persist_hold_report(canonical_json({"status": "preservation_blocked"}))
+    assert changed == [True] and list(directory.iterdir()) == []
+
+
+def test_hold_report_bound_refuses_before_any_new_directory(monkeypatch):
+    raw = canonical_json({"status": "X" * (2 * 1024 ** 2)})
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="hold_report_refused"):
+        outer._persist_hold_report(raw)
+    assert not outer.HOLD_REPORT_DIRECTORY.exists()
 
 
 def test_CLI_returns_two_only_after_all_negative_attempts_are_preserved(fabricated_outer_run, monkeypatch, capsys):

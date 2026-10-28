@@ -27755,3 +27755,88 @@ Latest100/200remainInProgress, operational.153/.155, noerror; thisisnotaccepted
 coverage/PnL. Purecompiledready,0jobs; active2nodespreserved. No long-livedpolling
 shell or recreatedautomation; boundedJSorchestrationusedseparatefreshcommands,
 and endedBEFOREthisHEADmutation. FuturestatususesnewHEAD/freshscopes.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-EC4-20261028-001/77db0b501f7b8a2cb99543db143b0fd18a60f46c19b179e4526e4adbaac262e9 at ec4e31f25cb542231a7272dc90df4a010b3b717e before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-EC4-PROGRESS-20261028-001/79db5fa86de3b79f5434c6f37f879240396b0eab2e2c6b9c38b92cbc338f5a06 at ec4e31f25cb542231a7272dc90df4a010b3b717e BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-EC4-20261028-002/7c0a2833c22b8b799dc74c122151a7d2665559a993659138b634720a56f89b00 at ec4e31f25cb542231a7272dc90df4a010b3b717e before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-EC4-PROGRESS-20261028-002/13093eb7cf5cffd5ed9e1fbc1e7bf4aacc734292a84203bae889a2fda35927ce at ec4e31f25cb542231a7272dc90df4a010b3b717e BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-EC4-20261028-003/0f3dcc08ca4439985539436ca0b5d7c95134869521130d1b3887309e18b3fffd at ec4e31f25cb542231a7272dc90df4a010b3b717e before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-EC4-PROGRESS-20261028-003/ac4982b7a0f6616fca3cb06ed8ff338b94dbb0c5eaa0961131670114c2bfe6fa at ec4e31f25cb542231a7272dc90df4a010b3b717e BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-EC4-20261028-004/946bff012744168868caa8da78518b6a076ef4cb571efd912e997620ad371ce8 at ec4e31f25cb542231a7272dc90df4a010b3b717e before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-EC4-PROGRESS-20261028-004/cfc2412d99d26e80ec09f01393fb0aad1f1bef354005c50a618468365367f7bf at ec4e31f25cb542231a7272dc90df4a010b3b717e BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+### 104.32 Optional private-result reader counter-review, before any native effect
+
+Source-only reader73b7703aa15bac4bb2eeae9e722f94a4078dff6331b844b3544e747b1b0bd5d0
+initiallypassed40focusedtests (author4.29s/root4.25s/independent4.17s) butis
+REJECTEDpendingcorrection: independentoffline103 proved decodedREADER_CONFIG
+parent_prefix/index_key drift afterInitialize couldcausea foreign-unreserved
+indexread beforelaterreplayrefusal. Findingscopeis NEW UNUSEDoptionalreader,
+notfinancialproducers/runningjobs. Every_boundmustreverifyfrozenJSONSHA/stable
+configurationidentity/exactdecodedconfig BEFOREclaim/read; authoraddingfirst-
+effect/duringeffect drift negatives. Rootalso required replayclaimindexdescriptor
+tokeepitsACTUALindexbytes, with journal_total_bytes separate; oldmetadata mixed
+indexkey/hashwithsumofchunkbytes. Preserveinitialsourceidentity/testhistory;
+no nativejob/privateinput wasusedby thisreader oritsauthors/reviewers.
+
+Allrawlicensedjournalrowsmustremainprivate/inQC. ReaderwillreplaceONLYmain,
+preserve23physicalfiles, source-select exactunchangedpureconsumer/evidence/
+metrichelpers asreadableAST/plaintext<60000; parent15activefileclosureand16
+publictemplatesremainseparatefromall24physicalpreservationinventory. Runtime
+requiresdistinctactualchild32job/project/locked/liveFalse, immutableownjobclaims
+before1index<=2MiB/<=1024chunks<=512KiBeach/<=256MiB/300000records/replay,
+same-nodeverificationONLY. Allorigin/backend/PIT/rights/reconciliation/admission/
+performance flagsstayfalse; reportedownNAVmetrics arenotindependentacceptance.
+ActualnativeCPU/memorylimitsunproved; no source-onlytestrelabelednativeproof.
+
+BoundedreadonlyEC4awaitbatch finishedall4freshAPI+operational-onlyprocessing
+phases, noHEAD/remote/sourceadvance, no effects/retries/purchases/cancellations.
+Latest100jobf9f9afa0...InProgress.204/200jobdf338f3d...InProgress.205, noerror;
+progressisoperationalmetadata, notacceptedcoverage/PnL. PureTPRcompiledready,
+0jobs. Rootcontinuestofivefixedarmoutcomes; exactlyonefinalpushstillpending.
+
+Fresh bounded native phase TPR-CMP28-API-FIXED-ARM-STATUS-20261028-006/e3a6ed4a68f89aff9305f8139ed782df6891f9c3e32595449fd14f3bfaaa82c0 at ec4e31f25cb542231a7272dc90df4a010b3b717e before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+### 104.33 Corrected optional reader accepted within focused software scope
+
+Correctednative_result_reader.py24198B/33fa772f8a0b1899937d4a9e4bb70a6c168df3cfea3dd7be69928996fb19144a;
+test19447B/a9a064ba503e21be479e1183c32c58a631ad7dc8cdd4943a24cca36712c53007.
+All40priortestsretained+21newnegativecases; author61passed6.30s, root61passed6.46s,
+independentoffline10361passed6.37s, AST/inmemorycompile/diffclean. Exactold
+foreign-prefixcounterexample nowperformsZEROclaim/read/_reads0/replayfalse.
+Every_boundchecksJSONstring/hash/types/exactdecodedcanonicalcfgagainstinit
+snapshots/immutableparenttuple, repeatsAFTERnativegetters, refusescoordinated
+JSON+hashrebasing andpre/duringeffectdrift. InitialpublicmetadatausesfrozenJSON.
+Cancellation/fatal remainsbodyfreewhenconfigurationdriftsduringexceptioncheck.
+ReplayclaimnowbindsACTUALindexkey/SHA/indexbytes, separatejournal_total_bytes.
+Initial73bsourceisrejectedsoftwarehistory, nevernativeused. Correctionaccepted
+foroptionaltemplateonly; no nativeABI/backend/resource/financialacceptance proof.
+
+Builderbuild_native_result_reader acceptsONLYpinnedpublicsourcebytes/exactparent
+completionbinding/summary+configbytes/indexdescriptor; generatedmainreadable
+plaintext<60000, preserves23otherphysicalcloudfiles. Purehelper/completion AST
+bodies areselected/namespace-transformedwithoutcompression/exec/importtricks.
+Originalpubliccalendarreusescore.CALENDAR_JSON, no duplicated/inventedaxis.
+Actualparentrenderer15activehashes/16templatesstayseparatefrom24preservation
+inventory. ZeroInitializeprivateeffects; lockedresearchchildproject/job!=parent
+checkedaroundclaim/index/chunkread/byteconversion/hash/parse/replay. Bound1026
+immutable<=4096Bclaims/1index<=2MiB/1024chunks<=512KiBeach/256MiBjournal/
+300000records/300050parse/10000hash/1440clockbars. Same-nodereadbackonly;
+rawlicensedjournalsremainINQC. OutputsafeownNAVmetrics/counts/hashes/feesonly,
+allindependentaccountreconciliation/origin/backend/PIT/rights/admission/accepted
+performanceflagsFalse. Worst-caserawchunkmemory256MiBandFractionCPUremain
+native-unproved; sourceonlysynthetic1449NAVreader==pureconsumeragreementisnot
+actualfinancialproof. Rootwillfreshlyreserveanyactualreadercompile/job ONLYif
+parentCompletedrequiresprivateframingaudit andcapacitypermits; noeffectnow.
+
+LatestboundedAPIstatus006 afterEC4 batch remains100/200InProgress/noerrors.
+ThiscommitafterallactiveAPIcellsfinished changesonlynewoptionalreader/tests/
+record; financialsource/config/calendar/economics unchanged. Purefinancialjob
+haspriorityfornextnaturalspare node. NoClaudecheckpoint or finalpushyet.

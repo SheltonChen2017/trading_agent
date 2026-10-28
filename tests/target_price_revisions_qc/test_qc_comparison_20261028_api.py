@@ -397,3 +397,23 @@ def test_cleanup_fatal_is_not_demoted_by_an_earlier_ordinary_failure(tmp_path,mo
     with pytest.raises(m.APIFatal) as result:execute(tmp_path,plan(),failed)
     assert result.value.report['status']=='failed_or_uncertain'
     assert 'synthetic fatal body' not in str(result.value)
+
+
+@pytest.mark.parametrize('start,size,accepted',[(0,20,True),(20,99,True),(0,100,False),(20,101,False)])
+def test_orders_page_range_is_strictly_less_than_100(start,size,accepted):
+    request=row('backtests/orders/read',{'projectId':m.PROJECT,'backtestId':'c'*32,
+        'start':start,'end':start+size})
+    if accepted:
+        assert plan([request])['requests'][0]['payload']['end']==start+size
+    else:
+        with pytest.raises(m.APIRefusal):plan([request])
+
+
+@pytest.mark.parametrize('size,accepted',[(200,True),(201,False)])
+def test_order_bound_correction_preserves_separate_log_window(size,accepted):
+    request=row('backtests/read/log',{'projectId':m.PROJECT,'backtestId':'c'*32,
+        'start':0,'end':size,'query':'CMP28'})
+    if accepted:
+        assert plan([request])['requests'][0]['payload']['end']==size
+    else:
+        with pytest.raises(m.APIRefusal):plan([request])

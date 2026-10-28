@@ -122,7 +122,8 @@ def _payload(endpoint, payload, allowed):
         if endpoint!='backtests/read':
             keys|={'start','end'}
             start=_integer(payload.get('start'),50000); end=_integer(payload.get('end'),50200)
-            if not start<end<=start+(200 if endpoint=='backtests/read/log' else 100): _fail()
+            # Official order range is strictly less than 100; logs retain their separate 200-line bound.
+            if not start<end<=start+(200 if endpoint=='backtests/read/log' else 99): _fail()
             if endpoint=='backtests/read/log':
                 keys.add('query'); query=payload.get('query')
                 if type(query) is not str or re.fullmatch(r'[A-Za-z0-9 _.-]{0,80}',query) is None: _fail()

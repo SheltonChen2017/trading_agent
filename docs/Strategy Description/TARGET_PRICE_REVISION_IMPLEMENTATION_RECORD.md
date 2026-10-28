@@ -27941,3 +27941,64 @@ diagnostic when a node is free. Mia004 capability consultation remains
 unsubmitted while Safari is in active use. Do not require Claude review,
 cancel viable jobs, upgrade resources, or push this intermediate state.
 Financial outcomes remain unaccepted/null for all five arms at this snapshot.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-374A-20261028-001/030b2e4302dfc31c7ff33e8fc16dd0052ef9f323467b0d1360da54ee9a9c7f14 at 374cea343bdea44d0d746608cbefd27a4344ef3e before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-374A-PROGRESS-20261028-001/3161b4374374e6abed57ec55958757c519476b6c325ab1560a1c92130a1fa81f at 374cea343bdea44d0d746608cbefd27a4344ef3e BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Readonly 374A/001 operationalstates [{"job":"f9f9afa0f2b5200f06f11fe1442adb6c","status":"In Progress...","completed":false,"progress_raw":0.304,"has_error":false},{"job":"df338f3dc811e509884195f94986c552","status":"In Progress...","completed":false,"progress_raw":0.305,"has_error":false}]; safe receipt28d63e8c2e11d115ac3d2c257de7a4bd5fc974e490b037a6fec8effebad29fb7; no nativejobs/newfinancialoutcomes or coverage/performanceacceptance.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-374A-20261028-002/57faf1486d1b121523f807b91d80cac5a69d0ca040e67b7872d60be3f7f00f57 at 374cea343bdea44d0d746608cbefd27a4344ef3e before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-374A-PROGRESS-20261028-002/a3e5589a71eae1d809a4afd77cfe428820374b721127d399ff62438ff0ac7e84 at 374cea343bdea44d0d746608cbefd27a4344ef3e BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Readonly 374A/002 operationalstates [{"job":"f9f9afa0f2b5200f06f11fe1442adb6c","status":"In Progress...","completed":false,"progress_raw":0.304,"has_error":false},{"job":"df338f3dc811e509884195f94986c552","status":"In Progress...","completed":false,"progress_raw":0.305,"has_error":false}]; safe receiptc0712be0f15675f70cce2effbdfe37268aae7e28cab86272950f4402c82ac94e; no nativejobs/newfinancialoutcomes or coverage/performanceacceptance.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-374A-20261028-003/4d8b93c6f7df8a4ee6e8f396e606e63723eabfc34c6570a69fd0b20423827cc0 at 374cea343bdea44d0d746608cbefd27a4344ef3e before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-374A-PROGRESS-20261028-003/29a09ea12d83bd5d46e40495e54012674fef753a2fe8276fd5c239e4e62c60a5 at 374cea343bdea44d0d746608cbefd27a4344ef3e BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Readonly 374A/003 operationalstates [{"job":"f9f9afa0f2b5200f06f11fe1442adb6c","status":"In Progress...","completed":false,"progress_raw":0.354,"has_error":false},{"job":"df338f3dc811e509884195f94986c552","status":"In Progress...","completed":false,"progress_raw":0.305,"has_error":false}]; safe receiptb2af08f2a70a1633c862bcfcfe382c7b9316323a5cbbe83722ff13f179e428d5; no nativejobs/newfinancialoutcomes or coverage/performanceacceptance.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-374A-20261028-004/a0820a21b7578b3f93630d9df7b878d28ed3b4ef6050e711a6ff71fcf265c172 at 374cea343bdea44d0d746608cbefd27a4344ef3e before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-374A-PROGRESS-20261028-004/79f82c0b3b1ea3314f69dcef1ae5e93e2c8550688e9c2061b1c347ce27be6596 at 374cea343bdea44d0d746608cbefd27a4344ef3e BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Readonly 374A/004 operationalstates [{"job":"f9f9afa0f2b5200f06f11fe1442adb6c","status":"In Progress...","completed":false,"progress_raw":0.354,"has_error":false},{"job":"df338f3dc811e509884195f94986c552","status":"In Progress...","completed":false,"progress_raw":0.305,"has_error":false}]; safe receiptefc65156ed64b86e62bdafefab1017fc7a72ac8fbf54a4c69c5d8d7c9266559f; no nativejobs/newfinancialoutcomes or coverage/performanceacceptance.
+
+### 104.35 OFF recovery boundary and result-collection correction
+
+Delegated source-only review by finish_off_preparation at374cea34 confirms:
+D009 cannot admit a prior-day real minute bar. The active _daily_audit rejects
+it before daily corroboration; corroboration itself requires an earlier real
+minute from the SAME session and an equal native RAW daily close. No verified
+drop-in external mark adapter exists. A later resumed feed is diagnostic,
+not a February10 repair. An admissible non-economic correction must be
+supported by actual native identity/mapping/subscription/lifecycle evidence,
+or a genuine final-delisting/action/fill chain. No terminal payoff, stale
+carry, later mark, exclusion, or custom cache insertion is authorized here.
+
+CMP104-D019: retain D017 as next bounded native gap-classification diagnostic
+after PURE gets capacity. A new EODHD five-date diagnostic could corroborate
+coverage/current identity, but external split-adjusted volume and absent QC
+clock custody cannot supply native mark authority. No existing EODHD/FMP
+transport/resolver is present; old Massive/Sharadar capture executors are
+fixed to older scopes and cannot be relabelled. Public-record source-only
+follow-up finds no exact EODHD credential locator: section87.10 intentionally
+removed it. Root elected NOT to scan credentials, guess locators, reopen old
+captures, or build/launch a redundant provider route now. No provider/private
+credential requests or purchases occurred; this does not block other arms.
+Canonical rights/PIT/input-admission claims remain false.
+
+CMP104-D020: independently verified official QC Orders request documentation
+states end-start must be LESS THAN100:
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/backtest-management/read-backtest/orders
+The lane API admitted100. Narrowed only that page bound to99; log request
+bound remains200. Six focused boundary cases prove20/99 accept,100/101 refuse,
+log200 accepts/log201 refuses. Entire focused API file81passed0.69s viaisolated
+49/52 runner, with actual credentials/network/subprocess forbidden. No full
+suite, compile/job/financial source or economics change. Historical100-page
+request failure is retained; its actual cause is not retroactively asserted
+from documentation alone. All future order census windows use<=99 (20 remains
+the earlier observed-working route).
+API 26758B/4d082d9bbefe7daf9c94099472cfb637ad343f205d664df5170a33158b3d5928; focusedtest 23548B/f4163491511679e08592a602604ecee06856b468ea975b2759b54e82e739ec4d. Financial100/200stillInProgress/.354/.305/noerrors atlatest374A/004; PUREsource1e8337... andcompile unchanged; no finalpush.

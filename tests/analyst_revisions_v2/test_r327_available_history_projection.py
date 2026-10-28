@@ -97,7 +97,13 @@ def test_all_quote_cash_fee_fill_methods_exact_AST_and_missing_marks_stops_uncha
     old_driver=m._node(old,'NewruleComparisonDriver',ast.ClassDef)
     new_driver=m._node(new,'NewruleComparisonDriver',ast.ClassDef)
     for name in m._QUOTE_METHODS:
-        assert m._dump(m._node(old_driver,name))==m._dump(m._node(new_driver,name))
+        if name!=m.CASH_BOUND_METHOD:
+            assert m._dump(m._node(old_driver,name))==m._dump(m._node(new_driver,name))
+    # Section 330: the buy loop differs only by the one declared cash-bound statement.
+    bounded=m._node(new_driver,m.CASH_BOUND_METHOD)
+    assert m._dump(m._cash_bound(bounded,*reversed(m.CASH_BOUND_CHANGE)))==m._dump(m._node(old_driver,m.CASH_BOUND_METHOD))
+    assert m._dump(m._cash_bound(bounded,m.CASH_BOUND_CHANGE[1],m.CASH_BOUND_CHANGE[1]))==m._dump(bounded)
+    fail('base_semantics',lambda:m._cash_bound(bounded,*m.CASH_BOUND_CHANGE))
     assert [m._dump(node) for node in old_driver.bases]==[m._dump(node) for node in new_driver.bases]
     for name,raw in supplied['addon_source_pairs'][:-1]:
         assert files[name]==m.common._cloud_source(raw,name)
@@ -119,6 +125,7 @@ def test_generated_cloud_profile_is_exact_new_period_and_preserves_economics(bat
     assert strategy['gross_target']=='0.98' and strategy['aggregate_stock_target_cap']=='0.098'
     assert strategy['fee_bps']=='10' and strategy['slippage_model_bps']=='0'
     assert strategy['execution_policy']==m.quote.POLICY
+    assert strategy['buy_cash_bound']==m.CASH_BOUND_FIELD[1]!=m.quote.policy_profile_fields()['buy_cash_bound']
     assert strategy['initial_state']=='new_epoch_empty_positions_and_orders_USD1000000'
     assert strategy['first_reference_close']=='2021-10-29'
     assert strategy['candidate_id']==f'arv2-r327-{size}-ar{arm}-2021Nov01-2026Oct13-v1-quote-aware-v1'

@@ -178,9 +178,11 @@ def test_warmup_split_is_retained_as_diagnostic_and_duplicate_occurrence_refuses
 
 def test_mock_engine_invalid_callback_with_stale_price_stops_without_resize_or_next_buy(public_w5):
     # The engine rejection is supplied by this mock; this is NOT LEAN-margin evidence.
+    # Section 330 (owner-directed ARV2R328-004): the stale engine price above the ask
+    # now bounds the cash-limited size; the fee basis stays the authenticated ask.
     case = quote_fixtures.case(public_w5.quote)
     driver, security = case.driver, case.security
-    security.price = D(120)  # Above the authenticated ask110; never used for resizing.
+    security.price = D(120)  # Above the authenticated ask110; bounds the cash-limited size.
     session = quote_fixtures.NOW.date().isoformat()
     driver._require_initialized = lambda: None
     driver._status = lambda status: status
@@ -195,12 +197,12 @@ def test_mock_engine_invalid_callback_with_stale_price_stops_without_resize_or_n
     driver._ensure_security = lambda _identity: (case.symbol, security)
     driver._portfolio_cash = lambda: D("220.22")
     driver._algorithm.live_mode = False
-    engine = NS(id=7, tag=None, quantity=D(2))
+    engine = NS(id=7, tag=None, quantity=D(1))
     driver._algorithm.transactions = NS(get_open_orders=lambda: (), get_order_by_id=lambda _id: engine)
     dispatched = []
 
     def reject(symbol, quantity, *, asynchronous, tag):
-        assert symbol is case.symbol and quantity == 2 and asynchronous is False
+        assert symbol is case.symbol and quantity == 1 and asynchronous is False
         engine.tag = tag
         assert driver._intent["fee_basis_quote"] == "110"  # Preserved ask fee/size semantics.
         dispatched.append((quantity, tag))
@@ -211,7 +213,7 @@ def test_mock_engine_invalid_callback_with_stale_price_stops_without_resize_or_n
     driver._algorithm.market_order = reject
     with pytest.raises(base.targets.NewruleError, match="^nonterminal_or_partial_order$"):
         driver.on_after_open()
-    assert len(dispatched) == 1 and dispatched[0][0] == 2
+    assert len(dispatched) == 1 and dispatched[0][0] == 1
     assert not driver._executed and not driver._order_ids and not driver._fills
     assert driver._intent is not None and driver._intent["fill"] is None
-    assert driver._cash_underfill_count == 0 and security.price == D(120)
+    assert driver._cash_underfill_count == 1 and security.price == D(120)

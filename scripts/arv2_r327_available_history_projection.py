@@ -19,7 +19,7 @@ from research.analyst_revisions_v2_qc import newrule_available_history_common_pr
 common,quote,plain=previous.common,previous.common.frozen,previous.plain
 native,vendor=previous.native,previous.vendor
 SCHEMA='arv2-r327-available-history-public-batch-v1'
-CELL_SCHEMA='arv2-r327-available-history-public-projection-v1'
+CELL_SCHEMA='arv2-r327-available-history-public-projection-v2'
 PATCHER_NAME='arv2_r327_available_history_projection.py'
 BASE_NAME='newrule_available_history_comparison_runtime.py'
 DRIVER_NAME='newrule_available_history_common_price_runtime.py'
@@ -51,6 +51,16 @@ _OLD_CONSTANTS=('SCHEMA','START_SESSION','META_STATISTIC','MONTHLY_STATISTIC')
 _NEW_CONSTANTS=('FIRST_REFERENCE_CLOSE','RESEARCH_EPOCH_ID','FULL_AXIS_COUNT','FULL_AXIS_SHA256')
 _PERIOD_METHODS=('initialize','on_end_of_algorithm')
 _QUOTE_METHODS=('__init__','_quote_snapshot','fee_basis','_current_execution_price','_submit_market','on_after_open','on_order_event')
+# Owner-directed W5 cash bound (section 330, ARV2R328-004). LEAN's pre-trade
+# buying-power check values a market buy at security.Price, which can be a stale
+# trade above the authenticated ask, so a cash-limited buy is sized on the larger
+# of the two. Ask fill price, fee basis and prior-close targets are unchanged.
+CASH_BOUND_METHOD='on_after_open'
+CASH_BOUND_CHANGE=('price = self._current_execution_price(security, 1)',
+ 'try:\n    price = max(self._current_execution_price(security, 1), number(security.price, positive=True))\n'
+ 'except targets.NewruleError:\n    raise\n'
+ 'except Exception:\n    raise targets.NewruleError("quote_execution_engine_price") from None')
+CASH_BOUND_FIELD=('buy_cash_bound','floor_current_cash_divided_by_max_of_ask_and_engine_security_price_times_1point001;prior_RAW_close_target_quantities_unchanged')
 
 
 class Refused(ValueError):pass
@@ -87,10 +97,24 @@ def _assignment(tree,name):
 def _replace_node(owner,old,new):owner.body[owner.body.index(old)]=copy.deepcopy(new)
 
 
-def _quoted_profile(node):
+def policy_profile_fields():
+    fields=quote.policy_profile_fields();require(CASH_BOUND_FIELD[0] in fields,'quote')
+    return {**fields,CASH_BOUND_FIELD[0]:CASH_BOUND_FIELD[1]}
+
+
+def _quoted_profile(node,fields):
     result=copy.deepcopy(node);require(isinstance(result.body[-1],ast.Return),'base_semantics')
-    result.body[-1:-1]=ast.parse('seed["candidate_id"] += "-quote-aware-v1"\nseed.update('+repr(quote.policy_profile_fields())+')').body
+    result.body[-1:-1]=ast.parse('seed["candidate_id"] += "-quote-aware-v1"\nseed.update('+repr(fields)+')').body
     return result
+
+
+def _cash_bound(method,old,new):
+    """Replace the single exact cash-bound statement anywhere in one method."""
+    result=copy.deepcopy(method);before,after=ast.parse(old).body[0],ast.parse(new).body[0]
+    sites=[(block,index) for node in ast.walk(result) for name in ('body','orelse')
+        for block in (getattr(node,name,None),) if type(block) is list
+        for index,item in enumerate(block) if _dump(item)==_dump(before)]
+    require(len(sites)==1,'base_semantics');block,index=sites[0];block[index]=after;return result
 
 
 def _period_base(old_host_raw,available_raw,quoted_raw):
@@ -102,11 +126,11 @@ def _period_base(old_host_raw,available_raw,quoted_raw):
     require(expected.encode('ascii')==available_raw,'base_delta')
     old_host,new_host,original=ast.parse(old_host_raw),ast.parse(available_raw),ast.parse(quoted_raw)
     tree=copy.deepcopy(original)
-    require(_dump(_node(original,'make_profile'))==_dump(_quoted_profile(_node(old_host,'make_profile'))),'quote')
+    require(_dump(_node(original,'make_profile'))==_dump(_quoted_profile(_node(old_host,'make_profile'),quote.policy_profile_fields())),'quote')
     for name in _OLD_CONSTANTS:_replace_node(tree,_assignment(tree,name),_assignment(new_host,name))
     insertion=tree.body.index(_assignment(tree,'START_SESSION'))+1
     tree.body[insertion:insertion]=[copy.deepcopy(_assignment(new_host,name)) for name in _NEW_CONSTANTS]
-    _replace_node(tree,_node(tree,'make_profile'),_quoted_profile(_node(new_host,'make_profile')))
+    _replace_node(tree,_node(tree,'make_profile'),_quoted_profile(_node(new_host,'make_profile'),policy_profile_fields()))
     _replace_node(tree,_node(tree,'validate_result_statistics'),_node(new_host,'validate_result_statistics'))
     owner=_node(tree,'NewruleComparisonDriver',ast.ClassDef)
     original_owner=_node(original,'NewruleComparisonDriver',ast.ClassDef)
@@ -116,13 +140,16 @@ def _period_base(old_host_raw,available_raw,quoted_raw):
         require(_dump(_node(original_owner,name))==_dump(_node(old_owner,name)),'quote')
         _replace_node(owner,_node(owner,name),_node(new_owner,name))
     for name in _QUOTE_METHODS:require(_dump(_node(owner,name))==_dump(_node(original_owner,name)),'base_semantics')
+    bounded=_cash_bound(_node(owner,CASH_BOUND_METHOD),*CASH_BOUND_CHANGE)
+    require(_dump(_cash_bound(bounded,*reversed(CASH_BOUND_CHANGE)))==_dump(_node(original_owner,CASH_BOUND_METHOD)),'base_semantics')
+    _replace_node(owner,_node(owner,CASH_BOUND_METHOD),bounded)
     restored=copy.deepcopy(tree)
     restored.body=[node for node in restored.body if not (isinstance(node,ast.Assign) and len(node.targets)==1
         and isinstance(node.targets[0],ast.Name) and node.targets[0].id in _NEW_CONSTANTS)]
     for name in _OLD_CONSTANTS:_replace_node(restored,_assignment(restored,name),_assignment(original,name))
     for name in ('make_profile','validate_result_statistics'):_replace_node(restored,_node(restored,name),_node(original,name))
     restored_owner=_node(restored,'NewruleComparisonDriver',ast.ClassDef)
-    for name in _PERIOD_METHODS:_replace_node(restored_owner,_node(restored_owner,name),_node(original_owner,name))
+    for name in (*_PERIOD_METHODS,CASH_BOUND_METHOD):_replace_node(restored_owner,_node(restored_owner,name),_node(original_owner,name))
     require(_dump(restored)==_dump(original),'base_semantics')
     ast.fix_missing_locations(tree);raw=(ast.unparse(tree)+'\n').encode('ascii')
     require(0<len(raw)<=MAX_SOURCE_BYTES,'source_bound');compile(b'from AlgorithmImports import *\n'+raw,BASE_NAME,'exec')
@@ -151,7 +178,7 @@ def _profile(axis,size,arm,pins):
     value=base.make_profile(axis,package_sha256=plain.PLAIN_PACKAGE_SHA256,lineage_sha256=plain.bridge.parent.LINEAGE,
         universe_count=size,ar_percent=arm,source_pins=pins)
     seed={key:item for key,item in value.items() if key!='profile_sha256'}
-    seed['candidate_id']+='-quote-aware-v1';seed.update(quote.policy_profile_fields())
+    seed['candidate_id']+='-quote-aware-v1';seed.update(policy_profile_fields())
     return {**seed,'profile_sha256':digest(seed)}
 
 
@@ -204,7 +231,7 @@ class Projection:
                 'original_available_source_pins','period_source_pin','period_sha256','research_epoch_id','patcher_sha256','source_files',
                 'engine_start_session','evaluation_start_session',
                 'all_old_quote_files_unchanged_except_Main','period_base_inverse_AST_equals_frozen_quote_base',
-                'quote_fee_cash_fill_methods_AST_unchanged','input_package_and_source_assignments_unchanged',*FALSE_FLAGS}
+                'quote_methods_AST_unchanged_except_declared_cash_bound','input_package_and_source_assignments_unchanged',*FALSE_FLAGS}
             and record['schema']==CELL_SCHEMA and record['profile_sha256']==profile['profile_sha256']
             and record['strategy_profile_sha256']==profile['strategy_profile_sha256']
             and record['source_files']==[{'project_path':name,'byte_count':len(raw),'content_sha256':sha(raw)} for name,raw in self.source_pairs]
@@ -214,7 +241,7 @@ class Projection:
             and record['research_epoch_id']==base.RESEARCH_EPOCH_ID and _hash(record['patcher_sha256'])
             and record['engine_start_session']==ENGINE_START_SESSION and record['evaluation_start_session']==base.START_SESSION
             and all(record[key] is True for key in ('all_old_quote_files_unchanged_except_Main',
-                'period_base_inverse_AST_equals_frozen_quote_base','quote_fee_cash_fill_methods_AST_unchanged',
+                'period_base_inverse_AST_equals_frozen_quote_base','quote_methods_AST_unchanged_except_declared_cash_bound',
                 'input_package_and_source_assignments_unchanged')),'projection')
         require(record['frozen_quote_base_sha256']==common.runtime.FROZEN_BASE_SHA256
             and record['available_history_quote_base_pin']==pin(dict(self.source_pairs)[BASE_NAME])
@@ -251,7 +278,7 @@ def _cell(pairs,cloud_addons,axis,view,size,arm,project,native_context,vendor_co
         'engine_start_session':ENGINE_START_SESSION,'evaluation_start_session':base.START_SESSION,
         'patcher_sha256':patcher_pin,'source_files':[{'project_path':name,'byte_count':len(raw),'content_sha256':sha(raw)} for name,raw in output],
         'all_old_quote_files_unchanged_except_Main':True,'period_base_inverse_AST_equals_frozen_quote_base':True,
-        'quote_fee_cash_fill_methods_AST_unchanged':True,'input_package_and_source_assignments_unchanged':True,**FALSE_FLAGS}
+        'quote_methods_AST_unchanged_except_declared_cash_bound':True,'input_package_and_source_assignments_unchanged':True,**FALSE_FLAGS}
     raw=canonical(record);value=Projection(sha(raw),raw,canonical(profile),output);value.to_record();return value
 
 
@@ -404,7 +431,8 @@ def profile_record():
         'frozen_quote_base_sha256':common.runtime.FROZEN_BASE_SHA256,'period_profile_sha256':period.digest(period.profile_record()),
         'source_count_per_cell':19,'source_delta':'explicit_W5_base_and_common_modules_Main_import_profile_start_date_only',
         'old_host_to_W5_host_delta':'exact_declared_byte_replacements_no_other_change',
-        'W5_cloud_inverse':'exact_frozen_quote_base_AST_after_restoring_period_nodes',
+        'W5_cloud_inverse':'exact_frozen_quote_base_AST_after_restoring_period_nodes_and_declared_cash_bound',
+        'buy_cash_bound':CASH_BOUND_FIELD[1],
         'project_id':'supplied_positive_id_is_unverified_locally_not_current_cloud_authority',
         'prices':'unchanged_AR_container_native_book_codecs_source_assignments_missing_marks_stop_no_fallback',
         'CAGR':'new_Nov1_capital_epoch_calendar_days_not_old_fullperiod_result',**FALSE_FLAGS}

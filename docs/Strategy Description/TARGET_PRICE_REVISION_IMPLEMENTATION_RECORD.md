@@ -26200,3 +26200,127 @@ tracked attempts and two exact witness keys. Full safe classifications are
 retained; raw market values/SIDs/clocks are withheld. Python-level output
 buffers do not prove a native SDK hard timeout or pre-allocation byte bound.
 All custody, economic and OFF acceptance flags stay false.
+
+### 104.5 Fresh append CREATE-ONLY registration
+
+Foundation localcommit`5845c4591441b3f17aedaf0dc815ae7a4a86139c` is retained locally only; no push has occurred.
+Current routing guards and historical section103 bounds passed625focused checks
+in19.05s. This claim precedes one genuine Mia append-only cell creation.
+One actual ownproject metadata read and one newcell source readback are
+allowed; no existing cell/notebook is replaced or executed. Any default-agent
+notebook creation is limited to the tool’s implicit fresh file; existingcells
+must remain exact. Actual file/cell/index/creation metadata and independently
+captured source must be verified under a new processing claim before a
+SEPARATE execution scope. This is not private native access or launch authority.
+
+```json
+{"cell_manifest":{"append_owned_cell_only":true,"builder_sha256":"1b0a4c6cd575a7316043f4107884e672d6ea53f545198faf690b6ff83af6aea9","byte_bound_before_native_allocation_proven":false,"cell_bytes":32636,"cell_sha256":"6749839e6ee0b3e570508d19fda55182540532ea085c405a1498c2ab67789e7d","creation_claim_required":true,"economics_accepted":false,"effects_authorized":false,"expires_utc":"2026-10-28T07:56:52.094254+00:00","historical_job_id":"3bcfc642896ea36e26b5cbca2988220c","independent_source_index_tool_readback_required":true,"issued_utc":"2026-10-28T07:46:52.094254+00:00","keys":["tpr-ext26/refusal-witness/TPR-EXT26-MIA-FIRST-REFUSAL-20261014-001/37650980/3bcfc642896ea36e26b5cbca2988220c/membership_json.gz","tpr-ext26/refusal-witness/TPR-EXT26-MIA-FIRST-REFUSAL-20261014-001/37650980/3bcfc642896ea36e26b5cbca2988220c/mark_json.gz"],"max_contains_calls":2,"max_gzip_and_plain_bytes_each_after_native_allocation":4096,"max_quantbook_initializations":1,"max_read_calls":2,"native_project_custody_proven":false,"new_codex_attempts":0,"new_jobs":0,"new_looks":0,"off_baseline_valid":false,"operation_id":"TPR-EXT26-RECOVERY-20261028-CELL001","program_sha256":"c7b677612b01ace2bb019e94f3047449cbf6c98cc55614b8ad5de9bb11f7e88e","project_id":37650980,"reader_sha256":"6ee5593ed2fe5e504fcef867219e5ba4a0c5883d0294a6544c3636440a8b1d22","schema":"tpr-ext26-recovery-cell-build-20261028-v1","sdk_hard_timeout_proven":false,"separate_execution_claim_required":true,"witness_sha256":"1b057f254fba91eee98862bbb63b2141cea63962905c458459d7a47531215a0f"},"compile_backtest_provider_account_effects":false,"existing_cell_edits_or_execution":0,"expires_utc":"2026-10-28T07:56:52.094254+00:00","issued_utc":"2026-10-28T07:46:52.094254+00:00","maximum_messages":1,"maximum_new_chats":1,"maximum_own_project_metadata_reads":1,"maximum_ui_calls":16,"new_cell_appends":1,"new_cell_readbacks":1,"new_observed_looks":0,"notebook_replace":false,"operation_id":"TPR-OFF-APPEND-CREATE-20261028-001","project_id":37650980,"quantbook_or_native_data_effects":false,"schema":"tpr-mia-cell-create-only-claim-v1","source_head":"5845c4591441b3f17aedaf0dc815ae7a4a86139c"}
+```
+
+Canonical creationclaim SHA-256`92c80b69be8951447b3f3e90d81445c36ff6106081d4695c30a1db165c1b42f6`.
+
+CREATE001 exact public prompt staged locally for native UI copy: 33892UTF8bytes/SHA256`d330bd90e230207dcca438cc6d7cb4d2bf3b621d46e5a8dc33905c119db83e88`; cell remains32636B/6749839e... . Reading this own public prompt via a separate local Safari text tab is included in UI transfer, not a private data access; close only that newly opened transfer tab. No effect or Send has occurred at registration.
+
+### 104.6 Unsent transfer closure and simpler placeholder successor
+
+CREATE001 ended beforeSend/cellcreation: the native local-file clipboard
+transfer did not populate the intended public prompt. The unsent draft
+contained only the owner's routine phrase "when done, push"; it was never
+submitted as a Mia task. No secret or licensed row was present, no native
+read/cell/job is inferred, and expiredcell001 is retained unexecuted. No
+unchanged transfer retry is authorized. Codex spent too long on this UI step
+and switches to a simpler staged source route.
+
+CREATE002 permits ONLY one new comment-only placeholder cell append and one
+readback in the already-created empty own chat. After actual source/cell-ID
+verification, a fresh separate API update scope may fill ONLY that newly owned
+cell with the exact source-bound public diagnostic, followed by independent
+readback and a separate execution scope. All pre-existing cells remain exact.
+No old notebook is executed; no default notebook replacement is permitted.
+
+```json
+{"existing_cell_edits_or_execution":0,"expires_utc":"2026-10-28T16:00:50.362505+00:00","issued_utc":"2026-10-28T15:50:50.362505+00:00","maximum_messages":1,"maximum_ui_calls":12,"native_data_reads_compiles_jobs":0,"new_cell_appends":1,"new_cell_readbacks":1,"new_chat":0,"notebook_replace":false,"operation_id":"TPR-OFF-APPEND-CREATE-20261028-002","own_project_metadata_reads":1,"placeholder_sha256":"6dd91a621fa5955662059dba5e4d8bfd70970a18cb597eee2355c0eec4f60c7f","placeholder_utf8_bytes":50,"project_id":37650980,"schema":"tpr-mia-placeholder-create-only-claim-v1","source_head":"5845c4591441b3f17aedaf0dc815ae7a4a86139c"}
+```
+
+Placeholder source is exactly one ASCII comment plus LF:
+
+```python
+# TPR-EXT26-RECOVERY-20261028-CELL002-PLACEHOLDER
+```
+
+Claim SHA-256`18c4f53fd1e266d31a559353e123cea3d953c91eadc43ebc549d84ab710e0552`.
+
+### 104.7 Actual placeholder creation and independent source readback
+
+GenuineMiaCREATE002 is terminalCompleted, task "Append one new code cell with
+the exact comment plus line feed". It observed actualproject37650980 and
+notebook`mia.ipynb`; appendedcommentcellindex11 andreaditback. It reports
+6236characters afterappend, noexistingcelledits, noexecution/QuantBook/data
+request. Native cellID/execution_count were not exposed by its readback;
+those fields are UNKNOWN until independent saved-source inspection, not
+fabricatedzero. New owncomment source is the registerednonce. OneSend only.
+The protected editor intercepted an earlier coordinatepaste; Cancel was used,
+editcontrol was not taken and no sourcechange is inferred. AXsetValue on the
+actual Miaentry was then positively read back beforeSend. The current terminal
+also displays buildID2860c2-1fc7a1 at3:53:52: retain as an additional observed
+platformbuild, not a deliberatebacktest or provennewoutcomelook. UIbuild counts
+and sourceclock remain separately reconciled. CREATE002 is closed.
+
+Beforeindependentread, freshSOURCEBASELINE20261028-002 uses the same committed
+identified producer and newclaim/time/HEAD. It reads ONLYcurrentOFFproject
+files twice (max17files,4MiB/response8MiBtotal,120s). No credentials/receipts/
+sourcearchive from an old operation is reopened. The complete new source
+archive will be retained privately, and a separate bounded processingclaim
+will precede parsing of the new notebook. No edit, privateObjectStore read,
+compile orbacktest is authorized by this source-read scope.
+
+### 104.8 Verified source readback and executable software candidates
+
+SOURCEBASELINE002 ended15:56:37UTC,2reads/541668wirebytes,16stablefiles.
+Plan`523cbbbabe39165ccabd416112dfe1a4dd97381a768e3f4c136b22754e643a22`;
+receipt8072B/`445a69b7817b89577112c455dc3c8b68085a057075aacb55585987495ebb5c3e`.
+Read1archive268826B/`bf8203940b0290c03812a1a002485280222f0d130ab34c7341eec13dba27842b`;
+read2archive268826B/`e2ce1a7ba01dc6af72c4aef578079b4737231b366eea84258f6fe8612fea7df9`.
+All displayedsourcefileidentities remain unchanged from001 except the newly
+appendedmia.ipynb:6236B/`18216a76b8d6604bb53890a4e10b22cd88b89c76a92c6b1c95b7fd7bdaf18116`.
+Inparticularmain remainsa098c087...; the protectededitor interception didnot
+produce a savedstrategychange. No compiledhistoricalsource acceptance is
+inferred. Allsourcebytes remain privatelyretained.
+
+The newOFFdriver subclasses only mature RAW/cash/MOO/action/fill/closing-audit
+methods, overrides initialization/selection/journal/summary and never reads
+ETFweight. That unusedfield therefore cannot dictate the NEWcap-only selection;
+no oldweightvalue is rescaled or oldF019finding closed by inference. This new
+study change follows the owner's explicit market-cap baseline request; old
+stockstudy source and its unresolvedhistory remain unchanged.
+Currentnativeoldscope/crypto/canonical gates are not invented blockers to the
+new separately scoped exploratory run. Newsource/config/calendar/job claims
+and actual accounting validation are still mandatory.
+
+Rootselected five newmodules:283passed3.10s, isolatedruntime roots/network
+denied; rootnewcapture12passed1.03s. OFFdriver owner60passed3.31s and
+independentCodexQA60passed2.33s, with all56 classificationconstant names
+verified against theprimaryLEANreference. Capture owner new12+old66=78passed
+1.59s; unchanged nativeTLS/claims/byte/time behavior was compared mechanically.
+These softwarechecks do not count as empiricalattempts or accept anybacktest.
+
+Finalsourceidentities for the next localfoundation:
+
+| Source | Bytes | SHA-256 |
+|---|---:|---|
+| comparison_20261028_algorithm.py | 30003 | 7dce184dc502c12f295b3b1e8382922c07263e9f51b1a9bfee145a98a017c714 |
+| comparison_20261028_massive_inventory.py | 13009 | ab1d3bc77f9e9fba9ab7cde0636531c64fb001831cf867d1c1e11653bd88c34f |
+| recovery_20261028_cell_install.py | 11502 | 50af07db2b37faa68ee21f1eccc2a0e25725f21162cdc5b8b9f210f772b4b54a |
+| comparison_20261028_capture.py | 28669 | 33369446fc7b98d28b0968adc7b9ed5a9338009ca6936d61851111b0b3d413ca |
+
+The sourcecapture successor raises only the explicitall-file capacity17to24,
+with exactnewmodule identity and boundedpublicfilename display. It retains
+the older10-file comparison solelyasHISTORICAL_DIAGNOSTIC; mismatch is not a
+newstudy economic verdict. Freshcurrentcaptures will use baseline-source,
+never bypass the oldpost-Mia historicalbaseline validator.
+The pureinstall helper replaces only the freshly ownedcell.source JSONtoken;
+allothernotebookbytes/cells/files remain exact. It grants no APIeffect itself.
+The inventory helper processes only the exact224765B sourceindexmetadata:
+386Massiveprojectiondescriptors/74windows/349018retained rows. The parent001
+operation staysFAILED due to laterSharadar processing; no wholecapture
+completion/PIT/rights or per-page rowcount is fabricated.

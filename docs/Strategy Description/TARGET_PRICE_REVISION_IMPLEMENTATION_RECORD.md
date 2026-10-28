@@ -27840,3 +27840,104 @@ LatestboundedAPIstatus006 afterEC4 batch remains100/200InProgress/noerrors.
 ThiscommitafterallactiveAPIcellsfinished changesonlynewoptionalreader/tests/
 record; financialsource/config/calendar/economics unchanged. Purefinancialjob
 haspriorityfornextnaturalspare node. NoClaudecheckpoint or finalpushyet.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-062A-20261028-001/db7e784c6aff6f450eadd4bcf062c12ad2062224fb9a8df25db7776556f85152 at 062696952256a36c0a9600856337e799eb6e5fab before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-062A-PROGRESS-20261028-001/09a2fa9ea59aada8736824ca090932f728046baaab8498e25d333e631e984b6c at 062696952256a36c0a9600856337e799eb6e5fab BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Readonly 062A/001 operationalstates [{"job":"f9f9afa0f2b5200f06f11fe1442adb6c","status":"In Progress...","completed":false,"progress_raw":0.254,"has_error":false},{"job":"df338f3dc811e509884195f94986c552","status":"In Progress...","completed":false,"progress_raw":0.205,"has_error":false}]; safe receiptd6afe2a459a2a0450e371481d55dd2f00d870ed5a69fb58a3238341eb8d64ba6; no nativejobs/newfinancialoutcomes or coverage/performanceacceptance.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-062A-20261028-002/5d60e21ce271d659b36fa3a1c16c6a3c82eb641545042af86a1c9dacb6352121 at 062696952256a36c0a9600856337e799eb6e5fab before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-062A-PROGRESS-20261028-002/e1be8ba6582e47c2e5e80111efe84d1d0be6edd04468ea413e53686a3dddd791 at 062696952256a36c0a9600856337e799eb6e5fab BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Readonly 062A/002 operationalstates [{"job":"f9f9afa0f2b5200f06f11fe1442adb6c","status":"In Progress...","completed":false,"progress_raw":0.254,"has_error":false},{"job":"df338f3dc811e509884195f94986c552","status":"In Progress...","completed":false,"progress_raw":0.255,"has_error":false}]; safe receipt23edf3e29fe5a622f888e2a5c86312c56e88f36623934659fabc3cd8ec09f3f8; no nativejobs/newfinancialoutcomes or coverage/performanceacceptance.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-062A-20261028-003/c11d8e6ddd69d0adf43f68f9d28c811602cc1f5d763cc636b42f96d66ab708d5 at 062696952256a36c0a9600856337e799eb6e5fab before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-062A-PROGRESS-20261028-003/5ccb602a4913d682309a731d124d27d2f4b1045c58e34f7019085aec20fd79ad at 062696952256a36c0a9600856337e799eb6e5fab BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Readonly 062A/003 operationalstates [{"job":"f9f9afa0f2b5200f06f11fe1442adb6c","status":"In Progress...","completed":false,"progress_raw":0.254,"has_error":false},{"job":"df338f3dc811e509884195f94986c552","status":"In Progress...","completed":false,"progress_raw":0.255,"has_error":false}]; safe receipt326495d0842c6072eb0c329af760a0492c8fcaee7bad11b94ed72d9863af7b6b; no nativejobs/newfinancialoutcomes or coverage/performanceacceptance.
+
+Mia4 source-before label001 refused by public prepare_plan before retained native phase/effects: missing required TPR-CMP28-API- prefix. Corrected label under fresh002 scope; no API request, compile, job or outcome look occurred.
+
+Fresh bounded native phase TPR-CMP28-API-MIA4-SOURCE-BEFORE-20261028-002/da68df68ebd19966ac88e17c9ecbb3ad13fe7838c5b825c35dc2af21095c6762 at 062696952256a36c0a9600856337e799eb6e5fab before1 exact requests/90s/1048576B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-062A-20261028-004/56ad0c7a57be63b9a1232c05390bf419b11eae494cba9cd56ca4c782fc7ffab5 at 062696952256a36c0a9600856337e799eb6e5fab before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-062A-PROGRESS-20261028-004/1bc957a20fcd2647aff252fe775f81b931e1433e52c3cf7a42f59b775117d6a0 at 062696952256a36c0a9600856337e799eb6e5fab BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Readonly 062A/004 operationalstates [{"job":"f9f9afa0f2b5200f06f11fe1442adb6c","status":"In Progress...","completed":false,"progress_raw":0.304,"has_error":false},{"job":"df338f3dc811e509884195f94986c552","status":"In Progress...","completed":false,"progress_raw":0.255,"has_error":false}]; safe receipte41c06fa587c1e4cc88f5509fb2748c8865a251e90b421122588ee430b8ccdad; no nativejobs/newfinancialoutcomes or coverage/performanceacceptance.
+
+Fresh bounded private phase TPR-CMP28-CLOUD-SOURCE-DISCREPANCY-20261028-001/93c3cbb9a21f0c1bfa88746273073d6d730aab55440a3032b93361fbda20566f at 062696952256a36c0a9600856337e799eb6e5fab BEFORE 3 exact private inputs/120s; Exact own source-only24file maps; compare current cloud with frozen pure/200 candidates, no code body projection/effects; fsync claim and directory retained.
+
+Cloud source discrepancy BEFOREMia4 UI: {"200": {"diff_files": [], "identical": true}, "cause_proved": false, "inventory": "fe4c4028144fd5315febead09b85438459f4ade51ca19e041f19316d45551b1f", "pure": {"diff_files": ["comparison_20261028_config.py", "comparison_20261028_multi_algorithm.py"], "identical": false}}; safe receipt {"file": "TPR-CMP28-CLOUD-SOURCE-DISCREPANCY-20261028-001.safe.json", "bytes": 258, "sha256": "5ec6de5decc50deb8cc269fb7bf2fbe0703d931969a5752cb78fd61b99ae6b76"}; no write/compile/launch, cause unproved, purelaunchheld pending scope reestablishment.
+
+Fresh bounded private phase TPR-CMP28-CLOUD-SOURCE-TIMELINE-20261028-001/c61c6d7b3cacb787c0b86ec5f980b1e0e7a3404070a023b7bdd93124a97a1476 at 062696952256a36c0a9600856337e799eb6e5fab BEFORE 3 exact private inputs/120s; Read only exact own API receipt controlmetadata for source discrepancy timeline; no raw source/data body; fsync claim and directory retained.
+
+Source discrepancy timeline safe receipt {"file": "TPR-CMP28-CLOUD-SOURCE-TIMELINE-20261028-001.safe.json", "bytes": 3707, "sha256": "ac632554a21bedaf1664969ec3a9acd359b10b6a2f2befecfe5094279b3fde32"}. Earlier safe discrepancy fe4c... is newline-framed metadata hash, NOT API inventory; API inventory remains74288df2... .
+
+Fresh genuine Mia004 capability-only UI claim 2bbba203f9a579eccbe5402136ed33e8fa3f3571276bc0c106191537744888b2 at 062696952256a36c0a9600856337e799eb6e5fab 2026-10-28T22:15:50.044315+00:00/600s/48UIcalls/1newrequest; no private data/History/ObjectStore/source edit/explicitcompile/research/kernel/backtest/node/account effects; sourcebefore74288... mismatch investigated and purelaunchheld; incidental completedchat/buildnotices bounded8, not financialattempts.
+
+Fresh bounded native phase TPR-CMP28-API-MIA4-SOURCE-AFTER-20261028-001/ff4eabd6bafb34002f934511ec1aa3c27cbc84a5424cc8ffdb9b053dcfc8c72c at 062696952256a36c0a9600856337e799eb6e5fab before2 exact requests/120s/2097152B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+### 104.34 Cloud source discrepancy and unsubmitted Mia004 capability check
+
+At 2026-10-28 22:13..22:19UTC current own24cloudfilemap was observed at
+74288df2a40e909147a6552ae8ede52e6f7eddc5c431ffcc274872fe2e52214e,
+rather than last verified PURE1e8337a0... . Fresh manifest/bounded three-way
+comparison proves ALL24bytes exactly the prior frozen200source, differing
+from frozenPURE ONLY comparison_20261028_config.py and
+comparison_20261028_multi_algorithm.py. Pure uploadreceipt447e77fb... proves
+writes and verified1e8337after; compilereceipt75594d37... proves same1e8337
+before/after compile dcd28696390467fc65ac77a2e0302b06-a1d20fd596b91972306a6335759b6e6f;
+compile-statusreceipt d2c24efb... reportsBuildSuccess. The subsequent writer
+and cause are NOT attested. No silent absorption: writes/launches stopped,
+mismatch reported, exact frozen200 preserved. ActualTargetremote remainsa0a45fc3...
+and HEAD06269695... . Both active100/200jobs remainunchanged.
+
+Mia004 capability-only manifest2bbba203.../promptf9239dde... at22:15:50UTC
+600s was reserved BEFOREUI, but NO new Mia prompt was submitted and no
+Research/privateHistory/ObjectStore request was made. Safari binding was anAPP,
+not a fixedtab; its active usertab had changed. A NEW own QC37650980tab was
+opened separately, completed Mia003 history auto-restored, Newchat selected,
+one incidental CloudBuildnotice shortId e846ab-fdd3b6 autoappeared onload.
+Fullcompileidentity/new-vs-replay not attested; no invented financialattempt
+or outcome. User then activelychangedSafari back; tool rejected staleUI
+action beforepromptpaste. Root did not fightuseractivity: closedONLY newly
+createdownQCtab564 by secondaryaction, verified8originaltabs/useractive tab
+remained. No otherQCtab or unrelatedproject was inspected/edited/stopped.
+Mia004 remains UNUSED/unsubmitted, not a completed consultation. Source-only
+delegation established Researchnodes are separate, but actual availableMia
+executiontool/kernelcontext remainsUNVERIFIED. No fabricatedQuantBook ID/lock.
+
+Fresh aftersource APIff4eabd6.../receiptd9c3fdd8... independently read ALL24
+twice afterownnewtabclosed: both stable74288df2... with identical raw443596B/
+885eb1832e44b8cdbb49d72a9956fdca63b48cbc3bd7f2539dc31634a488ae02.
+Unknownwriter notattributed; no backgroundeditorlock/CASproven. Root is
+explicitly re-establishing own frozen-source scope beforeanyrestoration.
+Latest readonly062A/004:100InProgress/.304/noerror;200InProgress/.255/noerror.
+Operationalprogress is not accepted calendarcoverage or financialperformance.
+
+
+Fresh bounded private phase TPR-CMP28-PURETPR-SOURCE-RESTORE-20261028-002/bbb08b88cfa611e6f2e9e760d302e5c11102b8ee8d1e1c13a2148103c8a4b012 at 062696952256a36c0a9600856337e799eb6e5fab BEFORE 1 exact private inputs/300s; One exact frozen2file source restoration after explicit24file scope reestablishment; preserve22others, no compile/job/economics change; stop on recurrence; fsync claim and directory retained.
+
+CMP104-D018 explicitscope re-established: twoindependentafterreads exact24frozen200/74288..., ownnewQCtabclosed/noactiveMia004/no pendingownedAPIwrite, Targetremotea0/HEAD062... unchanged. SingleboundedexactPURE2file restoration authorizedunderownerallfive/bestjudgment; independent cr31 source-onlyreviewaccepted scope. Reservationeeedc52f6c4502ff4acc158f5ace170c05626ac0f0dcd6773128bee2aa213b10 BEFOREwrites; candidatecompile/source remainoriginal0300ef6e, actorHEAD062...; 0compile/jobs/observedoutcomes. Unknownwriterunattributed; recurrence=>no morewrites, no overwrite loop.
+
+Exact restorationAPIplanbc0c156ce8a79c2859c56718c404c25e0b7eab68f6c4d225e1ee9a1278964a06 beforeeffects; preserve22files/read742->write2exact->read1e; 0compile/job. Recurrencehold explicit.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-RESTORE-CONFIRM-20261028-001/fbae1f7f4b03468400a110f1e992c0423d67df532dcacd2d593a73aa5881d583 at 062696952256a36c0a9600856337e799eb6e5fab before3 exact requests/120s/10485760B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-PURE-RESTORE-ARM-STATUS-20261028-001/37f2e76111e28c55186e8fd266d081a787b383126b795491c661c683f99c5593 at 062696952256a36c0a9600856337e799eb6e5fab BEFORE 2 exact private inputs/120s; Nativejob operationalstatus/errorpresence/progress only; no financialacceptance; fsync claim and directory retained.
+
+Exact2filePURErestoration4b1bea8c... succeeded; separatefreshsourceconfirmation verified1e8337... . No newcompile/job/outcomelook; originalcompileboundpreserved. Latestoperationalstates [{"job": "f9f9afa0f2b5200f06f11fe1442adb6c", "status": "In Progress...", "completed": false, "progress_raw": 0.304, "has_error": false}, {"job": "df338f3dc811e509884195f94986c552", "status": "In Progress...", "completed": false, "progress_raw": 0.305, "has_error": false}] safe2355c87f477e7cf1283839f6f05c015dae7b61ab35ad61d00493b942abdb000d; no acceptance.
+
+Next authorized ROOT action: continue bounded operational checks of the two
+existing jobs; launch the unchanged frozen PURE compiled candidate only after
+natural node availability and a fresh exact source/HEAD/access/launch/look
+reservation. On any source recurrence, stop further writes and retain the
+discrepancy. Give PURE priority; then run the prepared bounded post-gap input
+diagnostic when a node is free. Mia004 capability consultation remains
+unsubmitted while Safari is in active use. Do not require Claude review,
+cancel viable jobs, upgrade resources, or push this intermediate state.
+Financial outcomes remain unaccepted/null for all five arms at this snapshot.

@@ -28002,3 +28002,153 @@ request failure is retained; its actual cause is not retroactively asserted
 from documentation alone. All future order census windows use<=99 (20 remains
 the earlier observed-working route).
 API 26758B/4d082d9bbefe7daf9c94099472cfb637ad343f205d664df5170a33158b3d5928; focusedtest 23548B/f4163491511679e08592a602604ecee06856b468ea975b2759b54e82e739ec4d. Financial100/200stillInProgress/.354/.305/noerrors atlatest374A/004; PUREsource1e8337... andcompile unchanged; no finalpush.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-5A7A-20261028-001/94f2e2f7b03fc44367dc34fc6b643062b67b489b8110f18a82d99b12028d2bf2 at 5a7dd2a6c6203cef59096d02970cb27e3abe86b1 before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-5A7A-PROGRESS-20261028-001/477c9e66337f6add76880880b7ab59892437203c01073b4572d52ab44c38e09a at 5a7dd2a6c6203cef59096d02970cb27e3abe86b1 BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Readonly 5A7A/001 operationalstates [{"job":"f9f9afa0f2b5200f06f11fe1442adb6c","status":"In Progress...","completed":false,"progress_raw":0.354,"has_error":false},{"job":"df338f3dc811e509884195f94986c552","status":"In Progress...","completed":false,"progress_raw":0.355,"has_error":false}]; safe receiptf5277e0fedafe75d730051c31b4ae76f485709215e25e13a7db0cfcfd7482213; no nativejobs/newfinancialoutcomes or coverage/performanceacceptance.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-SOURCE-STABILITY-20261028-001/2c51a5fdfee7f63460ea37eba5eb7bc566a5bb3001744a29432a6b0caa1bf87f at 5a7dd2a6c6203cef59096d02970cb27e3abe86b1 before1 exact requests/90s/1048576B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-5A7B-20261028-001/de82114672d24344ecd7cca1b35f349a143ebec921532c22cd3ecfc1aae5e473 at 5a7dd2a6c6203cef59096d02970cb27e3abe86b1 before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-5A7B-PROGRESS-20261028-001/9707218af008ba39a7293b96d7f6cafbf25d21bf5ddc16d820692d2a76af154c at 5a7dd2a6c6203cef59096d02970cb27e3abe86b1 BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Readonly 5A7B/001 operationalstates [{"job":"f9f9afa0f2b5200f06f11fe1442adb6c","status":"In Progress...","completed":false,"progress_raw":0.354,"has_error":false},{"job":"df338f3dc811e509884195f94986c552","status":"In Progress...","completed":false,"progress_raw":0.355,"has_error":false}]; safe receiptd806bf8c30b32e7448ef62f8cb67d1ce5b85abe1ea8f07d6ed80af73903da02f; no nativejobs/newfinancialoutcomes or coverage/performanceacceptance.
+
+Fresh bounded private phase TPR-CMP28-OFF4-ORDER-SCHEMA-RECEIPT-20261028-001/c992c6bba934b8877da6f6d509069891ff5127411084b23fc0b1fa50e2d3ae4a at 5a7dd2a6c6203cef59096d02970cb27e3abe86b1 BEFORE 1 exact private inputs/120s; Exact own prior OFF4 simulatedorder APIreceiptmetadata only, prepare schema interoperability check; no provider/inputcapture/operator data; fsync claim and directory retained.
+
+Fresh ownorder schema-readiness receiptmetadata retained {"file": "TPR-CMP28-OFF4-ORDER-SCHEMA-RECEIPT-20261028-001.descriptors.json", "bytes": 1933, "sha256": "4287ca52db60af82154b1cc25e4202f75334652240f5082b56a44c91587a668a"}; 7rawpages notyetopened inthisphase, no newnativeeffect/financialoutcome.
+
+Fresh bounded private phase TPR-CMP28-OFF4-ORDER-SCHEMA-DESCRIPTORS-20261028-001/2899e73f78a9c0bd6496d315800d4a5c1bda86334bc4c2c596c7b7d3dc1d5d2c at 5a7dd2a6c6203cef59096d02970cb27e3abe86b1 BEFORE 1 exact private inputs/120s; Exact own simulatedorder-page descriptor metadata only; fsync claim and directory retained.
+
+Fresh bounded private phase TPR-CMP28-OFF4-ORDER-SCHEMA-PROCESS-20261028-001/e597f36574dc723b80d842a983ad28a7f0677b81a895011d31ab9a1c7aea11bc at 5a7dd2a6c6203cef59096d02970cb27e3abe86b1 BEFORE 7 exact private inputs/120s; Own prior OFF4 simulatedorder JSON schema/types/identities/currency-presence only, <=134orders/1000events/187000B; no providerinputcapture/prices/feeamount/PnL projection; isolated49/52 BEFOREimports; fsync claim and directory retained.
+
+Existing real ownOFF4 APIorder-schema interoperability: {"schema":"tpr-cmp28-owned-order-schema-readiness-v1","job_id":"12dd4732ba5d9d8f57950beb2a371c79","orders":134,"unique_events":268,"counts":{"events":268,"missing_fee":134,"zero_fill_events":134,"nonzero_fills":134},"currency_presence":{"other_or_missing_fee_currency":134,"USD_fee_currency":134},"statuses":{"Submitted":134,"Filled":134},"terminal_job_failed":true,"full_window_accounting_accepted":false,"raw_private_values_projected":false}; safe receipta7ffaf387740f87978ccabff9282397d84287bd943177f0fe35407ae2f25db36; isolated49/52/no network/operator/provider reads, no newjob/outcome/performance or fullwindowacceptance.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-5A7B-20261028-002/a30a9e7b0aa2c64a063765f4a9e8a03edd9840e9f314c47910a9b538d1ce002b at 5a7dd2a6c6203cef59096d02970cb27e3abe86b1 before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-5A7B-PROGRESS-20261028-002/cdb15b466354706df67e39359cd8544aa8346927687f55f803360f6837196013 at 5a7dd2a6c6203cef59096d02970cb27e3abe86b1 BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Readonly 5A7B/002 operationalstates [{"job":"f9f9afa0f2b5200f06f11fe1442adb6c","status":"In Progress...","completed":false,"progress_raw":0.404,"has_error":false},{"job":"df338f3dc811e509884195f94986c552","status":"In Progress...","completed":false,"progress_raw":0.355,"has_error":false}]; safe receipta05b12cbdd13993d12061c57b15d8922927c6a75b55ba7b3f09f61c4f64ad830; no nativejobs/newfinancialoutcomes or coverage/performanceacceptance.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-5A7B-20261028-003/4826ef46a5bfa2e6666f25df0864be8459a524aba19ae64bfc3c1e78059832b0 at 5a7dd2a6c6203cef59096d02970cb27e3abe86b1 before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-5A7B-PROGRESS-20261028-003/3150b920d24ebbea09051f69ea9e9560e1ad1d8c957c895ffc9224c4c4f84770 at 5a7dd2a6c6203cef59096d02970cb27e3abe86b1 BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Readonly 5A7B/003 operationalstates [{"job":"f9f9afa0f2b5200f06f11fe1442adb6c","status":"In Progress...","completed":false,"progress_raw":0.404,"has_error":false},{"job":"df338f3dc811e509884195f94986c552","status":"In Progress...","completed":false,"progress_raw":0.355,"has_error":false}]; safe receipt0d1e86d8a16bd338c8ec0e6cbf08cf587cf6802e7aec20cc7d30150fc1f6acd1; no nativejobs/newfinancialoutcomes or coverage/performanceacceptance.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-5A7B-20261028-004/7329c522c4f60aa92314706d0a7af2735fef266c604eb56dbb13234a250f3342 at 5a7dd2a6c6203cef59096d02970cb27e3abe86b1 before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-5A7B-PROGRESS-20261028-004/9be590362232b82ec5b58629d5a4b4ec5cd0d941f83e7570ffb5cea8cc3fa478 at 5a7dd2a6c6203cef59096d02970cb27e3abe86b1 BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Readonly 5A7B/004 operationalstates [{"job":"f9f9afa0f2b5200f06f11fe1442adb6c","status":"In Progress...","completed":false,"progress_raw":0.404,"has_error":false},{"job":"df338f3dc811e509884195f94986c552","status":"In Progress...","completed":false,"progress_raw":0.405,"has_error":false}]; safe receiptb59a3011d0af2b95aa08de630d2e8a5ed06701ec342432e8eeeff07076c03e37; no nativejobs/newfinancialoutcomes or coverage/performanceacceptance.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-5A7C-20261028-001/8f090b445fb19779d3eb5125974ecd83c01e897aa41d032b2abc56ca55f6e8f2 at 5a7dd2a6c6203cef59096d02970cb27e3abe86b1 before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-5A7C-PROGRESS-20261028-001/74a5300363eae811586e726bde83acbc3b212e89e1fd7aea316404724a59fb40 at 5a7dd2a6c6203cef59096d02970cb27e3abe86b1 BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Readonly 5A7C/001 operationalstates [{"job":"f9f9afa0f2b5200f06f11fe1442adb6c","status":"In Progress...","completed":false,"progress_raw":0.404,"has_error":false},{"job":"df338f3dc811e509884195f94986c552","status":"In Progress...","completed":false,"progress_raw":0.405,"has_error":false}]; safe receipt123191ac4d4a075543803633c38ed2f2fd2a9598ad00291295cb3d077d9d92fa; no nativejobs/newfinancialoutcomes or coverage/performanceacceptance.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-5A7C-20261028-002/8a3a7da23cbce8d5b9c665a79a09069099fcbedafa564f67b1f510ef5a4b86a6 at 5a7dd2a6c6203cef59096d02970cb27e3abe86b1 before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-5A7C-PROGRESS-20261028-002/60f6361c474d3cf746206a7b3c0832d5a20a359416dd0875b6f5872205e41e5a at 5a7dd2a6c6203cef59096d02970cb27e3abe86b1 BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Readonly 5A7C/002 operationalstates [{"job":"f9f9afa0f2b5200f06f11fe1442adb6c","status":"In Progress...","completed":false,"progress_raw":0.454,"has_error":false},{"job":"df338f3dc811e509884195f94986c552","status":"In Progress...","completed":false,"progress_raw":0.405,"has_error":false}]; safe receipt5a4c11f974ef2a2cc834d0d4d73d9448f68c4b4c06ebd1d088ed3afef3ae04cb; no nativejobs/newfinancialoutcomes or coverage/performanceacceptance.
+
+### 104.36 Independent supplied-accounting audit and optional private QC reader
+
+CMP104-D021. Root delegated the pure auditor to comparison_accounting_auditor,
+using the source-only gap/spec review from offline103_final_audit. It reuses
+the frozen completion framing and exact arithmetic, not the old candidate/
+attempt-limited native normalizer entry points. The raw-page wrapper remains;
+a two-phase normalizer produces a 2936..3004B compact artifact of full-parent
+binding/source/API-envelope commitments, event Counter fingerprints and all
+1449 ordered rounded NAV observations. No individual SID, order price or NAV
+point enters that compact. It grants no native/data authority. Original API
+receipts/terminal/source proof remain externally retained and root-verified.
+
+Fresh explicit retained-own-order schema processing (not a provider input
+capture) reproduced OFF4 134uniqueorders/268uniqueevents:134Submitted events
+omit fee amount/currency,134Filled have observed fees/USD. Receipt444B/
+a7ffaf387740f87978ccabff9282397d84287bd943177f0fe35407ae2f25db36.
+No fee absence becomes zero/USD. The auditor separates nonzero-fill/fee
+agreement, zero-fill observation agreement, missing zero-fill fee proof and
+full agreement. Counter multiplicity is preserved; no unique journal-to-API
+event-ID mapping is invented. Dividend-before-split order, every observed fee,
+signed fills, holdings/marks, cash and NAV are replayed. An actually encountered
+fractional held split permanently makes unretained cash-in-lieu unknown;
+it is never inferred from a later residual, and no generic blocker is applied
+when no remainder occurs. Chart precision agreement is distinct from exact
+private cash/holdings/NAV arithmetic and from execution-intent/MOO/cancel/
+slippage validation, which remain unproved.
+
+Superseded software snapshots are retained: first53/66passed; four semantic
+mutants detected ignored zero-fill fees, wrong dividend/split order, collapsed
+multiplicity and offsetting per-name value errors. Compact118 then119passed,
+with the known-zero count contradiction first proved RED before its fix.
+Root118passed23.40s and119passed23.86s; independent119passed24.75s, then found
+the exact-time defect: Python truncated nonzero100ns journal timestamps and
+allowed false agreement. Finding ACCEPTED; six full/partial replay regressions
+were RED6failed119deselected2.64s, then GREEN6passed1.32s after correction.
+The final manual ISO-aware parser constructs integer microseconds, refuses
+nonzero precision beyond six digits in local/offset fractions, and preserves
+equivalent trailing-zero/Z/signed-offset spellings. API order time/createdTime
+use it; numeric epoch and all legacy financial source stay unchanged.
+Finalauthor156passed26.81s, root156passed27.67s, independent37 targeted
+precision cases3.95s (119deselected). Independent disposition accepted after
+correction at9ff8df1c; no remaining verified bounded-review defect.
+
+CMP104-D022. cr31_synced_source_audit authored a NEW optional accounting reader,
+preserving old native reader33fa772f... byte-for-byte. It pins9ff8df1c and the
+original3ecccalendar, extends actual custody/config/claim/audit AST blocks and
+emits one readable main plus one pure helper. Safe metadata literals are
+plainly placed in the helper to fit per-file60000B; no encoded executable,
+compression/exec/eval or private-row export. Five actual OFF/multi public
+source-renderer shapes fit: main<=56004B, helper<=46869B. A separately spent
+accounting-processing claim precedes comparison; max1027claims,900150parses
+for three bounded record passes,10000hashes, index<=2MiB,1024chunks<=512KiB,
+journal<=256MiB/300000records. Initialize reads no licensed index/chunks.
+Actual child/project/locked/native-getter checks and pre/post immutable-config
+guards remain; body-free cancellation/fatal precedence and honest receipt
+publication status remain. Helper source/hash/config binding is externally
+verified, NOT runtime self-source authentication or native-adapter authority.
+
+Initial builder-only calendar lookup and test-only OFF operation-prefix
+errors were retained/corrected before effects; stale normalizer pins correctly
+refused while the timestamp fix was pending. Finalauthor51passed12.16s,
+root51passed13.71s, independent51passed14.14s plus AST/in-memorycompile2/2.
+Independent bounded software disposition ACCEPTED. Actual native SDK execution,
+runtime CPU/RAM/helper authenticity/backend custody remain unproved. Full raw
+API revalidation in the child, exact event-ID mapping, full order intent/MOO/
+cancel/slippage, native origin, PIT/rights/share basis/source admission,
+strategy/canonical acceptance all remain false. Synthetic fixtures are NOT a
+native/backtest acceptance or a relabelled genuine adapter.
+
+CMP104-D023. Root narrowly added ONLY
+comparison_20261028_accounting_runtime.py to the API write allowlist and
+extended physical source census24->25 for that one optional helper. Existing
+24 files are preserved except an explicitly scoped owned-main replacement;
+no deletes/notebook/account/resource changes. Exact-helper creation with all
+24 prior files preserved and25accept/26refuse are covered. Focused API
+87passed0.58s; no full lane/repository suite. This software change does not
+install anything: cloud remains frozen PURE inventory1e8337.../24files.
+PURE gets the next natural spare node; optional reader/D017 cannot delay it.
+Fresh bounded source/HEAD/access/operation/attempt/look claims and actual
+before/after source readback are required BEFORE any future compile/job.
+No new financial compile, launch or outcome occurred in this software work.
+No Claude checkpoint, purchase, provider/credential scan, broker/paper/live,
+operator-state read, side branch, history rewrite or final push occurred.
+
+Latest native status5A7C/002 is100InProgress/.454 and200InProgress/.405, both
+without reported error. OFF/50 remain failed at the guarded February10 mark;
+PURE is compiled/unlaunched. All five full-window financial outcomes remain
+unaccepted/null. Continue ROOT bounded native status checks; launch exact
+frozen PURE when capacity naturally frees, then run D017 and only an evidenced
+OFF mapping/action/data repair. Preserve all attempts, reservations, failures,
+unused looks, genuine observed jobs/outcomes and the old33-look baseline.
+Accumulate this lane only; exactly one successful non-force push remains
+withheld until the completed or concrete-blocked auditable final handoff.
+
+Exact final public tooling/test identities: {"research/target_price_revisions_qc/comparison_20261028_accounting.py":{"bytes":45629,"sha256":"9ff8df1cf142308d8cd73e2950ddfe02d64bbe88c02b5316b424f50cc49b1bc6"},"research/target_price_revisions_qc/comparison_20261028_accounting_reader.py":{"bytes":21213,"sha256":"e17fac24ed6458f70a9558d6f77dd7a898cb332b263220121bf19bc3e2358387"},"research/target_price_revisions_qc/comparison_20261028_api.py":{"bytes":26807,"sha256":"a2a160ac951a8a9f96b9531e5b51a5bf6b4e7b116b7873f77515780f059ebc5a"},"tests/target_price_revisions_qc/test_qc_comparison_20261028_accounting.py":{"bytes":43679,"sha256":"0dabebd135a5ccb04b26c5bbce4fd41db0bf675bdb9eceff089794e34fc709a8"},"tests/target_price_revisions_qc/test_qc_comparison_20261028_accounting_reader.py":{"bytes":17585,"sha256":"b4e041d97580e6fbe95201d0db56d617760051ec465b9051d90d22fd38386c19"},"tests/target_price_revisions_qc/test_qc_comparison_20261028_api.py":{"bytes":25361,"sha256":"a55187813b8c304c4311c17574574f328f8e472fd56b277129329ea7c984cbba"}}

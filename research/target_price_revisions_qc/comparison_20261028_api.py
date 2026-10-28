@@ -40,7 +40,8 @@ WRITE_FILES = frozenset(('main.py','extended_core.py','cap_tilt.py','cap_observe
     'extended_loader.py','extended_compressed_store.py','extended_runtime_successor.py',
     'extended_algorithm_successor.py','comparison_20261028.py','comparison_20261028_algorithm.py',
     'comparison_20261028_config.py','comparison_20261028_events.py',
-    'comparison_20261028_multi_algorithm.py','comparison_20261028_signal_native.py','raw_revision.py'))
+    'comparison_20261028_multi_algorithm.py','comparison_20261028_signal_native.py','raw_revision.py',
+    'comparison_20261028_accounting_runtime.py'))
 MAX_REQUESTS, MAX_BODY, MAX_RESPONSE, MAX_TOTAL = 64, 1024*1024, 4*1024*1024, 32*1024*1024
 _HASH = re.compile(r'[a-f0-9]{64}')
 _ID = re.compile(r'[A-Za-z0-9_.-]{1,160}')
@@ -358,7 +359,7 @@ def _execute(plan,root,*,transport,guard,clock,monotonic):
                 row['compile_state']=state
             if request['endpoint']=='files/read':
                 files=body.get('files')
-                if type(files) is not list or len(files)>24:_fail()
+                if type(files) is not list or len(files)>25:_fail()
                 inventory={}
                 for file in files:
                     if (type(file) is not dict or type(file.get('name')) is not str

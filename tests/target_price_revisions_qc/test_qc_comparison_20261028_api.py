@@ -92,7 +92,7 @@ def test_changed_before_inventory_stops_before_first_write(tmp_path):
     assert result['requests'][0]['raw_response'] is not None
 
 
-@pytest.mark.parametrize('name',['comparison_20261028_multi_algorithm.py','comparison_20261028_signal_native.py','raw_revision.py'])
+@pytest.mark.parametrize('name',['comparison_20261028_multi_algorithm.py','comparison_20261028_signal_native.py','raw_revision.py','comparison_20261028_accounting_runtime.py'])
 @pytest.mark.parametrize('fault',[None,'wrong_hash','missing_inventory_gate'])
 def test_exact_multi_packaging_names_keep_hash_and_inventory_admission(name,fault):
     source='# synthetic exact packaging source\n'
@@ -417,3 +417,32 @@ def test_order_bound_correction_preserves_separate_log_window(size,accepted):
         assert plan([request])['requests'][0]['payload']['end']==size
     else:
         with pytest.raises(m.APIRefusal):plan([request])
+
+
+@pytest.mark.parametrize('count,accepted',[(25,True),(26,False)])
+def test_one_bounded_accounting_helper_extends_physical_census_only_to_25(tmp_path,count,accepted):
+    files={f'preserved_{i}.py':'# untouched\n' for i in range(count)}
+    result=execute(tmp_path,plan(),lambda *_:response(source_response(files)))
+    assert (result['status']=='completed') is accepted
+    assert result['requests'][0]['raw_response'] is not None
+    if accepted:
+        assert result['requests'][0]['source_inventory']==inventory(files)
+
+
+def test_exact_accounting_helper_creation_preserves_all_existing_24_files(tmp_path):
+    name='comparison_20261028_accounting_runtime.py';content='# synthetic pure helper\n'
+    before={f'preserved_{i}.py':'# unchanged\n' for i in range(24)}
+    after={**before,name:content};cloud=dict(before)
+    rows=[row('files/read',{'projectId':m.PROJECT},'before',source_inventory_sha256=m._sha(m._canonical(inventory(before)))),
+        row('files/create',{'projectId':m.PROJECT,'name':name,'content':content},'helper'),
+        row('files/read',{'projectId':m.PROJECT},'after',source_inventory_sha256=m._sha(m._canonical(inventory(after))))]
+    p=plan(rows,allowed_source_hashes={name:m._sha(content.encode())},
+        attempt_id='fresh-accounting-helper-attempt',reserved_look_id='fresh-accounting-helper-look')
+    def transport(endpoint,raw,*_):
+        payload=json.loads(raw)
+        if endpoint=='files/read':return response(source_response(cloud))
+        assert endpoint=='files/create' and payload['name']==name
+        cloud[name]=payload['content'];return response({'success':True})
+    result=execute(tmp_path,p,transport)
+    assert result['status']=='completed' and cloud==after
+    assert {key:cloud[key] for key in before}==before

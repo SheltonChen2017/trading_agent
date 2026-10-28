@@ -67,8 +67,12 @@ class Provider:
 def minimal(module,arm="cap_tilt_200"):
     original=prior.minimal(module.previous)
     algo=module.ComparisonMultiAlgorithm();algo.__dict__.update(original.__dict__)
-    algo._config,_,_=config(module,arm)
-    algo.project_id=algo._config["project_id"]
+    algo._config,_,digest=config(module,arm)
+    module.EXPECTED_CONFIG_SHA256=digest
+    algo.project_id=algo._config["project_id"];algo.algorithm_id="c"*32;algo.get_locked=lambda:True
+    algo.live_mode=False
+    algo._evidence=module.MultiJournal(algo._config,digest,lambda:(algo.project_id,algo.algorithm_id,algo.get_locked()))
+    algo._initialize_signal_runtime()
     algo._signal_provider=Provider()
     return algo
 
@@ -174,7 +178,7 @@ def test_all_zero_selected_donor_remains_in_evidence_and_held_position_exits(dri
     algo._cap_snapshots[0]["caps"].update({"LOW":{"state":"available","value":"100"},"HIGH":{"state":"available","value":"90"}})
     algo._signal_provider=Provider({"LOW":{"state":"available","value":"-1"},"HIGH":{"state":"available","value":"1"}})
     algo._attempted_days=set();algo._decision_count=algo._refused_count=0
-    algo._assert_clock_subscription=lambda:None;algo._evidence=NS(require_binding=lambda:None)
+    algo._assert_clock_subscription=lambda:None
     algo.portfolio=NS(cash="99000",values=lambda:[NS(invested=True,symbol=low,quantity="10")])
     algo._prior_close_nav=Fraction(100000);algo._prior_close_day=date(2020,12,31)
     algo._prior_mark=lambda symbol:(Fraction(100),Fraction(10000))
@@ -233,13 +237,15 @@ def test_inherited_raw_money_action_paths_stay_identical(driver):
     assert driver.ComparisonMultiAlgorithm.initialize is not driver.previous.ComparisonOffAlgorithm.initialize
 
 
-def test_real_multi_initialization_reads_one_exact_packet_and_registers_new_six(driver,monkeypatch):
-    body,raw,digest=config(driver,"cap_tilt_50");driver.EXPECTED_CONFIG_SHA256=digest
+def test_real_multi_initialization_has_no_packet_effect_then_actual_job_reads_once(driver,monkeypatch):
+    packet=b"synthetic-packet";assert len(packet)==16
+    body,raw,digest=config(driver,"cap_tilt_50",signal_packet={"key":"tpr-cmp28/inputs/synthetic/packet.json",
+        "sha256":hashlib.sha256(packet).hexdigest(),"bytes":len(packet),"encoding":"utf-8-json","source_inventory_sha256":"e"*64})
+    driver.EXPECTED_CONFIG_SHA256=digest
     module=ModuleType("comparison_20261028_config");module.CONFIG_JSON=raw;monkeypatch.setitem(sys.modules,module.__name__,module)
     algo=driver.ComparisonMultiAlgorithm();algo.live_mode=False;algo.project_id=body["project_id"];algo.algorithm_id="";algo.get_locked=lambda:False
     algo._initialized_factor_provider=lambda:object()
-    reads=[];packet=b"synthetic-packet";assert len(packet)==16
-    algo.object_store=NS(read_bytes=lambda key:(reads.append(key) or packet))
+    store=prior.NativeStore();store.values[body["signal_packet"]["key"]]=packet;algo.object_store=store
     prepared=[];provider=Provider()
     driver.signal_native.prepare_native_signals=lambda raw,**kwargs:(prepared.append((raw,kwargs)) or provider)
     for name in ("set_start_date","set_end_date","set_time_zone","set_account_currency","set_cash","set_warm_up","set_benchmark"):
@@ -253,7 +259,11 @@ def test_real_multi_initialization_reads_one_exact_packet_and_registers_new_six(
         universes.append(value);return value
     algo.add_universe=add_universe;algo.date_rules=NS(every_day=lambda symbol:None);algo.time_rules=NS(at=lambda *_:None);algo.schedule=NS(on=lambda *_:None)
     algo.initialize()
-    assert reads==[body["signal_packet"]["key"]]
+    assert store.calls==[] and prepared==[] and algo._signal_provider is None
+    algo.algorithm_id="c"*32;algo.get_locked=lambda:True
+    assert algo._require_signal_provider() is provider
+    assert [key for method,key in store.calls if method=="read" and key==body["signal_packet"]["key"]]==[body["signal_packet"]["key"]]
+    before=list(store.calls);assert algo._require_signal_provider() is provider and store.calls==before
     assert len(prepared)==1 and prepared[0][0]==packet
     kwargs=prepared[0][1]
     assert kwargs["expected_sha256"]==body["signal_packet"]["sha256"]
@@ -362,3 +372,164 @@ def test_all_four_signal_arms_inherit_the_same_native_close_corroboration_and_sa
         summary=algo._mark_verification_summary()
         assert summary["mode"]=="strict_minute_or_raw_daily_equal_close_v1"
         assert summary["daily_requests"]==summary["daily_corroborated_marks"]==summary["refused_marks"]==0
+
+
+@pytest.fixture
+def signal_runtime(driver):
+    algo=minimal(driver)
+    packet=b"synthetic-packet"
+    body,_,digest=config(driver,signal_packet={"key":"tpr-cmp28/inputs/synthetic/packet.json",
+        "sha256":hashlib.sha256(packet).hexdigest(),"bytes":len(packet),"encoding":"utf-8-json","source_inventory_sha256":"e"*64})
+    driver.EXPECTED_CONFIG_SHA256=digest;algo._config=body
+    state=NS(project=body["project_id"],job="c"*32,locked=True,hook=lambda *_:None,orders=[],parsed=[],events=[])
+    algo.get_locked=lambda:state.locked
+    algo._evidence=driver.MultiJournal(body,digest,lambda:(algo.project_id,algo.algorithm_id,algo.get_locked()))
+    algo._initialize_signal_runtime()
+    class Store(prior.NativeStore):
+        def contains_key(self,key):
+            state.events.append("contains");state.hook("contains")
+            return super().contains_key(key)
+        def save_bytes(self,key,raw):
+            state.events.append("save");state.hook("save")
+            return super().save_bytes(key,raw)
+        def read_bytes(self,key):
+            kind="packet" if key==body["signal_packet"]["key"] else "claim_readback"
+            state.events.append(kind);state.hook(kind)
+            return super().read_bytes(key)
+    store=Store();store.values[body["signal_packet"]["key"]]=packet;algo.object_store=store
+    provider=Provider()
+    def prepare(raw,**kwargs):
+        state.events.append("parse");state.hook("parse");state.parsed.append((raw,kwargs));return provider
+    driver.signal_native.prepare_native_signals=prepare
+    algo.market_on_open_order=lambda *_args,**_kwargs:state.orders.append("order")
+    return NS(algo=algo,state=state,store=store,provider=provider,packet=packet,module=driver)
+
+
+def test_fresh_actual_job_claim_precedes_only_packet_read_and_provider_parse(signal_runtime):
+    case=signal_runtime;assert case.algo._require_signal_provider() is case.provider
+    assert case.state.events==["contains","save","claim_readback","packet","parse"]
+    claim_key=case.algo._signal_runtime["claim_key"];raw=case.store.values[claim_key];claim=json.loads(raw)
+    assert len(raw)<=4096 and claim_key.endswith("/37650453/"+"c"*32+"/signal-packet-access.json")
+    assert claim["job_id"]=="c"*32 and claim["project_id"]==37650453
+    assert claim["parent_config_sha256"]==case.module.EXPECTED_CONFIG_SHA256
+    assert claim["source_template_closure_sha256"]==case.algo._config["source_template_closure_sha256"]
+    assert claim["maximum_packet_reads"]==1 and claim["maximum_packet_bytes"]==len(case.packet)
+    assert claim["maximum_scores_calls"]==301 and claim["spent_before_effect"] is True
+    assert claim["no_standalone_outcome_permission"] is True and claim["backend_durability_proven"] is False
+    summary=case.algo._signal_runtime_summary()
+    assert summary["claim_same_node_verified"] is summary["provider_ready"] is summary["actual_job_bound"] is True
+    assert summary["backend_durability_proven"] is False and summary["packet_reads"]==1
+    before=list(case.state.events);assert case.algo._require_signal_provider() is case.provider
+    assert case.state.events==before and not case.state.orders
+
+
+@pytest.mark.parametrize("mode",["empty_job","wrong_project","unlocked","wrong_job_shape","config_mutation","source_config_hash"])
+def test_missing_runtime_custody_has_no_claim_or_packet_effect(signal_runtime,mode):
+    case=signal_runtime
+    if mode=="empty_job":case.algo.algorithm_id=""
+    elif mode=="wrong_project":case.algo.project_id=1
+    elif mode=="unlocked":case.state.locked=False
+    elif mode=="wrong_job_shape":case.algo.algorithm_id="foreign-job"
+    elif mode=="config_mutation":case.algo._config["signal_packet"]["bytes"]+=1
+    else:case.module.EXPECTED_CONFIG_SHA256="f"*64
+    with pytest.raises(ValueError,match="^CMP28 signal runtime refused$"):case.algo._require_signal_provider()
+    assert case.store.calls==[] and case.state.parsed==[] and not case.state.orders
+
+
+@pytest.mark.parametrize("stage",["contains","save","claim_readback","packet","parse"])
+@pytest.mark.parametrize("drift",["project","job","locked","live_mode"])
+def test_runtime_drift_after_any_uncertain_effect_stops_no_retry_and_preserves_bound_job(signal_runtime,stage,drift):
+    case=signal_runtime
+    def change(observed):
+        if observed!=stage:return
+        if drift=="project":case.algo.project_id=1
+        elif drift=="job":case.algo.algorithm_id="d"*32
+        elif drift=="live_mode":case.algo.live_mode=True
+        else:case.state.locked=False
+    case.state.hook=change
+    with pytest.raises(ValueError,match="^CMP28 signal runtime refused$"):case.algo._require_signal_provider()
+    assert case.algo._signal_native_binding[:2]==(37650453,"c"*32)
+    before=list(case.state.events)
+    with pytest.raises(ValueError):case.algo._require_signal_provider()
+    assert case.state.events==before and not case.state.orders
+    if stage in ("contains","save","claim_readback"):
+        assert "packet" not in case.state.events and not case.state.parsed
+    assert case.algo._signal_runtime["provider_ready"] is False
+
+
+@pytest.mark.parametrize("mode",["exists","unknown_exists","save_false","readback_bytes","readback_hash","packet_hash","packet_size"])
+def test_claim_uncertainty_or_input_hash_refuses_without_second_packet_read(signal_runtime,mode):
+    case=signal_runtime
+    if mode=="exists":case.store.contains_key=lambda key:True
+    elif mode=="unknown_exists":case.store.contains_key=lambda key:None
+    elif mode=="save_false":case.store.save_bytes=lambda key,raw:False
+    elif mode in ("readback_bytes","readback_hash"):
+        original=case.store.read_bytes
+        case.store.read_bytes=lambda key:(b"X" if mode=="readback_bytes" else bytes([original(key)[0]^1])+original(key)[1:])
+    elif mode=="packet_hash":case.store.values[case.algo._config["signal_packet"]["key"]]=b"private-bad-data"
+    else:case.store.values[case.algo._config["signal_packet"]["key"]]=case.packet+b"x"
+    with pytest.raises(ValueError):case.algo._require_signal_provider()
+    assert case.algo._signal_packet_attempted is True and case.algo._signal_runtime_faulted is True
+    assert case.algo._signal_runtime["packet_reads"]<=1 and not case.state.parsed and not case.state.orders
+    before=list(case.state.events)
+    with pytest.raises(ValueError):case.algo._require_signal_provider()
+    assert case.state.events==before
+    if mode in ("exists","unknown_exists","save_false","readback_bytes","readback_hash"):
+        assert case.algo._signal_runtime["packet_reads"]==0
+
+
+@pytest.mark.parametrize("stage",["contains","save","claim_readback","packet","parse"])
+@pytest.mark.parametrize("kind",["ordinary","cancel","fatal"])
+def test_private_errors_are_body_free_keep_cancellation_and_never_order_or_retry(signal_runtime,stage,kind):
+    case=signal_runtime
+    class Fatal(BaseException):pass
+    def stop(observed):
+        if observed==stage:raise {"ordinary":RuntimeError,"cancel":KeyboardInterrupt,"fatal":Fatal}[kind]("PRIVATE-PACKET-SENTINEL")
+    case.state.hook=stop
+    expected={"ordinary":ValueError,"cancel":KeyboardInterrupt,"fatal":case.module.SignalRuntimeStopped}[kind]
+    with pytest.raises(expected) as error:case.algo._require_signal_provider()
+    assert "PRIVATE-PACKET-SENTINEL" not in str(error.value) and not case.state.orders
+    before=list(case.state.events)
+    with pytest.raises(ValueError):case.algo._require_signal_provider()
+    assert case.state.events==before
+
+
+@pytest.mark.parametrize("phase",["scores","drain"])
+def test_subsequent_private_processing_checks_actual_job_and_stops_before_any_order(driver,phase):
+    algo=minimal(driver);day=supplied(driver,algo)
+    calls=[]
+    original=algo._signal_provider.scores_for
+    if phase=="scores":
+        def scores(*args):
+            calls.append("scores");algo.algorithm_id="d"*32;return original(*args)
+        algo._signal_provider.scores_for=scores
+    else:
+        def drain(**_):
+            calls.append("drain");algo.algorithm_id="d"*32;return []
+        algo._signal_provider.drain_private_binding_receipts=drain
+    with pytest.raises(ValueError,match="^CMP28 signal runtime refused$"):algo._prepare_targets(day)
+    assert calls==[phase] and algo._target_weights=={} and algo._signal_runtime_faulted is True
+
+
+def test_301_scores_budget_is_closed_before_302nd_processing(driver):
+    algo=minimal(driver);day=supplied(driver,algo);algo._signal_runtime["scores_calls"]=301
+    with pytest.raises(ValueError):algo._prepare_targets(day)
+    assert algo._signal_provider.calls==[]
+
+
+def test_cancellation_during_post_error_custody_has_priority_over_private_ordinary_error(signal_runtime):
+    case=signal_runtime
+    def ordinary(stage):
+        if stage=="packet":
+            case.algo.get_locked=lambda:(_ for _ in ()).throw(KeyboardInterrupt("PRIVATE-CANCEL"))
+            raise RuntimeError("PRIVATE-FIRST")
+    case.state.hook=ordinary
+    with pytest.raises(KeyboardInterrupt,match="^CMP28 signal operation cancelled$") as error:case.algo._require_signal_provider()
+    assert "PRIVATE" not in str(error.value) and not case.state.orders
+
+
+@pytest.mark.parametrize("value",[True,None,0,""])
+def test_signal_packet_runtime_requires_actual_explicit_research_mode(signal_runtime,value):
+    case=signal_runtime;case.algo.live_mode=value
+    with pytest.raises(ValueError,match="^CMP28 signal runtime refused$"):case.algo._require_signal_provider()
+    assert case.store.calls==[] and not case.state.parsed and not case.state.orders

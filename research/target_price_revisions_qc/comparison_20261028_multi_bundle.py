@@ -36,7 +36,7 @@ BASE_PINS = {
 PINS = {PREFIX + name: digest for name, digest in BASE_PINS.items()}
 PINS.update({
     PREFIX + "comparison_20261028_bundle.py": "76637ed47522b6f4eb0a8e19d0962afce5e08cd249d28348dc1204547ee71b6a",
-    PREFIX + "comparison_20261028_multi_algorithm.py": "201d1fa0ffa5f2771eb245997c6c160119e9cf766300d254615bcfc76eb49e34",
+    PREFIX + "comparison_20261028_multi_algorithm.py": "2af9c8d3b4762ca0990c0aaf2361653518a0572818e91def07603972f378e6ce",
     PREFIX + "comparison_20261028_events.py": "8041ed95e01103007379e4b5761d14b4f5c0425afb6e889d9e295dd6acc9965d",
     PREFIX + "comparison_20261028_signal_native.py": "6fdab16bdfe070e138b92977279dec0d03d67e6a05b1be5f9af5e9136bd96935",
     "research/target_price_revisions_development/raw_revision.py": "ea4efcd9b0e73ae0b5c166d820c51e054559a3ed610041a6eb2acc8abca36353"})

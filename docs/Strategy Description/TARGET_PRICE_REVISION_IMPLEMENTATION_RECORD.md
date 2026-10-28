@@ -27378,3 +27378,66 @@ selection/capital/economics muststayunchanged; no actualsignalarm waslaunched
 with the flawedinitread. finish_off_preparation owns source/focusedtestrepair.
 
 D014 correctedcontrolsource16441B/c7337090cc336472576abe4126c20317de47f31e5b9f59fb93eef36520b7662a; tests16823B/5cf844f69417612d8587ed55b6ebcf42fa26b00d4b79293c2929c4afb530218c. Author43passed1.72s; root43passed1.59s plus diff/source review. Root required exactoneTradeBar and duplicateTrade negative beforeacceptance. No shared or financialvaluationchange. Localcommit prepares immediatelyfresh003; no roundpush yet. Concurrentmulti source remainsunstaged/ownedbyfinishagent.
+
+Fresh bounded private phase TPR-CMP28-MARK-PROBE-CONTROL3-PREPARE-20261028-001/b22b233fc812a7fae92d6ecafabd574d019c1c847585d6cbaec9fd1be4428eec at 51270cbdabff727e76aecfaaa710ed661f7687cb BEFORE 1 exact private inputs/120s; Own source-only archive one exact read/render; preserve19files; reserve controlled probe003 with verifiedquotecompanion predicate beforeeffects; fsync claim and directory retained.
+
+NONECONOMIC controlled probe003 reservation 387278ce671e3d780c415d46e6e6f06cc8a8d21baa64498488a736d4a9745e9b retainedfsyncBEFOREeffects at 51270cbdabff727e76aecfaaa710ed661f7687cb; source28b76c7b1fb0e29b9a483e05091e6aabcecff33e5581cd0567e769c5f0e581e3; replaceONLYmain/preserve19; baseline0bd03b02f09b77b0c17fd52cc4347310c48b56dc459ae5bcb65842c69e75bbd9 -> 272f1392ee23025aa1bfdc5d3a832bf516c75a7a7fef456cd62b45c57744b574. D014 exactTradeBar/atmostoneverifiedQuoteBar, no financialguard change; four bounded RAWHistory calls, zeroorders. Priorcontrol002Completedconfigrefusal retained; financialcountsunchanged OFF4failedjobs,other4arms0.
+
+Fresh bounded private phase TPR-CMP28-MARK-PROBE-CONTROL3-UPLOAD-SOURCE-20261028-001/5db757308948da84a971559bddd931a7235f662df4c4cb61dbd484a0e78895be at 51270cbdabff727e76aecfaaa710ed661f7687cb BEFORE 1 exact private inputs/180s; Own exact source-only snapshot main-only update;3APIrequests180s/10MiB; reservation387278ce retained; fsync claim and directory retained.
+
+Actual controlledprobe003 uploadplan 12d43dad05671b88550bc04dd87afcdae4e7028ce52f213d7757aad6a0edfd97 BEFOREcredentials/effects; mainONLY/preserve19/exactbaseline0bd03b02...to272f1392.
+
+Fresh bounded native phase TPR-CMP28-API-MARK-PROBE-CONTROL3-COMPILE-20261028-001/8bc6814b1f602341eaeea5988d20a3f28b03a96c36fbab9a6055efd6846c1b49 at 51270cbdabff727e76aecfaaa710ed661f7687cb before3 exact requests/120s/10485760B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-MARK-PROBE-CONTROL3-COMPILE-READ-20261028-001/2676adcf3a8b9d5abcd9f3e3f43e3bd8495514e488ca1c2fe057aecee9ff3639 at 51270cbdabff727e76aecfaaa710ed661f7687cb before1 exact requests/60s/131072B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-MARK-PROBE-CONTROL3-LAUNCH-20261028-001/d955d6110ffd88b032818c6a7831698cf2b928d027293d13d5e96c93b90c1bbc at 51270cbdabff727e76aecfaaa710ed661f7687cb before3 exact requests/120s/10485760B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-MARK-PROBE-CONTROL3-RESULT-20261028-001/bc785687345c9424305cccc86f74255a8e4b069735b7612663ad5c2659350d1e at 51270cbdabff727e76aecfaaa710ed661f7687cb before2 exact requests/120s/4456448B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-MARK-PROBE-CONTROL3-PROCESS-20261028-001/4af8723aa5b3854e535a77c5579815a479a4b25709678dc3ef89572aebc7382f at 51270cbdabff727e76aecfaaa710ed661f7687cb BEFORE 1 exact private inputs/120s; Expected safe controlledprobe003 log only; no witnessbody/rawSID/quotes/PnL projection; fsync claim and directory retained.
+
+### 104.26 Controlled native evidence and fixed remaining-arm continuation
+
+Controlled003 actualcompilea72e25d608e6eacf00e5535c63d02076-07743ab11daf5f4859c37f2f54b1077d
+BuildSuccess; jobec4213876ae3f2223be64aba3b931844 terminalCompleted.
+Current20fileinventory272f1392ee23025aa1bfdc5d3a832bf516c75a7a7fef456cd62b45c57744b574
+verifiedbefore/afterupload/compile/launch; samejobownsourcepreserved.
+Freshsafe3353B/6ae30e975456b757b69107fda19262cfdcdf17b7ad1e149d425c2786db5f0181
+provespositiveSPY390minute/1daily, exactclose/current-session/positivevolume;
+actualtargetnativeSecurity/exactSID/ref/RAWregularnonFFminuteTradeBarONE and
+QuoteBarONE, noother/untypedconfigs, verifiedtrue; actualtargetMINUTE0/DAILY0,
+4Historycalls/noerrors/endcustodytrue. Parentwitnesshash/schema/identity roundtrip
+areverified, priorrealcache exactlyonedayearlier. This provesboundednative
+queries cannot supply the requiredfreshmark underthissetup, NOTuniversaldata
+absence/entitlement/PIT/rights/market-haltcause. No quotes/staleprices accepted.
+
+cr31 source-only recovery audit found no drop-in externalstockmark bridge in
+thisstudy. Legacy raw_market_capture has differentfrozenwindow/ownerhash/spent
+identities and mustnotbereused; its currentvintageimputedrawopens are not
+nativeclosingTradeBarcustody. ExistingEODHD/FMPsubscriptions doNOTthemselves
+prove a correctlybound RAW/action/PIT/markbridge. No purchase or fabricated
+nativeadapter is justified by this singleboundedmissingmark.
+
+Decision CMP104-D016: do not knowinglyrerun unchangedOFF4 path or change its
+frozenstockselection, valuation, cache, economics or missing-as-zero rule.
+OFF currently has a concrete fresh-native-mark input blocker for SIDhash1122...,
+but this doesnotprove everyfixedTPR armholds that identitywithpositiveweight.
+After D015 custodyrepair passes focusedchecks, proceed with eachof4PREDECLARED
+signal arms underfresh reservations/source/access manifests; accept legitimate
+negative/refusedterminal outcomes honestly. This is fixedrequestedcomparison,
+not an outcome-chasing sweep or silentlychangedcandidate. Retain each native
+attempt/job/source and precise blocker; no financial result is inferred from
+probes, partialruns or a terminalCompleted label. Onefinalpush remainsoutstanding.
+
+D015 final source37302B/2af9c8d3b4762ca0990c0aaf2361653518a0572818e91def07603972f378e6ce;
+renderer12187B/7015c94867da28d31426627275ec607e9f8fb3d8f6cb38d97cbd6aa5511b7e28;
+driver test31528B/77952a3a5a8342c0d4a76431b3f6f1fe84a34d8ec0c14f462b1a900126115473;
+renderer test12864B/58adbed407c6338dcbbf2f610e36cd6f9a317fb360d654894c41d63007e830c0.
+Author174passed6.85s; root174passed6.90s; independentoffline103174passed6.73s,
+AST/inmemorycompile/diffclean. Root required researchmodeFalse at EVERY private
+phase and mode-drift negative, includedbeforefinalsourcefreeze. cr31 separately
+spotchecked flowclean. Alldelegations source-only/no private/nativeeffects.
+Exactcalendar/universe/cap/TPR/allocation/execution arguments unchanged. This
+softwarecustody correction is not native/fullwindow/PIT/rights acceptance.
+Nextrole ROOT runs freshreserved fixedfourarm nativecomparisons; noClaude gate.

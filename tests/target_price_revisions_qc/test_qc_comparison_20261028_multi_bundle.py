@@ -159,7 +159,8 @@ def load_flat(files,monkeypatch):
 def setup_native_stubs(module,packet):
     algo=module.ComparisonMultiAlgorithm();algo.live_mode=False;algo.project_id=37650980;algo.algorithm_id=""
     algo.get_locked=lambda:False;algo._initialized_factor_provider=lambda:object()
-    reads=[];algo.object_store=NS(read_bytes=lambda key:(reads.append(key) or packet))
+    reads=[];store=off_tests.NativeStore();store.values[descriptor()["key"]]=packet
+    read=store.read_bytes;store.read_bytes=lambda key:(reads.append(key) or read(key));algo.object_store=store
     for name in ("set_start_date","set_end_date","set_time_zone","set_account_currency","set_cash","set_warm_up","set_benchmark"):
         setattr(algo,name,lambda *_:None)
     algo.add_chart=lambda *_:None;algo.universe_settings=NS();algo.add_security_initializer=lambda *_:None
@@ -181,8 +182,13 @@ def test_real_flat_modules_initialize_each_arm_with_exact_plain_packet_and_no_na
     assert issubclass(main.Main,module.ComparisonMultiAlgorithm)
     assert [name for name,value in main.__dict__.items() if isinstance(value,type)]==["Main"]
     algo,reads,labels,universes=setup_native_stubs(module,synthetic_packet());algo.initialize()
-    assert reads==[descriptor()["key"]] and labels==list(module.SLEEVES) and len(universes)==7
+    assert reads==[] and algo._signal_provider is None and algo.object_store.calls==[]
+    assert labels==list(module.SLEEVES) and len(universes)==7
     assert algo._config["arm"]==arm and algo._config["source_template_closure_sha256"]==report["source_template_closure_sha256"]
+    algo.algorithm_id="c"*32;algo.get_locked=lambda:True
+    algo._require_signal_provider()
+    assert reads==[algo._signal_runtime["claim_key"],descriptor()["key"]]
+    assert algo._signal_runtime["claim_same_node_verified"] is True and algo._signal_runtime["packet_reads"]==1
     summary=algo._signal_provider.public_summary()
     assert summary["native_provider_status"]=="not_requested" and summary["source_census"]["source_rows"]==0
     assert algo._signal_provider._packet==synthetic_packet()

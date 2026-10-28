@@ -99,6 +99,10 @@ def score_frame_sha256(scores):
     return hashlib.sha256(raw).hexdigest()
 
 
+class SignalRuntimeStopped(BaseException):
+    """Body-free nonordinary stop; never demoted into an ordinary refusal."""
+
+
 class MultiJournal(off.ComparisonJournal):
     def __init__(self, config, config_sha256, native_getter):
         if (type(config) is not dict or type(config.get("project_id")) is not int
@@ -202,14 +206,7 @@ class ComparisonMultiAlgorithm(off.ComparisonOffAlgorithm):
         self._initialize_mark_verification()
         if type(self.project_id) is not int or self.project_id != self._config["project_id"]:
             _fail()
-        packet = self._config["signal_packet"]
-        packet_raw = native_bytes(self.object_store.read_bytes(packet["key"]), packet["bytes"])
-        if type(self.project_id) is not int or self.project_id != self._config["project_id"]:
-            _fail()
-        self._signal_provider = signal_native.prepare_native_signals(packet_raw,
-            expected_sha256=packet["sha256"], expected_bytes=packet["bytes"], sessions=session_axis(),
-            expected_source_inventory_sha256=packet["source_inventory_sha256"])
-        del packet_raw
+        self._initialize_signal_runtime()
         self._identities, self._source_ticker_bridge, self._frames = {}, {}, {}
         self.set_start_date(2021, 1, 4)
         self.set_end_date(2026, 10, 9)
@@ -265,6 +262,122 @@ class ComparisonMultiAlgorithm(off.ComparisonOffAlgorithm):
         self.schedule.on(self.date_rules.every_day(self._benchmark), self.time_rules.at(9, 35), self._cancel_day_orders)
         self.schedule.on(self.date_rules.every_day(self._benchmark), self.time_rules.at(16, 1), self._daily_audit)
 
+
+    def _initialize_signal_runtime(self):
+        # Initialization has no actual job ID yet: no private read or parse.
+        self._signal_provider = None
+        self._signal_packet_attempted = False
+        self._signal_runtime_faulted = False
+        self._signal_native_binding = None
+        self._signal_runtime = {"claim_attempts":0,"claim_same_node_verified":False,
+            "backend_durability_proven":False,"claim_key":None,"claim_sha256":None,"claim_bytes":None,
+            "packet_reads":0,"provider_ready":False,"scores_calls":0,"drain_calls":0}
+
+    def _signal_bound(self):
+        project, job, locked = self.project_id, self.algorithm_id, self.get_locked()
+        if (self.live_mode is not False or type(project) is not int or project != self._config["project_id"]
+                or type(job) is not str or re.fullmatch(r"[0-9a-f]{32}",job) is None or locked is not True
+                or self._evidence._config_hash != EXPECTED_CONFIG_SHA256
+                or self._evidence._config_raw != _wire(self._config)):
+            _fail()
+        prefix = self._evidence.require_binding()
+        if type(prefix) is not str or not prefix.endswith("/"+str(project)+"/"+job+"/"):
+            _fail()
+        binding = (project,job,prefix)
+        if self._signal_native_binding is None:
+            self._signal_native_binding = binding
+        elif self._signal_native_binding != binding:
+            _fail()
+        return prefix
+
+    def _signal_effect(self, call):
+        """Real runtime custody around each bounded private phase, even errors."""
+        try:
+            if self._signal_runtime_faulted:
+                _fail()
+            self._signal_bound()
+            try:
+                value = call()
+            except BaseException as first:
+                try:
+                    self._signal_bound()
+                except BaseException as second:
+                    if isinstance(first,KeyboardInterrupt):raise first
+                    if isinstance(second,KeyboardInterrupt):raise second
+                    if not isinstance(first,Exception):raise first
+                    if not isinstance(second,Exception):raise second
+                raise
+            self._signal_bound()
+            return value
+        except KeyboardInterrupt:
+            self._signal_runtime_faulted = True
+            raise KeyboardInterrupt("CMP28 signal operation cancelled") from None
+        except Exception:
+            self._signal_runtime_faulted = True
+            raise ValueError("CMP28 signal runtime refused") from None
+        except BaseException:
+            self._signal_runtime_faulted = True
+            raise SignalRuntimeStopped("CMP28 signal operation stopped") from None
+
+    def _require_signal_provider(self):
+        if self._signal_provider is not None:
+            return self._signal_effect(lambda:self._signal_provider)
+        def prepare():
+            if self._signal_packet_attempted:
+                _fail()
+            self._signal_packet_attempted = True  # Before claim/read; no retry.
+            self._signal_runtime["claim_attempts"] += 1
+            prefix = self._signal_bound()
+            packet = dict(self._config["signal_packet"])
+            body = {"schema":"tpr-cmp28-native-signal-packet-access-v1","study_id":STUDY,
+                "candidate_id":self._config["candidate_id"],"arm":self._config["arm"],
+                "operation_id":self._config["operation_id"],"attempt":self._config["attempt"],
+                "project_id":self.project_id,"job_id":self.algorithm_id,
+                "parent_config_sha256":EXPECTED_CONFIG_SHA256,
+                "source_template_closure_sha256":self._config["source_template_closure_sha256"],
+                "policy_sha256":self._config["policy_sha256"],"calendar_sha256":self._config["calendar_sha256"],
+                "prior_attempts_looks_sha256":self._config["prior_attempts_looks_sha256"],
+                "signal_packet":packet,"maximum_packet_reads":1,"maximum_packet_bytes":packet["bytes"],
+                "maximum_scores_calls":301,"spent_before_effect":True,
+                "no_standalone_outcome_permission":True,"backend_durability_proven":False}
+            raw = _wire(body)
+            if not 0 < len(raw) <= 4096:
+                _fail()
+            key = prefix+"signal-packet-access.json"
+            digest = hashlib.sha256(raw).hexdigest()
+            self._signal_runtime.update(claim_key=key,claim_sha256=digest,claim_bytes=len(raw))
+            exists = self._signal_effect(lambda:self.object_store.contains_key(key))
+            if type(exists) is not bool or exists:
+                _fail()
+            if self._signal_effect(lambda:self.object_store.save_bytes(key,raw)) is not True:
+                _fail()
+            observed = self._signal_effect(lambda:native_bytes(self.object_store.read_bytes(key),len(raw)))
+            if observed != raw or len(observed) != len(raw) or hashlib.sha256(observed).hexdigest() != digest:
+                _fail()
+            # Local readback can be cache-backed; root external manifest is the
+            # durable authority. This is only verified same-node publication.
+            self._signal_runtime["claim_same_node_verified"] = True
+            self._signal_runtime["packet_reads"] += 1
+            observed = self._signal_effect(lambda:self.object_store.read_bytes(packet["key"]))
+            packet_raw = self._signal_effect(lambda:native_bytes(observed,packet["bytes"]))
+            del observed  # Release the native byte-array wrapper before parsing.
+            if len(packet_raw) != packet["bytes"] or self._signal_effect(lambda:hashlib.sha256(packet_raw).hexdigest()) != packet["sha256"]:
+                _fail()
+            provider = self._signal_effect(lambda:signal_native.prepare_native_signals(packet_raw,
+                expected_sha256=packet["sha256"],expected_bytes=packet["bytes"],sessions=session_axis(),
+                expected_source_inventory_sha256=packet["source_inventory_sha256"]))
+            if provider is None:
+                _fail()
+            return provider
+        provider = self._signal_effect(prepare)
+        self._signal_provider = provider
+        self._signal_runtime["provider_ready"] = True
+        return provider
+
+    def _signal_runtime_summary(self):
+        return {**self._signal_runtime,"faulted":self._signal_runtime_faulted,
+            "packet_scope_spent":self._signal_packet_attempted,
+            "actual_job_bound":self._signal_native_binding is not None}
 
     def _capture_caps(self, values):
         if self._config["arm"] != "pure_tpr":
@@ -334,7 +447,11 @@ class ComparisonMultiAlgorithm(off.ComparisonOffAlgorithm):
             baseline,_ = comparison.construct_off(members,current_caps,finance_insurance_by_sid=finance,
                 warning_ids=self._warning_ids,final_ids=self._delisted_ids)
             requested={sid:symbols[sid] for sid in baseline}
-        signal = self._signal_provider.scores_for(day,cutoff.isoformat(),requested)
+        provider = self._require_signal_provider()
+        if self._signal_runtime["scores_calls"] >= 301:
+            self._signal_effect(_fail)
+        self._signal_runtime["scores_calls"] += 1
+        signal = self._signal_effect(lambda:provider.scores_for(day,cutoff.isoformat(),requested))
         if type(signal) is not dict or type(signal.get("scores_by_sid")) is not dict or set(signal["scores_by_sid"]) != set(requested):
             _fail()
         scores=signal["scores_by_sid"]
@@ -342,7 +459,8 @@ class ComparisonMultiAlgorithm(off.ComparisonOffAlgorithm):
         # batches so the provider does not retain the whole run's observations.
         receipts = 0
         for part in range((386000+199)//200+1):
-            rows = self._signal_provider.drain_private_binding_receipts(maximum=200)
+            self._signal_runtime["drain_calls"] += 1
+            rows = self._signal_effect(lambda:provider.drain_private_binding_receipts(maximum=200))
             if type(rows) is not list or len(rows)>200 or any(type(row) is not dict for row in rows):
                 _fail()
             if not rows:
@@ -355,16 +473,16 @@ class ComparisonMultiAlgorithm(off.ComparisonOffAlgorithm):
         else:
             _fail()
         if arm == "pure_tpr":
-            weights,detail=comparison.construct_pure_tpr(members,scores,finance_insurance_by_sid=finance,
-                warning_ids=self._warning_ids,final_ids=self._delisted_ids)
+            weights,detail=self._signal_effect(lambda:comparison.construct_pure_tpr(members,scores,
+                finance_insurance_by_sid=finance,warning_ids=self._warning_ids,final_ids=self._delisted_ids))
         else:
-            weights,detail=comparison.construct_tilt(members,current_caps,scores,arm=arm,finance_insurance_by_sid=finance,
-                warning_ids=self._warning_ids,final_ids=self._delisted_ids)
+            weights,detail=self._signal_effect(lambda:comparison.construct_tilt(members,current_caps,scores,arm=arm,
+                finance_insurance_by_sid=finance,warning_ids=self._warning_ids,final_ids=self._delisted_ids))
         # Complete private scores are retained in bounded parts, not one
         # potentially oversized whole-IWM record or a public log message.
-        ordered = sorted(scores)
+        ordered = self._signal_effect(lambda:sorted(scores))
         parts = max(1, (len(ordered)+199)//200)
-        score_hash = score_frame_sha256(scores)
+        score_hash = self._signal_effect(lambda:score_frame_sha256(scores))
         for part in range(parts):
             self._log_audit("COVERAGE",{"kind":"signal_frame","session":day,"part":part,"parts":parts,
                 "requested_count":len(requested),"score_frame_sha256":score_hash,
@@ -493,6 +611,7 @@ class ComparisonMultiAlgorithm(off.ComparisonOffAlgorithm):
             "max_name_exposure": self._max_name_exposure, "name_soft_cap_breaches": self._name_soft_cap_breaches,
             "clock_assertions": self._clock_assertions, "reason_counts": dict(self._reasons),
             "delisting_audit": self._delisting_audit, "mark_verification": self._mark_verification_summary(),
+            "signal_runtime_access":self._signal_runtime_summary(),
             "source_inputs_admitted": False,
             "native_basis_authenticated": False, "full_evidence_retrieval_verified": False,
             "strategy_accepted": False, "canonical_admission": False, "accepted_performance": None}

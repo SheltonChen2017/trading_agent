@@ -1,18 +1,16 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **Sections 338–340 qualify eight fresh 2020Q4 SEC originals on clean
-`5f4988f4`, after complete 25-quarter source accounting and suppression of
-20,044 prior consumed accessions. All eight return HTTP200; 81,620 retained
-body bytes pass request/header/XML readback. The new consumed index has
-20,052 accessions. This is a bounded structural/custody sample, not completed
-original admission, historical public availability, PIT evidence or a full
-corpus. Existing-provider archive capability remains UNCONFIRMED; the owner
-explicitly declines supplier outreach. No purchase or provider-row probe is
-substituted for that missing evidence. Main312 focused and124 document/import
-checks pass; all twelve P2s remain OPEN, none P0/P1. Source/PIT/rights/look/
-QC/backtest readiness remains FALSE. No QC/Safari/SDK/job, source archive
-retry, outcome look or backtest. One final documented lane push; monitor
-PAUSED.**
+Status: **SECTION 341 RECORDS CLAUDE'S REVIEW OF THE 9 CODEX COMMITS IN
+`0c536a91..c0a44004` (SECTIONS 331-340). ALL 9 ARE ACCEPTED, TWO WITH
+CORRECTIONS. CODEX'S NC STRAY-DOCUMENT FIX AND PILOT COMPOSITION FIXES ARE
+CORRECT; TWO NC GUARDS ARE PINNED (`62948782`). THE REQUIRED-WINDOW READBACK
+NOW REFUSES AN UNEXPLAINED EARLY STOP (`645264ea`). THE ROUND'S THREE MASSIVE
+AND EIGHT SEC REQUESTS MATCH THEIR JOURNALS; NO CONTROL FILE HOLDS AN EMAIL
+ADDRESS. TWELVE P2 FINDINGS ARE OPEN; NONE IS P0/P1. BEFORE ANY FURTHER SEC
+CAPTURE, ADD THE REQUIRED-WINDOW ROOT TO THE EXPOSURE CENSUS (IBREQ21-OBS34101).
+NOT BACKTEST-READY: IBPUBLIC-KNOWNBY-01 (340). NO STRATEGY BACKTEST HAS RUN.
+CODEX COUNTER-REVIEWS SECTION 341. NO FUNDED/PAPER/LIVE/CAPITAL/REAL-ORDER/
+TRADING AUTHORITY.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -66,6 +64,8 @@ additive epoch in220–222; it does not retroactively narrow the original study
 or require original2006/2018 supplier exports for the pilot. No new outcome
 or QC authority follows from the observed metadata qualifications.
 Section 330 is Claude's later review of sections 219-329; it changes no
+gate.
+Section 341 is Claude's later review of sections 331-340; it changes no
 gate.
 
 ## 1. Canonical V1 contract
@@ -309,6 +309,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-26 | Codex owner-directed pre-QC continuation | Clean matching base`969e29d7`; this scoped implementation and separate final handoff | Two pilot composition corrections, no Claude wait or QC access | Genuine-plan window scheduling closes33002; exact target-relevance/count/ordered digest narrowly corrects33001 while target-affecting missing history still refuses. Acceptance MODEL explicitly distinguished from historical-publication evidence. | Main472 focused17.44s;124 boundary/document4.39s;4 whole-function reversals caught13 intended REDs,15 restored3.39s;112-image strong compile/pin proof; attributed final peer46GREEN5.41s. No full suite, actual input/QC/look. |12 OPENP2s; noneP0/P1. 33001 partlyOPEN; known-by, originals/PIT contexts and final population registration remain concrete blockers. | Separate exact-hash handoff, one final lane push. No ready-to-QC claim, source activation or automated next step; monitorPAUSED. |
 | 2026-10-27 | Codex existing-subscription evidence qualification | Starting origin`06870130`; implementation/preregistration and actual clean execution`78a048e3`; separate handoff337 | Retained NC/source17 actual activation and three new Massive metadata samples, NO QC | Native observation135.738256s accounts1,281,147rows and2lexical/nonadmitted candidates; fresh reference/index/Form4 samples3HTTP200. Known-by/bodyversion/wholepopulation/PIT rights not established. | Main405 focused8.07s; preactivation124 documents3.99s; peer94 finalprobe,240 observer; held metadata/raw-schema readbacks and exact158/50 Git source checks. No full suite/outcome. |12 OPENP2s retained. Wrong receipt helper stopped before observer launch, corrected before activation; P3 tooling-only disposition336.1. No failed actual source operation is rewritten. | Need genuine historical known-by archive and complete originals/PIT/context/registration evidence. One final accumulated push after final record checks; no purchase or QC launch inferred. |
 | 2026-10-28 | Codex free-original and archive qualification | Starting origin`923b962a`; implementation/preregistration and actual clean execution`5f4988f4`; separate handoff340 | First8 fresh required-window originals after full25 source/consumption proof; existing-provider archive check only | All8 HTTP200 and original header/XML structure bound;81,620 retained bytes; new consumed index20,052. Archive remains unconfirmed; owner declines all supplier outreach. No QC or purchase. | Main312 focused51.20s,124 documents/imports5.09s; actual827.493308s including census/custody; strict native body readback44.525630209s. Draft guard reversals and peer evidence remain attributed in338–339. No full suite or outcome look. |12 OPENP2s retained; draft-only corrections in338.4 all precede activation. Successful sample does not close public-known-by, complete-parent, reference, rights or full-population gates. | One final matching-lane push after separate exact-hash handoff and final checks. Preserve/REUSE this sample; never resume its namespace or repeat consumed requests. Need genuine archive/PIT inputs before pre-QC readiness; no supplier message or QC action inferred. |
+| 2026-10-28 | Claude review (macOS session) and corrections | `c0a44004` -> `645264ea`, `62948782` -> this review record | Independent review of sections 331-340 (`0c536a91..c0a44004`, 9 commits, 0 merges: NC and composition fixes, Massive v2, required-window SEC capture) | All 9 accepted, two with corrections. Three Massive and eight SEC requests checked against journals; no email-like string in control files. Required-window readback early stop refused; two NC guards pinned. | Final tree: 514 and 94 focused passes, 114 required-window passes, guards 107 with the 2 known SEP-2 failures; network and Keychain exec denied. No complete suite. No backtest. | IBREQ21-CR34101, IBNC-TEST34101 closed; IBDOC-CCR33001 accepted against Claude; IBREQ21-OBS34101/34102 and IBMASSIVE2-OBS34101 recorded; twelve P2 open | Codex counter-reviews section 341; close IBREQ21-OBS34101 before further SEC capture |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -39650,3 +39651,147 @@ checks find zero unexpected email/query-credential/private-key values, with
 two invented positive scanner controls detected. Only this record is dirty;
 matching origin remains923b962a. The separate final record commit and single
 push follow these verified results; the lane is explicitly NOT QC-ready.
+
+## 341. Claude review - sections 331-340 and corrections (2026-10-28 UTC)
+
+### 341.1 Scope and method
+
+Range `0c536a91..c0a44004`: 9 Codex commits, no merges.
+- **Record-only:** `c0ee6957`, `969e29d7`, `06870130`, `923b962a`, `c0a44004`.
+- **Code:**
+  - `b5f1ca47`: NC shadow-barrier correction.
+  - `060624c3`: pilot composition corrections.
+  - `78a048e3`: Massive evidence probe v2.
+  - `5f4988f4`: required-window SEC selection and capture.
+
+The owner directions quoted in 333 ("continue building to the last step
+before qc. skip claude review for now"), 335 and 338-340 (including no
+supplier contact) are Codex-attributed. This review did not witness them.
+
+Method:
+- Read sections 331, 332 and 340 in full, the decision and operation
+  parts of 333-339, and the four code diffs.
+- One read-only agent (no code execution) read the Massive v2 probe and the
+  required-window selection and capture; its findings were checked against
+  the code.
+- In-memory mutants on the NC fix, the composition fix and the required-window
+  readback.
+- Metadata-only checks of every new private output.
+- No Keychain read, and no SEC, provider, QC or browser access by the
+  review. Every test and mutant ran with network and `/usr/bin/security` exec
+  denied; mutants also had writes under `artifacts/` denied.
+
+### 341.2 Commit dispositions
+
+| Commit | Change | Claude disposition |
+|---|---|---|
+| `c0ee6957` | Section 331, Windows counter-review of round 330 | **Accepted.** `IBDOC-CCR33001` is confirmed against this reviewer: the range added 47 research and 56 test files, not 51 and 52. Section 330's test run did cover all 56 changed test files, but the record said 52. The narrowing of `IBNC-OBS33003` and its raise of `IBNC-OBS33004` to P2 are accepted. |
+| `b5f1ca47` | NC shadow front continues past stray DOCUMENT lines to a qualified TEXT barrier | **Accepted, with two test pins** in `62948782` (`IBNC-TEST34101`). The fix is correct. Shadow scanning now stops only at a qualified document header before its opaque TEXT. An incomplete front refuses the whole batch. Claims and the public counts are unchanged, and the pins propagate. |
+| `969e29d7` | Section 332 | **Accepted.** |
+| `060624c3` | Composition: schedule-only window disposition; pre-source target-interval refusal | **Accepted.** The interval bounds match the first-open rule (`bisect_right`), and old lots are never replayed or carried in. All four mutants on the new edges are killed. Codex's dispositions are agreed: `IBPILOT-COMP-33002` closed, and `-33001` partly corrected but still open. |
+| `06870130` | Section 334 | **Accepted.** |
+| `78a048e3` | Massive evidence probe v2 | **Accepted**, with `IBMASSIVE2-OBS34101` recorded. |
+| `923b962a` | Sections 336-337 | **Accepted.** |
+| `5f4988f4` | Required-window SEC selection and capture | **Accepted after correction** in `645264ea` (`IBREQ21-CR34101`), with P3 observations recorded. |
+| `c0a44004` | Sections 338-340 | **Accepted.** `IBPUBLIC-KNOWNBY-01` stays the factual blocker. |
+
+### 341.3 Independent check of the round's real operations
+
+Metadata only, under native network, fork, Documents-write and Keychain-exec
+denial:
+- **Massive v2:** `transport_invocation_count` 3 of 3 planned, on one
+  credential read; all three results are HTTP 200.
+- **Required-window SEC capture:** 8 planned, 8 started, all eight HTTP 200.
+- **No email or secrets:** no new control JSON contains an email-like
+  string.
+- **Custody:** every file created this round is 0600 and single-link.
+- **Fixed files:** the four v3 custody files still equal `aa0d635d`, no
+  non-lane file changed, and the range is whitespace-clean.
+
+### 341.4 Corrections
+
+- **`IBREQ21-CR34101` (P3, closed in `645264ea`).**
+  - The required-window readback accepted a `complete.json` cut back to a
+    structure-bound prefix, with the later leaves removed and the index and
+    complete re-pinned. The first-64 and batch readbacks refuse that case.
+  - It now refuses an unexplained early stop.
+  - The test failed before the fix, and its mutant is caught. The actual run
+    captured all eight requests, so recorded evidence is unaffected.
+- **`IBNC-TEST34101` (P3, closed in `62948782`, tests only).** Two route
+  guards survived mutants and are now pinned:
+  - a TEXT opening before a later qualified header must still refuse the
+    batch (mutant N3);
+  - document sequences must count from one without gaps (mutant N6).
+
+  They sit in a new test file, so the route's pinned test hashes are
+  unchanged. Both mutants are caught.
+- **Redundant NC survivors.**
+  - N2: a valid claim always has a complete front.
+  - N5: the header-budget check bounds the same bytes, and an incomplete
+    front refuses.
+
+### 341.5 Findings recorded, not fixed
+
+- **`IBREQ21-OBS34101` (P3).** The required-window namespace is not in the
+  exposure census (`pilot_sec_exposure.actual_roots`). The eight new
+  accessions are tracked only through the 20,052-accession consumed-index
+  chain. A successor that started from the batch campaign's 20,044 index
+  would select the same eight again. Add this root, or require the 20,052
+  index, before any further SEC capture.
+- **`IBREQ21-OBS34102` (P3).** The required-window readback:
+  - takes the plan's consumption base on trust, without comparing it with
+    the registered 20,044-accession pin;
+  - loses an out-of-range HTTP status's terminal record, so the scope stays
+    consumed but has no completion;
+  - has a source-order test that its earlier guard already refuses.
+- **`IBMASSIVE2-OBS34101` (P3).** A malformed provider `filing_url` or
+  `next_url` raises an untyped `ValueError` that skips the completion records.
+  The probe also has no committed readback. Consumed.
+
+### 341.6 Validation
+
+- **Pushed `c0a44004`**, default pytest temp, network and Keychain exec
+  denied:
+  - The five changed test files plus the NC family and pilot composition
+    files, under the Keychain probe: **510 passed**. The probe logged no exec.
+  - Massive v2, native Keychain-exec denial only: **94 passed**.
+  - Guards and record tests: **179 passed, 2 failed**. The failures are the
+    two SEP-2 guards that `IBSH-CR02` records.
+- **Final tree:**
+  - Probe run: **514 passed**, no Keychain exec.
+  - Massive v2: **94 passed**.
+  - Required-window files: **114 passed**.
+  - Guards: **107 passed, 2 failed** (the same two).
+- **Mutation:**
+  - NC fix: 3 of 7 killed, then 2 more after `62948782`; 2 are redundant.
+  - Composition: 4 of 4.
+  - Required-window early-stop check: 1 of 1.
+- **Compile and diff.** The three changed files compile in memory, and
+  the diff check is clean. No bytecode was written.
+- **Record checks** (record, active documents, lane boundary, EXACT package
+  guard) after this section: **124 passed**, network denied.
+- **Complete suite:** not run, by the owner's standing instruction.
+
+### 341.7 Retained P0-P3 finding ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IBREQ21-CR34101 | P3 | **CLOSED in `645264ea`** | `5f4988f4` | Required-window readback | A truncated capture passed readback. | 341.4. | Parity with first-64 and batch. | Early-stop refusal. | Red before; mutant caught. |
+| IBNC-TEST34101 | P3 | **CLOSED in `62948782`** (tests) | `b5f1ca47` | NC route | Two guards removable with tests green. | Mutants N3, N6. | Pre-activation barrier. | New test file. | Both mutants caught. |
+| IBDOC-CCR33001 | P3 | **Accepted against Claude** | `0c536a91` | Section 330 | File census and wording. | Git: 47/56/1. | Record accuracy. | 331.2. | Count. |
+| IBREQ21-OBS34101, IBREQ21-OBS34102, IBMASSIVE2-OBS34101 | P3 | **Recorded** | `5f4988f4`, `78a048e3` | Required-window capture; Massive v2 | 341.5. | Agent, checked. | Consumed one-shots; successor rule. | None; carry into successors. | None. |
+| IBNC-OBS33004, IBPILOT-COMP-33002 | P2 | **Accepted closed at Codex's scopes** | `b5f1ca47`, `060624c3` | NC route; composition | 332.2, 333. | Mutants and tests. | Correct. | Codex's. | 341.2. |
+| IBPILOT-COMP-33001 | P2 | **Partly corrected, OPEN** | `060624c3` | Composition | A target-interval pre-source lot still refuses the window. | 333. | Needs real older history. | Codex's. | Mutants killed. |
+| Codex's other findings of 331-340 and every earlier entry | as recorded | **Retained as recorded** | range | range | Unchanged. | Sections 1-340. | Unchanged. | None. | None new. |
+
+There is no open P0 or P1 finding. Twelve P2 findings remain open, as section
+340 counts them; all fail closed or only affect evidence quality.
+
+### 341.8 Next action
+
+Codex counter-reviews this section, `645264ea` and `62948782`. Before any
+further SEC capture, close `IBREQ21-OBS34101`. Before activating the NC
+source binding, repeat its metadata qualification at the current bytes. The
+lane is not backtest-ready (`IBPUBLIC-KNOWNBY-01`, 340), and QC remains
+unused in this round. No strategy backtest has run, and there is no capital,
+order or trading authority.

@@ -26400,3 +26400,77 @@ flat sourcefiles with independent template/final/config/calendar identities;
 its candidate flags grant no effects or acceptance. The owner-authorized
 next action remains actualOFFupload/compile/full-windowrun, then the other
 four arms, without routine Claude review and with one final push only.
+
+FreshSOURCEBASELINE003 registration beforecredentials/network: planSHA5fbdcf1c6e017703ee4c336cd5467c507b768d54ffb896ba9e20ff17a9250a67, HEAD7a47aa469b6b669cf0d64b9d2b80c9f0f72c0365; exactlytwoOFFfiles/read,24filesmax,4MiB/response8MiBtotal,120s. No write/compile/job/inputread authority.
+
+ActualOFF001 candidate prepared fromcommittedHEAD7a47aa469b6b669cf0d64b9d2b80c9f0f72c0365. Priorcensus1044df16d9d2502390b515d6cd2c7fc3b62ceef49fef0b022665923ea1727f59; reservation9b2396b6026413c49f479887754b4b63b08d1ce7e6209f33139a238bffe2f92d retainedBEFOREupload/compile/job. ReservedlookTPR-CMP28-OFF-LOOK001-20261028 is NOTyetobserved. Bundle/report/source metadata: [{"bytes": 4379, "name": "off001_bundle_report.json", "sha256": "d334ae022b97fae9356e55ff82abd42962d350c24332dc5032dfe674a679c8bc"}, {"bytes": 270041, "name": "off001_bundle_sources.json", "sha256": "f58435b24d377bc6ebf5d23ef8b0577f6304dfa0d701db79ac68fe94bced505a"}].
+SOURCEBASELINE003 ended16:35:46UTC,2stableOFFreads/541668wireB; read2archive268826B/ce7a05c3ebd39898f32eeb987c13c542ee4d6b84750c9cce9cbedac00ed62821. Currentnotebook6236B/18216a76... differsfromCELLINSTALL00141208B; thelatercloudchangeisretainedunattributed,andALLnotebooks/helpersareexcludedfromstrategywrites. Noexecutionacceptanceoroverwritereversionisinferred.
+
+Fresh386-page privateprojection/processing claimTPR-CMP28-MASSIVE-PROJECT-20261028-001/0216d3263046e9cdf75429b4169a7a2d5ff86dce53f183d3e8e3a7a96767ccd1, HEAD7a47aa469b6b669cf0d64b9d2b80c9f0f72c0365; exactinventoryclosure95602B/29d831c1..., exact386projectionfiles117003134B,900s,512MiBplain/128MiBgzipoutputmax; no rawwire/Sharadar/D0/provider/QC/outcomeread. Durablebeforefirstprivatebyte.
+
+FreshOFFuploadpayloadpreparationTPR-CMP28-OFF-UPLOAD-PREPARE-20261028-001/c9500c67cf7a6fc25bc90e05875b7b73a0a315fb862464af71504ffa7545ebea precedesexactSOURCE003read2archive268826B/ce7a05c3...; no network/privateinput/provider/job effect.
+OFFuploadpayloadmanifest 984ac48f2564cae3ac885b5edcee6fdf6f0a5362c25362e10ef5aa66fdb39db5; 11changed/newsourcewrites,20finalfiles/8preservedextras,first/lastwholeinventoryhashgates required; noinferrednativeacceptance.
+
+### 104.11 Actual derived packet and OFF reservation
+
+Fresh page operation TPR-CMP28-MASSIVE-PROJECT-20261028-001 completed at
+16:38:54 UTC. Its retained claim is
+`0216d3263046e9cdf75429b4169a7a2d5ff86dce53f183d3e8e3a7a96767ccd1`.
+It read exactly 387 files / 117098736 bytes: the new inventory plus its 386
+hash-verified retained projections. All 349018 source rows remain accounted
+for: 279672 derived nominal revisions and 69346 unavailable rows. Refusal
+categories overlap and are retained in the private receipt. No unavailable
+value was changed to zero. No raw wire, Sharadar, old D0, provider, native
+map/factor, QC input, or outcome was read by this operation.
+
+The private derived packet is 40637425 gzip bytes, SHA-256
+`2c0c7d7c3b5f988dd02261e2b10951819e59982125117177eae8ff4e90cb1eab`;
+its exact plaintext is 280105389 bytes, SHA-256
+`6a8f4915df539f5aee731832138e038caf6dd579b591ebe745e37b5d283e4708`.
+This proves retained-byte derivation only. Historical native identity, share
+basis, availability/PIT, source rights and canonical admission remain separate
+unproved states. The packet is private and is not committed or exported publicly.
+
+The OFF candidate reservation is retained before any upload/compile/job:
+TPR-CMP28-OFF-ATTEMPT001-20261028, reserved look
+TPR-CMP28-OFF-LOOK001-20261028, reservation SHA-256
+`9b2396b6026413c49f479887754b4b63b08d1ce7e6209f33139a238bffe2f92d`.
+A reservation is not an observed run or outcome. The prior census hash is
+`1044df16d9d2502390b515d6cd2c7fc3b62ceef49fef0b022665923ea1727f59`.
+The frozen OFF configuration hash is
+`4db2c6eb4a5fb2b201bfba20847a83102cc3d782195b09b5c8cdb974676f1547`;
+rendered source closure is
+`cee4b1bb7031ac92602a00366e0ce82b486a6f4b4378c394f381a0710b001783`.
+
+The source upload will change/create eleven strategy files, skip the unchanged
+core, and preserve eight existing extras. It requires exact whole-project
+inventory hashes before the first write and after the last write. Those hashes
+are respectively
+`5e355182568c2e232f4c2c7719e4b34d88cdb7747e3f658fcb57e64a34e145ae`
+and `b99c2f5c9953c044d229fce992d80fa2a25e20e5e8ccde6959a7ee1a0784ff71`.
+QC offers no atomic compare-and-swap across these calls; any detected source
+change stops the operation and leaves the complete partial receipts retained.
+No rollback, cancellation or overwrite of another lane is authorized.
+
+### 104.12 Source-bound API transport verification
+
+The new comparison API runner is an actual authenticated TLS/HMAC transport,
+restricted to the existing private OFF project and fixed research endpoints.
+It retains exclusive operation/request/payload claims before credentials or
+effects, bounded deadlines and responses, complete private response bytes, and
+body-free public metadata. Whole-source pre/post hashes guard uploads; no
+notebook/helper deletion or account/broker action is reachable. Production
+sources must match committed bytes and the calling lane's exact HEAD.
+
+Root reproduced two new red accounting tests (23 passed / 2 failed in 0.65s):
+receipt publication could demote cancellation, and cleanup could swallow a
+fatal exception after an ordinary failure. Both were corrected by preserving
+cancellation first, otherwise the first fatal exception, and truthful receipt
+publication status. Final focused API tests pass; the exact root result is
+recorded by the associated command output. Two in-memory compilations passed.
+Production source: 25301 bytes / SHA-256
+`e266706ed136fef2ac1875f4c5953425e4bfc3806896e5760ed7f749119d0e79`.
+Tests: 12922 bytes / SHA-256
+`c10bbbb7a6d93408cc3ff46071b91bc89e54e6ee96f52253ff05ce11fbbf299a`.
+No production API effect was performed by those synthetic tests. Legacy
+controllers and their old three-attempt contracts were not bypassed or relabelled.

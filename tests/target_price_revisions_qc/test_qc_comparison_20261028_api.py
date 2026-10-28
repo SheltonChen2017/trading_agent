@@ -1,0 +1,237 @@
+"""Synthetic HTTP and private artifacts only; actual credentials/network denied."""
+from contextlib import contextmanager
+from datetime import datetime,timedelta,timezone
+import hashlib
+import json
+from pathlib import Path
+import stat
+
+import pytest
+
+from research.target_price_revisions_qc import comparison_20261028_api as m
+
+NOW=datetime(2026,10,28,17,tzinfo=timezone.utc)
+OP='TPR-CMP28-API-SYNTHETIC-001'
+ROOT=Path(__file__).resolve().parents[2]
+
+
+@pytest.fixture(autouse=True)
+def deny_real(monkeypatch):
+    def deny(*_args,**_kwargs):raise AssertionError('actual credential/network/subprocess forbidden')
+    monkeypatch.setattr(m.ops,'credential',deny)
+    monkeypatch.setattr(m.http.client,'HTTPSConnection',deny)
+    monkeypatch.setattr(m.subprocess,'run',deny)
+
+
+def row(endpoint,payload,identity='r001',**extra):
+    return dict(id=identity,endpoint=endpoint,payload=payload,payload_file=None,
+        payload_sha256=m._sha(m._canonical(payload)),max_response_bytes=65536,seconds=10,**extra)
+
+
+def plan(requests=None,**extra):
+    arguments=dict(operation_id=OP,git_head='a'*40,
+        source_hashes={name:hashlib.sha256((ROOT/name).read_bytes()).hexdigest() for name in m.REQUIRED_SOURCES},
+        owner_instruction_sha256='b'*64,created_utc=(NOW-timedelta(seconds=1)).isoformat(),
+        expires_utc=(NOW+timedelta(seconds=599)).isoformat(),
+        requests=requests or [row('files/read',{'projectId':m.PROJECT})],mode='offline-fixture')
+    arguments.update(extra)
+    return m.prepare_plan(**arguments)
+
+
+def execute(tmp_path,p,transport):
+    return m._execute_fixture(p,tmp_path/'synthetic-api',transport=transport,clock=lambda:NOW)
+
+
+def response(body):return m._canonical(body),200,'SYNTHETIC-TOKEN'
+
+
+def inventory(files):return {name:{'bytes':len(text.encode()),'sha256':m._sha(text.encode())} for name,text in files.items()}
+
+
+def source_response(files):return {'success':True,'projectId':m.PROJECT,
+    'files':[{'name':name,'content':text} for name,text in files.items()]}
+
+
+def upload_plan():
+    before={'main.py':'# old\n','research.ipynb':'{"cells":["do not touch"]}\n','mia_diag.py':'# preserved helper\n'}
+    after={**before,'main.py':'# new exact source\n'}
+    first=row('files/read',{'projectId':m.PROJECT},'before',source_inventory_sha256=m._sha(m._canonical(inventory(before))))
+    write=row('files/update',{'projectId':m.PROJECT,'name':'main.py','content':after['main.py']},'write')
+    last=row('files/read',{'projectId':m.PROJECT},'after',source_inventory_sha256=m._sha(m._canonical(inventory(after))))
+    return plan([first,write,last],allowed_source_hashes={'main.py':m._sha(after['main.py'].encode())},
+        attempt_id='fresh-attempt-4',reserved_look_id='fresh-reserved-look-34'),before,after
+
+
+def test_upload_preconditions_extras_and_claims_are_verified_before_each_effect(tmp_path):
+    p,before,after=upload_plan();cloud=dict(before);calls=[];root=tmp_path/'synthetic-api'
+    def transport(endpoint,raw,seconds,maximum):
+        payload=json.loads(raw);calls.append(endpoint)
+        assert (root/(OP+'.operation.spent.json')).exists()
+        assert len(list(root.glob(OP+'.*.request.spent.json')))==len(calls)
+        if endpoint=='files/read':return response(source_response(cloud))
+        cloud[payload['name']]=payload['content'];return response({'success':True})
+    result=execute(tmp_path,p,transport)
+    assert result['status']=='completed' and cloud==after
+    assert calls==['files/read','files/update','files/read']
+    assert result['requests'][-1]['source_inventory']==inventory(after)
+    assert cloud['research.ipynb']==before['research.ipynb'] and cloud['mia_diag.py']==before['mia_diag.py']
+    assert result['receipt_published'] and result['lock_cleanup_complete']
+    assert result['atomic_remote_compare_and_swap_proven'] is False
+    for item in result['requests']:
+        artifact=root/item['raw_response']['name']
+        assert stat.S_IMODE(artifact.stat().st_mode)==0o600
+        assert m._sha(artifact.read_bytes())==item['raw_response']['sha256']
+    assert '# preserved helper' not in json.dumps(result)
+
+
+def test_changed_before_inventory_stops_before_first_write(tmp_path):
+    p,before,_=upload_plan();before['mia_diag.py']='# somebody changed helper\n';calls=[]
+    def transport(endpoint,*_):calls.append(endpoint);return response(source_response(before))
+    result=execute(tmp_path,p,transport)
+    assert result['status']=='failed_or_uncertain' and calls==['files/read']
+    assert result['requests'][0]['raw_response'] is not None
+
+
+def test_changed_after_extra_fails_without_rollback_or_further_effect(tmp_path):
+    p,before,after=upload_plan();calls=[]
+    def transport(endpoint,*_):
+        calls.append(endpoint)
+        if len(calls)==1:return response(source_response(before))
+        if endpoint=='files/update':return response({'success':True})
+        return response(source_response({**after,'mia_diag.py':'# remote race\n'}))
+    result=execute(tmp_path,p,transport)
+    assert result['status']=='failed_or_uncertain' and len(calls)==3
+    assert result['requests'][-1]['source_inventory']['mia_diag.py']!=inventory(after)['mia_diag.py']
+
+
+def test_compile_claim_spends_identity_but_adds_no_backtest_or_look(tmp_path):
+    p=plan([row('compile/create',{'projectId':m.PROJECT})],attempt_id='attempt-4',reserved_look_id='reserved-34')
+    result=execute(tmp_path,p,lambda *_:response({'success':True,'compileId':'compile-4','state':'BuildQueued'}))
+    assert result['compile_requests_attempted']==1
+    assert result['requests'][0]['compile_id']=='compile-4' and result['requests'][0]['compile_state']=='BuildQueued'
+    assert result['actual_new_backtests']==result['new_observed_looks']==0
+
+
+@pytest.mark.parametrize('mode',['success','unknown','cancelled'])
+def test_launch_counts_only_actual_returned_job_and_uncertainty_stops(tmp_path,mode):
+    p=plan([row('backtests/create',{'projectId':m.PROJECT,'compileId':'compile-4','backtestName':'candidate-attempt-4'})],
+        attempt_id='attempt-4',reserved_look_id='reserved-34')
+    def transport(*_):
+        if mode=='unknown':raise TimeoutError('synthetic-private-body')
+        if mode=='cancelled':raise KeyboardInterrupt('synthetic-private-body')
+        return response({'success':True,'backtest':{'projectId':m.PROJECT,'backtestId':'job-4'}})
+    if mode=='cancelled':
+        with pytest.raises(m.APICancelled) as stopped:execute(tmp_path,p,transport)
+        result=stopped.value.report
+    else:result=execute(tmp_path,p,transport)
+    assert 'synthetic-private-body' not in json.dumps(result)
+    assert result['actual_new_backtests']==(1 if mode=='success' else None)
+    assert result['new_observed_looks']==(1 if mode=='success' else 0)
+    assert result['receipt_published'] and result['lock_cleanup_complete']
+
+
+def test_private_payload_read_has_exact_fresh_claim_and_integrity(tmp_path,monkeypatch):
+    root=tmp_path/'synthetic-api';root.mkdir(mode=0o700)
+    raw=m._canonical({'projectId':m.PROJECT});path=root/'payload.synthetic.json';path.write_bytes(raw);path.chmod(0o600)
+    request=row('files/read',{'projectId':m.PROJECT});request['payload']=None
+    request['payload_file']={'name':path.name,'bytes':len(raw),'sha256':m._sha(raw)}
+    original=m.ops.read_private
+    def read(directory,name,maximum):
+        assert (root/(OP+'.r001.payload-read.spent.json')).exists()
+        assert (root/(OP+'.r001.request.spent.json')).exists()
+        return original(directory,name,maximum)
+    monkeypatch.setattr(m.ops,'read_private',read)
+    result=execute(tmp_path,plan([request]),lambda *_:response(source_response({})))
+    assert result['status']=='completed' and result['requests'][0]['payload_read_claim'] is not None
+
+
+def test_spent_operation_refuses_before_any_repeat_transport(tmp_path):
+    p=plan();calls=[]
+    def transport(*_):calls.append(True);return response(source_response({}))
+    execute(tmp_path,p,transport)
+    with pytest.raises(FileExistsError):execute(tmp_path,p,transport)
+    assert len(calls)==1
+
+
+def test_secret_echo_is_refused_before_raw_or_projection_retention(tmp_path):
+    result=execute(tmp_path,plan(),lambda *_:response({'success':True,'message':'SYNTHETIC-TOKEN'}))
+    assert result['status']=='failed_or_uncertain'
+    assert result['requests'][0]['raw_response'] is result['requests'][0]['projection'] is None
+    assert 'SYNTHETIC-TOKEN' not in json.dumps(result)
+
+
+@pytest.mark.parametrize('fault',['project','notebook_write','helper_write','hash','endpoint','no_attempt',
+    'no_precondition','too_many_compile','budget','expired','wrong_compile_id'])
+def test_closed_endpoint_source_identity_budget_guards(fault,tmp_path):
+    if fault=='wrong_compile_id':
+        p=plan([row('compile/read',{'projectId':m.PROJECT,'compileId':'expected'})])
+        result=execute(tmp_path,p,lambda *_:response({'success':True,'compileId':'foreign','state':'BuildSuccess'}))
+        assert result['status']=='failed_or_uncertain';return
+    args={};requests=[row('files/read',{'projectId':m.PROJECT})]
+    if fault=='project':requests[0]=row('files/read',{'projectId':1})
+    elif fault in {'notebook_write','helper_write'}:
+        name='research.ipynb' if fault=='notebook_write' else 'mia_diag.py'
+        requests=[row('files/update',{'projectId':m.PROJECT,'name':name,'content':'#bad'})]
+        args.update(allowed_source_hashes={name:m._sha(b'#bad')},attempt_id='a',reserved_look_id='l')
+    elif fault=='hash':requests[0]['payload_sha256']='c'*64
+    elif fault=='endpoint':requests[0]['endpoint']='projects/create'
+    elif fault=='no_attempt':requests=[row('compile/create',{'projectId':m.PROJECT})]
+    elif fault=='no_precondition':requests=[row('files/update',{'projectId':m.PROJECT,'name':'main.py','content':'#x'})];args.update(allowed_source_hashes={'main.py':m._sha(b'#x')},attempt_id='a',reserved_look_id='l')
+    elif fault=='too_many_compile':requests=[row('compile/create',{'projectId':m.PROJECT},'one'),row('compile/create',{'projectId':m.PROJECT},'two')];args.update(attempt_id='a',reserved_look_id='l')
+    elif fault=='budget':args['max_total_response_bytes']=1
+    else:args['expires_utc']=(NOW-timedelta(seconds=1)).isoformat()
+    with pytest.raises(m.APIRefusal):plan(requests,**args)
+
+
+def test_native_transport_uses_actual_tls_hmac_deadline_bounded_read_and_close(monkeypatch):
+    calls=[]
+    @contextmanager
+    def deadline(seconds):calls.append(('deadline',seconds));yield
+    monkeypatch.setattr(m.ops,'wall_deadline',deadline)
+    monkeypatch.setattr(m.ops,'credential',lambda:('123','SYNTHETIC-TOKEN'))
+    class Connection:
+        def __init__(self,host,timeout,context):
+            assert host=='www.quantconnect.com' and timeout==7
+            assert context.check_hostname and context.verify_mode==m.ssl.CERT_REQUIRED
+            assert context.keylog_filename is None
+        def request(self,method,path,body,headers):
+            assert method=='POST' and path=='/api/v2/files/read' and body==b'{}'
+            assert headers['Authorization'].startswith('Basic ') and 'Timestamp' in headers
+            calls.append(('request',path))
+        def getresponse(self):return self
+        @property
+        def status(self):return 200
+        def read(self,maximum):calls.append(('read',maximum));return b'{}'
+        def close(self):calls.append(('close',))
+    monkeypatch.setattr(m.http.client,'HTTPSConnection',Connection)
+    assert m._native_request('files/read',b'{}',7,101)==(b'{}',200,'SYNTHETIC-TOKEN')
+    assert calls==[('deadline',7),('request','/api/v2/files/read'),('read',102),('close',)]
+
+
+def test_production_has_no_fixture_transport_or_root_override():
+    with pytest.raises(m.APIRefusal):m.execute_plan(plan())
+
+
+def test_cancellation_stays_cancelled_when_receipt_publication_is_unavailable(tmp_path,monkeypatch):
+    original=m._publish
+    def publish(root,name,raw):
+        if name.endswith('.result.json'):raise OSError('synthetic publication body')
+        return original(root,name,raw)
+    monkeypatch.setattr(m,'_publish',publish)
+    def stopped(*_):raise KeyboardInterrupt('synthetic cancellation body')
+    with pytest.raises(m.APICancelled) as result:execute(tmp_path,plan(),stopped)
+    assert result.value.report['status']=='cancelled'
+    assert result.value.report['receipt_published'] is False
+
+
+def test_cleanup_fatal_is_not_demoted_by_an_earlier_ordinary_failure(tmp_path,monkeypatch):
+    original=m.os.unlink
+    def unlink(path,*args,**kwargs):
+        result=original(path,*args,**kwargs)
+        if str(path).endswith('comparison-api.lock'):raise SystemExit('synthetic fatal body')
+        return result
+    monkeypatch.setattr(m.os,'unlink',unlink)
+    def failed(*_):raise RuntimeError('synthetic earlier body')
+    with pytest.raises(m.APIFatal) as result:execute(tmp_path,plan(),failed)
+    assert result.value.report['status']=='failed_or_uncertain'
+    assert 'synthetic fatal body' not in str(result.value)

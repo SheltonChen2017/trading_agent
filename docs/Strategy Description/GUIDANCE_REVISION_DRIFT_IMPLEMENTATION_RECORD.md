@@ -1,8 +1,15 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Claude follow-up corrections recorded in section 54, 2026-10-28:
+Status: **Codex counter-review of sections 53 and 54 completed in section 55,
+2026-10-28; all four Claude commits are accepted after the recorded corrections.
+The published `fc07b099` review is consumed once.
+The invented SPY budget reconciliation is corrected in section 56 without
+changing strategy rules, orders, fills or cash. Whole-share rounding and
+released price-protection reserves are accounted for separately.
+The new section-55/56 source awaits independent Claude review.
+One end-of-round push is authorized; no intermediate push or monitor rearm.
+Claude follow-up corrections recorded in section 54, 2026-10-28:
 GDR-CR53-007 and GDR-CR53-008 are corrected, with one new P2 (GDR-CR54-002).
-Codex counter-review of sections 53 and 54 pending.
 The SYN native closure changes in `simulation.py` only (section 54);
 the retained `c589b3dd` custody and its recovery authorization are unchanged.
 Section 53 was published as `37bce7f2`.
@@ -14,7 +21,7 @@ Sections 51 and 52 are accepted in section 53 as offline software after correcti
 one P2 comparison-parity fix in `multi_session` and regression pins.
 The dated settlement contract and multi-session order rehearsal are offline
 software only. Real data, dated service-calendar authenticity, historical fees,
-SPY comparison parity and native execution remain unverified or blocked.
+real-data SPY comparison parity and native execution remain unverified or blocked.
 This is not the final step before QC. One unintended passive QC screenshot
 occurred after shared Safari changed tabs; all provider UI work then stopped
 (52.2). No deliberate QC navigation, query or launch occurs in either round.
@@ -35,8 +42,9 @@ Claude's `c6834173` is accepted after documentation correction (section 44).
 The published `c6834173` review is consumed once.
 Claude's `863a0dcd` is accepted after documentation correction (section 42).
 The section-46 coverage-source epoch is accepted in section 47.
-Accepted RP33 remains at exact producing `c589b3dd`; its runtime, draft and
-fixture files are unchanged, and no recovery carrier is regenerated.
+Accepted RP33 remains at exact producing `c589b3dd`; only that retained custody's
+runtime, draft and fixture bytes are unchanged. The current worktree runtime
+changed in section 54; no recovery carrier is regenerated or rebound.
 Monitor remains PAUSED.
 GDR-RP33 is accepted in section 34
 as offline software only: it retains every record digest in a 489-line paired
@@ -69,7 +77,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 54. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 56. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -7668,3 +7676,241 @@ execution nor empirical readiness. The proposed terminal-SPY rule and all
 eleven original decisions stay open.
 `docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` were not edited
 and stay frozen for both agents.
+
+## 55. Codex counter-review of sections 53 and 54, 2026-10-28
+
+### 55.1 Exact snapshot, scope and commit dispositions
+
+Owner direction: "first, counter review claude's review. then, fix the SPY
+budget-parity blocker without changing the strategy rules. don't access QC
+or buy anything, and push once when done." The round starts at clean local,
+fetched and live matching remote
+`fc07b0999be44146dedea00cfe6e495cf3a72b4c`, on
+`codex/strategy-guidance-revision-drift` in
+`/Users/sheltonchen/.codex/worktrees/guidance-revision-drift/trading_agent`,
+origin `https://github.com/SheltonChen2017/trading_agent.git`.
+The exact review range is
+`2d739339798eb1c7a1255de13f8ebe4999ed847f..fc07b0999be44146dedea00cfe6e495cf3a72b4c`.
+Every commit's complete diff was assigned and inspected separately, then
+assessed against the cumulative tree. No branch/worktree change or concurrent
+Claude implementation was observed. The current instruction authorizes only
+these corrections and the bounded offline SPY repair; it does not authorize
+another implementation/evaluation round.
+
+| Exact Claude commit | Disposition | Evidence and correction |
+|---|---|---|
+| `422e3cc2a212df02a0d36e34733ec27032032959` | Accepted | The boundary exposure blocker is correct; regression additions isolate planner, reference, decoder, contract and engine guards. No new defect found in this commit. |
+| `37bce7f2df043891e73aec521d460eafb8801452` | Accepted after clarification | The section-53 identities reproduce. Its SYN reachability and MSAA13 descriptions are superseded explicitly by section 54. GDR-CCR55-002 clarifies review-scope wording without rewriting history. |
+| `55ce741233cdf7890ec8874e0595f3cc5e84e8ff` | Accepted after correction | Dated SYN due exits are sound. GDR-CR54-002's share-uncertainty guard is incomplete across repeated actions; GDR-CCR55-001 fixes the verified generalized defect. |
+| `fc07b0999be44146dedea00cfe6e495cf3a72b4c` | Accepted after clarification/correction | Native custody and reported identities are correct. The new repeated-action reproduction qualifies the sufficiency of the section-54 correction. GDR-CCR55-003 corrects the active header's retained-versus-current runtime ambiguity. |
+
+The four-commit review is consumed once. The earlier publications and reviews
+remain consumed; none is a new trigger. These dispositions accept the reviewed
+software after the stated corrections. The new corrections themselves remain
+due for independent Claude review on the final published snapshot.
+
+### 55.2 Verified findings and correction
+
+| ID | Priority/status | Location, evidence, reason and verification |
+|---|---|---|
+| GDR-CCR55-001 | P2 / corrected | `multi_session._apply_action`, `_invalidation`, `_close`; `CounterReviewActionTests`. The two-string split guard lost its protection when the first refused cash terminal renamed the unresolved state. A second differently identified payout then credited the pre-split 495 shares, removed the holding and uncertainty, and could report software completion. A dividend after an unresolved split also paid on guessed shares; a later integral split scaled them. This is incorrect accounting, even while an earlier parity blocker survives. Keep non-window action/share uncertainty persistent; refuse numerical actions until reconciliation. Only the two explicitly benign outside-window exit reasons can become moot after a known payout. Window bookkeeping now preserves pre-existing economics uncertainty. Strategy and SPY cases, repeated cash terminals, dividends, later splits, noncash/CVR/unknown terminals and late-known entitlements are pinned. Correction commit: `3530f5a3cf530219087a86bcb6bf5501c3848c12`. |
+| GDR-CCR55-002 | P3 / clarified | Section 53.1's claim of a continuing focused-only review preference contradicts 50.2's explicit no-standing-waiver statement. Retain both historical reports, but this counter-review does not establish a waiver of Claude's future full-lane obligation. Codex uses focused checks and does not run a complete lane/repository suite without a separate explicit owner request. |
+| GDR-CCR55-003 | P3 / corrected | The active header said RP33 runtime files were unchanged without clearly limiting the claim to retained producing `c589b3dd`. Current `simulation.py` changed in section 54. Qualify the retained bytes explicitly and keep current-source/native-attempt identity separate. The active-document pins rotate with this record. |
+
+Reproduction of GDR-CCR55-001 at the reviewed source used only invented data:
+a 1.5 split, first $7 cash terminal and second differently identified $7
+terminal. The second terminal credited 3,465 on an unknown share basis,
+changing strategy cash from 95,045.0500 to 98,510.0500. A later $1 dividend
+credited 495 instead. These are accounting reproducers, not observed returns
+or empirical outcomes. The corrected source creates neither guessed payout;
+it retains exposure and unresolved economics. Legitimate resolved actions and
+known terminal settlement of moot exit-window cases still work.
+
+Six new methods fail on the uncorrected reviewed source: 26 assertion/subtest
+failures, zero errors, 15.396 s. They pass after correction in 17.147 s;
+nine existing action controls pass in 4.502 s. Four finally-restored in-memory
+mutants are caught with zero errors: narrowing the persistent guard to two
+split reasons, bypassing split/dividend refusal, and each of the two window
+bookkeeping overwrites. The pre-correction counter-review selection passed
+84 methods in 40.023 s, zero failures/errors/skips. The exact active-document
+method passed in 0.009 s before its subsequent deliberate status rotation.
+These are Codex/read-only-agent checks, not independent Claude acceptance of
+the new fix. All invoked rows are invented; network and repository writes
+were denied during these probes, with bytecode disabled.
+
+### 55.3 Reproduced identity and retained native custody
+
+At exact `fc07b099`, in-memory reconstruction reproduced section 54.6:
+
+| Artifact | SHA-256 / shape |
+|---|---|
+| Full source | `0f077b4aff666b4358f09ef624d39f82556957f68f42b7cfc092a0551202d370`, 59 members |
+| Review ZIP | `d7b5310156b38306c6649252afd41b812287af4689688bfdc17b7b8cf3b60905`, 898,841 bytes |
+| Native audit ZIP | `fa562a43d49f59e5e3305c3d99cb2d3537bf0045a494504c3f5e5711fd8ae3e6`, 293,994 bytes |
+| Handoff | `e422973618287411b72201c18e82ca97ec61d76d5398628cdda4981525b5408e`, 83,641 bytes |
+| Base replay | `dbbae722a0f281dbb588d716bee73dfa720e481bb8e60f582ef322de3846abeb` |
+| Stress replay | `826d3fbb4a1121ec62499e4694f990dae9a1b91ba32ae0a2676cd0d5e1d639e9` |
+
+Contract `219706fd...`, both plans and both coverage snapshots also reproduce;
+both replay blocker sets contain only the budget-parity false alarm addressed
+next. All 20 explicitly inventoried native source paths were compared with
+producing `c589b3dd`: only `simulation.py` differs. The new section-55/56
+corrections are outside that native import closure; they do not rebind the
+retained accepted carrier. Current-source native execution would still be a
+new candidate as explained in 54.2. No carrier/project is saved or uploaded.
+
+## 56. SPY admission-budget reconciliation without rule changes, 2026-10-28
+
+### 56.1 Diagnosed cause and bounded correction
+
+After completing the counter-review and local correction above, implement
+only the requested budget-parity repair. GDR-RP56-001 (P2 / corrected) is a
+false alarm in `MultiSessionReplay._fill_orders`: `_spy_entry` maximizes whole
+shares against the decision limit plus worst-case fees, but completion judged
+its actual cash residual against the cheaper eventual execution price.
+Released price-protection reserves were therefore mistaken for underallocation.
+
+The original plan's sections 5 and 6 require limit-based sizing, fees reserved
+separately, no topping up after fills, matched allocated budgets and retained
+idle cash. Preserve those rules and the fixed SPY-53 inputs. Do not enlarge
+the 92-share comparator order to 93, change the fixture, alter impact/fees,
+relax the funding/timing/partial-fill guards or silently widen a tolerance.
+
+For a completely filled comparator entry, reconcile exact decimal amounts:
+
+```
+committed = filled_shares * submitted_limit + cumulative_commission
+whole_share_rounding_cash = source_budget - committed
+released_price_reserve = committed - actual_entry_spending
+actual_idle_cash = whole_share_rounding_cash + released_price_reserve
+next_share_limit_cost = submitted_limit + commission(q+1) - commission(q)
+```
+
+Valid limit-based allocation requires nonnegative rounding cash strictly below
+the next-share limit cost, and nonnegative released price reserve. Equality
+at the next-share boundary remains a mismatch. The two kinds of idle cash
+are recorded separately in the tranche reconciliation; released reserves are
+not relabelled whole-share rounding. Genuine funding, delayed/unmatched fills
+and partial execution remain visible blockers. No second order/top-up or cash
+injection is created.
+
+The unchanged fixed recipe reconciles as follows (invented dollars):
+
+| Mode | Source budget | SPY shares | Limit-rounding cash | Released price reserve | Actual idle cash |
+|---|---:|---:|---:|---:|---:|
+| Base | 4,954.9500 | 92 | 29.1900 | 46.3220 | 75.5120 |
+| Stress | 4,959.9000 | 92 | 33.1400 | 41.4460 | 74.5860 |
+
+The handoff retains `gdr.pre-qc-handoff.v2` and its invented recipe, but its
+status becomes `invented_replays_reconciled_external_gates_closed`. The old
+invented-budget blocker is removed from the current remaining-work list;
+real-data funding/timing/fill parity is still unverified. Original economic
+decisions, source-rights/PIT flags, native verification, independent review,
+empirical and QC/trading authority stay closed. Historical handoffs are not
+rewritten; exact source-hash reconstruction distinguishes each epoch.
+
+### 56.2 Final verification and publication handoff
+
+SPY correction commit:
+`69f2a4a24d5521c93bc7cdfc47f5064f461b5bd0`.
+The additive tranche `entry_budget_reconciliation` is `None` until the entry
+order fills completely. Its completed form retains order ID, original filled
+quantity and limit, cumulative commission, committed limit cost, admission
+rounding cash, released price reserve, actual cash residual, next-share limit
+cost and `within_rounding`. It is a proof of this invented admission, not
+proof of funding/timing/partial-fill parity or a later share basis. It remains
+unchanged across a subsequent SPY split. A cancelled/refused/unfilled entry
+never receives a completed proof.
+
+The former SPY-53 expectation of a blocker was obsolete because it mixed
+admission and execution prices. Replace it with stronger expected cash,
+quantity and separate-reserve assertions; preserve every real refusal guard.
+Ten new behavioral methods cover fixed base/stress execution, coherent
+one-share undersizing, exact next-share equality, negative limit headroom
+despite positive actual-price cash, commission-floor crossovers at
+199/200 and 399/400 shares, favorable price changes without top-up, cumulative
+partial-fill fees, funding/zero-share refusals, above-limit non-execution and
+the retained admission audit after a split. Six finally-restored in-memory
+mutants are caught with zero errors: the old actual-price basis, always
+accepting, accepting next-share equality, dropping nonnegative headroom,
+omitting incremental fees and erasing the released reserve. The ten new
+methods pass in 5.317 s; the earlier ten-method selection including two
+updated originals passed in 7.992 s.
+
+Final checks on the frozen production tree:
+
+| Check | Result and practical limit |
+|---|---|
+| Focused selection: simulator, multi-session engine, planner, reference, decoder, execution contract, handoff, coverage, boundary and actual deterministic bundle reconstruction | 237 distinct methods passed in 123.368 s; zero failures/errors/skips. Not a full lane or repository suite. Bundled Python 3.12.14, sanitized environment, bytecode disabled; parent network and repository-file-write audit denial. The boundary test separately checks fresh-process imports; no claim of process-wide OS network isolation. |
+| Source stability across final tests | Full source `aeefa0b3...` identical before and after. The final engine test file contains 82 methods; all are in the 237-method selection. |
+| Rule-preservation comparison against committed pre-SPY-fix `3530f5a3` | Both base/stress strategy and comparator sleeve objects are byte-exact after removing only the additive reconciliation field. Orders, fills, fees, settled cash, receivables, positions, daily NAV, cash movements, refusals, input hash and lineage are unchanged. The old false blocker is removed; no economic input is changed. |
+| In-memory compilation | All 110 lane production/test Python files compile; no bytecode/cache written. |
+| Final documentation guards | 2 checks passed in 0.154 s: lane active-record consistency and the unchanged shared malformed-SHA function isolated from its pytest-dependent module. Direct module import lacked pytest; no installation, skipped assertion or full-suite claim. Three finally-restored header/status mutants are each caught by one assertion, zero errors. |
+| History and scope | Sections 1 through 54 below the active header are byte-exact to `fc07b099`. Only lane-owned implementation/tests and this record change. Root Session Handoff, Action Plan, Feature Milestone Record, process/shared files and original plan/PDF/draft stay frozen. |
+| Identity reconstruction | Current review ZIP, native audit ZIP and handoff built in memory only; both replay blocker lists empty. No saved/uploaded project, provider data or native execution. |
+
+One equivalence-probe harness initially passed a scalar/list directly to the
+dict-only `canonical_bytes`; wrapping the comparison value in an object
+corrected the harness. This was not a production regression or native attempt.
+A draft record append matched an older repeated sentence; the history check
+caught it, and the record was reconstructed with the exact prior body before
+verification. Final history/ordering guards pass. No prior text was revised.
+
+Current reproducible identities (new source epoch, not a carrier rebind):
+
+| Artifact | SHA-256 / shape |
+|---|---|
+| Full source | `aeefa0b379e3049a85954084cee5f2a1dc5f14a0f9265460c7f8e8c243666096`, 59 members |
+| Review ZIP | `dd5d193ab522e4e0c5f0d81ea38d773f7fefa080bfb3b5469b208bc6fe05f63e`, 900,365 bytes, 61 members |
+| Handoff | `cd8bad6f2636d8617ede3af23f5d81111a4eb50e8ece3e0e63af8a8e8c89963e`, 84,069 bytes |
+| Base replay | `65be357abdbee2c7a7bf5073ded811e24096526a311abde6ac5310d8dd865766` |
+| Stress replay | `54078bde8837d35cbda815d4af9d9ecab7711adee47de63e8f314f13e9140e6a` |
+| Native audit ZIP, unchanged from section 54 | `fa562a43d49f59e5e3305c3d99cb2d3537bf0045a494504c3f5e5711fd8ae3e6`, 293,994 bytes |
+| Execution contract, unchanged | `219706fd0a70ce4073e840848b7c8e0bb4e35fc9be054fff6352332f07fe42bb` |
+| Base intent plan, unchanged | `a314a98eea4f4a563f638b95e60bf33dcf2788ad5c69a58f149fe443feb4309d` |
+| Stress intent plan, unchanged | `2b6c67cca29364517b7095b195430ede7b5d047ca624af9db3d8dbd50add8079` |
+| October-28 coverage metadata, unchanged/unverified | `3019cd917d59891c428e96f12499e027e501f61a856481611b3fcb5ebb7aa590` |
+
+### 56.3 Custody, publication guard and next action
+
+This completed round accumulates local
+`3530f5a3cf530219087a86bcb6bf5501c3848c12`,
+`69f2a4a24d5521c93bc7cdfc47f5064f461b5bd0` and this final record/pin commit.
+Before each commit and before the single successful non-force push, verify
+the designated absolute root, matching branch, HEAD/status and origin. Push
+only `HEAD:refs/heads/codex/strategy-guidance-revision-drift`, guarded on the
+live remote still being reviewed `fc07b0999be44146dedea00cfe6e495cf3a72b4c`;
+preserve and reconcile any unexpected change. No intermediate push occurred.
+Verify the live remote equals the final record commit after publication;
+retain the exact completed publication in the paused automation memory/thread.
+Do not republish the finished `2d739339` or older rounds as a separate event.
+
+The original `GDR-base372-approved-20261008` remains CLOSED FAILED 3/3,
+zero manual attempts; project 37647834 was not accessed or modified.
+Separate `GDR-Mia-base372-recovery-authorized-20261011` remains zero
+unsuccessful attempts, zero pending intents and no new journal/project/launch,
+with maximum three unsuccessful attempts. Producing
+`c589b3dddab3f1dd136d10ae7ce1851d64818906`, retained full source
+`061ff30fe4053ebfabfa27c38d2e3ccd37d950c2fe3eae4375a933463125ee9f`, recovery
+project `c6b9443aa64f005c48e21f493bfea14918ecf6a730ac4f995bd3a70ee4c269a9`,
+prepared runtime `5d1dc6560ad2778fd6a8c514c16641b6e78cf82d514a0088f0a344c31783437d`
+and invented fixture `8f35d56a335d3f7d9dad016e1e2236de7fcd2635e5c463c30081f97b7b944458`
+retain their separate custody. Current native source remains different because
+of section 54; no permission or retained approval transfers silently.
+
+The monitor remains PAUSED. This round uses no browser/provider/QC access,
+quota check, Mia prompt, cloud query, purchase, credential/keychain action,
+empirical evaluation, operator database or trading operation. Existing
+subscription observations remain dated/unverified, not refreshed here. The
+bounded code fix does not require a new subscription.
+
+Next action is independent Claude review of this exact published correction
+series, with both action-accounting and SPY-budget regressions. No next
+implementation/evaluation/monitor round starts automatically. Verified
+guidance history/version/withdrawal/time semantics and rights, historical
+stock/SPY NBBO and six usable common years, authentic dated reference/action/
+settlement data, historical fees and native validation remain unresolved.
+The proposed terminal-SPY rule and all eleven original null decisions remain
+unfrozen. Real-data comparison validation and original GDR-0..6 definitions
+are not completed by these invented accounting checks. QC access remains
+prohibited by current owner direction.

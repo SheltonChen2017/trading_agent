@@ -876,6 +876,10 @@ Section 328 is Claude's independent review of the seventy-four Codex
 commits `3c905d42..0d38c59d`: all accepted, one P1 result-parser shape
 defect corrected in `41295615`, three P2s documented for owner or
 versioned decisions, and the owner's QC/Safari hold unchanged.
+Section 330 applies the owner-directed corrections of those findings: W5
+cash-limited buys are sized on max(ask, engine price), twenty spent-caller pin
+closures pass again, a guard requires the resolver literal, and reversible
+fingerprints and the owner's display name are withheld from the current text.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -2331,6 +2335,18 @@ current live continuation, superseding325's no-next-milestone endpoint.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
 
+Section 330 applies the owner-directed corrections of Claude's section-328
+findings. W5 cash-limited buys are now sized on max(ask, engine price),
+overriding 329.2's delegated decision (`ARV2R328-004`, `8381e0cb`). Twenty
+spent-caller pin closures pass against the approved post-merge pins, and a
+source guard requires the resolver literal in every outbound profile
+(`6c7c80a9`). Five reversible fingerprints and the owner's display name are
+withheld from the current text. The statement below that the current path
+preserves W5 quote economics is superseded for this one bound. Every W5
+profile hash changes, so the batch must be regenerated before any launch.
+The 329.10 resource hold still controls. The immediate next step is that
+Codex counter-reviews section 330 and its three commits.
+
 Section 328 is Claude's independent review of `3c905d42..0d38c59d`, the
 seventy-four Codex commits of sections 323 (Mac recovery) and 324–327.
 All are accepted; the W5 and R298 result parsers now accept a QC success
@@ -2462,7 +2478,8 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 327 (section 328); for section 250 the owner
+the pushed range through section 327 (section 328; owner-directed corrections
+in section 330); for section 250 the owner
 directed focused checks without the complete suite. Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
@@ -4316,6 +4333,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-28 | Codex owner-waived matched-history/local pre-QC recovery | `5b8d4f8a8603c60be182b6202e6d53b908f2bcff` -> this final handoff commit (nine recorded predecessors through `5735bb28`, TEN total) | Existing five-year period, exact identity/demand evidence, W5 six-cell runtime/source/result and verified project-independent archive | H/I/J/K actual0 plus separate native0 retained/spent; W5 uses Sep2021 callback warmup, Nov2021..Oct2026 USD1m epoch and unchanged source/economics; local archive148543046bytes/73ranges verified; no QC/Safari after owner hold and no strategy cell | New W5/archive227distinct focused passes plus repeated86document checks; earlier H/I/J/period counts/failures qualified in327; no full suite;337/259/53/699 unchanged | I327-001..016 dispositions in327; source/identity/actual-held-price/PIT limitations stay open; no independent review or formal admission claimed | ONE matching final push, then remain at local checkpoint under QC/Safari hold; next QC-only dated-coverage/source/project/transfer/run checks await release and all applicable gates |
 | 2026-10-28 | Claude independent review of the seventy-four Codex commits `3c905d42..0d38c59d` (sections 323 Mac, 324–327), excluding Claude's four R323 commits | `0d38c59d` -> `41295615` (correction) -> this record commit | All seventy-four accepted, `bfe79eef` after correction; section 328 | W5 and R298 result parsers accept an absent QC `errors` key; letter and special-character CUSIP/ISIN/FIGI checksum vectors added; DNS-profile, QC permission-action and buy-sizing risks documented | 152 range test files 9,095 passed / 20 failed (ARV2CR325-002 stale pin) / 10 harness errors; 349 affected passed; 5/5 mutations caught; 86 record gates; no full suite, no QC/Safari/provider access; 0 looks, 337/259/53/699 unchanged | 0 P0, 1 P1 corrected, 3 P2 documented, 10 P3 (one corrected) | Codex counter-reviews section 328; QC/Safari hold stays |
 | 2026-10-28 | Codex section328 counter-review, owner-released coverage preparation, then newly held offline checkpoint | `287952427b0e847d5f47261fc5d97c2057a04d17` -> this final handoff commit (five recorded predecessors through `02679fc7`, SIX total) | Accept incoming two-commit review after qualifications; prepare exact native dated coverage and bounded verification/result mechanisms | A first target passed once and is spent; four public QC code files installed before the new hold; two downloads retained with collision qualification; B/C/D remain uninvoked; no explicit compile/backtest | Root final250distinct focused passes7.96s plus four in-memory compilation checks/import absence; earlier counts and failures remain qualified in329; no full suite;337/259/53/699 unchanged | I329-001/002 P2 and I329-003 P3 corrected before use; existing price/actual-holdings/buy-sizing/source/PIT gates remain; no independent acceptance | ONE nonforce matching-lane push; then retain the new QC/Safari resource hold. Approved Ask-download preference awaits release. Fresh exact source verification, run/result freezes and genuine gates precede any coverage job or six/eight strategy submission |
+| 2026-10-28 | Claude owner-directed corrections of the section-328 findings | `f23ca94c` -> `8381e0cb` (W5 cash bound) -> `6c7c80a9` (pin closures, resolver guard) -> this record commit | Section 330; all fourteen findings dispositioned; `-003` erratum (the owner quote exists in 312.6) | W5 cash-limited buys sized on max(ask, engine price) by owner override of 329.2; twenty spent-caller pin closures restored through the post-merge manifest; resolver-literal guard; five reversible fingerprints and the owner's display name withheld | 29 focused files 1,986 passed; native channels 10 passed under their harness; 2 redaction tests; 2/2 mutations caught; 86 record gates; no full suite, no QC/Safari/provider access; 0 looks, 337/259/53/699 unchanged | `-004`, `-006`, `-007`, `-009` corrected; `-002` corrected forward; `-011` transport size and `-012` open; new P3 `ARV2R330-001` | Codex counter-reviews section 330; the 329.10 resource hold stays |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -59059,7 +59077,7 @@ attempt accounting, not evidence against the unexercised diagnostic source.
 The finite predicate alone does not identify raw rows or their count.
 
 Current authenticated Safari project38364439 panel separately showed exactly
-xiao chen(Owner), Codex ARV2 R298 A5 20261024 andMia. This is label evidence,
+the owner's account(Owner; display name withheld in section330), Codex ARV2 R298 A5 20261024 andMia. This is label evidence,
 not a full API row/UID/hash or proof every entry is an independent account.
 Opening the project from its terminal avatar implicitly allocated an editor
 and auto-built unchanged source: Lean2.5.0.0.18203, displayed10:00:40,
@@ -60083,8 +60101,8 @@ catalog/context/join pins, with fresh final private input admission passed.
 Authenticated redacted result: RAW first price date BEFORE both reference and
 decision, RAW last price date AFTER both; current-vintage isdelisted=N/false,
 one CUSIP candidate, clipped reference/decision interval relations INSIDE.
-Raw-date hashes are7e787dd7b3c47e175f54ba11033b10ffa0f052b1a31b59a759963c8af7d6bd24
-(first) and9b5e07753bd5ffffe0073fcaec8095bbb5635d9e0897814992799359678ee7b3(last).
+Raw-date hashes (first, last) are withheld in section330: a plain SHA-256 of
+a calendar date is reversible by dictionary (ARV2R328-006).
 No raw dates, security/ticker/FIGI/CUSIP/price/row or opaque route were printed
 or persisted by this consumer. Route discarded in memory. Zero new QC jobs,
 provider/credential/QC/capacity calls, strategy look/cell or source mutations;
@@ -61339,10 +61357,9 @@ market-clock protocol completed, NOT that data completeness passed.
 
 Native SID/display/SID.Date fingerprints matched before/after probes and at
 all three dated resolutions2020-11-01/2022-10-21/2022-10-24; each roundtrip
-matched and SID.Date related before_reference. SID SHA
-1473d9635c3db103e3ff7b0ccfa1a05a53df98727a202d491b853724dd5dea94;
-display9c3e954a5ee8ee9bb6e03de9d3f5533d03513a7ebb1212bd58bba3fb03ce9f7f;
-SID.Date7d9f65cb16b9d879072061e8ee4d77288f68d0336cde16b1c70176397a0cea26.
+matched and SID.Date related before_reference. SID, display and
+SID.Date SHA values are withheld in section330 as reversible low-entropy
+fingerprints (ARV2R328-006).
 Initial metadata SHA0e89d3718f6c13679a98b2addef1743151a0d4f8fa9659774528e1f0c31d66de.
 These are current-database within-job consistency observations, not original
 historical resolution/listing proof. N/A19 did not retain cross-job native
@@ -70714,3 +70731,252 @@ processing/source/attempt checks, separate exact run freeze, bounded new job and
 selected result capture precede any strategy continuation. Dense potential gaps
 remain distinct from actual target/held NAV demand; no price substitution,
 holding retirement by membership expiry, economics change or attempt renewal.
+
+## 330. Owner-directed corrections of Claude's section-328 findings, 2026-10-28
+
+### 330.1 Direction, synchronization and scope
+
+After Codex's section-329 checkpoint, the owner directed Claude: "proceed to
+fix all findings you identified". Two findings needed an owner decision, so
+Claude asked before changing anything:
+
+- **`ARV2R328-003`:** the owner answered "Confirm and accept (Recommended)".
+- **`ARV2R328-004`:** the owner first chose "Size on max(ask, price)
+  (Recommended)". Claude then reported that Codex's 329.2 had made the
+  opposite delegated decision and pinned it in a test. The owner answered
+  "Override: max(ask, price)".
+
+**Starting state.** A fetch showed local, tracking and live heads equal at
+`f23ca94cbccd7078fd181968ab11746598d87224`, with a clean worktree.
+
+**Not reviewed here.** The six section-329 Codex commits: section 4
+records the owner's waiver of Claude review of section 329, and this round
+only corrects section-328 findings.
+
+**Scope.** Every change is in this lane's code, tests and record. No QC,
+Safari, provider, credential or artifact access occurred. The owner's
+resource hold of 329.10 still controls.
+
+This round adds three commits:
+
+- `8381e0cb3e7d3cdef905893edade52e9f424c28d`, the W5 cash bound (330.3);
+- `6c7c80a9e0ed41a5d875311b3729ed6523f0abf5`, the spent-caller pin
+  closures and the resolver guard (330.4 and 330.5);
+- this record commit, with the record redactions (330.6).
+
+### 330.2 Disposition of every section-328 finding
+
+| ID | Status after this round |
+|---|---|
+| `ARV2R328-001` | Closed in 328. Claude accepts Codex's 329.2 reclassification to P2: the defect fails closed, and no corrupted result is shown. |
+| `ARV2R328-002` | **Corrected forward** (330.5). Claude accepts Codex's qualification: the missing resolver literal is the likely cause of AD's and AF's transport failures, not a proven one. 328.4's "predictable from the code" is withdrawn in favour of "consistent with the code", and both recorded outcomes stand. |
+| `ARV2R328-003` | **Closed; 328 erratum.** Claude's statement that no owner quote authorized the action was wrong. Section 312.6 records "Yes—remove only Mia from R298 and proceed.", which Codex cited in 329.2. The owner has now also confirmed both UI clicks and the exact pinned Mia-row representation. A later launch may tolerate that one row but does not need it: 329.3's path uses sole-owner access in the source project. |
+| `ARV2R328-004` | **Corrected by owner direction** (330.3), overriding 329.2's delegated decision to keep ask-only sizing. |
+| `ARV2R328-005` | Closed in 328. |
+| `ARV2R328-006` | **Corrected in the current text** (330.6). Git history is not rewritten. |
+| `ARV2R328-007` | **Corrected** (330.4). The ten native-channel tests also passed under their required harness. |
+| `ARV2R328-008` | **Closed as documented.** The automation lives in Codex's environment, outside this repository. Claude accepts 329.2: the owner's later direct monitor request superseded the paused monitor. Nothing is recreated, and no other-lane identifier is added. |
+| `ARV2R328-009` | **Corrected in the current text** (330.6). |
+| `ARV2R328-010` | Closed by 329.2, which pins the AP binding test. The hash-only outer programs remain unreviewable from Git. |
+| `ARV2R328-011` | Items (a) and (d) are covered by Codex's `test_r329_runtime_limits.py`. Its worst-case META statistic is 8,768 bytes, above the 8,002 bytes proven on QC, so transport sufficiency stays unproven until a QC run under a released hold. Items (b) and (c) are intentional or documentary. No offline fix remains. |
+| `ARV2R328-012` | **Open; needs provider data.** No EOD price admission is planned, and the in-window split check stays a precondition for any future admission. |
+| `ARV2R328-013` | Closed by 329.2's erratum. |
+| `ARV2R328-014` | Retained as 329.2 classifies it. Item (b) is met for D, which loads the pinned CA into its actual TLS context (329.11). The other items concern spent or frozen files and fail closed. |
+
+### 330.3 W5 cash-limited buys sized on max(ask, engine price) (`ARV2R328-004`)
+
+LEAN's pre-trade buying-power check values a market buy at
+`security.Price` plus its fee. W5 sized a cash-limited buy as
+`floor(cash / (ask × 1.001))`. A stale engine price above the ask could
+therefore make LEAN reject the last such buy and end the cell in Runtime
+Error.
+
+`scripts/arv2_r327_available_history_projection.py` now applies one
+declared, exact and reversible statement change to the generated buy loop:
+
+- **Cash bound:** the bound uses `max(ask, security.Price)`.
+- **Engine price check:** a missing or non-positive `security.Price` refuses
+  with the finite code `quote_execution_engine_price`.
+- **Unchanged:** fill price, fee basis, target quantities and every other
+  quote, fee and fill method. The frozen A16 quote family is untouched.
+- **Proof:** the generator checks that reversing the one statement restores
+  the frozen quote base's `on_after_open` exactly. The full inverse-AST
+  check still equals the frozen quote base.
+- **Profile:** the W5 profile's `buy_cash_bound` now reads
+  `floor_current_cash_divided_by_max_of_ask_and_engine_security_price_times_1point001;prior_RAW_close_target_quantities_unchanged`.
+  Every W5 profile hash changes.
+- **Record keys:** the cell projection key
+  `quote_fee_cash_fill_methods_AST_unchanged` is renamed
+  `quote_methods_AST_unchanged_except_declared_cash_bound`, and the cell
+  schema becomes `-v2`. The batch schema and the result parser are
+  unchanged.
+
+**Generated bytes.** The W5 quote base changes from 57,031 B `dd01d3ce…`
+to 57,307 B `ab12bb5124cb78f567a47fc4da5646d119accae1100745f7d7172efe5ce3203e`.
+The synthetic project-123 batch fixture changes from `40ee34ac…` to
+`9c9084d100bc5427f065b711ed0288db9d4b6c7c901e4822ff154d3a642149e9`.
+
+**Nothing operational is re-pinned.** No W5 source was installed or bound to
+a project. This supersedes 329.13's "no … economics change" for this one
+owner-directed W5 bound only.
+
+**Codex's test, adapted.** Codex's
+`test_mock_engine_invalid_callback_with_stale_price_stops_without_resize_or_next_buy`
+now expects one share and one underfill, sized by the stale engine price
+120. Its invalid-callback stop, the absence of a retry and the ask fee basis
+are unchanged.
+
+New `tests/analyst_revisions_v2/test_r330_w5_cash_bound.py` checks four
+things:
+
+- a cash-limited buy satisfies `quantity × security.Price + fee ≤ cash` for
+  engine prices 90, 110, 110.2, 120 and 150.5;
+- prices at or below the ask keep exact ask sizing;
+- a stale 120 sizes one share;
+- a missing or non-positive engine price refuses before any order.
+
+| File | Before (bytes / SHA-256) | After (bytes / SHA-256) |
+|---|---|---|
+| `scripts/arv2_r327_available_history_projection.py` | 33244 / `7eda0d27788cbf90e6d160a774de0fe2a184f0686f446e0594525ac6639cb1d2` | 35237 / `caca54d700effe7736b2195c81c06eead887e023bcbd8fc783e2a5972f384192` |
+| `tests/analyst_revisions_v2/test_r327_available_history_projection.py` | 14983 / `573c0aed8a99ebe41624881f94cebc7cd2e91d0b1e3fc8f0d7843451482e0c38` | 15585 / `551ec0849a8cc0763142d1def3cfad84b69d889a047d818a9ab1e382c38a86d2` |
+| `tests/analyst_revisions_v2/test_r329_runtime_limits.py` | 11746 / `7e0cf4c6578d7329d513547470ee1a0bb8512760e8fb29797d297f8806ebe268` | 11920 / `476c77ec6112681adb5b142303b320ae82684a0e0df1cb57a87802e47f0fa6d5` |
+| `tests/analyst_revisions_v2/test_r330_w5_cash_bound.py` (new) | — | 3407 / `53bd87272bf24cfd4c5bf51a00fd26ce5ab249f762510d1cb18c15ff30a0facf` |
+
+### 330.4 Spent-caller pin closures (`ARV2R328-007`)
+
+Twenty spent-caller closure tests compared the current tree with the old pins
+of the two R298 files that the approved EOF merge replaced (`ARV2CR325-002`).
+Each pin check now goes through
+`tests/analyst_revisions_v2/_post_merge_pins.py`. That helper maps a
+historical pin only when both path and pin equal a `REPLACEMENTS` row of
+Codex's `scripts/arv2_r298_post_merge_source_pins.py`.
+
+What this change does not do:
+
+- No test is marked xfail; Codex's 329.2 rejected a blanket xfail
+  conversion, and this is not one.
+- No pin is refreshed from disk.
+- Historical pins, the spent controls and the red outcomes recorded in 328.5
+  are unchanged.
+
+Any other drift still fails.
+
+The ten `test_r298_all_routes_native_channels.py` cases need no code change.
+Run under their required harness, they passed 10 of 10. That harness is the
+actual worker policy (`native_profile(worker_mode=True)`, 3,633 B,
+`54b4cad437872b641726a784237f51f6c458563fb013b00d7c02172f30e8cd6c`) plus
+all-artifact read and write denial, with network denied by the policy.
+
+| New file | Bytes | SHA-256 |
+|---|---:|---|
+| `tests/analyst_revisions_v2/_post_merge_pins.py` | 716 | `31e477fc0e2db7119806f1a179a9977b48883c90b1eaed540175bdb9a22469f4` |
+| `tests/analyst_revisions_v2/test_r330_post_merge_pins.py` | 1433 | `c7ed391e45a75ffe4795ccdfe61000049188425568f336473c78e25884bc1b90` |
+
+Each of the twenty caller files gains one import and one changed comparison:
+
+| Changed caller test | Bytes | SHA-256 |
+|---|---:|---|
+| `test_r298_a19_error_after_session_stop_caller.py` | 5178 | `9be6437341bae684774542a3fa68963a8ba32398ff57bd3ba217d8ed76309a63` |
+| `test_r298_a19_error_reconciliation_caller.py` | 20943 | `f150f00cbb750eb010e0ad3d89a7b138096c56222196cef1f4f2c0765f9276a8` |
+| `test_r298_post_mia_access_a17_caller.py` | 23458 | `529b0c1ff6cb5706e9b6ee39109f35c86436b13d9cdf71c50306254c79ee8a17` |
+| `test_r298_post_phase_access_caller.py` | 12479 | `2dba8fdbe7f5b50ad00470a4663700d331bd35688df1ca6baf1c10d2d6c7550b` |
+| `test_r298_quote_execution_a16_caller.py` | 22307 | `70f81a925c1743deeefbe438d0d5236ca811982dc465e860a6c6698f6c471af6` |
+| `test_r298_quote_execution_caller.py` | 20183 | `4e9ff322ace3d920cb87c795a5348ab0ef99f9c975296fe373aa5716c516931a` |
+| `test_r298_raw_reference_diagnostic_a18_caller.py` | 35178 | `42626704546174c1fa12b0dd49095f3c64319e21e134b3d6208b7f736b031260` |
+| `test_r298_raw_reference_diagnostic_caller.py` | 32213 | `1d44dc12c3169b3251efc004aa3626daab20d28a57dbe31d96e334a7294cf0f5` |
+| `test_r298_reference_feed_caller.py` | 9416 | `f2cd48f01d75319266869ecac8f15b66bc990ab74fc45a76820ffe78199618b1` |
+| `test_r298_reference_identity_diagnostic_caller.py` | 50234 | `6afd6aa512eb4e01d6d935afd428650df043960201a7e0f8b37de7d6d0a2ada0` |
+| `test_r298_reference_series_phase_caller.py` | 16615 | `c20eec8f8af1b949000846b49a01839a0d464ce8ccc277b8d45c8317a2dbc749` |
+| `test_r298_reference_series_recovery_caller.py` | 18520 | `9bce818ac928335664e74780adb3d8b83c0dedbf60b009d259bc29a53c3c158e` |
+| `test_r298_reference_ticker_caller.py` | 15628 | `5351161407ce3174d84333a4ae98ddfb1e85417b755e93cac0d75350c197efe3` |
+| `test_r298_sharadar_bulk_inventory_caller.py` | 13308 | `b45ef151bd91db683e766db780459badc1bfce4b938be2b651ec594505f5f5b5` |
+| `test_r298_sharadar_cusip_syntax_caller.py` | 23089 | `a2d9e96b586c0ab65dde0a0146c5ddc5762829af518b7442d58eea559b5356bb` |
+| `test_r298_sharadar_eligibility_caller.py` | 23556 | `5d8509ffd40b58230b4fd33291a854519f8b3fd30ceb01eb85c72c4ad993885b` |
+| `test_r298_sharadar_eligibility_v2_caller.py` | 30458 | `ce23c5f58f8c4fc6aabe50fb57472113b5b3872c88410a284e6520c3f66c82f1` |
+| `test_r298_sharadar_probe_metadata_caller.py` | 25209 | `392da9a7cfb644cc5f4be607dfd3feeb6b1103f1b99c296d35d8a733eb079744` |
+| `test_r298_sharadar_reference_caller.py` | 20370 | `5b30cb3d9d6394aba567b86b96678e6077946f7d51edc4e9d9ca4929f1d60d24` |
+| `test_r298_sharadar_status_shape_caller.py` | 12174 | `828ad1ad5caf0df26cd02676d6232b0db9b289123e4b2df50108f2bba19cf365` |
+
+### 330.5 Resolver-literal guard (`ARV2R328-002`)
+
+New `tests/analyst_revisions_v2/test_r330_resolver_profile_guard.py` (4000 B,
+`f2dfb9eefb1f16b45418d8508fd42734e323108ffec67fe82ea842808218e19d`) parses
+every Analyst script and every `research/analyst_revisions_v2_qc` module. A
+string expression that opens outbound exceptions
+(`(deny network-outbound (require-all`) must also contain
+`(require-not (literal "/private/var/run/mDNSResponder"))`.
+
+Six spent or deliberate-control files are exempt, each bound to its exact
+SHA-256:
+
+- the v1 transport diagnostic;
+- the v2 transport diagnostic, whose resolver-free profile is its control
+  arm;
+- the AD producer;
+- the AF observer;
+- raw-price acquisition v1 and v2, which had the same gap but which 328.4
+  did not name.
+
+Current forward callers carry the literal: raw-price v3, the AT project
+creator and 329's D readback. The guard refuses two in-memory changes:
+stripping the literal from v3, and appending one byte to an exempt file.
+
+### 330.6 Record redactions (`ARV2R328-006`, `-009`)
+
+Five plain SHA-256 values are withheld from the current text:
+
+- in 323.41, the raw first and last price dates;
+- in 323.60, the SID, the display ticker and the SID date.
+
+Section 323.25 now names the owner by role.
+
+New `tests/analyst_revisions_v2/test_r330_record_redactions.py` (1617 B,
+`d706b786867129ca95409dbbbb360b8e88dad582d4646ce7626d98ca8d2f2803`) stores
+only SHA-256 digests of the withheld 64-hex strings, which cannot be
+reversed. Both of its tests failed against the pre-redaction record. Git
+history still holds the old text; no history is rewritten, and no force push
+is made.
+
+**New observation `ARV2R330-001`** (P3, documented, unchanged). Section 4R
+names a reviewing session by its work e-mail address. This is deliberate
+provenance and outside the findings the owner asked to fix; the owner may
+direct a redaction.
+
+### 330.7 Validation
+
+All Python runs used `sandbox-exec`:
+
+- **Sandbox profile:** denies all network, `/usr/bin/security` and every
+  read or write under `artifacts/`.
+- **Python and pytest:** `env -i`, Python 3.13 venv, `-B`,
+  `--noconftest`, `--ignore=artifacts`, plugin autoload and cacheprovider
+  disabled.
+- **Scratch paths:** `TMPDIR`, `--basetemp` and the pycache prefix all
+  under `.pytest_cache/claude-review-330`.
+
+The owner directed that the complete lane suite not be run; it was not.
+
+| Stage | Result |
+|---|---|
+| Final focused run at `6c7c80a9`, 29 files: W5 cash bound, projection, runtime, result and runtime limits; R328 W5 result errors; quote execution; resolver guard; the twenty caller files and the helper test | **1,986 passed in 77.62 s.** |
+| Native-channel cases under their worker-policy harness | **10 passed in 26.21 s.** |
+| Record redactions | **2 passed in 0.15 s.** Both fail against the pre-redaction record. |
+| Record gates after this section | **86 passed in 1.02 s.** |
+| In-memory mutations (no file changed) | **2 of 2 caught.** A no-op cash bound fails 7 of the 11 new cash-bound tests; the four at-or-below-ask cases still pass, as intended. An empty post-merge map fails all twenty caller files plus the helper test (21). |
+
+Artifacts metadata census by `stat` only, sorted: 9,029 entries before
+and after the final runs, identical in name, inode, size, mtime, ctime, mode
+and link count.
+
+### 330.8 Handoff
+
+No result cell, look or booking was added: 337/259/53/699 stays.
+
+The owner's resource hold of 329.10 still controls. Nothing here authorizes
+a QC, Safari, provider or capacity action.
+
+Before any six-cell launch, the W5 batch must be regenerated from the current
+projection, because every W5 profile and cell hash changed (330.3).
+
+The immediate next step is that Codex counter-reviews section 330 and its
+three commits.

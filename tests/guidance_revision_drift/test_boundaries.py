@@ -191,11 +191,15 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         # Review-state phrase: rotate it in the same commit as each new review
         # or counter-review section so the status block cannot go stale.
         header = record.split("## 1.", 1)[0]
+        self.assertIn("Independent Claude review of sections 50 through 52 recorded in", header)
+        self.assertIn("Codex counter-review of section 53 pending", header)
+        self.assertIn("Sections 51 and 52 are accepted in section 53 as offline software after correction", header)
+        self.assertIn("Sections 50 through 52 were published together as `2d739339`", header)
+        self.assertNotIn("Claude review of section 51 is deferred at the owner's direction", header)
+        self.assertNotIn("This counter-review remains local-only; no push is requested", header)
         self.assertIn("Settlement and multi-session engineering recorded in section 52", header)
-        self.assertIn('The later owner instruction "when done, push" authorizes one completed', header)
         self.assertIn("One unintended passive QC screenshot", header)
         self.assertIn("Offline input-to-intent engineering recorded in section 51", header)
-        self.assertIn("Claude review of section 51 is deferred at the owner's direction", header)
         self.assertIn("This is not the final step before QC", header)
         self.assertIn("Codex counter-review of section 49 completed in section 50", header)
         self.assertIn("Claude's `23d06504` test hardening is accepted", header)
@@ -207,7 +211,6 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         self.assertIn("The published `c6834173` review is consumed once", header)
         self.assertIn("Claude's `863a0dcd` is accepted after documentation correction", header)
         self.assertIn("Monitor remains PAUSED", header)
-        self.assertIn("This counter-review remains local-only; no push is requested", header)
         self.assertIn("0 KB / 3 MB at 2026-10-21", header)
         self.assertIn("The section-46 coverage-source epoch is accepted in section 47", header)
         self.assertIn("Initial Safari attachment incidentally displayed its existing QC tab", header)
@@ -223,6 +226,7 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         self.assertGreater(record.index("\n## 50."), record.index("\n## 49."))
         self.assertGreater(record.index("\n## 51."), record.index("\n## 50."))
         self.assertGreater(record.index("\n## 52."), record.index("\n## 51."))
+        self.assertGreater(record.index("\n## 53."), record.index("\n## 52."))
         self.assertIn("research/__init__.py`, remains unobserved", header)
         self.assertIn("paused pending platform preflight", header)
         self.assertIn("GDR-RP33 is accepted in section 34", header)

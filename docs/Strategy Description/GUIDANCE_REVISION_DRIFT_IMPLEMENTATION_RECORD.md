@@ -1,15 +1,17 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Settlement and multi-session engineering recorded in section 52,
-2026-10-28. Offline input-to-intent engineering recorded in section 51.
-Claude review of section 51 is deferred at the owner's direction;
-section 52 review is also deferred, not independently accepted.
-The new dated settlement contract and multi-session order rehearsal are offline
+Status: **Independent Claude review of sections 50 through 52 recorded in
+section 53, 2026-10-28. Codex counter-review of section 53 pending.
+Settlement and multi-session engineering recorded in section 52.
+Offline input-to-intent engineering recorded in section 51.
+Sections 51 and 52 are accepted in section 53 as offline software after correction:
+one P2 comparison-parity fix in `multi_session` and regression pins.
+The dated settlement contract and multi-session order rehearsal are offline
 software only. Real data, dated service-calendar authenticity, historical fees,
 SPY comparison parity and native execution remain unverified or blocked.
 This is not the final step before QC. One unintended passive QC screenshot
 occurred after shared Safari changed tabs; all provider UI work then stopped
-(52.2). No deliberate QC navigation, query or launch occurs in this round.
+(52.2). No deliberate QC navigation, query or launch occurs in either round.
 No actual provider rows, purchase or empirical evaluation occurs.
 Codex counter-review of section 49 completed in section 50.
 Claude's `23d06504` test hardening is accepted.
@@ -17,12 +19,10 @@ Claude's `d6036b7d` review is accepted after documentation clarification.
 The published `d6036b7d` review is consumed once.
 The section-48 input-layer epoch is accepted in section 49
 after `23d06504` pinned thirty input-layer guards; no production source changed
-in that review or this counter-review. The section-49 round was published as
+in that review or the section-50 counter-review. The section-49 round was published as
 `d6036b7d`, including `ddaa5e54` and `23d06504`; it is not a pending push.
-This counter-review remains local-only; no push is requested.
-The later owner instruction "when done, push" authorizes one completed
-section-52 audit/build-round publication, including accumulated local notes;
-it does not certify backtest readiness or authorize QC. No intermediate push.
+Sections 50 through 52 were published together as `2d739339`; the owner's
+"when done, push" covered that one section-52 round, not backtest readiness or QC.
 Codex counter-review of section 47 skipped at the owner's direction (48.1);
 that waiver is not counter-review acceptance.
 Claude's `c6834173` is accepted after documentation correction (section 44).
@@ -63,7 +63,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 52. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 53. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -7366,3 +7366,142 @@ draft `b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c` retain
 their distinct custody. No carrier is regenerated/rebound or native attempt/look
 created. Monitor remains PAUSED; no automatic review/recovery rearm follows
 the one owner-requested end-of-round publication.
+
+## 53. Independent Claude review of `d6036b7d..2d739339`, 2026-10-28
+
+### 53.1 Scope and method
+
+Reviewed range: the three Codex commits after the section-49 push, all
+published together as `2d739339`:
+- `6b19e342`, the section-50 counter-review of section 49;
+- `be0637e2`, section 51: offline raw guidance to provisional intent
+  (`guidance_decoder`, `research_reference`, `order_planning`, `pre_qc`);
+- `2d739339`, section 52: dated settlement and multi-session execution
+  (`execution_contract`, `multi_session`, the dated coverage snapshot, the
+  `gdr.pre-qc-handoff.v2` handoff and the planner's receivable-date change).
+
+Sections 51 and 52 were built while the owner deferred Claude review (51.1,
+52.1); this section is that deferred review. The owner's instruction for this
+round was to watch for Codex's push, review every unreviewed commit and push
+once when done. At the start the worktree was clean and local, remote and the
+push all matched `2d739339`.
+
+Following the owner's standing preference, validation is focused rather than
+the full lane selection or the repository suite. Section 50 records that
+focused-only validation is not a standing waiver; the owner's preference
+stands until the owner changes it. This round covers:
+- the six new modules' tests, the coverage and input tests and the new pins;
+- the bundle, release and preparation-CLI consumers;
+- the lane gate and the shared active-document check;
+- 318 in-memory mutation trials over the six new modules, plus one revert check.
+
+Every run used the designated worktree, network-denied, with HEAD unchanged
+across it. No QC page, provider account, browser session or real data was
+contacted. Every exercised row is invented.
+
+### 53.2 Disposition of sections 50 through 52
+
+| Item | Claude disposition |
+|---|---|
+| 50 counter-review of section 49 | Accepted. GDR-CCR50-001 is right: the GDR-CR49-004 consequences describe what a guard-removing mutant would allow, not observed production behavior, and later findings are worded that way. GDR-CCR50-002 (stale publication header) is accepted. |
+| 51.1, 52.1 owner directions | Recorded by Codex as direct human messages; not reconfirmed (GDR-CCR42-002). Deferring review left debt, which this section settles; it did not accept anything. |
+| 51.2 `guidance_decoder` | Accepted after correction. Hash-first parsing, exact provider lexemes, one ambiguous-clock-safe publication instant and retained nonbaseline priors are sound. GDR-CR53-006 pins two refusals that only a later generic failure reached. |
+| 51.2 `research_reference` | Accepted after correction. Supplied sessions, as-of reference and bar slicing, ADV20 and the stock thresholds match the draft. GDR-CR53-004 pins sixteen guards no case isolated. |
+| 51.2 `order_planning` | Accepted after correction. The cutoff cohort, decision-time invalidation, D+3 to D+5 window, one-attempt rule, exact rational ranking and the notional-versus-fee split are sound, and its caps match the draft. GDR-CR53-001 pins twenty-three guards no case isolated. |
+| 51.2 `pre_qc` handoff | Accepted. The retained-hash check precedes reconstruction, and the CLI separates stdout from the publication path. |
+| 51.3 GDR-AQA51-001..005 | Accepted as author QA. |
+| 52.2 account observations and the QC display | Accepted as disclosed. This is the second incidental QC display (after 46.2), both from attaching to the shared Safari; no QC content is used. It is an environment and process matter, not lane code. The displayed Massive, EODHD and FMP access ends between November 6 and 14, 2026, so any existing-access evidence for 52.3 must be gathered before then. |
+| 52.3 coverage and rights | Accepted as documented capability and gap analysis, not entitlement. |
+| 52.4 `execution_contract` | Accepted after correction. The T+3, T+2 and T+1 eras (September 5, 2017 and May 28, 2024), the May 29, 2024 double settlement and settlement on supplied service dates are right; the costs reuse the accepted fee function. GDR-CR53-005 pins ten guards no case isolated. The terminal-SPY rule remains a proposal, not owner-frozen economics. |
+| 52.5 `multi_session` | Accepted after correction. GDR-CR53-002 is a P2 comparison-parity defect, fixed here. GDR-CR53-003 pins ninety-three engine guards no case isolated, and GDR-CR53-008 documents nine reachable edges. |
+| 52.6 GDR-AQA52-001..015 | Accepted as author QA. The open question about the accepted SYN runtime is answered by GDR-CR53-007. |
+| 52.6 identities | Reproduced at `2d739339`: full source `725001db...` (59 members), review bundle `9a2af5b9...` (896,766 bytes, 61 members), handoff `6187171b...` (83,641 bytes), contract `219706fd...`, both replays and both plans, and both coverage snapshots. The GDR-CR53-002 fix changes the source identity (53.5). |
+| 52.7 remaining gates | Accepted. Nothing here establishes data, rights, PIT, native execution or empirical readiness. |
+
+### 53.3 Commit disposition
+
+| Commit | Scope | Disposition | Notes |
+|---|---|---|---|
+| `6b19e342` | Section-50 counter-review | Accepted | Record and pin rotation only |
+| `be0637e2` | Section 51 | Accepted after correction | GDR-CR53-001, -004, -006 test pins |
+| `2d739339` | Section 52 | Accepted after correction | GDR-CR53-002 production fix; GDR-CR53-003, -005 test pins |
+
+### 53.4 Findings ledger
+
+| ID | Priority / status | Location | Finding, disposition and verification |
+|---|---|---|---|
+| GDR-CR53-001 | P3 / corrected | `order_planning.AccountSnapshot`, `_capacity`, `_affordable`, `plan_session`; `test_order_planning.py` | Twenty-three guards were never isolated (OP1, OP2, OP4-OP7, OP9, OP17, OP18, OP20, OP21, OP23, OP27, OP29, OP33, OP37, OP38, OP40, OP42, OP44, OP45, OP48 and OP49 survived). Without them, the planner would: size entries from an account asserted at another instant or with a mark older than 60 seconds; admit an entry before the third session after announcement; let a publication exactly at the cutoff join the cohort; let a later session enter when an earlier opportunity's evidence was missing; give one issuer two intents in one session; and pass a wide stock spread. It would also overshoot cash-limited sizing by the minimum or per-share fee, raising instead of sizing down, stop accumulating gross room across ranked intents, and invert the EPS tie-break. Added thirteen methods, from `test_account_assertion_rules_each_refuse_alone` to `test_one_issuer_receives_at_most_one_intent_per_session`. |
+| GDR-CR53-002 | P2 / corrected | `multi_session.MultiSessionReplay.snapshot`; `test_multi_session.py` | A verified cash terminal entitlement can schedule the SPY unwind after the last replay session. The comparator then keeps its tranche with no order, and nothing recorded it. At a clean SPY price, `comparison_parity_blocked` was `False` with zero blockers while 49 SPY shares stood against a flat strategy; only `complete_software_replay` was `False`. That contradicts 52.6 (GDR-AQA52-010): unmatched benchmark exposure at the study boundary blocks parity. Fix: at the boundary, any tranche still held after its source position is gone records `unmatched_comparator_exposure_at_replay_boundary`. `test_unmatched_spy_exposure_at_the_replay_boundary_blocks_parity` fails without the fix (FIX002 caught). The 23-session handoff replays end flat, so their blocker sets are unchanged. |
+| GDR-CR53-003 | P3 / corrected | `multi_session`; `test_multi_session.py` | Ninety-three of the 133 engine survivors were guards no case isolated; 53.5 lists them by area. Without them, for example: a reference published after the cutoff would govern a held exit; a split would trigger a false position stop and leave due exits unscaled; a SPY dividend would credit the strategy; the program drawdown would ignore the high-water NAV; a known cancellation would not stop a later fill; and slow SPY execution would let the comparator sell ahead of the strategy's executed exit fraction. Added 27 methods in `ReviewPinTests`. |
+| GDR-CR53-004 | P3 / corrected | `research_reference`; `test_research_reference.py` | Sixteen guards were never isolated (RR3, RR6, RR9-RR13, RR16, RR17, RR19, RR21, RR23, RR25, RR26, RR28 and RR29 survived). These cover the stock listing, exchange, primary-share, sector, 60-session, publication-before-close, positive-close, volume, ambiguity and $20M ADV rules; the 09:30 open and 13:00 or 16:00 close; and a listing after its validity. Without the first-session refusal, the cutoff of the first supplied session would wrap to the last supplied session, a future instant. Without the 20-session bound, eligibility at index 19 would crash; without the protected-date bound, an entry window could reach 2026-09-01. Added `test_stock_eligibility_rules_each_refuse_alone` and `test_calendar_shape_first_cutoff_and_protected_window_refuse`. |
+| GDR-CR53-005 | P3 / corrected | `execution_contract`; `test_execution_contract.py` | Ten guards were never isolated (EC5, EC7, EC8, EC10, EC11, EC14, EC16, EC18, EC19 and EC20 survived). Without them: a trade dated before the service-date inventory would settle on an earlier inventory date; a service date that is not a market session could be a trade date; duplicate service dates, mismatched coverage or a malformed source hash would pass. Further, a terminal unwind could be scheduled on 2026-09-01, an entitlement before 2013 or an aware non-UTC instant would be accepted, and an out-of-range fee quantity would fail with the wrong error. Added `test_settlement_trade_date_and_inventory_rules_each_refuse_alone` and `test_terminal_clock_and_fee_inputs_refuse_outside_their_scope`. |
+| GDR-CR53-006 | P3 / corrected | `guidance_decoder`; `test_guidance_decoder.py` | An unsupported announcement zone and a half-supplied `previous_*` range were refused only by a later, generic failure (GD14, GD17 survived). Added `test_unsupported_zone_and_half_previous_range_refuse_by_their_own_rule`. |
+| GDR-CR53-007 | P3 / documented | accepted SYN `simulation._schedule` | Answers 52.6. The accepted runtime keeps one due exit per issuer, with the earliest session and largest quantity, so the GDR-AQA52-003 premature liquidation exists there statically. It is reachable only through `schedule_invalidation`: every other `_schedule` call uses the next session. No accepted fixture, scenario, recovery-preparation step or release payload issues that command (checked across the package, its tests and the accepted release archive), so the accepted carrier cannot reach it. The runtime is frozen in the native closure and is not changed. If SYN invalidations are ever exercised, investigate again first. |
+| GDR-CR53-008 | P3 / documented | `multi_session` | Nine reachable engine edges stay unpinned, because each needs a multi-event or exact-boundary construction: MSE14, the entry account omitting an outstanding sale receivable (a conservative NAV); MSC9 and MSC11, gross-room trims, which need more than ten concurrent positions; MSY1, a terminal unwind while that tranche's SPY sell is still pending, where the mutant oversells and the tranche invariant then refuses the session; MSF5, a carried SPY sell across a dated SPY issuer change; MSF26, a sell fee above a sub-$1 exit notional; MSAA13, a cash terminal after an unresolved split (a conservative mutant); and MSC2 and MSP5, exact 85% drawdown and exact SPY-budget equality. None changes the accepted 23-session handoff. Codex may pin them in the next round. |
+
+Scripted count from this table: P0 0, P1 0, P2 1, P3 7; corrected 6, documented 2.
+
+### 53.5 Validation and mutation trials
+
+| Check | Scope | Result |
+|---|---|---|
+| Focused selection at `2d739339`: the six new test files, coverage and the four input files, bundle, release, preparation CLI, boundary and active-document | worktree, network-denied, HEAD and status unchanged | 283 passed, 449 subtests, no failures |
+| Section-52 identities | worktree, network-denied | All reproduced (53.2) |
+| 318 single-behaviour mutants over the six new modules | worktree, in memory, network-denied | 121 caught by Codex's tests; 197 survived |
+| The 197 survivors against the added pins, plus a revert of the GDR-CR53-002 fix | worktree, in memory | 144 caught, each by its intended pin; the revert fails the new regression test; 53 remain (below) |
+| Same focused selection after the corrections | worktree, network-denied, HEAD unchanged | 329 passed, 503 subtests, no failures; the 46 added methods are the difference |
+| Post-fix identities | worktree, network-denied | Full source `c4f6d7063494370f0f6d28ef3d8049f30b553ffddbbcc452d8005f97f0f89cc9` (59 members); review bundle `d5ab5b1f7ccab107c3bd01361423f63c1998c540ff8fa4b2efec16f126caa742` (897,236 bytes, 61 members); handoff `155cec3400a7fb5af594fe9ad262001f7186e586aea220e9d31ef81f16d14fc6` (83,641 bytes); base replay `a8e0c855c0178c2a264428329a74a4eb4687019ef54383c3bc47f318c5150ee5`, stress replay `7d8fac5e9ee733e50a127617d3084972a564323bf03bcc60842cd48d0a341102`. The contract `219706fd...` and both plans are unchanged. The replay and handoff hashes move only through the new producing-source hash; both blocker sets are unchanged. |
+| Full lane selection and repository suite | not run | Not run, per the owner's standing preference for focused review validation |
+| `git diff --check` | worktree | passed |
+| Closing check on this record commit | worktree, network-denied | lane gate plus shared active-document check: 76 passed |
+
+| Class | Count | Mutants |
+|---|---:|---|
+| Caught by Codex's tests | 121 | 48 engine, 20 planner, 13 reference, 12 contract, 28 decoder |
+| Survived, now caught by added pins | 144 | 93 engine (GDR-CR53-003), 23 planner (-001), 16 reference (-004), 10 contract (-005), 2 decoder (-006) |
+| Redundant by construction, unreachable or label-only, no test added | 44 | See below |
+| Reachable edges, documented | 9 | GDR-CR53-008 |
+
+The 93 newly pinned engine guards, by area:
+- **Binding:** action clocks, split cash-in-lieu, payment before the ex-date, late or zero-ratio splits, ex-open timing, service-date payment, session bounds, conflicting or out-of-window batches, a second SPY identity and the 512-session bound. Also the mode and session inventory after binding, detached repeated receipts and failed-session rollback.
+- **Invalidation:** the previous-session cutoff, the exact 18:00 boundary, pre-open knowledge, a known cancellation stopping later fills, racing shares exiting together and the outside-window label.
+- **Close:** position-cap and dated-sector trims, the inclusive 90% stop, the high-water drawdown, paired NAV values, missing comparator marks, one positive visible close, and incompleteness from unsettled cash or boundary orders.
+- **Orders:** due reduction after a fill, one enlargement of a pending exit, the exit-reason priority, per-session ADV participation, the buy limit and fee reservations.
+- **Comparator:** partial, timing and close-cancellation flags; sell-before-buy capacity; the SPY entry spread and fee-inclusive budget; own-tranche and fraction-following exits; carried-exit timing.
+- **Actions:** split scaling and open-order deferral, SPY dividends and terminals, late terminals after a fill or another action, actions between clock events, and due exits cleared by a cash terminal.
+- **Identity and controls:** as-of visibility (published after, at, or validated after the cutoff), uniqueness, listing, issuer and SPY symbol at exit, and the entry controls derived from engine state.
+
+The 44 unpinned survivors, by reason:
+- **Planner:** OP16, a budget equal to the minimum fee yields zero shares either way. OP28, a benchmark batch reusing the stock's id leaves no stock batch. OP30, the market batch already requires `SPY`. OP36, the ADV cap cannot bind: 0.1% of the $20M ADV floor is $20,000, above the $5,000 entry cap. OP43, the cutoff already refuses protected sessions. OP46, every admitted candidate's first sort key is the planning session.
+- **Reference, contract, decoder:** RR30 changes only a reason label. EC22: `from_dict` refuses the same hash with the same error type. GD4: an unknown kind fails both kind checks. GD13: a nonexistent clock yields two instants. GD27-GD29: the document already ties a point to equal bounds.
+- **Engine, unreachable or redundant (24):** MSAD3, events are sorted and later steps filter earlier instants. MSAA1, each action applies at one instant. MSE1, no replay fixture starts at the first supplied session, and the mutant would refuse at the cutoff. MSE7 equals the planner's earlier-eligible refusal. MSE9, the book starts flat and buys fill after 10:00. MSE15, every buy is cancelled at 10:05. MSF1, the market input refuses a same-callback minute. MSF14, sales are capped by the holding. MSF17, the next clock event reruns the invalidation (MSST10 is caught). MSF25, SPY sells are capped by the tranche less pending. MSM5, a bar validated by 18:00 is published by then. MSN4, terminal exits are skipped at submission. MSN6, the cutoff bound implies the 10:00 bound. MSO1, planner and SPY sizing already bound cash. MSP3 and MSP6, the 50% gross cap keeps comparator cash sufficient. MSSE1 and MSSE4, SPY buys are cancelled at the 18:00 close before any later exit. MSSN2 and MSSN6, every reachable unresolved state or active order keeps exposure. MSST5, the reservation checks keep the invariant. MSX4, entries and the close refresh identity and executions read the reference. MSX5, no buy is active at the next 10:00. MSX10, due entries leave with the position.
+- **Engine, blocked downstream or label-only (7):** MSAD2 credits cash before 09:30, but no order exists before 10:00 and NAV counts cash and receivables alike. MSE8, MSX2, MSP2 and MSP8: `_fill_orders` blocks terminal or unresolved securities, so the mutant only adds an unfillable order, and parity is already blocked. MSL1, zero ADV gives an unfillable exit instead of a refusal. MSY2, a zero-share SPY exit adds only a misleading refusal row.
+
+### 53.6 Commits and next action
+
+The status block names this section. In `test_boundaries.py`, the pins are
+rotated to "Codex counter-review of section 53 pending", the section-53
+acceptance and the `2d739339` publication. The stale section-51 deferral and
+section-50 local-only phrases are now guarded as absent, and a section-53
+ordering guard is added.
+
+| Commit | Scope |
+|---|---|
+| `422e3cc2` | GDR-CR53-002 fix and the GDR-CR53-001 and -003 to -006 pins |
+| This record commit | Section 53, status block, `test_boundaries.py` pin rotation |
+
+This round gets one push, guarded on the remote head still being `2d739339`;
+never force. It publishes both commits.
+
+Next, Codex counter-reviews section 53. QC stays untouched while the owner's
+instruction holds, and the Mia-led recovery stays paused. Real-data work
+still needs the concrete evidence in 52.3: a licensed, versioned guidance
+source with its removal, confirmation and time semantics; stock and SPY
+historical NBBO with six usable common years; and the processing rights. The
+displayed existing access ends between November 6 and 14, 2026.
+
+Acceptance here is a software review only. It establishes neither native
+execution nor empirical readiness. The proposed terminal-SPY rule and all
+eleven original decisions stay open.
+`docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` were not edited
+and stay frozen for both agents.

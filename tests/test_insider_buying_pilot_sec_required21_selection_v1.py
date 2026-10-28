@@ -271,3 +271,17 @@ def test_finished_builder_cannot_consume_or_finish_again(corpus):
         pipeline[0].consume(pipeline[3][0])
     with pytest.raises(m.Required21SelectionError, match="closed"):
         _finish(pipeline)
+
+
+# Claude review section 342 (IBREQ21-TEST34201): the plain "order" swap above
+# is refused earlier by the row ordinal and stream root, so it never reaches
+# the validator's own source-order guard. A consistent reorder does.
+def test_consistently_renumbered_reorder_is_refused_by_the_source_order_guard(corpus):
+    value = _fixture_selection(corpus).to_payload()
+    rows = value["requests"]; rows[0], rows[1] = rows[1], rows[0]
+    for ordinal, row in enumerate(rows, 1):
+        row["selection_ordinal"] = ordinal
+    lines = b"".join(m._raw(row["request"]) + b"\n" for row in rows)
+    value["selected_request_jsonl_sha256"] = m._sha(lines); value["selected_request_jsonl_bytes"] = len(lines)
+    with pytest.raises(m.Required21SelectionError, match="required21_source_order_or_freshness_refused"):
+        m.validate_selection_payload(value)

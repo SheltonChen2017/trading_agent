@@ -406,8 +406,11 @@ def _result_valid(value, row, ordinal, claim_sha256, start_sha256):
         and first.custody._stamp(lambda:value["finished_utc"]) == value["finished_utc"], "inputs_changed")
     status, checked, code = value["http_status"], value["inspection"], value["code"]
     if status is None:
+        # Section 342 (Claude review): a framing refusal raised before the status
+        # is observed (e.g. outside 100..599) is still a received response.
         _need(checked is None and value["body_object"] is None
-            and code in {"transport_ambiguous", "transport_deadline", "cleanup_refused"}, "inputs_changed")
+            and code in {"transport_ambiguous", "transport_deadline", "cleanup_refused", "HTTP_framing_refused"}
+            and (code != "HTTP_framing_refused" or value["transport_invocations"] == 1), "inputs_changed")
     else:
         _need(type(status) is int and 100 <= status <= 599 and value["transport_invocations"] == 1, "inputs_changed")
         if status != 200:
@@ -424,6 +427,13 @@ def _result_valid(value, row, ordinal, claim_sha256, start_sha256):
             else:
                 _inspection_valid(checked, b"", ()); _need(value["body_object"] is None, "inputs_changed")
     return value
+
+
+def _consumption_base_bound(plan, registered):
+    """Section 342 (Claude review): bind the plan's consumption base to the
+    registered index rather than to the plan's own consumed list."""
+    _need(plan["consumption_sha256"] == registered["known_consumed_index_sha256"]
+        and len(plan["consumed_accessions"]) == registered["known_consumed_count"], "inputs_changed")
 
 
 def _capture(ns, plan, identity, *, fixture, contact, guard, inspect, transport, authorization=None,
@@ -608,6 +618,7 @@ def _readback(root, complete_sha256, *, fixture):
         if not fixture:
             source.publication._source_identity(final["execution_identity"], required_paths=(SELF_PATH, TEST_PATH, PURE_PATH, PURE_TEST_PATH))
             _need(reservation["execution_identity"] == final["execution_identity"] and reservation["registration"] == registration(), "inputs_changed")
+            _consumption_base_bound(plan, reservation["registration"])
             started_selection = _decode(read(top, "selection-started.json")); selected = _decode(read(top, "selection-complete.json"))
             _need(started_selection == {"schema":SCHEMA+"/selection-started", "source_worker_invocations":1}
                 and selected["execution_identity"] == final["execution_identity"] and selected["selection"] == plan

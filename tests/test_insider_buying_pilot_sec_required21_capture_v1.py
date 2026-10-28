@@ -400,3 +400,28 @@ def test_readback_refuses_a_coherently_truncated_capture_without_a_final_refusal
     raw = m._raw(final); (root/"complete.json").write_bytes(raw)
     with pytest.raises(m.Required21CaptureError, match="^inputs_changed$"):
         m._readback(root, m._sha(raw), fixture=True)
+
+
+# Claude review section 342 (IBREQ21-CR34203): a response refused before its
+# status is observed (for example a status outside 100..599) keeps its record.
+def test_framing_refusal_without_an_observed_status_keeps_a_terminal_record(selected, tmp_path):
+    def transport(*args):raise m.Required21CaptureError("HTTP_framing_refused")
+    result, root, _, _ = _run(selected, tmp_path, transport=transport)
+    assert result["started"] == 1 and result["unattempted"] == 7 and result["completed_without_refusal"] is False
+    terminal = _read(root, "request-000-result.json")
+    assert terminal["http_status"] is None and terminal["code"] == "HTTP_framing_refused"
+    assert terminal["transport_invocations"] == 1 and terminal["body_object"] is None
+    assert m._readback(root, result["complete_sha256"], fixture=True)["started"] == 1
+
+
+# Claude review section 342 (IBREQ21-CR34204): the actual readback binds the
+# plan's consumption base to the registered 20,044-accession index.
+def test_actual_readback_consumption_base_must_equal_the_registered_index(selected):
+    plan = selected.to_payload(); registered = m.registration()
+    with pytest.raises(m.Required21CaptureError, match="^inputs_changed$"):
+        m._consumption_base_bound(plan, registered)
+    matching = {**plan, "consumption_sha256": registered["known_consumed_index_sha256"],
+                "consumed_accessions": [f"{n:010d}-20-000001" for n in range(registered["known_consumed_count"])]}
+    assert m._consumption_base_bound(matching, registered) is None
+    with pytest.raises(m.Required21CaptureError, match="^inputs_changed$"):
+        m._consumption_base_bound({**matching, "consumed_accessions": matching["consumed_accessions"][1:]}, registered)

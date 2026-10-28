@@ -105,7 +105,9 @@ def _public(batch_witness,body,stats,records):
         "route_batch":batch_witness,"eligible_join_disposition_counts":dict(sorted(counts.items())),
         "eligible_join_count":len(records),"route_batch_quarantined_members":batch_witness["members"]-len(records),
         "private_source17_candidate_count":counts.get("private_lexical_source17_candidate_not_admitted",0),
-        "all_input_NC_members_accounted":len(records)+(batch_witness["members"]-len(records))==batch_witness["members"],
+        # Section 342 (Claude review): derived from the route batch, not a tautology.
+        "all_input_NC_members_accounted":(len(records)==batch_witness["eligible_private_claims"]
+            and sum(batch_witness["disposition_counts"].values())==batch_witness["members"]),
         "consumption_scope":"exact caller-supplied set; no named journal attestation",
         "source_values_or_value_hashes_exported":False,"code_dependency_pins":dict(CODE_PINS),"authority":_authority()}
 

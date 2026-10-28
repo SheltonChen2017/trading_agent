@@ -69006,3 +69006,129 @@ denials. Those86 repeat earlier tests and are not additive; no H/private
 read/operation was replayed. The prior326final-handoff validation footnote was
 restored immediately above section327 after an append initially placed the
 new section before that old footnote. Historical text/evidence preserved.
+
+### 327.6 Offline ownership and W5 demand diagnostic freeze
+
+The next check uses existing rights and retained DATA only. Public code audit
+rules out simple SF1/stocks double-counting: current indexes contain only
+stocks/SEP and funds/SFP; duplicate target perma AND FIGI would already refuse
+as identity_ambiguous. No false collision or safe duplicate is established.
+H candidates omit CUSIP-only rivals, so rebuild BOTH complete retained current
+tables and their perma/FIGI/ticker/complete-token/poison physical-owner indexes.
+Retain malformed/quality-false rows too; separate exact candidate-full-row
+owners from other related owners, without granting either an exemption.
+Original full-snapshot CUSIP ownership is NOT reassessed; collision stays open.
+
+Four FixedDataGuard DATA leaves total5507602bytes, below unchanged32MiB/leaf,
+64MiB/group/8file limits. Exact paths are the new caller's literal DATA_PLAN:
+
+| Role | Bytes | SHA256 |
+|---|---|---|
+| H hierarchy-private.json |38548|b85c3d37acbe4f72192d4d42d6470654a2e727f0c6a23bed06a3539e2ec3aacd|
+| AR catalog-private.json |2224206|f55e44f85f39846f0b4946860318760eab68d10d95c79d2cf87da44ad9568cb1|
+| Z stocks-metadata.csv |2340169|354f578dd11ab0cebe1ff5b6f9ddb596b2d776f4e3161b34b8d4e1723ffe60e6|
+| Z funds-metadata.csv |904679|a85d60f8699ae4b606ee11b7a70fd48e683fd8de223f14f5b4e2599434bdefac|
+
+H embeds five original AD binding/SF1/CUSIP proofs/six candidate rows, avoiding
+AD/AA/AC rereads. NEW exclusive fsynced claim precedes DATA/genuine input.
+All four whole pins precede DATA parse and fresh genuine traversal. Frozen
+transport authenticates its five-role byte inventory; manifest/calendar/
+membership/runtime-binding semantics are traversed. Compare every6151 original
+binding with unchanged AR assignments and retain8funds. Recheck genuine
+fingerprint/record/FOUR parsed streams, separate catalog copy/public binding,
+and original DATA guards before publication. Reproduce every H pair against
+actual0/validator0/collector0 facte72ff5029df04609c1f7eb4d6fc2f2a552c4dfa0065764d2c4dc00f0601beab4.
+All guards/checks must return normally BEFORE private/public publication.
+
+W5 demand is a necessary membership envelope, not actual eligibility, orders
+or holdings. Never-potential requires empty start/no unexpected holdings.
+First required prior close AFTER2022-10-21 can exclude that earlier date;
+first decision2022-10-24 still requires2022-10-21 reference. Earlier potential
+keeps possible held NAV throughEND even if membership expires. No metadata-
+date retirement, actual old-gap case attribution, corporate-event/payoff
+proof, source assignment change, alias/collision/price admission or QC action.
+
+Exact new source/test bytes, all UNINVOKED before this freeze:
+
+| File | Bytes | SHA256 |
+|---|---|---|
+| scripts/arv2_r327_available_history_identity.py |38917|e8940f07f62015e185f159ef7469955f72945efb7da6ca800c4d491ea7b10ac1|
+| scripts/inspect_arv2_r327_available_history_identity.py |22438|70b171d141798951d4a136c92e131454a4eec58f8ee6ba7ebab8a737a919250f|
+| scripts/observe_arv2_r327_available_history_identity.py |14996|02ae6ea51f749c60a90e216a9d8b00f268efe9532593c7f0fdef7f130ad68039|
+| tests/analyst_revisions_v2/test_r327_available_history_identity.py |16538|7acbd6d9c9cf52c4041b760257fc9f67bd609c41f9765388f542b04cb6a8797f|
+| tests/analyst_revisions_v2/test_r327_available_history_identity_caller.py |16353|e9a2ad29e0606a9d16173b4eda3d69746000526cd1323faa44c73feca78218fa|
+| tests/analyst_revisions_v2/test_r327_available_history_identity_observer.py |11223|8f2e9576fd4295a6caf0638d27527dd3fb8fcea5f160c4c8d14667aa2abf800d|
+
+Caller canonical profile32276bytes
+SHA256951600b877492b9c6ea45caf410bf4338c3fadc02ca071f51cd1b4d7b2f3988e
+binds222 currently matching literal dependencies, not whole-interpreter
+integrity. Fixed observer profile3312bytes
+SHA256253ffcc5096a9914ac12e71bb6122affa659c2cd3153c375147cacf002effae6
+is a NEW explicitly bound I version of bounded orchestration, with no H
+global/module/entrypoint mutation or replay. Ordinary credential-free collector
+launches one native all-network/Keychain/security-denied producer and one
+separate native ALL-artifact-denied validator with the observed exit.
+Producer300s/external330, validator30/external35, collector400; own kill/reap
+and host-suspension/uninterruptible-I/O qualification. Complete128KiB stdout/
+8192stderr bounds, native validator0/byte equality AND actual producer0 AND
+actual collector0 mandatory. Actual2 may authenticate failure only; report-
+only/timeout/unknown/malformed/trailing/late failure remains inadmissible.
+Frozen bounded capture12105/febe87c5 unchanged. Only closed public pin/count/
+date/equality/process evidence leaves this seam (compressed64KiB/total96KiB);
+no raw rows/identifiers/credentials/exception. All original source stops remain.
+
+Pre-use corrections: I327-004(P2) public count/first-last/prior dates now bind
+exact259weekly decisions and genuine prior close; I327-005(P2) separate checked
+catalog dictionaries/public binding now have mutation checks beyond transport/
+selected streams. I327-006(P3) either unavailable parsed endpoint gives unknown
+equality, not None==None. I327-007(P2) forwarding300s/None into the frozen AE
+pure selection predicate would violate its120s limit; NEW helper passes local
+min(parent,now+120), bounded120 whenNone, never extending parent. AE/H/period
+and used files unchanged. Four direct tests invoke REAL AE.remaining; earlier
+115green did not cover that actual seam. Explicit pre-use literal bindings
+were updated prospectively, never refreshed at runtime.
+
+Initial joint69passes/13shared-fixture ERRORS4.53s: prepared fixture mocked
+_genuine but sent an empty manifest; now supplies correct empty-membership
+stream hash, production lookup unchanged. Corrected115passes4.80s; final
+I126distinctpasses4.74s after date/deadline cases, no failures/skips/warnings.
+Six files compile/single-EOF,222pins/profile match. Three fresh-process memory
+omissions caught1expected red each: catalog copy0.10s, four-stream postcheck
+0.11s, actual-exit0.09s; caller7e724d5d bytes unchanged. After deadline fix,
+forwarding300s caught1expected red0.14s at real AE.remaining, helpere8940f07
+bytes unchanged. Subsets/repeats not additive; no full suite. Advisory agents
+are same-round advice, not independent final acceptance. Final combined check
+follows before commit/access.
+
+Under standing owner-waived parser/price research recovery and current
+existing-rights direction, freeze ONE offline I invocation after technical
+checks pass. Own leaf
+artifacts/analyst_revisions_v2/newrule_available_history_identity/R327-20261027-I
+is UNINSPECTED/UNALLOCATED. Claim consumes use even without successful source;
+partial/ambiguous claim spent; no cleanup/repair/renaming/retry. Normal three
+files claim/identity-demand-private.json/report; failure may leave fourth.
+Private max16MiB/minfree64MiB; no APcorpus/ARmonths/native-QC-book/price read.
+Clean HEAD of THIS commit is --expected-head for all stages;
+observer --collector-sha25602ae6ea51f749c60a90e216a9d8b00f268efe9532593c7f0fdef7f130ad68039,
+producer/validator --caller-sha25670b171d141798951d4a136c92e131454a4eec58f8ee6ba7ebab8a737a919250f,
+--profile-sha256951600b877492b9c6ea45caf410bf4338c3fadc02ca071f51cd1b4d7b2f3988e.
+Designated Mac root/branch/Python3.13/clean Git/blob/env-i rules as327.4;
+one native public-source/Git/environment preflight before dispatch reads no
+DATA/control. Agents HOLD edits/tests/temp/operations through actual, no
+parallel session active. Record only bounded public result/process evidence
+and inert anchor. No source/PIT/master/readiness/trading/new-paid clearance.
+337/259/53/699 unchanged; exactly one final whole-round push pending.
+Before actual use root additionally corrected I327-008(P2): the caller's
+umbrella diagnosis label would discard known finite refusal detail. Exact
+diagnosis.Refused now retains ONLY whitelisted diagnosis_<code>; deadline stays
+deadline, raw/private/foreign-subclass text stays unknown. Two targeted tests
+cover this; it grants no root-cause inference from a category. Caller/observer
+source and observer profile above were rebound prospectively, before any I
+access. Earlier combined373passes11.10s predates this correction and overlaps
+the forthcoming final selection; it is not a complete-lane result.
+Final prefreeze375distinctpasses11.10s =128I+131H+30period+86document,
+no failures/skips/warnings. All222literal pins/two I profiles, six I files'
+compile/single-EOF and absent dispatch_fence passed in the same native all-
+network/artifact/Keychain-denied window. All earlier subsets/repeats overlap.
+No current test/operation session; every I DATA/control/producer/validator and
+collector remains uninvoked pending this committed clean freeze.

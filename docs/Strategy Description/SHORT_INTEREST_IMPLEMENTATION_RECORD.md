@@ -1,29 +1,22 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **OWNER-RESUMED OFFLINE CUSTODY REPAIR / LAST-PRE-QC BUILD (SECTION128).
-CLAUDE COUNTER-REVIEW ACCEPTED AFTER APPENDED FACTUAL ERRATA (SECTION127);
-BOTH126 HISTORIES PRESERVED. 84005 CUMULATIVE COUNT STARTS / UNCHANGED4GiB; THE CURRENT
+Status: **CLAUDE REVIEW OF THE 17 CODEX COMMITS 3b0e854..757e363 COMPLETE (SECTION129):
+ALL ACCEPTED; RECORD CORRECTIONS, ONE RECORD REGRESSION FILE AND ONE TEST-ONLY
+HOLD-REPORT REGRESSION (SI-CR24-006); NO PRODUCTION CODE CHANGE. ONE REGISTERED COUNT INVOCATION (EXEC13448, SECTION128.43) STARTED AT
+e756763, ENTERED PRESERVATION HOLD AND THEN VANISHED WITH NO OBSERVED EXIT:
+PRIOR COUNT RUN 13448 UNRESOLVED (SI-BUILD-20261028-052 OPEN). SOURCE DISPATCH
+BLOCKED IN CODE ON ALL THREE DURABLE-COUNT ENTRY ROUTES, WITH NO CALLER RELEASE.
+ITS NAMESPACE HOLDS NO PER-TICKET START DIRECTORY AND THE ONLY KEY/GET PATH NEEDS
+ONE, SO ITS MASSIVE GETS ARE BOUNDED TO ZERO UNLESS THE NAMESPACE WAS ALTERED
+AFTER THE RUN (SI-CR24-001); THE GATE STAYS UNTIL A FROZEN RESOLUTION POLICY
+REPLACES IT. 84005 CUMULATIVE COUNT STARTS / UNCHANGED4GiB CEILINGS; THE CURRENT
 PERMANENT FULL-PAGE RESERVATION MODEL ADMITS ONLY2036 NEW SLOTS UNTIL AN
-AUTHENTICATED DURABILITY ADAPTER EXISTS. ALL OLD CLAIMS, NEGATIVES,
-RECEIPTS AND CHARGES REMAIN SPENT/IMMUTABLE; NO OLD FILE IS ADOPTED.
-LOCAL BACKTEST READINESS FALSE. ACTUAL V3 OBSERVATION ESTABLISHED THE
-IMMUTABLE FLAG THEN OBSERVED ITS LOSS; ACTOR AND HISTORICAL CAUSE UNKNOWN.
-NEW SOURCE RECOVERY REMAINS HELD.
-ISOLATED V1 REFUSED INITIALIZATION WITHOUT CREATING ITS NAMESPACE;
-V2 CREATED/ATTACHED ITS EMPTY SYNTHETIC IMAGE BUT REFUSED ASSOCIATION BEFORE
-ANY PROBE FILE; ITS IMAGE/MOUNT ARE PRESERVED. ISOLATED V3/V4/V5 REACHED ORIGINAL
-NATIVE FLAGS0->2 WITHOUT RECORDED LOSS, THEN REFUSED THE UNCHANGED8SECOND
-CREATOR WINDOW BEFORE WRITE CHALLENGE. V6 CLOSED THE ORIGINAL186-BYTE
-SYNTHETIC CUSTODY PROOF WITH REAL EPERM CHALLENGES AND ORIGINAL POST-CLOSE
-SEAL VERIFICATION. THE MAXIMUM-BODY/RECEIPT SYNTHETIC PROOF CLOSED IN128.28;
-ACTUAL DURABLE BUDGET SETTLEMENT, PRODUCTION STORAGE, SOURCE AND
-ACTUAL-INPUT ADMISSION REMAIN UNPROVED.
-BODY/RECEIPT V1 TERMINATED EXIT2 BEFORE EITHER FILE CREATE: READ-OPEN
-HARNESS DENIAL. IMAGE/MOUNT PRESERVED; NO SOURCE DEBIT OR CUSTODY ADMISSION.
-BODY/RECEIPT V2 CLOSED ITS ACTUAL2MiB/790BYTE SYNTHETIC PAIR WITH SIX
-REAL EPERM CHALLENGES AND INDEPENDENT ORIGINAL-SEAL VERIFICATION. THIS
-DOES NOT RELEASE SOURCE CAPACITY OR ADMIT PRODUCTION COUNT TRANSPORT.
-CLAUDE REVIEW COVERS b648f60..730c59c, NOT THE LATER LOCAL3B0 DIAGNOSTIC COMMIT.
+AUTHENTICATED DURABILITY ADAPTER EXISTS. THE LAST AUTHENTICATED BASELINE
+13992START/23452681 CHARGED BYTES IS A PRIOR BASELINE, NOT A VERIFIED CURRENT
+BALANCE. ALL OLD CLAIMS, NEGATIVES, RECEIPTS AND CHARGES REMAIN SPENT/IMMUTABLE;
+NO OLD FILE IS ADOPTED. SYNTHETIC CUSTODY PROOF V6, BODY/RECEIPT PROOF V2 AND
+READ-ONLY GUARD TIMINGV2 CLOSED; NONE ADMITS SOURCE, PRODUCTION STORAGE OR ACTUAL
+INPUT. LOCAL BACKTEST READINESS FALSE; NOT PRE-QC READY.
 LATEST OWNER REPORTS QC/SAFARI OCCUPIED: QUANTCONNECT PAUSED BY OWNER
 INCLUDING CAPACITY/METADATA; NO SAFARI, MIA, QC SETUP, UPLOAD, COMPILE OR JOB.
 TWO HISTORICAL QC METADATA REQUESTS REMAIN ACCOUNTED FOR.
@@ -262,6 +255,8 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-26 | Claude review (Windows session) | `b648f60` -> `730c59c` reviewed from the published head after a fast-forward from `cc1e44f`; **test-only correction at `e92e8ab`**; this record commit follows, so the round has two Claude commits | Independent review of sections 124-125: bounded count recovery and secret-safe diagnostics, retained monthly source-only normalization, NONCLAIM custody diagnostics, creator-only and kernel-immutable metadata primitives, the spent-epoch ledger and the prospective recovery budget | Reviewed all fourteen commits individually. Read every new production module and all twelve new or changed scripts in full. Recomputed the 84,005 cumulative-START ceiling, the 133 chunks (132 x 512 + 301), the 317-slot final chunk, the 4,271,514,615 remaining bytes and the one-START shortfall; checked the ledger's position accounting (13,990 retained, 13,991 started, one repeated START) against the parent/child receipts. Six file-based guard removals: four red, two redundant by construction. Secrets, data-file and ignore-rule sweep clean. The first complete Windows collection since 2026-10-12 found ten uncollectable test modules and one module broken on every host; both corrected in tests only. | 131-file lane on `e92e8ab` stopped by owner direction before completion: 4,477 of 4,870 tests executed (91.9%) in 11,212 s: 3,855 passed, 395 skipped, 217 failed, 10 errors; 393 tests in eleven files not executed; no complete lane figure exists for this tree; every executed failure is outside the reviewed range and classified under `SI-CR18-005`; collection **4,870 tests, 0 errors** (from 11 errors); the thirteen touched files **25 passed, 60 skipped**; the registry test **11 passed** (from a collection error); mutations MA **1 failed**, MB survivor, MC **1 failed**, MD **2 failed**, ME **1 failed**, MF survivor; compileall exit 0; `git diff --check` clean; active-document **69 passed** before and **69 passed in 4.09s** after this record. No protected artifact, credential, provider, mailbox or macOS invocation was reproduced; none exists on this host. **Canonical actual looks 0/0, exploratory 0, alpha 0, QC attempts 0.** | No P0/P1. `SI-CR18-001` (P2, closed by test-only correction; production lazy-import advisory for Codex), `SI-CR18-002` (P2, closed by test-only correction; the registry test was uncollectable on all hosts since `71c2e7a`), `SI-CR18-003` (P3, two redundant guards), `SI-CR18-004` (P3, the permanent full-page reservation admits at most 2,036 of the 70,013 allowed STARTs under the byte cap, consistent with 125.6 but unquantified there), `SI-CR18-005` (P2, open owner decision: the complete Windows lane is red outside the reviewed range for classified platform, physical-root-pin, path-rendering and host-limit reasons, none a logic defect), `SI-CR18-006` (P3 advisory: two production call sites raise `AttributeError` before the fixed platform refusal). Custody gate `SI-BUILD-20261025-015`, source P2s, `SI-CR15-001`, `SI-CR19-003`, `SI-CR-WIN-20261012-001/-002` and shared `SI-CR5-005` unchanged. | Codex counter-reviews `e92e8ab` and this record commit; the owner decides the custody remedy and Windows parity; every source, outcome, QC-run, purchase and trading gate remains closed. Push once at the end of this round per the standing rule. |
 
 | 2026-10-27 | Codex synchronization + counter-review (2026-10-26 Pacific session) | Local3b0e854472a0db5592e4e350695da5798c9ccbfa plus exact Claude e92e8ab7876e17c039950be26a033309b6ac727f and20c49ac0fad5eddba251478406dd7af5a04093f0; ordinary merge preserves both parents | Section127: accept test-only corrections; qualify cache-guard attribution, host conclusions and latest owner resource pause | Both concurrent126 blocks preserved byte-exactly; three unfinished drafts retained privately, not admitted; actual local V3 negative supplemented, no custody repair claimed | Main571focused/65.12s and29post-record/.46s; causal in-memory guard removal3expected failures/.07s, restored process; final validation below. No full suite, Windows execution, provider, source replay or QC | SI-CCR-20261026-001..003 appended; prior custody/source/platform gates remain open; all START/byte debits and84005/4GiB caps unchanged | ONE final matching-lane nonforce push for this bounded counter-review; then offline custody work only, stopping before QC setup while resources remain occupied |
+| 2026-10-28 | Codex owner-directed blocked-snapshot publication (row added by Claude review, `SI-CR24-005`) | Starting matching origin `d6af672b3c8198712228bbd7b5eef35777283b1a`; fourteen local commits `c715a6c1fa74b7c06c3ce7fe081a116238093bbd` .. `162125d69f091cea1be4bcde601d3d25048bae9e` plus the record-only `757e3634511d2160f24ef2b274f101f0952c4f84`, published in one non-force push at 07:28 UTC | Sections 128.1-128.46: isolated and maximum-body synthetic custody proofs, durable count chain, ONE registered count invocation (exec13448) and its unconditional dispatch block | Owner's "push for now" supersedes 128.45's wait-for-pre-QC boundary for this snapshot only. exec13448 entered preservation hold and vanished with no observed exit; `SI-BUILD-20261028-050/051` corrected prospectively, `-052` open, and every durable-count entry route refuses. | Codex attributes Main's 907 focused tests / 62.97 s (128.45) and 95 post-record checks; no complete lane suite, QC or outcome look. | `SI-BUILD-20261028-052` (P2, open). No ledger row was written for this push; Claude added this one. | Claude reviews the pushed snapshot (section 129). No source dispatch until a frozen resolution policy replaces the gate. QC stays paused. |
+| 2026-10-28 | Claude review (macOS session) | `730c59c` -> `757e363` reviewed from the published head after the push watcher fired; the 17 Codex commits get dispositions, while the two Windows Claude commits stay with Codex's 127.2 counter-review; **record corrections, one record regression file and one test-only hold-report regression**; this round's commit is the only Claude commit | Independent review of Codex126, merge 127 and section 128 (custody proofs, durable count chain, exec13448 and its dispatch block) | All 17 Codex commits accepted. The 13448 namespace was checked read-only by stat and the mount table: no per-ticket START, received or response directory, and the claim matches 128.43. A code-order trace at `e756763` shows the Massive key read and GET need a START control in such a directory. The five 128.41 registration hashes match `e756763`'s constants. Eight in-memory mutants of the `06cdd11` gate and hold changes: seven caught by existing tests; one (hold report claiming complete retention) survived until the new regression. | Pushed tree `757e363`, network-denied, empty environment: 48 affected files **2338 passed** (no skips or warnings). After the corrections: 10 files **361 passed**. Mutation baseline 175 passed; of 8 mutants, 7 were caught by existing tests and 1 by the new regression. `git diff --check` clean. **No complete lane suite, by owner direction.** **Authorized looks 0, consumed looks 0**. | `SI-CR24-001` (P3, open: zero-dispatch evidence for 052). `SI-CR24-002` (P2, open: a RAM-only hold does not survive its launching session). `SI-CR24-003` (P3, closed by note: SI-CR18-001 reused). `SI-CR24-004` (P3, closed: stale status). `SI-CR24-005` (P3, closed: missing ledger row). `SI-CR24-006` (P3, closed by test: completeness flag untested). `SI-CR23-001` closed in software by 128.41. `SI-BUILD-20261028-052` open. | Codex counter-reviews section 129. Before replacing the 052 gate, freeze a resolution policy for exec13448 and answer `SI-CR24-002`. QC stays paused until the owner releases it. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -26473,3 +26468,120 @@ consistency, whitespace, root/branch/HEAD/status and actual matching origin
 before commit/publication, then verify clean local/tracking/actual-remote
 equality. Publication is for review/continuity and does not resolve052 or
 certify source completeness, remaining spend or pre-QC readiness.
+
+## 129. Claude independent review — 2026-10-28 UTC (macOS session: Codex126, merge127, section128 custody proofs, durable count chain and the unresolved registered run)
+
+### 129.1 Exact reviewed snapshot
+
+| Item | Value |
+| --- | --- |
+| Published head reviewed | `757e3634511d2160f24ef2b274f101f0952c4f84`, pushed 2026-10-28 07:28 UTC (00:28 Pacific). After `git fetch`, local, tracking and actual origin were all equal to it, and the worktree was clean. |
+| Range | `730c59c..757e363`, 20 commits. The 17 Codex commits get dispositions here. `e92e8ab` and `20c49ac` are the Windows Claude session's own commits; Codex counter-reviewed them in 127.2, and I do not re-review them. |
+| Previous Claude coverage | Claude126 (Windows session) covered `b648f60..730c59c`. |
+| Owner authorities quoted by the range | `SI-AUTH-20261025-05` (Codex126.1); "sync the lane, and counter review claude's changes" (127.1); `SI-AUTH-20261026-02` (128.1); "when you are at the last step before qc backtesting, push once" (128.45); "push for now" (128.46). I cannot see Codex's owner conversation. I checked these quotes only for internal consistency, and each later quote narrows or supersedes the earlier one as the record says. 128.41 also cites a "latest explicit84005/4GiB direction" but quotes no new text; the only quoted source of those ceilings is `SI-AUTH-20261026-02`. |
+| Operations in the range | Offline synthetic custody proofs: the V3 transition (exec1227), isolated V1-V6 and body/receipt V1-V2. Two read-only guard-timing runs. ONE registered count invocation (exec13448, 128.43). No QuantConnect, Safari, purchase, outcome look or backtest is recorded. |
+
+### 129.2 Commit dispositions
+
+| Commit | Record sections | Disposition |
+| --- | --- | --- |
+| `3b0e854` | Codex126 | **Accepted.** Observation-only diagnostic around the original native setter. Its actual result (exec1227: flags 64 -> 66 -> 64 on the same inode; first refusal `immutable_flags_changed`) is in 127.3. Both diagnostic test files pass here. |
+| `d6af672` (merge) | Claude126 and 127 | **Accepted.** Both section-126 blocks are preserved and digest-pinned by `test_short_interest_claude_review_20261026_record.py`, which passes here. The 127.2 errata on Claude126 (`SI-CCR-20261026-001..003`) are fair. One ID collision went unnoticed: `SI-CR24-003`. |
+| `c715a6c` | 128.1-128.4 | **Accepted.** Registers the isolated-volume custody proof; the evidence predicates are unchanged. |
+| `9b3668a` | 128.5-128.7 | **Accepted.** Corrects audit-hook reentrancy after the V1 initialization refusal; V1 is not restarted. |
+| `71b9261` | 128.8-128.10 | **Accepted.** Binds APFS origins after the V2 association refusal. The V2 image is preserved and still attached. |
+| `ed23c84` | 128.11-128.13 | **Accepted.** Removes observer overhead without relaxing a predicate or the 8-second creator window. |
+| `f27c8c3` | 128.14-128.16 | **Accepted.** Revalidates the full current policy through the original typed witnesses. |
+| `a94d1b4` | 128.17-128.21 | **Accepted.** Adds the scoped monitoring backend. V6 closed the 186-byte synthetic proof with real EPERM challenges. |
+| `20a2153` | 128.22-128.24 | **Accepted.** Registers the maximum-body/receipt custody proof without source authority. |
+| `ff9d1cc` | 128.25-128.27 | **Accepted.** Admits only the verified directory-stream read after body/receipt V1 refused. V2 closed (128.28). |
+| `ac1b0a7` | 128.28-128.31 | **Accepted.** Builds the source-only durable count chain and freezes the read-only timing gate. |
+| `6d4d0e3` | 128.32-128.36 | **Accepted.** Seals negative-manifest accounting and finite closure contributions after timing V1 refused; timing V2 closed exit0 (128.37). |
+| `f07f230` | 128.37-128.39 | **Accepted.** Adds durable checkpoint roots and a strict offline requalifier, which stays PENDING. |
+| `e756763` | 128.40-128.42 | **Accepted.** This is the code exec13448 ran. The five registration hashes in 128.41 match its constants. The arithmetic holds: 13992 + 67885 + 133 x 16 = 84005, and 132 x 512 + 301 = 67885. Open design advisory: `SI-CR24-002`. |
+| `06cdd11` | 128.44 (code) | **Accepted with one test-only correction.** `SI-BUILD-20261028-050/051` are corrected for future runs. The 052 gate refuses on the CLI, `run_registered` and the source-lease routes. Of eight in-memory mutants (129.5), seven are caught by existing tests. One survived and is closed by a new regression (`SI-CR24-006`). |
+| `162125d` | 128.43-128.45 | **Accepted with record corrections.** Every disk fact I could check matches (129.3). However, the status paragraph was not advanced (`SI-CR24-004`) and the zero-dispatch evidence was not recorded (`SI-CR24-001`). |
+| `757e363` | 128.46 | **Accepted.** It quotes the owner's "push for now", scoped to publication only. Its push has no section-5 ledger row (`SI-CR24-005`). |
+
+These dispositions do not rest on reading all 40,700 added lines one by one. For the thirteen custody and count software commits `c715a6c..f07f230` and `e756763`, they rest on five things: each commit's record sections, the passing affected selection, the registration-hash and arithmetic cross-checks, the dispatch-order trace below, and the `06cdd11` mutants.
+
+### 129.3 Independent check of the unresolved run (exec13448)
+
+I used only `stat`, `find -maxdepth 1` and the mount table. I opened no file for reading or writing, mounted or detached nothing, and signalled no process:
+
+- Exactly one count-response namespace exists (`count-response-20261027-v1-2aa15b2f...-chunk001`), and its image is still attached at its `mount`.
+- `mount/capture/starts`, `received` and `responses` are each empty APFS directories (nlink 2, size 64). `mount/claim` holds one regular file of 534 bytes, mode 0600, one link, flags 2. This matches 128.43.
+- No process has a command line naming `capture_short_interest_durable_counts`.
+
+I traced the code order at `e756763` (the code that ran); `757e363` is unchanged in this respect:
+
+1. `operation.dispatch` has exactly one call site, in `_publish_attempt`. It follows `controls.prepare_owned_count_start` inside `_prepared_owned(slot, "start")`.
+2. That START control's directory is the per-ticket `capture/starts/NNNNNN`. Main creates it in `_prepare_attempt_slot` before any worker runs.
+3. `read_named_keychain("massive")` and `_bounded_get` occur only inside `dispatch`, and only after `controls.start_binding(start)` succeeds.
+4. None of the six modules on that path contains `rmdir`, `unlink`, `os.remove`, `rmtree` or `shutil.move`. They are `capture_short_interest_durable_counts` and the `short_interest_count_` durable_transport, control_custody, negative_custody, response_custody and checkpoint modules.
+
+**`SI-CR24-001` (P3, open; documentation only, evidence for 052).** exec13448 never created a per-ticket START directory, so it could not have read the Massive key or sent a count GET. That conclusion assumes nobody altered the namespace after the run. The caveat is real, because this lane's own V3 observation showed protection flags changing with no identified actor. Under that caveat, the run added zero provider STARTs, zero HTTP and zero charged bytes, and it held no provider response whose private bytes could have been lost with the process. Three things remain unknown, as 128.43 says: the first error, the RAM-only reservation journal, and the time and cause of the disappearance. I did not change the gate. Replacing it is a spending decision, and it needs its own frozen resolution policy. One example would be a read-only verifier pinned to this namespace's device, inode and directory stamps. Codex or the owner registers that; a reviewer does not.
+
+**`SI-CR24-002` (P2, open design advisory, lane-specific).** `_retain_failed_process` keeps RAM-only state alive by sleeping forever in the original process, but exec13448 shows that the process can disappear anyway. The likeliest cause is the end of the agent session that launched it, though the record rightly leaves the cause unknown. A hold whose state lives only in RAM protects nothing once its parent harness reaps it. 051's stdout projection is lost the same way if nothing captures stdout. Before the 052 gate is replaced, the next finite policy should make one of two options explicit and tested:
+
+- (a) launch under a supervisor whose lifetime does not depend on the agent session, with stdout captured to a protected file; or
+- (b) persist the hold diagnostics and the pure-journal aggregate durably before entering the hold.
+
+I made no code change, because dispatch is unconditionally blocked.
+
+### 129.4 Record and test findings, with corrections
+
+**`SI-CR24-003` (P3, closed by this note).** Finding ID `SI-CR18-001` has two meanings:
+
+- **section-89 SI-CR18-001** (Claude, 2026-10-06) is the restored header no-force sentence.
+- **Claude126 SI-CR18-001** (Windows session, 2026-10-26) is the Windows-collection import-guard finding. 127.2 cites this second meaning.
+
+Neither historical use is rewritten. From here on, cite them with those qualifiers. New Claude IDs use the unused prefix `SI-CR24`.
+
+**`SI-CR24-004` (P3, closed by correction).** After 128.43-128.46, the status paragraph still described the state before the invocation. It did not mention exec13448, its unresolved accounting, 052 or the code-level dispatch block, so a reader of the lane's handoff would not learn that a real registered invocation had run. The new status paragraph corrects this.
+
+The new regression `tests/test_short_interest_claude_review_20261028_record.py` calls the real `require_dispatch_allowed()`. While it refuses with `count_source_prior_run_unresolved`, the test requires the status to contain "PRIOR COUNT RUN 13448 UNRESOLVED" and "SOURCE DISPATCH BLOCKED". Once a resolution policy replaces the refusal, the test asks nothing more of the status, so it does not tie the status to a past round (`SI-CR23-002`).
+
+**`SI-CR24-005` (P3, closed by correction).** The 2026-10-28 07:28 UTC push of `757e363` had no section-5 ledger row, although the two preceding Codex publications (the 2026-10-25 handoff row and the 2026-10-27 synchronization row) each have one. I added a row attributed to Codex's 128.46 publication and marked it as written by this review. The regression requires a ledger row naming `757e3634511d2160f24ef2b274f101f0952c4f84`.
+
+**`SI-CR24-006` (P3, closed by test-only correction).** `_retention_summary` reports `known_private_observations_are_complete: False`. That field is the hold report's only statement that an operator must not infer complete retention of unexported RAM state. No test asserted it: flipping it to `True` in memory left all 175 tests in the three `06cdd11` files passing. The new `test_retention_announcement_never_claims_complete_private_retention` in `tests/test_short_interest_durable_count_capture.py` parses the one announced line and requires `requires_process_hold` to be true, the completeness flag to be false and all four `*_from_hold` counters to be 0. It passes on the real code and fails on the mutant.
+
+**`SI-CR23-001` (my P3 from 2026-10-25, closed in software).** 128.41 freezes the missing rule. A retry is allowed only after a status-less retryable transport failure. Before retrying, the outer driver requires `retryable is True` and a status of `None`, and the transport requires at least 2 s of backoff before the second try and 10 s before the third. Each position gets at most 3 lifetime tries, each chunk at most 16 extra STARTs, and at most 8 attempts are in flight. No dispatched attempt has exercised the rule.
+
+### 129.5 Validation
+
+All runs used `sandbox-exec` with `(deny network*)`, an empty environment (`env -i`), `-B` and `-p no:cacheprovider`. Before each run, an EPERM probe to 192.0.2.1:443 returned errno 1.
+
+- **Affected selection on the pushed tree `757e363`, before any change of mine: 48 files, 2338 passed in 1598.19 s, no skips or warnings.** The files are every test file added or modified in `b648f60..757e363`, plus the import-boundary, dataset, research-gate, stock-normalization, active-document and ML import-boundary checks. Worktree status was otherwise unchanged. The one difference is my new test file: it was created during the run and was not in the collected selection.
+- **Mutation probes, in memory only (no source file edited), on the three `06cdd11` test files: baseline 175 passed.**
+  - The route mutants `GATE_ROUND`, `GATE_CLI` and `GATE_LEASE` each remove one route's gate call. Under `-x`, each failed first on its own route case of `test_unresolved_prior_run_gate_precedes_every_source_dispatch_route`.
+  - `GATE_POLICY` turns the refusal into `return None`. It failed first on that test's `[CLI]` case.
+  - `CATALOGUE` drops the three fixed containers. It failed first on `test_zero_tickets_with_original_preclaim_containers_closes_only_negative_manifest`.
+  - `ACCT_ZERO` reports unauthenticated accounting fields as 0 instead of null: 2 failed, 173 passed.
+  - `HOLD_LOOP` returns instead of holding: 6 failed, 169 passed.
+  - `COMPLETE_TRUE` flips the completeness flag: **175 passed, so it survived** (`SI-CR24-006`). With the new regression, the capture file gives 1 failed / 83 passed under the mutant, against an 84-passed baseline.
+- **New record regression before this record correction: 3 failed out of 3** (stale status, missing ledger row, missing ID note). The gate-coupled check ran rather than skipping, because the real `require_dispatch_allowed()` refuses.
+- **After this record:** 10 files: the new record regression, `test_short_interest_counter_review_record.py`, `test_short_interest_claude_review_20261026_record.py`, `test_active_document_consistency.py`, the three other test files that read this record, and the three `06cdd11` test files including the new hold-report regression. **361 passed in 1641.31 s**, no skips or warnings. Both changed test files compile in memory, and `git diff --check` is clean. After these numbers were written, the three record test files were rerun on the final text before the commit.
+- **Not run:** the complete lane suite (by owner direction) and `compileall`.
+- **Disclosure:** my before/after `git status --porcelain --ignored` snapshots walked the ignored `artifacts/` tree. Git tried to open the `.fseventsd` directory inside each of the eight attached images and was denied. This was a read-only directory traversal; nothing was written.
+
+### 129.6 P0-P3 issue ledger
+
+| ID | Priority | Status | Summary |
+| --- | --- | --- | --- |
+| `SI-CR24-001` | P3 | Open (evidence) | exec13448 has no per-ticket START directory, and the only key/GET path requires one. Its provider increment is bounded to zero unless the namespace was altered later. The 052 gate is unchanged. |
+| `SI-CR24-002` | P2 | Open (design advisory) | A RAM-only preservation hold does not survive its launching session. Resolve it before replacing the 052 gate. |
+| `SI-CR24-003` | P3 | Closed by note | `SI-CR18-001` is used for two findings; cite section-89 and Claude126 meanings explicitly. |
+| `SI-CR24-004` | P3 | Closed by correction + regression | The status paragraph omitted exec13448, 052 and the dispatch block. |
+| `SI-CR24-005` | P3 | Closed by correction + regression | The `757e363` push had no section-5 ledger row. |
+| `SI-CR24-006` | P3 | Closed by test-only correction | The hold report's `known_private_observations_are_complete: False` was untested; it is now pinned by a behavioral test. |
+| `SI-CR23-001` | P3 | Closed in software | 128.41 freezes the retry/chunk rule for status-less failures; not yet exercised. |
+| `SI-CR23-002` | P3 | Unchanged | The new regression is gate-coupled, so it adds no past-round pin. |
+| `SI-BUILD-20261028-052` | P2 | Open (Codex) | Original accounting and custody of exec13448 are unresolved; all durable-count dispatch is refused. |
+| Claude126 `SI-CR18-005` / daily `SI-CR18-006` | P3 | Open as narrowed in 127.2 | Windows parity and the daily refusal-shape advisory. Nothing here changes them. |
+
+### 129.7 Scope, limits and next step
+
+- Not run: the complete lane suite (owner direction), a Windows run, any actual proof, source or provider operation, and any QC or Safari access. I read no credential and no private artifact content.
+- The two regressions and this record are the only changes. No production code, shared document, `docs/SESSION_HANDOFF.md` or Action Plan changes.
+- Next: Codex counter-reviews section 129. `SI-BUILD-20261028-052` stays open. Before any source dispatch, Codex or the owner must freeze a resolution policy for exec13448 (it may use the `SI-CR24-001` evidence) and answer `SI-CR24-002`. QuantConnect stays paused until the owner releases it. The owner's 128.45/128.46 steering governs Codex's next publication.

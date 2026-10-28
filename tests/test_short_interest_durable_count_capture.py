@@ -7,6 +7,7 @@ do not establish actual-domain durability or source readiness.
 """
 from contextlib import contextmanager
 from types import SimpleNamespace
+import json
 import os
 import threading
 from concurrent.futures import ThreadPoolExecutor
@@ -671,6 +672,26 @@ def test_retention_loop_emits_only_fixed_projection_and_has_no_source_or_network
     assert sleeps == [30] and "preservation_blocked" in output
     assert "PRIVATE_BODY_SENTINEL" not in output and "PRIVATE_EXCEPTION_SENTINEL" not in output
     assert len(h.key_calls) == len(h.wire_calls) == 1 and h.preservation.fd_open
+
+
+def test_retention_announcement_never_claims_complete_private_retention(fabricated_outer_run, monkeypatch, capsys):
+    # SI-CR24-006: a hold report must not let an operator infer that every
+    # unexported RAM observation survived; only the process itself retains it.
+    h = fabricated_outer_run; h.block_negative = True
+    fail_after_first_genuine_observation(h, monkeypatch)
+    original_hold = outer._retain_failed_process
+    monkeypatch.setattr(outer, "_retain_failed_process", lambda: (_ for _ in ()).throw(HoldingTestSentinel()))
+    with pytest.raises(HoldingTestSentinel): h.run()
+    monkeypatch.setattr(outer, "_retain_failed_process", original_hold)
+    monkeypatch.setattr(outer.time, "sleep", lambda seconds: (_ for _ in ()).throw(HoldingTestSentinel()))
+    with pytest.raises(HoldingTestSentinel): original_hold()
+    lines = [line for line in capsys.readouterr().out.splitlines() if "preservation_blocked" in line]
+    assert len(lines) == 1
+    summary = json.loads(lines[0])
+    assert summary["requires_process_hold"] is True
+    assert summary["known_private_observations_are_complete"] is False
+    assert all(summary[name] == 0 for name in ("additional_HTTP_from_hold", "new_claims_from_hold",
+        "new_STARTs_from_hold", "new_credentials_from_hold"))
 
 
 def test_CLI_returns_two_only_after_all_negative_attempts_are_preserved(fabricated_outer_run, monkeypatch, capsys):

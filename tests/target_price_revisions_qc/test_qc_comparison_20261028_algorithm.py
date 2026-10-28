@@ -539,3 +539,36 @@ def test_unknown_intrinsic_native_market_is_refused_not_misclassified_as_foreign
     with pytest.raises(ValueError):
         algo._constituents_for("REMX",[Constituent(symbol,algo.utc_time-timedelta(days=8))])
     assert not algo._snapshots["REMX"]
+
+
+def test_current_construction_domain_is_not_polluted_by_more_than_4096_old_fundamental_caps(driver):
+    algo=minimal(driver);day=supplied_inputs(driver,algo)
+    current={str(row["symbol"].id) for snapshots in algo._snapshots.values()
+        for snapshot in snapshots for row in snapshot["members"]}
+    expected=dict.fromkeys(current,Fraction(1,60))
+    for index in range(comparison.MAX_IDENTITIES+1):
+        sid="HISTORICAL-"+str(index)
+        algo._symbols[sid]=Symbol(sid)
+        algo._cap_snapshots[0]["caps"][sid]={"state":"available","value":"9999999999"}
+    assert len(algo._cap_snapshots[0]["caps"])>comparison.MAX_IDENTITIES
+    algo._prepare_targets(day)
+    assert algo._target_weights==expected
+    report=algo._decision_coverage[day]
+    assert report["ignored_noncurrent_cap_cells"]==comparison.MAX_IDENTITIES+1
+    assert report["current_member_cap_domain_count"]==len(current)
+    caps_record=next(payload for kind,payload in algo._records if kind=="CAPS")
+    assert set(caps_record["caps"])==current
+
+
+def test_current_missing_cap_is_preserved_when_old_cells_are_narrowed(driver):
+    algo=minimal(driver);day=supplied_inputs(driver,algo)
+    del algo._cap_snapshots[0]["caps"]["SID-KIE"]
+    for index in range(comparison.MAX_IDENTITIES+1):
+        algo._cap_snapshots[0]["caps"]["OLD-"+str(index)]={"state":"available","value":"9999999999"}
+    algo._prepare_targets(day)
+    assert "SID-KIE" not in algo._target_weights
+    row=algo._decision_coverage[day]["sleeves"]["KIE"]
+    assert row["selection_coverage"]["cap_state_counts"]["missing"]==1
+    assert row["unfilled_slots"]==10
+    caps_record=next(payload for kind,payload in algo._records if kind=="CAPS")
+    assert caps_record["caps"]["SID-KIE"]=={"state":"missing","value":None}

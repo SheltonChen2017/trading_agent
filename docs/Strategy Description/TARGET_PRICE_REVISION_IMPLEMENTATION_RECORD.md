@@ -26324,3 +26324,79 @@ The inventory helper processes only the exact224765B sourceindexmetadata:
 386Massiveprojectiondescriptors/74windows/349018retained rows. The parent001
 operation staysFAILED due to laterSharadar processing; no wholecapture
 completion/PIT/rights or per-page rowcount is fabricated.
+
+Freshmetadata-only indexclaim`TPR-CMP28-MASSIVE-INDEX-20261028-001` retained BEFOREread: SHA256`6e6c88d6ada961ddd75340ce01538f95eaf7d13c1b7b90d61168b584a06c69ac`, HEAD`60cca1ef216f03fa5dcf84db449298f8af53b8e2`, exactlyone224765Bindex/701ab0f2...,120seconds. No page/wire/Sharadar/D0/provider/QC input is admitted by this scope.
+
+Freshowned-cellprocessingclaim`TPR-CMP28-CELL-PREPARE-20261028-001` SHA256`ab044a1a881beabe5fe1353ea544e9c4403395c4b763c738269974e4b82c724c`, HEAD`60cca1ef216f03fa5dcf84db449298f8af53b8e2`, precedes ONLYnewSOURCE002read2archive268826B/e2ce1a7b... . Maxonefile/120seconds. GeneratedCELL002 exactcodeSHA`cf5f8bee3a2336307bf46c8a067e99f2f7c7b7bccccde6ec42bde138abff4825`, deadline`2026-10-28T16:22:54.927277+00:00`; no network/update/execution yet.
+
+FreshAPIowned-cellsource-updateclaim`TPR-CMP28-CELL-INSTALL-20261028-001` SHA256`b74ef43a776ceb8c72590d957cab225e2fabb1e1ae590cb6b13a1b1163b9d0c6`, HEAD`60cca1ef216f03fa5dcf84db449298f8af53b8e2`, permits ONLYmia.ipynbcell11 sourceupdate, pre/postfilesread,3requests/180seconds/30seconds each; fixednewpreparedreport9393B/9f466d4d... andnotebook41208B/1e4040c3... . Allothercells/files must match; no deliberatecompile/job/privateObjectStore effect. Any implicitIDEbuild is retained separately. Claim is durable before privatepayload/credentialread.
+
+### 104.9 Verified cell installation and one native diagnostic execution
+
+CELLINSTALL001 completed16:14:11UTC:3acknowledgedAPIrequests (files/read,
+files/update,files/read),50601freshprivateinputbytes. The ONLYsavedchange
+is theownedmia.ipynbcell11source. Allothercells/files are exact. Notebook
+41208B/1e4040c3..., newcellsourcecf5f8bee..., execution_countNULL andoutputs[]
+confirmed independently. No cell was executed by theinstaller and no
+backtest was requested.
+A new native executionclaim follows before one genuineMia cell invocation.
+The reserved diagnostic invocation is separate from strategy/backtest/outcome
+looks; all historical33 observedlooks and three originalfailures remain.
+No fakeadaptermarker or oldcontrollerdispatch flag is enabled.
+
+```json
+{"cell_index":11,"cell_source_sha256":"cf5f8bee3a2336307bf46c8a067e99f2f7c7b7bccccde6ec42bde138abff4825","diagnostic_invocation_reservation":"TPR-CMP28-INPUT-DIAG-CELL002-001","expires_utc":"2026-10-28T16:22:54.927277+00:00","forbidden":"No other cells/notebooks/source edits/direct object_store_get/raw rows/History/provider/compile/backtest/account/resource changes/alternate action/retry","independent_API_readback_utc":"2026-10-28T16:14:11.335107+00:00","issued_utc":"2026-10-28T16:17:40.513557+00:00","max_bytes_each_after_allocation":4096,"max_exact_contains_calls":2,"max_exact_private_witness_reads":2,"max_safe_output_bytes":32768,"maximum_cell_executions":1,"maximum_mia_messages":1,"maximum_new_cell_source_reads":1,"maximum_new_chats":1,"maximum_ui_calls":12,"native_authentication_economics_acceptance":false,"new_strategy_compile_backtest_reservations":0,"notebook_name":"mia.ipynb","notebook_source_sha256":"1e4040c35a99e32df27a9fe14f28c85d252658342cd8c341caa45b9a78e419ac","operation_id":"TPR-CMP28-CELL-EXECUTE-20261028-001","project_id":37650980,"quantbook_initializations":1,"schema":"tpr-native-owned-cell-execution-claim-v1","source_head":"60cca1ef216f03fa5dcf84db449298f8af53b8e2"}
+```
+
+ExecutionclaimSHA256`20e48d4921d65efe894e675360ae570675d037010d42ba444705a0f373b87a06`.
+
+Nativeexecution001 was NOT sent: the Safari foreground changed to a different QCcontext/resourcepage duringpreflight. No otherlane tab/project/resource was modified or canceled. That UI route is left untouched; oldcellbody expires itself. Rootcontinues onlyindependent authenticatedOFFprojectAPI work. Freshprelaunchmetadata claim`TPR-CMP28-OFF-PRELAUNCH-METADATA-20261028-001`/53155af19431abf21f9c6e87be9a2c71fb1b1f9c1f48cd7998192dc5815c3415 precedes3read-onlyrequests/90s: ownbacktestlist andtwo alreadydisplayedcompileIDs, no outcome-statistics extraction orlaunch.
+
+Freshlocalmetadataresultrecovery TPR-CMP28-PRELAUNCH-METADATA-RECOVER-20261028-001/c872b6e1b7fb7a1cbda8975aca81b81547f3514df31c923b01444d452ec4fa74 beforeoneprioroperationresultread(max131072B/120s); no repeatedAPIrequest or outcome read.
+
+### 104.10 Closed diagnostics and new OFF launch preparation
+
+CELL-EXECUTE001 closed UNSENT: no deliberate native execution, QuantBook,
+witness read, strategy compile or backtest. Its reserved diagnostic identity
+is retained separately; no observed native run or outcome look is invented.
+The installed cell remains historical and is not reused. Shared Safari UI
+was left alone after another QC context appeared; native own-project API
+operations do not modify that lane's tabs/projects/resources.
+
+The fresh metadata recovery read exactly3768B/resultSHA
+`d83fd7eeb233d00fe05758f5e39d3748beb4103ed0d6db9a927911b01ed7279d`.
+The actual prior APIoperation ended16:27:47UTC and found17existing OFFjobs,
+all terminal, latestcreated2026-10-14; no newjob was requested or found.
+The two IDEdisplayedcompileIDs returnedInQueue with absentcreation/project
+metadata. Those observations remain separate and unreconciled; no cancellation,
+sourceclock or outcome acceptance follows. Newcomparison deliberateattempts
+remain0 at this checkpoint, originalOFF3/ON0/33observedlooks remain history.
+
+MASSIVEINDEX001 completedmetadata-only:224765privateinputbytes,
+386projections/74months/349018rows. Derivedinventory95602B/SHA
+`29d831c1f0fe103f0744b90e9f6e9d9f14a56a48592bf7acee849fdd5508c0f2`,
+exactprojectionbytebudget117003134. No page/raw wire/Sharadar/D0 read or
+PIT/rights/admission was implied. Fresh scopes precede actual pageprocessing.
+
+Confirmed lane-ownedP2 CMP104-F001: historical subscribed cap cells could
+exceed the4096 construction bound while the current member union remained
+valid. Two red regressions reproduced the defect. The corrected constructor
+passes exactly current members, retains explicit missing cells and journals
+source/current/ignored cellcounts; selection, fixedslots and economics do not
+change. Driver30860B/SHA
+`c45a254b8999859796aec2c3fec904f292489838f32f87c0c76f11f7156cd3bc`;
+renderer10428B/SHA
+`7051a421f2a4c559254ea2c53f1578e8a67cf448101ba63c7148d9f42e262f2d`.
+Root final focused driver+renderer+event bridge172passed3.92s; diffcheckclean.
+This is software evidence, not a completed native backtest.
+
+Pure retained-page eventbridge24947B/SHA
+`8041ed95e01103007379e4b5761d14b4f5c0425afb6e889d9e295dd6acc9965d`
+preserves signed measuredzero, missing/unknown, cutoff/update censoring,
+secondlateropen,20/80 decay and event-version identity bindings. Raw targets
+are not returned; historical native SID/sharebasis/PIT/rights remain unproved.
+OFFbundle intentionally excludes signals. The comparison renderer emits12
+flat sourcefiles with independent template/final/config/calendar identities;
+its candidate flags grant no effects or acceptance. The owner-authorized
+next action remains actualOFFupload/compile/full-windowrun, then the other
+four arms, without routine Claude review and with one final push only.

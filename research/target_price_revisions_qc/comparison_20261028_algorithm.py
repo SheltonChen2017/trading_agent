@@ -444,7 +444,16 @@ class ComparisonOffAlgorithm(execution.TargetPriceExtendedAlgorithm):
             self._decision_coverage[day] = None
             self._reason("unknown_asof_finance_classification")
             return
-        weights, detail = comparison.construct_off(members, cap_snapshot["caps"],
+        # The native snapshot also covers old subscribed identities and recent
+        # historical membership for action custody. Only the EXACT current six-
+        # universe union belongs to this construction call. Preserve every
+        # current missing cell; old cells cannot exhaust its4096 identity bound.
+        source_caps = cap_snapshot["caps"]
+        if type(source_caps) is not dict:
+            _fail()
+        current_caps = {sid: source_caps.get(sid, {"state": "missing", "value": None}) for sid in sorted(symbols)}
+        ignored_noncurrent = len(set(source_caps) - set(symbols))
+        weights, detail = comparison.construct_off(members, current_caps,
             finance_insurance_by_sid=finance, warning_ids=self._warning_ids, final_ids=self._delisted_ids)
         for sleeve in SLEEVES:
             reports[sleeve].update(detail["per_sleeve"][sleeve])
@@ -455,10 +464,13 @@ class ComparisonOffAlgorithm(execution.TargetPriceExtendedAlgorithm):
         self._decision_coverage[day] = {"session": day, "arm": "cap_off", "sleeves": reports,
             "construction": detail, "target_gross": core._text(detail["target_gross_weight"]),
             "unallocated_target_cash": core._text(detail["cash_weight"]),
+            "source_cap_snapshot_cell_count": len(source_caps), "current_member_cap_domain_count": len(current_caps),
+            "ignored_noncurrent_cap_cells": ignored_noncurrent,
             "source_inputs_admitted": False, "native_source_units_accepted": False}
         self._log_audit("CAPS", {"session": day, "effective_utc": cap_snapshot["effective"].isoformat(),
             "asof_utc": cap_snapshot["asof"].isoformat(), "received_utc": cap_snapshot["received"].isoformat(),
-            "caps": {sid: cap_snapshot["caps"].get(sid, {"state": "missing", "value": None}) for sid in sorted(symbols)},
+            "caps": current_caps, "source_cap_snapshot_cell_count": len(source_caps),
+            "current_member_cap_domain_count": len(current_caps), "ignored_noncurrent_cap_cells": ignored_noncurrent,
             "finance_insurance": finance, "native_source_units_accepted": False})
 
     def _selected_scores(self, *_args, **_kwargs):

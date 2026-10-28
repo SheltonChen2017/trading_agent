@@ -2304,6 +2304,9 @@ five-year runtime remains prospective; section327.7 records I's spent actual
 and identity gates still open. Section327.8 records the LATEST owner hold:
 NO QC or Safari access until further notice. Continue local/source fixes only
 to the last checkpoint BEFORE QC submission. No six/eight strategy job launched.
+Section327.10 records J's spent offline actual0/native0 query preparation:
+all5original cases retained;1exact EOD pair,3missing-CUSIP query-preparable,
+1global-ISIN-ownership conflict. No FMP contact, price or new source admission.
 No AU/AW/AY replay or QC source transfer/project/compile/strategy job followed
 the catalogue result. Current
 identity/reference/actual-held NAV/full-window/source/run gates remain;
@@ -69351,3 +69354,48 @@ a QC look/result cell. QC/Safari hold remains absolute;337/259/53/699 unchanged.
 Final J prefreeze record/document86passes1.28s, repeated/not additive.
 The precommit diff gate caught one new blank at document EOF before staging;
 removed that new unused document blank, leaving frozen files unchanged.
+
+### 327.10 Actual J completed; exact existing-evidence query states
+
+At clean freeze c9864f3bed213f0d4a8df8f68f8db2407b35abbe, sole public-only
+native artifact/network/Keychain-denied preflight exited0 with226source pins.
+The fixed collector then dispatched J ONCE; tool-observed collector actual0.
+Native producer07:28:35.651026Z..07:28:45.411059Z on2026-10-28 actual0;
+separate native all-artifact-denied validator07:28:46.021536Z..
+07:28:50.518874Z actual0, byte-identical11617byte public stdout
+SHA2562070ab4a803d926afef6465488f74e543a941108283c4edf5bf708949e127faa.
+All original bounded metadata complete, no stderr/transport bounds. These
+are process dispatch/completion brackets, not provider timestamps.
+Collector stdout8184bytes SHA25689f86df00815f57f67863b5a4e19128d4a0f45276ac1be9794980e6452d03ab7;
+report11486bytes SHA2567d57cccd2abf9a2d2ab64934dfd29ed6b622035d53b6dcb46a45e480620dfe37.
+Private fmp-query-plan-private.json18409bytes
+SHA2569971928e5c2c701f26c051f93cac9041e830314a8a86e5cdf28c7211624c2816
+at the exact J control from327.9; source fingerprint
+62b19c3ec81f1a47448291a652a9f452919dd1fad8b2b82b8bee88b9303c0828;
+three-search-plan digest2b2bfa3d13b00687f9aeee632c99597dc5581adf4e2bb1548e9c4d79854cfa11.
+
+All original6151stock+8fund BB results were reconstructed; all five I cases
+remain. Each has one related EOD mapping row and one catalog row, with an
+exact original FIGI and one valid observed ISIN. Case0 already has an exact
+original raw CUSIP pair. Cases1/3/4 have a genuinely null raw CUSIP and no J
+conflict, hence one exact observed ISIN query each is preparable. Case2 also
+has null raw CUSIP but the complete mapping/catalog inventory contains other
+owners for that ISIN; global_catalog_ISIN_owner_conflict and
+global_mapping_ISIN_owner_conflict remain. A shared ISIN flag is a constraint
+to investigate, not authenticated vendor-error/ticker-reuse/merger cause.
+No raw identifier, licensed row, FMP symbol or credential was disclosed.
+No source assignment was changed, no all-five readiness or price coverage
+was established. A future evidence-specific change must justify every route;
+do not execute only the favourable three and call all-five recovery complete.
+
+J producer/validator/collector/control are now SPENT; preserve all output and
+old evidence, no rerun, reader, repair, rename or cleanup. Native reconstruction
+of ALREADY-collected public bytes and inert-anchor equality is result recording,
+not a second operational read. New scripts/arv2_r327_j_source_binding.py16003
+bytes SHA2562e195b3def022fb2cc9c901fc588d806d431c5191509b03be1c8e0bb8c2740f7;
+canonical observed factc9ea9e452a0c8cb5f93279ba98e964f6ea218b08861b4f9a2da8783cc1098285.
+It grants no new read, provider operation, source/price admission or formal
+readiness. No QC/Safari/credential/provider operation occurred.337/259/53/699
+unchanged. Continue the separately versioned local W5 runtime/profile/Main/
+six-cell/result preparation and bounded source recovery under the owner hold;
+one final push only at the last honest local pre-QC checkpoint. No push yet.

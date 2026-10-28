@@ -28152,3 +28152,150 @@ Accumulate this lane only; exactly one successful non-force push remains
 withheld until the completed or concrete-blocked auditable final handoff.
 
 Exact final public tooling/test identities: {"research/target_price_revisions_qc/comparison_20261028_accounting.py":{"bytes":45629,"sha256":"9ff8df1cf142308d8cd73e2950ddfe02d64bbe88c02b5316b424f50cc49b1bc6"},"research/target_price_revisions_qc/comparison_20261028_accounting_reader.py":{"bytes":21213,"sha256":"e17fac24ed6458f70a9558d6f77dd7a898cb332b263220121bf19bc3e2358387"},"research/target_price_revisions_qc/comparison_20261028_api.py":{"bytes":26807,"sha256":"a2a160ac951a8a9f96b9531e5b51a5bf6b4e7b116b7873f77515780f059ebc5a"},"tests/target_price_revisions_qc/test_qc_comparison_20261028_accounting.py":{"bytes":43679,"sha256":"0dabebd135a5ccb04b26c5bbce4fd41db0bf675bdb9eceff089794e34fc709a8"},"tests/target_price_revisions_qc/test_qc_comparison_20261028_accounting_reader.py":{"bytes":17585,"sha256":"b4e041d97580e6fbe95201d0db56d617760051ec465b9051d90d22fd38386c19"},"tests/target_price_revisions_qc/test_qc_comparison_20261028_api.py":{"bytes":25361,"sha256":"a55187813b8c304c4311c17574574f328f8e472fd56b277129329ea7c984cbba"}}
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-541A-20261028-001/08f422b9509261df921520e4277865b32e7c779006dd33869b02101b90172178 at 5413b06f77a526135045342c19d65604aa58d16a before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-541A-PROGRESS-20261028-001/274e32b13f5f87bbb258438203de1f8da9ad0f2a2c2d20ee57a0fe9461bf88e1 at 5413b06f77a526135045342c19d65604aa58d16a BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Readonly 541A/001 operationalstates [{"job":"f9f9afa0f2b5200f06f11fe1442adb6c","status":"In Progress...","completed":false,"progress_raw":0.454,"has_error":false},{"job":"df338f3dc811e509884195f94986c552","status":"In Progress...","completed":false,"progress_raw":0.455,"has_error":false}]; safe receiptce59a6c5060c5e7c1190334e46cc17f7259a0be9f18442d5466e5f04fade074d; no nativejobs/newfinancialoutcomes or coverage/performanceacceptance.
+
+Fresh bounded private phase TPR-CMP28-OFF4-NORMALIZER-REQUEST-METADATA-20261028-001/a28dae3e31be4d02d56f47aeb638acbcf3a217e0ffa4e72f2283c66e9ee0fb4b at 5413b06f77a526135045342c19d65604aa58d16a BEFORE 1 exact private inputs/120s; Read retained own prior request metadata as DATA only, never reuse/execute its old spent authority; fsync claim and directory retained.
+
+Fresh bounded private phase TPR-CMP28-OFF4-NORMALIZER-DESCRIPTORS-20261028-001/619e773bbcaf5a193cf515ae026d3920e1191ae31d7d560ebbf3e55d6cba9912 at 5413b06f77a526135045342c19d65604aa58d16a BEFORE 1 exact private inputs/120s; Exact own-output descriptor metadata for focused real API schema interoperability; fsync claim and directory retained.
+
+Fresh bounded private phase TPR-CMP28-OFF4-NORMALIZER-INTEROP-20261028-001/5f7101459997963b85106b25ab7711a8143a42c8d8415c022b631a73a69fe27d at 5413b06f77a526135045342c19d65604aa58d16a BEFORE 7 exact private inputs/120s; Parse7exact previouslyretained ownsimulatedorder pages/134orders/268events with COMMITTEDnewnormalizer; no prices/shares/feeamount/PnL projection, no providercaptures/network/operator/nativeeffects; fsync claim and directory retained.
+
+CommittedrealownAPIorder-normalizerinteroperability {"schema":"tpr-cmp28-real-own-output-normalizer-interoperability-v1","status":"parsed","job_id":"12dd4732ba5d9d8f57950beb2a371c79","normalizer_sha256":"9ff8df1cf142308d8cd73e2950ddfe02d64bbe88c02b5316b424f50cc49b1bc6","pages":7,"orders":134,"events":268,"nonzero_fills":134,"fully_observed_economic_event_rows":134,"observed_zero_fill_skeleton_rows":134,"unknown_reasons":{"missing_native_event_economics":134,"unobserved_zero_fill_fee":134,"missing_or_non_usd_fee_currency":134},"currency_fields_complete":false,"currency_inference_performed":false,"native_effects":0,"full_window_accounting_accepted":false}; safe receipt8d93f9807403e140f9ae73165960b2f870eb7d50b95c3af5a377d790c23927e9; no missing-as-zero or fullwindowacceptance; oldspentrequestplanreadasdataONLY, freshaccessauthorityabove.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-541B-20261028-001/a46819ceb98ef1ce7dddecbc3343e821096342645e755ca075e0c6a7aef4323e at 5413b06f77a526135045342c19d65604aa58d16a before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-541B-PROGRESS-20261028-001/d8fd2fd3f9dec7b69190475fcdefd1ad7d35a9cf4a76f5a9a36b084de243c706 at 5413b06f77a526135045342c19d65604aa58d16a BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Readonly 541B/001 operationalstates [{"job":"f9f9afa0f2b5200f06f11fe1442adb6c","status":"In Progress...","completed":false,"progress_raw":0.454,"has_error":false},{"job":"df338f3dc811e509884195f94986c552","status":"In Progress...","completed":false,"progress_raw":0.455,"has_error":false}]; safe receipt2563d596588722e831c356be9f436689a71953eccb6d67e94a24625841680ffe; no nativejobs/newfinancialoutcomes or coverage/performanceacceptance.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-FROZEN-READINESS-20261028-001/eda9f8174858c4142bc34cb605e9871b3b97f49d8f8c0b9b1f83a9f0f0bfa47e at 5413b06f77a526135045342c19d65604aa58d16a before2 exact requests/90s/1179648B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-541B-20261028-002/37fe8014fa92a388d263265c3bb92d2b1af03fbe11a4f569f87c5df9f90ab8ae at 5413b06f77a526135045342c19d65604aa58d16a before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-541B-PROGRESS-20261028-002/3955af327ff550a39e08ffe11c6f4a5247d6484e06b23aa0462ee0d8220f21b0 at 5413b06f77a526135045342c19d65604aa58d16a BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Readonly 541B/002 operationalstates [{"job":"f9f9afa0f2b5200f06f11fe1442adb6c","status":"Runtime Error","completed":true,"progress_raw":1,"has_error":true},{"job":"df338f3dc811e509884195f94986c552","status":"In Progress...","completed":false,"progress_raw":0.455,"has_error":false}]; safe receipt9429b9db279e914fd707a1656c54a928be550ec659d807d31ec19a84203b1c5d; no nativejobs/newfinancialoutcomes or coverage/performanceacceptance.
+
+Fresh bounded private phase TPR-CMP28-TILT100-TERMINAL-CONTROL-20261028-001/6cc5dff05a88f50c97e4b89574c7679c547567bdefbc40b0219c5e42605c4b45 at 5413b06f77a526135045342c19d65604aa58d16a BEFORE 1 exact private inputs/120s; Own terminaljob error/clock/pointer controlmetadata only; no private quote/order/PnL/statistics projection; fsync claim and directory retained.
+
+Native100terminalcontrol {"job_id":"f9f9afa0f2b5200f06f11fe1442adb6c","terminal_status":"Runtime Error","completed":true,"error_bytes":1346,"error_sha256":"2e69ffe053cf2014f6230a29f8c597edf7c1e84a3cb33d63391b800f54548f04","mark_refusal_pointer":{"bytes":1361,"data_type":"trade_bar","expected_sha256":"4914cf526dca1af0faf42d3f3094f331be57bc1e3eeefc59d03eafd3421602e0","key":"tpr-cmp28/evidence/TPR-SIX-UNIVERSE-FIVE-ARM-20261028-v1/TPR-CMP28-TILT100-ATTEMPT001-20261028/f7d032ff6360b7053c1aaf5643ac27b5762d4adea56c9fda3e55c0c3f1180e23/attempt-1/37650980/f9f9afa0f2b5200f06f11fe1442adb6c/mark-refusal.json","predicates":{"expected_date_equals_algorithm":true,"observed_date_equals_session":false,"observed_equals_expected":false,"observed_relation":"before"},"readback_verified":true,"reason_code":"minute_or_native_close_wrong_day_or_future","schema":"tpr-cmp28-mark-refusal-pointer-v2","status":"verified","valuation_verification_mode":"strict_minute_or_raw_daily_equal_close_v1","verified_sha256":"4914cf526dca1af0faf42d3f3094f331be57bc1e3eeefc59d03eafd3421602e0"},"error_classification":"held_mark_guard"}; rawerrorprivate2e69ffe053cf2014f6230a29f8c597edf7c1e84a3cb33d63391b800f54548f04; safe986d8395197e634404f51871934dafb48a9a84071081db9db68fe4ad7a292e31; nofullwindowperformanceacceptance, no unchangedrelaunch.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-LAUNCH-PREFLIGHT-20261028-001/649ec502ec427517831692f3acedee216ef58f065376dc0365bb8bd19c11879e at 5413b06f77a526135045342c19d65604aa58d16a before3 exact requests/120s/2228224B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-PURE-CONTROLLER-PREFLIGHT-20261028-001/dca36c72ff07d2d21b138d49ea18ce41fc8a096c5e1e8ac33a56b0fb07de59c9 at 5413b06f77a526135045342c19d65604aa58d16a BEFORE 1 exact private inputs/120s; Own project job identity/status metadata only; detect competing controller before firstPURElaunch, no names/source/financialmetrics; fsync claim and directory retained.
+
+FreshPUREcontrollerpreflight {"project_id":37650980,"listed_jobs":27,"active":[{"job_id":"df338f3dc811e509884195f94986c552","status":"In Progress...","completed":false}],"unknown":[],"safe_to_launch_predeclared_pure":true}; safe6bee805ffd8611eb79a634d9aee46bd4f95bafa9225c298b63f4013ddf2f9c36; no source/job/resource change.
+
+Fresh bounded private phase TPR-CMP28-PURE-FIRST-LAUNCH-SOURCE-20261028-001/6b9b4919419e4a1dfecc64d84285d84584cf22ca366895d4e5a3bce541e12fb0 at 5413b06f77a526135045342c19d65604aa58d16a BEFORE 1 exact private inputs/180s; Fresh bindalreadycompiledexactfrozenPUREsource; source-only, no packet/capture read, no recompile/economicchange; fsync claim and directory retained.
+
+PUREfirstlaunchfreshreservation f484ad459798b73b37b86214b3c325375562286c6e436f5618f4108ad23ff963 at 5413b06f77a526135045342c19d65604aa58d16a BEFOREeffect. Alreadycompiledcandidate001/0300ef6e/source1e8337... unchanged, actorTPR-CMP28-PURETPR-LAUNCH001-COMPILED001-20261028/TPR-CMP28-PURETPR-LAUNCH-LOOK001-20261028 distinctfromoldcompile/reservation/look.100terminalheld-markguard isnotsharedstartupfailure;200onlyactive/0unknowncontrollers in27ownjobs. LaunchprespecifiedPUREonceonfreednode;0newcompile, preserveallhistoricalattempts/reservations/observedjobs/outcomelooks separately.
+
+Fresh bounded native phase TPR-CMP28-API-PURETPR-FIRST-LAUNCH-20261028-001/8112a768ef1f10144c44250aa238aba209f6694912d259f54c4b4aae260c64b7 at 5413b06f77a526135045342c19d65604aa58d16a before3 exact requests/120s/2228224B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+PUREfirstlaunch actualreceipt 0d13d713483d3cc2f25cda0ca1c21b4a30fbbb0e7d7bac3220273e4b62cf9435 statuscompleted observedjobs["ca9fec3941e1e60c63afd8547dfe97ea"]; nofullwindowperformance/sourceinputacceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-200-100ERROR-20261028-001/fb292c996be3d571251f71b7054e153c7953a1a0c2165bc098e0e886c5360e36 at 5413b06f77a526135045342c19d65604aa58d16a before3 exact requests/120s/8650752B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-200ERROR-100CLOCK-PROCESS-20261028-001/3a9dc19ca40614427b455185fa5b5b9deb2b39a5530c90d6cccc5827bcdae605 at 5413b06f77a526135045342c19d65604aa58d16a BEFORE 2 exact private inputs/120s; Own200terminal error/pointer and100failure-clock metadata only; no quote/order/statistic/PnL projection; fsync claim and directory retained.
+
+Native200terminal+100clock control {"twohundred_job_id":"df338f3dc811e509884195f94986c552","terminal_status":"Runtime Error","completed":true,"error_sha256":"70ce7de9ced4a4ef1cb1cbaf1408a4c28d5a6897ff14e08dacdb2dc0db6345b9","mark_refusal_pointer":{"bytes":1361,"data_type":"trade_bar","expected_sha256":"3df44a39950ba34fc04095b040128c048cf8c69078f9a1e94d164bcbb927ebd3","key":"tpr-cmp28/evidence/TPR-SIX-UNIVERSE-FIVE-ARM-20261028-v1/TPR-CMP28-TILT200-ATTEMPT001-20261028/ce8f77c8631b0203077612946edcfd1ff14770595cde760228abb4923b99c09c/attempt-1/37650980/df338f3dc811e509884195f94986c552/mark-refusal.json","predicates":{"expected_date_equals_algorithm":true,"observed_date_equals_session":false,"observed_equals_expected":false,"observed_relation":"before"},"readback_verified":true,"reason_code":"minute_or_native_close_wrong_day_or_future","schema":"tpr-cmp28-mark-refusal-pointer-v2","status":"verified","valuation_verification_mode":"strict_minute_or_raw_daily_equal_close_v1","verified_sha256":"3df44a39950ba34fc04095b040128c048cf8c69078f9a1e94d164bcbb927ebd3"},"error_classification":"held_mark_guard","hundred_error_log_clock_strings":["2023-09-26 16:01:00"],"hundred_log_top_keys":["length","logs","success"]}; safed60b2b6355eb92377ddbcd0858bd7f7b28d0342c403fe8b435d1624137e6cbe7;200rawerrorprivate70ce7de9ced4a4ef1cb1cbaf1408a4c28d5a6897ff14e08dacdb2dc0db6345b9; preservefailedjob, nofullwindowacceptance or unchangedrelaunch. PUREactualjobca9fec3941e1e60c63afd8547dfe97ea InProgress; nextfreednodeforfreshD017scope.
+
+Fresh bounded private phase TPR-CMP28-POSTGAP005-SOURCE-PREPARATION-20261028-001/a9a0b8b15c0c7d88f824e5585c6676023f7f0d0bde64f2503c4934085febd8f2 at 5413b06f77a526135045342c19d65604aa58d16a BEFORE 1 exact private inputs/600s; Fresh bounded ownsource-only preparation of D017 OFFexactSIDFeb08..12 diagnostic; preservePUREcompiled/running snapshot andother23files; no witness/input read inpreparation; fsync claim and directory retained.
+
+FreshD017postgap005 f35b3f7cecaafad2f53e687357c59d63a045f201ea2b9521dfb7eb80616b7a7a at 5413b06f77a526135045342c19d65604aa58d16a BEFOREupload/compile/job; sourcesd739fa9bae6a27c3c026ebee47b04f5904b894ee09a6820f78dffa59be868af3 configba1e3c99a9bae566ead88846f0d1d9bed371fd314a14b7c4fecc7d9e141e52ba; exactFeb08..12/4History/4810rows/20calendarcalls/oneOFF4witness<=4096B; financialPUREalreadyInProgress,200terminalfreedsecondnode. Onlymainchanges24fileinventory1e8337...->7d7a6e99e8118cd10a50e6301a2295033b414fde310869a905c23b4ea8f45ae3; no financialeconomics,0pastmarkreplacement/absence/terminal/recoveryacceptance. Oldunused004 andallpriordiagnosticsretained.
+
+FreshD017005upload plan45e2602c1992c189a384ce7ec73a5344623aa893f0f7d2d7365a3c8c84b8fcff BEFOREcredentials/effects, exactknownmainonly/preserveother23.
+
+FreshD017005compile plan49e93a4ed930720259adcacceb704c370bf158d0bdc64f3edc5e27c8bebf88fe BEFOREeffects; NONECONOMICcompileattempt1, nofinancialcandidateattemptreset.
+
+Fresh bounded native phase TPR-CMP28-API-POSTGAP005-COMPILE-READ-20261028-001/7aa4dee4ee5a5e55c634860209e46b76d5ba02922801616d17baa91d97d32860 at 5413b06f77a526135045342c19d65604aa58d16a before2 exact requests/90s/393216B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-POSTGAP005-LAUNCH-20261028-001/359b96bdf6be9cdcc998e824c9d1fc29c64afba9b6bb317c8a0a31731024d985 at 5413b06f77a526135045342c19d65604aa58d16a before3 exact requests/120s/2228224B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+D017005native launch receiptfc2f6b34355c73d220f7049d7da85e8217077837270f2efae2bf4831c37326cb statuscompleted actualjobs["05c2c497b65889b5b252af5124764c0b"]; NONECONOMICdiagnostic, not a sixthfinancialarm/financialattempt.
+
+Fresh bounded private phase TPR-CMP28-TILT200-ERROR-CLOCK-20261028-001/978e9aafc90299034a59a6a6f0b5e6936d1c623a71ac4c59e10b311ec64c59d0 at 5413b06f77a526135045342c19d65604aa58d16a BEFORE 1 exact private inputs/120s; Exact own200failure-clock metadata only, no PnL/quotes or underlyingwitness read; fsync claim and directory retained.
+
+200failureclockmetadata {"job_id":"df338f3dc811e509884195f94986c552","failure_log_clock_strings":["2023-09-26 16:01:00"],"underlying_sid_correlated":false,"full_window_performance":null} safef547ed403bf88ec90915260d41258b6ce877bbc141a01d3257d11ca0dc369a20; samecalendarclockdoesNOTprovecommonSIDwith100, preserveownseparatewitness.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-POSTGAP005-STATUS-20261028-001/e46ed57d9797d282ea03e936706cb3356d731f5072971db484a55d64b95be416 at 5413b06f77a526135045342c19d65604aa58d16a before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-POSTGAP005-SAFE-RESULT-20261028-001/783fedf6acd25fb6bc64ee61823abf414cbe79d6d16151d8998d57a3906504da at 5413b06f77a526135045342c19d65604aa58d16a before1 exact requests/90s/262144B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-POSTGAP005-RESULT-PROCESS-20261028-001/4b5fb56c580eb483b833da13b6c58fbfc09257bc895b73d59f2b4c027a4cb146 at 5413b06f77a526135045342c19d65604aa58d16a BEFORE 1 exact private inputs/120s; Own bounded synthetic-free diagnostic SAFE JSON only, no raw quote/bar/witness body; classify actualnativecontrol/gapfacts; fsync claim and directory retained.
+
+D017005actualsafe result {"actual_child_job_id":"05c2c497b65889b5b252af5124764c0b","backend_durability_proven":false,"canonical_admission":false,"clock_bars":960,"config_sha256":"ba1e3c99a9bae566ead88846f0d1d9bed371fd314a14b7c4fecc7d9e141e52ba","contains_calls":1,"control_daily":null,"control_minute":null,"control_request_path_status":"request_path_unproved","daily":null,"diagnostic_only_no_financial_recovery":true,"end_runtime_custody":true,"error_class":"ProbeRefusal","helper_sha256":"6539ae749aefb4884ed52258fc2f0f77c9481a5e8ee37ea80ec7065218f0da95","history_calls":0,"minute":null,"minute_daily_close_price_parity":null,"native_daily_precise_setting":true,"native_exact_subscription":{"add_security_calls":0,"all_external_exact_sid":null,"all_external_raw":null,"config_reads":0,"config_rows_examined":null,"external_config_count":null,"native_config_kind_counts":null,"registered_exact_native_reference":null,"regular_nonfillforward_raw_minute_quote_configs":null,"regular_nonfillforward_raw_minute_trade_configs":null,"returned_exact_sid":null,"returned_native_security":null,"unrecognized_external_config_count":null,"verified":false},"native_identity_roundtrip":true,"native_regular_calendars":{"control":{"exact_equity_usa":true,"final_close_before_now":true,"native_hours_new_york":true,"session_count":5,"verified":true},"target":null},"noneconomic_diagnostic":true,"one_of_five_economic_arms":false,"operation_id":"TPR-CMP28-MARK-PROBE-POST-GAP-005-20261028","parent_contains":true,"parent_hash_verified":true,"parent_job_id":"12dd4732ba5d9d8f57950beb2a371c79","parent_key_sha256":"7a27356ccf09e0674b56dac39adaad4d1a0ef7a2cee7ef7f948982f20004e13f","parent_observed_minus_expected_microseconds":-86400000000,"parent_predicates":{"expected_date_equals_algorithm":true,"observed_date_equals_session":false,"observed_equals_expected":false,"observed_relation":"before"},"parent_schema_verified":true,"parent_session_matches_config":true,"parent_witness_bytes":1343,"parent_witness_sha256":"eef08aca32b99056dee0ce00389c53a8ee6a1628c29188afd8bebd362fe183dd","phase":"native_calendar_control_close","read_calls":1,"root_head":"5413b06f77a526135045342c19d65604aa58d16a","schema":"tpr-cmp28-native-mark-probe-post-gap-result-v1","security_id_sha256":"1122fa5f1349f79e231e106127c098da27ef730836a97052d2154ecc46f1afc1","source_inputs_admitted":false,"status":"post_gap_history_scope_unproved","strategy_accepted":false,"target_data_gap_proven":false,"target_post_failure_rows_observed":null,"terminal_proven":false,"universal_absence_proven":false}; retained6ba7baabadcf6632690c8e20b39ec5dc083f39dfdeabec6db2791f7de04bd574; nativejobCompleted isnotautomaticfinancialacceptance, no absence/terminal/PIT/rightsproof inferred.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-STATUS-20261028-002/42f112cbd3f71635f9af5f02ffcdda9e99803dcd8b1266c527fa6b5385ad28c2 at 5413b06f77a526135045342c19d65604aa58d16a before1 exact requests/90s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+### 104.37 Native failures, PURE launch and bounded request-construction correction
+
+100actualjobf9f9afa0f2b5200f06f11fe1442adb6c endedRuntimeError; exact safe
+error2e69ffe053cf2014f6230a29f8c597edf7c1e84a3cb33d63391b800f54548f04,
+pointer1361B/4914cf526dca1af0faf42d3f3094f331be57bc1e3eeefc59d03eafd3421602e0.
+200actualjobdf338f3dc811e509884195f94986c552 also endedRuntimeError;
+error70ce7de9ced4a4ef1cb1cbaf1408a4c28d5a6897ff14e08dacdb2dc0db6345b9,
+pointer1361B/3df44a39950ba34fc04095b040128c048cf8c69078f9a1e94d164bcbb927ebd3.
+Both native log clocks are2023-09-26 16:01:00; both wrong-day held-mark guards
+report prior-session bars. Same failure clock does NOT prove same held SID;
+their separate underlying witnesses have not been correlated. Source/economic
+and terminal dispositions stay distinct; no full-window performance accepted,
+no unchanged relaunch. OFF4 and50 remain2021-02-10 failures, old history intact.
+
+After100 naturally freed capacity, fresh27-own-job controller census showed
+only200active/0unknown; full24source1e8337... and PUREcompileBuildSuccess verified.
+Fresh launch actorTPR-CMP28-PURETPR-LAUNCH001-COMPILED001-20261028/
+LOOKTPR-CMP28-PURETPR-LAUNCH-LOOK001-20261028 at5413b06f bound original
+compiledcandidate001/0300ef6e/source snapshotbce18bfb...; all original
+reservations/unused looks retained. APIreceipt0d13d713... createdactualPUREjob
+ca9fec3941e1e60c63afd8547dfe97ea, sourcebefore/after1e8337... identical,
+zero new compile. PURE subsequently observedInProgress. All five financial
+arms now have native launches; four are failed, PURE remains unfinished.
+Actual jobs, compile requests, reserved looks and genuinely observed economic
+outcomes remain separate counts, not inferred from a job-ID projection.
+
+After200 naturally freed the other node, fresh D017005 noneconomic reservation
+and source/HEAD/operation/look preceded one-main-only upload/compile/job.
+Compile5bcc0ee7442a9b986cdba8a290a8b0aa-6e6fffe1573484ef9a6beaf343c420bb,
+actualjob05c2c497b65889b5b252af5124764c0b; sourceinventory
+7d7a6e99e8118cd10a50e6301a2295033b414fde310869a905c23b4ea8f45ae3,
+all other23files preserved. PURE's compiled/running snapshot unchanged.
+005 terminalCompleted is NOT useful diagnostic acceptance: safe2530B/
+6ba7baabadcf6632690c8e20b39ec5dc083f39dfdeabec6db2791f7de04bd574
+reports post_gap_history_scope_unproved/history_calls0 after control native
+calendar verified all5sessions. ParentOFF4witness/hash/schema/nativeSIDroundtrip/
+clock verified, targetAdd0, targetcalendar null. It establishes NO new price
+coverage, absence, terminality or recovery. Old unused004, three prior native
+diagnostics and005 safe refusal retained; no financial attempt reset.
+
+CMP104-D024. Exact source review located strict request endpoint predicates:
+start is a fixed datetime, while end was derived by native self.time.replace.
+A native-clock subclass preserving replace reproduces old scope refusal with
+zero History calls; actual deployed clock class/root cause remains UNATTESTED.
+Root chose a narrowly closed request construction: literal plain
+datetime(2021,2,12,16,1), exactly the already-frozen request endpoint. Independent
+actual child NY/UTC clock checks still guard every effect. No type predicate
+was relaxed, no native marker/flag added, and no stale mark admitted.
+
+finish_off_preparation authored NEW pure post_gap_native successor; predecessor
+bf9c6932... and all control/base/helper/financial source remain byte-identical.
+Only runtime endpoint constructor plus declared successor schemas/config/source
+provenance changes. Main<=60000plain bytes; example48264. One witness<=4096B,
+four History calls/4810rows/20nativecalendar calls remain. Wrong actual clock,
+custody drift, input/body/source tampering still deny before effects.
+Author42focusedpassed4.19s; root42passed4.57s; independentoffline103
+42passed4.17s +AST/inmemorycompile2/2. Independent software dispositionACCEPTED,
+actual native class/data availability/recovery/rights/PIT/canonical authority
+still false. No fullsuite, no new Claude checkpoint, no broker/operator/account
+actions. Fresh006source/HEAD/access/attempt/look reservation is REQUIRED before
+its upload/compile/job; it is not an unchanged005 repeat. Continue PURE in
+parallel; no financial results invented and final single push still withheld.
+
+D024publicsource research/target_price_revisions_qc/comparison_20261028_mark_probe_post_gap_native.py 5249B/895ee46d8c802dd707b5f85de21bf43f1e32eaf4f92f99d82f5de4e2b2b03e43
+
+D024publicsource tests/target_price_revisions_qc/test_qc_comparison_20261028_mark_probe_post_gap_native.py 10999B/09602626c0ae5c109840646ad036bf5a749c7c91539df75e98d116d5e0ea423b

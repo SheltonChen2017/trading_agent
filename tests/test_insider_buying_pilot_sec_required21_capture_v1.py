@@ -379,3 +379,24 @@ def test_private_stdin_frame_requires_exact_bounded_LF_control(raw, monkeypatch)
         assert m._private_line() == {}
     else:
         with pytest.raises(ValueError):m._private_line()
+
+
+# Claude review section 341 (IBREQ21-CR34101): a capture cut back to a
+# structure-bound prefix, with the later leaves removed and the index and
+# complete re-pinned, must not pass readback.
+def test_readback_refuses_a_coherently_truncated_capture_without_a_final_refusal(selected, tmp_path):
+    result, root, _, _ = _run(selected, tmp_path)
+    final = _read(root, "complete.json"); plan = selected.to_payload(); keep = 3
+    for item in final["results"][keep:]:
+        terminal = _read(root, item["result_name"])
+        for leaf in (root/"claims"/item["claim_name"], root/item["start_name"], root/item["result_name"],
+                     root/item["result_name"].replace("-result.json", "-headers.json"), root/"objects"/terminal["body_object"]):
+            leaf.unlink()
+    final["results"] = final["results"][:keep]
+    index = _read(root, "consumed-index.json")
+    index["accessions"] = sorted(set(plan["consumed_accessions"]) | {item["accession_number"] for item in final["results"]})
+    raw = m._raw(index); (root/"consumed-index.json").write_bytes(raw); final["index_sha256"] = m._sha(raw)
+    final.update(started=keep, unattempted=final["planned"]-keep, completed_without_refusal=False)
+    raw = m._raw(final); (root/"complete.json").write_bytes(raw)
+    with pytest.raises(m.Required21CaptureError, match="^inputs_changed$"):
+        m._readback(root, m._sha(raw), fixture=True)

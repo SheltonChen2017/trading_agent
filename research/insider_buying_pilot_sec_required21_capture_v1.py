@@ -666,6 +666,10 @@ def _readback(root, complete_sha256, *, fixture):
                 # status/code/inspection relation, including cleanup refusal.
                 _need(result["body_object"] is None, "inputs_changed")
             if ordinal+1 < len(final["results"]):_need(checked is not None and checked["structure_bound"] is True, "inputs_changed")
+            stopped = not (checked is not None and checked.get("structure_bound") is True)
+        # Claude review section 341: as the first64 and batch readbacks do, a
+        # short result list must end in its stopping refusal.
+        _need(len(final["results"]) == len(plan["requests"]) or stopped, "inputs_changed")
         index_raw = read(top, "consumed-index.json"); index = _decode(index_raw)
         _need(_sha(index_raw) == final["index_sha256"] and index == {"schema":SCHEMA+"/consumed-index", "accessions":sorted(consumed),
             "previous_index_sha256":plan["consumption_sha256"], "plan_sha256":final["plan_sha256"], "unknown_prior_archive_memberships_remain_unknown":True}

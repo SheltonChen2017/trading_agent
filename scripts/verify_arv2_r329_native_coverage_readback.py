@@ -171,7 +171,7 @@ def validate_map(value):
         require(type(text) is str and text.isascii() and 0 < len(text) <= 512, 'map')
         path = Path(text)
         stem, suffix = name[:-3], '.py'
-        pattern = re.escape(stem) + r'(?: [1-9][0-9]{0,2}| \([1-9][0-9]{0,2}\))?' + re.escape(suffix)
+        pattern = re.escape(stem) + r'(?: [1-9][0-9]{0,2}| \([1-9][0-9]{0,2}\)|-[1-9][0-9]{0,2})?' + re.escape(suffix)
         require(path.is_absolute() and path.parent == DOWNLOADS and str(path) == text
             and re.fullmatch(pattern, path.name) is not None, 'map')
         paths.append(text)

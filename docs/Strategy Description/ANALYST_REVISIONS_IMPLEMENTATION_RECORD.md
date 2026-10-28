@@ -70408,3 +70408,53 @@ failure/ambiguous save/readback stops this stage; no blind replay. D2 does not
 launch a job or supply a QC node lease. B's exact observed path/map/profile/
 clean HEAD and the later job/attempt/result scope need separate committed
 freezes; a source upload success alone grants neither.
+
+### 329.8 D2 actual install and paused download collision handling
+
+At clean82aaec7dcc602df0b47bf07c17a8f32e07b3d8a1, the owned38522505 UI still
+showed sole Owner/no library and unchanged masterv18207/default foundation.
+One normal Upload selection sent the three named NEW modules, then one separate
+Upload replaced main.py last after its expected replace warning. The editor
+showed all three new names and the new coverage-only Main prefix; no explicit
+build/compile/backtest/Mia/parameter/permission/resource action. These UI
+observations are not byte authentication. Old book/ObjectStore and notebook
+were untouched by the requested code path; no old producer was invoked.
+
+The macOS file picker initially displayed its remembered other-lane directory
+and later an old Analyst source folder when a batched GoTo/paste did not replace
+the retained path. No upload was clicked there. Explicit PathTextField setting
+and observed selection then chose ONLY R329-A exact files. Chooser/Finder UI
+incidentally exposed directory/ancestor/sibling names; do not claim zero OS
+metadata/thumbnail access, no incidental name observation, or native isolation
+of normal Safari UI. No filesystem command, file-content selection, reader or
+change in those other/old locations occurred.
+
+Exactly two source Download gestures followed: Main produced literal
+`/Users/sheltonchen/Downloads/main-2.py` (7KB in UI), confirmed by Show in Finder.
+The second, accepted_risk_order_level_input_runtime.py, was shown at the exact
+pre-existing Downloads pathname with its DateAdded nowToday9:48AM, whereas the
+earlier ordinary Finder view showed Yesterday3:57AM. This is a browser-observed
+reuse/change of the public download copy, not evidence that the old control,
+original project source or historical pinned bytes changed. No content/metadata
+filesystem comparison was performed, so do not claim byte equality, retained
+original metadata, no overwrite or historical continuity. Stopped further
+downloads to avoid additional same-name collisions; no cleanup/restore/rename.
+Both currently observed files remain inert and B remains UNINVOKED/unallocated.
+
+Prospective B correction from actual main-2.py UI evidence: accept only the
+additional exact expected basename `-N.py` suffix for N1..999, retaining exact
+canonical externally pinned map and all path/security predicates. Source now
+29314bytes/ee586604c38a5246ba4cb48e0f1481d844b41b3088f604299986be2f1ca298d7;
+tests23833bytes/ead05a3e01ce313317e85c3ae281554cefb854567b4446f7142452b86e5f9f7f.
+Affected31passed/70deselected0.22s under native denial, including nine new cases
+and22old overlapping cases; current file101tests, no claim of a rerun101pass.
+Compilation/diff pass. Prior B pin remains historical uninvoked draft evidence;
+this is an explicit justified pre-use revision, not automatic operational refresh.
+
+Requested the narrowly scoped Safari download-location preference confirmation
+required by the browser tool: Ask for each download, to choose unique new names.
+No preference was changed before the owner's answer. A documented alternative
+is QC's named single-file read endpoint (official Read File documentation),
+but no new API caller/credential/project-file request was implemented/invoked
+to bypass this pause. Offline preparation may continue while it is pending.
+No result job/look;337/259/53/699 remains unchanged.

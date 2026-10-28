@@ -90,14 +90,15 @@ def test_exact_public_dependencies_and_transport_scope_are_pinned():
     assert m.STAGE_SHA256 == m.sha(REAL_STAGE.read_bytes())
 
 
-@pytest.mark.parametrize('suffix', ('', ' 1', ' 999', ' (1)', ' (999)'))
+@pytest.mark.parametrize('suffix', ('', ' 1', ' 999', ' (1)', ' (999)', '-1', '-2', '-999'))
 def test_exact_map_allows_only_observed_safari_numeric_names(suffix):
     value = {name: str(m.DOWNLOADS / (name[:-3] + suffix + '.py')) for name in m.projection.CLOUD_NAMES}
     assert m.validate_map(value) == value
 
 
 @pytest.mark.parametrize('change', ('missing', 'extra', 'different_role', 'outside', 'relative', 'traversal',
-    'double_slash', 'symlink_component', 'suffix_zero', 'suffix_fourdigits', 'unicode', 'wrong_type'))
+    'double_slash', 'symlink_component', 'suffix_zero', 'suffix_fourdigits', 'unicode', 'wrong_type',
+    'hyphen_zero', 'hyphen_fourdigits', 'hyphen_leading_zero', 'hyphen_arbitrary', 'double_hyphen'))
 def test_exact_map_refuses_unobserved_or_ambiguous_paths(change):
     value, name = paths(), 'main.py'
     if change == 'missing': value.pop(name)
@@ -112,6 +113,11 @@ def test_exact_map_refuses_unobserved_or_ambiguous_paths(change):
     elif change == 'suffix_fourdigits': value[name] = str(m.DOWNLOADS / 'main 1000.py')
     elif change == 'unicode': value[name] = str(m.DOWNLOADS / 'maïn.py')
     elif change == 'wrong_type': value[name] = False
+    elif change == 'hyphen_zero': value[name] = str(m.DOWNLOADS / 'main-0.py')
+    elif change == 'hyphen_fourdigits': value[name] = str(m.DOWNLOADS / 'main-1000.py')
+    elif change == 'hyphen_leading_zero': value[name] = str(m.DOWNLOADS / 'main-02.py')
+    elif change == 'hyphen_arbitrary': value[name] = str(m.DOWNLOADS / 'main-copy.py')
+    elif change == 'double_hyphen': value[name] = str(m.DOWNLOADS / 'main--2.py')
     refused('map', lambda: m.validate_map(value))
 
 
@@ -125,6 +131,15 @@ def test_canonical_map_external_binding_rejects_change(change):
     elif change == 'oversize': value.download_map_json = 'x' * (m.MAX_MAP_BYTES + 1)
     if change != 'hash': value.download_map_sha256 = m.sha(value.download_map_json.encode('ascii'))
     refused('arguments' if change == 'oversize' else 'map', lambda: m.path_map(value))
+
+
+def test_canonical_map_observed_main_hyphen_two_requires_its_own_external_pin():
+    value, mapping = args(), paths()
+    mapping['main.py'] = str(m.DOWNLOADS / 'main-2.py')
+    value.download_map_json = m.canonical(mapping).decode('ascii')
+    refused('map', lambda: m.path_map(value))
+    value.download_map_sha256 = m.sha(value.download_map_json.encode('ascii'))
+    assert m.path_map(value) == mapping
 
 
 @pytest.mark.parametrize('actual_exit', (None, False, True, -1, 1, 2, 99))

@@ -1,13 +1,18 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Codex counter-review of sections 53 and 54 completed in section 55,
+Status: **Coverage/licensing follow-up recorded in section 57, 2026-10-28.
+Known subscriptions still do not establish usable guidance and stock/SPY NBBO.
+Current-vintage exploratory reconstruction is permitted by the plan in principle;
+original receipt/version proof is required for PIT/confirmation claims.
+This audit is local-only; no new push, QC access, purchase or monitor rearm.
+The section-55/56 round was published once as `7d633144`.
+Codex counter-review of sections 53 and 54 completed in section 55,
 2026-10-28; all four Claude commits are accepted after the recorded corrections.
 The published `fc07b099` review is consumed once.
 The invented SPY budget reconciliation is corrected in section 56 without
 changing strategy rules, orders, fills or cash. Whole-share rounding and
 released price-protection reserves are accounted for separately.
 The new section-55/56 source awaits independent Claude review.
-One end-of-round push is authorized; no intermediate push or monitor rearm.
 Claude follow-up corrections recorded in section 54, 2026-10-28:
 GDR-CR53-007 and GDR-CR53-008 are corrected, with one new P2 (GDR-CR54-002).
 The SYN native closure changes in `simulation.py` only (section 54);
@@ -77,7 +82,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 56. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 57. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -7914,3 +7919,167 @@ The proposed terminal-SPY rule and all eleven original null decisions remain
 unfrozen. Real-data comparison validation and original GDR-0..6 definitions
 are not completed by these invented accounting checks. QC access remains
 prohibited by current owner direction.
+
+## 57. Existing-subscription guidance, quote and licensing follow-up, 2026-10-28
+
+### 57.1 Scope, account evidence and limits
+
+Owner direction: proceed with remaining guidance-history and stock/SPY bid/ask
+coverage and licensing checks using existing subscriptions; no QC or purchase;
+report exactly what still blocks backtesting. Start clean local/live matching
+`7d63314472b4462e153dde82b0bf71c848a253fa`, mandatory worktree/branch/origin
+unchanged. That previous three-commit round's one successful publication is
+complete; this audit does not authorize another push or review/recovery loop.
+
+Use official public product/technical/legal pages and the dated existing
+account observations in 52.2. Bounded searches of connected provider
+correspondence found no guidance/NBBO entitlement or applicable licence
+confirmation. The connected mailbox's older Sharadar qualification reply
+said support could not locate the subscription under that contact address;
+this does not disprove the owner's later Bundle-5Y report or prove which
+purchase route/account applies. No unrelated lane correspondence or
+attachments was opened, and no vendor message was sent.
+
+A temporary isolated in-app provider tab reached unauthenticated Massive,
+EODHD and FMP login/signup screens. It was closed. Do not extract keychain
+credentials or transfer the authenticated Safari session. Shared Safari was
+not attached, inspected or operated, avoiding its earlier QC-tab ownership
+hazard. No QC page, public QC documentation, API, quota, Mia, source, log or
+outcome was accessed. No provider data endpoint, licensed records, sample
+download, future-price join, account/security/subscription change or purchase.
+Public documentation examples are documentation, not measured data coverage.
+
+Consequently the last authenticated inventory remains the October-28
+observations, not a fresh entitlement check: Massive Stocks Starter displayed
+through November 6; FMP Starter through November 13; EOD All World plus
+Calendar through November 14. Sharadar Bundle 5Y remains the owner's
+October-24 report. No exact expiry instant, active hidden add-on, renewal,
+agreement acceptance or grandfathered grant is inferred.
+
+### 57.2 Coverage result and reuse of existing products
+
+| Existing product | Useful documented coverage | Missing proof for this lane |
+|---|---|---|
+| Massive Stocks Starter | Five rolling aggregate years; its separate All Tickers reference endpoint advertises all reference history with dated/inactive queries. | Stock and SPY historical NBBO is excluded from Starter/Developer. Corporate Guidance is a separate partner product and was not displayed as owned. Dated reference queries still do not prove original publication availability. |
+| EODHD All World plus Calendar | Daily/reference/action context; current delayed bid/ask snapshot; earnings and analyst estimate trends. | No established historical NBBO archive. The US websocket feed explicitly identifies EDGX single-venue quotes, not consolidated NBBO. Calendar analyst estimates are not issuer guidance. Intraday bars/trades are not bid/ask history, and expanded tick/intraday products are not inferred owned. |
+| FMP Starter | Up to five years of documented pricing/fundamentals/reference context. | No documented Starter archive of issuer-guidance revisions or six-year stock/SPY NBBO. Financial Estimates are analyst forecasts; live/aftermarket bid/ask is not a historical regular-session quote archive. |
+| Sharadar Bundle 5Y | Filing fundamentals, EOD stock/fund prices, actions and active/inactive reference context. | No issuer-guidance revision or intraday bid/ask product established. Five-year ownership alone does not meet the draft's six-common-year planning floor. Do not buy additional fundamentals to address a different missing data type. |
+
+Primary sources: [Massive quotes](https://massive.com/docs/rest/stocks/trades-quotes/quotes),
+[All Tickers](https://massive.com/docs/rest/stocks/tickers/all-tickers),
+[EODHD websocket scope](https://eodhd.com/financial-apis/new-real-time-data-api-websockets),
+[Live v2 snapshot](https://eodhd.com/financial-apis/live-v2-for-us-stocks-extended-quotes-2025),
+[Calendar](https://eodhd.com/financial-apis/calendar-upcoming-earnings-ipos-and-splits),
+[FMP history/tier](https://site.financialmodelingprep.com/datasets/market-data-historic),
+[FMP estimates](https://site.financialmodelingprep.com/developer/docs/stable/financial-estimates),
+[Sharadar Bundle](https://sharadar.com/bundle), [Prices](https://sharadar.com/prices).
+
+Massive Corporate Guidance advertises history from September 12, 2011 and
+two-hour updates with current/prior ranges and fiscal/method fields. Its
+public schema does not establish immutable original/as-of versions, first
+delivery, announcement timezone or confirmation/withdrawal delivery. The
+scheduled-release `official` tag is not a confirmation flag. Direct Benzinga
+documents confirmed versus expected guidance and a separate removed-record
+route, but their propagation through Massive is unverified; removal is not
+automatically an economic withdrawal. The direct process guide and endpoint
+schema also differ on exposed confirmation fields.
+[Guidance](https://massive.com/docs/rest/partners/benzinga/corporate-guidance),
+[partner subscriptions](https://massive.com/docs/rest/partners/overview),
+[Benzinga process](https://docs.benzinga.com/api-reference/guides/guidance-process-explained),
+[endpoint](https://docs.benzinga.com/api-reference/calendar-api/get-guidance),
+[removals](https://docs.benzinga.com/api-reference/calendar-api/get-removed).
+
+Massive Advanced is a documented NBBO-capable candidate, not an owned grant or
+purchase recommendation. Advertised listed-stock/ETF history including SPY
+starts September 10, 2003; it does not prove usable common coverage for the
+actual universe. Its quote-size migration began November 3, 2025, from round
+lots to shares, with historical flat-file regeneration and changed ETags.
+Bind actual retrieved vintage, size units, SIP/participant clocks, conditions,
+mapping and synchronized minute volume before use; never blindly multiply all
+historical sizes by 100.
+[History](https://massive.com/knowledge-base/article/how-much-historical-stock-data-does-massive-have),
+[size migration](https://massive.com/blog/change-stocks-quotes-round-lots-to-shares).
+
+### 57.3 Applicable licensing evidence still needed
+
+These are public terms, not certification of the owner's account agreement:
+
+| Provider | Positive scope and restrictions | Remaining account-specific check |
+|---|---|---|
+| Massive | Its help expressly describes an individual's own research/scripts/private apps, including partner products. Market Data Terms retain display/non-display and third-party-content conditions. | Identify the applicable plan/partner/exchange agreement resolving those conditions, private external processing and raw/reconstructible retention. Business is not automatically required for personal research. Cancellation pending is not itself immediate agreement termination/deletion. |
+| EODHD | Public terms expressly permit private noncommercial storage/manipulation/analysis and prohibit account/data sharing and redistribution. | Establish post-term reuse/retention and any private external-processor rights for the selected inputs. Public personal-use support does not close those questions. |
+| Sharadar direct personal route | Terms recognize backtests/research outputs. After termination, raw/reconstructible data must be deleted within 30 days and source use stopped; non-reconstructible results/models/logs may be retained. | Verify direct Sharadar versus Nasdaq purchase route and operative contract; processor access is not established by direct terms. Do not substitute a future-dated/indexed Nasdaq policy for the account's applicable agreement. |
+| FMP | Personal research remains subject to account terms, copying/derivation/access restrictions and storage/security requirements. Subscription-end licence revocation and agreement-termination deletion clauses affect reproducibility. | Obtain applicable retention and private processing rights and the incorporated acceptable-data-use policy. Reviewed public policy links were unavailable; do not assume their missing content. |
+
+[Massive personal-use help](https://massive.com/knowledge-base/article/which-plan-do-i-need-to-show-massive-data-in-my-app),
+[Market Data Terms](https://massive.com/legal/market-data-terms-of-service),
+[Individuals Terms](https://massive.com/legal/individuals-terms-of-service),
+[EODHD terms](https://eodhd.com/financial-apis/terms-conditions),
+[Sharadar terms](https://sharadar.com/terms),
+[Nasdaq contract route](https://data.nasdaq.com/terms),
+[FMP terms](https://site.financialmodelingprep.com/terms-of-service).
+
+Do not infer a blanket LLM prohibition from this audit. Equally, official AI
+integration documentation does not grant universal raw-data disclosure,
+training or external-processing rights. No licensed records were supplied to
+an assistant or external processor in this audit.
+
+### 57.4 Exact remaining blockers and practical next step
+
+The original plan permits declared current-vintage and last-update-censored
+historical exploration with `point_in_time_data=false`. Immutable every-version
+and original first-delivery proof are PIT/confirmation prerequisites, not a
+universal bar to every exploratory backtest. Qualify older statements of the
+guidance-history gap accordingly. An exploratory study still needs actual
+usable current/predecessor coverage, disclosed availability/reconstruction
+assumptions, rights and a frozen authorized outcome scope. No such dataset
+audit or scope freeze is manufactured here.
+
+The unresolved blockers are:
+
+1. An account-entitled issuer-guidance source with usable comparable FY EPS
+   and revenue disclosures/predecessors; documented time, confirmation,
+   correction/withdrawal and reconstruction semantics. For PIT/confirmation,
+   additionally prove original versions/availability. A product name alone
+   proves neither evidence class.
+2. Historical consolidated stock and SPY NBBO plus synchronized minute
+   volume, with actual usable common dates, inactive identifiers, conditions,
+   units and normalization. The draft proposes at least six common years
+   ending no later than August 31, 2026; five rolling years do not alone meet
+   that floor. No protected dates or later outcomes are opened to extend it.
+3. Applicable account/partner/exchange permission for the intended personal
+   research, raw/reconstructible audit retention and specifically identified
+   private external processing, including after the paid term where needed.
+   Resolve contractual ambiguity before data acquisition/upload.
+4. Authentic dated identity/sector/action/terminal and settlement calendars,
+   historical fees and declared price normalization. Existing subscriptions
+   may cover parts, but completeness has not been measured.
+5. The real-data/native execution adapter and order/cash/NAV/comparator parity
+   validation, plus independent review of new section-55/56 fixes. The fixed
+   invented SPY-budget false alarm is closed, not a remaining purchase need.
+6. Explicit research/economic/date/look freeze and eventual separately scoped
+   evaluation authority. All eleven original null decisions remain; current
+   no-QC instruction prevents any native launch now.
+
+The next purchase-free evidence step is a provider/account response or the
+applicable contract identifying existing guidance/NBBO add-ons and answering
+the exact history, timestamp, removal and retention/processing questions
+above. No response was sent or agreement accepted. Only if existing access
+cannot meet these requirements should additional guidance/NBBO coverage be
+considered; Advanced and Corporate Guidance names alone are insufficient.
+
+No production code, candidate, fixture, source epoch or coverage metadata
+snapshot changes. Full source remains
+`aeefa0b379e3049a85954084cee5f2a1dc5f14a0f9265460c7f8e8c243666096`;
+section 56's hashes remain current. Sections 1 through 56 are preserved
+below the active header. Only this lane record and its active-status pins
+change. Root/project-wide documents remain frozen. The original closed 3/3
+cycle and separate recovery's zero attempts/intents are unchanged. Monitor
+stays PAUSED. This local audit/notes commit receives no new push under the
+completed previous round's authorization.
+
+Focused verification: the active-record consistency method passes (1 method,
+zero failures/errors/skips); the changed test file compiles in memory,
+`git diff --check` passes, production source SHA is unchanged and sections
+1 through 56 are byte-exact to `7d633144`. No full lane/repository suite or
+repeated engine evaluation is needed or claimed for this documentation audit.

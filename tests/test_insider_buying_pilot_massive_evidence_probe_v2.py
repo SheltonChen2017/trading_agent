@@ -385,3 +385,21 @@ def test_real_wall_alarm_bounds_a_stalled_body(monkeypatch):
     # the real alarm still supplies the finite wall, and no body is retained.
     assert len(calls) == 1 and stream.closes == 1 and result.disposition == "partial-read"
     assert result.body == b"" and signal.getitimer(signal.ITIMER_REAL) == (0.0, 0.0)
+
+
+# Claude review section 342 (IBMASSIVE2-CR34201): a malformed provider URL is
+# a typed refusal that keeps the completion records, not an untyped escape.
+@pytest.mark.parametrize("field", ["filing_url", "next_url"])
+def test_malformed_provider_url_is_a_typed_refusal_with_completion_records(tmp_path, field):
+    def transport(url, credential):
+        ordinal = next(i for i, (_, expected) in enumerate(m.REQUESTS, 1) if url == expected)
+        body = _body(ordinal)
+        if ordinal == 2 and field == "filing_url":
+            body["results"][0]["filing_url"] = "https://[www.sec.gov/Archives/edgar/data/320193/x.txt"
+        if ordinal == 2 and field == "next_url":
+            body["next_url"] = "https://[api.massive.com/stocks/filings/vX/index"
+        return m.prior.date_probe.ProviderMetadataResponse(200, m._raw(body), True)
+    result = _run(tmp_path, transport=transport)
+    assert result["status"] == "stopped-capability-probe" and result["transport_invocation_count"] == 2
+    assert result["disposition"] == ("filing_link_identity_refused" if field == "filing_url" else "cursor_origin_refused")
+    assert (_output(tmp_path) / "02-completed.json").is_file() and (_output(tmp_path) / "complete.json").is_file()

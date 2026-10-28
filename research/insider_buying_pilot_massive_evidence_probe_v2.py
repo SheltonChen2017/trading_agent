@@ -127,6 +127,15 @@ def _structure(body):
             _need(value is None or type(value) is bool, "source_scalar_refused")
 
 
+def _split(url, code):
+    # Section 342 (Claude review): urlsplit raises a plain ValueError on, for
+    # example, an unbalanced IPv6 bracket. That is a typed source refusal.
+    try:
+        return parse.urlsplit(url)
+    except ValueError:
+        raise MassiveEvidenceProbeError(code) from None
+
+
 def _filing(row, kind):
     issuer = "cik" if kind == "index" else "issuer_cik"
     required = {"accession_number", issuer, "form_type", "filing_date", "filing_url"}
@@ -138,7 +147,7 @@ def _filing(row, kind):
           and "2020-10-01" <= row["filing_date"] <= "2020-12-31" and _text(row["accession_number"])
           and re.fullmatch(r"[0-9]{10}-20-[0-9]{6}", row["accession_number"]), "requested_filing_identity_refused")
     _day(row["filing_date"])
-    url = parse.urlsplit(row["filing_url"]) if _text(row["filing_url"]) else None
+    url = _split(row["filing_url"], "filing_link_identity_refused") if _text(row["filing_url"]) else None
     _need(url is not None and url.scheme == "https" and url.netloc in {"www.sec.gov", "sec.gov"}
           and not url.query and not url.fragment and url.path.startswith("/Archives/edgar/data/320193/")
           and (row["accession_number"] in url.path or row["accession_number"].replace("-", "") in url.path),
@@ -207,7 +216,7 @@ def _projection(raw, credential, ordinal):
     next_url = body.get("next_url")
     if next_url is not None:
         _need(_text(next_url), "cursor_origin_refused")
-        parsed = parse.urlsplit(next_url); expected = parse.urlsplit(REQUESTS[ordinal - 1][1])
+        parsed = _split(next_url, "cursor_origin_refused"); expected = parse.urlsplit(REQUESTS[ordinal - 1][1])
         _need(parsed.scheme == "https" and parsed.netloc == "api.massive.com" and parsed.path == expected.path
               and not parsed.fragment and parsed.query, "cursor_origin_refused")
     kind = REQUESTS[ordinal - 1][0]

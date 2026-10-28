@@ -68627,6 +68627,14 @@ no whitespace setting/attribute changed or red evidence hidden. Current215
 literal dependency pins continue matching. The final handoff/push row must be
 read with this qualification, not as an all-checks-green or full-suite claim.
 
+Final handoff's first record selection85pass/1fail1.39s caught a blank
+separator before the newly appended section5row; removed that separator to
+restore the mandatory contiguous GFM ledger. No production source changed;
+the original failure and corrected final record validation are retained.
+Corrected final86record/documentpasses1.36s;215current literal pins, frozen
+BC source/profile, actual-output reconstruction and new anchor single-EOF/
+compile/hash checks passed under native denials. This repeat is not additive.
+
 ## 327. Existing five-year history and matched-period recovery
 
 ### 327.1 Owner scope, preserved baseline and prospective comparison period
@@ -68732,10 +68740,178 @@ any new DATA or provider access. Fixed prospective R327-H output is not yet
 inspected/allocated. All old source modules and their actual pin chains stay
 frozen; no generic equality relaxation, silent refresh, favorable first-row
 selection, source/price fallback or response-body/credential/row disclosure.
-Final handoff's first record selection85pass/1fail1.39s caught a blank
-separator before the newly appended section5row; removed that separator to
-restore the mandatory contiguous GFM ledger. No production source changed;
-the original failure and corrected final record validation are retained.
-Corrected final86record/documentpasses1.36s;215current literal pins, frozen
-BC source/profile, actual-output reconstruction and new anchor single-EOF/
-compile/hash checks passed under native denials. This repeat is not additive.
+
+### 327.3 New hierarchy protocol and pre-use validation
+
+New pure scripts/arv2_r327_public_figi_hierarchy.py24909bytes
+SHA256568a82d3cde4834394cb06f614ab48ba4c63e2586ab231ae2b1ffc23677733d6;
+tests/analyst_revisions_v2/test_public_figi_hierarchy.py15390bytes
+SHA256dbafcf39004d87a3b98788a59b659f0e6547e5bf23a29bf9ccebda491fdce8ca.
+Every bounded row is retained diagnostically; only unique exact requested
+Equity records with valid nonnull composite/shareClass may reference a witness.
+Positive pairs require identical composite AND shareClass plus a unique exact
+FIGI==composite/exchCodeUS witness and ALL supplied jobs unambiguous. A shared
+shareClass, foreign composite, first favorable row or missing/ambiguous job
+does not establish identity. One optional sorted composite-only second phase
+excludes initial claims and cannot recurse. Maximum two requests,9jobs/phase,
+15000results/job inclusive,2MiB/body; strict bounded JSON, opaque/redacted
+private evidence and no route/alias/price/history authority.
+
+New scripts/run_arv2_r327_public_figi_hierarchy.py58844bytes
+SHA25666fac17278f2468bbbca869da1b1941c5d0ea9c1d55e603efdf5c3448abcd411;
+tests/analyst_revisions_v2/test_r327_public_figi_hierarchy_caller.py28206bytes
+SHA256e32c059c88fc90a91f4032a25e7e656a64b1c0b269be58eafc549b73877fbd73.
+Canonical profile30693bytes
+SHA256572bf51888b57d6986d7929b3faff90a02a3f1955c9a88183c4239ecc42f1f96
+binds217 currently matching literal dependencies (unchanged BC215 plus its
+caller and new helper), not whole-interpreter integrity. Own source/Git blob,
+exact clean HEAD/designated root/branch/Darwin Python3.13/environment also bind.
+
+Prospective output
+artifacts/analyst_revisions_v2/newrule_public_figi_diagnostic/R327-20261027-H
+is still UNINSPECTED/UNALLOCATED. Exclusive fsynced claim precedes DATA;
+persistent role intent/start markers and inherited original descriptors prevent
+normal CLI redispatch, not arbitrary same-user modification. NEW source guard
+reads ONLY AD DATA public-figi-private.json26503bytes
+SHA256babb09c92ccf109bede02e0e9d125dc650ad3d64fee99b64b08770f19a62961c.
+Old AD actual2/validator0/failure and exact selection24516bytes
+SHA2560776dc737e2b35f481b2f732d8bb17f5e2bf32e8faa3478e2897f64488740e7a
+are verified, never relabelled success. Pure original-binding checks occur
+while guarded; normal guard RETURN precedes owned seed publication. Parent
+requires source actual0 and rehashes that held seed before provider start.
+No old control/guard/entrypoint replay or historical cause/contact inference.
+
+Anonymous POST ONLY https://api.openfigi.com/v3/mapping sends nine exact
+ID_BB_GLOBAL/includeUnlistedEquitiesTrue jobs, then at most nine NEW derived
+composites once. Owned prepared body/headers/TLS context/pinned in-memory CA,
+hostname verification/TLS1.2minimum; no API key, alternate ID/filter, cookie,
+proxy, redirect, default environment trust or retry. Numeric status retained
+before later checks; non200 body unread. Complete bounded HTTP200 bodies are
+fsynced/read back on original descriptors BEFORE parse, retained on refusal.
+Official anonymous allowance25requests/minute/10jobs does not prove exclusive
+IP capacity;429/failure is terminal, never waited/retried. Application intents
+are not physical requests: provider_request_count remains unknown/null.
+
+Separate all-network-denied auth reproduces requests/raw bodies/every job,
+deterministic second-phase IDs/journal/index and EVERY selected pair. Source
+binds the actual five-or-six unique pair count from six retained vendor rows;
+authentication requires that exact count and finite helper labels. All five
+vendor blockers remain5, with identity/route/PIT/master/readiness flags false.
+Parent requires role actual0, held/named/security checks, exact private pin and
+postflight before report; actual parent0 PLUS separate native validator0 and
+byte-equal public output are mandatory. Report alone or actual2/unknown/late
+failure is inadmissible. One consumed/ambiguous attempt; no cleanup or retry.
+Normal own outputs18files (7DATA,claim,9role intent/start/observed,report), with
+inroot support runtime; not whole-tree continuous-integrity proof.
+
+Ordinary credential-free parent launches separate native role fences, not a
+native-network-denied parent. Source/auth/validator deny all network; provider
+permits HTTPS443/DNS53/local mDNSResolver socket (NOT a native domain fence).
+All roles deny Keychains/security CLI and outside-control/support writes;
+validator denies ALL artifacts. Parent240s/source60/provider120/auth60/
+validator20/external270s bounds have uninterruptible-I/O/host-suspension
+qualification; own child only kill/reap. All financial/source/privacy gates
+and frozen historical failures remain. No actual H invocation yet.
+
+Root pre-use audit corrected I327-001(P2): blocking stdin could bypass its
+role deadline until parent alarm; now one nonblocking selector handles all
+pipes/limits/own kill/reap, with real no-read/noisy/trailing/nonzero/FD tests.
+I327-002(P2): loose regex category/pair-count acceptance now binds finite
+labels and the source-selected scope. Prepared URL/body/Authorization-header
+tampering stops before send; max9+9 envelope fits128KiB. NEW uninvoked caller/
+test extra EOF blank removed before use; tracked-only diff had not inspected
+untracked bytes. Old frozen I326-033 files remain unchanged.
+The first combined prefreeze byte gate then caught one remaining caller-test
+EOF blank at28207/cefb47d5 BEFORE pytest collection. Root verified every other
+hash/HEAD unchanged (no concurrent edit), removed that unused test blank and
+records28206/e32c059c above. No operational source/pin or spent file changed;
+this interrupted byte gate is not a pytest pass/failure count.
+
+First joint93passes8.46s; root final214distinctpasses6.40s =98helper/caller+
+30period+86document, no failures/skips/warnings. Earlier subsets overlap,
+not additive. New files compile in memory; all217pins/profile and absent
+dispatch_fence verified under native all-network/artifact/Keychain denial.
+No full suite or production DATA/provider/QC/Safari operation. Three separate
+fresh-process memory-only omissions each produced one expected regression red:
+parent seed check0.12s(provider incorrectly reachable), body retention0.13s
+(required parser-refusal bytes lost), actual-exit constraint0.10s(false
+failure-envelope acceptance). File bytes unchanged. Same-round advisory
+inspection found no further material defect; not independent final review.
+The separately fixed durable external actual collector and clean exact one-shot
+run freeze remain required; test success alone grants no operational H call.
+
+### 327.4 Durable collector and exact one-shot H run freeze
+
+New scripts/observe_arv2_r327_public_figi_hierarchy.py14914bytes
+SHA2566979d7d63ff4d8040979f5edfd2b5cc0af63cdbfc9e42838295eb5ed407c1eab
+is the fixed external actual caller; it neither accepts an arbitrary callback
+nor runs a bare adapter. Canonical collector profile3290bytes
+SHA2562861d7d286528efd550bd3be9d416578fa0c2b1c104bfbe6efe8c3bed2e75e81.
+Tests/analyst_revisions_v2/test_r327_public_figi_hierarchy_observer.py11202bytes
+SHA256632a65f033bcb4f25418c745a57998e9076d06bcd24928f7a984767ee32588e0.
+It binds its own CLI source/Git blob at exact expected clean HEAD and the
+unchanged H source/profile/217pins; frozen bounded_actual_capture12105bytes
+SHA256febe87c53010227eeca399b8a5087c42d2363c7d3a9ee583d18dfd06b3a68356
+provides simultaneous nonblocking pipes, complete original metadata and own
+kill/reap. Collector330s bounds ONE ordinary Hrun270s, then only if complete
+observed H exit0or2 ONE separate native Hvalidate35s with THAT observed exit
+and exact original stdout. Limits128KiBstdout/8192stderr, complete stdin/
+stdout/stderr and no stderr mandatory; native validator0/byte equality and
+postflight required. Hactual2/native0 is authenticated FAILURE only and the
+collector returns2. Unknown/incomplete/malformed/nonzero validator never
+becomes success. The external tool's actual collector exit also remains a
+separate observed gate, not inferred from an emitted boolean/report.
+
+Only validated closed public H pin/count/finite evidence and original process
+metadata can be recorded. Its canonical public frame is compressed zlib9+
+standard base64, at most64KiB encoded, total closed collector result96KiB;
+bounded canonical decode reproduces the original128KiB maximum and rejects
+trailing/compression bombs. No raw stderr/exception, credential, identifier,
+price, private seed/body/package or source artifact read by this collector.
+H owns its private source/provider/auth evidence. Outer generic capture error
+cannot trigger retry. The tool/orchestration may retain only this finite
+validated result and derive an inert public fact anchor/record; no additional
+artifact reader, control inspection or provider contact is granted.
+
+First observer selection27passes/6fixturefailures0.18s: synthetic unknown or
+incomplete capture rows incorrectly combined bound=None with missing exit/
+complete flags, which the frozen capture schema correctly refuses. Fixtures
+now use coherent capture_io-bound failure metadata, preserving source and
+unknown-vs-incomplete distinctions. Corrected33passes0.12s, no production
+validation weakened. They add33distinct tests to the earlier214, not27+33;
+final combined verification follows. Collector/test compile without bytecode.
+Same-round audit/implementation is not independent review.
+
+Under the owner's standing scoped no-Claude-review research recovery direction
+and current existing-rights decision, this commit prospectively freezes ONE H
+invocation, conditional on every exact technical preflight. The clean HEAD of
+THIS commit is the --expected-head for collector AND all H roles; collector
+--collector-sha256 is6979d7d63ff4d8040979f5edfd2b5cc0af63cdbfc9e42838295eb5ed407c1eab,
+H --caller-sha25666fac17278f2468bbbca869da1b1941c5d0ea9c1d55e603efdf5c3448abcd411
+and --profile-sha256572bf51888b57d6986d7929b3faff90a02a3f1955c9a88183c4239ecc42f1f96.
+Exact designated Darwin/POSIX Python3.13 at
+/Users/sheltonchen/.venvs/trading_agent-py313/bin/python; credential-free env-i
+with fixed /usr/bin:/bin:/usr/sbin:/sbin PATH, allowed locale and ONLY inroot
+support/cache variables, -B/-s outer startup. One native all-network/artifact/
+Keychain-denied public-source/Git/environment preflight may precede dispatch;
+it reads no private DATA and allocates no H control. Repeated built-in stage
+pre/post checks are prescribed protocol, not replay of an old operational
+reader. H itself exclusively claims/fsyncs the fixed unallocated leaf before
+source. No private leaf existence/metadata inspection is authorized early.
+
+All agents HOLD file edits/tests/temp/private/operational work before this
+freeze and during the actual, preventing root/test overlap. No source guard,
+provider, collector, validator, H control, QC capacity/project/job or Safari
+operation has yet run. This is new current-hierarchy observation, NOT an AD
+retry, historical root-cause reconstruction, source/price admission, missing-
+price cure, alias, global-collision clearance or strategy result. If actual
+failure/ambiguity occurs preserve every leaf; no repair/retry/renaming. Continue
+only with separately coherent admissible recovery under existing rights.
+337/259/53/699 unchanged; no new paid/trading authority. The period/runtime
+projection design remains held, with no uncommitted projection files or
+parallel actual operation. One final push for the whole concluded round only.
+Final prefreeze selection247distinctpasses6.39s (98hierarchy/caller+
+33collector+30period+86document), no failures/skips/warnings. All eight new
+source/test files compile in memory/single EOF;217literal dependency pins and
+both exact profiles match, dispatch_fence absent, native network/artifact/
+Keychain denial retained. No concurrent native test or operational session.

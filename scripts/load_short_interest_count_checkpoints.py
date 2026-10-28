@@ -22,6 +22,7 @@ from scripts import load_short_interest_count_epoch_ledger as old_archive
 from scripts import short_interest_count_response_volume as storage
 from scripts import short_interest_lane_batch_guard as lane
 from scripts import capture_short_interest_durable_counts as producer
+from scripts import resolve_short_interest_count_run13448 as negative_resolution
 from research.short_interest_etf import native_count_recovery_budget as plans
 from research.short_interest_etf import native_dated_class_reference as references
 
@@ -29,6 +30,7 @@ ROOT = lane.ROOT
 DRIVER = "scripts/load_short_interest_count_checkpoints.py"
 PROTOCOL_SHA256 = "PENDING"
 EXPECTED_PRODUCER_HEAD = EXPECTED_PRODUCER_PROTOCOL = "PENDING"
+EXPECTED_PRODUCER_PLAN_PROFILE = "PENDING"
 EXPECTED_PRODUCER_CODE_MANIFEST = ()
 EXPECTED_RECEIPT_PATH = EXPECTED_RECEIPT_SHA256 = EXPECTED_RECEIPT_SEAL9_SHA256 = "PENDING"
 EXPECTED_ROUND_MOUNT = EXPECTED_ROUND_BODY_SHA256 = EXPECTED_ROUND_BODY_SEAL9_SHA256 = "PENDING"
@@ -46,6 +48,14 @@ HISTORICAL_HEADS = (
 _ISSUED, _FAILED, _CLOSED, _PRIVATE = {}, set(), {}, {}
 _DEADLINES, _DEADLINE_LAST, _PRODUCERS, _PRODUCER_PINS = {}, {}, {}, {}
 _MONOTONIC = time.monotonic
+_RESOLUTION_FUNCTION = negative_resolution.resolve_registered
+_RESOLUTION_CODE = _RESOLUTION_FUNCTION.__code__
+_RESOLUTION_PHASE, _RESOLUTION_ISSUED = None, {}
+LEGACY_EIGHT_PART_PRODUCER_PROTOCOLS = (
+    "0364f7bca6bc7eaf7c41af850df8c6e1558f23354c179e5ce27126b118b60cd7",
+    "0a12282d516613ac3d6f5e407aab331c385159fbf5244370bc05b88f5551f7e5",
+    "5d2cb9935d26bbdbe92ac15d2bc98b775a8b7202870a5f119f3aa15dcb74f959",
+    "14818d707b17eef1a6b9ba26416c3c0a4dd82cdc33c8819130ffcd3cb8cc4b29")
 _CODES = frozenset("""checkpoint_loader_registration_pending checkpoint_loader_root_changed
 checkpoint_loader_json_changed checkpoint_loader_shape_changed checkpoint_loader_seal_changed
 checkpoint_loader_file_changed checkpoint_loader_directory_changed checkpoint_loader_native_changed
@@ -89,13 +99,19 @@ def code_paths():
     # Storage has fixed lazy transport/outer/checkpoint validators. Bind that
     # complete executable closure, including the explicitly retained original
     # wrappers, rather than only this module's eager import statements.
-    return tuple(sorted(set((*producer.code_paths(), DRIVER))))
+    return tuple(sorted(set((*producer.code_paths(), *negative_resolution.code_paths(), DRIVER))))
 
 
 def protocol():
     return {"schema": "si-count-checkpoint-loader-policy-v1", "maximum_seconds": MAXIMUM_SECONDS,
         "maximum_chunks": MAXIMUM_CHUNKS, "maximum_file_bytes": MAXIMUM_BYTES,
         "producer_head": EXPECTED_PRODUCER_HEAD, "producer_protocol": EXPECTED_PRODUCER_PROTOCOL,
+        "producer_plan_profile": EXPECTED_PRODUCER_PLAN_PROFILE,
+        "legacy_eight_part_producer_protocols": list(LEGACY_EIGHT_PART_PRODUCER_PROTOCOLS),
+        "resolution_historical_code_head": negative_resolution.OLD_HEAD,
+        "resolution_historical_code_paths": list(negative_resolution.HISTORICAL_PATHS),
+        "plan_reconstruction": "frozen_legacy_eight_part_or_genuine_registered_negative_resolution_nine_part_never_JSON",
+        "negative_resolution_reads": "original_issued_function_phase_exact_hdiutil_info_plist_and_DEVNULL_only_no_writes_or_provider",
         "producer_code_manifest": [list(row) for row in EXPECTED_PRODUCER_CODE_MANIFEST],
         "receipt": [EXPECTED_RECEIPT_PATH, EXPECTED_RECEIPT_SHA256, EXPECTED_RECEIPT_SEAL9_SHA256],
         "round": [EXPECTED_ROUND_MOUNT, EXPECTED_ROUND_BODY_SHA256, EXPECTED_ROUND_BODY_SEAL9_SHA256,
@@ -124,6 +140,8 @@ def registered():
         and type(EXPECTED_RECEIPT_PATH) is str and Path(EXPECTED_RECEIPT_PATH).is_absolute()
         and type(EXPECTED_ROUND_MOUNT) is str and Path(EXPECTED_ROUND_MOUNT).is_absolute()
         and (MAXIMUM_SECONDS, MAXIMUM_CHUNKS, MAXIMUM_BYTES) == (1800, 133, 2097152)
+        and EXPECTED_PRODUCER_PLAN_PROFILE == ("legacy_four_epochs" if EXPECTED_PRODUCER_PROTOCOL
+            in LEGACY_EIGHT_PART_PRODUCER_PROTOCOLS else "permanent_run13448_negative8")
         and hash_payload(protocol()) == PROTOCOL_SHA256, "checkpoint_loader_registration_pending")
 
 
@@ -545,7 +563,7 @@ def _terminal_metadata(index, descriptors, round_directories, round_body9, round
 
 def _attempts(descriptor, private, plan, lifetime, *, ordinal_offset=0):
     attempts = descriptor["attempts"]; chunk = descriptor["plan"]["chunk"]
-    require(type(attempts) is list and 0 < len(attempts) <= len(plan.chunk_positions(chunk)) + 16,
+    require(type(attempts) is list and 0 < len(attempts) <= len(plan.chunk_positions(chunk)) + plan.chunk_extra_limit(chunk),
         "checkpoint_loader_accounting_changed")
     charges, reservations, covered, chains, epoch_tries = [], [], set(), {}, {}
     claim = _parse(private[descriptor["external_claim_path"]])
@@ -568,7 +586,8 @@ def _attempts(descriptor, private, plan, lifetime, *, ordinal_offset=0):
             and reservation["schema"] == "si-count-attempt-reservation-v1" and reservation["plan_sha256"] == plan.sha256
             and type(reservation["chunk_number"]) is int and reservation["chunk_number"] == chunk
             and type(reservation["reservation_ordinal"]) is int and reservation["reservation_ordinal"] == number
-            and type(reservation["lifetime_try"]) is int and reservation["lifetime_try"] == lifetime[position - 1] + 1 <= 3
+            and type(reservation["lifetime_try"]) is int and reservation["lifetime_try"] == lifetime[position - 1] + 1
+                <= plan.budget_profile()["maximum_lifetime_tries"]
             and type(reservation["bytes_reserved"]) is int and reservation["bytes_reserved"] == MAXIMUM_BYTES
             and reservation["dispatch_authority"] is False and _digest(reservation["request_sha256"])
             and hash_payload(reservation) == attempt["reservation_sha256"], "checkpoint_loader_accounting_changed")
@@ -677,7 +696,9 @@ def _git_allowed(executable, command, cwd, runtime_head):
     command = tuple(command)
     if len(command) == 3 and command[:2] == ("git", "show"):
         revision, separator, name = command[2].partition(":")
-        return separator == ":" and revision in (*HISTORICAL_HEADS, runtime_head, EXPECTED_PRODUCER_HEAD) and name in code_paths()
+        return separator == ":" and ((revision in (*HISTORICAL_HEADS, runtime_head, EXPECTED_PRODUCER_HEAD)
+            and name in code_paths()) or (_resolution_phase_active() and revision == negative_resolution.OLD_HEAD
+                and name in negative_resolution.HISTORICAL_PATHS))
     if len(command) == 5 and command[:3] == ("git", "merge-base", "--is-ancestor"):
         return command[3] in (*HISTORICAL_HEADS, EXPECTED_PRODUCER_HEAD) and command[4] == runtime_head
     return command in {
@@ -696,14 +717,82 @@ def _readonly_seams(runtime_head):
             raise CountCheckpointLoaderRefusal("REFUSED: checkpoint_loader_readonly_required")
         if event == "open":
             flags = args[2]
-            require(type(flags) is int and not flags & (os.O_WRONLY | os.O_RDWR | os.O_CREAT | os.O_TRUNC | os.O_APPEND),
+            null = (_resolution_phase_active() and type(args[0]) is str and args[0] == "/dev/null" and type(flags) is int
+                and flags in {os.O_RDWR, os.O_RDWR | getattr(os, "O_CLOEXEC", 0)}
+                and stat.S_ISCHR(os.lstat("/dev/null").st_mode))
+            require(type(flags) is int and (null or not flags & (os.O_WRONLY | os.O_RDWR | os.O_CREAT | os.O_TRUNC | os.O_APPEND)),
                 "checkpoint_loader_readonly_required")
         if event == "subprocess.Popen":
-            require(_git_allowed(args[0], args[1], args[2], runtime_head),
+            info = (_resolution_phase_active() and type(args[0]) is str and args[0] == "/usr/bin/hdiutil"
+                and type(args[1]) in (list, tuple) and all(type(item) is str for item in args[1])
+                and tuple(args[1]) == ("/usr/bin/hdiutil", "info", "-plist")
+                and (args[2] is None or type(args[2]) is str and args[2] == str(ROOT)))
+            require(info or _git_allowed(args[0], args[1], args[2], runtime_head),
                 "checkpoint_loader_readonly_required")
     sys.addaudithook(hook)
     try: yield
     finally: state[0] = False
+
+
+def _resolution_phase_active():
+    phase = _RESOLUTION_PHASE
+    return (type(phase) is tuple and len(phase) == 4 and type(phase[3]) is object
+        and _RESOLUTION_ISSUED.get(phase[3]) is phase
+        and phase[0] is _RESOLUTION_FUNCTION is negative_resolution.resolve_registered
+        and type(_RESOLUTION_FUNCTION) is FunctionType and _RESOLUTION_FUNCTION.__code__ is _RESOLUTION_CODE
+        and phase[1] is _RESOLUTION_CODE)
+
+
+def _recovery_plan(baseline, *, runtime_head, actual_remote, boundary):
+    """Independent original negative resolution, never a saved-payload cast."""
+    global _RESOLUTION_PHASE
+    if EXPECTED_PRODUCER_PROTOCOL in LEGACY_EIGHT_PART_PRODUCER_PROTOCOLS:
+        require(EXPECTED_PRODUCER_PLAN_PROFILE == "legacy_four_epochs", "checkpoint_loader_baseline_changed")
+        return plans.freeze_count_recovery_plan(baseline)
+    require(EXPECTED_PRODUCER_PLAN_PROFILE == "permanent_run13448_negative8"
+        and EXPECTED_PRODUCER_PROTOCOL == producer.RUN_PROTOCOL_SHA256
+        and _RESOLUTION_PHASE is None and negative_resolution.resolve_registered is _RESOLUTION_FUNCTION
+        and type(_RESOLUTION_FUNCTION) is FunctionType
+        and _RESOLUTION_FUNCTION.__code__ is _RESOLUTION_CODE, "checkpoint_loader_baseline_changed")
+    boundary(); phase = _RESOLUTION_FUNCTION, _RESOLUTION_CODE, baseline, object()
+    _RESOLUTION_ISSUED[phase[3]] = phase; _RESOLUTION_PHASE = phase
+    try:
+        resolved = _RESOLUTION_FUNCTION(baseline, runtime_head=runtime_head, actual_remote=actual_remote)
+    finally:
+        _RESOLUTION_PHASE = None; _RESOLUTION_ISSUED.pop(phase[3], None)
+    boundary()
+    original = negative_resolution.resolution_binding(resolved)
+    require(original[2] is baseline, "checkpoint_loader_baseline_changed")
+    return plans.freeze_count_recovery_plan_with_exposure(baseline, original[1])
+
+
+def _operative_accounting(plan, starts, charged):
+    require(type(plan) is plans.CountRecoveryPlan, "checkpoint_loader_accounting_changed")
+    plan._guard()
+    profile = plan.budget_profile()
+    exposed = plans.negative_exposure.exposure_binding(plan._parts[8]) if len(plan._parts) == 9 else None
+    slots = len(exposed[3]) if exposed is not None else 0
+    baseline = plan._parts[1].public_summary()
+    require(type(starts) is int and starts >= 0 and type(charged) is int and charged >= 0
+        and profile["known_baseline_START_debits"] == baseline["START_debits"]
+        and profile["known_baseline_charged_bytes"] == baseline["charged_response_bytes"]
+        and profile["permanent_unknown_START_upper_debits"] == slots
+        and profile["permanent_unknown_byte_debits"] == slots * MAXIMUM_BYTES
+        and profile["negative_exposure_sha256"] == (exposed[8] if exposed is not None else None)
+        and profile["initial_START_upper_bound"] == baseline["START_debits"] + slots
+        and profile["initial_byte_upper_bound"] == baseline["charged_response_bytes"] + slots * MAXIMUM_BYTES
+        and profile["maximum_cumulative_STARTs"] <= 84005
+        and profile["maximum_cumulative_bytes"] <= 4 * 1024 ** 3
+        and profile["initial_START_upper_bound"] + starts <= profile["maximum_cumulative_STARTs"]
+        and profile["initial_byte_upper_bound"] + charged <= profile["maximum_cumulative_bytes"],
+        "checkpoint_loader_accounting_changed")
+    return {"known_baseline_START_debits": profile["known_baseline_START_debits"],
+        "known_baseline_charged_bytes": profile["known_baseline_charged_bytes"],
+        "permanent_unknown_START_upper_debits": profile["permanent_unknown_START_upper_debits"],
+        "permanent_unknown_byte_debits": profile["permanent_unknown_byte_debits"],
+        "negative_exposure_sha256": profile["negative_exposure_sha256"],
+        "operative_cumulative_START_upper_bound": profile["initial_START_upper_bound"] + starts,
+        "operative_cumulative_byte_upper_bound": profile["initial_byte_upper_bound"] + charged}
 
 
 @contextmanager
@@ -734,7 +823,7 @@ def load_registered_count_checkpoints(root, *, runtime_head, actual_remote,
             closed_old = archive.closed_summary(); baseline = archive._anchor[0]
             require(closed_old["model_ledger_sha256"] == baseline.sha256 == plans.BASELINE_LEDGER_SHA256,
                 "checkpoint_loader_baseline_changed")
-            plan = plans.freeze_count_recovery_plan(baseline)
+            plan = _recovery_plan(baseline, runtime_head=runtime_head, actual_remote=actual_remote, boundary=boundary)
             with old_archive.count.old.cache.HeldFiles(tuple(root / name for name in code_paths()),
                     protected=False, boundary=boundary) as code:
                 audit_code(code)
@@ -798,8 +887,8 @@ def load_registered_count_checkpoints(root, *, runtime_head, actual_remote,
                     "accounts": [_account_root(account) for account in accounts]}
                 starts = sum(len(account["charges"]) for account in accounts)
                 charged = sum(sum(account["charges"]) for account in accounts)
-                require(expected == index["expected_accounting"] and 13992 + starts <= 84005
-                    and 23452681 + charged <= 4 * 1024 ** 3, "checkpoint_loader_accounting_changed")
+                require(expected == index["expected_accounting"], "checkpoint_loader_accounting_changed")
+                operative = _operative_accounting(plan, starts, charged)
                 summary = {"schema": "si-requalified-count-transport-corpus-v1", "status": "contexts_open",
                     "chunks": len(descriptors), "new_retained_STARTs": starts, "new_retained_charged_bytes": charged,
                     "baseline_sha256": baseline.sha256, "plan_sha256": plan.sha256,
@@ -807,6 +896,7 @@ def load_registered_count_checkpoints(root, *, runtime_head, actual_remote,
                     "round_index_sha256": EXPECTED_ROUND_BODY_SHA256,
                     "expected_union_binding_sha256": index["expected_union_binding_sha256"],
                     "producer_actual_union_sha256": main_receipt["actual_union_sha256"], "authority": authority()}
+                summary.update(operative)
                 value = object.__new__(RequalifiedCountTransportCorpus)
                 private = (tuple(canonical_json(item).encode() for item in descriptors),
                     tuple(canonical_json(item).encode() for item in accounts), index_raw, object())

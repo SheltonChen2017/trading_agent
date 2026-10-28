@@ -44,8 +44,11 @@ def isolated(monkeypatch):
 
 
 @pytest.fixture
-def h(monkeypatch, tmp_path):
-    plan = budget_support.genuine_plan(monkeypatch)
+def h(monkeypatch, tmp_path, request):
+    if getattr(request, "param", None) == "negative8":
+        unused, unused2, plan = budget_support.support.genuine_exposure_plan(monkeypatch)
+        monkeypatch.setattr(negative.accounting, "_EXPECTED_SOURCE_PROFILE", negative.accounting._source_profile())
+    else: plan = budget_support.genuine_plan(monkeypatch)
     budget = negative.accounting.open_durable_count_budget(plan)
     mount = tmp_path / "original-mount"; mount.mkdir(mode=0o700)
     fd = os.open(mount, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
@@ -396,6 +399,45 @@ def source_file(h, relative, raw=b"SYNTHETIC_PARTIAL", *, original_directories=T
 
 def manifest(h):
     return json.loads((h.mount / "quarantine/closure" / negative.primitive.BODY_NAME).read_bytes())
+
+
+@pytest.mark.parametrize("h", ["negative8"], indirect=True)
+def test_negative_manifest_carries_original_permanent_exposure_without_changing_known_B3(h, kernel):
+    plan = h.budget.plan; profile = plan.budget_profile(); baseline = plan._parts[1].public_summary()
+    lease = h.lease(); h.fail(); before = h.budget._state
+    report = negative.finalize_failed_chunk(lease)
+    assert report["final_negative_manifest_issued"] and not report["requires_process_hold"]
+    result = manifest(h)
+    assert result["historical_START_debits"] == baseline["START_debits"]
+    assert result["historical_charged_bytes"] == baseline["charged_response_bytes"]
+    assert result["permanent_unknown_START_upper_debits"] == 8
+    assert result["permanent_unknown_byte_debits"] == 8 * 2097152
+    assert result["negative_exposure_sha256"] == plan.negative_exposure().sha256
+    assert result["operative_initial_START_upper_bound"] == baseline["START_debits"] + 8
+    assert result["operative_cumulative_byte_upper_bound"] == profile["initial_byte_upper_bound"]
+    assert result["current_full_page_reservations"] == 0 and h.budget._state is before
+    assert result["source_contexts_closed"] is result["process_closed"] is False
+
+
+@pytest.mark.parametrize("h", ["negative8"], indirect=True)
+def test_failed_negative_path_keeps_new_full_pages_and_the_permanent_floor(h, kernel):
+    profile = h.budget.plan.budget_profile(); lease = h.lease(); observed = h.emit(); before = h.budget._state
+    h.fail(); negative.preserve_failed_observation(lease, observed)
+    report = negative.finalize_failed_chunk(lease)
+    assert report["final_negative_manifest_issued"] and not report["requires_process_hold"]
+    result = manifest(h)
+    assert result["current_full_page_reservations"] == 2097152
+    assert result["operative_cumulative_byte_upper_bound"] == profile["initial_byte_upper_bound"] + 2097152
+    assert result["permanent_unknown_byte_debits"] == 8 * 2097152 and h.budget._state is before
+
+
+@pytest.mark.parametrize("h", ["negative8"], indirect=True)
+def test_original_plan_profile_method_is_pinned_before_failure(h, monkeypatch):
+    lease = h.lease(); h.fail()
+    monkeypatch.setattr(negative.accounting.research_budget.CountRecoveryPlan, "budget_profile", lambda self: {})
+    report = negative.finalize_failed_chunk(lease)
+    assert report["requires_process_hold"] and not report["final_negative_manifest_issued"]
+    assert report["blockers"][0]["contract_code"] == "negative_original_code_changed"
 
 
 def original_empty_source_containers(h, monkeypatch):

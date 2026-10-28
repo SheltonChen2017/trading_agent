@@ -110,6 +110,8 @@ def policy():
         "settled_accounting": "original_append_issued_account7_only_pure_history_no_old_reader_clock_or_FAILED_veto",
         "release_barrier": "fixed_reader_exact_original_ClosedCountChunk_all_contexts_postclose_audits",
         "unknown_no_body": "full_page_charge_preserved", "individual_ticket_release": False,
+        "operative_balance": "original_guarded_plan_profile_known_B3_plus_permanent_negative_exposure_never_settled_or_refunded",
+        "chunk_extra_limit": "original_guarded_plan_per_chunk_limit_not_global_default",
         "actual_START_or_HTTP_observation": False, "authority": profile}
 
 
@@ -222,22 +224,28 @@ class DurableCountBudget:
     @_coherent
     def public_summary(self):
         plan, state = self._guard()
+        profile = plan.budget_profile()
         chunk, tickets, active, settlements, charged = state
-        return {"schema": "si-durable-count-budget-observation-v1", "plan_sha256": plan.sha256,
+        report = {"schema": "si-durable-count-budget-observation-v1", "plan_sha256": plan.sha256,
             "current_chunk": chunk, "closed_chunks": len(settlements),
-            "new_START_reservations": len(tickets), "cumulative_START_debits_upper_bound": research_budget.PRIOR_STARTS + len(tickets),
+            "new_START_reservations": len(tickets), "cumulative_START_debits_upper_bound": profile["initial_START_upper_bound"] + len(tickets),
             "new_closed_charged_bytes": charged, "historical_charged_bytes": research_budget.PRIOR_CHARGED_BYTES,
             "outstanding_full_page_bytes": len(active) * research_budget.MAXIMUM_RESPONSE_BYTES,
-            "cumulative_charged_plus_reserved_bytes": research_budget.PRIOR_CHARGED_BYTES + charged
+            "cumulative_charged_plus_reserved_bytes": profile["initial_byte_upper_bound"] + charged
                 + len(active) * research_budget.MAXIMUM_RESPONSE_BYTES,
             "settled_tickets": len(tickets) - len(active), "actual_START_or_HTTP_observation": False,
             "authority": authority()}
+        if profile["negative_exposure_sha256"] is not None:
+            report.update(permanent_unknown_START_upper_debits=profile["permanent_unknown_START_upper_debits"],
+                permanent_unknown_byte_debits=profile["permanent_unknown_byte_debits"],
+                negative_exposure_sha256=profile["negative_exposure_sha256"])
+        return report
 
     @_coherent
     def reserve_start_slot(self, position):
         """Spend one source-only reservation before any future START publication."""
         try:
-            plan, state = self._guard()
+            plan, state = self._guard(); profile = plan.budget_profile()
             require(_identity_class(CountAttemptTicket), "attempt_ticket_binding_changed")
             chunk, tickets, active, settlements, charged = state
             require(chunk <= len(plan._parts[3]), "current_chunk_required")
@@ -265,13 +273,14 @@ class DurableCountBudget:
                 tries, request, hash_bytes(raw), self._anchor[1], research_budget.MAXIMUM_RESPONSE_BYTES, self._anchor[3], raw)
             updated = (chunk, (*tickets, value), (*active, value), settlements, charged)
             repeats = len(active) - len({_TICKETS[item][5] for item in active})
-            require(len(active) + 1 <= len(positions) + research_budget.EXTRA_ATTEMPTS_PER_CHUNK, "current_chunk_START_cap")
+            extra_limit = plan.chunk_extra_limit(chunk)
+            require(len(active) + 1 <= len(positions) + extra_limit, "current_chunk_START_cap")
             require(not any(_TICKETS[item][5] == position for item in active)
-                or repeats + 1 <= research_budget.EXTRA_ATTEMPTS_PER_CHUNK, "current_chunk_extra_cap")
+                or repeats + 1 <= extra_limit, "current_chunk_extra_cap")
             require(tries <= research_budget.MAXIMUM_TOTAL_TRIES_PER_POSITION, "lifetime_try_cap")
-            require(research_budget.PRIOR_STARTS + len(tickets) + 1 <= research_budget.MAXIMUM_CUMULATIVE_STARTS,
+            require(profile["initial_START_upper_bound"] + len(tickets) + 1 <= research_budget.MAXIMUM_CUMULATIVE_STARTS,
                 "cumulative_START_cap")
-            require(research_budget.PRIOR_CHARGED_BYTES + charged + (len(active) + 1) * research_budget.MAXIMUM_RESPONSE_BYTES
+            require(profile["initial_byte_upper_bound"] + charged + (len(active) + 1) * research_budget.MAXIMUM_RESPONSE_BYTES
                 <= research_budget.MAXIMUM_CUMULATIVE_BYTES, "full_page_byte_capacity")
             # No I/O, callback, hashing, source access or caller code between
             # these capacity checks and the original append transition.
@@ -305,6 +314,7 @@ class DurableCountBudget:
             # owner may perform this final, callback-free pure transition.
             with _lock(self):
                 current_plan, state = self._guard()
+                profile = current_plan.budget_profile()
                 require(_identity_class(CountAttemptTicket), "attempt_ticket_binding_changed")
                 require(current_plan is plan and state is before, "closed_chunk_binding_changed")
                 chunk, tickets, active, settlements, charged = state
@@ -336,7 +346,7 @@ class DurableCountBudget:
                 view = self, self._anchor[3], plan, (*history[3], account)
                 updated = (chunk + 1, tickets, (), (*settlements, record), charged + total)
                 require(total <= len(active) * research_budget.MAXIMUM_RESPONSE_BYTES
-                    and research_budget.PRIOR_CHARGED_BYTES + charged + total <= research_budget.MAXIMUM_CUMULATIVE_BYTES,
+                    and profile["initial_byte_upper_bound"] + charged + total <= research_budget.MAXIMUM_CUMULATIVE_BYTES,
                     "closed_chunk_charge_changed")
                 # No reader/caller I/O, callback, hash, source access or partial
                 # ticket release occurs in this original locked append.

@@ -26868,3 +26868,182 @@ was corrected, with the2036 number explicitly qualified as a bound from the
 PRIOR baseline rather than verified remaining authority; no test was changed
 or weakened. Final historical-body/dated-row preservation and diff checks
 passed. These documentation-only changes do not alter the953-test source tree.
+
+## 132. Owner-directed conservative accounting continuation — 2026-10-28
+
+### 132.1 Authority and operational-history fact
+
+The owner now directs: "resolve the recovery accounting blocker without
+weakening checks or losing data, then build to the last step before QC setup.
+stay within84,005 cumulative STARTs and4GiB. no QC/Safari or purchases; push
+once when done." This is **SI-AUTH-20261028-02**. It authorizes a bounded local
+continuation, not a fourth attempt, claim reuse, refund, old-source adoption,
+scope change, QC operation or purchase.
+
+Main asked whether anyone had restored/replaced/detached/remounted the recovery
+image or manually changed the system clock since the original October27 run.
+The owner answered **"No, none of those changes"**. This is a new trusted
+operational-history prerequisite, not a conclusion from statV2 and not an
+assertion that the old process succeeded. The history statement must remain
+explicit in the separately frozen negative-resolution policy. All old actual
+HTTP/START/byte counts, error and exit remain unknown.
+
+### 132.2 Prospective negative-only resolution and unchanged ceilings
+
+**SI-DEC-20261028-01** selects a conservative eight-reservation allocation ONLY
+after a new read-only verifier authenticates the full retained ancestry,
+current native/backing association, the unchanged later leaf observations,
+exact E756 historical code/claim reconstruction and original B3 query mapping.
+The owner-history prerequisite excludes volume-state rollback, replacement,
+reattachment and manual clock changes; current native association alone does
+not prove that history. No old issuer/context closure or positive source
+capability is reconstructed. V2 remains present-observation-only.
+
+The scope of the new evidence is intentionally negative: E756 creates no
+per-ticket START directory until after the claim; the first Main reservation
+batch contains at most8 distinct first positions. Full ancestry chronology is
+needed in addition to leaf stamps to exclude ordinary ancestor relocation.
+Main verified on a disposable temporary tree that moving a parent away/back
+changes that parent's ctime while leaving its child ctime unchanged. This
+explains why the fuller chain is required. Actual retained metadata was only
+read by lstat and selected read-only hdiutil-info/native metadata; no old
+image was attached, detached, copied, unlocked or modified.
+
+| Conservative allocation, conditional on verifier closure | Amount |
+| --- | ---: |
+| Permanent unknown START upper debits |8|
+| Permanent unknown byte debits, eight full pages |16,777,216|
+| Historical known baseline START debits, unchanged |13,992|
+| Historical known baseline charged bytes, unchanged |23,452,681|
+| Operative initial START upper bound |14,000|
+| Operative initial byte upper bound |40,229,897|
+| Remaining START capacity under84,005 |70,005|
+| Remaining byte capacity under4GiB |4,254,737,399|
+| Required original missing positions, unchanged |67,885|
+| Future extra START slots |2,120|
+
+Every exact first-eight missing position receives one additional POSSIBLE
+lifetime try, derived from the genuine B3 ledger/matrix. Verify that each
+still has room for the required future attempt under the unchanged maximum3;
+otherwise refuse. A global8 debit alone would not suffice. First-chunk extra
+allowance becomes8 and each remaining132 chunks retains16, totaling2120.
+All settlement paths keep this permanent unknown floor; it is not a current
+ticket and cannot be settled away. Old B3 constants/policy/four epochs remain
+unchanged. Historical actual counts remain null, not zero or14,000.
+
+A whole-chunk528 allocation was examined and rejected for full readiness:
+although globally affordable, it leaves any first512 position potentially
+lifetime-exhausted. It cannot justify retrying all512 or quietly excluding
+them from the frozen study. No such scope change or retry reset is made.
+
+### 132.3 Software-only preparation; operations not yet activated
+
+New pure exposure and nine-part recovery-plan variants preserve the exact
+original B3 and old eight-part factory. Guarded per-plan profiles carry the
+known baseline, distinct permanent unknown debits, initial upper bounds and
+per-chunk allowances. Durable budgets retain original ticket14/journal4/
+account7 shapes, and their new-closed-bytes accumulator excludes the permanent
+floor. Union, failure reporting and saved-checkpoint accounting must all use
+that same profile and never turn an unknown debit into known wire activity.
+
+The new standalone read-only resolver is a distinct current evidence reader:
+original nofollow ROFDs, metadata-before-open, exact canonical claim/E756
+manifest binding, full ancestry and native uniqueness, terminal code/source/
+clock checks. It grants no old coverage or source authority. A new operational
+resolution is not issued from a pure allocation, JSON/hash, partial pin match,
+caller boolean or lost process handle. Registration and actual observed
+closure are still required before any dispatch-gate replacement.
+
+A lane-only one-shot launchd proof supervisor is also SOFTWARE-only for now.
+It imports no provider/credential/operator module; capture mode refuses.
+The finite proof must demonstrate ownership independent of the agent exec
+session and an original child-handle wait witness. An OS PID is not a Codex
+exec-session receipt. No recurring automation, LaunchAgent installation,
+KeepAlive/restart, source invocation or launchd job has been performed yet.
+Private bytes/FDs still require the original worker to remain alive during
+any incomplete quarantine; a durable report alone never releases that hold.
+
+All work currently starts from clean published
+f27d836ab0c7422463ea19b2f6fa3bba86535c4c in the designated existing worktree and
+branch. Current source dispatch remains BLOCKED, the saved-source reader
+remains PENDING, and no new provider request, source claim, credential read,
+outcome/look, QC/Safari or purchase occurred. This is not pre-QC readiness.
+No interim push is authorized in this continuation. Freeze a clean committed
+policy and validation before ONE prospective read-only evidence operation
+and ONE separately bounded source-free supervisor proof; document their true
+closure/results before considering source recovery activation.
+
+### 132.4 Frozen first evidence/proof checkpoint and validation
+
+The following SOFTWARE registrations are now frozen for one prospective
+read-only resolution and one source-free launchd proof at the resulting clean
+commit. Actual matching origin must still equal
+f27d836ab0c7422463ea19b2f6fa3bba86535c4c. No provider capture is activated:
+require_dispatch_allowed() and supervisor capture mode still refuse.
+
+| Control | SHA256 |
+| --- | --- |
+| Pure negative exposure | e7c5c99e7c05ae61167f1a2eb2f789504219ce0ea4e2aa11287aace7248c7cd3 |
+| Exposed-plan policy | ed27efa02139c39e7ae06957c79cc8056123eec7106d2375121c6c34d43e9f77 |
+| Durable budget policy | 6a314a021416d4d0e3301ba9cfac7543a62f7d6d5112380716fa796d7b1fde69 |
+| Negative preservation policy | f07d15287b69920503f936189ef44a297420e3f67948f1029ab39519154a2536 |
+| Transport-union policy | 8b3e8eb5420c229f3574320a9c66caa3a7948bcc48576941a18584174e873a92 |
+| Outer run, still dispatch-blocked | 0eb57c3e1b7461df5e111709373215b51e913ebafd617da351d199df0b3c1815 |
+| Read-only negative-resolution protocol | d38e077d78ea5249f90d2669d165a6a6238ddac4b1947d422b570c7029b30919 |
+| Source-free supervisor proof policy | 8071caa437d7d07dfbf5c8f70c6f9577ddc03cef03aa5e98d6bc8e4104b370a9 |
+
+All registrations independently match their semantic payloads. The old
+research base policy remains1e6e5191c35f5dff01592ff5964b77cf13b6bd9017c7226ff475fc10882852c6;
+its constants and B3 are unchanged. Current outer86 path-list SHA:
+9e1b5d473b39c845c05eec6394901c79dcea27e9c3b0e3d867ef5bd4278efeb2;
+mapping083df0ec4341702cf5a280743dffa5581ea923b2400bb6d2339bb31eb6509252.
+Current readonly87 path-list SHA:
+abd0c7c11ebe02dddd150cac4874bdaecdab425108a982aed161905407c3a185;
+mappingd5d548a323d0845b8a5663b23a2cf067c80299ce62f7e14fac3132a276b2403c.
+The original E756 claim's84-path catalogue remains separately frozen and
+must reconstruct its original662615... manifest; it is never replaced by
+the current expanded catalogue.
+
+Main final25 relevant focused files passed **1088tests/75.37s**, no skips or
+warnings reported, OS network denied, sanitized environment, bytecode/cache
+disabled. Main earlier9 affected files508/19.46s and new hold-floor projection
+1/.82s passed. All97 held/changed/proof source and test files compile in
+memory. No full lane/repository suite ran. A static peer accepted the frozen
+negative-evidence/exposure/plan/budget/hold changes; that peer ran no tests or
+operations and is not independent Claude review.
+
+Separately attributed author evidence: exposure+historical ledger64/1.33s;
+plan/budget113/3.04s; union/negative/loader+import201/11.90s; resolver55/1.04s
+before Main's added registration case; supervisor26/.64s. Their memory-only
+negative-floor, extra-slot, resolution-permission, original-code and terminal
+guard regressions each failed as expected before finally restoration.
+Forensic prototype tests exposed11 physical/preopen failures and3 terminal
+composition failures before correction. Supervisor preopen FIFO/identity
+regressions exposed6 failures before correction. These are fabricated tests,
+not actual retained-evidence or launcher-independence proof.
+
+One read-only invocation of resolve_short_interest_count_run13448.run_registered
+may now replay the original protected B3 archive, reconstruct the exact
+historical E756 claim and current full-chain/native evidence, and issue only
+a new negative-resolution observation after all original contexts, code,
+descriptor cleanup, terminal metadata and captured clock checks. It must
+make no claim/key/GET/source write, read no raw market row into chat, and
+emit actual old counts as null. A refusal is not a resolved052 gate and may
+not be papered over by assigning zero. Preserve every original file.
+
+The separately bounded supervisor proof may create ONLY its one fixed
+artifacts/short_interest/count-process-supervisor-proof-v1 namespace with
+launch.spec.json, job.plist, stdout.jsonl and result.json. Preparing metadata
+is not a launch or closure. Main may submit that exact committed, source-free
+job to the current user's launchd domain ONCE with no KeepAlive/restart,
+observe the original child wait result and kernel job terminal status, and
+independently authenticate original protected metadata/logs. No SourceAUTH
+release, provider request or v1 Codex-exec-session receipt follows. Do not
+restart an existing namespace/job or invent an exit from an absent PID.
+
+Freeze all authors/tests before either operation. While a pinned operation
+runs, do not edit/test/commit/push; poll only its known handle or exact job
+metadata after root/Git-root/branch/HEAD/status guards. Retain any live
+private bytes/FDs on failure. Document actual results and any verified causal
+fix before a fresh policy. No source capture, QC/Safari, purchase, new
+credential, outcome look or push has occurred at this checkpoint.

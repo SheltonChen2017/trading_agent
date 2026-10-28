@@ -34,12 +34,13 @@ from scripts import short_interest_count_negative_custody as negative
 from scripts import short_interest_count_transport_union as transport_union
 from scripts import short_interest_count_checkpoint as checkpoints
 from scripts import short_interest_count_source_authority as source_scope
+from scripts import resolve_short_interest_count_run13448 as resolution_reader
 from scripts import diagnose_short_interest_body_receipt_custody as antecedent
 
 ROOT, BRANCH = transport.ROOT, lane.BRANCH
 SOURCE_AUTHORITY_SHA256 = "9d67d93ad79657031befd8849659bc20fc5834173d76a569bccb9307347e3a6c"
-RUN_PROTOCOL_SHA256 = "14818d707b17eef1a6b9ba26416c3c0a4dd82cdc33c8819130ffcd3cb8cc4b29"
-NEGATIVE_PRESERVATION_POLICY_SHA256 = "e0e8df728d96dfaae20b43497ad150557d9a767e5d853d020ec6b9acfcc0423c"
+RUN_PROTOCOL_SHA256 = "0eb57c3e1b7461df5e111709373215b51e913ebafd617da351d199df0b3c1815"
+NEGATIVE_PRESERVATION_POLICY_SHA256 = "f07d15287b69920503f936189ef44a297420e3f67948f1029ab39519154a2536"
 BASELINE_LEDGER_SHA256 = research_budget.BASELINE_LEDGER_SHA256
 MAXIMUM_CHUNK_SECONDS, MAXIMUM_ARCHIVES = 3600, 1
 MAXIMUM_WORKERS = 8
@@ -109,6 +110,8 @@ def code_paths():
         "scripts/short_interest_count_transport_union.py",
         "scripts/short_interest_count_checkpoint.py",
         "scripts/short_interest_count_source_authority.py",
+        "scripts/resolve_short_interest_count_run13448.py",
+        "research/short_interest_etf/native_count_run13448_exposure.py",
         "research/short_interest_etf/native_count_recovery_budget.py"))))
 
 
@@ -120,6 +123,7 @@ def protocol():
         "archive_baseline_sha256": BASELINE_LEDGER_SHA256, "archive_context": "original_closed_before_new_chunk",
         "maximum_chunk_seconds": MAXIMUM_CHUNK_SECONDS, "maximum_archives": MAXIMUM_ARCHIVES,
         "maximum_inflight": 8, "positions_per_chunk": 512, "extra_STARTs_per_chunk": 16,
+        "resolved_plan_accounting": "typed_negative_exposure_floor_never_settled_away_first_chunk8_extras_other_chunks16",
         "worker_batch": MAXIMUM_WORKERS,
         "worker_order": "Main_reserve_remote_roster_START_received_dirs_workers_START_GET_received_Main_conditional_response_dirs_workers_pair_join_before_retry",
         "maximum_cumulative_STARTs": 84005, "maximum_cumulative_bytes": 4 * 1024 ** 3,
@@ -1269,7 +1273,8 @@ def _remember_preservation_failure(operation, error):
 def _hold_accounting(operation):
     """Authenticate original pure journals after FAILED; never a public guard."""
     names = ("closed_chunks", "new_START_reservations", "cumulative_START_reservations_upper_bound",
-        "closed_charged_bytes", "outstanding_full_page_bytes", "cumulative_charged_plus_reserved_bytes")
+        "closed_charged_bytes", "outstanding_full_page_bytes", "cumulative_charged_plus_reserved_bytes",
+        "permanent_unknown_START_upper_debits", "permanent_unknown_byte_debits")
     unknown = {"availability": "unavailable", **{name: None for name in names},
         "actual_START_or_HTTP_observation": False}
     try:
@@ -1289,9 +1294,17 @@ def _hold_accounting(operation):
                 and original[2] is budget._state and journal[0] is budget
                 and journal[1] is original[1][3] is op[3] and journal[2] is op[2],
                 "durable_capture_preservation_changed")
+            operative = op[2].budget_profile()
+            require(operative["known_baseline_START_debits"] == prior
+                and operative["known_baseline_charged_bytes"] == historical_bytes
+                and operative["maximum_cumulative_STARTs"] == maximum_starts
+                and operative["maximum_cumulative_bytes"] == maximum_bytes
+                and operative["maximum_response_bytes"] == page_bytes,
+                "durable_capture_preservation_changed")
+            initial_starts, initial_bytes = operative["initial_START_upper_bound"], operative["initial_byte_upper_bound"]
             state = original[2]
             require(type(state) is tuple and len(state) == 5 and type(state[1]) is tuple
-                and type(state[2]) is tuple and len(state[1]) <= maximum_starts - prior and len(state[2]) <= 528
+                and type(state[2]) is tuple and len(state[1]) <= maximum_starts - initial_starts and len(state[2]) <= 528
                 and type(state[0]) is int and state[0] == op[4]
                 and type(state[4]) is int and 0 <= state[4] <= maximum_bytes,
                 "durable_capture_preservation_changed")
@@ -1305,12 +1318,14 @@ def _hold_accounting(operation):
             require(all(accounting._TICKETS[ticket][3] == state[0] for ticket in state[2]),
                 "durable_capture_preservation_changed")
             starts, outstanding = len(state[1]), len(state[2]) * page_bytes
-            total = historical_bytes + state[4] + outstanding
-            require(prior + starts <= maximum_starts and total <= maximum_bytes,
+            total = initial_bytes + state[4] + outstanding
+            require(initial_starts + starts <= maximum_starts and total <= maximum_bytes,
                 "durable_capture_preservation_changed")
             return {"availability": "authenticated_original_pure_journal", "closed_chunks": len(journal[3]),
-                "new_START_reservations": starts, "cumulative_START_reservations_upper_bound": prior + starts,
+                "new_START_reservations": starts, "cumulative_START_reservations_upper_bound": initial_starts + starts,
                 "closed_charged_bytes": state[4], "outstanding_full_page_bytes": outstanding,
+                "permanent_unknown_START_upper_debits": operative["permanent_unknown_START_upper_debits"],
+                "permanent_unknown_byte_debits": operative["permanent_unknown_byte_debits"],
                 "cumulative_charged_plus_reserved_bytes": total, "actual_START_or_HTTP_observation": False}
     except BaseException:
         return unknown

@@ -13,6 +13,7 @@ import pytest
 from data.hashing import canonical_json, hash_bytes, hash_payload
 from scripts import load_short_interest_count_checkpoints as reader
 from test_short_interest_count_durable_budget import genuine_plan, isolated_registries_and_no_network
+from test_short_interest_count_recovery_budget import genuine_exposure_plan
 
 
 @pytest.fixture(autouse=True)
@@ -20,6 +21,125 @@ def fresh(monkeypatch):
     for name, value in (("_ISSUED", {}), ("_FAILED", set()), ("_CLOSED", {}), ("_PRIVATE", {}),
             ("_DEADLINES", {}), ("_DEADLINE_LAST", {}), ("_PRODUCERS", {}), ("_PRODUCER_PINS", {})):
         monkeypatch.setattr(reader, name, value)
+    monkeypatch.setattr(reader, "_RESOLUTION_PHASE", None)
+    monkeypatch.setattr(reader, "_RESOLUTION_ISSUED", {})
+
+
+def test_loader_operative_accounting_never_drops_the_genuine_permanent_floor(monkeypatch):
+    ledger, exposure, plan = genuine_exposure_plan(monkeypatch)
+    profile = plan.budget_profile()
+    result = reader._operative_accounting(plan, 3, 7)
+    assert result["known_baseline_START_debits"] == ledger.public_summary()["START_debits"]
+    assert result["negative_exposure_sha256"] == exposure.sha256
+    assert result["operative_cumulative_START_upper_bound"] == profile["initial_START_upper_bound"] + 3
+    assert result["operative_cumulative_byte_upper_bound"] == profile["initial_byte_upper_bound"] + 7
+    for starts, charged in ((profile["maximum_new_STARTs"] + 1, 0),
+            (0, profile["maximum_cumulative_bytes"] - profile["initial_byte_upper_bound"] + 1)):
+        with pytest.raises(reader.CountCheckpointLoaderRefusal, match="accounting_changed"):
+            reader._operative_accounting(plan, starts, charged)
+
+
+def test_registered_old_producer_reconstructs_only_legacy_plan_without_resolution(monkeypatch):
+    plan = genuine_plan(monkeypatch); ledger = plan._parts[1]
+    monkeypatch.setattr(reader, "EXPECTED_PRODUCER_PROTOCOL", reader.LEGACY_EIGHT_PART_PRODUCER_PROTOCOLS[0])
+    monkeypatch.setattr(reader, "EXPECTED_PRODUCER_PLAN_PROFILE", "legacy_four_epochs")
+    monkeypatch.setattr(reader.plans, "freeze_count_recovery_plan", lambda source: plan if source is ledger else None)
+    monkeypatch.setattr(reader.negative_resolution, "resolve_registered", lambda *a, **k: pytest.fail("legacy reopens negative footprint"))
+    assert reader._recovery_plan(ledger, runtime_head="a" * 40, actual_remote="b" * 40,
+        boundary=lambda: None) is plan and len(plan._parts) == 8
+
+
+def test_current_reader_reconstructs_nine_part_plan_only_from_issued_resolution_binding(monkeypatch):
+    ledger, exposed, unused = genuine_exposure_plan(monkeypatch)
+    monkeypatch.setattr(reader.plans, "_PLAN_MINTS", {}); monkeypatch.setattr(reader.plans, "_PLAN_KEYS", set())
+    result = object(); calls = []
+    def resolve(source, *, runtime_head, actual_remote):
+        assert reader._resolution_phase_active() and source is ledger
+        calls.append((source, runtime_head, actual_remote)); return result
+    # Explicit fabricated forensic-issuer seam. The negative cap/model are genuine toy factories.
+    monkeypatch.setattr(reader, "_RESOLUTION_FUNCTION", resolve)
+    monkeypatch.setattr(reader, "_RESOLUTION_CODE", resolve.__code__)
+    monkeypatch.setattr(reader.negative_resolution, "resolve_registered", resolve)
+    monkeypatch.setattr(reader.negative_resolution, "resolution_binding", lambda value:
+        (value, exposed, ledger, b"{}", "c" * 64, object()) if value is result else pytest.fail("foreign result"))
+    monkeypatch.setattr(reader, "EXPECTED_PRODUCER_PROTOCOL", "d" * 64)
+    monkeypatch.setattr(reader.producer, "RUN_PROTOCOL_SHA256", "d" * 64)
+    monkeypatch.setattr(reader, "EXPECTED_PRODUCER_PLAN_PROFILE", "permanent_run13448_negative8")
+    plan = reader._recovery_plan(ledger, runtime_head="a" * 40, actual_remote="b" * 40, boundary=lambda: None)
+    assert len(plan._parts) == 9 and plan._parts[1] is ledger and plan._parts[8] is exposed
+    assert plan.budget_profile()["permanent_unknown_START_upper_debits"] == 8
+    assert calls == [(ledger, "a" * 40, "b" * 40)] and not reader._resolution_phase_active()
+    assert reader._RESOLUTION_ISSUED == {}
+
+
+def test_new_plan_json_or_caller_status_cannot_replace_registered_resolution(monkeypatch):
+    ledger, exposed, unused = genuine_exposure_plan(monkeypatch)
+    monkeypatch.setattr(reader, "EXPECTED_PRODUCER_PROTOCOL", "d" * 64)
+    monkeypatch.setattr(reader.producer, "RUN_PROTOCOL_SHA256", "d" * 64)
+    monkeypatch.setattr(reader, "EXPECTED_PRODUCER_PLAN_PROFILE", "permanent_run13448_negative8")
+    monkeypatch.setattr(reader.negative_resolution, "resolve_registered", lambda *a, **k: {"complete": True})
+    with pytest.raises(reader.CountCheckpointLoaderRefusal, match="baseline_changed"):
+        reader._recovery_plan(ledger, runtime_head="a" * 40, actual_remote="b" * 40, boundary=lambda: None)
+    assert reader._RESOLUTION_PHASE is None and reader._RESOLUTION_ISSUED == {}
+
+
+def test_resolution_audit_phase_permits_only_exact_readonly_info_and_null(monkeypatch):
+    import sys
+    ledger, exposed, unused = genuine_exposure_plan(monkeypatch)
+    monkeypatch.setattr(reader.plans, "_PLAN_MINTS", {}); monkeypatch.setattr(reader.plans, "_PLAN_KEYS", set())
+    token = object(); events = []
+    before = reader.HISTORICAL_HEADS
+    def resolve(source, *, runtime_head, actual_remote):
+        assert reader._resolution_phase_active()
+        sys.audit("subprocess.Popen", "/usr/bin/hdiutil", ["/usr/bin/hdiutil", "info", "-plist"], None, {})
+        sys.audit("open", "/dev/null", None, os.O_RDWR)
+        events.append("exact-info-and-null")
+        assert reader._git_allowed("git", ["git", "show", reader.negative_resolution.OLD_HEAD + ":"
+            + reader.negative_resolution.HISTORICAL_PATHS[0]], reader.ROOT, runtime_head)
+        for command in (["/usr/bin/hdiutil", "attach", "-readonly"], ["/usr/bin/hdiutil", "create", "new"],
+                ["/usr/bin/hdiutil", "info", "-plist", "extra"]):
+            with pytest.raises(reader.CountCheckpointLoaderRefusal, match="readonly_required"):
+                sys.audit("subprocess.Popen", command[0], command, None, {})
+        with pytest.raises(reader.CountCheckpointLoaderRefusal, match="readonly_required"):
+            sys.audit("open", "/private/fabricated-source", None, os.O_RDWR)
+        with pytest.raises(reader.CountCheckpointLoaderRefusal, match="readonly_required"):
+            sys.audit("open", "/dev/null", None, os.O_RDWR | os.O_CREAT)
+        with pytest.raises(reader.CountCheckpointLoaderRefusal, match="readonly_required"):
+            sys.audit("socket.connect", object(), None)
+        return token
+    monkeypatch.setattr(reader, "_RESOLUTION_FUNCTION", resolve)
+    monkeypatch.setattr(reader, "_RESOLUTION_CODE", resolve.__code__)
+    monkeypatch.setattr(reader.negative_resolution, "resolve_registered", resolve)
+    monkeypatch.setattr(reader.negative_resolution, "resolution_binding", lambda value:
+        (value, exposed, ledger, b"{}", "c" * 64, object()))
+    monkeypatch.setattr(reader, "EXPECTED_PRODUCER_PROTOCOL", "d" * 64)
+    monkeypatch.setattr(reader.producer, "RUN_PROTOCOL_SHA256", "d" * 64)
+    monkeypatch.setattr(reader, "EXPECTED_PRODUCER_PLAN_PROFILE", "permanent_run13448_negative8")
+    with reader._readonly_seams("a" * 40):
+        for event, args in (("open", ("/dev/null", None, os.O_RDWR)),
+                ("subprocess.Popen", ("/usr/bin/hdiutil", ["/usr/bin/hdiutil", "info", "-plist"], None, {}))):
+            with pytest.raises(reader.CountCheckpointLoaderRefusal, match="readonly_required"): sys.audit(event, *args)
+        reader._recovery_plan(ledger, runtime_head="a" * 40, actual_remote="b" * 40, boundary=lambda: None)
+        with pytest.raises(reader.CountCheckpointLoaderRefusal, match="readonly_required"):
+            sys.audit("open", "/dev/null", None, os.O_RDWR)
+    assert events == ["exact-info-and-null"] and reader.HISTORICAL_HEADS is before
+    assert reader._RESOLUTION_PHASE is None and reader._RESOLUTION_ISSUED == {}
+
+
+def test_resolution_phase_is_revoked_after_original_resolver_failure(monkeypatch):
+    ledger, unused, unused2 = genuine_exposure_plan(monkeypatch)
+    def resolve(*args, **kwargs):
+        assert reader._resolution_phase_active()
+        raise RuntimeError("FABRICATED_PRIVATE_FORENSIC_ERROR")
+    monkeypatch.setattr(reader, "_RESOLUTION_FUNCTION", resolve)
+    monkeypatch.setattr(reader, "_RESOLUTION_CODE", resolve.__code__)
+    monkeypatch.setattr(reader.negative_resolution, "resolve_registered", resolve)
+    monkeypatch.setattr(reader, "EXPECTED_PRODUCER_PROTOCOL", "d" * 64)
+    monkeypatch.setattr(reader.producer, "RUN_PROTOCOL_SHA256", "d" * 64)
+    monkeypatch.setattr(reader, "EXPECTED_PRODUCER_PLAN_PROFILE", "permanent_run13448_negative8")
+    with pytest.raises(RuntimeError):
+        reader._recovery_plan(ledger, runtime_head="a" * 40, actual_remote="b" * 40, boundary=lambda: None)
+    assert not reader._resolution_phase_active() and reader._RESOLUTION_ISSUED == {}
 
 
 def test_unregistered_entry_refuses_before_receipt_source_code_or_native(monkeypatch, tmp_path):

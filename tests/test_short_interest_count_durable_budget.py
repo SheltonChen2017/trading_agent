@@ -36,6 +36,66 @@ def genuine_plan(monkeypatch, *, maximum_bytes=None, chunk_size=2):
 
 
 @pytest.fixture
+def negative_plan(monkeypatch):
+    value, exposed, plan = support.genuine_exposure_plan(monkeypatch)
+    monkeypatch.setattr(budget, "_EXPECTED_SOURCE_PROFILE", budget._source_profile())
+    return SimpleNamespace(ledger=value, exposure=exposed, plan=plan)
+
+
+def test_permanent_negative_allocation_survives_successful_partial_settlement(negative_plan, fabricated_reader):
+    h = negative_plan; value = budget.open_durable_count_budget(h.plan)
+    before = value.public_summary(); page = budget.research_budget.MAXIMUM_RESPONSE_BYTES
+    assert before["permanent_unknown_START_upper_debits"] == 8
+    assert before["permanent_unknown_byte_debits"] == 8 * page
+    assert before["cumulative_START_debits_upper_bound"] == h.ledger.public_summary()["START_debits"] + 8
+    for position in h.plan.chunk_positions(1): value.reserve_start_slot(position)
+    tickets = value.current_tickets()
+    assert tickets[0].public_summary()["lifetime_try"] == 3
+    assert all(ticket.public_summary()["lifetime_try"] == 2 for ticket in tickets[1:])
+    charged = 8 * 17; value.settle_closed_chunk(fabricated_reader.mint(value))
+    after = value.public_summary(); journal = budget.settled_chunk_accounting(value)
+    assert value._state[4] == after["new_closed_charged_bytes"] == charged
+    assert after["historical_charged_bytes"] == h.ledger.public_summary()["charged_response_bytes"]
+    assert after["permanent_unknown_byte_debits"] == 8 * page and after["permanent_unknown_START_upper_debits"] == 8
+    assert after["cumulative_charged_plus_reserved_bytes"] == before["cumulative_charged_plus_reserved_bytes"] + charged
+    assert after["cumulative_START_debits_upper_bound"] == before["cumulative_START_debits_upper_bound"] + 8
+    assert len(journal) == 4 and len(journal[3][0]) == 7 and len(budget.ticket_binding(tickets[0])) == 14
+    assert len(budget._TICKETS) == 8 and value.reserve_start_slot(13).public_summary()["reservation_ordinal"] == 9
+    assert value.public_summary()["permanent_unknown_byte_debits"] == 8 * page
+
+
+def test_possible_prior_try_prevents_a_fourth_lifetime_attempt(negative_plan):
+    value = budget.open_durable_count_budget(negative_plan.plan)
+    assert value.reserve_start_slot(5).public_summary()["lifetime_try"] == 3
+    original = value._state
+    with pytest.raises(budget.DurableCountBudgetRefusal, match="lifetime_try_cap"): value.reserve_start_slot(5)
+    assert value._state is original and len(original[1]) == 1
+
+
+def test_new_first_chunk_limit_rejects_old_sixteen_extra_allowance(monkeypatch):
+    ledger, exposed, plan = support.genuine_exposure_plan(monkeypatch, maximum_bytes=72 * 1024 ** 2, chunk_size=16)
+    monkeypatch.setattr(budget, "_EXPECTED_SOURCE_PROFILE", budget._source_profile())
+    value = budget.open_durable_count_budget(plan)
+    for position in (*range(5, 21), 13, 13, 14, 14, 15, 15, 16, 16): value.reserve_start_slot(position)
+    assert plan.chunk_extra_limit(1) == 8 and len(value._state[2]) == 24
+    # Position17 still has a legal lifetime try, but the ninth extra slot is
+    # forbidden even though the obsolete global +16 rule would accept it.
+    with pytest.raises(budget.DurableCountBudgetRefusal, match="current_chunk_START_cap"): value.reserve_start_slot(17)
+    assert len(value._state[1]) == 24
+
+
+def test_byte_capacity_counts_permanent_negative_pages_before_new_slot(monkeypatch):
+    ledger, exposed, plan = support.genuine_exposure_plan(monkeypatch, maximum_bytes=24 * 1024 ** 2)
+    monkeypatch.setattr(budget, "_EXPECTED_SOURCE_PROFILE", budget._source_profile())
+    value = budget.open_durable_count_budget(plan)
+    value.reserve_start_slot(5)
+    original = value._state
+    with pytest.raises(budget.DurableCountBudgetRefusal, match="full_page_byte_capacity"): value.reserve_start_slot(6)
+    assert value._state is original and len(original[1]) == 1
+    assert plan.budget_profile()["initial_byte_upper_bound"] + 2 * budget.research_budget.MAXIMUM_RESPONSE_BYTES > 24 * 1024 ** 2
+
+
+@pytest.fixture
 def plan(monkeypatch): return genuine_plan(monkeypatch)
 
 

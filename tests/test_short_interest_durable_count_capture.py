@@ -1180,6 +1180,32 @@ def test_prehold_pure_accounting_authenticates_full_original_reservations(fabric
     assert corrupted["outstanding_full_page_bytes"] is None
 
 
+def test_prehold_projection_retains_distinct_permanent_negative_floor(monkeypatch):
+    from test_short_interest_count_durable_budget import support
+    ledger, exposed, plan = support.genuine_exposure_plan(monkeypatch)
+    monkeypatch.setattr(outer.accounting, "_EXPECTED_SOURCE_PROFILE", outer.accounting._source_profile())
+    budget = outer.accounting.open_durable_count_budget(plan)
+    budget.reserve_start_slot(plan.chunk_positions(1)[0])
+    # Explicit operation-authentication seam only: the plan, original budget,
+    # ticket and append-issued journal are genuine pure fabricated factories.
+    operation = object(); op = [None] * 14
+    op[0], op[1], op[2], op[3], op[4] = operation, budget, plan, budget._anchor[3], 1
+    monkeypatch.setattr(outer, "_failed_original_state", lambda value: (tuple(op), None))
+    profile = plan.budget_profile()
+    monkeypatch.setattr(outer, "_HOLD_BASELINE", (profile["known_baseline_START_debits"],
+        profile["known_baseline_charged_bytes"], profile["maximum_cumulative_STARTs"],
+        profile["maximum_cumulative_bytes"], profile["maximum_response_bytes"]))
+    before = budget._state
+    outer.accounting._FAILED.add(budget)
+    report = outer._hold_accounting(operation)
+    assert report["availability"] == "authenticated_original_pure_journal"
+    assert report["permanent_unknown_START_upper_debits"] == 8
+    assert report["permanent_unknown_byte_debits"] == 16777216
+    assert report["cumulative_START_reservations_upper_bound"] == profile["initial_START_upper_bound"] + 1
+    assert report["cumulative_charged_plus_reserved_bytes"] == profile["initial_byte_upper_bound"] + 2097152
+    assert report["actual_START_or_HTTP_observation"] is False and budget._state is before
+
+
 def test_prehold_negative_codes_require_original_registry_identity_and_literal_catalogue(fabricated_outer_run, monkeypatch):
     h = fabricated_outer_run; _fabricated_blocked_hold(h, monkeypatch)
     from scripts import short_interest_count_negative_custody as real_negative

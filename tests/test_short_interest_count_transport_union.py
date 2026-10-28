@@ -15,6 +15,7 @@ from scripts import short_interest_count_durable_transport as transport
 from scripts import short_interest_count_durable_budget as accounting
 from test_short_interest_count_durable_transport import operation, isolated_registries_and_no_network
 from test_short_interest_closed_count_chunk import chunk as first_chunk
+from test_short_interest_count_recovery_budget import genuine_exposure_plan
 
 
 @pytest.fixture(autouse=True)
@@ -22,6 +23,86 @@ def fresh_union_registries(monkeypatch):
     for name in ("_CONTRIBUTIONS", "_PRIVATE_PROOFS", "_CLOSED_ORIGINS", "_UNIONS"):
         monkeypatch.setattr(union, name, {})
     monkeypatch.setattr(union, "_FAILED", set()); monkeypatch.setattr(union, "_UNION_FAILED", set())
+
+
+def test_genuine_negative_plan_profile_retains_known_baseline_and_distinct_permanent_floor(monkeypatch):
+    ledger, exposure, plan = genuine_exposure_plan(monkeypatch)
+    old = ledger.public_summary(); profile = union._operative_profile(plan, old)
+    assert profile["known_baseline_START_debits"] == old["START_debits"]
+    assert profile["known_baseline_charged_bytes"] == old["charged_response_bytes"]
+    fields = union._negative_fields(profile, 3, 7)
+    assert fields["negative_exposure_sha256"] == exposure.sha256
+    assert fields["permanent_unknown_START_upper_debits"] == 8
+    assert fields["permanent_unknown_byte_debits"] == 8 * 2097152
+    assert fields["operative_cumulative_START_upper_bound"] == old["START_debits"] + 8 + 3
+    assert fields["operative_cumulative_byte_upper_bound"] == old["charged_response_bytes"] + 8 * 2097152 + 7
+    assert len(ledger._parts[2]) == 4 and ledger.public_summary() == old
+
+
+def test_original_negative_cap_cannot_be_hidden_by_zero_profile_projection(monkeypatch):
+    ledger, exposure, plan = genuine_exposure_plan(monkeypatch)
+    original = plan.budget_profile()
+    def dropped(self):
+        return dict(original, permanent_unknown_START_upper_debits=0, permanent_unknown_byte_debits=0,
+            negative_exposure_sha256=None, initial_START_upper_bound=original["known_baseline_START_debits"],
+            initial_byte_upper_bound=original["known_baseline_charged_bytes"])
+    monkeypatch.setattr(union.plans.CountRecoveryPlan, "budget_profile", dropped)
+    with pytest.raises(union.CountTransportUnionRefusal, match="baseline_changed"):
+        union._operative_profile(plan, ledger.public_summary())
+
+
+def exposed_closed_fixture(monkeypatch, request):
+    import test_short_interest_count_durable_transport as fabricated_operator
+    ledger, exposure, plan = genuine_exposure_plan(monkeypatch)
+    monkeypatch.setattr(accounting, "_EXPECTED_SOURCE_PROFILE", accounting._source_profile())
+    # Explicit source/IO fixture selection; plan/exposure/budget/reader/union types remain genuine.
+    monkeypatch.setattr(fabricated_operator, "genuine_plan", lambda scoped_patch: plan)
+    h = request.getfixturevalue("first_chunk")
+    assert h.plan is plan and plan._parts[1] is ledger
+    return h, exposure
+
+
+def all_exposed_settled(h):
+    closed, contribution = first_contribution(h)
+    h.budget.settle_closed_chunk(closed); contributions = [contribution]
+    while h.budget.public_summary()["current_chunk"] <= len(h.plan._parts[3]):
+        closed = next_closed_chunk(h)
+        contribution = union.freeze_closed_count_transport_contribution(closed)
+        h.budget.settle_closed_chunk(closed); contributions.append(contribution)
+    return tuple(contributions)
+
+
+def test_full_nine_part_union_carries_permanent_allocation_after_real_toy_settlements(monkeypatch, request):
+    h, exposure = exposed_closed_fixture(monkeypatch, request)
+    contributions = all_exposed_settled(h)
+    old = h.plan._parts[1].public_summary(); profile = h.plan.budget_profile()
+    report = union.seal_count_transport_union(h.plan._parts[1], h.plan, contributions, h.budget).public_summary()
+    assert report["historical_START_debits"] == old["START_debits"]
+    assert report["historical_charged_bytes"] == old["charged_response_bytes"]
+    assert report["permanent_unknown_START_upper_debits"] == 8
+    assert report["permanent_unknown_byte_debits"] == 8 * 2097152
+    assert report["negative_exposure_sha256"] == exposure.sha256
+    assert report["operative_cumulative_START_upper_bound"] == profile["initial_START_upper_bound"] + report["new_START_debits"]
+    assert report["operative_cumulative_byte_upper_bound"] == profile["initial_byte_upper_bound"] + report["new_charged_bytes"]
+    assert report["cumulative_START_debits"] + 8 == report["operative_cumulative_START_upper_bound"]
+    assert report["cumulative_charged_bytes"] + 8 * 2097152 == report["operative_cumulative_byte_upper_bound"]
+    assert report["original_spent_epochs"] == 4 and not report["any_count_source_qualified"]
+
+
+def test_full_union_cap_uses_operative_floor_not_just_known_B3(monkeypatch, request):
+    h, unused = exposed_closed_fixture(monkeypatch, request)
+    contributions = all_exposed_settled(h)
+    original = union._operative_profile
+    def narrow(plan, old):
+        # Explicit conservative TOY-cap seam; exactly enough for known debits, short of the permanent8.
+        value = original(plan, old)
+        value["maximum_cumulative_STARTs"] = old["START_debits"] + sum(
+            len(union.contribution_binding(item)[5][3]) for item in contributions)
+        return value
+    monkeypatch.setattr(union, "_operative_profile", narrow)
+    with pytest.raises(union.CountTransportUnionRefusal, match="budget_exceeded"):
+        union.seal_count_transport_union(h.plan._parts[1], h.plan, contributions, h.budget)
+    assert union._UNIONS == {}
 
 
 def first_contribution(h):

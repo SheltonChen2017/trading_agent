@@ -72,6 +72,7 @@ def policy():
         "retention": "private_original_opaque_observation_response_and_immutable_bytes_no_raw_public_reader",
         "pure_access": "original_process_issued_tuple_hash_nonce_only_never_expired_reader_lease_volume_or_FAILED_budget",
         "union": "exact_old_four_epochs_original_plan_full_ordered_disjoint_chunks_original_settled_account7_identity",
+        "operative_accounting": "original_plan_budget_profile_permanent_negative_floor_never_historical_B3_rewrite_or_refund",
         "restart_reload_authority": False, "authority": profile}
 
 
@@ -88,6 +89,34 @@ def _source(baseline, plan):
             == ("original48", "refused13944", "v2zero", "v3zero"), "transport_union_baseline_changed")
     require(0 < len(plan._parts[3]) <= MAXIMUM_CONTRIBUTIONS, "transport_union_plan_changed")
     return baseline.public_summary()
+
+
+def _operative_profile(plan, old):
+    profile = plan.budget_profile()
+    exposed = plans.negative_exposure.exposure_binding(plan._parts[8]) if len(plan._parts) == 9 else None
+    slots = len(exposed[3]) if exposed is not None else 0
+    require(profile["known_baseline_START_debits"] == old["START_debits"]
+        and profile["known_baseline_charged_bytes"] == old["charged_response_bytes"]
+        and profile["permanent_unknown_START_upper_debits"] == slots
+        and profile["permanent_unknown_byte_debits"] == slots * MAXIMUM_BODY_BYTES
+        and profile["negative_exposure_sha256"] == (exposed[8] if exposed is not None else None)
+        and profile["initial_START_upper_bound"] == old["START_debits"] + profile["permanent_unknown_START_upper_debits"]
+        and profile["initial_byte_upper_bound"] == old["charged_response_bytes"] + profile["permanent_unknown_byte_debits"]
+        and profile["maximum_cumulative_STARTs"] <= MAXIMUM_CUMULATIVE_STARTS
+        and profile["maximum_cumulative_bytes"] <= MAXIMUM_CUMULATIVE_BYTES,
+        "transport_union_baseline_changed")
+    return profile
+
+
+def _negative_fields(profile, starts, charges):
+    if profile["negative_exposure_sha256"] is None: return {}
+    return {"negative_exposure_sha256": profile["negative_exposure_sha256"],
+        "permanent_unknown_START_upper_debits": profile["permanent_unknown_START_upper_debits"],
+        "permanent_unknown_byte_debits": profile["permanent_unknown_byte_debits"],
+        "operative_initial_START_upper_bound": profile["initial_START_upper_bound"],
+        "operative_initial_byte_upper_bound": profile["initial_byte_upper_bound"],
+        "operative_cumulative_START_upper_bound": profile["initial_START_upper_bound"] + starts,
+        "operative_cumulative_byte_upper_bound": profile["initial_byte_upper_bound"] + charges}
 
 
 class ClosedCountTransportContribution:
@@ -145,7 +174,8 @@ def freeze_closed_count_transport_contribution(closed):
     old = _source(baseline, plan)
     require(type(account) is tuple and len(account) == 7 and account[0] is op[3]
         and account[1] is op[2] and type(account[2]) is int and account[2] == op[4]
-        and type(account[3]) is tuple and 0 < len(account[3]) <= MAXIMUM_TICKETS_PER_CHUNK
+        and type(account[3]) is tuple and 0 < len(account[3]) <= min(MAXIMUM_TICKETS_PER_CHUNK,
+            len(plan.chunk_positions(account[2])) + plan.chunk_extra_limit(account[2]))
         and type(account[4]) is tuple and len(account[4]) == len(account[3])
         and account[5] == plan.chunk_positions(account[2]), "transport_union_original_chunk_required")
     require(type(terminal) is tuple and len(terminal) == 14 and terminal[0] is operation
@@ -186,8 +216,9 @@ def freeze_closed_count_transport_contribution(closed):
             None if durable is None else durable[6], None if durable is None else durable[8],
             None if durable is None else hash_payload(durable[9:11]),
             hash_payload(started[10]), hash_payload(received[8]), charge))
-    require(old["START_debits"] + len(account[3]) <= MAXIMUM_CUMULATIVE_STARTS
-        and old["charged_response_bytes"] + sum(account[4]) <= MAXIMUM_CUMULATIVE_BYTES,
+    profile = _operative_profile(plan, old)
+    require(profile["initial_START_upper_bound"] + len(account[3]) <= profile["maximum_cumulative_STARTs"]
+        and profile["initial_byte_upper_bound"] + sum(account[4]) <= profile["maximum_cumulative_bytes"],
         "transport_union_budget_exceeded")
     payload = {"schema": "si-closed-count-transport-contribution-v1", "baseline_sha256": baseline.sha256,
         "plan_sha256": plan.sha256, "chunk": account[2], "START_debits": len(account[3]),
@@ -200,6 +231,7 @@ def freeze_closed_count_transport_contribution(closed):
             "final_controls": [(item[2], item[3], item[5]) for item in final_controls],
             "runtime_heads": (op[8], op[9]), "registration_sha256": op[6]}),
         "closed_at": terminal[11], "operator_protocol_sha256": op[5], "outer_protocol_sha256": terminal[13],
+        **_negative_fields(profile, len(account[3]), sum(account[4])),
         "authority": authority()}
     raw_payload = canonical_json(payload).encode()
     # Expensive snapshot preparation does not move the deadline. The original
@@ -269,8 +301,9 @@ def seal_count_transport_union(baseline, plan, contributions, settled_budget):
         positions.update(account[5]); starts += len(account[3]); charges += sum(account[4])
         report = json.loads(original[7]); raws += report["retained_raw_bytes"]; reports.append(report)
     require(positions == set(range(1, historical.ORIGINAL_COUNT + 1)), "transport_union_incomplete")
-    require(old["START_debits"] + starts <= MAXIMUM_CUMULATIVE_STARTS
-        and old["charged_response_bytes"] + charges <= MAXIMUM_CUMULATIVE_BYTES,
+    profile = _operative_profile(plan, old)
+    require(profile["initial_START_upper_bound"] + starts <= profile["maximum_cumulative_STARTs"]
+        and profile["initial_byte_upper_bound"] + charges <= profile["maximum_cumulative_bytes"],
         "transport_union_budget_exceeded")
     payload = {"schema": "si-count-transport-union-v1", "baseline_sha256": baseline.sha256,
         "plan_sha256": plan.sha256, "original_spent_epochs": 4, "closed_settled_chunks": len(contributions),
@@ -278,6 +311,7 @@ def seal_count_transport_union(baseline, plan, contributions, settled_budget):
         "cumulative_START_debits": old["START_debits"] + starts,
         "historical_charged_bytes": old["charged_response_bytes"], "new_charged_bytes": charges,
         "cumulative_charged_bytes": old["charged_response_bytes"] + charges,
+        **_negative_fields(profile, starts, charges),
         "new_retained_raw_bytes": raws, "transport_position_count": len(positions),
         "retained_position_union_sha256": hash_payload(sorted(positions)),
         "contribution_sha256s": [item.sha256 for item in contributions],

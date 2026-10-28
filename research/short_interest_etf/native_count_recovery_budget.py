@@ -12,6 +12,7 @@ import json
 
 from data.hashing import canonical_json, hash_bytes, hash_payload
 import research.short_interest_etf.native_count_epoch_ledger as historical
+import research.short_interest_etf.native_count_run13448_exposure as negative_exposure
 
 BASELINE_LEDGER_SHA256 = "b3a8ac9057f8461bd4c450ffc911a5adac8c129ced762e33c5e56660215861e3"
 PRIOR_STARTS, PRIOR_CHARGED_BYTES = 13_992, 23_452_681
@@ -33,6 +34,7 @@ sealed_coordinator_changed coordinator_permanently_stopped finite_coordinator_ca
 plan_coordinator_already_minted exact_missing_position_required chunk_START_allowance_exhausted
 chunk_extra_allowance_exhausted total_try_allowance_exhausted cumulative_START_allowance_exhausted
 full_page_byte_capacity_exhausted""".split())
+_CODES = _CODES | frozenset(("exact_negative_exposure_required", "negative_exposure_plan_changed"))
 
 
 class CountRecoveryBudgetRefusal(ValueError):
@@ -86,6 +88,18 @@ def policy():
         "authority": profile}
 
 
+def exposure_plan_policy():
+    """Distinct future semantics; old B3 policy and old plan hashes are unchanged."""
+    return {"schema": "si-count-recovery-with-negative-exposure-policy-v1",
+        "historical_recovery_policy_sha256": hash_payload(policy()),
+        "negative_exposure_policy_sha256": negative_exposure.registered_sha256(),
+        "initial_accounting": "known_B3_plus_original_permanent_unknown_allocation_never_refunded",
+        "lifetime_tries": "known_B3_plus_one_possible_try_each_exact_first_eight_missing_positions",
+        "future_extras": "original_allocation_per_chunk_first8_later16",
+        "historical_ledger_rewritten": False, "forensic_release_required_separately": True,
+        "authority": authority()}
+
+
 @dataclass(frozen=True, slots=True, init=False, eq=False)
 class CountRecoveryPlan:
     _parts: tuple = field(repr=False)
@@ -97,15 +111,43 @@ class CountRecoveryPlan:
         minted = _PLAN_MINTS.get(id(self)) if type(self) is CountRecoveryPlan else None
         try: parts, identity = object.__getattribute__(self, "_parts"), object.__getattribute__(self, "_identity")
         except AttributeError: parts, identity = None, object()
-        require(type(parts) is tuple and len(parts) == 8 and parts is identity and minted is parts
+        require(type(parts) is tuple and len(parts) in (8, 9) and parts is identity and minted is parts
             and parts[0] is self, "sealed_plan_changed")
         parts[1]._guard()
-        require(parts[6] == hash_payload(policy()) and hash_bytes(parts[5]) == parts[7], "plan_scope_changed")
+        scope = policy()
+        if len(parts) == 9:
+            exposed = negative_exposure.exposure_binding(parts[8])
+            require(exposed[1] is parts[1] and exposed[2] == parts[2]
+                and len(exposed[5]) == len(parts[3]), "negative_exposure_plan_changed")
+            scope = exposure_plan_policy()
+        require(parts[6] == hash_payload(scope) and hash_bytes(parts[5]) == parts[7], "plan_scope_changed")
 
     @property
     def sha256(self): self._guard(); return self._parts[7]
 
     def public_summary(self): self._guard(); return json.loads(self._parts[5])
+
+    def negative_exposure(self):
+        self._guard(); return self._parts[8] if len(self._parts) == 9 else None
+
+    def chunk_extra_limit(self, chunk_number):
+        self.chunk_positions(chunk_number)
+        return (self._parts[8]._parts[5][chunk_number - 1] if len(self._parts) == 9 else EXTRA_ATTEMPTS_PER_CHUNK)
+
+    def budget_profile(self):
+        self._guard()
+        exposed = self._parts[8]._parts if len(self._parts) == 9 else None
+        slots = len(exposed[3]) if exposed is not None else 0
+        extras = exposed[5] if exposed is not None else (EXTRA_ATTEMPTS_PER_CHUNK,) * len(self._parts[3])
+        return {"known_baseline_START_debits": PRIOR_STARTS, "known_baseline_charged_bytes": PRIOR_CHARGED_BYTES,
+            "permanent_unknown_START_upper_debits": slots, "permanent_unknown_byte_debits": slots * MAXIMUM_RESPONSE_BYTES,
+            "initial_START_upper_bound": PRIOR_STARTS + slots,
+            "initial_byte_upper_bound": PRIOR_CHARGED_BYTES + slots * MAXIMUM_RESPONSE_BYTES,
+            "maximum_cumulative_STARTs": MAXIMUM_CUMULATIVE_STARTS,
+            "maximum_cumulative_bytes": MAXIMUM_CUMULATIVE_BYTES, "maximum_response_bytes": MAXIMUM_RESPONSE_BYTES,
+            "maximum_lifetime_tries": MAXIMUM_TOTAL_TRIES_PER_POSITION,
+            "maximum_new_STARTs": MAXIMUM_CUMULATIVE_STARTS - PRIOR_STARTS - slots,
+            "maximum_future_extra_slots": sum(extras), "negative_exposure_sha256": exposed[8] if exposed is not None else None}
 
     def chunk_positions(self, chunk_number):
         self._guard()
@@ -160,6 +202,61 @@ def freeze_count_recovery_plan(ledger):
     _PLAN_MINTS[id(value)] = parts; _PLAN_KEYS.add(key); value._guard(); return value
 
 
+def freeze_count_recovery_plan_with_exposure(ledger, exposure):
+    """Separate permanent negative allocation, never a forensic release witness."""
+    scope = hash_payload(exposure_plan_policy())
+    require(type(ledger) is historical.CountEpochLedger, "exact_historical_ledger_required")
+    ledger._guard(); require(ledger.sha256 == BASELINE_LEDGER_SHA256, "baseline_ledger_changed")
+    exposed = negative_exposure.exposure_binding(exposure)
+    require(exposed[1] is ledger, "exact_negative_exposure_required")
+    old = ledger.public_summary()
+    require(all(type(old.get(name)) is int and old[name] == expected for name, expected in (
+        ("START_debits", PRIOR_STARTS), ("charged_response_bytes", PRIOR_CHARGED_BYTES),
+        ("maximum_historical_STARTs", HISTORICAL_START_CEILING), ("maximum_historical_bytes", MAXIMUM_CUMULATIVE_BYTES))),
+        "baseline_accounting_changed")
+    selected, unused = historical._source_positions(ledger._parts[1]); retained = frozenset(ledger._parts[6])
+    missing = tuple(position for position in range(1, len(selected) + 1) if position not in retained)
+    chunks = tuple(missing[offset:offset + POSITIONS_PER_CHUNK] for offset in range(0, len(missing), POSITIONS_PER_CHUNK))
+    require(exposed[2] == missing and len(missing) == MISSING_POSITIONS and len(chunks) == MAXIMUM_CHUNKS
+        and len(exposed[5]) == len(chunks), "missing_position_plan_changed")
+    prior, position_chunks = [0] * len(selected), [0] * len(selected)
+    for epoch in ledger._parts[2]:
+        for position in epoch._parts[5]: prior[position - 1] += 1
+    require(exposed[4] == tuple(prior) and exposed[3] == missing[:len(exposed[3])]
+        and all(type(limit) is int and 0 <= limit <= EXTRA_ATTEMPTS_PER_CHUNK for limit in exposed[5]),
+        "negative_exposure_plan_changed")
+    for position in exposed[3]: prior[position - 1] += 1
+    require(all(prior[position - 1] < MAXIMUM_TOTAL_TRIES_PER_POSITION for position in missing),
+        "negative_exposure_plan_changed")
+    for number, chunk in enumerate(chunks, 1):
+        for position in chunk: position_chunks[position - 1] = number
+    slots, extras = len(exposed[3]), exposed[5]
+    initial_starts, initial_bytes = PRIOR_STARTS + slots, PRIOR_CHARGED_BYTES + slots * MAXIMUM_RESPONSE_BYTES
+    require(initial_starts + len(missing) + sum(extras) == MAXIMUM_CUMULATIVE_STARTS
+        and initial_bytes < MAXIMUM_CUMULATIVE_BYTES, "prospective_START_allowance_changed")
+    key = ledger.sha256, scope
+    require(key not in _PLAN_KEYS, "baseline_plan_already_minted")
+    require(len(_PLAN_MINTS) < MAXIMUM_PLANS, "finite_plan_capacity_exhausted")
+    report = {"schema": "si-count-recovery-plan-with-negative-exposure-v1", "policy_sha256": scope,
+        "baseline_ledger_sha256": ledger.sha256, "negative_exposure_sha256": exposed[8],
+        "missing_position_plan_sha256": hash_payload(missing), "chunks_sha256": hash_payload(chunks),
+        "missing_positions": len(missing), "chunks": len(chunks),
+        "full_chunks": sum(len(chunk) == POSITIONS_PER_CHUNK for chunk in chunks),
+        "final_chunk_positions": len(chunks[-1]), "final_chunk_maximum_slots": len(chunks[-1]) + extras[-1],
+        "maximum_new_slots": MAXIMUM_CUMULATIVE_STARTS - initial_starts,
+        "maximum_extra_slots": sum(extras), "remaining_bytes_after_permanent_unknown_allocation": MAXIMUM_CUMULATIVE_BYTES - initial_bytes,
+        "known_baseline_START_debits": PRIOR_STARTS, "known_baseline_charged_bytes": PRIOR_CHARGED_BYTES,
+        "permanent_unknown_START_upper_debits": slots, "permanent_unknown_byte_debits": slots * MAXIMUM_RESPONSE_BYTES,
+        "initial_START_upper_bound": initial_starts, "initial_byte_upper_bound": initial_bytes,
+        "maximum_cumulative_STARTs": MAXIMUM_CUMULATIVE_STARTS,
+        "historical_ledger_rewritten": False, "positive_closed_chunks": 0, "forensic_resolution_authenticated": False,
+        "authority": authority()}
+    raw = canonical_json(report).encode(); value = object.__new__(CountRecoveryPlan)
+    parts = value, ledger, missing, chunks, (tuple(prior), tuple(position_chunks)), raw, scope, hash_bytes(raw), exposure
+    object.__setattr__(value, "_parts", parts); object.__setattr__(value, "_identity", parts)
+    _PLAN_MINTS[id(value)] = parts; _PLAN_KEYS.add(key); value._guard(); return value
+
+
 @dataclass(frozen=True, slots=True, init=False, eq=False)
 class ConservativeCountBudget:
     _anchor: tuple = field(repr=False)
@@ -189,32 +286,38 @@ class ConservativeCountBudget:
             self._latch(); raise
 
     def public_summary(self):
-        unused, rows = self._guard()
-        return {"reserved_START_upper_bound": len(rows), "full_page_bytes_reserved": len(rows) * MAXIMUM_RESPONSE_BYTES,
-            "cumulative_START_upper_bound": PRIOR_STARTS + len(rows),
-            "cumulative_bytes_reserved_upper_bound": PRIOR_CHARGED_BYTES + len(rows) * MAXIMUM_RESPONSE_BYTES,
+        plan, rows = self._guard(); profile = plan.budget_profile()
+        report = {"reserved_START_upper_bound": len(rows), "full_page_bytes_reserved": len(rows) * MAXIMUM_RESPONSE_BYTES,
+            "cumulative_START_upper_bound": profile["initial_START_upper_bound"] + len(rows),
+            "cumulative_bytes_reserved_upper_bound": profile["initial_byte_upper_bound"] + len(rows) * MAXIMUM_RESPONSE_BYTES,
             "actual_STARTs_observed": 0, "receipt_durability_adapter_present": False,
             "reservation_journal_sha256": hash_payload(rows), "authority": authority()}
+        if profile["negative_exposure_sha256"] is not None:
+            report.update(permanent_unknown_START_upper_debits=profile["permanent_unknown_START_upper_debits"],
+                permanent_unknown_byte_debits=profile["permanent_unknown_byte_debits"],
+                negative_exposure_sha256=profile["negative_exposure_sha256"])
+        return report
 
     def reserve_start_slot(self, position):
         """Append one non-releasable slot; NOT an operational START permit."""
         try:
-            plan, rows = self._guard()
+            plan, rows = self._guard(); profile = plan.budget_profile()
             prior_tries, position_chunks = plan._parts[4]
             require(type(position) is int and 1 <= position <= len(prior_tries)
                 and position_chunks[position - 1] > 0, "exact_missing_position_required")
             chunk = position_chunks[position - 1]
             same_chunk = tuple(row for row in rows if row[0] == chunk)
-            require(len(same_chunk) < len(plan._parts[3][chunk - 1]) + EXTRA_ATTEMPTS_PER_CHUNK,
+            extra_limit = plan.chunk_extra_limit(chunk)
+            require(len(same_chunk) < len(plan._parts[3][chunk - 1]) + extra_limit,
                 "chunk_START_allowance_exhausted")
             repeats = len(same_chunk) - len({row[1] for row in same_chunk})
             if any(row[1] == position for row in same_chunk):
-                require(repeats < EXTRA_ATTEMPTS_PER_CHUNK, "chunk_extra_allowance_exhausted")
+                require(repeats < extra_limit, "chunk_extra_allowance_exhausted")
             tries = prior_tries[position - 1] + sum(row[1] == position for row in rows) + 1
             require(tries <= MAXIMUM_TOTAL_TRIES_PER_POSITION, "total_try_allowance_exhausted")
-            require(PRIOR_STARTS + len(rows) + 1 <= MAXIMUM_CUMULATIVE_STARTS,
+            require(profile["initial_START_upper_bound"] + len(rows) + 1 <= MAXIMUM_CUMULATIVE_STARTS,
                 "cumulative_START_allowance_exhausted")
-            require(PRIOR_CHARGED_BYTES + (len(rows) + 1) * MAXIMUM_RESPONSE_BYTES <= MAXIMUM_CUMULATIVE_BYTES,
+            require(profile["initial_byte_upper_bound"] + (len(rows) + 1) * MAXIMUM_RESPONSE_BYTES <= MAXIMUM_CUMULATIVE_BYTES,
                 "full_page_byte_capacity_exhausted")
             # No I/O or caller callback separates capacity checks and append.
             updated = (*rows, (chunk, position, tries))

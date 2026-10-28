@@ -26,7 +26,7 @@ from scripts import short_interest_count_control_custody as controls
 from scripts import short_interest_count_response_custody as responses
 
 immutable, creator = primitive.immutable, primitive.creator
-PRESERVATION_POLICY_SHA256 = "e0e8df728d96dfaae20b43497ad150557d9a767e5d853d020ec6b9acfcc0423c"
+PRESERVATION_POLICY_SHA256 = "f07d15287b69920503f936189ef44a297420e3f67948f1029ab39519154a2536"
 MAXIMUM_ATTEMPTS, MAXIMUM_LEASES = 528, 133
 MAXIMUM_BODY_BYTES, MAXIMUM_METADATA_BYTES = 2097152, 1024
 ROOT_NAME, PAIR_NAME, METADATA_NAME = "quarantine", "pair", "metadata"
@@ -92,6 +92,7 @@ def policy():
         "source_catalogue": "fixed_capture_subtree_external_claim_only_metadata_first_unknown_partial_never_read_or_adopted",
         "source_empty_containers": "fixed_capture_starts_received_responses_allowed_before_any_reservation_same_original_directory_checks",
         "source_budget": "all_STARTs_and_full_2MiB_negative_charges_unchanged_no_settlement",
+        "operative_budget": "known_B3_fields_unchanged_distinct_original_plan_permanent_negative_allocation_and_global_upper_bounds",
         "issuance": "LIVE_original_op_volume_before_claim_key_independent_dup_RO_mount_FD",
         "failure_validation": "FAILED_original_registries_inmemory_code_native_FD_pins_only_no_source_guard_reset",
         "publication": "fixed_fresh_quarantine_ordinal_once_no_clone_reseal_adoption_namespace_retry",
@@ -112,7 +113,7 @@ def _code_pins():
     """Original in-memory functions/defaults, never a post-failure disk read."""
     pins = []
     modules = (sys.modules[__name__], primitive, immutable, creator, primitive.cache, storage, transport, accounting,
-        controls, responses)
+        accounting.research_budget, accounting.research_budget.negative_exposure, controls, responses)
     for module in modules:
         for name, value in tuple(vars(module).items()):
             owners = [(module, name, value)]
@@ -448,7 +449,16 @@ def _negative_accounting(lease):
             and original[2] is budget._state and settled[0] is budget and settled[1] is op[3]
             and settled[2] is op[2], "negative_source_registry_changed")
         budget_state = original[2]; tickets = budget_state[2]
-        require(type(tickets) is tuple and len(tickets) <= MAXIMUM_ATTEMPTS
+        profile = op[2].budget_profile()
+        exposed = (accounting.research_budget.negative_exposure.exposure_binding(op[2]._parts[8])
+            if len(op[2]._parts) == 9 else None)
+        slots = len(exposed[3]) if exposed is not None else 0
+        require(profile["permanent_unknown_START_upper_debits"] == slots
+            and profile["permanent_unknown_byte_debits"] == slots * MAXIMUM_BODY_BYTES
+            and profile["negative_exposure_sha256"] == (exposed[8] if exposed is not None else None),
+            "negative_ticket_changed")
+        require(type(tickets) is tuple and len(tickets) <= min(MAXIMUM_ATTEMPTS,
+            len(op[2].chunk_positions(op[4])) + op[2].chunk_extra_limit(op[4]))
             and type(budget_state[0]) is int and budget_state[0] == op[4], "negative_ticket_changed")
         parts = []
         for ticket in tickets:
@@ -456,10 +466,13 @@ def _negative_accounting(lease):
             require(type(value) is tuple and len(value) == 14 and value[0] is ticket
                 and ticket._anchor is ticket._identity is value and value[1] is budget
                 and value[2] is op[2] and value[3] == op[4] and value[12] is op[3]
-                and type(value[4]) is int and 1 <= value[4] <= 70013
+                and type(value[4]) is int and 1 <= value[4] <= profile["maximum_new_STARTs"]
                 and value[11] == MAXIMUM_BODY_BYTES, "negative_ticket_changed")
             parts.append(value)
         require(len({value[4] for value in parts}) == len(parts), "negative_ticket_changed")
+        require(profile["initial_START_upper_bound"] + len(budget_state[1]) <= profile["maximum_cumulative_STARTs"]
+            and profile["initial_byte_upper_bound"] + budget_state[4] + len(tickets) * MAXIMUM_BODY_BYTES
+                <= profile["maximum_cumulative_bytes"], "negative_ticket_changed")
         return settled, budget_state, tuple(parts)
 
 
@@ -670,6 +683,7 @@ def finalize_failed_chunk(lease):
             _quarantine_membership(lease)
             op = anchor[2]
             journal = _settlement_rows(settled)
+            profile = op[2].budget_profile()
             payload = {"schema": "si-failed-count-chunk-preservation-manifest-v1",
                 "status": "preservation_manifest_sealed_only", "source_contexts_closed": False,
                 "process_closed": False, "chunk": op[4], "operator_protocol_sha256": op[5],
@@ -677,6 +691,14 @@ def finalize_failed_chunk(lease):
                 "plan_sha256": op[10], "preservation_policy_sha256": anchor[7],
                 "historical_START_debits": accounting.research_budget.PRIOR_STARTS,
                 "historical_charged_bytes": accounting.research_budget.PRIOR_CHARGED_BYTES,
+                "permanent_unknown_START_upper_debits": profile["permanent_unknown_START_upper_debits"],
+                "permanent_unknown_byte_debits": profile["permanent_unknown_byte_debits"],
+                "negative_exposure_sha256": profile["negative_exposure_sha256"],
+                "operative_initial_START_upper_bound": profile["initial_START_upper_bound"],
+                "operative_initial_byte_upper_bound": profile["initial_byte_upper_bound"],
+                "operative_cumulative_START_upper_bound": profile["initial_START_upper_bound"] + len(state[1]),
+                "operative_cumulative_byte_upper_bound": profile["initial_byte_upper_bound"] + state[4]
+                    + len(parts) * MAXIMUM_BODY_BYTES,
                 "original_irreversible_settlements": journal,
                 "all_current_reserved_tickets": [{"ordinal": value[4], "position": value[5],
                     "lifetime_try": value[7], "request_sha256": value[8], "reservation_sha256": value[9],

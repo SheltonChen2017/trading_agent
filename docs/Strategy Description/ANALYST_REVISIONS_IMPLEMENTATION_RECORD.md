@@ -2335,12 +2335,20 @@ Section 328 is Claude's independent review of `3c905d42..0d38c59d`, the
 seventy-four Codex commits of sections 323 (Mac recovery) and 324–327.
 All are accepted; the W5 and R298 result parsers now accept a QC success
 envelope without an `errors` key (`ARV2R328-001`, corrected in
-`41295615`). The immediate next step is that Codex counter-reviews
-section 328 and its correction. Before any six-cell launch after the
-owner releases the QC/Safari hold, the owner should settle the QC UI
-permission action and relaxed access row (`ARV2R328-003`), the buy-sizing
-buying-power risk needs its own versioned decision (`ARV2R328-004`), and
-any QC caller must carry the macOS resolver exception (`ARV2R328-002`).
+`41295615`). Codex's section 329 counter-review accepts the correction and
+qualifies the recorded access authority, suspected buy-sizing engine risk and
+resolver causality. The immediate next step is section 329's bounded native
+dated-coverage work, followed by strategy preparation only if actual gates pass.
+Under the standing scoped recovery direction, the owner explicitly waives
+Claude review of section 329 before this research continuation; independent
+acceptance is not claimed. Section 329 records the explicit hold release ("hold released.
+proceed"), counter-review of the exact two new Claude commits, and the
+prospective QC-only native dated-coverage continuation. The earlier hold is
+historical, not current. Review waiver for bounded research continues; no
+spent operation is renewed and no strategy/capacity/source gate is inferred.
+The current path preserves W5 quote economics, uses current sole-owner
+access rather than the old R298 Mia exception, and keeps native rows in QC.
+No new strategy result or research look exists at this starting checkpoint.
 V3 is spent after its
 first no-write grammar refusal (299.8). D13 completed
 once with a redacted `file not found` reason; the new contract must establish
@@ -70032,3 +70040,103 @@ correction. Before any six-cell launch after the hold is released:
 - the QC caller must meet the resolver requirement of `ARV2R328-002`.
 
 No result cell, look or booking was added: 337/259/53/699 stays.
+
+## 329. Hold release, section-328 counter-review and W5 native coverage continuation
+
+### 329.1 Owner scope and exact starting snapshot
+
+On October28 the owner directed "hold released. proceed" after the completed
+local checkpoint and its single push. This explicitly releases327.8's QC and
+Safari hold and resumes the six/eight x AR0/100/200 current-vintage research
+comparison under the standing review waiver and delegated bounded decisions.
+It is not paper/live/funded/broker authority, new paid rights, another lane's
+resource control, a spent attempt renewal, or source/price admission. Work
+continues only in the designated Code analyst root and matching lane branch;
+one final matching push at this concluded round, no intermediate push.
+
+Initial root/branch/status checks found a clean worktree at
+287952427b0e847d5f47261fc5d97c2057a04d17, beyond the prior Codex checkpoint
+0d38c59d8cdf7af1629c4a4342fa59cbf9449f61. Matching-branch-only fetch and live
+ls-remote confirmed the same head. Exact incoming range contains TWO commits:
+41295615163c39b83cf45d1e149b8c5fc0dfd758 and
+287952427b0e847d5f47261fc5d97c2057a04d17. Both are completed Claude review,
+not uncommitted/concurrent implementation. No reset/rebase/side worktree or
+other-lane operation occurred. Same-round Codex agents provide implementation
+and advisory checks, not independent Claude acceptance.
+
+### 329.2 Per-commit and finding dispositions
+
+| Incoming commit | Disposition | Evidence and limits |
+|---|---|---|
+|41295615163c39b83cf45d1e149b8c5fc0dfd758|Accepted|Both uninvoked result parsers now accept absent errors while rejecting a present malformed/nonempty value. Exact success/terminal/identity/selected-byte/actual-exit predicates remain. Three new checksum/response regression files retained. No operational caller imports or pins either changed parser; current source hashes match328.3, with no automatic repin of a used contract.|
+|287952427b0e847d5f47261fc5d97c2057a04d17|Accepted after documentary qualifications below|Read the complete new review/handoff and material source claims; retain every historical failure and open source/formal gate. No old private output/control/corpus census or spent operation was replayed.|
+
+| Finding | Counter-review disposition / forward action |
+|---|---|
+|ARV2R328-001|Confirmed, corrected. This is a material fail-closed compatibility defect, more directly supported as P2 than critical P1: no accepted corrupted financial result or live escape is shown. Actual backtests/read omission remains unobserved; related real QC success envelopes support optional absence. No severity change erases Claude's original classification.|
+|ARV2R328-002|Partially correct. Missing resolver-socket access is a verified profile limitation from later AN/AO evidence, but source inspection cannot establish AD/AF's exact historical cause or that every DNS path must fail. Preserve their unknown/refused outcomes. New REST callers must carry exact mDNSResponder access, pinned CA configuration and a bounded public preclaim resolver check; native all-network-denied offline tests remain denied. A Safari UI workflow uses the existing browser network stack and must not claim it exercised the REST profile.|
+|ARV2R328-003|Partially correct; claimed absence of owner permission is false. Section312.6 explicitly records "Yes—remove only Mia from R298 and proceed." Section323.1 excludes other-lane/project changes, not every authorized change in owned R298. Removal returned Collaboration not found, not success. Request Edit Control is distinct from removal and its effect/continuous exclusivity must not be inferred. Current work will use fresh sole-owner/no-other-writer access in the owned source project; no old Mia-row exception or new collaborator/permission action is adopted. Thus no repeat owner authorization is required for an already documented past scope, and historical access qualifications remain.|
+|ARV2R328-004|Partially correct, suspected engine refusal remains open. Ask-based size plus10bpsfee can mathematically exceed a hypothetical stale-trade-price engine buying-power check; deployed LEAN behavior is not verified by the repository tests. Frozen quantity/fill/fees intentionally use current quotes. Delegated prospective decision: preserve exact economics; do not size with a stale max-price, skip, resize or retry. Invalid/partial/nonterminal order continues to refuse. Resolve actual engine behavior before treating a strategy result as accepted; this concern does not block an order-free coverage diagnostic.|
+|ARV2R328-005|Confirmed test gap, corrected. New CUSIP letters/special-character vectors retained. Existing ISIN tests already caught the reported ISIN mutation; do not imply all identifier-letter mappings lacked coverage.|
+|ARV2R328-006|Confirmed privacy limitation: hashes of low-entropy identifiers/dates are pseudonyms, not guaranteed redaction. Do not reproduce dictionary recovery or expose recovered values; no historical rewrite. New public reports avoid new low-entropy fingerprints and expose only bounded aggregate/count evidence and necessary whole-source bindings.|
+|ARV2R328-007|Confirmed stale-source/harness qualifications statically. Claude's9095pass/20failure/10error counts remain reviewer-reported, not rerun by Codex. Preserve valid frozen tests and old failing outcomes; no blanket xfail conversion to manufacture a green suite. New operational source closures must bind their actual current dependencies prospectively.|
+|ARV2R328-008|Partially correct. The later direct request to set up an Insider resource monitor superseded the older monitor's task; it was not an unauthorized inference of new monitoring scope. Deletion/session-identifier disclosure remain historical qualifications. No monitor is recreated here, no other chat is messaged, and no other-lane session identifiers are newly committed.|
+|ARV2R328-009|Confirmed documentary privacy issue. Future records use Owner; no personal display name is repeated here and historical evidence is not rewritten.|
+|ARV2R328-010|Confirmed reproducibility limit for hash-only outer programs. AP test5849bytes/ef18dd367d13f81c618d227be95e31a5dc7e6980dc2d7d176137b5b3757774fc verified from public source. Prior outer bytes were not recovered/replayed. Future operational orchestration is committed or explicitly treated as non-reproducible evidence.|
+|ARV2R328-011|Confirmed operational qualifications. Local16384B is not QC transport proof; add bounded maximum-schema/warmup regression evidence. Same-resolution-six-cell policy remains intentional; a data refresh refuses rather than weakens comparability. Endpoint/prior-close predicates are redundant once the full-axis digest binds, not independent integrity observations. Warmup split/callback handling is diagnostic/cache state, not preevaluation strategy orders.|
+|ARV2R328-012|Confirmed held EOD route limitation. No EOD substitution/admission is planned; a split check remains necessary before any future EOD price admission. No new provider request is made to resolve an unused route.|
+|ARV2R328-013|Confirmed erratum: after the normal merge, QC job names refer to the Mac recovery section323, not a nonexistent review snapshot R323. Append this correction without changing any historical look booking.|
+|ARV2R328-014|Retain qualified minor findings: resolver IPC surface is broader than DNS semantics; CA precheck must bind actual transport; old taxonomy/swallowed-code/all-or-nothing/truncation/data-order/halt-day limitations remain. None justifies changing spent files, substituting prices, or silently adopting a new source. X's W-key observation and old source-pin derivability limits remain documentary evidence, not fresh source proof.|
+
+Focused Codex advisory selection: exactly30new regressions passed8.80s.
+Restoring BOTH old strict errors predicates in memory caused exactly2expected
+failures4.66s; originals restored in finally, harness actual0. Native all-
+network/artifact/Keychain/security-CLI denial, env-i, inroot support paths,
+-B/--noconftest/--ignore=artifacts/noautoload/no cacheprovider. No full suite,
+private data/credentials or cloud operation was exercised by those tests.
+Additional public-source sizing audit found no verified economic corruption;
+actual LEAN buying-power behavior remains specifically untested.
+
+### 329.3 Fresh UI observations and prospective boundary
+
+After owner release, Safari was inspected once. Its foreground tab belonged
+to another lane; it was left untouched. A SEPARATE tab opened only the known
+Analyst source project38522505, ARV2 R326 FIVE SOURCE RAW 20261027. The sidebar
+showed sole Owner, no library and masterv18207/default foundation. Opening the
+editor automatically displayed IDE build1010b6-58fd1d; no explicit build,
+backtest, notebook, Mia or source edit was requested. Automatic IDE build is
+not a launch or an authenticated source readback. No prior result was reread.
+
+The current organization UI showed Researcher, one member/Manager. Resources
+showed both B2-8 backtest nodes with Project/InUseBy empty and85.79MB/2GB
+Object Store usage. The research node was occupied by another lane and was
+not stopped, read, repurposed or changed. This is a transient read-only
+capacity observation, not an exclusive lease or processing-rights attestation.
+Source-project UI ownership is not general/dedicated API row authentication;
+no claim that those separate endpoints were read. Fresh current gates remain
+required before any later gesture. No settings/plan/account/permission change.
+
+Next is a NEW no-order QC-local dated coverage diagnostic consuming the
+already-pinned native book as DATA, after fresh genuine original bindings,
+current selected identity/collision/currency/calendar and source checks. It
+must not call old History preparation/publication, reread old controls, export
+native rows/prices or write the old book. W5 potential first-prior-to-end dense
+coverage is conservative, not an observed strategy holding path or full vendor
+coverage. All inputs, source files, project/run/attempt and selected result
+bounds must be committed separately before install/launch. No diagnostic
+attempt has yet been consumed;337shared/259development/53infrastructure/
+699cells is unchanged. Full strategy source/project/transfer admission remains
+pending. The six/eight evaluation is not yet running.
+
+Initial329document check:83passes/3failures1.29s caught the new navigation's
+missing space in section329 and retained immediate section328 direction.
+Corrected only current navigation, preserving historical sections and all
+existing tests. New synthetic runtime-limit selection5passes7.86s, no
+failures/skips/warnings (earlier5passes8.05s overlaps). Maximum valid closed-
+schema stress fixture produces META8768bytes and MONTHLY5299bytes; the former
+exceeds the historical8002byte QC witness, so transport sufficiency remains
+unproven. All64 fallback keys, maximum counters/60000orders/96char money
+encodings remain below local16384. Warmup capture/split and mocked invalid
+order regressions pass without economic edits; synthetic invalidity does not
+prove actual LEAN buying-power behavior. New test11746bytes SHA256
+7e0cf4c6578d7329d513547470ee1a0bb8512760e8fb29797d297f8806ebe268.

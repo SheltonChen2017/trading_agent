@@ -69515,3 +69515,101 @@ remainFalse and337/259/53/699 remains unchanged. New local archive packaging
 is separately prospective; old AR/AS/payload controls are not renewed here.
 Updated live navigation/record passed86focused document checks2.12s; this
 repeats earlier document tests and is not additive to this round's prior86.
+
+### 327.12 Project-independent local AR archive K freeze
+
+The final local packaging step is a NEW offline operation, not the held old
+project-creation/transfer or any AR/AS control replay. It stages the complete
+unchanged AR sidecar for a future project-bound transfer: catalog+71monthly
+shards+manifest,73DATA leaves/148531396bytes, unchanged roles/order/pins.
+No period clipping, price fill, source substitution, QC-only native book,
+provider/credential/Safari/QC access or processing-rights grant. Byte packaging
+does not prove all required strategy prices, source admission or cloud readiness.
+
+The frozen pure scripts/arv2_r298_common_price_payload.py remains unchanged
+at22991bytes/aff0a446a44c8c76cf83fd084c69d8a82877a4f451bf55c2c53045b511bf51e9.
+AR fact19194ca0fc562b4b0fed8331d7c6e725c3dd7cc31fada7fa519a08acc10d28b3,
+output70e6def0fe2621965904e31fe8121c7713c5201b9b151397766f78091e7ab843,
+plan1ad4590b361787b6126f5e4790034565c53a5e51d0173de67c422879160f74d4
+are explicit inputs from the inert public AR anchor. Exact archive148543046
+bytes includes the original bounded header11650bytes, SHA256
+2cda5157e4b305592568d71239ba613f8e452a43ac1507c8ee33b7ead2bd65fe.
+These source DATA leaves may be read only through this separately frozen
+new consumer. No old claims/reports/journals/operational entrypoints are read.
+
+K exclusively creates/fsyncs its own claim before fresh genuine package,
+all6151original binding catalog and full3466-axis checks. Every AR leaf hash
+is authenticated before any archive copy. Source bytes stream through the
+original held descriptors; the unchanged payload guard must RETURN normally
+before READY. Genuine process-bound catalog and selected streams are checked
+again after copying; this is not a claim of continuous source-filesystem
+stability. Own original archive FD/named metadata/native security checks and
+post-preflight precede a bounded report. No JSON/rows/prices are emitted.
+
+A separate top-level native verifier authenticates the complete public
+producer frame and OBSERVED actual exit. On actual0 it exclusively creates
+and fsyncs one verification-start marker BEFORE reading ONLY the NEW archive
+DATA. Exact header, every73range hash, whole external archive pin and original
+held/named ten-field metadata/native security are rechecked. It reads no old
+source DATA or old controls. Actual2 producer evidence is validated as failure
+without archive reading. Collector actual0 requires produceractual0, verifier
+actual0 and byte-identical complete bounded public stdout with no stderr.
+READY/report alone is insufficient; nonzero/unknown/trailing/timeout/noise or
+incomplete observation is spent/ambiguous, no unchanged retry or fabricated0.
+
+| New file | Bytes | SHA256 |
+|---|---:|---|
+| scripts/prepare_arv2_r327_available_history_archive.py |25379|9f3d261ea4ac99548a0931af3d82729545df24077c7135e27268025bfbb060c5|
+| scripts/observe_arv2_r327_available_history_archive.py |15152|bfcd6f536c209527515adfbe7013dad7604476e76f9a2bd127b3c8f2393c3cd1|
+| tests/analyst_revisions_v2/test_r327_available_history_archive.py |15133|d7c868699cb890d6b95309250e91488680aaeff156c57d775c498c51f64db5da|
+| tests/analyst_revisions_v2/test_r327_available_history_archive_observer.py |11225|ad81459030f8f3f386e668c8c9e7d3cac8c142c30bce9c756607bed8a05fe025|
+
+Canonical caller profile47564bytes/7c7679f448165bcf5548c207236e0adf3b7b81a012a7c9451352d9af50427651;
+collector profile3385bytes/74ff8181994cbaf97bba6e9462613bc828cda788fe22d2a1b7e429f629afde0b.
+All228literal dependencies matched the current public tree. Both caller and
+profile pins are literal in the collector; selected pins do not cover the
+whole interpreter. Four sources/tests compile in memory with one EOF LF.
+Root final84distinct focused tests passed6.02s under native all-network,
+production-artifact, Keychain/security-CLI denial with inroot support paths,
+noautoload/--noconftest/-B/no cacheprovider; no full suite or actual source
+DATA was exercised. Same-round static advice is not independent acceptance.
+
+I327-016(P2), corrected before use: the new output guard expected no parent
+directory link-count change after its own regular-file creation. First run
+64passes/4failures/6setup errors9.74s stopped at own claim-file creation.
+One in-memory synthetic diagnostic produced1expectedfailure0.21s and showed
+exactly +1 nlink for both mkdir and O_EXCL regular-file creates on this APFS
+host; other changed fields were directory size/mtime/ctime. NEW K now accepts
+exact old+1 ONLY after its own successful O_CREAT|O_EXCL regular-file create,
+with returned original child FD/named0600/owner/single-link/empty checks before
+refresh. First-five identity/mode/ownership fields, flags/native security
+remain exact; arbitrary +2/decrease/unchanged/identity/flag changes refuse.
+An unregistered synthetic new file's +1 still refuses during ordinary verify;
+no automatic refresh or general nlink/ctime/source waiver. Existing mkdir
+old/old+1 policy is unchanged. Child FDs close on failures while evidence
+files remain. All earlier failures/subsets are retained, not additive to84.
+This is a local new-caller defect, not evidence about an old QC upload cause.
+
+D-K one-shot decision: after this committed clean freeze, invoke ONLY the
+fixed new collector once with exact freeze HEAD and collector SHA above,
+designated Mac Code root/branch/Python3.13 and credential-free env-i support
+paths. Public-only native-denied preflight may check source/profile/Git before
+the sole invocation, with NO control inspection/allocation. Fixed prospective
+control is artifacts/analyst_revisions_v2/newrule_available_history_archive/
+R327-20261028-K; it has NOT been inspected/allocated. Producer1800s, verifier
+1800s, each1830s external observation, collector3700s; alarms/deadlines cannot
+bound uninterruptible I/O or host suspension. Only own child may be killed/
+reaped. Producer/verifier native deny ALL network, Keychains and security CLI,
+and bound their source/output filesystem access. The credential-free ordinary
+collector is not itself claimed to have native network denial.
+
+Own controls are at most claim/archive/report/failure/verification marker;
+partial claims/archive/markers remain spent/ambiguous, never cleaned/repaired/
+renamed/retried. Payload retains descriptor/resource bounds, no RLIMIT or
+security/settings changes. The result-recording scope is only already-captured
+closed public envelopes/process brackets/pins and an inert fact anchor, not
+a second archive/control reader. No transfer/project ID/source upload/compile/
+launch/capacity/native-book operation is authorized. All QC/Safari holds and
+false formal/readiness flags remain;337/259/53/699 unchanged. One final push
+at the concluded local checkpoint, no intermediate push and no push yet.
+K freeze record/document86checks passed1.21s, repeated/not additive.

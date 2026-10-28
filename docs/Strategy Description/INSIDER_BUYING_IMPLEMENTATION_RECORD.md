@@ -1,19 +1,18 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTIONS 335–337 QUALIFY EXISTING SOURCES ON CLEAN `78a048e3`:
-THE ACTUAL RETAINED NC/SOURCE17 OBSERVATION SUCCEEDS WITH TWO LEXICAL
-CANDIDATES, STILL NOT ADMITTED; ALL1,281,147 CONTEXT ROWS ARE ACCOUNTED.
-THREE FRESH MASSIVE REFERENCE/2020Q4 FILING SAMPLES RETURN HTTP200 WITH
-THE EXISTING KEY. CURSORS ARE NOT FOLLOWED; DIFFERENT SAMPLE ACCESSIONS
-ARE NOT CROSS-CORROBORATION OR PROOF OF MISSING HISTORY. THE OBSERVED
-FIELDS STILL DO NOT SUPPLY HISTORICAL PUBLIC-KNOWN-BY/BODY-VERSION
-EVIDENCE, COMPLETE ORIGINAL ADMISSION, PIT CONTEXTS OR FINAL PILOT
-POPULATION/REGISTRATION. SOURCE GAP RESOLUTION IS PARTIAL, NOT LANE
-COMPLETION OR BACKTEST READINESS. MAIN405 FOCUSED CHECKS PASS; ACTUAL
-RECEIPTS AND SOURCE IMAGES ARE INDEPENDENTLY READ BACK AT THEIR STATED
-SCOPES. TWELVE P2s REMAIN OPEN, NONE P0/P1; PRIOR SCOPED CORRECTIONS
-REMAIN CLOSED. NO QC/SAFARI/SDK/JOB, NEW SEC FILING/CARRIER REQUEST,
-OUTCOME LOOK OR BACKTEST. LOOKS/JOBS/BACKTESTS0/0/0; MONITOR PAUSED.**
+Status: **Sections 338–340 qualify eight fresh 2020Q4 SEC originals on clean
+`5f4988f4`, after complete 25-quarter source accounting and suppression of
+20,044 prior consumed accessions. All eight return HTTP200; 81,620 retained
+body bytes pass request/header/XML readback. The new consumed index has
+20,052 accessions. This is a bounded structural/custody sample, not completed
+original admission, historical public availability, PIT evidence or a full
+corpus. Existing-provider archive capability remains UNCONFIRMED; the owner
+explicitly declines supplier outreach. No purchase or provider-row probe is
+substituted for that missing evidence. Main312 focused and124 document/import
+checks pass; all twelve P2s remain OPEN, none P0/P1. Source/PIT/rights/look/
+QC/backtest readiness remains FALSE. No QC/Safari/SDK/job, source archive
+retry, outcome look or backtest. One final documented lane push; monitor
+PAUSED.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -309,6 +308,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-26 | Codex native-macOS counter-review completion | Captured origin`c0ee6957`; Claude four-commit range`96d4d8aa..0c536a91`; corrective`b5f1ca47`; this separate handoff | Sync plus per-commit review/native validation only, NO next milestone | Claude corrections accepted;331's attributed Windows limits retained, not rewritten. Bounded malformed-front correction closesIBNC-OBS33004 only at332's scope; actual NC activation remains withheld. | Main854 focused passes50.35s;105 auth passes1.59s,3 meaningful auth reversals/5 restored;147-image four-denial/live291 strong invented proof. Attributed82 batch/144 route plus independent144 route. Shared SEP-2 pair2 failed3.68s, unchanged. No full suite or actual-input/QC look. |13 OPENP2s; no P0/P1. Other findings and historical failed/consumed roots retained. | One final matching-lane push after handoff checks. Fresh actual qualification and real historical known-by/source/reference facts still missing; monitorPAUSED, no automatic next step. |
 | 2026-10-26 | Codex owner-directed pre-QC continuation | Clean matching base`969e29d7`; this scoped implementation and separate final handoff | Two pilot composition corrections, no Claude wait or QC access | Genuine-plan window scheduling closes33002; exact target-relevance/count/ordered digest narrowly corrects33001 while target-affecting missing history still refuses. Acceptance MODEL explicitly distinguished from historical-publication evidence. | Main472 focused17.44s;124 boundary/document4.39s;4 whole-function reversals caught13 intended REDs,15 restored3.39s;112-image strong compile/pin proof; attributed final peer46GREEN5.41s. No full suite, actual input/QC/look. |12 OPENP2s; noneP0/P1. 33001 partlyOPEN; known-by, originals/PIT contexts and final population registration remain concrete blockers. | Separate exact-hash handoff, one final lane push. No ready-to-QC claim, source activation or automated next step; monitorPAUSED. |
 | 2026-10-27 | Codex existing-subscription evidence qualification | Starting origin`06870130`; implementation/preregistration and actual clean execution`78a048e3`; separate handoff337 | Retained NC/source17 actual activation and three new Massive metadata samples, NO QC | Native observation135.738256s accounts1,281,147rows and2lexical/nonadmitted candidates; fresh reference/index/Form4 samples3HTTP200. Known-by/bodyversion/wholepopulation/PIT rights not established. | Main405 focused8.07s; preactivation124 documents3.99s; peer94 finalprobe,240 observer; held metadata/raw-schema readbacks and exact158/50 Git source checks. No full suite/outcome. |12 OPENP2s retained. Wrong receipt helper stopped before observer launch, corrected before activation; P3 tooling-only disposition336.1. No failed actual source operation is rewritten. | Need genuine historical known-by archive and complete originals/PIT/context/registration evidence. One final accumulated push after final record checks; no purchase or QC launch inferred. |
+| 2026-10-28 | Codex free-original and archive qualification | Starting origin`923b962a`; implementation/preregistration and actual clean execution`5f4988f4`; separate handoff340 | First8 fresh required-window originals after full25 source/consumption proof; existing-provider archive check only | All8 HTTP200 and original header/XML structure bound;81,620 retained bytes; new consumed index20,052. Archive remains unconfirmed; owner declines all supplier outreach. No QC or purchase. | Main312 focused51.20s,124 documents/imports5.09s; actual827.493308s including census/custody; strict native body readback44.525630209s. Draft guard reversals and peer evidence remain attributed in338–339. No full suite or outcome look. |12 OPENP2s retained; draft-only corrections in338.4 all precede activation. Successful sample does not close public-known-by, complete-parent, reference, rights or full-population gates. | One final matching-lane push after separate exact-hash handoff and final checks. Preserve/REUSE this sample; never resume its namespace or repeat consumed requests. Need genuine archive/PIT inputs before pre-QC readiness; no supplier message or QC action inferred. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -39450,3 +39450,203 @@ the single registered source/capture operation. Recheck exact root/branch/
 HEAD/expected status and matching origin first. Record the already-existing
 execution hash and actual results afterward, then make the separate durable
 handoff and one final matching-lane publication. No interim push.
+
+## 339. Observed required21 free-original qualification (2026-10-28)
+
+### 339.1 Exact execution and actual accounting
+
+The already-existing clean implementation/preregistration commit is
+**`5f4988f4294eb23f603ea94d0f4eaca962ba03c1`**. It exists BEFORE the actual
+operation; it is not a later hash retroactively assigned to uncommitted
+execution. Matching origin remains923b962a at activation; no incoming review
+is present or claimed. All four new images equal338.4's tested hashes.
+
+A metadata-only clean-code/Git identity check succeeds with161 source images,
+inventory `1bd6cd163dbe3aa198b82ae7ffff907a89a69b085b7db50fdf1f66f582286cf7`.
+It reads no private input/profile/contact and performs no source derivation.
+Main then reads the own connected profile exactly ONCE for the approved SEC
+contact. An ephemeral in-memory RSA relay delivers the contact through
+anonymous stdin; no plaintext tool argument, environment value, contact file,
+fingerprint, profile output or private-key export. Contact/decrypted buffers
+are zeroed and cleared, private key/padding references cleared; no supplier
+mail or message is sent.
+
+Main calls `run_actual` exactly ONCE, without a standalone full-source
+preflight or semantic restart. The native source worker completes the genuine
+25-quarter stream and unchanged audit; eight requests are selected from
+**2020Q4**, not the old campaign's2020Q1 or a substituted pilot prefix.
+Required21 source totals are1,051,925 all-six-form rows, of which960,072 are
+Form4/4-A targets and91,853 context forms. Complete25 context remains
+1,281,147 rows/1,163,648 Form4/4-A; pilot20 remains1,008,318/921,570.
+The pre-sample provisional eligible count940,145 is metadata after the exact
+20,044 global-consumption suppression, not a completed corpus or a grant for
+940,145 requests. Existing audit locator quarantines and one original
+ambiguous target remain represented; no source form, row or refusal is lost.
+
+Actual result: exit0, stderr0, **8 planned/8 started/8 HTTP200/0 unattempted**,
+eight transport invocations and eight privacy-cleared, header/XML-structured
+original bodies. Whole Python-process wall time observed by the trusted
+launcher is **827.493308s**; it includes full source/custody/lineage checks,
+not measured SEC transfer latency. The lane's existing cooperative controller
+EX lock remains held through capture. Every request has its permanent claim,
+durable start and terminal record; no redirect, retry, alias, pagination,
+archive request or old namespace resume occurs.
+
+Retained success-body total is **81,620 bytes**, not measured wire bytes:
+
+| Sample ordinal | Bytes | SHA-256 |
+| --- | --- | --- |
+| 1 | 6,044 | `3f1bdb529136e3f125adbe88529466d8291b333978acb0d3faa4c6e77e618a72` |
+| 2 | 4,381 | `c26e9a0a6d1cd4cc421304e57b559934abcedf559ad556182cfcaf232fa1b665` |
+| 3 | 9,739 | `694b896e46fee0ee625c89b716d9bc41ff37810af62cef2b420ea6a2b3e2c2cf` |
+| 4 | 28,499 | `6eaf2ca63c67b7994a87cedc2a4b99b843d2f6edf06d5fd6ff6d300ce19abcf5` |
+| 5 | 8,114 | `ae05029ebb3e8746903abb50586451e806f4fdf53e339aa272782d93a863efb9` |
+| 6 | 8,552 | `a48dcf3c05834f1e1ee6069e928e55503e3aa4591110fa23c78b84ed67733158` |
+| 7 | 4,651 | `7ded85a3947e44a94bf61943aaad1611d0fb3043041235ea732e496e402b2945` |
+| 8 | 11,640 | `3319c370e982b41526167ea0eb4a222498aff579ba66fc7122b329894beb1dfb` |
+
+Private ignored root is
+`artifacts/insider_buying/pilot_sec_required21_v1`. Its namespace is now
+permanently CONSUMED, never reset, resumed or renamed into a retry. The new
+consumed index binds20,052 accessions; future technical work must merge/reuse
+this exact new root as well as all earlier claims, not redispatch these eight.
+Old v2 selectors/collectors still know the older index; they are not silently
+made current or reactivated by this new sample.
+
+| Private control | Bytes | SHA-256 |
+| --- | --- | --- |
+| reservation.json | 23,055 | `501f33d8497ea3d33ac7d6e88690beb821ab3642dd7645e9883f4462f8984f7d` |
+| selection-started.json | 105 | `a011613e17501b410d0d77e6e3df50076332817bf2c5730308457299e81eadb1` |
+| plan.json | 516,504 | `79ee10366391b2a0a735f2d5127d583c17bf5d4c12f93871e110de9a1fe0fdf4` |
+| selection-complete.json | 536,874 | `18671f54087239c91a12051dc4265c72f8b261f229417a095fb709ba8f5dc115` |
+| consumed-index.json | 461,511 | `fc60ac0f83c6e1509cc45e2acf277f7d587906799187b99ca02493cbab66ed59` |
+| complete.json | 24,680 | `9a0fdbb8c4154d6199c50f8d9625671cef4ac6a8138b10f42c0e9b28b74b0a1c` |
+
+Input metadata root is
+`3a1b0f84b6e4687fd56c6ecfa2c66fd117d645a0a6f1452adeb4294a48ce0b21`;
+source roster `801661a5285ec79b02f1ce57e921eb3ff5116f23d671fcc64a64f0a896a364be`;
+parent audit `ce6a0a0eb678e0f90e9821efc1a0460808c5536202c1bb5407d9ec89b044f056`.
+Controls/raw originals remain private and ignored; no source rows, transaction
+values, contact or raw filing are committed.
+
+### 339.2 Observed readback and precise limits
+
+Main independently calls `verify_actual` once on the still-clean same5f4988f4
+assembly, externally pinning the observed completion above. Its native
+four-denial/real-memory worker checks immutable private files and complete
+leaf/claim/object inventories, request/source/root crosslinks, UTC/monotonic
+ordering, exact consumption, raw-body/header/XML spans and unchanged frozen
+complete-submission projections. **44.525630209s**, exit0/stderr0; all eight
+retained bodies and all eight structural bindings pass. No new HTTP request,
+source census, profile or credential read occurs. Original-contact privacy
+rescreen is explicitly FALSE: privacy screening belongs to the observed
+producer; readback does not invent a substitute contact.
+
+A separate main metadata-only reader runs with the same native four denials
+and real guard, reading six controls and eight result controls, opening ZERO
+raw originals. It confirms the counts/sizes/control roots above. Source-
+header acceptance remains a verbatim declaration/`SEC_ACCEPTANCE_MODEL`, not
+authenticated historical public availability, a body-version observation
+archive or a PIT signal. Issuer/owner/XML/request structural agreement does
+not create security-class/listing/QC-SID identity or canonical admission.
+
+An independent peer metadata-only reader checks41 control leaves with SH
+locks, no-follow/private0600/single-link/unchanged-version custody and exact
+inventories:35 top entries (33 leaves plus two directories), eight claims
+and eight object STAT entries. A Python audit hook refuses every `.bin` open;
+ZERO original-body opens, hashes or replays occur in this peer proof.
+The eight HTTP200/one-invocation/inspection-success controls, consumption
+20,052 and control roots agree. Its81,620-byte body sum is a receipt claim,
+not an independent body measurement. Reader4.131s under four native denials
+and the real guard. All161 current and committed repository source images
+(5,189,917 code bytes, including valid empty files) match exact5f4988f4 and
+inventory1bd6cd16 above. The separate Git-image helper0.067s permits the Git
+subprocess and `/dev/null` while denying network/repository writes/security
+exec; it is not described as a fork-denied worker. Initial reader cache-flag,
+`/dev/null` and overstrict nonempty-code setup refusals precede successful
+readers; only those readers are corrected, never source/receipts or the
+actual acquisition. The827.493308s actual duration remains main-observed,
+not peer-observed or independently replayed acquisition.
+
+This sample supplies genuine retained originals for subsequent qualified
+reuse. It does NOT complete required21 admission, reconstruct old lots,
+resolve the stoppedv3 unmatched start, settle rights, assemble a whole pilot
+population or establish readiness. No source financial arithmetic, signal,
+outcome join, QC/Safari/API/SDK/job/upload, backtest or trading action occurs.
+The long census/custody runtime is not a benchmark or extrapolated campaign
+capacity claim. Existing inventory/exposure scale limits still need a genuine
+partitioned successor before a full-population continuation.
+
+## 340. Separate final handoff — completed qualification, historical-archive blocker
+
+Exact implementation/preregistration and actual execution commit is
+`5f4988f4294eb23f603ea94d0f4eaca962ba03c1`, based on independently verified
+origin`923b962a6364ddf98ccb54758e4f2a14852f896d`. Incoming range is EMPTY.
+This separate record commit follows that already-existing hash and observed
+execution. New internal peer QA is not a Claude review or independent
+acceptance of Codex's own implementation. No Claude wait is reinstated.
+
+Completed: required21-specific additive selector/one-shot collector and strict
+readback; genuine full25 census before eight fresh warmup originals; current
+20,052-accession consumption chain; official provider/export/clock checks and
+an unsent, concrete archive inquiry. Supplier capability is **UNCONFIRMED**,
+not a denial. The owner explicitly says NOT to contact suppliers; no mail,
+support form/ticket or live chat is sent. No provider key, plan upgrade,
+purchase, normal insider row, earnings/news text or additional provider
+capture is used to pretend to answer the archive question.
+
+The **concrete missing input** is unchanged: an authenticated historical
+public-known-by upper bound for the exact relevant accession/body/version,
+with trustworthy clocks, correction/deletion/backfill lineage and complete
+required2020Q4–2025Q4 coverage/refusal accounting at the existing09:28/09:30
+cutoffs. Exact first-public seconds are not mandatory. Current original
+downloads, SEC acceptance clocks and current regenerated provider files do
+not themselves establish that input. No inspected public route or relevant
+mail metadata establishes an existing-account archival export; no claim a
+supplier can never supply one or that another purchase is mandatory.
+
+The owner-directed technical work reaches that factual boundary. Do not buy
+another price/earnings/general insider bundle on the basis of this gap. A
+genuine archive/export sample or other qualified historical public snapshots
+could resolve it; no further ordinary date-only row probe can manufacture
+its evidence. Respect the no-outreach decision rather than silently sending
+messages to remove the blocker.
+
+Full21 original admission, genuine older target-affecting lot history,
+historical issuer/share-class/listing/PIT maps, full active cohort, raw price/
+volume/liquidity and actual factor intervals, both prescribed earnings
+diagnostics, applicable processing rights and permanent pilot population/
+look/engine-parity bindings also remain unfinished. Future technical
+continuation must reuse this exact eight-original scope and all preceding
+claims; do not retarget/resume the old first64/all25/v3 collectors. No QC
+step is authorized by the current hold or by a successful structural sample.
+
+All twelve carried OPENP2s retain333.5's exact scopes; no P0/P1.338's draft
+findings close only the new engineering defects before activation, not the
+data gates. Prior scoped corrections remain CLOSED. Frozen v1/scale/pilot
+and all four current-byte-hashed v3 sources are unchanged. Stoppedv3 remains
+1,846 completed/1,847 starts unresolved; the separate7,373-byte diagnostic
+and its206e6db9 report do not resolve it. Legacy2022Q4–2023Q1 remains19,846
+source-bound/99,394,79,548 originally unattempted; these eight2020Q4 originals
+are not added to that different window. StrictD23 retains seven nonexact
+quarters and no82-quarter promotion digest. Both final nonretroactive access
+classifications remain distinct and unchanged. Source/PIT/rights/canonical/
+look/QC/backtest readiness stays FALSE; looks/jobs/backtests0/0/0.
+
+Main312 focused and124 document/import/package checks, native strong compile,
+actual results and readback are precisely scoped above. Completed-record
+checks124 GREEN3.92s follow339–340; peer metadata-only proof is339.2. Final
+record/hash/diff/status checks follow the peer addition before publication. Reverify
+root/branch/exactHEAD/record-only expected status, fetch ONLY the matching
+lane and stop on unexpected advancement. Make exactly ONE final successful
+push to origin/codex/strategy-insider-buying, then independently verify exact
+remote tip and clean/synced status. No interim push, side branch/worktree,
+reset/rebase/force, shared-document change, monitor rearm or other-chat message.
+
+Final prepublication receipt: completed-record124 GREEN3.92s and peer-added
+record3 GREEN0.33s, no skips/warnings. Current four new source hashes still
+equal338.4; all cumulative whitespace checks pass. Added-line secret-shape
+checks find zero unexpected email/query-credential/private-key values, with
+two invented positive scanner controls detected. Only this record is dirty;
+matching origin remains923b962a. The separate final record commit and single
+push follow these verified results; the lane is explicitly NOT QC-ready.

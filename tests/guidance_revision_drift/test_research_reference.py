@@ -217,6 +217,68 @@ class ReferenceBookTests(unittest.TestCase):
         with self.assertRaises(ResearchReferenceError):
             self.book.eligibility(self.calendar, "PERM-A", self.entry, role="unknown")
 
+    # GDR-CR53-004: stock eligibility, calendar-shape and window rules that no
+    # earlier case isolated.
+    def test_stock_eligibility_rules_each_refuse_alone(self):
+        body = self.book.to_dict()
+        last = max(row["session_date"] for row in body["daily_bars"])
+        sessions = self.calendar.sessions
+
+        def last_bar(values):
+            return next(row for row in values["daily_bars"] if (row["security_id"], row["session_date"]) == ("PERM-A", last))
+        cases = {
+            "security_not_listed": lambda values: values["references"][0].update(status="delisted"),
+            "ineligible_exchange": lambda values: values["references"][0].update(exchange="OTC"),
+            "not_primary_common_share": lambda values: values["references"][0].update(primary=False),
+            "missing_dated_sector": lambda values: values["references"][0].update(sector=None),
+            "fewer_than_60_completed_listing_sessions": lambda values: values["references"][0].update(
+                listed_on=sessions[16].session_date.isoformat()),
+            "daily_bar_publication_before_session_close": lambda values: last_bar(values).update(
+                published_at=stamp(instant(date.fromisoformat(last), 15, 59))),
+            "missing_or_nonpositive_raw_close": lambda values: last_bar(values).update(raw_close="0"),
+            "missing_volume": lambda values: last_bar(values).update(volume=None),
+            "ambiguous_history_session": lambda values: values["daily_bars"].append({**last_bar(values), "volume": 1}),
+            "adv20_below_20000000": lambda values: [row.update(volume=999_999) for row in values["daily_bars"]
+                                                    if row["security_id"] == "PERM-A"],
+        }
+        for reason, mutate in cases.items():
+            values = deepcopy(body)
+            mutate(values)
+            with self.subTest(reason=reason):
+                self.assertIn(reason, ReferenceBook.from_dict(values).eligibility(self.calendar, "PERM-A", self.entry)["reasons"])
+        boundary = deepcopy(body)
+        boundary["references"][0]["listed_on"] = sessions[15].session_date.isoformat()
+        for row in boundary["daily_bars"]:
+            if row["security_id"] == "PERM-A":
+                row["volume"] = 1_000_000
+        self.assertTrue(ReferenceBook.from_dict(boundary).eligibility(self.calendar, "PERM-A", self.entry)["eligible"])
+        early = self.book.eligibility(self.calendar, "PERM-A", sessions[19].session_date)
+        self.assertIn("insufficient_prior_schedule_sessions", early["reasons"])
+
+    def test_calendar_shape_first_cutoff_and_protected_window_refuse(self):
+        body = self.calendar.to_dict()
+        first = date.fromisoformat(body["sessions"][1]["date"])
+        for field, value in (("open_utc", stamp(instant(first, 9, 31))), ("close_utc", stamp(instant(first, 15)))):
+            changed = deepcopy(body)
+            changed["sessions"][1][field] = value
+            with self.subTest(field=field), self.assertRaises(ResearchReferenceError):
+                CalendarInput.from_dict(changed)
+        with self.assertRaises(ResearchReferenceError):
+            self.calendar.cutoff(self.calendar.sessions[0].session_date)
+        reference = deepcopy(self.book.to_dict())
+        reference["references"][0]["listed_on"] = "2026-08-03"
+        with self.assertRaises(ResearchReferenceError):
+            ReferenceBook.from_dict(reference)
+        days, cursor = [], date(2026, 8, 3)
+        while cursor <= date(2026, 9, 4):
+            if cursor.weekday() < 5:
+                days.append(cursor)
+            cursor += timedelta(days=1)
+        late = CalendarInput.from_dict({**body, "covered_from": days[0].isoformat(), "covered_through": days[-1].isoformat(),
+            "sessions": [{"date": d.isoformat(), "open_utc": stamp(instant(d, 9, 30)), "close_utc": stamp(instant(d, 16))} for d in days]})
+        with self.assertRaises(ResearchReferenceError):
+            late.entry_window(instant(date(2026, 8, 26), 12))
+
 
 if __name__ == "__main__":
     unittest.main()

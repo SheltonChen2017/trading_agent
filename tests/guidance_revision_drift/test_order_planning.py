@@ -2,14 +2,15 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from decimal import Decimal, localcontext
+import json
 import unittest
 from unittest.mock import patch
 
 from data.hashing import hash_bytes
 from research.guidance_revision_drift.contracts import load_candidate
-from research.guidance_revision_drift.guidance_inputs import GuidanceLedger
+from research.guidance_revision_drift.guidance_inputs import GuidanceDocument, GuidanceLedger, GuidanceReceipt
 from research.guidance_revision_drift.historical_market import HistoricalMarketBatch
 from research.guidance_revision_drift.input_contracts import InputError, canonical_bytes
 from research.guidance_revision_drift.order_planning import AccountSnapshot, plan_session
@@ -250,6 +251,165 @@ class OrderPlanningTests(unittest.TestCase):
              patch("subprocess.run", side_effect=AssertionError("process forbidden")), \
              patch("socket.create_connection", side_effect=AssertionError("network forbidden")):
             self.assertEqual(canonical_bytes(self.plan()), expected)
+
+    # GDR-CR53-001: planner and account rules that no earlier case isolated.
+    def _decision_on(self, offset):
+        calendar = self.inputs["calendar"]
+        session = calendar.sessions[calendar.index(self.inputs["entry_session"]) + offset]
+        self.inputs["entry_session"], self.inputs["market"] = session.session_date, ()
+        self.account(at=(session.open_utc + timedelta(minutes=30)).isoformat().replace("+00:00", "Z"))
+
+    def _two_events(self, eps_by_security):
+        old_rows, new_rows, batches = [], [], [self.inputs["market"][1]]
+        references = self.inputs["references"].to_dict()
+        template = references["references"][0]
+        history = [row for row in references["daily_bars"] if row["security_id"] == "INVENTED-SEC"]
+        for security, eps in eps_by_security.items():
+            common = {"security_id": security, "issuer_id": security + "-ISSUER"}
+            old_rows.append(receipt(security + "-OLD", "2025-03-03", **common))
+            new_rows.append(raised(security + "-NEW", "2025-04-01", **common,
+                                   period_values={"eps": {"lower": eps, "upper": eps, "kind": "point"}}))
+            references["references"].append({**template, **common})
+            references["daily_bars"].extend({**row, "security_id": security} for row in history)
+            raw = json.loads(self.inputs["market"][0].raw_bytes)
+            raw["security_id"] = security
+            batches.append(HistoricalMarketBatch(canonical_bytes(raw)))
+        self.inputs["references"] = ReferenceBook.from_dict(references)
+        self.inputs["guidance"] = GuidanceLedger(tuple(old_rows + new_rows))
+        self.inputs["market"] = tuple(batches)
+
+    def test_account_assertion_rules_each_refuse_alone(self):
+        original = self.inputs["account"].to_dict()
+        at = datetime.fromisoformat(original["at"].replace("Z", "+00:00"))
+
+        def held(security, issuer, age=0):
+            return {"security_id": security, "issuer_id": issuer, "sector": "technology", "quantity": 1,
+                    "raw_mark": "10", "mark_at": (at - timedelta(seconds=age)).isoformat().replace("+00:00", "Z"),
+                    "source_sha256": "0" * 64}
+        AccountSnapshot.from_dict({**original, "positions": [held("HELD", "HELD-ISSUER", 60)]})
+        pending = {"order_id": "PENDING", "issuer_id": "PENDING-ISSUER", "sector": "technology",
+                   "reserved_notional": "1", "reserved_fee": "1"}
+        controls = original["entry_controls"]
+        cases = {"mark_older_than_60_seconds": {**original, "positions": [held("HELD", "HELD-ISSUER", 61)]},
+                 "one_issuer_held_twice": {**original, "positions": [held("HELD-1", "HELD-ISSUER"), held("HELD-2", "HELD-ISSUER")]},
+                 "text_control": {**original, "entry_controls": {**controls, "program_stop_active": "false"}},
+                 "integer_control": {**original, "entry_controls": {**controls, "unresolved_actions": 0}},
+                 "duplicate_pending_order": {**original, "pending_buys": [pending, {**pending, "issuer_id": "OTHER"}]}}
+        for rule, values in cases.items():
+            with self.subTest(rule=rule), self.assertRaises(InputError):
+                AccountSnapshot.from_dict(values)
+        with self.assertRaises(InputError):
+            AccountSnapshot(canonical_bytes(original).replace(b",", b", ", 1))
+
+    def test_account_must_be_asserted_at_the_decision_and_with_positive_nav(self):
+        at = datetime.fromisoformat(self.inputs["account"].to_dict()["at"].replace("Z", "+00:00"))
+        self.account(at=(at - timedelta(seconds=1)).isoformat().replace("+00:00", "Z"))
+        with self.assertRaises(InputError):
+            self.plan()
+        self.inputs = rehearsal_inputs()
+        self.account(settled_cash="0")
+        with self.assertRaises(InputError):
+            self.plan()
+
+    def test_cash_limited_sizing_reserves_the_minimum_and_per_share_fee(self):
+        later = self.inputs["calendar"].sessions[self.inputs["calendar"].index(self.inputs["entry_session"]) + 1]
+        # A future receivable keeps NAV caps wide while settled cash binds.
+        for cash, shares, fee in (("101.5", 9, "1"), ("3041.5", 300, "1.5")):
+            self.account(settled_cash=cash, receivables=[{"amount": "100000",
+                         "settlement_session": later.session_date.isoformat()}])
+            with self.subTest(cash=cash):
+                intent = self.plan()["candidates"][0]["intent"]
+                self.assertEqual(intent["whole_shares"], shares)
+                self.assertEqual(Decimal(intent["reserved_fee"]), Decimal(fee))
+
+    def test_position_fraction_and_entry_notional_caps_each_bind_alone(self):
+        for cash, shares in (("50000", 247), ("200000", 495)):
+            self.account(settled_cash=cash)
+            with self.subTest(cash=cash):
+                self.assertEqual(self.plan()["candidates"][0]["intent"]["whole_shares"], shares)
+
+    def test_entry_before_the_third_session_after_announcement_refuses(self):
+        self._decision_on(-1)
+        self.assertIn("outside_first_three_entry_opportunities", self.reasons())
+
+    def test_publication_exactly_at_the_cutoff_is_outside_the_cohort(self):
+        first, second = self.inputs["guidance"].receipts
+        stamp = self.inputs["calendar"].cutoff(self.inputs["entry_session"]).isoformat().replace("+00:00", "Z")
+        document = second.document.to_dict()
+        document["published_at"] = stamp
+        self.inputs["guidance"] = GuidanceLedger((first, GuidanceReceipt(
+            second.raw_bytes, GuidanceDocument.from_dict(document), stamp, stamp)))
+        self.assertIn("publication_not_strictly_before_cutoff", self.reasons())
+
+    def test_missing_earlier_opportunity_evidence_refuses_a_later_session(self):
+        calendar = self.inputs["calendar"]
+        dropped = calendar.sessions[calendar.index(self.inputs["entry_session"]) - 20].session_date.isoformat()
+        values = self.inputs["references"].to_dict()
+        values["daily_bars"] = [row for row in values["daily_bars"]
+                                if (row["security_id"], row["session_date"]) != ("INVENTED-SEC", dropped)]
+        self.inputs["references"] = ReferenceBook.from_dict(values)
+        self._decision_on(1)
+        reasons = self.reasons()
+        self.assertIn("earlier_opportunity_evidence_incomplete", reasons)
+        self.assertNotIn("earlier_supplied_input_opportunity_already_eligible", reasons)
+
+    def test_stock_and_benchmark_identity_mismatches_are_named(self):
+        original = self.inputs["market"]
+        raw = json.loads(original[0].raw_bytes)
+        raw["symbol"] = "OTHER"
+        self.inputs["market"] = (HistoricalMarketBatch(canonical_bytes(raw)), original[1])
+        self.assertIn("stock_symbol_reference_mismatch", self.reasons())
+        self.inputs["market"] = original
+        values = self.inputs["references"].to_dict()
+        values["references"][1]["status"] = "delisted"
+        self.inputs["references"] = ReferenceBook.from_dict(values)
+        self.assertIn("benchmark_security_not_listed", self.reasons())
+
+    def test_wide_stock_decision_spread_refuses_the_entry(self):
+        raw = json.loads(self.inputs["market"][0].raw_bytes)
+        raw["quotes"][0]["bid_price"] = "9.9"
+        self.inputs["market"] = (HistoricalMarketBatch(canonical_bytes(raw)), self.inputs["market"][1])
+        self.assertIn("stock_decision_quote_refused", self.reasons())
+        self.assertIsNone(self.plan()["candidates"][0]["intent"])
+
+    def test_duplicate_security_or_second_benchmark_batch_refuses(self):
+        stock, spy = self.inputs["market"]
+        raw = json.loads(spy.raw_bytes)
+        raw["security_id"] = "INVENTED-SPY-2"
+        for market in ((stock, stock, spy), (stock, spy, HistoricalMarketBatch(canonical_bytes(raw)))):
+            self.inputs["market"] = market
+            with self.subTest(count=len(market)), self.assertRaises(InputError):
+                self.plan()
+
+    def test_eps_revision_breaks_an_exact_revenue_tie(self):
+        self._two_events({"A-SECURITY": "1.05", "Z-SECURITY": "1.10"})
+        ordered = sorted(self.plan()["candidates"], key=lambda row: row["priority_rank"])
+        self.assertEqual([row["security_id"] for row in ordered], ["Z-SECURITY", "A-SECURITY"])
+
+    def test_gross_room_accumulates_across_ranked_intents(self):
+        self._two_events({"A-SECURITY": "1.10", "Z-SECURITY": "1.05"})
+        self.account(pending_buys=[{"order_id": "P" + str(index), "issuer_id": "O" + str(index),
+            "sector": "SECTOR-" + str(index), "reserved_notional": "15000", "reserved_fee": "1"}
+            for index in range(3)])
+        ordered = sorted(self.plan()["candidates"], key=lambda row: row["priority_rank"])
+        self.assertEqual(ordered[0]["intent"]["whole_shares"], 495)
+        self.assertIsNone(ordered[1]["intent"])
+        self.assertEqual(ordered[1]["reasons"], ["insufficient_declared_cash_or_exposure_capacity"])
+
+    def test_one_issuer_receives_at_most_one_intent_per_session(self):
+        first, second = self.inputs["guidance"].receipts
+        raw = canonical_bytes({"invented": "SECOND-RAISE"})
+        document = second.document.to_dict()
+        document.update(disclosure_id="INVENTED-RAISE-2", published_at="2025-04-01T13:00:00Z",
+                        source_payload_sha256=hash_bytes(raw))
+        document["periods"][0]["revenue"] = {"lower": "105000000", "upper": "105000000", "kind": "point"}
+        document["periods"][0]["eps"] = {"lower": "1.11", "upper": "1.11", "kind": "point"}
+        self.inputs["guidance"] = GuidanceLedger((first, second, GuidanceReceipt(
+            raw, GuidanceDocument.from_dict(document), "2025-04-01T13:01:00Z", "2025-04-01T13:02:00Z")))
+        rows = self.plan()["candidates"]
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(len([row for row in rows if row["intent"] is not None]), 1)
+        self.assertIn(["issuer_reserved_by_prior_ranked_intent"], [row["reasons"] for row in rows])
 
 
 if __name__ == "__main__":

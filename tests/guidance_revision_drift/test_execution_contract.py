@@ -9,6 +9,7 @@ from zoneinfo import ZoneInfo
 from research.guidance_revision_drift.execution_contract import (
     ExecutionContract, ExecutionContractError, default_contract,
 )
+from research.guidance_revision_drift.input_contracts import InputError
 from research.guidance_revision_drift.research_reference import CalendarInput
 
 
@@ -132,6 +133,40 @@ class ExecutionContractTests(unittest.TestCase):
             ExecutionContract.from_bytes(contract.canonical_bytes + b"\n")
         with self.assertRaises(ExecutionContractError):
             default_contract((date(2024, 5, 25),), calendar_source_sha256=SOURCE)
+
+    # GDR-CR53-005: settlement, terminal-clock and fee input rules that no
+    # earlier case isolated.
+    def test_settlement_trade_date_and_inventory_rules_each_refuse_alone(self):
+        days = (date(2025, 4, 1), date(2025, 4, 2), date(2025, 4, 3), date(2025, 4, 4))
+        contract = default_contract(days[1:], calendar_source_sha256=SOURCE)
+        self.assertEqual(contract.settlement_on(_calendar(*days), days[1]), days[2])
+        with self.assertRaisesRegex(ExecutionContractError, "trade_date_outside_explicit_settlement_inventory"):
+            contract.settlement_on(_calendar(*days), days[0])
+        # A service date that is not a supplied market session is not a trade date.
+        with self.assertRaises(InputError):
+            contract.settlement_on(_calendar(days[0], days[2], days[3]), days[1])
+        with self.assertRaises(ExecutionContractError):
+            default_contract((days[1], days[1], days[2]), calendar_source_sha256=SOURCE)
+        for mutation in (lambda body: body.update(settlement_coverage_from=days[0].isoformat()),
+                         lambda body: body.update(settlement_calendar_source_sha256="not-a-digest")):
+            body = contract.to_dict()
+            mutation(body)
+            with self.subTest(mutation=mutation), self.assertRaises(ExecutionContractError):
+                ExecutionContract.from_dict(body)
+
+    def test_terminal_clock_and_fee_inputs_refuse_outside_their_scope(self):
+        last, protected = date(2026, 8, 31), date(2026, 9, 1)
+        contract = default_contract((last,), calendar_source_sha256=SOURCE)
+        with self.assertRaisesRegex(ExecutionContractError, "terminal_unwind_session_not_supplied"):
+            contract.terminal_spy_unwind_at(_calendar(last, protected), _at(last, 11))
+        early = (date(2012, 12, 28), date(2013, 1, 2))
+        with self.assertRaisesRegex(ExecutionContractError, "terminal_entitlement_outside_unprotected_calendar_coverage"):
+            contract.terminal_spy_unwind_at(_calendar(*early), _at(early[0], 11))
+        with self.assertRaises(ExecutionContractError):
+            contract.terminal_spy_unwind_at(_calendar(last, protected), _at(last, 9).astimezone(NY))
+        for quantity in (-1, 10**12 + 1):
+            with self.subTest(quantity=quantity), self.assertRaises(ExecutionContractError):
+                contract.commission(quantity, "base")
 
 
 if __name__ == "__main__":

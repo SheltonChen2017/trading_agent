@@ -515,5 +515,548 @@ class MultiSessionTests(unittest.TestCase):
         self.assertEqual(len(result["daily_nav"]), 4)
 
 
+# GDR-CR53-002/003 helpers. Every row stays invented; each helper rewrites only
+# the named invented field and keeps the strict contracts' own validation.
+def stamp(value):
+    return value.isoformat().replace("+00:00", "Z")
+
+
+def session(data, offset):
+    calendar = data["calendar"]
+    return calendar.sessions[calendar.index(data["first_session"]) + offset].session_date
+
+
+def edit_batches(data, edit):
+    batches = []
+    for batch in data["market_batches"]:
+        raw = json.loads(batch.raw_bytes)
+        edit(batch, raw)
+        batches.append(HistoricalMarketBatch(canonical_bytes(raw)))
+    data["market_batches"] = tuple(batches)
+
+
+def edit_bars(data, edit):
+    book = data["references"].to_dict()
+    for row in book["daily_bars"]:
+        edit(row)
+    data["references"] = ReferenceBook.from_dict(book)
+
+
+def reprice(data, role, price, *, from_date=None):
+    security = "INVENTED-SPY" if role == "benchmark" else "INVENTED-SEC"
+
+    def quotes(batch, raw):
+        if batch.role == role and (from_date is None or batch.session_date >= from_date):
+            for quote in raw["quotes"]:
+                quote["bid_price"] = quote["ask_price"] = price
+            for minute in raw["minutes"]:
+                for field in ("o", "h", "l", "c"):
+                    minute[field] = price
+
+    def closes(row):
+        if row["security_id"] == security and (from_date is None or row["session_date"] >= from_date.isoformat()):
+            row["raw_close"] = price
+    edit_batches(data, quotes)
+    edit_bars(data, closes)
+
+
+def redate(data, security, from_date, *, clock=None, keep_old=False, **changes):
+    book = data["references"].to_dict()
+    old = next(row for row in book["references"] if row["security_id"] == security)
+    new = {**old, "valid_from": from_date.isoformat(), **changes}
+    if clock is not None:
+        new.update(published_at=stamp(clock[0]), received_at=stamp(clock[1]), validated_at=stamp(clock[2]))
+    if not keep_old:
+        old["valid_through"] = (from_date - timedelta(days=1)).isoformat()
+    book["references"].append(new)
+    data["references"] = ReferenceBook.from_dict(book)
+
+
+def withdraw(data, validated):
+    document = data["guidance"].receipts[-1].document.to_dict()
+    raw = canonical_bytes({"invented": "WITHDRAWAL", "validated": stamp(validated)})
+    document.update(disclosure_id="INVENTED-WITHDRAWAL", kind="withdrawal", supersedes="INVENTED-RAISE",
+                    published_at=stamp(validated - timedelta(seconds=2)), periods=[], source_payload_sha256=hash_bytes(raw))
+    data["guidance"] = data["guidance"].append(GuidanceReceipt(raw, GuidanceDocument.from_dict(document),
+        stamp(validated - timedelta(seconds=1)), stamp(validated)))
+
+
+def known_action(kind, security, effective, validated, *, cash=None, pay=None, key="INVENTED-ACTION"):
+    return {"action_id": key, "security_id": security, "kind": kind, "effective_at": stamp(effective),
+            "received_at": stamp(validated - timedelta(minutes=1)), "validated_at": stamp(validated),
+            "source_sha256": hash_bytes(b"INVENTED-ACTION-ECONOMICS"), "ratio": None,
+            "cash_per_share": cash, "pay_date": None if pay is None else pay.isoformat()}
+
+
+def securities(data, count):
+    """Clone the invented event onto separate issuers and sectors."""
+    source = data["guidance"].receipts
+    originals, revised, ids, batches = [], [], [], []
+    book = data["references"].to_dict()
+    template = book["references"][0]
+    bars = [row for row in book["daily_bars"] if row["security_id"] == "INVENTED-SEC"]
+    for index in range(count):
+        security, issuer = "INVENTED-SEC-" + str(index), "INVENTED-ISSUER-" + str(index)
+        for target, original in ((originals, source[0]), (revised, source[1])):
+            doc = original.document.to_dict()
+            doc.update(security_id=security, issuer_id=issuer, disclosure_id=doc["disclosure_id"] + "-" + str(index))
+            target.append(GuidanceReceipt(original.raw_bytes, GuidanceDocument.from_dict(doc), original.received_at, original.validated_at))
+        book["references"].append({**template, "security_id": security, "issuer_id": issuer, "sector": "SECTOR-" + str(index)})
+        book["daily_bars"].extend({**row, "security_id": security} for row in bars)
+        for batch in data["market_batches"]:
+            if batch.role == "stock":
+                raw = json.loads(batch.raw_bytes)
+                raw["security_id"] = security
+                batches.append(HistoricalMarketBatch(canonical_bytes(raw)))
+        ids.append(security)
+    data["guidance"] = GuidanceLedger(tuple(originals + revised))
+    data["references"] = ReferenceBook.from_dict(book)
+    data["market_batches"] = tuple(batches) + tuple(batch for batch in data["market_batches"] if batch.role == "benchmark")
+    return ids
+
+
+def reasons(rows):
+    return [row["reason"] for row in rows]
+
+
+def sells(result, sleeve="strategy"):
+    return [row for row in result[sleeve]["fills"] if row["side"] == "sell"]
+
+
+class ReviewPinTests(unittest.TestCase):
+    def test_unmatched_spy_exposure_at_the_replay_boundary_blocks_parity(self):
+        # GDR-CR53-002: a terminal unwind after the last session left SPY held
+        # with no order, no blocker and comparison_parity_blocked=False.
+        data = inputs(count=2)
+        reprice(data, "benchmark", "100")
+        day1 = session(data, 1)
+        known = at(day1, 10, 30)
+        result = run_replay(**data, actions=(known_action("terminal_cash", "INVENTED-SEC", known, known, cash="7", pay=day1),))
+        self.assertEqual(result["strategy"]["positions"], [])
+        self.assertEqual([row["quantity"] for row in result["comparator"]["positions"]], [49])
+        self.assertFalse(result["complete_software_replay"])
+        self.assertTrue(result["comparison_parity_blocked"])
+        self.assertEqual(reasons(result["permanent_parity_blockers"]), ["unmatched_comparator_exposure_at_replay_boundary"])
+
+    def test_action_and_input_inventory_rules_each_refuse_at_binding(self):
+        data = inputs(count=2)
+        day0, day1 = data["first_session"], data["last_session"]
+        opening = at(day1, 9, 30)
+        dividend, split = action(data, "dividend", cash="1"), action(data, "split", ratio="2")
+        actions = {
+            "received_after_validated": {**dividend, "received_at": stamp(opening - timedelta(seconds=30)),
+                                         "validated_at": stamp(opening - timedelta(minutes=1))},
+            "split_cash_in_lieu": {**split, "cash_per_share": "1"},
+            "payment_before_ex_date": {**dividend, "pay_date": day0.isoformat()},
+            "unsupported_kind_with_economics": {**action(data, "noncash_merger"), "cash_per_share": "1"},
+            "late_split": {**split, "received_at": stamp(opening), "validated_at": stamp(opening + timedelta(minutes=1))},
+            "zero_split_ratio": {**split, "ratio": "0"},
+            "dividend_not_at_ex_open": action(data, "dividend", cash="1", minute=0),
+            "known_after_window": action(data, "dividend", index=3, cash="1"),
+        }
+        for rule, value in actions.items():
+            with self.subTest(rule=rule), self.assertRaises(InputError):
+                MultiSessionReplay(**data, actions=(value,))
+        service = tuple(row.session_date for row in data["calendar"].sessions if row.session_date.isoformat() != dividend["pay_date"])
+        with self.assertRaises(InputError):
+            MultiSessionReplay(**{**data, "contract": default_contract(service, calendar_source_sha256=hash_bytes(b"INVENTED-SERVICE-DAYS"))},
+                               actions=(dividend,))
+        batches = data["market_batches"]
+        stock = next(batch for batch in batches if batch.role == "stock" and batch.session_date == day0)
+        spy = next(batch for batch in batches if batch.role == "benchmark" and batch.session_date == day0)
+
+        def rebuilt(batch, **fields):
+            raw = json.loads(batch.raw_bytes)
+            raw.update(fields)
+            return HistoricalMarketBatch(canonical_bytes(raw))
+        changed = json.loads(stock.raw_bytes)
+        changed["minutes"][0]["v"] += 1
+        inventories = {
+            "session_bounds_differ": tuple(batch for batch in batches if batch is not stock) + (rebuilt(stock, session_close_utc=stamp(at(day0, 13))),),
+            "conflicting_batch": batches + (HistoricalMarketBatch(canonical_bytes(changed)),),
+            "second_spy_identity": batches + (rebuilt(spy, security_id="INVENTED-SPY-2"),),
+            "batch_outside_window": batches + tuple(batch for batch in inputs(count=3)["market_batches"] if batch.session_date > day1)[:1],
+        }
+        for rule, market in inventories.items():
+            with self.subTest(rule=rule), self.assertRaises(InputError):
+                MultiSessionReplay(**{**data, "market_batches": market})
+        calendar, extra, cursor = data["calendar"].to_dict(), [], date(2022, 12, 1)
+        while cursor < date.fromisoformat(calendar["covered_from"]):
+            if cursor.weekday() < 5:
+                extra.append({"date": cursor.isoformat(), "open_utc": stamp(at(cursor, 9, 30)), "close_utc": stamp(at(cursor, 16))})
+            cursor += timedelta(days=1)
+        calendar.update(covered_from=extra[0]["date"], sessions=extra + calendar["sessions"])
+        long = CalendarInput.from_dict(calendar)
+        with self.assertRaises(InputError):
+            MultiSessionReplay(**{**data, "calendar": long, "first_session": long.sessions[0].session_date})
+
+    def test_mode_session_inventory_and_repeated_receipts_cannot_change(self):
+        data = inputs(count=3)
+        replay = MultiSessionReplay(**data)
+        replay.step_session(replay.days[0])
+        repeated = replay.step_session(replay.days[0])
+        repeated["state_sha256"] = "0" * 64
+        self.assertNotEqual(replay.step_session(replay.days[0])["state_sha256"], "0" * 64)
+        replay.mode = "stress"
+        with self.assertRaises(InputError):
+            replay.step_session(replay.days[1])
+        replay = MultiSessionReplay(**data)
+        replay.days = (replay.days[0], replay.days[2])
+        with self.assertRaises(InputError):
+            replay.step_session(replay.days[0])
+
+    def test_failed_session_restores_all_of_its_effects(self):
+        replay = MultiSessionReplay(**inputs(count=1))
+        with patch.object(MultiSessionReplay, "_close", side_effect=InputError("invented close failure")), \
+                self.assertRaises(InputError):
+            replay.step_session(replay.days[0])
+        self.assertEqual(replay.snapshot()["strategy"]["orders"], [])
+        replay.step_session(replay.days[0])
+        self.assertEqual(len(replay.snapshot()["strategy"]["fills"]), 1)
+
+    def test_invalidation_exit_follows_the_previous_session_cutoff(self):
+        for offset, hour, exit_offset in ((0, 18, 1), (1, 8, 2)):
+            data = inputs(count=4)
+            withdraw(data, at(session(data, offset), hour))
+            exits = sells(run_replay(**data))
+            with self.subTest(offset=offset, hour=hour):
+                self.assertEqual({row["at"][:10] for row in exits}, {session(data, exit_offset).isoformat()})
+                self.assertEqual(sum(row["quantity"] for row in exits), 495)
+        data = inputs(count=1)
+        withdraw(data, at(data["first_session"], 11))
+        self.assertEqual(run_replay(**data)["unresolved"], {"INVENTED-SEC": "invalidation_exit_outside_replay_window"})
+
+    def test_known_cancellation_stops_later_fills_and_racing_shares_exit_together(self):
+        data = inputs(count=4, volume=10000)
+        withdraw(data, at(data["first_session"], 10, 2) + timedelta(seconds=30))
+        self.assertEqual([row["quantity"] for row in run_replay(**data)["strategy"]["fills"] if row["side"] == "buy"], [100, 100])
+        data = inputs(count=4, volume=10000)
+        withdraw(data, at(data["first_session"], 10, 2))
+        exits = sells(run_replay(**data))
+        self.assertEqual({row["at"][:10] for row in exits}, {session(data, 1).isoformat()})
+        self.assertEqual(sum(row["quantity"] for row in exits), 200)
+
+    def test_close_trims_drift_above_the_position_and_dated_sector_caps(self):
+        data = inputs(count=2)
+        first = data["first_session"].isoformat()
+        edit_bars(data, lambda row: row.update(raw_close="12") if (row["security_id"], row["session_date"]) == ("INVENTED-SEC", first) else None)
+        self.assertEqual([(row["quantity"], row["exit_reason"]) for row in sells(run_replay(**data))], [(75, "trim")])
+        data = inputs(count=3)
+        ids = securities(data, 4)
+        for security in ids:
+            redate(data, security, session(data, 1), sector="SHARED")
+        result = run_replay(**data)
+        self.assertEqual([(row["security_id"], row["exit_reason"]) for row in sells(result)], [(ids[3], "trim")])
+        held = {row["security_id"]: row["quantity"] for row in result["strategy"]["positions"]}
+        self.assertEqual([held[security] for security in ids], [495, 495, 495, 14])
+
+    def test_position_stop_is_inclusive_at_ninety_percent_of_entry_cost(self):
+        data = inputs(count=2)
+        first = data["first_session"].isoformat()
+        edit_bars(data, lambda row: row.update(raw_close="9.0045") if (row["security_id"], row["session_date"]) == ("INVENTED-SEC", first) else None)
+        self.assertEqual([(row["quantity"], row["exit_reason"]) for row in sells(run_replay(**data))], [(495, "position_stop")])
+
+    def test_program_drawdown_is_measured_from_the_high_water_nav(self):
+        data = inputs(count=4)
+        ids = securities(data, 4)
+        dividends = tuple({**action(data, "dividend", security=security, cash="5"), "action_id": "INVENTED-DIVIDEND-" + security}
+                          for security in ids)
+        crash = session(data, 2).isoformat()
+        edit_bars(data, lambda row: row.update(raw_close="0.01") if row["security_id"] in ids and row["session_date"] == crash else None)
+        result = run_replay(**data, actions=dividends)
+        self.assertTrue(result["program_stop_active"])
+        self.assertEqual([row["exit_reason"] for row in sells(result)], ["program_drawdown"] * 4)
+
+    def test_paired_daily_nav_counts_receivables_and_spy_value(self):
+        nav = run_replay(**inputs())["daily_nav"]
+        self.assertEqual((Decimal(nav[0]["strategy_nav"]), Decimal(nav[0]["comparator_nav"])), (Decimal("99995.05"), Decimal("99996.562")))
+        self.assertEqual((Decimal(nav[20]["strategy_receivables"]), Decimal(nav[20]["strategy_nav"])), (Decimal("4945.05"), Decimal("99990.1")))
+        data = inputs()
+        late = session(data, 1)
+        # Published after 18:00: missing for that day's mark, usable for later ADV.
+        edit_bars(data, lambda row: row.update(published_at=stamp(at(late, 18, 1)), received_at=stamp(at(late, 18, 2)),
+                  validated_at=stamp(at(late, 18, 3))) if (row["security_id"], row["session_date"]) == ("INVENTED-SPY", late.isoformat()) else None)
+        result = run_replay(**data)
+        self.assertIsNotNone(result["daily_nav"][1]["strategy_nav"])
+        self.assertIsNone(result["daily_nav"][1]["comparator_nav"])
+        self.assertIn("missing_daily_valuation", reasons(result["permanent_parity_blockers"]))
+        self.assertEqual(result["strategy"]["positions"], [])
+        self.assertFalse(result["complete_software_replay"])
+
+    def test_daily_mark_must_be_one_positive_visible_close(self):
+        for change in ("zero", "duplicate"):
+            data = inputs(count=1)
+            book = data["references"].to_dict()
+            row = next(row for row in book["daily_bars"]
+                       if (row["security_id"], row["session_date"]) == ("INVENTED-SEC", data["first_session"].isoformat()))
+            if change == "zero":
+                row["raw_close"] = "0"
+            else:
+                book["daily_bars"].append({**row, "raw_close": "11"})
+            data["references"] = ReferenceBook.from_dict(book)
+            with self.subTest(change=change):
+                self.assertIsNone(run_replay(**data)["daily_nav"][0]["strategy_nav"])
+
+    def test_unsettled_cash_and_boundary_orders_keep_the_replay_incomplete(self):
+        result = run_replay(**inputs(count=21))
+        self.assertEqual(result["strategy"]["positions"], [])
+        self.assertTrue(result["strategy"]["receivables"])
+        self.assertFalse(result["complete_software_replay"])
+        self.assertEqual(run_replay(**inputs(count=20))["unresolved"], {"INVENTED-SEC": "required_exit_outside_replay_window"})
+        data = inputs(count=21)
+        exit_date = session(data, 20)
+        edit_batches(data, lambda batch, raw: [minute.update(v=1000) for minute in raw["minutes"]]
+                     if batch.role == "benchmark" and batch.session_date == exit_date else None)
+        self.assertIn("unmatched_comparator_order_at_replay_boundary", reasons(run_replay(**data)["permanent_parity_blockers"]))
+
+    def test_executed_trim_clears_its_due_and_a_pending_exit_enlarges_once(self):
+        replay = MultiSessionReplay(**inputs(count=3))
+        replay.step_session(replay.days[0])
+        replay._schedule("INVENTED-SEC", replay.days[1], "trim", 100)
+        self.assertEqual([row["quantity"] for row in sells(replay.run())], [100])
+        data = inputs(count=3)
+        slow = session(data, 1)
+        edit_batches(data, lambda batch, raw: [minute.update(v=1000) for minute in raw["minutes"]]
+                     if batch.role == "stock" and batch.session_date == slow else None)
+        replay = MultiSessionReplay(**data)
+        replay.step_session(replay.days[0])
+        replay._schedule("INVENTED-SEC", replay.days[1], "trim", 100)
+        replay.step_session(replay.days[1])
+        replay._schedule("INVENTED-SEC", replay.days[2], "guidance_invalidation", 495)
+        result = replay.run()
+        self.assertEqual(sum(row["quantity"] for row in sells(result)), 495)
+        self.assertEqual(len({row["order_id"] for row in sells(result)}), 1)
+        self.assertEqual(sells(result)[-1]["exit_reason"], "guidance_invalidation")
+        self.assertEqual(result["strategy"]["positions"], [])
+
+    def test_exit_participation_is_bounded_by_each_session_adv(self):
+        data = inputs()
+        first = data["first_session"].isoformat()
+        edit_bars(data, lambda row: row.update(volume=10000) if row["security_id"] == "INVENTED-SEC" and row["session_date"] >= first else None)
+        exits = sells(run_replay(**data))
+        self.assertEqual(exits[0]["at"][:10], session(data, 20).isoformat())
+        self.assertEqual(sum(row["quantity"] for row in exits if row["at"][:10] == exits[0]["at"][:10]), 10)
+
+    def test_buy_never_fills_above_its_limit(self):
+        data = inputs(count=1)
+        edit_batches(data, lambda batch, raw: raw["quotes"][1].update(bid_price="10.2", ask_price="10.2") if batch.role == "stock" else None)
+        buys = run_replay(**data)["strategy"]["fills"]
+        self.assertEqual(buys[0]["at"], stamp(at(data["first_session"], 10, 2)))
+        self.assertTrue(all(Decimal(row["price"]) <= Decimal("10.10") for row in buys))
+
+    def test_comparator_partial_timing_and_close_cancellation_are_permanent(self):
+        data = inputs(count=1)
+        edit_batches(data, lambda batch, raw: [minute.update(v=500) for minute in raw["minutes"]] if batch.role == "benchmark" else None)
+        result = run_replay(**data)
+        self.assertIn("comparator_partial_or_unmatched_execution", reasons(result["permanent_parity_blockers"]))
+        self.assertIn("comparator_unfilled_remainder_at_close", reasons(result["permanent_parity_blockers"]))
+        self.assertEqual(result["comparator"]["orders"][0]["status"], "cancelled")
+        data = inputs(count=1)
+        # Without the 10:01:59 SPY quote, the 10:02 callback has no fresh quote.
+        edit_batches(data, lambda batch, raw: raw.update(quotes=raw["quotes"][:2] + raw["quotes"][3:]) if batch.role == "benchmark" else None)
+        self.assertIn("comparator_timing_mismatch", reasons(run_replay(**data)["permanent_parity_blockers"]))
+
+    def test_comparator_risk_reducing_sell_precedes_buy_in_shared_minute_capacity(self):
+        replay = MultiSessionReplay(**inputs(count=1, volume=100))
+        when = at(replay.days[0], 10)
+        for key, held in (("INVENTED-TRANCHE-BUY", 0), ("INVENTED-TRANCHE-SELL", 1)):
+            replay._state["tranches"][key] = {"tranche_id": key, "source_security_id": "INVENTED-SEC",
+                "quantity": held, "source_budget": Decimal("100"), "entry_spent": Decimal(0)}
+        replay._order("comparator", replay.spy, "buy", 1, when, Decimal("159000000"), limit=Decimal("53.53"), tranche="INVENTED-TRANCHE-BUY")
+        replay._order("comparator", replay.spy, "sell", 1, when, Decimal("159000000"), tranche="INVENTED-TRANCHE-SELL")
+        replay._fill_orders("comparator", when + timedelta(minutes=1))
+        self.assertEqual([row["side"] for row in replay._state["fills"]], ["sell"])
+
+    def test_open_buy_reserves_its_remaining_minimum_commission(self):
+        replay = MultiSessionReplay(**inputs(count=1, volume=10000))
+        when = at(replay.days[0], 10)
+        replay._order("strategy", "INVENTED-SEC", "buy", 495, when, Decimal("30000000"), limit=Decimal("10.10"),
+                      issuer="INVENTED-ISSUER", sector="technology", event=replay.guidance.receipts[-1].document.sha256)
+        self.assertEqual(replay._reserved("strategy"), Decimal("5001.975"))
+        replay._fill_orders("strategy", when + timedelta(minutes=1))
+        self.assertEqual(replay._reserved("strategy"), Decimal("3990.975"))
+
+    def test_split_scales_holding_stop_reference_and_due_but_waits_for_open_orders(self):
+        data = inputs(count=3)
+        reprice(data, "stock", "5", from_date=session(data, 1))
+        replay = MultiSessionReplay(**data, actions=(action(data, "split", ratio="2"),))
+        replay.step_session(replay.days[0])
+        replay._schedule("INVENTED-SEC", replay.days[2], "trim", 100)
+        result = replay.run()
+        self.assertEqual([(row["quantity"], row["exit_reason"]) for row in sells(result)], [(200, "trim")])
+        self.assertEqual(result["strategy"]["positions"][0]["quantity"], 790)
+        data = inputs()
+        exit_date = session(data, 20)
+        edit_batches(data, lambda batch, raw: [minute.update(v=1000) for minute in raw["minutes"]]
+                     if batch.role == "benchmark" and batch.session_date == exit_date else None)
+        result = run_replay(**data, actions=(action(data, "split", index=21, security="INVENTED-SPY", ratio="2"),))
+        self.assertEqual(result["unresolved"].get("INVENTED-SPY"), "split_requires_reconciled_orders")
+
+    def test_spy_dividend_and_terminal_actions_apply_to_comparator_tranches(self):
+        data = inputs(count=2)
+        result = run_replay(**data, actions=(action(data, "dividend", security="INVENTED-SPY", cash="1"),))
+        self.assertEqual([(row["kind"], Decimal(row["amount"])) for row in result["comparator"]["receivables"]], [("dividend", Decimal("92"))])
+        self.assertEqual(result["strategy"]["receivables"], [])
+        data = inputs(count=2)
+        result = run_replay(**data, actions=(action(data, "terminal_cash", security="INVENTED-SPY", cash="60"),))
+        self.assertTrue(all(row["quantity"] == 0 for row in result["comparator"]["positions"]))
+        self.assertEqual([Decimal(row["amount"]) for row in result["comparator"]["receivables"]], [Decimal("5520")])
+        self.assertIn("comparator_terminal_ends_matched_schedule", reasons(result["permanent_parity_blockers"]))
+        data = inputs(count=2)
+        result = run_replay(**data, actions=(action(data, "noncash_merger", security="INVENTED-SPY"),))
+        self.assertEqual(result["unresolved"].get("INVENTED-SPY"), "unsupported_or_unresolved_terminal_economics")
+        self.assertIn("unsupported_terminal_comparison_schedule", reasons(result["permanent_parity_blockers"]))
+
+    def test_late_terminal_after_a_fill_or_another_action_needs_reconciliation(self):
+        data = inputs(count=2)
+        day0 = data["first_session"]
+        late = known_action("terminal_cash", "INVENTED-SEC", at(day0, 10) + timedelta(seconds=30), at(day0, 10, 5),
+                            cash="7", pay=session(data, 1))
+        result = run_replay(**data, actions=(late,))
+        self.assertEqual(result["unresolved"].get("INVENTED-SEC"), "late_terminal_entitlement_changed_after_effective_time")
+        data = inputs(count=3)
+        day0, day1 = data["first_session"], session(data, 1)
+        late = known_action("terminal_cash", "INVENTED-SEC", at(day0, 19), at(day1, 11), cash="7", pay=day1, key="INVENTED-TERMINAL")
+        result = run_replay(**data, actions=(late, action(data, "dividend", cash="1")))
+        self.assertEqual(result["unresolved"].get("INVENTED-SEC"), "late_terminal_entitlement_changed_after_effective_time")
+
+    def test_action_between_clock_events_applies_and_clears_its_due_exits(self):
+        data = inputs(count=2)
+        known = at(session(data, 1), 11)
+        result = run_replay(**data, actions=(known_action("terminal_cash", "INVENTED-SEC", known, known, cash="7", pay=session(data, 1)),))
+        self.assertEqual(result["strategy"]["positions"], [])
+        self.assertIn("INVENTED-ACTION", result["actions"])
+        data = inputs(count=2)
+        replay = MultiSessionReplay(**data, actions=(action(data, "terminal_cash", cash="7"),))
+        replay.step_session(replay.days[0])
+        replay._schedule("INVENTED-SEC", replay.days[1], "trim", 100)
+        self.assertEqual(replay.run()["scheduled_exits"], {})
+
+    def test_held_exit_uses_only_a_visible_unique_listed_same_issuer_identity(self):
+        def replayed(edit):
+            data = inputs(count=2)
+            edit(data, data["first_session"], session(data, 1))
+            replay = MultiSessionReplay(**data)
+            replay.step_session(replay.days[0])
+            replay._schedule("INVENTED-SEC", replay.days[1], "position_stop", 495)
+            replay.step_session(replay.days[1])
+            return replay.snapshot()
+        blocked = {
+            "published_after_cutoff": lambda data, day0, day1: redate(data, "INVENTED-SEC", day1, sector="utilities",
+                clock=(at(day1, 12), at(day1, 12, 1), at(day1, 12, 2))),
+            "published_at_cutoff": lambda data, day0, day1: redate(data, "INVENTED-SEC", day1, sector="utilities",
+                clock=(at(day0, 18), at(day0, 18), at(day0, 18))),
+            "validated_after_cutoff": lambda data, day0, day1: redate(data, "INVENTED-SEC", day1, sector="utilities",
+                clock=(at(day0, 17), at(day0, 17, 30), at(day0, 19))),
+            "ambiguous": lambda data, day0, day1: redate(data, "INVENTED-SEC", day1, keep_old=True, sector="utilities"),
+            "delisted": lambda data, day0, day1: redate(data, "INVENTED-SEC", day1, status="delisted"),
+            "changed_issuer": lambda data, day0, day1: redate(data, "INVENTED-SEC", day1, issuer_id="OTHER-ISSUER"),
+        }
+        for rule, edit in blocked.items():
+            result = replayed(edit)
+            with self.subTest(rule=rule):
+                self.assertEqual(sells(result), [])
+                self.assertIn("missing_exit_liquidity", reasons(result["refusals"]))
+        for rule, edit in (("changed_issuer", blocked["changed_issuer"]),
+                           ("missing_sector", lambda data, day0, day1: redate(data, "INVENTED-SEC", day1, sector=None)),
+                           ("renamed_without_new_batch", lambda data, day0, day1: redate(data, "INVENTED-SEC", day1, symbol="RENAMED"))):
+            with self.subTest(rule=rule):
+                self.assertIn("missing_current_portfolio_valuation_blocks_entries", reasons(replayed(edit)["refusals"]))
+        result = replayed(lambda data, day0, day1: redate(data, "INVENTED-SPY", day1, symbol="IVV"))
+        self.assertIn("comparator_exit_liquidity_refused", reasons(result["permanent_parity_blockers"]))
+
+    def test_engine_state_sets_each_entry_control(self):
+        def refusals(data, prepare=None, actions=()):
+            replay = MultiSessionReplay(**data, actions=actions)
+            replay.step_session(replay.days[0])
+            if prepare is not None:
+                prepare(replay)
+            replay.step_session(replay.days[1])
+            return reasons(replay.snapshot()["refusals"])
+        data = inputs(count=2)
+        self.assertIn("entry_control_exits_or_trims_pending",
+                      refusals(data, lambda replay: replay._schedule("INVENTED-SEC", replay.days[1], "trim", 100)))
+        data = inputs(count=2)
+        self.assertIn("entry_control_unresolved_actions", refusals(data, actions=(action(data, "terminal_unresolved"),)))
+        data = inputs(count=2)
+        self.assertIn("entry_control_unresolved_actions",
+                      refusals(data, actions=(action(data, "terminal_cash", security="INVENTED-SPY", cash="60"),)))
+        data = inputs(count=2)
+        missing = session(data, 1)
+        data["market_batches"] = tuple(batch for batch in data["market_batches"] if not (batch.role == "stock" and batch.session_date == missing))
+        self.assertIn("missing_current_portfolio_valuation_blocks_entries", refusals(data))
+        replay = MultiSessionReplay(**inputs(count=2))
+        replay._state["daily_nav"].append({"session_date": replay.days[0] - timedelta(days=1),
+                                          "strategy_nav": None, "comparator_nav": Decimal("100000")})
+        replay._entries(at(replay.days[0], 10))
+        self.assertIn("entry_control_unresolved_valuations", reasons(replay._state["refusals"]))
+        replay = MultiSessionReplay(**inputs(count=2))
+        replay._state["stopped"] = True
+        replay._entries(at(replay.days[0], 10))
+        self.assertEqual(replay._state["orders"], {})
+        self.assertIn("entry_control_program_stop_active", reasons(replay._state["refusals"]))
+
+    def test_spy_entry_needs_a_tight_quote_and_a_fee_inclusive_budget(self):
+        data = inputs(count=1)
+        edit_batches(data, lambda batch, raw: raw["quotes"][1].update(bid_price="52") if batch.role == "benchmark" else None)
+        result = run_replay(**data)
+        self.assertEqual(result["comparator"]["orders"], [])
+        self.assertIn("comparator_entry_market_input_refused", reasons(result["permanent_parity_blockers"]))
+        # 100.06 needs the source fee for the 49th share; at 99.04 the fee
+        # spent keeps the residual below one more share.
+        for price in ("100.06", "99.04"):
+            data = inputs(count=1)
+            reprice(data, "benchmark", price)
+            result = run_replay(**data)
+            with self.subTest(price=price):
+                self.assertEqual([row["quantity"] for row in result["comparator"]["fills"]], [49])
+                self.assertNotIn("comparator_budget_mismatch_beyond_rounding", reasons(result["permanent_parity_blockers"]))
+
+    def test_source_exit_sells_only_its_own_tranches(self):
+        data = inputs(count=2)
+        first, second = securities(data, 2)
+        replay = MultiSessionReplay(**data)
+        replay.step_session(replay.days[0])
+        replay._schedule(first, replay.days[1], "position_stop", 495)
+        replay.step_session(replay.days[1])
+        tranches = {row["source_security_id"]: row["quantity"] for row in replay.snapshot()["comparator"]["positions"]}
+        self.assertEqual(tranches, {first: 0, second: 92})
+
+    def test_spy_exit_requests_follow_each_executed_strategy_fraction(self):
+        # Pending SPY sells are excluded from the base, so slow SPY execution
+        # cannot front-load the comparator ahead of the strategy's own exits.
+        data = inputs()
+        exit_date = session(data, 20)
+
+        def edit(batch, raw):
+            if batch.session_date == exit_date:
+                for minute in raw["minutes"]:
+                    minute["v"] = 10000 if batch.role == "stock" else 500
+        edit_batches(data, edit)
+        result = run_replay(**data)
+        self.assertEqual([row["quantity"] for row in sells(result)], [100, 100, 100, 100, 95])
+        self.assertEqual([row["quantity"] for row in result["comparator"]["orders"] if row["side"] == "sell"], [18, 18, 18, 19, 19])
+
+    def test_carried_spy_exit_waits_for_the_next_session_decision(self):
+        data = inputs()
+        exit_date, next_date = session(data, 20), session(data, 21)
+
+        def edit(batch, raw):
+            if batch.role == "benchmark" and batch.session_date == exit_date:
+                for minute in raw["minutes"]:
+                    minute["v"] = 1000
+            if batch.role == "benchmark" and batch.session_date == next_date:
+                opening = at(next_date, 9, 30)
+                raw["quotes"].insert(0, {**raw["quotes"][0], "sip_timestamp": instant_ns(opening + timedelta(seconds=30)),
+                                         "participant_timestamp": instant_ns(opening + timedelta(seconds=30))})
+                for number, quote in enumerate(raw["quotes"], 1):
+                    quote["sequence_number"] = number
+                raw["minutes"].insert(0, {**raw["minutes"][0], "t": instant_ns(opening) // 1000000})
+        edit_batches(data, edit)
+        carried = [row for row in sells(run_replay(**data), "comparator") if row["at"][:10] == next_date.isoformat()]
+        self.assertTrue(carried)
+        self.assertTrue(all(row["at"] > stamp(at(next_date, 10)) for row in carried))
+
+
 if __name__ == "__main__":
     unittest.main()

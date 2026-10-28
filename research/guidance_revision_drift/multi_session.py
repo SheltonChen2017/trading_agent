@@ -816,6 +816,11 @@ class MultiSessionReplay:
         if len(self._receipts) == len(self.days):
             parity.extend({"reason": "unmatched_comparator_order_at_replay_boundary", "at": _text(state["clock"]),
                            "reference": row["order_id"]} for row in self._active("comparator"))
+            # An exited or terminal source can leave SPY held with no order,
+            # e.g. a terminal unwind scheduled after the last replay session.
+            parity.extend({"reason": "unmatched_comparator_exposure_at_replay_boundary", "at": _text(state["clock"]),
+                           "reference": key} for key, row in sorted(state["tranches"].items())
+                          if row["quantity"] and row["source_security_id"] not in state["positions"])
         return _text({"schema": "gdr.invented-multi-session-replay.v1", "data_class": "invented_fixture",
             "input_sha256": self.input_sha256, "lineage": deepcopy(self.lineage),
             "complete_software_replay": bool(complete), "comparison_parity_blocked": bool(parity or self._active("comparator")),

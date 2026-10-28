@@ -302,6 +302,16 @@ class GuidanceDecoderTests(unittest.TestCase):
              patch("os.getenv", side_effect=AssertionError("environment")):
             self.assertIs(type(decode()), GuidanceReceipt)
 
+    # GDR-CR53-006: these two refusals were reached only through a later,
+    # generic failure; pin the rule that owns each one.
+    def test_unsupported_zone_and_half_previous_range_refuse_by_their_own_rule(self):
+        # 07:00 Chicago is 13:00 UTC, so the clock itself would match.
+        with self.assertRaisesRegex(GuidanceDecoderError, "explicit_supported_announcement_timezone_required"):
+            decode(announcement_timezone="America/Chicago", document_changes={"published_at": "2025-01-02T13:00:00Z"},
+                   received_at="2025-01-02T13:01:00Z", validated_at="2025-01-02T13:02:00Z")
+        with self.assertRaisesRegex(GuidanceDecoderError, "incomplete_provider_previous_range"):
+            decode(raw(previous_min_revenue_guidance=90000000))
+
 
 if __name__ == "__main__":
     unittest.main()

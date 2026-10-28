@@ -27441,3 +27441,233 @@ spotchecked flowclean. Alldelegations source-only/no private/nativeeffects.
 Exactcalendar/universe/cap/TPR/allocation/execution arguments unchanged. This
 softwarecustody correction is not native/fullwindow/PIT/rights acceptance.
 Nextrole ROOT runs freshreserved fixedfourarm nativecomparisons; noClaude gate.
+
+Fresh bounded private phase TPR-CMP28-FIXED-FOUR-ARM-BATCH-20261028-001-PREPARE/bd0980caba4125e0fdac4e5d55b14496c38fd033cf1bf3d7b4d270b4966fd04d at 0300ef6e0703bcadd505165832b8f8ce5504058a BEFORE 1 exact private inputs/120s; Read own source-only archive once and predeclare/render/reserve4fixedfinancialarms; no packet/privateoutcome read or nativeeffect; fsync claim and directory retained.
+
+Fresh fixedfinancialarm cap_tilt_50 TPR-CMP28-TILT50-ATTEMPT001R2-20261028 lookTPR-CMP28-TILT50-LOOK001R2-20261028 reservedfsyncBEFOREeffects 2ec06b572013a74e0362cde52f67ab90e923bc4758deea293ac0feab889a370d at 0300ef6e0703bcadd505165832b8f8ce5504058a; source349ce87241e53f2b5f3af09a90e65ab7014fca8bdbc53c92399c0549873e4225; config9c414f398280c6ae3e5469eb5fb8ca71c469c25a2c1d8f429457f7b276bbdd17; inventory272f1392ee23025aa1bfdc5d3a832bf516c75a7a7fef456cd62b45c57744b574->a08ec5df8ef579db7bda3be3b093d40a8ca171dd6d0ec3db5b621bc9a1806210; onepacketread280105389B/one<=4096Bmetadata claim/301scores. Batchpredeclared noadaptivechoice, priorledgerec8d5988505e893b89363581c5f5ccc402c5b26dc4a5b5d82dcab22333d3bab2. Reservation alone spends0compile/jobs;50oldunusedreservationretained.
+
+Fresh fixedfinancialarm cap_tilt_100 TPR-CMP28-TILT100-ATTEMPT001-20261028 lookTPR-CMP28-TILT100-LOOK001-20261028 reservedfsyncBEFOREeffects 2ea682e7bd780b8a8bf83d72a28c2f8afbe379a0ed0471bdc385fcf007e5489c at 0300ef6e0703bcadd505165832b8f8ce5504058a; sourceb048e922d4409b159f55419d92c8d948bc7f1ec4091a2367f82d549204b6b20e; configf7d032ff6360b7053c1aaf5643ac27b5762d4adea56c9fda3e55c0c3f1180e23; inventorya08ec5df8ef579db7bda3be3b093d40a8ca171dd6d0ec3db5b621bc9a1806210->24aba8d8a1e667d6321ce875f6e9d91fe3e465c393e85453ff6831bd23496c7a; onepacketread280105389B/one<=4096Bmetadata claim/301scores. Batchpredeclared noadaptivechoice, priorledgerec8d5988505e893b89363581c5f5ccc402c5b26dc4a5b5d82dcab22333d3bab2. Reservation alone spends0compile/jobs;50oldunusedreservationretained.
+
+Fresh fixedfinancialarm cap_tilt_200 TPR-CMP28-TILT200-ATTEMPT001-20261028 lookTPR-CMP28-TILT200-LOOK001-20261028 reservedfsyncBEFOREeffects 66118521724a74490786245dfc31c4f3694fe593e8dfd42938925c532a074740 at 0300ef6e0703bcadd505165832b8f8ce5504058a; source27f3664df87c258e31739930f89e1b33b55fead74a707b558d8e2badd6aa2aa1; configce8f77c8631b0203077612946edcfd1ff14770595cde760228abb4923b99c09c; inventory24aba8d8a1e667d6321ce875f6e9d91fe3e465c393e85453ff6831bd23496c7a->74288df2a40e909147a6552ae8ede52e6f7eddc5c431ffcc274872fe2e52214e; onepacketread280105389B/one<=4096Bmetadata claim/301scores. Batchpredeclared noadaptivechoice, priorledgerec8d5988505e893b89363581c5f5ccc402c5b26dc4a5b5d82dcab22333d3bab2. Reservation alone spends0compile/jobs;50oldunusedreservationretained.
+
+Fresh fixedfinancialarm pure_tpr TPR-CMP28-PURETPR-ATTEMPT001-20261028 lookTPR-CMP28-PURETPR-LOOK001-20261028 reservedfsyncBEFOREeffects 55feb85636de5e6fc1a5ed7349736e8e8cb053619804f4d3c6a3e0173af83273 at 0300ef6e0703bcadd505165832b8f8ce5504058a; sourcebce18bfb6debe8d0df39ba704ff23095145acda9989b42df903d11dde64f7f7c; config1815710938c921963bbbb0d1e2266f98b9c3bcd1a4639d1a3e7d27a5dc180be0; inventory74288df2a40e909147a6552ae8ede52e6f7eddc5c431ffcc274872fe2e52214e->1e8337a0f1845f10ef74a4e316ea1303afae22bc7c7e36ca12856deea20e8a97; onepacketread280105389B/one<=4096Bmetadata claim/301scores. Batchpredeclared noadaptivechoice, priorledgerec8d5988505e893b89363581c5f5ccc402c5b26dc4a5b5d82dcab22333d3bab2. Reservation alone spends0compile/jobs;50oldunusedreservationretained.
+
+Fresh bounded private phase TPR-CMP28-TILT50-UPLOAD-SOURCE-20261028-001/2d1277ba8827c5f8c986e032a9dc308f019de5792aa6d98ef7297c9bebc30317 at 0300ef6e0703bcadd505165832b8f8ce5504058a BEFORE 1 exact private inputs/600s; Own exact source-only snapshot; bounded diff upload preserving legacyfiles; reservedonecompile/job; fsync claim and directory retained.
+
+Exact cap_tilt_50 uploadplan 1a055349601411507d17c5c441848a9f6d4658d7665b7322bf29cca3cc43f8c2 BEFOREcredentials/effects; created4/changed5/preserveallothers; 272f1392ee23025aa1bfdc5d3a832bf516c75a7a7fef456cd62b45c57744b574 -> a08ec5df8ef579db7bda3be3b093d40a8ca171dd6d0ec3db5b621bc9a1806210.
+
+Fresh bounded native phase TPR-CMP28-API-TILT50-COMPILE-20261028-001/8653bd1b48014e9ed56033bb61332e31031a858014e38981c3208d74a559abb8 at 0300ef6e0703bcadd505165832b8f8ce5504058a before3 exact requests/120s/10485760B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-TILT50-COMPILE-READ-20261028-001/3f361b88028b68f148ca372c26a3e3042f0f867aaa629ea90cc7d4ee80edb8e9 at 0300ef6e0703bcadd505165832b8f8ce5504058a before1 exact requests/60s/131072B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-TILT50-LAUNCH-20261028-001/a7e420e7ad225f0afb82b47144e056e7fed54c30c083c4e5789f7c385b5ea18c at 0300ef6e0703bcadd505165832b8f8ce5504058a before3 exact requests/120s/10485760B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-TILT50-STATUS-20261028-001/a0635e4d5299a007a7e4eea727a5d29c6e99b6eeeb3ff0be35707d0513d411ad at 0300ef6e0703bcadd505165832b8f8ce5504058a before1 exact requests/60s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-TILT50-STARTUP-STATUS-PROCESS-20261028-001/dcbda8b705df37022ae17846f97565869a1f8346a712852fb65cf48733ddaac2 at 0300ef6e0703bcadd505165832b8f8ce5504058a BEFORE 1 exact private inputs/120s; Own native job startupstatus only; no economic/rawdata projection; fsync claim and directory retained.
+
+Fresh bounded private phase TPR-CMP28-TILT100-UPLOAD-SOURCE-20261028-001/3b16ed83db0368f7c94ccac7671f94d0e54f694676b04f33fe6dfdc8e6fe5595 at 0300ef6e0703bcadd505165832b8f8ce5504058a BEFORE 1 exact private inputs/600s; Own exact source-only snapshot; bounded diff upload preserving legacyfiles; reservedonecompile/job; fsync claim and directory retained.
+
+Exact cap_tilt_100 uploadplan c9ca8e43eca1d09c6fd49e022a21bbce79f82a91ccff942921fa793174122ee5 BEFOREcredentials/effects; created0/changed2/preserveallothers; a08ec5df8ef579db7bda3be3b093d40a8ca171dd6d0ec3db5b621bc9a1806210 -> 24aba8d8a1e667d6321ce875f6e9d91fe3e465c393e85453ff6831bd23496c7a.
+
+Fresh bounded native phase TPR-CMP28-API-TILT100-COMPILE-20261028-001/303331d01883c68ac080089e279718fddbe5bea983eb8e0e4ebab0b2f4c4b89f at 0300ef6e0703bcadd505165832b8f8ce5504058a before3 exact requests/120s/10485760B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-50STATUS-100COMPILE-20261028-001/672754acf0dfb4c0619866c8420523cd341fba1f5ff0ad213ee040e2d0c23232 at 0300ef6e0703bcadd505165832b8f8ce5504058a before2 exact requests/120s/4456448B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-TILT100-LAUNCH-20261028-001/6fcd5541e40871145ef3faeb6bac7a0dcc6a074c9943ef289a19c402d2671aea at 0300ef6e0703bcadd505165832b8f8ce5504058a before3 exact requests/120s/10485760B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-TILT200-UPLOAD-SOURCE-20261028-001/9e752509712b73ef95bf0aaf3dc6346acb2b2ef8545e7a3640628ba01fdf0ad1 at 0300ef6e0703bcadd505165832b8f8ce5504058a BEFORE 1 exact private inputs/600s; Own exact source-only snapshot; bounded diff upload preserving legacyfiles; reservedonecompile/job; fsync claim and directory retained.
+
+Exact cap_tilt_200 uploadplan af508363aa48cb02d490547948709ed692231af0315ec27ae858e1d1e4c617af BEFOREcredentials/effects; created0/changed2/preserveallothers; 24aba8d8a1e667d6321ce875f6e9d91fe3e465c393e85453ff6831bd23496c7a -> 74288df2a40e909147a6552ae8ede52e6f7eddc5c431ffcc274872fe2e52214e.
+
+Fresh bounded native phase TPR-CMP28-API-TILT200-COMPILE-20261028-001/7773fb1c3558dba20e94edcb190d29e37622f6227abc86907af0a1565cff1144 at 0300ef6e0703bcadd505165832b8f8ce5504058a before3 exact requests/120s/10485760B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-50-100STATUS-200COMPILE-20261028-001/d9accc7d3bcafcff59aeeb24b48861987a61fd423f26ca18d3d255d402841eee at 0300ef6e0703bcadd505165832b8f8ce5504058a before3 exact requests/120s/10485760B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-TILT200-LAUNCH-20261028-001/93f4e8ab4ff3556e5212b12848119d2e7ccfc2e5542f22b9005e9b3fec778dad at 0300ef6e0703bcadd505165832b8f8ce5504058a before3 exact requests/120s/10485760B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-TILT200-LAUNCH-REFUSAL-PROCESS-20261028-001/12d8cf8af3ff354df5f698dff5d1b1c15ded5989d06c3b179d60060b1a1c5d1b at 0300ef6e0703bcadd505165832b8f8ce5504058a BEFORE 1 exact private inputs/120s; Own APIlaunch-refusal controlmetadata only; classify capacity without exposingcredentials; no retry/job assumed; fsync claim and directory retained.
+
+Fresh bounded private phase TPR-CMP28-TILT200-ADMIN-REFUSAL-EXACT-20261028-001/e0962c0121a6e4b7c4b3d50d1aba716db5152e8b729afbc6fb0325a10d24429f at 0300ef6e0703bcadd505165832b8f8ce5504058a BEFORE 1 exact private inputs/120s; Exact administrative APIrefusal text only with strictcredential/URL/longidentity denial; no providerdata/economics; fsync claim and directory retained.
+
+### 104.27 Fixed native comparison launch ledger and actual capacity refusal
+
+Allfourarms were predeclared/reservedbeforeANYresult in batch001,
+priorledger1122B/ec8d5988505e893b89363581c5f5ccc402c5b26dc4a5b5d82dcab22333d3bab2;
+prepared4654B/b01a52fda6f196584da7177a579b715e541f62473eb908851f02f47c15b54a69.
+Sharednewtemplateclosure9e1f6fb4303457fcf89839e2ea6967dc651212703de29e3cb582590c5b6abbbd,
+unchangedpolicy2cfeca1b.../calendar590b0e7c..., signalpacket6a8f4915...280105389B.
+Allnativeaccess bounds include onepacketread, one<=4096Bsame-nodeclaim,
+301scorecalls and frozenfullwindowprivateaudit; rootmanifests are durableauthority.
+
+50% OP TPR-CMP28-TILT50-ATTEMPT001R2-20261028 (older001reservationunused/preserved):
+source440942B/349ce87241e53f2b5f3af09a90e65ab7014fca8bdbc53c92399c0549873e4225;
+reservation2ec06b572013a74e0362cde52f67ab90e923bc4758deea293ac0feab889a370d;
+config9c414f398280c6ae3e5469eb5fb8ca71c469c25a2c1d8f429457f7b276bbdd17;
+all24cloudinventorya08ec5df8ef579db7bda3be3b093d40a8ca171dd6d0ec3db5b621bc9a1806210.
+Actualcompilef95aed0cf135552a4b96308405f4eaca-40f5dc80d5fe52d7c25d43c558019ae3
+BuildSuccess; nativejob00c71aa64b3f0fa231ef5dba172dc56f launched. Initially
+InQueue... (APIclosedstatusprojectionunrecognized; exactsafeadminparseprovedqueue),
+thenactualInProgress. No progress/date/PnL acceptance inferred.
+
+100% OP TPR-CMP28-TILT100-ATTEMPT001-20261028:
+source440751B/b048e922d4409b159f55419d92c8d948bc7f1ec4091a2367f82d549204b6b20e;
+reservation2ea682e7bd780b8a8bf83d72a28c2f8afbe379a0ed0471bdc385fcf007e5489c;
+configf7d032ff6360b7053c1aaf5643ac27b5762d4adea56c9fda3e55c0c3f1180e23;
+inventory24aba8d8a1e667d6321ce875f6e9d91fe3e465c393e85453ff6831bd23496c7a.
+Compileebe9d16c89dabf1345529da68403b163-800b866fc8c43f2a1235d802d4d239a5
+BuildSuccess; actualjobf9f9afa0f2b5200f06f11fe1442adb6c launched, no outcomeaccepted.
+
+200% OP TPR-CMP28-TILT200-ATTEMPT001-20261028:
+source440751B/27f3664df87c258e31739930f89e1b33b55fead74a707b558d8e2badd6aa2aa1;
+reservation66118521724a74490786245dfc31c4f3694fe593e8dfd42938925c532a074740;
+configce8f77c8631b0203077612946edcfd1ff14770595cde760228abb4923b99c09c;
+inventory74288df2a40e909147a6552ae8ede52e6f7eddc5c431ffcc274872fe2e52214e.
+Compile35f4ad3dba460ccb2520aadc0ac47f60-fdd3b6bdb43481679db5337af725e803
+BuildSuccess. Launchrequest001 returned successFalse/NOjob: actualAPIerror
+says no spare nodes are available in this cluster, suggesting stopanotherjob
+or addcompute. Root does NEITHER. Administrative196Bresponsefca413c420f968236db7596d107f0c181729d1f4d63b59f6bd5b8f2c003f6612;
+exactsafe195B/7f80da5bc8dffd97ec58eb2b22bed35474e9f4bb4084efea5148155bb0994360.
+This is1successfulcompile/1failedlaunchrequest/0nativejobs/0observedoutcome looks;
+not an invented terminalbacktest or success. SpentAPIoperation andreservedlook
+retained. Waitfornaturalcapacity; any nextlaunch usesfreshboundedscope/reservation
+and honest linktoexactcompiledcandidate, no automatic retry or economicchange.
+
+PureTPR remainsreservedunlaunched/uncompiled whilecapacity isoccupied; preserve
+source440739B/bce18bfb6debe8d0df39ba704ff23095145acda9989b42df903d11dde64f7f7c,
+reservation55feb85636de5e6fc1a5ed7349736e8e8cb053619804f4d3c6a3e0173af83273,
+plannedinventory1e8337a0f1845f10ef74a4e316ea1303afae22bc7c7e36ca12856deea20e8a97.
+Currentactualsource remains200candidate; no unrelatedproject/tab/jobcancelled.
+Additional cr31 AST census at0300ef6e ruledout suspected inheritedOFFglobal
+config mismatch: onlyOFFinitialize/onEnd use its global, Multi overridesboth;
+inheritedmarkmethods use currentinstanceevidence/config. No correctionneeded.
+
+Fresh bounded native phase TPR-CMP28-API-FIXED-ARM-STATUS-20261028-001/5279bcf70075d23015d9b7f730fbdefc4b11454a89be9e69e69e811d550cc166 at 0300ef6e0703bcadd505165832b8f8ce5504058a before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-MIA3-SOURCE-BEFORE-20261028-001/88751ce97a1e049082f3449f1b175020ee18570902d95865df85f97363cf2079 at 0300ef6e0703bcadd505165832b8f8ce5504058a before1 exact requests/60s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+GenuinebuiltinMia READ/PROPOSE consultation003 reservedBEFOREUI/effect 996d1ee070039bf870b80a962f3254d23075d665da5f6171ac2a5999ec2499fe at 0300ef6e0703bcadd505165832b8f8ce5504058a; prompt141805ffae0e9225b8ac3c51a522f5468785eac8b7c47b7727a93fe3de6d5647; actualUTC2026-10-28T20:45:59.602904+00:00/600s/48UIcalls/20source+namedpricefreelogtools. Noedit/History/provider/ObjectStorecontent/compile/job/stop/accountauthority;50/100 runninguntouched. Exactall24sourcebefore/aftermusthold74288...; quiesceOWNtabafterconsultation toavoidstaleeditorwrites. Consultationnotfinancialattempt/outcome.
+
+MiaUIopening incident at 2026-10-28T20:47:37.361606+00:00: persistedoldcompletedMiathread/pricefreeoldcode/logexcerptwasautomaticallyshown, notrequestednewtaskevidence; no oldinputcapture/bodyexportwasopened. CloudTerminal also displayed two buildnotices with shortIDs426a18-fdd3b6/e03269-fdd3b6 wheneditorloaded; cannotattest fullcompileIDs or whether replay/newbuild from UIalone. OriginalUIclaimdeclared0builds; this incidentalplatformbehavior is NOThidden/relabelledfinancialattempts. FreshprospectiveUIbound 160d6ddd60ab94750b13905eaa4f163cba46aba3f789416e68e04f92e6219460 permits<=8backgroundeditorbuildnotices only,0explicitcompile/job/sourcechange; preservecountsandall24source. No financialjob/outcomelook invented. NewchatwillavoidreusingoldMiaconversation; quiesceOWNtabafter.
+
+Fresh bounded native phase TPR-CMP28-API-FIXED-ARM-STATUS-20261028-002/cb4bed091682f89b5c35acffd7586bd8ea729f2c8e729b15c924811aedcebc6d at 0300ef6e0703bcadd505165832b8f8ce5504058a before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-TILT50-FAILURE-PROCESS-20261028-001/c3cc4a33dfd38fd988c730c7151fdfdd0cd4d21714c7bceda080afa7dee490ea at 0300ef6e0703bcadd505165832b8f8ce5504058a BEFORE 1 exact private inputs/120s; Own failed50 run error/source-frame and safe markpointer only; no prices/fees/partialPnL projection; fsync claim and directory retained.
+
+Fresh bounded private phase TPR-CMP28-TILT50-FAILURE-PROCESS-20261028-002/6182ef8b43ad13e38038e8a46eef2bd7bbfaa5cb423b8550cc9e5322f001ddb6 at 0300ef6e0703bcadd505165832b8f8ce5504058a BEFORE 1 exact private inputs/120s; Own failed50 error/sourceframes and safe markpointer; decodeQCpresentationHTML underfreshscope; no price/fee/PnL projection; fsync claim and directory retained.
+
+50% job00c71aa64b3f0fa231ef5dba172dc56f RuntimeError; safeerror0c106a9000739a4c0fe6679e006ca5d7a6080a4b13f1d79d6790b11edcbd81f7 retained. Initialpointerparse001 failedonQCpresentationencoding beforeanysafeprojection; no nativeeffect/retry/financialacceptance. Fresh002decodesHTMLonly; allinputs/failures preserved.
+
+Fresh200launchrequest002 reservation a48fb18ded98f20854c13512b2ae7624ece0a3a00d3d161e206406eb660c4290 BEFOREeffect, after50naturalterminalresource-statechange. Samealreadycompiledcandidate001/configce8f77.../source74288...; compilecountremains1. Originallaunch001explicitcapacityrefusal/0jobs/look001retained; newLOOK002 distinctfrompriorreservedunobservedlook, APIeffectscopefresh, nativejobwillbindcompiledcandidate001/actualjob. No source/economicchange or accountingreset.
+
+Fresh bounded native phase TPR-CMP28-API-TILT200-LAUNCH-20261028-002/4596d1f3319643893c20629fb0eaee2e8922fe62c153a0b20a6d05a87ffa3ca2 at 0300ef6e0703bcadd505165832b8f8ce5504058a before3 exact requests/120s/10485760B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-MIA3-SOURCE-AFTER-20261028-001/442f51fbfcb8eff4043a1752e000dd220f6b3e3f1316b426d43c095717de1e88 at 0300ef6e0703bcadd505165832b8f8ce5504058a before3 exact requests/120s/12582912B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-NATIVE-PROGRESS-METADATA-20261028-001/c8e191781ccf3b7074425102cfca5d2d6045edc0b51c298ffd6e90aa4f8ba5be at 0300ef6e0703bcadd505165832b8f8ce5504058a BEFORE 2 exact private inputs/120s; Own native operational progress/errorpresence/serverstatKEYS only; not performance/coverage acceptance; fsync claim and directory retained.
+
+### 104.28 Genuine Mia consultation003 disposition; no automatic data diagnosis
+
+GenuineauthenticatedbuiltinMia task MarketDataLagIdentificationandRecovery
+was startedasNEWchat in ownSafari37650980 under fresh20:45:59UTC/600s manifest
+996d1ee070039bf870b80a962f3254d23075d665da5f6171ac2a5999ec2499fe and
+prospectiveUIbounds002/160d6ddd60ab94750b13905eaa4f163cba46aba3f789416e68e04f92e6219460.
+Prompt2342B/141805ffae0e9225b8ac3c51a522f5468785eac8b7c47b7727a93fe3de6d5647
+allowedonlyownsource/publicSDK andTWOexistingjobs' pricefreeerror/safelogs;
+forbadeedits/compile/job/History/provider/ObjectStorecontent/account/stop actions.
+Task visiblyCompleted/Stopdisabled; finalanswerobserved20:53withinbound,
+Miareported9readcalls/noedits/launch/dataqueries. Namedlogsearches/sourceexcerpts
+werevisible; no genericagent was relabelledMia. Currentroot200launch002 was
+separatealreadyreservedAPIeffect, not a Miarun. Backgroundeditorbuildnotice
+incident/replayedoldcompletedchat remains separatelyrecorded, not hidden.
+
+Rootcounter-review: ACCEPT measuredOFF4wrong-daycache and controlled003 SPY+
+registeredexactSID requestcounts alreadyindependentlyrootverified. ACCEPT that
+no source-onlypatch or synthesizedstale/quote/futuremark is justified. HOLD
+Mia's provider-hole/rootcause claim asHYPOTHESIS: target_data_gap_provenFalse;
+validSIDroundtrip/config doesnotalone prove historicaldataalias/providerroute,
+terminality, rights/PIT, universalabsence or excludeEVERYcache/scheduling issue.
+CORRECT its parent'RAW/noFFsubscription' statement: parentheldcachebar isreal
+nonFF; parentstandingminute subscription allowsFF. Probequeries/subscriptions
+areexplicitnoFF. QCOM/ALTM analogies fromMiamemory are NOTnewcurrentSID evidence.
+No oldQCOMcapture/data reopened; no terminaldelistingacceptance invented.
+
+Miarequests furtherownerpermission for boundedclassificationquery. Latestowner
+alreadydelegatedjudgment/authorized neededdiagnosis, so rootdoesnotadd another
+ownercheckpoint. Decision CMP104-D017 is a NEW noneconomic five-public-session
+Feb08..12 exactSID+SPY nativeavailabilityprobe (notperformance or backfill),
+preparedsource-only underfreshpins; effect waits untilfixedrequestedarms and
+capacitypermit. It can distinguish observablebefore/aftercoverage; itstillcannot
+prove universalabsence/terminality/rights or replacepastmarks. Preserve all
+historicalfailures/inputs/nooutcome-chasingparameters. No providercontactsent.
+
+OwnSafari tabquiescedabout:blank afterCompleted/noactiveMiatask, no unsavedprompt
+or other-tab/project change. All24cloudfiles beforeANDafterexact74288... with
+identical443596BrawSHA9bc9e138c7d29c5be3fd09702ddc48988c56b063f9a0607aa5e3a8cb1494b15b;
+0sourcechanges. Actualafterreceiptfd3b06684fc66f88324ed98d9c15a90946246063a70ed52a5db0b7682100098c.
+No handoff/push yet; rootcontinuingfourrequestedfixedarms, notendingsessionatMia.
+
+200launch002 succeededafter50naturalcompletion: actualjobdf338f3dc811e509884195f94986c552,
+receiptb8260bd465a0abe3ca2852d060bd67b67746614d9c51ff778b84d328e1741a91.
+Same compiledcandidate001, no newcompile; launchrequest2/freshLOOK002 separate
+fromoldcapacityrefusal/look001. 100and200 actualInProgress withnoerror inlatest
+boundedstatus; rawAPIprogress.053/.055 is operationalmetadata ONLY, not proved
+coverage or economicacceptance. PureTPRnextupload/compile; waitnaturalcapacity
+beforeitsjob request, no cancellation/upgrade.
+
+Fresh bounded private phase TPR-CMP28-PURETPR-UPLOAD-SOURCE-20261028-001/1c10a6ca571488ddab37ccdf386758f370a3a037a2f41253062bf46f27ea279f at 0300ef6e0703bcadd505165832b8f8ce5504058a BEFORE 1 exact private inputs/600s; Own exact source-only snapshot; bounded diff upload preserving legacyfiles; reservedonecompile/job; fsync claim and directory retained.
+
+Exact pure_tpr uploadplan 5f3d37831ce791ebc9846b113c8b40204b5083a3f8949af547f52706ad106660 BEFOREcredentials/effects; created0/changed2/preserveallothers; 74288df2a40e909147a6552ae8ede52e6f7eddc5c431ffcc274872fe2e52214e -> 1e8337a0f1845f10ef74a4e316ea1303afae22bc7c7e36ca12856deea20e8a97.
+
+Fresh bounded native phase TPR-CMP28-API-PURETPR-COMPILE-20261028-001/7ca4186424750e555547a4236964d3139948058f51ceac653bdd50dfd1f88847 at 0300ef6e0703bcadd505165832b8f8ce5504058a before3 exact requests/120s/10485760B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-100-200STATUS-PURECOMPILE-20261028-001/0ad24a5d73586e879912c0c4bc5d7731ab0b393c2a63473c5b75c0a76e2d834d at 0300ef6e0703bcadd505165832b8f8ce5504058a before3 exact requests/120s/10485760B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-NATIVE-SERVER-METADATA-20261028-001/c8ac117a2912d17e2ad692832fd4553b2eaca857c159fbf3b4cd31f07b8e3918 at 0300ef6e0703bcadd505165832b8f8ce5504058a BEFORE 2 exact private inputs/120s; Own native CPU/RAM/uptime/progress operationalmetadata only; no hostnames/economics or acceptance; fsync claim and directory retained.
+
+Fresh bounded native phase TPR-CMP28-API-ACTIVE-ARM-MARK-LOGS-20261028-001/edad2d7a8c58518b42cb86a28bcf14fcb0e62101a47360b6db88d291454e2e8d at 0300ef6e0703bcadd505165832b8f8ce5504058a before2 exact requests/120s/524288B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-FIXED-ARM-STATUS-20261028-003/78de24674c15a26f077ca803fbb0b0b278da89a87a98171e5023d8f611da75b1 at 0300ef6e0703bcadd505165832b8f8ce5504058a before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+### 104.29 Five-session availability diagnostic, source-only preparation
+
+CMP104-D017 new pure post-gap module15375B/bf9c69322c9fb505174908d5acd2fb4ef9ce63f458f5fcb85fea4038f77e84de;
+focusedtest14199B/86a715ff613139fdd373777b4db61926599d0acf75dcc0e730ef0950d739fdaa.
+Author35passed3.16s, root35passed3.27s, independentoffline10335passed3.07s,
+AST/inmemorycompile/diffclean. finish_off_preparation implemented; rootand
+independentagentreviewedsource-only/no private/nativeeffects. Finalhardening
+puts EACH20nativecalendaropen/closecalls insidepre/postactualcustodyguards;
+mode-drift test stopsafterfirstcall/0History. Priorunhardenedsnapshot3f1c...
+wasnotexecuted orpublishedasfinal; all priorcontrol/probe modules untouched.
+
+Renderedplainmain<=60000B, independentpinscontrolc7337090/base708dfff/helper6539ae/
+producer27c651. ExactparentFeb10witness/hash/sessionremainimmutable; childruns
+Feb12at16:01local/UTC withjoblockedproofbeforeeveryeffect. Fivepublicweekdays
+Feb08..12 use genuine typedUSA/NYexchangehours,20open/closecalls; eachreturned
+bar checkedagainstitsOWNnative sessionhours. FourHistorycalls2400minute/5daily
+perSymbol=>4810enumeratedrows,0extrapoke/oneparentcontains+read<=4096B/one
+nativeexactSIDregistration. SPYcontrolspositivevolumeregularobservationsforeach
+session+oneexactdailyclose each; minutecontrolsdoNOTclaim390completebars or
+allfinalminutes. Safeoffset(-2,-1,0,1,2)counts/positivevolume/nonnegative/close
+predicates only; no rawSID/price/volume/absolutebarclockexports, noorders/cache
+writes. Alluniversalabsence/terminality/financialrecoveryflagsstayFalse.
+Effectwaitsforfreshreservation ANDcapacity AFTERpureTPRrequestedfinancialarm.
+
+Primaryadditionalidentityaudit cr31: ordinaryLEANhistoryequitymapresolution
+usesSID.Symbol+SID.Date thenMappingEventProviderapplieshistoricalalias; no
+verifiedaliascorrection. JSONnativeSymbol{id,value}deserializationislegitimate
+exactSIDdiagnosticifneeded, butpermtickisjustanotherValuecopy, notindependent
+permanentID. Missinglocalfiles/mapdaterangescanproduce0rowswithoutanexception;
+therefore00resultsdonotdistinguishdatahole/mapping/delisting/rightscause.
+Source-onlyprimary links:
+https://github.com/QuantConnect/Lean/blob/master/Common/SymbolJsonConverter.cs
+https://github.com/QuantConnect/Lean/blob/master/Common/Data/Auxiliary/MappingExtensions.cs
+https://github.com/QuantConnect/Lean/blob/master/Engine/DataFeeds/SubscriptionDataReader.cs .
+
+Source-onlyperformancereviewfoundfull349018rowvalidation/indexing, then each
+signaldecision'sglobal83-sessionwindowbinding/scoringbeforeselectedSIDfilter;
+repeatedmapprojectionandDecimaldecaycostexist. NoN-by-calendarconstructorjoin
+or actualhangwasproved. LatestoperationalCPU143.6%/159.8%,RAM2113/2033of8192MB,
+uptime16:19/6:50/progress.053/.055 isNOTfinancialcoverageacceptance orhangproof.
+Nojobcancel/relaunch/parameterchange fromthishypothesis. rootcontinuesawaiting
+native100/200terminalstates; purecompileBuildSuccessalreadyretained,0jobs yet.

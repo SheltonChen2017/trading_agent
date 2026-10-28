@@ -24,10 +24,10 @@ PINS = {
     "extended_loader.py": "24c752b0859a04d73306e3afddc10d45cc6d3c7b566e2ff17ef160fd90e6e10b",
     "extended_runtime_successor.py": "2e6bb5c82f356ee7ece4811c9d634ce57d48533d408d4b57b8aee41de062517b",
     "extended_algorithm_successor.py": "e0077b7992dc64515384f56687b350725d694c746a8d4523336d18aa144dd9a8",
-    "comparison_20261028.py": "cb507762dded3340acb7dd69b8086045ae819e0398eea1943444acb496e0e161",
-    "comparison_20261028_algorithm.py": "1d365d21eaa1ae9fa40d6d67bf7ed2743280e1c39519154068f5c2aff38e1871",
+    "comparison_20261028.py": "e9b1f513fe453fcd47408171ecbc4342a9321195405c2ce31b7591439f5f44c5",
+    "comparison_20261028_algorithm.py": "27c6516b9dfd2d1e71f0ef8fbdb7c371266e36e11bd9e3089e2ce6b76d25aee0",
     "extended_calendar.json": "3eccdf3cf9a2542ffd249983241d5747c2ecd4e21bc4a71f7f826c77ec1fe53d",
-    "comparison_20261028_policy.json": "df4c89601ba5a45a17c79d6386fff1ac202ef0689c4e592a8b1f9aba32ada80c"}
+    "comparison_20261028_policy.json": "2cfeca1b9058f3587a6d5c98df0e6b1ed10b25cdc4398b24a3525130da6425b2"}
 SOURCE_PATHS = tuple(PREFIX + name for name in PINS)
 MAIN = b"import comparison_20261028_algorithm as candidate\n\nclass Main(candidate.ComparisonOffAlgorithm):\n    pass\n"
 

@@ -29,14 +29,14 @@ BASE_PINS = {
     "extended_loader.py": "24c752b0859a04d73306e3afddc10d45cc6d3c7b566e2ff17ef160fd90e6e10b",
     "extended_runtime_successor.py": "2e6bb5c82f356ee7ece4811c9d634ce57d48533d408d4b57b8aee41de062517b",
     "extended_algorithm_successor.py": "e0077b7992dc64515384f56687b350725d694c746a8d4523336d18aa144dd9a8",
-    "comparison_20261028.py": "cb507762dded3340acb7dd69b8086045ae819e0398eea1943444acb496e0e161",
-    "comparison_20261028_algorithm.py": "1d365d21eaa1ae9fa40d6d67bf7ed2743280e1c39519154068f5c2aff38e1871",
+    "comparison_20261028.py": "e9b1f513fe453fcd47408171ecbc4342a9321195405c2ce31b7591439f5f44c5",
+    "comparison_20261028_algorithm.py": "27c6516b9dfd2d1e71f0ef8fbdb7c371266e36e11bd9e3089e2ce6b76d25aee0",
     "extended_calendar.json": "3eccdf3cf9a2542ffd249983241d5747c2ecd4e21bc4a71f7f826c77ec1fe53d",
-    "comparison_20261028_policy.json": "df4c89601ba5a45a17c79d6386fff1ac202ef0689c4e592a8b1f9aba32ada80c"}
+    "comparison_20261028_policy.json": "2cfeca1b9058f3587a6d5c98df0e6b1ed10b25cdc4398b24a3525130da6425b2"}
 PINS = {PREFIX + name: digest for name, digest in BASE_PINS.items()}
 PINS.update({
-    PREFIX + "comparison_20261028_bundle.py": "9a12fab5ae937fd0e2b6b52e3bfdcc2f515436e0b3a696014ded9d045b079086",
-    PREFIX + "comparison_20261028_multi_algorithm.py": "55d090b97e53d18eaa4fa970309159e7f6c08115123ef3f3564da37f47f5e2f8",
+    PREFIX + "comparison_20261028_bundle.py": "76637ed47522b6f4eb0a8e19d0962afce5e08cd249d28348dc1204547ee71b6a",
+    PREFIX + "comparison_20261028_multi_algorithm.py": "201d1fa0ffa5f2771eb245997c6c160119e9cf766300d254615bcfc76eb49e34",
     PREFIX + "comparison_20261028_events.py": "8041ed95e01103007379e4b5761d14b4f5c0425afb6e889d9e295dd6acc9965d",
     PREFIX + "comparison_20261028_signal_native.py": "6fdab16bdfe070e138b92977279dec0d03d67e6a05b1be5f9af5e9136bd96935",
     "research/target_price_revisions_development/raw_revision.py": "ea4efcd9b0e73ae0b5c166d820c51e054559a3ed610041a6eb2acc8abca36353"})

@@ -91,6 +91,14 @@ def config(module, **changes):
 def driver(monkeypatch):
     old=old_runtime.runtime.__wrapped__(monkeypatch)
     api=sys.modules["AlgorithmImports"]
+    class NativeMinuteBar(api.TradeBar):
+        def __init__(self):
+            self.period=timedelta(minutes=1);self.is_fill_forward=False;self.price="50";self.symbol=None
+        @property
+        def time(self):return getattr(self,"_time",self.end_time-self.period)
+        @time.setter
+        def time(self,value):self._time=value
+    api.TradeBar=NativeMinuteBar
     api.Market=NS(USA="usa")
     api.ETFConstituentUniverse=Constituent
     api.Fundamental=Fundamental
@@ -644,7 +652,7 @@ def mark_witness_case(driver,monkeypatch,*,session="2021-02-10",observed=None,ex
     expected=expected or datetime.combine(day,time(16))
     observed=observed or datetime.combine(day,time(15,59))
     bar=driver.TradeBar();bar.end_time=observed
-    symbol=Symbol("PRIVATE-MARK-SID-SENTINEL")
+    symbol=Symbol("PRIVATE-MARK-SID-SENTINEL");bar.symbol=symbol
     calls=[]
     def last_data():calls.append("last_data");return bar
     def next_close(start,extended):
@@ -689,7 +697,7 @@ def test_failed_exact_close_retains_one_private_verified_snapshot_before_origina
         bar.end_time=datetime(2030,1,1)
         return save(key,raw)
     store.save_bytes=saved_first
-    with pytest.raises(ValueError,match="^CMP28 OFF native candidate refused$"):algo._daily_audit()
+    with pytest.raises(ValueError,match="^CMP28_MARK_REFUSAL "):algo._daily_audit()
     pointer=mark_pointer(logs);key=pointer["key"];raw=store.values[key];body=json.loads(raw)
     assert pointer["status"]=="verified" and pointer["readback_verified"] is True
     assert 0<len(raw)==pointer["bytes"]<=4096
@@ -697,7 +705,7 @@ def test_failed_exact_close_retains_one_private_verified_snapshot_before_origina
     assert key==algo._evidence.require_binding()+"mark-refusal.json"
     assert [method for method,_ in store.calls]==["contains","save","read"] and len(store.values)==1
     assert body["security_id"]==str(symbol.id) and body["project_id"]==driver.PROJECT
-    assert body["job_id"]==algo.algorithm_id and body["guard_unchanged"] is True
+    assert body["job_id"]==algo.algorithm_id and body["verification_policy_extended"] is True and body["valuation_verification_mode"]==driver.MARK_MODE
     assert body["observed_end_local"]==observed.replace(tzinfo=driver.NY).isoformat()
     assert body["expected_close_local"]==expected.replace(tzinfo=driver.NY).isoformat()
     assert body["source_inputs_admitted"] is body["strategy_accepted"] is body["canonical_admission"] is False
@@ -732,7 +740,7 @@ def test_witness_observes_native_job_drift_after_every_store_interaction(driver,
     def drift(*args):
         value=original(*args);algo.algorithm_id="foreign-job";return value
     setattr(store,name,drift)
-    with pytest.raises(ValueError,match="^CMP28 OFF native candidate refused$"):algo._daily_audit()
+    with pytest.raises(ValueError,match="^CMP28_MARK_REFUSAL "):algo._daily_audit()
     pointer=mark_pointer(logs)
     assert pointer["status"]=="publication_failed" and not pointer["readback_verified"] and pointer["verified_sha256"] is None
     assert [method for method,_ in store.calls]==["contains","save","read"][:{"contains":1,"save":2,"read":3}[phase]]
@@ -740,7 +748,7 @@ def test_witness_observes_native_job_drift_after_every_store_interaction(driver,
 
 def test_witness_wrong_native_project_refuses_before_any_private_effect(driver,monkeypatch):
     algo,_,_,_,logs,_=mark_witness_case(driver,monkeypatch);algo.project_id=1
-    with pytest.raises(ValueError,match="^CMP28 OFF native candidate refused$"):algo._daily_audit()
+    with pytest.raises(ValueError,match="^CMP28_MARK_REFUSAL "):algo._daily_audit()
     assert algo.object_store.calls==[] and mark_pointer(logs)["status"]=="publication_failed"
 
 
@@ -758,7 +766,7 @@ def test_witness_uncertain_publication_preserves_original_refusal_and_honest_saf
     else:
         def uncertain(key):raise TimeoutError("PRIVATE-TRANSPORT-BODY-SENTINEL")
         store.contains_key=uncertain
-    with pytest.raises(ValueError,match="^CMP28 OFF native candidate refused$"):algo._daily_audit()
+    with pytest.raises(ValueError,match="^CMP28_MARK_REFUSAL "):algo._daily_audit()
     pointer=mark_pointer(logs)
     assert pointer["status"]=={"bytes":"readback_mismatch","length":"readback_mismatch","save_false":"save_unconfirmed",
         "contains_unknown":"existing_or_unknown_key_refused","ordinary_error":"publication_failed"}[mode]
@@ -798,7 +806,7 @@ def test_witness_oversize_body_refuses_without_truncation_or_any_store_effect(dr
     algo,_,_,_,logs,_=mark_witness_case(driver,monkeypatch)
     config_body=json.loads(algo._evidence._config_raw);config_body["candidate_id"]="X"*4096
     algo._evidence._config_raw=driver._wire(config_body)
-    with pytest.raises(ValueError,match="^CMP28 OFF native candidate refused$"):algo._daily_audit()
+    with pytest.raises(ValueError,match="^CMP28_MARK_REFUSAL "):algo._daily_audit()
     assert algo.object_store.calls==[] and mark_pointer(logs)["status"]=="publication_failed"
 
 
@@ -806,5 +814,318 @@ def test_witness_notice_failure_cannot_replace_the_original_mark_refusal(driver,
     algo,_,_,_,_,_=mark_witness_case(driver,monkeypatch)
     def log_failed(_):raise RuntimeError("PRIVATE-LOGGER-SENTINEL")
     algo.log=log_failed
-    with pytest.raises(ValueError,match="^CMP28 OFF native candidate refused$"):algo._daily_audit()
+    with pytest.raises(ValueError,match="^CMP28_MARK_REFUSAL "):algo._daily_audit()
     assert len(algo.object_store.values)==1
+
+
+def corroboration_case(driver,monkeypatch,*,session="2021-02-10",close_hour=16,exact_minute=False):
+    day=date.fromisoformat(session);close=datetime.combine(day,time(close_hour))
+    algo,minute,symbol,clock_calls,logs,accounted=mark_witness_case(driver,monkeypatch,session=session,
+        observed=close if exact_minute else close-timedelta(minutes=1),expected=close)
+    class NativeSettings:
+        daily_precise_end_time=True
+    class NativeConfig:
+        def __init__(self):
+            self.symbol=symbol;self.is_internal_feed=False;self.data_normalization_mode=driver.DataNormalizationMode.RAW
+            self.resolution=driver.Resolution.MINUTE;self.tick_type=driver.TickType.TRADE
+            self.type=NS(FullName="QuantConnect.Data.Market.TradeBar");self.extended_market_hours=False;self.fill_data_forward=True
+    root=ModuleType("QuantConnect");root.AlgorithmSettings=NativeSettings
+    data=ModuleType("QuantConnect.Data");data.SubscriptionDataConfig=NativeConfig
+    monkeypatch.setitem(sys.modules,root.__name__,root);monkeypatch.setitem(sys.modules,data.__name__,data)
+    monkeypatch.setattr(sys.modules["System"],"Object",NS(ReferenceEquals=lambda left,right:left is right),raising=False)
+    algo.settings=NativeSettings();config=NativeConfig()
+    held=next(iter(algo.portfolio.values()));held.quantity="10";held.holdings_value="500"
+    class Portfolio:
+        cash="99500";total_portfolio_value="100000";total_holdings_value="500"
+        def __init__(self):self.held=held
+        def __getitem__(self,chosen):assert chosen==symbol;return self.held
+        def values(self):return [self.held]
+    algo.portfolio=Portfolio()
+    security=algo._assert_raw_subscriptions(symbol);security.symbol=symbol;security.price="50";security.cache=object()
+    algo._raw_security_configs=lambda chosen:(security,[config])
+    algo._assert_raw_subscriptions=lambda chosen:security
+    daily=driver.TradeBar();daily.symbol=symbol;daily.time=datetime.combine(day,time(9,30));daily.end_time=close
+    daily.period=close-daily.time;daily.close="50";daily.volume="100";daily.price="50"
+    state=NS(rows=[daily],request_calls=[],next_calls=0,on_request=lambda:None,on_next=lambda:None)
+    class TypedHistory:
+        def __getitem__(self,kind):
+            assert kind is driver.TradeBar
+            def request(chosen,start,end,resolution,**options):
+                state.request_calls.append((chosen,start,end,resolution,options));state.on_request()
+                assert chosen is symbol and start==datetime.combine(day,time()) and end==datetime.combine(day,time(16,1))
+                assert resolution==driver.Resolution.DAILY
+                assert options=={"fill_forward":False,"extended_market_hours":False,"data_normalization_mode":driver.DataNormalizationMode.RAW}
+                def rows():
+                    for row in state.rows:
+                        state.on_next();state.next_calls+=1;yield row
+                return rows()
+            return request
+    algo.history=TypedHistory()
+    return NS(algo=algo,minute=minute,daily=daily,symbol=symbol,security=security,config=config,state=state,
+        logs=logs,accounted=accounted,held=held,clock_calls=clock_calls)
+
+
+@pytest.mark.parametrize("session,close_hour",[("2021-02-10",16),("2021-11-26",13)])
+def test_daily_raw_equal_price_corroboration_preserves_every_native_snapshot_and_old_minute_clock(driver,monkeypatch,session,close_hour):
+    case=corroboration_case(driver,monkeypatch,session=session,close_hour=close_hour);algo=case.algo
+    original_end=case.minute.end_time;original_cache=case.security.cache
+    algo._daily_audit()
+    assert len(case.state.request_calls)==1 and case.state.next_calls==1 and case.accounted==[True]
+    assert case.minute.end_time==original_end and case.security.cache is original_cache and case.security.price=="50"
+    assert not case.logs
+    assert [method for method,_ in algo.object_store.calls]==["contains","save","read"]
+    proof=next(payload for kind,payload in algo._records if kind=="NAV" and payload.get("record_type")=="raw_daily_equal_close_corroboration")
+    assert proof["mode"]==driver.MARK_MODE and proof["decision_id"]=="TPR-CMP104-D009"
+    assert proof["minute_endpoint_equals_close"] is False and proof["native_snapshot_unchanged"] is True
+    assert proof["daily_close"]==50 and proof["daily_volume"]==100 and proof["security_id"]==str(case.symbol.id)
+    assert proof["original_minute_end_utc"]!=proof["daily_end_utc"]
+    assert proof["source_inputs_admitted"] is proof["canonical_admission"] is False
+    claim=proof["daily_access_claim"];claim_raw=algo.object_store.values[claim["key"]]
+    assert 0<len(claim_raw)==claim["bytes"]<=4096 and hashlib.sha256(claim_raw).hexdigest()==claim["sha256"]
+    claim_body=json.loads(claim_raw)
+    assert claim_body["spent_before_effect"] is True and claim_body["parent_config_sha256"]==algo._evidence._config_hash
+    assert claim_body["security_id"]==str(case.symbol.id) and claim_body["request"]["max_rows"]==2
+    assert claim_body["permission_issued"] is claim_body["outcome_permission"] is False
+    assert "price" not in claim_raw.decode() and "volume" not in claim_raw.decode()
+    counts=algo._mark_verification_summary()
+    assert counts["daily_requests"]==counts["daily_corroborated_marks"]==counts["daily_claims_attempted"]==counts["daily_claims_verified"]==1
+    assert counts["strict_minute_marks"]==counts["refused_marks"]==0
+    assert counts["minute_endpoints_rewritten"]==counts["prices_substituted"]==0
+
+
+@pytest.mark.parametrize("session,close_hour",[("2021-02-10",16),("2021-11-26",13)])
+def test_exact_real_minute_close_needs_zero_history_calls_with_new_mode(driver,monkeypatch,session,close_hour):
+    case=corroboration_case(driver,monkeypatch,session=session,close_hour=close_hour,exact_minute=True)
+    case.algo._daily_audit()
+    assert not case.state.request_calls and case.accounted==[True] and not case.logs
+    assert case.algo._mark_verification_summary()["strict_minute_marks"]==1
+
+
+@pytest.mark.parametrize("mode",["missing","duplicate","wrong_sid","wrong_day","wrong_end","fill_forward","not_tradebar",
+    "zero_volume","negative_volume","nonfinite_volume","zero_price","nonfinite_price","unequal_price"])
+def test_daily_corroboration_never_selects_clips_or_substitutes_invalid_or_ambiguous_native_bar(driver,monkeypatch,mode):
+    case=corroboration_case(driver,monkeypatch)
+    if mode=="missing":case.state.rows=[]
+    elif mode=="duplicate":case.state.rows=[case.daily]*3
+    elif mode=="wrong_sid":case.daily.symbol=Symbol("OTHER-SID",case.symbol.value)
+    elif mode=="wrong_day":case.daily.time-=timedelta(days=1)
+    elif mode=="wrong_end":case.daily.end_time+=timedelta(minutes=1)
+    elif mode=="fill_forward":case.daily.is_fill_forward=True
+    elif mode=="not_tradebar":case.state.rows=[NS(**vars(case.daily))]
+    elif mode=="zero_volume":case.daily.volume="0"
+    elif mode=="negative_volume":case.daily.volume="-1"
+    elif mode=="nonfinite_volume":case.daily.volume="NaN"
+    elif mode=="zero_price":case.daily.close="0"
+    elif mode=="nonfinite_price":case.daily.close="Infinity"
+    else:case.daily.close="50.01"
+    with pytest.raises(ValueError,match="^CMP28_MARK_REFUSAL ") as error:case.algo._daily_audit()
+    pointer=json.loads(str(error.value).split(" ",1)[1])
+    assert pointer["reason_code"] and not case.accounted
+    assert len(case.state.request_calls)==1 and case.state.next_calls<=2
+    assert case.algo._mark_verification_summary()["daily_corroborated_marks"]==0
+    assert case.security.price==case.minute.price=="50"
+    assert "PRIVATE-MARK-SID-SENTINEL" not in str(error.value) and "2021-02-10T" not in str(error.value)
+
+
+@pytest.mark.parametrize("mode",["wrong_day","future","fill_forward","nonminute","nontradebar","precise_off","settings_marker",
+    "config_marker","config_adjusted","cache_price_mismatch"])
+def test_ineligible_cache_or_unproved_native_settings_and_raw_configs_never_dispatch_history(driver,monkeypatch,mode):
+    case=corroboration_case(driver,monkeypatch)
+    if mode=="wrong_day":case.minute.end_time-=timedelta(days=1)
+    elif mode=="future":case.minute.end_time+=timedelta(minutes=3)
+    elif mode=="fill_forward":case.minute.is_fill_forward=True
+    elif mode=="nonminute":case.minute.period=timedelta(hours=1)
+    elif mode=="nontradebar":case.security.get_last_data=lambda:NS(end_time=case.minute.end_time)
+    elif mode=="precise_off":case.algo.settings.daily_precise_end_time=False
+    elif mode=="settings_marker":case.algo.settings=NS(daily_precise_end_time=True)
+    elif mode=="config_marker":case.algo._raw_security_configs=lambda _:(case.security,[NS(**vars(case.config))])
+    elif mode=="config_adjusted":case.config.data_normalization_mode=driver.DataNormalizationMode.ADJUSTED
+    else:case.security.price="50.01"
+    with pytest.raises(ValueError,match="^CMP28_MARK_REFUSAL "):case.algo._daily_audit()
+    assert not case.state.request_calls and not case.accounted
+
+
+@pytest.mark.parametrize("field",["cache_ref","last_ref","bar_time","bar_end","bar_period","bar_ff","bar_sid","bar_price",
+    "security_price","quantity","holding_ref","cash","nav","holdings_value","clock","raw_config","settings_ref","precise_setting","project","job"])
+def test_history_corroboration_refuses_any_native_state_or_custody_change_instead_of_hiding_it(driver,monkeypatch,field):
+    case=corroboration_case(driver,monkeypatch)
+    def mutate():
+        if field=="cache_ref":case.security.cache=object()
+        elif field=="last_ref":case.security.get_last_data=lambda:deepcopy(case.minute)
+        elif field=="bar_time":case.minute.time=case.minute.time-timedelta(minutes=1)
+        elif field=="bar_end":case.minute.end_time-=timedelta(minutes=1)
+        elif field=="bar_period":case.minute.period=timedelta(minutes=2)
+        elif field=="bar_ff":case.minute.is_fill_forward=True
+        elif field=="bar_sid":case.minute.symbol=Symbol("OTHER")
+        elif field=="bar_price":case.minute.price="51"
+        elif field=="security_price":case.security.price="51"
+        elif field=="quantity":case.held.quantity="11"
+        elif field=="holding_ref":case.algo.portfolio.held=deepcopy(case.held)
+        elif field=="cash":case.algo.portfolio.cash="99499"
+        elif field=="nav":case.algo.portfolio.total_portfolio_value="100001"
+        elif field=="holdings_value":case.algo.portfolio.total_holdings_value="501"
+        elif field=="clock":case.algo.utc_time+=timedelta(seconds=1)
+        elif field=="raw_config":case.config.extended_market_hours=True
+        elif field=="settings_ref":case.algo.settings=type(case.algo.settings)()
+        elif field=="precise_setting":case.algo.settings.daily_precise_end_time=False
+        elif field=="project":case.algo.project_id=1
+        else:case.algo.algorithm_id="foreign-job"
+    case.state.on_next=mutate
+    with pytest.raises(ValueError,match="^CMP28_MARK_REFUSAL "):case.algo._daily_audit()
+    assert not case.accounted and case.algo._mark_verification_summary()["daily_corroborated_marks"]==0
+    assert not any(payload.get("record_type")=="raw_daily_equal_close_corroboration" for kind,payload in case.algo._records)
+
+
+@pytest.mark.parametrize("kind",["ordinary","cancel","fatal"])
+def test_history_native_exceptions_are_body_free_and_nonordinary_stops_never_become_admission(driver,monkeypatch,kind):
+    case=corroboration_case(driver,monkeypatch)
+    class Fatal(BaseException):pass
+    def stop():raise {"ordinary":RuntimeError,"cancel":KeyboardInterrupt,"fatal":Fatal}[kind]("PRIVATE-HISTORY-ERROR-BODY")
+    case.state.on_request=stop
+    wanted={"ordinary":ValueError,"cancel":KeyboardInterrupt,"fatal":driver.MarkWitnessStopped}[kind]
+    with pytest.raises(wanted) as error:case.algo._daily_audit()
+    assert "PRIVATE-HISTORY-ERROR-BODY" not in str(error.value) and not case.accounted
+    assert len(case.state.request_calls)==1
+    if kind=="ordinary":
+        assert str(error.value).startswith("CMP28_MARK_REFUSAL ")
+        pointer=json.loads(str(error.value).split(" ",1)[1]);assert pointer["reason_code"]=="daily_native_request_or_representation_failed"
+        before=list(case.state.request_calls)
+        with pytest.raises(ValueError):case.algo._daily_audit()
+        assert case.state.request_calls==before  # No automatic repeat of a failed daily scope.
+
+
+def test_safe_refusal_pointer_is_available_in_valueerror_even_when_log_queue_is_lost(driver,monkeypatch):
+    case=corroboration_case(driver,monkeypatch);case.daily.close="51";case.algo.log=lambda _:None
+    with pytest.raises(ValueError,match="^CMP28_MARK_REFUSAL ") as error:case.algo._daily_audit()
+    pointer=json.loads(str(error.value).split(" ",1)[1])
+    assert pointer["readback_verified"] is True and pointer["key"] in case.algo.object_store.values
+    assert pointer["valuation_verification_mode"]==driver.MARK_MODE and pointer["reason_code"]=="daily_price_or_volume_mismatch"
+    assert "PRIVATE-MARK-SID-SENTINEL" not in str(error.value) and "2021-02-10T" not in str(error.value)
+
+
+def test_corroboration_requires_consistent_actual_algorithm_utc_and_local_clock_before_history(driver,monkeypatch):
+    case=corroboration_case(driver,monkeypatch);case.algo.utc_time+=timedelta(seconds=1)
+    with pytest.raises(ValueError,match="^CMP28_MARK_REFUSAL "):case.algo._daily_audit()
+    assert not case.state.request_calls and not case.accounted
+
+
+def test_unknown_internal_reason_cannot_put_untrusted_body_in_public_error(driver,monkeypatch):
+    case=corroboration_case(driver,monkeypatch)
+    with pytest.raises(ValueError) as error:
+        case.algo._reject_mark(case.symbol,None,None,"PRIVATE-UNTRUSTED-REASON")
+    assert "PRIVATE-UNTRUSTED-REASON" not in str(error.value)
+    assert json.loads(str(error.value).split(" ",1)[1])["reason_code"]=="mark_native_or_representation_failed"
+
+
+def claim_key_for(case):
+    return (case.algo._evidence.require_binding()+"daily-close-claims/"+case.algo.time.date().isoformat()+"-"
+        +hashlib.sha256(str(case.symbol.id).encode()).hexdigest()+".json")
+
+
+def test_fresh_durable_exact_scope_claim_is_verified_before_any_history_effect(driver,monkeypatch):
+    case=corroboration_case(driver,monkeypatch);key=claim_key_for(case)
+    def before_history():
+        assert case.algo._mark_history_attempts=={("2021-02-10",str(case.symbol.id))}
+        assert case.algo.object_store.calls==[("contains",key),("save",key),("read",key)]
+        raw=case.algo.object_store.values[key];body=json.loads(raw)
+        assert len(raw)<=4096 and body["spent_before_effect"] is True
+        assert body["project_id"]==case.algo.project_id and body["job_id"]==case.algo.algorithm_id
+        assert body["config_sha256"]==body["parent_config_sha256"]==case.algo._evidence._config_hash
+        assert body["source_template_closure_sha256"]==case.algo._config["source_template_closure_sha256"]
+        assert body["request"]=={"start_local":"2021-02-10T00:00:00","end_local":"2021-02-10T16:01:00",
+            "resolution":"DAILY","normalization":"RAW","fill_forward":False,"extended_market_hours":False,"max_rows":2}
+        counts=case.algo._mark_verification_summary()
+        assert counts["daily_claims_attempted"]==counts["daily_claims_verified"]==counts["daily_requests"]==1
+    case.state.on_request=before_history
+    case.algo._daily_audit()
+    assert case.accounted==[True] and len(case.state.request_calls)==1
+
+
+@pytest.mark.parametrize("mode",["existing","unknown","save_false","write_error","read_error","length","bytes","oversize"])
+def test_unverified_access_claim_means_no_history_no_reopen_no_retry_and_safe_fixed_reason(driver,monkeypatch,mode):
+    case=corroboration_case(driver,monkeypatch);store=case.algo.object_store;key=claim_key_for(case)
+    contains,save,read=store.contains_key,store.save_bytes,store.read_bytes
+    if mode=="existing":store.values[key]=b"PRIVATE-PREEXISTING-CLAIM"
+    elif mode=="unknown":store.contains_key=lambda chosen:None if chosen==key else contains(chosen)
+    elif mode=="save_false":store.save_bytes=lambda chosen,raw:False if chosen==key else save(chosen,raw)
+    elif mode=="write_error":
+        def write(chosen,raw):
+            if chosen==key:
+                store.calls.append(("save",chosen));raise TimeoutError("PRIVATE-CLAIM-WRITE-ERROR")
+            return save(chosen,raw)
+        store.save_bytes=write
+    elif mode in ("read_error","length","bytes"):
+        def corrupt(chosen):
+            if chosen!=key:return read(chosen)
+            raw=read(chosen)
+            if mode=="read_error":raise TimeoutError("PRIVATE-CLAIM-READ-ERROR")
+            return raw+b" " if mode=="length" else b"!"+raw[1:]
+        store.read_bytes=corrupt
+    else:
+        wire=driver._wire
+        monkeypatch.setattr(driver,"_wire",lambda body:wire(body)+b" "*4096 if body.get("schema")=="tpr-cmp28-daily-close-access-claim-v1" else wire(body))
+    with pytest.raises(ValueError,match="^CMP28_MARK_REFUSAL ") as error:case.algo._daily_audit()
+    pointer=json.loads(str(error.value).split(" ",1)[1])
+    expected=("daily_access_claim_key_exists_or_unknown" if mode in ("existing","unknown") else
+        "daily_access_claim_readback_mismatch" if mode in ("length","bytes") else "daily_access_claim_publication_failed")
+    assert pointer["reason_code"]==expected and not case.state.request_calls and not case.accounted
+    counts=case.algo._mark_verification_summary()
+    assert counts["daily_claims_attempted"]==1 and counts["daily_claims_verified"]==counts["daily_requests"]==0
+    assert "PRIVATE-CLAIM" not in str(error.value) and "PRIVATE-MARK-SID-SENTINEL" not in str(error.value)
+    if mode=="existing":
+        assert store.values[key]==b"PRIVATE-PREEXISTING-CLAIM"
+        assert [method for method,chosen in store.calls if chosen==key]==["contains"]
+    before=list(store.calls)
+    with pytest.raises(ValueError):case.algo._daily_audit()
+    assert store.calls==before and not case.state.request_calls
+
+
+@pytest.mark.parametrize("phase",["contains","save","read"])
+@pytest.mark.parametrize("mutation",["job","cash"])
+def test_access_claim_native_custody_and_unchanged_snapshot_guard_every_store_action(driver,monkeypatch,phase,mutation):
+    case=corroboration_case(driver,monkeypatch);store=case.algo.object_store;key=claim_key_for(case)
+    name={"contains":"contains_key","save":"save_bytes","read":"read_bytes"}[phase];original=getattr(store,name)
+    def changed(chosen,*args):
+        value=original(chosen,*args)
+        if chosen==key:
+            if mutation=="job":case.algo.algorithm_id="foreign-job"
+            else:case.algo.portfolio.cash="99499"
+        return value
+    setattr(store,name,changed)
+    with pytest.raises(ValueError,match="^CMP28_MARK_REFUSAL "):case.algo._daily_audit()
+    assert not case.state.request_calls and not case.accounted
+    counts=case.algo._mark_verification_summary();assert counts["daily_claims_verified"]==counts["daily_requests"]==0
+    assert [method for method,chosen in store.calls if chosen==key]==["contains","save","read"][:{"contains":1,"save":2,"read":3}[phase]]
+
+
+@pytest.mark.parametrize("kind",["cancel","fatal"])
+def test_access_claim_nonordinary_store_stops_remain_body_free_and_never_dispatch_history(driver,monkeypatch,kind):
+    case=corroboration_case(driver,monkeypatch);key=claim_key_for(case)
+    class Fatal(BaseException):pass
+    def stop(chosen):
+        assert chosen==key
+        raise (KeyboardInterrupt if kind=="cancel" else Fatal)("PRIVATE-CLAIM-STOP")
+    case.algo.object_store.contains_key=stop
+    with pytest.raises(KeyboardInterrupt if kind=="cancel" else driver.MarkWitnessStopped) as error:case.algo._daily_audit()
+    assert "PRIVATE-CLAIM-STOP" not in str(error.value) and not case.state.request_calls
+    assert case.algo._mark_history_attempts=={("2021-02-10",str(case.symbol.id))}
+
+
+def test_access_claim_budget_is_a_hard_scope_bound_not_a_holdings_exclusion(driver,monkeypatch):
+    case=corroboration_case(driver,monkeypatch);case.algo._mark_verification_summary()
+    case.algo._mark_verification_counts["daily_claims_attempted"]=driver.MAX_DAILY_CLOSE_CLAIMS
+    with pytest.raises(ValueError,match="^CMP28_MARK_REFUSAL ") as error:case.algo._daily_audit()
+    assert json.loads(str(error.value).split(" ",1)[1])["reason_code"]=="daily_access_claim_budget_exhausted"
+    assert not case.state.request_calls and not any("/daily-close-claims/" in key for _,key in case.algo.object_store.calls)
+    assert not case.accounted and case.held.invested is True
+
+
+def test_verified_claim_does_not_invent_a_history_call_when_native_method_binding_fails(driver,monkeypatch):
+    case=corroboration_case(driver,monkeypatch)
+    class MissingNativeMethod:
+        def __getitem__(self,_):raise AttributeError("PRIVATE-NATIVE-BINDING-ERROR")
+    case.algo.history=MissingNativeMethod()
+    with pytest.raises(ValueError,match="^CMP28_MARK_REFUSAL ") as error:case.algo._daily_audit()
+    counts=case.algo._mark_verification_summary()
+    assert counts["daily_claims_attempted"]==counts["daily_claims_verified"]==1 and counts["daily_requests"]==0
+    assert "PRIVATE-NATIVE-BINDING-ERROR" not in str(error.value) and not case.accounted

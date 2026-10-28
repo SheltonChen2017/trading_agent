@@ -87,6 +87,16 @@ def policy():
             "sizing_nav": "prior close", "prior_session_volume_limit": "0.01",
             "fees_usd_per_share": "0.01", "slippage_per_side": "0.001",
             "corporate_actions": "native RAW; affirmative known share-basis evidence required"},
+        "valuation_verification_contract": {
+            "mode": "strict_minute_or_raw_daily_equal_close_v1", "all_five_arms": True,
+            "primary": "real same-session minute cache ends exactly at native exchange close",
+            "corroboration": "earlier real same-session minute cache only; exactly1 native exact-SID current-session RAW DAILY non-fill-forward regular-hours bar ending at native close<=now",
+            "price": "positive finite daily.close exactly equals unchanged security.price and cached.price; positive volume",
+            "history_range": "local session midnight through captured16:01; max2rows; no future/date widening",
+            "custody": "actual project/job before and after request/enumeration; unchanged native cache/clock/price/quantity/cash/NAV snapshots",
+            "refuse": "missing/duplicate/wrongSID/wrongday/fillforward/future/zero-volume/unequal-price; no timestamp rewrite, mark substitution or exclusion",
+            "provenance": "retain original minute endpoint and independent DAILY session-close endpoint; DAILY aggregate is not proof of a final-minute trade",
+            "decision_id": "TPR-CMP104-D009"},
         "signal_contract": {
             "formula": "exploratory nominal new/prior target minus1, clipped[-1,1]; not canonical price-scaled TPR",
             "aggregation": "firm/security/eligible-session median;20-session half-life;80-session truncation; sum within firm then median firms",

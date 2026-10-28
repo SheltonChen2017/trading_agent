@@ -37,7 +37,24 @@ MAX_RECORD = 512 * 1024
 MAX_BYTES = 256 * 1024 * 1024
 MAX_RECORDS = 300000
 MAX_CHUNKS = 1024
+MARK_MODE = "strict_minute_or_raw_daily_equal_close_v1"
+MAX_DAILY_CLOSE_CLAIMS = 86940
+MARK_REFUSAL_CODES = frozenset(("valuation_clock", "not_real_minute_trade_bar",
+    "minute_or_native_close_wrong_day_or_future", "ineligible_minute_or_precise_daily_clock",
+    "native_job_custody", "native_raw_config_unproven", "native_cache_reference_changed",
+    "captured_price_or_clock_mismatch", "native_snapshot_changed", "daily_scope_already_attempted",
+    "daily_count_not_exactly_one", "daily_identity_type_or_clock", "daily_price_or_volume_mismatch",
+    "daily_native_request_or_representation_failed", "mark_native_or_representation_failed",
+    "daily_access_claim_key_exists_or_unknown", "daily_access_claim_publication_failed",
+    "daily_access_claim_readback_mismatch", "daily_access_claim_budget_exhausted"))
 KIND_NAMES = frozenset(("SUBSCRIPTION", "MEMBERSHIP", "CAPS", "COVERAGE", "FACTOR", "ORDER", "FILL", "ACTION", "NAV", "SUMMARY"))
+
+
+class MarkCorroborationRefused(ValueError):
+    """Fixed internal reason code, never a native exception/data body."""
+    def __init__(self, code):
+        self.code = code
+        super().__init__("CMP28 mark corroboration refused")
 
 
 class MarkWitnessStopped(BaseException):
@@ -277,6 +294,7 @@ class ComparisonOffAlgorithm(execution.TargetPriceExtendedAlgorithm):
         self._factor_provider = self._initialized_factor_provider()
         self._signal_store = None  # No signal module, packet, admission flag or fallback.
         self._mark_refusal_witness_attempted = False
+        self._initialize_mark_verification()
         self._identities, self._source_ticker_bridge, self._frames = {}, {}, {}
         self.set_start_date(2021, 1, 4)
         self.set_end_date(2026, 10, 9)
@@ -512,7 +530,7 @@ class ComparisonOffAlgorithm(execution.TargetPriceExtendedAlgorithm):
         again. There is no History call, price field, overwrite or retry. Only
         the small safe pointer/predicate envelope is eligible for public logs.
         """
-        pointer = {"schema": "tpr-cmp28-mark-refusal-pointer-v1", "status": "not_published",
+        pointer = {"schema": "tpr-cmp28-mark-refusal-pointer-v2", "status": "not_published",
             "key": None, "bytes": None, "expected_sha256": None, "verified_sha256": None,
             "readback_verified": False, "data_type": "trade_bar", "predicates": {
                 "observed_equals_expected": observed == close,
@@ -536,7 +554,7 @@ class ComparisonOffAlgorithm(execution.TargetPriceExtendedAlgorithm):
             sid = str(symbol.id)
             if not 0 < len(sid) <= 256 or sid.strip() != sid or any(ord(char) < 32 or ord(char) == 127 for char in sid):
                 _fail()
-            body = {"schema": "tpr-cmp28-private-mark-refusal-v1", "study_id": STUDY,
+            body = {"schema": "tpr-cmp28-private-mark-refusal-v2", "study_id": STUDY,
                 "candidate_id": config["candidate_id"], "arm": config["arm"],
                 "operation_id": config["operation_id"], "attempt": config["attempt"],
                 "config_sha256": self._evidence._config_hash,
@@ -546,7 +564,8 @@ class ComparisonOffAlgorithm(execution.TargetPriceExtendedAlgorithm):
                 "algorithm_utc": now.isoformat(), "algorithm_local": now.astimezone(NY).isoformat(),
                 "expected_close_utc": close.isoformat(), "expected_close_local": close.astimezone(NY).isoformat(),
                 "observed_end_utc": observed.isoformat(), "observed_end_local": observed.astimezone(NY).isoformat(),
-                "predicates": dict(pointer["predicates"]), "guard_unchanged": True,
+                "predicates": dict(pointer["predicates"]), "valuation_verification_mode": MARK_MODE,
+                "verification_policy_extended": True,
                 "source_inputs_admitted": False, "strategy_accepted": False, "canonical_admission": False}
             raw = _wire(body)
             if not 0 < len(raw) <= 4096:
@@ -600,36 +619,245 @@ class ComparisonOffAlgorithm(execution.TargetPriceExtendedAlgorithm):
             raise MarkWitnessStopped("CMP28 mark witness stopped") from None
         return pointer
 
-    def _daily_audit(self):
-        if not self.is_warming_up and self.time.date().isoformat() in core.VALUATIONS and self.time.time() != time(16, 1):
+    def _initialize_mark_verification(self):
+        contract = comparison.policy()["valuation_verification_contract"]
+        if contract["mode"] != MARK_MODE or contract["decision_id"] != "TPR-CMP104-D009" or contract["all_five_arms"] is not True:
             _fail()
+        self._mark_verification_counts = {"strict_minute_marks": 0, "daily_requests": 0,
+            "daily_claims_attempted": 0, "daily_claims_verified": 0,
+            "daily_corroborated_marks": 0, "refused_marks": 0}
+        self._mark_history_attempts = set()
+
+    def _mark_verification_summary(self):
+        if not hasattr(self, "_mark_verification_counts"):
+            self._initialize_mark_verification()
+        return {"mode": MARK_MODE, "decision_id": "TPR-CMP104-D009",
+            **self._mark_verification_counts, "minute_endpoints_rewritten": 0, "prices_substituted": 0}
+
+    def _reject_mark(self, symbol, close, observed, code, data_type="trade_bar"):
+        self._mark_verification_summary()
+        self._mark_verification_counts["refused_marks"] += 1
+        if isinstance(close, datetime) and isinstance(observed, datetime) and symbol is not None:
+            pointer = self._retain_mark_refusal_witness(symbol, close, observed)
+        else:
+            pointer = {"schema": "tpr-cmp28-mark-refusal-pointer-v2", "status": "clock_witness_unavailable",
+                "key": None, "bytes": None, "expected_sha256": None, "verified_sha256": None,
+                "readback_verified": False, "data_type": data_type, "predicates": {}}
+        pointer["reason_code"] = code if type(code) is str and code in MARK_REFUSAL_CODES else "mark_native_or_representation_failed"
+        pointer["valuation_verification_mode"] = MARK_MODE
+        notice = "CMP28_MARK_REFUSAL " + json.dumps(pointer, sort_keys=True, separators=(",", ":"))
+        try:
+            self.log(notice)
+        except KeyboardInterrupt:
+            raise KeyboardInterrupt("CMP28 mark refusal notice cancelled") from None
+        except Exception:
+            pass
+        except BaseException:
+            raise MarkWitnessStopped("CMP28 mark refusal notice stopped") from None
+        # The safe pointer survives when QC's queued Log messages are lost.
+        raise ValueError(notice) from None
+
+    def _corroborate_raw_daily_close(self, held, security, last, close, observed, now):
+        """D009: corroborate the unchanged price, never rewrite cache or clock."""
+        def refuse(code):
+            raise MarkCorroborationRefused(code) from None
+        try:
+            from System import Object as NetObject
+            from QuantConnect import AlgorithmSettings
+            from QuantConnect.Data import SubscriptionDataConfig
+            symbol, sid = held.symbol, str(held.symbol.id)
+            settings = self.settings
+            if (not isinstance(settings, AlgorithmSettings) or self.settings.daily_precise_end_time is not True
+                    or not isinstance(last.period, timedelta) or last.period != timedelta(minutes=1)
+                    or last.is_fill_forward is not False or last.symbol != symbol
+                    or self._native_clock(last.time, "America/New_York") + timedelta(minutes=1) != observed
+                    or observed.astimezone(NY).date() != now.astimezone(NY).date()
+                    or not observed < close <= now or close.astimezone(NY).date() != now.astimezone(NY).date()
+                    or self._native_clock(self.time,"America/New_York") != now):
+                refuse("ineligible_minute_or_precise_daily_clock")
+            prefix = self._evidence.require_binding()
+            project, job = self.project_id, self.algorithm_id
+            if (type(project) is not int or project != self._config["project_id"]
+                    or type(job) is not str or _identity(job) != job
+                    or not prefix.endswith("/"+str(project)+"/"+job+"/")):
+                refuse("native_job_custody")
+            def raw_snapshot():
+                actual, configs = self._raw_security_configs(symbol)
+                if (not NetObject.ReferenceEquals(actual, security) or not configs or len(configs)>64
+                        or any(not isinstance(row, SubscriptionDataConfig) or row.symbol != symbol
+                            or row.is_internal_feed is not False or row.data_normalization_mode != DataNormalizationMode.RAW
+                            for row in configs)
+                        or not any(row.resolution == Resolution.MINUTE and row.tick_type == TickType.TRADE
+                            and row.type.FullName == "QuantConnect.Data.Market.TradeBar" for row in configs)):
+                    refuse("native_raw_config_unproven")
+                current_held = self.portfolio[symbol]
+                current = security.get_last_data()
+                if (not NetObject.ReferenceEquals(current_held, held) or not NetObject.ReferenceEquals(current, last)
+                        or not isinstance(current, TradeBar) or current.is_fill_forward is not False
+                        or current.symbol != symbol or not isinstance(current.period, timedelta)):
+                    refuse("native_cache_reference_changed")
+                return {"cache": security.cache, "values": {
+                    "cache_time_utc": self._native_clock(current.time,"America/New_York").isoformat(),
+                    "cache_end_utc": self._native_clock(current.end_time,"America/New_York").isoformat(),
+                    "cache_period_microseconds": current.period//timedelta(microseconds=1),
+                    "cache_symbol_id": str(current.symbol.id), "cache_fill_forward": current.is_fill_forward,
+                    "cache_price": core.native_fraction(current.price), "security_price": core.native_fraction(security.price),
+                    "quantity": core.native_fraction(current_held.quantity), "cash": core.native_fraction(self.portfolio.cash),
+                    "nav": core.native_fraction(self.portfolio.total_portfolio_value),
+                    "holdings_value": core.native_fraction(self.portfolio.total_holdings_value),
+                    "algorithm_utc": self._native_clock(self.utc_time,"UTC").isoformat(), "algorithm_local": self.time.isoformat(),
+                    "raw_configs": sorted((str(row.symbol.id),str(row.resolution),str(row.tick_type),row.type.FullName,
+                        str(row.data_normalization_mode),row.extended_market_hours,row.fill_data_forward) for row in configs)}}
+            before = raw_snapshot()
+            if (before["values"]["cache_price"] <= 0 or before["values"]["cache_price"] != before["values"]["security_price"]
+                    or before["values"]["cache_end_utc"] != observed.isoformat()
+                    or before["values"]["algorithm_utc"] != now.isoformat()):
+                refuse("captured_price_or_clock_mismatch")
+            def bound():
+                if (self._evidence.require_binding() != prefix or self.project_id != project or self.algorithm_id != job
+                        or self.get_locked() is not True or not isinstance(self.settings, AlgorithmSettings)
+                        or not NetObject.ReferenceEquals(settings,self.settings) or self.settings.daily_precise_end_time is not True):
+                    refuse("native_job_custody")
+                after = raw_snapshot()
+                if not NetObject.ReferenceEquals(before["cache"], after["cache"]) or before["values"] != after["values"]:
+                    refuse("native_snapshot_changed")
+            def guarded(call):
+                bound()
+                try:
+                    value = call()
+                except BaseException as first:
+                    try:
+                        bound()
+                    except BaseException as second:
+                        if isinstance(second, KeyboardInterrupt): raise second
+                        if isinstance(first, KeyboardInterrupt) or not isinstance(first, Exception): raise first
+                        if not isinstance(second, Exception): raise second
+                    raise
+                bound()
+                return value
+            scope = (now.astimezone(NY).date().isoformat(), sid)
+            if scope in self._mark_history_attempts:
+                refuse("daily_scope_already_attempted")
+            if self._mark_verification_counts["daily_claims_attempted"] >= MAX_DAILY_CLOSE_CLAIMS:
+                refuse("daily_access_claim_budget_exhausted")
+            self._mark_history_attempts.add(scope)  # Spent BEFORE claim/publication/History effects.
+            self._mark_verification_counts["daily_claims_attempted"] += 1
+            start, end = datetime.combine(self.time.date(),time()), self.time
+            claim = {"schema": "tpr-cmp28-daily-close-access-claim-v1", "study_id": STUDY,
+                "mode": MARK_MODE, "decision_id": "TPR-CMP104-D009", "candidate_id": self._config["candidate_id"],
+                "arm": self._config["arm"], "operation_id": self._config["operation_id"], "attempt": self._config["attempt"],
+                "project_id": project, "job_id": job, "config_sha256": self._evidence._config_hash,
+                "parent_config_sha256": self._evidence._config_hash,
+                "source_template_closure_sha256": self._config["source_template_closure_sha256"],
+                "policy_sha256": self._config["policy_sha256"], "calendar_sha256": self._config["calendar_sha256"],
+                "security_id": sid, "session": scope[0], "spent_before_effect": True,
+                "request": {"start_local": start.isoformat(), "end_local": end.isoformat(), "resolution": "DAILY",
+                    "normalization": "RAW", "fill_forward": False, "extended_market_hours": False, "max_rows": 2},
+                "scope": "exact-held-SID-current-session-close-corroboration-only",
+                "parent_external_operation_manifest_required": True, "permission_issued": False,
+                "outcome_permission": False, "source_inputs_admitted": False, "canonical_admission": False}
+            claim_raw = _wire(claim)
+            if not 0 < len(claim_raw) <= 4096:
+                refuse("daily_access_claim_publication_failed")
+            claim_key = prefix + "daily-close-claims/" + scope[0] + "-" + hashlib.sha256(sid.encode("utf-8")).hexdigest() + ".json"
+            claim_hash = hashlib.sha256(claim_raw).hexdigest()
+            try:
+                exists = guarded(lambda: self.object_store.contains_key(claim_key))
+                if type(exists) is not bool or exists:
+                    refuse("daily_access_claim_key_exists_or_unknown")
+                saved = guarded(lambda: self.object_store.save_bytes(claim_key, claim_raw))
+                if saved is not True:
+                    refuse("daily_access_claim_publication_failed")
+                readback = native_bytes(guarded(lambda: self.object_store.read_bytes(claim_key)),4096)
+                if len(readback) != len(claim_raw) or hashlib.sha256(readback).hexdigest() != claim_hash or readback != claim_raw:
+                    refuse("daily_access_claim_readback_mismatch")
+            except KeyboardInterrupt:
+                raise
+            except MarkCorroborationRefused:
+                raise
+            except Exception:
+                refuse("daily_access_claim_publication_failed")
+            self._mark_verification_counts["daily_claims_verified"] += 1
+            claim_pointer = {"key": claim_key, "sha256": claim_hash, "bytes": len(claim_raw)}
+            def request_history():
+                method = self.history[TradeBar]
+                self._mark_verification_counts["daily_requests"] += 1
+                return method(symbol, start, end, Resolution.DAILY,
+                    fill_forward=False, extended_market_hours=False, data_normalization_mode=DataNormalizationMode.RAW)
+            history = guarded(request_history)
+            iterator = guarded(lambda: iter(history))
+            sentinel = object()
+            daily = guarded(lambda: next(iterator, sentinel))
+            second = guarded(lambda: next(iterator, sentinel))
+            if daily is sentinel or second is not sentinel:
+                refuse("daily_count_not_exactly_one")
+            if (not isinstance(daily, TradeBar) or daily.symbol != symbol or daily.is_fill_forward is not False
+                    or self._native_clock(daily.time,"America/New_York").astimezone(NY).date() != self.time.date()
+                    or self._native_clock(daily.end_time,"America/New_York") != close or close > now):
+                refuse("daily_identity_type_or_clock")
+            daily_price, volume = core.native_fraction(daily.close), core.native_fraction(daily.volume)
+            if daily_price <= 0 or volume <= 0 or daily_price != before["values"]["security_price"] or daily_price != before["values"]["cache_price"]:
+                refuse("daily_price_or_volume_mismatch")
+            bound()
+            self._log_audit("NAV", {"record_type": "raw_daily_equal_close_corroboration", "schema": "tpr-cmp28-raw-daily-close-proof-v1",
+                "session": scope[0], "security_id": sid, "mode": MARK_MODE, "decision_id": "TPR-CMP104-D009",
+                "project_id": project, "job_id": job, "config_sha256": self._evidence._config_hash,
+                "source_template_closure_sha256": self._config["source_template_closure_sha256"],
+                "policy_sha256": self._config["policy_sha256"], "calendar_sha256": self._config["calendar_sha256"],
+                "request": {"start_local": start.isoformat(), "end_local": end.isoformat(), "resolution": "DAILY",
+                    "normalization": "RAW", "fill_forward": False, "extended_market_hours": False, "max_rows": 2},
+                "original_minute_end_utc": observed.isoformat(), "daily_end_utc": close.isoformat(),
+                "daily_time_utc": self._native_clock(daily.time,"America/New_York").isoformat(),
+                "daily_close": daily_price, "daily_volume": volume, "native_snapshot": before["values"],
+                "daily_access_claim": claim_pointer,
+                "minute_endpoint_equals_close": False, "daily_price_equals_unchanged_cache": True,
+                "native_snapshot_unchanged": True, "source_inputs_admitted": False, "canonical_admission": False})
+            bound()
+            self._mark_verification_counts["daily_corroborated_marks"] += 1
+        except KeyboardInterrupt:
+            raise KeyboardInterrupt("CMP28 daily close corroboration cancelled") from None
+        except MarkCorroborationRefused:
+            raise
+        except Exception:
+            raise MarkCorroborationRefused("daily_native_request_or_representation_failed") from None
+        except BaseException:
+            raise MarkWitnessStopped("CMP28 daily close corroboration stopped") from None
+
+    def _daily_audit(self):
+        self._mark_verification_summary()
+        if not self.is_warming_up and self.time.date().isoformat() in core.VALUATIONS and self.time.time() != time(16, 1):
+            self._reject_mark(None,None,None,"valuation_clock","unavailable")
         if not self.is_warming_up and self.time.date().isoformat() in core.VALUATIONS:
             for held in self.portfolio.values():
                 if not held.invested:
                     continue
-                security = self._assert_raw_subscriptions(held.symbol)
-                last = security.get_last_data()
-                if not isinstance(last, TradeBar):
-                    _fail()
-                # Same-day alone is insufficient: a 09:31 stale cache must not
-                # masquerade as a close. Native hours also honor half-days.
-                # Query from this LOCAL session's midnight. From16:01 the
-                # supported next-close API would select the following session.
-                session_start = datetime.combine(self.time.date(), time())
-                expected_close = security.exchange.hours.get_next_market_close(session_start, False)
-                close = self._native_clock(expected_close, "America/New_York")
-                observed = self._native_clock(last.end_time, "America/New_York")
-                if observed != close or close.date() != self._native_clock(self.utc_time, "UTC").date():
-                    pointer = self._retain_mark_refusal_witness(held.symbol, close, observed)
-                    try:
-                        self.log("CMP28_MARK_REFUSAL " + json.dumps(pointer, sort_keys=True, separators=(",", ":")))
-                    except KeyboardInterrupt:
-                        raise KeyboardInterrupt("CMP28 mark witness notice cancelled") from None
-                    except Exception:
-                        pass  # A failed notice never replaces or relaxes refusal.
-                    except BaseException:
-                        raise MarkWitnessStopped("CMP28 mark witness notice stopped") from None
-                    _fail()
+                close = observed = last = None
+                try:
+                    security = self._assert_raw_subscriptions(held.symbol)
+                    last = security.get_last_data()
+                    if not isinstance(last, TradeBar) or last.is_fill_forward is not False or last.period != timedelta(minutes=1):
+                        raise MarkCorroborationRefused("not_real_minute_trade_bar")
+                    session_start = datetime.combine(self.time.date(),time())
+                    close = self._native_clock(security.exchange.hours.get_next_market_close(session_start,False),"America/New_York")
+                    observed = self._native_clock(last.end_time,"America/New_York")
+                    now = self._native_clock(self.utc_time,"UTC")
+                    if (observed.astimezone(NY).date() != self.time.date() or close.astimezone(NY).date() != self.time.date()
+                            or observed > close or close > now):
+                        raise MarkCorroborationRefused("minute_or_native_close_wrong_day_or_future")
+                    if observed == close:
+                        self._mark_verification_counts["strict_minute_marks"] += 1
+                    else:
+                        self._corroborate_raw_daily_close(held,security,last,close,observed,now)
+                except KeyboardInterrupt:
+                    raise KeyboardInterrupt("CMP28 mark verification cancelled") from None
+                except MarkCorroborationRefused as error:
+                    self._reject_mark(held.symbol,close,observed,error.code,
+                        "trade_bar" if isinstance(last,TradeBar) else "not_trade_bar")
+                except Exception:
+                    self._reject_mark(held.symbol,close,observed,"mark_native_or_representation_failed",
+                        "trade_bar" if isinstance(last,TradeBar) else "unavailable")
+                except BaseException:
+                    raise MarkWitnessStopped("CMP28 mark verification stopped") from None
         return super()._daily_audit()
 
     def on_end_of_algorithm(self):
@@ -663,7 +891,8 @@ class ComparisonOffAlgorithm(execution.TargetPriceExtendedAlgorithm):
             "position_ledger_mismatches": self._position_ledger_mismatches, "risk_breaches": self._risk_breaches,
             "max_name_exposure": self._max_name_exposure, "name_soft_cap_breaches": self._name_soft_cap_breaches,
             "clock_assertions": self._clock_assertions, "reason_counts": dict(self._reasons),
-            "delisting_audit": self._delisting_audit, "source_inputs_admitted": False,
+            "delisting_audit": self._delisting_audit, "mark_verification": self._mark_verification_summary(),
+            "source_inputs_admitted": False,
             "native_basis_authenticated": False, "full_evidence_retrieval_verified": False,
             "strategy_accepted": False, "canonical_admission": False, "accepted_performance": None}
         self._log_audit("SUMMARY", summary)

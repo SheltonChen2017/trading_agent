@@ -26880,3 +26880,132 @@ recovery authority remain in effect; the historical old-study3failures and33
 looks are not reset. The next step is exact error/pointer diagnosis under NEW
 bounded scopes, not an unchanged economic relaunch. No root cause or staleness
 exception is inferred from terminal status alone.
+
+Fresh bounded native phase TPR-CMP28-API-OFF-MARKLOG-20261028-001/d4f018de5e81d629c4e25c8a9621b17bde9c432f5c8ff5d656f3ba65d90e539f at d9e2e995fd585d3c870ceaabb350109c12ae8b3e before1 exact requests/60s/262144B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Owner explicitly renewed genuine Mia-for-fix authority. Fresh current source capture007/62a23ef7753aca7972094230378c0b0b3a7900923321a5a7a0a84258d2942e95 at d9e2e995fd585d3c870ceaabb350109c12ae8b3e before two bounded all-source reads24files/8MiB/120s; no edit/compile/job or private data access in capture. Separate bounded Mia fix manifest/reservations remain required before any task.
+
+Fresh exact runtime003 diagnosis 59cd882e4bf1f147e44953232df959649407fa62981b5d3989c5a936cd7ee95f at d9e2e995fd585d3c870ceaabb350109c12ae8b3e before49305B/2private response reads,120s/no newnative effect or economicmetric projection.
+
+Fresh genuine Mia-for-fix scope TPR-CMP28-MIA-OFF-FIX-20261028-001/7bf6182055e33db156f2a377120d4eee98cfa42930fdc0e0dc7867eb4f4e71df at d9e2e995fd585d3c870ceaabb350109c12ae8b3e before Safari setup/oneNewChat/oneSend,900s/24UIcalls; own20sourcefiles4MiB/200loglines/100orderrecords/one<=4096B exactnativeprice-freewitness only if genuine reader available. Promptc28606ae98eeedb5929b70e9316d66fbd95eb5f3458277a1ba05b385d5940759; ZERO sourceedit/compile/job/notebook/History/provider/export/account effects. This obtains a concrete fix for root verification and native run; no routine Claude checkpoint or fabricated adapter. Baseline007/8b0206c8732e82980968e770f6498aa81af604eb282701be47ea3bbaa8b7b5a3 retained; source comparison remains required afterward.
+
+During fresh Mia-for-fix setup the prior same-project completed task now exposes a final diagnosis that was absent from the earlier viewport. Fresh final-read TPR-CMP28-MIA-MARK-FINAL-READ-20261028-001/3d4095b0ea89055837d78089635724fc9d40133cfbcc1907fe78af961e9abbec at d9e2e995fd585d3c870ceaabb350109c12ae8b3e before <=8000char/max2read processing,120s/zeroeffects/no raw order payload expansion. No previously unobserved cause is presumed.
+
+### 104.19 Prospective equal-close verification decision and Mia-for-fix
+
+The genuine first Mia consultation's final prose became visible after its UI
+showed Completed. It confirms the guard location and that a held security was
+iterated. Its source/log/order review found no orders in that run for either
+factor-warning symbol, so that coincident warning is not the proved held-name
+trigger. Exact failed SID/bar/time remain unknown. The cache/fill-forward
+mechanism is consistent with evidence, not proved for that job. No source,
+compile/job or History effect was performed by that consultation. The earlier
+source/log-only prompt's order-read scope deviation remains recorded above;
+this final prose does not erase it or make a definitive causal claim.
+
+A separate genuine Mia-for-fix task was sent ONCE and visibly became Running:
+TPR-CMP28-MIA-OFF-FIX-20261028-001, prompt2117B/c28606ae98eeedb5929b70e9316d66fbd95eb5f3458277a1ba05b385d5940759,
+claim7bf6182055e33db156f2a377120d4eee98cfa42930fdc0e0dc7867eb4f4e71df.
+It may inspect the explicitly bounded own source/job evidence and propose a
+concrete patch. It has zero source-edit/compile/job/History/notebook/export
+permission; root verifies and runs any correction with new manifests.
+
+Decision CMP104-D009 under the owner's explicit best-judgment/delegated
+continuing authority prospectively adopts ONE common5-arm valuation
+verification mode: strict minute-cache close equality, OR fresh independent
+native RAW daily close corroboration of the EXACT SAME economic price. This
+changes the verification policy and source/config/policy hashes; it is NOT
+called an unchanged strict-minute check. All three earlier strict failures,
+source snapshots and observations remain. No performance result informed a
+parameter, stock, coefficient, date, weight, cash or cost choice.
+
+The corroboration branch is allowed ONLY for a real non-fill-forward minute
+cache from the SAME local session that ends EARLIER than native session close.
+Future, wrong-day, non-TradeBar or fill-forward cache observations still refuse.
+One exact native held-Symbol typed TradeBar DAILY/RAW/no-fill-forward/no-extended
+request covers current session midnight through captured16:01, never future.
+Consume at most2 rows, require exactly1 non-fill-forward native bar for that
+SID/current session, native precise EndTime==exchange close<=now, positive
+finite price/volume and exact represented daily-close==existing security.price
+==existing cached.price. No historical wrapper or minute timestamp is manually
+changed. Any missing, duplicate, wrong-identity/day, zero-volume, adjusted,
+fill-forward, future or unequal-price observation refuses; no best-row choice,
+range widening, mark substitution, cache update or holding exclusion occurs.
+Actual source/project/job custody surrounds History request/enumeration, and
+original native price/cache/clocks/quantity/cash/NAV snapshots must be unchanged.
+The independent proof is retained privately with both original minute clock
+and daily session endpoint, request options/source/config/job and parity.
+Inherited RAW action/quantity/cash/NAV/cent/risk checks remain mandatory.
+
+This recognizes a native DAILY session aggregate as fresh session-close
+corroboration; it does NOT claim a trade occurred in the final minute or turn
+fill-forward into a trade. It proves neither rights, historical PIT/share basis,
+canonical acceptance nor genuine operator authority. A source marker cannot
+substitute for the actual native typed observation and all exact predicates.
+New compile/runtime/access/History bounds and retained attempts/looks must be
+published before effect. Decision CMP104-D010 additionally transports only a
+bounded safe witness/predicate envelope in the ordinary mark-refusal error if
+the deferred public log is lost on RuntimeError; cancellation/nonordinary fatal
+bodies remain fixed/body-free. No raw SID/price/absolute private clock enters
+that public envelope.
+
+Root compared every existing new-study policy JSON field to committedd9e2e995...: all existing fields equal; ONLY explicit prospective valuation_verification_contract added. No date/universe/rank/tilt/order/cash/fee/slippage/action change. The own failed-run dashboard was incidentally visible during Mia text-field screenshot setup: this is a separately retained UI partial-outcome VIEW of existinglook003, not a newcandidate/job or accepted full-window outcome; displayed partial figures are unvalidated and do not inform parameter/selection choices. No performance conclusions follow. Future Mia observations use bounded AX task text to avoid unnecessary dashboard views.
+
+Genuine Mia-for-fix task now visibly Completed. Fresh post-consultation all-source capture008/02270913a8ca877a2115168f797fad23ed4dc3fbc82f00ab6fe7eb472e2084cd at d9e2e995fd585d3c870ceaabb350109c12ae8b3e before two source reads24files/8MiB/120s; no data/history or newjob. Root will retain every source/diff and verify any actualchanges before its next upload.
+
+Fresh exact Mia-for-fix whole-file source diff TPR-CMP28-MIA-FIX-SOURCE-DIFF-20261028-001/9cb2b0adfd35ebd8c46043a286e62ef990460f45714008ab9fb1376ee0777472 at d9e2e995fd585d3c870ceaabb350109c12ae8b3e before658668B/2privatearchives,120s/no data/outcome/nativeeffects.
+
+Mia-for-fix actualsourcecomparison: all20files identical/0changes, fullprivate diff3f14fd9c3cd3b51ae3c0e3ca924b2deff13685bff7488f86b82a44f1e400dc54, inventory9a47b4e6c527b05d856b9b130c333ded2eed7f5d0b0e7dd734f56628b38f9714. No cloud corrections orMia native runs to port. Actual read/propose outcome is accepted only after corrections below.
+
+### 104.20 Mia fix disposition and completed native-recovery source
+
+Genuine Mia-for-fix001 visibly completed a read/propose answer. Actual observed
+tools were source/file read/search and failed-job log search, with no observed
+edit/compile/job/History/notebook/provider effect. All20cloudfiles are identical
+before/after, complete588B private diff3f14fd9c3cd3b51ae3c0e3ca924b2deff13685bff7488f86b82a44f1e400dc54.
+Mia confirms the guard location and recommends daily-close price corroboration
+with retained accounting. Root accepts that concept underD009 after primary
+API/source verification and stronger native guards. Exact failed SID/bar and
+cache mechanism remain unknown. Mia's assertion that the ObjectStore key is
+absent has no captured direct metadata/read attestation and is NOT accepted.
+Its phrase first valuation session for February10 is incorrect: the frozen
+axis starts January4, still1449valuations/301decisions.
+
+The literal patch is not ported: it omits explicit RAW/regular-hours, exact
+session range/SID/non-fill-forward/type/volume, bounded enumeration and native
+state/custody proof. Its public SID/absolute-close log is rejected. Chat
+Completed is not native/economic acceptance. No scratch native experiment,
+subscription change, raw download or undocumented reader is substituted.
+The final answer was inspected across a long UI interaction; its exact time
+relative to the15-minute UI-scope expiry is not independently attested. Root
+does not claim every late UI read was within that expiry. Further Mia access
+requires a fresh time-checked scope; no spent scope is silently renewed.
+
+Final D009/D010 code enforces <=86940fresh immutable per-SID/session native
+access claims. Each <=4096B plain claim binds operation/attempt/config/source-
+template/policy/calendar/project/actualjob/exactSID/session/request and the
+external HEAD-manifest chain. RAM spent is set BEFORE effects; only absent
+boolFalse ->saveTrue->exact bytes/length/SHA readback permits History, with
+intrinsic custody and unchanged full money/cache state around each action.
+No confirmed claim means NO History/no retry. Actual History calls remain
+distinct from attempted/verified claims; method-binding failure invents none.
+Private NAV-kind proof references the verifiedclaim and is distinct from the
+1449 accounting valuations. Future witness/pointerv2 honestly names D009 and
+closed reason codes; historicalv1/strict failures remain. Safe ordinary error
+pointers survive lost queued logs, with no rawSID/price/absoluteprivateclock.
+
+Final OFF54939B/27c6516b9dfd2d1e71f0ef8fbdb7c371266e36e11bd9e3089e2ce6b76d25aee0;
+multi30717B/201d1fa0ffa5f2771eb245997c6c160119e9cf766300d254615bcfc76eb49e34;
+OFFrenderer11106B/76637ed47522b6f4eb0a8e19d0962afce5e08cd249d28348dc1204547ee71b6a;
+multirenderer12187B/390aca2a8c09c06b542403cc10e46fa54d336c48f742f05fd7c85f1ef10ebad2;
+policy5849B/2cfeca1b9058f3587a6d5c98df0e6b1ed10b25cdc4398b24a3525130da6425b2;
+core20941B/e9b1f513fe453fcd47408171ecbc4342a9321195405c2ce31b7591439f5f44c5.
+Calendar590b0e7c143093ea114783b77d08bf6f72fb85b929d2ea9fb640f9ac6eb0df19
+changes its policy binding; dates/counts unchanged. Multi15activefiles/max59774B
+stay within actual readable-source bounds. Core86passed0.66s; author328focused
+passed12.46s; purev2helper103passed0.53s; independent finalclaim19passed1.16s.
+Root final union output is retained separately. Source fixtures prove no native
+acceptance. Root immediately reserves OFF4/launches under fresh scopes; no
+Claude checkpoint or premature push.
+
+Root final five-module focused union431passed12.52s; independent final durableclaim19passed1.16s; all source changes remain lane-owned, no native result accepted. Commit is local preparation for immediate actual OFF4 recovery; exactlyone successful final push remains outstanding.

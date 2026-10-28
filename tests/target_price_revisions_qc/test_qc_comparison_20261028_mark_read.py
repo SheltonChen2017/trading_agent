@@ -167,3 +167,114 @@ def test_prepared_binding_is_an_independent_copy():
     copy['source_hashes'][m.MODULE] = 'b'*64
     assert binding['source_hashes'] != copy['source_hashes']
     assert binding['object_download_authorized'] is binding['native_effects_authorized'] is False
+
+
+def fixture_v2(*, reason='daily_price_or_volume_mismatch', **clock_arguments):
+    body, _, _, _ = fixture(**clock_arguments)
+    del body['guard_unchanged']
+    body.update(schema='tpr-cmp28-private-mark-refusal-v2', operation_id='TPR-CMP28-OFF-SYNTHETIC004',
+        attempt=4, job_id='2'*32, config_sha256='8'*64, source_template_closure_sha256='7'*64,
+        policy_sha256='9'*64, calendar_sha256='6'*64, valuation_verification_mode=m.V2_MODE,
+        verification_policy_extended=True)
+    return body, *bind_v2(body, reason=reason)
+
+
+def bind_v2(body, *, reason='daily_price_or_volume_mismatch', raw=None):
+    raw = wire(body) if raw is None else raw
+    binding = m.prepare_binding_v2(operation_id='TPR-CMP28-MARK-SYNTHETIC002', git_head='b'*40,
+        source_hashes={name: hashlib.sha256((ROOT/name).read_bytes()).hexdigest() for name in (m.MODULE, m.PRODUCER)},
+        off_operation_id='TPR-CMP28-OFF-SYNTHETIC004', attempt=4, job_id='2'*32,
+        config_sha256='8'*64, source_template_closure_sha256='7'*64, policy_sha256='9'*64,
+        calendar_sha256='6'*64, expected_sha256=hashlib.sha256(raw).hexdigest(), expected_bytes=len(raw))
+    pointer = {'schema': 'tpr-cmp28-mark-refusal-pointer-v2', 'status': 'verified', 'key': binding['key'],
+        'bytes': len(raw), 'expected_sha256': binding['expected_sha256'], 'verified_sha256': binding['expected_sha256'],
+        'readback_verified': True, 'data_type': 'trade_bar', 'predicates': dict(body['predicates']),
+        'reason_code': reason, 'valuation_verification_mode': m.V2_MODE}
+    return raw, binding, pointer
+
+
+@pytest.mark.parametrize('reason', sorted(m.V2_REASONS))
+def test_v2_closed_reasons_and_extended_verification_do_not_authenticate_policy_or_admit_marks(reason):
+    body, raw, binding, pointer = fixture_v2(reason=reason)
+    result = m.project_witness_v2(raw, binding=binding, pointer=pointer)
+    assert binding['schema']=='tpr-cmp28-mark-read-binding-v2'
+    assert result['schema']=='tpr-cmp28-safe-mark-witness-v2'
+    assert result['valuation_verification_mode']==m.V2_MODE and result['reason_code']==reason
+    assert result['verification_policy_extended'] is True and result['verification_policy_authenticated'] is False
+    assert result['source_inputs_admitted'] is result['strategy_accepted'] is result['canonical_admission'] is False
+    assert result['native_effects_performed']==result['private_reads_performed']==0
+    assert result['observed_minus_expected_microseconds']==-60000000
+    public=json.dumps(result)
+    assert all(body[name] not in public for name in ('security_id', 'algorithm_utc', 'algorithm_local',
+        'expected_close_utc', 'expected_close_local', 'observed_end_utc', 'observed_end_local'))
+    assert binding['key'] not in public and 'guard_unchanged' not in result
+
+
+def test_v2_contract_matches_exact_public_producer_mode_codes_and_schema_fields():
+    tree=ast.parse((ROOT/m.PRODUCER).read_bytes())
+    assignments={node.targets[0].id:node.value for node in tree.body
+        if isinstance(node,ast.Assign) and len(node.targets)==1 and isinstance(node.targets[0],ast.Name)}
+    assert ast.literal_eval(assignments['MARK_MODE'])==m.V2_MODE
+    assert frozenset(ast.literal_eval(assignments['MARK_REFUSAL_CODES'].args[0]))==m.V2_REASONS
+    function=next(node for node in ast.walk(tree) if isinstance(node,ast.FunctionDef) and node.name=='_retain_mark_refusal_witness')
+    body=next(node.value for node in ast.walk(function) if isinstance(node,ast.Assign)
+        and any(isinstance(target,ast.Name) and target.id=='body' for target in node.targets))
+    assert {ast.literal_eval(key) for key in body.keys}==m.V2_BODY_KEYS
+
+
+@pytest.mark.parametrize('fault', ['v1_pointer_in_v2', 'v1_binding_in_v2', 'v2_binding_in_v1',
+    'v2_pointer_in_v1', 'v1_body_in_v2', 'v2_body_in_v1', 'v1_marker_added', 'v2_marker_added_to_v1'])
+def test_historical_v1_and_future_v2_cannot_be_crossed_or_downgraded(fault):
+    body1,raw1,binding1,pointer1=fixture()
+    body2,raw2,binding2,pointer2=fixture_v2()
+    function=m.project_witness_v2;raw,binding,pointer=raw2,binding2,pointer2
+    if fault=='v1_pointer_in_v2':pointer=pointer1
+    elif fault=='v1_binding_in_v2':binding=binding1
+    elif fault=='v2_binding_in_v1':function=m.project_witness;raw,pointer=raw1,pointer1
+    elif fault=='v2_pointer_in_v1':function=m.project_witness;raw,binding=raw1,binding1
+    elif fault=='v1_body_in_v2':
+        body2.update(schema='tpr-cmp28-private-mark-refusal-v1',guard_unchanged=True)
+        del body2['valuation_verification_mode'];del body2['verification_policy_extended']
+        raw,binding,pointer=bind_v2(body2)
+    elif fault=='v2_body_in_v1':
+        body1.update(schema='tpr-cmp28-private-mark-refusal-v2',valuation_verification_mode=m.V2_MODE,
+            verification_policy_extended=True)
+        del body1['guard_unchanged'];raw,binding,pointer=bind(body1);function=m.project_witness
+    elif fault=='v1_marker_added':body2['guard_unchanged']=True;raw,binding,pointer=bind_v2(body2)
+    else:
+        body1['verification_policy_extended']=True;raw,binding,pointer=bind(body1);function=m.project_witness
+    with pytest.raises(m.MarkReadRefusal):function(raw,binding=binding,pointer=pointer)
+
+
+@pytest.mark.parametrize('fault', ['unknown_reason', 'reason_message', 'reason_not_text', 'pointer_mode',
+    'body_mode', 'unconfirmed_readback', 'clock_unavailable', 'body_flag_false', 'body_flag_integer',
+    'foreign_policy', 'binding_mode', 'extra_price', 'extra_sid', 'clock_pair', 'clock_predicate', 'body_schema', 'pointer_schema'])
+def test_v2_unknown_reason_mode_self_markers_and_clock_privacy_refuse(fault):
+    body,raw,binding,pointer=fixture_v2()
+    if fault=='unknown_reason':pointer['reason_code']='future_unreviewed_code'
+    elif fault=='reason_message':pointer['reason_code']='SYNTHETIC-PRIVATE-PRICE-123.45'
+    elif fault=='reason_not_text':pointer['reason_code']=['native_job_custody']
+    elif fault=='pointer_mode':pointer['valuation_verification_mode']='strict_minute_only'
+    elif fault=='body_mode':body['valuation_verification_mode']='self_declared_acceptance';raw,binding,pointer=bind_v2(body)
+    elif fault=='unconfirmed_readback':pointer['readback_verified']=False
+    elif fault=='clock_unavailable':pointer['status']='clock_witness_unavailable'
+    elif fault=='body_flag_false':body['verification_policy_extended']=False;raw,binding,pointer=bind_v2(body)
+    elif fault=='body_flag_integer':body['verification_policy_extended']=1;raw,binding,pointer=bind_v2(body)
+    elif fault=='foreign_policy':body['policy_sha256']='4'*64;raw,binding,pointer=bind_v2(body)
+    elif fault=='binding_mode':binding['valuation_verification_mode']='self_declared_acceptance'
+    elif fault=='extra_price':body['price']='SYNTHETIC-PRIVATE-PRICE-123.45';raw,binding,pointer=bind_v2(body)
+    elif fault=='extra_sid':pointer['security_id']='SYNTHETIC-PRIVATE-SID'
+    elif fault=='clock_pair':body['observed_end_local']='2021-01-04T15:59:00-04:00';raw,binding,pointer=bind_v2(body)
+    elif fault=='clock_predicate':body['predicates']['observed_relation']='equal';raw,binding,pointer=bind_v2(body)
+    elif fault=='body_schema':body['schema']='tpr-cmp28-private-mark-refusal-v3';raw,binding,pointer=bind_v2(body)
+    else:pointer['schema']='tpr-cmp28-mark-refusal-pointer-v3'
+    with pytest.raises(m.MarkReadRefusal,match='^exact private OFF mark witness refused$'):
+        m.project_witness_v2(raw,binding=binding,pointer=pointer)
+
+
+@pytest.mark.parametrize('day', ['2021-01-04','2021-07-06'])
+def test_v2_direct_clock_validation_retains_dst_and_relative_precision(day):
+    _,raw,binding,pointer=fixture_v2(day=day,observed_delta=-60,microseconds=123456)
+    result=m.project_witness_v2(raw,binding=binding,pointer=pointer)
+    assert result['observed_minus_expected_microseconds']==-60000000
+    assert result['predicates']['observed_date_equals_session'] is True

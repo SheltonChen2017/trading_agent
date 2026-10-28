@@ -351,3 +351,14 @@ def test_invalid_provider_receipt_batch_refuses_instead_of_losing_private_eviden
     algo=minimal(driver);day=supplied(driver,algo)
     algo._signal_provider.drain_private_binding_receipts=lambda **_:rows
     with pytest.raises(ValueError):algo._prepare_targets(day)
+
+
+def test_all_four_signal_arms_inherit_the_same_native_close_corroboration_and_safe_refusal(driver):
+    assert driver.ComparisonMultiAlgorithm._corroborate_raw_daily_close is driver.previous.ComparisonOffAlgorithm._corroborate_raw_daily_close
+    assert driver.ComparisonMultiAlgorithm._daily_audit is driver.previous.ComparisonOffAlgorithm._daily_audit
+    assert driver.ComparisonMultiAlgorithm._reject_mark is driver.previous.ComparisonOffAlgorithm._reject_mark
+    for arm in driver.CANDIDATES:
+        algo=minimal(driver,arm)
+        summary=algo._mark_verification_summary()
+        assert summary["mode"]=="strict_minute_or_raw_daily_equal_close_v1"
+        assert summary["daily_requests"]==summary["daily_corroborated_marks"]==summary["refused_marks"]==0

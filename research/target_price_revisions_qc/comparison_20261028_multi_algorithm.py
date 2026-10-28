@@ -198,6 +198,8 @@ class ComparisonMultiAlgorithm(off.ComparisonOffAlgorithm):
         self._factor_sources, self._basis_proofs = set(), {}
         self._factor_provider = self._initialized_factor_provider()
         self._signal_store = None
+        self._mark_refusal_witness_attempted = False
+        self._initialize_mark_verification()
         if type(self.project_id) is not int or self.project_id != self._config["project_id"]:
             _fail()
         packet = self._config["signal_packet"]
@@ -490,7 +492,8 @@ class ComparisonMultiAlgorithm(off.ComparisonOffAlgorithm):
             "position_ledger_mismatches": self._position_ledger_mismatches, "risk_breaches": self._risk_breaches,
             "max_name_exposure": self._max_name_exposure, "name_soft_cap_breaches": self._name_soft_cap_breaches,
             "clock_assertions": self._clock_assertions, "reason_counts": dict(self._reasons),
-            "delisting_audit": self._delisting_audit, "source_inputs_admitted": False,
+            "delisting_audit": self._delisting_audit, "mark_verification": self._mark_verification_summary(),
+            "source_inputs_admitted": False,
             "native_basis_authenticated": False, "full_evidence_retrieval_verified": False,
             "strategy_accepted": False, "canonical_admission": False, "accepted_performance": None}
         self._log_audit("SUMMARY", summary)

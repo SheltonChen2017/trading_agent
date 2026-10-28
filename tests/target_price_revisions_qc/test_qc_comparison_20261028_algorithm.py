@@ -54,6 +54,16 @@ class Fundamental:
     pass
 
 
+class SupportedExchangeHours:
+    """Only documented LEAN GetNextMarketClose(localDateTime,extendedHours)."""
+    __slots__=("close","calls")
+    def __init__(self,close):self.close=close;self.calls=[]
+    def get_next_market_close(self,local_datetime,extended_market_hours):
+        self.calls.append((local_datetime,extended_market_hours))
+        assert extended_market_hours is False
+        return self.close if local_datetime<self.close else self.close+timedelta(days=1)
+
+
 class NativeStore:
     def __init__(self):self.values={}; self.calls=[]
     def contains_key(self,key):self.calls.append(("contains",key)); return key in self.values
@@ -331,7 +341,7 @@ def test_same_day_stale_future_or_pre_halfday_closing_marks_refuse_before_accoun
     bar.end_time=datetime(2021,1,4,last_hour,0)
     symbol=Symbol("SID-HELD")
     security=NS(get_last_data=lambda:bar,
-        exchange=NS(hours=NS(get_previous_market_close=lambda *_:datetime(2021,1,4,close_hour,0))))
+        exchange=NS(hours=SupportedExchangeHours(datetime(2021,1,4,close_hour,0))))
     algo.portfolio=NS(values=lambda:[NS(invested=True,symbol=symbol)])
     algo._assert_raw_subscriptions=lambda *_:security
     with pytest.raises(ValueError):algo._daily_audit()
@@ -468,7 +478,7 @@ def test_raw_fill_dividend_split_ledger_and_native_close_audit_execute_without_r
     assert algo._quantity_ledger=={symbol.id:32} and algo._cash_ledger==Fraction("98415.84")
     bar=driver.TradeBar();bar.end_time=datetime(2021,1,5,16,0);bar.price="50"
     security.get_last_data=lambda:bar;security.price="50"
-    security.exchange=NS(hours=NS(get_previous_market_close=lambda *_:datetime(2021,1,5,16,0)))
+    security.exchange=NS(hours=SupportedExchangeHours(datetime(2021,1,5,16,0)))
     held=NS(symbol=symbol,quantity="32",invested=True,holdings_value="1600")
     algo.portfolio=NS(cash="98415.84",total_portfolio_value="100015.84",total_holdings_value="1600",values=lambda:[held])
     algo.time=datetime(2021,1,5,16,1);algo.utc_time=datetime(2021,1,5,21,1,tzinfo=timezone.utc)
@@ -589,3 +599,39 @@ def test_native_bytes_preserves_plain_bounded_python_bytes(driver,value):
 @pytest.mark.parametrize("value", [None,"plain",[112,108,97,105,110],b"",True])
 def test_native_bytes_rejects_arbitrary_coercions_and_empty_values(driver,value):
     with pytest.raises(ValueError):driver.native_bytes(value,64)
+
+
+@pytest.mark.parametrize("session,close_hour",[("2021-01-04",16),("2021-11-26",13)])
+def test_supported_next_close_is_queried_from_that_session_midnight_before_accounting(driver,monkeypatch,session,close_hour):
+    day=date.fromisoformat(session)
+    algo=minimal(driver);algo.time=datetime.combine(day,time(16,1))
+    algo.utc_time=algo.time.replace(tzinfo=driver.NY).astimezone(timezone.utc)
+    bar=driver.TradeBar();bar.end_time=datetime.combine(day,time(close_hour))
+    hours=SupportedExchangeHours(bar.end_time)
+    symbol=Symbol("SID-HELD")
+    algo.portfolio=NS(values=lambda:[NS(invested=True,symbol=symbol)])
+    algo._assert_raw_subscriptions=lambda *_:NS(get_last_data=lambda:bar,exchange=NS(hours=hours))
+    calls=[]
+    monkeypatch.setattr(driver.predecessor.TargetPriceExtendedAlgorithm,"_daily_audit",lambda self:calls.append("accounted"))
+    assert not hasattr(hours,"get_previous_market_close")
+    algo._daily_audit()
+    assert hours.calls==[(datetime.combine(day,time()),False)]
+    assert calls==["accounted"]
+
+
+@pytest.mark.parametrize("offset",[-1,1])
+def test_equal_last_bar_and_native_close_on_another_day_still_refuse(driver,monkeypatch,offset):
+    algo=minimal(driver);algo.time=datetime(2021,1,4,16,1)
+    algo.utc_time=datetime(2021,1,4,21,1,tzinfo=timezone.utc)
+    class WrongDayHours:
+        def get_next_market_close(self,local_datetime,extended_market_hours):
+            assert local_datetime==datetime(2021,1,4)
+            assert extended_market_hours is False
+            return datetime(2021,1,4,16)+timedelta(days=offset)
+    bar=driver.TradeBar();bar.end_time=datetime(2021,1,4,16)+timedelta(days=offset)
+    symbol=Symbol("SID-HELD")
+    algo.portfolio=NS(values=lambda:[NS(invested=True,symbol=symbol)])
+    algo._assert_raw_subscriptions=lambda *_:NS(get_last_data=lambda:bar,exchange=NS(hours=WrongDayHours()))
+    calls=[];monkeypatch.setattr(driver.predecessor.TargetPriceExtendedAlgorithm,"_daily_audit",lambda self:calls.append("accounted"))
+    with pytest.raises(ValueError):algo._daily_audit()
+    assert not calls

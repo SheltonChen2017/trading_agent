@@ -105,6 +105,26 @@ def test_existing_or_ambiguous_key_never_spends_a_write_or_packet_read(tmp_path,
     assert 'SYNTHETIC-CONTENT' not in json.dumps(result)
 
 
+def test_exact_native_missing_file_shape_is_explicit_absence_for_only_bound_key():
+    # Root independently observed this exact closed shape twice under fresh
+    # scopes:173B SHA f3e1633657326f4c82e7835a2ec1b7c49e0ca1be324cf1da5a4e4569fdd60851.
+    # No historical response or private packet is reopened by this fixture.
+    raw,status,token=response({'errors':['File not found '+m.KEY],'success':False})
+    assert m.properties_projection(raw,status,token,m.KEY)['classification']=='explicit_absence'
+
+
+@pytest.mark.parametrize('fault',['foreign_key','extra_field','permission','additional_error','http404'])
+def test_missing_file_success_false_is_not_a_generic_absence_permission(fault):
+    body={'errors':['File not found '+m.KEY],'success':False};status=200
+    if fault=='foreign_key':body['errors']=['File not found foreign-key']
+    elif fault=='extra_field':body['metadata']=None
+    elif fault=='permission':body['errors']=['Permission denied '+m.KEY]
+    elif fault=='additional_error':body['errors'].append('permission denied')
+    else:status=404
+    raw,status,token=response(body,status)
+    assert m.properties_projection(raw,status,token,m.KEY)['classification']=='unknown_refused'
+
+
 def test_cooperative_content_key_claim_prevents_second_write_with_fresh_operation(tmp_path):
     root=tmp_path/'synthetic';metadata,_=organization(root)
     present_calls=[]

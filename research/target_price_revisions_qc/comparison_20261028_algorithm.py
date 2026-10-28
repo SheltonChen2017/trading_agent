@@ -13,6 +13,7 @@ remains false until separately verified from retained native evidence.
 Official API references, checked2026-10-28:
 https://www.quantconnect.com/docs/v2/writing-algorithms/universes/equity/etf-constituents-universes
 https://www.lean.io/docs/v2/lean-engine/class-reference/classQuantConnect_1_1Data_1_1Fundamental_1_1MorningstarIndustryGroupCode.html
+https://www.quantconnect.com/docs/v2/writing-algorithms/securities/market-hours
 """
 from AlgorithmImports import *
 from datetime import date, datetime, time, timedelta, timezone
@@ -512,7 +513,10 @@ class ComparisonOffAlgorithm(execution.TargetPriceExtendedAlgorithm):
                     _fail()
                 # Same-day alone is insufficient: a 09:31 stale cache must not
                 # masquerade as a close. Native hours also honor half-days.
-                expected_close = security.exchange.hours.get_previous_market_close(self.time, False)
+                # Query from this LOCAL session's midnight. From16:01 the
+                # supported next-close API would select the following session.
+                session_start = datetime.combine(self.time.date(), time())
+                expected_close = security.exchange.hours.get_next_market_close(session_start, False)
                 close = self._native_clock(expected_close, "America/New_York")
                 observed = self._native_clock(last.end_time, "America/New_York")
                 if observed != close or close.date() != self._native_clock(self.utc_time, "UTC").date():

@@ -221,6 +221,9 @@ def properties_projection(raw,status,token,key):
         result['preview_withheld']='preview' in metadata
     elif status==200 and body.get('success') is True and 'metadata' in body and metadata is None and errors==[]:
         result['classification']='explicit_absence'
+    elif (status==200 and set(body)=={'errors','success'} and body['success'] is False
+            and body['errors']==['File not found '+key]):
+        result['classification']='explicit_absence'
     return result
 
 

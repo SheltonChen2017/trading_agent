@@ -25,7 +25,7 @@ PINS = {
     "extended_runtime_successor.py": "2e6bb5c82f356ee7ece4811c9d634ce57d48533d408d4b57b8aee41de062517b",
     "extended_algorithm_successor.py": "e0077b7992dc64515384f56687b350725d694c746a8d4523336d18aa144dd9a8",
     "comparison_20261028.py": "cb507762dded3340acb7dd69b8086045ae819e0398eea1943444acb496e0e161",
-    "comparison_20261028_algorithm.py": "22276770abd8eb267ca54b2b1dccc24bc2d9fba327f8d7f24fcb1738c432b149",
+    "comparison_20261028_algorithm.py": "ecad493f7ce8db1c013e90d58f07737f02d55c7a20e320b9a2470e0594bc285a",
     "extended_calendar.json": "3eccdf3cf9a2542ffd249983241d5747c2ecd4e21bc4a71f7f826c77ec1fe53d",
     "comparison_20261028_policy.json": "df4c89601ba5a45a17c79d6386fff1ac202ef0689c4e592a8b1f9aba32ada80c"}
 SOURCE_PATHS = tuple(PREFIX + name for name in PINS)

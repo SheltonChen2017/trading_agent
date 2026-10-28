@@ -26601,3 +26601,64 @@ No routine Claude checkpoint is required; the owner still directs all five
 actual full-window runs and one final push after completion.
 
 Final root union:214passed6.15s. Staged diff check then exposed one extra EOF blank line in the new multi driver (untracked-file checks had not covered it). Removed only that line, updated the independent renderer pin/current table, and reran the relevant multi tests. No native source/economic outcome changed by this whitespace correction.
+
+Fresh own-project organization-binding metadata claim TPR-CMP28-OBJECT-PROJECT-METADATA-20261028-001/fe4cd061b0c1f1bb3f7b01de5ae9a230fbe07691394f4a8ecf0c9efaac456065 at HEAD 3e8a13a06133b14b6591c696a80fd8ee8e6dce02 precedes one projects/read of37650980 only,120s/65536B. It grants no account/resource listing, packet read, ObjectStore write or new job. Actual organization identity remains private; only safe hash/binding descriptor is returned.
+
+Actual own-project metadata binding completed:1165B/1052a4b11a29c226668bf017c37d01d324d9654fa63df7634eb86b411bdff72d, safe organization hash a2d88859...; receipt1402B/436004edd06b8653451ed9f2cf296e0b9ab424338f1fb6b81f21b897629ec361. Fresh exact private plain-packet upload claim TPR-CMP28-OBJECT-PLAIN-PACKET-UPLOAD-20261028-001/df6a8de897c04e2a44fe75bc0c73ef82a1591607858cb4210331c26d77986c32 at HEAD 3e8a13a06133b14b6591c696a80fd8ee8e6dce02 precedes binding read, exact-key absence check, bounded2-pass560210778B local reads and one280105389B multipart object effect;300s overall/120s upload phase. Unknown absence stops before packet access/write. No new job/look, public export, account capacity change or source admission.
+
+Fresh OFF result-view002 reservation/scope 3faa66007b855bb96f8c9e89df2bd02f0c12b9b3b36cb10c9faa42b119768043 at 3e8a13a06133b14b6591c696a80fd8ee8e6dce02 precedes one read of existing job074dd398...,60s/4MiB. This is a retained view of the same fixed candidate, no new run or parameter choice. Any outcome-bearing snapshot remains a distinct retained observation; no historical look is reset.
+
+Actual OFF attempt1 job074dd398... ended Runtime Error, not accepted. Complete terminal response11391B/816167bc... retained. Packet upload001 stopped on unknown173B metadata response f3e16336... BEFORE packet read/write (localbytes0, effects0); receipt1436B/302c48c0... . Fresh exact fault diagnostic claim TPR-CMP28-EXACT-RUNTIME-OBJECT-DIAG-20261028-001/b44b1a2fcf0f2f12c1226d9d2889a6620c235e15b58d6a1c64f58ccf1fb310a4 precedes two exact private metadata/error files12556B and one exact-key properties request,120s/65536B. No new launch, packet read, upload, account action or statistics projection.
+
+### 104.15 Verified first runtime failure and exact metadata semantics
+
+The first new-study OFF run074dd39863bfe50fa2ecdf2bb091ee47 ended Runtime Error
+at2021-01-04 16:01. The actual failure is SecurityExchangeHours lacking
+get_previous_market_close, in the new driver's daily audit. Its terminal
+completed=true/progress=1 describe terminal job state, not full-window study
+coverage. No final performance or native accounting acceptance is claimed.
+The complete failed response is11391B/SHA-256
+`816167bc7854993ef0fc4ed70c82f5a69910fa697eb4a5f7f525892ec452794f`.
+All source bytes, compile/job IDs, reservations and both result-view receipts
+remain retained. New-study state: one compile succeeded, one actual runtime
+failed, no accepted OFF result; historical old-study failures/looks are intact.
+
+Confirmed CMP104-F002: the synthetic exchange-hours stub exposed an unsupported
+native method. Two supported-method-only regressions reproduced the actual
+AttributeError. The correction queries documented get_next_market_close from
+THAT local session's midnight. Exact same-day native close and last-data
+end-time equality remain mandatory, including half-days; no stale/future bar
+or next-day close is admitted. Both renderer independent pins were refreshed.
+The official Python API is documented at
+https://www.quantconnect.com/docs/v2/writing-algorithms/securities/market-hours .
+This source/runtime correction changes no selection, weight, cash, fee,
+slippage, action rule, valuation date or study economics.
+
+Current corrected driver31836B/SHA-256
+`ecad493f7ce8db1c013e90d58f07737f02d55c7a20e320b9a2470e0594bc285a`;
+OFF renderer11106B/SHA-256
+`e9853baba33e39f9cbaa5fa12fc3221e383d107a361fd33635d268e15c217a17`;
+multi renderer12187B/SHA-256
+`7a12aa85800f6b4dd25e333ffb8ffb8a3a90bc0b66f6be13549bcf350e677e5f`.
+
+Packet upload001 did not read a packet byte or perform a write. It retained
+an unrecognized exact173B properties response/SHA-256
+`f3e1633657326f4c82e7835a2ec1b7c49e0ca1be324cf1da5a4e4569fdd60851`.
+A fresh independently claimed diagnostic proved the exact native response:
+HTTP200, only errors/success keys, success=false and exactly one error equal
+to File not found followed by the COMPLETE requested content-addressed key.
+The combined safe diagnostic is1280B/SHA-256
+`bc03e8da336f2aae8456fe3a4fd638b3d4f9b2b0208ebc3d8e6f802438adb451`.
+The uploader now recognizes only that exact closed missing-key form as
+absence. Foreign keys, extra fields, permission/additional errors and generic
+404 remain refused. The original scope stays spent; a new source-bound
+organization receipt and fresh upload operation are required.
+Uploader21144B/SHA-256
+`8307e0296ccad17a007a1026b2c5be8438a7e7edcb98fbc7b78bfce62f3f6d2b`.
+
+Independent narrow OFF/renderer174focused checks passed6.05s; exact properties
+semantics25passed0.65s. The root final relevant five-module union's count/time
+is retained in its associated command output. The native-provider ABI check
+found no source mismatch in current public LEAN/Python.NET master sources;
+that is not proof of the exact deployed runtime. No routine Claude checkpoint
+or owner question is needed before the next bounded OFF recovery attempt.

@@ -30,12 +30,12 @@ BASE_PINS = {
     "extended_runtime_successor.py": "2e6bb5c82f356ee7ece4811c9d634ce57d48533d408d4b57b8aee41de062517b",
     "extended_algorithm_successor.py": "e0077b7992dc64515384f56687b350725d694c746a8d4523336d18aa144dd9a8",
     "comparison_20261028.py": "cb507762dded3340acb7dd69b8086045ae819e0398eea1943444acb496e0e161",
-    "comparison_20261028_algorithm.py": "22276770abd8eb267ca54b2b1dccc24bc2d9fba327f8d7f24fcb1738c432b149",
+    "comparison_20261028_algorithm.py": "ecad493f7ce8db1c013e90d58f07737f02d55c7a20e320b9a2470e0594bc285a",
     "extended_calendar.json": "3eccdf3cf9a2542ffd249983241d5747c2ecd4e21bc4a71f7f826c77ec1fe53d",
     "comparison_20261028_policy.json": "df4c89601ba5a45a17c79d6386fff1ac202ef0689c4e592a8b1f9aba32ada80c"}
 PINS = {PREFIX + name: digest for name, digest in BASE_PINS.items()}
 PINS.update({
-    PREFIX + "comparison_20261028_bundle.py": "bfbb0654389a28fe0dcc0974b339f50189187754c9701831778346ad5b20776a",
+    PREFIX + "comparison_20261028_bundle.py": "e9853baba33e39f9cbaa5fa12fc3221e383d107a361fd33635d268e15c217a17",
     PREFIX + "comparison_20261028_multi_algorithm.py": "55d090b97e53d18eaa4fa970309159e7f6c08115123ef3f3564da37f47f5e2f8",
     PREFIX + "comparison_20261028_events.py": "8041ed95e01103007379e4b5761d14b4f5c0425afb6e889d9e295dd6acc9965d",
     PREFIX + "comparison_20261028_signal_native.py": "6fdab16bdfe070e138b92977279dec0d03d67e6a05b1be5f9af5e9136bd96935",

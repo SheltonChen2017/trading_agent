@@ -68,6 +68,10 @@ def test_wrong_project_ownership_or_org_binding_does_not_admit_upload(tmp_path,f
 
 def test_one_exact_plain_upload_and_metadata_size_verification(tmp_path):
     root=tmp_path/'synthetic';metadata,_=organization(root);calls=[];uploads=[]
+    # The earlier packet-hash claim remains spent and byte-for-byte preserved;
+    # only the separately authorized NEW key gets a key-hash write claim.
+    old_claim=root/('object-key.'+m.PACKET_SHA256+'.write.spent.json')
+    old_claim.write_bytes(b'SYNTHETIC HISTORICAL CLAIM');old_claim.chmod(0o600)
     def properties(endpoint,payload):
         calls.append((endpoint,payload))
         if len(calls)==1:return response({'success':True,'metadata':None,'errors':[]})
@@ -77,7 +81,7 @@ def test_one_exact_plain_upload_and_metadata_size_verification(tmp_path):
         check();claim('read');claim('effect')
         assert org=='SYNTHETIC-ORG' and key==m.KEY
         assert (root/(report['operation_id']+'.packet-read.spent.json')).exists()
-        assert (root/('object-key.'+m.PACKET_SHA256+'.write.spent.json')).exists()
+        assert (root/('object-key.'+m._sha(key.encode())+'.write.spent.json')).exists()
         uploads.append(key);report['upload_attempted']=True;report['object_created']=None
         return (*response({'success':True}),'a'*32)
     result=execute(upload_plan(metadata['organization_binding']),root,properties,upload)
@@ -88,6 +92,10 @@ def test_one_exact_plain_upload_and_metadata_size_verification(tmp_path):
     assert 'SYNTHETIC-PRIVATE-PREVIEW' not in json.dumps(result)
     assert 'SYNTHETIC-ORG' not in json.dumps(result)
     assert result['object_listing'] is result['object_download'] is result['object_delete'] is False
+    assert old_claim.read_bytes()==b'SYNTHETIC HISTORICAL CLAIM'
+    assert m._sha(m.KEY.encode())!=m.PACKET_SHA256
+    assert result['failure_phase'] is result['failure_class'] is None
+    assert type(result['operation_elapsed_ms']) is int
 
 
 @pytest.mark.parametrize('body,status',[
@@ -106,9 +114,9 @@ def test_existing_or_ambiguous_key_never_spends_a_write_or_packet_read(tmp_path,
 
 
 def test_exact_native_missing_file_shape_is_explicit_absence_for_only_bound_key():
-    # Root independently observed this exact closed shape twice under fresh
-    # scopes:173B SHA f3e1633657326f4c82e7835a2ec1b7c49e0ca1be324cf1da5a4e4569fdd60851.
-    # No historical response or private packet is reopened by this fixture.
+    # Root observed this closed error convention for the historical old key.
+    # The NEW key still requires its own fresh exact-key metadata observation;
+    # this fixture does not reopen an old response or assert native absence.
     raw,status,token=response({'errors':['File not found '+m.KEY],'success':False})
     assert m.properties_projection(raw,status,token,m.KEY)['classification']=='explicit_absence'
 
@@ -150,6 +158,7 @@ def test_multipart_is_plain_binary_objectData_with_exact_org_and_key_fields():
     assert m.KEY.encode() in prefix and suffix.endswith(b'--\r\n')
     assert content_type.startswith('multipart/form-data; boundary=')
     assert '37650980/'+m.STUDY+'/' in m.KEY and m.PACKET_SHA256 in m.KEY
+    assert m.KEY==f'tpr-cmp28/inputs/37650980/{m.STUDY}/upload-003/{m.PACKET_SHA256}.json'
     assert m.PACKET_BYTES==280105389
 
 
@@ -159,10 +168,10 @@ def test_native_stream_hashes_before_credentials_and_streams_exact_plain_bytes_t
     path=inputs/'synthetic.json';path.write_bytes(packet);path.chmod(0o600)
     monkeypatch.setattr(m,'INPUT_ROOT',inputs);monkeypatch.setattr(m,'PACKET_BYTES',len(packet))
     monkeypatch.setattr(m,'PACKET_SHA256',packet_hash)
-    monkeypatch.setattr(m,'KEY',f'{m.PROJECT}/{m.STUDY}/signals/{packet_hash}.json')
+    monkeypatch.setattr(m,'KEY',f'tpr-cmp28/inputs/{m.PROJECT}/{m.STUDY}/upload-003/{packet_hash}.json')
     claims=[];sent=[];events=[]
     @contextmanager
-    def deadline(seconds):assert seconds==120;yield
+    def deadline(seconds):assert seconds==300;yield
     monkeypatch.setattr(m.ops,'wall_deadline',deadline)
     class Connection:
         def putrequest(self,method,endpoint):assert (method,endpoint)==('POST','/api/v2/object/set')
@@ -175,6 +184,7 @@ def test_native_stream_hashes_before_credentials_and_streams_exact_plain_bytes_t
         def status(self):return 200
         def close(self):events.append(('closed',))
     def connection(seconds):
+        assert seconds==300
         assert claims==['read','effect']
         return Connection(),{'Authorization':'SYNTHETIC','Timestamp':'123'},'SYNTHETIC-TOKEN'
     monkeypatch.setattr(m,'_connection',connection)
@@ -186,6 +196,11 @@ def test_native_stream_hashes_before_credentials_and_streams_exact_plain_bytes_t
     assert b''.join(sent)==prefix+packet+suffix
     assert report['local_packet_bytes_read']==2*len(packet)
     assert report['multipart_body_bytes']==len(prefix)+len(packet)+len(suffix)
+    assert report['packet_hash_read_bytes']==report['packet_stream_read_bytes']==len(packet)
+    assert report['completed_packet_send_bytes']==len(packet)
+    assert report['completed_send_bytes']==report['multipart_body_bytes']
+    assert report['completed_send_bytes_is_server_ack'] is False
+    assert type(report['upload_phase_elapsed_ms']) is int
     assert md5==hashlib.md5(packet).hexdigest() and status==200
 
 
@@ -214,3 +229,70 @@ def test_native_json_cleanup_cannot_replace_cancellation_with_ordinary_close_err
 
 def test_production_wrappers_do_not_accept_fixture_plans():
     with pytest.raises(m.api.APIRefusal):m.execute_metadata_plan(m.prepare_metadata_plan(**common()))
+
+
+def test_new_transport_hypothesis_has_exact_300_second_phase_600_second_scope():
+    arguments=common();arguments['expires_utc']=(NOW+timedelta(seconds=599)).isoformat()
+    plan=m.prepare_metadata_plan(**arguments)
+    assert m._validate(plan)==plan and plan['max_upload_phase_seconds']==300
+    assert (m._clock(plan['expires_utc'])-m._clock(plan['created_utc'])).total_seconds()==600
+    assert plan['automatic_retry'] is False and plan['max_upload_effects']==1
+    changed=dict(plan,max_upload_phase_seconds=301)
+    with pytest.raises(m.api.APIRefusal):m._validate(changed)
+
+
+@pytest.mark.parametrize('error,expected',[(BrokenPipeError('SYNTHETIC-SECRET'),'broken_pipe'),
+    (TimeoutError('SYNTHETIC-SECRET'),'timeout_error'),(KeyboardInterrupt('SYNTHETIC-SECRET'),'cancelled')])
+def test_native_failed_send_retains_phase_elapsed_and_read_vs_completed_send(tmp_path,monkeypatch,error,expected):
+    packet=b'0123456789abcdef';packet_hash=m._sha(packet)
+    inputs=tmp_path/'inputs';inputs.mkdir(mode=0o700)
+    path=inputs/'synthetic.json';path.write_bytes(packet);path.chmod(0o600)
+    monkeypatch.setattr(m,'INPUT_ROOT',inputs);monkeypatch.setattr(m,'PACKET_BYTES',len(packet))
+    monkeypatch.setattr(m,'PACKET_SHA256',packet_hash);monkeypatch.setattr(m,'CHUNK',4)
+    monkeypatch.setattr(m,'KEY',f'tpr-cmp28/inputs/{m.PROJECT}/{m.STUDY}/upload-003/{packet_hash}.json')
+    @contextmanager
+    def deadline(seconds):assert seconds==300;yield
+    monkeypatch.setattr(m.ops,'wall_deadline',deadline)
+    class Connection:
+        completed=0
+        closed=False
+        def putrequest(self,*_):pass
+        def putheader(self,*_):pass
+        def endheaders(self):pass
+        def send(self,raw):
+            if len(raw)==4:
+                if self.completed==8:raise error
+                self.completed+=len(raw)
+        def getresponse(self):pytest.fail('no response after failed send')
+        def close(self):self.closed=True
+    connection=Connection();claims=[]
+    monkeypatch.setattr(m,'_connection',lambda _:(connection,{},'SYNTHETIC-TOKEN'))
+    report={'expires_utc':(datetime.now(timezone.utc)+timedelta(seconds=599)).isoformat(),
+        'local_packet_bytes_read':0,'upload_attempted':False,'object_created':False}
+    descriptor={'name':path.name,'bytes':len(packet),'sha256':packet_hash}
+    with pytest.raises(type(error)):
+        m._native_upload('SYNTHETIC-ORG',m.KEY,descriptor,lambda:None,claims.append,report)
+    prefix,_,_=m.multipart_parts('SYNTHETIC-ORG',m.KEY)
+    assert claims==['read','effect'] and connection.closed
+    assert report['failure_phase']=='packet_stream_send' and report['failure_class']==expected
+    assert type(report['upload_phase_elapsed_ms']) is int and report['upload_phase_elapsed_ms']>=0
+    assert report['packet_hash_read_bytes']==16 and report['packet_stream_read_bytes']==12
+    assert report['local_packet_bytes_read']==28 and report['completed_packet_send_bytes']==8
+    assert report['completed_send_bytes']==len(prefix)+8
+    assert report['completed_send_bytes_is_server_ack'] is False and report['object_created'] is None
+    assert 'SYNTHETIC-SECRET' not in json.dumps(report)
+
+
+def test_failed_upload_fixture_publishes_body_free_phase_and_elapsed_without_retry(tmp_path):
+    root=tmp_path/'synthetic';metadata,_=organization(root);calls=[]
+    def upload(org,key,descriptor,check,claim,report):
+        claim('read');claim('effect');calls.append(key)
+        report['upload_attempted']=True;report['object_created']=None
+        raise ConnectionResetError('SYNTHETIC-SECRET-PACKET-ERROR')
+    result=execute(upload_plan(metadata['organization_binding']),root,
+        lambda *_:response({'success':True,'metadata':None,'errors':[]}),upload)
+    assert calls==[m.KEY] and result['automatic_retry'] is False and result['receipt_published']
+    assert result['failure_phase']=='upload_transport' and result['failure_class']=='connection_reset'
+    assert type(result['operation_elapsed_ms']) is int and result['object_created'] is None
+    assert 'SYNTHETIC-SECRET' not in json.dumps(result)
+    assert json.loads((root/result['receipt']['name']).read_bytes())['failure_class']=='connection_reset'

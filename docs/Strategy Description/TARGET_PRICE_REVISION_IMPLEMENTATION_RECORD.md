@@ -26662,3 +26662,69 @@ is retained in its associated command output. The native-provider ABI check
 found no source mismatch in current public LEAN/Python.NET master sources;
 that is not proof of the exact deployed runtime. No routine Claude checkpoint
 or owner question is needed before the next bounded OFF recovery attempt.
+
+Fresh OFF attempt2 source preparation TPR-CMP28-OFF-PREPARE-20261028-003/8ea65bbccc1e89a005cda721eb02fa40715182e2f9f74fddcbdcf8e57d80147a at f89456b54ac104c6503d5dcbf820b7db768c66e7 before exact prior source read324724B/1f1fce05..., no outcome/market/private input read or native effect.
+OFF attempt2 reservation f0c363b8fc8bef547375efa329ab96fb9141a7714cfa6e1be88f6247adc2945e retained before effects; prior census 7afbfe3f8dccb531cb1a45fd39eeab4b3189f4e36fc3b9deb64e5231b6798e88 preserves failed attempt1 and all old history. Fresh upload003 plan 9d9f12f5e8740037ed9b0fce077c0c8bf2abfc96f4fd215b3d7f58ee455e8a11 at f89456b54ac104c6503d5dcbf820b7db768c66e7 with3 exact writes,300s/10MiB, same20files/nine extras. Expected final source inventory 76fdacd2d8eece268948fc39d8e2344d89aa0fbe1cf98dae6e8d8d86f0643ba6; config 5d9125c2f67a592ed74cd6c7447541c91e944b438ad0ab51e5b0f552dd21990c; rendered closure 8854f6d68855e911714b395cb31cea4e85200ee769963b1e63046c10081c005f.
+
+Fresh organization-binding002 plan 509033cf7a7ff0e2e1cb88752711e26701381a873ff1a53a6348d5071ed382ce at HEAD f89456b54ac104c6503d5dcbf820b7db768c66e7 after the exact absent-key source correction; one own-project metadata request,120s/65536B. The old source-bound organization receipt is preserved, not reused after producer hash change. No packet read/write or new job/look.
+
+Fresh plain-packet upload002 plan 322949b502ca34328e12981c7db3d61d2b3411bcbc9aa14aa45f0bd2c5cdc4d1 at HEAD f89456b54ac104c6503d5dcbf820b7db768c66e7 precedes exact new binding0d17a1c8... read, verified native missing-key precheck, fresh packet read claim and at most one multipart effect. Two-pass byte bound560210778B, packet280105389B/6a8f4915...,300s overall/120s upload. Scope001 remains spent with zero packet reads/writes; no unchanged failing path, private data export, new backtest or owner purchase.
+
+Fresh native phase TPR-CMP28-API-OFF-COMPILE-20261028-002/cf701e1322f4627f156093df0155395a4de4233268b652554f79848cbaf0b3cc at HEAD f89456b54ac104c6503d5dcbf820b7db768c66e7 before effects, reservationf0c363b8.../attempt2/look002; 3 bounded requests, source inventory76fdacd2d8eece268948fc39d8e2344d89aa0fbe1cf98dae6e8d8d86f0643ba6 where applicable. Prior failedattempt1 is retained; no changed economics or blind unchanged retry.
+
+Fresh native phase TPR-CMP28-API-OFF-COMPILE-READ-20261028-002/2d98a01096b283b34e4f83066e90c126b75682e41778022341fafc495b413955 at HEAD f89456b54ac104c6503d5dcbf820b7db768c66e7 before effects, reservationf0c363b8.../attempt2/look002; 1 bounded requests, source inventory76fdacd2d8eece268948fc39d8e2344d89aa0fbe1cf98dae6e8d8d86f0643ba6 where applicable. Prior failedattempt1 is retained; no changed economics or blind unchanged retry.
+
+Fresh native phase TPR-CMP28-API-OFF-LAUNCH-20261028-002/e8e7c48b3d0edf71a6f949fa09f350ae2ebbdb4fa4483f8e143d60890871ebe3 at HEAD f89456b54ac104c6503d5dcbf820b7db768c66e7 before effects, reservationf0c363b8.../attempt2/look002; 3 bounded requests, source inventory76fdacd2d8eece268948fc39d8e2344d89aa0fbe1cf98dae6e8d8d86f0643ba6 where applicable. Prior failedattempt1 is retained; no changed economics or blind unchanged retry.
+
+OFF attempt2 genuine compile a8037a9c0a477908623c9760a06ce5d1-79f6b3d4a660e222c24595897c38bffa BuildSuccess; actualjob33bbbe164f5389f4ea2abe903f3b047f launched. Source inventory76fdacd2... exact before/after; compile/runtime counts now2/2, first failure retained. Packet upload002 ended uncertain after538055085 local readbytes with no acknowledged completion; receipt1635B/131cc6a6... and keywriteclaim847dc94d... remain spent. Fresh exact-key reconciliation TPR-CMP28-OBJECT-RECONCILE-20261028-001/9c935a7558f0a6656326de4724dd83c346cf2b537b923a0342148c6d4de2acfc precedes one binding1165B read, three local file metadata stats and one properties-only request,120s/65536B. No packet read/resend/overwrite/delete.
+
+Fresh OFF result-view003 reservation/scope a37ff429767ea7183e87b5ebd22aa38ba26af9242f23c4b995f486c2e8cb46ed at f89456b54ac104c6503d5dcbf820b7db768c66e7 before one existing attempt2 job33bbbe16... read,60s/4MiB. Retain this view separately; no new candidate/run/parameter decision or historical look reset.
+
+Actual attempt2 job33bbbe16... ended Runtime Error; complete terminal response49268B/0e87a104... retained. Fresh exact runtime diagnostic TPR-CMP28-OFF-RUNTIME002-DIAG-20261028-001/1478981e66c9f8330229c5e1e57cb5f14f13fc7d97f7cf6a95a1d91a30ddf9da before one49268B read,120s/no economic statistics projection. New-study state now two compile successes/two failed runtime jobs; all reservations/results retained, no accepted OFF performance.
+
+### 104.16 Second runtime failure and bounded input-transfer recovery
+
+Attempt2 job33bbbe164f5389f4ea2abe903f3b047f ended Runtime Error on
+2021-02-10 16:01. The supported close-lookup call succeeded; the retained exact
+same-day/bar-end predicate then refused. No symbol, observed bar-end or expected
+close witness was emitted. The root does not guess a stale/absent-price cause,
+relax the check, exclude a stock, substitute zero or claim a completed backtest.
+The complete49268B failed result is retained under SHA-256
+`0e87a104fe6822775d894532415845d8fa4ddeda2e8aec1a73fcf91e2eaf98e4`.
+Both new-study compile successes and both failed native runs remain counted.
+Further source/runtime diagnosis is necessary before an economic rerun.
+
+The packet's second transfer stopped without a server acknowledgment after
+538055085 local bytes read (whole hash pass plus257949696 second-pass bytes).
+No closing multipart suffix or response was reached; data delivery stayed
+unknown. Its receipt1635B/SHA-256
+`131cc6a6df3f1c056aaa362edffe887ce3498ebf22fa1ae11c6e1e8cad3cd53c`
+and old one-write claim remain spent. Fresh exact-key reconciliation proved
+that old key is absent: same native File not found predicate,173B/f3e16336... .
+Filesystem metadata shows approximately121.009s from operation claim to receipt
+and119.285s from write claim to receipt. This is not a native elapsed/exception
+attestation. A local120s budget is a supported transport hypothesis, not a
+proved server limit, quota, authentication or timeout classification.
+Reconciliation receipt SHA-256 is
+`73edfb6e25b6ba6748800390a3789b398774d4e11bea0543c6406262ce2c55d0`.
+
+Confirmed CMP104-F003: the earlier uploader key did not match the multi
+runtime's required tpr-cmp28/inputs prefix. Decision CMP104-D007 creates a NEW
+immutable compatible key under tpr-cmp28/inputs/37650980/current-study/upload-003,
+ending in the unchanged exact plaintext content hash. Its cooperative write
+claim binds SHA-256 of the FULL key. Old key/claim/receipts remain untouched.
+This changes transport naming only, not data, features, selection or economics.
+
+Under delegated owner judgment the next fresh transfer allows300s upload
+phase/600s whole operation, retaining the same two-pass560210778-byte read
+bound and exactly one effect. New body-free phase/exception-class/monotonic-ms,
+hash-read/stream-read/completed-local-send counters retain actual failure
+classification. Completed local sends are explicitly not server acknowledgment.
+There is no automatic retry, overwrite, delete, public export or paid upgrade.
+Uploader25431B/SHA-256
+`ef1269ba758a352eb49e793318bfed34afaaae536f91185830f0624e006b5439`;
+tests17090B/SHA-256
+`f5f6561cd8bd2ef0b0dac37a2a51f20dec959d03b0bef49c17422ebe4a7fc89a`.
+Root checked the actual new packet descriptor against the actual multi renderer
+parser, compiled both files in memory, and ran the focused uploader selection.
+The next source-bound organization binding and transfer must be newly claimed.

@@ -31,9 +31,11 @@ INPUT_ROOT=LANE/'artifacts/target_price_qc_recovery_20261028'
 STUDY='TPR-SIX-UNIVERSE-FIVE-ARM-20261028-v1'
 PACKET_BYTES=280105389
 PACKET_SHA256='6a8f4915df539f5aee731832138e038caf6dd579b591ebe745e37b5d283e4708'
-KEY=f'{PROJECT}/{STUDY}/signals/{PACKET_SHA256}.json'
+KEY=f'tpr-cmp28/inputs/{PROJECT}/{STUDY}/upload-003/{PACKET_SHA256}.json'
 MAX_RESPONSE=65536
 CHUNK=1024*1024
+MAX_OPERATION_SECONDS=600
+MAX_UPLOAD_SECONDS=300
 PROPERTIES_DOCUMENTATION='https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/object-store-management/get-object-store-metadata'
 UPLOAD_DOCUMENTATION='https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/object-store-management/upload-object-store-files'
 
@@ -42,6 +44,19 @@ def _fail():raise api.APIRefusal('exact plain-packet upload refused; no retry or
 def _canonical(value):return api._canonical(value)
 def _sha(raw):return hashlib.sha256(raw).hexdigest()
 def _clock(value):return api._clock(value)
+def _failure_class(error):
+    """Closed body-free classes; never copy exception messages or custom names."""
+    for kind,label in ((KeyboardInterrupt,'cancelled'),(SystemExit,'system_exit'),
+            (MemoryError,'memory_error'),(TimeoutError,'timeout_error'),
+            (BrokenPipeError,'broken_pipe'),(ConnectionResetError,'connection_reset'),
+            (ConnectionAbortedError,'connection_aborted'),(ssl.SSLError,'tls_error'),
+            (http.client.HTTPException,'http_error'),(api.APIRefusal,'api_refusal'),
+            (ops.Refusal,'operation_refusal'),(OSError,'os_error'),(Exception,'exception')):
+        if isinstance(error,kind):return label
+    return 'fatal'
+def _elapsed_ms(start):
+    elapsed=time.monotonic()-start
+    return int(elapsed*1000) if 0<=elapsed<float('inf') else None
 def _descriptor(value,maximum):
     api._closed(value,{'name','bytes','sha256'});api._identity(value['name'])
     api._integer(value['bytes'],maximum,1);api._hash(value['sha256'])
@@ -57,7 +72,7 @@ def _prepare(*,action,operation_id,git_head,source_hashes,owner_instruction_sha2
         if type(git_head) is not str or re.fullmatch(r'[a-f0-9]{40}',git_head) is None:_fail()
         api._hash(owner_instruction_sha256)
         if action not in {'organization','upload'} or mode not in {'production','offline-fixture'}:_fail()
-        if not timedelta(0)<_clock(expires_utc)-_clock(created_utc)<=timedelta(seconds=300):_fail()
+        if not timedelta(0)<_clock(expires_utc)-_clock(created_utc)<=timedelta(seconds=MAX_OPERATION_SECONDS):_fail()
         if type(source_hashes) is not dict or not REQUIRED_SOURCES<=set(source_hashes) or len(source_hashes)>48:_fail()
         for name,identity in source_hashes.items():
             if name not in REQUIRED_SOURCES and re.fullmatch(r'research/target_price_revisions_qc/[A-Za-z0-9_.-]+[.](py|json)',name) is None:_fail()
@@ -74,7 +89,7 @@ def _prepare(*,action,operation_id,git_head,source_hashes,owner_instruction_sha2
             'organization_binding_ref':organization_binding_ref,'packet_file':packet_file,'mode':mode,
             'key':KEY,'packet_bytes':PACKET_BYTES,'packet_sha256':PACKET_SHA256,
             'max_local_packet_read_passes':2,'max_local_packet_bytes':2*PACKET_BYTES,
-            'max_upload_effects':1,'max_response_bytes_each':MAX_RESPONSE,'max_upload_phase_seconds':120,
+            'max_upload_effects':1,'max_response_bytes_each':MAX_RESPONSE,'max_upload_phase_seconds':MAX_UPLOAD_SECONDS,
             'automatic_retry':False,'object_listing':False,'object_download':False,'object_delete':False,
             'encoded_or_compressed_cloud_input':False,'market_trading_authorized':False})
     except api.APIRefusal:raise
@@ -145,18 +160,26 @@ def multipart_parts(organization,key):
 
 
 def _native_upload(organization,key,descriptor,check,claim,report):
-    """Claimed two-pass fd read; no full-body allocation or raw packet output."""
+    """Claimed two-pass fd read; completed sends are local returns, not server ACKs."""
     directory=file=connection=None
     begin=datetime.now(timezone.utc);first_tick=previous_tick=time.monotonic();previous=begin
+    for name in ('packet_hash_read_bytes','packet_stream_read_bytes','completed_send_bytes','completed_packet_send_bytes'):
+        report.setdefault(name,0)
+    report['completed_send_bytes_is_server_ack']=False
+    report['phase']='upload_phase_start'
     def within_phase():
         nonlocal previous,previous_tick
         now,tick=datetime.now(timezone.utc),time.monotonic()
         if (now<previous or tick<previous_tick or now>=_clock(report['expires_utc'])
-                or not 0<=(now-begin).total_seconds()<120 or not 0<=tick-first_tick<120):_fail()
+                or not 0<=(now-begin).total_seconds()<MAX_UPLOAD_SECONDS or not 0<=tick-first_tick<MAX_UPLOAD_SECONDS):
+            report['phase']='upload_phase_budget_guard';_fail()
         previous,previous_tick=now,tick
-    with ops.wall_deadline(120):
+    try:
+      with ops.wall_deadline(MAX_UPLOAD_SECONDS):
         try:
+            report['phase']='packet_read_claim'
             claim('read');check()
+            report['phase']='packet_open'
             if INPUT_ROOT.resolve()!=INPUT_ROOT:_fail()
             directory=os.open(INPUT_ROOT,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);ops._custody(os.fstat(directory),True)
             file=os.open(descriptor['name'],os.O_RDONLY|os.O_NOFOLLOW,dir_fd=directory)
@@ -164,38 +187,62 @@ def _native_upload(organization,key,descriptor,check,claim,report):
             if before.st_size!=PACKET_BYTES:_fail()
             digest=hashlib.sha256();md5=hashlib.md5();count=0
             while count<PACKET_BYTES:
+                report['phase']='packet_hash_read'
                 within_phase();part=os.read(file,min(CHUNK,PACKET_BYTES-count))
                 if not part:_fail()
-                digest.update(part);md5.update(part);count+=len(part);report['local_packet_bytes_read']+=len(part)
+                report['packet_hash_read_bytes']+=len(part);report['local_packet_bytes_read']+=len(part)
+                digest.update(part);md5.update(part);count+=len(part)
+            report['phase']='packet_hash_verify'
             if digest.hexdigest()!=PACKET_SHA256:_fail()
             middle=os.fstat(file)
             if (before.st_dev,before.st_ino,before.st_size,before.st_mtime_ns)!=(middle.st_dev,middle.st_ino,middle.st_size,middle.st_mtime_ns):_fail()
             os.lseek(file,0,os.SEEK_SET);check()
             prefix,suffix,content_type=multipart_parts(organization,key)
             report['multipart_body_bytes']=len(prefix)+PACKET_BYTES+len(suffix)
+            report['phase']='object_write_claim'
             claim('effect');check()
-            connection,headers,token=_connection(120)
+            report['phase']='upload_connect'
+            connection,headers,token=_connection(MAX_UPLOAD_SECONDS)
             connection.putrequest('POST','/api/v2/object/set')
             for name,value in {**headers,'Content-Type':content_type,'Content-Length':str(report['multipart_body_bytes'])}.items():
                 connection.putheader(name,value)
             report['upload_attempted']=True;report['object_created']=None
-            connection.endheaders();connection.send(prefix)
+            report['phase']='upload_headers'
+            connection.endheaders()
+            report['phase']='upload_prefix_send'
+            connection.send(prefix);report['completed_send_bytes']+=len(prefix)
             streamed=hashlib.sha256();count=0
             while count<PACKET_BYTES:
+                report['phase']='packet_stream_read'
                 within_phase();part=os.read(file,min(CHUNK,PACKET_BYTES-count))
                 if not part:_fail()
                 report['local_packet_bytes_read']+=len(part)
-                connection.send(part);streamed.update(part);count+=len(part)
+                report['packet_stream_read_bytes']+=len(part)
+                report['phase']='packet_stream_send'
+                connection.send(part)
+                report['completed_send_bytes']+=len(part);report['completed_packet_send_bytes']+=len(part)
+                streamed.update(part);count+=len(part)
+            report['phase']='packet_stream_verify'
             after=os.fstat(file)
             if (streamed.hexdigest()!=PACKET_SHA256 or (before.st_dev,before.st_ino,before.st_size,before.st_mtime_ns)
                     !=(after.st_dev,after.st_ino,after.st_size,after.st_mtime_ns)):_fail()
-            check();connection.send(suffix)
+            check();report['phase']='upload_suffix_send'
+            connection.send(suffix);report['completed_send_bytes']+=len(suffix)
+            report['phase']='upload_response_headers'
             response=connection.getresponse()
-            return response.read(MAX_RESPONSE+1),response.status,token,md5.hexdigest()
+            report['phase']='upload_response_read'
+            raw=response.read(MAX_RESPONSE+1)
+            report['phase']='upload_response_received'
+            return raw,response.status,token,md5.hexdigest()
         finally:
+            if sys.exception() is None:report['phase']='upload_cleanup'
             _cleanup(([connection.close] if connection is not None else [])
                 +([lambda:os.close(file)] if file is not None else [])
                 +([lambda:os.close(directory)] if directory is not None else []))
+    except BaseException as error:
+        report['failure_phase']=report['phase'];report['failure_class']=_failure_class(error)
+        raise
+    finally:report['upload_phase_elapsed_ms']=_elapsed_ms(first_tick)
 
 
 def _body(raw,status,token):
@@ -234,13 +281,15 @@ def _execute(plan,*,root,guard,json_transport,upload_transport,clock):
             or plan['mode']=='offline-fixture' and (root==PRIVATE_ROOT or root.is_relative_to(LANE)
                 or json_transport is _native_json or upload_transport is _native_upload)):_fail()
     frozen=_canonical(plan);previous=None
+    first_tick=previous_tick=time.monotonic()
     def check():
-        nonlocal previous
-        guard(plan);now=clock()
+        nonlocal previous,previous_tick
+        guard(plan);now=clock();tick=time.monotonic()
         if (type(now) is not datetime or now.utcoffset()!=timedelta(0)
                 or not _clock(plan['created_utc'])<=now<_clock(plan['expires_utc'])
-                or previous is not None and now<previous or _canonical(plan)!=frozen):_fail()
-        previous=now
+                or previous is not None and now<previous or _canonical(plan)!=frozen
+                or tick<previous_tick or not 0<=tick-first_tick<MAX_OPERATION_SECONDS):_fail()
+        previous,previous_tick=now,tick
     check()
     if root.resolve()!=root:_fail()
     if plan['mode']=='production':
@@ -252,6 +301,10 @@ def _execute(plan,*,root,guard,json_transport,upload_transport,clock):
         'expires_utc':plan['expires_utc'],
         'organization_id_sha256':None,'organization_binding':None,'properties_before':None,'properties_after':None,
         'packet_sha256':PACKET_SHA256,'packet_bytes':PACKET_BYTES,'local_packet_bytes_read':0,
+        'packet_hash_read_bytes':0,'packet_stream_read_bytes':0,'completed_send_bytes':0,'completed_packet_send_bytes':0,
+        'completed_send_bytes_is_server_ack':False,'upload_phase_elapsed_ms':None,'operation_elapsed_ms':None,
+        'failure_phase':None,'failure_class':None,'phase':'operation_claim',
+        'max_upload_phase_seconds':MAX_UPLOAD_SECONDS,'max_operation_seconds':MAX_OPERATION_SECONDS,
         'multipart_body_bytes':None,'upload_attempted':False,'upload_response_success':False,'object_created':False,
         'metadata_size_verified':False,'server_md5_matches_local':False,'receipt_published':False,'object_write_claim':None,
         'object_listing':False,'object_download':False,'object_delete':False,'automatic_retry':False,
@@ -260,8 +313,11 @@ def _execute(plan,*,root,guard,json_transport,upload_transport,clock):
     api._publish(root,operation+'.operation.spent.json',frozen)
     try:
         if plan['action']=='organization':
+            report['phase']='project_metadata_claim'
             api._publish(root,operation+'.project-read.spent.json',_canonical({'projectId':PROJECT,'max_requests':1}))
+            report['phase']='project_metadata_read'
             check();raw,status,token=json_transport('projects/read',{'projectId':PROJECT});check()
+            report['phase']='project_metadata_verify'
             body=_body(raw,status,token);rows=body.get('projects')
             if status!=200 or body.get('success') is not True or type(rows) is not list or len(rows)!=1:_fail()
             row=rows[0]
@@ -274,6 +330,7 @@ def _execute(plan,*,root,guard,json_transport,upload_transport,clock):
             report['organization_binding']=api._publish(root,operation+'.organization.json',_canonical(binding))
             report['organization_id_sha256']=binding['organization_id_sha256'];report['status']='completed_metadata'
         else:
+            report['phase']='organization_binding_read'
             descriptor=plan['organization_binding_ref']
             api._publish(root,operation+'.organization-read.spent.json',_canonical(descriptor))
             check();raw=ops.read_private(root,descriptor['name'],MAX_RESPONSE);check()
@@ -288,33 +345,48 @@ def _execute(plan,*,root,guard,json_transport,upload_transport,clock):
             if _sha(organization.encode())!=binding['organization_id_sha256']:_fail()
             report['organization_id_sha256']=binding['organization_id_sha256']
             payload={'organizationId':organization,'key':KEY}
+            report['phase']='properties_before_claim'
             api._publish(root,operation+'.properties-before.spent.json',_canonical({'payload_sha256':_sha(_canonical(payload)),'key':KEY}))
+            report['phase']='properties_before_read'
             check();raw,status,token=json_transport('object/properties',payload);check()
+            report['phase']='properties_before_verify'
             report['properties_before']=properties_projection(raw,status,token,KEY)
             if report['properties_before']['classification']!='explicit_absence':_fail()
             api._publish(root,operation+'.upload.spent.json',_canonical({'key':KEY,'packet':plan['packet_file'],
-                'organization_id_sha256':report['organization_id_sha256'],'max_effects':1,'max_seconds':120}))
+                'organization_id_sha256':report['organization_id_sha256'],'max_effects':1,'max_seconds':MAX_UPLOAD_SECONDS}))
             def read_claim(action):
                 if action=='read':
                     api._publish(root,operation+'.packet-read.spent.json',_canonical({'input_root':str(INPUT_ROOT),
                         'packet':plan['packet_file'],'max_passes':2,'max_bytes':2*PACKET_BYTES}))
                 elif action=='effect':
-                    report['object_write_claim']=api._publish(root,'object-key.'+PACKET_SHA256+'.write.spent.json',
-                        _canonical({'operation_id':operation,'key':KEY,'packet_sha256':PACKET_SHA256,'max_effects':1}))
+                    key_sha256=_sha(KEY.encode())
+                    report['object_write_claim']=api._publish(root,'object-key.'+key_sha256+'.write.spent.json',
+                        _canonical({'operation_id':operation,'key':KEY,'key_sha256':key_sha256,
+                            'packet_sha256':PACKET_SHA256,'max_effects':1}))
                 else:_fail()
+            report['phase']='upload_transport'
             check();raw,status,token,local_md5=upload_transport(organization,KEY,plan['packet_file'],check,read_claim,report);check()
+            report['phase']='upload_response_verify'
             body=_body(raw,status,token)
             if status!=200 or body.get('success') is not True:_fail()
             report['upload_response_success']=True;report['object_created']=True
+            report['phase']='properties_after_claim'
             api._publish(root,operation+'.properties-after.spent.json',_canonical({'payload_sha256':_sha(_canonical(payload)),'key':KEY}))
+            report['phase']='properties_after_read'
             check();raw,status,token=json_transport('object/properties',payload);check()
+            report['phase']='properties_after_verify'
             report['properties_after']=properties_projection(raw,status,token,KEY)
             metadata=report['properties_after']
             if metadata['classification']!='present_refused' or metadata['size']!=PACKET_BYTES:_fail()
             report['metadata_size_verified']=True
             report['server_md5_matches_local']=metadata['md5'] is not None and metadata['md5']==local_md5
             report['status']='completed_upload_metadata_verified'
-    except BaseException as error:stop=error
+        report['phase']='completed'
+    except BaseException as error:
+        stop=error
+        if report['failure_phase'] is None:
+            report['failure_phase']=report['phase'];report['failure_class']=_failure_class(error)
+    report['operation_elapsed_ms']=_elapsed_ms(first_tick)
     report['status']='cancelled' if isinstance(stop,KeyboardInterrupt) else report['status']
     report['receipt_published']=True
     try:report['receipt']=api._publish(root,operation+'.result.json',_canonical(report))

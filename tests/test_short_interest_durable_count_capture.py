@@ -23,7 +23,9 @@ from test_short_interest_count_epoch_ledger_loader import Harness, forbid_extern
 
 
 @pytest.fixture(autouse=True)
-def fresh_outer_registries(monkeypatch):
+def fresh_outer_registries(monkeypatch, tmp_path_factory):
+    # Every reached hold writes its durable report here, never into the lane.
+    monkeypatch.setattr(outer, "HOLD_REPORT_DIRECTORY", tmp_path_factory.mktemp("hold") / "count_hold_reports")
     for name, value in (("_ARCHIVES", {}), ("_ARCHIVE_PLANS", {}), ("_ARCHIVE_FAILED", set()),
         ("_LEASES", {}), ("_LEASE_FAILED", set()), ("_LEASE_TERMINALS", {}), ("_LEASE_PHASES", {}),
         ("_LEASE_CLOCKS", {}), ("_RUNS", {}), ("_RUN_ORIGINS", {}), ("_TERMINAL_ORIGINS", {}),
@@ -692,6 +694,74 @@ def test_retention_announcement_never_claims_complete_private_retention(fabricat
     assert summary["known_private_observations_are_complete"] is False
     assert all(summary[name] == 0 for name in ("additional_HTTP_from_hold", "new_claims_from_hold",
         "new_STARTs_from_hold", "new_credentials_from_hold"))
+
+
+def _reach_real_hold(h, monkeypatch):
+    h.block_negative = True; h.raw = b"PRIVATE_BODY_SENTINEL"
+    fail_after_first_genuine_observation(h, monkeypatch)
+    original_hold = outer._retain_failed_process
+    monkeypatch.setattr(outer, "_retain_failed_process", lambda: (_ for _ in ()).throw(HoldingTestSentinel()))
+    with pytest.raises(HoldingTestSentinel): h.run()
+    monkeypatch.setattr(outer, "_retain_failed_process", original_hold)
+    monkeypatch.setattr(outer.time, "sleep", lambda seconds: (_ for _ in ()).throw(HoldingTestSentinel()))
+    return original_hold
+
+
+def test_hold_report_is_durable_content_addressed_and_written_before_stdout(fabricated_outer_run, monkeypatch, capsys):
+    # SI-CR24-002: exec13448's stdout projection died with its launching
+    # session; the accounting copy must already be on disk before stdout.
+    hold = _reach_real_hold(fabricated_outer_run, monkeypatch)
+    directory, seen, synced = outer.HOLD_REPORT_DIRECTORY, [], []
+    def recording_print(*args, **kwargs):
+        seen.append(sorted(path.name for path in directory.iterdir()) if directory.exists() else [])
+        print(*args, **kwargs)
+    monkeypatch.setattr(outer, "print", recording_print, raising=False)
+    real_fsync = os.fsync
+    monkeypatch.setattr(outer.os, "fsync", lambda fd: (synced.append(fd), real_fsync(fd))[1])
+    with pytest.raises(HoldingTestSentinel): hold()
+    files = sorted(directory.iterdir())
+    assert len(files) == 1 and seen and seen[0] == [files[0].name] and len(synced) == 2
+    data = files[0].read_bytes()
+    assert files[0].name == "hold-" + hash_bytes(data) + ".json"
+    assert files[0].lstat().st_mode & 0o777 == 0o400 and directory.lstat().st_mode & 0o777 == 0o700
+    assert b"PRIVATE_BODY_SENTINEL" not in data and b"PRIVATE_EXCEPTION_SENTINEL" not in data
+    lines = capsys.readouterr().out.splitlines()
+    summary = json.loads(next(line for line in lines if "preservation_blocked" in line))
+    record = json.loads(data)
+    assert record["retention_summary"] == summary and record["release_or_settlement_authority"] is False
+    assert record["private_bytes_retained_only_by_holding_process"] is True
+    persisted = json.loads(next(line for line in lines if "si-count-hold-report-persistence-v1" in line))
+    assert persisted == {"schema": "si-count-hold-report-persistence-v1", "durable_report_written": True,
+        "durable_report_sha256": hash_bytes(data)}
+
+
+@pytest.mark.parametrize("hazard", ["symlink", "group_readable"])
+def test_unsafe_hold_report_directory_never_receives_the_report_or_releases_hold(fabricated_outer_run, monkeypatch,
+        capsys, tmp_path, hazard):
+    hold = _reach_real_hold(fabricated_outer_run, monkeypatch)
+    target = tmp_path / "elsewhere"; target.mkdir(mode=0o700)
+    if hazard == "symlink":
+        outer.HOLD_REPORT_DIRECTORY.parent.mkdir(exist_ok=True)
+        outer.HOLD_REPORT_DIRECTORY.symlink_to(target, target_is_directory=True)
+    else:
+        outer.HOLD_REPORT_DIRECTORY.mkdir(); outer.HOLD_REPORT_DIRECTORY.chmod(0o750)
+    with pytest.raises(HoldingTestSentinel): hold()  # Still holds after the refused copy.
+    assert list(target.iterdir()) == [] and (hazard == "symlink" or list(outer.HOLD_REPORT_DIRECTORY.iterdir()) == [])
+    output = capsys.readouterr().out
+    assert "preservation_blocked" in output and '"durable_report_written":false' in output
+
+
+def test_hold_report_name_is_never_replaced(monkeypatch):
+    real = outer.datetime
+    class FixedClock:
+        @staticmethod
+        def now(zone): return real(2026, 10, 28, tzinfo=zone)
+    monkeypatch.setattr(outer, "datetime", FixedClock)
+    raw = canonical_json({"status": "preservation_blocked"})
+    digest = outer._persist_hold_report(raw)
+    path = outer.HOLD_REPORT_DIRECTORY / ("hold-" + digest + ".json"); original = path.read_bytes()
+    with pytest.raises(FileExistsError): outer._persist_hold_report(raw)
+    assert path.read_bytes() == original and len(list(outer.HOLD_REPORT_DIRECTORY.iterdir())) == 1
 
 
 def test_CLI_returns_two_only_after_all_negative_attempts_are_preserved(fabricated_outer_run, monkeypatch, capsys):

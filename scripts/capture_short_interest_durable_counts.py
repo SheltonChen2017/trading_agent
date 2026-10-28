@@ -8,6 +8,7 @@ No caller callback, JSON receipt, complete flag or pair closure is authority.
 """
 from contextlib import contextmanager
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
 import _thread
 import argparse
 import json
@@ -37,12 +38,13 @@ from scripts import diagnose_short_interest_body_receipt_custody as antecedent
 
 ROOT, BRANCH = transport.ROOT, lane.BRANCH
 SOURCE_AUTHORITY_SHA256 = "9d67d93ad79657031befd8849659bc20fc5834173d76a569bccb9307347e3a6c"
-RUN_PROTOCOL_SHA256 = "0a12282d516613ac3d6f5e407aab331c385159fbf5244370bc05b88f5551f7e5"
+RUN_PROTOCOL_SHA256 = "5d2cb9935d26bbdbe92ac15d2bc98b775a8b7202870a5f119f3aa15dcb74f959"
 NEGATIVE_PRESERVATION_POLICY_SHA256 = "e0e8df728d96dfaae20b43497ad150557d9a767e5d853d020ec6b9acfcc0423c"
 BASELINE_LEDGER_SHA256 = research_budget.BASELINE_LEDGER_SHA256
 MAXIMUM_CHUNK_SECONDS, MAXIMUM_ARCHIVES = 3600, 1
 MAXIMUM_WORKERS = 8
 DRIVER = "scripts/capture_short_interest_durable_counts.py"
+HOLD_REPORT_DIRECTORY = ROOT / "artifacts/short_interest/count_hold_reports"
 _ARCHIVES, _ARCHIVE_PLANS, _ARCHIVE_FAILED = {}, {}, set()
 _LEASES, _LEASE_FAILED, _LEASE_TERMINALS, _LEASE_PHASES, _LEASE_CLOCKS = {}, set(), {}, {}, {}
 _RUNS, _RUN_ORIGINS, _TERMINALS, _TERMINAL_ORIGINS, _TERMINAL_FAILED = {}, {}, {}, {}, set()
@@ -77,7 +79,7 @@ durable_capture_retention_required durable_capture_START_evidence_required
 durable_capture_START_evidence_changed durable_capture_contribution_changed
 durable_capture_checkpoint_changed durable_capture_checkpoint_required
 durable_capture_worker_slot_changed durable_capture_worker_stage_failed
-durable_capture_CLI_arguments_refused""".split())
+durable_capture_CLI_arguments_refused durable_capture_hold_report_refused""".split())
 _HOLD_CONTRACT_CODES = frozenset((*_CODES, *transport.diagnostics.LOCAL_CONTRACT_CODES,
     *(name for module in (transport, controls, responses, storage, reader, accounting, negative,
         transport_union, checkpoints, source_scope, negative.primitive, negative.immutable,
@@ -127,6 +129,7 @@ def protocol():
         "closed_control": "terminal_intent_only_until_original_outer_finish",
         "negative_preservation": "LIVE_independent_lease_before_claim_or_key_failed_already_received_only_inside_volume_drain",
         "negative_blocker": "fixed_allowlisted_original_failure_and_authenticated_pure_journal_or_explicit_unknown_before_mandatory_no_network_process_retention",
+        "hold_report": "content_addressed_owner_only_exclusive_fsynced_copy_before_stdout_write_failure_never_releases_process_retention",
         "negative_final": "once_issued_preservation_manifest_after_wire_drain_all_reserved_debits_unknowns_not_process_closure",
         "remote_START_evidence": "fresh_exact_origin_ref_original_SourceLease_at_most8_exact_ticket_roster_before_START_creator",
         "contribution": "original_reader_snapshot_immediately_after_chunkclosure_before_irreversible_settle_then_original_account7_only",
@@ -1373,14 +1376,60 @@ def _requires_process_hold():
     return bool(_BLOCKED_OPERATIONS) or any(summary["requires_process_hold"] for summary in summaries)
 
 
+def _persist_hold_report(raw):
+    """Durable owner-only copy of the fixed hold projection; never a release.
+
+    Only this process retains unexported RAM bytes, and its launcher can still
+    reap it (exec13448). The copy lets the projection's accounting outlive
+    stdout and the process. Its name is the SHA-256 of its exact bytes, so a
+    truncated or edited copy is self-evidently invalid; no file is replaced.
+    """
+    require(type(raw) is str and bool(raw), "durable_capture_hold_report_refused")
+    record = {"schema": "si-count-hold-report-v1",
+        "written_at_utc": datetime.now(timezone.utc).isoformat(timespec="microseconds"),
+        "process_id": os.getpid(), "retention_summary": json.loads(raw),
+        "private_bytes_retained_only_by_holding_process": True, "release_or_settlement_authority": False}
+    data = canonical_json(record).encode()
+    digest = hash_bytes(data); directory = HOLD_REPORT_DIRECTORY
+    try: directory.mkdir(mode=0o700)
+    except FileExistsError: pass
+    named = directory.lstat()
+    require(stat.S_ISDIR(named.st_mode) and named.st_uid == os.getuid()
+        and stat.S_IMODE(named.st_mode) == 0o700, "durable_capture_hold_report_refused")
+    parent = os.open(directory, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        opened = os.fstat(parent)
+        require((opened.st_dev, opened.st_ino) == (named.st_dev, named.st_ino), "durable_capture_hold_report_refused")
+        fd = os.open("hold-" + digest + ".json", os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o400,
+            dir_fd=parent)
+        try:
+            view = memoryview(data)
+            while view: view = view[os.write(fd, view):]
+            os.fsync(fd)
+        finally: os.close(fd)
+        os.fsync(parent)
+    finally: os.close(parent)
+    return digest
+
+
 def _retain_failed_process():
     """Keep independent ROFDs/private bytes alive; no network or cleanup API."""
     require(_requires_process_hold(), "durable_capture_retention_required")
     if "announced" not in _RETENTION_ANNOUNCED:
-        try:
-            print(canonical_json(_retention_summary()), flush=True)
-        except BaseException:
-            pass  # No notification failure authorizes losing private RAM/FDs.
+        raw = durable = None
+        try: raw = canonical_json(_retention_summary())
+        except BaseException: pass  # No summary failure authorizes losing private RAM/FDs.
+        if raw is not None:
+            # Durable copy first: an unread stdout pipe can block, and its
+            # reader can vanish with the launching session.
+            try: durable = _persist_hold_report(raw)
+            except BaseException: pass  # A failed copy never releases the hold.
+            try:
+                print(raw, flush=True)
+                print(canonical_json({"schema": "si-count-hold-report-persistence-v1",
+                    "durable_report_written": durable is not None, "durable_report_sha256": durable}), flush=True)
+            except BaseException:
+                pass  # No notification failure authorizes losing private RAM/FDs.
         _RETENTION_ANNOUNCED.add("announced")
     while True: time.sleep(30)
 

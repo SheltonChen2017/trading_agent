@@ -27702,3 +27702,56 @@ RootpausedallAPIeffectswhilehelperuncommitted; no nativejobwaspaused/cancelled.
 Freshoperation/HEAD/sourceboundsrequiredaftercommit; compiledfinancialsources
 areunchanged. Rootnextreadwillchecknaturalcapacityforpurelaunch; notendturn.
 Officialcontract: https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/backtest-management/read-backtest/charts .
+
+Fresh bounded native phase TPR-CMP28-API-FIXED-ARM-STATUS-20261028-005/034bb8d8a89cb95eb4dbf4a379702ba06c08590de7f5ea406faa0f40f8142fa6 at 4b0e0d396888be48d5b4042fcd98be58dc624901 before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-NATIVE-PROGRESS-METADATA-20261028-002/d2b58f13d92f8ddd97e75dd036c87320071eca559c15f4c9c34129f07c3efbf2 at 4b0e0d396888be48d5b4042fcd98be58dc624901 BEFORE 2 exact private inputs/120s; Own activejob operational CPU/RAM/uptime/progress only; no performance/coverageacceptance; fsync claim and directory retained.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-4B0-20261028-001/9a3b36303a608055f6d9861c91a0fe4494ea517c086d63931a8ce54a2a05dafa at 4b0e0d396888be48d5b4042fcd98be58dc624901 before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-4B0-PROGRESS-20261028-001/1d7863f2361d8eea4e64239353af0d91c772bd9b82a22d968ecad20b0155b80c at 4b0e0d396888be48d5b4042fcd98be58dc624901 BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-4B0-20261028-002/3ce61b8517a296c970980876d711fdb2c98dcdc5fa7a3e688f96459155318eba at 4b0e0d396888be48d5b4042fcd98be58dc624901 before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-4B0-PROGRESS-20261028-002/b652a46dfc036b195a85f3c95bde2a8c79a188e2b52b279f2474f5ee5491fe2b at 4b0e0d396888be48d5b4042fcd98be58dc624901 BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-4B0-20261028-003/62ad0a1bddf8afd273b5bbd3da0d8a72e6f3e6e8118195e8ebc9a1a27ee1d806 at 4b0e0d396888be48d5b4042fcd98be58dc624901 before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-4B0-PROGRESS-20261028-003/dfe020f12523edd861e250f3cf371b4f7ec85a2de0feead72c9ad925a85ad2e5 at 4b0e0d396888be48d5b4042fcd98be58dc624901 BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+Fresh bounded native phase TPR-CMP28-API-AWAIT-4B0-20261028-004/05a05fad344fe0cade0c0b4350a8f889aa8066662e5b03570d373d314bda4992 at 4b0e0d396888be48d5b4042fcd98be58dc624901 before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-AWAIT-4B0-PROGRESS-20261028-004/0d8319d3b18537df55b7b527e211e0e7079ced0f7f47958a1d0720ee16b7fb3a at 4b0e0d396888be48d5b4042fcd98be58dc624901 BEFORE 2 exact private inputs/120s; Own activejob terminalstatus/errorpresence/CPU/RAM/uptime/operationalprogress only; no financialacceptance; fsync claim and directory retained.
+
+### 104.31 Pure new-study completion framing and replay consumer
+
+New comparison_20261028_completion.py28531B/d0489d7c4e1c33207870f4c66e9bf0569145ba1be28f76edd4040685317e5467;
+focusedtest24932B/0849f031172c5cb1b176d177f2e4da6ffe8ef6a69ed9ca356ecfd02b74d915bd.
+Author85passed2.17s; root85passed2.47s, AST/inmemorycompile/diffclean. Root
+counter-reviewcaught realrenderer compatibility defect ininitialtemplatepath
+allowlist; correctedONLYexact development/raw_revision.py+pinnedsha ea4efcd9...,
+added actual OFF+all4multi publicrenderer source/config/calendarclosuretests
+withinertpacketdescriptor/no privatepacketreads. Three syntheticsemantic
+mutants (refusalreasonbypass, ordinalbypass, NAVcorroborationmiscount) werekilled.
+Only newmodule/tests; originalproducers/historyunchanged; no private/nativeeffects.
+
+Pure validate_completion / chunk_replay_plan / replay_chunks acceptONLYsupplied
+exactbytes/hashes/closedbinding. Checkactualstudy/candidate/op/attempt/project/
+job/config/policy/calendar/template+renderedclosures, producer-summaryconditions,
+indexv2-plain immutableprefix/chunkkeys/bytes/hash/counts andcontiguousordinals.
+Bound<=1024chunks/512KiBeach/256MiB/300000records. ActualdailyNAVaxis1449 is
+separatefromNAV-kindcorroborationproofs; reportedfull-axisNAVmetricsreuseexisting
+exactextended_metrics arithmetic. Independentfills/actions/cash/accounting,
+nativeorigin/backendcustody/fullretrieval/rights/PIT/canonical/permission flags
+REMAINFalse. A callerbindingorproducerboolean cannotmintnativeauthority or
+acceptedfinancialperformance. Reportedjournalmetrics areonlysuppliedobservations.
+Rawchunksstayprivate/inQC, neverpubliclicensedexports. Actualown-orderAPIpages
+andfullNAVchart areseparateindependentreconciliationworkifnativeCompleted.
+
+Read-onlyawaitbatch4B0 fourfreshstatus+operational-onlyprocessingphases completed
+withoutHEAD/remote/sourcemismatch; eachprivatefsyncclaim/response/receiptretained.
+No newjobs/retries/changes; actualTargetremotea0recheckedbeforeeachcommand.
+Latest100/200remainInProgress, operational.153/.155, noerror; thisisnotaccepted
+coverage/PnL. Purecompiledready,0jobs; active2nodespreserved. No long-livedpolling
+shell or recreatedautomation; boundedJSorchestrationusedseparatefreshcommands,
+and endedBEFOREthisHEADmutation. FuturestatususesnewHEAD/freshscopes.

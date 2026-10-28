@@ -70140,3 +70140,192 @@ encodings remain below local16384. Warmup capture/split and mocked invalid
 order regressions pass without economic edits; synthetic invalidity does not
 prove actual LEAN buying-power behavior. New test11746bytes SHA256
 7e0cf4c6578d7329d513547470ee1a0bb8512760e8fb29797d297f8806ebe268.
+
+The corrected current-document selection subsequently passed86checks1.30s;
+it does not add to the same86checks' initial83passes. Counter-review/runtime
+test record was committed locally as e843202f10e86fa1535bff49e4936d66366965ef.
+No round push has occurred. Matching live remote remains28795242 pending the
+single final handoff; every subsequent operation requires fresh local state.
+
+### 329.4 New dated native coverage contract and public source preparation
+
+The conservative W5 first-potential-prior-to-end envelopes contain, in the
+already-frozen five-source order,432/417/302/417/718sessions (2286total).
+The retained whole1452session native-book counts are366/374/257/375/1339valid.
+Thus at least66/43/45/42/0dense-envelope observations are unavailable by simple
+public-count arithmetic (196minimum). No source bytes or old controls were
+opened to compute that inequality. It is NOT proof that any realized strategy
+holding lacks a price: an exited stock can have later absent prices. Dense
+completeness is a conservative diagnostic, not a newly invented unconditional
+launch gate. Missing potential decision references and missing prices before,
+between, or after the first/last valid envelope marks are classified separately;
+neither potential membership nor this no-order result proves realized targets,
+position liquidation, terminal payoff or full strategy valuation.
+
+NEW `newrule_available_history_native_coverage.py` consumes the pinned original
+QC DATA through a fresh genuine input/6151binding/membership/NYSE/current
+identity/collision/currency check and the exact concrete native-book reader.
+It binds the W5period, all five expected demand geometries and exact book hash;
+it checks each dated envelope and potentially required decision reference.
+Its only emitted statistic is `ARV2_W5_NATIVE_COVERAGE`, at most8002ASCIIbytes,
+with exact closed schemas, count partitions and false readiness flags. Complete
+means the diagnostic finished; dense gaps remain possible. No raw price, row,
+new low-entropy identifier or free-form error is exported. Frozen dependencies
+retain dormant History/publication capabilities but the NEW Main/coverage
+call path invokes neither. No native book recreation or ObjectStore write.
+
+This is a justified no-order exception: measuring a pinned existing book's
+coverage has no trading target, and adding orders would not authenticate its
+dated observations. It gives no returns, strategy efficacy, capacity or
+independent-source/PIT/permanent-master admission. Main binds project38522505,
+non-live mode, USD1m, raw/no-fill-forward subscriptions, and the one algorithm
+day2026-10-14. It asserts no orders in initialize/on_data/end and emits only
+after exact summary validation; incomplete/late failure remains inadmissible.
+
+| New source | Bytes | SHA256 |
+|---|---:|---|
+|research/analyst_revisions_v2_qc/newrule_available_history_native_coverage.py|23296|f0f74cdc920f79d13e1e89ac0e60f71f993edeb72d2ac6853e13fc7a83798202|
+|tests/analyst_revisions_v2/test_r329_native_coverage.py|19311|b785dbeae7310a7de263915038661f7350bd2c2730b2ccccb8c6dce0b4b10ea5|
+|scripts/arv2_r329_native_coverage_projection.py|20072|d1058aefd6ca879f2c6d4879d5993697e4f721c81fe012a9ac5365e58faf9caf|
+|tests/analyst_revisions_v2/test_r329_native_coverage_projection.py|15964|c742f85617d9ed20fe044ccfa77ef3dc6bcc451220ce022ee7aa9a44d34c7b47|
+|scripts/prepare_arv2_r329_native_coverage_source.py|37209|652a46b6b0db83f50cf042e1b374b9beed3192d897e5886557e48cf25a75193e|
+|tests/analyst_revisions_v2/test_r329_native_coverage_source.py|16777|12da96a7ad0c2c164acacf86f34bd7c60e43f8439e6b9e26677042c3c0e47cde|
+
+Exact prospective projection for38522505:11Pythonfiles239149bytes,
+Main6892bytes/6f59864e930fba4c2ebc3ca16622b50fe859bb3ae1d793e0bc96b44a4794e298;
+projection2495bytes/a3a3a4a1a46b2760bc56964a89088a83f23c1918f74f5998c3e73d995fe64dba;
+profile7635bytes/bd22b98f02de9a81266e3768534aa5364a8c3d633220bd5b9d20794389a6ce5c
+(internal profile digest eaab07b09a5ad877ea8ee4f13032472706cfc3b02d94163ef5a0fb58972fd4db).
+Coverage profile4167bytes/97cc27c116037213dc6243164480336f98056f85abd7364185a684ae8d8194ad;
+projection policy4458bytes/d6c8b3cbde192236e855953fcb79e0be6806f43b2e442996880b8951384177db.
+Seven older deployed dependencies are byte-identical to the original source
+projection; fresh actual cloud readback still precedes launch. Existing unused
+research.ipynb is not imported/deployed Python evidence and remains untouched.
+
+Offline stage A fixes only
+`artifacts/analyst_revisions_v2/newrule_available_history_native_coverage_source/R329-20261028-A`.
+It exclusively creates/fsyncs a claim before generation/staging; retains
+original source/output descriptors and named ten-field/native ACL/xattr checks;
+publishes11sourcefiles plus profile/projection/report with no alternate output,
+cleanup or retry. Source bootstrap first authenticates24literal selected public
+execution/transform pins using stdlib, fixes package resolution and rejects
+flat/preloaded operational aliases, then checks retained endpoint metadata and
+native security again before claim. This prospectively corrects the same-round
+advisory finding that importing before pin checks omitted executed dependencies.
+It is not whole-interpreter integrity or continuous defense against arbitrary
+same-user modifications. Native policy denies all network, Keychains, security
+CLI and bytecode reads; permits only its new control/in-root support writes and
+no other artifact DATA/control read. No credential/provider/QC/Safari action.
+Its exact canonical profile is6289bytes/
+a898f1f8f386f94968b8c17178ed8584e99959e0bcaf0fec6000a2aac3989c05;
+native policy1450bytes/29cfbc8905336019079255faabb0d6041aa1a77cff83937d95593afd8620e95d.
+Internal180s starts after bootstrap/import; a committed outer210s collector
+must cover child startup/bootstrap/import and bound pipes before accumulation.
+Uninterruptible I/O/host suspension remain exclusions. Actual child0 plus exact
+bounded public-envelope validation is mandatory; a retained report alone never
+supplies success. Partial allocation/failure consumes or ambiguously spends A.
+
+Focused synthetic results, all native-network/artifact/Keychain/security denied:
+coverage63passes4.13s (initial49pass/1fixtureKeyError4.28s corrected only fixture;
+intermediate50/52/60pass selections overlap); geometry-pin and expiry-clipping
+memory mutations each caught1expectedfailure4.26s/4.51s, finally restored with
+unchanged source hash. Projection63passes4.50s, including isolated flat imports
+and exact old dependency equality. Stage56passes10.09s (39pass9.37s and55pass
+10.14s overlap), plus in-memory compilation of its two files. No actual stage,
+cloud source edit/readback, diagnostic job, private source read or look has
+occurred at this paragraph's writing. No full suite or independent acceptance.
+
+The NEW committed outer collector is
+`scripts/arv2_r329_bounded_process.py`,10073bytes/
+ff750d93cb2e48ff74e04cd6351e9380fe701a4ac7ee3e997e2de61ea751713a;
+its test4890bytes/d7b17368a1f4ece1ed4a58b44720a64b04aec378f25b3cccaebbf9fbdd6e80a6.
+It permits only fixed A/B caller paths, source-bound specification/arguments,
+env-i and a separately frozen exact native policy; its limited policy-string
+checks are NOT an independent native-policy verifier. Child stdout is bounded
+before accumulation; stderr is not forwarded; on deadline/bound/refusal only
+its own child is killed/reaped, no arbitrary process or other lane. Its210s
+starts before childPopen and covers child bootstrap/import, excluding outer
+spec/current-public-caller validation, plus up to5s reap. It does not guarantee
+descendant termination or bound uninterruptible I/O/host suspension. Overflow
+byte counts/hashes cover retained bytes, not total output. Outer0 can describe
+child2 and always leaves child_output_accepted=false until the target's exact
+validator checks the actually observed exit and envelope. Same-round advisory
+caught default argparse stderr echo; finite error override/no-echo regression
+was applied before any use. Final17passes0.43s, previous15passes0.43s/14passes0.46s overlap;
+real tiny synthetic children exercised bounds/timeout/reaping, not A/B data.
+Final integration additionally preserves exact finite preflight failures with
+all false flags, and bounds B child startup/import to60s instead of A210s.
+
+The NEW pure selected result parser
+`scripts/arv2_r329_native_coverage_result.py` is8687bytes/
+daaac5778c4f6c2a98996c6a061c5051b07207939f83df110a3fe74898c923ea;
+tests14539bytes/208dccef0bc39ef63f986e3e6c751b2b6efa7ce224123b9f80a76ee08a2ddcc9.
+Policy2113bytes/e409a66fbc35e3d13635c6ff8daf4f8fb6e5d07eb0bcfa119e8d9b89529d42fb.
+It checks only caller-supplied selected metadata: exact project/compile/job/name,
+current source/profile and future actual readback pins, exact Completed. versus
+finite failed terminal, strict canonical bounded JSON without duplicates or
+nonfinite/trailing content, genuine coverage geometry/partition arithmetic.
+Failed terminal overrides a complete statistic. It never invents absent IDs,
+authenticates external provenance, reads files/services, or treats coverage as
+strategy success.94distinctpasses0.24s; initial85pass/1fixture-expected-code
+failure0.26s corrected and86pass0.27s overlaps. No actual result parsed.
+
+NEW B code-only readback verifier
+`scripts/verify_arv2_r329_native_coverage_readback.py`29297bytes/
+8f951e7b70ca66ae69e05c774b37f5df53845b60c23c6cca4ae381fa55a19c05;
+tests22881bytes/919534d76679eb0d2cda6925d91d70017a51d8000747f8529f033795c28e1360.
+Its future fixed control is sibling`R329-20261028-B`. Exactly eleven literal
+Safari-observed Downloads paths, canonical map/hash/profile and clean run HEAD
+must be separately frozen BEFORE B allocation/read. It regenerates expected
+public projection from unchanged authenticated sources, then exclusively
+claims/fsyncs before reading those eleven public-code leaves through original
+nofollow FDs/full ten-field metadata. No search, census, fallback, download-code
+execution, deletion, metadata stripping, old control or private DATA read.
+New download-only transport policy permits bounded opaque values of only
+com.apple.provenance, com.apple.quarantine, com.apple.metadata:kMDItemWhereFroms
+and com.apple.lastuseddate#PS; it never interprets/prints values or strips them.
+Leaf emptyACL/owner/singlelink and before/after security equality remain. Outside
+root ancestor FDs retain named/fullmetadata identity; no emptyACL claim about
+the ordinary Downloads directory. Source files retain the old strict native
+security policy. This is a NEW public-browser-download scope, not an old
+source/security waiver. Its native policy denies all network/Keychains/security
+CLI/pyc reads, all nonlisted Downloads leaves and old artifact controls. The
+exact Downloads directory literal is allowed for original-FD traversal because
+macOS refused even O_EVTONLY under directory-data denial; census prohibition
+for this one directory FD is program-level, not falsely called native-enforced.
+
+B92focusedpasses9.56s. Earlier66pass/13fixturefail8.29s and78pass/1fixturefail
+retain missing macOS os.setxattr/synthetic control binding/nested sandbox refusal/
+OS-normalized synthetic provenance qualifications; corrected only fixture/policy
+scope before actualuse.82pass10.54s overlaps. Separate final direct native
+synthetic proof authenticated eleven synthetic leaves/full public closure and
+denied unlisted leaf and.pyc reads; no real Downloads or census. The superseded
+directory-denial probe failed and is not green evidence. Root compiled all
+12newsource/testfiles in memory under native all-artifact/network denial and
+verified current selected pins. Current-record selection86passes1.27s repeats
+the earlier86, not additive. No complete suite.
+
+### 329.5 D1 exact one-shot offline A stage freeze
+
+Delegated decision under the standing owner research/review waiver: invoke
+ONLY the new offline A stage once at the clean commit containing329.5 and the
+exact source/test pins above. Before dispatch verify designated root/branch,
+HEAD/status, current caller652a46... and outerff750d93... hashes. Pass that exact
+clean commit as --expected-head, the exact caller SHA and profilea898f1... .
+The committed outer collector receives canonical spec schema
+arv2-r329-bounded-offline-process-v1, operation=stage, those exact values,
+extra_args=[], and the exact1450byte native policy29cfbc... (not a reconstructed
+weaker policy). Compute/pass the spec's external SHA from those fixed fields;
+record actual spec/HEAD/result pins afterward. Use env-i, fixed Python3.13,
+PATH=/usr/bin:/bin:/usr/sbin:/sbin, -B/noautoload/no bytecode and already-created
+in-root `.pytest_cache/r329-stage-A/tmp` and `/pycache`. No network, Keychains,
+security CLI, credential, old control/DATA or QC access in this operation.
+
+Record the outer result and observed actual child exit in memory without
+rereading A output controls. Once-only pure target validate_output receives
+the exact bounded child envelope+observed child exit+original arguments under
+native all-network/all-artifact denial, and records only finite public result
+pins/counts. It is not an independent review or a second operational reader.
+Successful A permits a later separately recorded exact public-source install,
+not launch. Nonzero/unknown/ambiguous A is terminal/spent, no unchanged retry or
+renamed clone. No actual A allocation/invocation or job precedes this commit.

@@ -27009,3 +27009,96 @@ acceptance. Root immediately reserves OFF4/launches under fresh scopes; no
 Claude checkpoint or premature push.
 
 Root final five-module focused union431passed12.52s; independent final durableclaim19passed1.16s; all source changes remain lane-owned, no native result accepted. Commit is local preparation for immediate actual OFF4 recovery; exactlyone successful final push remains outstanding.
+
+Fresh OFF4 preparation005/89aaf2ecc03dddd5f3385ade9520e27ad294d6b68f75f1bdec3f05ac17331855 at a3d60ed60ef5a138f9f5f1620bc6613c8b47c676 before exact329334B current source read,120s/no data/outcome/nativeaccess.
+
+OFF4/look004 reservation 2d48b70e441c0bc35b20a4fe1c4d4fdd7b6ca7a59938b6e5a99861b6ccff0708 retained BEFORE effects at a3d60ed60ef5a138f9f5f1620bc6613c8b47c676; priorb26b5e8e6520b5bdab85077fe28862b9c6d4d198366059d8fb668c53c584e00b preserves all3newstrict failures+oldhistory/Miaconsultations. Exact4source-update candidatefebb0a092c83d7e028b75074dbe5fcca31c33757476da41d7a06ea1dd941bf55; fullinventory08ddcfc78c9e3e8579a0ce6ac2997034dc314ae54d963e464e141ad8ac571022; configb3d71478e7318b4c0771038617269bf263fa5a1e8edd764ef85fa9015baf44e7; bundle6d157dd3cfb47f0573078dd7c9b1c9ce692ac6202e02c591882b6feb587f689f. D009native scope explicitly includes <=86940fresh <=4096B ownjobclaims(contains/save/readback each1) BEFORE <=86940 exactheldSID/current-session DAILY/RAW/noFF/noextended requests/<=2rowseach. All source/HEAD/access/operation/look identities are chained to this durable reservation, no spent scopes or oldcaptures reopened. No unchanged blind retry, newparameters, upgrade/account/operator/broker action or rights/PIT acceptance.
+
+Fresh OFF4 upload005 read/effect scope 8c312fd6ded0fd4bbb34a4b7e885de596c890f23c45694421bb2b842e34472a7 at a3d60ed60ef5a138f9f5f1620bc6613c8b47c676 before exact347964B source read and6boundedrequests300s/10MiB; reservation2d48b70e... retained; preserve9extras.
+Native OFF4 upload005 plan 3061a55bbb9bd81636ec8f4f68c42a056faeeef0932ba2d599c68155db91fb95 precedescredentials/effects; before9a47b4e6.../after08ddcfc78c9e3e8579a0ce6ac2997034dc314ae54d963e464e141ad8ac571022.
+
+Fresh bounded native phase TPR-CMP28-API-OFF-COMPILE-20261028-004/efd45c0708cc05b7adb701a63e88a16eaf1e8bb0c221f17856151c7e8ac7f29d at a3d60ed60ef5a138f9f5f1620bc6613c8b47c676 before3 exact requests/120s/10485760B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-OFF-COMPILE-READ-20261028-004/d14cbda6869927e614b470113d4aea792ae79a63f8f88f216a847038a33025e1 at a3d60ed60ef5a138f9f5f1620bc6613c8b47c676 before1 exact requests/60s/131072B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-OFF-LAUNCH-20261028-004/05689f097cddee5a17c1b95daf3ec35b60323ed590eb6a19de6d4fb616da923b at a3d60ed60ef5a138f9f5f1620bc6613c8b47c676 before3 exact requests/120s/10485760B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+OFF4 genuine compile1e721f0c339222529c3d3dc41dd3dcdc-70893e76d2176f7a2f0ab9cb1c34a5e8
+BuildSuccess; actualjob12dd4732ba5d9d8f57950beb2a371c79 launched under reservation
+2d48b70e441c0bc35b20a4fe1c4d4fdd7b6ca7a59938b6e5a99861b6ccff0708.
+Launchreceipt32964ca6825f3e5cad1d0a9cc212440cb6dfa799967d9ff34f2f35df20190f6d;
+sourceinventory08ddcfc78c9e3e8579a0ce6ac2997034dc314ae54d963e464e141ad8ac571022
+was exact before/after compile AND launch. Actual new-study counts now4compile
+successes/4actualjobs, the first3terminal failures retained and OFF4pending;
+no accepted full-window result or invented profitability. Four signal arms
+remain unlaunched. No final push has occurred.
+
+Public-source-only dry rendering confirmed all4signal-arm templates accept the
+actual uploaded packet DESCRIPTOR without opening its280105389B data. All60
+source files compiled in memory,15perarm/max59774B; active closures plaintext
+and inherit D009/D010+durableclaim. Their preview operations/configs/closures
+are explicitly PROVISIONAL, no reservation/attempt/look/native readiness. Final
+configs must bind the actual OFF4 outcome ledger, not the preview placeholder.
+Commontemplateclosurebae651912b5ef646f18411f3127caafef18e396adbbf9b8bdd83aea00548457f;
+policy2cfeca1b...; calendar590b0e7c... . This is independent preparation during
+an actualnative run, not a software-only handoff or a substitute for5backtests.
+
+Audit qualification discovered during OFF4: official Python docs support bytes
+for save_bytes, and cloud backtests can write subject to actual permissions/
+quota; no actual permission or absent-key cause is established. Native SDK
+immediate save/readback MAY be cache-backed. Public LocalObjectStore marks RAM
+entries dirty and persists asynchronously; ReadBytes can return cache. Therefore
+our counts/pointers daily_claims_verified mean exact same-node byte/readback
+verification ONLY, not independent cloud-backend durability/immutability.
+The external fsync-retained root OFF4 source/HEAD/access/operation/look
+reservation2d48b70e... was durable BEFORE launch and explicitly bounded all
+fresh per-SID/session claim/History operations; those native receipts are
+additional evidence, not self-issued permission. No SDK marker/readback is
+substituted for that external durable authority. Backend claim/journal
+persistence remains unproved and must be independently checked before full
+auditable evidence acceptance. Do not relabel software/local cache proof as
+backend/Windows/operator custody. No new data request or account/purchase
+permission follows. This finding does not establish an actual native failure.
+Primary: https://www.quantconnect.com/docs/v2/writing-algorithms/object-store#Cache-Data
+https://github.com/QuantConnect/Lean/blob/master/Engine/Storage/LocalObjectStore.cs
+https://www.quantconnect.com/docs/v2/writing-algorithms/object-store#Save-Data .
+
+Fresh bounded native phase TPR-CMP28-API-OFF-STATUS-20261028-007/f435ebfb5ff9cb90abff71b6f6e5691cfd8e672796e6fd7a76a6bf49b405bbaa at a3d60ed60ef5a138f9f5f1620bc6613c8b47c676 before1 exact requests/60s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-OFF-STATUS-20261028-008/eb0e9730f070e20f9b9a2536f28791f193f7a0103246905161f99c8c7c756420 at a3d60ed60ef5a138f9f5f1620bc6613c8b47c676 before1 exact requests/60s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh OFF4 progress-only private scope TPR-CMP28-OFF-PROGRESS004-20261028-001/870754f9a326ac99675f4010170f1d23da1a00dbe3409497cedcd55f0106bd47 at a3d60ed60ef5a138f9f5f1620bc6613c8b47c676 before1557B read,60s/no economicfields projected/no effects.
+
+Decision CMP104-D011 under delegated scheduling judgment: OFF4 remains active
+and nativeAPI reports progress0.05/completedfalse/no error (metadata-only view,
+not accepted valuation coverage or performance). Begin the predetermined50%
+arm alongside it IF existingprivateQCcapacity permits; do not cancel others,
+change resources/accounts or infer resource contention from unrelated monitors.
+OFF was recovered/launched first; its full result remains pending and every
+source/attempt/view is retained. CompileId pins each job snapshot while the own
+private project is prepared for the next fixed arm. No outcome-selected
+parameter/universe/date/economic change or premature OFF acceptance is made.
+Actual scope/ledger for50must say OFF4pending, not pretend completed; all4
+signal configs regenerate from actualcurrent state rather than provisional
+preview ledger. Any observed common failure is diagnosed before knowingly
+repeating its path. A slot refusal creates no invented job/outcome look.
+
+Fresh actual50preparation001/ec64bff015d64d9d958862dc098ab52997201b01af24c4c0e549f6562a300575 at a3d60ed60ef5a138f9f5f1620bc6613c8b47c676 before347964B source-only read,120s/no inputpacket/outcome/nativeeffect; OFF4pending retained, D011fixed-arm scheduling.
+
+Actual50attempt1/look1 reservation 002c158e0a9c93f87ea834fcc24501d44567a1d4a2e56635dea18f8dca066cc8 retained beforeeffects at a3d60ed60ef5a138f9f5f1620bc6613c8b47c676; OFF4explicitlypending inprior1e658b8490788ef45561ef5c24fb2639354b51f5b47a4466c896196e585f79c5. Sourcebb410b56fc21cd21724a9639fec4c6a468e585e29be25466062cecc86e2eaf36; actualconfig1b93e7c14e6774abf6b970b80f378876b71e2887fc5132320053aa64bd4d2db3; full24fileinventory2403b7343a4291f4ddebc26e4e0aff1af77ba741bd4ebb9c918b393989068431; createdcomparison_20261028_events.py,comparison_20261028_multi_algorithm.py,comparison_20261028_signal_native.py,raw_revision.py. Native inputscope is exactlyone existingimmutable280105389B packet read/hash-beforeparse, <=400000events withcausalinitializedQCidentitymapper/frozenaxis, no rootpacketread/rawexport/rightsorPITinference. Nativeclose access operations share D009/D010closedlimits andexternaldurableparentauthority; SDKreadbackmeanssame-nodebytesonly. No resource/accountchange or cancellation; ifslotsunavailablewaitwithreceipt, no inventedjob/look.
+
+Confirmed CMP104-F004 before any50upload/compile effect: multi renderer pins
+one public template research/target_price_revisions_development/raw_revision.py,
+while API optional-source declarations only permit the QC module prefix.
+The guard would refuse a complete source declaration. Correction is ONLY an
+exact optional allowlisted public source path with existing hash/committedHEAD/
+diff protections. No broad development/sibling path access, private input right,
+source-write/payload/endpoint privilege or economic rule is added. All native
+multi bytes were already rendered from the exact pinned public source, hash
+ea4efcd9b0e73ae0b5c166d820c51e054559a3ed610041a6eb2acc8abca36353.
+The a3d60ed6...50source/reservation remain historical prepared artifacts, not
+spent or overwritten. A fresh upload/transport scope will explicitly bind that
+unchanged rendered snapshot to the new transport-only HEAD and unchanged
+renderer template hashes. No50compile/job/outcome exists yet; OFF4continues.
+
+CMP104-F004 narrow transport correction root55focusedpassed0.57s. API25515B/b5f9650e53b517a4b22ad89ae490b3c767d728c94c2f10c3fa1ab81ba5baec74; tests17727B/e657a8684ff5878f429e36429efed0986b16adffba15c335098fbe3e1d1e1780. Productiondiff only exactoptionalpublicsourcepath condition. All renderer templates/native flat bytes unchanged. Nextfreshscope distinguishes sourceSnapshotHEADa3d60ed6... and currenttransportHEAD; no oldclaim/rewrite/push.

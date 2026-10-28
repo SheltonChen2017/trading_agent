@@ -143,7 +143,8 @@ def prepare_plan(*, operation_id, git_head, source_hashes, owner_instruction_sha
         if not timedelta(0)<expires-issued<=timedelta(seconds=600): _fail()
         if type(source_hashes) is not dict or not REQUIRED_SOURCES<=set(source_hashes) or len(source_hashes)>48: _fail()
         for name,identity in source_hashes.items():
-            if name not in REQUIRED_SOURCES and re.fullmatch(r'research/target_price_revisions_qc/[A-Za-z0-9_.-]+[.](py|json)',name) is None: _fail()
+            if (name not in REQUIRED_SOURCES and name!='research/target_price_revisions_development/raw_revision.py'
+                    and re.fullmatch(r'research/target_price_revisions_qc/[A-Za-z0-9_.-]+[.](py|json)',name) is None): _fail()
             _hash(identity)
         allowed={} if allowed_source_hashes is None else allowed_source_hashes
         if type(allowed) is not dict or not set(allowed)<=WRITE_FILES or len(allowed)>24: _fail()

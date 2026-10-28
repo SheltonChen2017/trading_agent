@@ -116,6 +116,45 @@ def test_packaging_allowlist_does_not_admit_arbitrary_comparison_names():
     with pytest.raises(m.APIRefusal):plan(allowed_source_hashes={name:m._sha(b'# not admitted')})
 
 
+def test_exact_public_raw_numeric_helper_source_is_bound_in_upload_plan_without_new_write_authority():
+    name='research/target_price_revisions_development/raw_revision.py'
+    raw=(ROOT/name).read_bytes()
+    assert m._sha(raw)=='ea4efcd9b0e73ae0b5c166d820c51e054559a3ed610041a6eb2acc8abca36353'
+    upload,before,after=upload_plan()
+    sources={**upload['source_hashes'],name:m._sha(raw)}
+    prepared=plan(upload['requests'],source_hashes=sources,allowed_source_hashes=upload['allowed_source_hashes'],
+        attempt_id=upload['attempt_id'],reserved_look_id=upload['reserved_look_id'])
+    assert m._validated(prepared)==prepared and prepared['source_hashes'][name]==m._sha(raw)
+    assert prepared['allowed_source_hashes']=={'main.py':m._sha(after['main.py'].encode())}
+    assert name not in m.WRITE_FILES and prepared['automatic_retry'] is prepared['market_trading_authorized'] is False
+    assert before['mia_diag.py']==after['mia_diag.py']
+
+
+@pytest.mark.parametrize('name',[
+    'research/target_price_revisions_development/raw_revision2.py',
+    'research/target_price_revisions_development/RAW_revision.py',
+    'research/target_price_revisions_development/raw_revision.json',
+    'research/target_price_revisions_development/__init__.py',
+    'research/target_price_revisions_development/subdir/raw_revision.py',
+    'research/target_price_revisions_development/raw_revision.py/extra',
+    './research/target_price_revisions_development/raw_revision.py',
+    '../research/target_price_revisions_development/raw_revision.py',
+    'research/target_price_revisions_qc/../target_price_revisions_development/raw_revision.py',
+    'research/target_price_revisions_development/./raw_revision.py',
+    'research/other_lane/raw_revision.py', 'docs/ACTION_PLAN_2026-08-20.md',
+    str(ROOT/'research/target_price_revisions_development/raw_revision.py'),
+])
+def test_public_helper_exception_does_not_allow_neighbor_paths_aliases_or_other_repository_sources(name):
+    sources={**plan()['source_hashes'],name:'c'*64}
+    with pytest.raises(m.APIRefusal):plan(source_hashes=sources)
+
+
+@pytest.mark.parametrize('digest',['0'*64,'g'*64,'a'*63,True,None])
+def test_exact_public_helper_path_still_requires_a_valid_supplied_source_hash(digest):
+    sources={**plan()['source_hashes'],'research/target_price_revisions_development/raw_revision.py':digest}
+    with pytest.raises(m.APIRefusal):plan(source_hashes=sources)
+
+
 def test_changed_after_extra_fails_without_rollback_or_further_effect(tmp_path):
     p,before,after=upload_plan();calls=[]
     def transport(endpoint,*_):

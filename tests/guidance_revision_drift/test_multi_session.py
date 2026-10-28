@@ -1072,6 +1072,105 @@ class ReviewPinTests(unittest.TestCase):
         self.assertTrue(all(row["at"] > stamp(at(next_date, 10)) for row in carried))
 
 
+class CounterReviewActionTests(unittest.TestCase):
+    """GDR-CCR55-001: action uncertainty needs reconciliation, not another action."""
+
+    def _uncertain_split(self, security, *, count=5):
+        data = inputs(count=count)
+        reprice(data, "benchmark", "100")
+        split = {**known_action("split", security, at(session(data, 1), 9, 30),
+            at(session(data, 0), 17), key="INVENTED-SPLIT"), "ratio": "1.5"}
+        return data, split
+
+    def _cash(self, data, security, *, minute=30, key="INVENTED-CASH"):
+        known = at(session(data, 1), 10, minute)
+        return known_action("terminal_cash", security, known, known, cash="7",
+                            pay=session(data, 2), key=key)
+
+    def test_repeated_cash_terminal_cannot_clear_unknown_entitled_shares(self):
+        for security, sleeve in (("INVENTED-SEC", "strategy"), ("INVENTED-SPY", "comparator")):
+            data, split = self._uncertain_split(security)
+            first = self._cash(data, security)
+            second = self._cash(data, security, minute=31, key="INVENTED-CASH-2")
+            baseline = run_replay(**data, actions=(split, first))
+            result = run_replay(**data, actions=(split, first, second))
+            with self.subTest(security=security):
+                self.assertEqual(result["unresolved"].get(security), "unsupported_or_unresolved_terminal_economics")
+                self.assertEqual(result[sleeve]["settled_cash"], baseline[sleeve]["settled_cash"])
+                self.assertEqual(result[sleeve]["positions"], baseline[sleeve]["positions"])
+                self.assertFalse(result["complete_software_replay"])
+
+    def test_dividend_after_unknown_split_never_credits_guessed_shares(self):
+        for security, sleeve in (("INVENTED-SEC", "strategy"), ("INVENTED-SPY", "comparator")):
+            data, split = self._uncertain_split(security)
+            dividend = known_action("dividend", security, at(session(data, 2), 9, 30),
+                at(session(data, 1), 17), cash="1", pay=session(data, 3), key="INVENTED-DIVIDEND")
+            baseline = run_replay(**data, actions=(split,))
+            result = run_replay(**data, actions=(split, dividend))
+            with self.subTest(security=security):
+                self.assertEqual(result[sleeve]["settled_cash"], baseline[sleeve]["settled_cash"])
+                self.assertEqual(result[sleeve]["receivables"], [])
+                self.assertEqual(result["unresolved"].get(security), "fractional_split_cash_in_lieu_unsupported")
+
+    def test_later_integral_split_does_not_scale_an_unknown_share_basis(self):
+        for security, sleeve in (("INVENTED-SEC", "strategy"), ("INVENTED-SPY", "comparator")):
+            data, split = self._uncertain_split(security)
+            later = {**known_action("split", security, at(session(data, 2), 9, 30),
+                at(session(data, 1), 17), key="INVENTED-LATER-SPLIT"), "ratio": "2"}
+            baseline = run_replay(**data, actions=(split,))
+            result = run_replay(**data, actions=(split, later))
+            with self.subTest(security=security):
+                self.assertEqual(result[sleeve]["positions"], baseline[sleeve]["positions"])
+                self.assertEqual(result["unresolved"].get(security), "fractional_split_cash_in_lieu_unsupported")
+
+    def test_unsupported_terminal_economics_stay_unresolved_across_numeric_actions(self):
+        for security, sleeve in (("INVENTED-SEC", "strategy"), ("INVENTED-SPY", "comparator")):
+            for kind in ("noncash_merger", "cvr", "terminal_unresolved"):
+                for later_kind in ("terminal_cash", "dividend", "split"):
+                    data = inputs(count=4)
+                    known = at(session(data, 1), 9, 30)
+                    unsupported = known_action(kind, security, known, known, key="INVENTED-UNSUPPORTED")
+                    later_known = at(session(data, 2), 9, 30)
+                    later = known_action(later_kind, security, later_known, at(session(data, 1), 17),
+                        cash="1" if later_kind != "split" else None,
+                        pay=session(data, 3) if later_kind != "split" else None, key="INVENTED-LATER")
+                    if later_kind == "split":
+                        later["ratio"] = "2"
+                    baseline = run_replay(**data, actions=(unsupported,))
+                    result = run_replay(**data, actions=(unsupported, later))
+                    with self.subTest(security=security, kind=kind, later_kind=later_kind):
+                        self.assertEqual(result["unresolved"].get(security), "unsupported_or_unresolved_terminal_economics")
+                        self.assertEqual(result[sleeve]["settled_cash"], baseline[sleeve]["settled_cash"])
+                        self.assertEqual(result[sleeve]["positions"], baseline[sleeve]["positions"])
+
+    def test_late_terminal_uncertainty_cannot_be_cleared_by_another_payout(self):
+        data = inputs(count=4)
+        day0, day1 = session(data, 0), session(data, 1)
+        first = known_action("terminal_cash", "INVENTED-SEC", at(day0, 10) + timedelta(seconds=30),
+            at(day0, 10, 5), cash="7", pay=session(data, 2), key="INVENTED-LATE-CASH")
+        second = self._cash(data, "INVENTED-SEC")
+        baseline = run_replay(**data, actions=(first,))
+        result = run_replay(**data, actions=(first, second))
+        self.assertEqual(result["unresolved"].get("INVENTED-SEC"), "unsupported_or_unresolved_terminal_economics")
+        self.assertEqual(result["strategy"]["settled_cash"], baseline["strategy"]["settled_cash"])
+        self.assertEqual(result["strategy"]["positions"], baseline["strategy"]["positions"])
+
+    def test_exit_window_uncertainty_does_not_overwrite_unknown_action_economics(self):
+        data, split = self._uncertain_split("INVENTED-SEC", count=2)
+        withdraw(data, at(session(data, 1), 10, 30))
+        cash = self._cash(data, "INVENTED-SEC", minute=31)
+        result = run_replay(**data, actions=(split, cash))
+        self.assertEqual(result["unresolved"].get("INVENTED-SEC"), "unsupported_or_unresolved_terminal_economics")
+        self.assertEqual([row["quantity"] for row in result["strategy"]["positions"]], [495])
+        self.assertEqual(result["strategy"]["receivables"], [])
+        # A time exit outside the boundary must preserve the same uncertainty.
+        data, _ = self._uncertain_split("INVENTED-SEC", count=21)
+        split = {**known_action("split", "INVENTED-SEC", at(session(data, 20), 9, 30),
+            at(session(data, 19), 17), key="INVENTED-LAST-SPLIT"), "ratio": "1.5"}
+        self.assertEqual(run_replay(**data, actions=(split,))["unresolved"].get("INVENTED-SEC"),
+                         "fractional_split_cash_in_lieu_unsupported")
+
+
 class EdgePinTests(unittest.TestCase):
     """GDR-CR53-008 edges and the GDR-CR54-002 regression (section 54)."""
 

@@ -32,6 +32,7 @@ PRIORITY = {"program_drawdown": 1, "position_stop": 2, "guidance_invalidation": 
             "time": 4, "trim": 5, "terminal_entitlement": 0}
 _ACTION = {"action_id", "security_id", "kind", "effective_at", "received_at", "validated_at",
            "source_sha256", "ratio", "cash_per_share", "pay_date"}
+_EXIT_WINDOW_UNRESOLVED = {"required_exit_outside_replay_window", "invalidation_exit_outside_replay_window"}
 
 
 def _text(value):
@@ -311,7 +312,7 @@ class MultiSessionReplay:
                 if future:
                     self._schedule(security, future[0], "guidance_invalidation", position["quantity"])
                 else:
-                    self._state["unresolved"][security] = "invalidation_exit_outside_replay_window"
+                    self._state["unresolved"].setdefault(security, "invalidation_exit_outside_replay_window")
 
     def _submit_exits(self, at):
         today = at.astimezone(NY).date()
@@ -617,11 +618,15 @@ class MultiSessionReplay:
                 self._cancel(order, at)
             self._refuse("late_terminal_entitlement_requires_reconciliation", at, key)
             return
-        # An unresolved split leaves the entitled share count unknown, so a
-        # cash payout cannot be counted on the pre-split holding.
-        split_pending = self._state["unresolved"].get(security) in (
-            "split_requires_reconciled_orders", "fractional_split_cash_in_lieu_unsupported")
-        if kind in {"noncash_merger", "cvr", "terminal_unresolved"} or (kind == "terminal_cash" and split_pending):
+        # Only an exit beyond this rehearsal's boundary becomes moot after a
+        # verified payout. Unknown share or action economics need explicit
+        # reconciliation; a later action cannot make the old share basis true.
+        unresolved = self._state["unresolved"].get(security)
+        uncertain_economics = unresolved is not None and unresolved not in _EXIT_WINDOW_UNRESOLVED
+        if kind in {"split", "dividend"} and uncertain_economics:
+            self._refuse("unresolved_action_economics_requires_reconciliation", at, key, parity=True)
+            return
+        if kind in {"noncash_merger", "cvr", "terminal_unresolved"} or (kind == "terminal_cash" and uncertain_economics):
             self._state["terminal"].add(security)
             if held or (security == self.spy and any(row["quantity"] for row in tranches)):
                 self._state["unresolved"][security] = "unsupported_or_unresolved_terminal_economics"
@@ -680,8 +685,8 @@ class MultiSessionReplay:
                     tranche["terminal_unwind_at"] = unwind
 
     def _mark(self, security, session, at):
-        if self._state["unresolved"].get(security) not in (None, "required_exit_outside_replay_window",
-                                                         "invalidation_exit_outside_replay_window"):
+        unresolved = self._state["unresolved"].get(security)
+        if unresolved is not None and unresolved not in _EXIT_WINDOW_UNRESOLVED:
             return None
         rows = [row for row in self.references.to_dict()["daily_bars"] if row["security_id"] == security
                 and day(row["session_date"]) == session and utc(row["published_at"]) <= at
@@ -747,7 +752,7 @@ class MultiSessionReplay:
                     reason, quantity = "trim", quantity - retain
             if reason:
                 if future is None or future not in self.days:
-                    self._state["unresolved"][security] = "required_exit_outside_replay_window"
+                    self._state["unresolved"].setdefault(security, "required_exit_outside_replay_window")
                 else:
                     self._schedule(security, future, reason, quantity)
 

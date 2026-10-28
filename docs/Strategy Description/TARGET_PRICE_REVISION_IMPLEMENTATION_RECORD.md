@@ -26819,3 +26819,64 @@ No routine Claude checkpoint is required. Root continues with a fresh retained
 attempt/look/source/HEAD manifest, guarded upload/readback/compile and actual
 native diagnostic job; all two earlier new-study failures and historical
 old-study3failures/33looks remain retained. All four other arms remain unlaunched.
+
+Fresh OFF diagnostic preparation004/30b02e730f1e7e1b99f3307b46468f4661e9b0b4513462d215ad7c6f16eb398b at 78d08b0eefe9a1cf31ced44196b7fb436ba80fc8 before exact322474B source archive read,120s/no market/outcome/provider/native access.
+
+Diagnostic OFFattempt3/look003 reservation ca06671f5dfa82e4bd2733b6dde69bf9bf39e1cdb50fe2a01af9850ad671790f retained before effects at 78d08b0eefe9a1cf31ced44196b7fb436ba80fc8; priorcensus6d1008dddc52fc3c7733461203d192d535c6dfe21340880c7081ae53adc653a7 preserves all old/new failures/views. Generated20-file source 1f745366dec7db992e37293c0cb297d6366b9579e062e81a82c8582ad923bd8b; bundle reporte8bf1e3c5fa9758e19cff545cdda7973a1926e4921fb2ce9188198620bd90676; exactchangedfilescomparison_20261028_algorithm.py,comparison_20261028_config.py,extended_algorithm_successor.py; expectedfullinventory9a47b4e6c527b05d856b9b130c333ded2eed7f5d0b0e7dd734f56628b38f9714. Native private scope includes one<=4096B refusal witness and existing bounded own-job journal; no History/mark substitution/economic change or inferred success.
+
+Fresh diagnostic source upload004 read/effect scope ad331105358f0275f4c07868148ca525dede93c8ea3a491f34f6d56f230bc29e at 78d08b0eefe9a1cf31ced44196b7fb436ba80fc8 before exact329506B source read and5boundedAPIrequests; reservationca06671f.../attempt3/look003 retained.300s/10MiB, exact3sourceupdates, preserve9extras, no compile/job in this phase.
+Native API upload004 plan 522e4b7019dc2c766662600b629a2658631aa25e30239069fe83fde8ed231cb1 precedes credentials/effects; currentfullinventory76fdacd2d8eece268948fc39d8e2344d89aa0fbe1cf98dae6e8d8d86f0643ba6 to9a47b4e6c527b05d856b9b130c333ded2eed7f5d0b0e7dd734f56628b38f9714.
+
+Fresh diagnostic OFFcompile003/43f0e72800956846d38227258c334411f435f92b46a82d79b80f81caacb0f8f6 at 78d08b0eefe9a1cf31ced44196b7fb436ba80fc8 before3requests120s/10MiB; sourceinventory9a47b4e6c527b05d856b9b130c333ded2eed7f5d0b0e7dd734f56628b38f9714 checked before/after. Attempt3/look003 reservationca06671f... already retained; one genuine compile may spend an attempt without inventing a job/look.
+
+Fresh OFFcompile-read003/ee426264b8bb8f055ee29734850aa95807332c460c2f6e22ef1c50230b3c7acb at 78d08b0eefe9a1cf31ced44196b7fb436ba80fc8 before one knowncompile1bcdfc0c... read,60s/131072B; no newcompile/job/look.
+
+OFFcompile0031bcdfc0c17ebfe826bd367339c97ca66-9b45dfe180170b52a6e6cf6ce1818b4a actualBuildSuccess. Fresh launch003/87791c573dca25b0a2a47762d17e535564d3e992cc3b781bdaaa2684e0ed1156 at 78d08b0eefe9a1cf31ced44196b7fb436ba80fc8 before one backtest-create bracketed bysourceinventory9a47b4e6c527b05d856b9b130c333ded2eed7f5d0b0e7dd734f56628b38f9714,120s/10MiB; attempt3/look003 reservationca06671f... retained. One<=4096B privateprice-freewitness authorized, immutableownjobkey/readback; no History or changed economic rule.
+
+Diagnostic OFF3 actualjob4344595d56ea9e57134490dd5e759e04 launched undercompile1bcdfc0c...; launchreceipt794e386a... retained, sourceinventory9a47b4e6... exact before/after. Fresh result-view004/75b60c84a46bdfecc86e176b3a7570c1976d7cc6388d824bd3ed28640ee15065 at 78d08b0eefe9a1cf31ced44196b7fb436ba80fc8 before one knownjobread60s/4MiB. It does not create a newcandidate/job or reset priorviews.
+
+Fresh bounded native phase TPR-CMP28-API-OFF-STATUS-20261028-005/c0efe4573a09d6379bb9a21e5b7ff00c7e016481bb58ff12ed41333d4da194c8 at 78d08b0eefe9a1cf31ced44196b7fb436ba80fc8 before1 exact requests/60s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Root active-document selection597passed13.05s at78d08b0e... . Pure private
+witness validator/projector56focusedpassed0.34s, zero I/O/native/API paths;
+source10935B/c8566c9c3c76dea21457dbee7bee7a7c30bb9874eda0d6a5474b173199dad175,
+tests10561B/544570d7607229d3b6c90f7de859a0b1f6504ff981cf9d5ecbaa240ccd335cdc.
+It validates the exact source/config/job/readback pointer and closed body,
+returns only hashed SID/prefix and relative clocks/predicates, and grants no
+custody/download/rights. No raw witness download is attempted: the official
+QC object/get contract creates an export job and signed ZIP URL and documents
+additional export permission; neither export entitlement nor signed-host
+custody is established by a project organization binding. No purchase or
+invented direct-JSON transport is justified. Existing safe native pointer
+booleans may suffice; any additional body processing must be newly bounded
+inside the permitted native resource.
+
+Read-only primary-source investigation established a prospective exact typed
+DAILY/RAW/no-fill-forward/no-extended-hours history request for the held native
+Symbol over local session midnight through current16:01. It does not run here.
+The history provider filters start<EndTime<=end and uses a separate dummy
+security/cache; precise daily endpoints describe the native session aggregate,
+not a trade at16:00. A future equal-close corroboration would require exact SID,
+one non-fill-forward current-session bar ending at native close<=now, exact
+represented price equality and unchanged native money/cache snapshots. Missing
+or unequal evidence would still refuse. Allowing this as qualification is a
+new verification mode requiring an explicit delegated decision/common5-arm
+policy/source/config identities and fresh scopes; no such mode is silently
+admitted by this design evidence or by the currently running strict attempt3.
+Primary references: https://www.lean.io/docs/v2/lean-engine/class-reference/py/QuantConnect/Algorithm/_TypedHistory/
+https://github.com/QuantConnect/Lean/blob/master/Engine/HistoricalData/SubscriptionDataReaderHistoryProvider.cs
+https://github.com/QuantConnect/Lean/blob/master/Engine/DataFeeds/Enumerators/StrictDailyEndTimesEnumerator.cs
+https://github.com/QuantConnect/Lean/blob/master/Common/Util/LeanData.cs .
+
+Fresh bounded native phase TPR-CMP28-API-OFF-STATUS-20261028-006/c8df5bf666123800d83fdd46f7c034d465e4d8969fee7931e131a241c3e1afcb at 78d08b0eefe9a1cf31ced44196b7fb436ba80fc8 before1 exact requests/60s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+OFF diagnostic attempt3 actualjob4344595d56ea9e57134490dd5e759e04 ended
+Runtime Error; result-view006 receipt7f3291681bce13a40bcf1fd10eda02e2b1a55e96e9d40be3a7452a1ce78c209f,
+complete terminal49268B/3092fb911d4dcbdd8155e6f6fd975cecd1837868676739d819f2231b60460511.
+New-study OFF now3actualcompile successes/3failed native jobs, all retained;
+no full-window performance accepted. Four TPR arms remain unlaunched. The
+owner's specific prospective attempt-cap waiver and delegated continuing
+recovery authority remain in effect; the historical old-study3failures and33
+looks are not reset. The next step is exact error/pointer diagnosis under NEW
+bounded scopes, not an unchanged economic relaunch. No root cause or staleness
+exception is inferred from terminal status alone.

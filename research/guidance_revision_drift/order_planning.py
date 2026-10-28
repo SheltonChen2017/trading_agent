@@ -149,7 +149,9 @@ def _capacity(account: AccountSnapshot, calendar: CalendarInput, entry_session: 
     reasons = ["entry_control_" + name for name, state in value["entry_controls"].items() if state is not False]
     for row in value["receivables"]:
         settlement = day(row["settlement_session"])
-        calendar.index(settlement)
+        # This legacy field names a payment/service DATE assertion. Settlement
+        # services and NYSE trading sessions have distinct calendars; the
+        # execution contract checks service dates. This planner never credits it.
         if settlement <= entry_session and amount(row["amount"]) > 0:
             reasons.append("due_receivable_requires_reconciliation")
     return {"nav": nav, "gross": gross, "sectors": sectors,

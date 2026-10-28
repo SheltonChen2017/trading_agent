@@ -85,6 +85,8 @@ import research.guidance_revision_drift.guidance_decoder
 import research.guidance_revision_drift.research_reference
 import research.guidance_revision_drift.order_planning
 import research.guidance_revision_drift.pre_qc
+import research.guidance_revision_drift.execution_contract
+import research.guidance_revision_drift.multi_session
 import research.guidance_revision_drift.__main__
 import research.guidance_revision_drift.archive
 import research.guidance_revision_drift.artifacts
@@ -189,6 +191,9 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         # Review-state phrase: rotate it in the same commit as each new review
         # or counter-review section so the status block cannot go stale.
         header = record.split("## 1.", 1)[0]
+        self.assertIn("Settlement and multi-session engineering recorded in section 52", header)
+        self.assertIn('The later owner instruction "when done, push" authorizes one completed', header)
+        self.assertIn("One unintended passive QC screenshot", header)
         self.assertIn("Offline input-to-intent engineering recorded in section 51", header)
         self.assertIn("Claude review of section 51 is deferred at the owner's direction", header)
         self.assertIn("This is not the final step before QC", header)
@@ -217,6 +222,7 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         self.assertGreater(record.index("\n## 49."), record.index("\n## 48."))
         self.assertGreater(record.index("\n## 50."), record.index("\n## 49."))
         self.assertGreater(record.index("\n## 51."), record.index("\n## 50."))
+        self.assertGreater(record.index("\n## 52."), record.index("\n## 51."))
         self.assertIn("research/__init__.py`, remains unobserved", header)
         self.assertIn("paused pending platform preflight", header)
         self.assertIn("GDR-RP33 is accepted in section 34", header)

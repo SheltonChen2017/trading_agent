@@ -228,6 +228,24 @@ def observed_manifest() -> bytes:
                            "as_of_date": "2026-10-24", "subscriptions": subscriptions}).encode()
 
 
+def latest_observed_manifest() -> bytes:
+    """Retained October 28 metadata; no fresh probe or verified entitlement.
+
+    EODHD, FMP and Massive were observed again; only Stocks Starter appeared
+    in Massive's relevant inventory. Absent products have no inferred cause
+    or expiry status. Sharadar remains the October 24 owner report. Reuse the
+    historical snapshot as a detached projection; do not rewrite its evidence.
+    """
+    values = _decode(observed_manifest())
+    values["as_of_date"] = "2026-10-28"
+    for row in values["subscriptions"]:
+        if row["provider"] != "sharadar":
+            row["observed_on"] = "2026-10-28"
+        if row["provider"] == "massive":
+            row["products"] = ["stocks_starter"]
+    return canonical_json(values).encode()
+
+
 def main() -> int:
     raw = observed_manifest()
     print(canonical_json(assess_coverage(load_candidate(), raw, expected_sha256=hash_bytes(raw))))

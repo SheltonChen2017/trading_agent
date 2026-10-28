@@ -1,8 +1,8 @@
-"""Reproducible invented input-to-intent rehearsal and closed pre-QC handoff.
+"""Reproducible invented order rehearsals and closed pre-QC handoff.
 
 No provider, account, SDK, native algorithm, cloud project or evaluation is
 invoked. Exit zero means local software preparation, not readiness to upload.
-The complete multi-session real-equity order adapter is explicitly outstanding.
+The multi-session software remains unverified on real data or a native engine.
 """
 from __future__ import annotations
 
@@ -17,16 +17,20 @@ from research.guidance_revision_drift.bundle import (
     BundlePublicationUncertain, build_bundle, publish_bundle, verify_bundle,
 )
 from research.guidance_revision_drift.contracts import CandidateError, _read_regular_file, load_candidate
+from research.guidance_revision_drift.coverage_preflight import assess_coverage, latest_observed_manifest
 from research.guidance_revision_drift.fixtures import DATES
+from research.guidance_revision_drift.execution_contract import default_contract
 from research.guidance_revision_drift.guidance_decoder import decode_guidance
 from research.guidance_revision_drift.guidance_inputs import GuidanceLedger
 from research.guidance_revision_drift.historical_market import HistoricalMarketBatch, instant_ns
-from research.guidance_revision_drift.input_contracts import InputError, canonical_bytes, digest
+from research.guidance_revision_drift.input_contracts import InputError, canonical_bytes, decode_object, digest
 from research.guidance_revision_drift.order_planning import AccountSnapshot, plan_session
+from research.guidance_revision_drift.multi_session import run_replay
 from research.guidance_revision_drift.reporting import source_manifest_sha256
 from research.guidance_revision_drift.research_reference import CalendarInput, ReferenceBook
 
 NY = ZoneInfo("America/New_York")
+MAX_HANDOFF_BYTES = 1_048_576
 
 
 def _stamp(at: datetime) -> str:
@@ -122,6 +126,44 @@ def rehearsal_inputs() -> dict:
             "account": account, "entry_session": entry, "guidance_source_hashes": source_hashes}
 
 
+def multi_session_inputs() -> dict:
+    """Extend only the fixed invented recipe through time exit and cash receipt.
+
+    The settlement inventory deliberately uses a separately hashed copy of the
+    invented dates. It is not a derived or authenticated bank-service calendar.
+    No market/provider rows, calendars or subscription data are fetched.
+    """
+    inputs = rehearsal_inputs()
+    sessions = inputs["calendar"].sessions
+    first_index = inputs["calendar"].index(inputs["entry_session"])
+    last_session = sessions[first_index + 22].session_date
+    market = []
+    for session in sessions[first_index:first_index + 23]:
+        decision = _at(session.session_date, 10)
+        for template in inputs["market"]:
+            body = decode_object(template.raw_bytes)
+            price = body["quotes"][0]["ask_price"]
+            body.update(session_date=session.session_date.isoformat(),
+                        session_open_utc=_stamp(session.open_utc),
+                        session_close_utc=_stamp(session.close_utc))
+            body["quotes"] = [{"bid_price": price, "ask_price": price,
+                "bid_size": 100, "ask_size": 100,
+                "sip_timestamp": instant_ns(decision + timedelta(minutes=minute, seconds=-1)),
+                "participant_timestamp": instant_ns(decision + timedelta(minutes=minute, seconds=-1)),
+                "sequence_number": minute + 1, "conditions": []} for minute in range(7)]
+            body["minutes"] = [{"o": price, "h": price, "l": price, "c": price,
+                "v": 50000, "t": instant_ns(decision + timedelta(minutes=minute)) // 1000000}
+                for minute in range(6)]
+            market.append(HistoricalMarketBatch.from_bytes(canonical_bytes(body)))
+    settlement_days = tuple(session.session_date for session in sessions)
+    settlement_anchor = hash_bytes(canonical_bytes({"scope": "invented_settlement_service_dates",
+        "business_days": [day.isoformat() for day in settlement_days]}))
+    return {"calendar": inputs["calendar"], "references": inputs["references"],
+            "guidance": inputs["guidance"], "market_batches": tuple(market),
+            "contract": default_contract(settlement_days, calendar_source_sha256=settlement_anchor),
+            "first_session": inputs["entry_session"], "last_session": last_session}
+
+
 def build_handoff() -> dict:
     """Reconstruct the local invented recipe plus all-source audit inventory."""
     before = source_manifest_sha256()
@@ -137,30 +179,54 @@ def build_handoff() -> dict:
                 or intents[0]["comparator"]["order_now"] is not False
                 or plan["orders_submitted"] != 0 or plan["fills"]):
             raise InputError("invented pre-QC intent rehearsal did not reproduce")
+    replay_inputs = multi_session_inputs()
+    replays = {mode: run_replay(candidate, **replay_inputs, mode=mode,
+        producing_source_sha256=before) for mode in ("base", "stress")}
+    for mode, replay in replays.items():
+        if (replay["complete_software_replay"] is not True or len(replay["daily_nav"]) != 23
+                or replay["native_execution_verified"] is not False
+                or replay["comparison_parity_blocked"] is not True
+                or {row["reason"] for row in replay["permanent_parity_blockers"]}
+                    != {"comparator_budget_mismatch_beyond_rounding"}
+                or any(replay[sleeve]["receivables"] or
+                    sum(row["quantity"] for row in replay[sleeve]["positions"])
+                    for sleeve in ("strategy", "comparator"))):
+            raise InputError("invented multi-session cash or visible-parity rehearsal did not reproduce")
+    metadata = latest_observed_manifest()
+    coverage = assess_coverage(candidate, metadata, expected_sha256=hash_bytes(metadata))
     raw_bundle = build_bundle()
     bundle = verify_bundle(raw_bundle, expected_sha256=hash_bytes(raw_bundle))
     if source_manifest_sha256() != before:
         raise InputError("source changed during offline handoff preparation")
-    return {"schema": "gdr.pre-qc-handoff.v1", "status": "offline_rehearsal_prepared_not_QC_ready",
-        "recipe": "INVENTED-RAW-GUIDANCE-TO-ONE-SESSION-INTENTS-v1", "source_manifest_sha256": before,
+    report = {"schema": "gdr.pre-qc-handoff.v2", "status": "offline_replays_prepared_comparison_blocked",
+        "recipe": "INVENTED-RAW-GUIDANCE-TO-MULTI-SESSION-v2", "source_manifest_sha256": before,
         "candidate_sha256": candidate.sha256, "source_bundle_sha256": hash_bytes(raw_bundle),
         "source_bundle_bytes": len(raw_bundle), "source_bundle_members": len(bundle["manifest"]["members"]) + 1,
         "guidance_source_hashes": inputs["guidance_source_hashes"],
         "plans": plans, "plan_sha256s": {mode: hash_bytes(canonical_bytes(plan)) for mode, plan in plans.items()},
+        "replays": replays,
+        "replay_sha256s": {mode: hash_bytes(canonical_bytes(replay)) for mode, replay in replays.items()},
+        "execution_contract_sha256": replay_inputs["contract"].sha256,
+        "coverage_manifest_sha256": hash_bytes(metadata), "coverage": coverage,
         "unresolved_original_decisions": candidate.to_dict()["unresolved"],
         "remaining_before_QC": ["licensed_guidance_versions_and_withdrawals_and_time_semantics",
             "stock_and_SPY_NBBO_six_usable_common_years", "verified_dated_reference_calendar_and_actions",
-            "dated_fees_and_settlement_contract", "terminal_stock_payout_to_SPY_unwind_rule",
-            "multi_session_real_equity_fill_cancel_action_settlement_adapter", "exact_source_independent_review_deferred",
+            "dated_settlement_calendar_and_historical_fees_verified",
+            "proposed_terminal_SPY_policy_not_owner_frozen", "multi_session_comparator_parity_blocked",
+            "real_data_and_native_equity_adapter_validation", "exact_source_independent_review_deferred",
             "owner_research_scope_and_parameter_freeze", "explicit_QC_access_and_run_permission"],
-        "orders_submitted": 0, "native_adapter_implemented": False, "native_execution_verified": False,
+        "orders_submitted": 0, "multi_session_software_implemented": True,
+        "complete_comparison_verified": False, "native_adapter_implemented": False, "native_execution_verified": False,
         "data_rights_verified": False, "backtest_ready": False, "qc_upload_allowed": False,
         "qc_launch_allowed": False, "real_orders_allowed": False, "empirical_evaluation_allowed": False}
+    if len(canonical_bytes(report)) > MAX_HANDOFF_BYTES:
+        raise InputError("bounded offline handoff exceeded")
+    return report
 
 
 def verify_handoff(raw: bytes, *, expected_sha256: str) -> dict:
     digest(expected_sha256)
-    if type(raw) is not bytes or hash_bytes(raw) != expected_sha256:
+    if type(raw) is not bytes or len(raw) > MAX_HANDOFF_BYTES or hash_bytes(raw) != expected_sha256:
         raise InputError("retained offline handoff anchor mismatch")
     expected = build_handoff()
     if raw != canonical_bytes(expected):
@@ -178,7 +244,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("verify requires a retained hash and cannot publish")
     try:
         if args.verify_file:
-            report = verify_handoff(_read_regular_file(Path(args.verify_file), 65536), expected_sha256=args.sha256)
+            report = verify_handoff(_read_regular_file(Path(args.verify_file), MAX_HANDOFF_BYTES), expected_sha256=args.sha256)
         else:
             report = build_handoff()
         if args.output_dir:

@@ -1,13 +1,16 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Offline input-to-intent engineering recorded in section 51,
-2026-10-26. Claude review of section 51 is deferred at the owner's direction;
-it is not independent acceptance. The new supplied-input decoder, dated
-reference checks, provisional buy-intent planner and reproducible local handoff
-are offline software only. The full multi-session real-equity execution adapter,
-dated settlement/action contracts, terminal-stock-to-SPY rule and verified
-licensed data remain outstanding. This is not the final step before QC.
-No QC access, actual provider rows, purchase or empirical evaluation occurs.
+Status: **Settlement and multi-session engineering recorded in section 52,
+2026-10-28. Offline input-to-intent engineering recorded in section 51.
+Claude review of section 51 is deferred at the owner's direction;
+section 52 review is also deferred, not independently accepted.
+The new dated settlement contract and multi-session order rehearsal are offline
+software only. Real data, dated service-calendar authenticity, historical fees,
+SPY comparison parity and native execution remain unverified or blocked.
+This is not the final step before QC. One unintended passive QC screenshot
+occurred after shared Safari changed tabs; all provider UI work then stopped
+(52.2). No deliberate QC navigation, query or launch occurs in this round.
+No actual provider rows, purchase or empirical evaluation occurs.
 Codex counter-review of section 49 completed in section 50.
 Claude's `23d06504` test hardening is accepted.
 Claude's `d6036b7d` review is accepted after documentation clarification.
@@ -17,7 +20,9 @@ after `23d06504` pinned thirty input-layer guards; no production source changed
 in that review or this counter-review. The section-49 round was published as
 `d6036b7d`, including `ddaa5e54` and `23d06504`; it is not a pending push.
 This counter-review remains local-only; no push is requested.
-The section-51 implementation also remains local-only; no push is requested.
+The later owner instruction "when done, push" authorizes one completed
+section-52 audit/build-round publication, including accumulated local notes;
+it does not certify backtest readiness or authorize QC. No intermediate push.
 Codex counter-review of section 47 skipped at the owner's direction (48.1);
 that waiver is not counter-review acceptance.
 Claude's `c6834173` is accepted after documentation correction (section 44).
@@ -48,16 +53,17 @@ and policy level, without a QC clearance. Native loading of the recovery
 carrier is unverified. Only `data/__init__.py` was observed as one LF at
 runtime;
 `research/__init__.py`, remains unobserved. The input layer parses supplied
-local files only. Retained account observations are dated October 24, not a
-current entitlement check. A licensed/versioned issuer-guidance source,
+local files only. October 28 account observations refresh Massive/EODHD/FMP;
+Sharadar remains an October 24 owner report, not an account verification.
+A licensed/versioned issuer-guidance source,
 historical stock and SPY NBBO, six usable common years and processing rights
-remain unverified; no purchase is recommended yet (45, 46, 48.4, 50.4).
+remain unverified; no purchase is recommended yet (45, 46, 48.4, 50.4, 52).
 No successful native integration or empirical backtest readiness is
 established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 51. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 52. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -7038,3 +7044,325 @@ fixture `8f35d56a335d3f7d9dad016e1e2236de7fcd2635e5c463c30081f97b7b944458` and
 semantic draft `b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c`
 retain their previous custody. No carrier is regenerated/rebound, no new
 attempt/look is created, no publication is repushed and no monitor is rearmed.
+
+## 52. Coverage refresh, dated settlement and multi-session offline execution
+
+### 52.1 Owner scope, serialization and publication
+
+Owner direction: proceed with the remaining coverage checks, settlement and
+SPY rules and multi-session execution adapter, using existing subscriptions,
+deferring Claude review and accessing neither QC nor purchases. A follow-up
+first conditioned a single push on the last pre-QC step. The later instruction
+"when done, push" is applied to one completed bounded audit/build-round
+publication after focused verification and this handoff. It does not mean
+unverified data, rights or native execution become ready. The owner was told
+that these unresolved gates will remain explicit in the published record.
+There is no intermediate publication and no automatic next review watch.
+
+All repository work uses the mandatory worktree
+`/Users/sheltonchen/.codex/worktrees/guidance-revision-drift/trading_agent`,
+branch `codex/strategy-guidance-revision-drift`, origin
+`https://github.com/SheltonChen2017/trading_agent.git`. Clean start is
+`be0637e253b5955993e47d59a82734ae4cf27b85`, two known local commits ahead of
+live matching remote `d6036b7dc4de0164fb3cdf6c79a73bef35fdf948`. The local
+`6b19e342` section-50 closure and `be0637e2` section-51 implementation remain
+in the same linear history. No branch/worktree creation, switch, stash, reset,
+rebase, force push, PR/main merge or cross-lane mutation occurs. No Claude
+implementation/review runs concurrently in this worktree. Sections 1–51 remain
+byte-exact below the refreshed header. Only this lane record owns the handoff;
+all root/shared/process documents, original plan/PDF, draft and accepted
+synthetic runtime/carrier stay frozen.
+
+The section-49 Claude commits and their section-50 dispositions are consumed
+once; they are not a new review trigger. Sections 51–52 have explicit deferred
+independent review, not acceptance. Author/subagent QA below is not Claude
+review. No research family/look/date/economic freeze or empirical authority is
+inferred from permission to build. All eleven original null decisions remain.
+
+### 52.2 Existing-access observations and UI deviation
+
+Read-only authenticated subscription observations refreshed October 28:
+
+| Provider | Displayed scope | Evidence limit |
+|---|---|---|
+| Massive `/dashboard/subscriptions` | Stocks Starter, cancellation pending November 6, 2026; free Basic products for other asset classes | Corporate Guidance and Stocks Advanced are not displayed. Ratings/Insights seen October 24 are not in this refreshed inventory; no expiry/cancellation cause is inferred. No API/data entitlement or usable history is queried. |
+| EODHD `/cp/dashboard` | EOD All World and EOD Calendar cancelled, available until November 14, 2026 | Displayed access dates only, no exact expiry time or expanded product access. |
+| FMP dashboard subscription tab | Starter cancelled, active until November 13, 2026 | No hidden/higher-tier endpoint, transcript, quote archive or grandfathered grant is inferred. |
+| Sharadar | Bundle, five years, retained owner report dated October 24 | The current account was not verified; provider UI work stopped before that check completed. |
+
+Massive's Legal Agreements page says no agreements need filling out. This is
+not evidence of adequate non-display, retention or external-processing rights.
+No agreement was accepted, support/vendor message sent, key/password read or
+copied, billing/subscription/security setting changed, data endpoint queried,
+licensed row/sample downloaded or future-price/outcome join performed.
+Credential-containing provider UI fields were suppressed from emitted
+observations; only relevant plan names/dates were retained.
+
+Operational deviation: a fresh provider window was opened before attaching
+Safari to avoid inspecting its older QC tab. Later, while Sharadar's public
+page was selected in the last accessibility observation, shared Safari changed
+to an unrelated QC tab. An attempted element scroll was rejected as stale;
+the following screenshot passively displayed QC. Codex immediately stopped all
+Safari interaction and told the owner. There was no deliberate QC navigation,
+refresh, source/log/API query, quota read, Mia prompt, upload, compile or launch.
+The unrelated displayed content is not lane evidence and is not reproduced in
+this record or saved to a repository artifact. This round is therefore not
+described as having zero incidental QC observation. Public non-QC source
+research and offline engineering continued; no QC content was used.
+
+`coverage_preflight.latest_observed_manifest()` adds a separate strict dated
+metadata snapshot; the historical `observed_manifest()` and its CLI remain
+unchanged. Latest bytes: 1,234, SHA256
+`3019cd917d59891c428e96f12499e027e501f61a856481611b3fcb5ebb7aa590`.
+Historical October 24 bytes: 1,289, SHA256
+`b8a32bb90ed44c1aae5368e2ef19ffa30f16eb289e22adcc8f19d659f61bea38`.
+The latest snapshot updates only the envelope and three actually refreshed
+provider dates, retains Sharadar's older owner-report class and removes the
+no-longer-displayed analyst products from Massive's observed list. Existing
+`assess_coverage` still certifies no authenticity, rights, PIT or readiness.
+
+### 52.3 Targeted coverage and rights result
+
+Public primary documentation was checked October 28. These are documented
+capabilities and gaps, not an account grant or measured data completeness:
+
+- Massive Corporate Guidance is a separate product with advertised history
+  from September 12, 2011 and two-hour refresh. Its public schema still does
+  not establish immutable version/as-of history, original first delivery,
+  confirmation status, withdrawal semantics or announcement timezone. Prior
+  ranges and `last_updated` cannot prove the original immediate predecessor.
+  [Guidance](https://massive.com/docs/rest/partners/benzinga/corporate-guidance).
+- Benzinga separately documents confirmed/expected records and a removed
+  calendar route that includes guidance. It is not established that Massive
+  relays those fields/removals. Its `official` release tag is not a verified
+  confirmation flag. [Process](https://docs.benzinga.com/api-reference/guides/guidance-process-explained),
+  [removed records](https://docs.benzinga.com/api-reference/calendar-api/get-removed).
+- Massive Starter excludes historical NBBO. Advanced documents all quote
+  history from September 10, 2003, including stocks/ETFs such as SPY, but is
+  not displayed as owned. Starter's five rolling aggregate years cannot alone
+  establish the pinned proposed six-common-year floor. Bars are not quotes;
+  raw normalization, conditions, inactive identities and terminal consideration
+  still require source audit. [Quotes](https://massive.com/docs/rest/stocks/trades-quotes/quotes),
+  [history](https://massive.com/knowledge-base/article/how-much-historical-stock-data-does-massive-have),
+  [bars](https://massive.com/docs/rest/stocks/aggregates/custom-bars).
+- Owned alternatives remain useful for daily/reference context. Sharadar
+  Bundle documents daily/reference/action tables; EODHD All World bid/ask is
+  a current snapshot and its Calendar trends are analyst consensus; FMP Starter
+  does not establish the missing versioned issuer-guidance and historical-NBBO
+  pair. No actual common coverage is inferred or source histories stitched.
+  [Sharadar](https://sharadar.com/bundle),
+  [EODHD snapshot](https://eodhd.com/financial-apis/live-v2-for-us-stocks-extended-quotes-2025),
+  [FMP tiers](https://site.financialmodelingprep.com/datasets/market-data-historic).
+- Massive's public market-data terms require appropriate licensing for
+  non-display/investment-strategy use and impose retention/transmission limits.
+  Its individual terms distinguish subscription cancellation from agreement
+  termination and preserve paid access through the term. The actual agreement
+  must establish local research, raw/derived audit retention and private external
+  processing; neither blanket cloud permission/prohibition nor immediate
+  deletion on a displayed cancellation date is inferred. No legal clearance
+  is issued here. [Market Data Terms](https://massive.com/legal/market-data-terms-of-service),
+  [Individual Terms](https://massive.com/legal/individuals-terms-of-service).
+
+Before buying anything, obtain evidence of an owned guidance entitlement and
+the version/removal/confirmation/time semantics above; stock-plus-SPY historical
+NBBO entitlement and at least six usable common years; and the relevant
+non-display/retention/processing rights. These are specific unanswered coverage/
+contract questions, not an instruction to purchase Corporate Guidance or
+Advanced, open another account or acquire rows to probe unverified rights.
+
+### 52.4 Dated settlement, costs and proposed SPY terminal rule
+
+New `execution_contract.py` defines strict canonical
+`gdr.offline-execution-contract.v1`. It distinguishes factual regular-way
+settlement eras from proposed engineering costs and terminal timing. T+3 applies
+within the plan's 2013-start scope until September 5, 2017, T+2 from that date,
+and T+1 from May 28, 2024. Secondary-market SPY ETF shares use the corresponding
+regular-way cycle; creation/redemption and special settlements are outside the
+contract. [SEC 2017 guide](https://www.sec.gov/resources-small-businesses/small-business-compliance-guides/amendment-securities-transaction-settlement-cycle-small-entity-compliance-guide),
+[SEC T+1 final rule](https://www.sec.gov/files/rules/final/2023/34-96930.pdf).
+
+`default_contract(explicit_settlement_days, calendar_source_sha256=...)` never
+generates a bank calendar from weekdays or NYSE sessions. `settlement_on` uses
+the separately supplied service-date inventory; missing coverage refuses.
+May 24 and May 28, 2024 trades both settle May 29 under the documented cutover;
+market-open bank holidays can differ from settlement service days.
+[DTCC cutover](https://www.dtcc.com/Globals/PDFs/2024/April/25/20083-24),
+[DTC service calendar](https://www.dtcc.com/Globals/PDFs/2025/October/15/23036-25).
+Calendar hashes establish identity, not authenticity or completeness. A due
+payment on a nontrading service date is credited at the first observable
+market session on/after it. No protected later date is inspected to resolve a
+boundary receivable. The planner's legacy `settlement_session` receivable field
+now accepts a canonical payment date without demanding NYSE membership;
+it still never credits cash and flags already-due unreconciled amounts.
+
+Commission delegates to the existing pure cumulative fee function, preserving
+the proposed per-filled-order minimum and partial-fill delta. Base/stress
+impact remains 5/15 bps and minimum commission USD 1/2 with USD .005/share.
+Actual dated additional fees remain unverified. Nested fixed facts and false
+authority flags compare canonical bytes, rejecting bool/int aliases.
+
+The proposed terminal rule extinguishes a verified cash-entitled stock without
+fabricating a sale fill. Payout remains a receivable until its supplied pay date;
+no proceeds are injected into SPY. The corresponding SPY tranche requests an
+exit at the first supplied regular-session 10:00 strictly after the entitlement
+is known/effective; preopen knowledge can use that day's 10:00, exact 10:00 or
+later knowledge uses a later decision. Actual fills must still be subsequent.
+Late-known events and unmatched/cancelled/partial benchmark orders retain
+comparison blockers. This is a new proposed engineering policy, explicitly
+not owner-frozen economics, confirmation validity or a modification of the
+accepted SYN comparator's existing terminal blocker.
+
+SPY splits/dividends require explicit dated action inputs, including entitlement,
+amount and payment data; neither adjusted bars nor a quarterly scheduling formula
+supplies them. Fractional cash-in-lieu, noncash mergers, CVRs and ambiguous
+combined-action basis remain visible unsupported cases. [SPY prospectus](https://www.sec.gov/Archives/edgar/data/884394/000119312525013181/d875286d485bpos.htm),
+[FINRA ex-date rules](https://www.finra.org/sites/default/files/2024-02/Regulatory_Notice_24-04.pdf).
+
+### 52.5 Multi-session software and handoff contract
+
+New `multi_session.py` uses the neutral calendar/reference/guidance/market
+contracts with separate order/account/tranche state. `run_replay` and
+`MultiSessionReplay.step_session` accept explicitly invented rehearsals only;
+there is no provider loader, native SDK, broker call or empirical path. This
+does not relabel actual data or relax accepted SYN identifiers. Inputs are
+cloned and hash-bound; repeated session receipts are detached/idempotent,
+changed input binding or omitted/out-of-order sessions refuses, and failed
+sessions restore in-memory state. This is not durable crash-recovery storage.
+
+The engine covers entries/reservations, subsequent quote/completed-minute
+volume slicing, partial fills and cumulative fees, cancellation acknowledgement,
+guidance invalidation, twenty holding intervals, position/program stops, capacity
+trims, dated identity/sector, dividends/splits/terminal actions, settled cash and
+receivables, actual-fill-driven SPY tranches and complete paired daily NAV at
+18:00 New York. Missing valuations remain missing and pause new exposure while
+legitimate risk reduction continues. Unsupported actions and unresolved exits
+remain in the ledger; no last-close liquidation or future outcome is invented.
+The exact validated behavior and author corrections are recorded in 52.6.
+
+`pre_qc.multi_session_inputs()` extends only the fixed invented recipe for 23
+sessions, April 4 through May 7, 2025: entry, session-21 exit and settlement.
+Its separately hashed invented service dates are not actual bank-calendar proof.
+`build_handoff` now returns bounded `gdr.pre-qc-handoff.v2` with base/stress
+plans and full replay ledgers, exact hashes, latest coverage metadata and all
+remaining gates. The canonical verification-file ceiling is 1 MiB; oversized
+bytes refuse before expensive reconstruction. The CLI remains local-only,
+with source-ZIP publication/verify and ambiguous-publication reporting as in
+51.2; v1 handoffs belong to their retained old source epoch.
+
+Both 23-session books close to cash, but the fixed SPY-price-53 recipe exposes
+`comparator_budget_mismatch_beyond_rounding`: conservative limit sizing leaves
+more than a share-equivalent budget uninvested. This blocker is deliberately
+retained, not repaired by changing economics, source prices or reporting only a
+successful status. `complete_software_replay` describes completed accounting;
+`comparison_parity_blocked` remains true and all backtest/native/rights/authority
+flags remain false. A separate invented case tests admissible whole-share
+rounding. Neither case is a market return, an empirical look or native proof.
+
+### 52.6 Author correction ledger and final focused verification
+
+All findings below concern new, unpublished code in this round and were
+corrected before commit. No finding is erased by the subsequent green run.
+
+| ID | Priority/status | Confirmed issue and verified correction |
+|---|---|---|
+| GDR-AQA52-001 | P1 / corrected | An unresolved/terminal action could leave callback execution active; a cash terminal stock action also left its matched SPY buy open. Terminal/unreconciled securities now block fills, affected benchmark entry orders cancel and unmatched comparison evidence remains. No SPY buy follows its source entitlement. |
+| GDR-AQA52-002 | P1 / corrected | Permuting same-time split/dividend inputs retained the same input hash but changed cash. Global action iteration is deterministic; ambiguous same-security/same-instant action combinations refuse pending a declared share-basis ordering contract. Both permutations refuse rather than choosing favorable economics. |
+| GDR-AQA52-003 | P1 / corrected | Combining the earliest trim date with a later invalidation's larger quantity pulled liquidation before its cutoff. Per-reason requests now retain their own not-before dates; actual sales reduce remaining requested quantities. The regression sells 100 on the earlier trim date and the remaining 395 on the later invalidation date. |
+| GDR-AQA52-004 | P1 / corrected | Held sector/symbol stayed at entry metadata and a stale-symbol exit could fill after a dated change. As-of identity/sector refresh now governs holdings, capacity and execution batches. Wrong symbols/roles refuse. Risk-reducing exits do not inherit new-entry price/listing/liquidity-floor requirements. |
+| GDR-AQA52-005 | P1 / corrected | A same-day raw close published at 15:00 was accepted as the 16:00 close. Daily marks must originate no earlier than the supplied close and be known by 18:00. Future/missing marks remain missing and cannot become zero or a previous close. |
+| GDR-AQA52-006 | P2 / corrected | Split handling truncated fractional pending exit quantities. Every held/tranche/due quantity is checked before mutation; unsupported fractions remain unresolved without cash-in-lieu or silent integer truncation. |
+| GDR-AQA52-007 | P2 / corrected | Runtime SPY identity was not included in the bound lineage. Stable benchmark identity and all input bindings now recheck before every step, including cached retries. A changed runtime identity refuses. |
+| GDR-AQA52-008 | P2 / corrected | Late-known cash entitlement without intervening trades lacked a timing-parity blocker. Late knowledge remains permanent comparison evidence, with no backdated unwind or cash injection. Late actions with intervening trades require unresolved reconciliation. |
+| GDR-AQA52-009 | P2 / corrected | The planner demanded that receivable service dates belong to the trading calendar. Payment dates remain exact but independent; the execution contract checks supplied service coverage. An omitted trading date no longer aborts legitimate accounting or creates spendable cash. |
+| GDR-AQA52-010 | P2 / corrected | Pending benchmark sells could stop executing after their initial day. Overnight risk-reducing SPY orders retain identity, remaining quantity and cumulative fee while receiving the next session's execution clock/ADV. Pending/unmatched benchmark exposure at the study boundary explicitly blocks parity. |
+| GDR-AQA52-011 | P2 / corrected | Missing prior paired NAV did not always pause new entries, particularly after going flat or when only comparator NAV was absent. Either missing paired valuation blocks new exposure while legitimate liquidation continues. Program drawdown remains latched through the observation calendar. |
+| GDR-AQA52-012 | P2 / corrected | Lexical order IDs put order 10 before order 2; tiny-price comparator affordability used a potentially huge decrement loop. Creation sequence preserves shared-capacity order, and bounded binary search returns the same greatest affordable integer quantity. Twelve-order and call-count regressions pin both behaviors. |
+| GDR-AQA52-013 | P2 / corrected | The first actual multi-session integration failed when tuple-keyed daily usage reached canonical state hashing. Explicit unambiguous string keys now serialize; strict shared canonical JSON was not weakened. Complete session state receipts reconstruct. |
+| GDR-AQA52-014 | P2 / corrected | A withdrawal racing a partial entry scheduled only the shares held before the racing fill. Actual fills remain in the ledger, invalidation reruns after the buy fill and the full enlarged 200-share position exits at its permitted later session. Reservations release only on the simulated terminal acknowledgement. |
+| GDR-AQA52-015 | P2 / corrected | Fixed nested rule/false-flag dictionaries initially accepted bool/int aliases through Python equality. Canonical byte comparison rejects those aliases; commission reuses the existing pure cumulative function rather than duplicating it. Terminal preopen/10:00/10:01 timing has explicit regression coverage. |
+
+Read-only author probes reproduced eight of these concrete defects before
+correction and verified their current source fixes. The accepted SYN runtime's
+exit-scheduling helper has a similar static coalescing pattern; it is retained
+unchanged and is not claimed to have been independently re-reviewed or corrected
+here. Any analogous accepted-runtime issue needs its own scoped investigation
+before changing or reevaluating that old source. It creates no new attempt.
+
+Final root selection: 182 focused methods passed in 87.200 s, then three slower
+actual source-release/local CLI bundle-roundtrip/ordinary project-metadata
+methods passed in 193.384 s. Total 185 distinct focused methods, zero failures,
+errors or skips, bundled Python 3.12.14. Both commands use a sanitized
+environment, `-B`, parent/fresh-child network denial and parent repository-write
+denial; invented temporary directories support only named local file tests.
+Source identity is identical before/after. The project-metadata check is not
+QC access, a cloud project, a regenerated recovery carrier or native execution.
+No complete lane/repository suite is authorized or run.
+
+Author selections: contract 6 passed, with ten targeted in-memory mutants caught;
+coverage 17 passed, four new methods and four caught mutants; engine 29 passed
+in 15.845 s, then separate read-only author QA reproduced all 29 in 19.419 s.
+Root's combined contract/coverage/planner selection passed 40 in 0.905 s.
+Verifier-order/size and pure serialization probes also passed. Root's six
+additional targeted engine mutants each trigger the intended assertion failure,
+zero unexpected errors: future due-date admission, preclose NAV, benchmark
+identity mutation, lexical ordering, premature cash settlement and missing
+paired NAV. Every mutant is restored in memory in `finally`; no source file is
+rewritten by a mutation. This is author QA, not deferred independent acceptance.
+
+All 110 lane source/test Python files compile in memory. The fifteen-module
+native closure, immutable draft, original plan/PDF and sections 1–51 below the
+header are byte-exact to `be0637e2`. The initial bank-date regression's missing
+test import and one native-file comparison harness's module/path conversion
+were corrected; neither was a production failure or QC attempt. The final
+comparison/compilation and focused runs above are green.
+
+Current full source SHA256:
+`725001db4ca8250f6ba337b7be1fac6938022aa2383844ffbad579927dd81080`,
+59 production/draft/neutral manifest members. Complete review bundle SHA256:
+`9a2af5b961ab1bd318f252c628d5ea1339929cc3937a6d45037aa517f1cc4f57`,
+896,766 bytes, 61 archive members. Canonical v2 handoff: 83,641 bytes, SHA256
+`6187171be61de50d71aaa1d5aec55af5a658b32762e0175263f1b8d9c3f646f3`.
+Execution contract SHA256:
+`219706fd0a70ce4073e840848b7c8e0bb4e35fc9be054fff6352332f07fe42bb`.
+Base replay SHA256
+`b46bd84cf50219c6cb5e672d8fd565c9c94f8d37a67f1a035fdc1eba51167d3d`;
+stress replay SHA256
+`afbf433d21dc0fbbbc53ccccad41b123ebed59aca0d25da56fe58c4e6d20c73c`.
+The one-session plan hashes remain those in 51.4, while producing source and
+replay epoch are new. No hash implies source rights, PIT, native binding,
+economic freeze, performance or review approval.
+
+The complete package and handoff reconstruct/verify in memory. No durable source
+archive, native carrier, account configuration or provider dataset is published
+this round. Exactly thirteen lane-owned source/test/record files change.
+Final root/branch/HEAD/status/live matching-remote, exact staged content,
+credential-shape, history/frozen-path and diff checks precede commit. One
+guarded non-force push targets only the matching lane branch after the completed
+round is committed. Exact commit/publication result is retained in thread and
+private automation memory rather than a self-referential source hash here.
+
+### 52.7 Remaining gates and next authorized action
+
+This round completes bounded engineering/metadata work, not original GDR-0..6.
+No usable licensed guidance/NBBO corpus, six common years, dated settlement
+calendar authenticity, historical-fee audit, real-data/native adapter validation
+or empirical study is established. The terminal-SPY policy is proposed, review
+is deferred and the original economic/family/look/date decisions remain null.
+No data rights or backtest approval can be manufactured by a passing fixture.
+The next useful data action is evidence for the specific questions in 52.3,
+using existing access first; acquisition/evaluation waits for its actual scope
+and rights. Do not buy, renew, change account resources or access QC now.
+
+Original `GDR-base372-approved-20261008` remains CLOSED FAILED3/3, zero manual
+attempts, exhausted project 37647834 untouched by actions. Separate
+`GDR-Mia-base372-recovery-authorized-20261011` remains zero unsuccessful
+attempts, zero pending intents, no journal/project/launch, maximum three.
+Accepted producing `c589b3dddab3f1dd136d10ae7ce1851d64818906`, old full source
+`061ff30fe4053ebfabfa27c38d2e3ccd37d950c2fe3eae4375a933463125ee9f`, recovery
+project `c6b9443aa64f005c48e21f493bfea14918ecf6a730ac4f995bd3a70ee4c269a9`, prepared
+runtime `5d1dc6560ad2778fd6a8c514c16641b6e78cf82d514a0088f0a344c31783437d`, fixture
+`8f35d56a335d3f7d9dad016e1e2236de7fcd2635e5c463c30081f97b7b944458` and semantic
+draft `b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c` retain
+their distinct custody. No carrier is regenerated/rebound or native attempt/look
+created. Monitor remains PAUSED; no automatic review/recovery rearm follows
+the one owner-requested end-of-round publication.

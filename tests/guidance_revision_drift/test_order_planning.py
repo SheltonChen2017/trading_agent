@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from datetime import timedelta
+from datetime import date, timedelta
 from decimal import Decimal, localcontext
 import unittest
 from unittest.mock import patch
@@ -97,6 +97,17 @@ class OrderPlanningTests(unittest.TestCase):
                 with self.subTest(name=name, state=state):
                     self.assertIn("entry_control_" + name, self.reasons())
                     self.assertIsNone(self.plan()["candidates"][0]["intent"])
+
+    def test_future_receivable_date_need_not_be_a_trading_session_or_become_cash(self):
+        # The supplied trading calendar omits this date. A separately supplied
+        # payment/service calendar owns its validity, not the NYSE schedule.
+        with self.assertRaises(InputError):
+            self.inputs["calendar"].index(date(2025, 4, 18))
+        self.account(receivables=[{"amount": "10", "settlement_session": "2025-04-18"}])
+        report = self.plan()
+        self.assertEqual(report["nav_from_declared_inputs"], "100010")
+        self.assertEqual(report["remaining_declared_settled_cash"], "94998.025")
+        self.assertFalse(report["backtest_ready"])
 
     def test_extreme_current_price_does_not_create_unbounded_order_quantity(self):
         self.account(settled_cash="1000000000000000000")

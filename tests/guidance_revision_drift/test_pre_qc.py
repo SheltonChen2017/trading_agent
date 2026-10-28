@@ -13,7 +13,7 @@ from unittest.mock import patch
 from data.hashing import hash_bytes
 from research.guidance_revision_drift.bundle import BundlePublicationUncertain
 from research.guidance_revision_drift.input_contracts import InputError, canonical_bytes
-from research.guidance_revision_drift.pre_qc import build_handoff, verify_handoff, main
+from research.guidance_revision_drift.pre_qc import MAX_HANDOFF_BYTES, build_handoff, verify_handoff, main
 
 
 class PreQCHandoffTests(unittest.TestCase):
@@ -22,7 +22,8 @@ class PreQCHandoffTests(unittest.TestCase):
         raw = canonical_bytes(report)
         self.assertEqual(verify_handoff(raw, expected_sha256=hash_bytes(raw)), report)
         self.assertEqual(canonical_bytes(build_handoff()), raw)
-        self.assertEqual(report["source_bundle_members"], 59)
+        self.assertEqual(report["source_bundle_members"], 61)
+        self.assertEqual(report["schema"], "gdr.pre-qc-handoff.v2")
         self.assertEqual(set(report["plans"]), {"base", "stress"})
         for mode, plan in report["plans"].items():
             self.assertEqual(report["plan_sha256s"][mode], hash_bytes(canonical_bytes(plan)))
@@ -34,7 +35,23 @@ class PreQCHandoffTests(unittest.TestCase):
                     "empirical_evaluation_allowed"):
             self.assertIs(report[key], False)
         self.assertTrue(all(value is None for value in report["unresolved_original_decisions"].values()))
-        self.assertIn("terminal_stock_payout_to_SPY_unwind_rule", report["remaining_before_QC"])
+        self.assertIn("proposed_terminal_SPY_policy_not_owner_frozen", report["remaining_before_QC"])
+        self.assertIn("multi_session_comparator_parity_blocked", report["remaining_before_QC"])
+        self.assertTrue(report["multi_session_software_implemented"])
+        self.assertFalse(report["complete_comparison_verified"])
+        self.assertEqual(report["coverage"]["as_of_date"], "2026-10-28")
+        for mode, replay in report["replays"].items():
+            self.assertEqual(report["replay_sha256s"][mode], hash_bytes(canonical_bytes(replay)))
+            self.assertTrue(replay["complete_software_replay"])
+            self.assertEqual(len(replay["daily_nav"]), 23)
+            self.assertTrue(replay["comparison_parity_blocked"])
+            self.assertEqual({row["reason"] for row in replay["permanent_parity_blockers"]},
+                             {"comparator_budget_mismatch_beyond_rounding"})
+            self.assertEqual(replay["lineage"]["producing_source_sha256"], report["source_manifest_sha256"])
+            for sleeve in ("strategy", "comparator"):
+                self.assertFalse(replay[sleeve]["receivables"])
+                self.assertEqual(sum(row["quantity"] for row in replay[sleeve]["positions"]), 0)
+                self.assertEqual(len(replay[sleeve]["fills"]), 2)
         self.assertNotIn(b"source_payload_sha256", raw)
         self.assertNotIn(b"api_key", raw)
 
@@ -42,6 +59,12 @@ class PreQCHandoffTests(unittest.TestCase):
         with patch("research.guidance_revision_drift.pre_qc.build_handoff", side_effect=AssertionError("built before anchor")):
             with self.assertRaises(InputError):
                 verify_handoff(b"PRIVATE-INVALID", expected_sha256="0" * 64)
+
+    def test_oversized_handoff_refuses_before_expensive_reconstruction(self):
+        raw = b"x" * (MAX_HANDOFF_BYTES + 1)
+        with patch("research.guidance_revision_drift.pre_qc.build_handoff", side_effect=AssertionError("built oversized input")):
+            with self.assertRaises(InputError):
+                verify_handoff(raw, expected_sha256=hash_bytes(raw))
 
     def test_rehashed_approval_or_changed_plan_cannot_certify_itself(self):
         report = build_handoff()

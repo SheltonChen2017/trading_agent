@@ -13,7 +13,7 @@ from data.hashing import canonical_json, hash_bytes
 from research.guidance_revision_drift.contracts import load_candidate
 from research.guidance_revision_drift.readiness import preflight
 from research.guidance_revision_drift.coverage_preflight import (
-    CoverageError, assess_coverage, observed_manifest, main,
+    CoverageError, assess_coverage, latest_observed_manifest, observed_manifest, main,
 )
 
 
@@ -230,6 +230,78 @@ class CoveragePreflightTests(unittest.TestCase):
             self.assertEqual(main(), 2)
         self.assertEqual(opened, [expected, expected])
         self.assertFalse(json.loads(output.getvalue())["ready_for_backtesting"])
+
+    def test_latest_inventory_retains_separate_observation_dates_and_historical_bytes(self):
+        historical = observed_manifest()
+        self.assertEqual(hash_bytes(historical), "b8a32bb90ed44c1aae5368e2ef19ffa30f16eb289e22adcc8f19d659f61bea38")
+        latest = json.loads(latest_observed_manifest())
+        self.assertEqual(latest["as_of_date"], "2026-10-28")
+        old_rows = {row["provider"]: row for row in json.loads(historical)["subscriptions"]}
+        rows = {row["provider"]: row for row in latest["subscriptions"]}
+        for provider in ("eodhd", "fmp", "massive"):
+            expected = dict(old_rows[provider], observed_on="2026-10-28")
+            if provider == "massive":
+                expected["products"] = ["stocks_starter"]
+            with self.subTest(provider=provider):
+                self.assertEqual(rows[provider], expected)
+        # No account observation or cause for absent analyst products is added.
+        self.assertEqual(rows["sharadar"], old_rows["sharadar"])
+        self.assertEqual(rows["sharadar"]["observed_on"], "2026-10-24")
+        self.assertEqual(rows["sharadar"]["evidence_class"], "owner_report")
+        self.assertIsNone(rows["sharadar"]["displayed_access_end_date"])
+        self.assertEqual(observed_manifest(), historical)
+
+    def test_latest_manifest_has_stable_detached_bytes_and_no_new_io_seam(self):
+        with patch("research.guidance_revision_drift.coverage_preflight.load_candidate", return_value=self.candidate), \
+             patch("builtins.open", side_effect=AssertionError("file forbidden")), \
+             patch("os.open", side_effect=AssertionError("file forbidden")), \
+             patch("os.getenv", side_effect=AssertionError("environment forbidden")), \
+             patch("socket.socket.connect", side_effect=AssertionError("network forbidden")), \
+             patch("subprocess.run", side_effect=AssertionError("process forbidden")):
+            raw = latest_observed_manifest()
+            self.assertIs(type(raw), bytes)
+            self.assertEqual(hash_bytes(raw), "3019cd917d59891c428e96f12499e027e501f61a856481611b3fcb5ebb7aa590")
+            changed = json.loads(raw)
+            changed["subscriptions"][0]["products"].clear()
+            self.assertEqual(latest_observed_manifest(), raw)
+            with contextlib.redirect_stdout(io.StringIO()) as output:
+                self.assertEqual(main(), 2)
+            self.assertEqual(json.loads(output.getvalue())["as_of_date"], "2026-10-24")
+
+    def test_latest_assessment_remains_blocked_unverified_and_stock_only(self):
+        raw = latest_observed_manifest()
+        report = assess_coverage(self.candidate, raw, expected_sha256=hash_bytes(raw))
+        self.assertEqual(report["as_of_date"], "2026-10-28")
+        self.assertEqual(report["manifest_sha256"], hash_bytes(raw))
+        self.assertEqual(report["status"], "blocked")
+        for name in ("metadata_authenticity_verified", "ready_for_backtesting", "point_in_time_evidence_verified",
+                     "qc_access_allowed", "provider_access_allowed", "outcome_access_allowed", "orders_allowed"):
+            self.assertIs(report[name], False)
+        self.assertEqual(report["original_readiness"], preflight(self.candidate).to_dict())
+        massive = next(row for row in report["coverage"] if row["provider"] == "massive")
+        self.assertEqual(massive["guidance"], "issuer_guidance_not_in_reported_products")
+        self.assertEqual(massive["minute_volume"], "documented_aggregate_candidate_not_row_verified")
+        self.assertEqual(massive["historical_stock_nbbo"], "not_in_reported_product")
+        self.assertEqual(massive["historical_spy_nbbo"], "not_in_reported_product")
+        self.assertEqual(report["history"], self.assess()["history"])
+        self.assertEqual(report["blockers"], self.assess()["blockers"])
+
+    def test_latest_manifest_still_uses_strict_dates_hash_and_no_authority_fields(self):
+        original = json.loads(latest_observed_manifest())
+        for name, value in (("as_of_date", True), ("as_of_date", "20261028"), ("rights_verified", True)):
+            body = dict(original, **{name: value})
+            raw = canonical_json(body).encode()
+            with self.subTest(name=name, value=value), self.assertRaises(CoverageError):
+                assess_coverage(self.candidate, raw, expected_sha256=hash_bytes(raw))
+        for name, value in (("observed_on", False), ("observed_on", "2026-10-29"),
+                            ("rights_verified", True), ("nominal_history_years", True)):
+            body = json.loads(latest_observed_manifest())
+            body["subscriptions"][0][name] = value
+            raw = canonical_json(body).encode()
+            with self.subTest(name=name, value=value), self.assertRaises(CoverageError):
+                assess_coverage(self.candidate, raw, expected_sha256=hash_bytes(raw))
+        with self.assertRaises(CoverageError):
+            assess_coverage(self.candidate, latest_observed_manifest(), expected_sha256=hash_bytes(self.raw))
 
 
 if __name__ == "__main__":

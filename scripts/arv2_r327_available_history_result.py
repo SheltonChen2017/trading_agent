@@ -177,7 +177,10 @@ def select_response(value, *, expected_run_binding, expected_profile, expected_p
     binding = validate_run_binding(expected_run_binding, expected_profile=expected_profile, expected_public_cell=expected_public_cell)
     require(type(value) is dict, 'response')
     require(value.get('success') is True, 'response_success')
-    require(type(value.get('errors')) is list and not value['errors'], 'response_errors')
+    # Real QC success envelopes may omit `errors`; every reader that consumed
+    # actual responses accepts absence, so only a present non-empty or
+    # non-list value refuses (section 328).
+    require('errors' not in value or (type(value['errors']) is list and not value['errors']), 'response_errors')
     row = value.get('backtest')
     require(type(row) is dict, 'response_identity')
     require(type(row.get('projectId')) is int and row['projectId'] == binding['project_id']

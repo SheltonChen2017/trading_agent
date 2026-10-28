@@ -39238,3 +39238,215 @@ record is dirty after actual operations; cumulative changed paths are exactly
 the two new probe files and this record. Matching-only fetch still shows
 origin06870130. Diff whitespace checks pass; final code-pin/secret-shape and
 record checks precede the separate handoff commit and single publication.
+
+## 338. Free-original qualification and existing-provider archive check — prospective scope (2026-10-28)
+
+The owner explicitly directs: proceed with free SEC originals and existing
+subscriptions, check the historical availability archive before another
+purchase, NO QC, document everything and push once. The subsequent direction
+is to make that single push at the last step before QC backtesting, not an
+interim checkpoint. Starting independently fetched local/origin is exact
+`923b962a6364ddf98ccb54758e4f2a14852f896d`, clean on the designated lane.
+Incoming range is EMPTY. No older counter-review wait, arbitrary request cap,
+new purchase or QC release is inferred. All source/clock/rights/readiness
+facts and old consumed/failed/ambiguous roots remain binding.
+
+The still later explicit "when done, push" confirms one final publication
+for this completed investigation/qualification round. It does not turn a
+remaining factual blocker into readiness or permit an interim checkpoint
+push, source retry, supplier message or QC access.
+
+### 338.1 Existing-provider archival capability check
+
+The public-document investigation and one bounded connected-mail metadata
+search are read-only. The search is limited to the four existing providers
+and archival/dissemination/insider terms; four hits with unrelated subjects
+are not opened, their attachments are untouched and no private message values
+are copied into this record. This bounded metadata check establishes no
+archive confirmation; it does not rule out relevant text inside unread mail.
+It is not a full-mailbox absence claim or a supplier refusal.
+
+| Existing provider | Documented usable route | Archive question still unanswered |
+| --- | --- | --- |
+| Massive | [EDGAR Index](https://massive.com/docs/rest/stocks/filings/index) and [Form4](https://massive.com/docs/rest/stocks/filings/form-4) are daily early-access beta routes included in Stocks plans.335–336's actual samples succeeded. | No inspected public schema supplies original complete-submission bytes together with historically retained per-version public-observation/ingestion logs. Ask [support](https://massive.com/contact) whether a separate export is available under the existing account; no dedicated parsed Form5 product is established by those two routes. |
+| Sharadar | [Insiders/SF2](https://sharadar.com/docs/insiders) supplies normalized Forms3/4/5 history, with query and 5/10/full-history bulk CSV mechanisms. | The public fields do not provide accession-bound original parents or their historical first-observed/version history. A bulk file modification timestamp is the current export's clock, not each historical filing's publication. Ask about retained dated deliveries and underlying accession/version provenance through the provider's [contact route](https://sharadar.com/about). |
+| EODHD | [Form4](https://eodhd.com/financial-apis/insider-transactions-api) is an accession-based, daily refreshed endpoint with advertised history reaching2000. [Pricing](https://eodhd.com/pricing) places Insider Transactions in Fundamentals/All-In-One; broader SEC filings are All-In-One. | Existing EOD Historical plus Calendar does not itself establish entitlement. No refusal for this new route is claimed. Its date-only `filed_at` is not a historical per-version observation clock or an all-six-form original archive. Request export/sample and entitlement confirmation before any upgrade. |
+| FMP | [Insider search](https://site.financialmodelingprep.com/developer/docs/stable/search-insider-trades) supplies normalized transactions and official filing links. | Its own [timing guide](https://site.financialmodelingprep.com/insights/platform/api-access/how-fresh-is-fmp-data-understanding-update-timing-across-prices) distinguishes retrieval, filing/acceptance and historical database/version availability. None is silently substituted for another. Ask [support](https://site.financialmodelingprep.com/contact) for historically retained ingestion/change logs and original ownership parents. Existing order-form/retention rights still need actual evidence. |
+
+**IBDEC-338-01:** no additional ordinary insider/date-only/news API request is
+made merely to re-prove the absence of an archival field in an already
+inspected schema. No provider credential is read, plan changed, purchase made
+or financial/news/outcome representation captured for this check. A separate
+archive/export may exist: status is **UNCONFIRMED**, not unavailable, denied,
+entitled or qualified. A supplier response and authentic sample are needed
+to settle that account-specific question.
+
+Prepared supplier inquiry, without private account identifiers or keys:
+
+> I already subscribe to your service. Before purchasing anything else,
+> can my existing account obtain a historical archive for2020-10-01 through
+> 2025-12-31 covering SEC Forms 3, 3/A, 4, 4/A, 5 and 5/A? I need original complete
+> submission/header/ownership-XML bytes, accessions and issuer/owner CIKs,
+> historical receipt/public-observation timestamps with timezone and clock
+> semantics, exact body/version linkage, corrections/deletions/backfills and
+> explicit coverage gaps. SEC acceptance dates or a current regenerated bulk
+> file alone do not answer the historical-observation question. Please
+> distinguish an actual historical available-by upper bound from a later
+> reconstruction; an authenticated upper bound can suffice without the exact
+> first-public second. Please
+> identify any existing-account export, provide a small authentic sample and
+> manifest, and confirm permitted local retention and research processing.
+> Please do not activate a paid upgrade or new subscription.
+
+Sending provider messages requires explicit third-party communication
+instruction; this engineering/data-access task is not silently converted
+into sent mail or a support-ticket submission. The inquiry is concrete and
+ready for that separate instruction. No supplier message has been sent at
+this preregistration.
+
+**IBDEC-338-04, explicit subsequent owner answer:** "Do not send; continue
+the technical checks only." No supplier email, contact form, live chat or
+support ticket is sent. The inquiry remains an unsent specification, not
+an approval to contact anyone. Technical checks continue; an undocumented
+custom archive remains UNCONFIRMED, not a refusal or a purchased entitlement.
+
+### 338.2 New required21 original-quality qualification
+
+**IBDEC-338-02:** qualify genuinely fresh complete `.txt` original parents
+using the free [SEC archive route](https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data),
+rather than copy another normalized provider feed or fabricate NC wrappers.
+This is a bounded quality qualification, not the million-parent campaign or
+a claim to resolve historical knowability. Select at most EIGHT first eligible
+source-order Form 4 or 4/A requests in the required 2020Q4–2025Q4 window, after a
+genuine complete25-quarter all-six-form source/master/audit rederivation and
+current20,044-accession consumption reconciliation. All25 quarters remain
+included in late-repeat/conflict checks; no earlier2020Q1 substitution or
+silent refill after a late conflict. All source populations and underfill
+are conserved. Forms 3, 3/A, 5 and 5/A remain source context here, not silently
+acquired or admitted by a Form 4-only sample.
+
+The additive pure selector and protected collector use their own source/test
+images, registration and private namespace. They do not patch old campaign
+globals, retarget the old first64 selector or resume any old root. The new
+operation ID is `ib-sec-required21-originals-quality-20261028-once-v1`, root
+`artifacts/insider_buying/pilot_sec_required21_v1`. Existing failed planner,
+full-carrier, retained-prefix, first64, campaign-v2, v3 and ambiguous requests
+stay preserved. Unknown membership of previously exposed carriers remains
+unknown; it is not called zero exposure or an accession-specific claim.
+
+One actual activation on a clean committed exact source assembly performs
+one complete source selection and at most eight distinct parent GETs.
+Standalone full-source preflight is NOT also activated. Hold original inputs,
+current source images, intake/master evidence and current consumed controls
+through selection/capture; claim and durably start each request before HTTP.
+Hold the existing cooperative lane-controller EX lock through the whole
+selection/capture, without creating or rewriting that old controller root.
+Exclude completed, reserved, started, refused and ambiguous accessions. Never
+redirect, retry, follow a response link, switch an alias or resume the
+namespace. Stop at the first transport/framing/privacy/header/XML/native
+refusal and count every remaining unclaimed/unattempted candidate explicitly.
+
+Per-request transport deadline30s, body ceiling8MiB and at least0.5s from
+previous finish to next start; reserve8GiB plus worst-case selected-body space.
+These are lane-local controls, not a claim to enforce a machine-wide SEC
+request budget or count remote wire requests. Non200 bodies are unread and
+unhashed. Screen headers/body against the actual private SEC contact before
+success-body hashing/retention. A privacy-cleared but structurally rejected
+body may be retained with its fixed quarantine disposition; no parser guard
+is weakened. Preserve original bytes, not a reconstructed SEC-DOCUMENT or
+SEC-HEADER envelope. Reuse the unchanged complete-submission parser for
+request/header/XML identity diagnostics; declared acceptance is not thereby
+authenticated public availability or pre-entry knowability.
+
+Permit at most one own connected-profile read solely to supply the approved
+SEC contact through protected anonymous stdin. No contact argument,
+environment value, persisted contact file, fingerprint or profile output.
+Native source and inspection workers enforce process-tree network/fork/
+all-write/security-exec denial before private inputs and the existing real
+baseline-relative VM/sampled-RSS guard; this is not a hard RSS claim. Online
+transport belongs only to the separate trusted, exact-source, journal-bound
+parent. Invented fixture transport cannot dispatch actual requests.
+
+### 338.3 Completion, scope and publication boundary
+
+**IBDEC-338-03:** complete source structure and current collection custody
+can advance while historical known-by evidence stays unresolved. An
+authenticated historical upper bound at existing09:28/09:30 cutoffs remains
+sufficient; no exact-first-second rule, arbitrary delay, event dropping or
+new supplier purchase is imposed. Do not call accepted headers, current
+downloads or isolated green fixtures public-observation evidence.
+
+Use focused regression, meaningful guard-reversal, compilation, document/
+record/import-boundary and EXACT Insider package checks under effective
+native denial, never a complete suite. Peer QA remains attributed and is
+not a new independent Claude review. No QC/Safari/API/SDK/job/upload, outcome
+look, backtest, trading or shared-file change. Accumulate the work and a
+separate exact-hash final handoff; no interim push. Readiness and all twelve
+openP2 scopes remain unchanged until actual relevant evidence establishes
+otherwise. Missing archive/reference/rights/population facts are recorded as
+concrete blockers, never relabelled as pre-QC readiness.
+
+### 338.4 Final preactivation engineering qualification
+
+The actual source selection/contact/HTTP operation remains UNEXECUTED at this
+entry. Main independently observes **312 focused passes in51.20s**, no skips
+or warnings: the two new files, unchanged campaign-v2/batch-capture-v2 and
+original-parent structural tests, plus the EXACT Insider package guard.
+Main's active-document/record/lane-import-boundary/EXACT-package selection is
+**124 passed in5.09s**, no skips or warnings. Both use native process-tree
+network/security-exec denial and fresh privateTMP-only writes; the focused
+selection also denies fork. No full lane/repository suite is run.
+
+Final new source images:
+
+| Path | SHA-256 |
+| --- | --- |
+| `research/insider_buying_pilot_sec_required21_selection_v1.py` | `5fe982b17aef352ae636f95873cef7bbf0e8ff506b45adf9ef53e83756d45d70` |
+| `tests/test_insider_buying_pilot_sec_required21_selection_v1.py` | `d52d45a4dae7d881aa7dbfe6504d1f6dbcedf653b8a158dbe0404bacd99ef4ac` |
+| `research/insider_buying_pilot_sec_required21_capture_v1.py` | `4fda68c8aa547309894d4bf01fed312d9ba0d66dfe00ff7b48aea887daf67ecb` |
+| `tests/test_insider_buying_pilot_sec_required21_capture_v1.py` | `4f12381a312b46e05493f20eedfb1d614603960c13a2a989457320ce6699d74e` |
+
+Main's separate strong compile proof runs with all writes/network/fork/
+security-exec denied, isolated/no-site/no-bytecode flags and the REAL existing
+VM-growth/sampled-RSS guard live through stdout.151 images compile and current
+frozen pins match; inventory
+`c2eeff6ecfbc02da57fd0d113ad21a5db230809e83e8dcc1a620a24f723866cf`,
+elapsed1,646,398,459ns. This is current engineering qualification, not an
+actual parent observation or the later execution identity.
+
+Attributed internal peer QA, not Claude review: pure selection58 GREEN8.19s;
+final new-selection/capture/EXACT selection114 GREEN12.61s; separate150-image
+four-denial/live-memory compile inventory
+`642898bbfcd075845cc043ff2a70e5f6631795fa3d9a7a2776527f741b79ccf1`.
+Three pure-selector function reversals are caught: required-window and
+consumption-filter removals refuse in downstream validation; removing the
+late-selected-repeat finish guard causes the expected genuine-repeat test
+to fail. Four faithful live-module function reversals produce nine REDs:
+privacy1 at the pre-hash tripwire1.61s; durable-start1 before the invented
+HTTPS connection1.62s; first-refusal6 (eight calls rather than one)2.43s;
+zero-invocation/coherently rehashed success1 (expected refusal absent)1.87s.
+Methods are restored in `finally`; physical source images are unchanged.
+The final114 GREEN run follows those restorations and final corrections.
+
+Draft-only findings, all corrected before any actual activation:
+
+| ID | Priority | Disposition and reason | Evidence/qualification |
+| --- | --- | --- | --- |
+| IBREQ21-D01 | P2 | CLOSED: bind both original exposure inventory and snapshot; hold the existing cooperative EX controller through selection/capture. Otherwise another controller could race freshness or changed input metadata could be omitted. | Inspected old contracts, exact snapshot equality and actual fixed-root controller in production; temporary real-controller fixture holds EX through all eight invented requests. No actual concurrency incident. |
+| IBREQ21-D02 | P2 | CLOSED: fixture fencing/native denial occurs inside capture as well as its public wrapper, before private callbacks; the existing-parent fence precedes creation of the fresh leaf. | Initial invented setup failures were corrected in the new wrapper; direct actual-root substitution and capacity/spacing guards are tested. No actual namespace was consumed by these tests. |
+| IBREQ21-D03 | P2 | CLOSED: strict projection child spans/schema and one shared producer/readback terminal validator reject impossible status/invocation/body relations and invalid UTC ordering. | Positive original header/XML spans and coherent-rehash negatives; the zero-invocation guard reversal is killed. Finite assertions do not establish historic publication. |
+| IBREQ21-D04 | P3 | CLOSED: retain honestly recorded cleanup refusal in the common terminal/readback codec rather than divergent code allowlists. | Invoked cleanup refusal stops with a consumed claim and unread body; it is read back as refused, never completed. |
+
+The suggested extra scope-lock read was a FALSE ALARM: existing
+`_NewDirectory.publish` already verifies/pins its exact bytes, permissions,
+single-link identity and later reads. No redundant lock behavior is added.
+The trusted in-memory relay initially assumed JSON formatting for a public
+key tool result; that metadata-only parse refused before any contact/profile
+or source access, and the public-field codec was corrected. No private key
+is exported and no actual operation is relabelled or retried by that setup.
+
+Commit this qualified source assembly and prospective scope before activating
+the single registered source/capture operation. Recheck exact root/branch/
+HEAD/expected status and matching origin first. Record the already-existing
+execution hash and actual results afterward, then make the separate durable
+handoff and one final matching-lane publication. No interim push.

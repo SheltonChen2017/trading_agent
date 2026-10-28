@@ -27102,3 +27102,70 @@ unchanged rendered snapshot to the new transport-only HEAD and unchanged
 renderer template hashes. No50compile/job/outcome exists yet; OFF4continues.
 
 CMP104-F004 narrow transport correction root55focusedpassed0.57s. API25515B/b5f9650e53b517a4b22ad89ae490b3c767d728c94c2f10c3fa1ab81ba5baec74; tests17727B/e657a8684ff5878f429e36429efed0986b16adffba15c335098fbe3e1d1e1780. Productiondiff only exactoptionalpublicsourcepath condition. All renderer templates/native flat bytes unchanged. Nextfreshscope distinguishes sourceSnapshotHEADa3d60ed6... and currenttransportHEAD; no oldclaim/rewrite/push.
+
+Fresh bounded native phase TPR-CMP28-API-OFF-STATUS-20261028-009/33683916a9823de594c154e4139ecc023b884fad06e8aa7dae5e09fec43af335 at 1832f57c1a09ad581bf75d30619ac252638e3008 before1 exact requests/60s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+OFF4actualjob12dd4732... terminalRuntimeError, raw51218B/7c306b54... retained. Fresh error-only diagnosis TPR-CMP28-OFF-RUNTIME004-DIAG-20261028-001/65b2cd5f15cbab5e379c8234e18571ba845ff6112e9dd902f128dcc8e72a97d5 at 1832f57c1a09ad581bf75d30619ac252638e3008 before51218B read,120s/no economicprojection. Fiftycompile/job remains0; holdlaunchpending commonfaultdiagnosis rather thanblindrepeat.
+
+Fresh own-runtime-session metadata read TPR-CMP28-OFF-FAILURE-SESSION-20261028-001/924fbad7174ffc64d7c63ce59822ecebc7dad256bf0947d78394f0576d83499a at 1832f57c1a09ad581bf75d30619ac252638e3008 before51218B read,60s; failure-sessiondate only for a one-day non-economic private inputprobe, no rawbarclock/SID/prices/PnL.
+
+### 104.21 Actual previous-session refusal; bounded in-cloud diagnosis next
+
+OFF4 job12dd4732ba5d9d8f57950beb2a371c79 ended RuntimeError on its own
+2021-02-10 valuation. Complete response51218B/7c306b54997f7c52224e1cddd09db40d50e6e1c354d5f11e93483d3f6caa4c5e
+retained; error-only safe receipt942B/d2adea3deddcb8939389b39e7f4b3160dc3f85b75e83941e44537ecdd67cd523.
+The D010 direct pointer worked: reason minute_or_native_close_wrong_day_or_future,
+observed_date_equals_session=False, observed_relation=before, expected date
+equalsalgorithm=True. This is an EARLIER-SESSION cache, not a proved missing
+final minute. D009 correctly did not call daily corroboration for it. Earlier
+Mia cache/final-minute hypothesis is not the proved cause; do not relaunch that
+unchanged path or relax wrong-day guard. Parentwitness1343B/eef08aca32b99056dee0ce00389c53a8ee6a1628c29188afd8bebd362fe183dd
+was same-node readback verified. Backend existence remains unproved. Root
+has exported no witnessbody/rawSID/barclock/quote. New-studyOFF actual4compile
+successes/4failed nativejobs remain; all4signal arms have0compile/jobs, with50
+prepared reservation explicitlyheld after this common fault became known.
+
+Decision CMP104-D012 is a NONECONOMIC one-day own-private-QC metadata probe,
+not one of the5economic arms. Exception to order-based evaluation: this probe
+inspects the exact price-free parent witness and native input availability,
+places0orders/holds0stocks and interprets no PnL. Root will freshly reserve its
+compile/job/look and exact private/hash/source/HEAD access before effect.
+It may read ONLY the exact parent1343B/hashbound key IN QC; no object/get export,
+download, privatebody/rawSID/quotes leave QC. At native locked16:01 callback it
+reconstructs exact historical SID and requests current-session RAW/noFF/noextended
+MINUTE<=1000rows andDAILY<=2rows, no date widening/future/price/cache mutation.
+Safe output is only existence/hash/schema, hashedSID/relativeclockgap, typed
+row/count/session/end/parity booleans and actual childjob/provenance. It separates
+a native data gap from subscription lifecycle behavior without assuming either.
+
+Primary lifecycle verification corrected the draft design BEFORE any effect:
+upstream Initialize sees projectID but empty algorithmID/unlocked; Engine sets
+AlgorithmId/locked aftersetup. Therefore Initialize performs0private reads,
+configures only boundfailure_session2021-02-10 andSPYminuteextendedclock
+(max1440bars, noETFportfolio/substitution). ALL witness/History effects wait
+for actual childproject/job/lockedTrue proof before/after every action.
+Ownruntime failure-session parse safe162B/5d80caadb477ed11010b0f7e7733cd062624411a8f351036f2fdd5d79477acf5
+supplies that date, not a licensed raw bar clock. Missing/mismatched witness
+means0History and an honest diagnostic, never an invented identity.
+PrimarySIDrecipe SecurityIdentifier.parse thenSymbol(sid,sid.Symbol) is used
+byLEANOrderEvent.FromSerialized; actualnative roundtrip remains required.
+Primary: https://github.com/QuantConnect/Lean/blob/master/Common/Orders/OrderEvent.cs
+https://github.com/QuantConnect/Lean/blob/master/Engine/Engine.cs .
+
+Fresh parent publicconfig extraction TPR-CMP28-MARK-PROBE-PARENT-CONFIG-20261028-001/403da32f9c4829cf06a0a67863131396942f304b8799cc805aabf0ec1d3e9dc0 at 1832f57c1a09ad581bf75d30619ac252638e3008 before347964B source-only read,120s/no data/witness/outcome/nativeeffect.
+
+One-day probe source completed: renderer20721B/708dfff73f636d3a7f8cd4422a726e9b692d1b7ffcaab575e911db0224f7d8fc,
+tests18209B/c442b144008dd3f35f9e5bb0a59a9ae9e7374062a10bda69d6ac2b944df3bca1.
+Author38focusedpassed0.82s. Root source review corrected one end-provenance
+defect beforeeffect: end custody must match alreadyboundactualchildjob and may
+not overwrite its originalID afterdrift. Added negative provesfalse endcustody,
+preservedinitialID/0extraeffects. Pure renderer independentlypins unchanged
+helper6539ae.../producer27c651... and hard-binds OFF4parent metadata.
+GeneratedMAIN is readable<=60000B and self-contained, no newcloudfilename.
+Initialize0privateeffects; locked16:01exactparentcontains/read/hash/schema/
+session->nativeSIDroundtrip->2boundedRAWHistoryrequests, no unprovedfallback.
+Unknown/missingparent results0History; ordinarynativefailures are safediagnostic
+statuses, not acceptedfinancialresults. No rawSID/price/barclock exported.
+Rootproceedsnowto actualfresh probe reservation/compile/job, noClaudecheckpoint.
+
+Root final probe38focusedpassed0.63s; compilation/diffclean. No native/privateeffects by subagents. Localcommitprepares immediatelyreserved probe; onefinalsuccessfulpushstilloutstanding.

@@ -26728,3 +26728,94 @@ tests17090B/SHA-256
 Root checked the actual new packet descriptor against the actual multi renderer
 parser, compiled both files in memory, and ran the focused uploader selection.
 The next source-bound organization binding and transfer must be newly claimed.
+
+Fresh TPR-CMP28-OBJECT-PROJECT-METADATA-20261028-003 / 495b85f6a69612962649e6fcd36dfd41a8a6ff3cbc2145c231dd1f032059ddf2 at HEAD cc1d6a9e2028607deda4c4b12f827daeaba1c51b before private access/credentials/effects: one own-project organization metadata read,120s/65536B; no packet/object write or new job/look.
+
+Fresh TPR-CMP28-OBJECT-PLAIN-PACKET-UPLOAD-20261028-003 / 87fe99dcdaafb137380556b1bb6d97d924aeba166e9db71dca0de0bd08cd24d9 at HEAD cc1d6a9e2028607deda4c4b12f827daeaba1c51b before private access/credentials/effects: NEW immutable compatible key tpr-cmp28/inputs/37650980/TPR-SIX-UNIVERSE-FIVE-ARM-20261028-v1/upload-003/6a8f4915df539f5aee731832138e038caf6dd579b591ebe745e37b5d283e4708.json; exact absence before one effect,300s upload/600s operation, two-pass560210778B maximum; hash/stream/completed-send telemetry. Prior absent key/write claim stays spent and untouched; transport budget is an explicit hypothesis, no server-limit claim, automaticretry, overwrite, purchase or economic change.
+
+Fresh current OFF source capture005 651ad47004db98606f5794ffc104b6a5fb00e71a96597b33d5da9036486a063c at cc1d6a9e2028607deda4c4b12f827daeaba1c51b before genuine Mia read-only diagnostic, two files/read/24file/8MiB/120s. No source mutation, history, ObjectStore read or new job. A separate UI/Mia claim is required before any actual task.
+
+SOURCE005 stable current all-file baseline ended17:43:45UTC; read2archive322474B/3e18a5da... . Fresh genuine Mia READ-ONLY diagnostic scope TPR-CMP28-MIA-MARK-REVIEW-20261028-001/396d58364637def660f7bd642e31e8cf7b5a74b066605d55172f0b1c3ee89467 before Safari setup/one task;600s/24UIcalls/onechat/oneSend/own24files4MiB+200existingloglines only. Prompt 2cc5226eb414598a9d0e3d4cc25c5e9606c6a1182f6df0e6c44bf4fa5012ce4a; no source edit/control takeover/native run/ObjectStore/History/provider/account action. Implicit IDE build observations reserved separately; no new strategy job/outcome accepted. Stop if another own-project controller is active.
+
+### 104.17 Actual plain-packet delivery and genuine Mia consultation
+
+The fresh third transfer completed with server acknowledgment and metadata
+verification. Exact280105389-byte private plain JSON object is under the NEW
+compatible key tpr-cmp28/inputs/37650980/current-study/upload-003/contentSHA.json.
+Actual full-key SHA-256 is
+`8d3a181fabef2ea9167483319611268ee3ff0e14085e76c913b6eb596558fe9e`.
+The independent key-write claim is400B/SHA-256
+`9b71e258efbcd765cadd9bdc78bc17cecc81747554d5a9b24ca0b14e12edb768`.
+QC reported the exact size and MD5fe84b8224276bfef850509cd57836305, matching
+the local first-pass MD5. Native whole-SHA verification is still required in
+the actual TPR runtime; no source rights, native historical identity, share
+basis, PIT, canonical admission or economic performance follows from upload.
+The two local passes read exactly560210778B. Upload phase151525ms and whole
+operation154347ms were actually measured by the new telemetry, with no failure
+phase/class. Receipt2269B/SHA-256
+`655609ccc9496996266d4077078814eb4b4e535fa7fd01a7d97135efd645be92`.
+No purchase, overwrite, deletion, public data export or new backtest occurred.
+All earlier failed/uncertain-transfer receipts and old absent-key claim remain.
+
+The existing own-project Safari tab was stale/disconnected. Its one browser
+refresh restored the actual106-byte new main wrapper, matching current source
+rather than its cached old editor. The unrelated ARV2 tab and all provider tabs
+were preserved. A new implicit IDE build was visibly observed at5:47:04 with
+short ID52c87d-79f6b3 / LEAN2.5.0.0.18207; this is the separately reserved
+UI build observation003, not a deliberate strategy launch or outcome look.
+The first AX reload action failed before effect; native refresh restored the
+workspace. AX setValue/click and an unfocused paste did not populate the draft;
+a screenshot-guided native click positively focused the actual Mia text box,
+after which the exact scoped prompt appeared and ONE Send was clicked.
+
+Genuine built-in Mia task TPR-CMP28-MIA-MARK-REVIEW-20261028-001 is now pending
+in that own-project chat. The prompt hash is
+`2cc5226eb414598a9d0e3d4cc25c5e9606c6a1182f6df0e6c44bf4fa5012ce4a`.
+It permits only current own-project source and200 existing failed-job log lines;
+no source edit, edit-control takeover, compile/job, notebook/cell, ObjectStore,
+History/provider, account/resource or broker action. Source baseline005 is
+retained before the message. Actual task/tool provenance, output, limitations
+and post-task source comparison remain to be recorded; no Mia result or native
+witness is fabricated from a generic agent or from this pending state.
+
+Fresh existing-Mia closeout TPR-CMP28-MIA-MARK-CLOSEOUT-20261028-001/16b6ffe2321c8ade6cb31653a113ac04119869ad4306acdb54e2b9a3ad19b484 before another UI read,180s/max5calls. Parent diagnostic was sent once before its17:54:52 deadline; root now checks terminal result under a new observation scope. No new message/source/native data/job effect. If still running, stop only the same expired own read-only task, never another controller.
+
+Fresh existing-Mia closeout002 TPR-CMP28-MIA-MARK-CLOSEOUT-20261028-002/e6aba8b99ff476e9efd551bdf82922e30a8c9f0090274a6df8111c6228a04b72 at cc1d6a9e2028607deda4c4b12f827daeaba1c51b before bounded status/final-answer observation;180s/max5UIcalls/zero messages or native effects. Prior Stop outcome was not visible in truncated tool output and is not assumed.
+
+Mia UI now shows Completed after the single expired-task Stop; no final cause accepted. Actual observed read-only tools additionally included three read_backtest_orders calls outside the narrower source/log-only prompt; this scope deviation is retained rather than relabelled authorized in advance. No source edit/compile/job effect was observed. Fresh post-task current all-file capture006/5e83fb27571d361fe5a474edc51aca5e1ca7dd3db83406aba155e76f6546e937 at cc1d6a9e2028607deda4c4b12f827daeaba1c51b before two bounded source reads,120s/8MiB/24files. Separate exact private whole-file diff will establish any actual source changes.
+
+Fresh exact post-Mia whole-source diff TPR-CMP28-MIA-MARK-SOURCE-DIFF-20261028-001/276c7e871f6fa3a91b99f5fd8df87e7b57b4a616d877a76a9d0592c196a634e8 at cc1d6a9e2028607deda4c4b12f827daeaba1c51b before644948B maximum private source reads,120s/zero native effects.
+
+Post-Mia source reconciliation completed: all20files byte-identical,0changes, exact inventory76fdacd2d8eece268948fc39d8e2344d89aa0fbe1cf98dae6e8d8d86f0643ba6; complete private diff 801bb26f0fccc4de5f9c02b382455687138993e311f5b5feb09bc623ffc08b0d. The UI reports Completed after Stop, but no final diagnosis was captured and no full-window success follows. Native cache/factor warning hypotheses remain unproved. No Mia cloud correction to port.
+
+### 104.18 Exact mark-refusal diagnostic before the next native run
+
+Decision CMP104-D008 uses a fresh diagnostic OFF attempt3 to expose the
+previously opaque native close refusal. The economic guard itself is literally
+unchanged. Before that refusal a single at-most4096B plain JSON object retains
+the exact SID/expected-close/observed-end and native job/config/source/calendar
+bindings inside the own private QC ObjectStore. It queries no History, price,
+provider or replacement mark. The attempted flag precedes every effect; an
+existing/unknown key is never reopened or overwritten and no effect retries.
+Intrinsic project/job/locked custody surrounds contains/save/read, including
+uncertain effects. A public log can contain only key/hash/size/status/type and
+safe comparison predicates. SHA/bytes verification is claimed only after exact
+readback and post-read custody. Ordinary publication or notice failure still
+ends in the original strict refusal; cancellation and nonordinary fatal stops
+remain body-free. No staleness bypass, exclusion, economic change or completed
+backtest is claimed by this instrumentation.
+
+Root focused OFF/both-renderer checks:195passed6.39s; independent narrow
+privacy/custody/strict-close check24passed1.31s. In-memory compilation and diff
+checks passed. Driver38409B/SHA-256
+`1d365d21eaa1ae9fa40d6d67bf7ed2743280e1c39519154068f5c2aff38e1871`;
+OFFtest44572B/SHA-256
+`ef8e55aeab8fc7393fa0a3f86b33adc81f606eb5984bc2b4d5ba29550e46c567`;
+OFF renderer11106B/SHA-256
+`9a12fab5ae937fd0e2b6b52e3bfdcc2f515436e0b3a696014ded9d045b079086`;
+multi renderer12187B/SHA-256
+`40a8926e0cecd1372a8aad94170b266fcd851a37c90a920052c06b781609fd50`.
+No routine Claude checkpoint is required. Root continues with a fresh retained
+attempt/look/source/HEAD manifest, guarded upload/readback/compile and actual
+native diagnostic job; all two earlier new-study failures and historical
+old-study3failures/33looks remain retained. All four other arms remain unlaunched.

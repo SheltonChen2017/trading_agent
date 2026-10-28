@@ -635,3 +635,176 @@ def test_equal_last_bar_and_native_close_on_another_day_still_refuse(driver,monk
     calls=[];monkeypatch.setattr(driver.predecessor.TargetPriceExtendedAlgorithm,"_daily_audit",lambda self:calls.append("accounted"))
     with pytest.raises(ValueError):algo._daily_audit()
     assert not calls
+
+
+def mark_witness_case(driver,monkeypatch,*,session="2021-02-10",observed=None,expected=None):
+    day=date.fromisoformat(session)
+    algo=minimal(driver);algo.time=datetime.combine(day,time(16,1))
+    algo.utc_time=algo.time.replace(tzinfo=driver.NY).astimezone(timezone.utc)
+    expected=expected or datetime.combine(day,time(16))
+    observed=observed or datetime.combine(day,time(15,59))
+    bar=driver.TradeBar();bar.end_time=observed
+    symbol=Symbol("PRIVATE-MARK-SID-SENTINEL")
+    calls=[]
+    def last_data():calls.append("last_data");return bar
+    def next_close(start,extended):
+        assert start==datetime.combine(day,time()) and extended is False
+        calls.append("next_close");return expected
+    algo.portfolio=NS(values=lambda:[NS(invested=True,symbol=symbol)])
+    algo._assert_raw_subscriptions=lambda *_:NS(get_last_data=last_data,
+        exchange=NS(hours=NS(get_next_market_close=next_close)))
+    body,_,digest=config(driver)
+    algo._evidence=driver.ComparisonJournal(body,digest,lambda:(algo.project_id,algo.algorithm_id,algo.get_locked()))
+    algo.object_store=NativeStore();logs=[];algo.log=logs.append
+    accounted=[]
+    monkeypatch.setattr(driver.predecessor.TargetPriceExtendedAlgorithm,"_daily_audit",lambda self:accounted.append(True))
+    return algo,bar,symbol,calls,logs,accounted
+
+
+def mark_pointer(logs):
+    assert len(logs)==1 and logs[0].startswith("CMP28_MARK_REFUSAL ")
+    return json.loads(logs[0].split(" ",1)[1])
+
+
+@pytest.mark.parametrize("session,close_hour",[("2021-02-10",16),("2021-11-26",13)])
+def test_accepted_regular_or_halfday_close_has_no_witness_store_or_public_effect(driver,monkeypatch,session,close_hour):
+    close=datetime.combine(date.fromisoformat(session),time(close_hour))
+    algo,_,_,calls,logs,accounted=mark_witness_case(driver,monkeypatch,session=session,observed=close,expected=close)
+    algo._daily_audit()
+    assert calls==["last_data","next_close"] and accounted==[True]
+    assert algo.object_store.calls==[] and not logs
+    assert not getattr(algo,"_mark_refusal_witness_attempted",False)
+
+
+@pytest.mark.parametrize("observed,expected",[(datetime(2021,2,10,15,59),datetime(2021,2,10,16)),
+    (datetime(2021,2,10,16,1),datetime(2021,2,10,16)),
+    (datetime(2021,2,9,16),datetime(2021,2,10,16)),
+    (datetime(2021,2,11,16),datetime(2021,2,11,16))])
+def test_failed_exact_close_retains_one_private_verified_snapshot_before_original_refusal(driver,monkeypatch,observed,expected):
+    algo,bar,symbol,calls,logs,accounted=mark_witness_case(driver,monkeypatch,observed=observed,expected=expected)
+    store=algo.object_store;save=store.save_bytes
+    def saved_first(key,raw):
+        assert algo._mark_refusal_witness_attempted is True
+        # A later mutation must not change the captured mismatch inputs.
+        bar.end_time=datetime(2030,1,1)
+        return save(key,raw)
+    store.save_bytes=saved_first
+    with pytest.raises(ValueError,match="^CMP28 OFF native candidate refused$"):algo._daily_audit()
+    pointer=mark_pointer(logs);key=pointer["key"];raw=store.values[key];body=json.loads(raw)
+    assert pointer["status"]=="verified" and pointer["readback_verified"] is True
+    assert 0<len(raw)==pointer["bytes"]<=4096
+    assert pointer["verified_sha256"]==pointer["expected_sha256"]==hashlib.sha256(raw).hexdigest()
+    assert key==algo._evidence.require_binding()+"mark-refusal.json"
+    assert [method for method,_ in store.calls]==["contains","save","read"] and len(store.values)==1
+    assert body["security_id"]==str(symbol.id) and body["project_id"]==driver.PROJECT
+    assert body["job_id"]==algo.algorithm_id and body["guard_unchanged"] is True
+    assert body["observed_end_local"]==observed.replace(tzinfo=driver.NY).isoformat()
+    assert body["expected_close_local"]==expected.replace(tzinfo=driver.NY).isoformat()
+    assert body["source_inputs_admitted"] is body["strategy_accepted"] is body["canonical_admission"] is False
+    assert body["predicates"]==pointer["predicates"] and not accounted
+    assert calls==["last_data","next_close"]
+    assert str(symbol.id) not in logs[0] and observed.isoformat() not in logs[0] and expected.isoformat() not in logs[0]
+    assert "price" not in raw.decode() and "quote" not in raw.decode()
+    for field in ("algorithm_utc","algorithm_local","expected_close_utc","expected_close_local","observed_end_utc","observed_end_local"):
+        assert body[field] not in logs[0]
+
+
+def test_witness_does_not_reopen_or_overwrite_existing_key_and_never_retries(driver,monkeypatch):
+    algo,_,_,_,logs,_=mark_witness_case(driver,monkeypatch)
+    key=algo._evidence.require_binding()+"mark-refusal.json"
+    algo.object_store.values[key]=b"PRIVATE-EXISTING-WITNESS"
+    with pytest.raises(ValueError):algo._daily_audit()
+    first=mark_pointer(logs)
+    assert first["status"]=="existing_or_unknown_key_refused" and not first["readback_verified"]
+    assert first["verified_sha256"] is None and algo.object_store.values[key]==b"PRIVATE-EXISTING-WITNESS"
+    assert algo.object_store.calls==[("contains",key)]
+    before=list(algo.object_store.calls);logs.clear()
+    with pytest.raises(ValueError):algo._daily_audit()
+    assert algo.object_store.calls==before and mark_pointer(logs)["status"]=="already_attempted"
+
+
+@pytest.mark.parametrize("phase",["contains","save","read"])
+def test_witness_observes_native_job_drift_after_every_store_interaction(driver,monkeypatch,phase):
+    algo,_,_,_,logs,_=mark_witness_case(driver,monkeypatch)
+    store=algo.object_store
+    name={"contains":"contains_key","save":"save_bytes","read":"read_bytes"}[phase]
+    original=getattr(store,name)
+    def drift(*args):
+        value=original(*args);algo.algorithm_id="foreign-job";return value
+    setattr(store,name,drift)
+    with pytest.raises(ValueError,match="^CMP28 OFF native candidate refused$"):algo._daily_audit()
+    pointer=mark_pointer(logs)
+    assert pointer["status"]=="publication_failed" and not pointer["readback_verified"] and pointer["verified_sha256"] is None
+    assert [method for method,_ in store.calls]==["contains","save","read"][:{"contains":1,"save":2,"read":3}[phase]]
+
+
+def test_witness_wrong_native_project_refuses_before_any_private_effect(driver,monkeypatch):
+    algo,_,_,_,logs,_=mark_witness_case(driver,monkeypatch);algo.project_id=1
+    with pytest.raises(ValueError,match="^CMP28 OFF native candidate refused$"):algo._daily_audit()
+    assert algo.object_store.calls==[] and mark_pointer(logs)["status"]=="publication_failed"
+
+
+@pytest.mark.parametrize("mode",["bytes","length","save_false","contains_unknown","ordinary_error"])
+def test_witness_uncertain_publication_preserves_original_refusal_and_honest_safe_status(driver,monkeypatch,mode):
+    algo,_,_,_,logs,_=mark_witness_case(driver,monkeypatch);store=algo.object_store
+    if mode in ("bytes","length"):
+        original=store.read_bytes
+        def corrupt(key):
+            raw=original(key)
+            return b"!"+raw[1:] if mode=="bytes" else raw+b" "
+        store.read_bytes=corrupt
+    elif mode=="save_false":store.save_bytes=lambda *_:False
+    elif mode=="contains_unknown":store.contains_key=lambda *_:None
+    else:
+        def uncertain(key):raise TimeoutError("PRIVATE-TRANSPORT-BODY-SENTINEL")
+        store.contains_key=uncertain
+    with pytest.raises(ValueError,match="^CMP28 OFF native candidate refused$"):algo._daily_audit()
+    pointer=mark_pointer(logs)
+    assert pointer["status"]=={"bytes":"readback_mismatch","length":"readback_mismatch","save_false":"save_unconfirmed",
+        "contains_unknown":"existing_or_unknown_key_refused","ordinary_error":"publication_failed"}[mode]
+    assert pointer["verified_sha256"] is None and pointer["readback_verified"] is False
+    assert "PRIVATE-TRANSPORT-BODY-SENTINEL" not in logs[0]
+    before=list(store.calls);logs.clear()
+    with pytest.raises(ValueError):algo._daily_audit()
+    assert store.calls==before and mark_pointer(logs)["status"]=="already_attempted"
+
+
+@pytest.mark.parametrize("kind",["cancel","fatal"])
+def test_witness_cancellation_and_nonordinary_fatal_are_body_free_and_never_demoted(driver,monkeypatch,kind):
+    algo,_,_,_,logs,_=mark_witness_case(driver,monkeypatch)
+    class Fatal(BaseException):pass
+    def stop(key):raise (KeyboardInterrupt if kind=="cancel" else Fatal)("PRIVATE-STOP-BODY-SENTINEL")
+    algo.object_store.contains_key=stop
+    wanted=KeyboardInterrupt if kind=="cancel" else driver.MarkWitnessStopped
+    with pytest.raises(wanted) as error:algo._daily_audit()
+    assert "PRIVATE-STOP-BODY-SENTINEL" not in str(error.value) and not logs
+    assert algo._mark_refusal_witness_attempted is True
+
+
+def test_witness_after_error_custody_check_cannot_demote_cancellation(driver,monkeypatch):
+    algo,_,_,_,logs,_=mark_witness_case(driver,monkeypatch)
+    stopped=[False]
+    def locked():
+        if stopped[0]:raise SystemExit("PRIVATE-SECOND-STOP")
+        return True
+    algo.get_locked=locked
+    def stop(key):stopped[0]=True;raise KeyboardInterrupt("PRIVATE-FIRST-CANCEL")
+    algo.object_store.contains_key=stop
+    with pytest.raises(KeyboardInterrupt) as error:algo._daily_audit()
+    assert str(error.value)=="CMP28 mark witness cancelled" and not logs
+
+
+def test_witness_oversize_body_refuses_without_truncation_or_any_store_effect(driver,monkeypatch):
+    algo,_,_,_,logs,_=mark_witness_case(driver,monkeypatch)
+    config_body=json.loads(algo._evidence._config_raw);config_body["candidate_id"]="X"*4096
+    algo._evidence._config_raw=driver._wire(config_body)
+    with pytest.raises(ValueError,match="^CMP28 OFF native candidate refused$"):algo._daily_audit()
+    assert algo.object_store.calls==[] and mark_pointer(logs)["status"]=="publication_failed"
+
+
+def test_witness_notice_failure_cannot_replace_the_original_mark_refusal(driver,monkeypatch):
+    algo,_,_,_,_,_=mark_witness_case(driver,monkeypatch)
+    def log_failed(_):raise RuntimeError("PRIVATE-LOGGER-SENTINEL")
+    algo.log=log_failed
+    with pytest.raises(ValueError,match="^CMP28 OFF native candidate refused$"):algo._daily_audit()
+    assert len(algo.object_store.values)==1

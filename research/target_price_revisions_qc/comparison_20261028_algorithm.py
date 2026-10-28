@@ -40,6 +40,10 @@ MAX_CHUNKS = 1024
 KIND_NAMES = frozenset(("SUBSCRIPTION", "MEMBERSHIP", "CAPS", "COVERAGE", "FACTOR", "ORDER", "FILL", "ACTION", "NAV", "SUMMARY"))
 
 
+class MarkWitnessStopped(BaseException):
+    """Body-free nonordinary stop during private witness publication."""
+
+
 def _fail():
     raise ValueError("CMP28 OFF native candidate refused") from None
 
@@ -272,6 +276,7 @@ class ComparisonOffAlgorithm(execution.TargetPriceExtendedAlgorithm):
         self._factor_sources, self._basis_proofs = set(), {}
         self._factor_provider = self._initialized_factor_provider()
         self._signal_store = None  # No signal module, packet, admission flag or fallback.
+        self._mark_refusal_witness_attempted = False
         self._identities, self._source_ticker_bridge, self._frames = {}, {}, {}
         self.set_start_date(2021, 1, 4)
         self.set_end_date(2026, 10, 9)
@@ -500,6 +505,101 @@ class ComparisonOffAlgorithm(execution.TargetPriceExtendedAlgorithm):
     def _selected_scores(self, *_args, **_kwargs):
         _fail()  # Every non-OFF path stays closed, including inherited call seams.
 
+    def _retain_mark_refusal_witness(self, symbol, close, observed):
+        """One private <=4KiB own-job diagnostic; never repair/admit a mark.
+
+        The exact failed close inputs are supplied by the guard, not queried
+        again. There is no History call, price field, overwrite or retry. Only
+        the small safe pointer/predicate envelope is eligible for public logs.
+        """
+        pointer = {"schema": "tpr-cmp28-mark-refusal-pointer-v1", "status": "not_published",
+            "key": None, "bytes": None, "expected_sha256": None, "verified_sha256": None,
+            "readback_verified": False, "data_type": "trade_bar", "predicates": {
+                "observed_equals_expected": observed == close,
+                "expected_date_equals_algorithm": None, "observed_date_equals_session": None,
+                "observed_relation": "before" if observed < close else "after" if observed > close else "equal"}}
+        if getattr(self, "_mark_refusal_witness_attempted", False):
+            pointer["status"] = "already_attempted"
+            return pointer
+        self._mark_refusal_witness_attempted = True  # BEFORE every possible effect.
+        try:
+            now = self._native_clock(self.utc_time, "UTC")
+            pointer["predicates"]["expected_date_equals_algorithm"] = close.date() == now.date()
+            pointer["predicates"]["observed_date_equals_session"] = observed.astimezone(NY).date() == now.astimezone(NY).date()
+            prefix = self._evidence.require_binding()
+            project, job = self.project_id, self.algorithm_id
+            config = json.loads(self._evidence._config_raw)
+            if (type(project) is not int or project != config["project_id"]
+                    or type(job) is not str or _identity(job) != job
+                    or not prefix.endswith("/" + str(project) + "/" + job + "/")):
+                _fail()
+            sid = str(symbol.id)
+            if not 0 < len(sid) <= 256 or sid.strip() != sid or any(ord(char) < 32 or ord(char) == 127 for char in sid):
+                _fail()
+            body = {"schema": "tpr-cmp28-private-mark-refusal-v1", "study_id": STUDY,
+                "candidate_id": config["candidate_id"], "arm": config["arm"],
+                "operation_id": config["operation_id"], "attempt": config["attempt"],
+                "config_sha256": self._evidence._config_hash,
+                "source_template_closure_sha256": config["source_template_closure_sha256"],
+                "policy_sha256": config["policy_sha256"], "calendar_sha256": config["calendar_sha256"],
+                "project_id": project, "job_id": job, "security_id": sid, "data_type": "trade_bar",
+                "algorithm_utc": now.isoformat(), "algorithm_local": now.astimezone(NY).isoformat(),
+                "expected_close_utc": close.isoformat(), "expected_close_local": close.astimezone(NY).isoformat(),
+                "observed_end_utc": observed.isoformat(), "observed_end_local": observed.astimezone(NY).isoformat(),
+                "predicates": dict(pointer["predicates"]), "guard_unchanged": True,
+                "source_inputs_admitted": False, "strategy_accepted": False, "canonical_admission": False}
+            raw = _wire(body)
+            if not 0 < len(raw) <= 4096:
+                _fail()
+            key, digest = prefix + "mark-refusal.json", hashlib.sha256(raw).hexdigest()
+            pointer.update(key=key, bytes=len(raw), expected_sha256=digest)
+
+            def bound():
+                if (self._evidence.require_binding() != prefix or type(self.project_id) is not int
+                        or self.project_id != project or self.algorithm_id != job or self.get_locked() is not True):
+                    _fail()
+
+            def guarded(call):
+                bound()
+                try:
+                    value = call()
+                except BaseException as first:
+                    # Observe custody after an uncertain effect too. Cancellation
+                    # has priority, then the first nonordinary fatal condition.
+                    try:
+                        bound()
+                    except BaseException as second:
+                        if isinstance(second, KeyboardInterrupt):
+                            raise second
+                        if isinstance(first, KeyboardInterrupt) or not isinstance(first, Exception):
+                            raise first
+                        if not isinstance(second, Exception):
+                            raise second
+                    raise
+                bound()
+                return value
+
+            exists = guarded(lambda: self.object_store.contains_key(key))
+            if type(exists) is not bool or exists:
+                pointer["status"] = "existing_or_unknown_key_refused"
+                return pointer  # Never reopen or overwrite an existing object.
+            saved = guarded(lambda: self.object_store.save_bytes(key, raw))
+            if saved is not True:
+                pointer["status"] = "save_unconfirmed"
+                return pointer
+            readback = native_bytes(guarded(lambda: self.object_store.read_bytes(key)), 4096)
+            if len(readback) != len(raw) or hashlib.sha256(readback).hexdigest() != digest or readback != raw:
+                pointer["status"] = "readback_mismatch"
+                return pointer
+            pointer.update(status="verified", verified_sha256=digest, readback_verified=True)
+        except KeyboardInterrupt:
+            raise KeyboardInterrupt("CMP28 mark witness cancelled") from None
+        except Exception:
+            pointer["status"] = "publication_failed"
+        except BaseException:
+            raise MarkWitnessStopped("CMP28 mark witness stopped") from None
+        return pointer
+
     def _daily_audit(self):
         if not self.is_warming_up and self.time.date().isoformat() in core.VALUATIONS and self.time.time() != time(16, 1):
             _fail()
@@ -520,6 +620,15 @@ class ComparisonOffAlgorithm(execution.TargetPriceExtendedAlgorithm):
                 close = self._native_clock(expected_close, "America/New_York")
                 observed = self._native_clock(last.end_time, "America/New_York")
                 if observed != close or close.date() != self._native_clock(self.utc_time, "UTC").date():
+                    pointer = self._retain_mark_refusal_witness(held.symbol, close, observed)
+                    try:
+                        self.log("CMP28_MARK_REFUSAL " + json.dumps(pointer, sort_keys=True, separators=(",", ":")))
+                    except KeyboardInterrupt:
+                        raise KeyboardInterrupt("CMP28 mark witness notice cancelled") from None
+                    except Exception:
+                        pass  # A failed notice never replaces or relaxes refusal.
+                    except BaseException:
+                        raise MarkWitnessStopped("CMP28 mark witness notice stopped") from None
                     _fail()
         return super()._daily_audit()
 

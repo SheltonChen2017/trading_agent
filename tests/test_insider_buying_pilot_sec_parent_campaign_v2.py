@@ -426,6 +426,9 @@ def test_later_capture_namespace_blocks_planning(tmp_path):
 
 
 def test_actual_planning_checks_later_captures_before_any_planner_scope(monkeypatch):
+    # A lane directory present in every checkout stands in for the private
+    # capture namespace, so the test does not depend on retained artifacts.
+    monkeypatch.setattr(m,"UNCHAINED_LATER_CAPTURE_PARTS",(("tests",),))
     identity={"invented_source_identity":True}
     monkeypatch.setattr(m,"_identity",lambda _:identity)
     monkeypatch.setattr(m,"_launcher_health",lambda value:None)
@@ -437,6 +440,7 @@ def test_actual_planning_checks_later_captures_before_any_planner_scope(monkeypa
 
 
 def test_planner_worker_checks_later_captures_before_any_input(monkeypatch):
+    monkeypatch.setattr(m,"UNCHAINED_LATER_CAPTURE_PARTS",(("tests",),))
     monkeypatch.setattr(m,"_isolated",lambda:None)
     monkeypatch.setattr(m,"_current",lambda identity:None)
     monkeypatch.setattr(m,"_FailedLaunchHold",lambda *a:pytest.fail("old input reached"))

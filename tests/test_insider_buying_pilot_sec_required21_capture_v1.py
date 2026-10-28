@@ -412,6 +412,11 @@ def test_framing_refusal_without_an_observed_status_keeps_a_terminal_record(sele
     assert terminal["http_status"] is None and terminal["code"] == "HTTP_framing_refused"
     assert terminal["transport_invocations"] == 1 and terminal["body_object"] is None
     assert m._readback(root, result["complete_sha256"], fixture=True)["started"] == 1
+    # The framing refusal is a received response, so it needs its one invocation.
+    args = (selected.to_payload()["requests"][0], terminal["ordinal"], terminal["claim_sha256"], terminal["start_sha256"])
+    assert m._result_valid(terminal, *args) is terminal
+    with pytest.raises(m.Required21CaptureError, match="^inputs_changed$"):
+        m._result_valid({**terminal, "transport_invocations": 0}, *args)
 
 
 # Claude review section 342 (IBREQ21-CR34204): the actual readback binds the
@@ -423,5 +428,7 @@ def test_actual_readback_consumption_base_must_equal_the_registered_index(select
     matching = {**plan, "consumption_sha256": registered["known_consumed_index_sha256"],
                 "consumed_accessions": [f"{n:010d}-20-000001" for n in range(registered["known_consumed_count"])]}
     assert m._consumption_base_bound(matching, registered) is None
-    with pytest.raises(m.Required21CaptureError, match="^inputs_changed$"):
-        m._consumption_base_bound({**matching, "consumed_accessions": matching["consumed_accessions"][1:]}, registered)
+    for changed in ({**matching, "consumed_accessions": matching["consumed_accessions"][1:]},
+                    {**matching, "consumption_sha256": "0" * 64}):
+        with pytest.raises(m.Required21CaptureError, match="^inputs_changed$"):
+            m._consumption_base_bound(changed, registered)

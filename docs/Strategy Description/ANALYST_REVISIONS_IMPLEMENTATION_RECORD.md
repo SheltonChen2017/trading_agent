@@ -2295,6 +2295,12 @@ October21,2022 native-price gap. No price request follows an unresolved
 identity. The RAW-history parser remains held technical preparation, no price
 caller.
 No strategy historical-price acquisition or QC run follows without its gates.
+Section327.5 now records H's actual technical success and spent protocol:
+one anonymous9-job HTTP200, all9 unique US composites, but4of5 original/current
+pairs still disagree. The fallback-format hypothesis does not cure those
+identities. No route/price or known native-gap admission follows; the new
+five-year period is still prospective pending fresh genuine-source/required-
+price evidence. No six/eight strategy job launched this round.
 No AU/AW/AY replay or QC source transfer/project/compile/strategy job followed
 the catalogue result. Current
 identity/reference/actual-held NAV/full-window/source/run gates remain;
@@ -68915,3 +68921,88 @@ Final prefreeze selection247distinctpasses6.39s (98hierarchy/caller+
 source/test files compile in memory/single EOF;217literal dependency pins and
 both exact profiles match, dispatch_fence absent, native network/artifact/
 Keychain denial retained. No concurrent native test or operational session.
+
+### 327.5 Actual H completed; four composite disagreements remain
+
+At clean freeze b11eea5a0f8a213d84603db2ccd3dbc5a95041bb the allowed native
+all-network/artifact/Keychain-denied public-source/Git/environment preflight
+exited0, with no private/control/provider access. The fixed collector was
+then invoked ONCE and its actual tool-observed exit is0. H parent dispatched
+2026-10-28T05:45:16.619689Z, completed05:45:30.848123Z, actual0. Separate native
+validator dispatched05:45:30.936434Z, completed05:45:34.149685Z, actual0.
+These are complete external process brackets, not provider event timestamps or
+measured wire duration. Source/provider/auth role actuals also all0, bounds
+null/stderr0; parent/validator original stdin/stdout/stderr complete. No
+overlapping test/private/native operation or agent edit occurred.
+
+Collector stdout8891bytes
+SHA2566e3247e6e09f1656f21642e681d12105adfa828049fe65fff1905cf33d569647
+contains the validated compressed public frame and original actual metadata.
+H/native-validator byte-equal stdout32595bytes
+SHA256669d356cf38c7334c13425a1b0ca91a3b5a23bddc145d1eb251648fc72d559be;
+report32464bytes SHA2567d253fa38b1d119cdfab44fedb60bd3d013a674b84bf00057039c540a100d7fc.
+Source guard returned normally after exact26503byte AD DATA authentication;
+owned selection24516bytes retained its original0776dc73 pin. Actual five
+cases yield5 unique original/candidate FIGI pairs from6 retained vendor rows,
+with all five original whole-binding/schema/class proofs passing. The public
+non-USD-reporting count is0 for THIS five-case selection, not a reversal of
+the earlier reporting/trading-currency distinction or full-corpus claim.
+
+Exactly one application dispatch intent for9 public FIGIs, request739bytes
+SHA256602028ddafe7eefaac2d972b896590f14cbab6b53d3c34c2dfa4423bdaa59bfb,
+returned HTTP200; body2502bytes
+SHA2566f16c2af51fbbf5ca8edb407f03cf070bfe771e03c6082bf63e6ceb6cbf1b47e
+was persisted before parse. All9 jobs returned unique exact US Equity
+composites, with no invalid/ambiguous/unavailable job. No new composite needed
+a witness request, so phase2 job count0 and no second request occurred.
+Application dispatch/status evidence does not measure physical requests;
+provider_request_count remains null. No credential, price endpoint, paid
+right, QC/Safari/capacity/strategy action. Floor337/259/53/699 unchanged.
+
+Independent native auth reproduced all supplied bodies/jobs/journal/index/
+pairs. Exactly1pair has the same validated US composite/shareClass;4pairs
+have unresolved_composite_disagreement. Thus Sharadar's documented fallback
+semantics are a valid general possibility but do NOT explain these four
+actual mismatches: their returned composites are already distinct. This is
+I327-003(P2 OPEN): historical original/current identity/required-price recovery
+still needs evidence. Do not claim vendor corruption, ticker reuse, merger,
+delisting, entitlement failure or identify WHICH old refusal matched from
+aggregate counts alone. A same composite observation does not by itself clear
+the original vendor/global ownership/collision or historical-price gates.
+All five vendor blockers remain5 and no identity/route was rewritten.
+
+Preserved H DATA hierarchy-private.json38548bytes
+SHA256b85c3d37acbe4f72192d4d42d6470654a2e727f0c6a23bed06a3539e2ec3aacd;
+request journal161bytes
+SHA256f473110bca51ffd6f7774df60a669188f5d0b6d7fd5e7e17576fb672dc4297c4;
+provider index5187bytes
+SHA25665aa01909602bf232f166431f2fdc80012c32bd7e3a2f5a1977d63dfd8b0cc92.
+All original descriptors/normal output leaves/runtime retained, no cleanup or
+inspection/repair after closure. H parent/roles/collector/native validator are
+NOW SPENT; no retry/renaming or old AD causal conclusion. Future DATA use
+requires its own separately frozen guard/consumer, not this result or a bare
+old entrypoint. Source success is qualified current-vintage technical evidence,
+not immutable/PIT/permanent master/formal admission or strategy return.
+
+The new inert public scripts/arv2_r327_h_source_binding.py records actual
+source/role/parent/validator/collector metadata, only hashes/counts/pins and
+false admission/authority/readiness flags. Root pure reconstruction of the
+already collected public frame under native all-network/artifact/Keychain
+denial is result recording, not a second Hvalidator/reader/control use. No
+private H leaf was reopened. Next useful work is a separately scoped retained-
+evidence comparison of exact old/current identities and new-period genuine
+membership/required prices, including full ownership/collision proof where
+needed. Preserve all6151bindings/8funds and exact original source assignments;
+no metadata-date retirement of holdings or missing-mark substitution. Pure
+runtime projection remains held until it serves an admissible source path.
+Exactly one final push for this complete round remains pending; no push yet.
+H inert anchor15097bytes
+SHA2565280c31f84bce7aa088d57df5a861ab40a159a0e597e90600d339ba9a4590fce;
+canonical observed-fact digest
+e72ff5029df04609c1f7eb4d6fc2f2a552c4dfa0065764d2c4dc00f0601beab4.
+Root public-frame reconstruction and exact anchor equality, compile/single EOF,
+all217 unchanged pins and86record/documentpasses1.07s passed under native
+denials. Those86 repeat earlier tests and are not additive; no H/private
+read/operation was replayed. The prior326final-handoff validation footnote was
+restored immediately above section327 after an append initially placed the
+new section before that old footnote. Historical text/evidence preserved.

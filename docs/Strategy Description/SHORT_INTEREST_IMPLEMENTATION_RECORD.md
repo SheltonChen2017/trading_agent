@@ -26311,3 +26311,137 @@ preserving every debit/negative and the original process on any hold.
 
 Main post-record checks:95passed/1.06s;90 source/changed-test files compiled
 in memory; append-only history and whitespace checks passed.
+
+### 128.43 Actual registered invocation: preservation hold, terminal state unknown
+
+**Codex offline continuation, 2026-10-28 (America/Los_Angeles).** This append
+supersedes the prospective-only state at the end of128.42; every historical
+byte above is preserved. The ONE128.41 invocation did start at exact
+e7567635cea6e921d6cecef15e67517a1689c5f6 with matching tracking/actual origin
+d6af672b3c8198712228bbd7b5eef35777283b1a, exec13448. Its observed started
+message bound RUN0364f7bca6bc7eaf7c41af850df8c6e1558f23354c179e5ce27126b118b60cd7
+and SourceAUTH9d67d93ad79657031befd8849659bc20fc5834173d76a569bccb9307347e3a6c.
+After original archive replay it emitted si-count-private-retention-hold-v1:
+preservation_blocked/requires_process_hold=true, blocked_operations1,
+known_private_observations_retained0. Its zero additional HTTP/START/claim/key
+fields describe the HOLD only, not spending before that hold. The old blocked
+summary could substitute zero observations when original accounting could not
+be authenticated. None of those zeros establishes a zero-spend capture.
+
+The protected existing namespace remains:
+artifacts/short_interest/native_reported_counts/count-response-20261027-v1-2aa15b2fae72b6421a75702ea961af530a3b0901de342f670c21e1caaa328cd0-chunk001.
+Read-only directory/stat checks found backing.sparseimage and mount, with
+mount/.fseventsd, capture and claim. The existing claim is a regular534-byte
+0600/single-link file with flags2; its ORIGINAL seal/issuer closure is NOT
+authenticated by that observation. The three starts/received/responses
+containers are empty; no quarantine directory was found. No image, claim,
+metadata, receipt, source row or spent budget was altered, deleted, adopted,
+remounted, refunded or reset during this continuation.
+
+At this continuation the known exec handle returned Unknown process id13448.
+A separate full OS-argument scan filtered by Python executable and the exact
+original module/argument identity found no matching original recovery process;
+this was rechecked before the software commit. An initial broader command-text
+filter also matched its own inspection shell, so it was rejected and replaced
+by the executable-filtered scan. No process was signalled, attached, stopped,
+modified or restarted. Absence of the handle alone was not used as closure.
+There is no observed actual EXIT0/EXIT2, complete negative manifest, successful
+chunk, original reservation journal export or valid source-context closure.
+The cause/time of disappearance, original capture exception and original
+incremental reservation/HTTP/byte accounting remain UNKNOWN. The old RAM/FD
+state cannot be recovered through the existing CLI: it has no controlled
+stdin/mailbox/export interface and its hold loop only sleeps. No debugger,
+memory dump, key read, fresh provider request or speculative recovery claim
+was attempted. Complete retention of unexported RAM data cannot be certified.
+
+### 128.44 Verified prospective repairs; no retrospective closure or admission
+
+Continuing the owner's explicit offline repair/no-loss/no-weaken direction,
+**SI-DEC-20261028-01** authorizes SOFTWARE-only corrections in the same lane.
+The source ceiling stays84005 cumulative STARTs and4294967296 bytes. This
+decision neither enlarges those caps nor declares unresolved spending zero.
+Software commit: **06cdd118d1b63fa261cb43170cedb4bca5a7006b**. Only the outer
+driver, negative finalizer and pure SourceAUTH module plus their three focused
+test files changed. Shared documents, original source data and all other lane
+code remain untouched.
+
+| Finding | Disposition and evidence |
+| --- | --- |
+| SI-BUILD-20261028-050, P2: zero-ticket catalogue rejects coordinator containers | Confirmed and corrected prospectively. Main creates capture/starts, received and responses before claim/reservations; the old catalogue admitted those parent names only through ticket filenames. It now admits exactly these three fixed containers, preserving original pin/type/mode/no-follow/membership checks. Actual coordinator mkdir plus real finalizer regression closes only a negative manifest for zero tickets. Unknown or unreserved children, changed mode, changed inode and symlinks still refuse. This is NOT established as13448's actual cause: reservations precede per-ticket directory creation and may exist even with empty directories. |
+| SI-BUILD-20261028-051, P2: hold suppresses original diagnostic/accounting | Confirmed and corrected prospectively. Before mandatory hold, the optional stdout report now includes bounded allowlisted original-error/preservation-error classifications and authenticated original pure-journal aggregate reservations/charges. Authentication failure yields explicit unavailable/null, never default zero. The original first error survives later cleanup errors; at most16 fixed preservation failures and133 operation reports are projected. No exception text, paths, raw rows, dynamic types, credentials, source guard reset, settlement, retry or release authority was added. A best-effort stdout message is not a durable journal or retroactive receipt. Notification failure still enters the unchanged mandatory hold. |
+| SI-BUILD-20261028-052, P2: original13448 accounting/custody unresolved | OPEN, concrete external-evidence blocker. Neither empty directories, a sealed-looking claim, missing process nor fabricated tests can reconstruct the original issuer journal or certify complete private-data retention. All three production entry routes now refuse count_source_prior_run_unresolved before source lease/archive replay/CLI Git/image/claim/key/HTTP. The pure registered owner scope still validates, but it grants no dispatch through this operational gate. No caller release flag, namespace retry, adoption, latch clearing or spending reset exists. |
+
+The old original failed operation/finalizer is NOT re-executed or relabelled
+closed. Checks requiring the original issued closure/negative manifest remain
+unchanged. The last authenticated historical baseline13992START/
+13991recordedHTTP/23452681charged bytes remains a PRIOR baseline, not a verified
+current cumulative balance after13448. The unknown increment is not released
+or substituted by zero. No fresh count/daily source operation is permitted
+until independently trustworthy original preservation/accounting evidence
+resolves052 under a separately frozen finite policy. This software cannot
+manufacture evidence that no longer exists.
+
+| Current software control | SHA256 |
+| --- | --- |
+| SourceAUTH semantic scope, unchanged and operationally blocked | 9d67d93ad79657031befd8849659bc20fc5834173d76a569bccb9307347e3a6c |
+| negative policy, fixed empty containers | e0e8df728d96dfaae20b43497ad150557d9a767e5d853d020ec6b9acfcc0423c |
+| outer RUN, future fixed diagnostic projection | 0a12282d516613ac3d6f5e407aab331c385159fbf5244370bc05b88f5551f7e5 |
+| outer84 current-byte mapping | 59c413d321f5b78cad0f75c9118439122f26a838fa9ff729763ac2eaf23b1f5c |
+| readonly85 current-byte mapping | 1d5a86b3f68b5a87abe6ce20b796c97a5c1f5cfaa5b18c562b3408494ee65bb1 |
+
+The unchanged exact path-list hashes remain590904dc5a48401a4bea9704198143de77ffbfa37c73ca8e6fa59a94b327b621
+(outer84=82 runtime+2 explicitly bound historical wrappers) and
+4bcda69af6dc2c71733a31584b5ebb0d6b1154448323d57508683446dd2c9fd5
+(readonly85=83+the same wrappers). Working source compiles in memory;
+registrations independently match. The readonly saved-root requalifier is
+still PENDING, not activated against the unresolved old namespace.
+
+### 128.45 Validation, local-only handoff and owner's stricter publication boundary
+
+Main's TWENTY relevant focused files passed **907tests/62.97s**, with sanitized
+environment, OS network denied and cache/bytecode disabled. No warnings/skips
+were reported; no complete lane/repository suite ran. All88 current held
+source/changed-test files compiled in memory and whitespace checks passed.
+The runtime import catalogue test passed in that selection. Main separately
+ran SourceAUTH30/0.69s; removing its refusal in memory caused the expected
+ONE failure/0.09s, restored before the final907 run.
+
+Delegated author evidence is separately attributed: negative62/6.03s, with
+memory-only original-catalogue reversal1 expected failure/61deselected/.31s
+and finally restoration; outer83/5.63s, with memory-only ticket-authentication
+reversal1 expected failure/82deselected/.42s and restored regression1pass/
+82deselected/.85s. These are fabricated software checks, not operational
+source/custody proof. A separate read-only peer found no actionable defect
+in the six-file repair; that static peer ran no tests and is not Claude
+review. Main inspected the final changes. The owner's waiver of Claude
+review remains, with no independent Claude review claimed for local commits.
+
+All TWELVE prior unpublished commits from c715a6c1fa74b7c06c3ce7fe081a116238093bbd
+through e7567635cea6e921d6cecef15e67517a1689c5f6 remain in order, followed by
+06cdd118d1b63fa261cb43170cedb4bca5a7006b. Their exact prior dispositions and
+validation remain in128.1..128.42; none is rewritten. Tracking/actual origin
+was independently reverified asd6af672b3c8198712228bbd7b5eef35777283b1a
+immediately before the software commit. No push occurred in this round.
+
+**Latest owner steering, 2026-10-28: "when you are at the last step before qc
+backtesting, push once".** This supersedes the earlier permission to publish
+at a concrete blocker for this continuation. Keep the accumulated commits
+LOCAL until actual pre-QC readiness, then make exactly ONE successful
+non-force matching-lane push after fresh root/Git-root/branch/HEAD/status/
+matching-remote checks. Do not publish these partial repairs at052. No monitor
+or other chat was created, rearmed, modified or messaged.
+
+Current definition-of-done result: **NOT pre-QC/backtest ready.**052 prevents
+further recovery under trustworthy budgets/custody; actual count/denominator/
+daily-union/native-class/CIK/USD/eligibility/corporate-action/terminal-cash/
+rights/actual-input admission gates are not cleared by fixtures or this fix.
+The next safe action is to recover independently verifiable ORIGINAL terminal
+and reservation/preservation evidence for13448; if unavailable, report that
+irreducible missing-evidence gate without inventing closure, changing frozen
+candidate scope, weakening checks or enlarging84005/4GiB. No QC/Safari,
+purchases, new credentials, broker/operator database, outcome/S1/rank/order
+evaluation, backtest or trading action occurred. Canonical looks0/0,
+exploratory0, alpha0, permanent look IDs none, QC attempts0.
+
+Main post-record checks:95passed/0.79s, append-only prefix and whitespace
+checks passed. This lane-record commit follows06cdd118; both stay local.

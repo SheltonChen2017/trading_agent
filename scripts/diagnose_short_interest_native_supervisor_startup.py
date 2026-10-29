@@ -27,10 +27,10 @@ worker = proof.worker
 ROOT, PARENT = proof.ROOT, proof.PARENT
 MODULE = "scripts.diagnose_short_interest_native_supervisor_startup"
 DRIVER = "scripts/diagnose_short_interest_native_supervisor_startup.py"
-BOOTSTRAP = "count-native-supervisor-startup-diagnostic-v1"
-STATUS = "count-native-supervisor-startup-diagnostic-v1.jsonl"
-LABEL = "com.openai.codex.short-interest-native-startup-diagnostic-v1"
-POLICY_SHA256 = "0fbb3142c3269f6d38c41be469ebb1c2b50307ea1f36e56f09e6ac83899f02d8"
+BOOTSTRAP = "count-native-supervisor-startup-diagnostic-v2"
+STATUS = "count-native-supervisor-startup-diagnostic-v2.jsonl"
+LABEL = "com.openai.codex.short-interest-native-startup-diagnostic-v2"
+POLICY_SHA256 = "22f9e61d8898a9728526c9632dcea445c7d051e1252a62d5c95c7cc32d2b4a52"
 TARGET_HEAD = "b58f992ac73451f8e4ec1384061ad7030d8afffa"
 REMOTE = "f27d836ab0c7422463ea19b2f6fa3bba86535c4c"
 TARGET_SPEC = "28220a7af8aea2acc70da2a61fbceddd86cc831226cfc56c560ec13e0da2e8a6"
@@ -68,13 +68,15 @@ def authority():
 
 
 def policy():
-    return {"schema": "si-native-startup-diagnostic-policy-v1", "root": str(ROOT), "parent": str(PARENT),
+    return {"schema": "si-native-startup-diagnostic-policy-v2", "root": str(ROOT), "parent": str(PARENT),
         "bootstrap": BOOTSTRAP, "status": STATUS, "label": LABEL, "code_files": list(CODE_FILES),
         "target_head": TARGET_HEAD, "target_remote": REMOTE, "target_spec_sha256": TARGET_SPEC,
         "target_manifest": TARGET_MANIFEST, "maximum_config_bytes": MAX_CONFIG, "maximum_status_bytes": MAX_STATUS,
         "maximum_elapsed_acceptance_seconds": MAX_SECONDS, "maximum_Git_calls": MAX_GIT, "Git_per_call_seconds": 30,
         "deadline": "elapsed_acceptance_at_phase_and_terminal_boundaries_not_hard_wall_kill",
         "preauth": "externally_pinned_canonical_config_only_live_root_branch_HEAD_status_unknown_until_original_guard",
+        "configuration": "exact_spec_job_roles_original_first7_and_canonical_expected_bytes_SHA_across_phases_fresh_full9_FD_named_stability_each_read_including_close_no_evidence_capability_original_creator_pin_preserved_prepare_initial_Runtime_pin_configuration_only",
+        "retired": "startup_diagnostic_v1_namespace_status_and_job_preserved_never_reused",
         "status_role": "original_first7_empty0600_singlelink_nofollow_parentfd_WRONLY_NONBLOCK_no_CREATE_TRUNC_APPEND_full9_each_operation_one_bounded_line_no_evidence_capability",
         "runtime": "unchanged_original_guard_Code5_at_newruntimeHEAD_plus_own_Code6_then_original_historical_bootstrap_at_targetHEAD_no_global_mutation",
         "git_failure": "complete_trace_within128_unique_original_function_code_and_globals_frame_exact_arguments_CompletedProcess_returncode_only_no_output_stderr_paths_values_or_type",
@@ -238,7 +240,7 @@ class _OwnCode:
 
 
 def _payload(head, remote, manifest, pin):
-    return {"schema": "si-native-startup-bootstrap-v1", "policy_sha256": POLICY_SHA256,
+    return {"schema": "si-native-startup-bootstrap-v2", "policy_sha256": POLICY_SHA256,
         "runtime_head": head, "actual_remote": remote, "code_manifest": manifest,
         "target_head": TARGET_HEAD, "target_remote": REMOTE, "target_spec_sha256": TARGET_SPEC,
         "target_manifest": TARGET_MANIFEST, "status_name": STATUS, "status_original_identity": list(proof._status_pin(pin)),
@@ -259,25 +261,57 @@ def _protected(info, maximum=MAX_CONFIG):
 
 
 class _Inputs:
-    """Two original canonical config inputs; full9 every read and held epoch."""
-    def __init__(self, directory): self.directory, self.rows, self.fds = directory, [], []
-    def read(self, name):
-        require(name in ("launch.spec.json", "job.plist"), "startup_config"); self.directory.check()
-        before = _protected(os.stat(name, dir_fd=self.directory.fd, follow_symlinks=False))
-        fd = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=self.directory.fd); self.fds.append(fd)
-        proof._same(proof._stamp(os.fstat(fd)), before); raw = os.read(fd, MAX_CONFIG + 1)
-        require(len(raw) == before[6], "startup_config"); proof._same(proof._stamp(os.fstat(fd)), before)
-        proof._same(proof._stamp(os.stat(name, dir_fd=self.directory.fd, follow_symlinks=False)), before)
-        self.rows.append((name, fd, before, raw)); return raw
-    def audit(self, named=False):
+    """Exact two-role configuration reauthentication, never an evidence seal.
+
+    Original identity, protection, size and expected bytes never change. Each
+    separate read has its own full9 FD/name barrier through its original close.
+    Timestamps between operations are observations, not source custody evidence.
+    """
+    ROLES = ("launch.spec.json", "job.plist")
+    def __init__(self, directory):
+        require(type(directory) is proof._Directory and directory.path == ROOT / PARENT / BOOTSTRAP, "startup_config")
+        directory.check(); self.directory, self.rows = directory, {}
+    def _membership(self, named=False):
         self.directory.named() if named else self.directory.check()
-        require(set(os.listdir(self.directory.path if named else self.directory.fd)) == {"launch.spec.json", "job.plist"}, "startup_membership")
-        for name, fd, stamp, raw in self.rows:
-            proof._same(proof._stamp((self.directory.path / name).lstat()), stamp)
-            if not named:
-                proof._same(proof._stamp(os.fstat(fd)), stamp); os.lseek(fd, 0, os.SEEK_SET)
-                require(os.read(fd, len(raw) + 1) == raw, "startup_config"); proof._same(proof._stamp(os.fstat(fd)), stamp)
-    def close(self): proof._drain(self.fds)
+        require(set(os.listdir(self.directory.path if named else self.directory.fd)) == set(self.ROLES), "startup_membership")
+    def read(self, name, *, expected=None, original_pin=None, named=False):
+        require(type(name) is str and name in self.ROLES, "startup_config"); self._membership(named)
+        existing = self.rows.get(name)
+        require(existing is None or expected is original_pin is None, "startup_config")
+        if existing is not None:
+            pin, expected, digest = existing
+            require(hash_bytes(expected) == digest, "startup_config")
+        else:
+            require(expected is None or type(expected) is bytes and 0 < len(expected) <= MAX_CONFIG, "startup_config")
+            require(original_pin is None or type(original_pin) is tuple and len(original_pin) == 7
+                and all(type(v) is int for v in original_pin), "startup_config")
+            pin = original_pin
+        path = self.directory.path / name
+        info = path.lstat() if named else os.stat(name, dir_fd=self.directory.fd, follow_symlinks=False)
+        before = _protected(info)
+        require(pin is None or before[:7] == pin, "startup_config")
+        pin = before[:7] if pin is None else pin
+        fd = os.open(path if named else name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK,
+            **({} if named else {"dir_fd": self.directory.fd})); primary = None
+        try:
+            require(_protected(os.fstat(fd))[:7] == pin, "startup_config")
+            proof._same(proof._stamp(os.fstat(fd)), before); proof._same(proof._stamp(path.lstat()), before)
+            raw = os.read(fd, MAX_CONFIG + 1)
+            require(len(raw) == pin[6] and (expected is None or raw == expected), "startup_config")
+            proof._same(proof._stamp(os.fstat(fd)), before); proof._same(proof._stamp(path.lstat()), before)
+        except BaseException as error: primary = error; raise
+        finally: proof._close(fd, primary)
+        require(_protected(path.lstat())[:7] == pin, "startup_config")
+        proof._same(proof._stamp(path.lstat()), before)  # This reader's close remains inside its full9 barrier.
+        self.directory.named() if named else self.directory.check()
+        if existing is None: self.rows[name] = pin, raw, hash_bytes(raw)
+        return raw
+    def audit(self, named=False):
+        require(set(self.rows) == set(self.ROLES), "startup_config")
+        self._membership(named)
+        for name in self.ROLES: self.read(name, named=named)
+    def close(self):
+        pass  # Each original read FD is closed exactly once by that operation.
 
 
 def _config_write(directory, name, raw):
@@ -294,6 +328,7 @@ def _config_write(directory, name, raw):
     finally: proof._close(fd, primary)
     # Configuration timestamps across separate operations confer no evidence cap.
     require(_protected(os.stat(name, dir_fd=directory.fd, follow_symlinks=False))[:7] == pin, "startup_config")
+    return pin
 
 
 class _Status:
@@ -336,7 +371,7 @@ class _Status:
                 and (git["returncode"] is None or type(git["returncode"]) is int and -32768 <= git["returncode"] <= 32767), "startup_status")
         try:
             self.check(0)
-            raw = canonical_json({"schema": "si-native-startup-observation-v1", "status": "refused" if detail is not None else "readonly_predicates_passed_observation_only",
+            raw = canonical_json({"schema": "si-native-startup-observation-v2", "status": "refused" if detail is not None else "readonly_predicates_passed_observation_only",
                 "failure": detail, "authority": authority()}).encode() + b"\n"
             require(0 < len(raw) <= MAX_STATUS and raw.count(b"\n") == 1, "startup_status")
             proof._write(self.fd, raw); os.fsync(self.fd); self.check(len(raw))
@@ -389,9 +424,11 @@ def _prepare_readonly(head, remote):
         _phase("config_auth", clock); directory = proof._Directory(BOOTSTRAP, create=True); pin = _prepare_status(directory)
         raw = canonical_json(_payload(head, remote, manifest, pin)).encode(); digest = hash_bytes(raw)
         job_raw = plistlib.dumps(build_launchd_plist(head, remote, digest), sort_keys=True)
-        _config_write(directory, "launch.spec.json", raw); _config_write(directory, "job.plist", job_raw)
-        inputs = _Inputs(directory); require(inputs.read("launch.spec.json") == raw, "startup_config")
-        require(inputs.read("job.plist") == job_raw, "startup_config")
+        spec_pin = _config_write(directory, "launch.spec.json", raw)
+        job_pin = _config_write(directory, "job.plist", job_raw)
+        inputs = _Inputs(directory)
+        require(inputs.read("launch.spec.json", expected=raw, original_pin=spec_pin) == raw, "startup_config")
+        require(inputs.read("job.plist", expected=job_raw, original_pin=job_pin) == job_raw, "startup_config")
         _phase("terminal_code", clock); code.audit(); own.audit(); worker._guard(head, remote)
         _phase("original_audit", clock); inputs.audit()
     except BaseException as error: failure = error; failure_summary(error, head); raise

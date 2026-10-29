@@ -207,11 +207,15 @@ def test_original_code_ctime_change_during_last_git_callback_vetoes_success(fabr
     assert observation()["failure"]["mismatching_fields"] == ["ctime_ns"]
 
 
-def test_bootstrap_full9_drift_during_live_guard_is_not_rebaselined(fabricated, monkeypatch):
-    digest = prepare(); inode = (diag.ROOT / diag.PARENT / diag.BOOTSTRAP / "launch.spec.json").lstat().st_ino
-    real_stat, real_fstat, changed = os.stat, os.fstat, []
+def test_historical_live_bootstrap_full9_drift_is_not_rebaselined(fabricated, monkeypatch):
+    digest = prepare(); inode = (diag.ROOT / diag.PARENT / diag.proof.BOOTSTRAP / "launch.spec.json").lstat().st_ino
+    real_stat, real_fstat, changed, calls = os.stat, os.fstat, [], []
     def observed(info): return ProjectedStat(info, st_ctime_ns=info.st_ctime_ns + 1) if changed and info.st_ino == inode else info
-    fabricated.after_git = lambda role: changed.append(True)
+    def after(role):
+        if role == ("code_file", 6):
+            calls.append(True)
+            if len(calls) == 2: changed.append(True)
+    fabricated.after_git = after
     monkeypatch.setattr(diag.os, "stat", lambda *a, **k: observed(real_stat(*a, **k)))
     monkeypatch.setattr(diag.os, "fstat", lambda fd: observed(real_fstat(fd)))
     assert cli(digest) == 2
@@ -397,5 +401,119 @@ def test_prepare_refuses_same_size_job_mutation_after_original_writer_close(fabr
             raw = path.read_bytes(); path.write_bytes(b"X" + raw[1:]); changed.append(True)
         return result
     monkeypatch.setattr(diag.os, "open", opened); monkeypatch.setattr(diag.os, "close", close)
+    with pytest.raises(diag.StartupRefusal, match="config"): prepare()
+    assert changed == [True]
+
+
+def test_config_only_cross_phase_ctime_drift_is_not_an_evidence_seal(fabricated, monkeypatch):
+    digest = prepare(); inode = (diag.ROOT / diag.PARENT / diag.BOOTSTRAP / "launch.spec.json").lstat().st_ino
+    real_stat, real_fstat, changed = os.stat, os.fstat, []
+    def observed(info): return ProjectedStat(info, st_ctime_ns=info.st_ctime_ns + 1) if changed and info.st_ino == inode else info
+    fabricated.after_git = lambda role: changed.append(True)
+    monkeypatch.setattr(diag.os, "stat", lambda *a, **k: observed(real_stat(*a, **k)))
+    monkeypatch.setattr(diag.os, "fstat", lambda fd: observed(real_fstat(fd)))
+    assert cli(digest) == 0 and changed
+    assert observation()["authority"]["source_dispatch_authority"] is False
+
+
+@pytest.fixture
+def config_inputs(fabricated):
+    prepare(); directory = diag.proof._Directory(diag.BOOTSTRAP, create=False); inputs = diag._Inputs(directory)
+    for name in inputs.ROLES: inputs.read(name)
+    try: yield inputs, directory
+    finally: inputs.close(); directory.close()
+
+
+@pytest.mark.parametrize("hazard", ["bytes", "inode", "mode", "hardlink", "symlink", "fifo"])
+def test_config_reauthentication_never_relearns_original_pin_or_bytes(config_inputs, hazard):
+    inputs, directory = config_inputs; path = directory.path / "launch.spec.json"; original = inputs.rows.copy()
+    raw = path.read_bytes()
+    if hazard == "bytes": path.write_bytes(b"X" + raw[1:])
+    elif hazard == "mode": path.chmod(0o644)
+    elif hazard == "hardlink": os.link(path, directory.path.parent / "extra-link")
+    else:
+        retained = directory.path.parent / "retained-original-config"; path.rename(retained)
+        if hazard == "inode": path.write_bytes(raw); path.chmod(0o600)
+        elif hazard == "symlink": path.symlink_to(retained)
+        else: os.mkfifo(path, 0o600)
+    with pytest.raises((diag.StartupRefusal, diag.proof.NativeProofRefusal)): inputs.audit()
+    assert inputs.rows == original
+
+
+@pytest.mark.parametrize("hazard", ["ctime", "bytes"])
+def test_each_config_read_close_is_inside_original_full9_barrier(config_inputs, monkeypatch, hazard):
+    inputs, directory = config_inputs; path = directory.path / "launch.spec.json"; inode = path.lstat().st_ino
+    real_open, real_close, real_stat, real_fstat = os.open, os.close, os.stat, os.fstat
+    readers, changed = set(), []
+    def observed(info): return ProjectedStat(info, st_ctime_ns=info.st_ctime_ns + 1) if changed and info.st_ino == inode else info
+    def opened(name, flags, *args, **kwargs):
+        fd = real_open(name, flags, *args, **kwargs)
+        if real_fstat(fd).st_ino == inode: readers.add(fd)
+        return fd
+    def close(fd):
+        target = fd in readers; readers.discard(fd); result = real_close(fd)
+        if target:
+            changed.append(True)
+            if hazard == "bytes":
+                raw = path.read_bytes(); path.write_bytes(b"X" + raw[1:])
+        return result
+    monkeypatch.setattr(diag.os, "open", opened); monkeypatch.setattr(diag.os, "close", close)
+    monkeypatch.setattr(diag.os, "stat", lambda *a, **k: observed(real_stat(*a, **k)))
+    monkeypatch.setattr(diag.os, "fstat", lambda fd: observed(real_fstat(fd)))
+    with pytest.raises(diag.proof.NativeProofRefusal, match="stamp"): inputs.audit()
+    assert changed == [True]
+
+
+def test_prepare_never_adopts_a_replacement_after_original_creator_close(fabricated, monkeypatch):
+    real_open, real_close, writers, changed = os.open, os.close, set(), []
+    def opened(path, flags, *args, **kwargs):
+        fd = real_open(path, flags, *args, **kwargs)
+        if path == "job.plist" and flags & os.O_CREAT: writers.add(fd)
+        return fd
+    def close(fd):
+        target = fd in writers; writers.discard(fd); result = real_close(fd)
+        if target:
+            path = diag.ROOT / diag.PARENT / diag.BOOTSTRAP / "job.plist"; raw = path.read_bytes()
+            path.rename(diag.ROOT / "retained-creator-job"); path.write_bytes(raw); path.chmod(0o600); changed.append(True)
+        return result
+    monkeypatch.setattr(diag.os, "open", opened); monkeypatch.setattr(diag.os, "close", close)
+    with pytest.raises(diag.StartupRefusal, match="config"): prepare()
+    assert changed == [True]
+
+
+def test_timestamp_only_change_after_config_writer_close_still_requires_canonical_read(fabricated, monkeypatch):
+    real_open, real_close, real_stat, real_fstat = os.open, os.close, os.stat, os.fstat
+    writers, drifted = {}, set()
+    def observed(info): return ProjectedStat(info, st_ctime_ns=info.st_ctime_ns + 1) if info.st_ino in drifted else info
+    def opened(path, flags, *args, **kwargs):
+        fd = real_open(path, flags, *args, **kwargs)
+        if path in ("launch.spec.json", "job.plist") and flags & os.O_CREAT: writers[fd] = real_fstat(fd).st_ino
+        return fd
+    def close(fd):
+        inode = writers.pop(fd, None); result = real_close(fd)
+        if inode is not None: drifted.add(inode)
+        return result
+    monkeypatch.setattr(diag.os, "open", opened); monkeypatch.setattr(diag.os, "close", close)
+    monkeypatch.setattr(diag.os, "stat", lambda *a, **k: observed(real_stat(*a, **k)))
+    monkeypatch.setattr(diag.os, "fstat", lambda fd: observed(real_fstat(fd)))
+    assert len(prepare()) == 64 and len(drifted) == 2
+
+
+def test_config_roles_are_exact_and_expose_no_source_evidence_conversion(config_inputs):
+    inputs, unused = config_inputs
+    assert inputs.ROLES == ("launch.spec.json", "job.plist")
+    for name in ("seal", "inventory", "capture", "source", "authorize"): assert not hasattr(inputs, name)
+    with pytest.raises(diag.StartupRefusal): inputs.read("other.json")
+
+
+def test_prepare_carries_original_creator_pin_between_separate_config_operations(fabricated, monkeypatch):
+    original, changed = diag._config_write, []
+    def write(directory, name, raw):
+        pin = original(directory, name, raw)
+        if name == "job.plist":
+            path = directory.path / "launch.spec.json"; body = path.read_bytes()
+            path.rename(diag.ROOT / "retained-original-spec"); path.write_bytes(body); path.chmod(0o600); changed.append(True)
+        return pin
+    monkeypatch.setattr(diag, "_config_write", write)
     with pytest.raises(diag.StartupRefusal, match="config"): prepare()
     assert changed == [True]

@@ -27857,3 +27857,98 @@ old evidence; do not restart a namespace or launch another native proof before
 a verified causal diagnosis. Source access, claims, input and QC/Safari remain
 blocked. The separate approved budgets and all historical/unknown debits stay
 unchanged; no source START/HTTP/key read, look, purchase or push occurred.
+
+### 132.19 Actual diagnostic-v1 preparation refusal; configuration-only cause
+
+Checkpoint2a8410f59718a76d6a6bf5201504e14c3ec30b1e contains132.17..18 and the
+separate startup diagnostic. Main post-record98/.94s passed before commit.
+On clean2A with matching tracking/actual F27, exact new paths/job were absent.
+Registered prepare exec95125 ran ONCE and terminated exit2. The original fixed
+projection is stage original_audit, upstream native_proof_stamp, mismatch
+FIELD NAME ctime_ns only; original Git role/ordinal/returncode are all null.
+No launchd submission or native/source operation occurred.
+
+This phase invokes only new _Inputs.audit; its directory checks use five
+identity fields, while its full9 comparisons apply to exactly launch.spec.json
+and job.plist. The failed comparison FAMILY is therefore the new two-role
+configuration reader. Exact row/comparison and the actor remain UNKNOWN.
+Static inspection verifies that the helper stored full9 at first read and
+required those timestamps again after intervening terminal Code/Git callbacks.
+That is a configuration/evidence role error. It is not a diagnosis of native
+v4 or any earlier failed operation.
+
+Independent CURRENT read-only authentication found the exact two configuration
+files, empty original-identity status and job absent113. Current canonical
+spec SHA88436b090b2b21d1f27da200ffa598ec69726775e66673eea5862d8a0ffa0f2b
+(2389bytes) and job SHA3497ece5c471839a357e85f6a8a56cbfe236a44c516e4fb186c74fad741f9686
+(1462bytes) pass stable per-read/close checks. These present observations do
+not undo the failed preparation. The v1 namespace/status/label are permanently
+retired without submission, retry, adoption, reseal or cleanup.
+
+**SI-DEC-20261028-08** prospectively corrects ONLY the new diagnostic's two
+CONFIGURATION roles: original identity/protection/size and exact expected
+canonical bytes/hash remain fixed across separate operations; each fresh
+original-inode read requires full9 FD/name stability through that reader's
+close. Audits may never learn replacement bytes or pins. This role grants no
+evidence/source capability. A fixed distinct v2 may be registered only after
+causal phase-separated ctime tests and byte/inode/protection/read-close refusal
+tests, plus independent review. ALL original native/code/source/historical
+live-bootstrap full9 epochs remain unchanged. No equivalent native proof is
+being retried, no actor is asserted, and no source gate is released. All data,
+claims/debits and the separately approved budgets remain intact; no source
+START/HTTP/key read, look, QC/Safari, purchase or push occurred.
+
+### 132.20 Frozen diagnostic-v2 configuration role correction
+
+SI-DEC-20261028-08 now has the narrowly tested two-role implementation. Only
+the existing new diagnostic/test and this record changed. Its fixed bootstrap,
+status, label and schemas are v2; failed v1 remains untouched and retired.
+All original five native dependencies and the historical target B58/F27/spec
+are unchanged. No new native proof, image, source claim or provider operation
+is registered by this correction.
+
+_Inputs accepts ONLY the exact diagnostic bootstrap and launch.spec.json/
+job.plist roles. It fixes original first7 identity/protection/size, expected
+bytes and their hash; later audits cannot learn new pins/bytes. Prepare carries
+the actual _config_write creator pins into initial reads, so a same-byte
+replacement between publication operations still refuses. Runtime initial
+input is externally SHA-authenticated CONFIGURATION only. Each fresh bounded
+nofollow/nonblock read matches original first7, full9 named/FD before and after
+the exact-byte read, then the named full9 again AFTER that reader's close.
+Only timestamps BETWEEN separate configuration operations are observations;
+there is no evidence seal or conversion capability. Source/code/native and
+historical live-bootstrap full9 remain mandatory and unchanged.
+
+| Finding | Priority | Disposition |
+| --- | --- | --- |
+| SI-BUILD-20261028-063 | P2 | Corrected prospectively: new _Inputs had over-applied a cross-operation evidence timestamp seal to its two configuration inputs. An unchanged-body phase-separated ctime case was RED then GREEN. Actual95125 identifies this comparison family, not the actor or exact row; no earlier cause is attributed. |
+
+Bytes, inode, owner/mode, links, FIFO/symlink and read/read-close ctime/byte
+drift still refuse. Explicit old historical-live-bootstrap and own sixth-code
+ctime changes still fail their unchanged full9 guards. The delegated author's
+memory-only creator-pin removal made the replacement regression
+fail1/59deselected/.43s; it was restored without disk edits. No failed input
+or evidence is adopted, resealed, refunded or promoted.
+
+Registered policy:
+22f9e61d8898a9728526c9632dcea445c7d051e1252a62d5c95c7cc32d2b4a52.
+Source SHA256401b7120c8846badfb2ee8862c032194437b37f723e4c08520d8aac7ef67126e;
+test SHA256c67f738d7b6edbc61ce17fc8d8147308c30c1fe5af94a7752a445ed60306d7c5.
+Main10 relevant focused files passed **401/3.12s**, no skips/warnings reported;
+all92 held/proof/test paths compile in memory. Exact six-file closure, policy
+equality, original native dependency bytes/target hashes, historical-record
+prefix and whitespace passed. Separately attributed author69/1.42s and peer60
+diagnostic tests/1.03s passed; peer accepted final registered source. Sanitized
+environment, OS network denial/no bytecode/cache remained. No full suite,
+actual operation or Claude review occurred during development.
+
+After clean commit and matching actual/tracking F27 checks, Main may prepare
+this distinct v2 diagnostic ONCE and independently authenticate its canonical
+job/spec/original status identity before ONE exact one-shot submission. All
+authors/tests freeze while active. The external configuration role still
+asserts no live HEAD/branch/clean status before the unchanged original guard;
+two-head separation, complete genuine Git frame projection, fixed command and
+write fences, elapsed-acceptance bounds and ALL false admission authorities
+remain. Observe actual kernel termination and original bounded status; neither
+diagnostic0 nor current input reauthentication is native/source qualification.
+No source START/HTTP/key read/claim, look, QC/Safari, purchase or push occurred.

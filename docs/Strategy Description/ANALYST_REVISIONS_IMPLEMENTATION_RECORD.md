@@ -71414,3 +71414,40 @@ compiled in memory, dispatch_fence absent, native all-network/production-
 artifact/both-Keychain/security denial; no full suite. Earlier207pre-A and
 author/subset counts overlap and are not summed. Current V1/A/C pins were
 rechecked unchanged; V2/B pins match this separate first-use freeze.
+
+### 332.6 Actual B stopped after first delete; exact D reconciliation freeze
+
+B ran once at cleane5692dba2597ed3f9272d0df4a043541fe1031b6, record
+868087774cff59821eeacd150a607e79ef31a7cb9105bd56034da3257de538f2.
+Actualparent2/child2; six intents/application attempts. The first36561231
+delete returned HTTP200/API success, but its following projects/read did not
+satisfy the expected same-ID Recycle Bin/name representation. The batch stopped
+before any other target, reasonrecycle_not_confirmed, deletion outcome ambiguous.
+No delete retry or further B invocation. Confirmed recycled_count=0 means
+zero CONFIRMED removals, not proof no mutation happened. B is now spent/frozen.
+Failure report1097bytes/3df62e0541310a7fbb973cdb6069673bf5b08452efb5d5526c6414adbfbcd2ff
+was reconstructed from supplied output; finished2026-10-29T07:04:08.458332Z
+(October29PDT). The explicit legacy37017548 ID/name appeared and was preserved.
+
+The discarded post-read body cannot be recovered from this finite report.
+New scripts/diagnose_arv2_r332_recycle_state.py14711bytes SHA256
+15b88d8431390218dd7c43a41603967338451596f33662f726eb5ecda98ebde2
+is a separately frozen read-only current-state reconciliation. Fixed new
+controlqc_cleanup/R332-20261029-D is uninspected/unallocated. Exactly ONE
+projects/read{} catalog, select only36561231 current presence/name/owner-match/
+codeRunning and bounded whitelisted path/deletion scalars. No other project
+name/ID/account field, history, source, delete, capacity, job or Safari access.
+Absent target is an observed-not-returned state, not proof of permanent purge
+or Recycle Bin placement. Duplicate/malformed identity refuses.
+
+Same clean Mac/root/branch, frozen inventory transport84a17...3a5, exact D
+caller/record/HEAD binding, own claim before credentials/DNS,90/60second
+parent/worker and startup/I/O/reap qualifications. Native policy1518bytes SHA
+293784d49288434ddd8bb443f1df25ebeded0e2b1af8f9f1d2a07efbbbd5dc31.
+Public synthetic absence/presence/mismatch/duplicate/count/secrecy checks and
+memory compilation passed under native all-network/artifact/Keychain/security
+denial; no actual control/API was inspected by those tests. Commit this D
+decision and use its resulting clean HEAD/caller/record once. Require actual
+parent0/child0 plus reconstructed report; do not re-delete36561231. A/C/B stay
+spent. No remaining12deletion is authorized by this diagnostic-only freeze;
+first resolve the representation and separately freeze justified continuation.

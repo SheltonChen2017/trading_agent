@@ -30,4 +30,3 @@ def profile_record():
         "complete_strategy_price_coverage_proven": False,
         "point_in_time_proven": False, "permanent_identity_proven": False,
         "formal_forward_ready": False, "paper_or_live_ready": False}
-

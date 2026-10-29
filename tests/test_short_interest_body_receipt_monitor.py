@@ -13,6 +13,19 @@ from types import SimpleNamespace
 import pytest
 
 from data.hashing import canonical_json, hash_bytes, hash_payload
+
+# The runtime under test imports POSIX-only stdlib modules at import time, so
+# this module cannot even be collected on the supported Windows host; see the
+# lane record SI-CR18-001. Portable contract logic stays covered on POSIX.
+pytest.importorskip(
+    "fcntl",
+    reason=(
+        "the protected-capture runtime imports the POSIX-only module "
+        "fcntl at import time; it cannot execute on this host, see the "
+        "lane record SI-CR18-001"
+    ),
+)
+
 from scripts import short_interest_body_receipt_custody as custody
 from scripts import short_interest_body_receipt_monitor as monitor
 from scripts import short_interest_targeted_immutable_monitor as tiny_monitor

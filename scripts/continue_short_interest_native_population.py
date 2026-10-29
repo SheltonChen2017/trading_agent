@@ -341,7 +341,7 @@ def _capture(root, directory, opener, secret, source, *, head, remote, started_a
     _require(previous <= _clock(retrieved), 'report_chronology')
     report = {'schema': 'si-native-population-continuation-inventory-v1',
               'parent_source': protocol()['parent_source'],
-              'child_source': {'run': str(directory.relative_to(root)), 'head': head,
+              'child_source': {'run': directory.relative_to(root).as_posix(), 'head': head,
                               'protocol_sha256': EXPECTED_PROTOCOL_SHA256, 'code_identity_sha256': identity},
               'retrieved_at': retrieved, 'pages': parent_pages + pages,
               'scope': 'reported_provider_population_not_US_universe', 'source_latest_revised': True,

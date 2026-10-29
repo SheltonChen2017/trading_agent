@@ -17,6 +17,19 @@ import textwrap
 import pytest
 
 from data.hashing import hash_bytes
+
+# The runtime under test imports POSIX-only stdlib modules at import time, so
+# this module cannot even be collected on the supported Windows host; see the
+# lane record SI-CR18-001. Portable contract logic stays covered on POSIX.
+pytest.importorskip(
+    "fcntl",
+    reason=(
+        "the protected-capture runtime imports the POSIX-only module "
+        "fcntl at import time; it cannot execute on this host, see the "
+        "lane record SI-CR18-001"
+    ),
+)
+
 from scripts import short_interest_count_response_custody as custody
 from scripts import short_interest_count_control_custody as controls
 from scripts import short_interest_count_response_volume as volume

@@ -8,6 +8,18 @@ from types import SimpleNamespace
 import pytest
 
 import scripts.short_interest_keychain as keys
+import os
+
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
 
 
 @pytest.fixture
@@ -77,6 +89,7 @@ def test_platform_first_no_item_read(monkeypatch):
 
 
 @pytest.mark.parametrize('filemode,owner', ((0o120600, 123), (0o100620, 123), (0o100600, 124)))
+@_POSIX_CAPTURE_ONLY
 def test_path_owner_symlink_and_writable_storage_refuse_before_security(monkeypatch, filemode, owner):
     monkeypatch.setattr(keys.sys, 'platform', 'darwin')
     monkeypatch.setattr(keys.os, 'getuid', lambda: 123)
@@ -87,6 +100,7 @@ def test_path_owner_symlink_and_writable_storage_refuse_before_security(monkeypa
         keys.read_named_keychain('eodhd')
 
 
+@_POSIX_CAPTURE_ONLY
 def test_parent_symlink_refuses_before_security(monkeypatch):
     monkeypatch.setattr(keys.sys, 'platform', 'darwin')
     monkeypatch.setattr(keys.os, 'getuid', lambda: 123)

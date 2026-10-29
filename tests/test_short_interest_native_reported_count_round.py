@@ -14,6 +14,18 @@ from scripts.continue_short_interest_native_identity import ContinuationRefusal
 from scripts.qualify_sharadar_companion import SharadarCaptureRefusal
 from scripts.short_interest_keychain import KeychainSecret
 import scripts.capture_short_interest_native_reported_count_round as m
+import os
+
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
 
 SPEC = importlib.util.spec_from_file_location("operational_anchor_fixtures",
         Path(__file__).with_name("test_short_interest_native_reported_anchor_plan.py"))
@@ -87,6 +99,7 @@ def run(value):
         return m.capture_loaded_source(m.lane.ROOT, directory, source, plan, owned=owned, **args)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_exact_all_queries_claim_before_key_start_before_http_and_private_zero_authority(monkeypatch, tmp_path):
     value = setup(monkeypatch, tmp_path)
     result = run(value)
@@ -100,6 +113,7 @@ def test_exact_all_queries_claim_before_key_start_before_http_and_private_zero_a
     assert state["remote_reads"] == 18
 
 
+@_POSIX_CAPTURE_ONLY
 def test_duplicate_global_claim_is_immutable_and_key_never_read_again(monkeypatch, tmp_path):
     value = setup(monkeypatch, tmp_path, count=2)
     run(value)
@@ -112,6 +126,7 @@ def test_duplicate_global_claim_is_immutable_and_key_never_read_again(monkeypatc
     assert old == {p.name: hash_bytes(p.read_bytes()) for p in second.parent.iterdir() if p.is_file()}
 
 
+@_POSIX_CAPTURE_ONLY
 def test_named_key_unavailable_has_owned_zero_http_refusal_after_consumed_claim(monkeypatch, tmp_path):
     value = setup(monkeypatch, tmp_path, count=2)
     def missing(provider):
@@ -125,6 +140,7 @@ def test_named_key_unavailable_has_owned_zero_http_refusal_after_consumed_claim(
 
 
 @pytest.mark.parametrize("mode", ["raw", "unicode", "percent", "media"])
+@_POSIX_CAPTURE_ONLY
 def test_secret_echo_refuses_before_body_hash_or_persistence(monkeypatch, tmp_path, mode):
     value = setup(monkeypatch, tmp_path, count=2)
     encoded = (KEY.encode() if mode == "raw" else ("".join("\\u%04x" % ord(c) for c in KEY).encode()
@@ -143,6 +159,7 @@ def test_secret_echo_refuses_before_body_hash_or_persistence(monkeypatch, tmp_pa
     assert all(r["body_observed"] is False for r in result.iter_receipts())
 
 
+@_POSIX_CAPTURE_ONLY
 def test_current_key_echo_in_descriptor_refuses_before_started_receipt_and_http(monkeypatch, tmp_path):
     value = setup(monkeypatch, tmp_path, count=2)
     value[3]["read_secret"] = lambda provider: KeychainSecret("SYN")
@@ -151,6 +168,7 @@ def test_current_key_echo_in_descriptor_refuses_before_started_receipt_and_http(
     assert not list(value[2].glob("query-*.started.json"))
 
 
+@_POSIX_CAPTURE_ONLY
 def test_404_retained_unobserved_negative_all_later_frozen_queries_continue(monkeypatch, tmp_path):
     value = setup(monkeypatch, tmp_path)
     def missing(opener, request, maximum):
@@ -165,6 +183,7 @@ def test_404_retained_unobserved_negative_all_later_frozen_queries_continue(monk
 
 
 @pytest.mark.parametrize("status", [403, 429, 500, None])
+@_POSIX_CAPTURE_ONLY
 def test_material_failure_drains_at_most_eight_started_without_new_batch(monkeypatch, tmp_path, status):
     value = setup(monkeypatch, tmp_path)
     def failed(opener, request, maximum):
@@ -179,6 +198,7 @@ def test_material_failure_drains_at_most_eight_started_without_new_batch(monkeyp
     assert len(list(value[2].glob("*.received.json"))) == 8
 
 
+@_POSIX_CAPTURE_ONLY
 def test_remote_advancement_drains_exact_started_prefix_without_success_or_next_batch(monkeypatch, tmp_path):
     value = setup(monkeypatch, tmp_path)
     original = value[3]["http"]
@@ -193,6 +213,7 @@ def test_remote_advancement_drains_exact_started_prefix_without_success_or_next_
     assert not (value[2] / "completed.json").exists() and (value[2] / "run.refused.json").exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_full_page_reservation_ceiling_blocks_next_query_before_http(monkeypatch, tmp_path):
     value = setup(monkeypatch, tmp_path, maximum=m.parallel.MAXIMUM_RESPONSE_BYTES)
     inventory = run(value)
@@ -200,6 +221,7 @@ def test_full_page_reservation_ceiling_blocks_next_query_before_http(monkeypatch
     assert inventory.to_payload()["charged_response_bytes"] == len(RAW)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_pending_protocol_or_scope_reflection_never_reads_key_or_spends_claim(monkeypatch, tmp_path):
     value = setup(monkeypatch, tmp_path, count=2)
     monkeypatch.setattr(m, "PROTOCOL_SHA256", "PENDING")
@@ -208,6 +230,7 @@ def test_pending_protocol_or_scope_reflection_never_reads_key_or_spends_claim(mo
     assert not value[4]["keys"] and not value[4]["http"] and not tuple(value[2].iterdir())
 
 
+@_POSIX_CAPTURE_ONLY
 def test_callback_cannot_change_imported_response_budget_after_prospective_freeze(monkeypatch, tmp_path):
     value = setup(monkeypatch, tmp_path)
     original = value[3]["http"]
@@ -221,6 +244,7 @@ def test_callback_cannot_change_imported_response_budget_after_prospective_freez
     assert not (value[2] / "completed.json").exists() and not list(value[2].glob("*.raw"))
 
 
+@_POSIX_CAPTURE_ONLY
 def test_prepared_owned_directory_mode_drift_never_publishes_sensitive_results(monkeypatch, tmp_path):
     value = setup(monkeypatch, tmp_path)
     original = value[3]["http"]
@@ -234,6 +258,7 @@ def test_prepared_owned_directory_mode_drift_never_publishes_sensitive_results(m
     assert not list(value[2].glob("*.raw")) and not (value[2] / "completed.json").exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_backward_worker_clock_refuses_no_completed_receipt_and_no_retry(monkeypatch, tmp_path):
     value = setup(monkeypatch, tmp_path, count=2)
     good = value[3]["clock"]
@@ -251,6 +276,7 @@ def test_backward_worker_clock_refuses_no_completed_receipt_and_no_retry(monkeyp
     assert len(value[4]["http"]) == 2 and not (value[2] / "completed.json").exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_publication_fault_after_authorized_debit_raises_not_undercounted_inventory(monkeypatch, tmp_path):
     value = setup(monkeypatch, tmp_path)
     original = _OwnedOutput.publish
@@ -267,6 +293,7 @@ def test_publication_fault_after_authorized_debit_raises_not_undercounted_invent
     assert not (value[2] / "completed.json").exists() and not (value[2] / "inventory.private.json").exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_all_eight_descriptors_prevalidated_before_any_authorized_debit(monkeypatch, tmp_path):
     value = setup(monkeypatch, tmp_path)
     original, seen = m._wire_request, []

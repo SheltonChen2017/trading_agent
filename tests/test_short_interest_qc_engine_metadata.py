@@ -14,6 +14,17 @@ import pytest
 from data.hashing import canonical_json, hash_bytes
 from scripts import read_short_interest_qc_engine_metadata as m
 
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
+
 USER = '918273645'
 TOKEN = 'fabricated-only-token-abcdef0123456789'
 STAMP = 1234567890
@@ -61,6 +72,7 @@ def test_protocol_is_data_free_one_fixed_read_without_project_node_or_automatic_
     assert p['selection_is_execution_pin'] is False
 
 
+@_POSIX_CAPTURE_ONLY
 def test_exclusive_durable_claim_precedes_credentials_and_wire_and_blocks_restart(tmp_path):
     path = directory(tmp_path)
     trace = []
@@ -83,6 +95,7 @@ def test_exclusive_durable_claim_precedes_credentials_and_wire_and_blocks_restar
 
 
 @pytest.mark.parametrize('stage', ['credentials', 'wire', 'changed_scope'])
+@_POSIX_CAPTURE_ONLY
 def test_failure_spends_budget_and_never_records_arbitrary_exception_detail(tmp_path, stage):
     path = directory(tmp_path)
     def boom():
@@ -106,6 +119,7 @@ def test_failure_spends_budget_and_never_records_arbitrary_exception_detail(tmp_
         run(path)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_ephemeral_wire_authentication_matches_primary_documented_signature_not_receipt(tmp_path):
     path = directory(tmp_path)
     def wire(request):
@@ -124,6 +138,7 @@ def test_ephemeral_wire_authentication_matches_primary_documented_signature_not_
 
 
 @pytest.mark.parametrize('kind', ['token', 'unicode_token', 'signature', 'basic', 'header', 'encoded_token', 'user'])
+@_POSIX_CAPTURE_ONLY
 def test_secret_echo_is_discarded_before_any_raw_or_public_receipt(tmp_path, kind):
     path = directory(tmp_path)
     _request, markers = m.authenticated_request((USER, TOKEN), STAMP)
@@ -140,6 +155,7 @@ def test_secret_echo_is_discarded_before_any_raw_or_public_receipt(tmp_path, kin
     assert refusal['body_observed'] is True and refusal['raw_response_write_started'] is False
 
 
+@_POSIX_CAPTURE_ONLY
 def test_protected_raw_mixed_catalog_kept_but_public_output_omits_nonpublic_description(tmp_path):
     path = directory(tmp_path)
     raw = response([version(7, public=False, name='private-branch'), version(3),
@@ -169,6 +185,7 @@ def test_selection_latest_created_then_highest_id_is_order_independent():
     response([version(name='email@example.com')]), response([version(), version()]),
     response([version(public=False)]), response([]), response([version(userId='private')]),
 ])
+@_POSIX_CAPTURE_ONLY
 def test_unqualified_response_never_persisted_or_reported_as_public_metadata(tmp_path, raw):
     path = directory(tmp_path)
     with pytest.raises(m.MetadataRefusal):
@@ -178,6 +195,7 @@ def test_unqualified_response_never_persisted_or_reported_as_public_metadata(tmp
 
 
 @pytest.mark.parametrize('fault', ['directory_mode', 'symlink', 'claim_symlink', 'claim_hardlink'])
+@_POSIX_CAPTURE_ONLY
 def test_storage_protection_and_exclusive_claim_fail_before_secret_read(tmp_path, fault):
     path = directory(tmp_path)
     if fault == 'directory_mode':
@@ -241,6 +259,7 @@ def test_success_wire_is_still_fixed_bounded_and_failed_body_is_not_persisted(mo
         m.wire_read(request)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_public_receipt_failure_does_not_claim_clean_observed_raw_was_absent(tmp_path):
     path = directory(tmp_path)
     (path / 'public-observation.json').write_bytes(b'preexisting unrelated output')

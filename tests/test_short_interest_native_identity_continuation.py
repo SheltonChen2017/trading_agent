@@ -576,7 +576,7 @@ def test_operational_run_uses_owned_exclusive_output_named_key_fixed_headers_and
     monkeypatch.setattr(m, "_git", lambda root, *args: args[1] if args[0] == "check-ignore" else "")
     monkeypatch.setattr(m, "_prepare_capture_directory", lambda target: Path("/fabricated/owned/run"))
     def publish(where, name, raw):
-        pair = str(where), name
+        pair = Path(where).as_posix(), name  # fabricated POSIX paths, host-neutral
         assert pair not in saved
         saved[pair] = raw
         h.events.append("save:" + name)

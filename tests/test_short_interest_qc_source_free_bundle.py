@@ -6,6 +6,17 @@ import pytest
 
 from data.hashing import hash_bytes, hash_payload
 import scripts.short_interest_qc_source_free_bundle as p
+from pathlib import Path
+
+# These cases need the lane's pinned physical root: code manifests, protocol
+# paths and sibling imports are built from the designated macOS worktree.
+_DESIGNATED_ROOT_ONLY = pytest.mark.skipif(
+    Path.cwd().resolve() != p.ROOT,
+    reason=(
+        "the lane pins its physical root, code manifest and protocol paths to the "
+        "designated macOS worktree; this host is not it, see the lane record SI-CR18-005"
+    ),
+)
 
 
 HEAD = '0368862746e3388091e50801d4f2c128ebc9fe55'
@@ -22,6 +33,7 @@ def bundle():
     return p.assemble_bundle(expected_head=HEAD, guard=guard)
 
 
+@_DESIGNATED_ROOT_ONLY
 def test_current_main_complete_import_closure_is_package_valid(bundle):
     value = bundle.to_payload()
     files = dict(bundle.iter_files())
@@ -42,6 +54,7 @@ def test_imported_member_is_not_misclassified_as_a_package():
 
 @pytest.mark.parametrize('missing', ['data/__init__.py', 'data/hashing.py',
     'research/short_interest_etf/__init__.py', 'research/short_interest_etf/contracts.py'])
+@_DESIGNATED_ROOT_ONLY
 def test_missing_transitive_module_or_package_refuses(bundle, missing):
     files = dict(bundle.iter_files()); files.pop(missing)
     with pytest.raises(p.BundleRefusal, match='(package_marker_missing|local_source_dependency_missing)'):
@@ -55,6 +68,7 @@ def test_provider_secret_database_unknown_import_refuses(bad):
         p.audit_closure({'main.py': bad})
 
 
+@_DESIGNATED_ROOT_ONLY
 def test_bundle_hashes_all_code_bytes_and_flags_do_not_grant_execution(bundle):
     value = bundle.to_payload()
     asserted = value.pop('bundle_sha256')
@@ -71,6 +85,7 @@ def test_bundle_hashes_all_code_bytes_and_flags_do_not_grant_execution(bundle):
     assert value['actual_outcome_looks'] == value['qc_attempts'] == 0
 
 
+@_DESIGNATED_ROOT_ONLY
 def test_returned_manifest_detached_and_source_mapping_immutable(bundle):
     value = bundle.to_payload(); value['files'].clear()
     assert bundle.to_payload()['files']
@@ -84,6 +99,7 @@ def test_pending_proposal_has_no_operational_entrypoint():
         p.main()
 
 
+@_DESIGNATED_ROOT_ONLY
 def test_optional_receiving_overlay_preserves_economic_commands_and_fixture(bundle):
     checked = p.assemble_bundle(expected_head=HEAD, guard=guard, include_receiving_instrumentation=True)
     value = checked.to_payload()
@@ -97,6 +113,7 @@ def test_optional_receiving_overlay_preserves_economic_commands_and_fixture(bund
     assert b'self._hub.snapshot_family()' in checked_files['main.py']
     assert checked.to_payload()['actual_engine_proof'] is False
 
+@_DESIGNATED_ROOT_ONLY
 def test_manifest_cannot_be_mutated_and_rehashed_into_authority():
     value = p.assemble_bundle(expected_head=HEAD, guard=guard)
     value._manifest['actual_input_admitted'] = True

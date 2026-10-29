@@ -534,6 +534,14 @@ def test_changed_exact_class_hash_or_equality_never_executes_in_registry_lookup(
     assert calls == []
 
 
+@pytest.mark.skipif(
+    importlib.util.find_spec("resource") is None,
+    reason=(
+        "this case builds its fixtures from test_short_interest_count_durable_transport, whose "
+        "runtime imports the POSIX-only module resource at import time; it cannot execute on "
+        "this host, see the lane record SI-CR18-001"
+    ),
+)
 def test_original_current_reader_issuance_is_retained_after_reader_expiry(monkeypatch, tmp_path, request):
     # Function-local genuine fixture builders avoid a reverse module-level
     # import cycle. Their external source/file/wire closures remain fake.

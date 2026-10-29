@@ -40,7 +40,7 @@ def offline(monkeypatch):
     monkeypatch.setattr(capture, "_guard", lambda *args: events.append("guard"))
     monkeypatch.setattr(capture, "_utc_now", lambda: NOW)
     def publish(directory, name, value):
-        key = (str(directory), name)
+        key = (Path(directory).as_posix(), name)  # fabricated POSIX paths, host-neutral
         if key in saved:
             raise capture.CaptureRefusal("artifact_already_exists")
         saved[key] = value

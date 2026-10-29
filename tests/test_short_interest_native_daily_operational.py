@@ -10,6 +10,28 @@ from research.short_interest_etf import native_daily_active_reference as daily
 from scripts import capture_short_interest_native_daily_operational as m
 from data.exchange_calendar import trading_sessions
 from datetime import date
+import os
+
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
+
+# These cases need the lane's pinned physical root: code manifests, protocol
+# paths and sibling imports are built from the designated macOS worktree.
+_DESIGNATED_ROOT_ONLY = pytest.mark.skipif(
+    Path.cwd().resolve() != lane.ROOT,
+    reason=(
+        "the lane pins its physical root, code manifest and protocol paths to the "
+        "designated macOS worktree; this host is not it, see the lane record SI-CR18-005"
+    ),
+)
 
 def plan():
     return daily.freeze_daily_active_plan(tuple(at.isoformat() for at in trading_sessions(date(2022,1,3),date(2026,8,31))),calendar_sha256="a"*64)
@@ -74,6 +96,7 @@ def test_pending_literal_blocks_live_action(monkeypatch):
     monkeypatch.setattr(m,"SOURCE_ARCHIVE_SHA256","PENDING")
     with pytest.raises(m.OperationalRefusal,match="pending"): m.run_pending()
 
+@_POSIX_CAPTURE_ONLY
 def test_owned_source_read_once_then_no_rehash_or_reader_per_check(tmp_path):
     tmp_path.chmod(0o700); file=tmp_path/"source.bin"; file.write_bytes(b"synthetic-only"); file.chmod(0o600)
     calls=[]; held=m.HeldPinnedFile(file,hash_bytes(b"synthetic-only"),100,boundary=lambda:calls.append("local"))
@@ -86,6 +109,7 @@ def test_owned_source_read_once_then_no_rehash_or_reader_per_check(tmp_path):
     finally: held.close()
 
 @pytest.mark.parametrize("fault",["symlink","mode","hardlink"])
+@_POSIX_CAPTURE_ONLY
 def test_source_protection_failures_before_any_read(tmp_path,fault):
     tmp_path.chmod(0o700); file=tmp_path/"source.bin"; file.write_bytes(b"synthetic-only"); file.chmod(0o600)
     if fault=="symlink":
@@ -95,6 +119,7 @@ def test_source_protection_failures_before_any_read(tmp_path,fault):
         import os; os.link(file,tmp_path/"alias")
     with pytest.raises(m.OperationalRefusal): m.HeldPinnedFile(file,hash_bytes(b"synthetic-only"),100)
 
+@_POSIX_CAPTURE_ONLY
 def test_scoped_owned_output_no_unregistered_name_overwrite_or_success(tmp_path):
     tmp_path.chmod(0o700); directory=tmp_path/"output"; directory.mkdir(mode=0o700)
     gate,_,_=control()
@@ -110,6 +135,7 @@ def test_scoped_owned_output_no_unregistered_name_overwrite_or_success(tmp_path)
         with pytest.raises(m.OperationalRefusal): publisher.bytes(directory,"day-0001.qualified.private.json",b"{}")
         assert not (directory/"day-0001.qualified.private.json").exists()
 
+@_DESIGNATED_ROOT_ONLY
 def test_external_commit_and_complete_code_manifest_do_not_reset_stable_source_budget():
     before=hash_payload(m.protocol())
     first=m.RuntimeRegistration(head="a"*40,remote="b"*40,code_manifest=manifest())
@@ -118,6 +144,7 @@ def test_external_commit_and_complete_code_manifest_do_not_reset_stable_source_b
     assert "registered_head" not in m.protocol() and "code_pins" not in m.protocol()
     assert first.payload()["complete_current_code_manifest"]==manifest()
 
+@_DESIGNATED_ROOT_ONLY
 def test_controller_and_registration_reflection_cannot_rebind_source_or_lane():
     gate,_,_=control()
     gate.source_check=lambda:None
@@ -156,6 +183,7 @@ def test_literal_eight_inflight_transport_starts_share_one_remote_boundary(monke
     assert sorted(callbacks)==list(range(1,9)) and gate._invocations==8 and gate._slots=={}
     assert trace.count("ls-remote")==2  # initial + one boundary for eight starts
 
+@_POSIX_CAPTURE_ONLY
 def test_source_hash_and_read_operations_are_once_not_per_slot_or_64KiB_check(tmp_path,monkeypatch):
     tmp_path.chmod(0o700); path=tmp_path/"source"; raw=b"synthetic"*(20*1024)
     path.write_bytes(raw); path.chmod(0o600); sha=hash_bytes(raw)
@@ -169,6 +197,7 @@ def test_source_hash_and_read_operations_are_once_not_per_slot_or_64KiB_check(tm
         assert len(reads)==3 and hashes==[len(raw)]
     finally: held.close()
 
+@_POSIX_CAPTURE_ONLY
 def test_exact_typed_daily_qualification_requires_owned_raw_and_original_index(tmp_path,monkeypatch):
     import io,zipfile
     from research.short_interest_etf import sharadar_securities_master as master
@@ -205,6 +234,7 @@ def test_receipt_cannot_claim_unpublished_raw_or_wrong_request():
     with pytest.raises(m.OperationalRefusal,match="raw_receipt"):
         close(gate,dict(value,raw_path="day-0001-page-01.raw",raw_sha256="f"*64,raw_bytes=2))
 
+@_POSIX_CAPTURE_ONLY
 def test_private_parent_permission_change_is_detected_by_retained_slot_guard(tmp_path):
     tmp_path.chmod(0o700); path=tmp_path/"source"; path.write_bytes(b"synthetic"); path.chmod(0o600)
     held=m.HeldPinnedFile(path,hash_bytes(b"synthetic"),100)
@@ -213,6 +243,7 @@ def test_private_parent_permission_change_is_detected_by_retained_slot_guard(tmp
         with pytest.raises(m.OperationalRefusal,match="parent"): held.check()
     finally: held.close(); tmp_path.chmod(0o700)
 
+@_POSIX_CAPTURE_ONLY
 def test_private_parent_replacement_does_not_rebind_a_retained_source(tmp_path):
     parent=tmp_path/"parent"; parent.mkdir(mode=0o700); path=parent/"source"
     path.write_bytes(b"synthetic"); path.chmod(0o600)
@@ -224,11 +255,13 @@ def test_private_parent_replacement_does_not_rebind_a_retained_source(tmp_path):
     finally: held.close()
 
 @pytest.mark.parametrize("missing",["data/exchange_calendar.py","scripts/short_interest_keychain.py"])
+@_DESIGNATED_ROOT_ONLY
 def test_current_registration_cannot_omit_local_execution_dependency(missing):
     pins=manifest(); del pins[str(lane.ROOT/missing)]
     with pytest.raises(m.OperationalRefusal,match="complete.*manifest|manifest.*complete"):
         m.RuntimeRegistration(head="a"*40,remote="b"*40,code_manifest=pins)
 
+@_POSIX_CAPTURE_ONLY
 def test_negative_inventory_retains_fresh_final_remote_observation_even_on_drift(tmp_path):
     import json
     tmp_path.chmod(0o700); directory=tmp_path/"output"; directory.mkdir(mode=0o700)
@@ -242,16 +275,19 @@ def test_negative_inventory_retains_fresh_final_remote_observation_even_on_drift
     assert retained["final_remote_observation"]["matching_remote_equal"] is False
     assert retained["complete_frozen_sequence"] is False
 
+@_DESIGNATED_ROOT_ONLY
 def test_extra_unregistered_code_path_is_not_part_of_complete_manifest():
     pins=manifest(); pins[str(lane.ROOT/"synthetic-extra.py")]="d"*64
     with pytest.raises(m.OperationalRefusal,match="complete.*manifest"):
         m.RuntimeRegistration(head="a"*40,remote="b"*40,code_manifest=pins)
 
+@_DESIGNATED_ROOT_ONLY
 def test_current_registration_cannot_omit_transitive_immutable_allocator():
     pins=manifest(); pins.pop(str(lane.ROOT/"ml/immutable_io.py"),None)
     with pytest.raises(m.OperationalRefusal,match="complete.*manifest"):
         m.RuntimeRegistration(head="a"*40,remote="b"*40,code_manifest=pins)
 
+@_POSIX_CAPTURE_ONLY
 def test_negative_remote_exception_is_retained_without_exception_detail(tmp_path,monkeypatch):
     import json
     tmp_path.chmod(0o700); directory=tmp_path/"output"; directory.mkdir(mode=0o700)
@@ -266,6 +302,7 @@ def test_negative_remote_exception_is_retained_without_exception_detail(tmp_path
     assert payload["round_closure_status"]=="refused"
     assert payload["final_remote_observation"]["remote_status"]=="refused_or_unavailable"
 
+@_POSIX_CAPTURE_ONLY
 def test_naked_complete_closed_record_cannot_replace_fresh_audit(tmp_path):
     tmp_path.chmod(0o700); directory=tmp_path/"output"; directory.mkdir(mode=0o700)
     gate,_,_=control()
@@ -295,6 +332,7 @@ def whole_typed_gate(monkeypatch):
         gate.observe_qualified(report); gate.complete_day(day)
     return gate,trace,advanced
 
+@_DESIGNATED_ROOT_ONLY
 def test_advance_after_provisional_positive_inventory_is_refused_at_authoritative_close(tmp_path,monkeypatch):
     import json
     gate,trace,advanced=whole_typed_gate(monkeypatch)
@@ -315,6 +353,7 @@ def test_advance_after_provisional_positive_inventory_is_refused_at_authoritativ
     retained=json.loads((directory/"round.closed.json").read_bytes())
     assert retained["complete_frozen_sequence"] is False
 
+@_POSIX_CAPTURE_ONLY
 def test_missing_typed_coverage_never_completes_on_matching_final_remote(tmp_path):
     gate,_,_=control()
     tmp_path.chmod(0o700); directory=tmp_path/"output"; directory.mkdir(mode=0o700)
@@ -325,3 +364,20 @@ def test_missing_typed_coverage_never_completes_on_matching_final_remote(tmp_pat
     assert closed["complete_frozen_sequence"] is False
     assert closed["round_closure"]["final_remote_observation"]["matching_remote_equal"] is True
     assert closed["round_closure"]["final_remote_observation"]["all1169_typed_qualification_and_raw_receipts"] is False
+
+
+def test_pinned_file_constructor_refuses_before_boundary_stat_or_open_without_posix(monkeypatch,tmp_path):
+    # SI-CR18-006: the fixed platform refusal must precede the boundary hook, every stat and
+    # every open. The fabricated OS binding lacks getuid, so this holds on POSIX hosts too.
+    from scripts import qualify_finra_short_interest as base_capture
+    class _NoOwnershipSemantics:
+        name="nt"
+        def __getattr__(self,name): return getattr(os,name)
+    monkeypatch.setattr(base_capture,"os",_NoOwnershipSemantics())
+    touched=[]
+    monkeypatch.setattr(m.os,"open",lambda *a,**k: touched.append("open") or pytest.fail("open before the platform refusal"))
+    monkeypatch.setattr(m.Path,"lstat",lambda self: touched.append("lstat") or pytest.fail("lstat before the platform refusal"))
+    path=tmp_path/"pinned.json"; path.write_bytes(b"{}")
+    with pytest.raises(base_capture.CapturePlatformRefusal) as refused:
+        m.HeldPinnedFile(path,hash_bytes(b"{}"),100,boundary=lambda: touched.append("boundary") or pytest.fail("boundary before the platform refusal"))
+    assert refused.value.code=="protected_capture_platform_unavailable" and touched==[]

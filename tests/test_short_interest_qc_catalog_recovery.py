@@ -7,6 +7,17 @@ from scripts import read_short_interest_qc_engine_metadata as legacy
 import scripts.short_interest_qc_catalog_schema as schema
 import scripts.read_short_interest_qc_catalog_recovery as runtime
 
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
+
 USER="918273645"; TOKEN="fabricated-only-token-abcdef0123456789"
 def version(**changes):
     value={"id":1,"created":"2023-01-03T14:30:00Z","description":"private-description",
@@ -92,6 +103,7 @@ def test_description_omission_uses_no_fabricated_string_and_still_selects_public
 def test_bad_description_type_is_negative_not_publicly_exposed(description):
     assert schema.diagnose_and_select(response([version(description=description)]))["selected"] is None
 
+@_POSIX_CAPTURE_ONLY
 def test_exclusive_second_claim_before_env_and_wire_keeps_original_claim_spent(tmp_path,monkeypatch):
     directory,frozen=fixture(tmp_path,monkeypatch); old=(directory/legacy.CLAIM).read_bytes(); trace=[]
     def credentials():
@@ -106,7 +118,8 @@ def test_exclusive_second_claim_before_env_and_wire_keeps_original_claim_spent(t
     with pytest.raises(schema.RecoveryRefusal,match="request_budget_consumed"):
         run(directory,frozen,credential_reader=lambda:pytest.fail("no repeat secrets"))
 
-@pytest.mark.parametrize("fault",["missing_old","changed_old","mode","hardlink","oldraw","oldpublic","protocol"])
+@pytest.mark.parametrize("fault",[*(pytest.param(fault,marks=_POSIX_CAPTURE_ONLY)
+    for fault in ("missing_old","changed_old","mode","hardlink","oldraw","oldpublic")),"protocol"])
 def test_old_protected_proof_or_scope_fault_zero_claim_key_HTTP(tmp_path,monkeypatch,fault):
     directory,frozen=fixture(tmp_path,monkeypatch); old=directory/legacy.CLAIM
     if fault=="missing_old": old.unlink()
@@ -120,6 +133,7 @@ def test_old_protected_proof_or_scope_fault_zero_claim_key_HTTP(tmp_path,monkeyp
     assert not (directory/schema.CLAIM).exists()
 
 @pytest.mark.parametrize("echo",[TOKEN,USER])
+@_POSIX_CAPTURE_ONLY
 def test_echo_discard_before_raw_hash_or_shape_publication(tmp_path,monkeypatch,echo):
     directory,frozen=fixture(tmp_path,monkeypatch)
     with pytest.raises(schema.RecoveryRefusal,match="credential_echo_discarded"):
@@ -127,6 +141,7 @@ def test_echo_discard_before_raw_hash_or_shape_publication(tmp_path,monkeypatch,
     assert not (directory/"schema-recovery.response.raw.json").exists()
     assert (directory/schema.CLAIM).exists()
 
+@_POSIX_CAPTURE_ONLY
 def test_unknown_envelope_refused_without_unknown_name_publication(tmp_path,monkeypatch):
     directory,frozen=fixture(tmp_path,monkeypatch)
     with pytest.raises(schema.RecoveryRefusal,match="catalog_scope_refused"):
@@ -134,6 +149,7 @@ def test_unknown_envelope_refused_without_unknown_name_publication(tmp_path,monk
     assert not (directory/"schema-recovery.response.raw.json").exists()
     assert b"private_unknown" not in (directory/"schema-recovery.refused.json").read_bytes()
 
+@_POSIX_CAPTURE_ONLY
 def test_transport_exception_and_key_failure_sanitized_but_new_claim_remains_spent(tmp_path,monkeypatch):
     directory,frozen=fixture(tmp_path,monkeypatch)
     def fail(): raise RuntimeError(TOKEN+USER)

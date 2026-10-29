@@ -68,10 +68,15 @@ def rebind_api(p, width=20):
     return p
 
 
-def package(original, *, zero_fee=False, zero_fee_amount="0.25", actions=(), fractional=False, multiples=False, arm="cap_off"):
+def package(original, *, zero_fee=False, zero_fee_amount="0.25", actions=(), fractional=False, multiples=False, arm="cap_off", sell=False):
     p = fixture.pack(original, arm)
     sessions = p["calendar"]["valuation_sessions"]
-    if multiples:
+    if sell:
+        # Buy 10 at 20 (fee 0.10), then sell 4 at 25 (fee 0.20): the sale credits
+        # cash net of its fee and leaves 6 held, marked at the sale price.
+        fills = [fill(), fill(oid=2, quantity=-4, price=25, fee="0.2", cash="99899.7", held=6)]
+        cash, q, price, fees = Fraction("99899.7"), 6, Fraction(25), Fraction("0.3")
+    elif multiples:
         fills = [fill(quantity=1, fee="0.01", status="PartiallyFilled", cash="99979.99", held=1),
             fill(quantity=1, fee="0.01", status="PartiallyFilled", cash="99959.98", held=2),
             fill(quantity=1, fee="0.01", status="Filled", cash="99939.97", held=3)]
@@ -174,6 +179,24 @@ def test_full_axis_replay_all_five_candidates_without_old_attempt_cap(original, 
         assert report[key] is False
     assert report["accepted_performance"] is None
     assert SID not in json.dumps(report) and "PRIVATE-SYNTHETIC-ALIAS" not in json.dumps(report)
+
+
+def test_sell_fill_credits_cash_net_of_fee_reduces_holding_and_counts_absolute_shares(original):
+    """TPR-CR32: the sell side of the replay arithmetic was never exercised before."""
+    report = run(package(original, sell=True))
+    assert report["supplied_evidence_accounting_reconciled"] is True
+    assert report["replayed_fees"] == fixture.rat("0.3")
+    assert report["native_order_census"]["orders"] == 2
+    assert report["native_order_census"]["absolute_filled_shares"] == fixture.rat(14)
+    assert report["daily_nav_observations"] == 1449
+    # A gross credit (fee ignored) or a debit of the sale must not reconcile.
+    for wrong in ("99899.9", "99699.7"):
+        p = package(original, sell=True)
+        sale = next(row for row in p["records"] if row["kind"] == "FILL" and row["payload"]["order_id"] == 2)
+        sale["payload"]["cash_ledger"] = fixture.rat(wrong)
+        fixture.rebuild(p)
+        bad = run(p)
+        assert bad["cash_replay_within_cent"] is False and bad["supplied_evidence_accounting_reconciled"] is False
 
 
 def test_zero_fill_fee_charged_and_untouched_quantity_none_not_made_into_holding(original):

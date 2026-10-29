@@ -408,9 +408,28 @@ def test_live_mode_refuses_before_configuration_or_any_initializer_effect(driver
     with pytest.raises(ValueError):algo.initialize()
 
 
+# Closed member set of Lean's MorningstarIndustryGroupCode (Common/Data/Fundamental/
+# AssetClassificationHelper.cs, master, 2026-10-28): 56 names, including the two
+# aliases Furnishings and FixturesAndAppliances. An unknown name must refuse like
+# the native static class does, so the driver's literal list is actually checked.
+LEAN_INDUSTRY_GROUPS=frozenset(("Agriculture BuildingMaterials Chemicals ForestProducts MetalsAndMining Steel "
+    "VehiclesAndParts Furnishings FixturesAndAppliances HomebuildingAndConstruction ManufacturingApparelAndAccessories "
+    "PackagingAndContainers PersonalServices Restaurants RetailCyclical TravelAndLeisure AssetManagement Banks "
+    "CapitalMarkets Insurance DiversifiedFinancialServices CreditServices RealEstate REITs BeveragesAlcoholic "
+    "BeveragesNonAlcoholic ConsumerPackagedGoods Education RetailDefensive TobaccoProducts Biotechnology "
+    "DrugManufacturers HealthcarePlans HealthcareProvidersAndServices MedicalDevicesAndInstruments "
+    "MedicalDiagnosticsAndResearch MedicalDistribution UtilitiesIndependentPowerProducers UtilitiesRegulated "
+    "TelecommunicationServices MediaDiversified InteractiveMedia OilAndGas OtherEnergySources AerospaceAndDefense "
+    "BusinessServices Conglomerates Construction FarmAndHeavyConstructionMachinery IndustrialDistribution "
+    "IndustrialProducts Transportation WasteManagement Software Hardware Semiconductors").split())
+
+
 class GroupFields(type):
     def __getattr__(cls,name):
-        # Synthetic native static constants, distinct and deterministic.
+        # Synthetic native static constants, distinct and deterministic, but
+        # only for names the native class actually defines.
+        if name not in LEAN_INDUSTRY_GROUPS:
+            raise AttributeError(name)
         return 20000+sum(map(ord,name))
 
 
@@ -439,6 +458,26 @@ def test_insurance_classification_uses_native_complete_known_group_code_not_tick
     assert driver.ComparisonOffAlgorithm._classify_insurance(row)==expected
     row.has_fundamental_data=False
     assert driver.ComparisonOffAlgorithm._classify_insurance(row) is None
+
+
+def test_group_name_list_resolves_on_the_closed_lean_stub_and_a_misspelling_refuses_every_row(driver,monkeypatch):
+    """TPR-CR32: the 56-name literal must match Lean's static class; one unknown
+    name makes every classification None and refuses every decision day."""
+    install_groups(monkeypatch)
+    assert len(LEAN_INDUSTRY_GROUPS)==56
+    raw=(PUBLIC/"comparison_20261028_algorithm.py").read_text()
+    start=raw.index('names = ("Agriculture'); end=raw.index('.split()',start)
+    names=eval(raw[start+len('names = '):end]).split()
+    assert len(names)==56 and set(names)==LEAN_INDUSTRY_GROUPS
+    assert driver.ComparisonOffAlgorithm._classify_insurance(fundamental(Symbol("SID-BANK"),code=10320))=="noninsurance"
+    with pytest.raises(AttributeError):
+        getattr(Groups,"FurnishingsFixturesAndAppliances")
+    before='"Furnishings FixturesAndAppliances '
+    assert raw.count(before)==1
+    mutant=ModuleType("synthetic_cmp28_group_name_mutant")
+    exec(compile(raw.replace(before,'"FurnishingsFixturesAndAppliances ',1),"<synthetic-group-name-mutant>","exec"),mutant.__dict__)
+    assert mutant.ComparisonOffAlgorithm._classify_insurance(fundamental(Symbol("SID-BANK"),code=10320)) is None
+    assert mutant.ComparisonOffAlgorithm._classify_insurance(fundamental(Symbol("SID-INS"),code=10340)) is None
 
 
 def test_actual_native_fundamental_callback_keeps_cap_units_and_bound_classification_clocks(driver,monkeypatch):

@@ -28299,3 +28299,127 @@ parallel; no financial results invented and final single push still withheld.
 D024publicsource research/target_price_revisions_qc/comparison_20261028_mark_probe_post_gap_native.py 5249B/895ee46d8c802dd707b5f85de21bf43f1e32eaf4f92f99d82f5de4e2b2b03e43
 
 D024publicsource tests/target_price_revisions_qc/test_qc_comparison_20261028_mark_probe_post_gap_native.py 10999B/09602626c0ae5c109840646ad036bf5a749c7c91539df75e98d116d5e0ea423b
+
+Fresh bounded private phase TPR-CMP28-POSTGAP006-PRIOR-SOURCE-METADATA-20261028-001/0652cd04d946de9729b7183593017098c640dde3ca0f04eba551613f4a3da771 at 2f18f93ae7549494910bd3d7e896fee144635b63 BEFORE 1 exact private inputs/120s; Own005source descriptor metadata ASDATAonly, never replayoldspentauthority; preparefresh006corrected-source scope; fsync claim and directory retained.
+
+Fresh bounded private phase TPR-CMP28-POSTGAP006-SOURCE-PREPARATION-20261028-001/b58ac475b5c567fb319d3de39cf85690d0418853c400bdcedc551c0e54c10fdf at 2f18f93ae7549494910bd3d7e896fee144635b63 BEFORE 1 exact private inputs/600s; Fresh source-only fixed-endpoint successor006; preserve005andallpriorcaptures, other23cloudfiles andrunningPUREsnapshot; no witness/Historyread inpreparation; fsync claim and directory retained.
+
+D024fixed-endpoint006freshreservationeca0d86be4d9ca278e42c76868dd7581c2db2eba4e8dbae1ef3cfc00abab4877 at2f18f93ae7549494910bd3d7e896fee144635b63 BEFOREeffect, sources5846c2b093134a07d36619f5a93f82d6f4cdb3a6b0430e07a12706431160dd3b config8223dcdd2700c4779979f4a259498506371efb63a6b0c69ada706aa02035f139 main30350b912329ada8cdbaf29facdf647ff99fb6d322159f86ef06a17a2a43ffcd; mainonly24fileinventory7d7a...->b4b28a70cb48161294336cf0c7758c9aa4c83b89cc0b90f1ac6250b63ced82d6;1witness4History4810rows20calendarcalls; allnativeclock/custodyguardsunchanged, nofinancialattemptreset orrootcause/absence/terminal/recoveryclaim.
+
+Fresh006uploadplan32010e968f391c19c7e051a76b184e11d49a02e16b50623e51c729d3f716392a BEFOREcredentials/effects, exactknownmain/preserve23.
+
+Fresh006compileplan7055e6ca9c051bf98f1e81549a6d14348a9f597941f7e66a322b15bc8922ccb0 BEFOREeffects; noneconomicattempt, priorresultsintact.
+
+Fresh bounded native phase TPR-CMP28-API-POSTGAP006-COMPILE-PURESTATUS-20261028-001/5b4aa57ce353c7fa2da9464d0329562ef27fcb523b6cc33c6e120014606f5dbf at 2f18f93ae7549494910bd3d7e896fee144635b63 before2 exact requests/120s/4325376B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-POSTGAP006-LAUNCH-20261028-001/b2c0ffd4b9eb63d5d93b1dc105fa250668bb19fcdce7c5c8ec1130413151cef5 at 2f18f93ae7549494910bd3d7e896fee144635b63 before3 exact requests/120s/2228224B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+D024006native launch receipta59780794886b40826eb304fb90665a361168acf96ab040d09b6377939448ae9 statuscompleted actualjobs["32688702c82a0618695028a631697015"]; NONECONOMICfreshfixed-endpointattempt, old005refusal/004unused retained, notfinancialcandidate/retry.
+
+Fresh bounded native phase TPR-CMP28-API-POSTGAP006-PURE-STATUS-20261028-001/651cfcdd5d1ebf9ab812ada5b1586f103312811ad9dcd2334be88329af9f2dba at 2f18f93ae7549494910bd3d7e896fee144635b63 before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-POSTGAP006-SAFE-RESULT-20261028-001/68389210935822227a20dbbaa2fcd2d76c7161e704e97aedbba2379dd40da95d at 2f18f93ae7549494910bd3d7e896fee144635b63 before1 exact requests/90s/262144B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-POSTGAP006-RESULT-PROCESS-20261028-001/2786e354629bed2c143af511db3fd2aadedeccca10ac4989547b350e3c97a2ca at 2f18f93ae7549494910bd3d7e896fee144635b63 BEFORE 1 exact private inputs/120s; Exact correctednativeprobe SAFEoffsetcounts/control/identity/clock metadata only, no rawprices/bars/witnessbody; fsync claim and directory retained.
+
+D024006actualsafe result {"actual_child_job_id":"32688702c82a0618695028a631697015","backend_durability_proven":false,"canonical_admission":false,"clock_bars":960,"config_sha256":"8223dcdd2700c4779979f4a259498506371efb63a6b0c69ada706aa02035f139","contains_calls":1,"control_daily":{"all_end_not_after_request":true,"all_exact_sid":true,"all_native_regular_endpoints":true,"all_non_fill_forward":true,"all_positive_finite_closes":true,"by_failure_date_offset":{"-1":{"all_volume_nonnegative":true,"native_regular_close_rows":1,"nonnegative_volume_rows":1,"positive_volume_rows":1,"rows":1},"-2":{"all_volume_nonnegative":true,"native_regular_close_rows":1,"nonnegative_volume_rows":1,"positive_volume_rows":1,"rows":1},"0":{"all_volume_nonnegative":true,"native_regular_close_rows":1,"nonnegative_volume_rows":1,"positive_volume_rows":1,"rows":1},"1":{"all_volume_nonnegative":true,"native_regular_close_rows":1,"nonnegative_volume_rows":1,"positive_volume_rows":1,"rows":1},"2":{"all_volume_nonnegative":true,"native_regular_close_rows":1,"nonnegative_volume_rows":1,"positive_volume_rows":1,"rows":1}},"row_bound_reached_result_may_be_incomplete":true,"rows":5},"control_minute":{"all_end_not_after_request":true,"all_exact_sid":true,"all_native_regular_endpoints":true,"all_non_fill_forward":true,"all_positive_finite_closes":true,"by_failure_date_offset":{"-1":{"all_volume_nonnegative":true,"native_regular_close_rows":1,"nonnegative_volume_rows":390,"positive_volume_rows":390,"rows":390},"-2":{"all_volume_nonnegative":true,"native_regular_close_rows":1,"nonnegative_volume_rows":390,"positive_volume_rows":390,"rows":390},"0":{"all_volume_nonnegative":true,"native_regular_close_rows":1,"nonnegative_volume_rows":390,"positive_volume_rows":390,"rows":390},"1":{"all_volume_nonnegative":true,"native_regular_close_rows":1,"nonnegative_volume_rows":390,"positive_volume_rows":390,"rows":390},"2":{"all_volume_nonnegative":true,"native_regular_close_rows":1,"nonnegative_volume_rows":390,"positive_volume_rows":390,"rows":390}},"row_bound_reached_result_may_be_incomplete":false,"rows":1950},"control_request_path_status":"positive_five_session_controls_observed","daily":{"all_end_not_after_request":true,"all_exact_sid":true,"all_native_regular_endpoints":true,"all_non_fill_forward":true,"all_positive_finite_closes":true,"by_failure_date_offset":{"-1":{"all_volume_nonnegative":true,"native_regular_close_rows":1,"nonnegative_volume_rows":1,"positive_volume_rows":1,"rows":1},"-2":{"all_volume_nonnegative":true,"native_regular_close_rows":1,"nonnegative_volume_rows":1,"positive_volume_rows":1,"rows":1},"0":{"all_volume_nonnegative":null,"native_regular_close_rows":0,"nonnegative_volume_rows":0,"positive_volume_rows":0,"rows":0},"1":{"all_volume_nonnegative":true,"native_regular_close_rows":1,"nonnegative_volume_rows":1,"positive_volume_rows":1,"rows":1},"2":{"all_volume_nonnegative":true,"native_regular_close_rows":1,"nonnegative_volume_rows":1,"positive_volume_rows":1,"rows":1}},"row_bound_reached_result_may_be_incomplete":false,"rows":4},"diagnostic_only_no_financial_recovery":true,"end_runtime_custody":true,"error_class":null,"helper_sha256":"6539ae749aefb4884ed52258fc2f0f77c9481a5e8ee37ea80ec7065218f0da95","history_calls":4,"minute":{"all_end_not_after_request":true,"all_exact_sid":true,"all_native_regular_endpoints":true,"all_non_fill_forward":true,"all_positive_finite_closes":true,"by_failure_date_offset":{"-1":{"all_volume_nonnegative":true,"native_regular_close_rows":1,"nonnegative_volume_rows":319,"positive_volume_rows":319,"rows":319},"-2":{"all_volume_nonnegative":true,"native_regular_close_rows":1,"nonnegative_volume_rows":369,"positive_volume_rows":369,"rows":369},"0":{"all_volume_nonnegative":null,"native_regular_close_rows":0,"nonnegative_volume_rows":0,"positive_volume_rows":0,"rows":0},"1":{"all_volume_nonnegative":true,"native_regular_close_rows":1,"nonnegative_volume_rows":369,"positive_volume_rows":369,"rows":369},"2":{"all_volume_nonnegative":true,"native_regular_close_rows":1,"nonnegative_volume_rows":384,"positive_volume_rows":384,"rows":384}},"row_bound_reached_result_may_be_incomplete":false,"rows":1441},"minute_daily_close_price_parity":null,"native_daily_precise_setting":true,"native_exact_subscription":{"add_security_calls":1,"all_external_exact_sid":true,"all_external_raw":true,"config_reads":1,"config_rows_examined":2,"external_config_count":2,"native_config_kind_counts":{"other_native":0,"quote_bar":1,"trade_bar":1,"untyped":0},"registered_exact_native_reference":true,"regular_nonfillforward_raw_minute_quote_configs":1,"regular_nonfillforward_raw_minute_trade_configs":1,"returned_exact_sid":true,"returned_native_security":true,"unrecognized_external_config_count":0,"verified":true},"native_identity_roundtrip":true,"native_regular_calendars":{"control":{"exact_equity_usa":true,"final_close_before_now":true,"native_hours_new_york":true,"session_count":5,"verified":true},"target":{"exact_equity_usa":true,"final_close_before_now":true,"native_hours_new_york":true,"session_count":5,"verified":true}},"noneconomic_diagnostic":true,"one_of_five_economic_arms":false,"operation_id":"TPR-CMP28-MARK-PROBE-POST-GAP-006-20261028","parent_contains":true,"parent_hash_verified":true,"parent_job_id":"12dd4732ba5d9d8f57950beb2a371c79","parent_key_sha256":"7a27356ccf09e0674b56dac39adaad4d1a0ef7a2cee7ef7f948982f20004e13f","parent_observed_minus_expected_microseconds":-86400000000,"parent_predicates":{"expected_date_equals_algorithm":true,"observed_date_equals_session":false,"observed_equals_expected":false,"observed_relation":"before"},"parent_schema_verified":true,"parent_session_matches_config":true,"parent_witness_bytes":1343,"parent_witness_sha256":"eef08aca32b99056dee0ce00389c53a8ee6a1628c29188afd8bebd362fe183dd","phase":"complete","read_calls":1,"root_head":"2f18f93ae7549494910bd3d7e896fee144635b63","schema":"tpr-cmp28-native-mark-probe-post-gap-native-result-v1","security_id_sha256":"1122fa5f1349f79e231e106127c098da27ef730836a97052d2154ecc46f1afc1","source_inputs_admitted":false,"status":"completed_post_gap_observations","strategy_accepted":false,"target_data_gap_proven":false,"target_post_failure_rows_observed":{"daily":true,"minute":true},"terminal_proven":false,"universal_absence_proven":false} retained882fda21dcda128aea4923facc0b3f11a5860ec96994142032ccb3d22766e922; noautomaticfinancialacceptance or universalabsence/terminal/PIT/rights/recovery inference.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-STATUS-20261029-001/d05adb090d86e3b3bbd02aeef15fc45a2f3b5215b0a9b12b36d5f3b445be01da at 2f18f93ae7549494910bd3d7e896fee144635b63 before1 exact requests/90s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-PURE-OPERATIONAL-20261029-001/2d6a12da83e0520a70c904479a589770eb39d067dcd0d1c39ef23eab349ac7d8 at 2f18f93ae7549494910bd3d7e896fee144635b63 BEFORE 1 exact private inputs/120s; OwnPUREstatus/errorpresence/progress/CPU/RAM/uptime metadata only; no performance/dataacceptance; fsync claim and directory retained.
+
+PUREoperationalmetadata {"job_id":"ca9fec3941e1e60c63afd8547dfe97ea","status":"In Progress...","completed":false,"progress_raw":0.106,"has_error":false,"cpu":"162.2%","uptime":"0d 00:26:18","ram_mb":"1734","financial_performance_accepted":false} safe3243b387936fe7cb699cfcd4218dfcfd993ce2e63f081919fcd39900ba6d6b10; actualcoverage/performanceunaccepted.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-STATUS-20261029-002/797bff2f1eb4206f207b7d2ad02299d7106aac16c426caa4da3ba98b3c80fc2d at 2f18f93ae7549494910bd3d7e896fee144635b63 before1 exact requests/90s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+### 104.38 Corrected five-session native observations; no financial recovery
+
+D024006 compile15af696fbfe880c66cfc3188ac475451-4a38742c05a4102016f5a3b36be1922e
+BuildSuccess; actualnoneconomicjob32688702c82a0618695028a631697015 Completed.
+Freshreservation/source/upload/compile/launch claims retained before effects;
+sourceinventoryb4b28a70cb48161294336cf0c7758c9aa4c83b89cc0b90f1ac6250b63ced82d6
+before/aftercompile/launch matched, allother23files preserved.
+Safe6271B/882fda21dcda128aea4923facc0b3f11a5860ec96994142032ccb3d22766e922
+reports completed_post_gap_observations/history_calls4/errornull/endcustodytrue.
+
+ParentOFF4 witness1343B/eef08aca... read/hash/schema/nativeSIDroundtrip verified,
+sameSID hash1122fa5f... ; nativeSecurity registration exact,1TradeBar+1QuoteBar,
+RAW/noFF/Minute/regular/USA/NY,20nativecalendar calls across5sessions verified.
+SPY controls:1950realminute rows (390eachday) and5dailyclose rows, allpositive
+volume/nonFF/exactSID/native endpoints. Daily5rowcap reached is explicitly
+retained as bounded/may-be-incomplete, not a universal completeness assertion.
+Targetoffset-2/-1/0/+1/+2 minute counts369/319/0/369/384; daily1/1/0/1/1.
+Positive real data resume on both post-failure days; day0Feb10 returns no
+minute or daily rows on this exactnative request path, consistent with the
+prior controlled003 failure-day result. No raw quote/price/quantity exported.
+
+This is bounded native per-session availability evidence. It does NOT prove
+universal backend absence, a complete map/action audit, terminality, rights/PIT,
+or financial recovery. No cache/price/timestamp rewrite, stale carry, holding
+exclusion or unchanged OFF rerun follows. Clock-class hypothesis remains
+unattested even though the fixed request constructor successfully reached
+allfour History calls. Old005 internalrefusal/history0 and unused004 retained.
+
+Source-only primary-doc review by finish_off_preparation identifies a next
+safe discriminator: separate single-symbol typed nativeHistory[Tick] calls
+for SPY and sameSID during Feb10 15:59..16:00. That overload can return both
+trade and quote ticks; no invented tick_type keyword or quote-as-trade.
+Tick endpoints are inclusive andEndTime==Time, so boundary16:00 must be
+separate from the half-open minute. A derived tick consolidation would NOT
+refresh investedSecurity cache or automatically satisfy currentmarkpolicy.
+NativeSDK hardtimeout/preallocation bounds and Tick access remain unproved.
+
+Root delegated a NEW pure two-call tick-diagnostic renderer under fixed
+endpoints/max50000encounteredrows perSymbol/no retries/widening. Count all
+rows before filtering, check genuine types/SID/nonFF/time/order/finite trade
+values, report only counts/types/hashes/offsets and incomplete/access-error
+states. No financial source/policy change, no OFF relaunch or inferred input
+admission is authorized. Source/test/native effects still require fresh
+verified committed source and ROOT reservation; agent performs NO effects.
+PUREactualjobca9fec3941e1e60c63afd8547dfe97ea latest observedInProgress,
+operational.106/noerror/26minuptime, not accepted coverage or financialreturn.
+Continue PURE; all four previous arm failures and all historical counts stay
+intact. Final exactly-one nonforce lane push still withheld.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-STATUS-20261029-003/2cce22d566f3b91c5d48c58954d7e1531f2da8f3ccc1fe2db0f17be664c357fc at 2f18f93ae7549494910bd3d7e896fee144635b63 before1 exact requests/90s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-STATUS-20261029-004/200b3570a7982097047bb3a41e82b5d01b1be8dc106001b951cf867a5f16bba9 at 2f18f93ae7549494910bd3d7e896fee144635b63 before1 exact requests/90s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+### 104.39 D025 bounded native tick discriminator, accepted after correction
+
+CMP104-D025. Root chose one further noneconomic source-path discriminator:
+exact native Tick History for SPY and the parent OFF4 SID during only
+2021-02-10 15:59..16:00 New York. The single-symbol typed overload returns
+mixed trade/quote ticks; no invented tick_type keyword. It inspects genuine
+Tick/SID/nonFF/time/order/source flags, counts every encountered row BEFORE
+classification, reads finite positive trade price/quantity but never quote
+prices, and exports only safe counts/types/hashes. Inclusive16:00 trades are
+reported separately from the half-open closing minute. Two calls at most,
+50000 encountered rows per symbol/100000 total, no retry or window expansion.
+A bound hit is incomplete; access/validation errors never become zero rows.
+SDK hard timeout/preallocation, native origin/PIT/rights/canonical admission,
+cache update/derived bar/orders/financial recovery remain false/unproved.
+
+finish_off_preparation authored the pure successor; all six pinned public
+predecessors unchanged. Root and offline103 identified a configuration check
+timing gap: the earlier version checked before actual native getters but not
+after. Three regression traces proved an original-key contains/read or one
+History effect could follow getter-time decoded-config invalidation. Captured
+keys stayed original; NO foreign-key read is claimed. Corrected
+_tick_config_bound checks frozen JSON/SHA/decoded config both BEFORE and AFTER
+the unchanged actual native job/mode/project/locked/local/UTC getter guards.
+Original genuine-guard body AST remains identical; no self-declared adapter
+or marker substitutes for custody. Author65focused passed8.77s, root65passed
+8.91s, independent65passed9.00s plus AST/inmemorycompile2/2. Independent
+disposition ACCEPTED AFTER CORRECTION, no remaining verified bounded defect.
+
+Source15629B/7bc54d85bf7e4d39a185da862934ac29bd683ab2f237fcb360919a31581f7f55;
+test21726B/5e589a6f4210c09284aeb455b1cc1734132762091c280556f843e780a237119c.
+Example generated plaintext main48272B. Actual SDK/data behavior still
+UNPROVED until root creates a fresh007 HEAD/source/access/attempt/look claim,
+source inventory gates, upload, compile and native job. No financial candidate
+was changed or relaunched. Four arms retain runtime failures; PURE actualjob
+ca9fec3941e1e60c63afd8547dfe97ea remains viable/InProgress as last observed.
+Continue it naturally; do not cancel it or infer full-window performance.
+Final one successful nonforce push remains withheld until stable completed
+or concrete factual/external/safety-blocked handoff, all outcomes accounted.

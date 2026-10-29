@@ -25,10 +25,10 @@ ROOT = worker.ROOT
 MODULE = "scripts.short_interest_count_native_supervisor"
 DRIVER = "scripts/short_interest_count_native_supervisor.py"
 PARENT = Path("artifacts/short_interest")
-BOOTSTRAP = "count-process-supervisor-native-bootstrap-v1"
-DOMAIN = "count-process-supervisor-native-domain-v1"
-LABEL = "com.openai.codex.short-interest-native-process-proof-v1"
-POLICY_SHA256 = "9df40f358d3f48b66e605b2fe768646e90e2f2b47892a05788453e36e9a25484"
+BOOTSTRAP = "count-process-supervisor-native-bootstrap-v2"
+DOMAIN = "count-process-supervisor-native-domain-v2"
+LABEL = "com.openai.codex.short-interest-native-process-proof-v2"
+POLICY_SHA256 = "616753db5fd9db215ad7b31883e96aae6e9a896c0f501050f557c6e97e138b1e"
 CODE_FILES = ("data/__init__.py", "data/hashing.py", DRIVER,
     "scripts/short_interest_count_process_supervisor.py", "scripts/short_interest_isolated_custody_volume.py")
 MAXIMUM_SECONDS, COMMAND_SECONDS, VIRTUAL_BYTES = 300, 120, 8 * 1024 ** 3
@@ -42,6 +42,8 @@ _COLLECT_FUNCTION, _COLLECT_CODE = worker._collect, worker._collect.__code__
 _BUFFER_ORIGINS = {}
 _PRESERVATION_ORIGINS = {}
 _USED, _STAGE = False, "registration"
+_COMPONENT, _ORDINAL = "registration", 0
+_COMPONENTS = frozenset(("operation", "registration", "lane_guard", "code_file", "code_context", "bootstrap_directory", "bootstrap_spec", "bootstrap_job", "config_context", "terminal_clock"))
 _HELD, _RESULTS, _FAILURES, _FIELDS = [], {}, {}, {}
 _STAGES = frozenset("registration bootstrap current_code native_creation native_association output_creation child_launch child_observation terminal_code terminal_native provisional_publication original_audit cleanup named_audit".split())
 _CODES = frozenset("native_proof_unregistered native_proof_source_refused native_proof_arguments native_proof_clock native_proof_deadline native_proof_path native_proof_protection native_proof_membership native_proof_exists native_proof_write native_proof_stamp native_proof_code native_proof_command native_proof_plist native_proof_association native_proof_mount native_proof_backing native_proof_capacity native_proof_already_used native_proof_wait native_proof_result_factory native_proof_result_changed".split())
@@ -64,7 +66,7 @@ def authority():
 
 
 def policy():
-    return {"schema": "si-native-process-proof-policy-v1", "root": str(ROOT), "parent": str(PARENT),
+    return {"schema": "si-native-process-proof-policy-v2", "root": str(ROOT), "parent": str(PARENT),
         "bootstrap": BOOTSTRAP, "domain": DOMAIN, "label": LABEL, "code_files": list(CODE_FILES),
         "virtual_bytes": VIRTUAL_BYTES, "whole_seconds": MAXIMUM_SECONDS, "command_seconds": COMMAND_SECONDS,
         "native_output_bytes": MAXIMUM_NATIVE_BYTES, "control_bytes": MAXIMUM_CONTROL_BYTES,
@@ -73,6 +75,9 @@ def policy():
         "roles": list(ROLES), "worker_policy_sha256": worker.PROOF_POLICY_SHA256,
         "worker": "unchanged_two_second_worker_original_collect_wait_within_five_seconds",
         "host": "bootstrap_spec_job_bytes_only_no_host_creation_stamp_admission_stdout_stderr_devnull",
+        "configuration": "exact_two_roles_only_original_dev_ino_UID_GID_mode_nlink_size_and_canonical_bytes_SHA_across_phases_full9_stability_each_original_descriptor_read_write_timestamps_observations_not_evidence_caps",
+        "retired": "all_previous_bootstrap_and_domain_namespaces_retired_even_if_absent_never_reused",
+        "prepare_diagnostics": "fixed_entered_phase_component_catalogue_ordinal_includes_callbacks_not_forensic_actor_or_historical64753_attribution",
         "native": "new_SPARSE_APFS_same_parent_creator_original_FDs_global_unique_image_device_mount_no_shadow_no_detach_remount_retry_or_cleanup",
         "inner": "original_O_EXCL0600_singlelink_full9_stamp_and_exact_readback_never_reseal_adopt_or_ctime_relax",
         "inventory": "original_sealed_preceding_controls_hash_bytes_full9_stamps_native_original_pins_code5_manifest_inventory_and_marker_excluded_from_roster_marker_binds_original_inventory_body_and_seal",
@@ -92,8 +97,16 @@ def registered():
 
 
 def _phase(name):
-    global _STAGE
+    global _STAGE, _COMPONENT, _ORDINAL
     require(name in _STAGES, "native_proof_arguments"); _STAGE = name
+    _COMPONENT, _ORDINAL = "operation", 0
+
+
+def _component(name, ordinal=0):
+    global _COMPONENT, _ORDINAL
+    require(type(name) is str and name in _COMPONENTS and type(ordinal) is int and 0 <= ordinal <= len(CODE_FILES),
+        "native_proof_arguments")
+    _COMPONENT, _ORDINAL = name, ordinal
 
 
 def _stamp(info):
@@ -121,7 +134,9 @@ def failure_summary(error):
     number = OSError.errno.__get__(error, OSError) if isinstance(error, OSError) else None
     name = _ERRNOS.get(number) if type(number) is int else None
     fields = _FIELDS.get(id(error))
-    detail = {"stage": _STAGE, "category": "local_contract_refusal" if code or upstream["contract_code"] else "local_os_error" if name else "unknown_local_error",
+    detail = {"stage": _STAGE, "component": _COMPONENT, "ordinal": _ORDINAL,
+        "component_scope": "entered_phase_including_callbacks_not_forensic_attribution",
+        "category": "local_contract_refusal" if code or upstream["contract_code"] else "local_os_error" if name else "unknown_local_error",
         "contract_code": code, "upstream_contract_code": upstream["contract_code"], "errno_name": name or upstream.get("errno_name"),
         "mismatching_fields": list(fields[1]) if fields is not None and fields[0] is error else []}
     _FAILURES[id(error)] = error, canonical_json(detail)
@@ -206,6 +221,85 @@ class _Directory:
         finally: self.closed = True
 
 
+class _Config:
+    """Exact two bootstrap inputs; no seal, inventory or source capability API.
+
+Original identity/protection/size and expected bytes survive separate phases.
+Each individual descriptor read still requires an unchanged full9 snapshot.
+Timestamp changes between phases confer no creation/evidence authority.
+"""
+    ROLES = ("launch.spec.json", "job.plist")
+    def __init__(self, directory):
+        require(type(directory) is _Directory and directory.path == ROOT / PARENT / BOOTSTRAP,
+            "native_proof_path")
+        directory.check(); self.directory, self.rows = directory, {}
+    def _role(self, name):
+        require(type(name) is str and name in self.ROLES, "native_proof_membership")
+        _component("bootstrap_spec" if name == self.ROLES[0] else "bootstrap_job", self.ROLES.index(name) + 1)
+    def _identity(self, info):
+        require(stat.S_ISREG(info.st_mode) and info.st_uid == os.getuid()
+            and stat.S_IMODE(info.st_mode) == 0o600 and info.st_nlink == 1
+            and 0 < info.st_size <= MAXIMUM_CONTROL_BYTES, "native_proof_protection")
+        return _stamp(info)[:7]
+    def _membership(self, named=False):
+        if named: self.directory.named()
+        else: self.directory.check()
+        require(set(os.listdir(self.directory.path if named else self.directory.fd)) == set(self.rows),
+            "native_proof_membership")
+    def write(self, name, raw):
+        self._role(name); self.directory.check()
+        require(name not in self.rows and type(raw) is bytes and 0 < len(raw) <= MAXIMUM_CONTROL_BYTES
+            and set(os.listdir(self.directory.fd)) == set(self.rows), "native_proof_write")
+        fd = os.open(name, os.O_RDWR | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=self.directory.fd)
+        primary = None
+        try:
+            os.fchmod(fd, 0o600); before = os.fstat(fd)
+            require(stat.S_ISREG(before.st_mode) and before.st_uid == os.getuid()
+                and stat.S_IMODE(before.st_mode) == 0o600 and before.st_nlink == 1 and before.st_size == 0,
+                "native_proof_protection")
+            _same(_stamp(before), _stamp(os.stat(name, dir_fd=self.directory.fd, follow_symlinks=False)))
+            _write(fd, raw); os.fsync(fd); os.fsync(self.directory.fd); os.fsync(self.directory.parent)
+            pin = self._identity(os.fstat(fd))
+            require(pin[:6] == _stamp(before)[:6] and pin[6] == len(raw), "native_proof_write")
+            snapshot = _stamp(os.fstat(fd))
+            _same(_stamp(os.stat(name, dir_fd=self.directory.fd, follow_symlinks=False)), snapshot)
+            os.lseek(fd, 0, os.SEEK_SET); require(os.read(fd, len(raw) + 1) == raw, "native_proof_stamp")
+            _same(_stamp(os.fstat(fd)), snapshot)
+            _same(_stamp(os.stat(name, dir_fd=self.directory.fd, follow_symlinks=False)), snapshot)
+            self.rows[name] = pin, raw, hash_bytes(raw)
+        except BaseException as error:
+            primary = error; failure_summary(error); raise
+        finally: _close(fd, primary)
+        self._read(name)
+    def _read(self, name, named=False):
+        self._role(name); self._membership(named)
+        pin, raw, digest = self.rows[name]
+        path = self.directory.path / name
+        info = path.lstat() if named else os.stat(name, dir_fd=self.directory.fd, follow_symlinks=False)
+        require(self._identity(info) == pin and hash_bytes(raw) == digest, "native_proof_protection")
+        fd = os.open(path if named else name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK,
+            **({} if named else {"dir_fd": self.directory.fd}))
+        primary = None
+        try:
+            require(self._identity(os.fstat(fd)) == pin, "native_proof_protection")
+            before = _stamp(os.fstat(fd)); _same(before, _stamp(path.lstat()))
+            require(os.read(fd, len(raw) + 1) == raw, "native_proof_stamp")
+            _same(_stamp(os.fstat(fd)), before); _same(_stamp(path.lstat()), before)
+        except BaseException as error:
+            primary = error; failure_summary(error); raise
+        finally: _close(fd, primary)
+        require(self._identity(path.lstat()) == pin, "native_proof_protection")
+        _same(_stamp(path.lstat()), before)  # Reader close is INSIDE this read barrier.
+    def audit(self):
+        self._membership()
+        for name in self.rows: self._read(name)
+    def named(self):
+        self._membership(named=True)
+        for name in self.rows: self._read(name, named=True)
+    def close(self):
+        pass  # Each original descriptor is closed exactly once in its owning method.
+
+
 class _Files:
     def __init__(self, fd, parent, path, check, roles):
         self.fd, self.parent, self.path, self.callback, self.roles = fd, parent, path, check, frozenset(roles)
@@ -265,7 +359,8 @@ class _Code:
     def __init__(self, head, remote, clock):
         self.head, self.remote, self.clock, self.rows, self.fds = head, remote, clock, {}, []
         try:
-            for name in CODE_FILES:
+            for ordinal, name in enumerate(CODE_FILES, 1):
+                _component("code_file", ordinal)
                 path = ROOT / name; require(path.resolve() == path, "native_proof_path")
                 fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK); self.fds.append(fd)
                 info = os.fstat(fd)
@@ -278,7 +373,8 @@ class _Code:
             raise
     def audit(self, initial=False):
         result = {}
-        for name, (fd, stamp, original) in self.rows.items():
+        for ordinal, (name, (fd, stamp, original)) in enumerate(self.rows.items(), 1):
+            _component("code_file", ordinal)
             worker._guard(self.head, self.remote); self.clock.check()
             require((ROOT / name).resolve() == ROOT / name, "native_proof_path")
             _same(_stamp(os.fstat(fd)), stamp); _same(_stamp((ROOT / name).lstat()), stamp)
@@ -288,14 +384,15 @@ class _Code:
             _same(_stamp(os.fstat(fd)), stamp); self.rows[name] = fd, stamp, raw; result[name] = hash_bytes(raw)
         self.clock.check(); return result
     def named(self):
-        for name, (unused, stamp, unused_raw) in self.rows.items():
+        for ordinal, (name, (unused, stamp, unused_raw)) in enumerate(self.rows.items(), 1):
+            _component("code_file", ordinal)
             require((ROOT / name).resolve() == ROOT / name, "native_proof_path")
             _same(_stamp((ROOT / name).lstat()), stamp)
     def close(self): _drain(self.fds)
 
 
 def _spec(head, remote, manifest):
-    return {"schema": "si-native-process-bootstrap-v1", "runtime_head": head, "actual_remote": remote,
+    return {"schema": "si-native-process-bootstrap-v2", "runtime_head": head, "actual_remote": remote,
         "policy_sha256": POLICY_SHA256, "code_manifest": manifest, "domain": DOMAIN, "authority": authority()}
 
 
@@ -309,25 +406,34 @@ def build_launchd_plist(head, remote, digest):
 
 
 def prepare_bootstrap(head, remote):
-    registered(); clock = _Clock(); worker._guard(head, remote)
+    _phase("registration"); _component("registration")
+    registered(); clock = _Clock(); _component("lane_guard"); worker._guard(head, remote)
     code = directory = files = None; primary = None
     try:
+        _phase("current_code"); _component("code_context")
         code = _Code(head, remote, clock); raw = canonical_json(_spec(head, remote, code.manifest)).encode(); digest = hash_bytes(raw)
+        _phase("bootstrap"); _component("bootstrap_directory")
         directory = _Directory(BOOTSTRAP, create=True)
-        files = _Files(directory.fd, directory.parent, directory.path, directory.check, ("launch.spec.json", "job.plist"))
-        files.write("launch.spec.json", raw); files.write("job.plist", plistlib.dumps(build_launchd_plist(head, remote, digest), sort_keys=True))
-        code.audit(); worker._guard(head, remote); files.audit(); clock.check()
-    except BaseException as error: primary = error; raise
+        files = _Config(directory)
+        _component("bootstrap_spec", 1); files.write("launch.spec.json", raw)
+        _component("bootstrap_job", 2); files.write("job.plist", plistlib.dumps(build_launchd_plist(head, remote, digest), sort_keys=True))
+        _phase("current_code"); code.audit(); _component("lane_guard"); worker._guard(head, remote)
+        _phase("bootstrap"); _component("config_context"); files.audit(); _component("terminal_clock"); clock.check()
+    except BaseException as error:
+        primary = error; failure_summary(error); raise
     finally:
+        _phase("cleanup")
         first = primary
-        for obj in (files, directory, code):
+        for obj, component in ((files, "config_context"), (directory, "bootstrap_directory"), (code, "code_context")):
             if obj is not None:
+                _component(component)
                 try: obj.close()
                 except BaseException as error:
-                    if first is None: first = error
+                    if first is None: first = error; failure_summary(error)
         if primary is None and first is not None: raise first
-    files.named(); directory.named(); code.named(); clock.check()
-    return {"schema": "si-native-process-bootstrap-prepared-v1", "bootstrap_sha256": digest,
+    _phase("named_audit"); _component("code_context"); code.named()
+    _component("config_context"); files.named(); _component("terminal_clock"); clock.check()
+    return {"schema": "si-native-process-bootstrap-prepared-v2", "bootstrap_sha256": digest,
         "job_submitted": False, "native_created": False, "authority": authority()}
 
 

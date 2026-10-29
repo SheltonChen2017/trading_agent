@@ -126,6 +126,163 @@ def test_bootstrap_never_creates_native_domain_and_job_is_one_shot(fabricated):
     with pytest.raises(proof.NativeProofRefusal, match="exists"): prepare()
 
 
+def test_config_only_ctime_drift_after_writer_close_does_not_become_evidence_admission(fabricated, monkeypatch):
+    monkeypatch.setattr(proof.native, "_platform", lambda: None)  # Named wrapped-os.open capability seam.
+    real_open, real_close, real_stat, real_fstat = os.open, os.close, os.stat, os.fstat
+    writers, drifted = {}, set()
+    def observed(info):
+        return _ProjectedStat(info, st_ctime_ns=info.st_ctime_ns + 1) if info.st_ino in drifted else info
+    def opened(path, flags, *args, **kwargs):
+        fd = real_open(path, flags, *args, **kwargs)
+        if path in ("launch.spec.json", "job.plist") and flags & os.O_CREAT:
+            writers[fd] = real_fstat(fd).st_ino
+        return fd
+    def closed(fd):
+        inode = writers.pop(fd, None); value = real_close(fd)
+        if inode is not None: drifted.add(inode)
+        return value
+    monkeypatch.setattr(proof.os, "open", opened); monkeypatch.setattr(proof.os, "close", closed)
+    monkeypatch.setattr(proof.os, "stat", lambda *a, **k: observed(real_stat(*a, **k)))
+    monkeypatch.setattr(proof.os, "fstat", lambda fd: observed(real_fstat(fd)))
+    digest = prepare()
+    assert drifted and len(digest) == 64 and not fabricated.events
+    base = proof.ROOT / proof.PARENT / proof.BOOTSTRAP
+    assert set(os.listdir(base)) == {"launch.spec.json", "job.plist"}
+
+
+@pytest.fixture
+def config_only(fabricated):
+    directory = proof._Directory(proof.BOOTSTRAP, create=True); config = proof._Config(directory)
+    config.write("launch.spec.json", b'{"fixed":true}')
+    try: yield config, directory
+    finally: config.close(); directory.close()
+
+
+@pytest.mark.parametrize("mutation", ["bytes", "mtime_and_bytes", "mode", "hardlink", "identity", "symlink", "fifo"])
+def test_config_identity_protection_and_exact_bytes_remain_required(config_only, mutation):
+    config, directory = config_only; path = directory.path / "launch.spec.json"
+    raw = path.read_bytes()
+    if mutation in ("bytes", "mtime_and_bytes"):
+        path.write_bytes(b"X" + raw[1:])
+        if mutation == "mtime_and_bytes": os.utime(path, None)
+    elif mutation == "mode": path.chmod(0o644)
+    elif mutation == "hardlink": os.link(path, directory.path.parent / "extra-hardlink")
+    else:
+        retained = directory.path.parent / "retained-original-config"; path.rename(retained)
+        if mutation == "identity": path.write_bytes(raw); path.chmod(0o600)
+        elif mutation == "symlink": path.symlink_to(retained)
+        else: os.mkfifo(path, 0o600)
+    with pytest.raises(proof.NativeProofRefusal): config.audit()
+
+
+def test_config_full9_still_required_during_each_descriptor_read(config_only, monkeypatch):
+    config, directory = config_only; inode = (directory.path / "launch.spec.json").lstat().st_ino
+    real_read, real_stat, real_fstat = os.read, os.stat, os.fstat; changed = []
+    def observed(info): return _ProjectedStat(info, st_ctime_ns=info.st_ctime_ns + 1) if changed and info.st_ino == inode else info
+    def read(fd, maximum):
+        result = real_read(fd, maximum)
+        if real_fstat(fd).st_ino == inode: changed.append(True)
+        return result
+    monkeypatch.setattr(proof.os, "read", read)
+    monkeypatch.setattr(proof.os, "stat", lambda *a, **k: observed(real_stat(*a, **k)))
+    monkeypatch.setattr(proof.os, "fstat", lambda fd: observed(real_fstat(fd)))
+    with pytest.raises(proof.NativeProofRefusal, match="stamp"): config.audit()
+
+
+@pytest.mark.parametrize("mutation", ["bytes", "ctime"])
+def test_config_read_close_is_inside_that_reads_full9_barrier(config_only, monkeypatch, mutation):
+    config, directory = config_only; path = directory.path / "launch.spec.json"; inode = path.lstat().st_ino
+    real_open, real_close, real_stat, real_fstat = os.open, os.close, os.stat, os.fstat
+    readers, changed = set(), []
+    def opened(name, flags, *args, **kwargs):
+        fd = real_open(name, flags, *args, **kwargs)
+        if name == "launch.spec.json" and flags & os.O_ACCMODE == os.O_RDONLY: readers.add(fd)
+        return fd
+    def closed(fd):
+        value = real_close(fd)
+        if fd in readers and not changed:
+            changed.append(True)
+            if mutation == "bytes":
+                with path.open("r+b") as f: f.write(b"X")
+        return value
+    def observed(info):
+        return _ProjectedStat(info, st_ctime_ns=info.st_ctime_ns + 1) if mutation == "ctime" and changed and info.st_ino == inode else info
+    monkeypatch.setattr(proof.os, "open", opened); monkeypatch.setattr(proof.os, "close", closed)
+    monkeypatch.setattr(proof.os, "stat", lambda *a, **k: observed(real_stat(*a, **k)))
+    monkeypatch.setattr(proof.os, "fstat", lambda fd: observed(real_fstat(fd)))
+    with pytest.raises(proof.NativeProofRefusal, match="stamp"): config.audit()
+
+
+def test_config_role_cannot_publish_evidence_or_supply_a_source_seal(config_only):
+    config, unused = config_only
+    assert not hasattr(config, "seal") and not hasattr(config, "inventory")
+    with pytest.raises(proof.NativeProofRefusal): config.write("run.started.json", b"{}")
+
+
+@pytest.mark.parametrize("failure", ["write_zero", "fsync", "writer_close"])
+def test_config_publication_io_failures_are_fatal_and_original_fds_drain(config_only, monkeypatch, failure):
+    config, directory = config_only
+    original_open, original_close, original_write, original_fsync = os.open, os.close, os.write, os.fsync
+    targets, failed = set(), []
+    def opened(name, flags, *args, **kwargs):
+        fd = original_open(name, flags, *args, **kwargs)
+        if name == "job.plist" and flags & os.O_CREAT: targets.add(fd)
+        return fd
+    def closed(fd):
+        value = original_close(fd)
+        if failure == "writer_close" and fd in targets and not failed:
+            failed.append(True); raise OSError(5, "PRIVATE_WRITER_CLOSE_FAILURE")
+        return value
+    def write(fd, raw):
+        if failure == "write_zero" and fd in targets: failed.append(True); return 0
+        return original_write(fd, raw)
+    def fsync(fd):
+        if failure == "fsync" and fd in targets: failed.append(True); raise OSError(5, "PRIVATE_FSYNC_FAILURE")
+        return original_fsync(fd)
+    monkeypatch.setattr(proof.os, "open", opened); monkeypatch.setattr(proof.os, "close", closed)
+    monkeypatch.setattr(proof.os, "write", write); monkeypatch.setattr(proof.os, "fsync", fsync)
+    expected = proof.NativeProofRefusal if failure == "write_zero" else OSError
+    try: raise ValueError("UNRELATED_CALLER_EXCEPTION")
+    except ValueError:
+        with pytest.raises(expected): config.write("job.plist", b"FIXED_FAKE_PLIST")
+    assert targets and failed
+    for fd in targets:
+        with pytest.raises(OSError): os.fstat(fd)
+
+
+def test_prepare_failure_records_entered_phase_fixed_component_and_ordinal(fabricated, monkeypatch):
+    original = proof._Config.write
+    def fail(self, name, raw):
+        if name == "job.plist": raise OSError(5, "PRIVATE_UNCONTROLLED_ERROR_PATH")
+        return original(self, name, raw)
+    monkeypatch.setattr(proof._Config, "write", fail)
+    with pytest.raises(OSError) as caught: prepare()
+    detail = proof.failure_summary(caught.value)
+    assert (detail["stage"], detail["component"], detail["ordinal"]) == ("bootstrap", "bootstrap_job", 2)
+    assert detail["errno_name"] == "EIO" and "PRIVATE" not in canonical_json(detail)
+    assert detail["component_scope"] == "entered_phase_including_callbacks_not_forensic_attribution"
+
+
+def test_code_ctime_epoch_stays_strict_after_config_role_correction(fabricated, monkeypatch):
+    original_close, real_stat, real_fstat = proof._Code.close, os.stat, os.fstat
+    inode = (proof.ROOT / proof.CODE_FILES[0]).lstat().st_ino; changed = []
+    def close(self): original_close(self); changed.append(True)
+    def observed(info): return _ProjectedStat(info, st_ctime_ns=info.st_ctime_ns + 1) if changed and info.st_ino == inode else info
+    monkeypatch.setattr(proof._Code, "close", close)
+    monkeypatch.setattr(proof.os, "stat", lambda *a, **k: observed(real_stat(*a, **k)))
+    monkeypatch.setattr(proof.os, "fstat", lambda fd: observed(real_fstat(fd)))
+    with pytest.raises(proof.NativeProofRefusal, match="stamp"): prepare()
+
+
+def test_inner_evidence_ctime_epoch_stays_strict_after_config_role_correction(fabricated, monkeypatch):
+    real_stat, real_fstat = os.stat, os.fstat; changed = []
+    fabricated.terminal_callback = lambda volume: changed.append((volume.path / "proof/run.started.json").lstat().st_ino)
+    def observed(info): return _ProjectedStat(info, st_ctime_ns=info.st_ctime_ns + 1) if info.st_ino in changed else info
+    monkeypatch.setattr(proof.os, "stat", lambda *a, **k: observed(real_stat(*a, **k)))
+    monkeypatch.setattr(proof.os, "fstat", lambda fd: observed(real_fstat(fd)))
+    with pytest.raises(proof.NativeProofRefusal, match="stamp"): proof.run_registered(HEAD, REMOTE, prepare())
+
+
 @pytest.mark.parametrize("entry", ["bootstrap", "volume"])
 def test_unsupported_platform_refuses_before_consuming_any_new_namespace(fabricated, monkeypatch, entry):
     def unsupported(): raise proof.native.IsolatedVolumeRefusal("isolated_platform_refused")

@@ -27364,3 +27364,107 @@ causally verified correction before further work. Current source/capture gates
 remain blocked; DAILY/count aggregate-scope reconciliation is still pending.
 No new provider START/HTTP/key read, source claim, outcome/look, QC/Safari,
 purchase or push has occurred. This remains short of pre-QC readiness.
+
+### 132.10 Actual native-v1 bootstrap refusal; configuration-role correction
+
+The native checkpoint is local60baad810c6d3006e99f6066b6906cd6387bd95b;
+Main post-record98/1.09s passed before commit. At clean60BA and matching
+tracking/actual F27, Main verified both fixed directories and the exact job
+absent, then invoked prepare-proof ONCE as exec64753. Actual exit2 projected
+native_proof_stamp, mismatching FIELD NAMES ONLY [ctime_ns], entered phase
+registration. No bootstrap digest/positive preparation result was issued.
+The prepare function lacked phase updates around later audits; the EXACT
+failed component/guard instance and ctime-changing actor remain UNKNOWN.
+Do not attribute it to bootstrap files, code files, a provider or any actor.
+
+Independent protected nofollow read-only observation then found exactly two
+host configuration files: launch.spec.json1183bytes/SHA
+b6ef152decdb5255673f6a56d45c6d61bd019e499f24027506ceb2be84599ce2 and
+job.plist1421bytes/SHA8290e24a69274e8e41e8f3adfd7b57abf431f8fe36f6fd4376883e2b77f771df.
+The native domain is ABSENT; the exact kernel job remains ABSENT (query113).
+No bootstrap, image create/attach, supervisor/child, source claim/START/HTTP/
+credential read, look, QC/Safari, purchase or push occurred. The failed host
+bootstrap and its uninvoked v1 domain/label are retired even where absent;
+they will not be reused, adopted, resealed, reset or retried.
+
+Main investigated a file-free launchctl-submit alternative READ-ONLY. Installed
+launchctl.1 explicitly states submit keeps a failed program alive; help exposes
+no disabling flag. It was rejected without invocation because automatic
+failure restart contradicts this one-shot contract. Local SDK alternatives
+were not used. Classic bootstrap with explicit RunAtLoad=true/KeepAlive=false
+remains the bounded interface.
+
+A separately verified prospective adapter issue is now being corrected:
+prepare uses the native-evidence _Files creation seal across host config writer
+cleanup, despite declaring those two public launch files CONFIGURATION only.
+Exact registered canonical bytes/hash, original identity/protection/size and
+full9 stability within each actual original FD read/write authenticate current
+configuration. Cross-phase host timestamps cannot mint a source/proof creator
+capability and are observations for this role. A distinct exact-two-role
+_Config helper must be incapable of writing native/inner evidence or converting
+to an evidence capability. ALL live code/native/inner full9 seals stay unchanged;
+any real code-ctime failure still refuses. This is a role correction to be
+proved causally on fabricated config-only drift, NOT a diagnosis of64753.
+Future phase/component/ordinal projections will use only fixed labels/field
+names, never paths, values or arbitrary exception formatting. Any successor
+requires a newly frozen finite policy/namespaces after those regressions and
+review, with no source activation. Budget-scope reconciliation is still pending.
+
+### 132.11 Frozen exact-role configuration correction and native v2
+
+**SI-DEC-20261028-04** prospectively separates CONFIGURATION from EVIDENCE.
+Only the existing new native driver, its test and this lane record changed.
+The new fixed bootstrap/domain suffixes and exact kernel label are v2; all
+v1 namespaces/labels remain retired even if never created. Classic one-shot
+bootstrap retains RunAtLoad=true/KeepAlive=false; submit is not used.
+
+The separate _Config accepts ONLY launch.spec.json and job.plist in the exact
+new bootstrap directory. It exports no seal, inventory, source or native
+evidence capability. Original dev/ino/UID/GID/mode/nlink/size plus exact expected
+canonical bytes/hash remain mandatory across configuration publication phases.
+Original descriptor reads/writes keep nofollow, pre-open checks, full9
+within-operation stability, readback, positive progress, fsync and fatal
+cleanup checks. After a WRITER-close timestamp-only transition, a fresh
+original-identity canonical-byte read authenticates current configuration.
+A READ includes its own close barrier: same-size byte or timestamp mutation
+during that read/close refuses. ALL code, native and inner evidence full9
+seals and the original live-bootstrap read context9 remain unchanged.
+
+Causal fabricated tests first reproduced the over-applied creation-epoch
+_Files.named rejection for timestamp-only configuration, then proved _Config's
+narrow distinction. Additional same-size byte/ctime mutation during READ-FD
+close was exposed RED and corrected before release. Byte, mode, link, inode,
+FIFO/symlink, no-progress, fsync and close failures still refuse and drain
+original descriptors. No existing data/evidence timestamps are rebased.
+
+Future prepare failures now capture fixed entered phase/component/ordinal
+labels BEFORE cleanup; scopes explicitly include callbacks and are not
+forensic attribution. Only catalogue names, allowlisted codes/errno and actual
+failed-comparison FIELD NAMES may escape. No path/value/exception formatting
+is introduced. This verified software correction does not establish which
+component failed in64753 or the actor behind its ctime change.
+
+Registered native-v2 policy:
+616753db5fd9db215ad7b31883e96aae6e9a896c0f501050f557c6e97e138b1e.
+Registered source SHA256:
+e2f27e16d4fa683af7ec26aebef19ccdde20fa65e06c48d44067049374d85d58;
+test SHA25654f2f1f18406055757bee7a5b04f8064b8a881348841892b7fab367c9d61ba1b.
+Main9 relevant focused files passed **313/2.87s**, no skips/warnings reported;
+all90 held/proof/test paths compiled in memory. Semantic registration equality,
+old dependency byte equality, unchanged historical-record prefix and whitespace
+checks passed. Separately attributed author native/import73/1.60s and peer
+native-only64/.98s passed; peer accepted the correction. Main changed only the
+PENDING registration literal after peer freeze, then ran313 checks. Tests
+remain fabricated with sanitized environment/OS network denial/no bytecode or
+cache. No full suite or actual native/job/source operation ran in development.
+
+At the resulting clean commit with fresh matching tracking/actual F27, Main
+may prepare the distinct v2 bootstrap ONCE and, only after independent current
+configuration-byte/identity/protection checks, submit the exact one-shot job
+ONCE. Require original native evidence/inventory, child wait0, actual kernel0
+and no negative; no positive source/input/backtest claim follows. Freeze all
+authors/tests while active. Preserve any refusal or partial namespace without
+retry, old-name reuse, relaxed evidence checks or invented closure. Provider
+retrieval and capture remain blocked; count/DAILY scope clarification is still
+pending. No provider START/HTTP/key read, source claim, look, QC/Safari,
+purchase or push has occurred.

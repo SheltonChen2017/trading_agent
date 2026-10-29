@@ -25,12 +25,12 @@ ROOT = worker.ROOT
 MODULE = "scripts.short_interest_count_native_supervisor"
 DRIVER = "scripts/short_interest_count_native_supervisor.py"
 PARENT = Path("artifacts/short_interest")
-BOOTSTRAP = "count-process-supervisor-native-bootstrap-v3"
-DOMAIN = "count-process-supervisor-native-domain-v3"
-LABEL = "com.openai.codex.short-interest-native-process-proof-v3"
-STATUS_NAME = "count-process-supervisor-native-status-v3.jsonl"
+BOOTSTRAP = "count-process-supervisor-native-bootstrap-v4"
+DOMAIN = "count-process-supervisor-native-domain-v4"
+LABEL = "com.openai.codex.short-interest-native-process-proof-v4"
+STATUS_NAME = "count-process-supervisor-native-status-v4.jsonl"
 MAXIMUM_STATUS_BYTES = 2048
-POLICY_SHA256 = "cbc98e5fb6672065c20f5944f90c04e4015481112ba908570e9eb146f5f6c168"
+POLICY_SHA256 = "dd9475751f2ce3eb053087fedb37691e0612f1e91069a5cdb34b0ce130830ed5"
 CODE_FILES = ("data/__init__.py", "data/hashing.py", DRIVER,
     "scripts/short_interest_count_process_supervisor.py", "scripts/short_interest_isolated_custody_volume.py")
 MAXIMUM_SECONDS, COMMAND_SECONDS, VIRTUAL_BYTES = 300, 120, 8 * 1024 ** 3
@@ -71,7 +71,7 @@ def authority():
 
 
 def policy():
-    return {"schema": "si-native-process-proof-policy-v3", "root": str(ROOT), "parent": str(PARENT),
+    return {"schema": "si-native-process-proof-policy-v4", "root": str(ROOT), "parent": str(PARENT),
         "bootstrap": BOOTSTRAP, "domain": DOMAIN, "label": LABEL, "code_files": list(CODE_FILES),
         "virtual_bytes": VIRTUAL_BYTES, "whole_seconds": MAXIMUM_SECONDS, "command_seconds": COMMAND_SECONDS,
         "native_output_bytes": MAXIMUM_NATIVE_BYTES, "control_bytes": MAXIMUM_CONTROL_BYTES,
@@ -79,9 +79,9 @@ def policy():
         "native_output_limit_kind": "post_capture_acceptance_of_fixed_local_command_output_not_hard_capture_memory_bound",
         "roles": list(ROLES), "worker_policy_sha256": worker.PROOF_POLICY_SHA256,
         "worker": "unchanged_two_second_worker_original_collect_wait_within_five_seconds",
-        "host": "bootstrap_spec_job_bytes_only_no_host_creation_stamp_admission_stderr_devnull_stdout_fixed_observability_only_sibling",
+        "host": "bootstrap_spec_job_bytes_only_no_host_creation_stamp_admission_stdout_stderr_devnull_DebugTrue_Python_owns_existing_status_after_canonical_auth",
         "status_name": STATUS_NAME, "maximum_status_bytes": MAXIMUM_STATUS_BYTES,
-        "status_role": "original_first7_in_canonical_spec_empty0600_singlelink_FD1_and_nofollow_name_before_volume_and_emit_one_allowlisted_line_no_source_or_own_exit_authority_current_read_full9_not_creator_epoch_seal",
+        "status_role": "original_first7_in_canonical_spec_empty0600_singlelink_original_parentfd_WRONLY_NOFOLLOW_NONBLOCK_only_no_CREATE_TRUNC_APPEND_after_canonical_auth_open_FD_named_full9_bind_once_latched_failure_owned_close_one_allowlisted_line_no_source_own_exit_readback_authority",
         "configuration": "exact_two_roles_only_original_dev_ino_UID_GID_mode_nlink_size_and_canonical_bytes_SHA_across_phases_full9_stability_each_original_descriptor_read_write_timestamps_observations_not_evidence_caps",
         "retired": "all_previous_bootstrap_and_domain_namespaces_retired_even_if_absent_never_reused",
         "prepare_diagnostics": "fixed_entered_phase_component_catalogue_ordinal_includes_callbacks_not_forensic_actor_or_historical64753_attribution",
@@ -90,7 +90,7 @@ def policy():
         "inventory": "original_sealed_preceding_controls_hash_bytes_full9_stamps_native_original_pins_code5_manifest_inventory_and_marker_excluded_from_roster_marker_binds_original_inventory_body_and_seal",
         "backing": "mutable_container_original_inode0600_singlelink_not_immutable_evidence_seal",
         "closure": "all_code_Git_native_callbacks_then_original_control_membership_clock_audits_all_FDs_closed_final_original_named_seals_no_reopen",
-        "unknown": "retain_original_child_code_bootstrap_volume_output_FDs_no_kill_restart_or_positive_result",
+        "unknown": "source_free_only_hold_original_child_code_bootstrap_volume_output_and_owned_status_FDs_while_parent_lives_no_emit_close_kill_restart_positive_result_interrupted_parent_retention_unknown_never_capture_qualification",
         "late_negative": "exact_original_collect_failure_frame_all_present_pending_output_line_block_bytes_plus_remaining_pipe_and_partial_log_preserved_before_original_wait_late_exit_negative_only_otherwise_hold_all_contexts",
         "kernel_exit": "all_producer_records_provisional_until_Main_independent_actual_kernel_exit0_and_no_negative",
         "authority": authority()}
@@ -341,31 +341,73 @@ def _prepare_status(directory):
     return pin
 
 
-def _status_fd(): return 1
-
-
 class _Status:
-    """Original-spec-bound FD1 for one safe line; no evidence/source authority."""
+    """Python-owned existing observation file; no launcher or FD1 adoption."""
     def __init__(self):
-        self.fd, self.expected, self.parent_pin, self.attempted = _status_fd(), None, None, False
-        _status_identity(os.fstat(self.fd))  # Protection alone does NOT authorize output.
+        self.fd = self.parent_fd = self.expected = self.parent_pin = None
+        self.attempted = self.started = self.failed = self.closed = False
+        self.write_snapshot = None
     def bind(self, directory, original):
-        expected = _status_pin(original); directory.check()
-        require(_status_identity(os.fstat(self.fd)) == expected
-            == _status_identity(os.stat(STATUS_NAME, dir_fd=directory.parent, follow_symlinks=False)),
-            "native_status_refused")
-        self.parent_pin = _dir(os.fstat(directory.parent)); self.expected = expected
-        self.check(0)
+        require(not self.started and not self.closed, "native_status_refused"); self.started = True
+        try:
+            expected = _status_pin(original); directory.check()
+            self.parent_pin = _dir(os.fstat(directory.parent))
+            self.parent_fd = os.dup(directory.parent)
+            require(_dir(os.fstat(self.parent_fd)) == self.parent_pin, "native_status_refused")
+            before = os.stat(STATUS_NAME, dir_fd=self.parent_fd, follow_symlinks=False)
+            require(_status_identity(before) == expected, "native_status_refused")
+            snapshot = _stamp(before)
+            self.fd = os.open(STATUS_NAME, os.O_WRONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=self.parent_fd)
+            require(_status_identity(os.fstat(self.fd)) == expected, "native_status_refused")
+            _same(_stamp(os.fstat(self.fd)), snapshot)
+            _same(_stamp(os.stat(STATUS_NAME, dir_fd=self.parent_fd, follow_symlinks=False)), snapshot)
+            self.expected = expected; self.check(0)
+        except BaseException as error:
+            self.failed = True; failure_summary(error)
+            try: self.close()
+            except BaseException: pass
+            raise
     def check(self, size):
-        require(self.expected is not None and self.parent_pin is not None, "native_status_refused")
+        require(not self.closed and not self.failed and self.expected is not None
+            and self.parent_pin is not None and self.fd is not None and self.parent_fd is not None, "native_status_refused")
         parent = ROOT / PARENT; path = parent / STATUS_NAME
         require(ROOT.resolve() == ROOT and parent.resolve() == parent and path.resolve() == path
-            and _dir(parent.lstat()) == self.parent_pin, "native_status_refused")
-        left, right = os.fstat(self.fd), path.lstat()
+            and _dir(parent.lstat()) == _dir(os.fstat(self.parent_fd)) == self.parent_pin, "native_status_refused")
+        left = os.fstat(self.fd)
+        right = os.stat(STATUS_NAME, dir_fd=self.parent_fd, follow_symlinks=False)
         require(_status_identity(left, size)[:6] == self.expected[:6]
             == _status_identity(right, size)[:6], "native_status_refused")
         _same(_stamp(left), _stamp(right))
+    def close(self):
+        if self.closed: return
+        first = None; snapshot = None
+        if not self.failed and self.fd is not None and self.expected is not None:
+            try:
+                size = self.write_snapshot[6] if self.write_snapshot is not None else 0
+                self.check(size); snapshot = _stamp(os.fstat(self.fd))
+                if self.write_snapshot is not None: _same(snapshot, self.write_snapshot)
+            except BaseException as error: first = error
+        fd, self.fd = self.fd, None
+        if fd is not None:
+            try: os.close(fd)
+            except BaseException as error:
+                if first is None: first = error
+        if first is None and snapshot is not None:
+            try: _same(_stamp(os.stat(STATUS_NAME, dir_fd=self.parent_fd, follow_symlinks=False)), snapshot)
+            except BaseException as error: first = error
+        parent, self.parent_fd = self.parent_fd, None
+        if parent is not None:
+            try: os.close(parent)
+            except BaseException as error:
+                if first is None: first = error
+        self.closed = True
+        if first is not None:
+            self.failed = True; failure_summary(first); raise first
     def emit(self, detail=None):
+        try: self._emit(detail)
+        except BaseException as error:
+            self.failed = True; failure_summary(error); raise
+    def _emit(self, detail=None):
         require(not self.attempted, "native_status_refused"); self.attempted = True
         self.check(0)
         if detail is not None:
@@ -381,14 +423,14 @@ class _Status:
                 and (detail["errno_name"] is None or type(detail["errno_name"]) is str and detail["errno_name"] in set(_ERRNOS.values()) | set(native._ERRNOS.values()) | set(worker._ERRNOS.values()))
                 and type(detail["mismatching_fields"]) is list and len(detail["mismatching_fields"]) <= 9
                 and all(type(v) is str and v in _STAMP_NAMES for v in detail["mismatching_fields"]), "native_status_refused")
-        payload = {"schema": "si-native-status-observation-v3", "status_role": "observability_only",
+        payload = {"schema": "si-native-status-observation-v4", "status_role": "observability_only",
             "status": "refused" if detail is not None else "producer_checks_complete_provisional", "failure": detail,
             "supervisor_process_exit_attested": False, "launcher_independence_verified": False,
             "readback_claimed": False, "authority": authority()}
         raw = canonical_json(payload).encode() + b"\n"
         require(0 < len(raw) <= MAXIMUM_STATUS_BYTES and raw.count(b"\n") == 1, "native_status_refused")
-        _write(self.fd, raw); os.fsync(self.fd); self.check(len(raw))
-        # FD1 belongs to the process runtime. No readback or future kernel
+        _write(self.fd, raw); os.fsync(self.fd); self.check(len(raw)); self.write_snapshot = _stamp(os.fstat(self.fd))
+        # The descriptor is owned and closed by Python. No readback or future kernel
         # exit is claimed; Main independently verifies both after termination.
 
 
@@ -484,7 +526,7 @@ class _Code:
 
 
 def _spec(head, remote, manifest, status_pin):
-    return {"schema": "si-native-process-bootstrap-v3", "runtime_head": head, "actual_remote": remote,
+    return {"schema": "si-native-process-bootstrap-v4", "runtime_head": head, "actual_remote": remote,
         "policy_sha256": POLICY_SHA256, "code_manifest": manifest, "domain": DOMAIN,
         "status_original_identity": list(_status_pin(status_pin)), "status_name": STATUS_NAME,
         "authority": authority()}
@@ -496,7 +538,7 @@ def build_launchd_plist(head, remote, digest):
     return {"Label": LABEL, "ProgramArguments": [worker.PYTHON, "-B", "-m", MODULE, "run-proof",
         "--head", head, "--remote", remote, "--bootstrap-sha256", digest], "WorkingDirectory": str(ROOT),
         "EnvironmentVariables": worker._environment(), "RunAtLoad": True, "KeepAlive": False,
-        "StandardOutPath": str(ROOT / PARENT / STATUS_NAME), "StandardErrorPath": "/dev/null"}
+        "StandardOutPath": "/dev/null", "StandardErrorPath": "/dev/null", "Debug": True}
 
 
 def prepare_bootstrap(head, remote):
@@ -529,7 +571,7 @@ def prepare_bootstrap(head, remote):
         if primary is None and first is not None: raise first
     _phase("named_audit"); _component("code_context"); code.named()
     _component("config_context"); files.named(); _component("terminal_clock"); clock.check()
-    return {"schema": "si-native-process-bootstrap-prepared-v3", "bootstrap_sha256": digest,
+    return {"schema": "si-native-process-bootstrap-prepared-v4", "bootstrap_sha256": digest,
         "job_submitted": False, "native_created": False, "authority": authority()}
 
 
@@ -860,15 +902,16 @@ def _preserve_failed_collection(error, origin, process, outputs, volume, code, b
 def run_registered(head, remote, bootstrap_sha256):
     global _USED
     _phase("registration"); registered(); require(not _USED, "native_proof_already_used"); _USED = True
-    clock = _Clock(); code = bootstrap = volume = outputs = process = None
+    clock = _Clock(); code = bootstrap = volume = outputs = process = status_channel = None
+    owns_status = type(_CLI_STATUS) is not _Status
     bootstrap_fds = []; failure = None; unknown = False; log_fd = origin = None
     collect_entered = collect_returned = False
     try:
         _phase("current_code"); worker._guard(head, remote); code = _Code(head, remote, clock)
         _phase("bootstrap"); bootstrap, bootstrap_fds = _read_bootstrap(head, remote, code.manifest, bootstrap_sha256)
         _component("status_channel", 1)
-        status = _CLI_STATUS if type(_CLI_STATUS) is _Status else _Status()
-        status.bind(bootstrap, bootstrap.status_pin)
+        status_channel = _CLI_STATUS if type(_CLI_STATUS) is _Status else _Status()
+        status_channel.bind(bootstrap, bootstrap.status_pin)
         _phase("native_creation"); volume = _Volume(clock)
         _phase("output_creation"); outputs = volume.outputs()
         for role in ("before", "create", "attach", "initial"): outputs.write("native." + role + ".plist", volume.origins[role])
@@ -923,7 +966,7 @@ def run_registered(head, remote, bootstrap_sha256):
             except BaseException: pass
         collect_failure = collect_entered and not collect_returned
         if unknown or collect_failure:
-            held = (process, code, bootstrap, tuple(bootstrap_fds), volume, outputs)
+            held = (process, code, bootstrap, tuple(bootstrap_fds), volume, outputs, status_channel)
             _HELD.append(held); unknown = True
             if origin is not None and _preserve_failed_collection(error, origin, process, outputs, volume, code, bootstrap, clock, log_fd):
                 require(_HELD[-1] is held, "native_proof_wait"); unknown = False; _HELD.pop()
@@ -935,6 +978,7 @@ def run_registered(head, remote, bootstrap_sha256):
             _phase("cleanup"); first = failure
             actions = []
             if process is not None and process.stdout is not None: actions.append(process.stdout.close)
+            if owns_status and status_channel is not None: actions.append(status_channel.close)
             for obj in (outputs, volume, code):
                 if obj is not None: actions.append(obj.close)
             actions.append(lambda: _drain(bootstrap_fds))
@@ -951,32 +995,45 @@ def run_registered(head, remote, bootstrap_sha256):
     return value
 
 
+
+def _status_held(status):
+    # These references retain originals only while this parent lives. An escaped
+    # hold interruption returning2 proves neither child closure nor lifetime retention.
+    return status is not None and any(type(row) is tuple and len(row) == 7 and row[6] is status for row in _HELD)
+
+
 def main(argv=None):
     global _CLI_STATUS
     parser = argparse.ArgumentParser(description="One registered source-free native process proof")
     parser.add_argument("command", choices=("prepare-proof", "run-proof", "capture"))
     parser.add_argument("--head"); parser.add_argument("--remote"); parser.add_argument("--bootstrap-sha256")
     args = parser.parse_args(argv)
-    status = None
+    status = None; result_code = 2
     try:
         if args.command == "capture": raise NativeProofRefusal("REFUSED: native_proof_source_refused")
-        if args.command == "prepare-proof": result = prepare_bootstrap(args.head, args.remote)
+        if args.command == "prepare-proof":
+            result = prepare_bootstrap(args.head, args.remote); print(canonical_json(result)); result_code = 0
         else:
             _phase("status_publication"); _component("status_channel", 1)
             status = _Status(); _CLI_STATUS = status
             result = run_registered(args.head, args.remote, args.bootstrap_sha256).public_summary()
             _phase("status_publication"); _component("status_channel", 1); status.emit()
-            return 0
-        print(canonical_json(result)); return 0
+            result_code = 0
     except BaseException as error:
         detail = failure_summary(error)
         if args.command == "run-proof":
-            if status is not None:
+            if status is not None and not _status_held(status):
                 try: status.emit(detail)
                 except BaseException: pass  # No retry/exception formatting if reporting itself refuses.
         else: print(canonical_json({"status": "refused", "failure": detail, "authority": authority()}))
-        return 2
-    finally: _CLI_STATUS = None
+        result_code = 2
+    finally:
+        if status is not None and not _status_held(status):
+            try: status.close()
+            except BaseException as error:
+                failure_summary(error); result_code = 2
+        _CLI_STATUS = None
+    return result_code
 
 
 if __name__ == "__main__": raise SystemExit(main())

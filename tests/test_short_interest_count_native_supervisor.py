@@ -38,10 +38,6 @@ def fabricated(tmp_path, monkeypatch):
     monkeypatch.setattr(proof, "POLICY_SHA256", hash_payload(proof.policy()))
     h = SimpleNamespace(events=[], processes=[], status=0, raw=None, terminal_callback=None,
         named_callback=None, close_callback=None, volumes=[], wait_error=None, status_fd=None)
-    def status_fd():
-        if h.status_fd is None: h.status_fd = os.open(proof.ROOT / proof.PARENT / proof.STATUS_NAME, os.O_WRONLY | os.O_NOFOLLOW)
-        return h.status_fd
-    monkeypatch.setattr(proof, "_status_fd", status_fd)
     monkeypatch.setattr(proof.worker, "_guard", lambda *args: None)
     def git(arguments):
         assert arguments[:1] == ["show"] and arguments[1].startswith(HEAD + ":")
@@ -87,7 +83,7 @@ def fabricated(tmp_path, monkeypatch):
     try: yield h
     finally:
         for row in proof._HELD:
-            process, code, bootstrap, descriptors, volume, outputs = row
+            process, code, bootstrap, descriptors, volume, outputs, status = row
             for obj in (outputs, volume, code, bootstrap):
                 if obj is not None:
                     try: obj.close()
@@ -96,6 +92,9 @@ def fabricated(tmp_path, monkeypatch):
                 try: os.close(fd)
                 except OSError: pass
             if process.stdout is not None: process.stdout.close()
+            if status is not None:
+                try: status.close()
+                except BaseException: pass
         for child in h.processes:
             if not child.stdout.closed: child.stdout.close()
         if h.status_fd is not None: os.close(h.status_fd)
@@ -120,26 +119,31 @@ def test_capture_cli_refuses_before_registration_or_domain(monkeypatch, capsys):
     assert result["authority"]["provider_HTTP"] == 0
 
 
+def test_v4_launcher_does_not_create_or_open_private_status_file():
+    job = proof.build_launchd_plist(HEAD, REMOTE, "c" * 64)
+    assert job["StandardOutPath"] == job["StandardErrorPath"] == "/dev/null"
+    assert job["Debug"] is True
+
+
+def test_status_constructor_does_not_touch_unowned_fd1_or_open_before_config_auth(monkeypatch):
+    def denied(*args, **kwargs): pytest.fail("status constructor performed I/O before canonical bootstrap authentication")
+    monkeypatch.setattr(proof.os, "fstat", denied); monkeypatch.setattr(proof.os, "open", denied)
+    proof._Status()
+
+
 def test_fabricated_ctor_failure_survives_devnull_cli_via_observability_only_channel(fabricated, monkeypatch):
     digest = prepare()
-    status_path = proof.ROOT / proof.PARENT / "count-process-supervisor-native-status-v3.jsonl"
-    descriptor = None
-    if status_path.exists():
-        descriptor = os.open(status_path, os.O_WRONLY | os.O_NOFOLLOW)
-        monkeypatch.setattr(proof, "_status_fd", lambda: descriptor, raising=False)
+    status_path = proof.ROOT / proof.PARENT / proof.STATUS_NAME
     def refused(clock): raise proof.NativeProofRefusal("REFUSED: native_proof_mount")
     monkeypatch.setattr(proof, "_Volume", refused)
-    monkeypatch.setattr("builtins.print", lambda *a, **k: None)  # Exact old launchd /dev/null observability gap.
-    try:
-        assert proof.main(["run-proof", "--head", HEAD, "--remote", REMOTE, "--bootstrap-sha256", digest]) == 2
-        raw = status_path.read_bytes()
-        assert raw.count(b"\n") == 1 and len(raw) <= 2048
-        result = json.loads(raw)
-        assert result["failure"]["contract_code"] == "native_proof_mount"
-        assert result["supervisor_process_exit_attested"] is False
-        assert result["authority"]["source_dispatch_authority"] is False
-    finally:
-        if descriptor is not None: os.close(descriptor)
+    monkeypatch.setattr("builtins.print", lambda *a, **k: None)
+    assert proof.main(["run-proof", "--head", HEAD, "--remote", REMOTE, "--bootstrap-sha256", digest]) == 2
+    raw = status_path.read_bytes()
+    assert raw.count(b"\n") == 1 and len(raw) <= 2048
+    result = json.loads(raw)
+    assert result["failure"]["contract_code"] == "native_proof_mount"
+    assert result["supervisor_process_exit_attested"] is False
+    assert result["authority"]["source_dispatch_authority"] is False
 
 
 def cli(digest):
@@ -150,6 +154,145 @@ def status_line():
     raw = (proof.ROOT / proof.PARENT / proof.STATUS_NAME).read_bytes()
     assert raw.count(b"\n") == 1 and len(raw) <= proof.MAXIMUM_STATUS_BYTES
     return json.loads(raw)
+
+
+
+def test_owned_status_open_is_after_canonical_config_auth_and_uses_only_exact_flags(fabricated, monkeypatch):
+    monkeypatch.setattr(proof.native, "_platform", lambda: None)  # Named wrapped-open capability seam.
+    digest = prepare(); real_open, original_read = os.open, proof._read_bootstrap
+    authenticated, calls, statuses = [], [], []
+    def read(*args):
+        value = original_read(*args); authenticated.append(True); return value
+    def opened(path, flags, *args, **kwargs):
+        if path == proof.STATUS_NAME:
+            assert authenticated == [True] and flags == os.O_WRONLY | os.O_NOFOLLOW | os.O_NONBLOCK
+            assert not flags & (os.O_CREAT | os.O_TRUNC | os.O_APPEND)
+            assert kwargs.keys() == {"dir_fd"}
+            calls.append(kwargs["dir_fd"])
+        return real_open(path, flags, *args, **kwargs)
+    original_bind = proof._Status.bind
+    def bind(self, *args): statuses.append(self); return original_bind(self, *args)
+    monkeypatch.setattr(proof, "_read_bootstrap", read); monkeypatch.setattr(proof.os, "open", opened)
+    monkeypatch.setattr(proof._Status, "bind", bind)
+    assert cli(digest) == 0 and len(calls) == 1
+    assert statuses[0].closed and statuses[0].fd is statuses[0].parent_fd is None
+
+
+def test_bad_bootstrap_hash_never_opens_status_or_creates_volume(fabricated, monkeypatch):
+    monkeypatch.setattr(proof.native, "_platform", lambda: None)  # Named wrapped-open capability seam.
+    prepare(); real_open = os.open; calls = []
+    def opened(path, flags, *args, **kwargs):
+        if path == proof.STATUS_NAME: calls.append(True)
+        return real_open(path, flags, *args, **kwargs)
+    monkeypatch.setattr(proof.os, "open", opened)
+    assert cli("c" * 64) == 2 and calls == [] and not fabricated.events
+    assert (proof.ROOT / proof.PARENT / proof.STATUS_NAME).read_bytes() == b""
+
+
+@pytest.mark.parametrize("kind", ["symlink", "fifo"])
+def test_nonregular_status_is_refused_before_open(fabricated, monkeypatch, kind):
+    monkeypatch.setattr(proof.native, "_platform", lambda: None)  # Named wrapped-open capability seam.
+    digest = prepare(); path = proof.ROOT / proof.PARENT / proof.STATUS_NAME
+    original = proof.ROOT / "original-status-preserved"; path.rename(original)
+    if kind == "symlink": path.symlink_to(original)
+    else: os.mkfifo(path, 0o600)
+    real_open, calls = os.open, []
+    def opened(name, flags, *args, **kwargs):
+        if name == proof.STATUS_NAME: calls.append(True)
+        return real_open(name, flags, *args, **kwargs)
+    monkeypatch.setattr(proof.os, "open", opened)
+    assert cli(digest) == 2 and calls == [] and not fabricated.events
+    assert original.read_bytes() == b""
+
+
+def test_status_preopen_ctime_change_is_within_full9_operation_barrier(fabricated, monkeypatch):
+    monkeypatch.setattr(proof.native, "_platform", lambda: None)  # Named wrapped-open capability seam.
+    digest = prepare(); path = proof.ROOT / proof.PARENT / proof.STATUS_NAME
+    real_open, real_stat, real_fstat = os.open, os.stat, os.fstat; changed = []
+    inode = path.lstat().st_ino
+    def observed(info):
+        return _ProjectedStat(info, st_ctime_ns=info.st_ctime_ns + 1) if changed and info.st_ino == inode else info
+    def opened(name, flags, *args, **kwargs):
+        fd = real_open(name, flags, *args, **kwargs)
+        if name == proof.STATUS_NAME: changed.append(fd)
+        return fd
+    monkeypatch.setattr(proof.os, "open", opened)
+    monkeypatch.setattr(proof.os, "fstat", lambda fd: observed(real_fstat(fd)))
+    monkeypatch.setattr(proof.os, "stat", lambda *a, **k: observed(real_stat(*a, **k)))
+    assert cli(digest) == 2 and len(changed) == 1 and not fabricated.events
+    with pytest.raises(OSError): real_fstat(changed[0])
+    assert path.read_bytes() == b""
+
+
+def test_status_open_failure_never_reopens_or_masks_original_failure(fabricated, monkeypatch):
+    monkeypatch.setattr(proof.native, "_platform", lambda: None)  # Named wrapped-open capability seam.
+    digest = prepare(); real_open, calls, statuses = os.open, [], []
+    original_bind = proof._Status.bind
+    def bind(self, *args): statuses.append(self); return original_bind(self, *args)
+    def opened(name, flags, *args, **kwargs):
+        if name == proof.STATUS_NAME: calls.append(True); raise OSError(13, "PRIVATE_OPEN")
+        return real_open(name, flags, *args, **kwargs)
+    monkeypatch.setattr(proof.os, "open", opened); monkeypatch.setattr(proof._Status, "bind", bind)
+    assert cli(digest) == 2 and calls == [True] and not fabricated.events
+    status = statuses[0]
+    assert status.failed and status.closed and status.fd is status.parent_fd is None
+    with pytest.raises(proof.NativeProofRefusal): status.bind(None, None)
+    assert calls == [True]
+
+
+@pytest.mark.parametrize("entry", ["main", "standalone"])
+def test_owned_status_close_failure_is_fatal_and_both_fds_drain(fabricated, monkeypatch, entry):
+    digest = prepare(); real_close, statuses, failed = os.close, [], []
+    original_bind = proof._Status.bind
+    def bind(self, *args):
+        value = original_bind(self, *args); statuses.append((self, self.fd, self.parent_fd)); return value
+    def closed(fd):
+        value = real_close(fd)
+        if statuses and fd == statuses[0][1] and not failed:
+            failed.append(True); raise OSError(5, "PRIVATE_OWNED_CLOSE")
+        return value
+    monkeypatch.setattr(proof._Status, "bind", bind); monkeypatch.setattr(proof.os, "close", closed)
+    if entry == "main": assert cli(digest) == 2
+    else:
+        with pytest.raises(OSError) as caught: proof.run_registered(HEAD, REMOTE, digest)
+        assert proof.failure_summary(caught.value)["errno_name"] == "EIO"
+        assert not proof._RESULTS
+    assert failed == [True] and statuses[0][0].closed
+    for fd in statuses[0][1:]:
+        with pytest.raises(OSError): os.fstat(fd)
+    if entry == "main": assert status_line()["supervisor_process_exit_attested"] is False
+
+
+@pytest.mark.parametrize("refusal", [False, True])
+def test_standalone_owned_status_is_closed_on_known_terminal_paths(fabricated, monkeypatch, refusal):
+    digest = prepare(); statuses = []; original_bind = proof._Status.bind
+    def bind(self, *args):
+        value = original_bind(self, *args); statuses.append((self, self.fd, self.parent_fd)); return value
+    monkeypatch.setattr(proof._Status, "bind", bind)
+    if refusal:
+        def refused(clock): raise proof.NativeProofRefusal("REFUSED: native_proof_mount")
+        monkeypatch.setattr(proof, "_Volume", refused)
+        with pytest.raises(proof.NativeProofRefusal): proof.run_registered(HEAD, REMOTE, digest)
+    else: proof.run_registered(HEAD, REMOTE, digest)
+    assert statuses[0][0].closed and not proof._HELD
+    for fd in statuses[0][1:]:
+        with pytest.raises(OSError): os.fstat(fd)
+    assert (proof.ROOT / proof.PARENT / proof.STATUS_NAME).read_bytes() == b""
+
+
+def test_original_ctor_cause_survives_owned_status_close_failure(fabricated, monkeypatch):
+    digest = prepare(); real_close, inode, failed = os.close, (proof.ROOT / proof.PARENT / proof.STATUS_NAME).lstat().st_ino, []
+    def refused(clock): raise proof.NativeProofRefusal("REFUSED: native_proof_mount")
+    def closed(fd):
+        is_status = os.fstat(fd).st_ino == inode
+        value = real_close(fd)
+        if is_status and not failed: failed.append(True); raise OSError(5, "PRIVATE_LATE_CLOSE")
+        return value
+    monkeypatch.setattr(proof, "_Volume", refused); monkeypatch.setattr(proof.os, "close", closed)
+    assert cli(digest) == 2 and failed == [True]
+    result = status_line()
+    assert result["failure"]["contract_code"] == "native_proof_mount" and result["failure"]["errno_name"] is None
+    assert "PRIVATE" not in canonical_json(result)
 
 
 def test_status_original_first7_is_in_canonical_spec_and_not_config_or_inner_evidence(fabricated):
@@ -174,19 +317,14 @@ def test_status_cli_return_is_provisional_and_not_a_kernel_or_source_attestation
 def test_wrong_status_channel_cannot_dispatch_or_write_an_unrelated_file(fabricated, monkeypatch, hazard):
     digest = prepare(); path = proof.ROOT / proof.PARENT / proof.STATUS_NAME
     unrelated = proof.ROOT / "unrelated-empty-private"; unrelated.write_bytes(b""); unrelated.chmod(0o600)
-    extra_fd = None
     if hazard == "wrong_inode":
-        extra_fd = os.open(unrelated, os.O_WRONLY | os.O_NOFOLLOW)
-        monkeypatch.setattr(proof, "_status_fd", lambda: extra_fd)
+        path.rename(proof.ROOT / "preserved-original-status"); path.write_bytes(b""); path.chmod(0o600)
     elif hazard == "mode": path.chmod(0o644)
     elif hazard == "hardlink": os.link(path, proof.ROOT / "extra-link")
     else: path.write_bytes(b"PREEXISTING")
     before = path.read_bytes()
-    try:
-        assert cli(digest) == 2 and not fabricated.events
-        assert path.read_bytes() == before and unrelated.read_bytes() == b""
-    finally:
-        if extra_fd is not None: os.close(extra_fd)
+    assert cli(digest) == 2 and not fabricated.events
+    assert path.read_bytes() == before and unrelated.read_bytes() == b""
 
 
 def test_status_nofollow_name_must_still_identify_original_fd_before_volume(fabricated):
@@ -201,11 +339,12 @@ def test_status_nofollow_name_must_still_identify_original_fd_before_volume(fabr
 @pytest.mark.parametrize("failure", ["zero_progress", "fsync"])
 def test_status_publication_failure_keeps_kernel_return_negative_and_never_retries(fabricated, monkeypatch, failure):
     digest = prepare(); original_write, original_fsync = os.write, os.fsync; calls = []
+    inode = (proof.ROOT / proof.PARENT / proof.STATUS_NAME).lstat().st_ino
     def write(fd, raw):
-        if fd == fabricated.status_fd and failure == "zero_progress": calls.append(True); return 0
+        if os.fstat(fd).st_ino == inode and failure == "zero_progress": calls.append(True); return 0
         return original_write(fd, raw)
     def fsync(fd):
-        if fd == fabricated.status_fd and failure == "fsync": calls.append(True); raise OSError(5, "PRIVATE_STATUS_FSYNC")
+        if os.fstat(fd).st_ino == inode and failure == "fsync": calls.append(True); raise OSError(5, "PRIVATE_STATUS_FSYNC")
         return original_fsync(fd)
     monkeypatch.setattr(proof.os, "write", write); monkeypatch.setattr(proof.os, "fsync", fsync)
     assert cli(digest) == 2 and calls == [True]
@@ -250,9 +389,10 @@ def test_native_ctor_first_failure_has_entered_component_before_outputs(fabricat
 
 def test_reporting_failure_cannot_replace_the_original_ctor_cause(fabricated, monkeypatch):
     digest = prepare(); original_fsync = os.fsync
+    inode = (proof.ROOT / proof.PARENT / proof.STATUS_NAME).lstat().st_ino
     def refused(clock): raise proof.NativeProofRefusal("REFUSED: native_proof_mount")
     def fsync(fd):
-        if fd == fabricated.status_fd: raise OSError(5, "PRIVATE_REPORTING_FAILURE")
+        if os.fstat(fd).st_ino == inode: raise OSError(5, "PRIVATE_REPORTING_FAILURE")
         return original_fsync(fd)
     monkeypatch.setattr(proof, "_Volume", refused); monkeypatch.setattr(proof.os, "fsync", fsync)
     assert cli(digest) == 2
@@ -268,7 +408,7 @@ def test_bootstrap_never_creates_native_domain_and_job_is_one_shot(fabricated):
     job = plistlib.loads((base / "job.plist").read_bytes())
     assert job == proof.build_launchd_plist(HEAD, REMOTE, digest)
     assert job["RunAtLoad"] is True and job["KeepAlive"] is False
-    assert job["StandardOutPath"] == str(proof.ROOT / proof.PARENT / proof.STATUS_NAME)
+    assert job["StandardOutPath"] == "/dev/null"
     assert job["StandardErrorPath"] == "/dev/null"
     assert not {"StartInterval", "StartCalendarInterval", "WatchPaths", "QueueDirectories"} & set(job)
     with pytest.raises(proof.NativeProofRefusal, match="exists"): prepare()
@@ -508,10 +648,30 @@ def test_unknown_child_retains_all_original_contexts_without_closing_or_restarti
     monkeypatch.setattr(proof.time, "sleep", lambda seconds: (_ for _ in ()).throw(Held()))
     with pytest.raises(Held): proof.run_registered(HEAD, REMOTE, prepare())
     assert len(proof._HELD) == len(fabricated.processes) == 1
-    process, code, bootstrap, descriptors, volume, outputs = proof._HELD[0]
+    process, code, bootstrap, descriptors, volume, outputs, status = proof._HELD[0]
     assert process.waits == [30] and not process.stdout.closed
     assert code.fds and bootstrap.fds and descriptors and volume.fds and outputs.fds
+    assert not status.closed and status.fd is not None and status.parent_fd is not None
+    assert os.fstat(status.fd).st_size == 0 and os.fstat(status.parent_fd).st_ino == status.parent_pin[1]
     assert not outputs.closed and not proof._RESULTS
+
+
+
+def test_main_unknown_hold_retains_status_without_reporting_or_closing(fabricated, monkeypatch):
+    digest = prepare(); fabricated.raw = b"FABRICATED_UNRECOGNIZED_OUTPUT\n"
+    fabricated.wait_error = OSError(5, "FABRICATED_WAIT_UNAVAILABLE")
+    class Held(BaseException): pass
+    monkeypatch.setattr(proof.time, "sleep", lambda seconds: (_ for _ in ()).throw(Held()))
+    assert cli(digest) == 2 and len(proof._HELD) == 1
+    status = proof._HELD[0][6]
+    assert not status.closed and not status.attempted
+    assert status.fd is not None and status.parent_fd is not None
+    assert os.fstat(status.fd).st_size == 0
+    assert os.fstat(status.parent_fd).st_ino == status.parent_pin[1]
+    assert (proof.ROOT / proof.PARENT / proof.STATUS_NAME).read_bytes() == b""
+    assert not proof._RESULTS
+    assert "interrupted_parent_retention_unknown_never_capture_qualification" in proof.policy()["unknown"]
+    assert proof.authority()["source_dispatch_authority"] is False
 
 
 def test_caller_collect_status_without_original_wait_record_remains_held(fabricated, monkeypatch):

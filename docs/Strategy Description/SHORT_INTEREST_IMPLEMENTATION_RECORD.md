@@ -27572,3 +27572,156 @@ equivalent new namespace to guess, relaxed check or source invocation. Document
 the actual safe diagnostic/result before a causally justified next policy.
 Provider retrieval/capture and QC/Safari remain blocked; no source START/HTTP/
 key read/claim, look, purchase or push occurred. Budget scope is still pending.
+
+### 132.14 Actual native-v3 startup failure; status ownership correction
+
+The early-diagnostics checkpoint is local5ceea3bc5b18b91d336fda3a821363b500401648;
+Main post-record98/1.00s passed before commit. On clean5CEE with tracking and
+actual originF27, registered prepare exec24637 terminated exit0. Bootstrap SHA
+68c1c058ac1b0702f574888d1527bed068e6b7a6a85ec86601cb3c931dfd5a68
+and job SHAd39592f9b183d528551da70351e23a167c600af4bdb721c149266c6b4c05ca76
+matched independent canonical configuration/code/original-status checks.
+Main submitted that exact one-shot job ONCE. The later exact kernel query
+reports runs1/not running/last exit78:EX_CONFIG. Original status remains empty,
+SHAe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,
+with its original first7 identity/protection unchanged; native domain is absent.
+No Python entry, native creation, child or proof closure is authenticated.
+
+Boundary erratum to132.12: absence of a proof directory also permits failure
+in the first outputs().check() before its mkdir. The phrase early constructor
+failure did not identify an authenticated constructor predicate; only the
+pre-proof-directory region is established. Exact v2 cause remains UNKNOWN.
+
+The controlled Python entry has no78 result path. Independent read-only checks
+found the exact registered plist, searchable designated cwd and accessible
+Python executable, with no verified POSIX/configuration-shape defect. Bounded
+OS launch diagnostics, including info/debug records, retained only service
+inactivity and no cause. Exact startup failure remains UNKNOWN. In particular,
+no privacy, filesystem, provider, Keychain or other-agent cause is asserted.
+All original v3 configuration/status/job and absent domain names are retired
+without bootstrap retry, kickstart, adoption, reseal, overwrite or cleanup.
+
+A separate verified output-ownership defect is corrected prospectively under
+**SI-DEC-20261028-06**, continuing SI-AUTH-20261028-02. Installed primary
+launchd.plist.5 lines491..506 states StandardOutPath creates a missing file.
+V3 therefore delegates a create-capable pathname open to launchd BEFORE Python
+authenticates the canonical spec and original status identity. Its later
+post-open identity check cannot prevent that external file touch. This is not
+an explanation of78. The bounded correction moves ONLY the observation-file
+open into the authenticated producer, with no create/truncate/append, original
+parent-dirfd/nofollow/nonblock and original identity/protection/type/empty-size
+checks before and after open. All actual code/native/inner evidence full9
+checks remain mandatory. A separately frozen first operational test is allowed
+only after causal regressions and independent review; no equivalent namespace
+cycling, claim release or source invocation is authorized. If the corrected
+job again fails before entry without status, preserve it and require a verified
+launcher/platform cause before another invocation.
+
+| Finding | Priority | Disposition |
+| --- | --- | --- |
+| SI-BUILD-20261028-058 | P2 | Verified output-adapter ownership defect: launchd's create-capable status open precedes canonical original-identity authentication. Prospective producer-owned no-create correction pending causal tests; actual exit78 cause remains UNKNOWN. |
+
+The owner asked for a recommendation on count versus DAILY budget scope. Main
+recommended separate existing envelopes: count84005 cumulative START/4GiB,
+DAILY its existing residual36837 attempts/3327988047bytes. That would allow up
+to8GiB cumulative across both sources including old downloads. A combined
+84005 START envelope is below the frozen full-scope minimum86047 before retries.
+The recommendation is NOT an owner decision; the explicit scope question is
+pending. Source access remains blocked. No source START/HTTP/key read/claim,
+outcome/look, QC/Safari, purchase or push occurred.
+
+The read-only public-code bridge audit refined132.6: current closed corpus
+private state lacks genuine baseline/plan identities and an authenticated
+response stream. Actual media exists in HttpObservation16 but is omitted from
+its digest, RECEIVED persistence and checkpoint attempt facts. Before future
+retrieval, bind actual observed media prospectively into a distinct canonical
+receipt/checkpoint version and its authenticated reload path, preserving the
+1024-byte receipt cap. Old missing-media transport evidence must not acquire
+a fabricated observed application/json header. A distinct sealed reported-
+count registry and operational qualifier must consume original held response
+evidence and complete context/terminal closure, preserving disjoint positions,
+all negatives/retries/unknown debt and dated class/query semantics. No old-type
+cast, matching closed_summary or caller completion flag can admit counts.
+This is a preparatory dependency audit, not a source/usability/readiness claim;
+the separate registry, response stream and media persistence are not yet built.
+
+### 132.15 Owner resolves the source-budget scope
+
+After the explicit question describing up to8GiB cumulative across both
+sources including old downloads, the owner answered **"Use the separate
+existing budgets"**. This is **SI-AUTH-20261028-03**: count recovery keeps its
+84005 cumulative START/4294967296-byte ceiling, including every prior known
+debit and the permanent eight-START/16777216-byte unknown floor; DAILY keeps
+its separately existing residual36837 attempts/3327988047bytes/71468572rows
+after its original spent accounting. The pending-scope statements above are
+historical and are now resolved. Neither envelope may borrow from the other,
+reset spent authority, discard negatives, refund unknown reservations or hide
+retries. Every source attempt retains its own START/debit/receipt.
+
+This scope answer does not release custody, actual accounting, dispatch,
+receipt/checkpoint, source-qualification or input gates. No source retrieval
+has run in this round. No QC/Safari, purchase, new credential, outcome/look
+or backtest is authorized by this clarification. Continue the offline custody
+correction first, then separately frozen finite recovery and remaining
+qualification toward the last step before QC setup. One final matching-lane
+push remains pending completion; no interim push has occurred.
+
+### 132.16 Frozen producer-owned observation channel; native v4 pending
+
+SI-DEC-20261028-06 now has a tested prospective implementation. Only the native
+driver/test and this record changed. Fresh fixed bootstrap/domain/status/label
+suffixes are v4. All earlier names remain retired and untouched. The fixed
+one-shot job uses stdout/stderr=/dev/null, RunAtLoad=true, KeepAlive=false and
+Debug=true; launchd opens no private status pathname. This removes the verified
+create-capable output adapter without claiming to diagnose or fix exit78.
+
+Status construction performs no I/O. Only AFTER canonical bootstrap/code
+authentication, bind checks the original first7 identity, regular0600/current
+UID/single-link/empty file, duplicates the ORIGINAL parent FD and opens under
+that dirfd with O_WRONLY|O_NOFOLLOW|O_NONBLOCK only. O_CREAT/O_TRUNC/O_APPEND are
+absent. Fresh original-FD/nofollow named full9 and protection comparisons must
+pass before any status write or native creation. Binding is single-use and
+failure-latched. At most one bounded2048-byte allowlisted observation may be
+emitted. Known-terminal cleanup drains both owned FDs, retains the first cause
+and converts late close failure to main2. Status still grants no readback,
+kernel-exit, launcher, source, budget or evidence authority.
+
+| Finding | Priority | Disposition |
+| --- | --- | --- |
+| SI-BUILD-20261028-058 | P2 | Corrected prospectively by authenticated producer-owned no-create status opening. FIFO/symlink/replacement/nonempty/protection/ctime-during-open and no-write-before-bind causal cases refuse. Actual v3 startup cause stays UNKNOWN. |
+| SI-BUILD-20261028-059 | P2 | Corrected before v4 release: a hold-loop exception reaching main could close the original held status FD while the parent still lived. Exact original internal seven-field held-object identity now suppresses reporting/close, with causal RED then GREEN. |
+
+The honest SOURCE-FREE retention boundary is explicit: original references/FDs
+remain held while this parent lives. An interrupted parent returning nonzero
+cannot attest retention after its own exit or any unknown child closure.
+No uninterruptible trap, process restart, claim retry or source activation was
+added. Any nonzero/unknown actual kernel outcome vetoes the proof. Future
+capture requires its OWN durable pre-HTTP journals and permanent unknown
+full-page upper debits; this source-free interruption model never qualifies
+provider recovery. ALL native/code/inner/live-bootstrap full9 checks, original
+metadata inventory and2/5/300/120s bounds remain unchanged.
+
+Registered policy:
+dd9475751f2ce3eb053087fedb37691e0612f1e91069a5cdb34b0ce130830ed5.
+Source SHA25666762c1f7a1531c395aa20e79d4eac99984259e81f691bbfe1f407b983288f5b;
+test SHA25600b6d3105f0cb24c8edf449c8da4e1ef6749c06cef81e46492cde993e68e7a9d.
+Main9 relevant focused files passed **341/2.80s**, no skips/warnings reported;
+all90 held/proof/test paths compile in memory. Policy registration equality,
+exact five-file native closure, old dependency byte equality, historical-record
+prefix and whitespace checks passed. Separately attributed author101/1.90s
+and independent peer92 native-driver tests/1.06s passed. Peer accepted the final
+registered source/hash and limited contract. These are fabricated seam tests
+with empty environment, OS network denial and no bytecode/cache; not an actual
+native operation, full suite, source qualification or Claude review.
+
+After clean commit and matching tracking/actual F27 checks, Root may prepare
+the fresh v4 bootstrap/status ONCE, independently authenticate original current
+configuration/status identity and submit the exact one-shot job ONCE. All
+authors/tests must remain frozen while active. Independently require actual
+kernel0, original child wait0 and complete original native inventory/controls
+with no negative for proof acceptance. No status line or provisional marker
+substitutes for those checks. If pre-entry failure recurs without status,
+preserve it and require a verified launcher/platform cause before another
+invocation. Source dispatch and all later semantic/input gates stay blocked;
+the resolved separate budgets do not release them. No source START/HTTP/key
+read/claim, outcome/look, QC/Safari, purchase or push has occurred.

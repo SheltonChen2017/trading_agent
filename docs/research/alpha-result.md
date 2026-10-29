@@ -7369,3 +7369,25 @@ historical/other-lane entry is changed or rebooked; no funded/broker/real-order/
 paper/live authority or formal/PIT/master readiness follows. Analyst326.26–28
 own the exact one-use protocol, current UI/source/rights qualifications and
 remaining source/coverage gates.
+
+## R-298 N as-is rerun — one unbooked one-day launch (RETROACTIVELY RECONCILED FROM A QC CENSUS; NOT ADMISSIBLE) — 2026-10-29
+
+Written by the Windows-host Claude review snapshot R333. A 2026-10-29
+administrative census (zero looks: `backtests/list` and one status-only
+`backtests/read` projection of name, status, progress, error text, creation
+time and engine window; no statistic, chart, order, log or return) of private
+project `ARV2 R298 NEWRULE SIX OFF 2021 OCT2026` (`38364439`) finds nine
+backtests. Eight are booked above (the owner's manual sample, A12, A14, A16,
+A18, A19, N and R/P). The ninth, `5633b9955d98a08fb503f3bd78cb7de5`, named
+`R298-N-asis-rerun-20221024-20261026`, reached `Completed.` with no error,
+was created 2026-10-26 18:10:44 UTC and ran the one-day engine window
+2022-10-25. It is in neither the lane record nor this ledger. Its name
+describes an as-is rerun of the N feed-presence probe, but no record section
+claims it, so who launched it and from what source is unknown; the lane read
+no result from it on this host. It is counted conservatively as one
+input-presence infrastructure look: **337 -> 338 shared looks / 259 Analyst
+development evaluations unchanged / 53 -> 54 infrastructure looks / 699
+authenticated cells unchanged**. If a later push books this identity again,
+it must reconcile against this entry by identity rather than add it a second
+time. No formal alpha, efficacy, paper/live, broker, funded or real-order
+claim follows.

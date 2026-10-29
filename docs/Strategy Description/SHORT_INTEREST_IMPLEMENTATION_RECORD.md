@@ -28501,3 +28501,168 @@ negative, and even observation success is not native proof or source release.
 All original data/spent/unknown charges and both separate source budgets
 remain intact. Source START/HTTP/key0, looks0, QC/Safari0, purchases0 and
 pushes0 in this continuation.
+
+### 132.31 Actual v7 correlated status refusal; distinct native proof prerequisite
+
+Main committed registered v7 at5416d09568c645f752009c844f71b66f4b0808f9;
+post-record98/1.18s passed. Clean exact lane/matching tracking and actual F27,
+fresh fixed v7 names and absent exact job113 preceded ONE observe-readonly
+invocation, exec2505, with all authors/tests frozen. Actual outer exit0 returned
+NEGATIVE terminal_observation_only: original control-child wait2, registered
+target PID73315, exact independent kernel runs1/inactive/active0/no PID/exit2.
+The controller's fixed failure is startup_kernel_never_exited from a genuine
+query return0. Its refused intermediate row is not retained, so no particular
+running/transient state is inferred or retrospectively accepted.
+
+The private strict v7 filter now delivered the genuine correlated target
+failure: status_bind / native_proof_stamp / FIELD NAMES[ctime_ns], original
+Git/query evidence null. Thus the immediate refused relation belongs to the
+HOST STATUS OBSERVATION CHANNEL; it is not a source-data mismatch or provider
+failure. No source/native-domain creation was reached. The readable code has
+exactly two possible original stamped comparisons in bind: pre-open named
+full9 versus opened write-FD, or immediate FD full9 versus nofollow named full9.
+The receipt does not distinguish those two sites and does NOT identify an
+actor, flag effect, legitimate open effect or historical custody cause.
+Both comparisons remain unchanged and the failed instance remains latched.
+
+Independent guarded protected read/close authentication found original
+spec2532bytes SHAc312b5bf1c39aa92db8b82a45b7af9b57078b96a676152ea797ffcdfaed15bef,
+job3501bytes SHAabd1940a4ca4b48a61e9e02f90ae7ed1e13d5bbbaa4547cb5ae9b559ecb6a125,
+and status0bytes, with FD/named stamps stable during that read/close. Current
+readability does not repair the negative. Preserve every v7 file and terminal
+job unchanged, with every earlier namespace/claim/debit. Do not create another
+host metadata-probe namespace, guess the actor or relax either comparison.
+
+**SI-DEC-20261028-14** authorizes a DISTINCT bounded source-free native-proof
+prerequisite under continuing owner offline-repair authority. Old V1 native
+proof/status entrypoints, all original checks, negatives and result types stay
+untouched and cannot be adopted/cast. Their code explicitly gives host status
+only observation authority, not an evidence creation capability. A new typed
+protocol may instead use a private original PTY for bounded observability and
+keep AUTHORITATIVE ORIGINAL RECORDS in a fresh independently created APFS
+domain. It must have its own fixed namespace, factory/lifecycle/provenance and
+complete current transitive code closure; no in-memory global mutation or
+old fixed-domain constructor/preservation helper masquerading as a new one.
+
+Admission is conjunctive: exact canonical original config/load witness,
+actual registered native-parent kernel0, genuine original inner-worker wait0
+under unchanged two-line/5s collection contract, fresh original backing/mount/
+node/owner/local/nobrowse/writable/global association, O_EXCL0600/single-link/
+exact bytes/full9 original controls and FINAL membership, all code/native
+callbacks before final original sweeps, successful context exits/cleanup and
+postclose named seals/clock, and no negative sibling. Disk or TTY summaries
+remain provisional until independent terminal observation. No copied JSON,
+constructor flag, fresh read baseline, V1 result cast or public completed flag
+may mint closure. Unknown termination/buffer preservation failure retains all
+original contexts while parent lives without retry/kill/reset/detach/reuse.
+
+The new protocol must own its negative routing and any durable Main receipt;
+old _preserve_failed_collection is tied to V1 schemas/bootstrap and is not a
+generic adapter. Root-side reads must match producer-original seals, not adopt
+new ones. PTY remains observation-only; it alone cannot mint proof, data/source
+admission or SourceAUTH. The new proof may identify known pending kernel rows
+only as NONADMITTING metadata; final actual inactive runs1/exit0 remains required.
+Old never-exited refusals are not reclassified or accepted.
+
+Implementation/tests/review must precede any frozen actual invocation. Source
+lease/capture mode remains blocked even after any proof succeeds, until its
+separate exact accounting/production-supervision integration passes. Permanent
+run13448 exposure8START/16MiB, all old data/negatives/spent claims, count84005/
+4GiB and the owner's separate existing DAILY budget remain intact. This step
+creates no new source claim/START/HTTP/key read, outcome/look, QC/Safari access,
+purchase, external message or push.
+
+### 132.32 Frozen distinct native-supervision V2 prerequisite; actual pending
+
+**SI-DEC-20261029-01**, continuing132.31/decision14 and owner offline-repair
+authority, freezes the new source-free prerequisite. ONLY new
+scripts/prove_short_interest_native_supervision.py, its new test and this
+append-only record change. Original native-five/startup-v7 file bytes and
+all their checks/negative namespaces remain unchanged. This is not another
+host status probe or an adapter that skips old V1 bind. The new driver owns
+fresh bootstrap/domain/lifecycle, two result types/private issuance registries
+and complete held seven-path committed-code closure.
+
+Fixed fresh names: si-native-supervision-v2-v1-bootstrap,
+si-native-supervision-v2-v1-domain, and
+com.openai.codex.short-interest-native-supervision-v2-v1. Canonical config
+input/load transactions retain original identities/bytes and full9 within
+operations. The ordinary original private PTY is bounded observability only;
+there is NO host status-file gate in this separate protocol. Original V1
+result/control/status types cannot be cast or adopted. Exactly one initial
+kickstart without-k follows fresh exact-service absence and a canonical load;
+no debug/root escalation, restart, reset, remount or detach is available.
+
+The native parent exclusively creates a fresh8GiB VIRTUAL sparse APFS domain
+(local, ownership enforced, writable, nobrowse/nospotlight) and holds backing/
+under-mount/mount/proof/main originals. This is storage capacity, not a source
+byte allocation. Own copied file/directory guard algorithms retain O_EXCL0600,
+single-link, readback, original full9 seals/membership and close ordering;
+stateless native parsing/statfs/node helpers are reused. Exact original
+worker._collect/_CHILDREN/_WAITS prove the unchanged2s/two-line/5s worker wait0.
+Unknown/failed collection retains original buffers, traceback, process and all
+contexts while parent lives, without kill/retry or successful late recovery.
+Negative routing has independent original FD anchors; missing/partial negative
+publication never turns provisional controls into success.
+
+Producer output stays provisional until independent actual kernel0. Root reads
+must match the producer's ORIGINAL marker9 seal and inventory/control seals,
+not a new read baseline. Complete native command lineage, global unique mount/
+backing/node association, exact stdout/PIDs and canonical started/child control
+content are checked. Root retains exact issued parsed-kernel identity with its
+original typed CompletedProcess/query argv/return/stdout/frozen snapshot;
+copied/mutated dictionaries and constructor flags cannot supply that origin.
+Closed reader/code/config/load objects plus immutable private context snapshot
+and original kernel receipt remain in the exact Root issuance registry.
+
+| Finding | Priority | Disposition |
+| --- | --- | --- |
+| SI-BUILD-20261029-075 | P2 | Corrected before release: final native/control verification now repeats AFTER the last code/Git/config callbacks. Postclose named verification compares original backing/domain/mount/system/main/membership/native/device pins through strict readonly verification, closes those readers and rechecks original named seals; no hdiutil callback or new baseline afterward. |
+| SI-BUILD-20261029-076 | P2 | Corrected before release: initial-start attempt is latched and stale kernel cleared BEFORE dispatch. Empty/malformed PID or timeout may follow a real start, so originals remain held unless trustworthy terminal/no-start evidence exists; no cleanup based on old runs0 or missing PID. |
+
+Metadata omission reversal produced expected6 failures/67deselected/.74s;
+old start-attempt behavior produced expected3/70deselected/.40s. Kernel-origin
+integrity omission earlier produced expected3/59deselected/.63s. All reversals
+were memory-only and restored. Two draft undefined V1 names were corrected
+before first tests. Earlier fixture-only failures and exit129 came from the
+test's own PTY open acquiring a controlling terminal; test O_NOCTTY corrected
+that fixture, not production. None is an actual native/source failure.
+
+Final test author73/1.59s and independent peer73/1.63s passed. Main11 relevant
+focused files **557/6.10s** passed before final policy literal; after peer
+freeze Main changed ONLY PENDING to computed policy and registered new-file
+73/1.59s passed. Tests use exact original collector/wait provenance, real
+private PTY and genuine new config/file/code guards; coordinator APFS/device
+facts are an explicitly NAMED FABRICATED boundary, not actual APFS proof.
+Causal temporary backing/root/system/main seals and metadata audits remain
+real within that fixture. Sanitized-env/OS-network-denied/no cache/bytecode;
+no complete lane/repository suite or Claude review ran. Main94 source/test
+in-memory compile plus wrapper/body compile, exact AST closure7, old-six HEAD
+byte equality, actual-root canonical job3328bytes<=4096, wrapper1771bytes,
+historical-prefix and whitespace checks passed.
+
+Policy8e3ba4e2e3efb8d9724bc89485ab6017f830d22a0053455dd331b705698e0eb5;
+final sourcebd82149c4bdca92dd4ea7f270f8a078d3a38f6e3e49b071170576887c430c0cc;
+testf52ed7f84c5e14546d783c2998f0a1aca6902fe7ba4aa157b0da0c62add79bde.
+Peer reviewed pre-literal source1532348abf929d88593f7aca671ce337c9411ded684916210e48abb7e8faf1e4.
+Actual proof is PENDING. After clean commit, exact matching actual/tracking
+F27 and fresh bootstrap/domain/job absence113, ONE registered coordinate-proof
+may run with all authors/tests frozen. Require genuine actual parent kernel0,
+original inner wait0, all original APFS/control/code/context/cleanup/postclose
+checks and no negative before the new closed IN-MEMORY source-free type.
+
+The parent-seeded main directory must remain empty and match its original9
+seal. Durable Main receipt WRITING/READMISSION IS UNAVAILABLE; SourceAUTH and
+capture mode stay blocked even if this prerequisite succeeds. No backtest
+readiness/data admission or authority to issue another source claim follows.
+All existing data/spent and unknown charges, permanent exposure8START/16MiB,
+count84005/4GiB and DAILY's separate existing residual envelope are preserved.
+Source START/HTTP/key0, actual looks0/0/exploratory0, alpha0, permanent look IDs
+none, QC/Safari0, purchases0 and pushes0 remain in this continuation.
+
+Pre-commit staging check caught a trailing blank line in the NEW test; the
+commit did not run. Main removed only that extra EOF blank, with no semantic
+change. Final committed test SHA37dac51a27b60f511721e17eb9e29779ce72944e78c95a0cf2363478b2b8b86a;
+the f52ed7... test hash above identifies the prior validated pre-whitespace
+bytes. Source/policy and behavioral validation are unchanged. Historical
+committed record prefix remains untouched.
